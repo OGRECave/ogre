@@ -208,16 +208,14 @@ namespace Ogre {
             return the first one in the technique list which is supported by the hardware.
         */
         Technique* createTechnique(void);
-        /** Gets the indexed technique.
-         * @deprecated use getTechniques()  */
-        Technique* getTechnique(unsigned short index) const;
+        /** Gets the indexed technique. */
+        Technique* getTechnique(size_t index) const { return mTechniques.at(index); }
         /** searches for the named technique.
             Return 0 if technique with name is not found
         */
         Technique* getTechnique(const String& name) const;
-        /** Retrieves the number of techniques.
-         * @deprecated use getTechniques()  */
-        unsigned short getNumTechniques(void) const;
+        /** Retrieves the number of techniques.  */
+        size_t getNumTechniques(void) const { return mTechniques.size(); }
         /** Removes the technique at the given index. */        
         void removeTechnique(unsigned short index);     
         /** Removes all the techniques in this Material. */
@@ -244,12 +242,10 @@ namespace Ogre {
         /// @deprecated use getSupportedTechniques()
         OGRE_DEPRECATED TechniqueIterator getSupportedTechniqueIterator(void);
         
-        /** Gets the indexed supported technique.
-         * @deprecated use getSupportedTechniques() */
-        OGRE_DEPRECATED Technique* getSupportedTechnique(unsigned short index);
-        /** Retrieves the number of supported techniques.
-         * @deprecated use getSupportedTechniques() */
-        OGRE_DEPRECATED unsigned short getNumSupportedTechniques(void) const;
+        /** Gets the indexed supported technique. */
+        Technique* getSupportedTechnique(size_t index) const { return mSupportedTechniques.at(index); }
+        /** Retrieves the number of supported techniques. */
+        size_t getNumSupportedTechniques(void) const { return mSupportedTechniques.size(); }
         /** Gets a string explaining why any techniques are not supported. */
         const String& getUnsupportedTechniquesExplanation() const { return mUnsupportedReasons; }
 

@@ -515,11 +515,9 @@ namespace Ogre
         */
         const std::vector<ManualObjectSection*>& getSections() const { return mSectionList; }
 
-        /// @deprecated use getSections()
-        OGRE_DEPRECATED ManualObjectSection* getSection(unsigned int index) const;
+        ManualObjectSection* getSection(size_t index) const { return mSectionList.at(index); }
 
-        /// @deprecated use getSections()
-        OGRE_DEPRECATED unsigned int getNumSections(void) const;
+        size_t getNumSections(void) const { return mSectionList.size(); }
 
 
         /** Sets whether or not to keep the original declaration order when 

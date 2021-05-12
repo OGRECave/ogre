@@ -556,9 +556,8 @@ namespace Ogre {
             Throws an exception if the TextureUnitState is attached to another Pass.*/
         void addTextureUnitState(TextureUnitState* state);
         /** Retrieves a const pointer to a texture unit state.
-         * @deprecated use getTextureUnitStates()
          */
-        TextureUnitState* getTextureUnitState(unsigned short index) const;
+        TextureUnitState* getTextureUnitState(size_t index) const { return mTextureUnitStates.at(index); }
         /** Retrieves the Texture Unit State matching name.
             Returns 0 if name match is not found.
         */
@@ -595,13 +594,8 @@ namespace Ogre {
          */
         void removeAllTextureUnitStates(void);
 
-        /** Returns the number of texture unit settings.
-         * @deprecated use getTextureUnitStates()
-         */
-        unsigned short getNumTextureUnitStates(void) const
-        {
-            return static_cast<unsigned short>(mTextureUnitStates.size());
-        }
+        /** Returns the number of texture unit settings */
+        size_t getNumTextureUnitStates(void) const { return mTextureUnitStates.size(); }
 
         /** Gets the 'nth' texture which references the given content type.
             @remarks

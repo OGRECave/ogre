@@ -129,7 +129,7 @@ namespace Ogre {
         */
         virtual void setInitialColour(size_t chainIndex, float r, float g, float b, float a = 1.0);
         /** Get the starting ribbon colour. */
-        virtual const ColourValue& getInitialColour(size_t chainIndex) const;
+        const ColourValue& getInitialColour(size_t chainIndex) const { return mInitialColour.at(chainIndex); }
 
         /** Enables / disables fading the trail using colour. 
         @param chainIndex The index of the chain
@@ -143,7 +143,7 @@ namespace Ogre {
         */
         virtual void setInitialWidth(size_t chainIndex, Real width);
         /** Get the starting ribbon width in world units. */
-        virtual Real getInitialWidth(size_t chainIndex) const;
+        Real getInitialWidth(size_t chainIndex) const { return mInitialWidth.at(chainIndex); }
         
         /** Set the change in ribbon width per second. 
         @param chainIndex The index of the chain
@@ -151,7 +151,7 @@ namespace Ogre {
         */
         virtual void setWidthChange(size_t chainIndex, Real widthDeltaPerSecond);
         /** Get the change in ribbon width per second. */
-        virtual Real getWidthChange(size_t chainIndex) const;
+        Real getWidthChange(size_t chainIndex) const { return mDeltaWidth.at(chainIndex); }
 
         /** Enables / disables fading the trail using colour. 
         @param chainIndex The index of the chain
@@ -160,7 +160,7 @@ namespace Ogre {
         virtual void setColourChange(size_t chainIndex, float r, float g, float b, float a);
 
         /** Get the per-second fading amount */
-        virtual const ColourValue& getColourChange(size_t chainIndex) const;
+        const ColourValue& getColourChange(size_t chainIndex) const { return mDeltaColour.at(chainIndex); }
 
         /// @see Node::Listener::nodeUpdated
         void nodeUpdated(const Node* node);

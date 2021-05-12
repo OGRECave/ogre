@@ -238,12 +238,6 @@ namespace Ogre {
         return t;
     }
     //-----------------------------------------------------------------------
-    Technique* Material::getTechnique(unsigned short index) const
-    {
-        assert (index < mTechniques.size() && "Index out of bounds.");
-        return mTechniques[index];
-    }
-    //-----------------------------------------------------------------------
     Technique* Material::getTechnique(const String& name) const
     {
         Techniques::const_iterator i    = mTechniques.begin();
@@ -262,22 +256,6 @@ namespace Ogre {
         }
 
         return foundTechnique;
-    }
-    //-----------------------------------------------------------------------   
-    unsigned short Material::getNumTechniques(void) const
-    {
-        return static_cast<unsigned short>(mTechniques.size());
-    }
-    //-----------------------------------------------------------------------
-    Technique* Material::getSupportedTechnique(unsigned short index)
-    {
-        assert (index < mSupportedTechniques.size() && "Index out of bounds.");
-        return mSupportedTechniques[index];
-    }
-    //-----------------------------------------------------------------------   
-    unsigned short Material::getNumSupportedTechniques(void) const
-    {
-        return static_cast<unsigned short>(mSupportedTechniques.size());
     }
     //-----------------------------------------------------------------------
     unsigned short Material::getNumLodLevels(unsigned short schemeIndex) const

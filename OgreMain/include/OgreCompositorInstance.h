@@ -245,11 +245,11 @@ namespace Ogre {
         
         /** Get Compositor of which this is an instance
         */
-        Compositor *getCompositor();
+        Compositor *getCompositor() const { return mCompositor; }
         
         /** Get CompositionTechnique used by this instance
         */
-        CompositionTechnique *getTechnique();
+        CompositionTechnique *getTechnique() const { return mTechnique; }
 
         /** Change the technique we're using to render this compositor. 
         @param tech

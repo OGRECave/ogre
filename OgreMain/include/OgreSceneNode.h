@@ -134,21 +134,17 @@ namespace Ogre {
         virtual void attachObject(MovableObject* obj);
 
         /** Reports the number of objects attached to this node.
-        @deprecated use getAttachedObjects()
         */
-        unsigned short numAttachedObjects(void) const;
+        size_t numAttachedObjects(void) const { return mObjectsByName.size(); }
 
-        /** Retrieves a pointer to an attached object.
-        @remarks Retrieves by index, see alternate version to retrieve by name. The index
-        of an object may change as other objects are added / removed.
-        @deprecated use getAttachedObjects()
+        /** Retrieves a pointer to an attached object by index
+        @note The index of an object may change as other objects are added / removed.
         */
-        MovableObject* getAttachedObject(unsigned short index);
+        MovableObject* getAttachedObject(size_t index) const { return mObjectsByName.at(index); }
 
-        /** Retrieves a pointer to an attached object.
-        @remarks Retrieves by object name, see alternate version to retrieve by index.
+        /** Retrieves a pointer to an attached object by name
         */
-        MovableObject* getAttachedObject(const String& name);
+        MovableObject* getAttachedObject(const String& name) const;
 
         /** Detaches the indexed object from this scene node.
         @remarks

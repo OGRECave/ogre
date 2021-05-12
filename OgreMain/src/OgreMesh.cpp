@@ -2396,22 +2396,9 @@ namespace Ogre {
         return retPose;
     }
     //---------------------------------------------------------------------
-    Pose* Mesh::getPose(ushort index)
+    Pose* Mesh::getPose(const String& name) const
     {
-        if (index >= mPoseList.size())
-        {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-                "Index out of bounds",
-                "Mesh::getPose");
-        }
-
-        return mPoseList[index];
-
-    }
-    //---------------------------------------------------------------------
-    Pose* Mesh::getPose(const String& name)
-    {
-        for (PoseList::iterator i = mPoseList.begin(); i != mPoseList.end(); ++i)
+        for (auto i = mPoseList.begin(); i != mPoseList.end(); ++i)
         {
             if ((*i)->getName() == name)
                 return *i;

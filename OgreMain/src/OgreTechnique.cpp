@@ -299,12 +299,6 @@ namespace Ogre {
         return newPass;
     }
     //-----------------------------------------------------------------------------
-    Pass* Technique::getPass(unsigned short index) const
-    {
-        assert(index < mPasses.size() && "Index out of bounds");
-        return mPasses[index];
-    }
-    //-----------------------------------------------------------------------------
     Pass* Technique::getPass(const String& name) const
     {
         Passes::const_iterator i    = mPasses.begin();
@@ -323,11 +317,6 @@ namespace Ogre {
         }
 
         return foundPass;
-    }
-    //-----------------------------------------------------------------------------
-    unsigned short Technique::getNumPasses(void) const
-    {
-        return static_cast<unsigned short>(mPasses.size());
     }
     //-----------------------------------------------------------------------------
     void Technique::removePass(unsigned short index)

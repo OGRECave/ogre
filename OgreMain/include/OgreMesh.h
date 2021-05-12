@@ -952,14 +952,12 @@ namespace Ogre {
             A new Pose ready for population.
         */
         Pose* createPose(ushort target, const String& name = BLANKSTRING);
-        /** Get the number of poses.
-         * @deprecated use getPoseList() */
-        OGRE_DEPRECATED size_t getPoseCount(void) const { return mPoseList.size(); }
-        /** Retrieve an existing Pose by index.
-         * @deprecated use getPoseList() */
-        OGRE_DEPRECATED Pose* getPose(ushort index);
+        /** Get the number of poses */
+        size_t getPoseCount(void) const { return mPoseList.size(); }
+        /** Retrieve an existing Pose by index */
+        Pose* getPose(size_t index) const { return mPoseList.at(index); }
         /** Retrieve an existing Pose by name.*/
-        Pose* getPose(const String& name);
+        Pose* getPose(const String& name) const;
         /** Destroy a pose by index.
         @note
             This will invalidate any animation tracks referring to this pose or those after it.

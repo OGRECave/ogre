@@ -231,16 +231,6 @@ namespace Ogre
         mInitialColour[chainIndex].a = a;
     }
     //-----------------------------------------------------------------------
-    const ColourValue& RibbonTrail::getInitialColour(size_t chainIndex) const
-    {
-        if (chainIndex >= mChainCount)
-        {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
-                "chainIndex out of bounds", "RibbonTrail::getInitialColour");
-        }
-        return mInitialColour[chainIndex];
-    }
-    //-----------------------------------------------------------------------
     void RibbonTrail::setInitialWidth(size_t chainIndex, Real width)
     {
         if (chainIndex >= mChainCount)
@@ -249,16 +239,6 @@ namespace Ogre
                 "chainIndex out of bounds", "RibbonTrail::setInitialWidth");
         }
         mInitialWidth[chainIndex] = width;
-    }
-    //-----------------------------------------------------------------------
-    Real RibbonTrail::getInitialWidth(size_t chainIndex) const
-    {
-        if (chainIndex >= mChainCount)
-        {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
-                "chainIndex out of bounds", "RibbonTrail::getInitialWidth");
-        }
-        return mInitialWidth[chainIndex];
     }
     //-----------------------------------------------------------------------
     void RibbonTrail::setColourChange(size_t chainIndex, const ColourValue& valuePerSecond)
@@ -283,16 +263,6 @@ namespace Ogre
 
     }
     //-----------------------------------------------------------------------
-    const ColourValue& RibbonTrail::getColourChange(size_t chainIndex) const
-    {
-        if (chainIndex >= mChainCount)
-        {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
-                "chainIndex out of bounds", "RibbonTrail::getColourChange");
-        }
-        return mDeltaColour[chainIndex];
-    }
-    //-----------------------------------------------------------------------
     void RibbonTrail::setWidthChange(size_t chainIndex, Real widthDeltaPerSecond)
     {
         if (chainIndex >= mChainCount)
@@ -302,17 +272,6 @@ namespace Ogre
         }
         mDeltaWidth[chainIndex] = widthDeltaPerSecond;
         manageController();
-    }
-    //-----------------------------------------------------------------------
-    Real RibbonTrail::getWidthChange(size_t chainIndex) const
-    {
-        if (chainIndex >= mChainCount)
-        {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
-                "chainIndex out of bounds", "RibbonTrail::getWidthChange");
-        }
-        return mDeltaWidth[chainIndex];
-
     }
     //-----------------------------------------------------------------------
     void RibbonTrail::manageController(void)

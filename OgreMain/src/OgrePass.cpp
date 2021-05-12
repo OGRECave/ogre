@@ -500,13 +500,6 @@ namespace Ogre {
             mContentTypeLookupBuilt = false;
         }
     }
-    //-----------------------------------------------------------------------
-    TextureUnitState* Pass::getTextureUnitState(unsigned short index) const
-    {
-            OGRE_LOCK_MUTEX(mTexUnitChangeMutex);
-        assert (index < mTextureUnitStates.size() && "Index out of bounds");
-        return mTextureUnitStates[index];
-    }
     //-----------------------------------------------------------------------------
     TextureUnitState* Pass::getTextureUnitState(const String& name) const
     {

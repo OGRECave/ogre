@@ -147,10 +147,10 @@ namespace Ogre
         unsigned short getHandle(void) const { return mHandle; }
 
         /** Returns the number of keyframes in this animation. */
-        virtual unsigned short getNumKeyFrames(void) const;
+        size_t getNumKeyFrames(void) const { return mKeyFrames.size(); }
 
         /** Returns the KeyFrame at the specified index. */
-        virtual KeyFrame* getKeyFrame(unsigned short index) const;
+        KeyFrame* getKeyFrame(size_t index) const { return mKeyFrames.at(index); }
 
         /** Gets the 2 KeyFrame objects which are active at the time given, and the blend value between them.
         @remarks
