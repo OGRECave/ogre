@@ -119,28 +119,11 @@ namespace Ogre {
         needUpdate();
     }
     //-----------------------------------------------------------------------
-    unsigned short SceneNode::numAttachedObjects(void) const
-    {
-        return static_cast< unsigned short >( mObjectsByName.size() );
-    }
-    //-----------------------------------------------------------------------
-    MovableObject* SceneNode::getAttachedObject(unsigned short index)
-    {
-        if (index < mObjectsByName.size())
-        {
-            return mObjectsByName[index];
-        }
-        else
-        {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Object index out of bounds.", "SceneNode::getAttachedObject");
-        }
-    }
-    //-----------------------------------------------------------------------
-    MovableObject* SceneNode::getAttachedObject(const String& name)
+    MovableObject* SceneNode::getAttachedObject(const String& name) const
     {
         // Look up 
         MovableObjectNameExists pred = {name};
-        ObjectMap::iterator i = std::find_if(mObjectsByName.begin(), mObjectsByName.end(), pred);
+        auto i = std::find_if(mObjectsByName.begin(), mObjectsByName.end(), pred);
 
         if (i == mObjectsByName.end())
         {

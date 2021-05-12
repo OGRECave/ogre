@@ -139,19 +139,6 @@ void CompositionTargetPass::removePass(size_t index)
     mPasses.erase(i);
 }
 //-----------------------------------------------------------------------
-
-CompositionPass *CompositionTargetPass::getPass(size_t index)
-{
-    assert (index < mPasses.size() && "Index out of bounds.");
-    return mPasses[index];
-}
-//-----------------------------------------------------------------------
-
-size_t CompositionTargetPass::getNumPasses()
-{
-    return mPasses.size();
-}
-//-----------------------------------------------------------------------
 void CompositionTargetPass::removeAllPasses()
 {
     Passes::iterator i, iend;

@@ -54,19 +54,6 @@ namespace Ogre {
         removeAllKeyFrames();
     }
     //---------------------------------------------------------------------
-    unsigned short AnimationTrack::getNumKeyFrames(void) const
-    {
-        return (unsigned short)mKeyFrames.size();
-    }
-    //---------------------------------------------------------------------
-    KeyFrame* AnimationTrack::getKeyFrame(unsigned short index) const
-    {
-        // If you hit this assert, then the keyframe index is out of bounds
-        assert( index < (ushort)mKeyFrames.size() );
-
-        return mKeyFrames[index];
-    }
-    //---------------------------------------------------------------------
     Real AnimationTrack::getKeyFramesAtTime(const TimeIndex& timeIndex, KeyFrame** keyFrame1, KeyFrame** keyFrame2,
         unsigned short* firstKeyIndex) const
     {

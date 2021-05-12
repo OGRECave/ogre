@@ -180,16 +180,14 @@ namespace Ogre {
             enough facilities for what you're asking for.
         */
         Pass* createPass(void);
-        /** Retrieves the Pass with the given index.
-         * @deprecated use getPasses() */
-        Pass* getPass(unsigned short index) const;
+        /** Retrieves the Pass with the given index.*/
+        Pass* getPass(size_t index) const { return mPasses.at(index); }
         /** Retrieves the Pass matching name.
             Returns 0 if name match is not found.
         */
         Pass* getPass(const String& name) const;
-        /** Retrieves the number of passes.
-         * @deprecated use getPasses() */
-        unsigned short getNumPasses(void) const;
+        /** Retrieves the number of passes. */
+        size_t getNumPasses(void) const { return mPasses.size(); }
         /** Removes the Pass with the given index. */
         void removePass(unsigned short index);
         /** Removes all Passes from this Technique. */

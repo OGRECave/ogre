@@ -359,9 +359,8 @@ namespace Ogre {
         const MeshPtr& getMesh(void) const;
 
         /** Gets a pointer to a SubEntity, ie a part of an Entity.
-         @deprecated use getSubEntities()
         */
-        SubEntity* getSubEntity(size_t index) const;
+        SubEntity* getSubEntity(size_t index) const { return mSubEntityList.at(index); }
 
         /** Gets a pointer to a SubEntity by name
         @remarks 
@@ -370,9 +369,8 @@ namespace Ogre {
         SubEntity* getSubEntity( const String& name ) const;
 
         /** Retrieves the number of SubEntity objects making up this entity.
-        * @deprecated use getSubEntities()
         */
-        size_t getNumSubEntities(void) const;
+        size_t getNumSubEntities(void) const { return mSubEntityList.size(); }
 
         /** Retrieves SubEntity objects making up this entity.
         */

@@ -294,24 +294,10 @@ namespace Ogre {
         return mMesh;
     }
     //-----------------------------------------------------------------------
-    SubEntity* Entity::getSubEntity(size_t index) const
-    {
-        if (index >= mSubEntityList.size())
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-                        "Index out of bounds.",
-                        "Entity::getSubEntity");
-        return mSubEntityList[index];
-    }
-    //-----------------------------------------------------------------------
     SubEntity* Entity::getSubEntity(const String& name) const
     {
         ushort index = mMesh->_getSubMeshIndex(name);
         return getSubEntity(index);
-    }
-    //-----------------------------------------------------------------------
-    size_t Entity::getNumSubEntities(void) const
-    {
-        return mSubEntityList.size();
     }
     //-----------------------------------------------------------------------
     Entity* Entity::clone( const String& newName) const

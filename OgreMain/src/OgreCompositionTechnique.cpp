@@ -63,19 +63,11 @@ void CompositionTechnique::removeTextureDefinition(size_t index)
     OGRE_DELETE (*i);
     mTextureDefinitions.erase(i);
 }
-//-----------------------------------------------------------------------
-
-CompositionTechnique::TextureDefinition *CompositionTechnique::getTextureDefinition(size_t index)
-{
-    assert (index < mTextureDefinitions.size() && "Index out of bounds.");
-    return mTextureDefinitions[index];
-}
 //---------------------------------------------------------------------
-CompositionTechnique::TextureDefinition *CompositionTechnique::getTextureDefinition(const String& name)
+CompositionTechnique::TextureDefinition *CompositionTechnique::getTextureDefinition(const String& name) const
 {
-    TextureDefinitions::iterator i, iend;
-    iend = mTextureDefinitions.end();
-    for (i = mTextureDefinitions.begin(); i != iend; ++i)
+    auto iend = mTextureDefinitions.end();
+    for (auto i = mTextureDefinitions.begin(); i != iend; ++i)
     {
         if ((*i)->name == name)
             return *i;
@@ -83,12 +75,6 @@ CompositionTechnique::TextureDefinition *CompositionTechnique::getTextureDefinit
 
     return 0;
 
-}
-//-----------------------------------------------------------------------
-
-size_t CompositionTechnique::getNumTextureDefinitions()
-{
-    return mTextureDefinitions.size();
 }
 //-----------------------------------------------------------------------
 void CompositionTechnique::removeAllTextureDefinitions()
@@ -124,19 +110,6 @@ void CompositionTechnique::removeTargetPass(size_t index)
     mTargetPasses.erase(i);
 }
 //-----------------------------------------------------------------------
-
-CompositionTargetPass *CompositionTechnique::getTargetPass(size_t index)
-{
-    assert (index < mTargetPasses.size() && "Index out of bounds.");
-    return mTargetPasses[index];
-}
-//-----------------------------------------------------------------------
-
-size_t CompositionTechnique::getNumTargetPasses()
-{
-    return mTargetPasses.size();
-}
-//-----------------------------------------------------------------------
 void CompositionTechnique::removeAllTargetPasses()
 {
     TargetPasses::iterator i, iend;
@@ -151,11 +124,6 @@ void CompositionTechnique::removeAllTargetPasses()
 CompositionTechnique::TargetPassIterator CompositionTechnique::getTargetPassIterator(void)
 {
     return TargetPassIterator(mTargetPasses.begin(), mTargetPasses.end());
-}
-//-----------------------------------------------------------------------
-CompositionTargetPass *CompositionTechnique::getOutputTargetPass()
-{
-    return mOutputTarget;
 }
 //-----------------------------------------------------------------------
 bool CompositionTechnique::isSupported(bool acceptTextureDegradation)

@@ -431,7 +431,7 @@ void MeshSerializerTests::assertMeshClone(Mesh* a, Mesh* b, MeshVersion version 
             EXPECT_EQ(bList.at(it->first)->getAnimationType(), it->second->getAnimationType());
             ASSERT_EQ(bList.at(it->first)->getNumKeyFrames(), it->second->getNumKeyFrames());
 
-            for (int j = 0; j < it->second->getNumKeyFrames(); j++)
+            for (size_t j = 0; j < it->second->getNumKeyFrames(); j++)
             {
                 VertexPoseKeyFrame* aKeyFrame = it->second->getVertexPoseKeyFrame(j);
                 VertexPoseKeyFrame* bKeyFrame = bList.at(it->first)->getVertexPoseKeyFrame(j);

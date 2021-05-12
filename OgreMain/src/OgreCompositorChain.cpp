@@ -215,15 +215,9 @@ void CompositorChain::_queuedOperation(CompositorInstance::RenderSystemOperation
 
 }
 //-----------------------------------------------------------------------
-CompositorInstance *CompositorChain::getCompositor(size_t index)
+size_t CompositorChain::getCompositorPosition(const String& name) const
 {
-    assert (index < mInstances.size() && "Index out of bounds.");
-    return mInstances[index];
-}
-//-----------------------------------------------------------------------
-size_t CompositorChain::getCompositorPosition(const String& name)
-{
-    for (Instances::iterator it = mInstances.begin(); it != mInstances.end(); ++it) 
+    for (auto it = mInstances.begin(); it != mInstances.end(); ++it)
     {
         if ((*it)->getCompositor()->getName() == name) 
         {
@@ -232,7 +226,7 @@ size_t CompositorChain::getCompositorPosition(const String& name)
     }
     return NPOS;
 }
-CompositorInstance *CompositorChain::getCompositor(const String& name)
+CompositorInstance *CompositorChain::getCompositor(const String& name) const
 {
     size_t idx = getCompositorPosition(name);
     return idx == NPOS ? NULL : mInstances[idx];

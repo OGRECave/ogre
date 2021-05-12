@@ -98,18 +98,15 @@ namespace Ogre {
         void removeTextureDefinition(size_t idx);
         
         /** Get a local texture definition.
-        @deprecated use getTextureDefinitions()
         */
-        OGRE_DEPRECATED TextureDefinition *getTextureDefinition(size_t idx);
+        TextureDefinition *getTextureDefinition(size_t idx) const { return mTextureDefinitions.at(idx); }
         
         /** Get a local texture definition with a specific name.
         */
-        TextureDefinition *getTextureDefinition(const String& name);
+        TextureDefinition *getTextureDefinition(const String& name) const;
 
-        /** Get the number of local texture definitions.
-        @deprecated use getTextureDefinitions()
-        */
-        OGRE_DEPRECATED size_t getNumTextureDefinitions();
+        /** Get the number of local texture definitions.*/
+        size_t getNumTextureDefinitions() const { return mTextureDefinitions.size(); }
         
         /** Remove all Texture Definitions
         */
@@ -130,14 +127,11 @@ namespace Ogre {
         void removeTargetPass(size_t idx);
         
         /** Get a target pass.
-        @deprecated use getTargetPasses()
         */
-        OGRE_DEPRECATED CompositionTargetPass *getTargetPass(size_t idx);
+        CompositionTargetPass* getTargetPass(size_t idx) const { return mTargetPasses.at(idx); }
         
-        /** Get the number of target passes.
-        @deprecated use getTargetPasses()
-        */
-        OGRE_DEPRECATED size_t getNumTargetPasses();
+        /** Get the number of target passes. */
+        size_t getNumTargetPasses() const { return mTargetPasses.size(); }
         
         /** Remove all target passes.
         */
@@ -151,7 +145,7 @@ namespace Ogre {
         
         /** Get output (final) target pass
          */
-        CompositionTargetPass *getOutputTargetPass();
+        CompositionTargetPass *getOutputTargetPass() const { return mOutputTarget; }
         
         /** Determine if this technique is supported on the current rendering device. 
         @param allowTextureDegradation True to accept a reduction in texture depth

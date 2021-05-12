@@ -71,19 +71,6 @@ void Compositor::removeTechnique(size_t index)
     mCompilationRequired = true;
 }
 //-----------------------------------------------------------------------
-
-CompositionTechnique *Compositor::getTechnique(size_t index)
-{
-    assert (index < mTechniques.size() && "Index out of bounds.");
-    return mTechniques[index];
-}
-//-----------------------------------------------------------------------
-
-size_t Compositor::getNumTechniques()
-{
-    return mTechniques.size();
-}
-//-----------------------------------------------------------------------
 void Compositor::removeAllTechniques()
 {
     Techniques::iterator i, iend;
@@ -100,19 +87,6 @@ void Compositor::removeAllTechniques()
 Compositor::TechniqueIterator Compositor::getTechniqueIterator(void)
 {
     return TechniqueIterator(mTechniques.begin(), mTechniques.end());
-}
-//-----------------------------------------------------------------------
-
-CompositionTechnique *Compositor::getSupportedTechnique(size_t index)
-{
-    assert (index < mSupportedTechniques.size() && "Index out of bounds.");
-    return mSupportedTechniques[index];
-}
-//-----------------------------------------------------------------------
-
-size_t Compositor::getNumSupportedTechniques()
-{
-    return mSupportedTechniques.size();
 }
 //-----------------------------------------------------------------------
 

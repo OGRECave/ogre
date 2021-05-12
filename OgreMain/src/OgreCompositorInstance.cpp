@@ -531,16 +531,6 @@ void CompositorInstance::_compileOutputOperation(TargetOperation &finalState)
     collectPasses(finalState, tpass);
 }
 //-----------------------------------------------------------------------
-Compositor *CompositorInstance::getCompositor()
-{
-    return mCompositor;
-}
-//-----------------------------------------------------------------------
-CompositionTechnique *CompositorInstance::getTechnique()
-{
-    return mTechnique;
-}
-//-----------------------------------------------------------------------
 void CompositorInstance::setTechnique(CompositionTechnique* tech, bool reuseTextures)
 {
     if (mTechnique != tech)

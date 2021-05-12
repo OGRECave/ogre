@@ -551,20 +551,6 @@ ManualObject::ManualObject(const String& name)
         // Save setting for future sections
         mUseIdentityView = useIdentityView;
     }
-    //-----------------------------------------------------------------------
-    ManualObject::ManualObjectSection* ManualObject::getSection(unsigned int inIndex) const
-    {
-        if (inIndex >= mSectionList.size())
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-            "Index out of bounds.",
-            "ManualObject::getSection");
-        return mSectionList[inIndex];
-    }
-    //-----------------------------------------------------------------------
-    unsigned int ManualObject::getNumSections(void) const
-    {
-        return static_cast< unsigned int >( mSectionList.size() );
-    }
     //-----------------------------------------------------------------------------
     const String& ManualObject::getMovableType(void) const
     {
