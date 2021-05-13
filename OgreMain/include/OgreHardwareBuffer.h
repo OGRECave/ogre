@@ -41,7 +41,7 @@ namespace Ogre {
     *  @{
     */
     /// Enums describing buffer usage
-    enum HardwareBufferUsage
+    enum HardwareBufferUsage : uint8
     {
         /** Memory mappable on host and cached
          * @par Usage
@@ -110,7 +110,7 @@ namespace Ogre {
     {
 
         public:
-            typedef int Usage;
+            typedef uint8 Usage;
             /// Rather use HardwareBufferUsage
             enum UsageEnum
             {
@@ -130,7 +130,7 @@ namespace Ogre {
                 HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE = HBU_CPU_TO_GPU,
             };
             /// Locking options
-            enum LockOptions
+            enum LockOptions : uint8
             {
                 /** Normal mode, ie allows read/write and contents are preserved.
                  This kind of lock allows reading and writing from the buffer - it’s also the least
@@ -168,8 +168,6 @@ namespace Ogre {
             };
         protected:
             size_t mSizeInBytes;
-            Usage mUsage;
-            bool mIsLocked;
             size_t mLockStart;
             size_t mLockSize;
             std::unique_ptr<HardwareBuffer> mDelegate;
@@ -177,6 +175,8 @@ namespace Ogre {
             bool mSystemMemory;
             bool mShadowUpdated;
             bool mSuppressHardwareUpdate;
+            bool mIsLocked;
+            Usage mUsage;
             
             /// Internal implementation of lock()
             virtual void* lockImpl(size_t offset, size_t length, LockOptions options)
@@ -189,8 +189,8 @@ namespace Ogre {
         public:
             /// Constructor, to be called by HardwareBufferManager only
             HardwareBuffer(Usage usage, bool systemMemory, bool useShadowBuffer)
-                : mSizeInBytes(0), mUsage(usage), mIsLocked(false), mLockStart(0), mLockSize(0),
-                  mSystemMemory(systemMemory), mShadowUpdated(false), mSuppressHardwareUpdate(false)
+                : mSizeInBytes(0), mLockStart(0), mLockSize(0), mSystemMemory(systemMemory),
+                  mShadowUpdated(false), mSuppressHardwareUpdate(false), mIsLocked(false), mUsage(usage)
             {
                 // If use shadow buffer, upgrade to WRITE_ONLY on hardware side
                 if (useShadowBuffer && usage == HBU_CPU_ONLY)

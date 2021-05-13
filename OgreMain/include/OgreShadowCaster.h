@@ -53,8 +53,8 @@ namespace Ogre {
     class _OgreExport ShadowRenderable : public Renderable, public ShadowDataAlloc
     {
     protected:
-        MaterialPtr mMaterial;
         RenderOperation mRenderOp;
+        MaterialPtr mMaterial;
         ShadowRenderable* mLightCap; /// Used only if isLightCapSeparate == true
     public:
         ShadowRenderable() : mMaterial(), mLightCap(0) {}

@@ -45,7 +45,7 @@ namespace Ogre {
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
     AnimationTrack::AnimationTrack(Animation* parent, unsigned short handle) :
-        mParent(parent), mHandle(handle), mListener(0)
+        mParent(parent), mListener(0), mHandle(handle)
     {
     }
     //---------------------------------------------------------------------
@@ -339,17 +339,14 @@ namespace Ogre {
     // Node specialisations
     //---------------------------------------------------------------------
     NodeAnimationTrack::NodeAnimationTrack(Animation* parent, unsigned short handle)
-        : AnimationTrack(parent, handle), mTargetNode(0)
-        , mSplines(0), mSplineBuildNeeded(false)
-        , mUseShortestRotationPath(true)
+        : NodeAnimationTrack(parent, handle, 0)
     {
     }
     //---------------------------------------------------------------------
-    NodeAnimationTrack::NodeAnimationTrack(Animation* parent, unsigned short handle,
-        Node* targetNode)
-        : AnimationTrack(parent, handle), mTargetNode(targetNode)
-        , mSplines(0), mSplineBuildNeeded(false)
-        , mUseShortestRotationPath(true)
+    NodeAnimationTrack::NodeAnimationTrack(Animation* parent, unsigned short handle, Node* targetNode)
+        : AnimationTrack(parent, handle), mSplineBuildNeeded(false), mUseShortestRotationPath(true),
+          mTargetNode(targetNode), mSplines(0)
+
     {
     }
     //---------------------------------------------------------------------
@@ -688,8 +685,8 @@ namespace Ogre {
         VertexAnimationType animType, VertexData* targetData, TargetMode target)
         : AnimationTrack(parent, handle)
         , mAnimationType(animType)
-        , mTargetVertexData(targetData)
         , mTargetMode(target)
+        , mTargetVertexData(targetData)
     {
     }
     //--------------------------------------------------------------------------

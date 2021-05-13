@@ -51,16 +51,16 @@ namespace Ogre {
     */
     class _OgreExport HardwarePixelBuffer : public HardwareBuffer
     {
-    protected: 
+    protected:
+        LockOptions mCurrentLockOptions;
         /// Extents
         uint32 mWidth, mHeight, mDepth;
-        /// Pitches (offsets between rows and slices)
-        size_t mRowPitch, mSlicePitch;
         /// Internal format
         PixelFormat mFormat;
+        /// Pitches (offsets between rows and slices)
+        size_t mRowPitch, mSlicePitch;
         /// Currently locked region (local coords)
         PixelBox mCurrentLock;
-        LockOptions mCurrentLockOptions;
         /// The current locked box of this surface (entire surface coords)
         Box mLockedBox;
 

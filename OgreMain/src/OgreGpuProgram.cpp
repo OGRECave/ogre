@@ -99,7 +99,7 @@ namespace Ogre
                            bool isManual, ManualResourceLoader* loader)
         : Resource(creator, name, handle, group, isManual, loader), mType(GPT_VERTEX_PROGRAM), mLoadFromFile(true),
           mSkeletalAnimation(false), mMorphAnimation(false), mVertexTextureFetch(false), mNeedsAdjacencyInfo(false),
-          mCompileError(false), mPoseAnimation(0), mLoadedManualNamedConstants(false)
+          mCompileError(false), mLoadedManualNamedConstants(false), mPoseAnimation(0)
     {
         createParameterMappingStructures();
     }

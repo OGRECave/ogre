@@ -45,7 +45,7 @@ namespace Ogre
     */
     /** Specifies orientation mode.
     */
-    enum OrientationMode
+    enum OrientationMode : uint8
     {
         OR_DEGREE_0       = 0,
         OR_DEGREE_90      = 1,
@@ -59,7 +59,7 @@ namespace Ogre
 
     /** Specifies perspective (realistic) or orthographic (architectural) projection.
     */
-    enum ProjectionType
+    enum ProjectionType : uint8
     {
         PT_ORTHOGRAPHIC,
         PT_PERSPECTIVE
@@ -67,7 +67,7 @@ namespace Ogre
 
     /** Worldspace clipping planes.
     */
-    enum FrustumPlane
+    enum FrustumPlane : uint8
     {
         FRUSTUM_PLANE_NEAR   = 0,
         FRUSTUM_PLANE_FAR    = 1,
@@ -136,8 +136,6 @@ namespace Ogre
         bool mFrustumExtentsManuallySet;
         /// Frustum extents
         mutable RealRect mExtents;
-        /// Frustum orientation mode
-        mutable OrientationMode mOrientationMode;
         
         // Internal functions for calcs
         RealRect calcProjectionParameters() const;
@@ -166,11 +164,16 @@ namespace Ogre
         /// Shared class-level name for Movable type
         static String msMovableType;
 
-        mutable AxisAlignedBox mBoundingBox;
         mutable VertexData mVertexData;
 
         ColourValue mDebugColour;
         MaterialPtr mMaterial;
+        /// Pointer to a reflection plane (automatically updated)
+        const MovablePlane* mLinkedReflectPlane;
+        /// Pointer to oblique projection plane (automatically updated)
+        const MovablePlane* mLinkedObliqueProjPlane;
+
+        mutable AxisAlignedBox mBoundingBox;
         mutable Vector3 mWorldSpaceCorners[8];
 
         /// Derived reflection matrix
@@ -181,11 +184,6 @@ namespace Ogre
         mutable Plane mLastLinkedReflectionPlane;
         /// Fixed oblique projection plane
         mutable Plane mObliqueProjPlane;
-
-        /// Pointer to a reflection plane (automatically updated)
-        const MovablePlane* mLinkedReflectPlane;
-        /// Pointer to oblique projection plane (automatically updated)
-        const MovablePlane* mLinkedObliqueProjPlane;
         /// Record of the last world-space oblique depth projection plane info used
         mutable Plane mLastLinkedObliqueProjPlane;
 
@@ -193,6 +191,8 @@ namespace Ogre
         bool mReflect;
         /// Is this frustum using an oblique depth projection?
         bool mObliqueDepthProjection;
+        /// Frustum orientation mode
+        mutable OrientationMode mOrientationMode;
 
     public:
 

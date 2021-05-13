@@ -67,13 +67,6 @@ namespace Ogre {
         SubMesh();
         ~SubMesh();
 
-
-        /// Indicates if this submesh shares vertex data with other meshes or whether it has it's own vertices.
-        bool useSharedVertices;
-
-        /// The render operation type used to render this submesh
-        RenderOperation::OperationType operationType;
-
         /** Dedicated vertex data (only valid if useSharedVertices = false).
             @remarks
                 This data is completely owned by this submesh.
@@ -134,6 +127,12 @@ namespace Ogre {
 
         /// Reference to parent Mesh (not a smart pointer so child does not keep parent alive).
         Mesh* parent;
+
+        /// Indicates if this submesh shares vertex data with other meshes or whether it has it's own vertices.
+        bool useSharedVertices;
+
+        /// The render operation type used to render this submesh
+        RenderOperation::OperationType operationType;
 
         /// Sets the name of the Material which this SubMesh will use
         void setMaterialName(const String& matName, const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME );
@@ -228,14 +227,6 @@ namespace Ogre {
 
     private:
 
-        /// the material this SubMesh uses.
-        MaterialPtr mMaterial;
-
-        /// paired list of texture aliases and texture names
-        AliasTextureNamePairList mTextureAliases;
-
-        VertexBoneAssignmentList mBoneAssignments;
-
         /// Flag indicating that bone assignments need to be recompiled
         bool mBoneAssignmentsOutOfDate;
 
@@ -247,6 +238,14 @@ namespace Ogre {
 
         /// Is Build Edges Enabled
         bool mBuildEdgesEnabled;
+
+        /// the material this SubMesh uses.
+        MaterialPtr mMaterial;
+
+        /// paired list of texture aliases and texture names
+        AliasTextureNamePairList mTextureAliases;
+
+        VertexBoneAssignmentList mBoneAssignments;
 
         /// Internal method for removing LOD data
         void removeLodLevels(void);

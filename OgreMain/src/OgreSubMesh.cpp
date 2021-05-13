@@ -30,10 +30,10 @@ THE SOFTWARE.
 namespace Ogre {
     //-----------------------------------------------------------------------
     SubMesh::SubMesh()
-        : useSharedVertices(true)
-        , operationType(RenderOperation::OT_TRIANGLE_LIST)
-        , vertexData(0)
+        : vertexData(0)
         , parent(0)
+        , useSharedVertices(true)
+        , operationType(RenderOperation::OT_TRIANGLE_LIST)
         , mBoneAssignmentsOutOfDate(false)
         , mVertexAnimationType(VAT_NONE)
         , mVertexAnimationIncludesNormals(false)

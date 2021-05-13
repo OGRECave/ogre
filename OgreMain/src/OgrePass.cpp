@@ -119,7 +119,6 @@ namespace Ogre {
     Pass::Pass(Technique* parent, unsigned short index)
         : mParent(parent)
         , mHash(0)
-        , mIndex(index)
         , mAmbient(ColourValue::White)
         , mDiffuse(ColourValue::White)
         , mSpecular(ColourValue::Black)
@@ -145,31 +144,32 @@ namespace Ogre {
         , mPointAttenuationEnabled(false)
         , mContentTypeLookupBuilt(false)
         , mAlphaRejectVal(0)
-        , mDepthFunc(CMPF_LESS_EQUAL)
         , mDepthBiasConstant(0.0f)
         , mDepthBiasSlopeScale(0.0f)
         , mDepthBiasPerIteration(0.0f)
+        , mDepthFunc(CMPF_LESS_EQUAL)
         , mAlphaRejectFunc(CMPF_ALWAYS_PASS)
         , mCullMode(CULL_CLOCKWISE)
         , mManualCullMode(MANUAL_CULL_BACK)
         , mMaxSimultaneousLights(OGRE_MAX_SIMULTANEOUS_LIGHTS)
         , mStartLight(0)
         , mLightsPerIteration(1)
-        , mOnlyLightType(Light::LT_POINT)
+        , mIndex(index)
         , mLightMask(0xFFFFFFFF)
-        , mShadeOptions(SO_GOURAUD)
-        , mPolygonMode(PM_SOLID)
-        , mFogMode(FOG_NONE)
         , mFogColour(ColourValue::White)
         , mFogStart(0.0)
         , mFogEnd(1.0)
         , mFogDensity(0.001)
-        , mPassIterationCount(1)
         , mLineWidth(1.0f)
+        , mPassIterationCount(1)
         , mPointMinSize(0.0f)
         , mPointMaxSize(0.0f)
         , mPointAttenution(1.0f, 1.0f, 0.0f, 0.0f)
+        , mShadeOptions(SO_GOURAUD)
+        , mPolygonMode(PM_SOLID)
         , mIlluminationStage(IS_UNKNOWN)
+        , mOnlyLightType(Light::LT_POINT)
+        , mFogMode(FOG_NONE)
     {
         // init the hash inline
         _recalculateHash();
@@ -177,7 +177,7 @@ namespace Ogre {
 
     //-----------------------------------------------------------------------------
     Pass::Pass(Technique *parent, unsigned short index, const Pass& oth)
-        : mParent(parent), mIndex(index), mQueuedForDeletion(false), mPassIterationCount(1)
+        : mParent(parent), mQueuedForDeletion(false), mIndex(index), mPassIterationCount(1)
     {
         *this = oth;
         mParent = parent;

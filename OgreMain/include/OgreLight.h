@@ -100,7 +100,7 @@ namespace Ogre {
         void _calcTempSquareDist(const Vector3& worldPos);
 
         /// Defines the type of light
-        enum LightTypes
+        enum LightTypes : uint8
         {
             /// Point light sources give off light equally in all directions, so require only position not direction
             LT_POINT = 0,
@@ -569,7 +569,6 @@ namespace Ogre {
         bool isInLightRange(const Ogre::AxisAlignedBox& container) const;
     
     private:
-        LightTypes mLightType;
 #ifdef OGRE_NODELESS_POSITIONING
         Vector3 mPosition;
         Vector3 mDirection;
@@ -593,10 +592,9 @@ namespace Ogre {
         Real mSpotNearClip;
         // range, const, linear, quad coeffs
         Vector4f mAttenuation;
-        Real mPowerScale;
-        size_t mIndexInFrame;
         Real mShadowFarDist;
         Real mShadowFarDistSquared;
+        size_t mIndexInFrame;
         
         Real mShadowNearClipDist;
         Real mShadowFarClipDist;
@@ -615,7 +613,8 @@ namespace Ogre {
         typedef std::map<uint16, Vector4> CustomParameterMap;
         /// Stores the custom parameters for the light.
         CustomParameterMap mCustomParameters;
-
+        Real mPowerScale;
+        LightTypes mLightType;
         bool mOwnShadowFarDist;
     };
 

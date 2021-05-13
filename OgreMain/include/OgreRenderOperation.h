@@ -45,7 +45,7 @@ namespace Ogre {
     class _OgreExport RenderOperation {
     public:
         /// The rendering operation type to perform
-        enum OperationType {
+        enum OperationType : uint8 {
             /// A list of points, 1 vertex per point
             OT_POINT_LIST = 1,
             /// A list of lines, 2 vertices per line
@@ -107,6 +107,15 @@ namespace Ogre {
         /// Vertex source data
         VertexData *vertexData;
 
+        /// Index data - only valid if useIndexes is true
+        IndexData *indexData;
+        /// Debug pointer back to renderable which created this
+        const Renderable* srcRenderable;
+
+        /// The number of instances for the render operation - this option is supported
+        /// in only a part of the render systems.
+        uint32 numberOfInstances;
+
         /// The type of operation to perform
         OperationType operationType;
 
@@ -116,26 +125,16 @@ namespace Ogre {
             If true, then the indexBuffer, indexStart and numIndexes properties must be valid. */
         bool useIndexes;
 
-        /// Index data - only valid if useIndexes is true
-        IndexData *indexData;
-        /// Debug pointer back to renderable which created this
-        const Renderable* srcRenderable;
-
-        /// The number of instances for the render operation - this option is supported
-        /// in only a part of the render systems.
-        size_t numberOfInstances;
-
         /** A flag to indicate that it is possible for this operation to use a global
             vertex instance buffer if available.*/
         bool useGlobalInstancingVertexBufferIsAvailable;
 
-    RenderOperation() :
-        vertexData(0), operationType(OT_TRIANGLE_LIST), useIndexes(true),
-            indexData(0), srcRenderable(0), numberOfInstances(1),
-            useGlobalInstancingVertexBufferIsAvailable(true)
-            {}
-
-
+        RenderOperation()
+            : vertexData(0), indexData(0), srcRenderable(0), numberOfInstances(1),
+              operationType(OT_TRIANGLE_LIST), useIndexes(true),
+              useGlobalInstancingVertexBufferIsAvailable(true)
+        {
+        }
     };
     /** @} */
     /** @} */

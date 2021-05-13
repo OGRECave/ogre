@@ -459,20 +459,19 @@ namespace Ogre {
         uint32 mHeight;
         /// The depth of the image
         uint32 mDepth;
-        /// The size of the image buffer
-        size_t mBufSize;
         /// The number of mipmaps the image contains
         uint32 mNumMipmaps;
+        /// The size of the image buffer
+        size_t mBufSize;
         /// Image specific flags.
         int mFlags;
 
         /// The pixel format of the image
         PixelFormat mFormat;
 
+        uchar* mBuffer;
         /// The number of bytes per pixel
         uchar mPixelSize;
-        uchar* mBuffer;
-
         /// A bool to determine if we delete the buffer or the calling app does
         bool mAutoDelete;
     };

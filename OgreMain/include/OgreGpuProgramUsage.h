@@ -73,7 +73,6 @@ namespace Ogre
     class _OgreExport GpuProgramUsage : public Resource::Listener, public PassAlloc
     {
     private:
-        GpuProgramType mType;
         Pass* mParent;
         /// The program link
         GpuProgramPtr mProgram;
@@ -83,6 +82,7 @@ namespace Ogre
         
         /// Whether to recreate parameters next load
         bool mRecreateParams;
+        GpuProgramType mType;
 
         void recreateParameters();
 

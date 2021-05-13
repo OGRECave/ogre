@@ -90,7 +90,7 @@ namespace Ogre {
 
     /** Enum identifying the texture type
     */
-    enum TextureType
+    enum TextureType : uint8
     {
         /// 1D texture, used in combination with 1D texture coordinates
         TEX_TYPE_1D = 1,
@@ -452,13 +452,10 @@ namespace Ogre {
 
         uint32 mNumRequestedMipmaps;
         uint32 mNumMipmaps;
-        bool mMipmapsHardwareGenerated;
-        float mGamma;
-        bool mHwGamma;
-        uint mFSAA;
-        String mFSAAHint;
 
-        TextureType mTextureType;
+        float mGamma;
+        uint mFSAA;
+
         PixelFormat mFormat;
         int mUsage; /// Bit field, so this can't be TextureUsage
 
@@ -468,12 +465,15 @@ namespace Ogre {
         PixelFormat mDesiredFormat;
         unsigned short mDesiredIntegerBitDepth;
         unsigned short mDesiredFloatBitDepth;
-        bool mTreatLuminanceAsAlpha;
 
+        bool mTreatLuminanceAsAlpha;
         bool mInternalResourcesCreated;
+        bool mMipmapsHardwareGenerated;
+        bool mHwGamma;
 
         /// vector of images that should be loaded (cubemap/ texture array)
         std::vector<String> mLayerNames;
+        String mFSAAHint;
 
         /** Vector of images that were pulled from disk by
             prepareLoad but have yet to be pushed into texture memory
@@ -485,6 +485,8 @@ namespace Ogre {
         /// Vector of pointers to subsurfaces
         typedef std::vector<HardwarePixelBufferSharedPtr> SurfaceList;
         SurfaceList mSurfaceList;
+
+        TextureType mTextureType;
 
         void readImage(LoadedImages& imgs, const String& name, const String& ext, bool haveNPOT);
 

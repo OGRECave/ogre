@@ -39,8 +39,8 @@ namespace Ogre {
     //---------------------------------------------------------------------
     Skeleton::Skeleton()
         : Resource(),
-        mBlendState(ANIMBLEND_AVERAGE),
         mNextAutoHandle(0),
+        mBlendState(ANIMBLEND_AVERAGE),
         mManualBonesDirty(false)
     {
     }
@@ -48,7 +48,7 @@ namespace Ogre {
     Skeleton::Skeleton(ResourceManager* creator, const String& name, ResourceHandle handle,
         const String& group, bool isManual, ManualResourceLoader* loader) 
         : Resource(creator, name, handle, group, isManual, loader), 
-        mBlendState(ANIMBLEND_AVERAGE), mNextAutoHandle(0)
+        mNextAutoHandle(0), mBlendState(ANIMBLEND_AVERAGE)
         // set animation blending to weighted, not cumulative
     {
         if (createParamDictionary("Skeleton"))
