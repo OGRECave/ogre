@@ -566,11 +566,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void VertexData::convertPackedColour(VertexElementType, VertexElementType destType)
     {
-        if (destType != VET_UBYTE4_NORM)
-        {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-                "Invalid destType parameter", "VertexData::convertPackedColour");
-        }
+        OgreAssert(destType == VET_UBYTE4_NORM, "Not supported");
 
         const VertexBufferBinding::VertexBufferBindingMap& bindMap = 
             vertexBufferBinding->getBindings();

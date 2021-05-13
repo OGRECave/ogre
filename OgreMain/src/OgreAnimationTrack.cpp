@@ -695,23 +695,13 @@ namespace Ogre {
     //--------------------------------------------------------------------------
     VertexMorphKeyFrame* VertexAnimationTrack::createVertexMorphKeyFrame(Real timePos)
     {
-        if (mAnimationType != VAT_MORPH)
-        {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-                "Morph keyframes can only be created on vertex tracks of type morph.",
-                "VertexAnimationTrack::createVertexMorphKeyFrame");
-        }
+        OgreAssert(mAnimationType == VAT_MORPH, "Type mismatch");
         return static_cast<VertexMorphKeyFrame*>(createKeyFrame(timePos));
     }
     //--------------------------------------------------------------------------
     VertexPoseKeyFrame* VertexAnimationTrack::createVertexPoseKeyFrame(Real timePos)
     {
-        if (mAnimationType != VAT_POSE)
-        {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-                "Pose keyframes can only be created on vertex tracks of type pose.",
-                "VertexAnimationTrack::createVertexPoseKeyFrame");
-        }
+        OgreAssert(mAnimationType == VAT_POSE, "Type mismatch");
         return static_cast<VertexPoseKeyFrame*>(createKeyFrame(timePos));
     }
     //--------------------------------------------------------------------------
@@ -967,25 +957,13 @@ namespace Ogre {
     //--------------------------------------------------------------------------
     VertexMorphKeyFrame* VertexAnimationTrack::getVertexMorphKeyFrame(unsigned short index) const
     {
-        if (mAnimationType != VAT_MORPH)
-        {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-                "Morph keyframes can only be created on vertex tracks of type morph.",
-                "VertexAnimationTrack::getVertexMorphKeyFrame");
-        }
-
+        OgreAssert(mAnimationType == VAT_MORPH, "Type mismatch");
         return static_cast<VertexMorphKeyFrame*>(getKeyFrame(index));
     }
     //--------------------------------------------------------------------------
     VertexPoseKeyFrame* VertexAnimationTrack::getVertexPoseKeyFrame(unsigned short index) const
     {
-        if (mAnimationType != VAT_POSE)
-        {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-                "Pose keyframes can only be created on vertex tracks of type pose.",
-                "VertexAnimationTrack::getVertexPoseKeyFrame");
-        }
-
+        OgreAssert(mAnimationType == VAT_POSE, "Type mismatch");
         return static_cast<VertexPoseKeyFrame*>(getKeyFrame(index));
     }
     //--------------------------------------------------------------------------

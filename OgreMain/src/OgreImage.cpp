@@ -179,7 +179,7 @@ namespace Ogre {
 
     void Image::setTo(const ColourValue& col)
     {
-        OgreAssert(mBuffer, "image is empty");
+        OgreAssert(mBuffer, "No image data loaded");
         if(col == ColourValue::ZERO)
         {
             memset(mBuffer, 0, getSize());
@@ -197,14 +197,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------------
     Image & Image::flipAroundY()
     {
-        if( !mBuffer )
-        {
-            OGRE_EXCEPT( 
-                Exception::ERR_INTERNAL_ERROR,
-                "Can not flip an uninitialised texture",
-                "Image::flipAroundY" );
-        }
-        
+        OgreAssert(mBuffer, "No image data loaded");
         mNumMipmaps = 0; // Image operations lose precomputed mipmaps
 
         ushort y;
@@ -254,13 +247,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------------
     Image & Image::flipAroundX()
     {
-        if( !mBuffer )
-        {
-            OGRE_EXCEPT( 
-                Exception::ERR_INTERNAL_ERROR,
-                "Can not flip an uninitialised texture",
-                "Image::flipAroundX" );
-        }
+        OgreAssert(mBuffer, "No image data loaded");
         
         mNumMipmaps = 0; // Image operations lose precomputed mipmaps
         PixelUtil::bulkPixelVerticalFlip(getPixelBox());
@@ -291,10 +278,7 @@ namespace Ogre {
             mFlags |= IF_3D_TEXTURE;
         if(numFaces == 6)
             mFlags |= IF_CUBEMAP;
-        if(numFaces != 6 && numFaces != 1)
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
-            "Number of faces currently must be 6 or 1.", 
-            "Image::loadDynamicImage");
+        OgreAssert(numFaces == 6 || numFaces == 1, "Invalid number of faces");
 
         mBufSize = calculateSize(numMipMaps, numFaces, uWidth, uHeight, depth, eFormat);
         mBuffer = pData;
@@ -313,12 +297,7 @@ namespace Ogre {
     {
 
         size_t size = calculateSize(numMipMaps, numFaces, uWidth, uHeight, uDepth, eFormat);
-        if (size != stream->size())
-        {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
-                "Stream size does not match calculated image size", 
-                "Image::loadRawData");
-        }
+        OgreAssert(size == stream->size(), "Wrong stream size");
 
         uchar *buffer = OGRE_ALLOC_T(uchar, size, MEMCATEGORY_GENERAL);
         stream->read(buffer, size);
@@ -486,7 +465,7 @@ namespace Ogre {
         if( gamma == 1.0f )
             return;
 
-        OgreAssert( bpp == 24 || bpp == 32, "only 24/32-bit supported");
+        OgreAssert( bpp == 24 || bpp == 32, "");
 
         uint stride = bpp >> 3;
         
@@ -637,13 +616,8 @@ namespace Ogre {
         // face 1, mip 1
         // face 1, mip 2
         // etc
-        if(mipmap > getNumMipmaps())
-            OGRE_EXCEPT( Exception::ERR_NOT_IMPLEMENTED,
-            "Mipmap index out of range",
-            "Image::getPixelBox" ) ;
-        if(face >= getNumFaces())
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Face index out of range",
-            "Image::getPixelBox");
+        OgreAssert(mipmap <= getNumMipmaps(), "out of range");
+        OgreAssert(face < getNumFaces(), "out of range");
         // Calculate mipmap offset and size
         uint8 *offset = mBuffer;
         // Base offset is number of full faces
@@ -724,7 +698,7 @@ namespace Ogre {
                        rgb.getDepth() == alpha.getDepth(),
                    "Images must be the same dimensions");
         OgreAssert(rgb.getNumMipmaps() == alpha.getNumMipmaps() && rgb.getNumFaces() == alpha.getNumFaces(),
-                   "Images must have the same number of surfaces (faces & mipmaps)");
+                   "Images must have the same number of surfaces");
 
         // Format check
         OgreAssert(PixelUtil::getComponentCount(fmt) == 4, "Target format must have 4 components");

@@ -139,12 +139,7 @@ ManualObject::ManualObject(const String& name)
     void ManualObject::begin(const String& materialName,
         RenderOperation::OperationType opType, const String& groupName)
     {
-        if (mCurrentSection)
-        {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-                "You cannot call begin() again until after you call end()",
-                "ManualObject::begin");
-        }
+        OgreAssert(!mCurrentSection, "You cannot call begin() again until after you call end()");
 
         // Check that a valid material was provided
         MaterialPtr material = MaterialManager::getSingleton().getByName(materialName, groupName);
@@ -172,12 +167,7 @@ ManualObject::ManualObject(const String& name)
     //-----------------------------------------------------------------------------
     void ManualObject::begin(const MaterialPtr& mat, RenderOperation::OperationType opType)
     {
-      if (mCurrentSection)
-      {
-          OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-              "You cannot call begin() again until after you call end()",
-              "ManualObject::begin");
-      }
+      OgreAssert(!mCurrentSection, "You cannot call begin() again until after you call end()");
 
       if (mat)
       {
@@ -201,19 +191,8 @@ ManualObject::ManualObject(const String& name)
     //-----------------------------------------------------------------------------
     void ManualObject::beginUpdate(size_t sectionIndex)
     {
-        if (mCurrentSection)
-        {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-                "You cannot call begin() again until after you call end()",
-                "ManualObject::beginUpdate");
-        }
-        if (sectionIndex >= mSectionList.size())
-        {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-                "Invalid section index - out of range.",
-                "ManualObject::beginUpdate");
-        }
-        mCurrentSection = mSectionList[sectionIndex];
+        OgreAssert(!mCurrentSection, "You cannot call begin() again until after you call end()");
+        mCurrentSection = mSectionList.at(sectionIndex);
         mCurrentUpdating = true;
         mFirstVertex = true;
         mTexCoordIndex = 0;
@@ -342,12 +321,7 @@ ManualObject::ManualObject(const String& name)
     //-----------------------------------------------------------------------------
     ManualObject::ManualObjectSection* ManualObject::end(void)
     {
-        if (!mCurrentSection)
-        {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-                "You cannot call end() until after you call begin()",
-                "ManualObject::end");
-        }
+        OgreAssert(mCurrentSection, "You cannot call end() until after you call begin()");
         if (mTempVertexPending)
         {
             // bake current vertex
@@ -471,46 +445,12 @@ ManualObject::ManualObject(const String& name)
         return result;
     }
     //-----------------------------------------------------------------------------
-    void ManualObject::setMaterialName(size_t idx, const String& name, const String& group)
-    {
-        if (idx >= mSectionList.size())
-        {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-                "Index out of bounds!",
-                "ManualObject::setMaterialName");
-        }
-
-        mSectionList[idx]->setMaterialName(name, group);
-
-    }
-    //-----------------------------------------------------------------------------
-    void ManualObject::setMaterial(size_t subIndex, const MaterialPtr &mat)
-    {
-        if (subIndex >= mSectionList.size())
-        {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-                "Index out of bounds!",
-                "ManualObject::setMaterial");
-        }
-
-        mSectionList[subIndex]->setMaterial(mat);
-    }
-    //-----------------------------------------------------------------------------
     MeshPtr ManualObject::convertToMesh(const String& meshName, const String& groupName)
     {
-        if (mCurrentSection)
-        {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-                "You cannot call convertToMesh() whilst you are in the middle of "
-                "defining the object; call end() first.",
-                "ManualObject::convertToMesh");
-        }
-        if (mSectionList.empty())
-        {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-                "No data defined to convert to a mesh.",
-                "ManualObject::convertToMesh");
-        }
+        OgreAssert(!mCurrentSection, "You cannot call convertToMesh() whilst you are in the middle of "
+                                     "defining the object; call end() first.");
+        OgreAssert(!mSectionList.empty(), "No data defined to convert to a mesh.");
+
         MeshPtr m = MeshManager::getSingleton().createManual(meshName, groupName);
 
         for (auto sec : mSectionList)

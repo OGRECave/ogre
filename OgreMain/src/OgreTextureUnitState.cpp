@@ -330,24 +330,18 @@ namespace Ogre {
     void TextureUnitState::setFrameTextureName(const String& name, unsigned int frameNumber)
     {
         mTextureLoadFailed = false;
-        if (frameNumber < mFramePtrs.size())
-        {
-            mFramePtrs[frameNumber] = retrieveTexture(name);
+        OgreAssert(frameNumber < mFramePtrs.size(), "out of range");
 
-            if (isLoaded())
-            {
-                _load(); // reload
-            }
-            // Tell parent to recalculate hash
-            if( Pass::getHashFunction() == Pass::getBuiltinHashFunction( Pass::MIN_TEXTURE_CHANGE ) )
-            {
-                mParent->_dirtyHash();
-            }
-        }
-        else // raise exception for frameNumber out of bounds
+        mFramePtrs[frameNumber] = retrieveTexture(name);
+
+        if (isLoaded())
         {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "frameNumber parameter value exceeds number of stored frames.",
-                "TextureUnitState::setFrameTextureName");
+            _load(); // reload
+        }
+        // Tell parent to recalculate hash
+        if( Pass::getHashFunction() == Pass::getBuiltinHashFunction( Pass::MIN_TEXTURE_CHANGE ) )
+        {
+            mParent->_dirtyHash();
         }
     }
 
@@ -375,24 +369,17 @@ namespace Ogre {
     void TextureUnitState::deleteFrameTextureName(const size_t frameNumber)
     {
         mTextureLoadFailed = false;
-        if (frameNumber < mFramePtrs.size())
-        {
-            mFramePtrs.erase(mFramePtrs.begin() + frameNumber);
+        OgreAssert(frameNumber < mFramePtrs.size(), "out of range");
+        mFramePtrs.erase(mFramePtrs.begin() + frameNumber);
 
-            if (isLoaded())
-            {
-                _load();
-            }
-            // Tell parent to recalculate hash
-            if( Pass::getHashFunction() == Pass::getBuiltinHashFunction( Pass::MIN_TEXTURE_CHANGE ) )
-            {
-                mParent->_dirtyHash();
-            }
-        }
-        else
+        if (isLoaded())
         {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "frameNumber parameter value exceeds number of stored frames.",
-                "TextureUnitState::deleteFrameTextureName");
+            _load();
+        }
+        // Tell parent to recalculate hash
+        if( Pass::getHashFunction() == Pass::getBuiltinHashFunction( Pass::MIN_TEXTURE_CHANGE ) )
+        {
+            mParent->_dirtyHash();
         }
     }
 
@@ -488,21 +475,13 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void TextureUnitState::setCurrentFrame(unsigned int frameNumber)
     {
-        if (frameNumber < mFramePtrs.size())
+        OgreAssert(frameNumber < mFramePtrs.size(), "out of range");
+        mCurrentFrame = frameNumber;
+        // this will affect the hash
+        if( Pass::getHashFunction() == Pass::getBuiltinHashFunction( Pass::MIN_TEXTURE_CHANGE ) )
         {
-            mCurrentFrame = frameNumber;
-            // this will affect the hash
-            if( Pass::getHashFunction() == Pass::getBuiltinHashFunction( Pass::MIN_TEXTURE_CHANGE ) )
-            {
-                mParent->_dirtyHash();
-            }
+            mParent->_dirtyHash();
         }
-        else
-        {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "frameNumber parameter value exceeds number of stored frames.",
-                "TextureUnitState::setCurrentFrame");
-        }
-
     }
     //-----------------------------------------------------------------------
     unsigned int TextureUnitState::getCurrentFrame(void) const
@@ -517,11 +496,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     const String& TextureUnitState::getFrameTextureName(unsigned int frameNumber) const
     {
-        if (frameNumber >= mFramePtrs.size())
-        {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "frameNumber parameter value exceeds number of stored frames.",
-                "TextureUnitState::getFrameTextureName");
-        }
+        OgreAssert(frameNumber < mFramePtrs.size(), "out of range");
 
         return mFramePtrs[0] ? mFramePtrs[frameNumber]->getName() : BLANKSTRING;
     }

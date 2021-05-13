@@ -521,10 +521,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     RenderWindow* Root::initialise(bool autoCreateWindow, const String& windowTitle, const String& customCapabilitiesConfig)
     {
-        if (!mActiveRenderer)
-            OGRE_EXCEPT(Exception::ERR_INVALID_STATE,
-            "Cannot initialise - no render "
-            "system has been selected.", "Root::initialise");
+        OgreAssert(mActiveRenderer, "Cannot initialise");
 
         if (!mControllerManager)
             mControllerManager.reset(new ControllerManager());
@@ -837,7 +834,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void Root::startRendering(void)
     {
-        OgreAssert(mActiveRenderer != 0, "no RenderSystem");
+        OgreAssert(mActiveRenderer, "no RenderSystem");
 
         mActiveRenderer->_initRenderTargets();
 
@@ -1065,18 +1062,10 @@ namespace Ogre {
     RenderWindow* Root::createRenderWindow(const String &name, unsigned int width, unsigned int height,
             bool fullScreen, const NameValuePairList *miscParams)
     {
-        if (!mIsInitialised)
-        {
-            OGRE_EXCEPT(Exception::ERR_INVALID_STATE,
-            "Cannot create window - Root has not been initialised! "
-            "Make sure to call Root::initialise before creating a window.", "Root::createRenderWindow");
-        }
-        if (!mActiveRenderer)
-        {
-            OGRE_EXCEPT(Exception::ERR_INVALID_STATE,
-            "Cannot create window - no render "
-            "system has been selected.", "Root::createRenderWindow");
-        }
+        OgreAssert(mIsInitialised,
+                   "Cannot create window! Make sure to call Root::initialise before creating a window");
+        OgreAssert(mActiveRenderer, "Cannot create window");
+
         RenderWindow* ret;
         ret = mActiveRenderer->_createRenderWindow(name, width, height, fullScreen, miscParams);
 
@@ -1094,18 +1083,9 @@ namespace Ogre {
     bool Root::createRenderWindows(const RenderWindowDescriptionList& renderWindowDescriptions,
         RenderWindowList& createdWindows)
     {
-        if (!mIsInitialised)
-        {
-            OGRE_EXCEPT(Exception::ERR_INVALID_STATE,
-            "Cannot create window - Root has not been initialised! "
-            "Make sure to call Root::initialise before creating a window.", "Root::createRenderWindows");
-        }
-        if (!mActiveRenderer)
-        {
-            OGRE_EXCEPT(Exception::ERR_INVALID_STATE,
-                "Cannot create render windows - no render "
-                "system has been selected.", "Root::createRenderWindows");
-        }
+        OgreAssert(mIsInitialised,
+                   "Cannot create window! Make sure to call Root::initialise before creating a window");
+        OgreAssert(mActiveRenderer, "Cannot create window");
 
         bool success;
         OGRE_IGNORE_DEPRECATED_BEGIN
@@ -1122,25 +1102,13 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     RenderTarget* Root::detachRenderTarget(RenderTarget* target)
     {
-        if (!mActiveRenderer)
-        {
-            OGRE_EXCEPT(Exception::ERR_INVALID_STATE,
-            "Cannot detach target - no render "
-            "system has been selected.", "Root::detachRenderTarget");
-        }
-
+        OgreAssert(mActiveRenderer, "Cannot detach target");
         return mActiveRenderer->detachRenderTarget( target->getName() );
     }
     //-----------------------------------------------------------------------
     RenderTarget* Root::detachRenderTarget(const String &name)
     {
-        if (!mActiveRenderer)
-        {
-            OGRE_EXCEPT(Exception::ERR_INVALID_STATE,
-            "Cannot detach target - no render "
-            "system has been selected.", "Root::detachRenderTarget");
-        }
-
+        OgreAssert(mActiveRenderer, "Cannot detach target");
         return mActiveRenderer->detachRenderTarget( name );
     }
     //-----------------------------------------------------------------------
@@ -1158,13 +1126,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     RenderTarget* Root::getRenderTarget(const String &name)
     {
-        if (!mActiveRenderer)
-        {
-            OGRE_EXCEPT(Exception::ERR_INVALID_STATE,
-            "Cannot get target - no render "
-            "system has been selected.", "Root::getRenderTarget");
-        }
-
+        OgreAssert(mActiveRenderer, "Cannot get target");
         return mActiveRenderer->getRenderTarget(name);
     }
     //---------------------------------------------------------------------
@@ -1466,12 +1428,8 @@ namespace Ogre {
     //---------------------------------------------------------------------
     unsigned int Root::getDisplayMonitorCount() const
     {
-        if (!mActiveRenderer)
-        {
-            OGRE_EXCEPT(Exception::ERR_INVALID_STATE,
-                "Cannot get display monitor count "
-                "No render system has been selected.", "Root::getDisplayMonitorCount");
-        }
+        OgreAssert(mActiveRenderer,
+                   "Cannot get display monitor count - No render system has been selected");
 
         OGRE_IGNORE_DEPRECATED_BEGIN
         return mActiveRenderer->getDisplayMonitorCount();

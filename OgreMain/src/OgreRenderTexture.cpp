@@ -55,12 +55,7 @@ namespace Ogre
     void RenderTexture::copyContentsToMemory(const Box& src, const PixelBox &dst, FrameBuffer buffer)
     {
         if (buffer == FB_AUTO) buffer = FB_FRONT;
-        if (buffer != FB_FRONT)
-        {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-                        "Invalid buffer.",
-                        "RenderTexture::copyContentsToMemory" );
-        }
+        OgreAssert(buffer == FB_FRONT, "Invalid buffer");
 
         mBuffer->blitToMemory(src, dst);
     }

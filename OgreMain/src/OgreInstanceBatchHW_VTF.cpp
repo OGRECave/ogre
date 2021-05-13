@@ -529,12 +529,9 @@ namespace Ogre
         }
         else
         {
-            if( mManager->getCameraRelativeRendering() )
-            {
-                OGRE_EXCEPT(Exception::ERR_INVALID_STATE, "Camera-relative rendering is incompatible"
-                    " with Instancing's static batches. Disable at least one of them",
-                    "InstanceBatch::_updateRenderQueue");
-            }
+            OgreAssert(!mManager->getCameraRelativeRendering(),
+                       "Camera-relative rendering is incompatible with Instancing's static batches. "
+                       "Disable at least one of them");
 
             //Don't update when we're static
             if( mRenderOperation.numberOfInstances )

@@ -222,14 +222,7 @@ namespace Ogre {
     void BillboardChain::addChainElement(size_t chainIndex,
         const BillboardChain::Element& dtls)
     {
-
-        if (chainIndex >= mChainCount)
-        {
-            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND,
-                "chainIndex out of bounds",
-                "BillboardChain::addChainElement");
-        }
-        ChainSegment& seg = mChainSegmentList[chainIndex];
+        ChainSegment& seg = mChainSegmentList.at(chainIndex);
         if (seg.head == SEGMENT_EMPTY)
         {
             // Tail starts at end, head grows backwards
@@ -274,13 +267,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void BillboardChain::removeChainElement(size_t chainIndex)
     {
-        if (chainIndex >= mChainCount)
-        {
-            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND,
-                "chainIndex out of bounds",
-                "BillboardChain::removeChainElement");
-        }
-        ChainSegment& seg = mChainSegmentList[chainIndex];
+        ChainSegment& seg = mChainSegmentList.at(chainIndex);
         if (seg.head == SEGMENT_EMPTY)
             return; // do nothing, nothing to remove
 
@@ -311,13 +298,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void BillboardChain::clearChain(size_t chainIndex)
     {
-        if (chainIndex >= mChainCount)
-        {
-            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND,
-                "chainIndex out of bounds",
-                "BillboardChain::clearChain");
-        }
-        ChainSegment& seg = mChainSegmentList[chainIndex];
+        ChainSegment& seg = mChainSegmentList.at(chainIndex);
 
         // Just reset head & tail
         seg.tail = seg.head = SEGMENT_EMPTY;
@@ -351,19 +332,8 @@ namespace Ogre {
     void BillboardChain::updateChainElement(size_t chainIndex, size_t elementIndex,
         const BillboardChain::Element& dtls)
     {
-        if (chainIndex >= mChainCount)
-        {
-            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND,
-                "chainIndex out of bounds",
-                "BillboardChain::updateChainElement");
-        }
-        ChainSegment& seg = mChainSegmentList[chainIndex];
-        if (seg.head == SEGMENT_EMPTY)
-        {
-            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND,
-                "Chain segment is empty",
-                "BillboardChain::updateChainElement");
-        }
+        ChainSegment& seg = mChainSegmentList.at(chainIndex);
+        OgreAssert(seg.head != SEGMENT_EMPTY, "Chain segment is empty");
 
         size_t idx = seg.head + elementIndex;
         // adjust for the edge and start
@@ -383,20 +353,8 @@ namespace Ogre {
     const BillboardChain::Element&
     BillboardChain::getChainElement(size_t chainIndex, size_t elementIndex) const
     {
-
-        if (chainIndex >= mChainCount)
-        {
-            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND,
-                "chainIndex out of bounds",
-                "BillboardChain::getChainElement");
-        }
-        const ChainSegment& seg = mChainSegmentList[chainIndex];
-        if (seg.head == SEGMENT_EMPTY)
-        {
-            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND,
-                "Chain segment is empty",
-                "BillboardChain::getChainElement");
-        }
+        const ChainSegment& seg = mChainSegmentList.at(chainIndex);
+        OgreAssert(seg.head != SEGMENT_EMPTY, "Chain segment is empty");
 
         size_t idx = seg.head + elementIndex;
         // adjust for the edge and start
@@ -407,13 +365,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     size_t BillboardChain::getNumChainElements(size_t chainIndex) const
     {
-        if (chainIndex >= mChainCount)
-        {
-            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND,
-                "chainIndex out of bounds",
-                "BillboardChain::getNumChainElements");
-        }
-        const ChainSegment& seg = mChainSegmentList[chainIndex];
+        const ChainSegment& seg = mChainSegmentList.at(chainIndex);
         
         if (seg.head == SEGMENT_EMPTY)
         {

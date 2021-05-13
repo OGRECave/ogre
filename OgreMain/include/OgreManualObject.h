@@ -435,14 +435,20 @@ namespace Ogre
         @param name The name of the new material to use
         @param group The resource group of the new material to use
         */
-        virtual void setMaterialName(size_t subIndex, const String& name,
-            const String & group = ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+        void setMaterialName(size_t subIndex, const String& name,
+            const String & group = ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME)
+        {
+            mSectionList.at(subIndex)->setMaterialName(name, group);
+        }
 
         /** @overload
         @param subIndex The index of the subsection to alter
         @param mat The new material to use
         */
-        virtual void setMaterial(size_t subIndex, const MaterialPtr &mat);
+        void setMaterial(size_t subIndex, const MaterialPtr& mat)
+        {
+            mSectionList.at(subIndex)->setMaterial(mat);
+        }
 
         /** Convert this object to a Mesh. 
         @remarks

@@ -79,11 +79,8 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void SubMesh::addBoneAssignment(const VertexBoneAssignment& vertBoneAssign)
     {
-        if (useSharedVertices)
-        {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "This SubMesh uses shared geometry,  you "
-                "must assign bones to the Mesh, not the SubMesh", "SubMesh.addBoneAssignment");
-        }
+        OgreAssert(!useSharedVertices,
+                   "This SubMesh uses shared geometry, you must assign bones to the Mesh, not the SubMesh");
         mBoneAssignments.emplace(vertBoneAssign.vertexIndex, vertBoneAssign);
         mBoneAssignmentsOutOfDate = true;
     }

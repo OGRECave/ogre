@@ -110,9 +110,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void Frustum::setNearClipDistance(Real nearPlane)
     {
-        if (nearPlane <= 0)
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Near clip distance must be greater than zero.",
-                "Frustum::setNearClipDistance");
+        OgreAssert(nearPlane > 0, "Invalid clip distance");
         mNearDist = nearPlane;
         invalidateFrustum();
     }
@@ -142,13 +140,7 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void Frustum::setFocalLength(Real focalLength)
     {
-        if (focalLength <= 0)
-        {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-                "Focal length must be greater than zero.",
-                "Frustum::setFocalLength");
-        }
-
+        OgreAssert(focalLength > 0, "Invalid focal length");
         mFocalLength = focalLength;
         invalidateFrustum();
     }

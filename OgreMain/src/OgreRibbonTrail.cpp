@@ -164,13 +164,8 @@ namespace Ogre
     //-----------------------------------------------------------------------
     void RibbonTrail::setNumberOfChains(size_t numChains)
     {
-        if (numChains < mNodeList.size())
-        {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-                "Can't shrink the number of chains less than number of tracking nodes",
-                "RibbonTrail::setNumberOfChains");
-        }
-
+        OgreAssert(numChains >= mNodeList.size(),
+                   "Can't shrink the number of chains less than number of tracking nodes");
         size_t oldChains = getNumberOfChains();
 
         BillboardChain::setNumberOfChains(numChains);
@@ -220,25 +215,12 @@ namespace Ogre
     //-----------------------------------------------------------------------
     void RibbonTrail::setInitialColour(size_t chainIndex, float r, float g, float b, float a)
     {
-        if (chainIndex >= mChainCount)
-        {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
-                "chainIndex out of bounds", "RibbonTrail::setInitialColour");
-        }
-        mInitialColour[chainIndex].r = r;
-        mInitialColour[chainIndex].g = g;
-        mInitialColour[chainIndex].b = b;
-        mInitialColour[chainIndex].a = a;
+        mInitialColour.at(chainIndex) = ColourValue(r, g, b, a);
     }
     //-----------------------------------------------------------------------
     void RibbonTrail::setInitialWidth(size_t chainIndex, Real width)
     {
-        if (chainIndex >= mChainCount)
-        {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
-                "chainIndex out of bounds", "RibbonTrail::setInitialWidth");
-        }
-        mInitialWidth[chainIndex] = width;
+        mInitialWidth.at(chainIndex) = width;
     }
     //-----------------------------------------------------------------------
     void RibbonTrail::setColourChange(size_t chainIndex, const ColourValue& valuePerSecond)
@@ -249,28 +231,13 @@ namespace Ogre
     //-----------------------------------------------------------------------
     void RibbonTrail::setColourChange(size_t chainIndex, float r, float g, float b, float a)
     {
-        if (chainIndex >= mChainCount)
-        {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
-                "chainIndex out of bounds", "RibbonTrail::setColourChange");
-        }
-        mDeltaColour[chainIndex].r = r;
-        mDeltaColour[chainIndex].g = g;
-        mDeltaColour[chainIndex].b = b;
-        mDeltaColour[chainIndex].a = a;
-
+        mDeltaColour.at(chainIndex) = ColourValue(r, g, b, a);
         manageController();
-
     }
     //-----------------------------------------------------------------------
     void RibbonTrail::setWidthChange(size_t chainIndex, Real widthDeltaPerSecond)
     {
-        if (chainIndex >= mChainCount)
-        {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
-                "chainIndex out of bounds", "RibbonTrail::setWidthChange");
-        }
-        mDeltaWidth[chainIndex] = widthDeltaPerSecond;
+        mDeltaWidth.at(chainIndex) = widthDeltaPerSecond;
         manageController();
     }
     //-----------------------------------------------------------------------

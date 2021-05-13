@@ -1047,10 +1047,7 @@ CompositorInstance::resolveTexReference(const CompositionTechnique::TextureDefin
                         "Referenced texture '" + texDef->refTexName + "' must have global scope");
     }
 
-    if(!refTexDef)
-    {
-        OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "Referencing non-existent compositor texture");
-    }
+    OgreAssert(refTexDef, "Referencing non-existent compositor texture");
 
     if (refTexDef->scope == CompositionTechnique::TS_LOCAL)
         OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
@@ -1100,27 +1097,15 @@ RenderTarget *CompositorInstance::getTargetForTex(const String &name, int slice)
                     }
                 }
                 
-                if (refCompInst == 0 || !refCompInst->getEnabled()) 
-                {
-                    OGRE_EXCEPT(Exception::ERR_INVALID_STATE, "Referencing inactive compositor texture",
-                        "CompositorInstance::getTargetForTex");
-                }
-                if (!beforeMe)
-                {
-                    OGRE_EXCEPT(Exception::ERR_INVALID_STATE, "Referencing compositor that is later in the chain",
-                        "CompositorInstance::getTargetForTex");
-                }
+                OgreAssert(refCompInst && refCompInst->getEnabled(), "Referencing inactive compositor texture");
+                OgreAssert(beforeMe, "Referencing compositor that is later in the chain");
                 return refCompInst->getRenderTarget(texDef->refTexName, slice);
             }
             case CompositionTechnique::TS_GLOBAL:
             {
                 //Chain and global case - the referenced compositor will know how to handle
                 const CompositorPtr& refComp = CompositorManager::getSingleton().getByName(texDef->refCompName);
-                if(!refComp)
-                {
-                    OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "Referencing non-existent compositor",
-                        "CompositorInstance::getTargetForTex");
-                }
+                OgreAssert(refComp, "Referencing non-existent compositor");
                 return refComp->getRenderTarget(texDef->refTexName, slice);
             }
             case CompositionTechnique::TS_LOCAL:
@@ -1136,11 +1121,7 @@ RenderTarget *CompositorInstance::getTargetForTex(const String &name, int slice)
 const TexturePtr &CompositorInstance::getSourceForTex(const String &name, size_t mrtIndex)
 {
     CompositionTechnique::TextureDefinition* texDef = mTechnique->getTextureDefinition(name);
-    if(texDef == 0)
-    {
-        OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "Referencing non-existent TextureDefinition",
-                    "CompositorInstance::getSourceForTex");
-    }
+    OgreAssert(texDef, "Referencing non-existent TextureDefinition");
     
     //Check if texture definition is reference
     if(!texDef->refCompName.empty())
@@ -1168,28 +1149,16 @@ const TexturePtr &CompositorInstance::getSourceForTex(const String &name, size_t
                         beforeMe = false;
                     }
                 }
-                
-                if (refCompInst == 0 || !refCompInst->getEnabled()) 
-                {
-                    OGRE_EXCEPT(Exception::ERR_INVALID_STATE, "Referencing inactive compositor texture",
-                        "CompositorInstance::getSourceForTex");
-                }
-                if (!beforeMe)
-                {
-                    OGRE_EXCEPT(Exception::ERR_INVALID_STATE, "Referencing compositor that is later in the chain",
-                        "CompositorInstance::getSourceForTex");
-                }
+
+                OgreAssert(refCompInst && refCompInst->getEnabled(), "Referencing inactive compositor texture");
+                OgreAssert(beforeMe, "Referencing compositor that is later in the chain");
                 return refCompInst->getTextureInstance(texDef->refTexName, mrtIndex);
             }
             case CompositionTechnique::TS_GLOBAL:
             {
                 //Chain and global case - the referenced compositor will know how to handle
                 const CompositorPtr& refComp = CompositorManager::getSingleton().getByName(texDef->refCompName);
-                if(!refComp)
-                {
-                    OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "Referencing non-existent compositor",
-                        "CompositorInstance::getSourceForTex");
-                }
+                OgreAssert(refComp, "Referencing non-existent compositor");
                 return refComp->getTextureInstance(texDef->refTexName, mrtIndex);
             }
             case CompositionTechnique::TS_LOCAL:
