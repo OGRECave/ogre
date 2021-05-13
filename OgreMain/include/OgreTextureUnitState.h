@@ -204,8 +204,12 @@ namespace Ogre {
         const ColourValue& getBorderColour(void) const { return mBorderColour; }
 
     protected:
-        UVWAddressingMode mAddressMode;
         ColourValue mBorderColour;
+        /// Texture anisotropy.
+        unsigned int mMaxAniso;
+        /// Mipmap bias (always float, not Real).
+        float mMipmapBias;
+        UVWAddressingMode mAddressMode;
         /// Texture filtering - minification.
         FilterOptions mMinFilter;
         /// Texture filtering - magnification.
@@ -213,10 +217,6 @@ namespace Ogre {
         /// Texture filtering - mipmapping.
         FilterOptions mMipFilter;
         CompareFunction mCompareFunc;
-        /// Texture anisotropy.
-        unsigned int mMaxAniso;
-        /// Mipmap bias (always float, not Real).
-        float mMipmapBias;
         bool mCompareEnabled : 1;
         bool mDirty : 1; // flag for derived classes to sync with implementation
     };
@@ -475,7 +475,7 @@ namespace Ogre {
         /** The type of unit to bind the texture settings to.
             @deprecated only D3D9 has separate sampler bindings. All other RenderSystems use unified pipelines.
          */
-        enum BindingType
+        enum BindingType : uint8
         {
             /** Regular fragment processing unit - the default. */
             BT_FRAGMENT = 0,
@@ -486,7 +486,7 @@ namespace Ogre {
         };
         /** Enum identifying the type of content this texture unit contains.
         */
-        enum ContentType
+        enum ContentType : uint8
         {
             /// The default option, this derives texture content from a texture name, loaded by
             /// ordinary means from a file or having been manually created with a given name.
@@ -1094,10 +1094,7 @@ private:
         SceneBlendFactor mColourBlendFallbackDest;
 
         LayerBlendModeEx mAlphaBlendMode;
-        mutable bool mTextureLoadFailed;
         Real mGamma;
-
-        mutable bool mRecalcTexMatrix;
         Real mUMod, mVMod;
         Real mUScale, mVScale;
         Radian mRotate;
@@ -1107,6 +1104,10 @@ private:
         BindingType mBindingType;
         /// Content type of texture (normal loaded texture, auto-texture).
         ContentType mContentType;
+
+        mutable bool mTextureLoadFailed;
+        mutable bool mRecalcTexMatrix;
+
         /// The index of the referenced texture if referencing an MRT in a compositor.
         size_t mCompositorRefMrtIndex;
 

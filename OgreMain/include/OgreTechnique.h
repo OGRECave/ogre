@@ -55,7 +55,7 @@ namespace Ogre {
 
     private:
         /// Illumination pass state type
-        enum IlluminationPassesState
+        enum IlluminationPassesState : int8
         {
             IPS_COMPILE_DISABLED = -1,
             IPS_NOT_COMPILED = 0,
@@ -69,6 +69,8 @@ namespace Ogre {
         // Raw pointer since we don't want child to stop parent's destruction
         Material* mParent;
         IlluminationPassesState mIlluminationPassesCompilationPhase;
+
+        bool mIsSupported;
         /// LOD level
         unsigned short mLodIndex;
         /** Scheme index, derived from scheme name but the names are held on
@@ -106,8 +108,6 @@ namespace Ogre {
 
         // User objects binding.
         UserObjectBindings  mUserObjectBindings;
-
-        bool mIsSupported;
     public:
         /** Directive used to manually control technique support based on the
             inclusion or exclusion of some factor.

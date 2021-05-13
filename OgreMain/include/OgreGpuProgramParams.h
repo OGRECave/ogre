@@ -1204,10 +1204,10 @@ namespace Ogre {
         class AutoConstantEntry
         {
         public:
-            /// The type of parameter
-            AutoConstantType paramType;
             /// The target (physical) constant index
             size_t physicalIndex;
+            /// The type of parameter
+            AutoConstantType paramType;
             /// Additional information to go with the parameter
             union{
                 uint32 data;
@@ -1222,12 +1222,12 @@ namespace Ogre {
 
         AutoConstantEntry(AutoConstantType theType, size_t theIndex, uint32 theData,
                           uint16 theVariability, uint8 theElemCount = 4)
-            : paramType(theType), physicalIndex(theIndex),
+            : physicalIndex(theIndex), paramType(theType),
                 data(theData), variability(theVariability), elementCount(theElemCount) {}
 
         AutoConstantEntry(AutoConstantType theType, size_t theIndex, float theData,
                           uint16 theVariability, uint8 theElemCount = 4)
-            : paramType(theType), physicalIndex(theIndex),
+            : physicalIndex(theIndex), paramType(theType),
                 fData(theData), variability(theVariability), elementCount(theElemCount) {}
 
         };

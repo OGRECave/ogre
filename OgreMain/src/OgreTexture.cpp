@@ -43,11 +43,8 @@ namespace Ogre {
             mDepth(1),
             mNumRequestedMipmaps(0),
             mNumMipmaps(0),
-            mMipmapsHardwareGenerated(false),
             mGamma(1.0f),
-            mHwGamma(false),
             mFSAA(0),
-            mTextureType(TEX_TYPE_2D),            
             mFormat(PF_UNKNOWN),
             mUsage(TU_DEFAULT),
             mSrcFormat(PF_UNKNOWN),
@@ -58,7 +55,10 @@ namespace Ogre {
             mDesiredIntegerBitDepth(0),
             mDesiredFloatBitDepth(0),
             mTreatLuminanceAsAlpha(false),
-            mInternalResourcesCreated(false)
+            mInternalResourcesCreated(false),
+            mMipmapsHardwareGenerated(false),
+            mHwGamma(false),
+            mTextureType(TEX_TYPE_2D)
     {
         if (createParamDictionary("Texture"))
         {

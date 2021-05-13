@@ -125,9 +125,6 @@ namespace Ogre {
         mutable Quaternion mDerivedOrientation;
         mutable Vector3 mDerivedPosition;
 
-        /// Rendering type
-        PolygonMode mSceneDetail;
-
         /// Stored number of visible faces in the last render
         unsigned int mVisFacesLastRender;
 
@@ -174,13 +171,15 @@ namespace Ogre {
         Frustum *mCullFrustum;
         /// Camera to use for LOD calculation
         const Camera* mLodCamera;
-        /// @see Camera::getPixelDisplayRatio
-        Real mPixelDisplayRatio;
 
         typedef std::vector<Listener*> ListenerList;
         ListenerList mListeners;
+        /// @see Camera::getPixelDisplayRatio
+        Real mPixelDisplayRatio;
 
         SortMode mSortMode;
+        /// Rendering type
+        PolygonMode mSceneDetail;
 
         // Internal functions for calcs
         bool isViewOutOfDate(void) const;

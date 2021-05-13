@@ -71,14 +71,6 @@ namespace Ogre {
         /// SceneManager which created this node
         SceneManager* mCreator;
 
-        /// World-Axis aligned bounding box, updated only through _update
-        AxisAlignedBox mWorldAABB;
-
-        void updateFromParentImpl(void) const;
-
-        /** See Node */
-        void setParent(Node* parent);
-
         /// Auto tracking target
         SceneNode* mAutoTrackTarget;
 
@@ -88,6 +80,14 @@ namespace Ogre {
             it manually.
         */
         size_t mGlobalIndex;
+
+        /// World-Axis aligned bounding box, updated only through _update
+        AxisAlignedBox mWorldAABB;
+
+        void updateFromParentImpl(void) const;
+
+        /** See Node */
+        void setParent(Node* parent);
 
         /// Tracking offset for fine tuning
         Vector3 mAutoTrackOffset;

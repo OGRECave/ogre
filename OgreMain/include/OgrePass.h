@@ -45,7 +45,7 @@ namespace Ogre {
      *  @{
      */
     /// Categorisation of passes for the purpose of additive lighting
-    enum IlluminationStage
+    enum IlluminationStage : uint8
     {
         /// Part of the rendering which occurs without any kind of direct lighting
         IS_AMBIENT,
@@ -135,7 +135,6 @@ namespace Ogre {
         Technique* mParent;
         String mName; /// Optional name for the pass
         uint32 mHash; /// Pass hash
-        ushort mIndex; /// Pass index
         //-------------------------------------------------------------------------
         // Colour properties, only applicable in fixed-function passes
         ColourValue mAmbient;
@@ -179,11 +178,11 @@ namespace Ogre {
 
         uchar mAlphaRejectVal;
 
-        CompareFunction mDepthFunc;
         float mDepthBiasConstant;
         float mDepthBiasSlopeScale;
         float mDepthBiasPerIteration;
 
+        CompareFunction mDepthFunc;
         // Alpha reject settings
         CompareFunction mAlphaRejectFunc;
 
@@ -202,46 +201,49 @@ namespace Ogre {
         /// Iterate per how many lights?
         unsigned short mLightsPerIteration;
 
-        Light::LightTypes mOnlyLightType;
+        ushort mIndex; /// Pass index
+
         /// With a specific light mask?
         uint32 mLightMask;
 
-        /// Shading options
-        ShadeOptions mShadeOptions;
-        /// Polygon mode
-        PolygonMode mPolygonMode;
-
         //-------------------------------------------------------------------------
         // Fog
-        FogMode mFogMode;
         ColourValue mFogColour;
         Real mFogStart;
         Real mFogEnd;
         Real mFogDensity;
         //-------------------------------------------------------------------------
-
+        /// line width
+        float mLineWidth;
         /// Storage of texture unit states
         TextureUnitStates mTextureUnitStates;
+
+        // TU Content type lookups
+        typedef std::vector<unsigned short> ContentTypeLookup;
+        mutable ContentTypeLookup mShadowContentTypeLookup;
 
         /// Vertex program details
         std::unique_ptr<GpuProgramUsage> mProgramUsage[GPT_COUNT];
         /// Number of pass iterations to perform
         size_t mPassIterationCount;
-        /// line width
-        float mLineWidth;
         /// Point size, applies when not using per-vertex point size
         Real mPointMinSize;
         Real mPointMaxSize;
         /// Size, Constant, linear, quadratic coeffs
         Vector4f mPointAttenution;
-        // TU Content type lookups
-        typedef std::vector<unsigned short> ContentTypeLookup;
-        mutable ContentTypeLookup mShadowContentTypeLookup;
 
-        /// Illumination stage?
-        IlluminationStage mIlluminationStage;
         /// User objects binding.
         UserObjectBindings      mUserObjectBindings;
+
+        /// Shading options
+        ShadeOptions mShadeOptions;
+        /// Polygon mode
+        PolygonMode mPolygonMode;
+        /// Illumination stage?
+        IlluminationStage mIlluminationStage;
+
+        Light::LightTypes mOnlyLightType;
+        FogMode mFogMode;
 
         /// Used to get scene blending flags from a blending type
         void _getBlendFlags(SceneBlendType type, SceneBlendFactor& source, SceneBlendFactor& dest);

@@ -101,11 +101,11 @@ namespace Ogre  {
         void updateFromParentImpl(void) const override;
 
     private:
+        bool mInheritParentEntityOrientation;
+        bool mInheritParentEntityScale;
         Entity *mParentEntity;
         MovableObject *mChildObject;
         mutable Affine3 mFullLocalTransform;
-        bool mInheritParentEntityOrientation;
-        bool mInheritParentEntityScale;
     };
 
     /** @} */

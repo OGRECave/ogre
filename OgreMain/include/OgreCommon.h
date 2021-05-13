@@ -58,7 +58,7 @@ namespace Ogre {
 
     /** Comparison functions used for the depth/stencil buffer operations and 
         others. */
-    enum CompareFunction
+    enum CompareFunction : uint8
     {
         CMPF_ALWAYS_FAIL,  //!< Never writes a pixel to the render target
         CMPF_ALWAYS_PASS,  //!< Always writes a pixel to the render target
@@ -98,7 +98,7 @@ namespace Ogre {
         FT_MIP
     };
     /** Filtering options for textures / mipmaps. */
-    enum FilterOptions
+    enum FilterOptions : uint8
     {
         /// No filtering, used for FT_MIP to turn off mipmapping
         FO_NONE,
@@ -114,7 +114,7 @@ namespace Ogre {
 
     /** Texture addressing modes - default is TAM_WRAP.
     */
-    enum TextureAddressingMode
+    enum TextureAddressingMode : uint8
     {
         /// %Any value beyond 1.0 wraps back to 0.0. %Texture is repeated.
         TAM_WRAP,
@@ -132,7 +132,7 @@ namespace Ogre {
     };
 
     /** %Light shading modes. */
-    enum ShadeOptions
+    enum ShadeOptions : uint8
     {
         SO_FLAT, //!< No interpolation takes place. Each face is shaded with a single colour determined from the first vertex in the face.
         SO_GOURAUD, //!< Colour at each vertex is linearly interpolated across the face.
@@ -140,7 +140,7 @@ namespace Ogre {
     };
 
     /** Fog modes. */
-    enum FogMode
+    enum FogMode : uint8
     {
         /// No fog. Duh.
         FOG_NONE,
@@ -154,7 +154,7 @@ namespace Ogre {
 
     /** Hardware culling modes based on vertex winding.
         This setting applies to how the hardware API culls triangles it is sent. */
-    enum CullingMode
+    enum CullingMode : uint8
     {
         /// Hardware never culls triangles and renders everything it receives.
         CULL_NONE = 1,
@@ -169,7 +169,7 @@ namespace Ogre {
         hardware API. This culling mode is used by scene managers which choose to implement it -
         normally those which deal with large amounts of fixed world geometry which is often 
         planar (software culling movable variable geometry is expensive). */
-    enum ManualCullingMode
+    enum ManualCullingMode : uint8
     {
         /// No culling so everything is sent to the hardware.
         MANUAL_CULL_NONE = 1,
@@ -198,7 +198,7 @@ namespace Ogre {
     };
 
     /** The polygon mode to use when rasterising. */
-    enum PolygonMode
+    enum PolygonMode : uint8
     {
         /// Only the points of each polygon are rendered.
         PM_POINTS = 1,
@@ -305,7 +305,7 @@ namespace Ogre {
     };
 
     /** Function used compute the camera-distance for sorting objects */
-    enum SortMode
+    enum SortMode : uint8
     {
 
         /** Sort by direction of the camera

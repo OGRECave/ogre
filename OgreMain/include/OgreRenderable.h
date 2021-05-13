@@ -355,10 +355,10 @@ namespace Ogre {
     protected:
         typedef std::map<size_t, Vector4> CustomParameterMap;
         CustomParameterMap mCustomParameters;
+        UserObjectBindings mUserObjectBindings;      /// User objects binding.
         bool mPolygonModeOverrideable;
         bool mUseIdentityProjection;
         bool mUseIdentityView;
-        UserObjectBindings mUserObjectBindings;      /// User objects binding.
     };
 
     /** @} */

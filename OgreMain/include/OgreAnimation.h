@@ -92,7 +92,7 @@ namespace Ogre {
 
     public:
         /** The types of animation interpolation available. */
-        enum InterpolationMode
+        enum InterpolationMode : uint8
         {
             /** Values are interpolated along straight lines. */
             IM_LINEAR,
@@ -101,7 +101,7 @@ namespace Ogre {
         };
 
         /** The types of rotational interpolation available. */
-        enum RotationInterpolationMode
+        enum RotationInterpolationMode : uint8
         {
             /** Values are interpolated linearly. This is faster but does not 
                 necessarily give a completely accurate result.
@@ -519,16 +519,16 @@ namespace Ogre {
         InterpolationMode mInterpolationMode;
         RotationInterpolationMode mRotationInterpolationMode;
 
+        /// Dirty flag indicate that keyframe time list need to rebuild
+        mutable bool mKeyFrameTimesDirty;
+        bool mUseBaseKeyFrame;
+
         static InterpolationMode msDefaultInterpolationMode;
         static RotationInterpolationMode msDefaultRotationInterpolationMode;
 
         /// Global keyframe time list used to search global keyframe index.
         typedef std::vector<Real> KeyFrameTimeList;
         mutable KeyFrameTimeList mKeyFrameTimes;
-        /// Dirty flag indicate that keyframe time list need to rebuild
-        mutable bool mKeyFrameTimesDirty;
-
-        bool mUseBaseKeyFrame;
         Real mBaseKeyFrameTime;
         String mBaseKeyFrameAnimationName;
         AnimationContainer* mContainer;

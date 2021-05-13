@@ -379,8 +379,6 @@ namespace Ogre {
         
         /// The data pointer 
         uchar* data;
-        /// The pixel format 
-        PixelFormat format;
         /** Number of elements between the leftmost pixel of one row and the left
             pixel of the next. This value must always be equal to getWidth() (consecutive) 
             for compressed formats.
@@ -392,7 +390,8 @@ namespace Ogre {
             for compressed formats.
         */
         size_t slicePitch;
-        
+        /// The pixel format
+        PixelFormat format;
         /** Set the rowPitch and slicePitch so that the buffer is laid out consecutive 
             in memory.
         */        

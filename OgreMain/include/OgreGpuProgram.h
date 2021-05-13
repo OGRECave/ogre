@@ -45,7 +45,7 @@ namespace Ogre {
      *  @{
      */
     /** Enumerates the types of programs which can run on the GPU. */
-    enum GpuProgramType
+    enum GpuProgramType : uint8
     {
         GPT_VERTEX_PROGRAM = 0,
         GPT_FRAGMENT_PROGRAM,
@@ -90,8 +90,7 @@ namespace Ogre {
     bool mNeedsAdjacencyInfo;
     /// Did we encounter a compilation error?
     bool mCompileError;
-    /// Does this (vertex) program include pose animation (count of number of poses supported)
-    ushort mPoseAnimation;
+    bool mLoadedManualNamedConstants;
     /// The default parameters for use with this object
     GpuProgramParametersSharedPtr mDefaultParams;
     /** Record of logical to physical buffer maps. Mandatory for low-level
@@ -106,8 +105,8 @@ namespace Ogre {
     mutable GpuNamedConstantsPtr mConstantDefs;
     /// File from which to load named constants manually
     String mManualNamedConstantsFile;
-    bool mLoadedManualNamedConstants;
-
+    /// Does this (vertex) program include pose animation (count of number of poses supported)
+    ushort mPoseAnimation;
 
     /** Internal method for setting up the basic parameter definitions for a subclass.
         @remarks

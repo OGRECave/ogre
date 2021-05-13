@@ -240,15 +240,6 @@ namespace Ogre
 
         /** Returns the parent Animation object for this track. */
         Animation *getParent() const { return mParent; }
-    protected:
-        typedef std::vector<KeyFrame*> KeyFrameList;
-        KeyFrameList mKeyFrames;
-        Animation* mParent;
-        unsigned short mHandle;
-        Listener* mListener;
-
-        /// Internal method for clone implementation
-        virtual void populateClone(AnimationTrack* clone) const;
     private:
         /// Map used to translate global keyframe time lower bound index to local lower bound index
         typedef std::vector<ushort> KeyFrameIndexMap;
@@ -256,6 +247,15 @@ namespace Ogre
 
         /// Create a keyframe implementation - must be overridden
         virtual KeyFrame* createKeyFrameImpl(Real time) = 0;
+    protected:
+        typedef std::vector<KeyFrame*> KeyFrameList;
+        KeyFrameList mKeyFrames;
+        Animation* mParent;
+        Listener* mListener;
+        unsigned short mHandle;
+
+        /// Internal method for clone implementation
+        virtual void populateClone(AnimationTrack* clone) const;
     };
 
     /** Specialised AnimationTrack for dealing with generic animable values.
@@ -396,12 +396,12 @@ namespace Ogre
             RotationalSpline rotationSpline;
         };
 
+        mutable bool mSplineBuildNeeded;
+        /// Defines if rotation is done using shortest path
+        mutable bool mUseShortestRotationPath;
         Node* mTargetNode;
         // Prebuilt splines, must be mutable since lazy-update in const method
         mutable Splines* mSplines;
-        mutable bool mSplineBuildNeeded;
-        /// Defines if rotation is done using shortest path
-        mutable bool mUseShortestRotationPath ;
     };
 
     /** Type of vertex animation.
@@ -462,7 +462,7 @@ namespace Ogre
         that all morph animation can be expressed as pose animation, but not vice
         versa.
     */
-    enum VertexAnimationType
+    enum VertexAnimationType : uint8
     {
         /// No animation
         VAT_NONE = 0,
@@ -479,7 +479,7 @@ namespace Ogre
     {
     public:
         /** The target animation mode */
-        enum TargetMode
+        enum TargetMode : uint8
         {
             /// Interpolate vertex positions in software
             TM_SOFTWARE, 
@@ -559,10 +559,10 @@ namespace Ogre
     private:
         /// Animation type
         VertexAnimationType mAnimationType;
-        /// Target to animate
-        VertexData* mTargetVertexData;
         /// Mode to apply
         TargetMode mTargetMode;
+        /// Target to animate
+        VertexData* mTargetVertexData;
 
         /// @copydoc AnimationTrack::createKeyFrameImpl
         KeyFrame* createKeyFrameImpl(Real time);

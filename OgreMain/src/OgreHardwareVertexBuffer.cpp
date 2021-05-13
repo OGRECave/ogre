@@ -114,7 +114,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------------
     VertexElement::VertexElement(unsigned short source, size_t offset, VertexElementType theType,
                                  VertexElementSemantic semantic, unsigned short index)
-        : mSource(source), mIndex(index), mOffset(offset), mType(theType), mSemantic(semantic)
+        : mOffset(offset), mSource(source), mIndex(index), mType(theType), mSemantic(semantic)
     {
     }
     //-----------------------------------------------------------------------------

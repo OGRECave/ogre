@@ -33,17 +33,17 @@ namespace Ogre
 {
     //-----------------------------------------------------------------------------
     GpuProgramUsage::GpuProgramUsage(GpuProgramType gptype, Pass* parent) :
-        mType(gptype), mParent(parent), mProgram(), mRecreateParams(false)
+        mParent(parent), mProgram(), mRecreateParams(false),mType(gptype)
     {
     }
     //-----------------------------------------------------------------------------
     GpuProgramUsage::GpuProgramUsage(const GpuProgramUsage& oth, Pass* parent)
-        : mType(oth.mType)
-        , mParent(parent)
+        : mParent(parent)
         , mProgram(oth.mProgram)
         // nfz: parameters should be copied not just use a shared ptr to the original
         , mParameters(OGRE_NEW GpuProgramParameters(*oth.mParameters))
         , mRecreateParams(false)
+        , mType(oth.mType)
     {
     }
     //---------------------------------------------------------------------
