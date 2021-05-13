@@ -1071,13 +1071,16 @@ const Pass* SceneManager::_setPass(const Pass* pass, bool evenIfSuppressed,
                                      "attempted to render in a pipeline without a compositor");
             auto compName = pTex->getReferencedCompositorName();
             CompositorInstance* refComp = currentChain->getCompositor(compName);
-            OgreAssert(refComp,
-                       ("Current CompositorChain does not contain compositor named " + compName).c_str());
+            if (!refComp)
+                OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+                            "Current CompositorChain does not contain compositor named " + compName);
 
             auto texName = pTex->getReferencedTextureName();
             TexturePtr refTex = refComp->getTextureInstance(texName, pTex->getReferencedMRTIndex());
 
-            OgreAssert(refTex, ("Compositor " + compName + " does not declare texture " + texName).c_str());
+            if (!refTex)
+                OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+                            "Compositor " + compName + " does not declare texture " + texName);
             pTex->_setTexturePtr(refTex);
         }
         mDestRenderSystem->_setTextureUnitSettings(unit, *pTex);

@@ -61,8 +61,8 @@ namespace Ogre {
         SamplerPtr ret = _createSamplerImpl();
         if(!name.empty())
         {
-            OgreAssert(mNamedSamplers.find(name) == mNamedSamplers.end(),
-                       ("Sampler '" + name + "' already exists").c_str());
+            if (mNamedSamplers.find(name) != mNamedSamplers.end())
+                OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Sampler '" + name + "' already exists");
             mNamedSamplers[name] = ret;
         }
         return ret;

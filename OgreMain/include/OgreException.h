@@ -41,12 +41,12 @@ THE SOFTWARE.
 #   if OGRE_DEBUG_MODE
 #       define OgreAssert( a, b ) assert( (a) && (b) )
 #   else
-#       define OgreAssert( a, b ) if( !(a) ) OGRE_EXCEPT_2( Ogre::Exception::ERR_RT_ASSERTION_FAILED, (b) )
+#       define OgreAssert( a, b ) if( !(a) ) OGRE_EXCEPT_2( Ogre::Exception::ERR_RT_ASSERTION_FAILED, (#a " failed. " b) )
 #   endif
 
 // EXCEPTIONS mode
 #elif OGRE_ASSERT_MODE == 2
-#   define OgreAssert( a, b ) if( !(a) ) OGRE_EXCEPT_2( Ogre::Exception::ERR_RT_ASSERTION_FAILED, (b) )
+#   define OgreAssert( a, b ) if( !(a) ) OGRE_EXCEPT_2( Ogre::Exception::ERR_RT_ASSERTION_FAILED, (#a " failed. " b) )
 // STANDARD mode
 #else
 /** Checks a condition at runtime and throws exception/ aborts if it fails.

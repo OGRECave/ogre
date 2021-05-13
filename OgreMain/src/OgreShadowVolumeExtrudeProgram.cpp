@@ -67,8 +67,10 @@ namespace Ogre {
         for (auto name : programNames)
         {
             auto vp = HighLevelGpuProgramManager::getSingleton().getByName(name, RGN_INTERNAL);
-            OgreAssert(vp, (String(name) + " not found. Verify that you referenced the 'ShadowVolume' "
-                                   "folder in your resources.cfg").c_str());
+            if (!vp)
+                OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+                            String(name) + " not found. Verify that you referenced the 'Media/Main' "
+                                           "folder in your resources.cfg");
             vp->load();
             mPrograms.push_back(vp);
         }
