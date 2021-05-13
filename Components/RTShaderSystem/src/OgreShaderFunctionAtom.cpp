@@ -224,14 +224,16 @@ static String parameterNullMsg(const String& name, size_t pos)
 
 void FunctionAtom::pushOperand(ParameterPtr parameter, Operand::OpSemantic opSemantic, Operand::OpMask opMask, int indirectionLevel)
 {
-    OgreAssert(parameter, parameterNullMsg(mFunctionName, mOperands.size()).c_str());
+    if (!parameter)
+        OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, parameterNullMsg(mFunctionName, mOperands.size()));
     mOperands.push_back(Operand(parameter, opSemantic, opMask, indirectionLevel));
 }
 
 void FunctionAtom::setOperands(const OperandVector& ops)
 {
     for (size_t i = 0; i < ops.size(); i++)
-        OgreAssert(ops[i].getParameter(), parameterNullMsg(mFunctionName, i).c_str());
+        if(!ops[i].getParameter())
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, parameterNullMsg(mFunctionName, i));
 
     mOperands = ops;
 }
