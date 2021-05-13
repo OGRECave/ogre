@@ -177,10 +177,8 @@ namespace Ogre {
     //--------------------------------------------------------------------------
     void Texture::_loadImages( const ConstImagePtrList& images )
     {
-        if(images.empty())
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Cannot load empty vector of images",
-             "Texture::loadImages");
-        
+        OgreAssert(!images.empty(), "Cannot load empty vector of images");
+
         // Set desired texture size and properties from images[0]
         mSrcWidth = mWidth = images[0]->getWidth();
         mSrcHeight = mHeight = images[0]->getHeight();
@@ -355,12 +353,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------------   
     void Texture::copyToTexture( TexturePtr& target )
     {
-        if(target->getNumFaces() != getNumFaces())
-        {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
-                "Texture types must match",
-                "Texture::copyToTexture");
-        }
+        OgreAssert(target->getNumFaces() == getNumFaces(), "Texture types must match");
         size_t numMips = std::min(getNumMipmaps(), target->getNumMipmaps());
         if((mUsage & TU_AUTOMIPMAP) || (target->getUsage()&TU_AUTOMIPMAP))
             numMips = 0;
@@ -401,15 +394,8 @@ namespace Ogre {
     }
     const HardwarePixelBufferSharedPtr& Texture::getBuffer(size_t face, size_t mipmap)
     {
-        if (face >= getNumFaces())
-        {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Face index out of range", "Texture::getBuffer");
-        }
-
-        if (mipmap > mNumMipmaps)
-        {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Mipmap index out of range", "Texture::getBuffer");
-        }
+        OgreAssert(face < getNumFaces(), "out of range");
+        OgreAssert(mipmap <= mNumMipmaps, "out of range");
 
         unsigned long idx = face * (mNumMipmaps + 1) + mipmap;
         assert(idx < mSurfaceList.size());

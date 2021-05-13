@@ -81,13 +81,8 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void EdgeListBuilder::addVertexData(const VertexData* vertexData)
     {
-        if (vertexData->vertexStart != 0)
-        {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-                "The base vertex index of the vertex data must be zero for build edge list.",
-                "EdgeListBuilder::addVertexData");
-        }
-
+        OgreAssert(vertexData->vertexStart == 0,
+                   "The base vertex index of the vertex data must be zero for build edge list");
         mVertexDataList.push_back(vertexData);
     }
     //---------------------------------------------------------------------

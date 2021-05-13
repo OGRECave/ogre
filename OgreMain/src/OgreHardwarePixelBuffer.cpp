@@ -54,8 +54,8 @@ namespace Ogre
     //-----------------------------------------------------------------------------    
     void* HardwarePixelBuffer::lock(size_t offset, size_t length, LockOptions options)
     {
-        OgreAssert(!isLocked(), "Cannot lock this buffer: it is already locked");
-        OgreAssert(offset == 0 && length == mSizeInBytes, "Cannot lock memory region: must lock box or entire buffer");
+        OgreAssert(!isLocked(), "already locked");
+        OgreAssert(offset == 0 && length == mSizeInBytes, "must lock box or entire buffer");
         
         Box myBox(0, 0, 0, mWidth, mHeight, mDepth);
         const PixelBox &rv = lock(myBox, options);
@@ -91,7 +91,7 @@ namespace Ogre
     //-----------------------------------------------------------------------------    
     const PixelBox& HardwarePixelBuffer::getCurrentLock() 
     { 
-        OgreAssert(isLocked(), "Cannot get current lock: buffer not locked");
+        OgreAssert(isLocked(), "buffer not locked");
         return mCurrentLock; 
     }
     

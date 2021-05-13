@@ -99,12 +99,7 @@ namespace Ogre {
     };
     void SceneNode::attachObject(MovableObject* obj)
     {
-        if (obj->isAttached())
-        {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-                "Object already attached to a SceneNode or a Bone",
-                "SceneNode::attachObject");
-        }
+        OgreAssert(!obj->isAttached(), "Object already attached to a SceneNode or a Bone");
 
         obj->_notifyAttached(this);
 
@@ -136,28 +131,20 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     MovableObject* SceneNode::detachObject(unsigned short index)
     {
-        if (index < mObjectsByName.size())
-        {
+        OgreAssert(index < mObjectsByName.size(), "out of bounds");
+        ObjectMap::iterator i = mObjectsByName.begin();
+        i += index;
 
-            ObjectMap::iterator i = mObjectsByName.begin();
-            i += index;
+        MovableObject* ret = *i;
+        std::swap(*i, mObjectsByName.back());
+        mObjectsByName.pop_back();
 
-            MovableObject* ret = *i;
-            std::swap(*i, mObjectsByName.back());
-            mObjectsByName.pop_back();
+        ret->_notifyAttached((SceneNode*)0);
 
-            ret->_notifyAttached((SceneNode*)0);
+        // Make sure bounds get updated (must go right to the top)
+        needUpdate();
 
-            // Make sure bounds get updated (must go right to the top)
-            needUpdate();
-
-            return ret;
-        }
-        else
-        {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Object index out of bounds.", "SceneNode::getAttchedEntity");
-        }
-
+        return ret;
     }
     //-----------------------------------------------------------------------
     MovableObject* SceneNode::detachObject(const String& name)

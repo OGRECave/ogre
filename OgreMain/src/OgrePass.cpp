@@ -461,36 +461,28 @@ namespace Ogre {
     {
             OGRE_LOCK_MUTEX(mTexUnitChangeMutex);
 
-        assert(state && "state is 0 in Pass::addTextureUnitState()");
-        if (state)
-        {
-            // only attach TUS to pass if TUS does not belong to another pass
-            if ((state->getParent() == 0) || (state->getParent() == this))
-            {
-                mTextureUnitStates.push_back(state);
-                // Notify state
-                state->_notifyParent(this);
-                // if texture unit state name is empty then give it a default name based on its index
-                if (state->getName().empty())
-                {
-                    // its the last entry in the container so its index is size - 1
-                    size_t idx = mTextureUnitStates.size() - 1;
-                    
-                    // allow 8 digit hex number. there should never be that many texture units.
-                    // This sprintf replaced a call to StringConverter::toString for performance reasons
-                    state->setName( StringUtil::format("%lx", static_cast<long>(idx)));
-                }
-                _notifyNeedsRecompile();
-                _dirtyHash();
-            }
-            else
-            {
-                OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "TextureUnitState already attached to another pass",
-                    "Pass:addTextureUnitState");
+        OgreAssert(state , "TextureUnitState is NULL");
 
-            }
-            mContentTypeLookupBuilt = false;
+        // only attach TUS to pass if TUS does not belong to another pass
+        OgreAssert(!state->getParent() || (state->getParent() == this), "TextureUnitState already attached to another pass");
+
+        mTextureUnitStates.push_back(state);
+        // Notify state
+        state->_notifyParent(this);
+        // if texture unit state name is empty then give it a default name based on its index
+        if (state->getName().empty())
+        {
+            // its the last entry in the container so its index is size - 1
+            size_t idx = mTextureUnitStates.size() - 1;
+
+            // allow 8 digit hex number. there should never be that many texture units.
+            // This sprintf replaced a call to StringConverter::toString for performance reasons
+            state->setName( StringUtil::format("%lx", static_cast<long>(idx)));
         }
+        _notifyNeedsRecompile();
+        _dirtyHash();
+
+        mContentTypeLookupBuilt = false;
     }
     //-----------------------------------------------------------------------------
     TextureUnitState* Pass::getTextureUnitState(const String& name) const
@@ -522,18 +514,10 @@ namespace Ogre {
         assert(state && "state is 0 in Pass::getTextureUnitStateIndex()");
 
         // only find index for state attached to this pass
-        if (state->getParent() == this)
-        {
-            TextureUnitStates::const_iterator i =
-                std::find(mTextureUnitStates.begin(), mTextureUnitStates.end(), state);
-            assert(i != mTextureUnitStates.end() && "state is supposed to attached to this pass");
-            return static_cast<unsigned short>(std::distance(mTextureUnitStates.begin(), i));
-        }
-        else
-        {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "TextureUnitState is not attached to this pass",
-                "Pass:getTextureUnitStateIndex");
-        }
+        OgreAssert(state->getParent() == this, "TextureUnitState is not attached to this pass");
+        auto i = std::find(mTextureUnitStates.begin(), mTextureUnitStates.end(), state);
+        assert(i != mTextureUnitStates.end() && "state is supposed to attached to this pass");
+        return static_cast<unsigned short>(std::distance(mTextureUnitStates.begin(), i));
     }
 
     //-----------------------------------------------------------------------
@@ -997,12 +981,9 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     Pass* Pass::_split(unsigned short numUnits)
     {
-        if (isProgrammable())
-        {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Programmable passes cannot be "
-                "automatically split, define a fallback technique instead.",
-                "Pass:_split");
-        }
+        OgreAssert(
+            !isProgrammable(),
+            "Programmable passes cannot be automatically split, define a fallback technique instead");
 
         if (mTextureUnitStates.size() > numUnits)
         {

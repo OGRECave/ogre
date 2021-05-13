@@ -105,12 +105,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void Mesh::destroySubMesh(unsigned short index)
     {
-        if (index >= mSubMeshList.size())
-        {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-                        "Index out of bounds.",
-                        "Mesh::removeSubMesh");
-        }
+        OgreAssert(index < mSubMeshList.size(), "");
         SubMeshList::iterator i = mSubMeshList.begin();
         std::advance(i, index);
         OGRE_DELETE *i;
@@ -2414,12 +2409,7 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void Mesh::removePose(ushort index)
     {
-        if (index >= mPoseList.size())
-        {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-                "Index out of bounds",
-                "Mesh::removePose");
-        }
+        OgreAssert(index < mPoseList.size(), "");
         PoseList::iterator i = mPoseList.begin();
         std::advance(i, index);
         OGRE_DELETE *i;

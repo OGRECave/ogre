@@ -124,11 +124,7 @@ namespace Ogre {
     //---------------------------------------------------------------------
     Bone* Skeleton::createBone(unsigned short handle)
     {
-        if (handle >= OGRE_MAX_NUM_BONES)
-        {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Exceeded the maximum number of bones per skeleton.",
-                "Skeleton::createBone");
-        }
+        OgreAssert(handle < OGRE_MAX_NUM_BONES, "Exceeded the maximum number of bones per skeleton");
         // Check handle not used
         if (handle < mBoneList.size() && mBoneList[handle] != NULL)
         {
@@ -151,11 +147,7 @@ namespace Ogre {
     //---------------------------------------------------------------------
     Bone* Skeleton::createBone(const String& name, unsigned short handle)
     {
-        if (handle >= OGRE_MAX_NUM_BONES)
-        {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Exceeded the maximum number of bones per skeleton.",
-                "Skeleton::createBone");
-        }
+        OgreAssert(handle < OGRE_MAX_NUM_BONES, "Exceeded the maximum number of bones per skeleton");
         // Check handle not used
         if (handle < mBoneList.size() && mBoneList[handle] != NULL)
         {
@@ -520,11 +512,7 @@ namespace Ogre {
     void Skeleton::deriveRootBone(void) const
     {
         // Start at the first bone and work up
-        if (mBoneList.empty())
-        {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Cannot derive root bone as this "
-                "skeleton has no bones!", "Skeleton::deriveRootBone");
-        }
+        OgreAssert(!mBoneList.empty(), "Cannot derive root bone as this skeleton has no bones");
 
         mRootBones.clear();
 
@@ -735,13 +723,9 @@ namespace Ogre {
         ushort numSrcBones = src->getNumBones();
         ushort numDstBones = this->getNumBones();
 
-        if (boneHandleMap.size() != numSrcBones)
-        {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-                "Number of bones in the bone handle map must equal to "
-                "number of bones in the source skeleton.",
-                "Skeleton::_mergeSkeletonAnimations");
-        }
+        OgreAssert(
+            boneHandleMap.size() == numSrcBones,
+            "Number of bones in the bone handle map must equal to number of bones in the source skeleton");
 
         bool existsMissingBone = false;
 

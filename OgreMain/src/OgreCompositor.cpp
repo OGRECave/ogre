@@ -194,22 +194,11 @@ void Compositor::createGlobalTextures()
         if (def->scope == CompositionTechnique::TS_GLOBAL) 
         {
             //Check that this is a legit global texture
-            if (!def->refCompName.empty()) 
-            {
-                OGRE_EXCEPT(Exception::ERR_INVALID_STATE, 
-                    "Global compositor texture definition can not be a reference",
-                    "Compositor::createGlobalTextures");
-            }
-            if (def->width == 0 || def->height == 0) 
-            {
-                OGRE_EXCEPT(Exception::ERR_INVALID_STATE, 
-                    "Global compositor texture definition must have absolute size",
-                    "Compositor::createGlobalTextures");
-            }
+            OgreAssert(def->refCompName.empty(), "Global compositor texture definition can not be a reference");
+            OgreAssert(def->width && def->height, "Global compositor texture definition must have absolute size");
             if (def->pooled) 
             {
-                LogManager::getSingleton().logMessage(
-                    "Pooling global compositor textures has no effect", LML_CRITICAL);
+                LogManager::getSingleton().logWarning("Pooling global compositor textures has no effect");
             }
             globalTextureNames.insert(def->name);
 
@@ -302,13 +291,7 @@ void Compositor::createGlobalTextures()
         if (numGlobals != globalTextureNames.size())
             isConsistent = false;
 
-        if (!isConsistent) 
-        {
-            OGRE_EXCEPT(Exception::ERR_INVALID_STATE, 
-                "Different composition techniques define different global textures",
-                "Compositor::createGlobalTextures");
-        }
-
+        OgreAssert(isConsistent, "Different composition techniques define different global textures");
     }
     
 }

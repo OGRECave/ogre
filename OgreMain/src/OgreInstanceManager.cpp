@@ -77,36 +77,21 @@ namespace Ogre
     //----------------------------------------------------------------------
     void InstanceManager::setInstancesPerBatch( size_t instancesPerBatch )
     {
-        if( !mInstanceBatches.empty() )
-        {
-            OGRE_EXCEPT(Exception::ERR_INVALID_STATE, "Instances per batch can only be changed before"
-                        " building the batch.", "InstanceManager::setInstancesPerBatch");
-        }
-
+        OgreAssert(mInstanceBatches.empty(), "can only be changed before building the batch");
         mInstancesPerBatch = instancesPerBatch;
     }
 
     //----------------------------------------------------------------------
     void InstanceManager::setMaxLookupTableInstances( size_t maxLookupTableInstances )
     {
-        if( !mInstanceBatches.empty() )
-        {
-            OGRE_EXCEPT(Exception::ERR_INVALID_STATE, "Instances per batch can only be changed before"
-                " building the batch.", "InstanceManager::setMaxLookupTableInstances");
-        }
-
+        OgreAssert(mInstanceBatches.empty(), "can only be changed before building the batch");
         mMaxLookupTableInstances = maxLookupTableInstances;
     }
     
     //----------------------------------------------------------------------
     void InstanceManager::setNumCustomParams( unsigned char numCustomParams )
     {
-        if( !mInstanceBatches.empty() )
-        {
-            OGRE_EXCEPT(Exception::ERR_INVALID_STATE, "setNumCustomParams can only be changed before"
-                " building the batch.", "InstanceManager::setNumCustomParams");
-        }
-
+        OgreAssert(mInstanceBatches.empty(), "can only be changed before building the batch");
         mNumCustomParams = numCustomParams;
     }
     //----------------------------------------------------------------------

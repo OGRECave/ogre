@@ -231,9 +231,7 @@ bool SceneManager::hasCamera(const String& name) const
 //-----------------------------------------------------------------------
 void SceneManager::destroyCamera(Camera *cam)
 {
-    if(!cam)
-        OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Cannot destroy a null Camera.", "SceneManager::destroyCamera");
-
+    OgreAssert(cam, "Cannot destroy a null Camera");
     destroyCamera(cam->getName());
 }
 
@@ -795,8 +793,7 @@ void SceneManager::_destroySceneNode(SceneNodeList::iterator i)
 //---------------------------------------------------------------------
 void SceneManager::destroySceneNode(SceneNode* sn)
 {
-    if(!sn)
-        OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Cannot destroy a null SceneNode.", "SceneManager::destroySceneNode");
+    OgreAssert(sn, "Cannot destroy a null SceneNode");
 
     auto pos = sn->mGlobalIndex < mSceneNodes.size() &&
                        sn == *(mSceneNodes.begin() + sn->mGlobalIndex)
@@ -3805,9 +3802,7 @@ SceneManager::getMovableObjectIterator(const String& typeName)
 //---------------------------------------------------------------------
 void SceneManager::destroyMovableObject(MovableObject* m)
 {
-    if(!m)
-        OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Cannot destroy a null MovableObject.", "SceneManager::destroyMovableObject");
-
+    OgreAssert(m, "Cannot destroy a null MovableObject");
     destroyMovableObject(m->getName(), m->getMovableType());
 }
 //---------------------------------------------------------------------

@@ -302,12 +302,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     Entity* Entity::clone( const String& newName) const
     {
-        if (!mManager)
-        {
-            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
-                        "Cannot clone an Entity that wasn't created through a "
-                        "SceneManager", "Entity::clone");
-        }
+        OgreAssert(mManager, "Cannot clone an Entity that wasn't created through a SceneManager");
         Entity* newEnt = mManager->createEntity(newName, getMesh()->getName() );
 
         if (mInitialised)
@@ -713,12 +708,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     AnimationState* Entity::getAnimationState(const String& name) const
     {
-        if (!mAnimationState)
-        {
-            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "Entity is not animated",
-                        "Entity::getAnimationState");
-        }
-
+        OgreAssert(mAnimationState, "Entity is not animated");
         return mAnimationState->getAnimationState(name);
     }
     //-----------------------------------------------------------------------
@@ -1470,16 +1460,8 @@ namespace Ogre {
                 "An object with the name " + pMovable->getName() + " already attached",
                 "Entity::attachObjectToBone");
         }
-        if(pMovable->isAttached())
-        {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Object already attached to a sceneNode or a Bone",
-                "Entity::attachObjectToBone");
-        }
-        if (!hasSkeleton())
-        {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "This entity's mesh has no skeleton to attach object to.",
-                "Entity::attachObjectToBone");
-        }
+        OgreAssert(!pMovable->isAttached(), "Object already attached to a sceneNode or a Bone");
+        OgreAssert(hasSkeleton(), "This entity's mesh has no skeleton to attach object to");
         Bone* bone = mSkeletonInstance->getBone(boneName);
         if (!bone)
         {
@@ -2266,25 +2248,12 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void Entity::shareSkeletonInstanceWith(Entity* entity)
     {
-        if (entity->getMesh()->getSkeleton() != getMesh()->getSkeleton())
-        {
-            OGRE_EXCEPT(Exception::ERR_RT_ASSERTION_FAILED,
-                "The supplied entity has a different skeleton.",
-                "Entity::shareSkeletonWith");
-        }
-        if (!mSkeletonInstance)
-        {
-            OGRE_EXCEPT(Exception::ERR_RT_ASSERTION_FAILED,
-                "This entity has no skeleton.",
-                "Entity::shareSkeletonWith");
-        }
-        if (mSharedSkeletonEntities != NULL && entity->mSharedSkeletonEntities != NULL)
-        {
-            OGRE_EXCEPT(Exception::ERR_RT_ASSERTION_FAILED,
-                "Both entities already shares their SkeletonInstances! At least "
-                "one of the instances must not share it's instance.",
-                "Entity::shareSkeletonWith");
-        }
+        OgreAssert(entity->getMesh()->getSkeleton() == getMesh()->getSkeleton(),
+                   "The supplied entity has a different skeleton");
+        OgreAssert(mSkeletonInstance, "This entity has no skeleton");
+        OgreAssert(!mSharedSkeletonEntities || !entity->mSharedSkeletonEntities,
+                   "Both entities already shares their SkeletonInstances! At least one of the instances "
+                   "must not share it's instance");
 
         //check if we already share our skeletoninstance, we don't want to delete it if so
         if (mSharedSkeletonEntities != NULL)
@@ -2315,12 +2284,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void Entity::stopSharingSkeletonInstance()
     {
-        if (mSharedSkeletonEntities == NULL)
-        {
-            OGRE_EXCEPT(Exception::ERR_RT_ASSERTION_FAILED,
-                "This entity is not sharing it's skeletoninstance.",
-                "Entity::shareSkeletonWith");
-        }
+        OgreAssert(mSharedSkeletonEntities, "This entity is not sharing it's skeletoninstance");
         //check if there's no other than us sharing the skeleton instance
         if (mSharedSkeletonEntities->size() == 1)
         {

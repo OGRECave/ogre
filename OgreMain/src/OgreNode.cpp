@@ -273,7 +273,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     Node* Node::createChild(const String& name, const Vector3& inTranslate, const Quaternion& inRotate)
     {
-        OgreAssert(!name.empty(), "name must not be empty");
+        OgreAssert(!name.empty(), "");
         Node* newNode = createChildImpl(name);
         newNode->setPosition(inTranslate);
         newNode->setOrientation(inRotate);
@@ -309,28 +309,19 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     Node* Node::removeChild(unsigned short index)
     {
-        if (index < mChildren.size())
-        {
-            ChildNodeMap::iterator i = mChildren.begin();
-            i += index;
-            Node* ret = *i;
+        OgreAssert(index < mChildren.size(), "");
 
-            // cancel any pending update
-            cancelUpdate(ret);
+        ChildNodeMap::iterator i = mChildren.begin();
+        i += index;
+        Node* ret = *i;
 
-            std::swap(*i, mChildren.back());
-            mChildren.pop_back();
-            ret->setParent(NULL);
-            return ret;
-        }
-        else
-        {
-            OGRE_EXCEPT(
-                Exception::ERR_INVALIDPARAMS,
-                "Child index out of bounds.",
-                "Node::getChild" );
-        }
-        return 0;
+        // cancel any pending update
+        cancelUpdate(ret);
+
+        std::swap(*i, mChildren.back());
+        mChildren.pop_back();
+        ret->setParent(NULL);
+        return ret;
     }
     //-----------------------------------------------------------------------
     Node* Node::removeChild(Node* child)
@@ -636,7 +627,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     Node* Node::removeChild(const String& name)
     {
-        OgreAssert(!name.empty(), "name must not be empty");
+        OgreAssert(!name.empty(), "");
         NodeNameExists pred = {name};
         ChildNodeMap::iterator i = std::find_if(mChildren.begin(), mChildren.end(), pred);
 

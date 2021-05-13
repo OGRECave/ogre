@@ -37,10 +37,8 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void Pose::addVertex(size_t index, const Vector3& offset)
     {
-        if (!mNormalsMap.empty())
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
-                "Inconsistent calls to addVertex, must include normals always or never",
-                "Pose::addVertex");
+        OgreAssert(mNormalsMap.empty(),
+                   "Inconsistent calls to addVertex, must include normals always or never");
 
         if(offset.squaredLength() < 1e-6f)
         {
@@ -53,10 +51,8 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void Pose::addVertex(size_t index, const Vector3& offset, const Vector3& normal)
     {
-        if (!mVertexOffsetMap.empty() && mNormalsMap.empty())
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
-                "Inconsistent calls to addVertex, must include normals always or never",
-                "Pose::addVertex");
+        OgreAssert(mVertexOffsetMap.empty() || !mNormalsMap.empty(),
+                   "Inconsistent calls to addVertex, must include normals always or never");
 
         if(offset.squaredLength() < 1e-6f && normal.squaredLength() < 1e-6f)
         {

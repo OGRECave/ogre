@@ -102,21 +102,13 @@ namespace Ogre
     //-----------------------------------------------------------------------------
     RenderQueueInvocation* RenderQueueInvocationSequence::get(size_t index)
     {
-        if (index >= size())
-            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
-                "Index out of bounds", 
-                "RenderQueueInvocationSequence::get");
-
-        return mInvocations[index];
+        return mInvocations.at(index);
     }
     //-----------------------------------------------------------------------------
     void RenderQueueInvocationSequence::remove(size_t index)
     {
-        if (index >= size())
-            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
-            "Index out of bounds", 
-            "RenderQueueInvocationSequence::remove");
-        
+        OgreAssert(index >= size(), "Index out of bounds");
+
         RenderQueueInvocationList::iterator i = mInvocations.begin();
         std::advance(i, index);
         OGRE_DELETE *i;

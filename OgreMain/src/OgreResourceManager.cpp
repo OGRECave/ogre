@@ -488,8 +488,7 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void ResourceManager::destroyResourcePool(ResourcePool* pool)
     {
-        if(!pool)
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Cannot destroy a null ResourcePool.", "ResourceManager::destroyResourcePool");
+        OgreAssert(pool, "Cannot destroy a null ResourcePool");
 
         OGRE_LOCK_AUTO_MUTEX;
 
