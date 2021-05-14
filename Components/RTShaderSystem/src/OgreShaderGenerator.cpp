@@ -1891,9 +1891,14 @@ void ShaderGenerator::SGScheme::synchronizeWithLightSettings()
         
         auto currLightCount = mRenderState->getLightCount();
 
-        // Case light state has been changed -> invalidate this scheme.
-        if (currLightCount != sceneLightCount)
-        {       
+        auto lightDiff = currLightCount - sceneLightCount;
+
+        // Case new light appeared -> invalidate. But dont invalidate the other way as shader compilation is costly.
+        if (!(Vector3i(-1) < lightDiff))
+        {
+            LogManager::getSingleton().stream(LML_TRIVIAL)
+                << "RTSS: invalidating scheme " << mName << " - lights changed " << currLightCount
+                << " -> " << sceneLightCount;
             curRenderState->setLightCount(sceneLightCount);
             invalidate();
         }
@@ -1907,6 +1912,8 @@ void ShaderGenerator::SGScheme::synchronizeWithFogSettings()
 
     if (sceneManager != NULL && sceneManager->getFogMode() != mFogMode)
     {
+        LogManager::getSingleton().stream(LML_TRIVIAL)
+            << "RTSS: invalidating scheme " << mName << " - fog settings changed";
         mFogMode = sceneManager->getFogMode();
         invalidate();
     }
