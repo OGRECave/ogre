@@ -164,6 +164,10 @@ void DeferredShadingSystem::setActive(bool active)
         mActive = active;
         mGBufferInstance->setEnabled(active);
 
+        RTShader::ShaderGenerator& rtShaderGen = RTShader::ShaderGenerator::getSingleton();
+        // we do lights ourselves if active
+        rtShaderGen.getRenderState(RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME)->setLightCountAutoUpdate(!mActive);
+
         // mCurrentMode could have changed with a prior call to setMode, so iterate all
         setMode(mCurrentMode);
     }
@@ -197,6 +201,7 @@ void DeferredShadingSystem::createResources(void)
 
 
     RTShader::RenderState* schemRenderState = rtShaderGen.getRenderState("GBuffer");
+    schemRenderState->setLightCountAutoUpdate(false); // does not use lights
     RTShader::GBuffer* subRenderState = rtShaderGen.createSubRenderState<RTShader::GBuffer>();
     subRenderState->setOutBuffers({RTShader::GBuffer::TL_DIFFUSE_SPECULAR, RTShader::GBuffer::TL_NORMAL_VIEWDEPTH});
     schemRenderState->addTemplateSubRenderState(subRenderState);
