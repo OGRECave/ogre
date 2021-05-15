@@ -448,7 +448,6 @@ namespace Ogre {
             rotation inherited from a node attachment. */
         Vector3 getRealRight(void) const;
 
-        void getWorldTransforms(Matrix4* mat) const override;
         const String& getMovableType(void) const override;
 
         /** Sets the level-of-detail factor for this Camera.

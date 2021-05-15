@@ -647,20 +647,6 @@ namespace Ogre {
 #endif
     }
     //-----------------------------------------------------------------------
-    void Camera::getWorldTransforms(Matrix4* mat) const 
-    {
-        updateView();
-
-        Vector3 scale(1.0, 1.0, 1.0);
-        if (mParentNode)
-          scale = mParentNode->_getDerivedScale();
-
-        mat->makeTransform(
-                mDerivedPosition,
-                scale,
-                mDerivedOrientation);
-    }
-    //-----------------------------------------------------------------------
     const String& Camera::getMovableType(void) const
     {
         return msMovableType;
