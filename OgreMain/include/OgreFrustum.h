@@ -30,7 +30,6 @@ THE SOFTWARE.
 
 #include "OgrePrerequisites.h"
 #include "OgreMovableObject.h"
-#include "OgreRenderable.h"
 #include "OgreAxisAlignedBox.h"
 #include "OgreVertexIndexData.h"
 #include "OgreHeaderPrefix.h"
@@ -81,13 +80,9 @@ namespace Ogre
         used to represent either a visible area or a projection area. Can be used
         for a number of applications.
     */
-    class _OgreExport Frustum : public MovableObject, public Renderable
+    class _OgreExport Frustum : public MovableObject
     {
-        bool getCastsShadows(void) const override { return getCastShadows(); }
     protected:
-        /// Orthographic or perspective?
-        ProjectionType mProjType;
-
         /// y-direction field-of-view (default 45)
         Radian mFOVy;
         /// Far clip distance - default 10000
@@ -126,14 +121,14 @@ namespace Ogre
         mutable bool mRecalcFrustumPlanes;
         /// Something re the world space corners has changed
         mutable bool mRecalcWorldSpaceCorners;
-        /// Something re the vertex data has changed
-        mutable bool mRecalcVertexData;
         /// Are we using a custom view matrix?
         bool mCustomViewMatrix;
         /// Are we using a custom projection matrix?
         bool mCustomProjMatrix;
         /// Have the frustum extents been manually set?
         bool mFrustumExtentsManuallySet;
+        /// Orthographic or perspective?
+        ProjectionType mProjType;
         /// Frustum extents
         mutable RealRect mExtents;
         
@@ -153,7 +148,6 @@ namespace Ogre
         void updateWorldSpaceCorners(void) const;
         /// Implementation of updateWorldSpaceCorners (called if out of date)
         virtual void updateWorldSpaceCornersImpl(void) const;
-        void updateVertexData(void) const;
         virtual bool isViewOutOfDate(void) const;
         bool isFrustumOutOfDate(void) const;
         /// Signal to update frustum information.
@@ -164,10 +158,7 @@ namespace Ogre
         /// Shared class-level name for Movable type
         static String msMovableType;
 
-        mutable VertexData mVertexData;
-
         ColourValue mDebugColour;
-        MaterialPtr mMaterial;
         /// Pointer to a reflection plane (automatically updated)
         const MovablePlane* mLinkedReflectPlane;
         /// Pointer to oblique projection plane (automatically updated)
@@ -480,17 +471,8 @@ namespace Ogre
         const String& getMovableType(void) const override;
         void _notifyCurrentCamera(Camera* cam) override;
 
-        /// @deprecated use setDebugColour
-        OGRE_DEPRECATED void setMaterial(const MaterialPtr& mat);
-
         void setDebugColour(const ColourValue& col) { mDebugColour = col; }
         const ColourValue& getDebugColour() const { return mDebugColour; }
-
-        const MaterialPtr& getMaterial(void) const override;
-        void getRenderOperation(RenderOperation& op) override;
-        void getWorldTransforms(Matrix4* xform) const override;
-        Real getSquaredViewDepth(const Camera* cam) const override;
-        const LightList& getLights(void) const override;
 
         typedef Vector3 Corners[8];
 
