@@ -1608,6 +1608,7 @@ namespace Ogre
         // background thread.
         OGRE_RW_MUTEX(mNeighbourMutex);
 
+        void waitForDerivedProcesses();
     private:
         /** Gets the data size at a given LOD level.
         */
@@ -1634,7 +1635,7 @@ namespace Ogre
         void createOrDestroyGPUColourMap();
         void createOrDestroyGPULightmap();
         void createOrDestroyGPUCompositeMap();
-        void waitForDerivedProcesses();
+
         void convertSpace(Space inSpace, const Vector3& inVec, Space outSpace, Vector3& outVec, bool translation) const;
         Vector3 convertWorldToTerrainAxes(const Vector3& inVec) const;
         Vector3 convertTerrainToWorldAxes(const Vector3& inVec) const;
