@@ -8,6 +8,8 @@
 #include "OgreStdHeaders.h"
 #include "OgreMemoryAllocatorConfig.h"
 
+#include <deque>
+
 namespace Ogre
 {
     /** \addtogroup Core
