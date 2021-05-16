@@ -59,7 +59,7 @@ namespace Ogre{
                     if (aliasIt == aliasList.end())
                         continue;
 
-                    if (tus->getNumFrames())
+                    if (tus->getNumFrames() > 1)
                         tus->setAnimatedTextureName(aliasIt->second, tus->getNumFrames(),
                                                     tus->getAnimationDuration());
                     else
