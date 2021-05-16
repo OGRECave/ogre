@@ -408,7 +408,7 @@ namespace Ogre {
 
 #if !OGRE_RESOURCEMANAGER_STRICT
             // fall back to global
-            ResourceMap::iterator it = mResources.find(name);
+            auto it = mResources.find(name);
             if( it != mResources.end())
             {
                 return it->second;
