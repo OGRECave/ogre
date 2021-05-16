@@ -246,6 +246,7 @@ namespace Ogre
             mInstancesPerBatch = std::min( maxInstPerBatch, mInstancesPerBatch );
             batch->_setInstancesPerBatch( mInstancesPerBatch );
 
+            OgreAssert(mInstancesPerBatch, "unsupported instancing technique");
             //TODO: Create a "merge" function that merges all submeshes into one big submesh
             //instead of just sending submesh #0
 
