@@ -167,7 +167,7 @@ CompositorInstance *CompositorManager::addCompositor(Viewport *vp, const String 
 {
     CompositorPtr comp = getByName(compositor);
     if(!comp)
-        return 0;
+        OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Compositor '"+compositor+"' not found");
     CompositorChain *chain = getCompositorChain(vp);
     return chain->addCompositor(comp, addPosition==-1 ? CompositorChain::LAST : (size_t)addPosition);
 }
@@ -177,8 +177,10 @@ void CompositorManager::removeCompositor(Viewport *vp, const String &compositor)
     CompositorChain *chain = getCompositorChain(vp);
     size_t pos = chain->getCompositorPosition(compositor);
 
-    if(pos != CompositorChain::NPOS)
-        chain->removeCompositor(pos);
+    if(pos == CompositorChain::NPOS)
+        OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Compositor '"+compositor+"' not found");
+
+    chain->removeCompositor(pos);
 }
 //-----------------------------------------------------------------------
 void CompositorManager::setCompositorEnabled(Viewport *vp, const String &compositor, bool value)
@@ -186,8 +188,10 @@ void CompositorManager::setCompositorEnabled(Viewport *vp, const String &composi
     CompositorChain *chain = getCompositorChain(vp);
     size_t pos = chain->getCompositorPosition(compositor);
 
-    if(pos != CompositorChain::NPOS)
-        chain->setCompositorEnabled(pos, value);
+    if(pos == CompositorChain::NPOS)
+        OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Compositor '"+compositor+"' not found");
+
+    chain->setCompositorEnabled(pos, value);
 }
 //---------------------------------------------------------------------
 void CompositorManager::_reconstructAllCompositorResources()
