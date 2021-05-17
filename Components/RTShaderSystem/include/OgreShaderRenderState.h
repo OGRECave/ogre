@@ -72,12 +72,6 @@ public:
     */
     void removeSubRenderState(SubRenderState* subRenderState);
 
-    /// @deprecated use removeSubRenderState
-    OGRE_DEPRECATED void removeTemplateSubRenderState(SubRenderState* srs) { removeSubRenderState(srs); }
-
-    /// @deprecated use getSubRenderStates
-    OGRE_DEPRECATED const SubRenderStateList& getTemplateSubRenderStateList() const { return mSubRenderStateList; }
-
     /** Get the list of the sub render states composing this render state. */
     const SubRenderStateList& getSubRenderStates() const { return mSubRenderStateList; }
 
@@ -169,9 +163,6 @@ public:
     @param subRenderState The sub render state to add.
     */
     void addSubRenderStateInstance(SubRenderState* subRenderState);
-
-    /// @deprecated use removeSubRenderState
-    OGRE_DEPRECATED void removeSubRenderStateInstance(SubRenderState* srs) { removeSubRenderState(srs); }
 
     /** Acquire CPU/GPU programs set associated with the given render state and bind them to the pass.
     @param pass The pass to bind the programs to.

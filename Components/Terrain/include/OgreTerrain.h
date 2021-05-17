@@ -854,8 +854,6 @@ namespace Ogre
         */
         Affine3 getPointTransform() const;
 
-        /// @deprecated
-        OGRE_DEPRECATED void getPointTransform(Matrix4* outXform) const { *outXform = getPointTransform(); }
         /** Translate a vector from world space to local terrain space based on the alignment options.
         @param inVec The vector in basis space, where x/y represents the 
         terrain plane and z represents the up vector
