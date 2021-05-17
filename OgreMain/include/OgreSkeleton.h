@@ -423,6 +423,10 @@ namespace Ogre {
         virtual void _buildMapBoneByName(const Skeleton* source,
             BoneHandleMap& boneHandleMap) const;
 
+    protected:
+        /// Storage of animations, lookup by name
+        typedef std::map<String, Animation*> AnimationList;
+        AnimationList mAnimationsList;
     private:
         /// Lookup by bone name
         typedef std::map<String, Bone*> BoneListByName;
@@ -433,10 +437,6 @@ namespace Ogre {
         typedef std::set<Bone*> BoneSet;
         /// Manual bones
         BoneSet mManualBones;
-
-        /// Storage of animations, lookup by name
-        typedef std::map<String, Animation*> AnimationList;
-        AnimationList mAnimationsList;
 
         /// List of references to other skeletons to use animations from 
         mutable LinkedSkeletonAnimSourceList mLinkedSkeletonAnimSourceList;
