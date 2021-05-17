@@ -1080,26 +1080,6 @@ namespace Ogre {
 
     }
     //-----------------------------------------------------------------------
-    bool Root::createRenderWindows(const RenderWindowDescriptionList& renderWindowDescriptions,
-        RenderWindowList& createdWindows)
-    {
-        OgreAssert(mIsInitialised,
-                   "Cannot create window! Make sure to call Root::initialise before creating a window");
-        OgreAssert(mActiveRenderer, "Cannot create window");
-
-        bool success;
-        OGRE_IGNORE_DEPRECATED_BEGIN
-        success = mActiveRenderer->_createRenderWindows(renderWindowDescriptions, createdWindows);
-        OGRE_IGNORE_DEPRECATED_END
-        if(success && !mFirstTimePostWindowInit)
-        {
-            oneTimePostWindowInit();
-            createdWindows[0]->_setPrimary();
-        }
-
-        return success;
-    }
-    //-----------------------------------------------------------------------
     RenderTarget* Root::detachRenderTarget(RenderTarget* target)
     {
         OgreAssert(mActiveRenderer, "Cannot detach target");

@@ -580,10 +580,6 @@ namespace Ogre
             return createRenderWindow(desc.name, desc.width, desc.height,
                                       desc.useFullScreen, &desc.miscParams);
         }
-
-        /// @deprecated call createRenderWindow multiple times
-        OGRE_DEPRECATED bool createRenderWindows(const RenderWindowDescriptionList& renderWindowDescriptions,
-            RenderWindowList& createdWindows);
     
         /** Detaches a RenderTarget from the active render system
         and returns a pointer to it.
