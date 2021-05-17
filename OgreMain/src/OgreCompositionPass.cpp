@@ -275,23 +275,6 @@ bool CompositionPass::getStencilReadBackAsTextureOperation() const
 {
     return mStencilReadBackAsTexture;
 }
-
-void CompositionPass::setQuadCorners(Real left,Real top,Real right,Real bottom)
-{
-    mQuadCornerModified=true;
-    mQuad.left = left;
-    mQuad.top = top;
-    mQuad.right = right;
-    mQuad.bottom = bottom;
-}
-bool CompositionPass::getQuadCorners(Real & left,Real & top,Real & right,Real & bottom) const
-{
-    left = mQuad.left;
-    top = mQuad.top;
-    right = mQuad.right;
-    bottom = mQuad.bottom;
-    return mQuadCornerModified;
-}
 void CompositionPass::setQuadFarCorners(bool farCorners, bool farCornersViewSpace)
 {
     mQuadFarCorners = farCorners;

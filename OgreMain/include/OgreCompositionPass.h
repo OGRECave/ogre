@@ -287,15 +287,11 @@ namespace Ogre {
             @note applies when PassType is RENDERQUAD
          */
         void setQuadCorners(const FloatRect& quad) { mQuad = quad; mQuadCornerModified = true; }
-        /// @deprecated
-        OGRE_DEPRECATED void setQuadCorners(Real left,Real top,Real right,Real bottom);
 
         /** Get quad normalised positions [-1;1]x[-1;1]
             @note applies when PassType is RENDERQUAD 
          */
         bool getQuadCorners(FloatRect& quad) const { quad = mQuad; return mQuadCornerModified; }
-        /// @deprecated
-        OGRE_DEPRECATED bool getQuadCorners(Real & left,Real & top,Real & right,Real & bottom) const;
             
         /** Sets the use of camera frustum far corners provided in the quad's normals
             @note applies when PassType is RENDERQUAD 

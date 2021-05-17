@@ -141,9 +141,6 @@ namespace Ogre {
         void setMaterial(const MaterialPtr& mat) { mMaterial = mat; }
         const MaterialPtr& getMaterial() const { return mMaterial; }
 
-        /// @deprecated use getMaterial() instead
-        OGRE_DEPRECATED bool isMatInitialised(void) const { return bool(mMaterial); }
-
         /** Returns a RenderOperation structure required to render this mesh.
             @param 
                 rend Reference to a RenderOperation structure to populate.

@@ -1114,14 +1114,6 @@ namespace Ogre {
         updateFrustum();
         return mExtents;
     }
-    void Frustum::getFrustumExtents(Real& outleft, Real& outright, Real& outtop, Real& outbottom) const
-    {
-        updateFrustum();
-        outleft = mExtents.left;
-        outright = mExtents.right;
-        outtop = mExtents.top;
-        outbottom = mExtents.bottom;
-    }
     //---------------------------------------------------------------------
     PlaneBoundedVolume Frustum::getPlaneBoundedVolume()
     {
