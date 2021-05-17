@@ -25,6 +25,7 @@ branches:
 after_build:
   - IF NOT "%APPVEYOR_REPO_TAG%" == "true" set APPVEYOR_REPO_TAG_NAME=master
   - 7z a ogre-sdk-%APPVEYOR_REPO_TAG_NAME%-msvc141-x64.zip ./build/sdk/*
+  - SET PATH=C:\Python37-x64;C:\Python37-x64\Scripts;%PATH%
   - pip install --upgrade cloudsmith-cli
   - IF "%APPVEYOR_PULL_REQUEST_NUMBER%" == "" cloudsmith push raw ogrecave/ogre ogre-sdk-%APPVEYOR_REPO_TAG_NAME%-msvc141-x64.zip --republish -k %CS_APIKEY%
 artifacts:
