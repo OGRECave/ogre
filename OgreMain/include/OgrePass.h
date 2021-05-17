@@ -684,9 +684,6 @@ namespace Ogre {
         */
         void setSeparateSceneBlending( const SceneBlendFactor sourceFactor, const SceneBlendFactor destFactor, const SceneBlendFactor sourceFactorAlpha, const SceneBlendFactor destFactorAlpha );
 
-        /// @deprecated
-        OGRE_DEPRECATED bool hasSeparateSceneBlending() const;
-
         /// Retrieves the complete blend state of this pass
         const ColourBlendState& getBlendState() const { return mBlendState; }
 
@@ -722,9 +719,6 @@ namespace Ogre {
             @param alphaOp The blending operation mode to use for alpha channels in this pass
         */
         void setSeparateSceneBlendingOperation(SceneBlendOperation op, SceneBlendOperation alphaOp);
-
-        /// @deprecated
-        OGRE_DEPRECATED bool hasSeparateSceneBlendingOperations() const;
 
         /** Returns the current blending operation */
         SceneBlendOperation getSceneBlendingOperation() const;

@@ -316,11 +316,6 @@ namespace Ogre
         /** Get the extents of the frustum in view space. */
         RealRect getFrustumExtents() const;
 
-        /// @deprecated
-        /// @overload
-        OGRE_DEPRECATED void getFrustumExtents(Real& outleft, Real& outright, Real& outtop, Real& outbottom) const;
-
-
         /** Gets the projection matrix for this frustum adjusted for the current
             rendersystem specifics (may be right or left-handed, depth range
             may vary).

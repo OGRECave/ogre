@@ -660,11 +660,6 @@ namespace Ogre {
         return mBlendState.destFactorAlpha;
     }
     //-----------------------------------------------------------------------
-    bool Pass::hasSeparateSceneBlending() const
-    {
-        return true;
-    }
-    //-----------------------------------------------------------------------
     void Pass::setSceneBlendingOperation(SceneBlendOperation op)
     {
         mBlendState.operation = op;
@@ -685,11 +680,6 @@ namespace Ogre {
     SceneBlendOperation Pass::getSceneBlendingOperationAlpha() const
     {
         return mBlendState.alphaOperation;
-    }
-    //-----------------------------------------------------------------------
-    bool Pass::hasSeparateSceneBlendingOperations() const
-    {
-        return true;
     }
     //-----------------------------------------------------------------------
     bool Pass::isTransparent(void) const
