@@ -169,12 +169,6 @@ namespace Ogre
         */
         const String& getSource(void) const;
 
-        /// @deprecated obsolete
-        OGRE_DEPRECATED void setCharacterSpacer(uint charSpacer) {}
- 
-        /// @deprecated obsolete
-        OGRE_DEPRECATED uint getCharacterSpacer(void) const { return 1; }
-
         /** Sets the size of a truetype font (only required for FT_TRUETYPE). 
         @param ttfSize The size of the font in points. Note that the
             size of the font does not affect how big it is on the screen, just how large it is in

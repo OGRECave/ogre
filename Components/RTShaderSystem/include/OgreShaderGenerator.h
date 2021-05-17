@@ -146,9 +146,6 @@ public:
     */
     const String& getShaderProfiles(GpuProgramType type) const;
 
-    /// @deprecated use getShaderProfiles()
-    OGRE_DEPRECATED const StringVector& getShaderProfilesList(GpuProgramType type);
-
     /** 
     Set the output shader cache path. Generated shader code will be written to this path.
     In case of empty cache path shaders will be generated directly from system memory.
@@ -274,12 +271,6 @@ public:
         return hasShaderBasedTechnique(mat.getName(), mat.getGroup(), srcTechniqueSchemeName, dstTechniqueSchemeName);
     }
 
-    /// @deprecated
-    OGRE_DEPRECATED bool hasShaderBasedTechnique(const String& materialName, const String& srcTechniqueSchemeName, const String& dstTechniqueSchemeName) const
-    {
-        return hasShaderBasedTechnique(materialName, RGN_AUTODETECT, srcTechniqueSchemeName, dstTechniqueSchemeName);
-    }
-
     /**
     Create shader based technique from a given technique.
     Return true upon success. Failure may occur if the source technique is not FFP pure, or different
@@ -326,10 +317,6 @@ public:
     @return True if successful
     */
     bool cloneShaderBasedTechniques(const Material& srcMat, Material& dstMat);
-
-    /// @deprecated
-    OGRE_DEPRECATED bool cloneShaderBasedTechniques(const String& srcMaterialName,
-        const String& srcGroupName, const String& dstMaterialName, const String& dstGroupName);
 
     /** 
     Remove all shader based techniques that created by this shader generator.   
@@ -857,12 +844,8 @@ private:
     String mShaderLanguage;
     // The target vertex shader profile. Will be used as argument for program compilation.
     String mVertexShaderProfiles;
-    // List of target vertex shader profiles.
-    StringVector mVertexShaderProfilesList;
     // The target fragment shader profile. Will be used as argument for program compilation.
     String mFragmentShaderProfiles;
-    // List of target fragment shader profiles..
-    StringVector mFragmentShaderProfilesList;
     // Path for caching the generated shaders.
     String mShaderCachePath;
     // Shader program manager.

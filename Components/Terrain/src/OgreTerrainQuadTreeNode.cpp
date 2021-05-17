@@ -1142,11 +1142,6 @@ namespace Ogre
             y >= mOffsetY && y < mBoundaryY;
     }
     //---------------------------------------------------------------------
-    const AxisAlignedBox& TerrainQuadTreeNode::getAABB() const
-    {
-        return mAABB;
-    }
-    //---------------------------------------------------------------------
     Real TerrainQuadTreeNode::getBoundingRadius() const
     {
         return mBoundingRadius;

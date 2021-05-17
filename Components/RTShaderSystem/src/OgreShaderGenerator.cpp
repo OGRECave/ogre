@@ -658,11 +658,9 @@ void ShaderGenerator::setShaderProfiles(GpuProgramType type, const String& shade
     {
     case GPT_VERTEX_PROGRAM:
         mVertexShaderProfiles = shaderProfiles;
-        mVertexShaderProfilesList = StringUtil::split(shaderProfiles);
         break;
     case GPT_FRAGMENT_PROGRAM:
         mFragmentShaderProfiles = shaderProfiles;
-        mFragmentShaderProfilesList = StringUtil::split(shaderProfiles);
         break;
     default:
         OgreAssert(false, "not implemented");
@@ -681,22 +679,6 @@ const String& ShaderGenerator::getShaderProfiles(GpuProgramType type) const
     default:
         return BLANKSTRING;
     }
-}
-
-const StringVector& ShaderGenerator::getShaderProfilesList(GpuProgramType type)
-{
-    switch(type)
-    {
-    case GPT_VERTEX_PROGRAM:
-        return mVertexShaderProfilesList;
-    case GPT_FRAGMENT_PROGRAM:
-        return mFragmentShaderProfilesList;
-    default:
-        break;
-    }
-
-    static StringVector empty;
-    return empty;
 }
 //-----------------------------------------------------------------------------
 bool ShaderGenerator::hasShaderBasedTechnique(const String& materialName, 
@@ -929,38 +911,6 @@ bool ShaderGenerator::removeAllShaderBasedTechniques(const String& materialName,
     mMaterialEntriesMap.erase(itMatEntry);
     
     return true;
-}
-
-//-----------------------------------------------------------------------------
-bool ShaderGenerator::cloneShaderBasedTechniques(const String& srcMaterialName, 
-                                                 const String& srcGroupName, 
-                                                 const String& dstMaterialName, 
-                                                 const String& dstGroupName)
-{
-    OGRE_LOCK_AUTO_MUTEX;
-
-    //
-    // Check that both source and destination material exist
-    //
-
-    // Make sure material exists.
-    MaterialPtr srcMat = MaterialManager::getSingleton().getByName(srcMaterialName, srcGroupName);
-    MaterialPtr dstMat = MaterialManager::getSingleton().getByName(dstMaterialName, dstGroupName);
-    if (!srcMat || !dstMat || (srcMat == dstMat))
-        return false;
-
-    // Update group name in case it is AUTODETECT_RESOURCE_GROUP_NAME
-    const String& trueSrcGroupName = srcMat->getGroup();
-    const String& trueDstGroupName = dstMat->getGroup();
-
-    // Case the requested material belongs to different group and it is not AUTODETECT_RESOURCE_GROUP_NAME.
-    if ((trueSrcGroupName != srcGroupName && srcGroupName != ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME) ||
-        (trueDstGroupName != dstGroupName && dstGroupName != ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME))
-    {
-        return false;
-    }
-
-    return cloneShaderBasedTechniques(*srcMat, *dstMat);
 }
 
 bool ShaderGenerator::cloneShaderBasedTechniques(const Material& srcMat, Material& dstMat)
