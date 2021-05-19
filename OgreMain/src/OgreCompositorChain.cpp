@@ -148,10 +148,6 @@ CompositorInstance* CompositorChain::addCompositor(CompositorPtr filter, size_t 
     CompositionTechnique *tech = filter->getSupportedTechnique(scheme);
     if(!tech)
     {
-        /// Warn user
-        LogManager::getSingleton().logMessage(
-            "CompositorChain: Compositor " + filter->getName() + " has no supported techniques.", LML_CRITICAL
-            );
         return 0;
     }
     CompositorInstance *t = OGRE_NEW CompositorInstance(tech, this);
