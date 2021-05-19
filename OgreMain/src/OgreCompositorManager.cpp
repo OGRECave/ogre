@@ -178,7 +178,7 @@ void CompositorManager::removeCompositor(Viewport *vp, const String &compositor)
     size_t pos = chain->getCompositorPosition(compositor);
 
     if(pos == CompositorChain::NPOS)
-        OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Compositor '"+compositor+"' not found");
+        OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Compositor '"+compositor+"' not in chain");
 
     chain->removeCompositor(pos);
 }
@@ -189,7 +189,7 @@ void CompositorManager::setCompositorEnabled(Viewport *vp, const String &composi
     size_t pos = chain->getCompositorPosition(compositor);
 
     if(pos == CompositorChain::NPOS)
-        OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Compositor '"+compositor+"' not found");
+        OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Compositor '"+compositor+"' not in chain");
 
     chain->setCompositorEnabled(pos, value);
 }

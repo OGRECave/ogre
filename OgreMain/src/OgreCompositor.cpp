@@ -129,6 +129,9 @@ void Compositor::compile()
         }
     }
 
+    if (mSupportedTechniques.empty())
+        LogManager::getSingleton().logError("Compositor '" + getName() + "' has no supported techniques");
+
     mCompilationRequired = false;
 }
 //---------------------------------------------------------------------
