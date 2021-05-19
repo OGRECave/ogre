@@ -120,7 +120,7 @@ namespace Ogre{
      *  ScriptCompilerManager tied to specific object types.
      *  Each manager may manage multiple types.
      */
-    class ScriptTranslatorManager : public ScriptTranslatorAlloc
+    class _OgreExport ScriptTranslatorManager : public ScriptTranslatorAlloc
     {
     public:
         // required - virtual destructor
