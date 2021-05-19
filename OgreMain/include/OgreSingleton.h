@@ -80,7 +80,7 @@ protected:
     static T* msSingleton;
 
 public:
-#if defined(__GNUC__) || defined(__clang__)
+#if (defined(__has_attribute) && __has_attribute(no_sanitize)) || (defined(__GNUC__) && __GNUC__ >= 8)
     // The `static_cast` happens so early in the construction of the inheriting
     // classes that the `this` pointer is still detected as the super class
     // pointer. Therefore, disabling vptr checks.
