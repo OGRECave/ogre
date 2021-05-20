@@ -170,24 +170,17 @@ bool CompositionTechnique::isSupported(bool acceptTextureDegradation)
 
         for (PixelFormatList::iterator pfi = td->formatList.begin(); pfi != td->formatList.end(); ++pfi)
         {
-
             // Check whether equivalent supported
-            if(acceptTextureDegradation)
+            // Need a format which is the same number of bits to pass
+            bool accepted = texMgr.isEquivalentFormatSupported(td->type, *pfi, TU_RENDERTARGET);
+            if(!accepted && acceptTextureDegradation)
             {
                 // Don't care about exact format so long as something is supported
-                if(texMgr.getNativeFormat(td->type, *pfi, TU_RENDERTARGET) == PF_UNKNOWN)
-                {
-                    return false;
-                }
+                accepted = texMgr.getNativeFormat(td->type, *pfi, TU_RENDERTARGET) != PF_UNKNOWN;
             }
-            else
-            {
-                // Need a format which is the same number of bits to pass
-                if (!texMgr.isEquivalentFormatSupported(td->type, *pfi, TU_RENDERTARGET))
-                {
-                    return false;
-                }
-            }
+
+            if(!accepted)
+                return false;
         }
 
         //Check all render targets have same number of bits
