@@ -846,7 +846,7 @@ void SceneManager::ShadowRenderer::prepareShadowTextures(Camera* cam, Viewport* 
             shadowView->setMaterialScheme(vp->getMaterialScheme());
 
             // Set the viewport visibility flags
-            shadowView->setVisibilityMask(vp->getVisibilityMask());
+            shadowView->setVisibilityMask(light->getLightMask() & vp->getVisibilityMask());
 
             // update shadow cam - light mapping
             ShadowCamLightMapping::iterator camLightIt = mShadowCamLightMapping.find( texCam );
