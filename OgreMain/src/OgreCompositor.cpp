@@ -119,29 +119,13 @@ void Compositor::compile()
 {
     /// Sift out supported techniques
     mSupportedTechniques.clear();
-    Techniques::iterator i, iend;
-    iend = mTechniques.end();
 
-    // Try looking for exact technique support with no texture fallback
-    for (i = mTechniques.begin(); i != iend; ++i)
+    for (auto t : mTechniques)
     {
-        // Look for exact texture support first
-        if((*i)->isSupported(false))
+        // Allow texture support with degraded pixel format
+        if (t->isSupported(true))
         {
-            mSupportedTechniques.push_back(*i);
-        }
-    }
-
-    if (mSupportedTechniques.empty())
-    {
-        // Check again, being more lenient with textures
-        for (i = mTechniques.begin(); i != iend; ++i)
-        {
-            // Allow texture support with degraded pixel format
-            if((*i)->isSupported(true))
-            {
-                mSupportedTechniques.push_back(*i);
-            }
+            mSupportedTechniques.push_back(t);
         }
     }
 
