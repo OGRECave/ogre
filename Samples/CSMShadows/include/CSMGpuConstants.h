@@ -11,11 +11,11 @@
 namespace Ogre
 {
 
-class CSMGpuConstants : public SceneManager::Listener
+class CSMGpuConstants : public ShadowTextureListener
 {
 public:
     CSMGpuConstants(size_t cascadeCount);
-    void shadowTextureCasterPreViewProj(Light* light, Camera* camera, size_t iteration);
+    void shadowTextureCasterPreViewProj(Light* light, Camera* camera, size_t iteration) override;
 
 private:
     Ogre::GpuSharedParametersPtr mParamsScaleBias;

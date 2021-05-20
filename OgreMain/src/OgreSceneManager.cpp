@@ -2557,6 +2557,19 @@ void SceneManager::removeListener(Listener* delListener)
     if (i != mListeners.end())
         mListeners.erase(i);
 }
+void SceneManager::addShadowTextureListener(ShadowTextureListener* newListener)
+{
+    if (std::find(mShadowRenderer.mListeners.begin(), mShadowRenderer.mListeners.end(), newListener) ==
+        mShadowRenderer.mListeners.end())
+        mShadowRenderer.mListeners.push_back(newListener);
+}
+//---------------------------------------------------------------------
+void SceneManager::removeShadowTextureListener(ShadowTextureListener* delListener)
+{
+    auto i = std::find(mShadowRenderer.mListeners.begin(), mShadowRenderer.mListeners.end(), delListener);
+    if (i != mShadowRenderer.mListeners.end())
+        mShadowRenderer.mListeners.erase(i);
+}
 //---------------------------------------------------------------------
 void SceneManager::firePreRenderQueues()
 {
@@ -2615,39 +2628,12 @@ void SceneManager::fireRenderSingleObject(Renderable* rend, const Pass* pass,
     }
 }
 //---------------------------------------------------------------------
-void SceneManager::fireShadowTexturesUpdated(size_t numberOfShadowTextures)
-{
-    ListenerList listenersCopy = mListeners;
-    ListenerList::iterator i, iend;
-
-    iend = listenersCopy.end();
-    for (i = listenersCopy.begin(); i != iend; ++i)
-    {
-        (*i)->shadowTexturesUpdated(numberOfShadowTextures);
-    }
-}
-//---------------------------------------------------------------------
 void SceneManager::fireShadowTexturesPreCaster(Light* light, Camera* camera, size_t iteration)
 {
-    ListenerList listenersCopy = mListeners;
-    ListenerList::iterator i, iend;
-
-    iend = listenersCopy.end();
-    for (i = listenersCopy.begin(); i != iend; ++i)
+    auto listenersCopy = mShadowRenderer.mListeners;
+    for (auto l : listenersCopy)
     {
-        (*i)->shadowTextureCasterPreViewProj(light, camera, iteration);
-    }
-}
-//---------------------------------------------------------------------
-void SceneManager::fireShadowTexturesPreReceiver(Light* light, Frustum* f)
-{
-    ListenerList listenersCopy = mListeners;
-    ListenerList::iterator i, iend;
-
-    iend = listenersCopy.end();
-    for (i = listenersCopy.begin(); i != iend; ++i)
-    {
-        (*i)->shadowTextureReceiverPreViewProj(light, f);
+        l->shadowTextureCasterPreViewProj(light, camera, iteration);
     }
 }
 //---------------------------------------------------------------------
@@ -2930,31 +2916,7 @@ void SceneManager::findLightsAffectingFrustum(const Camera* camera)
             }
         }
 
-        // Sort the lights if using texture shadows, since the first 'n' will be
-        // used to generate shadow textures and we should pick the most appropriate
-        if (isShadowTechniqueTextureBased())
-        {
-            // Allow a Listener to override light sorting
-            // Reverse iterate so last takes precedence
-            bool overridden = false;
-            ListenerList listenersCopy = mListeners;
-            for (ListenerList::reverse_iterator ri = listenersCopy.rbegin();
-                ri != listenersCopy.rend(); ++ri)
-            {
-                overridden = (*ri)->sortLightsAffectingFrustum(mLightsAffectingFrustum);
-                if (overridden)
-                    break;
-            }
-            if (!overridden)
-            {
-                // default sort (stable to preserve directional light ordering
-                std::stable_sort(
-                    mLightsAffectingFrustum.begin(), mLightsAffectingFrustum.end(), 
-                    lightsForShadowTextureLess());
-            }
-            
-        }
-
+        mShadowRenderer.sortLightsAffectingFrustum(mLightsAffectingFrustum);
         // Use swap instead of copy operator for efficiently
         mCachedLightInfos.swap(mTestLightInfos);
 
