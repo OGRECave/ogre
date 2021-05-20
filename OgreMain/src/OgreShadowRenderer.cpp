@@ -452,7 +452,7 @@ void SceneManager::ShadowRenderer::renderModulativeTextureShadowedQueueGroupObje
             targetPass->_load();
 
             // Fire pre-receiver event
-            mSceneManager->fireShadowTexturesPreReceiver(l, cam);
+            fireShadowTexturesPreReceiver(l, cam);
 
             renderTextureShadowReceiverQueueGroupObjects(pGroup, om);
 
@@ -876,7 +876,7 @@ void SceneManager::ShadowRenderer::prepareShadowTextures(Camera* cam, Viewport* 
         shadowTextureIndex += textureCountPerLight;
     }
 
-    mSceneManager->fireShadowTexturesUpdated(std::min(lightList->size(), mShadowTextures.size()));
+    fireShadowTexturesUpdated(std::min(lightList->size(), mShadowTextures.size()));
 
     ShadowTextureManager::getSingleton().clearUnused();
 
@@ -2057,5 +2057,53 @@ SceneManager::ShadowRenderer::findShadowCastersForLight(const Light* light, cons
 
 
     return mShadowCasterList;
+}
+//---------------------------------------------------------------------
+void SceneManager::ShadowRenderer::fireShadowTexturesUpdated(size_t numberOfShadowTextures)
+{
+    ListenerList listenersCopy = mListeners;
+    ListenerList::iterator i, iend;
+
+    iend = listenersCopy.end();
+    for (i = listenersCopy.begin(); i != iend; ++i)
+    {
+        (*i)->shadowTexturesUpdated(numberOfShadowTextures);
+    }
+}
+//---------------------------------------------------------------------
+void SceneManager::ShadowRenderer::fireShadowTexturesPreReceiver(Light* light, Frustum* f)
+{
+    ListenerList listenersCopy = mListeners;
+    ListenerList::iterator i, iend;
+
+    iend = listenersCopy.end();
+    for (i = listenersCopy.begin(); i != iend; ++i)
+    {
+        (*i)->shadowTextureReceiverPreViewProj(light, f);
+    }
+}
+void SceneManager::ShadowRenderer::sortLightsAffectingFrustum(LightList& lightList)
+{
+    if ((mShadowTechnique & SHADOWDETAILTYPE_TEXTURE) == 0)
+        return;
+    // Sort the lights if using texture shadows, since the first 'n' will be
+    // used to generate shadow textures and we should pick the most appropriate
+
+    // Allow a Listener to override light sorting
+    // Reverse iterate so last takes precedence
+    bool overridden = false;
+    ListenerList listenersCopy = mListeners;
+    for (ListenerList::reverse_iterator ri = listenersCopy.rbegin();
+        ri != listenersCopy.rend(); ++ri)
+    {
+        overridden = (*ri)->sortLightsAffectingFrustum(lightList);
+        if (overridden)
+            break;
+    }
+    if (!overridden)
+    {
+        // default sort (stable to preserve directional light ordering
+        std::stable_sort(lightList.begin(), lightList.end(), lightsForShadowTextureLess());
+    }
 }
 }

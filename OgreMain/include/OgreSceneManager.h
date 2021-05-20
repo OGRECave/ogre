@@ -125,6 +125,87 @@ namespace Ogre {
 
     };
 
+    struct ShadowTextureListener
+    {
+        ShadowTextureListener() {}
+        virtual ~ShadowTextureListener() {}
+        /** Event raised after all shadow textures have been rendered into for
+            all queues / targets but before any other geometry has been rendered
+            (including main scene geometry and any additional shadow receiver
+            passes).
+        @remarks
+            This callback is useful for those that wish to perform some
+            additional processing on shadow textures before they are used to
+            render shadows. For example you could perform some filtering by
+            rendering the existing shadow textures into another alternative
+            shadow texture with a shader.
+        @note
+            This event will only be fired when texture shadows are in use.
+        @param numberOfShadowTextures The number of shadow textures in use
+        */
+        virtual void shadowTexturesUpdated(size_t numberOfShadowTextures)
+                    { (void)numberOfShadowTextures; }
+
+        /** This event occurs just before the view & projection matrices are
+            set for rendering into a shadow texture.
+        @remarks
+            You can use this event hook to perform some custom processing,
+            such as altering the camera being used for rendering the light's
+            view, including setting custom view & projection matrices if you
+            want to perform an advanced shadow technique.
+        @note
+            This event will only be fired when texture shadows are in use.
+        @param light Pointer to the light for which shadows are being rendered
+        @param camera Pointer to the camera being used to render
+        @param iteration For lights that use multiple shadow textures, the iteration number
+        */
+        virtual void shadowTextureCasterPreViewProj(Light* light,
+            Camera* camera, size_t iteration)
+                    { (void)light; (void)camera; (void)iteration; }
+
+        /** This event occurs just before the view & projection matrices are
+            set for re-rendering a shadow receiver.
+        @remarks
+            You can use this event hook to perform some custom processing,
+            such as altering the projection frustum being used for rendering
+            the shadow onto the receiver to perform an advanced shadow
+            technique.
+        @note
+            This event will only be fired when texture shadows are in use.
+        @param light Pointer to the light for which shadows are being rendered
+        @param frustum Pointer to the projection frustum being used to project
+            the shadow texture
+        */
+        virtual void shadowTextureReceiverPreViewProj(Light* light,
+            Frustum* frustum)
+                    { (void)light; (void)frustum; }
+
+        /** Hook to allow the listener to override the ordering of lights for
+            the entire frustum.
+
+            Whilst ordinarily lights are sorted per rendered object
+            (@ref MovableObject::queryLights), texture shadows adds another issue
+            in that, given there is a finite number of shadow textures, we must
+            choose which lights to render texture shadows from based on the entire
+            frustum. These lights should always be listed first in every objects
+            own list, followed by any other lights which will not cast texture
+            shadows (either because they have shadow casting off, or there aren't
+            enough shadow textures to service them).
+
+            This hook allows you to override the detailed ordering of the lights
+            per frustum. The default ordering is shadow casters first (which you
+            must also respect if you override this method), and ordered
+            by distance from the camera within those 2 groups. Obviously the closest
+            lights with shadow casting enabled will be listed first. Only lights
+            within the range of the frustum will be in the list.
+        @param lightList The list of lights within range of the frustum which you
+            may sort.
+        @return true if you sorted the list, false otherwise.
+        */
+        virtual bool sortLightsAffectingFrustum(LightList& lightList)
+                    { (void)lightList; return false; }
+    };
+
     /** Manages the organisation and rendering of a 'scene': a collection of objects and potentially world geometry.
 
         This class defines the interface and the basic behaviour of a 
@@ -285,82 +366,6 @@ namespace Ogre {
             virtual void postFindVisibleObjects(SceneManager* source, 
                 IlluminationRenderStage irs, Viewport* v)
                         { (void)source; (void)irs; (void)v; }
-
-            /** Event raised after all shadow textures have been rendered into for 
-                all queues / targets but before any other geometry has been rendered
-                (including main scene geometry and any additional shadow receiver 
-                passes). 
-            @remarks
-                This callback is useful for those that wish to perform some 
-                additional processing on shadow textures before they are used to 
-                render shadows. For example you could perform some filtering by 
-                rendering the existing shadow textures into another alternative 
-                shadow texture with a shader.]
-            @note
-                This event will only be fired when texture shadows are in use.
-            @param numberOfShadowTextures The number of shadow textures in use
-            */
-            virtual void shadowTexturesUpdated(size_t numberOfShadowTextures)
-                        { (void)numberOfShadowTextures; }
-
-            /** This event occurs just before the view & projection matrices are
-                set for rendering into a shadow texture.
-            @remarks
-                You can use this event hook to perform some custom processing,
-                such as altering the camera being used for rendering the light's
-                view, including setting custom view & projection matrices if you
-                want to perform an advanced shadow technique.
-            @note
-                This event will only be fired when texture shadows are in use.
-            @param light Pointer to the light for which shadows are being rendered
-            @param camera Pointer to the camera being used to render
-            @param iteration For lights that use multiple shadow textures, the iteration number
-            */
-            virtual void shadowTextureCasterPreViewProj(Light* light, 
-                Camera* camera, size_t iteration)
-                        { (void)light; (void)camera; (void)iteration; }
-
-            /** This event occurs just before the view & projection matrices are
-                set for re-rendering a shadow receiver.
-            @remarks
-                You can use this event hook to perform some custom processing,
-                such as altering the projection frustum being used for rendering 
-                the shadow onto the receiver to perform an advanced shadow 
-                technique.
-            @note
-                This event will only be fired when texture shadows are in use.
-            @param light Pointer to the light for which shadows are being rendered
-            @param frustum Pointer to the projection frustum being used to project
-                the shadow texture
-            */
-            virtual void shadowTextureReceiverPreViewProj(Light* light, 
-                Frustum* frustum)
-                        { (void)light; (void)frustum; }
-
-            /** Hook to allow the listener to override the ordering of lights for
-                the entire frustum.
-
-                Whilst ordinarily lights are sorted per rendered object 
-                (@ref MovableObject::queryLights), texture shadows adds another issue
-                in that, given there is a finite number of shadow textures, we must
-                choose which lights to render texture shadows from based on the entire
-                frustum. These lights should always be listed first in every objects
-                own list, followed by any other lights which will not cast texture 
-                shadows (either because they have shadow casting off, or there aren't
-                enough shadow textures to service them).
-
-                This hook allows you to override the detailed ordering of the lights
-                per frustum. The default ordering is shadow casters first (which you 
-                must also respect if you override this method), and ordered
-                by distance from the camera within those 2 groups. Obviously the closest
-                lights with shadow casting enabled will be listed first. Only lights 
-                within the range of the frustum will be in the list.
-            @param lightList The list of lights within range of the frustum which you
-                may sort.
-            @return true if you sorted the list, false otherwise.
-            */
-            virtual bool sortLightsAffectingFrustum(LightList& lightList)
-                        { (void)lightList; return false; }
 
             /** Event notifying the listener of the SceneManager's destruction. */
             virtual void sceneManagerDestroyed(SceneManager* source)
@@ -787,6 +792,9 @@ namespace Ogre {
             std::unique_ptr<SphereSceneQuery> mShadowCasterSphereQuery;
             std::unique_ptr<AxisAlignedBoxSceneQuery> mShadowCasterAABBQuery;
 
+            typedef std::vector<ShadowTextureListener*> ListenerList;
+            ListenerList mListeners;
+
             /// Inner class to use as callback for shadow caster scene query
             class _OgreExport ShadowCasterSceneQueryListener : public SceneQueryListener, public SceneMgtAlloc
             {
@@ -824,6 +832,11 @@ namespace Ogre {
                 could be affecting the frustum for a given light.
             */
             const ShadowCasterList& findShadowCastersForLight(const Light* light, const Camera* camera);
+            /// Internal method for firing the texture shadows updated event
+            void fireShadowTexturesUpdated(size_t numberOfShadowTextures);
+            /// Internal method for firing the pre receiver texture shadows event
+            void fireShadowTexturesPreReceiver(Light* light, Frustum* f);
+            void sortLightsAffectingFrustum(LightList& lightList);
         } mShadowRenderer;
 
         /** Internal method to validate whether a Pass should be allowed to render.
@@ -881,13 +894,8 @@ namespace Ogre {
         /// Internal method for firing when rendering a single object.
         void fireRenderSingleObject(Renderable* rend, const Pass* pass, const AutoParamDataSource* source,
             const LightList* pLightList, bool suppressRenderStateChanges);
-
-        /// Internal method for firing the texture shadows updated event
-        void fireShadowTexturesUpdated(size_t numberOfShadowTextures);
         /// Internal method for firing the pre caster texture shadows event
         virtual void fireShadowTexturesPreCaster(Light* light, Camera* camera, size_t iteration);
-        /// Internal method for firing the pre receiver texture shadows event
-        virtual void fireShadowTexturesPreReceiver(Light* light, Frustum* f);
         /// Internal method for firing pre update scene graph event
         void firePreUpdateSceneGraph(Camera* camera);
         /// Internal method for firing post update scene graph event
@@ -3065,6 +3073,13 @@ namespace Ogre {
         /** Remove a listener
         */
         void removeListener(Listener* s);
+
+        /** Add a listener which will get called back on shadow texture events.
+        */
+        void addShadowTextureListener(ShadowTextureListener* s);
+        /** Remove a listener
+        */
+        void removeShadowTextureListener(ShadowTextureListener* s);
 
         /// @name Static Geometry
         /// @{
