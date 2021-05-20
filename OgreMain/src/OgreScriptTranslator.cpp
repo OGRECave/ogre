@@ -5302,7 +5302,12 @@ namespace Ogre{
                     {
                         ProcessResourceNameScriptCompilerEvent evt(ProcessResourceNameScriptCompilerEvent::MATERIAL, sval);
                         compiler->_fireEvent(&evt, 0);
-                        mPass->setMaterialName(evt.mName);
+                        auto mat = MaterialManager::getSingleton().getByName(evt.mName, compiler->getResourceGroup());
+                        if (mat)
+                            mPass->setMaterial(mat);
+                        else
+                            compiler->addError(ScriptCompiler::CE_REFERENCETOANONEXISTINGOBJECT, prop->file,
+                                               prop->line, evt.mName);
                     }
                     break;
                 case ID_INPUT:
