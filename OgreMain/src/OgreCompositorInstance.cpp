@@ -111,15 +111,15 @@ void CompositorInstance::setAlive(bool value)
 class RSClearOperation: public CompositorInstance::RenderSystemOperation
 {
 public:
-    RSClearOperation(uint32 inBuffers, ColourValue inColour, Real inDepth, unsigned short inStencil, bool inAutomaticColour):
-        buffers(inBuffers), colour(inColour), automaticColour(inAutomaticColour), depth(inDepth), stencil(inStencil)
+    RSClearOperation(uint32 inBuffers, ColourValue inColour, Real inDepth, unsigned short inStencil, CompositorChain *inChain):
+        chain(inChain), buffers(inBuffers), colour(inColour), depth(inDepth), stencil(inStencil)
     {}
+    /// Automatic colour from original viewport background colour
+    CompositorChain* chain;
     /// Which buffers to clear (FrameBufferType)
     uint32 buffers;
     /// Colour to clear in case FBT_COLOUR is set
     ColourValue colour;
-    /// Automatic colour from original viewport background colour
-    bool automaticColour;
     /// Depth to set in case FBT_DEPTH is set
     Real depth;
     /// Stencil value to set in case FBT_STENCIL is set
@@ -127,9 +127,8 @@ public:
 
     virtual void execute(SceneManager *sm, RenderSystem *rs)
     {
-        // _getViewport returns the viewport currently rendered, while getViewport returns lastViewport!
-        if((buffers & FBT_COLOUR) && automaticColour)
-          colour = rs->_getViewport()->getCamera()->getViewport()->getBackgroundColour();
+        if((buffers & FBT_COLOUR) && chain) // if chain is present, query colour from dst viewport
+          colour = chain->getViewport()->getBackgroundColour();
         rs->clearFrameBuffer(buffers, colour, depth, stencil);
     }
 };
@@ -334,7 +333,7 @@ void CompositorInstance::collectPasses(TargetOperation &finalState, const Compos
                 pass->getClearColour(),
                 pass->getClearDepth(),
                 (ushort)pass->getClearStencil(),
-                pass->getAutomaticColour()
+                pass->getAutomaticColour() ? mChain : NULL
                 ));
             break;
         case CompositionPass::PT_STENCIL:
