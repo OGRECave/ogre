@@ -299,7 +299,7 @@ namespace Ogre {
     void Viewport::setClearEveryFrame(bool inClear, unsigned int inBuffers)
     {
         mClearEveryFrame = inClear;
-        mClearBuffers = inBuffers;
+        mClearBuffers = inClear ? inBuffers : 0;
     }
     //---------------------------------------------------------------------
     bool Viewport::getClearEveryFrame(void) const
