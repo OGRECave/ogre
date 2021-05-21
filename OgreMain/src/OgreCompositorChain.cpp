@@ -113,18 +113,17 @@ void CompositorChain::createOriginalScene()
     CompositorPtr scene = CompositorManager::getSingleton().getByName(compName, ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME);
     if (!scene)
     {
+        /// Create base "original scene" compositor
         scene = CompositorManager::getSingleton().create(compName, ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME);
         CompositionTargetPass *tp = scene->createTechnique()->getOutputTargetPass();
-        tp->createPass(CompositionPass::PT_CLEAR);
+        auto pass = tp->createPass(CompositionPass::PT_CLEAR);
+        pass->setAutomaticColour(true);
 
         /// Render everything, including skies
-        CompositionPass *pass = tp->createPass(CompositionPass::PT_RENDERSCENE);
+        pass = tp->createPass(CompositionPass::PT_RENDERSCENE);
         pass->setFirstRenderQueue(RENDER_QUEUE_BACKGROUND);
         pass->setLastRenderQueue(RENDER_QUEUE_SKIES_LATE);
-
-        /// Create base "original scene" compositor
-        scene = static_pointer_cast<Compositor>(CompositorManager::getSingleton().load(compName,
-            ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME));
+        scene->load();
     }
     mOriginalScene = OGRE_NEW CompositorInstance(scene->getSupportedTechnique(), this);
 }
@@ -351,7 +350,6 @@ void CompositorChain::preViewportUpdate(const RenderTargetViewportEvent& evt)
     CompositionPass* pass = mOriginalScene->getTechnique()->getOutputTargetPass()->getPasses()[0];
     CompositionTargetPass* passParent = pass->getParent();
     if (pass->getClearBuffers() != mViewport->getClearBuffers() ||
-        pass->getClearColour() != mViewport->getBackgroundColour() ||
         pass->getClearDepth() != mViewport->getDepthClear() ||
         passParent->getVisibilityMask() != mViewport->getVisibilityMask() ||
         passParent->getMaterialScheme() != mViewport->getMaterialScheme() ||
@@ -359,7 +357,6 @@ void CompositorChain::preViewportUpdate(const RenderTargetViewportEvent& evt)
     {
         // recompile if viewport settings are different
         pass->setClearBuffers(mViewport->getClearBuffers());
-        pass->setClearColour(mViewport->getBackgroundColour());
         pass->setClearDepth(mViewport->getDepthClear());
         passParent->setVisibilityMask(mViewport->getVisibilityMask());
         passParent->setMaterialScheme(mViewport->getMaterialScheme());
@@ -496,10 +493,6 @@ void CompositorChain::_compile()
     /// Set previous CompositorInstance for each compositor in the list
     CompositorInstance *lastComposition = mOriginalScene;
     mOriginalScene->mPreviousInstance = 0;
-    CompositionPass* pass = mOriginalScene->getTechnique()->getOutputTargetPass()->getPasses()[0];
-    pass->setClearBuffers(mViewport->getClearBuffers());
-    pass->setClearColour(mViewport->getBackgroundColour());
-    pass->setClearDepth(mViewport->getDepthClear());
     for(Instances::iterator i=mInstances.begin(); i!=mInstances.end(); ++i)
     {
         if((*i)->getEnabled())
