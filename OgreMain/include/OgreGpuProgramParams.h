@@ -1567,7 +1567,7 @@ namespace Ogre {
         /// @overload
         void setAutoConstant(size_t index, AutoConstantType acType, uint16 extraInfo1, uint16 extraInfo2)
         {
-            setAutoConstant(index, acType, (size_t)extraInfo1 | ((size_t)extraInfo2) << 16);
+            setAutoConstant(index, acType, (uint32)extraInfo1 | ((uint32)extraInfo2) << 16);
         }
 
         /** As setAutoConstant, but sets up the auto constant directly against a
