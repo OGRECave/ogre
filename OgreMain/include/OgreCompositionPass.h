@@ -228,17 +228,7 @@ namespace Ogre {
         */
         bool getStencilTwoSidedOperation() const;
 
-        /** Set read back stencil-depth buffer as texture operation.
-            @note applies when PassType is STENCIL
-        */
-        void setStencilReadBackAsTextureOperation(bool value);
-        /** Get read back stencil-depth buffer
-            @note applies when PassType is STENCIL
-        */
-        bool getStencilReadBackAsTextureOperation() const;
-
         const StencilState& getStencilState() const { return mStencilState; }
-
 
         /// Inputs (for material used for rendering the quad)
         struct InputTex
@@ -360,7 +350,6 @@ namespace Ogre {
         Vector3i mThreadGroups;
         /// Stencil operation parameters
         StencilState mStencilState;
-        bool mStencilReadBackAsTexture;
 
         /// True if quad should not cover whole screen
         bool mQuadCornerModified;

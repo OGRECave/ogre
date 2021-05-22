@@ -827,7 +827,6 @@ namespace Ogre
             ID_DEPTH_FAIL_OP,
             ID_PASS_OP,
             ID_TWO_SIDED,
-            ID_READ_BACK_AS_TEXTURE,
         // Suport for shader model 5.0
         // More program IDs
         ID_TESSELLATION_HULL_PROGRAM,
