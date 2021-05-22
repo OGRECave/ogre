@@ -256,10 +256,8 @@ namespace Ogre {
     }
 
     //-----------------------------------------------------------------------------
-    Image& Image::loadDynamicImage( uchar* pData, uint32 uWidth, uint32 uHeight,
-        uint32 depth,
-        PixelFormat eFormat, bool autoDelete, 
-        size_t numFaces, uint32 numMipMaps)
+    Image& Image::loadDynamicImage(uchar* pData, uint32 uWidth, uint32 uHeight, uint32 depth,
+                                   PixelFormat eFormat, bool autoDelete, uint32 numFaces, uint32 numMipMaps)
     {
 
         freeMemory();
@@ -285,15 +283,11 @@ namespace Ogre {
         mAutoDelete = autoDelete;
 
         return *this;
-
     }
 
     //-----------------------------------------------------------------------------
-    Image & Image::loadRawData(
-        const DataStreamPtr& stream,
-        uint32 uWidth, uint32 uHeight, uint32 uDepth,
-        PixelFormat eFormat,
-        size_t numFaces, uint32 numMipMaps)
+    Image& Image::loadRawData(const DataStreamPtr& stream, uint32 uWidth, uint32 uHeight, uint32 uDepth,
+                              PixelFormat eFormat, uint32 numFaces, uint32 numMipMaps)
     {
 
         size_t size = calculateSize(numMipMaps, numFaces, uWidth, uHeight, uDepth, eFormat);
@@ -430,7 +424,7 @@ namespace Ogre {
         return mHeight;
     }
     //-----------------------------------------------------------------------------
-    size_t Image::getNumFaces(void) const
+    uint32 Image::getNumFaces(void) const
     {
         if(hasFlag(IF_CUBEMAP))
             return 6;
@@ -590,7 +584,7 @@ namespace Ogre {
 
     //-----------------------------------------------------------------------------    
 
-    ColourValue Image::getColourAt(size_t x, size_t y, size_t z) const
+    ColourValue Image::getColourAt(uint32 x, uint32 y, uint32 z) const
     {
         ColourValue rval;
         PixelUtil::unpackColour(&rval, mFormat, getData(x, y, z));
@@ -599,14 +593,14 @@ namespace Ogre {
 
     //-----------------------------------------------------------------------------    
     
-    void Image::setColourAt(ColourValue const &cv, size_t x, size_t y, size_t z)
+    void Image::setColourAt(ColourValue const &cv, uint32 x, uint32 y, uint32 z)
     {
         PixelUtil::packColour(cv, mFormat, getData(x, y, z));
     }
 
     //-----------------------------------------------------------------------------    
 
-    PixelBox Image::getPixelBox(size_t face, size_t mipmap) const
+    PixelBox Image::getPixelBox(uint32 face, uint32 mipmap) const
     {
         // Image data is arranged as:
         // face 0, top level (mip 0)
@@ -622,13 +616,13 @@ namespace Ogre {
         uint8 *offset = mBuffer;
         // Base offset is number of full faces
         uint32 width = getWidth(), height=getHeight(), depth=getDepth();
-        size_t numMips = getNumMipmaps();
+        uint32 numMips = getNumMipmaps();
 
         // Figure out the offsets 
         size_t fullFaceSize = 0;
         size_t finalFaceSize = 0;
         uint32 finalWidth = 0, finalHeight = 0, finalDepth = 0;
-        for(size_t mip=0; mip <= numMips; ++mip)
+        for(uint32 mip=0; mip <= numMips; ++mip)
         {
             if (mip == mipmap)
             {
@@ -651,12 +645,12 @@ namespace Ogre {
         PixelBox src(finalWidth, finalHeight, finalDepth, getFormat(), offset);
         return src;
     }
-    //-----------------------------------------------------------------------------    
-    size_t Image::calculateSize(size_t mipmaps, size_t faces, uint32 width, uint32 height, uint32 depth, 
-        PixelFormat format)
+    //-----------------------------------------------------------------------------
+    size_t Image::calculateSize(uint32 mipmaps, uint32 faces, uint32 width, uint32 height, uint32 depth,
+                                PixelFormat format)
     {
         size_t size = 0;
-        for(size_t mip=0; mip<=mipmaps; ++mip)
+        for(uint32 mip=0; mip<=mipmaps; ++mip)
         {
             size += PixelUtil::getMemorySize(width, height, depth, format)*faces; 
             if(width!=1) width /= 2;
@@ -707,10 +701,10 @@ namespace Ogre {
                      PixelUtil::isCompressed(alpha.getFormat())),
                    "Compressed formats are not supported in this method");
 
-        size_t numFaces = rgb.getNumFaces();
+        uint32 numFaces = rgb.getNumFaces();
         create(fmt, rgb.getWidth(), rgb.getHeight(), rgb.getDepth(), numFaces, rgb.getNumMipmaps());
 
-        for (size_t face = 0; face < numFaces; ++face)
+        for (uint32 face = 0; face < numFaces; ++face)
         {
             for (uint8 mip = 0; mip <= mNumMipmaps; ++mip)
             {
@@ -723,11 +717,11 @@ namespace Ogre {
                 PixelBox srcAlpha = alpha.getPixelBox(face, mip);
                 uchar* psrcAlpha = srcAlpha.data;
                 uchar* pdst = dst.data;
-                for (size_t d = 0; d < mDepth; ++d)
+                for (uint32 d = 0; d < mDepth; ++d)
                 {
-                    for (size_t y = 0; y < mHeight; ++y)
+                    for (uint32 y = 0; y < mHeight; ++y)
                     {
-                        for (size_t x = 0; x < mWidth; ++x)
+                        for (uint32 x = 0; x < mWidth; ++x)
                         {
                             ColourValue colRGBA, colA;
                             // read RGB back from dest to save having another pointer

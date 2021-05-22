@@ -180,11 +180,9 @@ namespace Ogre {
             @remarks 
                 The size of the buffer must be numFaces * PixelUtil::getMemorySize(width, height, depth, format)
          */
-        Image& loadDynamicImage( uchar* data, uint32 width, uint32 height,
-                            uint32 depth,
-                             PixelFormat format, bool autoDelete = false, 
-                             size_t numFaces = 1, uint32 numMipMaps = 0);
-        
+        Image& loadDynamicImage(uchar* data, uint32 width, uint32 height, uint32 depth, PixelFormat format,
+                                bool autoDelete = false, uint32 numFaces = 1, uint32 numMipMaps = 0);
+
         /// @overload
         Image& loadDynamicImage(uchar* data, uint32 width, uint32 height, PixelFormat format)
         {
@@ -209,14 +207,10 @@ namespace Ogre {
                 Of course, you will never have multiple faces (cube map) and
                 depth too.
         */
-        Image & loadRawData( 
-            const DataStreamPtr& stream,
-            uint32 width, uint32 height, uint32 depth,
-            PixelFormat format,
-            size_t numFaces = 1, uint32 numMipMaps = 0);
+        Image& loadRawData(const DataStreamPtr& stream, uint32 width, uint32 height, uint32 depth,
+                           PixelFormat format, uint32 numFaces = 1, uint32 numMipMaps = 0);
         /// @overload
-        Image& loadRawData(const DataStreamPtr& stream, uint32 width, uint32 height,
-                           PixelFormat format)
+        Image& loadRawData(const DataStreamPtr& stream, uint32 width, uint32 height, PixelFormat format)
         {
             return loadRawData(stream, width, height, 1, format);
         }
@@ -381,7 +375,7 @@ namespace Ogre {
         /** Get the number of faces of the image. This is usually 6 for a cubemap, and
             1 for a normal image.
         */
-        size_t getNumFaces(void) const;
+        uint32 getNumFaces(void) const;
 
         /** Gets the physical width in bytes of each row of pixels.
         */
@@ -411,19 +405,19 @@ namespace Ogre {
          * is only valid for cubemaps and volume textures. This uses the first (largest)
          * mipmap.
          */
-        ColourValue getColourAt(size_t x, size_t y, size_t z) const;
+        ColourValue getColourAt(uint32 x, uint32 y, uint32 z) const;
         
         /**
          * Set colour value at a certain location in the image. The z coordinate
          * is only valid for cubemaps and volume textures. This uses the first (largest)
          * mipmap.
          */
-        void setColourAt(ColourValue const &cv, size_t x, size_t y, size_t z);
+        void setColourAt(ColourValue const &cv, uint32 x, uint32 y, uint32 z);
 
         /**
          * Get a PixelBox encapsulating the image data of a mipmap
          */
-        PixelBox getPixelBox(size_t face = 0, size_t mipmap = 0) const;
+        PixelBox getPixelBox(uint32 face = 0, uint32 mipmap = 0) const;
 
         /// Delete all the memory held by this image, if owned by this image (not dynamic)
         void freeMemory();
@@ -447,7 +441,7 @@ namespace Ogre {
         void resize(ushort width, ushort height, Filter filter = FILTER_BILINEAR);
         
         /// Static function to calculate size in bytes from the number of mipmaps, faces and the dimensions
-        static size_t calculateSize(size_t mipmaps, size_t faces, uint32 width, uint32 height, uint32 depth, PixelFormat format);
+        static size_t calculateSize(uint32 mipmaps, uint32 faces, uint32 width, uint32 height, uint32 depth, PixelFormat format);
 
         /// Static function to get an image type string from a stream via magic numbers
         static String getFileExtFromMagic(DataStreamPtr stream);
