@@ -175,7 +175,7 @@ namespace Ogre
     void TerrainMaterialGenerator::Profile::updateCompositeMap(const Terrain* terrain, const Rect& rect)
     {
         // convert point-space rect into image space
-        long compSize = terrain->getCompositeMap()->getWidth();
+        int32 compSize = terrain->getCompositeMap()->getWidth();
         Rect imgRect;
         Vector3 inVec, outVec;
         inVec.x = rect.left;

@@ -2055,10 +2055,10 @@ namespace Ogre
             // need to widen the dirty rectangle since change will affect surrounding
             // vertices at lower LOD
             Rect widenedRect(rect);
-            widenedRect.left = std::max(0L, widenedRect.left - step);
-            widenedRect.top = std::max(0L, widenedRect.top - step);
-            widenedRect.right = std::min((long)mSize, widenedRect.right + step);
-            widenedRect.bottom = std::min((long)mSize, widenedRect.bottom + step);
+            widenedRect.left = std::max(0, widenedRect.left - step);
+            widenedRect.top = std::max(0, widenedRect.top - step);
+            widenedRect.right = std::min((int)mSize, widenedRect.right + step);
+            widenedRect.bottom = std::min((int)mSize, widenedRect.bottom + step);
 
             // keep a merge of the widest
             finalRect.merge(widenedRect);
@@ -3247,10 +3247,10 @@ namespace Ogre
         // Widen the rectangle by 1 element in all directions since height
         // changes affect neighbours normals
         Rect widenedRect(
-            std::max(0L, rect.left - 1L), 
-            std::max(0L, rect.top - 1L), 
-            std::min((long)mSize, rect.right + 1L), 
-            std::min((long)mSize, rect.bottom + 1L)
+            std::max(0, rect.left - 1),
+            std::max(0, rect.top - 1),
+            std::min((int32)mSize, rect.right + 1),
+            std::min((int32)mSize, rect.bottom + 1)
             );
         // allocate memory for RGB
         uint8* pData = static_cast<uint8*>(
