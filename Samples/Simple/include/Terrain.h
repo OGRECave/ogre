@@ -84,17 +84,17 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
                 {
                     // we need point coords
                     Real terrainSize = (terrain->getSize() - 1);
-                    long startx = (tsPos.x - mBrushSizeTerrainSpace) * terrainSize;
-                    long starty = (tsPos.y - mBrushSizeTerrainSpace) * terrainSize;
-                    long endx = (tsPos.x + mBrushSizeTerrainSpace) * terrainSize;
-                    long endy= (tsPos.y + mBrushSizeTerrainSpace) * terrainSize;
-                    startx = std::max(startx, 0L);
-                    starty = std::max(starty, 0L);
-                    endx = std::min(endx, (long)terrainSize);
-                    endy = std::min(endy, (long)terrainSize);
-                    for (long y = starty; y <= endy; ++y)
+                    int startx = (tsPos.x - mBrushSizeTerrainSpace) * terrainSize;
+                    int starty = (tsPos.y - mBrushSizeTerrainSpace) * terrainSize;
+                    int endx = (tsPos.x + mBrushSizeTerrainSpace) * terrainSize;
+                    int endy= (tsPos.y + mBrushSizeTerrainSpace) * terrainSize;
+                    startx = std::max(startx, 0);
+                    starty = std::max(starty, 0);
+                    endx = std::min(endx, (int)terrainSize);
+                    endy = std::min(endy, (int)terrainSize);
+                    for (int y = starty; y <= endy; ++y)
                     {
-                        for (long x = startx; x <= endx; ++x)
+                        for (int x = startx; x <= endx; ++x)
                         {
                             Real tsXdist = (x / terrainSize) - tsPos.x;
                             Real tsYdist = (y / terrainSize)  - tsPos.y;
@@ -122,17 +122,17 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
                     TerrainLayerBlendMap* layer = terrain->getLayerBlendMap(mLayerEdit);
                     // we need image coords
                     Real imgSize = terrain->getLayerBlendMapSize();
-                    long startx = (tsPos.x - mBrushSizeTerrainSpace) * imgSize;
-                    long starty = (tsPos.y - mBrushSizeTerrainSpace) * imgSize;
-                    long endx = (tsPos.x + mBrushSizeTerrainSpace) * imgSize;
-                    long endy= (tsPos.y + mBrushSizeTerrainSpace) * imgSize;
-                    startx = std::max(startx, 0L);
-                    starty = std::max(starty, 0L);
-                    endx = std::min(endx, (long)imgSize);
-                    endy = std::min(endy, (long)imgSize);
-                    for (long y = starty; y <= endy; ++y)
+                    int startx = (tsPos.x - mBrushSizeTerrainSpace) * imgSize;
+                    int starty = (tsPos.y - mBrushSizeTerrainSpace) * imgSize;
+                    int endx = (tsPos.x + mBrushSizeTerrainSpace) * imgSize;
+                    int endy= (tsPos.y + mBrushSizeTerrainSpace) * imgSize;
+                    startx = std::max(startx, 0);
+                    starty = std::max(starty, 0);
+                    endx = std::min(endx, (int)imgSize);
+                    endy = std::min(endy, (int)imgSize);
+                    for (int y = starty; y <= endy; ++y)
                     {
-                        for (long x = startx; x <= endx; ++x)
+                        for (int x = startx; x <= endx; ++x)
                         {
                             Real tsXdist = (x / imgSize) - tsPos.x;
                             Real tsYdist = (y / imgSize)  - tsPos.y;
@@ -142,7 +142,7 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
                             weight = 1.0 - (weight * weight);
 
                             float paint = weight * timeElapsed;
-                            size_t imgY = imgSize - y;
+                            uint32 imgY = imgSize - y;
                             float val;
                             if (mKeyPressed == '+'  || mKeyPressed == SDLK_KP_PLUS)
                                 val = layer->getBlendValue(x, imgY) + paint;

@@ -382,7 +382,7 @@ namespace Ogre {
         /** Return the number of faces this texture has. This will be 6 for a cubemap
             texture and 1 for a 1D, 2D or 3D one.
         */
-        size_t getNumFaces() const;
+        uint32 getNumFaces() const;
 
         /** Return hardware pixel buffer for a surface. This buffer can then
             be used to copy data from and to a particular level of the texture.

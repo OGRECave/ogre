@@ -120,7 +120,7 @@ namespace Ogre {
         }
     }
 
-    void RenderSystem::setFFPLightParams(size_t index, bool enabled)
+    void RenderSystem::setFFPLightParams(uint32 index, bool enabled)
     {
         if(!mFixedFunctionParams)
             return;

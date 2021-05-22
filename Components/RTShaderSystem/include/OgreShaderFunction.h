@@ -91,9 +91,9 @@ public:
     void binaryOp(char op, const std::vector<Operand>& params) const;
 
 private:
-    size_t mStage;
+    uint32 mStage;
     Function* mParent;
-    FunctionStageRef(size_t stage, Function* parent) : mStage(stage), mParent(parent) {}
+    FunctionStageRef(uint32 stage, Function* parent) : mStage(stage), mParent(parent) {}
 };
 
 /** A class that represents a shader based program function.
@@ -226,7 +226,7 @@ public:
     void addAtomInstance(FunctionAtom* atomInstance);
 
     /// get a @ref FFPShaderStage of this function
-    FunctionStageRef getStage(size_t s)
+    FunctionStageRef getStage(uint32 s)
     {
         return FunctionStageRef(s, this);
     }

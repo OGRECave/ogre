@@ -148,9 +148,9 @@ namespace Ogre {
         size_t logicalIndex;
         /** Number of typed slots per element
             (some programs pack each array element to float4, some do not) */
-        size_t elementSize;
+        uint32 elementSize;
         /// Length of array
-        size_t arraySize;
+        uint32 arraySize;
         /// Data type
         GpuConstantType constType;
         /// How this parameter varies (bitwise combination of GpuProgramVariability)
@@ -191,7 +191,7 @@ namespace Ogre {
         /** Get the number of elements of a given type, including whether to pad the
             elements into multiples of 4 (e.g. SM1 and D3D does, GLSL doesn't)
         */
-        static size_t getElementSize(GpuConstantType ctype, bool padToMultiplesOf4)
+        static uint32 getElementSize(GpuConstantType ctype, bool padToMultiplesOf4)
         {
             if (padToMultiplesOf4)
             {
@@ -433,7 +433,7 @@ namespace Ogre {
             user. Only parameters which have been predefined here may be later
             updated.
         */
-        void addConstantDefinition(const String& name, GpuConstantType constType, size_t arraySize = 1);
+        void addConstantDefinition(const String& name, GpuConstantType constType, uint32 arraySize = 1);
 
         /// @deprecated removing a constant requires a full rebuild due to changed alignments
         OGRE_DEPRECATED void removeConstantDefinition(const String& name);
@@ -499,13 +499,13 @@ namespace Ogre {
         /** @copydoc GpuProgramParameters::setNamedConstant(const String& name, const Matrix4& m) */
         void setNamedConstant(const String& name, const Matrix4& m);
         /** @copydoc GpuProgramParameters::setNamedConstant(const String& name, const Matrix4* m, size_t numEntries) */
-        void setNamedConstant(const String& name, const Matrix4* m, size_t numEntries);
-        void setNamedConstant(const String& name, const float *val, size_t count);
-        void setNamedConstant(const String& name, const double *val, size_t count);
+        void setNamedConstant(const String& name, const Matrix4* m, uint32 numEntries);
+        void setNamedConstant(const String& name, const float *val, uint32 count);
+        void setNamedConstant(const String& name, const double *val, uint32 count);
         /** @copydoc GpuProgramParameters::setNamedConstant(const String& name, const ColourValue& colour) */
         void setNamedConstant(const String& name, const ColourValue& colour);
-        void setNamedConstant(const String& name, const int *val, size_t count);
-        void setNamedConstant(const String& name, const uint *val, size_t count);
+        void setNamedConstant(const String& name, const int *val, uint32 count);
+        void setNamedConstant(const String& name, const uint *val, uint32 count);
         /// Get a pointer to the 'nth' item in the float buffer
         float* getFloatPointer(size_t pos) { _markDirty(); return (float*)&mConstants[pos]; }
         /// Get a pointer to the 'nth' item in the float buffer
@@ -1635,13 +1635,13 @@ namespace Ogre {
             @param acType The type of automatic constant to set
             @param extraInfo If the constant type needs more information (like a light index) put it here.
         */
-        void setNamedAutoConstant(const String& name, AutoConstantType acType, size_t extraInfo = 0);
+        void setNamedAutoConstant(const String& name, AutoConstantType acType, uint32 extraInfo = 0);
         /// @overload
         void setNamedAutoConstantReal(const String& name, AutoConstantType acType, Real rData);
         /// @overload
         void setNamedAutoConstant(const String& name, AutoConstantType acType, uint16 extraInfo1, uint16 extraInfo2)
         {
-            setNamedAutoConstant(name, acType, (size_t)extraInfo1 | ((size_t)extraInfo2) << 16);
+            setNamedAutoConstant(name, acType, (uint32)extraInfo1 | ((uint32)extraInfo2) << 16);
         }
 
         /// @deprecated use ACT_TIME directly

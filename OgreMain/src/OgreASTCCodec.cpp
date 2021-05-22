@@ -269,7 +269,7 @@ namespace Ogre {
 
         imgData->flags = IF_COMPRESSED;
 
-		size_t numFaces = 1; // Always one face, cubemaps are not currently supported
+		uint32 numFaces = 1; // Always one face, cubemaps are not currently supported
                              // Calculate total size from number of mipmaps, faces and size
 		imgData->size = Image::calculateSize(imgData->num_mipmaps, numFaces,
                                              imgData->width, imgData->height, imgData->depth, imgData->format);

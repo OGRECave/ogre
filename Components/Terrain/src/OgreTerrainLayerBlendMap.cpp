@@ -120,12 +120,12 @@ namespace Ogre
         convertUVToImageSpace(x, 1.0f - y, outX, outY);
     }
     //---------------------------------------------------------------------
-    float TerrainLayerBlendMap::getBlendValue(size_t x, size_t y)
+    float TerrainLayerBlendMap::getBlendValue(uint32 x, uint32 y)
     {
         return *mData.getData<float>(x, y);
     }
     //---------------------------------------------------------------------
-    void TerrainLayerBlendMap::setBlendValue(size_t x, size_t y, float val)
+    void TerrainLayerBlendMap::setBlendValue(uint32 x, uint32 y, float val)
     {
         *mData.getData<float>(x, y) = val;
         dirtyRect(Rect(x, y, x+1, y+1));
@@ -189,10 +189,10 @@ namespace Ogre
             // mDirtyBox is in image space, convert to terrain units
             Rect compositeMapRect;
             float blendToTerrain = (float)mParent->getSize() / (float)mBuffer->getWidth();
-            compositeMapRect.left = (long)(mDirtyBox.left * blendToTerrain);
-            compositeMapRect.right = (long)(mDirtyBox.right * blendToTerrain + 1);
-            compositeMapRect.top = (long)((mBuffer->getHeight() - mDirtyBox.bottom) * blendToTerrain);
-            compositeMapRect.bottom = (long)((mBuffer->getHeight() - mDirtyBox.top) * blendToTerrain + 1);
+            compositeMapRect.left = (mDirtyBox.left * blendToTerrain);
+            compositeMapRect.right = (mDirtyBox.right * blendToTerrain + 1);
+            compositeMapRect.top = ((mBuffer->getHeight() - mDirtyBox.bottom) * blendToTerrain);
+            compositeMapRect.bottom = ((mBuffer->getHeight() - mDirtyBox.top) * blendToTerrain + 1);
             mParent->_dirtyCompositeMapRect(compositeMapRect);
             mParent->updateCompositeMapWithDelay();
 

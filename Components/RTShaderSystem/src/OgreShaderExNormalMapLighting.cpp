@@ -84,7 +84,7 @@ void NormalMapLighting::updateGpuProgramsParams(Renderable* rend, const Pass* pa
         }
 
         // Search a matching light from the current sorted lights of the given renderable.
-        size_t j;
+        uint32 j;
         for (j = curSearchLightIndex; j < pLightList->size(); ++j)
         {
             if (pLightList->at(j)->getType() == curLightType)

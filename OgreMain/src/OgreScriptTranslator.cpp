@@ -3745,7 +3745,7 @@ namespace Ogre{
     //-------------------------------------------------------------------------
     void GpuProgramTranslator::translateProgramParameters(ScriptCompiler *compiler, GpuProgramParametersSharedPtr params, ObjectAbstractNode *obj)
     {
-        size_t animParametricsCount = 0;
+        uint32 animParametricsCount = 0;
 
         String value;
         for(AbstractNodeList::iterator i = obj->children.begin(); i != obj->children.end(); ++i)
@@ -4387,7 +4387,7 @@ namespace Ogre{
             }
 
             AbstractNodeList::const_iterator arrayStart = getNodeAt(prop->values, 2), arrayEnd = prop->values.end();
-            size_t arraySz = 1;
+            uint32 arraySz = 1;
 
             if (arrayStart != arrayEnd)
             {
@@ -4825,7 +4825,7 @@ namespace Ogre{
                         // Save the first atom, should be name
                         AtomAbstractNode *atom0 = (AtomAbstractNode*)(*it).get();
 
-                        size_t width = 0, height = 0;
+                        uint32 width = 0, height = 0;
                         float widthFactor = 1.0f, heightFactor = 1.0f;
                         bool widthSet = false, heightSet = false, formatSet = false;
                         bool pooled = false;
@@ -4860,7 +4860,7 @@ namespace Ogre{
                             case ID_TARGET_HEIGHT_SCALED:
                                 {
                                     bool *pSetFlag;
-                                    size_t *pSize;
+                                    uint32 *pSize;
                                     float *pFactor;
 
                                     if (atom->id == ID_TARGET_WIDTH_SCALED)

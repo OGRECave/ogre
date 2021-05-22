@@ -335,7 +335,7 @@ namespace Ogre
         return memSize;
     }
     //---------------------------------------------------------------------
-    void GpuSharedParameters::addConstantDefinition(const String& name, GpuConstantType constType, size_t arraySize)
+    void GpuSharedParameters::addConstantDefinition(const String& name, GpuConstantType constType, uint32 arraySize)
     {
         if (mNamedConstants.map.find(name) != mNamedConstants.map.end())
         {
@@ -490,7 +490,7 @@ namespace Ogre
         setNamedConstant(name, m[0], 16);
     }
     //---------------------------------------------------------------------
-    void GpuSharedParameters::setNamedConstant(const String& name, const Matrix4* m, size_t numEntries)
+    void GpuSharedParameters::setNamedConstant(const String& name, const Matrix4* m, uint32 numEntries)
     {
         setNamedConstant(name, m[0][0], 16 * numEntries);
     }
@@ -500,7 +500,7 @@ namespace Ogre
         setNamedConstant(name, colour.ptr(), 4);
     }
     //---------------------------------------------------------------------
-    void GpuSharedParameters::setNamedConstant(const String& name, const float *val, size_t count)
+    void GpuSharedParameters::setNamedConstant(const String& name, const float *val, uint32 count)
     {
         GpuConstantDefinitionMap::const_iterator i = mNamedConstants.map.find(name);
         if (i != mNamedConstants.map.end())
@@ -513,7 +513,7 @@ namespace Ogre
         _markDirty();
     }
     //---------------------------------------------------------------------
-    void GpuSharedParameters::setNamedConstant(const String& name, const double *val, size_t count)
+    void GpuSharedParameters::setNamedConstant(const String& name, const double *val, uint32 count)
     {
         GpuConstantDefinitionMap::const_iterator i = mNamedConstants.map.find(name);
         if (i != mNamedConstants.map.end())
@@ -532,7 +532,7 @@ namespace Ogre
         _markDirty();
     }
     //---------------------------------------------------------------------
-    void GpuSharedParameters::setNamedConstant(const String& name, const int *val, size_t count)
+    void GpuSharedParameters::setNamedConstant(const String& name, const int *val, uint32 count)
     {
         GpuConstantDefinitionMap::const_iterator i = mNamedConstants.map.find(name);
         if (i != mNamedConstants.map.end())
@@ -545,7 +545,7 @@ namespace Ogre
         _markDirty();
     }
     //---------------------------------------------------------------------
-    void GpuSharedParameters::setNamedConstant(const String& name, const uint *val, size_t count)
+    void GpuSharedParameters::setNamedConstant(const String& name, const uint *val, uint32 count)
     {
         GpuConstantDefinitionMap::const_iterator i = mNamedConstants.map.find(name);
         if (i != mNamedConstants.map.end())
@@ -2228,7 +2228,7 @@ namespace Ogre
     //---------------------------------------------------------------------------
     static size_t withArrayOffset(const GpuConstantDefinition* def, const String& name)
     {
-        size_t offset = 0;
+        uint32 offset = 0;
         if(name.back() == ']')
         {
             size_t start = name.find('[');
@@ -2393,7 +2393,7 @@ namespace Ogre
     }
     //---------------------------------------------------------------------------
     void GpuProgramParameters::setNamedAutoConstant(const String& name,
-                                                    AutoConstantType acType, size_t extraInfo)
+                                                    AutoConstantType acType, uint32 extraInfo)
     {
         // look up, and throw an exception if we're not ignoring missing
         const GpuConstantDefinition* def =
