@@ -353,8 +353,8 @@ namespace Ogre {
                     WGL_SAMPLES_ARB, 2,
                     0
                 };
-                int formats[256];
-                unsigned int count;
+                int formats[256] = {0};
+                unsigned int count = 0;
                 // cheating here.  wglChoosePixelFormatARB procc address needed later on
                 // when a valid GL context does not exist and glew is not initialized yet.
                 PFNWGLGETPIXELFORMATATTRIBIVARBPROC wglGetPixelFormatAttribiv = (PFNWGLGETPIXELFORMATATTRIBIVARBPROC)wglGetProcAddress("wglGetPixelFormatAttribivARB");
