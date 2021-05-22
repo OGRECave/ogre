@@ -127,14 +127,14 @@ static bool isArray(GpuProgramParameters::AutoConstantType autoType)
     }
 }
 
-UniformParameterPtr Program::resolveParameter(GpuProgramParameters::AutoConstantType autoType, size_t data)
+UniformParameterPtr Program::resolveParameter(GpuProgramParameters::AutoConstantType autoType, uint32 data)
 {
     UniformParameterPtr param;
 
     // Check if parameter already exists.
     param = getParameterByAutoType(autoType);
 
-    size_t size = 0;
+    uint32 size = 0;
     if(isArray(autoType)) std::swap(size, data); // for array autotypes the extra parameter is the size
 
     if (param && param->getAutoConstantIntData() == data)
@@ -175,7 +175,7 @@ UniformParameterPtr Program::resolveAutoParameterReal(GpuProgramParameters::Auto
 
 //-----------------------------------------------------------------------------
 UniformParameterPtr Program::resolveAutoParameterReal(GpuProgramParameters::AutoConstantType autoType, GpuConstantType type,
-                                                Real data, size_t size)
+                                                float data, size_t size)
 {
     UniformParameterPtr param;
 
@@ -200,7 +200,7 @@ UniformParameterPtr Program::resolveAutoParameterReal(GpuProgramParameters::Auto
 
 //-----------------------------------------------------------------------------
 UniformParameterPtr Program::resolveAutoParameterInt(GpuProgramParameters::AutoConstantType autoType, GpuConstantType type, 
-                                           size_t data, size_t size)
+                                           uint32 data, size_t size)
 {
     UniformParameterPtr param;
 
