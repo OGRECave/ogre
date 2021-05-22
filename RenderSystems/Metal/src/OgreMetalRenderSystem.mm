@@ -1010,7 +1010,7 @@ namespace Ogre
     }
     //-------------------------------------------------------------------------
     void MetalRenderSystem::clearFrameBuffer( unsigned int buffers, const ColourValue& colour,
-                                             Real depth, unsigned short stencil )
+                                             float depth, unsigned short stencil )
     {
         if( buffers & FBT_COLOUR )
         {

@@ -186,7 +186,7 @@ uint8 CompositionPass::getLastRenderQueue() const
     return mLastRenderQueue;
 }
 //-----------------------------------------------------------------------
-void CompositionPass::setClearDepth(Real depth)
+void CompositionPass::setClearDepth(float depth)
 {
     mClearDepth = depth;
 }
@@ -194,11 +194,11 @@ Real CompositionPass::getClearDepth() const
 {
     return mClearDepth;
 }
-void CompositionPass::setClearStencil(uint32 value)
+void CompositionPass::setClearStencil(uint16 value)
 {
     mClearStencil = value;
 }
-uint32 CompositionPass::getClearStencil() const
+uint16 CompositionPass::getClearStencil() const
 {
     return mClearStencil;
 }

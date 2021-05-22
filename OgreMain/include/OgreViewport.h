@@ -123,9 +123,8 @@ namespace Ogre {
          @param depth The depth value to clear to, if FBT_DEPTH is included
          @param stencil The stencil value to clear to, if FBT_STENCIL is included
         */
-        void clear(unsigned int buffers = FBT_COLOUR | FBT_DEPTH,
-                   const ColourValue& colour = ColourValue::Black, 
-                   Real depth = 1.0f, unsigned short stencil = 0);
+        void clear(uint32 buffers = FBT_COLOUR | FBT_DEPTH, const ColourValue& colour = ColourValue::Black,
+                   float depth = 1.0f, uint16 stencil = 0);
 
         /** Retrieves a pointer to the render target for this viewport.
         */
@@ -223,11 +222,11 @@ namespace Ogre {
         /** Sets the initial depth buffer value of the viewport (before
             rendering). Default is 1
         */
-        void setDepthClear( Real depth );
+        void setDepthClear( float depth );
 
         /** Gets the default depth buffer value to which the viewport is cleared.
         */
-        Real getDepthClear(void) const;
+        float getDepthClear(void) const;
 
         /** Determines whether to clear the viewport before rendering.
         @remarks
@@ -414,7 +413,7 @@ namespace Ogre {
         int mZOrder;
         /// Background options
         ColourValue mBackColour;
-        Real mDepthClearValue;
+        float mDepthClearValue;
         bool mClearEveryFrame;
         unsigned int mClearBuffers;
         bool mUpdated;

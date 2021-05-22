@@ -332,7 +332,7 @@ void CompositorInstance::collectPasses(TargetOperation &finalState, const Compos
                 pass->getClearBuffers(),
                 pass->getClearColour(),
                 pass->getClearDepth(),
-                (ushort)pass->getClearStencil(),
+                pass->getClearStencil(),
                 pass->getAutomaticColour() ? mChain : NULL
                 ));
             break;
