@@ -2730,7 +2730,7 @@ namespace Ogre {
     }
     //---------------------------------------------------------------------
     void GLRenderSystem::clearFrameBuffer(unsigned int buffers,
-                                          const ColourValue& colour, Real depth, unsigned short stencil)
+                                          const ColourValue& colour, float depth, unsigned short stencil)
     {
         bool colourMask =
             !(mCurrentBlend.writeR && mCurrentBlend.writeG && mCurrentBlend.writeB && mCurrentBlend.writeA);

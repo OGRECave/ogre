@@ -191,7 +191,7 @@ namespace Ogre {
 
             void clearFrameBuffer(unsigned int buffers,
                 const ColourValue& colour = ColourValue::Black,
-                Real depth = 1.0f, unsigned short stencil = 0);
+                float depth = 1.0f, unsigned short stencil = 0);
             HardwareOcclusionQuery* createHardwareOcclusionQuery(void);
 
             // ----------------------------------

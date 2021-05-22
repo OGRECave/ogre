@@ -312,8 +312,7 @@ namespace Ogre {
         return mClearBuffers;
     }
     //---------------------------------------------------------------------
-    void Viewport::clear(unsigned int buffers, const ColourValue& col,  
-                         Real depth, unsigned short stencil)
+    void Viewport::clear(uint32 buffers, const ColourValue& col, float depth, uint16 stencil)
     {
         RenderSystem* rs = Root::getSingleton().getRenderSystem();
         if (rs)

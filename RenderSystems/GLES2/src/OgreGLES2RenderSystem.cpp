@@ -1424,7 +1424,7 @@ namespace Ogre {
 
     void GLES2RenderSystem::clearFrameBuffer(unsigned int buffers,
                                             const ColourValue& colour,
-                                            Real depth, unsigned short stencil)
+                                            float depth, unsigned short stencil)
     {
         uchar* colourWrite = mStateCacheManager->getColourMask();
         bool colourMask = !colourWrite[0] || !colourWrite[1] ||

@@ -153,7 +153,7 @@ namespace Ogre
             const GpuProgramParametersPtr& params, uint16 variabilityMask);
         virtual void clearFrameBuffer(unsigned int buffers,
             const ColourValue& colour = ColourValue::Black,
-            Real depth = 1.0f, unsigned short stencil = 0);
+            float depth = 1.0f, unsigned short stencil = 0);
         virtual void discardFrameBuffer( unsigned int buffers );
 
         virtual Real getMinimumDepthInputValue(void);

@@ -149,19 +149,19 @@ namespace Ogre {
         /** Set the viewport clear depth (defaults to 1.0) 
             @note applies when PassType is CLEAR
         */
-        void setClearDepth(Real depth);
+        void setClearDepth(float depth);
         /** Get the viewport clear depth (defaults to 1.0) 
             @note applies when PassType is CLEAR
         */
-        Real getClearDepth() const;
+        float getClearDepth() const;
         /** Set the viewport clear stencil value (defaults to 0) 
             @note applies when PassType is CLEAR
         */
-        void setClearStencil(uint32 value);
+        void setClearStencil(uint16 value);
         /** Get the viewport clear stencil value (defaults to 0) 
             @note applies when PassType is CLEAR
         */
-        uint32 getClearStencil() const;
+        uint16 getClearStencil() const;
 
         /** Set stencil check on or off.
             @note applies when PassType is STENCIL
@@ -349,9 +349,9 @@ namespace Ogre {
         /// Clear colour with the colour of the original viewport. Overrides mClearColour (in case of PT_CLEAR)
         bool mAutomaticColour;
         /// Clear depth (in case of PT_CLEAR)
-        Real mClearDepth;
+        float mClearDepth;
         /// Clear stencil value (in case of PT_CLEAR)
-        uint32 mClearStencil;
+        uint16 mClearStencil;
         /** Inputs (for material used for rendering the quad).
             An empty string signifies that no input is used */
         InputTex mInputs[OGRE_MAX_TEXTURE_LAYERS];

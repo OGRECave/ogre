@@ -3535,7 +3535,7 @@ namespace Ogre
     }
     //---------------------------------------------------------------------
     void D3D9RenderSystem::clearFrameBuffer(unsigned int buffers, 
-        const ColourValue& colour, Real depth, unsigned short stencil)
+        const ColourValue& colour, float depth, unsigned short stencil)
     {
         DWORD flags = 0;
         if (buffers & FBT_COLOUR)

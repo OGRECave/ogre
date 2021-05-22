@@ -965,9 +965,8 @@ namespace Ogre
         @param depth The value to initialise the depth buffer with, if enabled
         @param stencil The value to initialise the stencil buffer with, if enabled.
         */
-        virtual void clearFrameBuffer(unsigned int buffers, 
-            const ColourValue& colour = ColourValue::Black, 
-            Real depth = 1.0f, unsigned short stencil = 0) = 0;
+        virtual void clearFrameBuffer(uint32 buffers, const ColourValue& colour = ColourValue::Black,
+                                      float depth = 1.0f, uint16 stencil = 0) = 0;
         /** Returns the horizontal texel offset value required for mapping 
         texel origins to pixel origins in this rendersystem.
         @remarks
