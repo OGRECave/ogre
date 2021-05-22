@@ -542,7 +542,7 @@ namespace Ogre
 
             if (prof->getReceiveDynamicShadowsDepth())
             {
-                size_t samplerOffset = (tt == HIGH_LOD) ? mShadowSamplerStartHi : mShadowSamplerStartLo;
+                uint32 samplerOffset = (tt == HIGH_LOD) ? mShadowSamplerStartHi : mShadowSamplerStartLo;
                 for (uint i = 0; i < numTextures; ++i)
                 {
                     params->setNamedAutoConstant("inverseShadowmapSize" + StringConverter::toString(i), 

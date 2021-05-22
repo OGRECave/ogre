@@ -170,7 +170,7 @@ namespace Ogre {
         return getNumFaces() * PixelUtil::getMemorySize(mWidth, mHeight, mDepth, mFormat);
     }
     //--------------------------------------------------------------------------
-    size_t Texture::getNumFaces(void) const
+    uint32 Texture::getNumFaces(void) const
     {
         return getTextureType() == TEX_TYPE_CUBE_MAP ? 6 : 1;
     }
@@ -186,7 +186,7 @@ namespace Ogre {
         mSrcFormat = images[0]->getFormat();
 
         if(!mLayerNames.empty() && mTextureType != TEX_TYPE_CUBE_MAP)
-            mDepth = mLayerNames.size();
+            mDepth = uint32(mLayerNames.size());
 
         if(mTreatLuminanceAsAlpha && mSrcFormat == PF_L8)
             mDesiredFormat = PF_A8;
@@ -216,11 +216,11 @@ namespace Ogre {
         createInternalResources();
         // Check if we're loading one image with multiple faces
         // or a vector of images representing the faces
-        size_t faces;
+        uint32 faces;
         bool multiImage; // Load from multiple images?
         if(images.size() > 1)
         {
-            faces = images.size();
+            faces = uint32(images.size());
             multiImage = true;
         }
         else
@@ -269,9 +269,9 @@ namespace Ogre {
         
         // Main loading loop
         // imageMips == 0 if the image has no custom mipmaps, otherwise contains the number of custom mips
-        for(size_t mip = 0; mip <= std::min(mNumMipmaps, imageMips); ++mip)
+        for(uint32 mip = 0; mip <= std::min(mNumMipmaps, imageMips); ++mip)
         {
-            for(size_t i = 0; i < std::max(faces, images.size()); ++i)
+            for(uint32 i = 0; i < std::max(faces, uint32(images.size())); ++i)
             {
                 PixelBox src;
                 size_t face = (mDepth == 1) ? i : 0; // depth = 1, then cubemap face else 3d/ array layer
@@ -397,7 +397,7 @@ namespace Ogre {
         OgreAssert(face < getNumFaces(), "out of range");
         OgreAssert(mipmap <= mNumMipmaps, "out of range");
 
-        unsigned long idx = face * (mNumMipmaps + 1) + mipmap;
+        size_t idx = face * (mNumMipmaps + 1) + mipmap;
         assert(idx < mSurfaceList.size());
         return mSurfaceList[idx];
     }
@@ -408,7 +408,7 @@ namespace Ogre {
         uint32 numMips = includeMipMaps? getNumMipmaps() + 1 : 1;
         destImage.create(getFormat(), getWidth(), getHeight(), getDepth(), getNumFaces(), numMips);
 
-        for (size_t face = 0; face < getNumFaces(); ++face)
+        for (uint32 face = 0; face < getNumFaces(); ++face)
         {
             for (uint32 mip = 0; mip < numMips; ++mip)
             {

@@ -119,13 +119,13 @@ namespace Ogre
         @param x,y Coordinates of the point of data to get, in image space (top down)
         @return The blend data
         */
-        float getBlendValue(size_t x, size_t y);
+        float getBlendValue(uint32 x, uint32 y);
 
         /** Set a single value of blend information (0 = transparent, 255 = solid)
         @param x,y Coordinates of the point of data to get, in image space (top down)
         @param val The blend value to set (0..1)
         */
-        void setBlendValue(size_t x, size_t y, float val);
+        void setBlendValue(uint32 x, uint32 y, float val);
 
         /** Get a pointer to the whole blend data. 
         @remarks

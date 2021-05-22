@@ -61,8 +61,8 @@ namespace Ogre
         void updateFpParams(const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, const GpuProgramParametersSharedPtr& params);
         static const char* getChannel(uint idx);
 
-        size_t mShadowSamplerStartHi;
-        size_t mShadowSamplerStartLo;
+        uint32 mShadowSamplerStartHi;
+        uint32 mShadowSamplerStartLo;
         bool mIsGLSL;
     };
 

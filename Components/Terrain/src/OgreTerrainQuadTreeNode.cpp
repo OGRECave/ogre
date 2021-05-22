@@ -745,14 +745,14 @@ namespace Ogre
 
         // skirt rows
         // clamp rows to skirt spacing (round up)
-        long skirtStartX = rect.left;
-        long skirtStartY = rect.top;
+        int skirtStartX = rect.left;
+        int skirtStartY = rect.top;
         // for rows, clamp Y to skirt frequency, X to inc (LOD resolution vs top)
         if (skirtStartY % skirtSpacing)
             skirtStartY += skirtSpacing - (skirtStartY % skirtSpacing);
         if (skirtStartX % inc)
             skirtStartX += inc - (skirtStartX % inc);
-        skirtStartY = std::max(skirtStartY, (long)mOffsetY);
+        skirtStartY = std::max(skirtStartY, (int)mOffsetY);
         pBaseHeight = mTerrain->getHeightData(skirtStartX, skirtStartY);
         if (posbuf)
         {
@@ -815,7 +815,7 @@ namespace Ogre
         skirtStartY = rect.top;
         if (skirtStartY % inc)
             skirtStartY += inc - (skirtStartY % inc);
-        skirtStartX = std::max(skirtStartX, (long)mOffsetX);
+        skirtStartX = std::max(skirtStartX, (int)mOffsetX);
         if (posbuf)
         {
             // position dest buffer just after the main vertex data and skirt rows

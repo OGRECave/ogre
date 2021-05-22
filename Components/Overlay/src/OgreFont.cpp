@@ -450,7 +450,7 @@ namespace Ogre
         // Reset content (transparent)
         img.setTo(ColourValue::ZERO);
 
-        size_t l = 0, m = 0;
+        uint32 l = 0, m = 0;
         for (const CodePointRange& range : mCodePointRangeList)
         {
             for(CodePoint cp = range.first; cp <= range.second; ++cp )
@@ -516,7 +516,7 @@ namespace Ogre
                 for(int j = 0; j < buffer_h; j++ )
                 {
                     uchar* pSrc = buffer + j * buffer_pitch;
-                    size_t row = j + m + y_bearing;
+                    uint32 row = j + m + y_bearing;
                     uchar* pDest = img.getData(l, row);
                     for(unsigned int k = 0; k < width; k++ )
                     {

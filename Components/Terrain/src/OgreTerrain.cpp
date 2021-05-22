@@ -76,7 +76,7 @@ namespace Ogre
     const uint16 Terrain::WORKQUEUE_DERIVED_DATA_REQUEST = 1;
     const uint64 Terrain::TERRAIN_GENERATE_MATERIAL_INTERVAL_MS = 400;
     const uint16 Terrain::WORKQUEUE_GENERATE_MATERIAL_REQUEST = 2;
-    const size_t Terrain::LOD_MORPH_CUSTOM_PARAM = 1001;
+    const uint32 Terrain::LOD_MORPH_CUSTOM_PARAM = 1001;
     const uint8 Terrain::DERIVED_DATA_DELTAS = 1;
     const uint8 Terrain::DERIVED_DATA_NORMALS = 2;
     const uint8 Terrain::DERIVED_DATA_LIGHTMAP = 4;
@@ -854,9 +854,9 @@ namespace Ogre
             // convert image data to floats
             // Do this on a row-by-row basis, because we describe the terrain in
             // a bottom-up fashion (ie ascending world coords), while Image is top-down
-            for (size_t i = 0; i < mSize; ++i)
+            for (uint16 i = 0; i < mSize; ++i)
             {
-                size_t srcy = mSize - i - 1;
+                uint32 srcy = mSize - i - 1;
                 float* pDst = mHeightData + i * mSize;
                 PixelUtil::bulkPixelConversion(img->getData(0, srcy), img->getFormat(), pDst, PF_FLOAT32_R,
                                                mSize);
@@ -1194,15 +1194,15 @@ namespace Ogre
             + *getHeightData(x2, y2) * rx * ry;
     }
     //---------------------------------------------------------------------
-    void Terrain::setHeightAtPoint(long x, long y, float h)
+    void Terrain::setHeightAtPoint(int32 x, int32 y, float h)
     {
         // force to load all data
         load(0,true);
         // clamp
-        x = std::min(x, (long)mSize - 1L);
-        x = std::max(x, 0L);
-        y = std::min(y, (long)mSize - 1L);
-        y = std::max(y, 0L);
+        x = std::min(x, mSize - 1);
+        x = std::max(x, 0);
+        y = std::min(y, mSize - 1);
+        y = std::max(y, 0);
 
         *getHeightData(x, y) = h;
         Rect rect;
@@ -3392,10 +3392,10 @@ namespace Ogre
                 // build rectangle which has rounded down & rounded up values
                 // remember right & bottom are exclusive
                 Rect mergeRect(
-                    (long)(terrainHitPos.x * (mSize - 1)), 
-                    (long)(terrainHitPos.y * (mSize - 1)), 
-                    (long)(terrainHitPos.x * (float)(mSize - 1) + 0.5) + 1, 
-                    (long)(terrainHitPos.y * (float)(mSize - 1) + 0.5) + 1
+                    (terrainHitPos.x * (mSize - 1)),
+                    (terrainHitPos.y * (mSize - 1)),
+                    (terrainHitPos.x * (float)(mSize - 1) + 0.5) + 1,
+                    (terrainHitPos.y * (float)(mSize - 1) + 0.5) + 1
                     );
                 outRect.merge(mergeRect);
             }
@@ -3421,10 +3421,10 @@ namespace Ogre
         // widenedRect now contains terrain point space version of the area we
         // need to calculate. However, we need to calculate in lightmap image space
         float terrainToLightmapScale = (float)mLightmapSizeActual / (float)mSize;
-        widenedRect.left = (long)(widenedRect.left * terrainToLightmapScale);
-        widenedRect.right = (long)(widenedRect.right * terrainToLightmapScale);
-        widenedRect.top = (long)(widenedRect.top * terrainToLightmapScale);
-        widenedRect.bottom = (long)(widenedRect.bottom * terrainToLightmapScale);
+        widenedRect.left = (widenedRect.left * terrainToLightmapScale);
+        widenedRect.right = (widenedRect.right * terrainToLightmapScale);
+        widenedRect.top = (widenedRect.top * terrainToLightmapScale);
+        widenedRect.bottom = (widenedRect.bottom * terrainToLightmapScale);
 
         // clamp 
         widenedRect = widenedRect.intersect(Rect(0, 0, mLightmapSizeActual, mLightmapSizeActual));
@@ -3832,11 +3832,11 @@ namespace Ogre
             getEdgeRect(index, 1, &heightMatchRect);
             heightMatchRect = heightMatchRect.intersect(edgerect);
 
-            for (long y = heightMatchRect.top; y < heightMatchRect.bottom; ++y)
+            for (int y = heightMatchRect.top; y < heightMatchRect.bottom; ++y)
             {
-                for (long x = heightMatchRect.left; x < heightMatchRect.right; ++x)
+                for (int x = heightMatchRect.left; x < heightMatchRect.right; ++x)
                 {
-                    long nx, ny;
+                    int32 nx, ny;
                     getNeighbourPoint(index, x, y, &nx, &ny);
                     float neighbourHeight = neighbour->getHeightAtPoint(nx, ny); 
                     if (!Math::RealEqual(neighbourHeight, getHeightAtPoint(x, y), 1e-3f))
@@ -3887,7 +3887,7 @@ namespace Ogre
 
     }
     //---------------------------------------------------------------------
-    void Terrain::getEdgeRect(NeighbourIndex index, long range, Rect* outRect) const
+    void Terrain::getEdgeRect(NeighbourIndex index, int32 range, Rect* outRect) const
     {
         // We make the edge rectangle 2 rows / columns at the edge of the tile
         // 2 because this copes with normal changes and potentially filtered
@@ -3992,7 +3992,7 @@ namespace Ogre
 
     }
     //---------------------------------------------------------------------
-    void Terrain::getNeighbourPoint(NeighbourIndex index, long x, long y, long *outx, long *outy) const
+    void Terrain::getNeighbourPoint(NeighbourIndex index, int x, int y, int *outx, int *outy) const
     {
         // Get the index of the point we should be looking at on a neighbour
         // in order to match up points

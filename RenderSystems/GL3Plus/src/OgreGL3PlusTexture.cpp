@@ -364,11 +364,11 @@ namespace Ogre {
     {
         mSurfaceList.clear();
 
-        size_t depth = mDepth;
+        uint32 depth = mDepth;
         for (uint8 face = 0; face < getNumFaces(); face++)
         {
-            size_t width = mWidth;
-            size_t height = mHeight;
+            uint32 width = mWidth;
+            uint32 height = mHeight;
 
             for (uint32 mip = 0; mip <= getNumMipmaps(); mip++)
             {

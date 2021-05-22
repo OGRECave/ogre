@@ -935,8 +935,8 @@ namespace Ogre
         */
         virtual void setScissorTest(bool enabled, const Rect& rect = Rect()) = 0;
         /// @deprecated
-        OGRE_DEPRECATED void setScissorTest(bool enabled, size_t left, size_t top = 0,
-                                            size_t right = 800, size_t bottom = 600)
+        OGRE_DEPRECATED void setScissorTest(bool enabled, uint32 left, uint32 top = 0,
+                                            uint32 right = 800, uint32 bottom = 600)
         {
             setScissorTest(enabled, Rect(left, top, right, bottom));
         }
@@ -1272,7 +1272,7 @@ namespace Ogre
         GpuProgramParametersSharedPtr mFixedFunctionParams;
 
         void initFixedFunctionParams();
-        void setFFPLightParams(size_t index, bool enabled);
+        void setFFPLightParams(uint32 index, bool enabled);
         static CompareFunction reverseCompareFunction(CompareFunction func);
     private:
         StencilState mStencilState;

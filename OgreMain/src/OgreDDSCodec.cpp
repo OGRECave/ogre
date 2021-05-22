@@ -779,7 +779,7 @@ namespace {
         imgData->depth = 1; // (deal with volume later)
         imgData->width = header.width;
         imgData->height = header.height;
-        size_t numFaces = 1; // assume one face until we know otherwise
+        uint32 numFaces = 1; // assume one face until we know otherwise
 
         if (header.caps.caps1 & DDSCAPS_MIPMAP)
         {

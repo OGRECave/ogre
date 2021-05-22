@@ -49,7 +49,7 @@ namespace Ogre
             ::EGLDisplay mGlDisplay;
             ::EGLSurface mEglDrawable;
         public:
-            EGLPBuffer(EGLSupport* glsupport, PixelComponentType format, size_t width, size_t height);
+            EGLPBuffer(EGLSupport* glsupport, PixelComponentType format, uint32 width, uint32 height);
             virtual ~EGLPBuffer();
 
             GLContext *getContext() const { return mContext; }

@@ -77,7 +77,7 @@ void FFPLighting::updateGpuProgramsParams(Renderable* rend, const Pass* pass, co
 		}
 
 		// Search a matching light from the current sorted lights of the given renderable.
-		size_t j;
+		uint32 j;
 		for (j = curSearchLightIndex; j < (pLightList ? pLightList->size() : 0); ++j)
 		{
 			if (pLightList->at(j)->getType() == curLightType)

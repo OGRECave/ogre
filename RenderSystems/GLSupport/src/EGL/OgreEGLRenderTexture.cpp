@@ -42,7 +42,7 @@ THE SOFTWARE.
 
 namespace Ogre {
     EGLPBuffer::EGLPBuffer(EGLSupport* glsupport, PixelComponentType format,
-                           size_t width, size_t height)
+                           uint32 width, uint32 height)
         : GLPBuffer(format, width, height)
     {
         mGLSupport = glsupport;

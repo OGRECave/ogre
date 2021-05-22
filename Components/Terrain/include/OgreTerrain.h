@@ -288,7 +288,7 @@ namespace Ogre
         static const uint32 TERRAINGENERALINFO_CHUNK_ID;
         static const uint16 TERRAINGENERALINFO_CHUNK_VERSION;
 
-        static const size_t LOD_MORPH_CUSTOM_PARAM;
+        static const uint32 LOD_MORPH_CUSTOM_PARAM;
 
         typedef std::vector<Real> RealVector;
 
@@ -803,7 +803,7 @@ namespace Ogre
         left/right bottom/top
         @param h The new height
         */
-        void setHeightAtPoint(long x, long y, float h);
+        void setHeightAtPoint(int32 x, int32 y, float h);
 
         /** Get the height data for a given terrain position. 
         @param x, y Position in terrain space, values from 0 to 1 left/right bottom/top
@@ -1666,11 +1666,11 @@ namespace Ogre
 
         void updateDerivedDataImpl(const Rect& rect, const Rect& lightmapExtraRect, bool synchronous, uint8 typeMask);
 
-        void getEdgeRect(NeighbourIndex index, long range, Rect* outRect) const;
+        void getEdgeRect(NeighbourIndex index, int32 range, Rect* outRect) const;
         // get the equivalent of the passed in edge rectangle in neighbour
         void getNeighbourEdgeRect(NeighbourIndex index, const Rect& inRect, Rect* outRect) const;
         // get the equivalent of the passed in edge point in neighbour
-        void getNeighbourPoint(NeighbourIndex index, long x, long y, long *outx, long *outy) const;
+        void getNeighbourPoint(NeighbourIndex index, int x, int y, int *outx, int *outy) const;
         // overflow a point into a neighbour index and point
         void getNeighbourPointOverflow(long x, long y, NeighbourIndex *outindex, long *outx, long *outy) const;
 
