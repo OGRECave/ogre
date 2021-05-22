@@ -42,7 +42,6 @@ CompositionPass::CompositionPass(CompositionTargetPass *parent):
     mAutomaticColour(false),
     mClearDepth(1.0f),
     mClearStencil(0),
-    mStencilReadBackAsTexture(false),
     mQuadCornerModified(false),
     mQuad(-1, 1, 1, -1),
     mQuadFarCorners(false),
@@ -266,14 +265,6 @@ void CompositionPass::setStencilTwoSidedOperation(bool value)
 bool CompositionPass::getStencilTwoSidedOperation() const
 {
     return mStencilState.twoSidedOperation;
-}
-void CompositionPass::setStencilReadBackAsTextureOperation(bool value)
-{
-    mStencilReadBackAsTexture = value;
-}
-bool CompositionPass::getStencilReadBackAsTextureOperation() const
-{
-    return mStencilReadBackAsTexture;
 }
 void CompositionPass::setQuadFarCorners(bool farCorners, bool farCornersViewSpace)
 {

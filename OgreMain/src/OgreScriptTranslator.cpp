@@ -5240,10 +5240,6 @@ namespace Ogre{
                     if(getValue(prop, compiler, bval))
                         mPass->setStencilTwoSidedOperation(bval);
                     break;
-                case ID_READ_BACK_AS_TEXTURE:
-                    if(getValue(prop, compiler, bval))
-                        mPass->setStencilReadBackAsTextureOperation(bval);
-                    break;
                 case ID_BUFFERS:
                     {
                         uint32 buffers = 0;
