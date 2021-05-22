@@ -1107,5 +1107,27 @@ namespace Ogre {
         }
     }
 
+    void RenderSystem::setStencilCheckEnabled(bool enabled)
+    {
+        mStencilState.enabled = enabled;
+        if (!enabled)
+            setStencilState(mStencilState);
+    }
+    void RenderSystem::setStencilBufferParams(CompareFunction func, uint32 refValue, uint32 compareMask,
+                                              uint32 writeMask, StencilOperation stencilFailOp,
+                                              StencilOperation depthFailOp, StencilOperation passOp,
+                                              bool twoSidedOperation)
+    {
+        mStencilState.compareOp = func;
+        mStencilState.referenceValue = refValue;
+        mStencilState.compareMask = compareMask;
+        mStencilState.writeMask = writeMask;
+        mStencilState.stencilFailOp = stencilFailOp;
+        mStencilState.depthFailOp = depthFailOp;
+        mStencilState.depthStencilPassOp = passOp;
+        mStencilState.twoSidedOperation = twoSidedOperation;
+        if(mStencilState.enabled)
+            setStencilState(mStencilState);
+    }
 }
 

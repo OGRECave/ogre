@@ -1230,8 +1230,7 @@ void SceneManager::ShadowRenderer::setShadowVolumeStencilState(bool secondpass, 
             SOP_KEEP, // stencil test will never fail
             zfail ? incrOp : SOP_KEEP, // back face depth fail
             zfail ? SOP_KEEP : decrOp, // back face pass
-            twosided,
-            false
+            twosided
             );
     }
     else
@@ -1245,8 +1244,7 @@ void SceneManager::ShadowRenderer::setShadowVolumeStencilState(bool secondpass, 
             SOP_KEEP, // stencil test will never fail
             zfail ? decrOp : SOP_KEEP, // front face depth fail
             zfail ? SOP_KEEP : incrOp, // front face pass
-            twosided,
-            false
+            twosided
             );
     }
     mDestRenderSystem->_setCullingMode(mSceneManager->mPassCullingMode);

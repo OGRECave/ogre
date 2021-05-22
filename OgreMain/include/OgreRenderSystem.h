@@ -797,14 +797,6 @@ namespace Ogre
         /** Sets how to rasterise triangles, as points, wireframe or solid polys. */
         virtual void _setPolygonMode(PolygonMode level) = 0;
 
-        /** Turns stencil buffer checking on or off. 
-        @remarks
-        Stencilling (masking off areas of the rendering target based on the stencil 
-        buffer) can be turned on or off using this method. By default, stencilling is
-        disabled.
-        */
-        virtual void setStencilCheckEnabled(bool enabled) = 0;
-
         /** This method allows you to set all the stencil buffer parameters in one call.
 
         Unlike other render states, stencilling is left for the application to turn
@@ -814,27 +806,18 @@ namespace Ogre
         or separate render queue groups and register a RenderQueueListener to get notifications
         between batches.
 
-        @see StencilState
         @see RenderQueue
         */
-        virtual void setStencilBufferParams(CompareFunction func = CMPF_ALWAYS_PASS, 
-            uint32 refValue = 0, uint32 compareMask = 0xFFFFFFFF, uint32 writeMask = 0xFFFFFFFF, 
-            StencilOperation stencilFailOp = SOP_KEEP, 
-            StencilOperation depthFailOp = SOP_KEEP,
-            StencilOperation passOp = SOP_KEEP, 
-            bool twoSidedOperation = false,
-            bool readBackAsTexture = false) = 0;
+        virtual void setStencilState(const StencilState& state) = 0;
 
-        /// @overload
-        void setStencilState(const StencilState& state)
-        {
-            setStencilCheckEnabled(state.enabled);
-            if (!state.enabled)
-                return;
-            setStencilBufferParams(state.compareOp, state.referenceValue, state.compareMask,
-                                   state.writeMask, state.stencilFailOp, state.depthFailOp,
-                                   state.depthStencilPassOp, state.twoSidedOperation);
-        }
+        /// @deprecated use setStencilState
+        void setStencilCheckEnabled(bool enabled);
+        /// @deprecated use setStencilState
+        void setStencilBufferParams(CompareFunction func = CMPF_ALWAYS_PASS, uint32 refValue = 0,
+                                    uint32 compareMask = 0xFFFFFFFF, uint32 writeMask = 0xFFFFFFFF,
+                                    StencilOperation stencilFailOp = SOP_KEEP,
+                                    StencilOperation depthFailOp = SOP_KEEP,
+                                    StencilOperation passOp = SOP_KEEP, bool twoSidedOperation = false);
 
         /** Sets whether or not normals are to be automatically normalised.
         @remarks
@@ -1291,6 +1274,8 @@ namespace Ogre
         void initFixedFunctionParams();
         void setFFPLightParams(size_t index, bool enabled);
         static CompareFunction reverseCompareFunction(CompareFunction func);
+    private:
+        StencilState mStencilState;
     };
     /** @} */
     /** @} */

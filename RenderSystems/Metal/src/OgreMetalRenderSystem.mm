@@ -1256,16 +1256,9 @@ namespace Ogre
         HighLevelGpuProgramManager::getSingleton().addFactory( mMetalProgramFactory );
     }
     //-------------------------------------------------------------------------
-    void MetalRenderSystem::setStencilCheckEnabled(bool enabled)
+    void MetalRenderSystem::setStencilState(const StencilState& state)
     {
-        // Save this info so we can transfer it into a new encoder if necessary
-        mStencilEnabled = enabled;
-    }
-    void MetalRenderSystem::setStencilBufferParams( CompareFunction func,
-        uint32 refValue, uint32 compareMask, uint32 writeMask, StencilOperation stencilFailOp,
-        StencilOperation depthFailOp, StencilOperation passOp,
-        bool twoSidedOperation, bool readBackAsTexture )
-    {
+        mStencilEnabled = state.enabled;
         // There are two main cases:
         // 1. The active render encoder is valid and will be subsequently used for drawing.
         //      We need to set the stencil reference value on this encoder. We do this below.
@@ -1275,10 +1268,10 @@ namespace Ogre
 
         if (mStencilEnabled)
         {
-            mStencilRefValue = refValue;
+            mStencilRefValue = state.referenceValue;
 
             if( mActiveRenderEncoder )
-                [mActiveRenderEncoder setStencilReferenceValue:refValue];
+                [mActiveRenderEncoder setStencilReferenceValue:mStencilRefValue];
         }
     }
  }

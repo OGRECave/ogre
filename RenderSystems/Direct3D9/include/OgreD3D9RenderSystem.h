@@ -269,14 +269,7 @@ namespace Ogre
         void setShadingType( ShadeOptions so );
         void setLightingEnabled( bool enabled );
         void destroyRenderTarget(const String& name);
-        void setStencilCheckEnabled(bool enabled);
-        void setStencilBufferParams(CompareFunction func = CMPF_ALWAYS_PASS, 
-            uint32 refValue = 0, uint32 compareMask = 0xFFFFFFFF, uint32 writeMask = 0xFFFFFFFF,
-            StencilOperation stencilFailOp = SOP_KEEP, 
-            StencilOperation depthFailOp = SOP_KEEP,
-            StencilOperation passOp = SOP_KEEP, 
-            bool twoSidedOperation = false,
-            bool readBackAsTexture = false);
+        void setStencilState(const StencilState& state) override;
         void setNormaliseNormals(bool normalise);
 
         // Low-level overridden members, mainly for internal use
