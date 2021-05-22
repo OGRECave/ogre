@@ -138,27 +138,13 @@ public:
 class RSStencilOperation: public CompositorInstance::RenderSystemOperation
 {
 public:
-    RSStencilOperation(bool inStencilCheck, CompareFunction inFunc, uint32 inRefValue, uint32 inMask,
-        StencilOperation inStencilFailOp, StencilOperation inDepthFailOp, StencilOperation inPassOp,
-        bool inTwoSidedOperation, bool inReadBackAsTexture):
-        stencilCheck(inStencilCheck), func(inFunc), refValue(inRefValue), mask(inMask),
-        stencilFailOp(inStencilFailOp), depthFailOp(inDepthFailOp), passOp(inPassOp),
-        twoSidedOperation(inTwoSidedOperation), readBackAsTexture(inReadBackAsTexture)
-    {}
-    bool stencilCheck;
-    CompareFunction func; 
-    uint32 refValue;
-    uint32 mask;
-    StencilOperation stencilFailOp;
-    StencilOperation depthFailOp;
-    StencilOperation passOp;
-    bool twoSidedOperation;
-    bool readBackAsTexture;
+    RSStencilOperation(const StencilState& inState) : state(inState) {}
 
-    virtual void execute(SceneManager *sm, RenderSystem *rs)
+    StencilState state;
+
+    void execute(SceneManager *sm, RenderSystem *rs) override
     {
-        rs->setStencilCheckEnabled(stencilCheck);
-        rs->setStencilBufferParams(func, refValue, mask, 0xFFFFFFFF, stencilFailOp, depthFailOp, passOp, twoSidedOperation, readBackAsTexture);
+        rs->setStencilState(state);
     }
 };
 
@@ -337,11 +323,7 @@ void CompositorInstance::collectPasses(TargetOperation &finalState, const Compos
                 ));
             break;
         case CompositionPass::PT_STENCIL:
-            queueRenderSystemOp(finalState, OGRE_NEW RSStencilOperation(
-                pass->getStencilCheck(),pass->getStencilFunc(), pass->getStencilRefValue(),
-                pass->getStencilMask(), pass->getStencilFailOp(), pass->getStencilDepthFailOp(),
-                pass->getStencilPassOp(), pass->getStencilTwoSidedOperation(), pass->getStencilReadBackAsTextureOperation()
-                ));
+            queueRenderSystemOp(finalState, OGRE_NEW RSStencilOperation(pass->getStencilState()));
             break;
         case CompositionPass::PT_RENDERSCENE: 
         {

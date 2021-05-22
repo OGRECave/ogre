@@ -237,6 +237,8 @@ namespace Ogre {
         */
         bool getStencilReadBackAsTextureOperation() const;
 
+        const StencilState& getStencilState() const { return mStencilState; }
+
 
         /// Inputs (for material used for rendering the quad)
         struct InputTex
