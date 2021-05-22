@@ -1644,39 +1644,30 @@ namespace Ogre
         }
     }
     //---------------------------------------------------------------------
-    void D3D11RenderSystem::setStencilCheckEnabled(bool enabled)
-    {
-        mDepthStencilDesc.StencilEnable = enabled;
-        mDepthStencilDescChanged = true;
-    }
-    //---------------------------------------------------------------------
-    void D3D11RenderSystem::setStencilBufferParams(CompareFunction func, 
-        uint32 refValue, uint32 compareMask, uint32 writeMask, StencilOperation stencilFailOp, 
-        StencilOperation depthFailOp, StencilOperation passOp, 
-        bool twoSidedOperation, bool readBackAsTexture)
+    void D3D11RenderSystem::setStencilState(const StencilState& state)
     {
 		// We honor user intent in case of one sided operation, and carefully tweak it in case of two sided operations.
-		bool flipFront = twoSidedOperation &&
+		bool flipFront = state.twoSidedOperation &&
 						(mInvertVertexWinding && !mActiveRenderTarget->requiresTextureFlipping() ||
 						!mInvertVertexWinding && mActiveRenderTarget->requiresTextureFlipping());
-		bool flipBack = twoSidedOperation && !flipFront;
+		bool flipBack = state.twoSidedOperation && !flipFront;
 
-        mStencilRef = refValue;
-        mDepthStencilDesc.StencilReadMask = compareMask;
-        mDepthStencilDesc.StencilWriteMask = writeMask;
+        mDepthStencilDesc.StencilEnable = state.enabled;
+        mStencilRef = state.referenceValue;
+        mDepthStencilDesc.StencilReadMask = state.compareMask;
+        mDepthStencilDesc.StencilWriteMask = state.writeMask;
 
-		mDepthStencilDesc.FrontFace.StencilFailOp = D3D11Mappings::get(stencilFailOp, flipFront);
-		mDepthStencilDesc.BackFace.StencilFailOp = D3D11Mappings::get(stencilFailOp, flipBack);
+		mDepthStencilDesc.FrontFace.StencilFailOp = D3D11Mappings::get(state.stencilFailOp, flipFront);
+		mDepthStencilDesc.BackFace.StencilFailOp = D3D11Mappings::get(state.stencilFailOp, flipBack);
         
-		mDepthStencilDesc.FrontFace.StencilDepthFailOp = D3D11Mappings::get(depthFailOp, flipFront);
-		mDepthStencilDesc.BackFace.StencilDepthFailOp = D3D11Mappings::get(depthFailOp, flipBack);
+		mDepthStencilDesc.FrontFace.StencilDepthFailOp = D3D11Mappings::get(state.depthFailOp, flipFront);
+		mDepthStencilDesc.BackFace.StencilDepthFailOp = D3D11Mappings::get(state.depthFailOp, flipBack);
         
-		mDepthStencilDesc.FrontFace.StencilPassOp = D3D11Mappings::get(passOp, flipFront);
-		mDepthStencilDesc.BackFace.StencilPassOp = D3D11Mappings::get(passOp, flipBack);
+		mDepthStencilDesc.FrontFace.StencilPassOp = D3D11Mappings::get(state.depthStencilPassOp, flipFront);
+		mDepthStencilDesc.BackFace.StencilPassOp = D3D11Mappings::get(state.depthStencilPassOp, flipBack);
 
-		mDepthStencilDesc.FrontFace.StencilFunc = D3D11Mappings::get(func);
-		mDepthStencilDesc.BackFace.StencilFunc = D3D11Mappings::get(func);
-        mReadBackAsTexture = readBackAsTexture;
+		mDepthStencilDesc.FrontFace.StencilFunc = D3D11Mappings::get(state.compareOp);
+		mDepthStencilDesc.BackFace.StencilFunc = D3D11Mappings::get(state.compareOp);
         mDepthStencilDescChanged = true;
     }
     //---------------------------------------------------------------------

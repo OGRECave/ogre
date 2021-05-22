@@ -1972,24 +1972,22 @@ namespace Ogre {
         mStateCacheManager->setPolygonMode(glmode);
     }
     //---------------------------------------------------------------------
-    void GLRenderSystem::setStencilCheckEnabled(bool enabled)
+    void GLRenderSystem::setStencilState(const StencilState& state)
     {
-        mStateCacheManager->setEnabled(GL_STENCIL_TEST, enabled);
-    }
-    //---------------------------------------------------------------------
-    void GLRenderSystem::setStencilBufferParams(CompareFunction func,
-                                                uint32 refValue, uint32 compareMask, uint32 writeMask, StencilOperation stencilFailOp,
-                                                StencilOperation depthFailOp, StencilOperation passOp,
-                                                bool twoSidedOperation, bool readBackAsTexture)
-    {
-        bool flip;
-        mStencilWriteMask = writeMask;
+        mStateCacheManager->setEnabled(GL_STENCIL_TEST, state.enabled);
 
-        if (twoSidedOperation)
+        if(!state.enabled)
+            return;
+
+        bool flip;
+        mStencilWriteMask = state.writeMask;
+
+        auto compareOp = convertCompareFunction(state.compareOp);
+
+        if (state.twoSidedOperation)
         {
             if (!mCurrentCapabilities->hasCapability(RSC_TWO_SIDED_STENCIL))
-                OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "2-sided stencils are not supported",
-                            "GLRenderSystem::setStencilBufferParams");
+                OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "2-sided stencils are not supported");
 
             // NB: We should always treat CCW as front face for consistent with default
             // culling mode. Therefore, we must take care with two-sided stencil settings.
@@ -1998,39 +1996,39 @@ namespace Ogre {
             if(GLEW_VERSION_2_0) // New GL2 commands
             {
                 // Back
-                glStencilMaskSeparate(GL_BACK, writeMask);
-                glStencilFuncSeparate(GL_BACK, convertCompareFunction(func), refValue, compareMask);
+                glStencilMaskSeparate(GL_BACK, state.writeMask);
+                glStencilFuncSeparate(GL_BACK, compareOp, state.referenceValue, state.compareMask);
                 glStencilOpSeparate(GL_BACK, 
-                    convertStencilOp(stencilFailOp, !flip), 
-                    convertStencilOp(depthFailOp, !flip), 
-                    convertStencilOp(passOp, !flip));
+                    convertStencilOp(state.stencilFailOp, !flip),
+                    convertStencilOp(state.depthFailOp, !flip),
+                    convertStencilOp(state.depthStencilPassOp, !flip));
                 // Front
-                glStencilMaskSeparate(GL_FRONT, writeMask);
-                glStencilFuncSeparate(GL_FRONT, convertCompareFunction(func), refValue, compareMask);
+                glStencilMaskSeparate(GL_FRONT, state.writeMask);
+                glStencilFuncSeparate(GL_FRONT, compareOp, state.referenceValue, state.compareMask);
                 glStencilOpSeparate(GL_FRONT, 
-                    convertStencilOp(stencilFailOp, flip),
-                    convertStencilOp(depthFailOp, flip), 
-                    convertStencilOp(passOp, flip));
+                    convertStencilOp(state.stencilFailOp, flip),
+                    convertStencilOp(state.depthFailOp, flip),
+                    convertStencilOp(state.depthStencilPassOp, flip));
             }
             else // EXT_stencil_two_side
             {
                 mStateCacheManager->setEnabled(GL_STENCIL_TEST_TWO_SIDE_EXT, true);
                 // Back
                 glActiveStencilFaceEXT(GL_BACK);
-                mStateCacheManager->setStencilMask(writeMask);
-                glStencilFunc(convertCompareFunction(func), refValue, compareMask);
+                mStateCacheManager->setStencilMask(state.writeMask);
+                glStencilFunc(compareOp, state.referenceValue, state.compareMask);
                 glStencilOp(
-                    convertStencilOp(stencilFailOp, !flip),
-                    convertStencilOp(depthFailOp, !flip),
-                    convertStencilOp(passOp, !flip));
+                    convertStencilOp(state.stencilFailOp, !flip),
+                    convertStencilOp(state.depthFailOp, !flip),
+                    convertStencilOp(state.depthStencilPassOp, !flip));
                 // Front
                 glActiveStencilFaceEXT(GL_FRONT);
-                mStateCacheManager->setStencilMask(writeMask);
-                glStencilFunc(convertCompareFunction(func), refValue, compareMask);
+                mStateCacheManager->setStencilMask(state.writeMask);
+                glStencilFunc(compareOp, state.referenceValue, state.compareMask);
                 glStencilOp(
-                    convertStencilOp(stencilFailOp, flip),
-                    convertStencilOp(depthFailOp, flip),
-                    convertStencilOp(passOp, flip));
+                    convertStencilOp(state.stencilFailOp, flip),
+                    convertStencilOp(state.depthFailOp, flip),
+                    convertStencilOp(state.depthStencilPassOp, flip));
             }
         }
         else
@@ -2039,12 +2037,12 @@ namespace Ogre {
                 mStateCacheManager->setEnabled(GL_STENCIL_TEST_TWO_SIDE_EXT, false);
 
             flip = false;
-            mStateCacheManager->setStencilMask(writeMask);
-            glStencilFunc(convertCompareFunction(func), refValue, compareMask);
+            mStateCacheManager->setStencilMask(state.writeMask);
+            glStencilFunc(compareOp, state.referenceValue, state.compareMask);
             glStencilOp(
-                convertStencilOp(stencilFailOp, flip),
-                convertStencilOp(depthFailOp, flip),
-                convertStencilOp(passOp, flip));
+                convertStencilOp(state.stencilFailOp, flip),
+                convertStencilOp(state.depthFailOp, flip),
+                convertStencilOp(state.depthStencilPassOp, flip));
         }
     }
     //---------------------------------------------------------------------

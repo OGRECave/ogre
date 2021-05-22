@@ -2433,29 +2433,22 @@ namespace Ogre
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Error setting polygon mode.", "D3D9RenderSystem::setPolygonMode");
     }
     //---------------------------------------------------------------------
-    void D3D9RenderSystem::setStencilCheckEnabled(bool enabled)
-    {
-        // Allow stencilling
-        HRESULT hr = __SetRenderState(D3DRS_STENCILENABLE, enabled);
-        if (FAILED(hr))
-            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Error enabling / disabling stencilling.",
-            "D3D9RenderSystem::setStencilCheckEnabled");
-    }
-    //---------------------------------------------------------------------
-    void D3D9RenderSystem::setStencilBufferParams(CompareFunction func, 
-        uint32 refValue, uint32 compareMask, uint32 writeMask, StencilOperation stencilFailOp, 
-        StencilOperation depthFailOp, StencilOperation passOp, 
-        bool twoSidedOperation, bool readBackAsTexture)
+    void D3D9RenderSystem::setStencilState(const StencilState& state)
     {
         HRESULT hr;
         bool flip;
 
+        // Allow stencilling
+        hr = __SetRenderState(D3DRS_STENCILENABLE, state.enabled);
+        if (FAILED(hr))
+            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Error enabling / disabling stencilling.");
+
+        if(!state.enabled)
+            return;
+
         // 2-sided operation
-        if (twoSidedOperation)
+        if (state.twoSidedOperation)
         {
-            if (!mCurrentCapabilities->hasCapability(RSC_TWO_SIDED_STENCIL))
-                OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "2-sided stencils are not supported",
-                "D3D9RenderSystem::setStencilBufferParams");
             hr = __SetRenderState(D3DRS_TWOSIDEDSTENCILMODE, TRUE);
             if (FAILED(hr))
                 OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Error setting 2-sided stencil mode.",
@@ -2467,19 +2460,19 @@ namespace Ogre
 
             // Set alternative versions of ops
             // fail op
-            hr = __SetRenderState(D3DRS_CCW_STENCILFAIL, D3D9Mappings::get(stencilFailOp, !flip));
+            hr = __SetRenderState(D3DRS_CCW_STENCILFAIL, D3D9Mappings::get(state.stencilFailOp, !flip));
             if (FAILED(hr))
                 OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Error setting stencil fail operation (2-sided).",
                 "D3D9RenderSystem::setStencilBufferParams");
 
             // depth fail op
-            hr = __SetRenderState(D3DRS_CCW_STENCILZFAIL, D3D9Mappings::get(depthFailOp, !flip));
+            hr = __SetRenderState(D3DRS_CCW_STENCILZFAIL, D3D9Mappings::get(state.depthFailOp, !flip));
             if (FAILED(hr))
                 OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Error setting stencil depth fail operation (2-sided).",
                 "D3D9RenderSystem::setStencilBufferParams");
 
             // pass op
-            hr = __SetRenderState(D3DRS_CCW_STENCILPASS, D3D9Mappings::get(passOp, !flip));
+            hr = __SetRenderState(D3DRS_CCW_STENCILPASS, D3D9Mappings::get(state.depthStencilPassOp, !flip));
             if (FAILED(hr))
                 OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Error setting stencil pass operation (2-sided).",
                 "D3D9RenderSystem::setStencilBufferParams");
@@ -2494,43 +2487,43 @@ namespace Ogre
         }
 
         // func
-        hr = __SetRenderState(D3DRS_STENCILFUNC, D3D9Mappings::get(func));
+        hr = __SetRenderState(D3DRS_STENCILFUNC, D3D9Mappings::get(state.compareOp));
         if (FAILED(hr))
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Error setting stencil buffer test function.",
             "D3D9RenderSystem::setStencilBufferParams");
 
         // reference value
-        hr = __SetRenderState(D3DRS_STENCILREF, refValue);
+        hr = __SetRenderState(D3DRS_STENCILREF, state.referenceValue);
         if (FAILED(hr))
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Error setting stencil buffer reference value.",
             "D3D9RenderSystem::setStencilBufferParams");
 
         // compare mask
-        hr = __SetRenderState(D3DRS_STENCILMASK, compareMask);
+        hr = __SetRenderState(D3DRS_STENCILMASK, state.compareMask);
         if (FAILED(hr))
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Error setting stencil buffer compare mask.",
             "D3D9RenderSystem::setStencilBufferParams");
 
         // compare mask
-        hr = __SetRenderState(D3DRS_STENCILWRITEMASK, writeMask);
+        hr = __SetRenderState(D3DRS_STENCILWRITEMASK, state.writeMask);
         if (FAILED(hr))
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Error setting stencil buffer write mask.",
             "D3D9RenderSystem::setStencilBufferParams");
 
         // fail op
-        hr = __SetRenderState(D3DRS_STENCILFAIL, D3D9Mappings::get(stencilFailOp, flip));
+        hr = __SetRenderState(D3DRS_STENCILFAIL, D3D9Mappings::get(state.stencilFailOp, flip));
         if (FAILED(hr))
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Error setting stencil fail operation.",
             "D3D9RenderSystem::setStencilBufferParams");
 
         // depth fail op
-        hr = __SetRenderState(D3DRS_STENCILZFAIL, D3D9Mappings::get(depthFailOp, flip));
+        hr = __SetRenderState(D3DRS_STENCILZFAIL, D3D9Mappings::get(state.depthFailOp, flip));
         if (FAILED(hr))
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Error setting stencil depth fail operation.",
             "D3D9RenderSystem::setStencilBufferParams");
 
         // pass op
-        hr = __SetRenderState(D3DRS_STENCILPASS, D3D9Mappings::get(passOp, flip));
+        hr = __SetRenderState(D3DRS_STENCILPASS, D3D9Mappings::get(state.depthStencilPassOp, flip));
         if (FAILED(hr))
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Error setting stencil pass operation.",
             "D3D9RenderSystem::setStencilBufferParams");

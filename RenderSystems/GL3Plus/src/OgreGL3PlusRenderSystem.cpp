@@ -1050,57 +1050,48 @@ namespace Ogre {
         }
     }
 
-    void GL3PlusRenderSystem::setStencilCheckEnabled(bool enabled)
+    void GL3PlusRenderSystem::setStencilState(const StencilState& state)
     {
-        mStateCacheManager->setEnabled(GL_STENCIL_TEST, enabled);
-    }
+        mStateCacheManager->setEnabled(GL_STENCIL_TEST, state.enabled);
 
-    void GL3PlusRenderSystem::setStencilBufferParams(CompareFunction func,
-                                                     uint32 refValue, uint32 compareMask, uint32 writeMask,
-                                                     StencilOperation stencilFailOp,
-                                                     StencilOperation depthFailOp,
-                                                     StencilOperation passOp,
-                                                     bool twoSidedOperation,
-                                                     bool readBackAsTexture)
-    {
+        if(!state.enabled)
+            return;
         bool flip;
-        mStencilWriteMask = writeMask;
+        mStencilWriteMask = state.writeMask;
 
-        if (twoSidedOperation)
+        auto compareOp = convertCompareFunction(state.compareOp);
+
+        if (state.twoSidedOperation)
         {
-            if (!mCurrentCapabilities->hasCapability(RSC_TWO_SIDED_STENCIL))
-                OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "2-sided stencils are not supported",
-                            "GL3PlusRenderSystem::setStencilBufferParams");
-
             // NB: We should always treat CCW as front face for consistent with default
             // culling mode. Therefore, we must take care with two-sided stencil settings.
             flip = (mInvertVertexWinding && !mActiveRenderTarget->requiresTextureFlipping()) ||
                 (!mInvertVertexWinding && mActiveRenderTarget->requiresTextureFlipping());
             // Back
-            OGRE_CHECK_GL_ERROR(glStencilMaskSeparate(GL_BACK, writeMask));
-            OGRE_CHECK_GL_ERROR(glStencilFuncSeparate(GL_BACK, convertCompareFunction(func), refValue, compareMask));
+            OGRE_CHECK_GL_ERROR(glStencilMaskSeparate(GL_BACK, state.writeMask));
+            OGRE_CHECK_GL_ERROR(glStencilFuncSeparate(GL_BACK, compareOp, state.referenceValue, state.compareMask));
             OGRE_CHECK_GL_ERROR(glStencilOpSeparate(GL_BACK,
-                                                    convertStencilOp(stencilFailOp, !flip),
-                                                    convertStencilOp(depthFailOp, !flip),
-                                                    convertStencilOp(passOp, !flip)));
+                                                    convertStencilOp(state.stencilFailOp, !flip),
+                                                    convertStencilOp(state.depthFailOp, !flip),
+                                                    convertStencilOp(state.depthStencilPassOp, !flip)));
 
             // Front
-            OGRE_CHECK_GL_ERROR(glStencilMaskSeparate(GL_FRONT, writeMask));
-            OGRE_CHECK_GL_ERROR(glStencilFuncSeparate(GL_FRONT, convertCompareFunction(func), refValue, compareMask));
+            OGRE_CHECK_GL_ERROR(glStencilMaskSeparate(GL_FRONT, state.writeMask));
+            OGRE_CHECK_GL_ERROR(glStencilFuncSeparate(GL_FRONT, compareOp, state.referenceValue, state.compareMask));
             OGRE_CHECK_GL_ERROR(glStencilOpSeparate(GL_FRONT,
-                                                    convertStencilOp(stencilFailOp, flip),
-                                                    convertStencilOp(depthFailOp, flip),
-                                                    convertStencilOp(passOp, flip)));
+                                                    convertStencilOp(state.stencilFailOp, flip),
+                                                    convertStencilOp(state.depthFailOp, flip),
+                                                    convertStencilOp(state.depthStencilPassOp, flip)));
         }
         else
         {
             flip = false;
-            mStateCacheManager->setStencilMask(writeMask);
-            OGRE_CHECK_GL_ERROR(glStencilFunc(convertCompareFunction(func), refValue, compareMask));
+            mStateCacheManager->setStencilMask(state.writeMask);
+            OGRE_CHECK_GL_ERROR(glStencilFunc(compareOp, state.referenceValue, state.compareMask));
             OGRE_CHECK_GL_ERROR(glStencilOp(
-                convertStencilOp(stencilFailOp, flip),
-                convertStencilOp(depthFailOp, flip),
-                convertStencilOp(passOp, flip)));
+                convertStencilOp(state.stencilFailOp, flip),
+                convertStencilOp(state.depthFailOp, flip),
+                convertStencilOp(state.depthStencilPassOp, flip)));
         }
     }
 

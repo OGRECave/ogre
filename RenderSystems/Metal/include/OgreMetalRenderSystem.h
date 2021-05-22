@@ -114,13 +114,7 @@ namespace Ogre
 
         virtual DepthBuffer* _createDepthBufferFor( RenderTarget *renderTarget);
 
-        void setStencilCheckEnabled(bool enabled);
-        void setStencilBufferParams(CompareFunction func = CMPF_ALWAYS_PASS, uint32 refValue = 0,
-                                    uint32 compareMask = 0xFFFFFFFF, uint32 writeMask = 0xFFFFFFFF,
-                                    StencilOperation stencilFailOp = SOP_KEEP,
-                                    StencilOperation depthFailOp = SOP_KEEP,
-                                    StencilOperation passOp = SOP_KEEP, bool twoSidedOperation = false,
-                                    bool readBackAsTexture = false);
+        void setStencilState(const StencilState& state) override;
 
         /// See VaoManager::waitForTailFrameToFinish
         virtual void _waitForTailFrameToFinish(void);
