@@ -256,7 +256,7 @@ static GpuConstantType getGCType(const GpuProgramParameters::AutoConstantDefinit
 }
 
 //-----------------------------------------------------------------------
-UniformParameter::UniformParameter(GpuProgramParameters::AutoConstantType autoType, Real fAutoConstantData, size_t size)
+UniformParameter::UniformParameter(GpuProgramParameters::AutoConstantType autoType, float fAutoConstantData, size_t size)
 {
     auto parameterDef = GpuProgramParameters::getAutoConstantDefinition(autoType);
     assert(parameterDef);
@@ -283,7 +283,7 @@ UniformParameter::UniformParameter(GpuProgramParameters::AutoConstantType autoTy
 }
 
 //-----------------------------------------------------------------------
-UniformParameter::UniformParameter(GpuProgramParameters::AutoConstantType autoType, Real fAutoConstantData, size_t size, GpuConstantType type)
+UniformParameter::UniformParameter(GpuProgramParameters::AutoConstantType autoType, float fAutoConstantData, size_t size, GpuConstantType type)
 {
     auto parameterDef = GpuProgramParameters::getAutoConstantDefinition(autoType);
     assert(parameterDef);
@@ -310,7 +310,7 @@ UniformParameter::UniformParameter(GpuProgramParameters::AutoConstantType autoTy
 }
 
 //-----------------------------------------------------------------------
-UniformParameter::UniformParameter(GpuProgramParameters::AutoConstantType autoType, size_t nAutoConstantData, size_t size)
+UniformParameter::UniformParameter(GpuProgramParameters::AutoConstantType autoType, uint32 nAutoConstantData, size_t size)
 {
     auto parameterDef = GpuProgramParameters::getAutoConstantDefinition(autoType);
     assert(parameterDef);
@@ -333,7 +333,7 @@ UniformParameter::UniformParameter(GpuProgramParameters::AutoConstantType autoTy
 }
 
 //-----------------------------------------------------------------------
-UniformParameter::UniformParameter(GpuProgramParameters::AutoConstantType autoType, size_t nAutoConstantData, size_t size, GpuConstantType type)
+UniformParameter::UniformParameter(GpuProgramParameters::AutoConstantType autoType, uint32 nAutoConstantData, size_t size, GpuConstantType type)
 {
     auto parameterDef = GpuProgramParameters::getAutoConstantDefinition(autoType);
     assert(parameterDef);

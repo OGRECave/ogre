@@ -420,7 +420,7 @@ public:
     @param fAutoConstantData The real data for this auto constant parameter.    
     @param size number of elements in the parameter.    
     */
-    UniformParameter(GpuProgramParameters::AutoConstantType autoType, Real fAutoConstantData, size_t size);
+    UniformParameter(GpuProgramParameters::AutoConstantType autoType, float fAutoConstantData, size_t size);
     
     /** Class constructor.
     @param autoType The auto type of this parameter.
@@ -428,14 +428,14 @@ public:
     @param size number of elements in the parameter.
     @param type The desired data type of this auto constant parameter.
     */
-    UniformParameter(GpuProgramParameters::AutoConstantType autoType, Real fAutoConstantData, size_t size, GpuConstantType type);
+    UniformParameter(GpuProgramParameters::AutoConstantType autoType, float fAutoConstantData, size_t size, GpuConstantType type);
 
     /** Class constructor.
     @param autoType The auto type of this parameter.
     @param nAutoConstantData The int data for this auto constant parameter. 
     @param size number of elements in the parameter.    
     */
-    UniformParameter(GpuProgramParameters::AutoConstantType autoType, size_t nAutoConstantData, size_t size);
+    UniformParameter(GpuProgramParameters::AutoConstantType autoType, uint32 nAutoConstantData, size_t size);
     
     /** Class constructor.
     @param autoType The auto type of this parameter.
@@ -443,14 +443,14 @@ public:
     @param size number of elements in the parameter.
     @param type The desired data type of this auto constant parameter.
     */
-    UniformParameter(GpuProgramParameters::AutoConstantType autoType, size_t nAutoConstantData, size_t size, GpuConstantType type);
+    UniformParameter(GpuProgramParameters::AutoConstantType autoType, uint32 nAutoConstantData, size_t size, GpuConstantType type);
 
     
     /** Get auto constant int data of this parameter, in case it is auto constant parameter. */
-    size_t getAutoConstantIntData() const { return mAutoConstantIntData; }  
+    uint32 getAutoConstantIntData() const { return mAutoConstantIntData; }
 
     /** Get auto constant real data of this parameter, in case it is auto constant parameter. */
-    Real getAutoConstantRealData() const { return mAutoConstantRealData; }  
+    float getAutoConstantRealData() const { return mAutoConstantRealData; }
 
     /** Return true if this parameter is a floating point type, false otherwise. */
     bool isFloat() const;
@@ -583,7 +583,7 @@ public:
     }
 
     /// light index or array size
-    void updateExtraInfo(size_t data)
+    void updateExtraInfo(uint32 data)
     {
         if (!mParamsPtr)
             return;
@@ -601,9 +601,9 @@ private:
     union
     {
         // Auto constant int data.
-        size_t mAutoConstantIntData;
+        uint32 mAutoConstantIntData;
         // Auto constant real data.
-        Real mAutoConstantRealData;
+        float mAutoConstantRealData;
     };      
     // How this parameter varies (bitwise combination of GpuProgramVariability).
     uint16 mVariability;
