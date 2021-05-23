@@ -55,7 +55,9 @@ namespace Ogre
     mShowPortals(false),
     mZoneFactoryManager(0),
     mActiveCameraZone(0)
-    { }
+    {
+        addShadowTextureListener(this);
+    }
 
     PCZSceneManager::~PCZSceneManager()
     {
@@ -1064,7 +1066,7 @@ namespace Ogre
         }
     }
     //---------------------------------------------------------------------
-    void PCZSceneManager::fireShadowTexturesPreCaster(Light* light, Camera* camera, size_t iteration)
+    void PCZSceneManager::shadowTextureCasterPreViewProj(Light* light, Camera* camera, size_t iteration)
     {
         PCZSceneNode* camNode = (PCZSceneNode*)camera->getParentSceneNode();
 
@@ -1081,8 +1083,6 @@ namespace Ogre
             if (camNode->getHomeZone() != lightZone)
                 addPCZSceneNode(camNode, lightZone);
         }
-
-        SceneManager::fireShadowTexturesPreCaster(light, camera, iteration);
     }
 
     /* Attempt to automatically connect unconnected portals to proper target zones 

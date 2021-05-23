@@ -834,6 +834,8 @@ namespace Ogre {
             const ShadowCasterList& findShadowCastersForLight(const Light* light, const Camera* camera);
             /// Internal method for firing the texture shadows updated event
             void fireShadowTexturesUpdated(size_t numberOfShadowTextures);
+            /// Internal method for firing the pre caster texture shadows event
+            void fireShadowTexturesPreCaster(Light* light, Camera* camera, size_t iteration);
             /// Internal method for firing the pre receiver texture shadows event
             void fireShadowTexturesPreReceiver(Light* light, Frustum* f);
             void sortLightsAffectingFrustum(LightList& lightList);
@@ -894,8 +896,6 @@ namespace Ogre {
         /// Internal method for firing when rendering a single object.
         void fireRenderSingleObject(Renderable* rend, const Pass* pass, const AutoParamDataSource* source,
             const LightList* pLightList, bool suppressRenderStateChanges);
-        /// Internal method for firing the pre caster texture shadows event
-        virtual void fireShadowTexturesPreCaster(Light* light, Camera* camera, size_t iteration);
         /// Internal method for firing pre update scene graph event
         void firePreUpdateSceneGraph(Camera* camera);
         /// Internal method for firing post update scene graph event
