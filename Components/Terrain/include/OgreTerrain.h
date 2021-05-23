@@ -789,13 +789,13 @@ namespace Ogre
 
         /** Get a pointer to the height data for a given point. 
         */
-        float* getHeightData(long x, long y) const;
+        float* getHeightData(uint32 x, uint32 y) const;
 
         /** Get the height data for a given terrain point. 
         @param x, y Discrete coordinates in terrain vertices, values from 0 to size-1,
             left/right bottom/top
         */
-        float getHeightAtPoint(long x, long y) const;
+        float getHeightAtPoint(uint32 x, uint32 y) const;
 
         /** Set the height data for a given terrain point. 
         @note this doesn't take effect until you call update()
@@ -803,7 +803,7 @@ namespace Ogre
         left/right bottom/top
         @param h The new height
         */
-        void setHeightAtPoint(int32 x, int32 y, float h);
+        void setHeightAtPoint(uint32 x, uint32 y, float h);
 
         /** Get the height data for a given terrain position. 
         @param x, y Position in terrain space, values from 0 to 1 left/right bottom/top
@@ -829,26 +829,26 @@ namespace Ogre
 
         /** Get a pointer to the delta data for a given point. 
         */
-        const float* getDeltaData(long x, long y) const;
+        const float* getDeltaData(uint32 x, uint32 y) const;
 
         /** Get a Vector3 of the world-space point on the terrain, aligned as per
             options.
         @note This point is relative to Terrain::getPosition
         */
-        void getPoint(long x, long y, Vector3* outpos) const;
+        void getPoint(uint32 x, uint32 y, Vector3* outpos) const;
 
         /** Get a Vector3 of the world-space point on the terrain, aligned as per
         options. Cascades into neighbours if out of bounds.
         @note This point is relative to Terrain::getPosition - neighbours are
             adjusted to be relative to this tile
         */
-        void getPointFromSelfOrNeighbour(long x, long y, Vector3* outpos) const;
+        void getPointFromSelfOrNeighbour(int32 x, int32 y, Vector3* outpos) const;
 
         /** Get a Vector3 of the world-space point on the terrain, supplying the
             height data manually (can be more optimal). 
         @note This point is relative to Terrain::getPosition
         */
-        void getPoint(long x, long y, float height, Vector3* outpos) const;
+        void getPoint(uint32 x, uint32 y, float height, Vector3* outpos) const;
         /** Get a transform which converts Vector4(xindex, yindex, height, 1) into 
             an object-space position including scalings and alignment.
         */
@@ -1640,12 +1640,12 @@ namespace Ogre
         /** Get a Vector3 of the world-space point on the terrain, aligned Y-up always.
         @note This point is relative to Terrain::getPosition
         */
-        void getPointAlign(long x, long y, Alignment align, Vector3* outpos) const;
+        void getPointAlign(uint32 x, uint32 y, Alignment align, Vector3* outpos) const;
         /** Get a Vector3 of the world-space point on the terrain, supplying the
         height data manually (can be more optimal). 
         @note This point is relative to Terrain::getPosition
         */
-        void getPointAlign(long x, long y, float height, Alignment align, Vector3* outpos) const;
+        void getPointAlign(uint32 x, uint32 y, float height, Alignment align, Vector3* outpos) const;
         void calculateCurrentLod(Viewport* vp);
 
         /// Delete blend maps for all layers >= lowIndex
@@ -1670,9 +1670,9 @@ namespace Ogre
         // get the equivalent of the passed in edge rectangle in neighbour
         void getNeighbourEdgeRect(NeighbourIndex index, const Rect& inRect, Rect* outRect) const;
         // get the equivalent of the passed in edge point in neighbour
-        void getNeighbourPoint(NeighbourIndex index, int x, int y, int *outx, int *outy) const;
+        void getNeighbourPoint(NeighbourIndex index, uint32 x, uint32 y, uint32 *outx, uint32 *outy) const;
         // overflow a point into a neighbour index and point
-        void getNeighbourPointOverflow(long x, long y, NeighbourIndex *outindex, long *outx, long *outy) const;
+        void getNeighbourPointOverflow(int32 x, int32 y, NeighbourIndex *outindex, uint32 *outx, uint32 *outy) const;
 
         /// Removes this terrain instance from neighbouring terrain's list of neighbours.
         void removeFromNeighbours();
