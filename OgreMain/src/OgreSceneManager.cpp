@@ -2628,15 +2628,6 @@ void SceneManager::fireRenderSingleObject(Renderable* rend, const Pass* pass,
     }
 }
 //---------------------------------------------------------------------
-void SceneManager::fireShadowTexturesPreCaster(Light* light, Camera* camera, size_t iteration)
-{
-    auto listenersCopy = mShadowRenderer.mListeners;
-    for (auto l : listenersCopy)
-    {
-        l->shadowTextureCasterPreViewProj(light, camera, iteration);
-    }
-}
-//---------------------------------------------------------------------
 void SceneManager::firePreUpdateSceneGraph(Camera* camera)
 {
     ListenerList listenersCopy = mListeners;

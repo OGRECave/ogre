@@ -51,7 +51,7 @@ namespace Ogre
     /** Specialized SceneManager that uses Portal-Connected-Zones to divide the scene spatially.
     */
 
-    class _OgrePCZPluginExport PCZSceneManager : public SceneManager
+    class _OgrePCZPluginExport PCZSceneManager : public SceneManager, public ShadowTextureListener
     {
         friend class PCZIntersectionSceneQuery;
         friend class PCZRaySceneQuery;
@@ -369,7 +369,7 @@ namespace Ogre
         /// Internal method for creating shadow textures (texture-based shadows)
         virtual void ensureShadowTexturesCreated();
         /// Internal method for firing the pre caster texture shadows event
-        virtual void fireShadowTexturesPreCaster(Light* light, Camera* camera, size_t iteration);
+        void shadowTextureCasterPreViewProj(Light* light, Camera* camera, size_t iteration) override;
     };
 
     /// Factory for PCZSceneManager

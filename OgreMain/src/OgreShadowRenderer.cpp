@@ -862,7 +862,7 @@ void SceneManager::ShadowRenderer::prepareShadowTextures(Camera* cam, Viewport* 
             shadowView->setBackgroundColour(ColourValue::White);
 
             // Fire shadow caster update, callee can alter camera settings
-            mSceneManager->fireShadowTexturesPreCaster(light, texCam, j);
+            fireShadowTexturesPreCaster(light, texCam, j);
 
             // Update target
             shadowRTT->update();
@@ -2066,6 +2066,15 @@ void SceneManager::ShadowRenderer::fireShadowTexturesUpdated(size_t numberOfShad
     for (i = listenersCopy.begin(); i != iend; ++i)
     {
         (*i)->shadowTexturesUpdated(numberOfShadowTextures);
+    }
+}
+//---------------------------------------------------------------------
+void SceneManager::ShadowRenderer::fireShadowTexturesPreCaster(Light* light, Camera* camera, size_t iteration)
+{
+    auto listenersCopy = mListeners;
+    for (auto l : listenersCopy)
+    {
+        l->shadowTextureCasterPreViewProj(light, camera, iteration);
     }
 }
 //---------------------------------------------------------------------
