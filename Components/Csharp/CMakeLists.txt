@@ -55,7 +55,7 @@ if(OGRE_BUILD_COMPONENT_BITES)
 endif()
 
 set(CMAKE_WARN_DEPRECATED OFF)
-swig_add_module(libOgre csharp ${SWIG_INPUT_MODULES})
+swig_add_library(libOgre LANGUAGE csharp SOURCES ${SWIG_INPUT_MODULES})
 SWIG_LINK_LIBRARIES(libOgre OgreBites OgreOverlay OgreRTShaderSystem OgreTerrain OgreMain)
 
 set(CLI_DEST lib/cli/ogre-sharp-${OGRE_VERSION})
