@@ -527,6 +527,13 @@ namespace Ogre {
                     use.physicalIndex = def.physicalIndex;
                     use.currentSize = def.arraySize * def.elementSize;
                     mLogicalToPhysical->map.emplace(def.logicalIndex, use);
+
+                    // warn if there is a default value, that we would overwrite
+                    std::vector<int> val(use.currentSize);
+                    OGRE_CHECK_GL_ERROR(glGetUniformiv(mGLProgramHandle, def.logicalIndex, val.data()));
+                    if (val != std::vector<int>(use.currentSize))
+                        LogManager::getSingleton().logWarning("Default value of uniform '" + name +
+                                                              "' is ignored in " + mName);
                 }
             }
             else if(def.isSampler())
