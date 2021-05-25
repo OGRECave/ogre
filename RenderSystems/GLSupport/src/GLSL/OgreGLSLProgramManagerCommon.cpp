@@ -304,6 +304,14 @@ namespace Ogre {
                                                           + line + "' in file " + filename);
                 }
                 defs.map.emplace(paramName, def);
+
+                // warn if there is a default value, that we would overwrite
+                if (line.find('=') != String::npos)
+                {
+                    LogManager::getSingleton().logWarning("Default value of uniform '" + paramName +
+                                                          "' is ignored in " + filename);
+                    break;
+                }
             }
         }
     }
