@@ -44,7 +44,6 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #include "OgreGL3PlusDepthBuffer.h"
 #include "OgreGL3PlusHardwarePixelBuffer.h"
 #include "OgreGLContext.h"
-#include "OgreGLSLShaderFactory.h"
 #include "OgreGL3PlusFBORenderTexture.h"
 #include "OgreGL3PlusHardwareBufferManager.h"
 #include "OgreGLSLProgramManager.h"
@@ -137,6 +136,7 @@ namespace Ogre {
           mStencilWriteMask(0xFFFFFFFF),
           mStateCacheManager(0),
           mShaderManager(0),
+          mProgramManager(0),
           mGLSLShaderFactory(0),
           mSPIRVShaderFactory(0),
           mHardwareBufferManager(0),
@@ -520,9 +520,9 @@ namespace Ogre {
         mShaderManager = new GpuProgramManager();
         ResourceGroupManager::getSingleton()._registerResourceManager(mShaderManager->getResourceType(),
                                                                       mShaderManager);
-
+        mProgramManager = new GLSLProgramManager(this);
         // Create GLSL shader factory
-        mGLSLShaderFactory = new GLSLShaderFactory(this);
+        mGLSLShaderFactory = new GLSLShaderFactory();
         HighLevelGpuProgramManager::getSingleton().addFactory(mGLSLShaderFactory);
         mSPIRVShaderFactory = new SPIRVShaderFactory();
         HighLevelGpuProgramManager::getSingleton().addFactory(mSPIRVShaderFactory);
@@ -576,6 +576,9 @@ namespace Ogre {
             OGRE_DELETE mShaderManager;
             mShaderManager = 0;
         }
+
+        delete mProgramManager;
+        mProgramManager = NULL;
 
         OGRE_DELETE mHardwareBufferManager;
         mHardwareBufferManager = 0;
@@ -1172,9 +1175,7 @@ namespace Ogre {
             numberOfInstances *= getGlobalNumberOfInstances();
         }
 
-        GLSLProgram* program = GLSLProgramManager::getSingleton().getActiveProgram();
-
-        if (!program)
+        if (!mProgramManager->getActiveProgram())
         {
             LogManager::getSingleton().logError("Failed to create shader program.");
         }
@@ -1479,7 +1480,7 @@ namespace Ogre {
         for(auto shader : mCurrentShader)
         {
             if(!shader) continue;
-            GLSLProgramManager::getSingleton().setActiveShader(shader->getType(), NULL);
+            mProgramManager->setActiveShader(shader->getType(), NULL);
         }
 
         // Disable textures
@@ -1511,7 +1512,7 @@ namespace Ogre {
         for(auto shader : mCurrentShader)
         {
             if(!shader) continue;
-            GLSLProgramManager::getSingleton().setActiveShader(shader->getType(), shader);
+            mProgramManager->setActiveShader(shader->getType(), shader);
         }
 
         // Must reset depth/colour write mask to according with user desired, otherwise,
@@ -1776,7 +1777,7 @@ namespace Ogre {
 
         mCurrentShader[glprg->getType()] = glprg;
         // Bind the program
-        GLSLProgramManager::getSingleton().setActiveShader(glprg->getType(), glprg);
+        mProgramManager->setActiveShader(glprg->getType(), glprg);
 
         RenderSystem::bindGpuProgram(prg);
 
@@ -1799,7 +1800,7 @@ namespace Ogre {
 
     void GL3PlusRenderSystem::unbindGpuProgram(GpuProgramType gptype)
     {
-        GLSLProgramManager::getSingleton().setActiveShader(gptype, NULL);
+        mProgramManager->setActiveShader(gptype, NULL);
 
         if (gptype == GPT_VERTEX_PROGRAM && mCurrentShader[gptype])
         {
@@ -1862,7 +1863,7 @@ namespace Ogre {
         // Link can throw exceptions, ignore them at this point.
         try
         {
-            program = GLSLProgramManager::getSingleton().getActiveProgram();
+            program = mProgramManager->getActiveProgram();
         }
         catch (InvalidParametersException& e)
         {

@@ -47,6 +47,7 @@ namespace Ogre {
     class GLES2FBOManager;
     class GpuProgramManager;
     class GLSLESProgramCommon;
+    class GLSLESProgramManager;
     class GLSLESProgramFactory;
     class GLES2StateCacheManager;
 #if !OGRE_NO_GLES2_CG_SUPPORT
@@ -73,7 +74,8 @@ namespace Ogre {
             /// State cache manager which responsible to reduce redundant state changes
             GLES2StateCacheManager* mStateCacheManager;
 
-            GpuProgramManager *mGpuProgramManager;
+            GpuProgramManager *mShaderManager;
+            GLSLESProgramManager* mProgramManager;
             GLSLESProgramFactory* mGLSLESProgramFactory;
 #if !OGRE_NO_GLES2_CG_SUPPORT
             GLSLESCgProgramFactory* mGLSLESCgProgramFactory;

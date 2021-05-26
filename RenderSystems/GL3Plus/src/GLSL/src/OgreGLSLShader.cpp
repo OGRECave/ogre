@@ -678,11 +678,23 @@ namespace Ogre {
         }
     }
 
+    static const String language = "glsl";
 
     const String& GLSLShader::getLanguage(void) const
     {
-        static const String language = "glsl";
-
         return language;
+    }
+
+    const String& GLSLShaderFactory::getLanguage(void) const
+    {
+        return language;
+    }
+
+    GpuProgram* GLSLShaderFactory::create(
+        ResourceManager* creator,
+        const String& name, ResourceHandle handle,
+        const String& group, bool isManual, ManualResourceLoader* loader)
+    {
+        return OGRE_NEW GLSLShader(creator, name, handle, group, isManual, loader);
     }
 }

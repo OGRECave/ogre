@@ -47,8 +47,8 @@ namespace Ogre {
     *  @{
     */
     class GLSLShaderManager;
-    class GLSLShaderFactory;
     class GLSLProgram;
+    class GLSLProgramManager;
     class HardwareBufferManager;
 
     /**
@@ -79,7 +79,8 @@ namespace Ogre {
         GL3PlusStateCacheManager* mStateCacheManager;
 
         GpuProgramManager *mShaderManager;
-        GLSLShaderFactory* mGLSLShaderFactory;
+        GLSLProgramManager* mProgramManager;
+        HighLevelGpuProgramFactory* mGLSLShaderFactory;
         HighLevelGpuProgramFactory* mSPIRVShaderFactory;
         HardwareBufferManager* mHardwareBufferManager;
 

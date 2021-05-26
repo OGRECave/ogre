@@ -29,13 +29,14 @@
 #define __GLSLShader_H__
 
 #include "OgreGL3PlusPrerequisites.h"
+#include "OgreHighLevelGpuProgramManager.h"
 #include "OgreGLSLShaderCommon.h"
 #include "OgreRenderOperation.h"
 
 namespace Ogre {
 
     class GLUniformCache;
-    class _OgreGL3PlusExport GLSLShader : public GLSLShaderCommon
+    class GLSLShader : public GLSLShaderCommon
     {
     public:
         GLSLShader(ResourceManager* creator,
@@ -67,6 +68,18 @@ namespace Ogre {
         void extractBufferBlocks(GLenum type) const;
 
         mutable HardwareBufferPtr mDefaultBuffer;
+    };
+
+    /** Factory class for GLSL shaders.
+     */
+    class GLSLShaderFactory : public HighLevelGpuProgramFactory
+    {
+    public:
+        /// Get the name of the language this factory creates shaders for.
+        const String& getLanguage(void) const;
+        /// Create an instance of GLSLProgram.
+        GpuProgram* create(ResourceManager* creator, const String& name, ResourceHandle handle,
+                           const String& group, bool isManual, ManualResourceLoader* loader);
     };
 }
 
