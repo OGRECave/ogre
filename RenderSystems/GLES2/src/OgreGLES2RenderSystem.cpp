@@ -37,7 +37,6 @@ THE SOFTWARE.
 #include "OgreGLES2FBORenderTexture.h"
 #include "OgreGLES2HardwareOcclusionQuery.h"
 #include "OgreGLVertexArrayObject.h"
-#include "OgreGLSLESProgramFactory.h"
 #include "OgreRoot.h"
 #include "OgreViewport.h"
 #include "OgreFrustum.h"
@@ -156,7 +155,8 @@ namespace Ogre {
 
     GLES2RenderSystem::GLES2RenderSystem()
         : mStateCacheManager(0),
-          mGpuProgramManager(0),
+          mShaderManager(0),
+          mProgramManager(0),
           mGLSLESProgramFactory(0),
 #if !OGRE_NO_GLES2_CG_SUPPORT
           mGLSLESCgProgramFactory(0),
@@ -532,9 +532,11 @@ namespace Ogre {
         if(caps->getNumVertexAttributes() < 16)
             GLSLProgramCommon::useTightAttributeLayout();
 
-        mGpuProgramManager = new GpuProgramManager();
-        ResourceGroupManager::getSingleton()._registerResourceManager(mGpuProgramManager->getResourceType(),
-                                                                      mGpuProgramManager);
+        mShaderManager = new GpuProgramManager();
+        ResourceGroupManager::getSingleton()._registerResourceManager(mShaderManager->getResourceType(),
+                                                                      mShaderManager);
+
+        mProgramManager = new GLSLESProgramManager();
 
         mGLSLESProgramFactory = OGRE_NEW GLSLESProgramFactory();
         HighLevelGpuProgramManager::getSingleton().addFactory(mGLSLESProgramFactory);
@@ -587,12 +589,15 @@ namespace Ogre {
         mBackgroundContextList.clear();
 
         // Deleting the GPU program manager and hardware buffer manager.  Has to be done before the mGLSupport->stop().
-        if(mGpuProgramManager)
+        if(mShaderManager)
         {
-            ResourceGroupManager::getSingleton()._unregisterResourceManager(mGpuProgramManager->getResourceType());
-            OGRE_DELETE mGpuProgramManager;
-            mGpuProgramManager = 0;
+            ResourceGroupManager::getSingleton()._unregisterResourceManager(mShaderManager->getResourceType());
+            OGRE_DELETE mShaderManager;
+            mShaderManager = 0;
         }
+
+        delete mProgramManager;
+        mProgramManager = NULL;
 
         OGRE_DELETE mHardwareBufferManager;
         mHardwareBufferManager = 0;
@@ -1493,9 +1498,9 @@ namespace Ogre {
         // scene manager treat render system as ONE 'context' ONLY, and it
         // cached the GPU programs using state.
         if (mCurrentVertexProgram)
-            GLSLESProgramManager::getSingleton().setActiveShader(GPT_VERTEX_PROGRAM, NULL);
+            mProgramManager->setActiveShader(GPT_VERTEX_PROGRAM, NULL);
         if (mCurrentFragmentProgram)
-            GLSLESProgramManager::getSingleton().setActiveShader(GPT_FRAGMENT_PROGRAM, NULL);
+            mProgramManager->setActiveShader(GPT_FRAGMENT_PROGRAM, NULL);
         
         // Disable textures
         _disableTextureUnitsFrom(0);
@@ -1525,9 +1530,9 @@ namespace Ogre {
 
         // Rebind GPU programs to new context
         if (mCurrentVertexProgram)
-            GLSLESProgramManager::getSingleton().setActiveShader(GPT_VERTEX_PROGRAM, mCurrentVertexProgram);
+            mProgramManager->setActiveShader(GPT_VERTEX_PROGRAM, mCurrentVertexProgram);
         if (mCurrentFragmentProgram)
-            GLSLESProgramManager::getSingleton().setActiveShader(GPT_FRAGMENT_PROGRAM, mCurrentFragmentProgram);
+            mProgramManager->setActiveShader(GPT_FRAGMENT_PROGRAM, mCurrentFragmentProgram);
         
         // Must reset depth/colour write mask to according with user desired, otherwise,
         // clearFrameBuffer would be wrong because the value we are recorded may be
@@ -1760,14 +1765,14 @@ namespace Ogre {
         }
         
         // Bind the program
-        GLSLESProgramManager::getSingleton().setActiveShader(glprg->getType(), glprg);
+        mProgramManager->setActiveShader(glprg->getType(), glprg);
 
         RenderSystem::bindGpuProgram(prg);
     }
 
     void GLES2RenderSystem::unbindGpuProgram(GpuProgramType gptype)
     {
-        GLSLESProgramManager::getSingleton().setActiveShader(gptype, NULL);
+        mProgramManager->setActiveShader(gptype, NULL);
 
         if (gptype == GPT_VERTEX_PROGRAM && mCurrentVertexProgram)
         {
@@ -1801,7 +1806,7 @@ namespace Ogre {
         // Link can throw exceptions, ignore them at this point
         try
         {
-            program = GLSLESProgramManager::getSingleton().getActiveProgram();
+            program = mProgramManager->getActiveProgram();
             // Pass on parameters from params to program object uniforms
             program->updateUniforms(params, mask, gptype);
         }

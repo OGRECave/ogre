@@ -300,11 +300,10 @@ namespace Ogre {
         OGRE_CHECK_GL_ERROR(glDetachShader(programObject, mGLShaderHandle));
     }
 
+    static const String language = "glsles";
     //-----------------------------------------------------------------------
     const String& GLSLESProgram::getLanguage(void) const
     {
-        static const String language = "glsles";
-
         return language;
     }
     //-----------------------------------------------------------------------
@@ -313,5 +312,18 @@ namespace Ogre {
         GpuProgramParametersSharedPtr params = HighLevelGpuProgram::createParameters();
         params->setTransposeMatrices(true);
         return params;
+    }
+
+    //-----------------------------------------------------------------------
+    const String& GLSLESProgramFactory::getLanguage(void) const
+    {
+        return language;
+    }
+    //-----------------------------------------------------------------------
+    GpuProgram* GLSLESProgramFactory::create(ResourceManager* creator,
+        const String& name, ResourceHandle handle,
+        const String& group, bool isManual, ManualResourceLoader* loader)
+    {
+        return OGRE_NEW GLSLESProgram(creator, name, handle, group, isManual, loader);
     }
 }
