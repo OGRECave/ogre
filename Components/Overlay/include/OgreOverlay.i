@@ -67,6 +67,7 @@ SHARED_PTR(OverlayElement);
   }
 }
 %include "OgreOverlayElement.h"
+%feature("director") Ogre::OverlayElementFactory;
 %include "OgreOverlayElementFactory.h"
 SHARED_PTR(OverlayContainer);
 %ignore Ogre::OverlayContainer::getChildIterator;
