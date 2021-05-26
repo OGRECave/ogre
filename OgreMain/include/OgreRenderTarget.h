@@ -62,17 +62,6 @@ namespace Ogre {
     class _OgreExport RenderTarget : public RenderSysAlloc
     {
     public:
-        enum StatFlags
-        {
-            SF_NONE           = 0,
-            SF_FPS            = 1,
-            SF_AVG_FPS        = 2,
-            SF_BEST_FPS       = 4,
-            SF_WORST_FPS      = 8,
-            SF_TRIANGLE_COUNT = 16,
-            SF_ALL            = 0xFFFF
-        };
-
         struct FrameStats
         {
             /// frames per second (FPS) based on the frames rendered in the last second
