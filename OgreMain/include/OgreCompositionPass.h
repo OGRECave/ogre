@@ -278,12 +278,12 @@ namespace Ogre {
         /** Set quad normalised positions [-1;1]x[-1;1]
             @note applies when PassType is RENDERQUAD
          */
-        void setQuadCorners(const FloatRect& quad) { mQuad = quad; mQuadCornerModified = true; }
+        void setQuadCorners(const FloatRect& quad) { mQuad.rect = quad; mQuad.cornerModified = true; }
 
         /** Get quad normalised positions [-1;1]x[-1;1]
             @note applies when PassType is RENDERQUAD 
          */
-        bool getQuadCorners(FloatRect& quad) const { quad = mQuad; return mQuadCornerModified; }
+        bool getQuadCorners(FloatRect& quad) const { quad = mQuad.rect; return mQuad.cornerModified; }
             
         /** Sets the use of camera frustum far corners provided in the quad's normals
             @note applies when PassType is RENDERQUAD 
@@ -315,54 +315,96 @@ namespace Ogre {
         void setThreadGroups(const Vector3i& g) { mThreadGroups = g; }
         const Vector3i& getThreadGroups() const { return mThreadGroups; }
 
-        void setCameraName(const String& name) { mCameraName = name; }
-        const String& getCameraName() const { return mCameraName; }
+        void setCameraName(const String& name) { mRenderScene.cameraName = name; }
+        const String& getCameraName() const { return mRenderScene.cameraName; }
 
-        void setAlignCameraToFace(bool val) { mAlignCameraToFace = val; }
-        bool getAlignCameraToFace() const { return mAlignCameraToFace; }
+        void setAlignCameraToFace(bool val) { mRenderScene.alignCameraToFace = val; }
+        bool getAlignCameraToFace() const { return mRenderScene.alignCameraToFace; }
     private:
         /// Parent technique
         CompositionTargetPass *mParent;
         /// Type of composition pass
         PassType mType;
-        /// Identifier for this pass
-        uint32 mIdentifier;
-        /// Material used for rendering
-        MaterialPtr mMaterial;
-        /// [first,last] render queue to render this pass (in case of PT_RENDERSCENE)
-        uint8 mFirstRenderQueue;
-        uint8 mLastRenderQueue;
-        /// Material scheme name
-        String mMaterialScheme;
-        /// Clear buffers (in case of PT_CLEAR)
-        uint32 mClearBuffers;
-        /// Clear colour (in case of PT_CLEAR)
-        ColourValue mClearColour;
-        /// Clear colour with the colour of the original viewport. Overrides mClearColour (in case of PT_CLEAR)
-        bool mAutomaticColour;
-        /// Clear depth (in case of PT_CLEAR)
-        float mClearDepth;
-        /// Clear stencil value (in case of PT_CLEAR)
-        uint16 mClearStencil;
-        /** Inputs (for material used for rendering the quad).
-            An empty string signifies that no input is used */
-        InputTex mInputs[OGRE_MAX_TEXTURE_LAYERS];
+
+        // in case of PT_RENDERQUAD, PT_COMPUTE, PT_CUSTOM
+        struct MaterialData
+        {
+            /// Identifier for this pass
+            uint32 identifier;
+            /// Material used for rendering
+            MaterialPtr material;
+            /** Inputs (for material used for rendering the quad).
+                An empty string signifies that no input is used */
+            InputTex inputs[OGRE_MAX_TEXTURE_LAYERS];
+
+            MaterialData() : identifier(0) {}
+        } mMaterial;
+
+        // in case of PT_RENDERSCENE
+        struct RenderSceneData
+        {
+            /// [first,last] render queue to render this pass (in case of PT_RENDERSCENE)
+            uint8 firstRenderQueue;
+            uint8 lastRenderQueue;
+
+            /// Material scheme name
+            String materialScheme;
+
+            /// name of camera to use instead of default
+            String cameraName;
+            bool alignCameraToFace;
+
+            RenderSceneData()
+                : firstRenderQueue(RENDER_QUEUE_BACKGROUND), lastRenderQueue(RENDER_QUEUE_SKIES_LATE),
+                  alignCameraToFace(false)
+            {
+            }
+        } mRenderScene;
+
+        // in case of PT_CLEAR
+        struct ClearData
+        {
+            /// Clear buffers
+            uint32 buffers;
+            /// Clear colour
+            ColourValue colour;
+            /// Clear colour with the colour of the original viewport. Overrides mClearColour
+            bool automaticColour;
+            /// Clear depth
+            float depth;
+            /// Clear stencil value
+            uint16 stencil;
+
+            ClearData()
+                : buffers(FBT_COLOUR | FBT_DEPTH), colour(ColourValue::ZERO), automaticColour(false),
+                  depth(1.0f), stencil(0)
+            {
+            }
+        } mClear;
+
+        /// in case of PT_COMPUTE
         Vector3i mThreadGroups;
-        /// Stencil operation parameters
+
+        /// in case of PT_STENCIL
         StencilState mStencilState;
 
-        /// True if quad should not cover whole screen
-        bool mQuadCornerModified;
-        /// quad positions in normalised coordinates [-1;1]x[-1;1] (in case of PT_RENDERQUAD)
-        FloatRect mQuad;
+        // in case of PT_RENDERQUAD
+        struct QuadData
+        {
+            /// True if quad should not cover whole screen
+            bool cornerModified;
+            /// quad positions in normalised coordinates [-1;1]x[-1;1]
+            FloatRect rect;
+            bool farCorners, farCornersViewSpace;
 
-        bool mQuadFarCorners, mQuadFarCornersViewSpace;
-        /// The type name of the custom composition pass.
+            QuadData()
+                : cornerModified(false), rect(-1, 1, 1, -1), farCorners(false), farCornersViewSpace(false)
+            {
+            }
+        } mQuad;
+
+        /// in case of PT_RENDERCUSTOM
         String mCustomType;
-
-        /// name of camera to use instead of default
-        String mCameraName;
-        bool mAlignCameraToFace;
     };
     /** @} */
     /** @} */
