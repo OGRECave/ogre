@@ -103,12 +103,6 @@ class _OgreRTSSExport Function : public RTShaderSystemAlloc
     friend ProgramManager;
 // Interface.
 public:
-    /** Get the name of this function */
-    const String& getName() const { return mName; }
-
-    /** Get the description of this function */
-    const String& getDescription() const { return mDescription; }
-
     /// @deprecated
     ParameterPtr resolveInputParameter(Parameter::Semantic semantic, int index,  const Parameter::Content content, GpuConstantType type);
 
@@ -164,37 +158,23 @@ public:
         return _getParameterByContent(mOutputParameters, content, type);
     }
 
-    /// @deprecated local parameters do not have index or semantic. use resolveLocalParameter(const String&, GpuConstantType)
-    ParameterPtr resolveLocalParameter(Parameter::Semantic semantic, int index, const String& name, GpuConstantType type);
+    /** Resolve local parameter of this function
 
-    /** Resolve local parameter of this function    
+    local parameters do not have index or semantic.
     @param name The name of the parameter.
     @param type The type of the desired parameter.  
-    Return parameter instance in case of that resolve operation succeeded.
+    @return parameter instance in case of that resolve operation succeeded.
     */
-    ParameterPtr resolveLocalParameter(GpuConstantType type, const String& name)
-    {
-        return resolveLocalParameter(Parameter::SPS_UNKNOWN, 0, name, type);
-    }
-
-    /// @deprecated
-    OGRE_DEPRECATED ParameterPtr resolveLocalParameter(const String& name, GpuConstantType type)
-    {
-        return resolveLocalParameter(Parameter::SPS_UNKNOWN, 0, name, type);
-    }
-
-    /// @deprecated local parameters do not have index or semantic. use resolveLocalParameter(const String&, GpuConstantType)
-    ParameterPtr resolveLocalParameter(Parameter::Semantic semantic, int index, const Parameter::Content content, GpuConstantType type);
+    ParameterPtr resolveLocalParameter(GpuConstantType type, const String& name);
 
     /** Resolve local parameter of this function
+
+    local parameters do not have index or semantic.
     @param content The content of the parameter.
     @param type The type of the desired parameter.
-    Return parameter instance in case of that resolve operation succeeded.
+    @return parameter instance in case of that resolve operation succeeded.
     */
-    ParameterPtr resolveLocalParameter(Parameter::Content content, GpuConstantType type = GCT_UNKNOWN)
-    {
-        return resolveLocalParameter(Parameter::SPS_UNKNOWN, 0,content, type);
-    }
+    ParameterPtr resolveLocalParameter(Parameter::Content content, GpuConstantType type = GCT_UNKNOWN);
 
     /**
      * get local parameter by content
@@ -263,14 +243,6 @@ private:
     static ParameterPtr _getParameterBySemantic(const ShaderParameterList& parameterList, const Parameter::Semantic semantic, int index);
     static ParameterPtr _getParameterByContent(const ShaderParameterList& parameterList, const Parameter::Content content, GpuConstantType type);
 
-
-    /** Class constructor.
-    @param name The name of this function.
-    @param desc The description of this function.
-    @remarks This class is allocated via an instance of Program class. 
-    */
-    Function(const String& name, const String& desc);
-
     /** Class destructor */
     ~Function();
 
@@ -280,10 +252,6 @@ private:
     /** Delete parameter from a given list */
     void deleteParameter(ShaderParameterList& parameterList, ParameterPtr parameter);
 
-    // Function name.
-    String mName;
-    // Function description.
-    String mDescription;
     // Input parameters.
     ShaderParameterList mInputParameters;
     // Output parameters.

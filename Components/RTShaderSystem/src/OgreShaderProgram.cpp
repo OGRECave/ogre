@@ -35,7 +35,7 @@ Program::Program(GpuProgramType type)
 {
     mType               = type;
     // all programs must have an entry point
-    mEntryPointFunction = new Function("main", "");
+    mEntryPointFunction = new Function();
     mSkeletalAnimation  = false;
     mColumnMajorMatrices = true;
 }

@@ -232,10 +232,7 @@ void CGProgramWriter::writeFunctionDeclaration(std::ostream& os, Function* funct
     const ShaderParameterList& outParams = function->getOutputParameters();
 
 
-    os << "void";
-    os << " ";
-
-    os << function->getName();
+    os << "void main";
     os << std::endl << "\t(" << std::endl;
 
     ShaderParameterConstIterator it;
