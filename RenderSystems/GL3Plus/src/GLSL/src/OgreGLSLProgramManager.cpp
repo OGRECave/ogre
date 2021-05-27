@@ -151,45 +151,15 @@ namespace Ogre {
         return false;
     }
 
-    
-    //FIXME This is code bloat...either template or unify UniformReference
-    // and AtomicCounterReference
-    bool GLSLProgramManager::findAtomicCounterDataSource(
-        const String& paramName,
-        const GpuConstantDefinitionMap* (&constantDefs)[6],
-        GLAtomicCounterReference& refToUpdate)
-    {
-        for(int i = 0; i < 6; i++) {
-            if (constantDefs[i])
-            {
-                GpuConstantDefinitionMap::const_iterator parami =
-                        constantDefs[i]->find(paramName);
-                if (parami != constantDefs[i]->end())
-                {
-                    refToUpdate.mSourceProgType = static_cast<GpuProgramType>(i);
-                    refToUpdate.mConstantDef = &(parami->second);
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-
-    
-    void GLSLProgramManager::extractUniformsFromProgram(
-        GLuint programObject,
-        const GpuConstantDefinitionMap* (&constantDefs)[6],
-        GLUniformReferenceList& uniformList,
-        GLAtomicCounterReferenceList& counterList,
-        GLCounterBufferList& counterBufferList)
+    void GLSLProgramManager::extractUniformsFromProgram(GLuint programObject,
+                                                        const GpuConstantDefinitionMap* (&constantDefs)[6],
+                                                        GLUniformReferenceList& uniformList)
     {
 #define uniformLength 200
         //              GLint uniformLength = 0;
         //        glGetProgramiv(programObject, GL_ACTIVE_UNIFORM_MAX_LENGTH, &uniformLength);
 
         char uniformName[uniformLength] = {0};
-        GLAtomicCounterReference newGLAtomicCounterReference;
         GLUniformReference newGLUniformReference;
 
 
@@ -248,55 +218,7 @@ namespace Ogre {
                 // anyway, individual indexes are only needed for lookup from
                 // user params
             }
-            else if (glType == GL_UNSIGNED_INT_ATOMIC_COUNTER)
-            {
-                // Handle atomic counters. Currently atomic counters
-                // cannot be in uniform blocks and are always unsigned
-                // integers.
-                GLint binding, offset;
-                OGRE_CHECK_GL_ERROR(glGetActiveUniformsiv(programObject, 1, &index, GL_UNIFORM_ATOMIC_COUNTER_BUFFER_INDEX, &binding));
-                OGRE_CHECK_GL_ERROR(glGetActiveUniformsiv(programObject, 1, &index, GL_UNIFORM_OFFSET, &offset));
-
-                newGLAtomicCounterReference.mBinding = binding;
-                newGLAtomicCounterReference.mOffset = offset;
-
-                // increment the total number of atomic counters
-                // including size of array if applicable
-                //atomicCounterCount += arraySize;
-                // actually, this should not be necessary since
-                // parameters are processed one by one
-
-                printf("ATOMIC COUNTER FOUND: %s %d", paramName.c_str(), arraySize);
-
-                // Find out which params object this comes from
-                bool foundSource = findAtomicCounterDataSource(
-                    paramName, constantDefs,newGLAtomicCounterReference);
-
-                // Only add this parameter if we found the source
-                if (foundSource)
-                {
-                    // size_t adjustedArraySize = 0;
-                    // if (arraySize == 2 && newGLAtomicCounterReference.mConstantDef->arraySize == 1) {
-                    //     adjustedArraySize = 1;
-                    // }
-                    // else {
-                    //     adjustedArraySize = (size_t) arraySize;
-                    // }
-
-                    //FIXME On Linux AMD Catalyst 13.4, OpenGL reports
-                    // a single atomic counter as having size 2.  Bug
-                    // or feature?
-                    // assert((size_t)arraySize == newGLAtomicCounterReference.mConstantDef->arraySize
-                    //        && "GL doesn't agree with our array size!");
-
-                    counterList.push_back(newGLAtomicCounterReference);
-                    printf("ATOMIC COUNTER SOURCE FOUND\n");
-                }
-            }
         } // end for
-
-
-        // FIXME uniform buffers need to be created during material script parsing of shared params
 
         // FIXME Ogre materials need a new shared param that is associated with an entity.
         // This could be impemented as a switch-like statement inside shared_params:
@@ -369,33 +291,6 @@ namespace Ogre {
                 OGRE_CHECK_GL_ERROR(glShaderStorageBlockBinding(
                     programObject, index,
                     static_cast<GL3PlusHardwareBuffer*>(hwGlBuffer.get())->getGLBufferBinding()));
-            }
-        }
-
-        if (mRenderSystem->hasMinGLVersion(4, 2) || mRenderSystem->checkExtension("GL_ARB_shader_atomic_counters"))
-        {
-            // Now deal with atomic counters buffers
-            OGRE_CHECK_GL_ERROR(glGetProgramiv(programObject, GL_ACTIVE_ATOMIC_COUNTER_BUFFERS, &blockCount));
-
-            for (int index = 0; index < blockCount; index++)
-            {
-                //TODO Is this necessary?
-                //GpuSharedParametersPtr blockSharedParams = GpuProgramManager::getSingleton().getSharedParameters(uniformName);
-
-                //TODO We could build list of atomic counters here or above,
-                // whichever is most efficient.
-                // GLint * active_indices;
-                // OGRE_CHECK_GL_ERROR(glGetActiveAtomicCounterBufferiv(programObject, index, GL_ATOMIC_COUNTER_BUFFER_ACTIVE_ATOMIC_COUNTER_INDICES, active_indices));
-
-                GLint bufferSize, bufferBinding;
-                OGRE_CHECK_GL_ERROR(glGetActiveAtomicCounterBufferiv(programObject, index, GL_ATOMIC_COUNTER_BUFFER_DATA_SIZE, &bufferSize));
-                OGRE_CHECK_GL_ERROR(glGetActiveAtomicCounterBufferiv(programObject, index, GL_ATOMIC_COUNTER_BUFFER_BINDING, &bufferBinding));
-                //TODO check parameters of this GL call
-                auto newCounterBuffer = hbm.createCounterBuffer(bufferSize);
-
-                auto hwGlBuffer = static_cast<GL3PlusHardwareBuffer*>(newCounterBuffer.get());
-                hwGlBuffer->setGLBufferBinding(bufferBinding);
-                counterBufferList.push_back(newCounterBuffer);
             }
         }
     }

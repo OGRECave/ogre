@@ -84,13 +84,6 @@ namespace Ogre
         */
         void updateUniforms(GpuProgramParametersSharedPtr params,
                             uint16 mask, GpuProgramType fromProgType);
-        /** Updates program object atomic counter buffers using data
-            from GpuProgramParameters.  Normally called by
-            GLSLShader::bindProgramAtomicCounterParameters() just
-            before rendering occurs.
-        */
-        void updateAtomicCounters(GpuProgramParametersSharedPtr params,
-                                  uint16 mask, GpuProgramType fromProgType);
 
         /** Makes a program pipeline object active by making sure it
             is linked and then putting it in use.

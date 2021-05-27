@@ -305,36 +305,4 @@ namespace Ogre
             } // End switch
         }     // End for
     }
-
-    void GLSLSeparableProgram::updateAtomicCounters(GpuProgramParametersSharedPtr params,
-                                                    uint16 mask, GpuProgramType fromProgType)
-    {
-        // Iterate through the list of atomic counter buffers and update them as needed
-        // GLAtomicBufferIterator currentBuffer = mGLAtomicBufferReferences.begin();
-        // GLAtomicBufferIterator endBuffer = mGLAtomicBufferReferences.end();
-
-        GLAtomicCounterReferenceIterator currentAtomicCounter = mGLAtomicCounterReferences.begin();
-        GLAtomicCounterReferenceIterator endAtomicCounter = mGLAtomicCounterReferences.end();
-
-        for (; currentAtomicCounter != endAtomicCounter; ++currentAtomicCounter)
-        {
-            if (fromProgType == currentAtomicCounter->mSourceProgType)
-            {
-                const GpuConstantDefinition* def = currentAtomicCounter->mConstantDef;
-                if (def->variability & mask)
-                {
-                    GLsizei glArraySize = (GLsizei)def->arraySize;
-                    GLuint glBinding = currentAtomicCounter->mBinding;
-                    GLuint glOffset = currentAtomicCounter->mOffset;
-
-                    // Get the buffer this atomic counter belongs to.
-                    //TODO exception handling
-                    HardwareCounterBufferSharedPtr atomic_buffer = mGLCounterBufferReferences[glBinding];
-
-                    // Update the value.
-                    atomic_buffer->writeData(glOffset, sizeof(GLuint) * glArraySize, params->getUnsignedIntPointer(def->physicalIndex));
-                }
-            }
-        }
-    }
 }

@@ -1237,22 +1237,6 @@ namespace Ogre {
             break;
         }
 
-
-        // Bind atomic counter buffers.
-        // if (Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_ATOMIC_COUNTERS))
-        // {
-        //     GLuint atomicsBuffer = 0;
-
-        //     glGenBuffers(1, &atomicsBuffer);
-        //     glBindBuffer(GL_ATOMIC_COUNTER_BUFFER,
-        //                  static_cast<GL3PlusHardwareCounterBuffer*>(HardwareBufferManager::getSingleton().getCounterBuffer().getGLBufferId()));
-        //                  //static_cast<GL3PlusHardwareCounterBuffer*>(op..getCounterBuffer().getGLBufferId()));
-        //     // glBufferData(GL_ATOMIC_COUNTER_BUFFER, sizeof(GLuint) * 3, NULL, GL_DYNAMIC_DRAW);
-        //     // glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, 0);
-        // }
-        //TODO: Reset atomic counters somewhere
-
-
         // Render to screen!
         if (mCurrentShader[GPT_DOMAIN_PROGRAM])
         {
@@ -1868,7 +1852,6 @@ namespace Ogre {
 
         // Pass on parameters from params to program object uniforms.
         program->updateUniforms(params, mask, gptype);
-        program->updateAtomicCounters(params, mask, gptype);
 
         // FIXME This needs to be moved somewhere texture specific.
         // Update image bindings for image load/store

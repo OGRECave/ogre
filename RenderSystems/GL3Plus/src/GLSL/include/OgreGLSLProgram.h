@@ -36,27 +36,6 @@
 #include "OgreGLSLShader.h"
 
 namespace Ogre {
-    /** Structure used to keep track of named atomic counter uniforms
-        in the linked program object.  Same as GLUniformReference, but
-        contains an additional offset parameter which currently only
-        atomic counters feature.
-    */
-    struct GLAtomicCounterReference
-    {
-        /// GL binding handle (similar to location)
-        GLint mBinding;
-        /// GL offset (only used for atomic counters)
-        GLint mOffset;
-        /// Which type of program params will this value come from?
-        GpuProgramType mSourceProgType;
-        /// The constant definition it relates to
-        const GpuConstantDefinition* mConstantDef;
-    };
-
-    typedef std::vector<GLAtomicCounterReference> GLAtomicCounterReferenceList;
-    typedef GLAtomicCounterReferenceList::iterator GLAtomicCounterReferenceIterator;
-    typedef std::vector<HardwareCounterBufferSharedPtr> GLCounterBufferList;
-    typedef GLCounterBufferList::iterator GLCounterBufferIterator;
 
     /** C++ encapsulation of GLSL program object.
      */
@@ -71,18 +50,10 @@ namespace Ogre {
         /// add the microcode to the cache
         static void writeMicrocodeToCache(uint32 id, GLuint programHandle);
 
-        virtual void updateAtomicCounters(GpuProgramParametersSharedPtr params, uint16 mask,
-                                          GpuProgramType fromProgType) = 0;
-
         void setTransformFeedbackVaryings(const std::vector<String>& nameStrings);
     protected:
         /// Constructor should only be used by GLSLMonolithicProgramManager and GLSLSeparableProgramManager
         GLSLProgram(const GLShaderList& shaders);
-
-        /// Container of atomic counter uniform references that are active in the program object
-        GLAtomicCounterReferenceList mGLAtomicCounterReferences;
-        /// Container of counter buffer references that are active in the program object
-        GLCounterBufferList mGLCounterBufferReferences;
     };
 
 
