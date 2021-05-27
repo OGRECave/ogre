@@ -122,15 +122,12 @@ namespace Ogre
         ///  The bitmask applied to both the stencil value and the reference value before comparison
         uint32 compareMask;
         /** The bitmask the controls which bits from stencilRefValue will be written to stencil buffer
-        (valid for operations such as SOP_REPLACE) */
+        (valid for operations such as #SOP_REPLACE) */
         uint32 writeMask;
 
         /// Turns stencil buffer checking on or off
         bool enabled : 1;
-        /** If set to true, then if you render both back and front faces
-        (you'll have to turn off culling) then these parameters will apply for front faces,
-        and the inverse of them will happen for back faces (keep remains the same)
-         */
+        /// Toggles two-sided stencil operation, which swaps increment and decrement for back-facing polygons.
         bool twoSidedOperation : 1;
 
         StencilState()

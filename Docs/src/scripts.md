@@ -759,7 +759,7 @@ Here are the attributes you can use in a ’stencil’ section of a .compositor 
 
     ### check
 
-    Enables or disables the stencil check, thus enabling the use of the rest of the features in this section. The rest of the options in this section do nothing if the stencil check is off. 
+    Enables or disables the stencil check. The rest of the options in this section do nothing if the stencil check is off.
     @par
     Format: check (on | off)
 
@@ -767,18 +767,21 @@ Here are the attributes you can use in a ’stencil’ section of a .compositor 
 
     ### comp\_func
 
-    Sets the function used to perform the stencil comparison.
+    @copybrief Ogre::StencilState::compareOp
 
     @par
-    Format: comp\_func (always\_fail | always\_pass | less | less\_equal | not\_equal | greater\_equal | greater)
+    Format: comp\_func &lt;func&gt;
     @par
     Default: comp\_func always\_pass
+
+    @param func one of Ogre::CompareFunction without the `CMPF_` prefix. E.g. `CMPF_LESS_EQUAL` becomes `less_equal`.
 
     <a name="compositor_005fstencil_005fref_005fvalue"></a><a name="ref_005fvalue"></a>
 
     ### ref\_value
 
-    Sets the reference value used to compare with the stencil buffer as described in [comp\_func](#compositor_005fstencil_005fcomp_005ffunc). 
+    @copybrief Ogre::StencilState::referenceValue
+
     @par
     Format: ref\_value &lt;value&gt; 
     @par
@@ -788,7 +791,8 @@ Here are the attributes you can use in a ’stencil’ section of a .compositor 
 
     ### mask
 
-    Sets the mask used to compare with the stencil buffer as described in [comp\_func](#compositor_005fstencil_005fcomp_005ffunc). 
+    @copybrief Ogre::StencilState::compareMask
+
     @par
     Format: mask &lt;value&gt; 
     @par
@@ -798,71 +802,47 @@ Here are the attributes you can use in a ’stencil’ section of a .compositor 
 
     ### fail\_op
 
-    Sets what to do with the stencil buffer value if the result of the stencil comparison ([comp\_func](#compositor_005fstencil_005fcomp_005ffunc)) and depth comparison is that both fail. 
+    @copybrief Ogre::StencilState::stencilFailOp
+
     @par
-    Format: fail\_op (keep | zero | replace | increment | decrement | increment\_wrap | decrement\_wrap | invert)
+    Format: fail\_op &lt;op&gt;
     @par
-    Default: depth\_fail\_op keep These actions mean:
+    Default: fail\_op keep
 
-    <dl compact="compact">
-    <dt>keep</dt> <dd>
+    @param op one of Ogre::StencilOperation without the `SOP_` prefix. E.g. `SOP_INCREMENT_WRAP` becomes `increment_wrap`.
 
-    Leave the stencil buffer unchanged.
-
-    </dd> <dt>zero</dt> <dd>
-
-    Set the stencil value to zero.
-
-    </dd> <dt>replace</dt> <dd>
-
-    Set the stencil value to the reference value.
-
-    </dd> <dt>increment</dt> <dd>
-
-    Add one to the stencil value, clamping at the maximum value.
-
-    </dd> <dt>decrement</dt> <dd>
-
-    Subtract one from the stencil value, clamping at 0.
-
-    </dd> <dt>increment\_wrap</dt> <dd>
-
-    Add one to the stencil value, wrapping back to 0 at the maximum.
-
-    </dd> <dt>decrement\_wrap</dt> <dd>
-
-    Subtract one from the stencil value, wrapping to the maximum below 0.
-
-    </dd> <dt>invert</dt> <dd>
-
-    invert the stencil value.
-
-    </dd> </dl> <a name="compositor_005fstencil_005fdepth_005ffail_005fop"></a><a name="depth_005ffail_005fop"></a>
+    <a name="compositor_005fstencil_005fdepth_005ffail_005fop"></a><a name="depth_005ffail_005fop"></a>
 
     ### depth\_fail\_op
 
-    Sets what to do with the stencil buffer value if the result of the stencil comparison ([comp\_func](#compositor_005fstencil_005fcomp_005ffunc)) passes but the depth comparison fails. 
+    @copybrief Ogre::StencilState::depthFailOp
 
     @par
-    Format: depth\_fail\_op (keep | zero | replace | increment | decrement | increment\_wrap | decrement\_wrap | invert)
+    Format: depth\_fail\_op &lt;op&gt;
     @par
     Default: depth\_fail\_op keep
+
+    @param op one of Ogre::StencilOperation without the `SOP_` prefix. E.g. `SOP_INCREMENT_WRAP` becomes `increment_wrap`.
 
     <a name="compositor_005fstencil_005fpass_005fop"></a><a name="pass_005fop"></a>
 
     ### pass\_op
 
-    Sets what to do with the stencil buffer value if the result of the stencil comparison ([comp\_func](#compositor_005fstencil_005fcomp_005ffunc)) and the depth comparison pass.  
+    @copybrief Ogre::StencilState::depthStencilPassOp
+
     @par
-    Format: pass\_op (keep | zero | replace | increment | decrement | increment\_wrap | decrement\_wrap | invert)
+    Format: pass\_op &lt;op&gt;
     @par
     Default: pass\_op keep
+
+    @param op one of Ogre::StencilOperation without the `SOP_` prefix. E.g. `SOP_INCREMENT_WRAP` becomes `increment_wrap`.
 
     <a name="compositor_005fstencil_005ftwo_005fsided"></a><a name="two_005fsided"></a>
 
     ### two\_sided
 
-    Enables or disables two-sided stencil operations, which means the inverse of the operations applies to back-facing polygons.
+    @copybrief Ogre::StencilState::twoSidedOperation
+
     @par
     Format: two\_sided (on | off)
     @par
