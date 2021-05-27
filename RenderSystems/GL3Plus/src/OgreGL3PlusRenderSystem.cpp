@@ -253,9 +253,6 @@ namespace Ogre {
             rsc->setCapability(RSC_ANISOTROPY);
         }
 
-        // DOT3 support is standard
-        rsc->setCapability(RSC_DOT3);
-
         // Point sprites
         rsc->setCapability(RSC_POINT_SPRITES);
         rsc->setCapability(RSC_POINT_EXTENDED_PARAMETERS);
@@ -322,18 +319,12 @@ namespace Ogre {
         // GL always shares vertex and fragment texture units (for now?)
         rsc->setVertexTextureUnitsShared(true);
 
-        // Blending support
-        rsc->setCapability(RSC_ADVANCED_BLEND_OPERATIONS);
-
         // Check for non-power-of-2 texture support
         rsc->setCapability(RSC_NON_POWER_OF_2_TEXTURES);
 
         // Check for SSBO support
         if (hasMinGLVersion(4, 3) || checkExtension("GL_ARB_shader_storage_buffer_object"))
             rsc->setCapability(RSC_READ_WRITE_BUFFERS);
-
-        // Scissor test is standard
-        rsc->setCapability(RSC_SCISSOR_TEST);
 
         // As are user clipping planes
         rsc->setCapability(RSC_USER_CLIP_PLANES);
@@ -343,11 +334,6 @@ namespace Ogre {
         rsc->setCapability(RSC_TEXTURE_3D);
         rsc->setCapability(RSC_TEXTURE_2D_ARRAY);
 
-        // UBYTE4 always supported
-        rsc->setCapability(RSC_VERTEX_FORMAT_UBYTE4);
-
-        // Infinite far plane always supported
-        rsc->setCapability(RSC_INFINITE_FAR_PLANE);
         rsc->setCapability(RSC_DEPTH_CLAMP);
 
         // Check for hardware occlusion support

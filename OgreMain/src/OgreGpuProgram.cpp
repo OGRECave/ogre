@@ -238,13 +238,6 @@ namespace Ogre
             return false;
         }
 
-        // If skeletal animation is being done, we need support for UBYTE4
-        if (isSkeletalAnimationIncluded() && 
-            !caps->hasCapability(RSC_VERTEX_FORMAT_UBYTE4))
-        {
-            return false;
-        }
-
         // Vertex texture fetch required?
         if (isVertexTextureFetchRequired() && 
             !caps->hasCapability(RSC_VERTEX_TEXTURE_FETCH))

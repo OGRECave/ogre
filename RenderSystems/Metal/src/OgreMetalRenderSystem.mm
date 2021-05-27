@@ -151,7 +151,6 @@ namespace Ogre
         rsc->setNumTextureUnits(16);
         rsc->setNumVertexTextureUnits(16);
         rsc->setCapability(RSC_ANISOTROPY);
-        rsc->setCapability(RSC_DOT3);
         rsc->setCapability(RSC_TEXTURE_COMPRESSION);
 #if TARGET_OS_TV
         rsc->setCapability(RSC_TEXTURE_COMPRESSION_ASTC);
@@ -173,8 +172,6 @@ namespace Ogre
         rsc->setCapability(RSC_TWO_SIDED_STENCIL);
         rsc->setCapability(RSC_STENCIL_WRAP);
         rsc->setCapability(RSC_USER_CLIP_PLANES);
-        rsc->setCapability(RSC_VERTEX_FORMAT_UBYTE4);
-        rsc->setCapability(RSC_INFINITE_FAR_PLANE);
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
         if( [mActiveDevice->mDevice supportsFeatureSet:MTLFeatureSet_iOS_GPUFamily4_v1] )
 #endif

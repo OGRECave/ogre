@@ -298,19 +298,15 @@ TEST_F(RenderSystemCapabilitiesTests,WriteAllFalseCapabilities)
     // confirm every caps
     EXPECT_TRUE(find(lines.begin(), lines.end(), "\tautomipmap_compressed false") != lines.end());
     EXPECT_TRUE(find(lines.begin(), lines.end(), "\tanisotropy false") != lines.end());
-    EXPECT_TRUE(find(lines.begin(), lines.end(), "\tdot3 false") != lines.end());
     EXPECT_TRUE(find(lines.begin(), lines.end(), "\thwstencil false") != lines.end());
 
     EXPECT_TRUE(find(lines.begin(), lines.end(), "\tvertex_program false") != lines.end());
     EXPECT_TRUE(find(lines.begin(), lines.end(), "\tfragment_program false") != lines.end());
-    EXPECT_TRUE(find(lines.begin(), lines.end(), "\tscissor_test false") != lines.end());
     EXPECT_TRUE(find(lines.begin(), lines.end(), "\ttwo_sided_stencil false") != lines.end());
     EXPECT_TRUE(find(lines.begin(), lines.end(), "\tstencil_wrap false") != lines.end());
 
     EXPECT_TRUE(find(lines.begin(), lines.end(), "\thwocclusion false") != lines.end());
     EXPECT_TRUE(find(lines.begin(), lines.end(), "\tuser_clip_planes false") != lines.end());
-    EXPECT_TRUE(find(lines.begin(), lines.end(), "\tvertex_format_ubyte4 false") != lines.end());
-    EXPECT_TRUE(find(lines.begin(), lines.end(), "\tinfinite_far_plane false") != lines.end());
     EXPECT_TRUE(find(lines.begin(), lines.end(), "\thwrender_to_texture false") != lines.end());
     EXPECT_TRUE(find(lines.begin(), lines.end(), "\ttexture_float false") != lines.end());
 
@@ -461,7 +457,6 @@ TEST_F(RenderSystemCapabilitiesTests,WriteAndReadComplexCapabilities)
     caps.setCapability(RSC_HWSTENCIL);
     caps.setCapability(RSC_TWO_SIDED_STENCIL);
     caps.setCapability(RSC_HWOCCLUSION);
-    caps.setCapability(RSC_VERTEX_FORMAT_UBYTE4);
     caps.setCapability(RSC_HWRENDER_TO_TEXTURE);
     caps.setCapability(RSC_TEXTURE_FLOAT);
     caps.setCapability(RSC_NON_POWER_OF_2_TEXTURES);
@@ -537,7 +532,6 @@ TEST_F(RenderSystemCapabilitiesTests,WriteAndReadComplexCapabilities)
 
     EXPECT_EQ(caps.hasCapability(RSC_HWOCCLUSION), caps2.hasCapability(RSC_HWOCCLUSION));
     EXPECT_EQ(caps.hasCapability(RSC_USER_CLIP_PLANES), caps2.hasCapability(RSC_USER_CLIP_PLANES));
-    EXPECT_EQ(caps.hasCapability(RSC_VERTEX_FORMAT_UBYTE4), caps2.hasCapability(RSC_VERTEX_FORMAT_UBYTE4));
     EXPECT_EQ(caps.hasCapability(RSC_HWRENDER_TO_TEXTURE), caps2.hasCapability(RSC_HWRENDER_TO_TEXTURE));
     EXPECT_EQ(caps.hasCapability(RSC_TEXTURE_FLOAT), caps2.hasCapability(RSC_TEXTURE_FLOAT));
 
