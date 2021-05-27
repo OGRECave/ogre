@@ -405,8 +405,6 @@ namespace Ogre {
             rsc->setCapability(RSC_ANISOTROPY);
         }
 
-        rsc->setCapability(RSC_DOT3);
-
         // Point sprites
         if (GLEW_VERSION_2_0 || GLEW_ARB_point_sprite)
         {
@@ -617,8 +615,6 @@ namespace Ogre {
             rsc->setCapability(RSC_TEXTURE_COMPRESSION_VTC);
         }
 
-        // Scissor test is standard in GL 1.2 (is it emulated on some cards though?)
-        rsc->setCapability(RSC_SCISSOR_TEST);
         // As are user clipping planes
         rsc->setCapability(RSC_USER_CLIP_PLANES);
 
@@ -629,12 +625,6 @@ namespace Ogre {
         }
         rsc->setCapability(RSC_STENCIL_WRAP);
         rsc->setCapability(RSC_HWOCCLUSION);
-
-        // UBYTE4 always supported
-        rsc->setCapability(RSC_VERTEX_FORMAT_UBYTE4);
-
-        // Infinite far plane always supported
-        rsc->setCapability(RSC_INFINITE_FAR_PLANE);
 
         // Check for non-power-of-2 texture support
         if(GLEW_ARB_texture_non_power_of_two)
@@ -708,12 +698,6 @@ namespace Ogre {
             // Alpha to coverage always 'supported' when MSAA is available
             // although card may ignore it if it doesn't specifically support A2C
             rsc->setCapability(RSC_ALPHA_TO_COVERAGE);
-        }
-
-        // Advanced blending operations
-        if(GLEW_VERSION_2_0)
-        {
-            rsc->setCapability(RSC_ADVANCED_BLEND_OPERATIONS);
         }
 
         GLfloat lineWidth[2] = {1, 1};

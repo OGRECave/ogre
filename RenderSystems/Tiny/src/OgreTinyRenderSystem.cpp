@@ -121,14 +121,8 @@ namespace Ogre {
         // GL always shares vertex and fragment texture units (for now?)
         rsc->setVertexTextureUnitsShared(true);
 
-        // Blending support
-        rsc->setCapability(RSC_ADVANCED_BLEND_OPERATIONS);
-
         // Check for non-power-of-2 texture support
         rsc->setCapability(RSC_NON_POWER_OF_2_TEXTURES);
-
-        // Scissor test is standard
-        rsc->setCapability(RSC_SCISSOR_TEST);
 
         // As are user clipping planes
         rsc->setCapability(RSC_USER_CLIP_PLANES);
@@ -138,12 +132,8 @@ namespace Ogre {
         rsc->setCapability(RSC_TEXTURE_3D);
         rsc->setCapability(RSC_TEXTURE_2D_ARRAY);
 
-        // UBYTE4 always supported
-        rsc->setCapability(RSC_VERTEX_FORMAT_UBYTE4);
         rsc->setCapability(RSC_32BIT_INDEX);
 
-        // Infinite far plane always supported
-        rsc->setCapability(RSC_INFINITE_FAR_PLANE);
         rsc->setCapability(RSC_DEPTH_CLAMP);
 
         rsc->setCapability(RSC_VERTEX_BUFFER_INSTANCE_DATA);

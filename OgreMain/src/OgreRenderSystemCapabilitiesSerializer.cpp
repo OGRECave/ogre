@@ -365,7 +365,6 @@ namespace Ogre
 
         addCapabilitiesMapping("fixed_function", RSC_FIXED_FUNCTION);
         addCapabilitiesMapping("anisotropy", RSC_ANISOTROPY);
-        addCapabilitiesMapping("dot3", RSC_DOT3);
         addCapabilitiesMapping("hwstencil", RSC_HWSTENCIL);
         addCapabilitiesMapping("32bit_index", RSC_32BIT_INDEX);
         addCapabilitiesMapping("vertex_program", RSC_VERTEX_PROGRAM);
@@ -374,13 +373,10 @@ namespace Ogre
         addCapabilitiesMapping("tessellation_hull_program", RSC_TESSELLATION_HULL_PROGRAM);
         addCapabilitiesMapping("tessellation_domain_program", RSC_TESSELLATION_DOMAIN_PROGRAM);
         addCapabilitiesMapping("compute_program", RSC_COMPUTE_PROGRAM);
-        addCapabilitiesMapping("scissor_test", RSC_SCISSOR_TEST);
         addCapabilitiesMapping("two_sided_stencil", RSC_TWO_SIDED_STENCIL);
         addCapabilitiesMapping("stencil_wrap", RSC_STENCIL_WRAP);
         addCapabilitiesMapping("hwocclusion", RSC_HWOCCLUSION);
         addCapabilitiesMapping("user_clip_planes", RSC_USER_CLIP_PLANES);
-        addCapabilitiesMapping("vertex_format_ubyte4", RSC_VERTEX_FORMAT_UBYTE4);
-        addCapabilitiesMapping("infinite_far_plane", RSC_INFINITE_FAR_PLANE);
         addCapabilitiesMapping("hwrender_to_texture", RSC_HWRENDER_TO_TEXTURE);
         addCapabilitiesMapping("texture_float", RSC_TEXTURE_FLOAT);
         addCapabilitiesMapping("non_power_of_2_textures", RSC_NON_POWER_OF_2_TEXTURES);

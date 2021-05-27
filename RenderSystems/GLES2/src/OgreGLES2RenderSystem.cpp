@@ -272,9 +272,6 @@ namespace Ogre {
                 (checkExtension("GL_EXT_sRGB") && checkExtension("GL_NV_sRGB_formats")))
             rsc->setCapability(RSC_HW_GAMMA);
 
-        // Scissor test is standard
-        rsc->setCapability(RSC_SCISSOR_TEST);
-
         // Vertex Buffer Objects are always supported by OpenGL ES
         if(hasMinGLVersion(3, 0) || checkExtension("GL_OES_element_index_uint"))
             rsc->setCapability(RSC_32BIT_INDEX);
@@ -359,12 +356,6 @@ namespace Ogre {
 
         // GL always shares vertex and fragment texture units (for now?)
         rsc->setVertexTextureUnitsShared(true);
-
-        // Blending support
-        rsc->setCapability(RSC_ADVANCED_BLEND_OPERATIONS);
-
-        // DOT3 support is standard
-        rsc->setCapability(RSC_DOT3);
         
         // Point size
         GLfloat psRange[2] = {0.0, 0.0};
@@ -389,12 +380,6 @@ namespace Ogre {
         rsc->addShaderProfile("ps_2_0");
         rsc->addShaderProfile("vs_2_0");
 #endif
-
-        // UBYTE4 always supported
-        rsc->setCapability(RSC_VERTEX_FORMAT_UBYTE4);
-
-        // Infinite far plane always supported
-        rsc->setCapability(RSC_INFINITE_FAR_PLANE);
 
         // Vertex/Fragment Programs
         rsc->setCapability(RSC_VERTEX_PROGRAM);

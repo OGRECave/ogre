@@ -838,14 +838,11 @@ namespace Ogre
         rsc->setNumTextureUnits(OGRE_MAX_TEXTURE_LAYERS);
         rsc->setNumVertexAttributes(14); // see D3DDECLUSAGE
         rsc->setCapability(RSC_ANISOTROPY);
-        rsc->setCapability(RSC_DOT3);
-        rsc->setCapability(RSC_SCISSOR_TEST);       
         rsc->setCapability(RSC_TWO_SIDED_STENCIL);      
         rsc->setCapability(RSC_STENCIL_WRAP);
         rsc->setCapability(RSC_HWOCCLUSION);        
         rsc->setCapability(RSC_USER_CLIP_PLANES);           
-        rsc->setCapability(RSC_32BIT_INDEX);            
-        rsc->setCapability(RSC_VERTEX_FORMAT_UBYTE4);           
+        rsc->setCapability(RSC_32BIT_INDEX);
         rsc->setCapability(RSC_TEXTURE_1D);         
         rsc->setCapability(RSC_TEXTURE_3D);         
         rsc->setCapability(RSC_NON_POWER_OF_2_TEXTURES);
@@ -859,7 +856,6 @@ namespace Ogre
         rsc->setCapability(RSC_PERSTAGECONSTANT);
         rsc->setCapability(RSC_HWSTENCIL);
         rsc->setStencilBufferBitDepth(8);
-        rsc->setCapability(RSC_ADVANCED_BLEND_OPERATIONS);
         rsc->setCapability(RSC_RTT_MAIN_DEPTHBUFFER_ATTACHABLE);
         rsc->setCapability(RSC_RTT_DEPTHBUFFER_RESOLUTION_LESSEQUAL);
         rsc->setCapability(RSC_VERTEX_BUFFER_INSTANCE_DATA);
@@ -917,11 +913,11 @@ namespace Ogre
 
             // Check Dot product 3.
             if ((rkCurCaps.TextureOpCaps & D3DTEXOPCAPS_DOTPRODUCT3) == 0)
-                rsc->unsetCapability(RSC_DOT3);
+                has_level_9_1 = false;
 
             // Scissor test
             if ((rkCurCaps.RasterCaps & D3DPRASTERCAPS_SCISSORTEST) == 0)
-                rsc->unsetCapability(RSC_SCISSOR_TEST);
+                has_level_9_1 = false;
 
             if ((rkCurCaps.RasterCaps & (D3DPRASTERCAPS_DEPTHBIAS | D3DPRASTERCAPS_SLOPESCALEDEPTHBIAS)) == 0)
                 has_level_9_1 = false;
@@ -945,7 +941,7 @@ namespace Ogre
 
             // UBYTE4 type?
             if ((rkCurCaps.DeclTypes & D3DDTCAPS_UBYTE4) == 0)          
-                rsc->unsetCapability(RSC_VERTEX_FORMAT_UBYTE4); 
+                has_level_9_1 = false;
 
             // Check cube map support.
             if ((rkCurCaps.TextureCaps & D3DPTEXTURECAPS_CUBEMAP) == 0)
@@ -1004,7 +1000,7 @@ namespace Ogre
 
             // Advanced blend operations? min max subtract rev 
             if((rkCurCaps.PrimitiveMiscCaps & D3DPMISCCAPS_BLENDOP) == 0)
-                rsc->unsetCapability(RSC_ADVANCED_BLEND_OPERATIONS);
+                has_level_9_1 = false;
 
             // see https://technet.microsoft.com/en-us/evalcenter/jj841213(v=vs.90)
             if (!has_level_9_1)
@@ -1041,15 +1037,6 @@ namespace Ogre
             break;
         };
 
-        // Infinite projection?
-        // We have no capability for this, so we have to base this on our
-        // experience and reports from users
-        // Non-vertex program capable hardware does not appear to support it
-        if (rsc->hasCapability(RSC_VERTEX_PROGRAM))
-        {
-            rsc->setCapability(RSC_INFINITE_FAR_PLANE);
-        }
-    
         // We always support rendertextures bigger than the frame buffer
         rsc->setCapability(RSC_HWRENDER_TO_TEXTURE);
 
