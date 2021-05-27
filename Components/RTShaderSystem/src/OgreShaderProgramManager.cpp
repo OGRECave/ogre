@@ -331,7 +331,7 @@ GpuProgramPtr ProgramManager::createGpuProgram(Program* shaderProgram,
 
     pGpuProgram->setSource(source);
     pGpuProgram->setParameter("preprocessor_defines", shaderProgram->getPreprocessorDefines());
-    pGpuProgram->setParameter("entry_point", shaderProgram->getEntryPointFunction()->getName());
+    pGpuProgram->setParameter("entry_point", "main");
 
     if (language == "hlsl")
     {

@@ -678,16 +678,6 @@ public:
 
     static ParameterPtr createInTexcoord(GpuConstantType type, int index, Parameter::Content content);
     static ParameterPtr createOutTexcoord(GpuConstantType type, int index, Parameter::Content content);
-    /// @deprecated use createInTexcoord
-    static ParameterPtr createInTexcoord1(int index, Parameter::Content content);
-    /// @deprecated use createOutTexcoord
-    static ParameterPtr createOutTexcoord1(int index, Parameter::Content content);
-    static ParameterPtr createInTexcoord2(int index, Parameter::Content content);
-    static ParameterPtr createOutTexcoord2(int index, Parameter::Content content);
-    static ParameterPtr createInTexcoord3(int index, Parameter::Content content);
-    static ParameterPtr createOutTexcoord3(int index, Parameter::Content content);
-    static ParameterPtr createInTexcoord4(int index, Parameter::Content content);           
-    static ParameterPtr createOutTexcoord4(int index, Parameter::Content content);
 
     static ParameterPtr createConstParam(const Vector2& val);
     static ParameterPtr createConstParam(const Vector3& val);

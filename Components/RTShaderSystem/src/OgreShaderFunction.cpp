@@ -182,13 +182,6 @@ void FunctionStageRef::binaryOp(char op, const std::vector<Operand>& params) con
 }
 
 //-----------------------------------------------------------------------------
-Function::Function(const String& name, const String& desc)
-{
-    mName           = name;
-    mDescription    = desc;
-}
-
-//-----------------------------------------------------------------------------
 Function::~Function()
 {
     std::map<size_t, FunctionAtomInstanceList>::iterator jt;
@@ -391,39 +384,32 @@ ParameterPtr Function::resolveOutputParameter(Parameter::Semantic semantic,
 }
 
 //-----------------------------------------------------------------------------
-ParameterPtr Function::resolveLocalParameter(Parameter::Semantic semantic, int index,
-                                           const String& name,
-                                           GpuConstantType type)
+ParameterPtr Function::resolveLocalParameter(GpuConstantType type, const String& name)
 {
     ParameterPtr param;
 
     param = _getParameterByName(mLocalParameters, name);
     if (param.get() != NULL)
     {
-        if (param->getType() == type &&
-            param->getSemantic() == semantic &&
-            param->getIndex() == index)
+        if (param->getType() == type)
         {
             return param;
         }
         else 
         {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
-                "Can not resolve local parameter due to type mismatch. Function <" + getName() + ">",           
-                "Function::resolveLocalParameter" );
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+                        "Can not resolve local parameter due to type mismatch");
         }       
     }
         
-    param = ParameterPtr(OGRE_NEW Parameter(type, name, semantic, index, Parameter::SPC_UNKNOWN));
+    param = std::make_shared<Parameter>(type, name, Parameter::SPS_UNKNOWN, 0, Parameter::SPC_UNKNOWN);
     addParameter(mLocalParameters, param);
             
     return param;
 }
 
 //-----------------------------------------------------------------------------
-ParameterPtr Function::resolveLocalParameter(Parameter::Semantic semantic, int index,
-                                           const Parameter::Content content,
-                                           GpuConstantType type)
+ParameterPtr Function::resolveLocalParameter(const Parameter::Content content, GpuConstantType type)
 {
     ParameterPtr param;
 
@@ -434,8 +420,8 @@ ParameterPtr Function::resolveLocalParameter(Parameter::Semantic semantic, int i
         return param;
 
     param = std::make_shared<Parameter>(
-        type, getParameterName("l", semanticFromContent(content), mLocalParameters.size()), semantic, index,
-        content);
+        type, getParameterName("l", semanticFromContent(content), mLocalParameters.size()),
+        Parameter::SPS_UNKNOWN, 0, content);
     addParameter(mLocalParameters, param);
 
     return param;
@@ -449,8 +435,7 @@ void Function::addInputParameter(ParameterPtr parameter)
     if (_getParameterBySemantic(mInputParameters, parameter->getSemantic(), parameter->getIndex()).get() != NULL)
     {
         OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, 
-            "Parameter <" + parameter->getName() + "> has equal semantic parameter in function <" + getName() + ">",
-            "Function::addInputParameter" );
+            "Parameter <" + parameter->getName() + "> has equal semantic parameter");
     }
 
     addParameter(mInputParameters, parameter);
@@ -463,8 +448,7 @@ void Function::addOutputParameter(ParameterPtr parameter)
     if (_getParameterBySemantic(mOutputParameters, parameter->getSemantic(), parameter->getIndex()).get() != NULL)
     {
         OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, 
-            "Parameter <" + parameter->getName() + "> has equal semantic parameter in function <" + getName() + ">",
-            "Function::addOutputParameter" );
+            "Parameter <" + parameter->getName() + "> has equal semantic parameter");
     }
 
     addParameter(mOutputParameters, parameter);
@@ -501,16 +485,14 @@ void Function::addParameter(ShaderParameterList& parameterList, ParameterPtr par
     if (_getParameterByName(mInputParameters, parameter->getName()).get() != NULL)
     {
         OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, 
-            "Parameter <" + parameter->getName() + "> already declared in function <" + getName() + ">",            
-            "Function::addParameter" );
+            "Parameter <" + parameter->getName() + "> already declared");
     }
 
     // Check that parameter with the same name doest exist in output parameters list.
     if (_getParameterByName(mOutputParameters, parameter->getName()).get() != NULL)
     {
         OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, 
-            "Parameter <" + parameter->getName() + "> already declared in function <" + getName() + ">",            
-            "Function::addParameter" );
+            "Parameter <" + parameter->getName() + "> already declared");
     }
 
 

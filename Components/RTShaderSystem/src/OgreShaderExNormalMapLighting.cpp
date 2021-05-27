@@ -643,22 +643,22 @@ SubRenderState* NormalMapLightingFactory::createInstance(ScriptCompiler* compile
 
                     if (strValue == "none")
                     {
-                        normalMapSubRenderState->setNormalMapFiltering(FO_POINT, FO_POINT, FO_NONE);
+                        normalMapSubRenderState->getNormalMapSampler()->setFiltering(TFO_NONE);
                     }
 
                     else if (strValue == "bilinear")
                     {
-                        normalMapSubRenderState->setNormalMapFiltering(FO_LINEAR, FO_LINEAR, FO_POINT);
+                        normalMapSubRenderState->getNormalMapSampler()->setFiltering(TFO_BILINEAR);
                     }
 
                     else if (strValue == "trilinear")
                     {
-                        normalMapSubRenderState->setNormalMapFiltering(FO_LINEAR, FO_LINEAR, FO_LINEAR);
+                        normalMapSubRenderState->getNormalMapSampler()->setFiltering(TFO_TRILINEAR);
                     }
 
                     else if (strValue == "anisotropic")
                     {
-                        normalMapSubRenderState->setNormalMapFiltering(FO_ANISOTROPIC, FO_ANISOTROPIC, FO_LINEAR);
+                        normalMapSubRenderState->getNormalMapSampler()->setFiltering(TFO_ANISOTROPIC);
                     }
                     else
                     {
@@ -678,7 +678,7 @@ SubRenderState* NormalMapLightingFactory::createInstance(ScriptCompiler* compile
                     ++it;
                     if (SGScriptTranslator::getUInt(*it, &maxAnisotropy))
                     {
-                        normalMapSubRenderState->setNormalMapAnisotropy(maxAnisotropy);
+                        normalMapSubRenderState->getNormalMapSampler()->setAnisotropy(maxAnisotropy);
                     }
                 }
 
@@ -690,7 +690,7 @@ SubRenderState* NormalMapLightingFactory::createInstance(ScriptCompiler* compile
                     ++it;
                     if (SGScriptTranslator::getReal(*it, &mipBias))
                     {
-                        normalMapSubRenderState->setNormalMapMipBias(mipBias);
+                        normalMapSubRenderState->getNormalMapSampler()->setMipmapBias(mipBias);
                     }
                 }
                                 

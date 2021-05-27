@@ -134,16 +134,6 @@ public:
     */
     const String& getNormalMapTextureName() const { return mNormalMapTextureName; }
 
-    /// @deprecated use setNormalMapSampler
-    void setNormalMapFiltering(const FilterOptions minFilter, const FilterOptions magFilter, const FilterOptions mipFilter) 
-    { mNormalMapSampler->setFiltering(minFilter, magFilter, mipFilter); }
-
-    /// @deprecated use setNormalMapSampler
-    void setNormalMapAnisotropy(unsigned int anisotropy) { mNormalMapSampler->setAnisotropy(anisotropy); }
-
-    /// @deprecated use setNormalMapSampler
-    void setNormalMapMipBias(Real mipBias) { mNormalMapSampler->setMipmapBias(mipBias); }
-
     /// return the normal map sampler
     const SamplerPtr& getNormalMapSampler() const { return mNormalMapSampler; }
 
