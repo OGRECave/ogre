@@ -2376,21 +2376,6 @@ namespace Ogre
         if (def)
             _writeRawConstants(withArrayOffset(def, name), val, rawCount);
     }
-    //---------------------------------------------------------------------
-    void GpuProgramParameters::setNamedSubroutine(const String& subroutineSlot, const String& subroutine)
-    {
-        const GpuConstantDefinition* def =
-            _findNamedConstantDefinition(subroutineSlot, !mIgnoreMissingParams);
-        if (def)
-        {
-            setSubroutine(def->logicalIndex, subroutine);
-        }
-    }
-    //---------------------------------------------------------------------
-    void GpuProgramParameters::setSubroutine(size_t index, const String& subroutine)
-    {
-        mSubroutineMap.insert(std::make_pair(index, subroutine));
-    }
     //---------------------------------------------------------------------------
     void GpuProgramParameters::setNamedAutoConstant(const String& name,
                                                     AutoConstantType acType, uint32 extraInfo)
@@ -2521,7 +2506,7 @@ namespace Ogre
                                source.getDoublePointer(olddef.physicalIndex),
                                sz * sizeof(double));
                     }
-                    else if (newdef->isSampler() || newdef->isSubroutine())
+                    else if (newdef->isSampler())
                     {
                         *getRegPointer(newdef->physicalIndex) = *source.getRegPointer(olddef.physicalIndex);
                     }

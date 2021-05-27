@@ -830,12 +830,6 @@ namespace Ogre
         convertComputeShaderCaps(rsc);
         rsc->addShaderProfile("hlsl");
 
-        // Check support for dynamic linkage
-        if (mFeatureLevel >= D3D_FEATURE_LEVEL_11_0)
-        {
-            rsc->setCapability(RSC_SHADER_SUBROUTINE);
-        }
-
         rsc->setCapability(RSC_USER_CLIP_PLANES);
 
 
@@ -2471,17 +2465,15 @@ namespace Ogre
             break;
         };
 
+#ifdef SUBROUTINES
         // Now, set class instances
-        const GpuProgramParameters::SubroutineMap& subroutineMap = params->getSubroutineMap();
-        if (subroutineMap.empty())
-            return;
+        std::map<uint32, String> subroutineMap;
 
-        GpuProgramParameters::SubroutineIterator it;
-        GpuProgramParameters::SubroutineIterator end = subroutineMap.end();
-        for(it = subroutineMap.begin(); it != end; ++it)
+        for(auto it& : subroutineMap)
         {
-            setSubroutine(gptype, it->first, it->second);
+            setSubroutine(gptype, it.first, it.second);
         }
+#endif
     }
     //---------------------------------------------------------------------
     void D3D11RenderSystem::setSubroutine(GpuProgramType gptype, unsigned int slotIndex, const String& subroutineName)

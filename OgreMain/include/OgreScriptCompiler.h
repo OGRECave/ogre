@@ -841,9 +841,6 @@ namespace Ogre
         ID_TESSELLATION_DOMAIN,
         ID_COMPUTE,
 
-        // Support for subroutine
-        ID_SUBROUTINE,
-
         // added during 1.11. re-sort for 1.12
         ID_LINE_WIDTH,
         ID_SAMPLER,
