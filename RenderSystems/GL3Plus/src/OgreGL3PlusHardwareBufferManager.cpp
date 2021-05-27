@@ -96,11 +96,6 @@ namespace Ogre {
         return std::make_shared<GL3PlusHardwareBuffer>(GL_SHADER_STORAGE_BUFFER, sizeBytes, usage, useShadowBuffer);
     }
 
-    HardwareBufferPtr GL3PlusHardwareBufferManager::createCounterBuffer(size_t sizeBytes, HardwareBufferUsage usage, bool useShadowBuffer)
-    {
-        return std::make_shared<GL3PlusHardwareBuffer>(GL_ATOMIC_COUNTER_BUFFER, sizeBytes, usage, useShadowBuffer);
-    }
-
     RenderToVertexBufferSharedPtr GL3PlusHardwareBufferManager::createRenderToVertexBuffer()
     {
         return RenderToVertexBufferSharedPtr(new GL3PlusRenderToVertexBuffer);

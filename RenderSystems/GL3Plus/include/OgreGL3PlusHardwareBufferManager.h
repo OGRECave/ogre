@@ -62,9 +62,7 @@ namespace Ogre {
         HardwareBufferPtr createShaderStorageBuffer(size_t sizeBytes,
                                                     HardwareBufferUsage usage = HBU_CPU_TO_GPU,
                                                     bool useShadowBuffer = false);
-        /// Create a counter buffer
-        HardwareBufferPtr createCounterBuffer(size_t sizeBytes, HardwareBufferUsage usage = HBU_GPU_ONLY,
-                                              bool useShadowBuffer = false);
+
         /// Create a render to vertex buffer
         RenderToVertexBufferSharedPtr createRenderToVertexBuffer();
 
