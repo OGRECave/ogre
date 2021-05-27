@@ -289,7 +289,7 @@ namespace Ogre {
                                                          (GLint*)params->getIntPointer(def->physicalIndex)));
                         break;
                     case GCT_UNKNOWN:
-                    case GCT_SUBROUTINE:
+                    case GCT_SPECIALIZATION:
                     case GCT_DOUBLE1:
                     case GCT_DOUBLE2:
                     case GCT_DOUBLE3:

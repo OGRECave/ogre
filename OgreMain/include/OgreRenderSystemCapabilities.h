@@ -186,8 +186,6 @@ namespace Ogre
         /// D3D11: Supports asynchronous hardware occlusion queries
         RSC_HWOCCLUSION_ASYNCHRONOUS = OGRE_CAPS_VALUE(CAPS_CATEGORY_D3D9, 3),
         RSC_HWRENDER_TO_TEXTURE_3D = OGRE_CAPS_VALUE(CAPS_CATEGORY_D3D9, 4),
-        /// D3D11: Supports dynamic linkage/shader subroutine
-        RSC_SHADER_SUBROUTINE = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 18),
 
         // ***** GL Specific Caps *****
         /// Support for PBuffer

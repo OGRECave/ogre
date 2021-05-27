@@ -1232,7 +1232,7 @@ namespace Ogre {
             break;
 
         case D3D_SVT_INTERFACE_POINTER:
-            def.constType = GCT_SUBROUTINE;
+            def.constType = GCT_SPECIALIZATION;
             break;
 
         default:

@@ -55,7 +55,7 @@ namespace Ogre {
         BCT_UINT = 0x30,
         BCT_BOOL = 0x40,
         BCT_SAMPLER = 0x50,
-        BCT_SUBROUTINE = 0x60,
+        BCT_SPECIALIZATION = 0x60, //!< shader specialisation constant
         BCT_UNKNOWN = 0x70
     };
 
@@ -92,7 +92,7 @@ namespace Ogre {
         GCT_INT2 = BCT_INT + 2,
         GCT_INT3 = BCT_INT + 3,
         GCT_INT4 = BCT_INT + 4,
-        GCT_SUBROUTINE = BCT_SUBROUTINE,
+        GCT_SPECIALIZATION = BCT_SPECIALIZATION,
         GCT_DOUBLE1 = BCT_DOUBLE + 1,
         GCT_DOUBLE2 = BCT_DOUBLE + 2,
         GCT_DOUBLE3 = BCT_DOUBLE + 3,
@@ -180,8 +180,8 @@ namespace Ogre {
         bool isSampler() const { return isSampler(constType); }
         static bool isSampler(GpuConstantType c) { return getBaseType(c) == BCT_SAMPLER; }
 
-        bool isSubroutine() const { return isSubroutine(constType); }
-        static bool isSubroutine(GpuConstantType c) { return getBaseType(c) == BCT_SUBROUTINE; }
+        bool isSpecialization() const { return isSpecialization(constType); }
+        static bool isSpecialization(GpuConstantType c) { return getBaseType(c) == BCT_SPECIALIZATION; }
 
         static BaseConstantType getBaseType(GpuConstantType ctype)
         {
@@ -1235,14 +1235,7 @@ namespace Ogre {
         typedef std::vector<AutoConstantEntry> AutoConstantList;
 
         typedef std::vector<GpuSharedParametersUsage> GpuSharedParamUsageList;
-
-        // Map that store subroutines associated with slots
-        typedef std::unordered_map<size_t, String> SubroutineMap;
-        typedef std::unordered_map<size_t, String>::const_iterator SubroutineIterator;
-
     private:
-        SubroutineMap mSubroutineMap;
-
         static AutoConstantDefinition AutoConstantDictionary[];
 
         /// Packed list of constants (physical indexing)
@@ -1861,18 +1854,6 @@ namespace Ogre {
         const Any& _getRenderSystemData() const { return mRenderSystemData; }
 
         size_t calculateSize(void) const;
-
-        /** Set subroutine name by slot name
-         */
-        void setNamedSubroutine(const String& subroutineSlot, const String& subroutine);
-
-        /** Set subroutine name by slot index
-         */
-        void setSubroutine(size_t index, const String& subroutine);
-
-        /** Get map with
-         */
-        const SubroutineMap& getSubroutineMap() const { return mSubroutineMap; }
     };
 
     /** @} */

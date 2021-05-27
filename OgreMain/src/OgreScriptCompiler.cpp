@@ -1195,8 +1195,6 @@ namespace Ogre
         mIds["pass_op"] = ID_PASS_OP;
         mIds["two_sided"] = ID_TWO_SIDED;
 
-        mIds["subroutine"] = ID_SUBROUTINE;
-
         mIds["line_width"] = ID_LINE_WIDTH;
         mIds["sampler"] = ID_SAMPLER;
         mIds["sampler_ref"] = ID_SAMPLER_REF;
