@@ -922,7 +922,7 @@ void SceneManager::ShadowRenderer::renderShadowVolumesToStencil(const Light* lig
     // Do we have access to vertex programs?
     bool extrudeInSoftware = true;
     bool finiteExtrude = !mShadowUseInfiniteFarPlane;
-    if (mDestRenderSystem->getCapabilities()->hasCapability(RSC_VERTEX_PROGRAM))
+    if (ShadowVolumeExtrudeProgram::frgProgram->isSupported())
     {
         extrudeInSoftware = false;
         // attach the appropriate extrusion vertex program
@@ -1362,11 +1362,9 @@ void SceneManager::ShadowRenderer::initShadowVolumeMaterials()
             mShadowDebugPass->setDepthWriteEnabled(false);
             mShadowDebugPass->setCullingMode(CULL_NONE);
 
-            if (mDestRenderSystem->getCapabilities()->hasCapability(
-                RSC_VERTEX_PROGRAM))
+            ShadowVolumeExtrudeProgram::initialise();
+            if (ShadowVolumeExtrudeProgram::frgProgram->isSupported())
             {
-                ShadowVolumeExtrudeProgram::initialise();
-
                 // Enable the (infinite) point light extruder for now, just to get some params
                 mShadowDebugPass->setGpuProgram(
                     GPT_VERTEX_PROGRAM, ShadowVolumeExtrudeProgram::get(Light::LT_POINT, false));
@@ -1397,7 +1395,7 @@ void SceneManager::ShadowRenderer::initShadowVolumeMaterials()
         {
             mShadowDebugPass = matDebug->getTechnique(0)->getPass(0);
 
-            if (mDestRenderSystem->getCapabilities()->hasCapability(RSC_VERTEX_PROGRAM))
+            if (mShadowDebugPass->isProgrammable())
             {
                 msInfiniteExtrusionParams = mShadowDebugPass->getVertexProgramParameters();
             }
@@ -1417,8 +1415,7 @@ void SceneManager::ShadowRenderer::initShadowVolumeMaterials()
                 ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME);
             mShadowStencilPass = matStencil->getTechnique(0)->getPass(0);
 
-            if (mDestRenderSystem->getCapabilities()->hasCapability(
-                RSC_VERTEX_PROGRAM))
+            if (ShadowVolumeExtrudeProgram::frgProgram->isSupported())
             {
 
                 // Enable the finite point light extruder for now, just to get some params
@@ -1455,7 +1452,7 @@ void SceneManager::ShadowRenderer::initShadowVolumeMaterials()
         {
             mShadowStencilPass = matStencil->getTechnique(0)->getPass(0);
 
-            if (mDestRenderSystem->getCapabilities()->hasCapability(RSC_VERTEX_PROGRAM) && !msFiniteExtrusionParams)
+            if (!msFiniteExtrusionParams && mShadowStencilPass->isProgrammable())
             {
                 msFiniteExtrusionParams = mShadowStencilPass->getVertexProgramParameters();
             }
