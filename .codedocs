@@ -684,7 +684,6 @@ INPUT                  = OgreMain/include \
                             Docs/src/high-level-programs.md \
                             Docs/src/particle-scripts.md \
                             Docs/src/hardware-buffers.md \
-                            Docs/src/hlms.md \
                             Docs/src/rtss.md \
                             Docs/src/resourcemanagement.md \
                             BuildingOgre.md \

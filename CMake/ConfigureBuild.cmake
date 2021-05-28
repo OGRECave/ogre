@@ -238,11 +238,6 @@ if (UNIX)
     configure_file(${OGRE_TEMPLATES_DIR}/OGRE-Bites.pc.in ${PROJECT_BINARY_DIR}/pkgconfig/OGRE-Bites.pc @ONLY)
     install(FILES ${PROJECT_BINARY_DIR}/pkgconfig/OGRE-Bites.pc DESTINATION ${OGRE_LIB_DIRECTORY}/pkgconfig)
   endif ()
-
-  if (OGRE_BUILD_COMPONENT_HLMS)
-    configure_file(${OGRE_TEMPLATES_DIR}/OGRE-HLMS.pc.in ${PROJECT_BINARY_DIR}/pkgconfig/OGRE-HLMS.pc @ONLY)
-    install(FILES ${PROJECT_BINARY_DIR}/pkgconfig/OGRE-HLMS.pc DESTINATION ${OGRE_LIB_DIRECTORY}/pkgconfig)
-  endif ()
 endif ()
 
 if(OGRE_CONFIG_STATIC_LINK_CRT)
