@@ -34,7 +34,6 @@ APKZip=/packs/skybox.zip
 APKZip=/packs/DamagedHelmet.zip
 
 APKFileSystem=/PBR
-APKFileSystem=/HLMS
 APKFileSystem=/DeferredShadingMedia
 APKFileSystem=/DeferredShadingMedia/DeferredShading/post
 

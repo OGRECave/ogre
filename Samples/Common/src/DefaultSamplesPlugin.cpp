@@ -50,9 +50,6 @@
 #include "FacialAnimation.h"
 #include "Fresnel.h"
 #include "Grass.h"
-#ifdef OGRE_BUILD_COMPONENT_HLMS
-#   include "HLMS.h"
-#endif
 #ifdef HAVE_IMGUI
 #include "ImGuiDemo.h"
 #endif
@@ -162,9 +159,6 @@ DefaultSamplesPlugin::DefaultSamplesPlugin() : SamplePlugin("DefaultSamplesPlugi
 #ifdef OGRE_BUILD_COMPONENT_TERRAIN
     addSample(new Sample_Terrain);
     addSample(new Sample_EndlessWorld);
-#endif
-#ifdef OGRE_BUILD_COMPONENT_HLMS
-    addSample(new Sample_HLMS);
 #endif
 }
 

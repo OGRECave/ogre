@@ -53,8 +53,6 @@ Zip=@OGRE_MEDIA_DIR_REL@/volumeTerrain/volumeTerrainBig.zip
 Zip=@OGRE_MEDIA_DIR_REL@/packs/DamagedHelmet.zip
 Zip=@OGRE_MEDIA_DIR_REL@/packs/filament_shaders.zip
 
-FileSystem=@OGRE_CORE_MEDIA_DIR@/HLMS
-
 [BSPWorld]
 Zip=@OGRE_MEDIA_DIR_REL@/packs/oa_rpg3dm2.pk3
 Zip=@OGRE_MEDIA_DIR_REL@/packs/ogretestmap.zip
