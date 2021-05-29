@@ -239,7 +239,7 @@ namespace Ogre
         }
     }
     //---------------------------------------------------------------------
-    const GpuNamedConstants& HighLevelGpuProgram::getConstantDefinitions() const
+    const GpuNamedConstants& HighLevelGpuProgram::getConstantDefinitions()
     {
         if (!mConstantDefsBuilt)
         {

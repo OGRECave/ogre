@@ -97,12 +97,12 @@ namespace Ogre {
         programs or high-level programs which set their params the same way.
         This is a shared pointer because if the program is recompiled and the parameters
         change, this definition will alter, but previous params may reference the old def. */
-    mutable GpuLogicalBufferStructPtr mLogicalToPhysical;
+    GpuLogicalBufferStructPtr mLogicalToPhysical;
     /** Parameter name -> ConstantDefinition map, shared instance used by all parameter objects.
         This is a shared pointer because if the program is recompiled and the parameters
         change, this definition will alter, but previous params may reference the old def.
     */
-    mutable GpuNamedConstantsPtr mConstantDefs;
+    GpuNamedConstantsPtr mConstantDefs;
     /// File from which to load named constants manually
     String mManualNamedConstantsFile;
     /// Does this (vertex) program include pose animation (count of number of poses supported)
@@ -132,11 +132,11 @@ namespace Ogre {
     void postLoadImpl();
 
     /// Create the internal params logical & named mapping structures
-    void createParameterMappingStructures(bool recreateIfExists = true) const;
+    void createParameterMappingStructures(bool recreateIfExists = true);
     /// Create the internal params logical mapping structures
-    void createLogicalParameterMappingStructures(bool recreateIfExists = true) const;
+    void createLogicalParameterMappingStructures(bool recreateIfExists = true);
     /// Create the internal params named mapping structures
-    void createNamedParameterMappingStructures(bool recreateIfExists = true) const;
+    void createNamedParameterMappingStructures(bool recreateIfExists = true);
 
     public:
 

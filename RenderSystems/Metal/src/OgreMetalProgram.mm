@@ -442,7 +442,7 @@ namespace Ogre {
         mCompiled = false;
     }
     //-----------------------------------------------------------------------
-    void MetalProgram::buildConstantDefinitions(void) const
+    void MetalProgram::buildConstantDefinitions(void)
     {
         if( mType == GPT_FRAGMENT_PROGRAM && mShaderReflectionPairHint.empty() )
         {

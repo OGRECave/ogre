@@ -201,7 +201,7 @@ namespace Ogre {
         /// Overridden from GpuProgram
         const String& getLanguage(void) const;
 
-        virtual void buildConstantDefinitions() const;
+        virtual void buildConstantDefinitions() override;
         ID3D11VertexShader* getVertexShader(void) const;
         ID3D11PixelShader* getPixelShader(void) const; 
         ID3D11GeometryShader* getGeometryShader(void) const; 

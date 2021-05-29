@@ -294,7 +294,7 @@ namespace Ogre {
         SAFE_RELEASE(mMicroCode);
     }
     //-----------------------------------------------------------------------
-    void D3D9HLSLProgram::buildConstantDefinitions() const
+    void D3D9HLSLProgram::buildConstantDefinitions()
     {
         mConstantDefs->bufferSize = mLogicalToPhysical->bufferSize;
 

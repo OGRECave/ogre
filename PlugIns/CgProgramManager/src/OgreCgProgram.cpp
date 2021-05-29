@@ -886,7 +886,7 @@ namespace Ogre {
         }
 	}
 	//-----------------------------------------------------------------------
-	void CgProgram::buildConstantDefinitions() const
+	void CgProgram::buildConstantDefinitions()
 	{
 		// Derive parameter names from Cg
 		createParameterMappingStructures(true);

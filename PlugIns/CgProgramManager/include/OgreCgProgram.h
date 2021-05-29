@@ -90,7 +90,7 @@ namespace Ogre {
         /// Internal unload implementation, must be implemented by subclasses
         void unloadHighLevelImpl(void);
         /// Populate the passed parameters with name->index map, must be overridden
-        void buildConstantDefinitions() const;
+        void buildConstantDefinitions() override;
 
         /// Load the high-level part in a thread-safe way, required for delegate functionality
         void loadHighLevelSafe();

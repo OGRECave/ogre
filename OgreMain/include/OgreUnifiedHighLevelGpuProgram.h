@@ -70,7 +70,6 @@ namespace Ogre {
 
         void createLowLevelImpl(void);
         void unloadHighLevelImpl(void);
-        void buildConstantDefinitions() const;
         void loadFromSource(void);
 
         void unloadImpl() { resetCompileError(); }

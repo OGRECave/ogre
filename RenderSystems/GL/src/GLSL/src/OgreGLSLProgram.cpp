@@ -247,7 +247,7 @@ namespace Ogre {
         }
     }
     //-----------------------------------------------------------------------
-    void GLSLProgram::buildConstantDefinitions() const
+    void GLSLProgram::buildConstantDefinitions()
     {
         // We need an accurate list of all the uniforms in the shader, but we
         // can't get at them until we link all the shaders into a program object.

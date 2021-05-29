@@ -127,7 +127,7 @@ namespace Ogre
         void unloadHighLevelImpl(void);
 
         /// Populate the passed parameters with name->index map, must be overridden
-        void buildConstantDefinitions(void) const;
+        void buildConstantDefinitions(void) override;
 
         void parsePreprocessorDefinitions( NSMutableDictionary<NSString*, NSObject*> *inOutMacros );
 

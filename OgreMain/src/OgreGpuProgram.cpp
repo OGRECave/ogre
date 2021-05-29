@@ -256,19 +256,19 @@ namespace Ogre
         return GpuProgramManager::getSingleton().isSyntaxSupported(mSyntaxCode);
     }
     //---------------------------------------------------------------------
-    void GpuProgram::createParameterMappingStructures(bool recreateIfExists) const
+    void GpuProgram::createParameterMappingStructures(bool recreateIfExists)
     {
         createLogicalParameterMappingStructures(recreateIfExists);
         createNamedParameterMappingStructures(recreateIfExists);
     }
     //---------------------------------------------------------------------
-    void GpuProgram::createLogicalParameterMappingStructures(bool recreateIfExists) const
+    void GpuProgram::createLogicalParameterMappingStructures(bool recreateIfExists)
     {
         if (recreateIfExists || !mLogicalToPhysical)
             mLogicalToPhysical = GpuLogicalBufferStructPtr(OGRE_NEW GpuLogicalBufferStruct());
     }
     //---------------------------------------------------------------------
-    void GpuProgram::createNamedParameterMappingStructures(bool recreateIfExists) const
+    void GpuProgram::createNamedParameterMappingStructures(bool recreateIfExists)
     {
         if (recreateIfExists || !mConstantDefs)
             mConstantDefs = GpuNamedConstantsPtr(OGRE_NEW GpuNamedConstants());
