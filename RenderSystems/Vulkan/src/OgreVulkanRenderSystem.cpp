@@ -50,9 +50,6 @@ THE SOFTWARE.
 #include "OgreVulkanWindow.h"
 #include "OgrePixelFormat.h"
 
-#   include <xcb/xcb.h>
-#    include "vulkan/vulkan_xcb.h"
-
 #define TODO_addVpCount_to_passpso
 
 namespace Ogre
@@ -680,34 +677,26 @@ namespace Ogre
         std::vector<VkExtensionProperties> availableExtensions(numExtensions);
         OGRE_VK_CHECK(vkEnumerateInstanceExtensionProperties(0, &numExtensions, availableExtensions.data()));
 
+        bool debugEnabled = true;
+        //StringConverter::parse(mOptions.at("Debug Layer").currentValue, debugEnabled);
+
         // Check supported extensions we may want
-        FastArray<const char *> reqInstanceExtensions;
+        std::vector<const char *> reqInstanceExtensions;
         for( size_t i = 0u; i < numExtensions; ++i )
         {
             const String extensionName = availableExtensions[i].extensionName;
             LogManager::getSingleton().logMessage( "Found instance extension: " + extensionName );
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-            if( extensionName == VulkanWin32Window::getRequiredExtensionName() )
+            if (extensionName == VulkanWindow::getRequiredExtensionName())
             {
-                reqInstanceExtensions.push_back( VulkanWin32Window::getRequiredExtensionName() );
+                reqInstanceExtensions.push_back(VulkanWindow::getRequiredExtensionName());
             }
-#elif OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-            if( extensionName == VulkanAndroidWindow::getRequiredExtensionName() )
-            {
-                reqInstanceExtensions.push_back( VulkanAndroidWindow::getRequiredExtensionName() );
-            }
-#else
-            if( extensionName == VK_KHR_XCB_SURFACE_EXTENSION_NAME )
-            {
-                reqInstanceExtensions.push_back( VK_KHR_XCB_SURFACE_EXTENSION_NAME );
-            }
-#endif
-#if 1 //OGRE_DEBUG_MODE
-            if( extensionName == VK_EXT_DEBUG_REPORT_EXTENSION_NAME )
-                reqInstanceExtensions.push_back( VK_EXT_DEBUG_REPORT_EXTENSION_NAME );
-#endif
+
+            if (debugEnabled && extensionName == "VK_EXT_debug_report")
+                reqInstanceExtensions.push_back("VK_EXT_debug_report");
         }
+
+        reqInstanceExtensions.push_back("VK_KHR_surface"); // required for window surface
 
         // Check supported layers we may want
         uint32 numInstanceLayers = 0u;
