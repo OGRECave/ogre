@@ -62,7 +62,6 @@ namespace Ogre
 
         bool mLowestLatencyVSync;
         bool mHwGamma;
-        bool mClosed;
 
         bool mVisible;
         bool mHidden;
@@ -87,13 +86,13 @@ namespace Ogre
         bool mRebuildingSwapchain;
         bool mSuboptimal;
 
-        void parseSharedParams( const NameValuePairList *miscParams );
-
         VkSurfaceTransformFlagBitsKHR mSurfaceTransform;
 
         PixelFormat chooseSurfaceFormat( bool hwGamma );
         void createSwapchain( void );
         void destroySwapchain( void );
+
+        void createSurface(size_t windowHandle);
 
     public:
         void acquireNextImage( void );
@@ -101,6 +100,8 @@ namespace Ogre
     public:
         VulkanWindow( const String &title, uint32 width, uint32 height, bool fullscreenMode );
         virtual ~VulkanWindow();
+
+        static const char *getRequiredExtensionName();
 
         VulkanTextureGpu* getTexture() { return mTexture; }
         VulkanTextureGpu* getDepthTexture() { return mDepthTexture; }
@@ -133,8 +134,6 @@ namespace Ogre
         VkSemaphore getRenderFinishedSemaphore() const;
 
         const std::vector<VkImageView>& getSwapchainImageViews() const { return mSwapchainImageViews; }
-
-        virtual bool isClosed( void ) const;
 
         virtual void setVSync( bool vSync, uint32 vSyncInterval );
 

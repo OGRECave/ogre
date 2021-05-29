@@ -42,10 +42,8 @@ THE SOFTWARE.
 #include "vulkan/vulkan_core.h"
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_LINUX
-#include <X11/Xlib-xcb.h>
-#include <xcb/randr.h>
-#include <xcb/xcb.h>
-#include "vulkan/vulkan_xcb.h"
+#include <X11/Xlib.h>
+#include "vulkan/vulkan_xlib.h"
 #endif
 
 #include "OgreDepthBuffer.h"
@@ -57,7 +55,6 @@ namespace Ogre
     VulkanWindow::VulkanWindow( const String &title, uint32 width, uint32 height, bool fullscreenMode ) :
         mLowestLatencyVSync( false ),
         mHwGamma( false ),
-        mClosed( false ),
         mDevice( 0 ),
         mTexture( 0 ),
         mDepthTexture( 0 ),
@@ -75,28 +72,6 @@ namespace Ogre
     VulkanWindow::~VulkanWindow()
     {
         destroy();
-    }
-    //-------------------------------------------------------------------------
-    void VulkanWindow::parseSharedParams( const NameValuePairList *miscParams )
-    {
-        NameValuePairList::const_iterator opt;
-        NameValuePairList::const_iterator end = miscParams->end();
-
-        opt = miscParams->find( "vsync" );
-        if( opt != end )
-            mVSync = StringConverter::parseBool( opt->second );
-        opt = miscParams->find( "vsyncInterval" );
-        if( opt != end )
-            mVSyncInterval = StringConverter::parseUnsignedInt( opt->second );
-        opt = miscParams->find( "FSAA" );
-        if( opt != end )
-            mFSAA = StringConverter::parseUnsignedInt(opt->second);
-        opt = miscParams->find( "gamma" );
-        if( opt != end )
-            mHwGamma = StringConverter::parseBool( opt->second );
-        opt = miscParams->find( "vsync_method" );
-        if( opt != end )
-            mLowestLatencyVSync = opt->second == "Lowest Latency";
     }
     //-------------------------------------------------------------------------
     PixelFormat VulkanWindow::chooseSurfaceFormat( bool hwGamma )
@@ -383,6 +358,33 @@ namespace Ogre
         mDevice = device;
     }
     //-------------------------------------------------------------------------
+    void VulkanWindow::createSurface(size_t windowHandle)
+    {
+#if OGRE_PLATFORM == OGRE_PLATFORM_LINUX
+        Display *dpy = XOpenDisplay(NULL);
+
+        VkXlibSurfaceCreateInfoKHR surfCreateInfo = {VK_STRUCTURE_TYPE_XLIB_SURFACE_CREATE_INFO_KHR};
+        surfCreateInfo.dpy = dpy;
+        surfCreateInfo.window = (Window)windowHandle;;
+
+        int scr = DefaultScreen( dpy );
+        if (!vkGetPhysicalDeviceXlibPresentationSupportKHR(mDevice->mPhysicalDevice, mDevice->mGraphicsQueue.mFamilyIdx,
+                                                           dpy, DefaultVisual(dpy, scr)->visualid))
+        {
+            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Vulkan not supported on given X11 window");
+        }
+
+        OGRE_VK_CHECK(vkCreateXlibSurfaceKHR(mDevice->mInstance, &surfCreateInfo, 0, &mSurfaceKHR));
+#endif
+    }
+
+    const char *VulkanWindow::getRequiredExtensionName()
+    {
+#if OGRE_PLATFORM == OGRE_PLATFORM_LINUX
+        return VK_KHR_XLIB_SURFACE_EXTENSION_NAME;
+#endif
+    }
+
     void VulkanWindow::create(const String& name, unsigned int width, unsigned int height, bool fullScreen,
                               const NameValuePairList* miscParams)
     {
@@ -394,59 +396,32 @@ namespace Ogre
         mHeight = height;
         mFSAA = 1;
 
-        xcb_connection_t *mConnection;
-        xcb_screen_t *mScreen;
-        xcb_window_t mXcbWindow;
+        size_t windowHandle = 0;
 
         if( miscParams )
         {
-            NameValuePairList::const_iterator opt;
             NameValuePairList::const_iterator end = miscParams->end();
 
-            opt = miscParams->find( "externalWindowHandle" );
-            OgreAssert( opt != end,  "externalWindowHandle required" );
-            {
-#if OGRE_PLATFORM == OGRE_PLATFORM_LINUX
-                Display *dpy = XOpenDisplay(NULL);
-                mConnection = XGetXCBConnection(dpy);
-                mXcbWindow = (xcb_window_t)StringConverter::parseSizeT( opt->second );
+            auto opt = miscParams->find( "externalWindowHandle" );
+            if( opt != end )
+                windowHandle = StringConverter::parseSizeT( opt->second );
 
-                XWindowAttributes windowAttrib;
-                XGetWindowAttributes( dpy, mXcbWindow, &windowAttrib );
-
-                int scr = DefaultScreen( dpy );
-
-                const xcb_setup_t *setup = xcb_get_setup( mConnection );
-                xcb_screen_iterator_t iter = xcb_setup_roots_iterator( setup );
-                while( scr-- > 0 )
-                    xcb_screen_next( &iter );
-
-                mScreen = iter.data;
-#endif
-            }
-
-            parseSharedParams( miscParams );
+            opt = miscParams->find( "vsync" );
+            if( opt != end )
+                mVSync = StringConverter::parseBool( opt->second );
+            opt = miscParams->find( "vsyncInterval" );
+            if( opt != end )
+                mVSyncInterval = StringConverter::parseUnsignedInt( opt->second );
+            opt = miscParams->find( "FSAA" );
+            if( opt != end )
+                mFSAA = StringConverter::parseUnsignedInt(opt->second);
+            opt = miscParams->find( "gamma" );
+            if( opt != end )
+                mHwGamma = StringConverter::parseBool( opt->second );
         }
 
-        PFN_vkGetPhysicalDeviceXcbPresentationSupportKHR get_xcb_presentation_support =
-            (PFN_vkGetPhysicalDeviceXcbPresentationSupportKHR)vkGetInstanceProcAddr(
-                mDevice->mInstance, "vkGetPhysicalDeviceXcbPresentationSupportKHR" );
-        PFN_vkCreateXcbSurfaceKHR create_xcb_surface = (PFN_vkCreateXcbSurfaceKHR)vkGetInstanceProcAddr(
-            mDevice->mInstance, "vkCreateXcbSurfaceKHR" );
-
-        if( !get_xcb_presentation_support( mDevice->mPhysicalDevice, mDevice->mGraphicsQueue.mFamilyIdx,
-                                           mConnection, mScreen->root_visual ) )
-        {
-            OGRE_EXCEPT( Exception::ERR_RENDERINGAPI_ERROR, "Vulkan not supported on given X11 window",
-                         "VulkanXcbWindow::_initialize" );
-        }
-
-        VkXcbSurfaceCreateInfoKHR xcbSurfCreateInfo;
-        memset( &xcbSurfCreateInfo, 0, sizeof( xcbSurfCreateInfo ) );
-        xcbSurfCreateInfo.sType = VK_STRUCTURE_TYPE_XCB_SURFACE_CREATE_INFO_KHR;
-        xcbSurfCreateInfo.connection = mConnection;
-        xcbSurfCreateInfo.window = mXcbWindow;
-        create_xcb_surface( mDevice->mInstance, &xcbSurfCreateInfo, 0, &mSurfaceKHR );
+        OgreAssert( windowHandle,  "externalWindowHandle required" );
+        createSurface(windowHandle);
 
         auto texMgr = TextureManager::getSingletonPtr();
         mTexture = new VulkanTextureGpuWindow("RenderWindow", TEX_TYPE_2D, texMgr, this);;
@@ -492,8 +467,6 @@ namespace Ogre
         return mRenderFinishedSemaphores[mCurrentSemaphoreIndex];
     }
 
-    //-------------------------------------------------------------------------
-    bool VulkanWindow::isClosed( void ) const { return mClosed; }
     //-------------------------------------------------------------------------
     void VulkanWindow::setVSync( bool vSync, uint32 vSyncInterval )
     {
