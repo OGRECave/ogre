@@ -619,7 +619,7 @@ namespace Ogre {
         }
     }
 
-    void GLSLShader::buildConstantDefinitions() const
+    void GLSLShader::buildConstantDefinitions()
     {
         createParameterMappingStructures(true);
         auto caps = Root::getSingleton().getRenderSystem()->getCapabilities();

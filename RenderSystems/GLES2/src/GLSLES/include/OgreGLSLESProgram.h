@@ -88,7 +88,7 @@ namespace Ogre {
         void unloadHighLevelImpl(void);
 
         /// Populate the passed parameters with name->index map, must be overridden
-        void buildConstantDefinitions() const;
+        void buildConstantDefinitions() override;
         /** check the compile result for an error with default precision - and recompile if needed.
             some glsl compilers return an error default precision is set to types other then
             int or float, this function test a failed compile result for the error,

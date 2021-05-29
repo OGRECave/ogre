@@ -1033,7 +1033,7 @@ namespace Ogre {
     }
 
     //-----------------------------------------------------------------------
-    void D3D11HLSLProgram::buildConstantDefinitions() const
+    void D3D11HLSLProgram::buildConstantDefinitions()
     {
         createParameterMappingStructures(true);
 
