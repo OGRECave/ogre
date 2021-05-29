@@ -281,8 +281,8 @@
 
 <!ELEMENT animation (keyframe+)>
 <!ATTLIST animation
-    name    PCDATA          #REQUIRED
-    length  PCDATA          #REQUIRED
+    name    CDATA          #REQUIRED
+    length  CDATA          #REQUIRED
     enable  (true | false)  "false"
     loop    (true | false)  "false"
     interpolationMode           (linear | spline)       "linear"
@@ -291,5 +291,5 @@
 
 <!ELEMENT keyframe (translation?, rotation?, scale?)>
 <!ATTLIST keyframe
-    time    PCDATA  #REQUIRED
+    time    CDATA  #REQUIRED
 >

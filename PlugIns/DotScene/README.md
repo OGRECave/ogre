@@ -11,7 +11,7 @@ DotScene file does not contain any mesh data, texture data, etc. It just contain
 
 A simple .scene file example:
 ```xml
-<scene formatVersion="">
+<scene formatVersion="1.1">
     <nodes>
         <node name="Robot" id="3">
             <position x="10.0" y="5" z="10.5" />
