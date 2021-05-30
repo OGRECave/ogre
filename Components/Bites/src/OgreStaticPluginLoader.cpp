@@ -47,6 +47,9 @@
 #ifdef OGRE_STATIC_CgProgramManager
 #  include "OgreCgPlugin.h"
 #endif
+#ifdef OGRE_BUILD_PLUGIN_GLSLANG
+#  include "OgreGLSLangProgramManager.h"
+#endif
 #ifdef OGRE_BUILD_PLUGIN_ASSIMP
 #  include "OgreAssimpLoader.h"
 #endif
@@ -161,6 +164,10 @@ void OgreBites::StaticPluginLoader::load()
 #endif
 #ifdef OGRE_BUILD_PLUGIN_ASSIMP
     plugin = OGRE_NEW AssimpPlugin();
+    mPlugins.push_back(plugin);
+#endif
+#ifdef OGRE_BUILD_PLUGIN_GLSLANG
+    plugin = OGRE_NEW GLSLangPlugin();
     mPlugins.push_back(plugin);
 #endif
 #endif
