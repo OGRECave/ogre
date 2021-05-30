@@ -258,7 +258,7 @@ namespace Ogre {
         mLogicalToPhysical.reset();
 
         GLSLLinkProgramManager::getSingleton().extractUniformsFromGLSL(
-            mSource, *mConstantDefs, mName);
+            mSource, *mConstantDefs, getResourceLogName());
 
         // Also parse any attached sources
         for (GLSLProgramContainer::const_iterator i = mAttachedGLSLPrograms.begin();

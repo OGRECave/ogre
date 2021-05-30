@@ -271,7 +271,7 @@ namespace Ogre {
         // Therefore instead, parse the source code manually and extract the uniforms
         createParameterMappingStructures(true);
         mLogicalToPhysical.reset();
-        GLSLESProgramManager::getSingleton().extractUniformsFromGLSL(mSource, *mConstantDefs, mName);
+        GLSLESProgramManager::getSingleton().extractUniformsFromGLSL(mSource, *mConstantDefs, getResourceLogName());
     }
 
     //-----------------------------------------------------------------------
