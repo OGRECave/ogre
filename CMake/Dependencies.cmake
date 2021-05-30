@@ -226,6 +226,10 @@ if (NOT (APPLE_IOS OR WINDOWS_STORE OR WINDOWS_PHONE OR ANDROID OR EMSCRIPTEN))
   macro_log_feature(Cg_FOUND "cg" "C for graphics shader language" "http://developer.nvidia.com/object/cg_toolkit.html" FALSE "" "")
 endif ()
 
+# Find glslang
+find_package(SPIRV-Tools) # glslangs own cmake is broken
+macro_log_feature(SPIRV-Tools_FOUND "glslang" "GLSL to SPIRV reference compiler" "https://github.com/KhronosGroup/glslang" FALSE "" "")
+
 # OpenEXR
 find_package(OpenEXR)
 macro_log_feature(OPENEXR_FOUND "OpenEXR" "Load High dynamic range images" "http://www.openexr.com/" FALSE "" "")

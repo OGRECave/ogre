@@ -55,3 +55,7 @@ endif ()
 if (OGRE_BUILD_PLUGIN_ASSIMP)
   add_subdirectory(Assimp)
 endif ()
+
+if (OGRE_BUILD_PLUGIN_GLSLANG)
+  add_subdirectory(GLSLang)
+endif()
