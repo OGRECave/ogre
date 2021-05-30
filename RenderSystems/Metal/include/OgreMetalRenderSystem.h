@@ -52,7 +52,6 @@ namespace Ogre
 
         bool mInitialized;
         HardwareBufferManager   *mHardwareBufferManager;
-        GpuProgramManager      *mShaderManager;
         MetalProgramFactory         *mMetalProgramFactory;
 
         bool mStencilEnabled;

@@ -77,7 +77,6 @@ namespace Ogre {
         bool mDepthWrite;
         bool mBlendAdd;
 
-        GpuProgramManager *mShaderManager;
         HardwareBufferManager* mHardwareBufferManager;
 
         /// Check if the GL system has already been initialised

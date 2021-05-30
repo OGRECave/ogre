@@ -7,6 +7,7 @@
 /* Includes the header in the wrapper code */
 #include "Ogre.h"
 #include "OgreDefaultDebugDrawer.h"
+#include "OgreUnifiedHighLevelGpuProgram.h"
 #include "OgreTerrainLayerBlendMap.h"
 #include "OgreTerrainMaterialGeneratorA.h"
 #include "OgreTerrain.h"

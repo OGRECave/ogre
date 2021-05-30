@@ -79,6 +79,19 @@ namespace Ogre {
         void setExternalMicrocode(ID3DXBuffer* pMicrocode);
         /** Gets the external microcode buffer, if any. */
         LPD3DXBUFFER getExternalMicrocode(void);
+
+        /// Gets the vertex shader
+        IDirect3DVertexShader9* getVertexShader(void);
+
+        /// Gets the pixel shader
+        IDirect3DPixelShader9* getPixelShader(void);
+
+        // Called immediately after the Direct3D device has been created.
+        virtual void notifyOnDeviceCreate(IDirect3DDevice9* d3d9Device);
+
+        // Called before the Direct3D device is going to be destroyed.
+        virtual void notifyOnDeviceDestroy(IDirect3DDevice9* d3d9Device);
+
     protected:
         /** @copydoc Resource::loadImpl */
         void loadImpl(void);
@@ -91,7 +104,7 @@ namespace Ogre {
         /** Loads this program from source to specified device */
         void loadFromSource(IDirect3DDevice9* d3d9Device);        
         /** Loads this program from microcode, must be overridden by subclasses. */
-        virtual void loadFromMicrocode(IDirect3DDevice9* d3d9Device, ID3DXBuffer* microcode) = 0;
+        void loadFromMicrocode(IDirect3DDevice9* d3d9Device, ID3DXBuffer* microcode);
 
 
         /** Creates a new parameters object compatible with this program definition. 
@@ -102,70 +115,19 @@ namespace Ogre {
             they are appropriate.
         */
         virtual GpuProgramParametersSharedPtr createParameters(void);
-    protected:    
+    protected:
         bool mColumnMajorMatrices;
         ID3DXBuffer* mExternalMicrocode;
+
+        typedef std::map<IDirect3DDevice9*, IUnknown*>   DeviceToShaderMap;
+        DeviceToShaderMap     mMapDeviceToShader;
 
         void getMicrocodeFromCache( IDirect3DDevice9* d3d9Device, uint32 id );
         void compileMicrocode( IDirect3DDevice9* d3d9Device );
     };
 
-    /** Direct3D implementation of low-level vertex programs. */
-    class _OgreD3D9Export D3D9GpuVertexProgram : public D3D9GpuProgram
-    {  
-    public:
-        D3D9GpuVertexProgram(ResourceManager* creator, const String& name, ResourceHandle handle,
-            const String& group, bool isManual, ManualResourceLoader* loader);
-        ~D3D9GpuVertexProgram();
-        
-        /// Gets the vertex shader
-        IDirect3DVertexShader9* getVertexShader(void);
-
-        // Called immediately after the Direct3D device has been created.
-        virtual void notifyOnDeviceCreate(IDirect3DDevice9* d3d9Device);
-
-        // Called before the Direct3D device is going to be destroyed.
-        virtual void notifyOnDeviceDestroy(IDirect3DDevice9* d3d9Device);
-
-    protected:
-        /** @copydoc Resource::unloadImpl */
-        void unloadImpl(void);
-        void loadFromMicrocode(IDirect3DDevice9* d3d9Device, ID3DXBuffer* microcode);
-
-    protected:
-        typedef std::map<IDirect3DDevice9*, IDirect3DVertexShader9*>   DeviceToVertexShaderMap;
-        typedef DeviceToVertexShaderMap::iterator                       DeviceToVertexShaderIterator;
-    
-        DeviceToVertexShaderMap     mMapDeviceToVertexShader;   
-    };
-
-    /** Direct3D implementation of low-level fragment programs. */
-    class _OgreD3D9Export D3D9GpuFragmentProgram : public D3D9GpuProgram
-    {  
-    public:
-        D3D9GpuFragmentProgram(ResourceManager* creator, const String& name, ResourceHandle handle,
-            const String& group, bool isManual, ManualResourceLoader* loader);
-        ~D3D9GpuFragmentProgram();
-        /// Gets the pixel shader
-        IDirect3DPixelShader9* getPixelShader(void);
-
-        // Called immediately after the Direct3D device has been created.
-        virtual void notifyOnDeviceCreate(IDirect3DDevice9* d3d9Device);
-
-        // Called before the Direct3D device is going to be destroyed.
-        virtual void notifyOnDeviceDestroy(IDirect3DDevice9* d3d9Device);
-
-    protected:
-        /** @copydoc Resource::unloadImpl */
-        void unloadImpl(void);
-        void loadFromMicrocode(IDirect3DDevice9* d3d9Device, ID3DXBuffer* microcode);
-
-    protected:
-        typedef std::map<IDirect3DDevice9*, IDirect3DPixelShader9*>    DeviceToPixelShaderMap;
-        typedef DeviceToPixelShaderMap::iterator                        DeviceToPixelShaderIterator;
-
-        DeviceToPixelShaderMap      mMapDeviceToPixelShader;            
-    };
+    typedef D3D9GpuProgram D3D9GpuFragmentProgram;
+    typedef D3D9GpuProgram D3D9GpuVertexProgram;
 }
 
 

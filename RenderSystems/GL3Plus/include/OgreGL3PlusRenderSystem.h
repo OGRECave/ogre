@@ -78,7 +78,6 @@ namespace Ogre {
         // statecaches are per context
         GL3PlusStateCacheManager* mStateCacheManager;
 
-        GpuProgramManager *mShaderManager;
         GLSLProgramManager* mProgramManager;
         HighLevelGpuProgramFactory* mGLSLShaderFactory;
         HighLevelGpuProgramFactory* mSPIRVShaderFactory;

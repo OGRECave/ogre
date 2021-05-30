@@ -678,12 +678,6 @@ namespace Ogre
         LogManager::getSingleton().logMessage("D3D11: Shutting down cleanly.");
         SAFE_DELETE( mTextureManager );
         SAFE_DELETE( mHardwareBufferManager );
-
-        if(mGpuProgramManager)
-        {
-            ResourceGroupManager::getSingleton()._unregisterResourceManager(mGpuProgramManager->getResourceType());
-            SAFE_DELETE( mGpuProgramManager );
-        }
     }
     //---------------------------------------------------------------------
 	RenderWindow* D3D11RenderSystem::_createRenderWindow(const String &name,
@@ -744,10 +738,6 @@ namespace Ogre
 			// Also create hardware buffer manager
 			mHardwareBufferManager = new D3D11HardwareBufferManager(mDevice);
 
-			// Create the GPU program manager
-	        mGpuProgramManager = new GpuProgramManager();
-	        ResourceGroupManager::getSingleton()._registerResourceManager(mGpuProgramManager->getResourceType(),
-	                                                                      mGpuProgramManager);
 			// create & register HLSL factory
 			if (mHLSLProgramFactory == NULL)
 				mHLSLProgramFactory = new D3D11HLSLProgramFactory(mDevice);
@@ -2731,7 +2721,6 @@ namespace Ogre
         mDriverList = NULL;
         mTextureManager = NULL;
         mHardwareBufferManager = NULL;
-        mGpuProgramManager = NULL;
         mPrimaryWindow = NULL;
         mMinRequestedFeatureLevel = D3D_FEATURE_LEVEL_9_1;
 #if __OGRE_WINRT_PHONE // Windows Phone support only FL 9.3, but simulator can create much more capable device, so restrict it artificially here

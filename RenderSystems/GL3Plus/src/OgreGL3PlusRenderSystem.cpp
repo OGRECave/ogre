@@ -135,7 +135,6 @@ namespace Ogre {
         : mDepthWrite(true),
           mStencilWriteMask(0xFFFFFFFF),
           mStateCacheManager(0),
-          mShaderManager(0),
           mProgramManager(0),
           mGLSLShaderFactory(0),
           mSPIRVShaderFactory(0),
@@ -503,9 +502,6 @@ namespace Ogre {
                         "GL3PlusRenderSystem::initialiseFromRenderSystemCapabilities");
         }
 
-        mShaderManager = new GpuProgramManager();
-        ResourceGroupManager::getSingleton()._registerResourceManager(mShaderManager->getResourceType(),
-                                                                      mShaderManager);
         mProgramManager = new GLSLProgramManager(this);
         // Create GLSL shader factory
         mGLSLShaderFactory = new GLSLShaderFactory();
@@ -556,13 +552,6 @@ namespace Ogre {
         mBackgroundContextList.clear();
 
         // Deleting the GPU program manager and hardware buffer manager.  Has to be done before the mGLSupport->stop().
-        if(mShaderManager)
-        {
-            ResourceGroupManager::getSingleton()._unregisterResourceManager(mShaderManager->getResourceType());
-            OGRE_DELETE mShaderManager;
-            mShaderManager = 0;
-        }
-
         delete mProgramManager;
         mProgramManager = NULL;
 

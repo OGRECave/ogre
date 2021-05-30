@@ -29,8 +29,8 @@ THE SOFTWARE.
 #define __UnifiedHighLevelGpuProgram_H__
 
 #include "OgrePrerequisites.h"
-#include "OgreHighLevelGpuProgram.h"
-#include "OgreHighLevelGpuProgramManager.h"
+#include "OgreGpuProgram.h"
+#include "OgreGpuProgramManager.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {
@@ -152,7 +152,7 @@ namespace Ogre {
     };
 
     /** Factory class for Unified programs. */
-    class _OgreExport UnifiedHighLevelGpuProgramFactory : public HighLevelGpuProgramFactory
+    class _OgreExport UnifiedHighLevelGpuProgramFactory : public GpuProgramFactory
     {
     public:
         UnifiedHighLevelGpuProgramFactory();

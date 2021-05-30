@@ -89,7 +89,6 @@ namespace Ogre
         void createDevice();
         
         D3D11HardwareBufferManager* mHardwareBufferManager;
-        GpuProgramManager* mGpuProgramManager;
         D3D11HLSLProgramFactory* mHLSLProgramFactory;
 
         size_t mLastVertexSourceCount;
