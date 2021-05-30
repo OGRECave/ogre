@@ -533,7 +533,7 @@ namespace Ogre {
                     OGRE_CHECK_GL_ERROR(glGetUniformiv(mGLProgramHandle, def.logicalIndex, val.data()));
                     if (val != std::vector<int>(use.currentSize))
                         LogManager::getSingleton().logWarning("Default value of uniform '" + name +
-                                                              "' is ignored in " + mName);
+                                                              "' is ignored in " + getResourceLogName());
                 }
             }
             else if(def.isSampler())
@@ -545,7 +545,7 @@ namespace Ogre {
             else
             {
                 LogManager::getSingleton().logError("Could not parse type of GLSL Uniform: '" + name +
-                                                    "' in file " + mName);
+                                                    "' in file " + getResourceLogName());
             }
             mConstantDefs->map.emplace(name, def);
         }
@@ -577,7 +577,8 @@ namespace Ogre {
                 int binding = int(mType);
                 if (binding > 1)
                     LogManager::getSingleton().logWarning(
-                        mName + " - using a UBO in this shader type will alias with shared_params");
+                        getResourceLogName() +
+                        " - using a UBO in this shader type will alias with shared_params");
 
                 mDefaultBuffer = hbm.createUniformBuffer(values[2]);
                 static_cast<GL3PlusHardwareBuffer*>(mDefaultBuffer.get())->setGLBufferBinding(binding);
@@ -637,7 +638,7 @@ namespace Ogre {
         // We need an accurate list of all the uniforms in the shader, but we
         // can't get at them until we link all the shaders into a program object.
         // Therefore instead parse the source code manually and extract the uniforms.
-        GLSLProgramManager::getSingleton().extractUniformsFromGLSL(mSource, *mConstantDefs, mName);
+        GLSLProgramManager::getSingleton().extractUniformsFromGLSL(mSource, *mConstantDefs, getResourceLogName());
 
 
         // Also parse any attached sources.
