@@ -25,8 +25,7 @@
 
 namespace Ogre {
     TinyRenderSystem::TinyRenderSystem()
-        : mShaderManager(0),
-          mHardwareBufferManager(0)
+        : mHardwareBufferManager(0)
     {
         LogManager::getSingleton().logMessage(getName() + " created.");
 
@@ -154,10 +153,6 @@ namespace Ogre {
                         "Trying to initialize TinyRenderSystem from RenderSystemCapabilities that do not support Tiny");
         }
 
-        mShaderManager = new GpuProgramManager();
-        ResourceGroupManager::getSingleton()._registerResourceManager(mShaderManager->getResourceType(),
-                                                                      mShaderManager);
-
         // Use VBO's by default
         mHardwareBufferManager = new DefaultHardwareBufferManager();
 
@@ -176,9 +171,6 @@ namespace Ogre {
 
         OGRE_DELETE mTextureManager;
         mTextureManager = 0;
-
-        OGRE_DELETE mShaderManager;
-        mShaderManager = 0;
 
         mGLInitialised = 0;
     }

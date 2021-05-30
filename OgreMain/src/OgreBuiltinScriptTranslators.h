@@ -95,7 +95,7 @@ namespace Ogre{
         GpuProgramTranslator();
         void translate(ScriptCompiler *compiler, const AbstractNodePtr &node);
     protected:
-        void translateGpuProgram(ScriptCompiler *compiler, ObjectAbstractNode *obj, const String& language);
+        void translateGpuProgram(ScriptCompiler *compiler, ObjectAbstractNode *obj, String language);
     public:
         static void translateProgramParameters(ScriptCompiler *compiler, GpuProgramParametersSharedPtr params, ObjectAbstractNode *obj);
     };

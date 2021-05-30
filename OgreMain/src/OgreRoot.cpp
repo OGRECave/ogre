@@ -56,7 +56,7 @@ THE SOFTWARE.
 #endif
 
 #include "OgreHardwareBufferManager.h"
-#include "OgreHighLevelGpuProgramManager.h"
+#include "OgreGpuProgramManager.h"
 #include "OgreExternalTextureSourceManager.h"
 #include "OgreCompositorManager.h"
 
@@ -199,7 +199,7 @@ namespace Ogre {
         ASTCCodec::startup();
 #endif
 
-        mHighLevelGpuProgramManager.reset(new HighLevelGpuProgramManager());
+        mGpuProgramManager.reset(new GpuProgramManager());
         mExternalTextureSourceManager.reset(new ExternalTextureSourceManager());
         mCompositorManager.reset(new CompositorManager());
         mCompilerManager.reset(new ScriptCompilerManager());
@@ -255,6 +255,7 @@ namespace Ogre {
 #endif
 		mCompositorManager.reset(); // needs rendersystem
         mParticleManager.reset(); // may use plugins
+        mGpuProgramManager.reset(); // may use plugins
         unloadPlugins();
 
         mAutoWindow = 0;

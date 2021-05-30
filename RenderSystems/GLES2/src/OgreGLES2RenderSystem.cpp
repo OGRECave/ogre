@@ -155,7 +155,6 @@ namespace Ogre {
 
     GLES2RenderSystem::GLES2RenderSystem()
         : mStateCacheManager(0),
-          mShaderManager(0),
           mProgramManager(0),
           mGLSLESProgramFactory(0),
 #if !OGRE_NO_GLES2_CG_SUPPORT
@@ -517,10 +516,6 @@ namespace Ogre {
         if(caps->getNumVertexAttributes() < 16)
             GLSLProgramCommon::useTightAttributeLayout();
 
-        mShaderManager = new GpuProgramManager();
-        ResourceGroupManager::getSingleton()._registerResourceManager(mShaderManager->getResourceType(),
-                                                                      mShaderManager);
-
         mProgramManager = new GLSLESProgramManager();
 
         mGLSLESProgramFactory = OGRE_NEW GLSLESProgramFactory();
@@ -574,13 +569,6 @@ namespace Ogre {
         mBackgroundContextList.clear();
 
         // Deleting the GPU program manager and hardware buffer manager.  Has to be done before the mGLSupport->stop().
-        if(mShaderManager)
-        {
-            ResourceGroupManager::getSingleton()._unregisterResourceManager(mShaderManager->getResourceType());
-            OGRE_DELETE mShaderManager;
-            mShaderManager = 0;
-        }
-
         delete mProgramManager;
         mProgramManager = NULL;
 

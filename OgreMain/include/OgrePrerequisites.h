@@ -109,7 +109,10 @@ namespace Ogre {
     class GpuProgramParameters;
     class GpuSharedParameters;
     class GpuProgram;
+    class GpuProgramFactory;
+    typedef GpuProgramFactory HighLevelGpuProgramFactory; //!< @deprecated
     class GpuProgramManager;
+    typedef GpuProgramManager HighLevelGpuProgramManager; //!< @deprecated
     class GpuProgramUsage;
     class HardwareBuffer;
     class HardwareIndexBuffer;
@@ -117,8 +120,6 @@ namespace Ogre {
     class HardwareVertexBuffer;
     class HardwarePixelBuffer;
     class HighLevelGpuProgram;
-    class HighLevelGpuProgramManager;
-    class HighLevelGpuProgramFactory;
     class IndexData;
     class InstanceBatch;
     class InstanceBatchHW;

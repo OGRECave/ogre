@@ -481,7 +481,7 @@ namespace Ogre {
 				// Create a low-level program, give it the same name as us
                 mAssemblerProgram =
 					GpuProgramManager::getSingleton().createProgramFromString(
-					mName,
+					mName+"/Delegate",
 					mGroup,
 					mProgramString,
 					mType,

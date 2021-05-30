@@ -721,6 +721,7 @@ namespace Ogre
 
         // Create the GPU program manager       
         mGpuProgramManager = OGRE_NEW D3D9GpuProgramManager();
+        GpuProgramManager::getSingleton().addFactory(mGpuProgramManager);
 
         // Create & register HLSL factory       
         mHLSLProgramFactory = OGRE_NEW D3D9HLSLProgramFactory();

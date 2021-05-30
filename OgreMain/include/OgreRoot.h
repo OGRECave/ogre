@@ -93,7 +93,7 @@ namespace Ogre
         std::unique_ptr<ResourceGroupManager> mResourceGroupManager;
         std::unique_ptr<ResourceBackgroundQueue> mResourceBackgroundQueue;
         std::unique_ptr<MaterialManager> mMaterialManager;
-        std::unique_ptr<HighLevelGpuProgramManager> mHighLevelGpuProgramManager;
+        std::unique_ptr<GpuProgramManager> mGpuProgramManager;
         std::unique_ptr<ControllerManager> mControllerManager;
         std::unique_ptr<MeshManager> mMeshManager;
         std::unique_ptr<SkeletonManager> mSkeletonManager;

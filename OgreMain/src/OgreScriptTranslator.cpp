@@ -3560,15 +3560,18 @@ namespace Ogre{
             }
 
             if (language == "asm")
+            {
+                compiler->addError(ScriptCompiler::CE_DEPRECATEDSYMBOL, obj->file, obj->line, "asm. Use syntax code.");
                 break; // always supported
-            if (HighLevelGpuProgramManager::getSingleton().isLanguageSupported(language))
+            }
+            if (GpuProgramManager::getSingleton().isLanguageSupported(language))
                 break;
         }
 
         translateGpuProgram(compiler, obj, language);
     }
     //-------------------------------------------------------------------------
-    void GpuProgramTranslator::translateGpuProgram(ScriptCompiler *compiler, ObjectAbstractNode *obj, const String& language)
+    void GpuProgramTranslator::translateGpuProgram(ScriptCompiler *compiler, ObjectAbstractNode *obj, String language)
     {
         String syntax;
         std::vector<String> delegates;
@@ -3648,16 +3651,14 @@ namespace Ogre{
         GpuProgramType gpt = translateIDToGpuProgramType(obj->id);
         GpuProgram *prog = 0;
 
-        bool isHighLevel = language != "asm";
+        if(language == "asm")
+            language = syntax;
         CreateGpuProgramScriptCompilerEvent evt(obj->file, obj->name, compiler->getResourceGroup(), source,
-                                                isHighLevel ? language : syntax, gpt);
+                                                language, gpt);
         bool processed = compiler->_fireEvent(&evt, &prog);
         if(!processed)
         {
-            if(isHighLevel)
-                prog = HighLevelGpuProgramManager::getSingleton().createProgram(obj->name, compiler->getResourceGroup(), language, gpt).get();
-            else
-                prog = GpuProgramManager::getSingleton().createProgram(obj->name, compiler->getResourceGroup(), source, gpt, syntax).get();
+            prog = GpuProgramManager::getSingleton().create(obj->name, compiler->getResourceGroup(), gpt, language).get();
 
             if(prog) // duplicate definition resolved by "use previous"
                 prog->setSourceFile(source);

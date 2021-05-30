@@ -35,12 +35,9 @@ using namespace Ogre;
 
 struct RTShaderSystem : public RootWithoutRenderSystemFixture
 {
-    std::unique_ptr<GpuProgramManager> gpuProgMgr;
-
     void SetUp()
     {
         RootWithoutRenderSystemFixture::SetUp();
-        gpuProgMgr.reset(new GpuProgramManager());
 
         RTShader::ShaderGenerator::initialize();
         RTShader::ShaderGenerator::getSingleton().setTargetLanguage("glsl");
@@ -48,7 +45,6 @@ struct RTShaderSystem : public RootWithoutRenderSystemFixture
     void TearDown()
     {
         RTShader::ShaderGenerator::destroy();
-        gpuProgMgr.reset();
         RootWithoutRenderSystemFixture::TearDown();
     }
 };

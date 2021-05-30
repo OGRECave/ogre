@@ -57,7 +57,6 @@ namespace Ogre
         RenderSystem(),
         mInitialized( false ),
         mHardwareBufferManager( 0 ),
-        mShaderManager( 0 ),
         mMetalProgramFactory( 0 ),
         mCurrentIndexBuffer( 0 ),
         mCurrentVertexBuffer( 0 ),
@@ -116,9 +115,6 @@ namespace Ogre
             OGRE_DELETE mMetalProgramFactory;
             mMetalProgramFactory = 0;
         }
-
-        OGRE_DELETE mShaderManager;
-        mShaderManager = 0;
 
         OGRE_DELETE mTextureManager;
         mTextureManager = 0;
@@ -1248,7 +1244,6 @@ namespace Ogre
     void MetalRenderSystem::initialiseFromRenderSystemCapabilities(RenderSystemCapabilities* caps, RenderTarget* primary)
     {
         //DepthBuffer::DefaultDepthBufferFormat = PF_D32_FLOAT_X24_S8_UINT;
-        mShaderManager = OGRE_NEW GpuProgramManager();
         mMetalProgramFactory = new MetalProgramFactory( &mDevice );
         HighLevelGpuProgramManager::getSingleton().addFactory( mMetalProgramFactory );
     }
