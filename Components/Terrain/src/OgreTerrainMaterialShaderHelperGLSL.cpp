@@ -390,7 +390,7 @@ namespace Ogre
 
         outStream <<
             "    vec3 lightDir = \n"
-            "        lightPosObjSpace.xyz - (oPosObj.xyz * lightPosObjSpace.w);\n"
+            "        -(lightPosObjSpace.xyz - (oPosObj.xyz * lightPosObjSpace.w));\n"
             "    vec3 eyeDir = eyePosObjSpace - oPosObj.xyz;\n"
 
             // set up accumulation areas

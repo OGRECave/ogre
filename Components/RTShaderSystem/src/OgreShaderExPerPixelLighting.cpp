@@ -137,7 +137,7 @@ bool PerPixelLighting::resolvePerLightParameters(ProgramSet* programSet)
         switch (mLightParamsList[i].mType)
         {
         case Light::LT_DIRECTIONAL:
-            mLightParamsList[i].mDirection = psProgram->resolveParameter(GpuProgramParameters::ACT_LIGHT_POSITION_VIEW_SPACE, i);
+            mLightParamsList[i].mDirection = psProgram->resolveParameter(GpuProgramParameters::ACT_LIGHT_DIRECTION_VIEW_SPACE, i);
             mLightParamsList[i].mPSInDirection = mLightParamsList[i].mDirection;
             needViewPos = mSpecularEnable || needViewPos;
             break;
@@ -151,7 +151,7 @@ bool PerPixelLighting::resolvePerLightParameters(ProgramSet* programSet)
 
         case Light::LT_SPOTLIGHT:
             mLightParamsList[i].mPosition = psProgram->resolveParameter(GpuProgramParameters::ACT_LIGHT_POSITION_VIEW_SPACE, i);
-            mLightParamsList[i].mDirection = psProgram->resolveParameter(GCT_FLOAT4, -1, (uint16)GPV_LIGHTS, "light_direction_view_space");
+            mLightParamsList[i].mDirection = psProgram->resolveParameter(GpuProgramParameters::ACT_LIGHT_DIRECTION_VIEW_SPACE, i);
             mLightParamsList[i].mPSInDirection = mLightParamsList[i].mDirection;
             mLightParamsList[i].mAttenuatParams = psProgram->resolveParameter(GpuProgramParameters::ACT_LIGHT_ATTENUATION, i);
             mLightParamsList[i].mSpotParams = psProgram->resolveParameter(GpuProgramParameters::ACT_SPOTLIGHT_PARAMS, i);
