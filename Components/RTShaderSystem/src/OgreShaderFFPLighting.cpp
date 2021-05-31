@@ -106,10 +106,7 @@ void FFPLighting::updateGpuProgramsParams(Renderable* rend, const Pass* pass, co
 			curParams.mPosition->updateExtraInfo(j);
             curParams.mAttenuatParams->updateExtraInfo(j);
             curParams.mSpotParams->updateExtraInfo(j);
-
-            Vector3 vec3;
-			vec3 = source->getInverseTransposeViewMatrix().linear() * source->getLightDirection(j);
-			curParams.mDirection->setGpuParameter(Vector4(-vec3.normalisedCopy(), 0));
+			curParams.mDirection->updateExtraInfo(j);
 		}
 			break;
 		}
@@ -177,7 +174,7 @@ bool FFPLighting::resolveParameters(ProgramSet* programSet)
 		switch (mLightParamsList[i].mType)
 		{
 		case Light::LT_DIRECTIONAL:
-			mLightParamsList[i].mDirection = vsProgram->resolveParameter(GpuProgramParameters::ACT_LIGHT_POSITION_VIEW_SPACE, i);
+			mLightParamsList[i].mDirection = vsProgram->resolveParameter(GpuProgramParameters::ACT_LIGHT_DIRECTION_VIEW_SPACE, i);
 			mLightParamsList[i].mPSInDirection = mLightParamsList[i].mDirection;
 			break;
 		
@@ -194,7 +191,7 @@ bool FFPLighting::resolveParameters(ProgramSet* programSet)
 			mLightParamsList[i].mPosition = vsProgram->resolveParameter(GpuProgramParameters::ACT_LIGHT_POSITION_VIEW_SPACE, i);
             mLightParamsList[i].mAttenuatParams = vsProgram->resolveParameter(GpuProgramParameters::ACT_LIGHT_ATTENUATION, i);
 
-			mLightParamsList[i].mDirection = vsProgram->resolveParameter(GCT_FLOAT4, -1, (uint16)GPV_LIGHTS, "light_direction_view_space");
+			mLightParamsList[i].mDirection = vsProgram->resolveParameter(GpuProgramParameters::ACT_LIGHT_DIRECTION_VIEW_SPACE, i);
 			mLightParamsList[i].mPSInDirection = mLightParamsList[i].mDirection;
 
 			mLightParamsList[i].mSpotParams = vsProgram->resolveParameter(GpuProgramParameters::ACT_SPOTLIGHT_PARAMS, i);
