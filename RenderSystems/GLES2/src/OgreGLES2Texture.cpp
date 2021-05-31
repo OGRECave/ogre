@@ -187,9 +187,9 @@ namespace Ogre {
                 LogManager::getSingleton().logMessage("GLES2Texture::create - Mip: " + StringConverter::toString(mip) +
                                                       " Width: " + StringConverter::toString(width) +
                                                       " Height: " + StringConverter::toString(height) +
-                                                      " Internal Format: " + StringConverter::toString(internalformat, 0, ' ', std::ios::hex) +
-                                                      " Format: " + StringConverter::toString(format, 0, ' ', std::ios::hex)
-                                                      );
+                                                      " Internal Format: " + StringUtil::format("%x", internalformat) +
+                                                      " Format: " + StringUtil::format("%x", format)
+                                                       );
 #endif
                 size = static_cast<GLsizei>(PixelUtil::getMemorySize(width, height, depth, mFormat));
                 
@@ -249,7 +249,7 @@ namespace Ogre {
                                                       " ID: " + StringConverter::toString(mTextureID) +
                                                       " Width: " + StringConverter::toString(width) +
                                                       " Height: " + StringConverter::toString(height) +
-                                                      " Internal Format: " + StringConverter::toString(internalformat, 0, ' ', std::ios::hex));
+                                                      " Internal Format: " + StringUtil::format("%x", internalformat));
 #endif
             switch(mTextureType)
             {
