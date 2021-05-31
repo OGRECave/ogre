@@ -245,8 +245,8 @@ namespace Ogre {
         LogManager::getSingleton().logMessage("GLES2TextureBuffer::upload - ID: " + StringConverter::toString(mTextureID) +
                                               " Target: " + StringConverter::toString(mTarget) +
                                               " Format: " + PixelUtil::getFormatName(data.format) +
-                                              " Origin format: " + StringConverter::toString(GLES2PixelUtil::getGLOriginFormat(data.format), 0, ' ', std::ios::hex) +
-                                              " Data type: " + StringConverter::toString(GLES2PixelUtil::getGLOriginDataType(data.format), 0, ' ', std::ios::hex));
+                                              " Origin format: " + StringUtil::format("%x", GLES2PixelUtil::getGLOriginFormat(data.format)) +
+                                              " Data type: " + StringUtil::format("%x", GLES2PixelUtil::getGLOriginDataType(data.format)));
 #endif
 #endif
 
