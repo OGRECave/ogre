@@ -280,9 +280,9 @@ namespace Ogre {
                                                   " ID: " + StringConverter::toString(mTextureID) +
                                                   " Width: " + StringConverter::toString(width) +
                                                   " Height: " + StringConverter::toString(height) +
-                                                  " Internal Format: " + StringConverter::toString(internalformat, 0, ' ', std::ios::hex) +
-                                                  " Format: " + StringConverter::toString(format, 0, ' ', std::ios::hex) +
-                                                  " Datatype: " + StringConverter::toString(datatype, 0, ' ', std::ios::hex)
+                                                  " Internal Format: " + StringUtil::format("%x", internalformat) +
+                                                  " Format: " + StringUtil::format("%x", format) +
+                                                  " Datatype: " + StringUtil::format("%x", datatype)
                                                   );
 #endif
             // Normal formats
