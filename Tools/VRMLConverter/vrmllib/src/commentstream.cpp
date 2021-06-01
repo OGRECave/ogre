@@ -10,14 +10,14 @@ class commentstreambuf : public std::streambuf {
     const int m_end;
     bool m_comment;
 public:
-    commentstreambuf(std::streambuf *, char start, char end);
+    commentstreambuf(std::streambuf *, char start_sb, char end_sb);
 
     int underflow();
 };
 
-commentstreambuf::commentstreambuf(std::streambuf *sb, char start, char end)
-    :   m_sbuf(sb), m_start(static_cast<unsigned char>(start)),
-        m_end(static_cast<unsigned char>(end)), m_comment(false)
+commentstreambuf::commentstreambuf(std::streambuf *sb, char start_sb, char end_sb)
+    :   m_sbuf(sb), m_start(static_cast<unsigned char>(start_sb)),
+        m_end(static_cast<unsigned char>(end_sb)), m_comment(false)
 {
     setg(m_buf, m_buf, m_buf);
 }
@@ -43,8 +43,8 @@ int commentstreambuf::underflow()
     return *m_buf;
 }
 
-commentstream::commentstream(std::istream &s, char start, char end)
-    :   std::istream(new commentstreambuf(s.rdbuf(), start, end))
+commentstream::commentstream(std::istream &s, char start_sb, char end_sb)
+    :   std::istream(new commentstreambuf(s.rdbuf(), start_sb, end_sb))
 {
 }
 
