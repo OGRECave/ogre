@@ -37,6 +37,8 @@ THE SOFTWARE.
 #include "OgreResourceGroupManager.h"
 #include "OgreLogManager.h"
 #include "OgreSTBICodec.h"
+#include "OgreStreamSerialiser.h"
+#include "OgreDefaultHardwareBufferManager.h"
 
 using namespace Ogre;
 
@@ -104,10 +106,22 @@ TEST_F(TerrainTests, create)
     imp.minBatchSize = 33;
     imp.maxBatchSize = 65;
     ASSERT_TRUE(t->prepare(imp));
-    
-    // Note: Do not load as this would require GPU access!
-    //t->load();
+
+    {
+        DefaultHardwareBufferManager hbm;
+        StreamSerialiser ser(Root::createFileStream("TerrainTest.dat"));
+        t->save(ser);
+        OGRE_DELETE t;
+    }
+
+    // read-back from file
+    t = OGRE_NEW Terrain(mSceneMgr);
+    StreamSerialiser ser(Root::openFileStream("TerrainTest.dat"));
+    ASSERT_TRUE(t->prepare(ser));
+    ASSERT_EQ(t->getSize(), imp.terrainSize);
 
     OGRE_DELETE t;
+
+    FileSystemLayer::removeFile("TerrainTest.dat");
 }
 //--------------------------------------------------------------------------
