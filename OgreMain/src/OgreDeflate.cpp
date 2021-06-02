@@ -233,21 +233,19 @@ namespace Ogre
                         mZStream->next_in = mTmp;
                     }
                     
-                    if (mZStream->avail_in)
+                    if (mZStream->avail_in || mZStream->avail_out)
                     {
                         int availpre = mZStream->avail_out;
-                        int status = inflate(mZStream, Z_SYNC_FLUSH);
+                        mStatus = inflate(mZStream, Z_SYNC_FLUSH);
                         size_t readUncompressed = availpre - mZStream->avail_out;
                         newReadUncompressed += readUncompressed;
-                        if (status != Z_OK)
+                        if (mStatus != Z_OK)
                         {
                             // End of data, or error
-                            if (status != Z_STREAM_END)
+                            if (mStatus != Z_STREAM_END)
                             {
                                 mCompressedStream->seek(restorePoint);
-                                OGRE_EXCEPT(Exception::ERR_INVALID_STATE, 
-                                            "Error in compressed stream",
-                                            "DeflateStrea::read");
+                                OGRE_EXCEPT(Exception::ERR_INVALID_STATE, "Error in compressed stream");
                             }
                             else 
                             {
@@ -438,7 +436,7 @@ namespace Ogre
             if (mStreamType == Invalid)
                 return mCompressedStream->eof();
             else
-                return mCompressedStream->eof() && mZStream->avail_in == 0;
+                return mCompressedStream->eof() && mStatus == Z_STREAM_END;
         }
     }
     //---------------------------------------------------------------------

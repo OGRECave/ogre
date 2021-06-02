@@ -182,6 +182,7 @@ namespace Ogre
         DataStreamPtr mTmpWriteStream;
         String mTempFileName;
         z_stream* mZStream;
+        int mStatus;
         size_t mCurrentPos;
         size_t mAvailIn;
         
