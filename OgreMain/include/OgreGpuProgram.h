@@ -348,7 +348,7 @@ namespace Ogre {
         a high-level program which loads them, or a low-level program which has them
         specified manually.
     */
-    virtual const GpuNamedConstants& getConstantDefinitions() const { return *mConstantDefs.get(); }
+    virtual const GpuNamedConstants& getConstantDefinitions() { return *mConstantDefs.get(); }
 
     size_t calculateSize(void) const override;
 
