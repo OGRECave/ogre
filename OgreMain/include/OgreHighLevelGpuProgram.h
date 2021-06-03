@@ -125,7 +125,7 @@ namespace Ogre {
         @note
         Only available if this parameters object has named parameters.
         */
-        const GpuNamedConstants& getConstantDefinitions();
+        const GpuNamedConstants& getConstantDefinitions() override;
 
         virtual size_t calculateSize(void) const;
 
