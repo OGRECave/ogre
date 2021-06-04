@@ -58,6 +58,7 @@ macro(create_android_proj ANDROID_PROJECT_TARGET)
 
     SET(ANDROID_SDK_API_LEVEL "${ANDROID_NATIVE_API_LEVEL}")
     SET(ANDROID_TARGET "android-${ANDROID_SDK_API_LEVEL}")
+    SET(MINIZ_X86_OR_X64_CPU "0")
 
     file(MAKE_DIRECTORY "${NDKOUT}/app/src/main/assets")
     file(MAKE_DIRECTORY "${NDKOUT}/app/src/main/res")
