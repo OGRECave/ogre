@@ -349,14 +349,14 @@ void CompositorChain::preViewportUpdate(const RenderTargetViewportEvent& evt)
     // set original scene details from viewport
     CompositionPass* pass = mOriginalScene->getTechnique()->getOutputTargetPass()->getPasses()[0];
     CompositionTargetPass* passParent = pass->getParent();
-    if (pass->getClearBuffers() != mViewport->getClearBuffers() ||
+    if (pass->getClearBuffers() != mOldClearEveryFrameBuffers ||
         pass->getClearDepth() != mViewport->getDepthClear() ||
         passParent->getVisibilityMask() != mViewport->getVisibilityMask() ||
         passParent->getMaterialScheme() != mViewport->getMaterialScheme() ||
         passParent->getShadowsEnabled() != mViewport->getShadowsEnabled())
     {
         // recompile if viewport settings are different
-        pass->setClearBuffers(mViewport->getClearBuffers());
+        pass->setClearBuffers(mOldClearEveryFrameBuffers);
         pass->setClearDepth(mViewport->getDepthClear());
         passParent->setVisibilityMask(mViewport->getVisibilityMask());
         passParent->setMaterialScheme(mViewport->getMaterialScheme());
