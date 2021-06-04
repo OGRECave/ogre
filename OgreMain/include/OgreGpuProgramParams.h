@@ -1273,10 +1273,6 @@ namespace Ogre {
 
         GpuSharedParamUsageList mSharedParamSets;
 
-        // Optional data the rendersystem might want to store
-        mutable Any mRenderSystemData;
-
-
     public:
         GpuProgramParameters();
         ~GpuProgramParameters();
@@ -1847,11 +1843,6 @@ namespace Ogre {
          */
         void _updateSharedParams();
         /// @}
-
-        /** Internal method that the RenderSystem might use to store optional data. */
-        void _setRenderSystemData(const Any& data) const { mRenderSystemData = data; }
-        /** Internal method that the RenderSystem might use to store optional data. */
-        const Any& _getRenderSystemData() const { return mRenderSystemData; }
 
         size_t calculateSize(void) const;
     };
