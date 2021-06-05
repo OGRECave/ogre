@@ -227,7 +227,7 @@ if (NOT (APPLE_IOS OR WINDOWS_STORE OR WINDOWS_PHONE OR ANDROID OR EMSCRIPTEN))
 endif ()
 
 # Find glslang
-find_package(SPIRV-Tools) # glslangs own cmake is broken
+find_package(SPIRV-Tools QUIET) # glslangs own cmake is broken
 macro_log_feature(SPIRV-Tools_FOUND "glslang" "GLSL to SPIRV reference compiler" "https://github.com/KhronosGroup/glslang" FALSE "" "")
 
 # OpenEXR
