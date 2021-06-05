@@ -120,8 +120,8 @@ const TBuiltInResource DefaultTBuiltInResource = {
         /* .generalSamplerIndexing = */ 1,
         /* .generalVariableIndexing = */ 1,
         /* .generalConstantMatrixVectorIndexing = */ 1,
-    }};
-}
+    }
+};
 
 namespace Ogre
 {
