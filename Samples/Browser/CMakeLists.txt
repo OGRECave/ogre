@@ -193,9 +193,9 @@ if (APPLE)
 	# NOTE: $(CONFIGURATION) is not resolvable at CMake run time, it's only 
 	# valid at build time (hence parenthesis rather than braces)
 	
-    set(OGRE_OSX_BUILD_CONFIGURATION "$ENV{PLATFORM_NAME}/$ENV{CONFIGURATION}")
+    set(OGRE_OSX_BUILD_CONFIGURATION "${CMAKE_OSX_SYSROOT}/$(CONFIGURATION)")
 	set (OGRE_SAMPLE_CONTENTS_PATH 
-		${PROJECT_BINARY_DIR}/bin/$ENV{CONFIGURATION}/SampleBrowser.app/Contents)
+		${PROJECT_BINARY_DIR}/bin/$(CONFIGURATION)/SampleBrowser.app/Contents)
 	add_custom_command(TARGET SampleBrowser POST_BUILD
 		COMMAND mkdir ARGS -p ${OGRE_SAMPLE_CONTENTS_PATH}/Frameworks
 		COMMAND ln ARGS -s -f ${PROJECT_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}/Ogre.framework ${OGRE_SAMPLE_CONTENTS_PATH}/Frameworks/
