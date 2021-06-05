@@ -215,7 +215,7 @@ if (APPLE)
     set_target_properties(OgreMain PROPERTIES INSTALL_NAME_DIR "OGRE")
   else()
     if(OGRE_BUILD_LIBS_AS_FRAMEWORKS)
-      set(OGRE_OSX_BUILD_CONFIGURATION "$ENV{PLATFORM_NAME}/$ENV{CONFIGURATION}")
+      set(OGRE_OSX_BUILD_CONFIGURATION "${CMAKE_OSX_SYSROOT}/$(CONFIGURATION)")
       add_custom_command(TARGET OgreMain POST_BUILD
           COMMAND mkdir ARGS -p ${PROJECT_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}/Ogre.framework/Headers/Threading
           COMMAND ditto
