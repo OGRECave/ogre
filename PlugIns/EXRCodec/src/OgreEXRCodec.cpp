@@ -57,7 +57,7 @@ EXRCodec::~EXRCodec()
     LogManager::getSingleton().logMessage("EXRCodec deinitialised");
 }
 
-Codec::DecodeResult EXRCodec::decode(const DataStreamPtr& input) const
+ImageCodec::DecodeResult EXRCodec::decode(const DataStreamPtr& input) const
 {
     ImageData * imgData = new ImageData;
     MemoryDataStreamPtr output;

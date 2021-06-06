@@ -73,7 +73,7 @@ namespace Ogre {
         virtual ~ImageCodec();
         /** Codec return class for images. Has information about the size and the
             pixel format of the image. */
-        class _OgrePrivate ImageData : public Codec::CodecData
+        class _OgrePrivate ImageData
         {
         public:
             ImageData():
@@ -91,6 +91,20 @@ namespace Ogre {
 
             PixelFormat format;
         };
+        typedef SharedPtr<ImageData> CodecDataPtr;
+
+        /// @deprecated
+        OGRE_DEPRECATED virtual DataStreamPtr encode(const MemoryDataStreamPtr& input, const CodecDataPtr& pData) const { return encode(Any()); }
+        /// @deprecated
+        OGRE_DEPRECATED virtual void encodeToFile(const MemoryDataStreamPtr& input, const String& outFileName, const CodecDataPtr& pData) const
+        { encodeToFile(Any(), ""); }
+        /// Result of a decoding; both a decoded data stream and CodecData metadata
+        typedef std::pair<MemoryDataStreamPtr, CodecDataPtr> DecodeResult;
+        /// @deprecated
+        OGRE_DEPRECATED virtual DecodeResult decode(const DataStreamPtr& input) const
+        {
+            return DecodeResult();
+        }
     };
 
     /** @} */

@@ -37,7 +37,7 @@ namespace Ogre {
     void ImageCodec::decode(const DataStreamPtr& input, const Any& output) const
     {
         OGRE_IGNORE_DEPRECATED_BEGIN
-        Codec::DecodeResult res = decode(input);
+        DecodeResult res = decode(input);
         OGRE_IGNORE_DEPRECATED_END
 
         auto pData = static_cast<ImageCodec::ImageData*>(res.second.get());

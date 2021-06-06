@@ -129,7 +129,7 @@ namespace Ogre {
     {
     }
     //---------------------------------------------------------------------
-    Codec::DecodeResult ETCCodec::decode(const DataStreamPtr& stream) const
+    ImageCodec::DecodeResult ETCCodec::decode(const DataStreamPtr& stream) const
     {
         DecodeResult ret;
         if (decodeKTX(stream, ret))
