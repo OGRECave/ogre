@@ -105,7 +105,7 @@ namespace Ogre {
     }
     //---------------------------------------------------------------------
     DataStreamPtr STBIImageCodec::encode(const MemoryDataStreamPtr& input,
-                                         const Codec::CodecDataPtr& pData) const
+                                         const CodecDataPtr& pData) const
     {
         if(mType != "png") {
             OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED,
@@ -153,7 +153,7 @@ namespace Ogre {
     }
     //---------------------------------------------------------------------
     void STBIImageCodec::encodeToFile(const MemoryDataStreamPtr& input, const String& outFileName,
-                                      const Codec::CodecDataPtr& pData) const
+                                      const CodecDataPtr& pData) const
     {
 #if OGRE_PLATFORM != OGRE_PLATFORM_EMSCRIPTEN
         MemoryDataStreamPtr data = static_pointer_cast<MemoryDataStream>(encode(input, pData));
@@ -168,7 +168,7 @@ namespace Ogre {
 #endif
     }
     //---------------------------------------------------------------------
-    Codec::DecodeResult STBIImageCodec::decode(const DataStreamPtr& input) const
+    ImageCodec::DecodeResult STBIImageCodec::decode(const DataStreamPtr& input) const
     {
         String contents = input->getAsString();
 

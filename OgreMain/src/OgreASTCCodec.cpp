@@ -188,7 +188,7 @@ namespace Ogre {
     { 
     }
     //---------------------------------------------------------------------
-    Codec::DecodeResult ASTCCodec::decode(const DataStreamPtr& stream) const
+    ImageCodec::DecodeResult ASTCCodec::decode(const DataStreamPtr& stream) const
     {
         DecodeResult ret;
         ASTCHeader header;
