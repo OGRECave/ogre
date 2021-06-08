@@ -688,7 +688,7 @@ namespace Ogre {
                 return; // don't bother
         }
 
-        if (isPrepared())
+        if (isPrepared() || isLoaded())
         {
             // Load immediately
             SkeletonPtr skelPtr = static_pointer_cast<Skeleton>(

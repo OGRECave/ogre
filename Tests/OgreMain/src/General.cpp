@@ -44,6 +44,7 @@ THE SOFTWARE.
 #include "OgreMeshManager.h"
 #include "OgreMesh.h"
 #include "OgreSkeletonManager.h"
+#include "OgreSkeletonInstance.h"
 #include "OgreCompositorManager.h"
 #include "OgreTextureManager.h"
 #include "OgreFileSystem.h"
@@ -406,4 +407,14 @@ TEST_F(HighLevelGpuProgramTest, resolveIncludes)
                  "#line 2 \"foo.cg\"";
 
     ASSERT_EQ(res.substr(0, ref.size()), ref);
+}
+
+typedef RootWithoutRenderSystemFixture SkeletonTests;
+TEST_F(SkeletonTests, linkedSkeletonAnimationSource)
+{
+    auto sceneMgr = mRoot->createSceneManager();
+    auto entity = sceneMgr->createEntity("jaiqua.mesh");
+    entity->getSkeleton()->addLinkedSkeletonAnimationSource("ninja.skeleton");
+    entity->refreshAvailableAnimationState();
+    EXPECT_TRUE(entity->getAnimationState("Stealth")); // animation from ninja.sekeleton
 }
