@@ -275,7 +275,6 @@ namespace Ogre
                         case GCT_DOUBLE2:
                         case GCT_DOUBLE3:
                         case GCT_DOUBLE4:
-                        case GCT_SAMPLERRECT:
                         case GCT_MATRIX_DOUBLE_2X2:
                         case GCT_MATRIX_DOUBLE_2X3:
                         case GCT_MATRIX_DOUBLE_2X4:

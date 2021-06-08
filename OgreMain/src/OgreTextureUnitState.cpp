@@ -277,7 +277,7 @@ namespace Ogre {
         setContentType(CONTENT_NAMED);
         mTextureLoadFailed = false;
         
-        if (texPtr->getTextureType() == TEX_TYPE_EXTERNAL_OES || texPtr->getTextureType() == TEX_TYPE_2D_RECT)
+        if (texPtr->getTextureType() == TEX_TYPE_EXTERNAL_OES)
         {
             setTextureAddressingMode( TAM_CLAMP );
             setTextureFiltering(FT_MIP, FO_NONE);
