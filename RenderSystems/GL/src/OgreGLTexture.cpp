@@ -186,8 +186,6 @@ namespace Ogre {
                                 size, &tmpdata[0]);
                         }
                         break;
-                    case TEX_TYPE_2D_RECT:
-                        break;
                     case TEX_TYPE_EXTERNAL_OES:
                         OGRE_EXCEPT(
                             Exception::ERR_RENDERINGAPI_ERROR,
@@ -235,8 +233,6 @@ namespace Ogre {
                                 width, height, 0, 
                                 format, datatype, 0);
                         }
-                        break;
-                    case TEX_TYPE_2D_RECT:
                         break;
                     case TEX_TYPE_EXTERNAL_OES:
                         OGRE_EXCEPT(

@@ -184,7 +184,6 @@ namespace Ogre
             case GCT_SAMPLER2DARRAY:
             case GCT_SAMPLER3D:
             case GCT_SAMPLERCUBE:
-            case GCT_SAMPLERRECT:
                 // Samplers handled like 1-element ints
             case GCT_INT1:
                 OGRE_CHECK_GL_ERROR(glProgramUniform1iv(progID, def->logicalIndex, glArraySize,

@@ -272,7 +272,6 @@ namespace Ogre {
                     case GCT_SAMPLER2DARRAY:
                     case GCT_SAMPLER3D:
                     case GCT_SAMPLERCUBE:
-                    case GCT_SAMPLERRECT:
                         // Samplers handled like 1-element ints, but use register storage
                         OGRE_CHECK_GL_ERROR(glUniform1iv(currentUniform->mLocation, glArraySize,
                                     (GLint*)params->getRegPointer(def->physicalIndex)));

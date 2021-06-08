@@ -77,7 +77,6 @@ namespace Ogre
             case TEX_TYPE_1D:
                 return MTLTextureType1D;
             case TEX_TYPE_2D:
-            case TEX_TYPE_2D_RECT:
                 return MTLTextureType2D;
             case TEX_TYPE_CUBE_MAP:
                 return MTLTextureTypeCube;
