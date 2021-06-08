@@ -44,6 +44,7 @@ THE SOFTWARE.
 #include "OgreMeshManager.h"
 #include "OgreMesh.h"
 #include "OgreSkeletonManager.h"
+#include "OgreSkeletonInstance.h"
 #include "OgreCompositorManager.h"
 #include "OgreTextureManager.h"
 #include "OgreFileSystem.h"
@@ -424,4 +425,14 @@ TEST(Math, TriangleRayIntersection)
     EXPECT_FALSE(Math::intersects(ray, tri[0], tri[1], tri[2], true, false).first);
     EXPECT_TRUE(Math::intersects(ray, tri[0], tri[1], tri[2], false, true).first);
     EXPECT_FALSE(Math::intersects(ray, tri[0], tri[1], tri[2], false, false).first);
+}
+
+typedef RootWithoutRenderSystemFixture SkeletonTests;
+TEST_F(SkeletonTests, linkedSkeletonAnimationSource)
+{
+    auto sceneMgr = mRoot->createSceneManager();
+    auto entity = sceneMgr->createEntity("jaiqua.mesh");
+    entity->getSkeleton()->addLinkedSkeletonAnimationSource("ninja.skeleton");
+    entity->refreshAvailableAnimationState();
+    EXPECT_TRUE(entity->getAnimationState("Stealth")); // animation from ninja.sekeleton
 }
