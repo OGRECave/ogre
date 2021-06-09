@@ -115,26 +115,23 @@ namespace Ogre
                                                       uint32 width, uint32 height,
                                                       uint32 depth, PixelFormat format ) :
         HardwarePixelBuffer( width, height, depth, format,
-                             HardwareBuffer::HBU_STATIC_WRITE_ONLY, false, false ),
-        mDummyRenderTexture( 0 )
+                             HardwareBuffer::HBU_STATIC_WRITE_ONLY, false, false )
     {
         String name = "DepthTexture/" + StringConverter::toString((size_t)this) + "/" + baseName;
 
-        mDummyRenderTexture = OGRE_NEW MetalDepthTextureTarget( parentTexture, name, this, 0 );
-        // mDummyRenderTexture->setPreferDepthTexture( true );
-        // mDummyRenderTexture->setDesiredDepthBufferFormat( format );
+        mSliceTRT.push_back(OGRE_NEW MetalDepthTextureTarget( parentTexture, name, this, 0 ));
+        // mSliceTRT[0]->setPreferDepthTexture( true );
+        // mSliceTRT[0]->setDesiredDepthBufferFormat( format );
 
         RenderSystem *renderSystem = Root::getSingleton().getRenderSystem();
-        renderSystem->setDepthBufferFor( mDummyRenderTexture );
+        renderSystem->setDepthBufferFor( mSliceTRT[0] );
 
         //TODO: Should we do this?
-        Root::getSingleton().getRenderSystem()->attachRenderTarget( *mDummyRenderTexture );
+        Root::getSingleton().getRenderSystem()->attachRenderTarget( *mSliceTRT[0] );
     }
     //-----------------------------------------------------------------------------------
     MetalDepthPixelBuffer::~MetalDepthPixelBuffer()
     {
-        if( mDummyRenderTexture )
-            Root::getSingleton().getRenderSystem()->destroyRenderTarget( mDummyRenderTexture->getName() );
     }
     //-----------------------------------------------------------------------------------
     PixelBox MetalDepthPixelBuffer::lockImpl( const Box &lockBox, LockOptions options )
@@ -147,11 +144,6 @@ namespace Ogre
         OGRE_EXCEPT( Exception::ERR_NOT_IMPLEMENTED, "", "MetalDepthPixelBuffer::unlockImpl" );
     }
     //-----------------------------------------------------------------------------------
-    void MetalDepthPixelBuffer::_clearSliceRTT( size_t zoffset )
-    {
-        mDummyRenderTexture = 0;
-    }
-    //-----------------------------------------------------------------------------------
     void MetalDepthPixelBuffer::blitFromMemory( const PixelBox &src, const Box &dstBox )
     {
         OGRE_EXCEPT( Exception::ERR_NOT_IMPLEMENTED, "", "MetalDepthPixelBuffer::blitFromMemory" );
@@ -160,11 +152,6 @@ namespace Ogre
     void MetalDepthPixelBuffer::blitToMemory( const Box &srcBox, const PixelBox &dst )
     {
         OGRE_EXCEPT( Exception::ERR_NOT_IMPLEMENTED, "", "MetalDepthPixelBuffer::blitToMemory" );
-    }
-    //-----------------------------------------------------------------------------------
-    RenderTexture* MetalDepthPixelBuffer::getRenderTarget( size_t slice )
-    {
-        return mDummyRenderTexture;
     }
     //-----------------------------------------------------------------------------------
     //-----------------------------------------------------------------------------------

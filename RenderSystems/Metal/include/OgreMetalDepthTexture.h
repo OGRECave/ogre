@@ -74,9 +74,6 @@ namespace Ogre
         virtual PixelBox lockImpl( const Box &lockBox, LockOptions options );
         virtual void unlockImpl(void);
 
-        /// Notify HardwarePixelBuffer of destruction of render target.
-        virtual void _clearSliceRTT( size_t zoffset );
-
     public:
         MetalDepthPixelBuffer( MetalDepthTexture *parentTexture, const String &baseName,
                                  uint32 width, uint32 height, uint32 depth, PixelFormat format );
@@ -84,7 +81,6 @@ namespace Ogre
 
         virtual void blitFromMemory( const PixelBox &src, const Box &dstBox );
         virtual void blitToMemory( const Box &srcBox, const PixelBox &dst );
-        virtual RenderTexture* getRenderTarget( size_t slice=0 );
     };
 
     class _OgreMetalExport MetalDepthTextureTarget : public RenderTexture //MetalRenderTexture

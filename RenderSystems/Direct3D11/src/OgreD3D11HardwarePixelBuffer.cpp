@@ -86,15 +86,6 @@ namespace Ogre {
     }
     D3D11HardwarePixelBuffer::~D3D11HardwarePixelBuffer()
     {
-        if(!mSliceTRT.empty())
-        {   
-            // Delete all render targets that are not yet deleted via _clearSliceRTT
-            for(size_t zoffset=0; zoffset<mDepth; ++zoffset)
-            {
-                if(mSliceTRT[zoffset])
-                    Root::getSingleton().getRenderSystem()->destroyRenderTarget(mSliceTRT[zoffset]->getName());
-            }
-        }
     }
     //-----------------------------------------------------------------------------  
     void D3D11HardwarePixelBuffer::_map(ID3D11Resource *res, D3D11_MAP flags, PixelBox & box)
@@ -432,13 +423,6 @@ namespace Ogre {
             }   
         }
 
-    }
-    //-----------------------------------------------------------------------------    
-    RenderTexture *D3D11HardwarePixelBuffer::getRenderTarget(size_t zoffset)
-    {
-        assert(mUsage & TU_RENDERTARGET);
-        assert(zoffset < mDepth);
-        return mSliceTRT[zoffset];
     }
     //-----------------------------------------------------------------------------    
     D3D11Texture * D3D11HardwarePixelBuffer::getParentTexture() const

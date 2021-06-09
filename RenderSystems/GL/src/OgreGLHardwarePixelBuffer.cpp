@@ -121,7 +121,7 @@ GLTextureBuffer::GLTextureBuffer(GLRenderSystem* renderSystem, GLTexture* parent
                                  GLint level, uint32 width, uint32 height, uint32 depth)
     : GLHardwarePixelBuffer(width, height, depth, parent->getFormat(), (Usage)parent->getUsage()),
       mTarget(parent->getGLTextureTarget()), mFaceTarget(0), mTextureID(parent->getGLID()),
-      mLevel(level), mHwGamma(parent->isHardwareGammaEnabled()), mSliceTRT(0),
+      mLevel(level), mHwGamma(parent->isHardwareGammaEnabled()),
       mRenderSystem(renderSystem)
 {
     // Get face identifier
@@ -172,15 +172,6 @@ GLTextureBuffer::GLTextureBuffer(GLRenderSystem* renderSystem, GLTexture* parent
 }
 GLTextureBuffer::~GLTextureBuffer()
 {
-    if(mUsage & TU_RENDERTARGET)
-    {
-        // Delete all render targets that are not yet deleted via _clearSliceRTT because the rendertarget
-        // was deleted by the user.
-        for (SliceTRT::const_iterator it = mSliceTRT.begin(); it != mSliceTRT.end(); ++it)
-        {
-            Root::getSingleton().getRenderSystem()->destroyRenderTarget((*it)->getName());
-        }
-    }
 }
 //-----------------------------------------------------------------------------
 void GLTextureBuffer::upload(const PixelBox &data, const Box &dest)

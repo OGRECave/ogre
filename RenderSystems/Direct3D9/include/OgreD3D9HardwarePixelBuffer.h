@@ -65,9 +65,6 @@ namespace Ogre {
         /// Mipmapping
         bool mDoMipmapGen;
         bool mHWMipmaps;
-        
-        /// Render target
-        D3D9RenderTexture* mRenderTexture;
 
         // The owner texture if exists.
         D3D9Texture* mOwnerTexture;
@@ -135,9 +132,6 @@ namespace Ogre {
         
         /// Accessor for AA surface
         IDirect3DSurface9 *getFSAASurface(IDirect3DDevice9* d3d9Device);
-
-        /// Notify TextureBuffer of destruction of render target
-        virtual void _clearSliceRTT(size_t zoffset);
 
         /// Release surfaces held by this pixel buffer.
         void releaseSurfaces(IDirect3DDevice9* d3d9Device);

@@ -283,18 +283,6 @@ namespace Ogre {
 
     MetalTextureBuffer::~MetalTextureBuffer()
     {
-        if (mUsage & TU_RENDERTARGET)
-        {
-            // Delete all render targets that are not yet deleted via _clearSliceRTT because the rendertarget
-            // was deleted by the user.
-            for (SliceTRT::const_iterator it = mSliceTRT.begin(); it != mSliceTRT.end(); ++it)
-            {
-                if( *it )
-                    Root::getSingleton().getRenderSystem()->destroyRenderTarget((*it)->getName());
-            }
-
-            mSliceTRT.clear();
-        }
     }
 
     void MetalTextureBuffer::upload(const PixelBox &data, const Box &dest)
@@ -573,12 +561,5 @@ namespace Ogre {
 
         // Blit
         blitFromTexture(&tex, tempTarget, dstBox);
-    }
-
-    RenderTexture *MetalTextureBuffer::getRenderTarget(size_t zoffset)
-    {
-        assert(mUsage & TU_RENDERTARGET);
-        assert(zoffset < mDepth);
-        return mSliceTRT[zoffset];
     }
 }
