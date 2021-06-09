@@ -50,7 +50,7 @@ namespace Ogre {
                                                GLint face, GLint level, uint32 width, uint32 height,
                                                uint32 depth)
         : GL3PlusHardwarePixelBuffer(width, height, depth, parent->getFormat(), (Usage)parent->getUsage()),
-          mTarget(parent->getGL3PlusTextureTarget()), mTextureID(parent->getGLID()), mLevel(level), mSliceTRT(0)
+          mTarget(parent->getGL3PlusTextureTarget()), mTextureID(parent->getGLID()), mLevel(level)
     {
         // Get face identifier
         mFaceTarget = mTarget;
@@ -100,15 +100,6 @@ namespace Ogre {
 
     GL3PlusTextureBuffer::~GL3PlusTextureBuffer()
     {
-        if (mUsage & TU_RENDERTARGET)
-        {
-            // Delete all render targets that are not yet deleted via _clearSliceRTT because the rendertarget
-            // was deleted by the user.
-            for (SliceTRT::const_iterator it = mSliceTRT.begin(); it != mSliceTRT.end(); ++it)
-            {
-                Root::getSingleton().getRenderSystem()->destroyRenderTarget((*it)->getName());
-            }
-        }
     }
 
 
@@ -521,13 +512,4 @@ namespace Ogre {
         // Delete temp texture
         TextureManager::getSingleton().remove(tex);
     }
-
-
-    RenderTexture *GL3PlusTextureBuffer::getRenderTarget(size_t zoffset)
-    {
-        assert(mUsage & TU_RENDERTARGET);
-        assert(zoffset < mDepth);
-        return mSliceTRT[zoffset];
-    }
-
 }

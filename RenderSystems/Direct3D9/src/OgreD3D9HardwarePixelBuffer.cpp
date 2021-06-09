@@ -45,8 +45,7 @@ namespace Ogre {
 D3D9HardwarePixelBuffer::D3D9HardwarePixelBuffer(HardwareBuffer::Usage usage, 
                                                  D3D9Texture* ownerTexture):
     HardwarePixelBuffer(0, 0, 0, PF_UNKNOWN, usage, false, false),
-    mDoMipmapGen(false), mHWMipmaps(false), mOwnerTexture(ownerTexture), 
-    mRenderTexture(NULL)
+    mDoMipmapGen(false), mHWMipmaps(false), mOwnerTexture(ownerTexture)
 {   
 }
 D3D9HardwarePixelBuffer::~D3D9HardwarePixelBuffer()
@@ -947,11 +946,6 @@ void D3D9HardwarePixelBuffer::_setMipmapping(bool doMipmapGen,
     mDoMipmapGen = doMipmapGen;
     mHWMipmaps = HWMipmaps; 
 }
-//-----------------------------------------------------------------------------   
-void D3D9HardwarePixelBuffer::_clearSliceRTT(size_t zoffset)
-{
-    mRenderTexture = NULL;
-}
 
 //-----------------------------------------------------------------------------  
 void D3D9HardwarePixelBuffer::releaseSurfaces(IDirect3DDevice9* d3d9Device)
@@ -991,31 +985,24 @@ IDirect3DSurface9* D3D9HardwarePixelBuffer::getFSAASurface(IDirect3DDevice9* d3d
     return bufferResources->fSAASurface;
 }
 //-----------------------------------------------------------------------------    
-RenderTexture *D3D9HardwarePixelBuffer::getRenderTarget(size_t zoffset)
-{
-    assert(mUsage & TU_RENDERTARGET);
-    assert(mRenderTexture != NULL);   
-    return mRenderTexture;
-}
-//-----------------------------------------------------------------------------    
 void D3D9HardwarePixelBuffer::updateRenderTexture(bool writeGamma, uint fsaa, const String& srcName)
 {
-    if (mRenderTexture == NULL)
+    if (mSliceTRT.empty())
     {
         String name;
         name = "rtt/" +Ogre::StringConverter::toString((size_t)this) + "/" + srcName;
 
-        mRenderTexture = OGRE_NEW D3D9RenderTexture(name, this, writeGamma, fsaa);      
-        Root::getSingleton().getRenderSystem()->attachRenderTarget(*mRenderTexture);
+        mSliceTRT.push_back(OGRE_NEW D3D9RenderTexture(name, this, writeGamma, fsaa));
+        Root::getSingleton().getRenderSystem()->attachRenderTarget(*mSliceTRT[0]);
     }
 }
 //-----------------------------------------------------------------------------    
 void D3D9HardwarePixelBuffer::destroyRenderTexture()
 {
-    if (mRenderTexture != NULL)
+    if (!mSliceTRT.empty())
     {
-        Root::getSingleton().getRenderSystem()->destroyRenderTarget(mRenderTexture->getName());
-        mRenderTexture = NULL;
+        Root::getSingleton().getRenderSystem()->destroyRenderTarget(mSliceTRT[0]->getName());
+        mSliceTRT.clear();
     }
 }
 

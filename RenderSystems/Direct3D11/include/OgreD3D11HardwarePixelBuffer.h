@@ -52,10 +52,6 @@ namespace Ogre {
         const UINT mFace;
         const UINT mMipLevel;
 
-        /// Render targets
-        typedef std::vector<RenderTexture*> SliceTRT;
-        SliceTRT mSliceTRT;
-
         void createStagingBuffer();
         bool mUsingStagingBuffer;
         ComPtr<ID3D11Resource> mStagingBuffer;
@@ -83,18 +79,6 @@ namespace Ogre {
 
 
         ~D3D11HardwarePixelBuffer();
-
-        /// Get rendertarget for z slice
-        RenderTexture *getRenderTarget(size_t zoffset);
-
-        /// Notify TextureBuffer of destruction of render target
-        virtual void _clearSliceRTT(size_t zoffset)
-        {
-            if (mSliceTRT.size() > zoffset)
-            {
-                mSliceTRT[zoffset] = 0;
-            }
-        }
 
         D3D11Texture * getParentTexture() const;
 

@@ -28,6 +28,7 @@ THE SOFTWARE.
 #include "OgreStableHeaders.h"
 #include "OgreHardwarePixelBuffer.h"
 #include "OgreImage.h"
+#include "OgreRenderTexture.h"
 
 namespace Ogre 
 {
@@ -49,6 +50,16 @@ namespace Ogre
     //-----------------------------------------------------------------------------    
     HardwarePixelBuffer::~HardwarePixelBuffer()
     {
+        if (mUsage & TU_RENDERTARGET)
+        {
+            // Delete all render targets that are not yet deleted via _clearSliceRTT because the rendertarget
+            // was deleted by the user.
+            for (auto rt : mSliceTRT)
+            {
+                if (rt)
+                    Root::getSingleton().getRenderSystem()->destroyRenderTarget(rt->getName());
+            }
+        }
     }
     
     //-----------------------------------------------------------------------------    
@@ -167,16 +178,17 @@ namespace Ogre
     }
     //-----------------------------------------------------------------------------    
     
-    RenderTexture *HardwarePixelBuffer::getRenderTarget(size_t)
+    RenderTexture *HardwarePixelBuffer::getRenderTarget(size_t zoffset)
     {
-        OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED,
-                "Not yet implemented for this rendersystem.",
-                "HardwarePixelBuffer::getRenderTarget");
+        assert(mUsage & TU_RENDERTARGET);
+        return mSliceTRT.at(zoffset);
     }
     //-----------------------------------------------------------------------------    
 
     void HardwarePixelBuffer::_clearSliceRTT(size_t zoffset)
     {
+        if(zoffset < mSliceTRT.size())
+            mSliceTRT[zoffset] = NULL;
     }
 
 }

@@ -96,9 +96,6 @@ namespace Ogre {
 
         virtual void bindToFramebuffer(uint32 attachment, size_t zoffset);
 
-        /// @copydoc HardwarePixelBuffer::getRenderTarget
-        RenderTexture* getRenderTarget(size_t slice);
-
         /// Upload a box of pixels to this buffer on the card
         virtual void upload(const PixelBox &data, const Box &dest);
 
@@ -110,12 +107,6 @@ namespace Ogre {
 
         /// Lock a box
 //            PixelBox lockImpl(const Box &lockBox, LockOptions options) { return PixelBox(); }
-
-        /// Notify TextureBuffer of destruction of render target
-        void _clearSliceRTT(size_t zoffset)
-        {
-            mSliceTRT[zoffset] = 0;
-        }
 
         // Copy from framebuffer
         void copyFromFramebuffer(size_t zoffset);
@@ -134,9 +125,6 @@ namespace Ogre {
         uint32 mBufferId;
         int mFace;
         int mLevel;
-
-        typedef std::vector<RenderTexture*> SliceTRT;
-        SliceTRT mSliceTRT;
     };
 }
 

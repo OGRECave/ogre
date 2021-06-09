@@ -45,8 +45,6 @@ namespace Ogre {
 
         virtual void bindToFramebuffer(uint32 attachment, uint32 zoffset);
 
-        RenderTexture* getRenderTarget(size_t);
-
         /// Upload a box of pixels to this buffer on the card.
         virtual void upload(const PixelBox &data, const Box &dest);
 
@@ -55,12 +53,6 @@ namespace Ogre {
 
         /// Hardware implementation of blitFromMemory.
         virtual void blitFromMemory(const PixelBox &src_orig, const Box &dstBox);
-
-        /// Notify TextureBuffer of destruction of render target.
-        void _clearSliceRTT(size_t zoffset)
-        {
-            mSliceTRT[zoffset] = 0;
-        }
 
         /// Copy from framebuffer.
         void copyFromFramebuffer(uint32 zoffset);
@@ -80,9 +72,6 @@ namespace Ogre {
         GLenum mFaceTarget;
         GLuint mTextureID;
         GLint mLevel;
-
-        typedef std::vector<RenderTexture*> SliceTRT;
-        SliceTRT mSliceTRT;
 
         void _bindToFramebuffer(GLenum attachment, uint32 zoffset, GLenum which);
     };

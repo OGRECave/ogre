@@ -64,6 +64,8 @@ namespace Ogre {
         /// The current locked box of this surface (entire surface coords)
         Box mLockedBox;
 
+        typedef std::vector<RenderTexture*> SliceTRT;
+        SliceTRT mSliceTRT;
         
         /// Internal implementation of lock(), must be overridden in subclasses
         virtual PixelBox lockImpl(const Box &lockBox,  LockOptions options) = 0;
@@ -75,7 +77,7 @@ namespace Ogre {
         /** Notify TextureBuffer of destruction of render target.
             Called by RenderTexture when destroyed.
         */
-        virtual void _clearSliceRTT(size_t zoffset);
+        void _clearSliceRTT(size_t zoffset);
         friend class RenderTexture;
     public:
         /// Should be called by HardwareBufferManager
@@ -171,13 +173,12 @@ namespace Ogre {
         void blitToMemory(const PixelBox& dst) { blitToMemory(Box(getSize()), dst); }
 
         /** Get a render target for this PixelBuffer, or a slice of it. The texture this
-            was acquired from must have TU_RENDERTARGET set, otherwise it is possible to
-            render to it and this method will throw an ERR_RENDERSYSTEM exception.
+            was acquired from must have TU_RENDERTARGET set
             @param slice    Which slice
             @return A pointer to the render target. This pointer has the lifespan of this
             PixelBuffer.
         */
-        virtual RenderTexture *getRenderTarget(size_t slice=0);
+        RenderTexture *getRenderTarget(size_t slice=0);
         
         /// Gets the width of this buffer
         uint32 getWidth() const { return mWidth; }

@@ -68,12 +68,7 @@ namespace Ogre {
   
         /// Hardware implementation of blitFromMemory
         virtual void blitFromMemory(const PixelBox &src_orig, const Box &dstBox);
-        
-        /// Notify TextureBuffer of destruction of render target
-        void _clearSliceRTT(size_t zoffset)
-        {
-            mSliceTRT[zoffset] = 0;
-        }
+
         /// Copy from framebuffer
         void copyFromFramebuffer(uint32 zoffset);
         /// @copydoc HardwarePixelBuffer::blit
@@ -87,9 +82,6 @@ namespace Ogre {
         GLuint mTextureID;
         GLint mLevel;
         bool mHwGamma;
-
-        typedef std::vector<RenderTexture*> SliceTRT;
-        SliceTRT mSliceTRT;
 
         GLRenderSystem* mRenderSystem;
     };
