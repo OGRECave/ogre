@@ -82,6 +82,15 @@ if(OGRE_BUILD_DEPENDENCIES AND NOT EXISTS ${OGREDEPS_PATH})
     execute_process(COMMAND ${CMAKE_COMMAND}
         --build ${PROJECT_BINARY_DIR}/pugixml-1.10 ${BUILD_COMMAND_OPTS})
 
+    
+    # download and extract irrxml so that we can build it later
+    message(STATUS "Building IrrXML")
+    # download
+    file(DOWNLOAD https://nchc.dl.sourceforge.net/project/irrlicht/irrXML%20SDK/1.2/irrxml-1.2.zip ${PROJECT_BINARY_DIR}/irrxml-1.2.zip)
+    # extract
+    execute_process(COMMAND ${CMAKE_COMMAND}
+    -E tar xf irrxml-1.2.zip WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
+    
     #find_package(Freetype)
     if (NOT FREETYPE_FOUND)
         message(STATUS "Building freetype")
