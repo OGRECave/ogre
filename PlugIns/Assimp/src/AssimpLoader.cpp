@@ -1267,7 +1267,7 @@ struct AssimpCodec : public Codec
         Assimp::Importer tmp;
         tmp.GetExtensionList(extensions);
 
-        String blacklist[] = {"mesh", "mesh.xml", "raw", "mdc"};
+        String blacklist[] = {"mesh", "mesh.xml", "raw", "mdc", "bsp"};
         auto stream = LogManager::getSingleton().stream();
         stream << "Supported formats:";
         // Register codecs
