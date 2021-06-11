@@ -54,7 +54,6 @@ namespace Ogre
         unsigned int getHeight() const { return mDisplayMode.Height; }
         D3DFORMAT getFormat() const { return mDisplayMode.Format; }
         unsigned int getRefreshRate() const { return mDisplayMode.RefreshRate; }
-        unsigned int getColourDepth() const;
         D3DDISPLAYMODE getDisplayMode() const { return mDisplayMode; }
         void increaseRefreshRate(unsigned int rr) { mDisplayMode.RefreshRate = rr; } 
         String getDescription() const;

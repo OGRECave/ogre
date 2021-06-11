@@ -95,11 +95,10 @@ namespace Ogre {
         virtual const String& getName(void) const;
 
         /// Retrieve information about the render target.
-        virtual void getMetrics(unsigned int& width, unsigned int& height, unsigned int& colourDepth);
+        void getMetrics(unsigned int& width, unsigned int& height);
 
         virtual uint32 getWidth(void) const;
         virtual uint32 getHeight(void) const;
-        virtual uint32 getColourDepth(void) const;
 
         /**
          * Sets the pool ID this RenderTarget should query from. Default value is POOL_DEFAULT.
@@ -447,7 +446,6 @@ namespace Ogre {
 
         uint32 mWidth;
         uint32 mHeight;
-        uint32 mColourDepth;
         uint16       mDepthBufferPoolId;
         DepthBuffer *mDepthBuffer;
 

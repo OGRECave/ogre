@@ -327,7 +327,6 @@ namespace Ogre {
         mName = [windowTitle cStringUsingEncoding:NSUTF8StringEncoding];
         mWidth = _getPixelFromPoint(widthPt);
         mHeight = _getPixelFromPoint(heightPt);
-        mColourDepth = colourDepth;
         mFSAA = fsaa_samples;
 
         if(!externalWindowHandle)

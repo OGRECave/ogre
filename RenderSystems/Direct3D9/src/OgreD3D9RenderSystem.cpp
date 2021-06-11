@@ -2284,7 +2284,7 @@ namespace Ogre
         if( enabled )
         {
             // If we have 16bit depth buffer enable w-buffering.
-            if((mActiveRenderTarget->getColourDepth() == 16) && mCurrentCapabilities->hasCapability(RSC_WBUFFER) )
+            if((mActiveRenderTarget->suggestPixelFormat() == PF_R5G6B5) && mCurrentCapabilities->hasCapability(RSC_WBUFFER) )
                 hr = __SetRenderState( D3DRS_ZENABLE, D3DZB_USEW );
             else
                 hr = __SetRenderState( D3DRS_ZENABLE, D3DZB_TRUE );

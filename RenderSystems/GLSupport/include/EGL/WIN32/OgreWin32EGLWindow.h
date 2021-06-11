@@ -36,6 +36,7 @@ THE SOFTWARE.
 namespace Ogre {
     class _OgrePrivate Win32EGLWindow : public EGLWindow
     {
+        uint32 mColourDepth;
     protected:
         void createNativeWindow( int &left, int &top, uint &width, uint &height, String &title );
         virtual void resize(unsigned int width, unsigned int height);

@@ -48,23 +48,6 @@ namespace Ogre
         return StringUtil::format("%d x %d @ %d-bit colour", mModeDesc.Width, mModeDesc.Height, colourDepth);
     }
     //---------------------------------------------------------------------
-    unsigned int D3D11VideoMode::getColourDepth() const
-    {
-        unsigned int colourDepth = 16;
-        if( mModeDesc.Format == DXGI_FORMAT_R32G32B32A32_TYPELESS ||
-            mModeDesc.Format == DXGI_FORMAT_R32G32B32A32_FLOAT ||
-            mModeDesc.Format == DXGI_FORMAT_R32G32B32A32_UINT ||
-            mModeDesc.Format == DXGI_FORMAT_R32G32B32A32_SINT ||
-            mModeDesc.Format == DXGI_FORMAT_R32G32B32_TYPELESS ||
-            mModeDesc.Format == DXGI_FORMAT_R32G32B32_FLOAT ||
-            mModeDesc.Format == DXGI_FORMAT_R32G32B32_UINT ||
-            mModeDesc.Format == DXGI_FORMAT_R32G32B32_SINT 
-            )
-            colourDepth = 32;
-
-        return colourDepth;
-    }
-    //---------------------------------------------------------------------
     unsigned int D3D11VideoMode::getWidth() const
     {
         return mModeDesc.Width;

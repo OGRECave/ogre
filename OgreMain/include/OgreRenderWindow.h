@@ -200,11 +200,7 @@ namespace Ogre
         /** Overloaded version of getMetrics from RenderTarget, including extra details
             specific to windowing systems. Result is in pixels.
         */
-        virtual void getMetrics(unsigned int& width, unsigned int& height, unsigned int& colourDepth, 
-            int& left, int& top) const;
-
-        /// @copydoc RenderTarget::getMetrics
-        using RenderTarget::getMetrics;
+        void getMetrics(unsigned int& width, unsigned int& height, int& left, int& top) const;
 
         /// Override since windows don't usually have alpha
         PixelFormat suggestPixelFormat() const { return PF_BYTE_RGB; }
