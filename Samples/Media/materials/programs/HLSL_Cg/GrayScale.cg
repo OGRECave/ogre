@@ -1,11 +1,12 @@
+uniform sampler2D RT : register(s0);
+
 float4 GrayScale_ps( float4 pos : POSITION,
                      float2 iTexCoord : TEXCOORD0) : COLOR
 {
-	return float4(0, 0, 1.0, 1.0);
+	return dot(tex2D(RT, iTexCoord).rgb, float3(0.3, 0.59, 0.11));
 }
 
 float4 Embossed_ps( float4 pos : POSITION,
-uniform sampler2D RT : register(s0),
                     float2 iTexCoord : TEXCOORD0) : COLOR
 {
     float4 Color;
