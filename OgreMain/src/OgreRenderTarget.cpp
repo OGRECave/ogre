@@ -85,11 +85,10 @@ namespace Ogre {
     }
 
 
-    void RenderTarget::getMetrics(unsigned int& width, unsigned int& height, unsigned int& colourDepth)
+    void RenderTarget::getMetrics(unsigned int& width, unsigned int& height)
     {
         width = mWidth;
         height = mHeight;
-        colourDepth = mColourDepth;
     }
 
     unsigned int RenderTarget::getWidth(void) const
@@ -99,10 +98,6 @@ namespace Ogre {
     unsigned int RenderTarget::getHeight(void) const
     {
         return mHeight;
-    }
-    unsigned int RenderTarget::getColourDepth(void) const
-    {
-        return mColourDepth;
     }
     //-----------------------------------------------------------------------
     void RenderTarget::setDepthBufferPool( uint16 poolId )

@@ -41,8 +41,6 @@ namespace Ogre
         mPriority = OGRE_REND_TO_TEX_RT_GROUP;
         mWidth = mBuffer->getWidth();
         mHeight = mBuffer->getHeight();
-        mColourDepth = static_cast<unsigned int>(
-            Ogre::PixelUtil::getNumElemBits(mBuffer->getFormat()));
 
         if(PixelUtil::isDepth(mBuffer->getFormat()))
             mDepthBufferPoolId = DepthBuffer::POOL_NO_DEPTH;

@@ -69,6 +69,7 @@ namespace Ogre
         
         /** Overridden - see RenderTarget.
         */
+        PixelFormat         suggestPixelFormat() const override;
         void                copyContentsToMemory    (const Box& src, const PixelBox &dst, FrameBuffer buffer);
         bool                requiresTextureFlipping () const { return false; }
 
@@ -142,6 +143,7 @@ namespace Ogre
         DWORD                       mFullscreenWinStyle;    // Fullscreen mode window style flags.       
         unsigned int                mDesiredWidth;          // Desired width after resizing
         unsigned int                mDesiredHeight;         // Desired height after resizing
+        uint32                      mColourDepth;
     };
 }
 #endif

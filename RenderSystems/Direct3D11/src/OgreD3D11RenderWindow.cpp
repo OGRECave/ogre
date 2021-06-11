@@ -126,8 +126,6 @@ namespace Ogre
 			rsys->addToSwitchingFullscreenCounter();
 		}
 
-        mColourDepth = colourDepth;
-
         mWidth = mHeight = mLeft = mTop = 0;
 
         mActive = true;
@@ -832,8 +830,7 @@ namespace Ogre
 
         LogManager::getSingleton().stream()
             << "D3D11: Created D3D11 Rendering Window '"
-            << mName << "' : " << mWidth << "x" << mHeight 
-            << ", " << mColourDepth << "bpp";
+            << mName << "' : " << mWidth << "x" << mHeight;
 
         _createSwapChain();
         _createSizeDependedD3DResources();
@@ -1275,7 +1272,7 @@ namespace Ogre
 
         LogManager::getSingleton().stream() << std::fixed << std::setprecision(1) 
             << "D3D11: Created D3D11 Rendering Window \"" << mName << "\", " << rc.Width << " x " << rc.Height
-            << ", with backing store " << mWidth << "x" << mHeight << ", " << mColourDepth << "bpp, "
+            << ", with backing store " << mWidth << "x" << mHeight << " "
             << "using content scaling factor " << scale;
 
         _createSwapChain();
@@ -1428,7 +1425,7 @@ namespace Ogre
 
         LogManager::getSingleton().stream() << std::fixed << std::setprecision(1) 
             << "D3D11: Created D3D11 SwapChainPanel Rendering Window \"" << mName << "\", " << sz.Width << " x " << sz.Height
-            << ", with backing store " << mWidth << "x" << mHeight << ", " << mColourDepth << "bpp, "
+            << ", with backing store " << mWidth << "x" << mHeight << " "
             << "using content scaling factor { " << mCompositionScale.Width << ", " << mCompositionScale.Height << " }";
 
         _createSwapChain();

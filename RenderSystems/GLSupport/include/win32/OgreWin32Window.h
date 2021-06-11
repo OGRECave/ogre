@@ -83,6 +83,7 @@ namespace Ogre {
         bool    mOwnsGLContext;
         bool    mSizing;
         int     mDisplayFrequency;      // fullscreen only, to restore display
+        uint32  mColourDepth;
         DWORD   mWindowedWinStyle;      // Windowed mode window style flags.
         DWORD   mFullscreenWinStyle;    // Fullscreen mode window style flags.
     };

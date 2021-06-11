@@ -297,14 +297,14 @@ static void GLXProc( Ogre::RenderWindow *win, const XEvent &event )
     }
     case ConfigureNotify:
     {
-        unsigned int oldWidth, oldHeight, oldDepth;
+        unsigned int oldWidth, oldHeight;
         int oldLeft, oldTop;
-        win->getMetrics(oldWidth, oldHeight, oldDepth, oldLeft, oldTop);
+        win->getMetrics(oldWidth, oldHeight, oldLeft, oldTop);
         win->resize(event.xconfigurerequest.width, event.xconfigurerequest.height);
 
-        unsigned int newWidth, newHeight, newDepth;
+        unsigned int newWidth, newHeight;
         int newLeft, newTop;
-        win->getMetrics(newWidth, newHeight, newDepth, newLeft, newTop);
+        win->getMetrics(newWidth, newHeight, newLeft, newTop);
 
         if (newLeft != oldLeft || newTop != oldTop)
         {
