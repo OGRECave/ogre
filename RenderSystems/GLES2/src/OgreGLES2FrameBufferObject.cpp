@@ -29,7 +29,7 @@ THE SOFTWARE.
 #include "OgreGLES2FrameBufferObject.h"
 #include "OgreGLES2HardwarePixelBuffer.h"
 #include "OgreGLES2FBORenderTexture.h"
-#include "OgreGLES2DepthBuffer.h"
+#include "OgreGLDepthBufferCommon.h"
 #include "OgreGLUtil.h"
 #include "OgreRoot.h"
 #include "OgreGLES2RenderSystem.h"
@@ -340,7 +340,7 @@ namespace Ogre {
     {
         bind(true); // recreate FBO if unusable with current context, bind it
 
-        GLES2DepthBuffer *glDepthBuffer = static_cast<GLES2DepthBuffer*>(depthBuffer);
+        auto glDepthBuffer = static_cast<GLDepthBufferCommon*>(depthBuffer);
 
         if( glDepthBuffer )
         {

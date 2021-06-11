@@ -43,7 +43,6 @@ namespace Ogre {
     class GLFBOManager;
     class GLHardwarePixelBuffer;
     class GLRenderBuffer;
-    class GLDepthBuffer;
 
     typedef shared_ptr<GLGpuProgram> GLGpuProgramPtr;
     typedef shared_ptr<GLTexture> GLTexturePtr;

@@ -33,7 +33,7 @@ THE SOFTWARE.
 #include "OgreRoot.h"
 #include "OgreGLHardwarePixelBuffer.h"
 #include "OgreGLFBORenderTexture.h"
-#include "OgreGLDepthBuffer.h"
+#include "OgreGLDepthBufferCommon.h"
 #include "OgreGLRenderSystemCommon.h"
 
 namespace Ogre {
@@ -245,7 +245,7 @@ namespace Ogre {
 
     void GLFrameBufferObject::attachDepthBuffer( DepthBuffer *depthBuffer )
     {
-        GLDepthBuffer *glDepthBuffer = static_cast<GLDepthBuffer*>(depthBuffer);
+        auto glDepthBuffer = static_cast<GLDepthBufferCommon*>(depthBuffer);
 
         glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, mMultisampleFB ? mMultisampleFB : mFB );
 

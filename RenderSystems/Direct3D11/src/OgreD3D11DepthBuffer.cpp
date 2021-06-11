@@ -37,16 +37,11 @@ namespace Ogre
                                         ID3D11DepthStencilView *depthBufferView,
                                         uint32 width, uint32 height,
                                         uint32 fsaa, uint32 multiSampleQuality, bool isManual ) :
-                DepthBuffer( poolId, 0, width, height, fsaa, "", isManual ),
+                DepthBuffer( poolId, width, height, fsaa, isManual ),
                 mDepthStencilView( depthBufferView ),
                 mMultiSampleQuality( multiSampleQuality),
                 mRenderSystem(renderSystem)
     {
-        D3D11_DEPTH_STENCIL_VIEW_DESC pDesc;
-        mDepthStencilView->GetDesc( &pDesc );
-        // Unknown PixelFormat at the moment
-        PixelFormat format = D3D11Mappings::_getPF(pDesc.Format);
-        mBitDepth = static_cast<uint16>(PixelUtil::getNumElemBytes(format) * 8);
     }
 
     D3D11DepthBuffer::~D3D11DepthBuffer()
