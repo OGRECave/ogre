@@ -28,7 +28,7 @@ THE SOFTWARE.
 #define NOMINMAX
 #include "OgreGLES2RenderSystem.h"
 #include "OgreGLES2TextureManager.h"
-#include "OgreGLES2DepthBuffer.h"
+#include "OgreGLDepthBufferCommon.h"
 #include "OgreGLES2HardwarePixelBuffer.h"
 #include "OgreGLES2HardwareBufferManager.h"
 #include "OgreGLES2HardwareBuffer.h"
@@ -638,12 +638,9 @@ namespace Ogre {
         if( win->getDepthBufferPool() != DepthBuffer::POOL_NO_DEPTH )
         {
             // Unlike D3D9, OGL doesn't allow sharing the main depth buffer, so keep them separate.
-            // Only Copy does, but Copy means only one depth buffer...
             GLContext *windowContext = dynamic_cast<GLRenderTarget*>(win)->getContext();
-            GLES2DepthBuffer *depthBuffer = OGRE_NEW GLES2DepthBuffer( DepthBuffer::POOL_DEFAULT, this,
-                                                            windowContext, 0, 0,
-                                                            win->getWidth(), win->getHeight(),
-                                                            win->getFSAA(), true );
+            auto depthBuffer =
+                new GLDepthBufferCommon(DepthBuffer::POOL_DEFAULT, this, windowContext, 0, 0, win, true);
 
             mDepthBufferPool[depthBuffer->getPoolId()].push_back( depthBuffer );
 
@@ -656,15 +653,11 @@ namespace Ogre {
     //---------------------------------------------------------------------
     DepthBuffer* GLES2RenderSystem::_createDepthBufferFor( RenderTarget *renderTarget )
     {
-        GLES2DepthBuffer *retVal = 0;
-
         if( auto fbo = dynamic_cast<GLRenderTarget*>(renderTarget)->getFBO() )
         {
-            // Presence of an FBO means the manager is an FBO Manager, that's why it's safe to downcast
             // Find best depth & stencil format suited for the RT's format
             GLuint depthFormat, stencilFormat;
-            static_cast<GLES2FBOManager*>(mRTTManager)->getBestDepthStencil( fbo->getFormat(),
-                                                                        &depthFormat, &stencilFormat );
+            mRTTManager->getBestDepthStencil(fbo->getFormat(), &depthFormat, &stencilFormat);
 
             GLES2RenderBuffer *depthBuffer = OGRE_NEW GLES2RenderBuffer( depthFormat, fbo->getWidth(),
                                                                 fbo->getHeight(), fbo->getFSAA() );
@@ -681,12 +674,11 @@ namespace Ogre {
                                                        fbo->getHeight(), fbo->getFSAA() );
             }
 
-            // No "custom-quality" multisample for now in GL
-            retVal = OGRE_NEW GLES2DepthBuffer( 0, this, mCurrentContext, depthBuffer, stencilBuffer,
-                                        fbo->getWidth(), fbo->getHeight(), fbo->getFSAA(), false );
+            return new GLDepthBufferCommon(0, this, mCurrentContext, depthBuffer, stencilBuffer,
+                                           renderTarget, false);
         }
 
-        return retVal;
+        return NULL;
     }
 
     MultiRenderTarget* GLES2RenderSystem::createMultiRenderTarget(const String & name)
@@ -728,7 +720,7 @@ namespace Ogre {
             {
                 // A DepthBuffer with no depth & stencil pointers is a dummy one,
                 // look for the one that matches the same GL context
-                GLES2DepthBuffer *depthBuffer = static_cast<GLES2DepthBuffer*>(*itor);
+                auto depthBuffer = static_cast<GLDepthBufferCommon*>(*itor);
                 GLContext *glContext = depthBuffer->getGLContext();
                 
                 if( glContext == windowContext &&
@@ -1647,7 +1639,7 @@ namespace Ogre {
             }
 
             // Check the FBO's depth buffer status
-            GLES2DepthBuffer *depthBuffer = static_cast<GLES2DepthBuffer*>(target->getDepthBuffer());
+            auto depthBuffer = static_cast<GLDepthBufferCommon*>(target->getDepthBuffer());
 
             if( target->getDepthBufferPool() != DepthBuffer::POOL_NO_DEPTH &&
                 (!depthBuffer || depthBuffer->getGLContext() != mCurrentContext ) )
@@ -1833,12 +1825,10 @@ namespace Ogre {
         static_cast<GLES2FBOManager*>(mRTTManager)->_reload();
         
         _destroyDepthBuffer(win);
-        
-        GLES2DepthBuffer *depthBuffer = OGRE_NEW GLES2DepthBuffer( DepthBuffer::POOL_DEFAULT, this,
-                                                                  mMainContext, 0, 0,
-                                                                  win->getWidth(), win->getHeight(),
-                                                                  win->getFSAA(), true );
-        
+
+        auto depthBuffer =
+            new GLDepthBufferCommon(DepthBuffer::POOL_DEFAULT, this, mMainContext, 0, 0, win, true);
+
         mDepthBufferPool[depthBuffer->getPoolId()].push_back( depthBuffer );
         win->attachDepthBuffer( depthBuffer );
         

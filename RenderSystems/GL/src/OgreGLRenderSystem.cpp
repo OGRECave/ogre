@@ -44,7 +44,7 @@ THE SOFTWARE.
 #include "OgreException.h"
 #include "OgreGLSLExtSupport.h"
 #include "OgreGLHardwareOcclusionQuery.h"
-#include "OgreGLDepthBuffer.h"
+#include "OgreGLDepthBufferCommon.h"
 #include "OgreGLHardwarePixelBuffer.h"
 #include "OgreGLContext.h"
 #include "OgreGLSLProgramFactory.h"
@@ -1055,10 +1055,8 @@ namespace Ogre {
             //Only Copy does, but Copy means only one depth buffer...
             GLContext *windowContext = dynamic_cast<GLRenderTarget*>(win)->getContext();;
 
-            GLDepthBuffer *depthBuffer = new GLDepthBuffer( DepthBuffer::POOL_DEFAULT, this,
-                                                            windowContext, 0, 0,
-                                                            win->getWidth(), win->getHeight(),
-                                                            win->getFSAA(), true );
+            auto depthBuffer =
+                new GLDepthBufferCommon(DepthBuffer::POOL_DEFAULT, this, windowContext, 0, 0, win, true);
 
             mDepthBufferPool[depthBuffer->getPoolId()].push_back( depthBuffer );
 
@@ -1070,15 +1068,11 @@ namespace Ogre {
     //---------------------------------------------------------------------
     DepthBuffer* GLRenderSystem::_createDepthBufferFor( RenderTarget *renderTarget )
     {
-        GLDepthBuffer *retVal = 0;
-
         if( auto fbo = dynamic_cast<GLRenderTarget*>(renderTarget)->getFBO() )
         {
-            //Presence of an FBO means the manager is an FBO Manager, that's why it's safe to downcast
             //Find best depth & stencil format suited for the RT's format
             GLuint depthFormat, stencilFormat;
-            static_cast<GLFBOManager*>(mRTTManager)->getBestDepthStencil( fbo->getFormat(),
-                                                                          &depthFormat, &stencilFormat );
+            mRTTManager->getBestDepthStencil(fbo->getFormat(), &depthFormat, &stencilFormat);
 
             GLRenderBuffer *depthBuffer = new GLRenderBuffer( depthFormat, fbo->getWidth(),
                                                               fbo->getHeight(), fbo->getFSAA() );
@@ -1095,19 +1089,11 @@ namespace Ogre {
                                                     fbo->getHeight(), fbo->getFSAA() );
             }
 
-            //No "custom-quality" multisample for now in GL
-            retVal = new GLDepthBuffer( 0, this, mCurrentContext, depthBuffer, stencilBuffer,
-                                        fbo->getWidth(), fbo->getHeight(), fbo->getFSAA(), false );
-        }
-        else
-        {
-            // Only FBO support different depth buffers, so everything
-            // else creates dummy (empty) containers
-            retVal = new GLDepthBuffer(0, this, mCurrentContext, NULL, NULL, renderTarget->getWidth(),
-                                       renderTarget->getHeight(), renderTarget->getFSAA(), false);
+            return new GLDepthBufferCommon(0, this, mCurrentContext, depthBuffer, stencilBuffer,
+                                           renderTarget, false);
         }
 
-        return retVal;
+        return NULL;
     }
 
     void GLRenderSystem::initialiseContext(RenderWindow* primary)
@@ -1179,7 +1165,7 @@ namespace Ogre {
             {
                 //A DepthBuffer with no depth & stencil pointers is a dummy one,
                 //look for the one that matches the same GL context
-                GLDepthBuffer *depthBuffer = static_cast<GLDepthBuffer*>(*itor);
+                auto depthBuffer = static_cast<GLDepthBufferCommon*>(*itor);
                 GLContext *glContext = depthBuffer->getGLContext();
 
                 if( glContext == windowContext &&
@@ -2899,7 +2885,7 @@ namespace Ogre {
             }
 
             //Check the FBO's depth buffer status
-            GLDepthBuffer *depthBuffer = static_cast<GLDepthBuffer*>(target->getDepthBuffer());
+            auto depthBuffer = static_cast<GLDepthBufferCommon*>(target->getDepthBuffer());
 
             if( target->getDepthBufferPool() != DepthBuffer::POOL_NO_DEPTH &&
                 (!depthBuffer || depthBuffer->getGLContext() != mCurrentContext ) )

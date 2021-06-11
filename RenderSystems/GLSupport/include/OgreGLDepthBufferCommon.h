@@ -27,7 +27,7 @@ namespace Ogre
     public:
         GLDepthBufferCommon(uint16 poolId, GLRenderSystemCommon* renderSystem, GLContext* creatorContext,
                             GLHardwarePixelBufferCommon* depth, GLHardwarePixelBufferCommon* stencil,
-                            uint32 width, uint32 height, uint32 fsaa, bool isManual);
+                            const RenderTarget* target, bool isManual);
 
         virtual ~GLDepthBufferCommon();
 

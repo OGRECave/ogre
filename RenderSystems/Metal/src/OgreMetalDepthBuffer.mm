@@ -41,7 +41,7 @@ namespace Ogre
                                         bool isDepthTexture, bool _isManual,
                                         id<MTLTexture> depthTexture, id<MTLTexture> stencilTexture,
                                         MetalDevice *device ) :
-        DepthBuffer( poolId, 0, width, height, fsaa, "",
+        DepthBuffer( poolId, width, height, fsaa,
                      _isManual ),
         mDepthAttachmentDesc( 0 ),
         mStencilAttachmentDesc( 0 ),

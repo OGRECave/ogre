@@ -41,7 +41,7 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #include "OgreException.h"
 #include "OgreGLSLExtSupport.h"
 #include "OgreGL3PlusHardwareOcclusionQuery.h"
-#include "OgreGL3PlusDepthBuffer.h"
+#include "OgreGLDepthBufferCommon.h"
 #include "OgreGL3PlusHardwarePixelBuffer.h"
 #include "OgreGLContext.h"
 #include "OgreGL3PlusFBORenderTexture.h"
@@ -631,12 +631,9 @@ namespace Ogre {
         if ( win->getDepthBufferPool() != DepthBuffer::POOL_NO_DEPTH )
         {
             // Unlike D3D9, OGL doesn't allow sharing the main depth buffer, so keep them separate.
-            // Only Copy does, but Copy means only one depth buffer...
             GL3PlusContext *windowContext = dynamic_cast<GLRenderTarget*>(win)->getContext();
-            GL3PlusDepthBuffer *depthBuffer = new GL3PlusDepthBuffer( DepthBuffer::POOL_DEFAULT, this,
-                                                                      windowContext, 0, 0,
-                                                                      win->getWidth(), win->getHeight(),
-                                                                      win->getFSAA(), true );
+            auto depthBuffer =
+                new GLDepthBufferCommon(DepthBuffer::POOL_DEFAULT, this, windowContext, 0, 0, win, true);
 
             mDepthBufferPool[depthBuffer->getPoolId()].push_back( depthBuffer );
 
@@ -649,11 +646,8 @@ namespace Ogre {
 
     DepthBuffer* GL3PlusRenderSystem::_createDepthBufferFor( RenderTarget *renderTarget )
     {
-        GL3PlusDepthBuffer *retVal = 0;
-
         if ( auto fbo = dynamic_cast<GLRenderTarget*>(renderTarget)->getFBO() )
         {
-            // Presence of an FBO means the manager is an FBO Manager, that's why it's safe to downcast.
             // Find best depth & stencil format suited for the RT's format.
             GLuint depthFormat, stencilFormat;
             _getDepthStencilFormatFor(fbo->getFormat(), &depthFormat, &stencilFormat);
@@ -673,12 +667,11 @@ namespace Ogre {
                                                          fbo->getHeight(), fbo->getFSAA() );
             }
 
-            // No "custom-quality" multisample for now in GL
-            retVal = new GL3PlusDepthBuffer( 0, this, mCurrentContext, depthBuffer, stencilBuffer,
-                                             fbo->getWidth(), fbo->getHeight(), fbo->getFSAA(), false );
+            return new GLDepthBufferCommon(0, this, mCurrentContext, depthBuffer, stencilBuffer,
+                                           renderTarget, false);
         }
 
-        return retVal;
+        return NULL;
     }
 
     MultiRenderTarget* GL3PlusRenderSystem::createMultiRenderTarget(const String & name)
@@ -714,7 +707,7 @@ namespace Ogre {
             {
                 // A DepthBuffer with no depth & stencil pointers is a dummy one,
                 // look for the one that matches the same GL context.
-                GL3PlusDepthBuffer *depthBuffer = static_cast<GL3PlusDepthBuffer*>(*itor);
+                auto depthBuffer = static_cast<GLDepthBufferCommon*>(*itor);
                 GL3PlusContext *glContext = depthBuffer->getGLContext();
 
                 if ( glContext == windowContext &&
@@ -1645,7 +1638,7 @@ namespace Ogre {
             }
 
             // Check the FBO's depth buffer status
-            GL3PlusDepthBuffer *depthBuffer = static_cast<GL3PlusDepthBuffer*>(target->getDepthBuffer());
+            auto depthBuffer = static_cast<GLDepthBufferCommon*>(target->getDepthBuffer());
 
             if ( target->getDepthBufferPool() != DepthBuffer::POOL_NO_DEPTH &&
                  (!depthBuffer || depthBuffer->getGLContext() != mCurrentContext ) )
