@@ -65,11 +65,6 @@ void help(void)
     cout << "-tm            = Split tangent vertices at UV mirror points" << endl;
     cout << "-tr            = Split tangent vertices where basis is rotated > 90 degrees" << endl;
     cout << "-r         = DON'T reorganise buffers to recommended format" << endl;
-    cout << "-d3d       = Convert to argb colour format" << endl;
-    cout << "-gl        = Convert to abgr colour format" << endl;
-    cout << "-byte      = Convert to byte colour format" << endl;
-    cout << "-srcd3d    = Interpret ambiguous colours as D3D style" << endl;
-    cout << "-srcgl     = Interpret ambiguous colours as GL style" << endl;
     cout << "-E endian  = Set endian mode 'big' 'little' or 'native' (default)" << endl;
     cout << "-b         = Recalculate bounding box (static meshes only)" << endl;
     cout << "-V version = Specify OGRE version format to write instead of latest" << endl;
@@ -91,10 +86,6 @@ struct UpgradeOptions {
     bool tangentSplitMirrored;
     bool tangentSplitRotated;
     bool dontReorganise;
-    bool destColourFormatSet;
-    VertexElementType destColourFormat;
-    bool srcColourFormatSet;
-    VertexElementType srcColourFormat;
     bool lodAutoconfigure;
     unsigned short numLods;
     Real lodDist;
@@ -134,8 +125,6 @@ void parseOpts(UnaryOptionList& unOpts, BinaryOptionList& binOpts)
     opts.tangentSplitRotated = false;
     opts.dontReorganise = false;
     opts.endian = Serializer::ENDIAN_NATIVE;
-    opts.destColourFormatSet = false;
-    opts.srcColourFormatSet = false;
 
     opts.lodAutoconfigure = false;
     opts.lodDist = 500;
@@ -155,26 +144,6 @@ void parseOpts(UnaryOptionList& unOpts, BinaryOptionList& binOpts)
     opts.dontReorganise = unOpts["-r"];
 
     // Unary options (true/false options that don't take a parameter)
-    if (unOpts["-d3d"]) {
-        opts.destColourFormatSet = true;
-        opts.destColourFormat = VET_COLOUR_ARGB;
-    }
-    if (unOpts["-gl"]) {
-        opts.destColourFormatSet = true;
-        opts.destColourFormat = VET_COLOUR_ABGR;
-    }
-    if (unOpts["-byte"]) {
-        opts.destColourFormatSet = true;
-        opts.destColourFormat = VET_UBYTE4_NORM;
-    }
-    if (unOpts["-srcd3d"]) {
-        opts.srcColourFormatSet = true;
-        opts.srcColourFormat = VET_COLOUR_ARGB;
-    }
-    if (unOpts["-srcgl"]) {
-        opts.srcColourFormatSet = true;
-        opts.srcColourFormat = VET_COLOUR_ABGR;
-    }
     if (unOpts["-b"]) {
         opts.recalcBounds = true;
     }
@@ -890,45 +859,16 @@ void resolveColourAmbiguities(Mesh* mesh)
         }
     }
 
-    String response;
+    if(!hasColour)
+        return;
 
-    // Ask what format we want to save in
-    VertexElementType desiredType = VET_FLOAT1;
-    if (hasColour) {
-        if (opts.destColourFormatSet) {
-            desiredType = opts.destColourFormat;
-        } else {
-            if (opts.interactive) {
-
-                response = "";
-                cout << "\nYour mesh has vertex colours, which can be stored in one of two layouts,\n"
-                     << "each of which will be slightly faster to load in a different render system.\n"
-                     << "Do you want to prefer Direct3D (d3d) or OpenGL (gl)?\n";
-                while (response.empty()) {
-                    cin >> response;
-                    StringUtil::toLowerCase(response);
-                    if (response == "d3d") {
-                        desiredType = VET_COLOUR_ARGB;
-                    } else if (response == "gl") {
-                        desiredType = VET_COLOUR_ABGR;
-                    } else {
-                        cout << "Wrong answer!\n";
-                        response = "";
-                    }
-                }
-            } else {
-                // 'do no harm'
-                return;
-            }
-        }
-    }
-
-    if (mesh->sharedVertexData && hasColour) {
+    VertexElementType desiredType = VET_UBYTE4_NORM;
+    if (mesh->sharedVertexData) {
         mesh->sharedVertexData->convertPackedColour(originalType, desiredType);
     }
     for (unsigned short i = 0; i < mesh->getNumSubMeshes(); ++i) {
         SubMesh* sm = mesh->getSubMesh(i);
-        if (sm->useSharedVertices == false && hasColour) {
+        if (!sm->useSharedVertices) {
             sm->vertexData->convertPackedColour(originalType, desiredType);
         }
     }
@@ -977,11 +917,7 @@ int main(int numargs, char** args)
         unOptList["-tm"] = false;
         unOptList["-tr"] = false;
         unOptList["-r"] = false;
-        unOptList["-gl"] = false;
-        unOptList["-d3d"] = false;
-        unOptList["-byte"] = false;
-        unOptList["-srcgl"] = false;
-        unOptList["-srcd3d"] = false;
+        unOptList["-byte"] = true; // this is the only option now, dont error if specified
         unOptList["-autogen"] = false;
         unOptList["-b"] = false;
         binOptList["-l"] = "";
