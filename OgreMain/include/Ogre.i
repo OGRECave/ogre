@@ -830,8 +830,6 @@ SHARED_PTR(Mesh);
 %include "OgreCompositorChain.h"
 %ignore Ogre::RenderQueueGroup::getIterator;
 %include "OgreRenderQueueSortingGrouping.h"
-%ignore Ogre::RenderQueueInvocationSequence::iterator;
-%include "OgreRenderQueueInvocation.h"
 %ignore Ogre::SceneManager::getCameraIterator; // deprecated
 %ignore Ogre::SceneManager::getAnimationIterator;
 %ignore Ogre::SceneManager::getAnimationStateIterator;

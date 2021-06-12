@@ -139,9 +139,6 @@ namespace Ogre
 
         uint32 mNextMovableObjectTypeFlag;
 
-        typedef std::map<String, RenderQueueInvocationSequence*> RenderQueueInvocationSequenceMap;
-        RenderQueueInvocationSequenceMap mRQSequenceMap;
-
         /// Are we initialised yet?
         bool mIsInitialised;
         ///Tells whether blend indices information needs to be passed to the GPU
@@ -797,33 +794,6 @@ namespace Ogre
         @return false if a FrameListener indicated it wishes to exit the render loop
         */
         bool _updateAllRenderTargets(FrameEvent& evt);
-
-        /** Create a new RenderQueueInvocationSequence, useful for linking to
-            Viewport instances to perform custom rendering.
-        @param name The name to give the new sequence
-        */
-        RenderQueueInvocationSequence* createRenderQueueInvocationSequence(
-            const String& name);
-
-        /** Get a RenderQueueInvocationSequence. 
-        @param name The name to identify the sequence
-        */
-        RenderQueueInvocationSequence* getRenderQueueInvocationSequence(
-            const String& name);
-
-        /** Destroy a RenderQueueInvocationSequence. 
-        @remarks
-            You must ensure that no Viewports are using this sequence.
-        @param name The name to identify the sequence
-        */
-        void destroyRenderQueueInvocationSequence(
-            const String& name);
-
-        /** Destroy all RenderQueueInvocationSequences. 
-        @remarks
-            You must ensure that no Viewports are using custom sequences.
-        */
-        void destroyAllRenderQueueInvocationSequences(void);
 
         /// @copydoc Singleton::getSingleton()
         static Root& getSingleton(void);

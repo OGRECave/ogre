@@ -417,7 +417,6 @@ namespace Ogre {
 
         /// Queue of objects for rendering
         std::unique_ptr<RenderQueue> mRenderQueue;
-        bool mLastRenderQueueInvocationCustom;
 
         /// The rendering system to send the scene to
         RenderSystem *mDestRenderSystem;
@@ -914,8 +913,6 @@ namespace Ogre {
 
         /** Internal method for rendering all objects using the default queue sequence. */
         void renderVisibleObjectsDefaultSequence(void);
-        /** Internal method for rendering all objects using a custom queue sequence. */
-        void renderVisibleObjectsCustomSequence(RenderQueueInvocationSequence* s);
         /** Internal method for preparing the render queue for use with each render. */
         void prepareRenderQueue(void);
 
@@ -1025,10 +1022,6 @@ namespace Ogre {
         /// Visibility mask used to show / hide objects
         uint32 mVisibilityMask;
         bool mFindVisibleObjects;
-        /// Suppress render state changes?
-        bool mSuppressRenderStateChanges;
-        /// Suppress shadows?
-        bool mSuppressShadows;
 
         /** Render a group in the ordinary way */
         void renderBasicQueueGroupObjects(RenderQueueGroup* pGroup,
@@ -2586,23 +2579,6 @@ namespace Ogre {
 
         /// @name Shadow Setup
         /// @{
-
-        /** Indicates to the SceneManager whether it should suppress the
-            active shadow rendering technique until told otherwise.
-        @remarks
-            This is a temporary alternative to setShadowTechnique to suppress
-            the rendering of shadows and forcing all processing down the
-            standard rendering path. This is intended for internal use only.
-        @param suppress If true, no shadow rendering will occur until this
-            method is called again with a parameter of false.
-        */
-        void _suppressShadows(bool suppress);
-
-        /** Are shadows suppressed?
-        @see _suppressShadows
-        */
-        bool _areShadowsSuppressed(void) const { return mSuppressShadows; }
-
         /** Sets the general shadow technique to be used in this scene.
         @remarks   
             There are multiple ways to generate shadows in a scene, and each has 
@@ -3352,38 +3328,9 @@ namespace Ogre {
         void _injectRenderWithPass(Pass *pass, Renderable *rend, bool shadowDerivation = true,
             bool doLightIteration = false, const LightList* manualLightList = 0);
 
-        /** Indicates to the SceneManager whether it should suppress changing
-            the RenderSystem states when rendering objects.
-        @remarks
-            This method allows you to tell the SceneManager not to change any
-            RenderSystem state until you tell it to. This method is only 
-            intended for advanced use, don't use it if you're unsure of the 
-            effect. The only RenderSystems calls made are to set the world 
-            matrix for each object (note - view an projection matrices are NOT
-            SET - they are under your control) and to render the object; it is up to 
-            the caller to do everything else, including enabling any vertex / 
-            fragment programs and updating their parameter state, and binding
-            parameters to the RenderSystem.
-        @note
-            Calling this implicitly disables shadow processing since no shadows
-            can be rendered without changing state.
-        @param suppress If true, no RenderSystem state changes will be issued
-            until this method is called again with a parameter of false.
-        */
-        void _suppressRenderStateChanges(bool suppress);
-        
-        /** Are render state changes suppressed? 
-        @see _suppressRenderStateChanges
-        */
-        bool _areRenderStateChangesSuppressed(void) const
-        { return mSuppressRenderStateChanges; }
-
         /** Internal method for setting up the renderstate for a rendering pass.
             @param pass The Pass details to set.
-            @param evenIfSuppressed Sets the pass details even if render state
-                changes are suppressed; if you are using this to manually set state
-                when render state changes are suppressed, you should set this to 
-                true.
+            @param evenIfSuppressed unused
             @param shadowDerivation If false, disables the derivation of shadow
                 passes from original passes
             @return
@@ -3402,8 +3349,7 @@ namespace Ogre {
         */
         void _markGpuParamsDirty(uint16 mask);
 
-        /** Render the objects in a given queue group 
-        @remarks You should only call this from a RenderQueueInvocation implementation
+        /** Render the objects in a given queue group
         */
         void _renderQueueGroupObjects(RenderQueueGroup* group,
             QueuedRenderableCollection::OrganisationMode om);
@@ -3413,7 +3359,7 @@ namespace Ogre {
         @remarks
             You can use this method to insert your own implementation of the 
             QueuedRenderableVisitor interface, which receives calls as the queued
-            renderables are parsed in a given order (determined by RenderQueueInvocationSequence)
+            renderables are parsed in a given order
             and are sent to the renderer. If you provide your own implementation of
             this visitor, you are responsible for either calling the rendersystem, 
             or passing the calls on to the base class implementation.

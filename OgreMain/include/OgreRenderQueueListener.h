@@ -70,7 +70,7 @@ namespace Ogre {
             This method is called by the SceneManager before each queue group is
             rendered. 
         @param queueGroupId The id of the queue group which is about to be rendered
-        @param invocation Name of the @ref RenderQueueInvocation which is causing this to be
+        @param invocation Name of the illumination stage which is causing this to be
             called
         @param skipThisInvocation A boolean passed by reference which is by default set to 
             false. If the event sets this to true, the queue will be skipped and not
@@ -86,7 +86,7 @@ namespace Ogre {
             This method is called by the SceneManager after each queue group is
             rendered. 
         @param queueGroupId The id of the queue group which has just been rendered
-        @param invocation Name of the @ref RenderQueueInvocation which is causing this to be
+        @param invocation Name of the illumination stage which is causing this to be
             called
         @param repeatThisInvocation A boolean passed by reference which is by default set to 
             false. If the event sets this to true, the queue which has just been

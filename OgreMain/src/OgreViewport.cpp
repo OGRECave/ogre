@@ -50,7 +50,6 @@ namespace Ogre {
         , mShowSkies(true)
         , mShowShadows(true)
         , mVisibilityMask(0xFFFFFFFF)
-        , mRQSequence(0)
         , mMaterialSchemeName(MaterialManager::DEFAULT_SCHEME_NAME)
         , mIsAutoUpdated(true)
 		, mColourBuffer(CBT_BACK)
@@ -417,30 +416,6 @@ namespace Ogre {
     bool Viewport::getShadowsEnabled(void) const
     {
         return mShowShadows;
-    }
-    //-----------------------------------------------------------------------
-    void Viewport::setRenderQueueInvocationSequenceName(const String& sequenceName)
-    {
-        mRQSequenceName = sequenceName;
-        if (mRQSequenceName.empty())
-        {
-            mRQSequence = 0;
-        }
-        else
-        {
-            mRQSequence =
-                Root::getSingleton().getRenderQueueInvocationSequence(mRQSequenceName);
-        }
-    }
-    //-----------------------------------------------------------------------
-    const String& Viewport::getRenderQueueInvocationSequenceName(void) const
-    {
-        return mRQSequenceName;
-    }
-    //-----------------------------------------------------------------------
-    RenderQueueInvocationSequence* Viewport::_getRenderQueueInvocationSequence(void)
-    {
-        return mRQSequence;
     }
     //-----------------------------------------------------------------------
     void Viewport::pointOrientedToScreen(const Vector2 &v, int orientationMode, Vector2 &outv)
