@@ -44,7 +44,6 @@ THE SOFTWARE.
 #include "OgreBillboardChain.h"
 #include "OgreRibbonTrail.h"
 #include "OgreLight.h"
-#include "OgreRenderQueueInvocation.h"
 #include "OgreConvexBody.h"
 #include "OgreTimer.h"
 #include "OgreFrameListener.h"
@@ -238,8 +237,6 @@ namespace Ogre {
     Root::~Root()
     {
         shutdown();
-
-        destroyAllRenderQueueInvocationSequences();
 
 #if OGRE_NO_DDS_CODEC == 0
         DDSCodec::shutdown();
@@ -1351,61 +1348,6 @@ namespace Ogre {
             mMovableObjectFactoryMap.end());
 
     }
-    //---------------------------------------------------------------------
-    RenderQueueInvocationSequence* Root::createRenderQueueInvocationSequence(
-        const String& name)
-    {
-        RenderQueueInvocationSequenceMap::iterator i =
-            mRQSequenceMap.find(name);
-        if (i != mRQSequenceMap.end())
-        {
-            OGRE_EXCEPT(Exception::ERR_DUPLICATE_ITEM,
-                "RenderQueueInvocationSequence with the name " + name +
-                    " already exists.",
-                "Root::createRenderQueueInvocationSequence");
-        }
-        RenderQueueInvocationSequence* ret = OGRE_NEW RenderQueueInvocationSequence(name);
-        mRQSequenceMap[name] = ret;
-        return ret;
-    }
-    //---------------------------------------------------------------------
-    RenderQueueInvocationSequence* Root::getRenderQueueInvocationSequence(
-        const String& name)
-    {
-        RenderQueueInvocationSequenceMap::iterator i =
-            mRQSequenceMap.find(name);
-        if (i == mRQSequenceMap.end())
-        {
-            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND,
-                "RenderQueueInvocationSequence with the name " + name +
-                " not found.",
-                "Root::getRenderQueueInvocationSequence");
-        }
-        return i->second;
-    }
-    //---------------------------------------------------------------------
-    void Root::destroyRenderQueueInvocationSequence(
-        const String& name)
-    {
-        RenderQueueInvocationSequenceMap::iterator i =
-            mRQSequenceMap.find(name);
-        if (i != mRQSequenceMap.end())
-        {
-            OGRE_DELETE i->second;
-            mRQSequenceMap.erase(i);
-        }
-    }
-    //---------------------------------------------------------------------
-    void Root::destroyAllRenderQueueInvocationSequences(void)
-    {
-        for (RenderQueueInvocationSequenceMap::iterator i = mRQSequenceMap.begin();
-            i != mRQSequenceMap.end(); ++i)
-        {
-            OGRE_DELETE i->second;
-        }
-        mRQSequenceMap.clear();
-    }
-
     //---------------------------------------------------------------------
     unsigned int Root::getDisplayMonitorCount() const
     {
