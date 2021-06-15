@@ -627,6 +627,10 @@ SHARED_PTR(UnifiedHighLevelGpuProgram);
         typedef pointer_category category;
         static const char* type_name() { return "Ogre::AnimationState"; }
     };
+    template<> struct traits<Ogre::Camera> {
+        typedef pointer_category category;
+        static const char* type_name() { return "Ogre::Camera"; }
+    };
     }
 %}
 #endif
@@ -841,6 +845,7 @@ SHARED_PTR(Mesh);
 %newobject Ogre::SceneManager::createRayQuery(const Ray&);
 %rename(SceneManager_Listener) Ogre::SceneManager::Listener;
 %template(MovableObjectMap) std::map<Ogre::String, Ogre::MovableObject*>;
+%template(CameraMap) std::map<Ogre::String, Ogre::Camera*>;
 %include "OgreSceneManager.h"
 %ignore Ogre::SceneManagerEnumerator::createSceneManager(SceneTypeMask);
 %ignore Ogre::SceneManagerEnumerator::createSceneManager(SceneTypeMask, const String&);
