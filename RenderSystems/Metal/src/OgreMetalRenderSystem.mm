@@ -185,7 +185,6 @@ namespace Ogre
         rsc->setCapability(RSC_TEXTURE_3D);
         // rsc->setCapability(RSC_TEXTURE_SIGNED_INT);
         rsc->setCapability(RSC_VERTEX_PROGRAM);
-        rsc->setCapability(RSC_FRAGMENT_PROGRAM);
         rsc->setCapability(RSC_VERTEX_BUFFER_INSTANCE_DATA);
         rsc->setCapability(RSC_MIPMAP_LOD_BIAS);
         rsc->setCapability(RSC_ALPHA_TO_COVERAGE);

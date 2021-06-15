@@ -369,7 +369,6 @@ namespace Ogre
         addCapabilitiesMapping("32bit_index", RSC_32BIT_INDEX);
         addCapabilitiesMapping("vertex_program", RSC_VERTEX_PROGRAM);
         addCapabilitiesMapping("geometry_program", RSC_GEOMETRY_PROGRAM);
-        addCapabilitiesMapping("fragment_program", RSC_FRAGMENT_PROGRAM);
         addCapabilitiesMapping("tessellation_hull_program", RSC_TESSELLATION_HULL_PROGRAM);
         addCapabilitiesMapping("tessellation_domain_program", RSC_TESSELLATION_DOMAIN_PROGRAM);
         addCapabilitiesMapping("compute_program", RSC_COMPUTE_PROGRAM);

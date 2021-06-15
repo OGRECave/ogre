@@ -1333,7 +1333,6 @@ namespace Ogre
                 rsc->addShaderProfile("ps_1_2");
 
             rsc->addShaderProfile("ps_1_1");
-            rsc->setCapability(RSC_FRAGMENT_PROGRAM);
         }
     }
     //-----------------------------------------------------------------------

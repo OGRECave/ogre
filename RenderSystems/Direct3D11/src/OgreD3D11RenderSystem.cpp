@@ -999,10 +999,6 @@ namespace Ogre
             rsc->addShaderProfile("ps_5_0");
         }
 
-
-        rsc->setCapability(RSC_FRAGMENT_PROGRAM);
-
-
         // TODO: constant buffers have no limits but lower models do
         // 16 boolean params allowed
         rsc->setFragmentProgramConstantBoolCount(16);
