@@ -27,7 +27,7 @@ else()
 	endif()
 endif()
 
-set(CMAKE_SWIG_FLAGS -w401,314 -package org.ogre)
+set(CMAKE_SWIG_FLAGS -w401,314 -package org.ogre -Dfinal)
 
 if (APPLE AND NOT ANDROID)
 	# we are using libc++ on OSX

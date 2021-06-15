@@ -14,7 +14,7 @@ if(SKBUILD)
     set(PYTHON_SITE_PACKAGES Ogre/)
 endif()
 
-set(CMAKE_SWIG_FLAGS -w401,314 -builtin)
+set(CMAKE_SWIG_FLAGS -w401,314 -builtin -Dfinal)
 
 if (APPLE AND NOT ANDROID)
     # we are using libc++ on OSX
