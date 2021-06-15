@@ -382,7 +382,6 @@ namespace Ogre {
 
         // Vertex/Fragment Programs
         rsc->setCapability(RSC_VERTEX_PROGRAM);
-        rsc->setCapability(RSC_FRAGMENT_PROGRAM);
 
         // Separate shader objects
         OGRE_IF_IOS_VERSION_IS_GREATER_THAN(5.0)

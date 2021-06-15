@@ -477,14 +477,12 @@ namespace Ogre {
         if (GLEW_NV_register_combiners2 &&
             GLEW_NV_texture_shader)
         {
-            rsc->setCapability(RSC_FRAGMENT_PROGRAM);
             rsc->addShaderProfile("fp20");
         }
 
         // NFZ - check for ATI fragment shader support
         if (GLEW_ATI_fragment_shader)
         {
-            rsc->setCapability(RSC_FRAGMENT_PROGRAM);
             // no boolean params allowed
             rsc->setFragmentProgramConstantBoolCount(0);
             // no integer params allowed
@@ -501,8 +499,6 @@ namespace Ogre {
 
         if (GLEW_ARB_fragment_program)
         {
-            rsc->setCapability(RSC_FRAGMENT_PROGRAM);
-
             // Fragment Program Properties
             rsc->setFragmentProgramConstantBoolCount(0);
             rsc->setFragmentProgramConstantIntCount(0);

@@ -301,7 +301,6 @@ TEST_F(RenderSystemCapabilitiesTests,WriteAllFalseCapabilities)
     EXPECT_TRUE(find(lines.begin(), lines.end(), "\thwstencil false") != lines.end());
 
     EXPECT_TRUE(find(lines.begin(), lines.end(), "\tvertex_program false") != lines.end());
-    EXPECT_TRUE(find(lines.begin(), lines.end(), "\tfragment_program false") != lines.end());
     EXPECT_TRUE(find(lines.begin(), lines.end(), "\ttwo_sided_stencil false") != lines.end());
     EXPECT_TRUE(find(lines.begin(), lines.end(), "\tstencil_wrap false") != lines.end());
 
