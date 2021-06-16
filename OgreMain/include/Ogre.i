@@ -387,7 +387,8 @@ CS_VECTOR_OPS(4);
     }
 }
 %typecheck(SWIG_TYPECHECK_POINTER) const TYPE& {
-    $1 = true; // actual check in the typemap
+    // actual check in the typemap, just skip strings here
+    $1 = PyUnicode_Check($input) == 0;
 }
 %enddef
 TYPEMAP_SEQUENCE_FOR(Ogre::Vector2, len == 2)
