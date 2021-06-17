@@ -105,7 +105,6 @@ namespace Ogre
         bool gamma = false;
         ::GLXContext glxContext = 0;
         ::GLXDrawable glxDrawable = 0;
-        Window externalWindow = 0;
         Window parentWindow = DefaultRootWindow(xDisplay);
         int left = DisplayWidth(xDisplay, DefaultScreen(xDisplay))/2 - width/2;
         int top  = DisplayHeight(xDisplay, DefaultScreen(xDisplay))/2 - height/2;
@@ -183,13 +182,14 @@ namespace Ogre
 			}
 #endif
 
-            if((opt = miscParams->find("parentWindowHandle")) != end)
+            if ((opt = miscParams->find("parentWindowHandle")) != end ||
+                (opt = miscParams->find("externalWindowHandle")) != end)
             {
                 std::vector<String> tokens = StringUtil::split(opt->second, " :");
 
-                if (tokens.size() == 3)
+                if (tokens.size() >= 3)
                 {
-                    // deprecated display:screen:xid format
+                    // deprecated display:screen:xid:visualinfo format
                     StringConverter::parse(tokens[2], parentWindow);
                 }
                 else
@@ -201,31 +201,6 @@ namespace Ogre
                 // reset drawable in case currentGLContext was used
                 // it should be queried from the parentWindow
                 glxDrawable = 0;
-            }
-            else if((opt = miscParams->find("externalWindowHandle")) != end)
-            {
-                std::vector<String> tokens = StringUtil::split(opt->second, " :");
-
-                LogManager::getSingleton().logMessage(
-                    "GLXWindow::create: The externalWindowHandle parameter is deprecated.\n"
-                    "Use the parentWindowHandle or currentGLContext parameter instead.");
-
-                if (tokens.size() == 3)
-                {
-                    // Old display:screen:xid format
-                    // The old GLX code always created a "parent" window in this case:
-                    StringConverter::parse(tokens[2], parentWindow);
-                }
-                else if (tokens.size() == 4)
-                {
-                    // Old display:screen:xid:visualinfo format
-                    StringConverter::parse(tokens[2], externalWindow);
-                }
-                else
-                {
-                    // xid format
-                    StringConverter::parse(tokens[0], externalWindow);
-                }
             }
 
             if ((opt = miscParams->find("border")) != end)
@@ -243,26 +218,11 @@ namespace Ogre
             if (! XGetWindowAttributes(xDisplay, parentWindow, &windowAttrib) ||
                 windowAttrib.root != DefaultRootWindow(xDisplay))
             {
-                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Invalid parentWindowHandle (wrong server or screen)", "GLXWindow::create");
+                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Invalid parentWindowHandle (wrong server or screen)");
             }
-        }
-
-        // Validate externalWindowHandle
-
-        if (externalWindow != 0)
-        {
-            XWindowAttributes windowAttrib;
-
-            if (! XGetWindowAttributes(xDisplay, externalWindow, &windowAttrib) ||
-                windowAttrib.root != DefaultRootWindow(xDisplay))
-            {
-                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Invalid externalWindowHandle (wrong server or screen)", "GLXWindow::create");
-            }
-            glxDrawable = externalWindow;
         }
 
         // Derive fbConfig
-
         ::GLXFBConfig fbConfig = 0;
 
         if (glxDrawable)

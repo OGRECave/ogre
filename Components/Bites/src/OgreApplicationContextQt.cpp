@@ -129,11 +129,7 @@ namespace OgreBites
         p.width = window->width();
         p.height= window->height();
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_LINUX
-        p.miscParams["parentWindowHandle"] = std::to_string(size_t(window->winId()));
-#else
         p.miscParams["externalWindowHandle"] = std::to_string(size_t(window->winId()));
-#endif
 
         if (!mWindows.empty())
         {
