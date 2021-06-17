@@ -37,10 +37,7 @@ public class Example : ApplicationContextBase
 
     public override NativeWindowPair createWindow(string title, uint w, uint h, NameValuePairList miscParams)
     {
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-            miscParams["parentWindowHandle"] = form.Handle.ToString();
-        else
-            miscParams["externalWindowHandle"] = form.Handle.ToString();
+        miscParams["externalWindowHandle"] = form.Handle.ToString();
 
         var ret = base.createWindow(title, w, h, miscParams);
 

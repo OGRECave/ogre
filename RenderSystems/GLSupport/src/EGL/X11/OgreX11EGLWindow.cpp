@@ -107,7 +107,6 @@ namespace Ogre {
 
     void X11EGLWindow::initNativeCreatedWindow(const NameValuePairList *miscParams)
     {
-        mExternalWindow = 0;
         mNativeDisplay = mGLSupport->getNativeDisplay();
         mParentWindow = DefaultRootWindow((Display*)mNativeDisplay);
 
@@ -116,13 +115,14 @@ namespace Ogre {
             NameValuePairList::const_iterator opt;
             NameValuePairList::const_iterator end = miscParams->end();
 
-            if ((opt = miscParams->find("parentWindowHandle")) != end)
+            if ((opt = miscParams->find("parentWindowHandle")) != end ||
+                (opt = miscParams->find("externalWindowHandle")) != end)
             {
                 StringVector tokens = StringUtil::split(opt->second, " :");
 
-                if (tokens.size() == 3)
+                if (tokens.size() >= 3)
                 {
-                    // deprecated display:screen:xid format
+                    // deprecated display:screen:xid:visualinfo format
                     mParentWindow = (Window)StringConverter::parseSizeT(tokens[2]);
                 }
                 else
@@ -131,32 +131,6 @@ namespace Ogre {
                     mParentWindow = (Window)StringConverter::parseSizeT(tokens[0]);
                 }
             }
-            else if ((opt = miscParams->find("externalWindowHandle")) != end)
-            {
-                //std::vector<String> tokens = StringUtil::split(opt->second, " :");
-                        StringVector tokens = StringUtil::split(opt->second, " :");
-
-                LogManager::getSingleton().logMessage(
-                    "EGLWindow::create: The externalWindowHandle parameter is deprecated.\n"
-                    "Use the parentWindowHandle or currentGLContext parameter instead.");
-                if (tokens.size() == 3)
-                {
-                    // Old display:screen:xid format
-                    // The old EGL code always created a "parent" window in this case:
-                    mParentWindow = (Window)StringConverter::parseSizeT(tokens[2]);
-                }
-                else if (tokens.size() == 4)
-                {
-                    // Old display:screen:xid:visualinfo format
-                    mExternalWindow = (Window)StringConverter::parseSizeT(tokens[2]);
-                }
-                else
-                {
-                    // xid format
-                    mExternalWindow = (Window)StringConverter::parseSizeT(tokens[0]);
-                }
-            }
-
         }
 
         // Ignore fatal XErrorEvents during parameter validation:
@@ -171,26 +145,8 @@ namespace Ogre {
                 windowAttrib.root != DefaultRootWindow((Display*)mNativeDisplay))
             {
                 OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-                    "Invalid parentWindowHandle (wrong server or screen)",
-                    "EGLWindow::create");
+                            "Invalid parentWindowHandle (wrong server or screen)");
             }
-        }
-
-        // Validate externalWindowHandle
-        if (mExternalWindow != 0)
-        {
-            XWindowAttributes windowAttrib;
-
-            if (!XGetWindowAttributes((Display*)mNativeDisplay, mExternalWindow, &windowAttrib) ||
-                windowAttrib.root != DefaultRootWindow((Display*)mNativeDisplay))
-            {
-                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-                    "Invalid externalWindowHandle (wrong server or screen)",
-                    "EGLWindow::create");
-            }
-
-            mEglConfig = 0;
-            mEglSurface = createSurfaceFromWindow(mEglDisplay, (NativeWindowType)mExternalWindow);
         }
 
         XSetErrorHandler(oldXErrorHandler);

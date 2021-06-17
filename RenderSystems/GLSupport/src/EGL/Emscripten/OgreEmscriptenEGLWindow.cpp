@@ -177,8 +177,9 @@ namespace Ogre {
             {
                 mCSAA = Ogre::StringConverter::parseInt(opt->second);
             }
-            
-            if((opt = miscParams->find("parentWindowHandle")) != end)
+
+            if ((opt = miscParams->find("externalWindowHandle")) != end ||
+                (opt = miscParams->find("parentWindowHandle")) != end)
             {
                 mCanvasSelector = opt->second;
             }
