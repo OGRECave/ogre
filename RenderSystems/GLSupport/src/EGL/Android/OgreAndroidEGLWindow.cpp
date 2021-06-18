@@ -222,10 +222,9 @@ namespace Ogre {
         eglQuerySurface(mEglDisplay, mEglSurface, EGL_HEIGHT, (EGLint*)&mHeight);
         EGL_CHECK_ERROR
 
-        mActive = true;
-        mVisible = true;
-        mClosed = false;
         mPreserveContext = preserveContextOpt;
+
+        finaliseWindow();
     }
 
     void AndroidEGLWindow::_notifySurfaceDestroyed()
