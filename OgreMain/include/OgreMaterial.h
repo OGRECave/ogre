@@ -109,7 +109,7 @@ namespace Ogre {
         /// Supported techniques of any sort
         Techniques mSupportedTechniques;
         typedef std::map<unsigned short, Technique*> LodTechniques;
-        typedef std::map<unsigned short, LodTechniques*> BestTechniquesBySchemeList;
+        typedef std::map<unsigned short, LodTechniques> BestTechniquesBySchemeList;
         /** Map of scheme -> list of LOD techniques. 
             Current scheme is set on MaterialManager,
             and can be set per Viewport for auto activation.
