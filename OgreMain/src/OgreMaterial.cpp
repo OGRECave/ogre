@@ -273,7 +273,7 @@ namespace Ogre {
             i = mBestTechniquesBySchemeList.begin();
         }
 
-        return static_cast<unsigned short>(i->second->size());
+        return static_cast<unsigned short>(i->second.size());
     }
     //-----------------------------------------------------------------------
     unsigned short Material::getNumLodLevels(const String& schemeName) const
@@ -287,22 +287,10 @@ namespace Ogre {
         mSupportedTechniques.push_back(t);
         // get scheme
         unsigned short schemeIndex = t->_getSchemeIndex();
-        BestTechniquesBySchemeList::iterator i =
-            mBestTechniquesBySchemeList.find(schemeIndex);
-        LodTechniques* lodtechs = 0;
-        if (i == mBestTechniquesBySchemeList.end())
-        {
-            lodtechs = OGRE_NEW_T(LodTechniques, MEMCATEGORY_RESOURCE);
-            mBestTechniquesBySchemeList[schemeIndex] = lodtechs;
-        }
-        else
-        {
-            lodtechs = i->second;
-        }
 
         // Insert won't replace if supported technique for this scheme/lod is
         // already there, which is what we want
-        lodtechs->emplace(t->getLodIndex(), t);
+        mBestTechniquesBySchemeList[schemeIndex].emplace(t->getLodIndex(), t);
 
     }
     //-----------------------------------------------------------------------------
@@ -334,13 +322,13 @@ namespace Ogre {
             }
 
             // get LOD
-            LodTechniques::iterator li = si->second->find(lodIndex);
+            LodTechniques::iterator li = si->second.find(lodIndex);
             // LOD not found? 
-            if (li == si->second->end())
+            if (li == si->second.end())
             {
                 // Use the next LOD level up
-                for (LodTechniques::reverse_iterator rli = si->second->rbegin(); 
-                    rli != si->second->rend(); ++rli)
+                for (LodTechniques::reverse_iterator rli = si->second.rbegin();
+                    rli != si->second.rend(); ++rli)
                 {
                     if (rli->second->getLodIndex() < lodIndex)
                     {
@@ -353,7 +341,7 @@ namespace Ogre {
                 {
                     // shouldn't ever hit this really, unless user defines no LOD 0
                     // pick the first LOD we have (must be at least one to have a scheme entry)
-                    ret = si->second->begin()->second;
+                    ret = si->second.begin()->second;
                 }
 
             }
@@ -460,11 +448,6 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void Material::clearBestTechniqueList(void)
     {
-        for (BestTechniquesBySchemeList::iterator i = mBestTechniquesBySchemeList.begin();
-            i != mBestTechniquesBySchemeList.end(); ++i)
-        {
-            OGRE_DELETE_T(i->second, LodTechniques, MEMCATEGORY_RESOURCE);
-        }
         mBestTechniquesBySchemeList.clear();
     }
     //-----------------------------------------------------------------------
