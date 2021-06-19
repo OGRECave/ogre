@@ -308,6 +308,7 @@ namespace Ogre {
     StaticGeometry::SubMeshLodGeometryLinkList*
     StaticGeometry::determineGeometry(SubMesh* sm)
     {
+        OgreAssert(sm->indexData->indexBuffer, "currently only works with indexed geometry");
         // First, determine if we've already seen this submesh before
         SubMeshGeometryLookup::iterator i =
             mSubMeshGeometryLookup.find(sm);
