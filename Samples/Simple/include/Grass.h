@@ -155,8 +155,10 @@ class _OgreSampleClassExport Sample_Grass : public SdkSample
 
      setupLighting();
 
-     mCameraMan->setStyle(CS_ORBIT);
+     mTrayMgr->createCheckBox(TL_TOPLEFT, "wind", "Wind")->setChecked(false, false);
      mTrayMgr->showCursor();
+
+     mCameraMan->setStyle(CS_ORBIT);
      mCameraMan->setYawPitchDist(Degree(0), Degree(25), 200);
  }
 
@@ -285,6 +287,22 @@ class _OgreSampleClassExport Sample_Grass : public SdkSample
              {
                  for (auto geom : mb.second->getGeometryList())
                      geom->setCustomParameter(999, offset);
+             }
+         }
+     }
+ }
+
+ void checkBoxToggled(CheckBox* box)
+ {
+     auto mat = MaterialManager::getSingleton().getByName(box->isChecked() ? "Examples/GrassBladesWaver"
+                                                                           : "Examples/GrassBlades");
+     for (const auto& reg : mField->getRegions())
+     {
+         for (auto lod : reg.second->getLODBuckets())
+         {
+             for (const auto& mb : lod->getMaterialBuckets())
+             {
+                 mb.second->setMaterial(mat);
              }
          }
      }

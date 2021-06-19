@@ -1308,6 +1308,13 @@ namespace Ogre {
         }
 
     }
+    void StaticGeometry::MaterialBucket::setMaterial(const MaterialPtr& material)
+    {
+        OgreAssert(material, "NULL pointer");
+        mMaterial = material;
+        mMaterial->load();
+        mMaterialName = material->getName();
+    }
     //--------------------------------------------------------------------------
     String StaticGeometry::MaterialBucket::getGeometryFormatString(
         SubMeshLodGeometryLink* geom)
