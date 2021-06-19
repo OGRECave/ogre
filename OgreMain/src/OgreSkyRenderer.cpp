@@ -132,7 +132,7 @@ void SceneManager::SkyPlaneRenderer::setSkyPlane(
         // Create node and attach
         if (!mSceneNode)
         {
-            mSceneNode = mSceneManager->createSceneNode(meshName + "Node");
+            mSceneNode = mSceneManager->createSceneNode();
             mSceneNode->setListener(this);
         }
         else
@@ -188,7 +188,7 @@ void SceneManager::SkyBoxRenderer::setSkyBox(
         // Create node
         if (!mSceneNode)
         {
-            mSceneNode = mSceneManager->createSceneNode("SkyBoxNode");
+            mSceneNode = mSceneManager->createSceneNode();
             mSceneNode->setListener(this);
         }
 
@@ -311,7 +311,7 @@ void SceneManager::SkyDomeRenderer::setSkyDome(
         // Create node
         if (!mSceneNode)
         {
-            mSceneNode = mSceneManager->createSceneNode("SkyDomeNode");
+            mSceneNode = mSceneManager->createSceneNode();
             mSceneNode->setListener(this);
         }
         else
