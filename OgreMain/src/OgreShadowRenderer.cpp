@@ -668,7 +668,7 @@ void SceneManager::ShadowRenderer::ensureShadowTexturesCreated()
             // in prepareShadowTextures to coexist with multiple SMs
             Camera* cam = mSceneManager->createCamera(camName);
             cam->setAspectRatio((Real)shadowTex->getWidth() / (Real)shadowTex->getHeight());
-            mSceneManager->getRootSceneNode()->createChildSceneNode(camName)->attachObject(cam);
+            mSceneManager->getRootSceneNode()->createChildSceneNode()->attachObject(cam);
             mShadowTextureCameras.push_back(cam);
 
             // Create a viewport, if not there already
