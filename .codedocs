@@ -695,6 +695,7 @@ INPUT                  = OgreMain/include \
                             Docs/src/tutorials/profiler.md \
                             Docs/src/tutorials/background-resource.md \
                             Docs/src/tutorials/reversed-depth.md \
+                            Docs/src/tutorials/static-geometry.md \
                             Docs/src/tutorials/setup.md \
                             Docs/src/tutorials/trays.md \
                             Docs/src/tutorials/tutorials.md \
