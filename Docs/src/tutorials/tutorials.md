@@ -13,6 +13,7 @@
     - @subpage meshlod-generator
 - In Depth
     - @subpage manual-mesh-creation
+    - @subpage tut_StaticGeom
     - @subpage profiler
     - @subpage reversed-depth
     - @subpage External-Texture-Sources

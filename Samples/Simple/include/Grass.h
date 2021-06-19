@@ -114,6 +114,7 @@ class _OgreSampleClassExport Sample_Grass : public SdkSample
      ground->setCastShadows(false);
      mSceneMgr->getRootSceneNode()->attachObject(ground);
 
+     //! [static_geom]
      // create our grass mesh, and create a grass entity from it
      createGrassMesh();
      Entity* grass = mSceneMgr->createEntity("Grass", "grass");
@@ -122,7 +123,9 @@ class _OgreSampleClassExport Sample_Grass : public SdkSample
      mField = mSceneMgr->createStaticGeometry("Field");
      mField->setRegionDimensions(Vector3(140, 140, 140));
      mField->setOrigin(Vector3(70, 70, 70));
+     //! [static_geom]
 
+     //! [grass_field]
      // add grass uniformly throughout the field, with some random variations
      for (int x = -280; x < 280; x += 20)
      {
@@ -137,6 +140,7 @@ class _OgreSampleClassExport Sample_Grass : public SdkSample
      }
 
      mField->build();  // build our static geometry (bake the grass into it)
+     //! [grass_field]
 
      // build tangent vectors for the ogre head mesh
      MeshPtr headMesh = MeshManager::getSingleton().load("ogrehead.mesh", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
@@ -161,16 +165,21 @@ class _OgreSampleClassExport Sample_Grass : public SdkSample
      const float width = 40;
      const float height = 40;
 
+     //! [mo]
      ManualObject obj("GrassObject");
      obj.begin("Examples/GrassBlades");
+     //! [mo]
      // to apply wind in vertex shader:
      // obj.begin("Examples/GrassBladesWaver");
 
      for (unsigned int i = 0; i < 3; i++)  // each grass mesh consists of 3 planes
      {
+         //! [grass_base]
          // planes intersect along the Y axis with 60 degrees between them
          Vector3 vec = Quaternion(Degree(i * 60), Vector3::UNIT_Y) * Vector3(width / 2, 0, 0);
+         //! [grass_base]
 
+         //! [mo_quad]
          for (unsigned int j = 0; j < 4; j++) // each plane has 4 vertices
          {
              vec.y = j % 2 ? 0 : height;
@@ -180,14 +189,19 @@ class _OgreSampleClassExport Sample_Grass : public SdkSample
              // all normals point straight up
              obj.normal(0, 1, 0);
          }
+         //! [mo_quad]
+         //! [mo_index]
          unsigned int off = i * 4;
          // each plane consists of 2 triangles
          obj.triangle(off + 0, off + 3, off + 1);
          obj.triangle(off + 0, off + 2, off + 3);
+         //! [mo_index]
      }
 
+     //! [finish]
      obj.end();
      obj.convertToMesh("grass");
+     //! [finish]
  }
 
  void setupLighting()
