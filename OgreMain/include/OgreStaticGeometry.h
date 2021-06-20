@@ -160,7 +160,6 @@ namespace Ogre {
             SubMesh* submesh;
             /// Link to LOD list of geometry, potentially optimised
             SubMeshLodGeometryLinkList* geometryLodList;
-            String materialName;
             Vector3 position;
             Quaternion orientation;
             Vector3 scale;
@@ -193,37 +192,16 @@ namespace Ogre {
             QueuedGeometryList mQueuedGeometry;
             /// Pointer to parent bucket
             MaterialBucket* mParent;
-            /// String identifying the vertex / index format
-            String mFormatString;
             /// Vertex information, includes current number of vertices
             /// committed to be a part of this bucket
             VertexData* mVertexData;
             /// Index information, includes index type which limits the max
             /// number of vertices which are allowed in one bucket
             IndexData* mIndexData;
-            /// Size of indexes
-            HardwareIndexBuffer::IndexType mIndexType;
             /// Maximum vertex indexable
             size_t mMaxVertexIndex;
-
-            template<typename T>
-            void copyIndexes(const T* src, T* dst, size_t count, size_t indexOffset)
-            {
-                if (indexOffset == 0)
-                {
-                    memcpy(dst, src, sizeof(T) * count);
-                }
-                else
-                {
-                    while(count--)
-                    {
-                        *dst++ = static_cast<T>(*src++ + indexOffset);
-                    }
-                }
-            }
         public:
-            GeometryBucket(MaterialBucket* parent, const String& formatString, 
-                const VertexData* vData, const IndexData* iData);
+            GeometryBucket(MaterialBucket* parent, const VertexData* vData, const IndexData* iData);
             virtual ~GeometryBucket();
             MaterialBucket* getParent(void) { return mParent; }
             /// Get the vertex data for this geometry 
@@ -258,8 +236,6 @@ namespace Ogre {
         private:
             /// Pointer to parent LODBucket
             LODBucket* mParent;
-            /// Material being used
-            String mMaterialName;
             /// Pointer to material being used
             MaterialPtr mMaterial;
             /// Active technique
@@ -268,17 +244,15 @@ namespace Ogre {
             /// list of Geometry Buckets in this region
             GeometryBucketList mGeometryBucketList;
             // index to current Geometry Buckets for a given geometry format
-            typedef std::map<String, GeometryBucket*> CurrentGeometryMap;
+            typedef std::map<uint32, GeometryBucket*> CurrentGeometryMap;
             CurrentGeometryMap mCurrentGeometryMap;
-            /// Get a packed string identifying the geometry format
-            String getGeometryFormatString(SubMeshLodGeometryLink* geom);
             
         public:
-            MaterialBucket(LODBucket* parent, const String& materialName);
+            MaterialBucket(LODBucket* parent, const MaterialPtr& material);
             virtual ~MaterialBucket();
             LODBucket* getParent(void) { return mParent; }
             /// Get the material name
-            const String& getMaterialName(void) const { return mMaterialName; }
+            const String& getMaterialName(void) const { return mMaterial->getName(); }
             /// Assign geometry to this bucket
             void assign(QueuedGeometry* qsm);
             /// Build

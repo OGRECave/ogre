@@ -291,7 +291,6 @@ namespace Ogre {
             // Get the geometry for this SubMesh
             q->submesh = se->getSubMesh();
             q->geometryLodList = determineGeometry(q->submesh);
-            q->materialName = se->getMaterialName();
             q->orientation = orientation;
             q->position = position;
             q->scale = scale;
@@ -1046,15 +1045,15 @@ namespace Ogre {
         // Locate a material bucket
         MaterialBucket* mbucket = 0;
         MaterialBucketMap::iterator m =
-            mMaterialBucketMap.find(qmesh->materialName);
+            mMaterialBucketMap.find(qmesh->submesh->getMaterial()->getName());
         if (m != mMaterialBucketMap.end())
         {
             mbucket = m->second;
         }
         else
         {
-            mbucket = OGRE_NEW MaterialBucket(this, qmesh->materialName);
-            mMaterialBucketMap[qmesh->materialName] = mbucket;
+            mbucket = OGRE_NEW MaterialBucket(this, qmesh->submesh->getMaterial());
+            mMaterialBucketMap[mbucket->getMaterialName()] = mbucket;
         }
         mbucket->assign(q);
     }
@@ -1213,9 +1212,9 @@ namespace Ogre {
     //--------------------------------------------------------------------------
     //--------------------------------------------------------------------------
     StaticGeometry::MaterialBucket::MaterialBucket(LODBucket* parent,
-        const String& materialName)
+        const MaterialPtr& material)
         : mParent(parent)
-        , mMaterialName(materialName)
+        , mMaterial(material)
         , mTechnique(0)
     {
     }
@@ -1233,28 +1232,50 @@ namespace Ogre {
         // no need to delete queued meshes, these are managed in StaticGeometry
     }
     //--------------------------------------------------------------------------
+    static uint32 getHash(StaticGeometry::SubMeshLodGeometryLink* geom)
+    {
+        // Formulate an identifying string for the geometry format
+        // Must take into account the vertex declaration and the index type
+        // Format is:
+        // Index type
+        // Vertex element (repeating)
+        //   source
+        //   semantic
+        //   type
+        uint32 hash = HashCombine(0, geom->indexData->indexBuffer->getType());
+        const auto& elemList = geom->vertexData->vertexDeclaration->getElements();
+        for (const VertexElement& elem : elemList)
+        {
+            hash = HashCombine(hash, elem.getSource());
+            hash = HashCombine(hash, elem.getSemantic());
+            hash = HashCombine(hash, elem.getType());
+        }
+
+        return hash;
+    }
+    //--------------------------------------------------------------------------
     void StaticGeometry::MaterialBucket::assign(QueuedGeometry* qgeom)
     {
         // Look up any current geometry
-        String formatString = getGeometryFormatString(qgeom->geometry);
-        CurrentGeometryMap::iterator gi = mCurrentGeometryMap.find(formatString);
+        uint32 hash = getHash(qgeom->geometry);
+        CurrentGeometryMap::iterator gi = mCurrentGeometryMap.find(hash);
         bool newBucket = true;
         if (gi != mCurrentGeometryMap.end())
         {
             // Found existing geometry, try to assign
             newBucket = !gi->second->assign(qgeom);
             // Note that this bucket will be replaced as the 'current'
-            // for this format string below since it's out of space
+            // for this hash string below since it's out of space
         }
         // Do we need to create a new one?
         if (newBucket)
         {
-            GeometryBucket* gbucket = OGRE_NEW GeometryBucket(this, formatString,
-                qgeom->geometry->vertexData, qgeom->geometry->indexData);
+            GeometryBucket* gbucket =
+                OGRE_NEW GeometryBucket(this, qgeom->geometry->vertexData, qgeom->geometry->indexData);
             // Add to main list
             mGeometryBucketList.push_back(gbucket);
             // Also index in 'current' list
-            mCurrentGeometryMap[formatString] = gbucket;
+            mCurrentGeometryMap[hash] = gbucket;
             if (!gbucket->assign(qgeom))
             {
                 OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
@@ -1268,19 +1289,11 @@ namespace Ogre {
     void StaticGeometry::MaterialBucket::build(bool stencilShadows)
     {
         mTechnique = 0;
-        mMaterial = MaterialManager::getSingleton().getByName(mMaterialName);
-        if (!mMaterial)
-        {
-            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND,
-                "Material '" + mMaterialName + "' not found.",
-                "StaticGeometry::MaterialBucket::build");
-        }
         mMaterial->load();
         // tell the geometry buckets to build
-        for (GeometryBucketList::iterator i = mGeometryBucketList.begin();
-            i != mGeometryBucketList.end(); ++i)
+        for (auto gb : mGeometryBucketList)
         {
-            (*i)->build(stencilShadows);
+            gb->build(stencilShadows);
         }
     }
     //--------------------------------------------------------------------------
@@ -1313,38 +1326,6 @@ namespace Ogre {
         OgreAssert(material, "NULL pointer");
         mMaterial = material;
         mMaterial->load();
-        mMaterialName = material->getName();
-    }
-    //--------------------------------------------------------------------------
-    String StaticGeometry::MaterialBucket::getGeometryFormatString(
-        SubMeshLodGeometryLink* geom)
-    {
-        // Formulate an identifying string for the geometry format
-        // Must take into account the vertex declaration and the index type
-        // Format is (all lines separated by '|'):
-        // Index type
-        // Vertex element (repeating)
-        //   source
-        //   semantic
-        //   type
-        StringStream str;
-
-        str << geom->indexData->indexBuffer->getType() << "|";
-        const VertexDeclaration::VertexElementList& elemList =
-            geom->vertexData->vertexDeclaration->getElements();
-        VertexDeclaration::VertexElementList::const_iterator ei, eiend;
-        eiend = elemList.end();
-        for (ei = elemList.begin(); ei != eiend; ++ei)
-        {
-            const VertexElement& elem = *ei;
-            str << elem.getSource() << "|";
-            str << elem.getSource() << "|";
-            str << elem.getSemantic() << "|";
-            str << elem.getType() << "|";
-        }
-
-        return str.str();
-
     }
     //--------------------------------------------------------------------------
     StaticGeometry::MaterialBucket::GeometryIterator
@@ -1356,7 +1337,7 @@ namespace Ogre {
     //--------------------------------------------------------------------------
     void StaticGeometry::MaterialBucket::dump(std::ofstream& of) const
     {
-        of << "Material Bucket " << mMaterialName << std::endl;
+        of << "Material Bucket " << getMaterialName() << std::endl;
         of << "--------------------------------------------------" << std::endl;
         of << "Geometry buckets: " << mGeometryBucketList.size() << std::endl;
         for (GeometryBucketList::const_iterator i = mGeometryBucketList.begin();
@@ -1380,10 +1361,9 @@ namespace Ogre {
     }
     //--------------------------------------------------------------------------
     //--------------------------------------------------------------------------
-    StaticGeometry::GeometryBucket::GeometryBucket(MaterialBucket* parent,
-        const String& formatString, const VertexData* vData,
-        const IndexData* iData)
-        : Renderable(), mParent(parent), mFormatString(formatString)
+    StaticGeometry::GeometryBucket::GeometryBucket(MaterialBucket* parent, const VertexData* vData,
+                                                   const IndexData* iData)
+        : Renderable(), mParent(parent)
     {
         // Clone the structure from the example
         mVertexData = vData->clone(false);
@@ -1392,9 +1372,8 @@ namespace Ogre {
         mVertexData->vertexStart = 0;
         mIndexData->indexCount = 0;
         mIndexData->indexStart = 0;
-        mIndexType = iData->indexBuffer->getType();
         // Derive the max vertices
-        if (mIndexType == HardwareIndexBuffer::IT_32BIT)
+        if (iData->indexBuffer->getType() == HardwareIndexBuffer::IT_32BIT)
         {
             mMaxVertexIndex = 0xFFFFFFFF;
         }
@@ -1499,6 +1478,21 @@ namespace Ogre {
         return true;
     }
     //--------------------------------------------------------------------------
+    template<typename T>
+    static void copyIndexes(const T* src, T* dst, size_t count, uint32 indexOffset)
+    {
+        if (indexOffset == 0)
+        {
+            memcpy(dst, src, sizeof(T) * count);
+        }
+        else
+        {
+            while(count--)
+            {
+                *dst++ = static_cast<T>(*src++ + indexOffset);
+            }
+        }
+    }
     void StaticGeometry::GeometryBucket::build(bool stencilShadows)
     {
         // Ok, here's where we transfer the vertices and indexes to the shared
@@ -1508,8 +1502,9 @@ namespace Ogre {
         VertexBufferBinding* binds = mVertexData->vertexBufferBinding;
 
         // create index buffer, and lock
+        auto indexType = mIndexData->indexBuffer->getType();
         mIndexData->indexBuffer = HardwareBufferManager::getSingleton()
-            .createIndexBuffer(mIndexType, mIndexData->indexCount,
+            .createIndexBuffer(indexType, mIndexData->indexCount,
                 HardwareBuffer::HBU_STATIC_WRITE_ONLY);
         HardwareBufferLockGuard dstIndexLock(mIndexData->indexBuffer, HardwareBuffer::HBL_DISCARD);
         uint32* p32Dest = static_cast<uint32*>(dstIndexLock.pData);
@@ -1547,7 +1542,7 @@ namespace Ogre {
 
 
         // Iterate over the geometry items
-        size_t indexOffset = 0;
+        uint32 indexOffset = 0;
         QueuedGeometryList::iterator gi, giend;
         giend = mQueuedGeometry.end();
         Vector3 regionCentre = mParent->getParent()->getParent()->getCentre();
@@ -1560,7 +1555,7 @@ namespace Ogre {
                                                srcIdxData->indexStart * srcIdxData->indexBuffer->getIndexSize(), 
                                                srcIdxData->indexCount * srcIdxData->indexBuffer->getIndexSize(),
                                                HardwareBuffer::HBL_READ_ONLY);
-            if (mIndexType == HardwareIndexBuffer::IT_32BIT)
+            if (indexType == HardwareIndexBuffer::IT_32BIT)
             {
                 uint32* pSrc = static_cast<uint32*>(srcIdxLock.pData);
                 copyIndexes(pSrc, p32Dest, srcIdxData->indexCount, indexOffset);
@@ -1708,7 +1703,6 @@ namespace Ogre {
     {
         of << "Geometry Bucket" << std::endl;
         of << "---------------" << std::endl;
-        of << "Format string: " << mFormatString << std::endl;
         of << "Geometry items: " << mQueuedGeometry.size() << std::endl;
         of << "Vertex count: " << mVertexData->vertexCount << std::endl;
         of << "Index count: " << mIndexData->indexCount << std::endl;
