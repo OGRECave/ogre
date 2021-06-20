@@ -1987,8 +1987,10 @@ namespace Ogre {
                         // Lock, we'll be locking the (suppressed hardware update) shadow buffer
                         HardwareBufferLockGuard posLock(esrPositionBuffer, HardwareBuffer::HBL_NORMAL);
                         float* pSrc = static_cast<float*>(posLock.pData);
-                        float* pDest = pSrc + (egi->vertexData->vertexCount * 3);
-                        memcpy(pDest, pSrc, sizeof(float) * 3 * egi->vertexData->vertexCount);
+                        float* pDest = pSrc + (egi->vertexData->vertexCount * 4);
+                        memcpy(pDest, pSrc, sizeof(float) * 4 * egi->vertexData->vertexCount);
+                        for (size_t i = 0; i < egi->vertexData->vertexCount; i++)
+                            pDest[i * 4 + 3] = 0; // second part needs w=0
                     }
                     if (egi->vertexData == mMesh->sharedVertexData)
                     {
@@ -2121,18 +2123,11 @@ namespace Ogre {
         // Create vertex data which just references position component (and 2 component)
         mRenderOp.vertexData = OGRE_NEW VertexData();
         // Map in position data
-        mRenderOp.vertexData->vertexDeclaration->addElement(0,0,VET_FLOAT3, VES_POSITION);
+        mRenderOp.vertexData->vertexDeclaration->addElement(0,0,VET_FLOAT4, VES_POSITION);
         mOriginalPosBufferBinding =
             vertexData->vertexDeclaration->findElementBySemantic(VES_POSITION)->getSource();
         mPositionBuffer = vertexData->vertexBufferBinding->getBuffer(mOriginalPosBufferBinding);
         mRenderOp.vertexData->vertexBufferBinding->setBinding(0, mPositionBuffer);
-        // Map in w-coord buffer (if present)
-        if(vertexData->hardwareShadowVolWBuffer)
-        {
-            mRenderOp.vertexData->vertexDeclaration->addElement(1,0,VET_FLOAT1, VES_TEXTURE_COORDINATES, 0);
-            mWBuffer = vertexData->hardwareShadowVolWBuffer;
-            mRenderOp.vertexData->vertexBufferBinding->setBinding(1, mWBuffer);
-        }
         // Use same vertex start as input
         mRenderOp.vertexData->vertexStart = vertexData->vertexStart;
 

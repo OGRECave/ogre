@@ -1993,10 +1993,8 @@ namespace Ogre {
 
 
         // Lock destination buffers for writing
-        HardwareBufferLockGuard destPosLock(destPosBuf,
-            (destNormBuf != destPosBuf && destPosBuf->getVertexSize() == destElemPos->getSize()) ||
-            (destNormBuf == destPosBuf && destPosBuf->getVertexSize() == destElemPos->getSize() + destElemNorm->getSize()) ?
-            HardwareBuffer::HBL_DISCARD : HardwareBuffer::HBL_NORMAL);
+        // HBL_NORMAL to keep W-coord for stencil shadows
+        HardwareBufferLockGuard destPosLock(destPosBuf, HardwareBuffer::HBL_NORMAL);
         destElemPos->baseVertexPointerToElement(destPosLock.pData, &pDestPos);
         HardwareBufferLockGuard destNormLock;
         if (includeNormals)

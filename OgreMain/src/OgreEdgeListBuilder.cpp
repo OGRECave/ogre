@@ -414,11 +414,11 @@ namespace Ogre {
     void EdgeData::updateFaceNormals(size_t vertexSet, 
         const HardwareVertexBufferSharedPtr& positionBuffer)
     {
-        assert (positionBuffer->getVertexSize() == sizeof(float) * 3
-            && "Position buffer should contain only positions!");
+        OgreAssert(positionBuffer->getVertexSize() == sizeof(float) * 4,
+                   "Position buffer should contain only positions!");
 
         // Triangle face normals should be 1:1 with triangles
-        assert(triangleFaceNormals.size() == triangles.size());
+        OgreAssert(triangleFaceNormals.size() == triangles.size(), "size mismatch");
 
         // Calculate triangles which are using this vertex set
         const EdgeData::EdgeGroup& eg = edgeGroups[vertexSet];
@@ -429,7 +429,8 @@ namespace Ogre {
                 static_cast<float*>(positionsLock.pData),
                 &triangles[eg.triStart],
                 &triangleFaceNormals[eg.triStart],
-                eg.triCount);
+                eg.triCount,
+                4);
         }
     }
     //---------------------------------------------------------------------

@@ -113,7 +113,8 @@ namespace Ogre {
             const float *positions,
             const EdgeData::Triangle *triangles,
             Vector4 *faceNormals,
-            size_t numTriangles);
+            size_t numTriangles,
+            int components);
 
         /// @copydoc OptimisedUtil::calculateLightFacing
         virtual void __OGRE_SIMD_ALIGN_ATTRIBUTE calculateLightFacing(
@@ -224,7 +225,8 @@ namespace Ogre {
             const float *positions,
             const EdgeData::Triangle *triangles,
             Vector4 *faceNormals,
-            size_t numTriangles)
+            size_t numTriangles,
+            int components)
         {
             __OGRE_SIMD_ALIGN_STACK();
 
@@ -232,7 +234,8 @@ namespace Ogre {
                 positions,
                 triangles,
                 faceNormals,
-                numTriangles);
+                numTriangles,
+                components);
         }
 
         /// @copydoc OptimisedUtil::calculateLightFacing
@@ -1583,7 +1586,8 @@ namespace Ogre {
         const float *positions,
         const EdgeData::Triangle *triangles,
         Vector4 *faceNormals,
-        size_t numTriangles)
+        size_t numTriangles,
+        int components)
     {
         __OGRE_CHECK_STACK_ALIGNED_FOR_SSE();
 
@@ -1628,24 +1632,24 @@ namespace Ogre {
 
             // Load vertex 0 of four triangles, packed as component-major format: xxxx yyyy zzzz
             __LOAD_FOUR_VECTOR3(x0, y0, z0,
-                positions + triangles[0].vertIndex[0] * 3,
-                positions + triangles[1].vertIndex[0] * 3,
-                positions + triangles[2].vertIndex[0] * 3,
-                positions + triangles[3].vertIndex[0] * 3);
+                positions + triangles[0].vertIndex[0] * components,
+                positions + triangles[1].vertIndex[0] * components,
+                positions + triangles[2].vertIndex[0] * components,
+                positions + triangles[3].vertIndex[0] * components);
 
             // Load vertex 1 of four triangles, packed as component-major format: xxxx yyyy zzzz
             __LOAD_FOUR_VECTOR3(x1, y1, z1,
-                positions + triangles[0].vertIndex[1] * 3,
-                positions + triangles[1].vertIndex[1] * 3,
-                positions + triangles[2].vertIndex[1] * 3,
-                positions + triangles[3].vertIndex[1] * 3);
+                positions + triangles[0].vertIndex[1] * components,
+                positions + triangles[1].vertIndex[1] * components,
+                positions + triangles[2].vertIndex[1] * components,
+                positions + triangles[3].vertIndex[1] * components);
 
             // Load vertex 2 of four triangles, packed as component-major format: xxxx yyyy zzzz
             __LOAD_FOUR_VECTOR3(x2, y2, z2,
-                positions + triangles[0].vertIndex[2] * 3,
-                positions + triangles[1].vertIndex[2] * 3,
-                positions + triangles[2].vertIndex[2] * 3,
-                positions + triangles[3].vertIndex[2] * 3);
+                positions + triangles[0].vertIndex[2] * components,
+                positions + triangles[1].vertIndex[2] * components,
+                positions + triangles[2].vertIndex[2] * components,
+                positions + triangles[3].vertIndex[2] * components);
 
             triangles += 4;
 
@@ -1688,9 +1692,9 @@ namespace Ogre {
         for (size_t j = 0; j < numTriangles; ++j)
         {
             // Load vertices of the triangle
-            __m128 v0 = __LOAD_VECTOR3(positions + triangles->vertIndex[0] * 3);
-            __m128 v1 = __LOAD_VECTOR3(positions + triangles->vertIndex[1] * 3);
-            __m128 v2 = __LOAD_VECTOR3(positions + triangles->vertIndex[2] * 3);
+            __m128 v0 = __LOAD_VECTOR3(positions + triangles->vertIndex[0] * components);
+            __m128 v1 = __LOAD_VECTOR3(positions + triangles->vertIndex[1] * components);
+            __m128 v2 = __LOAD_VECTOR3(positions + triangles->vertIndex[2] * components);
             ++triangles;
 
             // Calculate face normal
@@ -1896,14 +1900,10 @@ namespace Ogre {
             // Looks like VC7.1 generate a bit inefficient code for 'rsqrtss', so use 'rsqrtps' instead
             tmp = _mm_mul_ss(_mm_rsqrt_ps(tmp), _mm_load_ss(&extrudeDist));
             __m128 dir = _mm_mul_ps(lp, __MM_SELECT(tmp, 0));               // X Y Z -
+            dir = _mm_cvt_si2ss(dir, 1); // dir[3] = 1: ensure w is zero in result
 
-            // Prepare extrude direction for extruding 4 vertices parallelly
-            __m128 dir0 = _mm_shuffle_ps(dir, dir, _MM_SHUFFLE(0,2,1,0));   // X Y Z X
-            __m128 dir1 = _mm_shuffle_ps(dir, dir, _MM_SHUFFLE(1,0,2,1));   // Y Z X Y
-            __m128 dir2 = _mm_shuffle_ps(dir, dir, _MM_SHUFFLE(2,1,0,2));   // Z X Y Z
-
-            __m128 s0, s1, s2;
-            __m128 d0, d1, d2;
+            __m128 s0, s1, s2, s3;
+            __m128 d0, d1, d2, d3;
 
             size_t numIterations = numVertices / 4;
             numVertices &= 3;
@@ -1914,63 +1914,31 @@ namespace Ogre {
                 s0 = SrcAccessor::load(pSrcPos + 0);
                 s1 = SrcAccessor::load(pSrcPos + 4);
                 s2 = SrcAccessor::load(pSrcPos + 8);
-                pSrcPos += 12;
+                s3 = SrcAccessor::load(pSrcPos + 12);
+                pSrcPos += 16;
 
                 // The extrusion direction is inverted, use subtract instruction here
-                d0 = _mm_sub_ps(s0, dir0);                      // X0 Y0 Z0 X1
-                d1 = _mm_sub_ps(s1, dir1);                      // Y1 Z1 X2 Y2
-                d2 = _mm_sub_ps(s2, dir2);                      // Z2 X3 Y3 Z3
+                d0 = _mm_sub_ps(s0, dir);                      // X0 Y0 Z0 W0
+                d1 = _mm_sub_ps(s1, dir);                      // X1 Y1 Z1 W1
+                d2 = _mm_sub_ps(s2, dir);                      // X2 Y2 Z2 W2
+                d3 = _mm_sub_ps(s3, dir);                      // X3 Y3 Z3 W3
 
                 DestAccessor::store(pDestPos + 0, d0);
                 DestAccessor::store(pDestPos + 4, d1);
                 DestAccessor::store(pDestPos + 8, d2);
-                pDestPos += 12;
+                DestAccessor::store(pDestPos + 12, d3);
+                pDestPos += 16;
             }
 
-            // Dealing with remaining vertices
-            switch (numVertices)
+            for (size_t vert = 0; vert < numVertices; ++vert)
             {
-            case 3:
-                // 9 floating-point values
                 s0 = SrcAccessor::load(pSrcPos + 0);
-                s1 = SrcAccessor::load(pSrcPos + 4);
-                s2 = _mm_load_ss(pSrcPos + 8);
-
                 // The extrusion direction is inverted, use subtract instruction here
-                d0 = _mm_sub_ps(s0, dir0);                      // X0 Y0 Z0 X1
-                d1 = _mm_sub_ps(s1, dir1);                      // Y1 Z1 X2 Y2
-                d2 = _mm_sub_ss(s2, dir2);                      // Z2 -- -- --
-
+                d0 = _mm_sub_ps(s0, dir);
                 DestAccessor::store(pDestPos + 0, d0);
-                DestAccessor::store(pDestPos + 4, d1);
-                _mm_store_ss(pDestPos + 8, d2);
-                break;
 
-            case 2:
-                // 6 floating-point values
-                s0 = SrcAccessor::load(pSrcPos + 0);
-                s1 = _mm_loadl_pi(dir1, (const __m64*)(pSrcPos + 4)); // dir1 is meaningless here
-
-                // The extrusion direction is inverted, use subtract instruction here
-                d0 = _mm_sub_ps(s0, dir0);                      // X0 Y0 Z0 X1
-                d1 = _mm_sub_ps(s1, dir1);                      // Y1 Z1 -- --
-
-                DestAccessor::store(pDestPos + 0, d0);
-                _mm_storel_pi((__m64*)(pDestPos + 4), d1);
-                break;
-
-            case 1:
-                // 3 floating-point values
-                s0 = _mm_loadl_pi(dir0, (const __m64*)(pSrcPos + 0)); // dir0 is meaningless here
-                s1 = _mm_load_ss(pSrcPos + 2);
-
-                // The extrusion direction is inverted, use subtract instruction here
-                d0 = _mm_sub_ps(s0, dir0);                      // X0 Y0 -- --
-                d1 = _mm_sub_ss(s1, dir2);                      // Z0 -- -- --
-
-                _mm_storel_pi((__m64*)(pDestPos + 0), d0);
-                _mm_store_ss(pDestPos + 2, d1);
-                break;
+                pSrcPos += 4;
+                pDestPos += 4;
             }
         }
     };
@@ -2004,13 +1972,14 @@ namespace Ogre {
             for (size_t i = 0; i < numIterations; ++i)
             {
                 // Load source positions
-                __m128 s0 = SrcAccessor::load(pSrcPos + 0);     // x0 y0 z0 x1
-                __m128 s1 = SrcAccessor::load(pSrcPos + 4);     // y1 z1 x2 y2
-                __m128 s2 = SrcAccessor::load(pSrcPos + 8);     // z2 x3 y3 z3
-                pSrcPos += 12;
+                __m128 s0 = SrcAccessor::load(pSrcPos + 0);     // x0 y0 z0 w0
+                __m128 s1 = SrcAccessor::load(pSrcPos + 4);     // x1 y1 z1 w1
+                __m128 s2 = SrcAccessor::load(pSrcPos + 8);     // x2 y2 z2 w2
+                __m128 s3 = SrcAccessor::load(pSrcPos + 12);    // x3 y3 z3 w3
+                pSrcPos += 16;
 
-                // Arrange to 3x4 component-major for batches calculate
-                __MM_TRANSPOSE4x3_PS(s0, s1, s2);
+                // Arrange to 4x4 component-major for batches calculate
+                __MM_TRANSPOSE4x4_PS(s0, s1, s2, s3);
 
                 // Calculate unnormalised extrusion direction
                 __m128 dx = _mm_sub_ps(s0, __MM_SELECT(lp, 0)); // X0 X1 X2 X3
@@ -2028,15 +1997,17 @@ namespace Ogre {
                 __m128 d0 = _mm_add_ps(dx, s0);
                 __m128 d1 = _mm_add_ps(dy, s1);
                 __m128 d2 = _mm_add_ps(dz, s2);
+                __m128 d3 = _mm_setzero_ps();
 
-                // Arrange back to 4x3 continuous format for store results
-                __MM_TRANSPOSE3x4_PS(d0, d1, d2);
+                // Arrange back to 4x4 continuous format for store results
+                __MM_TRANSPOSE4x4_PS(d0, d1, d2, d3);
 
                 // Store extruded positions
                 DestAccessor::store(pDestPos + 0, d0);
                 DestAccessor::store(pDestPos + 4, d1);
                 DestAccessor::store(pDestPos + 8, d2);
-                pDestPos += 12;
+                DestAccessor::store(pDestPos + 12,d3);
+                pDestPos += 16;
             }
 
             // Dealing with remaining vertices
@@ -2044,7 +2015,7 @@ namespace Ogre {
             {
                 // Load source position
                 __m128 src = _mm_loadh_pi(_mm_load_ss(pSrcPos + 0), (const __m64*)(pSrcPos + 1)); // x 0 y z
-                pSrcPos += 3;
+                pSrcPos += 4;
 
                 // Calculate unnormalised extrusion direction
                 __m128 dir = _mm_sub_ps(src, _mm_shuffle_ps(lp, lp, _MM_SHUFFLE(2,1,3,0))); // X 1 Y Z
@@ -2062,7 +2033,7 @@ namespace Ogre {
                 // Store extruded position
                 _mm_store_ss(pDestPos + 0, dst);
                 _mm_storeh_pi((__m64*)(pDestPos + 1), dst);
-                pDestPos += 3;
+                pDestPos += 4;
             }
         }
     };

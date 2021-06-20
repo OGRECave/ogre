@@ -155,12 +155,14 @@ namespace Ogre {
         @param faceNormals The array of Vector4 used to store triangles face normal,
             Must be aligned to SIMD alignment.
         @param numTriangles Number of triangles to calculate face normal.
+        @param components Number of components in positions buffer. Must be 3 or 4
         */
         virtual void calculateFaceNormals(
             const float *positions,
             const EdgeData::Triangle *triangles,
             Vector4 *faceNormals,
-            size_t numTriangles) = 0;
+            size_t numTriangles,
+            int components = 3) = 0;
 
         /** Calculate the light facing state of the triangle's face normals
         @remarks

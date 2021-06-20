@@ -324,8 +324,6 @@ namespace Ogre {
             Entity* mParent;
             /// Shared link to position buffer.
             HardwareVertexBufferSharedPtr mPositionBuffer;
-            /// Shared link to w-coord buffer (optional).
-            HardwareVertexBufferSharedPtr mWBuffer;
             /// Link to current vertex data used to bind (maybe changes).
             const VertexData* mCurrentVertexData;
             /// Link to SubEntity, only present if SubEntity has it's own geometry.
@@ -343,7 +341,6 @@ namespace Ogre {
             void _createSeparateLightCap();
             void getWorldTransforms(Matrix4* xform) const override;
             HardwareVertexBufferSharedPtr getPositionBuffer(void) { return mPositionBuffer; }
-            HardwareVertexBufferSharedPtr getWBuffer(void) { return mWBuffer; }
             /// Rebind the source positions (for temp buffer users).
             void rebindPositionBuffer(const VertexData* vertexData, bool force);
             bool isVisible(void) const override;

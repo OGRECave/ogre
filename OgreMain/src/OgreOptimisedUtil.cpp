@@ -202,7 +202,8 @@ namespace Ogre {
             const float *positions,
             const EdgeData::Triangle *triangles,
             Vector4 *faceNormals,
-            size_t numTriangles)
+            size_t numTriangles,
+            int components)
         {
             static ProfileItems results;
             static size_t index;
@@ -215,7 +216,8 @@ namespace Ogre {
                 positions,
                 triangles,
                 faceNormals,
-                numTriangles);
+                numTriangles,
+                components);
             profile.end();
 
             //

@@ -75,7 +75,8 @@ namespace Ogre {
             const float *positions,
             const EdgeData::Triangle *triangles,
             Vector4 *faceNormals,
-            size_t numTriangles);
+            size_t numTriangles,
+            int components);
 
         /// @copydoc OptimisedUtil::calculateLightFacing
         virtual void calculateLightFacing(
@@ -286,20 +287,21 @@ namespace Ogre {
         const float *positions,
         const EdgeData::Triangle *triangles,
         Vector4 *faceNormals,
-        size_t numTriangles)
+        size_t numTriangles,
+        int components)
     {
         for ( ; numTriangles; --numTriangles)
         {
             const EdgeData::Triangle& t = *triangles++;
             size_t offset;
 
-            offset = t.vertIndex[0] * 3;
+            offset = t.vertIndex[0] * components;
             Vector3 v1(positions[offset+0], positions[offset+1], positions[offset+2]);
 
-            offset = t.vertIndex[1] * 3;
+            offset = t.vertIndex[1] * components;
             Vector3 v2(positions[offset+0], positions[offset+1], positions[offset+2]);
 
-            offset = t.vertIndex[2] * 3;
+            offset = t.vertIndex[2] * components;
             Vector3 v3(positions[offset+0], positions[offset+1], positions[offset+2]);
 
             *faceNormals++ = Math::calculateFaceNormalWithoutNormalize(v1, v2, v3);
@@ -341,6 +343,7 @@ namespace Ogre {
                 *pDestPos++ = *pSrcPos++ + extrusionDir.x;
                 *pDestPos++ = *pSrcPos++ + extrusionDir.y;
                 *pDestPos++ = *pSrcPos++ + extrusionDir.z;
+                pDestPos++, pSrcPos++;
             }
         }
         else
@@ -360,6 +363,7 @@ namespace Ogre {
                 *pDestPos++ = *pSrcPos++ + extrusionDir.x;
                 *pDestPos++ = *pSrcPos++ + extrusionDir.y;
                 *pDestPos++ = *pSrcPos++ + extrusionDir.z;
+                pDestPos++, pSrcPos++;
             }
         }
     }

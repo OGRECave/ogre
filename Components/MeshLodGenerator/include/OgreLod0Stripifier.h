@@ -207,7 +207,6 @@ namespace Ogre
 		vertexData->vertexStart = 0;
 		vertexData->vertexCount = remapInfo.usedCount;
 
-		vertexData->hardwareShadowVolWBuffer = HardwareVertexBufferSharedPtr(); // TODO: check this
 		vertexData->hwAnimationDataList.clear(); // TODO: check this
 		vertexData->hwAnimDataItemsUsed = 0; // TODO: check this
 	}

@@ -465,7 +465,7 @@ namespace Ogre {
 
         // TODO: We should add extra (ununsed) vertices ensure source and
         // destination buffer have same alignment for slight performance gain.
-        float* pDest = pSrc + originalVertexCount * 3;
+        float* pDest = pSrc + originalVertexCount * 4;
 
         OptimisedUtil::getImplementation()->extrudeVertices(
             light, extrudeDist,

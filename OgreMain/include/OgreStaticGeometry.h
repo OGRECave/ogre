@@ -292,9 +292,6 @@ namespace Ogre {
                 LODBucket* mParent;
                 // Shared link to position buffer
                 HardwareVertexBufferSharedPtr mPositionBuffer;
-                // Shared link to w-coord buffer (optional)
-                HardwareVertexBufferSharedPtr mWBuffer;
-
             public:
                 LODShadowRenderable(LODBucket* parent, 
                     HardwareIndexBufferSharedPtr* indexBuffer, const VertexData* vertexData, 
@@ -302,7 +299,6 @@ namespace Ogre {
                 ~LODShadowRenderable();
                 void getWorldTransforms(Matrix4* xform) const override;
                 HardwareVertexBufferSharedPtr getPositionBuffer(void) { return mPositionBuffer; }
-                HardwareVertexBufferSharedPtr getWBuffer(void) { return mWBuffer; }
                 virtual void rebindIndexBuffer(const HardwareIndexBufferSharedPtr& indexBuffer) override;
 
             };

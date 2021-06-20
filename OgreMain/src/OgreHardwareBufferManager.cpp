@@ -476,7 +476,7 @@ namespace Ogre {
         if (positions && !destPositionBuffer)
         {
             destPositionBuffer = srcPositionBuffer->getManager()->allocateVertexBufferCopy(srcPositionBuffer, 
-                HardwareBufferManagerBase::BLT_AUTOMATIC_RELEASE, this);
+                HardwareBufferManagerBase::BLT_AUTOMATIC_RELEASE, this, true); // copy contents to keep W-coord for stencil shadows
         }
         if (normals && !posNormalShareBuffer && srcNormalBuffer && !destNormalBuffer)
         {

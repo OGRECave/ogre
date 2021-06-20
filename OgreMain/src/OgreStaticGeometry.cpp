@@ -941,18 +941,11 @@ namespace Ogre {
         // Create vertex data which just references position component (and 2 component)
         mRenderOp.vertexData = OGRE_NEW VertexData();
         // Map in position data
-        mRenderOp.vertexData->vertexDeclaration->addElement(0,0,VET_FLOAT3, VES_POSITION);
+        mRenderOp.vertexData->vertexDeclaration->addElement(0,0,VET_FLOAT4, VES_POSITION);
         ushort origPosBind =
             vertexData->vertexDeclaration->findElementBySemantic(VES_POSITION)->getSource();
         mPositionBuffer = vertexData->vertexBufferBinding->getBuffer(origPosBind);
         mRenderOp.vertexData->vertexBufferBinding->setBinding(0, mPositionBuffer);
-        // Map in w-coord buffer (if present)
-        if(vertexData->hardwareShadowVolWBuffer)
-        {
-            mRenderOp.vertexData->vertexDeclaration->addElement(1,0,VET_FLOAT1, VES_TEXTURE_COORDINATES, 0);
-            mWBuffer = vertexData->hardwareShadowVolWBuffer;
-            mRenderOp.vertexData->vertexBufferBinding->setBinding(1, mWBuffer);
-        }
         // Use same vertex start as input
         mRenderOp.vertexData->vertexStart = vertexData->vertexStart;
 
@@ -1495,6 +1488,11 @@ namespace Ogre {
     }
     void StaticGeometry::GeometryBucket::build(bool stencilShadows)
     {
+        // Need to double the vertex count for the position buffer
+        // if we're doing stencil shadows
+        OgreAssert(!stencilShadows || mVertexData->vertexCount * 2 <= mMaxVertexIndex,
+                   "Index range exceeded when using stencil shadows, consider reducing your region size or "
+                   "reducing poly count");
         // Ok, here's where we transfer the vertices and indexes to the shared
         // buffers
         // Shortcuts
@@ -1511,22 +1509,12 @@ namespace Ogre {
         uint16* p16Dest = static_cast<uint16*>(dstIndexLock.pData);
         // create all vertex buffers, and lock
         ushort b;
-        ushort posBufferIdx = dcl->findElementBySemantic(VES_POSITION)->getSource();
 
         std::vector<uchar*> destBufferLocks;
         std::vector<VertexDeclaration::VertexElementList> bufferElements;
         for (b = 0; b < binds->getBufferCount(); ++b)
         {
             size_t vertexCount = mVertexData->vertexCount;
-            // Need to double the vertex count for the position buffer
-            // if we're doing stencil shadows
-            if (stencilShadows && b == posBufferIdx)
-            {
-                vertexCount = vertexCount * 2;
-                assert(vertexCount <= mMaxVertexIndex &&
-                    "Index range exceeded when using stencil shadows, consider "
-                    "reducing your region size or reducing poly count");
-            }
             HardwareVertexBufferSharedPtr vbuf =
                 HardwareBufferManager::getSingleton().createVertexBuffer(
                     dcl->getVertexSize(b),
@@ -1659,44 +1647,6 @@ namespace Ogre {
         {
             binds->getBuffer(b)->unlock();
         }
-
-        // If we're dealing with stencil shadows, copy the position data from
-        // the early half of the buffer to the latter part
-        if (stencilShadows)
-        {
-            HardwareVertexBufferSharedPtr buf = binds->getBuffer(posBufferIdx);
-            HardwareBufferLockGuard bufLock(buf, HardwareBuffer::HBL_NORMAL);
-            void* pSrc = bufLock.pData;
-            // Point dest at second half (remember vertexcount is original count)
-            void* pDest = static_cast<uchar*>(pSrc) +
-                buf->getVertexSize() * mVertexData->vertexCount;
-            memcpy(pDest, pSrc, buf->getVertexSize() * mVertexData->vertexCount);
-            bufLock.unlock();
-
-            // Also set up hardware W buffer if appropriate
-            RenderSystem* rend = Root::getSingleton().getRenderSystem();
-            if (rend)
-            {
-                buf = HardwareBufferManager::getSingleton().createVertexBuffer(
-                    sizeof(float), mVertexData->vertexCount * 2,
-                    HardwareBuffer::HBU_STATIC_WRITE_ONLY, false);
-                // Fill the first half with 1.0, second half with 0.0
-                bufLock.lock(buf, HardwareBuffer::HBL_DISCARD);
-                float *pW = static_cast<float*>(bufLock.pData);
-                size_t v;
-                for (v = 0; v < mVertexData->vertexCount; ++v)
-                {
-                    *pW++ = 1.0f;
-                }
-                for (v = 0; v < mVertexData->vertexCount; ++v)
-                {
-                    *pW++ = 0.0f;
-                }
-                bufLock.unlock();
-                mVertexData->hardwareShadowVolWBuffer = buf;
-            }
-        }
-
     }
     //--------------------------------------------------------------------------
     void StaticGeometry::GeometryBucket::dump(std::ofstream& of) const

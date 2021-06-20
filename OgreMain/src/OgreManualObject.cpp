@@ -773,18 +773,11 @@ ManualObject::ManualObject(const String& name)
         // Create vertex data which just references position component (and 2 component)
         mRenderOp.vertexData = OGRE_NEW VertexData();
         // Map in position data
-        mRenderOp.vertexData->vertexDeclaration->addElement(0,0,VET_FLOAT3, VES_POSITION);
+        mRenderOp.vertexData->vertexDeclaration->addElement(0,0,VET_FLOAT4, VES_POSITION);
         ushort origPosBind =
             vertexData->vertexDeclaration->findElementBySemantic(VES_POSITION)->getSource();
         mPositionBuffer = vertexData->vertexBufferBinding->getBuffer(origPosBind);
         mRenderOp.vertexData->vertexBufferBinding->setBinding(0, mPositionBuffer);
-        // Map in w-coord buffer (if present)
-        if(vertexData->hardwareShadowVolWBuffer)
-        {
-            mRenderOp.vertexData->vertexDeclaration->addElement(1,0,VET_FLOAT1, VES_TEXTURE_COORDINATES, 0);
-            mWBuffer = vertexData->hardwareShadowVolWBuffer;
-            mRenderOp.vertexData->vertexBufferBinding->setBinding(1, mWBuffer);
-        }
         // Use same vertex start as input
         mRenderOp.vertexData->vertexStart = vertexData->vertexStart;
 

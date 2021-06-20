@@ -471,6 +471,11 @@ FORCE_INLINE __m128 _mm_load_ss(const float * p)
 	return vreinterpretq_m128_f32(vsetq_lane_f32(*p, vdupq_n_f32(0), 0));
 }
 
+// Loads an single - precision, floating - point value into the low word and copy the upper three words.  https://msdn.microsoft.com/en-us/library/k2204k44%28v=vs.90%29.aspx
+FORCE_INLINE __m128 _mm_cvt_si2ss(__m128 a, int b)
+{
+	return vreinterpretq_m128_f32(vsetq_lane_f32((float)b, a, 0));
+}
 
 // ******************************************
 // Logic/Binary operations

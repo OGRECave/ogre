@@ -623,8 +623,6 @@ namespace Ogre
             ManualObject* mParent;
             // Shared link to position buffer
             HardwareVertexBufferSharedPtr mPositionBuffer;
-            // Shared link to w-coord buffer (optional)
-            HardwareVertexBufferSharedPtr mWBuffer;
 
         public:
             ManualObjectSectionShadowRenderable(ManualObject* parent, 
@@ -633,7 +631,6 @@ namespace Ogre
             ~ManualObjectSectionShadowRenderable();
             void getWorldTransforms(Matrix4* xform) const override;
             HardwareVertexBufferSharedPtr getPositionBuffer(void) { return mPositionBuffer; }
-            HardwareVertexBufferSharedPtr getWBuffer(void) { return mWBuffer; }
             virtual void rebindIndexBuffer(const HardwareIndexBufferSharedPtr& indexBuffer) override;
 
             
