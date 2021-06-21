@@ -119,8 +119,8 @@ namespace Ogre {
         */
         VertexData* clone(bool copyData = true, HardwareBufferManagerBase* mgr = 0) const OGRE_NODISCARD;
 
-        /** Modifies the vertex data to be suitable for use for rendering shadow geometry.
-        @remarks
+        /** Modifies the vertex data to be suitable for use for rendering shadow geometry as in @cite mcguire2003fast
+
             Preparing vertex data to generate a shadow volume involves firstly ensuring that the 
             vertex buffer containing the positions is a standalone vertex buffer,
             with no other components in it. This method will therefore break apart any existing
@@ -131,12 +131,16 @@ namespace Ogre {
             the same though, so as not to add any overhead to regular rendering of the object.
             Both copies of the position are required in one buffer because shadow volumes stretch 
             from the original mesh to the extruded version. 
-        @par
+
             It's important to appreciate that this method can fundamentally change the structure of your
             vertex buffers, although in reality they will be new buffers. As it happens, if other 
             objects are using the original buffers then they will be unaffected because the reference
             counting will keep them intact. However, if you have made any assumptions about the 
             structure of the vertex data in the buffers of this object, you may have to rethink them.
+
+            Because shadow volumes are rendered in turn, no additional
+            index buffer space is allocated by this method, a shared index buffer allocated by the
+            shadow rendering algorithm is used for addressing this extended vertex buffer.
         */
         void prepareForShadowVolume(void);
 
