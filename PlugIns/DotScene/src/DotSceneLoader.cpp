@@ -985,6 +985,7 @@ void DotSceneLoader::writeNode(pugi::xml_node& parentXML, const SceneNode* n)
             auto clipping = camera.append_child("clipping");
             clipping.append_attribute("near") = StringConverter::toString(c->getNearClipDistance()).c_str();
             clipping.append_attribute("far") = StringConverter::toString(c->getFarClipDistance()).c_str();
+            continue;
         }
 
         if (auto l = dynamic_cast<Light*>(mo))
@@ -1040,9 +1041,6 @@ void DotSceneLoader::writeNode(pugi::xml_node& parentXML, const SceneNode* n)
             continue;
         }
 
-        // non-standard fallback:
-        auto generic = nodeXML.append_child("movableObject");
-        generic.append_attribute("name") = mo->getName().c_str();
         LogManager::getSingleton().logWarning("DotSceneLoader - unsupported MovableType " +
                                             mo->getMovableType());
     }
