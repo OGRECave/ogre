@@ -287,6 +287,13 @@ namespace Ogre {
          */
         void loadChildren(const String& filename);
 
+        /**
+         * Save the scene hierarchy starting at this node to file
+         *
+         * @param filename destination file
+         */
+        void saveChildren(const String& filename);
+
         /** Allows the showing of the node's bounding box.
         @remarks
             Use this to show or hide the bounding box of the node.

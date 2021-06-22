@@ -382,6 +382,13 @@ namespace Ogre {
             filename, ResourceGroupManager::getSingleton().getWorldResourceGroupName());
         codec->decode(stream, this);
     }
+    void SceneNode::saveChildren(const String& filename)
+    {
+        String baseName, strExt;
+        StringUtil::splitBaseFilename(filename, baseName, strExt);
+        auto codec = Codec::getCodec(strExt);
+        codec->encodeToFile(this, filename);
+    }
     //-----------------------------------------------------------------------
     SceneNode* SceneNode::createChildSceneNode(const Vector3& inTranslate, 
         const Quaternion& inRotate)
