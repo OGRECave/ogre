@@ -29,9 +29,12 @@ public:
 
     void load(Ogre::DataStreamPtr& stream, const Ogre::String& groupName, Ogre::SceneNode* rootNode);
 
+    void exportScene(SceneNode* rootNode, const String& outFileName);
+
     const Ogre::ColourValue& getBackgroundColour() { return mBackgroundColour; }
 
 protected:
+    void writeNode(pugi::xml_node& parentXML, const SceneNode* node);
     void processScene(pugi::xml_node& XMLRoot);
 
     void processNodes(pugi::xml_node& XMLNode);
