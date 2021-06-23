@@ -746,6 +746,17 @@ namespace Ogre {
         virtual void dump(const String& filename) const;
 
 
+    /** Dummy factory to let Regions adhere to MovableObject protocol */
+    class _OgreExport StaticGeometryFactory : public MovableObjectFactory
+    {
+        MovableObject* createInstanceImpl( const String& name, const NameValuePairList* params) { return NULL; }
+    public:
+        StaticGeometryFactory() {}
+        ~StaticGeometryFactory() {}
+
+        static String FACTORY_TYPE_NAME;
+
+        const String& getType(void) const { return FACTORY_TYPE_NAME; }
     };
     /** @} */
     /** @} */
