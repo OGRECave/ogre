@@ -290,6 +290,7 @@ namespace Ogre {
 
             // Get the geometry for this SubMesh
             q->submesh = se->getSubMesh();
+            q->material = se->getMaterial();
             q->geometryLodList = determineGeometry(q->submesh);
             q->orientation = orientation;
             q->position = position;
@@ -1045,15 +1046,15 @@ namespace Ogre {
         // Locate a material bucket
         MaterialBucket* mbucket = 0;
         MaterialBucketMap::iterator m =
-            mMaterialBucketMap.find(qmesh->submesh->getMaterial()->getName());
+            mMaterialBucketMap.find(qmesh->material->getName());
         if (m != mMaterialBucketMap.end())
         {
             mbucket = m->second;
         }
         else
         {
-            mbucket = OGRE_NEW MaterialBucket(this, qmesh->submesh->getMaterial());
-            mMaterialBucketMap[mbucket->getMaterialName()] = mbucket;
+            mbucket = OGRE_NEW MaterialBucket(this, qmesh->material);
+            mMaterialBucketMap[qmesh->material->getName()] = mbucket;
         }
         mbucket->assign(q);
     }

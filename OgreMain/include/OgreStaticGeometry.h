@@ -158,6 +158,7 @@ namespace Ogre {
         struct QueuedSubMesh : public BatchedGeometryAlloc
         {
             SubMesh* submesh;
+            MaterialPtr material;
             /// Link to LOD list of geometry, potentially optimised
             SubMeshLodGeometryLinkList* geometryLodList;
             Vector3 position;
@@ -745,6 +746,8 @@ namespace Ogre {
         */
         virtual void dump(const String& filename) const;
 
+
+    };
 
     /** Dummy factory to let Regions adhere to MovableObject protocol */
     class _OgreExport StaticGeometryFactory : public MovableObjectFactory
