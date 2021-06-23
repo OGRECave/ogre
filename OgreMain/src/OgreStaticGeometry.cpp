@@ -1710,6 +1710,6 @@ namespace Ogre {
 
     }
     //--------------------------------------------------------------------------
-
+    String StaticGeometryFactory::FACTORY_TYPE_NAME = "StaticGeometry";
 }
 

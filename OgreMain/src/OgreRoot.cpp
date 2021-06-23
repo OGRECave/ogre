@@ -51,6 +51,7 @@ THE SOFTWARE.
 #include "OgreLodStrategyManager.h"
 #include "OgreFileSystemLayer.h"
 #include "OgreSceneLoaderManager.h"
+#include "OgreStaticGeometry.h"
 
 #if OGRE_NO_DDS_CODEC == 0
 #include "OgreDDSCodec.h"
@@ -222,6 +223,8 @@ namespace Ogre {
         addMovableObjectFactory(mBillboardChainFactory.get());
         mRibbonTrailFactory.reset(new RibbonTrailFactory());
         addMovableObjectFactory(mRibbonTrailFactory.get());
+        mStaticGeometryFactory.reset(new StaticGeometryFactory());
+        addMovableObjectFactory(mStaticGeometryFactory.get());
 
         // Load plugins
         if (!pluginFileName.empty())
