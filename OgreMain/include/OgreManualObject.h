@@ -616,29 +616,6 @@ namespace Ogre
             void convertToSubMesh(SubMesh* sm) const;
                     
         };
-        /** Nested class to allow shadows. */
-        class _OgreExport ManualObjectSectionShadowRenderable : public ShadowRenderable
-        {
-        protected:
-            ManualObject* mParent;
-            // Shared link to position buffer
-            HardwareVertexBufferSharedPtr mPositionBuffer;
-            // Shared link to w-coord buffer (optional)
-            HardwareVertexBufferSharedPtr mWBuffer;
-
-        public:
-            ManualObjectSectionShadowRenderable(ManualObject* parent, 
-                HardwareIndexBufferSharedPtr* indexBuffer, const VertexData* vertexData, 
-                bool createSeparateLightCap, bool isLightCap = false);
-            ~ManualObjectSectionShadowRenderable();
-            void getWorldTransforms(Matrix4* xform) const override;
-            HardwareVertexBufferSharedPtr getPositionBuffer(void) { return mPositionBuffer; }
-            HardwareVertexBufferSharedPtr getWBuffer(void) { return mWBuffer; }
-            virtual void rebindIndexBuffer(const HardwareIndexBufferSharedPtr& indexBuffer) override;
-
-            
-
-        };
 
         typedef std::vector<ManualObjectSection*> SectionList;
 

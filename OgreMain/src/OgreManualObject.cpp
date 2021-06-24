@@ -588,7 +588,6 @@ ManualObject::ManualObject(const String& name)
 
         EdgeData::EdgeGroupList::iterator egi;
         ShadowRenderableList::iterator si, siend;
-        ManualObjectSectionShadowRenderable* esr = 0;
         SectionList::iterator seci;
         if (init)
             mShadowRenderables.resize(edgeList->edgeGroups.size());
@@ -623,12 +622,11 @@ ManualObject::ManualObject(const String& name)
                         break;
                     }
                 }
-                *si = OGRE_NEW ManualObjectSectionShadowRenderable(this, indexBuffer,
-                    egi->vertexData, vertexProgram || !extrude);
+                *si = OGRE_NEW ShadowRenderable(this, *indexBuffer, egi->vertexData,
+                                                vertexProgram || !extrude);
             }
             // Get shadow renderable
-            esr = static_cast<ManualObjectSectionShadowRenderable*>(*si);
-            HardwareVertexBufferSharedPtr esrPositionBuffer = esr->getPositionBuffer();
+            HardwareVertexBufferSharedPtr esrPositionBuffer = (*si)->getPositionBuffer();
             // Extrude vertices in software if required
             if (extrude)
             {
@@ -756,75 +754,6 @@ ManualObject::ManualObject(const String& name)
             OGRE_DELETE sm->indexData;
             sm->indexData = mRenderOperation.indexData->clone(true);
         }
-    }
-    //--------------------------------------------------------------------------
-    ManualObject::ManualObjectSectionShadowRenderable::ManualObjectSectionShadowRenderable(
-        ManualObject* parent, HardwareIndexBufferSharedPtr* indexBuffer,
-        const VertexData* vertexData, bool createSeparateLightCap,
-        bool isLightCap)
-        : mParent(parent)
-    {
-        // Initialise render op
-        mRenderOp.indexData = OGRE_NEW IndexData();
-        mRenderOp.indexData->indexBuffer = *indexBuffer;
-        mRenderOp.indexData->indexStart = 0;
-        // index start and count are sorted out later
-
-        // Create vertex data which just references position component (and 2 component)
-        mRenderOp.vertexData = OGRE_NEW VertexData();
-        // Map in position data
-        mRenderOp.vertexData->vertexDeclaration->addElement(0,0,VET_FLOAT3, VES_POSITION);
-        ushort origPosBind =
-            vertexData->vertexDeclaration->findElementBySemantic(VES_POSITION)->getSource();
-        mPositionBuffer = vertexData->vertexBufferBinding->getBuffer(origPosBind);
-        mRenderOp.vertexData->vertexBufferBinding->setBinding(0, mPositionBuffer);
-        // Map in w-coord buffer (if present)
-        if(vertexData->hardwareShadowVolWBuffer)
-        {
-            mRenderOp.vertexData->vertexDeclaration->addElement(1,0,VET_FLOAT1, VES_TEXTURE_COORDINATES, 0);
-            mWBuffer = vertexData->hardwareShadowVolWBuffer;
-            mRenderOp.vertexData->vertexBufferBinding->setBinding(1, mWBuffer);
-        }
-        // Use same vertex start as input
-        mRenderOp.vertexData->vertexStart = vertexData->vertexStart;
-
-        if (isLightCap)
-        {
-            // Use original vertex count, no extrusion
-            mRenderOp.vertexData->vertexCount = vertexData->vertexCount;
-        }
-        else
-        {
-            // Vertex count must take into account the doubling of the buffer,
-            // because second half of the buffer is the extruded copy
-            mRenderOp.vertexData->vertexCount =
-                vertexData->vertexCount * 2;
-            if (createSeparateLightCap)
-            {
-                // Create child light cap
-                mLightCap = OGRE_NEW ManualObjectSectionShadowRenderable(parent,
-                    indexBuffer, vertexData, false, true);
-            }
-        }
-    }
-    //--------------------------------------------------------------------------
-    ManualObject::ManualObjectSectionShadowRenderable::~ManualObjectSectionShadowRenderable()
-    {
-        OGRE_DELETE mRenderOp.indexData;
-        OGRE_DELETE mRenderOp.vertexData;
-    }
-    //--------------------------------------------------------------------------
-    void ManualObject::ManualObjectSectionShadowRenderable::getWorldTransforms(
-        Matrix4* xform) const
-    {
-        // pretransformed
-        *xform = mParent->_getParentNodeFullTransform();
-    }
-    //-----------------------------------------------------------------------
-    void ManualObject::ManualObjectSectionShadowRenderable::rebindIndexBuffer(const HardwareIndexBufferSharedPtr& indexBuffer)
-    {
-        mRenderOp.indexData->indexBuffer = indexBuffer;
-        if (mLightCap) mLightCap->rebindIndexBuffer(indexBuffer);
     }
     //-----------------------------------------------------------------------------
     //-----------------------------------------------------------------------------

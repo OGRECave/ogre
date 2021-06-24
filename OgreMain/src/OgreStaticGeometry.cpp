@@ -927,76 +927,6 @@ namespace Ogre {
     }
     //--------------------------------------------------------------------------
     //--------------------------------------------------------------------------
-    StaticGeometry::LODBucket::LODShadowRenderable::LODShadowRenderable(
-        LODBucket* parent, HardwareIndexBufferSharedPtr* indexBuffer,
-        const VertexData* vertexData, bool createSeparateLightCap,
-        bool isLightCap)
-        : mParent(parent)
-    {
-        // Initialise render op
-        mRenderOp.indexData = OGRE_NEW IndexData();
-        mRenderOp.indexData->indexBuffer = *indexBuffer;
-        mRenderOp.indexData->indexStart = 0;
-        // index start and count are sorted out later
-
-        // Create vertex data which just references position component (and 2 component)
-        mRenderOp.vertexData = OGRE_NEW VertexData();
-        // Map in position data
-        mRenderOp.vertexData->vertexDeclaration->addElement(0,0,VET_FLOAT3, VES_POSITION);
-        ushort origPosBind =
-            vertexData->vertexDeclaration->findElementBySemantic(VES_POSITION)->getSource();
-        mPositionBuffer = vertexData->vertexBufferBinding->getBuffer(origPosBind);
-        mRenderOp.vertexData->vertexBufferBinding->setBinding(0, mPositionBuffer);
-        // Map in w-coord buffer (if present)
-        if(vertexData->hardwareShadowVolWBuffer)
-        {
-            mRenderOp.vertexData->vertexDeclaration->addElement(1,0,VET_FLOAT1, VES_TEXTURE_COORDINATES, 0);
-            mWBuffer = vertexData->hardwareShadowVolWBuffer;
-            mRenderOp.vertexData->vertexBufferBinding->setBinding(1, mWBuffer);
-        }
-        // Use same vertex start as input
-        mRenderOp.vertexData->vertexStart = vertexData->vertexStart;
-
-        if (isLightCap)
-        {
-            // Use original vertex count, no extrusion
-            mRenderOp.vertexData->vertexCount = vertexData->vertexCount;
-        }
-        else
-        {
-            // Vertex count must take into account the doubling of the buffer,
-            // because second half of the buffer is the extruded copy
-            mRenderOp.vertexData->vertexCount =
-                vertexData->vertexCount * 2;
-            if (createSeparateLightCap)
-            {
-                // Create child light cap
-                mLightCap = OGRE_NEW LODShadowRenderable(parent,
-                    indexBuffer, vertexData, false, true);
-            }
-        }
-    }
-    //--------------------------------------------------------------------------
-    StaticGeometry::LODBucket::LODShadowRenderable::~LODShadowRenderable()
-    {
-        OGRE_DELETE mRenderOp.indexData;
-        OGRE_DELETE mRenderOp.vertexData;
-    }
-    //--------------------------------------------------------------------------
-    void StaticGeometry::LODBucket::LODShadowRenderable::getWorldTransforms(
-        Matrix4* xform) const
-    {
-        // pretransformed
-        *xform = mParent->getParent()->_getParentNodeFullTransform();
-    }
-    //-----------------------------------------------------------------------
-    void StaticGeometry::LODBucket::LODShadowRenderable::rebindIndexBuffer(const HardwareIndexBufferSharedPtr& indexBuffer)
-    {
-        mRenderOp.indexData->indexBuffer = indexBuffer;
-        if (mLightCap) mLightCap->rebindIndexBuffer(indexBuffer);
-    }
-    //--------------------------------------------------------------------------
-    //--------------------------------------------------------------------------
     StaticGeometry::LODBucket::LODBucket(Region* parent, unsigned short lod,
         Real lodValue)
         : mParent(parent), mLod(lod), mLodValue(lodValue), mEdgeList(0)
@@ -1173,7 +1103,6 @@ namespace Ogre {
 
         EdgeData::EdgeGroupList::iterator egi;
         ShadowCaster::ShadowRenderableList::iterator si, siend;
-        LODShadowRenderable* esr = 0;
         if (init)
             mShadowRenderables.resize(mEdgeList->edgeGroups.size());
 
@@ -1189,12 +1118,11 @@ namespace Ogre {
                 // for extruding the shadow volume) since otherwise we can
                 // get depth-fighting on the light cap
 
-                *si = OGRE_NEW LODShadowRenderable(this, indexBuffer,
-                    egi->vertexData, mVertexProgramInUse || !extrude);
+                *si = OGRE_NEW ShadowRenderable(mParent, *indexBuffer, egi->vertexData,
+                                                mVertexProgramInUse || !extrude);
             }
             // Get shadow renderable
-            esr = static_cast<LODShadowRenderable*>(*si);
-            HardwareVertexBufferSharedPtr esrPositionBuffer = esr->getPositionBuffer();
+            HardwareVertexBufferSharedPtr esrPositionBuffer = (*si)->getPositionBuffer();
             // Extrude vertices in software if required
             if (extrude)
             {
