@@ -872,11 +872,9 @@ namespace Ogre {
         return LODIterator(mLodBucketList.begin(), mLodBucketList.end());
     }
     //---------------------------------------------------------------------
-    const ShadowCaster::ShadowRenderableList&
-    StaticGeometry::Region::getShadowVolumeRenderableList(
-        ShadowTechnique shadowTechnique, const Light* light,
-        HardwareIndexBufferSharedPtr* indexBuffer, size_t* indexBufferUsedSize,
-        bool extrude, Real extrusionDistance, unsigned long flags)
+    const ShadowRenderableList& StaticGeometry::Region::getShadowVolumeRenderableList(
+        const Light* light, const HardwareIndexBufferPtr& indexBuffer, size_t& indexBufferUsedSize,
+        float extrusionDistance, int flags)
     {
         // Calculate the object space light details
         Vector4 lightPos = light->getAs4DVector();
@@ -886,9 +884,9 @@ namespace Ogre {
         extrusionDistance *= Math::Sqrt(std::min(std::min(world2Obj3x3.GetColumn(0).squaredLength(), world2Obj3x3.GetColumn(1).squaredLength()), world2Obj3x3.GetColumn(2).squaredLength()));
 
         // per-LOD shadow lists & edge data
-        mLodBucketList[mCurrentLod]->updateShadowRenderables(
-            shadowTechnique, lightPos, indexBuffer, extrude, extrusionDistance, flags);
-        
+        mLodBucketList[mCurrentLod]->updateShadowRenderables(lightPos, indexBuffer,
+                                                             extrusionDistance, flags);
+
         EdgeData* edgeList = mLodBucketList[mCurrentLod]->getEdgeList();
         ShadowRenderableList& shadowRendList = mLodBucketList[mCurrentLod]->getShadowRenderableList();
 
@@ -896,9 +894,7 @@ namespace Ogre {
         updateEdgeListLightFacing(edgeList, lightPos);
 
         // Generate indexes and update renderables
-        generateShadowVolume(edgeList, *indexBuffer, *indexBufferUsedSize,
-            light, shadowRendList, flags);
-
+        generateShadowVolume(edgeList, indexBuffer, indexBufferUsedSize, light, shadowRendList, flags);
 
         return shadowRendList;
 
@@ -1086,27 +1082,25 @@ namespace Ogre {
 
     }
     //---------------------------------------------------------------------
-    void StaticGeometry::LODBucket::updateShadowRenderables(
-        ShadowTechnique shadowTechnique, const Vector4& lightPos, 
-        HardwareIndexBufferSharedPtr* indexBuffer, bool extrude, 
-        Real extrusionDistance, unsigned long flags /* = 0  */)
+    void StaticGeometry::LODBucket::updateShadowRenderables(const Vector4& lightPos,
+                                                            const HardwareIndexBufferPtr& indexBuffer,
+                                                            Real extrusionDistance, int flags)
     {
-        assert(indexBuffer && "Only external index buffers are supported right now");
-        assert((*indexBuffer)->getType() == HardwareIndexBuffer::IT_16BIT &&
-            "Only 16-bit indexes supported for now");
+        assert(indexBuffer->getType() == HardwareIndexBuffer::IT_16BIT &&
+               "Only 16-bit indexes supported for now");
 
         // We need to search the edge list for silhouette edges
         OgreAssert(mEdgeList, "You enabled stencil shadows after the build process!");
 
         // Init shadow renderable list if required
         bool init = mShadowRenderables.empty();
+        bool extrude = flags & SRF_EXTRUDE_IN_SOFTWARE;
 
         EdgeData::EdgeGroupList::iterator egi;
         ShadowCaster::ShadowRenderableList::iterator si, siend;
         if (init)
             mShadowRenderables.resize(mEdgeList->edgeGroups.size());
 
-        //bool updatedSharedGeomNormals = false;
         siend = mShadowRenderables.end();
         egi = mEdgeList->edgeGroups.begin();
         for (si = mShadowRenderables.begin(); si != siend; ++si, ++egi)
@@ -1118,22 +1112,16 @@ namespace Ogre {
                 // for extruding the shadow volume) since otherwise we can
                 // get depth-fighting on the light cap
 
-                *si = OGRE_NEW ShadowRenderable(mParent, *indexBuffer, egi->vertexData,
+                *si = OGRE_NEW ShadowRenderable(mParent, indexBuffer, egi->vertexData,
                                                 mVertexProgramInUse || !extrude);
             }
-            // Get shadow renderable
-            HardwareVertexBufferSharedPtr esrPositionBuffer = (*si)->getPositionBuffer();
             // Extrude vertices in software if required
             if (extrude)
             {
-                mParent->extrudeVertices(esrPositionBuffer,
-                    egi->vertexData->vertexCount,
-                    lightPos, extrusionDistance);
-
+                mParent->extrudeVertices((*si)->getPositionBuffer(), egi->vertexData->vertexCount, lightPos,
+                                         extrusionDistance);
             }
-
         }
-
     }
     //--------------------------------------------------------------------------
     //--------------------------------------------------------------------------

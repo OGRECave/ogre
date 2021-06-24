@@ -330,11 +330,8 @@ namespace Ogre {
             EdgeData* getEdgeList() const { return mEdgeList; }
             ShadowCaster::ShadowRenderableList& getShadowRenderableList() { return mShadowRenderables; }
             bool isVertexProgramInUse() const { return mVertexProgramInUse; }
-            void updateShadowRenderables(
-                ShadowTechnique shadowTechnique, const Vector4& lightPos, 
-                HardwareIndexBufferSharedPtr* indexBuffer, 
-                bool extrudeVertices, Real extrusionDistance, unsigned long flags = 0 );
-            
+            void updateShadowRenderables(const Vector4& lightPos, const HardwareIndexBufferPtr& indexBuffer,
+                                         Real extrusionDistance, int flags = 0);
         };
         /** The details of a topological region which is the highest level of
             partitioning for this class.
@@ -415,10 +412,10 @@ namespace Ogre {
             OGRE_DEPRECATED LODIterator getLODIterator(void);
             /// Get an list of the LODs in this region
             const LODBucketList& getLODBuckets() const { return mLodBucketList; }
-            const ShadowRenderableList& getShadowVolumeRenderableList(
-                ShadowTechnique shadowTechnique, const Light* light, 
-                HardwareIndexBufferSharedPtr* indexBuffer, size_t* indexBufferUsedSize,
-                bool extrudeVertices, Real extrusionDistance, unsigned long flags = 0 ) override;
+            const ShadowRenderableList&
+            getShadowVolumeRenderableList(const Light* light, const HardwareIndexBufferPtr& indexBuffer,
+                                          size_t& indexBufferUsedSize, float extrusionDistance,
+                                          int flags = 0) override;
             EdgeData* getEdgeList(void) override;
 
             void _releaseManualHardwareResources() override;

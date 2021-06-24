@@ -114,8 +114,12 @@ namespace Ogre {
         /// For shadow volume techniques only, generate a dark cap on the volume.
         SRF_INCLUDE_DARK_CAP  = 0x00000002,
         /// For shadow volume techniques only, indicates volume is extruded to infinity.
-        SRF_EXTRUDE_TO_INFINITY  = 0x00000004
+        SRF_EXTRUDE_TO_INFINITY  = 0x00000004,
+        /// For shadow volume techniques only, indicates hardware extrusion is not supported.
+        SRF_EXTRUDE_IN_SOFTWARE  = 0x00000008,
     };
+
+    typedef std::vector<ShadowRenderable*> ShadowRenderableList;
 
     /** This class defines the interface that must be implemented by shadow casters.
     */
@@ -138,7 +142,7 @@ namespace Ogre {
         /** Gets the world space bounding box of the dark cap, as extruded using the light provided. */
         virtual const AxisAlignedBox& getDarkCapBounds(const Light& light, Real dirLightExtrusionDist) const = 0;
 
-        typedef std::vector<ShadowRenderable*> ShadowRenderableList;
+        typedef Ogre::ShadowRenderableList ShadowRenderableList;
         typedef VectorIterator<ShadowRenderableList> ShadowRenderableListIterator;
 
         /** Gets an list of the renderables required to render the shadow volume.
@@ -146,8 +150,6 @@ namespace Ogre {
             Shadowable geometry should ideally be designed such that there is only one
             ShadowRenderable required to render the the shadow; however this is not a necessary
             limitation and it can be exceeded if required.
-        @param shadowTechnique
-            The technique being used to generate the shadow.
         @param light
             The light to generate the shadow from.
         @param indexBuffer
@@ -157,20 +159,15 @@ namespace Ogre {
             If the rest of buffer is enough than it would be locked with
             HBL_NO_OVERWRITE semantic and indexBufferUsedSize would be increased,
             otherwise HBL_DISCARD would be used and indexBufferUsedSize would be reset.
-        @param extrudeVertices
-            If @c true, this means this class should extrude
-            the vertices of the back of the volume in software. If false, it
-            will not be done (a vertex program is assumed).
         @param extrusionDistance
             The distance to extrude the shadow volume.
         @param flags
             Technique-specific flags, see ShadowRenderableFlags.
         */
         virtual const ShadowRenderableList&
-        getShadowVolumeRenderableList(ShadowTechnique shadowTechnique, const Light* light,
-                                      HardwareIndexBufferSharedPtr* indexBuffer,
-                                      size_t* indexBufferUsedSize, bool extrudeVertices,
-                                      Real extrusionDistance, unsigned long flags = 0) = 0;
+        getShadowVolumeRenderableList(const Light* light, const HardwareIndexBufferPtr& indexBuffer,
+                                      size_t& indexBufferUsedSize, float extrusionDistance,
+                                      int flags = 0) = 0;
 
         /** Common implementation of releasing shadow renderables.*/
         static void clearShadowRenderableList(ShadowRenderableList& shadowRenderables);
