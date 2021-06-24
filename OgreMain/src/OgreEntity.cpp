@@ -1926,7 +1926,6 @@ namespace Ogre {
 
         EdgeData::EdgeGroupList::iterator egi;
         ShadowRenderableList::iterator si, siend;
-        EntityShadowRenderable* esr = 0;
         if (init)
             mShadowRenderables.resize(edgeList->edgeGroups.size());
 
@@ -1956,7 +1955,7 @@ namespace Ogre {
                 // for extruding the shadow volume) since otherwise we can
                 // get depth-fighting on the light cap
 
-                *si = OGRE_NEW EntityShadowRenderable(this, indexBuffer, pVertData,
+                *si = OGRE_NEW EntityShadowRenderable(this, *indexBuffer, pVertData,
                     mVertexProgramInUse || !extrude, subent);
             }
             else
@@ -1970,8 +1969,7 @@ namespace Ogre {
 
             }
             // Get shadow renderable
-            esr = static_cast<EntityShadowRenderable*>(*si);
-            HardwareVertexBufferSharedPtr esrPositionBuffer = esr->getPositionBuffer();
+            HardwareVertexBufferSharedPtr esrPositionBuffer = (*si)->getPositionBuffer();
             // For animated entities we need to recalculate the face normals
             if (hasAnimation)
             {
@@ -2104,53 +2102,20 @@ namespace Ogre {
     }
     //-----------------------------------------------------------------------
     //-----------------------------------------------------------------------
-    Entity::EntityShadowRenderable::EntityShadowRenderable(Entity* parent,
-        HardwareIndexBufferSharedPtr* indexBuffer, const VertexData* vertexData,
-        bool createSeparateLightCap, SubEntity* subent, bool isLightCap)
-        : mParent(parent), mSubEntity(subent)
+    Entity::EntityShadowRenderable::EntityShadowRenderable(MovableObject* parent,
+                                                           const HardwareIndexBufferSharedPtr& indexBuffer,
+                                                           const VertexData* vertexData,
+                                                           bool createSeparateLightCap, SubEntity* subent,
+                                                           bool isLightCap)
+        : ShadowRenderable(parent, indexBuffer, vertexData, false, isLightCap), mSubEntity(subent)
     {
         // Save link to vertex data
         mCurrentVertexData = vertexData;
-
-        // Initialise render op
-        mRenderOp.indexData = OGRE_NEW IndexData();
-        mRenderOp.indexData->indexBuffer = *indexBuffer;
-        mRenderOp.indexData->indexStart = 0;
-        // index start and count are sorted out later
-
-        // Create vertex data which just references position component (and 2 component)
-        mRenderOp.vertexData = OGRE_NEW VertexData();
-        // Map in position data
-        mRenderOp.vertexData->vertexDeclaration->addElement(0,0,VET_FLOAT3, VES_POSITION);
         mOriginalPosBufferBinding =
             vertexData->vertexDeclaration->findElementBySemantic(VES_POSITION)->getSource();
-        mPositionBuffer = vertexData->vertexBufferBinding->getBuffer(mOriginalPosBufferBinding);
-        mRenderOp.vertexData->vertexBufferBinding->setBinding(0, mPositionBuffer);
-        // Map in w-coord buffer (if present)
-        if(vertexData->hardwareShadowVolWBuffer)
+        if (!isLightCap && createSeparateLightCap) // we passed createSeparateLightCap=false to parent
         {
-            mRenderOp.vertexData->vertexDeclaration->addElement(1,0,VET_FLOAT1, VES_TEXTURE_COORDINATES, 0);
-            mWBuffer = vertexData->hardwareShadowVolWBuffer;
-            mRenderOp.vertexData->vertexBufferBinding->setBinding(1, mWBuffer);
-        }
-        // Use same vertex start as input
-        mRenderOp.vertexData->vertexStart = vertexData->vertexStart;
-
-        if (isLightCap)
-        {
-            // Use original vertex count, no extrusion
-            mRenderOp.vertexData->vertexCount = vertexData->vertexCount;
-        }
-        else
-        {
-            // Vertex count must take into account the doubling of the buffer,
-            // because second half of the buffer is the extruded copy
-            mRenderOp.vertexData->vertexCount =
-                vertexData->vertexCount * 2;
-            if (createSeparateLightCap)
-            {
-                _createSeparateLightCap();
-            }
+            _createSeparateLightCap();
         }
     }
 
@@ -2161,19 +2126,8 @@ namespace Ogre {
         {
             // Create child light cap
             mLightCap = OGRE_NEW EntityShadowRenderable(mParent,
-                &mRenderOp.indexData->indexBuffer, mCurrentVertexData, false, mSubEntity, true);
+                mRenderOp.indexData->indexBuffer, mCurrentVertexData, false, mSubEntity, true);
         }   
-    }
-    //-----------------------------------------------------------------------
-    Entity::EntityShadowRenderable::~EntityShadowRenderable()
-    {
-        OGRE_DELETE mRenderOp.indexData;
-        OGRE_DELETE mRenderOp.vertexData;
-    }
-    //-----------------------------------------------------------------------
-    void Entity::EntityShadowRenderable::getWorldTransforms(Matrix4* xform) const
-    {
-        *xform = mParent->_getParentNodeFullTransform();
     }
     //-----------------------------------------------------------------------
     void Entity::EntityShadowRenderable::rebindPositionBuffer(const VertexData* vertexData, bool force)
@@ -2202,13 +2156,6 @@ namespace Ogre {
             return ShadowRenderable::isVisible();
         }
     }
-    //-----------------------------------------------------------------------
-    void Entity::EntityShadowRenderable::rebindIndexBuffer(const HardwareIndexBufferSharedPtr& indexBuffer)
-    {
-        mRenderOp.indexData->indexBuffer = indexBuffer;
-        if (mLightCap) mLightCap->rebindIndexBuffer(indexBuffer);
-    }
-
     //-----------------------------------------------------------------------
     void Entity::setRenderQueueGroup(uint8 queueID)
     {

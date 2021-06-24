@@ -31,6 +31,68 @@ THE SOFTWARE.
 #include "OgreOptimisedUtil.h"
 
 namespace Ogre {
+    ShadowRenderable::ShadowRenderable(MovableObject* parent, const HardwareIndexBufferSharedPtr& indexBuffer,
+                                   const VertexData* vertexData, bool createSeparateLightCap,
+                                   bool isLightCap)
+    : mLightCap(0), mParent(parent)
+    {
+        // Initialise render op
+        mRenderOp.indexData = OGRE_NEW IndexData();
+        mRenderOp.indexData->indexBuffer = indexBuffer;
+        mRenderOp.indexData->indexStart = 0;
+        // index start and count are sorted out later
+
+        // Create vertex data which just references position component (and 2 component)
+        mRenderOp.vertexData = OGRE_NEW VertexData();
+        // Map in position data
+        mRenderOp.vertexData->vertexDeclaration->addElement(0,0,VET_FLOAT3, VES_POSITION);
+        ushort origPosBind =
+            vertexData->vertexDeclaration->findElementBySemantic(VES_POSITION)->getSource();
+        mPositionBuffer = vertexData->vertexBufferBinding->getBuffer(origPosBind);
+        mRenderOp.vertexData->vertexBufferBinding->setBinding(0, mPositionBuffer);
+        // Map in w-coord buffer (if present)
+        if(vertexData->hardwareShadowVolWBuffer)
+        {
+            mRenderOp.vertexData->vertexDeclaration->addElement(1,0,VET_FLOAT1, VES_TEXTURE_COORDINATES, 0);
+            mWBuffer = vertexData->hardwareShadowVolWBuffer;
+            mRenderOp.vertexData->vertexBufferBinding->setBinding(1, mWBuffer);
+        }
+        // Use same vertex start as input
+        mRenderOp.vertexData->vertexStart = vertexData->vertexStart;
+
+        if (isLightCap)
+        {
+            // Use original vertex count, no extrusion
+            mRenderOp.vertexData->vertexCount = vertexData->vertexCount;
+        }
+        else
+        {
+            // Vertex count must take into account the doubling of the buffer,
+            // because second half of the buffer is the extruded copy
+            mRenderOp.vertexData->vertexCount = vertexData->vertexCount * 2;
+
+            if (createSeparateLightCap)
+            {
+                // Create child light cap
+                mLightCap = OGRE_NEW ShadowRenderable(parent, indexBuffer, vertexData, false, true);
+            }
+        }
+    }
+    ShadowRenderable::~ShadowRenderable()
+    {
+        delete mLightCap;
+        delete mRenderOp.indexData;
+        delete mRenderOp.vertexData;
+    }
+    void ShadowRenderable::rebindIndexBuffer(const HardwareIndexBufferSharedPtr& indexBuffer)
+    {
+        mRenderOp.indexData->indexBuffer = indexBuffer;
+        if (mLightCap) mLightCap->rebindIndexBuffer(indexBuffer);
+    }
+    void ShadowRenderable::getWorldTransforms(Matrix4* xform) const
+    {
+        *xform = mParent->_getParentNodeFullTransform();
+    }
     const LightList& ShadowRenderable::getLights(void) const 
     {
         // return empty

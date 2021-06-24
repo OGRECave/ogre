@@ -56,25 +56,28 @@ namespace Ogre {
         RenderOperation mRenderOp;
         MaterialPtr mMaterial;
         ShadowRenderable* mLightCap; /// Used only if isLightCapSeparate == true
+        MovableObject* mParent;
+        /// Shared link to position buffer.
+        HardwareVertexBufferSharedPtr mPositionBuffer;
+        /// Shared link to w-coord buffer (optional).
+        HardwareVertexBufferSharedPtr mWBuffer;
     public:
-        ShadowRenderable() : mMaterial(), mLightCap(0) {}
-        virtual ~ShadowRenderable() { delete mLightCap; }
+        ShadowRenderable() : mLightCap(0) {}
+        ShadowRenderable(MovableObject* parent, const HardwareIndexBufferSharedPtr& indexBuffer,
+                         const VertexData* vertexData, bool createSeparateLightCap,
+                         bool isLightCap = false);
+        virtual ~ShadowRenderable();
         /** Set the material to be used by the shadow, should be set by the caller 
             before adding to a render queue
         */
         void setMaterial(const MaterialPtr& mat) { mMaterial = mat; }
-        /// @copydoc Renderable::getMaterial
-        const MaterialPtr& getMaterial(void) const { return mMaterial; }
-        /// @copydoc Renderable::getRenderOperation
-        void getRenderOperation(RenderOperation& op) { op = mRenderOp; }
+        const MaterialPtr& getMaterial(void) const override { return mMaterial; }
+        void getRenderOperation(RenderOperation& op) override { op = mRenderOp; }
         /// Get the internal render operation for set up.
         RenderOperation* getRenderOperationForUpdate(void) {return &mRenderOp;}
-        /// @copydoc Renderable::getWorldTransforms
-        void getWorldTransforms(Matrix4* xform) const = 0;
-        /// @copydoc Renderable::getSquaredViewDepth
-        Real getSquaredViewDepth(const Camera*) const{ return 0; /* not used */}
-        /// @copydoc Renderable::getLights
-        const LightList& getLights(void) const;
+        void getWorldTransforms(Matrix4* xform) const override;
+        Real getSquaredViewDepth(const Camera*) const override { return 0; /* not used */}
+        const LightList& getLights(void) const override;
         /** Does this renderable require a separate light cap?
         @remarks
             If possible, the light cap (when required) should be contained in the
@@ -98,8 +101,9 @@ namespace Ogre {
         @param indexBuffer
             Pointer to the new index buffer.
         */
-        virtual void rebindIndexBuffer(const HardwareIndexBufferSharedPtr& indexBuffer) = 0;
+        void rebindIndexBuffer(const HardwareIndexBufferSharedPtr& indexBuffer);
 
+        const HardwareVertexBufferSharedPtr& getPositionBuffer(void) const { return mPositionBuffer; }
     };
 
     /** A set of flags that can be used to influence ShadowRenderable creation. */

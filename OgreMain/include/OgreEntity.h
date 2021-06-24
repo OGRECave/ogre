@@ -321,11 +321,6 @@ namespace Ogre {
         /** Nested class to allow entity shadows. */
         class EntityShadowRenderable : public ShadowRenderable
         {
-            Entity* mParent;
-            /// Shared link to position buffer.
-            HardwareVertexBufferSharedPtr mPositionBuffer;
-            /// Shared link to w-coord buffer (optional).
-            HardwareVertexBufferSharedPtr mWBuffer;
             /// Link to current vertex data used to bind (maybe changes).
             const VertexData* mCurrentVertexData;
             /// Link to SubEntity, only present if SubEntity has it's own geometry.
@@ -334,20 +329,15 @@ namespace Ogre {
             ushort mOriginalPosBufferBinding;
 
         public:
-            EntityShadowRenderable(Entity* parent,
-                HardwareIndexBufferSharedPtr* indexBuffer, const VertexData* vertexData,
+            EntityShadowRenderable(MovableObject* parent,
+                const HardwareIndexBufferSharedPtr& indexBuffer, const VertexData* vertexData,
                 bool createSeparateLightCap, SubEntity* subent, bool isLightCap = false);
-            ~EntityShadowRenderable();
             
             /// Create the separate light cap if it doesn't already exists.
             void _createSeparateLightCap();
-            void getWorldTransforms(Matrix4* xform) const override;
-            HardwareVertexBufferSharedPtr getPositionBuffer(void) { return mPositionBuffer; }
-            HardwareVertexBufferSharedPtr getWBuffer(void) { return mWBuffer; }
             /// Rebind the source positions (for temp buffer users).
             void rebindPositionBuffer(const VertexData* vertexData, bool force);
             bool isVisible(void) const override;
-            virtual void rebindIndexBuffer(const HardwareIndexBufferSharedPtr& indexBuffer) override;
         };
     public:
         /** Default destructor.

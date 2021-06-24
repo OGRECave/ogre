@@ -287,26 +287,6 @@ namespace Ogre {
             /// Lookup of Material Buckets in this region
             typedef std::map<String, MaterialBucket*> MaterialBucketMap;
         private:
-            /** Nested class to allow shadows. */
-            class LODShadowRenderable : public ShadowRenderable
-            {
-                LODBucket* mParent;
-                // Shared link to position buffer
-                HardwareVertexBufferSharedPtr mPositionBuffer;
-                // Shared link to w-coord buffer (optional)
-                HardwareVertexBufferSharedPtr mWBuffer;
-
-            public:
-                LODShadowRenderable(LODBucket* parent, 
-                    HardwareIndexBufferSharedPtr* indexBuffer, const VertexData* vertexData, 
-                    bool createSeparateLightCap, bool isLightCap = false);
-                ~LODShadowRenderable();
-                void getWorldTransforms(Matrix4* xform) const override;
-                HardwareVertexBufferSharedPtr getPositionBuffer(void) { return mPositionBuffer; }
-                HardwareVertexBufferSharedPtr getWBuffer(void) { return mWBuffer; }
-                virtual void rebindIndexBuffer(const HardwareIndexBufferSharedPtr& indexBuffer) override;
-
-            };
             /// Pointer to parent region
             Region* mParent;
             /// LOD level (0 == full LOD)
