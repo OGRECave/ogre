@@ -277,23 +277,28 @@ namespace Ogre {
     typedef SharedPtr<GpuLogicalBufferStruct> GpuLogicalBufferStructPtr;
     typedef SharedPtr<GpuSharedParameters> GpuSharedParametersPtr;
     typedef SharedPtr<GpuProgramParameters> GpuProgramParametersPtr;
-    typedef GpuProgramParametersPtr GpuProgramParametersSharedPtr; //!< @deprecated
     typedef SharedPtr<HardwareBuffer> HardwareBufferPtr;
-    typedef SharedPtr<HardwareIndexBuffer> HardwareIndexBufferSharedPtr;
-    typedef SharedPtr<HardwarePixelBuffer> HardwarePixelBufferSharedPtr;
-    typedef HardwareBufferPtr HardwareUniformBufferSharedPtr; //!< @deprecated
-    typedef HardwareBufferPtr HardwareCounterBufferSharedPtr; //!< @deprecated
-    typedef SharedPtr<HardwareVertexBuffer> HardwareVertexBufferSharedPtr;
-    typedef GpuProgramPtr HighLevelGpuProgramPtr; //!< @deprecated
+    typedef SharedPtr<HardwareIndexBuffer> HardwareIndexBufferPtr;
+    typedef SharedPtr<HardwarePixelBuffer> HardwarePixelBufferPtr;
+    typedef SharedPtr<HardwareVertexBuffer> HardwareVertexBufferPtr;
     typedef SharedPtr<Material> MaterialPtr;
     typedef SharedPtr<MemoryDataStream> MemoryDataStreamPtr;
     typedef SharedPtr<Mesh> MeshPtr;
     typedef SharedPtr<PatchMesh> PatchMeshPtr;
-    typedef SharedPtr<RenderToVertexBuffer> RenderToVertexBufferSharedPtr;
+    typedef SharedPtr<RenderToVertexBuffer> RenderToVertexBufferPtr;
     typedef SharedPtr<Resource> ResourcePtr;
     typedef SharedPtr<ShadowCameraSetup> ShadowCameraSetupPtr;
     typedef SharedPtr<Skeleton> SkeletonPtr;
     typedef SharedPtr<Texture> TexturePtr;
+
+    typedef RenderToVertexBufferPtr RenderToVertexBufferSharedPtr; //!< @deprecated
+    typedef HardwareIndexBufferPtr HardwareIndexBufferSharedPtr; //!< @deprecated
+    typedef HardwarePixelBufferPtr HardwarePixelBufferSharedPtr; //!< @deprecated
+    typedef HardwareVertexBufferPtr HardwareVertexBufferSharedPtr; //!< @deprecated
+    typedef GpuProgramPtr HighLevelGpuProgramPtr; //!< @deprecated
+    typedef HardwareBufferPtr HardwareUniformBufferSharedPtr; //!< @deprecated
+    typedef HardwareBufferPtr HardwareCounterBufferSharedPtr; //!< @deprecated
+    typedef GpuProgramParametersPtr GpuProgramParametersSharedPtr; //!< @deprecated
 }
 
 /* Include all the standard header *after* all the configuration
