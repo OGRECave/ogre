@@ -508,10 +508,9 @@ namespace Ogre {
         EdgeData* getEdgeList(void) { return NULL; }
         /// Define a default implementation of method from ShadowCaster which implements no shadows
         const ShadowRenderableList& getShadowVolumeRenderableList(
-            ShadowTechnique shadowTechnique, const Light* light, 
-            HardwareIndexBufferSharedPtr* indexBuffer, size_t* indexBufferUsedSize,
-            bool extrudeVertices, Real extrusionDist, unsigned long flags = 0);
-        
+            const Light* light, const HardwareIndexBufferPtr& indexBuffer,
+            size_t& indexBufferUsedSize, float extrusionDist, int flags = 0) override;
+
         const AxisAlignedBox& getLightCapBounds(void) const override;
         const AxisAlignedBox& getDarkCapBounds(const Light& light, Real dirLightExtrusionDist) const override;
         /** Sets whether or not this object will cast shadows.

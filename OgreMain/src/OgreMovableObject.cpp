@@ -361,10 +361,9 @@ namespace Ogre {
         return mLightList;
     }
     //-----------------------------------------------------------------------
-    const ShadowCaster::ShadowRenderableList& MovableObject::getShadowVolumeRenderableList(
-        ShadowTechnique shadowTechnique, const Light* light, 
-        HardwareIndexBufferSharedPtr* indexBuffer, size_t* indexBufferUsedSize,
-        bool inExtrudeVertices, Real extrusionDist, unsigned long flags )
+    const ShadowRenderableList& MovableObject::getShadowVolumeRenderableList(
+        const Light* light, const HardwareIndexBufferPtr& indexBuffer, size_t& indexBufferUsedSize,
+        float extrusionDist, int flags)
     {
         static ShadowRenderableList dummyList;
         return dummyList;

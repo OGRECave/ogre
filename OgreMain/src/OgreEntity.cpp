@@ -1838,15 +1838,12 @@ namespace Ogre {
         return mMeshLodFactorTransformed;
     }
     //-----------------------------------------------------------------------
-    const ShadowCaster::ShadowRenderableList&
-        Entity::getShadowVolumeRenderableList(
-        ShadowTechnique shadowTechnique, const Light* light,
-        HardwareIndexBufferSharedPtr* indexBuffer, size_t* indexBufferUsedSize,
-        bool extrude, Real extrusionDistance, unsigned long flags)
+    const ShadowRenderableList&
+    Entity::getShadowVolumeRenderableList(const Light* light, const HardwareIndexBufferPtr& indexBuffer,
+                                          size_t& indexBufferUsedSize, float extrusionDistance, int flags)
     {
-        assert(indexBuffer && "Only external index buffers are supported right now");
-        assert((*indexBuffer)->getType() == HardwareIndexBuffer::IT_16BIT &&
-            "Only 16-bit indexes supported for now");
+        assert(indexBuffer->getType() == HardwareIndexBuffer::IT_16BIT &&
+               "Only 16-bit indexes supported for now");
 
         // Check mesh state count, will be incremented if reloaded
         if (mMesh->getStateCount() != mMeshStateCount)
@@ -1877,9 +1874,8 @@ namespace Ogre {
                             mAnimationState->copyMatchingState(targetState);
                     }
                 }
-                return mLodEntityList[mMeshLodIndex-1]->getShadowVolumeRenderableList(
-                    shadowTechnique, light, indexBuffer, indexBufferUsedSize,
-                    extrude, extrusionDistance, flags);
+                return mLodEntityList[mMeshLodIndex - 1]->getShadowVolumeRenderableList(
+                    light, indexBuffer, indexBufferUsedSize, extrusionDistance, flags);
             }
         }
 #endif
@@ -1931,6 +1927,7 @@ namespace Ogre {
 
         bool isAnimated = hasAnimation;
         bool updatedSharedGeomNormals = false;
+        bool extrude = flags & SRF_EXTRUDE_IN_SOFTWARE;
         siend = mShadowRenderables.end();
         egi = edgeList->edgeGroups.begin();
         for (si = mShadowRenderables.begin(); si != siend; ++si, ++egi)
@@ -1955,8 +1952,8 @@ namespace Ogre {
                 // for extruding the shadow volume) since otherwise we can
                 // get depth-fighting on the light cap
 
-                *si = OGRE_NEW EntityShadowRenderable(this, *indexBuffer, pVertData,
-                    mVertexProgramInUse || !extrude, subent);
+                *si = OGRE_NEW EntityShadowRenderable(this, indexBuffer, pVertData,
+                                                      mVertexProgramInUse || !extrude, subent);
             }
             else
             {
@@ -2010,9 +2007,7 @@ namespace Ogre {
         updateEdgeListLightFacing(edgeList, lightPos);
 
         // Generate indexes and update renderables
-        generateShadowVolume(edgeList, *indexBuffer, *indexBufferUsedSize,
-            light, mShadowRenderables, flags);
-
+        generateShadowVolume(edgeList, indexBuffer, indexBufferUsedSize, light, mShadowRenderables, flags);
 
         return mShadowRenderables;
     }

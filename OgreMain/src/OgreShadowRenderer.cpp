@@ -1065,11 +1065,12 @@ void SceneManager::ShadowRenderer::renderShadowVolumesToStencil(const Light* lig
 
         }
 
+        if(extrudeInSoftware) // convert to flag
+            flags |= SRF_EXTRUDE_IN_SOFTWARE;
+
         // Get shadow renderables
-        const ShadowCaster::ShadowRenderableList& shadowRenderables =
-            caster->getShadowVolumeRenderableList(mShadowTechnique,
-            light, &mShadowIndexBuffer, &mShadowIndexBufferUsedSize,
-            extrudeInSoftware, extrudeDist, flags);
+        const ShadowRenderableList& shadowRenderables = caster->getShadowVolumeRenderableList(
+            light, mShadowIndexBuffer, mShadowIndexBufferUsedSize, extrudeDist, flags);
 
         // Render a shadow volume here
         //  - if we have 2-sided stencil, one render with no culling

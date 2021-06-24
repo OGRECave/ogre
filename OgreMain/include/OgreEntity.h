@@ -584,9 +584,8 @@ namespace Ogre {
 
         EdgeData* getEdgeList(void) override;
         const ShadowRenderableList& getShadowVolumeRenderableList(
-            ShadowTechnique shadowTechnique, const Light* light,
-            HardwareIndexBufferSharedPtr* indexBuffer, size_t* indexBufferUsedSize,
-            bool extrudeVertices, Real extrusionDistance, unsigned long flags = 0) override;
+            const Light* light, const HardwareIndexBufferPtr& indexBuffer,
+            size_t& indexBufferUsedSize, float extrusionDistance, int flags = 0) override;
 
         /** Internal method for retrieving bone matrix information. */
         const Affine3* _getBoneMatrices(void) const { return mBoneMatrices;}

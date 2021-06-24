@@ -562,14 +562,10 @@ ManualObject::ManualObject(const String& name)
         return mEdgeList;
     }
     //-----------------------------------------------------------------------------
-    const ShadowCaster::ShadowRenderableList&
-    ManualObject::getShadowVolumeRenderableList(
-        ShadowTechnique shadowTechnique, const Light* light,
-        HardwareIndexBufferSharedPtr* indexBuffer, size_t* indexBufferUsedSize,
-        bool extrude, Real extrusionDistance, unsigned long flags)
+    const ShadowRenderableList& ManualObject::getShadowVolumeRenderableList(
+        const Light* light, const HardwareIndexBufferPtr& indexBuffer, size_t& indexBufferUsedSize,
+        float extrusionDistance, int flags)
     {
-        assert(indexBuffer && "Only external index buffers are supported right now");       
-
         EdgeData* edgeList = getEdgeList();
         if (!edgeList)
         {
@@ -585,6 +581,7 @@ ManualObject::ManualObject(const String& name)
 
         // Init shadow renderable list if required (only allow indexed)
         bool init = mShadowRenderables.empty() && mAnyIndexed;
+        bool extrude = flags & SRF_EXTRUDE_IN_SOFTWARE;
 
         EdgeData::EdgeGroupList::iterator egi;
         ShadowRenderableList::iterator si, siend;
@@ -613,27 +610,22 @@ ManualObject::ManualObject(const String& name)
                 mat->load();
                 bool vertexProgram = false;
                 Technique* t = mat->getBestTechnique(0, *seci);
-                for (unsigned short p = 0; p < t->getNumPasses(); ++p)
+                for (auto pass : t->getPasses())
                 {
-                    Pass* pass = t->getPass(p);
                     if (pass->hasVertexProgram())
                     {
                         vertexProgram = true;
                         break;
                     }
                 }
-                *si = OGRE_NEW ShadowRenderable(this, *indexBuffer, egi->vertexData,
+                *si = OGRE_NEW ShadowRenderable(this, indexBuffer, egi->vertexData,
                                                 vertexProgram || !extrude);
             }
-            // Get shadow renderable
-            HardwareVertexBufferSharedPtr esrPositionBuffer = (*si)->getPositionBuffer();
             // Extrude vertices in software if required
             if (extrude)
             {
-                extrudeVertices(esrPositionBuffer,
-                    egi->vertexData->vertexCount,
-                    lightPos, extrusionDistance);
-
+                extrudeVertices((*si)->getPositionBuffer(), egi->vertexData->vertexCount, lightPos,
+                                extrusionDistance);
             }
 
             ++si;
@@ -643,8 +635,7 @@ ManualObject::ManualObject(const String& name)
         updateEdgeListLightFacing(edgeList, lightPos);
 
         // Generate indexes and update renderables
-        generateShadowVolume(edgeList, *indexBuffer, *indexBufferUsedSize, 
-            light, mShadowRenderables, flags);
+        generateShadowVolume(edgeList, indexBuffer, indexBufferUsedSize, light, mShadowRenderables, flags);
 
         return mShadowRenderables;
     }
