@@ -1,6 +1,14 @@
 # Change Log
 
-## v1.10.3 [Xalafu] (pending) - MAJOR RELEASE
+## v1.13.0 [Tsathoggua] (Pending) - MAJOR RELEASE
+
+## v1.12.12 [Rhagorthua] (21 Apr 2021) - MAJOR RELEASE
+* [New and Noteworthy in OGRE 1.12](1.12-Notes.md)
+
+## v1.11.6 [Rhagorthua] (24 Apr 2019) - MAJOR RELEASE
+* [New and Noteworthy in OGRE 1.11](1.11-Notes.md)
+
+## v1.10.12 [Xalafu] (27 Apr 2018) - MAJOR RELEASE
 * [New and Noteworthy in OGRE 1.10](1.10-Notes.md)
 * [Closed JIRA tickets for Ogre 1.10](https://ogre3d.atlassian.net/browse/OGRE-536?jql=fixVersion%20in%20%28%221.10.0%22%29%20AND%20status%20in%20%28Resolved%2C%20Closed%29%20ORDER%20BY%20key%20DESC)
 

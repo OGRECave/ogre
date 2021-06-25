@@ -83,13 +83,14 @@
 
 <!ELEMENT entity (userData?)>
 <!ATTLIST entity
-    name            CDATA    #IMPLIED
-    id                ID        #IMPLIED
-    visible            (true | false) "true"
-    meshFile        CDATA    #REQUIRED
-    material        CDATA    #IMPLIED
-    static            (true | false) "false"
-    castShadows        (true | false) "true"
+    name		CDATA	#IMPLIED
+    id			ID		#IMPLIED
+    visible		(true | false) "true"
+    meshFile	CDATA	#REQUIRED
+    material	CDATA	#IMPLIED
+	static		CDATA	#IMPLIED
+	instanced	CDATA	#IMPLIED
+    castShadows	(true | false) "true"
 >
 
 <!ELEMENT environment (fog?, skyBox?, skyDome?, skyPlane?, colourAmbient?, colourBackground?)>

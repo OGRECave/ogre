@@ -604,20 +604,56 @@ void DotSceneLoader::processEntity(pugi::xml_node& XMLNode, SceneNode* pParent)
     LogManager::getSingleton().logMessage("[DotSceneLoader] Processing Entity: " + name, LML_TRIVIAL);
 
     String meshFile = getAttrib(XMLNode, "meshFile");
+	String staticGeometry = getAttrib(XMLNode, "static");
+	String instancedManager = getAttrib(XMLNode, "instanced");
+	String material = getAttrib(XMLNode, "material");
     bool castShadows = getAttribBool(XMLNode, "castShadows", true);
     bool visible = getAttribBool(XMLNode, "visible", true);
 
     // Create the entity
-    Entity* pEntity = 0;
+	MovableObject* pEntity = 0;
+
     try
     {
-        pEntity = mSceneMgr->createEntity(name, meshFile, m_sGroupName);
-        pEntity->setCastShadows(castShadows);
-        pEntity->setVisible(visible);
-        pParent->attachObject(pEntity);
+		// If the Entity is instanced then the creation path is different
+		if (!instancedManager.empty())
+		{
+			LogManager::getSingleton().logMessage("[DotSceneLoader] Adding entity: " + name + " to Instance Manager: " + instancedManager, LML_TRIVIAL);
 
-        if (auto material = XMLNode.attribute("material"))
-            pEntity->setMaterialName(material.value());
+			// Load the Mesh to get the material name of the first submesh
+			Ogre::MeshPtr mesh = MeshManager::getSingletonPtr()->load(meshFile, m_sGroupName);
+
+			// Get the material name of the entity
+			if(!material.empty())
+				pEntity = mSceneMgr->createInstancedEntity(material, instancedManager);
+			else
+				pEntity = mSceneMgr->createInstancedEntity(mesh->getSubMesh(0)->getMaterialName(), instancedManager);
+
+			pParent->attachObject(static_cast<InstancedEntity*>(pEntity));
+		}
+		else
+		{
+			pEntity = mSceneMgr->createEntity(name, meshFile, m_sGroupName);
+
+			static_cast<Entity*>(pEntity)->setCastShadows(castShadows);
+			static_cast<Entity*>(pEntity)->setVisible(visible);
+
+			if (!material.empty())
+				static_cast<Entity*>(pEntity)->setMaterialName(material);
+
+			// If the Entity belongs to a Static Geometry group then it doesn't get attached to a node
+			// * TODO * : Clean up nodes without attached entities or children nodes? (should be done afterwards if the hierarchy is being processed)
+			if (!staticGeometry.empty())
+			{
+				LogManager::getSingleton().logMessage("[DotSceneLoader] Adding entity: " + name + " to Static Group: " + staticGeometry, LML_TRIVIAL);
+				mSceneMgr->getStaticGeometry(staticGeometry)->addEntity(static_cast<Entity*>(pEntity), pParent->_getDerivedPosition(), pParent->_getDerivedOrientation(), pParent->_getDerivedScale());
+			}
+			else
+			{
+				LogManager::getSingleton().logMessage("[DotSceneLoader] pParent->attachObject(): " + name, LML_TRIVIAL);
+				pParent->attachObject(static_cast<Entity*>(pEntity));
+			}
+		}
     }
     catch (const Exception& e)
     {
