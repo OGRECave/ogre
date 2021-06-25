@@ -64,11 +64,6 @@ public:
     virtual const String& getType() const;
 
     /** 
-    @see SubRenderState::updateGpuProgramsParams.
-    */
-    virtual void updateGpuProgramsParams(Renderable* rend, const Pass* pass, const AutoParamDataSource* source, const LightList* pLightList);
-
-    /** 
     @see SubRenderState::copyFrom.
     */
     virtual void copyFrom(const SubRenderState& rhs);
