@@ -36,6 +36,7 @@ namespace Ogre {
     class _OgreD3D9Export D3D9GpuProgramManager : public GpuProgramFactory
     {
     public:
+        static String currentLanguage;
         const String& getLanguage(void) const override;
         GpuProgram* create(ResourceManager* creator, const String& name, ResourceHandle handle,
                            const String& group, bool isManual, ManualResourceLoader* loader) override;

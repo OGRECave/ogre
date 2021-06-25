@@ -279,10 +279,9 @@ namespace Ogre {
                 GpuProgramManager::getSingleton().createProgram(
                     mName+"/Delegate",
                     mGroup,
-                    "_d3d9asm", // dummy syntax for factory lookup
+                    getTarget(),
                     mType);
             mAssemblerProgram->setSource("");
-            mAssemblerProgram->setSyntaxCode(getTarget());
             static_cast<D3D9GpuProgram*>(mAssemblerProgram.get())->setExternalMicrocode(mMicroCode);
         }
 

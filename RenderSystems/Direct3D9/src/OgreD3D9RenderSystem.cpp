@@ -721,7 +721,6 @@ namespace Ogre
 
         // Create the GPU program manager       
         mGpuProgramManager = OGRE_NEW D3D9GpuProgramManager();
-        GpuProgramManager::getSingleton().addFactory(mGpuProgramManager);
 
         // Create & register HLSL factory       
         mHLSLProgramFactory = OGRE_NEW D3D9HLSLProgramFactory();
@@ -1374,8 +1373,19 @@ namespace Ogre
                 "Trying to initialize D3D9RenderSystem from RenderSystemCapabilities that do not support Direct3D9",
                 "D3D9RenderSystem::initialiseFromRenderSystemCapabilities");
         }
-        if (caps->isShaderProfileSupported("hlsl"))
-            HighLevelGpuProgramManager::getSingleton().addFactory(mHLSLProgramFactory);
+
+        for(const auto& lang : caps->getSupportedShaderProfiles())
+        {
+            if (lang == "hlsl")
+            {
+                GpuProgramManager::getSingleton().addFactory(mHLSLProgramFactory);
+            }
+            else
+            {
+                D3D9GpuProgramManager::currentLanguage = lang;
+                GpuProgramManager::getSingleton().addFactory(mGpuProgramManager);
+            }
+        }
     }
 
     //-----------------------------------------------------------------------
