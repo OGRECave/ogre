@@ -38,6 +38,7 @@ if(DOXYGEN_FOUND)
         ${PROJECT_SOURCE_DIR}/PlugIns
         ${PROJECT_SOURCE_DIR}/PlugIns/PCZSceneManager/docs/readme.md
         ${PROJECT_SOURCE_DIR}/RenderSystems
+        ${BASIC_TUTORIALS}
         ${PROJECT_SOURCE_DIR}/Docs/src/apimainpage.md
         ${PROJECT_SOURCE_DIR}/Docs/src/manual.md
         ${PROJECT_SOURCE_DIR}/Docs/src/OgreShadows.md
@@ -47,10 +48,10 @@ if(DOXYGEN_FOUND)
         ${PROJECT_SOURCE_DIR}/Docs/src/particle-scripts.md
         ${PROJECT_SOURCE_DIR}/Docs/src/hardware-buffers.md
         ${PROJECT_SOURCE_DIR}/Docs/src/rtss.md
+        ${PROJECT_SOURCE_DIR}/Docs/src/instancing.md
         ${PROJECT_SOURCE_DIR}/Docs/src/resourcemanagement.md
         ${PROJECT_SOURCE_DIR}/BuildingOgre.md
-        ${TUTORIALS}
-        ${BASIC_TUTORIALS})
+		${TUTORIALS})
     string(REPLACE ";" " \\\n" CMAKE_DOXYGEN_INPUT_LIST "${CMAKE_DOXYGEN_INPUT_LIST}")
     configure_file(${OGRE_TEMPLATES_DIR}/html.cfg.in ${PROJECT_BINARY_DIR}/html.cfg)
     add_custom_target(OgreDoc COMMAND 

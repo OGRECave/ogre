@@ -1,5 +1,5 @@
 
-# Licence Information
+# License Information
 
 
 <p>OGRE is released under an <a href="http://www.opensource.org/">open source</a> license, specifically the MIT License.

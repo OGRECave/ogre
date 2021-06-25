@@ -1,6 +1,7 @@
 # API Reference Start Page {#mainpage}
 
 # What is this?
+
 This is the complete API reference for <a href="https://www.ogre3d.org"><b>OGRE</b></a> (<b>O</b>bject-Oriented <b>G</b>raphics <b>R</b>endering <b>E</b>ngine). Contained within are the 
 specifications for each namespace/module/class and the methods from those which you can refer to when writing code which uses OGRE. 
 
@@ -20,6 +21,7 @@ more "discussive" documentation such as:
 general introduction to the OGRE principles and core components, and a 
 reference to various important parts of the OGRE system, especially the
 script syntax for materials, particle systems, and overlays.
+
 * [The OGRE Tutorials](@ref tutorials): This is a gold mine for new and experienced users alike.
 
 We make an effort to document our classes fully so we hope you can find what

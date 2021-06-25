@@ -3,7 +3,7 @@
         <node name="Robot">
             <position x="10.0" y="5" z="10.5" />
             <scale x="1" y="1" z="1" />
-            <entity name="Robot" meshFile="robot.mesh" static="false" />
+            <entity name="Robot" meshFile="robot.mesh"/>
         </node>
         <node name="Omni01">
             <position x="-23" y="49" z="18" />
