@@ -31,6 +31,7 @@ THE SOFTWARE.
 
 namespace Ogre {
     //-----------------------------------------------------------------------------
+    String D3D9GpuProgramManager::currentLanguage = "vs_2_0";
     GpuProgram* D3D9GpuProgramManager::create(ResourceManager* creator, const String& name, ResourceHandle handle,
         const String& group, bool isManual, ManualResourceLoader* loader)
     {
@@ -38,7 +39,6 @@ namespace Ogre {
     }
 
     const String& D3D9GpuProgramManager::getLanguage(void) const {
-        static String lang = "_d3d9asm";
-        return lang;
+        return currentLanguage;
     }
 }
