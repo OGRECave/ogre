@@ -45,6 +45,8 @@ THE SOFTWARE.
 #define EGL_CONTEXT_MINOR_VERSION EGL_NONE
 #endif
 
+#include <EGL/eglext.h>
+
 namespace Ogre {
 
 
@@ -56,8 +58,40 @@ namespace Ogre {
 
     EGLDisplay EGLSupport::getGLDisplay(void)
     {
-        mGLDisplay = eglGetDisplay(mNativeDisplay);
-        EGL_CHECK_ERROR
+#ifdef EGL_VERSION_1_5
+        static auto eglQueryDevicesEXT = (PFNEGLQUERYDEVICESEXTPROC)eglGetProcAddress("eglQueryDevicesEXT");
+        static auto eglQueryDeviceStringEXT =
+            (PFNEGLQUERYDEVICESTRINGEXTPROC)eglGetProcAddress("eglQueryDeviceStringEXT");
+
+        if(eglQueryDevicesEXT && mNativeDisplay == EGL_DEFAULT_DISPLAY)
+        {
+            int numDevices;
+            eglQueryDevicesEXT(0, NULL, &numDevices);
+            EGL_CHECK_ERROR
+            std::vector<EGLDeviceEXT> devices(numDevices);
+            eglQueryDevicesEXT(numDevices, devices.data(), &numDevices);
+
+            EGLAttrib attribs[] = {EGL_NONE};
+            for(auto dev : devices)
+            {
+                EGLDisplay display = eglGetPlatformDisplay(EGL_PLATFORM_DEVICE_EXT, dev, attribs);
+                EGL_CHECK_ERROR
+
+                if(display != EGL_NO_DISPLAY && !mGLDisplay)
+                {
+                    mGLDisplay = display;
+                    const char* exts = eglQueryDeviceStringEXT(dev, EGL_EXTENSIONS);
+                    LogManager::getSingleton().stream() << "EGL: using default display. Device extensions: " << exts;
+                    break;
+                }
+            }
+        }
+        else
+#endif
+        {
+            mGLDisplay = eglGetDisplay(mNativeDisplay);
+            EGL_CHECK_ERROR
+        }
 
         if(mGLDisplay == EGL_NO_DISPLAY)
         {
