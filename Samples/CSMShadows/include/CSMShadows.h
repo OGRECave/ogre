@@ -111,8 +111,7 @@ private:
     void setupLights()
     {
         mSceneMgr->setAmbientLight(ColourValue(0.3, 0.3, 0.3));
-        Light* light = mSceneMgr->createLight();
-        light->setType(Light::LT_DIRECTIONAL);
+        Light* light = mSceneMgr->createLight(Light::LT_DIRECTIONAL);
         Vector3 direction(1, -1, 0.4);
         light->setCastShadows(true);
         light->setShadowFarClipDistance(12000);

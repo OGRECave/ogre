@@ -188,19 +188,17 @@ protected:
 
 
         // add a blue spotlight
-        Light* l = mSceneMgr->createLight();
+        Light* l = mSceneMgr->createLight(Light::LT_SPOTLIGHT);
         Vector3 pos(-40, 180, -10);
         SceneNode* ln = mSceneMgr->getRootSceneNode()->createChildSceneNode(pos);
         ln->attachObject(l);
-        l->setType(Light::LT_SPOTLIGHT);
         ln->setDirection(-pos);
         l->setDiffuseColour(0.0, 0.0, 0.5);
         bbs->createBillboard(pos)->setColour(l->getDiffuseColour());
         
 
         // add a green spotlight.
-        l = mSceneMgr->createLight();
-        l->setType(Light::LT_SPOTLIGHT);
+        l = mSceneMgr->createLight(Light::LT_SPOTLIGHT);
         pos = Vector3(0, 150, -100);
         ln = mSceneMgr->getRootSceneNode()->createChildSceneNode(pos);
         ln->attachObject(l);

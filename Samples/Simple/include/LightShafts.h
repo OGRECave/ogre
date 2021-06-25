@@ -128,8 +128,7 @@ public:
         mSceneMgr->setAmbientLight(ColourValue(0.1, 0.1, 0.1));
 
         // Set up light 0
-        Light* mLight0 = mSceneMgr->createLight("Light0");
-        mLight0->setType(Light::LT_SPOTLIGHT);
+        Light* mLight0 = mSceneMgr->createLight(Light::LT_SPOTLIGHT);
         mLight0->setDiffuseColour(0.9, 0.9, 0.9);
         mLight0->setSpecularColour(1, 1, 1);
         mLight0->setSpotlightRange(Degree(17.5f), Degree(22.5f));

@@ -1230,8 +1230,24 @@ namespace Ogre {
         */
         virtual Light* createLight(const String& name);
 
+        /// @overload
+        Light* createLight(const String& name, Light::LightTypes type)
+        {
+            auto l = createLight(name);
+            l->setType(type);
+            return l;
+        }
+
         /** Creates a light with a generated name. */
         virtual Light* createLight();
+
+        /// @overload
+        Light* createLight(Light::LightTypes type)
+        {
+            auto l = createLight();
+            l->setType(type);
+            return l;
+        }
 
         /** Returns a pointer to the named Light which has previously been added to the scene.
         @note Throws an exception if the named instance does not exist

@@ -89,8 +89,7 @@ protected:
         mSceneMgr->setAmbientLight(ColourValue(0.3, 0.3, 0.3));
 
         // add a bright light above the scene
-        Light* light = mSceneMgr->createLight();
-        light->setType(Light::LT_POINT);
+        Light* light = mSceneMgr->createLight(Light::LT_POINT);
         mSceneMgr->getRootSceneNode()
             ->createChildSceneNode(Vector3(-10, 40, 20))
             ->attachObject(light);

@@ -169,8 +169,7 @@ protected:
         mSceneMgr->setAmbientLight(ColourValue(0.0, 0.0, 0.0));
 
         // Fixed light, dim
-        mSunLight = mSceneMgr->createLight("SunLight");
-        mSunLight->setType(Light::LT_SPOTLIGHT);
+        mSunLight = mSceneMgr->createLight(Light::LT_SPOTLIGHT);
 
         Vector3 pos(1500,1750,1300);
         auto ln = mSceneMgr->getRootSceneNode()->createChildSceneNode(pos);
