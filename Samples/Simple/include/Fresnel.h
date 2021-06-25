@@ -68,12 +68,9 @@ protected:
         mSceneMgr->setSkyBox(true, "Examples/CloudyNoonSkyBox");  // set a skybox
 
         // make the scene's main light come from above
-        Light* l = mSceneMgr->createLight();
-        l->setType(Light::LT_DIRECTIONAL);
-
         auto ln = mSceneMgr->getRootSceneNode()->createChildSceneNode();
         ln->setDirection(Vector3::NEGATIVE_UNIT_Y);
-        ln->attachObject(l);
+        ln->attachObject(mSceneMgr->createLight(Light::LT_DIRECTIONAL));
 
         setupWater();
         setupProps();

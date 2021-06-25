@@ -84,9 +84,8 @@ class _OgreSampleClassExport Sample_DualQuaternion : public SdkSample
         bbs->setMaterialName("Examples/Flare");
         lightsBbsNode->attachObject(bbs);
 
-        Light* l = mSceneMgr->createLight();
+        Light* l = mSceneMgr->createLight(Light::LT_POINT);
         Vector3 pos(30, 70, 40);
-        l->setType(Light::LT_POINT);
         auto ln = mSceneMgr->getRootSceneNode()->createChildSceneNode(pos);
         ln->attachObject(l);
         ln->setDirection(-pos.normalisedCopy());
