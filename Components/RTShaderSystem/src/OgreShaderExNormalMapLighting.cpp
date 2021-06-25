@@ -56,91 +56,6 @@ const String& NormalMapLighting::getType() const
 }
 
 //-----------------------------------------------------------------------
-void NormalMapLighting::updateGpuProgramsParams(Renderable* rend, const Pass* pass, const AutoParamDataSource* source,
-    const LightList* pLightList)
-{       
-    if (mLightParamsList.empty())
-        return;
-
-    Light::LightTypes curLightType = Light::LT_DIRECTIONAL; 
-    unsigned int curSearchLightIndex = 0;
-
-    // We need the inverse of the inverse transpose
-    Matrix3 matWorldInvRotation = source->getTransposeWorldMatrix().linear();
-
-    // Update inverse rotation parameter.
-    if (mWorldInvRotMatrix.get() != NULL)   
-        mWorldInvRotMatrix->setGpuParameter(matWorldInvRotation);   
-        
-    // Update per light parameters.
-    for (unsigned int i=0; i < mLightParamsList.size(); ++i)
-    {
-        const LightParams& curParams = mLightParamsList[i];
-
-        if (curLightType != curParams.mType)
-        {
-            curLightType = curParams.mType;
-            curSearchLightIndex = 0;
-        }
-
-        // Search a matching light from the current sorted lights of the given renderable.
-        uint32 j;
-        for (j = curSearchLightIndex; j < pLightList->size(); ++j)
-        {
-            if (pLightList->at(j)->getType() == curLightType)
-            {               
-                curSearchLightIndex = j + 1;
-                break;
-            }           
-        }
-
-        switch (curParams.mType)
-        {
-        case Light::LT_DIRECTIONAL:                                 
-            {                       
-                Vector3 vec3;                           
-
-                // Update light direction. (Object space).
-                vec3 = matWorldInvRotation * source->getLightDirection(j);
-                curParams.mDirection->setGpuParameter(Vector4(-vec3.normalisedCopy(), 0.0f));
-            }
-            break;
-
-        case Light::LT_POINT:
-            // update light index. data will be set by scene manager
-            curParams.mPosition->updateExtraInfo(j);
-            curParams.mAttenuatParams->updateExtraInfo(j);
-            break;
-
-        case Light::LT_SPOTLIGHT:
-            {                       
-                Vector3 vec3;               
-                                            
-                // Update light position. (World space).                
-                curParams.mPosition->updateExtraInfo(j);
-                curParams.mAttenuatParams->updateExtraInfo(j);
-                curParams.mSpotParams->updateExtraInfo(j);
-
-                // Update light direction. (Object space).
-                vec3 = matWorldInvRotation * source->getLightDirection(j);
-                curParams.mDirection->setGpuParameter(Vector4(-vec3.normalisedCopy(), 0.0f));
-            }
-            break;
-        }
-
-
-        // Update diffuse colour.
-        curParams.mDiffuseColour->updateExtraInfo(j);
-
-        // Update specular colour if need to.
-        if (mSpecularEnable)
-        {
-            curParams.mSpecularColour->updateExtraInfo(j);
-        }                                                                           
-    }
-}
-
-//-----------------------------------------------------------------------
 bool NormalMapLighting::resolveGlobalParameters(ProgramSet* programSet)
 {
     Program* vsProgram = programSet->getCpuProgram(GPT_VERTEX_PROGRAM);
@@ -227,7 +142,7 @@ bool NormalMapLighting::resolveGlobalParameters(ProgramSet* programSet)
         mWorldMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_WORLD_MATRIX);
 
         // Resolve inverse world rotation matrix.
-        mWorldInvRotMatrix = vsProgram->resolveParameter(GCT_MATRIX_3X3, -1, (uint16)GPV_PER_OBJECT, "inv_world_rotation_matrix");
+        mWorldInvRotMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_TRANSPOSE_WORLD_MATRIX);
     }
 
     return true;
@@ -258,7 +173,7 @@ bool NormalMapLighting::resolvePerLightParameters(ProgramSet* programSet)
         switch (mLightParamsList[i].mType)
         {
         case Light::LT_DIRECTIONAL:
-            mLightParamsList[i].mDirection = vsProgram->resolveParameter(GCT_FLOAT4, -1, (uint16)GPV_LIGHTS|GPV_PER_OBJECT, "light_direction_obj_space");
+            mLightParamsList[i].mDirection = vsProgram->resolveParameter(GpuProgramParameters::ACT_LIGHT_DIRECTION_OBJECT_SPACE, i);
             mLightParamsList[i].mVSOutDirection =
                 vsMain->resolveOutputParameter(Parameter::Content(lightDirContent + i));
             mLightParamsList[i].mPSInDirection = psMain->resolveInputParameter(mLightParamsList[i].mVSOutDirection);
@@ -282,7 +197,7 @@ bool NormalMapLighting::resolvePerLightParameters(ProgramSet* programSet)
                 vsMain->resolveOutputParameter(Parameter::Content(lightPosContent + i), GCT_FLOAT3);
             mLightParamsList[i].mToLight = psMain->resolveInputParameter(mLightParamsList[i].mVSOutToLightDir);
 
-            mLightParamsList[i].mDirection = vsProgram->resolveParameter(GCT_FLOAT4, -1, (uint16)GPV_LIGHTS|GPV_PER_OBJECT, "light_direction_obj_space");
+            mLightParamsList[i].mDirection = vsProgram->resolveParameter(GpuProgramParameters::ACT_LIGHT_DIRECTION_OBJECT_SPACE, i);
             mLightParamsList[i].mVSOutDirection =
                 vsMain->resolveOutputParameter(Parameter::Content(lightDirContent + i));
             mLightParamsList[i].mPSInDirection = psMain->resolveInputParameter(mLightParamsList[i].mVSOutDirection);
@@ -327,7 +242,7 @@ bool NormalMapLighting::resolvePerLightParameters(ProgramSet* programSet)
         mVSWorldPosition = vsMain->resolveLocalParameter(Parameter::SPC_POSITION_WORLD_SPACE);
         mWorldMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_WORLD_MATRIX);
         // Resolve inverse world rotation matrix.
-        mWorldInvRotMatrix = vsProgram->resolveParameter(GCT_MATRIX_3X3, -1, (uint16)GPV_PER_OBJECT, "inv_world_rotation_matrix");
+        mWorldInvRotMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_TRANSPOSE_WORLD_MATRIX);
     }
 
     return true;
