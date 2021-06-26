@@ -58,7 +58,7 @@ namespace Ogre {
 
     EGLDisplay EGLSupport::getGLDisplay(void)
     {
-#ifdef EGL_VERSION_1_5
+#if defined(EGL_VERSION_1_5) && OGRE_PLATFORM != OGRE_PLATFORM_ANDROID
         static auto eglQueryDevicesEXT = (PFNEGLQUERYDEVICESEXTPROC)eglGetProcAddress("eglQueryDevicesEXT");
         static auto eglQueryDeviceStringEXT =
             (PFNEGLQUERYDEVICESTRINGEXTPROC)eglGetProcAddress("eglQueryDeviceStringEXT");
