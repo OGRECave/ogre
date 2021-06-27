@@ -56,7 +56,7 @@ The GBufferSchemeHandlers works like this :
 For each pass in the technique that would have been used normally, the GBufferSchemeHandler::inspectPass is called, inspects the pass, and returns the PassProperties - does this pass have a texture? a normal map? is it skinned? tranpsarent? Etc. The PassProperties (should) contain all the information required to build a GBuffer technique for an object.
 
 ### Generate the G-Buffer technique
-After a pass has been inspected and understood, the next stage is to generate the G-Buffer-writing technique. This is done using the class GBufferMaterialGenerator. The class receives the flags of the features needed by the material, and dynamically generates the (CG) shaders and material to render an object with those properties to the G-Buffer. This greatly reduces the number of shaders that you need to manage when using deferred shading, as most of them are created on the fly. Here is an example of what they look like :
+After a pass has been inspected and understood, the next stage is to generate the G-Buffer-writing technique. This is done using the RTSS GBuffer lighting stage. This greatly reduces the number of shaders that you need to manage when using deferred shading, as most of them are created on the fly. Here is an example of what they look like :
 
 ```cpp
 void ToGBufferVP(
@@ -108,13 +108,13 @@ void ToGBufferVP(
 (This is for an object with a texture and a normal map)
 
 ### Add the G-Buffer technique to the original material
-We don't want to inspect the passes and generate the material each time an object is rendered, so we create a technique in the original material, and fill it with the auto-generated information. After copying the information from the GBuffer technique, texture references have to be updated, to use the correct textures when rendering the object. This happens in `GBufferSchemeHandler::fillPass`. The next time the object will be rendered, it WILL have a technique for the GBuffer scheme, so
+We don't want to inspect the passes and generate the material each time an object is rendered, so we create a technique in the original material, and fill it with the auto-generated information. The next time the object will be rendered, it WILL have a technique for the GBuffer scheme, so
 the listener won't get called.
 
 ### Postponing transparent objects
 We don't want to render transparent objects to the GBuffer, as it doesn't work properly later.
 
-To address this, we also create a technique with a scheme called called 'NoGBuffer'. If the inspectPass decided that
+To address this, we also create a technique with a scheme called called 'NoGBuffer'. If
 the object is transparent, we will not add an auto-generated pass to the 'GBuffer' technique, but instead copy the regular pass
 to the 'NoGBuffer' technique, to render it regularly later.
 
