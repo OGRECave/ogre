@@ -265,6 +265,7 @@ namespace Ogre
         outStream << "#include <OgreUnifiedShader.h>\n";
         // helpers
         outStream << "#include <TerrainHelpers.glsl>\n";
+        outStream << "#include <SGXLib_NormalMap.glsl>\n";
         outStream << "#include <SGXLib_PerPixelLighting.glsl>\n";
         outStream << "#include <SGXLib_IntegratedPSSM.glsl>\n";
 

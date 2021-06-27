@@ -38,14 +38,6 @@ THE SOFTWARE.
 #define M_PI 3.141592654
 
 //-----------------------------------------------------------------------------
-void SGX_FetchNormal(in sampler2D s,
-				   in vec2 uv,
-				   out vec3 vOut)
-{
-	vOut = 2.0 * texture2D(s, uv).xyz - 1.0;
-}
-
-//-----------------------------------------------------------------------------
 void SGX_Light_Directional_Diffuse(
 				   in vec3 vNormal,
 				   in vec3 vLightDirView,

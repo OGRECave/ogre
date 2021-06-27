@@ -33,22 +33,33 @@ THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
 //-----------------------------------------------------------------------------
+void SGX_FetchNormal(in sampler2D s,
+				   in vec2 uv,
+				   out vec3 vOut)
+{
+	vOut = 2.0 * texture2D(s, uv).xyz - 1.0;
+}
+
+//-----------------------------------------------------------------------------
 void SGX_ConstructTBNMatrix(in vec3 vNormal,
 				   in vec3 vTangent,
 				   out mat3 vOut)
 {
+	vNormal = normalize(vNormal);
+	vTangent = normalize(vTangent);
 	vec3 vBinormal = cross(vNormal, vTangent);
-	vOut = mtxFromRows(vTangent, vBinormal, vNormal);
+	// direction: from tangent space to world
+	vOut = mtxFromCols(vTangent, vBinormal, vNormal);
 }
 
 //-----------------------------------------------------------------------------
 void SGX_Generate_Parallax_Texcoord(in sampler2D normalHeightMap,
 						in vec2 texCoord,
-						in vec3 eyeVec,
+						in vec3 viewPos,
 						in vec2 scaleBias,
 						out vec2 newTexCoord)
 {
-	eyeVec = normalize(eyeVec);
+	vec3 eyeVec = -normalize(viewPos);
 	float height = texture2D(normalHeightMap, texCoord).a;
 	float displacement = (height * scaleBias.x) + scaleBias.y;
 	vec2 scaledEyeDir = eyeVec.xy * displacement;
