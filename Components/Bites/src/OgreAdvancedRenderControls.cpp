@@ -178,7 +178,7 @@ bool AdvancedRenderControls::keyPressed(const KeyboardEvent& evt) {
         // Add per pixel lighting sub render state to the global scheme render state.
         // It will override the default FFP lighting sub render state.
         if (useFFPLighting) {
-            auto perPixelLightModel = mShaderGenerator->createSubRenderState<Ogre::RTShader::FFPLighting>();
+            auto perPixelLightModel = mShaderGenerator->createSubRenderState("FFP_Lighting");
 
             schemRenderState->addTemplateSubRenderState(perPixelLightModel);
         }
@@ -188,7 +188,7 @@ bool AdvancedRenderControls::keyPressed(const KeyboardEvent& evt) {
         else {
             for (auto srs : schemRenderState->getSubRenderStates()) {
                 // This is the per pixel sub render state -> remove it.
-                if (dynamic_cast<Ogre::RTShader::FFPLighting*>(srs)) {
+                if (srs->getType() == "FFP_Lighting") {
                     schemRenderState->removeSubRenderState(srs);
                     break;
                 }
