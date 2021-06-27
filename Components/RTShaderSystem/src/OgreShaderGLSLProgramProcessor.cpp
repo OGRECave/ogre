@@ -92,7 +92,9 @@ void GLSLProgramProcessor::bindTextureSamplers(Program* pCpuProgram, GpuProgramP
     for (const auto& pCurParam : pCpuProgram->getParameters())
     {
         if (pCurParam->isSampler() && pCurParam->isUsed())
-        {       
+        {
+            // The optimizer may remove some unnecessary parameters, so we should ignore them
+            pGpuParams->setIgnoreMissingParams(true);
             pGpuParams->setNamedConstant(pCurParam->getName(), pCurParam->getIndex());                      
         }       
     }
