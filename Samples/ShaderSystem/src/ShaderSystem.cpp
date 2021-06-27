@@ -653,7 +653,7 @@ void Sample_ShaderSystem::generateShaders(Entity* entity)
 #ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
             if (mCurLightingModel == SSLM_PerVertexLighting)
             {
-                RTShader::SubRenderState* perPerVertexLightModel = mShaderGenerator->createSubRenderState<RTShader::FFPLighting>();
+                RTShader::SubRenderState* perPerVertexLightModel = mShaderGenerator->createSubRenderState("FFP_Lighting");
 
                 renderState->addTemplateSubRenderState(perPerVertexLightModel); 
             }
@@ -662,7 +662,7 @@ void Sample_ShaderSystem::generateShaders(Entity* entity)
 #ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
             else if (mCurLightingModel == SSLM_PerPixelLighting)
             {
-                RTShader::SubRenderState* perPixelLightModel = mShaderGenerator->createSubRenderState<RTShader::PerPixelLighting>();
+                RTShader::SubRenderState* perPixelLightModel = mShaderGenerator->createSubRenderState("SGX_PerPixelLighting");
                 
                 renderState->addTemplateSubRenderState(perPixelLightModel);             
             }
@@ -671,10 +671,10 @@ void Sample_ShaderSystem::generateShaders(Entity* entity)
                 // Apply normal map only on main entity.
                 if (entity->getName() == MAIN_ENTITY_NAME)
                 {
-                    RTShader::NormalMapLighting* normalMapSubRS = mShaderGenerator->createSubRenderState<RTShader::NormalMapLighting>();
+                    RTShader::SubRenderState* normalMapSubRS = mShaderGenerator->createSubRenderState("NormalMap");
                     
-                    normalMapSubRS->setNormalMapSpace(RTShader::NormalMapLighting::NMS_TANGENT);
-                    normalMapSubRS->setNormalMapTextureName("Panels_Normal_Tangent.png");   
+                    normalMapSubRS->setParameter("normalmap_space", "tangent_space");
+                    normalMapSubRS->setParameter("texture", "Panels_Normal_Tangent.png");
 
                     renderState->addTemplateSubRenderState(normalMapSubRS);
                 }
@@ -682,7 +682,7 @@ void Sample_ShaderSystem::generateShaders(Entity* entity)
                 // It is secondary entity -> use simple per pixel lighting.
                 else
                 {
-                    RTShader::SubRenderState* perPixelLightModel = mShaderGenerator->createSubRenderState<RTShader::PerPixelLighting>();
+                    RTShader::SubRenderState* perPixelLightModel = mShaderGenerator->createSubRenderState("SGX_PerPixelLighting");
                     renderState->addTemplateSubRenderState(perPixelLightModel);
                 }               
             }
@@ -691,10 +691,10 @@ void Sample_ShaderSystem::generateShaders(Entity* entity)
                 // Apply normal map only on main entity.
                 if (entity->getName() == MAIN_ENTITY_NAME)
                 {
-                    RTShader::NormalMapLighting* normalMapSubRS = mShaderGenerator->createSubRenderState<RTShader::NormalMapLighting>();
+                    RTShader::SubRenderState* normalMapSubRS = mShaderGenerator->createSubRenderState("NormalMap");
                 
-                    normalMapSubRS->setNormalMapSpace(RTShader::NormalMapLighting::NMS_OBJECT);
-                    normalMapSubRS->setNormalMapTextureName("Panels_Normal_Obj.png");   
+                    normalMapSubRS->setParameter("normalmap_space", "object_space");
+                    normalMapSubRS->setParameter("texture", "Panels_Normal_Obj.png");
 
                     renderState->addTemplateSubRenderState(normalMapSubRS);
                 }
@@ -702,7 +702,7 @@ void Sample_ShaderSystem::generateShaders(Entity* entity)
                 // It is secondary entity -> use simple per pixel lighting.
                 else
                 {
-                    RTShader::SubRenderState* perPixelLightModel = mShaderGenerator->createSubRenderState<RTShader::PerPixelLighting>();
+                    RTShader::SubRenderState* perPixelLightModel = mShaderGenerator->createSubRenderState("SGX_PerPixelLighting");
                     renderState->addTemplateSubRenderState(perPixelLightModel);
                 }               
             }

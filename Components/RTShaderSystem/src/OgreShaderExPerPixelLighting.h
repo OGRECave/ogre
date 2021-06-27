@@ -46,7 +46,7 @@ namespace RTShader {
 /** Per pixel Lighting extension sub render state implementation.
 Derives from SubRenderState class.
 */
-class _OgreRTSSExport PerPixelLighting : public FFPLighting
+class PerPixelLighting : public FFPLighting
 {
 
 // Interface.
@@ -106,7 +106,7 @@ protected:
 A factory that enables creation of PerPixelLighting instances.
 @remarks Sub class of SubRenderStateFactory
 */
-class _OgreRTSSExport PerPixelLightingFactory : public SubRenderStateFactory
+class PerPixelLightingFactory : public SubRenderStateFactory
 {
 public:
 
