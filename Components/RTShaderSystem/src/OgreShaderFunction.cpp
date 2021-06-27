@@ -118,12 +118,13 @@ static Parameter::Semantic semanticFromContent(Parameter::Content content, bool 
         return Parameter::SPS_BLEND_INDICES;
     case Parameter::SPC_BLEND_WEIGHTS:
         return Parameter::SPS_BLEND_WEIGHTS;
-    case Parameter::SPC_TANGENT_OBJECT_SPACE:
-        return Parameter::SPS_TANGENT;
     case Parameter::SPC_POINTSPRITE_COORDINATE:
         return Parameter::SPS_TEXTURE_COORDINATES;
     case Parameter::SPC_BINORMAL_OBJECT_SPACE:
         return Parameter::SPS_BINORMAL;
+    case Parameter::SPC_TANGENT_OBJECT_SPACE:
+        if(!isVSOut) return Parameter::SPS_TANGENT;
+        OGRE_FALLTHROUGH;
     case Parameter::SPC_POSITION_OBJECT_SPACE:
         if(!isVSOut) return Parameter::SPS_POSITION;
         OGRE_FALLTHROUGH;
