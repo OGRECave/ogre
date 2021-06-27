@@ -37,10 +37,10 @@ namespace RTShader {
 /************************************************************************/
 /*                                                                      */
 /************************************************************************/
-String NormalMapLighting::Type                      = "SGX_NormalMapLighting";
+String NormalMapLighting::Type                      = "NormalMap";
 
 //-----------------------------------------------------------------------
-NormalMapLighting::NormalMapLighting() : PerPixelLighting()
+NormalMapLighting::NormalMapLighting()
 {
     mNormalMapSamplerIndex          = 0;
     mVSTexCoordSetIndex             = 0;
@@ -54,355 +54,85 @@ const String& NormalMapLighting::getType() const
 {
     return Type;
 }
-
 //-----------------------------------------------------------------------
-bool NormalMapLighting::resolveGlobalParameters(ProgramSet* programSet)
+bool NormalMapLighting::createCpuSubPrograms(ProgramSet* programSet)
 {
     Program* vsProgram = programSet->getCpuProgram(GPT_VERTEX_PROGRAM);
-    Program* psProgram = programSet->getCpuProgram(GPT_FRAGMENT_PROGRAM);
     Function* vsMain = vsProgram->getEntryPointFunction();
-    Function* psMain = psProgram->getEntryPointFunction();
-    
-    // Resolve normal map texture sampler parameter.
-    if(!mLightParamsList.empty())
-        mPSNormalMapSampler = psProgram->resolveParameter(GCT_SAMPLER2D, "gNormalMapSampler", mNormalMapSamplerIndex);
-
-    // Get surface ambient colour if need to.
-    if ((mTrackVertexColourType & TVC_AMBIENT) == 0)
-    {       
-        mDerivedAmbientLightColour = psProgram->resolveParameter(GpuProgramParameters::ACT_DERIVED_AMBIENT_LIGHT_COLOUR);
-    }
-    else
-    {
-        mLightAmbientColour = psProgram->resolveParameter(GpuProgramParameters::ACT_AMBIENT_LIGHT_COLOUR);
-    }
-
-    // Get surface emissive colour if need to.
-    if ((mTrackVertexColourType & TVC_EMISSIVE) == 0)
-    {
-        mSurfaceEmissiveColour = psProgram->resolveParameter(GpuProgramParameters::ACT_SURFACE_EMISSIVE_COLOUR);
-    }
-
-    // Get derived scene colour.
-    mDerivedSceneColour = psProgram->resolveParameter(GpuProgramParameters::ACT_DERIVED_SCENE_COLOUR);
-
-    // Get surface shininess.
-    mSurfaceShininess = psProgram->resolveParameter(GpuProgramParameters::ACT_SURFACE_SHININESS);
-
-    // Resolve input vertex shader normal.
-    mVSInNormal = vsMain->resolveInputParameter(Parameter::SPC_NORMAL_OBJECT_SPACE);
-
-    auto normalContent = Parameter::SPC_NORMAL_OBJECT_SPACE;
-    auto posContent = Parameter::SPC_POSTOCAMERA_OBJECT_SPACE;
-
-    // Resolve input vertex shader tangent.
-    if (mNormalMapSpace & NMS_TANGENT)
-    {
-        mVSInTangent = vsMain->resolveInputParameter(Parameter::SPC_TANGENT_OBJECT_SPACE);
-        
-        // Resolve local vertex shader TNB matrix.
-        mVSTBNMatrix = vsMain->resolveLocalParameter(GCT_MATRIX_3X3, "lMatTBN");
-
-        normalContent = Parameter::SPC_NORMAL_TANGENT_SPACE;
-        posContent = Parameter::SPC_POSTOCAMERA_TANGENT_SPACE;
-    }
-    
-    // Resolve input vertex shader texture coordinates.
-    mVSInTexcoord = vsMain->resolveInputParameter(
-        Parameter::Content(Parameter::SPC_TEXTURE_COORDINATE0 + mVSTexCoordSetIndex), GCT_FLOAT2);
-    mVSOutTexcoord = vsMain->resolveOutputParameter(
-        Parameter::Content(Parameter::SPC_TEXTURE_COORDINATE0 + mVSTexCoordSetIndex), GCT_FLOAT2);
-    mPSInTexcoord = psMain->resolveInputParameter(mVSOutTexcoord);
-
-    // Resolve pixel shader normal.
-    mViewNormal = psMain->resolveLocalParameter(normalContent, GCT_FLOAT3);
-
-    mInDiffuse = psMain->getInputParameter(Parameter::SPC_COLOR_DIFFUSE);
-    if (mInDiffuse.get() == NULL)
-    {
-        mInDiffuse = psMain->getLocalParameter(Parameter::SPC_COLOR_DIFFUSE);
-    }
-    OgreAssert(mInDiffuse, "mInDiffuse is NULL");
-
-    mOutDiffuse = psMain->resolveOutputParameter(Parameter::SPC_COLOR_DIFFUSE);
-
-    if (mSpecularEnable)
-    {
-        mOutSpecular = psMain->resolveLocalParameter(Parameter::SPC_COLOR_SPECULAR);
-
-        mVSInPosition = vsMain->resolveInputParameter(Parameter::SPC_POSITION_OBJECT_SPACE);
-        mVSOutViewPos = vsMain->resolveOutputParameter(posContent);
-        mToView = psMain->resolveInputParameter(mVSOutViewPos);
-
-        // Resolve camera position world space.
-        mCamPosWorldSpace = vsProgram->resolveParameter(GpuProgramParameters::ACT_CAMERA_POSITION);
-        mVSLocalDir = vsMain->resolveLocalParameter(GCT_FLOAT3, "lNormalMapTempDir");
-        mVSWorldPosition = vsMain->resolveLocalParameter(Parameter::SPC_POSITION_WORLD_SPACE);
-        // Resolve world matrix.                
-        mWorldMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_WORLD_MATRIX);
-
-        // Resolve inverse world rotation matrix.
-        mWorldInvRotMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_TRANSPOSE_WORLD_MATRIX);
-    }
-
-    return true;
-}
-
-//-----------------------------------------------------------------------
-bool NormalMapLighting::resolvePerLightParameters(ProgramSet* programSet)
-{
-    Program* vsProgram = programSet->getCpuProgram(GPT_VERTEX_PROGRAM);
     Program* psProgram = programSet->getCpuProgram(GPT_FRAGMENT_PROGRAM);
-    Function* vsMain = vsProgram->getEntryPointFunction();
     Function* psMain = psProgram->getEntryPointFunction();
-
-    // at most 8 lights are supported
-    if(mLightParamsList.size() > 8)
-        mLightParamsList.resize(8);
-
-    bool needViewPos = mNormalMapSpace == NMS_PARALLAX;
-
-    auto lightDirContent = mNormalMapSpace & NMS_TANGENT ? Parameter::SPC_LIGHTDIRECTION_TANGENT_SPACE0
-                                                          : Parameter::SPC_LIGHTDIRECTION_OBJECT_SPACE0;
-    auto lightPosContent = mNormalMapSpace & NMS_TANGENT ? Parameter::SPC_POSTOLIGHT_TANGENT_SPACE0
-                                                          : Parameter::SPC_POSITION_OBJECT_SPACE;
-
-    // Resolve per light parameters.
-    for (unsigned int i=0; i < mLightParamsList.size(); ++i)
-    {       
-        switch (mLightParamsList[i].mType)
-        {
-        case Light::LT_DIRECTIONAL:
-            mLightParamsList[i].mDirection = vsProgram->resolveParameter(GpuProgramParameters::ACT_LIGHT_DIRECTION_OBJECT_SPACE, i);
-            mLightParamsList[i].mVSOutDirection =
-                vsMain->resolveOutputParameter(Parameter::Content(lightDirContent + i));
-            mLightParamsList[i].mPSInDirection = psMain->resolveInputParameter(mLightParamsList[i].mVSOutDirection);
-            break;
-
-        case Light::LT_POINT:
-            mLightParamsList[i].mPosition = vsProgram->resolveParameter(GpuProgramParameters::ACT_LIGHT_POSITION, i);
-            mLightParamsList[i].mVSOutToLightDir =
-                vsMain->resolveOutputParameter(Parameter::Content(lightPosContent + i), GCT_FLOAT3);
-            mLightParamsList[i].mToLight = psMain->resolveInputParameter(mLightParamsList[i].mVSOutToLightDir);
-
-            mLightParamsList[i].mAttenuatParams = psProgram->resolveParameter(GpuProgramParameters::ACT_LIGHT_ATTENUATION, i);
-
-            needViewPos = true;
-            break;
-
-        case Light::LT_SPOTLIGHT:
-
-            mLightParamsList[i].mPosition = vsProgram->resolveParameter(GpuProgramParameters::ACT_LIGHT_POSITION, i);
-            mLightParamsList[i].mVSOutToLightDir =
-                vsMain->resolveOutputParameter(Parameter::Content(lightPosContent + i), GCT_FLOAT3);
-            mLightParamsList[i].mToLight = psMain->resolveInputParameter(mLightParamsList[i].mVSOutToLightDir);
-
-            mLightParamsList[i].mDirection = vsProgram->resolveParameter(GpuProgramParameters::ACT_LIGHT_DIRECTION_OBJECT_SPACE, i);
-            mLightParamsList[i].mVSOutDirection =
-                vsMain->resolveOutputParameter(Parameter::Content(lightDirContent + i));
-            mLightParamsList[i].mPSInDirection = psMain->resolveInputParameter(mLightParamsList[i].mVSOutDirection);
-
-            mLightParamsList[i].mAttenuatParams = psProgram->resolveParameter(GpuProgramParameters::ACT_LIGHT_ATTENUATION, i);
-            mLightParamsList[i].mSpotParams = psProgram->resolveParameter(GpuProgramParameters::ACT_SPOTLIGHT_PARAMS, i);
-
-            needViewPos = true;
-            break;
-        }
-
-        // Resolve diffuse colour.
-        if ((mTrackVertexColourType & TVC_DIFFUSE) == 0)
-        {
-            mLightParamsList[i].mDiffuseColour = psProgram->resolveParameter(GpuProgramParameters::ACT_DERIVED_LIGHT_DIFFUSE_COLOUR, i);
-        }
-        else
-        {
-            mLightParamsList[i].mDiffuseColour = psProgram->resolveParameter(GpuProgramParameters::ACT_LIGHT_DIFFUSE_COLOUR_POWER_SCALED, i);
-        }       
-            
-        if (mSpecularEnable)
-        {
-            // Resolve specular colour.
-            if ((mTrackVertexColourType & TVC_SPECULAR) == 0)
-            {
-                mLightParamsList[i].mSpecularColour = psProgram->resolveParameter(GpuProgramParameters::ACT_DERIVED_LIGHT_SPECULAR_COLOUR, i);
-            }
-            else
-            {
-                mLightParamsList[i].mSpecularColour = psProgram->resolveParameter(GpuProgramParameters::ACT_LIGHT_SPECULAR_COLOUR_POWER_SCALED, i);
-            }   
-        }   
-
-    }
-
-    if(needViewPos)
-    {
-        mVSInPosition = vsMain->resolveInputParameter(Parameter::SPC_POSITION_OBJECT_SPACE);
-        // Resolve local dir.
-        mVSLocalDir = vsMain->resolveLocalParameter(GCT_FLOAT3, "lNormalMapTempDir");
-        mVSWorldPosition = vsMain->resolveLocalParameter(Parameter::SPC_POSITION_WORLD_SPACE);
-        mWorldMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_WORLD_MATRIX);
-        // Resolve inverse world rotation matrix.
-        mWorldInvRotMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_TRANSPOSE_WORLD_MATRIX);
-    }
-
-    return true;
-}
-
-//-----------------------------------------------------------------------
-bool NormalMapLighting::resolveDependencies(ProgramSet* programSet)
-{
-    Program* vsProgram = programSet->getCpuProgram(GPT_VERTEX_PROGRAM);
-    Program* psProgram = programSet->getCpuProgram(GPT_FRAGMENT_PROGRAM);
 
     vsProgram->addDependency(FFP_LIB_TRANSFORM);
-    vsProgram->addDependency(FFP_LIB_TEXTURING);
-    vsProgram->addDependency(SGX_LIB_NORMALMAP);
 
+    psProgram->addDependency(FFP_LIB_TRANSFORM);
     psProgram->addDependency(FFP_LIB_TEXTURING);
-    psProgram->addDependency(SGX_LIB_PERPIXELLIGHTING);
     psProgram->addDependency(SGX_LIB_NORMALMAP);
 
-    return true;
-}
+    // Resolve texture coordinates.
+    auto vsInTexcoord = vsMain->resolveInputParameter(
+        Parameter::Content(Parameter::SPC_TEXTURE_COORDINATE0 + mVSTexCoordSetIndex), GCT_FLOAT2);
+    auto vsOutTexcoord = vsMain->resolveOutputParameter(
+        Parameter::Content(Parameter::SPC_TEXTURE_COORDINATE0 + mVSTexCoordSetIndex), GCT_FLOAT2);
+    auto psInTexcoord = psMain->resolveInputParameter(vsOutTexcoord);
 
-//-----------------------------------------------------------------------
-bool NormalMapLighting::addFunctionInvocations(ProgramSet* programSet)
-{
-    Program* vsProgram = programSet->getCpuProgram(GPT_VERTEX_PROGRAM); 
-    Function* vsMain = vsProgram->getEntryPointFunction();  
-    Program* psProgram = programSet->getCpuProgram(GPT_FRAGMENT_PROGRAM);
-    Function* psMain = psProgram->getEntryPointFunction();  
+    // Resolve normal.
+    auto vsInNormal = vsMain->resolveInputParameter(Parameter::SPC_NORMAL_OBJECT_SPACE);
+    auto vsOutNormal = vsMain->resolveOutputParameter(Parameter::SPC_NORMAL_VIEW_SPACE);
+    auto viewNormal = psMain->resolveInputParameter(vsOutNormal);
+    auto newViewNormal = psMain->resolveLocalParameter(Parameter::SPC_NORMAL_VIEW_SPACE);
 
-    // Add the global illumination functions.
-    addVSInvocation(vsMain->getStage(FFP_VS_LIGHTING));
+    // insert before lighting stage
+    auto vstage = vsMain->getStage(FFP_PS_COLOUR_BEGIN + 1);
+    auto fstage = psMain->getStage(FFP_PS_COLOUR_BEGIN + 1);
 
-    auto stage = psMain->getStage(FFP_PS_COLOUR_BEGIN + 1);
+    // Output texture coordinates.
+    vstage.assign(vsInTexcoord, vsOutTexcoord);
 
-    if (!mLightParamsList.empty() && mNormalMapSpace == NMS_PARALLAX)
+    // Add the normal fetch function invocation
+    auto normalMapSampler = psProgram->resolveParameter(GCT_SAMPLER2D, "gNormalMapSampler", mNormalMapSamplerIndex);
+    fstage.callFunction(SGX_FUNC_FETCHNORMAL, normalMapSampler, psInTexcoord, newViewNormal);
+
+    if (mNormalMapSpace & NMS_TANGENT)
     {
+        auto vsInTangent = vsMain->resolveInputParameter(Parameter::SPC_TANGENT_OBJECT_SPACE);
+        auto vsOutTangent = vsMain->resolveOutputParameter(Parameter::SPC_TANGENT_OBJECT_SPACE);
+        auto psInTangent = psMain->resolveInputParameter(vsOutTangent);
+
+        // transform normal & tangent
+        auto normalMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_NORMAL_MATRIX);
+        vstage.callFunction(FFP_FUNC_TRANSFORM, normalMatrix, vsInNormal, vsOutNormal);
+        vstage.callFunction(FFP_FUNC_TRANSFORM, normalMatrix, vsInTangent, vsOutTangent);
+
+        // Construct TBN matrix.
+        auto TBNMatrix = psMain->resolveLocalParameter(GCT_MATRIX_3X3, "lMatTBN");
+        fstage.callFunction(SGX_FUNC_CONSTRUCT_TBNMATRIX, viewNormal, psInTangent, TBNMatrix);
+        // transform normal
+        fstage.callFunction(FFP_FUNC_TRANSFORM, TBNMatrix, newViewNormal, newViewNormal);
+    }
+    else if (mNormalMapSpace & NMS_OBJECT)
+    {
+        // transform normal in FS
+        auto normalMatrix = psProgram->resolveParameter(GpuProgramParameters::ACT_NORMAL_MATRIX);
+        fstage.callFunction(FFP_FUNC_TRANSFORM, normalMatrix, newViewNormal, newViewNormal);
+    }
+
+    if (mNormalMapSpace == NMS_PARALLAX)
+    {
+        // assuming: lighting stage computed this
+        auto vsOutViewPos = vsMain->resolveOutputParameter(Parameter::SPC_POSITION_VIEW_SPACE);
+        auto viewPos = psMain->resolveInputParameter(vsOutViewPos);
+
         // TODO: user specificed scale and bias
-        stage.callFunction("SGX_Generate_Parallax_Texcoord", {In(mPSNormalMapSampler), In(mPSInTexcoord), In(mToView),
-                                                              In(Vector2(0.04, -0.02)), Out(mPSInTexcoord)});
+        fstage.callFunction("SGX_Generate_Parallax_Texcoord", {In(normalMapSampler), In(psInTexcoord), In(viewPos),
+                                                              In(Vector2(0.04, -0.02)), Out(psInTexcoord)});
 
         // overwrite texcoord0 unconditionally, only one texcoord set is supported with parallax mapping
         // we are before FFP_PS_TEXTURING, so the new value will be used
         auto texcoord0 = psMain->resolveInputParameter(Parameter::SPC_TEXTURE_COORDINATE0, GCT_FLOAT2);
-        stage.assign(mPSInTexcoord, texcoord0);
+        fstage.assign(psInTexcoord, texcoord0);
     }
-
-    // Add the normal fetch function invocation
-    if(!mLightParamsList.empty())
-    {
-        stage.callFunction(SGX_FUNC_FETCHNORMAL, mPSNormalMapSampler, mPSInTexcoord, mViewNormal);
-    }
-
-    // Add the global illumination functions.
-    addPSGlobalIlluminationInvocation(stage);
-
-    // Add per light functions.
-    for (const auto& lp : mLightParamsList)
-    {
-        addIlluminationInvocation(&lp, stage);
-    }
-
-    // Assign back temporary variables
-    stage.assign(mOutDiffuse, mInDiffuse);
 
     return true;
-}
-
-//-----------------------------------------------------------------------
-void NormalMapLighting::addVSInvocation(const FunctionStageRef& stage)
-{
-    // Construct TNB matrix.
-    if (mNormalMapSpace & NMS_TANGENT)
-    {
-        stage.callFunction(SGX_FUNC_CONSTRUCT_TBNMATRIX, mVSInNormal, mVSInTangent, mVSTBNMatrix);
-    }
-    
-    // Output texture coordinates.
-    stage.assign(mVSInTexcoord, mVSOutTexcoord);
-
-    // Compute world space position.
-    if (mVSWorldPosition.get() != NULL)
-    {
-        stage.callFunction(FFP_FUNC_TRANSFORM, mWorldMatrix, mVSInPosition, mVSWorldPosition);
-    }
-    
-
-
-    // Compute view vector.
-    if (mVSInPosition && mVSOutViewPos)
-    {
-        // View vector in world space.
-        stage.sub(In(mCamPosWorldSpace).xyz(), In(mVSWorldPosition).xyz(), mVSLocalDir);
-
-        // Transform to object space.
-        stage.callFunction(FFP_FUNC_TRANSFORM, mWorldInvRotMatrix, mVSLocalDir, mVSLocalDir);
-
-        // Transform to tangent space.
-        if (mNormalMapSpace & NMS_TANGENT)
-        {
-            stage.callFunction(FFP_FUNC_TRANSFORM, mVSTBNMatrix, mVSLocalDir, mVSOutViewPos);
-        }
-
-        // Output object space.
-        else if (mNormalMapSpace & NMS_OBJECT)
-        {
-            stage.assign(mVSLocalDir, mVSOutViewPos);
-        }
-    }
-
-    // Add per light functions.
-    for (const auto& lp : mLightParamsList)
-    {
-        addVSIlluminationInvocation(&lp, stage);
-    }
-}
-
-//-----------------------------------------------------------------------
-void NormalMapLighting::addVSIlluminationInvocation(const LightParams* curLightParams, const FunctionStageRef& stage)
-{
-    // Compute light direction in texture space.
-    if (curLightParams->mDirection.get() != NULL &&
-        curLightParams->mVSOutDirection.get() != NULL)
-    {
-        // Transform to texture space.
-        if (mNormalMapSpace & NMS_TANGENT)
-        {
-            stage.callFunction(FFP_FUNC_TRANSFORM, mVSTBNMatrix, In(curLightParams->mDirection).xyz(),
-                               curLightParams->mVSOutDirection);
-        }
-        // Output object space.
-        else if (mNormalMapSpace & NMS_OBJECT)
-        {
-            stage.assign(In(curLightParams->mDirection).xyz(), curLightParams->mVSOutDirection);
-        }
-    }
-    
-    // Transform light vector to target space..
-    if (curLightParams->mPosition.get() != NULL &&
-        curLightParams->mVSOutToLightDir.get() != NULL)
-    {
-        // Compute light vector.
-        stage.sub(In(curLightParams->mPosition).xyz(), mVSWorldPosition, mVSLocalDir);
-
-        // Transform to object space.
-        stage.callFunction(FFP_FUNC_TRANSFORM, mWorldInvRotMatrix, mVSLocalDir, mVSLocalDir);
-
-        // Transform to tangent space.      
-        if (mNormalMapSpace & NMS_TANGENT)
-        {
-            stage.callFunction(FFP_FUNC_TRANSFORM, mVSTBNMatrix, mVSLocalDir,
-                               curLightParams->mVSOutToLightDir);
-        }
-
-        // Output object space.
-        else if (mNormalMapSpace & NMS_OBJECT)
-        {
-            stage.assign(mVSLocalDir, curLightParams->mVSOutToLightDir);
-        }
-    }
 }
 
 //-----------------------------------------------------------------------
@@ -410,10 +140,6 @@ void NormalMapLighting::copyFrom(const SubRenderState& rhs)
 {
     const NormalMapLighting& rhsLighting = static_cast<const NormalMapLighting&>(rhs);
 
-    setLightCount(rhsLighting.getLightCount());
-
-    mTrackVertexColourType = rhsLighting.mTrackVertexColourType;
-    mSpecularEnable = rhsLighting.mSpecularEnable;
     mNormalMapSpace = rhsLighting.mNormalMapSpace;
     mNormalMapTextureName = rhsLighting.mNormalMapTextureName;
     mNormalMapSampler = rhsLighting.mNormalMapSampler;
@@ -422,17 +148,11 @@ void NormalMapLighting::copyFrom(const SubRenderState& rhs)
 //-----------------------------------------------------------------------
 bool NormalMapLighting::preAddToRenderState(const RenderState* renderState, Pass* srcPass, Pass* dstPass)
 {
-    if (!PerPixelLighting::preAddToRenderState(renderState, srcPass, dstPass))
-        return false;
-
     TextureUnitState* normalMapTexture = dstPass->createTextureUnitState();
 
     normalMapTexture->setTextureName(mNormalMapTextureName);
     normalMapTexture->setSampler(mNormalMapSampler);
     mNormalMapSamplerIndex = dstPass->getNumTextureUnitStates() - 1;
-
-    if(mNormalMapSpace == NMS_PARALLAX)
-        mSpecularEnable = true;
 
     return true;
 }
@@ -469,9 +189,15 @@ bool NormalMapLighting::setParameter(const String& name, const String& value)
 
 	if(name == "texcoord_index")
 	{
-		setNormaliseEnabled(StringConverter::parseBool(value));
+		setTexCoordIndex(StringConverter::parseInt(value));
 		return true;
 	}
+
+    if(name == "sampler")
+    {
+        setNormalMapSampler(TextureManager::getSingleton().getSampler(value));
+        return true;
+    }
 
 	return false;
 }
@@ -556,57 +282,8 @@ SubRenderState* NormalMapLightingFactory::createInstance(ScriptCompiler* compile
                         return NULL;
                     }
 
-                    if (strValue == "none")
-                    {
-                        normalMapSubRenderState->getNormalMapSampler()->setFiltering(TFO_NONE);
-                    }
-
-                    else if (strValue == "bilinear")
-                    {
-                        normalMapSubRenderState->getNormalMapSampler()->setFiltering(TFO_BILINEAR);
-                    }
-
-                    else if (strValue == "trilinear")
-                    {
-                        normalMapSubRenderState->getNormalMapSampler()->setFiltering(TFO_TRILINEAR);
-                    }
-
-                    else if (strValue == "anisotropic")
-                    {
-                        normalMapSubRenderState->getNormalMapSampler()->setFiltering(TFO_ANISOTROPIC);
-                    }
-                    else
-                    {
-                        // sampler reference
-                        normalMapSubRenderState->setNormalMapSampler(TextureManager::getSingleton().getSampler(strValue));
-                        return subRenderState;
-                    }
-
-                    compiler->addError(ScriptCompiler::CE_DEPRECATEDSYMBOL, prop->file, prop->line, "use sampler reference");
-                }
-
-                // Read max anisotropy value.
-                if (prop->values.size() >= 6)
-                {   
-                    unsigned int maxAnisotropy = 0;
-
-                    ++it;
-                    if (SGScriptTranslator::getUInt(*it, &maxAnisotropy))
-                    {
-                        normalMapSubRenderState->getNormalMapSampler()->setAnisotropy(maxAnisotropy);
-                    }
-                }
-
-                // Read mip bias value.
-                if (prop->values.size() >= 7)
-                {   
-                    Real mipBias = 0;
-
-                    ++it;
-                    if (SGScriptTranslator::getReal(*it, &mipBias))
-                    {
-                        normalMapSubRenderState->getNormalMapSampler()->setMipmapBias(mipBias);
-                    }
+                    // sampler reference
+                    normalMapSubRenderState->setParameter("sampler", strValue);
                 }
                                 
                 return subRenderState;                              

@@ -42,11 +42,16 @@ material DeferredDemo/RockWall
 			{
 				texture rockwall.tga
 			}
-			//This directive will allow the framework to pick up on the fact
-			//that this texture is a normal map
-			texture_unit NormalMap
+
+			// include normalmap in normal GBuffer
+			rtshader_system GBuffer
 			{
-				texture rockwall_NH.tga
+				lighting_stage normal_map rockwall_NH.tga
+			}
+
+			rtshader_system
+			{
+				lighting_stage normal_map rockwall_NH.tga
 			}
 		}
 	}
@@ -61,12 +66,15 @@ material DeferredDemo/DeferredAthena
 		{
 			diffuse 0.7 0.7 0.7
 			specular 1.0 1.0 1.0 1.0 0.5
-			
-			texture_unit
+
+			rtshader_system GBuffer
 			{
-				//The fact that the texture has 'normal' in the name will allow the framework
-				//to understand that it is a normal map
-				texture atheneNormalMap.png
+				lighting_stage normal_map atheneNormalMap.png
+			}
+
+			rtshader_system
+			{
+				lighting_stage normal_map atheneNormalMap.png
 			}
 		}
 	}

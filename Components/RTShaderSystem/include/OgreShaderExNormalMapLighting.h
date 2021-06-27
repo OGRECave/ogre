@@ -32,6 +32,7 @@ THE SOFTWARE.
 #include "OgreShaderExPerPixelLighting.h"
 #include "OgreLight.h"
 #include "OgreCommon.h"
+#include "OgreShaderFFPRenderState.h"
 
 namespace Ogre {
 namespace RTShader {
@@ -46,7 +47,7 @@ namespace RTShader {
 /** Normal Map Lighting extension sub render state implementation.
 Derives from SubRenderState class.
 */
-class _OgreRTSSExport NormalMapLighting : public PerPixelLighting
+class _OgreRTSSExport NormalMapLighting : public SubRenderState
 {
 
 // Interface.
@@ -58,6 +59,8 @@ public:
     @see SubRenderState::getType.
     */
     virtual const String& getType() const;
+
+    int getExecutionOrder() const { return FFP_LIGHTING - 1; }
 
     /** 
     @see SubRenderState::copyFrom.
@@ -139,31 +142,7 @@ public:
 
 // Protected methods
 protected:
-    /** Resolve global lighting parameters */
-    bool resolveGlobalParameters(ProgramSet* programSet);
-
-    /** Resolve per light parameters */
-    bool resolvePerLightParameters(ProgramSet* programSet);
-
-    /** 
-    @see SubRenderState::resolveDependencies.
-    */
-    virtual bool resolveDependencies(ProgramSet* programSet);
-
-    /** 
-    @see SubRenderState::addFunctionInvocations.
-    */
-    virtual bool addFunctionInvocations(ProgramSet* programSet);
-    
-    /** 
-    Internal method that adds related vertex shader functions invocations.
-    */
-    void addVSInvocation(const FunctionStageRef& stage);
-
-    /** 
-    Internal method that adds per light illumination component functions invocations.
-    */
-    void addVSIlluminationInvocation(const LightParams* curLightParams, const FunctionStageRef& stage);
+    bool createCpuSubPrograms(ProgramSet* programSet) override;
 
 // Attributes.
 protected:  
@@ -177,28 +156,6 @@ protected:
     SamplerPtr mNormalMapSampler;
     // The normal map space.
     NormalMapSpace mNormalMapSpace;
-    // World matrix parameter.
-    UniformParameterPtr mWorldMatrix;
-    // World matrix inverse rotation matrix parameter.
-    UniformParameterPtr mWorldInvRotMatrix;
-    // Camera position in world space parameter.    
-    UniformParameterPtr mCamPosWorldSpace;
-    // Vertex shader world position parameter.
-    ParameterPtr mVSWorldPosition;
-    // Vertex shader input tangent.
-    ParameterPtr mVSInTangent;
-    // Vertex shader local TNB matrix.
-    ParameterPtr mVSTBNMatrix;
-    // Vertex shader local light direction.
-    ParameterPtr mVSLocalDir;
-    // Normal map texture sampler parameter.
-    UniformParameterPtr mPSNormalMapSampler;
-    // Vertex shader input texture coordinates.
-    ParameterPtr mVSInTexcoord;
-    // Vertex shader output texture coordinates.
-    ParameterPtr mVSOutTexcoord;
-    // Pixel shader input texture coordinates.
-    ParameterPtr mPSInTexcoord;
 };
 
 
