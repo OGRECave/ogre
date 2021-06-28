@@ -68,6 +68,8 @@ namespace Ogre
     //-----------------------------------------------------------------------------
     void GpuProgram::setSourceFile(const String& filename)
     {
+        OgreAssert(!filename.empty(), "invalid filename");
+
         mFilename = filename;
         mSource.clear();
         mLoadFromFile = true;

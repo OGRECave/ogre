@@ -3656,7 +3656,14 @@ namespace Ogre{
             else
                 prog = GpuProgramManager::getSingleton().createProgram(obj->name, compiler->getResourceGroup(), source, gpt, syntax).get();
 
-            if(prog) // duplicate definition resolved by "use previous"
+            if (source.empty() && language != "unified")
+            {
+                compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, obj->file, obj->line,
+                                   "No 'source' provided for GPU program");
+                return;
+            }
+
+            if(prog && !source.empty()) // prog=0 if duplicate definition resolved by "use previous"
                 prog->setSourceFile(source);
         }
 
