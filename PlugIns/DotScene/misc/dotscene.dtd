@@ -85,6 +85,7 @@
 <!ATTLIST entity
     name            CDATA    #IMPLIED
     id                ID        #IMPLIED
+    visible            (true | false) "true"
     meshFile        CDATA    #REQUIRED
     material        CDATA    #IMPLIED
     static            (true | false) "false"
