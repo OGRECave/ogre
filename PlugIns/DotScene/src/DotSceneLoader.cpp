@@ -1039,6 +1039,11 @@ void DotSceneLoader::writeNode(pugi::xml_node& parentXML, const SceneNode* n)
             auto entity = nodeXML.append_child("entity");
             entity.append_attribute("name") = e->getName().c_str();
             entity.append_attribute("meshFile") = e->getMesh()->getName().c_str();
+
+            // Heuristic: assume first submesh is representative
+            auto sub0mat = e->getSubEntity(0)->getMaterial();
+            if(sub0mat != e->getMesh()->getSubMesh(0)->getMaterial())
+                entity.append_attribute("material") = sub0mat->getName().c_str();
             continue;
         }
 
