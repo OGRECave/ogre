@@ -606,6 +606,7 @@ void DotSceneLoader::processEntity(pugi::xml_node& XMLNode, SceneNode* pParent)
 
     String meshFile = getAttrib(XMLNode, "meshFile");
     bool castShadows = getAttribBool(XMLNode, "castShadows", true);
+    bool visible = getAttribBool(XMLNode, "visible", true);
 
     // Create the entity
     Entity* pEntity = 0;
@@ -613,6 +614,7 @@ void DotSceneLoader::processEntity(pugi::xml_node& XMLNode, SceneNode* pParent)
     {
         pEntity = mSceneMgr->createEntity(name, meshFile, m_sGroupName);
         pEntity->setCastShadows(castShadows);
+        pEntity->setVisible(visible);
         pParent->attachObject(pEntity);
 
         if (auto material = XMLNode.attribute("material"))
@@ -994,6 +996,10 @@ void DotSceneLoader::writeNode(pugi::xml_node& parentXML, const SceneNode* n)
             auto light = nodeXML.append_child("light");
             light.append_attribute("name") = l->getName().c_str();
             light.append_attribute("castShadows") = StringConverter::toString(l->getCastShadows()).c_str();
+
+            if(!l->isVisible())
+                light.append_attribute("visible") = "false";
+
             auto diffuse = light.append_child("colourDiffuse");
             write(diffuse, l->getDiffuseColour());
             auto specular = light.append_child("colourSpecular");
@@ -1039,6 +1045,9 @@ void DotSceneLoader::writeNode(pugi::xml_node& parentXML, const SceneNode* n)
             auto entity = nodeXML.append_child("entity");
             entity.append_attribute("name") = e->getName().c_str();
             entity.append_attribute("meshFile") = e->getMesh()->getName().c_str();
+
+            if(!e->isVisible())
+                entity.append_attribute("visible") = "false";
 
             // Heuristic: assume first submesh is representative
             auto sub0mat = e->getSubEntity(0)->getMaterial();
