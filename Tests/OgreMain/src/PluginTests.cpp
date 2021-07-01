@@ -9,6 +9,7 @@
 #include <OgrePlugin.h>
 #include <OgreConfigFile.h>
 #include <OgreEntity.h>
+#include <OgreSubEntity.h>
 
 #include "RootWithoutRenderSystemFixture.h"
 
@@ -37,11 +38,14 @@ TEST_F(DotSceneTests, exportImport)
 
     auto sceneMgr = mRoot->createSceneManager();
     auto entity = sceneMgr->createEntity("Entity", "jaiqua.mesh");
+    auto entityUnlit = sceneMgr->createEntity("EntityUnlit", "jaiqua.mesh");
+    entityUnlit->setMaterialName("BaseWhiteNoLighting");
     auto camera = sceneMgr->createCamera("MainCamera");
     auto light = sceneMgr->createLight();
     sceneMgr->getRootSceneNode()->createChildSceneNode(Vector3(1, 0, 0))->attachObject(entity);
     sceneMgr->getRootSceneNode()->createChildSceneNode(Vector3(0, 1, 0))->attachObject(camera);
     sceneMgr->getRootSceneNode()->createChildSceneNode(Vector3(0, 0, 1))->attachObject(light);
+    sceneMgr->getRootSceneNode()->createChildSceneNode(Vector3(1, 1, 1))->attachObject(entityUnlit);
 
     sceneMgr->getRootSceneNode()->saveChildren("DotSceneTest.scene");
 
@@ -52,13 +56,14 @@ TEST_F(DotSceneTests, exportImport)
 
     sceneMgr->getRootSceneNode()->loadChildren("DotSceneTest.scene");
 
-    EXPECT_EQ(sceneMgr->getRootSceneNode()->getChildren().size(), 3);
+    EXPECT_EQ(sceneMgr->getRootSceneNode()->getChildren().size(), 4);
 
     for (auto c : sceneMgr->getRootSceneNode()->getChildren())
         EXPECT_EQ(dynamic_cast<SceneNode*>(c)->getAttachedObjects().size(), 1);
 
     EXPECT_TRUE(sceneMgr->getCamera("MainCamera")->getParentSceneNode()->getPosition() == Vector3(0, 1, 0));
     EXPECT_TRUE(sceneMgr->getEntity("Entity")->getParentSceneNode()->getPosition() == Vector3(1, 0, 0));
+    EXPECT_EQ(sceneMgr->getEntity("EntityUnlit")->getSubEntity(0)->getMaterialName(), "BaseWhiteNoLighting");
 
     FileSystemLayer::removeFile("DotSceneTest.scene");
 }
