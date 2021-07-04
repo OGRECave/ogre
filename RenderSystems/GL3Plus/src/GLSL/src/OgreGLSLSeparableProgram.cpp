@@ -119,7 +119,7 @@ namespace Ogre
         GLUniformCache* uniformCache = mShaders[fromProgType]->getUniformCache();
 
         // Iterate through uniform reference list and update uniform values
-        for (const auto it : params->getConstantDefinitions().map)
+        for (const auto& it : params->getConstantDefinitions().map)
         {
             const GpuConstantDefinition* def = &it.second;
             if ((def->variability & mask) == 0) // masked
