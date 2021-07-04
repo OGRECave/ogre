@@ -78,10 +78,10 @@ namespace Ogre
             Root::getSingleton().destroySceneManager(mCompositeMapSM);
             mCompositeMapSM = 0;
             mCompositeMapCam = 0;
-            mCompositeMapPlane = 0;
             mCompositeMapLight = 0;
             mLightNode = 0;
         }
+        delete mCompositeMapPlane;
     }
     //---------------------------------------------------------------------
     void TerrainMaterialGenerator::_renderCompositeMap(size_t size, 
