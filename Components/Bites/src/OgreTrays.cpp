@@ -72,6 +72,7 @@ Ogre::Vector2 Widget::cursorOffset(Ogre::OverlayElement *element, const Ogre::Ve
 Ogre::Real Widget::getCaptionWidth(const Ogre::DisplayString &caption, Ogre::TextAreaOverlayElement *area)
 {
     Ogre::FontPtr font = area->getFont();
+    font->load(); // ensure glyph info is there
     Ogre::Real lineWidth = 0;
 
     for (unsigned int i = 0; i < caption.length(); i++)
@@ -232,6 +233,7 @@ void TextBox::setText(const Ogre::DisplayString &text)
     mLines.clear();
 
     Ogre::FontPtr font = mTextArea->getFont();
+    font->load(); // ensure glyph info is there
 
     Ogre::String current = text;
     bool firstWord = true;
