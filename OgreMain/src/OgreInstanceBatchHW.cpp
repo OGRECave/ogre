@@ -71,6 +71,7 @@ namespace Ogre
         //We need to clone the VertexData (but just reference all buffers, except the last one)
         //because last buffer contains data specific to this batch, we need a different binding
         mRenderOperation.vertexData = mRenderOperation.vertexData->clone( false );
+        mRemoveOwnVertexData = true;
         VertexData *thisVertexData      = mRenderOperation.vertexData;
         const unsigned short lastSource = thisVertexData->vertexDeclaration->getMaxSource();
         HardwareVertexBufferSharedPtr vertexBuffer =
