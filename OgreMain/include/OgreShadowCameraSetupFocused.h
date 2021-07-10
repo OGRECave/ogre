@@ -169,7 +169,7 @@ namespace Ogre {
         */
         void calculateShadowMappingMatrix(const SceneManager& sm, const Camera& cam, 
             const Light& light, Affine3 *out_view,
-            Matrix4 *out_proj, Camera *out_cam) const;
+            Matrix4 *out_proj, Frustum *out_cam) const;
 
         /** Calculates the intersection bodyB.
         @remarks
@@ -261,13 +261,6 @@ namespace Ogre {
             are mapped to the unit cube.
         */
         Matrix4 transformToUnitCube(const Matrix4& m, const PointListBody& body) const;
-
-        /** Builds a view matrix.
-        @remarks
-            Builds a standard view matrix out of a given position, direction and up vector.
-        */
-        Affine3 buildViewMatrix(const Vector3& pos, const Vector3& dir, const Vector3& up) const;
-
     public:
         /// @deprecated use create()
         FocusedShadowCameraSetup(bool useAggressiveRegion = true);
