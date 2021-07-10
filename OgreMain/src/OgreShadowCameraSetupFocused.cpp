@@ -46,6 +46,16 @@ namespace Ogre
         0, -1,  0,  0,      // z
         0,  0,  0,  1); // w
 
+    /// Builds a standard view matrix out of a given position, direction and up vector.
+    static Affine3 buildViewMatrix(const Vector3& pos, const Vector3& dir, const Vector3& up)
+    {
+        Matrix3 Rt = Math::lookRotation(-dir, up).transpose();
+        Matrix4 m;
+        m = Rt;
+        m.setTrans(-Rt * pos);
+        return Affine3(m); // make sure projective part is identity
+    }
+
     FocusedShadowCameraSetup::FocusedShadowCameraSetup(bool useAggressiveRegion)
         : mTempFrustum(OGRE_NEW Frustum())
         , mLightFrustumCameraNode(NULL)
@@ -62,7 +72,7 @@ namespace Ogre
     //-----------------------------------------------------------------------
     void FocusedShadowCameraSetup::calculateShadowMappingMatrix(const SceneManager& sm,
         const Camera& cam, const Light& light, Affine3 *out_view, Matrix4 *out_proj,
-        Camera *out_cam) const
+        Frustum *out_cam) const
     {
         // get the shadow far distance
         Real shadowDist = light.getShadowFarDistance();
@@ -73,6 +83,12 @@ namespace Ogre
         }
         Real shadowOffset = shadowDist * sm.getShadowDirLightTextureOffset();
 
+        if (out_cam)
+        {
+            // common options
+            out_cam->setNearClipDistance(light._deriveShadowNearClipDistance(&cam));
+            out_cam->setFarClipDistance(light._deriveShadowFarClipDistance());
+        }
 
         if (light.getType() == Light::LT_DIRECTIONAL)
         {
@@ -107,7 +123,6 @@ namespace Ogre
                 out_cam->getParentSceneNode()->setDirection(light.getDerivedDirection(), Node::TS_WORLD);
                 out_cam->getParentSceneNode()->setPosition(cam.getDerivedPosition());
                 out_cam->setFOVy(Degree(90));
-                out_cam->setNearClipDistance(shadowOffset);
             }
         }
         else if (light.getType() == Light::LT_POINT)
@@ -148,8 +163,6 @@ namespace Ogre
                 out_cam->getParentSceneNode()->setDirection(lightDir, Node::TS_WORLD);
                 out_cam->getParentSceneNode()->setPosition(light.getDerivedPosition());
                 out_cam->setFOVy(Degree(120));
-                out_cam->setNearClipDistance(light._deriveShadowNearClipDistance(&cam));
-                out_cam->setFarClipDistance(light._deriveShadowFarClipDistance());
             }
         }
         else if (light.getType() == Light::LT_SPOTLIGHT)
@@ -181,8 +194,6 @@ namespace Ogre
                 out_cam->getParentSceneNode()->setDirection(light.getDerivedDirection(), Node::TS_WORLD);
                 out_cam->getParentSceneNode()->setPosition(light.getDerivedPosition());
                 out_cam->setFOVy(Ogre::Math::Clamp<Radian>(light.getSpotlightOuterAngle() * 1.2, Radian(0), Radian(Math::PI/2.0f)));
-                out_cam->setNearClipDistance(light._deriveShadowNearClipDistance(&cam));
-                out_cam->setFarClipDistance(light._deriveShadowFarClipDistance());
             }
         }
     }
@@ -384,16 +395,6 @@ namespace Ogre
         return mOut;
     }
     //-----------------------------------------------------------------------
-    Affine3 FocusedShadowCameraSetup::buildViewMatrix(const Vector3& pos, const Vector3& dir,
-        const Vector3& up) const
-    {
-        Matrix3 Rt = Math::lookRotation(-dir, up).transpose();
-        Matrix4 m;
-        m = Rt;
-        m.setTrans(-Rt * pos);
-        return Affine3(m); // make sure projective part is identity
-    }
-    //-----------------------------------------------------------------------
     void FocusedShadowCameraSetup::getShadowCamera (const SceneManager *sm, const Camera *cam, 
         const Viewport *vp, const Light *light, Camera *texCam, size_t iteration) const
     {
@@ -458,7 +459,7 @@ namespace Ogre
         // - position is the origin
         // - the view direction is the calculated viewDir
         // - the up vector is the y-axis
-        LProj = buildViewMatrix(Vector3::ZERO, viewDir, Vector3::UNIT_Y) * LProj;
+        LProj = Matrix4(Math::lookRotation(-viewDir, Vector3::UNIT_Y).transpose()) * LProj;
 
         // map bodyB to unit cube
         LProj = transformToUnitCube(LProj * LView, mPointListBodyB) * LProj;
