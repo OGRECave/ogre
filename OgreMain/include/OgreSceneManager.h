@@ -1416,7 +1416,7 @@ namespace Ogre {
         /** Returns if all bounding boxes of scene nodes are to be displayed */
         bool getShowBoundingBoxes() const;
 
-        DebugDrawer* getDebugDrawer() { return mDebugDrawer.get(); }
+        DebugDrawer* getDebugDrawer() const { return mDebugDrawer.get(); }
         /// @}
 
         /** Prefab shapes available without loading a model.
