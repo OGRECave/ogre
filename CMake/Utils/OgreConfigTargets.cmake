@@ -76,22 +76,6 @@ elseif (UNIX)
   set(OGRE_SAMPLE_PATH "/OGRE/Samples")
 endif ()
 
-# create vcproj.user file for Visual Studio to set debug working directory
-function(ogre_create_vcproj_userfile TARGETNAME)
-  if (MSVC AND NOT WINDOWS_STORE AND NOT WINDOWS_PHONE)
-    configure_file(
-	  ${OGRE_TEMPLATES_DIR}/VisualStudioUserFile.vcproj.user.in
-	  ${CMAKE_CURRENT_BINARY_DIR}/${TARGETNAME}.vcproj.user
-	  @ONLY
-	)
-    configure_file(
-	  ${OGRE_TEMPLATES_DIR}/VisualStudioUserFile.vcxproj.user.in
-	  ${CMAKE_CURRENT_BINARY_DIR}/${TARGETNAME}.vcxproj.user
-	  @ONLY
-	)
-  endif ()
-endfunction(ogre_create_vcproj_userfile)
-
 # install targets according to current build type
 function(ogre_install_target TARGETNAME SUFFIX EXPORT)
 	if(EXPORT)
@@ -174,8 +158,6 @@ function(ogre_config_common TARGETNAME)
   if(NOT OGRE_STATIC AND (CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang"))
     set_target_properties(${TARGETNAME} PROPERTIES XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH "NO")
   endif()
-
-  ogre_create_vcproj_userfile(${TARGETNAME})
 endfunction(ogre_config_common)
 
 # checks whether the target LIBNAME produces a pdb file
