@@ -6,7 +6,7 @@ environment:
 image:
  - Visual Studio 2017
 install:
- - cmd: choco install swig -y --version 3.0.12 & exit 0
+ - cmd: choco install swig -y --version 4.0.2 & exit 0
  - cmd: cd %APPVEYOR_BUILD_FOLDER%
  - cmd: git submodule update --init --recursive
 build_script:

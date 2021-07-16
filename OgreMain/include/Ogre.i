@@ -236,7 +236,7 @@ JNIEnv* OgreJNIGetEnv() {
 %ignore Ogre::AllocPolicy;
 %import "OgreMemoryAllocatorConfig.h"
 %include "OgreCommon.h"
-%template(NameValuePairList) std::map<Ogre::String, Ogre::String>;
+%template(NameValuePairList) std::map<std::string, std::string>;
 ADD_REPR(TRect)
 %template(Rect) Ogre::TRect<long>;
 %template(FloatRect) Ogre::TRect<float>;
@@ -440,13 +440,13 @@ ADD_REPR(Plane)
 %include "OgrePlaneBoundedVolume.h"
 // I/O
 %include "OgreConfigOptionMap.h"
-%template(ConfigOptionMap) std::map<Ogre::String, Ogre::ConfigOption>;
+%template(ConfigOptionMap) std::map<std::string, Ogre::ConfigOption>;
 %ignore Ogre::ConfigFile::load; // conflicting overloads
 %ignore Ogre::ConfigFile::getSettingsIterator; // deprecated
 %ignore Ogre::ConfigFile::getSectionIterator;
-%template(SettingsBySection) std::map<Ogre::String, std::multimap< Ogre::String, Ogre::String> >;
+%template(SettingsBySection) std::map<std::string, std::multimap< std::string, std::string> >;
 #ifdef SWIGPYTHON
-%template(SettingsMultiMap) std::multimap<Ogre::String, Ogre::String>;
+%template(SettingsMultiMap) std::multimap<std::string, std::string>;
 #endif
 %include "OgreConfigFile.h"
 %ignore Ogre::Log::Stream; // not useful in bindings
@@ -636,7 +636,7 @@ SHARED_PTR(UnifiedHighLevelGpuProgram);
     }
 %}
 #endif
-%template(AnimationStateMap) std::map<Ogre::String, Ogre::AnimationState*>;
+%template(AnimationStateMap) std::map<std::string, Ogre::AnimationState*>;
 %ignore Ogre::Animation::getVertexTrackIterator;
 %ignore Ogre::Animation::getNodeTrackIterator;
 %ignore Ogre::Animation::getNumericTrackIterator;
@@ -844,8 +844,8 @@ SHARED_PTR(Mesh);
 %newobject Ogre::SceneManager::createRayQuery(const Ray&, uint32 mask);
 %newobject Ogre::SceneManager::createRayQuery(const Ray&);
 %rename(SceneManager_Listener) Ogre::SceneManager::Listener;
-%template(MovableObjectMap) std::map<Ogre::String, Ogre::MovableObject*>;
-%template(CameraMap) std::map<Ogre::String, Ogre::Camera*>;
+%template(MovableObjectMap) std::map<std::string, Ogre::MovableObject*>;
+%template(CameraMap) std::map<std::string, Ogre::Camera*>;
 %include "OgreSceneManager.h"
 %ignore Ogre::SceneManagerEnumerator::createSceneManager(SceneTypeMask);
 %ignore Ogre::SceneManagerEnumerator::createSceneManager(SceneTypeMask, const String&);
