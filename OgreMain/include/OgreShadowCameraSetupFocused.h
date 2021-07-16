@@ -56,6 +56,18 @@ namespace Ogre {
     */
     class _OgreExport FocusedShadowCameraSetup : public ShadowCameraSetup
     {
+        /** Temporary preallocated frustum to set up a projection matrix in
+            calculateShadowMappingMatrix().
+        */
+        std::unique_ptr<Frustum> mTempFrustum;
+        /** Temporary preallocated camera to set up a light frustum for clipping in FocusedShadowCameraSetup::calculateB.
+        */
+        SceneNode mLightFrustumCameraNode;
+        std::unique_ptr<Camera> mLightFrustumCamera;
+        // Persistent calculations to prevent reallocation
+        mutable ConvexBody mBodyB;
+        /// Use tighter focus region?
+        bool mUseAggressiveRegion;
     protected:
         /** Transform to or from light space as defined by Wimmer et al.
         @remarks
@@ -67,19 +79,7 @@ namespace Ogre {
         static const Matrix4 msNormalToLightSpace;
         static const Matrix4 msLightSpaceToNormal;
 
-        /** Temporary preallocated frustum to set up a projection matrix in 
-            calculateShadowMappingMatrix().
-        */
-        std::unique_ptr<Frustum> mTempFrustum;
-
-        /** Temporary preallocated camera to set up a light frustum for clipping in FocusedShadowCameraSetup::calculateB.
-        */
-        SceneNode mLightFrustumCameraNode;
-        std::unique_ptr<Camera> mLightFrustumCamera;
         mutable bool mLightFrustumCameraCalculated;
-
-        /// Use tighter focus region?
-        bool mUseAggressiveRegion;
 
         /** Internal class holding a point list representation of a convex body.
         */
@@ -142,7 +142,6 @@ namespace Ogre {
         };
 
         // Persistent calculations to prevent reallocation
-        mutable ConvexBody mBodyB;
         mutable PointListBody mPointListBodyB;
         mutable PointListBody mPointListBodyLVS;
 

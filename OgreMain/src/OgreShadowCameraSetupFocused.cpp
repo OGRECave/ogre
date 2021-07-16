@@ -60,8 +60,8 @@ namespace Ogre
         : mTempFrustum(OGRE_NEW Frustum())
         , mLightFrustumCameraNode(NULL)
         , mLightFrustumCamera(OGRE_NEW Camera("TEMP LIGHT INTERSECT CAM", NULL))
-        , mLightFrustumCameraCalculated(false)
         , mUseAggressiveRegion(useAggressiveRegion)
+        , mLightFrustumCameraCalculated(false)
     {
         mLightFrustumCamera->_notifyAttached(&mLightFrustumCameraNode);
         mTempFrustum->setProjectionType(PT_PERSPECTIVE);
