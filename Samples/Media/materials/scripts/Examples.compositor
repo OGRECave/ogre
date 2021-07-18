@@ -859,3 +859,48 @@ compositor Fresnel
         }
     }
 }
+
+compositor WBOIT
+{
+    technique
+    {
+        texture opaque target_width target_height PF_BYTE_RGBA no_fsaa depth_pool 1
+        texture accum target_width target_height PF_FLOAT16_RGBA PF_FLOAT16_R depth_pool 1
+
+        target opaque
+        {
+            input previous
+        }
+
+        target accum
+        {
+            pass clear
+            {
+                buffers colour
+                colour_value 0 0 0 1
+            }
+            pass render_scene
+            {
+                first_render_queue 96
+                last_render_queue 97
+            }
+        }
+
+        target_output
+        {
+            input none
+            pass clear {}
+            pass render_quad
+            {
+                material Compositor/Copy
+                input 0 opaque
+            }
+            pass render_quad
+            {
+                material Compositor/WBOIT
+                input 0 accum 0
+                input 1 accum 1
+            }
+        }
+    }
+}

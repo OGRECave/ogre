@@ -1,0 +1,54 @@
+material Compositor/Copy
+{
+    technique
+    {
+        pass
+        {
+            lighting off
+            texture_unit
+            {
+                filtering bilinear
+                tex_address_mode clamp
+            }
+        }
+    }
+}
+
+fragment_program Compositor/wboitFP glsl glsles hlsl
+{
+    source wboit.frag
+    default_params
+    {
+        param_named accumTexture int 0
+        param_named revealageTexture int 1
+    }
+}
+
+material Compositor/WBOIT
+{
+    technique
+    {
+        pass
+        {
+            scene_blend add
+            // for correct alpha blending:
+            //scene_blend one_minus_src_alpha src_alpha
+            vertex_program_ref Ogre/Compositor/StdQuad_vp
+            {
+            }
+            fragment_program_ref Compositor/wboitFP
+            {
+            }
+            texture_unit
+            {
+                filtering none
+                tex_address_mode clamp
+            }
+            texture_unit
+            {
+                filtering none
+                tex_address_mode clamp
+            }
+        }
+    }
+}

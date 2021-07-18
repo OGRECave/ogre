@@ -511,6 +511,21 @@ material Examples/WaterStream
 	}
 }
 
+material Examples/WaterStream/OIT : Examples/WaterStream
+{
+	technique
+	{
+		pass
+		{
+			diffuse 1 1 1 0.9
+			rtshader_system
+			{
+				weighted_blended_oit on
+			}
+		}
+	}
+}
+
 material Examples/Flare
 {
 	technique
