@@ -47,23 +47,40 @@ public:
 
 protected:
 
+    void checkBoxToggled(CheckBox* box)
+    {
+        auto& cm = CompositorManager::getSingleton();
+        cm.setCompositorEnabled(mViewport, "WBOIT", box->isChecked());
+
+        if(box->isChecked())
+        {
+            mWaterStream->setMaterialName("Examples/WaterStream/OIT");
+            mWaterStream->setRenderQueueGroup(96); // transparents must be separated
+        }
+        else
+        {
+            mWaterStream->setMaterialName("Examples/WaterStream");
+            mWaterStream->setRenderQueueGroup(RENDER_QUEUE_MAIN);
+        }
+    }
+
     void setupContent()
     {     
         mSceneMgr->setSkyBox(true, "Examples/TrippySkyBox");
 
-        mCameraNode->setPosition(0, 0, 300);   // set camera's starting position
+        mCameraMan->setStyle(CS_ORBIT);
+        mCameraMan->setYawPitchDist(Radian(0), Radian(0), 300); // set camera's starting position
 
         mSceneMgr->getRootSceneNode()
             ->createChildSceneNode(Vector3(20, 80, 50))
             ->attachObject(mSceneMgr->createLight());  // add basic point light
 
         // create a torus knot model, give it the translucent texture, and attach it to the origin
-        Entity* ent = mSceneMgr->createEntity("Knot", "knot.mesh");
-        ent->setMaterialName("Examples/WaterStream");
-        mSceneMgr->getRootSceneNode()->attachObject(ent);
+        mWaterStream = mSceneMgr->createEntity("Knot", "knot.mesh");
+        mSceneMgr->getRootSceneNode()->attachObject(mWaterStream);
 
         // create a fishy and enable its swimming animation
-        ent = mSceneMgr->createEntity("Fish", "fish.mesh");
+        auto ent = mSceneMgr->createEntity("Fish", "fish.mesh");
         mFishSwim = ent->getAnimationState("swim");
         mFishSwim->setEnabled(true);
         
@@ -71,8 +88,19 @@ protected:
         mFishNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
         mFishNode->attachObject(ent);
         mFishNode->setScale(2, 2, 2);
+
+        // OIT compositor (disabled)
+        auto& cm = CompositorManager::getSingleton();
+        cm.addCompositor(mViewport, "WBOIT");
+
+        if(!mTrayMgr)
+            return;
+        // GUI
+        mTrayMgr->showCursor();
+        mTrayMgr->createCheckBox(TL_TOPLEFT, "OIT", "Order Independent Transparency")->setChecked(false, true);
     }
 
+    Entity* mWaterStream;
     SceneNode* mFishNode;
     AnimationState* mFishSwim;
 };
