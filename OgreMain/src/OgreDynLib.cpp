@@ -105,7 +105,7 @@ namespace Ogre {
         // dlopen() does not add .so to the filename, like windows does for .dll
         if (name.find(".so") == String::npos)
         {
-            name += StringUtil::format(".so.%d.%d.%d", OGRE_VERSION_MAJOR, OGRE_VERSION_MINOR, OGRE_VERSION_PATCH);
+            name += StringUtil::format(".so.%d.%d", OGRE_VERSION_MAJOR, OGRE_VERSION_MINOR);
         }
 #elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE
         // dlopen() does not add .dylib to the filename, like windows does for .dll
