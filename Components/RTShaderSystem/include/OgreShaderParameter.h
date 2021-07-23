@@ -589,7 +589,7 @@ public:
             return;
 
         mParamsPtr->_setRawAutoConstant(mPhysicalIndex, mAutoConstantType, data, mVariability,
-                                        mElementSize);
+            static_cast<uint8>(mElementSize));
     }
 
 protected:
