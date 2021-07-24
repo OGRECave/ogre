@@ -313,19 +313,16 @@ UniformParameter::UniformParameter(GpuProgramParameters::AutoConstantType autoTy
 
 //-----------------------------------------------------------------------
 void UniformParameter::bind(GpuProgramParametersSharedPtr paramsPtr)
-{   
-    if (paramsPtr.get() != NULL)
-    {
-        // do not throw on failure: some RS optimize unused uniforms away. Also unit tests run without any RS
-        const GpuConstantDefinition* def = paramsPtr->_findNamedConstantDefinition(mBindName.empty() ? mName : mBindName, false);
+{
+    // do not throw on failure: some RS optimize unused uniforms away. Also unit tests run without any RS
+    const GpuConstantDefinition* def = paramsPtr->_findNamedConstantDefinition(mBindName.empty() ? mName : mBindName, false);
 
-        if (def != NULL)
-        {
-            mParamsPtr = paramsPtr.get();
-            mPhysicalIndex = def->physicalIndex;
-            mElementSize = def->elementSize;
-            mVariability = def->variability;
-        }
+    if (def != NULL)
+    {
+        mParamsPtr = paramsPtr.get();
+        mPhysicalIndex = def->physicalIndex;
+        mElementSize = def->elementSize;
+        mVariability = def->variability;
     }
 }
 
