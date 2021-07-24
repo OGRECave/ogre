@@ -612,7 +612,7 @@ private:
     // The physical index of this parameter in the GPU program.
     size_t mPhysicalIndex;
     // The size of this parameter in the GPU program
-    size_t mElementSize;
+    uint8 mElementSize;
 };
 
 typedef std::vector<UniformParameterPtr>       UniformParameterList;
