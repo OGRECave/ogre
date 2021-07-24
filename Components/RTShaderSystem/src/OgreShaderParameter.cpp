@@ -171,50 +171,6 @@ Parameter::Parameter(GpuConstantType type, const String& name,
 }
 
 //-----------------------------------------------------------------------
-bool UniformParameter::isFloat() const
-{
-    switch(getType())
-    {
-    case GCT_INT1:
-    case GCT_INT2:
-    case GCT_INT3:
-    case GCT_INT4:
-    case GCT_UINT1:
-    case GCT_UINT2:
-    case GCT_UINT3:
-    case GCT_UINT4:
-    case GCT_SAMPLER1D:
-    case GCT_SAMPLER2D:
-    case GCT_SAMPLER2DARRAY:
-    case GCT_SAMPLER3D:
-    case GCT_SAMPLERCUBE:
-    case GCT_SAMPLER1DSHADOW:
-    case GCT_SAMPLER2DSHADOW:
-        return false;
-    default:
-        return true;
-    };
-}
-
-//-----------------------------------------------------------------------
-bool UniformParameter::isSampler() const
-{
-    switch(getType())
-    {
-    case GCT_SAMPLER1D:
-    case GCT_SAMPLER2D:
-    case GCT_SAMPLER2DARRAY:
-    case GCT_SAMPLER3D:
-    case GCT_SAMPLERCUBE:
-    case GCT_SAMPLER1DSHADOW:
-    case GCT_SAMPLER2DSHADOW:
-        return true;
-    default:
-        return false;
-    };
-}
-
-//-----------------------------------------------------------------------
 UniformParameter::UniformParameter(GpuConstantType type, const String& name, 
                  const Semantic& semantic, int index, 
                  const Content& content,
