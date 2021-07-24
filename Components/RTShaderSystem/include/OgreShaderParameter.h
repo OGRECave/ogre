@@ -453,10 +453,10 @@ public:
     float getAutoConstantRealData() const { return mAutoConstantRealData; }
 
     /** Return true if this parameter is a floating point type, false otherwise. */
-    bool isFloat() const;
+    bool isFloat() const { return GpuConstantDefinition::isFloat(mType); }
 
     /** Return true if this parameter is a texture sampler type, false otherwise. */
-    bool isSampler() const;
+    bool isSampler() const { return GpuConstantDefinition::isSampler(mType); }
 
     /** Return true if this parameter is an auto constant parameter, false otherwise. */
     bool isAutoConstantParameter() const { return mIsAutoConstantReal || mIsAutoConstantInt; }
