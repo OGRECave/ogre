@@ -263,7 +263,8 @@ namespace Ogre {
                 Real lodValue);
             /// Get the material for this bucket
             const MaterialPtr& getMaterial(void) const { return mMaterial; }
-            void setMaterial(const MaterialPtr& material);
+            /// Override Material without changing the partitioning. For advanced use only.
+            void _setMaterial(const MaterialPtr& material);
             /// Iterator over geometry
             typedef VectorIterator<GeometryBucketList> GeometryIterator;
             /// Get a list of the contained geometry

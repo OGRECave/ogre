@@ -302,7 +302,7 @@ class _OgreSampleClassExport Sample_Grass : public SdkSample
          {
              for (const auto& mb : lod->getMaterialBuckets())
              {
-                 mb.second->setMaterial(mat);
+                 mb.second->_setMaterial(mat);
              }
          }
      }

@@ -1235,7 +1235,7 @@ namespace Ogre {
         }
 
     }
-    void StaticGeometry::MaterialBucket::setMaterial(const MaterialPtr& material)
+    void StaticGeometry::MaterialBucket::_setMaterial(const MaterialPtr& material)
     {
         OgreAssert(material, "NULL pointer");
         mMaterial = material;
