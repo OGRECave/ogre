@@ -37,31 +37,7 @@ same license as the rest of the engine.
 #include "GBufferSchemeHandler.h"
 #include "NullSchemeHandler.h"
 
-#include "SharedData.h"
-
 #include "OgreShaderExGBuffer.h"
-
-namespace Ogre
-{
-    template<> SharedData* Singleton<SharedData>::msSingleton = 0;
-}
-
-SharedData::SharedData()
-    : iRoot(0), iCamera(0), iWindow(0), iSystem(0), iActivate(false),
-      iGlobalActivate(false), iMainLight(0)
-{
-}
-
-SharedData::~SharedData() {}
-
-SharedData* SharedData::getSingletonPtr(void)
-{
-    return msSingleton;
-}
-SharedData& SharedData::getSingleton(void)
-{
-    assert( msSingleton );  return ( *msSingleton );
-}
 
 using namespace Ogre;
 
