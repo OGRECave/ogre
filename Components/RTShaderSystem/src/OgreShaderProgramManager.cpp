@@ -409,12 +409,7 @@ void ProgramManager::removeProgramProcessor(ProgramProcessor* processor)
 //-----------------------------------------------------------------------------
 void ProgramManager::destroyGpuProgram(GpuProgramPtr& gpuProgram)
 {       
-    HighLevelGpuProgramPtr res           = dynamic_pointer_cast<HighLevelGpuProgram>(gpuProgram);
-
-    if (res)
-    {
-        HighLevelGpuProgramManager::getSingleton().remove(res);
-    }
+    GpuProgramManager::getSingleton().remove(gpuProgram);
 }
 
 //-----------------------------------------------------------------------
