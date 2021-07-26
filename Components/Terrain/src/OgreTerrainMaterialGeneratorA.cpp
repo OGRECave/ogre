@@ -589,7 +589,10 @@ namespace Ogre
                     if(prof->isLayerNormalMappingEnabled())
                         params->setNamedConstant("normtex" + StringConverter::toString(i), (int)numSamplers++);
                 }
+            }
 
+            if (prof->isShadowingEnabled(tt, terrain))
+            {
                 uint numShadowTextures = 1;
                 if (prof->getReceiveDynamicShadowsPSSM())
                     numShadowTextures = (uint)prof->getReceiveDynamicShadowsPSSM()->getSplitCount();
