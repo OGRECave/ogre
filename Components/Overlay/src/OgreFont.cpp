@@ -262,13 +262,13 @@ namespace Ogre
     {
         if (mMaterial)
         {
-            MaterialManager::getSingleton().remove(mMaterial->getHandle());
+            MaterialManager::getSingleton().remove(mMaterial);
             mMaterial.reset();
         }
 
         if (mTexture)
         {
-            mTexture->unload();
+            TextureManager::getSingleton().remove(mTexture);
             mTexture.reset();
         }
     }
