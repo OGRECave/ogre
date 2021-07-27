@@ -236,7 +236,7 @@ JNIEnv* OgreJNIGetEnv() {
 %ignore Ogre::AllocPolicy;
 %import "OgreMemoryAllocatorConfig.h"
 %include "OgreCommon.h"
-%template(NameValuePairList) std::map<std::string, std::string>;
+%template(NameValueMap) std::map<std::string, std::string>;
 ADD_REPR(TRect)
 %template(Rect) Ogre::TRect<long>;
 %template(FloatRect) Ogre::TRect<float>;
@@ -260,8 +260,8 @@ ADD_REPR(Degree)
 ADD_REPR(Radian)
 %template(RayTestResult) std::pair<bool, float>;
 %include "OgreStringVector.h"
-%template(StringVector) std::vector<Ogre::String>;  // actual vector<T>
-%template(StringVectorPtr) Ogre::SharedPtr<std::vector<Ogre::String> >;
+%template(StringList) std::vector<Ogre::String>;  // actual vector<T>
+%template(StringListPtr) Ogre::SharedPtr<std::vector<Ogre::String> >;
 %include "OgreFileSystemLayer.h"
 // Linear Algebra
 %ignore Ogre::Vector<2, Ogre::Real>::Vector(float, float, float);
@@ -444,7 +444,7 @@ ADD_REPR(Plane)
 %ignore Ogre::ConfigFile::load; // conflicting overloads
 %ignore Ogre::ConfigFile::getSettingsIterator; // deprecated
 %ignore Ogre::ConfigFile::getSectionIterator;
-%template(SettingsBySection) std::map<std::string, std::multimap< std::string, std::string> >;
+%template(SettingsBySectionMap) std::map<std::string, std::multimap< std::string, std::string> >;
 #ifdef SWIGPYTHON
 %template(SettingsMultiMap) std::multimap<std::string, std::string>;
 #endif
@@ -662,7 +662,7 @@ SHARED_PTR(Skeleton);
 %ignore Ogre::Material::getSupportedTechnique;
 %ignore Ogre::Material::getNumSupportedTechniques;
 SHARED_PTR(Material);
-%template(Techniques) std::vector<Ogre::Technique*>;
+%template(TechniqueList) std::vector<Ogre::Technique*>;
 %include "OgreMaterial.h"
 %ignore Ogre::RenderSystem::_setBindingType;
 %ignore Ogre::RenderSystem::_setBindingType;
@@ -711,11 +711,11 @@ SHARED_PTR(Material);
     %ignore Ogre::Light::getDirection;
     %include "OgreLight.h"
     %ignore Ogre::Node::getChildIterator;
-    %template(ChildNodeList) std::vector<Ogre::Node*>;
+    %template(NodeList) std::vector<Ogre::Node*>;
     %include "OgreNode.h"
         %include "OgreBone.h"
         %ignore Ogre::SceneNode::getAttachedObjectIterator;
-        %template(NodeObjectMap) std::vector<Ogre::MovableObject*>;
+        %template(MovableObjectList) std::vector<Ogre::MovableObject*>;
         %include "OgreSceneNode.h"
     SHARED_PTR(ShadowCameraSetup);
     SHARED_PTR(DefaultShadowCameraSetup);
@@ -803,13 +803,13 @@ SHARED_PTR(Mesh);
 %ignore Ogre::Pass::getTextureUnitStateIterator; // deprecated
 %ignore Ogre::Pass::hasSeparateSceneBlending;
 %ignore Ogre::Pass::hasSeparateSceneBlendingOperations;
-%template(TextureUnitStates) std::vector<Ogre::TextureUnitState*>;
+%template(TextureUnitStateList) std::vector<Ogre::TextureUnitState*>;
 %include "OgrePass.h"
     %ignore Ogre::Technique::getGPUVendorRuleIterator;
     %ignore Ogre::Technique::getGPUDeviceNameRuleIterator;
     %ignore Ogre::Technique::getIlluminationPassIterator;
     %ignore Ogre::Technique::getPassIterator();
-    %template(Passes) std::vector<Ogre::Pass*>;
+    %template(PassList) std::vector<Ogre::Pass*>;
     %template(IlluminationPassList) std::vector<Ogre::IlluminationPass*>;
     %include "OgreTechnique.h"
 %ignore Ogre::RenderTarget::copyContentsToMemory(const PixelBox&);
