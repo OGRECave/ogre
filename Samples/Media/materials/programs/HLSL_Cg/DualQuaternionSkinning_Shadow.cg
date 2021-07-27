@@ -1,0 +1,13 @@
+float3 calculateBlendPosition(float4 position, float2x4 blendDQ)
+{
+	float3 blendPosition = position.xyz + 2.0*cross(blendDQ[0].yzw, cross(blendDQ[0].yzw, position.xyz) + blendDQ[0].x*position.xyz);
+	float3 trans = 2.0*(blendDQ[0].x*blendDQ[1].yzw - blendDQ[1].x*blendDQ[0].yzw + cross(blendDQ[0].yzw, blendDQ[1].yzw));
+	blendPosition += trans;
+
+	return blendPosition;
+}
+
+float3 calculateBlendNormal(float3 normal, float2x4 blendDQ)
+{
+	return normal + 2.0*cross(blendDQ[0].yzw, cross(blendDQ[0].yzw, normal) + blendDQ[0].x*normal);
+}
