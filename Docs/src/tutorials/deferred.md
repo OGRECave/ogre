@@ -130,11 +130,11 @@ In some cases the automatic material generation will not be good enough. We want
 How do we do this? Easily! Since GBufferSchemeHandler::handleSchemeNotFound only gets called when an object doesn't already have a GBuffer scheme, adding a 'GBuffer' technique to the material will cause it to not get passed to the listener even once.
 
 ## Seeing it in action
-Using tools like NVIDIA's PerfHUD, we can see the texture being built during the frame : 
+Using tools like [RenderDoc](https://renderdoc.org/), we can see the texture being built during the frame:
 
-![](GBufferPerfHUD.PNG)
+@image html GBufferRenderdoc.jpg width=90%
 
-Note that nothing has been written to the final output yet (main view is completely black) and that two textures are being written to (see right hand side).
+Note that nothing has been written to the final output yet and that two output textures are being written to (see right hand side).
 
 # Lighting the scene {#lighting}
 In the GBuffer compositor, we built the G-Buffer for the current frame. It is now the time to use it to calculate the final lighting of the scene. This is what the compositor looks like :
@@ -202,14 +202,9 @@ The demo currently supports just spotlight shadow casting (since it is the cheap
 
 ### Seeing it in action
 
+Here is a screenshot from RenderDoc of the draw call that renders a spotlight that casts shadows. See the two G-Buffer textures and one shadow texture on the right:
 
-Here is a screenshot from PerfHUD of the draw call that renders a spotlight that casts shadows. See the two G-Buffer textures and one shadow texture on the left : 
-
-![](DeferredCone1.PNG)
-
-Here is a visualization of the texture being built : 
-
-![](DeferredCone2.PNG)
+@image html DeferredCone.jpg width=90%
 
 After all the lights are rendered, the scene is fully lit!
 
