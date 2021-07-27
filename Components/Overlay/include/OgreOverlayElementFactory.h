@@ -66,40 +66,6 @@ namespace Ogre {
         /** Gets the string uniquely identifying the type of element this factory creates. */
         virtual const String& getTypeName(void) const = 0;
     };
-
-
-    /** Factory for creating PanelOverlayElement instances. */
-    class _OgreOverlayExport PanelOverlayElementFactory: public OverlayElementFactory
-    {
-    public:
-        OverlayElement* createOverlayElement(const String& instanceName) override
-        {
-            return OGRE_NEW PanelOverlayElement(instanceName);
-        }
-        const String& getTypeName(void) const override;
-    };
-
-    /** Factory for creating BorderPanelOverlayElement instances. */
-    class _OgreOverlayExport BorderPanelOverlayElementFactory: public OverlayElementFactory
-    {
-    public:
-        OverlayElement* createOverlayElement(const String& instanceName) override
-        {
-            return OGRE_NEW BorderPanelOverlayElement(instanceName);
-        }
-        const String& getTypeName(void) const override;
-    };
-
-    /** Factory for creating TextAreaOverlayElement instances. */
-    class _OgreOverlayExport TextAreaOverlayElementFactory: public OverlayElementFactory
-    {
-    public:
-        OverlayElement* createOverlayElement(const String& instanceName) override
-        {
-            return OGRE_NEW TextAreaOverlayElement(instanceName);
-        }
-        const String& getTypeName(void) const override;
-    };
     /** @} */
     /** @} */
 
