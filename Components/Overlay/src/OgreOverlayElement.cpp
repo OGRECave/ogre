@@ -84,7 +84,6 @@ namespace Ogre {
       , mZOrder(0)
       , mEnabled(true)
       , mInitialised(false)
-      , mSourceTemplate(0)
     {
         // default overlays to preserve their own detail level
         mPolygonModeOverrideable = false;
@@ -793,13 +792,6 @@ namespace Ogre {
             ret = this;
         }
         return ret;
-    }
-    //-----------------------------------------------------------------------
-    void OverlayElement::copyFromTemplate(OverlayElement* templateOverlay)
-    {
-        templateOverlay->copyParametersTo(this);
-        mSourceTemplate = templateOverlay ;
-        return;
     }
     //-----------------------------------------------------------------------
     OverlayElement* OverlayElement::clone(const String& instanceName)

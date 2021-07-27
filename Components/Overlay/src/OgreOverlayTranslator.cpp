@@ -139,8 +139,6 @@ void ElementTranslator::translate(ScriptCompiler* compiler, const AbstractNodePt
 {
     ObjectAbstractNode* obj = static_cast<ObjectAbstractNode*>(node.get());
 
-    bool isATemplate = obj->cls != "overlay" && !obj->parent; // only top level elements are templates
-
     String name;
     // legacy compat
     if ((obj->cls == "template") && !obj->values.empty())
@@ -176,8 +174,8 @@ void ElementTranslator::translate(ScriptCompiler* compiler, const AbstractNodePt
     if(!obj->bases.empty())
         templateName = obj->bases.front();
 
-    OverlayElement* newElement = OverlayManager::getSingleton().createOverlayElementFromTemplate(
-        templateName, type, name, isATemplate);
+    OverlayElement* newElement =
+        OverlayManager::getSingleton().createOverlayElementFromTemplate(templateName, type, name);
 
     if(obj->parent && obj->parent->context.has_value())
     {

@@ -156,9 +156,6 @@ namespace Ogre {
         /// Is element initialised?
         bool mInitialised;
 
-        /// Used to see if this element is created from a Template
-        OverlayElement* mSourceTemplate ;
-
         /** Internal method which is triggered when the positions of the element get updated,
         meaning the element should be rebuilding it's mesh positions. Abstract since
         subclasses must implement this.
@@ -461,11 +458,8 @@ namespace Ogre {
             return ll;
         }
 
-        virtual void copyFromTemplate(OverlayElement* templateOverlay);
+        virtual void copyFromTemplate(OverlayElement* templateOverlay) { templateOverlay->copyParametersTo(this); }
         virtual OverlayElement* clone(const String& instanceName);
-
-        /// Returns the SourceTemplate for this element
-        const OverlayElement* getSourceTemplate() const { return mSourceTemplate; }
     };
 
 

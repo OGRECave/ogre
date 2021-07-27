@@ -72,27 +72,12 @@ namespace Ogre {
 
         FactoryMap mFactories;
 
-        ElementMap mInstances;
-        ElementMap mTemplates;
+        ElementMap mElements;
 
         typedef std::set<String> LoadedScripts;
         LoadedScripts mLoadedScripts;
 
         std::unique_ptr<ScriptTranslatorManager> mTranslatorManager;
-
-        ElementMap& getElementMap(bool isTemplate);
-
-        OverlayElement* createOverlayElementImpl(const String& typeName, const String& instanceName, ElementMap& elementMap);
-
-        OverlayElement* getOverlayElementImpl(const String& name, ElementMap& elementMap);
-        
-        bool hasOverlayElementImpl(const String& name, ElementMap& elementMap);
-
-        void destroyOverlayElementImpl(const String& instanceName, ElementMap& elementMap);
-
-        void destroyOverlayElementImpl(OverlayElement* pInstance, ElementMap& elementMap);
-
-        void destroyAllOverlayElementsImpl(ElementMap& elementMap);
 
     public:
         OverlayManager();
@@ -153,36 +138,35 @@ namespace Ogre {
         allows plugins to register new types of component.
         @param typeName The type of element to create.
         @param instanceName The name to give the new instance.
-        @param isTemplate
         */
-        OverlayElement* createOverlayElement(const String& typeName, const String& instanceName, bool isTemplate = false);
+        OverlayElement* createOverlayElement(const String& typeName, const String& instanceName, bool = false);
 
         /** Gets a reference to an existing element. */
-        OverlayElement* getOverlayElement(const String& name, bool isTemplate = false);
+        OverlayElement* getOverlayElement(const String& name, bool = false);
 
         /** Tests if an element exists. */
-        bool hasOverlayElement(const String& name, bool isTemplate = false);
+        bool hasOverlayElement(const String& name, bool = false);
         
         /** Destroys a OverlayElement. 
         @remarks
         Make sure you're not still using this in an Overlay. If in
         doubt, let OGRE destroy elements on shutdown.
         */
-        void destroyOverlayElement(const String& instanceName, bool isTemplate = false);
+        void destroyOverlayElement(const String& instanceName, bool = false);
 
         /** Destroys a OverlayElement. 
         @remarks
         Make sure you're not still using this in an Overlay. If in
         doubt, let OGRE destroy elements on shutdown.
         */
-        void destroyOverlayElement(OverlayElement* pInstance, bool isTemplate = false);
+        void destroyOverlayElement(OverlayElement* pInstance, bool = false);
 
         /** Destroys all the OverlayElement  created so far.
         @remarks
         Best to leave this to the engine to call internally, there
         should rarely be a need to call it yourself.
         */
-        void destroyAllOverlayElements(bool isTemplate = false);
+        void destroyAllOverlayElements(bool = false);
 
         /** Registers a new OverlayElementFactory with this manager.
         @remarks
@@ -196,7 +180,7 @@ namespace Ogre {
             return mFactories;
         }
 
-        OverlayElement* createOverlayElementFromTemplate(const String& templateName, const String& typeName, const String& instanceName, bool isTemplate = false);
+        OverlayElement* createOverlayElementFromTemplate(const String& templateName, const String& typeName, const String& instanceName, bool = false);
         /**
         *  @remarks
         *  Creates a new OverlayElement object from the specified template name.  The new
@@ -205,12 +189,6 @@ namespace Ogre {
         OverlayElement* cloneOverlayElementFromTemplate(const String& templateName, const String& instanceName);
 
         OverlayElement* createOverlayElementFromFactory(const String& typeName, const String& instanceName);
-
-        /* Returns whether the Element with the given name is a Template */
-        bool isTemplate (String strName) const {
-            return (mTemplates.find (strName) != mTemplates.end()) ;
-        }
-
 
         /** Override standard Singleton retrieval.
         @remarks
