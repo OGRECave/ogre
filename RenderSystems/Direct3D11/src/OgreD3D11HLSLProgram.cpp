@@ -1006,6 +1006,14 @@ namespace Ogre {
         }
     }
     //-----------------------------------------------------------------------
+    void D3D11HLSLProgram::unprepareImpl(void)
+    {
+        for(unsigned int i = 0 ; i < mSerStrings.size() ; i++)
+        {
+            delete mSerStrings[i];
+        }
+        mSerStrings.clear();
+    }
     void D3D11HLSLProgram::unloadHighLevelImpl(void)
     {
         mSlotMap.clear();
@@ -1018,11 +1026,7 @@ namespace Ogre {
         mHullShader.Reset();
         mComputeShader.Reset();
 
-        for(unsigned int i = 0 ; i < mSerStrings.size() ; i++)
-        {
-            delete mSerStrings[i];
-        }
-        mSerStrings.clear();
+        unprepareImpl();
         mD3d11ShaderInputParameters.clear();
         mD3d11ShaderOutputParameters.clear();
         mD3d11ShaderBufferDescs.clear();
