@@ -4,12 +4,13 @@
 - @subpage The-Core-Objects
 - @subpage Resource-Management
 - @subpage Scripts
-- @subpage Runtime-Shader-Generation
+- @subpage rtss
 - @subpage Mesh-Tools
 - @subpage Hardware-Buffers
 - @subpage Shadows
 - @subpage Animation
 - @subpage Instancing
+- @subpage Cross-platform-Shaders
 
 @page Introduction Introduction
 
