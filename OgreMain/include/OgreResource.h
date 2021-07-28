@@ -195,12 +195,12 @@ namespace Ogre {
         */
         virtual void postUnloadImpl(void) {}
 
-        /** Internal implementation of the meat of the 'prepare' action. 
+        /** Internal implementation of the meat of the 'prepare' action, only called if this
+            resource is not being loaded from a ManualResourceLoader.
         */
         virtual void prepareImpl(void) {}
-        /** Internal function for undoing the 'prepare' action.  Called when
-            the load is completed, and when resources are unloaded when they
-            are prepared but not yet loaded.
+        /** Internal function for undoing the 'prepare' action. Only called during
+            unload if this resource is prepared but not yet loaded.
         */
         virtual void unprepareImpl(void) {}
         /** Internal implementation of the meat of the 'load' action, only called if this 
