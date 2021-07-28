@@ -89,9 +89,10 @@ namespace Ogre {
         void notifyDeviceRestored(D3D11Device* device);
 
         /// noop
-        void createLowLevelImpl(void) {}
+        void createLowLevelImpl(void) override {}
         /// Internal unload implementation, must be implemented by subclasses
-        void unloadHighLevelImpl(void);
+        void unloadHighLevelImpl(void) override;
+        void unprepareImpl() override;
 
         // Recursive utility method for populateParameterNames
         void processParamElement(String prefix, String paramName, ID3D11ShaderReflectionType* varRefType);
