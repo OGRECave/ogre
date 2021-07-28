@@ -64,11 +64,6 @@ preprocessor_defines CLEVERTECHNIQUE,NUMTHINGS=2
 
 This way you can use the same source code but still include small variations, each one defined as a different %Ogre program name but based on the same source code.
 
-Furthermore, %Ogre automatically sets the following defines for convenience:
-- The current shading language and native version: e.g. @c OGRE_GLSL=120, @c OGRE_HLSL=3
-- The current shader type: e.g. @c OGRE_VERTEX_SHADER, @c OGRE_FRAGMENT_SHADER
-- Whether @ref reversed-depth is enabled: @c OGRE_REVERSED_Z
-
 @note on GLSL %Ogre pre-processes the source itself instead on relying on the driver implementation which is often buggy. This relaxes using @c \#ifdef directives compared to the standard - e.g. you can <tt>\#ifdef \#version</tt>. However this means that defines specified in GLSL extensions are not present.
 
 # Cg programs {#Cg}
@@ -781,35 +776,68 @@ Again as at the time of writing, the types of texture you can use in a vertex pr
 
 As at the time of writing (early Q3 2006), ATI do not support texture fetch in their current crop of cards (Radeon X1n00). nVidia do support it in both their 6n00 and 7n00 range. ATI support an alternative called ’Render to Vertex Buffer’, but this is not standardised at this time and is very much different in its implementation, so cannot be considered to be a drop-in replacement. This is the case even though the Radeon X1n00 cards claim to support vs\_3\_0 (which requires vertex texture fetch).
 
-@page Runtime-Shader-Generation Runtime Shader Generation 
+@page Cross-platform-Shaders Cross-platform Shaders
 
-Writing shading programs is a common task when developing 3D based application. Most of the visual effects used by 3D based applications involve shader programs.
-Additionally with D3D11/ GL3, support for fixed pipeline functionality was removed. Meaning you can only render objects using shaders.
+When targeting multiple graphics APIs, one typically needs to provide separate shaders for each API. This results in lots of duplicated code gets out of hand quickly.
 
-While @ref High-level-Programs offer you maximal control and flexibility over how your objects are rendered, writing and maintaining them is also a very time consuming task.
+@tableofcontents
 
-Instead %Ogre can also automatically generate shaders on the fly, based on object material properties, scene setup and other user definitions. While the resulting shaders are less optimized, they offer the following advantages:
+To support using the same shader code for multiple APIs, %Ogre provides the following mechanisms.
+- @c \#include directives are universally supported - even with GLSL, so you can rely on them to organised your shaders.
+- There are several built-in defines that can be used to conditionally compile different versions of the same shader.
 
-* Save development time e.g. when your target scene has dynamic lights and the number changes, fog changes and the number of material attributes increases the total count of needed shaders dramatically. It can easily cross 100 and it becomes a time consuming development task.
-* Reusable code - once you've written the shader extension you can use it anywhere due to its independent nature.
-* Custom shaders extension library - enjoy the shared library of effects created by the community. Unlike hand written shader code, which may require many adjustments to be plugged into your own shader code, using the extensions library requires minimum changes.
+# Built-in defines
+The following defines are available:
+- The current shading language and native version: e.g. @c OGRE_GLSL=120, @c OGRE_HLSL=3
+- The current shader type: e.g. @c OGRE_VERTEX_SHADER, @c OGRE_FRAGMENT_SHADER
+- Whether @ref reversed-depth is enabled: @c OGRE_REVERSED_Z
 
-The system is implemented as a component, so you can enable/ disable it at compile time.
+# Cross-platform macros
 
-* @subpage rtss <br />
-The RTSS is not another Uber shader with an exploding amount of @c \#ifdefs that make it increasingly difficult to add new functionality. 
-Instead, it manages a set of opaque isolated components (SubRenderStates) where each implements a specific effect.
-These "effects" notably include full Fixed Function emulation. At the core these components are plain shader files providing a set of functions. The shaders are based on properties defined in @ref Material-Scripts.
+Additionally, the `OgreUnifiedShader.h` provides macros to map GLSL to HLSL and (to some extent) Metal.
+
+As everything is handled by standard macros, the conversion can be performed by simply running the standard c preprocessor (`cpp`) on them - even without running %Ogre.
+
+In general, you have to do the following changes compared to regular GLSL:
+- Add the `#include <OgreUnifiedShader.h>` directive at the top of the file
+- Use the `MAIN_PARAMETERS` and `MAIN_DECLARATION` directives instead of `void main()`
+- Use the `IN`/ `OUT` macros to specify non-uniform parameters that are passed to the main function.
+- Declare Samplers with `SAMPLER2D/3D/CUBE/..` macros instead of `sampler2D/3D/Cube/..`
+- Use `mtxFromRows` / `mtxFromCols` to construct matrices from vectors
+- Use the HLSL style `mul` instead of `*` to multiply matrices
+- Use `vec2_splat(1.0)` instead of the `vec2(1.0)` single component constructor.
+
+Lets take a look on how to use the `OgreUnifiedShader.h` macros by starting with a simple GLSL shader:
+
+```cpp
+uniform mat4 worldMatrix;
+
+attribute vec4 vertex;
+void main()
+{
+    gl_Position = worldMatrix * vertex;
+}
+```
+
+to make it cross-platform, we need to modify it as:
+
+```cpp
+#include <OgreUnifiedShader.h>
+uniform mat4 worldMatrix;
+
+MAIN_PARAMETERS
+IN(vec4 vertex, POSITION)
+MAIN_DECLARATION
+{
+    gl_Position = mul(worldMatrix, vertex);
+}
+```
+
+@note If you only target D3D, the reduced `HLSL_SM4Support.hlsl` header only includes the `SAMPLER` macros to map HLSL9/ Cg to HLSL SM4 (D3D11)
 
 # Uber shader tips
 
-In case, you are not conviced and want to go with your hand-rolled uber shader, here are some tips:
-
-1. %Ogre supports @c \#include directives universally - even with GLSL, so use them to split up your shader.
-2. The `OgreUnifiedShader.h` header provides macros to map GLSL to HLSL and (to some extent) Metal. This allows you to write shader code once and use it for multiple rendersystems.
-3. The `HLSL_SM4Support.hlsl` helper allows mapping HLSL9/ Cg to HLSL SM4 (D3D11), if you only target D3D.
-
-Then you can have a shader skeleton like this:
+To toggle features on and off use a shader skeleton like this:
 
 ```cpp
 #ifdef USE_UV
@@ -836,7 +864,7 @@ void main()
 }
 ```
 
-then in the material file, you can instanciate it as:
+then in the material file, you can instantiate it as:
 
 ```cpp
 vertex_program TextureAndSkinning glsl
@@ -851,16 +879,4 @@ vertex_program TextureAndSkinning glsl
 ```
 and reference it with your materials.
 
-Incidentally, this is very similar to what the RTSS is doing internally. Except, you do not need the @c preprocessor_defines part, as it can derive automatically from the material what needs to be done.
-
-# Historical background
-
-When the early graphic cards came into the market they contained a fixed but large set of functions with which you could influence how 3D object were rendered. These included influencing object positions using matrices, calculating the effect of textures on a pixel, calculating the effect of lights on vertices and so on. These set of functions and their implementation in hardware became later known as the graphic card fixed pipeline (or Fixed Function Pipeline).
-
-As graphic cards became more powerful and graphic application became more complex, a need for new ways to manipulate the rendering of 3D models became apparent. This need saw the introduction of shaders. 
-
-Shaders are small custom made programs that run directly on the graphics card. Using these programs, one could replace the calculations that were made by the fixed pipeline and add new functionality. However there was a catch: If shaders are used on an object, the object can no longer use any of the functionality of the fixed pipeline. Any calculation that was used in the fixed pipeline needed to be recreated in the shaders. With early graphics applications this was not problematic. Shaders were simple and their numbers were kept low. However as applications grew in complexity this meant that the need for shaders grew as well. As a programmer you were left with 2 choices, both bad. Either create an exuberant amount of small shaders that soon became too many to effectively maintain. Or create an uber shader, a huge complex shader, that soon became too complex to effectively maintain as well.
-
-The RTSS seeks to fix those problems by automatically generating shaders based on the operations previously required from the fixed pipeline and new capabilities required by the user.
-
-With the introduction of the version 11 of Direct3D, a new reason for having an RTSS like system became apparent. With D3D11 support for fixed pipeline functionality was removed. Meaning, you can only render objects using shaders. The RTSS is an excellent tool for this purpose.
+Incidentally, this is very similar to what the [RTSS](@ref rtss) is doing internally. Except, you do not need the @c preprocessor_defines part, as it can derive automatically from the material what needs to be done.

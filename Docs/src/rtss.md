@@ -1,7 +1,17 @@
-# RTSS: Run Time Shader System {#rtss}
+# Runtime Shader Generation {#rtss}
 
-The Run Time Shader System or RTSS for short is the %Ogre way of managing Shaders and their variations. Initially it was created as a drop-in-replacement to the Fixed-Function Pipeline (FFP) for RenderSystems that lacked it (e.g D3D11, GLES2).
+With D3D11 and GL3, support for fixed pipeline functionality was removed. Meaning you can only render objects using shaders.
+
+While @ref High-level-Programs offer you maximal control and flexibility over how your objects are rendered, writing and maintaining them is also a very time consuming task.
+
+The Run Time Shader System or RTSS for short is the %Ogre way of managing Shaders and their variations. Initially it was created as a drop-in-replacement to the Fixed-Function Pipeline (FFP) for RenderSystems that lacked it.
 However, since then it grew to a general way to express shader functionality in @ref Material-Scripts without having to manually write shaders.
+
+While the resulting shaders are less optimized, they offer the following advantages:
+
+* Save development time e.g. when your target scene has dynamic lights and the number changes, fog changes and the number of material attributes increases the total count of needed shaders dramatically. It can easily cross 100 and it becomes a time consuming development task.
+* Reusable code - once you've written the shader extension you can use it anywhere due to its independent nature.
+* Custom shaders extension library - enjoy the shared library of effects created by the community. Unlike hand written shader code, which may require many adjustments to be plugged into your own shader code, using the extensions library requires minimum changes.
 
 For fixed function function properties, the RTSS will read the standard `pass` and `texture_unit` definitions, so no changes are required. To enable features that go beyond the possibilities of the FFP, you have to define an additional `rtshader_system` block with the respective properties.
 
@@ -13,9 +23,9 @@ To modify the default lighting stage [see below](@ref rtss_custom_api). For more
 
 @tableofcontents
 
-# RTSS properties in Material Scripts {#rtss_custom_mat}
+# RTSS Pass properties {#rtss_custom_mat}
 
-Here are the attributes you can use in a `rtshader_system` block of a .material script:
+Here are the attributes you can use in a `rtshader_system` block of a `pass {}`:
 
 - [transform_stage](#transform_stage)
 - [lighting_stage](#lighting_stage)
@@ -122,6 +132,13 @@ Example: `hardware_skinning 24 2 dual_quaternion true false`
 @param scale_shear add scaling and shearing support to dual quaternion computation
 
 @note You can also use Ogre::RTShader::HardwareSkinningFactory::prepareEntityForSkinning to derive this information automatically.
+
+# RTSS Texture Unit properties {#rtss_tu_props}
+
+Here are the attributes you can use in a `rtshader_system` block of a `texture_unit {}`:
+
+- [layered_blend](#layered_blend)
+- [source_modifier](#source_modifier)
 
 <a name="layered_blend"></a>
 
