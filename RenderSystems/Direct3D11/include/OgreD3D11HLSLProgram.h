@@ -90,11 +90,12 @@ namespace Ogre {
         void notifyDeviceRestored(D3D11Device* device);
 
         /// noop
-        void createLowLevelImpl(void) {}
+        void createLowLevelImpl(void) override {}
         /// Internal unload implementation, must be implemented by subclasses
         void unloadHighLevelImpl(void);
         /// Populate the passed parameters with name->index map, must be overridden
         void populateParameterNames(GpuProgramParametersSharedPtr params);
+        void unprepareImpl() override;
 
         // Recursive utility method for populateParameterNames
         void processParamElement(String prefix, LPCSTR pName, ID3D11ShaderReflectionType* varRefType);
