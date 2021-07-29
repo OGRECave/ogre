@@ -36,9 +36,13 @@ namespace Ogre {
     // init statics
     ScaleAffector::CmdScaleAdjust ScaleAffector::msScaleCmd;
 
+    static SimpleParamCommand<ScaleAffector, const Vector2&, &ScaleAffector::getScaleRange,
+                              &ScaleAffector::setScaleRange>
+        msScaleRangeCmd;
+
     //-----------------------------------------------------------------------
     ScaleAffector::ScaleAffector(ParticleSystem* psys)
-        :ParticleAffector(psys)
+        :ParticleAffector(psys), mScaleRange(Vector2::UNIT_SCALE)
     {
         mScaleAdj = 0;
         mType = "Scaler";
@@ -48,41 +52,35 @@ namespace Ogre {
         {
             ParamDictionary* dict = getParamDictionary();
 
-            dict->addParameter(ParameterDef("rate", 
-                "The amount by which to adjust the x and y scale components of particles per second.",
-                PT_REAL), &msScaleCmd);
+            dict->addParameter("rate", &msScaleCmd);
+            dict->addParameter("scale_range", &msScaleRangeCmd);
         }
+    }
+    //-----------------------------------------------------------------------
+    void ScaleAffector::_initParticle(Particle* p)
+    {
+        float w = mParent->getDefaultWidth();
+        float h = mParent->getDefaultHeight();
+        if (p->hasOwnDimensions())
+        {
+            w = p->getOwnWidth();
+            h = p->getOwnHeight();
+        }
+        float s = Math::RangeRandom(mScaleRange[0], mScaleRange[1]);
+        p->setDimensions(s * w, s * h);
     }
     //-----------------------------------------------------------------------
     void ScaleAffector::_affectParticles(ParticleSystem* pSystem, Real timeElapsed)
     {
-        Real ds;
-
         // Scale adjustments by time
-        ds = mScaleAdj * timeElapsed;
-
-        Real NewWide, NewHigh;
+        float ds = mScaleAdj * timeElapsed;
 
         for (auto p : pSystem->_getActiveParticles())
         {
-            if( p->hasOwnDimensions() == false )
-            {
-                NewWide = pSystem->getDefaultWidth() + ds;
-                NewHigh = pSystem->getDefaultHeight() + ds;
-
-            }
-            else
-            {
-                NewWide = p->getOwnWidth()  + ds;
-                NewHigh = p->getOwnHeight() + ds;
-            }
-            if (NewWide < 0)
-                NewWide = 0;
-            if (NewHigh < 0)
-                NewHigh = 0;
-            p->setDimensions( NewWide, NewHigh ); 
+            float w = std::max(0.0f, p->getOwnWidth() + ds);
+            float h = std::max(0.0f, p->getOwnHeight() + ds);
+            p->setDimensions(w, h);
         }
-
     }
     //-----------------------------------------------------------------------
     void ScaleAffector::setAdjust( Real rate )
