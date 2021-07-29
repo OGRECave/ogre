@@ -119,12 +119,12 @@ void FFP_GenerateTexCoord_EnvMap_Reflect(in mat4 mWorld,
 	vec3 vReflect = reflect(vNormViewPos, vViewNormal);
 
 #ifdef OGRE_HLSL
-  	matViewT[0][2] = -matViewT[0][2];
- 	matViewT[1][2] = -matViewT[1][2];
-  	matViewT[2][2] = -matViewT[2][2];
-#else
 	matViewT[2][0] = -matViewT[2][0];
 	matViewT[2][1] = -matViewT[2][1];
+	matViewT[2][2] = -matViewT[2][2];
+#else
+	matViewT[0][2] = -matViewT[0][2];
+	matViewT[1][2] = -matViewT[1][2];
 	matViewT[2][2] = -matViewT[2][2];
 #endif
 	vReflect = mul(to_mat3(matViewT), vReflect);
