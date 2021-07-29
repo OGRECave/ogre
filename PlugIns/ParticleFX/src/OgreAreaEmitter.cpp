@@ -74,13 +74,6 @@ namespace Ogre {
         }
         return false;
     }
-
-    //-----------------------------------------------------------------------
-    unsigned short AreaEmitter::_getEmissionCount(Real timeElapsed)
-    {
-        // Use basic constant emission 
-        return genConstantEmissionCount(timeElapsed);
-    }
     //-----------------------------------------------------------------------
     void AreaEmitter::setDirection( const Vector3& inDirection )
     {

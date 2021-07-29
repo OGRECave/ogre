@@ -80,8 +80,6 @@ namespace Ogre {
 
         AreaEmitter(ParticleSystem* psys) : ParticleEmitter(psys) {}
 
-        unsigned short _getEmissionCount(Real timeElapsed) override;
-
         /** Overloaded to update the trans. matrix */
         void setDirection( const Vector3& direction );
 

@@ -51,8 +51,6 @@ namespace Ogre {
         PointEmitter(ParticleSystem* psys);
 
         void _initParticle(Particle* pParticle) override;
-
-        unsigned short _getEmissionCount(Real timeElapsed) override;
     };
     /** @} */
     /** @} */
