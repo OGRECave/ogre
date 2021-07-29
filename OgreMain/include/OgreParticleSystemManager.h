@@ -104,9 +104,6 @@ namespace Ogre {
             const String& resourceGroup);
         /// Internal implementation of createSystem
         ParticleSystem* createSystemImpl(const String& name, const String& templateName);
-        /// Internal implementation of destroySystem
-        void destroySystemImpl(ParticleSystem* sys);
-        
         
     public:
 
@@ -348,8 +345,6 @@ namespace Ogre {
         static String FACTORY_TYPE_NAME;
 
         const String& getType(void) const;
-        void destroyInstance( MovableObject* obj);  
-
     };
     /** @} */
     /** @} */

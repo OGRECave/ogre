@@ -239,11 +239,6 @@ namespace Ogre {
         
     }
     //-----------------------------------------------------------------------
-    void ParticleSystemManager::destroySystemImpl(ParticleSystem* sys)
-    {
-        OGRE_DELETE sys;
-    }
-    //-----------------------------------------------------------------------
     ParticleEmitter* ParticleSystemManager::_createEmitter(
         const String& emitterType, ParticleSystem* psys)
     {
@@ -420,14 +415,6 @@ namespace Ogre {
     const String& ParticleSystemFactory::getType(void) const
     {
         return FACTORY_TYPE_NAME;
-    }
-    //-----------------------------------------------------------------------
-    void ParticleSystemFactory::destroyInstance( MovableObject* obj) 
-    {
-        // use manager
-        ParticleSystemManager::getSingleton().destroySystemImpl(
-            static_cast<ParticleSystem*>(obj));
-
     }
     //-----------------------------------------------------------------------
 }
