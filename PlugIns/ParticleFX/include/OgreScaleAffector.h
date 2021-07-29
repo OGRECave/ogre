@@ -57,6 +57,7 @@ namespace Ogre {
         /** Default constructor. */
         ScaleAffector(ParticleSystem* psys);
 
+        void _initParticle(Particle* pParticle) override;
         void _affectParticles(ParticleSystem* pSystem, Real timeElapsed) override;
 
         /** Sets the scale adjustment to be made per second to particles. 
@@ -70,11 +71,14 @@ namespace Ogre {
         /** Gets the scale adjustment to be made per second to particles. */
         Real getAdjust(void) const;
 
+        const Vector2& getScaleRange() const {  return mScaleRange; }
+        void setScaleRange(const Vector2& range) {  mScaleRange = range; }
+
         static CmdScaleAdjust msScaleCmd;
 
     protected:
-        Real mScaleAdj;
-
+        float mScaleAdj;
+        Vector2 mScaleRange;
     };
 
     /** @} */

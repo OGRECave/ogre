@@ -659,12 +659,15 @@ affector ColourFader2
 
 It’s extra attributes are:
 
-<dl compact="compact">
-<dt>rate</dt> <dd>
 
+@par rate
 The amount by which to scale the particles in both the x and y direction per second.
 
-</dd> </dl>
+@par scale_range
+The scale factor range to be applied to emitted particles.
+@par
+example: scale_range 0.5 1.5<br>
+default: 1.0 1.0<br>
 
 To create a scale affector, include a section like this within your particle system script:
 
