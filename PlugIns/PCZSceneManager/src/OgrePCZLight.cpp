@@ -187,10 +187,5 @@ namespace Ogre
         return OGRE_NEW PCZLight(name);
 
     }
-    //-----------------------------------------------------------------------
-    void PCZLightFactory::destroyInstance( MovableObject* obj)
-    {
-        OGRE_DELETE obj;
-    }
 
 } // Namespace
