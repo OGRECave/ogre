@@ -125,7 +125,7 @@ namespace Ogre {
         Real mRepeatDelayRemain;
 
         // Fractions of particles wanted to be emitted last time
-        Real mRemainder;
+        float mRemainder;
 
         /// The name of the emitter. The name is optional unless it is used as an emitter that is emitted itself.
         String mName;
@@ -158,7 +158,7 @@ namespace Ogre {
         virtual void genEmissionColour(RGBA& destColour);
 
         /** Internal utility method for generating an emission count based on a constant emission rate. */
-        virtual unsigned short genConstantEmissionCount(Real timeElapsed);
+        unsigned short genConstantEmissionCount(Real timeElapsed);
 
         /** Internal method for setting up the basic parameter definitions for a subclass. 
         @remarks
@@ -381,7 +381,10 @@ namespace Ogre {
             The emitter should not track these _initParticle calls, it should assume all emissions
             requested were made (even if they could not be because of particle quotas).
         */
-        virtual unsigned short _getEmissionCount(Real timeElapsed) = 0;
+        virtual unsigned short _getEmissionCount(Real timeElapsed)
+        {
+            return genConstantEmissionCount(timeElapsed);
+        }
 
         /** Initialises a particle based on the emitter's approach and parameters.
         @remarks
