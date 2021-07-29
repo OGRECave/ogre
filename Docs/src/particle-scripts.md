@@ -740,9 +740,11 @@ The point in time of stage 2.<br>     format: time2 &lt;0-1 based on lifetim
 
 The colour at stage 2.<br>     format: colour2 &lt;r&gt; &lt;g&gt; &lt;b&gt; \[&lt;a&gt;\]<br> example: colour2 0 0 1 1<br> default: 0.5 0.5 0.5 0.0<br>
 
-</dd> <dt>\[...\]</dt> </dl>
+</dd> </dl>
 
-The number of stages is variable. The maximal number of stages is 6; where time5 and colour5 are the last possible parameters. To create a colour interpolation affector, include a section like this within your particle system script:
+@note The number of stages is variable. The maximal number of stages is 6; where time5 and colour5 are the last possible parameters.
+
+To create a colour interpolation affector, include a section like this within your particle system script:
 
 ```cpp
 affector ColourInterpolator
