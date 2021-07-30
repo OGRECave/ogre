@@ -70,6 +70,10 @@ namespace Ogre {
         /// retrieve an named sampler
         const SamplerPtr& getSampler(const String& name) const;
 
+        /// clear the list of named samplers
+        /// @copydetails removeAll()
+        void removeAllNamedSamplers() { mNamedSamplers.clear(); }
+
         /// Create a new texture
         /// @copydetails ResourceManager::createResource
         TexturePtr create (const String& name, const String& group,
