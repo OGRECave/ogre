@@ -39,8 +39,7 @@ String FFPFog::Type = "FFP_Fog";
 FFPFog::FFPFog()
 {
     mFogMode                = FOG_NONE;
-    mCalcMode               = CM_PER_VERTEX;    
-    mPassOverrideParams     = false;
+    mCalcMode               = CM_PER_VERTEX;
 }
 
 //-----------------------------------------------------------------------
@@ -49,47 +48,10 @@ const String& FFPFog::getType() const
     return Type;
 }
 
-
 //-----------------------------------------------------------------------
 int FFPFog::getExecutionOrder() const
 {
     return FFP_FOG;
-}
-//-----------------------------------------------------------------------
-void FFPFog::updateGpuProgramsParams(Renderable* rend, const Pass* pass, const AutoParamDataSource* source,
-                                     const LightList* pLightList)
-{   
-    if (mFogMode == FOG_NONE)
-        return;
-
-    FogMode fogMode;
-    ColourValue newFogColour;
-    Real newFogStart, newFogEnd, newFogDensity;
-
-    if (mPassOverrideParams)
-    {
-        fogMode         = pass->getFogMode();
-        newFogColour    = pass->getFogColour();
-        newFogStart     = pass->getFogStart();
-        newFogEnd       = pass->getFogEnd();
-        newFogDensity   = pass->getFogDensity();
-    }
-    else
-    {
-        SceneManager* sceneMgr = ShaderGenerator::getSingleton().getActiveSceneManager();
-        
-        fogMode         = sceneMgr->getFogMode();
-        newFogColour    = sceneMgr->getFogColour();
-        newFogStart     = sceneMgr->getFogStart();
-        newFogEnd       = sceneMgr->getFogEnd();
-        newFogDensity   = sceneMgr->getFogDensity();                
-    }
-
-    // Set fog properties.
-    setFogProperties(fogMode, newFogColour, newFogStart, newFogEnd, newFogDensity);
-
-    mFogParams->setGpuParameter(mFogParamsValue);
-    mFogColour->setGpuParameter(mFogColourValue);
 }
 
 //-----------------------------------------------------------------------
@@ -107,7 +69,7 @@ bool FFPFog::resolveParameters(ProgramSet* programSet)
     mVSOutPos = vsMain->resolveOutputParameter(Parameter::SPC_POSITION_PROJECTIVE_SPACE);
     
     // Resolve fog colour.
-    mFogColour = psProgram->resolveParameter(GCT_FLOAT4, "gFogColor");
+    mFogColour = psProgram->resolveParameter(GpuProgramParameters::ACT_FOG_COLOUR);
     
     // Resolve pixel shader output diffuse color.
     mPSOutDiffuse = psMain->resolveOutputParameter(Parameter::SPC_COLOR_DIFFUSE);
@@ -116,7 +78,7 @@ bool FFPFog::resolveParameters(ProgramSet* programSet)
     if (mCalcMode == CM_PER_PIXEL)
     {
         // Resolve fog params.      
-        mFogParams = psProgram->resolveParameter(GCT_FLOAT4, "gFogParams");
+        mFogParams = psProgram->resolveParameter(GpuProgramParameters::ACT_FOG_PARAMS);
         
         // Resolve vertex shader output depth.      
         mVSOutDepth = vsMain->resolveOutputParameter(Parameter::SPC_DEPTH_VIEW_SPACE);
@@ -128,7 +90,7 @@ bool FFPFog::resolveParameters(ProgramSet* programSet)
     else
     {       
         // Resolve fog params.      
-        mFogParams = vsProgram->resolveParameter(GCT_FLOAT4, "gFogParams");
+        mFogParams = vsProgram->resolveParameter(GpuProgramParameters::ACT_FOG_PARAMS);
         
         // Resolve vertex shader output fog factor.
         mVSOutFogFactor = vsMain->resolveOutputParameter(Parameter::SPC_UNKNOWN, GCT_FLOAT1);
@@ -233,76 +195,26 @@ void FFPFog::copyFrom(const SubRenderState& rhs)
     const FFPFog& rhsFog = static_cast<const FFPFog&>(rhs);
 
     mFogMode            = rhsFog.mFogMode;
-    mFogColourValue     = rhsFog.mFogColourValue;
-    mFogParamsValue     = rhsFog.mFogParamsValue;
 
     setCalcMode(rhsFog.mCalcMode);
 }
 
 //-----------------------------------------------------------------------
 bool FFPFog::preAddToRenderState(const RenderState* renderState, Pass* srcPass, Pass* dstPass)
-{   
-    FogMode fogMode;
-    ColourValue newFogColour;
-    Real newFogStart, newFogEnd, newFogDensity;
-
+{
     if (srcPass->getFogOverride())
     {
-        fogMode         = srcPass->getFogMode();
-        newFogColour    = srcPass->getFogColour();
-        newFogStart     = srcPass->getFogStart();
-        newFogEnd       = srcPass->getFogEnd();
-        newFogDensity   = srcPass->getFogDensity();
-        mPassOverrideParams = true;
+        mFogMode         = srcPass->getFogMode();
     }
-    else
+    else if(SceneManager* sceneMgr = ShaderGenerator::getSingleton().getActiveSceneManager())
     {
-        SceneManager* sceneMgr = ShaderGenerator::getSingleton().getActiveSceneManager();
-        
-        if (sceneMgr == NULL)
-        {
-            fogMode         = FOG_NONE;
-            newFogColour    = ColourValue::White;
-            newFogStart     = 0.0;
-            newFogEnd       = 0.0;
-            newFogDensity   = 0.0;
-        }
-        else
-        {
-            fogMode         = sceneMgr->getFogMode();
-            newFogColour    = sceneMgr->getFogColour();
-            newFogStart     = sceneMgr->getFogStart();
-            newFogEnd       = sceneMgr->getFogEnd();
-            newFogDensity   = sceneMgr->getFogDensity();            
-        }
-        mPassOverrideParams = false;
+        mFogMode         = sceneMgr->getFogMode();
     }
-
-    // Set fog properties.
-    setFogProperties(fogMode, newFogColour, newFogStart, newFogEnd, newFogDensity);
-    
-    
-    // Override scene fog since it will happen in shader.
-    dstPass->setFog(true, FOG_NONE, newFogColour, newFogDensity, newFogStart, newFogEnd);   
 
     return mFogMode != FOG_NONE;
 }
 
 //-----------------------------------------------------------------------
-void FFPFog::setFogProperties(FogMode fogMode, 
-                             const ColourValue& fogColour, 
-                             float fogStart, 
-                             float fogEnd, 
-                             float fogDensity)
-{
-    mFogMode            = fogMode;
-    mFogColourValue     = fogColour;
-    mFogParamsValue.x   = fogDensity;
-    mFogParamsValue.y   = fogStart;
-    mFogParamsValue.z   = fogEnd;
-    mFogParamsValue.w   = fogEnd != fogStart ? 1 / (fogEnd - fogStart) : 0; 
-}
-
 bool FFPFog::setParameter(const String& name, const String& value)
 {
 	if(name == "calc_mode")

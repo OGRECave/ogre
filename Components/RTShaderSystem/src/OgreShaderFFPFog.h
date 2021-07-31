@@ -74,11 +74,6 @@ public:
     virtual int getExecutionOrder() const;
 
     /** 
-    @see SubRenderState::updateGpuProgramsParams.
-    */
-    virtual void updateGpuProgramsParams(Renderable* rend, const Pass* pass, const AutoParamDataSource* source, const LightList* pLightList);
-
-    /** 
     @see SubRenderState::copyFrom.
     */
     virtual void copyFrom(const SubRenderState& rhs);
@@ -87,21 +82,6 @@ public:
     @see SubRenderState::preAddToRenderState.
     */
     virtual bool preAddToRenderState(const RenderState* renderState, Pass* srcPass, Pass* dstPass);
-
-    /** 
-    Set the fog properties this fog sub render state should emulate.
-    @param fogMode The fog mode to emulate (FOG_NONE, FOG_EXP, FOG_EXP2, FOG_LINEAR).
-    @param fogColour The colour of the fog.
-    @param fogStart Start distance of fog, used for linear mode only.
-    @param fogEnd End distance of fog, used for linear mode only.
-    @param fogDensity Fog density used in exponential modes only.
-    @see http://msdn.microsoft.com/en-us/library/bb173401.aspx
-    */
-    void setFogProperties(FogMode fogMode, 
-        const ColourValue& fogColour, 
-        float fogStart, 
-        float fogEnd, 
-        float fogDensity);
 
     /** 
     Set the fog calculation mode. Either per vertex or per pixel.
@@ -142,12 +122,6 @@ protected:
     CalcMode mCalcMode;
     // Fog formula. 
     FogMode mFogMode;
-    // Fog colour value.
-    ColourValue mFogColourValue;
-    // Fog parameters (density, start, end, 1/end-start).
-    Vector4 mFogParamsValue;
-    // True if the fog parameters should be taken from the pass.
-    bool mPassOverrideParams;
 
     // Fog colour parameter.    
     UniformParameterPtr mFogColour;
