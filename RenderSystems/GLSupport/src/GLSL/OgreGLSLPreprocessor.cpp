@@ -199,6 +199,7 @@ namespace Ogre {
         Expanding = true;
 
         CPreprocessor cpp;
+        cpp.SupplimentaryExpand = true;
         std::swap(cpp.MacroList, iMacros);
 
         // Define a new macro for every argument
@@ -1343,6 +1344,11 @@ namespace Ogre {
             case Token::TK_LINECONT:
                 // Backslash-Newline sequences are deleted, no matter where.
                 empty_lines++;
+                break;
+
+            case Token::TK_PUNCTUATION:
+                if (output_enabled && (!SupplimentaryExpand || t.String[0] != '#'))
+                    output.Append (t);
                 break;
 
             case Token::TK_NEWLINE:

@@ -174,3 +174,17 @@ TEST(CPreprocessorTests, MacroRecursion3)
     EXPECT_EQ(str, "(((1,1,1)+(2,2,2),(1,1,1)+(2,2,2),(1,1,1)+(2,2,2)),((1,1,1)+(2,2,2),(1,1,1)+(2,2,2),(1,1,1)+(2,2,2)),((1,1,1)+(2,2,2),(1,1,1)+(2,2,2),(1,1,1)+(2,2,2)))");
     free(out);
 }
+
+TEST(CPreprocessorTests, MacroConcat)
+{
+    CPreprocessor prep;
+    String src = "#define concat( a, b ) a##b\n"
+                 "concat( Hello , World )";
+
+    size_t olen;
+    char* out = prep.Parse(src.c_str(), src.size(), olen);
+    String str(out, olen);
+    StringUtil::trim(str);
+    EXPECT_EQ(str, "HelloWorld");
+    free(out);
+}
