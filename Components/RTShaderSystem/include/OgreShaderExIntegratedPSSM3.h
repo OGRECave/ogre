@@ -183,6 +183,7 @@ protected:
     UniformParameterPtr mPSDerivedSceneColour;
 
     bool mUseTextureCompare;
+    bool mUseColourShadows;
     bool mDebug;
 };
 

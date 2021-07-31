@@ -98,7 +98,12 @@ namespace Ogre
         if (prof->getReceiveDynamicShadowsPSSM())
         {
             uint numShadowTextures = prof->getReceiveDynamicShadowsPSSM()->getSplitCount();
-            ret->setParameter("preprocessor_defines", StringUtil::format("PSSM_NUM_SPLITS=%d", numShadowTextures));
+
+            auto defines = StringUtil::format("PSSM_NUM_SPLITS=%d", numShadowTextures);
+            if (!prof->getReceiveDynamicShadowsDepth())
+                defines += ",PSSM_SAMPLE_COLOUR";
+
+            ret->setParameter("preprocessor_defines", defines);
         }
 
         if(!mIsGLSL)
@@ -263,8 +268,7 @@ namespace Ogre
         }
 
         outStream << "#include <OgreUnifiedShader.h>\n";
-        // helpers
-        outStream << "#include <TerrainHelpers.glsl>\n";
+        // shader libs
         outStream << "#include <SGXLib_NormalMap.glsl>\n";
         outStream << "#include <SGXLib_PerPixelLighting.glsl>\n";
         outStream << "#include <SGXLib_IntegratedPSSM.glsl>\n";
@@ -328,10 +332,7 @@ namespace Ogre
             for (uint i = 0; i < numShadowTextures; ++i)
             {
                 outStream << StringUtil::format("uniform SAMPLER2D(shadowMap%d, %d);\n", i, currentSamplerIdx++);
-                if (prof->getReceiveDynamicShadowsDepth())
-                {
-                    outStream << "uniform float inverseShadowmapSize" << i << ";\n";
-                }
+                outStream << "uniform float inverseShadowmapSize" << i << ";\n";
             }
         }
 
@@ -609,24 +610,14 @@ namespace Ogre
         if (prof->getReceiveDynamicShadowsPSSM())
         {
             uint numTextures = prof->getReceiveDynamicShadowsPSSM()->getSplitCount();
-
-            if (prof->getReceiveDynamicShadowsDepth())
-            {
-                outStream << 
-                    "    SGX_ComputeShadowFactor_PSSM3(";
-            }
-            else
-            {
-                outStream << 
-                    "    calcPSSMSimpleShadow(";
-            }
+            outStream <<
+                "    SGX_ComputeShadowFactor_PSSM3(";
             outStream << "oUVMisc.z, pssmSplitPoints,\n        ";
             for (uint i = 0; i < numTextures; ++i)
             {
                 outStream << "oLightSpacePos" << i << ", ";
                 outStream << "shadowMap" << i << ", ";
-                if (prof->getReceiveDynamicShadowsDepth())
-                    outStream << "vec2_splat(inverseShadowmapSize" << i << "), ";
+                outStream << "vec2_splat(inverseShadowmapSize" << i << "), ";
                 outStream << "\n        ";
             }
 
@@ -634,16 +625,8 @@ namespace Ogre
         }
         else
         {
-            if (prof->getReceiveDynamicShadowsDepth())
-            {
-                outStream <<
-                    "    SGX_ShadowPCF4(shadowMap0, oLightSpacePos0, vec2_splat(inverseShadowmapSize0), rtshadow);";
-            }
-            else
-            {
-                outStream <<
-                    "    rtshadow = calcSimpleShadow(shadowMap0, oLightSpacePos0);";
-            }
+            outStream <<
+                "    SGX_ShadowPCF4(shadowMap0, oLightSpacePos0, vec2_splat(inverseShadowmapSize0), rtshadow);";
         }
 
         outStream << 

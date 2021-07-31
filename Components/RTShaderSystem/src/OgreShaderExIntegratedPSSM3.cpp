@@ -44,6 +44,7 @@ String IntegratedPSSM3::Type = "SGX_IntegratedPSSM3";
 IntegratedPSSM3::IntegratedPSSM3()
 {
     mUseTextureCompare = false;
+    mUseColourShadows = false;
     mDebug = false;
     mShadowTextureParamsList.resize(1); // normal single texture depth shadowmapping
 }
@@ -83,6 +84,7 @@ void IntegratedPSSM3::copyFrom(const SubRenderState& rhs)
     const IntegratedPSSM3& rhsPssm= static_cast<const IntegratedPSSM3&>(rhs);
 
     mUseTextureCompare = rhsPssm.mUseTextureCompare;
+    mUseColourShadows = rhsPssm.mUseColourShadows;
     mDebug = rhsPssm.mDebug;
     mShadowTextureParamsList.resize(rhsPssm.mShadowTextureParamsList.size());
 
@@ -110,6 +112,7 @@ bool IntegratedPSSM3::preAddToRenderState(const RenderState* renderState,
     if (!configs.empty())
         shadowTexFormat = configs[0].format; // assume first texture is representative
     mUseTextureCompare = PixelUtil::isDepth(shadowTexFormat);
+    mUseColourShadows = PixelUtil::getComponentType(shadowTexFormat) == PCT_BYTE; // use colour shadowmaps for byte textures
 
     ShadowTextureParamsIterator it = mShadowTextureParamsList.begin();
 
@@ -233,6 +236,9 @@ bool IntegratedPSSM3::resolveDependencies(ProgramSet* programSet)
 
     if(mUseTextureCompare)
         psProgram->addPreprocessorDefines("PSSM_SAMPLE_CMP");
+
+    if(mUseColourShadows)
+        psProgram->addPreprocessorDefines("PSSM_SAMPLE_COLOUR");
 
     return true;
 }
