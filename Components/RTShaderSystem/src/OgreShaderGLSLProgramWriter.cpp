@@ -112,6 +112,7 @@ const char* GLSLProgramWriter::getGL3CompatDefines()
            "#define texture2D texture\n"
            "#define shadow2D texture\n"
            "#define shadow2DProj textureProj\n"
+           "#define texture2DProj textureProj\n"
            "#define texture3D texture\n"
            "#define textureCube texture\n"
            "#define texture2DLod textureLod\n";

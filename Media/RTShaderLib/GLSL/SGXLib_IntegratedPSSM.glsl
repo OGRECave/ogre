@@ -117,16 +117,24 @@ void SGX_ComputeShadowFactor_PSSM3(in float fDepth,
 							out float oShadowFactor)
 {
 	if (fDepth  <= vSplitPoints.x)
-	{									
+	{
+#ifdef PSSM_SAMPLE_COLOUR
+		oShadowFactor = texture2DProj(shadowMap0, lightPosition0).x;
+#else
 		SGX_ShadowPCF4(shadowMap0, lightPosition0, invShadowMapSize0, oShadowFactor);
+#endif
 #ifdef DEBUG_PSSM
         pssm_lod_info.r = 1.0;
 #endif
 	}
 #if PSSM_NUM_SPLITS > 2
 	else if (fDepth <= vSplitPoints.y)
-	{									
+	{
+#ifdef PSSM_SAMPLE_COLOUR
+		oShadowFactor = texture2DProj(shadowMap1, lightPosition1).x;
+#else
 		SGX_ShadowPCF4(shadowMap1, lightPosition1, invShadowMapSize1, oShadowFactor);
+#endif
 #ifdef DEBUG_PSSM
         pssm_lod_info.g = 1.0;
 #endif
@@ -135,7 +143,11 @@ void SGX_ComputeShadowFactor_PSSM3(in float fDepth,
 #if PSSM_NUM_SPLITS > 3
 	else if (fDepth <= vSplitPoints.z)
 	{
+#ifdef PSSM_SAMPLE_COLOUR
+		oShadowFactor = texture2DProj(shadowMap2, lightPosition2).x;
+#else
 		SGX_ShadowPCF4(shadowMap2, lightPosition2, invShadowMapSize2, oShadowFactor);
+#endif
 #ifdef DEBUG_PSSM
 		pssm_lod_info.r = 1.0;
         pssm_lod_info.g = 1.0;
@@ -144,7 +156,11 @@ void SGX_ComputeShadowFactor_PSSM3(in float fDepth,
 #endif
 	else
 	{
+#ifdef PSSM_SAMPLE_COLOUR
+		oShadowFactor = texture2DProj(shadowMap3, lightPosition3).x;
+#else
 		SGX_ShadowPCF4(shadowMap3, lightPosition3, invShadowMapSize3, oShadowFactor);
+#endif
 #ifdef DEBUG_PSSM
         pssm_lod_info.b = 1.0;
 #endif
