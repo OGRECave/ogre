@@ -79,7 +79,6 @@ namespace Ogre
     */
     class _OgreTerrainExport TerrainQuadTreeNode : private Renderable, private MovableObject
     {
-        friend class TerrainTransform;
     public:
         /** Constructor.
         @param terrain The ultimate parent terrain

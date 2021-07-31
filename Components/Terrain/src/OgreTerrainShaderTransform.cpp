@@ -24,13 +24,9 @@ String TerrainTransform::Type = "TerrainTransform";
 bool TerrainTransform::preAddToRenderState(const RenderState* renderState, Pass* srcPass, Pass* dstPass)
 {
     auto terrainAny = srcPass->getUserObjectBindings().getUserAny("Terrain");
-    if (terrainAny.has_value())
-    {
-        auto terrain = any_cast<const Terrain*>(terrainAny);
-        mCompressed = terrain->_getUseVertexCompression();
-        mAlign = terrain->getAlignment();
-    }
-
+    mTerrain = any_cast<const Terrain*>(terrainAny);
+    mCompressed = mTerrain->_getUseVertexCompression();
+    mAlign = mTerrain->getAlignment();
     return true;
 }
 
@@ -38,15 +34,14 @@ void TerrainTransform::updateGpuProgramsParams(Renderable* rend, const Pass* pas
                                                const AutoParamDataSource* source,
                                                const LightList* pLightList)
 {
-    if(!mPointTrans)
+    if(!mPointTrans || mConstParamsSet)
         return;
 
-    auto qtn = static_cast<TerrainQuadTreeNode*>(rend); // cant dynamic_cast due to private inheritance
-    auto terrain = qtn->getTerrain();
-    mPointTrans->setGpuParameter(terrain->getPointTransform());
+    mPointTrans->setGpuParameter(mTerrain->getPointTransform());
 
-    float baseUVScale = 1.0f / (terrain->getSize() - 1);
+    float baseUVScale = 1.0f / (mTerrain->getSize() - 1);
     mBaseUVScale->setGpuParameter(baseUVScale);
+    mConstParamsSet = true;
 }
 
 //-----------------------------------------------------------------------
