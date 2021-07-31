@@ -26,7 +26,9 @@ public:
 
     static String Type;
 private:
+    const Terrain* mTerrain;
     bool mCompressed = false;
+    bool mConstParamsSet = false;
     Terrain::Alignment mAlign = Terrain::ALIGN_X_Z;
     RTShader::UniformParameterPtr mPointTrans;
     RTShader::UniformParameterPtr mBaseUVScale;
