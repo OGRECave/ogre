@@ -833,7 +833,9 @@ MAIN_DECLARATION
 }
 ```
 
-@note If you only target D3D, the reduced `HLSL_SM4Support.hlsl` header only includes the `SAMPLER` macros to map HLSL9/ Cg to HLSL SM4 (D3D11)
+@note If you only target different versions of the same API, there are reduced headers:
+- `HLSL_SM4Support.hlsl` providing the `SAMPLER*` macros for mapping HLSL9/ Cg and HLSL SM4 (D3D11)
+- `GLSL_GL3Support.glsl` providing the `IN`/ `OUT` macros and `texture` aliases for mapping GLSL <= 120 and GLSL >= 130
 
 # Uber shader tips
 

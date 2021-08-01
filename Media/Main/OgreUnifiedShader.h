@@ -93,6 +93,8 @@ enum {
 #define IN(decl, sem) decl [[ attribute(sem) ]];
 #else
 // GLSL
+#include "GLSL_GL3Support.glsl"
+
 #define SAMPLER1D(name, reg) sampler1D name
 #define SAMPLER2D(name, reg) sampler2D name
 #define SAMPLER3D(name, reg) sampler3D name
@@ -100,29 +102,6 @@ enum {
 
 #define saturate(x) clamp(x, 0.0, 1.0)
 #define mul(a, b) ((a) * (b))
-
-#if __VERSION__ == 100
-mat2 transpose(mat2 m)
-{
-  return mat2(m[0][0], m[1][0],
-              m[0][1], m[1][1]);
-}
-
-mat3 transpose(mat3 m)
-{
-  return mat3(m[0][0], m[1][0], m[2][0],
-              m[0][1], m[1][1], m[2][1],
-              m[0][2], m[1][2], m[2][2]);
-}
-
-mat4 transpose(mat4 m)
-{
-  return mat4(m[0][0], m[1][0], m[2][0], m[3][0],
-              m[0][1], m[1][1], m[2][1], m[3][1],
-              m[0][2], m[1][2], m[2][2], m[3][2],
-              m[0][3], m[1][3], m[2][3], m[3][3]);
-}
-#endif
 
 #define vec2_splat vec2
 #define vec3_splat vec3
@@ -148,11 +127,4 @@ mat3 mtxFromCols(vec3 a, vec3 b, vec3 c)
 #define MAIN_PARAMETERS
 #define MAIN_DECLARATION void main()
 
-#ifdef OGRE_VERTEX_SHADER
-#define IN(decl, sem) attribute decl;
-#define OUT(decl, sem) varying decl;
-#else
-#define IN(decl, sem) varying decl;
-#define OUT(decl, sem) out decl;
-#endif
 #endif

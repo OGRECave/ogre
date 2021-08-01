@@ -105,28 +105,10 @@ void GLSLProgramWriter::initializeStringMaps()
 }
 
 //-----------------------------------------------------------------------
-const char* GLSLProgramWriter::getGL3CompatDefines()
-{
-    // Redefine texture functions to maintain reusability
-    return "#define texture1D texture\n"
-           "#define texture2D texture\n"
-           "#define shadow2D texture\n"
-           "#define shadow2DProj textureProj\n"
-           "#define texture2DProj textureProj\n"
-           "#define texture3D texture\n"
-           "#define textureCube texture\n"
-           "#define texture2DLod textureLod\n";
-}
-
 void GLSLProgramWriter::writeSourceCode(std::ostream& os, Program* program)
 {
     // Write the current version (this force the driver to more fulfill the glsl standard)
     os << "#version "<< mGLSLVersion << std::endl;
-
-    if(mGLSLVersion > 120)
-    {
-        os << getGL3CompatDefines();
-    }
 
     // Generate dependencies.
     writeProgramDependencies(os, program);
@@ -287,20 +269,11 @@ void GLSLProgramWriter::writeInputParameters(std::ostream& os, Function* functio
                 continue;
             }
 
-            // After GLSL 1.20 varying is deprecated
-            if(mGLSLVersion <= 120 || (mGLSLVersion == 100 && mIsGLSLES))
-            {
-                os << "varying\t";
-            }
-            else
-            {
-                os << "in\t";
-            }
-
+            os << "IN(";
             os << mGpuConstTypeMap[pParam->getType()];
             os << "\t"; 
             os << paramName;
-            os << ";" << std::endl; 
+            os << ", 0)" << std::endl; // location currently unused
         }
         else if (gpuType == GPT_VERTEX_PROGRAM && 
                  mContentToPerVertexAttributes.find(paramContent) != mContentToPerVertexAttributes.end())
@@ -309,16 +282,7 @@ void GLSLProgramWriter::writeInputParameters(std::ostream& os, Function* functio
             // according there content.
             pParam->_rename(mContentToPerVertexAttributes[paramContent]);
 
-            // After GLSL 1.20 attribute is deprecated
-            if (mGLSLVersion > 120 || (mGLSLVersion > 100 && mIsGLSLES))
-            {
-                os << "in\t";
-            }
-            else
-            {
-                os << "attribute\t";
-            }
-
+            os << "IN(";
             // all uv texcoords passed by ogre are at least vec4
             if ((paramContent == Parameter::SPC_TEXTURE_COORDINATE0 ||
                  paramContent == Parameter::SPC_TEXTURE_COORDINATE1 ||
@@ -342,7 +306,7 @@ void GLSLProgramWriter::writeInputParameters(std::ostream& os, Function* functio
             }
             os << "\t"; 
             os << mContentToPerVertexAttributes[paramContent];
-            os << ";" << std::endl; 
+            os << ", 0)" << std::endl; // location currently unused
         }
         else if(paramContent == Parameter::SPC_COLOR_DIFFUSE && !mIsGLSLES)
         {
@@ -388,15 +352,7 @@ void GLSLProgramWriter::writeOutParameters(std::ostream& os, Function* function,
             }
             else
             {
-                // After GLSL 1.20 varying is deprecated
-                if(mGLSLVersion <= 120 || (mGLSLVersion == 100 && mIsGLSLES))
-                {
-                    os << "varying\t";
-                }
-                else
-                {
-                    os << "out\t";
-                }
+                os << "OUT(";
 
                 // In the vertex and fragment program the variable names must match.
                 // Unfortunately now the input params are prefixed with an 'i' and output params with 'o'.
@@ -412,7 +368,7 @@ void GLSLProgramWriter::writeOutParameters(std::ostream& os, Function* function,
                 {
                     os << "[" << pParam->getSize() << "]";  
                 }
-                os << ";" << std::endl; 
+                os << ", 0)" << std::endl; // location currently unused
             }
         }
         else if(gpuType == GPT_FRAGMENT_PROGRAM &&
