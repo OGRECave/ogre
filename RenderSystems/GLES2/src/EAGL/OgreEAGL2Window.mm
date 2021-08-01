@@ -113,14 +113,6 @@ namespace Ogre {
             [mWindow setHidden:hidden];
         }
     }
-
-    void EAGL2Window::setFullscreen(bool fullscreen, uint widthPt, uint heightPt)
-    {
-    }
-
-    void EAGL2Window::reposition(int leftPt, int topPt)
-	{
-	}
     
 	void EAGL2Window::resize(unsigned int widthPt, unsigned int heightPt)
 	{

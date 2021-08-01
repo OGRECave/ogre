@@ -66,7 +66,6 @@ namespace Ogre {
             void create(const String& name, unsigned int width, unsigned int height, bool fullScreen,
                         const NameValuePairList* miscParams);
 
-            void reposition(int left, int top) {}
             void resize(unsigned int width, unsigned int height) {}
 
             virtual void setFullscreen (bool fullscreen, uint width, uint height);
