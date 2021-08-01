@@ -23,7 +23,6 @@ namespace Ogre
 
         void destroy(void) {}
 
-        void reposition(int left, int top) {}
         void resize(unsigned int width, unsigned int height);
 
         bool isClosed(void) const { return mClosed; }

@@ -107,8 +107,9 @@ namespace Ogre
                 bool fullScreen, const NameValuePairList *miscParams) = 0;
 
         /** Alter fullscreen mode options. 
-        @note Nothing will happen unless the settings here are different from the
+        Nothing will happen unless the settings here are different from the
             current settings.
+        @note Only implemented by few RenderSystems. Prefer native windowing API.
         @param fullScreen Whether to use fullscreen mode or not. 
         @param widthPt The new width to use
         @param heightPt The new height to use
@@ -130,8 +131,10 @@ namespace Ogre
         virtual void windowMovedOrResized() {}
 
         /** Reposition the window.
+
+        @note Only implemented by few RenderSystems. Prefer native windowing API.
         */
-        virtual void reposition(int leftPt, int topPt) = 0;
+        virtual void reposition(int leftPt, int topPt) {}
 
         /** Indicates whether the window is visible (not minimized or obscured)
         */
