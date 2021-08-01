@@ -2,6 +2,8 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at https://www.ogre3d.org/licensing.
 
+// @public-api
+
 #if __VERSION__ == 100
 mat2 transpose(mat2 m)
 {
