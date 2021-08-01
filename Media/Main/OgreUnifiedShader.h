@@ -14,6 +14,8 @@
 //     GLSL code here
 // }
 
+// @public-api
+
 #if defined(OGRE_HLSL) || defined(OGRE_CG)
 // HLSL
 #include "HLSL_SM4Support.hlsl"
