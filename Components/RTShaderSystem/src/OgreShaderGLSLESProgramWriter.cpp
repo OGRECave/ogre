@@ -80,9 +80,6 @@ namespace Ogre {
                 // sampler3D has no default precision
                 os << "precision highp sampler3D;" << std::endl;
                 os << "precision highp sampler2DShadow;" << std::endl;
-                // Redefine texture functions to maintain reusability
-                os << getGL3CompatDefines();
-
             }
 
             // Generate source code header.
