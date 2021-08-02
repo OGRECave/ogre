@@ -133,6 +133,8 @@ namespace Ogre {
         /// The name of the emitter to be emitted (optional)
         String mEmittedEmitter;
 
+        uint16 mBurstParticleCount;
+
         // If 'true', this emitter is emitted by another emitter.
         // NB. That doesn't imply that the emitter itself emits other emitters (that could or could not be the case)
         bool mEmitted;
@@ -300,6 +302,9 @@ namespace Ogre {
 
         /** Returns the emission rate set for this emitter. */
         virtual Real getEmissionRate(void) const;
+
+        /// emit a fixed number of particles at the next frame
+        void burst(uint16 particlesToEmit);
 
         /** Sets the lifetime of all particles emitted.
         @remarks

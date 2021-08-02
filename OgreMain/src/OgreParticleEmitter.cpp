@@ -70,7 +70,8 @@ namespace Ogre
         mDurationRemain(0),
         mRepeatDelayMin(0),
         mRepeatDelayMax(0),
-        mRepeatDelayRemain(0)
+        mRepeatDelayRemain(0),
+        mBurstParticleCount(0)
     {
 
         // Reasonable defaults
@@ -175,6 +176,12 @@ namespace Ogre
     Real ParticleEmitter::getEmissionRate(void) const 
     { 
         return mEmissionRate; 
+    }
+    //-----------------------------------------------------------------------
+    void ParticleEmitter::burst(uint16 particlesToEmit)
+    {
+        mBurstParticleCount = particlesToEmit;
+        mEnabled = true;
     }
     //-----------------------------------------------------------------------
     void ParticleEmitter::setTimeToLive(Real ttl)
@@ -327,6 +334,8 @@ namespace Ogre
                     setEnabled(false);
                 }
             }
+            intRequest += mBurstParticleCount;
+            mBurstParticleCount = 0; // single shot only
             return intRequest;
         }
         else
