@@ -298,32 +298,12 @@ namespace Ogre {
         return memSize;
     }
     //-----------------------------------------------------------------------
-    void Pass::setName(const String& name)
-    {
-        mName = name;
-    }
-    //-----------------------------------------------------------------------
-    void Pass::setPointSpritesEnabled(bool enabled)
-    {
-        mPointSpritesEnabled = enabled;
-    }
-    //-----------------------------------------------------------------------
-    bool Pass::getPointSpritesEnabled(void) const
-    {
-        return mPointSpritesEnabled;
-    }
-    //-----------------------------------------------------------------------
     void Pass::setPointAttenuation(bool enabled, float constant, float linear, float quadratic)
     {
         mPointAttenuationEnabled = enabled;
         mPointAttenution[1] = enabled ? constant : 1.0f;
         mPointAttenution[2] = enabled ? linear : 0.0f;
         mPointAttenution[3] = enabled ? quadratic : 0.0f;
-    }
-    //-----------------------------------------------------------------------
-    bool Pass::isPointAttenuationEnabled(void) const
-    {
-        return mPointAttenuationEnabled;
     }
     //-----------------------------------------------------------------------
     void Pass::setPointMinSize(Real min)
@@ -354,22 +334,12 @@ namespace Ogre {
 
     }
     //-----------------------------------------------------------------------
-    void Pass::setAmbient(const ColourValue& ambient)
-    {
-        mAmbient = ambient;
-    }
-    //-----------------------------------------------------------------------
     void Pass::setDiffuse(float red, float green, float blue, float alpha)
     {
         mDiffuse.r = red;
         mDiffuse.g = green;
         mDiffuse.b = blue;
         mDiffuse.a = alpha;
-    }
-    //-----------------------------------------------------------------------
-    void Pass::setDiffuse(const ColourValue& diffuse)
-    {
-        mDiffuse = diffuse;
     }
     //-----------------------------------------------------------------------
     void Pass::setSpecular(float red, float green, float blue, float alpha)
@@ -380,62 +350,11 @@ namespace Ogre {
         mSpecular.a = alpha;
     }
     //-----------------------------------------------------------------------
-    void Pass::setSpecular(const ColourValue& specular)
-    {
-        mSpecular = specular;
-    }
-    //-----------------------------------------------------------------------
-    void Pass::setShininess(Real val)
-    {
-        mShininess = val;
-    }
-    //-----------------------------------------------------------------------
     void Pass::setSelfIllumination(float red, float green, float blue)
     {
         mEmissive.r = red;
         mEmissive.g = green;
         mEmissive.b = blue;
-
-    }
-    //-----------------------------------------------------------------------
-    void Pass::setSelfIllumination(const ColourValue& selfIllum)
-    {
-        mEmissive = selfIllum;
-    }
-    //-----------------------------------------------------------------------
-    void Pass::setVertexColourTracking(TrackVertexColourType tracking)
-    {
-        mTracking = tracking;
-    }
-    //-----------------------------------------------------------------------
-    const ColourValue& Pass::getAmbient(void) const
-    {
-        return mAmbient;
-    }
-    //-----------------------------------------------------------------------
-    const ColourValue& Pass::getDiffuse(void) const
-    {
-        return mDiffuse;
-    }
-    //-----------------------------------------------------------------------
-    const ColourValue& Pass::getSpecular(void) const
-    {
-        return mSpecular;
-    }
-    //-----------------------------------------------------------------------
-    const ColourValue& Pass::getSelfIllumination(void) const
-    {
-        return mEmissive;
-    }
-    //-----------------------------------------------------------------------
-    Real Pass::getShininess(void) const
-    {
-        return mShininess;
-    }
-    //-----------------------------------------------------------------------
-    TrackVertexColourType Pass::getVertexColourTracking(void) const
-    {
-        return mTracking;
     }
     //-----------------------------------------------------------------------
     TextureUnitState* Pass::createTextureUnitState(void)
@@ -640,26 +559,6 @@ namespace Ogre {
         mBlendState.destFactorAlpha = destFactorAlpha;
     }
     //-----------------------------------------------------------------------
-    SceneBlendFactor Pass::getSourceBlendFactor(void) const
-    {
-        return mBlendState.sourceFactor;
-    }
-    //-----------------------------------------------------------------------
-    SceneBlendFactor Pass::getDestBlendFactor(void) const
-    {
-        return mBlendState.destFactor;
-    }
-    //-----------------------------------------------------------------------
-    SceneBlendFactor Pass::getSourceBlendFactorAlpha(void) const
-    {
-        return mBlendState.sourceFactorAlpha ;
-    }
-    //-----------------------------------------------------------------------
-    SceneBlendFactor Pass::getDestBlendFactorAlpha(void) const
-    {
-        return mBlendState.destFactorAlpha;
-    }
-    //-----------------------------------------------------------------------
     void Pass::setSceneBlendingOperation(SceneBlendOperation op)
     {
         mBlendState.operation = op;
@@ -670,16 +569,6 @@ namespace Ogre {
     {
         mBlendState.operation = op;
         mBlendState.alphaOperation = alphaOp;
-    }
-    //-----------------------------------------------------------------------
-    SceneBlendOperation Pass::getSceneBlendingOperation() const
-    {
-        return mBlendState.operation;
-    }
-    //-----------------------------------------------------------------------
-    SceneBlendOperation Pass::getSceneBlendingOperationAlpha() const
-    {
-        return mBlendState.alphaOperation;
     }
     //-----------------------------------------------------------------------
     bool Pass::isTransparent(void) const
@@ -699,76 +588,11 @@ namespace Ogre {
         }
     }
     //-----------------------------------------------------------------------
-    void Pass::setDepthCheckEnabled(bool enabled)
-    {
-        mDepthCheck = enabled;
-    }
-    //-----------------------------------------------------------------------
-    bool Pass::getDepthCheckEnabled(void) const
-    {
-        return mDepthCheck;
-    }
-    //-----------------------------------------------------------------------
-    void Pass::setDepthWriteEnabled(bool enabled)
-    {
-        mDepthWrite = enabled;
-    }
-    //-----------------------------------------------------------------------
-    bool Pass::getDepthWriteEnabled(void) const
-    {
-        return mDepthWrite;
-    }
-    //-----------------------------------------------------------------------
-    void Pass::setDepthFunction( CompareFunction func)
-    {
-        mDepthFunc = func;
-    }
-    //-----------------------------------------------------------------------
-    CompareFunction Pass::getDepthFunction(void) const
-    {
-        return mDepthFunc;
-    }
-    //-----------------------------------------------------------------------
     void Pass::setAlphaRejectSettings(CompareFunction func, unsigned char value, bool alphaToCoverage)
     {
         mAlphaRejectFunc = func;
         mAlphaRejectVal = value;
         mAlphaToCoverageEnabled = alphaToCoverage;
-    }
-    //-----------------------------------------------------------------------
-    void Pass::setAlphaRejectFunction(CompareFunction func)
-    {
-        mAlphaRejectFunc = func;
-    }
-    //-----------------------------------------------------------------------
-    void Pass::setAlphaRejectValue(unsigned char val)
-    {
-        mAlphaRejectVal = val;
-    }
-    //---------------------------------------------------------------------
-    void Pass::setAlphaToCoverageEnabled(bool enabled)
-    {
-        mAlphaToCoverageEnabled = enabled;
-    }
-    //-----------------------------------------------------------------------
-    void Pass::setTransparentSortingEnabled(bool enabled)
-    {
-        mTransparentSorting = enabled;
-    }
-    //-----------------------------------------------------------------------
-    bool Pass::getTransparentSortingEnabled(void) const
-    {
-        return mTransparentSorting;
-    }
-    //-----------------------------------------------------------------------
-    void Pass::setTransparentSortingForced(bool enabled)
-    {
-        mTransparentSortingForced = enabled;
-    }
-    //-----------------------------------------------------------------------
-    bool Pass::getTransparentSortingForced(void) const
-    {
-        return mTransparentSortingForced;
     }
     //-----------------------------------------------------------------------
     void Pass::setColourWriteEnabled(bool enabled)
@@ -802,92 +626,12 @@ namespace Ogre {
         alpha = mBlendState.writeA;
     }
     //-----------------------------------------------------------------------
-    void Pass::setCullingMode( CullingMode mode)
-    {
-        mCullMode = mode;
-    }
-    //-----------------------------------------------------------------------
-    CullingMode Pass::getCullingMode(void) const
-    {
-        return mCullMode;
-    }
-    //-----------------------------------------------------------------------
-    void Pass::setLightingEnabled(bool enabled)
-    {
-        mLightingEnabled = enabled;
-    }
-    //-----------------------------------------------------------------------
-    bool Pass::getLightingEnabled(void) const
-    {
-        return mLightingEnabled;
-    }
-    //-----------------------------------------------------------------------
-    void Pass::setMaxSimultaneousLights(unsigned short maxLights)
-    {
-        mMaxSimultaneousLights = maxLights;
-    }
-    //-----------------------------------------------------------------------
-    unsigned short Pass::getMaxSimultaneousLights(void) const
-    {
-        return mMaxSimultaneousLights;
-    }
-    //-----------------------------------------------------------------------
-    void Pass::setStartLight(unsigned short startLight)
-    {
-        mStartLight = startLight;
-    }
-    //-----------------------------------------------------------------------
-    unsigned short Pass::getStartLight(void) const
-    {
-        return mStartLight;
-    }
-    //-----------------------------------------------------------------------
-    void Pass::setLightMask(uint32 mask)
-    {
-        mLightMask = mask;
-    }
-    //-----------------------------------------------------------------------
-    uint32 Pass::getLightMask() const
-    {
-        return mLightMask;
-    }
-    //-----------------------------------------------------------------------
-    void Pass::setLightCountPerIteration(unsigned short c)
-    {
-        mLightsPerIteration = c;
-    }
-    //-----------------------------------------------------------------------
-    unsigned short Pass::getLightCountPerIteration(void) const
-    {
-        return mLightsPerIteration;
-    }
-    //-----------------------------------------------------------------------
     void Pass::setIteratePerLight(bool enabled,
             bool onlyForOneLightType, Light::LightTypes lightType)
     {
         mIteratePerLight = enabled;
         mRunOnlyForOneLightType = onlyForOneLightType;
         mOnlyLightType = lightType;
-    }
-    //-----------------------------------------------------------------------
-    void Pass::setShadingMode(ShadeOptions mode)
-    {
-        mShadeOptions = mode;
-    }
-    //-----------------------------------------------------------------------
-    ShadeOptions Pass::getShadingMode(void) const
-    {
-        return mShadeOptions;
-    }
-    //-----------------------------------------------------------------------
-    void Pass::setPolygonMode(PolygonMode mode)
-    {
-        mPolygonMode = mode;
-    }
-    //-----------------------------------------------------------------------
-    PolygonMode Pass::getPolygonMode(void) const
-    {
-        return mPolygonMode;
     }
     //-----------------------------------------------------------------------
     void Pass::setManualCullingMode(ManualCullingMode mode)
@@ -913,60 +657,10 @@ namespace Ogre {
         }
     }
     //-----------------------------------------------------------------------
-    bool Pass::getFogOverride(void) const
-    {
-        return mFogOverride;
-    }
-    //-----------------------------------------------------------------------
-    FogMode Pass::getFogMode(void) const
-    {
-        return mFogMode;
-    }
-    //-----------------------------------------------------------------------
-    const ColourValue& Pass::getFogColour(void) const
-    {
-        return mFogColour;
-    }
-    //-----------------------------------------------------------------------
-    Real Pass::getFogStart(void) const
-    {
-        return mFogStart;
-    }
-    //-----------------------------------------------------------------------
-    Real Pass::getFogEnd(void) const
-    {
-        return mFogEnd;
-    }
-    //-----------------------------------------------------------------------
-    Real Pass::getFogDensity(void) const
-    {
-        return mFogDensity;
-    }
-    //-----------------------------------------------------------------------
     void Pass::setDepthBias(float constantBias, float slopeScaleBias)
     {
        mDepthBiasConstant = constantBias;
        mDepthBiasSlopeScale = slopeScaleBias;
-    }
-    //-----------------------------------------------------------------------
-    float Pass::getDepthBiasConstant(void) const
-    {
-        return mDepthBiasConstant;
-    }
-    //-----------------------------------------------------------------------
-    float Pass::getDepthBiasSlopeScale(void) const
-    {
-        return mDepthBiasSlopeScale;
-    }
-    //---------------------------------------------------------------------
-    void Pass::setIterationDepthBias(float biasPerIteration)
-    {
-        mDepthBiasPerIteration = biasPerIteration;
-    }
-    //---------------------------------------------------------------------
-    float Pass::getIterationDepthBias() const
-    {
-        return mDepthBiasPerIteration;
     }
     //-----------------------------------------------------------------------
     Pass* Pass::_split(unsigned short numUnits)
@@ -1231,11 +925,6 @@ namespace Ogre {
         return mProgramUsage[programType]->getProgram();
 	}
     //-----------------------------------------------------------------------
-    const GpuProgramPtr& Pass::getVertexProgram(void) const
-    {
-        return getGpuProgram(GPT_VERTEX_PROGRAM);
-    }
-    //-----------------------------------------------------------------------
     const String& Pass::getGpuProgramName(GpuProgramType type) const
     {
         OGRE_LOCK_MUTEX(mGpuProgramChangeMutex);
@@ -1252,19 +941,9 @@ namespace Ogre {
         return getGpuProgramParameters(GPT_FRAGMENT_PROGRAM);
     }
     //-----------------------------------------------------------------------
-    const GpuProgramPtr& Pass::getFragmentProgram(void) const
-    {
-        return getGpuProgram(GPT_FRAGMENT_PROGRAM);
-    }
-    //-----------------------------------------------------------------------
     GpuProgramParametersSharedPtr Pass::getGeometryProgramParameters(void) const
     {
         return getGpuProgramParameters(GPT_GEOMETRY_PROGRAM);
-    }
-    //-----------------------------------------------------------------------
-    const GpuProgramPtr& Pass::getGeometryProgram(void) const
-    {
-        return getGpuProgram(GPT_GEOMETRY_PROGRAM);
     }
     //-----------------------------------------------------------------------
     GpuProgramParametersSharedPtr Pass::getTessellationHullProgramParameters(void) const
@@ -1272,29 +951,14 @@ namespace Ogre {
         return getGpuProgramParameters(GPT_HULL_PROGRAM);
     }
     //-----------------------------------------------------------------------
-    const GpuProgramPtr& Pass::getTessellationHullProgram(void) const
-    {
-        return getGpuProgram(GPT_HULL_PROGRAM);
-    }
-    //-----------------------------------------------------------------------
     GpuProgramParametersSharedPtr Pass::getTessellationDomainProgramParameters(void) const
     {
         return getGpuProgramParameters(GPT_DOMAIN_PROGRAM);
     }
     //-----------------------------------------------------------------------
-    const GpuProgramPtr& Pass::getTessellationDomainProgram(void) const
-    {
-        return getGpuProgram(GPT_DOMAIN_PROGRAM);
-    }
-    //-----------------------------------------------------------------------
     GpuProgramParametersSharedPtr Pass::getComputeProgramParameters(void) const
     {
         return getGpuProgramParameters(GPT_COMPUTE_PROGRAM);
-    }
-    //-----------------------------------------------------------------------
-    const GpuProgramPtr& Pass::getComputeProgram(void) const
-    {
-        return getGpuProgram(GPT_COMPUTE_PROGRAM);
     }
     //-----------------------------------------------------------------------
     bool Pass::isLoaded(void) const
