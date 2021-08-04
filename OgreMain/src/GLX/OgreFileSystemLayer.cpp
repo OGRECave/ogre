@@ -31,6 +31,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <pwd.h>
+#include <dlfcn.h>
 
 namespace Ogre
 {
@@ -111,13 +112,23 @@ namespace Ogre
 
             // use application path as first config search path
             mConfigPaths.push_back(appPath + '/');
-            // then search inside ../share/OGRE
-            mConfigPaths.push_back(StringUtil::normalizeFilePath(appPath + "/../share/OGRE/", false));
         }
 
-        // XDG_DATA_HOME (used by PIP)
-        if(const char* home = getenv("HOME"))
-            mConfigPaths.push_back(String(home)+"/.local/share/OGRE/");
+        Dl_info info;
+        if (dladdr((const void*)resolveSymlink, &info))
+        {
+            String base(info.dli_fname);
+            // need to strip the module filename from the path
+            String::size_type pos = base.rfind('/');
+            if (pos != String::npos)
+                base.erase(pos);
+
+            // search inside ../share/OGRE
+            mConfigPaths.push_back(StringUtil::normalizeFilePath(base + "/../share/OGRE/", false));
+            // then look relative to PIP structure
+            mConfigPaths.push_back(StringUtil::normalizeFilePath(base+"/../../../../share/OGRE/"));
+        }
+
         // then try system wide /etc
         mConfigPaths.push_back("/etc/OGRE/");
     }

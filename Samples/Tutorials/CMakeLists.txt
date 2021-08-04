@@ -5,11 +5,9 @@ project(OgreTutorialsSample)
 set(CMAKE_CXX_STANDARD 11)
 
 ## [discover_ogre]
-# specify which components you need. The CONFIG flag makes sure you get OGRE 1.x
+# specify which components you need.
+# The CONFIG flag makes sure you get OGRE instead of OGRE-next
 find_package(OGRE REQUIRED COMPONENTS Bites RTShaderSystem CONFIG)
-
-# copy resource.cfg next to our binaries where OGRE looks for it
-file(COPY ${OGRE_CONFIG_DIR}/resources.cfg DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
 # add the source files as usual
 add_executable(0_Bootstrap Bootstrap.cpp)
