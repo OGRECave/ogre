@@ -307,7 +307,7 @@ format: direction\_position\_reference &lt;x&gt; &lt;y&gt; &lt;z&gt; &lt;enable&
 
 ## emission\_rate
 
-Sets how many particles per second should be emitted. The specific emitter does not have to emit these in a continuous burst - this is a relative parameter and the emitter may choose to emit all of the second’s worth of particles every half-second for example, the behaviour depends on the emitter. The emission rate will also be limited by the particle system’s ’quota’ setting.
+Sets how many particles per second should be emitted. The specific emitter does not have to emit these in a continuous manner - this is a relative parameter and the emitter may choose to emit all of the second’s worth of particles every half-second for example, the behaviour depends on the emitter. The emission rate will also be limited by the particle system’s ’quota’ setting.
 
 format: emission\_rate &lt;particles\_per\_second&gt;<br> example: emission\_rate 50<br> default: 10<br>
 
@@ -355,9 +355,12 @@ format: as time\_to\_live<br> example:<br>     time\_to\_live\_min 2<br>  �
 
 ## duration
 
-Sets the number of seconds the emitter is active. The emitter can be started again, see [repeat\_delay](#repeat_005fdelay). A value of 0 means infinite duration. See also the duration\_min and duration\_max attributes which let you set a duration range instead of a fixed one.
+Sets the number of seconds the emitter is active. The emitter can be started again, see [repeat\_delay](#repeat_005fdelay).
+See also the duration\_min and duration\_max attributes which let you set a duration range instead of a fixed one.
 
 format: duration &lt;seconds&gt;<br> example:<br>     duration 2.5<br> default: 0<br> <br>
+
+@note A value of 0 means infinite duration. A value < 0 means "burst" where @c emission_rate of particles are emitted once in the next frame.
 
 <a name="duration_005fmin"></a><a name="duration_005fmax"></a>
 
