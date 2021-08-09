@@ -200,9 +200,8 @@ namespace Ogre {
         mBillboardSet->beginBillboards(currentParticles.size());
         Billboard bb;
 
-        for (auto i = currentParticles.begin(); i != currentParticles.end(); ++i)
+        for (Particle* p : currentParticles)
         {
-            Particle* p = *i;
             bb.mPosition = p->mPosition;
 
             if (mBillboardSet->getBillboardType() == BBT_ORIENTED_SELF ||
@@ -215,8 +214,9 @@ namespace Ogre {
             bb.mColour = p->mColour;
             bb.mRotation = p->mRotation;
             bb.mTexcoordIndex = p->mTexcoordIndex;
-            // Assign and compare at the same time
-            if ((bb.mOwnDimensions = p->mOwnDimensions) == true)
+            bb.mOwnDimensions = p->mWidth != mBillboardSet->getDefaultWidth() ||
+                                p->mHeight != mBillboardSet->getDefaultHeight();
+            if (bb.mOwnDimensions)
             {
                 bb.mWidth = p->mWidth;
                 bb.mHeight = p->mHeight;

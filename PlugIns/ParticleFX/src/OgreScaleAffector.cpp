@@ -59,13 +59,8 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void ScaleAffector::_initParticle(Particle* p)
     {
-        float w = mParent->getDefaultWidth();
-        float h = mParent->getDefaultHeight();
-        if (p->hasOwnDimensions())
-        {
-            w = p->getOwnWidth();
-            h = p->getOwnHeight();
-        }
+        float w = p->getOwnWidth();
+        float h = p->getOwnHeight();
         float s = Math::RangeRandom(mScaleRange[0], mScaleRange[1]);
         p->setDimensions(s * w, s * h);
     }

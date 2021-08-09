@@ -50,9 +50,9 @@ namespace Ogre {
             Emitter
         };
 
-        /// Personal width if mOwnDimensions == true
+        /// Particle width
         float mWidth;
-        /// Personal height if mOwnDimensions == true
+        /// Particle height
         float mHeight;
         /// Current rotation value
         Radian mRotation;
@@ -75,32 +75,25 @@ namespace Ogre {
         /// Index into the array of texture coordinates @see BillboardSet::setTextureStacksAndSlices()
         uint8 mTexcoordIndex;
         uint8 mRandomTexcoordOffset;
-        /// Does this particle have it's own dimensions?
-        bool mOwnDimensions;
 
         Particle()
             : mWidth(0), mHeight(0),
             mRotation(0), mPosition(Vector3::ZERO), mDirection(Vector3::ZERO),
             mColour(0xFFFFFFFF), mTimeToLive(10), mTotalTimeToLive(10),
-            mRotationSpeed(0), mParticleType(Visual), mTexcoordIndex(0), mRandomTexcoordOffset(0), mOwnDimensions(false)
+            mRotationSpeed(0), mParticleType(Visual), mTexcoordIndex(0), mRandomTexcoordOffset(0)
         {
         }
 
         /** Sets the width and height for this particle.
-        @remarks
-        Note that it is most efficient for every particle in a ParticleSystem to have the same dimensions. If you
-        choose to alter the dimensions of an individual particle the set will be less efficient. Do not call
-        this method unless you really need to have different particle dimensions within the same set. Otherwise
-        just call the ParticleSystem::setDefaultDimensions method instead.
         */
-        void setDimensions(float width, float height);
+        void setDimensions(float width, float height)
+        {
+            mWidth = width;
+            mHeight = height;
+        }
 
-        /** Returns true if this particle deviates from the ParticleSystem's default dimensions (i.e. if the
-        particle::setDimensions method has been called for this instance).
-        @see
-        particle::setDimensions
-        */
-        bool hasOwnDimensions(void) const { return mOwnDimensions; }
+        /// @deprecated do not use
+        OGRE_DEPRECATED bool hasOwnDimensions(void) const { return true; }
 
         /** Retrieves the particle's personal width, if hasOwnDimensions is true. */
         float getOwnWidth(void) const { return mWidth; }
@@ -112,9 +105,6 @@ namespace Ogre {
         void setRotation(const Radian& rad) { mRotation = rad; }
 
         const Radian& getRotation(void) const { return mRotation; }
-
-        /// Utility method to reset this particle
-        void resetDimensions(void);
     };
     /** @} */
     /** @} */
