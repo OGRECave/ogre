@@ -33,6 +33,7 @@ THE SOFTWARE.
 #include "OgreColourValue.h"
 #include "OgreStringInterface.h"
 #include "OgreParticle.h"
+#include "OgreParticleSystem.h"
 #include "OgreHeaderPrefix.h"
 
 
@@ -397,7 +398,7 @@ namespace Ogre {
         */
         virtual void _initParticle(Particle* pParticle) {
             // Initialise size in case it's been altered
-            pParticle->resetDimensions();
+            pParticle->setDimensions(mParent->getDefaultWidth(), mParent->getDefaultHeight());
         }
 
 

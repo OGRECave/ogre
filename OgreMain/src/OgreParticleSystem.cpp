@@ -857,20 +857,11 @@ namespace Ogre {
                     max.x = max.y = max.z = Math::NEG_INFINITY;
                 }
                 Vector3 halfScale = Vector3::UNIT_SCALE * 0.5;
-                Vector3 defaultPadding = halfScale * std::max(mDefaultHeight, mDefaultWidth);
                 for (auto p : mActiveParticles)
                 {
-                    if (p->mOwnDimensions)
-                    {
-                        Vector3 padding = halfScale * std::max(p->mWidth, p->mHeight);
-                        min.makeFloor(p->mPosition - padding);
-                        max.makeCeil(p->mPosition + padding);
-                    }
-                    else
-                    {
-                        min.makeFloor(p->mPosition - defaultPadding);
-                        max.makeCeil(p->mPosition + defaultPadding);
-                    }
+                    Vector3 padding = halfScale * std::max(p->mWidth, p->mHeight);
+                    min.makeFloor(p->mPosition - padding);
+                    max.makeCeil(p->mPosition + padding);
                 }
                 mWorldAABB.setExtents(min, max);
             }
