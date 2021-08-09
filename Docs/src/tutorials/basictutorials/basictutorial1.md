@@ -192,15 +192,16 @@ Compile and run your application. We should now have a rotated Ogre head in our 
 
 # The Ogre Environment {#TheOgreEnvironment}
 
-The library and configuration files for Ogre can be found in the 'bin' folder of your OgreSDK. You should use the debug files when building your application in debug mod
+On Windows, the library and configuration files for Ogre can be found in the @c bin folder of your OgreSDK.
+On Unix they are split into @c share/OGRE for configuration files, @c lib/ for libraries and  @c lib/OGRE for Plugins.
 
 ## Libraries and Plugins {#LibrariesandPlugins}
 
-Ogre is divided into three shared library groups: main library, plugins, and third-party libraries.
+Ogre is divided into three library groups: main libraries, plugins, and third-party libraries.
 
-### Main library
+### Main libraries
 
-The main library group contains the Ogre library itself and the shared libraries it relies on. The Ogre library is contained within @c OgreMain.dll or @c libOgreMain.so depending on your platform. This library must be included in all of your Ogre applications. OgreMain only depends on @c libz and @c libzzip.
+The main library group contains the OgreMain library itself and the component libraries that rely on it. OgreMain is named @c OgreMain.dll or @c libOgreMain.so depending on your platform. This library must be included in all of your Ogre applications.
 
 ### Plugins
 
