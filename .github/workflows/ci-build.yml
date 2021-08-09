@@ -14,7 +14,7 @@ jobs:
         sudo apt update
         sudo apt install -y libxrandr-dev \
           libgles2-mesa-dev mesa-common-dev libgl1-mesa-dev libglu1-mesa-dev \
-          libzzip-dev libfreetype6-dev libpugixml-dev libassimp-dev qtbase5-dev \
+          libfreetype6-dev libpugixml-dev libassimp-dev qtbase5-dev \
           nvidia-cg-dev glslang-dev spirv-tools \
           swig4.0 mono-mcs python3-dev \
           python3-lxml texlive-binaries texlive-base graphviz doxygen g++-7
@@ -81,7 +81,7 @@ jobs:
     runs-on: macos-10.15
     steps:
     - name: Install Dependencies
-      run: brew update && brew install libzzip sdl2 pugixml
+      run: brew update && brew install sdl2 pugixml
     - uses: actions/checkout@v2
     - name: Build
       run: |
