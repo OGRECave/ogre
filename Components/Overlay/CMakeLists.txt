@@ -19,11 +19,11 @@ list(APPEND HEADER_FILES
 file(GLOB SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
 
 if(OGRE_BUILD_COMPONENT_OVERLAY_IMGUI)
-  set(IMGUI_DIR "${PROJECT_BINARY_DIR}/imgui-1.79" CACHE PATH "")
+  set(IMGUI_DIR "${PROJECT_BINARY_DIR}/imgui-1.83" CACHE PATH "")
   if(NOT EXISTS ${IMGUI_DIR})
     message(STATUS "Downloading imgui")
     file(DOWNLOAD
-        https://github.com/ocornut/imgui/archive/v1.79.tar.gz
+        https://github.com/ocornut/imgui/archive/v1.83.tar.gz
         ${PROJECT_BINARY_DIR}/imgui.tar.gz)
     execute_process(COMMAND ${CMAKE_COMMAND}
         -E tar xf imgui.tar.gz WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
@@ -31,9 +31,11 @@ if(OGRE_BUILD_COMPONENT_OVERLAY_IMGUI)
   list(APPEND SOURCE_FILES
     ${IMGUI_DIR}/imgui.cpp
     ${IMGUI_DIR}/imgui_draw.cpp
+    ${IMGUI_DIR}/imgui_tables.cpp
     ${IMGUI_DIR}/imgui_widgets.cpp
     ${IMGUI_DIR}/imgui_demo.cpp)
   if(FREETYPE_FOUND)
+    set(IMGUI_ENABLE_FREETYPE TRUE)
     list(APPEND SOURCE_FILES ${IMGUI_DIR}/misc/freetype/imgui_freetype.cpp)
   endif()
 else()
@@ -74,7 +76,7 @@ if(OGRE_BUILD_COMPONENT_OVERLAY_IMGUI)
       COMPILE_FLAGS "-Wno-cast-qual")
   endif()
 
-  configure_file(${OGRE_TEMPLATES_DIR}/imconfig.h ${IMGUI_DIR}/imconfig.h COPYONLY)
+  configure_file(${OGRE_TEMPLATES_DIR}/imconfig.h ${IMGUI_DIR}/imconfig.h)
 
   list(APPEND HEADER_FILES
     ${IMGUI_DIR}/imgui.h
