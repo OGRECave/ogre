@@ -14,6 +14,7 @@
 %ignore ImGui::TextDisabledV;
 %ignore ImGui::TextWrappedV;
 %ignore ImGui::LabelTextV;
+%ignore ImGui::LogTextV;
 %ignore ImGui::BulletTextV;
 %ignore ImGui::TreeNodeV;
 %ignore ImGui::TreeNodeExV;
