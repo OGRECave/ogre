@@ -1,0 +1,25 @@
+var class_ogre_1_1_vulkan_texture_gpu =
+[
+    [ "VulkanTextureGpu", "class_ogre_1_1_vulkan_texture_gpu.html#a62bbbfea1ddbf61a4194607188c52392", null ],
+    [ "~VulkanTextureGpu", "class_ogre_1_1_vulkan_texture_gpu.html#a4d9bc54b12f379d3beb5ed6f61b750cf", null ],
+    [ "getNumLayers", "class_ogre_1_1_vulkan_texture_gpu.html#afa480c9fc69c362cf04d2fc3bd111f38", null ],
+    [ "hasMsaaExplicitResolves", "class_ogre_1_1_vulkan_texture_gpu.html#a223428b724257a31a12bd77aeb8733c9", null ],
+    [ "isUav", "class_ogre_1_1_vulkan_texture_gpu.html#a041925445e6761bf7d5f0981f05f19b3", null ],
+    [ "isMultisample", "class_ogre_1_1_vulkan_texture_gpu.html#a15c03a0344cc5a885845f110ddc451cf", null ],
+    [ "isRenderWindowSpecific", "class_ogre_1_1_vulkan_texture_gpu.html#ad4a4f3e6ce10bd91e0e98180f1a7640b", null ],
+    [ "getCurrentLayout", "class_ogre_1_1_vulkan_texture_gpu.html#a7907dc2b740b0704df14a1d70525d02b", null ],
+    [ "copyTo", "class_ogre_1_1_vulkan_texture_gpu.html#a0728fe04861e95b5a4b95a5bf2822b86", null ],
+    [ "_autogenerateMipmaps", "class_ogre_1_1_vulkan_texture_gpu.html#aa60a073ee0a216c7bee1f5cac5dd7cc5", null ],
+    [ "getVulkanTextureType", "class_ogre_1_1_vulkan_texture_gpu.html#a21571655f9b2ee623e7fa528c2847490", null ],
+    [ "getInternalVulkanTextureViewType", "class_ogre_1_1_vulkan_texture_gpu.html#abb90b45a1ccbcc0e499d2dcfabbaa3a1", null ],
+    [ "_createView", "class_ogre_1_1_vulkan_texture_gpu.html#ac0eb1c6ede28c18c54bd8f92fc6574b6", null ],
+    [ "createView", "class_ogre_1_1_vulkan_texture_gpu.html#af3c9d08dad106bb9eabfbb589a47d1eb", null ],
+    [ "getDefaultDisplaySrv", "class_ogre_1_1_vulkan_texture_gpu.html#a624cabb524d4fc589803108d79fea2df", null ],
+    [ "destroyView", "class_ogre_1_1_vulkan_texture_gpu.html#ae4e93138a97ffb507ace65e342a356aa", null ],
+    [ "getImageMemoryBarrier", "class_ogre_1_1_vulkan_texture_gpu.html#a829c17e22a5acd6ec583c3d2520db784", null ],
+    [ "getDisplayTextureName", "class_ogre_1_1_vulkan_texture_gpu.html#afbb2223272d9736f93dd8a255d41b925", null ],
+    [ "getFinalTextureName", "class_ogre_1_1_vulkan_texture_gpu.html#a80ab4a439e06b33cba80b1af7afd01c2", null ],
+    [ "getMsaaTextureName", "class_ogre_1_1_vulkan_texture_gpu.html#aa81103ab248da51484145ef5eef56bdb", null ],
+    [ "mCurrLayout", "class_ogre_1_1_vulkan_texture_gpu.html#ae48b5ec410564e91ffd7ac70252674c3", null ],
+    [ "mNextLayout", "class_ogre_1_1_vulkan_texture_gpu.html#aa2706154db19568bbb4ddf600ffa6309", null ]
+];

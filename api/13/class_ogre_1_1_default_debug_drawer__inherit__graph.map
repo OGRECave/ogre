@@ -1,0 +1,5 @@
+<map id="Ogre::DefaultDebugDrawer" name="Ogre::DefaultDebugDrawer">
+<area shape="rect" id="node1" title=" " alt="" coords="5,169,204,196"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_debug_drawer.html" title="Interface for visualising debugging the SceneManager state." alt="" coords="29,95,180,121"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_scene_manager_1_1_listener.html" title="Class that allows listening in on the various stages of SceneManager processing, so that custom behav..." alt="" coords="26,5,183,47"/>
+</map>

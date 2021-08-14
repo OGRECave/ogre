@@ -1,0 +1,18 @@
+<map id="Ogre::HardwarePixelBuffer" name="Ogre::HardwarePixelBuffer">
+<area shape="rect" id="node1" title="Specialisation of HardwareBuffer for a pixel buffer." alt="" coords="360,191,556,217"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_d3_d11_hardware_pixel_buffer.html" title=" " alt="" coords="620,33,820,74"/>
+<area shape="rect" id="node5" href="$class_ogre_1_1_d3_d9_hardware_pixel_buffer.html" title=" " alt="" coords="604,99,836,125"/>
+<area shape="rect" id="node6" href="$class_ogre_1_1_g_l_hardware_pixel_buffer_common.html" title=" " alt="" coords="613,150,827,191"/>
+<area shape="rect" id="node13" href="$class_ogre_1_1_metal_hardware_pixel_buffer.html" title=" " alt="" coords="623,215,817,257"/>
+<area shape="rect" id="node15" href="$class_ogre_1_1_tiny_hardware_pixel_buffer.html" title=" " alt="" coords="609,281,831,308"/>
+<area shape="rect" id="node16" href="$class_ogre_1_1_vulkan_hardware_pixel_buffer.html" title=" " alt="" coords="619,333,821,374"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_hardware_buffer.html" title="Abstract class defining common features of hardware buffers." alt="" coords="148,191,312,217"/>
+<area shape="rect" id="node3" title=" " alt="" coords="5,191,100,217"/>
+<area shape="rect" id="node7" href="$class_ogre_1_1_g_l3_plus_render_buffer.html" title="Renderbuffer surface." alt="" coords="885,5,1084,32"/>
+<area shape="rect" id="node8" href="$class_ogre_1_1_g_l3_plus_texture_buffer.html" title="Texture surface." alt="" coords="884,56,1085,83"/>
+<area shape="rect" id="node9" href="$class_ogre_1_1_g_l_e_s2_render_buffer.html" title=" " alt="" coords="891,107,1079,133"/>
+<area shape="rect" id="node10" href="$class_ogre_1_1_g_l_e_s2_texture_buffer.html" title=" " alt="" coords="889,157,1080,184"/>
+<area shape="rect" id="node11" href="$class_ogre_1_1_g_l_render_buffer.html" title="Renderbuffer surface." alt="" coords="903,208,1067,235"/>
+<area shape="rect" id="node12" href="$class_ogre_1_1_g_l_texture_buffer.html" title="Texture surface." alt="" coords="902,259,1067,285"/>
+<area shape="rect" id="node14" href="$class_ogre_1_1_metal_texture_buffer.html" title="Texture surface." alt="" coords="891,309,1078,336"/>
+</map>

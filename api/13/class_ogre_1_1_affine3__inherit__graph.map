@@ -1,0 +1,5 @@
+<map id="Ogre::Affine3" name="Ogre::Affine3">
+<area shape="rect" id="node1" title="Transform specialization for 3D Affine &#45; encapsulating a 3x4 Matrix." alt="" coords="46,169,153,196"/>
+<area shape="rect" id="node2" href="$struct_ogre_1_1_transform_base_real.html" title=" " alt="" coords="5,95,193,121"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_transform_base.html" title=" " alt="" coords="20,5,179,47"/>
+</map>

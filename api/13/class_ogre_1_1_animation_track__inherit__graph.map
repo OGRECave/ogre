@@ -1,0 +1,7 @@
+<map id="Ogre::AnimationTrack" name="Ogre::AnimationTrack">
+<area shape="rect" id="node1" title="A &#39;track&#39; in an animation sequence, i.e." alt="" coords="255,80,417,107"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_node_animation_track.html" title="Specialised AnimationTrack for dealing with node transforms." alt="" coords="5,155,203,181"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_numeric_animation_track.html" title="Specialised AnimationTrack for dealing with generic animable values." alt="" coords="227,155,445,181"/>
+<area shape="rect" id="node5" href="$class_ogre_1_1_vertex_animation_track.html" title="Specialised AnimationTrack for dealing with changing vertex position information." alt="" coords="470,155,677,181"/>
+<area shape="rect" id="node2" title=" " alt="" coords="275,5,397,32"/>
+</map>

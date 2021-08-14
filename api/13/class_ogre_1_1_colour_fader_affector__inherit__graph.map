@@ -1,0 +1,6 @@
+<map id="Ogre::ColourFaderAffector" name="Ogre::ColourFaderAffector">
+<area shape="rect" id="node1" title="This affector modifies the colour of particles in flight." alt="" coords="58,155,249,181"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_particle_affector.html" title="Abstract class defining the interface to be implemented by particle affectors." alt="" coords="73,80,234,107"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_string_interface.html" title="Class defining the common interface which classes can use to present a reflection&#45;style,..." alt="" coords="5,5,163,32"/>
+<area shape="rect" id="node4" title=" " alt="" coords="187,5,258,32"/>
+</map>

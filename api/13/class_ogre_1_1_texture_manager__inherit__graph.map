@@ -1,0 +1,16 @@
+<map id="Ogre::TextureManager" name="Ogre::TextureManager">
+<area shape="rect" id="node1" title="Class for loading &amp; managing textures." alt="" coords="429,208,596,235"/>
+<area shape="rect" id="node6" href="$class_ogre_1_1_d3_d11_texture_manager.html" title=" " alt="" coords="657,5,868,32"/>
+<area shape="rect" id="node7" href="$class_ogre_1_1_d3_d9_texture_manager.html" title=" " alt="" coords="661,56,864,83"/>
+<area shape="rect" id="node8" href="$class_ogre_1_1_default_texture_manager.html" title="Specialisation of TextureManager for offline processing. Cannot be used with an active RenderSystem." alt="" coords="655,107,870,133"/>
+<area shape="rect" id="node9" href="$class_ogre_1_1_g_l3_plus_texture_manager.html" title="GL3Plus&#45;specific implementation of a TextureManager." alt="" coords="653,157,872,184"/>
+<area shape="rect" id="node10" href="$class_ogre_1_1_g_l_e_s2_texture_manager.html" title="GL ES&#45;specific implementation of a TextureManager." alt="" coords="659,208,866,235"/>
+<area shape="rect" id="node11" href="$class_ogre_1_1_g_l_texture_manager.html" title="GL&#45;specific implementation of a TextureManager." alt="" coords="671,259,854,285"/>
+<area shape="rect" id="node12" href="$class_ogre_1_1_metal_texture_manager.html" title=" " alt="" coords="661,309,864,336"/>
+<area shape="rect" id="node13" href="$class_ogre_1_1_tiny_texture_manager.html" title=" " alt="" coords="666,360,859,387"/>
+<area shape="rect" id="node14" href="$class_ogre_1_1_vulkan_texture_gpu_manager.html" title=" " alt="" coords="644,411,881,437"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_resource_manager.html" title="Defines a generic resource handler." alt="" coords="199,179,378,205"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_script_loader.html" title="Abstract class defining the interface used by classes which wish to perform script loading to define ..." alt="" coords="5,153,148,180"/>
+<area shape="rect" id="node4" title=" " alt="" coords="19,204,134,231"/>
+<area shape="rect" id="node5" href="$class_ogre_1_1_singleton.html" title=" " alt="" coords="196,230,381,271"/>
+</map>

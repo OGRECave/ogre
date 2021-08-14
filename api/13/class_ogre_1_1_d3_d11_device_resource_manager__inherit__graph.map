@@ -1,0 +1,4 @@
+<map id="Ogre::D3D11DeviceResourceManager" name="Ogre::D3D11DeviceResourceManager">
+<area shape="rect" id="node1" title="Singleton that is used to propagate device state changed notifications." alt="" coords="5,5,216,47"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_d3_d11_render_system.html" title="Implementation of DirectX11 as a rendering system." alt="" coords="11,95,211,121"/>
+</map>

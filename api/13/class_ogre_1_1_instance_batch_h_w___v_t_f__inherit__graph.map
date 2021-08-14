@@ -1,0 +1,10 @@
+<map id="Ogre::InstanceBatchHW_VTF" name="Ogre::InstanceBatchHW_VTF">
+<area shape="rect" id="node1" title="Instancing implementation using vertex texture through Vertex Texture Fetch (VTF) and hardware instan..." alt="" coords="77,304,285,331"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_base_instance_batch_v_t_f.html" title="Instancing implementation using vertex texture through Vertex Texture Fetch (VTF) This implementation..." alt="" coords="76,229,287,256"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_instance_batch.html" title="InstanceBatch forms part of the new Instancing system This is an abstract class that must be derived ..." alt="" coords="105,155,258,181"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_renderable.html" title="Abstract class defining the interface all renderable objects must implement." alt="" coords="29,80,163,107"/>
+<area shape="rect" id="node5" href="$class_ogre_1_1_movable_object.html" title="Abstract class defining a movable object in a scene." alt="" coords="187,80,346,107"/>
+<area shape="rect" id="node6" href="$class_ogre_1_1_shadow_caster.html" title="This class defines the interface that must be implemented by shadow casters." alt="" coords="5,5,160,32"/>
+<area shape="rect" id="node7" href="$class_ogre_1_1_animable_object.html" title="Defines an interface to classes which have one or more AnimableValue instances to expose." alt="" coords="184,5,349,32"/>
+<area shape="rect" id="node8" title=" " alt="" coords="374,5,485,32"/>
+</map>

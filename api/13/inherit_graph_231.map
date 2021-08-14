@@ -1,0 +1,4 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="node1" href="$class_ogre_1_1_queued_renderable_visitor.html" title="Visitor interface for items in a QueuedRenderableCollection." alt="" coords="5,20,232,47"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_scene_manager_1_1_scene_mgr_queued_renderable_visitor.html" title="Inner helper class to implement the visitor pattern for rendering objects in a queue." alt="" coords="280,5,499,61"/>
+</map>

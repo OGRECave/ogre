@@ -1,0 +1,47 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="node1" href="$class_ogre_1_1_intersection_scene_query_listener.html" title="Alternative listener class for dealing with IntersectionSceneQuery." alt="" coords="299,123,515,164"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_intersection_scene_query.html" title="Separate SceneQuery class to query for pairs of objects which are possibly intersecting one another." alt="" coords="583,130,799,157"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_default_intersection_scene_query.html" title="Default implementation of IntersectionSceneQuery." alt="" coords="867,121,1054,163"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_bsp_intersection_scene_query.html" title="BSP specialisation of IntersectionSceneQuery." alt="" coords="1117,5,1319,47"/>
+<area shape="rect" id="node5" href="$class_ogre_1_1_octree_intersection_scene_query.html" title="Octree implementation of IntersectionSceneQuery." alt="" coords="1127,71,1309,112"/>
+<area shape="rect" id="node6" href="$class_ogre_1_1_p_c_z_intersection_scene_query.html" title="PCZ implementation of IntersectionSceneQuery." alt="" coords="1117,136,1319,177"/>
+<area shape="rect" id="node7" href="$class_ogre_1_1_ray_scene_query_listener.html" title="Alternative listener class for dealing with RaySceneQuery." alt="" coords="299,541,515,567"/>
+<area shape="rect" id="node8" href="$class_ogre_1_1_ray_scene_query.html" title="Specialises the SceneQuery class for querying along a ray." alt="" coords="609,491,773,518"/>
+<area shape="rect" id="node9" href="$class_ogre_1_1_default_ray_scene_query.html" title="Default implementation of RaySceneQuery." alt="" coords="855,499,1067,526"/>
+<area shape="rect" id="node10" href="$class_ogre_1_1_bsp_ray_scene_query.html" title="BSP specialisation of RaySceneQuery." alt="" coords="1124,450,1312,477"/>
+<area shape="rect" id="node11" href="$class_ogre_1_1_octree_ray_scene_query.html" title="Octree implementation of RaySceneQuery." alt="" coords="1115,501,1321,527"/>
+<area shape="rect" id="node12" href="$class_ogre_1_1_p_c_z_ray_scene_query.html" title="PCZ implementation of RaySceneQuery." alt="" coords="1123,551,1313,578"/>
+<area shape="rect" id="node13" href="$class_ogre_1_1_scene_query_listener.html" title="This optional class allows you to receive per&#45;result callbacks from SceneQuery executions instead of ..." alt="" coords="27,225,217,251"/>
+<area shape="rect" id="node14" href="$class_ogre_1_1_region_scene_query.html" title="Abstract class defining a query which returns single results from a region." alt="" coords="599,302,783,329"/>
+<area shape="rect" id="node27" href="$class_ogre_1_1_scene_manager_1_1_shadow_renderer_1_1_shadow_caster_scene_query_listener.html" title="Inner class to use as callback for shadow caster scene query." alt="" coords="287,242,528,298"/>
+<area shape="rect" id="node15" href="$class_ogre_1_1_axis_aligned_box_scene_query.html" title="Specialises the SceneQuery class for querying within an axis aligned box." alt="" coords="859,229,1062,271"/>
+<area shape="rect" id="node19" href="$class_ogre_1_1_plane_bounded_volume_list_scene_query.html" title="Specialises the SceneQuery class for querying within a plane&#45;bounded volume." alt="" coords="859,295,1063,336"/>
+<area shape="rect" id="node23" href="$class_ogre_1_1_sphere_scene_query.html" title="Specialises the SceneQuery class for querying within a sphere." alt="" coords="869,377,1053,403"/>
+<area shape="rect" id="node16" href="$class_ogre_1_1_default_axis_aligned_box_scene_query.html" title="Default implementation of AxisAlignedBoxSceneQuery." alt="" coords="1125,201,1311,243"/>
+<area shape="rect" id="node17" href="$class_ogre_1_1_octree_axis_aligned_box_scene_query.html" title="Octree implementation of AxisAlignedBoxSceneQuery." alt="" coords="1381,132,1588,173"/>
+<area shape="rect" id="node18" href="$class_ogre_1_1_p_c_z_axis_aligned_box_scene_query.html" title="PCZ implementation of AxisAlignedBoxSceneQuery." alt="" coords="1371,197,1599,239"/>
+<area shape="rect" id="node20" href="$class_ogre_1_1_default_plane_bounded_volume_list_scene_query.html" title="Default implementation of PlaneBoundedVolumeListSceneQuery." alt="" coords="1117,295,1319,336"/>
+<area shape="rect" id="node21" href="$class_ogre_1_1_octree_plane_bounded_volume_list_scene_query.html" title="Octree implementation of PlaneBoundedVolumeListSceneQuery." alt="" coords="1386,263,1583,304"/>
+<area shape="rect" id="node22" href="$class_ogre_1_1_p_c_z_plane_bounded_volume_list_scene_query.html" title="PCZ implementation of PlaneBoundedVolumeListSceneQuery." alt="" coords="1369,328,1600,369"/>
+<area shape="rect" id="node24" href="$class_ogre_1_1_default_sphere_scene_query.html" title="Default implementation of SphereSceneQuery." alt="" coords="1121,384,1315,425"/>
+<area shape="rect" id="node25" href="$class_ogre_1_1_octree_sphere_scene_query.html" title="Octree implementation of SphereSceneQuery." alt="" coords="1371,394,1598,421"/>
+<area shape="rect" id="node26" href="$class_ogre_1_1_p_c_z_sphere_scene_query.html" title="PCZ implementation of SphereSceneQuery." alt="" coords="1379,445,1590,471"/>
+<area shape="rect" id="node28" href="$struct_ogre_1_1_shadow_texture_listener.html" title=" " alt="" coords="301,591,513,618"/>
+<area shape="rect" id="node29" href="$class_ogre_1_1_p_c_z_scene_manager.html" title="Specialized SceneManager that uses Portal&#45;Connected&#45;Zones to divide the scene spatially." alt="" coords="600,542,783,569"/>
+<area shape="rect" id="node30" title=" " alt="" coords="63,453,181,479"/>
+<area shape="rect" id="node31" href="$class_ogre_1_1_auto_param_data_source.html" title="This utility class is used to hold the information used to generate the matrices and other informatio..." alt="" coords="303,423,511,450"/>
+<area shape="rect" id="node32" href="$struct_ogre_1_1_intersection_scene_query_result.html" title="Holds the results of an intersection scene query (pair values)." alt="" coords="299,475,515,516"/>
+<area shape="rect" id="node33" href="$class_ogre_1_1_scene_manager.html" title="Manages the organisation and rendering of a &#39;scene&#39;: a collection of objects and potentially world ge..." alt="" coords="329,642,486,669"/>
+<area shape="rect" id="node37" href="$class_ogre_1_1_scene_manager_enumerator.html" title="Enumerates the SceneManager classes available to applications." alt="" coords="291,821,524,847"/>
+<area shape="rect" id="node38" href="$class_ogre_1_1_scene_manager_factory.html" title="Class which will create instances of a given SceneManager." alt="" coords="305,770,510,797"/>
+<area shape="rect" id="node43" href="$class_ogre_1_1_scene_query.html" title="A class for performing queries on a scene." alt="" coords="338,322,477,349"/>
+<area shape="rect" id="node44" href="$struct_ogre_1_1_scene_query_result.html" title="Holds the results of a scene query." alt="" coords="317,373,497,399"/>
+<area shape="rect" id="node34" href="$class_ogre_1_1_bsp_scene_manager.html" title="Specialisation of the SceneManager class to deal with indoor scenes based on a BSP tree." alt="" coords="601,593,782,619"/>
+<area shape="rect" id="node35" href="$class_ogre_1_1_default_scene_manager.html" title="Default scene manager." alt="" coords="589,643,794,670"/>
+<area shape="rect" id="node36" href="$class_ogre_1_1_octree_scene_manager.html" title="Specialized SceneManager that divides the geometry into an octree in order to facilitate spatial quer..." alt="" coords="591,694,791,721"/>
+<area shape="rect" id="node39" href="$class_ogre_1_1_bsp_scene_manager_factory.html" title="Factory for BspSceneManager." alt="" coords="577,795,806,822"/>
+<area shape="rect" id="node40" href="$class_ogre_1_1_default_scene_manager_factory.html" title="Factory for default scene manager." alt="" coords="589,847,794,888"/>
+<area shape="rect" id="node41" href="$class_ogre_1_1_octree_scene_manager_factory.html" title="Factory for OctreeSceneManager." alt="" coords="591,912,791,953"/>
+<area shape="rect" id="node42" href="$class_ogre_1_1_p_c_z_scene_manager_factory.html" title="Factory for PCZSceneManager." alt="" coords="576,745,807,771"/>
+<area shape="rect" id="node45" href="$class_ogre_1_1_singleton.html" title=" " alt="" coords="5,813,239,855"/>
+</map>

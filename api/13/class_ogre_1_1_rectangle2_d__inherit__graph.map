@@ -1,0 +1,9 @@
+<map id="Ogre::Rectangle2D" name="Ogre::Rectangle2D">
+<area shape="rect" id="node1" title="Allows the rendering of a simple 2D rectangle This class renders a simple 2D rectangle; this rectangl..." alt="" coords="280,229,424,256"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_simple_renderable.html" title="Simple implementation of MovableObject and Renderable for single&#45;part custom objects." alt="" coords="262,155,442,181"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_movable_object.html" title="Abstract class defining a movable object in a scene." alt="" coords="187,80,346,107"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_shadow_caster.html" title="This class defines the interface that must be implemented by shadow casters." alt="" coords="5,5,160,32"/>
+<area shape="rect" id="node5" href="$class_ogre_1_1_animable_object.html" title="Defines an interface to classes which have one or more AnimableValue instances to expose." alt="" coords="184,5,349,32"/>
+<area shape="rect" id="node6" title=" " alt="" coords="374,5,485,32"/>
+<area shape="rect" id="node7" href="$class_ogre_1_1_renderable.html" title="Abstract class defining the interface all renderable objects must implement." alt="" coords="370,80,505,107"/>
+</map>

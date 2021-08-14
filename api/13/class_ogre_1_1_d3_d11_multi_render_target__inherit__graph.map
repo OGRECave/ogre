@@ -1,0 +1,7 @@
+<map id="Ogre::D3D11MultiRenderTarget" name="Ogre::D3D11MultiRenderTarget">
+<area shape="rect" id="node1" title=" " alt="" coords="87,229,311,256"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_multi_render_target.html" title="This class represents a render target that renders to multiple RenderTextures at once." alt="" coords="5,155,185,181"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_render_target.html" title="A &#39;canvas&#39; which can receive the results of a rendering operation." alt="" coords="22,80,169,107"/>
+<area shape="rect" id="node4" title=" " alt="" coords="34,5,157,32"/>
+<area shape="rect" id="node5" href="$class_ogre_1_1_d3_d11_render_target.html" title=" " alt="" coords="209,155,400,181"/>
+</map>

@@ -1,0 +1,4 @@
+<map id="Ogre::Billboard" name="Ogre::Billboard">
+<area shape="rect" id="node1" title="A billboard is a primitive which always faces the camera in every frame." alt="" coords="5,80,124,107"/>
+<area shape="rect" id="node2" title=" " alt="" coords="29,5,100,32"/>
+</map>

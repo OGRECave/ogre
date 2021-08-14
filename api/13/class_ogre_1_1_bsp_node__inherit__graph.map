@@ -1,0 +1,4 @@
+<map id="Ogre::BspNode" name="Ogre::BspNode">
+<area shape="rect" id="node1" title="Encapsulates a node in a BSP tree." alt="" coords="5,80,124,107"/>
+<area shape="rect" id="node2" title=" " alt="" coords="21,5,109,32"/>
+</map>

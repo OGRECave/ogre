@@ -1,0 +1,6 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="node1" title=" " alt="" coords="5,38,161,65"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_script_translator.html" title="This class translates script AST (abstract syntax tree) into Ogre resources." alt="" coords="238,13,401,39"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_script_translator_manager.html" title="The ScriptTranslatorManager manages the lifetime and access to script translators." alt="" coords="209,63,429,90"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_r_t_shader_1_1_s_g_script_translator.html" title="This class responsible for translating core features of the RT Shader System for Ogre material script..." alt="" coords="477,5,664,47"/>
+</map>

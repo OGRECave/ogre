@@ -1,0 +1,7 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="node1" title=" " alt="" coords="5,56,115,83"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_property_base.html" title="Base interface for an instance of a property." alt="" coords="163,5,311,32"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_property_def.html" title="Definition of a property of an object." alt="" coords="167,56,306,83"/>
+<area shape="rect" id="node5" href="$class_ogre_1_1_property_set.html" title="Defines a complete set of properties for a single object instance." alt="" coords="168,107,305,133"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_property.html" title="Property instance with passthrough calls to a given object." alt="" coords="359,5,513,32"/>
+</map>

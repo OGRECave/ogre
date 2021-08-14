@@ -1,0 +1,6 @@
+<map id="Ogre::D3D9HardwareBuffer" name="Ogre::D3D9HardwareBuffer">
+<area shape="rect" id="node1" title="Specialisation of HardwareVertexBuffer for D3D9." alt="" coords="79,155,279,181"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_hardware_buffer.html" title="Abstract class defining common features of hardware buffers." alt="" coords="5,80,169,107"/>
+<area shape="rect" id="node3" title=" " alt="" coords="40,5,135,32"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_d3_d9_resource.html" title="Represents a Direct3D rendering resource." alt="" coords="194,80,351,107"/>
+</map>

@@ -1,0 +1,4 @@
+<map id="OgreBites::ParamsPanel" name="OgreBites::ParamsPanel">
+<area shape="rect" id="node1" title="Basic parameters panel widget." alt="" coords="5,80,184,107"/>
+<area shape="rect" id="node2" href="$class_ogre_bites_1_1_widget.html" title="Abstract base class for all widgets." alt="" coords="25,5,165,32"/>
+</map>

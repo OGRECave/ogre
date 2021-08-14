@@ -1,0 +1,6 @@
+<map id="Ogre::D3D9RenderWindow" name="Ogre::D3D9RenderWindow">
+<area shape="rect" id="node1" title=" " alt="" coords="5,229,200,256"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_render_window.html" title="Manages the target rendering window." alt="" coords="23,155,182,181"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_render_target.html" title="A &#39;canvas&#39; which can receive the results of a rendering operation." alt="" coords="29,80,176,107"/>
+<area shape="rect" id="node4" title=" " alt="" coords="41,5,164,32"/>
+</map>

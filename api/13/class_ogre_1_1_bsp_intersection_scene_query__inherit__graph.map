@@ -1,0 +1,8 @@
+<map id="Ogre::BspIntersectionSceneQuery" name="Ogre::BspIntersectionSceneQuery">
+<area shape="rect" id="node1" title="BSP specialisation of IntersectionSceneQuery." alt="" coords="74,333,275,375"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_default_intersection_scene_query.html" title="Default implementation of IntersectionSceneQuery." alt="" coords="81,244,268,285"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_intersection_scene_query.html" title="Separate SceneQuery class to query for pairs of objects which are possibly intersecting one another." alt="" coords="67,169,283,196"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_scene_query.html" title="A class for performing queries on a scene." alt="" coords="5,87,144,114"/>
+<area shape="rect" id="node5" title=" " alt="" coords="15,5,134,32"/>
+<area shape="rect" id="node6" href="$class_ogre_1_1_intersection_scene_query_listener.html" title="Alternative listener class for dealing with IntersectionSceneQuery." alt="" coords="168,80,384,121"/>
+</map>

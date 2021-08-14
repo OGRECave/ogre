@@ -1,0 +1,8 @@
+<map id="Ogre::HollowEllipsoidEmitter" name="Ogre::HollowEllipsoidEmitter">
+<area shape="rect" id="node1" title="Particle emitter which emits particles randomly from points inside a hollow ellipsoid." alt="" coords="58,304,267,331"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_ellipsoid_emitter.html" title="Particle emitter which emits particles randomly from points inside an ellipsoid." alt="" coords="81,229,245,256"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_area_emitter.html" title="Particle emitter which emits particles randomly from points inside an area (box, sphere,..." alt="" coords="93,155,232,181"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_particle_emitter.html" title="Abstract class defining the interface to be implemented by particle emitters." alt="" coords="83,80,242,107"/>
+<area shape="rect" id="node5" href="$class_ogre_1_1_string_interface.html" title="Class defining the common interface which classes can use to present a reflection&#45;style,..." alt="" coords="5,5,163,32"/>
+<area shape="rect" id="node6" href="$class_ogre_1_1_particle.html" title="Class representing a single particle instance." alt="" coords="187,5,298,32"/>
+</map>

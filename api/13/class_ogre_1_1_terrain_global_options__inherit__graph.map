@@ -1,0 +1,5 @@
+<map id="Ogre::TerrainGlobalOptions" name="Ogre::TerrainGlobalOptions">
+<area shape="rect" id="node1" title="Options class which just stores default options for the terrain." alt="" coords="37,95,235,121"/>
+<area shape="rect" id="node2" title=" " alt="" coords="5,13,104,39"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_singleton.html" title=" " alt="" coords="128,5,309,47"/>
+</map>

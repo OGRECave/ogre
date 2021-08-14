@@ -1,0 +1,4 @@
+<map id="OgreBites::SGTechniqueResolverListener" name="OgreBites::SGTechniqueResolverListener">
+<area shape="rect" id="node1" title="Default implementation of a Listener to use with the Ogre::RTShader system." alt="" coords="5,95,240,136"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_material_manager_1_1_listener.html" title="Listener on any general material events." alt="" coords="37,5,209,47"/>
+</map>
