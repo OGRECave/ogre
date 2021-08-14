@@ -1,0 +1,6 @@
+<map id="Ogre::FileSystemArchiveFactory" name="Ogre::FileSystemArchiveFactory">
+<area shape="rect" id="node1" title="Specialisation of the ArchiveFactory to allow reading of files from filesystem folders / directories." alt="" coords="87,155,316,181"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_archive_factory.html" title="Abstract factory class, archive codec plugins can register concrete subclasses of this." alt="" coords="122,80,281,107"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_factory_obj.html" title=" " alt="" coords="5,5,216,32"/>
+<area shape="rect" id="node4" title=" " alt="" coords="241,5,343,32"/>
+</map>

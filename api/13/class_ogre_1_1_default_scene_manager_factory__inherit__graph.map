@@ -1,0 +1,5 @@
+<map id="Ogre::DefaultSceneManagerFactory" name="Ogre::DefaultSceneManagerFactory">
+<area shape="rect" id="node1" title="Factory for default scene manager." alt="" coords="5,155,211,196"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_scene_manager_factory.html" title="Class which will create instances of a given SceneManager." alt="" coords="5,80,211,107"/>
+<area shape="rect" id="node3" title=" " alt="" coords="49,5,167,32"/>
+</map>

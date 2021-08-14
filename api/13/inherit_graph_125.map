@@ -1,0 +1,8 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="node1" title=" " alt="" coords="5,107,135,133"/>
+<area shape="rect" id="node2" href="$struct_ogre_1_1_gpu_logical_buffer_struct.html" title="Container struct to allow params to safely &amp; update shared list of logical buffer assignments." alt="" coords="186,5,397,32"/>
+<area shape="rect" id="node3" href="$struct_ogre_1_1_gpu_named_constants.html" title="Struct collecting together the information for named constants." alt="" coords="192,56,391,83"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_gpu_program_parameters.html" title="Collects together the program parameters used for a GpuProgram." alt="" coords="183,107,400,133"/>
+<area shape="rect" id="node5" href="$class_ogre_1_1_gpu_shared_parameters.html" title="A group of manually updated parameters that are shared between many parameter sets." alt="" coords="188,157,395,184"/>
+<area shape="rect" id="node6" href="$class_ogre_1_1_gpu_shared_parameters_usage.html" title="This class records the usage of a set of shared parameters in a concrete set of GpuProgramParameters." alt="" coords="188,209,395,250"/>
+</map>

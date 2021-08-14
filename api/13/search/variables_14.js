@@ -1,0 +1,27 @@
+var searchData=
+[
+  ['u_20819',['u',['../struct_ogre_1_1_sampler_1_1_u_v_w_addressing_mode.html#a1c5a9ff33cf02123738072572897df10',1,'Ogre::Sampler::UVWAddressingMode']]],
+  ['uncompressedsize_20820',['uncompressedSize',['../struct_ogre_1_1_file_info.html#a66c7bf4f59feb619016a5c70e4ded4ee',1,'Ogre::FileInfo']]],
+  ['uniform_5findex_5fstart_20821',['UNIFORM_INDEX_START',['../class_ogre_1_1_metal_program.html#af2af7bb54d6c60770f961a4a9f25d34f',1,'Ogre::MetalProgram']]],
+  ['uninitialized_5fcollapse_5fcost_20822',['UNINITIALIZED_COLLAPSE_COST',['../struct_ogre_1_1_lod_data.html#af95ac40c4f3bdd402aa2e0cc1e25fc9c',1,'Ogre::LodData']]],
+  ['unit_5fscale_20823',['UNIT_SCALE',['../struct_ogre_1_1_vector_base_3_012_00_01_real_01_4.html#a979837f10b7068528efc6802742f5509',1,'Ogre::VectorBase&lt; 2, Real &gt;::UNIT_SCALE()'],['../struct_ogre_1_1_vector_base_3_013_00_01_real_01_4.html#a89fbc371d11d0363db247d6ef1fa7afa',1,'Ogre::VectorBase&lt; 3, Real &gt;::UNIT_SCALE()']]],
+  ['unit_5fx_20824',['UNIT_X',['../struct_ogre_1_1_vector_base_3_012_00_01_real_01_4.html#adeeb454e50949d89f71b52a38e52951e',1,'Ogre::VectorBase&lt; 2, Real &gt;::UNIT_X()'],['../struct_ogre_1_1_vector_base_3_013_00_01_real_01_4.html#a2fe25096ba980b3569e44833ddf155e6',1,'Ogre::VectorBase&lt; 3, Real &gt;::UNIT_X()']]],
+  ['unit_5fy_20825',['UNIT_Y',['../struct_ogre_1_1_vector_base_3_012_00_01_real_01_4.html#ab771b243b99665aaff02505c273be9ee',1,'Ogre::VectorBase&lt; 2, Real &gt;::UNIT_Y()'],['../struct_ogre_1_1_vector_base_3_013_00_01_real_01_4.html#a25a0d767f153bc408453ee85de866c87',1,'Ogre::VectorBase&lt; 3, Real &gt;::UNIT_Y()']]],
+  ['unit_5fz_20826',['UNIT_Z',['../struct_ogre_1_1_vector_base_3_013_00_01_real_01_4.html#ab8448c3f1c0a210e465a1aa0e551a33a',1,'Ogre::VectorBase&lt; 3, Real &gt;']]],
+  ['unknown_20827',['unknown',['../structbsp__face__t.html#adf2e01928d721064f72ba3f9c2e6a2fd',1,'bsp_face_t']]],
+  ['updatefrom_20828',['updateFrom',['../struct_ogre_1_1_volume_1_1_chunk_parameters.html#aeefacd1d618206fcb432ed947b58e06e',1,'Ogre::Volume::ChunkParameters']]],
+  ['updateto_20829',['updateTo',['../struct_ogre_1_1_volume_1_1_chunk_parameters.html#afe30999e8cc71a1f48d87d68bf43059d',1,'Ogre::Volume::ChunkParameters']]],
+  ['usage_20830',['usage',['../struct_ogre_1_1_vulkan_device_1_1_selected_queue.html#ad3b70ed4aed581a14a7eb46f9499222b',1,'Ogre::VulkanDevice::SelectedQueue']]],
+  ['usebackgroundqueue_20831',['useBackgroundQueue',['../struct_ogre_1_1_lod_config_1_1_advanced.html#af0b0ebeed034ed3d63ea1bfc3c36fab0',1,'Ogre::LodConfig::Advanced']]],
+  ['usecompression_20832',['useCompression',['../struct_ogre_1_1_lod_config_1_1_advanced.html#a170e01ea28652c19ec4d610c0b491ab7',1,'Ogre::LodConfig::Advanced']]],
+  ['usedcount_20833',['usedCount',['../struct_ogre_1_1_lod0_stripifier_1_1_remap_info.html#a433c84c8a42109d4f1e0987c063b0eee',1,'Ogre::Lod0Stripifier::RemapInfo']]],
+  ['usefullscreen_20834',['useFullScreen',['../struct_ogre_1_1_render_window_description.html#a5809e1727a29bbc2737e090ab338c6a7',1,'Ogre::RenderWindowDescription']]],
+  ['useglobalinstancingvertexbufferisavailable_20835',['useGlobalInstancingVertexBufferIsAvailable',['../class_ogre_1_1_render_operation.html#a58effcf80fb468f10360aeab08d3c32e',1,'Ogre::RenderOperation']]],
+  ['useindexes_20836',['useIndexes',['../class_ogre_1_1_render_operation.html#ae12d3ff9f224f21738fa50f832484f3d',1,'Ogre::RenderOperation']]],
+  ['userkey_20837',['UserKey',['../class_ogre_1_1_r_t_shader_1_1_target_render_state.html#ad89fc9a3c7ec0c73a5d7805013547c24',1,'Ogre::RTShader::TargetRenderState']]],
+  ['uservalue_20838',['userValue',['../struct_ogre_1_1_mesh_lod_usage.html#a114e1bc321b7b64f5bc931a30fea4dfe',1,'Ogre::MeshLodUsage']]],
+  ['usesharedvertexbuffer_20839',['useSharedVertexBuffer',['../struct_ogre_1_1_lod_input_buffer_1_1_submesh.html#a575926e31feb1cc9bfebab8a13fded97',1,'Ogre::LodInputBuffer::Submesh']]],
+  ['usesharedvertices_20840',['useSharedVertices',['../class_ogre_1_1_sub_mesh.html#a931e3764e3bf1c3ef7431fc852770fb1',1,'Ogre::SubMesh']]],
+  ['usevertexnormals_20841',['useVertexNormals',['../struct_ogre_1_1_lod_config_1_1_advanced.html#aa510662a645fab3ef85ef4b1cde1a7a2',1,'Ogre::LodConfig::Advanced']]],
+  ['uvrect_20842',['uvRect',['../struct_ogre_1_1_glyph_info.html#a84b183865a26dd978207ade16075f075',1,'Ogre::GlyphInfo']]]
+];

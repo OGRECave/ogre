@@ -1,0 +1,4 @@
+<map id="Ogre::OverlayElementFactory" name="Ogre::OverlayElementFactory">
+<area shape="rect" id="node1" title="Defines the interface which all components wishing to supply OverlayElement subclasses must implement..." alt="" coords="5,80,220,107"/>
+<area shape="rect" id="node2" title=" " alt="" coords="60,5,165,32"/>
+</map>

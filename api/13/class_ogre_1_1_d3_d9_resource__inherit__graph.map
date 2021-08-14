@@ -1,0 +1,8 @@
+<map id="Ogre::D3D9Resource" name="Ogre::D3D9Resource">
+<area shape="rect" id="node1" title="Represents a Direct3D rendering resource." alt="" coords="5,115,163,141"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_d3_d9_gpu_program.html" title="Direct3D implementation of a few things common to low&#45;level vertex &amp; fragment programs." alt="" coords="233,5,411,32"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_d3_d9_hardware_buffer.html" title="Specialisation of HardwareVertexBuffer for D3D9." alt="" coords="222,56,422,83"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_d3_d9_hardware_occlusion_query.html" title="This is a class that is the DirectX9 implementation of hardware occlusion testing." alt="" coords="211,107,433,149"/>
+<area shape="rect" id="node5" href="$class_ogre_1_1_d3_d9_texture.html" title=" " alt="" coords="249,173,395,200"/>
+<area shape="rect" id="node6" href="$class_ogre_1_1_d3_d9_vertex_declaration.html" title="Specialisation of VertexDeclaration for D3D9." alt="" coords="215,224,429,251"/>
+</map>

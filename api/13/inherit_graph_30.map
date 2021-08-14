@@ -1,0 +1,23 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="node1" title=" " alt="" coords="79,81,167,108"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_bsp_node.html" title="Encapsulates a node in a BSP tree." alt="" coords="337,31,455,57"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_node.html" title="Class representing a general&#45;purpose node an articulated scene graph." alt="" coords="349,81,443,108"/>
+<area shape="rect" id="node10" href="$class_ogre_1_1_octree.html" title="Octree datastructure for managing scene nodes." alt="" coords="344,132,448,159"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_bone.html" title="A bone in a skeleton." alt="" coords="600,5,695,32"/>
+<area shape="rect" id="node6" href="$class_ogre_1_1_scene_node.html" title="Class representing a node in the scene graph." alt="" coords="580,81,715,108"/>
+<area shape="rect" id="node5" href="$class_ogre_1_1_tag_point.html" title="A tagged point on a skeleton, which can be used to attach entities to on specific other entities." alt="" coords="813,5,929,32"/>
+<area shape="rect" id="node7" href="$class_ogre_1_1_bsp_scene_node.html" title="Specialisation of SceneNode for the BspSceneManager." alt="" coords="791,56,950,83"/>
+<area shape="rect" id="node8" href="$class_ogre_1_1_octree_node.html" title="Specialized SceneNode that is customized for working within an Octree." alt="" coords="801,107,940,133"/>
+<area shape="rect" id="node9" href="$class_ogre_1_1_p_c_z_scene_node.html" title="The PCZSceneNode is an extension used to store zone information and provide additional functionality ..." alt="" coords="791,157,951,184"/>
+<area shape="rect" id="node11" title=" " alt="" coords="31,233,214,260"/>
+<area shape="rect" id="node12" href="$class_ogre_1_1_p_c_zone.html" title="Portal&#45;Connected Zone datastructure for managing scene nodes." alt="" coords="341,183,451,209"/>
+<area shape="rect" id="node15" href="$class_ogre_1_1_p_c_zone_factory.html" title="Factory for PCZones." alt="" coords="317,233,475,260"/>
+<area shape="rect" id="node18" href="$class_ogre_1_1_p_c_zone_factory_manager.html" title=" " alt="" coords="288,335,504,361"/>
+<area shape="rect" id="node19" href="$class_ogre_1_1_zone_data.html" title=" " alt="" coords="333,284,459,311"/>
+<area shape="rect" id="node13" href="$class_ogre_1_1_default_zone.html" title=" " alt="" coords="576,132,719,159"/>
+<area shape="rect" id="node14" href="$class_ogre_1_1_octree_zone.html" title=" " alt="" coords="579,183,716,209"/>
+<area shape="rect" id="node16" href="$class_ogre_1_1_default_zone_factory.html" title=" " alt="" coords="552,233,743,260"/>
+<area shape="rect" id="node17" href="$class_ogre_1_1_octree_zone_factory.html" title="Factory for OctreeZone." alt="" coords="555,284,740,311"/>
+<area shape="rect" id="node20" href="$class_ogre_1_1_octree_zone_data.html" title=" " alt="" coords="563,335,731,361"/>
+<area shape="rect" id="node21" href="$class_ogre_1_1_singleton.html" title=" " alt="" coords="5,327,240,369"/>
+</map>

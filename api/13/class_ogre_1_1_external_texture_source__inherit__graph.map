@@ -1,0 +1,4 @@
+<map id="Ogre::ExternalTextureSource" name="Ogre::ExternalTextureSource">
+<area shape="rect" id="node1" title="IMPORTANT: Plugins must override default dictionary name! Base class that texture plugins derive from..." alt="" coords="5,80,212,107"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_string_interface.html" title="Class defining the common interface which classes can use to present a reflection&#45;style,..." alt="" coords="30,5,187,32"/>
+</map>

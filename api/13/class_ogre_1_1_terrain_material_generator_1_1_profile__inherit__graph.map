@@ -1,0 +1,5 @@
+<map id="Ogre::TerrainMaterialGenerator::Profile" name="Ogre::TerrainMaterialGenerator::Profile">
+<area shape="rect" id="node1" title="Inner class which should also be subclassed to provide profile&#45;specific material generation." alt="" coords="5,80,229,121"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_terrain_material_generator_a_1_1_s_m2_profile.html" title="Shader model 2 profile target." alt="" coords="5,169,229,211"/>
+<area shape="rect" id="node2" title=" " alt="" coords="68,5,167,32"/>
+</map>

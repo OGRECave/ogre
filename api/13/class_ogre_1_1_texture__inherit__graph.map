@@ -1,0 +1,16 @@
+<map id="Ogre::Texture" name="Ogre::Texture">
+<area shape="rect" id="node1" title="Abstract class representing a Texture resource." alt="" coords="380,132,489,159"/>
+<area shape="rect" id="node5" href="$class_ogre_1_1_d3_d11_texture.html" title="Specialisation of Texture for D3D11." alt="" coords="553,5,706,32"/>
+<area shape="rect" id="node6" href="$class_ogre_1_1_d3_d9_texture.html" title=" " alt="" coords="557,56,702,83"/>
+<area shape="rect" id="node7" href="$class_ogre_1_1_g_l_texture_common.html" title=" " alt="" coords="537,107,721,133"/>
+<area shape="rect" id="node11" href="$class_ogre_1_1_metal_texture.html" title=" " alt="" coords="556,157,703,184"/>
+<area shape="rect" id="node12" href="$class_ogre_1_1_tiny_texture.html" title=" " alt="" coords="561,208,697,235"/>
+<area shape="rect" id="node13" href="$class_ogre_1_1_vulkan_texture_gpu.html" title=" " alt="" coords="539,259,719,285"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_resource.html" title="Abstract class representing a loadable resource." alt="" coords="211,132,332,159"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_string_interface.html" title="Class defining the common interface which classes can use to present a reflection&#45;style,..." alt="" coords="5,107,163,133"/>
+<area shape="rect" id="node4" title=" " alt="" coords="27,157,141,184"/>
+<area shape="rect" id="node8" href="$class_ogre_1_1_g_l3_plus_texture.html" title=" " alt="" coords="805,56,966,83"/>
+<area shape="rect" id="node9" href="$class_ogre_1_1_g_l_e_s2_texture.html" title=" " alt="" coords="810,107,961,133"/>
+<area shape="rect" id="node10" href="$class_ogre_1_1_g_l_texture.html" title=" " alt="" coords="823,157,948,184"/>
+<area shape="rect" id="node14" href="$class_ogre_1_1_vulkan_texture_gpu_window.html" title=" " alt="" coords="769,259,1001,285"/>
+</map>

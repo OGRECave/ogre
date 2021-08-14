@@ -1,0 +1,16 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="node1" title=" " alt="" coords="74,163,151,190"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_lod_strategy.html" title="Strategy for determining level of detail." alt="" coords="297,163,435,190"/>
+<area shape="rect" id="node9" href="$class_ogre_1_1_lod_strategy_manager.html" title="Manager for LOD strategies." alt="" coords="268,218,464,245"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_distance_lod_strategy_base.html" title="Level of detail strategy based on distance from camera." alt="" coords="519,71,747,98"/>
+<area shape="rect" id="node6" href="$class_ogre_1_1_pixel_count_lod_strategy_base.html" title="Abstract base class for level of detail strategy based on pixel count approximations from bounding sp..." alt="" coords="512,254,753,281"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_distance_lod_box_strategy.html" title="Level of detail strategy based on distance from camera to an object&#39;s bounding box." alt="" coords="811,42,1033,69"/>
+<area shape="rect" id="node5" href="$class_ogre_1_1_distance_lod_sphere_strategy.html" title="Level of detail strategy based on distance from camera to an object&#39;s bounding sphere." alt="" coords="801,111,1043,138"/>
+<area shape="rect" id="node7" href="$class_ogre_1_1_absolute_pixel_count_lod_strategy.html" title=" " alt="" coords="828,213,1016,255"/>
+<area shape="rect" id="node8" href="$class_ogre_1_1_screen_ratio_pixel_count_lod_strategy.html" title=" " alt="" coords="817,292,1027,333"/>
+<area shape="rect" id="node10" href="$class_ogre_1_1_singleton.html" title=" " alt="" coords="535,188,730,229"/>
+<area shape="rect" id="node11" href="$class_ogre_1_1_singleton.html" title=" " alt="" coords="535,5,730,47"/>
+<area shape="rect" id="node12" href="$class_ogre_1_1_singleton.html" title=" " alt="" coords="535,123,730,164"/>
+<area shape="rect" id="node13" href="$class_ogre_1_1_singleton.html" title=" " alt="" coords="5,215,220,256"/>
+<area shape="rect" id="node14" href="$class_ogre_1_1_singleton.html" title=" " alt="" coords="525,305,740,347"/>
+</map>

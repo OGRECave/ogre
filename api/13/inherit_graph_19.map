@@ -1,0 +1,16 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="node1" title=" " alt="" coords="5,132,127,159"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_animation.html" title="An animation sequence." alt="" coords="202,5,330,32"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_animation_state.html" title="Represents the state of an animation and the weight of its influence." alt="" coords="185,56,347,83"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_animation_state_set.html" title="Class encapsulating a set of AnimationState objects." alt="" coords="175,107,357,133"/>
+<area shape="rect" id="node5" href="$class_ogre_1_1_animation_track.html" title="A &#39;track&#39; in an animation sequence, i.e." alt="" coords="185,157,347,184"/>
+<area shape="rect" id="node9" href="$class_ogre_1_1_key_frame.html" title="A key frame in an animation sequence defined by an AnimationTrack." alt="" coords="203,233,329,260"/>
+<area shape="rect" id="node14" href="$class_ogre_1_1_pose.html" title="A pose is a linked set of vertex offsets applying to one set of vertex data." alt="" coords="220,284,312,311"/>
+<area shape="rect" id="node6" href="$class_ogre_1_1_node_animation_track.html" title="Specialised AnimationTrack for dealing with node transforms." alt="" coords="416,56,613,83"/>
+<area shape="rect" id="node7" href="$class_ogre_1_1_numeric_animation_track.html" title="Specialised AnimationTrack for dealing with generic animable values." alt="" coords="405,107,624,133"/>
+<area shape="rect" id="node8" href="$class_ogre_1_1_vertex_animation_track.html" title="Specialised AnimationTrack for dealing with changing vertex position information." alt="" coords="411,157,618,184"/>
+<area shape="rect" id="node10" href="$class_ogre_1_1_numeric_key_frame.html" title="Specialised KeyFrame which stores any numeric value." alt="" coords="424,208,605,235"/>
+<area shape="rect" id="node11" href="$class_ogre_1_1_transform_key_frame.html" title="Specialised KeyFrame which stores a full transform." alt="" coords="419,259,611,285"/>
+<area shape="rect" id="node12" href="$class_ogre_1_1_vertex_morph_key_frame.html" title="Specialised KeyFrame which stores absolute vertex positions for a complete buffer,..." alt="" coords="409,309,620,336"/>
+<area shape="rect" id="node13" href="$class_ogre_1_1_vertex_pose_key_frame.html" title="Specialised KeyFrame which references a Mesh::Pose at a certain influence level, which stores offsets..." alt="" coords="415,360,615,387"/>
+</map>

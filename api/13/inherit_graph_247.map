@@ -1,0 +1,10 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="node1" href="$class_ogre_1_1_resource_group_listener.html" title="This class defines an interface which is called back during resource group loading to indicate the pr..." alt="" coords="5,5,217,32"/>
+<area shape="rect" id="node2" href="$class_ogre_bites_1_1_tray_manager.html" title="Main class to manage a cursor, backdrop, trays and widgets." alt="" coords="285,31,464,57"/>
+<area shape="rect" id="node3" href="$struct_ogre_bites_1_1_input_listener.html" title="the return values of the callbacks are ignored by ApplicationContext however they can be used to cont..." alt="" coords="22,148,201,175"/>
+<area shape="rect" id="node4" href="$class_ogre_bites_1_1_advanced_render_controls.html" title=" " alt="" coords="273,82,477,123"/>
+<area shape="rect" id="node5" href="$class_ogre_bites_1_1_camera_man.html" title="Utility class for controlling the camera in samples." alt="" coords="288,148,461,175"/>
+<area shape="rect" id="node6" href="$struct_ogre_bites_1_1_im_gui_input_listener.html" title=" " alt="" coords="265,199,484,225"/>
+<area shape="rect" id="node7" href="$class_ogre_bites_1_1_input_listener_chain.html" title="Chain of multiple InputListeners that acts as a single InputListener." alt="" coords="285,250,464,291"/>
+<area shape="rect" id="node8" href="$class_ogre_bites_1_1_tray_listener.html" title="Listener class for responding to tray events." alt="" coords="24,56,199,83"/>
+</map>

@@ -1,0 +1,4 @@
+<map id="Ogre::RenderQueueGroup" name="Ogre::RenderQueueGroup">
+<area shape="rect" id="node1" title="A grouping level underneath RenderQueue which groups renderables to be issued at coarsely the same ti..." alt="" coords="5,80,193,107"/>
+<area shape="rect" id="node2" title=" " alt="" coords="28,5,171,32"/>
+</map>

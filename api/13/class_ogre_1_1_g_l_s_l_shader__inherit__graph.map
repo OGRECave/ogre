@@ -1,0 +1,8 @@
+<map id="Ogre::GLSLShader" name="Ogre::GLSLShader">
+<area shape="rect" id="node1" title=" " alt="" coords="39,304,178,331"/>
+<area shape="rect" id="node6" href="$class_ogre_1_1_s_p_i_r_v_shader.html" title=" " alt="" coords="37,379,181,405"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_g_l_s_l_shader_common.html" title="Specialisation of HighLevelGpuProgram to provide support for OpenGL Shader Language (GLSL)." alt="" coords="10,229,207,256"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_high_level_gpu_program.html" title="Abstract base class representing a high&#45;level program (a vertex or fragment program)." alt="" coords="5,155,212,181"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_gpu_program.html" title="Defines a program which runs on the GPU such as a vertex or fragment program." alt="" coords="37,80,180,107"/>
+<area shape="rect" id="node5" href="$class_ogre_1_1_resource.html" title="Abstract class representing a loadable resource." alt="" coords="48,5,169,32"/>
+</map>

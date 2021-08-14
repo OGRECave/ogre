@@ -1,0 +1,5 @@
+<map id="Ogre::RTShader::SampleTextureAtom" name="Ogre::RTShader::SampleTextureAtom">
+<area shape="rect" id="node1" title="shorthand for &quot;dst = texture(sampler, uv);&quot; instead of using FFP_SampleTexture" alt="" coords="5,155,268,181"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_r_t_shader_1_1_function_atom.html" title="A class that represents an atomic code section of shader based program function." alt="" coords="26,80,247,107"/>
+<area shape="rect" id="node3" title=" " alt="" coords="54,5,219,32"/>
+</map>

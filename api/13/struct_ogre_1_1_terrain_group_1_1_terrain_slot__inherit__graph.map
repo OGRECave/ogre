@@ -1,0 +1,4 @@
+<map id="Ogre::TerrainGroup::TerrainSlot" name="Ogre::TerrainGroup::TerrainSlot">
+<area shape="rect" id="node1" title="Slot for a terrain instance, together with its definition." alt="" coords="5,80,149,121"/>
+<area shape="rect" id="node2" title=" " alt="" coords="28,5,127,32"/>
+</map>

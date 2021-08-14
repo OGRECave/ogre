@@ -1,0 +1,8 @@
+<map id="Ogre::Serializer" name="Ogre::Serializer">
+<area shape="rect" id="node1" title="Generic class for serialising data to / from binary stream&#45;based files." alt="" coords="168,81,291,108"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_gpu_named_constants_serializer.html" title="Simple class for loading / saving GpuNamedConstants." alt="" coords="339,5,599,32"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_lod_config_serializer.html" title=" " alt="" coords="375,56,562,83"/>
+<area shape="rect" id="node5" href="$class_ogre_1_1_mesh_serializer.html" title="Class for serialising mesh data to/from an OGRE .mesh file." alt="" coords="390,107,547,133"/>
+<area shape="rect" id="node6" href="$class_ogre_1_1_skeleton_serializer.html" title="Class for serialising skeleton data to/from an OGRE .skeleton file." alt="" coords="379,157,558,184"/>
+<area shape="rect" id="node2" title=" " alt="" coords="5,81,120,108"/>
+</map>

@@ -1,0 +1,37 @@
+var class_ogre_1_1_composition_technique =
+[
+    [ "TextureDefinition", "class_ogre_1_1_composition_technique_1_1_texture_definition.html", "class_ogre_1_1_composition_technique_1_1_texture_definition" ],
+    [ "TargetPasses", "class_ogre_1_1_composition_technique.html#ae3bc01432cca2866776fc578be61b7b5", null ],
+    [ "TargetPassIterator", "class_ogre_1_1_composition_technique.html#a5a54aecf9c72e8323b12d55199308c66", null ],
+    [ "TextureDefinitions", "class_ogre_1_1_composition_technique.html#af6b63a9d4592c48d2389525148a334ee", null ],
+    [ "TextureDefinitionIterator", "class_ogre_1_1_composition_technique.html#a34f28a53486ea2cee58619b2c1a639fe", null ],
+    [ "TextureScope", "class_ogre_1_1_composition_technique.html#a72f5c327008d8292c004bcd5bdf6fb1e", [
+      [ "TS_LOCAL", "class_ogre_1_1_composition_technique.html#a72f5c327008d8292c004bcd5bdf6fb1ea6f778889142bb74cc5aefa4f396b386d", null ],
+      [ "TS_CHAIN", "class_ogre_1_1_composition_technique.html#a72f5c327008d8292c004bcd5bdf6fb1ea90fc4ed7303d0d5b549dcc1873ddcde7", null ],
+      [ "TS_GLOBAL", "class_ogre_1_1_composition_technique.html#a72f5c327008d8292c004bcd5bdf6fb1eaeaa58ffdb5ed352498ce0fa8263bda4d", null ]
+    ] ],
+    [ "CompositionTechnique", "class_ogre_1_1_composition_technique.html#aed3697e1f5dee4e6e71b03338371dac9", null ],
+    [ "~CompositionTechnique", "class_ogre_1_1_composition_technique.html#a3b37aab5a73a19c0c2537b33cea5256e", null ],
+    [ "createTextureDefinition", "class_ogre_1_1_composition_technique.html#a4354d86478e8ec9fdf65024ea5ddfd6a", null ],
+    [ "removeTextureDefinition", "class_ogre_1_1_composition_technique.html#a4bba82fa0f4e54090a2497fe9f658fab", null ],
+    [ "getTextureDefinition", "class_ogre_1_1_composition_technique.html#a6b31045a07cbdb50484f7ffbfe0d4d51", null ],
+    [ "getTextureDefinition", "class_ogre_1_1_composition_technique.html#aade1fc762152c5237db8ae961e85d5ce", null ],
+    [ "getNumTextureDefinitions", "class_ogre_1_1_composition_technique.html#aef09c60a1e9c66d5f140c34651f4d082", null ],
+    [ "removeAllTextureDefinitions", "class_ogre_1_1_composition_technique.html#a03d4c71942abef880d9b2c9e363fe259", null ],
+    [ "getTextureDefinitions", "class_ogre_1_1_composition_technique.html#a393537a12b7ef9d8acbc0a7a9150b2b0", null ],
+    [ "getTextureDefinitionIterator", "class_ogre_1_1_composition_technique.html#a07fe9d82291bef342e223b765a88a5f1", null ],
+    [ "createTargetPass", "class_ogre_1_1_composition_technique.html#a781c6fcbbfc75d7c4265e268e9749f93", null ],
+    [ "removeTargetPass", "class_ogre_1_1_composition_technique.html#a13b52dbaf483cd1ab0eec9edbef078e2", null ],
+    [ "getTargetPass", "class_ogre_1_1_composition_technique.html#a574dc7f6a7b7adbf91022d62b21885a3", null ],
+    [ "getNumTargetPasses", "class_ogre_1_1_composition_technique.html#a67c5761dc115b3f0e8b3b29e5f6caf26", null ],
+    [ "removeAllTargetPasses", "class_ogre_1_1_composition_technique.html#a4b34afd12984d3a5883e24b512c2b4a2", null ],
+    [ "getTargetPasses", "class_ogre_1_1_composition_technique.html#a42c5894ee143fc9279aab3cdb5b0496f", null ],
+    [ "getTargetPassIterator", "class_ogre_1_1_composition_technique.html#a472bbfd655c99319514ebc1fc58961c5", null ],
+    [ "getOutputTargetPass", "class_ogre_1_1_composition_technique.html#a06c8a86ab15dbe396f28b1dd814c8fff", null ],
+    [ "isSupported", "class_ogre_1_1_composition_technique.html#a7395bb89044375bea1be770737651875", null ],
+    [ "setSchemeName", "class_ogre_1_1_composition_technique.html#a13d2bcb0ecbd440325621b809becd2c4", null ],
+    [ "getSchemeName", "class_ogre_1_1_composition_technique.html#a01857515043aba164d7dfafd7ca7255e", null ],
+    [ "setCompositorLogicName", "class_ogre_1_1_composition_technique.html#af221a1809b2de447c7036dd356026ad5", null ],
+    [ "getCompositorLogicName", "class_ogre_1_1_composition_technique.html#a9290015c60a3e10221b768af3381f4c6", null ],
+    [ "getParent", "class_ogre_1_1_composition_technique.html#a6b95f7376905fe23c3d5a27b0ec783d6", null ]
+];

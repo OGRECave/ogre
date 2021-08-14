@@ -1,0 +1,5 @@
+<map id="Ogre::ManualObject::ManualObjectSection" name="Ogre::ManualObject::ManualObjectSection">
+<area shape="rect" id="node1" title="Built, renderable section of geometry." alt="" coords="62,80,230,121"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_renderable.html" title="Abstract class defining the interface all renderable objects must implement." alt="" coords="5,5,140,32"/>
+<area shape="rect" id="node3" title=" " alt="" coords="164,5,275,32"/>
+</map>

@@ -1,0 +1,9 @@
+<map id="Ogre::GLArbGpuProgram" name="Ogre::GLArbGpuProgram">
+<area shape="rect" id="node1" title="Specialisation of the GL low&#45;level program for ARB programs." alt="" coords="167,304,350,331"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_g_l_gpu_program.html" title="Generalised low&#45;level GL program, can be applied to multiple types (eg ARB and NV)" alt="" coords="179,229,338,256"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_gpu_program.html" title="Defines a program which runs on the GPU such as a vertex or fragment program." alt="" coords="93,155,235,181"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_resource.html" title="Abstract class representing a loadable resource." alt="" coords="103,80,225,107"/>
+<area shape="rect" id="node5" href="$class_ogre_1_1_string_interface.html" title="Class defining the common interface which classes can use to present a reflection&#45;style,..." alt="" coords="5,5,163,32"/>
+<area shape="rect" id="node6" title=" " alt="" coords="187,5,301,32"/>
+<area shape="rect" id="node7" href="$struct_ogre_1_1_g_l_gpu_program_base.html" title=" " alt="" coords="259,155,450,181"/>
+</map>

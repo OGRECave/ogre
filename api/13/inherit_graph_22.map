@@ -1,0 +1,12 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="node1" title=" " alt="" coords="59,122,162,149"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_archive.html" title="Archive&#45;handling class." alt="" coords="292,122,403,149"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_archive_factory.html" title="Abstract factory class, archive codec plugins can register concrete subclasses of this." alt="" coords="268,71,427,98"/>
+<area shape="rect" id="node8" href="$class_ogre_1_1_archive_manager.html" title="This class manages the available ArchiveFactory plugins." alt="" coords="264,177,431,203"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_a_p_k_file_system_archive_factory.html" title=" " alt="" coords="490,5,697,47"/>
+<area shape="rect" id="node5" href="$class_ogre_1_1_file_system_archive_factory.html" title="Specialisation of the ArchiveFactory to allow reading of files from filesystem folders / directories." alt="" coords="479,71,708,98"/>
+<area shape="rect" id="node6" href="$class_ogre_1_1_zip_archive_factory.html" title="Specialisation to allow reading of files from a zip format source archive." alt="" coords="504,122,683,149"/>
+<area shape="rect" id="node7" href="$class_ogre_1_1_embedded_zip_archive_factory.html" title="Specialisation of ZipArchiveFactory for embedded Zip files." alt="" coords="756,115,956,156"/>
+<area shape="rect" id="node9" href="$class_ogre_1_1_factory_obj.html" title=" " alt="" coords="5,71,216,98"/>
+<area shape="rect" id="node10" href="$class_ogre_1_1_singleton.html" title=" " alt="" coords="17,173,204,215"/>
+</map>

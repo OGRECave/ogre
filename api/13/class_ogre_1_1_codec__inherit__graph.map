@@ -1,0 +1,9 @@
+<map id="Ogre::Codec" name="Ogre::Codec">
+<area shape="rect" id="node1" title="Abstract class that defines a &#39;codec&#39;." alt="" coords="286,80,387,107"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_image_codec.html" title="Codec specialized in images." alt="" coords="265,155,408,181"/>
+<area shape="rect" id="node2" title=" " alt="" coords="289,5,384,32"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_e_x_r_codec.html" title=" " alt="" coords="5,229,132,256"/>
+<area shape="rect" id="node5" href="$class_ogre_1_1_free_image_codec.html" title=" " alt="" coords="157,229,327,256"/>
+<area shape="rect" id="node6" href="$class_ogre_1_1_rs_image_codec.html" title=" " alt="" coords="352,229,511,256"/>
+<area shape="rect" id="node7" href="$class_ogre_1_1_s_t_b_i_image_codec.html" title=" " alt="" coords="535,229,706,256"/>
+</map>

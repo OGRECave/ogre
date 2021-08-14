@@ -1,0 +1,4 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="node1" href="$class_ogre_1_1_any.html" title="Variant type that can hold Any other type." alt="" coords="5,5,92,32"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_any_numeric.html" title="Specialised Any class which has built in arithmetic operators, but can hold only types which support ..." alt="" coords="140,5,281,32"/>
+</map>

@@ -1,0 +1,5 @@
+<map id="Ogre::RTShader::AssignmentAtom" name="Ogre::RTShader::AssignmentAtom">
+<area shape="rect" id="node1" title="shorthand for &quot;lhs = rhs;&quot; insted of using FFP_Assign(rhs, lhs)" alt="" coords="5,155,248,181"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_r_t_shader_1_1_function_atom.html" title="A class that represents an atomic code section of shader based program function." alt="" coords="16,80,237,107"/>
+<area shape="rect" id="node3" title=" " alt="" coords="44,5,209,32"/>
+</map>

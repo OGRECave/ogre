@@ -1,0 +1,5 @@
+<map id="Ogre::TempBlendedBufferInfo" name="Ogre::TempBlendedBufferInfo">
+<area shape="rect" id="node1" title="Structure for recording the use of temporary blend buffers." alt="" coords="99,80,314,107"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_hardware_buffer_licensee.html" title="Abstract interface representing a &#39;licensee&#39; of a hardware buffer copy." alt="" coords="5,5,227,32"/>
+<area shape="rect" id="node3" title=" " alt="" coords="251,5,346,32"/>
+</map>

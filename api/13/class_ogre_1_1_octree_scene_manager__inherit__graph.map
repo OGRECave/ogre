@@ -1,0 +1,5 @@
+<map id="Ogre::OctreeSceneManager" name="Ogre::OctreeSceneManager">
+<area shape="rect" id="node1" title="Specialized SceneManager that divides the geometry into an octree in order to facilitate spatial quer..." alt="" coords="5,155,205,181"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_scene_manager.html" title="Manages the organisation and rendering of a &#39;scene&#39;: a collection of objects and potentially world ge..." alt="" coords="27,80,184,107"/>
+<area shape="rect" id="node3" title=" " alt="" coords="46,5,165,32"/>
+</map>

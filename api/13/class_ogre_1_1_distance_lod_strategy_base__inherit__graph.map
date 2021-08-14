@@ -1,0 +1,7 @@
+<map id="Ogre::DistanceLodStrategyBase" name="Ogre::DistanceLodStrategyBase">
+<area shape="rect" id="node1" title="Level of detail strategy based on distance from camera." alt="" coords="130,155,358,181"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_distance_lod_box_strategy.html" title="Level of detail strategy based on distance from camera to an object&#39;s bounding box." alt="" coords="5,229,227,256"/>
+<area shape="rect" id="node5" href="$class_ogre_1_1_distance_lod_sphere_strategy.html" title="Level of detail strategy based on distance from camera to an object&#39;s bounding sphere." alt="" coords="251,229,493,256"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_lod_strategy.html" title="Strategy for determining level of detail." alt="" coords="175,80,313,107"/>
+<area shape="rect" id="node3" title=" " alt="" coords="205,5,283,32"/>
+</map>
