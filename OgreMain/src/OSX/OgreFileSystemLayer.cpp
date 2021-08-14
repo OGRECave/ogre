@@ -29,6 +29,7 @@
 #include "macUtils.h"
 #include <pwd.h>
 #include <dlfcn.h>
+#include <sys/stat.h>
 
 namespace Ogre
 {
