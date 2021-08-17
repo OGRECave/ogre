@@ -56,7 +56,6 @@ public:
 		, mTerrainPagedWorldSection(0)
 		, mPerlinNoiseTerrainGenerator(0)
         , mLodStatus(false)
-		, mAutoLod(true)
 		, mFly(true)
 		, mFallVelocity(0)
         , mTerrainPos(0,0,0)
@@ -213,16 +212,8 @@ public:
 		{
 			if(mTerrainGroup)
 			{
-				if(!mAutoLod && mAutoBox->isChecked())
-				{
-					mTerrainGroup->setAutoUpdateLod( TerrainAutoUpdateLodFactory::getAutoUpdateLod(BY_DISTANCE) );
-					mAutoLod = true;
-				}
-				else if(mAutoLod && !mAutoBox->isChecked())
-				{
-					mTerrainGroup->setAutoUpdateLod( TerrainAutoUpdateLodFactory::getAutoUpdateLod(BY_DISTANCE) );
-					mAutoLod = false;
-				}
+				auto strategy = mAutoBox->isChecked() ? BY_DISTANCE : NONE;
+				mTerrainGroup->setAutoUpdateLod(TerrainAutoUpdateLodFactory::getAutoUpdateLod(strategy));
 			}
 		}
 	}
@@ -237,7 +228,6 @@ protected:
 	TerrainPagedWorldSection* mTerrainPagedWorldSection;
 	PerlinNoiseTerrainGenerator* mPerlinNoiseTerrainGenerator;
 	bool mLodStatus;
-	bool mAutoLod;
 
 	/// This class just pretends to provide procedural page content to avoid page loading
 	class DummyPageProvider : public PageProvider
@@ -357,7 +347,6 @@ protected:
 	{
 		mTerrainGlobals = OGRE_NEW TerrainGlobalOptions();
 
-		setupControls();
 		mCameraMan->setTopSpeed(100);
 
 		setDragLook(true);
@@ -421,6 +410,8 @@ protected:
 
 		mLodInfoOverlay->add2D(mLodInfoOverlayContainer);
 		mLodInfoOverlay->show();
+
+		setupControls();
 	}
 
 	void _shutdown()
