@@ -1541,7 +1541,7 @@ namespace Ogre
         mCombinedVariability = GPV_GLOBAL;
     }
     //-----------------------------------------------------------------------------
-    void GpuProgramParameters::setAutoConstantReal(size_t index, AutoConstantType acType, Real rData)
+    void GpuProgramParameters::setAutoConstantReal(size_t index, AutoConstantType acType, float rData)
     {
         // Get auto constant definition for sizing
         const AutoConstantDefinition* autoDef = getAutoConstantDefinition(acType);

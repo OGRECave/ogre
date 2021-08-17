@@ -176,7 +176,7 @@ void CompositionPass::setClearDepth(float depth)
 {
     mClear.depth = depth;
 }
-Real CompositionPass::getClearDepth() const
+float CompositionPass::getClearDepth() const
 {
     return mClear.depth;
 }

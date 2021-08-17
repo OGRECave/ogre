@@ -644,7 +644,7 @@ namespace Ogre {
         return mManualCullMode;
     }
     //-----------------------------------------------------------------------
-    void Pass::setFog(bool overrideScene, FogMode mode, const ColourValue& colour, Real density, Real start, Real end)
+    void Pass::setFog(bool overrideScene, FogMode mode, const ColourValue& colour, float density, float start, float end)
     {
         mFogOverride = overrideScene;
         if (overrideScene)
