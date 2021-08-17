@@ -285,12 +285,12 @@ namespace Ogre {
         return mBackColour;
     }
     //---------------------------------------------------------------------
-    void Viewport::setDepthClear( Real depth )
+    void Viewport::setDepthClear( float depth )
     {
         mDepthClearValue = depth;
     }
     //---------------------------------------------------------------------
-    Real Viewport::getDepthClear(void) const
+    float Viewport::getDepthClear(void) const
     {
         return mDepthClearValue;
     }
