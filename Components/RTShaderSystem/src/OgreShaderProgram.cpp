@@ -167,7 +167,7 @@ UniformParameterPtr Program::resolveAutoParameterReal(GpuProgramParameters::Auto
     }
     
     // Create new parameter.
-    param = UniformParameterPtr(OGRE_NEW UniformParameter(autoType, data, size));
+    param = UniformParameterPtr(OGRE_NEW UniformParameter(autoType, float(data), size));
     addParameter(param);
 
     return param;
