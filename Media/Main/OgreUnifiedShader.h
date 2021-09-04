@@ -28,6 +28,7 @@
 #define texture1D tex1D
 #define texture2D tex2D
 #define texture3D tex3D
+#define texture2DArray tex2DARRAY
 #define textureCube texCUBE
 #define shadow2D tex2Dcmp
 #define texture2DProj tex2Dproj
@@ -37,6 +38,7 @@ vec4 texture2DLod(sampler2D s, vec2 v, float lod) { return tex2Dlod(s, vec4(v.x,
 #define sampler2DShadow Sampler2DShadow
 
 #define mix lerp
+#define fract frac
 
 vec2 vec2_splat(float x) { return vec2(x, x); }
 vec3 vec3_splat(float x) { return vec3(x, x, x); }
@@ -100,6 +102,7 @@ enum {
 #define SAMPLER1D(name, reg) sampler1D name
 #define SAMPLER2D(name, reg) sampler2D name
 #define SAMPLER3D(name, reg) sampler3D name
+#define SAMPLER2DARRAY(name, reg) sampler2DArray name
 #define SAMPLERCUBE(name, reg) samplerCube name
 
 #define saturate(x) clamp(x, 0.0, 1.0)

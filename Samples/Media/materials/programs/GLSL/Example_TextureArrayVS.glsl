@@ -1,11 +1,13 @@
-attribute vec3 uv0;
-attribute vec4 vertex;
-varying vec3 oUv;
+#include <OgreUnifiedShader.h>
 
 uniform mat4 worldViewProj;
 
-void main(void)
+MAIN_PARAMETERS
+IN(vec4 vertex, POSITION)
+IN(vec3 uv0, TEXCOORD0)
+OUT(vec3 oUv, TEXCOORD0)
+MAIN_DECLARATION
 {
-	gl_Position = worldViewProj * vertex;
+	gl_Position = mul(worldViewProj, vertex);
 	oUv = uv0;
 }
