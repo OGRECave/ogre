@@ -79,6 +79,10 @@ if(OGRE_BUILD_COMPONENT_OVERLAY_IMGUI)
       COMPILE_FLAGS "-Wno-cast-qual")
   endif()
 
+  if(MINGW)
+    target_link_libraries(OgreOverlay PRIVATE imm32)
+  endif()
+
   configure_file(${OGRE_TEMPLATES_DIR}/imconfig.h ${IMGUI_DIR}/imconfig.h)
 
   list(APPEND HEADER_FILES
