@@ -31,6 +31,7 @@ mat4 transpose(mat4 m)
 #define texture1D texture
 #define texture2D texture
 #define texture3D texture
+#define texture2DArray texture
 #define textureCube texture
 #define shadow2D texture
 #define shadow2DProj textureProj

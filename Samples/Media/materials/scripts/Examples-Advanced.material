@@ -723,7 +723,7 @@ vertex_program Examples/TextureArrayVScg hlsl
 	}
 }
 
-vertex_program Examples/TextureArrayVSglsl glsl glsles
+vertex_program Examples/TextureArrayVS glsl glsles hlsl
 {
 	source Example_TextureArrayVS.glsl
 
@@ -736,73 +736,44 @@ vertex_program Examples/TextureArrayVSglsl glsl glsles
 fragment_program Examples/TextureArrayPSglsl glsl
 {
 	source Example_TextureArrayPS.glsl
-
-	default_params
-	{
-		param_named TextureArrayTex int 0
-	}
 }
 
 fragment_program Examples/TextureArrayPSglsles glsles
 {
 	source Example_TextureArrayPS.glsles
 	syntax glsl300es
+}
 
+fragment_program Examples/TextureArrayPShlsl4 hlsl
+{
+	source Example_TextureArrayPS.glsl
+	target ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
+}
+
+fragment_program Examples/TextureArrayPS unified
+{
+	delegate Examples/TextureArrayPSglsl
+	delegate Examples/TextureArrayPSglsles
+	delegate Examples/TextureArrayPShlsl4
 	default_params
 	{
 		param_named TextureArrayTex int 0
 	}
 }
 
-fragment_program Examples/TextureArrayPShlsl4 hlsl
-{
-	entry_point textureArray_p
-	source Example_TextureArrayPS.hlsl4
-	target ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
-}
-
 material Examples/TextureArray
 {
-	technique HLSL4
+	technique
 	{
 		pass
 		{
-			vertex_program_ref Examples/TextureArrayVScg
+			vertex_program_ref Examples/TextureArrayVS
 			{
 			}
 
-			fragment_program_ref Examples/TextureArrayPShlsl4
+			fragment_program_ref Examples/TextureArrayPS
 			{
 			}
 		}
 	}
-
-	technique GLSL
-	{
-		pass
-		{
-			vertex_program_ref Examples/TextureArrayVSglsl
-			{
-			}
-
-			fragment_program_ref Examples/TextureArrayPSglsl
-			{
-			}
-		}
-	}
-
-	technique GLSLES
-	{
-		pass
-		{
-			vertex_program_ref Examples/TextureArrayVSglsl
-			{
-			}
-
-			fragment_program_ref Examples/TextureArrayPSglsles
-			{
-			}
-		}
-	}
-
 }

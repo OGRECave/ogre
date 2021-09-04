@@ -83,7 +83,7 @@ struct Sampler2DArray
 #define SAMPLER2DARRAY(name, reg) \
     Texture2DArray name ## Tex : register(t ## reg);\
     SamplerState name ## State : register(s ## reg);\
-    static Sampler2DShadow name = {name ## Tex, name ## State}
+    static Sampler2DArray name = {name ## Tex, name ## State}
 
 float tex2Dcmp(Sampler2DShadow s, float3 v) { return s.t.SampleCmpLevelZero(s.s, v.xy, v.z); }
 float4 tex2DARRAY(Sampler2DArray s, float3 v) { return s.t.Sample(s.s, v); }
