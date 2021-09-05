@@ -1324,8 +1324,7 @@ namespace Ogre {
                         clonedEmitter->setEmitted(emitter->isEmitted()); // is always 'true' by the way, but just in case
 
                         // Initially deactivate the emitted emitter if duration/repeat_delay are set
-                        if (clonedEmitter->getDuration() > 0.0f && 
-                            (clonedEmitter->getRepeatDelay() > 0.0f || clonedEmitter->getMinRepeatDelay() > 0.0f))
+                        if (clonedEmitter->getDuration() != 0.0f && clonedEmitter->getRepeatDelay() > 0.0f)
                             clonedEmitter->setEnabled(false);
 
                         // Add cloned emitters to the pool
