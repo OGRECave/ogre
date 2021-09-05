@@ -83,6 +83,7 @@ void CGProgramWriter::initializeStringMaps()
     mParamSemanticMap[Parameter::SPS_TEXTURE_COORDINATES] = "TEXCOORD";
     mParamSemanticMap[Parameter::SPS_BINORMAL] = "BINORMAL";
     mParamSemanticMap[Parameter::SPS_TANGENT] = "TANGENT";
+    mParamSemanticMap[Parameter::SPS_FRONT_FACING] = "VFACE";
     mParamSemanticMap[Parameter::SPS_UNKNOWN] = "";
 }
 

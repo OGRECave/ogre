@@ -1,0 +1,16 @@
+material Tests/TwoSidedLighting
+{
+	technique
+	{
+		pass
+		{
+			diffuse 0 0.0 0.8
+			specular 0.8 0 0 128
+			cull_hardware none
+			rtshader_system
+			{
+				lighting_stage per_pixel two_sided
+			}
+		}
+	}
+}

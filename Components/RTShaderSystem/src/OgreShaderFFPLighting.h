@@ -200,6 +200,7 @@ protected:
     // Specular component enabled/disabled.
     bool mSpecularEnable;
     bool mNormalisedEnable;
+    bool mTwoSidedLighting;
     // Light list.
     LightParamsList mLightParamsList;
     // World view matrix parameter.

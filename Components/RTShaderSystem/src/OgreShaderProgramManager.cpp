@@ -415,49 +415,43 @@ void ProgramManager::destroyGpuProgram(GpuProgramPtr& gpuProgram)
 //-----------------------------------------------------------------------
 void ProgramManager::synchronizePixelnToBeVertexOut( ProgramSet* programSet )
 {
-    Program* vsProgram = programSet->getCpuProgram(GPT_VERTEX_PROGRAM);
-    Program* psProgram = programSet->getCpuProgram(GPT_FRAGMENT_PROGRAM);
+    Function* vertexMain = programSet->getCpuProgram(GPT_VERTEX_PROGRAM)->getMain();
+    Function* pixelMain = programSet->getCpuProgram(GPT_FRAGMENT_PROGRAM)->getMain();
 
-    // first find the vertex shader
-    Function* vertexMain = vsProgram->getEntryPointFunction();
-    Function* pixelMain = psProgram->getEntryPointFunction();;
+    // save the pixel program original input parameters
+    auto pixelOriginalInParams = pixelMain->getInputParameters();
 
-    if(pixelMain)
+    // set the pixel Input to be the same as the vertex prog output
+    pixelMain->deleteAllInputParameters();
+
+    // Loop the vertex shader output parameters and make sure that
+    //   all of them exist in the pixel shader input.
+    // If the parameter type exist in the original output - use it
+    // If the parameter doesn't exist - use the parameter from the
+    //   vertex shader input.
+    // The order will be based on the vertex shader parameters order
+    // Write output parameters.
+    for (const auto& curOutParemter : vertexMain->getOutputParameters())
     {
-        // save the pixel program original input parameters
-        const ShaderParameterList pixelOriginalInParams = pixelMain->getInputParameters();
+        ParameterPtr paramToAdd = Function::_getParameterBySemantic(
+            pixelOriginalInParams, curOutParemter->getSemantic(), curOutParemter->getIndex());
 
-        // set the pixel Input to be the same as the vertex prog output
-        pixelMain->deleteAllInputParameters();
+        pixelOriginalInParams.erase(
+            std::remove(pixelOriginalInParams.begin(), pixelOriginalInParams.end(), paramToAdd),
+            pixelOriginalInParams.end());
 
-        // Loop the vertex shader output parameters and make sure that
-        //   all of them exist in the pixel shader input.
-        // If the parameter type exist in the original output - use it
-        // If the parameter doesn't exist - use the parameter from the 
-        //   vertex shader input.
-        // The order will be based on the vertex shader parameters order 
-        // Write output parameters.
-        ShaderParameterConstIterator it;
-        if(vertexMain)
+        if (!paramToAdd)
         {
-            const ShaderParameterList& outParams = vertexMain->getOutputParameters();
-            for (it=outParams.begin(); it != outParams.end(); ++it)
-            {
-                ParameterPtr curOutParemter = *it;
-                ParameterPtr paramToAdd = Function::_getParameterBySemantic(
-                    pixelOriginalInParams, 
-                    curOutParemter->getSemantic(), 
-                    curOutParemter->getIndex());
-
-                if (!paramToAdd)
-                {
-                    // param not found - we will add the one from the vertex shader
-                    paramToAdd = curOutParemter; 
-                }
-
-                pixelMain->addInputParameter(paramToAdd);
-            }
+            // param not found - we will add the one from the vertex shader
+            paramToAdd = curOutParemter;
         }
+
+        pixelMain->addInputParameter(paramToAdd);
+    }
+
+    for(const auto& paramToAdd : pixelOriginalInParams)
+    {
+        pixelMain->addInputParameter(paramToAdd);
     }
 }
 
