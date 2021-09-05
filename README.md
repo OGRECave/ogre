@@ -19,7 +19,7 @@ classes.
 | MSVC | [![Build status](https://ci.appveyor.com/api/projects/status/kcki7y0n1ahrggdw/branch/master?svg=true)](https://ci.appveyor.com/project/paroj/ogre-bsrh7/branch/master) |
 
 ## Index Of Contents
-* [What's New?](Docs/1.12-Notes.md)  
+* [What's New?](Docs/13-Notes.md)
 A summary of the new and altered features in this release.
 * [Building the core OGRE libraries](https://ogrecave.github.io/ogre/api/latest/building-ogre.html)  
 If you're using the full source release, this will help you build it. If you're using a precompiled SDK then most of the work has already been done for you, and you should use the sample projects to see how to compile your own code against OGRE.
