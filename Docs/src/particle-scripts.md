@@ -228,11 +228,34 @@ format: texture_sheet_size &lt;stacks&gt; &lt;slices&gt;
 
 Particle emitters are classified by ’type’ e.g. ’Point’ emitters emit from a single point whilst ’Box’ emitters emit randomly from an area. New emitters can be added to Ogre by creating plugins. You add an emitter to a system by nesting another section within it, headed with the keyword ’emitter’ followed by the name of the type of emitter (case sensitive). Ogre currently supports ’Point’, ’Box’, ’Cylinder’, ’Ellipsoid’, ’HollowEllipsoid’ and ’Ring’ emitters.
 
-It is also possible to ’emit emitters’ - that is, have new emitters spawned based on the position of particles. See @ref Emitting-Emitters
+@see @ref Particle-Affectors
 
-<a name="Particle-Emitter-Universal-Attributes"></a>
+## Emitting Emitters {#Emitting-Emitters}
 
-## Particle Emitter Universal Attributes
+It is possible to ’emit emitters’ - that is, have new emitters spawned based on the position of particles,, for example to product ’firework’ style effects.
+
+This is controlled via the following directives:
+
+<dl compact="compact">
+<dt>emit\_emitter\_quota</dt> <dd>
+
+This parameter is a system-level parameter telling the system how many emitted emitters may be in use at any one time. This is just to allow for the space allocation process.
+
+</dd> <dt>name</dt> <dd>
+
+This parameter is an emitter-level parameter, giving a name to an emitter. This can then be referred to in another emitter as the new emitter type to spawn.
+
+</dd> <dt>emit\_emitter</dt> <dd>
+
+This is an emitter-level parameter, and if specified, it means that the particles spawned by this emitter, are themselves emitters of the named type.
+
+</dd> </dl>
+
+<a name="Particle-Emitter-Attributes"></a> <a name="Particle-Emitter-Attributes-1"></a>
+
+## Common Emitter Attributes
+
+This section describes the common attributes of all particle emitters. Specific emitter types may also support their own extra attributes.
 
 -   [angle](#angle)
 -   [colour](#colour)
@@ -254,14 +277,6 @@ It is also possible to ’emit emitters’ - that is, have new emitters spawned 
 -   [repeat\_delay](#repeat_005fdelay)
 -   [repeat\_delay\_min](#repeat_005fdelay_005fmin)
 -   [repeat\_delay\_max](#repeat_005fdelay_005fmax)
-
-@see @ref Particle-Affectors
-
-<a name="Particle-Emitter-Attributes"></a> <a name="Particle-Emitter-Attributes-1"></a>
-
-## Particle Emitter Attributes
-
-This section describes the common attributes of all particle emitters. Specific emitter types may also support their own extra attributes.
 
 <a name="angle"></a><a name="angle-1"></a>
 
@@ -486,29 +501,6 @@ The width of the inner area which does not emit any particles.
 </dd> <dt>inner\_height</dt> <dd>
 
 The height of the inner area which does not emit any particles.
-
-</dd> </dl> 
-
-See also: [Particle Scripts](#Particle-Scripts), [Particle Emitters](#Particle-Emitters)
-
-## Emitting Emitters {#Emitting-Emitters}
-
-It is possible to spawn new emitters on the expiry of particles, for example to product ’firework’ style effects.
-
-This is controlled via the following directives:
-
-<dl compact="compact">
-<dt>emit\_emitter\_quota</dt> <dd>
-
-This parameter is a system-level parameter telling the system how many emitted emitters may be in use at any one time. This is just to allow for the space allocation process.
-
-</dd> <dt>name</dt> <dd>
-
-This parameter is an emitter-level parameter, giving a name to an emitter. This can then be referred to in another emitter as the new emitter type to spawn when an emitted particle dies.
-
-</dd> <dt>emit\_emitter</dt> <dd>
-
-This is an emitter-level parameter, and if specified, it means that when particles emitted by this emitter die, they spawn a new emitter of the named type.
 
 </dd> </dl>
 
