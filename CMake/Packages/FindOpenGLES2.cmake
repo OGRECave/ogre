@@ -23,6 +23,8 @@
 #  EGL_INCLUDE_DIR  - the EGL include directory
 #  EGL_LIBRARIES    - Link these to use EGL
 
+include(FindPkgMacros)
+
 IF(APPLE)
   create_search_paths(/Developer/Platforms)
   findpkg_framework(OpenGLES2)
