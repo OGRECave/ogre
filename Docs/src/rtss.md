@@ -59,7 +59,7 @@ Example: `transform_stage instanced 1`
 Force a specific lighting model.
 
 @par
-Format: `lighting_stage <ffp|per_pixel|normal_map|gbuffer> [normalised]`
+Format: `lighting_stage <ffp|per_pixel|normal_map|gbuffer> [two_sided] [normalised]`
 @par
 Format2: `lighting_stage normal_map <texturename> [tangent_space|object_space|parallax] [coordinateIndex] [samplerName]`
 @par
@@ -67,7 +67,8 @@ Format3: `lighting_stage gbuffer <target_layout> [target_layout]`
 @par
 Example: `lighting_stage normal_map Panels_Normal_Tangent.png tangent_space 0 SamplerToUse`
 
-@param normalised with @c ffp or @c per_pixel @copybrief Ogre::RTShader::FFPLighting::setNormaliseEnabled @copydetails Ogre::RTShader::FFPLighting::setNormaliseEnabled
+@param two_sided compute lighting on both sides of the surface, when culling is disabled.
+@param normalised with @c ffp or @c per_pixel normalise the blinn-phong reflection model to make it energy conserving - see [this for details](http://www.rorydriscoll.com/2009/01/25/energy-conservation-in-games/)
 @param texturename normal map to use with @c normal_map
 @param target_layout with @c gbuffer, this specifies the data to be written into one or two MRT targets. Possible values are @c depth, @c normal, @c viewpos, @c normal_viewdepth and @c diffuse_specular
 

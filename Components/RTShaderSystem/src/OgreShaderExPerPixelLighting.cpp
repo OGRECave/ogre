@@ -41,6 +41,16 @@ const String& PerPixelLighting::getType() const
     return Type;
 }
 
+bool PerPixelLighting::setParameter(const String& name, const String& value)
+{
+	if(name == "two_sided")
+	{
+		return StringConverter::parse(value, mTwoSidedLighting);
+	}
+
+	return FFPLighting::setParameter(name, value);
+}
+
 //-----------------------------------------------------------------------
 bool PerPixelLighting::resolveParameters(ProgramSet* programSet)
 {
@@ -210,6 +220,11 @@ bool PerPixelLighting::resolvePerLightParameters(ProgramSet* programSet)
         }
     }
 
+    if(mTwoSidedLighting)
+    {
+        mFrontFacing = psMain->resolveInputParameter(Parameter::SPC_FRONT_FACING);
+    }
+
     return true;
 }
 
@@ -247,6 +262,9 @@ bool PerPixelLighting::addFunctionInvocations(ProgramSet* programSet)
 
     if (mToView)
         stage.mul(Vector3(-1), mViewPos, mToView);
+
+    if(mFrontFacing)
+        stage.callFunction("SGX_Flip_Backface_Normal", mFrontFacing, mViewNormal);
 
     // Add per light functions.
     for (const auto& lp : mLightParamsList)
@@ -321,27 +339,24 @@ SubRenderState* PerPixelLightingFactory::createInstance(ScriptCompiler* compiler
     auto it = prop->values.begin();
     String val;
 
-    if(!SGScriptTranslator::getString(*it, &val))
+    if(!SGScriptTranslator::getString(*it++, &val))
     {
         compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
         return NULL;
     }
 
-    SubRenderState* ret = NULL;
-    if (val == "per_pixel")
-    {
-        ret = createOrRetrieveInstance(translator);
-    }
+    if (val != "per_pixel")
+        return NULL;
 
-    if(ret && prop->values.size() >= 2)
+    auto ret = createOrRetrieveInstance(translator);
+
+    // process the flags
+    while(it != prop->values.end())
     {
-        if(!SGScriptTranslator::getString(*it, &val))
+        if (!SGScriptTranslator::getString(*it++, &val) || !ret->setParameter(val, "true"))
         {
-            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
-            return NULL;
+            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line, val);
         }
-
-        static_cast<PerPixelLighting*>(ret)->setNormaliseEnabled(val == "normalised");
     }
 
     return ret;

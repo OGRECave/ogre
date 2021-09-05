@@ -56,6 +56,8 @@ public:
     */
     virtual const String& getType() const;
 
+    bool setParameter(const String& name, const String& value) override;
+
     static String Type;
 
 // Protected methods
@@ -99,6 +101,7 @@ protected:
     ParameterPtr mVSOutViewPos;
     // Vertex shader output normal.
     ParameterPtr mVSOutNormal;
+    ParameterPtr mFrontFacing;
 };
 
 

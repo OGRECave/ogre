@@ -40,6 +40,7 @@ FFPLighting::FFPLighting()
 	mTrackVertexColourType			= TVC_NONE;
 	mSpecularEnable					= false;
 	mNormalisedEnable               = false;
+	mTwoSidedLighting               = false;
 }
 
 //-----------------------------------------------------------------------
@@ -410,6 +411,7 @@ void FFPLighting::copyFrom(const SubRenderState& rhs)
 
 	setLightCount(rhsLighting.getLightCount());
 	mNormalisedEnable = rhsLighting.mNormalisedEnable;
+	mTwoSidedLighting = rhsLighting.mTwoSidedLighting;
 }
 
 //-----------------------------------------------------------------------
@@ -478,10 +480,9 @@ bool FFPLighting::preAddToRenderState(const RenderState* renderState, Pass* srcP
 
 bool FFPLighting::setParameter(const String& name, const String& value)
 {
-	if(name == "normalise")
+	if(name == "normalise" || name == "normalised") // allow both spelling variations
 	{
-		setNormaliseEnabled(StringConverter::parseBool(value));
-		return true;
+		return StringConverter::parse(value, mNormalisedEnable);
 	}
 
 	return false;

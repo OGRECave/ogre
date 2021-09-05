@@ -67,7 +67,9 @@ public:
         /// Binormal (Y axis if normal is Z)
         SPS_BINORMAL = 8,
         /// Tangent (X axis if normal is Z)
-        SPS_TANGENT = 9
+        SPS_TANGENT = 9,
+        /// VFACE
+        SPS_FRONT_FACING
     };
 
     /** Shader parameter content
@@ -302,6 +304,9 @@ public:
 
         /// point sprite size
         SPC_POINTSPRITE_SIZE,
+
+        /// gl_FrontFacing
+        SPC_FRONT_FACING,
 
         /// Reserved custom content range to be used by user custom shader extensions.
         SPC_CUSTOM_CONTENT_BEGIN    = 1000,

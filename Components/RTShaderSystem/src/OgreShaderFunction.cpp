@@ -99,6 +99,8 @@ static GpuConstantType typeFromContent(Parameter::Content content)
     case Parameter::SPC_POINTSPRITE_SIZE:
     case Parameter::SPC_DEPTH_VIEW_SPACE:
         return GCT_FLOAT1;
+    case Parameter::SPC_FRONT_FACING:
+        return GCT_FLOAT1;
     default:
         OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "cannot derive type from content");
         break;
@@ -122,6 +124,8 @@ static Parameter::Semantic semanticFromContent(Parameter::Content content, bool 
         return Parameter::SPS_TEXTURE_COORDINATES;
     case Parameter::SPC_BINORMAL_OBJECT_SPACE:
         return Parameter::SPS_BINORMAL;
+    case Parameter::SPC_FRONT_FACING:
+        return Parameter::SPS_FRONT_FACING;
     case Parameter::SPC_TANGENT_OBJECT_SPACE:
         if(!isVSOut) return Parameter::SPS_TANGENT;
         OGRE_FALLTHROUGH;
@@ -236,6 +240,9 @@ static String getParameterName(const char* prefix, Parameter::Semantic semantic,
         break;
     case Parameter::SPS_TANGENT:
         name = "Tangent";
+        break;
+    case Parameter::SPS_FRONT_FACING:
+        name = "FrontFacing";
         break;
     case Parameter::SPS_UNKNOWN:
         name = "Param";

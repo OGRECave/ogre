@@ -268,6 +268,11 @@ void GLSLProgramWriter::writeInputParameters(std::ostream& os, Function* functio
                 pParam->_rename("gl_FragCoord");
                 continue;
             }
+            else if(paramContent == Parameter::SPC_FRONT_FACING)
+            {
+                pParam->_rename("gl_FrontFacing");
+                continue;
+            }
 
             os << "IN(";
             os << mGpuConstTypeMap[pParam->getType()];
