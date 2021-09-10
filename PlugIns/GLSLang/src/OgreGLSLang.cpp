@@ -274,11 +274,22 @@ GLSLangProgram::GLSLangProgram(ResourceManager* creator, const String& name, Res
                                const String& group, bool isManual, ManualResourceLoader* loader)
     : HighLevelGpuProgram(creator, name, handle, group, isManual, loader)
 {
+    if (createParamDictionary("glslangProgram"))
+    {
+        setupBaseParamDictionary();
+    }
 }
 
 const String& GLSLangProgram::getLanguage(void) const
 {
     return sLanguageName;
+}
+
+bool GLSLangProgram::isSupported() const
+{   bool ret = !mCompileError;
+    if(mSyntaxCode != "glslang") // in case this is provided by user
+        ret = ret && GpuProgramManager::isSyntaxSupported(mSyntaxCode);
+    return ret;
 }
 
 void GLSLangProgram::createLowLevelImpl()
@@ -287,7 +298,7 @@ void GLSLangProgram::createLowLevelImpl()
         return;
 
     mAssemblerProgram =
-        GpuProgramManager::getSingleton().createProgram(mName + "/Delegate", mGroup, "gl_spirv", mType);
+        GpuProgramManager::getSingleton().createProgram(mName + "/Delegate", mGroup, mSyntaxCode, mType);
     String assemblyStr((char*)mAssembly.data(), mAssembly.size() * sizeof(uint32));
     mAssemblerProgram->setSource(assemblyStr);
     mAssembly.clear(); // delegate stores the data now
@@ -298,13 +309,29 @@ void GLSLangProgram::prepareImpl()
 {
     HighLevelGpuProgram::prepareImpl();
 
+    if (mSyntaxCode == "glslang")
+    {
+        // find actual syntax code
+        for(auto lang : {"gl_spirv", "spirv"})
+        {
+            if(GpuProgramManager::isSyntaxSupported(lang))
+            {
+                mSyntaxCode = lang;
+                break;
+            }
+        }
+    }
+
     auto stage = getShLanguage(mType);
     glslang::TShader shader(stage);
     const char* source = mSource.c_str();
     const char* name = mFilename.empty() ? NULL : mFilename.c_str();
 
     shader.setStringsWithLengthsAndNames(&source, NULL, &name, 1);
-    shader.setEnvClient(glslang::EShClientOpenGL, glslang::EShTargetOpenGL_450);
+    if(mSyntaxCode == "gl_spirv")
+        shader.setEnvClient(glslang::EShClientOpenGL, glslang::EShTargetOpenGL_450);
+    else if(mSyntaxCode == "spirv")
+        shader.setEnvClient(glslang::EShClientVulkan, glslang::EShTargetVulkan_1_0);
 
     // require 430 for explicit uniform location
     if (!shader.parse(&DefaultTBuiltInResource, 430, false, EShMsgSpvRules))
