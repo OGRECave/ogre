@@ -40,7 +40,7 @@ public:
                    bool isManual, ManualResourceLoader* loader);
     const String& getLanguage(void) const override;
 
-    bool isSupported() const override { return !mCompileError; }
+    bool isSupported() const override;
 };
 
 /** Factory class for GLSLang programs. */
