@@ -506,7 +506,8 @@ namespace Ogre {
         Particle* pParticle;
         ParticleEmitter* pParticleEmitter;
 
-        for (auto i = mActiveParticles.begin(); i != mActiveParticles.end();)
+        auto iend = mActiveParticles.end();
+        for (auto i = mActiveParticles.begin(); i != iend;)
         {
             pParticle = static_cast<Particle*>(*i);
             if (pParticle->mTimeToLive < timeElapsed)
@@ -531,9 +532,8 @@ namespace Ogre {
                     removeFromActiveEmittedEmitters (pParticleEmitter);
                 }
 
-                // And erase from mActiveParticles
-                *i = mActiveParticles.back();
-                mActiveParticles.pop_back();
+                // And remove from mActiveParticles
+                *i = std::move(*(--iend));
             }
             else
             {
@@ -541,8 +541,9 @@ namespace Ogre {
                 pParticle->mTimeToLive -= timeElapsed;
                 ++i;
             }
-
         }
+
+        mActiveParticles.erase(iend, mActiveParticles.end());
     }
     //-----------------------------------------------------------------------
     void ParticleSystem::_triggerEmitters(Real timeElapsed)
