@@ -69,6 +69,8 @@ Nevertheless, there is fallback code so you still can use old `.material` files.
 
 Glyph placement has been improved. Previously Ogre only considered glyph width for typesetting. However, this did not take into account that glphs can overlap, as happens with italic fonts. Therefore, there is now an independent property `GlyphInfo::advance`. Ogre internal code was updated for this change. However, if you directly access the texture atlas, you have to update your code.
 
+An Exception is now thrown, when querying a `GlyphInfo` of a Font that is not loaded. Make sure to call `font->load()` before querying.
+
 ## RTSS
 There is now a  RTSS stage for Weighted, blended Order Independent Transparency, which implements the according algorithm by Morgan McGuire.
 See the transparency Sample for how to integrate it into your pipeline.
