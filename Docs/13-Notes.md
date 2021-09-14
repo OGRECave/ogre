@@ -93,6 +93,10 @@ Atomic buffers are no longer supported. They were only partially implemented, wh
 
 Separate shader objects are now used by default, if available. This enables an improved shader parser using the GL introspection API and allows mixing GLSL and SPIRV shaders.
 
+## D3D9
+
+The Option "Multi device memory hint" was renamed to "Auto hardware buffer management" as it is generally enables memory recovery on device loss.
+
 ## GLSLang Plugin
 
 This new Plugin enables Ogre to automatically compile GLSL shaders to SPIRV that in turn will be loaded by GL3+.
