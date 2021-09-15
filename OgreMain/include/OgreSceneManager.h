@@ -1272,17 +1272,14 @@ namespace Ogre {
         */
         virtual void invalidatePerFrameScissorRectCache();
 
-        /** Removes the named light from the scene and destroys it.
+        /** Removes the light from the scene and destroys it.
             @remarks
                 Any pointers held to this light after calling this method will be invalid.
         */
         virtual void destroyLight(const String& name);
 
-        /** Removes the light from the scene and destroys it based on a pointer.
-            @remarks
-                Any pointers held to this light after calling this method will be invalid.
-        */
-        virtual void destroyLight(Light* light);
+        /// @overload
+        void destroyLight(Light* light) { destroyMovableObject(light); }
         /** Removes and destroys all lights in the scene.
         */
         virtual void destroyAllLights(void);
@@ -1491,7 +1488,7 @@ namespace Ogre {
             @see
                 SceneManager::clearScene
         */
-        void destroyEntity(Entity* ent);
+        void destroyEntity(MovableObject* ent) { destroyMovableObject(ent); }
 
         /// @overload
         void destroyEntity(const String& name);
@@ -1530,7 +1527,7 @@ namespace Ogre {
 
         /** Removes & destroys a ManualObject from the SceneManager.
         */
-        void destroyManualObject(ManualObject* obj);
+        void destroyManualObject(MovableObject* obj) {  destroyMovableObject(obj); }
         /// @overload
         void destroyManualObject(const String& name);
         /** Removes & destroys all ManualObjects from the SceneManager.
@@ -1560,7 +1557,7 @@ namespace Ogre {
 
         /** Removes & destroys a BillboardChain from the SceneManager.
         */
-        void destroyBillboardChain(BillboardChain* obj);
+        void destroyBillboardChain(MovableObject* obj) { destroyMovableObject(obj); }
         /// @overload
         void destroyBillboardChain(const String& name);
         /** Removes & destroys all BillboardChains from the SceneManager.
@@ -1586,7 +1583,7 @@ namespace Ogre {
 
         /** Removes & destroys a RibbonTrail from the SceneManager.
         */
-        void destroyRibbonTrail(RibbonTrail* obj);
+        void destroyRibbonTrail(MovableObject* obj) { destroyMovableObject(obj); }
         /// @overload
         void destroyRibbonTrail(const String& name);
         /** Removes & destroys all RibbonTrails from the SceneManager.
@@ -1670,9 +1667,8 @@ namespace Ogre {
 
         /** Removes & destroys a ParticleSystem from the SceneManager.
         */
-        void destroyParticleSystem(ParticleSystem* obj);
-        /** Removes & destroys a ParticleSystem from the SceneManager.
-        */
+        void destroyParticleSystem(MovableObject* obj) { destroyMovableObject(obj); }
+        /// @overload
         void destroyParticleSystem(const String& name);
         /** Removes & destroys all ParticleSystems from the SceneManager.
         */
@@ -2234,7 +2230,7 @@ namespace Ogre {
                 to a SceneNode. It may be safer to wait to clear the whole
                 scene. If you are unsure, use clearScene.
         */
-        void destroyBillboardSet(BillboardSet* set);
+        void destroyBillboardSet(MovableObject* set) { destroyMovableObject(set); }
 
         /// @overload
         void destroyBillboardSet(const String& name);
