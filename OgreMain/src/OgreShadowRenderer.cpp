@@ -53,6 +53,7 @@ mShadowIndexBufferSize(51200),
 mShadowIndexBufferUsedSize(0),
 mShadowTextureCustomCasterPass(0),
 mShadowTextureCustomReceiverPass(0),
+mFullScreenQuad(0),
 mShadowAdditiveLightClip(false),
 mDebugShadows(false),
 mShadowMaterialInitDone(false),
@@ -260,7 +261,7 @@ void SceneManager::ShadowRenderer::renderModulativeStencilShadowedQueueGroupObje
             mDestRenderSystem->setStencilCheckEnabled(true);
             // NB we render where the stencil is not equal to zero to render shadows, not lit areas
             mDestRenderSystem->setStencilBufferParams(CMPF_NOT_EQUAL, 0);
-            mSceneManager->renderSingleObject(mFullScreenQuad.get(), mShadowModulativePass, false, false);
+            mSceneManager->renderSingleObject(mFullScreenQuad, mShadowModulativePass, false, false);
             // Reset stencil params
             mDestRenderSystem->setStencilBufferParams();
             mDestRenderSystem->setStencilCheckEnabled(false);
@@ -1499,7 +1500,7 @@ void SceneManager::ShadowRenderer::initShadowVolumeMaterials()
     // Also init full screen quad while we're at it
     if (!mFullScreenQuad)
     {
-        mFullScreenQuad.reset(new Rectangle2D());
+        mFullScreenQuad = mSceneManager->createScreenSpaceRect();
         mFullScreenQuad->setCorners(-1,1,1,-1);
     }
 

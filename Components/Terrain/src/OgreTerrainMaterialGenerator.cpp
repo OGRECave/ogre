@@ -81,7 +81,6 @@ namespace Ogre
             mCompositeMapLight = 0;
             mLightNode = 0;
         }
-        delete mCompositeMapPlane;
     }
     //---------------------------------------------------------------------
     void TerrainMaterialGenerator::_renderCompositeMap(size_t size, 
@@ -110,7 +109,7 @@ namespace Ogre
 
 
             // set up scene
-            mCompositeMapPlane = new Rectangle2D(true);
+            mCompositeMapPlane = mCompositeMapSM->createScreenSpaceRect(true);
             mCompositeMapPlane->setCorners(-1, 1, 1, -1);
             mCompositeMapPlane->setUVs({0 - hOffset, 0 - vOffset}, {0 - hOffset, 1 - vOffset},
                                        {1 - hOffset, 0 - vOffset}, {1 - hOffset, 1 - vOffset});

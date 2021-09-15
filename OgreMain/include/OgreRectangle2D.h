@@ -90,6 +90,7 @@ namespace Ogre {
 
         Real getBoundingRadius(void) const { return 0; }
 
+        const String& getMovableType() const override;
     };
     /** @} */
     /** @} */

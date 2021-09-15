@@ -84,6 +84,8 @@ extern "C" {
 #include "OgreQuaternion.h"
 #include "OgreRadixSort.h"
 #include "OgreRay.h"
+#include "OgreRectangle2D.h"
+#include "OgreBuiltinMovableFactories.h"
 #include "OgreRenderSystem.h"
 #include "OgreResourceGroupManager.h"
 #include "OgreResource.h"

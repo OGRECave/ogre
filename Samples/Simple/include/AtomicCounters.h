@@ -21,8 +21,6 @@ using namespace OgreBites;
 class _OgreSampleClassExport Sample_AtomicCounters : public SdkSample
 {
  public:
-    std::unique_ptr<Rectangle2D> mRect;
-
     Sample_AtomicCounters()
     {
         mInfo["Title"] = "Atomic Counters";
@@ -49,12 +47,12 @@ class _OgreSampleClassExport Sample_AtomicCounters : public SdkSample
         float w = 480.0 / mWindow->getWidth();
         float h = 480.0 / mWindow->getHeight();
 
-        mRect.reset(new Rectangle2D);
-        mRect->setCorners(-w, h, w, -h);
-        mRect->setBoundingBox(AxisAlignedBox::BOX_INFINITE);
+        auto rect = mSceneMgr->createScreenSpaceRect();
+        rect->setCorners(-w, h, w, -h);
+        rect->setBoundingBox(AxisAlignedBox::BOX_INFINITE);
 
         MaterialPtr mat = MaterialManager::getSingleton().getByName("Example/RasterizationOrder");
-        mRect->setMaterial(mat);
-        mSceneMgr->getRootSceneNode()->createChildSceneNode()->attachObject(mRect.get());
+        rect->setMaterial(mat);
+        mSceneMgr->getRootSceneNode()->createChildSceneNode()->attachObject(rect);
     }
 };
