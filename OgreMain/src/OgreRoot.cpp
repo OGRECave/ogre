@@ -222,6 +222,8 @@ namespace Ogre {
         addMovableObjectFactory(mRibbonTrailFactory.get());
         mStaticGeometryFactory.reset(new StaticGeometryFactory());
         addMovableObjectFactory(mStaticGeometryFactory.get());
+        mRectangle2DFactory.reset(new Rectangle2DFactory());
+        addMovableObjectFactory(mRectangle2DFactory.get());
 
         // Load plugins
         if (!pluginFileName.empty())

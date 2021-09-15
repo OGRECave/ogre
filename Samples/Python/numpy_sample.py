@@ -3,7 +3,7 @@ import Ogre.Bites
 import Ogre.RTShader
 
 import numpy as np
-#from matplotlib import pyplot
+from matplotlib import pyplot
 
 def main():
     app = Ogre.Bites.ApplicationContext("PySample")
@@ -33,7 +33,7 @@ def main():
     rpass.setLightingEnabled(False)
     rpass.createTextureUnitState("gradient")
 
-    rect = Ogre.Rectangle2D(True)
+    rect = scn_mgr.createScreenSpaceRect(True)
     rect.setCorners(-0.5, 0.5, 0.5, -0.5) # in normalized screen space
     rect.setMaterial(mat)
     rect.setBoundingBox(Ogre.AxisAlignedBox.BOX_INFINITE)

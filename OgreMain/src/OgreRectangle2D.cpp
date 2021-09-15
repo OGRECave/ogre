@@ -26,7 +26,6 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 #include "OgreStableHeaders.h"
-#include "OgreRectangle2D.h"
 
 namespace Ogre {
 #define POSITION_BINDING 0
@@ -224,6 +223,23 @@ namespace Ogre {
         *xform = Matrix4::IDENTITY;
     }
 
+    const String& Rectangle2D::getMovableType() const
+    {
+        return Rectangle2DFactory::FACTORY_TYPE_NAME;
+    }
 
+    const String Rectangle2DFactory::FACTORY_TYPE_NAME = "Rectangle2D";
+
+    MovableObject* Rectangle2DFactory::createInstanceImpl(const String& name, const NameValuePairList* params)
+    {
+        bool includeTextureCoords = false;
+        if (params)
+        {
+            auto ni = params->find("includeTextureCoords");
+            if (ni != params->end())
+                StringConverter::parse(ni->second, includeTextureCoords);
+        }
+        return new Rectangle2D(includeTextureCoords);
+    }
 }
 

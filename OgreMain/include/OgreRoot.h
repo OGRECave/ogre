@@ -111,6 +111,7 @@ namespace Ogre
         std::unique_ptr<MovableObjectFactory> mLightFactory;
         std::unique_ptr<MovableObjectFactory> mEntityFactory;
         std::unique_ptr<MovableObjectFactory> mStaticGeometryFactory;
+        std::unique_ptr<MovableObjectFactory> mRectangle2DFactory;
 
         std::unique_ptr<ParticleSystemManager> mParticleManager;
         std::unique_ptr<LodStrategyManager> mLodStrategyManager;

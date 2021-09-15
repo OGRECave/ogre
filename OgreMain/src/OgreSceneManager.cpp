@@ -509,6 +509,26 @@ void SceneManager::destroyAllManualObjects(void)
 {
     destroyAllMovableObjectsByType(ManualObjectFactory::FACTORY_TYPE_NAME);
 }
+Rectangle2D* SceneManager::createScreenSpaceRect(const String& name, bool includeTextureCoords)
+{
+    NameValuePairList params;
+    if(includeTextureCoords)
+        params["includeTextureCoords"] = "true";
+    return static_cast<Rectangle2D*>(createMovableObject(name, Rectangle2DFactory::FACTORY_TYPE_NAME, &params));
+}
+Rectangle2D* SceneManager::createScreenSpaceRect(bool includeTextureCoords)
+{
+    return createScreenSpaceRect(mMovableNameGenerator.generate(), includeTextureCoords);
+}
+
+bool SceneManager::hasScreenSpaceRect(const String& name) const
+{
+    return hasMovableObject(name, Rectangle2DFactory::FACTORY_TYPE_NAME);
+}
+Rectangle2D* SceneManager::getScreenSpaceRect(const String& name) const
+{
+    return static_cast<Rectangle2D*>(getMovableObject(name, Rectangle2DFactory::FACTORY_TYPE_NAME));
+}
 //-----------------------------------------------------------------------
 BillboardChain* SceneManager::createBillboardChain(const String& name)
 {
