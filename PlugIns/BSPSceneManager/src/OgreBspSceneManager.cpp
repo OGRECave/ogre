@@ -789,11 +789,6 @@ namespace Ogre {
     {
         return OGRE_NEW BspSceneManager(instanceName);
     }
-    //-----------------------------------------------------------------------
-    void BspSceneManagerFactory::destroyInstance(SceneManager* instance)
-    {
-        OGRE_DELETE instance;
-    }
 
 }
 

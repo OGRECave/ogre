@@ -1442,11 +1442,5 @@ namespace Ogre
     {
         return OGRE_NEW PCZSceneManager(instanceName);
     }
-    //-----------------------------------------------------------------------
-    void PCZSceneManagerFactory::destroyInstance(SceneManager* instance)
-    {
-        OGRE_DELETE instance;
-    }
-
 
 }

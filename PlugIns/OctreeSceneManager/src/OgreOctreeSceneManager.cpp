@@ -1135,11 +1135,5 @@ SceneManager* OctreeSceneManagerFactory::createInstance(
 {
     return OGRE_NEW OctreeSceneManager(instanceName);
 }
-//-----------------------------------------------------------------------
-void OctreeSceneManagerFactory::destroyInstance(SceneManager* instance)
-{
-    OGRE_DELETE instance;
-}
-
 
 }
