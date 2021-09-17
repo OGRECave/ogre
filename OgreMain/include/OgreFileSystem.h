@@ -60,8 +60,6 @@ namespace Ogre {
         using ArchiveFactory::createInstance;
 
         Archive *createInstance( const String& name, bool readOnly );
-        /// @copydoc FactoryObj::destroyInstance
-        void destroyInstance(Archive* ptr) { OGRE_DELETE ptr; }
 
         /// Set whether filesystem enumeration will include hidden files or not.
         /// This should be called prior to declaring and/or initializing filesystem
@@ -81,8 +79,6 @@ namespace Ogre {
         const String& getType(void) const;
         /// @copydoc ArchiveFactory::createInstance
         Archive *createInstance( const String& name, bool readOnly );
-        /// @copydoc FactoryObj::destroyInstance
-        void destroyInstance( Archive* ptr) { OGRE_DELETE ptr; }
     private:
         AAssetManager* mAssetMgr;
     };

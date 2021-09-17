@@ -62,7 +62,7 @@ namespace Ogre {
         /** Destroys an object which was created by this factory.
         @param ptr Pointer to the object to destroy
         */
-        virtual void destroyInstance(T* ptr) = 0;
+        virtual void destroyInstance(T* ptr) { delete ptr; }
     };
 
     /** @} */

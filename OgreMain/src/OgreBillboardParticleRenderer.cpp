@@ -248,12 +248,6 @@ namespace Ogre {
         return OGRE_NEW BillboardParticleRenderer();
     }
     //-----------------------------------------------------------------------
-    void BillboardParticleRendererFactory::destroyInstance( 
-        ParticleSystemRenderer* inst)
-    {
-        OGRE_DELETE  inst;
-    }
-    //-----------------------------------------------------------------------
     //-----------------------------------------------------------------------
     String CmdBillboardType::doGet(const void* target) const
     {
