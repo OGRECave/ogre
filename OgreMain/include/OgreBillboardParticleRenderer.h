@@ -158,8 +158,6 @@ namespace Ogre {
         const String& getType() const;
         /// @copydoc FactoryObj::createInstance
         ParticleSystemRenderer* createInstance( const String& name );
-        /// @copydoc FactoryObj::destroyInstance
-        void destroyInstance(ParticleSystemRenderer* ptr);
     };
     /** @} */
     /** @} */

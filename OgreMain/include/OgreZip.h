@@ -63,8 +63,6 @@ namespace Ogre {
         using ArchiveFactory::createInstance;
 
         Archive *createInstance( const String& name, bool readOnly );
-        /// @copydoc FactoryObj::destroyInstance
-        void destroyInstance( Archive* ptr) { OGRE_DELETE ptr; }
     };
 
     /** Specialisation of ZipArchiveFactory for embedded Zip files. */
