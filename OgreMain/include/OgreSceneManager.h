@@ -3523,7 +3523,7 @@ namespace Ogre {
         */
         virtual SceneManager* createInstance(const String& instanceName) = 0;
         /** Destroy an instance of a SceneManager. */
-        virtual void destroyInstance(SceneManager* instance) = 0;
+        virtual void destroyInstance(SceneManager* instance) { delete instance; }
 
     };
 

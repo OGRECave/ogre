@@ -274,11 +274,6 @@ namespace Ogre {
         return OGRE_NEW DefaultSceneManager(instanceName);
     }
     //-----------------------------------------------------------------------
-    void DefaultSceneManagerFactory::destroyInstance(SceneManager* instance)
-    {
-        OGRE_DELETE instance;
-    }
-    //-----------------------------------------------------------------------
     //-----------------------------------------------------------------------
     DefaultSceneManager::DefaultSceneManager(const String& name)
         : SceneManager(name)

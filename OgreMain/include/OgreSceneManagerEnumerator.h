@@ -53,7 +53,6 @@ namespace Ogre {
         /// Factory type name
         static const String FACTORY_TYPE_NAME;
         SceneManager* createInstance(const String& instanceName);
-        void destroyInstance(SceneManager* instance);
     };
 
     /// Default scene manager
