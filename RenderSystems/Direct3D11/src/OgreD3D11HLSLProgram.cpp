@@ -41,7 +41,6 @@ THE SOFTWARE.
 
 namespace Ogre {
     //-----------------------------------------------------------------------
-    D3D11HLSLProgram::CmdEntryPoint D3D11HLSLProgram::msCmdEntryPoint;
     D3D11HLSLProgram::CmdTarget D3D11HLSLProgram::msCmdTarget;
     D3D11HLSLProgram::CmdColumnMajorMatrices D3D11HLSLProgram::msCmdColumnMajorMatrices;
     D3D11HLSLProgram::CmdEnableBackwardsCompatibility D3D11HLSLProgram::msCmdEnableBackwardsCompatibility;
@@ -1254,7 +1253,7 @@ namespace Ogre {
         ResourceHandle handle, const String& group, bool isManual, 
         ManualResourceLoader* loader, D3D11Device & device)
         : HighLevelGpuProgram(creator, name, handle, group, isManual, loader)
-        , mEntryPoint("main"), mDevice(device), mConstantBufferSize(0)
+        , mDevice(device), mConstantBufferSize(0)
         , mColumnMajorMatrices(true), mEnableBackwardsCompatibility(false), mReinterpretingGS(false)
     {
 #if SUPPORT_SM2_0_HLSL_SHADERS == 1
@@ -1266,9 +1265,6 @@ namespace Ogre {
             setupBaseParamDictionary();
             ParamDictionary* dict = getParamDictionary();
 
-            dict->addParameter(ParameterDef("entry_point", 
-                "The entry point for the HLSL program.",
-                PT_STRING),&msCmdEntryPoint);
             dict->addParameter(ParameterDef("target", 
                 "Name of the assembler target to compile down to.",
                 PT_STRING),&msCmdTarget);
@@ -1371,15 +1367,6 @@ namespace Ogre {
     }
 
     //-----------------------------------------------------------------------
-    //-----------------------------------------------------------------------
-    String D3D11HLSLProgram::CmdEntryPoint::doGet(const void *target) const
-    {
-        return static_cast<const D3D11HLSLProgram*>(target)->getEntryPoint();
-    }
-    void D3D11HLSLProgram::CmdEntryPoint::doSet(void *target, const String& val)
-    {
-        static_cast<D3D11HLSLProgram*>(target)->setEntryPoint(val);
-    }
     //-----------------------------------------------------------------------
     String D3D11HLSLProgram::CmdTarget::doGet(const void *target) const
     {

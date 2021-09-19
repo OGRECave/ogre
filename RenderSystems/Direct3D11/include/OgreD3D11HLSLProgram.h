@@ -49,13 +49,6 @@ namespace Ogre {
         , protected D3D11DeviceResource
     {
     public:
-        /// Command object for setting entry point
-        class CmdEntryPoint : public ParamCommand
-        {
-        public:
-            String doGet(const void* target) const;
-            void doSet(void* target, const String& val);
-        };
         /// Command object for setting target assembler
         class CmdTarget : public ParamCommand
         {
@@ -80,7 +73,6 @@ namespace Ogre {
 
     protected:
 
-        static CmdEntryPoint msCmdEntryPoint;
         static CmdTarget msCmdTarget;
         static CmdColumnMajorMatrices msCmdColumnMajorMatrices;
         static CmdEnableBackwardsCompatibility msCmdEnableBackwardsCompatibility;
@@ -100,7 +92,6 @@ namespace Ogre {
         void populateDef(D3D11_SHADER_TYPE_DESC& d3dDesc, GpuConstantDefinition& def) const;
 
         String mTarget;
-        String mEntryPoint;
         bool mColumnMajorMatrices;
         bool mEnableBackwardsCompatibility;
 
@@ -176,10 +167,6 @@ namespace Ogre {
             const String& group, bool isManual, ManualResourceLoader* loader, D3D11Device & device);
         ~D3D11HLSLProgram();
 
-        /** Sets the entry point for this program ie the first method called. */
-        void setEntryPoint(const String& entryPoint) { mEntryPoint = entryPoint; }
-        /** Gets the entry point defined for this program. */
-        const String& getEntryPoint(void) const { return mEntryPoint; }
         /** Sets the shader target to compile down to, e.g. 'vs_1_1'. */
         void setTarget(const String& target);
         /** Gets the shader target to compile down to, e.g. 'vs_1_1'. */

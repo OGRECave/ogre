@@ -46,13 +46,6 @@ namespace Ogre {
             String doGet(const void* target) const;
             void doSet(void* target, const String& val);
         };
-        /// Command object for setting entry point
-        class CmdEntryPoint : public ParamCommand
-        {
-        public:
-            String doGet(const void* target) const;
-            void doSet(void* target, const String& val);
-        };
 
         GLSLESCgProgram(ResourceManager* creator, 
             const String& name, ResourceHandle handle,
@@ -75,9 +68,7 @@ namespace Ogre {
         /** Gets the Cg profiles which can be supported by the program. */
         const StringVector& getProfiles(void) const { return mProfiles; }
     protected:
-        static CmdEntryPoint msCmdEntryPoint;
         static CmdProfiles msCmdProfiles;
-        String mEntryPoint;
         StringVector mProfiles;
 
         // check if syntax is supported

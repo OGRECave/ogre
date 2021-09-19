@@ -328,6 +328,8 @@ void GLSLangProgram::prepareImpl()
     const char* name = mFilename.empty() ? NULL : mFilename.c_str();
 
     shader.setStringsWithLengthsAndNames(&source, NULL, &name, 1);
+    shader.setEntryPoint("main");
+    shader.setSourceEntryPoint(mEntryPoint.c_str());
     if(mSyntaxCode == "gl_spirv")
         shader.setEnvClient(glslang::EShClientOpenGL, glslang::EShTargetOpenGL_450);
     else if(mSyntaxCode == "spirv")

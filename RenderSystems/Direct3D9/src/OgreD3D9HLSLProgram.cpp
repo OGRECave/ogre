@@ -33,7 +33,6 @@ THE SOFTWARE.
 
 namespace Ogre {
     //-----------------------------------------------------------------------
-    D3D9HLSLProgram::CmdEntryPoint D3D9HLSLProgram::msCmdEntryPoint;
     D3D9HLSLProgram::CmdTarget D3D9HLSLProgram::msCmdTarget;
     D3D9HLSLProgram::CmdColumnMajorMatrices D3D9HLSLProgram::msCmdColumnMajorMatrices;
     D3D9HLSLProgram::CmdOptimisation D3D9HLSLProgram::msCmdOptimisation;
@@ -521,7 +520,6 @@ namespace Ogre {
         ResourceHandle handle, const String& group, bool isManual, 
         ManualResourceLoader* loader)
         : HighLevelGpuProgram(creator, name, handle, group, isManual, loader)
-        , mEntryPoint("main")
         , mColumnMajorMatrices(true)
         , mBackwardsCompatibility(false)
         , mMicroCode(NULL)
@@ -533,9 +531,6 @@ namespace Ogre {
             setupBaseParamDictionary();
             ParamDictionary* dict = getParamDictionary();
 
-            dict->addParameter(ParameterDef("entry_point", 
-                "The entry point for the HLSL program.",
-                PT_STRING),&msCmdEntryPoint);
             dict->addParameter(ParameterDef("target", 
                 "Name of the assembler target to compile down to.",
                 PT_STRING),&msCmdTarget);
@@ -617,15 +612,6 @@ namespace Ogre {
         return language;
     }
     //-----------------------------------------------------------------------
-    //-----------------------------------------------------------------------
-    String D3D9HLSLProgram::CmdEntryPoint::doGet(const void *target) const
-    {
-        return static_cast<const D3D9HLSLProgram*>(target)->getEntryPoint();
-    }
-    void D3D9HLSLProgram::CmdEntryPoint::doSet(void *target, const String& val)
-    {
-        static_cast<D3D9HLSLProgram*>(target)->setEntryPoint(val);
-    }
     //-----------------------------------------------------------------------
     String D3D9HLSLProgram::CmdTarget::doGet(const void *target) const
     {

@@ -34,7 +34,6 @@ THE SOFTWARE.
 
 namespace Ogre {
 	//-----------------------------------------------------------------------
-	CgProgram::CmdEntryPoint CgProgram::msCmdEntryPoint;
 	CgProgram::CmdProfiles CgProgram::msCmdProfiles;
 	CgProgram::CmdArgs CgProgram::msCmdArgs;
 	//-----------------------------------------------------------------------
@@ -1179,7 +1178,6 @@ namespace Ogre {
 		ManualResourceLoader* loader, CGcontext context)
 		: HighLevelGpuProgram(creator, name, handle, group, isManual, loader),
 		mCgContext(context),
-        mEntryPoint("main"),
 		mSelectedCgProfile(CG_PROFILE_UNKNOWN), mCgArguments(0), mParametersMapSizeAsBuffer(0)
 	{
 		if (createParamDictionary("CgProgram"))
@@ -1188,9 +1186,6 @@ namespace Ogre {
 
 			ParamDictionary* dict = getParamDictionary();
 
-			dict->addParameter(ParameterDef("entry_point",
-				"The entry point for the Cg program.",
-				PT_STRING),&msCmdEntryPoint);
 			dict->addParameter(ParameterDef("profiles",
 				"Space-separated list of Cg profiles supported by this profile.",
 				PT_STRING),&msCmdProfiles);
@@ -1242,15 +1237,6 @@ namespace Ogre {
 	}
 	//-----------------------------------------------------------------------
 	//-----------------------------------------------------------------------
-	//-----------------------------------------------------------------------
-	String CgProgram::CmdEntryPoint::doGet(const void *target) const
-	{
-		return static_cast<const CgProgram*>(target)->getEntryPoint();
-	}
-	void CgProgram::CmdEntryPoint::doSet(void *target, const String& val)
-	{
-		static_cast<CgProgram*>(target)->setEntryPoint(val);
-	}
 	//-----------------------------------------------------------------------
 	String CgProgram::CmdProfiles::doGet(const void *target) const
 	{

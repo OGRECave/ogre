@@ -47,12 +47,25 @@ namespace Ogre
     };
     static CmdPreprocessorDefines msCmdPreprocessorDefines;
 
+    /// Command object for setting entry point
+    class CmdEntryPoint : public ParamCommand
+    {
+    public:
+        String doGet(const void* target) const
+        {
+            return static_cast<const HighLevelGpuProgram*>(target)->getEntryPoint();
+        }
+        void doSet(void* target, const String& val) { static_cast<HighLevelGpuProgram*>(target)->setEntryPoint(val); }
+    };
+    static CmdEntryPoint msCmdEntryPoint;
+
     void HighLevelGpuProgram::setupBaseParamDictionary()
     {
         GpuProgram::setupBaseParamDictionary();
         ParamDictionary* dict = getParamDictionary();
 
-        dict->addParameter(ParameterDef("preprocessor_defines", "", PT_STRING), &msCmdPreprocessorDefines);
+        dict->addParameter("preprocessor_defines", &msCmdPreprocessorDefines);
+        dict->addParameter("entry_point", &msCmdEntryPoint);
     }
 
     //---------------------------------------------------------------------------
@@ -60,7 +73,7 @@ namespace Ogre
         const String& name, ResourceHandle handle, const String& group, 
         bool isManual, ManualResourceLoader* loader)
         : GpuProgram(creator, name, handle, group, isManual, loader), 
-        mHighLevelLoaded(false), mConstantDefsBuilt(false), mAssemblerProgram()
+        mHighLevelLoaded(false), mConstantDefsBuilt(false), mEntryPoint("main")
     {
     }
     //---------------------------------------------------------------------------

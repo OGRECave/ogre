@@ -58,7 +58,6 @@ namespace Ogre {
     }
 
     //-----------------------------------------------------------------------
-    MetalProgram::CmdEntryPoint MetalProgram::msCmdEntryPoint;
     MetalProgram::CmdShaderReflectionPairHint MetalProgram::msCmdShaderReflectionPairHint;
     //-----------------------------------------------------------------------
     //-----------------------------------------------------------------------
@@ -78,9 +77,6 @@ namespace Ogre {
             setupBaseParamDictionary();
             ParamDictionary* dict = getParamDictionary();
 
-            dict->addParameter(ParameterDef("entry_point",
-                                            "The entry point for the Metal program.",
-                                            PT_STRING),&msCmdEntryPoint);
             dict->addParameter(ParameterDef("shader_reflection_pair_hint",
                                             "Metal requires Pixel Shaders to be paired with a valid "
                                             "vertex shader to obtain reflection data (i.e. program "
@@ -89,7 +85,6 @@ namespace Ogre {
                                             PT_STRING),&msCmdShaderReflectionPairHint);
         }
         mTargetBufferName = "";
-        mEntryPoint = "main";
     }
     //---------------------------------------------------------------------------
     MetalProgram::~MetalProgram()
@@ -494,15 +489,6 @@ namespace Ogre {
 
             ++itor;
         }
-    }
-    //-----------------------------------------------------------------------
-    String MetalProgram::CmdEntryPoint::doGet(const void *target) const
-    {
-        return static_cast<const MetalProgram*>(target)->getEntryPoint();
-    }
-    void MetalProgram::CmdEntryPoint::doSet(void *target, const String& val)
-    {
-        static_cast<MetalProgram*>(target)->setEntryPoint(val);
     }
     //-----------------------------------------------------------------------
     String MetalProgram::CmdShaderReflectionPairHint::doGet(const void *target) const

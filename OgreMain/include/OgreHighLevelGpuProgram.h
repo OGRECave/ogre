@@ -72,6 +72,8 @@ namespace Ogre {
         GpuProgramPtr mAssemblerProgram;
         /// Preprocessor options
         String mPreprocessorDefines;
+        /// Entry point for this program
+        String mEntryPoint;
 
         /// in-situ parsing of defines
         static std::vector<std::pair<const char*, const char*>> parseDefines(String& defines);
@@ -133,6 +135,11 @@ namespace Ogre {
         void setPreprocessorDefines(const String& defines) { mPreprocessorDefines = defines; }
         /** Gets the preprocessor defines used to compile the program. */
         const String& getPreprocessorDefines(void) const { return mPreprocessorDefines; }
+
+        /** Sets the entry point for this program i.e, the first method called. */
+        void setEntryPoint(const String& entryPoint) { mEntryPoint = entryPoint; }
+        /** Gets the entry point defined for this program. */
+        const String& getEntryPoint(void) const { return mEntryPoint; }
 
         /// Scan the source for \#include and replace with contents from OGRE resources
         static String _resolveIncludes(const String& source, Resource* resourceBeingLoaded, const String& fileName, bool supportsFilename = false);
