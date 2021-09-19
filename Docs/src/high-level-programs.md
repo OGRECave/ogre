@@ -41,7 +41,12 @@ The better alternative to Cg is to use @ref multi-language-programs with `OgreUn
 
 ## Preprocessor definitions {#Preprocessor-definitions}
 
-Both GLSL and HLSL support using preprocessor definitions in your code - some are defined by the implementation, but you can also define your own, say in order to use the same source code for a few different variants of the same technique. In order to use this feature, include preprocessor conditions in your code, of the kind <tt>\#ifdef SYMBOL</tt>, <tt>\#if SYMBOL==2</tt> etc. Then in your program definition, use the `preprocessor_defines` option, following it with a string of definitions. Definitions are separated by `;` or `,` and may optionally have a `=` operator within them to specify a definition value. Those without an `=` will implicitly have a definition of 1. For example:
+Both GLSL and HLSL support using preprocessor definitions in your code - some are defined by the implementation, but you can also define your own, say in order to use the same source code for a few different variants of the same technique. In order to use this feature, include preprocessor conditions in your code, of the kind <tt>\#ifdef SYMBOL</tt>, <tt>\#if SYMBOL==2</tt> etc. Then in your program definition, use the `preprocessor_defines` option, following it with a string of definitions. Definitions are separated by `;` or `,` and may optionally have a `=` operator within them to specify a definition value. Those without an `=` will implicitly have a definition of 1.
+
+@par
+Format: preprocessor_defines &lt;defines&gt;
+@par
+Example: preprocessor_defines CLEVERTECHNIQUE,NUMTHINGS=2
 
 ```cpp
 // in your shader
@@ -57,14 +62,23 @@ Both GLSL and HLSL support using preprocessor definitions in your code - some ar
 #else
     // something else
 #endif
-
-// in  your program definition
-preprocessor_defines CLEVERTECHNIQUE,NUMTHINGS=2
 ```
 
 This way you can use the same source code but still include small variations, each one defined as a different %Ogre program name but based on the same source code.
 
 @note on GLSL %Ogre pre-processes the source itself instead on relying on the driver implementation which is often buggy. This relaxes using @c \#ifdef directives compared to the standard - e.g. you can <tt>\#ifdef \#version</tt>. However this means that defines specified in GLSL extensions are not present.
+
+## Entry Point
+
+The parameter @c entry_point, specifies the name of a function which will be the first one called as part of the program. Unlike assembler programs, which just run top-to-bottom, high-level programs can include multiple functions and as such you must specify the one which start the ball rolling.
+If you omit this line, %Ogre will default to looking for a function called `main`.
+
+@par
+Format: entry_point &lt;name&gt;
+@par
+Example: entry_point main_vp
+
+@note on GLSL the @c entry_point is required to be `main`
 
 # Cg programs {#Cg}
 
@@ -79,10 +93,9 @@ fragment_program myCgFragmentProgram cg
 }
 ```
 
-There are a few differences between this and the assembler program - to begin with, we declare that the fragment program is of type `cg` rather than `asm`, which indicates that it’s a high-level program using Cg. The `source` parameter is the same, except this time it’s referencing a Cg source file instead of a file of assembler.  Here is where things start to change. Firstly, we need to define an `entry_point`, which is the name of a function in the Cg program which will be the first one called as part of the fragment program. Unlike assembler programs, which just run top-to-bottom, Cg programs can include multiple functions and as such you must specify the one which start the ball rolling.
-If you omit this line, %Ogre will default to looking for a function called `main`.
+There are a few differences between this and the assembler program - to begin with, we declare that the fragment program is of type `cg` rather than `asm`, which indicates that it’s a high-level program using Cg. The `source` parameter is the same, except this time it’s referencing a Cg source file instead of a file of assembler.
 
-Next, instead of a fixed `syntax` parameter, you specify one or more `profiles`; profiles are how Cg compiles a program down to the low-level assembler. The profiles have the same names as the assembler syntax codes mentioned above; the main difference is that you can list more than one, thus allowing the program to be compiled down to more low-level syntaxes so you can write a single high-level program which runs on both D3D and GL. You are advised to just enter the simplest profiles under which your programs can be compiled in order to give it the maximum compatibility. The ordering also matters; if a card supports more than one syntax then the one listed first will be used.
+Here is where things start to change. Instead of a fixed `syntax` parameter, you specify one or more `profiles`; profiles are how Cg compiles a program down to the low-level assembler. The profiles have the same names as the assembler syntax codes mentioned above; the main difference is that you can list more than one, thus allowing the program to be compiled down to more low-level syntaxes so you can write a single high-level program which runs on both D3D and GL. You are advised to just enter the simplest profiles under which your programs can be compiled in order to give it the maximum compatibility. The ordering also matters; if a card supports more than one syntax then the one listed first will be used.
 
 @note Instead of `preprocessor_defines` Cg uses the `compile_arguments` option where you can specify arguments exactly as you would to the [cgc command-line compiler](http://developer.download.nvidia.com/cg/cgc.html). While this gives you more flexibility, it means that you must specify the defines as `-DSYMBOL` separated by spaces. Keep this in mind when copying program definitions across the supported languages.
 

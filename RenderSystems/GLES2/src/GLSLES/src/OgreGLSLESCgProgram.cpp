@@ -35,7 +35,6 @@ THE SOFTWARE.
 namespace Ogre {
 
     //-----------------------------------------------------------------------
-    GLSLESCgProgram::CmdEntryPoint GLSLESCgProgram::msCmdEntryPoint;
     GLSLESCgProgram::CmdProfiles GLSLESCgProgram::msCmdProfiles;
     //-----------------------------------------------------------------------
     // for use with Hlsl2Glsl_SetUserAttributeNames to map ogre att names
@@ -91,7 +90,7 @@ namespace Ogre {
     GLSLESCgProgram::GLSLESCgProgram(ResourceManager* creator, 
         const String& name, ResourceHandle handle,
         const String& group, bool isManual, ManualResourceLoader* loader)
-        : GLSLESProgram(creator, name, handle, group, isManual, loader), mEntryPoint("main")
+        : GLSLESProgram(creator, name, handle, group, isManual, loader)
     {
 
         // Add parameter "entry_point" and "profiles" to the material serializer dictionary
@@ -100,9 +99,6 @@ namespace Ogre {
             setupBaseParamDictionary();
             ParamDictionary* dict = getParamDictionary();
 
-            dict->addParameter(ParameterDef("entry_point", 
-                "The entry point for the Cg program.",
-                PT_STRING),&msCmdEntryPoint);
             dict->addParameter(ParameterDef("profiles", 
                 "Space-separated list of Cg profiles supported by this profile.",
                 PT_STRING),&msCmdProfiles);
@@ -322,15 +318,6 @@ namespace Ogre {
             }
         }
         return syntaxSupported;
-    }
-    //-----------------------------------------------------------------------
-    String GLSLESCgProgram::CmdEntryPoint::doGet(const void *target) const
-    {
-        return static_cast<const GLSLESCgProgram*>(target)->getEntryPoint();
-    }
-    void GLSLESCgProgram::CmdEntryPoint::doSet(void *target, const String& val)
-    {
-        static_cast<GLSLESCgProgram*>(target)->setEntryPoint(val);
     }
     //-----------------------------------------------------------------------
     String GLSLESCgProgram::CmdProfiles::doGet(const void *target) const

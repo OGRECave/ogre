@@ -56,14 +56,6 @@ namespace Ogre
     class _OgreMetalExport MetalProgram : public HighLevelGpuProgram
     {
     public:
-        /// Command object for setting entry point
-        class CmdEntryPoint : public ParamCommand
-        {
-        public:
-            String doGet(const void* target) const;
-            void doSet(void* target, const String& val);
-        };
-
         /// Command object for setting vertex shader pair
         class CmdShaderReflectionPairHint : public ParamCommand
         {
@@ -113,7 +105,6 @@ namespace Ogre
 
         static uint32 getAttributeIndex(VertexElementSemantic semantic);
     protected:
-        static CmdEntryPoint msCmdEntryPoint;
         static CmdShaderReflectionPairHint msCmdShaderReflectionPairHint;
 
         /** Internal load implementation, must be implemented by subclasses.

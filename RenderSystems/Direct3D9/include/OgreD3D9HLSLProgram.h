@@ -45,13 +45,6 @@ namespace Ogre {
     class _OgreD3D9Export D3D9HLSLProgram : public HighLevelGpuProgram
     {
     public:
-        /// Command object for setting entry point
-        class CmdEntryPoint : public ParamCommand
-        {
-        public:
-            String doGet(const void* target) const;
-            void doSet(void* target, const String& val);
-        };
         /// Command object for setting target assembler
         class CmdTarget : public ParamCommand
         {
@@ -100,7 +93,6 @@ namespace Ogre {
 
     protected:
 
-        static CmdEntryPoint msCmdEntryPoint;
         static CmdTarget msCmdTarget;
         static CmdColumnMajorMatrices msCmdColumnMajorMatrices;
         static CmdOptimisation msCmdOptimisation;
@@ -123,7 +115,6 @@ namespace Ogre {
         void populateDef(D3DXCONSTANT_DESC& d3dDesc, GpuConstantDefinition& def) const;
 
         String mTarget;
-        String mEntryPoint;
         bool mColumnMajorMatrices;
         bool mBackwardsCompatibility;
 

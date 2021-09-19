@@ -59,7 +59,7 @@ const String& SPIRVShader::getLanguage(void) const
 void SPIRVShader::compileSource(void)
 {
     OGRE_CHECK_GL_ERROR(glShaderBinary(1, &mGLShaderHandle, GL_SHADER_BINARY_FORMAT_SPIR_V, mSource.data(), mSource.size()));
-    OGRE_CHECK_GL_ERROR(glSpecializeShader(mGLShaderHandle, "main", 0, NULL, NULL));
+    OGRE_CHECK_GL_ERROR(glSpecializeShader(mGLShaderHandle, mEntryPoint.c_str(), 0, NULL, NULL));
 }
 
 SPIRVShaderFactory::SPIRVShaderFactory()
