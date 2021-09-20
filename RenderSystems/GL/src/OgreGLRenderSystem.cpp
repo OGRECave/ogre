@@ -1768,36 +1768,18 @@ namespace Ogre {
         // face by glFrontFace anywhere.
 
         GLenum cullMode;
+        bool flip = flipFrontFace();
 
         switch( mode )
         {
         case CULL_NONE:
             mStateCacheManager->setEnabled( GL_CULL_FACE, false );
             return;
-        default:
         case CULL_CLOCKWISE:
-            if (mActiveRenderTarget && 
-                ((mActiveRenderTarget->requiresTextureFlipping() && !mInvertVertexWinding) ||
-                (!mActiveRenderTarget->requiresTextureFlipping() && mInvertVertexWinding)))
-            {
-                cullMode = GL_FRONT;
-            }
-            else
-            {
-                cullMode = GL_BACK;
-            }
+            cullMode = flip ? GL_FRONT : GL_BACK;
             break;
         case CULL_ANTICLOCKWISE:
-            if (mActiveRenderTarget && 
-                ((mActiveRenderTarget->requiresTextureFlipping() && !mInvertVertexWinding) ||
-                (!mActiveRenderTarget->requiresTextureFlipping() && mInvertVertexWinding)))
-            {
-                cullMode = GL_BACK;
-            }
-            else
-            {
-                cullMode = GL_FRONT;
-            }
+            cullMode = flip ? GL_BACK : GL_FRONT;
             break;
         }
 
@@ -1957,8 +1939,7 @@ namespace Ogre {
 
             // NB: We should always treat CCW as front face for consistent with default
             // culling mode. Therefore, we must take care with two-sided stencil settings.
-            flip = (mInvertVertexWinding && !mActiveRenderTarget->requiresTextureFlipping()) ||
-                (!mInvertVertexWinding && mActiveRenderTarget->requiresTextureFlipping());
+            flip = flipFrontFace();
             if(GLEW_VERSION_2_0) // New GL2 commands
             {
                 // Back

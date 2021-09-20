@@ -1510,10 +1510,7 @@ namespace Ogre
     {
         mCullingMode = mode;
 
-		bool flip = (mInvertVertexWinding && !mActiveRenderTarget->requiresTextureFlipping() ||
-					!mInvertVertexWinding && mActiveRenderTarget->requiresTextureFlipping());
-
-		mRasterizerDesc.CullMode = D3D11Mappings::get(mode, flip);
+		mRasterizerDesc.CullMode = D3D11Mappings::get(mode, flipFrontFace());
         mRasterizerDescChanged = true;
     }
     void D3D11RenderSystem::_setDepthClamp(bool enable)
@@ -1622,9 +1619,7 @@ namespace Ogre
     void D3D11RenderSystem::setStencilState(const StencilState& state)
     {
 		// We honor user intent in case of one sided operation, and carefully tweak it in case of two sided operations.
-		bool flipFront = state.twoSidedOperation &&
-						(mInvertVertexWinding && !mActiveRenderTarget->requiresTextureFlipping() ||
-						!mInvertVertexWinding && mActiveRenderTarget->requiresTextureFlipping());
+		bool flipFront = state.twoSidedOperation && flipFrontFace();
 		bool flipBack = state.twoSidedOperation && !flipFront;
 
         mDepthStencilDesc.StencilEnable = state.enabled;

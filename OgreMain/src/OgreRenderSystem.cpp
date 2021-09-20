@@ -1107,6 +1107,11 @@ namespace Ogre {
         }
     }
 
+    bool RenderSystem::flipFrontFace() const
+    {
+        return mInvertVertexWinding != mActiveRenderTarget->requiresTextureFlipping();
+    }
+
     void RenderSystem::setStencilCheckEnabled(bool enabled)
     {
         mStencilState.enabled = enabled;
