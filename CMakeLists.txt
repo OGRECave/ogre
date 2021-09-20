@@ -46,6 +46,11 @@ if (APPLE AND NOT ANDROID)
   set(CMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LANGUAGE_STANDARD "c++11")
   set(CMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LIBRARY "libc++")
 
+  if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.16.0")
+    enable_language(OBJC)
+    enable_language(OBJCXX)
+  endif()
+
   if(POLICY CMP0068)
     cmake_policy(SET CMP0068 NEW)  # CMake 3.9+: `RPATH` settings on macOS do not affect `install_name`.
   endif()
