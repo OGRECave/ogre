@@ -223,6 +223,7 @@ bool PerPixelLighting::resolvePerLightParameters(ProgramSet* programSet)
     if(mTwoSidedLighting)
     {
         mFrontFacing = psMain->resolveInputParameter(Parameter::SPC_FRONT_FACING);
+        mTargetFlipped = psProgram->resolveParameter(GpuProgramParameters::ACT_RENDER_TARGET_FLIPPING);
     }
 
     return true;
@@ -264,7 +265,7 @@ bool PerPixelLighting::addFunctionInvocations(ProgramSet* programSet)
         stage.mul(Vector3(-1), mViewPos, mToView);
 
     if(mFrontFacing)
-        stage.callFunction("SGX_Flip_Backface_Normal", mFrontFacing, mViewNormal);
+        stage.callFunction("SGX_Flip_Backface_Normal", mFrontFacing, mTargetFlipped, mViewNormal);
 
     // Add per light functions.
     for (const auto& lp : mLightParamsList)
