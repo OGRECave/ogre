@@ -1270,6 +1270,7 @@ namespace Ogre
 
         void initFixedFunctionParams();
         void setFFPLightParams(uint32 index, bool enabled);
+        bool flipFrontFace() const;
         static CompareFunction reverseCompareFunction(CompareFunction func);
     private:
         StencilState mStencilState;
