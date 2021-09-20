@@ -102,6 +102,7 @@ protected:
     // Vertex shader output normal.
     ParameterPtr mVSOutNormal;
     ParameterPtr mFrontFacing;
+    ParameterPtr mTargetFlipped;
 };
 
 

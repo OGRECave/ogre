@@ -38,17 +38,20 @@ THE SOFTWARE.
 #define M_PI 3.141592654
 
 #ifdef OGRE_HLSL
-void SGX_Flip_Backface_Normal(in float triArea, inout vec3 normal)
+void SGX_Flip_Backface_Normal(in float triArea, in float targetFlipped, inout vec3 normal)
 {
 #if OGRE_HLSL == 3
 	triArea *= -1.0;
 #endif
+	triArea *= targetFlipped;
 	if(triArea < 0.0)
 		normal *= -1.0;
 }
 #else
-void SGX_Flip_Backface_Normal(in bool frontFacing, inout vec3 normal)
+void SGX_Flip_Backface_Normal(in bool frontFacing, in float targetFlipped, inout vec3 normal)
 {
+	if(targetFlipped < 0)
+		frontFacing = !frontFacing;
 	if(!frontFacing)
 		normal *= -1.0;
 }
