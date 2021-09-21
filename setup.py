@@ -65,8 +65,7 @@ def main():
                        "-DCMAKE_INSTALL_RPATH=$ORIGIN;$ORIGIN/OGRE"]
     elif sys.platform == "darwin":
         cmake_args += ["-DOGRE_BUILD_LIBS_AS_FRAMEWORKS=OFF",
-                       "-DCMAKE_INSTALL_RPATH=@loader_path;@loader_path/OGRE",
-                       "-DOGRE_ENABLE_PRECOMPILED_HEADERS=OFF"]
+                       "-DCMAKE_INSTALL_RPATH=@loader_path;@loader_path/OGRE"]
 
     version = re.search("project\(OGRE VERSION (\S+)\)", open("CMakeLists.txt").read()).group(1)
     # version += ".dev0"
@@ -105,7 +104,6 @@ def main():
             "Programming Language :: Python",
             "Programming Language :: Python :: 3",
             "Programming Language :: Python :: 3 :: Only",
-            "Programming Language :: Python :: 3.6",
             "Programming Language :: Python :: 3.8",
             "Programming Language :: C++",
             "Programming Language :: Python :: Implementation :: CPython",
