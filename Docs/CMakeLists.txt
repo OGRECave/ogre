@@ -13,10 +13,12 @@
 ###############################################################
 
 # Set docs target directory
-if (WIN32 OR APPLE)
-  set(OGRE_DOCS_PATH "Docs")
-elseif (UNIX)
-  set(OGRE_DOCS_PATH "share/doc/OGRE")
+if (NOT OGRE_DOCS_PATH)
+    if (WIN32 OR APPLE)
+        set(OGRE_DOCS_PATH "Docs")
+    elseif (UNIX)
+        set(OGRE_DOCS_PATH "share/doc/OGRE")
+    endif ()
 endif ()
 
 # Build and install API documentation if doxygen is available
