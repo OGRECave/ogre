@@ -154,7 +154,7 @@ void SGX_ComputeShadowFactor_PSSM3(in float fDepth,
 #endif
 	}
 #endif
-	else
+	else if (fDepth <= vSplitPoints.w)
 	{
 #ifdef PSSM_SAMPLE_COLOUR
 		oShadowFactor = texture2DProj(shadowMap3, lightPosition3).x;
@@ -164,5 +164,10 @@ void SGX_ComputeShadowFactor_PSSM3(in float fDepth,
 #ifdef DEBUG_PSSM
         pssm_lod_info.b = 1.0;
 #endif
+	}
+	else
+	{
+		// behind far distance
+		oShadowFactor = 1.0;
 	}
 }

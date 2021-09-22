@@ -567,6 +567,7 @@ namespace Ogre
                 {
                     splitPoints[i-1] = splitPointList[i];
                 }
+                splitPoints[3] = splitPointList.back();
                 params->setNamedConstant("pssmSplitPoints", splitPoints);
             }
 
