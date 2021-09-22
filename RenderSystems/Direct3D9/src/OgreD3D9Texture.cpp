@@ -1212,7 +1212,7 @@ namespace Ogre
     {
         IDirect3DDevice9* d3d9Device = D3D9RenderSystem::getActiveD3D9Device();
         TextureResources* textureResources = getTextureResources(d3d9Device);
-        if (textureResources == NULL || textureResources->pBaseTex == NULL)
+        if ((!textureResources || !textureResources->pBaseTex) && isLoaded())
         {
             // FIXME
             // createTextureResources(d3d9Device);
