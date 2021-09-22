@@ -333,6 +333,9 @@ namespace Ogre {
         {
             createInternalResourcesImpl();
             mInternalResourcesCreated = true;
+
+            // this is also public API, so redundantly set state
+            mLoadingState.store(LOADSTATE_LOADED);
         }
     }
     //-----------------------------------------------------------------------------
@@ -343,6 +346,9 @@ namespace Ogre {
             mSurfaceList.clear();
             freeInternalResourcesImpl();
             mInternalResourcesCreated = false;
+
+            // this is also public API, so redundantly set state
+            mLoadingState.store(LOADSTATE_UNLOADED);
         }
     }
     //-----------------------------------------------------------------------------
