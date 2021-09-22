@@ -64,14 +64,7 @@ namespace Ogre
         
         // have to call this here reather than in Resource destructor
         // since calling virtual methods in base destructors causes crash
-        if (isLoaded())
-        {
-            unload(); 
-        }
-        else
-        {
-            freeInternalResources();
-        }               
+        unload();
 
         // Free memory allocated per device.
         DeviceToTextureResourcesIterator it = mMapDeviceToTextureResources.begin();
