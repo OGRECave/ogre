@@ -73,6 +73,7 @@ void IntegratedPSSM3::updateGpuProgramsParams(Renderable* rend, const Pass* pass
     {
         vSplitPoints[i] = mShadowTextureParamsList[i].mMaxRange;
     }
+    vSplitPoints[3] = mShadowTextureParamsList.back().mMaxRange;
 
     mPSSplitPoints->setGpuParameter(vSplitPoints);
 
