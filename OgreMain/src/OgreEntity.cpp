@@ -1256,15 +1256,19 @@ namespace Ogre {
             
         if (destNormElem && srcNormElem)
         {
-            HardwareVertexBufferSharedPtr srcbuf = 
-                srcData->vertexBufferBinding->getBuffer(srcNormElem->getSource());
-            HardwareVertexBufferSharedPtr dstbuf = 
-                destData->vertexBufferBinding->getBuffer(destNormElem->getSource());
-            HardwareBufferLockGuard srcLock(srcbuf, HardwareBuffer::HBL_READ_ONLY);
+            auto srcbuf = srcData->vertexBufferBinding->getBuffer(srcNormElem->getSource());
+            auto dstbuf = destData->vertexBufferBinding->getBuffer(destNormElem->getSource());
+
             HardwareBufferLockGuard dstLock(dstbuf, HardwareBuffer::HBL_NORMAL);
-            char* pSrcBase = static_cast<char*>(srcLock.pData) + srcData->vertexStart * srcbuf->getVertexSize();
             char* pDstBase = static_cast<char*>(dstLock.pData) + destData->vertexStart * dstbuf->getVertexSize();
-            
+            char* pSrcBase = pDstBase;
+
+            HardwareBufferLockGuard srcLock;
+            if (srcbuf != dstbuf)
+            {
+                srcLock.lock(srcbuf, HardwareBuffer::HBL_READ_ONLY);
+                pSrcBase = static_cast<char*>(srcLock.pData) + srcData->vertexStart * srcbuf->getVertexSize();
+            }
             // The goal here is to detect the length of the vertices, and to apply
             // the base mesh vertex normal at one minus that length; this deals with 
             // any individual vertices which were either not affected by any pose, or
