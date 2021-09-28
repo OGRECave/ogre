@@ -324,6 +324,16 @@ void GLSLangProgram::prepareImpl()
 
     auto stage = getShLanguage(mType);
     glslang::TShader shader(stage);
+
+    String defines = appendBuiltinDefines(mPreprocessorDefines);
+    String preamble = "#extension GL_GOOGLE_cpp_style_line_directive: enable\n";
+    for (auto def : parseDefines(defines))
+    {
+        preamble += StringUtil::format("#define %s %s\n", def.first, def.second);
+    }
+    shader.setPreamble(preamble.c_str());
+
+    mSource = _resolveIncludes(mSource, this, mFilename, true);
     const char* source = mSource.c_str();
     const char* name = mFilename.empty() ? NULL : mFilename.c_str();
 
