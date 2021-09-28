@@ -43,7 +43,6 @@ namespace Ogre
     {
         mIsFullScreen = false;
         mActive = false;
-        mClosed = false;
         mFSAA = 1;
     }
     //-------------------------------------------------------------------------
@@ -300,11 +299,6 @@ namespace Ogre
 #else
         mMetalView.frame = [mWindow.contentView bounds];
 #endif
-    }
-    //-------------------------------------------------------------------------
-    bool MetalRenderWindow::isClosed(void) const
-    {
-        return mClosed;
     }
     //-------------------------------------------------------------------------
     void MetalRenderWindow::getCustomAttribute( const String& name, void* pData )

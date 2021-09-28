@@ -49,7 +49,6 @@ namespace Ogre
         void                destroy             (void);
         bool                isActive            () const;
         bool                isVisible           () const;
-        bool                isClosed            () const { return mClosed; }
         bool                isVSync             () const { return mVSync; }
         bool                isAA                () const { return mFSAA != 0; }
         bool                isHidden            () const { return mHidden; }
@@ -131,7 +130,6 @@ namespace Ogre
         bool                        mDeviceValid;           // Device was validation succeeded.
         HWND                        mHWnd;                  // Win32 Window handle      
         bool                        mIsExternal;            // window not created by Ogre
-        bool                        mClosed;                // Is this window destroyed.        
         bool                        mHidden;                // True if this is hidden render window. 
         bool                        mSwitchingFullscreen;   // Are we switching from fullscreen to windowed or vice versa       
         D3DMULTISAMPLE_TYPE         mFSAAType;              // AA type.

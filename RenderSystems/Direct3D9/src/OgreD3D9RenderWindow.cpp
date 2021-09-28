@@ -51,8 +51,7 @@ namespace Ogre
         mIsFullScreen = false;      
         mIsExternal = false;
         mHWnd = 0;
-        mActive = false;        
-        mClosed = false;
+        mActive = false;
         mHidden = false;
         mSwitchingFullscreen = false;
         mDisplayFrequency = 0;

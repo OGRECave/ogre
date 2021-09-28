@@ -51,7 +51,6 @@ namespace Ogre {
     class _OgrePrivate EAGL2Window : public RenderWindow, public GLRenderTarget
     {
         protected:
-            bool mClosed;
             bool mVisible;
             bool mHidden;
             /// Is this using an external window handle?
@@ -91,7 +90,6 @@ namespace Ogre {
                         bool fullScreen, const NameValuePairList *miscParams);
 
             void destroy(void);
-            bool isClosed(void) const { return mClosed; }
             bool isVisible(void) const { return mVisible; }
             void setVisible(bool visible) { mVisible = visible; }
             bool isHidden(void) const { return mHidden; }
