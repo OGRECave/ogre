@@ -39,7 +39,6 @@ namespace Ogre
     public:
         GLWindow();
 
-        bool isClosed(void) const { return mClosed; }
         bool isVisible(void) const { return mVisible; }
         void setVisible(bool visible) { mVisible = visible; }
         bool isHidden(void) const { return mHidden; }
@@ -52,7 +51,6 @@ namespace Ogre
         GLContext* getContext() const { return mContext; }
 
     protected:
-        bool mClosed;
         bool mVisible;
         bool mHidden;
         bool mIsTopLevel;

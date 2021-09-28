@@ -186,7 +186,7 @@ namespace Ogre
 
         /** Indicates whether the window has been closed by the user.
         */
-        virtual bool isClosed(void) const = 0;
+        virtual bool isClosed(void) const { return mClosed; }
         
         /** Indicates whether the window is the primary window. The
             primary window is special in that it is destroyed when 
@@ -227,6 +227,7 @@ namespace Ogre
         bool mIsFullScreen;
         bool mIsPrimary;
         bool mAutoDeactivatedOnFocusChange;
+        bool mClosed;
         int mLeft;
         int mTop;
         unsigned int mVSyncInterval;

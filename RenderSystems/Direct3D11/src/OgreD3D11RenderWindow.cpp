@@ -63,7 +63,6 @@ namespace Ogre
         mIsExternal = false;
         mActive = false;
         mSizing = false;
-        mClosed = false;
         mHidden = false;
     }
     //---------------------------------------------------------------------

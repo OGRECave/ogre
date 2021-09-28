@@ -18,7 +18,6 @@ TinyWindow::TinyWindow() : mParentWindow(NULL)
 {
     mIsFullScreen = false;
     mActive = true;
-    mClosed = false;
 }
 
 void TinyWindow::create(const String& name, uint width, uint height,

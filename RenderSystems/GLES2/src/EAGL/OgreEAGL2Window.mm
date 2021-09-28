@@ -53,8 +53,7 @@ namespace Ogre {
 
 
     EAGL2Window::EAGL2Window(EAGL2Support *glsupport)
-        :   mClosed(false),
-            mVisible(false),
+        :   mVisible(false),
             mHidden(false),
             mIsExternal(false),
             mUsingExternalView(false),

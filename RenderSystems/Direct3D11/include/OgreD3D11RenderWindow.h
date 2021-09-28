@@ -61,7 +61,6 @@ namespace Ogre
         /// @copydoc RenderTarget::setFSAA
         virtual void setFSAA(uint fsaa, const String& fsaaHint) { mFSAA = fsaa; mFSAAHint = fsaaHint; resize(mWidth, mHeight); }
 
-        bool isClosed() const                                   { return mClosed; }
         bool isHidden() const                                   { return mHidden; }
 
         virtual uint getNumberOfViews() const;
@@ -97,7 +96,6 @@ namespace Ogre
         D3D11Device & mDevice;          // D3D11 driver
         bool    mIsExternal;            // window not created by Ogre
         bool    mSizing;
-        bool    mClosed;
         bool    mHidden;
 
         DXGI_SAMPLE_DESC mFSAAType;     // Effective FSAA mode, limited by hardware capabilities

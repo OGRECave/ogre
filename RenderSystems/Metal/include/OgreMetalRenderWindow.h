@@ -41,8 +41,6 @@ namespace Ogre
 {
     class MetalRenderWindow : public RenderWindow, public MetalRenderTargetCommon
     {
-        bool    mClosed;
-
         CAMetalLayer        *mMetalLayer;
         id<CAMetalDrawable> mCurrentDrawable;
         id<MTLTexture>      mMsaaTex;
@@ -70,8 +68,6 @@ namespace Ogre
 
         virtual void resize( unsigned int width, unsigned int height );
         virtual void reposition( int left, int top );
-
-        virtual bool isClosed(void) const;
 
         // RenderTarget overloads.
         virtual void copyContentsToMemory(const Box& src, const PixelBox &dst, FrameBuffer buffer) {}
