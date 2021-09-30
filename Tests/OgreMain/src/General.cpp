@@ -404,7 +404,7 @@ TEST_F(HighLevelGpuProgramTest, resolveIncludes)
                  "Hello\n"
                  "#line 1  \"bar.cg\"\n"
                  "World\n"
-                 "#line 2 \"foo.cg\"";
+                 "#line 3 \"foo.cg\"";
 
     ASSERT_EQ(res.substr(0, ref.size()), ref);
 }

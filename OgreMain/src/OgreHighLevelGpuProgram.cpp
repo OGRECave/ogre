@@ -355,7 +355,7 @@ namespace Ogre
             if (newLineBefore != String::npos && newLineBefore >= startMarker)
                 outSource.append(inSource.substr(startMarker, newLineBefore-startMarker+1));
 
-            // Count the line number of #include statement, account for new line after the statement
+            // Count the line number of #include statement, +1 for new line after the statement
             size_t lineCount = std::count(inSource.begin(), inSource.begin() + newLineAfter, '\n') + 1;
 
             // use include filename if supported (cg) - else use include line as id (glsl)
@@ -367,8 +367,9 @@ namespace Ogre
             // recurse into include
             outSource.append(_resolveIncludes(resource->getAsString(), resourceBeingLoaded, filename, supportsFilename));
 
-            // Add #line to the end of the included file to correct the line count
-            outSource.append("\n#line " + std::to_string(lineCount) + lineFilename);
+            // Add #line to the end of the included file to correct the line count.
+            // +1 as #line specifies the number of the following line
+            outSource.append("\n#line " + std::to_string(lineCount + 1) + lineFilename);
 
             startMarker = newLineAfter;
 
