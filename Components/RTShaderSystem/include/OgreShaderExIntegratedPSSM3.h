@@ -94,6 +94,8 @@ public:
 
     void setDebug(bool enable) { mDebug = enable; }
 
+    bool setParameter(const String& name, const String& value) override;
+
     static String Type;
 
     // Protected types:
@@ -182,6 +184,7 @@ protected:
     // Derived scene colour (ambient term).
     UniformParameterPtr mPSDerivedSceneColour;
 
+    float mPCFxSamples;
     bool mUseTextureCompare;
     bool mUseColourShadows;
     bool mDebug;
