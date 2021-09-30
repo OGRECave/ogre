@@ -30,8 +30,6 @@ THE SOFTWARE.
 
 #include "OgrePrerequisites.h"
 
-#include "OgreLogManager.h"
-
 namespace Ogre {
     // Forward declarations
     class GLContext;
@@ -84,7 +82,7 @@ namespace Ogre {
 #define ENABLE_GL_CHECK 0
 
 #if ENABLE_GL_CHECK
-#include "OgreStringVector.h"
+#include "OgreLogManager.h"
 #define OGRE_CHECK_GL_ERROR(glFunc) \
 { \
     glFunc; \
@@ -101,10 +99,11 @@ namespace Ogre {
             case GL_OUT_OF_MEMORY:      errorString = "GL_OUT_OF_MEMORY";       break; \
             default:                                                            break; \
         } \
-        char msgBuf[4096]; \
-        StringVector tokens = StringUtil::split(#glFunc, "("); \
-        sprintf(msgBuf, "OpenGL error 0x%04X %s in %s at line %i for %s\n", e, errorString, __PRETTY_FUNCTION__, __LINE__, tokens[0].c_str()); \
-        LogManager::getSingleton().logMessage(msgBuf, LML_CRITICAL); \
+        String funcname = #glFunc; \
+        funcname = funcname.substr(0, funcname.find('(')); \
+        LogManager::getSingleton().logError(StringUtil::format("%s failed with %s in %s at %s(%d)",          \
+                                                                funcname.c_str(), errorString, __FUNCTION__, \
+                                                                __FILE__, __LINE__));                        \
     } \
 }
 #else

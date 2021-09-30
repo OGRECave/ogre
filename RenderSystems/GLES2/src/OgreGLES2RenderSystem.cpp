@@ -40,6 +40,7 @@ THE SOFTWARE.
 #include "OgreRoot.h"
 #include "OgreViewport.h"
 #include "OgreFrustum.h"
+#include "OgreLogManager.h"
 #if !OGRE_NO_GLES2_CG_SUPPORT
 #include "OgreGLSLESCgProgramFactory.h"
 #endif
