@@ -78,22 +78,6 @@ mat3 mtxFromCols(vec3 a, vec3 b, vec3 c)
 #define mat3 metal::float3x3
 #define mat4 metal::float4x4
 
-// fake semantics for attribute locations
-enum {
-    POSITION = 0,
-    BLENDWEIGHT,
-    NORMAL,
-    COLOR0,
-    COLOR = COLOR0,
-    COLOR1,
-    BLENDIDICES = 7,
-    TEXCOORD0,
-    TEXCOORD1,
-    TEXCOORD2,
-    TEXCOORD3,
-    TANGENT = 15
-};
-
 #define IN(decl, sem) decl [[ attribute(sem) ]];
 #else
 // GLSL
@@ -132,4 +116,20 @@ mat3 mtxFromCols(vec3 a, vec3 b, vec3 c)
 #define MAIN_PARAMETERS
 #define MAIN_DECLARATION void main()
 
+#endif
+
+#if defined(OGRE_METAL) || defined(OGRE_GLSLANG)
+// semantics as aliases for attribute locations
+#define POSITION    0
+#define BLENDWEIGHT 1
+#define NORMAL      2
+#define COLOR0      3
+#define COLOR1      4
+#define COLOR COLOR0
+#define BLENDIDICES 7
+#define TEXCOORD0   8
+#define TEXCOORD1   9
+#define TEXCOORD2  10
+#define TEXCOORD3  11
+#define TANGENT    15
 #endif
