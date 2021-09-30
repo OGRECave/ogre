@@ -41,6 +41,11 @@ THE SOFTWARE.
 STATIC vec3 pssm_lod_info = vec3(0.0, 0.0, 0.0);
 #endif
 
+// default to 2x2 PCF
+#ifndef PCF_XSAMPLES
+#define PCF_XSAMPLES 2.0
+#endif
+
 //-----------------------------------------------------------------------------
 void SGX_ApplyShadowFactor_Diffuse(in vec4 ambient, 
 					  in vec4 lightSum, 
@@ -76,23 +81,20 @@ void SGX_ShadowPCF4(in SAMPLER_TYPE shadowMap, in vec4 shadowMapPos, in vec2 inv
 	shadowMapPos.z = shadowMapPos.z * 0.5 + 0.5; // convert -1..1 to 0..1
 #endif
 	vec2 uv = shadowMapPos.xy;
-	vec3 o = vec3(invTexSize, -invTexSize.x) * 0.5;
 
     // depth must be clamped to support floating-point depth formats. This is to avoid comparing a
     // value from the depth texture (which is never greater than 1.0) with a greater-than-one
     // comparison value (which is possible with floating-point formats).
 	float depth = clamp(shadowMapPos.z, 0.0, 1.0);
 
-	// Note: We using 2x2 PCF. Good enough and is a lot faster.
-	c =	 sampleDepth(shadowMap, uv.xy - o.xy, depth); // top left
-	c += sampleDepth(shadowMap, uv.xy + o.xy, depth); // bottom right
-	c += sampleDepth(shadowMap, uv.xy + o.zy, depth); // bottom left
-	c += sampleDepth(shadowMap, uv.xy - o.zy, depth); // top right
-		
-	c /= 4.0;
-#ifdef OGRE_REVERSED_Z
-    c = 1.0 - c;
-#endif
+	c = 0.0;
+	float scale = 1.0;
+	float offset = (PCF_XSAMPLES / 2.0 - 0.5) * scale;
+	for (float y = -offset; y <= offset; y += scale)
+		for (float x = -offset; x <= offset; x += scale)
+			c += sampleDepth(shadowMap, uv + invTexSize * vec2(x, y), depth);
+
+	c /= PCF_XSAMPLES * PCF_XSAMPLES;
 }
 
 //-----------------------------------------------------------------------------
