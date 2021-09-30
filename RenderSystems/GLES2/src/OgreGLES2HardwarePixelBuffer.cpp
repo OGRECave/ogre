@@ -44,6 +44,7 @@ THE SOFTWARE.
 #include "OgreGLNativeSupport.h"
 #include "OgreGLES2HardwareBuffer.h"
 #include "OgreGLES2Texture.h"
+#include "OgreLogManager.h"
 
 namespace Ogre {
     GLES2HardwarePixelBuffer::GLES2HardwarePixelBuffer(uint32 width, uint32 height,
