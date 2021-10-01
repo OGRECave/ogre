@@ -705,14 +705,8 @@ namespace Ogre {
             popInnerChunk(stream);
         }
 
-        // Perform any necessary colour conversion for an active rendersystem
-        if (Root::getSingletonPtr() && Root::getSingleton().getRenderSystem())
-        {
-            // We don't know the source type if it's VET_COLOUR, but assume ARGB
-            // since that's the most common. Won't get used unless the mesh is
-            // ambiguous anyway, which will have been warned about in the log
-            dest->convertPackedColour(VET_COLOUR_ARGB, VET_UBYTE4_NORM);
-        }
+        // Perform any necessary colour conversions from ARGB to ABGR (UBYTE4)
+        dest->convertPackedColour(_DETAIL_SWAP_RB, VET_UBYTE4_NORM);
     }
     //---------------------------------------------------------------------
     void MeshSerializerImpl::readGeometryVertexDeclaration(const DataStreamPtr& stream,
