@@ -332,7 +332,7 @@ void Sample_NewInstancing::createEntities()
         if (mAnimations.insert( anim ).second)
         {
             anim->setEnabled( true );
-            anim->addTime( float(rng())/rng.max() * 10 ); //Random start offset
+            anim->addTime( float(rng())/float(rng.max()) * 10 ); //Random start offset
         }
     }
 }
@@ -355,14 +355,14 @@ void Sample_NewInstancing::createInstancedEntities()
                 //Get the animation
                 AnimationState *anim = ent->getAnimationState( "Walk" );
                 anim->setEnabled( true );
-                anim->addTime( float(rng())/rng.max() * 10); //Random start offset
+                anim->addTime( float(rng())/float(rng.max()) * 10); //Random start offset
                 mAnimations.insert( anim );
             }
 
             if ((mInstancingTechnique < NUM_TECHNIQUES) && (!mUseSceneNodes->isChecked()))
             {
                 mMovedInstances.push_back( ent );
-                ent->setOrientation(Quaternion(Radian(float(orng())/orng.max() * 10 * Math::PI), Vector3::UNIT_Y));
+                ent->setOrientation(Quaternion(Radian(float(orng())/float(orng.max()) * 10 * Math::PI), Vector3::UNIT_Y));
                 ent->setPosition( Ogre::Vector3(mEntities[0]->getBoundingRadius() * (i - NUM_INST_ROW * 0.5f), 0,
                     mEntities[0]->getBoundingRadius() * (j - NUM_INST_COLUMN * 0.5f)) );
             }
@@ -386,7 +386,7 @@ void Sample_NewInstancing::createSceneNodes()
             {
                 SceneNode *sceneNode = rootNode->createChildSceneNode();
                 sceneNode->attachObject( mEntities[idx] );
-                sceneNode->yaw( Radian( float(rng())/rng.max() * 10 * Math::PI )); //Random orientation
+                sceneNode->yaw( Radian( float(rng())/float(rng.max()) * 10 * Math::PI )); //Random orientation
                 sceneNode->setPosition( mEntities[idx]->getBoundingRadius() * (i - NUM_INST_ROW * 0.5f), 0,
                     mEntities[idx]->getBoundingRadius() * (j - NUM_INST_COLUMN * 0.5f) );
                 mSceneNodes.push_back( sceneNode );
