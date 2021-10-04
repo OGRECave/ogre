@@ -327,6 +327,10 @@ void GLSLangProgram::prepareImpl()
 
     String defines = appendBuiltinDefines(mPreprocessorDefines);
     String preamble = "#extension GL_GOOGLE_cpp_style_line_directive: enable\n";
+
+    if(mSyntaxCode == "spirv")
+        preamble += "#define VULKAN 100\n";
+
     for (auto def : parseDefines(defines))
     {
         preamble += StringUtil::format("#define %s %s\n", def.first, def.second);
@@ -380,7 +384,7 @@ void GLSLangProgram::prepareImpl()
             continue;
 
         GpuConstantDefinition def;
-        def.logicalIndex = u.getType()->getQualifier().layoutLocation;
+        def.logicalIndex = u.index != -1 ? u.offset : u.getType()->getQualifier().layoutLocation;
         def.arraySize = u.size;
         def.physicalIndex = mConstantDefs->bufferSize * 4;
         def.constType = mapToGCT(u.glDefineType);
