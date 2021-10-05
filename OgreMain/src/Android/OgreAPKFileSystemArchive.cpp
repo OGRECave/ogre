@@ -79,9 +79,9 @@ namespace {
         if (mPathPreFix.size() > 0)
         	mPathPreFix += "/";
 			
-		if(!IsFolderParsed( mName )) {
-			ParseFolder( mAssetMgr, mName );
-		}			
+        if(!IsFolderParsed( mName )) {
+            ParseFolder( mAssetMgr, mName );
+        }			
 	}
 
 	APKFileSystemArchive::~APKFileSystemArchive()
