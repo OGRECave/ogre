@@ -172,11 +172,16 @@ generate_export_header(OgreBites
     EXPORT_MACRO_NAME _OgreBitesExport
     EXPORT_FILE_NAME ${PROJECT_BINARY_DIR}/include/OgreBitesPrerequisites.h)
 
-if(Qt5_FOUND)
-  qt5_wrap_cpp(MOC_SRC "${CMAKE_CURRENT_SOURCE_DIR}/include/OgreApplicationContextQt.h")
+if(Qt6_FOUND OR Qt5_FOUND)
+  if(Qt6_FOUND)
+    qt6_wrap_cpp(MOC_SRC "${CMAKE_CURRENT_SOURCE_DIR}/include/OgreApplicationContextQt.h")
+  else()
+    qt5_wrap_cpp(MOC_SRC "${CMAKE_CURRENT_SOURCE_DIR}/include/OgreApplicationContextQt.h")
+  endif()
+
   add_library(OgreBitesQt ${OGRE_COMP_LIB_TYPE} ${MOC_SRC} "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreApplicationContextQt.cpp")
   set_target_properties(OgreBitesQt PROPERTIES VERSION ${OGRE_SOVERSION} SOVERSION ${OGRE_SOVERSION})
-  target_link_libraries(OgreBitesQt PUBLIC Qt5::Gui OgreBites)
+  target_link_libraries(OgreBitesQt PUBLIC Qt${QT_VERSION_MAJOR}::Gui OgreBites)
   ogre_config_component(OgreBitesQt)
 endif()
 

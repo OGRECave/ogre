@@ -285,8 +285,11 @@ if(NOT ANDROID AND NOT EMSCRIPTEN)
     )
   endif()
 
-  find_package(Qt5 COMPONENTS Core Gui QUIET)
-  macro_log_feature(Qt5_FOUND "Qt" "optional integration with the Qt Library for window creation and input" "http://www.qt.io/" FALSE "" "")
+  find_package(QT NAMES Qt6 Qt5 COMPONENTS Core Gui QUIET)
+  find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Core Gui QUIET)
+
+  macro_log_feature(Qt5_FOUND "Qt" "optional integration with the Qt5 Library for window creation and input" "http://www.qt.io/" FALSE "" "")
+  macro_log_feature(Qt6_FOUND "Qt" "optional integration with the Qt6 Library for window creation and input" "http://www.qt.io/" FALSE "" "")
 endif()
 
 #######################################################################
