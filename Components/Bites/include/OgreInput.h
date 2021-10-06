@@ -202,7 +202,7 @@ public:
     InputListenerChain() {}
     InputListenerChain(std::vector<InputListener*> chain) : mListenerChain(chain) {}
 
-    InputListenerChain& operator=(InputListenerChain o)
+    InputListenerChain& operator=(const InputListenerChain& o)
     {
         mListenerChain = o.mListenerChain;
         return *this;
