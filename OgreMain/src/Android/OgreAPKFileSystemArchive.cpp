@@ -72,12 +72,12 @@ namespace {
 	APKFileSystemArchive::APKFileSystemArchive(const String& name, const String& archType, AAssetManager* assetMgr)
 		:Archive(name, archType), mAssetMgr(assetMgr)
 	{
-        if (mName.size() > 0 && mName[0] == '/')
-        	mName.erase(mName.begin());
+		if (mName.size() > 0 && mName[0] == '/')
+			mName.erase(mName.begin());
 
-        mPathPreFix = mName;
-        if (mPathPreFix.size() > 0)
-        	mPathPreFix += "/";
+		mPathPreFix = mName;
+		if (mPathPreFix.size() > 0)
+			mPathPreFix += "/";
 			
 		if(!IsFolderParsed( mName )) {
 			ParseFolder( mAssetMgr, mName );
