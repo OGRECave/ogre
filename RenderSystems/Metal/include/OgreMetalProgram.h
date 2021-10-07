@@ -131,7 +131,6 @@ namespace Ogre
         /// Flag indicating if shader object successfully compiled
         bool mCompiled;
         /// Preprocessor options
-        String mEntryPoint;
         String mTargetBufferName;
 
         std::vector<GpuConstantDefinition> mConstantDefsSorted;

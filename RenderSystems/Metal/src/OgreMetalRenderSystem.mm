@@ -358,7 +358,7 @@ namespace Ogre
             if(auto sz = vpParams->getConstantList().size())
             {
                 mAutoParamsBuffer.reset(new MetalHardwareBufferCommon(sz, HBU_CPU_TO_GPU,
-                                                                      false, 4, NULL, &mDevice));
+                                                                      false, 4, &mDevice));
             }
         }
 
