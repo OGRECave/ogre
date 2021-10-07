@@ -257,10 +257,7 @@ namespace Ogre {
         if(!mInitialised)
             return;
 
-        VertexBufferBinding* bind = mRenderOp2.vertexData->vertexBufferBinding;
-        bind->unsetBinding(POSITION_BINDING);
-        bind->unsetBinding(TEXCOORD_BINDING);
-
+        mRenderOp2.vertexData->vertexBufferBinding->unsetAllBindings();
         mRenderOp2.indexData->indexBuffer.reset();
 
         PanelOverlayElement::_releaseManualHardwareResources();
