@@ -53,7 +53,6 @@ namespace Ogre
         GpuProgram* create(ResourceManager* creator,
             const String& name, ResourceHandle handle,
             const String& group, bool isManual, ManualResourceLoader* loader);
-        void destroy(GpuProgram* prog);
     };
 }
 

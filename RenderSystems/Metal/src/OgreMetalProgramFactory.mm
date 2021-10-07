@@ -56,9 +56,4 @@ namespace Ogre {
     {
         return OGRE_NEW MetalProgram(creator, name, handle, group, isManual, loader, mDevice);
     }
-    //-----------------------------------------------------------------------
-    void MetalProgramFactory::destroy(GpuProgram* prog)
-    {
-        OGRE_DELETE prog;
-    }
 }

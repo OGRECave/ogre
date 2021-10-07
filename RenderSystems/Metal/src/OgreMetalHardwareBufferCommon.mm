@@ -28,8 +28,6 @@ THE SOFTWARE.
 
 #include "OgreMetalHardwareBufferCommon.h"
 #include "OgreMetalDevice.h"
-#include "OgreMetalDiscardBufferManager.h"
-#include "OgreMetalStagingBuffer.h"
 #include "OgreDefaultHardwareBufferManager.h"
 
 #import <Metal/MTLDevice.h>
@@ -39,13 +37,10 @@ namespace Ogre
 {
     MetalHardwareBufferCommon::MetalHardwareBufferCommon( size_t sizeBytes, Usage usage, bool useShadowBuffer,
                                                           uint16 alignment,
-                                                          MetalDiscardBufferManager *discardBufferMgr,
                                                           MetalDevice *device ) :
         HardwareBuffer(usage, false, false),
         mBuffer( 0 ),
         mDevice( device ),
-        mDiscardBuffer( 0 ),
-        mStagingBuffer( 0 ),
         mLastFrameUsed( 0 ),
         mLastFrameGpuWrote( 0 )
     {
@@ -67,15 +62,8 @@ namespace Ogre
             resourceOptions |= MTLResourceStorageModeShared;
         }
 
-        if( true )
-        {
-            mBuffer = [mDevice->mDevice newBufferWithLength:alignToNextMultiple( sizeBytes, 4u )
+        mBuffer = [mDevice->mDevice newBufferWithLength:alignToNextMultiple( sizeBytes, 4u )
                                                     options:resourceOptions];
-        }
-        else
-        {
-            mDiscardBuffer = discardBufferMgr->createDiscardBuffer( sizeBytes, alignment );
-        }
 
         if (useShadowBuffer)
         {
@@ -86,12 +74,6 @@ namespace Ogre
     MetalHardwareBufferCommon::~MetalHardwareBufferCommon()
     {
         mBuffer = 0;
-        if( mDiscardBuffer )
-        {
-            MetalDiscardBufferManager *discardBufferManager = mDiscardBuffer->getOwner();
-            discardBufferManager->destroyDiscardBuffer( mDiscardBuffer );
-            mDiscardBuffer = 0;
-        }
     }
     //-----------------------------------------------------------------------------------
     void MetalHardwareBufferCommon::_notifyDeviceStalled(void)
@@ -104,41 +86,8 @@ namespace Ogre
     {
         mLastFrameUsed = 0;//mVaoManager->getFrameCount();
         outOffset = 0;
-        return !mDiscardBuffer ? mBuffer : mDiscardBuffer->getBufferName( outOffset );
-    }
-    //-----------------------------------------------------------------------------------
-    id<MTLBuffer> MetalHardwareBufferCommon::getBufferNameForGpuWrite(void)
-    {
-        assert( !mDiscardBuffer && "Discardable buffers can't be written from GPU!" );
-        mLastFrameUsed      = 0;//mVaoManager->getFrameCount();
-        mLastFrameGpuWrote  = mLastFrameUsed;
         return mBuffer;
     }
-
-    StagingBuffer* MetalHardwareBufferCommon::createStagingBuffer( size_t sizeBytes, bool forUpload )
-    {
-        sizeBytes = std::max<size_t>( sizeBytes, 4 * 1024 * 1024 );
-        sizeBytes = alignToNextMultiple( sizeBytes, 4u );
-
-        MTLResourceOptions resourceOptions = 0;
-
-        resourceOptions |= MTLResourceStorageModeShared;
-
-        if( forUpload )
-            resourceOptions |= MTLResourceCPUCacheModeWriteCombined;
-        else
-            resourceOptions |= MTLResourceCPUCacheModeDefaultCache;
-
-        id<MTLBuffer> bufferName = [mDevice->mDevice newBufferWithLength:sizeBytes
-                                                                         options:resourceOptions];
-
-        MetalStagingBuffer *stagingBuffer = OGRE_NEW MetalStagingBuffer( 0, sizeBytes, forUpload,
-                                                                         bufferName, mDevice );
-        //mRefedStagingBuffers[forUpload].push_back( stagingBuffer );
-
-        return stagingBuffer;
-    }
-
     //-----------------------------------------------------------------------------------
     void* MetalHardwareBufferCommon::lockImpl( size_t offset, size_t length, LockOptions options)
     {
@@ -147,33 +96,6 @@ namespace Ogre
         const uint32 currentFrame       = 2;//mVaoManager->getFrameCount();
         const uint32 bufferMultiplier   = 1;//mVaoManager->getDynamicBufferMultiplier();
 
-        if( mDiscardBuffer )
-        {
-            //If we're here, it was created with HBU_DISCARDABLE bit
-            if( options == HardwareBuffer::HBL_READ_ONLY )
-            {
-                LogManager::getSingleton().logMessage(
-                            "PERFORMANCE WARNING: reads from discardable "
-                            "buffers are uncached. May be slow." );
-
-                //We can't write from GPU to discardable memory. No need to check
-            }
-            else if( options == HardwareBuffer::HBL_NORMAL || options == HardwareBuffer::HBL_WRITE_ONLY )
-            {
-                if( currentFrame - mLastFrameUsed < bufferMultiplier )
-                {
-                    LogManager::getSingleton().logMessage(
-                                "PERFORMANCE WARNING: locking with HBL_NORMAL or HBL_WRITE_ONLY for a "
-                                "buffer created with HBU_DISCARDABLE bit is slow/stalling. Consider "
-                                "locking w/ another locking option, or change the buffer's usage flag" );
-                    mDevice->stall();
-                }
-            }
-
-            retPtr = mDiscardBuffer->map( options != HardwareBuffer::HBL_DISCARD );
-            retPtr = static_cast<void*>( static_cast<uint8*>( retPtr ) + offset );
-        }
-        else
         {
             if( mBuffer.storageMode != MTLStorageModePrivate )
             {
@@ -206,11 +128,6 @@ namespace Ogre
                         options != HardwareBuffer::HBL_READ_ONLY) &&
                         "Reading from a write-only buffer! Create "
                         "the buffer without HBL_WRITE_ONLY bit (or use readData)" );
-
-                assert( !mStagingBuffer && "Invalid state, and mStagingBuffer will leak" );
-
-                mStagingBuffer = createStagingBuffer( length, true );
-                retPtr = mStagingBuffer->map( length );
             }
         }
 
@@ -219,14 +136,6 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void MetalHardwareBufferCommon::unlockImpl()
     {
-        if( mDiscardBuffer )
-            mDiscardBuffer->unmap();
-
-        if( mStagingBuffer )
-        {
-            mStagingBuffer->_unmapToV1( this, mLockStart, mLockSize );
-            mStagingBuffer = 0;
-        }
     }
     //-----------------------------------------------------------------------------------
     void MetalHardwareBufferCommon::readData( size_t offset, size_t length, void* pDest )
@@ -245,27 +154,12 @@ namespace Ogre
         const uint32 currentFrame       = 0;//mVaoManager->getFrameCount();
         const uint32 bufferMultiplier   = 1;//mVaoManager->getDynamicBufferMultiplier();
 
-        if( mDiscardBuffer )
-           {
-            //We can't write from GPU to discardable memory. No need to check.
-            srcData = mDiscardBuffer->map( true );
-        }
-        else
         {
             if( mBuffer.storageMode != MTLStorageModePrivate )
             {
                 if( currentFrame - mLastFrameGpuWrote < bufferMultiplier )
                     mDevice->stall();
                 srcData = [mBuffer contents];
-            }
-            else
-            {
-                //Reading from HBL_WRITE_ONLY.
-                stagingBuffer = createStagingBuffer( length, false );
-                size_t stagingBufferOffset = stagingBuffer ->_asyncDownloadV1( this, offset, length );
-                mDevice->stall();
-                srcData = stagingBuffer->_mapForRead( stagingBufferOffset, length );
-                offset = 0;
             }
         }
 
@@ -289,20 +183,12 @@ namespace Ogre
                                                   bool discardWholeBuffer)
     {
         // FIXME
-        if(true ||  (discardWholeBuffer && mDiscardBuffer) || mBuffer.storageMode == MTLStorageModePrivate)
+        if(true || mBuffer.storageMode == MTLStorageModePrivate)
         {
             //Fast path is through locking (it either discards or already uses a StagingBuffer).
             void *dstData = this->lockImpl( offset, length, HBL_DISCARD);
             memcpy( dstData, pSource, length );
             this->unlockImpl();
-        }
-        else
-        {
-            //Use a StagingBuffer to avoid blocking
-            StagingBuffer *stagingBuffer = createStagingBuffer( length, true );
-            void *dstData = stagingBuffer->map( length );
-            memcpy( dstData, pSource, length );
-            stagingBuffer->_unmapToV1( this, offset, length );
         }
     }
     //-----------------------------------------------------------------------------------
@@ -317,11 +203,11 @@ namespace Ogre
         auto srcBuffer = static_cast<MetalHardwareBufferCommon*>(&_srcBuffer);
         discardWholeBuffer = discardWholeBuffer || (dstOffset == 0 && length == mSizeInBytes);
 
-        if( !this->mDiscardBuffer || srcBuffer->mBuffer.storageMode == MTLStorageModePrivate )
+        if( srcBuffer->mBuffer.storageMode == MTLStorageModePrivate )
         {
             size_t srcOffsetStart = 0;
             __unsafe_unretained id<MTLBuffer> srcBuf = srcBuffer->getBufferName( srcOffsetStart );
-            __unsafe_unretained id<MTLBuffer> dstBuf = this->getBufferNameForGpuWrite();
+            __unsafe_unretained id<MTLBuffer> dstBuf = mBuffer;
 
             __unsafe_unretained id<MTLBlitCommandEncoder> blitEncoder = mDevice->getBlitEncoder();
             [blitEncoder copyFromBuffer:srcBuf
@@ -329,9 +215,6 @@ namespace Ogre
                                toBuffer:dstBuf
                       destinationOffset:dstOffset
                                    size:length];
-
-            if( this->mDiscardBuffer )
-                mDevice->stall();
         }
         else
         {

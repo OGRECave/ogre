@@ -28,22 +28,16 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 #include "OgreMetalHardwareBufferManager.h"
 #include "OgreMetalHardwareBufferCommon.h"
-#include "OgreMetalDiscardBufferManager.h"
 
 namespace Ogre {
-    MetalHardwareBufferManager::MetalHardwareBufferManager( MetalDevice *device) :
-        mDiscardBufferManager( 0 )
+    MetalHardwareBufferManager::MetalHardwareBufferManager( MetalDevice *device) : mDevice(device)
     {
-        mDiscardBufferManager = OGRE_NEW MetalDiscardBufferManager( device );
     }
     //-----------------------------------------------------------------------------------
     MetalHardwareBufferManager::~MetalHardwareBufferManager()
     {
         destroyAllDeclarations();
         destroyAllBindings();
-
-        OGRE_DELETE mDiscardBufferManager;
-        mDiscardBufferManager = 0;
     }
     //-----------------------------------------------------------------------------------
     void MetalHardwareBufferManager::_notifyDeviceStalled(void)
@@ -72,8 +66,6 @@ namespace Ogre {
                 ++itor;
             }
         }
-
-        mDiscardBufferManager->_notifyDeviceStalled();
     }
     //-----------------------------------------------------------------------------------
     HardwareVertexBufferSharedPtr
@@ -81,8 +73,8 @@ namespace Ogre {
                                                         HardwareBuffer::Usage usage,
                                                         bool useShadowBuffer )
     {
-        auto impl = new MetalHardwareBufferCommon(vertexSize * numVerts, usage, useShadowBuffer, 4, mDiscardBufferManager,
-                                                  mDiscardBufferManager->getDevice());
+        auto impl = new MetalHardwareBufferCommon(vertexSize * numVerts, usage, useShadowBuffer, 4,
+                                                  mDevice);
         auto buf = std::make_shared<HardwareVertexBuffer>(this, vertexSize, numVerts, impl);
         {
             OGRE_LOCK_MUTEX(mVertexBuffersMutex);
@@ -98,8 +90,8 @@ namespace Ogre {
                                                        bool useShadowBuffer )
     {
         auto indexSize = HardwareIndexBuffer::indexSize(itype);
-        auto impl = new MetalHardwareBufferCommon(indexSize * numIndexes, usage, useShadowBuffer, 4, mDiscardBufferManager,
-                                                  mDiscardBufferManager->getDevice());
+        auto impl = new MetalHardwareBufferCommon(indexSize * numIndexes, usage, useShadowBuffer, 4,
+                                                  mDevice);
 
         auto buf = std::make_shared<HardwareIndexBuffer>(this, itype, numIndexes, impl);
         {

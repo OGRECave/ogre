@@ -46,15 +46,13 @@ namespace Ogre
     private:
         id<MTLBuffer>       mBuffer;
         MetalDevice         *mDevice;
-        MetalDiscardBuffer  *mDiscardBuffer;
-        StagingBuffer       *mStagingBuffer;
         uint32              mLastFrameUsed;
         uint32              mLastFrameGpuWrote;
 
         StagingBuffer* createStagingBuffer( size_t sizeBytes, bool forUpload );
     public:
         MetalHardwareBufferCommon(size_t sizeBytes, Usage usage, bool useShadowBuffer, uint16 alignment,
-                                  MetalDiscardBufferManager* discardBufferManager, MetalDevice* device);
+                                  MetalDevice* device);
         virtual ~MetalHardwareBufferCommon();
 
         void _notifyDeviceStalled(void);
@@ -68,7 +66,6 @@ namespace Ogre
             The MTLBuffer in question.
         */
         id<MTLBuffer> getBufferName( size_t &outOffset );
-        id<MTLBuffer> getBufferNameForGpuWrite(void);
 
         void* lockImpl(size_t offset, size_t length, LockOptions options) override;
         void unlockImpl() override;
