@@ -376,22 +376,25 @@ void GLSLangProgram::prepareImpl()
     getConstantDefinitions();
     program.buildReflection();
 
-    int nuniforms = program.getNumUniformVariables();
+    int nuniforms = program.getNumLiveUniformVariables();
     for(int i = 0; i < nuniforms; i++)
     {
-        auto u = program.getUniform(i);
-        if(u.getType()->isOpaque())
+        auto utype = program.getUniformTType(i);
+        if(utype->isOpaque())
             continue;
 
+        auto uindex = program.getUniformBlockIndex(i);
+        auto uoffset = program.getUniformBufferOffset(i);
+
         GpuConstantDefinition def;
-        def.logicalIndex = u.index != -1 ? u.offset : u.getType()->getQualifier().layoutLocation;
-        def.arraySize = u.size;
+        def.logicalIndex = uindex != -1 ? uoffset : utype->getQualifier().layoutLocation;
+        def.arraySize = program.getUniformArraySize(i);
         def.physicalIndex = mConstantDefs->bufferSize * 4;
-        def.constType = mapToGCT(u.glDefineType);
+        def.constType = mapToGCT(program.getUniformType(i));
         def.elementSize = GpuConstantDefinition::getElementSize(def.constType, false);
 
         mConstantDefs->bufferSize += def.arraySize * def.elementSize;
-        mConstantDefs->map.emplace(u.name, def);
+        mConstantDefs->map.emplace(program.getUniformName(i), def);
 
         // also allow index based referencing
         GpuLogicalIndexUse use;

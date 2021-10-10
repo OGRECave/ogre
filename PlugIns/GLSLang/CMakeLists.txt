@@ -5,7 +5,16 @@ add_library(Plugin_GLSLangProgramManager ${OGRE_LIB_TYPE} ${HEADER_FILES} src/Og
 target_include_directories(Plugin_GLSLangProgramManager PUBLIC
     "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
     $<INSTALL_INTERFACE:include/OGRE/Plugins/GLSLang>)
-target_link_libraries(Plugin_GLSLangProgramManager PUBLIC OgreMain glslang HLSL OSDependent OGLCompiler SPIRV SPIRV-Tools)
+
+if(ANDROID)
+    target_include_directories(Plugin_GLSLangProgramManager PRIVATE
+        ${ANDROID_NDK}/sources/third_party/shaderc/third_party/glslang
+        ${ANDROID_NDK}/sources/third_party/shaderc/third_party/)
+    target_link_libraries(Plugin_GLSLangProgramManager PUBLIC OgreMain
+        ${ANDROID_NDK}/sources/third_party/shaderc/libs/c++_static/${ANDROID_ABI}/libshaderc.a)
+else()
+    target_link_libraries(Plugin_GLSLangProgramManager PUBLIC OgreMain glslang HLSL OSDependent OGLCompiler SPIRV SPIRV-Tools)
+endif()
 
 ogre_config_framework(Plugin_GLSLangProgramManager)
 ogre_config_plugin(Plugin_GLSLangProgramManager)
