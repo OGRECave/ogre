@@ -51,27 +51,12 @@ namespace Ogre {
         // Generate framebuffer object
         OGRE_CHECK_GL_ERROR(glGenFramebuffers(1, &mFB));
 
-	   if(rs->getCapabilities()->hasCapability(RSC_DEBUG))
-       {
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
-           OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, mFB)); // to avoid GL_INVALID_OPERATION in glLabelObjectEXT(GL_FRAMEBUFFER,...) on iOS 
-#endif
-           OGRE_CHECK_GL_ERROR(glLabelObjectEXT(GL_FRAMEBUFFER, mFB, 0, ("FBO #" + StringConverter::toString(mFB)).c_str()));
-       }
-
         mNumSamples = std::min(mNumSamples, manager->getMaxFSAASamples());
 
         // Will we need a second FBO to do multisampling?
         if (mNumSamples)
         {
             OGRE_CHECK_GL_ERROR(glGenFramebuffers(1, &mMultisampleFB));
-            if(rs->getCapabilities()->hasCapability(RSC_DEBUG))
-            {
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
-                OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, mMultisampleFB)); // to avoid GL_INVALID_OPERATION in glLabelObjectEXT(GL_FRAMEBUFFER,...) on iOS 
-#endif
-                OGRE_CHECK_GL_ERROR(glLabelObjectEXT(GL_FRAMEBUFFER, mMultisampleFB, 0, ("MSAA FBO #" + StringConverter::toString(mMultisampleFB)).c_str()));
-            }
         }
         else
         {
@@ -278,29 +263,11 @@ namespace Ogre {
             
             // Generate framebuffer object
             OGRE_CHECK_GL_ERROR(glGenFramebuffers(1, &mFB));
-#ifdef DEBUG
-            if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_DEBUG))
-            {
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
-                OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, mFB)); // to avoid GL_INVALID_OPERATION in glLabelObjectEXT(GL_FRAMEBUFFER,...) on iOS
-#endif
-                OGRE_CHECK_GL_ERROR(glLabelObjectEXT(GL_FRAMEBUFFER, mFB, 0, ("FBO ##" + StringConverter::toString(mFB)).c_str()));
-            }
-#endif
             
             // Will we need a second FBO to do multisampling?
             if (mNumSamples)
             {
                 OGRE_CHECK_GL_ERROR(glGenFramebuffers(1, &mMultisampleFB));
-#ifdef DEBUG
-                if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_DEBUG))
-                {
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
-                    OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, mMultisampleFB)); // to avoid GL_INVALID_OPERATION in glLabelObjectEXT(GL_FRAMEBUFFER,...) on iOS
-#endif
-                    OGRE_CHECK_GL_ERROR(glLabelObjectEXT(GL_FRAMEBUFFER, mMultisampleFB, 0, ("MSAA FBO ##" + StringConverter::toString(mMultisampleFB)).c_str()));
-                }
-#endif
             }
             else
             {

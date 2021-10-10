@@ -108,7 +108,10 @@ namespace Ogre {
 
         // Generate texture name
         OGRE_CHECK_GL_ERROR(glGenTextures(1, &mTextureID));
-           
+
+        if (renderCaps->hasCapability(RSC_DEBUG))
+            OGRE_CHECK_GL_ERROR(glLabelObjectEXT(GL_TEXTURE, mTextureID, -1, mName.c_str()));
+
         // Set texture type
         mRenderSystem->_getStateCacheManager()->bindGLTexture(texTarget, mTextureID);
         
