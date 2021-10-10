@@ -429,7 +429,7 @@ namespace Ogre {
         auto caps = Root::getSingleton().getRenderSystem()->getCapabilities();
 
         if (caps->hasCapability(RSC_DEBUG))
-            OGRE_CHECK_GL_ERROR(glObjectLabel(GL_SHADER, mGLShaderHandle, 0, mName.c_str()));
+            OGRE_CHECK_GL_ERROR(glObjectLabel(GL_SHADER, mGLShaderHandle, -1, mName.c_str()));
 
         compileSource();
 
@@ -443,9 +443,6 @@ namespace Ogre {
         if (compiled && caps->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
         {
             OGRE_CHECK_GL_ERROR(mGLProgramHandle = glCreateProgram());
-            if (caps->hasCapability(RSC_DEBUG))
-                OGRE_CHECK_GL_ERROR(glObjectLabel(GL_PROGRAM, mGLProgramHandle, 0, mName.c_str()));
-
             // do not attempt to link attach only shaders
             if(mSyntaxCode == "gl_spirv" || (mSource.find("void main") != String::npos))
                 compiled = linkSeparable();

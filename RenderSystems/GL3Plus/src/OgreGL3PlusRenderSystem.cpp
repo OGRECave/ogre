@@ -1822,7 +1822,7 @@ namespace Ogre {
     void GL3PlusRenderSystem::beginProfileEvent( const String &eventName )
     {
         if (getCapabilities()->hasCapability(RSC_DEBUG))
-            OGRE_CHECK_GL_ERROR(glPushDebugGroup(GL_DEBUG_SOURCE_THIRD_PARTY, 0, static_cast<GLint>(eventName.length()), eventName.c_str()));
+            OGRE_CHECK_GL_ERROR(glPushDebugGroup(GL_DEBUG_SOURCE_THIRD_PARTY, 0, -1, eventName.c_str()));
     }
 
 
@@ -1843,7 +1843,7 @@ namespace Ogre {
                                  GL_DEBUG_TYPE_PERFORMANCE,
                                  0,
                                  GL_DEBUG_SEVERITY_LOW,
-                                 static_cast<GLint>(eventName.length()),
+                                 -1,
                                  eventName.c_str());
     }
 
