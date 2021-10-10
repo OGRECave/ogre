@@ -68,6 +68,7 @@ namespace Ogre
 
         bool mVSync;
         int mVSyncInterval;
+        size_t mWindowHandle = 0;
 
         VulkanDevice *mDevice;
         VulkanTextureGpuWindow* mTexture;
@@ -83,8 +84,6 @@ namespace Ogre
         std::vector<VkSemaphore> mRenderFinishedSemaphores;
         int mCurrentSemaphoreIndex;
         SwapchainStatus mSwapchainStatus;
-        bool mRebuildingSwapchain;
-        bool mSuboptimal;
 
         VkSurfaceTransformFlagBitsKHR mSurfaceTransform;
 
@@ -123,6 +122,8 @@ namespace Ogre
 
         void resize(unsigned int widthPt, unsigned int heightPt) override;
 
+        void windowMovedOrResized() override;
+
         void _setDevice( VulkanDevice *device );
 
         void create(const String& name, unsigned int widthPt, unsigned int heightPt, bool fullScreen,
@@ -141,13 +142,18 @@ namespace Ogre
         /// Calling swapBuffers during the command buffer that is rendering to us is key for
         /// good performance; otherwise Ogre may split the commands that render to this window
         /// and the command that presents this window into two queue submissions.
-        virtual void swapBuffers( void );
+        void swapBuffers( void ) override;
 
         /** Actually performs present. Called by VulkanDevice::commitAndNextCommandBuffer
         @param queueFinishSemaphore
             Makes our present request wait until the Queue is done executing before we can present
         */
         void _swapBuffers();
+
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+        void _notifySurfaceDestroyed() {}
+        void _notifySurfaceCreated(void* window, void* config) {}
+#endif
     };
 }  // namespace Ogre
 
