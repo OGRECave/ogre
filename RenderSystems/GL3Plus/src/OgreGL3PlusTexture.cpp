@@ -98,6 +98,9 @@ namespace Ogre {
         OGRE_CHECK_GL_ERROR(glGenTextures(1, &mTextureID));
         GLenum texTarget = getGL3PlusTextureTarget();
 
+        if (mRenderSystem->getCapabilities()->hasCapability(RSC_DEBUG))
+            OGRE_CHECK_GL_ERROR(glObjectLabel(GL_TEXTURE, mTextureID, -1, mName.c_str()));
+
         // Calculate size for all mip levels of the texture.
         uint32 width, height, depth;
 
