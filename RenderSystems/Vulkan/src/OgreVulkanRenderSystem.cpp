@@ -1275,7 +1275,7 @@ namespace Ogre
             if( mStencilEnabled )
             {
                 vkCmdSetStencilReference( mActiveDevice->mGraphicsQueue.mCurrentCmdBuffer,
-                                          VK_STENCIL_FACE_FRONT_AND_BACK, mStencilRefValue );
+                                          VK_STENCIL_FRONT_AND_BACK, mStencilRefValue );
             }
 
             mVpChanged = true;
@@ -1556,7 +1556,7 @@ namespace Ogre
             if( mActiveDevice->mGraphicsQueue.getEncoderState() == VulkanQueue::EncoderGraphicsOpen )
             {
                 vkCmdSetStencilReference( mActiveDevice->mGraphicsQueue.mCurrentCmdBuffer,
-                                          VK_STENCIL_FACE_FRONT_AND_BACK, mStencilRefValue );
+                                          VK_STENCIL_FRONT_AND_BACK, mStencilRefValue );
             }
         }
     }

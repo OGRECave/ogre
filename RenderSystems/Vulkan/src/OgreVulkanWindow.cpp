@@ -44,6 +44,12 @@ THE SOFTWARE.
 #if OGRE_PLATFORM == OGRE_PLATFORM_LINUX
 #include <X11/Xlib.h>
 #include "vulkan/vulkan_xlib.h"
+#elif OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+#include <windows.h>
+#include "vulkan/vulkan_win32.h"
+#elif OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+#include <android/native_window.h>
+#include "vulkan/vulkan_android.h"
 #endif
 
 #include "OgreDepthBuffer.h"
@@ -62,8 +68,6 @@ namespace Ogre
         mSwapchain( 0 ),
         mCurrentSemaphoreIndex( 0 ),
         mSwapchainStatus( SwapchainReleased ),
-        mRebuildingSwapchain( false ),
-        mSuboptimal( false )
         mSurfaceTransform( VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR )
     {
         mActive = true;
@@ -116,8 +120,6 @@ namespace Ogre
     //-------------------------------------------------------------------------
     void VulkanWindow::createSwapchain( void )
     {
-        mSuboptimal = false;
-
         mTexture->setWidth(mWidth);
         mTexture->setHeight(mHeight);
         mTexture->createInternalResources();
@@ -285,23 +287,9 @@ namespace Ogre
         uint32 imageIdx = 0u;
         VkResult result =
             vkAcquireNextImageKHR(mDevice->mDevice, mSwapchain, UINT64_MAX, semaphore, VK_NULL_HANDLE, &imageIdx);
-        if( result != VK_SUCCESS || mSuboptimal )
+        if (result != VK_ERROR_OUT_OF_DATE_KHR && result != VK_SUBOPTIMAL_KHR && result != VK_SUCCESS)
         {
-            // Recreate the swapchain if it's no longer compatible with the surface (OUT_OF_DATE)
-            // or no longer optimal for presentation (SUBOPTIMAL)
-            if( ( mSuboptimal ||
-                  ( result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR ) ) &&
-                !mRebuildingSwapchain )
-            {
-                mRebuildingSwapchain = true;
-                windowMovedOrResized();
-                mRebuildingSwapchain = false;
-            }
-            else
-            {
-                LogManager::getSingleton().logMessage("vkAcquireNextImageKHR failed VkResult = " +
-                                                      vkResultToString(result));
-            }
+            LogManager::getSingleton().logError("vkAcquireNextImageKHR failed with" + vkResultToString(result));
         }
         else
         {
@@ -332,6 +320,16 @@ namespace Ogre
             for (auto it : mViewportList)
                 it.second->_updateDimensions();
         }
+    }
+
+    void VulkanWindow::windowMovedOrResized()
+    {
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+        // read size from handle
+        auto width = ANativeWindow_getWidth((ANativeWindow*)mWindowHandle);
+        auto height = ANativeWindow_getHeight((ANativeWindow*)mWindowHandle);
+        resize(width, height);
+#endif
     }
 
     void VulkanWindow::copyContentsToMemory(const Box& src, const PixelBox &dst, FrameBuffer buffer)
@@ -375,6 +373,21 @@ namespace Ogre
         }
 
         OGRE_VK_CHECK(vkCreateXlibSurfaceKHR(mDevice->mInstance, &surfCreateInfo, 0, &mSurfaceKHR));
+#elif OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+        HINSTANCE hInst = NULL;
+        static TCHAR staticVar;
+        GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, &staticVar, &hInst);
+
+        VkWin32SurfaceCreateInfoKHR surfCreateInfo = {VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR};
+        surfCreateInfo.hinstance = hInst;
+        surfCreateInfo.hwnd = (HWND)windowHandle;
+
+        OGRE_VK_CHECK(vkCreateWin32SurfaceKHR(mDevice->mInstance, &surfCreateInfo, 0, &mSurfaceKHR));
+#elif OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+        VkAndroidSurfaceCreateInfoKHR surfCreateInfo = {VK_STRUCTURE_TYPE_ANDROID_SURFACE_CREATE_INFO_KHR};
+        surfCreateInfo.window = (ANativeWindow*)windowHandle;
+
+        OGRE_VK_CHECK(vkCreateAndroidSurfaceKHR(mDevice->mInstance, &surfCreateInfo, 0, &mSurfaceKHR));
 #endif
     }
 
@@ -382,6 +395,10 @@ namespace Ogre
     {
 #if OGRE_PLATFORM == OGRE_PLATFORM_LINUX
         return VK_KHR_XLIB_SURFACE_EXTENSION_NAME;
+#elif OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+        return VK_KHR_WIN32_SURFACE_EXTENSION_NAME;
+#elif OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+        return VK_KHR_ANDROID_SURFACE_EXTENSION_NAME;
 #endif
     }
 
@@ -396,15 +413,13 @@ namespace Ogre
         mHeight = height;
         mFSAA = 1;
 
-        size_t windowHandle = 0;
-
         if( miscParams )
         {
             NameValuePairList::const_iterator end = miscParams->end();
 
             auto opt = miscParams->find( "externalWindowHandle" );
             if( opt != end )
-                windowHandle = StringConverter::parseSizeT( opt->second );
+                mWindowHandle = StringConverter::parseSizeT( opt->second );
 
             opt = miscParams->find( "vsync" );
             if( opt != end )
@@ -420,8 +435,8 @@ namespace Ogre
                 mHwGamma = StringConverter::parseBool( opt->second );
         }
 
-        OgreAssert( windowHandle,  "externalWindowHandle required" );
-        createSurface(windowHandle);
+        OgreAssert( mWindowHandle,  "externalWindowHandle required" );
+        createSurface(mWindowHandle);
 
         auto texMgr = TextureManager::getSingletonPtr();
         mTexture = new VulkanTextureGpuWindow("RenderWindow", TEX_TYPE_2D, texMgr, this);;
@@ -547,7 +562,7 @@ namespace Ogre
         }
 
         if( result == VK_SUBOPTIMAL_KHR || result == VK_ERROR_OUT_OF_DATE_KHR )
-            mSuboptimal = true;
+            LogManager::getSingleton().logMessage("[VulkanWindow::swapBuffers] swapchain suboptimal or out fo date");
 
         mSwapchainStatus = SwapchainReleased;
     }
