@@ -158,9 +158,6 @@ namespace Ogre {
             if (caps->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
             {
                 OGRE_CHECK_GL_ERROR(mGLProgramHandle = glCreateProgram());
-                if (caps->hasCapability(RSC_DEBUG))
-                    OGRE_CHECK_GL_ERROR(
-                        glLabelObjectEXT(GL_PROGRAM_OBJECT_EXT, mGLProgramHandle, 0, mName.c_str()));
             }
         }
 

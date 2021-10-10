@@ -63,12 +63,6 @@ namespace Ogre {
         }
         
         mRenderSystem->_getStateCacheManager()->bindGLBuffer(mTarget, mBufferId);
-
-        if(mRenderSystem->getCapabilities()->hasCapability(RSC_DEBUG))
-        {
-            OGRE_CHECK_GL_ERROR(glLabelObjectEXT(GL_BUFFER_OBJECT_EXT, mBufferId, 0, ("Buffer #" + StringConverter::toString(mBufferId)).c_str()));
-        }
-
         OGRE_CHECK_GL_ERROR(glBufferData(mTarget, mSizeInBytes, NULL, getGLUsage(mUsage)));
     }
 
