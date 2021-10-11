@@ -14,7 +14,7 @@
 
 namespace
 {
-const TBuiltInResource DefaultTBuiltInResource = {
+TBuiltInResource DefaultTBuiltInResource = {
     /* .MaxLights = */ 32,
     /* .MaxClipPlanes = */ 6,
     /* .MaxTextureUnits = */ 32,
@@ -108,19 +108,8 @@ const TBuiltInResource DefaultTBuiltInResource = {
     /* .maxTaskWorkGroupSizeZ_NV = */ 1,
     /* .maxMeshViewCountNV = */ 4,
     /* .maxDualSourceDrawBuffersEXT =  1,*/
-
-    /* .limits = */
-    {
-        /* .nonInductiveForLoops = */ 1,
-        /* .whileLoops = */ 1,
-        /* .doWhileLoops = */ 1,
-        /* .generalUniformIndexing = */ 1,
-        /* .generalAttributeMatrixVectorIndexing = */ 1,
-        /* .generalVaryingIndexing = */ 1,
-        /* .generalSamplerIndexing = */ 1,
-        /* .generalVariableIndexing = */ 1,
-        /* .generalConstantMatrixVectorIndexing = */ 1,
-    }};
+    /* .limits = memset below*/
+    };
 }
 
 namespace Ogre
@@ -277,6 +266,7 @@ GLSLangProgram::GLSLangProgram(ResourceManager* creator, const String& name, Res
     if (createParamDictionary("glslangProgram"))
     {
         setupBaseParamDictionary();
+        memset(&DefaultTBuiltInResource.limits, 1, sizeof(TLimits));
     }
 }
 
