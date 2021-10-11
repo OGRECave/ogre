@@ -228,6 +228,9 @@ endif ()
 
 # Find glslang
 find_package(SPIRV-Tools QUIET) # glslangs own cmake is broken
+if(DEFINED ENV{VULKAN_SDK})
+    set(SPIRV-Tools_FOUND TRUE)
+endif()
 macro_log_feature(SPIRV-Tools_FOUND "glslang" "GLSL to SPIRV reference compiler" "https://github.com/KhronosGroup/glslang" FALSE "" "")
 
 # OpenEXR
