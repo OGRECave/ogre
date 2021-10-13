@@ -10,7 +10,7 @@
 
 #include <glslang/Public/ShaderLang.h>
 #include <glslang/SPIRV/GlslangToSpv.h>
-#include <glslang/MachineIndependent/gl_types.h>
+#include "gl_types.h"
 
 namespace
 {
