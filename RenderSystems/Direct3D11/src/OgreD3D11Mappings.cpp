@@ -402,14 +402,6 @@ namespace Ogre
         return "";
     }
     //---------------------------------------------------------------------
-    void D3D11Mappings::get(const ColourValue& inColour, float * outColour )
-    {
-        outColour[0] = inColour.r;
-        outColour[1] = inColour.g;
-        outColour[2] = inColour.b;
-        outColour[3] = inColour.a;  
-    }
-    //---------------------------------------------------------------------
     PixelFormat D3D11Mappings::_getPF(DXGI_FORMAT d3dPF)
     {
         switch(d3dPF)

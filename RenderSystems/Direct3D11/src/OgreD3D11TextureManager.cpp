@@ -62,7 +62,7 @@ namespace Ogre
         {
             auto borderColour =
                 (reversedZ && mCompareEnabled) ? ColourValue::White - mBorderColour : mBorderColour;
-            D3D11Mappings::get(borderColour, desc.BorderColor);
+            memcpy(desc.BorderColor, borderColour.ptr(), sizeof(float)*4);
         }
 
         OGRE_CHECK_DX_ERROR(mDevice->CreateSamplerState(&desc, mState.ReleaseAndGetAddressOf()));

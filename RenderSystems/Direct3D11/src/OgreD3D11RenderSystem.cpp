@@ -2583,14 +2583,11 @@ namespace Ogre
 
             if (buffers & FBT_COLOUR)
             {
-                float ClearColor[4];
-                D3D11Mappings::get(colour, ClearColor);
-
                 // Clear all views
                 uint numberOfViews = d3d11RenderTarget->getNumberOfViews();
                 for (uint i = 0; i < numberOfViews; ++i)
                 {
-                    mDevice.GetImmediateContext()->ClearRenderTargetView(pRTView[i], ClearColor);
+                    mDevice.GetImmediateContext()->ClearRenderTargetView(pRTView[i], colour.ptr());
                 }
 
             }
