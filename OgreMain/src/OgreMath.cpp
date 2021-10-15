@@ -30,14 +30,14 @@ THE SOFTWARE.
 namespace Ogre
 {
 
-    const Real Math::POS_INFINITY = std::numeric_limits<Real>::infinity();
-    const Real Math::NEG_INFINITY = -std::numeric_limits<Real>::infinity();
-    const Real Math::PI = Real( 4.0 * atan( 1.0 ) );
-    const Real Math::TWO_PI = Real( 2.0 * PI );
-    const Real Math::HALF_PI = Real( 0.5 * PI );
-    const float Math::fDeg2Rad = PI / float(180.0);
-    const float Math::fRad2Deg = float(180.0) / PI;
-    const Real Math::LOG2 = std::log(Real(2.0));
+    constexpr Real Math::POS_INFINITY;
+    constexpr Real Math::NEG_INFINITY;
+    constexpr Real Math::PI;
+    constexpr Real Math::TWO_PI;
+    constexpr Real Math::HALF_PI;
+    constexpr float Math::fDeg2Rad;
+    constexpr float Math::fRad2Deg;
+    constexpr Real Math::LOG2;
 
     int Math::mTrigTableSize;
    Math::AngleUnit Math::msAngleUnit;
