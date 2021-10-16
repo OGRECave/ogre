@@ -25,6 +25,7 @@ branches:
   only:
     - master
     - stable
+    - /v\d+\.\d+\.\d+/
 after_build:
   - IF NOT "%APPVEYOR_REPO_TAG%" == "true" set APPVEYOR_REPO_TAG_NAME=master
   - 7z a ogre-sdk-%APPVEYOR_REPO_TAG_NAME%-msvc141-x64.zip ./build/sdk/*
