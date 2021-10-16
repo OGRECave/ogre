@@ -41,15 +41,15 @@ For manually building the dependencies, please refer to the list below and get a
 
 ### Linux
 
-On linux you additionally need the following system headers to build the GL & GLES2 RenderSystems (command for Ubuntu):
+On linux you additionally need the following system headers to build the GL, GL3+, GLES2 & Vulkan RenderSystems (command for Ubuntu):
 
-    sudo apt-get install libgles2-mesa-dev
+    sudo apt-get install libgles2-mesa-dev libvulkan-dev glslang-dev
 
 furthermore we recommend installing the following optional packages
 
     sudo apt-get install libsdl2-dev libxt-dev libxaw7-dev doxygen
 
-these will enable input handling in the SampleBrowser and building the documentation.
+these will enable input handling in the SampleBrowser, the X11 ConfigDialog and allow building the documentation.
 
 ### Essential dependencies
 
@@ -65,6 +65,7 @@ these will enable input handling in the SampleBrowser and building the documenta
 ### Optional dependencies
 
 * DirectX SDK: http://msdn.microsoft.com/en-us/directx/
+* Vulkan SDK: https://vulkan.lunarg.com/
 * FreeImage: http://freeimage.sourceforge.net
 * Doxygen: http://doxygen.org
 * Cg: http://developer.nvidia.com/object/cg_toolkit.html
