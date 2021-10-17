@@ -226,12 +226,8 @@ if (NOT (APPLE_IOS OR WINDOWS_STORE OR WINDOWS_PHONE OR ANDROID OR EMSCRIPTEN))
   macro_log_feature(Cg_FOUND "cg" "C for graphics shader language" "http://developer.nvidia.com/object/cg_toolkit.html" FALSE "" "")
 endif ()
 
-# Find glslang
-find_package(SPIRV-Tools QUIET) # glslangs own cmake is broken
-if(DEFINED ENV{VULKAN_SDK})
-    set(SPIRV-Tools_FOUND TRUE)
-endif()
-macro_log_feature(SPIRV-Tools_FOUND "glslang" "GLSL to SPIRV reference compiler" "https://github.com/KhronosGroup/glslang" FALSE "" "")
+# Find Vulkan SDK
+macro_log_feature(ENV{VULKAN_SDK} "Vulkan SDK" "Vulkan RenderSystem, glslang Plugin. Alternatively use system packages" "https://vulkan.lunarg.com/" FALSE "" "")
 
 # OpenEXR
 find_package(OpenEXR)

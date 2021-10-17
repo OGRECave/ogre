@@ -17,7 +17,7 @@ elseif(WIN32)
     target_link_directories(Plugin_GLSLangProgramManager PRIVATE $ENV{VULKAN_SDK}/lib)
     target_link_libraries(Plugin_GLSLangProgramManager PUBLIC OgreMain shaderc_combined)
 else()
-    target_link_libraries(Plugin_GLSLangProgramManager PUBLIC OgreMain glslang HLSL OSDependent OGLCompiler SPIRV SPIRV-Tools)
+    target_link_libraries(Plugin_GLSLangProgramManager PUBLIC OgreMain glslang HLSL OSDependent OGLCompiler SPIRV)
 endif()
 
 ogre_config_framework(Plugin_GLSLangProgramManager)
