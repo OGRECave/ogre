@@ -993,6 +993,12 @@ namespace Ogre
         // Call super class.
         RenderSystem::_render( op );
 
+        if(mActiveDevice->mGraphicsQueue.getEncoderState() != VulkanQueue::EncoderGraphicsOpen)
+        {
+            beginRenderPassDescriptor(mCurrentRenderPassDescriptor, false);
+            executeRenderPassDescriptorDelayedActions();
+        }
+
         std::vector<VkVertexInputAttributeDescription> vertexInputs;
         uint32 uvCount = 0;
         for (auto elem : op.vertexData->vertexDeclaration->getElements())
@@ -1621,8 +1627,5 @@ namespace Ogre
     {
         mCurrentRenderPassDescriptor->setClearColour(colour);
         mCurrentRenderPassDescriptor->setClearDepth(depth);
-
-        beginRenderPassDescriptor(mCurrentRenderPassDescriptor, false);
-        executeRenderPassDescriptorDelayedActions();
     }
 }  // namespace Ogre
