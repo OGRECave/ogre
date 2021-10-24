@@ -76,12 +76,16 @@ private:
     void bindTextureSamplers(Program* pCpuProgram, GpuProgramPtr pGpuProgram);
 
     static String TargetLanguage;
-
-    // The list of created library shaders.
-    StringVector mLibraryPrograms;
-
 };
 
+class GLSLESProgramProcessor : public GLSLProgramProcessor
+{
+public:
+    const String& getTargetLanguage() const override { return TargetLanguage; }
+
+private:
+    static String TargetLanguage;
+};
 
 /** @} */
 /** @} */

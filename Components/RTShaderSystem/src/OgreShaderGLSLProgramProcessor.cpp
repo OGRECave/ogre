@@ -31,25 +31,16 @@ namespace Ogre {
 namespace RTShader {
 
 String GLSLProgramProcessor::TargetLanguage = "glsl";
+String GLSLESProgramProcessor::TargetLanguage = "glsles";
 
 //-----------------------------------------------------------------------------
 GLSLProgramProcessor::GLSLProgramProcessor()
 {
-
 }
 
 //-----------------------------------------------------------------------------
 GLSLProgramProcessor::~GLSLProgramProcessor()
 {
-    StringVector::iterator it = mLibraryPrograms.begin();
-    StringVector::iterator itEnd = mLibraryPrograms.end();
-    
-    for (; it != itEnd; ++it)
-    {
-        HighLevelGpuProgramManager::getSingleton().remove(
-            *it, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
-    }
-    mLibraryPrograms.clear();
 }
 
 //-----------------------------------------------------------------------------
