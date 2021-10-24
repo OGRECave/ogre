@@ -88,7 +88,6 @@ namespace Ogre
         VulkanFlushOnlyDescMap      mFlushOnlyDescMap;
         uint32                      mEntriesToFlush;
         bool                        mVpChanged;
-        bool                        mInterruptedRenderCommandEncoder;
         // clang-format on
 
         bool mHasValidationLayers;
@@ -212,8 +211,7 @@ namespace Ogre
 
         virtual void beginRenderPassDescriptor( RenderPassDescriptor *desc, bool warnIfRtvWasFlushed );
         void executeRenderPassDescriptorDelayedActions( bool officialCall = true );
-        inline void endRenderPassDescriptor( bool isInterruptingRender );
-        virtual void endRenderPassDescriptor( void );
+        void endRenderPassDescriptor();
 
         DepthBuffer *_createDepthBufferFor( RenderTarget* renderTarget);
 
@@ -225,7 +223,7 @@ namespace Ogre
         VulkanDevice *getVulkanDevice() const { return mDevice; }
         void _notifyDeviceStalled();
 
-        void _notifyActiveEncoderEnded( bool callEndRenderPassDesc );
+        void _notifyActiveEncoderEnded();
         void _notifyActiveComputeEnded( void );
 
         void _setViewport(Viewport *vp);

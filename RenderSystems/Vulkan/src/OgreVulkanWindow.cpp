@@ -515,7 +515,7 @@ namespace Ogre
         mDevice->mGraphicsQueue.mWindowsPendingSwap.push_back( this );
         mSwapchainStatus = SwapchainPendingSwap;
 
-        //endRenderPassDescriptor( false );
+        //endRenderPassDescriptor();
         mDevice->commitAndNextCommandBuffer( SubmissionType::EndFrameAndSwap );
     }
     //-------------------------------------------------------------------------
