@@ -138,9 +138,7 @@ namespace Ogre {
         Real mBoneBoundingRadius;
 
         /// Optional linked skeleton.
-        String mSkeletonName;
         SkeletonPtr mSkeleton;
-
        
         VertexBoneAssignmentList mBoneAssignments;
 
@@ -419,7 +417,7 @@ namespace Ogre {
         void setSkeletonName(const String& skelName);
 
         /** Returns true if this Mesh has a linked Skeleton. */
-        bool hasSkeleton(void) const;
+        bool hasSkeleton(void) const { return mSkeleton != 0; }
 
         /** Returns whether or not this mesh has some kind of vertex animation. 
         */
@@ -429,7 +427,7 @@ namespace Ogre {
         @return
             Weak reference to the skeleton - copy this if you want to hold a strong pointer.
         */
-        const SkeletonPtr& getSkeleton(void) const;
+        const SkeletonPtr& getSkeleton(void) const { return mSkeleton; }
 
         /** Gets the name of any linked Skeleton */
         const String& getSkeletonName(void) const;

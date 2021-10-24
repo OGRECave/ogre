@@ -352,7 +352,6 @@ namespace Ogre {
             }
         }
 
-        newMesh->mSkeletonName = mSkeletonName;
         newMesh->mSkeleton = mSkeleton;
 
         // Keep prepared shadow volume info (buffers may already be prepared)
@@ -481,10 +480,8 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void Mesh::setSkeletonName(const String& skelName)
     {
-        if (skelName != mSkeletonName)
+        if (skelName != getSkeletonName())
         {
-            mSkeletonName = skelName;
-
             if (skelName.empty())
             {
                 // No skeleton
@@ -513,16 +510,6 @@ namespace Ogre {
             if (isLoaded())
                 _dirtyState();
         }
-    }
-    //-----------------------------------------------------------------------
-    bool Mesh::hasSkeleton(void) const
-    {
-        return !(mSkeletonName.empty());
-    }
-    //-----------------------------------------------------------------------
-    const SkeletonPtr& Mesh::getSkeleton(void) const
-    {
-        return mSkeleton;
     }
     //-----------------------------------------------------------------------
     void Mesh::addBoneAssignment(const VertexBoneAssignment& vertBoneAssign)
@@ -1092,7 +1079,6 @@ namespace Ogre {
     void Mesh::_notifySkeleton(SkeletonPtr& pSkel)
     {
         mSkeleton = pSkel;
-        mSkeletonName = pSkel->getName();
     }
     //---------------------------------------------------------------------
     Mesh::BoneAssignmentIterator Mesh::getBoneAssignmentIterator(void)
@@ -1103,7 +1089,7 @@ namespace Ogre {
     //---------------------------------------------------------------------
     const String& Mesh::getSkeletonName(void) const
     {
-        return mSkeletonName;
+        return mSkeleton ? mSkeleton->getName() : BLANKSTRING;
     }
     //---------------------------------------------------------------------
     const MeshLodUsage& Mesh::getLodLevel(ushort index) const
