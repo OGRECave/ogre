@@ -101,13 +101,7 @@ namespace Ogre {
     void ResourceGroupManager::initialiseResourceGroup(const String& name)
     {
         LogManager::getSingleton().logMessage("Initialising resource group " + name);
-        ResourceGroup* grp = getResourceGroup(name);
-        if (!grp)
-        {
-            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
-                "Cannot find a group named " + name, 
-                "ResourceGroupManager::initialiseResourceGroup");
-        }
+        ResourceGroup* grp = getResourceGroup(name, true);
         OGRE_LOCK_MUTEX(grp->OGRE_AUTO_MUTEX_NAME); // lock group mutex;
 
         if (grp->groupStatus == ResourceGroup::UNINITIALSED)
@@ -158,14 +152,7 @@ namespace Ogre {
     {
         LogManager::getSingleton().stream() << "Preparing resource group '" << name << "'";
         // load all created resources
-        ResourceGroup* grp = getResourceGroup(name);
-        if (!grp)
-        {
-            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
-                "Cannot find a group named " + name, 
-                "ResourceGroupManager::prepareResourceGroup");
-        }
-
+        ResourceGroup* grp = getResourceGroup(name, true);
         OGRE_LOCK_AUTO_MUTEX;
         OGRE_LOCK_MUTEX(grp->OGRE_AUTO_MUTEX_NAME); // lock group mutex 
         // Set current group
@@ -230,14 +217,7 @@ namespace Ogre {
     {
         LogManager::getSingleton().stream() << "Loading resource group '" << name << "'";
         // load all created resources
-        ResourceGroup* grp = getResourceGroup(name);
-        if (!grp)
-        {
-            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
-                "Cannot find a group named " + name, 
-                "ResourceGroupManager::loadResourceGroup");
-        }
-
+        ResourceGroup* grp = getResourceGroup(name, true);
         OGRE_LOCK_AUTO_MUTEX;
         OGRE_LOCK_MUTEX(grp->OGRE_AUTO_MUTEX_NAME); // lock group mutex 
         // Set current group
@@ -304,14 +284,7 @@ namespace Ogre {
     void ResourceGroupManager::unloadResourceGroup(const String& name, bool reloadableOnly)
     {
         LogManager::getSingleton().logMessage("Unloading resource group " + name);
-        ResourceGroup* grp = getResourceGroup(name);
-        if (!grp)
-        {
-            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
-                "Cannot find a group named " + name, 
-                "ResourceGroupManager::unloadResourceGroup");
-        }
-
+        ResourceGroup* grp = getResourceGroup(name, true);
         OGRE_LOCK_AUTO_MUTEX;
         // Set current group
         mCurrentGroup = grp;
@@ -345,14 +318,7 @@ namespace Ogre {
     {
         LogManager::getSingleton().logMessage(
             "Unloading unused resources in resource group " + name);
-        ResourceGroup* grp = getResourceGroup(name);
-        if (!grp)
-        {
-            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
-                "Cannot find a group named " + name, 
-                "ResourceGroupManager::unloadUnreferencedResourcesInGroup");
-        }
-
+        ResourceGroup* grp = getResourceGroup(name, true);
         OGRE_LOCK_AUTO_MUTEX;
         // Set current group
         mCurrentGroup = grp;
@@ -388,14 +354,7 @@ namespace Ogre {
     void ResourceGroupManager::clearResourceGroup(const String& name)
     {
             LogManager::getSingleton().logMessage("Clearing resource group " + name);
-        ResourceGroup* grp = getResourceGroup(name);
-        if (!grp)
-        {
-            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
-                "Cannot find a group named " + name, 
-                "ResourceGroupManager::clearResourceGroup");
-        }
-
+        ResourceGroup* grp = getResourceGroup(name, true);
         OGRE_LOCK_AUTO_MUTEX;
         // set current group
         mCurrentGroup = grp;
@@ -410,14 +369,7 @@ namespace Ogre {
     void ResourceGroupManager::destroyResourceGroup(const String& name)
     {
         LogManager::getSingleton().logMessage("Destroying resource group " + name);
-        ResourceGroup* grp = getResourceGroup(name);
-        if (!grp)
-        {
-            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
-                "Cannot find a group named " + name, 
-                "ResourceGroupManager::destroyResourceGroup");
-        }
-
+        ResourceGroup* grp = getResourceGroup(name, true);
         OGRE_LOCK_AUTO_MUTEX;
         // set current group
         mCurrentGroup = grp;
@@ -431,27 +383,14 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     bool ResourceGroupManager::isResourceGroupInitialised(const String& name) const
     {
-        ResourceGroup* grp = getResourceGroup(name);
-        if (!grp)
-        {
-            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
-                "Cannot find a group named " + name, 
-                "ResourceGroupManager::isResourceGroupInitialised");
-        }
+        ResourceGroup* grp = getResourceGroup(name, true);
         return (grp->groupStatus != ResourceGroup::UNINITIALSED &&
             grp->groupStatus != ResourceGroup::INITIALISING);
     }
     //-----------------------------------------------------------------------
     bool ResourceGroupManager::isResourceGroupLoaded(const String& name) const
     {
-        ResourceGroup* grp = getResourceGroup(name);
-        if (!grp)
-        {
-            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
-                "Cannot find a group named " + name, 
-                "ResourceGroupManager::isResourceGroupInitialised");
-        }
-        return (grp->groupStatus == ResourceGroup::LOADED);
+        return getResourceGroup(name, true)->groupStatus == ResourceGroup::LOADED;
     }
     //-----------------------------------------------------------------------
     bool ResourceGroupManager::resourceGroupExists(const String& name) const
@@ -516,14 +455,7 @@ namespace Ogre {
     void ResourceGroupManager::removeResourceLocation(const String& name, 
         const String& resGroup)
     {
-        ResourceGroup* grp = getResourceGroup(resGroup);
-        if (!grp)
-        {
-            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
-                "Cannot locate a resource group called '" + resGroup + "'", 
-                "ResourceGroupManager::removeResourceLocation");
-        }
-
+        ResourceGroup* grp = getResourceGroup(resGroup, true);
         OGRE_LOCK_MUTEX(grp->OGRE_AUTO_MUTEX_NAME); // lock group mutex
 
         // Remove from location list
@@ -559,14 +491,7 @@ namespace Ogre {
         ManualResourceLoader* loader,
         const NameValuePairList& loadParameters)
     {
-        ResourceGroup* grp = getResourceGroup(groupName);
-        if (!grp)
-        {
-            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
-                "Cannot find a group named " + groupName, 
-                "ResourceGroupManager::declareResource");
-        }
-        
+        ResourceGroup* grp = getResourceGroup(groupName, true);
         ResourceDeclaration dcl;
         dcl.loader = loader;
         dcl.parameters = loadParameters;
@@ -580,14 +505,7 @@ namespace Ogre {
     void ResourceGroupManager::undeclareResource(const String& name, 
         const String& groupName)
     {
-        ResourceGroup* grp = getResourceGroup(groupName);
-        if (!grp)
-        {
-            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
-                "Cannot find a group named " + groupName, 
-                "ResourceGroupManager::undeclareResource");
-        }
-
+        ResourceGroup* grp = getResourceGroup(groupName, true);
         OGRE_LOCK_MUTEX(grp->OGRE_AUTO_MUTEX_NAME); // lock group mutex
 
         for (ResourceDeclarationList::iterator i = grp->resourceDeclarations.begin();
@@ -616,16 +534,11 @@ namespace Ogre {
         }
 
         // Try to find in resource index first
-        ResourceGroup* grp = getResourceGroup(groupName);
+        ResourceGroup* grp = getResourceGroup(groupName, throwOnFailure);
         if (!grp)
         {
-            if(!throwOnFailure)
-                return DataStreamPtr();
-
-            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
-                "Cannot locate a resource group called '" + groupName + 
-                "' for resource '" + resourceName + "'" , 
-                "ResourceGroupManager::openResource");
+            // we only get here if throwOnFailure is false
+            return DataStreamPtr();
         }
 
         Archive* pArch = resourceExists(grp, resourceName);
@@ -663,14 +576,7 @@ namespace Ogre {
     DataStreamList ResourceGroupManager::openResources(
         const String& pattern, const String& groupName) const
     {
-        ResourceGroup* grp = getResourceGroup(groupName);
-        if (!grp)
-        {
-            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
-                "Cannot locate a resource group called '" + groupName + "'", 
-                "ResourceGroupManager::openResources");
-        }
-
+        ResourceGroup* grp = getResourceGroup(groupName, true);
         OGRE_LOCK_MUTEX(grp->OGRE_AUTO_MUTEX_NAME); // lock group mutex
 
         // Iterate through all the archives and build up a combined list of
@@ -702,14 +608,7 @@ namespace Ogre {
     DataStreamPtr ResourceGroupManager::createResource(const String& filename, 
         const String& groupName, bool overwrite, const String& locationPattern)
     {
-        ResourceGroup* grp = getResourceGroup(groupName);
-        if (!grp)
-        {
-            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
-                "Cannot locate a resource group called '" + groupName + "'", 
-                "ResourceGroupManager::createResource");
-        }
-
+        ResourceGroup* grp = getResourceGroup(groupName, true);
         OGRE_LOCK_AUTO_MUTEX;
         OGRE_LOCK_MUTEX(grp->OGRE_AUTO_MUTEX_NAME); // lock group mutex
         
@@ -744,14 +643,7 @@ namespace Ogre {
     void ResourceGroupManager::deleteResource(const String& filename, const String& groupName, 
         const String& locationPattern)
     {
-        ResourceGroup* grp = getResourceGroup(groupName);
-        if (!grp)
-        {
-            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
-                "Cannot locate a resource group called '" + groupName + "'", 
-                "ResourceGroupManager::createResource");
-        }
-
+        ResourceGroup* grp = getResourceGroup(groupName, true);
         OGRE_LOCK_AUTO_MUTEX;
         OGRE_LOCK_MUTEX(grp->OGRE_AUTO_MUTEX_NAME); // lock group mutex
         
@@ -779,14 +671,7 @@ namespace Ogre {
     void ResourceGroupManager::deleteMatchingResources(const String& filePattern, 
         const String& groupName, const String& locationPattern)
     {
-        ResourceGroup* grp = getResourceGroup(groupName);
-        if (!grp)
-        {
-            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
-                "Cannot locate a resource group called '" + groupName + "'", 
-                "ResourceGroupManager::createResource");
-        }
-
+        ResourceGroup* grp = getResourceGroup(groupName, true);
         OGRE_LOCK_MUTEX(grp->OGRE_AUTO_MUTEX_NAME); // lock group mutex
 
         
@@ -1150,11 +1035,21 @@ namespace Ogre {
         loadList.push_back(res);
     }
     //-----------------------------------------------------------------------
-    ResourceGroupManager::ResourceGroup* ResourceGroupManager::getResourceGroup(const String& name) const
+    ResourceGroupManager::ResourceGroup* ResourceGroupManager::getResourceGroup(const String& name,
+                                                                                bool throwOnFailure) const
     {
         OGRE_LOCK_AUTO_MUTEX;
         ResourceGroupMap::const_iterator i = mResourceGroupMap.find(name);
-        return i != mResourceGroupMap.end() ? i->second : NULL;
+
+        if (i == mResourceGroupMap.end())
+        {
+            if (throwOnFailure)
+                OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "Cannot locate a resource group called '" + name + "'");
+
+            return nullptr;
+        }
+
+        return i->second;
     }
     //-----------------------------------------------------------------------
     ResourceManager* ResourceGroupManager::_getResourceManager(const String& resourceType) const
@@ -1396,14 +1291,7 @@ namespace Ogre {
         StringVectorPtr vec(OGRE_NEW_T(StringVector, MEMCATEGORY_GENERAL)(), SPFM_DELETE_T);
 
         // Try to find in resource index first
-        ResourceGroup* grp = getResourceGroup(groupName);
-        if (!grp)
-        {
-            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
-                "Cannot locate a resource group called '" + groupName + "'", 
-                "ResourceGroupManager::listResourceNames");
-        }
-
+        ResourceGroup* grp = getResourceGroup(groupName, true);
         OGRE_LOCK_MUTEX(grp->OGRE_AUTO_MUTEX_NAME); // lock group mutex
 
         // Iterate over the archives
@@ -1426,14 +1314,7 @@ namespace Ogre {
         FileInfoListPtr vec(OGRE_NEW_T(FileInfoList, MEMCATEGORY_GENERAL)(), SPFM_DELETE_T);
 
         // Try to find in resource index first
-        ResourceGroup* grp = getResourceGroup(groupName);
-        if (!grp)
-        {
-            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
-                "Cannot locate a resource group called '" + groupName + "'", 
-                "ResourceGroupManager::listResourceFileInfo");
-        }
-
+        ResourceGroup* grp = getResourceGroup(groupName, true);
         OGRE_LOCK_MUTEX(grp->OGRE_AUTO_MUTEX_NAME); // lock group mutex
 
         // Iterate over the archives
@@ -1456,14 +1337,7 @@ namespace Ogre {
         StringVectorPtr vec(OGRE_NEW_T(StringVector, MEMCATEGORY_GENERAL)(), SPFM_DELETE_T);
 
         // Try to find in resource index first
-        ResourceGroup* grp = getResourceGroup(groupName);
-        if (!grp)
-        {
-            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
-                "Cannot locate a resource group called '" + groupName + "'", 
-                "ResourceGroupManager::findResourceNames");
-        }
-
+        ResourceGroup* grp = getResourceGroup(groupName, true);
         OGRE_LOCK_MUTEX(grp->OGRE_AUTO_MUTEX_NAME); // lock group mutex
 
             // Iterate over the archives
@@ -1485,14 +1359,7 @@ namespace Ogre {
         FileInfoListPtr vec(OGRE_NEW_T(FileInfoList, MEMCATEGORY_GENERAL)(), SPFM_DELETE_T);
 
         // Try to find in resource index first
-        ResourceGroup* grp = getResourceGroup(groupName);
-        if (!grp)
-        {
-            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
-                "Cannot locate a resource group called '" + groupName + "'", 
-                "ResourceGroupManager::findResourceFileInfo");
-        }
-
+        ResourceGroup* grp = getResourceGroup(groupName, true);
         OGRE_LOCK_MUTEX(grp->OGRE_AUTO_MUTEX_NAME); // lock group mutex
 
             // Iterate over the archives
@@ -1510,14 +1377,7 @@ namespace Ogre {
     bool ResourceGroupManager::resourceExists(const String& groupName, const String& resourceName) const
     {
         // Try to find in resource index first
-        ResourceGroup* grp = getResourceGroup(groupName);
-        if (!grp)
-        {
-            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
-                "Cannot locate a resource group called '" + groupName + "'", 
-                "ResourceGroupManager::resourceExists");
-        }
-
+        ResourceGroup* grp = getResourceGroup(groupName, true);
         return resourceExists(grp, resourceName) != 0;
     }
     //-----------------------------------------------------------------------
@@ -1565,16 +1425,8 @@ namespace Ogre {
     time_t ResourceGroupManager::resourceModifiedTime(const String& groupName, const String& resourceName) const
     {
         // Try to find in resource index first
-        ResourceGroup* grp = getResourceGroup(groupName);
-        if (!grp)
-        {
-            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
-                "Cannot locate a resource group called '" + groupName + "'", 
-                "ResourceGroupManager::resourceModifiedTime");
-        }
-
+        ResourceGroup* grp = getResourceGroup(groupName, true);
         return resourceModifiedTime(grp, resourceName);
-
     }
     //-----------------------------------------------------------------------
     time_t ResourceGroupManager::resourceModifiedTime(ResourceGroup* grp, const String& resourceName) const
@@ -1630,14 +1482,7 @@ namespace Ogre {
         StringVectorPtr vec(OGRE_NEW_T(StringVector, MEMCATEGORY_GENERAL)(), SPFM_DELETE_T);
 
         // Try to find in resource index first
-        ResourceGroup* grp = getResourceGroup(groupName);
-        if (!grp)
-        {
-            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
-                "Cannot locate a resource group called '" + groupName + "'", 
-                "ResourceGroupManager::listResourceNames");
-        }
-
+        ResourceGroup* grp = getResourceGroup(groupName, true);
         OGRE_LOCK_MUTEX(grp->OGRE_AUTO_MUTEX_NAME); // lock group mutex
 
         // Iterate over the archives
@@ -1656,14 +1501,7 @@ namespace Ogre {
         StringVectorPtr vec(OGRE_NEW_T(StringVector, MEMCATEGORY_GENERAL)(), SPFM_DELETE_T);
 
         // Try to find in resource index first
-        ResourceGroup* grp = getResourceGroup(groupName);
-        if (!grp)
-        {
-            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
-                "Cannot locate a resource group called '" + groupName + "'", 
-                "ResourceGroupManager::listResourceNames");
-        }
-
+        ResourceGroup* grp = getResourceGroup(groupName, true);
         OGRE_LOCK_MUTEX(grp->OGRE_AUTO_MUTEX_NAME); // lock group mutex
 
         // Iterate over the archives
@@ -1684,40 +1522,21 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void ResourceGroupManager::setCustomStagesForResourceGroup(const String& group, uint32 stageCount)
     {
-        ResourceGroup* grp = getResourceGroup(group);
-        if (!grp)
-        {
-            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND,
-                        "Cannot locate a resource group called '" + group + "'");
-        }
-
+        ResourceGroup* grp = getResourceGroup(group, true);
         OGRE_LOCK_MUTEX(grp->OGRE_AUTO_MUTEX_NAME); // lock group mutex
         grp->customStageCount = stageCount;
     }
     //-----------------------------------------------------------------------
     uint32 ResourceGroupManager::getCustomStagesForResourceGroup(const String& group)
     {
-        ResourceGroup* grp = getResourceGroup(group);
-        if (!grp)
-        {
-            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND,
-                        "Cannot locate a resource group called '" + group + "'");
-        }
-
+        ResourceGroup* grp = getResourceGroup(group, true);
         OGRE_LOCK_MUTEX(grp->OGRE_AUTO_MUTEX_NAME); // lock group mutex
         return grp->customStageCount;
     }
     //-----------------------------------------------------------------------
     bool ResourceGroupManager::isResourceGroupInGlobalPool(const String& name) const
     {
-        ResourceGroup* grp = getResourceGroup(name);
-        if (!grp)
-        {
-            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
-                "Cannot find a group named " + name, 
-                "ResourceGroupManager::isResourceGroupInitialised");
-        }
-        return grp->inGlobalPool;
+        return getResourceGroup(name, true)->inGlobalPool;
     }
     //-----------------------------------------------------------------------
     StringVector ResourceGroupManager::getResourceGroups(void) const
@@ -1735,29 +1554,13 @@ namespace Ogre {
     ResourceGroupManager::ResourceDeclarationList 
     ResourceGroupManager::getResourceDeclarationList(const String& group) const
     {
-        ResourceGroup* grp = getResourceGroup(group);
-        if (!grp)
-        {
-            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
-                "Cannot locate a resource group called '" + group + "'", 
-                "ResourceGroupManager::getResourceDeclarationList");
-        }
-
-        return grp->resourceDeclarations;
+        return getResourceGroup(group, true)->resourceDeclarations;
     }
     //---------------------------------------------------------------------
     const ResourceGroupManager::LocationList& 
     ResourceGroupManager::getResourceLocationList(const String& group) const
     {
-            ResourceGroup* grp = getResourceGroup(group);
-        if (!grp)
-        {
-            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
-                "Cannot locate a resource group called '" + group + "'", 
-                "ResourceGroupManager::getResourceLocationList");
-        }
-
-        return grp->locationList;
+        return getResourceGroup(group, true)->locationList;
     }
     //-------------------------------------------------------------------------
     void ResourceGroupManager::setLoadingListener(ResourceLoadingListener *listener)

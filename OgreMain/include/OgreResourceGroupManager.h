@@ -349,7 +349,7 @@ namespace Ogre {
         /** Adds a created resource to a group. */
         void addCreatedResource(ResourcePtr& res, ResourceGroup& group) const;
         /** Get resource group */
-        ResourceGroup* getResourceGroup(const String& name) const;
+        ResourceGroup* getResourceGroup(const String& name, bool throwOnFailure = false) const;
         /** Drops contents of a group, leave group there, notify ResourceManagers. */
         void dropGroupContents(ResourceGroup* grp);
         /** Delete a group for shutdown - don't notify ResourceManagers. */
