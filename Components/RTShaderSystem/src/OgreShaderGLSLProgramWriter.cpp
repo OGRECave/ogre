@@ -137,17 +137,8 @@ void GLSLProgramWriter::writeMainSourceCode(std::ostream& os, Program* program)
     // Write the uniforms 
     for (itUniformParam = parameterList.begin();  itUniformParam != parameterList.end(); ++itUniformParam)
     {
-        ParameterPtr pUniformParam = *itUniformParam;
-
-        os << "uniform\t"; 
-        os << mGpuConstTypeMap[pUniformParam->getType()];
-        os << "\t"; 
-        os << pUniformParam->getName();
-        if (pUniformParam->isArray() == true)
-        {
-            os << "[" << pUniformParam->getSize() << "]";   
-        }
-        os << ";" << std::endl;     
+        writeUniformParameter(os, *itUniformParam);
+        os << ";" << std::endl;
     }
     os << std::endl;            
 

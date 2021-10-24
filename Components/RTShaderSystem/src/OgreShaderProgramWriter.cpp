@@ -54,5 +54,46 @@ void ProgramWriter::writeFunctionTitle(std::ostream& os, Function* function)
     os << "//-----------------------------------------------------------------------------" << std::endl;
 }
 
+void ProgramWriter::writeUniformParameter(std::ostream& os, const UniformParameterPtr& parameter)
+{
+    os << "uniform\t";
+    if(!parameter->isSampler() || parameter->getType() == GCT_SAMPLER_EXTERNAL_OES)
+    {
+        os << mGpuConstTypeMap[parameter->getType()];
+        os << "\t";
+        os << parameter->getName();
+        if (parameter->isArray() == true)
+        {
+            os << "[" << parameter->getSize() << "]";
+        }
+        return;
+    }
+
+    switch(parameter->getType())
+    {
+    case GCT_SAMPLER1D:
+        os << "SAMPLER1D(";
+        break;
+    case GCT_SAMPLER2D:
+        os << "SAMPLER2D(";
+        break;
+    case GCT_SAMPLER3D:
+        os << "SAMPLER3D(";
+        break;
+    case GCT_SAMPLERCUBE:
+        os << "SAMPLERCUBE(";
+        break;
+    case GCT_SAMPLER2DSHADOW:
+        os << "SAMPLER2DSHADOW(";
+        break;
+    case GCT_SAMPLER2DARRAY:
+        os << "SAMPLER2DARRAY(";
+        break;
+    default:
+        OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "unsuppported sampler type");
+    }
+    os << parameter->getName() << ", " << parameter->getIndex() << ")";
+}
+
 }
 }

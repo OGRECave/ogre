@@ -167,24 +167,6 @@ void CGProgramWriter::writeProgramDependencies(std::ostream& os, Program* progra
 }
 
 //-----------------------------------------------------------------------
-void CGProgramWriter::writeUniformParameter(std::ostream& os, const UniformParameterPtr& parameter)
-{
-    os << mGpuConstTypeMap[parameter->getType()];
-    os << "\t"; 
-    os << parameter->getName(); 
-    if (parameter->isArray() == true)
-    {
-        os << "[" << parameter->getSize() << "]";   
-    }
-    
-    if (parameter->isSampler())
-    {
-        os << " : register(s" << parameter->getIndex() << ")";      
-    }
-
-}
-
-//-----------------------------------------------------------------------
 void CGProgramWriter::writeFunctionParameter(std::ostream& os, ParameterPtr parameter)
 {
     os << mGpuConstTypeMap[parameter->getType()];
