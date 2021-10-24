@@ -83,7 +83,6 @@ THE SOFTWARE.
 
 #include "OgreShaderHLSLProgramProcessor.h"
 #include "OgreShaderGLSLProgramProcessor.h"
-#include "OgreShaderGLSLESProgramProcessor.h"
 
 #include "OgreShaderProgramWriter.h"
 #include "OgreShaderProgramWriterManager.h"
