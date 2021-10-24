@@ -721,6 +721,7 @@ namespace Ogre
     void VulkanQueue::getCopyEncoder( const BufferPacked *buffer, VulkanTextureGpu *texture,
                                       const bool bDownload )
     {
+        OgreAssert(mEncoderState != EncoderGraphicsOpen, "interrupting RenderPass not supported");
         if( mEncoderState != EncoderCopyOpen )
         {
             endRenderEncoder();
@@ -746,6 +747,7 @@ namespace Ogre
     //-------------------------------------------------------------------------
     void VulkanQueue::getCopyEncoderV1Buffer( const bool bDownload )
     {
+        OgreAssert(mEncoderState != EncoderGraphicsOpen, "interrupting RenderPass not supported");
         if( mEncoderState != EncoderCopyOpen )
         {
             endRenderEncoder();
@@ -862,7 +864,9 @@ namespace Ogre
     {
         if( mEncoderState != EncoderGraphicsOpen )
             return;
-        mRenderSystem->_notifyActiveEncoderEnded( endRenderPassDesc );
+        mRenderSystem->_notifyActiveEncoderEnded();
+        if( endRenderPassDesc )
+            mRenderSystem->endRenderPassDescriptor();
         mEncoderState = EncoderClosed;
     }
     //-------------------------------------------------------------------------

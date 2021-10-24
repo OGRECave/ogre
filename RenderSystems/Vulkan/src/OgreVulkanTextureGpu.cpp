@@ -228,6 +228,8 @@ namespace Ogre
         OGRE_VK_CHECK(vkAllocateMemory(device->mDevice, &memAllocInfo, NULL, &mMemory));
         OGRE_VK_CHECK(vkBindImageMemory(device->mDevice, mFinalTextureName, mMemory, 0));
 
+        OgreAssert(device->mGraphicsQueue.getEncoderState() != VulkanQueue::EncoderGraphicsOpen,
+                   "interrupting RenderPass not supported");
         device->mGraphicsQueue.endAllEncoders();
 
         // Pool owners transition all its slices to read_only_optimal to avoid the validation layers

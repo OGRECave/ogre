@@ -135,11 +135,6 @@ namespace Ogre
         VulkanQueue *mQueue;
         VulkanRenderSystem *mRenderSystem;
 
-#if OGRE_DEBUG_MODE && OGRE_PLATFORM == OGRE_PLATFORM_LINUX
-        void *mCallstackBacktrace[32];
-        size_t mNumCallstackEntries;
-#endif
-
         void checkRenderWindowStatus( void );
         void calculateSharedKey( void );
         void calculateSharedFlushOnlyKey( void );
@@ -185,8 +180,8 @@ namespace Ogre
 
         uint32 willSwitchTo( VulkanRenderPassDescriptor *newDesc, bool warnIfRtvWasFlushed ) const;
 
-        void performLoadActions( bool renderingWasInterrupted );
-        void performStoreActions( bool isInterruptingRendering );
+        void performLoadActions();
+        void performStoreActions();
     };
 
     /** @} */
