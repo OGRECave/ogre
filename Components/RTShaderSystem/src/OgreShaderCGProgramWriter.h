@@ -83,9 +83,6 @@ protected:
 
     /** Write the program dependencies. */
     virtual void writeProgramDependencies(std::ostream& os, Program* program);
-    
-    /** Write a uniform parameter. */
-    virtual void writeUniformParameter(std::ostream& os, const UniformParameterPtr& parameter);
 
     /** Write a function parameter. */
     void writeFunctionParameter(std::ostream& os, ParameterPtr parameter);
@@ -106,8 +103,6 @@ protected:
 
 // Attributes.
 protected:
-    // Map between GPU constant type to string value.
-    GpuConstTypeToStringMap mGpuConstTypeMap;
     // Map between parameter semantic to string value.
     ParamSemanticToStringMap mParamSemanticMap;
 };

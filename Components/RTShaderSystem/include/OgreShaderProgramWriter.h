@@ -76,6 +76,13 @@ protected:
 
     /** Write a function title. */
     void                writeFunctionTitle          (std::ostream& os, Function* function);
+
+    /** Write a uniform parameter. */
+    void writeUniformParameter(std::ostream& os, const UniformParameterPtr& parameter);
+
+    typedef std::map<GpuConstantType, const char*> GpuConstTypeToStringMap;
+    // Map between GPU constant type to string value.
+    GpuConstTypeToStringMap mGpuConstTypeMap;
 };
 
 /** @} */

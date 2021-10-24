@@ -54,8 +54,6 @@ public:
     */
     HLSLProgramWriter();
 
-    void writeUniformParameter(std::ostream& os, const UniformParameterPtr& parameter);
-
     /** Class destructor */
     virtual ~HLSLProgramWriter();
 

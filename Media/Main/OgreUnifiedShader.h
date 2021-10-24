@@ -88,6 +88,7 @@ mat3 mtxFromCols(vec3 a, vec3 b, vec3 c)
 #define SAMPLER3D(name, reg) sampler3D name
 #define SAMPLER2DARRAY(name, reg) sampler2DArray name
 #define SAMPLERCUBE(name, reg) samplerCube name
+#define SAMPLER2DSHADOW(name, reg) sampler2DShadow name
 
 #define saturate(x) clamp(x, 0.0, 1.0)
 #define mul(a, b) ((a) * (b))

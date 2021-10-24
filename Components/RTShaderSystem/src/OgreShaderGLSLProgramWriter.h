@@ -94,15 +94,12 @@ protected:
     void writeOutParameters(std::ostream& os, Function* function, GpuProgramType gpuType);
 
 protected:
-    typedef std::map<GpuConstantType, const char*>     GpuConstTypeToStringMap;
     typedef std::map<Parameter::Semantic, const char*> ParamSemanticToStringMap;
     typedef std::map<Parameter::Content, const char*>  ParamContentToStringMap;
     typedef std::map<String, String>                   StringMap;
 
     // Attributes.
 protected:
-    // Map between GPU constant type to string value.
-    GpuConstTypeToStringMap mGpuConstTypeMap;
     // Map between parameter semantic to string value.
     ParamSemanticToStringMap mParamSemanticMap;
 
