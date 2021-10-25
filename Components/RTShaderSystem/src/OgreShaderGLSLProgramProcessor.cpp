@@ -77,6 +77,9 @@ bool GLSLProgramProcessor::postCreateGpuPrograms(ProgramSet* programSet)
 //-----------------------------------------------------------------------------
 void GLSLProgramProcessor::bindTextureSamplers(Program* pCpuProgram, GpuProgramPtr pGpuProgram)
 {
+    if (StringConverter::parseBool(pGpuProgram->getParameter("has_sampler_binding")))
+        return;
+
     GpuProgramParametersSharedPtr pGpuParams = pGpuProgram->getDefaultParameters();
 
     // Bind the samplers.

@@ -81,8 +81,11 @@ protected:
     void writeUniformParameter(std::ostream& os, const UniformParameterPtr& parameter);
 
     typedef std::map<GpuConstantType, const char*> GpuConstTypeToStringMap;
+    typedef std::map<Parameter::Semantic, const char*> ParamSemanticToStringMap;
     // Map between GPU constant type to string value.
     GpuConstTypeToStringMap mGpuConstTypeMap;
+    // Map between parameter semantic to string value.
+    ParamSemanticToStringMap mParamSemanticMap;
 };
 
 /** @} */

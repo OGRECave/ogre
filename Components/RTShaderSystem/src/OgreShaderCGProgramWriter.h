@@ -95,16 +95,6 @@ protected:
 
     /** Write function atom instance. */
     void writeAtomInstance(std::ostream& os, FunctionAtom* atom);
-
-
-protected:
-    typedef std::map<GpuConstantType, const char*> GpuConstTypeToStringMap;
-    typedef std::map<Parameter::Semantic, const char*> ParamSemanticToStringMap;
-
-// Attributes.
-protected:
-    // Map between parameter semantic to string value.
-    ParamSemanticToStringMap mParamSemanticMap;
 };
 
 /** CG program writer factory implementation.

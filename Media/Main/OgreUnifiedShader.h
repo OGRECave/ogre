@@ -6,13 +6,17 @@
 // - shiny: https://ogrecave.github.io/shiny/defining-materials-shaders.html
 // - bgfx: https://github.com/bkaradzic/bgfx/blob/master/src/bgfx_shader.sh
 
-// general usage:
+/// general usage:
 // MAIN_PARAMETERS
 // IN(vec4 vertex, POSITION)
 // MAIN_DECLARATION
 // {
 //     GLSL code here
 // }
+
+/// configuration
+// use macros that will be default with Ogre 14
+// #define USE_OGRE_FROM_FUTURE
 
 // @public-api
 
@@ -83,12 +87,20 @@ mat3 mtxFromCols(vec3 a, vec3 b, vec3 c)
 // GLSL
 #include "GLSL_GL3Support.glsl"
 
-#define SAMPLER1D(name, reg) sampler1D name
-#define SAMPLER2D(name, reg) sampler2D name
-#define SAMPLER3D(name, reg) sampler3D name
-#define SAMPLER2DARRAY(name, reg) sampler2DArray name
-#define SAMPLERCUBE(name, reg) samplerCube name
-#define SAMPLER2DSHADOW(name, reg) sampler2DShadow name
+#ifndef USE_OGRE_FROM_FUTURE
+#define UNIFORM_BINDING(b)
+#elif OGRE_GLSL >= 420 || defined(OGRE_GLSLANG)
+#define UNIFORM_BINDING(b) layout(binding = b) uniform
+#else
+#define UNIFORM_BINDING(b) uniform
+#endif
+
+#define SAMPLER1D(name, reg) UNIFORM_BINDING(reg) sampler1D name
+#define SAMPLER2D(name, reg) UNIFORM_BINDING(reg) sampler2D name
+#define SAMPLER3D(name, reg) UNIFORM_BINDING(reg) sampler3D name
+#define SAMPLER2DARRAY(name, reg) UNIFORM_BINDING(reg) sampler2DArray name
+#define SAMPLERCUBE(name, reg) UNIFORM_BINDING(reg) samplerCube name
+#define SAMPLER2DSHADOW(name, reg) UNIFORM_BINDING(reg) sampler2DShadow name
 
 #define saturate(x) clamp(x, 0.0, 1.0)
 #define mul(a, b) ((a) * (b))
