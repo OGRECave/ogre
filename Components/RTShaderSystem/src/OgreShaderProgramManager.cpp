@@ -339,8 +339,12 @@ GpuProgramPtr ProgramManager::createGpuProgram(Program* shaderProgram,
         pGpuProgram->setParameter("enable_backwards_compatibility", "true");
         pGpuProgram->setParameter("column_major_matrices", StringConverter::toString(shaderProgram->getUseColumnMajorMatrices()));
     }
-    else if (language == "cg")
-        pGpuProgram->setParameter("profiles", profiles);
+    else if (language == "glsl")
+    {
+        auto* rs = Root::getSingleton().getRenderSystem();
+        if( rs && rs->getNativeShadingLanguageVersion() >= 420)
+            pGpuProgram->setParameter("has_sampler_binding", "true");
+    }
 
     pGpuProgram->load();
 

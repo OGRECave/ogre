@@ -1,6 +1,9 @@
 #version 430
 
-layout(binding = 2) uniform sampler2D texSampler;
+#define USE_OGRE_FROM_FUTURE
+#include <OgreUnifiedShader.h>
+
+SAMPLER2D(texSampler, 2);
 
 layout(location = 0) in vec3 uv;
 

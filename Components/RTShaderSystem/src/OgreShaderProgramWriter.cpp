@@ -56,9 +56,9 @@ void ProgramWriter::writeFunctionTitle(std::ostream& os, Function* function)
 
 void ProgramWriter::writeUniformParameter(std::ostream& os, const UniformParameterPtr& parameter)
 {
-    os << "uniform\t";
     if(!parameter->isSampler() || parameter->getType() == GCT_SAMPLER_EXTERNAL_OES)
     {
+        os << "uniform\t";
         os << mGpuConstTypeMap[parameter->getType()];
         os << "\t";
         os << parameter->getName();
