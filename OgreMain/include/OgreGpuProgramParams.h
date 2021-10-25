@@ -28,6 +28,8 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #ifndef __GpuProgramParams_H_
 #define __GpuProgramParams_H_
 
+#include <limits>
+
 // Precompiler options
 #include "OgrePrerequisites.h"
 #include "OgreSharedPtr.h"
