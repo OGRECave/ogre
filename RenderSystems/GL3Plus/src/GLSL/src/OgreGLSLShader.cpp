@@ -42,6 +42,22 @@
 #include "OgreGL3PlusHardwareBufferManager.h"
 
 namespace Ogre {
+
+    /// Command object for setting the maximum output vertices (geometry shader only)
+    class CmdHasSamplersBinding : public ParamCommand
+    {
+    public:
+        String doGet(const void* target) const
+        {
+            return StringConverter::toString(static_cast<const GLSLShader*>(target)->getSamplerBinding());
+        }
+        void doSet(void* target, const String& val)
+        {
+            static_cast<GLSLShader*>(target)->setSamplerBinding(StringConverter::parseBool(val));
+        }
+    };
+    static CmdHasSamplersBinding msCmdHasSamplerBinding;
+
     /**  Convert GL uniform size and type to OGRE constant types
          and associate uniform definitions together. */
     static void convertGLUniformtoOgreType(GLenum gltype, GpuConstantDefinition& defToUpdate)
@@ -249,16 +265,12 @@ namespace Ogre {
             setupBaseParamDictionary();
             ParamDictionary* dict = getParamDictionary();
 
-            dict->addParameter(ParameterDef(
-                "attach",
-                "name of another GLSL program needed by this program",
-                PT_STRING), &msCmdAttach);
-            dict->addParameter(ParameterDef(
-                "column_major_matrices",
-                "Whether matrix packing in column-major order.",
-                PT_BOOL), &msCmdColumnMajorMatrices);
+            dict->addParameter("attach", &msCmdAttach);
+            dict->addParameter("column_major_matrices", &msCmdColumnMajorMatrices);
+            dict->addParameter("has_sampler_binding", &msCmdHasSamplerBinding);
         }
 
+        mHasSamplerBinding = false;
         // There is nothing to load
         mLoadFromFile = false;
     }
@@ -535,6 +547,8 @@ namespace Ogre {
             }
             else if(def.isSampler())
             {
+                if(mHasSamplerBinding)
+                    continue;
                 def.physicalIndex = mConstantDefs->registerCount;
                 mConstantDefs->registerCount += def.arraySize * def.elementSize;
                 // no index based referencing

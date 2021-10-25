@@ -49,6 +49,9 @@ namespace Ogre {
 
         bool linkSeparable();
 
+        void setSamplerBinding(bool enable) { mHasSamplerBinding = enable; }
+        bool getSamplerBinding() const { return mHasSamplerBinding; }
+
         const HardwareBufferPtr& getDefaultBuffer() const { return mDefaultBuffer; }
 
         /// Overridden from GpuProgram
@@ -68,6 +71,7 @@ namespace Ogre {
         void extractBufferBlocks(GLenum type) const;
 
         mutable HardwareBufferPtr mDefaultBuffer;
+        bool mHasSamplerBinding;
     };
 
     /** Factory class for GLSL shaders.
