@@ -131,7 +131,7 @@ mat3 mtxFromCols(vec3 a, vec3 b, vec3 c)
 
 #endif
 
-#if defined(OGRE_METAL) || defined(OGRE_GLSLANG)
+#if defined(OGRE_METAL) || defined(OGRE_GLSLANG) || __VERSION__ > 150
 // semantics as aliases for attribute locations
 #define POSITION    0
 #define BLENDWEIGHT 1
@@ -139,7 +139,7 @@ mat3 mtxFromCols(vec3 a, vec3 b, vec3 c)
 #define COLOR0      3
 #define COLOR1      4
 #define COLOR COLOR0
-#define BLENDIDICES 7
+#define BLENDINDICES 7
 #define TEXCOORD0   8
 #define TEXCOORD1   9
 #define TEXCOORD2  10

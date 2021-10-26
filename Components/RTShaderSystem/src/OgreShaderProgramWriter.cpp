@@ -54,6 +54,20 @@ void ProgramWriter::writeFunctionTitle(std::ostream& os, Function* function)
     os << "//-----------------------------------------------------------------------------" << std::endl;
 }
 
+ProgramWriter::ProgramWriter()
+{
+    mParamSemanticMap[Parameter::SPS_POSITION] = "POSITION";
+    mParamSemanticMap[Parameter::SPS_BLEND_WEIGHTS] = "BLENDWEIGHT";
+    mParamSemanticMap[Parameter::SPS_BLEND_INDICES] = "BLENDINDICES";
+    mParamSemanticMap[Parameter::SPS_NORMAL] = "NORMAL";
+    mParamSemanticMap[Parameter::SPS_COLOR] = "COLOR";
+    mParamSemanticMap[Parameter::SPS_TEXTURE_COORDINATES] = "TEXCOORD";
+    mParamSemanticMap[Parameter::SPS_BINORMAL] = "BINORMAL";
+    mParamSemanticMap[Parameter::SPS_TANGENT] = "TANGENT";
+}
+
+ProgramWriter::~ProgramWriter() {}
+
 void ProgramWriter::writeUniformParameter(std::ostream& os, const UniformParameterPtr& parameter)
 {
     if(!parameter->isSampler() || parameter->getType() == GCT_SAMPLER_EXTERNAL_OES)
@@ -93,6 +107,18 @@ void ProgramWriter::writeUniformParameter(std::ostream& os, const UniformParamet
         OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "unsuppported sampler type");
     }
     os << parameter->getName() << ", " << parameter->getIndex() << ")";
+}
+
+void ProgramWriter::writeParameterSemantic(std::ostream& os, const ParameterPtr& parameter)
+{
+    OgreAssertDbg(parameter->getSemantic() != Parameter::SPS_UNKNOWN, "invalid semantic");
+    os << mParamSemanticMap[parameter->getSemantic()];
+
+    if (parameter->getSemantic() == Parameter::SPS_TEXTURE_COORDINATES ||
+        (parameter->getSemantic() == Parameter::SPS_COLOR && parameter->getIndex() > 0))
+    {
+        os << parameter->getIndex();
+    }
 }
 
 }
