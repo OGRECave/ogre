@@ -52,9 +52,9 @@ class _OgreRTSSExport ProgramWriter : public RTShaderSystemAlloc
 {
 // Interface.
 public:
-
+    ProgramWriter();
     /** Class destructor */
-    virtual ~ProgramWriter  () {}
+    virtual ~ProgramWriter();
 
 
     /** Write the program shader source code.
@@ -79,6 +79,9 @@ protected:
 
     /** Write a uniform parameter. */
     void writeUniformParameter(std::ostream& os, const UniformParameterPtr& parameter);
+
+    /** Write a function parameter. */
+    void writeParameterSemantic(std::ostream& os, const ParameterPtr& parameter);
 
     typedef std::map<GpuConstantType, const char*> GpuConstTypeToStringMap;
     typedef std::map<Parameter::Semantic, const char*> ParamSemanticToStringMap;

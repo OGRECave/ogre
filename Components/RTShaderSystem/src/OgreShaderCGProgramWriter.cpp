@@ -74,17 +74,7 @@ void CGProgramWriter::initializeStringMaps()
     mGpuConstTypeMap[GCT_UINT3] = "uint3";
     mGpuConstTypeMap[GCT_UINT4] = "uint4";
 
-
-    mParamSemanticMap[Parameter::SPS_POSITION] = "POSITION";
-    mParamSemanticMap[Parameter::SPS_BLEND_WEIGHTS] = "BLENDWEIGHT";
-    mParamSemanticMap[Parameter::SPS_BLEND_INDICES] = "BLENDINDICES";
-    mParamSemanticMap[Parameter::SPS_NORMAL] = "NORMAL";
-    mParamSemanticMap[Parameter::SPS_COLOR] = "COLOR";
-    mParamSemanticMap[Parameter::SPS_TEXTURE_COORDINATES] = "TEXCOORD";
-    mParamSemanticMap[Parameter::SPS_BINORMAL] = "BINORMAL";
-    mParamSemanticMap[Parameter::SPS_TANGENT] = "TANGENT";
     mParamSemanticMap[Parameter::SPS_FRONT_FACING] = "VFACE";
-    mParamSemanticMap[Parameter::SPS_UNKNOWN] = "";
 }
 
 //-----------------------------------------------------------------------
@@ -178,22 +168,8 @@ void CGProgramWriter::writeFunctionParameter(std::ostream& os, ParameterPtr para
         os << "[" << parameter->getSize() << "]";   
     }
     
-    if (parameter->getSemantic() != Parameter::SPS_UNKNOWN)
-    {
-        os << " : ";
-        os << mParamSemanticMap[parameter->getSemantic()];
-
-        if (parameter->getSemantic() != Parameter::SPS_POSITION && 
-            parameter->getSemantic() != Parameter::SPS_NORMAL &&
-            parameter->getSemantic() != Parameter::SPS_TANGENT &&
-            parameter->getSemantic() != Parameter::SPS_BLEND_INDICES &&
-            parameter->getSemantic() != Parameter::SPS_BLEND_WEIGHTS &&
-            (!(parameter->getSemantic() == Parameter::SPS_COLOR && parameter->getIndex() == 0)) &&
-            parameter->getIndex() >= 0)
-        {           
-            os << StringConverter::toString(parameter->getIndex()).c_str();
-        }
-    }
+    os << " : ";
+    writeParameterSemantic(os, parameter);
 }
 
 //-----------------------------------------------------------------------
@@ -215,24 +191,16 @@ void CGProgramWriter::writeFunctionDeclaration(std::ostream& os, Function* funct
     const ShaderParameterList& outParams = function->getOutputParameters();
 
 
-    os << "void main";
-    os << std::endl << "\t(" << std::endl;
+    os << "void main(\n";
 
     ShaderParameterConstIterator it;
-    size_t paramsCount = inParams.size() + outParams.size();
-    size_t curParamIndex = 0;
 
     // Write input parameters.
     for (it=inParams.begin(); it != inParams.end(); ++it)
     {                   
         os << "\t in ";
-
         writeFunctionParameter(os, *it);
-
-        if (curParamIndex + 1 != paramsCount)       
-            os << ", " << std::endl;
-
-        curParamIndex++;
+        os << ",\n";
     }
 
 
@@ -241,14 +209,12 @@ void CGProgramWriter::writeFunctionDeclaration(std::ostream& os, Function* funct
     {
         os << "\t out ";
         writeFunctionParameter(os, *it);
+        os << ",\n";
+    }
 
-        if (curParamIndex + 1 != paramsCount)               
-            os << ", " << std::endl;
+    os.seekp(-2, std::ios_base::end);
 
-        curParamIndex++;
-    }   
-
-    os << std::endl << "\t)" << std::endl;
+    os << "\n)\n";
 }
 
 //-----------------------------------------------------------------------

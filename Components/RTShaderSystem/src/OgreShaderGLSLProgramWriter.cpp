@@ -302,8 +302,9 @@ void GLSLProgramWriter::writeInputParameters(std::ostream& os, Function* functio
                 os << mGpuConstTypeMap[type];
             }
             os << "\t"; 
-            os << mContentToPerVertexAttributes[paramContent];
-            os << ", 0)" << std::endl; // location currently unused
+            os << mContentToPerVertexAttributes[paramContent] << ", ";
+            writeParameterSemantic(os, pParam);  // maps to location
+            os << ")\n";
         }
         else if(paramContent == Parameter::SPC_COLOR_DIFFUSE && !mIsGLSLES)
         {
