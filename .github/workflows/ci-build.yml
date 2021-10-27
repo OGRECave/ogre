@@ -54,7 +54,7 @@ jobs:
     - uses: actions/checkout@v2
     - uses: actions/cache@v2
       with:
-        path: android-ndk-r18b
+        path: android-ndk-r21e
         key: ${{ runner.os }}-android-ndk
     - name: Install Dependencies
       run: sudo apt-get install -y swig4.0
