@@ -47,6 +47,15 @@ THE SOFTWARE.
 
 namespace Ogre
 {
+    // Mask away read flags from srcAccessMask
+    static const uint32 c_srcValidAccessFlags =
+        0xFFFFFFFF ^
+        ( VK_ACCESS_INDIRECT_COMMAND_READ_BIT | VK_ACCESS_INDEX_READ_BIT |
+          VK_ACCESS_VERTEX_ATTRIBUTE_READ_BIT | VK_ACCESS_UNIFORM_READ_BIT |
+          VK_ACCESS_INPUT_ATTACHMENT_READ_BIT | VK_ACCESS_SHADER_READ_BIT |
+          VK_ACCESS_COLOR_ATTACHMENT_READ_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT |
+          VK_ACCESS_TRANSFER_READ_BIT | VK_ACCESS_HOST_READ_BIT | VK_ACCESS_MEMORY_READ_BIT );
+
     VulkanQueue::VulkanQueue() :
         mDevice( 0 ),
         mFamily( NumQueueFamilies ),
