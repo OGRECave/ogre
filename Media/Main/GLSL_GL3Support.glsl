@@ -39,13 +39,13 @@ mat4 transpose(mat4 m)
 #define texture2DLod textureLod
 #define textureCubeLod textureLod
 
-#if defined(OGRE_GLSLANG) || (__VERSION__ > 150 && defined(OGRE_VERTEX_SHADER))
+#if defined(OGRE_GLSLANG) || (__VERSION__ > 150 && defined(OGRE_VERTEX_SHADER)) || __VERSION__ >= 410
 #define IN(decl, loc) layout(location = loc) in decl;
 #else
 #define IN(decl, loc) in decl;
 #endif
 
-#if defined(OGRE_GLSLANG) || (__VERSION__ > 150 && defined(OGRE_FRAGMENT_SHADER))
+#if defined(OGRE_GLSLANG) || (__VERSION__ > 150 && defined(OGRE_FRAGMENT_SHADER)) || __VERSION__ >= 410
 #define OUT(decl, loc) layout(location = loc) out decl;
 #else
 #define OUT(decl, loc) out decl;
