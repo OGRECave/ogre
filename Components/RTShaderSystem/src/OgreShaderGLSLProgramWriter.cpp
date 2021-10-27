@@ -242,6 +242,8 @@ void GLSLProgramWriter::writeInputParameters(std::ostream& os, Function* functio
     ShaderParameterConstIterator itParam = inParams.begin();
     ShaderParameterConstIterator itParamEnd = inParams.end();
 
+    int psInLocation = 0;
+
     for ( ; itParam != itParamEnd; ++itParam)
     {       
         ParameterPtr pParam = *itParam;
@@ -270,7 +272,7 @@ void GLSLProgramWriter::writeInputParameters(std::ostream& os, Function* functio
             os << mGpuConstTypeMap[pParam->getType()];
             os << "\t"; 
             os << paramName;
-            os << ", 0)" << std::endl; // location currently unused
+            os << ", " << psInLocation++ << ")\n";
         }
         else if (gpuType == GPT_VERTEX_PROGRAM && 
                  mContentToPerVertexAttributes.find(paramContent) != mContentToPerVertexAttributes.end())
@@ -333,6 +335,8 @@ void GLSLProgramWriter::writeOutParameters(std::ostream& os, Function* function,
     ShaderParameterConstIterator itParam = outParams.begin();
     ShaderParameterConstIterator itParamEnd = outParams.end();
 
+    int vsOutLocation = 0;
+
     for ( ; itParam != itParamEnd; ++itParam)
     {
         ParameterPtr pParam = *itParam;
@@ -366,7 +370,7 @@ void GLSLProgramWriter::writeOutParameters(std::ostream& os, Function* function,
                 {
                     os << "[" << pParam->getSize() << "]";  
                 }
-                os << ", 0)" << std::endl; // location currently unused
+                os << ", " << vsOutLocation++ << ")\n";
             }
         }
         else if(gpuType == GPT_FRAGMENT_PROGRAM &&
