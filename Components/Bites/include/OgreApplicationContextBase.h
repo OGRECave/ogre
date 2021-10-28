@@ -179,6 +179,9 @@ namespace OgreBites
         */
         virtual void setWindowGrab(NativeWindowType* win, bool grab = true) {}
 
+        /// get the vertical DPI of the display
+        virtual float getDisplayDPI() const { return 96.0f; }
+
         /// @overload
         void setWindowGrab(bool grab = true) {
             OgreAssert(!mWindows.empty(), "create a window first");
