@@ -815,7 +815,6 @@ namespace OgreBites
                 miscParams["FSAA"] = "2";
             }
 #endif
-            NativeWindowPair res = ApplicationContext::createWindow(name, w, h, miscParams);
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
             mGestureView = [[SampleBrowserGestureView alloc] init];
@@ -824,7 +823,7 @@ namespace OgreBites
             [[[UIApplication sharedApplication] keyWindow] addSubview:mGestureView];
 #endif
 
-            return res;
+            return ApplicationContext::createWindow(name, w, h, miscParams);
         }
 
         /*-----------------------------------------------------------------------------
@@ -834,6 +833,10 @@ namespace OgreBites
           -----------------------------------------------------------------------------*/
         virtual void loadResources()
         {
+#if OGRE_PLATFORM != OGRE_PLATFORM_APPLE
+            Ogre::OverlayManager::getSingleton().setPixelRatio(getDisplayDPI()/96);
+#endif
+
             Ogre::ResourceGroupManager::getSingleton().initialiseResourceGroup("Essential");
             mTrayMgr = new TrayManager("BrowserControls", getRenderWindow(), this);
             mTrayMgr->showBackdrop("SdkTrays/Bands");
