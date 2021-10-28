@@ -33,6 +33,7 @@ THE SOFTWARE
 #include "OgreTextureUnitState.h"
 #include "OgreTechnique.h"
 #include "OgreBitwise.h"
+#include "OgreOverlayManager.h"
 
 #include "utf8.h"
 #include "OgreBillboardSet.h"
@@ -357,6 +358,7 @@ namespace Ogre
         {
             mCodePointRangeList.push_back(CodePointRange(33, 126));
         }
+        float vpScale = OverlayManager::getSingleton().getPixelRatio();
 #ifdef HAVE_FREETYPE
         // ManualResourceLoader implementation - load the texture
         FT_Library ftLibrary;
@@ -375,9 +377,8 @@ namespace Ogre
 
         // Convert our point size to freetype 26.6 fixed point format
         FT_F26Dot6 ftSize = (FT_F26Dot6)(mTtfSize * (1 << 6));
-        if( FT_Set_Char_Size( face, ftSize, 0, mTtfResolution, mTtfResolution ) )
-            OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR,
-            "Could not set char size!", "Font::createTextureFromFont" );
+        if (FT_Set_Char_Size(face, ftSize, 0, mTtfResolution * vpScale, mTtfResolution * vpScale))
+            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Could not set char size!");
 
         //FILE *fo_def = stdout;
 
@@ -401,7 +402,7 @@ namespace Ogre
         stbtt_fontinfo font;
         stbtt_InitFont(&font, ttfchunk.getPtr(), 0);
         // 64 gives the same texture resolution as freetype.
-        float scale = stbtt_ScaleForPixelHeight(&font, mTtfSize * mTtfResolution / 64);
+        float scale = stbtt_ScaleForPixelHeight(&font, vpScale * mTtfSize * mTtfResolution / 64);
 
         int max_width = 0, max_height = 0;
         // Calculate maximum width, height and bearing

@@ -42,6 +42,12 @@ public:
     void setupContent(void)
     {
         auto imguiOverlay = new ImGuiOverlay();
+
+        // handle DPI scaling
+        float vpScale = OverlayManager::getSingleton().getPixelRatio();
+        ImGui::GetIO().FontGlobalScale = std::round(vpScale); // default font does not work with fractional scaling
+        ImGui::GetStyle().ScaleAllSizes(vpScale);
+
         imguiOverlay->setZOrder(300);
         imguiOverlay->show();
         OverlayManager::getSingleton().addOverlay(imguiOverlay); // now owned by overlaymgr

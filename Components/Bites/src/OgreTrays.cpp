@@ -2135,8 +2135,10 @@ bool TrayManager::mouseMoved(const MouseMotionEvent &evt)
     // thats a separate event. Ignore for now.
     static float wheelDelta = 0;
 
+    auto vpScale = Ogre::OverlayManager::getSingleton().getPixelRatio();
+
     // always keep track of the mouse pos for refreshCursor()
-    mCursorPos = Ogre::Vector2(evt.x, evt.y);
+    mCursorPos = Ogre::Vector2(evt.x, evt.y) / vpScale;
     mCursor->setPosition(mCursorPos.x, mCursorPos.y);
 
     if (mExpandedMenu)   // only check top priority widget until it passes on

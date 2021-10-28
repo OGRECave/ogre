@@ -104,9 +104,11 @@ ImFont* ImGuiOverlay::addFont(const String& name, const String& group)
         cprangePtr = mCodePointRanges.back().data();
     }
 
+    float vpScale = OverlayManager::getSingleton().getPixelRatio();
+
     ImFontConfig cfg;
     strncpy(cfg.Name, name.c_str(), IM_ARRAYSIZE(cfg.Name) - 1);
-    return io.Fonts->AddFontFromMemoryTTF(ttfchunk.getPtr(), ttfchunk.size(), font->getTrueTypeSize(), &cfg,
+    return io.Fonts->AddFontFromMemoryTTF(ttfchunk.getPtr(), ttfchunk.size(), font->getTrueTypeSize() * vpScale, &cfg,
                                           cprangePtr);
 }
 
@@ -144,7 +146,8 @@ void ImGuiOverlay::NewFrame()
     OverlayManager& oMgr = OverlayManager::getSingleton();
 
     // Setup display size (every frame to accommodate for window resizing)
-    io.DisplaySize = ImVec2(oMgr.getViewportWidth(), oMgr.getViewportHeight());
+    auto vpScale = oMgr.getPixelRatio();
+    io.DisplaySize = ImVec2(oMgr.getViewportWidth() * vpScale, oMgr.getViewportHeight() * vpScale);
 
     // Start the frame
     ImGui::NewFrame();
@@ -158,19 +161,19 @@ void ImGuiOverlay::ImGUIRenderable::_update()
     }
 
     RenderSystem* rSys = Root::getSingleton().getRenderSystem();
-    OverlayManager& oMgr = OverlayManager::getSingleton();
 
     // Construct projection matrix, taking texel offset corrections in account (important for DirectX9)
     // See also:
     //     - OGRE-API specific hint: http://www.ogre3d.org/forums/viewtopic.php?f=5&p=536881#p536881
     //     - IMGUI Dx9 demo solution:
-    //     https://github.com/ocornut/imgui/blob/master/examples/directx9_example/imgui_impl_dx9.cpp#L127-L138
+    //     https://github.com/ocornut/imgui/blob/v1.50/examples/directx9_example/imgui_impl_dx9.cpp#L127-L138
+    ImGuiIO& io = ImGui::GetIO();
     float texelOffsetX = rSys->getHorizontalTexelOffset();
     float texelOffsetY = rSys->getVerticalTexelOffset();
     float L = texelOffsetX;
-    float R = oMgr.getViewportWidth() + texelOffsetX;
+    float R = io.DisplaySize.x + texelOffsetX;
     float T = texelOffsetY;
-    float B = oMgr.getViewportHeight() + texelOffsetY;
+    float B = io.DisplaySize.y + texelOffsetY;
 
     mXform = Matrix4(2.0f / (R - L), 0.0f, 0.0f, (L + R) / (L - R), 0.0f, -2.0f / (B - T), 0.0f,
                      (T + B) / (B - T), 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f);
