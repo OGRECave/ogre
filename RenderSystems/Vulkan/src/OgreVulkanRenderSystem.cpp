@@ -1279,7 +1279,7 @@ namespace Ogre
         mVpChanged = false;
     }
     //-------------------------------------------------------------------------
-    inline void VulkanRenderSystem::endRenderPassDescriptor()
+    void VulkanRenderSystem::endRenderPassDescriptor()
     {
         if( mCurrentRenderPassDescriptor )
         {
