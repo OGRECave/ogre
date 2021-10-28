@@ -103,10 +103,10 @@ namespace {
             if(!mBuffer)
                 mBuffer.reset(new MemoryDataStream(_openFileStream(mName, std::ios::binary)));
 
-            mZipFile = zip_open_stream((const char*)mBuffer->getPtr(), mBuffer->size());
+            mZipFile = zip_stream_open((const char*)mBuffer->getPtr(), mBuffer->size(), 0, 'r');
 
             // Cache names
-            int n = zip_total_entries(mZipFile);
+            int n = zip_entries_total(mZipFile);
             for (int i = 0; i < n; ++i) {
                 FileInfo info;
                 info.archive = this;
