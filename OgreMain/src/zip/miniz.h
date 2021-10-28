@@ -1753,6 +1753,8 @@ MINIZ_EXPORT void *mz_zip_extract_archive_file_to_heap_v2(
 #endif
 
 #endif /* MINIZ_NO_ARCHIVE_APIS */
+
+#ifndef MINIZ_HEADER_FILE_ONLY
 /**************************************************************************
  *
  * Copyright 2013-2014 RAD Game Tools and Valve Software
@@ -9954,3 +9956,4 @@ mz_bool mz_zip_end(mz_zip_archive *pZip) {
 #endif
 
 #endif /*#ifndef MINIZ_NO_ARCHIVE_APIS*/
+#endif // MINIZ_HEADER_FILE_ONLY
