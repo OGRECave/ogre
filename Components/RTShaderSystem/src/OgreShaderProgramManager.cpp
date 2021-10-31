@@ -154,26 +154,21 @@ void ProgramManager::destroyDefaultProgramWriterFactories()
 void ProgramManager::createDefaultProgramProcessors()
 {
     // Add standard shader processors
-#if OGRE_PLATFORM != OGRE_PLATFORM_ANDROID
     mDefaultProgramProcessors.push_back(OGRE_NEW GLSLProgramProcessor);
+    addProgramProcessor("glsles", mDefaultProgramProcessors.back());
+#if OGRE_PLATFORM != OGRE_PLATFORM_ANDROID
+    addProgramProcessor("glsl", mDefaultProgramProcessors.back());
     mDefaultProgramProcessors.push_back(OGRE_NEW HLSLProgramProcessor);
+    addProgramProcessor("hlsl", mDefaultProgramProcessors.back());
 #endif
-    mDefaultProgramProcessors.push_back(OGRE_NEW GLSLESProgramProcessor);
-
-    for (unsigned int i=0; i < mDefaultProgramProcessors.size(); ++i)
-    {
-        addProgramProcessor(mDefaultProgramProcessors[i]);
-    }
 }
 
 //-----------------------------------------------------------------------------
 void ProgramManager::destroyDefaultProgramProcessors()
 {
-    for (unsigned int i=0; i < mDefaultProgramProcessors.size(); ++i)
-    {
-        removeProgramProcessor(mDefaultProgramProcessors[i]);
-        OGRE_DELETE mDefaultProgramProcessors[i];
-    }
+    // removing unknown is not an error
+    for(auto lang : {"glsl", "glsles", "hlsl"})
+        removeProgramProcessor(lang);
     mDefaultProgramProcessors.clear();
 }
 
@@ -385,25 +380,23 @@ String ProgramManager::generateHash(const String& programString, const String& d
 
 
 //-----------------------------------------------------------------------------
-void ProgramManager::addProgramProcessor(ProgramProcessor* processor)
+void ProgramManager::addProgramProcessor(const String& lang, ProgramProcessor* processor)
 {
     
-    ProgramProcessorIterator itFind = mProgramProcessorsMap.find(processor->getTargetLanguage());
+    ProgramProcessorIterator itFind = mProgramProcessorsMap.find(lang);
 
     if (itFind != mProgramProcessorsMap.end())
     {
-        OGRE_EXCEPT(Exception::ERR_DUPLICATE_ITEM,
-            "A processor for language '" + processor->getTargetLanguage() + "' already exists.",
-            "ProgramManager::addProgramProcessor");
-    }       
+        OGRE_EXCEPT(Exception::ERR_DUPLICATE_ITEM, "A processor for language '" + lang + "' already exists.");
+    }
 
-    mProgramProcessorsMap[processor->getTargetLanguage()] = processor;
+    mProgramProcessorsMap[lang] = processor;
 }
 
 //-----------------------------------------------------------------------------
-void ProgramManager::removeProgramProcessor(ProgramProcessor* processor)
+void ProgramManager::removeProgramProcessor(const String& lang)
 {
-    ProgramProcessorIterator itFind = mProgramProcessorsMap.find(processor->getTargetLanguage());
+    ProgramProcessorIterator itFind = mProgramProcessorsMap.find(lang);
 
     if (itFind != mProgramProcessorsMap.end())
         mProgramProcessorsMap.erase(itFind);

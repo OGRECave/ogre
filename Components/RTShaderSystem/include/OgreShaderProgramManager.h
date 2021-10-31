@@ -164,13 +164,13 @@ private:
     Add program processor instance to this manager.
     @param processor The instance to add.
     */
-    void addProgramProcessor(ProgramProcessor* processor);
+    void addProgramProcessor(const String& lang, ProgramProcessor* processor);
 
     /** 
     Remove program processor instance from this manager. 
     @param processor The instance to remove.
     */
-    void removeProgramProcessor(ProgramProcessor* processor);
+    void removeProgramProcessor(const String& lang);
 
     /** Destroy a GPU program by name.
     @param gpuProgram The program to destroy.

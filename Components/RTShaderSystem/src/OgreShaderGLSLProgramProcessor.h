@@ -56,9 +56,6 @@ public:
     /** Class destructor */
     virtual ~GLSLProgramProcessor();
 
-    /** Return the target language of this processor. */
-    virtual const String& getTargetLanguage() const { return TargetLanguage; }
-
     /** 
     @see ProgramProcessor::preCreateGpuPrograms
     */
@@ -74,17 +71,6 @@ private:
 
     /** Bind texture samplers. */
     void bindTextureSamplers(Program* pCpuProgram, GpuProgramPtr pGpuProgram);
-
-    static String TargetLanguage;
-};
-
-class GLSLESProgramProcessor : public GLSLProgramProcessor
-{
-public:
-    const String& getTargetLanguage() const override { return TargetLanguage; }
-
-private:
-    static String TargetLanguage;
 };
 
 /** @} */
