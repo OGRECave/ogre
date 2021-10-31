@@ -52,16 +52,13 @@ ProgramManager& ProgramManager::getSingleton()
 ProgramManager::ProgramManager()
 {
     createDefaultProgramProcessors();
-    createDefaultProgramWriterFactories();
 }
 
 //-----------------------------------------------------------------------------
 ProgramManager::~ProgramManager()
 {
     flushGpuProgramsCache();
-    destroyDefaultProgramWriterFactories();
     destroyDefaultProgramProcessors();  
-    destroyProgramWriters();
 }
 
 //-----------------------------------------------------------------------------
@@ -121,35 +118,6 @@ void ProgramManager::flushGpuProgramsCache(GpuProgramsMap& gpuProgramsMap)
         gpuProgramsMap.erase(it);
     }
 }
-
-//-----------------------------------------------------------------------------
-void ProgramManager::createDefaultProgramWriterFactories()
-{
-    // Add standard shader writer factories 
-#if OGRE_PLATFORM != OGRE_PLATFORM_ANDROID
-    mProgramWriterFactories.push_back(OGRE_NEW ShaderProgramWriterCGFactory());
-    mProgramWriterFactories.push_back(OGRE_NEW ShaderProgramWriterGLSLFactory());
-    mProgramWriterFactories.push_back(OGRE_NEW ShaderProgramWriterHLSLFactory());
-#endif
-    mProgramWriterFactories.push_back(OGRE_NEW ShaderProgramWriterGLSLESFactory());
-    
-    for (unsigned int i=0; i < mProgramWriterFactories.size(); ++i)
-    {
-        ProgramWriterManager::getSingletonPtr()->addFactory(mProgramWriterFactories[i]);
-    }
-}
-
-//-----------------------------------------------------------------------------
-void ProgramManager::destroyDefaultProgramWriterFactories()
-{ 
-    for (unsigned int i=0; i<mProgramWriterFactories.size(); i++)
-    {
-        ProgramWriterManager::getSingletonPtr()->removeFactory(mProgramWriterFactories[i]);
-        OGRE_DELETE mProgramWriterFactories[i];
-    }
-    mProgramWriterFactories.clear();
-}
-
 //-----------------------------------------------------------------------------
 void ProgramManager::createDefaultProgramProcessors()
 {
@@ -173,23 +141,6 @@ void ProgramManager::destroyDefaultProgramProcessors()
 }
 
 //-----------------------------------------------------------------------------
-void ProgramManager::destroyProgramWriters()
-{
-    ProgramWriterIterator it    = mProgramWritersMap.begin();
-    ProgramWriterIterator itEnd = mProgramWritersMap.end();
-
-    for (; it != itEnd; ++it)
-    {
-        if (it->second != NULL)
-        {
-            OGRE_DELETE it->second;
-            it->second = NULL;
-        }                   
-    }
-    mProgramWritersMap.clear();
-}
-
-//-----------------------------------------------------------------------------
 void ProgramManager::createGpuPrograms(ProgramSet* programSet)
 {
     // Before we start we need to make sure that the pixel shader input
@@ -205,19 +156,8 @@ void ProgramManager::createGpuPrograms(ProgramSet* programSet)
 
     // Grab the matching writer.
     const String& language = ShaderGenerator::getSingleton().getTargetLanguage();
-    ProgramWriterIterator itWriter = mProgramWritersMap.find(language);
-    ProgramWriter* programWriter = NULL;
 
-    // No writer found -> create new one.
-    if (itWriter == mProgramWritersMap.end())
-    {
-        programWriter = ProgramWriterManager::getSingletonPtr()->createProgramWriter(language);
-        mProgramWritersMap[language] = programWriter;
-    }
-    else
-    {
-        programWriter = itWriter->second;
-    }
+    auto programWriter = ProgramWriterManager::getSingleton().getProgramWriter(language);
 
     ProgramProcessorIterator itProcessor = mProgramProcessorsMap.find(language);
     ProgramProcessor* programProcessor = NULL;

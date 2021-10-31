@@ -75,38 +75,6 @@ public:
 
     static String TargetLanguage;
 };
-
-/** GLSL ES program writer factory implementation.
-@see ProgramWriterFactory
-*/
-class ShaderProgramWriterGLSLESFactory : public ProgramWriterFactory
-{
-public:
-    ShaderProgramWriterGLSLESFactory() : mLanguage("glsles")
-    {
-    }
-    virtual ~ShaderProgramWriterGLSLESFactory() {}
-
-    /** 
-    @see ProgramWriterFactory::getTargetLanguage
-    */
-    virtual const String& getTargetLanguage(void) const
-    {
-        return mLanguage;
-    }
-
-    /** 
-    @see ProgramWriterFactory::create
-    */
-    virtual ProgramWriter* create(void)
-    {
-        return OGRE_NEW GLSLESProgramWriter();
-    }
-
-private:
-    String mLanguage;
-};
-
 /** @} */
 /** @} */
 

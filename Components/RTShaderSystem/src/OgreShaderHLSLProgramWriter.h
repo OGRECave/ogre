@@ -64,38 +64,6 @@ public:
 
     static String TargetLanguage;
 };
-
-/** HLSL program writer factory implementation.
-@see ProgramWriterFactory
-*/
-class ShaderProgramWriterHLSLFactory : public ProgramWriterFactory
-{
-public:
-    ShaderProgramWriterHLSLFactory() : mLanguage("hlsl") {}
-    virtual ~ShaderProgramWriterHLSLFactory() {}
-
-    /** 
-    @see ProgramWriterFactory::getTargetLanguage
-    */
-    virtual const String& getTargetLanguage(void) const
-    {
-        return mLanguage;
-    }
-
-    /** 
-    @see ProgramWriterFactory::create
-    */
-    virtual ProgramWriter* create(void)
-    {
-        return OGRE_NEW HLSLProgramWriter();
-    }
-
-private:
-    String mLanguage;
-
-};
-
-
 /** @} */
 /** @} */
 }

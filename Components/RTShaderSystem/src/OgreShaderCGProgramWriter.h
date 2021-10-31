@@ -96,39 +96,6 @@ protected:
     /** Write function atom instance. */
     void writeAtomInstance(std::ostream& os, FunctionAtom* atom);
 };
-
-/** CG program writer factory implementation.
-@see ProgramWriterFactory
-*/
-class ShaderProgramWriterCGFactory : public ProgramWriterFactory
-{
-public:
-    ShaderProgramWriterCGFactory() : mLanguage("cg")
-    {
-    }
-    virtual ~ShaderProgramWriterCGFactory() {}
-
-    /** 
-    @see ProgramWriterFactory::getTargetLanguage
-    */
-    virtual const String& getTargetLanguage(void) const
-    {
-        return mLanguage;
-    }
-
-    /** 
-    @see ProgramWriterFactory::create
-    */
-    virtual ProgramWriter* create(void)
-    {
-        return OGRE_NEW CGProgramWriter();
-    }
-
-private:
-    String mLanguage;
-
-};
-
 /** @} */
 /** @} */
 }
