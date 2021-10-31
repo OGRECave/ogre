@@ -52,6 +52,7 @@ ProgramWriterManager::ProgramWriterManager()
     // Add standard shader writer factories
 #if OGRE_PLATFORM != OGRE_PLATFORM_ANDROID
     addProgramWriter("glsl", new GLSLProgramWriter());
+    addProgramWriter("glslang", new GLSLProgramWriter());
     addProgramWriter("hlsl", new HLSLProgramWriter());
 #endif
     addProgramWriter("glsles", new GLSLESProgramWriter());

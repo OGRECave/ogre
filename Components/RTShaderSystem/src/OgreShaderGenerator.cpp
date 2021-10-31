@@ -149,6 +149,10 @@ ShaderGenerator::ShaderGenerator() :
     {
         mShaderLanguage = "hlsl";
     }
+    else if (hmgr.isLanguageSupported("glslang"))
+    {
+        mShaderLanguage = "glslang";
+    }
     else
     {
         mShaderLanguage = "null"; // falling back to HLSL, for unit tests mainly

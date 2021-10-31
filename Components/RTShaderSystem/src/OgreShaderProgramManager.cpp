@@ -126,6 +126,7 @@ void ProgramManager::createDefaultProgramProcessors()
     addProgramProcessor("glsles", mDefaultProgramProcessors.back());
 #if OGRE_PLATFORM != OGRE_PLATFORM_ANDROID
     addProgramProcessor("glsl", mDefaultProgramProcessors.back());
+    addProgramProcessor("glslang", mDefaultProgramProcessors.back());
     mDefaultProgramProcessors.push_back(OGRE_NEW HLSLProgramProcessor);
     addProgramProcessor("hlsl", mDefaultProgramProcessors.back());
 #endif
@@ -135,7 +136,7 @@ void ProgramManager::createDefaultProgramProcessors()
 void ProgramManager::destroyDefaultProgramProcessors()
 {
     // removing unknown is not an error
-    for(auto lang : {"glsl", "glsles", "hlsl"})
+    for(auto lang : {"glsl", "glsles", "glslang", "hlsl"})
         removeProgramProcessor(lang);
     mDefaultProgramProcessors.clear();
 }
