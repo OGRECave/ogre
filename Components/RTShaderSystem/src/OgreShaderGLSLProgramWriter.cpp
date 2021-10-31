@@ -125,16 +125,25 @@ void GLSLProgramWriter::writeMainSourceCode(std::ostream& os, Program* program)
     }
 
     const UniformParameterList& parameterList = program->getParameters();
-    UniformParameterConstIterator itUniformParam = parameterList.begin();
     
     // Generate global variable code.
     writeUniformParametersTitle(os, program);
     os << std::endl;
 
+    auto* rs = Root::getSingleton().getRenderSystem();
+    auto hasSSO = rs ? rs->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS) : false;
+
+    int uniformLoc = 0;
     // Write the uniforms 
-    for (itUniformParam = parameterList.begin();  itUniformParam != parameterList.end(); ++itUniformParam)
+    for (auto uparam : parameterList)
     {
-        writeUniformParameter(os, *itUniformParam);
+        if(!uparam->isSampler() && mGLSLVersion >= 430 && hasSSO)
+        {
+            os << "layout(location = " << uniformLoc << ") ";
+            auto esize = GpuConstantDefinition::getElementSize(uparam->getType(), true) / 4;
+            uniformLoc += esize * std::max<int>(uparam->getSize(), 1);
+        }
+        writeUniformParameter(os, uparam);
         os << ";" << std::endl;
     }
     os << std::endl;            
