@@ -30,9 +30,6 @@ THE SOFTWARE.
 namespace Ogre {
 namespace RTShader {
 
-String GLSLProgramProcessor::TargetLanguage = "glsl";
-String GLSLESProgramProcessor::TargetLanguage = "glsles";
-
 //-----------------------------------------------------------------------------
 GLSLProgramProcessor::GLSLProgramProcessor()
 {
