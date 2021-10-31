@@ -42,8 +42,9 @@ to handle input events, we then override the according method
 @snippet Samples/Tutorials/Bootstrap.cpp key_handler
 
 the interesting part however is the setup method
+@note The code is explained in detail in the Tutorial @ref tut_FirstScene
+
 @snippet Samples/Tutorials/Bootstrap.cpp setup
-@note The above code is explained in detail in @ref tut_FirstScene.
 
 finally we start everything as
 @snippet Samples/Tutorials/Bootstrap.cpp main
@@ -63,16 +64,29 @@ For instance to render into an existing Qt Window.
 
 # Running your App {#setupRunning}
 
-On Linux you will typically install OGRE into `/usr/local/` which is automatically searched by the linker, so nothing more to do.
+%Ogre is divided into two library groups: main libraries and plugins.
+
+@par Main libraries
+The main library group contains the @c OgreMain library itself (named @c OgreMain.dll or @c libOgreMain.so depending on your platform) and the component libraries that rely on it.
+@par
+On Linux you will typically install these into `/usr/local/` which is automatically searched by the linker, so nothing more to do.
 On Windows however, you will have to either add the `sdk/bin` folder to `PATH` or copy your executable into `sdk/bin`.
+
+@par Plugins
+The second group of shared libraries are the plugins. %Ogre pushes a good portion of its functionality into plugins so that they may be turned on or off easily at runtime. The core plugins that are included with %Ogre have names that start with @c "Plugin_" and @c "Codec_". You can also write your own plugins.
+@par
+%Ogre also uses plugins for the different render systems (such as OpenGL, DirectX, etc). These plugins start with @c "RenderSystem_".
+
+On Windows, the library and configuration files for %Ogre can be found in the @c bin folder of the SDK.
+On Unix they are split into @c share/OGRE for configuration files, @c lib/ for libraries and  @c lib/OGRE for Plugins.
 
 ## Configuration Files
 
-Ogre uses several configuration files (\*.cfg). They control things like which plugins are loaded and where your application will search for resource files. We will briefly introduce you to each of these files. You'll slowly read more about them as you progress through the tutorials as well.
+%Ogre uses several configuration files (\*.cfg) in the INI format. They control things like which plugins are loaded and where your application will search for resource files. We will briefly introduce you to each of these files. You'll slowly read more about them as you progress through the tutorials as well.
 
-You can place these files the same directory as your executable or in any of [the default lookup paths described here](@ref Ogre::FileSystemLayer::getConfigFilePath). Alternatively you can set the @c OGRE_CONFIG_DIR environment variable for the configuration file location. This overrides the step "executable path" in the default lookup order.
+These files are searched in [a set of predefined locations as described here](@ref Ogre::FileSystemLayer::getConfigFilePath). Alternatively, you can set the @c OGRE_CONFIG_DIR environment variable for a custom configuration file location.
 
-@attention %Ogre must find @c plugins.cfg and @c resources.cfg to function properly. Later tutorials will cover more of their use.
+@attention The above sample code must find @c plugins.cfg and @c resources.cfg to function properly.
 
 ### plugins.cfg
 
@@ -80,14 +94,13 @@ This file tells %Ogre which plugins to load. You modify this file when you want 
 
 ```py
 # Plugin=RenderSystem_Direct3D9
-# Plugin=RenderSystem_Direct3D10
 # Plugin=RenderSystem_Direct3D11
 Plugin=RenderSystem_GL
 ```
 
-We have the three DirectX systems commented out, and an active line for OpenGL. On a windows system, you may have this reversed. You can see why it might be helpful not to delete unused lines, because then you have to try and remember whether it was RenderSystem_OpenGL or RenderSystem_GL.
+We have the DirectX systems commented out, and an active line for OpenGL. On a windows system, you may have this reversed. You can see why it might be helpful not to delete unused lines, because then you have to try and remember whether it was @c RenderSystem_OpenGL or @c RenderSystem_GL.
 
-You can also decide where %Ogre looks for plugins by changing the @c PluginFolder variable. You can use both absolute and relative paths. Relative paths are resolved relative to the location of @c plugins.cfg. Additionally, you can use the @c OGRE_PLUGIN_DIR environment variable to override the value of @c PluginFolder.
+You can also decide where %Ogre looks for plugins by changing the @c PluginFolder variable. You can use both absolute and relative paths. Relative paths are resolved relative to the location of @c plugins.cfg.
 
 For example, if you have built %Ogre from source on a linux machine, then you will need a line like this at the beginning of your file:
 
@@ -96,6 +109,8 @@ PluginFolder=/usr/local/lib/OGRE
 ```
 
 By default, %Ogre would have been looking in the same directory where the @c plugins.cfg is located, which is sufficient on Windows.
+
+Additionally, you can use the @c OGRE_PLUGIN_DIR environment variable to override the value of @c PluginFolder.
 
 @note %Ogre is aware whether your app is a bundle. Therefore a relative path like `Contents/Frameworks/` will be correctly resolved inside the app bundle on OSX.
 
