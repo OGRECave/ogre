@@ -43,8 +43,8 @@ namespace RTShader {
 *  @{
 */
 
-/** Interface definition for factories of ShaderProgramWriter. */
-class _OgreRTSSExport ProgramWriterFactory : public RTShaderSystemAlloc
+/// @deprecated
+class _OgreRTSSExport OGRE_DEPRECATED ProgramWriterFactory : public RTShaderSystemAlloc
 {
 public:
     ProgramWriterFactory() {}
@@ -60,33 +60,46 @@ public:
 class _OgreRTSSExport ProgramWriterManager 
     : public Singleton<ProgramWriterManager>, public RTShaderSystemAlloc
 {
+    std::map<String, ProgramWriter*> mProgramWriters;
 public:
     typedef std::map<String, ProgramWriterFactory*> FactoryMap;
 protected:
-    /// Factories capable of creating ShaderProgramWriterFactory instances
+    /// unused
     FactoryMap mFactories;
 
 public:
     ProgramWriterManager();
     ~ProgramWriterManager();
 
-    /** Add a new factory object for high-level programs of a given language. */
-    void addFactory(ProgramWriterFactory* factory);
-    
-    /** Remove a factory object for high-level programs of a given language. */
-    void removeFactory(ProgramWriterFactory* factory);
+    /// register and transfer ownership of writer
+    void addProgramWriter(const String& lang, ProgramWriter* writer);
 
     /** Returns whether a given high-level language is supported. */
     bool isLanguageSupported(const String& lang);
 
-    /** Create a new, unloaded HighLevelGpuProgram. 
-    @par
-    This method creates a new program of the type specified as the second and third parameters.
-    You will have to call further methods on the returned program in order to 
-    define the program fully before you can load it.
-    @param language Code of the language to use (e.g. "cg")
-    */
-    ProgramWriter* createProgramWriter( const String& language);
+    /// @deprecated
+    OGRE_DEPRECATED void addFactory(ProgramWriterFactory* factory)
+    {
+        addProgramWriter(factory->getTargetLanguage(), factory->create());
+    }
+
+    /// @deprecated
+    OGRE_DEPRECATED void removeFactory(ProgramWriterFactory* factory)
+    {
+        mProgramWriters.erase(factory->getTargetLanguage());
+    }
+
+    /// @deprecated
+    OGRE_DEPRECATED ProgramWriter* createProgramWriter( const String& language);
+
+    ProgramWriter* getProgramWriter(const String& language) const
+    {
+        auto it = mProgramWriters.find(language);
+        if (it != mProgramWriters.end())
+            return it->second;
+        OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "No program writer for language " + language);
+        return nullptr;
+    }
 
     /** Override standard Singleton retrieval.
     @remarks

@@ -107,39 +107,6 @@ protected:
     // set by derived class
     bool mIsGLSLES;
 };
-
-/** GLSL program writer factory implementation.
-@see ProgramWriterFactory
-*/
-class ShaderProgramWriterGLSLFactory : public ProgramWriterFactory
-{
-public:
-    ShaderProgramWriterGLSLFactory() : mLanguage("glsl")
-    {
-    }
-    virtual ~ShaderProgramWriterGLSLFactory() {}
-
-    /** 
-    @see ProgramWriterFactory::getTargetLanguage
-    */
-    virtual const String& getTargetLanguage(void) const
-    {
-        return mLanguage;
-    }
-
-    /** 
-    @see ProgramWriterFactory::create
-    */
-    virtual ProgramWriter* create(void)
-    {
-        return OGRE_NEW GLSLProgramWriter();
-    }
-
-private:
-    String mLanguage;
-
-};
-
 /** @} */
 /** @} */
 
