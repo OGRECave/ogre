@@ -353,6 +353,13 @@ namespace Ogre {
     {
         GLRenderSystemCommon::initConfigOptions();
 
+        ConfigOption optRTTMode;
+        optRTTMode.name = "RTT Preferred Mode";
+        optRTTMode.possibleValues = {"FBO", "PBuffer", "Copy"};
+        optRTTMode.currentValue = optRTTMode.possibleValues[0];
+        optRTTMode.immutable = true;
+        mOptions[optRTTMode.name] = optRTTMode;
+
         ConfigOption opt;
         opt.name = "Fixed Pipeline Enabled";
         opt.possibleValues = {"Yes", "No"};
@@ -918,7 +925,7 @@ namespace Ogre {
                 {
                     // Use PBuffers
                     mRTTManager = new GLPBRTTManager(mGLSupport, primary);
-                    LogManager::getSingleton().logMessage("GL: Using PBuffers for rendering to textures");
+                    LogManager::getSingleton().logWarning("GL: Using PBuffers for rendering to textures");
 
                     //TODO: Depth buffer sharing in pbuffer is left unsupported
                 }
@@ -927,8 +934,8 @@ namespace Ogre {
             {
                 // No pbuffer support either -- fallback to simplest copying from framebuffer
                 mRTTManager = new GLCopyingRTTManager();
-                LogManager::getSingleton().logMessage("GL: Using framebuffer copy for rendering to textures (worst)");
-                LogManager::getSingleton().logMessage("GL: Warning: RenderTexture size is restricted to size of framebuffer. If you are on Linux, consider using GLX instead of SDL.");
+                LogManager::getSingleton().logWarning("GL: Using framebuffer copy for rendering to textures (worst)");
+                LogManager::getSingleton().logWarning("GL: RenderTexture size is restricted to size of framebuffer. If you are on Linux, consider using GLX instead of SDL.");
 
                 //Copy method uses the main depth buffer but no other depth buffer
                 caps->setCapability(RSC_RTT_MAIN_DEPTHBUFFER_ATTACHABLE);
