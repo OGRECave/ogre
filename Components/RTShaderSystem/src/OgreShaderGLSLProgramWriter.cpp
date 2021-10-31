@@ -97,11 +97,8 @@ void GLSLProgramWriter::initializeStringMaps()
     mContentToPerVertexAttributes[Parameter::SPC_TEXTURE_COORDINATE6] = "uv6";
     mContentToPerVertexAttributes[Parameter::SPC_TEXTURE_COORDINATE7] = "uv7";  
 
-    if (mGLSLVersion >= 130 || mIsGLSLES)
-    {
-        mContentToPerVertexAttributes[Parameter::SPC_COLOR_DIFFUSE] = "colour";
-        mContentToPerVertexAttributes[Parameter::SPC_COLOR_SPECULAR] = "secondary_colour";
-    }
+    mContentToPerVertexAttributes[Parameter::SPC_COLOR_DIFFUSE] = "colour";
+    mContentToPerVertexAttributes[Parameter::SPC_COLOR_SPECULAR] = "secondary_colour";
 }
 
 //-----------------------------------------------------------------------
@@ -307,14 +304,6 @@ void GLSLProgramWriter::writeInputParameters(std::ostream& os, Function* functio
             os << mContentToPerVertexAttributes[paramContent] << ", ";
             writeParameterSemantic(os, pParam);  // maps to location
             os << ")\n";
-        }
-        else if(paramContent == Parameter::SPC_COLOR_DIFFUSE && !mIsGLSLES)
-        {
-            pParam->_rename("gl_Color");
-        }
-        else if(paramContent == Parameter::SPC_COLOR_SPECULAR && !mIsGLSLES)
-        {
-            pParam->_rename("gl_SecondaryColor");
         }
         else
         {
