@@ -661,6 +661,18 @@ namespace Ogre {
             GLSLProgramManager::getSingleton().extractUniformsFromGLSL(
                 childShader->getSource(), *mConstantDefs, childShader->getName());
         }
+
+        if(!mHasSamplerBinding)
+            return;
+
+        // drop samplers from constant definitions
+        for(auto it = mConstantDefs->map.begin(); it != mConstantDefs->map.end();)
+        {
+            if(it->second.isSampler())
+                it = mConstantDefs->map.erase(it);
+            else
+                ++it;
+        }
     }
 
     void GLSLShader::attachToProgramObject(const GLuint programObject)
