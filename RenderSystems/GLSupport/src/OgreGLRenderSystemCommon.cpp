@@ -84,14 +84,6 @@ namespace Ogre {
         }
         mOptions[optFSAA.name] = optFSAA;
 
-        // TODO remove this on next release
-        ConfigOption optRTTMode;
-        optRTTMode.name = "RTT Preferred Mode";
-        optRTTMode.possibleValues.push_back("FBO");
-        optRTTMode.currentValue = optRTTMode.possibleValues[0];
-        optRTTMode.immutable = true;
-        mOptions[optRTTMode.name] = optRTTMode;
-
         refreshConfig();
     }
 
