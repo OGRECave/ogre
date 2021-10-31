@@ -2,7 +2,7 @@
 
 @tableofcontents
 
-This first tutorial will cover the basic elements of building a scene in Ogre. The primary focus will be the Ogre::SceneManager, Ogre::SceneNode, and Entity(external link). An Ogre::Entity is anything represented by a mesh. A Ogre::SceneNode is what attaches an object to your scene. Finally, the SceneManager is the object that organizes everything. It keeps track of the entities and nodes in your scene and determines how to display them.
+This first tutorial will cover the basic elements of building a scene in Ogre. The primary focus will be the Ogre::SceneManager, Ogre::SceneNode, and Ogre::Entity. An Entity is anything represented by a mesh. A Ogre::SceneNode is what attaches an object to your scene. Finally, the SceneManager is the object that organizes everything. It keeps track of the entities and nodes in your scene and determines how to display them.
 
 We'll start with an explanation of some of the basic concepts in Ogre. Don't worry, this first tutorial has a little more explanation than the rest, but that changes very quickly once you get to the later tutorials. We will be building plenty of things. We just have to lay a little groundwork first, so you have somewhere to stand.
 
@@ -41,13 +41,11 @@ The first thing we want to do is turn on the lights.
 
 The setAmbientLight method takes an Ogre::ColourValue. The three values represent the red, green, and blue values of the colour, and they range between 0 and 1.
 
-scnMgr is a variable that is defined in OgreBites::ApplicationContext. There are a number of features avariables, like setting up resources and initialization of required routines for rendering. They will be introduced as we need them.
+scnMgr is a variable that is defined in OgreBites::ApplicationContext. There are a number of features available, like setting up resources and initialization of required routines for rendering. They will be introduced as we need them.
 
 Lights will be covered in detail in the next tutorial, but we will still add a simple one to this scene as a teaser. New Light objects can also be requested from the Ogre::SceneManager. We give the Light a unique name when it is created.
 
 @snippet Samples/Tutorials/BasicTutorial1.cpp newlight
-
-@note Starting from version 1.10, camera and lights should be attached to scene nodes for positioning.
 
 Once the Light is created and attached to its SceneNode, we set its position. The three parameters are the x, y, and z coordinates of the location we want to place the Light.
 
@@ -190,32 +188,13 @@ Compile and run your application. We should now have a rotated Ogre head in our 
 
 ![](bt1_rotated_entity.png)
 
-# The Ogre Environment {#TheOgreEnvironment}
+# Plugins {#TheOgreEnvironment}
 
-On Windows, the library and configuration files for Ogre can be found in the @c bin folder of your OgreSDK.
-On Unix they are split into @c share/OGRE for configuration files, @c lib/ for libraries and  @c lib/OGRE for Plugins.
+Third-party plugins make it easy to integrate external libraries to add things like physics, input, and GUI systems. These libraries are used together to form a full game development environment. You might find this piecemeal approach a little strange, but it is a very common design pattern in large software projects. It is harder to comprehend at first, but it is a much more flexible approach when you want to start building more complicated scenes.
 
-## Libraries and Plugins {#LibrariesandPlugins}
+The SDK includes some of these third-party libraries. The [Simple DirectMedia Layer](https://www.libsdl.org/) is used to manage input events and distribute them to Ogre. You can also make use of [Assimp](https://www.assimp.org/) through the @ref AssimpCodec. This library allows you to load many popular geometry formats like .obj. There are other libraries (not included with the SDK) that offer functionality such as sound and physics.
 
-Ogre is divided into three library groups: main libraries, plugins, and third-party libraries.
-
-### Main libraries
-
-The main library group contains the OgreMain library itself and the component libraries that rely on it. OgreMain is named @c OgreMain.dll or @c libOgreMain.so depending on your platform. This library must be included in all of your Ogre applications.
-
-### Plugins
-
-The second group of shared libraries are the plugins. Ogre pushes a good portion of its functionality into shared libraries so that they may be turned on or off easily. The core plugins that are included with Ogre have names that start with @c "Plugin_" and @c "Codec_". You can also write your own plugins.
-
-Ogre also uses plugins for the different render systems (such as OpenGL, DirectX, etc). These plugins start with @c "RenderSystem_". This is also so that you can add only the systems you will need. This can be useful if you write shaders that rely on a particular system, because you can simply remove the incompatible system so that the program won't try to run incorrect code. This also means you can write your own plugins if you want to extend Ogre into another render system.
-
-### Third-party Plugins
-
-The last major group contains third-party libraries and other general support libraries. Ogre is focused sharply on being a graphics rendering library. This group makes it easy to integrate external libraries to add things like physics, input, and GUI systems. These libraries are used together to form a full game development environment. You might find this piecemeal approach a little strange, but it is a very common design pattern in large software projects. It is harder to comprehend at first, but it is a much more flexible approach when you want to start building more complicated scenes.
-
-The Ogre demos and SDK include some of these third-party libraries. The [Simple DirectMedia Layer](https://www.libsdl.org/) is used to manage input events and distribute them to Ogre. You can also make use of [Assimp](https://www.assimp.org/) through the @ref AssimpCodec. This library allows you to load many popular geometry formats like .obj. There are other libraries (not included with Ogre) that offer functionality such as sound and physics.
-
-### Testing vs Release
+## Testing vs Release
 
 When you're building your application you can just leave every plugin activated. This will allow you to experiment with using them or not. But when you get ready to distribute a release build of your work, then you will want to deactivate any of the plugins you are not using.
 
