@@ -141,6 +141,9 @@ class _OgreSampleClassExport Sample_DualQuaternion : public SdkSample
         RTShader::HardwareSkinningFactory::getSingleton().prepareEntityForSkinning(entDQ, RTShader::ST_DUAL_QUATERNION, false, true);
 #endif
 
+        // make sure we query the correct scheme
+        MaterialManager::getSingleton().setActiveScheme(mViewport->getMaterialScheme());
+
         // Create name and value for skinning mode.
         StringVector names;
         names.push_back("Skinning");

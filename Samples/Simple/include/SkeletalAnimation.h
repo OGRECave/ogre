@@ -277,6 +277,9 @@ protected:
         String value = "Software";
         enableBoneBoundingBoxMode( false );  // update status panel entry
 
+        // make sure we query the correct scheme
+        MaterialManager::getSingleton().setActiveScheme(mViewport->getMaterialScheme());
+
         // change the value if hardware skinning is enabled
         MaterialPtr entityMaterial = ent->getSubEntity(0)->getMaterial();
         if(entityMaterial)
