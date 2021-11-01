@@ -238,7 +238,7 @@ GpuProgramPtr ProgramManager::createGpuProgram(Program* shaderProgram,
     // Case cache directory specified -> create program from file.
     if (!cachePath.empty())
     {
-        const String  programFullName = programName + "." + language;
+        const String  programFullName = programName + "." + programWriter->getTargetLanguage();
         const String  programFileName = cachePath + programFullName;
         std::ifstream programFile;
 
