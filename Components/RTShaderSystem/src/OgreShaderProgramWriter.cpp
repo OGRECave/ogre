@@ -68,18 +68,19 @@ ProgramWriter::ProgramWriter()
 
 ProgramWriter::~ProgramWriter() {}
 
-void ProgramWriter::writeUniformParameter(std::ostream& os, const UniformParameterPtr& parameter)
+void ProgramWriter::writeParameter(std::ostream& os, const ParameterPtr& parameter)
 {
-    if(!parameter->isSampler() || parameter->getType() == GCT_SAMPLER_EXTERNAL_OES)
+    os << mGpuConstTypeMap[parameter->getType()] << '\t' << parameter->getName();
+    if (parameter->isArray())
+        os << '[' << parameter->getSize() << ']';
+}
+
+void ProgramWriter::writeSamplerParameter(std::ostream& os, const UniformParameterPtr& parameter)
+{
+    if (parameter->getType() == GCT_SAMPLER_EXTERNAL_OES)
     {
         os << "uniform\t";
-        os << mGpuConstTypeMap[parameter->getType()];
-        os << "\t";
-        os << parameter->getName();
-        if (parameter->isArray() == true)
-        {
-            os << "[" << parameter->getSize() << "]";
-        }
+        writeParameter(os, parameter);
         return;
     }
 
@@ -104,7 +105,7 @@ void ProgramWriter::writeUniformParameter(std::ostream& os, const UniformParamet
         os << "SAMPLER2DARRAY(";
         break;
     default:
-        OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "unsuppported sampler type");
+        OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "unsupported sampler type");
     }
     os << parameter->getName() << ", " << parameter->getIndex() << ")";
 }

@@ -80,9 +80,6 @@ void CGProgramWriter::initializeStringMaps()
 //-----------------------------------------------------------------------
 void CGProgramWriter::writeSourceCode(std::ostream& os, Program* program)
 {
-    const UniformParameterList& parameterList = program->getParameters();
-    UniformParameterConstIterator itUniformParam = parameterList.begin();
-
     // Generate source code header.
     writeProgramTitle(os, program);
     os << std::endl;
@@ -95,9 +92,9 @@ void CGProgramWriter::writeSourceCode(std::ostream& os, Program* program)
     writeUniformParametersTitle(os, program);
     os << std::endl;
 
-    for (itUniformParam=parameterList.begin();  itUniformParam != parameterList.end(); ++itUniformParam)
+    for (const auto& param : program->getParameters())
     {
-        writeUniformParameter(os, *itUniformParam);         
+        param->isSampler() ? writeSamplerParameter(os, param) : writeParameter(os, param);
         os << ";" << std::endl;             
     }
     os << std::endl;
@@ -117,7 +114,7 @@ void CGProgramWriter::writeSourceCode(std::ostream& os, Program* program)
     for (itParam=localParams.begin();  itParam != localParams.end(); ++itParam)
     {
         os << "\t";
-        writeLocalParameter(os, *itParam);
+        writeParameter(os, *itParam);
         os << ";" << std::endl;
     }
 
@@ -159,29 +156,9 @@ void CGProgramWriter::writeProgramDependencies(std::ostream& os, Program* progra
 //-----------------------------------------------------------------------
 void CGProgramWriter::writeFunctionParameter(std::ostream& os, ParameterPtr parameter)
 {
-    os << mGpuConstTypeMap[parameter->getType()];
-
-    os << "\t"; 
-    os << parameter->getName(); 
-    if (parameter->isArray() == true)
-    {
-        os << "[" << parameter->getSize() << "]";   
-    }
-    
+    writeParameter(os, parameter);
     os << " : ";
     writeParameterSemantic(os, parameter);
-}
-
-//-----------------------------------------------------------------------
-void CGProgramWriter::writeLocalParameter(std::ostream& os, ParameterPtr parameter)
-{
-    os << mGpuConstTypeMap[parameter->getType()];
-    os << "\t"; 
-    os << parameter->getName();     
-    if (parameter->isArray() == true)
-    {
-        os << "[" << parameter->getSize() << "]";   
-    }
 }
 
 //-----------------------------------------------------------------------

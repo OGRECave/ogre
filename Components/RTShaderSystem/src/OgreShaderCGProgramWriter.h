@@ -87,9 +87,6 @@ protected:
     /** Write a function parameter. */
     void writeFunctionParameter(std::ostream& os, ParameterPtr parameter);
 
-    /** Write a local parameter. */
-    void writeLocalParameter(std::ostream& os, ParameterPtr parameter);
-
     /** Write a function declaration. */
     void writeFunctionDeclaration(std::ostream& os, Function* function);
 
