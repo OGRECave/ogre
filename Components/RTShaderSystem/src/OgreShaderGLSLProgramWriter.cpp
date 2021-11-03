@@ -137,14 +137,24 @@ void GLSLProgramWriter::writeMainSourceCode(std::ostream& os, Program* program)
     // Write the uniforms 
     for (auto uparam : parameterList)
     {
-        if(!uparam->isSampler() && mGLSLVersion >= 430 && hasSSO)
+        if(uparam->isSampler())
         {
-            os << "layout(location = " << uniformLoc << ") ";
-            auto esize = GpuConstantDefinition::getElementSize(uparam->getType(), true) / 4;
-            uniformLoc += esize * std::max<int>(uparam->getSize(), 1);
+            writeSamplerParameter(os, uparam);
         }
-        writeUniformParameter(os, uparam);
-        os << ";" << std::endl;
+        else
+        {
+            if(mGLSLVersion >= 430 && hasSSO)
+            {
+                os << "layout(location = " << uniformLoc << ") ";
+                auto esize = GpuConstantDefinition::getElementSize(uparam->getType(), true) / 4;
+                uniformLoc += esize * std::max<int>(uparam->getSize(), 1);
+            }
+
+            os << "uniform\t";
+            writeParameter(os, uparam);
+        }
+
+        os << ";\n";
     }
     os << std::endl;            
 
@@ -168,7 +178,7 @@ void GLSLProgramWriter::writeMainSourceCode(std::ostream& os, Program* program)
     for (; itParam != itParamEnd; ++itParam)
     {
         os << "\t";
-        writeLocalParameter(os, *itParam);
+        writeParameter(os, *itParam);
         os << ";" << std::endl;
     }
     os << std::endl;
@@ -361,13 +371,7 @@ void GLSLProgramWriter::writeOutParameters(std::ostream& os, Function* function,
                 paramName[0] = 'i';
                 pParam->_rename(paramName);
 
-                os << mGpuConstTypeMap[pParam->getType()];
-                os << "\t";
-                os << paramName;
-                if (pParam->isArray() == true)
-                {
-                    os << "[" << pParam->getSize() << "]";  
-                }
+                writeParameter(os, pParam);
                 os << ", " << vsOutLocation++ << ")\n";
             }
         }
@@ -397,18 +401,6 @@ void GLSLProgramWriter::writeOutParameters(std::ostream& os, Function* function,
         {
             os << "out gl_PerVertex\n{\nvec4 gl_Position;\nfloat gl_PointSize;\nfloat gl_ClipDistance[];\n};\n" << std::endl;
         }
-    }
-}
-
-//-----------------------------------------------------------------------
-void GLSLProgramWriter::writeLocalParameter(std::ostream& os, ParameterPtr parameter)
-{
-    os << mGpuConstTypeMap[parameter->getType()];
-    os << "\t"; 
-    os << parameter->getName();     
-    if (parameter->isArray() == true)
-    {
-        os << "[" << parameter->getSize() << "]";   
     }
 }
 //-----------------------------------------------------------------------

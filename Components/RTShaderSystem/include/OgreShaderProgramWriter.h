@@ -78,7 +78,10 @@ protected:
     void                writeFunctionTitle          (std::ostream& os, Function* function);
 
     /** Write a uniform parameter. */
-    void writeUniformParameter(std::ostream& os, const UniformParameterPtr& parameter);
+    void writeSamplerParameter(std::ostream& os, const UniformParameterPtr& parameter);
+
+    /** Write a undecorated/ local parameter. */
+    void writeParameter(std::ostream& os, const ParameterPtr& parameter);
 
     /** Write a function parameter. */
     void writeParameterSemantic(std::ostream& os, const ParameterPtr& parameter);
