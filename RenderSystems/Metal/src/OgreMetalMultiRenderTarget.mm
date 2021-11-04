@@ -99,29 +99,9 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void MetalMultiRenderTarget::getCustomAttribute( const String& name, void *pData )
     {
-        if( name == "MetalRenderTargetCommon" )
-        {
-            MetalRenderTargetCommon **metalRttCommon = static_cast<MetalRenderTargetCommon**>(pData);
-            for( size_t i=0; i<mNumMRTs; ++i )
-                metalRttCommon[i] = mMetalRenderTargetCommon[i];
-        }
-        else if( name == "mNumMRTs" )
+        if( name == "mNumMRTs" )
         {
             *static_cast<uint8*>(pData) = mNumMRTs;
-        }
-        else if( name == "MetalDevice" )
-        {
-            if( mMetalRenderTargetCommon[0] )
-            {
-                *static_cast<MetalDevice**>(pData) = mMetalRenderTargetCommon[0]->getOwnerDevice();
-            }
-            else
-            {
-                *static_cast<MetalDevice**>(pData) = 0;
-                OGRE_EXCEPT( Exception::ERR_INVALID_STATE,
-                             "Cannot get 'MetalDevice' while no RTT is attached to this MRT",
-                             "MetalMultiRenderTarget::getCustomAttribute" );
-            }
         }
         else
         {

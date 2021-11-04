@@ -69,8 +69,7 @@ namespace Ogre {
         mLibrary( nil ),
         mFunction( nil ),
         mDevice( device ),
-        mCompiled( false ),
-        mConstantsBytesToWrite( 0 )
+        mCompiled( false )
     {
         if (createParamDictionary("MetalProgram"))
         {
@@ -372,12 +371,6 @@ namespace Ogre {
                 String varName = arg.name.UTF8String;
 
                 mConstantDefs->map.insert( GpuConstantDefinitionMap::value_type( varName, def ) );
-                mConstantDefsSorted.push_back( def );
-
-                mConstantsBytesToWrite = std::max<uint32>( mConstantsBytesToWrite,
-                                                           def.logicalIndex +
-                                                           def.arraySize * def.elementSize *
-                                                           sizeof(float) );
             }
         }
 
@@ -419,12 +412,6 @@ namespace Ogre {
                 String varName = member.name.UTF8String;
 
                 mConstantDefs->map.insert( GpuConstantDefinitionMap::value_type( varName, def ) );
-                mConstantDefsSorted.push_back( def );
-
-                mConstantsBytesToWrite = std::max<uint32>( mConstantsBytesToWrite,
-                                                           def.logicalIndex +
-                                                           def.arraySize * def.elementSize *
-                                                           sizeof(float) );
             }
         }
     }
@@ -466,29 +453,6 @@ namespace Ogre {
         }
 
         mLogicalToPhysical.reset(); // disallow access by index for now
-    }
-    //-----------------------------------------------------------------------
-    uint32 MetalProgram::getBufferRequiredSize(void) const
-    {
-        return mConstantsBytesToWrite;
-    }
-    //-----------------------------------------------------------------------
-    void MetalProgram::updateBuffers( const GpuProgramParametersPtr &params,
-                                      uint8 * RESTRICT_ALIAS dstData )
-    {
-        auto itor = mConstantDefsSorted.begin();
-        auto end  = mConstantDefsSorted.end();
-
-        while( itor != end )
-        {
-            const GpuConstantDefinition& def = *itor;
-
-            const void * RESTRICT_ALIAS src = params->getConstantList().data() + def.physicalIndex;
-
-            memcpy( &dstData[def.logicalIndex], src, def.elementSize * def.arraySize * sizeof(float) );
-
-            ++itor;
-        }
     }
     //-----------------------------------------------------------------------
     String MetalProgram::CmdShaderReflectionPairHint::doGet(const void *target) const

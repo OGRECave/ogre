@@ -97,12 +97,6 @@ namespace Ogre
                                                             MTLRenderPipelineDescriptor *outPsd );
         void analyzeParameterBuffer( MTLArgument *arg );
 
-        /// In bytes.
-        uint32 getBufferRequiredSize(void) const;
-        /// dstData must be able to hold at least getBufferRequiredSize
-        void updateBuffers( const GpuProgramParametersSharedPtr &params,
-                            uint8 * RESTRICT_ALIAS dstData );
-
         static uint32 getAttributeIndex(VertexElementSemantic semantic);
     protected:
         static CmdShaderReflectionPairHint msCmdShaderReflectionPairHint;
@@ -132,10 +126,6 @@ namespace Ogre
         bool mCompiled;
         /// Preprocessor options
         String mTargetBufferName;
-
-        std::vector<GpuConstantDefinition> mConstantDefsSorted;
-        uint32 mConstantsBytesToWrite;
-
         String mShaderReflectionPairHint;
     };
 }

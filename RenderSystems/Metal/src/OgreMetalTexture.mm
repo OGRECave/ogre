@@ -33,7 +33,6 @@ THE SOFTWARE.
 #include "OgreMetalRenderSystem.h"
 #include "OgreTextureManager.h"
 #include "OgreStringConverter.h"
-#include "OgreMetalDepthTexture.h"
 #include "OgreMetalDepthBuffer.h"
 #include "OgreBitwise.h"
 
@@ -213,16 +212,15 @@ namespace Ogre
         {
         #if OGRE_DEBUG_MODE
             RenderTarget *renderTarget = mSurfaceList[0]->getRenderTarget();
+            assert( dynamic_cast<MetalRenderTexture*>( renderTarget ) );
             if( PixelUtil::isDepth( renderTarget->suggestPixelFormat() ) )
             {
-                assert( dynamic_cast<MetalDepthTextureTarget*>( renderTarget ) );
                 MetalDepthBuffer *depthBuffer = static_cast<MetalDepthBuffer*>(
                             renderTarget->getDepthBuffer() );
                 assert( depthBuffer->mDepthAttachmentDesc.loadAction != MTLLoadActionClear );
             }
             else
             {
-                assert( dynamic_cast<MetalRenderTexture*>( renderTarget ) );
                 MetalRenderTexture *renderTexture = static_cast<MetalRenderTexture*>( renderTarget );
                 assert( renderTexture->mColourAttachmentDesc.loadAction != MTLLoadActionClear );
             }

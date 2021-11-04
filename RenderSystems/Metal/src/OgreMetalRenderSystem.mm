@@ -126,12 +126,6 @@ namespace Ogre
         return strName;
     }
     //-------------------------------------------------------------------------
-    const String& MetalRenderSystem::getFriendlyName(void) const
-    {
-        static String strName("Metal_RS");
-        return strName;
-    }
-    //-------------------------------------------------------------------------
     HardwareOcclusionQuery* MetalRenderSystem::createHardwareOcclusionQuery(void)
     {
         return 0; //TODO
@@ -1001,12 +995,10 @@ namespace Ogre
         [mActiveRenderEncoder setVertexBytes:params->getFloatPointer(0)
             length:params->getConstantList().size() atIndex:16];
         #else
-        // TODO rather use this:
+        // TODO rather use this, but there are some transpositon/ alignment issues
         size_t unused;
-        mAutoParamsBuffer->writeData(0, params->getFloatConstantList().size()*sizeof(float), params->getFloatPointer(0));
+        mAutoParamsBuffer->writeData(0, params->getConstantList().size(), params->getFloatPointer(0));
         [mActiveRenderEncoder setVertexBuffer:mAutoParamsBuffer->getBufferName(unused) offset:0 atIndex:16];
-        // or
-        // shader->updateBuffers( params, mAutoParamsBuffer->lockImpl()  );
         #endif
     }
     //-------------------------------------------------------------------------
@@ -1042,27 +1034,6 @@ namespace Ogre
         }
     }
     //-------------------------------------------------------------------------
-    void MetalRenderSystem::discardFrameBuffer( unsigned int buffers )
-    {
-        if( buffers & FBT_COLOUR )
-        {
-            for( size_t i=0; i<mNumMRTs; ++i )
-            {
-                if( mCurrentColourRTs[i] )
-                    mCurrentColourRTs[i]->mColourAttachmentDesc.loadAction = MTLLoadActionDontCare;
-            }
-        }
-
-        if( mCurrentDepthBuffer )
-        {
-            if( buffers & FBT_DEPTH && mCurrentDepthBuffer->mDepthAttachmentDesc )
-                mCurrentDepthBuffer->mDepthAttachmentDesc.loadAction = MTLLoadActionDontCare;
-
-            if( buffers & FBT_STENCIL && mCurrentDepthBuffer->mStencilAttachmentDesc )
-                mCurrentDepthBuffer->mStencilAttachmentDesc.loadAction = MTLLoadActionDontCare;
-        }
-    }
-    //-------------------------------------------------------------------------
     Real MetalRenderSystem::getMinimumDepthInputValue(void)
     {
         return 0.0f;
@@ -1094,16 +1065,15 @@ namespace Ogre
 
         mActiveRenderTarget = target;
 
-        if( target )
+        if( auto metalTarget = dynamic_cast<MetalRenderTargetCommon*>(target) )
         {
             //if( target->getForceDisableColourWrites() )
             //    viewportRenderTargetFlags &= ~VP_RTT_COLOUR_WRITE;
 
-            mCurrentColourRTs[0] = 0;
+            mCurrentColourRTs[0] = metalTarget;
             //We need to set mCurrentColourRTs[0] to grab the active device,
             //even if we won't be drawing to colour target.
             target->getCustomAttribute( "mNumMRTs", &mNumMRTs );
-            target->getCustomAttribute( "MetalRenderTargetCommon", &mCurrentColourRTs[0] );
 
             MetalDevice *ownerDevice = 0;
 
@@ -1162,50 +1132,6 @@ namespace Ogre
         {
             mNumMRTs = 0;
             mCurrentDepthBuffer = 0;
-        }
-    }
-    //-------------------------------------------------------------------------
-    void MetalRenderSystem::_notifyCompositorNodeSwitchedRenderTarget( RenderTarget *previousTarget )
-    {
-        if( previousTarget )
-        {
-            bool mustClear = false;
-            uint8 numMRTs = 0;
-            MetalRenderTargetCommon *currentColourRTs[OGRE_MAX_MULTIPLE_RENDER_TARGETS];
-            previousTarget->getCustomAttribute( "mNumMRTs", &numMRTs );
-            previousTarget->getCustomAttribute( "MetalRenderTargetCommon", &currentColourRTs[0] );
-
-            for( size_t i=0; i<numMRTs; ++i )
-            {
-                if( currentColourRTs[i] )
-                {
-                    if( currentColourRTs[i]->mColourAttachmentDesc.loadAction == MTLLoadActionClear )
-                        mustClear = true;
-                }
-            }
-
-            MetalDepthBuffer *depthBuffer = static_cast<MetalDepthBuffer*>(
-                        previousTarget->getDepthBuffer() );
-
-            if( depthBuffer )
-            {
-                if( depthBuffer->mDepthAttachmentDesc &&
-                    depthBuffer->mDepthAttachmentDesc.loadAction == MTLLoadActionClear )
-                {
-                    mustClear = true;
-                }
-                if( depthBuffer->mStencilAttachmentDesc &&
-                    depthBuffer->mStencilAttachmentDesc.loadAction == MTLLoadActionClear )
-                {
-                    mustClear = true;
-                }
-            }
-
-            if( mustClear )
-            {
-                _setRenderTarget( previousTarget );
-                createRenderEncoder();
-            }
         }
     }
     //-------------------------------------------------------------------------

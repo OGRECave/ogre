@@ -75,17 +75,9 @@ namespace Ogre
     //-------------------------------------------------------------------------
     void MetalRenderTexture::getCustomAttribute( const String& name, void* pData )
     {
-        if( name == "MetalRenderTargetCommon" )
-        {
-            *static_cast<MetalRenderTargetCommon**>(pData) = this;
-        }
-        else if( name == "mNumMRTs" )
+        if( name == "mNumMRTs" )
         {
             *static_cast<uint8*>(pData) = 1u;
-        }
-        else if( name == "MetalDevice" )
-        {
-            *static_cast<MetalDevice**>(pData) = this->getOwnerDevice();
         }
         else
         {

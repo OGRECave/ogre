@@ -96,7 +96,6 @@ namespace Ogre
         virtual void shutdown(void);
 
         virtual const String& getName(void) const;
-        virtual const String& getFriendlyName(void) const;
         virtual void setConfigOption(const String &name, const String &value) {}
 
         virtual HardwareOcclusionQuery* createHardwareOcclusionQuery(void);
@@ -148,13 +147,11 @@ namespace Ogre
         virtual void clearFrameBuffer(unsigned int buffers,
             const ColourValue& colour = ColourValue::Black,
             float depth = 1.0f, unsigned short stencil = 0);
-        virtual void discardFrameBuffer( unsigned int buffers );
 
         virtual Real getMinimumDepthInputValue(void);
         virtual Real getMaximumDepthInputValue(void);
 
         virtual void _setRenderTarget(RenderTarget *target);
-        virtual void _notifyCompositorNodeSwitchedRenderTarget( RenderTarget *previousTarget );
 
         virtual void beginProfileEvent( const String &eventName );
         virtual void endProfileEvent( void );
