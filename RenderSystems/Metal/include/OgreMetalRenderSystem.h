@@ -48,6 +48,7 @@ namespace Ogre
     {
         MTLRenderPipelineDescriptor *psd;
         MTLDepthStencilDescriptor*    mDepthStencilDesc;
+        id<MTLDepthStencilState>    mDepthStencilState;
         bool                        mDepthStencilDescChanged;
 
         bool mInitialized;

@@ -859,6 +859,15 @@ namespace Ogre
             [mActiveRenderEncoder setVertexBuffer:mtlbuf->getBufferName(unused) offset:0 atIndex:bufferIdx];
         }
 
+        if(mDepthStencilDescChanged)
+        {
+            mDepthStencilState =
+                    [mActiveDevice->mDevice newDepthStencilStateWithDescriptor:mDepthStencilDesc];
+            mDepthStencilDescChanged = false;
+        }
+
+        [mActiveRenderEncoder setDepthStencilState:mDepthStencilState];
+
         [mActiveRenderEncoder setRenderPipelineState:getPipelineState()];
 
         const size_t numberOfInstances = op.numberOfInstances;
