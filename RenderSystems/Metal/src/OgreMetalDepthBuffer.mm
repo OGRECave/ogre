@@ -73,9 +73,7 @@ namespace Ogre
     bool MetalDepthBuffer::isCompatible( RenderTarget *renderTarget) const
     {
         //First check they belong to the same GPU device.
-        MetalDevice *device = 0;
-        renderTarget->getCustomAttribute( "MetalDevice", &device );
-
+        auto device = dynamic_cast<MetalRenderTargetCommon*>(renderTarget)->getOwnerDevice();
         if( device == mDevice && renderTarget->suggestPixelFormat() != PF_UNKNOWN &&
             this->getWidth() == renderTarget->getWidth() &&
             this->getHeight() == renderTarget->getHeight() &&

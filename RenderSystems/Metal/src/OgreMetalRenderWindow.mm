@@ -303,19 +303,9 @@ namespace Ogre
     //-------------------------------------------------------------------------
     void MetalRenderWindow::getCustomAttribute( const String& name, void* pData )
     {
-        if( name == "MetalRenderTargetCommon" )
-        {
-            if( mMetalView.layerSizeDidUpdate )
-                checkLayerSizeChanges();
-            *static_cast<MetalRenderTargetCommon**>(pData) = this;
-        }
-        else if( name == "mNumMRTs" )
+        if( name == "mNumMRTs" )
         {
             *static_cast<uint8*>(pData) = 1u;
-        }
-        else if( name == "MetalDevice" )
-        {
-            *static_cast<MetalDevice**>(pData) = this->getOwnerDevice();
         }
         else if( name == "UIView" )
         {
