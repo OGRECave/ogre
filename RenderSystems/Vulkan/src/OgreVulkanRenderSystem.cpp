@@ -1138,11 +1138,14 @@ namespace Ogre
     //-------------------------------------------------------------------------
     Real VulkanRenderSystem::getMaximumDepthInputValue( void ) { return 1.0f; }
     //-------------------------------------------------------------------------
-    void VulkanRenderSystem::beginProfileEvent( const String &eventName ) {}
+    void VulkanRenderSystem::beginProfileEvent(const String& eventName)
+    {
+        beginRegion(mActiveDevice->mGraphicsQueue.mCurrentCmdBuffer, eventName.c_str());
+    }
     //-------------------------------------------------------------------------
-    void VulkanRenderSystem::endProfileEvent( void ) {}
+    void VulkanRenderSystem::endProfileEvent(void) { endRegion(mActiveDevice->mGraphicsQueue.mCurrentCmdBuffer); }
     //-------------------------------------------------------------------------
-    void VulkanRenderSystem::markProfileEvent( const String &event ) {}
+    void VulkanRenderSystem::markProfileEvent(const String& event) {}
     //-------------------------------------------------------------------------
     void VulkanRenderSystem::initGPUProfiling( void ) {}
     //-------------------------------------------------------------------------

@@ -107,4 +107,21 @@ namespace Ogre
             pfnDebugMarkerSetObjectName( device, &nameInfo );
         }
     }
+
+    void beginRegion(VkCommandBuffer cmdBuffer, const char* name)
+    {
+        if(pfnCmdDebugMarkerBegin)
+        {
+            VkDebugMarkerMarkerInfoEXT markerInfo = {VK_STRUCTURE_TYPE_DEBUG_MARKER_MARKER_INFO_EXT};
+            markerInfo.pMarkerName = name;
+            pfnCmdDebugMarkerBegin(cmdBuffer, &markerInfo);
+        }
+    }
+    void endRegion(VkCommandBuffer cmdBuffer)
+    {
+        if(pfnCmdDebugMarkerEnd)
+        {
+            pfnCmdDebugMarkerEnd(cmdBuffer);
+        }
+    }
 }  // namespace Ogre
