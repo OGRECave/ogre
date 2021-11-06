@@ -311,6 +311,7 @@ namespace Ogre
         if (mTexture->hasAlpha())
         {
             mMaterial->setSceneBlending( SBT_TRANSPARENT_ALPHA );
+            mMaterial->getTechnique(0)->getPass(0)->setTransparentSortingEnabled(false);
         }
         else
         {
