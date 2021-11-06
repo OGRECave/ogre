@@ -71,6 +71,7 @@ namespace Ogre
         mSurfaceTransform( VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR )
     {
         mActive = true;
+        mName = title;
     }
     //-------------------------------------------------------------------------
     VulkanWindow::~VulkanWindow()
