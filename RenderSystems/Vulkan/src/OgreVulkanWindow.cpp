@@ -236,6 +236,7 @@ namespace Ogre
         mSwapchainImageViews.resize(numSwapchainImages);
         mImageReadySemaphores.resize(numSwapchainImages);
         mRenderFinishedSemaphores.resize(numSwapchainImages);
+        mImageFences.resize(numSwapchainImages);
 
         VkSemaphoreCreateInfo semaphoreCreateInfo = {VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO};
         for (uint32 i = 0; i < numSwapchainImages; i++)
@@ -285,18 +286,19 @@ namespace Ogre
         auto semaphore = mImageReadySemaphores[mCurrentSemaphoreIndex];
 
         uint32 imageIdx = 0u;
-        VkResult result =
+        auto res =
             vkAcquireNextImageKHR(mDevice->mDevice, mSwapchain, UINT64_MAX, semaphore, VK_NULL_HANDLE, &imageIdx);
-        if (result != VK_ERROR_OUT_OF_DATE_KHR && result != VK_SUBOPTIMAL_KHR && result != VK_SUCCESS)
+        if (res != VK_ERROR_OUT_OF_DATE_KHR && res != VK_SUBOPTIMAL_KHR && res != VK_SUCCESS)
         {
-            LogManager::getSingleton().logError("vkAcquireNextImageKHR failed with" + vkResultToString(result));
+            LogManager::getSingleton().logError("vkAcquireNextImageKHR failed with" + vkResultToString(res));
+            return;
         }
-        else
-        {
-            mSwapchainStatus = SwapchainAcquired;
 
-            mTexture->_setCurrentImage( mSwapchainImages[imageIdx], imageIdx );
-        }
+        if(mImageFences[imageIdx])
+            OGRE_VK_CHECK(vkWaitForFences(mDevice->mDevice, 1, &mImageFences[imageIdx], VK_TRUE, UINT64_MAX));
+
+        mSwapchainStatus = SwapchainAcquired;
+        mTexture->_setCurrentImage( mSwapchainImages[imageIdx], imageIdx );
     }
 
     void VulkanWindow::resize(uint width, uint height)

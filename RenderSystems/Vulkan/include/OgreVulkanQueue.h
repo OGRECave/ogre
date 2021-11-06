@@ -54,10 +54,9 @@ namespace Ogre
 
         struct PerFrameData
         {
-            VkCommandPool mCmdPool;
-            FastArray<VkCommandBuffer> mCommands;
-            size_t mCurrentCmdIdx;
-            FastArray<VkFence> mProtectingFences;
+            VkCommandPool mCommandPool;
+            VkCommandBuffer mCommandBuffer;
+            VkFence mProtectingFence;
 
             std::vector<std::pair<VkBuffer, VkDeviceMemory>> mBufferGraveyard;
         };
@@ -88,16 +87,6 @@ namespace Ogre
         const uint8 maxNumFrames = 1;
         uint8 dynBufferFrame = 0;
 
-        struct RefCountedFence
-        {
-            uint32 refCount;
-            /// When true, the VkFence is no longer inside PerFrameData::mProtectingFences and it is
-            /// VulkanQueue::releaseFence's responsibility to put the fence back into mAvailableFences
-            bool recycleAfterRelease;
-            RefCountedFence() {}
-            RefCountedFence( uint32 _refCount ) : refCount( _refCount ), recycleAfterRelease( false ) {}
-        };
-
         // clang-format off
         // One per buffered frame
         FastArray<PerFrameData> mPerFrameData;
@@ -111,26 +100,13 @@ namespace Ogre
         VkSemaphoreArray                mGpuSignalSemaphForCurrCmdBuff;
         // clang-format on
 
-        typedef std::map<VkFence, RefCountedFence> RefCountedFenceMap;
-
-        VkFenceArray mAvailableFences;
-        /// Fences which haven't been released.
-        /// mCurrentFence is not included even if mCurrentFenceRefCount > 0
-        RefCountedFenceMap mRefCountedFences;
-
     public:
         FastArray<VulkanWindow *> mWindowsPendingSwap;
 
     protected:
-        FastArray<VkCommandBuffer> mPendingCmds;
-
         VulkanRenderSystem *mRenderSystem;
 
         VkFence mCurrentFence;
-        /// Starts at 0. Increases with each acquireCurrentFence
-        /// If commitAndNextCommandBuffer gets called with mCurrentFenceRefCount == 0,
-        /// then mCurrentFence can enter into the recycle pool
-        uint32 mCurrentFenceRefCount;
 
         typedef std::map<const BufferPacked *, bool> BufferPackedDownloadMap;
         typedef std::map<VulkanTextureGpu *, bool> TextureGpuDownloadMap;
@@ -150,18 +126,6 @@ namespace Ogre
         /// When mCopyDownloadBuffers[buffer] = false, this buffer has been last uploaded
         /// When mCopyDownloadBuffers[buffer] = not_found, this buffer hasn't been downloaded/uploaded
         BufferPackedDownloadMap mCopyDownloadBuffers;
-
-        /// Returns a signaled fence, could be recycled or new
-        VkFence getFence( void );
-        /// Puts all input fences into mAvailableFences for recycling,
-        /// unless their external reference count isn't 0
-        ///
-        /// Clears fences.
-        void recycleFences( FastArray<VkFence> &fences );
-
-        inline VkFence getCurrentFence( void );
-
-        VkCommandBuffer getCmdBuffer( size_t currFrame );
 
         static VkPipelineStageFlags deriveStageFromBufferAccessFlags( VkAccessFlags accessFlags );
         static VkPipelineStageFlags deriveStageFromTextureAccessFlags( VkAccessFlags accessFlags );
@@ -266,9 +230,6 @@ namespace Ogre
         void endAllEncoders( bool endRenderPassDesc = true );
 
         void notifyTextureDestroyed( VulkanTextureGpu *texture );
-
-        VkFence acquireCurrentFence( void );
-        void releaseFence( VkFence fence );
 
         /// When we'll call commitAndNextCommandBuffer, we'll have to wait for
         /// this semaphore on to execute STAGE_COLOR_ATTACHMENT_OUTPUT_BIT
