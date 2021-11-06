@@ -1564,6 +1564,7 @@ void SceneManager::SceneMgrQueuedRenderableVisitor::visit(const Pass* p, Rendera
     if (!targetSceneMgr->validatePassForRendering(p))
         return;
 
+    OgreProfileBeginGPUEvent(p->getParent()->getParent()->getName());
     // Set pass, store the actual one used
     mUsedPass = targetSceneMgr->_setPass(p);
 
@@ -1576,6 +1577,8 @@ void SceneManager::SceneMgrQueuedRenderableVisitor::visit(const Pass* p, Rendera
         // Render a single object, this will set up auto params if required
         targetSceneMgr->renderSingleObject(r, mUsedPass, scissoring, autoLights, manualLightList);
     }
+
+    OgreProfileEndGPUEvent(p->getParent()->getParent()->getName());
 }
 //-----------------------------------------------------------------------
 void SceneManager::SceneMgrQueuedRenderableVisitor::visit(RenderablePass* rp)
@@ -1591,8 +1594,10 @@ void SceneManager::SceneMgrQueuedRenderableVisitor::visit(RenderablePass* rp)
     if (targetSceneMgr->validateRenderableForRendering(rp->pass, rp->renderable))
     {
         mUsedPass = targetSceneMgr->_setPass(rp->pass);
+        OgreProfileBeginGPUEvent(mUsedPass->getParent()->getParent()->getName());
         targetSceneMgr->renderSingleObject(rp->renderable, mUsedPass, scissoring, 
             autoLights, manualLightList);
+        OgreProfileEndGPUEvent(mUsedPass->getParent()->getParent()->getName());
     }
 }
 //-----------------------------------------------------------------------
@@ -1781,8 +1786,6 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
                                       bool lightScissoringClipping, bool doLightIteration,
                                       const LightList* manualLightList)
 {
-    OgreProfileBeginGPUEvent(pass->getParent()->getParent()->getName());
-
     // Tell auto params object about the renderable change
     mAutoParamDataSource->setCurrentRenderable(rend);
 
@@ -1865,7 +1868,6 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
 
         // Reset view / projection changes if any
         resetViewProjMode();
-        OgreProfileEndGPUEvent(pass->getParent()->getParent()->getName());
         return;
     }
 
@@ -2041,7 +2043,6 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
     
     // Reset view / projection changes if any
     resetViewProjMode();
-    OgreProfileEndGPUEvent(pass->getParent()->getParent()->getName());
 }
 //-----------------------------------------------------------------------
 void SceneManager::setAmbientLight(const ColourValue& colour)
