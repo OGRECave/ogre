@@ -1185,9 +1185,10 @@ namespace Ogre
             mAutoParamsBufferStep =
                 alignToNextMultiple(sizeBytes, mDevice->mDeviceProperties.limits.minUniformBufferOffsetAlignment);
 
-            // allocate buffer for 96 render batches
-            mAutoParamsBuffer = new VulkanHardwareBuffer(
-                VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, mAutoParamsBufferStep * 96, HBU_CPU_TO_GPU, false, mDevice);
+            // allocate buffer for 256 * frames-in-flight render batches
+            size_t sz = mAutoParamsBufferStep * 256 * mActiveDevice->mGraphicsQueue.mNumFramesInFlight;
+            mAutoParamsBuffer =
+                new VulkanHardwareBuffer(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, sz, HBU_CPU_TO_GPU, false, mDevice);
         }
 
         return GpuProgramManager::getSingleton().getByName("VulkanDefaultVP")->getDefaultParameters();

@@ -83,9 +83,9 @@ namespace Ogre
 
         VulkanDevice *mOwnerDevice;
 
+        uint8 mNumFramesInFlight;
     protected:
-        const uint8 maxNumFrames = 1;
-        uint8 dynBufferFrame = 0;
+        uint8 mCurrentFrameIdx;
 
         // clang-format off
         // One per buffered frame

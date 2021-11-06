@@ -64,6 +64,8 @@ namespace Ogre
         mQueue( 0 ),
         mCurrentCmdBuffer( 0 ),
         mOwnerDevice( 0 ),
+        mNumFramesInFlight( 3 ),
+        mCurrentFrameIdx( 0 ),
         mRenderSystem( 0 ),
         mCurrentFence( 0 ),
         mEncoderState( EncoderClosed ),
@@ -91,8 +93,7 @@ namespace Ogre
         mQueue = queue;
         mRenderSystem = renderSystem;
 
-        // Create one cmd pool per thread (assume single threaded for now)
-        mPerFrameData.resize( maxNumFrames );
+        mPerFrameData.resize( mNumFramesInFlight );
 
         VkCommandPoolCreateInfo cmdPoolCreateInfo = {VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO};
         cmdPoolCreateInfo.flags = VK_COMMAND_POOL_CREATE_TRANSIENT_BIT;
@@ -105,12 +106,12 @@ namespace Ogre
         VkFenceCreateInfo fenceCi = {VK_STRUCTURE_TYPE_FENCE_CREATE_INFO};
         fenceCi.flags = VK_FENCE_CREATE_SIGNALED_BIT;
 
-        for( size_t i = 0; i < maxNumFrames; ++i )
+        for (auto& fd : mPerFrameData)
         {
-            OGRE_VK_CHECK(vkCreateCommandPool(mDevice, &cmdPoolCreateInfo, 0, &mPerFrameData[i].mCommandPool));
-            allocateInfo.commandPool = mPerFrameData[i].mCommandPool;
-            OGRE_VK_CHECK(vkAllocateCommandBuffers( mDevice, &allocateInfo, &mPerFrameData[i].mCommandBuffer ));
-            OGRE_VK_CHECK(vkCreateFence(mDevice, &fenceCi, 0, &mPerFrameData[i].mProtectingFence));
+            OGRE_VK_CHECK(vkCreateCommandPool(mDevice, &cmdPoolCreateInfo, 0, &fd.mCommandPool));
+            allocateInfo.commandPool = fd.mCommandPool;
+            OGRE_VK_CHECK(vkAllocateCommandBuffers( mDevice, &allocateInfo, &fd.mCommandBuffer ));
+            OGRE_VK_CHECK(vkCreateFence(mDevice, &fenceCi, 0, &fd.mProtectingFence));
         }
 
         newCommandBuffer();
@@ -122,17 +123,15 @@ namespace Ogre
         {
             vkDeviceWaitIdle( mDevice );
 
+            for(size_t i = 0; i < mPerFrameData.size(); ++i)
             {
-                FastArray<PerFrameData>::iterator itor = mPerFrameData.begin();
-                FastArray<PerFrameData>::iterator endt = mPerFrameData.end();
+                _waitOnFrame(i);
+            }
 
-                while( itor != endt )
-                {
-                    vkDestroyFence( mDevice, itor->mProtectingFence, 0 );
-                    vkDestroyCommandPool( mDevice, itor->mCommandPool, 0 );
-
-                    ++itor;
-                }
+            for(auto& fd : mPerFrameData)
+            {
+                vkDestroyFence( mDevice, fd.mProtectingFence, 0 );
+                vkDestroyCommandPool( mDevice, fd.mCommandPool, 0 );
             }
 
             mDevice = 0;
@@ -142,11 +141,11 @@ namespace Ogre
     //-------------------------------------------------------------------------
     void VulkanQueue::newCommandBuffer( void )
     {
-        _waitOnFrame(dynBufferFrame);
+        _waitOnFrame(mCurrentFrameIdx);
 
-        vkResetCommandPool(mDevice, mPerFrameData[dynBufferFrame].mCommandPool, 0);
-        mCurrentCmdBuffer = mPerFrameData[dynBufferFrame].mCommandBuffer;
-        mCurrentFence = mPerFrameData[dynBufferFrame].mProtectingFence;
+        vkResetCommandPool(mDevice, mPerFrameData[mCurrentFrameIdx].mCommandPool, 0);
+        mCurrentCmdBuffer = mPerFrameData[mCurrentFrameIdx].mCommandBuffer;
+        mCurrentFence = mPerFrameData[mCurrentFrameIdx].mProtectingFence;
 
         VkCommandBufferBeginInfo beginInfo = {VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO};
         beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
@@ -825,7 +824,7 @@ namespace Ogre
     //-------------------------------------------------------------------------
     void VulkanQueue::queueForDeletion(VkBuffer buffer, VkDeviceMemory memory)
     {
-       mPerFrameData[dynBufferFrame].mBufferGraveyard.push_back({buffer, memory});
+       mPerFrameData[mCurrentFrameIdx].mBufferGraveyard.push_back({buffer, memory});
     }
     void VulkanQueue::_waitOnFrame( uint8 frameIdx )
     {
@@ -858,12 +857,6 @@ namespace Ogre
     void VulkanQueue::commitAndNextCommandBuffer( SubmissionType::SubmissionType submissionType )
     {
         endCommandBuffer();
-
-        // We must reset all bindings or else after 3 (mDynamicBufferCurrentFrame) frames
-        // there could be dangling API handles left hanging around indefinitely that
-        // may be collected by RootLayouts that use more slots than they need
-        if( submissionType >= SubmissionType::NewFrameIdx )
-            mRenderSystem->resetAllBindings();
 
         VkSubmitInfo submitInfo = {VK_STRUCTURE_TYPE_SUBMIT_INFO};
         submitInfo.commandBufferCount   = 1;
@@ -915,7 +908,7 @@ namespace Ogre
 
         if( submissionType >= SubmissionType::NewFrameIdx )
         {
-            dynBufferFrame = (dynBufferFrame + 1) % mPerFrameData.size();
+            mCurrentFrameIdx = (mCurrentFrameIdx + 1) % mPerFrameData.size();
         }
 
         newCommandBuffer();

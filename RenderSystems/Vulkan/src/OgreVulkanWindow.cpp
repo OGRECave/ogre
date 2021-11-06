@@ -253,6 +253,13 @@ namespace Ogre
     //-------------------------------------------------------------------------
     void VulkanWindow::destroySwapchain( void )
     {
+        for(auto imf : mImageFences)
+        {
+            if(imf == VK_NULL_HANDLE)
+                continue;
+            OGRE_VK_CHECK(vkWaitForFences(mDevice->mDevice, 1, &imf, VK_TRUE, UINT64_MAX));
+        }
+
         mTexture->unload();
         mDepthTexture->unload();
         mDevice->mRenderSystem->notifySwapchainDestroyed( this );
