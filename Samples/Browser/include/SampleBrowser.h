@@ -206,14 +206,14 @@ namespace OgreBites
                     Ogre::Real top = Ogre::Math::Sin(phase) * 200.0;
                     Ogre::Real scale = 1.0 / Ogre::Math::Pow((Ogre::Math::Abs(thumbOffset) + 1.0), 0.75);
 
-                    Ogre::BorderPanelOverlayElement* frame =
-                        (Ogre::BorderPanelOverlayElement*)mThumbs[i]->getChildren().begin()->second;
+                    auto frame =
+                        dynamic_cast<Ogre::BorderPanelOverlayElement*>(mThumbs[i]->getChildren().begin()->second);
 
                     mThumbs[i]->setDimensions(128.0 * scale, 96.0 * scale);
                     frame->setDimensions(mThumbs[i]->getWidth() + 16.0, mThumbs[i]->getHeight() + 16.0);
                     mThumbs[i]->setPosition((int)(left - 80.0 - (mThumbs[i]->getWidth() / 2.0)),
                                             (int)(top - 5.0 - (mThumbs[i]->getHeight() / 2.0)));
-
+                    frame->setMaterial(nullptr); // dont draw inner region
                     if (i == mSampleMenu->getSelectionIndex()) frame->setBorderMaterialName("SdkTrays/Frame/Over");
                     else frame->setBorderMaterialName("SdkTrays/Frame");
                 }
@@ -424,8 +424,8 @@ namespace OgreBites
                         tus->setTextureName(info["Thumbnail"]);
 
                         // create sample thumbnail overlay
-                        Ogre::BorderPanelOverlayElement* bp = (Ogre::BorderPanelOverlayElement*)
-                            om.createOverlayElementFromTemplate("SdkTrays/Picture", "BorderPanel", name);
+                        auto bp = dynamic_cast<Ogre::PanelOverlayElement*>(
+                            om.createOverlayElementFromTemplate("SdkTrays/Picture", "", name));
                         bp->setHorizontalAlignment(Ogre::GHA_RIGHT);
                         bp->setVerticalAlignment(Ogre::GVA_CENTER);
                         bp->setMaterialName(name);
