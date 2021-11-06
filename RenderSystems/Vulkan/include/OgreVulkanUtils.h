@@ -42,6 +42,8 @@ namespace Ogre
 
     void setObjectName( VkDevice device, uint64_t object, VkDebugReportObjectTypeEXT objectType,
                         const char *name );
+    void beginRegion(VkCommandBuffer cmdBuffer, const char* name);
+    void endRegion(VkCommandBuffer cmdBuffer);
 }  // namespace Ogre
 
 #endif  //#ifndef _OgreVulkanPrerequisites_H_
