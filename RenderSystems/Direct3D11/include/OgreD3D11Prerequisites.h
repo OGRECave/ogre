@@ -57,7 +57,7 @@ THE SOFTWARE.
 #define SAFE_RELEASE(p)      { if(p) { (p)->Release(); (p)=NULL; } }
 
 #if defined(_WIN32_WINNT_WIN8) // Win8 SDK required to compile, will work on Windows 8 and Platform Update for Windows 7
-#define OGRE_D3D11_PROFILING OGRE_PROFILING
+#define OGRE_D3D11_PROFILING 1
 #endif
 
 #undef NOMINMAX
