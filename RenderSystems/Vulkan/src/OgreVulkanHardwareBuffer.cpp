@@ -85,15 +85,8 @@ namespace Ogre
 
     VulkanHardwareBuffer::~VulkanHardwareBuffer()
     {
-        if(mUsage == HBU_CPU_ONLY)
-        {
-            // wait until we are sure staging buffers were processed
-            mDevice->mGraphicsQueue.queueForDeletion(mBuffer, mMemory);
-            return;
-        }
-
-        vkDestroyBuffer(mDevice->mDevice, mBuffer, 0);
-        vkFreeMemory(mDevice->mDevice, mMemory, 0);
+        // delay until we are sure this buffer is no longer in use
+        mDevice->mGraphicsQueue.queueForDeletion(mBuffer, mMemory);
     }
 
     void VulkanHardwareBuffer::_notifyDeviceStalled()
