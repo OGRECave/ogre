@@ -66,7 +66,6 @@ namespace Ogre
         mOwnerDevice( 0 ),
         mRenderSystem( 0 ),
         mCurrentFence( 0 ),
-        mCurrentFenceRefCount( 0u ),
         mEncoderState( EncoderClosed ),
         mCopyEndReadSrcBufferFlags( 0 ),
         mCopyEndReadDstBufferFlags( 0 ),
@@ -76,90 +75,6 @@ namespace Ogre
     }
     //-------------------------------------------------------------------------
     VulkanQueue::~VulkanQueue() { destroy(); }
-    //-------------------------------------------------------------------------
-    VkFence VulkanQueue::getFence( void )
-    {
-        VkFence retVal;
-        if( !mAvailableFences.empty() )
-        {
-            retVal = mAvailableFences.back();
-            mAvailableFences.pop_back();
-        }
-        else
-        {
-            VkFenceCreateInfo fenceCi = {VK_STRUCTURE_TYPE_FENCE_CREATE_INFO};
-            OGRE_VK_CHECK(vkCreateFence( mDevice, &fenceCi, 0, &retVal ));
-        }
-        return retVal;
-    }
-    //-------------------------------------------------------------------------
-    void VulkanQueue::recycleFences( FastArray<VkFence> &fences )
-    {
-        const size_t oldNumAvailableFences = mAvailableFences.size();
-
-        FastArray<VkFence>::const_iterator itor = fences.begin();
-        FastArray<VkFence>::const_iterator endt = fences.end();
-
-        while( itor != endt )
-        {
-            // We can only put this fence back into mAvailableFences (for recycle)
-            // if there's no external reference holding onto it
-            RefCountedFenceMap::iterator itAcquired = mRefCountedFences.find( *itor );
-            if( itAcquired == mRefCountedFences.end() )
-            {
-                // There are no external references. Put back to mAvailableFences
-                mAvailableFences.push_back( *itor );
-            }
-            else
-            {
-                // We can't do it. External code still depends on this fence.
-                // releaseFence will recycle it later
-                OGRE_ASSERT_LOW( itAcquired->second.refCount > 0u );
-                OGRE_ASSERT_LOW( !itAcquired->second.recycleAfterRelease );
-                itAcquired->second.recycleAfterRelease = true;
-            }
-
-            ++itor;
-        }
-        fences.clear();
-
-        // Reset the recycled fences so they can be used again
-        const uint32 numFencesToReset = ( uint32 )( mAvailableFences.size() - oldNumAvailableFences );
-        if( numFencesToReset > 0u )
-            vkResetFences( mDevice, numFencesToReset, &mAvailableFences[oldNumAvailableFences] );
-    }
-    //-------------------------------------------------------------------------
-    inline VkFence VulkanQueue::getCurrentFence( void )
-    {
-        if( mCurrentFence == 0 )
-        {
-            mCurrentFence = getFence();
-            OGRE_ASSERT_LOW( mCurrentFenceRefCount == 0u );
-        }
-        return mCurrentFence;
-    }
-    //-------------------------------------------------------------------------
-    VkCommandBuffer VulkanQueue::getCmdBuffer( size_t currFrame )
-    {
-        PerFrameData &frameData = mPerFrameData[currFrame];
-
-        if( frameData.mCurrentCmdIdx >= frameData.mCommands.size() )
-        {
-            VkCommandBuffer cmdBuffer;
-
-            VkCommandBufferAllocateInfo allocateInfo = {VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO};
-            allocateInfo.commandPool = frameData.mCmdPool;
-            allocateInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-            allocateInfo.commandBufferCount = 1u;
-            OGRE_VK_CHECK(vkAllocateCommandBuffers( mDevice, &allocateInfo, &cmdBuffer ));
-
-            frameData.mCommands.push_back( cmdBuffer );
-        }
-        else if( frameData.mCurrentCmdIdx == 0u )
-            vkResetCommandPool( mDevice, frameData.mCmdPool, 0 );
-
-        return frameData.mCommands[frameData.mCurrentCmdIdx++];
-    }
     //-------------------------------------------------------------------------
     void VulkanQueue::setQueueData( VulkanDevice *owner, QueueFamily family, uint32 familyIdx,
                                     uint32 queueIdx )
@@ -176,23 +91,27 @@ namespace Ogre
         mQueue = queue;
         mRenderSystem = renderSystem;
 
-        // Create at least maxNumFrames fences, though we may need more
-        mAvailableFences.resize( maxNumFrames );
-
-        VkFenceCreateInfo fenceCi = {VK_STRUCTURE_TYPE_FENCE_CREATE_INFO};
-        for( size_t i = 0; i < maxNumFrames; ++i )
-        {
-            OGRE_VK_CHECK(vkCreateFence(mDevice, &fenceCi, 0, &mAvailableFences[i]));
-        }
-
         // Create one cmd pool per thread (assume single threaded for now)
         mPerFrameData.resize( maxNumFrames );
+
         VkCommandPoolCreateInfo cmdPoolCreateInfo = {VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO};
         cmdPoolCreateInfo.flags = VK_COMMAND_POOL_CREATE_TRANSIENT_BIT;
         cmdPoolCreateInfo.queueFamilyIndex = mFamilyIdx;
 
+        VkCommandBufferAllocateInfo allocateInfo = {VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO};
+        allocateInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+        allocateInfo.commandBufferCount = 1u;
+
+        VkFenceCreateInfo fenceCi = {VK_STRUCTURE_TYPE_FENCE_CREATE_INFO};
+        fenceCi.flags = VK_FENCE_CREATE_SIGNALED_BIT;
+
         for( size_t i = 0; i < maxNumFrames; ++i )
-            vkCreateCommandPool( mDevice, &cmdPoolCreateInfo, 0, &mPerFrameData[i].mCmdPool );
+        {
+            OGRE_VK_CHECK(vkCreateCommandPool(mDevice, &cmdPoolCreateInfo, 0, &mPerFrameData[i].mCommandPool));
+            allocateInfo.commandPool = mPerFrameData[i].mCommandPool;
+            OGRE_VK_CHECK(vkAllocateCommandBuffers( mDevice, &allocateInfo, &mPerFrameData[i].mCommandBuffer ));
+            OGRE_VK_CHECK(vkCreateFence(mDevice, &fenceCi, 0, &mPerFrameData[i].mProtectingFence));
+        }
 
         newCommandBuffer();
     }
@@ -209,41 +128,13 @@ namespace Ogre
 
                 while( itor != endt )
                 {
-                    VkFenceArray::const_iterator itFence = itor->mProtectingFences.begin();
-                    VkFenceArray::const_iterator enFence = itor->mProtectingFences.end();
-
-                    while( itFence != enFence )
-                        vkDestroyFence( mDevice, *itFence++, 0 );
-                    itor->mProtectingFences.clear();
-
-                    vkDestroyCommandPool( mDevice, itor->mCmdPool, 0 );
-                    itor->mCommands.clear();
+                    vkDestroyFence( mDevice, itor->mProtectingFence, 0 );
+                    vkDestroyCommandPool( mDevice, itor->mCommandPool, 0 );
 
                     ++itor;
                 }
             }
-            {
-                RefCountedFenceMap::const_iterator itor = mRefCountedFences.begin();
-                RefCountedFenceMap::const_iterator endt = mRefCountedFences.end();
 
-                while( itor != endt )
-                {
-                    // If recycleAfterRelease == false, then they were destroyed with mProtectingFences
-                    if( itor->second.recycleAfterRelease )
-                        vkDestroyFence( mDevice, itor->first, 0 );
-                    ++itor;
-                }
-
-                mRefCountedFences.clear();
-            }
-
-            VkFenceArray::const_iterator itor = mAvailableFences.begin();
-            VkFenceArray::const_iterator endt = mAvailableFences.end();
-
-            while( itor != endt )
-                vkDestroyFence( mDevice, *itor++, 0 );
-
-            mAvailableFences.clear();
             mDevice = 0;
         }
     }
@@ -252,7 +143,10 @@ namespace Ogre
     void VulkanQueue::newCommandBuffer( void )
     {
         _waitOnFrame(dynBufferFrame);
-        mCurrentCmdBuffer = getCmdBuffer( dynBufferFrame );
+
+        vkResetCommandPool(mDevice, mPerFrameData[dynBufferFrame].mCommandPool, 0);
+        mCurrentCmdBuffer = mPerFrameData[dynBufferFrame].mCommandBuffer;
+        mCurrentFence = mPerFrameData[dynBufferFrame].mProtectingFence;
 
         VkCommandBufferBeginInfo beginInfo = {VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO};
         beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
@@ -266,9 +160,6 @@ namespace Ogre
             endAllEncoders();
 
             OGRE_VK_CHECK(vkEndCommandBuffer( mCurrentCmdBuffer ));
-
-            mPendingCmds.push_back( mCurrentCmdBuffer );
-            mCurrentCmdBuffer = 0;
         }
     }
     //-------------------------------------------------------------------------
@@ -925,40 +816,6 @@ namespace Ogre
         }
     }
     //-------------------------------------------------------------------------
-    VkFence VulkanQueue::acquireCurrentFence( void )
-    {
-        VkFence retVal = getCurrentFence();
-        ++mCurrentFenceRefCount;
-        return retVal;
-    }
-    //-------------------------------------------------------------------------
-    void VulkanQueue::releaseFence( VkFence fence )
-    {
-        OGRE_ASSERT_LOW( fence );
-        if( fence == mCurrentFence )
-        {
-            OGRE_ASSERT_MEDIUM( mRefCountedFences.find( fence ) == mRefCountedFences.end() );
-            --mCurrentFenceRefCount;
-        }
-        else
-        {
-            RefCountedFenceMap::iterator itor = mRefCountedFences.find( fence );
-            OGRE_ASSERT_LOW( itor != mRefCountedFences.end() );
-            OGRE_ASSERT_LOW( itor->second.refCount > 0u );
-            --itor->second.refCount;
-
-            if( itor->second.refCount == 0u )
-            {
-                if( itor->second.recycleAfterRelease )
-                {
-                    vkResetFences( mDevice, 1u, &itor->first );
-                    mAvailableFences.push_back( itor->first );
-                }
-                mRefCountedFences.erase( itor );
-            }
-        }
-    }
-    //-------------------------------------------------------------------------
     void VulkanQueue::addWindowToWaitFor( VkSemaphore imageAcquisitionSemaph )
     {
         OGRE_ASSERT_MEDIUM( mFamily == Graphics );
@@ -972,14 +829,8 @@ namespace Ogre
     }
     void VulkanQueue::_waitOnFrame( uint8 frameIdx )
     {
-        FastArray<VkFence> &fences = mPerFrameData[frameIdx].mProtectingFences;
-
-        if( fences.empty() )
-            return;
-
-        const uint32 numFences = static_cast<uint32>( fences.size() );
-        vkWaitForFences( mDevice, numFences, &fences[0], VK_TRUE, UINT64_MAX );
-        recycleFences( fences );
+        VkFence fence = mPerFrameData[frameIdx].mProtectingFence;
+        vkWaitForFences( mDevice, 1, &fence, VK_TRUE, UINT64_MAX );
 
         // it is safe to free staging buffers now
         for(auto bm : mPerFrameData[frameIdx].mBufferGraveyard)
@@ -992,23 +843,16 @@ namespace Ogre
     //-------------------------------------------------------------------------
     bool VulkanQueue::_isFrameFinished( uint8 frameIdx )
     {
-        bool bIsFinished = true;
-        FastArray<VkFence> &fences = mPerFrameData[frameIdx].mProtectingFences;
-
-        if( !fences.empty() )
+        VkFence fence = mPerFrameData[frameIdx].mProtectingFence;
+        VkResult ret = vkWaitForFences( mDevice, 1, &fence, VK_TRUE, 0u );
+        if( ret != VK_TIMEOUT )
         {
-            const uint32 numFences = static_cast<uint32>( fences.size() );
-            VkResult ret = vkWaitForFences( mDevice, numFences, &fences[0], VK_TRUE, 0u );
-            if( ret != VK_TIMEOUT )
-            {
-                OGRE_VK_CHECK(ret);
-                recycleFences( fences );
-            }
-            else
-                bIsFinished = false;
+            OGRE_VK_CHECK(ret);
+            //recycleFences( fences );
+            return true;
         }
 
-        return bIsFinished;
+        return false;
     }
     //-------------------------------------------------------------------------
     void VulkanQueue::commitAndNextCommandBuffer( SubmissionType::SubmissionType submissionType )
@@ -1021,10 +865,9 @@ namespace Ogre
         if( submissionType >= SubmissionType::NewFrameIdx )
             mRenderSystem->resetAllBindings();
 
-        if( mPendingCmds.empty() )
-            return;
-
         VkSubmitInfo submitInfo = {VK_STRUCTURE_TYPE_SUBMIT_INFO};
+        submitInfo.commandBufferCount   = 1;
+        submitInfo.pCommandBuffers      = &mCurrentCmdBuffer;
 
         if( !mGpuWaitSemaphForCurrCmdBuff.empty() )
         {
@@ -1044,6 +887,7 @@ namespace Ogre
                 for (auto w : mWindowsPendingSwap)
                 {
                     mGpuSignalSemaphForCurrCmdBuff.push_back(w->getRenderFinishedSemaphore());
+                    w->setImageFence(mCurrentFence);
                 }
             }
 
@@ -1058,38 +902,10 @@ namespace Ogre
             }
         }
 
-        if( submissionType >= SubmissionType::NewFrameIdx )
-        {
-            // Ensure mCurrentFence is not nullptr.
-            // We *must* have a fence if we're advancing the frameIdx
-
-            getCurrentFence();
-        }
-
-        // clang-format off
-        submitInfo.commandBufferCount   = mPendingCmds.size();
-        submitInfo.pCommandBuffers      = mPendingCmds.data();
-        // clang-format on
-
-        _waitOnFrame(dynBufferFrame);
-        VkFence fence = mCurrentFence;  // Note: mCurrentFence may be nullptr
-
-        vkQueueSubmit( mQueue, 1u, &submitInfo, fence );
+        OGRE_VK_CHECK(vkResetFences(mDevice, 1, &mCurrentFence) );
+        vkQueueSubmit( mQueue, 1u, &submitInfo, mCurrentFence );
         mGpuWaitSemaphForCurrCmdBuff.clear();
-
-        if( mCurrentFence && mCurrentFenceRefCount > 0 )
-        {
-            OGRE_ASSERT_MEDIUM( mRefCountedFences.find( mCurrentFence ) == mRefCountedFences.end() );
-            mRefCountedFences[mCurrentFence] = RefCountedFence( mCurrentFenceRefCount );
-            mCurrentFenceRefCount = 0u;
-        }
-
-        mCurrentFence = 0;
-
-        if( fence )
-            mPerFrameData[dynBufferFrame].mProtectingFences.push_back( fence );
-
-        mPendingCmds.clear();
+        mCurrentCmdBuffer = VK_NULL_HANDLE;
 
         if( submissionType >= SubmissionType::EndFrameAndSwap )
         {
@@ -1099,7 +915,6 @@ namespace Ogre
 
         if( submissionType >= SubmissionType::NewFrameIdx )
         {
-            mPerFrameData[dynBufferFrame].mCurrentCmdIdx = 0u;
             dynBufferFrame = (dynBufferFrame + 1) % mPerFrameData.size();
         }
 

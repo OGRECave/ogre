@@ -82,6 +82,7 @@ namespace Ogre
         /// Makes Queue execution wait until the acquired image is done presenting
         std::vector<VkSemaphore> mImageReadySemaphores;
         std::vector<VkSemaphore> mRenderFinishedSemaphores;
+        std::vector<VkFence> mImageFences;
         int mCurrentSemaphoreIndex;
         SwapchainStatus mSwapchainStatus;
 
@@ -133,6 +134,8 @@ namespace Ogre
         VkSemaphore getImageAcquiredSemaphore( void );
 
         VkSemaphore getRenderFinishedSemaphore() const;
+
+        void setImageFence(VkFence fence) { mImageFences[mCurrentSemaphoreIndex] = fence; }
 
         const std::vector<VkImageView>& getSwapchainImageViews() const { return mSwapchainImageViews; }
 
