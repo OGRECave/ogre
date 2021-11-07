@@ -126,7 +126,9 @@ namespace Ogre
         mssCi{VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO},
         rasterState{VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO},
         blendStateCi{VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO},
-        mVertUBOInfo{},
+        mUBOInfo{},
+        mUBODynOffsets{},
+        mImageInfos{},
         depthStencilStateCi{VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO},
         mVkViewport{},
         viewportStateCi{VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO}
@@ -164,26 +166,38 @@ namespace Ogre
         viewportStateCi.viewportCount = 1u;
         viewportStateCi.scissorCount = 1u;
 
-        mImageInfos[0].imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-
         // use a single descriptor set for all shaders
         mDescriptorSetBindings.push_back({0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, 1, VK_SHADER_STAGE_ALL_GRAPHICS});
+        mDescriptorSetBindings.push_back({1, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, 1, VK_SHADER_STAGE_ALL_GRAPHICS});
         mDescriptorSetBindings.push_back({2, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_ALL_GRAPHICS});
+        mDescriptorSetBindings.push_back({3, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_ALL_GRAPHICS});
 
         // one descriptor will have at most OGRE_MAX_TEXTURE_LAYERS and one UBO per shader type (for now)
         mDescriptorPoolSizes.push_back({VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, GPT_COUNT});
         mDescriptorPoolSizes.push_back({VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, OGRE_MAX_TEXTURE_LAYERS});
 
-        mDescriptorWrites.resize(2, {VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET});
+        // silence validation layer, when unused
+        mUBOInfo[0].range = 1;
+        mUBOInfo[1].range = 1;
+
+        mDescriptorWrites.resize(OGRE_MAX_TEXTURE_LAYERS + 2, {VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET});
         mDescriptorWrites[0].dstBinding = 0;
         mDescriptorWrites[0].descriptorCount = 1;
         mDescriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
-        mDescriptorWrites[0].pBufferInfo = &mVertUBOInfo;
+        mDescriptorWrites[0].pBufferInfo = mUBOInfo.data();
 
-        mDescriptorWrites[1].dstBinding = 2;
+        mDescriptorWrites[1].dstBinding = 1;
         mDescriptorWrites[1].descriptorCount = 1;
-        mDescriptorWrites[1].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-        mDescriptorWrites[1].pImageInfo = mImageInfos.data();
+        mDescriptorWrites[1].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
+        mDescriptorWrites[1].pBufferInfo = mUBOInfo.data() + 1;
+
+        for(int i = 0; i < OGRE_MAX_TEXTURE_LAYERS; i++)
+        {
+            mDescriptorWrites[i + 2].dstBinding = 2 + i;
+            mDescriptorWrites[i + 2].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+            mDescriptorWrites[i + 2].pImageInfo = mImageInfos.data() + i;
+            mDescriptorWrites[i + 2].descriptorCount = 1;
+        }
 
         initializeVkInstance();
         enumerateDevices();
@@ -608,8 +622,6 @@ namespace Ogre
 
         rsc->addShaderProfile( "spirv" );
 
-        rsc->setCapability(RSC_FIXED_FUNCTION); // FIXME: hack to get past RTSS
-
         if( rsc->getVendor() == GPU_QUALCOMM )
         {
 #ifdef OGRE_VK_WORKAROUND_ADRENO_D32_FLOAT
@@ -831,6 +843,16 @@ namespace Ogre
             pipelineLayoutCi.setLayoutCount = 1;
             OGRE_VK_CHECK(vkCreatePipelineLayout(mActiveDevice->mDevice, &pipelineLayoutCi, 0, &mLayout));
 
+            // allocate buffer for 256 * frames-in-flight render batches of 512 bytes
+            mAutoParamsBufferStep =
+                alignToNextMultiple(512, mDevice->mDeviceProperties.limits.minUniformBufferOffsetAlignment);
+            size_t sz = mAutoParamsBufferStep * 256 * mActiveDevice->mGraphicsQueue.mNumFramesInFlight;
+            mAutoParamsBuffer =
+                new VulkanHardwareBuffer(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, sz, HBU_CPU_TO_GPU, false, mDevice);
+
+            mUBOInfo[0].buffer = mAutoParamsBuffer->getVkBuffer();
+            mUBOInfo[1].buffer = mAutoParamsBuffer->getVkBuffer();
+
             resetAllBindings();
 
             String workaroundsStr;
@@ -862,14 +884,15 @@ namespace Ogre
     //-------------------------------------------------------------------------
     void VulkanRenderSystem::_setTexture( size_t unit, bool enabled, const TexturePtr& texPtr )
     {
-        if( texPtr && enabled && unit == 0)
+        if( texPtr && enabled)
         {
             VulkanTextureGpu *tex = static_cast<VulkanTextureGpu *>( texPtr.get() );
-            mImageInfos[0].imageView = tex->getDefaultDisplaySrv();
+            mImageInfos[unit].imageView = tex->getDefaultDisplaySrv();
+            mImageInfos[unit].imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
         }
         else
         {
-            //mImageInfo.imageView = mDummyTextureView;
+            mImageInfos[unit].imageView = NULL;
         }
     }
     //-------------------------------------------------------------------------
@@ -906,8 +929,15 @@ namespace Ogre
 
     VkDescriptorSet VulkanRenderSystem::getDescriptorSet()
     {
-        uint32 hash = HashCombine(0, mVertUBOInfo);
-        hash = HashCombine(hash, mImageInfos[0]);
+        uint32 hash = HashCombine(0, mUBOInfo);
+
+        int numTextures = 0;
+        for (; numTextures < OGRE_MAX_TEXTURE_LAYERS; numTextures++)
+        {
+            if (!mImageInfos[numTextures].imageView)
+                break;
+            hash = HashCombine(hash, mImageInfos[numTextures]);
+        }
 
         VkDescriptorSet retVal = mDescriptorSetCache[hash];
 
@@ -916,12 +946,14 @@ namespace Ogre
 
         retVal = mDescriptorPool->allocate();
 
-        mVertUBOInfo.buffer = mAutoParamsBuffer->getVkBuffer();
-
         mDescriptorWrites[0].dstSet = retVal;
         mDescriptorWrites[1].dstSet = retVal;
+        for(int i = 0; i < numTextures; i++)
+        {
+            mDescriptorWrites[i + 2].dstSet = retVal;
+        }
 
-        int bindCount = mImageInfos[0].imageView ? 2 : 1;
+        int bindCount = numTextures + 2;
         vkUpdateDescriptorSets(mActiveDevice->mDevice, bindCount, mDescriptorWrites.data(), 0, nullptr);
 
         mDescriptorSetCache[hash] = retVal;
@@ -1046,8 +1078,8 @@ namespace Ogre
 
         auto pipeline = getPipeline();
         auto descriptorSet = getDescriptorSet();
-        vkCmdBindDescriptorSets(cmdBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineCi.layout, 0, 1, &descriptorSet, 1,
-                                &mAutoParamsBufferPos);
+        vkCmdBindDescriptorSets(cmdBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineCi.layout, 0, 1, &descriptorSet, 2,
+                                mUBODynOffsets.data());
 
         vkCmdBindPipeline( cmdBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline );
 
@@ -1122,10 +1154,12 @@ namespace Ogre
             break;
         }
 
-        auto sizeBytes = params->getConstantList().size();
-        if(sizeBytes && mAutoParamsBuffer && gptype == GPT_VERTEX_PROGRAM)
+        auto sizeBytes = std::min<size_t>(params->getConstantList().size(), mAutoParamsBufferStep);
+        if(sizeBytes && gptype <= GPT_FRAGMENT_PROGRAM)
         {
             mAutoParamsBufferPos = (mAutoParamsBufferPos + mAutoParamsBufferStep) % mAutoParamsBuffer->getSizeInBytes();
+            mUBOInfo[gptype].range = sizeBytes;
+            mUBODynOffsets[gptype] = mAutoParamsBufferPos;
             mAutoParamsBuffer->writeData(mAutoParamsBufferPos, sizeBytes, params->getConstantList().data());
         }
     }
@@ -1160,45 +1194,6 @@ namespace Ogre
     {
         mSPIRVProgramFactory = OGRE_NEW VulkanProgramFactory( mActiveDevice );
         GpuProgramManager::getSingleton().addFactory( mSPIRVProgramFactory );
-    }
-    const GpuProgramParametersPtr& VulkanRenderSystem::getFixedFunctionParams(TrackVertexColourType tracking,
-                                                                              FogMode fog)
-    {
-        if(!mAutoParamsBuffer)
-        {
-            auto defaultVP = GpuProgramManager::getSingleton().createProgram("VulkanDefaultVP", RGN_INTERNAL, "glslang",
-                                                                             GPT_VERTEX_PROGRAM);
-            defaultVP->setSourceFile("VulkanDefault.vert");
-            auto defaultFP = GpuProgramManager::getSingleton().createProgram("VulkanDefaultFP", RGN_INTERNAL, "glslang",
-                                                                             GPT_FRAGMENT_PROGRAM);
-            defaultFP->setSourceFile("VulkanDefault.frag");
-
-            defaultVP->load();
-            defaultFP->load();
-
-            bindGpuProgram(defaultVP->_getBindingDelegate());
-            bindGpuProgram(defaultFP->_getBindingDelegate());
-
-            auto vpParams = defaultVP->getDefaultParameters();
-            vpParams->setTransposeMatrices( true );
-            vpParams->setNamedAutoConstant("modelViewProj", GpuProgramParameters::ACT_WORLDVIEWPROJ_MATRIX);
-            vpParams->setNamedAutoConstant("texMtx", GpuProgramParameters::ACT_TEXTURE_MATRIX);
-            auto sizeBytes = vpParams->getConstantList().size();
-            mVertUBOInfo.range = sizeBytes;
-            mAutoParamsBufferStep =
-                alignToNextMultiple(sizeBytes, mDevice->mDeviceProperties.limits.minUniformBufferOffsetAlignment);
-
-            // allocate buffer for 256 * frames-in-flight render batches
-            size_t sz = mAutoParamsBufferStep * 256 * mActiveDevice->mGraphicsQueue.mNumFramesInFlight;
-            mAutoParamsBuffer =
-                new VulkanHardwareBuffer(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, sz, HBU_CPU_TO_GPU, false, mDevice);
-        }
-
-        return GpuProgramManager::getSingleton().getByName("VulkanDefaultVP")->getDefaultParameters();
-    }
-    void VulkanRenderSystem::applyFixedFunctionParams(const GpuProgramParametersPtr& params, uint16 mask)
-    {
-        bindGpuProgramParameters(GPT_VERTEX_PROGRAM, params, mask);
     }
     //-------------------------------------------------------------------------
     void VulkanRenderSystem::beginRenderPassDescriptor( RenderPassDescriptor *newPassDesc, bool warnIfRtvWasFlushed )

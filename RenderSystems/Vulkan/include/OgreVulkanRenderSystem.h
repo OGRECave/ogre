@@ -120,7 +120,8 @@ namespace Ogre
         std::vector<VkDescriptorSetLayoutBinding> mDescriptorSetBindings;
         std::vector<VkDescriptorPoolSize> mDescriptorPoolSizes;
         std::vector<VkWriteDescriptorSet> mDescriptorWrites;
-        VkDescriptorBufferInfo mVertUBOInfo;
+        std::array<VkDescriptorBufferInfo, 2> mUBOInfo;
+        std::array<uint32, 2> mUBODynOffsets;
         std::array<VkDescriptorImageInfo, OGRE_MAX_TEXTURE_LAYERS> mImageInfos;
         VkDescriptorSetLayout mDescriptorSetLayout;
 
@@ -205,9 +206,6 @@ namespace Ogre
 
         virtual void initialiseFromRenderSystemCapabilities( RenderSystemCapabilities *caps,
                                                              RenderTarget *primary );
-
-        const GpuProgramParametersPtr& getFixedFunctionParams(TrackVertexColourType tracking, FogMode fog) override;
-        void applyFixedFunctionParams(const GpuProgramParametersPtr& params, uint16 mask) override;
 
         virtual void beginRenderPassDescriptor( RenderPassDescriptor *desc, bool warnIfRtvWasFlushed );
         void executeRenderPassDescriptorDelayedActions( bool officialCall = true );
