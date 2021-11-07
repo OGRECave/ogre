@@ -37,6 +37,13 @@ GLSLProgramWriter::GLSLProgramWriter() : mIsGLSLES(false)
 {
     auto* rs = Root::getSingleton().getRenderSystem();
     mGLSLVersion = rs ? rs->getNativeShadingLanguageVersion() : 120;
+
+    if(rs && rs->getCapabilities()->isShaderProfileSupported("spirv"))
+    {
+        mGLSLVersion = 460;
+        mIsVulkan = true;
+    }
+
     initializeStringMaps();
 }
 
@@ -114,6 +121,21 @@ void GLSLProgramWriter::writeSourceCode(std::ostream& os, Program* program)
     writeMainSourceCode(os, program);
 }
 
+void GLSLProgramWriter::writeUniformBlock(std::ostream& os, const String& name, int binding,
+                                          const UniformParameterList& uniforms)
+{
+    os << "layout(row_major) uniform;\n";
+    os << "_UNIFORM_BINDING(" << binding << ") " << name << " {";
+
+    for (auto uparam : uniforms)
+    {
+        writeParameter(os, uparam);
+        os << ";\n";
+    }
+
+    os << "\n};\n";
+}
+
 void GLSLProgramWriter::writeMainSourceCode(std::ostream& os, Program* program)
 {
     GpuProgramType gpuType = program->getType();
@@ -133,27 +155,36 @@ void GLSLProgramWriter::writeMainSourceCode(std::ostream& os, Program* program)
     auto* rs = Root::getSingleton().getRenderSystem();
     auto hasSSO = rs ? rs->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS) : false;
 
-    int uniformLoc = 0;
-    // Write the uniforms 
-    for (auto uparam : parameterList)
+    // Write the uniforms
+    UniformParameterList uniforms;
+    for (auto param : parameterList)
     {
-        if(uparam->isSampler())
+        if(!param->isSampler())
         {
-            writeSamplerParameter(os, uparam);
+            uniforms.push_back(param);
+            continue;
         }
-        else
+        writeSamplerParameter(os, param, mIsVulkan * 2);
+        os << ";" << std::endl;
+    }
+    if (mIsVulkan && !uniforms.empty())
+    {
+        writeUniformBlock(os, "OgreUniforms", gpuType, uniforms);
+        uniforms.clear();
+    }
+
+    int uniformLoc = 0;
+    for (auto uparam : uniforms)
+    {
+        if(mGLSLVersion >= 430 && hasSSO)
         {
-            if(mGLSLVersion >= 430 && hasSSO)
-            {
-                os << "layout(location = " << uniformLoc << ") ";
-                auto esize = GpuConstantDefinition::getElementSize(uparam->getType(), true) / 4;
-                uniformLoc += esize * std::max<int>(uparam->getSize(), 1);
-            }
-
-            os << "uniform\t";
-            writeParameter(os, uparam);
+            os << "layout(location = " << uniformLoc << ") ";
+            auto esize = GpuConstantDefinition::getElementSize(uparam->getType(), true) / 4;
+            uniformLoc += esize * std::max<int>(uparam->getSize(), 1);
         }
 
+        os << "uniform\t";
+        writeParameter(os, uparam);
         os << ";\n";
     }
     os << std::endl;            

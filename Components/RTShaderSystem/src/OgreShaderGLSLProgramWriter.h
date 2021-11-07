@@ -90,6 +90,8 @@ protected:
     /** Write the output params of the function */
     void writeOutParameters(std::ostream& os, Function* function, GpuProgramType gpuType);
 
+    void writeUniformBlock(std::ostream& os, const String& name, int binding, const UniformParameterList& uniforms);
+
 protected:
     typedef std::map<Parameter::Content, const char*>  ParamContentToStringMap;
 
@@ -103,6 +105,7 @@ protected:
     int mGLSLVersion;
     // set by derived class
     bool mIsGLSLES;
+    bool mIsVulkan;
 };
 /** @} */
 /** @} */

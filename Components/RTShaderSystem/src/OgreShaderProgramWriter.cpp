@@ -75,7 +75,7 @@ void ProgramWriter::writeParameter(std::ostream& os, const ParameterPtr& paramet
         os << '[' << parameter->getSize() << ']';
 }
 
-void ProgramWriter::writeSamplerParameter(std::ostream& os, const UniformParameterPtr& parameter)
+void ProgramWriter::writeSamplerParameter(std::ostream& os, const UniformParameterPtr& parameter, int offset)
 {
     if (parameter->getType() == GCT_SAMPLER_EXTERNAL_OES)
     {
@@ -107,7 +107,7 @@ void ProgramWriter::writeSamplerParameter(std::ostream& os, const UniformParamet
     default:
         OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "unsupported sampler type");
     }
-    os << parameter->getName() << ", " << parameter->getIndex() << ")";
+    os << parameter->getName() << ", " << (parameter->getIndex() + offset) << ")";
 }
 
 void ProgramWriter::writeParameterSemantic(std::ostream& os, const ParameterPtr& parameter)
