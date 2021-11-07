@@ -367,21 +367,23 @@ void GLSLangProgram::prepareImpl()
     program.buildReflection();
 
     int nuniforms = program.getNumLiveUniformVariables();
+    int blockIdx = -1;
     for(int i = 0; i < nuniforms; i++)
     {
         auto utype = program.getUniformTType(i);
         if(utype->isOpaque())
             continue;
 
-        auto uindex = program.getUniformBlockIndex(i);
+        blockIdx = program.getUniformBlockIndex(i);
+        auto isUBO = blockIdx != -1;
         auto uoffset = program.getUniformBufferOffset(i);
 
         GpuConstantDefinition def;
-        def.logicalIndex = uindex != -1 ? uoffset : utype->getQualifier().layoutLocation;
+        def.logicalIndex = isUBO ? uoffset : utype->getQualifier().layoutLocation;
         def.arraySize = program.getUniformArraySize(i);
-        def.physicalIndex = mConstantDefs->bufferSize * 4;
+        def.physicalIndex = isUBO ? uoffset : mConstantDefs->bufferSize * 4;
         def.constType = mapToGCT(program.getUniformType(i));
-        def.elementSize = GpuConstantDefinition::getElementSize(def.constType, false);
+        def.elementSize = GpuConstantDefinition::getElementSize(def.constType, isUBO); // UBOs are padded
 
         mConstantDefs->bufferSize += def.arraySize * def.elementSize;
         mConstantDefs->map.emplace(program.getUniformName(i), def);
@@ -392,6 +394,9 @@ void GLSLangProgram::prepareImpl()
         use.currentSize = def.arraySize * def.elementSize;
         mLogicalToPhysical->map.emplace(def.logicalIndex, use);
     }
+
+    if(blockIdx != -1)
+        mConstantDefs->bufferSize = program.getUniformBlockSize(blockIdx);
 }
 
 void GLSLangProgram::loadFromSource() {}
