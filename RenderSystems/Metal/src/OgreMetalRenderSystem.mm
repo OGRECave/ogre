@@ -993,12 +993,12 @@ namespace Ogre
         // update const buffer
         #if 1
         [mActiveRenderEncoder setVertexBytes:params->getFloatPointer(0)
-            length:params->getConstantList().size() atIndex:16];
+            length:params->getConstantList().size() atIndex:MetalProgram::UNIFORM_INDEX_START];
         #else
-        // TODO rather use this, but there are some transpositon/ alignment issues
+        // TODO rather use this, but buffer seems to be never updated
         size_t unused;
         mAutoParamsBuffer->writeData(0, params->getConstantList().size(), params->getFloatPointer(0));
-        [mActiveRenderEncoder setVertexBuffer:mAutoParamsBuffer->getBufferName(unused) offset:0 atIndex:16];
+        [mActiveRenderEncoder setVertexBuffer:mAutoParamsBuffer->getBufferName(unused) offset:0 atIndex:MetalProgram::UNIFORM_INDEX_START];
         #endif
     }
     //-------------------------------------------------------------------------

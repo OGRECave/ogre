@@ -52,16 +52,6 @@ THE SOFTWARE.
     @class MTLRenderPassStencilAttachmentDescriptor;
 #endif
 
-#define OGRE_METAL_CONST_SLOT_START     16u
-#define OGRE_METAL_TEX_SLOT_START       24u
-#define OGRE_METAL_PARAMETER_SLOT       23u
-#define OGRE_METAL_UAV_SLOT_START       28u
-
-#define OGRE_METAL_CS_PARAMETER_SLOT    8u
-#define OGRE_METAL_CS_CONST_SLOT_START  0u
-#define OGRE_METAL_CS_UAV_SLOT_START    8u
-#define OGRE_METAL_CS_TEX_SLOT_START    16u
-
 #define RESTRICT_ALIAS __restrict__
 #define RESTRICT_ALIAS_RETURN
 

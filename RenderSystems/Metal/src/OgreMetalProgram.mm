@@ -129,19 +129,6 @@ namespace Ogre {
         NSMutableDictionary<NSString *, NSObject *> *preprocessorMacros =
                 [NSMutableDictionary dictionary];
 
-        preprocessorMacros[@"CONST_SLOT_START"] =
-                [NSNumber numberWithUnsignedInt:mType != GPT_COMPUTE_PROGRAM ?
-                    OGRE_METAL_CONST_SLOT_START : OGRE_METAL_CS_CONST_SLOT_START];
-        preprocessorMacros[@"TEX_SLOT_START"] =
-                [NSNumber numberWithUnsignedInt:mType != GPT_COMPUTE_PROGRAM ?
-                    OGRE_METAL_TEX_SLOT_START : OGRE_METAL_CS_TEX_SLOT_START];
-        preprocessorMacros[@"UAV_SLOT_START"] =
-                [NSNumber numberWithUnsignedInt:mType != GPT_COMPUTE_PROGRAM ?
-                    OGRE_METAL_UAV_SLOT_START : OGRE_METAL_CS_UAV_SLOT_START];
-        preprocessorMacros[@"PARAMETER_SLOT"] =
-                [NSNumber numberWithUnsignedInt:mType != GPT_COMPUTE_PROGRAM ?
-                    OGRE_METAL_PARAMETER_SLOT : OGRE_METAL_CS_PARAMETER_SLOT];
-
         parsePreprocessorDefinitions( preprocessorMacros );
 
         options.preprocessorMacros = preprocessorMacros;
@@ -258,7 +245,7 @@ namespace Ogre {
 
             for( MTLArgument *arg in arguments )
             {
-                if( arg.type == MTLArgumentTypeBuffer && arg.index == OGRE_METAL_CS_PARAMETER_SLOT )
+                if( arg.type == MTLArgumentTypeBuffer && arg.index >= UNIFORM_INDEX_START )
                     analyzeParameterBuffer( arg );
             }
         }
@@ -335,7 +322,7 @@ namespace Ogre {
 
             for( MTLArgument *arg in arguments )
             {
-                if( arg.type == MTLArgumentTypeBuffer && arg.index == OGRE_METAL_CONST_SLOT_START )
+                if( arg.type == MTLArgumentTypeBuffer && arg.index >= UNIFORM_INDEX_START )
                     analyzeParameterBuffer( arg );
             }
         }
