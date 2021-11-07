@@ -66,8 +66,8 @@ namespace Ogre
         //There are up to 8 VES_TEXTURE_COORDINATES. Occupy range [8; 16)
         //Range [14; 16) overlaps with VES_TANGENT & VES_BINORMAL
         //(slot 16 is where const buffers start)
-        14,// VES_BINORMAL - 1
-        15,  // VES_TANGENT - 1
+        15,// VES_BINORMAL - 1
+        14,  // VES_TANGENT - 1
     };
 
     static VKAPI_ATTR VkBool32 dbgFunc( VkFlags msgFlags, VkDebugReportObjectTypeEXT objType,
@@ -171,6 +171,8 @@ namespace Ogre
         mDescriptorSetBindings.push_back({1, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, 1, VK_SHADER_STAGE_ALL_GRAPHICS});
         mDescriptorSetBindings.push_back({2, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_ALL_GRAPHICS});
         mDescriptorSetBindings.push_back({3, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_ALL_GRAPHICS});
+        mDescriptorSetBindings.push_back({4, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_ALL_GRAPHICS});
+        mDescriptorSetBindings.push_back({5, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_ALL_GRAPHICS});
 
         // one descriptor will have at most OGRE_MAX_TEXTURE_LAYERS and one UBO per shader type (for now)
         mDescriptorPoolSizes.push_back({VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, GPT_COUNT});

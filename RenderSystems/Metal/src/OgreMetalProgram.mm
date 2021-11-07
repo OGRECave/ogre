@@ -48,8 +48,8 @@ namespace Ogre {
         //There are up to 8 VES_TEXTURE_COORDINATES. Occupy range [8; 16)
         //Range [14; 16) overlaps with VES_TANGENT & VES_BINORMAL
         //(slot 16 is where const buffers start)
-        14,// VES_BINORMAL - 1
-        15,  // VES_TANGENT - 1
+        15,// VES_BINORMAL - 1
+        14,  // VES_TANGENT - 1
     };
 
     uint32 MetalProgram::getAttributeIndex(VertexElementSemantic semantic)
