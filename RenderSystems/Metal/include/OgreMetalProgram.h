@@ -98,6 +98,9 @@ namespace Ogre
         void analyzeParameterBuffer( MTLArgument *arg );
 
         static uint32 getAttributeIndex(VertexElementSemantic semantic);
+
+        // first 15 slots are reserved for the vertex attribute buffers
+        constexpr static int UNIFORM_INDEX_START = 16;
     protected:
         static CmdShaderReflectionPairHint msCmdShaderReflectionPairHint;
 

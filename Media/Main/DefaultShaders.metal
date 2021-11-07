@@ -18,8 +18,11 @@ struct Uniform
   mat4 texMtx;
 };
 
+// first 15 slots are reserved for the vertex attributes
+#define UNIFORM_INDEX_START 16
+
 vertex RasterizerData default_vp(Vertex in [[stage_in]],
-                                 constant Uniform& u [[buffer(CONST_SLOT_START)]])
+                                 constant Uniform& u [[buffer(UNIFORM_INDEX_START)]])
 {
   RasterizerData out;
   out.pos = u.mvpMtx * vec4(in.pos, 1);
