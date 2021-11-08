@@ -388,15 +388,18 @@ void GLSLangProgram::prepareImpl()
         mConstantDefs->bufferSize += def.arraySize * def.elementSize;
         mConstantDefs->map.emplace(program.getUniformName(i), def);
 
-        // also allow index based referencing
-        GpuLogicalIndexUse use;
-        use.physicalIndex = def.physicalIndex;
-        use.currentSize = def.arraySize * def.elementSize;
-        mLogicalToPhysical->map.emplace(def.logicalIndex, use);
+        if(!isUBO)
+        {
+            // also allow index based referencing
+            GpuLogicalIndexUse use;
+            use.physicalIndex = def.physicalIndex;
+            use.currentSize = def.arraySize * def.elementSize;
+            mLogicalToPhysical->map.emplace(def.logicalIndex, use);
+        }
     }
 
-    if(blockIdx != -1)
-        mConstantDefs->bufferSize = program.getUniformBlockSize(blockIdx);
+    if (blockIdx != -1)
+        mConstantDefs->bufferSize = program.getUniformBlockSize(blockIdx) / 4;
 }
 
 void GLSLangProgram::loadFromSource() {}
