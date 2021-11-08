@@ -131,6 +131,7 @@ namespace Ogre
         mImageInfos{},
         depthStencilStateCi{VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO},
         mVkViewport{},
+        mScissorRect{},
         viewportStateCi{VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO}
     {
         mAutoParamsBuffer = 0;
@@ -994,18 +995,13 @@ namespace Ogre
         if(retVal != VK_NULL_HANDLE)
             return retVal;
 
-        VkRect2D vkRect = {{int32(mVkViewport.x), int32(mVkViewport.y)},
-                            {uint32(mVkViewport.width), uint32(mVkViewport.height)}};
-        viewportStateCi.pScissors = &vkRect;
-
-#if 0
         // if we resize the window, we create new FBOs which mean a new renderpass and invalid caches anyway..
-        const VkDynamicState dynamicStates[] = {VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR};
+        // VK_DYNAMIC_STATE_VIEWPORT
+        const VkDynamicState dynamicStates[] = {VK_DYNAMIC_STATE_SCISSOR};
         VkPipelineDynamicStateCreateInfo dynamicStateCi = {VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO};
         dynamicStateCi.dynamicStateCount = 1;
         dynamicStateCi.pDynamicStates = dynamicStates;
         pipelineCi.pDynamicState = &dynamicStateCi;
-#endif
 
         OGRE_VK_CHECK(vkCreateGraphicsPipelines(mActiveDevice->mDevice, 0, 1, &pipelineCi, 0, &retVal));
 
@@ -1022,6 +1018,8 @@ namespace Ogre
         if(mActiveDevice->mGraphicsQueue.getEncoderState() != VulkanQueue::EncoderGraphicsOpen)
         {
             beginRenderPassDescriptor(mCurrentRenderPassDescriptor, false);
+            // ensure scissor is set
+            vkCmdSetScissor(mActiveDevice->mGraphicsQueue.mCurrentCmdBuffer, 0u, 1, &mScissorRect);
             executeRenderPassDescriptorDelayedActions();
         }
 
@@ -1271,8 +1269,6 @@ namespace Ogre
             // these are hardcoded for now
 #if 0
             vkCmdSetViewport( mActiveDevice->mGraphicsQueue.mCurrentCmdBuffer, 0u, 1, &mVkViewport );
-            vkCmdSetScissor( mActiveDevice->mGraphicsQueue.mCurrentCmdBuffer, 0u, numViewports,
-                             scissorRect );
 #endif
         }
 
@@ -1485,6 +1481,21 @@ namespace Ogre
         depthStencilStateCi.depthCompareOp = VulkanMappings::get(func);
     }
 
+    void VulkanRenderSystem::setScissorTest(bool enabled, const Rect& rect)
+    {
+        if (!enabled)
+        {
+            mScissorRect = {{int32(mVkViewport.x), int32(mVkViewport.y)},
+                            {uint32(mVkViewport.width), uint32(mVkViewport.height)}};
+        }
+        else
+        {
+            mScissorRect = {{int32(rect.left), int32(rect.top)}, {uint32(rect.width()), uint32(rect.height())}};
+        }
+
+        vkCmdSetScissor(mActiveDevice->mGraphicsQueue.mCurrentCmdBuffer, 0u, 1, &mScissorRect);
+    }
+
     void VulkanRenderSystem::setStencilState(const StencilState& state)
     {
         depthStencilStateCi.stencilTestEnable = state.enabled;
@@ -1567,6 +1578,8 @@ namespace Ogre
             mVkViewport.y = vpRect.top;
             mVkViewport.width = vpRect.width();
             mVkViewport.height = vpRect.height();
+
+            setScissorTest(false); // reset scissor
 
             vp->_clearUpdatedFlag();
         }

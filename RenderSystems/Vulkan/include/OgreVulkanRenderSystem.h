@@ -131,6 +131,7 @@ namespace Ogre
 
         VkPipelineDepthStencilStateCreateInfo depthStencilStateCi;
         VkViewport mVkViewport;
+        VkRect2D   mScissorRect;
         VkPipelineViewportStateCreateInfo viewportStateCi;
 
         std::unordered_map<uint32, VkDescriptorSet> mDescriptorSetCache;
@@ -228,8 +229,7 @@ namespace Ogre
         void _setRenderTarget(RenderTarget *target);
         void clearFrameBuffer(unsigned int buffers, const ColourValue& colour = ColourValue::Black,
                               Real depth = 1.0f, unsigned short stencil = 0);
-        // TODO:
-        void setScissorTest(bool enabled, const Rect& rect = Rect()) {}
+        void setScissorTest(bool enabled, const Rect& rect = Rect()) override;
         void setStencilState(const StencilState& state) override;
         void _setPolygonMode(PolygonMode level) override;
         void _convertProjectionMatrix(const Matrix4& matrix, Matrix4& dest, bool) override;
