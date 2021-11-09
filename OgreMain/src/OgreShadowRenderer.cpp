@@ -176,18 +176,18 @@ void SceneManager::ShadowRenderer::renderAdditiveStencilShadowedQueueGroupObject
                 // Clear stencil
                 mDestRenderSystem->clearFrameBuffer(FBT_STENCIL);
                 renderShadowVolumesToStencil(l, mSceneManager->mCameraInProgress, false);
-                // turn stencil check on
-                mDestRenderSystem->setStencilCheckEnabled(true);
                 // NB we render where the stencil is equal to zero to render lit areas
-                mDestRenderSystem->setStencilBufferParams(CMPF_EQUAL, 0);
+                StencilState stencilState;
+                stencilState.enabled = true;
+                stencilState.compareOp = CMPF_EQUAL;
+                mDestRenderSystem->setStencilState(stencilState);
             }
 
             // render lighting passes for this light
             mSceneManager->renderObjects(pPriorityGrp->getSolidsDiffuseSpecular(), om, false, false, &lightList);
 
             // Reset stencil params
-            mDestRenderSystem->setStencilBufferParams();
-            mDestRenderSystem->setStencilCheckEnabled(false);
+            mDestRenderSystem->setStencilState(StencilState());
 
             if (scissored == CLIPPED_SOME)
                 mSceneManager->resetScissor();
@@ -257,14 +257,14 @@ void SceneManager::ShadowRenderer::renderModulativeStencilShadowedQueueGroupObje
             renderShadowVolumesToStencil(l, mSceneManager->mCameraInProgress, true);
             // render full-screen shadow modulator for all lights
             mSceneManager->_setPass(mShadowModulativePass);
-            // turn stencil check on
-            mDestRenderSystem->setStencilCheckEnabled(true);
             // NB we render where the stencil is not equal to zero to render shadows, not lit areas
-            mDestRenderSystem->setStencilBufferParams(CMPF_NOT_EQUAL, 0);
+            StencilState stencilState;
+            stencilState.enabled = true;
+            stencilState.compareOp = CMPF_NOT_EQUAL;
+            mDestRenderSystem->setStencilState(stencilState);
             mSceneManager->renderSingleObject(mFullScreenQuad, mShadowModulativePass, false, false);
             // Reset stencil params
-            mDestRenderSystem->setStencilBufferParams();
-            mDestRenderSystem->setStencilCheckEnabled(false);
+            mDestRenderSystem->setStencilState(StencilState());
         }
 
     }// for each light
@@ -985,7 +985,6 @@ void SceneManager::ShadowRenderer::renderShadowVolumesToStencil(const Light* lig
     mDestRenderSystem->setColourBlendState(disabled);
     mDestRenderSystem->_disableTextureUnitsFrom(0);
     mDestRenderSystem->_setDepthBufferParams(true, false, CMPF_LESS);
-    mDestRenderSystem->setStencilCheckEnabled(true);
 
     // Figure out the near clip volume
     const PlaneBoundedVolume& nearClipVol =
@@ -1091,7 +1090,7 @@ void SceneManager::ShadowRenderer::renderShadowVolumesToStencil(const Light* lig
         if (mDebugShadows)
         {
             // reset stencil & colour ops
-            mDestRenderSystem->setStencilBufferParams();
+            mDestRenderSystem->setStencilState(StencilState());
             if (mShadowDebugPass->hasFragmentProgram())
             {
                 mShadowDebugPass->getFragmentProgramParameters()->setNamedConstant(
@@ -1106,7 +1105,7 @@ void SceneManager::ShadowRenderer::renderShadowVolumesToStencil(const Light* lig
     }
 
     // revert stencil state
-    mDestRenderSystem->setStencilCheckEnabled(false);
+    mDestRenderSystem->setStencilState(StencilState());
 
     mDestRenderSystem->unbindGpuProgram(GPT_VERTEX_PROGRAM);
 
@@ -1221,34 +1220,23 @@ void SceneManager::ShadowRenderer::setShadowVolumeStencilState(bool secondpass, 
     // When two-sided stencil, always pass front face stencil
     // operation parameters and the inverse of them will happen
     // for back faces
+    StencilState stencilState;
+    stencilState.enabled = true;
+    stencilState.compareOp = CMPF_ALWAYS_PASS; // always pass stencil check
+    stencilState.twoSidedOperation = twosided;
     if ( !twosided && ((secondpass || zfail) && !(secondpass && zfail)) )
     {
         mSceneManager->mPassCullingMode = twosided? CULL_NONE : CULL_ANTICLOCKWISE;
-        mDestRenderSystem->setStencilBufferParams(
-            CMPF_ALWAYS_PASS, // always pass stencil check
-            0, // no ref value (no compare)
-            0xFFFFFFFF, // no compare mask
-            0xFFFFFFFF, // no write mask
-            SOP_KEEP, // stencil test will never fail
-            zfail ? incrOp : SOP_KEEP, // back face depth fail
-            zfail ? SOP_KEEP : decrOp, // back face pass
-            twosided
-            );
+        stencilState.depthFailOp = zfail ? incrOp : SOP_KEEP; // back face depth fail
+        stencilState.depthStencilPassOp = zfail ? SOP_KEEP : decrOp; // back face pass
     }
     else
     {
         mSceneManager->mPassCullingMode = twosided? CULL_NONE : CULL_CLOCKWISE;
-        mDestRenderSystem->setStencilBufferParams(
-            CMPF_ALWAYS_PASS, // always pass stencil check
-            0, // no ref value (no compare)
-            0xFFFFFFFF, // no compare mask
-            0xFFFFFFFF, // no write mask
-            SOP_KEEP, // stencil test will never fail
-            zfail ? decrOp : SOP_KEEP, // front face depth fail
-            zfail ? SOP_KEEP : incrOp, // front face pass
-            twosided
-            );
+        stencilState.depthFailOp = zfail ? decrOp : SOP_KEEP; // front face depth fail
+        stencilState.depthStencilPassOp = zfail ? SOP_KEEP : incrOp; // front face pass
     }
+    mDestRenderSystem->setStencilState(stencilState);
     mDestRenderSystem->_setCullingMode(mSceneManager->mPassCullingMode);
 
 }

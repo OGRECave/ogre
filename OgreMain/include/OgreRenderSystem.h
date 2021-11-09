@@ -808,9 +808,9 @@ namespace Ogre
         virtual void setStencilState(const StencilState& state) = 0;
 
         /// @deprecated use setStencilState
-        void setStencilCheckEnabled(bool enabled);
+        OGRE_DEPRECATED void setStencilCheckEnabled(bool enabled);
         /// @deprecated use setStencilState
-        void setStencilBufferParams(CompareFunction func = CMPF_ALWAYS_PASS, uint32 refValue = 0,
+        OGRE_DEPRECATED void setStencilBufferParams(CompareFunction func = CMPF_ALWAYS_PASS, uint32 refValue = 0,
                                     uint32 compareMask = 0xFFFFFFFF, uint32 writeMask = 0xFFFFFFFF,
                                     StencilOperation stencilFailOp = SOP_KEEP,
                                     StencilOperation depthFailOp = SOP_KEEP,
