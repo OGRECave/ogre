@@ -72,14 +72,6 @@ namespace Ogre
 
         VulkanRenderPassDescriptor    *mCurrentRenderPassDescriptor;
 
-        // Vulkan requires a valid handle when updating descriptors unless nullDescriptor is present
-        // So we just use a dummy. The dummy texture we get it from TextureGpuManager which needs
-        // to create some anyway for different reasons
-        VulkanHardwareBuffer *mDummyBuffer;
-        VulkanHardwareBuffer *mDummyTexBuffer;
-        VkImageView mDummyTextureView;
-        SamplerPtr mDummySampler;
-
         // clang-format off
         VulkanFrameBufferDescMap    mFrameBufferDescMap;
         VulkanFlushOnlyDescMap      mFlushOnlyDescMap;

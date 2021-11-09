@@ -48,8 +48,6 @@ namespace Ogre
                                VulkanWindow* window);
         virtual ~VulkanTextureGpuWindow();
 
-        virtual void setTextureType( TextureType textureType );
-
         bool isRenderWindowSpecific() const override { return true; }
 
         /// @copydoc VulkanWindow::getImageAcquiredSemaphore
@@ -61,8 +59,6 @@ namespace Ogre
         VulkanWindow* getWindow() const { return mWindow; }
 
         virtual void getCustomAttribute( const String& name, void *pData );
-
-        virtual void _setToDisplayDummyTexture( void );
     };
 }  // namespace Ogre
 

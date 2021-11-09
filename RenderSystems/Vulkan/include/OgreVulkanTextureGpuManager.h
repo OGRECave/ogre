@@ -66,23 +66,6 @@ namespace Ogre
     class VulkanTextureGpuManager : public TextureManager
     {
     protected:
-        struct BlankTexture
-        {
-            VkImage vkImage;
-            VkImageView defaultView;
-            size_t vboPoolIdx;
-            size_t internalBufferStart;
-        };
-
-        struct CachedView
-        {
-            uint32 refCount;
-            VkImageView imageView;
-        };
-
-        /// 4x4 texture for when we have nothing to display.
-        BlankTexture mBlankTexture[TEX_TYPE_2D_ARRAY + 1];
-
         VulkanDevice *mDevice;
 
         bool mCanRestrictImageViewUsage;
@@ -96,9 +79,6 @@ namespace Ogre
     public:
         VulkanTextureGpuManager(RenderSystem* renderSystem, VulkanDevice* device, bool bCanRestrictImageViewUsage);
         virtual ~VulkanTextureGpuManager();
-
-        VkImage getBlankTextureVulkanName( TextureType textureType ) const;
-        VkImageView getBlankTextureView( TextureType textureType ) const;
 
         VulkanDevice *getDevice() const { return mDevice; }
 

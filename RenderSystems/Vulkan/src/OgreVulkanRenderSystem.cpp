@@ -108,9 +108,6 @@ namespace Ogre
         mVkInstance( 0 ),
         mActiveDevice( 0 ),
         mDevice( 0 ),
-        mDummyBuffer( 0 ),
-        mDummyTexBuffer( 0 ),
-        mDummyTextureView( 0 ),
         mEntriesToFlush( 0u ),
         mVpChanged( false ),
         mHasValidationLayers( false ),
@@ -291,24 +288,6 @@ namespace Ogre
         }
 #endif
         _cleanupDepthBuffers();
-
-        mDummySampler.reset();
-
-        if( mDummyTextureView )
-        {
-            vkDestroyImageView( mActiveDevice->mDevice, mDummyTextureView, 0 );
-            mDummyTextureView = 0;
-        }
-
-        if( mDummyTexBuffer )
-        {
-            mDummyTexBuffer = 0;
-        }
-
-        if( mDummyBuffer )
-        {
-            mDummyBuffer = 0;
-        }
 
         delete mAutoParamsBuffer;
         mAutoParamsBuffer = 0;
@@ -808,30 +787,7 @@ namespace Ogre
             //vaoManager->initDrawIdVertexBuffer();
 
             mTextureManager = new VulkanTextureGpuManager(this, mDevice, bCanRestrictImageViewUsage);
-#if 0
-            uint32 dummyData = 0u;
-            //mDummyBuffer = vaoManager->createConstBuffer( 4u, BT_IMMUTABLE, &dummyData, false );
-            //mDummyTexBuffer =
-            //    vaoManager->createTexBuffer( PFG_RGBA8_UNORM, 4u, BT_IMMUTABLE, &dummyData, false );
 
-            {
-                VkImage dummyImage =
-                    textureGpuManager->getBlankTextureVulkanName( TEX_TYPE_2D );
-
-                VkImageViewCreateInfo imageViewCi;
-                makeVkStruct( imageViewCi, VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO );
-                imageViewCi.image = dummyImage;
-                imageViewCi.viewType = VK_IMAGE_VIEW_TYPE_2D;
-                imageViewCi.format = VK_FORMAT_R8G8B8A8_UNORM;
-                imageViewCi.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-                imageViewCi.subresourceRange.levelCount = 1u;
-                imageViewCi.subresourceRange.layerCount = 1u;
-
-                VkResult result =
-                    vkCreateImageView( mActiveDevice->mDevice, &imageViewCi, 0, &mDummyTextureView );
-                checkVkResult( result, "vkCreateImageView" );
-            }
-#endif
             VkDescriptorSetLayoutCreateInfo descriptorSetLayoutCi = {VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO};
             descriptorSetLayoutCi.bindingCount = mDescriptorSetBindings.size();
             descriptorSetLayoutCi.pBindings = mDescriptorSetBindings.data();

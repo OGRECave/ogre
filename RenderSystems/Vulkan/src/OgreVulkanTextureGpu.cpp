@@ -149,7 +149,7 @@ namespace Ogre
         mCurrLayout( VK_IMAGE_LAYOUT_UNDEFINED ),
         mNextLayout( VK_IMAGE_LAYOUT_UNDEFINED )
     {
-        _setToDisplayDummyTexture();
+
     }
     //-----------------------------------------------------------------------------------
     VulkanTextureGpu::~VulkanTextureGpu() { unload(); }
@@ -301,41 +301,11 @@ namespace Ogre
 
         mCurrLayout = VK_IMAGE_LAYOUT_UNDEFINED;
         mNextLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-
-        _setToDisplayDummyTexture();
     }
     //-----------------------------------------------------------------------------------
     void VulkanTextureGpu::createMsaaSurface( void ) {}
     //-----------------------------------------------------------------------------------
     void VulkanTextureGpu::destroyMsaaSurface( void ) {}
-    //-----------------------------------------------------------------------------------
-    void VulkanTextureGpu::_setToDisplayDummyTexture( void )
-    {
-        if( !mCreator )
-        {
-            assert( isRenderWindowSpecific() );
-            return;  // This can happen if we're a window and we're on shutdown
-        }
-
-        if( mDefaultDisplaySrv)
-        {
-            destroyView( mDefaultDisplaySrv );
-            mDefaultDisplaySrv = 0;
-        }
-
-        auto textureManagerVk = static_cast<VulkanTextureGpuManager*>(mCreator);
-        mDisplayTextureName = textureManagerVk->getBlankTextureVulkanName( mTextureType );
-        mDefaultDisplaySrv = textureManagerVk->getBlankTextureView( mTextureType );
-    }
-    //-----------------------------------------------------------------------------------
-    void VulkanTextureGpu::setTextureType( TextureType textureType )
-    {
-        const TextureType oldType = mTextureType;
-        TextureGpu::setTextureType( textureType );
-
-        if( oldType != mTextureType && mDisplayTextureName != mFinalTextureName )
-            _setToDisplayDummyTexture();
-    }
     //-----------------------------------------------------------------------------------
     void VulkanTextureGpu::copyTo( TextureGpu *dst, const PixelBox &dstBox, uint8 dstMipLevel,
                                    const PixelBox &srcBox, uint8 srcMipLevel,
