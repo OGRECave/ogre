@@ -41,7 +41,7 @@ private:
 
         void initialise();
 
-        void updateVertexData(const ImVector<ImDrawVert>& vtxBuf, const ImVector<ImDrawIdx>& idxBuf);
+        void updateVertexData(ImDrawData* draw_data);
 
         bool preRender(SceneManager* sm, RenderSystem* rsys);
 

@@ -193,12 +193,15 @@ bool ImGuiOverlay::ImGUIRenderable::preRender(SceneManager* sm, RenderSystem* rs
 
     TextureUnitState* tu = mMaterial->getBestTechnique()->getPass(0)->getTextureUnitState(0);
 
+    updateVertexData(draw_data);
+
+    mRenderOp.indexData->indexStart = 0;
+    mRenderOp.vertexData->vertexStart = 0;
+
     for (int i = 0; i < draw_data->CmdListsCount; ++i)
     {
         const ImDrawList* draw_list = draw_data->CmdLists[i];
-        updateVertexData(draw_list->VtxBuffer, draw_list->IdxBuffer);
-
-        unsigned int startIdx = 0;
+        mRenderOp.vertexData->vertexCount = draw_list->VtxBuffer.size();
 
         for (int j = 0; j < draw_list->CmdBuffer.Size; ++j)
         {
@@ -226,7 +229,6 @@ bool ImGuiOverlay::ImGUIRenderable::preRender(SceneManager* sm, RenderSystem* rs
             rsys->setScissorTest(true, scissor);
 
             // Render!
-            mRenderOp.indexData->indexStart = startIdx;
             mRenderOp.indexData->indexCount = drawCmd->ElemCount;
 
             rsys->_render(mRenderOp);
@@ -239,8 +241,9 @@ bool ImGuiOverlay::ImGUIRenderable::preRender(SceneManager* sm, RenderSystem* rs
             }
 
             // Update counts
-            startIdx += drawCmd->ElemCount;
+            mRenderOp.indexData->indexStart += drawCmd->ElemCount;
         }
+        mRenderOp.vertexData->vertexStart += draw_list->VtxBuffer.size();
     }
     rsys->setScissorTest(false);
     return false;
@@ -297,28 +300,36 @@ ImGuiOverlay::ImGUIRenderable::~ImGUIRenderable()
     OGRE_DELETE mRenderOp.indexData;
 }
 //-----------------------------------------------------------------------------------
-void ImGuiOverlay::ImGUIRenderable::updateVertexData(const ImVector<ImDrawVert>& vtxBuf,
-                                                     const ImVector<ImDrawIdx>& idxBuf)
+void ImGuiOverlay::ImGUIRenderable::updateVertexData(ImDrawData* draw_data)
 {
+    if(!draw_data->TotalVtxCount)
+        return;
+
     VertexBufferBinding* bind = mRenderOp.vertexData->vertexBufferBinding;
 
-    if (bind->getBindings().empty() || bind->getBuffer(0)->getNumVertices() < size_t(vtxBuf.size()))
+    if (bind->getBindings().empty() || bind->getBuffer(0)->getNumVertices() < size_t(draw_data->TotalVtxCount))
     {
         bind->setBinding(0, HardwareBufferManager::getSingleton().createVertexBuffer(
-                                sizeof(ImDrawVert), vtxBuf.size(), HBU_CPU_TO_GPU));
+                                sizeof(ImDrawVert), draw_data->TotalVtxCount, HBU_CPU_TO_GPU));
     }
     if (!mRenderOp.indexData->indexBuffer ||
-        mRenderOp.indexData->indexBuffer->getNumIndexes() < size_t(idxBuf.size()))
+        mRenderOp.indexData->indexBuffer->getNumIndexes() < size_t(draw_data->TotalIdxCount))
     {
         mRenderOp.indexData->indexBuffer = HardwareBufferManager::getSingleton().createIndexBuffer(
-            HardwareIndexBuffer::IT_16BIT, idxBuf.size(), HBU_CPU_TO_GPU);
+            HardwareIndexBuffer::IT_16BIT, draw_data->TotalIdxCount, HBU_CPU_TO_GPU);
     }
 
     // Copy all vertices
-    bind->getBuffer(0)->writeData(0, vtxBuf.size_in_bytes(), vtxBuf.Data, true);
-    mRenderOp.indexData->indexBuffer->writeData(0, idxBuf.size_in_bytes(), idxBuf.Data, true);
-
-    mRenderOp.vertexData->vertexStart = 0;
-    mRenderOp.vertexData->vertexCount = vtxBuf.size();
+    size_t vtx_offset = 0;
+    size_t idx_offset = 0;
+    for (int i = 0; i < draw_data->CmdListsCount; ++i)
+    {
+        const ImDrawList* draw_list = draw_data->CmdLists[i];
+        bind->getBuffer(0)->writeData(vtx_offset, draw_list->VtxBuffer.size_in_bytes(), draw_list->VtxBuffer.Data);
+        mRenderOp.indexData->indexBuffer->writeData(idx_offset, draw_list->IdxBuffer.size_in_bytes(),
+                                                    draw_list->IdxBuffer.Data);
+        vtx_offset += draw_list->VtxBuffer.size_in_bytes();
+        idx_offset += draw_list->IdxBuffer.size_in_bytes();
+    }
 }
 } // namespace Ogre
