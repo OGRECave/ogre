@@ -134,8 +134,6 @@ namespace Ogre
                          const String& group, bool isManual, ManualResourceLoader* loader);
         virtual ~VulkanTextureGpu();
 
-        virtual void setTextureType( TextureType textureType );
-
         VkImageLayout getCurrentLayout( void ) const { return mCurrLayout; }
 
         virtual void copyTo( TextureGpu *dst, const PixelBox &dstBox, uint8 dstMipLevel,
@@ -144,8 +142,6 @@ namespace Ogre
                              ResourceAccess::ResourceAccess issueBarriers = ResourceAccess::ReadWrite );
 
         void _autogenerateMipmaps( bool bUseBarrierSolver = false );
-
-        virtual void _setToDisplayDummyTexture( void );
 
         VkImageType getVulkanTextureType( void ) const;
 

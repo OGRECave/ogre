@@ -86,13 +86,4 @@ namespace Ogre
         //if( name == "Window" )
         //    *static_cast<Window **>( pData ) = mWindow;
     }
-    //-----------------------------------------------------------------------------------
-    void VulkanTextureGpuWindow::_setToDisplayDummyTexture( void ) {}
-    //-----------------------------------------------------------------------------------
-    void VulkanTextureGpuWindow::setTextureType( TextureType textureType )
-    {
-        OGRE_EXCEPT( Exception::ERR_INVALID_CALL,
-                     "You cannot call setTextureType if isRenderWindowSpecific is true",
-                     "VulkanTextureGpuWindow::setTextureType" );
-    }
 }  // namespace Ogre
