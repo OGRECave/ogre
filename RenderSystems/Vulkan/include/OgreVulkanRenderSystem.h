@@ -58,7 +58,6 @@ namespace Ogre
         std::vector<String> mDevices;
 
         VulkanHardwareBuffer* mAutoParamsBuffer;
-        uint32 mAutoParamsBufferStep;
         uint32 mAutoParamsBufferPos;
 
         // For v1 rendering.
