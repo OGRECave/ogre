@@ -41,9 +41,9 @@ THE SOFTWARE.
 namespace Ogre
 {
     VulkanHardwarePixelBuffer::VulkanHardwarePixelBuffer(VulkanTextureGpu* tex, uint32 width, uint32 height, uint32 depth,
-                                                        uint8 face)
+                                                        uint8 face, uint32 mip)
         : HardwarePixelBuffer(width, height, depth, tex->getFormat(), tex->getUsage(), false, false), mParent(tex),
-        mFace(face)
+        mFace(face), mLevel(mip)
     {
     }
 
@@ -84,7 +84,7 @@ namespace Ogre
         region.bufferImageHeight = 0;
 
         region.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-        region.imageSubresource.mipLevel = 0;
+        region.imageSubresource.mipLevel = mLevel;
         region.imageSubresource.baseArrayLayer = mFace;
         region.imageSubresource.layerCount = 1;
 
@@ -255,12 +255,22 @@ namespace Ogre
         mNextLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 
         // create
+        uint32 depth = mDepth;
         for (uint8 face = 0; face < getNumFaces(); face++)
         {
+            uint32 width = mWidth;
+            uint32 height = mHeight;
+
             for (uint32 mip = 0; mip <= getNumMipmaps(); mip++)
             {
-                auto buf = std::make_shared<VulkanHardwarePixelBuffer>(this, mWidth, mHeight, mDepth, face);
+                auto buf = std::make_shared<VulkanHardwarePixelBuffer>(this, width, height, depth, face, mip);
                 mSurfaceList.push_back(buf);
+                if (width > 1)
+                    width = width / 2;
+                if (height > 1)
+                    height = height / 2;
+                if (depth > 1 && mTextureType != TEX_TYPE_2D_ARRAY)
+                    depth = depth / 2;
             }
         }
 
