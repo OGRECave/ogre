@@ -130,7 +130,6 @@ namespace Ogre
         viewportStateCi{VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO}
     {
         mAutoParamsBuffer = 0;
-        mAutoParamsBufferStep = 0;
         mAutoParamsBufferPos = 0;
 
         pipelineCi.pVertexInputState = &vertexFormatCi;
@@ -802,9 +801,8 @@ namespace Ogre
             OGRE_VK_CHECK(vkCreatePipelineLayout(mActiveDevice->mDevice, &pipelineLayoutCi, 0, &mLayout));
 
             // allocate buffer for 256 * frames-in-flight render batches of 512 bytes
-            mAutoParamsBufferStep =
-                alignToNextMultiple(512, mDevice->mDeviceProperties.limits.minUniformBufferOffsetAlignment);
-            size_t sz = mAutoParamsBufferStep * 256 * mActiveDevice->mGraphicsQueue.mNumFramesInFlight;
+            auto sz = alignToNextMultiple(256 * mActiveDevice->mGraphicsQueue.mNumFramesInFlight * 512,
+                                          mDevice->mDeviceProperties.limits.minUniformBufferOffsetAlignment);
             mAutoParamsBuffer =
                 new VulkanHardwareBuffer(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, sz, HBU_CPU_TO_GPU, false, mDevice);
 
@@ -1109,13 +1107,16 @@ namespace Ogre
             break;
         }
 
-        auto sizeBytes = std::min<size_t>(params->getConstantList().size(), mAutoParamsBufferStep);
+        auto sizeBytes = params->getConstantList().size();
         if(sizeBytes && gptype <= GPT_FRAGMENT_PROGRAM)
         {
-            mAutoParamsBufferPos = (mAutoParamsBufferPos + mAutoParamsBufferStep) % mAutoParamsBuffer->getSizeInBytes();
+            auto step =
+                alignToNextMultiple(sizeBytes, mDevice->mDeviceProperties.limits.minUniformBufferOffsetAlignment);
+            sizeBytes = std::min<uint32>(mAutoParamsBuffer->getSizeInBytes() - mAutoParamsBufferPos, sizeBytes);
             mUBOInfo[gptype].range = sizeBytes;
             mUBODynOffsets[gptype] = mAutoParamsBufferPos;
             mAutoParamsBuffer->writeData(mAutoParamsBufferPos, sizeBytes, params->getConstantList().data());
+            mAutoParamsBufferPos = (mAutoParamsBufferPos + step) % mAutoParamsBuffer->getSizeInBytes();
         }
     }
     //-------------------------------------------------------------------------
