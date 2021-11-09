@@ -72,9 +72,6 @@ namespace Ogre
 
         VulkanRenderPassDescriptor    *mCurrentRenderPassDescriptor;
 
-        uint32_t mStencilRefValue;
-        bool mStencilEnabled;
-
         // Vulkan requires a valid handle when updating descriptors unless nullDescriptor is present
         // So we just use a dummy. The dummy texture we get it from TextureGpuManager which needs
         // to create some anyway for different reasons
@@ -178,8 +175,6 @@ namespace Ogre
         virtual VulkanFrameBufferDescMap &_getFrameBufferDescMap( void ) { return mFrameBufferDescMap; }
         virtual VulkanFlushOnlyDescMap &_getFlushOnlyDescMap( void ) { return mFlushOnlyDescMap; }
         virtual RenderPassDescriptor *createRenderPassDescriptor( void );
-
-        virtual void setStencilBufferParams( uint32 refValue, const StencilState &stencilParams );
 
         virtual void _beginFrame( void );
         virtual void _endFrame( void );
