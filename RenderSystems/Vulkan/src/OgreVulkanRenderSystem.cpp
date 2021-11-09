@@ -787,6 +787,7 @@ namespace Ogre
             //vaoManager->initDrawIdVertexBuffer();
 
             mTextureManager = new VulkanTextureGpuManager(this, mDevice, bCanRestrictImageViewUsage);
+            mTextureManager->_getWarningTexture(); // preload warning texture, so does not interrupt render pass
 
             VkDescriptorSetLayoutCreateInfo descriptorSetLayoutCi = {VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO};
             descriptorSetLayoutCi.bindingCount = mDescriptorSetBindings.size();
