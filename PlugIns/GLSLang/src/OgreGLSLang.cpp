@@ -399,7 +399,10 @@ void GLSLangProgram::prepareImpl()
     }
 
     if (blockIdx != -1)
+    {
         mConstantDefs->bufferSize = program.getUniformBlockSize(blockIdx) / 4;
+        mLogicalToPhysical.reset();
+    }
 }
 
 void GLSLangProgram::loadFromSource() {}
