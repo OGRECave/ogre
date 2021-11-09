@@ -63,8 +63,9 @@ namespace Ogre
     {
         VulkanTextureGpu* mParent;
         uint8 mFace;
+        uint32 mLevel;
     public:
-        VulkanHardwarePixelBuffer(VulkanTextureGpu* tex, uint32 width, uint32 height, uint32 depth, uint8 face);
+        VulkanHardwarePixelBuffer(VulkanTextureGpu* tex, uint32 width, uint32 height, uint32 depth, uint8 face, uint32 mip);
         PixelBox lockImpl(const Box &lockBox,  LockOptions options) override;
         void blitFromMemory(const PixelBox& src, const Box& dstBox) override;
         void blitToMemory(const Box& srcBox, const PixelBox& dst) override;
