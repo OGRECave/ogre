@@ -59,6 +59,7 @@ namespace Ogre
             VkFence mProtectingFence;
 
             std::vector<std::pair<VkBuffer, VkDeviceMemory>> mBufferGraveyard;
+            std::vector<std::shared_ptr<VulkanDescriptorPool>> mDescriptorPoolGraveyard;
         };
 
         enum EncoderState
@@ -84,8 +85,8 @@ namespace Ogre
         VulkanDevice *mOwnerDevice;
 
         uint8 mNumFramesInFlight;
-    protected:
         uint8 mCurrentFrameIdx;
+    protected:
 
         // clang-format off
         // One per buffered frame
@@ -182,7 +183,7 @@ namespace Ogre
         void destroy( void );
 
         void queueForDeletion(VkBuffer buffer, VkDeviceMemory memory);
-
+        void queueForDeletion(const std::shared_ptr<VulkanDescriptorPool>& descriptorPool);
     protected:
         void newCommandBuffer( void );
         void endCommandBuffer( void );

@@ -28,6 +28,8 @@ THE SOFTWARE.
 
 #include "OgreVulkanRenderSystem.h"
 
+#include <numeric>
+
 #include "OgreGpuProgramManager.h"
 #include "OgreViewport.h"
 
@@ -129,7 +131,6 @@ namespace Ogre
         mScissorRect{},
         viewportStateCi{VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO}
     {
-        mAutoParamsBuffer = 0;
         mAutoParamsBufferPos = 0;
 
         pipelineCi.pVertexInputState = &vertexFormatCi;
@@ -288,8 +289,7 @@ namespace Ogre
 #endif
         _cleanupDepthBuffers();
 
-        delete mAutoParamsBuffer;
-        mAutoParamsBuffer = 0;
+        mAutoParamsBuffer.reset();
 
         OGRE_DELETE mHardwareBufferManager;
         mHardwareBufferManager = 0;
@@ -794,20 +794,13 @@ namespace Ogre
             OGRE_VK_CHECK(vkCreateDescriptorSetLayout(mActiveDevice->mDevice, &descriptorSetLayoutCi, nullptr,
                                                       &mDescriptorSetLayout));
 
-            mDescriptorPool.reset(new VulkanDescriptorPool(mDescriptorPoolSizes, mDescriptorSetLayout, mDevice));
-
             pipelineLayoutCi.pSetLayouts = &mDescriptorSetLayout;
             pipelineLayoutCi.setLayoutCount = 1;
             OGRE_VK_CHECK(vkCreatePipelineLayout(mActiveDevice->mDevice, &pipelineLayoutCi, 0, &mLayout));
 
-            // allocate buffer for 256 * frames-in-flight render batches of 512 bytes
-            auto sz = alignToNextMultiple(256 * mActiveDevice->mGraphicsQueue.mNumFramesInFlight * 512,
-                                          mDevice->mDeviceProperties.limits.minUniformBufferOffsetAlignment);
-            mAutoParamsBuffer =
-                new VulkanHardwareBuffer(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, sz, HBU_CPU_TO_GPU, false, mDevice);
-
-            mUBOInfo[0].buffer = mAutoParamsBuffer->getVkBuffer();
-            mUBOInfo[1].buffer = mAutoParamsBuffer->getVkBuffer();
+            // allocate 1.5MB buffer. Holds e.g. 1024 batches of 512 bytes for 3 frames-in-flight
+            resizeAutoParamsBuffer(1024 * 512 * 3);
+            mAutoParamsBufferUsage.resize(mActiveDevice->mGraphicsQueue.mNumFramesInFlight);
 
             resetAllBindings();
 
@@ -829,6 +822,22 @@ namespace Ogre
 
         return win;
     }
+
+    void VulkanRenderSystem::resizeAutoParamsBuffer(size_t size)
+    {
+        size = alignToNextMultiple(size, mDevice->mDeviceProperties.limits.minUniformBufferOffsetAlignment);
+        mAutoParamsBuffer = mHardwareBufferManager->createUniformBuffer(size);
+        mAutoParamsBufferPos = 0;
+
+        mUBOInfo[0].buffer = static_cast<VulkanHardwareBuffer*>(mAutoParamsBuffer.get())->getVkBuffer();
+        mUBOInfo[1].buffer = mUBOInfo[0].buffer;
+
+        // descriptors referring to old buffer are invalidated
+        mDescriptorSetCache.clear();
+        mActiveDevice->mGraphicsQueue.queueForDeletion(mDescriptorPool);
+        mDescriptorPool.reset( new VulkanDescriptorPool(mDescriptorPoolSizes, mDescriptorSetLayout, mDevice));
+    }
+
     //-------------------------------------------------------------------------
     void VulkanRenderSystem::_notifyDeviceStalled()
     {
@@ -965,6 +974,9 @@ namespace Ogre
 
     void VulkanRenderSystem::_render( const RenderOperation &op )
     {
+        if ((op.useIndexes && op.indexData->indexCount == 0) || op.vertexData->vertexCount == 0)
+            return;
+
         // Call super class.
         RenderSystem::_render( op );
 
@@ -973,6 +985,7 @@ namespace Ogre
             beginRenderPassDescriptor(mCurrentRenderPassDescriptor, false);
             // ensure scissor is set
             vkCmdSetScissor(mActiveDevice->mGraphicsQueue.mCurrentCmdBuffer, 0u, 1, &mScissorRect);
+            mAutoParamsBufferUsage[mActiveDevice->mGraphicsQueue.mCurrentFrameIdx] = 0;
             executeRenderPassDescriptorDelayedActions();
         }
 
@@ -1112,11 +1125,26 @@ namespace Ogre
         {
             auto step =
                 alignToNextMultiple(sizeBytes, mDevice->mDeviceProperties.limits.minUniformBufferOffsetAlignment);
-            sizeBytes = std::min<uint32>(mAutoParamsBuffer->getSizeInBytes() - mAutoParamsBufferPos, sizeBytes);
             mUBOInfo[gptype].range = sizeBytes;
+
+            if (std::accumulate(mAutoParamsBufferUsage.begin(), mAutoParamsBufferUsage.end(), 0) + step >=
+                mAutoParamsBuffer->getSizeInBytes())
+            {
+                // ran out of UBO memory, allocate a bigger buffer
+                resizeAutoParamsBuffer(mAutoParamsBuffer->getSizeInBytes() * 2);
+            }
+
+            if((mAutoParamsBufferPos + sizeBytes) >= mAutoParamsBuffer->getSizeInBytes())
+                mAutoParamsBufferPos = 0;
+
             mUBODynOffsets[gptype] = mAutoParamsBufferPos;
+
             mAutoParamsBuffer->writeData(mAutoParamsBufferPos, sizeBytes, params->getConstantList().data());
-            mAutoParamsBufferPos = (mAutoParamsBufferPos + step) % mAutoParamsBuffer->getSizeInBytes();
+            mAutoParamsBufferPos += step;
+            mAutoParamsBufferUsage[mActiveDevice->mGraphicsQueue.mCurrentFrameIdx] += step;
+
+            if(mAutoParamsBufferPos >= mAutoParamsBuffer->getSizeInBytes())
+                mAutoParamsBufferPos = 0;
         }
     }
     //-------------------------------------------------------------------------

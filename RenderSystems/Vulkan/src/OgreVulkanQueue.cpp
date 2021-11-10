@@ -39,6 +39,7 @@ THE SOFTWARE.
 #include "OgreStringConverter.h"
 
 #include "OgreVulkanUtils.h"
+#include "OgreVulkanDescriptorPool.h"
 
 #include <vulkan/vulkan.h>
 
@@ -826,6 +827,10 @@ namespace Ogre
     {
        mPerFrameData[mCurrentFrameIdx].mBufferGraveyard.push_back({buffer, memory});
     }
+    void VulkanQueue::queueForDeletion(const std::shared_ptr<VulkanDescriptorPool>& descriptorPool)
+    {
+        mPerFrameData[mCurrentFrameIdx].mDescriptorPoolGraveyard.push_back(descriptorPool);
+    }
     void VulkanQueue::_waitOnFrame( uint8 frameIdx )
     {
         VkFence fence = mPerFrameData[frameIdx].mProtectingFence;
@@ -838,6 +843,7 @@ namespace Ogre
             vkFreeMemory(mDevice, bm.second, nullptr);
         }
         mPerFrameData[frameIdx].mBufferGraveyard.clear();
+        mPerFrameData[frameIdx].mDescriptorPoolGraveyard.clear();
     }
     //-------------------------------------------------------------------------
     bool VulkanQueue::_isFrameFinished( uint8 frameIdx )
