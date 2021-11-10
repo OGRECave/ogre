@@ -404,10 +404,8 @@ namespace Ogre {
 
             for (uint32 mip = 0; mip <= getNumMipmaps(); mip++)
             {
-                GLES2HardwarePixelBuffer* buf = OGRE_NEW GLES2TextureBuffer(
-                    this, static_cast<GLint>(face), mip, width, height, depth);
-
-                mSurfaceList.push_back(HardwarePixelBufferSharedPtr(buf));
+                auto buf = std::make_shared<GLES2TextureBuffer>(this, int(face), mip, width, height, depth);
+                mSurfaceList.push_back(buf);
 
                 if (width > 1)
                     width = width / 2;

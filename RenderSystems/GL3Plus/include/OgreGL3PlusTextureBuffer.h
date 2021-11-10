@@ -35,8 +35,9 @@ namespace Ogre {
 
     /** Texture surface.
      */
-    class _OgreGL3PlusExport GL3PlusTextureBuffer: public GL3PlusHardwarePixelBuffer
+    class _OgreGL3PlusExport GL3PlusTextureBuffer: public GLHardwarePixelBufferCommon
     {
+        GL3PlusRenderSystem* mRenderSystem;
     public:
         /** Texture constructor */
         GL3PlusTextureBuffer(GL3PlusTexture* parent, GLint face, GLint level, uint32 width,
@@ -52,7 +53,7 @@ namespace Ogre {
         virtual void download(const PixelBox &data);
 
         /// Hardware implementation of blitFromMemory.
-        virtual void blitFromMemory(const PixelBox &src_orig, const Box &dstBox);
+        void blitFromMemory(const PixelBox &src_orig, const Box &dstBox) override;
 
         /// Copy from framebuffer.
         void copyFromFramebuffer(uint32 zoffset);
@@ -64,6 +65,8 @@ namespace Ogre {
         void blitFromTexture(GL3PlusTextureBuffer *src,
                              const Box &srcBox, const Box &dstBox);
 
+        void blitFromMemory(const PixelBox &src);
+        void blitToMemory(const Box &srcBox, const PixelBox &dst) override;
     protected:
         // In case this is a texture level.
         GLenum mTarget;

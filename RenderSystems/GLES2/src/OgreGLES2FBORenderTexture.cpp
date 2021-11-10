@@ -78,7 +78,7 @@ namespace Ogre {
     void GLES2FBORenderTexture::notifyOnContextReset()
     {
         GLSurfaceDesc target;
-        target.buffer = static_cast<GLES2HardwarePixelBuffer*>(mBuffer);
+        target.buffer = static_cast<GLHardwarePixelBufferCommon*>(mBuffer);
         target.zoffset = mZOffset;
         
         mFB.notifyOnContextReset(target);
