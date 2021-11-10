@@ -57,8 +57,11 @@ namespace Ogre
 
         std::vector<String> mDevices;
 
-        VulkanHardwareBuffer* mAutoParamsBuffer;
+        HardwareBufferPtr mAutoParamsBuffer;
         uint32 mAutoParamsBufferPos;
+        std::vector<uint32> mAutoParamsBufferUsage;
+
+        void resizeAutoParamsBuffer(size_t size);
 
         // For v1 rendering.
         IndexData *mCurrentIndexBuffer;
@@ -126,7 +129,7 @@ namespace Ogre
         std::unordered_map<uint32, VkRenderPass> mRenderPassCache;
         std::unordered_map<uint32, VkPipeline> mPipelineCache;
 
-        std::unique_ptr<VulkanDescriptorPool> mDescriptorPool;
+        std::shared_ptr<VulkanDescriptorPool> mDescriptorPool;
 
         // clears the pipeline cache
         void clearPipelineCache();
