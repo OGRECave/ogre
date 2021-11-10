@@ -176,8 +176,7 @@ namespace Ogre
             mDevice->mGraphicsQueue.getCopyEncoderV1Buffer( false );
 
             VkBuffer srcBuf = srcBuffer->getVkBuffer();
-            VkBufferCopy region = {srcOffset, dstOffset};
-            region.size = alignToNextMultiple( length, 4u );
+            VkBufferCopy region = {srcOffset, dstOffset, length};
             vkCmdCopyBuffer( mDevice->mGraphicsQueue.mCurrentCmdBuffer, srcBuf, mBuffer, 1u, &region );
 
             //if( this->mDiscardBuffer )
