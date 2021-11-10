@@ -33,34 +33,18 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #include "OgreGLHardwarePixelBufferCommon.h"
 
 namespace Ogre {
-    class _OgreGL3PlusExport GL3PlusHardwarePixelBuffer: public GLHardwarePixelBufferCommon
-    {
-
-    protected:
-        GL3PlusRenderSystem* mRenderSystem;
-    public:
-        /// Should be called by HardwareBufferManager
-        GL3PlusHardwarePixelBuffer(uint32 mWidth, uint32 mHeight, uint32 mDepth,
-                               PixelFormat mFormat,
-                               HardwareBuffer::Usage usage);
-
-        /// @copydoc HardwarePixelBuffer::blitFromMemory
-        void blitFromMemory(const PixelBox &src, const Box &dstBox);
-
-        /// @copydoc HardwarePixelBuffer::blitToMemory
-        void blitToMemory(const Box &srcBox, const PixelBox &dst);
-    };
-
-    /** Renderbuffer surface.  Needs FBO extension.
+    /** Renderbuffer surface.
      */
-    class _OgreGL3PlusExport GL3PlusRenderBuffer: public GL3PlusHardwarePixelBuffer
+    class GL3PlusRenderBuffer: public GLHardwarePixelBufferCommon
     {
+        void blitFromMemory(const PixelBox& src, const Box& dstBox) override { OgreAssertDbg(false, "Not supported"); }
+        void blitToMemory(const Box& srcBox, const PixelBox& dst) override { OgreAssertDbg(false, "Not supported"); }
+        GL3PlusRenderSystem* mRenderSystem;
     public:
             GL3PlusRenderBuffer(GLenum format, uint32 width, uint32 height, GLsizei numSamples);
         ~GL3PlusRenderBuffer();
 
-        /// @copydoc GL3PlusHardwarePixelBuffer::bindToFramebuffer
-            virtual void bindToFramebuffer(uint32 attachment, uint32 zoffset);
+        void bindToFramebuffer(uint32 attachment, uint32 zoffset) override;
 
     protected:
         // In case this is a render buffer

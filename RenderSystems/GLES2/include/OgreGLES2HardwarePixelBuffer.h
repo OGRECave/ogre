@@ -33,24 +33,7 @@ THE SOFTWARE.
 #include "OgreGLHardwarePixelBufferCommon.h"
 
 namespace Ogre {
-    class _OgreGLES2Export GLES2HardwarePixelBuffer: public GLHardwarePixelBufferCommon
-    {
-        public:
-            /// Should be called by HardwareBufferManager
-            GLES2HardwarePixelBuffer(uint32 mWidth, uint32 mHeight, uint32 mDepth,
-                                  PixelFormat mFormat,
-                                  HardwareBuffer::Usage usage);
-
-            /// @copydoc HardwarePixelBuffer::blitFromMemory
-            void blitFromMemory(const PixelBox &src, const Box &dstBox);
-
-            /// @copydoc HardwarePixelBuffer::blitToMemory
-            void blitToMemory(const Box &srcBox, const PixelBox &dst);
-    };
-
-    /** Texture surface.
-    */
-    class _OgreGLES2Export GLES2TextureBuffer: public GLES2HardwarePixelBuffer
+    class GLES2TextureBuffer: public GLHardwarePixelBufferCommon
             {
         public:
             /** Texture constructor */
@@ -58,8 +41,7 @@ namespace Ogre {
                                GLint height, GLint depth);
             virtual ~GLES2TextureBuffer();
 
-            /// @copydoc GLES2HardwarePixelBuffer::bindToFramebuffer
-            virtual void bindToFramebuffer(uint32 attachment, uint32 zoffset);
+            void bindToFramebuffer(uint32 attachment, uint32 zoffset) override;
 
             /// Upload a box of pixels to this buffer on the card
             virtual void upload(const PixelBox &data, const Box &dest);
@@ -78,6 +60,9 @@ namespace Ogre {
             // Blitting implementation
             void blitFromTexture(GLES2TextureBuffer *src, const Box &srcBox, const Box &dstBox);
             
+            void blitFromMemory(const PixelBox &src);
+            void blitToMemory(const Box &srcBox, const PixelBox &dst) override;
+
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
         // Friends.
         protected:
@@ -96,16 +81,15 @@ namespace Ogre {
             void buildMipmaps(const PixelBox &data);
     };
 
-     /** Renderbuffer surface.  Needs FBO extension.
-     */
-    class _OgreGLES2Export GLES2RenderBuffer: public GLES2HardwarePixelBuffer
+    class GLES2RenderBuffer: public GLHardwarePixelBufferCommon
     {
+        void blitFromMemory(const PixelBox& src, const Box& dstBox) override { OgreAssertDbg(false, "Not supported"); }
+        void blitToMemory(const Box& srcBox, const PixelBox& dst) override { OgreAssertDbg(false, "Not supported"); }
         public:
             GLES2RenderBuffer(GLenum format, uint32 width, uint32 height, GLsizei numSamples);
             virtual ~GLES2RenderBuffer();
 
-            /// @copydoc GLES2HardwarePixelBuffer::bindToFramebuffer
-            virtual void bindToFramebuffer(uint32 attachment, uint32 zoffset);
+            void bindToFramebuffer(uint32 attachment, uint32 zoffset) override;
 
         protected:
             // In case this is a render buffer

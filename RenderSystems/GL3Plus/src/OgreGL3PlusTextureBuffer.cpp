@@ -49,9 +49,10 @@ namespace Ogre {
     GL3PlusTextureBuffer::GL3PlusTextureBuffer(GL3PlusTexture* parent,
                                                GLint face, GLint level, uint32 width, uint32 height,
                                                uint32 depth)
-        : GL3PlusHardwarePixelBuffer(width, height, depth, parent->getFormat(), (Usage)parent->getUsage()),
+        : GLHardwarePixelBufferCommon(width, height, depth, parent->getFormat(), (Usage)parent->getUsage()),
           mTarget(parent->getGL3PlusTextureTarget()), mTextureID(parent->getGLID()), mLevel(level)
     {
+        mRenderSystem = static_cast<GL3PlusRenderSystem*>(Root::getSingleton().getRenderSystem());
         // Get face identifier
         mFaceTarget = mTarget;
         if (mTarget == GL_TEXTURE_CUBE_MAP)
@@ -367,7 +368,7 @@ namespace Ogre {
         }
         else
         {
-            GL3PlusHardwarePixelBuffer::blit(src, srcBox, dstBox);
+            GLHardwarePixelBufferCommon::blit(src, srcBox, dstBox);
         }
     }
 
@@ -484,16 +485,16 @@ namespace Ogre {
     // blitFromMemory doing hardware bilinear scaling
     void GL3PlusTextureBuffer::blitFromMemory(const PixelBox &src, const Box &dstBox)
     {
+        if (!mBuffer.contains(dstBox))
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Destination box out of range");
+
         // Fall back to normal GLHardwarePixelBuffer::blitFromMemory in case
         // the source dimensions match the destination ones, in which case no scaling is needed
         if (src.getSize() == dstBox.getSize())
         {
-            GL3PlusHardwarePixelBuffer::blitFromMemory(src, dstBox);
+            blitFromMemory(src);
             return;
         }
-        if (!mBuffer.contains(dstBox))
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Destination box out of range",
-                        "GL3PlusTextureBuffer::blitFromMemory");
 
         TextureType type = (src.getDepth() != 1) ? TEX_TYPE_3D : TEX_TYPE_2D;
 
@@ -511,5 +512,64 @@ namespace Ogre {
 
         // Delete temp texture
         TextureManager::getSingleton().remove(tex);
+    }
+    void GL3PlusTextureBuffer::blitFromMemory(const PixelBox &src)
+    {
+        PixelBox converted;
+
+        if (GL3PlusPixelUtil::getGLInternalFormat(src.format) == 0)
+        {
+            // Extents match, but format is not accepted as valid
+            // source format for GL. Do conversion in temporary buffer.
+            allocateBuffer();
+            converted = mBuffer.getSubVolume(src);
+            PixelUtil::bulkPixelConversion(src, converted);
+        }
+        else
+        {
+            // No conversion needed.
+            converted = src;
+        }
+
+        upload(converted, src);
+        freeBuffer();
+    }
+
+    void GL3PlusTextureBuffer::blitToMemory(const Box &srcBox, const PixelBox &dst)
+    {
+        if (!mBuffer.contains(srcBox))
+        {
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+                        "source box out of range",
+                        "GL3PlusHardwarePixelBuffer::blitToMemory");
+        }
+
+        if (srcBox.getOrigin() == Vector3i(0, 0 ,0) &&
+            srcBox.getSize() == getSize() &&
+            dst.getSize() == getSize() &&
+            GL3PlusPixelUtil::getGLInternalFormat(dst.format) != 0)
+        {
+            // The direct case: the user wants the entire texture in a format supported by GL
+            // so we don't need an intermediate buffer
+            download(dst);
+        }
+        else
+        {
+            // Use buffer for intermediate copy
+            allocateBuffer();
+            // Download entire buffer
+            download(mBuffer);
+            if(srcBox.getSize() != dst.getSize())
+            {
+                // We need scaling
+                Image::scale(mBuffer.getSubVolume(srcBox), dst, Image::FILTER_BILINEAR);
+            }
+            else
+            {
+                // Just copy the bit that we need
+                PixelUtil::bulkPixelConversion(mBuffer.getSubVolume(srcBox), dst);
+            }
+            freeBuffer();
+        }
     }
 }
