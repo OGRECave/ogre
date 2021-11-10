@@ -63,11 +63,6 @@ namespace Ogre
 
         void resizeAutoParamsBuffer(size_t size);
 
-        // For v1 rendering.
-        IndexData *mCurrentIndexBuffer;
-        VertexData *mCurrentVertexBuffer;
-        VkPrimitiveTopology mCurrentPrimType;
-
         VulkanDevice *mActiveDevice;
 
         VulkanDevice *mDevice;
@@ -77,8 +72,6 @@ namespace Ogre
         // clang-format off
         VulkanFrameBufferDescMap    mFrameBufferDescMap;
         VulkanFlushOnlyDescMap      mFlushOnlyDescMap;
-        uint32                      mEntriesToFlush;
-        bool                        mVpChanged;
         // clang-format on
 
         bool mHasValidationLayers;
