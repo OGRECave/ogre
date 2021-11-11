@@ -325,7 +325,8 @@ void ImGuiOverlay::ImGUIRenderable::updateVertexData(ImDrawData* draw_data)
     for (int i = 0; i < draw_data->CmdListsCount; ++i)
     {
         const ImDrawList* draw_list = draw_data->CmdLists[i];
-        bind->getBuffer(0)->writeData(vtx_offset, draw_list->VtxBuffer.size_in_bytes(), draw_list->VtxBuffer.Data);
+        bind->getBuffer(0)->writeData(vtx_offset, draw_list->VtxBuffer.size_in_bytes(), draw_list->VtxBuffer.Data,
+                                      i == 0); // discard on first write
         mRenderOp.indexData->indexBuffer->writeData(idx_offset, draw_list->IdxBuffer.size_in_bytes(),
                                                     draw_list->IdxBuffer.Data);
         vtx_offset += draw_list->VtxBuffer.size_in_bytes();
