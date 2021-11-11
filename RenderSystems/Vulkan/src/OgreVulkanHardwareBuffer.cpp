@@ -36,16 +36,28 @@ namespace Ogre
     VulkanHardwareBuffer::VulkanHardwareBuffer(uint32 target,
         size_t sizeBytes, Usage usage, bool useShadowBuffer, VulkanDevice *device ) :
         HardwareBuffer(usage, false, useShadowBuffer),
-        mDevice( device )
+        mBuffer(VK_NULL_HANDLE),
+        mDevice( device ),
+        mTarget( target )
     {
         mSizeInBytes = sizeBytes;
 
-        mLastFrameUsed = 0;//mVaoManager->getFrameCount() - mVaoManager->getDynamicBufferMultiplier();
-        mLastFrameGpuWrote = mLastFrameUsed;
+        discard();
+
+        if(mUsage == HBU_GPU_ONLY)
+        {
+            mShadowBuffer.reset(new VulkanHardwareBuffer(VK_BUFFER_USAGE_TRANSFER_SRC_BIT, sizeBytes, HBU_CPU_ONLY, false, mDevice));
+        }
+    }
+
+    void VulkanHardwareBuffer::discard()
+    {
+        if(mBuffer)
+            mDevice->mGraphicsQueue.queueForDeletion(mBuffer, mMemory);
 
         VkBufferCreateInfo bufferCi = {VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO};
-        bufferCi.size = sizeBytes;
-        bufferCi.usage = target;
+        bufferCi.size = mSizeInBytes;
+        bufferCi.usage = mTarget;
 
         if((mUsage & HBU_CPU_ONLY) == 0)
             bufferCi.usage |= VK_BUFFER_USAGE_TRANSFER_DST_BIT;
@@ -59,11 +71,10 @@ namespace Ogre
         memAllocInfo.allocationSize = buffMemRequirements.size;
 
         uint32 reqFlags = 0;
-        if(usage != HBU_GPU_ONLY)
+        if(mUsage != HBU_GPU_ONLY)
             reqFlags = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
         else
             reqFlags = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
-
 
         const auto& memProperties = mDevice->mDeviceMemoryProperties;
         for(; memAllocInfo.memoryTypeIndex < memProperties.memoryTypeCount; memAllocInfo.memoryTypeIndex++)
@@ -76,11 +87,6 @@ namespace Ogre
 
         OGRE_VK_CHECK(vkAllocateMemory(mDevice->mDevice, &memAllocInfo, NULL, &mMemory));
         OGRE_VK_CHECK(vkBindBufferMemory(mDevice->mDevice, mBuffer, mMemory, 0));
-
-        if(mUsage == HBU_GPU_ONLY)
-        {
-            mShadowBuffer.reset(new VulkanHardwareBuffer(VK_BUFFER_USAGE_TRANSFER_SRC_BIT, sizeBytes, HBU_CPU_ONLY, false, mDevice));
-        }
     }
 
     VulkanHardwareBuffer::~VulkanHardwareBuffer()
@@ -89,49 +95,21 @@ namespace Ogre
         mDevice->mGraphicsQueue.queueForDeletion(mBuffer, mMemory);
     }
 
-    void VulkanHardwareBuffer::_notifyDeviceStalled()
-    {
-        mLastFrameUsed = 0;//mVaoManager->getFrameCount() - mVaoManager->getDynamicBufferMultiplier();
-        mLastFrameGpuWrote = mLastFrameUsed;
-    }
-
-    VkBuffer VulkanHardwareBuffer::getVkBuffer()
-    {
-        mLastFrameUsed = 0;//mVaoManager->getFrameCount();
-        //if( !mDiscardBuffer )
-        {
-            //outOffset = mBuffer.mInternalBufferStart;
-            return mBuffer;
-        }
-    }
-
     void* VulkanHardwareBuffer::lockImpl(size_t offset, size_t length, LockOptions options)
     {
-        void *retPtr = 0;
-
-        const uint32 currentFrame       = 0;//mVaoManager->getFrameCount();
-        const uint32 bufferMultiplier   = 1;//mVaoManager->getDynamicBufferMultiplier();
-
         if( options == HardwareBuffer::HBL_READ_ONLY )
         {
-            if( currentFrame - mLastFrameGpuWrote < bufferMultiplier )
-                mDevice->stall();
-        }
-        else if( options != HardwareBuffer::HBL_NO_OVERWRITE && 0 )
-        {
-            if( currentFrame - mLastFrameUsed < bufferMultiplier )
-            {
-                LogManager::getSingleton().logMessage(
-                    "PERFORMANCE WARNING: locking to a non-HBU_WRITE_ONLY or "
-                    "non-HBU_DISCARDABLE for other than reading is slow/stalling." );
-
-                mDevice->stall();
-            }
+            //if( currentFrame - mLastFrameGpuWrote < bufferMultiplier )
+            //    mDevice->stall();
         }
 
         if(mShadowBuffer)
             return mShadowBuffer->lock(offset, length, options);
 
+        if (options == HBL_DISCARD && mUsage == HBU_CPU_TO_GPU)
+            discard();
+
+        void *retPtr = 0;
         OGRE_VK_CHECK(vkMapMemory(mDevice->mDevice, mMemory, 0, mSizeInBytes, 0, &retPtr));
         return static_cast<uint8*>(retPtr) + offset;
     }
@@ -178,9 +156,6 @@ namespace Ogre
             VkBuffer srcBuf = srcBuffer->getVkBuffer();
             VkBufferCopy region = {srcOffset, dstOffset, length};
             vkCmdCopyBuffer( mDevice->mGraphicsQueue.mCurrentCmdBuffer, srcBuf, mBuffer, 1u, &region );
-
-            //if( this->mDiscardBuffer )
-            //    mDevice->stall();
         }
         else
         {
