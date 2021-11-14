@@ -452,9 +452,6 @@ namespace Ogre {
             rsc->setCapability(RSC_VERTEX_PROGRAM);
 
             // Vertex Program Properties
-            rsc->setVertexProgramConstantBoolCount(0);
-            rsc->setVertexProgramConstantIntCount(0);
-
             GLint floatConstantCount;
             glGetProgramivARB(GL_VERTEX_PROGRAM_ARB, GL_MAX_PROGRAM_LOCAL_PARAMETERS_ARB, &floatConstantCount);
             rsc->setVertexProgramConstantFloatCount(floatConstantCount);
@@ -490,11 +487,6 @@ namespace Ogre {
         // NFZ - check for ATI fragment shader support
         if (GLEW_ATI_fragment_shader)
         {
-            // no boolean params allowed
-            rsc->setFragmentProgramConstantBoolCount(0);
-            // no integer params allowed
-            rsc->setFragmentProgramConstantIntCount(0);
-
             // only 8 Vector4 constant floats supported
             rsc->setFragmentProgramConstantFloatCount(8);
 
@@ -507,9 +499,6 @@ namespace Ogre {
         if (GLEW_ARB_fragment_program)
         {
             // Fragment Program Properties
-            rsc->setFragmentProgramConstantBoolCount(0);
-            rsc->setFragmentProgramConstantIntCount(0);
-
             GLint floatConstantCount;
             glGetProgramivARB(GL_FRAGMENT_PROGRAM_ARB, GL_MAX_PROGRAM_LOCAL_PARAMETERS_ARB, &floatConstantCount);
             rsc->setFragmentProgramConstantFloatCount(floatConstantCount);
@@ -553,12 +542,9 @@ namespace Ogre {
             GLEW_EXT_geometry_shader4)
         {
             rsc->setCapability(RSC_GEOMETRY_PROGRAM);
-            rsc->setGeometryProgramConstantBoolCount(0);
-            rsc->setGeometryProgramConstantIntCount(0);
-
             GLint floatConstantCount = 0;
             glGetIntegerv(GL_MAX_GEOMETRY_UNIFORM_COMPONENTS_EXT, &floatConstantCount);
-            rsc->setGeometryProgramConstantFloatCount(floatConstantCount);
+            rsc->setGeometryProgramConstantFloatCount(floatConstantCount/4);
 
             GLint maxOutputVertices;
             glGetIntegerv(GL_MAX_GEOMETRY_OUTPUT_VERTICES_EXT,&maxOutputVertices);

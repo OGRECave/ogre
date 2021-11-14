@@ -383,31 +383,21 @@ namespace Ogre {
 
         GLint constantCount = 0;
         OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_MAX_VERTEX_UNIFORM_COMPONENTS, &constantCount));
-        rsc->setVertexProgramConstantFloatCount((Ogre::ushort)constantCount);
-        rsc->setVertexProgramConstantBoolCount((Ogre::ushort)constantCount);
-        rsc->setVertexProgramConstantIntCount((Ogre::ushort)constantCount);
+        rsc->setVertexProgramConstantFloatCount((Ogre::ushort)constantCount/4);
 
         // Fragment Program Properties
         constantCount = 0;
         OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_MAX_FRAGMENT_UNIFORM_COMPONENTS, &constantCount));
-        rsc->setFragmentProgramConstantFloatCount((Ogre::ushort)constantCount);
-        rsc->setFragmentProgramConstantBoolCount((Ogre::ushort)constantCount);
-        rsc->setFragmentProgramConstantIntCount((Ogre::ushort)constantCount);
+        rsc->setFragmentProgramConstantFloatCount((Ogre::ushort)constantCount/4);
 
         // Geometry Program Properties
         rsc->setCapability(RSC_GEOMETRY_PROGRAM);
 
         OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_MAX_GEOMETRY_UNIFORM_COMPONENTS, &constantCount));
-        rsc->setGeometryProgramConstantFloatCount(constantCount);
+        rsc->setGeometryProgramConstantFloatCount(constantCount/4);
 
         OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_MAX_GEOMETRY_OUTPUT_VERTICES, &constantCount));
-        rsc->setGeometryProgramNumOutputVertices(constantCount);
-
-        //FIXME Is this correct?
-        OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_MAX_GEOMETRY_UNIFORM_COMPONENTS, &constantCount));
-        rsc->setGeometryProgramConstantFloatCount(constantCount);
-        rsc->setGeometryProgramConstantBoolCount(constantCount);
-        rsc->setGeometryProgramConstantIntCount(constantCount);
+        rsc->setGeometryProgramNumOutputVertices(constantCount/4);
 
         // Tessellation Program Properties
         if (hasMinGLVersion(4, 0) || checkExtension("GL_ARB_tessellation_shader"))
@@ -416,20 +406,12 @@ namespace Ogre {
             rsc->setCapability(RSC_TESSELLATION_DOMAIN_PROGRAM);
 
             OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_MAX_TESS_CONTROL_UNIFORM_COMPONENTS, &constantCount));
-            // 16 boolean params allowed
-            rsc->setTessellationHullProgramConstantBoolCount(constantCount);
-            // 16 integer params allowed, 4D
-            rsc->setTessellationHullProgramConstantIntCount(constantCount);
-            // float params, always 4D
-            rsc->setTessellationHullProgramConstantFloatCount(constantCount);
+            // float params
+            rsc->setTessellationHullProgramConstantFloatCount(constantCount/4);
 
             OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_MAX_TESS_EVALUATION_UNIFORM_COMPONENTS, &constantCount));
-            // 16 boolean params allowed
-            rsc->setTessellationDomainProgramConstantBoolCount(constantCount);
-            // 16 integer params allowed, 4D
-            rsc->setTessellationDomainProgramConstantIntCount(constantCount);
-            // float params, always 4D
-            rsc->setTessellationDomainProgramConstantFloatCount(constantCount);
+            // float params
+            rsc->setTessellationDomainProgramConstantFloatCount(constantCount/4);
         }
 
         // Compute Program Properties
@@ -437,11 +419,8 @@ namespace Ogre {
         {
             rsc->setCapability(RSC_COMPUTE_PROGRAM);
 
-            //FIXME Is this correct?
             OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_MAX_COMPUTE_UNIFORM_COMPONENTS, &constantCount));
             rsc->setComputeProgramConstantFloatCount(constantCount);
-            rsc->setComputeProgramConstantBoolCount(constantCount);
-            rsc->setComputeProgramConstantIntCount(constantCount);
 
             //TODO we should also check max workgroup count & size
             // OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_MAX_COMPUTE_WORK_GROUP_SIZE, &workgroupCount));

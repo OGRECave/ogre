@@ -956,13 +956,8 @@ namespace Ogre
 
         rsc->setCapability(RSC_VERTEX_PROGRAM);
 
-        // TODO: constant buffers have no limits but lower models do
-        // 16 boolean params allowed
-        rsc->setVertexProgramConstantBoolCount(16);
-        // 16 integer params allowed, 4D
-        rsc->setVertexProgramConstantIntCount(16);
         // float params, always 4D
-        rsc->setVertexProgramConstantFloatCount(512);
+        rsc->setVertexProgramConstantFloatCount(D3D11_REQ_CONSTANT_BUFFER_ELEMENT_COUNT);
 
     }
     //---------------------------------------------------------------------
@@ -999,13 +994,8 @@ namespace Ogre
             rsc->addShaderProfile("ps_5_0");
         }
 
-        // TODO: constant buffers have no limits but lower models do
-        // 16 boolean params allowed
-        rsc->setFragmentProgramConstantBoolCount(16);
-        // 16 integer params allowed, 4D
-        rsc->setFragmentProgramConstantIntCount(16);
         // float params, always 4D
-        rsc->setFragmentProgramConstantFloatCount(512);
+        rsc->setFragmentProgramConstantFloatCount(D3D11_REQ_CONSTANT_BUFFER_ELEMENT_COUNT);
 
     }
     //---------------------------------------------------------------------
@@ -1018,13 +1008,8 @@ namespace Ogre
             
             rsc->setCapability(RSC_TESSELLATION_HULL_PROGRAM);
 
-            // TODO: constant buffers have no limits but lower models do
-            // 16 boolean params allowed
-            rsc->setTessellationHullProgramConstantBoolCount(16);
-            // 16 integer params allowed, 4D
-            rsc->setTessellationHullProgramConstantIntCount(16);
             // float params, always 4D
-            rsc->setTessellationHullProgramConstantFloatCount(512);
+            rsc->setTessellationHullProgramConstantFloatCount(D3D11_REQ_CONSTANT_BUFFER_ELEMENT_COUNT);
         }
 
     }
@@ -1038,14 +1023,8 @@ namespace Ogre
 
             rsc->setCapability(RSC_TESSELLATION_DOMAIN_PROGRAM);
 
-
-            // TODO: constant buffers have no limits but lower models do
-            // 16 boolean params allowed
-            rsc->setTessellationDomainProgramConstantBoolCount(16);
-            // 16 integer params allowed, 4D
-            rsc->setTessellationDomainProgramConstantIntCount(16);
             // float params, always 4D
-            rsc->setTessellationDomainProgramConstantFloatCount(512);
+            rsc->setTessellationDomainProgramConstantFloatCount(D3D11_REQ_CONSTANT_BUFFER_ELEMENT_COUNT);
         }
 
     }
@@ -1067,16 +1046,8 @@ namespace Ogre
             rsc->addShaderProfile("cs_5_0");
         }
 
-
-
-        // TODO: constant buffers have no limits but lower models do
-        // 16 boolean params allowed
-        rsc->setComputeProgramConstantBoolCount(16);
-        // 16 integer params allowed, 4D
-        rsc->setComputeProgramConstantIntCount(16);
         // float params, always 4D
-        rsc->setComputeProgramConstantFloatCount(512);
-
+        rsc->setComputeProgramConstantFloatCount(D3D11_REQ_CONSTANT_BUFFER_ELEMENT_COUNT);
     }
     //---------------------------------------------------------------------
     void D3D11RenderSystem::convertGeometryShaderCaps(RenderSystemCapabilities* rsc) const
@@ -1096,9 +1067,7 @@ namespace Ogre
             rsc->addShaderProfile("gs_5_0");
         }
 
-        rsc->setGeometryProgramConstantFloatCount(512);
-        rsc->setGeometryProgramConstantIntCount(16);
-        rsc->setGeometryProgramConstantBoolCount(16);
+        rsc->setGeometryProgramConstantFloatCount(D3D11_REQ_CONSTANT_BUFFER_ELEMENT_COUNT);
         rsc->setGeometryProgramNumOutputVertices(1024);
     }
     //-----------------------------------------------------------------------

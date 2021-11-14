@@ -192,14 +192,8 @@ namespace Ogre
 
         //These don't make sense on Metal, so just use flexible defaults.
         rsc->setVertexProgramConstantFloatCount( 16384 );
-        rsc->setVertexProgramConstantBoolCount( 16384 );
-        rsc->setVertexProgramConstantIntCount( 16384 );
         rsc->setFragmentProgramConstantFloatCount( 16384 );
-        rsc->setFragmentProgramConstantBoolCount( 16384 );
-        rsc->setFragmentProgramConstantIntCount( 16384 );
         rsc->setComputeProgramConstantFloatCount( 16384 );
-        rsc->setComputeProgramConstantBoolCount( 16384 );
-        rsc->setComputeProgramConstantIntCount( 16384 );
 
 #if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
         uint8 mrtCount = 8u;

@@ -577,25 +577,13 @@ namespace Ogre
         rsc->setMaxPointSize( 256 );
 
         //rsc->setMaximumResolutions( 16384, 4096, 16384 );
-
-        rsc->setVertexProgramConstantFloatCount( 256u );
-        rsc->setVertexProgramConstantIntCount( 256u );
-        rsc->setVertexProgramConstantBoolCount( 256u );
-        rsc->setGeometryProgramConstantFloatCount( 256u );
-        rsc->setGeometryProgramConstantIntCount( 256u );
-        rsc->setGeometryProgramConstantBoolCount( 256u );
-        rsc->setFragmentProgramConstantFloatCount( 256u );
-        rsc->setFragmentProgramConstantIntCount( 256u );
-        rsc->setFragmentProgramConstantBoolCount( 256u );
-        rsc->setTessellationHullProgramConstantFloatCount( 256u );
-        rsc->setTessellationHullProgramConstantIntCount( 256u );
-        rsc->setTessellationHullProgramConstantBoolCount( 256u );
-        rsc->setTessellationDomainProgramConstantFloatCount( 256u );
-        rsc->setTessellationDomainProgramConstantIntCount( 256u );
-        rsc->setTessellationDomainProgramConstantBoolCount( 256u );
-        rsc->setComputeProgramConstantFloatCount( 256u );
-        rsc->setComputeProgramConstantIntCount( 256u );
-        rsc->setComputeProgramConstantBoolCount( 256u );
+        auto maxFloatVectors = deviceLimits.maxUniformBufferRange / (4 * sizeof(float));
+        rsc->setVertexProgramConstantFloatCount(maxFloatVectors);
+        rsc->setGeometryProgramConstantFloatCount(maxFloatVectors);
+        rsc->setFragmentProgramConstantFloatCount(maxFloatVectors);
+        rsc->setTessellationHullProgramConstantFloatCount(maxFloatVectors);
+        rsc->setTessellationDomainProgramConstantFloatCount(maxFloatVectors);
+        rsc->setComputeProgramConstantFloatCount(maxFloatVectors);
 
         rsc->addShaderProfile( "spirv" );
 
