@@ -278,24 +278,12 @@ namespace Ogre
         /// The identifier associated with the render system for which these capabilities are valid
         String mRenderSystemName;
 
-        /// The number of floating-point constants vertex programs support
-        ushort mVertexProgramConstantFloatCount;           
-        /// The number of integer constants vertex programs support
-        ushort mVertexProgramConstantIntCount;           
-        /// The number of boolean constants vertex programs support
-        ushort mVertexProgramConstantBoolCount;           
-        /// The number of floating-point constants geometry programs support
-        ushort mGeometryProgramConstantFloatCount;           
-        /// The number of integer constants vertex geometry support
-        ushort mGeometryProgramConstantIntCount;           
-        /// The number of boolean constants vertex geometry support
-        ushort mGeometryProgramConstantBoolCount;           
-        /// The number of floating-point constants fragment programs support
-        ushort mFragmentProgramConstantFloatCount;           
-        /// The number of integer constants fragment programs support
-        ushort mFragmentProgramConstantIntCount;           
-        /// The number of boolean constants fragment programs support
-        ushort mFragmentProgramConstantBoolCount;
+        /// The number of floating-point 4-vector constants vertex programs support
+        ushort mVertexProgramConstantFloatCount;
+        /// The number of floating-point 4-vector constants geometry programs support
+        ushort mGeometryProgramConstantFloatCount;
+        /// The number of floating-point 4-vector constants fragment programs support
+        ushort mFragmentProgramConstantFloatCount;
         /// The number of simultaneous render targets supported
         ushort mNumMultiRenderTargets;
         /// The maximum point size
@@ -315,25 +303,12 @@ namespace Ogre
         /// The list of supported shader profiles
         ShaderProfiles mSupportedShaderProfiles;
 
-        // Support for new shader stages in shader model 5.0
-        /// The number of floating-point constants tessellation Hull programs support
-        ushort mTessellationHullProgramConstantFloatCount;           
-        /// The number of integer constants tessellation Hull programs support
-        ushort mTessellationHullProgramConstantIntCount;           
-        /// The number of boolean constants tessellation Hull programs support
-        ushort mTessellationHullProgramConstantBoolCount;
-        /// The number of floating-point constants tessellation Domain programs support
-        ushort mTessellationDomainProgramConstantFloatCount;           
-        /// The number of integer constants tessellation Domain programs support
-        ushort mTessellationDomainProgramConstantIntCount;           
-        /// The number of boolean constants tessellation Domain programs support
-        ushort mTessellationDomainProgramConstantBoolCount;
-        /// The number of floating-point constants compute programs support
-        ushort mComputeProgramConstantFloatCount;           
-        /// The number of integer constants compute programs support
-        ushort mComputeProgramConstantIntCount;           
-        /// The number of boolean constants compute programs support
-        ushort mComputeProgramConstantBoolCount;
+        /// The number of floating-point 4-vector constants tessellation Hull programs support
+        ushort mTessellationHullProgramConstantFloatCount;
+        /// The number of floating-point 4-vector constants tessellation Domain programs support
+        ushort mTessellationDomainProgramConstantFloatCount;
+        /// The number of floating-point 4-vector constants compute programs support
+        ushort mComputeProgramConstantFloatCount;
 
         /// The number of vertex attributes available
         ushort mNumVertexAttributes;
@@ -523,50 +498,20 @@ namespace Ogre
         }
 
 
-        /// The number of floating-point constants vertex programs support
+        /// The number of floating-point 4-vector constants vertex programs support
         ushort getVertexProgramConstantFloatCount(void) const
         {
-            return mVertexProgramConstantFloatCount;           
+            return mVertexProgramConstantFloatCount;
         }
-        /// The number of integer constants vertex programs support
-        ushort getVertexProgramConstantIntCount(void) const
-        {
-            return mVertexProgramConstantIntCount;           
-        }
-        /// The number of boolean constants vertex programs support
-        ushort getVertexProgramConstantBoolCount(void) const
-        {
-            return mVertexProgramConstantBoolCount;           
-        }
-        /// The number of floating-point constants geometry programs support
+        /// The number of floating-point 4-vector constants geometry programs support
         ushort getGeometryProgramConstantFloatCount(void) const
         {
-            return mGeometryProgramConstantFloatCount;           
+            return mGeometryProgramConstantFloatCount;
         }
-        /// The number of integer constants geometry programs support
-        ushort getGeometryProgramConstantIntCount(void) const
-        {
-            return mGeometryProgramConstantIntCount;           
-        }
-        /// The number of boolean constants geometry programs support
-        ushort getGeometryProgramConstantBoolCount(void) const
-        {
-            return mGeometryProgramConstantBoolCount;           
-        }
-        /// The number of floating-point constants fragment programs support
+        /// The number of floating-point 4-vector constants fragment programs support
         ushort getFragmentProgramConstantFloatCount(void) const
         {
-            return mFragmentProgramConstantFloatCount;           
-        }
-        /// The number of integer constants fragment programs support
-        ushort getFragmentProgramConstantIntCount(void) const
-        {
-            return mFragmentProgramConstantIntCount;           
-        }
-        /// The number of boolean constants fragment programs support
-        ushort getFragmentProgramConstantBoolCount(void) const
-        {
-            return mFragmentProgramConstantBoolCount;           
+            return mFragmentProgramConstantFloatCount;
         }
 
         /// sets the device name for Render system
@@ -581,51 +526,22 @@ namespace Ogre
             return mDeviceName;
         }
 
-        /// The number of floating-point constants vertex programs support
+        /// The number of floating-point 4-vector constants vertex programs support
         void setVertexProgramConstantFloatCount(ushort c)
         {
-            mVertexProgramConstantFloatCount = c;           
+            mVertexProgramConstantFloatCount = c;
         }
-        /// The number of integer constants vertex programs support
-        void setVertexProgramConstantIntCount(ushort c)
-        {
-            mVertexProgramConstantIntCount = c;           
-        }
-        /// The number of boolean constants vertex programs support
-        void setVertexProgramConstantBoolCount(ushort c)
-        {
-            mVertexProgramConstantBoolCount = c;           
-        }
-        /// The number of floating-point constants geometry programs support
+        /// The number of floating-point 4-vector constants geometry programs support
         void setGeometryProgramConstantFloatCount(ushort c)
         {
-            mGeometryProgramConstantFloatCount = c;           
+            mGeometryProgramConstantFloatCount = c;
         }
-        /// The number of integer constants geometry programs support
-        void setGeometryProgramConstantIntCount(ushort c)
-        {
-            mGeometryProgramConstantIntCount = c;           
-        }
-        /// The number of boolean constants geometry programs support
-        void setGeometryProgramConstantBoolCount(ushort c)
-        {
-            mGeometryProgramConstantBoolCount = c;           
-        }
-        /// The number of floating-point constants fragment programs support
+        /// The number of floating-point 4-vector constants fragment programs support
         void setFragmentProgramConstantFloatCount(ushort c)
         {
-            mFragmentProgramConstantFloatCount = c;           
+            mFragmentProgramConstantFloatCount = c;
         }
-        /// The number of integer constants fragment programs support
-        void setFragmentProgramConstantIntCount(ushort c)
-        {
-            mFragmentProgramConstantIntCount = c;           
-        }
-        /// The number of boolean constants fragment programs support
-        void setFragmentProgramConstantBoolCount(ushort c)
-        {
-            mFragmentProgramConstantBoolCount = c;           
-        }
+
         /// Maximum point screen size in pixels
         void setMaxPointSize(Real s)
         {
@@ -725,98 +641,157 @@ namespace Ogre
         /** Write the capabilities to the pass in Log */
         void log(Log* pLog) const;
 
-        // Support for new shader stages in shader model 5.0
-        /// The number of floating-point constants tessellation Hull programs support
-        void setTessellationHullProgramConstantFloatCount(ushort c)
-        {
-            mTessellationHullProgramConstantFloatCount = c;           
-        }
-        /// The number of integer constants tessellation Domain programs support
-        void setTessellationHullProgramConstantIntCount(ushort c)
-        {
-            mTessellationHullProgramConstantIntCount = c;           
-        }
-        /// The number of boolean constants tessellation Domain programs support
-        void setTessellationHullProgramConstantBoolCount(ushort c)
-        {
-            mTessellationHullProgramConstantBoolCount = c;           
-        }
-        /// The number of floating-point constants fragment programs support
-        ushort getTessellationHullProgramConstantFloatCount(void) const
-        {
-            return mTessellationHullProgramConstantFloatCount;           
-        }
-        /// The number of integer constants fragment programs support
-        ushort getTessellationHullProgramConstantIntCount(void) const
-        {
-            return mTessellationHullProgramConstantIntCount;           
-        }
-        /// The number of boolean constants fragment programs support
-        ushort getTessellationHullProgramConstantBoolCount(void) const
-        {
-            return mTessellationHullProgramConstantBoolCount;           
-        }
-
-        /// The number of floating-point constants tessellation Domain programs support
-        void setTessellationDomainProgramConstantFloatCount(ushort c)
-        {
-            mTessellationDomainProgramConstantFloatCount = c;           
-        }
-        /// The number of integer constants tessellation Domain programs support
-        void setTessellationDomainProgramConstantIntCount(ushort c)
-        {
-            mTessellationDomainProgramConstantIntCount = c;           
-        }
-        /// The number of boolean constants tessellation Domain programs support
-        void setTessellationDomainProgramConstantBoolCount(ushort c)
-        {
-            mTessellationDomainProgramConstantBoolCount = c;           
-        }
-        /// The number of floating-point constants fragment programs support
-        ushort getTessellationDomainProgramConstantFloatCount(void) const
-        {
-            return mTessellationDomainProgramConstantFloatCount;           
-        }
-        /// The number of integer constants fragment programs support
-        ushort getTessellationDomainProgramConstantIntCount(void) const
-        {
-            return mTessellationDomainProgramConstantIntCount;           
-        }
-        /// The number of boolean constants fragment programs support
-        ushort getTessellationDomainProgramConstantBoolCount(void) const
-        {
-            return mTessellationDomainProgramConstantBoolCount;           
-        }
-
-        /// The number of floating-point constants compute programs support
+        /// The number of floating-point 4-vector constants compute programs support
         void setComputeProgramConstantFloatCount(ushort c)
         {
-            mComputeProgramConstantFloatCount = c;           
+            mComputeProgramConstantFloatCount = c;
         }
-        /// The number of integer constants compute programs support
-        void setComputeProgramConstantIntCount(ushort c)
-        {
-            mComputeProgramConstantIntCount = c;           
-        }
-        /// The number of boolean constants compute programs support
-        void setComputeProgramConstantBoolCount(ushort c)
-        {
-            mComputeProgramConstantBoolCount = c;           
-        }
-        /// The number of floating-point constants fragment programs support
+        /// The number of floating-point 4-vector constants fragment programs support
         ushort getComputeProgramConstantFloatCount(void) const
         {
-            return mComputeProgramConstantFloatCount;           
+            return mComputeProgramConstantFloatCount;
         }
-        /// The number of integer constants fragment programs support
-        ushort getComputeProgramConstantIntCount(void) const
+        /// The number of floating-point 4-vector constants fragment programs support
+        ushort getTessellationDomainProgramConstantFloatCount(void) const
         {
-            return mComputeProgramConstantIntCount;           
+            return mTessellationDomainProgramConstantFloatCount;
         }
-        /// The number of boolean constants fragment programs support
-        ushort getComputeProgramConstantBoolCount(void) const
+        /// The number of floating-point 4-vector constants tessellation Domain programs support
+        void setTessellationDomainProgramConstantFloatCount(ushort c)
         {
-            return mComputeProgramConstantBoolCount;           
+            mTessellationDomainProgramConstantFloatCount = c;
+        }
+        /// The number of floating-point 4-vector constants fragment programs support
+        ushort getTessellationHullProgramConstantFloatCount(void) const
+        {
+            return mTessellationHullProgramConstantFloatCount;
+        }
+        /// The number of floating-point 4-vector constants tessellation Hull programs support
+        void setTessellationHullProgramConstantFloatCount(ushort c)
+        {
+            mTessellationHullProgramConstantFloatCount = c;
+        }
+
+
+        /// @deprecated use getVertexProgramConstantFloatCount instead
+        OGRE_DEPRECATED ushort getVertexProgramConstantIntCount(void) const
+        {
+            return mVertexProgramConstantFloatCount;
+        }
+        /// @deprecated use getVertexProgramConstantFloatCount instead
+        OGRE_DEPRECATED ushort getVertexProgramConstantBoolCount(void) const
+        {
+            return mVertexProgramConstantFloatCount;
+        }
+        /// @deprecated use getGeometryProgramConstantFloatCount instead
+        OGRE_DEPRECATED ushort getGeometryProgramConstantIntCount(void) const
+        {
+            return mGeometryProgramConstantFloatCount;
+        }
+        /// @deprecated use getGeometryProgramConstantFloatCount instead
+        OGRE_DEPRECATED ushort getGeometryProgramConstantBoolCount(void) const
+        {
+            return mGeometryProgramConstantFloatCount;
+        }
+        /// @deprecated use getFragmentProgramConstantFloatCount instead
+        OGRE_DEPRECATED ushort getFragmentProgramConstantIntCount(void) const
+        {
+            return mFragmentProgramConstantFloatCount;
+        }
+        /// @deprecated use getFragmentProgramConstantFloatCount instead
+        OGRE_DEPRECATED ushort getFragmentProgramConstantBoolCount(void) const
+        {
+            return mFragmentProgramConstantFloatCount;
+        }
+        /// @deprecated use setVertexProgramConstantFloatCount instead
+        OGRE_DEPRECATED void setVertexProgramConstantIntCount(ushort c)
+        {
+            mVertexProgramConstantFloatCount = c;
+        }
+        /// @deprecated use setVertexProgramConstantFloatCount instead
+        OGRE_DEPRECATED void setVertexProgramConstantBoolCount(ushort c)
+        {
+            mVertexProgramConstantFloatCount = c;
+        }
+        /// @deprecated use setGeometryProgramConstantFloatCount instead
+        OGRE_DEPRECATED void setGeometryProgramConstantIntCount(ushort c)
+        {
+            mGeometryProgramConstantFloatCount = c;
+        }
+        /// @deprecated use setGeometryProgramConstantFloatCount instead
+        OGRE_DEPRECATED void setGeometryProgramConstantBoolCount(ushort c)
+        {
+            mGeometryProgramConstantFloatCount = c;
+        }
+        /// @deprecated use setFragmentProgramConstantFloatCount instead
+        OGRE_DEPRECATED void setFragmentProgramConstantIntCount(ushort c)
+        {
+            mFragmentProgramConstantFloatCount = c;
+        }
+        /// @deprecated use setFragmentProgramConstantFloatCount instead
+        OGRE_DEPRECATED void setFragmentProgramConstantBoolCount(ushort c)
+        {
+            mFragmentProgramConstantFloatCount = c;
+        }
+        /// @deprecated use setTessellationHullProgramConstantFloatCount instead
+        OGRE_DEPRECATED void setTessellationHullProgramConstantIntCount(ushort c)
+        {
+            mTessellationHullProgramConstantFloatCount = c;
+        }
+        /// @deprecated use setTessellationHullProgramConstantFloatCount instead
+        OGRE_DEPRECATED void setTessellationHullProgramConstantBoolCount(ushort c)
+        {
+            mTessellationHullProgramConstantFloatCount = c;
+        }
+        /// @deprecated use getTessellationHullProgramConstantFloatCount instead
+        OGRE_DEPRECATED ushort getTessellationHullProgramConstantIntCount(void) const
+        {
+            return mTessellationHullProgramConstantFloatCount;
+        }
+        /// @deprecated use getTessellationHullProgramConstantFloatCount instead
+        OGRE_DEPRECATED ushort getTessellationHullProgramConstantBoolCount(void) const
+        {
+            return mTessellationHullProgramConstantFloatCount;
+        }
+        /// @deprecated use setTessellationDomainProgramConstantFloatCount instead
+        OGRE_DEPRECATED void setTessellationDomainProgramConstantIntCount(ushort c)
+        {
+            mTessellationDomainProgramConstantFloatCount = c;
+        }
+        /// @deprecated use setTessellationDomainProgramConstantFloatCount instead
+        OGRE_DEPRECATED void setTessellationDomainProgramConstantBoolCount(ushort c)
+        {
+            mTessellationDomainProgramConstantFloatCount = c;
+        }
+        /// @deprecated use getTessellationDomainProgramConstantFloatCount instead
+        OGRE_DEPRECATED ushort getTessellationDomainProgramConstantIntCount(void) const
+        {
+            return mTessellationDomainProgramConstantFloatCount;
+        }
+        /// @deprecated use getTessellationDomainProgramConstantFloatCount instead
+        OGRE_DEPRECATED ushort getTessellationDomainProgramConstantBoolCount(void) const
+        {
+            return mTessellationDomainProgramConstantFloatCount;
+        }
+        /// @deprecated use setComputeProgramConstantFloatCount instead
+        OGRE_DEPRECATED void setComputeProgramConstantIntCount(ushort c)
+        {
+            mComputeProgramConstantFloatCount = c;
+        }
+        /// @deprecated use setComputeProgramConstantFloatCount instead
+        OGRE_DEPRECATED void setComputeProgramConstantBoolCount(ushort c)
+        {
+            mComputeProgramConstantFloatCount = c;
+        }
+        /// @deprecated use getComputeProgramConstantFloatCount instead
+        OGRE_DEPRECATED ushort getComputeProgramConstantIntCount(void) const
+        {
+            return mComputeProgramConstantFloatCount;
+        }
+        /// @deprecated use getComputeProgramConstantFloatCount instead
+        OGRE_DEPRECATED ushort getComputeProgramConstantBoolCount(void) const
+        {
+            return mComputeProgramConstantFloatCount;
         }
 
     };

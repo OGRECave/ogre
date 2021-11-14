@@ -401,25 +401,13 @@ namespace Ogre {
         }
 
         GLfloat floatConstantCount = 0;
-#if OGRE_NO_GLES3_SUPPORT == 0
-        glGetFloatv(GL_MAX_VERTEX_UNIFORM_COMPONENTS, &floatConstantCount);
-#else
         glGetFloatv(GL_MAX_VERTEX_UNIFORM_VECTORS, &floatConstantCount);
-#endif
         rsc->setVertexProgramConstantFloatCount((Ogre::ushort)floatConstantCount);
-        rsc->setVertexProgramConstantBoolCount((Ogre::ushort)floatConstantCount);
-        rsc->setVertexProgramConstantIntCount((Ogre::ushort)floatConstantCount);
 
         // Fragment Program Properties
         floatConstantCount = 0;
-#if OGRE_NO_GLES3_SUPPORT == 0
-        glGetFloatv(GL_MAX_FRAGMENT_UNIFORM_COMPONENTS, &floatConstantCount);
-#else
         glGetFloatv(GL_MAX_FRAGMENT_UNIFORM_VECTORS, &floatConstantCount);
-#endif
         rsc->setFragmentProgramConstantFloatCount((Ogre::ushort)floatConstantCount);
-        rsc->setFragmentProgramConstantBoolCount((Ogre::ushort)floatConstantCount);
-        rsc->setFragmentProgramConstantIntCount((Ogre::ushort)floatConstantCount);
 
         // Check for Float textures
         if(hasMinGLVersion(3, 0) || checkExtension("GL_OES_texture_float") || checkExtension("GL_OES_texture_half_float"))

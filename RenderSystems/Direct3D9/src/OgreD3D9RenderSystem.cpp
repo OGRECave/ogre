@@ -1188,26 +1188,20 @@ namespace Ogre
         {
         case 1:
             // No boolean params allowed
-            rsc->setVertexProgramConstantBoolCount(0);
             // No integer params allowed
-            rsc->setVertexProgramConstantIntCount(0);
             // float params, always 4D
             rsc->setVertexProgramConstantFloatCount(static_cast<ushort>(minVSCaps.MaxVertexShaderConst));
 
             break;
         case 2:
             // 16 boolean params allowed
-            rsc->setVertexProgramConstantBoolCount(16);
             // 16 integer params allowed, 4D
-            rsc->setVertexProgramConstantIntCount(16);
             // float params, always 4D
             rsc->setVertexProgramConstantFloatCount(static_cast<ushort>(minVSCaps.MaxVertexShaderConst));
             break;
         case 3:
             // 16 boolean params allowed
-            rsc->setVertexProgramConstantBoolCount(16);
             // 16 integer params allowed, 4D
-            rsc->setVertexProgramConstantIntCount(16);
             // float params, always 4D
             rsc->setVertexProgramConstantFloatCount(static_cast<ushort>(minVSCaps.MaxVertexShaderConst));
             break;
@@ -1285,9 +1279,7 @@ namespace Ogre
         {
         case 1:
             // no boolean params allowed
-            rsc->setFragmentProgramConstantBoolCount(0);
             // no integer params allowed
-            rsc->setFragmentProgramConstantIntCount(0);
             // float params, always 4D
             // NB in ps_1_x these are actually stored as fixed point values,
             // but they are entered as floats
@@ -1295,17 +1287,13 @@ namespace Ogre
             break;
         case 2:
             // 16 boolean params allowed
-            rsc->setFragmentProgramConstantBoolCount(16);
             // 16 integer params allowed, 4D
-            rsc->setFragmentProgramConstantIntCount(16);
             // float params, always 4D
             rsc->setFragmentProgramConstantFloatCount(32);
             break;
         case 3:
             // 16 boolean params allowed
-            rsc->setFragmentProgramConstantBoolCount(16);
             // 16 integer params allowed, 4D
-            rsc->setFragmentProgramConstantIntCount(16);
             // float params, always 4D
             rsc->setFragmentProgramConstantFloatCount(224);
             break;

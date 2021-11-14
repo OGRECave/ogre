@@ -482,12 +482,7 @@ TEST_F(RenderSystemCapabilitiesTests,WriteAndReadComplexCapabilities)
     caps.addShaderProfile("..f(_)specialsymbolextravaganza!@#$%^&*_but_no_spaces");
 
     caps.setVertexProgramConstantFloatCount(1111);
-    caps.setVertexProgramConstantIntCount(2222);
-    caps.setVertexProgramConstantBoolCount(3333);
-
     caps.setFragmentProgramConstantFloatCount(4444);
-    caps.setFragmentProgramConstantIntCount(5555);
-    caps.setFragmentProgramConstantBoolCount(64000);
 
     caps.setMaxPointSize(123.75);
     caps.setNonPOW2TexturesLimited(true);
@@ -558,12 +553,7 @@ TEST_F(RenderSystemCapabilitiesTests,WriteAndReadComplexCapabilities)
     EXPECT_EQ(caps.getNumMultiRenderTargets(), caps2.getNumMultiRenderTargets());
 
     EXPECT_EQ(caps.getVertexProgramConstantFloatCount(), caps2.getVertexProgramConstantFloatCount());
-    EXPECT_EQ(caps.getVertexProgramConstantIntCount(), caps2.getVertexProgramConstantIntCount());
-    EXPECT_EQ(caps.getVertexProgramConstantBoolCount(), caps2.getVertexProgramConstantBoolCount());
-
     EXPECT_EQ(caps.getFragmentProgramConstantFloatCount(), caps2.getFragmentProgramConstantFloatCount());
-    EXPECT_EQ(caps.getFragmentProgramConstantIntCount(), caps2.getFragmentProgramConstantIntCount());
-    EXPECT_EQ(caps.getFragmentProgramConstantBoolCount(), caps2.getFragmentProgramConstantBoolCount());
 
     EXPECT_EQ(caps.getMaxPointSize(), caps2.getMaxPointSize());
     EXPECT_EQ(caps.getNonPOW2TexturesLimited(), caps2.getNonPOW2TexturesLimited());

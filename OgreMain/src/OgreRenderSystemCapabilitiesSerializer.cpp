@@ -86,23 +86,11 @@ namespace Ogre
         file << "\t" << "stencil_buffer_bit_depth " << StringConverter::toString(caps->getStencilBufferBitDepth()) << endl;
         file << "\t" << "num_multi_render_targets " << StringConverter::toString(caps->getNumMultiRenderTargets()) << endl;
         file << "\t" << "vertex_program_constant_float_count " << StringConverter::toString(caps->getVertexProgramConstantFloatCount()) << endl;
-        file << "\t" << "vertex_program_constant_int_count " << StringConverter::toString(caps->getVertexProgramConstantIntCount()) << endl;
-        file << "\t" << "vertex_program_constant_bool_count " << StringConverter::toString(caps->getVertexProgramConstantBoolCount()) << endl;
         file << "\t" << "fragment_program_constant_float_count " << StringConverter::toString(caps->getFragmentProgramConstantFloatCount()) << endl;
-        file << "\t" << "fragment_program_constant_int_count " << StringConverter::toString(caps->getFragmentProgramConstantIntCount()) << endl;
-        file << "\t" << "fragment_program_constant_bool_count " << StringConverter::toString(caps->getFragmentProgramConstantBoolCount()) << endl;
         file << "\t" << "geometry_program_constant_float_count " << StringConverter::toString(caps->getGeometryProgramConstantFloatCount()) << endl;
-        file << "\t" << "geometry_program_constant_int_count " << StringConverter::toString(caps->getGeometryProgramConstantIntCount()) << endl;
-        file << "\t" << "geometry_program_constant_bool_count " << StringConverter::toString(caps->getGeometryProgramConstantBoolCount()) << endl;
         file << "\t" << "tessellation_hull_program_constant_float_count " << StringConverter::toString(caps->getTessellationHullProgramConstantFloatCount()) << endl;
-        file << "\t" << "tessellation_hull_program_constant_int_count " << StringConverter::toString(caps->getTessellationHullProgramConstantIntCount()) << endl;
-        file << "\t" << "tessellation_hull_program_constant_bool_count " << StringConverter::toString(caps->getTessellationHullProgramConstantBoolCount()) << endl;
         file << "\t" << "tessellation_domain_program_constant_float_count " << StringConverter::toString(caps->getTessellationDomainProgramConstantFloatCount()) << endl;
-        file << "\t" << "tessellation_domain_program_constant_int_count " << StringConverter::toString(caps->getTessellationDomainProgramConstantIntCount()) << endl;
-        file << "\t" << "tessellation_domain_program_constant_bool_count " << StringConverter::toString(caps->getTessellationDomainProgramConstantBoolCount()) << endl;
         file << "\t" << "compute_program_constant_float_count " << StringConverter::toString(caps->getComputeProgramConstantFloatCount()) << endl;
-        file << "\t" << "compute_program_constant_int_count " << StringConverter::toString(caps->getComputeProgramConstantIntCount()) << endl;
-        file << "\t" << "compute_program_constant_bool_count " << StringConverter::toString(caps->getComputeProgramConstantBoolCount()) << endl;
         file << "\t" << "num_vertex_texture_units " << StringConverter::toString(caps->getNumVertexTextureUnits()) << endl;
         file << "\t" << "num_vertex_attributes " << StringConverter::toString(caps->getNumVertexAttributes()) << endl;
 
@@ -327,23 +315,11 @@ namespace Ogre
         addSetIntMethod("stencil_buffer_bit_depth", &RenderSystemCapabilities::setStencilBufferBitDepth);
         addSetIntMethod("num_multi_render_targets", &RenderSystemCapabilities::setNumMultiRenderTargets);
         addSetIntMethod("vertex_program_constant_float_count", &RenderSystemCapabilities::setVertexProgramConstantFloatCount);
-        addSetIntMethod("vertex_program_constant_int_count", &RenderSystemCapabilities::setVertexProgramConstantIntCount);
-        addSetIntMethod("vertex_program_constant_bool_count", &RenderSystemCapabilities::setVertexProgramConstantBoolCount);
         addSetIntMethod("fragment_program_constant_float_count", &RenderSystemCapabilities::setFragmentProgramConstantFloatCount);
-        addSetIntMethod("fragment_program_constant_int_count", &RenderSystemCapabilities::setFragmentProgramConstantIntCount);
-        addSetIntMethod("fragment_program_constant_bool_count", &RenderSystemCapabilities::setFragmentProgramConstantBoolCount);
         addSetIntMethod("geometry_program_constant_float_count", &RenderSystemCapabilities::setGeometryProgramConstantFloatCount);
-        addSetIntMethod("geometry_program_constant_int_count", &RenderSystemCapabilities::setGeometryProgramConstantIntCount);
-        addSetIntMethod("geometry_program_constant_bool_count", &RenderSystemCapabilities::setGeometryProgramConstantBoolCount);
         addSetIntMethod("tessellation_hull_program_constant_float_count", &RenderSystemCapabilities::setTessellationHullProgramConstantFloatCount);
-        addSetIntMethod("tessellation_hull_program_constant_int_count", &RenderSystemCapabilities::setTessellationHullProgramConstantIntCount);
-        addSetIntMethod("tessellation_hull_program_constant_bool_count", &RenderSystemCapabilities::setTessellationHullProgramConstantBoolCount);
         addSetIntMethod("tessellation_domain_program_constant_float_count", &RenderSystemCapabilities::setTessellationDomainProgramConstantFloatCount);
-        addSetIntMethod("tessellation_domain_program_constant_int_count", &RenderSystemCapabilities::setTessellationDomainProgramConstantIntCount);
-        addSetIntMethod("tessellation_domain_program_constant_bool_count", &RenderSystemCapabilities::setTessellationDomainProgramConstantBoolCount);
         addSetIntMethod("compute_program_constant_float_count", &RenderSystemCapabilities::setComputeProgramConstantFloatCount);
-        addSetIntMethod("compute_program_constant_int_count", &RenderSystemCapabilities::setComputeProgramConstantIntCount);
-        addSetIntMethod("compute_program_constant_bool_count", &RenderSystemCapabilities::setComputeProgramConstantBoolCount);
         addSetIntMethod("num_vertex_texture_units", &RenderSystemCapabilities::setNumVertexTextureUnits);
 
         // initialize bool types

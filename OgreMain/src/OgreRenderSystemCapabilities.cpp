@@ -111,61 +111,37 @@ namespace Ogre {
                              StringConverter::toString(hasCapability(RSC_STENCIL_WRAP), true));
         }
         pLog->logMessage(" * Vertex programs: yes");
-        pLog->logMessage("   - Number of floating-point constants: " +
+        pLog->logMessage("   - Number of constant 4-vectors: " +
                          StringConverter::toString(mVertexProgramConstantFloatCount));
-        pLog->logMessage("   - Number of integer constants: " +
-                         StringConverter::toString(mVertexProgramConstantIntCount));
-        pLog->logMessage("   - Number of boolean constants: " +
-                         StringConverter::toString(mVertexProgramConstantBoolCount));
         pLog->logMessage(" * Fragment programs: yes");
-        pLog->logMessage("   - Number of floating-point constants: " +
+        pLog->logMessage("   - Number of constant 4-vectors: " +
                          StringConverter::toString(mFragmentProgramConstantFloatCount));
-        pLog->logMessage("   - Number of integer constants: " +
-                         StringConverter::toString(mFragmentProgramConstantIntCount));
-        pLog->logMessage("   - Number of boolean constants: " +
-                         StringConverter::toString(mFragmentProgramConstantBoolCount));
         pLog->logMessage(" * Geometry programs: " +
                          StringConverter::toString(hasCapability(RSC_GEOMETRY_PROGRAM), true));
         if (hasCapability(RSC_GEOMETRY_PROGRAM))
         {
-            pLog->logMessage("   - Number of floating-point constants: " +
+            pLog->logMessage("   - Number of constant 4-vectors: " +
                              StringConverter::toString(mGeometryProgramConstantFloatCount));
-            pLog->logMessage("   - Number of integer constants: " +
-                             StringConverter::toString(mGeometryProgramConstantIntCount));
-            pLog->logMessage("   - Number of boolean constants: " +
-                             StringConverter::toString(mGeometryProgramConstantBoolCount));
         }
         pLog->logMessage(" * Tessellation Hull programs: " +
                          StringConverter::toString(hasCapability(RSC_TESSELLATION_HULL_PROGRAM), true));
         if (hasCapability(RSC_TESSELLATION_HULL_PROGRAM))
         {
-            pLog->logMessage("   - Number of floating-point constants: " +
+            pLog->logMessage("   - Number of constant 4-vectors: " +
                              StringConverter::toString(mTessellationHullProgramConstantFloatCount));
-            pLog->logMessage("   - Number of integer constants: " +
-                             StringConverter::toString(mTessellationHullProgramConstantIntCount));
-            pLog->logMessage("   - Number of boolean constants: " +
-                             StringConverter::toString(mTessellationHullProgramConstantBoolCount));
         }
         pLog->logMessage(" * Tessellation Domain programs: " +
                          StringConverter::toString(hasCapability(RSC_TESSELLATION_DOMAIN_PROGRAM), true));
         if (hasCapability(RSC_TESSELLATION_DOMAIN_PROGRAM))
         {
-            pLog->logMessage("   - Number of floating-point constants: " +
+            pLog->logMessage("   - Number of constant 4-vectors: " +
                              StringConverter::toString(mTessellationDomainProgramConstantFloatCount));
-            pLog->logMessage("   - Number of integer constants: " +
-                             StringConverter::toString(mTessellationDomainProgramConstantIntCount));
-            pLog->logMessage("   - Number of boolean constants: " +
-                             StringConverter::toString(mTessellationDomainProgramConstantBoolCount));
         }
         pLog->logMessage(" * Compute programs: " + StringConverter::toString(hasCapability(RSC_COMPUTE_PROGRAM), true));
         if (hasCapability(RSC_COMPUTE_PROGRAM))
         {
-            pLog->logMessage("   - Number of floating-point constants: " +
+            pLog->logMessage("   - Number of constant 4-vectors: " +
                              StringConverter::toString(mComputeProgramConstantFloatCount));
-            pLog->logMessage("   - Number of integer constants: " +
-                             StringConverter::toString(mComputeProgramConstantIntCount));
-            pLog->logMessage("   - Number of boolean constants: " +
-                             StringConverter::toString(mComputeProgramConstantBoolCount));
         }
         pLog->logMessage(
             " * Supported Shader Profiles: " +
