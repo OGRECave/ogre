@@ -8,7 +8,8 @@ The full source for this tutorial can be found in samples directory **Samples/Si
 
 @note Refer to @ref setup for instructions how set up an Ogre project and compile it successfully.
 
-![](bt3_fog_visual.png)
+@image html bt3_fog_visual.png width=70%
+
 Ignore the FPS stats in the screenshots. They were rendered on an ancient computer.
 
 # An Introduction to Terrain {#tut_terrain}
