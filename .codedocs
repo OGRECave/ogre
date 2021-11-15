@@ -981,7 +981,7 @@ HTML_STYLESHEET        =
 # robust against future updates. Doxygen will copy the style sheet file to
 # the output directory.
 
-HTML_EXTRA_STYLESHEET  = "Docs/ogre_style.css"
+HTML_EXTRA_STYLESHEET  = "Docs/doxygen-awesome.css" "Docs/ogre_style.css"
 
 # The HTML_EXTRA_FILES tag can be used to specify one or more extra images or
 # other source files which should be copied to the HTML output directory. Note
