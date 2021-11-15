@@ -1,23 +1,6 @@
-# What is instancing? {#WhatIsInstancing}
-
-Instancing is a rendering technique to draw multiple instances of the
-same mesh using just one render call. There are two kinds of instancing:
-
--   **Software:** Two larges vertex & index buffers are created and the mesh vertices/indices are duplicated N number of times.
-    When rendering, invisible instances receive a transform matrix filled with 0s.
-	This technique can take a lot of VRAM and has limited culling capabilities.
--   **Hardware:** The hardware supports an extra param which allows Ogre to tell the GPU to repeat the drawing of vertices N number of times;
-    thus taking considerably less VRAM. Because N can be controlled at runtime, individual instances can be culled before sending the data to the GPU.
-
-Hardware techniques are almost always superior to Software techniques, but Software are more compatible, where as Hardware techniques require D3D9 or GL3, and is not supported in GLES2
-
-All instancing techniques require shaders.
-It is not possible to use instancing with FFP (Fixed Function Pipeline)
-But, it is possible to have the [RTSS (Realtime Shader System)](@ref rtss) generate the shaders for you.
+# Instancing User-Guide {#WhatIsInstancing}
 
 @tableofcontents
-
-# Instancing 101 {#Instancing101}
 
 A common question is why should I use instancing.
 The big reason is performance.
@@ -366,14 +349,12 @@ Do it sparingly and profile the optimal frequency of calling.
 
 # Troubleshooting {#InstancingTroubleshooting}
 
-Q: My mesh doesn't show up.
-
+@par Q: My mesh doesn't show up.
 A: Verify you're using the right material, the vertex shader is set correctly, and it matches the instancing technique being used.
 
-Q: My animation plays quite differently than when it is an Entity, or previewed in Ogre Meshy
-
+@par Q: My animation plays quite differently than when it is an Entity, or previewed in [Ogre Mesh Viewer](https://github.com/OGRECave/ogre-meshviewer).
 A: Your rig animation must be using more than one weight per bone.
-You need to add support for it in the vertex shader, and make sure you didn't create the instance manager with the flags `IM_USEONEWEIGHT` or `IM_FORCEONEWEIGHT`.
+You need to add support for it in the vertex shader, and make sure you didn't create the instance manager with the flags Ogre::IM_USEONEWEIGHT or Ogre::IM_FORCEONEWEIGHT.
 
 For example, to modify the HW VTF vertex shader, you need to sample the additional matrices from the VTF:
 
@@ -422,23 +403,17 @@ Fortunately they fit the texture cache very well; nonetheless it's something to 
 Instancing is meant for rendering large number of objects in a scene.
 If you plan on rendering thousands or tens of thousands of animated objects with 4 weights per vertex, don't expect it to be fast; no matter what technique you use to draw them.
 
-Try convincing the art department to lower the animation quality or just use `IM_FORCEONEWEIGHT` for Ogre to do the downgrade for you.
+Try convincing the art department to lower the animation quality or just use Ogre::IM_FORCEONEWEIGHT for Ogre to do the downgrade for you.
 There are many plugins for popular modeling packages (3DS Max, Maya, Blender) out there that help automatizing this task.
 
-Q: The instance doesn't show up, or when playing animations the mesh deforms very weirdly or other very visible artifacts occur
+@par Q: The instance doesn't show up, or when playing animations the mesh deforms very weirdly or other very visible artifacts occur
 
 A: Your rig uses more than one weight per vertex.
-Either create the instance manager with the flag `IM_FORCEONEWEIGHT`, or modify the vertex shader to support the *exact* amount of weights per vertex needed (see previous questions).
+Either create the instance manager with the flag Ogre::IM_FORCEONEWEIGHT, or modify the vertex shader to support the *exact* amount of weights per vertex needed (see previous questions).
 
-Q: How do I find how many weights per vertices is using my model?
+@par Q: How do I find how many weights per vertices is using my model?
 
-A: The quickest way is by looking at the size of `VES_BLEND_WEIGHTS` and divide it by 4[^10].
-
-![](ogre_meshy.png)
-
-In the picture above, the [Ogre
-Meshy](http://yosoygames.com.ar/wp/ogre-meshy/) viewer is being used to quickly display the mesh' information.
-It can be seen that the Hair uses 1 weight per vertex, while the Head needs 2 weights per vertex.
+A: The quickest way is by looking at the type of Ogre::VES_BLEND_WEIGHTS, where `VET_FLOAT<N>` means N weights.
 
 [^7]: Whether it is actually faster than HW VTF depends on the GPU architecture
 
@@ -447,5 +422,3 @@ It can be seen that the Hair uses 1 weight per vertex, while the Head needs 2 we
 
 [^9]: Only HW instancing techniques cull per instance.
       SW instancing techniques send all of their instances, zeroing matrices of those instances that are not in the scene.
-
-[^10]: One weight is one float. One float is 4 bytes; hence number of weights \* 4 is the size of the vertex element.

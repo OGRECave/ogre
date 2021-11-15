@@ -919,42 +919,29 @@ This class allows you to build a batched object from a series of entities in ord
  - A single material must apply for each batch. In fact this class allows you to use multiple materials, but you should be aware that internally this means that there is one batch per material.
    Therefore you won't gain as much benefit from the batching if you use many different materials; try to keep the number down.
 
-Consult the following links to get more information:
- - API Documentation: [Ogre::StaticGeometry Class Reference](@ref Ogre::StaticGeometry)
- - Tutorial: [Tutorial - Static Geometry](@ref tut_StaticGeom)
+@see Ogre::StaticGeometry
+@see [Tutorial - Static Geometry](@ref tut_StaticGeom)
 
 # Instance Manager {#Instance-Manager}
 Instancing is a rendering technique to draw multiple instances of the same mesh using just one render call. There are two kinds of instancing:
 
-Software: Two larges vertex & index buffers are created and the mesh vertices/indices are duplicated N number of times. When rendering, invisible instances receive a transform matrix filled with 0s. This technique can take a lot of VRAM and has limited culling capabilities.
-Hardware: The hardware supports an extra param which allows Ogre to tell the GPU to repeat the drawing of vertices N number of times; thus taking considerably less VRAM. Because N can be controlled at runtime, individual instances can be culled before sending the data to the GPU.
+@par Software
+Two larges vertex & index buffers are created and the mesh vertices/indices are duplicated N number of times. When rendering, invisible instances receive a transform matrix filled with 0s. This technique can take a lot of VRAM and has limited culling capabilities.
+@par Hardware
+The hardware supports an extra param which allows Ogre to tell the GPU to repeat the drawing of vertices N number of times; thus taking considerably less VRAM. Because N can be controlled at runtime, individual instances can be culled before sending the data to the GPU.
 Hardware techniques are almost always superior to Software techniques, but Software are more compatible, where as Hardware techniques require D3D9 or GL3, and is not supported in GLES2
 
-All instancing techniques require shaders. It is not possible to use instancing with FFP (Fixed Function Pipeline)
+All instancing techniques require shaders. It is possible to have the [RTSS (Realtime Shader System)](@ref rtss) generate the shaders for you.
 
-Consult the following links to get more information:
- - API Documentation: [Ogre::InstanceManager Class Reference](@ref Ogre::InstanceManager)
- - In-depth explanation: @subpage WhatIsInstancing
+@see Ogre::InstanceManager
+@see @subpage WhatIsInstancing
 
 # Static Geometry vs Instancing {#Static-Geometry-vs-Instancing}
-<table>
-<tr><th>Static Geometry<th>Instancing
-<tr>
-<td>Static Geometry is more about any sort of mesh grouped in a minimal number of meshes, and cannot be updated (each mesh cannot move independently, only all the static geometry would be able to do so.)
-<td>Instancing is mainly about same mesh used many times, so Instanced geometry can be updated (each mesh can move independently)
-<tr>
-<td>If you have a scene with many unique meshes, static geometry still is the best solution.
-<td>Instancing is only about reusing same mesh many times without the draw call cost.
-<tr>
-<td>StaticGeometry is useful for batching up small static detail fragments like grass without shaders.
-<td>Instancing lets you have one mesh repeated many times without the performance hit of having them as individual meshes.
-<tr>
-<td>Staticgeometry is for geometry that doesn't move and has low in GPU requirements
-<td>Instanced is more for dynamic geometry (animated or moving) and better GPU (sm2.0+)
-<tr>
-<td>StaticGeometry batches separate sets of polygons together, as long as they have the same properties such as material.
-    These batches are then automatically split into regions for better culling. You can control the region size.
-    This is a good way to reduce batches for static elements.
-<td>InstancedGeometry is good for large numbers of the same exact object.
-    You can have multiple instances of one object that can dynamically move but that are drawn in one draw call.
-</table>
+
+| Static Geometry | Instancing |
+| ----------------|------------|
+| Any sort of mesh is grouped in a minimal number of meshes, and cannot be updated (each mesh cannot move independently, only all the static geometry would be able to do so.) | The same mesh used many times, so Instanced geometry can be updated (each mesh can move independently) |
+| You have a scene with many unique meshes| Reuse the same mesh many times without the draw call cost. |
+| Batches up small static detail fragments like grass without shaders. | One mesh is repeated many times without the performance hit of having them as individual meshes. |
+| Geometry that doesn't move and has low in GPU requirements | Dynamic geometry (animated or moving) and better GPU (sm2.0+) |
+| Batches separate sets of polygons together, as long as they have the same properties such as material. These batches are then automatically split into regions for better culling. You can control the region size. This is a good way to reduce batches for static elements. | Good for large numbers of the same exact object. You can have multiple instances of one object that can dynamically move but that are drawn in one draw call. |
