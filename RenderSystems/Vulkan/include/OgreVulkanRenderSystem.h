@@ -69,10 +69,7 @@ namespace Ogre
 
         VulkanRenderPassDescriptor    *mCurrentRenderPassDescriptor;
 
-        // clang-format off
         VulkanFrameBufferDescMap    mFrameBufferDescMap;
-        VulkanFlushOnlyDescMap      mFlushOnlyDescMap;
-        // clang-format on
 
         bool mHasValidationLayers;
 
@@ -160,7 +157,6 @@ namespace Ogre
         void _setTexture( size_t unit, bool enabled, const TexturePtr& texPtr ) override;
 
         virtual VulkanFrameBufferDescMap &_getFrameBufferDescMap( void ) { return mFrameBufferDescMap; }
-        virtual VulkanFlushOnlyDescMap &_getFlushOnlyDescMap( void ) { return mFlushOnlyDescMap; }
         virtual RenderPassDescriptor *createRenderPassDescriptor( void );
 
         virtual void _beginFrame( void );
@@ -190,7 +186,6 @@ namespace Ogre
         virtual void initialiseFromRenderSystemCapabilities( RenderSystemCapabilities *caps,
                                                              RenderTarget *primary );
 
-        virtual void beginRenderPassDescriptor( RenderPassDescriptor *desc, bool warnIfRtvWasFlushed );
         void executeRenderPassDescriptorDelayedActions( bool officialCall = true );
         void endRenderPassDescriptor();
 

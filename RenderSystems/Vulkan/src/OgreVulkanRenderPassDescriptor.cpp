@@ -37,18 +37,11 @@ THE SOFTWARE.
 #include "OgreVulkanMappings.h"
 #include "OgreVulkanUtils.h"
 
-#if OGRE_DEBUG_MODE && OGRE_PLATFORM == OGRE_PLATFORM_LINUX
-#    include <execinfo.h>  //backtrace
-#endif
-
-#define TODO_use_render_pass_that_can_load
-
 namespace Ogre
 {
     VulkanRenderPassDescriptor::VulkanRenderPassDescriptor( VulkanQueue *graphicsQueue,
                                                             VulkanRenderSystem *renderSystem ) :
         mSharedFboItor( renderSystem->_getFrameBufferDescMap().end() ),
-        mSharedFboFlushItor( renderSystem->_getFlushOnlyDescMap().end() ),
         mTargetWidth( 0u ),
         mTargetHeight( 0u ),
         mQueue( graphicsQueue ),
@@ -57,22 +50,6 @@ namespace Ogre
     }
     //-----------------------------------------------------------------------------------
     VulkanRenderPassDescriptor::~VulkanRenderPassDescriptor() { releaseFbo(); }
-    //-----------------------------------------------------------------------------------
-    void VulkanRenderPassDescriptor::checkRenderWindowStatus( void )
-    {
-        if( ( mNumColourEntries > 0 && mColour[0]->isRenderWindowSpecific() ) ||
-            ( mDepth && mDepth->isRenderWindowSpecific() ) )
-        {
-            if( mNumColourEntries > 1u )
-            {
-                OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
-                             "Cannot use RenderWindow as MRT with other colour textures",
-                             "VulkanRenderPassDescriptor::colourEntriesModified" );
-            }
-        }
-
-        calculateSharedKey();
-    }
     //-----------------------------------------------------------------------------------
     void VulkanRenderPassDescriptor::calculateSharedKey( void )
     {
@@ -93,26 +70,6 @@ namespace Ogre
         releaseFbo();
 
         mSharedFboItor = newItor;
-        calculateSharedFlushOnlyKey();
-    }
-    //-----------------------------------------------------------------------------------
-    void VulkanRenderPassDescriptor::calculateSharedFlushOnlyKey( void )
-    {
-        FrameBufferDescKey key( *this );
-        VulkanFlushOnlyDescMap &frameBufferDescMap = mRenderSystem->_getFlushOnlyDescMap();
-        VulkanFlushOnlyDescMap::iterator newItor = frameBufferDescMap.find( key );
-
-        if( newItor == frameBufferDescMap.end() )
-        {
-            VulkanFlushOnlyDescValue value;
-            value.refCount = 0;
-            frameBufferDescMap[key] = value;
-            newItor = frameBufferDescMap.find( key );
-        }
-
-        ++newItor->second.refCount;
-
-        mSharedFboFlushItor = newItor;
     }
     //-----------------------------------------------------------------------------------
     VkClearColorValue VulkanRenderPassDescriptor::getClearColour( const ColourValue &clearColour,
@@ -299,21 +256,6 @@ namespace Ogre
         if( fboDesc.mRenderPass )
             return;  // Already initialized
 
-#if 0
-        if( mDepth.texture && mDepth.texture->getResidencyStatus() != GpuResidency::Resident )
-        {
-            OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
-                         "RenderTexture '" + mDepth.texture->getName() + "' must be resident!",
-                         "VulkanRenderPassDescriptor::updateFbo" );
-        }
-
-        if( mStencil.texture && mStencil.texture->getResidencyStatus() != GpuResidency::Resident )
-        {
-            OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
-                         "RenderTexture '" + mStencil.texture->getName() + "' must be resident!",
-                         "VulkanRenderPassDescriptor::updateFbo" );
-        }
-#endif
         bool hasRenderWindow = false;
 
         uint32 attachmentIdx = 0u;
@@ -405,28 +347,16 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void VulkanRenderPassDescriptor::releaseFbo( void )
     {
+        VulkanFrameBufferDescMap &frameBufferDescMap = mRenderSystem->_getFrameBufferDescMap();
+        if( mSharedFboItor != frameBufferDescMap.end() )
         {
-            VulkanFrameBufferDescMap &frameBufferDescMap = mRenderSystem->_getFrameBufferDescMap();
-            if( mSharedFboItor != frameBufferDescMap.end() )
+            --mSharedFboItor->second.refCount;
+            if( !mSharedFboItor->second.refCount )
             {
-                --mSharedFboItor->second.refCount;
-                if( !mSharedFboItor->second.refCount )
-                {
-                    destroyFbo( mQueue, mSharedFboItor->second );
-                    frameBufferDescMap.erase( mSharedFboItor );
-                }
-                mSharedFboItor = frameBufferDescMap.end();
+                destroyFbo( mQueue, mSharedFboItor->second );
+                frameBufferDescMap.erase( mSharedFboItor );
             }
-        }
-        {
-            VulkanFlushOnlyDescMap &frameBufferDescMap = mRenderSystem->_getFlushOnlyDescMap();
-            if( mSharedFboFlushItor != frameBufferDescMap.end() )
-            {
-                --mSharedFboFlushItor->second.refCount;
-                if( !mSharedFboFlushItor->second.refCount )
-                    frameBufferDescMap.erase( mSharedFboFlushItor );
-                mSharedFboFlushItor = frameBufferDescMap.end();
-            }
+            mSharedFboItor = frameBufferDescMap.end();
         }
     }
     //-----------------------------------------------------------------------------------
@@ -465,7 +395,7 @@ namespace Ogre
         //if( mNumColourEntries > 0 && mColour[0].texture->isRenderWindowSpecific() &&
         //    mColour[0].texture == window->getTexture() )
         {
-            entriesModified( RenderPassDescriptor::All );
+            entriesModified( true );
         }
     }
     //-----------------------------------------------------------------------------------
@@ -477,11 +407,9 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
-    void VulkanRenderPassDescriptor::entriesModified( uint32 entryTypes )
+    void VulkanRenderPassDescriptor::entriesModified( bool createFbo )
     {
-        //RenderPassDescriptor::entriesModified( entryTypes );
-
-        checkRenderWindowStatus();
+        calculateSharedKey();
 
         TextureGpu *anyTargetTexture = 0;
         const uint8 numColourEntries = mNumColourEntries;
@@ -498,7 +426,7 @@ namespace Ogre
             mTargetHeight = anyTargetTexture->getHeight();
         }
 
-        if( entryTypes & RenderPassDescriptor::All )
+        if( createFbo )
             setupFbo( mSharedFboItor->second );
     }
     //-----------------------------------------------------------------------------------
@@ -556,29 +484,8 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
-    uint32 VulkanRenderPassDescriptor::willSwitchTo( VulkanRenderPassDescriptor *newDesc,
-                                                     bool warnIfRtvWasFlushed ) const
-    {
-        uint32 entriesToFlush = 0;
-
-        if( !newDesc ||                                                   //
-            this->mSharedFboFlushItor != newDesc->mSharedFboFlushItor ||  //
-            this->mInformationOnly || newDesc->mInformationOnly )
-        {
-            entriesToFlush = RenderPassDescriptor::All;
-        }
-
-        if( warnIfRtvWasFlushed )
-            newDesc->checkWarnIfRtvWasFlushed( entriesToFlush );
-
-        return entriesToFlush;
-    }
-    //-----------------------------------------------------------------------------------
     void VulkanRenderPassDescriptor::performLoadActions()
     {
-        if( mInformationOnly )
-            return;
-
         VkCommandBuffer cmdBuffer = mQueue->mCurrentCmdBuffer;
 
         const VulkanFrameBufferDescValue &fboDesc = mSharedFboItor->second;
@@ -612,9 +519,6 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void VulkanRenderPassDescriptor::performStoreActions()
     {
-        if( mInformationOnly )
-            return;
-
         if( mQueue->getEncoderState() != VulkanQueue::EncoderGraphicsOpen )
             return;
 
@@ -643,8 +547,6 @@ namespace Ogre
     }
     //-----------------------------------------------------------------------------------
     //-----------------------------------------------------------------------------------
-    //-----------------------------------------------------------------------------------
-    VulkanFlushOnlyDescValue::VulkanFlushOnlyDescValue() : refCount( 0 ) {}
     //-----------------------------------------------------------------------------------
     VulkanFrameBufferDescValue::VulkanFrameBufferDescValue() :
         refCount( 0u ),
