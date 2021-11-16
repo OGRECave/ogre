@@ -328,7 +328,7 @@ void ImGuiOverlay::ImGUIRenderable::updateVertexData(ImDrawData* draw_data)
         bind->getBuffer(0)->writeData(vtx_offset, draw_list->VtxBuffer.size_in_bytes(), draw_list->VtxBuffer.Data,
                                       i == 0); // discard on first write
         mRenderOp.indexData->indexBuffer->writeData(idx_offset, draw_list->IdxBuffer.size_in_bytes(),
-                                                    draw_list->IdxBuffer.Data);
+                                                    draw_list->IdxBuffer.Data, i == 0);
         vtx_offset += draw_list->VtxBuffer.size_in_bytes();
         idx_offset += draw_list->IdxBuffer.size_in_bytes();
     }
