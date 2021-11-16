@@ -968,7 +968,6 @@ namespace Ogre
 
         if(mActiveDevice->mGraphicsQueue.getEncoderState() != VulkanQueue::EncoderGraphicsOpen)
         {
-            beginRenderPassDescriptor(mCurrentRenderPassDescriptor, false);
             // ensure scissor is set
             vkCmdSetScissor(mActiveDevice->mGraphicsQueue.mCurrentCmdBuffer, 0u, 1, &mScissorRect);
             mAutoParamsBufferUsage[mActiveDevice->mGraphicsQueue.mCurrentFrameIdx] = 0;
@@ -1162,23 +1161,6 @@ namespace Ogre
     {
         mSPIRVProgramFactory = OGRE_NEW VulkanProgramFactory( mActiveDevice );
         GpuProgramManager::getSingleton().addFactory( mSPIRVProgramFactory );
-    }
-    //-------------------------------------------------------------------------
-    void VulkanRenderSystem::beginRenderPassDescriptor( RenderPassDescriptor *newPassDesc, bool warnIfRtvWasFlushed )
-    {
-        VulkanRenderPassDescriptor *currPassDesc = mCurrentRenderPassDescriptor;
-
-        // Determine whether:
-        //  1. We need to store current active RenderPassDescriptor
-        //  2. We need to perform clears when loading the new RenderPassDescriptor
-        uint32 entriesToFlush = 0;
-        if( currPassDesc )
-        {
-            entriesToFlush = currPassDesc->willSwitchTo( newPassDesc, warnIfRtvWasFlushed );
-
-            if( entriesToFlush != 0 )
-                currPassDesc->performStoreActions();
-        }
     }
     //-------------------------------------------------------------------------
     void VulkanRenderSystem::executeRenderPassDescriptorDelayedActions( bool officialCall )

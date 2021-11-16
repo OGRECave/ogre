@@ -64,12 +64,6 @@ namespace Ogre
         bool operator<( const VulkanFrameBufferDescKey &other ) const;
     };
 
-    struct VulkanFlushOnlyDescValue
-    {
-        uint16 refCount;
-        VulkanFlushOnlyDescValue();
-    };
-
     struct VulkanFrameBufferDescValue
     {
         uint16 refCount;
@@ -94,7 +88,6 @@ namespace Ogre
     };
 
     typedef std::map<VulkanFrameBufferDescKey, VulkanFrameBufferDescValue> VulkanFrameBufferDescMap;
-    typedef std::map<FrameBufferDescKey, VulkanFlushOnlyDescValue> VulkanFlushOnlyDescMap;
 
     class _OgreVulkanExport VulkanRenderPassDescriptor
     {
@@ -103,12 +96,6 @@ namespace Ogre
         VulkanTextureGpu* mDepth;
         uint8                   mNumColourEntries = 0;
     private:
-        /// When true, beginRenderPassDescriptor & endRenderPassDescriptor won't actually
-        /// load/store this pass descriptor; but will still set the mCurrentRenderPassDescriptor
-        /// so we have required information by some passes.
-        /// Examples of these are stencil passes.
-        public: bool            mInformationOnly = false;
-
         // 1 per MRT
         // 1 per MRT MSAA resolve
         // 1 for Depth buffer
@@ -116,14 +103,6 @@ namespace Ogre
         VkClearValue mClearValues[OGRE_MAX_MULTIPLE_RENDER_TARGETS * 2u + 2u];
 
         VulkanFrameBufferDescMap::iterator mSharedFboItor;
-        /// We need mSharedFboItor & mSharedFboFlushItor because:
-        ///     - In Vulkan FrameBufferObjects include load/store actions embedded,
-        ///       so we want to share them. That's mSharedFboItor for
-        ///     - But a clear pass followed by the same pass that performs a load can be
-        ///       merged together as if they were one pass. That's what mSharedFboFlushItor
-        ///       is for. Metal only has mSharedFboItor because load/store actions are not
-        ///       embedded into API objects
-        VulkanFlushOnlyDescMap::iterator mSharedFboFlushItor;
 
         /// This value MUST be set to the resolution of any of the textures.
         /// If it's changed arbitrarily then FrameBufferDescKey will not take
@@ -135,9 +114,7 @@ namespace Ogre
         VulkanQueue *mQueue;
         VulkanRenderSystem *mRenderSystem;
 
-        void checkRenderWindowStatus( void );
         void calculateSharedKey( void );
-        void calculateSharedFlushOnlyKey( void );
 
         static VkClearColorValue getClearColour( const ColourValue &clearColour,
                                                  PixelFormatGpu pixelFormat );
@@ -152,22 +129,13 @@ namespace Ogre
         void releaseFbo( void );
         static void destroyFbo( VulkanQueue *queue, VulkanFrameBufferDescValue &fboDesc );
     public:
-        enum {
-            All = 1,
-            Colour0 = All,
-            Depth = All,
-            Stencil = All
-        };
-
-        void checkWarnIfRtvWasFlushed( uint32 entriesToFlush ) {}
-
         VulkanRenderPassDescriptor( VulkanQueue *graphicsQueue, VulkanRenderSystem *renderSystem );
         virtual ~VulkanRenderPassDescriptor();
 
         void notifySwapchainCreated( VulkanWindow *window );
         void notifySwapchainDestroyed( VulkanWindow *window );
 
-        virtual void entriesModified( uint32 entryTypes );
+        virtual void entriesModified( bool createFbo );
 
         virtual void setClearColour( uint8 idx, const ColourValue &clearColour );
         virtual void setClearDepth( Real clearDepth );
@@ -177,8 +145,6 @@ namespace Ogre
         /// than calling setClearColour( idx, clearColour ) for each entry
         /// individually.
         virtual void setClearColour( const ColourValue &clearColour );
-
-        uint32 willSwitchTo( VulkanRenderPassDescriptor *newDesc, bool warnIfRtvWasFlushed ) const;
 
         void performLoadActions();
         void performStoreActions();
