@@ -286,8 +286,7 @@ namespace Ogre {
         */
         void createInternalResources(void);
 
-        /** Frees internal texture resources for this texture. 
-        */
+        /// @deprecated use unload() instead
         void freeInternalResources(void);
         
         /** Copies (and maybe scales to fit) the contents of this texture to

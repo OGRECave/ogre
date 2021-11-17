@@ -334,8 +334,12 @@ namespace Ogre {
             createInternalResourcesImpl();
             mInternalResourcesCreated = true;
 
-            // this is also public API, so redundantly set state
-            mLoadingState.store(LOADSTATE_LOADED);
+            // this is also public API, so update state accordingly
+            if(!isLoading())
+            {
+                mLoadingState.store(LOADSTATE_LOADED);
+                _fireLoadingComplete(false);
+            }
         }
     }
     //-----------------------------------------------------------------------------
@@ -347,8 +351,12 @@ namespace Ogre {
             freeInternalResourcesImpl();
             mInternalResourcesCreated = false;
 
-            // this is also public API, so redundantly set state
-            mLoadingState.store(LOADSTATE_UNLOADED);
+            // this is also public API, so update state accordingly
+            if(mLoadingState.load() != LOADSTATE_UNLOADING)
+            {
+                mLoadingState.store(LOADSTATE_UNLOADED);
+                _fireUnloadingComplete();
+            }
         }
     }
     //-----------------------------------------------------------------------------
