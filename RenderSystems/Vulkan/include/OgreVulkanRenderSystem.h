@@ -191,8 +191,7 @@ namespace Ogre
 
         DepthBuffer *_createDepthBufferFor( RenderTarget* renderTarget);
 
-        void notifySwapchainCreated( VulkanWindow *window );
-        void notifySwapchainDestroyed( VulkanWindow *window );
+        void notifySwapchainDestroyed();
 
         VkRenderPass getVkRenderPass();
 

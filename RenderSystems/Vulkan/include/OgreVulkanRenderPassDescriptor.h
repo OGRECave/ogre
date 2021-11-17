@@ -126,14 +126,12 @@ namespace Ogre
         VkImageView setupDepthAttachment( VkAttachmentDescription &attachment );
 
         void setupFbo( VulkanFrameBufferDescValue &fboDesc );
-        void releaseFbo( void );
         static void destroyFbo( VulkanQueue *queue, VulkanFrameBufferDescValue &fboDesc );
     public:
         VulkanRenderPassDescriptor( VulkanQueue *graphicsQueue, VulkanRenderSystem *renderSystem );
         virtual ~VulkanRenderPassDescriptor();
 
-        void notifySwapchainCreated( VulkanWindow *window );
-        void notifySwapchainDestroyed( VulkanWindow *window );
+        void releaseFbo( void );
 
         virtual void entriesModified( bool createFbo );
 

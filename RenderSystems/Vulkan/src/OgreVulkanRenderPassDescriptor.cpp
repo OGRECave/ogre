@@ -387,26 +387,6 @@ namespace Ogre
         fboDesc.mRenderPass = 0;
     }
     //-----------------------------------------------------------------------------------
-    void VulkanRenderPassDescriptor::notifySwapchainCreated( VulkanWindow *window )
-    {
-        mNumColourEntries = 1;
-        mColour[0] = window->getTexture(); // FIXME
-        mDepth = window->getDepthTexture();
-        //if( mNumColourEntries > 0 && mColour[0].texture->isRenderWindowSpecific() &&
-        //    mColour[0].texture == window->getTexture() )
-        {
-            entriesModified( true );
-        }
-    }
-    //-----------------------------------------------------------------------------------
-    void VulkanRenderPassDescriptor::notifySwapchainDestroyed( VulkanWindow *window )
-    {
-        if (mNumColourEntries > 0 && mColour[0]->isRenderWindowSpecific() && mColour[0] == window->getTexture())
-        {
-            releaseFbo();
-        }
-    }
-    //-----------------------------------------------------------------------------------
     void VulkanRenderPassDescriptor::entriesModified( bool createFbo )
     {
         calculateSharedKey();
