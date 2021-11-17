@@ -41,8 +41,7 @@ namespace Ogre
     VulkanTextureGpuWindow::VulkanTextureGpuWindow(String name,
         TextureType initialType, TextureManager *textureManager,
         VulkanWindow *window ) :
-        VulkanTextureGpuRenderTarget( name, initialType,
-                                      textureManager ),
+        VulkanTextureGpu( textureManager, name, 0, "", true, 0),
         mWindow( window ),
         mCurrentImageIdx( 0u )
     {

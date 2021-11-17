@@ -35,6 +35,7 @@ THE SOFTWARE.
 #include "OgreVulkanUtils.h"
 #include "OgreVulkanHardwareBuffer.h"
 #include "OgreBitwise.h"
+#include "OgreRoot.h"
 
 #define TODO_add_resource_transitions
 
@@ -45,11 +46,66 @@ namespace Ogre
         : HardwarePixelBuffer(width, height, depth, tex->getFormat(), tex->getUsage(), false, false), mParent(tex),
         mFace(face), mLevel(mip)
     {
+        if(mParent->getUsage() & TU_RENDERTARGET)
+        {
+            // Create render target for each slice
+            mSliceTRT.reserve(mDepth);
+            for(size_t zoffset=0; zoffset<mDepth; ++zoffset)
+            {
+                String name;
+                name = "rtt/"+StringConverter::toString((size_t)this) + "/" + mParent->getName();
+
+                RenderTexture *trt = new VulkanRenderTexture(name, this, zoffset);
+                mSliceTRT.push_back(trt);
+                Root::getSingleton().getRenderSystem()->attachRenderTarget(*trt);
+            }
+        }
     }
 
     PixelBox VulkanHardwarePixelBuffer::lockImpl(const Box &lockBox,  LockOptions options)
     {
-        return PixelBox();
+        PixelBox ret(lockBox, mParent->getFormat());
+
+        auto textureManager = static_cast<VulkanTextureGpuManager*>(mParent->getCreator());
+        VulkanDevice* device = textureManager->getDevice();
+        mStagingBuffer.reset(new VulkanHardwareBuffer(VK_BUFFER_USAGE_TRANSFER_SRC_BIT, ret.getConsecutiveSize(),
+                                                      HBU_CPU_ONLY, false, device));
+        return PixelBox(lockBox, mParent->getFormat(), mStagingBuffer->lock(options));
+    }
+
+    void VulkanHardwarePixelBuffer::unlockImpl()
+    {
+        mStagingBuffer->unlock();
+
+        auto textureManager = static_cast<VulkanTextureGpuManager*>(mParent->getCreator());
+        VulkanDevice* device = textureManager->getDevice();
+        device->mGraphicsQueue.getCopyEncoder( 0, mParent, false );
+
+        VkBuffer srcBuffer = mStagingBuffer->getVkBuffer();
+
+        VkBufferImageCopy region;
+        region.bufferOffset = 0;
+        region.bufferRowLength = 0;
+        region.bufferImageHeight = 0;
+
+        region.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+        region.imageSubresource.mipLevel = mLevel;
+        region.imageSubresource.baseArrayLayer = mFace;
+        region.imageSubresource.layerCount = 1;
+
+        region.imageOffset.x = mCurrentLock.left;
+        region.imageOffset.y = mCurrentLock.top;
+        region.imageOffset.z = mCurrentLock.front;
+        region.imageExtent.width = mCurrentLock.getWidth();
+        region.imageExtent.height = mCurrentLock.getHeight();
+        region.imageExtent.depth = mCurrentLock.getDepth();
+
+        vkCmdCopyBufferToImage(device->mGraphicsQueue.mCurrentCmdBuffer, srcBuffer, mParent->getFinalTextureName(),
+                                VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1u, &region);
+
+        if((mParent->getUsage() & TU_AUTOMIPMAP) && mFace == mParent->getNumFaces() - 1)
+            mParent->_autogenerateMipmaps();
+        mStagingBuffer.reset();
     }
 
     void VulkanHardwarePixelBuffer::blitFromMemory(const PixelBox& src, const Box& dstBox)
@@ -66,40 +122,11 @@ namespace Ogre
             return;
         }
 
-        auto textureManager = static_cast<VulkanTextureGpuManager*>(mParent->getCreator());
-        VulkanDevice* device = textureManager->getDevice();
+        auto ptr = lock(dstBox, HBL_WRITE_ONLY).data;
 
-        device->mGraphicsQueue.getCopyEncoder( 0, mParent, false );
+        memcpy(ptr, src.data, src.getConsecutiveSize());
 
-        auto stagingBuffer = std::make_shared<VulkanHardwareBuffer>(
-            VK_BUFFER_USAGE_TRANSFER_SRC_BIT, src.getConsecutiveSize(), HBU_CPU_ONLY, false, device);
-
-        stagingBuffer->writeData(0, src.getConsecutiveSize(), src.data);
-
-        VkBuffer srcBuffer = stagingBuffer->getVkBuffer();
-
-        VkBufferImageCopy region;
-        region.bufferOffset = 0;
-        region.bufferRowLength = 0;
-        region.bufferImageHeight = 0;
-
-        region.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-        region.imageSubresource.mipLevel = mLevel;
-        region.imageSubresource.baseArrayLayer = mFace;
-        region.imageSubresource.layerCount = 1;
-
-        region.imageOffset.x = 0;
-        region.imageOffset.y = 0;
-        region.imageOffset.z = 0;
-        region.imageExtent.width = src.getWidth();
-        region.imageExtent.height = src.getHeight();
-        region.imageExtent.depth = src.getDepth();
-
-        vkCmdCopyBufferToImage(device->mGraphicsQueue.mCurrentCmdBuffer, srcBuffer, mParent->getFinalTextureName(),
-                                VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1u, &region);
-
-        if((mParent->getUsage() & TU_AUTOMIPMAP) && mFace == mParent->getNumFaces() - 1)
-            mParent->_autogenerateMipmaps();
+        unlock();
     }
     void VulkanHardwarePixelBuffer::blitToMemory(const Box& srcBox, const PixelBox& dst)
     {
@@ -312,10 +339,6 @@ namespace Ogre
         mCurrLayout = VK_IMAGE_LAYOUT_UNDEFINED;
         mNextLayout = VK_IMAGE_LAYOUT_UNDEFINED;
     }
-    //-----------------------------------------------------------------------------------
-    void VulkanTextureGpu::createMsaaSurface( void ) {}
-    //-----------------------------------------------------------------------------------
-    void VulkanTextureGpu::destroyMsaaSurface( void ) {}
     //-----------------------------------------------------------------------------------
     void VulkanTextureGpu::copyTo( TextureGpu *dst, const PixelBox &dstBox, uint8 dstMipLevel,
                                    const PixelBox &srcBox, uint8 srcMipLevel,
@@ -642,14 +665,7 @@ namespace Ogre
         return imageMemBarrier;
     }
     //-----------------------------------------------------------------------------------
-    VulkanTextureGpuRenderTarget::VulkanTextureGpuRenderTarget(String name,
-        TextureType initialType,
-        TextureManager *textureManager ) :
-        VulkanTextureGpu( textureManager, name, 0, "Default", true, nullptr)
-    {
-    }
-    //-----------------------------------------------------------------------------------
-    void VulkanTextureGpuRenderTarget::createMsaaSurface( void )
+    void VulkanTextureGpu::createMsaaSurface( void )
     {
         VkImageCreateInfo imageInfo = {VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO};
         imageInfo.imageType = getVulkanTextureType();
@@ -714,12 +730,19 @@ namespace Ogre
                               0u, 0, 0u, 0, 1u, &imageBarrier );
     }
     //-----------------------------------------------------------------------------------
-    void VulkanTextureGpuRenderTarget::destroyMsaaSurface( void )
+    void VulkanTextureGpu::destroyMsaaSurface( void )
     {
+        if(!mMsaaTextureName)
+            return;
         auto textureManager = static_cast<VulkanTextureGpuManager*>(mCreator);
         VulkanDevice *device = textureManager->getDevice();
 
         vkDestroyImage(device->mDevice, mMsaaTextureName, 0);
         vkFreeMemory(device->mDevice, mMsaaMemory, 0);
+    }
+
+    VulkanRenderTexture::VulkanRenderTexture(const String &name, HardwarePixelBuffer *buffer, uint32 zoffset) : RenderTexture(buffer, zoffset)
+    {
+        mName = name;
     }
 }  // namespace Ogre

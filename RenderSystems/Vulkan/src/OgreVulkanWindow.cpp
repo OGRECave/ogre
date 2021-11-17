@@ -458,7 +458,7 @@ namespace Ogre
         mTexture->setFormat(chooseSurfaceFormat(mHwGamma));
         mTexture->setFSAA(mFSAA, "");
 
-        mDepthTexture = new VulkanTextureGpuRenderTarget("RenderWindow DepthBuffer", TEX_TYPE_2D, texMgr);
+        mDepthTexture = new VulkanTextureGpu(texMgr, "RenderWindow DepthBuffer", 0, "", true, 0);
         mDepthTexture->setFormat(PF_DEPTH32F);
         mDepthTexture->setUsage(TU_RENDERTARGET);
         mDepthTexture->setFSAA(mFSAA, "");
