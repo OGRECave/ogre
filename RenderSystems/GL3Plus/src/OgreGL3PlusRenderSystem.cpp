@@ -1110,11 +1110,10 @@ namespace Ogre {
             static_cast<GLVertexArrayObject*>(op.vertexData->vertexDeclaration);
         // Bind VAO (set of per-vertex attributes: position, normal, etc.).
         vao->bind(this);
-        bool updateVAO = vao->needsUpdate(op.vertexData->vertexBufferBinding,
-                                          op.vertexData->vertexStart);
+        bool updateVAO = vao->needsUpdate(op.vertexData->vertexBufferBinding, 0);
 
         if (updateVAO)
-            vao->bindToGpu(this, op.vertexData->vertexBufferBinding, op.vertexData->vertexStart);
+            vao->bindToGpu(this, op.vertexData->vertexBufferBinding, 0);
 
         // We treat index buffer binding inside VAO as volatile, always updating and never relying onto it,
         // as one shared vertex buffer could be rendered with several index buffers, from submeshes and/or LODs
@@ -1219,13 +1218,13 @@ namespace Ogre {
                 void *pBufferData = GL_BUFFER_OFFSET(op.indexData->indexStart *
                                                      op.indexData->indexBuffer->getIndexSize());
                 GLenum indexType = (op.indexData->indexBuffer->getType() == HardwareIndexBuffer::IT_16BIT) ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT;
-                OGRE_CHECK_GL_ERROR(glDrawElements(GL_PATCHES, op.indexData->indexCount, indexType, pBufferData));
+                OGRE_CHECK_GL_ERROR(glDrawElementsBaseVertex(GL_PATCHES, op.indexData->indexCount, indexType, pBufferData, op.vertexData->vertexStart));
                 //OGRE_CHECK_GL_ERROR(glDrawElements(GL_PATCHES, op.indexData->indexCount, indexType, pBufferData));
                 //                OGRE_CHECK_GL_ERROR(glDrawArraysInstanced(GL_PATCHES, 0, primCount, 1));
             }
             else
             {
-                OGRE_CHECK_GL_ERROR(glDrawArrays(GL_PATCHES, 0, op.vertexData->vertexCount));
+                OGRE_CHECK_GL_ERROR(glDrawArrays(GL_PATCHES, op.vertexData->vertexStart, op.vertexData->vertexCount));
                 //OGRE_CHECK_GL_ERROR(glDrawArrays(GL_PATCHES, 0, primCount));
                 //                OGRE_CHECK_GL_ERROR(glDrawArraysInstanced(GL_PATCHES, 0, primCount, 1));
             }
@@ -1241,11 +1240,14 @@ namespace Ogre {
             {
                 if (hasInstanceData)
                 {
-                    OGRE_CHECK_GL_ERROR(glDrawElementsInstanced(primType, op.indexData->indexCount, indexType, pBufferData, numberOfInstances));
+                    OGRE_CHECK_GL_ERROR(glDrawElementsInstancedBaseVertex(primType, op.indexData->indexCount, indexType,
+                                                                          pBufferData, numberOfInstances,
+                                                                          op.vertexData->vertexStart));
                 }
                 else
                 {
-                    OGRE_CHECK_GL_ERROR(glDrawElements(primType, op.indexData->indexCount, indexType, pBufferData));
+                    OGRE_CHECK_GL_ERROR(glDrawElementsBaseVertex(primType, op.indexData->indexCount, indexType,
+                                                                 pBufferData, op.vertexData->vertexStart));
                 }
             } while (updatePassIterationRenderState());
         }
@@ -1255,11 +1257,12 @@ namespace Ogre {
             {
                 if (hasInstanceData)
                 {
-                    OGRE_CHECK_GL_ERROR(glDrawArraysInstanced(primType, 0, op.vertexData->vertexCount, numberOfInstances));
+                    OGRE_CHECK_GL_ERROR(glDrawArraysInstanced(primType, op.vertexData->vertexStart,
+                                                              op.vertexData->vertexCount, numberOfInstances));
                 }
                 else
                 {
-                    OGRE_CHECK_GL_ERROR(glDrawArrays(primType, 0, op.vertexData->vertexCount));
+                    OGRE_CHECK_GL_ERROR(glDrawArrays(primType, op.vertexData->vertexStart, op.vertexData->vertexCount));
                 }
             } while (updatePassIterationRenderState());
         }
