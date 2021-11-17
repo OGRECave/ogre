@@ -126,11 +126,6 @@ namespace Ogre
         _setSrcAttributes(mWidth, mHeight, mDepth, mFormat);
     }
     //---------------------------------------------------------------------
-    void D3D11Texture::freeInternalResources(void)
-    {
-        freeInternalResourcesImpl();
-    }
-    //---------------------------------------------------------------------
     void D3D11Texture::freeInternalResourcesImpl()
     {
         mpTex.Reset();
@@ -138,11 +133,6 @@ namespace Ogre
         mp1DTex.Reset();
         mp2DTex.Reset();
         mp3DTex.Reset();
-    }
-    //---------------------------------------------------------------------
-    void D3D11Texture::createInternalResources(void)
-    {
-        createInternalResourcesImpl();
     }
 
     //---------------------------------------------------------------------
