@@ -68,7 +68,8 @@ namespace Ogre
         mSwapchain( 0 ),
         mCurrentSemaphoreIndex( 0 ),
         mSwapchainStatus( SwapchainReleased ),
-        mSurfaceTransform( VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR )
+        mSurfaceTransform( VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR ),
+        mRenderPassDescriptor( 0 )
     {
         mActive = true;
         mName = title;
@@ -249,7 +250,10 @@ namespace Ogre
 
         acquireNextImage();
 
-        mDevice->mRenderSystem->notifySwapchainCreated( this );
+        mRenderPassDescriptor->mColour[0] = mTexture;
+        mRenderPassDescriptor->mDepth = mDepthTexture;
+        mRenderPassDescriptor->mNumColourEntries = 1;
+        mRenderPassDescriptor->entriesModified(true);
     }
     //-------------------------------------------------------------------------
     void VulkanWindow::destroySwapchain( void )
@@ -263,7 +267,8 @@ namespace Ogre
 
         mTexture->unload();
         mDepthTexture->unload();
-        mDevice->mRenderSystem->notifySwapchainDestroyed( this );
+        mRenderPassDescriptor->releaseFbo();
+        mDevice->mRenderSystem->notifySwapchainDestroyed();
 
         for(auto iv : mSwapchainImageViews)
         {
@@ -463,6 +468,7 @@ namespace Ogre
             mStencilBuffer = mDepthBuffer;
 #endif
 
+        mRenderPassDescriptor = mDevice->mRenderSystem->createRenderPassDescriptor();
         createSwapchain();
     }
     //-------------------------------------------------------------------------

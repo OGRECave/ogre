@@ -36,6 +36,7 @@ THE SOFTWARE.
 
 namespace Ogre
 {
+    class VulkanRenderPassDescriptor;
     class VulkanWindow : public RenderWindow
     {
     public:
@@ -94,6 +95,8 @@ namespace Ogre
 
         void createSurface(size_t windowHandle);
 
+        VulkanRenderPassDescriptor* mRenderPassDescriptor;
+
     public:
         void acquireNextImage( void );
 
@@ -102,6 +105,8 @@ namespace Ogre
         virtual ~VulkanWindow();
 
         static const char *getRequiredExtensionName();
+
+        VulkanRenderPassDescriptor* getRenderPassDescriptor() const { return mRenderPassDescriptor; }
 
         VulkanTextureGpu* getTexture() { return mTexture; }
         VulkanTextureGpu* getDepthTexture() { return mDepthTexture; }

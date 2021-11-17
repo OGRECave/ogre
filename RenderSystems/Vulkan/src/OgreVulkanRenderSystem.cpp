@@ -110,6 +110,7 @@ namespace Ogre
         mVkInstance( 0 ),
         mActiveDevice( 0 ),
         mDevice( 0 ),
+        mCurrentRenderPassDescriptor( 0 ),
         mHasValidationLayers( false ),
         CreateDebugReportCallback( 0 ),
         DestroyDebugReportCallback( 0 ),
@@ -1185,22 +1186,9 @@ namespace Ogre
     }
 
     //-------------------------------------------------------------------------
-    void VulkanRenderSystem::notifySwapchainCreated( VulkanWindow *window )
-    {
-        for(auto renderPassDesc : mRenderPassDescs)
-        {
-            renderPassDesc->notifySwapchainCreated( window );
-        }
-    }
-    //-------------------------------------------------------------------------
-    void VulkanRenderSystem::notifySwapchainDestroyed( VulkanWindow *window )
+    void VulkanRenderSystem::notifySwapchainDestroyed()
     {
         clearPipelineCache();
-
-        for(auto renderPassDesc : mRenderPassDescs)
-        {
-            renderPassDesc->notifySwapchainDestroyed( window );
-        }
     }
 
     //-------------------------------------------------------------------------
@@ -1459,9 +1447,7 @@ namespace Ogre
 
         if(auto win = dynamic_cast<VulkanWindow*>(target))
         {
-            // TODO unused. Currently set in notifySwapchainCreated
-            mCurrentRenderPassDescriptor->mColour[0] = win->getTexture();
-            mCurrentRenderPassDescriptor->mDepth = win->getDepthTexture();
+            mCurrentRenderPassDescriptor = win->getRenderPassDescriptor();
         }
     }
     void VulkanRenderSystem::clearFrameBuffer(unsigned int buffers, const ColourValue& colour, Real depth,
