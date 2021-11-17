@@ -62,3 +62,8 @@ mat4 transpose(mat4 m)
 #endif
 
 #endif
+
+#if defined(OGRE_FRAGMENT_SHADER) && (defined(OGRE_GLSLANG) || (__VERSION__ > 130))
+#define gl_FragColor FragColor
+OUT(vec4 FragColor, 0)
+#endif

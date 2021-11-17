@@ -409,18 +409,14 @@ void GLSLProgramWriter::writeOutParameters(std::ostream& os, Function* function,
         else if(gpuType == GPT_FRAGMENT_PROGRAM &&
                 pParam->getSemantic() == Parameter::SPS_COLOR)
         {                   
-            // GLSL fragment program has to write always gl_FragColor (but this is also deprecated after version 120)
-            // Always add gl_FragColor as an output.  The name is for compatibility.
-            if(mGLSLVersion <= 120 || (mIsGLSLES && mGLSLVersion == 100))
+            if(pParam->getIndex() == 0)
             {
+                // handled by UnifiedShader
                 pParam->_rename("gl_FragColor");
+                continue;
             }
-            else
-            {
-                if (mGLSLVersion >= 150)
-                    os << "layout(location = " << pParam->getIndex() << ") ";
-                os << "out vec4\t" << pParam->getName() << ";" << std::endl;
-            }
+
+            os << "OUT(vec4\t" << pParam->getName() << ", " << pParam->getIndex() << ")\n";
         }
     }
     
