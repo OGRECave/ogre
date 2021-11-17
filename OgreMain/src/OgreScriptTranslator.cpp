@@ -1871,6 +1871,8 @@ namespace Ogre{
                     ManualCullingMode mmode;
                     if(getValue(prop, compiler, mmode))
                         mPass->setManualCullingMode(mmode);
+                    compiler->addError(ScriptCompiler::CE_DEPRECATEDSYMBOL, prop->file, prop->line,
+                                       prop->name + ". Only used by the BSP scene manager.");
                     break;
                 case ID_NORMALISE_NORMALS:
                     if(getValue(prop, compiler, bval))
