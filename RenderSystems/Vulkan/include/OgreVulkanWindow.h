@@ -73,7 +73,7 @@ namespace Ogre
 
         VulkanDevice *mDevice;
         VulkanTextureGpuWindow* mTexture;
-        VulkanTextureGpuRenderTarget* mDepthTexture;
+        VulkanTextureGpu* mDepthTexture;
 
         VkSurfaceKHR mSurfaceKHR;
         VkSwapchainKHR mSwapchain;

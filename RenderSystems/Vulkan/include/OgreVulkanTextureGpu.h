@@ -32,11 +32,12 @@ THE SOFTWARE.
 #include "OgreVulkanPrerequisites.h"
 
 #include "OgreTexture.h"
-#include "OgreFrustum.h"
 
 #include "vulkan/vulkan_core.h"
 
 #include "OgreHardwarePixelBuffer.h"
+#include "OgreVulkanHardwareBuffer.h"
+#include "OgreRenderTexture.h"
 
 namespace Ogre
 {
@@ -64,9 +65,11 @@ namespace Ogre
         VulkanTextureGpu* mParent;
         uint8 mFace;
         uint32 mLevel;
+        std::unique_ptr<VulkanHardwareBuffer> mStagingBuffer;
+        PixelBox lockImpl(const Box &lockBox,  LockOptions options) override;
+        void unlockImpl(void) override;
     public:
         VulkanHardwarePixelBuffer(VulkanTextureGpu* tex, uint32 width, uint32 height, uint32 depth, uint8 face, uint32 mip);
-        PixelBox lockImpl(const Box &lockBox,  LockOptions options) override;
         void blitFromMemory(const PixelBox& src, const Box& dstBox) override;
         void blitToMemory(const Box& srcBox, const PixelBox& dst) override;
     };
@@ -165,14 +168,12 @@ namespace Ogre
         VkImage getMsaaTextureName( void ) const { return mMsaaTextureName; }
     };
 
-    class VulkanTextureGpuRenderTarget : public VulkanTextureGpu
+    class VulkanRenderTexture : public RenderTexture
     {
-    protected:
-        virtual void createMsaaSurface( void );
-        virtual void destroyMsaaSurface( void );
-
     public:
-        VulkanTextureGpuRenderTarget(String name, TextureType initialType, TextureManager* textureManager);
+        VulkanRenderTexture(const String &name, HardwarePixelBuffer *buffer, uint32 zoffset);
+
+        bool requiresTextureFlipping() const override { return false; }
     };
 
     /** @} */

@@ -35,7 +35,7 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-    class _OgreVulkanExport VulkanTextureGpuWindow : public VulkanTextureGpuRenderTarget
+    class _OgreVulkanExport VulkanTextureGpuWindow : public VulkanTextureGpu
     {
         VulkanWindow *mWindow;
         uint32 mCurrentImageIdx;
