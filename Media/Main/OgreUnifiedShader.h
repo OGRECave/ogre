@@ -65,6 +65,8 @@ mat3 mtxFromCols(vec3 a, vec3 b, vec3 c)
 
 #define STATIC static
 
+#define OGRE_UNIFORMS(x) x
+
 #define MAIN_PARAMETERS void main(
 
 #ifdef OGRE_VERTEX_SHADER

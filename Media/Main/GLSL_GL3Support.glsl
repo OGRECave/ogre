@@ -67,3 +67,15 @@ mat4 transpose(mat4 m)
 #define gl_FragColor FragColor
 OUT(vec4 FragColor, 0)
 #endif
+
+#ifdef OGRE_GLSLANG
+
+#ifdef OGRE_VERTEX_SHADER
+#define OGRE_UNIFORMS(x) layout(binding = 0) uniform OgreUniforms { x };
+#else
+#define OGRE_UNIFORMS(x) layout(binding = 1) uniform OgreUniforms { x };
+#endif
+
+#else
+#define OGRE_UNIFORMS(x) x
+#endif
