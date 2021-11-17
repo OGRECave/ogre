@@ -92,12 +92,8 @@ namespace Ogre {
         /// internal method, create a blank cube texture
         void _create3DTex();
 
-        /// @copydoc Texture::createInternalResources
-        void createInternalResources(void);
         /// @copydoc Texture::createInternalResourcesImpl
         void createInternalResourcesImpl(void);
-        /// @copydoc Texture::freeInternalResources
-        void freeInternalResources(void);
         /// free internal resources
         void freeInternalResourcesImpl(void);
         /// internal method, set Texture class source image protected attributes

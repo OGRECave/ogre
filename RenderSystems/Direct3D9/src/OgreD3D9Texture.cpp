@@ -204,12 +204,6 @@ namespace Ogre
     }
 
     /****************************************************************************************/
-    void D3D9Texture::freeInternalResources(void)
-    {
-        freeInternalResourcesImpl();
-    }
-
-    /****************************************************************************************/
     void D3D9Texture::freeInternalResourcesImpl()
     {
         D3D9_DEVICE_ACCESS_CRITICAL_SECTION
@@ -312,12 +306,6 @@ namespace Ogre
         size_t instanceSize = getNumFaces() * PixelUtil::getMemorySize(mWidth, mHeight, mDepth, mFormat);
 
         return instanceSize * mMapDeviceToTextureResources.size();
-    }
-
-    /****************************************************************************************/
-    void D3D9Texture::createInternalResources(void)
-    {
-        createInternalResourcesImpl();
     }
 
     /****************************************************************************************/

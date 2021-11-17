@@ -85,10 +85,6 @@ namespace Ogre {
 
         /// @copydoc Resource::calculateSize
         size_t calculateSize(void) const;
-        /// @copydoc Texture::createInternalResources
-        void createInternalResources(void);
-        /// @copydoc Texture::freeInternalResources
-        void freeInternalResources(void);
         /// @copydoc Texture::createInternalResourcesImpl
         void createInternalResourcesImpl(void);
         /// Creates this texture resources on the specified device.
