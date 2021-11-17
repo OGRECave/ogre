@@ -132,7 +132,6 @@ material SSAO/Post/NoFilter
         pass
         {
             cull_hardware none
-			cull_software none
 			depth_check off
             lighting off
 

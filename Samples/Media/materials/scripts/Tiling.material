@@ -23,7 +23,6 @@ material Ogre/Compositor/Tiling
 		pass
 		{
 			cull_hardware none
-			cull_software none
 			depth_func always_pass
             polygon_mode_overrideable false
 

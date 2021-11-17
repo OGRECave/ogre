@@ -408,7 +408,6 @@ material Examples/OgreDance
 			lighting off
 			scene_blend alpha_blend
 			cull_hardware none
-			cull_software none
 
 			texture_unit
 			{
@@ -493,7 +492,6 @@ material Examples/WaterStream
 			ambient 0.1 0.1 0.1
 			scene_blend add
 			depth_write off
-			cull_software none
 			cull_hardware none
 
 			texture_unit
@@ -1350,7 +1348,6 @@ material Examples/TextureEffect1
 		{
 			ambient 0.75 0.75 0.75
 			cull_hardware none
-			cull_software none
 
 			texture_unit
 			{
@@ -1385,7 +1382,6 @@ material Examples/TextureEffect3
 		{
 			ambient 0.7 0.7 0.7
 			cull_hardware none
-			cull_software none
 
 			texture_unit
 			{
@@ -1412,7 +1408,6 @@ material Examples/TextureEffect4
 			ambient 0.3 0.3 0.3
 			scene_blend colour_blend
 			cull_hardware none
-			cull_software none
 
 			texture_unit
 			{
