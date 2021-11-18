@@ -53,16 +53,18 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void VulkanRenderPassDescriptor::calculateSharedKey( void )
     {
-        VulkanFrameBufferDescKey key( *this );
+        uint32 hash = FastHash((const char*)mColour, mNumColourEntries * sizeof(mColour[0]));
+        hash = HashCombine(hash, mDepth);
+
         VulkanFrameBufferDescMap &frameBufferDescMap = mRenderSystem->_getFrameBufferDescMap();
-        VulkanFrameBufferDescMap::iterator newItor = frameBufferDescMap.find( key );
+        VulkanFrameBufferDescMap::iterator newItor = frameBufferDescMap.find( hash );
 
         if( newItor == frameBufferDescMap.end() )
         {
             VulkanFrameBufferDescValue value;
             value.refCount = 0;
-            frameBufferDescMap[key] = value;
-            newItor = frameBufferDescMap.find( key );
+            frameBufferDescMap[hash] = value;
+            newItor = frameBufferDescMap.find(hash);
         }
 
         ++newItor->second.refCount;
@@ -508,22 +510,6 @@ namespace Ogre
         // Another encoder will have to be created, and don't let ours linger
         // since mCurrentRenderPassDescriptor probably doesn't even point to 'this'
         mQueue->endAllEncoders( false );
-    }
-    //-----------------------------------------------------------------------------------
-    //-----------------------------------------------------------------------------------
-    //-----------------------------------------------------------------------------------
-    VulkanFrameBufferDescKey::VulkanFrameBufferDescKey() {}
-    //-----------------------------------------------------------------------------------
-    VulkanFrameBufferDescKey::VulkanFrameBufferDescKey( const RenderPassDescriptor &desc )
-    {
-    }
-    //-----------------------------------------------------------------------------------
-    bool VulkanFrameBufferDescKey::operator<( const VulkanFrameBufferDescKey &other ) const
-    {
-        if( this->numColourEntries != other.numColourEntries )
-            return this->numColourEntries < other.numColourEntries;
-
-        return false;
     }
     //-----------------------------------------------------------------------------------
     //-----------------------------------------------------------------------------------
