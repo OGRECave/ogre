@@ -68,8 +68,7 @@ namespace Ogre
         mSwapchain( 0 ),
         mCurrentSemaphoreIndex( 0 ),
         mSwapchainStatus( SwapchainReleased ),
-        mSurfaceTransform( VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR ),
-        mRenderPassDescriptor( 0 )
+        mSurfaceTransform( VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR )
     {
         mActive = true;
         mName = title;
@@ -468,7 +467,7 @@ namespace Ogre
             mStencilBuffer = mDepthBuffer;
 #endif
 
-        mRenderPassDescriptor = mDevice->mRenderSystem->createRenderPassDescriptor();
+        mRenderPassDescriptor.reset(new VulkanRenderPassDescriptor(&mDevice->mGraphicsQueue, mDevice->mRenderSystem));
         createSwapchain();
     }
     //-------------------------------------------------------------------------

@@ -799,8 +799,6 @@ namespace Ogre
                 LogManager::getSingleton().logMessage( workaroundsStr );
             }
 
-            mCurrentRenderPassDescriptor = createRenderPassDescriptor();
-
             mInitialized = true;
         }
 
@@ -846,14 +844,6 @@ namespace Ogre
         {
             mImageInfos[unit].imageView = NULL;
         }
-    }
-    //-------------------------------------------------------------------------
-    RenderPassDescriptor *VulkanRenderSystem::createRenderPassDescriptor( void )
-    {
-        VulkanRenderPassDescriptor *retVal =
-            OGRE_NEW VulkanRenderPassDescriptor( &mActiveDevice->mGraphicsQueue, this );
-        mRenderPassDescs.insert( retVal );
-        return retVal;
     }
     //-------------------------------------------------------------------------
     void VulkanRenderSystem::_beginFrame( void ) {}
