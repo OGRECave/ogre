@@ -73,9 +73,6 @@ namespace Ogre
 
         bool mHasValidationLayers;
 
-        typedef std::set<VulkanRenderPassDescriptor*> RenderPassDescriptorSet;
-        RenderPassDescriptorSet mRenderPassDescs;
-
         PFN_vkCreateDebugReportCallbackEXT CreateDebugReportCallback;
         PFN_vkDestroyDebugReportCallbackEXT DestroyDebugReportCallback;
         VkDebugReportCallbackEXT mDebugReportCallback;
@@ -157,7 +154,6 @@ namespace Ogre
         void _setTexture( size_t unit, bool enabled, const TexturePtr& texPtr ) override;
 
         virtual VulkanFrameBufferDescMap &_getFrameBufferDescMap( void ) { return mFrameBufferDescMap; }
-        virtual RenderPassDescriptor *createRenderPassDescriptor( void );
 
         virtual void _beginFrame( void );
         virtual void _endFrame( void );

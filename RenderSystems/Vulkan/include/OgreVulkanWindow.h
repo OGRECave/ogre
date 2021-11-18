@@ -95,7 +95,7 @@ namespace Ogre
 
         void createSurface(size_t windowHandle);
 
-        VulkanRenderPassDescriptor* mRenderPassDescriptor;
+        std::unique_ptr<VulkanRenderPassDescriptor> mRenderPassDescriptor;
 
     public:
         void acquireNextImage( void );
@@ -106,7 +106,7 @@ namespace Ogre
 
         static const char *getRequiredExtensionName();
 
-        VulkanRenderPassDescriptor* getRenderPassDescriptor() const { return mRenderPassDescriptor; }
+        VulkanRenderPassDescriptor* getRenderPassDescriptor() const { return mRenderPassDescriptor.get(); }
 
         VulkanTextureGpu* getTexture() { return mTexture; }
         VulkanTextureGpu* getDepthTexture() { return mDepthTexture; }
