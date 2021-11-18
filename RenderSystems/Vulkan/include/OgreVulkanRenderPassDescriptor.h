@@ -48,21 +48,7 @@ namespace Ogre
      */
     // forward compatibility defines
     class VulkanRenderPassDescriptor;
-    struct VulkanFrameBufferDescKey;
-
     typedef VulkanRenderPassDescriptor RenderPassDescriptor;
-    typedef VulkanFrameBufferDescKey FrameBufferDescKey;
-
-    struct VulkanFrameBufferDescKey
-    {
-        uint8             numColourEntries = 1;
-        VulkanTextureGpu* colour[1] = {};
-        VulkanTextureGpu* depth = 0;
-        VulkanFrameBufferDescKey();
-        VulkanFrameBufferDescKey( const RenderPassDescriptor &desc );
-
-        bool operator<( const VulkanFrameBufferDescKey &other ) const;
-    };
 
     struct VulkanFrameBufferDescValue
     {
@@ -87,7 +73,7 @@ namespace Ogre
         VulkanFrameBufferDescValue();
     };
 
-    typedef std::map<VulkanFrameBufferDescKey, VulkanFrameBufferDescValue> VulkanFrameBufferDescMap;
+    typedef std::unordered_map<uint32, VulkanFrameBufferDescValue> VulkanFrameBufferDescMap;
 
     class _OgreVulkanExport VulkanRenderPassDescriptor
     {
