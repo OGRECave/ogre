@@ -242,7 +242,7 @@ namespace Ogre
         VkSemaphoreCreateInfo semaphoreCreateInfo = {VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO};
         for (uint32 i = 0; i < numSwapchainImages; i++)
         {
-            mSwapchainImageViews[i] = mTexture->_createView(0, 0, 0, 1u, mSwapchainImages[i]);
+            mSwapchainImageViews[i] = mTexture->_createView(0, 1, 0, 1u, mSwapchainImages[i]);
             OGRE_VK_CHECK(vkCreateSemaphore(mDevice->mDevice, &semaphoreCreateInfo, 0, &mImageReadySemaphores[i]));
             OGRE_VK_CHECK(vkCreateSemaphore(mDevice->mDevice, &semaphoreCreateInfo, 0, &mRenderFinishedSemaphores[i]));
         }

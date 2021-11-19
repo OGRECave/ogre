@@ -55,7 +55,7 @@ namespace Ogre
                 String name;
                 name = "rtt/"+StringConverter::toString((size_t)this) + "/" + mParent->getName();
 
-                RenderTexture *trt = new VulkanRenderTexture(name, this, zoffset);
+                RenderTexture *trt = new VulkanRenderTexture(name, this, zoffset, mParent, mFace);
                 mSliceTRT.push_back(trt);
                 Root::getSingleton().getRenderSystem()->attachRenderTarget(*trt);
             }
@@ -571,7 +571,7 @@ namespace Ogre
         }
 
         if( !numMipmaps )
-            numMipmaps = mNumMipmaps - mipLevel;
+            numMipmaps = mNumMipmaps - mipLevel + 1;
 
         OGRE_ASSERT_LOW( numMipmaps <= (mNumMipmaps - mipLevel + 1) &&
                          "Asking for more mipmaps than the texture has!" );
@@ -602,7 +602,7 @@ namespace Ogre
         // Thus prefer depth over stencil. We only use both flags for FBOs
         imageViewCi.subresourceRange.aspectMask = VulkanMappings::getImageAspect(mFormat, imageOverride == 0);
         imageViewCi.subresourceRange.baseMipLevel = mipLevel;
-        imageViewCi.subresourceRange.levelCount = numMipmaps + 1;
+        imageViewCi.subresourceRange.levelCount = numMipmaps;
         imageViewCi.subresourceRange.baseArrayLayer = arraySlice;
         if( numSlices == 0u )
             imageViewCi.subresourceRange.layerCount = VK_REMAINING_ARRAY_LAYERS;
@@ -741,8 +741,33 @@ namespace Ogre
         vkFreeMemory(device->mDevice, mMsaaMemory, 0);
     }
 
-    VulkanRenderTexture::VulkanRenderTexture(const String &name, HardwarePixelBuffer *buffer, uint32 zoffset) : RenderTexture(buffer, zoffset)
+    VulkanRenderTexture::VulkanRenderTexture(const String& name, HardwarePixelBuffer* buffer, uint32 zoffset,
+                                             VulkanTextureGpu* target, uint32 face)
+        : RenderTexture(buffer, zoffset), mTexture(target)
     {
         mName = name;
+
+        if(PixelUtil::isDepth(target->getFormat()))
+            return;
+
+        auto texMgr = TextureManager::getSingletonPtr();
+        VulkanDevice* device = static_cast<VulkanTextureGpuManager*>(texMgr)->getDevice();
+
+        mTexture->setFSAA(1, "");
+
+        mDepthTexture.reset(new VulkanTextureGpu(texMgr, mName+"/Depth", 0, "", true, 0));
+        mDepthTexture->setWidth(mTexture->getWidth());
+        mDepthTexture->setHeight(mTexture->getHeight());
+        mDepthTexture->setFormat(PF_DEPTH32F);
+        mDepthTexture->setUsage(TU_RENDERTARGET);
+        mDepthTexture->createInternalResources();
+        mDepthTexture->setFSAA(1, "");
+
+        mRenderPassDescriptor.reset(new VulkanRenderPassDescriptor(&device->mGraphicsQueue, device->mRenderSystem));
+        mRenderPassDescriptor->mColour[0] = mTexture;
+        mRenderPassDescriptor->mSlice = face;
+        mRenderPassDescriptor->mDepth = mDepthTexture.get();
+        mRenderPassDescriptor->mNumColourEntries = 1;
+        mRenderPassDescriptor->entriesModified(true);
     }
 }  // namespace Ogre
