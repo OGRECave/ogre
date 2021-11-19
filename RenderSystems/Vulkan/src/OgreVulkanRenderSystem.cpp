@@ -1225,12 +1225,6 @@ namespace Ogre
         dest[2][1] = (dest[2][1] + dest[3][1]) / 2;
         dest[2][2] = (dest[2][2] + dest[3][2]) / 2;
         dest[2][3] = (dest[2][3] + dest[3][3]) / 2;
-
-        // Vulkan clip space has inverted Y
-        dest[1][0] = -dest[1][0];
-        dest[1][1] = -dest[1][1];
-        dest[1][2] = -dest[1][2];
-        dest[1][3] = -dest[1][3];
     }
 
     void VulkanRenderSystem::_setCullingMode(CullingMode mode) { rasterState.cullMode = VulkanMappings::get(mode); }

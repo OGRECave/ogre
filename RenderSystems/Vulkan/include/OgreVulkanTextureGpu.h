@@ -179,7 +179,7 @@ namespace Ogre
         VulkanRenderTexture(const String& name, HardwarePixelBuffer* buffer, uint32 zoffset, VulkanTextureGpu* target,
                             uint32 face);
 
-        bool requiresTextureFlipping() const override { return false; }
+        bool requiresTextureFlipping() const override { return true; }
 
         VulkanRenderPassDescriptor* getRenderPassDescriptor() const { return mRenderPassDescriptor.get(); }
     };
