@@ -124,8 +124,7 @@ void GLSLProgramWriter::writeSourceCode(std::ostream& os, Program* program)
 void GLSLProgramWriter::writeUniformBlock(std::ostream& os, const String& name, int binding,
                                           const UniformParameterList& uniforms)
 {
-    os << "layout(row_major) uniform;\n";
-    os << "_UNIFORM_BINDING(" << binding << ") " << name << " {";
+    os << "layout(binding = " << binding << ", row_major) uniform " << name << " {";
 
     for (auto uparam : uniforms)
     {
@@ -164,7 +163,7 @@ void GLSLProgramWriter::writeMainSourceCode(std::ostream& os, Program* program)
             uniforms.push_back(param);
             continue;
         }
-        writeSamplerParameter(os, param, mIsVulkan * 2);
+        writeSamplerParameter(os, param);
         os << ";" << std::endl;
     }
     if (mIsVulkan && !uniforms.empty())
