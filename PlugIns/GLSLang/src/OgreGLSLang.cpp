@@ -339,8 +339,8 @@ void GLSLangProgram::prepareImpl()
     else if(mSyntaxCode == "spirv")
         shader.setEnvClient(glslang::EShClientVulkan, glslang::EShTargetVulkan_1_0);
 
-    // require 430 for explicit uniform location
-    if (!shader.parse(&DefaultTBuiltInResource, 430, false, EShMsgSpvRules))
+    // minimal version is 430 for explicit uniform location, but we use latest to get all features
+    if (!shader.parse(&DefaultTBuiltInResource, 460, false, EShMsgSpvRules))
     {
         LogManager::getSingleton().logError("GLSLang compilation failed for " + mName + ":\n" +
                                             shader.getInfoLog());
