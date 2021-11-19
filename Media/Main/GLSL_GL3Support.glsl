@@ -68,7 +68,7 @@ mat4 transpose(mat4 m)
 OUT(vec4 FragColor, 0)
 #endif
 
-#ifdef OGRE_GLSLANG
+#ifdef VULKAN
 
 #ifdef OGRE_VERTEX_SHADER
 #define OGRE_UNIFORMS(x) layout(binding = 0, row_major) uniform OgreUniforms { x };
