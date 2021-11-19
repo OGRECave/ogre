@@ -124,7 +124,9 @@ namespace Ogre
 
         PixelFormat suggestPixelFormat() const { return mTexture->getFormat(); }
         void copyContentsToMemory(const Box& src, const PixelBox &dst, FrameBuffer buffer = FB_AUTO);
-        bool requiresTextureFlipping() const { return false; }
+
+        /// Vulkan clip space has inverted Y axis compared to OpenGL
+        bool requiresTextureFlipping() const { return true; }
 
         void resize(unsigned int widthPt, unsigned int heightPt) override;
 
