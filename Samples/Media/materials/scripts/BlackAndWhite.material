@@ -4,15 +4,9 @@ fragment_program Ogre/Compositor/B&W_Cg_FP hlsl
 	entry_point GrayScale_ps
 }
 
-fragment_program Ogre/Compositor/B&W_GLSL_FP glsl glsles
+fragment_program Ogre/Compositor/B&W_FP glsl glsles glslang hlsl
 {
 	source GrayScale.glsl
-}
-
-fragment_program Ogre/Compositor/B&W_FP unified
-{
-	delegate Ogre/Compositor/B&W_GLSL_FP
-	delegate Ogre/Compositor/B&W_Cg_FP
 }
 
 material Ogre/Compositor/BlackAndWhite
@@ -25,7 +19,7 @@ material Ogre/Compositor/BlackAndWhite
 			depth_check off
                         polygon_mode_overrideable false
 
-			vertex_program_ref Ogre/Compositor/StdQuad_Tex2a_vp
+			vertex_program_ref Ogre/Compositor/StdQuad_Tex2_vp
 			{
 			}
 
