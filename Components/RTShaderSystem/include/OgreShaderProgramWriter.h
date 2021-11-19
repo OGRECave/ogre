@@ -78,7 +78,7 @@ protected:
     void                writeFunctionTitle          (std::ostream& os, Function* function);
 
     /** Write a uniform parameter. */
-    void writeSamplerParameter(std::ostream& os, const UniformParameterPtr& parameter, int offset = 0);
+    void writeSamplerParameter(std::ostream& os, const UniformParameterPtr& parameter);
 
     /** Write a undecorated/ local parameter. */
     void writeParameter(std::ostream& os, const ParameterPtr& parameter);
