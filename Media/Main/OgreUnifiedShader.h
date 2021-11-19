@@ -91,7 +91,7 @@ mat3 mtxFromCols(vec3 a, vec3 b, vec3 c)
 
 #ifndef USE_OGRE_FROM_FUTURE
 #define _UNIFORM_BINDING(b)
-#elif defined(OGRE_GLSLANG)
+#elif defined(VULKAN)
 #define _UNIFORM_BINDING(b) layout(binding = b + 2) uniform
 #elif __VERSION__ >= 420
 #define _UNIFORM_BINDING(b) layout(binding = b) uniform
