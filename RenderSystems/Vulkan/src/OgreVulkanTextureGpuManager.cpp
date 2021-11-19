@@ -69,6 +69,9 @@ namespace Ogre
         samplerCi.unnormalizedCoordinates = VK_FALSE;
         samplerCi.maxLod = mMipFilter == FO_NONE ? 0 : VK_LOD_CLAMP_NONE;
 
+        samplerCi.borderColor =
+            mBorderColour.getAsRGBA() == 0xFF ? VK_BORDER_COLOR_FLOAT_OPAQUE_BLACK : VK_BORDER_COLOR_FLOAT_OPAQUE_WHITE;
+
         if (mCompareEnabled)
         {
             samplerCi.compareEnable = VK_TRUE;
