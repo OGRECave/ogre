@@ -165,15 +165,18 @@ namespace Ogre
         attachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
         if( !bResolveTex )
         {
+            attachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED; // TODO VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
             if (texture->isRenderWindowSpecific() && !texture->isMultisample())
             {
-                attachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED; // TODO VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
                 attachment.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+            }
+            else if(!texture->isMultisample())
+            {
+                attachment.finalLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
             }
             else
             {
-                attachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-                attachment.finalLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+                attachment.finalLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
             }
         }
         else
