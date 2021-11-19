@@ -319,32 +319,21 @@ namespace Ogre
         /** Gets the projection matrix for this frustum adjusted for the current
             rendersystem specifics (may be right or left-handed, depth range
             may vary).
-        @remarks
-            This method retrieves the rendering-API dependent version of the projection
-            matrix. If you want a 'typical' projection matrix then use 
-            getProjectionMatrix.
+
+            @deprecated do not use
         */
-        const Matrix4& getProjectionMatrixRS(void) const;
-        /** Gets the depth-adjusted projection matrix for the current rendersystem,
-            but one which still conforms to right-hand rules.
-        @remarks
-            This differs from the rendering-API dependent getProjectionMatrix
-            in that it always returns a right-handed projection matrix result 
-            no matter what rendering API is being used - this is required for
-            vertex and fragment programs for example. However, the resulting depth
-            range may still vary between render systems since D3D uses [0,1] and 
-            GL uses [-1,1], and the range must be kept the same between programmable
-            and fixed-function pipelines.
+        OGRE_DEPRECATED const Matrix4& getProjectionMatrixRS(void) const;
+        /** Gets the depth-adjusted projection matrix for the current rendersystem
+
+            This differs from the rendering-API independent @ref getProjectionMatrix
+            in that it the resulting depth range may vary between render systems since D3D uses [0,1] and
+            GL uses [-1,1]. This is required for vertex and fragment programs.
         */
         const Matrix4& getProjectionMatrixWithRSDepth(void) const;
-        /** Gets the normal projection matrix for this frustum, ie the 
-            projection matrix which conforms to standard right-handed rules and
-            uses depth range [-1,+1].
-        @remarks
-            This differs from the rendering-API dependent getProjectionMatrixRS
-            in that it always returns a right-handed projection matrix with depth
-            range [-1,+1], result no matter what rendering API is being used - this
-            is required for some uniform algebra for example.
+        /** Gets the normal projection matrix for this frustum
+
+            i.e. the projection matrix which conforms to standard right-handed rules and
+            uses depth range [-1,+1]. This is required for some uniform algebra.
         */
         const Matrix4& getProjectionMatrix(void) const;
 
