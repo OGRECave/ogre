@@ -131,6 +131,8 @@ namespace Ogre
         /// individually.
         virtual void setClearColour( const ColourValue &clearColour );
 
+        VkRenderPass getRenderPass() const;
+
         void performLoadActions();
         void performStoreActions();
     };

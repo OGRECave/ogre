@@ -905,7 +905,7 @@ namespace Ogre
 
     VkPipeline VulkanRenderSystem::getPipeline()
     {
-        pipelineCi.renderPass = getVkRenderPass();
+        pipelineCi.renderPass = mCurrentRenderPassDescriptor->getRenderPass();
         pipelineCi.layout = mLayout;
         mssCi.rasterizationSamples = VkSampleCountFlagBits(std::max(mActiveRenderTarget->getFSAA(), 1u));
 
@@ -1179,100 +1179,6 @@ namespace Ogre
     void VulkanRenderSystem::notifySwapchainDestroyed()
     {
         clearPipelineCache();
-    }
-
-    //-------------------------------------------------------------------------
-    VkRenderPass VulkanRenderSystem::getVkRenderPass()
-    {
-        uint8 mrtCount = 1;
-
-        auto resolveColourFormat = PF_UNKNOWN;
-        auto colourFormat = mCurrentRenderPassDescriptor->mColour[0]->getFormat();
-        auto depthFormat = PF_UNKNOWN;
-        if(mCurrentRenderPassDescriptor->mDepth)
-            depthFormat = mCurrentRenderPassDescriptor->mDepth->getFormat();
-        auto colourSamples = mCurrentRenderPassDescriptor->mColour[0]->getFSAA();
-
-        bool usesResolveAttachments = false;
-
-        uint32 attachmentIdx = 0u;
-        uint32 numColourAttachments = 0u;
-        VkAttachmentDescription attachments[OGRE_MAX_MULTIPLE_RENDER_TARGETS * 2u + 2u] = {};
-
-        VkAttachmentReference colourAttachRefs[OGRE_MAX_MULTIPLE_RENDER_TARGETS] = {};
-        VkAttachmentReference resolveAttachRefs[OGRE_MAX_MULTIPLE_RENDER_TARGETS] = {};
-        VkAttachmentReference depthAttachRef = {};
-
-        for( size_t i = 0; i < mrtCount; ++i )
-        {
-            resolveAttachRefs[numColourAttachments].attachment = VK_ATTACHMENT_UNUSED;
-            resolveAttachRefs[numColourAttachments].layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-
-            if( colourFormat != PF_UNKNOWN )
-            {
-                colourAttachRefs[numColourAttachments].attachment = attachmentIdx;
-                colourAttachRefs[numColourAttachments].layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-
-                attachments[attachmentIdx].samples = static_cast<VkSampleCountFlagBits>(colourSamples);
-                attachments[attachmentIdx].format = VulkanMappings::get( colourFormat );
-                attachments[attachmentIdx].initialLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-                attachments[attachmentIdx].finalLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-                ++attachmentIdx;
-
-                if( resolveColourFormat != PF_UNKNOWN )
-                {
-                    usesResolveAttachments = true;
-
-                    attachments[attachmentIdx].samples = VK_SAMPLE_COUNT_1_BIT;
-                    attachments[attachmentIdx].format = VulkanMappings::get(resolveColourFormat);
-                    attachments[attachmentIdx].initialLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-                    attachments[attachmentIdx].finalLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-
-                    resolveAttachRefs[numColourAttachments].attachment = attachmentIdx;
-                    resolveAttachRefs[numColourAttachments].layout =
-                        VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-                    ++attachmentIdx;
-                }
-                ++numColourAttachments;
-            }
-        }
-
-        if( depthFormat != PF_UNKNOWN )
-        {
-            attachments[attachmentIdx].format = VulkanMappings::get( depthFormat );
-            attachments[attachmentIdx].samples = static_cast<VkSampleCountFlagBits>(colourSamples);
-            attachments[attachmentIdx].initialLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
-            attachments[attachmentIdx].finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
-
-            depthAttachRef.attachment = attachmentIdx;
-            depthAttachRef.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
-            ++attachmentIdx;
-        }
-
-        VkSubpassDescription subpass = {};
-        subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
-        subpass.inputAttachmentCount = 0u;
-        subpass.colorAttachmentCount = numColourAttachments;
-        subpass.pColorAttachments = colourAttachRefs;
-        subpass.pResolveAttachments = usesResolveAttachments ? resolveAttachRefs : 0;
-        subpass.pDepthStencilAttachment = ( depthFormat != PF_UNKNOWN ) ? &depthAttachRef : 0;
-
-        VkRenderPassCreateInfo renderPassCreateInfo = {VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO};
-        renderPassCreateInfo.attachmentCount = attachmentIdx;
-        renderPassCreateInfo.pAttachments = attachments;
-        renderPassCreateInfo.subpassCount = 1u;
-        renderPassCreateInfo.pSubpasses = &subpass;
-
-        uint32 hash = FastHash((const char*)&attachments, sizeof(VkAttachmentDescription) * attachmentIdx);
-
-        VkRenderPass retVal = mRenderPassCache[hash];
-
-        if(retVal != VK_NULL_HANDLE)
-            return retVal;
-
-        OGRE_VK_CHECK(vkCreateRenderPass(mDevice->mGraphicsQueue.mDevice, &renderPassCreateInfo, 0, &retVal));
-        mRenderPassCache[hash] = retVal;
-        return retVal;
     }
     //-------------------------------------------------------------------------
     void VulkanRenderSystem::setColourBlendState(const ColourBlendState& state)
