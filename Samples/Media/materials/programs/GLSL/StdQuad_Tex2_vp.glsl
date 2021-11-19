@@ -1,15 +1,16 @@
-uniform mat4 worldViewProj;
-attribute vec4 vertex;
-attribute vec2 uv0;
-varying vec2 oUv0;
-varying vec2 oUv1;
+#include <OgreUnifiedShader.h>
 
-void main()
+OGRE_UNIFORMS(
+uniform mat4 worldViewProj;
+)
+
+MAIN_PARAMETERS
+IN(vec4 vertex, POSITION)
+IN(vec2 uv0, TEXCOORD0)
+OUT(vec2 oUv0, TEXCOORD0)
+MAIN_DECLARATION
 {
 	// Use standardise transform, so work accord with render system specific (RS depth, requires texture flipping, etc)
-    gl_Position = worldViewProj * vertex;
-
-    // Convert to image-space
+    gl_Position = mul(worldViewProj, vertex);
     oUv0 = uv0;
-    oUv1 = oUv0;
 }

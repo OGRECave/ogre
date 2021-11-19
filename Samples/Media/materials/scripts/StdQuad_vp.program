@@ -10,18 +10,6 @@ vertex_program Ogre/Compositor/StdQuad_Cg_vp cg
 	}
 }
 
-vertex_program Ogre/Compositor/StdQuad_Tex2_Cg_vp cg
-{
-	source StdQuad_vp.cg
-	entry_point StdQuad_Tex2_vp
-	profiles vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3 vs_2_0 vs_1_1 arbvp1
-
-	default_params
-	{
-		param_named_auto worldViewProj worldviewproj_matrix
-	}
-}
-
 vertex_program Ogre/Compositor/StdQuad_Tex2a_Cg_vp cg
 {
 	source StdQuad_vp.cg
@@ -67,7 +55,7 @@ vertex_program Ogre/Compositor/StdQuad_GLSL_vp glsl glsles
     }
 }
 
-vertex_program Ogre/Compositor/StdQuad_Tex2_GLSL_vp glsl glsles
+vertex_program Ogre/Compositor/StdQuad_Tex2_vp glsl glsles glslang hlsl
 {
 	source StdQuad_Tex2_vp.glsl
 	default_params
@@ -107,18 +95,6 @@ vertex_program Ogre/Compositor/StdQuad_HLSL_vp hlsl
 {
 	source StdQuad_vp.cg
 	entry_point StdQuad_vp
-	target vs_1_1 vs_2_0
-
-	default_params
-	{
-		param_named_auto worldViewProj worldviewproj_matrix
-	}
-}
-
-vertex_program Ogre/Compositor/StdQuad_Tex2_HLSL_vp hlsl
-{
-	source StdQuad_vp.cg
-	entry_point StdQuad_Tex2_vp
 	target vs_1_1 vs_2_0
 
 	default_params
@@ -175,13 +151,6 @@ vertex_program Ogre/Compositor/StdQuad_NoCG_vp unified
 {
 	delegate Ogre/Compositor/StdQuad_HLSL_vp
 	delegate Ogre/Compositor/StdQuad_GLSL_vp
-}
-
-vertex_program Ogre/Compositor/StdQuad_Tex2_vp unified
-{
-	delegate Ogre/Compositor/StdQuad_Tex2_GLSL_vp
-	delegate Ogre/Compositor/StdQuad_Tex2_HLSL_vp	
-	delegate Ogre/Compositor/StdQuad_Tex2_Cg_vp
 }
 
 vertex_program Ogre/Compositor/StdQuad_Tex2a_vp unified
