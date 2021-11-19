@@ -189,8 +189,6 @@ namespace Ogre
 
         void notifySwapchainDestroyed();
 
-        VkRenderPass getVkRenderPass();
-
         VulkanDevice *getVulkanDevice() const { return mDevice; }
         void _notifyDeviceStalled();
 

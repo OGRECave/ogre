@@ -493,6 +493,10 @@ namespace Ogre
                 ++attachmentIdx;
         }
     }
+    VkRenderPass VulkanRenderPassDescriptor::getRenderPass() const
+    {
+        return mSharedFboItor->second.mRenderPass;
+    }
     //-----------------------------------------------------------------------------------
     void VulkanRenderPassDescriptor::performLoadActions()
     {
