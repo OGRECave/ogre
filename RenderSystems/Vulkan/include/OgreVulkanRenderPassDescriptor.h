@@ -80,7 +80,8 @@ namespace Ogre
     public:
         VulkanTextureGpu* mColour[1];
         VulkanTextureGpu* mDepth;
-        uint8                   mNumColourEntries = 0;
+        uint8             mNumColourEntries = 0;
+        uint8             mSlice = 0;
     private:
         // 1 per MRT
         // 1 per MRT MSAA resolve

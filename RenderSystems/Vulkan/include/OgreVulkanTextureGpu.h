@@ -48,6 +48,8 @@ namespace Ogre
      *  @{
      */
 
+    class VulkanRenderPassDescriptor;
+
     namespace ResourceAccess
     {
     /// Enum identifying the texture access privilege
@@ -170,10 +172,16 @@ namespace Ogre
 
     class VulkanRenderTexture : public RenderTexture
     {
+        VulkanTextureGpu* mTexture;
+        std::unique_ptr<VulkanTextureGpu> mDepthTexture;
+        std::unique_ptr<VulkanRenderPassDescriptor> mRenderPassDescriptor;
     public:
-        VulkanRenderTexture(const String &name, HardwarePixelBuffer *buffer, uint32 zoffset);
+        VulkanRenderTexture(const String& name, HardwarePixelBuffer* buffer, uint32 zoffset, VulkanTextureGpu* target,
+                            uint32 face);
 
         bool requiresTextureFlipping() const override { return false; }
+
+        VulkanRenderPassDescriptor* getRenderPassDescriptor() const { return mRenderPassDescriptor.get(); }
     };
 
     /** @} */

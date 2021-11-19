@@ -172,8 +172,8 @@ namespace Ogre
             }
             else
             {
-                attachment.initialLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-                attachment.finalLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+                attachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+                attachment.finalLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
             }
         }
         else
@@ -186,11 +186,11 @@ namespace Ogre
         }
 
         const uint8 mipLevel = 0;//bResolveTex ? colour.resolveMipLevel : colour.mipLevel;
-        const uint16 slice = 0;//bResolveTex ? colour.resolveSlice : colour.slice;
+        //mSlice = bResolveTex ? colour.resolveSlice : colour.slice;
 
         if( !texture->isRenderWindowSpecific() || ( texture->isMultisample() && !bResolveTex ) )
         {
-            fboDesc.mImageViews[currAttachmIdx] = texture->_createView(mipLevel, 0, slice, 1u, texName);
+            fboDesc.mImageViews[currAttachmIdx] = texture->_createView(mipLevel, 1, mSlice, 1u, texName);
         }
         else
         {
@@ -250,7 +250,7 @@ namespace Ogre
         VulkanTextureGpu *texture = mDepth;
         VkImage texName =
             texture->getMsaaTextureName() ? texture->getMsaaTextureName() : texture->getFinalTextureName();
-        return texture->_createView(0, 0, 0, 1u, texName);
+        return texture->_createView(0, 1, 0, 1u, texName);
     }
     //-----------------------------------------------------------------------------------
     void VulkanRenderPassDescriptor::setupFbo( VulkanFrameBufferDescValue &fboDesc )
@@ -320,11 +320,36 @@ namespace Ogre
 
         fboDesc.mNumImageViews = attachmentIdx;
 
+		// Use subpass dependencies for layout transitions for RenderTextures
+		std::array<VkSubpassDependency, 2> dependencies;
+		dependencies[0].srcSubpass = VK_SUBPASS_EXTERNAL;
+		dependencies[0].dstSubpass = 0;
+		dependencies[0].srcStageMask = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+		dependencies[0].dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+		dependencies[0].srcAccessMask = VK_ACCESS_SHADER_READ_BIT;
+		dependencies[0].dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+		dependencies[0].dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT;
+
+		dependencies[1].srcSubpass = 0;
+		dependencies[1].dstSubpass = VK_SUBPASS_EXTERNAL;
+		dependencies[1].srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+		dependencies[1].dstStageMask = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+		dependencies[1].srcAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+		dependencies[1].dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
+		dependencies[1].dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT;
+
         VkRenderPassCreateInfo renderPassCreateInfo = {VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO};
         renderPassCreateInfo.attachmentCount = attachmentIdx;
         renderPassCreateInfo.pAttachments = attachments;
         renderPassCreateInfo.subpassCount = 1u;
         renderPassCreateInfo.pSubpasses = &subpass;
+
+        if(!hasRenderWindow)
+        {
+            renderPassCreateInfo.dependencyCount = dependencies.size();
+            renderPassCreateInfo.pDependencies = dependencies.data();
+        }
+
         OGRE_VK_CHECK(vkCreateRenderPass( mQueue->mDevice, &renderPassCreateInfo, 0, &fboDesc.mRenderPass ));
 
         VkFramebufferCreateInfo fbCreateInfo = {VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO};

@@ -1188,7 +1188,9 @@ namespace Ogre
 
         auto resolveColourFormat = PF_UNKNOWN;
         auto colourFormat = mCurrentRenderPassDescriptor->mColour[0]->getFormat();
-        auto depthFormat = mCurrentRenderPassDescriptor->mDepth->getFormat();
+        auto depthFormat = PF_UNKNOWN;
+        if(mCurrentRenderPassDescriptor->mDepth)
+            depthFormat = mCurrentRenderPassDescriptor->mDepth->getFormat();
         auto colourSamples = mCurrentRenderPassDescriptor->mColour[0]->getFSAA();
 
         bool usesResolveAttachments = false;
@@ -1438,6 +1440,10 @@ namespace Ogre
         if(auto win = dynamic_cast<VulkanWindow*>(target))
         {
             mCurrentRenderPassDescriptor = win->getRenderPassDescriptor();
+        }
+        if(auto rtt = dynamic_cast<VulkanRenderTexture*>(target))
+        {
+            mCurrentRenderPassDescriptor = rtt->getRenderPassDescriptor();
         }
     }
     void VulkanRenderSystem::clearFrameBuffer(unsigned int buffers, const ColourValue& colour, Real depth,
