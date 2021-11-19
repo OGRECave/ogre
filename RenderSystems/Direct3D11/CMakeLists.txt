@@ -55,5 +55,16 @@ if(OGRE_CONFIG_ENABLE_QUAD_BUFFER_STEREO)
   target_link_libraries(RenderSystem_Direct3D11 ${NVAPI_LIBRARIES})
 endif()
 
+target_include_directories(RenderSystem_Direct3D11 PUBLIC 
+    "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
+    $<INSTALL_INTERFACE:include/OGRE/RenderSystems/Direct3D11>)
+
+if(OGRE_CONFIG_ENABLE_QUAD_BUFFER_STEREO)
+target_include_directories(RenderSystem_Direct3D11 PUBLIC ${NVAPI_INCLUDE_DIR})
+target_link_directories(RenderSystem_Direct3D11 PUBLIC ${NVAPI_LIBRARY_DIR})
+endif()
+
+target_include_directories(RenderSystem_Direct3D11 PUBLIC ${DirectX11_INCLUDE_DIR})
+
 ogre_config_plugin(RenderSystem_Direct3D11)
 install(FILES ${HEADER_FILES} DESTINATION include/OGRE/RenderSystems/Direct3D11)

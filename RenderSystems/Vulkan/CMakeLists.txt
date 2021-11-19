@@ -28,10 +28,14 @@ endif()
 target_include_directories(RenderSystem_Vulkan PUBLIC
     "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
     $<INSTALL_INTERFACE:include/OGRE/RenderSystems/Vulkan>)
+    
+if(WIN32)
+    target_include_directories(RenderSystem_Vulkan PUBLIC $ENV{VULKAN_SDK}/Include)
+    target_link_directories(RenderSystem_Vulkan PUBLIC $ENV{VULKAN_SDK}/Lib)
+endif()
 
 ogre_config_framework(RenderSystem_Vulkan)
 
 ogre_config_plugin(RenderSystem_Vulkan)
 install(FILES ${HEADER_FILES} DESTINATION include/OGRE/RenderSystems/Vulkan)
 install(FILES ${PLATFORM_HEADERS} DESTINATION include/OGRE/RenderSystems/Vulkan/${PLATFORM_HEADER_INSTALL})
-install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include DESTINATION include/OGRE/RenderSystems/Vulkan)

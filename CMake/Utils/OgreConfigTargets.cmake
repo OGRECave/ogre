@@ -16,7 +16,7 @@ if(APPLE)
   if(NOT OGRE_BUILD_PLATFORM_ANDROID AND NOT APPLE_IOS)
     set(PLATFORM_NAME "macosx")
   elseif(APPLE_IOS)
-    set(PLATFORM_NAME "$(PLATFORM_NAME)")
+    set(PLATFORM_NAME "${PLATFORM_NAME}")
   endif()
 endif()
 

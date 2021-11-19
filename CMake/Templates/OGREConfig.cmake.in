@@ -132,6 +132,18 @@ if(@OGRE_BUILD_RENDERSYSTEM_D3D11@)
     ogre_declare_plugin(RenderSystem Direct3D11)
 endif()
 
+if(@OGRE_BUILD_RENDERSYSTEM_TINY@)
+    ogre_declare_plugin(RenderSystem Tiny)
+endif()
+
+if(@OGRE_BUILD_RENDERSYSTEM_METAL@)
+    ogre_declare_plugin(RenderSystem Metal)
+endif()
+
+if(@OGRE_BUILD_RENDERSYSTEM_VULKAN@)
+    ogre_declare_plugin(RenderSystem Vulkan)
+endif()
+
 if(@OGRE_BUILD_PLUGIN_STBI@)
     ogre_declare_plugin(Codec STBI)
 endif()

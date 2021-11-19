@@ -34,3 +34,4 @@ generate_export_header(RenderSystem_Tiny
 
 ogre_config_framework(RenderSystem_Tiny)
 ogre_config_plugin(RenderSystem_Tiny)
+install(FILES ${HEADER_FILES} DESTINATION include/OGRE/RenderSystems/Tiny)

@@ -41,5 +41,16 @@ if(OGRE_CONFIG_ENABLE_QUAD_BUFFER_STEREO)
   target_link_libraries(RenderSystem_Direct3D9 ${NVAPI_LIBRARIES})
 endif()
 
+target_include_directories(RenderSystem_Direct3D9 PUBLIC 
+    "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
+    $<INSTALL_INTERFACE:include/OGRE/RenderSystems/Direct3D9>)
+    
+if(OGRE_CONFIG_ENABLE_QUAD_BUFFER_STEREO)
+target_include_directories(RenderSystem_Direct3D9 PUBLIC ${NVAPI_INCLUDE_DIR})
+target_link_directories(RenderSystem_Direct3D9 PUBLIC ${NVAPI_LIBRARY_DIR})
+endif()
+
+target_include_directories(RenderSystem_Direct3D9 PUBLIC ${DirectX9_INCLUDE_DIR})
+
 ogre_config_plugin(RenderSystem_Direct3D9)
 install(FILES ${HEADER_FILES} DESTINATION include/OGRE/RenderSystems/Direct3D9)
