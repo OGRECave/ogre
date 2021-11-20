@@ -71,11 +71,16 @@ OUT(vec4 FragColor, 0)
 #ifdef VULKAN
 
 #ifdef OGRE_VERTEX_SHADER
-#define OGRE_UNIFORMS(x) layout(binding = 0, row_major) uniform OgreUniforms { x };
+#define OGRE_UNIFORMS_BEGIN layout(binding = 0, row_major) uniform OgreUniforms {
 #else
-#define OGRE_UNIFORMS(x) layout(binding = 1, row_major) uniform OgreUniforms { x };
+#define OGRE_UNIFORMS_BEGIN layout(binding = 1, row_major) uniform OgreUniforms {
 #endif
 
+#define OGRE_UNIFORMS_END };
+
 #else
-#define OGRE_UNIFORMS(x) x
+
+#define OGRE_UNIFORMS_BEGIN
+#define OGRE_UNIFORMS_END
+
 #endif
