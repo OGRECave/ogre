@@ -60,8 +60,6 @@ protected:
 
     void sliderMoved(Slider* slider);
 
-    void testCapabilities(const RenderSystemCapabilities* caps);
-
     //The difference between testCapabilities() is that features checked here aren't fatal errors.
     //which means the sample can run (with limited functionality) on those computers
     void checkHardwareSupport();
