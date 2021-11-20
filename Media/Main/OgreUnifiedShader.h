@@ -65,7 +65,8 @@ mat3 mtxFromCols(vec3 a, vec3 b, vec3 c)
 
 #define STATIC static
 
-#define OGRE_UNIFORMS(x) x
+#define OGRE_UNIFORMS_BEGIN
+#define OGRE_UNIFORMS_END
 
 #define MAIN_PARAMETERS void main(
 
@@ -150,3 +151,5 @@ mat3 mtxFromCols(vec3 a, vec3 b, vec3 c)
 #define TEXCOORD3  11
 #define TANGENT    14
 #endif
+
+#define OGRE_UNIFORMS(params) OGRE_UNIFORMS_BEGIN params OGRE_UNIFORMS_END
