@@ -1,10 +1,10 @@
-vertex_program glTF2/PBR_vs hlsl glsl glsles
+vertex_program glTF2/PBR_vs hlsl glsl glsles glslang
 {
 	source pbr-vert.glsl
     preprocessor_defines HAS_NORMALS,HAS_TANGENTS,HAS_UV
 }
 
-fragment_program glTF2/PBR_fs_glsl glsl
+fragment_program glTF2/PBR_fs_glsl glsl glslang
 {
 	source pbr-frag.glsl
     preprocessor_defines MANUAL_SRGB,SRGB_FAST_APPROXIMATION,HAS_NORMALS,HAS_TANGENTS,HAS_BASECOLORMAP,HAS_NORMALMAP,HAS_EMISSIVEMAP,HAS_METALROUGHNESSMAP,HAS_OCCLUSIONMAP,USE_IBL,USE_TEX_LOD

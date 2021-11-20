@@ -1,14 +1,12 @@
-#ifdef GL_ES
-#version 100
-#endif
-
 #include <OgreUnifiedShader.h>
 
 // The MIT License
 // Copyright (c) 2016-2017 Mohamad Moneimne and Contributors
 
+OGRE_UNIFORMS(
 uniform mat4 u_MVPMatrix;
 uniform mat4 u_ModelMatrix;
+)
 
 MAIN_PARAMETERS
 
