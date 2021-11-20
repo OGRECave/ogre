@@ -440,6 +440,9 @@ void GLSLangPlugin::install() {}
 //---------------------------------------------------------------------
 void GLSLangPlugin::initialise()
 {
+    if (!GpuProgramManager::isSyntaxSupported("gl_spirv") && !GpuProgramManager::isSyntaxSupported("spirv"))
+        return;
+
     // Create new factory
     mProgramFactory.reset(new GLSLangProgramFactory());
 
