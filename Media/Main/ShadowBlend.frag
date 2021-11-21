@@ -4,7 +4,8 @@ OGRE_UNIFORMS(
     uniform vec4 shadowColor;
 )
 
-MAIN(VOID)
+MAIN_PARAMETERS
+MAIN_DECLARATION
 {
     gl_FragColor = shadowColor;
 }
