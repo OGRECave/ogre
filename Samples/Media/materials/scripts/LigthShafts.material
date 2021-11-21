@@ -6,38 +6,10 @@
 
 // --------------------- Light shafts material ------------------------
 
-vertex_program LightShafts_VP_GLSL glsl glsles
+vertex_program LightShafts_VP glsl glsles hlsl glslang
 {
     source LightShafts.vert
-}
 
-vertex_program LightShafts_VP_HLSL hlsl
-{
-    source LightShafts.vert
-    target vs_2_0
-}
-
-fragment_program LightShafts_FP_GLSL glsl glsles
-{
-    source LightShafts.frag
-    default_params
-    {
-        param_named uDepthMap int 0
-        param_named uCookieMap int 1
-        param_named uNoiseMap int 2
-    }
-}
-
-fragment_program LightShafts_FP_HLSL hlsl
-{
-    source LightShafts.frag
-    target ps_2_0
-}
-
-vertex_program LightShafts_VP unified
-{
-    delegate LightShafts_VP_GLSL
-    delegate LightShafts_VP_HLSL
     default_params
     {
         param_named_auto uWorldView worldview_matrix
@@ -46,10 +18,15 @@ vertex_program LightShafts_VP unified
     }
 }
 
-fragment_program LightShafts_FP unified
+fragment_program LightShafts_FP glsl glsles hlsl glslang
 {
-    delegate LightShafts_FP_GLSL
-    delegate LightShafts_FP_HLSL
+    source LightShafts.frag
+    default_params
+    {
+        param_named uDepthMap int 0
+        param_named uCookieMap int 1
+        param_named uNoiseMap int 2
+    }
 }
 
 material LightShafts
