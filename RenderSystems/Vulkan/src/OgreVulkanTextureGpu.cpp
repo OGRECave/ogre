@@ -216,12 +216,12 @@ namespace Ogre
             imageInfo.flags |= VK_IMAGE_CREATE_CUBE_COMPATIBLE_BIT;
 
         imageInfo.usage |= VK_IMAGE_USAGE_SAMPLED_BIT;
-        if (mUsage & TU_RENDERTARGET)
-        {
-            imageInfo.usage |= PixelUtil::isDepth( mFormat )
-                                   ? VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT
-                                   : VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
-        }
+
+        if (PixelUtil::isDepth(mFormat))
+            imageInfo.usage |= VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
+        else if(mUsage & TU_RENDERTARGET)
+            imageInfo.usage |= VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+
         if( isUav() )
             imageInfo.usage |= VK_IMAGE_USAGE_STORAGE_BIT;
 
@@ -743,31 +743,32 @@ namespace Ogre
 
     VulkanRenderTexture::VulkanRenderTexture(const String& name, HardwarePixelBuffer* buffer, uint32 zoffset,
                                              VulkanTextureGpu* target, uint32 face)
-        : RenderTexture(buffer, zoffset), mTexture(target)
+        : RenderTexture(buffer, zoffset)
     {
         mName = name;
-
-        if(PixelUtil::isDepth(target->getFormat()))
-            return;
 
         auto texMgr = TextureManager::getSingletonPtr();
         VulkanDevice* device = static_cast<VulkanTextureGpuManager*>(texMgr)->getDevice();
 
-        mTexture->setFSAA(1, "");
+        target->setFSAA(1, "");
 
-        mDepthTexture.reset(new VulkanTextureGpu(texMgr, mName+"/Depth", 0, "", true, 0));
-        mDepthTexture->setWidth(mTexture->getWidth());
-        mDepthTexture->setHeight(mTexture->getHeight());
-        mDepthTexture->setFormat(PF_DEPTH32F);
-        mDepthTexture->setUsage(TU_RENDERTARGET);
-        mDepthTexture->createInternalResources();
-        mDepthTexture->setFSAA(1, "");
+        bool depthTarget = PixelUtil::isDepth(target->getFormat());
+
+        if(!depthTarget)
+        {
+            mDepthTexture.reset(new VulkanTextureGpu(texMgr, mName+"/Depth", 0, "", true, 0));
+            mDepthTexture->setWidth(target->getWidth());
+            mDepthTexture->setHeight(target->getHeight());
+            mDepthTexture->setFormat(PF_DEPTH32F);
+            mDepthTexture->createInternalResources();
+            mDepthTexture->setFSAA(1, "");
+        }
 
         mRenderPassDescriptor.reset(new VulkanRenderPassDescriptor(&device->mGraphicsQueue, device->mRenderSystem));
-        mRenderPassDescriptor->mColour[0] = mTexture;
+        mRenderPassDescriptor->mColour[0] = depthTarget ? 0 : target;
         mRenderPassDescriptor->mSlice = face;
-        mRenderPassDescriptor->mDepth = mDepthTexture.get();
-        mRenderPassDescriptor->mNumColourEntries = 1;
+        mRenderPassDescriptor->mDepth = depthTarget ? target : mDepthTexture.get();
+        mRenderPassDescriptor->mNumColourEntries = int(depthTarget == 0);
         mRenderPassDescriptor->entriesModified(true);
     }
 }  // namespace Ogre

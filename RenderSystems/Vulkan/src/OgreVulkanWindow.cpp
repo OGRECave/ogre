@@ -459,7 +459,6 @@ namespace Ogre
 
         mDepthTexture = new VulkanTextureGpu(texMgr, "RenderWindow DepthBuffer", 0, "", true, 0);
         mDepthTexture->setFormat(PF_DEPTH32F);
-        mDepthTexture->setUsage(TU_RENDERTARGET);
         mDepthTexture->setFSAA(mFSAA, "");
 #if 0
         mStencilBuffer = 0;
