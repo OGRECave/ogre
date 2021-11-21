@@ -38,8 +38,14 @@ namespace Ogre
     ShaderHelperGLSL::ShaderHelperGLSL() : ShaderHelper()
     {
         const auto& hmgr = HighLevelGpuProgramManager::getSingleton();
-        mIsGLES = hmgr.isLanguageSupported("glsles");
-        mIsGLSL = hmgr.isLanguageSupported("glsl") || mIsGLES;
+        for(auto lang : {"glsl", "hlsl", "glsles", "glslang"})
+        {
+            if(hmgr.isLanguageSupported(lang))
+            {
+                mLang = lang;
+                break;
+            }
+        }
     }
     //---------------------------------------------------------------------
     HighLevelGpuProgramPtr
@@ -49,15 +55,11 @@ namespace Ogre
         HighLevelGpuProgramManager& mgr = HighLevelGpuProgramManager::getSingleton();
         String progName = getVertexProgramName(prof, terrain, tt);
 
-        String lang = "hlsl";
-        if(mIsGLSL)
-            lang = mIsGLES ? "glsles" : "glsl";
-
         HighLevelGpuProgramPtr ret = mgr.getByName(progName, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
         if (!ret)
         {
             ret = mgr.createProgram(progName, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
-                                    lang, GPT_VERTEX_PROGRAM);
+                                    mLang, GPT_VERTEX_PROGRAM);
         }
         else
         {
@@ -80,15 +82,11 @@ namespace Ogre
         HighLevelGpuProgramManager& mgr = HighLevelGpuProgramManager::getSingleton();
         String progName = getFragmentProgramName(prof, terrain, tt);
 
-        String lang = "hlsl";
-        if(mIsGLSL)
-            lang = mIsGLES ? "glsles" : "glsl";
-
         HighLevelGpuProgramPtr ret = mgr.getByName(progName, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
         if (!ret)
         {
             ret = mgr.createProgram(progName, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
-                                    lang, GPT_FRAGMENT_PROGRAM);
+                                    mLang, GPT_FRAGMENT_PROGRAM);
         }
         else
         {
@@ -106,7 +104,7 @@ namespace Ogre
             ret->setParameter("preprocessor_defines", defines);
         }
 
-        if(!mIsGLSL)
+        if(mLang == "hlsl")
         {
             ret->setParameter("enable_backwards_compatibility", "true");
             ret->setParameter("target", "ps_4_0 ps_3_0 ps_2_b");
@@ -119,13 +117,7 @@ namespace Ogre
     void ShaderHelperGLSL::generateVertexProgramSource(const SM2Profile* prof, const Terrain* terrain,
                                                                                    TechniqueType tt, StringStream& outStream)
     {
-        if(mIsGLSL)
-        {
-            int version = mIsGLES ? 100 : 120;
-            outStream << "#version " << version << "\n";
-        }
-
-        if(mIsGLES) {
+        if(mLang == "glsles") {
             outStream << "precision highp int;\n";
             outStream << "precision highp float;\n";
         }
@@ -135,6 +127,7 @@ namespace Ogre
         outStream << "#include <TerrainTransforms.glsl>\n";
 
         outStream <<
+            "OGRE_UNIFORMS_BEGIN\n"
             "uniform mat4 worldMatrix;\n"
             "uniform mat4 viewProjMatrix;\n"
             "uniform vec2 lodMorph;\n"; // morph amount, morph LOD target
@@ -164,11 +157,12 @@ namespace Ogre
                 outStream << "uniform mat4 texViewProjMatrix" << i << ";\n";
             }
         }
+        outStream << "OGRE_UNIFORMS_END\n";
 
         outStream << "MAIN_PARAMETERS\n";
         if (compression)
         {
-            const char* idx2 = mIsGLSL ? "vec2" : "int2";
+            const char* idx2 = (mLang == "glsl" || mLang == "glsles") ? "vec2" : "ivec2";
             outStream << "IN(" << idx2 << " vertex, POSITION)\n"
                          "IN(float uv0, TEXCOORD0)\n";
         }
@@ -256,17 +250,12 @@ namespace Ogre
     void ShaderHelperGLSL::generateFpHeader(const SM2Profile* prof, const Terrain* terrain,
                                                                                    TechniqueType tt, StringStream& outStream)
     {
-        if (mIsGLSL)
-        {
-            int version = mIsGLES ? 100 : 120;
-            outStream << "#version " << version << "\n";
-        }
-
-        if(mIsGLES) {
+        if(mLang == "glsles") {
             outStream << "precision highp int;\n";
             outStream << "precision highp float;\n";
         }
 
+        outStream << "#define USE_OGRE_FROM_FUTURE\n";
         outStream << "#include <OgreUnifiedShader.h>\n";
         // shader libs
         outStream << "#include <SGXLib_NormalMap.glsl>\n";
@@ -280,29 +269,30 @@ namespace Ogre
         uint numLayers = std::min(maxLayers, static_cast<uint>(terrain->getLayerCount()));
 
         uint currentSamplerIdx = 0;
-        outStream << StringUtil::format("uniform SAMPLER2D(globalNormal, %d);\n", currentSamplerIdx++);
+        outStream << StringUtil::format("SAMPLER2D(globalNormal, %d);\n", currentSamplerIdx++);
 
         if (terrain->getGlobalColourMapEnabled() && prof->isGlobalColourMapEnabled())
         {
-            outStream << StringUtil::format("uniform SAMPLER2D(globalColourMap, %d);\n", currentSamplerIdx++);
+            outStream << StringUtil::format("SAMPLER2D(globalColourMap, %d);\n", currentSamplerIdx++);
         }
         if (prof->isLightmapEnabled())
         {
-            outStream << StringUtil::format("uniform SAMPLER2D(lightMap, %d);\n", currentSamplerIdx++);
+            outStream << StringUtil::format("SAMPLER2D(lightMap, %d);\n", currentSamplerIdx++);
         }
         // Blend textures - sampler definitions
         for (uint i = 0; i < numBlendTextures; ++i)
         {
-            outStream << StringUtil::format("uniform SAMPLER2D(blendTex%d, %d);\n", i, currentSamplerIdx++);
+            outStream << StringUtil::format("SAMPLER2D(blendTex%d, %d);\n", i, currentSamplerIdx++);
         }
 
         // Layer textures - sampler definitions & UV multipliers
         for (uint i = 0; i < numLayers; ++i)
         {
-            outStream << StringUtil::format("uniform SAMPLER2D(difftex%d, %d);\n", i, currentSamplerIdx++);
-            outStream << StringUtil::format("uniform SAMPLER2D(normtex%d, %d);\n", i, currentSamplerIdx++);
+            outStream << StringUtil::format("SAMPLER2D(difftex%d, %d);\n", i, currentSamplerIdx++);
+            outStream << StringUtil::format("SAMPLER2D(normtex%d, %d);\n", i, currentSamplerIdx++);
         }
 
+        outStream << "OGRE_UNIFORMS_BEGIN\n";
         // uv multipliers
         uint numUVMultipliers = (numLayers + 3) / 4; // integer ceil
         for (uint i = 0; i < numUVMultipliers; ++i)
@@ -320,7 +310,7 @@ namespace Ogre
             }
             for (uint i = 0; i < numShadowTextures; ++i)
             {
-                outStream << StringUtil::format("uniform SAMPLER2D(shadowMap%d, %d);\n", i, currentSamplerIdx++);
+                outStream << StringUtil::format("SAMPLER2D(shadowMap%d, %d);\n", i, currentSamplerIdx++);
                 outStream << "uniform float inverseShadowmapSize" << i << ";\n";
             }
         }
@@ -345,6 +335,8 @@ namespace Ogre
 
         if (fog)
             outStream << "uniform vec3 fogColour;\n";
+
+        outStream << "OGRE_UNIFORMS_END\n";
 
         outStream << "MAIN_PARAMETERS\n"
                      "IN(vec4 oPosObj, TEXCOORD0)\n";

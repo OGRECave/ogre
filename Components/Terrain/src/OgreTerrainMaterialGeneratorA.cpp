@@ -583,7 +583,7 @@ namespace Ogre
         }
 
         // Explicitly bind samplers for GLSL
-        if (mIsGLSL)
+        if (mLang == "glsl" || mLang == "glsles")
         {
             int numSamplers = 0;
             if (tt == LOW_LOD)

@@ -40,7 +40,7 @@ namespace Ogre
     class ShaderHelper : public TerrainAlloc
     {
     public:
-        ShaderHelper() : mShadowSamplerStartHi(0), mIsGLSL(false) {}
+        ShaderHelper() : mShadowSamplerStartHi(0) {}
         virtual ~ShaderHelper() {}
         HighLevelGpuProgramPtr generateVertexProgram(const SM2Profile* prof, const Terrain* terrain, TechniqueType tt);
         HighLevelGpuProgramPtr generateFragmentProgram(const SM2Profile* prof, const Terrain* terrain, TechniqueType tt);
@@ -62,7 +62,7 @@ namespace Ogre
 
         uint32 mShadowSamplerStartHi;
         uint32 mShadowSamplerStartLo;
-        bool mIsGLSL;
+        String mLang;
     };
 
     /// Utility class to help with generating shaders for unified GLSL.
@@ -70,7 +70,6 @@ namespace Ogre
     {
         ShaderHelperGLSL();
     protected:
-        bool mIsGLES;
         HighLevelGpuProgramPtr createVertexProgram(const SM2Profile* prof, const Terrain* terrain, TechniqueType tt);
         HighLevelGpuProgramPtr createFragmentProgram(const SM2Profile* prof, const Terrain* terrain, TechniqueType tt);
         void generateVertexProgramSource(const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, StringStream& outStream);
