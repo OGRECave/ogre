@@ -554,7 +554,7 @@ namespace Ogre
         //rsc->setCapability( RSC_EXPLICIT_FSAA_RESOLVE );
         rsc->setCapability( RSC_TEXTURE_1D );
 
-        rsc->setCapability( RSC_HWSTENCIL );
+        //rsc->setCapability( RSC_HWSTENCIL );
         rsc->setStencilBufferBitDepth( 8 );
         rsc->setNumTextureUnits( OGRE_MAX_TEXTURE_LAYERS );
         rsc->setCapability( RSC_TEXTURE_COMPRESSION );
