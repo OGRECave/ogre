@@ -1024,6 +1024,7 @@ namespace Ogre {
         mDomainShader.Reset();
         mHullShader.Reset();
         mComputeShader.Reset();
+        mDefaultBuffer.reset();
 
         unprepareImpl();
         mD3d11ShaderInputParameters.clear();
