@@ -6,10 +6,11 @@
 
 #include <OgreUnifiedShader.h>
 
-// UNIFORM
+OGRE_UNIFORMS(
 uniform mat4 uWorldView;
 uniform mat4 uWorldViewProj;
 uniform mat4 uTexWorldViewProj;
+)
 
 MAIN_PARAMETERS
 IN(vec4 vertex , POSITION)
