@@ -153,6 +153,3 @@ mat3 mtxFromCols(vec3 a, vec3 b, vec3 c)
 #endif
 
 #define OGRE_UNIFORMS(params) OGRE_UNIFORMS_BEGIN params OGRE_UNIFORMS_END
-
-#define VOID
-#define MAIN(inOutParams) MAIN_PARAMETERS inOutParams MAIN_DECLARATION
