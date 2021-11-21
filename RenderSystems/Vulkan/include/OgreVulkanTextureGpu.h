@@ -172,7 +172,6 @@ namespace Ogre
 
     class VulkanRenderTexture : public RenderTexture
     {
-        VulkanTextureGpu* mTexture;
         std::unique_ptr<VulkanTextureGpu> mDepthTexture;
         std::unique_ptr<VulkanRenderPassDescriptor> mRenderPassDescriptor;
     public:
