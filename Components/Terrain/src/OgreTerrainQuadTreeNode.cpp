@@ -1386,6 +1386,7 @@ namespace Ogre
     {
         if (isRenderedAtCurrentLod())
         {
+            mNodeWithVertexData->updateGpuVertexData();
             queue->addRenderable(this, mTerrain->getRenderQueueGroup());
         }
     }
@@ -1407,8 +1408,6 @@ namespace Ogre
     //---------------------------------------------------------------------
     void TerrainQuadTreeNode::getRenderOperation(RenderOperation& op)
     {
-        mNodeWithVertexData->updateGpuVertexData();
-
         op.indexData = mLodLevels[mCurrentLod]->gpuIndexData;
         op.operationType = RenderOperation::OT_TRIANGLE_STRIP;
         op.useIndexes = true;
