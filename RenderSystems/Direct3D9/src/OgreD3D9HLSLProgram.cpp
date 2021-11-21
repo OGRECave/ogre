@@ -99,6 +99,8 @@ namespace Ogre {
             cacheMicrocode->read( &def,  sizeof(GpuConstantDefinition));
 
             mParametersMap.emplace(paramName, def);
+
+            mLogicalToPhysical->bufferSize += def.elementSize * def.arraySize;
         }
     }
     //-----------------------------------------------------------------------
