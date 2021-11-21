@@ -77,7 +77,7 @@ float sampleDepth(in SAMPLER_TYPE shadowMap, vec2 uv, float depth)
 void SGX_ShadowPCF4(in SAMPLER_TYPE shadowMap, in vec4 shadowMapPos, in vec2 invTexSize, out float c)
 {
 	shadowMapPos = shadowMapPos / shadowMapPos.w;
-#if !defined(OGRE_REVERSED_Z) && !defined(OGRE_HLSL)
+#if !defined(OGRE_REVERSED_Z) && !defined(OGRE_HLSL) && !defined(VULKAN)
 	shadowMapPos.z = shadowMapPos.z * 0.5 + 0.5; // convert -1..1 to 0..1
 #endif
 	vec2 uv = shadowMapPos.xy;
