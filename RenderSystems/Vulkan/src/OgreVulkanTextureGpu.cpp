@@ -100,10 +100,17 @@ namespace Ogre
         region.imageExtent.height = mCurrentLock.getHeight();
         region.imageExtent.depth = mCurrentLock.getDepth();
 
+        if(mParent->getTextureType() == TEX_TYPE_2D_ARRAY)
+        {
+            region.imageSubresource.baseArrayLayer = mCurrentLock.front;
+            region.imageOffset.z = 0;
+        }
+
         vkCmdCopyBufferToImage(device->mGraphicsQueue.mCurrentCmdBuffer, srcBuffer, mParent->getFinalTextureName(),
                                 VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1u, &region);
 
-        if((mParent->getUsage() & TU_AUTOMIPMAP) && mFace == mParent->getNumFaces() - 1)
+        bool finalSlice = region.imageSubresource.baseArrayLayer == mParent->getNumLayers() - 1;
+        if((mParent->getUsage() & TU_AUTOMIPMAP) && finalSlice)
             mParent->_autogenerateMipmaps();
         mStagingBuffer.reset();
     }
@@ -205,6 +212,10 @@ namespace Ogre
         imageInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
         imageInfo.usage = VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT;
         imageInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+
+        if(mTextureType == TEX_TYPE_2D_ARRAY)
+            std::swap(imageInfo.extent.depth, imageInfo.arrayLayers);
+
         if( hasMsaaExplicitResolves() )
         {
             imageInfo.samples = VkSampleCountFlagBits(std::max(mFSAA, 1u));
@@ -301,7 +312,7 @@ namespace Ogre
             }
         }
 
-        mDefaultDisplaySrv = _createView(0, 0, 0, getNumFaces());
+        mDefaultDisplaySrv = _createView(0, 0, 0, getNumLayers());
 
         if( mFSAA > 1 && !hasMsaaExplicitResolves() )
             createMsaaSurface();
@@ -508,6 +519,12 @@ namespace Ogre
             region.dstOffsets[1].y = static_cast<int32_t>( std::max( internalHeight >> i, 1u ) );
             region.dstOffsets[1].z = static_cast<int32_t>( std::max( getDepth() >> i, 1u ) );
 
+            if(mTextureType == TEX_TYPE_2D_ARRAY)
+            {
+                region.srcOffsets[1].z = 1;
+                region.dstOffsets[1].z = 1;
+            }
+
             vkCmdBlitImage( device->mGraphicsQueue.mCurrentCmdBuffer, mFinalTextureName, mCurrLayout,
                             mFinalTextureName, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1u, &region,
                             VK_FILTER_LINEAR );
@@ -661,7 +678,7 @@ namespace Ogre
         imageMemBarrier.subresourceRange.baseMipLevel = 0u;
         imageMemBarrier.subresourceRange.levelCount = mNumMipmaps + 1;
         imageMemBarrier.subresourceRange.baseArrayLayer = 0;
-        imageMemBarrier.subresourceRange.layerCount = getNumFaces();
+        imageMemBarrier.subresourceRange.layerCount = getNumLayers();
         return imageMemBarrier;
     }
     //-----------------------------------------------------------------------------------
