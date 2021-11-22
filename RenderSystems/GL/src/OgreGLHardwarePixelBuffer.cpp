@@ -42,7 +42,7 @@ THE SOFTWARE.
 
 namespace Ogre {
 //-----------------------------------------------------------------------------  
-void GLTextureBuffer::blitFromMemory(const PixelBox &src)
+void GLTextureBuffer::_blitFromMemory(const PixelBox &src, const Box &dst)
 {
     if(!mBuffer.contains(src))
         OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "destination box out of range",
@@ -63,7 +63,7 @@ void GLTextureBuffer::blitFromMemory(const PixelBox &src)
         converted = src;
     }
     
-    upload(converted, src);
+    upload(converted, dst);
     freeBuffer();
 }
 //-----------------------------------------------------------------------------  
@@ -611,7 +611,7 @@ void GLTextureBuffer::blitFromMemory(const PixelBox &src, const Box &dstBox)
     if (!GLEW_EXT_framebuffer_object ||
         (src.getSize() == dstBox.getSize()))
     {
-        blitFromMemory(src);
+        _blitFromMemory(src, dstBox);
         return;
     }
     if(!mBuffer.contains(dstBox))

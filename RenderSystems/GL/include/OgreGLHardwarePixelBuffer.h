@@ -57,12 +57,12 @@ namespace Ogre {
         void copyFromFramebuffer(uint32 zoffset);
         /// @copydoc HardwarePixelBuffer::blit
         void blit(const HardwarePixelBufferSharedPtr &src, const Box &srcBox, const Box &dstBox);
-        /// Blitting implementation
-        void blitFromTexture(GLTextureBuffer *src, const Box &srcBox, const Box &dstBox);
-
-        void blitFromMemory(const PixelBox &src);
         void blitToMemory(const Box &srcBox, const PixelBox &dst) override;
     protected:
+        /// Blitting implementation
+        void blitFromTexture(GLTextureBuffer *src, const Box &srcBox, const Box &dstBox);
+        void _blitFromMemory(const PixelBox &src, const Box &dst);
+
         // In case this is a texture level
         GLenum mTarget;
         GLenum mFaceTarget; // same as mTarget in case of GL_TEXTURE_xD, but cubemap face for cubemaps
