@@ -986,7 +986,8 @@ namespace Ogre
         std::vector<VkVertexInputBindingDescription> bufferBindings;
         for(auto it : op.vertexData->vertexBufferBinding->getBindings())
         {
-            bufferBindings.push_back({it.first, uint32(it.second->getVertexSize()), VK_VERTEX_INPUT_RATE_VERTEX});
+            auto inputRate = it.second->isInstanceData() ? VK_VERTEX_INPUT_RATE_INSTANCE : VK_VERTEX_INPUT_RATE_VERTEX;
+            bufferBindings.push_back({it.first, uint32(it.second->getVertexSize()), inputRate});
             auto b = it.second->_getImpl<VulkanHardwareBuffer>()->getVkBuffer();
             vertexBuffers.push_back(b);
         }
