@@ -408,7 +408,7 @@ void SceneManager::ShadowRenderer::renderModulativeTextureShadowedQueueGroupObje
                 TextureUnitState* t = NULL;
                 // Add spot fader if not present already
                 if (targetPass->getNumTextureUnitStates() == 2 &&
-                    targetPass->getTextureUnitState(1)->getTextureName() == "spot_shadow_fade.dds")
+                    targetPass->getTextureUnitState(1)->_getTexturePtr() == mSpotFadeTexture)
                 {
                     // Just set
                     t = targetPass->getTextureUnitState(1);
@@ -419,7 +419,8 @@ void SceneManager::ShadowRenderer::renderModulativeTextureShadowedQueueGroupObje
                     while(targetPass->getNumTextureUnitStates() > 1)
                         targetPass->removeTextureUnitState(1);
 
-                    t = targetPass->createTextureUnitState("spot_shadow_fade.dds");
+                    t = targetPass->createTextureUnitState();
+                    t->setTexture(mSpotFadeTexture);
                     t->setColourOperation(LBO_ADD);
                     t->setTextureAddressingMode(TextureUnitState::TAM_CLAMP);
                 }
@@ -1307,10 +1308,14 @@ void SceneManager::ShadowRenderer::setShadowTechnique(ShadowTechnique technique)
         }
     }
 
+    if (mShadowTechnique == SHADOWTYPE_TEXTURE_MODULATIVE && !mSpotFadeTexture)
+        mSpotFadeTexture = TextureManager::getSingleton().load("spot_shadow_fade.dds", RGN_INTERNAL);
+
     if ((mShadowTechnique & SHADOWDETAILTYPE_TEXTURE) == 0)
     {
         // Destroy shadow textures to optimise resource usage
-        mSceneManager->destroyShadowTextures();
+        destroyShadowTextures();
+        mSpotFadeTexture.reset();
     }
     else
     {
