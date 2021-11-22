@@ -655,6 +655,7 @@ namespace Ogre {
 
             SamplerPtr mBorderSampler;
 
+            TexturePtr mSpotFadeTexture;
             TexturePtr mNullShadowTexture;
             CameraList mShadowTextureCameras;
             LightList mShadowTextureCurrentCasterLightList;
