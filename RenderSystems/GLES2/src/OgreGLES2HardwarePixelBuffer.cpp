@@ -47,7 +47,7 @@ THE SOFTWARE.
 #include "OgreLogManager.h"
 
 namespace Ogre {
-    void GLES2TextureBuffer::blitFromMemory(const PixelBox &src)
+    void GLES2TextureBuffer::_blitFromMemory(const PixelBox &src, const Box &dst)
     {
         if (!mBuffer.contains(src))
         {
@@ -72,7 +72,7 @@ namespace Ogre {
             converted = src;
         }
 
-        upload(converted, src);
+        upload(converted, dst);
         freeBuffer();
     }
 
@@ -467,7 +467,7 @@ namespace Ogre {
         if(true ||
            (src.getSize() == dstBox.getSize()))
         {
-            blitFromMemory(src);
+            _blitFromMemory(src, dstBox);
             return;
         }
         if(!mBuffer.contains(dstBox))

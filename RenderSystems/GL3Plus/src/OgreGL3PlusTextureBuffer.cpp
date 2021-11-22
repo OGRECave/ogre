@@ -492,7 +492,7 @@ namespace Ogre {
         // the source dimensions match the destination ones, in which case no scaling is needed
         if (src.getSize() == dstBox.getSize())
         {
-            blitFromMemory(src);
+            _blitFromMemory(src, dstBox);
             return;
         }
 
@@ -513,7 +513,7 @@ namespace Ogre {
         // Delete temp texture
         TextureManager::getSingleton().remove(tex);
     }
-    void GL3PlusTextureBuffer::blitFromMemory(const PixelBox &src)
+    void GL3PlusTextureBuffer::_blitFromMemory(const PixelBox &src, const Box& dst)
     {
         PixelBox converted;
 
@@ -531,7 +531,7 @@ namespace Ogre {
             converted = src;
         }
 
-        upload(converted, src);
+        upload(converted, dst);
         freeBuffer();
     }
 

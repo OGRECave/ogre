@@ -57,10 +57,6 @@ namespace Ogre {
 
             /// @copydoc HardwarePixelBuffer::blit
             void blit(const HardwarePixelBufferSharedPtr &src, const Box &srcBox, const Box &dstBox);
-            // Blitting implementation
-            void blitFromTexture(GLES2TextureBuffer *src, const Box &srcBox, const Box &dstBox);
-            
-            void blitFromMemory(const PixelBox &src);
             void blitToMemory(const Box &srcBox, const PixelBox &dst) override;
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
@@ -72,6 +68,10 @@ namespace Ogre {
 #endif
                 
         protected:
+            // Blitting implementation
+            void blitFromTexture(GLES2TextureBuffer *src, const Box &srcBox, const Box &dstBox);
+            void _blitFromMemory(const PixelBox &src, const Box &dst);
+
             // In case this is a texture level
             GLenum mTarget;
             GLenum mFaceTarget; // same as mTarget in case of GL_TEXTURE_xD, but cubemap face for cubemaps
