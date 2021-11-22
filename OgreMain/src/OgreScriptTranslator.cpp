@@ -3719,15 +3719,28 @@ namespace Ogre{
         }
     }
     //-------------------------------------------------------------------------
-    static int parseProgramParameterDimensions(String& declarator, const char* type)
+    static int parseProgramParameterDimensions(String& declarator, BaseConstantType& type)
     {
         // Assume 1 unless otherwise specified
         int dimensions = 1;
 
-        if(declarator.size() == strlen(type))
-            return dimensions;
+        // get the type
+        const char* typeStrings[] = {"float", "int", "uint", "double", "bool"};
+        BaseConstantType baseTypes[] = {BCT_FLOAT, BCT_INT, BCT_UINT, BCT_DOUBLE, BCT_BOOL};
 
-        size_t start = declarator.find_first_not_of(type);
+        const char* typeStr = "";
+
+        for(int i = 0; i < 5; ++i)
+        {
+            if(declarator.find(typeStrings[i]) == 0)
+            {
+                type = baseTypes[i];
+                typeStr = typeStrings[i];
+                break;
+            }
+        }
+
+        size_t start = declarator.find_first_not_of(typeStr);
 
         if (start != String::npos)
         {
@@ -3840,8 +3853,8 @@ namespace Ogre{
                             }
                             else
                             {
-                                // GpuProgramParameters::ElementType type = GpuProgramParameters::ET_FLOAT;
                                 int count;
+                                BaseConstantType type;
 
                                 // First, clear out any offending auto constants
                                 if (named)
@@ -3849,12 +3862,11 @@ namespace Ogre{
                                 else
                                     params->clearAutoConstant(index);
 
-                                if (atom1->value.find("float") != String::npos)
-                                {
-                                    // type = GpuProgramParameters::ET_FLOAT;
-                                    count = parseProgramParameterDimensions(atom1->value, "float");
-                                    int roundedCount = count%4 != 0 ? count + 4 - (count%4) : count;
+                                count = parseProgramParameterDimensions(atom1->value, type);
+                                int roundedCount = (count + 3) / 4; // integer ceil
 
+                                if (type == BCT_FLOAT)
+                                {
                                     std::vector<float> vals;
                                     if (_getVector(k, prop->values.end(), vals, roundedCount))
                                     {
@@ -3877,11 +3889,8 @@ namespace Ogre{
                                                            "incorrect float constant declaration");
                                     }
                                 }
-                                else if (atom1->value.find("uint") != String::npos)
+                                else if (type == BCT_UINT)
                                 {
-                                    count = parseProgramParameterDimensions(atom1->value, "uint");
-                                    int roundedCount = count%4 != 0 ? count + 4 - (count%4) : count;
-
                                     std::vector<uint> vals;
                                     if (_getVector(k, prop->values.end(), vals, roundedCount))
                                     {
@@ -3904,11 +3913,8 @@ namespace Ogre{
                                                            "incorrect unsigned integer constant declaration");
                                     }
                                 }
-                                else if (atom1->value.find("int") != String::npos)
+                                else if (type == BCT_INT)
                                 {
-                                    count = parseProgramParameterDimensions(atom1->value, "int");
-                                    int roundedCount = count%4 != 0 ? count + 4 - (count%4) : count;
-
                                     std::vector<int> vals;
                                     if (_getVector(k, prop->values.end(), vals, roundedCount))
                                     {
@@ -3921,8 +3927,8 @@ namespace Ogre{
                                         }
                                         catch (Exception& e)
                                         {
-                                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                                               e.getDescription());
+                                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file,
+                                                                prop->line, e.getDescription());
                                         }
                                     }
                                     else
@@ -3931,11 +3937,8 @@ namespace Ogre{
                                                            "incorrect integer constant declaration");
                                     }
                                 }
-                                else if (atom1->value.find("double") != String::npos)
+                                else if (type == BCT_DOUBLE)
                                 {
-                                    count = parseProgramParameterDimensions(atom1->value, "double");
-                                    int roundedCount = count%4 != 0 ? count + 4 - (count%4) : count;
-
                                     std::vector<double> vals;
                                     if (_getVector(k, prop->values.end(), vals, roundedCount))
                                     {
@@ -3958,11 +3961,8 @@ namespace Ogre{
                                                            "incorrect double constant declaration");
                                     }
                                 }                                
-                                else if (atom1->value.find("bool") != String::npos)
+                                else if (type == BCT_BOOL)
                                 {
-                                    count = parseProgramParameterDimensions(atom1->value, "bool");
-                                    int roundedCount = count%4 != 0 ? count + 4 - (count%4) : count;
-
                                     std::vector<bool> tmp;
                                     if (_getVector(k, prop->values.end(), tmp, roundedCount))
                                     {
