@@ -710,20 +710,7 @@ material Examples/Athene/NormalMappedSpecular : Examples/BumpMapping/MultiLightS
 	}
 }
 
-
-vertex_program Examples/TextureArrayVScg hlsl
-{
-	source Example_TextureArrayVS.cg
-	entry_point textureArray_v
-	target vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3
-
-	default_params
-	{
-		param_named_auto worldViewProj worldviewproj_matrix
-	}
-}
-
-vertex_program Examples/TextureArrayVS glsl glsles hlsl
+vertex_program Examples/TextureArrayVS glsl glsles hlsl glslang
 {
 	source Example_TextureArrayVS.glsl
 
@@ -733,7 +720,7 @@ vertex_program Examples/TextureArrayVS glsl glsles hlsl
 	}
 }
 
-fragment_program Examples/TextureArrayPSglsl glsl
+fragment_program Examples/TextureArrayPSglsl glsl glslang
 {
 	source Example_TextureArrayPS.glsl
 }
