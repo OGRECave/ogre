@@ -128,6 +128,8 @@ void GLSLProgramWriter::writeUniformBlock(std::ostream& os, const String& name, 
 
     for (auto uparam : uniforms)
     {
+        if(uparam->getType() == GCT_MATRIX_3X4 || uparam->getType() == GCT_MATRIX_2X4)
+            os << "layout(column_major) ";
         writeParameter(os, uparam);
         os << ";\n";
     }
