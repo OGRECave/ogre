@@ -1229,9 +1229,9 @@ namespace Ogre
 
     void VulkanRenderSystem::_setDepthBias(float constantBias, float slopeScaleBias)
     {
-        rasterState.depthBiasEnable = constantBias != 0.0f;
-        rasterState.depthBiasConstantFactor = constantBias;
-        rasterState.depthBiasSlopeFactor = slopeScaleBias;
+        rasterState.depthBiasEnable = (constantBias + slopeScaleBias) != 0.0f;
+        rasterState.depthBiasConstantFactor = -constantBias;
+        rasterState.depthBiasSlopeFactor = -slopeScaleBias;
     }
 
     void VulkanRenderSystem::_setAlphaRejectSettings(CompareFunction func, unsigned char value, bool alphaToCoverage)
