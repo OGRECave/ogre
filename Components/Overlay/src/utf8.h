@@ -23,7 +23,7 @@
  * error, but it will always advance at least one byte.
  */
 static const char *
-utf8_decode(const char *s, uint32_t *c, int *e)
+utf8_decode(const char *buf, uint32_t *c, int *e)
 {
     static const char lengths[] = {
         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
@@ -34,13 +34,14 @@ utf8_decode(const char *s, uint32_t *c, int *e)
     static const int shiftc[] = {0, 18, 12, 6, 0};
     static const int shifte[] = {0, 6, 4, 2, 0};
 
+    const unsigned char *s = (const unsigned char *)buf;
     int len = lengths[s[0] >> 3];
 
     /* Compute the pointer to the next character early so that the next
      * iteration can start working on the next character. Neither Clang
      * nor GCC figure out this reordering on their own.
      */
-    const char *next = s + len + !len;
+    const char *next = buf + len + !len;
 
     /* Assume a four-byte character and load four bytes. Unused bits are
      * shifted out.
