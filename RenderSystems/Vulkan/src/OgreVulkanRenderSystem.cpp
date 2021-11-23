@@ -1002,9 +1002,6 @@ namespace Ogre
 
         inputAssemblyCi.topology = VulkanMappings::get( op.operationType );
 
-        auto numberOfInstances = op.numberOfInstances;
-        //const bool hasInstanceData = mCurrentVertexBuffer->vertexBufferBinding->hasInstanceData();
-
         VkCommandBuffer cmdBuffer = mActiveDevice->mGraphicsQueue.mCurrentCmdBuffer;
 
         if(!vertexBuffers.empty())
@@ -1040,7 +1037,7 @@ namespace Ogre
                                        0.f, mDerivedDepthBiasSlopeScale * biasSign );
                 }
 
-                vkCmdDrawIndexed(cmdBuffer, (uint32)op.indexData->indexCount, numberOfInstances,
+                vkCmdDrawIndexed(cmdBuffer, (uint32)op.indexData->indexCount, op.numberOfInstances,
                                  (uint32)op.indexData->indexStart, (int32)op.vertexData->vertexStart, 0u);
             } while( updatePassIterationRenderState() );
         }
@@ -1059,7 +1056,7 @@ namespace Ogre
                                        0.0f, mDerivedDepthBiasSlopeScale * biasSign );
                 }
                 const uint32 vertexStart = static_cast<uint32>( op.vertexData->vertexStart );
-                vkCmdDraw(cmdBuffer, (uint32)op.vertexData->vertexCount, numberOfInstances, vertexStart, 0u);
+                vkCmdDraw(cmdBuffer, (uint32)op.vertexData->vertexCount, op.numberOfInstances, vertexStart, 0u);
             } while( updatePassIterationRenderState() );
         }
     }

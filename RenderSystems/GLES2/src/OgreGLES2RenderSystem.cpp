@@ -1196,16 +1196,12 @@ namespace Ogre {
 
         HardwareVertexBufferSharedPtr globalInstanceVertexBuffer;
         VertexDeclaration* globalVertexDeclaration = 0;
-        bool hasInstanceData = false;
+
         size_t numberOfInstances = 0;
         if(getCapabilities()->hasCapability(RSC_VERTEX_BUFFER_INSTANCE_DATA))
         {
             globalInstanceVertexBuffer = getGlobalInstanceVertexBuffer();
             globalVertexDeclaration = getGlobalInstanceVertexBufferVertexDeclaration();
-            hasInstanceData = (op.useGlobalInstancingVertexBufferIsAvailable &&
-                                globalInstanceVertexBuffer && (globalVertexDeclaration != NULL))
-                                || op.vertexData->vertexBufferBinding->hasInstanceData();
-
             numberOfInstances = op.numberOfInstances;
 
             if (op.useGlobalInstancingVertexBufferIsAvailable)
@@ -1284,7 +1280,7 @@ namespace Ogre {
 
             do
             {
-                if(hasInstanceData && getCapabilities()->hasCapability(RSC_VERTEX_BUFFER_INSTANCE_DATA))
+                if(numberOfInstances > 1)
                 {
                     OGRE_CHECK_GL_ERROR(glDrawElementsInstancedEXT((polyMode == GL_FILL) ? primType : polyMode, static_cast<GLsizei>(op.indexData->indexCount), indexType, pBufferData, static_cast<GLsizei>(numberOfInstances)));
                 }
@@ -1299,7 +1295,7 @@ namespace Ogre {
         {
             do
             {
-                if(getCapabilities()->hasCapability(RSC_VERTEX_BUFFER_INSTANCE_DATA) && hasInstanceData)
+                if(numberOfInstances > 1)
                 {
                     OGRE_CHECK_GL_ERROR(glDrawArraysInstancedEXT((polyMode == GL_FILL) ? primType : polyMode, 0, static_cast<GLsizei>(op.vertexData->vertexCount), static_cast<GLsizei>(numberOfInstances)));
                 }

@@ -3011,10 +3011,6 @@ namespace Ogre
         
         HardwareVertexBufferSharedPtr globalInstanceVertexBuffer = getGlobalInstanceVertexBuffer();
         VertexDeclaration* globalVertexDeclaration = getGlobalInstanceVertexBufferVertexDeclaration();
-        bool hasInstanceData = useGlobalInstancingVertexBufferIsAvailable &&
-                    globalInstanceVertexBuffer && globalVertexDeclaration != NULL 
-                || binding->hasInstanceData();
-
 
         // TODO: attempt to detect duplicates
         const VertexBufferBinding::VertexBufferBindingMap& binds = binding->getBindings();
@@ -3050,7 +3046,7 @@ namespace Ogre
             }
 
             // SetStreamSourceFreq
-            if ( hasInstanceData ) 
+            if ( numberOfInstances > 1 )
             {
                 if ( i->second->isInstanceData() )
                 {

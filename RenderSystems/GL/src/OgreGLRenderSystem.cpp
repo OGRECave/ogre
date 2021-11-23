@@ -2305,10 +2305,6 @@ namespace Ogre {
 
         HardwareVertexBufferSharedPtr globalInstanceVertexBuffer = getGlobalInstanceVertexBuffer();
         VertexDeclaration* globalVertexDeclaration = getGlobalInstanceVertexBufferVertexDeclaration();
-        bool hasInstanceData = (op.useGlobalInstancingVertexBufferIsAvailable &&
-                                globalInstanceVertexBuffer && globalVertexDeclaration != NULL) ||
-                                op.vertexData->vertexBufferBinding->hasInstanceData();
-
         size_t numberOfInstances = op.numberOfInstances;
 
         if (op.useGlobalInstancingVertexBufferIsAvailable)
@@ -2404,7 +2400,7 @@ namespace Ogre {
 
             do
             {
-                if(hasInstanceData)
+                if(numberOfInstances > 1)
                 {
                     glDrawElementsInstancedARB(primType, op.indexData->indexCount, indexType, pBufferData, numberOfInstances);
                 }
@@ -2419,7 +2415,7 @@ namespace Ogre {
         {
             do
             {
-                if(hasInstanceData)
+                if(numberOfInstances > 1)
                 {
                     glDrawArraysInstancedARB(primType, 0, op.vertexData->vertexCount, numberOfInstances);
                 }
