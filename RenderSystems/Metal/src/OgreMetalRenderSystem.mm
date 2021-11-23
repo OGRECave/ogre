@@ -859,7 +859,6 @@ namespace Ogre
         [mActiveRenderEncoder setRenderPipelineState:getPipelineState()];
 
         const size_t numberOfInstances = op.numberOfInstances;
-        const bool hasInstanceData = mCurrentVertexBuffer->vertexBufferBinding->hasInstanceData();
 
         // Render to screen!
         if( op.useIndexes )
@@ -920,7 +919,7 @@ namespace Ogre
                 const uint32 vertexStart = static_cast<uint32>( mCurrentVertexBuffer->vertexStart );
 #endif
 
-                if (hasInstanceData)
+                if (numberOfInstances > 1)
                 {
                     [mActiveRenderEncoder drawPrimitives:mCurrentPrimType
                                              vertexStart:vertexStart
