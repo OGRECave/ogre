@@ -135,7 +135,7 @@ if (OGRE_BUILD_RENDERSYSTEM_TINY)
 	set(_rendersystems "${_rendersystems}  + Tiny (Software) [EXPERIMENTAL]\n")
 endif ()
 if (OGRE_BUILD_RENDERSYSTEM_VULKAN)
-	set(_rendersystems "${_rendersystems}  + Vulkan [EXPERIMENTAL]\n")
+	set(_rendersystems "${_rendersystems}  + Vulkan [BETA]\n")
 endif ()
 
 if (DEFINED _rendersystems)

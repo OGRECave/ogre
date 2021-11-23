@@ -336,6 +336,7 @@ namespace Ogre
         optVideoMode.name = "Video Mode";
         optVideoMode.immutable = false;
 
+        optVideoMode.possibleValues.push_back("1920 x 1080");
         optVideoMode.possibleValues.push_back("1280 x 720");
         optVideoMode.possibleValues.push_back("800 x 600");
         optVideoMode.currentValue = optVideoMode.possibleValues.front();
