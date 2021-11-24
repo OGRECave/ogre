@@ -52,7 +52,7 @@ THE SOFTWARE.
 #include "OgreVulkanWindow.h"
 #include "OgrePixelFormat.h"
 
-#define TODO_addVpCount_to_passpso
+#define USE_VALIDATION_LAYERS 1
 
 namespace Ogre
 {
@@ -653,7 +653,7 @@ namespace Ogre
         std::vector<VkExtensionProperties> availableExtensions(numExtensions);
         OGRE_VK_CHECK(vkEnumerateInstanceExtensionProperties(0, &numExtensions, availableExtensions.data()));
 
-        bool debugEnabled = true;
+        bool debugEnabled = USE_VALIDATION_LAYERS;
         //StringConverter::parse(mOptions.at("Debug Layer").currentValue, debugEnabled);
 
         // Check supported extensions we may want
