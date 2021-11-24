@@ -4,4 +4,5 @@ font DejaVu/SerifCondensedItalic
 	source 		DejaVuSerifCondensed-Italic.ttf
 	size 		15
 	resolution 	180
+	code_points 33-126 192-255
 }
