@@ -2494,7 +2494,7 @@ namespace Ogre
                     size_t sz = std::min(srcsz, destsz);
                     if (newdef->isFloat() || newdef->isInt() || newdef->isUnsignedInt() || newdef->isBool())
                     {
-
+                        OgreAssertDbg(mConstants.size() >= (newdef->physicalIndex + sz * 4), "Invalid physical index");
                         memcpy(getFloatPointer(newdef->physicalIndex),
                                source.getFloatPointer(olddef.physicalIndex),
                                sz * 4);
