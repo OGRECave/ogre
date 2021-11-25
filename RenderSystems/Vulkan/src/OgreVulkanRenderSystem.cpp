@@ -52,7 +52,7 @@ THE SOFTWARE.
 #include "OgreVulkanWindow.h"
 #include "OgrePixelFormat.h"
 
-#define USE_VALIDATION_LAYERS 1
+#define USE_VALIDATION_LAYERS 0
 
 namespace Ogre
 {
