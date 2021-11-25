@@ -98,7 +98,9 @@ protected:
 
         // create a water entity using our mesh, give it the shader material, and attach it to the origin
         mWater = mSceneMgr->createEntity("Water", "water");
-        mWater->setMaterialName("Examples/FresnelReflectionRefraction");
+        auto mat = MaterialManager::getSingleton().getByName("Examples/FresnelReflectionRefraction");
+        mat->getTechnique(0)->getPass(0)->getTextureUnitState(0)->setProjectiveTexturing(true, mCamera);
+        mWater->setMaterial(mat);
         mSceneMgr->getRootSceneNode()->attachObject(mWater);
 
         // hide the water from the render textures
@@ -211,6 +213,7 @@ protected:
         mFishSplines.clear();
 
         MeshManager::getSingleton().remove("water", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+        MaterialManager::getSingleton().unload("Examples/FresnelReflectionRefraction");
     }
 
     const unsigned int NUM_FISH;
