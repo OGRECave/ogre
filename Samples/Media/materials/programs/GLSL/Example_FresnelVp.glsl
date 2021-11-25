@@ -1,34 +1,34 @@
-attribute vec4 uv0;
-attribute vec4 position;
-attribute vec3 normal;
+#include <OgreUnifiedShader.h>
 
+OGRE_UNIFORMS(
 uniform mat4 worldViewProjMatrix;
+uniform mat4 textureProjMatrix;
+uniform mat3 normalMatrix;
 uniform vec3 eyePosition; // object space
 uniform float timeVal;
 uniform float scale;  // the amount to scale the noise texture by
 uniform float scroll; // the amount by which to scroll the noise
 uniform float noise;  // the noise perturb as a factor of the time
+)
 
-varying vec3 noiseCoord;
-varying vec4 projectionCoord;
-varying vec3 eyeDir;
-varying vec3 oNormal;
+MAIN_PARAMETERS
+IN(vec4 position, POSITION)
+IN(vec3 normal, NORMAL)
+IN(vec4 uv0, TEXCOORD0)
 
-// Vertex program for fresnel reflections / refractions
-void main()
+OUT(vec3 noiseCoord, TEXCOORD0)
+OUT(vec4 projectionCoord, TEXCOORD1)
+OUT(vec3 eyeDir, TEXCOORD2)
+OUT(vec3 oNormal, TEXCOORD3)
+MAIN_DECLARATION
 {
-	gl_Position = worldViewProjMatrix * position;
-	// Projective texture coordinates, adjust for mapping
-	mat4 scalemat = mat4(0.5, 0.0, 0.0, 0.0, 
-                         0.0, -0.5, 0.0, 0.0,
-                         0.0, 0.0, 0.5, 0.0,
-                         0.5, 0.5, 0.5, 1.0);
-	projectionCoord = scalemat * gl_Position;
+	gl_Position = mul(worldViewProjMatrix, position);
+	projectionCoord = mul(textureProjMatrix, position);
 
 	// Noise map coords
 	noiseCoord.xy = (uv0.xy + (timeVal * scroll)) * scale;
 	noiseCoord.z = noise * timeVal;
 
 	eyeDir = normalize(position.xyz - eyePosition); 
-	oNormal = normal.rgb;
+	oNormal = normal;
 }

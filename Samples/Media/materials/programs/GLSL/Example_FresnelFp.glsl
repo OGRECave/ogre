@@ -1,19 +1,24 @@
+#define USE_OGRE_FROM_FUTURE
+#include <OgreUnifiedShader.h>
+
+SAMPLER2D(noiseMap, 0);
+SAMPLER2D(reflectMap, 1);
+SAMPLER2D(refractMap, 2);
+
+OGRE_UNIFORMS(
 uniform vec4 tintColour;
 uniform float noiseScale;
 uniform float fresnelBias;
 uniform float fresnelScale;
 uniform float fresnelPower;
-uniform sampler2D noiseMap;
-uniform sampler2D reflectMap;
-uniform sampler2D refractMap;
+)
 
-varying vec3 noiseCoord;
-varying vec4 projectionCoord;
-varying vec3 eyeDir;
-varying vec3 oNormal;
-
-// Fragment program for distorting a texture using a 3D noise texture
-void main()
+MAIN_PARAMETERS
+IN(vec3 noiseCoord, TEXCOORD0)
+IN(vec4 projectionCoord, TEXCOORD1)
+IN(vec3 eyeDir, TEXCOORD2)
+IN(vec3 oNormal, TEXCOORD3)
+MAIN_DECLARATION
 {
 	// Do the tex projection manually so we can distort _after_
 	vec2 final = projectionCoord.xy / projectionCoord.w;

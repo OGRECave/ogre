@@ -526,33 +526,11 @@ material Examples/GeneralTexProjection
 //----------------------------
 // Distortion effects
 //----------------------------
-
-vertex_program Examples/FresnelRefractReflectVPCg hlsl
-{
-	source Example_Fresnel.cg
-	entry_point main_vp
-	target vs_2_0
-}
-vertex_program Examples/FresnelRefractReflectVPGLSL glsl glsles
+vertex_program Examples/FresnelRefractReflectVP glsl glsles glslang hlsl
 {
 	source Example_FresnelVp.glsl
 }
-
-vertex_program Examples/FresnelRefractReflectVP unified
-{
-	delegate Examples/FresnelRefractReflectVPGLSL
-	delegate Examples/FresnelRefractReflectVPCg
-}
-
-fragment_program Examples/FresnelRefractReflectFPCg hlsl
-{
-	source Example_Fresnel.cg
-	entry_point main_fp
-	// sorry, ps_1_1 and fp20 can't do this
-	target ps_2_0
-}
-
-fragment_program Examples/FresnelRefractReflectFPGLSL glsl glsles
+fragment_program Examples/FresnelRefractReflectFP glsl glsles glslang hlsl
 {
 	source Example_FresnelFp.glsl
 	default_params
@@ -562,12 +540,6 @@ fragment_program Examples/FresnelRefractReflectFPGLSL glsl glsles
 		param_named reflectMap int 1
 		param_named refractMap int 2
 	}
-}
-
-fragment_program Examples/FresnelRefractReflectFP unified
-{
-	delegate Examples/FresnelRefractReflectFPGLSL
-	delegate Examples/FresnelRefractReflectFPCg
 }
 
 material Examples/FresnelReflectionRefraction
@@ -581,6 +553,8 @@ material Examples/FresnelReflectionRefraction
 			vertex_program_ref Examples/FresnelRefractReflectVP
 			{
 				param_named_auto worldViewProjMatrix worldviewproj_matrix
+				param_named_auto textureProjMatrix texture_worldviewproj_matrix 0
+				param_named_auto normalMatrix normal_matrix
 				param_named_auto eyePosition camera_position_object_space
 				param_named_auto timeVal time 0.05
 				param_named scroll float 1  
