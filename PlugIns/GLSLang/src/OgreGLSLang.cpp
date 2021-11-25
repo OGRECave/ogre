@@ -383,7 +383,8 @@ void GLSLangProgram::prepareImpl()
         def.arraySize = program.getUniformArraySize(i);
         def.physicalIndex = isUBO ? uoffset : mConstantDefs->bufferSize * 4;
         def.constType = mapToGCT(program.getUniformType(i));
-        def.elementSize = GpuConstantDefinition::getElementSize(def.constType, isUBO); // UBOs are padded
+        bool doPadding = isUBO && GpuConstantDefinition::getElementSize(def.constType, false) > 1;
+        def.elementSize = GpuConstantDefinition::getElementSize(def.constType, doPadding);
 
         mConstantDefs->bufferSize += def.arraySize * def.elementSize;
         mConstantDefs->map.emplace(program.getUniformName(i), def);
