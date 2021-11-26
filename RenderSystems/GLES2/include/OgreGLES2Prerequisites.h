@@ -45,17 +45,12 @@ namespace Ogre {
 #   ifdef __OBJC__
 #       include <OpenGLES/EAGL.h>
 #   endif
-#else
-#   if (OGRE_PLATFORM == OGRE_PLATFORM_WIN32)
-#       if !defined( __MINGW32__ )
-#           define __PRETTY_FUNCTION__ __FUNCTION__
-#           ifndef WIN32_LEAN_AND_MEAN
-#               define WIN32_LEAN_AND_MEAN 1
-#           endif
-#           ifndef NOMINMAX
-#               define NOMINMAX // required to stop windows.h messing up std::min
-#           endif
-#       endif
+#elif (OGRE_PLATFORM == OGRE_PLATFORM_WIN32)
+#   ifndef WIN32_LEAN_AND_MEAN
+#       define WIN32_LEAN_AND_MEAN 1
+#   endif
+#   ifndef NOMINMAX
+#       define NOMINMAX // required to stop windows.h messing up std::min
 #   endif
 #endif
 

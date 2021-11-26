@@ -34,11 +34,6 @@ The wiki article explaining this demo can be found here :
 
 #include "SdkSample.h"
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-#define WIN32_LEAN_AND_MEAN
-#include "windows.h"
-#endif
-
 #include "OgreCompositorInstance.h"
 #include "OgreSceneManager.h"
 #include "OgreSceneNode.h"

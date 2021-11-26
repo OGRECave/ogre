@@ -48,23 +48,16 @@ namespace Ogre {
     typedef shared_ptr<GLTexture> GLTexturePtr;
 }
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-#if !defined( __MINGW32__ )
-#   define WIN32_LEAN_AND_MEAN
-#  ifndef NOMINMAX
-#   define NOMINMAX // required to stop windows.h messing up std::min
-#  endif
+#if (OGRE_PLATFORM == OGRE_PLATFORM_WIN32)
+#   ifndef WIN32_LEAN_AND_MEAN
+#       define WIN32_LEAN_AND_MEAN 1
+#   endif
+#   ifndef NOMINMAX
+#       define NOMINMAX // required to stop windows.h messing up std::min
+#   endif
 #endif
-#   include <windows.h>
-#   include <wingdi.h>
-#   include <GL/glew.h>
-#   include <GL/wglew.h>
-#elif OGRE_PLATFORM == OGRE_PLATFORM_LINUX
-#   include <GL/glew.h>
-#   define GL_GLEXT_PROTOTYPES
-#elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE
-#   include <GL/glew.h>
-#endif
+
+#include <GL/glew.h>
 
 namespace Ogre {
     inline const char* glErrorToString(GLenum glErr) {
@@ -85,11 +78,6 @@ namespace Ogre {
         }
     }
 }
-
-/// Lots of generated code in here which triggers the new VC CRT security warnings
-#if !defined( _CRT_SECURE_NO_DEPRECATE )
-#define _CRT_SECURE_NO_DEPRECATE
-#endif
 
 #if (OGRE_PLATFORM == OGRE_PLATFORM_WIN32) && !defined(__MINGW32__) && !defined(OGRE_STATIC_LIB)
 #   ifdef OGRE_GLPLUGIN_EXPORTS

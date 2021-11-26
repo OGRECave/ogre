@@ -35,13 +35,7 @@ THE SOFTWARE.
 #include "OgreHeaderPrefix.h"
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-#  if !defined(WIN32_LEAN_AND_MEAN)
-#   define WIN32_LEAN_AND_MEAN
-#  endif
-#  if !defined(NOMINMAX) && defined(_MSC_VER)
-#   define NOMINMAX // required to stop windows.h messing up std::min
-#  endif
-#  include <windows.h>
+#include <wtypes.h>
 #endif
 
 namespace OgreBites

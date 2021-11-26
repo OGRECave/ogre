@@ -41,6 +41,7 @@ THE SOFTWARE.
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
 #include <android/native_window.h>
 #elif OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #endif
 #include "OgreDepthBuffer.h"

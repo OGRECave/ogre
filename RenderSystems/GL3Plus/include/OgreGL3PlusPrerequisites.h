@@ -51,26 +51,16 @@ namespace Ogre {
     typedef shared_ptr<GL3PlusTexture> GL3PlusTexturePtr;
 }
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-#if !defined( __MINGW32__ )
-#   define WIN32_LEAN_AND_MEAN
-#  ifndef NOMINMAX
-#   define NOMINMAX // required to stop windows.h messing up std::min
-#  endif
-#endif
-#   include <windows.h>
-#   include <wingdi.h>
-#   include <GL/gl3w.h>
-#elif OGRE_PLATFORM == OGRE_PLATFORM_LINUX
-#   include <GL/gl3w.h>
-#elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE
-#   include <GL/gl3w.h>
+#if (OGRE_PLATFORM == OGRE_PLATFORM_WIN32)
+#   ifndef WIN32_LEAN_AND_MEAN
+#       define WIN32_LEAN_AND_MEAN 1
+#   endif
+#   ifndef NOMINMAX
+#       define NOMINMAX // required to stop windows.h messing up std::min
+#   endif
 #endif
 
-// Lots of generated code in here which triggers the new VC CRT security warnings
-#if !defined( _CRT_SECURE_NO_DEPRECATE )
-#define _CRT_SECURE_NO_DEPRECATE
-#endif
+#include <GL/gl3w.h>
 
 // Convenience macro from ARB_vertex_buffer_object spec
 #define GL_BUFFER_OFFSET(i) ((char *)(i))

@@ -123,20 +123,6 @@ namespace Ogre
     } \
 }
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-#    if !defined( __MINGW32__ )
-#        define WIN32_LEAN_AND_MEAN
-#        ifndef NOMINMAX
-#            define NOMINMAX  // required to stop windows.h messing up std::min
-#        endif
-#    endif
-#endif
-
-// Lots of generated code in here which triggers the new VC CRT security warnings
-#if !defined( _CRT_SECURE_NO_DEPRECATE )
-#    define _CRT_SECURE_NO_DEPRECATE
-#endif
-
 #if( OGRE_PLATFORM == OGRE_PLATFORM_WIN32 ) && !defined( __MINGW32__ ) && !defined( OGRE_STATIC_LIB )
 #    ifdef RenderSystem_Vulkan_EXPORTS
 #        define _OgreVulkanExport __declspec( dllexport )
