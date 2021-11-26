@@ -31,8 +31,6 @@ THE SOFTWARE.
 
 #include "OgreVulkanPrerequisites.h"
 
-#include "vulkan/vulkan_core.h"
-
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre

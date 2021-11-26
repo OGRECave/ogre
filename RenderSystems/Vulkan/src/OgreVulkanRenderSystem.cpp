@@ -194,6 +194,12 @@ namespace Ogre
             mDescriptorWrites[i + 2].descriptorCount = 1;
         }
 
+        if(volkInitialize() != VK_SUCCESS)
+        {
+            LogManager::getSingleton().logWarning("Vulkan unavailable - loader not found");
+            return;
+        }
+
         initializeVkInstance();
         enumerateDevices();
         initConfigOptions();
@@ -700,6 +706,7 @@ namespace Ogre
         }
 
         mVkInstance = VulkanDevice::createInstance(reqInstanceExtensions, instanceLayers, dbgFunc);
+        volkLoadInstanceOnly(mVkInstance);
 
         if(mHasValidationLayers)
             addInstanceDebugCallback();
@@ -765,6 +772,7 @@ namespace Ogre
                 deviceExtensions.push_back( VK_EXT_DEBUG_MARKER_EXTENSION_NAME );
 
             mDevice->createDevice( deviceExtensions, 0u, 0u );
+            volkLoadDevice(mDevice->mDevice);
 
             mHardwareBufferManager = OGRE_NEW VulkanHardwareBufferManager( mDevice );
 
@@ -1130,10 +1138,20 @@ namespace Ogre
     //-------------------------------------------------------------------------
     void VulkanRenderSystem::beginProfileEvent(const String& eventName)
     {
-        beginRegion(mActiveDevice->mGraphicsQueue.mCurrentCmdBuffer, eventName.c_str());
+        if(vkCmdDebugMarkerBeginEXT)
+        {
+            VkDebugMarkerMarkerInfoEXT markerInfo = {VK_STRUCTURE_TYPE_DEBUG_MARKER_MARKER_INFO_EXT};
+            markerInfo.pMarkerName = eventName.c_str();
+            vkCmdDebugMarkerBeginEXT(mActiveDevice->mGraphicsQueue.mCurrentCmdBuffer, &markerInfo);
+        }
     }
     //-------------------------------------------------------------------------
-    void VulkanRenderSystem::endProfileEvent(void) { endRegion(mActiveDevice->mGraphicsQueue.mCurrentCmdBuffer); }
+    void VulkanRenderSystem::endProfileEvent(void) {
+                if(vkCmdDebugMarkerEndEXT)
+        {
+            vkCmdDebugMarkerEndEXT(mActiveDevice->mGraphicsQueue.mCurrentCmdBuffer);
+        }
+ }
     //-------------------------------------------------------------------------
     void VulkanRenderSystem::markProfileEvent(const String& event) {}
     //-------------------------------------------------------------------------

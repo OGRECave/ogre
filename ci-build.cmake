@@ -69,7 +69,7 @@ endif()
 if(DEFINED ENV{ANDROID})
     set(CMAKE_BUILD_TYPE RelWithDebInfo)
     set(CROSS
-        -DANDROID_PLATFORM=android-24
+        -DANDROID_PLATFORM=android-16
         -DANDROID_NDK=${CMAKE_CURRENT_SOURCE_DIR}/android-ndk-r21e
         -DCMAKE_TOOLCHAIN_FILE=${CMAKE_CURRENT_SOURCE_DIR}/android-ndk-r21e/build/cmake/android.toolchain.cmake
         -DANDROID_ARM_NEON=TRUE

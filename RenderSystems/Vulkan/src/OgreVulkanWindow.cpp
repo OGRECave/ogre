@@ -38,20 +38,11 @@ THE SOFTWARE.
 #include "OgreVulkanTextureGpuManager.h"
 #include "OgreHardwarePixelBuffer.h"
 #include "OgreViewport.h"
-
-#include "vulkan/vulkan_core.h"
-
-#if OGRE_PLATFORM == OGRE_PLATFORM_LINUX
-#include <X11/Xlib.h>
-#include "vulkan/vulkan_xlib.h"
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+#include <android/native_window.h>
 #elif OGRE_PLATFORM == OGRE_PLATFORM_WIN32
 #include <windows.h>
-#include "vulkan/vulkan_win32.h"
-#elif OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-#include <android/native_window.h>
-#include "vulkan/vulkan_android.h"
 #endif
-
 #include "OgreDepthBuffer.h"
 
 #define TODO_handleSeparatePresentQueue

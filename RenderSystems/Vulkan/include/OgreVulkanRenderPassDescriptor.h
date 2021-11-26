@@ -34,8 +34,6 @@ THE SOFTWARE.
 #include "OgreCommon.h"
 #include "OgrePixelFormat.h"
 
-#include "vulkan/vulkan_core.h"
-
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre

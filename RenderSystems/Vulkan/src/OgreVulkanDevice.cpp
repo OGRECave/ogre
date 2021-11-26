@@ -36,8 +36,6 @@ THE SOFTWARE.
 
 #include "OgreVulkanUtils.h"
 
-#include <vulkan/vulkan.h>
-
 #define TODO_findRealPresentQueue
 
 namespace Ogre
@@ -267,8 +265,6 @@ namespace Ogre
         createInfo.pEnabledFeatures = &mDeviceFeatures;
 
         OGRE_VK_CHECK(vkCreateDevice(mPhysicalDevice, &createInfo, NULL, &mDevice));
-
-        initUtils( mDevice );
     }
     //-------------------------------------------------------------------------
     void VulkanDevice::initQueues( void )

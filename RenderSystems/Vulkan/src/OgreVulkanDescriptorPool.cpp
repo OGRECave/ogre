@@ -32,8 +32,6 @@ THE SOFTWARE.
 #include "OgreVulkanUtils.h"
 #include "OgreException.h"
 
-#include "vulkan/vulkan_core.h"
-
 namespace Ogre
 {
     static const int MAX_POOL_CAPACITY = 50;
