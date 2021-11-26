@@ -32,7 +32,16 @@ THE SOFTWARE.
 
 #include "OgreLogManager.h"
 #include "OgrePixelFormat.h"
-#include <vulkan/vulkan_core.h>
+
+#if OGRE_PLATFORM == OGRE_PLATFORM_LINUX
+#define VK_USE_PLATFORM_XLIB_KHR
+#elif OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+#define VK_USE_PLATFORM_WIN32_KHR
+#elif OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+#define VK_USE_PLATFORM_ANDROID_KHR
+#endif
+
+#include <volk.h>
 
 
 namespace Ogre

@@ -41,8 +41,6 @@ THE SOFTWARE.
 #include "OgreVulkanUtils.h"
 #include "OgreVulkanDescriptorPool.h"
 
-#include <vulkan/vulkan.h>
-
 #define TODO_findRealPresentQueue
 #define TODO_we_assume_has_stencil
 

@@ -32,18 +32,12 @@ THE SOFTWARE.
 
 #include "OgreString.h"
 
-#include "vulkan/vulkan_core.h"
-
 namespace Ogre
 {
-    void initUtils( VkDevice device );
-
     String vkResultToString( VkResult result );
 
     void setObjectName( VkDevice device, uint64_t object, VkDebugReportObjectTypeEXT objectType,
                         const char *name );
-    void beginRegion(VkCommandBuffer cmdBuffer, const char* name);
-    void endRegion(VkCommandBuffer cmdBuffer);
 }  // namespace Ogre
 
 #endif  //#ifndef _OgreVulkanPrerequisites_H_

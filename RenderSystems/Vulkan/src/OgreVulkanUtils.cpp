@@ -34,12 +34,6 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-    PFN_vkDebugMarkerSetObjectTagEXT pfnDebugMarkerSetObjectTag;
-    PFN_vkDebugMarkerSetObjectNameEXT pfnDebugMarkerSetObjectName;
-    PFN_vkCmdDebugMarkerBeginEXT pfnCmdDebugMarkerBegin;
-    PFN_vkCmdDebugMarkerEndEXT pfnCmdDebugMarkerEnd;
-    PFN_vkCmdDebugMarkerInsertEXT pfnCmdDebugMarkerInsert;
-
     String vkResultToString( VkResult result )
     {
         // clang-format off
@@ -79,49 +73,18 @@ namespace Ogre
         // clang-format on
     }
 
-    void initUtils( VkDevice device )
-    {
-        pfnDebugMarkerSetObjectTag = (PFN_vkDebugMarkerSetObjectTagEXT)vkGetDeviceProcAddr(
-            device, "vkDebugMarkerSetObjectTagEXT" );
-        pfnDebugMarkerSetObjectName = (PFN_vkDebugMarkerSetObjectNameEXT)vkGetDeviceProcAddr(
-            device, "vkDebugMarkerSetObjectNameEXT" );
-        pfnCmdDebugMarkerBegin =
-            (PFN_vkCmdDebugMarkerBeginEXT)vkGetDeviceProcAddr( device, "vkCmdDebugMarkerBeginEXT" );
-        pfnCmdDebugMarkerEnd =
-            (PFN_vkCmdDebugMarkerEndEXT)vkGetDeviceProcAddr( device, "vkCmdDebugMarkerEndEXT" );
-        pfnCmdDebugMarkerInsert =
-            (PFN_vkCmdDebugMarkerInsertEXT)vkGetDeviceProcAddr( device, "vkCmdDebugMarkerInsertEXT" );
-    }
-
     void setObjectName( VkDevice device, uint64_t object, VkDebugReportObjectTypeEXT objectType,
                         const char *name )
     {
         // Check for a valid function pointer
-        if( pfnDebugMarkerSetObjectName )
+        if( vkDebugMarkerSetObjectNameEXT )
         {
             VkDebugMarkerObjectNameInfoEXT nameInfo = {};
             nameInfo.sType = VK_STRUCTURE_TYPE_DEBUG_MARKER_OBJECT_NAME_INFO_EXT;
             nameInfo.objectType = objectType;
             nameInfo.object = object;
             nameInfo.pObjectName = name;
-            pfnDebugMarkerSetObjectName( device, &nameInfo );
-        }
-    }
-
-    void beginRegion(VkCommandBuffer cmdBuffer, const char* name)
-    {
-        if(pfnCmdDebugMarkerBegin)
-        {
-            VkDebugMarkerMarkerInfoEXT markerInfo = {VK_STRUCTURE_TYPE_DEBUG_MARKER_MARKER_INFO_EXT};
-            markerInfo.pMarkerName = name;
-            pfnCmdDebugMarkerBegin(cmdBuffer, &markerInfo);
-        }
-    }
-    void endRegion(VkCommandBuffer cmdBuffer)
-    {
-        if(pfnCmdDebugMarkerEnd)
-        {
-            pfnCmdDebugMarkerEnd(cmdBuffer);
+            vkDebugMarkerSetObjectNameEXT( device, &nameInfo );
         }
     }
 }  // namespace Ogre

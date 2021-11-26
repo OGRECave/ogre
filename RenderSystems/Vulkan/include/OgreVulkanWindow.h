@@ -32,7 +32,6 @@ THE SOFTWARE.
 
 #include "OgreRenderWindow.h"
 #include "OgreVulkanTextureGpuWindow.h"
-#include "vulkan/vulkan_core.h"
 
 namespace Ogre
 {

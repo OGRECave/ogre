@@ -37,8 +37,6 @@ Copyright (c) 2000-present Torus Knot Software Ltd
 #include "OgreRenderOperation.h"
 #include "OgreRenderSystem.h"
 
-#include "vulkan/vulkan_core.h"
-
 namespace Ogre
 {
     class _OgreVulkanExport VulkanMappings

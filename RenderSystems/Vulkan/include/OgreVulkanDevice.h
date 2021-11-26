@@ -33,8 +33,6 @@ THE SOFTWARE.
 
 #include "OgreVulkanQueue.h"
 
-#include "vulkan/vulkan_core.h"
-
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre

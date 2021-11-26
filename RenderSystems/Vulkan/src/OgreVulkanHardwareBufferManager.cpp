@@ -29,8 +29,6 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #include "OgreVulkanHardwareBufferManager.h"
 #include "OgreVulkanHardwareBuffer.h"
 
-#include <vulkan/vulkan_core.h>
-
 namespace Ogre
 {
     VulkanHardwareBufferManager::VulkanHardwareBufferManager( VulkanDevice *device) :

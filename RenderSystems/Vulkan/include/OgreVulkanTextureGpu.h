@@ -33,8 +33,6 @@ THE SOFTWARE.
 
 #include "OgreTexture.h"
 
-#include "vulkan/vulkan_core.h"
-
 #include "OgreHardwarePixelBuffer.h"
 #include "OgreVulkanHardwareBuffer.h"
 #include "OgreRenderTexture.h"
