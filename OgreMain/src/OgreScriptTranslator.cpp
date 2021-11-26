@@ -3723,6 +3723,7 @@ namespace Ogre{
     {
         // Assume 1 unless otherwise specified
         int dimensions = 1;
+        type = BCT_UNKNOWN;
 
         // get the type
         const char* typeStrings[] = {"float", "int", "uint", "double", "bool"};
@@ -3739,6 +3740,9 @@ namespace Ogre{
                 break;
             }
         }
+
+        if(type == BCT_UNKNOWN)
+            return dimensions;
 
         size_t start = declarator.find_first_not_of(typeStr);
 
