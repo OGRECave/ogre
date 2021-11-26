@@ -36,6 +36,7 @@ THE SOFTWARE.
 #include "OgreVulkanHardwareBuffer.h"
 #include "OgreBitwise.h"
 #include "OgreRoot.h"
+#include "OgreVulkanTextureGpuWindow.h"
 
 #define TODO_add_resource_transitions
 
@@ -167,6 +168,7 @@ namespace Ogre
 
         vkCmdCopyImageToBuffer(device->mGraphicsQueue.mCurrentCmdBuffer, mParent->getFinalTextureName(),
                                 VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, dstBuffer, 1u, &region);
+        device->mGraphicsQueue.commitAndNextCommandBuffer();
 
         stagingBuffer->readData(0, dst.getConsecutiveSize(), dst.data);
     }
