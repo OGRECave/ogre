@@ -167,7 +167,7 @@ namespace Ogre {
             {
                 bool isDepth = PixelUtil::isDepth(mColour[x].buffer->getFormat());
 
-                bufs[x] = isDepth ? GL_DEPTH_ATTACHMENT : (GL_COLOR_ATTACHMENT0 + x);
+                bufs[x] = isDepth ? GL_NONE : (GL_COLOR_ATTACHMENT0 + x);
                 // Keep highest used buffer + 1
                 if(!isDepth)
                     n = x+1;
