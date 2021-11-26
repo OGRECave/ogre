@@ -200,7 +200,12 @@ namespace Ogre
             return;
         }
 
-        initializeVkInstance();
+        try {
+            initializeVkInstance();
+        } catch(const std::exception& e) {
+            LogManager::getSingleton().logWarning(e.what());
+            return;
+        }
         enumerateDevices();
         initConfigOptions();
     }
