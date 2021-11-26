@@ -554,7 +554,6 @@ material Examples/FresnelReflectionRefraction
 			{
 				param_named_auto worldViewProjMatrix worldviewproj_matrix
 				param_named_auto textureProjMatrix texture_worldviewproj_matrix 0
-				param_named_auto normalMatrix normal_matrix
 				param_named_auto eyePosition camera_position_object_space
 				param_named_auto timeVal time 0.05
 				param_named scroll float 1  
