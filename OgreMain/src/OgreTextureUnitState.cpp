@@ -1170,7 +1170,7 @@ namespace Ogre {
         // don't unload named textures. may be used elsewhere
         // drop references on managed textures, however
         if(mContentType != CONTENT_NAMED)
-            mFramePtrs.clear();
+            mFramePtrs[0].reset();
     }
     //-----------------------------------------------------------------------------
     bool TextureUnitState::isLoaded(void) const
