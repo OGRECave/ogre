@@ -253,10 +253,8 @@ namespace Ogre
         
         // Automatically disable normal & parallax mapping if card cannot handle it
         // We do this rather than having a specific technique for it since it's simpler
-        GpuProgramManager& gmgr = GpuProgramManager::getSingleton();
-        if (!gmgr.isSyntaxSupported("ps_4_0") && !gmgr.isSyntaxSupported("ps_3_0") && !gmgr.isSyntaxSupported("ps_2_x")
-            && !gmgr.isSyntaxSupported("fp40") && !gmgr.isSyntaxSupported("arbfp1") && !gmgr.isSyntaxSupported("glsl")
-            && !gmgr.isSyntaxSupported("glsles"))
+        auto rsc = Root::getSingletonPtr()->getRenderSystem()->getCapabilities();
+        if (rsc->getNumTextureUnits() < 9)
         {
             setLayerNormalMappingEnabled(false);
             setLayerParallaxMappingEnabled(false);
