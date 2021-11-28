@@ -52,7 +52,7 @@ THE SOFTWARE.
 #include "OgreVulkanWindow.h"
 #include "OgrePixelFormat.h"
 
-#define USE_VALIDATION_LAYERS 0
+#define USE_VALIDATION_LAYERS 1
 
 namespace Ogre
 {
@@ -568,7 +568,7 @@ namespace Ogre
 
         //rsc->setCapability( RSC_HWSTENCIL );
         rsc->setStencilBufferBitDepth( 8 );
-        rsc->setNumTextureUnits( OGRE_MAX_TEXTURE_LAYERS );
+        rsc->setNumTextureUnits( OGRE_MAX_TEXTURE_COORD_SETS );
         rsc->setCapability( RSC_TEXTURE_COMPRESSION );
         rsc->setCapability( RSC_32BIT_INDEX );
         rsc->setCapability( RSC_TWO_SIDED_STENCIL );
@@ -886,7 +886,7 @@ namespace Ogre
         uint32 hash = HashCombine(0, mUBOInfo);
 
         int numTextures = 0;
-        for (; numTextures < OGRE_MAX_TEXTURE_LAYERS; numTextures++)
+        for (; numTextures < OGRE_MAX_TEXTURE_COORD_SETS; numTextures++)
         {
             if (!mImageInfos[numTextures].imageView)
                 break;
