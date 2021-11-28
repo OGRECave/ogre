@@ -47,11 +47,12 @@ namespace RTShader {
 class ShaderExInstancedViewports : public SubRenderState
 {
     friend class ShaderExInstancedViewportsFactory;
-
+    bool mOwnsGlobalData; // only true for template sub render state
 // Interface.
 public:
     /** Class default constructor */    
     ShaderExInstancedViewports();
+    ~ShaderExInstancedViewports();
     
     /** 
     @see SubRenderState::getType.
