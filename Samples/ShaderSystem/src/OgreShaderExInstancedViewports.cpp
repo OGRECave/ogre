@@ -32,6 +32,8 @@ THE SOFTWARE.
 #include "OgreShaderProgramSet.h"
 #include "OgreScriptCompiler.h"
 #include "OgreTechnique.h"
+#include "OgreHardwareBufferManager.h"
+#include "OgreRoot.h"
 
 namespace Ogre {
 namespace RTShader {
@@ -53,6 +55,7 @@ ShaderExInstancedViewports::ShaderExInstancedViewports()
 {
     mMonitorsCount              = Vector2(1.0, 1.0);            
     mMonitorsCountChanged       = true;
+    mOwnsGlobalData             = false;
 }
 
 //-----------------------------------------------------------------------
@@ -241,11 +244,92 @@ void ShaderExInstancedViewports::updateGpuProgramsParams(Renderable* rend, const
     }   
 }
 //-----------------------------------------------------------------------
-void ShaderExInstancedViewports::setMonitorsCount( const Vector2 monitorsCount )
+void ShaderExInstancedViewports::setMonitorsCount( const Vector2 monitorCount )
 {
-    mMonitorsCount = monitorsCount;
+    mMonitorsCount = monitorCount;
     mMonitorsCountChanged = true;
+
+    Ogre::VertexDeclaration* vertexDeclaration = Ogre::HardwareBufferManager::getSingleton().createVertexDeclaration();
+    size_t offset = 0;
+    offset = vertexDeclaration->getVertexSize(0);
+    vertexDeclaration->addElement(0, offset, Ogre::VET_FLOAT4, Ogre::VES_TEXTURE_COORDINATES, 3);
+    offset = vertexDeclaration->getVertexSize(0);
+    vertexDeclaration->addElement(0, offset, Ogre::VET_FLOAT4, Ogre::VES_TEXTURE_COORDINATES, 4);
+    offset = vertexDeclaration->getVertexSize(0);
+    vertexDeclaration->addElement(0, offset, Ogre::VET_FLOAT4, Ogre::VES_TEXTURE_COORDINATES, 5);
+    offset = vertexDeclaration->getVertexSize(0);
+    vertexDeclaration->addElement(0, offset, Ogre::VET_FLOAT4, Ogre::VES_TEXTURE_COORDINATES, 6);
+    offset = vertexDeclaration->getVertexSize(0);
+    vertexDeclaration->addElement(0, offset, Ogre::VET_FLOAT4, Ogre::VES_TEXTURE_COORDINATES, 7);
+
+    Ogre::HardwareVertexBufferSharedPtr vbuf =
+        Ogre::HardwareBufferManager::getSingleton().createVertexBuffer(
+        vertexDeclaration->getVertexSize(0), monitorCount.x * monitorCount.y, Ogre::HardwareBuffer::HBU_STATIC_WRITE_ONLY);
+    vbuf->setInstanceDataStepRate(1);
+    vbuf->setIsInstanceData(true);
+
+    float * buf = (float *)vbuf->lock(Ogre::HardwareBuffer::HBL_DISCARD);
+    for (float x = 0 ; x < monitorCount.x ; x++)
+        for (float y = 0 ; y < monitorCount.y ; y++)
+        {
+            *buf = x; buf++;
+            *buf = y; buf++;
+            *buf = 0; buf++;
+            *buf = 0; buf++;
+
+            Ogre::Quaternion q;
+            Ogre::Radian angle = Ogre::Degree(90 / ( monitorCount.x *  monitorCount.y) * (x + y * monitorCount.x) );
+            q.FromAngleAxis(angle,Ogre::Vector3::UNIT_Y);
+            q.normalise();
+            Ogre::Matrix3 rotMat;
+            q.ToRotationMatrix(rotMat);
+
+            *buf = rotMat.GetColumn(0).x; buf++;
+            *buf = rotMat.GetColumn(0).y; buf++;
+            *buf = rotMat.GetColumn(0).z; buf++;
+            *buf = x * -20; buf++;
+
+            *buf = rotMat.GetColumn(1).x; buf++;
+            *buf = rotMat.GetColumn(1).y; buf++;
+            *buf = rotMat.GetColumn(1).z; buf++;
+            *buf = 0; buf++;
+
+            *buf = rotMat.GetColumn(2).x; buf++;
+            *buf = rotMat.GetColumn(2).y; buf++;
+            *buf = rotMat.GetColumn(2).z; buf++;
+            *buf =  y * 20; buf++;
+
+            *buf = 0; buf++;
+            *buf = 0; buf++;
+            *buf = 0; buf++;
+            *buf = 1; buf++;
+        }
+    vbuf->unlock();
+
+    mOwnsGlobalData = true;
+
+    auto rs = Ogre::Root::getSingleton().getRenderSystem();
+    rs->setGlobalInstanceVertexBuffer(vbuf);
+    rs->setGlobalInstanceVertexBufferVertexDeclaration(vertexDeclaration);
+    rs->setGlobalNumberOfInstances(monitorCount.x * monitorCount.y);
 }
+ShaderExInstancedViewports::~ShaderExInstancedViewports()
+{
+    if (!mOwnsGlobalData)
+        return;
+
+    auto rs = Ogre::Root::getSingleton().getRenderSystem();
+    if (rs->getGlobalInstanceVertexBufferVertexDeclaration())
+    {
+        Ogre::HardwareBufferManager::getSingleton().destroyVertexDeclaration(
+            rs->getGlobalInstanceVertexBufferVertexDeclaration());
+    }
+
+    rs->setGlobalInstanceVertexBufferVertexDeclaration(NULL);
+    rs->setGlobalNumberOfInstances(1);
+    rs->setGlobalInstanceVertexBuffer(Ogre::HardwareVertexBufferSharedPtr() );
+}
+
 //-----------------------------------------------------------------------
 SubRenderState* ShaderExInstancedViewportsFactory::createInstance(ScriptCompiler* compiler, 
                                                          PropertyAbstractNode* prop, Pass* pass, SGScriptTranslator* translator)
