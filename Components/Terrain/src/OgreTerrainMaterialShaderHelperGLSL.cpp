@@ -289,8 +289,16 @@ namespace Ogre
         for (uint i = 0; i < numLayers; ++i)
         {
             outStream << StringUtil::format("SAMPLER2D(difftex%d, %d);\n", i, currentSamplerIdx++);
-            outStream << StringUtil::format("SAMPLER2D(normtex%d, %d);\n", i, currentSamplerIdx++);
+            if(prof->isLayerNormalMappingEnabled())
+                outStream << StringUtil::format("SAMPLER2D(normtex%d, %d);\n", i, currentSamplerIdx++);
         }
+
+        mShadowSamplerStartHi = currentSamplerIdx;
+        uint numShadowTextures = uint(prof->isShadowingEnabled(tt, terrain));
+        if (numShadowTextures && prof->getReceiveDynamicShadowsPSSM())
+            numShadowTextures = prof->getReceiveDynamicShadowsPSSM()->getSplitCount();
+        for (uint i = 0; i < numShadowTextures; ++i)
+            outStream << StringUtil::format("SAMPLER2D(shadowMap%d, %d);\n", i, currentSamplerIdx++);
 
         outStream << "OGRE_UNIFORMS_BEGIN\n";
         // uv multipliers
@@ -298,22 +306,10 @@ namespace Ogre
         for (uint i = 0; i < numUVMultipliers; ++i)
             outStream << "uniform vec4 uvMul_" << i << ";\n";
 
-        uint numShadowTextures = uint(prof->isShadowingEnabled(tt, terrain));
-        if (numShadowTextures)
-        {
-                mShadowSamplerStartHi = currentSamplerIdx;
-
-            if (prof->getReceiveDynamicShadowsPSSM())
-            {
-                numShadowTextures = prof->getReceiveDynamicShadowsPSSM()->getSplitCount();
-                outStream << "uniform vec4 pssmSplitPoints;\n";
-            }
-            for (uint i = 0; i < numShadowTextures; ++i)
-            {
-                outStream << StringUtil::format("SAMPLER2D(shadowMap%d, %d);\n", i, currentSamplerIdx++);
-                outStream << "uniform float inverseShadowmapSize" << i << ";\n";
-            }
-        }
+        if (numShadowTextures && prof->getReceiveDynamicShadowsPSSM())
+            outStream << "uniform vec4 pssmSplitPoints;\n";
+        for (uint i = 0; i < numShadowTextures; ++i)
+            outStream << "uniform float inverseShadowmapSize" << i << ";\n";
 
         // check we haven't exceeded samplers
         OgreAssert(
