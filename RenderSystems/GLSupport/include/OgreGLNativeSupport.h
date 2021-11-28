@@ -39,12 +39,8 @@ namespace Ogre
 {
     class GLPBuffer;
 
-    /** \addtogroup RenderSystems RenderSystems
-    *  @{
-    */
-    /** \defgroup GLSupport GLSupport
+    /**
     * provides OpenGL Context creation using GLX, WGL, EGL, Cocoa
-    *  @{
     */
     class _OgreGLExport GLNativeSupport
     {
@@ -116,9 +112,6 @@ namespace Ogre
 
             ContextProfile mContextProfile;
     };
-    /** @} */
-    /** @} */
-
 }
 
 #endif

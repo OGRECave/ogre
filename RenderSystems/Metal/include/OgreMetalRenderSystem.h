@@ -41,8 +41,12 @@ namespace Ogre
 {
         class HardwareBufferManager;
 
-    /**
-       Implementation of Metal as a rendering system.
+    /** \addtogroup RenderSystems RenderSystems
+    *  @{
+    */
+    /** \defgroup Metal Metal
+    * Implementation of Metal as a rendering system.
+    *  @{
     */
     class _OgreMetalExport MetalRenderSystem : public RenderSystem
     {
@@ -171,6 +175,8 @@ namespace Ogre
         void _notifyActiveComputeEnded(void);
         void _notifyDeviceStalled(void);
     };
+    /** @} */
+    /** @} */
 }
 
 #endif
