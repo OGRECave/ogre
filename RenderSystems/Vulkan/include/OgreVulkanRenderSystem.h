@@ -40,8 +40,12 @@ namespace Ogre
 {
     class VulkanHardwareBufferManager;
 
-    /**
-       Implementation of Vulkan as a rendering system.
+    /** \addtogroup RenderSystems RenderSystems
+    *  @{
+    */
+    /** \defgroup Vulkan Vulkan
+    * Implementation of Vulkan as a rendering system.
+    *  @{
     */
     class _OgreVulkanExport VulkanRenderSystem : public RenderSystem
     {
@@ -211,6 +215,8 @@ namespace Ogre
         void _setSampler(size_t texUnit, Sampler& s) override;
         MultiRenderTarget * createMultiRenderTarget(const String & name) { return NULL; }
     };
+    /** @} */
+    /** @} */
 }  // namespace Ogre
 
 #endif
