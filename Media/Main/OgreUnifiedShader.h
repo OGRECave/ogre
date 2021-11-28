@@ -153,6 +153,10 @@ mat3 mtxFromCols(vec3 a, vec3 b, vec3 c)
 #define TEXCOORD1   9
 #define TEXCOORD2  10
 #define TEXCOORD3  11
+#define TEXCOORD4  12
+#define TEXCOORD5  13
+#define TEXCOORD6  14
+#define TEXCOORD7  15
 #define TANGENT    14
 #endif
 
