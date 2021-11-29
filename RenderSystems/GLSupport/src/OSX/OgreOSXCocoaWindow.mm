@@ -33,6 +33,7 @@ THE SOFTWARE.
 
 #import "OgreGLRenderSystemCommon.h"
 #import "OgreGLNativeSupport.h"
+#import <AppKit/AppKit.h>
 #import <AppKit/NSScreen.h>
 #import <AppKit/NSOpenGLView.h>
 #import <QuartzCore/CVDisplayLink.h>

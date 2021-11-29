@@ -30,6 +30,8 @@
 #include <pwd.h>
 #include <dlfcn.h>
 #include <sys/stat.h>
+#include <sys/types.h>
+#include <unistd.h>
 
 namespace Ogre
 {
