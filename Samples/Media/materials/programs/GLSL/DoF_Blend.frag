@@ -4,6 +4,8 @@
 // This code is in the public domain. You may do whatever you want with it.
 
 // based on "Advanced Depth of Field" by "Thorsten Scheuermann"
+#define USE_OGRE_FROM_FUTURE
+#include <OgreUnifiedShader.h>
 
 #ifdef GL_ES
 precision highp float; // for accumulation
@@ -12,22 +14,15 @@ precision highp float; // for accumulation
 #define NUM_TAPS 12						// number of taps the shader will use
 
 uniform vec4 pixelSizeScene;			// pixel size of full resolution image
-vec2 pixelSizeBlur;						// pixel size of downsampled and blurred image
 
-uniform sampler2D scene;				// full resolution image
-uniform sampler2D depth;				// full resolution image with depth values
-uniform sampler2D blur;					// downsampled and blurred image
-
-varying vec2 oUv0;
-
-vec2 poisson[NUM_TAPS];					// containts poisson-distributed positions on the unit circle
-
-vec2 CoC = vec2(5.0, 1.0);			    // max and min circle of confusion (CoC) radius
+SAMPLER2D(scene, 0);				// full resolution image
+SAMPLER2D(depth, 1);				// full resolution image with depth values
+SAMPLER2D(blur,  2);				// downsampled and blurred image
 
 // dofParams coefficients:
 // x = near blur depth; y = focal plane depth; z = far blur depth
 // w = blurriness cutoff constant
-vec4 dofParams = vec4(0.9991, 0.9985, 0.9975, 1);
+STATIC vec4 dofParams = vec4(0.9991, 0.9985, 0.9975, 1);
 
 float getBlurAmount(float depth)
 {
@@ -47,11 +42,14 @@ float getBlurAmount(float depth)
     return 1.0 - clamp(f, 0.0, dofParams.w);
 }
 
-
-void main()
+MAIN_PARAMETERS
+IN(vec2 oUv0, TEXCOORD0)
+MAIN_DECLARATION
 {
-    pixelSizeBlur = pixelSizeScene.zw*4.0;
+    vec2 CoC = vec2(5.0, 1.0);	                 // max and min circle of confusion (CoC) radius
+    vec2 pixelSizeBlur = pixelSizeScene.zw*4.0; // pixel size of downsampled and blurred image
 
+    vec2 poisson[NUM_TAPS];					     // contains poisson-distributed positions on the unit circle
     poisson[ 0] = vec2( 0.00,  0.00);
     poisson[ 1] = vec2( 0.07, -0.45);
     poisson[ 2] = vec2(-0.15, -0.33);
@@ -70,7 +68,7 @@ void main()
     float centerBlur = getBlurAmount(centerDepth);
     float discRadius = max(0.0, centerBlur * CoC.x - CoC.y);
 
-    vec4 sum = vec4(0.0);
+    vec4 sum = vec4_splat(0.0);
 
     for (int i = 0; i < NUM_TAPS; ++i)
     {

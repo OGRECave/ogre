@@ -1,4 +1,4 @@
-fragment_program DOF_Blur_ps glsl glsles
+fragment_program DOF_Blur_ps glsl glsles hlsl
 {
     source DoF_Gaussian3x3.frag
     default_params
@@ -7,9 +7,10 @@ fragment_program DOF_Blur_ps glsl glsles
     }
 }
 
-fragment_program DOF_Blend_ps glsl glsles
+fragment_program DOF_Blend_ps glsl glsles hlsl
 {
     source DoF_Blend.frag
+    target ps_4_0
     default_params
     {
         param_named_auto pixelSizeScene viewport_size
