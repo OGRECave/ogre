@@ -80,9 +80,6 @@ namespace Ogre {
         /// internal method, create a blank cube texture        
         void _createVolumeTex(IDirect3DDevice9* d3d9Device);
 
-        /// internal method, return a D3D pixel format for texture creation
-        D3DFORMAT _chooseD3DFormat(IDirect3DDevice9* d3d9Device);
-
         /// @copydoc Resource::calculateSize
         size_t calculateSize(void) const;
         /// @copydoc Texture::createInternalResourcesImpl
