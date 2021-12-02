@@ -357,6 +357,8 @@ namespace Ogre
             mUsage |= TU_DYNAMIC;
         }
 
+        mFormat = TextureManager::getSingleton().getNativeFormat(mTextureType, mFormat, mUsage);
+
         // load based on tex.type
         switch (getTextureType())
         {
@@ -384,10 +386,7 @@ namespace Ogre
 
         // determine which D3D9 pixel format we'll use
         HRESULT hr;
-        D3DFORMAT d3dPF = _chooseD3DFormat(d3d9Device);
-
-        // let's D3DX check the corrected pixel format
-        hr = D3DXCheckTextureRequirements(d3d9Device, NULL, NULL, NULL, 0, &d3dPF, mD3DPool);
+        D3DFORMAT d3dPF = D3D9Mappings::_getPF(mFormat);
 
         // Use D3DX to help us create the texture, this way it can adjust any relevant sizes
         DWORD usage = (mUsage & TU_RENDERTARGET) ? D3DUSAGE_RENDERTARGET : 0;
@@ -542,10 +541,7 @@ namespace Ogre
 
         // determine which D3D9 pixel format we'll use
         HRESULT hr;
-        D3DFORMAT d3dPF = _chooseD3DFormat(d3d9Device);
-
-        // let's D3DX check the corrected pixel format
-        hr = D3DXCheckCubeTextureRequirements(d3d9Device, NULL, NULL, 0, &d3dPF, mD3DPool);
+        D3DFORMAT d3dPF = D3D9Mappings::_getPF(mFormat);
 
         // Use D3DX to help us create the texture, this way it can adjust any relevant sizes
         DWORD usage = (mUsage & TU_RENDERTARGET) ? D3DUSAGE_RENDERTARGET : 0;
@@ -701,9 +697,7 @@ namespace Ogre
 
         // determine which D3D9 pixel format we'll use
         HRESULT hr;
-        D3DFORMAT d3dPF = _chooseD3DFormat(d3d9Device);
-        // let's D3DX check the corrected pixel format
-        hr = D3DXCheckVolumeTextureRequirements(d3d9Device, NULL, NULL, NULL, NULL, 0, &d3dPF, mD3DPool);
+        D3DFORMAT d3dPF = D3D9Mappings::_getPF(mFormat);
 
         // Use D3DX to help us create the texture, this way it can adjust any relevant sizes
         DWORD usage = (mUsage & TU_RENDERTARGET) ? D3DUSAGE_RENDERTARGET : 0;
@@ -1043,20 +1037,6 @@ namespace Ogre
         // this HR could a SUCCES
         // but mip maps will not be generated
         return hr == D3D_OK;
-    }
-    /****************************************************************************************/
-    D3DFORMAT D3D9Texture::_chooseD3DFormat(IDirect3DDevice9* d3d9Device)
-    {       
-        // Choose frame buffer pixel format in case PF_UNKNOWN was requested
-        if(mFormat == PF_UNKNOWN)
-        {   
-            D3D9Device* device = D3D9RenderSystem::getDeviceManager()->getDeviceFromD3D9Device(d3d9Device);
-            
-            return device->getBackBufferFormat();       
-        }
-
-        // Choose closest supported D3D format as a D3D format
-        return D3D9Mappings::_getPF(D3D9Mappings::_getClosestSupportedPF(mFormat));
     }
     /****************************************************************************************/
     // Macro to hide ugly cast
