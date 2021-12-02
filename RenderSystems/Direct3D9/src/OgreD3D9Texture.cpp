@@ -391,8 +391,7 @@ namespace Ogre
 
         // Use D3DX to help us create the texture, this way it can adjust any relevant sizes
         DWORD usage = (mUsage & TU_RENDERTARGET) ? D3DUSAGE_RENDERTARGET : 0;
-        UINT numMips = (mNumRequestedMipmaps == MIP_UNLIMITED) ? 
-                D3DX_DEFAULT : mNumRequestedMipmaps + 1;
+        UINT numMips = (mNumRequestedMipmaps == MIP_UNLIMITED) ? 0 : mNumRequestedMipmaps + 1;
         // Check dynamic textures
         if (mUsage & TU_DYNAMIC)
         {
@@ -466,15 +465,14 @@ namespace Ogre
 
 
         // create the texture
-        hr = D3DXCreateTexture( 
-                d3d9Device,                             // device
+        hr = d3d9Device->CreateTexture(
                 static_cast<UINT>(mSrcWidth),           // width
                 static_cast<UINT>(mSrcHeight),          // height
                 numMips,                                // number of mip map levels
                 usage,                                  // usage
                 d3dPF,                                  // pixel format
                 mD3DPool,
-                &textureResources->pNormTex);           // data pointer
+                &textureResources->pNormTex, NULL);
         // check result and except if failed
         if (FAILED(hr))
         {
@@ -551,8 +549,7 @@ namespace Ogre
 
         // Use D3DX to help us create the texture, this way it can adjust any relevant sizes
         DWORD usage = (mUsage & TU_RENDERTARGET) ? D3DUSAGE_RENDERTARGET : 0;
-        UINT numMips = (mNumRequestedMipmaps == MIP_UNLIMITED) ? 
-            D3DX_DEFAULT : mNumRequestedMipmaps + 1;
+        UINT numMips = (mNumRequestedMipmaps == MIP_UNLIMITED) ? 0 : mNumRequestedMipmaps + 1;
         // Check dynamic textures
         if (mUsage & TU_DYNAMIC)
         {
@@ -623,14 +620,13 @@ namespace Ogre
 
 
         // create the texture
-        hr = D3DXCreateCubeTexture( 
-                d3d9Device,                                 // device
+        hr = d3d9Device->CreateCubeTexture(
                 static_cast<UINT>(mSrcWidth),               // dimension
                 numMips,                                    // number of mip map levels
                 usage,                                      // usage
                 d3dPF,                                      // pixel format
                 mD3DPool,
-                &textureResources->pCubeTex);               // data pointer
+                &textureResources->pCubeTex, NULL);
         // check result and except if failed
         if (FAILED(hr))
         {
@@ -711,8 +707,7 @@ namespace Ogre
 
         // Use D3DX to help us create the texture, this way it can adjust any relevant sizes
         DWORD usage = (mUsage & TU_RENDERTARGET) ? D3DUSAGE_RENDERTARGET : 0;
-        UINT numMips = (mNumRequestedMipmaps == MIP_UNLIMITED) ? 
-            D3DX_DEFAULT : mNumRequestedMipmaps + 1;
+        UINT numMips = (mNumRequestedMipmaps == MIP_UNLIMITED) ? 0 : mNumRequestedMipmaps + 1;
         // Check dynamic textures
         if (mUsage & TU_DYNAMIC)
         {
@@ -773,8 +768,7 @@ namespace Ogre
 
 
         // create the texture
-        hr = D3DXCreateVolumeTexture(   
-                d3d9Device,                                 // device
+        hr = d3d9Device->CreateVolumeTexture(
                 static_cast<UINT>(mWidth),                  // dimension
                 static_cast<UINT>(mHeight),
                 static_cast<UINT>(mDepth),
@@ -782,7 +776,7 @@ namespace Ogre
                 usage,                                      // usage
                 d3dPF,                                      // pixel format
                 mD3DPool,
-                &textureResources->pVolumeTex);             // data pointer
+                &textureResources->pVolumeTex, NULL);
         // check result and except if failed
         if (FAILED(hr))
         {
