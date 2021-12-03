@@ -47,6 +47,7 @@ namespace Ogre {
         virtual void getCustomAttribute( const String& name, void *pData );
 
         bool requiresTextureFlipping() const { return false; }
+        bool attachDepthBuffer( DepthBuffer *depthBuffer ) override;
     private:
         D3D9HardwarePixelBuffer *mRenderTargets[OGRE_MAX_MULTIPLE_RENDER_TARGETS];
         virtual void bindSurfaceImpl(size_t attachment, RenderTexture *target);
@@ -54,6 +55,8 @@ namespace Ogre {
 
         /** Check surfaces and update RenderTarget extent */
         void checkAndUpdate();
+
+        RenderTexture *mDepthTarget;
     };
 };
 

@@ -184,6 +184,7 @@ namespace Ogre {
         /// Override needed to deal with FSAA
         void swapBuffers();
 
+        void _setDepthBuffer(DepthBuffer *depthBuffer) { mDepthBuffer = depthBuffer; }
     };
 
 }
