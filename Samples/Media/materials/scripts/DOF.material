@@ -10,7 +10,7 @@ fragment_program DOF_Blur_ps glsl glsles hlsl
 fragment_program DOF_Blend_ps glsl glsles hlsl
 {
     source DoF_Blend.frag
-    target ps_4_0
+    target ps_2_a
     default_params
     {
         param_named_auto pixelSizeScene viewport_size
