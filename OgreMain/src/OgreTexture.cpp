@@ -91,18 +91,12 @@ namespace Ogre {
     {
         OgreAssert(img.getSize(), "cannot load empty image");
         LoadingState old = mLoadingState.load();
-        if (old!=LOADSTATE_UNLOADED && old!=LOADSTATE_PREPARED) return;
-
-        if (!mLoadingState.compare_exchange_strong(old,LOADSTATE_LOADING)) return;
 
         // Scope lock for actual loading
         try
         {
-                    OGRE_LOCK_AUTO_MUTEX;
-            std::vector<const Image*> imagePtrs;
-            imagePtrs.push_back(&img);
-            _loadImages( imagePtrs );
-
+            OGRE_LOCK_AUTO_MUTEX;
+            _loadImages({&img});
         }
         catch (...)
         {
@@ -112,15 +106,11 @@ namespace Ogre {
             throw;
         }
 
-        mLoadingState.store(LOADSTATE_LOADED);
-
         // Notify manager
         if(getCreator())
             getCreator()->_notifyResourceLoaded(this);
 
         // No deferred loading events since this method is not called in background
-
-
     }
     //--------------------------------------------------------------------------
     void Texture::setFormat(PixelFormat pf)
