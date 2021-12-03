@@ -38,6 +38,7 @@ THE SOFTWARE.
 #include "OgreD3D9Device.h"
 #include "OgreD3D9DeviceManager.h"
 #include "OgreD3D9ResourceManager.h"
+#include "OgreD3D9DepthBuffer.h"
 
 #include <d3dx9.h>
 
@@ -357,7 +358,8 @@ namespace Ogre
             mUsage |= TU_DYNAMIC;
         }
 
-        mFormat = TextureManager::getSingleton().getNativeFormat(mTextureType, mFormat, mUsage);
+        if(!PixelUtil::isDepth(mFormat))
+            mFormat = TextureManager::getSingleton().getNativeFormat(mTextureType, mFormat, mUsage);
 
         // load based on tex.type
         switch (getTextureType())
@@ -462,6 +464,14 @@ namespace Ogre
         else
             textureResources = allocateTextureResources(d3d9Device);
 
+        if(PixelUtil::isDepth(mFormat))
+        {
+            usage = D3DUSAGE_DEPTHSTENCIL;
+            mD3DPool = D3DPOOL_DEFAULT;
+            // we cannot resolve depth on D3D9
+            mFSAAType = D3DMULTISAMPLE_NONE;
+            mFSAA = 0;
+        }
 
         // create the texture
         hr = d3d9Device->CreateTexture(
@@ -1384,14 +1394,23 @@ namespace Ogre
     {
         if(name == "DDBACKBUFFER")
         {
+            auto device = D3D9RenderSystem::getActiveD3D9Device();
+            auto d3dBuffer = static_cast<D3D9HardwarePixelBuffer*>(mBuffer);
+
+            if(PixelUtil::isDepth(mBuffer->getFormat()))
+            {
+                *static_cast<IDirect3DSurface9**>(pData) = d3dBuffer->getNullSurface(device);
+                return;
+            }
+
             if (mFSAA > 0)
             {
                 // rendering to AA surface
-                *(IDirect3DSurface9**)pData = static_cast<D3D9HardwarePixelBuffer*>(mBuffer)->getFSAASurface(D3D9RenderSystem::getActiveD3D9Device());
+                *(IDirect3DSurface9**)pData = d3dBuffer->getFSAASurface(device);
             }
             else
             {
-                *(IDirect3DSurface9**)pData = static_cast<D3D9HardwarePixelBuffer*>(mBuffer)->getSurface(D3D9RenderSystem::getActiveD3D9Device());
+                *(IDirect3DSurface9**)pData = d3dBuffer->getSurface(device);
             }
         }
         else if(name == "HWND")

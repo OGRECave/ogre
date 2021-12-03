@@ -34,8 +34,11 @@ THE SOFTWARE.
 #include "OgreBitwise.h"
 #include "OgreRoot.h"
 #include "OgreD3D9RenderSystem.h"
+#include "OgreD3D9DepthBuffer.h"
 
 #include <d3dx9.h>
+
+#define D3DFMT_NULL (D3DFORMAT)MAKEFOURCC('N', 'U', 'L', 'L')
 
 namespace Ogre {
 
@@ -82,7 +85,7 @@ void D3D9HardwarePixelBuffer::bind(IDirect3DDevice9 *dev, IDirect3DSurface9 *sur
 
     if (bufferResources == NULL)
     {
-        bufferResources = createBufferResources();      
+        bufferResources = new BufferResources();
         mMapDeviceToBufferResources[dev] = bufferResources;
         isNewBuffer = true;
     }
@@ -107,7 +110,21 @@ void D3D9HardwarePixelBuffer::bind(IDirect3DDevice9 *dev, IDirect3DSurface9 *sur
     mSizeInBytes = PixelUtil::getMemorySize(mWidth, mHeight, mDepth, mFormat);  
     
     if(mUsage & TU_RENDERTARGET)
+    {
         updateRenderTexture(writeGamma, fsaa, srcName);
+        if (PixelUtil::isDepth(mFormat))
+        {
+            // create null colour surface
+            dev->CreateRenderTarget(desc.Width, desc.Height, D3DFMT_NULL, D3DMULTISAMPLE_NONE, 0, false,
+                                    &bufferResources->nullSurface, NULL);
+
+            auto rs = (D3D9RenderSystem *)Root::getSingleton().getRenderSystem();
+            auto rtt = static_cast<D3D9RenderTexture *>(mSliceTRT.front());
+            auto depthBuf = rs->_addManualDepthBuffer(dev, getSurface(dev));
+            rtt->_setDepthBuffer(depthBuf);
+            depthBuf->_notifyRenderTargetAttached(rtt);
+        }
+    }
 
     if (isNewBuffer && mOwnerTexture->isLoaded() && mOwnerTexture->isManuallyLoaded())
     {
@@ -143,7 +160,7 @@ void D3D9HardwarePixelBuffer::bind(IDirect3DDevice9 *dev, IDirect3DVolume9 *volu
 
     if (bufferResources == NULL)
     {
-        bufferResources = createBufferResources();
+        bufferResources = new BufferResources();
         mMapDeviceToBufferResources[dev] = bufferResources;
         isNewBuffer = true;
     }
@@ -200,17 +217,6 @@ D3D9HardwarePixelBuffer::BufferResources* D3D9HardwarePixelBuffer::getBufferReso
     
     return NULL;
 }
-
-//-----------------------------------------------------------------------------  
-D3D9HardwarePixelBuffer::BufferResources* D3D9HardwarePixelBuffer::createBufferResources()
-{
-    BufferResources* newResources = OGRE_ALLOC_T(BufferResources, 1, MEMCATEGORY_RENDERSYS);
-
-    memset(newResources, 0, sizeof(BufferResources));
-
-    return newResources;
-}
-
 //-----------------------------------------------------------------------------  
 void D3D9HardwarePixelBuffer::destroyBufferResources(IDirect3DDevice9* d3d9Device)
 {
@@ -221,6 +227,7 @@ void D3D9HardwarePixelBuffer::destroyBufferResources(IDirect3DDevice9* d3d9Devic
     if (it != mMapDeviceToBufferResources.end())
     {
         SAFE_RELEASE(it->second->surface);
+        SAFE_RELEASE(it->second->nullSurface);
         SAFE_RELEASE(it->second->volume);           
         if (it->second != NULL)
         {
@@ -955,11 +962,13 @@ void D3D9HardwarePixelBuffer::releaseSurfaces(IDirect3DDevice9* d3d9Device)
     if (bufferResources != NULL)
     {
         SAFE_RELEASE(bufferResources->surface);
+        SAFE_RELEASE(bufferResources->nullSurface);
         SAFE_RELEASE(bufferResources->volume);
     }
 }
-//-----------------------------------------------------------------------------   
-IDirect3DSurface9* D3D9HardwarePixelBuffer::getSurface(IDirect3DDevice9* d3d9Device)
+//-----------------------------------------------------------------------------
+D3D9HardwarePixelBuffer::BufferResources*
+D3D9HardwarePixelBuffer::createOrRetrieveResources(IDirect3DDevice9* d3d9Device)
 {
     BufferResources* bufferResources = getBufferResources(d3d9Device);
 
@@ -969,20 +978,7 @@ IDirect3DSurface9* D3D9HardwarePixelBuffer::getSurface(IDirect3DDevice9* d3d9Dev
         bufferResources = getBufferResources(d3d9Device);
     }
 
-    return bufferResources->surface;
-}
-//-----------------------------------------------------------------------------   
-IDirect3DSurface9* D3D9HardwarePixelBuffer::getFSAASurface(IDirect3DDevice9* d3d9Device)
-{
-    BufferResources* bufferResources = getBufferResources(d3d9Device);
-
-    if (bufferResources == NULL)
-    {
-        mOwnerTexture->createTextureResources(d3d9Device);
-        bufferResources = getBufferResources(d3d9Device);
-    }
-    
-    return bufferResources->fSAASurface;
+    return bufferResources;
 }
 //-----------------------------------------------------------------------------    
 void D3D9HardwarePixelBuffer::updateRenderTexture(bool writeGamma, uint fsaa, const String& srcName)

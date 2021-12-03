@@ -31,6 +31,8 @@ THE SOFTWARE.
 #include "OgreLogManager.h"
 #include "OgreException.h"
 
+#define D3DFMT_INTZ ( (D3DFORMAT)MAKEFOURCC('I', 'N', 'T', 'Z') )
+
 namespace Ogre 
 {
     //---------------------------------------------------------------------
@@ -672,6 +674,8 @@ namespace Ogre
             return PF_DXT4;
         case D3DFMT_DXT5:
             return PF_DXT5;
+        case D3DFMT_INTZ:
+            return PF_DEPTH16;
         default:
             return PF_UNKNOWN;
         }
@@ -737,6 +741,8 @@ namespace Ogre
             return D3DFMT_DXT4;
         case PF_DXT5:
             return D3DFMT_DXT5;
+        case PF_DEPTH16:
+            return D3DFMT_INTZ;
         case PF_UNKNOWN:
         default:
             return D3DFMT_UNKNOWN;

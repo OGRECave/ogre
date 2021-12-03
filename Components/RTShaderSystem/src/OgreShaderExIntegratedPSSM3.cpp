@@ -110,11 +110,14 @@ bool IntegratedPSSM3::preAddToRenderState(const RenderState* renderState,
         renderState->getLightCount().isZeroLength())
         return false;
 
+    bool isD3D9 = ShaderGenerator::getSingleton().getTargetLanguage() == "hlsl" &&
+                  !GpuProgramManager::getSingleton().isSyntaxSupported("vs_4_0_level_9_1");
+
     PixelFormat shadowTexFormat = PF_UNKNOWN;
     const auto& configs = ShaderGenerator::getSingleton().getActiveSceneManager()->getShadowTextureConfigList();
     if (!configs.empty())
         shadowTexFormat = configs[0].format; // assume first texture is representative
-    mUseTextureCompare = PixelUtil::isDepth(shadowTexFormat);
+    mUseTextureCompare = PixelUtil::isDepth(shadowTexFormat) && !isD3D9;
     mUseColourShadows = PixelUtil::getComponentType(shadowTexFormat) == PCT_BYTE; // use colour shadowmaps for byte textures
 
     ShadowTextureParamsIterator it = mShadowTextureParamsList.begin();
