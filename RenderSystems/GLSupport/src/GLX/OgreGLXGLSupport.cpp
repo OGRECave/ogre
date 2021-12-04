@@ -38,11 +38,8 @@
 
 #include "OgreGLUtil.h"
 
-#ifndef Status
-#define Status int
-#endif
+#include "OgreX11.h"
 
-#include <X11/Xlib.h>
 #include <X11/extensions/Xrandr.h>
 
 static bool ctxErrorOccurred = false;
@@ -73,50 +70,7 @@ namespace Ogre
         // A connection that is NOT shared to enable independent event processing:
         mXDisplay  = getXDisplay();
 
-        int dummy;
-
-        if (XQueryExtension(mXDisplay, "RANDR", &dummy, &dummy, &dummy))
-        {
-            XRRScreenConfiguration *screenConfig;
-
-            screenConfig = XRRGetScreenInfo(mXDisplay, DefaultRootWindow(mXDisplay));
-
-            if (screenConfig)
-            {
-                XRRScreenSize *screenSizes;
-                int nSizes = 0;
-                Rotation currentRotation;
-                int currentSizeID = XRRConfigCurrentConfiguration(screenConfig, &currentRotation);
-
-                screenSizes = XRRConfigSizes(screenConfig, &nSizes);
-
-                mCurrentMode.width = screenSizes[currentSizeID].width;
-                mCurrentMode.height = screenSizes[currentSizeID].height;
-                mCurrentMode.refreshRate = XRRConfigCurrentRate(screenConfig);
-
-                mOriginalMode = mCurrentMode;
-
-                for(int sizeID = 0; sizeID < nSizes; sizeID++)
-                {
-                    short *rates;
-                    int nRates = 0;
-
-                    rates = XRRConfigRates(screenConfig, sizeID, &nRates);
-
-                    for (int rate = 0; rate < nRates; rate++)
-                    {
-                        VideoMode mode;
-
-                        mode.width = screenSizes[sizeID].width;
-                        mode.height = screenSizes[sizeID].height;
-                        mode.refreshRate = rates[rate];
-
-                        mVideoModes.push_back(mode);
-                    }
-                }
-                XRRFreeScreenConfigInfo(screenConfig);
-            }
-        }
+        getXVideoModes(mXDisplay, mCurrentMode, mVideoModes);
 
         if(mVideoModes.empty())
         {
@@ -124,10 +78,10 @@ namespace Ogre
             mCurrentMode.height = DisplayHeight(mXDisplay, DefaultScreen(mXDisplay));
             mCurrentMode.refreshRate = 0;
 
-            mOriginalMode = mCurrentMode;
-
             mVideoModes.push_back(mCurrentMode);
         }
+
+        mOriginalMode = mCurrentMode;
 
         GLXFBConfig *fbConfigs;
         int config, nConfigs = 0;
