@@ -129,12 +129,7 @@ namespace Ogre {
 
     void EGLWindow::getCustomAttribute( const String& name, void* pData )
     {
-        if (name == "DISPLAYNAME")
-        {
-            *static_cast<String*>(pData) = mGLSupport->getDisplayName();
-            return;
-        }
-        else if (name == "DISPLAY")
+        if (name == "DISPLAY")
         {
             *static_cast<EGLDisplay*>(pData) = mEglDisplay;
             return;
