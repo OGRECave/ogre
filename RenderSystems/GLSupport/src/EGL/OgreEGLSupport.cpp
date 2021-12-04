@@ -95,9 +95,7 @@ namespace Ogre {
 
         if(mGLDisplay == EGL_NO_DISPLAY)
         {
-            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-                        "Couldn`t open EGLDisplay " + getDisplayName(),
-                        "EGLSupport::getGLDisplay");
+            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Couldn`t get EGLDisplay");
         }
 
         if (eglInitialize(mGLDisplay, &mEGLMajor, &mEGLMinor) == EGL_FALSE)
@@ -109,12 +107,6 @@ namespace Ogre {
         EGL_CHECK_ERROR
 
         return mGLDisplay;
-    }
-
-
-    String EGLSupport::getDisplayName(void)
-    {
-        return "todo";
     }
 
     EGLConfig* EGLSupport::chooseGLConfig(const EGLint *attribList, EGLint *nElements)

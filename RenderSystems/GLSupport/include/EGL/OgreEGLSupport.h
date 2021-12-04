@@ -89,7 +89,7 @@ namespace Ogre {
 
             void start(void);
             void stop(void);
-            virtual String getDisplayName (void);
+
             EGLDisplay getGLDisplay(void);
             void setGLDisplay(EGLDisplay val);
             EGLConfig* chooseGLConfig(const EGLint *attribList, EGLint *nElements);
