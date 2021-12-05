@@ -77,8 +77,8 @@ these will enable input handling in the SampleBrowser, the X11 ConfigDialog and 
 * Doxygen: http://doxygen.org
 * Cg: http://developer.nvidia.com/object/cg_toolkit.html
 * Remotery: https://github.com/Celtoys/Remotery
-* Assimp: https://www.assimp.org/
 * SWIG: http://www.swig.org/
+* %Assimp: https://www.assimp.org/
 
 Running CMake
 -------------
