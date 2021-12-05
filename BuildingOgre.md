@@ -43,15 +43,21 @@ For manually building the dependencies, please refer to the list below and get a
 
 On linux you additionally need the following system headers to build the GL, GL3+, GLES2 & Vulkan RenderSystems:
 * Ubuntu
+
     sudo apt-get install libgles2-mesa-dev libvulkan-dev glslang-dev
-* Fedora    
+
+* Fedora
+
     sudo dnf install mesa-libGL-devel mesa-vulkan-devel glslang-devel
 
 furthermore we recommend installing the following optional packages
 
 * Ubuntu
+
     sudo apt-get install libsdl2-dev libxt-dev libxaw7-dev doxygen
-* Fedora    
+
+* Fedora
+
     sudo dnf install SDL2-devel libXt-devel libXaw-devel doxygen pugixml-devel
 
 these will enable input handling in the SampleBrowser, the X11 ConfigDialog and allow building the documentation.
