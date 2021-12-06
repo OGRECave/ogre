@@ -1089,7 +1089,6 @@ const Pass* SceneManager::_setPass(const Pass* pass, bool evenIfSuppressed,
     }
     mDestRenderSystem->_setCullingMode(mPassCullingMode);
     mDestRenderSystem->setShadingType(pass->getShadingMode());
-    mDestRenderSystem->_setPolygonMode(pass->getPolygonMode());
 
     mAutoParamDataSource->setPassNumber( pass->getIndex() );
     // mark global params as dirty
@@ -1295,9 +1294,6 @@ void SceneManager::_renderScene(Camera* camera, Viewport* vp, bool includeOverla
     }        
     // Begin the frame
     mDestRenderSystem->_beginFrame();
-
-    // Set rasterisation mode
-    mDestRenderSystem->_setPolygonMode(camera->getPolygonMode());
 
     mDestRenderSystem->_setTextureProjectionRelativeTo(mCameraRelativeRendering, camera->getDerivedPosition());
 
@@ -3116,9 +3112,6 @@ void SceneManager::_resumeRendering(SceneManager::RenderContext* context)
     }
     mCameraInProgress = context->camera;
     mDestRenderSystem->_resumeFrame(context->rsContext);
-
-    // Set rasterisation mode
-    mDestRenderSystem->_setPolygonMode(mCameraInProgress->getPolygonMode());
     
     mDestRenderSystem->_setTextureProjectionRelativeTo(mCameraRelativeRendering, mCameraInProgress->getDerivedPosition());
     delete context;
