@@ -24,7 +24,7 @@ if(OGRE_CONFIG_ENABLE_GL_STATE_CACHE_SUPPORT)
     PROPERTIES COMPILE_DEFINITIONS OGRE_ENABLE_STATE_CACHE)
 endif()
 add_library(RenderSystem_GL3Plus ${OGRE_LIB_TYPE} ${HEADER_FILES} ${GLSL_HEADERS} ${GLSL_SOURCE} ${SOURCE_FILES})
-target_link_libraries(RenderSystem_GL3Plus PUBLIC OgreMain ${OPENGL_gl_LIBRARY} ${CMAKE_DL_LIBS} PRIVATE OgreGLSupport)
+target_link_libraries(RenderSystem_GL3Plus PUBLIC OgreMain ${CMAKE_DL_LIBS} PRIVATE OgreGLSupport)
 target_include_directories(RenderSystem_GL3Plus PUBLIC
     "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
     $<INSTALL_INTERFACE:include/OGRE/RenderSystems/GL3Plus>

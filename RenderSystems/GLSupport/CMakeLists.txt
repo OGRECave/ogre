@@ -44,9 +44,7 @@ elseif (WIN32)
     set(NATIVE_INCLUDES
         ${CMAKE_CURRENT_SOURCE_DIR}/include/win32)
         
-    if(MINGW)
-        set(PLATFORM_LIBS opengl32)
-    endif()
+    set(PLATFORM_LIBS ${OPENGL_gl_LIBRARY})
   endif()
 elseif(APPLE_IOS)
   # only works with GLES2 - no shared components here.
@@ -81,7 +79,7 @@ elseif (UNIX)
         ${CMAKE_CURRENT_SOURCE_DIR}/include/GLX
         ${OPENGL_INCLUDE_DIR})
     
-    set(PLATFORM_LIBS ${X11_LIBRARIES} ${X11_Xrandr_LIB} ${OPENGL_gl_LIBRARY})
+    set(PLATFORM_LIBS ${X11_LIBRARIES} ${X11_Xrandr_LIB} ${OPENGL_glx_LIBRARY})
   endif()
   list(APPEND NATIVE_INCLUDES "${CMAKE_CURRENT_SOURCE_DIR}/src/X11/")
 endif ()
