@@ -41,29 +41,29 @@ namespace Ogre {
     *  @{
     */
     /** A class for performing queries on a scene.
-    @remarks
+
         This is an abstract class for performing a query on a scene, i.e. to retrieve
         a list of objects and/or world geometry sections which are potentially intersecting a
         given region. Note the use of the word 'potentially': the results of a scene query
         are generated based on bounding volumes, and as such are not correct at a triangle
         level; the user of the SceneQuery is expected to filter the results further if
         greater accuracy is required.
-    @par
+
         Different SceneManagers will implement these queries in different ways to
         exploit their particular scene organisation, and thus will provide their own
         concrete subclasses. In fact, these subclasses will be derived from subclasses
         of this class rather than directly because there will be region-type classes
         in between.
-    @par
+
         These queries could have just been implemented as methods on the SceneManager,
         however, they are wrapped up as objects to allow 'compilation' of queries
         if deemed appropriate by the implementation; i.e. each concrete subclass may
         precalculate information (such as fixed scene partitions involved in the query)
         to speed up the repeated use of the query.
-    @par
+
         You should never try to create a SceneQuery object yourself, they should be created
         using the SceneManager interfaces for the type of query required, e.g.
-        SceneManager::createSphereSceneQuery.
+        @ref SceneManager::createSphereQuery.
     */
     class _OgreExport SceneQuery : public SceneMgtAlloc
     {
@@ -73,6 +73,8 @@ namespace Ogre {
             these types will be supported by all SceneManagers; once the application
             has decided which SceneManager specialisation to use, it is expected that 
             it will know which type of world geometry abstraction is available to it.
+
+            @note only supported by the BspSceneManager
         */
         enum WorldFragmentType {
             /// Return no world geometry hits at all
@@ -126,7 +128,7 @@ namespace Ogre {
         virtual ~SceneQuery();
 
         /** Sets the mask for results of this query.
-        @remarks
+
             This method allows you to set a 'mask' to limit the results of this
             query to certain types of result. The actual meaning of this value is
             up to the application; basically MovableObject instances will only be returned
@@ -139,7 +141,7 @@ namespace Ogre {
         virtual uint32 getQueryMask(void) const;
 
         /** Sets the type mask for results of this query.
-        @remarks
+
             This method allows you to set a 'type mask' to limit the results of this
             query to certain types of objects. Whilst setQueryMask deals with flags
             set per instance of object, this method deals with setting a mask on 
@@ -152,7 +154,7 @@ namespace Ogre {
 
         /** Tells the query what kind of world geometry to return from queries;
             often the full renderable geometry is not what is needed. 
-        @remarks
+
             The application receiving the world geometry is expected to know 
             what to do with it; inevitably this means that the application must 
             have knowledge of at least some of the structures
