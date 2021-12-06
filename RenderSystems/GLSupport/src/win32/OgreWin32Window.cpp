@@ -368,27 +368,7 @@ namespace Ogre {
 
             if (mIsFullScreen)
             {
-                DEVMODE displayDeviceMode;
-
-                memset(&displayDeviceMode, 0, sizeof(displayDeviceMode));
-                displayDeviceMode.dmSize = sizeof(DEVMODE);
-                displayDeviceMode.dmBitsPerPel = mColourDepth;
-                displayDeviceMode.dmPelsWidth = mWidth;
-                displayDeviceMode.dmPelsHeight = mHeight;
-                displayDeviceMode.dmFields = DM_BITSPERPEL | DM_PELSWIDTH | DM_PELSHEIGHT;
-
-                if (mDisplayFrequency)
-                {
-                    displayDeviceMode.dmDisplayFrequency = mDisplayFrequency;
-                    displayDeviceMode.dmFields |= DM_DISPLAYFREQUENCY;
-                    if (ChangeDisplaySettingsEx(mDeviceName, &displayDeviceMode, NULL, CDS_FULLSCREEN | CDS_TEST, NULL) != DISP_CHANGE_SUCCESSFUL)
-                    {
-                        LogManager::getSingleton().logMessage(LML_NORMAL, "ChangeDisplaySettings with user display frequency failed");
-                        displayDeviceMode.dmFields ^= DM_DISPLAYFREQUENCY;
-                    }
-                }
-                if (ChangeDisplaySettingsEx(mDeviceName, &displayDeviceMode, NULL, CDS_FULLSCREEN, NULL) != DISP_CHANGE_SUCCESSFUL)                             
-                    LogManager::getSingleton().logMessage(LML_CRITICAL, "ChangeDisplaySettings failed");
+                switchMode(mWidth, mHeight, mDisplayFrequency);
             }
 
             // Pass pointer to self as WM_CREATE parameter
@@ -519,6 +499,30 @@ namespace Ogre {
 
     }
 
+    void Win32Window::switchMode(uint width, uint height, uint frequency)
+    {
+        DEVMODE displayDeviceMode = {};
+
+        displayDeviceMode.dmSize = sizeof(DEVMODE);
+        displayDeviceMode.dmBitsPerPel = mColourDepth;
+        displayDeviceMode.dmPelsWidth = width;
+        displayDeviceMode.dmPelsHeight = height;
+        displayDeviceMode.dmFields = DM_BITSPERPEL | DM_PELSWIDTH | DM_PELSHEIGHT;
+
+        if (frequency)
+        {
+            displayDeviceMode.dmDisplayFrequency = frequency;
+            displayDeviceMode.dmFields |= DM_DISPLAYFREQUENCY;
+            if (ChangeDisplaySettingsEx(mDeviceName, &displayDeviceMode, NULL, CDS_FULLSCREEN | CDS_TEST, NULL) != DISP_CHANGE_SUCCESSFUL)
+            {
+                LogManager::getSingleton().logWarning("ChangeDisplaySettings with user display frequency failed");
+                displayDeviceMode.dmFields ^= DM_DISPLAYFREQUENCY;
+            }
+        }
+        if (ChangeDisplaySettingsEx(mDeviceName, &displayDeviceMode, NULL, CDS_FULLSCREEN, NULL) != DISP_CHANGE_SUCCESSFUL)
+            LogManager::getSingleton().logError("ChangeDisplaySettings failed");
+    }
+
     void Win32Window::setFullscreen(bool fullScreen, unsigned int width, unsigned int height)
     {
         if(mIsExternal)
@@ -530,49 +534,7 @@ namespace Ogre {
             
             if (mIsFullScreen)
             {
-                
-                DEVMODE displayDeviceMode;
-
-                memset(&displayDeviceMode, 0, sizeof(displayDeviceMode));
-                displayDeviceMode.dmSize = sizeof(DEVMODE);
-                displayDeviceMode.dmBitsPerPel = mColourDepth;
-                displayDeviceMode.dmPelsWidth = width;
-                displayDeviceMode.dmPelsHeight = height;
-                displayDeviceMode.dmFields = DM_BITSPERPEL | DM_PELSWIDTH | DM_PELSHEIGHT;
-                if (mDisplayFrequency)
-                {
-                    displayDeviceMode.dmDisplayFrequency = mDisplayFrequency;
-                    displayDeviceMode.dmFields |= DM_DISPLAYFREQUENCY;
-
-                    if (ChangeDisplaySettingsEx(mDeviceName, &displayDeviceMode, NULL, 
-                        CDS_FULLSCREEN | CDS_TEST, NULL) != DISP_CHANGE_SUCCESSFUL)                 
-                    {
-                        LogManager::getSingleton().logMessage(LML_NORMAL, "ChangeDisplaySettings with user display frequency failed");
-                        displayDeviceMode.dmFields ^= DM_DISPLAYFREQUENCY;
-                    }
-                }
-                else
-                {
-                    // try a few
-                    displayDeviceMode.dmDisplayFrequency = 100;
-                    displayDeviceMode.dmFields |= DM_DISPLAYFREQUENCY;
-                    if (ChangeDisplaySettingsEx(mDeviceName, &displayDeviceMode, NULL, 
-                        CDS_FULLSCREEN | CDS_TEST, NULL) != DISP_CHANGE_SUCCESSFUL)     
-                    {
-                        displayDeviceMode.dmDisplayFrequency = 75;
-                        if (ChangeDisplaySettingsEx(mDeviceName, &displayDeviceMode, NULL, 
-                            CDS_FULLSCREEN | CDS_TEST, NULL) != DISP_CHANGE_SUCCESSFUL)     
-                        {
-                            displayDeviceMode.dmFields ^= DM_DISPLAYFREQUENCY;
-                        }
-                    }
-
-                }
-                // move window to 0,0 before display switch
-                SetWindowPos(mHWnd, HWND_TOPMOST, 0, 0, mWidth, mHeight, SWP_NOACTIVATE);
-
-                if (ChangeDisplaySettingsEx(mDeviceName, &displayDeviceMode, NULL, CDS_FULLSCREEN, NULL) != DISP_CHANGE_SUCCESSFUL)             
-                    LogManager::getSingleton().logMessage(LML_CRITICAL, "ChangeDisplaySettings failed");
+                switchMode(width, height, mDisplayFrequency);
 
                 // Get the nearest monitor to this window.
                 HMONITOR hMonitor = MonitorFromWindow(mHWnd, MONITOR_DEFAULTTONEAREST);
@@ -852,23 +814,8 @@ namespace Ogre {
                 ShowWindow(mHWnd, SW_SHOWMINNOACTIVE);
             }
             else
-            {   //Restore App
-                ShowWindow(mHWnd, SW_SHOWNORMAL);
-
-                DEVMODE displayDeviceMode;
-
-                memset(&displayDeviceMode, 0, sizeof(displayDeviceMode));
-                displayDeviceMode.dmSize = sizeof(DEVMODE);
-                displayDeviceMode.dmBitsPerPel = mColourDepth;
-                displayDeviceMode.dmPelsWidth = mWidth;
-                displayDeviceMode.dmPelsHeight = mHeight;
-                displayDeviceMode.dmFields = DM_BITSPERPEL | DM_PELSWIDTH | DM_PELSHEIGHT;
-                if (mDisplayFrequency)
-                {
-                    displayDeviceMode.dmDisplayFrequency = mDisplayFrequency;
-                    displayDeviceMode.dmFields |= DM_DISPLAYFREQUENCY;
-                }
-                ChangeDisplaySettingsEx(mDeviceName, &displayDeviceMode, NULL, CDS_FULLSCREEN, NULL);
+            {
+                switchMode(mWidth, mHeight, mDisplayFrequency);
             }
         }
     }
