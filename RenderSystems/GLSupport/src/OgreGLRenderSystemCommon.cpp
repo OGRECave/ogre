@@ -43,7 +43,7 @@ namespace Ogre {
         c.erase(p, c.end());
     }
 
-    String GLRenderSystemCommon::VideoMode::getDescription() const
+    String VideoMode::getDescription() const
     {
         return StringUtil::format("%4d x %4d", width, height);
     }

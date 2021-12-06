@@ -79,11 +79,7 @@ namespace Ogre {
     {
         
     }
-    
-    void AndroidEGLSupport::switchMode( uint& width, uint& height, short& frequency )
-    {
-    }
-    
+
     RenderWindow* AndroidEGLSupport::newWindow( const String &name, unsigned int width, unsigned int height, bool fullScreen, const NameValuePairList *miscParams)
     {
         AndroidEGLWindow* window = new AndroidEGLWindow(this);

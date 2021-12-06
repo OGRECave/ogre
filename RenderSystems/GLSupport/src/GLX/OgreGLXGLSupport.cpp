@@ -56,6 +56,23 @@ static int ctxErrorHandler( Display *dpy, XErrorEvent *ev )
 
 namespace Ogre
 {
+    struct GLXVideoMode
+    {
+        typedef std::pair<uint, uint>      ScreenSize;
+        typedef short                      Rate;
+        ScreenSize first;
+        Rate second;
+
+        GLXVideoMode() {}
+        GLXVideoMode(const VideoMode& m) : first(m.width, m.height), second(m.refreshRate) {}
+
+        bool operator!=(const GLXVideoMode& o) const
+        {
+            return first != o.first || second != o.second;
+        }
+    };
+    typedef std::vector<GLXVideoMode>    GLXVideoModes;
+
     GLNativeSupport* getGLSupport(int profile)
     {
         return new GLXGLSupport(profile);

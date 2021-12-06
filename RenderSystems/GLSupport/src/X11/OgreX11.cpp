@@ -159,8 +159,7 @@ void finaliseTopLevel(Display* display, Window window, int& left, int& top, uint
     height = windowAttrib.height;
 }
 
-bool getXVideoModes(Display* display, GLRenderSystemCommon::VideoMode& currentMode,
-                           GLRenderSystemCommon::VideoModes& videoModes)
+bool getXVideoModes(Display* display, VideoMode& currentMode, VideoModes& videoModes)
 {
     int dummy;
     if (!XQueryExtension(display, "RANDR", &dummy, &dummy, &dummy))
@@ -190,7 +189,7 @@ bool getXVideoModes(Display* display, GLRenderSystemCommon::VideoMode& currentMo
 
         for (int rate = 0; rate < nRates; rate++)
         {
-            GLRenderSystemCommon::VideoMode mode;
+            VideoMode mode = {};
 
             mode.width = screenSizes[sizeID].width;
             mode.height = screenSizes[sizeID].height;
