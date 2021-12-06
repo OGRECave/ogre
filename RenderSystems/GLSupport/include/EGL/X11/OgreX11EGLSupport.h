@@ -57,7 +57,6 @@ namespace Ogre {
             X11EGLSupport(int profile);
             virtual ~X11EGLSupport();
 
-            virtual void switchMode(uint& width, uint& height, short& frequency);
             String getDisplayName(void);
 
             NativeDisplayType getNativeDisplay(void);

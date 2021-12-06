@@ -7,7 +7,7 @@
 #define OGRE_X11_H__
 
 #include <OgrePrerequisites.h>
-#include <OgreGLRenderSystemCommon.h>
+#include <OgreGLNativeSupport.h>
 
 #ifndef Status
 #define Status int
@@ -32,8 +32,7 @@ void queryRect(Display* display, Window window, int& left, int& top, uint& width
 void finaliseTopLevel(Display* display, Window window, int& left, int& top, uint& width, uint& height, String& title,
                       Atom wmDelete);
 
-bool getXVideoModes(Display* display, GLRenderSystemCommon::VideoMode& currentMode,
-                    GLRenderSystemCommon::VideoModes& videoModes);
+bool getXVideoModes(Display* display, VideoMode& currentMode, VideoModes& videoModes);
 } // namespace Ogre
 
 #endif

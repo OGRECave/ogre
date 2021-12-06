@@ -58,11 +58,6 @@ namespace Ogre {
     {        
     }
     
-    void EmscriptenEGLSupport::switchMode( uint& width, uint& height, short& frequency )
-    {
-        //TODO
-    }
-    
     RenderWindow* EmscriptenEGLSupport::newWindow( const String &name, unsigned int width, unsigned int height, bool fullScreen, const NameValuePairList *miscParams)
     {
         EmscriptenEGLWindow* window = new EmscriptenEGLWindow(this);

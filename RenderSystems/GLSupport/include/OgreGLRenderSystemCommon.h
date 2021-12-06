@@ -74,16 +74,6 @@ namespace Ogre {
         */
         virtual void _oneTimeContextInitialization() = 0;
     public:
-        struct VideoMode {
-            uint32 width;
-            uint32 height;
-            int16 refreshRate;
-            uint8  bpp;
-
-            String getDescription() const;
-        };
-        typedef std::vector<VideoMode>    VideoModes;
-
         /**
          Specific options:
 

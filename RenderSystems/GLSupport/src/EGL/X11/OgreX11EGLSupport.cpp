@@ -131,49 +131,6 @@ namespace Ogre {
         return String((const char*)XDisplayName(DisplayString(mNativeDisplay)));
     }
 
-
-    void X11EGLSupport::switchMode(uint& width, uint& height, short& frequency)
-    {
-        int size = 0;
-
-        EGLVideoModes eglVideoModes(mVideoModes.begin(), mVideoModes.end());
-        EGLVideoModes::iterator mode;
-        EGLVideoModes::iterator end = eglVideoModes.end();
-        EGLVideoMode *newMode = 0;
-
-        for(mode = eglVideoModes.begin(); mode != end; size++)
-        {
-            if (mode->first.first >= width &&
-                mode->first.second >= height)
-            {
-                if (!newMode ||
-                    mode->first.first < newMode->first.first ||
-                    mode->first.second < newMode->first.second)
-                {
-                    newMode = &(*mode);
-                }
-            }
-
-            EGLVideoMode* lastMode = &(*mode);
-
-            while (++mode != end && mode->first == lastMode->first)
-            {
-                if (lastMode == newMode && mode->second == frequency)
-                {
-                    newMode = &(*mode);
-                }
-            }
-        }
-
-        if (newMode && *newMode != mCurrentMode)
-        {
-            newMode->first.first = DisplayWidth(mNativeDisplay, 0);
-            newMode->first.second = DisplayHeight(mNativeDisplay, 0);
-            newMode->second = 0; // TODO: Hardcoding refresh rate for LCD's
-            mCurrentMode = {newMode->first.first, newMode->first.second, newMode->second};
-        }
-    }
-
     XVisualInfo *X11EGLSupport::getVisualFromFBConfig(::EGLConfig glConfig)
     {
         XVisualInfo *vi, tmp;
