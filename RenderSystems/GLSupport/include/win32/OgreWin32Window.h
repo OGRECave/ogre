@@ -68,6 +68,8 @@ namespace Ogre {
 
     protected:
         
+        void switchMode(uint width, uint height, uint frequency);
+
         /** Update the window rect. */ 
         void updateWindowRect();
 
