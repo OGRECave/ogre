@@ -189,8 +189,7 @@ endif ()
 
 # Find OpenGL
 if(NOT ANDROID AND NOT EMSCRIPTEN)
-  set(OpenGL_GL_PREFERENCE LEGACY) # we want to use OPENGL_gl_LIBRARY for now
-  find_package(OpenGL)
+  find_package(OpenGL COMPONENTS EGL GLX)
   macro_log_feature(OPENGL_FOUND "OpenGL" "Support for the OpenGL and OpenGL 3+ render systems" "http://www.opengl.org/" FALSE "" "")
 endif()
 
