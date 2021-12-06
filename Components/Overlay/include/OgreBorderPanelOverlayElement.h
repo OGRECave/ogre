@@ -235,6 +235,7 @@ namespace Ogre {
         {
             mUseIdentityProjection = true;
             mUseIdentityView = true;
+            mPolygonModeOverrideable = parent->getPolygonModeOverrideable();
         }
         const MaterialPtr& getMaterial(void) const { return mParent->mBorderMaterial; }
         void getRenderOperation(RenderOperation& op) { op = mParent->mRenderOp2; }
@@ -246,10 +247,6 @@ namespace Ogre {
             // N/A, panels are not lit
             static LightList ll;
             return ll;
-        }
-        bool getPolygonModeOverrideable(void) const
-        {
-            return mParent->getPolygonModeOverrideable();
         }
     };
     /** @} */
