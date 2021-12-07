@@ -1136,7 +1136,7 @@ namespace Ogre
                     D3D9HardwarePixelBuffer* currPixelBuffer = GETLEVEL(face, mip);
                     
                     
-                    if (mip == 0 && mNumRequestedMipmaps != 0 && (mUsage & TU_AUTOMIPMAP))
+                    if (mip == 0 && mNumRequestedMipmaps != 0 && (mUsage & TU_AUTOMIPMAP) && face == 5)
                         currPixelBuffer->_setMipmapping(true, mMipmapsHardwareGenerated);
 
                     currPixelBuffer->bind(d3d9Device, surface, textureResources->pFSAASurface,
