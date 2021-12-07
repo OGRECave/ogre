@@ -469,7 +469,7 @@ namespace Ogre
             device->mGraphicsQueue.getCopyEncoder( 0, this, true );
         }
 
-        const uint32 numSlices = getDepth();
+        const uint32 numSlices = getNumLayers();
 
         VkImageMemoryBarrier imageBarrier = getImageMemoryBarrier();
 
