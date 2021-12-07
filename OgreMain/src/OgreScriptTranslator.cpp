@@ -3868,6 +3868,7 @@ namespace Ogre{
 
                                 count = parseProgramParameterDimensions(atom1->value, type);
                                 int roundedCount = (count + 3) / 4; // integer ceil
+                                roundedCount *= 4;
 
                                 if (type == BCT_FLOAT)
                                 {
