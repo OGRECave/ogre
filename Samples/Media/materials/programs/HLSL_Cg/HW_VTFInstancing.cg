@@ -79,12 +79,14 @@ VS_OUTPUT main_vs( in VS_INPUT input,
 	worldPos = float4(calculateBlendPosition(input.Position, blendDQ), 1.0);
 	worldNorm = calculateBlendNormal(input.Normal, blendDQ);
 #else
+	//! [world_pos]
 	float3x4 worldMatrix;
 	worldMatrix[0] = tex2Dlod( matrixTexture, float4(input.m03.xw + input.mOffset, 0, 0) );
 	worldMatrix[1] = tex2Dlod( matrixTexture, float4(input.m03.yw + input.mOffset, 0, 0) );
 	worldMatrix[2] = tex2Dlod( matrixTexture, float4(input.m03.zw + input.mOffset, 0, 0) );
 
 	worldPos = float4( mul( worldMatrix, input.Position ).xyz, 1.0f );
+	//! [world_pos]
 	worldNorm= mul( (float3x3)(worldMatrix), input.Normal );
 #endif
 

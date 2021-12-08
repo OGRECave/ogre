@@ -62,7 +62,7 @@ Files:
 See `Examples/Instancing/RTSS/Robot` for an example on how to use instancing with the [RTSS: Run Time Shader System](@ref rtss)
 
 Add to the Vertex Shader input example:
-```
+```cpp
 	...
 	float4 blendIdx : BLENDINDICES,
 	uniform float3x4 worldMatrix3x4Array[80],
@@ -70,7 +70,7 @@ Add to the Vertex Shader input example:
 ```
 
 Vertex position calculation example:
-```
+```cpp
 	int idx = int(blendIdx[0]);
 	float4 worldPos  = float4( mul( worldMatrix3x4Array[idx], position ).xyz, 1.0f );
 	oClipPos = mul( viewProjMatrix, worldPos );
@@ -104,7 +104,7 @@ texture_unit InstancingVTF
 }
 ```
 
-Add to Vertex Shader input example:
+Vertex Shader input example:
 ```
 	...
 	float4 m01 : TEXCOORD1,
@@ -114,15 +114,8 @@ Add to Vertex Shader input example:
 ```
 
 Vertex position calculation example:
-```
-	float3x4 worldMatrix;
-	worldMatrix[0] = tex2D( matrixTexture, m01.xy );
-	worldMatrix[1] = tex2D( matrixTexture, m01.zw );
-	worldMatrix[2] = tex2D( matrixTexture, m23.xy );
-	float4 worldPos = float4( mul( worldMatrix, position ).xyz, 1.0f );
-	oClipPos = mul( viewProjMatrix, worldPos );
-	...
-```
+
+@snippet Samples/Media/materials/programs/HLSL_Cg/VTFInstancing.cg world_pos
 
 ## HW VTF {#InstancingTechniquesHWVTF}
 
@@ -154,14 +147,8 @@ Vertex Shader input example:
 ```
 
 Vertex position calculation example:
-```
-	float3x4 worldMatrix;
-	worldMatrix[0] = tex2D( matrixTexture, m03.xw + mOffset );
-	worldMatrix[1] = tex2D( matrixTexture, m03.yw + mOffset );
-	worldMatrix[2] = tex2D( matrixTexture, m03.zw + mOffset );
-	float4 worldPos = float4( mul( worldMatrix, position ).xyz, 1.0f );
-	oClipPos = mul( viewProjMatrix, worldPos );
-```
+
+@snippet Samples/Media/materials/programs/HLSL_Cg/HW_VTFInstancing.cg world_pos
 
 ### HW VTF LUT {#InstancingTechniquesHW}
 
@@ -199,20 +186,15 @@ Files:
 See `Examples/Instancing/RTSS/Robot` for an example on how to use instancing with the [RTSS: Run Time Shader System](@ref rtss)
 
 Vertex Shader input example:
-```
+```cpp
 	...
-	float4 mat14 : TEXCOORD1,
-	float4 mat24 : TEXCOORD2,
-	float4 mat34 : TEXCOORD3,
+	float3x4 worldMatrix : TEXCOORD1,
 	...
 ```
 
 Vertex position calculation example:
-```
-	float3x4 worldMatrix;
-	worldMatrix[0] = mat14;
-	worldMatrix[1] = mat24;
-	worldMatrix[2] = mat34;
+```cpp
+	...
 	float4 worldPos = float4( mul( worldMatrix, position ).xyz, 1.0f );
 	oClipPos = mul( viewProjMatrix, worldPos );
 	...
