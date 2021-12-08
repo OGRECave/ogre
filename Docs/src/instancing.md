@@ -99,7 +99,6 @@ Texture unit example:
 ```
 texture_unit InstancingVTF
 {
-	binding_type vertex
 	filtering none
 }
 ```
@@ -134,7 +133,6 @@ Texture unit example:
 ```
 texture_unit InstancingVTF
 {
-	binding_type vertex
 	filtering none
 }
 ```

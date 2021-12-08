@@ -675,8 +675,6 @@ namespace Ogre {
             {
                 rsc->setCapability(RSC_VERTEX_TEXTURE_FETCH);
             }
-            // GL always shares vertex and fragment texture units (for now?)
-            rsc->setVertexTextureUnitsShared(true);
         }
 
         rsc->setCapability(RSC_MIPMAP_LOD_BIAS);

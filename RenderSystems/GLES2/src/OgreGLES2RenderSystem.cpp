@@ -353,9 +353,6 @@ namespace Ogre {
 
         // Stencil wrapping
         rsc->setCapability(RSC_STENCIL_WRAP);
-
-        // GL always shares vertex and fragment texture units (for now?)
-        rsc->setVertexTextureUnitsShared(true);
         
         // Point size
         GLfloat psRange[2] = {0.0, 0.0};

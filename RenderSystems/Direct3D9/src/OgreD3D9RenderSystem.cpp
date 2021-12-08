@@ -61,6 +61,8 @@ THE SOFTWARE.
 
 #define FLOAT2DWORD(f) *((DWORD*)&f)
 
+static DWORD getSamplerId(size_t unit) { return static_cast<DWORD>(unit); }
+
 namespace Ogre 
 {
     D3D9RenderSystem* D3D9RenderSystem::msD3D9RenderSystem = NULL;
@@ -127,7 +129,6 @@ namespace Ogre
             mTexStageDesc[n].coordIndex = 0;
             mTexStageDesc[n].texType = D3D9Mappings::D3D_TEX_TYPE_NORMAL;
             mTexStageDesc[n].pTex = 0;
-            mTexStageDesc[n].pVertexTex = 0;
         }
 
         mLastVertexSourceCount = 0;
@@ -1076,7 +1077,6 @@ namespace Ogre
                 rsc->setCapability(RSC_VERTEX_TEXTURE_FETCH);
                 // always 4 vertex texture units in vs_3_0, and never shared
                 rsc->setNumVertexTextureUnits(4);
-                rsc->setVertexTextureUnitsShared(false);
             }
         }   
         else
@@ -1668,6 +1668,7 @@ namespace Ogre
     {
         HRESULT hr;
         D3D9TexturePtr dt = static_pointer_cast<D3D9Texture>(tex);
+        auto hasVTF = mCurrentCapabilities->hasCapability(RSC_VERTEX_TEXTURE_FETCH);
         if (enabled && dt)
         {
             // note used
@@ -1696,6 +1697,17 @@ namespace Ogre
                 {
                     __SetSamplerState(getSamplerId(stage), D3DSAMP_SRGBTEXTURE, FALSE);
                 }
+
+                if (hasVTF && stage < 4)
+                {
+                    HRESULT hr = getActiveD3D9Device()->SetTexture(D3DVERTEXTEXTURESAMPLER0 + static_cast<DWORD>(stage), pTex);
+                    if( hr != S_OK )
+                    {
+                        String str = "Unable to set vertex texture '" + tex->getName() + "' in D3D9";
+                        OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, str);
+                    }
+                }
+
             }
         }
         else
@@ -1707,6 +1719,17 @@ namespace Ogre
                 {
                     String str = "Unable to disable texture '" + StringConverter::toString(stage) + "' in D3D9";
                     OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, str, "D3D9RenderSystem::_setTexture" );
+                }
+
+                if (hasVTF && stage < 4)
+                {
+                    HRESULT hr = getActiveD3D9Device()->SetTexture(D3DVERTEXTEXTURESAMPLER0 + static_cast<DWORD>(stage), 0);
+                    if( hr != S_OK )
+                    {
+                        String str = "Unable to disable vertex texture '"
+                            + StringConverter::toString(stage) + "' in D3D9";
+                        OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, str);
+                    }
                 }
             }
 
@@ -1764,57 +1787,6 @@ namespace Ogre
                                D3D9Mappings::get(FT_MIP, sampler.getFiltering(FT_MIP), caps, texType));
         if (FAILED(hr))
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Failed to set texture filter ", "D3D9RenderSystem::_setSampler");
-    }
-    //---------------------------------------------------------------------
-    void D3D9RenderSystem::_setVertexTexture(size_t stage, const TexturePtr& tex)
-    {
-        if (!tex)
-        {
-
-            if (mTexStageDesc[stage].pVertexTex != 0)
-            {
-                HRESULT hr = getActiveD3D9Device()->SetTexture(D3DVERTEXTEXTURESAMPLER0 + static_cast<DWORD>(stage), 0);
-                if( hr != S_OK )
-                {
-                    String str = "Unable to disable vertex texture '" 
-                        + StringConverter::toString(stage) + "' in D3D9";
-                    OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, str, "D3D9RenderSystem::_setVertexTexture" );
-                }
-            }
-
-            // set stage desc. to defaults
-            mTexStageDesc[stage].pVertexTex = 0;
-        }
-        else
-        {
-            D3D9TexturePtr dt = static_pointer_cast<D3D9Texture>(tex);
-            // note used
-            dt->touch();
-
-            IDirect3DBaseTexture9 *pTex = dt->getTexture();
-            if (mTexStageDesc[stage].pVertexTex != pTex)
-            {
-                HRESULT hr = getActiveD3D9Device()->SetTexture(D3DVERTEXTEXTURESAMPLER0 + static_cast<DWORD>(stage), pTex);
-                if( hr != S_OK )
-                {
-                    String str = "Unable to set vertex texture '" + tex->getName() + "' in D3D9";
-                    OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, str, "D3D9RenderSystem::_setVertexTexture" );
-                }
-
-                // set stage desc.
-                mTexStageDesc[stage].pVertexTex = pTex;
-            }
-
-        }
-
-    }
-    //---------------------------------------------------------------------
-    void D3D9RenderSystem::_disableTextureUnit(size_t texUnit)
-    {
-        RenderSystem::_disableTextureUnit(texUnit);
-        // also disable vertex texture unit
-        static TexturePtr nullPtr;
-        _setVertexTexture(texUnit, nullPtr);
     }
     //---------------------------------------------------------------------
     void D3D9RenderSystem::_setTextureCoordSet( size_t stage, size_t index )
@@ -2545,6 +2517,9 @@ namespace Ogre
     //---------------------------------------------------------------------
     HRESULT D3D9RenderSystem::__SetSamplerState(DWORD sampler, D3DSAMPLERSTATETYPE type, DWORD value)
     {
+        if(sampler < 4)
+            __SetSamplerState(sampler + D3DVERTEXTEXTURESAMPLER0, type, value);
+
         HRESULT hr;
         DWORD oldVal;
 
@@ -3789,13 +3764,6 @@ namespace Ogre
         std::vector<wchar_t> result(eventName.length() + 1, '\0');
         (void)MultiByteToWideChar(CP_ACP, 0, eventName.data(), eventName.length(), &result[0], result.size());
         (void)D3DPERF_SetMarker(D3DCOLOR_ARGB(1, 0, 1, 0), &result[0]);
-    }
-
-    //---------------------------------------------------------------------
-    DWORD D3D9RenderSystem::getSamplerId(size_t unit) 
-    {
-        return static_cast<DWORD>(unit) +
-            ((mTexStageDesc[unit].pVertexTex == NULL) ? 0 : D3DVERTEXTEXTURESAMPLER0);
     }
 
     //---------------------------------------------------------------------

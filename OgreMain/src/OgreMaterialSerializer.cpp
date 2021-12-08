@@ -1109,23 +1109,6 @@ namespace Ogre
                 writeScrollEffect(texEffect, pTex);
             }
 
-            // Binding type
-            TextureUnitState::BindingType bt = pTex->getBindingType();
-            if (mDefaults ||
-                bt != TextureUnitState::BT_FRAGMENT)
-            {
-                writeAttribute(4, "binding_type");
-                switch(bt)
-                {
-                case TextureUnitState::BT_FRAGMENT:
-                    writeValue("fragment");
-                    break;
-                case TextureUnitState::BT_VERTEX:
-                    writeValue("vertex");
-                    break;
-                };
-        
-            }
             // Content type
             if (mDefaults ||
                 pTex->getContentType() != TextureUnitState::CONTENT_NAMED)

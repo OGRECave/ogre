@@ -952,7 +952,6 @@ Here are the attributes you can use in a @c texture_unit section of a .material 
 -   [scale](#scale)
 -   [wave\_xform](#wave_005fxform)
 -   [transform](#transform)
--   [binding\_type](#binding_005ftype)
 -   [content\_type](#content_005ftype)
 -   [sampler_ref](#sampler_ref)
 
@@ -1077,18 +1076,6 @@ The 6 textures are combined into a single ’cubic’ texture map which is then 
 
 </dd>
 </dl> <br>
-
-<a name="binding_005ftype"></a><a name="binding_005ftype-1"></a>
-
-## binding\_type
-
-@copydetails Ogre::TextureUnitState::setBindingType
-
-@see @ref Vertex-Texture-Fetch
-
-Format: binding\_type &lt;vertex|fragment&gt;
-@par
-Default: binding\_type fragment
 
 <a name="content_005ftype"></a>
 

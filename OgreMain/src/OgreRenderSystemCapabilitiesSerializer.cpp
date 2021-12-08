@@ -79,7 +79,6 @@ namespace Ogre
 
         file << endl;
         file << "\t" << "non_pow2_textures_limited " << StringConverter::toString(caps->getNonPOW2TexturesLimited()) << endl;
-        file << "\t" << "vertex_texture_units_shared " << StringConverter::toString(caps->getVertexTextureUnitsShared())<< endl;
         
         file << endl;
         file << "\t" << "num_texture_units " << StringConverter::toString(caps->getNumTextureUnits()) << endl;
@@ -324,11 +323,9 @@ namespace Ogre
 
         // initialize bool types
         addKeywordType("non_pow2_textures_limited", SET_BOOL_METHOD);
-        addKeywordType("vertex_texture_units_shared", SET_BOOL_METHOD);
 
         // initialize bool setters
         addSetBoolMethod("non_pow2_textures_limited", &RenderSystemCapabilities::setNonPOW2TexturesLimited);
-        addSetBoolMethod("vertex_texture_units_shared", &RenderSystemCapabilities::setVertexTextureUnitsShared);
 
         // initialize Real types
         addKeywordType("max_point_size", SET_REAL_METHOD);

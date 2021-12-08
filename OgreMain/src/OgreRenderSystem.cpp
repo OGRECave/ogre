@@ -430,31 +430,8 @@ namespace Ogre {
         if(!tex || tl.isTextureLoadFailing())
             tex = mTextureManager->_getWarningTexture();
 
-        // Vertex texture binding (D3D9 only)
-        if (mCurrentCapabilities->hasCapability(RSC_VERTEX_TEXTURE_FETCH) &&
-            !mCurrentCapabilities->getVertexTextureUnitsShared())
-        {
-            if (tl.getBindingType() == TextureUnitState::BT_VERTEX)
-            {
-                // Bind vertex texture
-                _setVertexTexture(texUnit, tex);
-                // bind nothing to fragment unit (hardware isn't shared but fragment
-                // unit can't be using the same index
-                _setTexture(texUnit, true, sNullTexPtr);
-            }
-            else
-            {
-                // vice versa
-                _setVertexTexture(texUnit, sNullTexPtr);
-                _setTexture(texUnit, true, tex);
-            }
-        }
-        else
-        {
-            // Shared vertex / fragment textures or no vertex texture support
-            // Bind texture (may be blank)
-            _setTexture(texUnit, true, tex);
-        }
+        // Bind texture (may be blank)
+        _setTexture(texUnit, true, tex);
 
         // Set texture coordinate set
         _setTextureCoordSet(texUnit, tl.getTextureCoordSet());

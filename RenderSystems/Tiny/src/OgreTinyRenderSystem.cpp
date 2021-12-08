@@ -117,9 +117,6 @@ namespace Ogre {
         // Vertex Buffer Objects are always supported
         rsc->setCapability(RSC_MAPBUFFER);
 
-        // GL always shares vertex and fragment texture units (for now?)
-        rsc->setVertexTextureUnitsShared(true);
-
         // Check for non-power-of-2 texture support
         rsc->setCapability(RSC_NON_POWER_OF_2_TEXTURES);
 
