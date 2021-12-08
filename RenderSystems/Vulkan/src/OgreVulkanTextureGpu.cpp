@@ -616,6 +616,11 @@ namespace Ogre
                                           VK_COMPONENT_SWIZZLE_ONE};
             }
         }
+        else if (mFormat == PF_A8)
+        {
+            imageViewCi.components = {VK_COMPONENT_SWIZZLE_ONE, VK_COMPONENT_SWIZZLE_ONE, VK_COMPONENT_SWIZZLE_ONE,
+                                      VK_COMPONENT_SWIZZLE_R};
+        }
 
         // Using both depth & stencil aspects in an image view for texture sampling is illegal
         // Thus prefer depth over stencil. We only use both flags for FBOs
