@@ -148,6 +148,7 @@ mat3 mtxFromCols(vec3 a, vec3 b, vec3 c)
 #define COLOR0      3
 #define COLOR1      4
 #define COLOR COLOR0
+#define FOG         5
 #define BLENDINDICES 7
 #define TEXCOORD0   8
 #define TEXCOORD1   9
