@@ -3,6 +3,8 @@
 //Written by Matias N. Goldberg ("dark_sylinc")
 //---------------------------------------------------------------------------
 
+#include "HLSL_SM4Support.hlsl"
+
 //---------------------------------------------
 //Vertex Shader Input
 //---------------------------------------------
@@ -10,7 +12,6 @@ struct VS_INPUT
 {
 	float4 Position	:	POSITION;
 	float3 Normal	:	NORMAL;
-	float3 Tangent	:	TANGENT;
 #ifdef BONE_TWO_WEIGHTS
 	float4 weights		: 	BLENDWEIGHT;
 #endif
@@ -31,17 +32,17 @@ struct VS_INPUT
 #include "DualQuaternionSkinning_Shadow.cg"
 #endif
 
+#ifdef DEPTH_SHADOWCASTER
+	uniform SAMPLER2D(matrixTexture, 0);
+#else
+	uniform SAMPLER2D(matrixTexture, 2);
+#endif
+
 //---------------------------------------------
 //Main Vertex Shader
 //---------------------------------------------
 VS_OUTPUT main_vs( in VS_INPUT input,
-				   uniform float4x4 viewProjMatrix,
-				   
-#ifdef DEPTH_SHADOWCASTER
-				   uniform sampler2D matrixTexture : register(s0)
-#else
-				   uniform sampler2D matrixTexture : register(s2)
-#endif
+				   uniform float4x4 viewProjMatrix
 
 #if defined( DEPTH_SHADOWCASTER ) || defined( DEPTH_SHADOWRECEIVER )
 				,  uniform float4 depthRange
@@ -58,13 +59,13 @@ VS_OUTPUT main_vs( in VS_INPUT input,
 
 #ifdef ST_DUAL_QUATERNION
 	float2x4 blendDQ;	
-	blendDQ[0] = tex2D( matrixTexture, float2(input.m03.x, 0.0) + input.mOffset );
-	blendDQ[1] = tex2D( matrixTexture, float2(input.m03.y, 0.0) + input.mOffset );
+	blendDQ[0] = tex2Dlod( matrixTexture, float4(float2(input.m03.x, 0.0) + input.mOffset, 0, 0) );
+	blendDQ[1] = tex2Dlod( matrixTexture, float4(float2(input.m03.y, 0.0) + input.mOffset, 0, 0) );
 #ifdef BONE_TWO_WEIGHTS
 	float2x4 blendDQ2;
 	//Use the empty parts of m03, z and w, for the second dual quaternion
-	blendDQ2[0] = tex2D( matrixTexture, float2(input.m03.z, 0.0) + input.mOffset );
-	blendDQ2[1] = tex2D( matrixTexture, float2(input.m03.w, 0.0) + input.mOffset );
+	blendDQ2[0] = tex2Dlod( matrixTexture, float4(float2(input.m03.z, 0.0) + input.mOffset, 0, 0) );
+	blendDQ2[1] = tex2Dlod( matrixTexture, float4(float2(input.m03.w, 0.0) + input.mOffset, 0, 0) );
 	
 	//Accurate antipodality handling. For speed increase, remove the following line
 	if (dot(blendDQ[0], blendDQ2[0]) < 0.0) blendDQ2 *= -1.0;
@@ -79,9 +80,9 @@ VS_OUTPUT main_vs( in VS_INPUT input,
 	worldNorm = calculateBlendNormal(input.Normal, blendDQ);
 #else
 	float3x4 worldMatrix;
-	worldMatrix[0] = tex2D( matrixTexture, input.m03.xw + input.mOffset );
-	worldMatrix[1] = tex2D( matrixTexture, input.m03.yw + input.mOffset );
-	worldMatrix[2] = tex2D( matrixTexture, input.m03.zw + input.mOffset );
+	worldMatrix[0] = tex2Dlod( matrixTexture, float4(input.m03.xw + input.mOffset, 0, 0) );
+	worldMatrix[1] = tex2Dlod( matrixTexture, float4(input.m03.yw + input.mOffset, 0, 0) );
+	worldMatrix[2] = tex2Dlod( matrixTexture, float4(input.m03.zw + input.mOffset, 0, 0) );
 
 	worldPos = float4( mul( worldMatrix, input.Position ).xyz, 1.0f );
 	worldNorm= mul( (float3x3)(worldMatrix), input.Normal );
@@ -100,12 +101,9 @@ VS_OUTPUT main_vs( in VS_INPUT input,
 
 
 	//Transform the position
-	output.Position		= mul( viewProjMatrix, worldPos );
+	output.ps.Position		= mul( viewProjMatrix, worldPos );
 
-#ifdef DEPTH_SHADOWCASTER
-	output.ps.unused	= float3( 0 );
-	output.ps.depth		= (output.Position.z - depthRange.x + SHADOW_BIAS) * depthRange.w;
-#else
+#ifndef DEPTH_SHADOWCASTER
 	output.ps.uv0		= input.uv0;
 
 	//Pass Normal and position for Blinn Phong lighting
@@ -115,8 +113,6 @@ VS_OUTPUT main_vs( in VS_INPUT input,
 	#ifdef DEPTH_SHADOWRECEIVER
 		// Calculate the position of vertex in light space to do shadows
 		output.ps.lightSpacePos = mul( texViewProjMatrix, worldPos );
-		// make linear
-		output.ps.lightSpacePos.z = (output.ps.lightSpacePos.z - depthRange.x) * depthRange.w;
 	#endif
 #endif
 
