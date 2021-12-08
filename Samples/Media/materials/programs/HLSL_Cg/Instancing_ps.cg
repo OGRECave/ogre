@@ -5,7 +5,7 @@
 #include "HLSL_SM4Support.hlsl"
 #include "InstancingVertexInterpolators.cg"
 
-float calcDepthShadow(sampler2D shadowMap, float4 uv, float invShadowMapSize)
+float calcDepthShadow(sampler2D shadowMap, float4 uv)
 {
     uv /= uv.w;
     return tex2D(shadowMap, uv.xy).x >= uv.z ? 1.0 : 0.0;
@@ -28,14 +28,11 @@ half4 main_ps( PS_INPUT input ,
 				uniform half3	lightSpecular,
 				uniform half4	lightAttenuation,
 				uniform half	lightGloss
-#ifdef DEPTH_SHADOWRECEIVER
-			,	uniform float invShadowMapSize
-#endif
 			) : COLOR0
 {
 	float fShadow = 1.0f;
 #ifdef DEPTH_SHADOWRECEIVER
-	fShadow = calcDepthShadow( shadowMap, input.lightSpacePos, invShadowMapSize );
+	fShadow = calcDepthShadow( shadowMap, input.lightSpacePos );
 #endif
 
 	const half4 baseColour = tex2D( diffuseMap, input.uv0 );
