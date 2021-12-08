@@ -318,6 +318,7 @@ namespace Ogre
         case PF_R16G16_UINT:             return VK_FORMAT_R16G16_UINT;
         case PF_R16G16_SNORM:            return VK_FORMAT_R16G16_SNORM;
         case PF_R16G16_SINT:             return VK_FORMAT_R16G16_SINT;
+        case PF_DEPTH32:
         case PF_DEPTH32F:              return VK_FORMAT_D32_SFLOAT;
         case PF_FLOAT32_R:             return VK_FORMAT_R32_SFLOAT;
         case PF_R32_UINT:              return VK_FORMAT_R32_UINT;
