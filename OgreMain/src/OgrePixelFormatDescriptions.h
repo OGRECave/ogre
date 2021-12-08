@@ -103,7 +103,7 @@ namespace Ogre {
             /* Bytes per element */
             1,
             /* Flags */
-            PFF_HASALPHA | PFF_NATIVEENDIAN,
+            PFF_HASALPHA,
             /* Component type and count */
             PCT_BYTE, 1,
             /* rbits, gbits, bbits, abits */
