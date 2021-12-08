@@ -1189,6 +1189,8 @@ namespace Ogre {
         }
         else
         {
+            // shadow caster material should never receive shadows
+            val->setReceiveShadows(false); // should we warn if this is not set?
             mShadowCasterMaterial = val; 
             mShadowCasterMaterialName = val->getName();
         }
@@ -1196,8 +1198,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void  Technique::setShadowCasterMaterial(const Ogre::String &name) 
     { 
-        mShadowCasterMaterialName = name;
-        mShadowCasterMaterial = MaterialManager::getSingleton().getByName(name);
+        setShadowCasterMaterial(MaterialManager::getSingleton().getByName(name));
     }
     //-----------------------------------------------------------------------
     Ogre::MaterialPtr  Technique::getShadowReceiverMaterial() const 
