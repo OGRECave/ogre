@@ -576,6 +576,7 @@ namespace Ogre
         rsc->setCapability( RSC_USER_CLIP_PLANES );
         rsc->setCapability( RSC_TEXTURE_3D );
         rsc->setCapability( RSC_NON_POWER_OF_2_TEXTURES );
+        rsc->setCapability(RSC_VERTEX_TEXTURE_FETCH);
         rsc->setNonPOW2TexturesLimited( false );
         rsc->setCapability( RSC_HWRENDER_TO_TEXTURE );
         rsc->setCapability( RSC_TEXTURE_FLOAT );
