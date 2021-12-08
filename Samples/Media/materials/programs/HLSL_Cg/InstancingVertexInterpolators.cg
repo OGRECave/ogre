@@ -8,10 +8,8 @@
 //---------------------------------------------
 struct PS_INPUT
 {
-#ifdef DEPTH_SHADOWCASTER
-	float3 unused	:	TEXCOORD0;
-	float depth		:	TEXCOORD1;
-#else
+	float4 Position	:	POSITION;
+#ifndef DEPTH_SHADOWCASTER
 	float2 uv0		:	TEXCOORD0;
 	float3 Normal	:	TEXCOORD1;
 	float3 vPos		:	TEXCOORD2;
@@ -22,13 +20,10 @@ struct PS_INPUT
 #endif
 };
 
-#define SHADOW_BIAS 0
-
 //---------------------------------------------
 //Vertex Shader Output
 //---------------------------------------------
 struct VS_OUTPUT
 {
-	float4 Position	:	POSITION;
 	PS_INPUT	ps;
 };

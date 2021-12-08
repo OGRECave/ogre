@@ -2,7 +2,7 @@
 //These materials/shaders are part of the NEW InstanceManager implementation
 //Written by Matias N. Goldberg ("dark_sylinc")
 //---------------------------------------------------------------------------
-
+#include "HLSL_SM4Support.hlsl"
 #include "InstancingVertexInterpolators.cg"
 
 float calcDepthShadow(sampler2D shadowMap, float4 uv, float invShadowMapSize)
@@ -14,6 +14,12 @@ float calcDepthShadow(sampler2D shadowMap, float4 uv, float invShadowMapSize)
 //---------------------------------------------
 //Main Pixel Shader
 //---------------------------------------------
+//Textures
+uniform SAMPLER2D(diffuseMap, 0);
+#ifdef DEPTH_SHADOWRECEIVER
+	uniform SAMPLER2D(shadowMap, 1);
+#endif
+
 half4 main_ps( PS_INPUT input ,
 				uniform float4	lightPosition,
 				uniform float3	cameraPosition,
@@ -21,14 +27,9 @@ half4 main_ps( PS_INPUT input ,
 				uniform half3	lightDiffuse,
 				uniform half3	lightSpecular,
 				uniform half4	lightAttenuation,
-				uniform half	lightGloss,
-
-				//Textures
-				uniform sampler2D diffuseMap : register(s0)
-
+				uniform half	lightGloss
 #ifdef DEPTH_SHADOWRECEIVER
-			,	uniform float invShadowMapSize,
-				uniform sampler2D shadowMap : register(s1)
+			,	uniform float invShadowMapSize
 #endif
 			) : COLOR0
 {

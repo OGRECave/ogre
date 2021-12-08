@@ -44,37 +44,11 @@ fragment_program Ogre/Instancing_glsles_ps glsles
 //--------------------------------------------------------------
 // CG Programs
 //--------------------------------------------------------------
-fragment_program Ogre/Instancing_cg_ps cg
+fragment_program Ogre/Instancing_hlsl_ps hlsl
 {
 	source Instancing_ps.cg
 	entry_point main_ps
-	profiles ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3 ps_3_0 ps_2_x fp40
-
-	compile_arguments -DDEPTH_SHADOWRECEIVER
-}
-
-fragment_program Ogre/Instancing/shadow_caster_cg_ps cg
-{
-	source pssm.cg
-	profiles ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3 ps_3_0 ps_2_x fp40
-	entry_point shadow_caster_ps
-
-	default_params
-	{
-	}
-}
-
-fragment_program Ogre/Instancing_hlsl_ps hlsl
-{
-	source Instancing_ps.hlsl
-	entry_point main_ps
-	target ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
-
 	preprocessor_defines DEPTH_SHADOWRECEIVER
-	//default_params
-	//{
-	//	param_named_auto lightAttenuation light_attenuation_color 0
-	//}
 }
 
 fragment_program Ogre/Instancing/shadow_caster_hlsl_ps hlsl
@@ -97,7 +71,6 @@ fragment_program Ogre/Instancing_ps unified
 	delegate Ogre/Instancing_glsl_ps
 	delegate Ogre/Instancing_glsles_ps
 	delegate Ogre/Instancing_hlsl_ps
-	delegate Ogre/Instancing_cg_ps
 	
 	default_params
 	{
@@ -116,5 +89,4 @@ fragment_program Ogre/Instancing/shadow_caster_ps unified
 {
 	delegate Ogre/Instancing/shadow_caster_glsl_ps
 	delegate Ogre/Instancing/shadow_caster_hlsl_ps
-	delegate Ogre/Instancing/shadow_caster_cg_ps
 }
