@@ -571,24 +571,13 @@ bool FFPTexturing::preAddToRenderState(const RenderState* renderState, Pass* src
             return false;
     }
 
-    //count the number of texture units we need to process
-    size_t validTexUnits = 0;
-    for (const auto tu : srcPass->getTextureUnitStates())
-    {
-        validTexUnits += int(isProcessingNeeded(tu));
-    }
-
-    setTextureUnitCount(validTexUnits);
+    setTextureUnitCount(srcPass->getTextureUnitStates().size());
 
     // Build texture stage sub states.
     for (unsigned short i=0; i < srcPass->getNumTextureUnitStates(); ++i)
     {       
         TextureUnitState* texUnitState = srcPass->getTextureUnitState(i);
-
-        if (isProcessingNeeded(texUnitState))
-        {
-            setTextureUnit(i, texUnitState);    
-        }
+        setTextureUnit(i, texUnitState);
     }   
 
     return true;
@@ -615,7 +604,6 @@ void FFPTexturing::setTextureUnitCount(size_t count)
 void FFPTexturing::setTextureUnit(unsigned short index, TextureUnitState* textureUnitState)
 {
     OgreAssert(index < mTextureUnitParamsList.size(), "FFPTexturing unit index out of bounds");
-    OgreAssert(textureUnitState->getBindingType() == TextureUnitState::BT_FRAGMENT, "only fragment shaders supported");
 
     TextureUnitParams& curParams = mTextureUnitParamsList[index];
 
@@ -669,13 +657,6 @@ void FFPTexturing::setTextureUnit(unsigned short index, TextureUnitState* textur
      if (curParams.mTexCoordCalcMethod == TEXCALC_PROJECTIVE_TEXTURE)
          curParams.mVSOutTextureCoordinateType = GCT_FLOAT3;    
 }
-
-//-----------------------------------------------------------------------
-bool FFPTexturing::isProcessingNeeded(TextureUnitState* texUnitState)
-{
-    return texUnitState->getBindingType() == TextureUnitState::BT_FRAGMENT;
-}
-
 
 //-----------------------------------------------------------------------
 const String& FFPTexturingFactory::getType() const

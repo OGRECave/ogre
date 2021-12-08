@@ -892,7 +892,6 @@ namespace Ogre
     
         rsc->setCapability(RSC_VERTEX_TEXTURE_FETCH);
         rsc->setNumVertexTextureUnits(4);
-        rsc->setVertexTextureUnitsShared(true);
 
         rsc->setCapability(RSC_MIPMAP_LOD_BIAS);
 

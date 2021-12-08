@@ -216,7 +216,6 @@ namespace Ogre
                     {
                         texUnit->setTextureName( mMatrixTexture->getName(), textureType );
                         texUnit->setTextureFiltering( TFO_NONE );
-                        texUnit->setBindingType( TextureUnitState::BT_VERTEX );
                     }
                 }
             }

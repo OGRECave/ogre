@@ -3360,7 +3360,13 @@ namespace Ogre{
                 case ID_BINDING_TYPE:
                     TextureUnitState::BindingType bt;
                     if(getValue(prop, compiler, bt))
+                    {
+                        compiler->addError(ScriptCompiler::CE_DEPRECATEDSYMBOL, prop->file, prop->line,
+                                           "binding_type. no longer needed");
+                        OGRE_IGNORE_DEPRECATED_BEGIN
                         mUnit->setBindingType(bt);
+                        OGRE_IGNORE_DEPRECATED_END
+                    }
                     break;
                 case ID_CONTENT_TYPE:
                     if(prop->values.empty())

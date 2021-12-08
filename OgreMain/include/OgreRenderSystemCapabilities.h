@@ -590,14 +590,13 @@ namespace Ogre
         {
             return mNumVertexTextureUnits;
         }
-        /// Set whether the vertex texture units are shared with the fragment processor
-        void setVertexTextureUnitsShared(bool shared)
+        /// @deprecated obsolete
+        OGRE_DEPRECATED void setVertexTextureUnitsShared(bool shared)
         {
             mVertexTextureUnitsShared = shared;
         }
-        /// Get whether the vertex texture units are shared with the fragment processor
-        /// @deprecated only needed for D3D9
-        bool getVertexTextureUnitsShared(void) const
+        /// @deprecated obsolete
+        OGRE_DEPRECATED bool getVertexTextureUnitsShared(void) const
         {
             return mVertexTextureUnitsShared;
         }

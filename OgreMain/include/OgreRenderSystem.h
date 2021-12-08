@@ -541,17 +541,8 @@ namespace Ogre
         virtual void _setTexture(size_t unit, bool enabled, 
             const TexturePtr &texPtr) = 0;
 
-        /** Binds a texture to a vertex, geometry, compute, tesselation hull
-        or tessellation domain sampler.
-        @remarks
-        Not all rendersystems support separate vertex samplers. For those that
-        do, you can set a texture for them, separate to the regular texture
-        samplers, using this method. For those that don't, you should use the
-        regular texture samplers which are shared between the vertex and
-        fragment units; calling this method will throw an exception.
-        @deprecated only needed for D3D9
-        */
-        virtual void _setVertexTexture(size_t unit, const TexturePtr& tex);
+        /// @deprecated obsolete
+        OGRE_DEPRECATED virtual void _setVertexTexture(size_t unit, const TexturePtr& tex);
 
         /**
         Sets the texture coordinate set to use for a texture unit.

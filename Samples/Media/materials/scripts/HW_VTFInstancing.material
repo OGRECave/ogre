@@ -246,7 +246,6 @@ material Examples/Instancing/VTF/HW/shadow_caster
 
 			texture_unit InstancingVTF
 			{
-				binding_type	vertex
 				filtering		none
 			}
 		}
@@ -268,7 +267,6 @@ material Examples/Instancing/VTF/HW/shadow_caster_dq
 
 			texture_unit InstancingVTF
 			{
-				binding_type	vertex
 				filtering	none
 			}
 		}
@@ -291,7 +289,6 @@ material Examples/Instancing/VTF/HW/shadow_caster_dq_two_weights
 
 			texture_unit InstancingVTF
 			{
-				binding_type	vertex
 				filtering	none
 			}
 		}
@@ -329,7 +326,6 @@ abstract material Examples/Instancing/HW_VTF
 
 			texture_unit InstancingVTF
 			{
-				binding_type	vertex
 				filtering	none
 			}
 		}
@@ -373,7 +369,6 @@ abstract material Examples/Instancing/HW_VTF_dq
 
 			texture_unit InstancingVTF
 			{
-				binding_type	vertex
 				filtering		none
 			}
 		}
@@ -420,7 +415,6 @@ abstract material Examples/Instancing/HW_VTF_dq_two_weights
 
 			texture_unit InstancingVTF
 			{
-				binding_type	vertex
 				filtering		none
 			}
 		}

@@ -498,22 +498,11 @@ namespace Ogre {
             CONTENT_COMPOSITOR = 2
         };
 
-        /** Sets the type of unit these texture settings should be bound to. 
+        /// @deprecated obsolete
+        OGRE_DEPRECATED void setBindingType(BindingType bt);
 
-            Some render systems, when implementing vertex texture fetch, separate
-            the binding of textures for use in the vertex program versus those
-            used in fragment programs. This setting allows you to target the
-            vertex processing unit with a texture binding, in those cases. For
-            rendersystems which have a unified binding for the vertex and fragment
-            units, this setting makes no difference.
-        @deprecated see @ref Ogre::TextureUnitState::BindingType comment
-        */
-        void setBindingType(BindingType bt);
-
-        /** Gets the type of unit these texture settings should be bound to.  
-        @deprecated see @ref BindingType
-        */
-        BindingType getBindingType(void) const;
+        /// @deprecated obsolete
+        OGRE_DEPRECATED BindingType getBindingType(void) const;
 
         /** Set the type of content this TextureUnitState references.
         @remarks

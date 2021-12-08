@@ -197,10 +197,8 @@ protected:
     */
     bool needsTextureMatrix(TextureUnitState* textureUnitState);
 
-    /** 
-    Determines whether a given texture unit needs to be processed by this srs
-    */
-    virtual bool isProcessingNeeded(TextureUnitState* texUnitState);
+    /// @deprecated do not use
+    OGRE_DEPRECATED bool isProcessingNeeded(TextureUnitState* texUnitState) { return true; }
 
 
 // Attributes.
