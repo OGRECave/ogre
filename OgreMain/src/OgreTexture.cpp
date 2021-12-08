@@ -286,10 +286,6 @@ namespace Ogre {
                     src = images[0]->getPixelBox(i, mip);
                 }
 
-                // Allow reinterpreting luminance as alpha
-                if (mDesiredFormat == PF_A8 && (src.format == PF_L8 || src.format == PF_R8))
-                    src.format = PF_A8;
-
                 if(mGamma != 1.0f) {
                     // Apply gamma correction
                     // Do not overwrite original image but do gamma correction in temporary buffer

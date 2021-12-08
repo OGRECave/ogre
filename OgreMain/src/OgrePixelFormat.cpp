@@ -509,6 +509,9 @@ namespace Ogre {
                 ((uint8*)dest)[0] = (uint8)Bitwise::floatToFixed(r, 8);
                 ((uint8*)dest)[1] = (uint8)Bitwise::floatToFixed(a, 8);
                 break;
+            case PF_A8:
+                ((uint8*)dest)[0] = (uint8)Bitwise::floatToFixed(r, 8);
+                break;
             case PF_A2B10G10R10:
             {
                 const uint16 ir = static_cast<uint16>( Math::saturate( r ) * 1023.0f + 0.5f );
