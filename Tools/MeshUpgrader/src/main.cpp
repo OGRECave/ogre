@@ -874,13 +874,13 @@ void resolveColourAmbiguities(Mesh* mesh)
     }
 }
 
-struct MaterialCreator : public MeshSerializerListener
+struct MeshResourceCreator : public MeshSerializerListener
 {
     void processMaterialName(Mesh *mesh, String *name)
     {
 		if(name->empty()) {
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-                "The provided mesh file has an empty material name. See https://ogrecave.github.io/ogre/api/latest/_mesh-_tools.html#Exporters");
+                "The provided mesh file has an empty material name. See https://ogrecave.github.io/ogre/api/latest/_mesh-_tools.html#autotoc_md32");
 		}
         else {
             // create material because we do not load any .material files
@@ -888,7 +888,16 @@ struct MaterialCreator : public MeshSerializerListener
         }
     }
 
-    void processSkeletonName(Mesh *mesh, String *name) {}
+    void processSkeletonName(Mesh *mesh, String *name)
+    {
+        if (name->empty())
+        {
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "The provided mesh file uses an empty skeleton name");
+        }
+
+        // create skeleton because we do not load any .skeleton files
+        SkeletonManager::getSingleton().createOrRetrieve(*name, mesh->getGroup(), true);
+    }
     void processMeshCompleted(Mesh *mesh) {}
 };
 }
@@ -948,8 +957,8 @@ int main(int numargs, char** args)
         matMgr->initialise();
         skelMgr = new SkeletonManager();
         meshSerializer = new MeshSerializer();
-        MaterialCreator matCreator;
-        meshSerializer->setListener(&matCreator);
+        MeshResourceCreator resCreator;
+        meshSerializer->setListener(&resCreator);
         skeletonSerializer = new SkeletonSerializer();
         bufferManager = new DefaultHardwareBufferManager(); // needed because we don't have a rendersystem
         meshMgr = new MeshManager();
