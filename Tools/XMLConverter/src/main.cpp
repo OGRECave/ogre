@@ -407,14 +407,14 @@ void skeletonToXML(XmlOptions opts)
                                            ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
 }
 
-struct MaterialCreator : public MeshSerializerListener
+struct MeshResourceCreator : public MeshSerializerListener
 {
     void processMaterialName(Mesh *mesh, String *name)
     {
         if (name->empty())
         {
             LogManager::getSingleton().logWarning("one of the SubMeshes is using an empty material name. "
-                                                  "This violates the specs and may lead to crashes.");
+                                                  "See https://ogrecave.github.io/ogre/api/latest/_mesh-_tools.html#autotoc_md32");
             // here, we explicitly want to allow fixing that
             return;
         }
@@ -423,7 +423,18 @@ struct MaterialCreator : public MeshSerializerListener
         MaterialManager::getSingleton().createOrRetrieve(*name, mesh->getGroup());
     }
 
-    void processSkeletonName(Mesh *mesh, String *name) {}
+    void processSkeletonName(Mesh *mesh, String *name)
+    {
+        if (name->empty())
+        {
+            LogManager::getSingleton().logWarning("the mesh is using an empty skeleton name.");
+            // here, we explicitly want to allow fixing that
+            return;
+        }
+
+        // create skeleton because we do not load any .skeleton files
+        SkeletonManager::getSingleton().createOrRetrieve(*name, mesh->getGroup(), true);
+    }
     void processMeshCompleted(Mesh *mesh) {}
 };
 }
@@ -460,8 +471,8 @@ int main(int numargs, char** args)
         matMgr->initialise();
         skelMgr = new SkeletonManager();
         meshSerializer = new MeshSerializer();
-        MaterialCreator matCreator;
-        meshSerializer->setListener(&matCreator);
+        MeshResourceCreator resCreator;
+        meshSerializer->setListener(&resCreator);
         xmlMeshSerializer = new XMLMeshSerializer();
         skeletonSerializer = new SkeletonSerializer();
         xmlSkeletonSerializer = new XMLSkeletonSerializer();
