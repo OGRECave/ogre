@@ -498,9 +498,7 @@ namespace Ogre {
                     mSkeleton.reset();
                     // Log this error
                     String msg = "Unable to load skeleton '";
-                    msg += skelName + "' for Mesh '" + mName
-                        + "'. This Mesh will not be animated. "
-                        + "You can ignore this message if you are using an offline tool.";
+                    msg += skelName + "' for Mesh '" + mName + "'. This Mesh will not be animated.";
                     LogManager::getSingleton().logError(msg);
 
                 }
@@ -1076,7 +1074,7 @@ namespace Ogre {
         }
     }
     //---------------------------------------------------------------------
-    void Mesh::_notifySkeleton(SkeletonPtr& pSkel)
+    void Mesh::_notifySkeleton(const SkeletonPtr& pSkel)
     {
         mSkeleton = pSkel;
     }
