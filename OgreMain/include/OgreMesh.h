@@ -469,7 +469,7 @@ namespace Ogre {
             Skeleton. Best to let OGRE deal with this, don't call it yourself unless you
             really know what you're doing.
         */
-        void _notifySkeleton(SkeletonPtr& pSkel);
+        void _notifySkeleton(const SkeletonPtr& pSkel);
 
 
         /// @deprecated use getBoneAssignments
