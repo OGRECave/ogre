@@ -40,6 +40,7 @@ THE SOFTWARE.
 #include "OgreLodStrategyManager.h"
 #include "OgreLodStrategy.h"
 #include "OgreMaterialManager.h"
+#include "OgreSkeletonManager.h"
 #include <cstddef>
 
 namespace Ogre {
@@ -1279,7 +1280,10 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void XMLMeshSerializer::readSkeletonLink(pugi::xml_node& mSkelNode)
     {
-        mMesh->setSkeletonName(mSkelNode.attribute("name").value());
+        String name = mSkelNode.attribute("name").value();
+        // create dummy, because we do not load external resources
+        auto skel = SkeletonManager::getSingleton().create(name, mMesh->getGroup());
+        mMesh->_notifySkeleton(skel);
     }
     //---------------------------------------------------------------------
     void XMLMeshSerializer::readBoneAssignments(pugi::xml_node& mBoneAssignmentsNode)
