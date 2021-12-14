@@ -8,7 +8,19 @@ include_directories(${PYTHON_INCLUDE_PATH})
 include_directories("${PROJECT_BINARY_DIR}/include" "${PROJECT_SOURCE_DIR}/OgreMain/include")
 include(${SWIG_USE_FILE})
 
-set(PYTHON_SITE_PACKAGES lib/python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}/dist-packages/Ogre/)
+execute_process(
+  COMMAND ${PYTHON_EXECUTABLE} -c "import sysconfig; print(sysconfig.get_paths()[\"purelib\"], end=\"\")"
+  OUTPUT_VARIABLE PY_PATH
+  ERROR_VARIABLE ERR_
+  RESULT_VARIABLE RES_
+)
+if(RES_ EQUAL 0)
+  message("Detected python site-lib path: ${PY_PATH}")
+  set(PYTHON_SITE_PACKAGES "${PY_PATH}/Ogre/")
+else()
+  message("Error detecting site-lib path: ${ERR_}")
+  set(PYTHON_SITE_PACKAGES lib/python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}/dist-packages/Ogre/)
+endif()
 
 if(SKBUILD)
     set(PYTHON_SITE_PACKAGES Ogre/)
