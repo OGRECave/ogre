@@ -251,11 +251,11 @@ find_package(ZLIB)
 macro_log_feature(ZLIB_FOUND "zlib" "Simple data compression library" "http://www.zlib.net" FALSE "" "")
 
 # Assimp
-find_package(ASSIMP QUIET)
-macro_log_feature(ASSIMP_FOUND "Assimp" "Needed for the AssimpLoader Plugin" "https://www.assimp.org/" FALSE "" "")
+find_package(assimp QUIET)
+macro_log_feature(assimp_FOUND "Assimp" "Needed for the AssimpLoader Plugin" "https://www.assimp.org/" FALSE "" "")
 
-if(ASSIMP_FOUND)
-  # workaround horribly broken assimp cmake
+if(assimp_FOUND)
+  # workaround horribly broken assimp cmake, fixed with assimp 5.1
   add_library(fix::assimp INTERFACE IMPORTED)
   set_target_properties(fix::assimp PROPERTIES
       INTERFACE_LINK_LIBRARIES "${ASSIMP_LIBRARIES}"
