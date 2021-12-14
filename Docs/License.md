@@ -252,7 +252,7 @@ Licensed Under:</td>
         <p>Grass texture is courtesy of Mathias 'freezer' Walc</p>
     </li>
     <li>
-        <p>The 'Cuckoo' TrueType font is provided by <a href="http://www.grsites.com">http://www.grsites.com</a>.</p>
+        <p>The 'Cuckoo' TrueType font is provided by http://www.downloadheaven.co.uk.</p>
     </li>
     <li>SoftImage|XSI sample media files (facial.mesh, jaiqua.mesh and associated files) are provided courtesy of Avid Technology, Inc.<br />
         &copy; 2004 Avid Technology, Inc. All rights
