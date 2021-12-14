@@ -32,6 +32,10 @@ if(WIN32)
   set(CMAKE_SUPPRESS_REGENERATION true)
 endif()
 
+# prefer GLVND
+if(POLICY CMP0072)
+  cmake_policy(SET CMP0072 NEW)
+endif()
 # use legacy swig mode
 if(POLICY CMP0078)
   cmake_policy(SET CMP0078 OLD)
