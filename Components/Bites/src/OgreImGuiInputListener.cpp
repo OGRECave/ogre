@@ -154,5 +154,34 @@ bool ImGuiInputListener::textInput (const TextInputEvent& evt)
     io.AddInputCharactersUTF8 (evt.chars);
     return true;
 }
+bool ImGuiInputListener::buttonPressed(const ButtonEvent& evt)
+{
+    ImGuiIO& io = ImGui::GetIO();
+    switch(evt.button)
+    {
+    case 0:
+        io.NavInputs[ImGuiNavInput_Activate] = 1;
+        break;
+    case 1:
+        io.NavInputs[ImGuiNavInput_Cancel] = 1;
+        break;
+    case 2:
+        io.NavInputs[ImGuiNavInput_Menu] = 1;
+        break;
+    case 11:
+        io.NavInputs[ImGuiNavInput_DpadUp] = 1;
+        break;
+    case 12:
+        io.NavInputs[ImGuiNavInput_DpadDown] = 1;
+        break;
+    case 13:
+        io.NavInputs[ImGuiNavInput_DpadLeft] = 1;
+        break;
+    case 14:
+        io.NavInputs[ImGuiNavInput_DpadRight] = 1;
+        break;
+    }
+    return true;
+}
 
 } // namespace OgreBites
