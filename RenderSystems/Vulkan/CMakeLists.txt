@@ -29,9 +29,10 @@ elseif(ANDROID)
 else()
     set_source_files_properties("${CMAKE_CURRENT_SOURCE_DIR}/src/volk.c"
         PROPERTIES COMPILE_DEFINITIONS VK_USE_PLATFORM_XLIB_KHR)
+    target_link_libraries(RenderSystem_Vulkan PRIVATE ${X11_LIBRARIES})
 endif()
 
-target_link_libraries(RenderSystem_Vulkan PUBLIC OgreMain)
+target_link_libraries(RenderSystem_Vulkan PUBLIC OgreMain PRIVATE ${CMAKE_DL_LIBS})
 
 target_include_directories(RenderSystem_Vulkan PUBLIC
     "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
