@@ -50,6 +50,9 @@ void SGX_Flip_Backface_Normal(in float triArea, in float targetFlipped, inout ve
 #else
 void SGX_Flip_Backface_Normal(in bool frontFacing, in float targetFlipped, inout vec3 normal)
 {
+#ifdef VULKAN
+	targetFlipped *= -1.0;
+#endif
 	if(targetFlipped < 0.0)
 		frontFacing = !frontFacing;
 	if(!frontFacing)
