@@ -142,10 +142,10 @@ if(OGRE_BUILD_DEPENDENCIES AND NOT EXISTS ${OGREDEPS_PATH})
 
       message(STATUS "Building Assimp")
       file(DOWNLOAD
-          https://github.com/assimp/assimp/archive/v5.0.1.tar.gz
-          ${PROJECT_BINARY_DIR}/v5.0.1.tar.gz)
+          https://github.com/assimp/assimp/archive/v5.1.3.tar.gz
+          ${PROJECT_BINARY_DIR}/v5.1.3.tar.gz)
       execute_process(COMMAND ${CMAKE_COMMAND}
-          -E tar xf v5.0.1.tar.gz WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
+          -E tar xf v5.1.3.tar.gz WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
       execute_process(COMMAND ${BUILD_COMMAND_COMMON}
           -DZLIB_ROOT=${OGREDEPS_PATH}
           -DBUILD_SHARED_LIBS=OFF
@@ -153,13 +153,13 @@ if(OGRE_BUILD_DEPENDENCIES AND NOT EXISTS ${OGREDEPS_PATH})
           -DASSIMP_NO_EXPORT=TRUE
           -DASSIMP_BUILD_OGRE_IMPORTER=OFF
           -DASSIMP_BUILD_ASSIMP_TOOLS=OFF
-          ${PROJECT_BINARY_DIR}/assimp-5.0.1
-          WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/assimp-5.0.1)
+          ${PROJECT_BINARY_DIR}/assimp-5.1.3
+          WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/assimp-5.1.3)
       execute_process(COMMAND ${CMAKE_COMMAND}
-        --build ${PROJECT_BINARY_DIR}/assimp-5.0.1 ${BUILD_COMMAND_OPTS})
+        --build ${PROJECT_BINARY_DIR}/assimp-5.1.3 ${BUILD_COMMAND_OPTS})
       # RelWithDebInfo has Release ABI
       if(NOT OGRE_DEBUG_MODE)
-        file(REMOVE ${OGREDEPS_PATH}/lib/cmake/assimp-5.0/assimpTargets-debug.cmake)
+        file(REMOVE ${OGREDEPS_PATH}/lib/cmake/assimp-5.1/assimpTargets-debug.cmake)
       endif()
     endif()
 endif()
@@ -251,14 +251,14 @@ find_package(ZLIB)
 macro_log_feature(ZLIB_FOUND "zlib" "Simple data compression library" "http://www.zlib.net" FALSE "" "")
 
 # Assimp
-find_package(ASSIMP QUIET)
-macro_log_feature(ASSIMP_FOUND "Assimp" "Needed for the AssimpLoader Plugin" "https://www.assimp.org/" FALSE "" "")
+find_package(assimp QUIET)
+macro_log_feature(assimp_FOUND "Assimp" "Needed for the AssimpLoader Plugin" "https://www.assimp.org/" FALSE "" "")
 
-if(ASSIMP_FOUND)
-  # workaround horribly broken assimp cmake
+if(assimp_FOUND)
+  # workaround horribly broken assimp cmake, fixed with assimp 5.1
   add_library(fix::assimp INTERFACE IMPORTED)
   set_target_properties(fix::assimp PROPERTIES
-      INTERFACE_LINK_LIBRARIES "${ASSIMP_LIBRARIES}"
+      INTERFACE_LINK_LIBRARIES "${ASSIMP_LIBRARIES};pugixml"
       INTERFACE_LINK_DIRECTORIES "${ASSIMP_LIBRARY_DIRS}"
   )
   if(EXISTS "${ASSIMP_INCLUDE_DIRS}")
