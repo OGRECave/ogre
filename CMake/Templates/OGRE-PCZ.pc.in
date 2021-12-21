@@ -1,11 +1,11 @@
 prefix=@OGRE_PREFIX_PATH@
 exec_prefix=${prefix}
-libdir=${prefix}/@OGRE_LIB_DIRECTORY@
+plugindir=${prefix}/@OGRE_PLUGINS_PATH@
 includedir=${prefix}/include
 
 Name: OGRE-PCZ
 Description: Portal-Connected Zone Scene Manager for OGRE
 Version: @OGRE_VERSION@
 Requires: OGRE = @OGRE_VERSION@
-Libs: ${libdir}/OGRE/@OGRE_PLUGIN_PREFIX@Plugin_PCZSceneManager@OGRE_LIB_SUFFIX@@OGRE_PLUGIN_EXT@ ${libdir}/OGRE/@OGRE_PLUGIN_PREFIX@Plugin_OctreeZone@OGRE_LIB_SUFFIX@@OGRE_PLUGIN_EXT@ -Wl,-rpath,${libdir}/OGRE
+Libs: -L${plugindir} -lPlugin_PCZSceneManager@OGRE_LIB_SUFFIX@ -lPlugin_OctreeZone@OGRE_LIB_SUFFIX@
 Cflags: -I${includedir}/OGRE/Plugins/PCZSceneManager -I${includedir}/OGRE/Plugins/OctreeZone @OGRE_CFLAGS@
