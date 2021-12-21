@@ -157,11 +157,9 @@ endif ()
 
 # Create the pkg-config package files on Unix systems
 if (UNIX)
-  set(OGRE_PLUGIN_PREFIX "")
   set(OGRE_PLUGIN_EXT ".so")
   set(OGRE_PAGING_ADDITIONAL_PACKAGES "")
   if (OGRE_STATIC)
-    set(OGRE_PLUGIN_PREFIX "lib")
     set(OGRE_PLUGIN_EXT ".a")
   endif ()
 
