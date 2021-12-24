@@ -37,3 +37,14 @@
 %apply float* INOUT { float* v };
 %apply int* INOUT { int* v };
 %include "imgui.h"
+
+%extend ImGuiStyle
+{
+    const ImVec4& getColor(int i) const {
+        return $self->Colors[i];
+    }
+
+    void setColor(int i, const ImVec4& v) {
+        $self->Colors[i] = v;
+    }
+}
