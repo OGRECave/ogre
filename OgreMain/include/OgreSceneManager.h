@@ -398,6 +398,15 @@ namespace Ogre {
             /// Scissoring if requested?
             bool scissoring;
 
+            /** Render a set of objects
+
+                transparentShadowCastersMode is intended to be used to render the shadows of transparent objects which have
+                transparency_casts_shadows set to 'on' in their material
+                @see SceneManager::_injectRenderWithPass
+            */
+            void renderObjects(const QueuedRenderableCollection& objs, QueuedRenderableCollection::OrganisationMode om,
+                               bool lightScissoringClipping, bool doLightIteration,
+                               const LightList* manualLightList = 0, bool transparentShadowCastersMode = false);
         };
         /// Allow visitor helper to access protected methods
         friend class SceneMgrQueuedRenderableVisitor;
@@ -1027,14 +1036,6 @@ namespace Ogre {
         /** Render a group in the ordinary way */
         void renderBasicQueueGroupObjects(RenderQueueGroup* pGroup,
             QueuedRenderableCollection::OrganisationMode om);
-        /** Render a set of objects, see renderSingleObject for param definitions
-            @remarks
-            transparentShadowCastersMode is intended to be used to render the shadows of transparent objects which have
-            transparency_casts_shadows set to 'on' in their material
-        */
-        void renderObjects(const QueuedRenderableCollection& objs,
-            QueuedRenderableCollection::OrganisationMode om, bool lightScissoringClipping,
-            bool doLightIteration, const LightList* manualLightList = 0, bool transparentShadowCastersMode = false);
 
         /** Update the state of the global render queue splitting based on a shadow
         option change. */
@@ -1864,7 +1865,7 @@ namespace Ogre {
 
         /** Sends visible objects found in _findVisibleObjects to the rendering engine.
         */
-        void _renderVisibleObjects(void);
+        void _renderVisibleObjects(void) { renderVisibleObjectsDefaultSequence(); }
 
         /** Prompts the class to send its contents to the renderer.
             @remarks
@@ -3383,8 +3384,10 @@ namespace Ogre {
         void setQueuedRenderableVisitor(SceneMgrQueuedRenderableVisitor* visitor);
 
         /** Gets the current visitor object which processes queued renderables. */
-        SceneMgrQueuedRenderableVisitor* getQueuedRenderableVisitor(void) const;
-
+        SceneMgrQueuedRenderableVisitor* getQueuedRenderableVisitor(void) const
+        {
+            return mActiveQueuedRenderableVisitor;
+        }
 
         /** Get the rendersystem subclass to which the output of this Scene Manager
             gets sent
