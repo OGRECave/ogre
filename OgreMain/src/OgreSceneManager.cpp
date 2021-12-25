@@ -1498,11 +1498,6 @@ void SceneManager::_findVisibleObjects(
 
 }
 //-----------------------------------------------------------------------
-void SceneManager::_renderVisibleObjects(void)
-{
-    renderVisibleObjectsDefaultSequence();
-}
-//-----------------------------------------------------------------------
 void SceneManager::renderVisibleObjectsDefaultSequence(void)
 {
     firePreRenderQueues();
@@ -1597,6 +1592,20 @@ void SceneManager::SceneMgrQueuedRenderableVisitor::visit(RenderablePass* rp)
     }
 }
 //-----------------------------------------------------------------------
+void SceneManager::SceneMgrQueuedRenderableVisitor::renderObjects(const QueuedRenderableCollection& objs,
+                                                    QueuedRenderableCollection::OrganisationMode om,
+                                                    bool lightScissoringClipping, bool doLightIteration,
+                                                    const LightList* _manualLightList, bool _transparentShadowCastersMode)
+{
+    autoLights = doLightIteration;
+    manualLightList = _manualLightList;
+    transparentShadowCastersMode = _transparentShadowCastersMode;
+    scissoring = lightScissoringClipping;
+    // Use visitor
+    objs.acceptVisitor(this, om);
+    transparentShadowCastersMode = false;
+}
+//-----------------------------------------------------------------------
 bool SceneManager::validatePassForRendering(const Pass* pass)
 {
     // Bypass if we're doing a texture shadow render and 
@@ -1651,22 +1660,6 @@ bool SceneManager::validateRenderableForRendering(const Pass* pass, const Render
 
 }
 //-----------------------------------------------------------------------
-void SceneManager::renderObjects(const QueuedRenderableCollection& objs,
-                                 QueuedRenderableCollection::OrganisationMode om,
-                                 bool lightScissoringClipping,
-                                 bool doLightIteration,
-                                 const LightList* manualLightList,
-                                 bool transparentShadowCastersMode)
-{
-    mActiveQueuedRenderableVisitor->autoLights = doLightIteration;
-    mActiveQueuedRenderableVisitor->manualLightList = manualLightList;
-    mActiveQueuedRenderableVisitor->transparentShadowCastersMode = transparentShadowCastersMode;
-    mActiveQueuedRenderableVisitor->scissoring = lightScissoringClipping;
-    // Use visitor
-    objs.acceptVisitor(mActiveQueuedRenderableVisitor, om);
-    mActiveQueuedRenderableVisitor->transparentShadowCastersMode = false;
-}
-//-----------------------------------------------------------------------
 void SceneManager::_renderQueueGroupObjects(RenderQueueGroup* pGroup, 
                                            QueuedRenderableCollection::OrganisationMode om)
 {
@@ -1699,6 +1692,7 @@ void SceneManager::renderBasicQueueGroupObjects(RenderQueueGroup* pGroup,
 {
     // Basic render loop
     // Iterate through priorities
+    auto visitor = mActiveQueuedRenderableVisitor;
 
     for (const auto& pg : pGroup->getPriorityGroups())
     {
@@ -1708,14 +1702,12 @@ void SceneManager::renderBasicQueueGroupObjects(RenderQueueGroup* pGroup,
         pPriorityGrp->sort(mCameraInProgress);
 
         // Do solids
-        renderObjects(pPriorityGrp->getSolidsBasic(), om, true, true);
+        visitor->renderObjects(pPriorityGrp->getSolidsBasic(), om, true, true);
         // Do unsorted transparents
-        renderObjects(pPriorityGrp->getTransparentsUnsorted(), om, true, true);
+        visitor->renderObjects(pPriorityGrp->getTransparentsUnsorted(), om, true, true);
         // Do transparents (always descending)
-        renderObjects(pPriorityGrp->getTransparents(), 
-            QueuedRenderableCollection::OM_SORT_DESCENDING, true, true);
-
-
+        visitor->renderObjects(pPriorityGrp->getTransparents(), QueuedRenderableCollection::OM_SORT_DESCENDING, true,
+                               true);
     }// for each priority
 }
 //-----------------------------------------------------------------------
@@ -3682,11 +3674,6 @@ void SceneManager::setQueuedRenderableVisitor(SceneManager::SceneMgrQueuedRender
         mActiveQueuedRenderableVisitor = visitor;
     else
         mActiveQueuedRenderableVisitor = &mDefaultQueuedRenderableVisitor;
-}
-//---------------------------------------------------------------------
-SceneManager::SceneMgrQueuedRenderableVisitor* SceneManager::getQueuedRenderableVisitor(void) const
-{
-    return mActiveQueuedRenderableVisitor;
 }
 //---------------------------------------------------------------------
 void SceneManager::addLodListener(LodListener *listener)

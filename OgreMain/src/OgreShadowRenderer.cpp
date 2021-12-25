@@ -134,6 +134,7 @@ void SceneManager::ShadowRenderer::renderAdditiveStencilShadowedQueueGroupObject
     QueuedRenderableCollection::OrganisationMode om)
 {
     LightList lightList;
+    auto visitor = mSceneManager->getQueuedRenderableVisitor();
 
     for (const auto& pg : pGroup->getPriorityGroups())
     {
@@ -146,9 +147,9 @@ void SceneManager::ShadowRenderer::renderAdditiveStencilShadowedQueueGroupObject
         lightList.clear();
 
         // Render all the ambient passes first, no light iteration, no lights
-        mSceneManager->renderObjects(pPriorityGrp->getSolidsBasic(), om, false, false, &lightList);
+        visitor->renderObjects(pPriorityGrp->getSolidsBasic(), om, false, false, &lightList);
         // Also render any objects which have receive shadows disabled
-        mSceneManager->renderObjects(pPriorityGrp->getSolidsNoShadowReceive(), om, true, true);
+        visitor->renderObjects(pPriorityGrp->getSolidsNoShadowReceive(), om, true, true);
 
 
         // Now iterate per light
@@ -184,7 +185,7 @@ void SceneManager::ShadowRenderer::renderAdditiveStencilShadowedQueueGroupObject
             }
 
             // render lighting passes for this light
-            mSceneManager->renderObjects(pPriorityGrp->getSolidsDiffuseSpecular(), om, false, false, &lightList);
+            visitor->renderObjects(pPriorityGrp->getSolidsDiffuseSpecular(), om, false, false, &lightList);
 
             // Reset stencil params
             mDestRenderSystem->setStencilState(StencilState());
@@ -198,7 +199,7 @@ void SceneManager::ShadowRenderer::renderAdditiveStencilShadowedQueueGroupObject
 
 
         // Now render decal passes, no need to set lights as lighting will be disabled
-        mSceneManager->renderObjects(pPriorityGrp->getSolidsDecal(), om, false, false);
+        visitor->renderObjects(pPriorityGrp->getSolidsDecal(), om, false, false);
 
 
     }// for each priority
@@ -209,9 +210,9 @@ void SceneManager::ShadowRenderer::renderAdditiveStencilShadowedQueueGroupObject
         RenderPriorityGroup* pPriorityGrp = pg.second;
 
         // Do unsorted transparents
-        mSceneManager->renderObjects(pPriorityGrp->getTransparentsUnsorted(), om, true, true);
+        visitor->renderObjects(pPriorityGrp->getTransparentsUnsorted(), om, true, true);
         // Do transparents (always descending sort)
-        mSceneManager->renderObjects(pPriorityGrp->getTransparents(),
+        visitor->renderObjects(pPriorityGrp->getTransparents(),
             QueuedRenderableCollection::OM_SORT_DESCENDING, true, true);
 
     }// for each priority
@@ -232,6 +233,7 @@ void SceneManager::ShadowRenderer::renderModulativeStencilShadowedQueueGroupObje
     interleaved as in the normal rendering loop.
     */
     // Iterate through priorities
+    auto visitor = mSceneManager->getQueuedRenderableVisitor();
     for (const auto& pg : pGroup->getPriorityGroups())
     {
         RenderPriorityGroup* pPriorityGrp = pg.second;
@@ -240,7 +242,7 @@ void SceneManager::ShadowRenderer::renderModulativeStencilShadowedQueueGroupObje
         pPriorityGrp->sort(mSceneManager->mCameraInProgress);
 
         // Do (shadowable) solids
-        mSceneManager->renderObjects(pPriorityGrp->getSolidsBasic(), om, true, true);
+        visitor->renderObjects(pPriorityGrp->getSolidsBasic(), om, true, true);
     }
 
     // Override auto param ambient to force vertex programs to use shadow colour
@@ -278,7 +280,7 @@ void SceneManager::ShadowRenderer::renderModulativeStencilShadowedQueueGroupObje
         RenderPriorityGroup* pPriorityGrp = pg.second;
 
         // Do non-shadowable solids
-        mSceneManager->renderObjects(pPriorityGrp->getSolidsNoShadowReceive(), om, true, true);
+        visitor->renderObjects(pPriorityGrp->getSolidsNoShadowReceive(), om, true, true);
 
     }// for each priority
 
@@ -289,9 +291,9 @@ void SceneManager::ShadowRenderer::renderModulativeStencilShadowedQueueGroupObje
         RenderPriorityGroup* pPriorityGrp = pg.second;
 
         // Do unsorted transparents
-        mSceneManager->renderObjects(pPriorityGrp->getTransparentsUnsorted(), om, true, true);
+        visitor->renderObjects(pPriorityGrp->getTransparentsUnsorted(), om, true, true);
         // Do transparents (always descending sort)
-        mSceneManager->renderObjects(pPriorityGrp->getTransparents(),
+        visitor->renderObjects(pPriorityGrp->getTransparents(),
             QueuedRenderableCollection::OM_SORT_DESCENDING, true, true);
 
     }// for each priority
@@ -322,6 +324,7 @@ void SceneManager::ShadowRenderer::renderTextureShadowCasterQueueGroupObjects(
         mSceneManager->setAmbientLight(mShadowColour);
     }
 
+    auto visitor = mSceneManager->getQueuedRenderableVisitor();
     for (const auto& pg : pGroup->getPriorityGroups())
     {
         RenderPriorityGroup* pPriorityGrp = pg.second;
@@ -330,12 +333,12 @@ void SceneManager::ShadowRenderer::renderTextureShadowCasterQueueGroupObjects(
         pPriorityGrp->sort(mSceneManager->mCameraInProgress);
 
         // Do solids, override light list incase any vertex programs use them
-        mSceneManager->renderObjects(pPriorityGrp->getSolidsBasic(), om, false, false, &mShadowTextureCurrentCasterLightList);
-        mSceneManager->renderObjects(pPriorityGrp->getSolidsNoShadowReceive(), om, false, false, &mShadowTextureCurrentCasterLightList);
+        visitor->renderObjects(pPriorityGrp->getSolidsBasic(), om, false, false, &mShadowTextureCurrentCasterLightList);
+        visitor->renderObjects(pPriorityGrp->getSolidsNoShadowReceive(), om, false, false, &mShadowTextureCurrentCasterLightList);
         // Do unsorted transparents that cast shadows
-        mSceneManager->renderObjects(pPriorityGrp->getTransparentsUnsorted(), om, false, false, &mShadowTextureCurrentCasterLightList);
+        visitor->renderObjects(pPriorityGrp->getTransparentsUnsorted(), om, false, false, &mShadowTextureCurrentCasterLightList);
         // Do transparents that cast shadows
-        mSceneManager->renderObjects(pPriorityGrp->getTransparents(), QueuedRenderableCollection::OM_SORT_DESCENDING,
+        visitor->renderObjects(pPriorityGrp->getTransparents(), QueuedRenderableCollection::OM_SORT_DESCENDING,
                       false, false, &mShadowTextureCurrentCasterLightList, true);
 
     }// for each priority
@@ -357,6 +360,7 @@ void SceneManager::ShadowRenderer::renderModulativeTextureShadowedQueueGroupObje
     interleaved as in the normal rendering loop.
     */
     // Iterate through priorities
+    auto visitor = mSceneManager->getQueuedRenderableVisitor();
     for (const auto& pg : pGroup->getPriorityGroups())
     {
         RenderPriorityGroup* pPriorityGrp = pg.second;
@@ -365,8 +369,8 @@ void SceneManager::ShadowRenderer::renderModulativeTextureShadowedQueueGroupObje
         pPriorityGrp->sort(mSceneManager->mCameraInProgress);
 
         // Do solids
-        mSceneManager->renderObjects(pPriorityGrp->getSolidsBasic(), om, true, true);
-        mSceneManager->renderObjects(pPriorityGrp->getSolidsNoShadowReceive(), om, true, true);
+        visitor->renderObjects(pPriorityGrp->getSolidsBasic(), om, true, true);
+        visitor->renderObjects(pPriorityGrp->getSolidsNoShadowReceive(), om, true, true);
     }
 
 
@@ -472,9 +476,9 @@ void SceneManager::ShadowRenderer::renderModulativeTextureShadowedQueueGroupObje
         RenderPriorityGroup* pPriorityGrp = pg.second;
 
         // Do unsorted transparents
-        mSceneManager->renderObjects(pPriorityGrp->getTransparentsUnsorted(), om, true, true);
+        visitor->renderObjects(pPriorityGrp->getTransparentsUnsorted(), om, true, true);
         // Do transparents (always descending)
-        mSceneManager->renderObjects(pPriorityGrp->getTransparents(),
+        visitor->renderObjects(pPriorityGrp->getTransparents(),
             QueuedRenderableCollection::OM_SORT_DESCENDING, true, true);
 
     }// for each priority
@@ -486,6 +490,7 @@ void SceneManager::ShadowRenderer::renderAdditiveTextureShadowedQueueGroupObject
     QueuedRenderableCollection::OrganisationMode om)
 {
     LightList lightList;
+    auto visitor = mSceneManager->getQueuedRenderableVisitor();
 
     for (const auto& pg : pGroup->getPriorityGroups())
     {
@@ -498,9 +503,9 @@ void SceneManager::ShadowRenderer::renderAdditiveTextureShadowedQueueGroupObject
         lightList.clear();
 
         // Render all the ambient passes first, no light iteration, no lights
-        mSceneManager->renderObjects(pPriorityGrp->getSolidsBasic(), om, false, false, &lightList);
+        visitor->renderObjects(pPriorityGrp->getSolidsBasic(), om, false, false, &lightList);
         // Also render any objects which have receive shadows disabled
-        mSceneManager->renderObjects(pPriorityGrp->getSolidsNoShadowReceive(), om, true, true);
+        visitor->renderObjects(pPriorityGrp->getSolidsNoShadowReceive(), om, true, true);
 
 
         // only perform this next part if we're in the 'normal' render stage, to avoid
@@ -568,7 +573,7 @@ void SceneManager::ShadowRenderer::renderAdditiveTextureShadowedQueueGroupObject
                 if(scissored == CLIPPED_ALL || clipped == CLIPPED_ALL)
                     continue;
 
-                mSceneManager->renderObjects(pPriorityGrp->getSolidsDiffuseSpecular(), om, false, false, &lightList);
+                visitor->renderObjects(pPriorityGrp->getSolidsDiffuseSpecular(), om, false, false, &lightList);
                 if (scissored == CLIPPED_SOME)
                     mSceneManager->resetScissor();
                 if (clipped == CLIPPED_SOME)
@@ -579,7 +584,7 @@ void SceneManager::ShadowRenderer::renderAdditiveTextureShadowedQueueGroupObject
             mSceneManager->mIlluminationStage = IRS_NONE;
 
             // Now render decal passes, no need to set lights as lighting will be disabled
-            mSceneManager->renderObjects(pPriorityGrp->getSolidsDecal(), om, false, false);
+            visitor->renderObjects(pPriorityGrp->getSolidsDecal(), om, false, false);
 
         }
 
@@ -592,9 +597,9 @@ void SceneManager::ShadowRenderer::renderAdditiveTextureShadowedQueueGroupObject
         RenderPriorityGroup* pPriorityGrp = pg.second;
 
         // Do unsorted transparents
-        mSceneManager->renderObjects(pPriorityGrp->getTransparentsUnsorted(), om, true, true);
+        visitor->renderObjects(pPriorityGrp->getTransparentsUnsorted(), om, true, true);
         // Do transparents (always descending sort)
-        mSceneManager->renderObjects(pPriorityGrp->getTransparents(),
+        visitor->renderObjects(pPriorityGrp->getTransparents(),
             QueuedRenderableCollection::OM_SORT_DESCENDING, true, true);
 
     }// for each priority
@@ -612,13 +617,14 @@ void SceneManager::ShadowRenderer::renderTextureShadowReceiverQueueGroupObjects(
     // Override auto param ambient to force vertex programs to go full-bright
     ColourValue currAmbient = mSceneManager->getAmbientLight();
     mSceneManager->setAmbientLight(ColourValue::White);
+    auto visitor = mSceneManager->getQueuedRenderableVisitor();
 
     for (const auto& pg : pGroup->getPriorityGroups())
     {
         RenderPriorityGroup* pPriorityGrp = pg.second;
 
         // Do solids, override light list incase any vertex programs use them
-        mSceneManager->renderObjects(pPriorityGrp->getSolidsBasic(), om, false, false, &nullLightList);
+        visitor->renderObjects(pPriorityGrp->getSolidsBasic(), om, false, false, &nullLightList);
 
         // Don't render transparents or passes which have shadow receipt disabled
 
