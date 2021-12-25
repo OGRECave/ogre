@@ -1779,19 +1779,6 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
 
     setWorldTransform(rend);
 
-    // Reissue any texture gen settings which are dependent on view matrix
-    size_t unit = 0;
-    Pass::TextureUnitStates::const_iterator it;
-    for(it = pass->getTextureUnitStates().begin(); it != pass->getTextureUnitStates().end(); ++it)
-    {
-        TextureUnitState* pTex = *it;
-        if (pTex->hasViewRelativeTextureCoordinateGeneration())
-        {
-            mDestRenderSystem->_setTextureUnitSettings(unit, *pTex);
-        }
-        ++unit;
-    }
-
     // Sort out normalisation
     // Assume first world matrix representative - shaders that use multiple
     // matrices should control renormalisation themselves
