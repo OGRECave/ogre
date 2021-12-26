@@ -3464,70 +3464,74 @@ namespace Ogre{
         // Set the value of the source
         ExternalTextureSourceManager::getSingleton().setCurrentPlugIn(obj->values.front()->getValue());
 
-        // Set up the technique, pass, and texunit levels
-        if(ExternalTextureSourceManager::getSingleton().getCurrentPlugIn() != 0)
+        if (!ExternalTextureSourceManager::getSingleton().getCurrentPlugIn())
         {
-            TextureUnitState *texunit = any_cast<TextureUnitState*>(obj->parent->context);
-            Pass *pass = texunit->getParent();
-            Technique *technique = pass->getParent();
-            Material *material = technique->getParent();
-
-            unsigned short techniqueIndex = 0, passIndex = 0, texUnitIndex = 0;
-            for(unsigned short i = 0; i < material->getNumTechniques(); i++)
-            {
-                if(material->getTechnique(i) == technique)
-                {
-                    techniqueIndex = i;
-                    break;
-                }
-            }
-            for(unsigned short i = 0; i < technique->getNumPasses(); i++)
-            {
-                if(technique->getPass(i) == pass)
-                {
-                    passIndex = i;
-                    break;
-                }
-            }
-            for(unsigned short i = 0; i < pass->getNumTextureUnitStates(); i++)
-            {
-                if(pass->getTextureUnitState(i) == texunit)
-                {
-                    texUnitIndex = i;
-                    break;
-                }
-            }
-
-            String tps;
-            tps = StringConverter::toString(techniqueIndex) + " "
-                + StringConverter::toString(passIndex) + " "
-                + StringConverter::toString(texUnitIndex);
-
-            ExternalTextureSourceManager::getSingleton().getCurrentPlugIn()->setParameter( "set_T_P_S", tps );
-
-            for(AbstractNodeList::iterator i = obj->children.begin(); i != obj->children.end(); ++i)
-            {
-                if((*i)->type == ANT_PROPERTY)
-                {
-                    PropertyAbstractNode *prop = (PropertyAbstractNode*)(*i).get();
-                    // Glob the property values all together
-                    String str = "";
-                    for(AbstractNodeList::iterator j = prop->values.begin(); j != prop->values.end(); ++j)
-                    {
-                        if(j != prop->values.begin())
-                            str = str + " ";
-                        str = str + (*j)->getValue();
-                    }
-                    ExternalTextureSourceManager::getSingleton().getCurrentPlugIn()->setParameter(prop->name, str);
-                }
-                else if((*i)->type == ANT_OBJECT)
-                {
-                    processNode(compiler, *i);
-                }
-            }
-
-            ExternalTextureSourceManager::getSingleton().getCurrentPlugIn()->createDefinedTexture(material->getName(), material->getGroup());
+            compiler->addError(ScriptCompiler::CE_REFERENCETOANONEXISTINGOBJECT, node->file, node->line,
+                               obj->values.front()->getValue());
+            return;
         }
+
+        // Set up the technique, pass, and texunit levels
+        TextureUnitState *texunit = any_cast<TextureUnitState*>(obj->parent->context);
+        Pass *pass = texunit->getParent();
+        Technique *technique = pass->getParent();
+        Material *material = technique->getParent();
+
+        unsigned short techniqueIndex = 0, passIndex = 0, texUnitIndex = 0;
+        for(unsigned short i = 0; i < material->getNumTechniques(); i++)
+        {
+            if(material->getTechnique(i) == technique)
+            {
+                techniqueIndex = i;
+                break;
+            }
+        }
+        for(unsigned short i = 0; i < technique->getNumPasses(); i++)
+        {
+            if(technique->getPass(i) == pass)
+            {
+                passIndex = i;
+                break;
+            }
+        }
+        for(unsigned short i = 0; i < pass->getNumTextureUnitStates(); i++)
+        {
+            if(pass->getTextureUnitState(i) == texunit)
+            {
+                texUnitIndex = i;
+                break;
+            }
+        }
+
+        String tps;
+        tps = StringConverter::toString(techniqueIndex) + " "
+            + StringConverter::toString(passIndex) + " "
+            + StringConverter::toString(texUnitIndex);
+
+        ExternalTextureSourceManager::getSingleton().getCurrentPlugIn()->setParameter( "set_T_P_S", tps );
+
+        for(AbstractNodeList::iterator i = obj->children.begin(); i != obj->children.end(); ++i)
+        {
+            if((*i)->type == ANT_PROPERTY)
+            {
+                PropertyAbstractNode *prop = (PropertyAbstractNode*)(*i).get();
+                // Glob the property values all together
+                String str = "";
+                for(AbstractNodeList::iterator j = prop->values.begin(); j != prop->values.end(); ++j)
+                {
+                    if(j != prop->values.begin())
+                        str = str + " ";
+                    str = str + (*j)->getValue();
+                }
+                ExternalTextureSourceManager::getSingleton().getCurrentPlugIn()->setParameter(prop->name, str);
+            }
+            else if((*i)->type == ANT_OBJECT)
+            {
+                processNode(compiler, *i);
+            }
+        }
+
+        ExternalTextureSourceManager::getSingleton().getCurrentPlugIn()->createDefinedTexture(material->getName(), material->getGroup());
     }
 
     /**************************************************************************
