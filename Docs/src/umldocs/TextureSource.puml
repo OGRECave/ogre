@@ -1,4 +1,5 @@
 @startuml
+skinparam backgroundcolor transparent
 hide empty members
 set namespaceSeparator none
 class ExternalTextureSource {
@@ -7,27 +8,28 @@ class ExternalTextureSource {
 class ExternalTextureSourceManager {
 + setExternalTextureSource()
 + setCurrentPlugin()
++ createDefinedTexture()
 }
-ExternalTextureSource -up-o ExternalTextureSourceManager
+ExternalTextureSource -down-o ExternalTextureSourceManager
 class ScriptTranslator {
     * Set "video" plugin active
-    * Parse & Set parameters
+    * Parse & set parameters
     * Create Texture
 }
-class Plugin_ffmpegVideoSystem {
-+ dllStartPlugin()
+class Plugin_TheoraVideoSystem {
++ install()
 }
 object Plugins.cfg {
-    Plugin=Plugin_ffmpegVideoSystem
     Plugin=..
+    Plugin=Plugin_TheoraVideoSystem
     Plugin=..
 }
-Plugins.cfg -- Plugin_ffmpegVideoSystem
-Plugin_ffmpegVideoSystem -down-> ExternalTextureSourceManager
+Plugins.cfg -- Plugin_TheoraVideoSystem
+Plugin_TheoraVideoSystem -down-> ExternalTextureSourceManager
 ScriptTranslator -down-> ExternalTextureSourceManager
 
 object "Sample Material Script" as material {
-pass
+texture_source video
 &#123;
 \tfilename test.mpeg
 \tplay_mode play
