@@ -452,8 +452,10 @@ ADD_REPR(Plane)
 %ignore Ogre::Log::Stream; // not useful in bindings
 %ignore Ogre::Log::stream;
 %feature("director") Ogre::LogListener;
+%ignore Ogre::Log::setLogDetail;
 %include "OgreLog.h"
 %ignore Ogre::LogManager::stream; // not useful in bindings
+%ignore Ogre::LogManager::setLogDetail;
 %include "OgreLogManager.h"
 #ifdef SWIGJAVA
 // conflicts with SWIG interal func
@@ -472,11 +474,9 @@ SHARED_PTR(FileHandleDataStream);
 // %template(FactoryObjArchive) Ogre::FactoryObj<Ogre::Archive>;
 %include "OgreArchiveFactory.h"
 %ignore Ogre::ZipArchiveFactory; // private
-%ignore Ogre::ZipDataStream; // private
 %include "OgreZip.h"
 %ignore Ogre::ArchiveManager::getArchiveIterator;
 %include "OgreArchiveManager.h"
-%ignore Ogre::Codec::getCodecIterator;
 %include "OgreCodec.h"
 %include "OgreSerializer.h"
 %include "OgreScriptLoader.h"
@@ -496,7 +496,6 @@ SHARED_PTR(FileHandleDataStream);
 // More Data Types
 %include "OgreColourValue.h"
 ADD_REPR(ColourValue)
-%ignore Ogre::PixelUtil::getBNFExpressionOfPixelFormats;
 %include "OgrePixelFormat.h"
 #ifdef SWIGCSHARP
 %extend Ogre::PixelBox
@@ -511,9 +510,14 @@ ADD_REPR(ColourValue)
 
 %include "OgreNameGenerator.h"
 %include "OgreController.h"
+%ignore Ogre::RenderSystemCapabilities::setVertexTextureUnitsShared;
+%ignore Ogre::RenderSystemCapabilities::getVertexTextureUnitsShared;
+%rename("$ignore", regextarget=1) ".*ProgramConstantIntCount.*";
+%rename("$ignore", regextarget=1) ".*ProgramConstantBoolCount.*";
 %include "OgreRenderSystemCapabilities.h"
 %ignore Ogre::GpuProgramParameters::hasPassIterationNumber; // deprecated
 %ignore Ogre::GpuProgramParameters::getPassIterationNumberIndex; // deprecated
+%ignore Ogre::GpuProgramParameters::setConstantFromTime;
 %ignore Ogre::GpuProgramParameters::getConstantDefinitionIterator;
 %ignore Ogre::GpuSharedParameters::getConstantDefinitionIterator;
 SHARED_PTR(GpuProgramParameters);
@@ -541,16 +545,24 @@ SHARED_PTR(StringInterface);
     SHARED_PTR(Resource);
     %include "OgreResource.h"
         SHARED_PTR(Texture);
+        %ignore Ogre::Texture::setTreatLuminanceAsAlpha;
         %include "OgreTexture.h"
         SHARED_PTR(GpuProgram);
+        %ignore Ogre::GpuProgram::setAdjacencyInfoRequired;
         %include "OgreGpuProgram.h"
             SHARED_PTR(HighLevelGpuProgram);
             %include "OgreHighLevelGpuProgram.h"
+%ignore Ogre::PreApplyTextureAliasesScriptCompilerEvent;
 %include "OgreScriptCompiler.h"
 %ignore Ogre::TextureUnitState::setCubicTexture;
 %ignore Ogre::TextureUnitState::setCubicTextureName;
 %ignore Ogre::TextureUnitState::isCubic;
 %ignore Ogre::TextureUnitState::is3D;
+%ignore Ogre::TextureUnitState::setBindingType;
+%ignore Ogre::TextureUnitState::getBindingType;
+%ignore Ogre::TextureUnitState::setIsAlpha;
+%ignore Ogre::TextureUnitState::setTextureNameAlias;
+%ignore Ogre::TextureUnitState::getTextureNameAlias;
 %include "OgreTextureUnitState.h"
 %template(ControllerReal) Ogre::Controller<Ogre::Real>;
 %template(ControllerValueRealPtr) Ogre::SharedPtr<Ogre::ControllerValue<Ogre::Real> >;
@@ -661,19 +673,30 @@ SHARED_PTR(Skeleton);
 %ignore Ogre::Material::getTechniqueIterator;
 %ignore Ogre::Material::getSupportedTechnique;
 %ignore Ogre::Material::getNumSupportedTechniques;
+%ignore Ogre::Material::clone(const String&, bool) const;
+%ignore Ogre::Material::clone(const String&, bool, const String&) const;
 SHARED_PTR(Material);
 %template(TechniqueList) std::vector<Ogre::Technique*>;
 %include "OgreMaterial.h"
-%ignore Ogre::RenderSystem::_setBindingType;
-%ignore Ogre::RenderSystem::_setBindingType;
 %ignore Ogre::RenderSystem::_setTextureUnitFiltering;
 %ignore Ogre::RenderSystem::_setTextureAddressingMode;
 %ignore Ogre::RenderSystem::_setSceneBlending;
+%ignore Ogre::RenderSystem::_setSeparateSceneBlending;
+%ignore Ogre::RenderSystem::_setDepthBufferCheckEnabled;
+%ignore Ogre::RenderSystem::_setDepthBufferWriteEnabled;
+%ignore Ogre::RenderSystem::_setDepthBufferFunction;
+%ignore Ogre::RenderSystem::_setColourBufferWriteEnabled;
 %ignore Ogre::RenderSystem::_setFog;
 %ignore Ogre::RenderSystem::_setWorldMatrix;
 %ignore Ogre::RenderSystem::_setViewMatrix;
+%ignore Ogre::RenderSystem::_setVertexTexture;
 %ignore Ogre::RenderSystem::_setProjectionMatrix;
 %ignore Ogre::RenderSystem::getRenderTargetIterator;
+%ignore Ogre::RenderSystem::convertColourValue;
+%ignore Ogre::RenderSystem::getColourVertexElementType;
+%ignore Ogre::RenderSystem::setStencilCheckEnabled;
+%ignore Ogre::RenderSystem::setStencilBufferParams;
+%ignore Ogre::RenderSystem::getDisplayMonitorCount;
 %include "OgreRenderSystem.h"
 %include "OgreCompositorManager.h"
 #ifdef SWIGJAVA
@@ -704,6 +727,8 @@ SHARED_PTR(Material);
     %include "OgreBillboardChain.h"
         %ignore Ogre::RibbonTrail::getNodeIterator;
         %include "OgreRibbonTrail.h"
+    %ignore Ogre::BillboardSet::setTextureCoords(const FloatRect*, uint16);
+    %ignore Ogre::BillboardSet::getTextureCoords(uint16*);
     %include "OgreBillboardSet.h"
     %include "OgreMovablePlane.h"
     %ignore Ogre::Light::setPosition;
@@ -730,6 +755,7 @@ SHARED_PTR(Material);
         %include "OgreShadowCameraSetupPSSM.h"
             %template(SplitPointList) std::vector<Ogre::Real>;
     %ignore Ogre::Frustum::getFrustumExtents(Real&, Real& ,Real& ,Real&) const;
+    %ignore Ogre::Frustum::getProjectionMatrixRS;
     %include "OgreFrustum.h"
         %ignore Ogre::Camera::setPosition;
         %ignore Ogre::Camera::getPosition;
@@ -748,6 +774,7 @@ SHARED_PTR(Material);
         %ignore Ogre::Camera::setAutoTracking;
         %ignore Ogre::Camera::move;
         %ignore Ogre::Camera::moveRelative;
+        %ignore Ogre::Camera::_renderScene(Viewport*, bool);
         %include "OgreCamera.h"
         ADD_REPR(Camera)
     %include "OgreManualObject.h"
@@ -787,6 +814,7 @@ SHARED_PTR(Mesh);
 %include "OgreMesh.h"
 %ignore Ogre::SubMesh::getBoneAssignmentIterator;
 %ignore Ogre::SubMesh::getAliasTextureIterator;
+%ignore Ogre::SubMesh::removeAllTextureAliases;
 %include "OgreSubMesh.h"
 %ignore Ogre::StaticGeometry::getRegionIterator;
 %ignore Ogre::StaticGeometry::Region::getLODIterator;
@@ -801,8 +829,6 @@ SHARED_PTR(Mesh);
 %include "OgreLodStrategy.h"
 %include "OgrePixelCountLodStrategy.h"
 %ignore Ogre::Pass::getTextureUnitStateIterator; // deprecated
-%ignore Ogre::Pass::hasSeparateSceneBlending;
-%ignore Ogre::Pass::hasSeparateSceneBlendingOperations;
 %template(TextureUnitStateList) std::vector<Ogre::TextureUnitState*>;
 %include "OgrePass.h"
     %ignore Ogre::Technique::getGPUVendorRuleIterator;
@@ -828,6 +854,7 @@ SHARED_PTR(Mesh);
 #endif
     %include "OgreRenderWindow.h"
     %include "OgreRenderTexture.h"
+%ignore Ogre::Viewport::getActualDimensions(int&, int& ,int& ,int&) const;
 %include "OgreViewport.h"
 %ignore Ogre::CompositorChain::getNumCompositors;
 %ignore Ogre::CompositorChain::getCompositor;
@@ -847,8 +874,8 @@ SHARED_PTR(Mesh);
 %template(MovableObjectMap) std::map<std::string, Ogre::MovableObject*>;
 %template(CameraMap) std::map<std::string, Ogre::Camera*>;
 %include "OgreSceneManager.h"
-%ignore Ogre::SceneManagerEnumerator::createSceneManager(SceneTypeMask);
-%ignore Ogre::SceneManagerEnumerator::createSceneManager(SceneTypeMask, const String&);
+%ignore Ogre::SceneManagerEnumerator::createSceneManager(uint16);
+%ignore Ogre::SceneManagerEnumerator::createSceneManager(uint16, const String&);
 %ignore Ogre::SceneManagerEnumerator::getSceneManagerIterator;
 %ignore Ogre::SceneManagerEnumerator::getMetaDataIterator;
 %include "OgreDefaultDebugDrawer.h"
@@ -857,9 +884,11 @@ SHARED_PTR(Mesh);
 %template(RenderSystemList) std::vector<Ogre::RenderSystem*>;
 %ignore Ogre::Root::getSceneManagerMetaDataIterator;
 %ignore Ogre::Root::getSceneManagerIterator;
-%ignore Ogre::Root::createSceneManager(SceneTypeMask);
-%ignore Ogre::Root::createSceneManager(SceneTypeMask, const String&);
+%ignore Ogre::Root::createSceneManager(uint16);
+%ignore Ogre::Root::createSceneManager(uint16, const String&);
 %ignore Ogre::Root::getMovableObjectFactoryIterator;
+%ignore Ogre::Root::convertColourValue;
+%ignore Ogre::Root::getDisplayMonitorCount;
 %include "OgreRoot.h"
 // dont wrap: platform specific
 // %include "OgreWindowEventUtilities.h"
