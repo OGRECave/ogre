@@ -88,9 +88,11 @@ mCameraRelativeRendering(false),
 mLastLightHash(0),
 mGpuParamsDirty((uint16)GPV_ALL)
 {
-    Root *root = Root::getSingletonPtr();
-    if (root)
+    if (Root* root = Root::getSingletonPtr())
         _setDestinationRenderSystem(root->getRenderSystem());
+
+    if (mDestRenderSystem)
+        mNormaliseNormalsOnScale = mDestRenderSystem->getCapabilities()->hasCapability(RSC_FIXED_FUNCTION);
 
     // Setup default queued renderable visitor
     mActiveQueuedRenderableVisitor = &mDefaultQueuedRenderableVisitor;
