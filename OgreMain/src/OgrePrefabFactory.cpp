@@ -91,13 +91,13 @@ namespace Ogre {
         //! [vertex_decl]
 
         //! [vertex_buffer]
-        HardwareVertexBufferSharedPtr vbuf =
+        HardwareVertexBufferPtr vbuf =
             HardwareBufferManager::getSingleton().createVertexBuffer(offset, 4, HBU_GPU_ONLY);
         vbuf->writeData(0, vbuf->getSizeInBytes(), vertices, true);
         bind->setBinding(0, vbuf);
 
-        HardwareIndexBufferSharedPtr ibuf = HardwareBufferManager::getSingleton().createIndexBuffer(
-            HardwareIndexBuffer::IT_16BIT, 6, HBU_GPU_ONLY);
+        HardwareIndexBufferPtr ibuf =
+            HardwareBufferManager::getSingleton().createIndexBuffer(HardwareIndexBuffer::IT_16BIT, 6, HBU_GPU_ONLY);
         ibuf->writeData(0, ibuf->getSizeInBytes(), faces, true);
         //! [vertex_buffer]
 
