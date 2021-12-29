@@ -3785,7 +3785,7 @@ void SceneManager::updateGpuProgramParameters(const Pass* pass)
     {
         pass->_updateAutoParams(mAutoParamDataSource.get(), mGpuParamsDirty);
 
-        for (int i = 0; i < GPT_COUNT; i++)
+        for (int i = 0; i < GPT_COMPUTE_PROGRAM; i++) // compute program is bound via RSComputeOperation
         {
             GpuProgramType t = (GpuProgramType)i;
             if (pass->hasGpuProgram(t))
