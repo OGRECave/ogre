@@ -121,7 +121,7 @@ namespace Ogre {
     /** The variability of a GPU parameter, as derived from auto-params targeting it.
         These values must be powers of two since they are used in masks.
     */
-    enum GpuParamVariability
+    enum GpuParamVariability : uint16
     {
         /// No variation except by manual setting - the default
         GPV_GLOBAL = 1,
