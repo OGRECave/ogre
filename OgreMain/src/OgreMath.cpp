@@ -103,7 +103,7 @@ namespace Ogre
     float Math::TanTable (float fValue)
     {
         // Convert range to index values, wrap if required
-        int idx = int(fValue *= mTrigTableFactor) % mTrigTableSize;
+        int idx = int(fValue * mTrigTableFactor) % mTrigTableSize;
         return mTanTable[idx];
     }
     //-----------------------------------------------------------------------
