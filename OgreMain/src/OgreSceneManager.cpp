@@ -91,7 +91,7 @@ mGpuParamsDirty((uint16)GPV_ALL)
     if (Root* root = Root::getSingletonPtr())
         _setDestinationRenderSystem(root->getRenderSystem());
 
-    if (mDestRenderSystem)
+    if (mDestRenderSystem && mDestRenderSystem->getCapabilities())
         mNormaliseNormalsOnScale = mDestRenderSystem->getCapabilities()->hasCapability(RSC_FIXED_FUNCTION);
 
     // Setup default queued renderable visitor
