@@ -1648,13 +1648,12 @@ const Pass* SceneManager::ShadowRenderer::deriveShadowReceiverPass(const Pass* p
 
     if (mShadowTechnique & SHADOWDETAILTYPE_TEXTURE)
     {
-        Pass* retPass = NULL;
         if (pass->getParent()->getShadowReceiverMaterial())
         {
-            return retPass = pass->getParent()->getShadowReceiverMaterial()->getBestTechnique()->getPass(0);
+            return pass->getParent()->getShadowReceiverMaterial()->getBestTechnique()->getPass(0);
         }
 
-        retPass = mShadowTextureCustomReceiverPass ? mShadowTextureCustomReceiverPass : mShadowReceiverPass;
+        Pass* retPass = mShadowTextureCustomReceiverPass ? mShadowTextureCustomReceiverPass : mShadowReceiverPass;
 
         unsigned short keepTUCount;
         // If additive, need lighting parameters & standard programs
