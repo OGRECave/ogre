@@ -182,8 +182,6 @@ void ProgramManager::createGpuPrograms(ProgramSet* programSet)
         auto gpuProgram = createGpuProgram(programSet->getCpuProgram(type), programWriter, language,
                                            ShaderGenerator::getSingleton().getShaderProfiles(type),
                                            ShaderGenerator::getSingleton().getShaderCachePath());
-
-        OgreAssert(gpuProgram, "gpu program could not be created");
         programSet->setGpuProgram(gpuProgram);
     }
 
@@ -283,15 +281,6 @@ GpuProgramPtr ProgramManager::createGpuProgram(Program* shaderProgram,
     }
 
     pGpuProgram->load();
-
-    // Case an error occurred.
-    if (pGpuProgram->hasCompileError())
-    {
-        //! [debug_break]
-        pGpuProgram.reset();
-        //! [debug_break]
-        return GpuProgramPtr(pGpuProgram);
-    }
 
     // Add the created GPU program to local cache.
     if (pGpuProgram->getType() == GPT_VERTEX_PROGRAM)
