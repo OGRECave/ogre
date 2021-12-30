@@ -65,7 +65,12 @@ protected:
     }
 
     void setupContent()
-    {     
+    {
+#ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
+        // Need RTSS for WBOIT
+        mViewport->setMaterialScheme(RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+        MaterialManager::getSingleton().setActiveScheme(mViewport->getMaterialScheme());
+#endif
         mSceneMgr->setSkyBox(true, "Examples/TrippySkyBox");
 
         mCameraMan->setStyle(CS_ORBIT);
@@ -89,14 +94,23 @@ protected:
         mFishNode->attachObject(ent);
         mFishNode->setScale(2, 2, 2);
 
+        mWaterStream->setMaterialName("Examples/WaterStream");
+        mWaterStream->setRenderQueueGroup(RENDER_QUEUE_MAIN);
+        if(!mTrayMgr)
+            return;
+
         // OIT compositor (disabled)
         auto& cm = CompositorManager::getSingleton();
         cm.addCompositor(mViewport, "WBOIT");
 
-        if(!mTrayMgr)
-            return;
         // GUI
         mTrayMgr->showCursor();
+
+        auto oitMat = Ogre::MaterialManager::getSingleton().getByName("Examples/WaterStream/OIT");
+        oitMat->load();
+        if (oitMat->getBestTechnique()->getSchemeName() != mViewport->getMaterialScheme())
+            return;
+
         mTrayMgr->createCheckBox(TL_TOPLEFT, "OIT", "Order Independent Transparency")->setChecked(false, true);
     }
 
