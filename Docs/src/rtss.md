@@ -415,7 +415,4 @@ A couple of notes on debugging shaders coming from the RTSS:
 * Call OgreBites::ApplicationContext::setRTSSWriteShadersToDisk. This will cache the generated shaders onto the disk under the directory [WRITABLE_PATH](@ref Ogre::FileSystemLayer::getWritablePath)`/RTShaderLib/cache`. This is important for 2 reasons:
   * It will make compilation problems easier to detect.
   * Once a shader is written to the disk, as long as you don't change the code behind it, the same shader will be picked up in the next application run even if its content has changed. If you have compilation or visual problems with the shader you can try to manually tinker with it without compiling the code again and again.
-* Add a breakpoint in OgreShaderProgramManager.cpp at
-@snippetlineno Components/RTShaderSystem/src/OgreShaderProgramManager.cpp debug_break 
-If a shader will fail to compile it will usually fail there. Once that happens you can find the shader name under the `programName` parameter, then look for it in the cache directory you created.
 * Other common problems with creating shaders in RTSS usually occur from defining vertex shader parameters and using them in the pixel shader and vice versa. so watch out for those.
