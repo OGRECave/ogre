@@ -69,7 +69,6 @@ namespace Ogre {
                 compileAndLink();
             }
 
-            extractLayoutQualifiers();
             buildGLUniformReferences();
         }
 
