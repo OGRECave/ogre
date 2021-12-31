@@ -383,7 +383,7 @@ void GLTextureBuffer::blit(const HardwarePixelBufferSharedPtr &src, const Box &s
     
     // Using this in Terrain composite map RTT interferes with Impostor RTT rendering in pagedgeometry
     // I have no idea why! For the moment, disable when src is RTT
-    if(GLEW_EXT_framebuffer_object && (src->getUsage() & TU_RENDERTARGET) == 0 &&
+    if(GLAD_GL_EXT_framebuffer_object && (src->getUsage() & TU_RENDERTARGET) == 0 &&
         (srct->mTarget==GL_TEXTURE_1D||srct->mTarget==GL_TEXTURE_2D
          ||srct->mTarget==GL_TEXTURE_3D)&&mTarget!=GL_TEXTURE_2D_ARRAY_EXT)
     {
@@ -608,7 +608,7 @@ void GLTextureBuffer::blitFromMemory(const PixelBox &src, const Box &dstBox)
     /// Fall back to normal GLHardwarePixelBuffer::blitFromMemory in case 
     /// - FBO is not supported
     /// - the source dimensions match the destination ones, in which case no scaling is needed
-    if (!GLEW_EXT_framebuffer_object ||
+    if (!GLAD_GL_EXT_framebuffer_object ||
         (src.getSize() == dstBox.getSize()))
     {
         _blitFromMemory(src, dstBox);

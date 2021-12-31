@@ -45,7 +45,7 @@ namespace Ogre {
         // Generate framebuffer object
         glGenFramebuffersEXT(1, &mFB);
         // check multisampling
-        if (GLEW_EXT_framebuffer_blit && GLEW_EXT_framebuffer_multisample)
+        if (GLAD_GL_EXT_framebuffer_blit && GLAD_GL_EXT_framebuffer_multisample)
         {
             // check samples supported
             GLint maxSamples;

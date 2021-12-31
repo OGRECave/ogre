@@ -41,11 +41,11 @@ namespace Ogre {
     {
         glBlendEquation(GL_FUNC_ADD);
 
-        if(GLEW_VERSION_2_0)
+        if(GLAD_GL_VERSION_2_0)
         {
             glBlendEquationSeparate(GL_FUNC_ADD, GL_FUNC_ADD);
         }
-        else if(GLEW_EXT_blend_equation_separate)
+        else if(GLAD_GL_EXT_blend_equation_separate)
         {
             glBlendEquationSeparateEXT(GL_FUNC_ADD, GL_FUNC_ADD);
         }
@@ -431,11 +431,11 @@ namespace Ogre {
             mBlendEquationRGB = eqRGB;
             mBlendEquationAlpha = eqAlpha;
 
-            if(GLEW_VERSION_2_0)
+            if(GLAD_GL_VERSION_2_0)
             {
                 glBlendEquationSeparate(eqRGB, eqAlpha);
             }
-            else if(GLEW_EXT_blend_equation_separate)
+            else if(GLAD_GL_EXT_blend_equation_separate)
             {
                 glBlendEquationSeparateEXT(eqRGB, eqAlpha);
             }

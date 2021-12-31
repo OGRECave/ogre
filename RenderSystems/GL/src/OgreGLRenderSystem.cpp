@@ -69,6 +69,11 @@ extern "C" void glFlushRenderAPPLE();
 
 namespace Ogre {
 
+    static GLNativeSupport* glsupport;
+    static void* get_proc(const char* proc) {
+        return glsupport->getProcAddress(proc);
+    }
+
     typedef TransformBase<4, float> Matrix4f;
 
     // Callback function used when registering GLGpuPrograms
@@ -172,6 +177,7 @@ namespace Ogre {
 
         // Get our GLSupport
         mGLSupport = getGLSupport(GLNativeSupport::CONTEXT_COMPATIBILITY);
+        glsupport = mGLSupport;
 
         mWorldMatrix = Matrix4::IDENTITY;
         mViewMatrix = Matrix4::IDENTITY;
@@ -392,7 +398,7 @@ namespace Ogre {
         GLint units;
         glGetIntegerv( GL_MAX_TEXTURE_UNITS, &units );
 
-        if (GLEW_ARB_fragment_program)
+        if (GLAD_GL_ARB_fragment_program)
         {
             // Also check GL_MAX_TEXTURE_IMAGE_UNITS_ARB since NV at least
             // only increased this on the FX/6x00 series
@@ -404,7 +410,7 @@ namespace Ogre {
         rsc->setNumTextureUnits(std::min(OGRE_MAX_TEXTURE_LAYERS, units));
 
         // Check for Anisotropy support
-        if(GLEW_EXT_texture_filter_anisotropic)
+        if(GLAD_GL_EXT_texture_filter_anisotropic)
         {
             GLfloat maxAnisotropy = 0;
             glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &maxAnisotropy);
@@ -413,17 +419,17 @@ namespace Ogre {
         }
 
         // Point sprites
-        if (GLEW_VERSION_2_0 || GLEW_ARB_point_sprite)
+        if (GLAD_GL_VERSION_2_0 || GLAD_GL_ARB_point_sprite)
         {
             rsc->setCapability(RSC_POINT_SPRITES);
         }
 
-        if(GLEW_ARB_point_parameters)
+        if(GLAD_GL_ARB_point_parameters)
         {
             glPointParameterf = glPointParameterfARB;
             glPointParameterfv = glPointParameterfvARB;
         }
-        else if(GLEW_EXT_point_parameters)
+        else if(GLAD_GL_EXT_point_parameters)
         {
             glPointParameterf = glPointParameterfEXT;
             glPointParameterfv = glPointParameterfvEXT;
@@ -447,7 +453,7 @@ namespace Ogre {
         rsc->setCapability(RSC_MAPBUFFER);
         rsc->setCapability(RSC_32BIT_INDEX);
 
-        if(GLEW_ARB_vertex_program)
+        if(GLAD_GL_ARB_vertex_program)
         {
             rsc->setCapability(RSC_VERTEX_PROGRAM);
 
@@ -461,31 +467,31 @@ namespace Ogre {
             rsc->setNumVertexAttributes(attrs);
 
             rsc->addShaderProfile("arbvp1");
-            if (GLEW_NV_vertex_program2_option)
+            if (GLAD_GL_NV_vertex_program2_option)
             {
                 rsc->addShaderProfile("vp30");
             }
 
-            if (GLEW_NV_vertex_program3)
+            if (GLAD_GL_NV_vertex_program3)
             {
                 rsc->addShaderProfile("vp40");
             }
 
-            if (GLEW_NV_gpu_program4)
+            if (GLAD_GL_NV_gpu_program4)
             {
                 rsc->addShaderProfile("gp4vp");
                 rsc->addShaderProfile("gpu_vp");
             }
         }
 
-        if (GLEW_NV_register_combiners2 &&
-            GLEW_NV_texture_shader)
+        if (GLAD_GL_NV_register_combiners2 &&
+            GLAD_GL_NV_texture_shader)
         {
             rsc->addShaderProfile("fp20");
         }
 
         // NFZ - check for ATI fragment shader support
-        if (GLEW_ATI_fragment_shader)
+        if (GLAD_GL_ATI_fragment_shader)
         {
             // only 8 Vector4 constant floats supported
             rsc->setFragmentProgramConstantFloatCount(8);
@@ -496,7 +502,7 @@ namespace Ogre {
             rsc->addShaderProfile("ps_1_1");
         }
 
-        if (GLEW_ARB_fragment_program)
+        if (GLAD_GL_ARB_fragment_program)
         {
             // Fragment Program Properties
             GLint floatConstantCount;
@@ -504,17 +510,17 @@ namespace Ogre {
             rsc->setFragmentProgramConstantFloatCount(floatConstantCount);
 
             rsc->addShaderProfile("arbfp1");
-            if (GLEW_NV_fragment_program_option)
+            if (GLAD_GL_NV_fragment_program_option)
             {
                 rsc->addShaderProfile("fp30");
             }
 
-            if (GLEW_NV_fragment_program2)
+            if (GLAD_GL_NV_fragment_program2)
             {
                 rsc->addShaderProfile("fp40");
             }
 
-            if (GLEW_NV_gpu_program4)
+            if (GLAD_GL_NV_gpu_program4)
             {
                 rsc->addShaderProfile("gp4fp");
                 rsc->addShaderProfile("gpu_fp");
@@ -522,11 +528,11 @@ namespace Ogre {
         }
 
         // NFZ - Check if GLSL is supported
-        if ( GLEW_VERSION_2_0 ||
-             (GLEW_ARB_shading_language_100 &&
-              GLEW_ARB_shader_objects &&
-              GLEW_ARB_fragment_shader &&
-              GLEW_ARB_vertex_shader) )
+        if ( GLAD_GL_VERSION_2_0 ||
+             (GLAD_GL_ARB_shading_language_100 &&
+              GLAD_GL_ARB_shader_objects &&
+              GLAD_GL_ARB_fragment_shader &&
+              GLAD_GL_ARB_vertex_shader) )
         {
             rsc->addShaderProfile("glsl");
             if(getNativeShadingLanguageVersion() >= 120)
@@ -538,8 +544,8 @@ namespace Ogre {
         }
 
         // Check if geometry shaders are supported
-        if (GLEW_VERSION_2_0 &&
-            GLEW_EXT_geometry_shader4)
+        if (GLAD_GL_VERSION_2_0 &&
+            GLAD_GL_EXT_geometry_shader4)
         {
             rsc->setCapability(RSC_GEOMETRY_PROGRAM);
             GLint floatConstantCount = 0;
@@ -551,7 +557,7 @@ namespace Ogre {
             rsc->setGeometryProgramNumOutputVertices(maxOutputVertices);
         }
 
-        if(GLEW_NV_gpu_program4)
+        if(GLAD_GL_NV_gpu_program4)
         {
             rsc->setCapability(RSC_GEOMETRY_PROGRAM);
             rsc->addShaderProfile("nvgp4");
@@ -573,15 +579,15 @@ namespace Ogre {
                 rsc->setCapability(RSC_CAN_GET_COMPILED_SHADER_BUFFER);
         }
 
-        if (GLEW_VERSION_3_3 || GLEW_ARB_instanced_arrays)
+        if (hasMinGLVersion(3, 3) || GLAD_GL_ARB_instanced_arrays)
         {
             // states 3.3 here: http://www.opengl.org/sdk/docs/man3/xhtml/glVertexAttribDivisor.xml
             rsc->setCapability(RSC_VERTEX_BUFFER_INSTANCE_DATA);
         }
 
         //Check if render to vertex buffer (transform feedback in OpenGL)
-        if (GLEW_VERSION_2_0 &&
-            GLEW_NV_transform_feedback)
+        if (GLAD_GL_VERSION_2_0 &&
+            GLAD_GL_NV_transform_feedback)
         {
             rsc->setCapability(RSC_HWRENDER_TO_VERTEX_BUFFER);
         }
@@ -590,7 +596,7 @@ namespace Ogre {
         rsc->setCapability(RSC_TEXTURE_COMPRESSION);
 
         // Check for dxt compression
-        if(GLEW_EXT_texture_compression_s3tc)
+        if(GLAD_GL_EXT_texture_compression_s3tc)
         {
 #if defined(__APPLE__) && defined(__PPC__)
             // Apple on ATI & PPC has errors in DXT
@@ -599,7 +605,7 @@ namespace Ogre {
                 rsc->setCapability(RSC_TEXTURE_COMPRESSION_DXT);
         }
         // Check for vtc compression
-        if(GLEW_NV_texture_compression_vtc)
+        if(GLAD_GL_NV_texture_compression_vtc)
         {
             rsc->setCapability(RSC_TEXTURE_COMPRESSION_VTC);
         }
@@ -608,7 +614,7 @@ namespace Ogre {
         rsc->setCapability(RSC_USER_CLIP_PLANES);
 
         // 2-sided stencil?
-        if (GLEW_VERSION_2_0 || GLEW_EXT_stencil_two_side)
+        if (GLAD_GL_VERSION_2_0 || GLAD_GL_EXT_stencil_two_side)
         {
             rsc->setCapability(RSC_TWO_SIDED_STENCIL);
         }
@@ -616,13 +622,13 @@ namespace Ogre {
         rsc->setCapability(RSC_HWOCCLUSION);
 
         // Check for non-power-of-2 texture support
-        if(GLEW_ARB_texture_non_power_of_two)
+        if(GLAD_GL_ARB_texture_non_power_of_two)
         {
             rsc->setCapability(RSC_NON_POWER_OF_2_TEXTURES);
         }
 
         // Check for Float textures
-        if(GLEW_ATI_texture_float || GLEW_ARB_texture_float)
+        if(GLAD_GL_ATI_texture_float || GLAD_GL_ARB_texture_float)
         {
             rsc->setCapability(RSC_TEXTURE_FLOAT);
         }
@@ -631,17 +637,17 @@ namespace Ogre {
         rsc->setCapability(RSC_TEXTURE_1D);
         rsc->setCapability(RSC_TEXTURE_3D);
 
-        if(GLEW_VERSION_3_0 || GLEW_EXT_texture_array)
+        if(hasMinGLVersion(3, 0) || GLAD_GL_EXT_texture_array)
             rsc->setCapability(RSC_TEXTURE_2D_ARRAY);
 
         // Check for framebuffer object extension
-        if(GLEW_EXT_framebuffer_object)
+        if(GLAD_GL_EXT_framebuffer_object)
         {
             // Probe number of draw buffers
             // Only makes sense with FBO support, so probe here
-            if(GLEW_VERSION_2_0 ||
-               GLEW_ARB_draw_buffers ||
-               GLEW_ATI_draw_buffers)
+            if(GLAD_GL_VERSION_2_0 ||
+               GLAD_GL_ARB_draw_buffers ||
+               GLAD_GL_ATI_draw_buffers)
             {
                 GLint buffers;
                 glGetIntegerv(GL_MAX_DRAW_BUFFERS_ARB, &buffers);
@@ -653,7 +659,7 @@ namespace Ogre {
         }
 
         // Check GLSupport for PBuffer support
-        if(GLEW_ARB_pixel_buffer_object || GLEW_EXT_pixel_buffer_object)
+        if(GLAD_GL_ARB_pixel_buffer_object || GLAD_GL_EXT_pixel_buffer_object)
         {
             // Use PBuffers
             rsc->setCapability(RSC_HWRENDER_TO_TEXTURE);
@@ -719,7 +725,7 @@ namespace Ogre {
             }
         }
 
-        if(!GLEW_ARB_vertex_buffer_object)
+        if(!GLAD_GL_ARB_vertex_buffer_object)
         {
             // Assign ARB functions same to GL 1.5 version since
             // interface identical
@@ -851,7 +857,7 @@ namespace Ogre {
             LogManager::getSingleton().logMessage("GLSL support detected");
         }
 
-        if(caps->hasCapability(RSC_HWOCCLUSION) && !GLEW_ARB_occlusion_query)
+        if(caps->hasCapability(RSC_HWOCCLUSION) && !GLAD_GL_ARB_occlusion_query)
         {
             // Assign ARB functions same to GL 1.5 version since
             // interface identical
@@ -890,10 +896,10 @@ namespace Ogre {
         if(caps->hasCapability(RSC_HWRENDER_TO_TEXTURE) && rttMode < 1)
         {
             // Before GL version 2.0, we need to get one of the extensions
-            if(GLEW_ARB_draw_buffers)
-                GLEW_GET_FUN(__glewDrawBuffers) = glDrawBuffersARB;
-            else if(GLEW_ATI_draw_buffers)
-                GLEW_GET_FUN(__glewDrawBuffers) = glDrawBuffersATI;
+            if(GLAD_GL_ARB_draw_buffers)
+                glDrawBuffers = glDrawBuffersARB;
+            else if(GLAD_GL_ATI_draw_buffers)
+                glDrawBuffers = glDrawBuffersATI;
 
             // Create FBO manager
             LogManager::getSingleton().logMessage("GL: Using GL_EXT_framebuffer_object for rendering to textures (best)");
@@ -1093,23 +1099,22 @@ namespace Ogre {
         if(mCurrentContext)
             mCurrentContext->setCurrent();
 
-        // Setup GLSupport
-        initialiseExtensions();
+        gladLoadGLLoader(get_proc);
 
-        LogManager::getSingleton().logMessage("***************************");
-        LogManager::getSingleton().logMessage("*** GL Renderer Started ***");
-        LogManager::getSingleton().logMessage("***************************");
-
-        // Get extension function pointers
-        glewInit();
-
-        if (!GLEW_VERSION_1_5) {
+        if (!GLAD_GL_VERSION_1_5) {
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
                         "OpenGL 1.5 is not supported",
                         "GLRenderSystem::initialiseContext");
         }
 
+        // Get extension function pointers
+        initialiseExtensions();
+
         mStateCacheManager = mCurrentContext->createOrRetrieveStateCacheManager<GLStateCacheManager>();
+
+        LogManager::getSingleton().logMessage("***************************");
+        LogManager::getSingleton().logMessage("*** GL Renderer Started ***");
+        LogManager::getSingleton().logMessage("***************************");
     }
 
 
@@ -1427,10 +1432,10 @@ namespace Ogre {
                 target, GL_TEXTURE_MAX_ANISOTROPY_EXT,
                 std::min<uint>(mCurrentCapabilities->getMaxSupportedAnisotropy(), sampler.getAnisotropy()));
 
-        if(GLEW_VERSION_2_0)
+        if(GLAD_GL_VERSION_2_0)
         {
             mStateCacheManager->setTexParameteri(target, GL_TEXTURE_COMPARE_MODE,
-                                                 sampler.getCompareEnabled() ? GL_COMPARE_REF_TO_TEXTURE
+                                                 sampler.getCompareEnabled() ? GL_COMPARE_REF_DEPTH_TO_TEXTURE_EXT
                                                                              : GL_NONE);
             if (sampler.getCompareEnabled())
                 mStateCacheManager->setTexParameteri(target, GL_TEXTURE_COMPARE_FUNC,
@@ -1931,7 +1936,7 @@ namespace Ogre {
             // NB: We should always treat CCW as front face for consistent with default
             // culling mode. Therefore, we must take care with two-sided stencil settings.
             flip = flipFrontFace();
-            if(GLEW_VERSION_2_0) // New GL2 commands
+            if(GLAD_GL_VERSION_2_0) // New GL2 commands
             {
                 // Back
                 glStencilMaskSeparate(GL_BACK, state.writeMask);
@@ -1971,7 +1976,7 @@ namespace Ogre {
         }
         else
         {
-            if(!GLEW_VERSION_2_0)
+            if(!GLAD_GL_VERSION_2_0)
                 mStateCacheManager->setEnabled(GL_STENCIL_TEST_TWO_SIDE_EXT, false);
 
             flip = false;
@@ -2443,7 +2448,7 @@ namespace Ogre {
         }
         glDisableClientState( GL_NORMAL_ARRAY );
         glDisableClientState( GL_COLOR_ARRAY );
-        if (GLEW_EXT_secondary_color)
+        if (GLAD_GL_EXT_secondary_color)
         {
             glDisableClientState( GL_SECONDARY_COLOR_ARRAY );
         }
@@ -2862,7 +2867,7 @@ namespace Ogre {
             // Bind frame buffer object
             mRTTManager->bind(target);
 
-            if (GLEW_EXT_framebuffer_sRGB)
+            if (GLAD_GL_EXT_framebuffer_sRGB)
             {
                 // Enable / disable sRGB states
                 mStateCacheManager->setEnabled(GL_FRAMEBUFFER_SRGB_EXT, target->isHardwareGammaEnabled());
@@ -2909,7 +2914,7 @@ namespace Ogre {
         if( eventName.empty() )
             return;
 
-        if(GLEW_GREMEDY_string_marker)
+        if(GLAD_GL_GREMEDY_string_marker)
             glStringMarkerGREMEDY(eventName.length(), eventName.c_str());
     }
 
@@ -3007,7 +3012,7 @@ namespace Ogre {
                 glEnableClientState( GL_COLOR_ARRAY );
                 break;
             case VES_SPECULAR:
-                if (GLEW_EXT_secondary_color)
+                if (GLAD_GL_EXT_secondary_color)
                 {
                     glSecondaryColorPointerEXT(4,
                                                GLHardwareBufferManager::getGLType(elem.getType()),

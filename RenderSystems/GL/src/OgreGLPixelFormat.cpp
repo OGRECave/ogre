@@ -31,6 +31,10 @@ THE SOFTWARE.
 #include "OgreRenderSystem.h"
 #include "OgreBitwise.h"
 
+#ifndef GL_HALF_FLOAT
+#define GL_HALF_FLOAT                     0x140B
+#endif
+
 namespace Ogre  {
 
     struct GLPixelFormatDescription {

@@ -82,7 +82,7 @@ namespace Ogre {
         @param list The list to populate (will not be cleared before adding, clear
         it yourself before calling this if that's what you want).
         */
-        static void extractUniforms(GLhandleARB programObject,
+        static void extractUniforms(uint programObject,
             const GpuConstantDefinitionMap* vertexConstantDefs, 
             const GpuConstantDefinitionMap* geometryConstantDefs,
             const GpuConstantDefinitionMap* fragmentConstantDefs,
