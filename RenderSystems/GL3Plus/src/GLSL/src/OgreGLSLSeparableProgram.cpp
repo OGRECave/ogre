@@ -98,8 +98,6 @@ namespace Ogre
         if (!mLinked)
         {
             compileAndLink();
-
-            extractLayoutQualifiers();
         }
 
         if (mLinked)

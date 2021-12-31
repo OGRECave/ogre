@@ -125,8 +125,6 @@ namespace Ogre
 #endif
             compileAndLink();
 
-            extractLayoutQualifiers();
-
             buildGLUniformReferences();
         }
 

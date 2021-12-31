@@ -45,8 +45,6 @@ namespace Ogre {
     class _OgreGLES2Export GLSLESLinkProgram : public GLSLESProgramCommon
     {
     protected:
-        virtual void extractLayoutQualifiers(void) {}
-
         /// Compiles and links the vertex and fragment programs
         virtual void compileAndLink(void);
 
