@@ -80,6 +80,8 @@ namespace Ogre {
     GpuProgramType mType;
     /// Whether we need to load source from file or not
     bool mLoadFromFile;
+    /// Does this (vertex) program include Instancing?
+    bool mInstancing;
     /// Does this (vertex) program include skeletal animation?
     bool mSkeletalAnimation;
     /// Does this (vertex) program include morph animation?
@@ -192,25 +194,34 @@ namespace Ogre {
     */
     virtual GpuProgramParametersSharedPtr createParameters(void);
 
-    /** Sets whether a vertex program includes the required instructions
-        to perform skeletal animation.
+    /// @name GPU offloading features
+    /// @{
+    /** Sets whether a vertex program can do instancing.
+
+        If this is set to true, OGRE will provide an instance buffer holding the
+        World Matrix of each instance to the vertex program.
+    */
+    void setInstancingIncluded(bool included) { mInstancing = included; }
+
+    /** Returns whether a vertex program can do instancing.
+    */
+    bool isInstancingIncluded(void) const { return mInstancing; }
+
+    /** Sets whether a vertex program can do skeletal animation.
 
         If this is set to true, OGRE will not blend the geometry according to
         skeletal animation, it will expect the vertex program to do it.
     */
-    virtual void setSkeletalAnimationIncluded(bool included)
-    { mSkeletalAnimation = included; }
+    virtual void setSkeletalAnimationIncluded(bool included) { mSkeletalAnimation = included; }
 
-    /** Returns whether a vertex program includes the required instructions
-        to perform skeletal animation.
+    /** Returns whether a vertex program can do skeletal animation.
 
         If this returns true, OGRE will not blend the geometry according to
         skeletal animation, it will expect the vertex program to do it.
     */
     virtual bool isSkeletalAnimationIncluded(void) const { return mSkeletalAnimation; }
 
-    /** Sets whether a vertex program includes the required instructions
-        to perform morph animation.
+    /** Sets whether a vertex program can do morph animation.
 
         If this is set to true, OGRE will not blend the geometry according to
         morph animation, it will expect the vertex program to do it.
@@ -218,8 +229,7 @@ namespace Ogre {
     virtual void setMorphAnimationIncluded(bool included)
     { mMorphAnimation = included; }
 
-    /** Sets whether a vertex program includes the required instructions
-        to perform pose animation.
+    /** Sets whether a vertex program can do pose animation.
 
         If this is set to true, OGRE will not blend the geometry according to
         pose animation, it will expect the vertex program to do it.
@@ -228,16 +238,14 @@ namespace Ogre {
     virtual void setPoseAnimationIncluded(ushort poseCount)
     { mPoseAnimation = poseCount; }
 
-    /** Returns whether a vertex program includes the required instructions
-        to perform morph animation.
+    /** Returns whether a vertex program can do morph animation.
 
         If this returns true, OGRE will not blend the geometry according to
         morph animation, it will expect the vertex program to do it.
     */
     virtual bool isMorphAnimationIncluded(void) const { return mMorphAnimation; }
 
-    /** Returns whether a vertex program includes the required instructions
-        to perform pose animation.
+    /** Returns whether a vertex program can do pose animation.
 
         If this returns true, OGRE will not blend the geometry according to
         pose animation, it will expect the vertex program to do it.
@@ -247,6 +255,8 @@ namespace Ogre {
         blend, for use in pose animation.
     */
     virtual ushort getNumberOfPosesIncluded(void) const { return mPoseAnimation; }
+    /// @}
+
     /** Sets whether this vertex program requires support for vertex
         texture fetch from the hardware.
     */
