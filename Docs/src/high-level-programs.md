@@ -713,9 +713,32 @@ pass
 
 You should pass the projected shadow coordinates from the custom vertex program. As for textures, define a @c texture_unit with @c content_type @c shadow to pull the shadow texture. Your shadow receiver fragment program is likely to be the same as the bare lighting pass of your normal material, except that you insert an extra texture sampler for the shadow texture, which you will use to adjust the result by (modulating diffuse and specular components).
 
+# Instancing in Vertex Programs {#Instancing-in-Vertex-Programs}
+
+You can implement hardware instancing by writing a vertex program which reads the world matrix of each instance from a `float3x4` vertex attribute.
+However, you need to communicate this support to %Ogre so it batches the instances instead of rendering them individually.
+You do this by adding the following attribute to your `vertex_program` definition:
+
+```cpp
+   includes_instancing true
+```
+
+When you do this, all SubEntities with the same material will be batched together. %Ogre will create and populate an instance buffer with the world matrices of the instances. This buffer is provided in the `TEXCOORD1` attribute (also consuming `TEXCOORD2` and `TEXCOORD3`) to the vertex shader.
+
+When batching, all instances are rendered in a single draw-call. All per-renderable operations
+
+Therefore the following features are not supported:
+- `start_light` and `iteration` (all instances share the same lights)
+- flip culling on negative scale (all instances use the same face order)
+- custom renderable parameters (not implemented)
+- light scissoring & clipping (not implemented)
+- manualLightList (not implemented)
+
+@note Instancing cannot be used together with skeletal animation (neither Hardware nor Software).
+
 # Skeletal Animation in Vertex Programs {#Skeletal-Animation-in-Vertex-Programs}
 
-You can implement skeletal animation in hardware by writing a vertex program which uses the per-vertex blending indices and blending weights, together with an array of world matrices (which will be provided for you by Ogre if you bind the automatic parameter ’world\_matrix\_array\_3x4’). However, you need to communicate this support to Ogre so it does not perform skeletal animation in software for you. You do this by adding the following attribute to your vertex\_program definition:
+You can implement skeletal animation in hardware by writing a vertex program which uses the per-vertex blending indices and blending weights, together with an array of world matrices (which will be provided for you by Ogre if you bind the automatic parameter ’world\_matrix\_array\_3x4’). However, you need to communicate this support to Ogre so it does not perform skeletal animation in software for you. You do this by adding the following attribute to your `vertex_program` definition:
 
 ```cpp
    includes_skeletal_animation true
@@ -726,7 +749,7 @@ When you do this, any skeletally animated entity which uses this material will f
 
 # Morph Animation in Vertex Programs {#Morph-Animation-in-Vertex-Programs}
 
-You can implement morph animation in hardware by writing a vertex program which linearly blends between the first and second position keyframes passed as positions and the first free texture coordinate set, and by binding the animation\_parametric value to a parameter (which tells you how far to interpolate between the two). However, you need to communicate this support to Ogre so it does not perform morph animation in software for you. You do this by adding the following attribute to your vertex\_program definition:
+You can implement morph animation in hardware by writing a vertex program which linearly blends between the first and second position keyframes passed as positions and the first free texture coordinate set, and by binding the animation\_parametric value to a parameter (which tells you how far to interpolate between the two). However, you need to communicate this support to Ogre so it does not perform morph animation in software for you. You do this by adding the following attribute to your `vertex_program` definition:
 
 ```cpp
    includes_morph_animation true

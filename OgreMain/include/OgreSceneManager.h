@@ -414,6 +414,8 @@ namespace Ogre {
         typedef std::map<String, Camera* > CameraList;
         typedef std::map<String, Animation*> AnimationList;
         typedef std::map<String, MovableObject*> MovableObjectMap;
+    private:
+        HardwareVertexBufferPtr mInstanceBuffer;
     protected:
 
         /// Subclasses can override this to ensure their specialised SceneNode is used.
@@ -936,6 +938,9 @@ namespace Ogre {
         scissor rectangle and user clip planes.
         */
         void renderSingleObject(Renderable* rend, const Pass* pass,
+            bool lightScissoringClipping, bool doLightIteration, const LightList* manualLightList = 0);
+
+        void renderInstancedObject(const RenderableList& rend, const Pass* pass,
             bool lightScissoringClipping, bool doLightIteration, const LightList* manualLightList = 0);
 
         /** Internal method for creating the AutoParamDataSource instance. */
