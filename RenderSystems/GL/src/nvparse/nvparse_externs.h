@@ -4,7 +4,10 @@
 extern nvparse_errors errors;
 extern int line_number;
 extern char * myin;
-#include "OgreGLPrerequisites.h"
-#include <GL/glew.h>
+
+#ifdef _WIN32
+#include <windows.h>
+#endif
+#include <glad/glad.h>
 
 #endif

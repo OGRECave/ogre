@@ -57,7 +57,7 @@ namespace Ogre {
 #   endif
 #endif
 
-#include <GL/glew.h>
+#include <glad/glad.h>
 
 namespace Ogre {
     inline const char* glErrorToString(GLenum glErr) {
@@ -69,7 +69,7 @@ namespace Ogre {
                 return "GL_INVALID_VALUE";
             case GL_INVALID_OPERATION:
                 return "GL_INVALID_OPERATION";
-            case GL_INVALID_FRAMEBUFFER_OPERATION:
+            case GL_INVALID_FRAMEBUFFER_OPERATION_EXT:
                 return "GL_INVALID_FRAMEBUFFER_OPERATION";
             case GL_OUT_OF_MEMORY:
                 return "GL_OUT_OF_MEMORY";

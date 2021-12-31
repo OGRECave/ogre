@@ -43,8 +43,8 @@ namespace Ogre {
             const String& group, bool isManual, ManualResourceLoader* loader);
         ~GLSLProgram();
 
-        void attachToProgramObject( const GLhandleARB programObject );
-        void detachFromProgramObject( const GLhandleARB programObject );
+        void attachToProgramObject( const uint programObject );
+        void detachFromProgramObject( const uint programObject );
 
         /// Overridden from GpuProgram
         const String& getLanguage(void) const;

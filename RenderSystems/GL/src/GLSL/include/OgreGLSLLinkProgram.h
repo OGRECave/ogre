@@ -77,7 +77,7 @@ namespace Ogre {
         void updateUniforms(GpuProgramParametersSharedPtr params, uint16 mask, GpuProgramType fromProgType);
 
         /// Get the GL Handle for the program object
-        GLhandleARB getGLHandle(void) const { return mGLProgramHandle; }
+        uint getGLHandle(void) const { return mGLProgramHandle; }
     };
 
     }

@@ -308,7 +308,7 @@ namespace Ogre {
         {
             //Have GLSL shaders, using varying attributes
             GLSL::GLSLLinkProgram* linkProgram = GLSL::GLSLLinkProgramManager::getSingleton().getActiveLinkProgram();
-            GLhandleARB linkProgramId = linkProgram->getGLHandle();
+            uint linkProgramId = linkProgram->getGLHandle();
             
             std::vector<GLint> locations;
             for (unsigned short e=0; e < declaration->getElementCount(); e++)

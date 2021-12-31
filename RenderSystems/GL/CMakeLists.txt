@@ -11,7 +11,7 @@
 
 file(GLOB HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h")
 file(GLOB SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
-list(APPEND SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/glew.c")
+list(APPEND SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/glad.c")
 
 file(GLOB NVPARSE_SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/src/nvparse/*.cpp")
 file(GLOB NVPARSE_HEADERS "${CMAKE_CURRENT_SOURCE_DIR}/src/nvparse/*.h")
@@ -58,12 +58,12 @@ include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}/src/nvparse
 )
 
-add_definitions(-DGLEW_STATIC -DYY_NEVER_INTERACTIVE)
+add_definitions(-DYY_NEVER_INTERACTIVE)
 add_definitions(-DOGRE_GLPLUGIN_EXPORTS ${OGRE_VISIBILITY_FLAGS})
 #Note that in the next row SOURCE_FILES are added last. This is to prevent compilation problems of unity build found on Windows Visual Studio. 
 #In this situation any file added after the "glew.cpp" file, which belongs to the SOURCE_FILES package, does not compile
 add_library(RenderSystem_GL ${OGRE_LIB_TYPE} ${HEADER_FILES} ${GLSL_SOURCE} ${ATIFS_SOURCE} ${NVPARSE_SOURCE} ${SOURCE_FILES})
-target_link_libraries(RenderSystem_GL PUBLIC OgreMain PRIVATE OgreGLSupport OpenGL::GL)
+target_link_libraries(RenderSystem_GL PUBLIC OgreMain PRIVATE OgreGLSupport ${CMAKE_DL_LIBS})
 target_include_directories(RenderSystem_GL PUBLIC 
     "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
     $<INSTALL_INTERFACE:include/OGRE/RenderSystems/GL>)
@@ -74,5 +74,5 @@ ogre_config_framework(RenderSystem_GL)
 
 ogre_config_plugin(RenderSystem_GL)
 install(FILES ${HEADER_FILES} ${GLSUPPORT_HEADERS} DESTINATION include/OGRE/RenderSystems/GL)
-install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/GL DESTINATION include/OGRE/RenderSystems/GL)
-install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/src/GLSL/include/ DESTINATION include/OGRE/RenderSystems/GL)
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/glad DESTINATION include/OGRE/RenderSystems/glad)
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/KHR DESTINATION include/OGRE/RenderSystems/KHR)

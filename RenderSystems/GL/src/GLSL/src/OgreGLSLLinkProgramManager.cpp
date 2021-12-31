@@ -157,7 +157,7 @@ namespace Ogre {
 
     }
     //---------------------------------------------------------------------
-    void GLSLLinkProgramManager::extractUniforms(GLhandleARB programObject, 
+    void GLSLLinkProgramManager::extractUniforms(uint programObject,
         const GpuConstantDefinitionMap* vertexConstantDefs, 
         const GpuConstantDefinitionMap* geometryConstantDefs,
         const GpuConstantDefinitionMap* fragmentConstantDefs,
@@ -172,7 +172,7 @@ namespace Ogre {
         GLUniformReference newGLUniformReference;
 
         // get the number of active uniforms
-        glGetObjectParameterivARB(programObject, GL_OBJECT_ACTIVE_UNIFORMS_ARB,
+        glGetObjectParameterivARB((GLhandleARB)programObject, GL_OBJECT_ACTIVE_UNIFORMS_ARB,
             &uniformCount);
 
         // Loop over each of the active uniforms, and add them to the reference container
@@ -181,10 +181,10 @@ namespace Ogre {
         {
             GLint arraySize = 0;
             GLenum glType;
-            glGetActiveUniformARB(programObject, index, BUFFERSIZE, NULL, 
+            glGetActiveUniformARB((GLhandleARB)programObject, index, BUFFERSIZE, NULL,
                 &arraySize, &glType, uniformName);
             // don't add built in uniforms
-            newGLUniformReference.mLocation = glGetUniformLocationARB(programObject, uniformName);
+            newGLUniformReference.mLocation = glGetUniformLocationARB((GLhandleARB)programObject, uniformName);
             if (newGLUniformReference.mLocation >= 0)
             {
                 // user defined uniform found, add it to the reference list
