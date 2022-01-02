@@ -34,6 +34,7 @@ THE SOFTWARE.
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {
+    template <typename T> class MapIterator;
 
     /** \addtogroup Core
     *  @{
