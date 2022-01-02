@@ -100,7 +100,7 @@ namespace Ogre {
             // Use glMapBuffer
             mRenderSystem->_getStateCacheManager()->bindGLBuffer(mTarget, mBufferId);
             // Use glMapBuffer
-            if(options == HBL_DISCARD || options == HBL_NO_OVERWRITE) // TODO: check possibility to use GL_MAP_UNSYNCHRONIZED_BIT for HBL_NO_OVERWRITE locking promise
+            if(options == HBL_DISCARD) // TODO: check possibility to use GL_MAP_UNSYNCHRONIZED_BIT for HBL_NO_OVERWRITE locking promise
             {
                 // Discard the buffer
                 glBufferDataARB(mTarget, mSizeInBytes, NULL, GLHardwareBufferManager::getGLUsage(mUsage));

@@ -75,14 +75,11 @@ namespace Ogre {
 
         if (writeOnly)
         {
-            access |= GL_MAP_WRITE_BIT;
-            if(options == HBL_DISCARD || options == HBL_NO_OVERWRITE)
-            {
-                // Discard the buffer
+            if(options == HBL_DISCARD)
                 OGRE_CHECK_GL_ERROR(glBufferData(mTarget, mSizeInBytes, NULL, getGLUsage(mUsage)));
-            }
  
-            if(options == HardwareBuffer::HBL_NO_OVERWRITE)
+            access |= GL_MAP_WRITE_BIT;
+            if(options == HBL_NO_OVERWRITE)
                 access |= GL_MAP_UNSYNCHRONIZED_BIT;
         }
         else if (options == HardwareBuffer::HBL_READ_ONLY)
