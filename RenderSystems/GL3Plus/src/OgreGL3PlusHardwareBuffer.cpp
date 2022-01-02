@@ -76,10 +76,10 @@ namespace Ogre {
         if (writeOnly)
         {
             access |= GL_MAP_WRITE_BIT;
-            if(options == HardwareBuffer::HBL_DISCARD || options == HardwareBuffer::HBL_NO_OVERWRITE)
+            if(options == HBL_DISCARD || options == HBL_NO_OVERWRITE)
             {
                 // Discard the buffer
-                access |= GL_MAP_INVALIDATE_RANGE_BIT;
+                OGRE_CHECK_GL_ERROR(glBufferData(mTarget, mSizeInBytes, NULL, getGLUsage(mUsage)));
             }
  
             if(options == HardwareBuffer::HBL_NO_OVERWRITE)
