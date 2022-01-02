@@ -153,11 +153,11 @@ namespace Ogre {
                 */
                 HBL_DISCARD,
                 /** Lock the buffer for reading only. Not allowed in buffers which are created with
-                HBU_WRITE_ONLY.
+                HBU_GPU_ONLY.
                 Mandatory on static buffers, i.e. those created without the HBU_DYNAMIC flag.
                 */
                 HBL_READ_ONLY,
-                /** As HBL_DISCARD, except the application guarantees not to overwrite any
+                /** As HBL_WRITE_ONLY, except the application guarantees not to overwrite any
                 region of the buffer which has already been used in this frame, can allow
                 some optimisation on some APIs.
                 @note Only useful on buffers with no shadow buffer.*/

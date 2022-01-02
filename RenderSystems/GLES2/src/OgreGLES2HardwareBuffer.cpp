@@ -92,11 +92,10 @@ namespace Ogre {
             if (writeOnly)
             {
                 access = GL_MAP_WRITE_BIT_EXT;
-                if (options == HBL_DISCARD || options == HBL_NO_OVERWRITE)
-                {
-                    // Discard the buffer
+                if (options == HBL_NO_OVERWRITE)
+                    access |= GL_MAP_UNSYNCHRONIZED_BIT_EXT;
+                if (options == HBL_DISCARD)
                     OGRE_CHECK_GL_ERROR(glBufferData(mTarget, mSizeInBytes, NULL, getGLUsage(mUsage)));
-                }
             }
             else if (options == HardwareBuffer::HBL_READ_ONLY)
                 access = GL_MAP_READ_BIT_EXT;
