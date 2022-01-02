@@ -42,6 +42,7 @@ namespace Ogre
         VkDeviceMemory  mMemory;
         VulkanDevice *mDevice;
         uint32 mTarget;
+        void *mMappedPtr;
 
         void discard();
     public:
