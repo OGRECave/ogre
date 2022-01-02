@@ -38,7 +38,8 @@ namespace Ogre
         HardwareBuffer(usage, false, useShadowBuffer),
         mBuffer(VK_NULL_HANDLE),
         mDevice( device ),
-        mTarget( target )
+        mTarget( target ),
+        mMappedPtr( nullptr )
     {
         mSizeInBytes = sizeBytes;
 
@@ -87,10 +88,17 @@ namespace Ogre
 
         OGRE_VK_CHECK(vkAllocateMemory(mDevice->mDevice, &memAllocInfo, NULL, &mMemory));
         OGRE_VK_CHECK(vkBindBufferMemory(mDevice->mDevice, mBuffer, mMemory, 0));
+
+        if (mUsage == HBU_CPU_TO_GPU)
+        {
+            OGRE_VK_CHECK(vkMapMemory(mDevice->mDevice, mMemory, 0, mSizeInBytes, 0, &mMappedPtr));
+        }
     }
 
     VulkanHardwareBuffer::~VulkanHardwareBuffer()
     {
+        if(mMappedPtr)
+            vkUnmapMemory( mDevice->mDevice, mMemory );
         // delay until we are sure this buffer is no longer in use
         mDevice->mGraphicsQueue.queueForDeletion(mBuffer, mMemory);
     }
@@ -109,6 +117,9 @@ namespace Ogre
         if (options == HBL_DISCARD && mUsage == HBU_CPU_TO_GPU)
             discard();
 
+        if (mMappedPtr) // persistent mapping
+            return static_cast<uint8*>(mMappedPtr) + offset;
+
         void *retPtr = 0;
         OGRE_VK_CHECK(vkMapMemory(mDevice->mDevice, mMemory, 0, mSizeInBytes, 0, &retPtr));
         return static_cast<uint8*>(retPtr) + offset;
@@ -117,6 +128,8 @@ namespace Ogre
     void VulkanHardwareBuffer::unlockImpl()
     {
         OgreAssert(!mShadowBuffer, "should be handled by _updateFromShadow");
+        if(mMappedPtr) // persistent mapping
+            return;
         vkUnmapMemory( mDevice->mDevice, mMemory );
     }
 
