@@ -323,6 +323,9 @@ namespace Ogre {
             // this is also public API, so update state accordingly
             if(!isLoading())
             {
+                if(mIsManual && mLoader)
+                    mLoader->loadResource(this);
+
                 mLoadingState.store(LOADSTATE_LOADED);
                 _fireLoadingComplete(false);
             }
