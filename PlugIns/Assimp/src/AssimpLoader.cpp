@@ -351,7 +351,9 @@ bool AssimpLoader::load(const String& source, Mesh* mesh, SkeletonPtr& skeletonP
 bool AssimpLoader::_load(const char* name, Assimp::Importer& importer, Mesh* mesh, SkeletonPtr& skeletonPtr,
                          const Options& options)
 {
-    uint32 flags = aiProcessPreset_TargetRealtime_Quality | aiProcess_TransformUVCoords | aiProcess_FlipUVs;
+    uint32 flags = aiProcessPreset_TargetRealtime_Fast | aiProcess_TransformUVCoords | aiProcess_FlipUVs;
+    flags &= ~(aiProcess_JoinIdenticalVertices | aiProcess_CalcTangentSpace); // optimize for fast loading
+    flags |= options.postProcessSteps;
     importer.SetPropertyFloat("PP_GSN_MAX_SMOOTHING_ANGLE", options.maxEdgeAngle);
     const aiScene* scene = importer.ReadFile(name, flags);
 
@@ -364,7 +366,8 @@ bool AssimpLoader::_load(const char* name, Assimp::Importer& importer, Mesh* mes
 
     mAnimationSpeedModifier = options.animationSpeedModifier;
     mLoaderParams = options.params;
-    mQuietMode = ((mLoaderParams & LP_QUIET_MODE) == 0) ? false : true;
+    mQuietMode = mLoaderParams & LP_QUIET_MODE;
+    mUseIndexBuffer = flags & aiProcess_JoinIdenticalVertices;
     mCustomAnimationName = options.customAnimationName;
     mNodeDerivedTransformByName.clear();
 
@@ -1156,6 +1159,9 @@ bool AssimpLoader::createSubMesh(const String& name, int index, const aiNode* pN
     {
         LogManager::getSingleton().logMessage(StringConverter::toString(mesh->mNumFaces) + " faces");
     }
+
+    if(!mUseIndexBuffer)
+        return true;
 
     aiFace* faces = mesh->mFaces;
     int faceSz = mesh->mPrimitiveTypes == aiPrimitiveType_LINE ? 2 : 3;

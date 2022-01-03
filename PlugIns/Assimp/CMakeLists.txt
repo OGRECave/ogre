@@ -5,7 +5,7 @@ add_library(Codec_Assimp ${OGRE_LIB_TYPE} ${HEADER_FILES} src/AssimpLoader.cpp)
 target_include_directories(Codec_Assimp PUBLIC
     "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
     $<INSTALL_INTERFACE:include/OGRE/Plugins/Assimp>)
-target_link_libraries(Codec_Assimp PUBLIC OgreMain PRIVATE fix::assimp)
+target_link_libraries(Codec_Assimp PUBLIC OgreMain fix::assimp)
 
 ogre_config_framework(Codec_Assimp)
 ogre_config_plugin(Codec_Assimp)

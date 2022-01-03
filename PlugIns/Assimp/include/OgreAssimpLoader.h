@@ -82,10 +82,11 @@ public:
     {
         float animationSpeedModifier;
         int params;
+        int postProcessSteps;
         String customAnimationName;
         float maxEdgeAngle;
 
-        Options() : animationSpeedModifier(1), params(0), maxEdgeAngle(30) {}
+        Options() : animationSpeedModifier(1), params(0), postProcessSteps(0), maxEdgeAngle(30) {}
     };
 
     AssimpLoader();
@@ -135,6 +136,7 @@ private:
     static int msBoneCount;
 
     bool mQuietMode;
+    bool mUseIndexBuffer;
     Real mTicksPerSecond;
     Real mAnimationSpeedModifier;
 };
