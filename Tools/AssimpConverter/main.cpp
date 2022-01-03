@@ -44,6 +44,7 @@ THE SOFTWARE.
 #include "OgreScriptCompiler.h"
 
 #include "OgreAssimpLoader.h"
+#include <assimp/postprocess.h>
 
 using namespace Ogre;
 
@@ -126,6 +127,7 @@ AssOptions parseArgs(int numArgs, char** args)
         opts.options.params |= AssimpLoader::LP_CUT_ANIMATION_WHERE_NO_FURTHER_CHANGE;
     }
 
+    opts.options.postProcessSteps = aiProcessPreset_TargetRealtime_Quality;
     opts.logFile = binOpt["-log"];
     StringConverter::parse(binOpt["-aniSpeedMod"], opts.options.animationSpeedModifier);
     opts.options.customAnimationName = binOpt["-aniName"];
