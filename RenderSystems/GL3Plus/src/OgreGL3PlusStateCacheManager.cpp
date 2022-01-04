@@ -30,6 +30,11 @@
 #include "OgreGL3PlusRenderSystem.h"
 #include "OgreRoot.h"
 
+// performance critical state
+// this one is per-context and can be unconditionally cached
+// without breaking multi-context scenarios
+#define OGRE_ENABLE_STATE_CACHE_CRITICAL
+
 namespace Ogre {
     
     GL3PlusStateCacheManager::GL3PlusStateCacheManager(void)
@@ -102,7 +107,6 @@ namespace Ogre {
 #endif
         mActiveBufferMap.clear();
         mTexUnitsMap.clear();
-        mTextureCoordGen.clear();
 
         mPointSize = 1.0f;
 
@@ -172,7 +176,7 @@ namespace Ogre {
     
     void GL3PlusStateCacheManager::bindGLBuffer(GLenum target, GLuint buffer, bool force)
     {
-#ifdef OGRE_ENABLE_STATE_CACHE
+#ifdef OGRE_ENABLE_STATE_CACHE_CRITICAL
         auto ret = mActiveBufferMap.emplace(target, buffer);
         if(ret.first->second != buffer || force) // Update the cached value if needed
         {
@@ -239,7 +243,7 @@ namespace Ogre {
         //always delete the buffer, even if not currently bound
         OGRE_CHECK_GL_ERROR(glDeleteBuffers(1, &buffer));
 
-#ifdef OGRE_ENABLE_STATE_CACHE
+#ifdef OGRE_ENABLE_STATE_CACHE_CRITICAL
         BindBufferMap::iterator i = mActiveBufferMap.find(target);
         
         if (i != mActiveBufferMap.end() && ((*i).second == buffer))
@@ -254,7 +258,7 @@ namespace Ogre {
 
     void GL3PlusStateCacheManager::bindGLVertexArray(GLuint vao)
     {
-#ifdef OGRE_ENABLE_STATE_CACHE
+#ifdef OGRE_ENABLE_STATE_CACHE_CRITICAL
         if(mActiveVertexArray != vao)
         {
             mActiveVertexArray = vao;
@@ -497,7 +501,7 @@ namespace Ogre {
 
     void GL3PlusStateCacheManager::setPolygonMode(GLenum mode)
     {
-#ifdef OGRE_ENABLE_STATE_CACHE
+#ifdef OGRE_ENABLE_STATE_CACHE_CRITICAL
         if (mPolygonMode != mode)
 #endif
         {
@@ -516,46 +520,6 @@ namespace Ogre {
             mPointSize = size;
             OGRE_CHECK_GL_ERROR(glPointSize(mPointSize));
         }
-    }
-    
-    void GL3PlusStateCacheManager::enableTextureCoordGen(GLenum type)
-    {
-#ifdef OGRE_ENABLE_STATE_CACHE
-        std::unordered_map<GLenum, TexGenParams>::iterator it = mTextureCoordGen.find(mActiveTextureUnit);
-        if (it == mTextureCoordGen.end())
-        {
-            OGRE_CHECK_GL_ERROR(glEnable(type));
-            mTextureCoordGen[mActiveTextureUnit].mEnabled.insert(type);
-        }
-        else
-        {
-            if (it->second.mEnabled.find(type) == it->second.mEnabled.end())
-            {
-                OGRE_CHECK_GL_ERROR(glEnable(type));
-                it->second.mEnabled.insert(type);
-            }
-        }
-#else
-        OGRE_CHECK_GL_ERROR(glEnable(type));
-#endif
-    }
-
-    void GL3PlusStateCacheManager::disableTextureCoordGen(GLenum type)
-    {
-#ifdef OGRE_ENABLE_STATE_CACHE
-        std::unordered_map<GLenum, TexGenParams>::iterator it = mTextureCoordGen.find(mActiveTextureUnit);
-        if (it != mTextureCoordGen.end())
-        {
-            std::set<GLenum>::iterator found = it->second.mEnabled.find(type);
-            if (found != it->second.mEnabled.end())
-            {
-                OGRE_CHECK_GL_ERROR(glDisable(type));
-                it->second.mEnabled.erase(found);
-            }
-        }
-#else
-        OGRE_CHECK_GL_ERROR(glDisable(type));
-#endif
     }
     void GL3PlusStateCacheManager::bindGLProgramPipeline(GLuint handle)
     {
