@@ -53,13 +53,6 @@ namespace Ogre
         /// Stores textures currently bound to each texture stage
         std::unordered_map <GLenum, GLuint> mBoundTextures;
 
-        struct TexGenParams
-        {
-            std::set<GLenum> mEnabled;
-        };
-        /// Stores the currently enabled texcoord generation types per texture unit
-        std::unordered_map <GLenum, TexGenParams> mTextureCoordGen;
-
         /// Stores the currently bound draw frame buffer value
         GLuint mActiveDrawFrameBuffer;
         /// Stores the currently bound read frame buffer value
@@ -208,20 +201,10 @@ namespace Ogre
          */
         void setEnabled(GLenum flag, bool enabled);
 
-        /** Gets the current polygon rendering mode, fill, wireframe, points, etc.
-         @return The current polygon rendering mode.
-         */
-        GLenum getPolygonMode(void) const { return mPolygonMode; }
-
         /** Sets the current polygon rendering mode.
          @param mode The polygon mode to use.
          */
         void setPolygonMode(GLenum mode);
-
-        /** Sets the face culling mode.
-         @return The current face culling mode
-         */
-        GLenum getCullFace(void) const { return mCullFace; }
 
         /** Sets the face culling setting.
          @param face The face culling mode to use.
@@ -232,11 +215,6 @@ namespace Ogre
          @param handle The handle to the program pipeline
          */
         void bindGLProgramPipeline(GLuint handle);
-
-        /// Enable the specified texture coordinate generation option for the currently active texture unit
-        void enableTextureCoordGen(GLenum type);
-        /// Disable the specified texture coordinate generation option for the currently active texture unit
-        void disableTextureCoordGen(GLenum type);
 
         void setPointSize(GLfloat size);
 
