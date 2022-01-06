@@ -4,7 +4,7 @@ Particle scripts allow you to define particle systems to be instantiated in your
 
 @tableofcontents
 
-Once scripts have been parsed, your code is free to instantiate systems based on them using the SceneManager::createParticleSystem() method which can take both a name for the new system, and the name of the template to base it on (this template name is in the script).
+Once scripts have been parsed, your code is free to instantiate systems based on them using the Ogre::SceneManager::createParticleSystem() method which can take both a name for the new system, and the name of the template to base it on (this template name is in the script).
 
 @snippet Samples/Media/particle/Examples.particle manual_sample
 
@@ -27,7 +27,7 @@ This section describes to attributes which you can set on every particle system 
 -   [iteration\_interval](#iteration_005finterval)
 -   [nonvisible\_update\_timeout](#nonvisible_005fupdate_005ftimeout)
 
-@ref Billboard-Renderer-Attributes
+@par Billboard Renderer Attributes
 
 -   [billboard\_type](#billboard_005ftype)
 -   [billboard\_origin](#billboard_005forigin)
@@ -37,7 +37,8 @@ This section describes to attributes which you can set on every particle system 
 -   [point\_rendering](#particle_005fpoint_005frendering)
 -   [accurate\_facing](#particle_005faccurate_005ffacing)
 
-See also: @ref Particle-Emitters, @ref Particle-Affectors
+@see @ref Particle-Emitters
+@see @ref Particle-Affectors
 
 
 <a name="quota"></a><a name="quota-1"></a>
