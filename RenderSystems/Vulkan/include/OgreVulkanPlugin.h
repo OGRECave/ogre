@@ -34,7 +34,7 @@ THE SOFTWARE.
 namespace Ogre
 {
     /** Plugin instance for Vulkan Manager */
-    class VulkanPlugin : public Plugin
+    class _OgreVulkanExport VulkanPlugin : public Plugin
     {
     public:
         VulkanPlugin();
