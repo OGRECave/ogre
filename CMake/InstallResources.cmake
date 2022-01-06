@@ -268,7 +268,6 @@ install(FILES
    ${PROJECT_BINARY_DIR}/cmake/OGREConfigVersion.cmake
    DESTINATION ${OGRE_CMAKE_DIR}
 )
-install(EXPORT OgreTargetsRelease CONFIGURATIONS Release None "" DESTINATION ${OGRE_CMAKE_DIR} FILE OgreTargets.cmake)
+install(EXPORT OgreTargetsRelease CONFIGURATIONS Release MinSizeRel None "" DESTINATION ${OGRE_CMAKE_DIR} FILE OgreTargets.cmake)
 install(EXPORT OgreTargetsRelWithDebInfo CONFIGURATIONS RelWithDebInfo DESTINATION ${OGRE_CMAKE_DIR} FILE OgreTargets.cmake)
-install(EXPORT OgreTargetsMinSizeRel CONFIGURATIONS MinSizeRel DESTINATION ${OGRE_CMAKE_DIR} FILE OgreTargets.cmake)
 install(EXPORT OgreTargetsDebug CONFIGURATIONS Debug DESTINATION ${OGRE_CMAKE_DIR} FILE OgreTargets.cmake)
