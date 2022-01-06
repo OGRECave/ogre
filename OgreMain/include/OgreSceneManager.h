@@ -1641,23 +1641,7 @@ namespace Ogre {
             size_t quota = 500, 
             const String& resourceGroup = ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
 
-        /** Create a blank particle system with a generated name.
-        @remarks
-            This method creates a new, blank ParticleSystem instance and returns a pointer to it.
-            The caller should not delete this object, it will be freed at system shutdown, or can
-            be released earlier using the destroyParticleSystem method.
-        @par
-            The instance returned from this method won't actually do anything because on creation a
-            particle system has no emitters. The caller should manipulate the instance through it's 
-            ParticleSystem methods to actually create a real particle effect. 
-        @par
-            Creating a particle system does not make it a part of the scene. As with other MovableObject
-            subclasses, a ParticleSystem is not rendered until it is attached to a SceneNode. 
-        @param 
-            quota The maximum number of particles to allow in this system. 
-        @param
-            resourceGroup The resource group which will be used to load dependent resources
-        */
+        /// @overload
         ParticleSystem* createParticleSystem(size_t quota = 500,
             const String& resourceGroup = ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
         /// @copydoc getMovableObject()
