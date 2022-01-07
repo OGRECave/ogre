@@ -44,30 +44,26 @@ namespace Ogre
     /** This is the main starting point for the new instancing system.
         Each InstanceManager can control one technique and one mesh, but it can manage
         multiple materials at the same time.
-        @see SceneManager::createInstanceManager, which creates this InstanceManager. Each one
+        @ref SceneManager::createInstanceManager, which creates this InstanceManager. Each one
         must have a unique name. It's wasteless to create two InstanceManagers with the same
         mesh reference, instancing technique and instances per batch count.
         This class takes care of managing batches automatically, so that more are created when
         needed, and reuse existing ones as much as possible; thus the user doesn't have to worry
         of managing all those low level issues.
-        See @ref InstanceBatch and see @ref InstancedEntity for more information.
 
-    @remarks
-        Design discussion webpage: http://www.ogre3d.org/forums/viewtopic.php?f=4&t=59902
-    @author
-        Matias N. Goldberg ("dark_sylinc")
-    @version
-        1.0
+        @see @ref InstanceBatch
+        @see @ref InstancedEntity
+        @see Design discussion thread: http://www.ogre3d.org/forums/viewtopic.php?f=4&t=59902
      */
     class _OgreExport InstanceManager : public FactoryAlloc
     {
     public:
         enum InstancingTechnique
         {
-            ShaderBased,            ///< Any SM 2.0+ @see InstanceBatchShader
-            TextureVTF,             ///< Needs Vertex Texture Fetch & SM 3.0+ @see InstanceBatchVTF
-            HWInstancingBasic,      ///< Needs SM 3.0+ and HW instancing support @see InstanceBatchHW
-            HWInstancingVTF,        ///< Needs SM 3.0+, HW instancing support & VTF @see InstanceBatchHW_VTF
+            ShaderBased,            ///< %Any SM 2.0+ @ref InstanceBatchShader
+            TextureVTF,             ///< Needs Vertex Texture Fetch & SM 3.0+ @ref InstanceBatchVTF
+            HWInstancingBasic,      ///< Needs SM 3.0+ and HW instancing support @ref InstanceBatchHW
+            HWInstancingVTF,        ///< Needs SM 3.0+, HW instancing support & VTF @ref InstanceBatchHW_VTF
             InstancingTechniquesCount
         };
 
@@ -164,8 +160,8 @@ namespace Ogre
         SceneManager* getSceneManager() const { return mSceneManager; }
 
         /** Raises an exception if trying to change it after creating the first InstancedEntity
-        @remarks The actual value may be less if the technique doesn't support having so much
-        @see getMaxOrBestNumInstancesPerBatches for the usefulness of this function
+        The actual value may be less if the technique doesn't support having so much.
+        See @ref getMaxOrBestNumInstancesPerBatch for the usefulness of this function
         @param instancesPerBatch New instances per batch number
         */
         void setInstancesPerBatch( size_t instancesPerBatch );
@@ -211,11 +207,11 @@ namespace Ogre
             per batch given the suggested size for the technique this manager was created for.
         @remarks
             This is done automatically when creating an instanced entity, but this function in conjunction
-            with @see setInstancesPerBatch allows more flexible control over the amount of instances
+            with @ref setInstancesPerBatch allows more flexible control over the amount of instances
             per batch
         @param materialName Name of the material to base on
         @param suggestedSize Suggested amount of instances per batch
-        @param flags Flags to pass to the InstanceManager. @see InstanceManagerFlags
+        @param flags @ref InstanceManagerFlags to pass to the InstanceManager
         @return The max/best amount of instances per batch given the suggested size and flags
         */
         size_t getMaxOrBestNumInstancesPerBatch( const String &materialName, size_t suggestedSize, uint16 flags );
@@ -256,18 +252,18 @@ namespace Ogre
         */
         void defragmentBatches( bool optimizeCulling );
 
-        /** Applies a setting for all batches using the same material_ existing ones and
-            those that will be created in the future.
-        @par
-            For example setSetting( BatchSetting::CAST_SHADOWS, false ) disables shadow
-            casting for all instanced entities (@see MovableObject::setCastShadow)
-        @par
-            For example setSetting( BatchSetting::SHOW_BOUNDINGBOX, true, "MyMat" )
+        /** Applies a setting for all batches using the same material
+
+            If the material name hasn't been used, the settings are still stored
+            This allows setting up batches before they get even created.
+            @par Examples
+            `setSetting(InstanceManager::CAST_SHADOWS, false, "")` disables shadow
+            casting for all instanced entities (see @ref MovableObject::setCastShadows)
+            @par
+            `setSetting(InstanceManager::SHOW_BOUNDINGBOX, true, "MyMat")`
             will display the bounding box of the batch (not individual InstancedEntities)
             from all batches using material "MyMat"
-        @note If the material name hasn't been used, the settings are still stored
-            This allows setting up batches before they get even created.
-        @param id Setting Id to setup, @see BatchSettings::BatchSettingId
+        @param id @ref BatchSettingId to setup
         @param enabled Boolean value. It's meaning depends on the id.
         @param materialName When Blank, the setting is applied to all existing materials
         */
