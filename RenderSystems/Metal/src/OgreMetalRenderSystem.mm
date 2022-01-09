@@ -403,7 +403,7 @@ namespace Ogre
         desc.storageMode = MTLStorageModePrivate;
 #endif
 
-        PixelFormat desiredDepthBufferFormat = PF_DEPTH32F;//renderTarget->getDesiredDepthBufferFormat();
+        PixelFormat desiredDepthBufferFormat = PF_DEPTH24_STENCIL8;//renderTarget->getDesiredDepthBufferFormat();
 
         MTLPixelFormat depthFormat = MTLPixelFormatInvalid;
         MTLPixelFormat stencilFormat = MTLPixelFormatInvalid;
@@ -440,9 +440,8 @@ namespace Ogre
 
         DepthBuffer *retVal = new MetalDepthBuffer( 0, this, renderTarget->getWidth(),
                                                     renderTarget->getHeight(),
-                                                    renderTarget->getFSAA(), 0,
-                                                    desiredDepthBufferFormat,
-                                                    /*renderTarget->prefersDepthTexture()*/ false, false,
+                                                    renderTarget->getFSAA(),
+                                                    depthFormat, false,
                                                     depthTexture, stencilTexture,
                                                     mActiveDevice );
 
@@ -820,8 +819,7 @@ namespace Ogre
 
         psd.colorAttachments[0].pixelFormat =  MetalMappings::getPixelFormat(
                         mActiveRenderTarget->suggestPixelFormat(), mActiveRenderTarget->isHardwareGammaEnabled() );
-        // TODO check mActiveRenderTarget->getDepthBuffer().. but this is the only supported one for now
-        psd.depthAttachmentPixelFormat = MTLPixelFormatDepth32Float;
+        psd.depthAttachmentPixelFormat = static_cast<MetalDepthBuffer*>(mActiveRenderTarget->getDepthBuffer())->getFormat();
 
         MTLVertexDescriptor *vertexDescriptor = [psd vertexDescriptor];
         [vertexDescriptor reset];

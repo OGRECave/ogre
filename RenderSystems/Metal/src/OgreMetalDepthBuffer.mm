@@ -37,8 +37,7 @@ namespace Ogre
 {
     MetalDepthBuffer::MetalDepthBuffer( uint16 poolId, MetalRenderSystem *renderSystem,
                                         uint32 width, uint32 height, uint32 fsaa,
-                                        uint32 multiSampleQuality, PixelFormat pixelFormat,
-                                        bool isDepthTexture, bool _isManual,
+                                        MTLPixelFormat pixelFormat, bool _isManual,
                                         id<MTLTexture> depthTexture, id<MTLTexture> stencilTexture,
                                         MetalDevice *device ) :
         DepthBuffer( poolId, width, height, fsaa,
@@ -47,6 +46,7 @@ namespace Ogre
         mStencilAttachmentDesc( 0 ),
         mDevice( device )
     {
+        mFormat = pixelFormat;
         if( depthTexture )
         {
             mDepthAttachmentDesc = [MTLRenderPassDepthAttachmentDescriptor new];

@@ -200,11 +200,7 @@ namespace Ogre
 
         switch( pf )
         {
-#if 0
-        case PF_D24_UNORM_S8_UINT:
-        case PF_D24_UNORM_X8:
-        case PF_X24_S8_UINT:
-        case PF_D24_UNORM:
+        case PF_DEPTH24_STENCIL8:
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
             depthFormat = MTLPixelFormatDepth32Float;
             stencilFormat = MTLPixelFormatStencil8;
@@ -220,7 +216,10 @@ namespace Ogre
                 stencilFormat = MTLPixelFormatDepth32Float_Stencil8;
             }
 #endif
+            // keep stencil off for now
+            stencilFormat = MTLPixelFormatInvalid;
             break;
+#if 0
         case PF_D32_FLOAT:
         case PF_D32_FLOAT_X24_X8:
             depthFormat = MTLPixelFormatDepth32Float;
