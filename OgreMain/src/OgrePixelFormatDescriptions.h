@@ -1528,6 +1528,18 @@ namespace Ogre {
             /* Masks and shifts */
             0, 0, 0, 0, 0, 0, 0, 0
         },
+        {"PF_DEPTH24_STENCIL8",
+            /* Bytes per element */
+            4,
+            /* Flags */
+            PFF_LUMINANCE | PFF_DEPTH | PFF_NATIVEENDIAN,
+            /* Component type and count */
+            PCT_UINT, 1,
+            /* rbits, gbits, bbits, abits */
+            24, 0, 0, 0,
+            /* Masks and shifts */
+            0, 0, 0, 0, 0, 0, 0, 0
+        },
     };
     /** @} */
     /** @} */

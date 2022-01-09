@@ -783,7 +783,7 @@ namespace Ogre
             mDepthTexture.reset(new VulkanTextureGpu(texMgr, mName+"/Depth", 0, "", true, 0));
             mDepthTexture->setWidth(target->getWidth());
             mDepthTexture->setHeight(target->getHeight());
-            mDepthTexture->setFormat(PF_DEPTH32F);
+            mDepthTexture->setFormat(PF_DEPTH24_STENCIL8);
             mDepthTexture->createInternalResources();
             mDepthTexture->setFSAA(1, "");
         }
