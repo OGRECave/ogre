@@ -166,14 +166,12 @@ namespace Ogre
         case PF_ASTC_RGBA_12X12_LDR:    return MTLPixelFormatASTC_12x12_LDR;
 #endif
 
-#if 0
 #if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
-        case PF_D24_UNORM_S8_UINT:      return MTLPixelFormatDepth24Unorm_Stencil8;
-        case PF_D24_UNORM_X8:           return MTLPixelFormatDepth24Unorm_Stencil8;
+        case PF_DEPTH24_STENCIL8:             return MTLPixelFormatDepth24Unorm_Stencil8;
 #else
-        case PF_D24_UNORM_S8_UINT:      return MTLPixelFormatDepth32Float_Stencil8;
-        case PF_D24_UNORM_X8:           return MTLPixelFormatDepth32Float;
+        case PF_DEPTH24_STENCIL8:             return MTLPixelFormatDepth32Float_Stencil8;
 #endif
+#if 0
         case PF_X24_S8_UINT:            return MTLPixelFormatStencil8;
 #if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
         case PF_D24_UNORM:              return MTLPixelFormatDepth24Unorm_Stencil8;

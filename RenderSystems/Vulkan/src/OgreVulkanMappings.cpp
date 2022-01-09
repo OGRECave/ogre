@@ -324,7 +324,7 @@ namespace Ogre
         case PF_R32_UINT:              return VK_FORMAT_R32_UINT;
         case PF_R32_SINT:              return VK_FORMAT_R32_SINT;
         //case PF_D24_UNORM:             return VK_FORMAT_X8_D24_UNORM_PACK32;
-        //case PF_D24_UNORM_S8_UINT:     return VK_FORMAT_D24_UNORM_S8_UINT;
+        case PF_DEPTH24_STENCIL8:            return VK_FORMAT_D24_UNORM_S8_UINT;
         case PF_BYTE_LA:
         case PF_RG8:                   return VK_FORMAT_R8G8_UNORM;
         case PF_R8G8_UINT:              return VK_FORMAT_R8G8_UINT;
@@ -369,7 +369,7 @@ namespace Ogre
         case PF_BC6H_UF16:             return VK_FORMAT_BC6H_UFLOAT_BLOCK;
         case PF_BC6H_SF16:             return VK_FORMAT_BC6H_SFLOAT_BLOCK;
         case PF_BC7_UNORM:             return VK_FORMAT_BC7_UNORM_BLOCK;
-        //case PF_B4G4R4A4_UNORM:        return VK_FORMAT_B4G4R4A4_UNORM_PACK16;
+        case PF_A4R4G4B4:              return VK_FORMAT_B4G4R4A4_UNORM_PACK16;
         case PF_PVRTC_RGB2:            return VK_FORMAT_PVRTC1_2BPP_UNORM_BLOCK_IMG;
         case PF_PVRTC_RGBA2:           return VK_FORMAT_PVRTC1_2BPP_UNORM_BLOCK_IMG;
         case PF_PVRTC_RGB4:            return VK_FORMAT_PVRTC1_4BPP_UNORM_BLOCK_IMG;

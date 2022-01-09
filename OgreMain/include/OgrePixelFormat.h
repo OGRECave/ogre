@@ -114,7 +114,7 @@ namespace Ogre {
         PF_X8B8G8R8,
         /// 32-bit pixel format, 8 bits for red, green, blue and alpha.
         PF_R8G8B8A8,
-        /// Depth texture format
+        /// Depth texture format, with 16-bit unsigned integer
         PF_DEPTH16,
         PF_DEPTH = PF_DEPTH16,
         /// 64-bit pixel format, 16 bits for red, green, blue and alpha
@@ -277,6 +277,8 @@ namespace Ogre {
         PF_DEPTH32,
         /// Depth texture format with 32-bit floating point
         PF_DEPTH32F,
+        /// Depth texture format with 24-bit unsigned integer and 8-bit stencil
+        PF_DEPTH24_STENCIL8,
         /// Number of pixel formats currently defined
         PF_COUNT,
         // endianess aware aliases

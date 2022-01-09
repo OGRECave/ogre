@@ -117,6 +117,7 @@ namespace Ogre {
                 case PF_DEPTH16:
                     format = PF_FLOAT16_R;
                     break;
+                case PF_DEPTH24_STENCIL8:
                 case PF_DEPTH32F:
                 case PF_DEPTH32:
                     format = PF_FLOAT32_R;
