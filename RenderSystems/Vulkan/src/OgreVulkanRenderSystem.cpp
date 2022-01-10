@@ -567,7 +567,6 @@ namespace Ogre
         rsc->setCapability( RSC_TEXTURE_1D );
 
         //rsc->setCapability( RSC_HWSTENCIL );
-        rsc->setStencilBufferBitDepth( 8 );
         rsc->setNumTextureUnits( OGRE_MAX_TEXTURE_COORD_SETS );
         rsc->setCapability( RSC_TEXTURE_COMPRESSION );
         rsc->setCapability( RSC_32BIT_INDEX );

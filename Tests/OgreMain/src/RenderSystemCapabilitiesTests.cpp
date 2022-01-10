@@ -455,7 +455,6 @@ TEST_F(RenderSystemCapabilitiesTests,WriteAndReadComplexCapabilities)
     caps.setCapability(RSC_VAO);
 
     caps.setNumTextureUnits(22);
-    caps.setStencilBufferBitDepth(20001);
     caps.setNumMultiRenderTargets(23);
 
     caps.addShaderProfile("99foo100");
@@ -530,7 +529,6 @@ TEST_F(RenderSystemCapabilitiesTests,WriteAndReadComplexCapabilities)
     EXPECT_EQ(caps.hasCapability(RSC_VAO), caps2.hasCapability(RSC_VAO));
 
     EXPECT_EQ(caps.getNumTextureUnits(), caps2.getNumTextureUnits());
-    EXPECT_EQ(caps.getStencilBufferBitDepth(), caps2.getStencilBufferBitDepth());
     EXPECT_EQ(caps.getNumMultiRenderTargets(), caps2.getNumMultiRenderTargets());
 
     EXPECT_EQ(caps.getVertexProgramConstantFloatCount(), caps2.getVertexProgramConstantFloatCount());

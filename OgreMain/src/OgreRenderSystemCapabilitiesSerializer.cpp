@@ -82,7 +82,6 @@ namespace Ogre
         
         file << endl;
         file << "\t" << "num_texture_units " << StringConverter::toString(caps->getNumTextureUnits()) << endl;
-        file << "\t" << "stencil_buffer_bit_depth " << StringConverter::toString(caps->getStencilBufferBitDepth()) << endl;
         file << "\t" << "num_multi_render_targets " << StringConverter::toString(caps->getNumMultiRenderTargets()) << endl;
         file << "\t" << "vertex_program_constant_float_count " << StringConverter::toString(caps->getVertexProgramConstantFloatCount()) << endl;
         file << "\t" << "fragment_program_constant_float_count " << StringConverter::toString(caps->getFragmentProgramConstantFloatCount()) << endl;

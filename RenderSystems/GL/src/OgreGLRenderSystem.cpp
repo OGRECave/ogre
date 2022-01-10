@@ -445,7 +445,6 @@ namespace Ogre {
         if(stencil)
         {
             rsc->setCapability(RSC_HWSTENCIL);
-            rsc->setStencilBufferBitDepth(stencil);
         }
 
         rsc->setCapability(RSC_HW_GAMMA);

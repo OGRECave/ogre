@@ -265,7 +265,6 @@ namespace Ogre {
         {
             rsc->setCapability(RSC_HWSTENCIL);
             rsc->setCapability(RSC_TWO_SIDED_STENCIL);
-            rsc->setStencilBufferBitDepth(stencil);
         }
 
         if(hasMinGLVersion(3, 0) ||
@@ -515,7 +514,6 @@ namespace Ogre {
         mHardwareBufferManager = OGRE_NEW GLES2HardwareBufferManager();
 
         // Create FBO manager
-        LogManager::getSingleton().logMessage("GL ES 2: Using FBOs for rendering to textures");
         mRTTManager = new GLES2FBOManager();
 
         mGLInitialised = true;
