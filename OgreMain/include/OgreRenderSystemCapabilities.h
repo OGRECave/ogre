@@ -379,6 +379,7 @@ namespace Ogre
             mNumTextureUnits = num;
         }
 
+        /// @deprecated do not use
         void setStencilBufferBitDepth(ushort num)
         {
             mStencilBufferBitDepth = num;
@@ -417,12 +418,7 @@ namespace Ogre
             return mNumTextureUnits;
         }
 
-        /** Determines the bit depth of the hardware accelerated stencil 
-        buffer, if supported.
-        @remarks
-        If hardware stencilling is not supported, the software will
-        provide an 8-bit software stencil.
-        */
+        /// @deprecated assume 8-bit stencil buffer
         ushort getStencilBufferBitDepth(void) const
         {
             return mStencilBufferBitDepth;

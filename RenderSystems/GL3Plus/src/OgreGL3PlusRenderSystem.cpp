@@ -259,7 +259,6 @@ namespace Ogre {
         // Check for hardware stencil support and set bit depth
         rsc->setCapability(RSC_HWSTENCIL);
         rsc->setCapability(RSC_TWO_SIDED_STENCIL);
-        rsc->setStencilBufferBitDepth(8);
 
         rsc->setCapability(RSC_HW_GAMMA);
 

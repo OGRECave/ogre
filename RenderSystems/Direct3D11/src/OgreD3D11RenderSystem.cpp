@@ -784,7 +784,6 @@ namespace Ogre
         //rsc->setCapability(RSC_FIXED_FUNCTION);
 
         rsc->setCapability(RSC_HWSTENCIL);
-        rsc->setStencilBufferBitDepth(8);
 
         UINT formatSupport;
         if(mFeatureLevel >= D3D_FEATURE_LEVEL_9_2

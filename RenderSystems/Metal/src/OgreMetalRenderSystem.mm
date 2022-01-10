@@ -137,7 +137,6 @@ namespace Ogre
         rsc->setRenderSystemName(getName());
 
         rsc->setCapability(RSC_HWSTENCIL);
-        rsc->setStencilBufferBitDepth(8);
         rsc->setNumTextureUnits(16);
         rsc->setNumVertexTextureUnits(16);
         rsc->setCapability(RSC_ANISOTROPY);

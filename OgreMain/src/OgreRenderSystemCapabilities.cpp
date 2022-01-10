@@ -57,7 +57,7 @@ namespace Ogre {
     RenderSystemCapabilities::RenderSystemCapabilities()
         : mVendor(GPU_UNKNOWN)
         , mNumTextureUnits(0)
-        , mStencilBufferBitDepth(0)
+        , mStencilBufferBitDepth(8)
         , mNumMultiRenderTargets(1)
         , mNonPOW2TexturesLimited(false)
         , mMaxSupportedAnisotropy(0)
@@ -104,7 +104,6 @@ namespace Ogre {
                          StringConverter::toString(hasCapability(RSC_HWSTENCIL), true));
         if (hasCapability(RSC_HWSTENCIL))
         {
-            pLog->logMessage("   - Stencil depth: " + StringConverter::toString(getStencilBufferBitDepth()));
             pLog->logMessage("   - Two sided stencil support: " +
                              StringConverter::toString(hasCapability(RSC_TWO_SIDED_STENCIL), true));
             pLog->logMessage("   - Wrap stencil values: " +
