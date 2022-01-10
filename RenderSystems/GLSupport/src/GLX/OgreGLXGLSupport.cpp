@@ -539,7 +539,9 @@ namespace Ogre
             // find maximal supported context version
             context_attribs[1] = 4;
             context_attribs[3] = 6;
-            while(!glxContext && (context_attribs[1] >= majorVersion && context_attribs[3] >= minorVersion))
+            while(!glxContext &&
+                  ((context_attribs[1] > majorVersion) ||
+                   (context_attribs[1] == majorVersion && context_attribs[3] >= minorVersion)))
             {
                 ctxErrorOccurred = false;
                 glxContext = _glXCreateContextAttribsARB(mGLDisplay, fbConfig, shareList, direct, context_attribs);
