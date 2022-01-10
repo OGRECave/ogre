@@ -345,12 +345,12 @@ namespace Ogre {
             EGL_NONE
         };
 
+        if (!eglBindAPI(mContextProfile == CONTEXT_ES ? EGL_OPENGL_ES_API : EGL_OPENGL_API))
+        {
+            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "eglBindAPI failed");
+        }
+
         if(mContextProfile != CONTEXT_ES) {
-            if (!eglBindAPI(EGL_OPENGL_API))
-            {
-                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Could not bind GL API");
-            }
-            EGL_CHECK_ERROR
             contextAttrs[1] = 4;
             contextAttrs[3] = 6;
 
