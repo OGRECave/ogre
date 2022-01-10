@@ -54,6 +54,7 @@ Nevertheless, there is fallback code so you still can use old `.material` files.
 - ShadowTextureListener was factored out of SceneManager::Listener
 - SWIG 4.0 is now fully supported
 - Flollowing SemVer, incrementing PATCH now guarantees ABI compatibility. Therefore SOVERSION on Unix system now only contains two digits e.g. `libOgreMain.so.13.0` instead of `libOgreMain.so.1.12.13`.
+- since 13.3, `PF_DEPTH24_STENCIL8` is available
 
 
 ### Breaking non-API changes
@@ -96,6 +97,17 @@ Separate shader objects are now used by default, if available. This enables an i
 ## D3D9
 
 The Option "Multi device memory hint" was renamed to "Auto hardware buffer management" as it is generally enables memory recovery on device loss.
+
+Since 13.2.1 there is support for `PF_DEPTH16` textures, which can be part of a MRT too.
+
+Since 13.3, the first 4 textures are shared between vertex and fragment programs. Explicitly stating BindingType for vertex textures fetch is no longer needed.
+
+## Vulkan (since 13.2)
+
+The RenderSystem does not yet support all of Ogre features, but many common use-cases are already covered. There are two caveats though:
+
+1. *Buffer updates*: Ogre does not try to hide the asynchronicity of Vulkan from the user and rather lets you run into rendering glitches. The solution here is to either implement triple-buffering yourself or discard the buffer contents on update (`HBL_DISCARD`), which will give you new memory on Vulkan.
+2. *Rendering interruption*: Closely related to the above is rendering interruption. This means that after the first Renderable was submitted for the current frame, you decide to load another Texture or update a buffer. Typically, it is possible to schedule your buffer updates before rendering kicks off. Additionally, this improves performance on tile-based hardware (mobile).
 
 ## GLSLang Plugin
 
