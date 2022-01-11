@@ -88,7 +88,6 @@ namespace Ogre
         Window parentWindow = DefaultRootWindow(xDisplay);
         int left = DisplayWidth(xDisplay, DefaultScreen(xDisplay))/2 - width/2;
         int top  = DisplayHeight(xDisplay, DefaultScreen(xDisplay))/2 - height/2;
-        String border;
 
         int minBufferSize = 16;
 
@@ -182,9 +181,6 @@ namespace Ogre
                 // it should be queried from the parentWindow
                 glxDrawable = 0;
             }
-
-            if ((opt = miscParams->find("border")) != end)
-                border = opt->second;
         }
 
         validateParentWindow(xDisplay, parentWindow);
