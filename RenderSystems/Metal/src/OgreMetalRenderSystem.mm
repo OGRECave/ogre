@@ -136,6 +136,8 @@ namespace Ogre
         RenderSystemCapabilities* rsc = new RenderSystemCapabilities();
         rsc->setRenderSystemName(getName());
 
+        rsc->setDeviceName(mActiveDevice->mDevice.name.UTF8String);
+
         rsc->setCapability(RSC_HWSTENCIL);
         rsc->setNumTextureUnits(16);
         rsc->setNumVertexTextureUnits(16);
