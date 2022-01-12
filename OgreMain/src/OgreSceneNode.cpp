@@ -106,8 +106,9 @@ namespace Ogre {
         // Also add to name index
         MovableObjectNameExists pred = {obj->getName()};
         ObjectMap::iterator it = std::find_if(mObjectsByName.begin(), mObjectsByName.end(), pred);
-        OgreAssert(it == mObjectsByName.end(), "Object was not attached because an object of the "
-                                               "same name was already attached to this node.");
+        if (it != mObjectsByName.end())
+            OGRE_EXCEPT(Exception::ERR_DUPLICATE_ITEM,
+                        "An object named '" + obj->getName() + "' already attached to this SceneNode");
         mObjectsByName.push_back(obj);
 
         // Make sure bounds get updated (must go right to the top)
