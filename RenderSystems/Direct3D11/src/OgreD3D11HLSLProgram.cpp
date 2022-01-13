@@ -1742,7 +1742,8 @@ namespace Ogre {
     //-----------------------------------------------------------------------------
     uint32 D3D11HLSLProgram::getNameForMicrocodeCache()
     {
-        uint32 seed = FastHash("D3D11", 5); // shaders are identical to D3D9 & Cg
+        const char* target = getCompatibleTarget();
+        uint32 seed = FastHash(target, strlen(target));
         return _getHash(seed);
     }
 

@@ -45,7 +45,9 @@ namespace Ogre {
     {
         HighLevelGpuProgram::prepareImpl();
 
-        uint32 hash = _getHash();
+        const String& target = getTarget();
+        uint32 seed = FastHash(target.c_str(), target.length());
+        uint32 hash = _getHash(seed);
         if ( GpuProgramManager::getSingleton().isMicrocodeAvailableInCache(hash) )
         {
             getMicrocodeFromCache(hash);
