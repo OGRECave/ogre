@@ -172,7 +172,9 @@ namespace Ogre {
 	{
 		selectProfile();
 
-        uint32 hash = FastHash("CG", 2); // HLSL and Cg shaders are indentical
+		// need to differentiate between target profiles
+		// also HLSL and Cg shaders sources are identical
+        uint32 hash = HashCombine(0, mSelectedCgProfile);
         hash = _getHash(hash);
 
 		if ( GpuProgramManager::getSingleton().isMicrocodeAvailableInCache(hash) )
