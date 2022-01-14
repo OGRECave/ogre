@@ -4581,7 +4581,16 @@ namespace Ogre{
         }
 
         ParticleSystem *system = any_cast<ParticleSystem*>(obj->parent->context);
-        mEmitter = system->addEmitter(type);
+
+        try
+        {
+            mEmitter = system->addEmitter(type);
+        }
+        catch(Exception &e)
+        {
+            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, obj->file, obj->line, e.getDescription());
+            return;
+        }
 
         for(AbstractNodeList::iterator i = obj->children.begin(); i != obj->children.end(); ++i)
         {
@@ -4646,7 +4655,15 @@ namespace Ogre{
         }
 
         ParticleSystem *system = any_cast<ParticleSystem*>(obj->parent->context);
-        mAffector = system->addAffector(type);
+        try
+        {
+            mAffector = system->addAffector(type);
+        }
+        catch(Exception &e)
+        {
+            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, obj->file, obj->line, e.getDescription());
+            return;
+        }
 
         for(AbstractNodeList::iterator i = obj->children.begin(); i != obj->children.end(); ++i)
         {

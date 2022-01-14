@@ -248,8 +248,7 @@ namespace Ogre {
 
         if (pFact == mEmitterFactories.end())
         {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Cannot find requested emitter type.", 
-                "ParticleSystemManager::_createEmitter");
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Cannot find emitter type '" + emitterType + "'");
         }
 
         return pFact->second->createEmitter(psys);
@@ -282,8 +281,7 @@ namespace Ogre {
 
         if (pFact == mAffectorFactories.end())
         {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Cannot find requested affector type.", 
-                "ParticleSystemManager::_createAffector");
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Cannot find affector type '" + affectorType + "'");
         }
 
         return pFact->second->createAffector(psys);
