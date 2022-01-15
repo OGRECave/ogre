@@ -123,11 +123,6 @@ namespace Ogre {
 
     }
     //-----------------------------------------------------------------------
-    void MaterialManager::parseScript(DataStreamPtr& stream, const String& groupName)
-    {
-        ScriptCompilerManager::getSingleton().parseScript(stream, groupName);
-    }
-    //-----------------------------------------------------------------------
     void MaterialManager::setDefaultTextureFiltering(TextureFilterOptions fo)
     {
         TextureManager::getSingleton().getDefaultSampler()->setFiltering(fo);

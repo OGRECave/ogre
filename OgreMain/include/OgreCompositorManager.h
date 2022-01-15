@@ -79,10 +79,6 @@ namespace Ogre {
         /// @see ResourceManager::getResourceByName
         CompositorPtr getByName(const String& name, const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME) const;
 
-        /** @see ScriptLoader::parseScript
-        */
-        void parseScript(DataStreamPtr& stream, const String& groupName);
-
         /** Get the compositor chain for a Viewport. If there is none yet, a new
             compositor chain is registered.
             XXX We need a _notifyViewportRemoved to find out when this viewport disappears,

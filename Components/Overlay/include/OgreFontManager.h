@@ -58,8 +58,6 @@ namespace Ogre
         /// @see ResourceManager::getResourceByName
         FontPtr getByName(const String& name, const String& groupName OGRE_RESOURCE_GROUP_INIT) const;
 
-        /** @copydoc ScriptLoader::parseScript */
-        void parseScript(DataStreamPtr& stream, const String& groupName);
         /** Override standard Singleton retrieval.
         @remarks
         Why do we do this? Well, it's because the Singleton

@@ -97,11 +97,6 @@ void CompositorManager::initialise(void)
 {
 }
 //-----------------------------------------------------------------------
-void CompositorManager::parseScript(DataStreamPtr& stream, const String& groupName)
-{
-    ScriptCompilerManager::getSingleton().parseScript(stream, groupName);
-}
-//-----------------------------------------------------------------------
 CompositorChain *CompositorManager::getCompositorChain(Viewport *vp)
 {
     Chains::iterator i=mChains.find(vp);

@@ -378,46 +378,9 @@ namespace Ogre {
             ManualResourceLoader* loader = 0, const NameValuePairList* loadParams = 0,
             bool backgroundThread = false);
 
-        /** Gets the file patterns which should be used to find scripts for this
-            ResourceManager.
-        @remarks
-            Some resource managers can read script files in order to define
-            resources ahead of time. These resources are added to the available
-            list inside the manager, but none are loaded initially. This allows
-            you to load the items that are used on demand, or to load them all 
-            as a group if you wish (through ResourceGroupManager).
-        @par
-            This method lets you determine the file pattern which will be used
-            to identify scripts intended for this manager.
-        @return
-            A list of file patterns, in the order they should be searched in.
-        @see parseScript
-        */
-        const StringVector& getScriptPatterns(void) const { return mScriptPatterns; }
-
-        /** Parse the definition of a set of resources from a script file.
-        @remarks
-            Some resource managers can read script files in order to define
-            resources ahead of time. These resources are added to the available
-            list inside the manager, but none are loaded initially. This allows
-            you to load the items that are used on demand, or to load them all 
-            as a group if you wish (through ResourceGroupManager).
-        @param stream Weak reference to a data stream which is the source of the script
-        @param groupName The name of the resource group that resources which are
-            parsed are to become a member of. If this group is loaded or unloaded, 
-            then the resources discovered in this script will be loaded / unloaded
-            with it.
-        */
-        void parseScript(DataStreamPtr& stream, const String& groupName)
-                { (void)stream; (void)groupName; }
-
-        /** Gets the relative loading order of resources of this type.
-        @remarks
-            There are dependencies between some kinds of resource in terms of loading
-            order, and this value enumerates that. Higher values load later during
-            bulk loading tasks.
-        */
-        Real getLoadingOrder(void) const { return mLoadOrder; }
+        const StringVector& getScriptPatterns(void) const override { return mScriptPatterns; }
+        void parseScript(DataStreamPtr& stream, const String& groupName) override;
+        Real getLoadingOrder(void) const override { return mLoadOrder; }
 
         /** Gets a string identifying the type of resource this manager handles. */
         const String& getResourceType(void) const { return mResourceType; }
