@@ -27,7 +27,6 @@ THE SOFTWARE
 #include "OgreFontManager.h"
 
 #include "OgreResourceGroupManager.h"
-#include "OgreScriptCompiler.h"
 
 namespace Ogre
 {
@@ -84,10 +83,5 @@ namespace Ogre
                                     const NameValuePairList* createParams)
     {
         return static_pointer_cast<Font>(createResource(name,group,isManual,loader,createParams));
-    }
-    //---------------------------------------------------------------------
-    void FontManager::parseScript(DataStreamPtr& stream, const String& groupName)
-    {
-        ScriptCompilerManager::getSingleton().parseScript(stream, groupName);
     }
 }

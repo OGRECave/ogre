@@ -175,11 +175,6 @@ namespace Ogre {
         /** Initialises the material manager, which also triggers it to 
          * parse all available .program and .material scripts. */
         void initialise(void);
-        
-        /** @see ScriptLoader::parseScript
-        */
-        void parseScript(DataStreamPtr& stream, const String& groupName);
-
 
         /** Sets the default texture filtering to be used for loaded textures, for when textures are
             loaded automatically (e.g. by Material class) or when 'load' is called with the default

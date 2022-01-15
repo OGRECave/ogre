@@ -43,6 +43,10 @@ namespace Ogre {
         destroyAllResourcePools();
         removeAll();
     }
+    void ResourceManager::parseScript(DataStreamPtr& stream, const String& groupName)
+    {
+        ScriptCompilerManager::getSingleton().parseScript(stream, groupName);
+    }
     //-----------------------------------------------------------------------
     ResourcePtr ResourceManager::createResource(const String& name, const String& group,
         bool isManual, ManualResourceLoader* loader, const NameValuePairList* params)
