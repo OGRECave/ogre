@@ -105,17 +105,16 @@ namespace Ogre
 
     void* VulkanHardwareBuffer::lockImpl(size_t offset, size_t length, LockOptions options)
     {
-        if( options == HardwareBuffer::HBL_READ_ONLY )
-        {
-            //if( currentFrame - mLastFrameGpuWrote < bufferMultiplier )
-            //    mDevice->stall();
-        }
-
         if(mShadowBuffer)
             return mShadowBuffer->lock(offset, length, options);
 
         if (options == HBL_DISCARD && mUsage == HBU_CPU_TO_GPU)
             discard();
+
+        if ((options == HBL_READ_ONLY || options == HBL_NORMAL) && mUsage == HBU_GPU_ONLY)
+        {
+            LogManager::getSingleton().logWarning("HardwareBuffer - UNIMPLEMENTED implicit GPU to HOST copy (slow)");
+        }
 
         if (mMappedPtr) // persistent mapping
             return static_cast<uint8*>(mMappedPtr) + offset;
