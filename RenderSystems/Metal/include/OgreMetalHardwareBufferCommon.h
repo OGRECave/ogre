@@ -40,22 +40,17 @@ namespace Ogre
     ///		Lack of WRITE_ONLY and DISCARDABLE buffer puts it in slowest path.
     ///		Puts WRITE_ONLY in device memory and uses staging buffers to avoid blocking.
     ///			Use WRITE_ONLY when possible.
-    ///		When DISCARDABLE bit is set, it uses MetalDiscardBuffer.
     class _OgreMetalExport MetalHardwareBufferCommon : public HardwareBuffer
     {
     private:
         id<MTLBuffer>       mBuffer;
         MetalDevice         *mDevice;
-        uint32              mLastFrameUsed;
-        uint32              mLastFrameGpuWrote;
-
-        StagingBuffer* createStagingBuffer( size_t sizeBytes, bool forUpload );
     public:
         MetalHardwareBufferCommon(size_t sizeBytes, Usage usage, bool useShadowBuffer, uint16 alignment,
                                   MetalDevice* device);
         virtual ~MetalHardwareBufferCommon();
 
-        void _notifyDeviceStalled(void);
+        void _notifyDeviceStalled() {}
 
         /** Returns the actual API buffer, but first sets mLastFrameUsed as we
             assume you're calling this function to use the buffer in the GPU.

@@ -40,18 +40,13 @@ namespace Ogre
                                                           MetalDevice *device ) :
         HardwareBuffer(usage, false, false),
         mBuffer( 0 ),
-        mDevice( device ),
-        mLastFrameUsed( 0 ),
-        mLastFrameGpuWrote( 0 )
+        mDevice( device )
     {
         mSizeInBytes = sizeBytes;
-        // FIXME read write hazards not handled due to the following commented out
-        mLastFrameUsed = 0;//mVaoManager->getFrameCount() - mVaoManager->getDynamicBufferMultiplier();
-        mLastFrameGpuWrote = mLastFrameUsed;
 
         MTLResourceOptions resourceOptions = 0;
 
-        // FIXME always using shared storage for now. Using staging buffers leaks severly
+        // FIXME always using shared storage for now
         if( usage & HBU_DETAIL_WRITE_ONLY & 0)
         {
             resourceOptions |= MTLResourceStorageModePrivate;
@@ -76,62 +71,21 @@ namespace Ogre
         mBuffer = 0;
     }
     //-----------------------------------------------------------------------------------
-    void MetalHardwareBufferCommon::_notifyDeviceStalled(void)
-    {
-        mLastFrameUsed      = 0;//mVaoManager->getFrameCount() - mVaoManager->getDynamicBufferMultiplier();
-        mLastFrameGpuWrote  = mLastFrameUsed;
-    }
-    //-----------------------------------------------------------------------------------
     id<MTLBuffer> MetalHardwareBufferCommon::getBufferName( size_t &outOffset )
     {
-        mLastFrameUsed = 0;//mVaoManager->getFrameCount();
         outOffset = 0;
         return mBuffer;
     }
     //-----------------------------------------------------------------------------------
     void* MetalHardwareBufferCommon::lockImpl( size_t offset, size_t length, LockOptions options)
     {
-        void *retPtr = 0;
-
-        const uint32 currentFrame       = 2;//mVaoManager->getFrameCount();
-        const uint32 bufferMultiplier   = 1;//mVaoManager->getDynamicBufferMultiplier();
-
+        if ((options == HBL_READ_ONLY || options == HBL_NORMAL) && mBuffer.storageMode == MTLStorageModePrivate)
         {
-            if( mBuffer.storageMode != MTLStorageModePrivate )
-            {
-                if( options == HardwareBuffer::HBL_READ_ONLY )
-                {
-                    if( currentFrame - mLastFrameGpuWrote < bufferMultiplier )
-                        mDevice->stall();
-                }
-                else if( options != HardwareBuffer::HBL_NO_OVERWRITE )
-                {
-                    if( currentFrame - mLastFrameUsed < bufferMultiplier )
-                    {
-                        LogManager::getSingleton().logMessage(
-                                    "PERFORMANCE WARNING: locking to a non-HBU_WRITE_ONLY or "
-                                    "non-HBU_DISCARDABLE for other than reading is slow/stalling." );
-
-                        mDevice->stall();
-                    }
-                }
-
-                retPtr = [mBuffer contents];
-                retPtr = static_cast<void*>( static_cast<uint8*>( retPtr ) + offset );
-            }
-            else
-            {
-                //If we're here, the buffer was created with HBU_WRITE_ONLY, but not discardable.
-                //Write to a staging buffer to avoid blocking. We don't have to care about
-                //reading access.
-                assert( (options != HardwareBuffer::HBL_NORMAL ||
-                        options != HardwareBuffer::HBL_READ_ONLY) &&
-                        "Reading from a write-only buffer! Create "
-                        "the buffer without HBL_WRITE_ONLY bit (or use readData)" );
-            }
+            LogManager::getSingleton().logWarning("HardwareBuffer - UNIMPLEMENTED implicit GPU to HOST copy (slow)");
         }
 
-        return retPtr;
+        void *retPtr = mBuffer.contents;
+        return static_cast<uint8*>( retPtr ) + offset;
     }
     //-----------------------------------------------------------------------------------
     void MetalHardwareBufferCommon::unlockImpl()
@@ -140,32 +94,9 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void MetalHardwareBufferCommon::readData( size_t offset, size_t length, void* pDest )
     {
-        assert( (offset + length) <= mSizeInBytes );
-
-        if (mShadowBuffer)
-        {
-            mShadowBuffer->readData(offset, length, pDest);
-            return;
-        }
-
-        void const *srcData = 0;
-        StagingBuffer *stagingBuffer = 0;
-
-        const uint32 currentFrame       = 0;//mVaoManager->getFrameCount();
-        const uint32 bufferMultiplier   = 1;//mVaoManager->getDynamicBufferMultiplier();
-
-        {
-            if( mBuffer.storageMode != MTLStorageModePrivate )
-            {
-                if( currentFrame - mLastFrameGpuWrote < bufferMultiplier )
-                    mDevice->stall();
-                srcData = [mBuffer contents];
-            }
-        }
-
-        srcData = static_cast<const void*>( static_cast<const uint8*>( srcData ) + offset );
-
-        memcpy( pDest, srcData, length );
+        // just use memcpy
+        HardwareBufferLockGuard thisLock(this, offset, length, HBL_READ_ONLY);
+        memcpy(pDest, thisLock.pData, length);
     }
     //-----------------------------------------------------------------------------------
     void MetalHardwareBufferCommon::writeData(size_t offset, size_t length, const void* pSource,
@@ -185,10 +116,9 @@ namespace Ogre
         // FIXME
         if(true || mBuffer.storageMode == MTLStorageModePrivate)
         {
-            //Fast path is through locking (it either discards or already uses a StagingBuffer).
-            void *dstData = this->lockImpl( offset, length, HBL_DISCARD);
+            void *dstData = lockImpl( offset, length, HBL_DISCARD);
             memcpy( dstData, pSource, length );
-            this->unlockImpl();
+            unlockImpl();
         }
     }
     //-----------------------------------------------------------------------------------
