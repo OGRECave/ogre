@@ -41,7 +41,7 @@ void FFP_Transform(in mat3 m,
              in vec3 v, 
              out vec3 vOut)
 {
-    vOut = m * v;
+    vOut = mul(m, v);
 }
 
 //-----------------------------------------------------------------------------
@@ -49,7 +49,7 @@ void FFP_Transform(in mat4 m,
 			 in vec4 v, 
 			 out vec4 vOut)
 {
-	vOut = m * v;
+	vOut = mul(m, v);
 }
 
 //-----------------------------------------------------------------------------
@@ -57,10 +57,25 @@ void FFP_Transform(in mat4 m,
 				   in vec4 v, 
 				   out vec3 vOut)
 {
-	vOut = (m * v).xyz;
+	vOut = mul(m, v).xyz;
 }
 
-#if !defined(OGRE_GLSLES) || OGRE_GLSLES > 100
+#ifdef OGRE_HLSL
+void FFP_Transform(in float3x4 m,
+				   in float4 v,
+				   out float3 vOut)
+{
+	vOut = mul(m, v);
+}
+
+//-----------------------------------------------------------------------------
+void FFP_Transform(in float3x4 m,
+				   in float3 v,
+				   out float3 vOut)
+{
+	vOut = mul((float3x3)m, v);
+}
+#elif !defined(OGRE_GLSLES) || OGRE_GLSLES > 100
 //-----------------------------------------------------------------------------
 void FFP_Transform(in mat3x4 m,
 				   in vec4 v,
@@ -86,7 +101,11 @@ void FFP_Transform(in mat4 m,
 				   in vec3 v, 
 				   out vec3 vOut)
 {
+#ifdef OGRE_HLSL
+	vOut = mul((float3x3)m, v);
+#else
 	vOut = mat3(m) * v;
+#endif
 }
 
 //-----------------------------------------------------------------------------
