@@ -272,14 +272,9 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     const AxisAlignedBox& Light::getBoundingBox(void) const
     {
-        // Null, lights are not visible
-        static AxisAlignedBox box;
+        // zero extent to still allow SceneQueries to work
+        static AxisAlignedBox box(Vector3(0, 0, 0), Vector3(0, 0, 0));
         return box;
-    }
-    //-----------------------------------------------------------------------
-    void Light::_updateRenderQueue(RenderQueue* queue)
-    {
-        // Do nothing
     }
     //-----------------------------------------------------------------------
     void Light::visitRenderables(Renderable::Visitor* visitor, 
