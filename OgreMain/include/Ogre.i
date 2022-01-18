@@ -507,6 +507,9 @@ ADD_REPR(ColourValue)
 %include "OgreRay.h"
 %include "OgreSceneQuery.h"
 %template(RaySceneQueryResult) std::vector<Ogre::RaySceneQueryResultEntry>;
+#ifdef SWIGPYTHON
+%template(SceneQueryResultMovableList) std::list<Ogre::MovableObject*>;
+#endif
 
 %include "OgreNameGenerator.h"
 %include "OgreController.h"
