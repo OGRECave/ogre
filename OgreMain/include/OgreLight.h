@@ -314,11 +314,10 @@ namespace Ogre {
         */
         Real getPowerScale(void) const;
 
-        /** @copydoc MovableObject::getBoundingBox */
-        const AxisAlignedBox& getBoundingBox(void) const;
+        Real getBoundingRadius(void) const override { return 0; }
+        const AxisAlignedBox& getBoundingBox(void) const override;
 
-        /** @copydoc MovableObject::_updateRenderQueue */
-        void _updateRenderQueue(RenderQueue* queue);
+        void _updateRenderQueue(RenderQueue* queue) override {} // No rendering
 
         /** @copydoc MovableObject::getMovableType */
         const String& getMovableType(void) const;
@@ -356,9 +355,6 @@ namespace Ogre {
             means it no longer affects the scene.
         */
         void setVisible(bool visible) { MovableObject::setVisible(visible); }
-
-        /** @copydoc MovableObject::getBoundingRadius */
-        Real getBoundingRadius(void) const { return 0; /* not visible */ }
 
         /** Returns the details of this light as a 4D vector.
         @remarks
@@ -415,9 +411,8 @@ namespace Ogre {
         /** Return a pointer to the custom shadow camera setup (null means use SceneManager global version). */
         const ShadowCameraSetupPtr& getCustomShadowCameraSetup(void) const;
 
-        /// @copydoc MovableObject::visitRenderables
         void visitRenderables(Renderable::Visitor* visitor, 
-            bool debugRenderables = false);
+            bool debugRenderables = false) override;
 
         /** Returns the index at which this light is in the current render.
         @remarks
