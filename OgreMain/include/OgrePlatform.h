@@ -70,17 +70,6 @@ THE SOFTWARE.
 #   define OGRE_CPU OGRE_CPU_UNKNOWN
 #endif
 
-/* Find the arch type */
-#if defined(__x86_64__) || defined(_M_X64) || defined(_M_X64) || defined(_M_AMD64) \
- || defined(__ppc64__) \
- || defined(__arm64__) || defined(__aarch64__) || defined(_M_ARM64) \
- || defined(__mips64) || defined(__mips64_) \
- || defined(__alpha__) || defined(__ia64__) || defined(__s390__) || defined(__s390x__)
-#   define OGRE_ARCH_TYPE OGRE_ARCHITECTURE_64
-#else
-#   define OGRE_ARCH_TYPE OGRE_ARCHITECTURE_32
-#endif
-
 /* Determine CPU endian.
    We were once in situation when XCode could produce mixed endian fat binary with x86 and ppc archs inside, so it's safer to sniff compiler macros too
  */
@@ -184,8 +173,8 @@ THE SOFTWARE.
 #   define OGRE_PLATFORM OGRE_PLATFORM_LINUX
 #endif
 
-    /* Find the arch type */
-#if defined(__x86_64__) || defined(_M_X64) || defined(_M_AMD64) || defined(_M_ARM64) || defined(__powerpc64__) || defined(__alpha__) || defined(__ia64__) || defined(__s390__) || defined(__s390x__) || defined(__arm64__) || defined(__aarch64__) || defined(__mips64) || defined(__mips64_) || (defined(__riscv) && (__riscv_xlen == 64))
+/* Find the arch type */
+#if defined(__LP64__) || defined(_WIN64)
 #   define OGRE_ARCH_TYPE OGRE_ARCHITECTURE_64
 #else
 #   define OGRE_ARCH_TYPE OGRE_ARCHITECTURE_32
