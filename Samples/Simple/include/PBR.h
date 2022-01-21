@@ -29,7 +29,7 @@ protected:
 
         SelectMenu* objectType = mTrayMgr->createThickSelectMenu(TL_TOPLEFT, "term", "Material", gui_width, 9);
         objectType->addItem("glTF2 Shader");
-        objectType->addItem("RTSS Fallback");
+        objectType->addItem("RTSS");
         if(GpuProgramManager::getSingleton().isSyntaxSupported("glsl330"))
             objectType->addItem("Filament Shader");
         objectType->selectItem(0, false);
@@ -48,6 +48,7 @@ protected:
 
         Light* light = mSceneMgr->createLight();
         light->setDiffuseColour(ColourValue::White);
+        light->setSpecularColour(ColourValue::White);
 
         mSceneMgr->getRootSceneNode()
             ->createChildSceneNode(Vector3(4, 1, 6))
@@ -73,7 +74,7 @@ protected:
 
     void itemSelected(SelectMenu* menu)
     {
-        static const char* materials[] = {"DamagedHelmet", "DamagedHelmet_FFP", "DamagedHelmet_Filament"};
+        static const char* materials[] = {"DamagedHelmet", "DamagedHelmet_RTSS", "DamagedHelmet_Filament"};
         int n = menu->getSelectionIndex();
 
         mEntity->setMaterialName(materials[n]);

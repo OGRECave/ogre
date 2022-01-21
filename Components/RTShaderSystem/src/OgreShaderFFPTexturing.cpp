@@ -39,7 +39,7 @@ String FFPTexturing::Type = "FFP_Texturing";
 const String c_ParamTexelEx("texel_");
 
 //-----------------------------------------------------------------------
-FFPTexturing::FFPTexturing() : mIsPointSprite(false)
+FFPTexturing::FFPTexturing() : mIsPointSprite(false), mLateAddBlend(false)
 {   
 }
 
@@ -326,6 +326,11 @@ bool FFPTexturing::addPSFunctionInvocations(TextureUnitParams* textureUnitParams
         alphaBlend.source2 == LBS_MANUAL)
         needDifferentAlphaBlend = true;
 
+    if(mLateAddBlend && colourBlend.operation == LBX_ADD)
+    {
+        groupOrder = FFP_PS_COLOUR_END + 50 + 1; // after PBR lighting
+    }
+
     // Build colours blend
     addPSBlendInvocations(psMain, source1, source2, texel, 
         textureUnitParams->mTextureSamplerIndex,
@@ -547,11 +552,22 @@ bool FFPTexturing::needsTextureMatrix(TextureUnitState* textureUnitState)
 }
 
 
+bool FFPTexturing::setParameter(const String& name, const String& value)
+{
+    if(name == "late_add_blend")
+    {
+        StringConverter::parse(value, mLateAddBlend);
+        return true;
+    }
+    return false;
+}
+
 //-----------------------------------------------------------------------
 void FFPTexturing::copyFrom(const SubRenderState& rhs)
 {
     const FFPTexturing& rhsTexture = static_cast<const FFPTexturing&>(rhs);
 
+    mLateAddBlend = rhsTexture.mLateAddBlend;
     setTextureUnitCount(rhsTexture.getTextureUnitCount());
 
     for (unsigned int i=0; i < rhsTexture.getTextureUnitCount(); ++i)
@@ -672,18 +688,23 @@ SubRenderState* FFPTexturingFactory::createInstance(ScriptCompiler* compiler,
     {
         if(prop->values.size() == 1)
         {
-            String modelType;
+            String value;
 
-            if(false == SGScriptTranslator::getString(prop->values.front(), &modelType))
+            if(false == SGScriptTranslator::getString(prop->values.front(), &value))
             {
                 compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
                 return NULL;
             }
 
-            if (modelType == "ffp")
-            {
-                return createOrRetrieveInstance(translator);
-            }
+            auto inst = createOrRetrieveInstance(translator);
+
+            if (value == "ffp")
+                return inst;
+
+            if (value == "late_add_blend")
+                inst->setParameter(value, "true");
+
+            return inst;
         }       
     }
 
