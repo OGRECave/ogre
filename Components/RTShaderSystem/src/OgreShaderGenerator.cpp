@@ -266,6 +266,10 @@ void ShaderGenerator::createBuiltinSRSFactories()
         addSubRenderStateFactory(curFactory);
         mBuiltinSRSFactories.push_back(curFactory);
 
+        curFactory = new CookTorranceLightingFactory;
+        addSubRenderStateFactory(curFactory);
+        mBuiltinSRSFactories.push_back(curFactory);
+
         curFactory = OGRE_NEW IntegratedPSSM3Factory;   
         addSubRenderStateFactory(curFactory);
         mBuiltinSRSFactories.push_back(curFactory);

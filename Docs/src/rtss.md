@@ -29,6 +29,9 @@ Here are the attributes you can use in a `rtshader_system` block of a `pass {}`:
 
 - [transform_stage](#transform_stage)
 - [lighting_stage](#lighting_stage)
+- [gbuffer](#gbuffer)
+- [normal_map](#normal_map)
+- [metal_roughness_map](#metal_roughness_map)
 - [fog_stage](#fog_stage)
 - [light_count](#light_count)
 - [triplanarTexturing](#triplanarTexturing)
@@ -59,21 +62,57 @@ Example: `transform_stage instanced 1`
 Force a specific lighting model.
 
 @par
-Format: `lighting_stage <ffp|per_pixel|normal_map|gbuffer> [two_sided] [normalised]`
+Format: `lighting_stage <ffp|per_pixel> [two_sided] [normalised]`
 @par
-Format2: `lighting_stage normal_map <texturename> [tangent_space|object_space|parallax] [coordinateIndex] [samplerName]`
+Example: `lighting_stage ffp two_sided`
+
+@param two_sided compute lighting on both sides of the surface, when culling is disabled.
+@param normalised normalise the blinn-phong reflection model to make it energy conserving - see [this for details](http://www.rorydriscoll.com/2009/01/25/energy-conservation-in-games/)
+
+<a name="gbuffer"></a>
+
+## gbuffer
+
+Redirects intermediate lighting results into gbuffers for e.g. deferred shading.
+
 @par
-Format3: `lighting_stage gbuffer <target_layout> [target_layout]`
+Format: `lighting_stage gbuffer <target_layout> [target_layout]`
+@par
+Example: `lighting_stage gbuffer normal_viewdepth diffuse_specular`
+
+@param target_layout with @c gbuffer, this specifies the data to be written into one or two MRT targets. Possible values are @c depth, @c normal, @c viewpos, @c normal_viewdepth and @c diffuse_specular
+
+<a name="normal_map"></a>
+
+## normal_map
+
+Use a normal map for lighting computations
+
+@par
+Format: `lighting_stage normal_map <texturename> [tangent_space|object_space|parallax] [coordinateIndex] [samplerName]`
 @par
 Example: `lighting_stage normal_map Panels_Normal_Tangent.png tangent_space 0 SamplerToUse`
 
-@param two_sided compute lighting on both sides of the surface, when culling is disabled.
-@param normalised with @c ffp or @c per_pixel normalise the blinn-phong reflection model to make it energy conserving - see [this for details](http://www.rorydriscoll.com/2009/01/25/energy-conservation-in-games/)
 @param texturename normal map to use with @c normal_map
-@param target_layout with @c gbuffer, this specifies the data to be written into one or two MRT targets. Possible values are @c depth, @c normal, @c viewpos, @c normal_viewdepth and @c diffuse_specular
 
 @see Ogre::RTShader::NormalMapLighting::NormalMapSpace
 @see @ref Samplers
+
+<a name="metal_roughness_map"></a>
+
+## metal_roughness_map
+
+Use a metal roughness map for lighting computations.
+
+@par
+Format: `lighting_stage metal_roughness_map <texturename>`
+@par
+Example: `lighting_stage metal_roughness_map Default_metalRoughness.jpg`
+
+@param texturename normal map to use with @c metal_roughness_map.
+[In accordance to the glTF2.0 specification](https://www.khronos.org/registry/glTF/specs/2.0/glTF-2.0.html#_material_pbrmetallicroughness_metallicroughnesstexture), metalness is sampled from the B channel and roughness from the G channel.
+
+@note Using this option switches the lighting equations from Blinn-Phong to the Cook-Torrance PBR model [using the equations described by Filament](https://google.github.io/filament/Filament.html#materialsystem/standardmodelsummary).
 
 <a name="fog_stage"></a>
 
