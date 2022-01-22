@@ -234,15 +234,6 @@ bool FFPLighting::resolveParameters(ProgramSet* programSet)
         mWorldViewMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_WORLDVIEW_MATRIX);
         mVSInPosition = vsMain->resolveInputParameter(Parameter::SPC_POSITION_OBJECT_SPACE);
         mViewPos = vsMain->resolveLocalParameter(Parameter::SPC_POSITION_VIEW_SPACE);
-        mToLight = vsMain->resolveLocalParameter(Parameter::SPC_LIGHTDIRECTION_VIEW_SPACE0);
-        mToView = vsMain->resolveLocalParameter(Parameter::SPC_POSTOCAMERA_VIEW_SPACE);
-
-        for (auto& l : mLightParamsList)
-        {
-            if(l.mType != Light::LT_POINT && l.mType != Light::LT_SPOTLIGHT)
-                continue;
-            l.mToLight = mToLight;
-        }
 	}
 
 	return true;
@@ -271,9 +262,6 @@ bool FFPLighting::addFunctionInvocations(ProgramSet* programSet)
 
 	// Add the global illumination functions.
 	addGlobalIlluminationInvocation(stage);
-
-    if (mToView)
-        stage.mul(Vector3(-1), mViewPos, mToView);
 
     // Add per light functions.
     for (const auto& lp : mLightParamsList)
@@ -347,7 +335,7 @@ void FFPLighting::addIlluminationInvocation(const LightParams* curLightParams, c
         if (mSpecularEnable)
         {
             stage.callFunction(SGX_FUNC_LIGHT_DIRECTIONAL_DIFFUSESPECULAR,
-                               {In(mViewNormal), In(mToView), In(curLightParams->mPSInDirection).xyz(),
+                               {In(mViewNormal), In(mViewPos), In(curLightParams->mPSInDirection).xyz(),
                                 In(curLightParams->mDiffuseColour).xyz(), In(curLightParams->mSpecularColour).xyz(),
                                 In(mSurfaceShininess), InOut(mOutDiffuse).xyz(), InOut(mOutSpecular).xyz()});
         }
@@ -361,12 +349,10 @@ void FFPLighting::addIlluminationInvocation(const LightParams* curLightParams, c
         break;
 
     case Light::LT_POINT:
-        if(mToLight)
-            stage.sub(In(curLightParams->mPosition).xyz(), mViewPos, mToLight);
         if (mSpecularEnable)
         {
             stage.callFunction(SGX_FUNC_LIGHT_POINT_DIFFUSESPECULAR,
-                               {In(mViewNormal), In(mToView), In(curLightParams->mToLight),
+                               {In(mViewNormal), In(mViewPos), In(curLightParams->mPosition).xyz(),
                                 In(curLightParams->mAttenuatParams), In(curLightParams->mDiffuseColour).xyz(),
                                 In(curLightParams->mSpecularColour).xyz(), In(mSurfaceShininess),
                                 InOut(mOutDiffuse).xyz(), InOut(mOutSpecular).xyz()});
@@ -374,19 +360,18 @@ void FFPLighting::addIlluminationInvocation(const LightParams* curLightParams, c
         else
         {
             stage.callFunction(SGX_FUNC_LIGHT_POINT_DIFFUSE,
-                               {In(mViewNormal), In(curLightParams->mToLight), In(curLightParams->mAttenuatParams),
-                                In(curLightParams->mDiffuseColour).xyz(), InOut(mOutDiffuse).xyz()});
+                               {In(mViewNormal), In(mViewPos), In(curLightParams->mPosition).xyz(),
+                                In(curLightParams->mAttenuatParams), In(curLightParams->mDiffuseColour).xyz(),
+                                InOut(mOutDiffuse).xyz()});
         }
 				
         break;
 
     case Light::LT_SPOTLIGHT:
-        if(mToLight)
-            stage.sub(In(curLightParams->mPosition).xyz(), mViewPos, mToLight);
         if (mSpecularEnable)
         {
             stage.callFunction(SGX_FUNC_LIGHT_SPOT_DIFFUSESPECULAR,
-                               {In(mViewNormal), In(mToView), In(curLightParams->mToLight),
+                               {In(mViewNormal), In(mViewPos), In(curLightParams->mPosition).xyz(),
                                 In(curLightParams->mPSInDirection).xyz(), In(curLightParams->mAttenuatParams),
                                 In(curLightParams->mSpotParams).xyz(), In(curLightParams->mDiffuseColour).xyz(),
                                 In(curLightParams->mSpecularColour).xyz(), In(mSurfaceShininess),
@@ -395,9 +380,10 @@ void FFPLighting::addIlluminationInvocation(const LightParams* curLightParams, c
         else
         {
             stage.callFunction(SGX_FUNC_LIGHT_SPOT_DIFFUSE,
-                               {In(mViewNormal), In(curLightParams->mToLight), In(curLightParams->mPSInDirection).xyz(),
-                                In(curLightParams->mAttenuatParams), In(curLightParams->mSpotParams).xyz(),
-                                In(curLightParams->mDiffuseColour).xyz(), InOut(mOutDiffuse).xyz()});
+                               {In(mViewNormal), In(mViewPos), In(curLightParams->mPosition).xyz(),
+                                In(curLightParams->mPSInDirection).xyz(), In(curLightParams->mAttenuatParams),
+                                In(curLightParams->mSpotParams).xyz(), In(curLightParams->mDiffuseColour).xyz(),
+                                InOut(mOutDiffuse).xyz()});
         }
         break;
     }
