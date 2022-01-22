@@ -120,6 +120,8 @@ namespace Ogre
          @param vao The vertex array object ID.
          */
         void bindGLVertexArray(GLuint vao);
+
+        void deleteGLVertexArray(GLuint vao);
         
         /** Bind an OpenGL texture of any type.
          @param target The texture target.

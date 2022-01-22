@@ -271,6 +271,20 @@ namespace Ogre {
 #endif
     }
 
+    void GL3PlusStateCacheManager::deleteGLVertexArray(GLuint vao)
+    {
+#ifdef OGRE_ENABLE_STATE_CACHE_CRITICAL
+        if(mActiveVertexArray == vao)
+        {
+            mActiveVertexArray = 0;
+            //we also need to clear the cached GL_ELEMENT_ARRAY_BUFFER value, as it is invalidated by glBindVertexArray
+            mActiveBufferMap[GL_ELEMENT_ARRAY_BUFFER] = 0;
+        }
+#else
+        OGRE_CHECK_GL_ERROR(glDeleteVertexArrays(1, &vao));
+#endif
+    }
+
     void GL3PlusStateCacheManager::invalidateStateForTexture(GLuint texture)
     {
 #ifdef OGRE_ENABLE_STATE_CACHE

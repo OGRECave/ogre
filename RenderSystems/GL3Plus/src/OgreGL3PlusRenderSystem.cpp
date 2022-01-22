@@ -1474,7 +1474,7 @@ namespace Ogre {
         if(context != mCurrentContext)
             context->_getVaoDeferredForDestruction().push_back(vao);
         else
-            OGRE_CHECK_GL_ERROR(glDeleteVertexArrays(1, &vao));
+            _getStateCacheManager()->deleteGLVertexArray(vao);
     }
 
     void GL3PlusRenderSystem::_destroyFbo(GLContext* context, uint32 fbo)
