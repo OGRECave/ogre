@@ -639,7 +639,7 @@ namespace Ogre
     //---------------------------------------------------------------------
     D3D11RenderTexture::~D3D11RenderTexture()
     {
-        if (mDepthBuffer)
+        if (mDepthBuffer && PixelUtil::isDepth (mBuffer->getFormat ()))
             delete mDepthBuffer;
     }
 
