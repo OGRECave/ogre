@@ -546,8 +546,8 @@ namespace Ogre {
 
             while( itor != end )
             {
-//                if( bCleanManualBuffers || !(*itor)->isManual() )
-  //                  delete *itor;
+                if( bCleanManualBuffers || !(*itor)->isManual() )
+                    delete *itor;
                 ++itor;
             }
 
