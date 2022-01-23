@@ -72,7 +72,8 @@ struct OgreIOStream : public Assimp::IOStream
 
     size_t Read(void* pvBuffer, size_t pSize, size_t pCount)
     {
-        return stream->read(pvBuffer, pSize * pCount);
+        size_t bytes = stream->read(pvBuffer, pSize * pCount);
+        return bytes / pSize;
     }
     size_t Tell() const { return stream->tell(); }
     size_t FileSize() const { return stream->size(); }
@@ -111,8 +112,12 @@ struct OgreIOSystem : public Assimp::IOSystem
         String file = StringUtil::normalizeFilePath(pFile, false);
         DataStreamPtr res;
         if (file == source->getName())
+        {
             res = source;
-
+            // glTF2 importer wants to open files multiple times
+            // while this is not fully correct, this makes it happy
+            source->seek(0);
+        }
         if (!res)
             res = ResourceGroupManager::getSingleton().openResource(file, _group, NULL, false);
 
@@ -353,6 +358,10 @@ bool AssimpLoader::_load(const char* name, Assimp::Importer& importer, Mesh* mes
 {
     uint32 flags = aiProcessPreset_TargetRealtime_Fast | aiProcess_TransformUVCoords | aiProcess_FlipUVs;
     flags &= ~(aiProcess_JoinIdenticalVertices | aiProcess_CalcTangentSpace); // optimize for fast loading
+
+    if(StringUtil::endsWith(name, ".gltf") || StringUtil::endsWith(name, ".glb"))
+        flags |= aiProcess_JoinIdenticalVertices;
+
     flags |= options.postProcessSteps;
     importer.SetPropertyFloat("PP_GSN_MAX_SMOOTHING_ANGLE", options.maxEdgeAngle);
     const aiScene* scene = importer.ReadFile(name, flags);
