@@ -602,7 +602,7 @@ namespace Ogre
         D3D11RenderSystem* rs = (D3D11RenderSystem*)Root::getSingleton().getRenderSystem();
         mDepthBuffer =
             new D3D11DepthBuffer(DepthBuffer::POOL_NO_DEPTH, rs, depthStencilView, mWidth, mHeight,
-                                 BBDesc.SampleDesc.Count, BBDesc.SampleDesc.Quality, true);
+                                 BBDesc.SampleDesc.Count, BBDesc.SampleDesc.Quality, false);
         mDepthBuffer->_notifyRenderTargetAttached(this);
     }
 
@@ -629,7 +629,10 @@ namespace Ogre
     //---------------------------------------------------------------------
     D3D11RenderTexture::~D3D11RenderTexture()
     {
+        if (mDepthBuffer && PixelUtil::isDepth (mBuffer->getFormat ()))
+            delete mDepthBuffer;
     }
+
     //---------------------------------------------------------------------
     void D3D11RenderTexture::notifyDeviceLost(D3D11Device* device)
     {
