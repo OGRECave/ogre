@@ -7,6 +7,10 @@ target_include_directories(Codec_Assimp PUBLIC
     $<INSTALL_INTERFACE:include/OGRE/Plugins/Assimp>)
 target_link_libraries(Codec_Assimp PUBLIC OgreMain fix::assimp)
 
+if(OGRE_BUILD_COMPONENT_RTSHADERSYSTEM)
+    target_link_libraries(Codec_Assimp PUBLIC OgreRTShaderSystem)
+endif()
+
 ogre_config_framework(Codec_Assimp)
 ogre_config_plugin(Codec_Assimp)
 generate_export_header(Codec_Assimp

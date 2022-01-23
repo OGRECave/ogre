@@ -46,6 +46,10 @@ THE SOFTWARE.
 
 #include <OgreCodec.h>
 
+#ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
+#include <OgreShaderGenerator.h>
+#endif
+
 namespace Ogre
 {
 
@@ -943,6 +947,8 @@ MaterialPtr AssimpLoader::createMaterial(const aiMaterial* mat, const Ogre::Stri
         }
     }
 
+    String basename;
+    String outPath;
     if (mat->GetTexture(type, 0, &path) == AI_SUCCESS)
     {
         if (!mQuietMode)
@@ -950,23 +956,68 @@ MaterialPtr AssimpLoader::createMaterial(const aiMaterial* mat, const Ogre::Stri
             LogManager::getSingleton().logMessage("Found texture " + String(path.data) + " for channel " +
                                                   StringConverter::toString(uvindex));
         }
-        if (AI_SUCCESS == aiGetMaterialString(mat, AI_MATKEY_TEXTURE_DIFFUSE(0), &szPath))
-        {
-            if (!mQuietMode)
-            {
-                LogManager::getSingleton().logMessage("Using aiGetMaterialString : Found texture " +
-                                                      String(szPath.data) + " for channel " +
-                                                      StringConverter::toString(uvindex));
-            }
-        }
 
-        String basename;
-        String outPath;
-        StringUtil::splitFilename(String(szPath.data), basename, outPath);
+        StringUtil::splitFilename(String(path.data), basename, outPath);
         omat->getTechnique(0)->getPass(0)->createTextureUnitState(basename);
 
         // TODO: save embedded images to file
     }
+
+    if (mat->GetTexture(aiTextureType_EMISSIVE, 0, &path) == AI_SUCCESS)
+    {
+        if (!mQuietMode)
+        {
+            LogManager::getSingleton().logMessage("Found emissive map: " + String(path.data));
+        }
+
+        StringUtil::splitFilename(String(path.data), basename, outPath);
+        auto tus = omat->getTechnique(0)->getPass(0)->createTextureUnitState(basename);
+        tus->setColourOperation(LBO_ADD);
+    }
+
+#ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
+    auto& dstScheme = RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME;
+    auto shaderGen = RTShader::ShaderGenerator::getSingletonPtr();
+
+    if(!shaderGen)
+        return omat;
+
+    if (mat->GetTexture(aiTextureType_NORMALS, 0, &path) == AI_SUCCESS)
+    {
+        if (!mQuietMode)
+        {
+            LogManager::getSingleton().logMessage("Found normal map: " + String(path.data));
+        }
+
+        shaderGen->createShaderBasedTechnique(omat->getTechnique(0), dstScheme);
+        auto rs = shaderGen->getRenderState(dstScheme, *omat, 0);
+        auto srs = shaderGen->createSubRenderState("NormalMap");
+
+        StringUtil::splitFilename(String(path.data), basename, outPath);
+        srs->setParameter("texture", basename);
+        rs->addTemplateSubRenderState(srs);
+    }
+
+    if (mat->GetTexture(aiTextureType_UNKNOWN, 0, &path) == AI_SUCCESS)
+    {
+        if (!mQuietMode)
+        {
+            LogManager::getSingleton().logMessage("Found metal roughness map: " + String(path.data));
+        }
+
+        shaderGen->createShaderBasedTechnique(omat->getTechnique(0), dstScheme);
+        auto rs = shaderGen->getRenderState(dstScheme, *omat, 0);
+        auto srs = shaderGen->createSubRenderState("CookTorranceLighting");
+
+        StringUtil::splitFilename(String(path.data), basename, outPath);
+        srs->setParameter("metal_roughness_map", basename);
+        rs->addTemplateSubRenderState(srs);
+
+        srs = shaderGen->createSubRenderState("FFP_Texturing");
+        srs->setParameter("late_add_blend", "true");
+        rs->addTemplateSubRenderState(srs);
+    }
+#endif
 
     return omat;
 }
