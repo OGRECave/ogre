@@ -1500,7 +1500,6 @@ void SceneManager::ShadowRenderer::initShadowVolumeMaterials()
     if (!mFullScreenQuad)
     {
         mFullScreenQuad = mSceneManager->createScreenSpaceRect();
-        mFullScreenQuad->setCorners(-1,1,1,-1);
     }
 
     // Also init shadow caster material for texture shadows
