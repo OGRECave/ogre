@@ -70,7 +70,7 @@ namespace Ogre {
 
                 break;
             }
-            
+
             if(program->getType() == GPT_FRAGMENT_PROGRAM && mGLSLVersion > 100)
             {
                 // sampler3D has no default precision
