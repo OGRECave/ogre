@@ -258,7 +258,7 @@ namespace Ogre
         /** Add a new request to the queue.
         @param channel The channel this request will go into = 0; the channel is the top-level
             categorisation of the request
-        @param requestType An identifier that's unique within this queue which
+        @param requestType An identifier that's unique within this channel which
             identifies the type of the request (user decides the actual value)
         @param rData The data required by the request process. 
         @param retryCount The number of times the request should be retried
