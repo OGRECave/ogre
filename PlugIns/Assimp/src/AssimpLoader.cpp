@@ -1010,7 +1010,7 @@ MaterialPtr AssimpLoader::createMaterial(const aiMaterial* mat, const Ogre::Stri
         auto srs = shaderGen->createSubRenderState("CookTorranceLighting");
 
         StringUtil::splitFilename(String(path.data), basename, outPath);
-        srs->setParameter("metal_roughness_map", basename);
+        srs->setParameter("texture", basename);
         rs->addTemplateSubRenderState(srs);
 
         srs = shaderGen->createSubRenderState("FFP_Texturing");
