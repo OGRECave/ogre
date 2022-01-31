@@ -83,12 +83,22 @@ bool CookTorranceLighting::createCpuSubPrograms(ProgramSet* programSet)
     }
 
     // add the lighting computation
-    auto metalRoughnessSampler =
-        psProgram->resolveParameter(GCT_SAMPLER2D, "metalRoughnessSampler", mMRMapSamplerIndex);
-    auto mrSample = psMain->resolveLocalParameter(GCT_FLOAT4, "mrSample");
-    // Roughness is stored in the 'g' channel, metallic is stored in the 'b' channel.
-    // This layout intentionally reserves the 'r' channel for (optional) occlusion map data
-    fstage.sampleTexture(metalRoughnessSampler, psInTexcoord, mrSample);
+    In mrparams(ParameterPtr(NULL));
+    if(!mMetalRoughnessMapName.empty())
+    {
+        auto metalRoughnessSampler =
+            psProgram->resolveParameter(GCT_SAMPLER2D, "metalRoughnessSampler", mMRMapSamplerIndex);
+        auto mrSample = psMain->resolveLocalParameter(GCT_FLOAT4, "mrSample");
+        // Roughness is stored in the 'g' channel, metallic is stored in the 'b' channel.
+        // This layout intentionally reserves the 'r' channel for (optional) occlusion map data
+        fstage.sampleTexture(metalRoughnessSampler, psInTexcoord, mrSample);
+        mrparams = In(mrSample).mask(Operand::OPM_YZ);
+    }
+    else
+    {
+        auto specular = psProgram->resolveParameter(GpuProgramParameters::ACT_SURFACE_SPECULAR_COLOUR);
+        mrparams = In(specular).xy();
+    }
 
     auto litResult = psMain->resolveLocalParameter(GCT_FLOAT3, "litResult");
     fstage.assign(Vector3(0), litResult);
@@ -103,7 +113,7 @@ bool CookTorranceLighting::createCpuSubPrograms(ProgramSet* programSet)
 
         fstage.callFunction("PBR_Light", {In(viewNormal), In(viewPos), In(lightPos), In(lightDiffuse).xyz(),
                                           In(pointParams), In(lightDirView), In(spotParams), In(outDiffuse).xyz(),
-                                          In(mrSample).mask(Operand::OPM_YZ), InOut(litResult)});
+                                          mrparams, InOut(litResult)});
     }
 
     fstage.assign(litResult, Out(outDiffuse).xyz());
@@ -128,6 +138,9 @@ bool CookTorranceLighting::preAddToRenderState(const RenderState* renderState, P
     auto lightsPerType = renderState->getLightCount();
     mLightCount = lightsPerType[0] + lightsPerType[1] + lightsPerType[2];
 
+    if(mMetalRoughnessMapName.empty())
+        return true;
+
     dstPass->createTextureUnitState(mMetalRoughnessMapName);
     mMRMapSamplerIndex = dstPass->getNumTextureUnitStates() - 1;
 
@@ -136,7 +149,7 @@ bool CookTorranceLighting::preAddToRenderState(const RenderState* renderState, P
 
 bool CookTorranceLighting::setParameter(const String& name, const String& value)
 {
-    if (name == "metal_roughness_map")
+    if (name == "texture")
     {
         mMetalRoughnessMapName = value;
         return true;
@@ -152,32 +165,37 @@ const String& CookTorranceLightingFactory::getType() const { return CookTorrance
 SubRenderState* CookTorranceLightingFactory::createInstance(ScriptCompiler* compiler, PropertyAbstractNode* prop,
                                                             Pass* pass, SGScriptTranslator* translator)
 {
-    if (prop->name == "lighting_stage" && prop->values.size() == 2)
+    if (prop->name == "lighting_stage" && prop->values.size() >= 1)
     {
         String strValue;
         AbstractNodeList::const_iterator it = prop->values.begin();
 
         // Read light model type.
-        if (false == SGScriptTranslator::getString(*it, &strValue))
+        if (!SGScriptTranslator::getString(*it++, &strValue) || strValue != "metal_roughness")
         {
             compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
             return NULL;
         }
 
-        // Case light model type is metal_roughness map
-        if (strValue == "metal_roughness_map")
-        {
-            ++it;
-            if (false == SGScriptTranslator::getString(*it, &strValue))
-            {
-                compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
-                return NULL;
-            }
+        auto subRenderState = createOrRetrieveInstance(translator);
 
-            auto subRenderState = createOrRetrieveInstance(translator);
-            subRenderState->setParameter("metal_roughness_map", strValue);
+        if(prop->values.size() == 1)
+            return subRenderState;
+
+        if (!SGScriptTranslator::getString(*it++, &strValue) || strValue != "texture")
+        {
+            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
             return subRenderState;
         }
+
+        if (false == SGScriptTranslator::getString(*it, &strValue))
+        {
+            compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
+            return subRenderState;
+        }
+
+        subRenderState->setParameter("texture", strValue);
+        return subRenderState;
     }
 
     return NULL;
@@ -190,7 +208,10 @@ void CookTorranceLightingFactory::writeInstance(MaterialSerializer* ser, SubRend
     auto ctSubRenderState = static_cast<CookTorranceLighting*>(subRenderState);
 
     ser->writeAttribute(4, "lighting_stage");
-    ser->writeValue("metal_roughness_map");
+    ser->writeValue("metal_roughness");
+    if(ctSubRenderState->getMetalRoughnessMapName().empty())
+        return;
+    ser->writeValue("texture");
     ser->writeValue(ctSubRenderState->getMetalRoughnessMapName());
 }
 

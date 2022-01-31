@@ -31,7 +31,7 @@ Here are the attributes you can use in a `rtshader_system` block of a `pass {}`:
 - [lighting_stage](#lighting_stage)
 - [gbuffer](#gbuffer)
 - [normal_map](#normal_map)
-- [metal_roughness_map](#metal_roughness_map)
+- [metal_roughness](#metal_roughness)
 - [fog_stage](#fog_stage)
 - [light_count](#light_count)
 - [triplanarTexturing](#triplanarTexturing)
@@ -98,18 +98,20 @@ Example: `lighting_stage normal_map Panels_Normal_Tangent.png tangent_space 0 Sa
 @see Ogre::RTShader::NormalMapLighting::NormalMapSpace
 @see @ref Samplers
 
-<a name="metal_roughness_map"></a>
+<a name="metal_roughness"></a>
 
-## metal_roughness_map
+## metal_roughness
 
-Use a metal roughness map for lighting computations.
+Use metal roughness parametrisation for lighting computations.
+
+By default, metalness is read from `specular[0]` and roughness from `specular[1]`.
 
 @par
-Format: `lighting_stage metal_roughness_map <texturename>`
+Format: `lighting_stage metal_roughness [texture <texturename>]`
 @par
-Example: `lighting_stage metal_roughness_map Default_metalRoughness.jpg`
+Example: `lighting_stage metal_roughness texture Default_metalRoughness.jpg`
 
-@param texturename normal map to use with @c metal_roughness_map.
+@param texturename texture for spatially varying parametrization.
 [In accordance to the glTF2.0 specification](https://www.khronos.org/registry/glTF/specs/2.0/glTF-2.0.html#_material_pbrmetallicroughness_metallicroughnesstexture), metalness is sampled from the B channel and roughness from the G channel.
 
 @note Using this option switches the lighting equations from Blinn-Phong to the Cook-Torrance PBR model [using the equations described by Filament](https://google.github.io/filament/Filament.html#materialsystem/standardmodelsummary).

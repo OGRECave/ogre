@@ -1479,3 +1479,36 @@ material DebugSphere1000
 	{			
 	}
 }
+
+material Examples/WoodenFloor
+{
+	technique
+	{
+		pass
+		{
+			texture_unit
+			{
+				texture WoodFloor043_1K_Color.jpg
+			}
+			rtshader_system
+			{
+                lighting_stage metal_roughness texture WoodFloor043_1K_MetalRoughness.jpg
+                lighting_stage normal_map WoodFloor043_1K_NormalGL.jpg
+			}
+		}
+	}
+}
+
+material Examples/PBR_Sphere
+{
+	technique
+	{
+		pass
+		{
+			rtshader_system
+			{
+                lighting_stage metal_roughness
+			}
+		}
+	}
+}

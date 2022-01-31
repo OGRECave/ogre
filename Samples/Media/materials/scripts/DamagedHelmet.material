@@ -45,7 +45,7 @@ material DamagedHelmet_RTSS {
             // additional maps - requires RTSS
             rtshader_system
             {
-                lighting_stage metal_roughness_map Default_metalRoughness.jpg
+                lighting_stage metal_roughness texture Default_metalRoughness.jpg
                 lighting_stage normal_map Default_normal.jpg
                 texturing_stage late_add_blend // needed for emissive to work
             }
