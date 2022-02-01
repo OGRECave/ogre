@@ -48,6 +48,11 @@ vec4 texture2DLod(sampler2D s, vec2 v, float lod) { return tex2Dlod(s, vec4(v.x,
 #define mix lerp
 #define fract frac
 
+float mod(float _a, float _b) { return _a - _b * floor(_a / _b); }
+vec2  mod(vec2  _a, vec2  _b) { return _a - _b * floor(_a / _b); }
+vec3  mod(vec3  _a, vec3  _b) { return _a - _b * floor(_a / _b); }
+vec4  mod(vec4  _a, vec4  _b) { return _a - _b * floor(_a / _b); }
+
 vec2 vec2_splat(float x) { return vec2(x, x); }
 vec3 vec3_splat(float x) { return vec3(x, x, x); }
 vec4 vec4_splat(float x) { return vec4(x, x, x, x); }
