@@ -327,7 +327,7 @@ namespace Ogre
         outStream << "MAIN_PARAMETERS\n"
                      "IN(vec4 oPosObj, TEXCOORD0)\n";
         uint texCoordSet = 1;
-        outStream << "IN(highp vec4 oUVMisc, TEXCOORD" << texCoordSet++ << ")\n";
+        outStream << "IN(f32vec4 oUVMisc, TEXCOORD" << texCoordSet++ << ")\n";
 
         if (prof->getParent()->getDebugLevel() && tt != RENDER_COMPOSITE_MAP)
         {
@@ -345,7 +345,7 @@ namespace Ogre
         outStream << "MAIN_DECLARATION\n"
             "{\n"
             "    float shadow = 1.0;\n"
-            "    highp vec2 uv = oUVMisc.xy;\n"
+            "    f32vec2 uv = oUVMisc.xy;\n"
             // base colour
             "    gl_FragColor = vec4(0,0,0,1);\n";
 

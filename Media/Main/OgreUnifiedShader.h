@@ -163,8 +163,15 @@ mat3 mtxFromCols(vec3 a, vec3 b, vec3 c)
 
 #define OGRE_UNIFORMS(params) OGRE_UNIFORMS_BEGIN params OGRE_UNIFORMS_END
 
-#ifndef OGRE_GLSLES
-#define highp
-#define mediump
-#define lowp
+// GL_EXT_shader_explicit_arithmetic_types polyfill
+#ifdef OGRE_GLSLES
+#define float32_t highp float
+#define f32vec2 highp vec2
+#define f32vec3 highp vec3
+#define f32vec4 highp vec4
+#else
+#define float32_t float
+#define f32vec2 vec2
+#define f32vec3 vec3
+#define f32vec4 vec4
 #endif
