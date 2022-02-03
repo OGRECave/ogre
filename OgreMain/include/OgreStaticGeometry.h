@@ -352,10 +352,6 @@ namespace Ogre {
         private:
             /// Parent static geometry
             StaticGeometry* mParent;
-            /// Scene manager link
-            SceneManager* mSceneMgr;
-            /// Scene node
-            SceneNode* mNode;
             /// Local list of queued meshes (not used for deallocation)
             QueuedSubMeshList mQueuedSubMeshes;
             /// Unique identifier for the region
