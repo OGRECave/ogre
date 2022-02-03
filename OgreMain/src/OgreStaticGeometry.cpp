@@ -677,19 +677,19 @@ namespace Ogre {
     //--------------------------------------------------------------------------
     StaticGeometry::Region::Region(StaticGeometry* parent, const String& name,
         SceneManager* mgr, uint32 regionID, const Vector3& centre)
-        : MovableObject(name), mParent(parent), mSceneMgr(mgr), mNode(0),
+        : MovableObject(name), mParent(parent),
         mRegionID(regionID), mCentre(centre), mBoundingRadius(0.0f),
         mCurrentLod(0), mLodStrategy(0), mCamera(0), mSquaredViewDepth(0)
     {
+        mManager = mgr;
     }
     //--------------------------------------------------------------------------
     StaticGeometry::Region::~Region()
     {
-        if (mNode)
+        if (mParentNode)
         {
-            mNode->getParentSceneNode()->removeChild(mNode);
-            mSceneMgr->destroySceneNode(mNode->getName());
-            mNode = 0;
+            mManager->destroySceneNode(static_cast<SceneNode*>(mParentNode));
+            mParentNode = 0;
         }
         // delete
         for (LODBucketList::iterator i = mLodBucketList.begin();
@@ -771,9 +771,7 @@ namespace Ogre {
     void StaticGeometry::Region::build(bool stencilShadows)
     {
         // Create a node
-        mNode = mSceneMgr->getRootSceneNode()->createChildSceneNode(mName,
-            mCentre);
-        mNode->attachObject(this);
+        mManager->getRootSceneNode()->createChildSceneNode(mCentre)->attachObject(this);
         // We need to create enough LOD buckets to deal with the highest LOD
         // we encountered in all the meshes queued
         for (ushort lod = 0; lod < mLodValues.size(); ++lod)
