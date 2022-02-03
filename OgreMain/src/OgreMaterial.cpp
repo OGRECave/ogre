@@ -193,6 +193,14 @@ namespace Ogre {
         newMat->mName = newName;
         newMat->mHandle = newHandle;
 
+        //if we're cloning from a loaded material, notify the creator or otherwise size won't be right
+        if (newMat->getLoadingState() == LOADSTATE_LOADED)
+        {
+            // Notify manager
+            if (mCreator)
+                mCreator->_notifyResourceLoaded(newMat.get());
+        }
+
         return newMat;
     }
     //-----------------------------------------------------------------------
