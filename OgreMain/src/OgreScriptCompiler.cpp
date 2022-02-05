@@ -238,7 +238,7 @@ namespace Ogre
         case CE_OBJECTNAMEEXPECTED:
             return "object name expected";
         case CE_OBJECTALLOCATIONERROR:
-            return "object allocation error";
+            return "no object created";
         case CE_OBJECTBASENOTFOUND:
             return "base object not found";
         case CE_INVALIDPARAMETERS:

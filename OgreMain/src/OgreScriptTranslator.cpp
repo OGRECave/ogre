@@ -1103,18 +1103,12 @@ namespace Ogre{
         if(!processed)
         {
             mMaterial = MaterialManager::getSingleton().create(obj->name, compiler->getResourceGroup()).get();
-
-            if(!mMaterial) // duplicate definition resolved by "use previous"
-                return;
         }
-        else
+
+        if(!mMaterial)
         {
-            if(!mMaterial)
-            {
-                compiler->addError(ScriptCompiler::CE_OBJECTALLOCATIONERROR, obj->file, obj->line,
-                                   "failed to find or create material \"" + obj->name + "\"");
-                return;
-            }
+            compiler->addError(ScriptCompiler::CE_OBJECTALLOCATIONERROR, obj->file, obj->line, obj->name);
+            return;
         }
 
         mMaterial->removeAllTechniques();
@@ -3684,11 +3678,9 @@ namespace Ogre{
                 prog->setSourceFile(source);
         }
 
-        // Check that allocation worked
-        if(prog == 0)
+        if(!prog)
         {
-            compiler->addError(ScriptCompiler::CE_OBJECTALLOCATIONERROR, obj->file, obj->line,
-                               "GPU program \"" + obj->name + "\" could not be created");
+            compiler->addError(ScriptCompiler::CE_OBJECTALLOCATIONERROR, obj->file, obj->line, obj->name);
             return;
         }
 
@@ -4303,7 +4295,7 @@ namespace Ogre{
 
         if (!sharedParams)
         {
-            compiler->addError(ScriptCompiler::CE_OBJECTALLOCATIONERROR, obj->file, obj->line);
+            compiler->addError(ScriptCompiler::CE_OBJECTALLOCATIONERROR, obj->file, obj->line, obj->name);
             return;
         }
 
@@ -4464,7 +4456,7 @@ namespace Ogre{
 
         if(!mSystem)
         {
-            compiler->addError(ScriptCompiler::CE_OBJECTALLOCATIONERROR, obj->file, obj->line);
+            compiler->addError(ScriptCompiler::CE_OBJECTALLOCATIONERROR, obj->file, obj->line, obj->name);
             return;
         }
 
@@ -4727,9 +4719,9 @@ namespace Ogre{
             mCompositor = CompositorManager::getSingleton().create(obj->name, compiler->getResourceGroup()).get();
         }
 
-        if(mCompositor == 0)
+        if(!mCompositor)
         {
-            compiler->addError(ScriptCompiler::CE_OBJECTALLOCATIONERROR, obj->file, obj->line);
+            compiler->addError(ScriptCompiler::CE_OBJECTALLOCATIONERROR, obj->file, obj->line, obj->name);
             return;
         }
 
