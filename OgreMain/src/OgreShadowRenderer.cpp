@@ -923,15 +923,13 @@ void SceneManager::ShadowRenderer::renderShadowVolumesToStencil(const Light* lig
     // Do we have access to vertex programs?
     bool extrudeInSoftware = true;
     bool finiteExtrude = !mShadowUseInfiniteFarPlane;
-    if (ShadowVolumeExtrudeProgram::frgProgram->isSupported())
+    if (const auto& fprog = mShadowStencilPass->getFragmentProgram())
     {
         extrudeInSoftware = false;
         // attach the appropriate extrusion vertex program
         // Note we never unset it because support for vertex programs is constant
-        mShadowStencilPass->setGpuProgram(
-            GPT_VERTEX_PROGRAM, ShadowVolumeExtrudeProgram::get(light->getType(), finiteExtrude),
-            false);
-        mShadowStencilPass->setGpuProgram(GPT_FRAGMENT_PROGRAM, ShadowVolumeExtrudeProgram::frgProgram);
+        mShadowStencilPass->setGpuProgram(GPT_VERTEX_PROGRAM,
+                                          ShadowVolumeExtrudeProgram::get(light->getType(), finiteExtrude), false);
         // Set params
         if (finiteExtrude)
         {
@@ -943,11 +941,8 @@ void SceneManager::ShadowRenderer::renderShadowVolumesToStencil(const Light* lig
         }
         if (mDebugShadows)
         {
-            mShadowDebugPass->setGpuProgram(
-                GPT_VERTEX_PROGRAM,
-                ShadowVolumeExtrudeProgram::get(light->getType(), finiteExtrude, true), false);
-            mShadowDebugPass->setGpuProgram(GPT_FRAGMENT_PROGRAM, ShadowVolumeExtrudeProgram::frgProgram);
-
+            mShadowDebugPass->setGpuProgram(GPT_VERTEX_PROGRAM,
+                                            ShadowVolumeExtrudeProgram::get(light->getType(), finiteExtrude), false);
 
             // Set params
             if (finiteExtrude)
@@ -961,11 +956,7 @@ void SceneManager::ShadowRenderer::renderShadowVolumesToStencil(const Light* lig
         }
 
         mSceneManager->bindGpuProgram(mShadowStencilPass->getVertexProgram()->_getBindingDelegate());
-        if (ShadowVolumeExtrudeProgram::frgProgram)
-        {
-            mSceneManager->bindGpuProgram(mShadowStencilPass->getFragmentProgram()->_getBindingDelegate());
-        }
-
+        mSceneManager->bindGpuProgram(fprog->_getBindingDelegate());
     }
     else
     {
@@ -1341,149 +1332,24 @@ void SceneManager::ShadowRenderer::initShadowVolumeMaterials()
 
     if (!mShadowDebugPass)
     {
-        MaterialPtr matDebug =
-            MaterialManager::getSingleton().getByName("Ogre/Debug/ShadowVolumes");
-        if (!matDebug)
-        {
-            // Create
-            matDebug = MaterialManager::getSingleton().create(
-                "Ogre/Debug/ShadowVolumes",
-                ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME);
-            mShadowDebugPass = matDebug->getTechnique(0)->getPass(0);
-            mShadowDebugPass->setSceneBlending(SBT_ADD);
-            mShadowDebugPass->setLightingEnabled(false);
-            mShadowDebugPass->setDepthWriteEnabled(false);
-            mShadowDebugPass->setCullingMode(CULL_NONE);
-
-            ShadowVolumeExtrudeProgram::initialise();
-            if (ShadowVolumeExtrudeProgram::frgProgram->isSupported())
-            {
-                // Enable the (infinite) point light extruder for now, just to get some params
-                mShadowDebugPass->setGpuProgram(
-                    GPT_VERTEX_PROGRAM, ShadowVolumeExtrudeProgram::get(Light::LT_POINT, false));
-                mShadowDebugPass->setGpuProgram(GPT_FRAGMENT_PROGRAM, ShadowVolumeExtrudeProgram::frgProgram);
-                msInfiniteExtrusionParams =
-                    mShadowDebugPass->getVertexProgramParameters();
-                msInfiniteExtrusionParams->setAutoConstant(0,
-                    GpuProgramParameters::ACT_WORLDVIEWPROJ_MATRIX);
-                msInfiniteExtrusionParams->setAutoConstant(4,
-                    GpuProgramParameters::ACT_LIGHT_POSITION_OBJECT_SPACE);
-                // Note ignored extra parameter - for compatibility with finite extrusion vertex program
-                msInfiniteExtrusionParams->setAutoConstant(5,
-                    GpuProgramParameters::ACT_SHADOW_EXTRUSION_DISTANCE);
-
-                try {
-                    msInfiniteExtrusionParams->setNamedAutoConstant(
-                        "worldviewproj_matrix",
-                        GpuProgramParameters::ACT_WORLDVIEWPROJ_MATRIX);
-                    msInfiniteExtrusionParams->setNamedAutoConstant(
-                        "light_position_object_space",
-                        GpuProgramParameters::ACT_LIGHT_POSITION_OBJECT_SPACE);
-                } catch(InvalidParametersException&) {} // ignore
-            }
-            matDebug->compile();
-
-        }
-        else
-        {
-            mShadowDebugPass = matDebug->getTechnique(0)->getPass(0);
-
-            if (mShadowDebugPass->isProgrammable())
-            {
-                msInfiniteExtrusionParams = mShadowDebugPass->getVertexProgramParameters();
-            }
-        }
+        ShadowVolumeExtrudeProgram::initialise();
+        MaterialPtr matDebug = MaterialManager::getSingleton().getByName("Ogre/Debug/ShadowVolumes");
+        mShadowDebugPass = matDebug->getTechnique(0)->getPass(0);
+        msInfiniteExtrusionParams = mShadowDebugPass->getVertexProgramParameters();
     }
 
     if (!mShadowStencilPass)
     {
-
-        MaterialPtr matStencil = MaterialManager::getSingleton().getByName(
-            "Ogre/StencilShadowVolumes");
-        if (!matStencil)
-        {
-            // Init
-            matStencil = MaterialManager::getSingleton().create(
-                "Ogre/StencilShadowVolumes",
-                ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME);
-            mShadowStencilPass = matStencil->getTechnique(0)->getPass(0);
-
-            if (ShadowVolumeExtrudeProgram::frgProgram->isSupported())
-            {
-
-                // Enable the finite point light extruder for now, just to get some params
-                mShadowStencilPass->setGpuProgram(
-                    GPT_VERTEX_PROGRAM, ShadowVolumeExtrudeProgram::get(Light::LT_POINT, true));
-                mShadowStencilPass->setGpuProgram(GPT_FRAGMENT_PROGRAM, ShadowVolumeExtrudeProgram::frgProgram);
-                msFiniteExtrusionParams =
-                    mShadowStencilPass->getVertexProgramParameters();
-                msFiniteExtrusionParams->setAutoConstant(0,
-                    GpuProgramParameters::ACT_WORLDVIEWPROJ_MATRIX);
-                msFiniteExtrusionParams->setAutoConstant(4,
-                    GpuProgramParameters::ACT_LIGHT_POSITION_OBJECT_SPACE);
-                // Note extra parameter
-                msFiniteExtrusionParams->setAutoConstant(5,
-                    GpuProgramParameters::ACT_SHADOW_EXTRUSION_DISTANCE);
-
-                try {
-                    msFiniteExtrusionParams->setNamedAutoConstant(
-                        "worldviewproj_matrix",
-                        GpuProgramParameters::ACT_WORLDVIEWPROJ_MATRIX);
-                    msFiniteExtrusionParams->setNamedAutoConstant(
-                        "light_position_object_space",
-                        GpuProgramParameters::ACT_LIGHT_POSITION_OBJECT_SPACE);
-                    msFiniteExtrusionParams->setNamedAutoConstant(
-                        "shadow_extrusion_distance",
-                        GpuProgramParameters::ACT_SHADOW_EXTRUSION_DISTANCE);
-                } catch(InvalidParametersException&) {} // ignore
-            }
-            matStencil->compile();
-            // Nothing else, we don't use this like a 'real' pass anyway,
-            // it's more of a placeholder
-        }
-        else
-        {
-            mShadowStencilPass = matStencil->getTechnique(0)->getPass(0);
-
-            if (!msFiniteExtrusionParams && mShadowStencilPass->isProgrammable())
-            {
-                msFiniteExtrusionParams = mShadowStencilPass->getVertexProgramParameters();
-            }
-        }
+        MaterialPtr matStencil = MaterialManager::getSingleton().getByName("Ogre/StencilShadowVolumes");
+        mShadowStencilPass = matStencil->getTechnique(0)->getPass(0);
+        msFiniteExtrusionParams = mShadowStencilPass->getVertexProgramParameters();
     }
-
-
-
 
     if (!mShadowModulativePass)
     {
-    MaterialPtr matModStencil = MaterialManager::getSingleton().getByName(
-        "Ogre/StencilShadowModulationPass");
-    if (!matModStencil)
-    {
-        // Init
-        matModStencil = MaterialManager::getSingleton().create(
-            "Ogre/StencilShadowModulationPass",
-            ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME);
-        mShadowModulativePass = matModStencil->getTechnique(0)->getPass(0);
-        mShadowModulativePass->setSceneBlending(SBF_DEST_COLOUR, SBF_ZERO);
-        mShadowModulativePass->setLightingEnabled(false);
-        mShadowModulativePass->setDepthWriteEnabled(false);
-        mShadowModulativePass->setDepthCheckEnabled(false);
-        mShadowModulativePass->createTextureUnitState();
-
-
-        mShadowModulativePass->setCullingMode(CULL_NONE);
-
-        mShadowModulativePass->setVertexProgram("Ogre/ShadowBlendVP");
-        mShadowModulativePass->setFragmentProgram("Ogre/ShadowBlendFP");
+        MaterialPtr matModStencil = MaterialManager::getSingleton().getByName("Ogre/StencilShadowModulationPass");
         matModStencil->load();
-    }
-    else
-    {
         mShadowModulativePass = matModStencil->getTechnique(0)->getPass(0);
-    }
-
     }
 
     // Also init full screen quad while we're at it
@@ -1495,34 +1361,9 @@ void SceneManager::ShadowRenderer::initShadowVolumeMaterials()
     // Also init shadow caster material for texture shadows
     if (!mShadowCasterPlainBlackPass)
     {
-        MaterialPtr matPlainBlack = MaterialManager::getSingleton().getByName(
-            "Ogre/TextureShadowCaster");
-        if (!matPlainBlack)
-        {
-            matPlainBlack = MaterialManager::getSingleton().create(
-                "Ogre/TextureShadowCaster",
-                ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME);
-            matPlainBlack->setReceiveShadows(false);
-            mShadowCasterPlainBlackPass = matPlainBlack->getTechnique(0)->getPass(0);
-            // Lighting has to be on, because we need shadow coloured objects
-            // Note that because we can't predict vertex programs, we'll have to
-            // bind light values to those, and so we bind White to ambient
-            // reflectance, and we'll set the ambient colour to the shadow colour
-            mShadowCasterPlainBlackPass->setAmbient(ColourValue::White);
-            mShadowCasterPlainBlackPass->setDiffuse(ColourValue::Black);
-            mShadowCasterPlainBlackPass->setSelfIllumination(ColourValue::Black);
-            mShadowCasterPlainBlackPass->setSpecular(ColourValue::Black);
-            // set depth bias in case this is used with PF_DEPTH
-            mShadowCasterPlainBlackPass->setDepthBias(-1, -1);
-            // Override fog
-            mShadowCasterPlainBlackPass->setFog(true, FOG_NONE);
-            // no textures or anything else, we will bind vertex programs
-            // every so often though
-        }
-        else
-        {
-            mShadowCasterPlainBlackPass = matPlainBlack->getTechnique(0)->getPass(0);
-        }
+        MaterialPtr matPlainBlack = MaterialManager::getSingleton().getByName("Ogre/TextureShadowCaster");
+        matPlainBlack->load();
+        mShadowCasterPlainBlackPass = matPlainBlack->getTechnique(0)->getPass(0);
     }
 
     if (!mShadowReceiverPass)
