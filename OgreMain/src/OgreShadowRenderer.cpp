@@ -84,13 +84,6 @@ SceneManager::ShadowRenderer::~ShadowRenderer() {}
 void SceneManager::ShadowRenderer::setShadowColour(const ColourValue& colour)
 {
     mShadowColour = colour;
-
-    // Change shadow material setting only when it's prepared,
-    // otherwise, it'll set up while preparing shadow materials.
-    if (mShadowModulativePass)
-    {
-        mShadowModulativePass->getFragmentProgramParameters()->setNamedConstant("shadowColor",colour);
-    }
 }
 
 void SceneManager::ShadowRenderer::render(RenderQueueGroup* group,
@@ -1098,16 +1091,15 @@ void SceneManager::ShadowRenderer::renderShadowVolumesToStencil(const Light* lig
         {
             // reset stencil & colour ops
             mDestRenderSystem->setStencilState(StencilState());
-            if (mShadowDebugPass->hasFragmentProgram())
-            {
-                mShadowDebugPass->getFragmentProgramParameters()->setNamedConstant(
-                    "shadowColor", zfailAlgo ? ColourValue(0.7, 0.0, 0.2) : ColourValue(0.0, 0.7, 0.2));
-            }
+
+            auto shadowColour = mShadowColour;
+            mShadowColour = zfailAlgo ? ColourValue(0.7, 0.0, 0.2) : ColourValue(0.0, 0.7, 0.2);
             mSceneManager->_setPass(mShadowDebugPass);
             renderShadowVolumeObjects(shadowRenderables, mShadowDebugPass, &lightList, flags,
                 true, false, false);
             mDestRenderSystem->setColourBlendState(disabled);
             mDestRenderSystem->_setDepthBufferParams(true, false, CMPF_LESS);
+            mShadowColour = shadowColour;
         }
     }
 
@@ -1485,8 +1477,6 @@ void SceneManager::ShadowRenderer::initShadowVolumeMaterials()
 
         mShadowModulativePass->setVertexProgram("Ogre/ShadowBlendVP");
         mShadowModulativePass->setFragmentProgram("Ogre/ShadowBlendFP");
-
-        mShadowModulativePass->getFragmentProgramParameters()->setNamedConstant("shadowColor", mShadowColour);
         matModStencil->load();
     }
     else
