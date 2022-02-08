@@ -14,6 +14,10 @@ vertex_program Ogre/ShadowBlendVP glsl glsles hlsl glslang
 fragment_program Ogre/ShadowBlendFP glsl glsles hlsl glslang
 {
     source ShadowBlend.frag
+    default_params
+    {
+        param_named_auto shadowColor shadow_colour
+    }
 }
 
 vertex_program Ogre/ShadowExtrudePointLight glsl glsles hlsl
