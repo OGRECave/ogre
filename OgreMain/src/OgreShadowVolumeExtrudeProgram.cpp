@@ -55,8 +55,6 @@ namespace {
 }
 
 namespace Ogre {
-    HighLevelGpuProgramPtr ShadowVolumeExtrudeProgram::frgProgram;
-
     std::vector<GpuProgramPtr> ShadowVolumeExtrudeProgram::mPrograms;
 
     void ShadowVolumeExtrudeProgram::initialise(void)
@@ -74,23 +72,15 @@ namespace Ogre {
             vp->load();
             mPrograms.push_back(vp);
         }
-
-        frgProgram = HighLevelGpuProgramManager::getSingleton().getByName("Ogre/ShadowBlendFP", RGN_INTERNAL);
-        OgreAssert(frgProgram, "Ogre/ShadowBlendFP not found.");
-        frgProgram->load();
     }
     //---------------------------------------------------------------------
     void ShadowVolumeExtrudeProgram::shutdown(void)
     {
         mPrograms.clear();
-        frgProgram.reset();
     }
     //---------------------------------------------------------------------
-    const GpuProgramPtr& ShadowVolumeExtrudeProgram::get(Light::LightTypes lightType, bool finite,
-                                                         bool debug)
+    const GpuProgramPtr& ShadowVolumeExtrudeProgram::get(Light::LightTypes lightType, bool finite)
     {
-        // note: we could use the debug flag to create special "debug" programs
-        // however this is currently just one uniform in the fragment shader..
         if (lightType == Light::LT_DIRECTIONAL)
         {
             return mPrograms[finite ? DIRECTIONAL_LIGHT_FINITE : DIRECTIONAL_LIGHT];
