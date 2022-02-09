@@ -672,7 +672,14 @@ WARN_LOGFILE           = "build/doxygen_warnings.log"
 # with spaces.
 
 INPUT                  = OgreMain/include \
-                            Components \
+                            Components/Bites/include \
+                            Components/MeshLodGenerator/include \
+                            Components/Overlay/include \
+                            Components/Paging/include \
+                            Components/Property/include \
+                            Components/RTShaderSystem/include \
+                            Components/Terrain/include \
+                            Components/Volume/include \
                             PlugIns \
                             PlugIns/PCZSceneManager/docs/readme.md \
                             RenderSystems \
