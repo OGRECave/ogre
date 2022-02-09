@@ -47,7 +47,7 @@ def main():
     rgm.initialiseAllResourceGroups()
 
     rs = shadergen.getRenderState(Ogre.RTShader.ShaderGenerator.DEFAULT_SCHEME_NAME)
-    rs.addTemplateSubRenderState(shadergen.createSubRenderState(Ogre.RTShader.PerPixelLighting.Type))
+    rs.addTemplateSubRenderState(shadergen.createSubRenderState("SGX_PerPixelLighting"))
 
     scn_mgr = root.createSceneManager()
     shadergen.addSceneManager(scn_mgr)
