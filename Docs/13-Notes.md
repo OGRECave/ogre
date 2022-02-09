@@ -81,6 +81,30 @@ This allows using it with per-pixel lighting as before, but also enables combini
 
 The PSSM3 stage now also supports colour shadows in addition to depth shadows. Colour shadows are automatically used for `PCT_BYTE` texture formats.
 
+### PBR Material support (since 13.3)
+
+The RTSS can now be used to create a PBR pipeline. To enable it via material scripts, specify
+
+```nginx
+rtshader_system
+{
+   lighting_stage metal_roughness texture Default_metalRoughness.jpg
+}
+```
+
+The parameters are expected to be in the green and blue channels (as per glTF2.0) and lighting will be done according to the [Filament equations](https://google.github.io/filament/Filament.md.html#materialsystem).
+
+Alternatively, you can use material-wide settings, by skipping the texture part like:
+
+```nginx
+rtshader_system
+{
+   lighting_stage metal_roughness
+}
+```
+
+Here, metalness is read from `specular[0]` and roughness from `specular[1]`.
+
 ## DotScene
 The Plugin now supports exporting via a generic `SceneNode::saveChildren` API. This allows you to dump your dynamically generated Scene to file and later inspect it with ogre-meshviewer, which also got improved .scene support.
 
