@@ -42,28 +42,28 @@ coordinates, and \f$\vec{u} = [u_1,u_2,u_3,1]^t\f$ the shadow map
 coordinates.
 
 \f[
-    \begin{aligned}
-    \left[ \begin{array}{c}
-        u_1  w_l \\
-        u_2  w_l \\
-        u_3  w_l \\
-        w_l     \end{array} \right] =  P_l M_l \left[ \begin{array}{c}
-        x_1 \\
-        x_2 \\
-        x_3 \\
-        1     \end{array} \right]\end{aligned}
+	\begin{aligned}
+	\left[ \begin{array}{c}
+		u_1  w_l \\
+		u_2  w_l \\
+		u_3  w_l \\
+		w_l     \end{array} \right] =  P_l M_l \left[ \begin{array}{c}
+		x_1 \\
+		x_2 \\
+		x_3 \\
+		1     \end{array} \right]\end{aligned}
 \f]
 
 \f[\begin{aligned}
-    \left[ \begin{array}{c}
-        y_1  w_c \\
-        y_2  w_c \\
-        y_3  w_c \\
-        w_c     \end{array} \right] =  P_c M_c \left[ \begin{array}{c}
-        x_1 \\
-        x_2 \\
-        x_3 \\
-        1     \end{array} \right]\end{aligned}\f]
+	\left[ \begin{array}{c}
+		y_1  w_c \\
+		y_2  w_c \\
+		y_3  w_c \\
+		w_c     \end{array} \right] =  P_c M_c \left[ \begin{array}{c}
+		x_1 \\
+		x_2 \\
+		x_3 \\
+		1     \end{array} \right]\end{aligned}\f]
 
 These equations can be written more concisely as:
 \f$\vec{u}w_l = P_l M_l \vec{x}\f$ and \f$\vec{y} w_c = P_c M_c \vec{x}\f$.
@@ -78,7 +78,11 @@ exploited to combat the aliasing issue.
 
 ## Depth Biasing {#DepthBias}
 
-![](images/depthbias.svg) Shadow map sample must use one float to represent a range of possible depth values. A depth sample is chosen in the middle. Any camera image point in between the two camera rays will see the geometry, and depending on distance from light will report differently on shadowed versus lit. However, every such point should be lit.
+![](images/depthbias.svg) Shadow map sample must use one float to represent a range of possible depth values.
+A depth sample is chosen in the middle.
+Any camera image point in between the two camera rays will see the geometry, 
+and depending on distance from light will report differently on shadowed versus lit.
+However, every such point should be lit.
 
 Due to the finite precision of floating point representations and
 inherent inability of one number to represent a range of values, it is
@@ -189,9 +193,9 @@ The many variants can, however, be broken up into three broad
 categories:
 1. Those that store additional information beyond a single
 float,
-2. those that divide up shadow frusta into multiple frusta to be
+2. Those that divide up shadow frusta into multiple frusta to be
 handled separately, and
-3. those that propose less naive \f$P_l\f$ and
+3. Those that propose less naive \f$P_l\f$ and
 \f$M_l\f$ to use and thereby affect the sampling distribution. 
 
 Algorithms in each category usually work quite independently and so many hybrid
@@ -210,10 +214,10 @@ While variance shadow maps are motivated by statistical considerations,
 it is perhaps more properly understood in the Deep Shadow Maps
 framework. Analyzing it in terms of distributions is flawed for two
 reasons:
-1. the inequality considered is valid only for unimodal
+1. The inequality considered is valid only for unimodal
 distributions whereas depth values are often discontinuous in regions
 that matter; 
-2. the inequality is treated as equality. The equations
+2. The inequality is treated as equality. The equations
 are justified with a very specific example in which two planes are
 viewed straight on. In practice there are very noticeable halo effects
 around objects, which makes more heuristic tweaks necessary.
@@ -228,7 +232,7 @@ forms.
 
 ## Breaking up Shadow Frusta {#sm_breaking_frusta}
 
-Adaptive Shadow Maps  @cite FFB01 are an example of this. It is still largely
+Adaptive Shadow Maps @cite FFB01 are an example of this. It is still largely
 considered too expensive for real-time rendering, but continued research
 and growing GPU power may make some variant worthwhile.
 
@@ -268,8 +272,7 @@ considering very special cases and assuming the general case is very
 similar. For clarification, we explore some of these misconceptions
 here.
 
-## (Non)Optimality of Logarithmic Shadow Maps {#sm_nonopt}
-
+## (Non) Optimality of Logarithmic Shadow Maps {#sm_nonopt}
 
 We start with one *heuristic* that has gained quite a bit
 of traction: the idea of using some logarithmic mapping between light
@@ -350,7 +353,7 @@ turned on, but be warned that this will only work properly if
 appropriate depth biasing is also used. The example code will manually
 account for depth biasing via the method described above in section
 @ref DepthBias. The shadow caster and shadow receiver materials are
-defined in a materials script. They tell Ogre which shaders to use when
+defined in a material script. They tell Ogre which shaders to use when
 rendering shadow casters into the shadow map and rendering shadow
 receivers during shadow determination.
 
@@ -397,15 +400,336 @@ Non-PCF block. Note that after doing this, the uSTexWidth and
 uSTexHeight variables are likely to be optimized away and so you should
 uncomment these variables in the materials script as well.
 
-The following shows how to activate plane optimal shadow mapping given
+## Debugging Shadows
+Since shadows are a difficult subject, so it is a good idea to have the Shadow Map 
+projected on a Mini-Screen where it is possible to see how the Depth Caster is performing.
+
+Material definition: `shadow_debug.material`
+```
+material ShadowDebug
+{
+	technique
+	{
+		pass
+		{
+			lighting off
+
+			texture_unit ShadowMap
+			{
+				tex_address_mode clamp
+				filtering none
+				content_type shadow
+			}
+		}
+	}
+}
+```
+
+With only this material definition the [RTSS (Realtime Shader System)](@ref rtss) 
+takes care of generating the proper shader to project the Shadow Map on the Mini Screen.
+
+Source code to create a Rectangle on the screen and proyect the Shadow Map texture:
+```cpp
+// Create rectangle for the Mini-Screen and attach to node
+Ogre::Rectangle2D* miniScreen = mSceneMgr->createScreenSpaceRect(true);
+miniScreen->setCorners(.5, 1.0, 1.0, .5);
+miniScreen->setBoundingBox(Ogre::AxisAlignedBox::BOX_INFINITE);
+miniScreen->setMaterial(Ogre::MaterialManager::getSingletonPtr()->getByName("ShadowDebug"));
+
+Ogre::SceneNode* miniScreenNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+miniScreenNode->attachObject(miniScreen);
+```
+
+## Improving Shadow Quality
+
+### Shadow Camera Setups {#sm_shadow_camera_setup}
+
+The default projection used when rendering shadow textures is a uniform frustum.
+This is pretty straight forward but doesn't make the best use of the space in the shadow map 
+since texels closer to the camera will be larger, resulting in 'jaggies'.
+There are several ways to distribute the texels in the shadow texture differently.
+Ogre is provided with several alternative shadow camera setups:
+ - Ogre::FocusedShadowCameraSetup: Implements the uniform shadow mapping algorithm in focused mode.
+ - LiSPSM (Ogre::LiSPSMShadowCameraSetup): Implements the Light Space Perspective Shadow Mapping Algorithm.
+ - PSSM (Ogre::PSSMShadowCameraSetup): Parallel Split Shadow Map (PSSM) shadow camera setup.
+
+ - Plane Optimal (Ogre::PlaneOptimalShadowCameraSetup): Implements the plane optimal shadow camera algorithm.
+
+These Shadow Camera Setups can be enabled for the whole Scene with SceneManager::setShadowCameraSetup 
+or per light with Light::setCustomShadowCameraSetup
+
+The following shows how to activate Plane Optimal Shadow Mapping given
 some pointer to a MovablePlane and a pointer to a light.
+```cpp
+Ogre::MovablePlane *movablePlane = new Ogre::MovablePlane( Ogre::Vector3::UNIT_Y, 0 );
+Ogre::Entity *movablePlaneEntity = mSceneMgr->createEntity( "movablePlane", "Floor.mesh" );
+Ogre::SceneNode *movablePlaneNode = mSceneMgr->getRootSceneNode()->createChildSceneNode("MovablePlaneNode");
+movablePlaneNode->attachObject(movablePlaneEntity);
+Ogre::ShadowCameraSetupPtr shadowCameraSetup = Ogre::PlaneOptimalShadowCameraSetup::create(movablePlane);
+light->setCustomShadowCameraSetup(Ogre::ShadowCameraSetupPtr(shadowCameraSetup));
+```
+
+Another example, using LiSPSM Camera Setup:
+```cpp
+Ogre::ShadowCameraSetupPtr shadowCameraSetup = Ogre::LiSPSMShadowCameraSetup::create();
+mSceneMgr->setShadowCameraSetup(shadowCameraSetup);
+```
+
+For big scenes with directional lights one of the better performing Shadow Camera Setups is PSSM.
+A PSSM shadow system uses multiple shadow maps per light and maps each texture into a region of space, 
+progressing away from the camera. As such it is most appropriate for directional light setups.
+A more in depth explanation can be found in the wiki: [Parallel Split Shadow Mapping](https://wiki.ogre3d.org/Parallel+Split+Shadow+Mapping)
 
 ```cpp
-Ogre::PlaneOptimalShadowCameraSetup *planeOptShadowCamera = 
-                                new PlaneOptimalShadowCameraSetup(movablePlane);
-Ogre::Entity *movablePlaneEntity = sceneMgr->createEntity( "movablePlane", "plane.mesh" );
-Ogre::SceneNode *movablePlaneNode = 
-                sceneMgr->getRootSceneNode()->createChildSceneNode("MovablePlaneNode");
-movablePlaneNode->attachObject(movablePlaneEntity);
-light->setCustomShadowCameraSetup(Ogre::ShadowCameraSetupPtr(planeOptShadowCamera));
+// General scene setup
+mSceneMgr->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_ADDITIVE_INTEGRATED);
+mSceneMgr->setShadowTextureCasterMaterial(Ogre::MaterialManager::getSingletonPtr()->getByName("PSSMCaster"));
+mSceneMgr->setShadowTextureSelfShadow(true);
+mSceneMgr->setShadowFarDistance(3000);
+// 3 textures per directional light (PSSM)
+mSceneMgr->setShadowTextureCountPerLightType(Ogre::Light::LT_DIRECTIONAL, 3);
+mSceneMgr->setShadowTextureCount(3);
+mSceneMgr->setShadowTextureConfig(0, 2048, 2048, Ogre::PF_DEPTH16);
+mSceneMgr->setShadowTextureConfig(1, 1024, 1024, Ogre::PF_DEPTH16);
+mSceneMgr->setShadowTextureConfig(2, 512, 512, Ogre::PF_DEPTH16);
+
+Ogre::PSSMShadowCameraSetup* pssmSetup = new Ogre::PSSMShadowCameraSetup(); //static_cast<Ogre::PSSMShadowCameraSetup*>(shadowCameraSetup->getPointer());
+pssmSetup->setSplitPadding(1);
+pssmSetup->calculateSplitPoints(3, 1, mSceneMgr->getShadowFarDistance());
+pssmSetup->setOptimalAdjustFactor(0, 2);
+pssmSetup->setOptimalAdjustFactor(1, 1);
+pssmSetup->setOptimalAdjustFactor(2, 0.5);
+mSceneMgr->setShadowCameraSetup(Ogre::ShadowCameraSetupPtr(pssmSetup));
+```
+
+The Shadow Caster Vertex and Fragment programs are the same as the regular shadow mapping techniques.
+
+But some changes have to be made to the shaders of the Shadow Receiver as well as the program definition, because now we are sending three shadow map splits (in this example).
+
+Material definition:
+```
+material PSSMShadowReceiver
+{
+	technique default
+	{
+		pass
+		{
+			vertex_program_ref PSSMShadowReceiverVP {}
+			fragment_program_ref PSSMShadowReceiverFP {}
+
+			texture_unit ShadowMap0
+			{
+				tex_address_mode clamp
+				tex_border_colour 1.0 1.0 1.0 1.0
+				content_type shadow
+				filtering none
+			}
+
+			texture_unit ShadowMap1
+			{
+				tex_address_mode clamp
+				tex_border_colour 1.0 1.0 1.0 1.0
+				content_type shadow
+				filtering none
+			}
+
+			texture_unit ShadowMap2
+			{
+				tex_address_mode clamp
+				tex_border_colour 1.0 1.0 1.0 1.0
+				content_type shadow
+				filtering none
+			}
+		}
+	}
+}
+```
+
+Program definition:
+```
+vertex_program PSSMShadowReceiverVP glsl
+{
+	source "PSSMShadowReceiver.vs"
+
+	default_params
+	{
+		param_named_auto world world_matrix
+		param_named_auto worldIT inverse_transpose_world_matrix
+		param_named_auto worldViewProj worldviewproj_matrix
+		param_named_auto lightPosition light_position 0
+		param_named_auto lightColour light_diffuse_colour 0
+
+		param_named_auto texViewProj0 texture_viewproj_matrix 0
+		param_named_auto texViewProj1 texture_viewproj_matrix 1
+		param_named_auto texViewProj2 texture_viewproj_matrix 2
+	}
+}
+
+fragment_program PSSMShadowReceiverFP glsl
+{
+	source "PSSMShadowReceiver.fs"
+
+	preprocessor_defines PCF=0
+
+	default_params
+	{
+		param_named inverseShadowmapSize float 0.0009765625
+		param_named fixedDepthBias float 0.0005
+		param_named gradientClamp float 0.0098
+		param_named gradientScaleBias float 0
+
+		param_named shadowMap0 int 0
+		param_named shadowMap1 int 1
+		param_named shadowMap2 int 2
+
+		param_named_auto invShadowMapSize0 inverse_texture_size 0
+		param_named_auto invShadowMapSize1 inverse_texture_size 1
+		param_named_auto invShadowMapSize2 inverse_texture_size 2
+
+		param_named pssmSplitPoints float4 0 0 0 0
+	}
+}
+```
+
+The vertex shader now includes three texture proyection matrixes
+```glsl
+#version 330 core
+
+layout (location = 0) in vec4 vertex;
+layout (location = 2) in vec3 normal;
+
+uniform mat4 world;
+uniform mat4 worldIT;
+uniform mat4 worldViewProj;
+uniform vec4 lightPosition;
+uniform vec4 lightColour;
+
+uniform mat4 texViewProj0;
+uniform mat4 texViewProj1;
+uniform mat4 texViewProj2;
+
+out vec4 outColor;
+
+out vec4 oUv0;
+out vec4 oUv1;
+out vec4 oUv2;
+
+out float depth;
+
+void main()
+{
+	gl_Position = worldViewProj * vertex;
+	depth = gl_Position.z;
+
+	vec4 worldPos = world * vertex;
+
+	vec3 worldNorm = (worldIT * vec4(normal, 1.0)).xyz;
+
+	// calculate lighting (simple vertex lighting)
+	vec3 lightDir = normalize(lightPosition.xyz - (worldPos.xyz * lightPosition.w));
+
+	outColor = lightColour * max(dot(lightDir, worldNorm), 0.0);
+
+	// calculate shadow map coords
+	oUv0 = texViewProj0 * worldPos;
+	oUv1 = texViewProj1 * worldPos;
+	oUv2 = texViewProj2 * worldPos;
+}
+```
+
+And the fragment shader has to be accomodated to select the correct Shadow Map according to the camera distance
+```glsl
+#version 330 core
+
+in vec4 oUv0;
+in vec4 oUv1;
+in vec4 oUv2;
+
+in vec4 outColor;
+
+in float depth;
+
+uniform float inverseShadowmapSize;
+uniform float fixedDepthBias;
+uniform float gradientClamp;
+uniform float gradientScaleBias;
+
+uniform sampler2D shadowMap0;
+uniform sampler2D shadowMap1;
+uniform sampler2D shadowMap2;
+
+uniform vec4 invShadowMapSize0;
+uniform vec4 invShadowMapSize1;
+uniform vec4 invShadowMapSize2;
+
+uniform vec4 pssmSplitPoints;
+
+void shadowFilter( sampler2D shadowMap, vec4 oUv, vec2 offset, vec3 splitColour )
+{
+	// Perform perspective divide
+	vec4 shadowUV = oUv;
+	shadowUV = shadowUV / shadowUV.w;
+
+	// Transform [-1, 1] to [0, 1] range
+#ifndef OGRE_REVERSED_Z
+	shadowUV.z = shadowUV.z * 0.5 + 0.5;
+#endif
+
+	// Get closest depth value from light's perspective (using [0,1] range fragPosLight as coords)
+	float centerdepth = texture2D(shadowMap, shadowUV.xy).x;
+
+	// Gradient calculation
+	float pixeloffset = inverseShadowmapSize;
+	vec4 depths = vec4(
+		texture2D(shadowMap, shadowUV.xy + vec2(-pixeloffset, 0.0)).x,
+		texture2D(shadowMap, shadowUV.xy + vec2(+pixeloffset, 0.0)).x,
+		texture2D(shadowMap, shadowUV.xy + vec2(0.0, -pixeloffset)).x,
+		texture2D(shadowMap, shadowUV.xy + vec2(0.0, +pixeloffset)).x);
+
+	vec2 differences = abs( depths.yw - depths.xz );
+	float gradient = min(gradientClamp, max(differences.x, differences.y));
+	float gradientFactor = gradient * gradientScaleBias;
+
+	// Visibility function
+	float depthAdjust = gradientFactor + (fixedDepthBias * centerdepth);
+	float finalCenterDepth = centerdepth + depthAdjust;
+
+	// shadowUV.z contains lightspace position of current object
+#if PCF
+	// Use depths from prev, calculate diff
+	depths += depthAdjust;
+	float final = (finalCenterDepth > shadowUV.z) ? 1.0 : 0.0;
+	final += (depths.x > shadowUV.z) ? 1.0 : 0.0;
+	final += (depths.y > shadowUV.z) ? 1.0 : 0.0;
+	final += (depths.z > shadowUV.z) ? 1.0 : 0.0;
+	final += (depths.w > shadowUV.z) ? 1.0 : 0.0;
+
+	final *= 0.2;
+
+	gl_FragColor = vec4(outColor.xyz * final * splitColour, 1.0);
+#else
+	// Check whether current frag pos is in shadow
+	gl_FragColor = (finalCenterDepth > shadowUV.z) ? vec4(outColor.xyz * splitColour, 1.0) : vec4(0.0, 0.0, 0.0, 1.0);
+#endif
+}
+
+void main()
+{
+	if( depth <= pssmSplitPoints.y )
+	{
+		shadowFilter( shadowMap0, oUv0, invShadowMapSize0.xy, vec3( 1.0, 0.0, 0.0 ) );
+	}
+	else if( depth <= pssmSplitPoints.z )
+	{
+		shadowFilter( shadowMap1, oUv1, invShadowMapSize1.xy, vec3( 0.0, 1.0, 0.0 ) );
+	}
+	else if( depth <= pssmSplitPoints.w )
+	{
+		shadowFilter( shadowMap2, oUv2, invShadowMapSize2.xy, vec3( 0.0, 0.0, 1.0 ) );
+	}
+	else
+	{
+		discard;
+	}
+}
 ```

@@ -45,7 +45,7 @@ if(DOXYGEN_FOUND)
         ${BASIC_TUTORIALS}
         ${PROJECT_SOURCE_DIR}/Docs/src/apimainpage.md
         ${PROJECT_SOURCE_DIR}/Docs/src/manual.md
-        ${PROJECT_SOURCE_DIR}/Docs/src/OgreShadows.md
+        ${PROJECT_SOURCE_DIR}/Docs/src/ogre-shadows.md
         ${PROJECT_SOURCE_DIR}/Docs/src/scripts.md
         ${PROJECT_SOURCE_DIR}/Docs/src/material-scripts.md
         ${PROJECT_SOURCE_DIR}/Docs/src/high-level-programs.md

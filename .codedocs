@@ -685,7 +685,7 @@ INPUT                  = OgreMain/include \
                             RenderSystems \
                             Docs/src/apimainpage.md \
                             Docs/src/manual.md \
-                            Docs/src/OgreShadows.md \
+                            Docs/src/ogre-shadows.md \
                             Docs/src/scripts.md \
                             Docs/src/material-scripts.md \
                             Docs/src/high-level-programs.md \
