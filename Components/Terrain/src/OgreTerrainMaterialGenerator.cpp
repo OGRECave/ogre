@@ -112,7 +112,6 @@ namespace Ogre
             mCompositeMapPlane = mCompositeMapSM->createScreenSpaceRect(true);
             mCompositeMapPlane->setUVs({0 - hOffset, 0 - vOffset}, {0 - hOffset, 1 - vOffset},
                                        {1 - hOffset, 0 - vOffset}, {1 - hOffset, 1 - vOffset});
-            mCompositeMapPlane->setBoundingBox(AxisAlignedBox::BOX_INFINITE);
 
             mCompositeMapSM->getRootSceneNode()->attachObject(mCompositeMapPlane);
 

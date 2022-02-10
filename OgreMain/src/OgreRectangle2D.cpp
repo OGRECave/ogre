@@ -50,6 +50,8 @@ namespace Ogre {
         mUseIdentityProjection = true;
         mUseIdentityView = true;
 
+        mBox.setInfinite(); // screenspace -> never culled
+
         mRenderOp.vertexData = OGRE_NEW VertexData();
 
         mRenderOp.indexData = 0;
