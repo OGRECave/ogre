@@ -17,47 +17,10 @@ Also see acknowledgements in Readme.html
 
 namespace Ogre
 {
-    const String& ProceduralManualObject::getMovableType(void) const
-    {
-        return ProceduralManualObjectFactory::FACTORY_TYPE_NAME;
-    }
     //-----------------------------------------------------------------------------
     void ProceduralManualObject::_updateRenderQueue(RenderQueue* queue)
     {
-        mR2vbObject->update(mParentSceneManager);
+        mR2vbObject->update(mManager);
         queue->addRenderable(this);
-    }
-    //-----------------------------------------------------------------------------
-    void ProceduralManualObject::getRenderOperation(RenderOperation& op)
-    {
-        mR2vbObject->getRenderOperation(op);
-    }
-    //-----------------------------------------------------------------------------
-    void ProceduralManualObject::setManualObject(Ogre::ManualObject *manualObject)
-    {
-        mManualObject = manualObject;
-        mParentSceneManager = manualObject->_getManager();
-        if (mR2vbObject)
-        {
-            mR2vbObject->setSourceRenderable(manualObject->getSections()[0]);
-        }
-    }
-    //-----------------------------------------------------------------------------
-    String ProceduralManualObjectFactory::FACTORY_TYPE_NAME = "ProceduralManualObject";
-    //-----------------------------------------------------------------------------
-    const String& ProceduralManualObjectFactory::getType(void) const
-    {
-        return FACTORY_TYPE_NAME;
-    }
-    //-----------------------------------------------------------------------------
-    MovableObject* ProceduralManualObjectFactory::createInstanceImpl(
-        const String& name, const NameValuePairList* params)
-    {
-        return new ProceduralManualObject();
-    }
-    //-----------------------------------------------------------------------------
-    void ProceduralManualObjectFactory::destroyInstance( MovableObject* obj)
-    {
-        delete obj;
     }
 }
