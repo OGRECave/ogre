@@ -27,7 +27,6 @@ class _OgreSampleClassExport Sample_ParticleGS : public SdkSample
     bool frameEnded(const FrameEvent& evt);
 #endif
     ProceduralManualObject* mParticleSystem;
-    ProceduralManualObjectFactory *mProceduralManualObjectFactory;
 };
 }
 #endif
