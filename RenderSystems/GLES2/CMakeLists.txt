@@ -10,12 +10,12 @@
 # Configure OpenGL ES 2.0 RenderSystem build
 
 # GLSL-Optimizer
-find_package(GLSLOptimizer)
-macro_log_feature(GLSL_Optimizer_FOUND "GLSL Optimizer" "GLSL Optimizer" "http://github.com/aras-p/glsl-optimizer/" FALSE "" "")
+find_package(GLSLOptimizer QUIET)
+macro_log_feature(GLSL_Optimizer_FOUND "GLSL Optimizer" "GLSL Optimizer" "http://github.com/aras-p/glsl-optimizer/")
 
 # HLSL2GLSL
-find_package(HLSL2GLSL)
-macro_log_feature(HLSL2GLSL_FOUND "HLSL2GLSL" "HLSL2GLSL" "http://hlsl2glslfork.googlecode.com/" FALSE "" "")
+find_package(HLSL2GLSL QUIET)
+macro_log_feature(HLSL2GLSL_FOUND "HLSL2GLSL" "HLSL2GLSL" "http://hlsl2glslfork.googlecode.com/")
 
 file(GLOB HEADER_FILES "include/*.h")
 list(APPEND HEADER_FILES
