@@ -70,7 +70,7 @@ namespace Ogre {
         @param updateAABB Tells if you want to recalculate the AABB according to 
         the new corners. If false, the axis aligned bounding box will remain identical.
         */
-        void setCorners(float left, float top, float right, float bottom, bool updateAABB = true);
+        void setCorners(float left, float top, float right, float bottom, bool updateAABB = false);
 
         /** Sets the normals of the rectangle
         */
