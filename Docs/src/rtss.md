@@ -212,6 +212,30 @@ Example: `source_modifier src1_inverse_modulate custom 2`
 @param operation one of `src1_modulate, src2_modulate, src1_inverse_modulate, src2_inverse_modulate`
 @param parameterNum number of the custom shader parameter that controls the operation
 
+# Setting properties programmatically {#RTSS-Props-API}
+
+In case you need to set the properties programmatically, see the following example for how the script is mapped to the API.
+
+```cpp
+rtshader_system
+{
+	lighting_stage normal_map Default_normal.jpg
+}
+```
+becomes
+```cpp
+using namespace Ogre::RTShader;
+auto& dstScheme = ShaderGenerator::DEFAULT_SCHEME_NAME;
+ShaderGenerator* shaderGen = ShaderGenerator::getSingletonPtr();
+
+shaderGen->createShaderBasedTechnique(mat->getTechnique(0), dstScheme);
+RenderState* rs = shaderGen->getRenderState(dstScheme, *mat, 0);
+SubRenderState* srs = shaderGen->createSubRenderState("NormalMap");
+rs->addTemplateSubRenderState(srs);
+
+srs->setParameter("texture", "Default_normal.jpg");
+```
+
 # System overview {#rtss_overview}
 
 The RTSS manages a set of opaque isolated components (SubRenderStates) where each implements a specific effect.

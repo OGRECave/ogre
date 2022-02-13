@@ -456,33 +456,6 @@ bool Sample_Compositor::frameRenderingQueued(const FrameEvent& evt)
 /// Create the hard coded postfilter effects
 void Sample_Compositor::createEffects(void)
 {
-    // Glass compositor is loaded from script but here is the hard coded equivalent
-    /// Glass effect
-    //          CompositorPtr comp2 = CompositorManager::getSingleton().create(
-    //                          "Glass", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME
-    //                  );
-    //          {
-    //                  CompositionTechnique *t = comp2->createTechnique();
-    //                  {
-    //                          CompositionTechnique::TextureDefinition *def = t->createTextureDefinition("rt0");
-    //                          def->width = 0;
-    //                          def->height = 0;
-    //                          def->format = PF_R8G8B8;
-    //                  }
-    //                  {
-    //                          CompositionTargetPass *tp = t->createTargetPass();
-    //                          tp->setInputMode(CompositionTargetPass::IM_PREVIOUS);
-    //                          tp->setOutputName("rt0");
-    //                  }
-    //                  {
-    //                          CompositionTargetPass *tp = t->getOutputTargetPass();
-    //                          tp->setInputMode(CompositionTargetPass::IM_NONE);
-    //                          { CompositionPass *pass = tp->createPass(CompositionPass::PT_RENDERQUAD);
-    //                          pass->setMaterialName("Ogre/Compositor/GlassPass");
-    //                          pass->setInput(0, "rt0");
-    //                          }
-    //                  }
-    //          }
     /// Motion blur effect
     Ogre::CompositorPtr comp3 = Ogre::CompositorManager::getSingleton().create(
         "Motion Blur", Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME
