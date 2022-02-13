@@ -865,7 +865,36 @@ Where viewport is a pointer to your viewport, and compositorName is the name of 
 Ogre::CompositorManager::getSingleton().setCompositorEnabled(viewport, compositorName, enabledOrDisabled);
 ```
 
-For more information on defining and using compositors, see Demo\_Compositor in the Samples area, together with the Examples.compositor script in the media area.
+For more information on defining and using compositors, see @c Sample_Compositor in the Samples area, together with the Examples.compositor script in the media area.
+
+# Programmatic creation {#Compositor-API}
+
+In case you need to create Compositors programmatically, see the following example for how the script is mapped to the API.
+
+@snippet Samples/Media/materials/scripts/Examples.compositor glass_script
+
+becomes
+```cpp
+using namespace Ogre;
+CompositorPtr glass = CompositorManager::getSingleton().create("Glass", RGN_DEFAULT);
+
+CompositionTechnique *t = glass->createTechnique();
+auto td = t->createTextureDefinition("rt0");
+td->width = 0;
+td->height = 0;
+td->format = PF_BYTE_RGB;
+
+CompositionTargetPass *tp = t->createTargetPass();
+tp->setInputMode(CompositionTargetPass::IM_PREVIOUS);
+tp->setOutputName("rt0");
+
+CompositionTargetPass *tp = t->getOutputTargetPass();
+tp->setInputMode(CompositionTargetPass::IM_NONE);
+
+CompositionPass *pass = tp->createPass(CompositionPass::PT_RENDERQUAD)
+pass->setMaterialName("Ogre/Compositor/GlassPass");
+pass->setInput(0, "rt0");
+```
 
 @page Overlay-Scripts Overlay Scripts
 

@@ -69,6 +69,7 @@ compositor Bloom
     }
 }
 
+//! [glass_script]
 compositor Glass
 {
     technique
@@ -90,6 +91,7 @@ compositor Glass
         }
     }
 }
+//! [glass_script]
 
 compositor "Old TV"
 {
