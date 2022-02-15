@@ -13,7 +13,7 @@ if (OGRE_BUILD_TESTS)
   if(NOT EXISTS ${PROJECT_BINARY_DIR}/googletest-1.10.x)
     message(STATUS "Building gtest")
     file(DOWNLOAD
-        https://github.com/google/googletest/archive/v1.10.x.tar.gz
+        https://github.com/google/googletest/archive/refs/heads/v1.10.x.tar.gz
         ${PROJECT_BINARY_DIR}/v1.10.x.tar.gz)
     execute_process(COMMAND ${CMAKE_COMMAND}
         -E tar xf v1.10.x.tar.gz WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
