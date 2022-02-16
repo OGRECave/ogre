@@ -120,11 +120,6 @@ protected:
     ShadowProjection mCurrentProjection;
     ShadowMaterial mCurrentMaterial;
 
-    GpuProgramParametersSharedPtr mCustomRockwallVparams;
-    GpuProgramParametersSharedPtr mCustomRockwallFparams;
-    GpuProgramParametersSharedPtr mCustomAtheneVparams;
-    GpuProgramParametersSharedPtr mCustomAtheneFparams;
-
     ShadowCameraSetupPtr mCurrentShadowCameraSetup;
     /// Plane that defines plane-optimal shadow mapping basis
     MovablePlane* mPlane;
@@ -363,7 +358,6 @@ protected:
     
     Slider* mFixedBiasSlider;
     Slider* mSlopedBiasSlider;
-    Slider* mClampSlider;
 
     void setupGUI()
     {
@@ -399,17 +393,13 @@ protected:
         mMaterialMenu->addItem("Depth Shadowmap");
         mMaterialMenu->addItem("Depth Shadowmap (PCF)");
         
-        mFixedBiasSlider = mTrayMgr->createThickSlider(TL_NONE, "FixedBiasSlider", "Fixed Bias", 256, 80, 0, 0.02, 100);
-        mFixedBiasSlider->setValue(0.0009, false);
+        mFixedBiasSlider = mTrayMgr->createThickSlider(TL_NONE, "FixedBiasSlider", "Fixed Bias", 256, 80, 0, 5, 100);
+        mFixedBiasSlider->setValue(0.5, false);
         mFixedBiasSlider->hide();
 
-        mSlopedBiasSlider = mTrayMgr->createThickSlider(TL_NONE, "SlopedBiasSlider", "Sloped Bias", 256, 80, 0, 0.2, 100);
-        mSlopedBiasSlider->setValue(0.0008, false);
+        mSlopedBiasSlider = mTrayMgr->createThickSlider(TL_NONE, "SlopedBiasSlider", "Sloped Bias", 256, 80, 0, 10, 100);
+        mSlopedBiasSlider->setValue(1, false);
         mSlopedBiasSlider->hide();
-
-        mClampSlider = mTrayMgr->createThickSlider(TL_NONE, "SlopeClampSlider", "Slope Clamp", 256, 80, 0, 2, 100);
-        mClampSlider->setValue(0.2, false);
-        mClampSlider->hide();
 
         updateGUI(mCurrentShadowTechnique);
         mTrayMgr->showCursor();
@@ -512,59 +502,19 @@ protected:
             mCurrentProjection = proj;
 
             mSceneMgr->setShadowCameraSetup(mCurrentShadowCameraSetup);
-
-            if (mCustomRockwallVparams && mCustomRockwallFparams)
-            {
-                // set
-                setDefaultDepthShadowParams();
-            }
-
         }
     }
 
     void updateDepthShadowParams()
     {
-        mCustomRockwallFparams->setNamedConstant("fixedDepthBias", 
-            mFixedBiasSlider->getValue());
-        mCustomRockwallFparams->setNamedConstant("gradientScaleBias",
-            mSlopedBiasSlider->getValue());
-        mCustomRockwallFparams->setNamedConstant("gradientClamp",
-            mClampSlider->getValue());
-
-        mCustomAtheneFparams->setNamedConstant("fixedDepthBias", 
-            mFixedBiasSlider->getValue());
-        mCustomAtheneFparams->setNamedConstant("gradientScaleBias",
-            mSlopedBiasSlider->getValue());
-        mCustomAtheneFparams->setNamedConstant("gradientClamp",
-            mClampSlider->getValue());
-    }
-
-    void setDefaultDepthShadowParams()
-    {
-        switch(mCurrentProjection)
-        {
-        case UNIFORM:
-        case UNIFORM_FOCUSED:
-        case PLANE_OPTIMAL:
-            mFixedBiasSlider->setValue(0.0f, false);
-            mSlopedBiasSlider->setValue(0.0f, false);
-            break;
-        case LISPSM:
-            mFixedBiasSlider->setValue(0.009f, false);
-            mSlopedBiasSlider->setValue(0.04f, false);
-            break;
-        };
-
-        updateDepthShadowParams();
-
+        auto mat = MaterialManager::getSingleton().getByName(CUSTOM_CASTER_MATERIAL);
+        auto pass = mat->getTechniques().back()->getPass(0);
+        pass->setDepthBias(-mFixedBiasSlider->getValue(), -mSlopedBiasSlider->getValue());
     }
 
     void sliderMoved(Slider* slider)
     {
-        if (mCustomRockwallVparams && mCustomRockwallFparams)
-        {
-            updateDepthShadowParams();
-        }
+        updateDepthShadowParams();
     }
 
     void resetMaterials()
@@ -577,12 +527,6 @@ protected:
         {
             (*i)->setMaterialName(BASIC_ROCKWALL_MATERIAL);
         }
-
-        mCustomRockwallVparams.reset();
-        mCustomRockwallFparams.reset();
-        mCustomAtheneVparams.reset();
-        mCustomAtheneFparams.reset();
-
     }
     
     void handleMaterialChanged()
@@ -605,7 +549,7 @@ protected:
 
                 break;
             case MAT_DEPTH_FLOAT:
-                mSceneMgr->setShadowTexturePixelFormat(PF_FLOAT32_R);
+                mSceneMgr->setShadowTexturePixelFormat(PF_DEPTH16);
                 mSceneMgr->setShadowTechnique(SHADOWTYPE_TEXTURE_ADDITIVE_INTEGRATED);
 
                 themat = MaterialManager::getSingleton().getByName(CUSTOM_CASTER_MATERIAL);
@@ -620,22 +564,13 @@ protected:
                     (*i)->setMaterialName(CUSTOM_ROCKWALL_MATERIAL);
                 }
 
-                themat = MaterialManager::getSingleton().getByName(CUSTOM_ROCKWALL_MATERIAL);
-                themat->load();
-                mCustomRockwallVparams = themat->getBestTechnique()->getPass(1)->getVertexProgramParameters();
-                mCustomRockwallFparams = themat->getBestTechnique()->getPass(1)->getFragmentProgramParameters();
-                themat = MaterialManager::getSingleton().getByName(CUSTOM_ATHENE_MATERIAL);
-                themat->load();
-                mCustomAtheneVparams = themat->getBestTechnique()->getPass(1)->getVertexProgramParameters();
-                mCustomAtheneFparams = themat->getBestTechnique()->getPass(1)->getFragmentProgramParameters();
                 showSliders = true;
 
-
                 // set the current params
-                setDefaultDepthShadowParams();
+                updateDepthShadowParams();
                 break;
             case MAT_DEPTH_FLOAT_PCF:
-                mSceneMgr->setShadowTexturePixelFormat(PF_FLOAT32_R);
+                mSceneMgr->setShadowTexturePixelFormat(PF_DEPTH16);
                 mSceneMgr->setShadowTechnique(SHADOWTYPE_TEXTURE_ADDITIVE_INTEGRATED);
 
                 themat = MaterialManager::getSingleton().getByName(CUSTOM_CASTER_MATERIAL);
@@ -650,18 +585,10 @@ protected:
                     (*i)->setMaterialName(CUSTOM_ROCKWALL_MATERIAL + "/PCF");
                 }
 
-                themat = MaterialManager::getSingleton().getByName(CUSTOM_ROCKWALL_MATERIAL + "/PCF");
-                themat->load();
-                mCustomRockwallVparams = themat->getBestTechnique()->getPass(1)->getVertexProgramParameters();
-                mCustomRockwallFparams = themat->getBestTechnique()->getPass(1)->getFragmentProgramParameters();
-                themat = MaterialManager::getSingleton().getByName(CUSTOM_ATHENE_MATERIAL + "/PCF");
-                themat->load();
-                mCustomAtheneVparams = themat->getBestTechnique()->getPass(1)->getVertexProgramParameters();
-                mCustomAtheneFparams = themat->getBestTechnique()->getPass(1)->getFragmentProgramParameters();
                 showSliders = true;
 
                 // set the current params
-                setDefaultDepthShadowParams();
+                updateDepthShadowParams();
                 break;
             };
             mCurrentMaterial = mat;
@@ -672,8 +599,6 @@ protected:
                 mTrayMgr->moveWidgetToTray(mFixedBiasSlider, TL_TOPRIGHT);
                 mSlopedBiasSlider->show();
                 mTrayMgr->moveWidgetToTray(mSlopedBiasSlider, TL_TOPRIGHT);
-                mClampSlider->show();   
-                mTrayMgr->moveWidgetToTray(mClampSlider, TL_TOPRIGHT);          
             }
             else
             {
@@ -681,8 +606,6 @@ protected:
                 mTrayMgr->removeWidgetFromTray(mFixedBiasSlider);
                 mSlopedBiasSlider->hide();
                 mTrayMgr->removeWidgetFromTray(mSlopedBiasSlider);
-                mClampSlider->hide();       
-                mTrayMgr->removeWidgetFromTray(mClampSlider);       
             }
         }
     }
