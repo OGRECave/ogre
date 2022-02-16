@@ -336,7 +336,7 @@ as it may affect how certain resources are loaded.
 
 ```cpp
 // Use Ogre's custom shadow mapping ability
-sceneMgr->setShadowTexturePixelFormat(PF_FLOAT32_R);
+sceneMgr->setShadowTexturePixelFormat(PF_DEPTH16);
 sceneMgr->setShadowTechnique( SHADOWTYPE_TEXTURE_ADDITIVE );
 sceneMgr->setShadowTextureCasterMaterial("Ogre/DepthShadowmap/Caster/Float");
 sceneMgr->setShadowTextureReceiverMaterial("Ogre/DepthShadowmap/Receiver/Float");
@@ -345,9 +345,8 @@ sceneMgr->setShadowTextureSize(1024);
 ```
 
 The setShadowTechnique call is all that is required for Ogre’s default
-shadow mapping. In the code above, we have told Ogre to use the R
-channel of a floating point texture to store depth values. This tends to
-be a very portable method (over graphics cards and APIs). The sample
+shadow mapping. In the code above, we have told Ogre to use a 16-bit depth texture.
+This tends to be a very portable method (over graphics cards and APIs). The sample
 uses 1024x1024 shadow maps. Self-shadowing is
 turned on, but be warned that this will only work properly if
 appropriate depth biasing is also used. The example code will manually
@@ -381,18 +380,13 @@ This is a pretty standard vertex shader.
 
 @include Samples/Media/materials/programs/GLSL/pssmCasterFp.glsl
 
-Just write out the depth values here. We compute the bias and derivatives in the receiver.
+Just write out the depth values here. The bias and derivatives are handled by the @c depth_bias set in the pass.
 
 @include Samples/Media/materials/programs/GLSL/DepthShadowmapReceiverVp.glsl
 
 This is a pretty standard vertex shader as well.
 
 @include Samples/Media/materials/programs/GLSL/DepthShadowmapReceiverFp.glsl
-
-This shader computes the two depth bias pieces described in section
-@ref DepthBias. These are used to offset the stored depth value. This is
-where the notation differs from above, but the translation is quite
-straightforward.
 
 Additionally this file implements percentage closest filtering. To use unfiltered
 shadow mapping, comment out the PCF block as noted and uncomment the
@@ -442,18 +436,15 @@ miniScreenNode->attachObject(miniScreen);
 
 ## Improving Shadow Quality
 
-### Shadow Camera Setups {#sm_shadow_camera_setup}
-
 The default projection used when rendering shadow textures is a uniform frustum.
 This is pretty straight forward but doesn't make the best use of the space in the shadow map 
 since texels closer to the camera will be larger, resulting in 'jaggies'.
 There are several ways to distribute the texels in the shadow texture differently.
 Ogre is provided with several alternative shadow camera setups:
  - Ogre::FocusedShadowCameraSetup: Implements the uniform shadow mapping algorithm in focused mode.
- - LiSPSM (Ogre::LiSPSMShadowCameraSetup): Implements the Light Space Perspective Shadow Mapping Algorithm.
- - PSSM (Ogre::PSSMShadowCameraSetup): Parallel Split Shadow Map (PSSM) shadow camera setup.
-
- - Plane Optimal (Ogre::PlaneOptimalShadowCameraSetup): Implements the plane optimal shadow camera algorithm.
+ - Ogre::LiSPSMShadowCameraSetup: Implements the Light Space Perspective Shadow Mapping Algorithm.
+ - Ogre::PSSMShadowCameraSetup: Parallel Split Shadow Map (PSSM) shadow camera setup.
+ - Ogre::PlaneOptimalShadowCameraSetup: Implements the plane optimal shadow camera algorithm.
 
 These Shadow Camera Setups can be enabled for the whole Scene with SceneManager::setShadowCameraSetup 
 or per light with Light::setCustomShadowCameraSetup
@@ -508,6 +499,13 @@ But some changes have to be made to the shaders of the Shadow Receiver as well a
 
 Material definition:
 ```
+sampler DepthSampler
+{
+	filtering none
+	tex_address_mode clamp
+	tex_border_colour 1.0 1.0 1.0 1.0
+}
+
 material PSSMShadowReceiver
 {
 	technique default
@@ -519,26 +517,20 @@ material PSSMShadowReceiver
 
 			texture_unit ShadowMap0
 			{
-				tex_address_mode clamp
-				tex_border_colour 1.0 1.0 1.0 1.0
 				content_type shadow
-				filtering none
+				sampler_ref DepthSampler
 			}
 
 			texture_unit ShadowMap1
 			{
-				tex_address_mode clamp
-				tex_border_colour 1.0 1.0 1.0 1.0
 				content_type shadow
-				filtering none
+				sampler_ref DepthSampler
 			}
 
 			texture_unit ShadowMap2
 			{
-				tex_address_mode clamp
-				tex_border_colour 1.0 1.0 1.0 1.0
 				content_type shadow
-				filtering none
+				sampler_ref DepthSampler
 			}
 		}
 	}
@@ -549,7 +541,7 @@ Program definition:
 ```
 vertex_program PSSMShadowReceiverVP glsl
 {
-	source "PSSMShadowReceiver.vs"
+	source PSSMShadowReceiver.vert
 
 	default_params
 	{
@@ -567,31 +559,20 @@ vertex_program PSSMShadowReceiverVP glsl
 
 fragment_program PSSMShadowReceiverFP glsl
 {
-	source "PSSMShadowReceiver.fs"
-
-	preprocessor_defines PCF=0
+	source PSSMShadowReceiver.frag
 
 	default_params
 	{
-		param_named inverseShadowmapSize float 0.0009765625
-		param_named fixedDepthBias float 0.0005
-		param_named gradientClamp float 0.0098
-		param_named gradientScaleBias float 0
-
 		param_named shadowMap0 int 0
 		param_named shadowMap1 int 1
 		param_named shadowMap2 int 2
-
-		param_named_auto invShadowMapSize0 inverse_texture_size 0
-		param_named_auto invShadowMapSize1 inverse_texture_size 1
-		param_named_auto invShadowMapSize2 inverse_texture_size 2
 
 		param_named pssmSplitPoints float4 0 0 0 0
 	}
 }
 ```
 
-The vertex shader now includes three texture proyection matrixes
+The vertex shader now includes three texture projection matrixes
 ```glsl
 #version 330 core
 
@@ -649,83 +630,41 @@ in vec4 outColor;
 
 in float depth;
 
-uniform float inverseShadowmapSize;
-uniform float fixedDepthBias;
-uniform float gradientClamp;
-uniform float gradientScaleBias;
-
 uniform sampler2D shadowMap0;
 uniform sampler2D shadowMap1;
 uniform sampler2D shadowMap2;
 
-uniform vec4 invShadowMapSize0;
-uniform vec4 invShadowMapSize1;
-uniform vec4 invShadowMapSize2;
-
 uniform vec4 pssmSplitPoints;
 
-void shadowFilter( sampler2D shadowMap, vec4 oUv, vec2 offset, vec3 splitColour )
+void shadowFilter( sampler2D shadowMap, vec4 oUv, vec3 splitColour )
 {
 	// Perform perspective divide
 	vec4 shadowUV = oUv;
 	shadowUV = shadowUV / shadowUV.w;
 
 	// Transform [-1, 1] to [0, 1] range
-#ifndef OGRE_REVERSED_Z
 	shadowUV.z = shadowUV.z * 0.5 + 0.5;
-#endif
 
 	// Get closest depth value from light's perspective (using [0,1] range fragPosLight as coords)
 	float centerdepth = texture2D(shadowMap, shadowUV.xy).x;
 
-	// Gradient calculation
-	float pixeloffset = inverseShadowmapSize;
-	vec4 depths = vec4(
-		texture2D(shadowMap, shadowUV.xy + vec2(-pixeloffset, 0.0)).x,
-		texture2D(shadowMap, shadowUV.xy + vec2(+pixeloffset, 0.0)).x,
-		texture2D(shadowMap, shadowUV.xy + vec2(0.0, -pixeloffset)).x,
-		texture2D(shadowMap, shadowUV.xy + vec2(0.0, +pixeloffset)).x);
-
-	vec2 differences = abs( depths.yw - depths.xz );
-	float gradient = min(gradientClamp, max(differences.x, differences.y));
-	float gradientFactor = gradient * gradientScaleBias;
-
-	// Visibility function
-	float depthAdjust = gradientFactor + (fixedDepthBias * centerdepth);
-	float finalCenterDepth = centerdepth + depthAdjust;
-
-	// shadowUV.z contains lightspace position of current object
-#if PCF
-	// Use depths from prev, calculate diff
-	depths += depthAdjust;
-	float final = (finalCenterDepth > shadowUV.z) ? 1.0 : 0.0;
-	final += (depths.x > shadowUV.z) ? 1.0 : 0.0;
-	final += (depths.y > shadowUV.z) ? 1.0 : 0.0;
-	final += (depths.z > shadowUV.z) ? 1.0 : 0.0;
-	final += (depths.w > shadowUV.z) ? 1.0 : 0.0;
-
-	final *= 0.2;
-
-	gl_FragColor = vec4(outColor.xyz * final * splitColour, 1.0);
-#else
 	// Check whether current frag pos is in shadow
 	gl_FragColor = (finalCenterDepth > shadowUV.z) ? vec4(outColor.xyz * splitColour, 1.0) : vec4(0.0, 0.0, 0.0, 1.0);
-#endif
 }
 
 void main()
 {
 	if( depth <= pssmSplitPoints.y )
 	{
-		shadowFilter( shadowMap0, oUv0, invShadowMapSize0.xy, vec3( 1.0, 0.0, 0.0 ) );
+		shadowFilter( shadowMap0, oUv0, vec3( 1.0, 0.0, 0.0 ) );
 	}
 	else if( depth <= pssmSplitPoints.z )
 	{
-		shadowFilter( shadowMap1, oUv1, invShadowMapSize1.xy, vec3( 0.0, 1.0, 0.0 ) );
+		shadowFilter( shadowMap1, oUv1, vec3( 0.0, 1.0, 0.0 ) );
 	}
 	else if( depth <= pssmSplitPoints.w )
 	{
-		shadowFilter( shadowMap2, oUv2, invShadowMapSize2.xy, vec3( 0.0, 0.0, 1.0 ) );
+		shadowFilter( shadowMap2, oUv2, vec3( 0.0, 0.0, 1.0 ) );
 	}
 	else
 	{

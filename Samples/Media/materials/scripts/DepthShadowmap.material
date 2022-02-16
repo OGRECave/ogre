@@ -108,12 +108,6 @@ fragment_program Ogre/DepthShadowmap/NormalMapReceiverFPPCF_GLSL glsl glsles
 // **-- End GLSL Section --**
 
 // **-- Begin Unified Section --**
-vertex_program Ogre/DepthShadowmap/CasterVP unified
-{
-}
-fragment_program Ogre/DepthShadowmap/CasterFP unified
-{
-}
 vertex_program Ogre/DepthShadowmap/ReceiverVP unified
 {
 	delegate Ogre/DepthShadowmap/ReceiverVP_GLSL
@@ -133,14 +127,6 @@ fragment_program Ogre/DepthShadowmap/ReceiverFP unified
 {
 	delegate Ogre/DepthShadowmap/ReceiverFP_GLSL
 	delegate Ogre/DepthShadowmap/ReceiverFP_HLSL
-
-	default_params
-    {
-        param_named inverseShadowmapSize float 0.0009765625
-		param_named fixedDepthBias float 0.0005
-		param_named gradientClamp float 0.0098
-		param_named gradientScaleBias float 0
-    }
 }
 fragment_program Ogre/DepthShadowmap/ReceiverFPPCF unified
 {
@@ -149,9 +135,7 @@ fragment_program Ogre/DepthShadowmap/ReceiverFPPCF unified
 
 	default_params
     {
-        param_named inverseShadowmapSize float 0.0009765625
-		param_named gradientClamp float 0.0098
-		param_named gradientScaleBias float 0
+        param_named_auto inverseShadowmapSize inverse_texture_size 0
     }
 }
 vertex_program Ogre/DepthShadowmap/NormalMapReceiverVP unified
@@ -175,10 +159,6 @@ fragment_program Ogre/DepthShadowmap/NormalMapReceiverFP unified
 	default_params
     {
 		param_named_auto lightColour light_diffuse_colour 0
-        param_named inverseShadowmapSize float 0.0009765625
-		param_named fixedDepthBias float 0.0005
-		param_named gradientClamp float 0.0098
-		param_named gradientScaleBias float 0
 	}
 }
 fragment_program Ogre/DepthShadowmap/NormalMapReceiverFPPCF unified
@@ -189,33 +169,13 @@ fragment_program Ogre/DepthShadowmap/NormalMapReceiverFPPCF unified
 	default_params
     {
 		param_named_auto lightColour light_diffuse_colour 0
-        param_named inverseShadowmapSize float 0.0009765625
-		param_named fixedDepthBias float 0.0005
-		param_named gradientClamp float 0.0098
-		param_named gradientScaleBias float 0
+        param_named_auto inverseShadowmapSize inverse_texture_size 0
 	}
 }
 
 // **-- End Unified Section --**
 
 //! [shadow_material]
-// Generic Shadow caster material (floating point shadowmap)
-material Ogre/DepthShadowmap/Caster/Float
-{
-	technique
-    {
-        pass 
-        {
-            vertex_program_ref Ogre/DepthShadowmap/CasterVP
-            {
-            }
-            fragment_program_ref Ogre/DepthShadowmap/CasterFP
-            {
-            }
-        }
-    }
-}
-
 // Specific receiver material for rockwall
 material Ogre/DepthShadowmap/Receiver/RockWall
 {
