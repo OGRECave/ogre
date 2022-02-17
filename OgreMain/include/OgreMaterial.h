@@ -276,6 +276,9 @@ namespace Ogre {
         */
         MaterialPtr clone(const String& newName, const String& newGroup = BLANKSTRING) const;
 
+        // needed because of deprecated variant below
+        MaterialPtr clone(const String& newName, const char* newGroup) const { return clone(newName, String(newGroup)); }
+
         /// @deprecated use clone(const String&, const String&)
         OGRE_DEPRECATED MaterialPtr clone(const String& newName, bool changeGroup,
                                           const String& newGroup = BLANKSTRING) const
