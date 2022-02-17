@@ -1457,13 +1457,9 @@ namespace Ogre {
             Generally the smaller your lights are the more chance you’ll see a benefit rather than
             a penalty from clipping.
 
-            @note A specific note about OpenGL: user clip planes are completely ignored when you use
-            an ARB vertex program. This means light clip planes won’t help much if you use ARB
-            vertex programs on GL, although OGRE will perform some optimisation of its own, in that
-            if it sees that the clip volume is completely off-screen, it won’t perform a render at
-            all. When using GLSL, user clipping can be used but you have to use gl_ClipVertex in your
-            shader, see the GLSL documentation for more information. In Direct3D user clip planes are
-            always respected.
+            @note Only has an effect with the fixed-function pipeline. Exceptions:
+            - with D3D9, clip planes are even available when shaders are used
+            - with GL1, shaders must write to gl_ClipVertex
         */
         void setLightClipPlanesEnabled(bool enabled) { mLightClipPlanes = enabled; }
         /** Gets whether or not this pass will be clipped by user clips planes
