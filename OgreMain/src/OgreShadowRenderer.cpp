@@ -140,7 +140,7 @@ void SceneManager::ShadowRenderer::renderAdditiveStencilShadowedQueueGroupObject
         lightList.clear();
 
         // Render all the ambient passes first, no light iteration, no lights
-        visitor->renderObjects(pPriorityGrp->getSolidsBasic(), om, false, false, &lightList);
+        visitor->renderObjects(pPriorityGrp->getSolidsBasic(), om, false, false);
         // Also render any objects which have receive shadows disabled
         visitor->renderObjects(pPriorityGrp->getSolidsNoShadowReceive(), om, true, true);
 
@@ -496,7 +496,7 @@ void SceneManager::ShadowRenderer::renderAdditiveTextureShadowedQueueGroupObject
         lightList.clear();
 
         // Render all the ambient passes first, no light iteration, no lights
-        visitor->renderObjects(pPriorityGrp->getSolidsBasic(), om, false, false, &lightList);
+        visitor->renderObjects(pPriorityGrp->getSolidsBasic(), om, false, false);
         // Also render any objects which have receive shadows disabled
         visitor->renderObjects(pPriorityGrp->getSolidsNoShadowReceive(), om, true, true);
 
@@ -603,8 +603,6 @@ void SceneManager::ShadowRenderer::renderTextureShadowReceiverQueueGroupObjects(
     RenderQueueGroup* pGroup,
     QueuedRenderableCollection::OrganisationMode om)
 {
-    static LightList nullLightList;
-
     // Iterate through priorities
 
     // Override auto param ambient to force vertex programs to go full-bright
@@ -617,7 +615,7 @@ void SceneManager::ShadowRenderer::renderTextureShadowReceiverQueueGroupObjects(
         RenderPriorityGroup* pPriorityGrp = pg.second;
 
         // Do solids, override light list incase any vertex programs use them
-        visitor->renderObjects(pPriorityGrp->getSolidsBasic(), om, false, false, &nullLightList);
+        visitor->renderObjects(pPriorityGrp->getSolidsBasic(), om, false, false);
 
         // Don't render transparents or passes which have shadow receipt disabled
 
@@ -1495,8 +1493,6 @@ const Pass* SceneManager::ShadowRenderer::deriveShadowReceiverPass(const Pass* p
             retPass->setDiffuse(pass->getDiffuse());
             retPass->setSpecular(pass->getSpecular());
             retPass->setShininess(pass->getShininess());
-            retPass->setIteratePerLight(pass->getIteratePerLight(),
-                pass->getRunOnlyForOneLightType(), pass->getOnlyLightType());
             retPass->setLightMask(pass->getLightMask());
 
             // We need to keep alpha rejection settings
@@ -1529,6 +1525,10 @@ const Pass* SceneManager::ShadowRenderer::deriveShadowReceiverPass(const Pass* p
             // need to keep spotlight fade etc
             keepTUCount = retPass->getNumTextureUnitStates();
         }
+
+        // re-/set light iteration settings
+        retPass->setIteratePerLight(pass->getIteratePerLight(), pass->getRunOnlyForOneLightType(),
+                                    pass->getOnlyLightType());
 
         // Remove any extra texture units
         while (retPass->getNumTextureUnitStates() > keepTUCount)
