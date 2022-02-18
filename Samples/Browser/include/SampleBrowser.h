@@ -69,7 +69,7 @@ namespace OgreBites
     class SampleBrowser : public SampleContext, public TrayListener
     {
 #ifdef OGRE_STATIC_LIB
-        typedef std::map<Ogre::String, Ogre::Plugin*> PluginMap;
+        typedef std::map<Ogre::String, SamplePlugin*> PluginMap;
         PluginMap mPluginNameMap;                      // A structure to map plugin names to class types
 #endif
     public:
@@ -860,58 +860,55 @@ namespace OgreBites
         virtual Sample* loadSamples()
         {
             Sample* startupSample = 0;
-
             Ogre::StringVector unloadedSamplePlugins;
+
+            Ogre::String startupSampleTitle;
+            Ogre::StringVector sampleList;
+#ifdef OGRE_STATIC_LIB
+            for(auto it = mPluginNameMap.begin(); it != mPluginNameMap.end(); ++it)
+            {
+                sampleList.push_back(it->first);
+            }
+#else
             Ogre::ConfigFile cfg;
-#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+#   if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
             Ogre::Archive* apk = Ogre::ArchiveManager::getSingleton().load("", "APKFileSystem", true);
             cfg.load(apk->open(mFSLayer->getConfigFilePath("samples.cfg")));
-#else
+#   else
             cfg.load(mFSLayer->getConfigFilePath("samples.cfg"));
-#endif
+#   endif
 
             Ogre::String sampleDir = cfg.getSetting("SampleFolder");        // Mac OS X just uses Resources/ directory
-            Ogre::StringVector sampleList = cfg.getMultiSetting("SamplePlugin");
-            Ogre::String startupSampleTitle = cfg.getSetting("StartupSample");
+            sampleList = cfg.getMultiSetting("SamplePlugin");
+            startupSampleTitle = cfg.getSetting("StartupSample");
 
             sampleDir = Ogre::FileSystemLayer::resolveBundlePath(sampleDir);
 
-#if OGRE_PLATFORM != OGRE_PLATFORM_APPLE && OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
+#   if OGRE_PLATFORM != OGRE_PLATFORM_APPLE && OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
             if (sampleDir.empty()) sampleDir = ".";   // user didn't specify plugins folder, try current one
-#endif
+#   endif
 
             // add slash or backslash based on platform
             char lastChar = sampleDir[sampleDir.length() - 1];
             if (lastChar != '/' && lastChar != '\\')
             {
-#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || (OGRE_PLATFORM == OGRE_PLATFORM_WINRT)
+#   if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || (OGRE_PLATFORM == OGRE_PLATFORM_WINRT)
                 sampleDir += "\\";
-#elif OGRE_PLATFORM == OGRE_PLATFORM_LINUX
+#   elif OGRE_PLATFORM == OGRE_PLATFORM_LINUX
                 sampleDir += "/";
-#endif
+#   endif
             }
+#endif
 
             SampleSet newSamples;
 
             // loop through all sample plugins...
             for (Ogre::StringVector::iterator i = sampleList.begin(); i != sampleList.end(); i++)
             {
+#ifndef OGRE_STATIC_LIB
                 try   // try to load the plugin
                 {
-#ifdef OGRE_STATIC_LIB
-                    Ogre::String sampleName = *i;
-                    // in debug, remove any suffix
-                    if(Ogre::StringUtil::endsWith(sampleName, "_d"))
-                        sampleName = sampleName.substr(0, sampleName.length()-2);
-
-                    Ogre::Plugin* pluginInstance = mPluginNameMap[sampleName];
-                    if(pluginInstance)
-                    {
-                        mRoot->installPlugin(pluginInstance);
-                    }
-#else
                     mRoot->loadPlugin(sampleDir + *i);
-#endif
                 }
                 catch (Ogre::Exception& e)   // plugin couldn't be loaded
                 {
@@ -925,16 +922,15 @@ namespace OgreBites
 
                 if (!sp)  // this is not a SamplePlugin, so unload it
                 {
-                    //unloadedSamplePlugins.push_back(sampleDir + *i);
-#ifdef OGRE_STATIC_LIB
-                    //mRoot->uninstallPlugin(p);
-#else
-                    //mRoot->unloadPlugin(sampleDir + *i);
-#endif
+                    unloadedSamplePlugins.push_back(sampleDir + *i);
+                    mRoot->unloadPlugin(sampleDir + *i);
                     continue;
                 }
 
                 mLoadedSamplePlugins.push_back(sampleDir + *i);   // add to records
+#else
+                SamplePlugin* sp = mPluginNameMap[*i];
+#endif
 
                 // go through every sample in the plugin...
                 newSamples = sp->getSamples();
@@ -971,19 +967,7 @@ namespace OgreBites
           -----------------------------------------------------------------------------*/
         virtual void unloadSamples()
         {
-#ifdef OGRE_STATIC_LIB
-            const Ogre::Root::PluginInstanceList pluginList = mRoot->getInstalledPlugins();
-            for(unsigned int i = 0; i < pluginList.size(); i++)
-            {
-                SamplePlugin* sp = dynamic_cast<SamplePlugin*>(pluginList[i]);
-
-                // This is a sample plugin so we can unload it
-                if(!sp) continue;
-
-                mRoot->uninstallPlugin(sp);
-                delete sp;
-            }
-#else
+#ifndef OGRE_STATIC_LIB
             for (unsigned int i = 0; i < mLoadedSamplePlugins.size(); i++)
             {
                 mRoot->unloadPlugin(mLoadedSamplePlugins[i]);
