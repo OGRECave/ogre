@@ -57,6 +57,7 @@ def main():
     if sys.platform == "win32":
         cmake_args += ["-DSWIG_EXECUTABLE=C:/ProgramData/chocolatey/bin/swig.exe",
                        "-DOGRE_BIN_DIRECTORY=Ogre", # direct dlls into python package
+                       "-DOGRE_CFG_INSTALL_PATH=bin", # but keep config files in bin, relative to Media
                        "-DOGRE_BUILD_RENDERSYSTEM_D3D9=OFF" # do not require old runtime
                        ]
     elif sys.platform == "linux":
