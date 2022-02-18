@@ -167,15 +167,12 @@ set(OGRE_CORE_MEDIA_DIR "${OGRE_MEDIA_DIR_REL}")
 configure_file(${OGRE_TEMPLATES_DIR}/resources.cfg.in ${PROJECT_BINARY_DIR}/inst/bin/resources.cfg)
 configure_file(${OGRE_TEMPLATES_DIR}/plugins.cfg.in ${PROJECT_BINARY_DIR}/inst/bin/plugins.cfg)
 configure_file(${OGRE_TEMPLATES_DIR}/samples.cfg.in ${PROJECT_BINARY_DIR}/inst/bin/samples.cfg)
-configure_file(${OGRE_TEMPLATES_DIR}/tests.cfg.in ${PROJECT_BINARY_DIR}/inst/bin/tests.cfg)
-
 
 # install resource files
 install(FILES 
   ${PROJECT_BINARY_DIR}/inst/bin/resources.cfg
   ${PROJECT_BINARY_DIR}/inst/bin/plugins.cfg
   ${PROJECT_BINARY_DIR}/inst/bin/samples.cfg
-  ${PROJECT_BINARY_DIR}/inst/bin/tests.cfg
   DESTINATION "${OGRE_CFG_INSTALL_PATH}"
 )
 
@@ -220,11 +217,6 @@ elseif (MSVC AND NOT NMAKE)
   configure_file(${OGRE_TEMPLATES_DIR}/samples.cfg.in ${PROJECT_BINARY_DIR}/bin/relwithdebinfo/samples.cfg)
   configure_file(${OGRE_TEMPLATES_DIR}/samples.cfg.in ${PROJECT_BINARY_DIR}/bin/minsizerel/samples.cfg)
   configure_file(${OGRE_TEMPLATES_DIR}/samples.cfg.in ${PROJECT_BINARY_DIR}/bin/debug/samples.cfg)
-
-  configure_file(${OGRE_TEMPLATES_DIR}/tests.cfg.in ${PROJECT_BINARY_DIR}/bin/release/tests.cfg)
-  configure_file(${OGRE_TEMPLATES_DIR}/tests.cfg.in ${PROJECT_BINARY_DIR}/bin/relwithdebinfo/tests.cfg)
-  configure_file(${OGRE_TEMPLATES_DIR}/tests.cfg.in ${PROJECT_BINARY_DIR}/bin/minsizerel/tests.cfg)
-  configure_file(${OGRE_TEMPLATES_DIR}/tests.cfg.in ${PROJECT_BINARY_DIR}/bin/debug/tests.cfg)
 else() # other OS only need one cfg file
   # create resources.cfg
   configure_file(${OGRE_TEMPLATES_DIR}/resources.cfg.in ${PROJECT_BINARY_DIR}/bin/resources.cfg)
@@ -232,8 +224,6 @@ else() # other OS only need one cfg file
   configure_file(${OGRE_TEMPLATES_DIR}/plugins.cfg.in ${PROJECT_BINARY_DIR}/bin/plugins.cfg)
   # create samples.cfg
   configure_file(${OGRE_TEMPLATES_DIR}/samples.cfg.in ${PROJECT_BINARY_DIR}/bin/samples.cfg)
-  # create tests.cfg
-  configure_file(${OGRE_TEMPLATES_DIR}/tests.cfg.in ${PROJECT_BINARY_DIR}/bin/tests.cfg)
 endif ()
 
 

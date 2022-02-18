@@ -41,10 +41,8 @@ THE SOFTWARE.
 #include <windows.h>
 #endif
 
-#ifdef OGRE_STATIC_LIB
 #include "VTestPlugin.h"
 #include "PlayPenTestPlugin.h"
-#endif
 
 TestContext::TestContext(int argc, char** argv) : OgreBites::SampleContext(), mSuccess(true), mTimestep(0.01f), mBatch(0)
 {
@@ -141,44 +139,8 @@ void TestContext::setup()
     Ogre::TextureManager::getSingleton().setDefaultNumMipmaps(5);
     mRoot->addFrameListener(this);
 
-    // Get the path and list of test plugins from the config file.
-    Ogre::ConfigFile testConfig;
-    testConfig.load(mFSLayer->getConfigFilePath("tests.cfg"));
-    mPluginDirectory = Ogre::FileSystemLayer::resolveBundlePath(testConfig.getSetting("TestFolder"));
-
-#if OGRE_PLATFORM != OGRE_PLATFORM_APPLE && OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
-    if (mPluginDirectory.empty()) mPluginDirectory = ".";   // user didn't specify plugins folder, try current one
-#endif
-
-    // add slash or backslash based on platform
-    char lastChar = mPluginDirectory[mPluginDirectory.length() - 1];
-    if (lastChar != '/' && lastChar != '\\')
-    {
-#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || (OGRE_PLATFORM == OGRE_PLATFORM_WINRT)
-        mPluginDirectory += "\\";
-#elif OGRE_PLATFORM == OGRE_PLATFORM_LINUX
-        mPluginDirectory += "/";
-#endif
-    }
-
-    // Parse for the test sets and plugins that they're made up of.
-    ConfigFile::SettingsBySection_::const_iterator seci;
-    for(seci = testConfig.getSettingsBySection().begin(); seci != testConfig.getSettingsBySection().end(); ++seci) {
-        const ConfigFile::SettingsMultiMap& settings = seci->second;
-        Ogre::String setName = seci->first;
-        if (setName != "")
-        {
-            mTestSets[setName] = Ogre::StringVector();
-            Ogre::ConfigFile::SettingsMultiMap::const_iterator it = settings.begin();
-            for (; it != settings.end(); ++it)
-                mTestSets[setName].push_back(it->second);
-        }
-    }
-
-#ifdef OGRE_STATIC_LIB
-    mPluginNameMap["VTests"]       = (OgreBites::SamplePlugin *) OGRE_NEW VTestPlugin();
-    mPluginNameMap["PlayPenTests"] = (OgreBites::SamplePlugin *) OGRE_NEW PlaypenTestPlugin();
-#endif
+    mPluginNameMap["VTests"]       = new VTestPlugin();
+    mPluginNameMap["PlayPenTests"] = new PlaypenTestPlugin();
 
     Ogre::String batchName = BLANKSTRING;
     time_t raw = time(0);
@@ -211,61 +173,20 @@ void TestContext::setup()
                            mWindow->getWidth(), mWindow->getHeight(), mOutputDir + batchName + "/");
     mBatch->comment = mComment;
 
-    OgreBites::Sample* firstTest = loadTests(mTestSetName);
+    OgreBites::Sample* firstTest = loadTests();
     if (firstTest)
         runSample(firstTest);
 }
 //-----------------------------------------------------------------------
 
-OgreBites::Sample* TestContext::loadTests(Ogre::String set)
+OgreBites::Sample* TestContext::loadTests()
 {
     OgreBites::Sample* startSample = 0;
-    Ogre::StringVector sampleList;
-
-    // Need support for static loading in here!!!!
 
     // load all of the plugins in the set
-    for (Ogre::StringVector::iterator it = mTestSets[set].begin(); it !=
-             mTestSets[set].end(); ++it)
+    for(auto it : mPluginNameMap)
     {
-        Ogre::String plugin = *it;
-
-        // try loading up the test plugin
-        try
-        {
-#ifdef OGRE_STATIC_LIB
-            // in debug, remove any suffix
-            if(StringUtil::endsWith(plugin, "_d"))
-                plugin = plugin.substr(0, plugin.length()-2);
-
-            OgreBites::SamplePlugin *pluginInstance = (OgreBites::SamplePlugin *) mPluginNameMap[plugin];
-            if(pluginInstance)
-            {
-                //                OgreBites::SamplePlugin* sp = OGRE_NEW OgreBites::SamplePlugin(pluginInstance->getInfo()["Title"]);
-
-                //                sp->addSample(pluginInstance);
-                mRoot->installPlugin(pluginInstance);
-            }
-#else
-            mRoot->loadPlugin(mPluginDirectory + plugin);
-#endif
-        }
-        // if it fails, just return right away
-        catch (Ogre::Exception&)
-        {
-            return 0;
-        }
-
-        // grab the plugin and cast to SamplePlugin
-        Ogre::Plugin* p = mRoot->getInstalledPlugins().back();
-        OgreBites::SamplePlugin* sp = dynamic_cast<OgreBites::SamplePlugin*>(p);
-
-        // if something has gone wrong return null
-        if (!sp)
-            return 0;
-
-        // go through every sample (test) in the plugin...
-        OgreBites::SampleSet newSamples = sp->getSamples();
+        OgreBites::SampleSet newSamples = it.second->getSamples();
         for (OgreBites::SampleSet::iterator j = newSamples.begin(); j != newSamples.end(); j++)
         {
             // capability check
@@ -436,7 +357,7 @@ void TestContext::go(OgreBites::Sample* initialSample)
         std::cout<<"\t-d           Force config dialog.\n";
         std::cout<<"\t-h, --help   Show usage details.\n";
         std::cout<<"\t-m [comment] Optional comment.\n";
-        std::cout<<"\t-ts [name]   Name of the test set to use (defined in tests.cfg).\n";
+        std::cout<<"\t-ts [name]   Name of the test set to use.\n";
         std::cout<<"\t-c [name]    Name of the test result batch to compare against.\n";
         std::cout<<"\t-n [name]    Name for this result image set.\n";
         std::cout<<"\t-rs [name]   Render system to use.\n";
