@@ -70,9 +70,8 @@ class TestContext : public OgreBites::SampleContext
     virtual void runSample(OgreBites::Sample* s);
 
     /** Loads test plugins
-     *        @param set The name of the test set to load
      *        @return The initial tets or sample to run */
-    OgreBites::Sample* loadTests(String set);
+    OgreBites::Sample* loadTests();
 
     /** Setup the Root */
     virtual void createRoot();
@@ -103,18 +102,12 @@ class TestContext : public OgreBites::SampleContext
         return mSuccess;
     }
 
- protected:
+ private:
     typedef std::map<String, OgreBites::SamplePlugin *> PluginMap;
     bool mSuccess;
 
     /// The timestep
     Real mTimestep;
-
-    /// Path to the test plugin directory
-    String mPluginDirectory;
-
-    /// List of available test sets
-    std::map<String, StringVector> mTestSets;
 
     /// The tests to be run
     std::deque<OgreBites::Sample*> mTests;

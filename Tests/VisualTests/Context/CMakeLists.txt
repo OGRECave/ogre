@@ -30,22 +30,13 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 include_directories(${PROJECT_SOURCE_DIR}/Samples/Common/include)
 include_directories(${PROJECT_SOURCE_DIR}/Samples/Browser/include)
 include_directories(${PROJECT_SOURCE_DIR}/Tests/VisualTests/Common/include)
+include_directories(${PROJECT_SOURCE_DIR}/Tests/VisualTests/VTests/include)
+include_directories(${PROJECT_SOURCE_DIR}/Tests/VisualTests/PlayPen/include)
 
-if (OGRE_STATIC)
-  include_directories(${PROJECT_SOURCE_DIR}/Tests/VisualTests/VTests/include)
-  include_directories(${PROJECT_SOURCE_DIR}/Tests/VisualTests/PlayPen/include)
-  
-  # Fix for static build with MinGW
-  if (OGRE_BUILD_RENDERSYSTEM_D3D9 AND MINGW AND OGRE_STATIC)
-	include_directories(${DirectX9_INCLUDE_DIR})
-  endif() 
-  
-  list(APPEND SAMPLE_LIBRARIES VTests)
-  list(APPEND SAMPLE_LIBRARIES PlayPenTests)
-endif()
+set(SAMPLE_LIBRARIES VTests PlayPenTests)
 
 add_executable(TestContext ${HEADER_FILES} ${SOURCE_FILES})
-target_link_libraries(TestContext OgreMain ${OGRE_PLUGIN_LIBRARIES} ${SAMPLE_LIBRARIES} OgreOverlay OgreRTShaderSystem OgreBites)
+target_link_libraries(TestContext OgreMain ${SAMPLE_LIBRARIES} OgreOverlay OgreRTShaderSystem OgreBites)
 ogre_config_common(TestContext)
 
 # Make sure all plugins are built
@@ -124,8 +115,6 @@ if (APPLE)
 		COMMAND ln ARGS -s -f ${PROJECT_BINARY_DIR}/bin/plugins.cfg
 		${OGRE_TESTCONTEXT_CONTENTS_PATH}/Resources/
 		COMMAND ln ARGS -s -f ${PROJECT_BINARY_DIR}/bin/resources.cfg
-		${OGRE_TESTCONTEXT_CONTENTS_PATH}/Resources/
-		COMMAND ln ARGS -s -f ${PROJECT_BINARY_DIR}/bin/tests.cfg
 		${OGRE_TESTCONTEXT_CONTENTS_PATH}/Resources/
 		COMMAND ln ARGS -s -f ${PROJECT_SOURCE_DIR}/Samples/Media
 		${OGRE_TESTCONTEXT_CONTENTS_PATH}/Resources/

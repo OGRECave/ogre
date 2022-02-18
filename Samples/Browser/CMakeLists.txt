@@ -62,7 +62,6 @@ if (WINDOWS_STORE OR WINDOWS_PHONE)
         ${PROJECT_BINARY_DIR}/inst/bin/resources.cfg
         ${PROJECT_BINARY_DIR}/inst/bin/plugins.cfg
         ${PROJECT_BINARY_DIR}/inst/bin/samples.cfg
-        ${PROJECT_BINARY_DIR}/inst/bin/tests.cfg
 
         ${PROJECT_SOURCE_DIR}/Samples/Common/misc.winrt/Logo.png
         ${PROJECT_SOURCE_DIR}/Samples/Common/misc.winrt/SmallLogo.png
@@ -84,7 +83,6 @@ if (WINDOWS_STORE OR WINDOWS_PHONE)
         ${CMAKE_CURRENT_BINARY_DIR}/resources.cfg
         ${CMAKE_CURRENT_BINARY_DIR}/plugins.cfg
         ${CMAKE_CURRENT_BINARY_DIR}/samples.cfg
-        ${CMAKE_CURRENT_BINARY_DIR}/tests.cfg
     )
     set_property(SOURCE ${CONTENT_FILES} PROPERTY VS_DEPLOYMENT_CONTENT 1)
 
