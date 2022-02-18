@@ -304,6 +304,8 @@ namespace Ogre {
     //-----------------------------------------------------------------------------
     Technique* Material::getBestTechnique(unsigned short lodIndex, const Renderable* rend)
     {
+        OgreAssertDbg(mSupportedTechniques.empty() == mBestTechniquesBySchemeList.empty(),
+                      "Techniques and scheme list must be in sync");
         if (mSupportedTechniques.empty())
         {
             return NULL;
@@ -313,8 +315,7 @@ namespace Ogre {
             Technique* ret = 0;
             MaterialManager& matMgr = MaterialManager::getSingleton();
             // get scheme
-            BestTechniquesBySchemeList::iterator si = 
-                mBestTechniquesBySchemeList.find(matMgr._getActiveSchemeIndex());
+            auto si = mBestTechniquesBySchemeList.find(matMgr._getActiveSchemeIndex());
             // scheme not found?
             if (si == mBestTechniquesBySchemeList.end())
             {
@@ -330,13 +331,12 @@ namespace Ogre {
             }
 
             // get LOD
-            LodTechniques::iterator li = si->second.find(lodIndex);
+            auto li = si->second.find(lodIndex);
             // LOD not found? 
             if (li == si->second.end())
             {
                 // Use the next LOD level up
-                for (LodTechniques::reverse_iterator rli = si->second.rbegin();
-                    rli != si->second.rend(); ++rli)
+                for (auto rli = si->second.rbegin(); rli != si->second.rend(); ++rli)
                 {
                     if (rli->second->getLodIndex() < lodIndex)
                     {
@@ -370,9 +370,7 @@ namespace Ogre {
         Techniques::iterator i = mTechniques.begin() + index;
         OGRE_DELETE(*i);
         mTechniques.erase(i);
-        mSupportedTechniques.clear();
         clearBestTechniqueList();
-        mCompilationRequired = true;
     }
     //-----------------------------------------------------------------------
     void Material::removeAllTechniques(void)
@@ -384,9 +382,7 @@ namespace Ogre {
             OGRE_DELETE(*i);
         }
         mTechniques.clear();
-        mSupportedTechniques.clear();
         clearBestTechniqueList();
-        mCompilationRequired = true;
     }
     //-----------------------------------------------------------------------
     Material::TechniqueIterator Material::getTechniqueIterator(void) 
@@ -415,7 +411,6 @@ namespace Ogre {
     void Material::compile(bool autoManageTextureUnits)
     {
         // Compile each technique, then add it to the list of supported techniques
-        mSupportedTechniques.clear();
         clearBestTechniqueList();
         mUnsupportedReasons.clear();
 
@@ -456,7 +451,9 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void Material::clearBestTechniqueList(void)
     {
+        mSupportedTechniques.clear();
         mBestTechniquesBySchemeList.clear();
+        mCompilationRequired = true;
     }
     //-----------------------------------------------------------------------
     void Material::setPointSize(Real ps)
