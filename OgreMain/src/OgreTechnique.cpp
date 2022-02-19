@@ -582,57 +582,23 @@ namespace Ogre {
         return mParent->isLoaded() && mIsSupported;
     }
     //-----------------------------------------------------------------------
-    void Technique::setPointSize(Real ps)
-    {
-        Passes::iterator i, iend;
-        iend = mPasses.end();
-        for (i = mPasses.begin(); i != iend; ++i)
-        {
-            (*i)->setPointSize(ps);
-        }
-
-    }
+    #define ALL_PASSES(fncall) for(auto p : mPasses) p->fncall
+    void Technique::setPointSize(Real ps) { ALL_PASSES(setPointSize(ps)); }
     //-----------------------------------------------------------------------
-    void Technique::setAmbient(float red, float green, float blue)
-    {
-        setAmbient(ColourValue(red, green, blue));
-        
-
-    }
+    void Technique::setAmbient(float red, float green, float blue) { setAmbient(ColourValue(red, green, blue)); }
     //-----------------------------------------------------------------------
-    void Technique::setAmbient(const ColourValue& ambient)
-    {
-        Passes::iterator i, iend;
-        iend = mPasses.end();
-        for (i = mPasses.begin(); i != iend; ++i)
-        {
-            (*i)->setAmbient(ambient);
-        }
-    }
+    void Technique::setAmbient(const ColourValue& ambient) { ALL_PASSES(setAmbient(ambient)); }
     //-----------------------------------------------------------------------
     void Technique::setDiffuse(float red, float green, float blue, float alpha)
     {
-        Passes::iterator i, iend;
-        iend = mPasses.end();
-        for (i = mPasses.begin(); i != iend; ++i)
-        {
-            (*i)->setDiffuse(red, green, blue, alpha);
-        }
+        ALL_PASSES(setDiffuse(red, green, blue, alpha));
     }
     //-----------------------------------------------------------------------
-    void Technique::setDiffuse(const ColourValue& diffuse)
-    {
-        setDiffuse(diffuse.r, diffuse.g, diffuse.b, diffuse.a);
-    }
+    void Technique::setDiffuse(const ColourValue& diffuse) { setDiffuse(diffuse.r, diffuse.g, diffuse.b, diffuse.a); }
     //-----------------------------------------------------------------------
     void Technique::setSpecular(float red, float green, float blue, float alpha)
     {
-        Passes::iterator i, iend;
-        iend = mPasses.end();
-        for (i = mPasses.begin(); i != iend; ++i)
-        {
-            (*i)->setSpecular(red, green, blue, alpha);
-        }
+        ALL_PASSES(setSpecular(red, green, blue, alpha));
     }
     //-----------------------------------------------------------------------
     void Technique::setSpecular(const ColourValue& specular)
@@ -640,202 +606,71 @@ namespace Ogre {
         setSpecular(specular.r, specular.g, specular.b, specular.a);
     }
     //-----------------------------------------------------------------------
-    void Technique::setShininess(Real val)
-    {
-        Passes::iterator i, iend;
-        iend = mPasses.end();
-        for (i = mPasses.begin(); i != iend; ++i)
-        {
-            (*i)->setShininess(val);
-        }
-    }
+    void Technique::setShininess(Real val) { ALL_PASSES(setShininess(val)); }
     //-----------------------------------------------------------------------
     void Technique::setSelfIllumination(float red, float green, float blue)
     {
         setSelfIllumination(ColourValue(red, green, blue));
     }
     //-----------------------------------------------------------------------
-    void Technique::setSelfIllumination(const ColourValue& selfIllum)
-    {
-        Passes::iterator i, iend;
-        iend = mPasses.end();
-        for (i = mPasses.begin(); i != iend; ++i)
-        {
-            (*i)->setSelfIllumination(selfIllum);
-        }
-    }
+    void Technique::setSelfIllumination(const ColourValue& selfIllum) { ALL_PASSES(setSelfIllumination(selfIllum)); }
     //-----------------------------------------------------------------------
-    void Technique::setDepthCheckEnabled(bool enabled)
-    {
-        Passes::iterator i, iend;
-        iend = mPasses.end();
-        for (i = mPasses.begin(); i != iend; ++i)
-        {
-            (*i)->setDepthCheckEnabled(enabled);
-        }
-    }
+    void Technique::setDepthCheckEnabled(bool enabled) { ALL_PASSES(setDepthCheckEnabled(enabled)); }
     //-----------------------------------------------------------------------
-    void Technique::setDepthWriteEnabled(bool enabled)
-    {
-        Passes::iterator i, iend;
-        iend = mPasses.end();
-        for (i = mPasses.begin(); i != iend; ++i)
-        {
-            (*i)->setDepthWriteEnabled(enabled);
-        }
-    }
+    void Technique::setDepthWriteEnabled(bool enabled) { ALL_PASSES(setDepthWriteEnabled(enabled)); }
     //-----------------------------------------------------------------------
-    void Technique::setDepthFunction( CompareFunction func )
-    {
-        Passes::iterator i, iend;
-        iend = mPasses.end();
-        for (i = mPasses.begin(); i != iend; ++i)
-        {
-            (*i)->setDepthFunction(func);
-        }
-    }
+    void Technique::setDepthFunction(CompareFunction func) { ALL_PASSES(setDepthFunction(func)); }
     //-----------------------------------------------------------------------
-    void Technique::setColourWriteEnabled(bool enabled)
-    {
-        Passes::iterator i, iend;
-        iend = mPasses.end();
-        for (i = mPasses.begin(); i != iend; ++i)
-        {
-            (*i)->setColourWriteEnabled(enabled);
-        }
-    }
+    void Technique::setColourWriteEnabled(bool enabled) { ALL_PASSES(setColourWriteEnabled(enabled)); }
     //-----------------------------------------------------------------------
     void Technique::setColourWriteEnabled(bool red, bool green, bool blue, bool alpha)
     {
-        Passes::iterator i, iend;
-        iend = mPasses.end();
-        for (i = mPasses.begin(); i != iend; ++i)
-        {
-            (*i)->setColourWriteEnabled(red, green, blue, alpha);
-        }
+        ALL_PASSES(setColourWriteEnabled(red, green, blue, alpha));
     }
     //-----------------------------------------------------------------------
-    void Technique::setCullingMode( CullingMode mode )
-    {
-        Passes::iterator i, iend;
-        iend = mPasses.end();
-        for (i = mPasses.begin(); i != iend; ++i)
-        {
-            (*i)->setCullingMode(mode);
-        }
-    }
+    void Technique::setCullingMode(CullingMode mode) { ALL_PASSES(setCullingMode(mode)); }
     //-----------------------------------------------------------------------
-    void Technique::setManualCullingMode( ManualCullingMode mode )
-    {
-        Passes::iterator i, iend;
-        iend = mPasses.end();
-        for (i = mPasses.begin(); i != iend; ++i)
-        {
-            (*i)->setManualCullingMode(mode);
-        }
-    }
+    void Technique::setManualCullingMode(ManualCullingMode mode) { ALL_PASSES(setManualCullingMode(mode)); }
     //-----------------------------------------------------------------------
-    void Technique::setLightingEnabled(bool enabled)
-    {
-        Passes::iterator i, iend;
-        iend = mPasses.end();
-        for (i = mPasses.begin(); i != iend; ++i)
-        {
-            (*i)->setLightingEnabled(enabled);
-        }
-    }
+    void Technique::setLightingEnabled(bool enabled) { ALL_PASSES(setLightingEnabled(enabled)); }
     //-----------------------------------------------------------------------
-    void Technique::setShadingMode( ShadeOptions mode )
-    {
-        Passes::iterator i, iend;
-        iend = mPasses.end();
-        for (i = mPasses.begin(); i != iend; ++i)
-        {
-            (*i)->setShadingMode(mode);
-        }
-    }
+    void Technique::setShadingMode(ShadeOptions mode) { ALL_PASSES(setShadingMode(mode)); }
     //-----------------------------------------------------------------------
-    void Technique::setFog(bool overrideScene, FogMode mode, const ColourValue& colour,
-        Real expDensity, Real linearStart, Real linearEnd)
+    void Technique::setFog(bool overrideScene, FogMode mode, const ColourValue& colour, Real expDensity,
+                           Real linearStart, Real linearEnd)
     {
-        Passes::iterator i, iend;
-        iend = mPasses.end();
-        for (i = mPasses.begin(); i != iend; ++i)
-        {
-            (*i)->setFog(overrideScene, mode, colour, expDensity, linearStart, linearEnd);
-        }
+        ALL_PASSES(setFog(overrideScene, mode, colour, expDensity, linearStart, linearEnd));
     }
     //-----------------------------------------------------------------------
     void Technique::setDepthBias(float constantBias, float slopeScaleBias)
     {
-        Passes::iterator i, iend;
-        iend = mPasses.end();
-        for (i = mPasses.begin(); i != iend; ++i)
-        {
-            (*i)->setDepthBias(constantBias, slopeScaleBias);
-        }
+        ALL_PASSES(setDepthBias(constantBias, slopeScaleBias));
     }
     //-----------------------------------------------------------------------
     void Technique::setTextureFiltering(TextureFilterOptions filterType)
     {
-        Passes::iterator i, iend;
-        iend = mPasses.end();
-        for (i = mPasses.begin(); i != iend; ++i)
-        {
-            (*i)->setTextureFiltering(filterType);
-        }
+        ALL_PASSES(setTextureFiltering(filterType));
     }
     // --------------------------------------------------------------------
-    void Technique::setTextureAnisotropy(unsigned int maxAniso)
+    void Technique::setTextureAnisotropy(unsigned int maxAniso) { ALL_PASSES(setTextureAnisotropy(maxAniso)); }
+    // --------------------------------------------------------------------
+    void Technique::setSceneBlending(const SceneBlendType sbt) { ALL_PASSES(setSceneBlending(sbt)); }
+    // --------------------------------------------------------------------
+    void Technique::setSeparateSceneBlending(const SceneBlendType sbt, const SceneBlendType sbta)
     {
-        Passes::iterator i, iend;
-        iend = mPasses.end();
-        for (i = mPasses.begin(); i != iend; ++i)
-        {
-            (*i)->setTextureAnisotropy(maxAniso);
-        }
+        ALL_PASSES(setSeparateSceneBlending(sbt, sbta));
     }
     // --------------------------------------------------------------------
-    void Technique::setSceneBlending( const SceneBlendType sbt )
+    void Technique::setSceneBlending(const SceneBlendFactor sourceFactor, const SceneBlendFactor destFactor)
     {
-        Passes::iterator i, iend;
-        iend = mPasses.end();
-        for (i = mPasses.begin(); i != iend; ++i)
-        {
-            (*i)->setSceneBlending(sbt);
-        }
-    }
-    // --------------------------------------------------------------------
-    void Technique::setSeparateSceneBlending( const SceneBlendType sbt, const SceneBlendType sbta )
-    {
-        Passes::iterator i, iend;
-        iend = mPasses.end();
-        for (i = mPasses.begin(); i != iend; ++i)
-        {
-            (*i)->setSeparateSceneBlending(sbt, sbta);
-        }
-    }
-    // --------------------------------------------------------------------
-    void Technique::setSceneBlending( const SceneBlendFactor sourceFactor,
-        const SceneBlendFactor destFactor)
-    {
-        Passes::iterator i, iend;
-        iend = mPasses.end();
-        for (i = mPasses.begin(); i != iend; ++i)
-        {
-            (*i)->setSceneBlending(sourceFactor, destFactor);
-        }
+        ALL_PASSES(setSceneBlending(sourceFactor, destFactor));
     }
     // --------------------------------------------------------------------
     void Technique::setSeparateSceneBlending( const SceneBlendFactor sourceFactor, const SceneBlendFactor destFactor, const SceneBlendFactor sourceFactorAlpha, const SceneBlendFactor destFactorAlpha)
     {
-        Passes::iterator i, iend;
-        iend = mPasses.end();
-        for (i = mPasses.begin(); i != iend; ++i)
-        {
-            (*i)->setSeparateSceneBlending(sourceFactor, destFactor, sourceFactorAlpha, destFactorAlpha);
-        }
+        ALL_PASSES(setSeparateSceneBlending(sourceFactor, destFactor, sourceFactorAlpha, destFactorAlpha));
     }
+    #undef ALL_PASSES
 
     // --------------------------------------------------------------------
     void Technique::setName(const String& name)
