@@ -126,7 +126,7 @@ void SceneManager::ShadowRenderer::renderAdditiveStencilShadowedQueueGroupObject
     RenderQueueGroup* pGroup,
     QueuedRenderableCollection::OrganisationMode om)
 {
-    LightList lightList;
+    LightList lightList(1);
     auto visitor = mSceneManager->getQueuedRenderableVisitor();
 
     for (const auto& pg : pGroup->getPriorityGroups())
@@ -135,9 +135,6 @@ void SceneManager::ShadowRenderer::renderAdditiveStencilShadowedQueueGroupObject
 
         // Sort the queue first
         pPriorityGrp->sort(mSceneManager->mCameraInProgress);
-
-        // Clear light list
-        lightList.clear();
 
         // Render all the ambient passes first, no light iteration, no lights
         visitor->renderObjects(pPriorityGrp->getSolidsBasic(), om, false, false);
@@ -150,10 +147,7 @@ void SceneManager::ShadowRenderer::renderAdditiveStencilShadowedQueueGroupObject
         for (Light* l : mSceneManager->_getLightsAffectingFrustum())
         {
             // Set light state
-            if (lightList.empty())
-                lightList.push_back(l);
-            else
-                lightList[0] = l;
+            lightList[0] = l;
 
             // set up scissor, will cover shadow vol and regular light rendering
             ClipResult scissored = mSceneManager->buildAndSetScissor(lightList, mSceneManager->mCameraInProgress);
@@ -326,13 +320,13 @@ void SceneManager::ShadowRenderer::renderTextureShadowCasterQueueGroupObjects(
         pPriorityGrp->sort(mSceneManager->mCameraInProgress);
 
         // Do solids, override light list incase any vertex programs use them
-        visitor->renderObjects(pPriorityGrp->getSolidsBasic(), om, false, false, &mShadowTextureCurrentCasterLightList);
-        visitor->renderObjects(pPriorityGrp->getSolidsNoShadowReceive(), om, false, false, &mShadowTextureCurrentCasterLightList);
+        visitor->renderObjects(pPriorityGrp->getSolidsBasic(), om, false, false);
+        visitor->renderObjects(pPriorityGrp->getSolidsNoShadowReceive(), om, false, false);
         // Do unsorted transparents that cast shadows
-        visitor->renderObjects(pPriorityGrp->getTransparentsUnsorted(), om, false, false, &mShadowTextureCurrentCasterLightList);
+        visitor->renderObjects(pPriorityGrp->getTransparentsUnsorted(), om, false, false, nullptr, true);
         // Do transparents that cast shadows
-        visitor->renderObjects(pPriorityGrp->getTransparents(), QueuedRenderableCollection::OM_SORT_DESCENDING,
-                      false, false, &mShadowTextureCurrentCasterLightList, true);
+        visitor->renderObjects(pPriorityGrp->getTransparents(), QueuedRenderableCollection::OM_SORT_DESCENDING, false,
+                               false, nullptr, true);
 
     }// for each priority
 
@@ -482,7 +476,7 @@ void SceneManager::ShadowRenderer::renderAdditiveTextureShadowedQueueGroupObject
     RenderQueueGroup* pGroup,
     QueuedRenderableCollection::OrganisationMode om)
 {
-    LightList lightList;
+    LightList lightList(1);
     auto visitor = mSceneManager->getQueuedRenderableVisitor();
 
     for (const auto& pg : pGroup->getPriorityGroups())
@@ -491,9 +485,6 @@ void SceneManager::ShadowRenderer::renderAdditiveTextureShadowedQueueGroupObject
 
         // Sort the queue first
         pPriorityGrp->sort(mSceneManager->mCameraInProgress);
-
-        // Clear light list
-        lightList.clear();
 
         // Render all the ambient passes first, no light iteration, no lights
         visitor->renderObjects(pPriorityGrp->getSolidsBasic(), om, false, false);
@@ -552,10 +543,7 @@ void SceneManager::ShadowRenderer::renderAdditiveTextureShadowedQueueGroupObject
                 }
 
                 // render lighting passes for this light
-                if (lightList.empty())
-                    lightList.push_back(l);
-                else
-                    lightList[0] = l;
+                lightList[0] = l;
 
                 // set up light scissoring, always useful in additive modes
                 ClipResult scissored = mSceneManager->buildAndSetScissor(lightList, mSceneManager->mCameraInProgress);
@@ -815,11 +803,6 @@ void SceneManager::ShadowRenderer::prepareShadowTextures(Camera* cam, Viewport* 
         // skip light if shadows are disabled
         if (!light->getCastShadows())
             continue;
-
-        if (mShadowTextureCurrentCasterLightList.empty())
-            mShadowTextureCurrentCasterLightList.push_back(light);
-        else
-            mShadowTextureCurrentCasterLightList[0] = light;
 
         // texture iteration per light.
         size_t textureCountPerLight = mShadowTextureCountPerType[light->getType()];
