@@ -667,7 +667,7 @@ namespace Ogre {
             TexturePtr mSpotFadeTexture;
             TexturePtr mNullShadowTexture;
             CameraList mShadowTextureCameras;
-            LightList mShadowTextureCurrentCasterLightList;
+            LightList mShadowTextureCurrentCasterLightList; // remove for 13.4: unused
             // ShadowCamera to light mapping
             ShadowCamLightMapping mShadowCamLightMapping;
             // Array defining shadow texture index in light list.
