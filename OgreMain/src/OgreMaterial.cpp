@@ -304,8 +304,6 @@ namespace Ogre {
     //-----------------------------------------------------------------------------
     Technique* Material::getBestTechnique(unsigned short lodIndex, const Renderable* rend)
     {
-        OgreAssertDbg(mSupportedTechniques.empty() == mBestTechniquesBySchemeList.empty(),
-                      "Techniques and scheme list must be in sync");
         if (mSupportedTechniques.empty())
         {
             return NULL;
@@ -324,6 +322,7 @@ namespace Ogre {
                 if (ret)
                     return ret;
 
+                OgreAssert(!mBestTechniquesBySchemeList.empty(), "handleSchemeNotFound() must not remove techniques");
                 // Nope, use default
                 // get the first item, will be 0 (the default) if default
                 // scheme techniques exist, otherwise the earliest defined
