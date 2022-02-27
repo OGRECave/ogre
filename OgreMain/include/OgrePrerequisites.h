@@ -166,7 +166,6 @@ namespace Ogre {
     class ParticleSystemRenderer;
     template<typename T> class FactoryObj;
     typedef FactoryObj<ParticleSystemRenderer> ParticleSystemRendererFactory;
-    class ParticleVisualData;
     class Pass;
     class PatchMesh;
     class PixelBox;
