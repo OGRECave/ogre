@@ -339,7 +339,9 @@ namespace Ogre
         void getWorldTransforms(Matrix4* xform) const override;
         Real getSquaredViewDepth(const Camera* cam) const override;
         const LightList& getLights(void) const override;
-        bool getCastsShadows(void) const override;
+        bool getCastShadows(void) const override;
+        /// @deprecated will be private in 14
+        bool getCastsShadows(void) const override { return getCastShadows(); }
 
 
         const VertexDataRecord* getVertexDataRecord() const;
