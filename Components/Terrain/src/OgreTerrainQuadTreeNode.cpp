@@ -1441,7 +1441,7 @@ namespace Ogre
         return queryLights();
     }
     //---------------------------------------------------------------------
-    bool TerrainQuadTreeNode::getCastsShadows(void) const
+    bool TerrainQuadTreeNode::getCastShadows(void) const
     {
         return TerrainGlobalOptions::getSingleton().getCastsDynamicShadows();
     }
