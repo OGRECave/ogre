@@ -188,6 +188,7 @@ protected:
     bool mUseTextureCompare;
     bool mUseColourShadows;
     bool mDebug;
+    bool mIsD3D9;
 };
 
 

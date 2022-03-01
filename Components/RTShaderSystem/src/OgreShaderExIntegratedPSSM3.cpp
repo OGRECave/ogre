@@ -47,6 +47,7 @@ IntegratedPSSM3::IntegratedPSSM3()
     mUseTextureCompare = false;
     mUseColourShadows = false;
     mDebug = false;
+    mIsD3D9 = false;
     mShadowTextureParamsList.resize(1); // normal single texture depth shadowmapping
 }
 
@@ -75,6 +76,15 @@ void IntegratedPSSM3::updateGpuProgramsParams(Renderable* rend, const Pass* pass
         vSplitPoints[i] = mShadowTextureParamsList[i].mMaxRange;
     }
     vSplitPoints[3] = mShadowTextureParamsList.back().mMaxRange;
+
+    const Matrix4& proj = source->getProjectionMatrix();
+
+    for(int i = 0; i < 4; i++)
+    {
+        auto tmp = proj * Vector4(0, 0, -vSplitPoints[i], 1);
+        vSplitPoints[i] = tmp[2] / tmp[3];
+    }
+
 
     mPSSplitPoints->setGpuParameter(vSplitPoints);
 
@@ -110,14 +120,14 @@ bool IntegratedPSSM3::preAddToRenderState(const RenderState* renderState,
         renderState->getLightCount().isZeroLength())
         return false;
 
-    bool isD3D9 = ShaderGenerator::getSingleton().getTargetLanguage() == "hlsl" &&
-                  !GpuProgramManager::getSingleton().isSyntaxSupported("vs_4_0_level_9_1");
+    mIsD3D9 = ShaderGenerator::getSingleton().getTargetLanguage() == "hlsl" &&
+              !GpuProgramManager::getSingleton().isSyntaxSupported("vs_4_0_level_9_1");
 
     PixelFormat shadowTexFormat = PF_UNKNOWN;
     const auto& configs = ShaderGenerator::getSingleton().getActiveSceneManager()->getShadowTextureConfigList();
     if (!configs.empty())
         shadowTexFormat = configs[0].format; // assume first texture is representative
-    mUseTextureCompare = PixelUtil::isDepth(shadowTexFormat) && !isD3D9;
+    mUseTextureCompare = PixelUtil::isDepth(shadowTexFormat) && !mIsD3D9;
     mUseColourShadows = PixelUtil::getComponentType(shadowTexFormat) == PCT_BYTE; // use colour shadowmaps for byte textures
 
     ShadowTextureParamsIterator it = mShadowTextureParamsList.begin();
@@ -190,12 +200,14 @@ bool IntegratedPSSM3::resolveParameters(ProgramSet* programSet)
     
     // Get output position parameter.
     mVSOutPos = vsMain->getOutputParameter(Parameter::SPC_POSITION_PROJECTIVE_SPACE);
-    
-    // Resolve vertex shader output depth.      
-    mVSOutDepth = vsMain->resolveOutputParameter(Parameter::SPC_DEPTH_VIEW_SPACE);
-    
+
+    if (mIsD3D9)
+    {
+        mVSOutPos = vsMain->resolveOutputParameter(Parameter::SPC_UNKNOWN, GCT_FLOAT4);
+    }
+
     // Resolve input depth parameter.
-    mPSInDepth = psMain->resolveInputParameter(mVSOutDepth);
+    mPSInDepth = psMain->resolveInputParameter(mVSOutPos);
     
     // Get in/local diffuse parameter.
     mPSDiffuse = psMain->getInputParameter(Parameter::SPC_COLOR_DIFFUSE);
@@ -255,8 +267,8 @@ bool IntegratedPSSM3::resolveDependencies(ProgramSet* programSet)
     Program* psProgram = programSet->getCpuProgram(GPT_FRAGMENT_PROGRAM);
     psProgram->addDependency(SGX_LIB_INTEGRATEDPSSM);
 
-    psProgram->addPreprocessorDefines(
-        StringUtil::format("PSSM_NUM_SPLITS=%zu,PCF_XSAMPLES=%.1f", mShadowTextureParamsList.size(), mPCFxSamples));
+    psProgram->addPreprocessorDefines(StringUtil::format("PROJ_SPACE_SPLITS,PSSM_NUM_SPLITS=%zu,PCF_XSAMPLES=%.1f",
+                                                         mShadowTextureParamsList.size(), mPCFxSamples));
 
     if(mDebug)
         psProgram->addPreprocessorDefines("DEBUG_PSSM");
@@ -293,8 +305,11 @@ bool IntegratedPSSM3::addVSInvocation(Function* vsMain, const int groupOrder)
 {
     auto stage = vsMain->getStage(groupOrder);
 
-    // Output the vertex depth in camera space.
-    stage.assign(In(mVSOutPos).z(), mVSOutDepth);
+    if(mIsD3D9)
+    {
+        auto vsOutPos = vsMain->resolveOutputParameter(Parameter::SPC_POSITION_PROJECTIVE_SPACE);
+        stage.assign(vsOutPos, mVSOutPos);
+    }
 
     // Compute world space position.    
     ShadowTextureParamsIterator it = mShadowTextureParamsList.begin();
@@ -323,7 +338,12 @@ bool IntegratedPSSM3::addPSInvocation(Program* psProgram, const int groupOrder)
     }
     else
     {
-        std::vector<Operand> params = {In(mPSInDepth), In(mPSSplitPoints)};
+        auto fdepth = psMain->resolveLocalParameter(GCT_FLOAT1, "fdepth");
+        if(mIsD3D9)
+            stage.div(In(mPSInDepth).z(), In(mPSInDepth).w(), fdepth);
+        else
+            stage.assign(In(mPSInDepth).z(), fdepth);
+        std::vector<Operand> params = {In(fdepth), In(mPSSplitPoints)};
 
         for(auto& texp : mShadowTextureParamsList)
         {
