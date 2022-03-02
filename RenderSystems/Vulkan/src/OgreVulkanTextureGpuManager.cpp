@@ -69,13 +69,23 @@ namespace Ogre
         samplerCi.unnormalizedCoordinates = VK_FALSE;
         samplerCi.maxLod = mMipFilter == FO_NONE ? 0 : VK_LOD_CLAMP_NONE;
 
-        samplerCi.borderColor =
-            mBorderColour.getAsRGBA() == 0xFF ? VK_BORDER_COLOR_FLOAT_OPAQUE_BLACK : VK_BORDER_COLOR_FLOAT_OPAQUE_WHITE;
+        bool reversedZ = Root::getSingleton().getRenderSystem()->isReverseDepthBufferEnabled();
+
+        auto borderBlack = VK_BORDER_COLOR_FLOAT_OPAQUE_BLACK;
+        auto borderWhite = VK_BORDER_COLOR_FLOAT_OPAQUE_WHITE;
+
+        if(reversedZ)
+            std::swap(borderBlack, borderWhite);
+
+        samplerCi.borderColor = mBorderColour.getAsRGBA() == 0x0000FF ? borderBlack : borderWhite;
 
         if (mCompareEnabled)
         {
+            auto cmpFunc = mCompareFunc;
+            if(reversedZ)
+                cmpFunc = VulkanRenderSystem::reverseCompareFunction(cmpFunc);
             samplerCi.compareEnable = VK_TRUE;
-            samplerCi.compareOp = VulkanMappings::get(mCompareFunc);
+            samplerCi.compareOp = VulkanMappings::get(cmpFunc);
         }
 
         OGRE_VK_CHECK(vkCreateSampler(mDevice, &samplerCi, 0, &mVkSampler));
