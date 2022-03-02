@@ -49,6 +49,7 @@ namespace Ogre
     */
     class _OgreVulkanExport VulkanRenderSystem : public RenderSystem
     {
+        friend class VulkanSampler;
         bool mInitialized;
         VulkanHardwareBufferManager *mHardwareBufferManager;
 
