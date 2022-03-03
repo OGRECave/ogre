@@ -48,6 +48,26 @@ Consequently, most protected members are private now.
 
 Nevertheless, there is fallback code so you still can use old `.material` files. Here, a caster/ receiver material will be generated on demand. However, you are highly encouraged to define those explicitly.
 
+### `texture_alias` API removed
+Texture aliases were a restricted version of Script Variables, which you should instead.
+I.e. replace
+
+```cpp
+texture_alias DiffuseMap
+// and
+set_texture_alias	DiffuseMap	r2skin.jpg
+```
+
+by
+
+```cpp
+texture $DiffuseMap
+// and
+set     $DiffuseMap r2skin.jpg
+```
+
+There is limited backward compatibility for material scripts, where `texture_alias` will set the texture unit name and later `set_texture_alias` is applied based on that.
+
 ### Other
 - Size of the Particle class was reduced by 12% which results in about 13% faster rendering
 - Frustum is not a Renderable any more. Rendering Frusta is now done by the DebugDrawer.
