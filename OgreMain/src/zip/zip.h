@@ -45,7 +45,7 @@ typedef long ssize_t; /* byte count or error */
 #endif
 
 #ifndef MAX_PATH
-#define MAX_PATH 32767 /* # chars in a path name including NULL */
+#define MAX_PATH 1024 /* # chars in a path name including NULL */
 #endif
 
 /**

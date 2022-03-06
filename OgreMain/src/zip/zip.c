@@ -66,6 +66,14 @@
     }                                                                          \
   } while (0)
 
+#define UNX_IFDIR 0040000  /* Unix directory */
+#define UNX_IFREG 0100000  /* Unix regular file */
+#define UNX_IFSOCK 0140000 /* Unix socket (BSD, not SysV or Amiga) */
+#define UNX_IFLNK 0120000  /* Unix symbolic link (not SysV, Amiga) */
+#define UNX_IFBLK 0060000  /* Unix block special       (not Amiga) */
+#define UNX_IFCHR 0020000  /* Unix character special   (not Amiga) */
+#define UNX_IFIFO 0010000  /* Unix fifo    (BCC, not MSC or Amiga) */
+
 struct zip_entry_t {
   int index;
   char *name;
@@ -250,8 +258,14 @@ static char *zip_name_normalize(char *name, char *const nname, size_t len) {
 }
 
 static mz_bool zip_name_match(const char *name1, const char *name2) {
-  size_t len2 = strlen(name2);
-  char *nname2 = zip_strrpl(name2, len2, '\\', '/');
+  char *nname2 = NULL;
+
+#ifdef ZIP_RAW_ENTRYNAME
+  nname2 = STRCLONE(name2);
+#else
+  nname2 = zip_strrpl(name2, strlen(name2), '\\', '/');
+#endif
+
   if (!nname2) {
     return MZ_FALSE;
   }
@@ -371,12 +385,12 @@ static int zip_archive_extract(mz_zip_archive *zip_archive, const char *dir,
         }
       }
 
-#if defined(_MSC_VER)
+#if defined(_MSC_VER) || defined(PS4)
       (void)xattr; // unused
 #else
       xattr = (info.m_external_attr >> 16) & 0xFFFF;
-      if (xattr > 0) {
-        if (chmod(path, (mode_t)xattr) < 0) {
+      if (xattr > 0 && xattr <= MZ_UINT16_MAX) {
+        if (CHMOD(path, (mode_t)xattr) < 0) {
           err = ZIP_ENOPERM;
           goto out;
         }
@@ -422,10 +436,13 @@ static ssize_t zip_entry_mark(struct zip_t *zip,
     }
 
     mz_bool name_matches = MZ_FALSE;
-    for (int j = 0; j < (const int)len; ++j) {
-      if (zip_name_match(zip->entry.name, entries[j])) {
-        name_matches = MZ_TRUE;
-        break;
+    {
+      size_t j;
+      for (j = 0; j < len; ++j) {
+        if (zip_name_match(zip->entry.name, entries[j])) {
+          name_matches = MZ_TRUE;
+          break;
+        }
       }
     }
     if (name_matches) {
@@ -459,8 +476,8 @@ static ssize_t zip_entry_mark(struct zip_t *zip,
 }
 
 static int zip_index_next(mz_uint64 *local_header_ofs_array, int cur_index) {
-  int new_index = 0;
-  for (int i = cur_index - 1; i >= 0; --i) {
+  int new_index = 0, i;
+  for (i = cur_index - 1; i >= 0; --i) {
     if (local_header_ofs_array[cur_index] > local_header_ofs_array[i]) {
       new_index = i + 1;
       return new_index;
@@ -474,7 +491,8 @@ static int zip_sort(mz_uint64 *local_header_ofs_array, int cur_index) {
 
   if (nxt_index != cur_index) {
     mz_uint64 temp = local_header_ofs_array[cur_index];
-    for (int i = cur_index; i > nxt_index; i--) {
+    int i;
+    for (i = cur_index; i > nxt_index; i--) {
       local_header_ofs_array[i] = local_header_ofs_array[i - 1];
     }
     local_header_ofs_array[nxt_index] = temp;
@@ -484,7 +502,8 @@ static int zip_sort(mz_uint64 *local_header_ofs_array, int cur_index) {
 
 static int zip_index_update(struct zip_entry_mark_t *entry_mark, int last_index,
                             int nxt_index) {
-  for (int j = 0; j < last_index; j++) {
+  int j;
+  for (j = 0; j < last_index; j++) {
     if (entry_mark[j].file_index >= nxt_index) {
       entry_mark[j].file_index += 1;
     }
@@ -637,17 +656,23 @@ static int zip_central_dir_move(mz_zip_internal_state *pState, int begin,
   if (l_size == 0) {
     memmove(pState->m_central_dir.m_p, next, r_size);
     pState->m_central_dir.m_p = MZ_REALLOC(pState->m_central_dir.m_p, r_size);
-    for (int i = end; i < entry_num; i++) {
-      MZ_ZIP_ARRAY_ELEMENT(&pState->m_central_dir_offsets, mz_uint32, i) -=
-          d_size;
+    {
+      int i;
+      for (i = end; i < entry_num; i++) {
+        MZ_ZIP_ARRAY_ELEMENT(&pState->m_central_dir_offsets, mz_uint32, i) -=
+            d_size;
+      }
     }
   }
 
   if (l_size * r_size != 0) {
     memmove(deleted, next, r_size);
-    for (int i = end; i < entry_num; i++) {
-      MZ_ZIP_ARRAY_ELEMENT(&pState->m_central_dir_offsets, mz_uint32, i) -=
-          d_size;
+    {
+      int i;
+      for (i = end; i < entry_num; i++) {
+        MZ_ZIP_ARRAY_ELEMENT(&pState->m_central_dir_offsets, mz_uint32, i) -=
+            d_size;
+      }
     }
   }
 
@@ -688,8 +713,8 @@ static int zip_central_dir_delete(mz_zip_internal_state *pState,
       i++;
     }
     end = i;
-    int k = 0;
-    for (int j = end; j < entry_num; j++) {
+    int k = 0, j;
+    for (j = end; j < entry_num; j++) {
       MZ_ZIP_ARRAY_ELEMENT(&pState->m_central_dir_offsets, mz_uint32,
                            begin + k) =
           (mz_uint32)MZ_ZIP_ARRAY_ELEMENT(&pState->m_central_dir_offsets,
@@ -801,7 +826,8 @@ struct zip_t *zip_open(const char *zipname, int level, char mode) {
   switch (mode) {
   case 'w':
     // Create a new archive.
-    if (!mz_zip_writer_init_file(&(zip->archive), zipname, 0)) {
+    if (!mz_zip_writer_init_file_v2(&(zip->archive), zipname, 0,
+                                    MZ_ZIP_FLAG_WRITE_ZIP64)) {
       // Cannot initialize zip_archive writer
       goto cleanup;
     }
@@ -810,17 +836,19 @@ struct zip_t *zip_open(const char *zipname, int level, char mode) {
   case 'r':
   case 'a':
   case 'd':
-    if (!mz_zip_reader_init_file(
+    if (!mz_zip_reader_init_file_v2_rpb(
             &(zip->archive), zipname,
-            zip->level | MZ_ZIP_FLAG_DO_NOT_SORT_CENTRAL_DIRECTORY)) {
+            zip->level | MZ_ZIP_FLAG_DO_NOT_SORT_CENTRAL_DIRECTORY, 0, 0)) {
       // An archive file does not exist or cannot initialize
       // zip_archive reader
       goto cleanup;
     }
-    if ((mode == 'a' || mode == 'd') &&
-        !mz_zip_writer_init_from_reader(&(zip->archive), zipname)) {
-      mz_zip_reader_end(&(zip->archive));
-      goto cleanup;
+    if ((mode == 'a' || mode == 'd')) {
+      if (!mz_zip_writer_init_from_reader_v2_noreopen(&(zip->archive), zipname,
+                                                      0)) {
+        mz_zip_reader_end(&(zip->archive));
+        goto cleanup;
+      }
     }
     break;
 
@@ -863,10 +891,16 @@ int zip_entry_open(struct zip_t *zip, const char *entryname, int case_sensitive)
   mz_uint num_alignment_padding_bytes, level;
   mz_zip_archive_file_stat stats;
   int err = 0;
+  mz_uint16 dos_time, dos_date;
+  mz_uint32 extra_size = 0;
+  mz_uint8 extra_data[MZ_ZIP64_MAX_CENTRAL_EXTRA_FIELD_SIZE];
+  mz_uint64 local_dir_header_ofs = 0;
 
   if (!zip) {
     return ZIP_ENOINIT;
   }
+
+  local_dir_header_ofs = zip->archive.m_archive_size;
 
   if (!entryname) {
     return ZIP_EINVENTNAME;
@@ -891,7 +925,12 @@ int zip_entry_open(struct zip_t *zip, const char *entryname, int case_sensitive)
   if (zip->entry.name) {
     CLEANUP(zip->entry.name);
   }
+#ifdef ZIP_RAW_ENTRYNAME
+  zip->entry.name = STRCLONE(entryname);
+#else
   zip->entry.name = zip_strrpl(entryname, entrylen, '\\', '/');
+#endif
+
   if (!zip->entry.name) {
     // Cannot parse zip entry name
     return ZIP_EINVENTNAME;
@@ -925,6 +964,8 @@ int zip_entry_open(struct zip_t *zip, const char *entryname, int case_sensitive)
     return 0;
   }
 
+  level = zip->level & 0xF;
+
   zip->entry.index = (int)zip->archive.m_total_files;
   zip->entry.comp_size = 0;
   zip->entry.uncomp_size = 0;
@@ -932,11 +973,11 @@ int zip_entry_open(struct zip_t *zip, const char *entryname, int case_sensitive)
   zip->entry.offset = zip->archive.m_archive_size;
   zip->entry.header_offset = zip->archive.m_archive_size;
   memset(zip->entry.header, 0, MZ_ZIP_LOCAL_DIR_HEADER_SIZE * sizeof(mz_uint8));
-  zip->entry.method = 0;
+  zip->entry.method = level ? MZ_DEFLATED : 0;
 
   // UNIX or APPLE
 #if MZ_PLATFORM == 3 || MZ_PLATFORM == 19
-  // regular file with rw-r--r-- persmissions
+  // regular file with rw-r--r-- permissions
   zip->entry.external_attr = (mz_uint32)(0100644) << 16;
 #else
   zip->entry.external_attr = 0;
@@ -955,24 +996,47 @@ int zip_entry_open(struct zip_t *zip, const char *entryname, int case_sensitive)
     err = ZIP_EINVLVL;
     goto cleanup;
   }
-  // no zip64 support yet
-  if ((pzip->m_total_files == 0xFFFF) ||
-      ((pzip->m_archive_size + num_alignment_padding_bytes +
-        MZ_ZIP_LOCAL_DIR_HEADER_SIZE + MZ_ZIP_CENTRAL_DIR_HEADER_SIZE +
-        entrylen) > 0xFFFFFFFF)) {
-    // No zip64 support yet
-    err = ZIP_ENOSUP64;
-    goto cleanup;
-  }
+
   if (!mz_zip_writer_write_zeros(pzip, zip->entry.offset,
-                                 num_alignment_padding_bytes +
-                                     sizeof(zip->entry.header))) {
+                                 num_alignment_padding_bytes)) {
     // Cannot memset zip entry header
     err = ZIP_EMEMSET;
     goto cleanup;
   }
+  local_dir_header_ofs += num_alignment_padding_bytes;
 
-  zip->entry.header_offset += num_alignment_padding_bytes;
+  zip->entry.m_time = time(NULL);
+#ifndef MINIZ_NO_TIME
+  mz_zip_time_t_to_dos_time(zip->entry.m_time, &dos_time, &dos_date);
+#endif
+
+  // ZIP64 header with NULL sizes (sizes will be in the data descriptor, just
+  // after file data)
+  extra_size = mz_zip_writer_create_zip64_extra_data(
+      extra_data, NULL, NULL,
+      (local_dir_header_ofs >= MZ_UINT32_MAX) ? &local_dir_header_ofs : NULL);
+
+  if (!mz_zip_writer_create_local_dir_header(
+          pzip, zip->entry.header, entrylen, (mz_uint16)extra_size, 0, 0, 0,
+          zip->entry.method,
+          MZ_ZIP_GENERAL_PURPOSE_BIT_FLAG_UTF8 |
+              MZ_ZIP_LDH_BIT_FLAG_HAS_LOCATOR,
+          dos_time, dos_date)) {
+    // Cannot create zip entry header
+    err = ZIP_EMEMSET;
+    goto cleanup;
+  }
+
+  zip->entry.header_offset = zip->entry.offset + num_alignment_padding_bytes;
+
+  if (pzip->m_pWrite(pzip->m_pIO_opaque, zip->entry.header_offset,
+                     zip->entry.header,
+                     sizeof(zip->entry.header)) != sizeof(zip->entry.header)) {
+    // Cannot write zip entry header
+    err = ZIP_EMEMSET;
+    goto cleanup;
+  }
+
   if (pzip->m_file_offset_alignment) {
     MZ_ASSERT(
         (zip->entry.header_offset & (pzip->m_file_offset_alignment - 1)) == 0);
@@ -987,7 +1051,15 @@ int zip_entry_open(struct zip_t *zip, const char *entryname, int case_sensitive)
   }
 
   zip->entry.offset += entrylen;
-  level = zip->level & 0xF;
+
+  if (pzip->m_pWrite(pzip->m_pIO_opaque, zip->entry.offset, extra_data,
+                     extra_size) != extra_size) {
+    // Cannot write ZIP64 data to zip entry
+    err = ZIP_EWRTENT;
+    goto cleanup;
+  }
+  zip->entry.offset += extra_size;
+
   if (level) {
     zip->entry.state.m_pZip = pzip;
     zip->entry.state.m_cur_archive_file_ofs = zip->entry.offset;
@@ -1003,8 +1075,6 @@ int zip_entry_open(struct zip_t *zip, const char *entryname, int case_sensitive)
       goto cleanup;
     }
   }
-
-  zip->entry.m_time = time(NULL);
 
   return 0;
 
@@ -1061,7 +1131,12 @@ int zip_entry_openbyindex(struct zip_t *zip, int index) {
   if (zip->entry.name) {
     CLEANUP(zip->entry.name);
   }
+#ifdef ZIP_RAW_ENTRYNAME
+  zip->entry.name = STRCLONE(pFilename);
+#else
   zip->entry.name = zip_strrpl(pFilename, namelen, '\\', '/');
+#endif
+
   if (!zip->entry.name) {
     // local entry name is NULL
     return ZIP_EINVENTNAME;
@@ -1093,6 +1168,11 @@ int zip_entry_close(struct zip_t *zip) {
   mz_uint16 entrylen;
   mz_uint16 dos_time = 0, dos_date = 0;
   int err = 0;
+  mz_uint8 *pExtra_data = NULL;
+  mz_uint32 extra_size = 0;
+  mz_uint8 extra_data[MZ_ZIP64_MAX_CENTRAL_EXTRA_FIELD_SIZE];
+  mz_uint8 local_dir_footer[MZ_ZIP_DATA_DESCRIPTER_SIZE64];
+  mz_uint32 local_dir_footer_size = MZ_ZIP_DATA_DESCRIPTER_SIZE32;
 
   if (!zip) {
     // zip_t handler is not initialized
@@ -1106,7 +1186,7 @@ int zip_entry_close(struct zip_t *zip) {
   }
 
   level = zip->level & 0xF;
-  if (level) {
+  if (level && zip->entry.uncomp_size) {
     done = tdefl_compress_buffer(&(zip->entry.comp), "", 0, TDEFL_FINISH);
     if (done != TDEFL_STATUS_DONE && done != TDEFL_STATUS_OKAY) {
       // Cannot flush compressed buffer
@@ -1119,37 +1199,46 @@ int zip_entry_close(struct zip_t *zip) {
   }
 
   entrylen = (mz_uint16)strlen(zip->entry.name);
-  if ((zip->entry.comp_size > 0xFFFFFFFF) || (zip->entry.offset > 0xFFFFFFFF)) {
-    // No zip64 support, yet
-    err = ZIP_ENOSUP64;
-    goto cleanup;
-  }
-
 #ifndef MINIZ_NO_TIME
   mz_zip_time_t_to_dos_time(zip->entry.m_time, &dos_time, &dos_date);
 #endif
 
-  if (!mz_zip_writer_create_local_dir_header(
-          pzip, zip->entry.header, entrylen, 0, zip->entry.uncomp_size,
-          zip->entry.comp_size, zip->entry.uncomp_crc32, zip->entry.method, 0,
-          dos_time, dos_date)) {
-    // Cannot create zip entry header
-    err = ZIP_ECRTHDR;
-    goto cleanup;
-  }
+  MZ_WRITE_LE32(local_dir_footer + 0, MZ_ZIP_DATA_DESCRIPTOR_ID);
+  MZ_WRITE_LE32(local_dir_footer + 4, zip->entry.uncomp_crc32);
+  MZ_WRITE_LE64(local_dir_footer + 8, zip->entry.comp_size);
+  MZ_WRITE_LE64(local_dir_footer + 16, zip->entry.uncomp_size);
+  local_dir_footer_size = MZ_ZIP_DATA_DESCRIPTER_SIZE64;
 
-  if (pzip->m_pWrite(pzip->m_pIO_opaque, zip->entry.header_offset,
-                     zip->entry.header,
-                     sizeof(zip->entry.header)) != sizeof(zip->entry.header)) {
+  if (pzip->m_pWrite(pzip->m_pIO_opaque, zip->entry.offset, local_dir_footer,
+                     local_dir_footer_size) != local_dir_footer_size) {
     // Cannot write zip entry header
     err = ZIP_EWRTHDR;
     goto cleanup;
   }
+  zip->entry.offset += local_dir_footer_size;
+
+  pExtra_data = extra_data;
+  extra_size = mz_zip_writer_create_zip64_extra_data(
+      extra_data,
+      (zip->entry.uncomp_size >= MZ_UINT32_MAX) ? &zip->entry.uncomp_size
+                                                : NULL,
+      (zip->entry.comp_size >= MZ_UINT32_MAX) ? &zip->entry.comp_size : NULL,
+      (zip->entry.header_offset >= MZ_UINT32_MAX) ? &zip->entry.header_offset
+                                                  : NULL);
+
+  if ((entrylen) && (zip->entry.name[entrylen - 1] == '/') &&
+      !zip->entry.uncomp_size) {
+    /* Set DOS Subdirectory attribute bit. */
+    zip->entry.external_attr |= MZ_ZIP_DOS_DIR_ATTRIBUTE_BITFLAG;
+  }
 
   if (!mz_zip_writer_add_to_central_dir(
-          pzip, zip->entry.name, entrylen, NULL, 0, "", 0,
-          zip->entry.uncomp_size, zip->entry.comp_size, zip->entry.uncomp_crc32,
-          zip->entry.method, 0, dos_time, dos_date, zip->entry.header_offset,
+          pzip, zip->entry.name, entrylen, pExtra_data, (mz_uint16)extra_size,
+          "", 0, zip->entry.uncomp_size, zip->entry.comp_size,
+          zip->entry.uncomp_crc32, zip->entry.method,
+          MZ_ZIP_GENERAL_PURPOSE_BIT_FLAG_UTF8 |
+              MZ_ZIP_LDH_BIT_FLAG_HAS_LOCATOR,
+          dos_time, dos_date, zip->entry.header_offset,
           zip->entry.external_attr, NULL, 0)) {
     // Cannot write to zip central dir
     err = ZIP_EWRTDIR;
@@ -1256,6 +1345,7 @@ int zip_entry_fwrite(struct zip_t *zip, const char *filename) {
   MZ_FILE *stream = NULL;
   mz_uint8 buf[MZ_ZIP_MAX_IO_BUF_SIZE];
   struct MZ_FILE_STAT_STRUCT file_stat;
+  mz_uint16 modes;
 
   if (!zip) {
     // zip_t handler is not initialized
@@ -1269,11 +1359,32 @@ int zip_entry_fwrite(struct zip_t *zip, const char *filename) {
     return ZIP_ENOENT;
   }
 
-  if ((file_stat.st_mode & 0200) == 0) {
-    // MS-DOS read-only attribute
-    zip->entry.external_attr |= 0x01;
+#if defined(_WIN32) || defined(__WIN32__) || defined(DJGPP)
+  (void)modes; // unused
+#else
+  /* Initialize with permission bits--which are not implementation-optional */
+  modes = file_stat.st_mode &
+          (S_IRWXU | S_IRWXG | S_IRWXO | S_ISUID | S_ISGID | S_ISVTX);
+  if (S_ISDIR(file_stat.st_mode))
+    modes |= UNX_IFDIR;
+  if (S_ISREG(file_stat.st_mode))
+    modes |= UNX_IFREG;
+  if (S_ISLNK(file_stat.st_mode))
+    modes |= UNX_IFLNK;
+  if (S_ISBLK(file_stat.st_mode))
+    modes |= UNX_IFBLK;
+  if (S_ISCHR(file_stat.st_mode))
+    modes |= UNX_IFCHR;
+  if (S_ISFIFO(file_stat.st_mode))
+    modes |= UNX_IFIFO;
+  if (S_ISSOCK(file_stat.st_mode))
+    modes |= UNX_IFSOCK;
+  zip->entry.external_attr = (modes << 16) | !(file_stat.st_mode & S_IWRITE);
+  if ((file_stat.st_mode & S_IFMT) == S_IFDIR) {
+    zip->entry.external_attr |= MZ_ZIP_DOS_DIR_ATTRIBUTE_BITFLAG;
   }
-  zip->entry.external_attr |= (mz_uint32)((file_stat.st_mode & 0xFFFF) << 16);
+#endif
+
   zip->entry.m_time = file_stat.st_mtime;
 
   if (!(stream = MZ_FOPEN(filename, "rb"))) {
@@ -1372,7 +1483,7 @@ int zip_entry_fread(struct zip_t *zip, const char *filename) {
     return ZIP_ENOFILE;
   }
 
-#if defined(_MSC_VER)
+#if defined(_MSC_VER) || defined(PS4)
   (void)xattr; // unused
 #else
   if (!mz_zip_reader_file_stat(pzip, idx, &info)) {
@@ -1381,8 +1492,8 @@ int zip_entry_fread(struct zip_t *zip, const char *filename) {
   }
 
   xattr = (info.m_external_attr >> 16) & 0xFFFF;
-  if (xattr > 0) {
-    if (chmod(filename, (mode_t)xattr) < 0) {
+  if (xattr > 0 && xattr <= MZ_UINT16_MAX) {
+    if (CHMOD(filename, (mode_t)xattr) < 0) {
       return ZIP_ENOPERM;
     }
   }
@@ -1548,6 +1659,7 @@ int zip_create(const char *zipname, const char *filenames[], size_t len) {
   mz_zip_archive zip_archive;
   struct MZ_FILE_STAT_STRUCT file_stat;
   mz_uint32 ext_attributes = 0;
+  mz_uint16 modes;
 
   if (!zipname || strlen(zipname) < 1) {
     // zip_t archive name is empty or NULL
@@ -1582,11 +1694,32 @@ int zip_create(const char *zipname, const char *filenames[], size_t len) {
       break;
     }
 
-    if ((file_stat.st_mode & 0200) == 0) {
-      // MS-DOS read-only attribute
-      ext_attributes |= 0x01;
+#if defined(_WIN32) || defined(__WIN32__) || defined(DJGPP)
+    (void)modes; // unused
+#else
+
+    /* Initialize with permission bits--which are not implementation-optional */
+    modes = file_stat.st_mode &
+            (S_IRWXU | S_IRWXG | S_IRWXO | S_ISUID | S_ISGID | S_ISVTX);
+    if (S_ISDIR(file_stat.st_mode))
+      modes |= UNX_IFDIR;
+    if (S_ISREG(file_stat.st_mode))
+      modes |= UNX_IFREG;
+    if (S_ISLNK(file_stat.st_mode))
+      modes |= UNX_IFLNK;
+    if (S_ISBLK(file_stat.st_mode))
+      modes |= UNX_IFBLK;
+    if (S_ISCHR(file_stat.st_mode))
+      modes |= UNX_IFCHR;
+    if (S_ISFIFO(file_stat.st_mode))
+      modes |= UNX_IFIFO;
+    if (S_ISSOCK(file_stat.st_mode))
+      modes |= UNX_IFSOCK;
+    ext_attributes = (modes << 16) | !(file_stat.st_mode & S_IWRITE);
+    if ((file_stat.st_mode & S_IFMT) == S_IFDIR) {
+      ext_attributes |= MZ_ZIP_DOS_DIR_ATTRIBUTE_BITFLAG;
     }
-    ext_attributes |= (mz_uint32)((file_stat.st_mode & 0xFFFF) << 16);
+#endif
 
     if (!mz_zip_writer_add_file(&zip_archive, zip_basename(name), name, "", 0,
                                 ZIP_DEFAULT_COMPRESSION_LEVEL,
