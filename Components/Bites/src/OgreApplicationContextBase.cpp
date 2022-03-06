@@ -345,13 +345,21 @@ void ApplicationContextBase::_destroyWindow(const NativeWindowPair& win)
 void ApplicationContextBase::_fireInputEvent(const Event& event, uint32_t windowID) const
 {
     Event scaled = event;
-    if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE && event.type == MOUSEMOTION)
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
+    if (event.type == MOUSEMOTION)
     {
         // assumes all windows have the same scale
         float viewScale = getRenderWindow()->getViewPointToPixelScale();
         scaled.motion.x *= viewScale;
         scaled.motion.y *= viewScale;
     }
+    else if(event.type == MOUSEBUTTONDOWN || event.type == MOUSEBUTTONUP)
+    {
+        float viewScale = getRenderWindow()->getViewPointToPixelScale();
+        scaled.button.x *= viewScale;
+        scaled.button.y *= viewScale;
+    }
+#endif
 
     for(InputListenerList::iterator it = mInputListeners.begin();
             it != mInputListeners.end(); ++it)
@@ -370,10 +378,10 @@ void ApplicationContextBase::_fireInputEvent(const Event& event, uint32_t window
             l.keyReleased(event.key);
             break;
         case MOUSEBUTTONDOWN:
-            l.mousePressed(event.button);
+            l.mousePressed(scaled.button);
             break;
         case MOUSEBUTTONUP:
-            l.mouseReleased(event.button);
+            l.mouseReleased(scaled.button);
             break;
         case MOUSEWHEEL:
             l.mouseWheelRolled(event.wheel);
