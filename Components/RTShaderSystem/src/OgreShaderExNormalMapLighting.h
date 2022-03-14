@@ -86,30 +86,10 @@ public:
     // Type of this render state.
     static String Type;
 
-    /// Normal map space definition.
     enum NormalMapSpace
     {
-        /**
-        Normal map contains normal data in object local space.
-        This normal mapping technique has the advantages of better visualization results,
-        lack of artifacts that comes from texture mirroring usage, it doesn't requires tangent
-        and it also saves some instruction in the vertex shader stage.
-        The main drawback of using this kind of normal map is that the target object must be static
-        in terms of local space rotations and translations.
-         */
         NMS_OBJECT = 1,
-        /**
-        Normal map contains normal data in tangent space.
-        This is the default normal mapping behavior and it requires that the
-        target mesh will have valid tangents within its vertex data.
-         */
         NMS_TANGENT = 2,
-        /**
-        Normal map contains normal data in parallax corrected tangent space
-        The restrictions of NMS_TANGENT apply. Additionally the alpha
-        channel of the normal texture is expected to contain height displacement data.
-        This is used for parallax corrected rendering.
-         */
         NMS_PARALLAX = 6
     };
 
@@ -123,20 +103,9 @@ public:
     NormalMapSpace getNormalMapSpace() const { return mNormalMapSpace; }
 
     /** 
-    Set the normal map texture name.
-    */
-    void setNormalMapTextureName(const String& textureName) { mNormalMapTextureName = textureName; }
-
-    /** 
     Return the normal map texture name.
     */
     const String& getNormalMapTextureName() const { return mNormalMapTextureName; }
-
-    /// return the normal map sampler
-    const SamplerPtr& getNormalMapSampler() const { return mNormalMapSampler; }
-
-    /// set the normal map sampler
-    void setNormalMapSampler(const SamplerPtr& sampler) { mNormalMapSampler = sampler; }
 
     bool setParameter(const String& name, const String& value) override;
 
