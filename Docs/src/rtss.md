@@ -89,14 +89,32 @@ Example: `lighting_stage gbuffer normal_viewdepth diffuse_specular`
 Use a normal map for lighting computations
 
 @par
-Format: `lighting_stage normal_map <texturename> [tangent_space|object_space|parallax] [coordinateIndex] [samplerName]`
+Format: `lighting_stage normal_map <texture> [normalmap_space] [texcoord_index] [sampler]`
 @par
 Example: `lighting_stage normal_map Panels_Normal_Tangent.png tangent_space 0 SamplerToUse`
 
-@param texturename normal map to use with @c normal_map
+@param texture normal map name to use
+@param normalmap_space <dl compact="compact">
+<dt>tangent_space</dt>
+<dd>Normal map contains normal data in tangent space.
+This is the default normal mapping behavior and it requires that the
+target mesh will have valid tangents within its vertex data.</dd>
+<dt>object_space</dt>
+<dd>Normal map contains normal data in object local space.
+This normal mapping technique has the advantages of better visualization results,
+lack of artifacts that comes from texture mirroring usage, it doesn't requires tangent
+and it also saves some instruction in the vertex shader stage.
+The main drawback of using this kind of normal map is that the target object must be static
+in terms of local space rotations and translations.</dd>
+<dt>parallax</dt>
+<dd>Normal map contains normal data in parallax corrected tangent space
+The restrictions of @c tangent_space apply. Additionally the alpha
+channel of the normal texture is expected to contain height displacement data.
+This is used for parallax corrected rendering.</dd>
+</dl>
+@param texcoord_index the start texcoord attribute index to read the uv coordinates from
+@param sampler the [Sampler](@ref Samplers) to use for the normal map
 
-@see Ogre::RTShader::NormalMapLighting::NormalMapSpace
-@see @ref Samplers
 
 <a name="metal_roughness"></a>
 
@@ -123,9 +141,11 @@ Example: `lighting_stage metal_roughness texture Default_metalRoughness.jpg`
 Force a specific fog calculation
 
 @par
-Format: `fog_stage ffp <per_vertex|per_pixel>`
+Format: `fog_stage ffp <calc_mode>`
 @par
 Example: `fog_stage ffp per_pixel`
+
+@param calc_mode either `per_vertex` or `per_pixel`
 
 <a name="light_count"></a>
 
@@ -158,7 +178,9 @@ Valid values are [0; 0.57] not bigger to avoid division by zero
 ## integrated_pssm4
 Integrated PSSM shadow receiver with 2 splits. Custom split points.
 @par
-Format: `integrated_pssm4 <znear> <sp0> <sp1> <zfar>`
+Format: `integrated_pssm4 <znear> <sp0> <sp1> <zfar> [debug] [filter]`
+@param debug visualize the active shadow-splits in the scene
+@param filter one of `pcf4, pcf16` (default: @c pcf4)
 
 <a name="hardware_skinning"></a>
 
