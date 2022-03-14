@@ -157,10 +157,6 @@ if(OGRE_BUILD_DEPENDENCIES AND NOT EXISTS ${OGREDEPS_PATH})
           WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/assimp-5.1.6)
       execute_process(COMMAND ${CMAKE_COMMAND}
         --build ${PROJECT_BINARY_DIR}/assimp-5.1.6 ${BUILD_COMMAND_OPTS})
-      # RelWithDebInfo has Release ABI
-      if(NOT OGRE_DEBUG_MODE)
-        file(REMOVE ${OGREDEPS_PATH}/lib/cmake/assimp-5.1/assimpTargets-debug.cmake)
-      endif()
     endif()
 endif()
 
