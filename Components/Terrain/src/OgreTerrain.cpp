@@ -3741,19 +3741,12 @@ namespace Ogre
                 return NEIGHBOUR_EAST;
         }
 
+        // x == 0, given the check above
         if (y < 0)
-        {
-            if (x == 0)
-                return NEIGHBOUR_SOUTH;
-        }
+            return NEIGHBOUR_SOUTH;
         else if (y > 0)
-        {
-            if (x == 0)
-                return NEIGHBOUR_NORTH;
-        }
-
+            return NEIGHBOUR_NORTH;
         return NEIGHBOUR_NORTH;
-
     }
     //---------------------------------------------------------------------
     void Terrain::notifyNeighbours()

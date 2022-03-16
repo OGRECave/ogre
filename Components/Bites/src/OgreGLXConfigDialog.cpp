@@ -403,7 +403,6 @@ void GLXConfigurator::SetRenderer(RenderSystem *r) {
     for(std::list<Widget>::iterator i=mRenderOptionWidgets.begin(); i!=mRenderOptionWidgets.end(); i++)
         XtDestroyWidget(*i);
     mRenderOptionWidgets.clear();
-    mConfigCallbackData.back();
 
     // Create option GUI
     int cury = ystart + 1*rowh + 10;
