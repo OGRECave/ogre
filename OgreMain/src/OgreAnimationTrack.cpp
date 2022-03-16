@@ -72,12 +72,10 @@ namespace Ogre {
             assert(timeIndex.getKeyIndex() < mKeyFrameIndexMap.size());
             i = mKeyFrames.begin() + mKeyFrameIndexMap[timeIndex.getKeyIndex()];
 #if OGRE_DEBUG_MODE
-            KeyFrame timeKey(0, timePos);
-            if (i != std::lower_bound(mKeyFrames.begin(), mKeyFrames.end(), &timeKey, KeyFrameTimeLess()))
+            KeyFrame timeKey(NULL, timePos);
+            if (i != std::lower_bound(mKeyFrames.begin(), mKeyFrames.end() - 1, &timeKey, KeyFrameTimeLess()))
             {
-                OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
-                    "Optimised key frame search failed",
-                    "AnimationTrack::getKeyFramesAtTime");
+                OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Optimised key frame search failed");
             }
 #endif
         }
@@ -91,29 +89,19 @@ namespace Ogre {
                 timePos = std::fmod( timePos, totalAnimationLength );
 
             // No global keyframe index, need to search with local keyframes.
-            KeyFrame timeKey(0, timePos);
-            i = std::lower_bound(mKeyFrames.begin(), mKeyFrames.end(), &timeKey, KeyFrameTimeLess());
+            KeyFrame timeKey(NULL, timePos);
+            i = std::lower_bound(mKeyFrames.begin(), mKeyFrames.end() - 1, &timeKey, KeyFrameTimeLess());
         }
 
-        if (i == mKeyFrames.end())
-        {
-            // There is no keyframe after this time, wrap back to first
-            *keyFrame2 = mKeyFrames.front();
-            t2 = mParent->getLength() + (*keyFrame2)->getTime();
+        OgreAssertDbg(i != mKeyFrames.end(), "time should have been wrapped before this");
 
-            // Use last keyframe as previous keyframe
+        *keyFrame2 = *i;
+        t2 = (*keyFrame2)->getTime();
+
+        // Find last keyframe before or on current time
+        if (i != mKeyFrames.begin() && timePos < (*i)->getTime())
+        {
             --i;
-        }
-        else
-        {
-            *keyFrame2 = *i;
-            t2 = (*keyFrame2)->getTime();
-
-            // Find last keyframe before or on current time
-            if (i != mKeyFrames.begin() && timePos < (*i)->getTime())
-            {
-                --i;
-            }
         }
 
         // Fill index of the first key
@@ -206,13 +194,13 @@ namespace Ogre {
     void AnimationTrack::_buildKeyFrameIndexMap(const std::vector<Real>& keyFrameTimes)
     {
         // Pre-allocate memory
-        mKeyFrameIndexMap.resize(keyFrameTimes.size() + 1);
+        mKeyFrameIndexMap.resize(keyFrameTimes.size());
 
         size_t i = 0, j = 0;
-        while (j <= keyFrameTimes.size())
+        while (j < keyFrameTimes.size())
         {
             mKeyFrameIndexMap[j] = static_cast<ushort>(i);
-            while (i < mKeyFrames.size() && mKeyFrames[i]->getTime() <= keyFrameTimes[j])
+            while (i < (mKeyFrames.size() - 1) && mKeyFrames[i]->getTime() <= keyFrameTimes[j])
                 ++i;
             ++j;
         }
