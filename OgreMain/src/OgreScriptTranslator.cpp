@@ -780,22 +780,15 @@ namespace Ogre{
         int n = 0;
         while (i != end && n < 16)
         {
-            if (i != end)
-            {
-                Real r = 0;
-                if (getReal(*i, &r))
-                    (*m)[n/4][n%4] = r;
-                else
-                    return false;
-            }
-            else
-            {
+            Real r = 0;
+            if (!getReal(*i, &r))
                 return false;
-            }
+
+            (*m)[n/4][n%4] = r;
             ++i;
             ++n;
         }
-        return true;
+        return n == 16;
     }
     //-------------------------------------------------------------------------
     bool ScriptTranslator::getInts(AbstractNodeList::const_iterator i, AbstractNodeList::const_iterator end, int *vals, int count)
