@@ -154,9 +154,6 @@ namespace RTShader {
         mPSOutDiffuse = rhsTP.mPSOutDiffuse;
         mPSInDiffuse = rhsTP.mPSInDiffuse;
 
-        mVSInPosition = rhsTP.mVSInPosition;
-        mVSOutPosition = rhsTP.mVSOutPosition;
-
         mVSOutNormal = rhsTP.mVSOutNormal;
         mVSInNormal = rhsTP.mVSInNormal;
         mPSInNormal = rhsTP.mPSInNormal;
