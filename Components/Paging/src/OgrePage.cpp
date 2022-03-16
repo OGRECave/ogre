@@ -110,7 +110,7 @@ namespace Ogre
         if (nextFrame < mFrameLastHeld)
         {
             // we must have wrapped around
-            dist = mFrameLastHeld + (std::numeric_limits<unsigned long>::max() - mFrameLastHeld);
+            dist = nextFrame + (std::numeric_limits<unsigned long>::max() - mFrameLastHeld);
         }
         else
             dist = nextFrame - mFrameLastHeld;

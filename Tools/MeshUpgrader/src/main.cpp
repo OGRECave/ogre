@@ -792,7 +792,7 @@ void buildLod(MeshPtr& mesh)
     } else {
         // not interactive: read parameters from console
         numLod = opts.numLods;
-        LodLevel lodLevel;
+        LodLevel lodLevel = {};
         lodLevel.distance = 0.0;
         for (unsigned short iLod = 0; iLod < numLod; ++iLod) {
 

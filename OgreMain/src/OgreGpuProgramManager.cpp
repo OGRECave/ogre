@@ -88,13 +88,15 @@ namespace {
                                             bool isManual, ManualResourceLoader* loader,
                                             const NameValuePairList* params)
     {
+        OgreAssert(params, "params cannot be null");
+
         auto langIt = params->find("language");
         auto typeIt = params->find("type");
 
         if(langIt == params->end())
             langIt = params->find("syntax");
 
-        if (!params || langIt == params->end() || typeIt == params->end())
+        if (langIt == params->end() || typeIt == params->end())
         {
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
                         "You must supply 'language' or 'syntax' and 'type' parameters");
