@@ -647,9 +647,7 @@ namespace Ogre {
             timePos = std::fmod( timePos, totalAnimationLength );
 
         // Search for global index
-        KeyFrameTimeList::iterator it =
-            std::lower_bound(mKeyFrameTimes.begin(), mKeyFrameTimes.end(), timePos);
-
+        auto it = std::lower_bound(mKeyFrameTimes.begin(), mKeyFrameTimes.end() - 1, timePos);
         return TimeIndex(timePos, static_cast<uint>(std::distance(mKeyFrameTimes.begin(), it)));
     }
     //-----------------------------------------------------------------------
