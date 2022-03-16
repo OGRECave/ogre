@@ -1298,6 +1298,8 @@ void SceneManager::ShadowRenderer::setShadowTechnique(ShadowTechnique technique)
         }
     }
 
+    if(mShadowTechnique)
+        initShadowVolumeMaterials();
 }
 //---------------------------------------------------------------------
 void SceneManager::ShadowRenderer::initShadowVolumeMaterials()

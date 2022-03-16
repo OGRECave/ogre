@@ -1149,12 +1149,6 @@ void SceneManager::_renderScene(Camera* camera, Viewport* vp, bool includeOverla
     // reset light hash so even if light list is the same, we refresh the content every frame
     useLights(NULL, 0);
 
-    if (isShadowTechniqueInUse())
-    {
-        // Prepare shadow materials
-        initShadowVolumeMaterials();
-    }
-
     // Perform a quick pre-check to see whether we should override far distance
     // When using stencil volumes we have to use infinite far distance
     // to prevent dark caps getting clipped
