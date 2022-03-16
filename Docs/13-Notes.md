@@ -97,9 +97,12 @@ There is now a  RTSS stage for Weighted, blended Order Independent Transparency,
 See the transparency Sample for how to integrate it into your pipeline.
 
 The RTSS Normal Map stage, is no longer a lighting stage but only does normal mapping.
-This allows using it with per-pixel lighting as before, but also enables combining it with the GBuffer stage to enable normal mapping in the GBuffer
+This allows using it with per-pixel lighting as before, but also enables combining it with the GBuffer stage to enable normal mapping in the GBuffer.
+
+**ACTION REQUIRED** Direct specification of sampler parameters via `lighting_stage normal_map ...` is no longer supported and the additional parameters will be interpreted as a sampler reference.
 
 The PSSM3 stage now also supports colour shadows in addition to depth shadows. Colour shadows are automatically used for `PCT_BYTE` texture formats.
+Since 13.3, the PSSM3 stage supports the "Reversed Z-Buffer" RenderSystem option.
 
 ### PBR Material support (since 13.3)
 
