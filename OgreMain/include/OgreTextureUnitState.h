@@ -651,7 +651,11 @@ namespace Ogre {
 
         /// get the associated sampler
         const SamplerPtr& getSampler() const { return mSampler; }
-        void setSampler(const SamplerPtr& sampler) { mSampler = sampler; }
+        void setSampler(const SamplerPtr& sampler)
+        {
+            OgreAssert(sampler, "sampler must not be NULL");
+            mSampler = sampler;
+        }
 
         /// @copydoc Sampler::setAddressingMode
         const Sampler::UVWAddressingMode& getTextureAddressingMode(void) const
