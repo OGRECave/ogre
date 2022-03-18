@@ -51,7 +51,7 @@ namespace OgreBites
     /*=============================================================================
     | Utility class used to hold a set of samples in an OGRE plugin.
     =============================================================================*/
-    class _OgreSampleClassExport SamplePlugin : public Ogre::Plugin
+    class _OgreSampleExport SamplePlugin : public Ogre::Plugin
     {
     public:
 
