@@ -894,7 +894,7 @@ namespace OgreBites
             {
 #   if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || (OGRE_PLATFORM == OGRE_PLATFORM_WINRT)
                 sampleDir += "\\";
-#   elif OGRE_PLATFORM == OGRE_PLATFORM_LINUX
+#   else
                 sampleDir += "/";
 #   endif
             }
