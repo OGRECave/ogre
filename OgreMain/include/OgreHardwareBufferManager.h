@@ -127,9 +127,9 @@ namespace Ogre {
         OGRE_MUTEX(mVertexBufferBindingsMutex);
 
         /// Internal method for destroys all vertex declarations.
-        virtual void destroyAllDeclarations(void);
+        void destroyAllDeclarations(void);
         /// Internal method for destroys all vertex buffer bindings.
-        virtual void destroyAllBindings(void);
+        void destroyAllBindings(void);
 
         /// Internal method for creates a new vertex declaration, may be overridden by certain rendering APIs.
         virtual VertexDeclaration* createVertexDeclarationImpl(void);
