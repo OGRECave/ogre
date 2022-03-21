@@ -50,17 +50,10 @@ public:
     /// Execute the param binding functions for this program
     void bindProgramParameters(GpuProgramParametersSharedPtr params, uint16 mask);
 
-    /// Get the assigned GL program id
-    GLuint getProgramID(void) const
-    { return mProgramID; }
-
 protected:
     /// @copydoc Resource::unload
     void unloadImpl(void);
     void loadFromSource(void);
-
-private:
-    GLuint mProgramID;
 };
 
 } // namespace Ogre
