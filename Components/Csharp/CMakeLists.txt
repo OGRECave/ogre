@@ -1,13 +1,18 @@
 if(NOT SWIG_FOUND)
     set(OGRE_BUILD_COMPONENT_CSHARP OFF CACHE BOOL "" FORCE)
-    message(WARNING "Csharp Component disabled because SWIG or Csharp was not found")
+    message(WARNING "Csharp Component disabled because SWIG was not found")
     return()
 endif()
 
 if(MSVC)
     enable_language(CSharp)
 else()
-    set(CMAKE_CSharp_COMPILER mcs)
+    find_program(CMAKE_CSharp_COMPILER mcs)
+endif()
+
+if(NOT CMAKE_CSharp_COMPILER)
+    message(WARNING "Csharp Component disabled because Csharp was not found")
+    return()
 endif()
 
 include_directories("${PROJECT_BINARY_DIR}/include" "${PROJECT_SOURCE_DIR}/OgreMain/include")
