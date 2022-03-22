@@ -32,7 +32,7 @@ def create_image_background(scn_mgr):
 
     rect = scn_mgr.createScreenSpaceRect(True)
     rect.setMaterial(mat)
-    rect.setRenderQueueGroup(Ogre.RENDER_QUEUE_OVERLAY)
+    rect.setRenderQueueGroup(Ogre.RENDER_QUEUE_BACKGROUND)
     scn_mgr.getRootSceneNode().attachObject(rect)
 
     return tex
