@@ -138,6 +138,9 @@ void ProgramManager::destroyDefaultProgramProcessors()
     // removing unknown is not an error
     for(auto lang : {"glsl", "glsles", "glslang", "hlsl"})
         removeProgramProcessor(lang);
+    for (auto processor : mDefaultProgramProcessors) {
+        OGRE_DELETE processor;
+    }
     mDefaultProgramProcessors.clear();
 }
 
