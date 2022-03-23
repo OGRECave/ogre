@@ -42,12 +42,8 @@ namespace Ogre
     /** \addtogroup Scene
     *  @{
     */
-    /** Implements the Light Space Perspective Shadow Mapping Algorithm.
-    @remarks
-    Implements the LiSPSM algorithm for an advanced shadow map generation. LiSPSM was
-    developed by Michael Wimmer, Daniel Scherzer and Werner Purgathofer of the TU Wien.
-    The algorithm was presented on the Eurographics Symposium on Rendering 2004.
-    @note
+    /** Implements the %Light Space Perspective Shadow Mapping Algorithm @cite WSP04
+
     Shadow mapping was introduced by Williams in 1978. First a depth image is rendered
     from the light's view and compared in a second pass with depth values of the normal 
     camera view. In case the depth camera's depth value is greater than the depth seen
@@ -57,8 +53,7 @@ namespace Ogre
     viewer however the perspective projection affects near objects to be displayed 
     bigger than further away objects. The same thing happens with the shadow map texels:
     Near shadows appear very coarse and far away shadows are perfectly sampled.
-    In 2002 Stamminger et al. presented an algorithm called Perspective Shadow Maps 
-    (PSM). PSM battles the perspective aliasing by distributing 50% of the shadow map 
+    PSM @cite stamminger2002perspective battles the perspective aliasing by distributing 50% of the shadow map
     texels for objects in the range of < near clipping plane > to < near clipping plane * 2 >
     which inverts the problem: The shadows near the viewer are perfectly sampled, 
     however far away shadow may contain aliasing artefacts. A near clipping plane may be
@@ -85,14 +80,12 @@ namespace Ogre
     However there are still problems. PSM as well as LiSPSM only devote to minimize
     perspective aliasing. Projection aliasing is still a problem, also 'swimming 
     artefacts' still occur. The LiSPSM quality distribution is very good but not the 
-    best available: Some sources say logarithmic shadow mapping is the non plus ultra, 
-    however others reject this thought. There is a research project on logarithmic shadow 
-    maps. The web page url is http://gamma.cs.unc.edu/logsm/. However there is no techical 
-    report available yet (Oct 23rd, 2006).
-    @note
+    best available: Some sources say logarithmic shadow mapping @cite lloyd2007practical
+    is the non plus ultra, however others reject this thought.
+
     More information can be found on the webpage of the TU Wien: 
     http://www.cg.tuwien.ac.at/research/vr/lispsm/
-    @note
+
     Original implementation by Matthias Fink <matthias.fink@web.de>, 2006.
     */
     class _OgreExport LiSPSMShadowCameraSetup : public FocusedShadowCameraSetup
