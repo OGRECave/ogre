@@ -196,7 +196,7 @@ namespace Ogre {
         void removeAllTemplates(bool deleteTemplate = true);
 
 
-        /** Removes all templates that belong to a secific Resource Group from the ParticleSystemManager.
+        /** Removes all templates that belong to a specific Resource Group from the ParticleSystemManager.
         @remarks
             This method removes all templates that belong in a particular resource group from the ParticleSystemManager.
         @param resourceGroup

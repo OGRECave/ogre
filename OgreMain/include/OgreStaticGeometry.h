@@ -573,7 +573,7 @@ namespace Ogre {
             it's parent, so if you have this node already attached to the scene
             graph, you will need to remove it if you wish to avoid the overhead
             of rendering <i>both</i> the original objects and their new static
-            versions! We don't do this for you incase you are preparing this 
+            versions! We don't do this for you in case you are preparing this
             in advance and so don't want the originals detached yet. 
         @note Must be called before 'build'.
         @param node Pointer to the node to use to provide a set of Entity 

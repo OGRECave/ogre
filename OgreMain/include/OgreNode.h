@@ -421,7 +421,7 @@ namespace Ogre {
             rotate(Quaternion(angle, axis), relativeTo);
         }
 
-        /** Rotate the node around an aritrary axis using a Quarternion.
+        /** Rotate the node around an arbitrary axis using a Quarternion.
         */
         void rotate(const Quaternion& q, TransformSpace relativeTo = TS_LOCAL);
 

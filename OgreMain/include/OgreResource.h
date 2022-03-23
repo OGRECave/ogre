@@ -122,7 +122,7 @@ namespace Ogre {
             LF_DEFAULT = 0,
             /// Process non-reloadable resources too.
             LF_INCLUDE_NON_RELOADABLE = 1,
-            /// Process only resources which are not referenced by any other object. Usefull to reduce resource consumption.
+            /// Process only resources which are not referenced by any other object. Useful to reduce resource consumption.
             LF_ONLY_UNREFERENCED = 2,
             /// Combination of LF_ONLY_UNREFERENCED and LF_INCLUDE_NON_RELOADABLE
             LF_ONLY_UNREFERENCED_INCLUDE_NON_RELOADABLE = 3,

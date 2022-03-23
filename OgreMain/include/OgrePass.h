@@ -836,7 +836,7 @@ namespace Ogre {
         /** Sets the culling mode for this pass based on the 'vertex winding'.
             A typical way for the rendering engine to cull triangles is based on the 'vertex winding' of
             triangles. Vertex winding refers to the direction in which the vertices are passed or indexed
-            to in the rendering operation as viewed from the camera, and will wither be clockwise or
+            to in the rendering operation as viewed from the camera, and will either be clockwise or
             anticlockwise (that's 'counterclockwise' for you Americans out there ;) The default is
             Ogre::CULL_CLOCKWISE i.e. that only triangles whose vertices are passed/indexed in anticlockwise order
             are rendered - this is a common approach and is used in 3D studio models for example. You can

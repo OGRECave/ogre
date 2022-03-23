@@ -49,9 +49,9 @@ Set the general parameters, see the comments for their meaning:
 Ogre::Volume::ChunkParameters parameters;
 parameters.sceneManager = mSceneMgr;       // The SceneManager to use
 parameters.src = &unionSrc;                // The just created density source.
-parameters.baseError = (Real)1.8;          // The error of the highest LOD-level
-parameters.errorMultiplicator = (Real)0.9; // The factor between each LOD-level (error = baseError * errorMultiplicator  * level)
-parameters.skirtFactor = (Real)0.7;        // Controls how long the skirts are. The lower the number, the shorter the skirts are. This saves geometry. But if they are too short, cracks might occure.
+parameters.baseError = 1.8;                // The error of the highest LOD-level
+parameters.errorMultiplicator = 0.9;       // The factor between each LOD-level (error = baseError * errorMultiplicator  * level)
+parameters.skirtFactor = 0.7;              // Controls how long the skirts are. The lower the number, the shorter the skirts are. This saves geometry. But if they are too short, cracks might occur.
 parameters.scale = 10;                     // The displayed volume will be scaled by this factor.
 parameters.maxScreenSpaceError = 30;       // The screen space error controlling when the LOD-levels change.
 ```
@@ -122,7 +122,7 @@ if (intersects)
 
 # Editing a Volume made from a GridSource {#editing}
 
-A usecase is realtime editing of volume terrain as seen as in the sample. Let's union the terrain with a sphere of the radius 2.5 and the center 123/123/123. __volumeRoot__ is the Chunk instance with which the terrain was initially loaded. The factor 1.5 is just to have a save border arround the sphere which also gets updated. The rest of the parameters are 5 LOD levels and a volume mesh covering an area of 384^3.
+A usecase is realtime editing of volume terrain as seen as in the sample. Let's union the terrain with a sphere of the radius 2.5 and the center 123/123/123. __volumeRoot__ is the Chunk instance with which the terrain was initially loaded. The factor 1.5 is just to have a save border around the sphere which also gets updated. The rest of the parameters are 5 LOD levels and a volume mesh covering an area of 384^3.
 ```cpp
 Vector3 center(123);
 Real radius = (Real)2.5;

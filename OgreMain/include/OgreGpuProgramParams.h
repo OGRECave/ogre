@@ -1051,7 +1051,7 @@ namespace Ogre {
             ACT_FAR_CLIP_DISTANCE,
 
             /** provides the pass index number within the technique
-                of the active materil.
+                of the active material.
             */
             ACT_PASS_NUMBER,
 

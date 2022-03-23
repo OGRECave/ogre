@@ -313,7 +313,7 @@ namespace Ogre {
         */
         void _fireNotifyResourcesCreated(bool forResizeOnly);
         
-        /** Notify listeners ressources
+        /** Notify listeners resources
         */
         void _fireNotifyResourcesReleased(bool forResizeOnly);
     private:

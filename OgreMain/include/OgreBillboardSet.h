@@ -330,7 +330,7 @@ namespace Ogre {
             Behaviour once the billboard pool has been exhausted depends on the
             BillboardSet::setAutoextend option.
         @param position
-            The position of the new billboard realtive to the certer of the set
+            The position of the new billboard relative to the center of the set
         @param colour
             Optional base colour of the billboard.
         @return

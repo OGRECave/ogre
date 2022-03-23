@@ -47,7 +47,7 @@ In order to read or update a hardware buffer, you have to notify the card about 
 
 ## writeData and readData
 
-If your data is aready somwhere in system memory, you can use the simple @c writeData and @c readData methods. These can be thought of as locking the buffer (as described below) and doing a @c memcpy. Some APIs, like OpenGL, implement this more efficiently though.
+If your data is already somewhere in system memory, you can use the simple @c writeData and @c readData methods. These can be thought of as locking the buffer (as described below) and doing a @c memcpy. Some APIs, like OpenGL, implement this more efficiently though.
 
 ```cpp
 std::vector<float> vec = ...;
@@ -56,7 +56,7 @@ Ogre::HardwareBufferPtr pBuffer = ...;
 pBuffer->writeData(0, vec.size() * sizeof(float), vec.data(), true);
 ```
 
-However, this approach has a noticable overhead, if you update small portions of the buffer at different locations. Also, it obviously requires system memory to be allocated for the data.
+However, this approach has a noticeable overhead, if you update small portions of the buffer at different locations. Also, it obviously requires system memory to be allocated for the data.
 
 ## Locking buffers {#Locking-buffers}
 

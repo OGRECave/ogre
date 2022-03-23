@@ -202,7 +202,7 @@ namespace Ogre
         @par
             Note this is a helper function, as such it takes a submesh base to compute
             the parameters, instead of using the object's own. This allows
-            querying for a technique without requiering to actually build it.
+            querying for a technique without requiring to actually build it.
         @param baseSubMesh The base submesh that will be using to build it.
         @param flags Flags to pass to the InstanceManager. @see InstanceManagerFlags
         @return The max instances limit
@@ -215,7 +215,7 @@ namespace Ogre
         @param baseSubMesh A sub mesh which the instances will be based upon from
         @remarks
             Call this only ONCE. This is done automatically by Ogre::InstanceManager
-            Caller is responsable for freeing buffers in this RenderOperation
+            Caller is responsible for freeing buffers in this RenderOperation
             Buffers inside the RenderOp may be null if the built failed.
         @return
             A render operation which is very useful to pass to other InstanceBatches
@@ -234,7 +234,7 @@ namespace Ogre
         @param baseSubMesh A sub mesh which the instances will be based upon from
         @param renderOperation The RenderOp to reference.
         @remarks
-            Caller is responsable for freeing buffers passed as input arguments
+            Caller is responsible for freeing buffers passed as input arguments
             This function replaces the need to call build()
         */
         virtual void buildFrom( const SubMesh *baseSubMesh, const RenderOperation &renderOperation );
