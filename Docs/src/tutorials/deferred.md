@@ -241,7 +241,7 @@ So, the steps are :
 
 
 
-And thats it! In the demo, the DeferredShading class takes care of that.
+And that's it! In the demo, the DeferredShading class takes care of that.
 
 ## Adapting the framework
 The deferred shading framework in the demo was designed to be usable in real applications. Where would one want to modify it ?
@@ -260,6 +260,6 @@ In addition to that, the deferred shading implementation was focused on simplici
 Deferred Shading is an advanced rendering technique, that brings a pretty big implementation challenge along with it. This article, along with the demo, shows that it is possible to implement without relying on hacks and bypassing ogre's systems. Yes, it involves more advanced usage of ogre's APIs and requires a bit of knowledge about what happens behind the scenes, but is in no way impossible.
 
 ## Further reading {#further}
-* [KillZone 2 Deferred Shading overview](https://d1z4o56rleaq4j.cloudfront.net/downloads/assets/Develop07_Valient_DeferredRenderingInKillzone2.pdf) - Great resource for understanding deferred shading in general before diving into implemeting it in Ogre.
+* [KillZone 2 Deferred Shading overview](https://d1z4o56rleaq4j.cloudfront.net/downloads/assets/Develop07_Valient_DeferredRenderingInKillzone2.pdf) - Great resource for understanding deferred shading in general before diving into implementing it in Ogre.
 * [Improving Ogre's Compositor Framework GSoC project page](http://www.ogre3d.org/tikiwiki/tiki-index.php?page=SoC2009+Compositor)
 * [Deferred Rendering Demystified](https://www.gamedev.net/articles/programming/graphics/deferred-rendering-demystified-r2746/) - An article written around this project that explains the design behind the deferred renderer.

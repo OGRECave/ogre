@@ -93,7 +93,7 @@ namespace Ogre {
 
         You can control the default log level through the `OGRE_MIN_LOGLEVEL` environment variable.
         Here, the value 1 corresponds to #LML_TRIVIAL etc.
-        @note Should not be used directly, but trough the LogManager class.
+        @note Should not be used directly, but through the LogManager class.
     */
     class _OgreExport Log : public LogAlloc
     {

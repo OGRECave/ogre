@@ -961,7 +961,7 @@ If several texture units share the same Sampler settings, you are encouraged to 
 
 You can also use nested section in order to use a special add-ins
 - @c texture_source as a source of texture data, see @ref External-Texture-Sources for details
-- @c rtshader_system for addtitional layer blending  options, see @ref rtss for details.
+- @c rtshader_system for additional layer blending  options, see @ref rtss for details.
 
 <a name="Attribute-Descriptions-1"></a>
 
@@ -1059,7 +1059,7 @@ The base\_name in this format is something like ’skybox.jpg’, and the system
 @par
 Format2 (long): cubic\_texture &lt;front&gt; &lt;back&gt; &lt;left&gt; &lt;right&gt; &lt;up&gt; &lt;down&gt; &lt;combinedUVW|separateUV&gt;
 
-In this case each face is specified explicitly, incase you don’t want to conform to the image naming standards above. You can only use this for the separateUV version since the combinedUVW version requires a single texture name to be assigned to the combined 3D texture (see below).
+In this case each face is specified explicitly, in case you don’t want to conform to the image naming standards above. You can only use this for the separateUV version since the combinedUVW version requires a single texture name to be assigned to the combined 3D texture (see below).
 
 In both cases the final parameter means the following:
 

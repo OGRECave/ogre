@@ -359,7 +359,7 @@ namespace Ogre {
             doesn't loss visual quality.
         @par
             This method allow you queries hardware texture filtering capability to deciding
-            which verion of the shader to be used. Note it's up to you to write multi-version
+            which version of the shader to be used. Note it's up to you to write multi-version
             shaders for support various hardware, internal engine can't do that for you
             automatically.
         @note

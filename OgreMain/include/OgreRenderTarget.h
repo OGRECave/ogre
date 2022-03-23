@@ -206,7 +206,7 @@ namespace Ogre {
         */
         virtual void removeAllViewports(void);
 
-        /** Retieves details of current rendering performance. */
+        /** Retrieves details of current rendering performance. */
         const FrameStats& getStatistics(void) const {
             return mStats;
         }
@@ -335,7 +335,7 @@ namespace Ogre {
         virtual bool requiresTextureFlipping() const = 0;
 
         /** Utility method to notify a render target that a camera has been removed,
-        incase it was referring to it as a viewer.
+        in case it was referring to it as a viewer.
         */
         virtual void _notifyCameraRemoved(const Camera* cam);
 

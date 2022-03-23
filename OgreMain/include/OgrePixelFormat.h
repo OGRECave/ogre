@@ -49,7 +49,7 @@ namespace Ogre {
      * The example above would be expressed with an array of bytes as `{0xBB, 0xGG, 0xRR, 0xAA}` on both machines.
      * Therefore, one would use the Ogre::PF_BYTE_BGRA format when reading pixel data expressed in bytes.
      * This format aliases to either Ogre::PF_A8B8G8R8 or Ogre::PF_R8G8B8A8
-     * depending on the machine endianess.
+     * depending on the machine endianness.
      */
     enum PixelFormat
     {
@@ -281,7 +281,7 @@ namespace Ogre {
         PF_DEPTH24_STENCIL8,
         /// Number of pixel formats currently defined
         PF_COUNT,
-        // endianess aware aliases
+        // endianness aware aliases
 #if OGRE_ENDIAN == OGRE_ENDIAN_BIG
         /// @copydoc PF_R8G8B8
         PF_BYTE_RGB = PF_R8G8B8,
@@ -568,8 +568,8 @@ namespace Ogre {
         */
         static PixelFormat getFormatFromName(const String& name, bool accessibleOnly = false, bool caseSensitive = false);
 
-        /** Returns the similar format but acoording with given bit depths.
-            @param fmt      The original foamt.
+        /** Returns the similar format but according with given bit depths.
+            @param fmt      The original format.
             @param integerBits Preferred bit depth (pixel bits) for integer pixel format.
                             Available values: 0, 16 and 32, where 0 (the default) means as it is.
             @param floatBits Preferred bit depth (channel bits) for float pixel format.

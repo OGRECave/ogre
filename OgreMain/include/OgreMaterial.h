@@ -625,7 +625,7 @@ namespace Ogre {
         /// @deprecated use getLodValues()
         OGRE_DEPRECATED LodValueIterator getLodValueIterator(void) const;
 
-        /** Gets the user-defined list of values which are internally transfomed by the LodStrategy.
+        /** Gets the user-defined list of values which are internally transformed by the LodStrategy.
         @remarks
             Note that the iterator returned from this method is not totally analogous to 
             the one passed in by calling setLodLevels - the list includes a zero

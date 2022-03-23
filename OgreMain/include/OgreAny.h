@@ -42,7 +42,7 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-	// resolve circular dependancy
+	// resolve circular dependency
     class Any;
     template<typename ValueType> ValueType
     any_cast(const Any & operand);

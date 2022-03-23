@@ -63,7 +63,7 @@ namespace Ogre
 
          The search order is
          1. Subdirectory in user Home (see @ref getWritablePath)
-         2. OS dependant config-paths
+         2. OS dependent config-paths
          3. Current working directory
 
          @param filename The config file name (without path)

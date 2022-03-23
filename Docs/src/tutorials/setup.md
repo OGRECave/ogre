@@ -35,7 +35,7 @@ class MyTestApp : public OgreBites::ApplicationContext, public OgreBites::InputL
     ...
 }
 ```
-in the constructor we set our application name. The ogre configuration files will be stored in a system dependant location specific to our app.
+in the constructor we set our application name. The ogre configuration files will be stored in a system dependent location specific to our app.
 @snippet Samples/Tutorials/Bootstrap.cpp constructor
 
 to handle input events, we then override the according method

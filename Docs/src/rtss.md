@@ -466,7 +466,7 @@ Therefore parameters are not resolved by name (except for local variables), but 
 @par
 You can think of the latter as an extension of the Cg/ HLSL Semantics to the actual content of the parameter.
 @par
-In case of the Ogre::RTShader::FFPTransform wee nned the world view projection matrix and vertex shader input and output position parameters.
+In case of the Ogre::RTShader::FFPTransform we need the world view projection matrix and vertex shader input and output position parameters.
 @par
 @snippet Components/RTShaderSystem/src/OgreShaderFFPTransform.cpp param_resolve
 
@@ -486,7 +486,7 @@ The arguments to the function are the ones you resolved in the first step and th
 You can add call as many functions as you need. The calls will appear in the same order in the generates shader source code.
 @note
 * The ordering of the function invocation is crucial. Use the Ogre::RTShader::FFPVertexShaderStage and Ogre::RTShader::FFPFragmentShaderStage enumarations to place your invocations in the desired global order.
-* Make sure the parameter semantic (in/out) in the SubRenderState code matches to your shader code implementation you supplied in the library file. GLSL will fail to link to libray functions if it won't be able to find a perfect function declaration match. 
+* Make sure the parameter semantic (in/out) in the SubRenderState code matches to your shader code implementation you supplied in the library file. GLSL will fail to link to library functions if it won't be able to find a perfect function declaration match.
 * Ogre::RTShader::SubRenderState::updateGpuProgramsParams - As the name suggest this method should be overridden only in case your SubRenderState should update some parameter it created before.
 * Ogre::RTShader::SubRenderState::preAddToRenderState(): this method called before adding this SubRenderState to a parent RenderState instances. It allows this SubRenderState to exclude itself from the list in case the source pass is not matching. I.E in case of SubRenderState that perform lighting calculations it can return false when the given source pass specifies that lighting calculations disabled for it.
 @snippet Components/RTShaderSystem/src/OgreShaderFFPLighting.cpp disable
@@ -494,7 +494,7 @@ This method also let the SubRenderState to opportunity to modify the destination
 
 Implementing the Ogre::RTShader::SubRenderStateFactory is much simpler and involves implementing the following methods
 * Ogre::RTShader::SubRenderStateFactory::createInstanceImpl(): This method should return instance for the SubRenderState sub class.
-* Ogre::RTShader::SubRenderStateFactory::createInstance(): This method should return instasnce for the SubRenderState sub class using the given script compiler parameters. Implemet this method if you want to be able to creat your custom shader extension from material script.
+* Ogre::RTShader::SubRenderStateFactory::createInstance(): This method should return instance for the SubRenderState sub class using the given script compiler parameters. Implement this method if you want to be able to create your custom shader extension from material script.
 * Ogre::RTShader::SubRenderStateFactory::writeInstance(): This method should write down the parameters of a given SubRenderState instance to material script file. Implement this method if you want to be able to export a material that contains your custom shader extension.
 
 ## Tips for debugging shaders {#debugging}

@@ -1186,7 +1186,7 @@ namespace Ogre {
         */
         virtual void destroyAllCameras(void);
 
-        /** Set whether to use camera-relative co-ordinates when rendering, ie
+        /** Set whether to use camera-relative coordinates when rendering, ie
             to always place the camera at the origin and move the world around it.
         @remarks
             This is a technique to alleviate some of the precision issues associated with
@@ -1202,7 +1202,7 @@ namespace Ogre {
         */
         void setCameraRelativeRendering(bool rel) { mCameraRelativeRendering = rel; }
 
-        /** Get whether to use camera-relative co-ordinates when rendering, ie
+        /** Get whether to use camera-relative coordinates when rendering, ie
             to always place the camera at the origin and move the world around it.
         */
         bool getCameraRelativeRendering() const { return mCameraRelativeRendering; }
@@ -1659,7 +1659,7 @@ namespace Ogre {
         void destroyAllParticleSystems(void);
         /// @}
 
-        /** Empties the entire scene, inluding all SceneNodes, Entities, Lights, 
+        /** Empties the entire scene, including all SceneNodes, Entities, Lights,
             BillboardSets etc. Cameras are not deleted at this stage since
             they are still referenced by viewports, which are not destroyed during
             this process.
@@ -1752,7 +1752,7 @@ namespace Ogre {
         virtual ViewPoint getSuggestedViewpoint(bool random = false);
 
         /** Method for setting a specific option of the Scene Manager. These options are usually
-            specific for a certain implemntation of the Scene Manager class, and may (and probably
+            specific for a certain implementation of the Scene Manager class, and may (and probably
             will) not exist across different implementations.
             @param
                 strKey The name of the option to set
@@ -1995,7 +1995,7 @@ namespace Ogre {
             @param
                 materialName The name of the material the box will use
             @param
-                distance Distance in world coorinates from the camera to
+                distance Distance in world coordinates from the camera to
                 each plane of the box. The default is normally OK.
             @param
                 drawFirst If true, the box is drawn before all other
@@ -2047,11 +2047,11 @@ namespace Ogre {
                 realistic looking sky where the scene is not going to be
                 'fogged', and there is always a 'floor' of some sort to prevent
                 the viewer looking below the horizon (the distortion effect below
-                the horizon can be pretty horrible, and there is never anyhting
+                the horizon can be pretty horrible, and there is never anything
                 directly below the viewer). If you need a complete wrap-around
                 background, use the setSkyBox method instead. You can actually
                 combine a sky box and a sky dome if you want, to give a positional
-                backdrop with an overlayed curved cloud layer.
+                backdrop with an overlaid curved cloud layer.
             @par
                 Sky domes work well with 2D repeating textures like clouds. You
                 can change the apparent 'curvature' of the sky depending on how
@@ -2072,7 +2072,7 @@ namespace Ogre {
                 tiling How many times to tile the texture(s) across the
                 dome.
             @param
-                distance Distance in world coorinates from the camera to
+                distance Distance in world coordinates from the camera to
                 each plane of the box the dome is rendered on. The default
                 is normally OK.
             @param
@@ -2253,7 +2253,7 @@ namespace Ogre {
         @par
             A single animation can affect multiple Node objects (each AnimationTrack affects a single Node).
             In addition, through animation blending a single Node can be affected by multiple animations,
-            athough this is more useful when performing skeletal animation (see Skeleton::createAnimation).
+            although this is more useful when performing skeletal animation (see Skeleton::createAnimation).
         @par
             Note that whilst it uses the same classes, the animations created here are kept separate from the
             skeletal animations of meshes (each Skeleton owns those animations).
@@ -2705,7 +2705,7 @@ namespace Ogre {
         */
         const ShadowCameraSetupPtr& getShadowCameraSetup() const;
 
-        /** Sets whether we should use an inifinite camera far plane
+        /** Sets whether we should use an infinite camera far plane
             when rendering stencil shadows.
         @remarks
             Stencil shadow coherency is very reliant on the shadow volume

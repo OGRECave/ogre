@@ -71,15 +71,15 @@ namespace Ogre {
         - \f$-z\f$ is away
 
         Cameras maintain their own aspect ratios, field of view, and frustum,
-        and project co-ordinates into normalised device coordinates measured from -1 to 1 in x and y,
+        and project coordinates into normalised device coordinates measured from -1 to 1 in x and y,
         and 0 to 1 in z, where
         - \f$+x\f$ is right
         - \f$+y\f$ is up
         - \f$+z\f$ is away
 
         At render time, the camera will be rendering to a
-        Viewport which will translate these parametric co-ordinates into real screen
-        co-ordinates. Obviously it is advisable that the viewport has the same
+        Viewport which will translate these parametric coordinates into real screen
+        coordinates. Obviously it is advisable that the viewport has the same
         aspect ratio as the camera to avoid distortion (unless you want it!).
     */
     class _OgreExport Camera : public Frustum

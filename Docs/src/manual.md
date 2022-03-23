@@ -486,8 +486,8 @@ The main disadvantage to texture shadows is that, because they are simply a text
 
 The simplest projection is just to render the shadow casters from the lights perspective using a regular camera setup. This can look bad though, so there are many other projections which can help to improve the quality from the main camera’s perspective. OGRE supports pluggable projection bases via it’s ShadowCameraSetup class, and comes with several existing options
 - **Uniform**, which is the simplest,
-- **Uniform Focussed**, which is still a normal camera projection, except that the camera is focussed into the area that the main viewing camera is looking at
-- **Light Space Perspective Shadow Mapping** (LiSPSM), which both focusses and distorts the shadow frustum based on the main view camera and
+- **Uniform Focused**, which is still a normal camera projection, except that the camera is focused into the area that the main viewing camera is looking at
+- **Light Space Perspective Shadow Mapping** (LiSPSM), which both focuses and distorts the shadow frustum based on the main view camera and
 - **Plane Optimal**, which seeks to optimise the shadow fidelity for a single receiver plane.
 
 </dd> <dt>Filtering</dt> <dd>

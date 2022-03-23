@@ -212,7 +212,7 @@ namespace Ogre
             The position of the near clipping plane is the distance from the frustums position to the screen
             on which the world is projected. The near plane distance, combined with the field-of-view and the
             aspect ratio, determines the size of the viewport through which the world is viewed (in world
-            co-ordinates). Note that this world viewport is different to a screen viewport, which has it's
+            coordinates). Note that this world viewport is different to a screen viewport, which has it's
             dimensions expressed in pixels. The frustums viewport should have the same aspect ratio as the
             screen viewport it renders into to avoid distortion.
         @param nearDist

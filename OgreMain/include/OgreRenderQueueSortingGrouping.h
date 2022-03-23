@@ -132,7 +132,7 @@ namespace Ogre {
                 uint32 hashb = b->getHash();
                 if (hasha == hashb)
                 {
-                    // Must differentTransparentQueueItemLessiate by pointer incase 2 passes end up with the same hash
+                    // Must differentTransparentQueueItemLessiate by pointer in case 2 passes end up with the same hash
                     return a < b;
                 }
                 else

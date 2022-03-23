@@ -422,7 +422,7 @@ material ShadowDebug
 With only this material definition the [RTSS (Realtime Shader System)](@ref rtss) 
 takes care of generating the proper shader to project the Shadow Map on the Mini Screen.
 
-Source code to create a Rectangle on the screen and proyect the Shadow Map texture:
+Source code to create a Rectangle on the screen and project the Shadow Map texture:
 ```cpp
 // Create rectangle for the Mini-Screen and attach to node
 Ogre::Rectangle2D* miniScreen = mSceneMgr->createScreenSpaceRect(true);
@@ -618,7 +618,7 @@ void main()
 }
 ```
 
-And the fragment shader has to be accomodated to select the correct Shadow Map according to the camera distance
+And the fragment shader has to be accommodated to select the correct Shadow Map according to the camera distance
 ```glsl
 #version 330 core
 

@@ -827,7 +827,7 @@ namespace Ogre
             ID_DEPTH_FAIL_OP,
             ID_PASS_OP,
             ID_TWO_SIDED,
-        // Suport for shader model 5.0
+        // Support for shader model 5.0
         // More program IDs
         ID_TESSELLATION_HULL_PROGRAM,
         ID_TESSELLATION_DOMAIN_PROGRAM,
