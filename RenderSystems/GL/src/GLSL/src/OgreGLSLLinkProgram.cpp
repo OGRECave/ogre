@@ -423,19 +423,19 @@ namespace Ogre {
             // attach Geometry Program
             mShaders[GPT_GEOMETRY_PROGRAM]->attachToProgramObject(mGLProgramHandle);
 
-            //Don't set adjacency flag. We handle it internally and expose "false"
+            if (GLAD_GL_EXT_geometry_shader4)
+            {
+                RenderOperation::OperationType inputOperationType = gshader->getInputOperationType();
+                glProgramParameteriEXT(mGLProgramHandle, GL_GEOMETRY_INPUT_TYPE_EXT,
+                                       getGLGeometryInputPrimitiveType(inputOperationType));
 
-            RenderOperation::OperationType inputOperationType = gshader->getInputOperationType();
-            glProgramParameteriEXT(mGLProgramHandle, GL_GEOMETRY_INPUT_TYPE_EXT,
-                getGLGeometryInputPrimitiveType(inputOperationType));
+                RenderOperation::OperationType outputOperationType = gshader->getOutputOperationType();
 
-            RenderOperation::OperationType outputOperationType = gshader->getOutputOperationType();
+                glProgramParameteriEXT(mGLProgramHandle, GL_GEOMETRY_OUTPUT_TYPE_EXT,
+                                       getGLGeometryOutputPrimitiveType(outputOperationType));
 
-            glProgramParameteriEXT(mGLProgramHandle, GL_GEOMETRY_OUTPUT_TYPE_EXT,
-                getGLGeometryOutputPrimitiveType(outputOperationType));
-
-            glProgramParameteriEXT(mGLProgramHandle, GL_GEOMETRY_VERTICES_OUT_EXT,
-                gshader->getMaxOutputVertices());
+                glProgramParameteriEXT(mGLProgramHandle, GL_GEOMETRY_VERTICES_OUT_EXT, gshader->getMaxOutputVertices());
+            }
         }
 
         if (mShaders[GPT_FRAGMENT_PROGRAM])
