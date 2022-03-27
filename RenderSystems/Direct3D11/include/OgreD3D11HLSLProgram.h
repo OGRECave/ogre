@@ -91,7 +91,6 @@ namespace Ogre {
 
         void populateDef(D3D11_SHADER_TYPE_DESC& d3dDesc, GpuConstantDefinition& def) const;
 
-        String mTarget;
         bool mColumnMajorMatrices;
         bool mEnableBackwardsCompatibility;
 
@@ -170,7 +169,7 @@ namespace Ogre {
         /** Sets the shader target to compile down to, e.g. 'vs_1_1'. */
         void setTarget(const String& target);
         /** Gets the shader target to compile down to, e.g. 'vs_1_1'. */
-        const String& getTarget(void) const { return mTarget; }
+        const String& getTarget(void) const { return mSyntaxCode; }
         /** Gets the shader target promoted to the first compatible, e.g. 'vs_4_0' or 'ps_4_0' if backward compatibility is enabled. */
         const char* getCompatibleTarget(void) const;
 
@@ -182,8 +181,6 @@ namespace Ogre {
         void setEnableBackwardsCompatibility(bool enableBackwardsCompatibility) { mEnableBackwardsCompatibility = enableBackwardsCompatibility; }
         /** Gets whether backwards compatibility is enabled. */
         bool getEnableBackwardsCompatibility(void) const { return mEnableBackwardsCompatibility; }
-        /// Overridden from GpuProgram
-        bool isSupported(void) const;
         /// Overridden from GpuProgram
         GpuProgramParametersSharedPtr createParameters(void);
         /// Overridden from GpuProgram
