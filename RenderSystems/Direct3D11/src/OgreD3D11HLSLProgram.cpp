@@ -61,6 +61,8 @@ namespace Ogre {
     {
         HighLevelGpuProgram::prepareImpl();
 
+        mSyntaxCode = getCompatibleTarget();
+
         uint32 hash = getNameForMicrocodeCache();
         if ( GpuProgramManager::getSingleton().isMicrocodeAvailableInCache(hash) )
         {
@@ -279,7 +281,7 @@ namespace Ogre {
 #if OGRE_DEBUG_MODE
         compileFlags |= D3DCOMPILE_DEBUG;
         // Skip optimization only if we have enough instruction slots (>=256) and not feature level 9 hardware
-        if (mTarget != "ps_2_0" && mTarget != "ps_4_0_level_9_1" && rsys->_getFeatureLevel() >= D3D_FEATURE_LEVEL_10_0)
+        if (mSyntaxCode != "ps_2_0" && mSyntaxCode != "ps_4_0_level_9_1" && rsys->_getFeatureLevel() >= D3D_FEATURE_LEVEL_10_0)
             compileFlags |= D3DCOMPILE_SKIP_OPTIMIZATION;
 #else
         compileFlags |= D3DCOMPILE_OPTIMIZATION_LEVEL3;
@@ -299,7 +301,7 @@ namespace Ogre {
             compileFlags |= D3DCOMPILE_ENABLE_BACKWARDS_COMPATIBILITY;
         }
 
-        const char* target = getCompatibleTarget();
+        const char* target = mSyntaxCode.c_str();
 
         ComPtr<ID3DBlob> pMicroCode;
         ComPtr<ID3DBlob> errors;
@@ -1295,15 +1297,6 @@ namespace Ogre {
         }
     }
     //-----------------------------------------------------------------------
-    bool D3D11HLSLProgram::isSupported(void) const
-    {
-        // Use the current render system
-        RenderSystem* rs = Root::getSingleton().getRenderSystem();
-
-        // Get the supported syntaxed from RenderSystemCapabilities 
-        return rs->getCapabilities()->isShaderProfileSupported(getCompatibleTarget()) && GpuProgram::isSupported();
-    }
-    //-----------------------------------------------------------------------
     GpuProgramParametersSharedPtr D3D11HLSLProgram::createParameters(void)
     {
         // Call superclass
@@ -1317,47 +1310,46 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void D3D11HLSLProgram::setTarget(const String& target)
     {
-        mTarget = "";
+        mSyntaxCode = "hlsl";
         std::vector<String> profiles = StringUtil::split(target, " ");
         for(unsigned int i = 0 ; i < profiles.size() ; i++)
         {
             String & currentProfile = profiles[i];
             if(GpuProgramManager::getSingleton().isSyntaxSupported(currentProfile))
             {
-                mTarget = currentProfile;
+                mSyntaxCode = currentProfile;
                 break;
             }
         }
 
-        if(mTarget == "")
+        if(mSyntaxCode == "hlsl")
         {
             LogManager::getSingleton().logMessage(
                 "Invalid target for D3D11 shader '" + mName + "' - '" + target + "'");
+            return;
         }
-
-
     }
     //-----------------------------------------------------------------------
     const char* D3D11HLSLProgram::getCompatibleTarget(void) const
     {
-        if(mTarget.empty())
+        if(mSyntaxCode == "hlsl")
         {
             return mType == GPT_VERTEX_PROGRAM ? "vs_4_0_level_9_1" : "ps_4_0_level_9_1";
         }
 
         if(mEnableBackwardsCompatibility)
         {
-            if(mTarget == "vs_2_0") return "vs_4_0_level_9_1";
-            if(mTarget == "vs_2_a") return "vs_4_0_level_9_3";
-            if(mTarget == "vs_3_0") return "vs_4_0";
+            if(mSyntaxCode == "vs_2_0") return "vs_4_0_level_9_1";
+            if(mSyntaxCode == "vs_2_a") return "vs_4_0_level_9_3";
+            if(mSyntaxCode == "vs_3_0") return "vs_4_0";
 
-            if(mTarget == "ps_2_0") return "ps_4_0_level_9_1";
-            if(mTarget == "ps_2_a") return "ps_4_0_level_9_3";
-            if(mTarget == "ps_2_b") return "ps_4_0_level_9_3";
-            if(mTarget == "ps_3_0") return "ps_4_0";
+            if(mSyntaxCode == "ps_2_0") return "ps_4_0_level_9_1";
+            if(mSyntaxCode == "ps_2_a") return "ps_4_0_level_9_3";
+            if(mSyntaxCode == "ps_2_b") return "ps_4_0_level_9_3";
+            if(mSyntaxCode == "ps_3_0") return "ps_4_0";
         }
 
-        return mTarget.c_str();
+        return mSyntaxCode.c_str();
     }
     //-----------------------------------------------------------------------
     const String& D3D11HLSLProgram::getLanguage(void) const
@@ -1742,8 +1734,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------------
     uint32 D3D11HLSLProgram::getNameForMicrocodeCache()
     {
-        const char* target = getCompatibleTarget();
-        uint32 seed = FastHash(target, strlen(target));
+        uint32 seed = FastHash(mSyntaxCode.c_str(), mSyntaxCode.size());
         return _getHash(seed);
     }
 
