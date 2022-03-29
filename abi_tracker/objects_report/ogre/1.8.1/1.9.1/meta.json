@@ -1,0 +1,14 @@
+{
+  "BC": "38.75",
+  "Added": 532,
+  "Removed": 604,
+  "TotalProblems": 1294,
+  "Source_BC": 61.29,
+  "Source_TotalProblems": 624,
+  "ObjectsAdded": 2,
+  "ObjectsRemoved": 0,
+  "ObjectsAddedSymbols": 565,
+  "ObjectsRemovedSymbols": 0,
+  "ChangedSoname": 4,
+  "TotalObjects": 4
+}

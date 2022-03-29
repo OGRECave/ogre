@@ -1,0 +1,3961 @@
+<!-- verdict:incompatible;affected:21.4;added:276;removed:79;type_problems_high:8;type_problems_medium:0;type_problems_low:3;interface_problems_high:0;interface_problems_medium:3;interface_problems_low:0;changed_constants:0;tool_version:2.3 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta name="keywords" content="libOgreOverlay, source compatibility, API, report" />
+<meta name="description" content="Source compatibility report for the libOgreOverlay object between 1.11.6 and 1.12.13 versions" />
+<title>libOgreOverlay: 1.11.6 to 1.12.13 source compatibility report</title>
+<style type="text/css">
+body {
+    font-family:Arial, sans-serif;
+    background-color:White;
+    color:Black;
+}
+hr {
+    color:Black;
+    background-color:Black;
+    height:1px;
+    border:0;
+}
+h1 {
+    margin-bottom:0px;
+    padding-bottom:0px;
+    font-size:1.625em;
+}
+h2 {
+    margin-bottom:0px;
+    padding-bottom:0px;
+    font-size:1.25em;
+    white-space:nowrap;
+}
+span.section {
+    font-weight:bold;
+    cursor:pointer;
+    color:#003E69;
+    white-space:nowrap;
+    margin-left:0.3125em;
+}
+span.new_sign {
+    font-weight:bold;
+    margin-left:1.65em;
+    color:#003E69;
+}
+span.new_sign_lbl {
+    margin-left:3em;
+    font-size:1em;
+    color:Black;
+}
+span:hover.section {
+    color:#336699;
+}
+span.sect_aff {
+    cursor:pointer;
+    padding-left:1.55em;
+    font-size:0.875em;
+    color:#cc3300;
+}
+span.sect_info {
+    cursor:pointer;
+    padding-left:1.55em;
+    font-size:0.875em;
+    color:Black;
+}
+span.ext {
+    font-weight:normal;
+}
+span.h_name {
+    color:#cc3300;
+    font-size:0.875em;
+    font-weight:bold;
+}
+div.h_list, div.lib_list {
+    font-size:0.94em;
+    padding-left:0.4em;
+}
+span.ns {
+    color:#408080;
+    font-size:0.94em;
+}
+span.lib_name {
+    color:Green;
+    font-size:0.875em;
+    font-weight:bold;
+}
+span.iname {
+    font-weight:bold;
+    color:#003E69;
+    margin-left:0.3125em;
+}
+span.iname_b {
+    font-weight:bold;
+}
+span.iname_a {
+    color:#333333;
+    font-weight:bold;
+    font-size:0.94em;
+}
+span.sym_p {
+    font-weight:normal;
+    white-space:normal;
+}
+span.sym_pd {
+    white-space:normal;
+}
+span.sym_p span, span.sym_pd span {
+    white-space:nowrap;
+}
+div.affect {
+    padding-left:1em;
+    padding-bottom:10px;
+    font-size:0.87em;
+    font-style:italic;
+    line-height:0.9em;
+}
+div.affected {
+    padding-left:1.9em;
+    padding-top:10px;
+}
+table.ptable {
+    border-collapse:collapse;
+    border:1px outset black;
+    margin-left:0.95em;
+    margin-top:3px;
+    margin-bottom:3px;
+    width:56.25em;
+}
+table.ptable td {
+    border:1px solid gray;
+    padding:3px;
+    font-size:0.875em;
+    text-align:left;
+    vertical-align:top;
+    max-width:28em;
+    word-wrap:break-word;
+}
+table.ptable th.pn {
+    width:2%;
+}
+table.ptable th.chg {
+    width:47%;
+}
+table.vtable {
+    border-collapse:collapse;
+    border:1px outset black;
+    margin-left:1.9em;
+    margin-top:0.7em;
+}
+table.vtable td {
+    border:1px solid gray;
+    padding:3px;
+    font-size:0.875em;
+    vertical-align:top;
+    max-width:450px;
+    word-wrap:break-word;
+}
+table.ptable th, table.vtable th {
+    background-color:#eeeeee;
+    font-weight:bold;
+    color:#333333;
+    font-family:Verdana, Arial;
+    font-size:0.875em;
+    border:1px solid gray;
+    text-align:center;
+    vertical-align:top;
+    white-space:nowrap;
+    padding:3px;
+}
+table.summary {
+    border-collapse:collapse;
+    border:1px outset black;
+}
+table.summary th {
+    background-color:#eeeeee;
+    font-weight:normal;
+    text-align:left;
+    font-size:0.94em;
+    white-space:nowrap;
+    border:1px inset gray;
+    padding:3px;
+}
+table.summary td {
+    text-align:right;
+    white-space:nowrap;
+    border:1px inset gray;
+    padding:3px 5px 3px 10px;
+}
+span.mngl {
+    padding-left:1em;
+    font-size:0.875em;
+    cursor:text;
+    color:#444444;
+    font-weight:bold;
+}
+span.pleft {
+    padding-left:2.5em;
+}
+span.sym_ver {
+    color:#333333;
+    white-space:nowrap;
+    font-family:"DejaVu Sans Mono", Monospace;
+}
+span.attr {
+    color:#333333;
+    font-weight:normal;
+}
+span.color_p {
+    font-style:italic;
+    color:Brown;
+}
+span.p {
+    font-style:italic;
+}
+span.fp {
+    font-style:italic;
+    background-color:#DCDCDC;
+}
+span.ttype {
+    font-weight:normal;
+}
+span.nowrap {
+    white-space:nowrap;
+}
+span.value {
+    font-weight:bold;
+}
+.passed {
+    background-color:#CCFFCC;
+    font-weight:normal;
+}
+.warning {
+    background-color:#F4F4AF;
+    font-weight:normal;
+}
+.failed {
+    background-color:#FFCCCC;
+    font-weight:normal;
+}
+.new {
+    background-color:#C6DEFF;
+    font-weight:normal;
+}
+.compatible {
+    background-color:#CCFFCC;
+    font-weight:normal;
+}
+.almost_compatible {
+    background-color:#FFDAA3;
+    font-weight:normal;
+}
+.incompatible {
+    background-color:#FFCCCC;
+    font-weight:normal;
+}
+.gray {
+    background-color:#DCDCDC;
+    font-weight:normal;
+}
+.top_ref {
+    font-size:0.69em;
+}
+.footer {
+    font-size:0.75em;
+}
+</style>
+<script type="text/javascript" language="JavaScript">
+<!--
+function showContent(header, id)
+{
+    e = document.getElementById(id);
+    if(e.style.display == 'none')
+    {
+        e.style.display = 'block';
+        e.style.visibility = 'visible';
+        header.innerHTML = header.innerHTML.replace(/\[[^0-9 ]\]/gi,"[&minus;]");
+    }
+    else
+    {
+        e.style.display = 'none';
+        e.style.visibility = 'hidden';
+        header.innerHTML = header.innerHTML.replace(/\[[^0-9 ]\]/gi,"[+]");
+    }
+}
+-->
+</script>
+</head>
+
+<body>
+<div><a name='Top'></a>
+<h1>Source compatibility report for the <span style='color:Blue;'>libOgreOverlay.so</span> object between <span style='color:Red;'>1.11.6</span> and <span style='color:Red;'>1.12.13</span> versions</h1>
+
+<h2>Test Info</h2><hr/>
+<table class='summary'>
+<tr><th>Module Name</th><td>libOgreOverlay</td></tr>
+<tr><th>Version #1</th><td>1.11.6</td></tr>
+<tr><th>Version #2</th><td>1.12.13</td></tr>
+<tr><th>Arch</th><td>x86_64</td></tr>
+</table>
+<h2>Test Results</h2><hr/>
+<table class='summary'><tr><th>Total Header Files</th><td><a href='#Headers' style='color:Blue;'>41</a></td></tr>
+<tr><th>Total Source Files</th><td><a href='#Sources' style='color:Blue;'>13</a></td></tr>
+<tr><th>Total Objects</th><td><a href='#Libs' style='color:Blue;'>1</a></td></tr>
+<tr><th>Total Symbols / Types</th><td>634 / 147</td></tr>
+<tr><th>Compatibility</th>
+<td class='incompatible'>78.6%</td>
+</tr>
+</table>
+<h2>Problem Summary</h2><hr/>
+<table class='summary'><tr><th></th><th style='text-align:center;'>Severity</th><th style='text-align:center;'>Count</th></tr><tr><th>Added Symbols</th><td>-</td><td class='new'><a href='#Added' style='color:Blue;'>276</a></td></tr>
+<tr><th>Removed Symbols</th><td>High</td><td class='failed'><a href='#Removed' style='color:Blue;'>79</a></td></tr>
+<tr><th rowspan='3'>Problems with<br/>Data Types</th><td>High</td><td class='failed'><a href='#Type_Problems_High' style='color:Blue;'>8</a></td></tr>
+<tr><td>Medium</td><td>0</td></tr>
+<tr><td>Low</td><td class='warning'><a href='#Type_Problems_Low' style='color:Blue;'>3</a></td></tr>
+<tr><th rowspan='3'>Problems with<br/>Symbols</th><td>High</td><td>0</td></tr>
+<tr><td>Medium</td><td class='failed'><a href='#Symbol_Problems_Medium' style='color:Blue;'>3</a></td></tr>
+<tr><td>Low</td><td>0</td></tr>
+<tr><th>Problems with<br/>Constants</th><td>Low</td><td>0</td></tr>
+</table>
+
+<a name='Added'></a><h2>Added Symbols <span class='new'>&nbsp;276&nbsp;</span></h2><hr/>
+<span class='h_name'>OgreFont.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_364')">
+Font::_setMaterial&#160;<span class='sym_p'><span>(&#160;MaterialPtr const&amp; <span class='color_p'>mat</span></span>&#160;)</span></span>
+<br/>
+<div id="c_364" style="display:none;">
+<span class='mngl'>_ZN4Ogre4Font12_setMaterialERKNS_9SharedPtrINS_8MaterialEEE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_365')">
+Font::Font <span class='attr'>[C1]</span>&#160;<span class='sym_p'><span>(&#160;ResourceManager* <span class='color_p'>creator</span></span>, <span>String const&amp; <span class='color_p'>name</span></span>, <span>unsigned long <span class='color_p'>handle</span></span>, <span>String const&amp; <span class='color_p'>group</span></span>, <span>bool <span class='color_p'>isManual</span></span>, <span>ManualResourceLoader* <span class='color_p'>loader</span></span>&#160;)</span></span>
+<br/>
+<div id="c_365" style="display:none;">
+<span class='mngl'>_ZN4Ogre4FontC1EPNS_15ResourceManagerERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEEmSA_bPNS_20ManualResourceLoaderE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_366')">
+Font::Font <span class='attr'>[C2]</span>&#160;<span class='sym_p'><span>(&#160;ResourceManager* <span class='color_p'>creator</span></span>, <span>String const&amp; <span class='color_p'>name</span></span>, <span>unsigned long <span class='color_p'>handle</span></span>, <span>String const&amp; <span class='color_p'>group</span></span>, <span>bool <span class='color_p'>isManual</span></span>, <span>ManualResourceLoader* <span class='color_p'>loader</span></span>&#160;)</span></span>
+<br/>
+<div id="c_366" style="display:none;">
+<span class='mngl'>_ZN4Ogre4FontC2EPNS_15ResourceManagerERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEEmSA_bPNS_20ManualResourceLoaderE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_367')">
+Font::putText&#160;<span class='sym_p'><span>(&#160;BillboardSet* <span class='color_p'>bbs</span></span>, <span>String const&amp; <span class='color_p'>text</span></span>, <span>float <span class='color_p'>height</span></span>, <span>ColourValue const&amp; <span class='color_p'>colour</span></span>&#160;)</span></span>
+<br/>
+<div id="c_367" style="display:none;">
+<span class='mngl'>_ZN4Ogre4Font7putTextEPNS_12BillboardSetERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEEfRKNS_11ColourValueE</span>
+<br/>
+<br/>
+</div>
+
+<br/>
+<span class='h_name'>OgreFontManager.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_368')">
+FontManager::createImpl&#160;<span class='sym_p'><span>(&#160;String const&amp; <span class='color_p'>name</span></span>, <span>unsigned long <span class='color_p'>handle</span></span>, <span>String const&amp; <span class='color_p'>group</span></span>, <span>bool <span class='color_p'>isManual</span></span>, <span>ManualResourceLoader* <span class='color_p'>loader</span></span>, <span>NameValuePairList const* <span class='color_p'>params</span></span>&#160;)</span></span>
+<br/>
+<div id="c_368" style="display:none;">
+<span class='mngl'>_ZN4Ogre11FontManager10createImplERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEEmS8_bPNS_20ManualResourceLoaderEPKSt3mapIS6_S6_St4lessIS6_ESaISt4pairIS7_S6_EEE</span>
+<br/>
+<br/>
+</div>
+
+<br/>
+<span class='h_name'>OgreOverlay.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_369')">
+Overlay::setVisible&#160;<span class='sym_p'><span>(&#160;bool <span class='color_p'>visible</span></span>&#160;)</span></span>
+<br/>
+<div id="c_369" style="display:none;">
+<span class='mngl'>_ZN4Ogre7Overlay10setVisibleEb</span>
+<br/>
+<br/>
+</div>
+
+<br/>
+<span class='h_name'>OgreOverlayManager.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_370')">
+OverlayManager::addOverlay&#160;<span class='sym_p'><span>(&#160;Overlay* <span class='color_p'>overlay</span></span>&#160;)</span></span>
+<br/>
+<div id="c_370" style="display:none;">
+<span class='mngl'>_ZN4Ogre14OverlayManager10addOverlayEPNS_7OverlayE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_371')">
+OverlayManager::getPixelRatio&#160;<span class='sym_p'>(&#160;)</span> const</span>
+<br/>
+<div id="c_371" style="display:none;">
+<span class='mngl'>_ZNK4Ogre14OverlayManager13getPixelRatioEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_372')">
+OverlayManager::setPixelRatio&#160;<span class='sym_p'><span>(&#160;float <span class='color_p'>ratio</span></span>&#160;)</span></span>
+<br/>
+<div id="c_372" style="display:none;">
+<span class='mngl'>_ZN4Ogre14OverlayManager13setPixelRatioEf</span>
+<br/>
+<br/>
+</div>
+
+<br/>
+<span class='h_name'>OgreOverlaySystem.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_373')">
+OverlaySystem::getSingleton&#160;<span class='sym_p'>(&#160;)</span> <span class='attr'>[static]</span></span>
+<br/>
+<div id="c_373" style="display:none;">
+<span class='mngl'>_ZN4Ogre13OverlaySystem12getSingletonEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_374')">
+OverlaySystem::getSingletonPtr&#160;<span class='sym_p'>(&#160;)</span> <span class='attr'>[static]</span></span>
+<br/>
+<div id="c_374" style="display:none;">
+<span class='mngl'>_ZN4Ogre13OverlaySystem15getSingletonPtrEv</span>
+<br/>
+<br/>
+</div>
+
+<br/>
+<span class='h_name'>OgreSingleton.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_375')">
+Singleton&lt;OverlaySystem&gt;::msSingleton <span class='attr'>[data]</span></span>
+<br/>
+<div id="c_375" style="display:none;">
+<span class='mngl'>_ZN4Ogre9SingletonINS_13OverlaySystemEE11msSingletonE</span>
+<br/>
+<br/>
+</div>
+
+<br/>
+<span class='h_name'>OgreUTFString.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_376')">
+UTFString::_base_iterator::_base_iterator <span class='attr'>[C1]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_376" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString14_base_iteratorC1Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_377')">
+UTFString::_base_iterator::_base_iterator <span class='attr'>[C2]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_377" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString14_base_iteratorC2Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_378')">
+UTFString::_base_iterator::_become&#160;<span class='sym_p'><span>(&#160;UTFString::_base_iterator const&amp; <span class='color_p'>i</span></span>&#160;)</span></span>
+<br/>
+<div id="c_378" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString14_base_iterator7_becomeERKS1_</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_379')">
+UTFString::_base_iterator::_get_index&#160;<span class='sym_p'>(&#160;)</span> const</span>
+<br/>
+<div id="c_379" style="display:none;">
+<span class='mngl'>_ZNK4Ogre9UTFString14_base_iterator10_get_indexEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_380')">
+UTFString::_base_iterator::_getCharacter&#160;<span class='sym_p'>(&#160;)</span> const</span>
+<br/>
+<div id="c_380" style="display:none;">
+<span class='mngl'>_ZNK4Ogre9UTFString14_base_iterator13_getCharacterEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_381')">
+UTFString::_base_iterator::_jump_to&#160;<span class='sym_p'><span>(&#160;UTFString::size_type <span class='color_p'>index</span></span>&#160;)</span></span>
+<br/>
+<div id="c_381" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString14_base_iterator8_jump_toEm</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_382')">
+UTFString::_base_iterator::_moveNext&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_382" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString14_base_iterator9_moveNextEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_383')">
+UTFString::_base_iterator::_movePrev&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_383" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString14_base_iterator9_movePrevEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_384')">
+UTFString::_base_iterator::_seekFwd&#160;<span class='sym_p'><span>(&#160;UTFString::size_type <span class='color_p'>c</span></span>&#160;)</span></span>
+<br/>
+<div id="c_384" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString14_base_iterator8_seekFwdEm</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_385')">
+UTFString::_base_iterator::_seekRev&#160;<span class='sym_p'><span>(&#160;UTFString::size_type <span class='color_p'>c</span></span>&#160;)</span></span>
+<br/>
+<div id="c_385" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString14_base_iterator8_seekRevEm</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_386')">
+UTFString::_base_iterator::_setCharacter&#160;<span class='sym_p'><span>(&#160;UTFString::unicode_char <span class='color_p'>uc</span></span>&#160;)</span></span>
+<br/>
+<div id="c_386" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString14_base_iterator13_setCharacterEj</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_387')">
+UTFString::_base_iterator::_test_begin&#160;<span class='sym_p'>(&#160;)</span> const</span>
+<br/>
+<div id="c_387" style="display:none;">
+<span class='mngl'>_ZNK4Ogre9UTFString14_base_iterator11_test_beginEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_388')">
+UTFString::_base_iterator::_test_end&#160;<span class='sym_p'>(&#160;)</span> const</span>
+<br/>
+<div id="c_388" style="display:none;">
+<span class='mngl'>_ZNK4Ogre9UTFString14_base_iterator9_test_endEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_389')">
+UTFString::_const_fwd_iterator::_const_fwd_iterator <span class='attr'>[C1]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_389" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString19_const_fwd_iteratorC1Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_390')">
+UTFString::_const_fwd_iterator::_const_fwd_iterator <span class='attr'>[C2]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_390" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString19_const_fwd_iteratorC2Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_391')">
+UTFString::_const_fwd_iterator::_const_fwd_iterator <span class='attr'>[C1]</span>&#160;<span class='sym_p'><span>(&#160;UTFString::_const_fwd_iterator const&amp; <span class='color_p'>i</span></span>&#160;)</span></span>
+<br/>
+<div id="c_391" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString19_const_fwd_iteratorC1ERKS1_</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_392')">
+UTFString::_const_fwd_iterator::_const_fwd_iterator <span class='attr'>[C2]</span>&#160;<span class='sym_p'><span>(&#160;UTFString::_const_fwd_iterator const&amp; <span class='color_p'>i</span></span>&#160;)</span></span>
+<br/>
+<div id="c_392" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString19_const_fwd_iteratorC2ERKS1_</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_393')">
+UTFString::_const_fwd_iterator::_const_fwd_iterator <span class='attr'>[C1]</span>&#160;<span class='sym_p'><span>(&#160;UTFString::_fwd_iterator const&amp; <span class='color_p'>i</span></span>&#160;)</span></span>
+<br/>
+<div id="c_393" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString19_const_fwd_iteratorC1ERKNS0_13_fwd_iteratorE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_394')">
+UTFString::_const_fwd_iterator::_const_fwd_iterator <span class='attr'>[C2]</span>&#160;<span class='sym_p'><span>(&#160;UTFString::_fwd_iterator const&amp; <span class='color_p'>i</span></span>&#160;)</span></span>
+<br/>
+<div id="c_394" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString19_const_fwd_iteratorC2ERKNS0_13_fwd_iteratorE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_395')">
+UTFString::_const_fwd_iterator::getCharacter&#160;<span class='sym_p'>(&#160;)</span> const</span>
+<br/>
+<div id="c_395" style="display:none;">
+<span class='mngl'>_ZNK4Ogre9UTFString19_const_fwd_iterator12getCharacterEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_396')">
+UTFString::_const_fwd_iterator::moveNext&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_396" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString19_const_fwd_iterator8moveNextEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_397')">
+UTFString::_const_fwd_iterator::movePrev&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_397" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString19_const_fwd_iterator8movePrevEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_398')">
+UTFString::_const_fwd_iterator::operator*&#160;<span class='sym_p'>(&#160;)</span> const</span>
+<br/>
+<div id="c_398" style="display:none;">
+<span class='mngl'>_ZNK4Ogre9UTFString19_const_fwd_iteratordeEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_399')">
+UTFString::_const_fwd_iterator::operator+&#160;<span class='sym_p'><span>(&#160;std::iterator&lt;std::random_access_iterator_tag, unsigned short, long, unsigned short*, unsigned short&amp;&gt;::difference_type <span class='color_p'>n</span></span>&#160;)</span></span>
+<br/>
+<div id="c_399" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString19_const_fwd_iteratorplEl</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_400')">
+UTFString::_const_fwd_iterator::operator++&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_400" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString19_const_fwd_iteratorppEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_401')">
+UTFString::_const_fwd_iterator::operator++&#160;<span class='sym_p'><span>(&#160;int <span class='color_p'>p1</span></span>&#160;)</span></span>
+<br/>
+<div id="c_401" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString19_const_fwd_iteratorppEi</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_402')">
+UTFString::_const_fwd_iterator::operator+=&#160;<span class='sym_p'><span>(&#160;std::iterator&lt;std::random_access_iterator_tag, unsigned short, long, unsigned short*, unsigned short&amp;&gt;::difference_type <span class='color_p'>n</span></span>&#160;)</span></span>
+<br/>
+<div id="c_402" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString19_const_fwd_iteratorpLEl</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_403')">
+UTFString::_const_fwd_iterator::operator-&#160;<span class='sym_p'><span>(&#160;std::iterator&lt;std::random_access_iterator_tag, unsigned short, long, unsigned short*, unsigned short&amp;&gt;::difference_type <span class='color_p'>n</span></span>&#160;)</span></span>
+<br/>
+<div id="c_403" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString19_const_fwd_iteratormiEl</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_404')">
+UTFString::_const_fwd_iterator::operator--&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_404" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString19_const_fwd_iteratormmEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_405')">
+UTFString::_const_fwd_iterator::operator--&#160;<span class='sym_p'><span>(&#160;int <span class='color_p'>p1</span></span>&#160;)</span></span>
+<br/>
+<div id="c_405" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString19_const_fwd_iteratormmEi</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_406')">
+UTFString::_const_fwd_iterator::operator-=&#160;<span class='sym_p'><span>(&#160;std::iterator&lt;std::random_access_iterator_tag, unsigned short, long, unsigned short*, unsigned short&amp;&gt;::difference_type <span class='color_p'>n</span></span>&#160;)</span></span>
+<br/>
+<div id="c_406" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString19_const_fwd_iteratormIEl</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_407')">
+UTFString::_const_fwd_iterator::operator&#160;=&#160;<span class='sym_p'><span>(&#160;UTFString::_const_fwd_iterator const&amp; <span class='color_p'>rhs</span></span>&#160;)</span></span>
+<br/>
+<div id="c_407" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString19_const_fwd_iteratoraSERKS1_</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_408')">
+UTFString::_const_fwd_iterator::operator[&#160;]&#160;<span class='sym_p'><span>(&#160;std::iterator&lt;std::random_access_iterator_tag, unsigned short, long, unsigned short*, unsigned short&amp;&gt;::difference_type <span class='color_p'>n</span></span>&#160;)</span> const</span>
+<br/>
+<div id="c_408" style="display:none;">
+<span class='mngl'>_ZNK4Ogre9UTFString19_const_fwd_iteratorixEl</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_409')">
+UTFString::_const_rev_iterator::_const_rev_iterator <span class='attr'>[C1]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_409" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString19_const_rev_iteratorC1Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_410')">
+UTFString::_const_rev_iterator::_const_rev_iterator <span class='attr'>[C2]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_410" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString19_const_rev_iteratorC2Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_411')">
+UTFString::_const_rev_iterator::_const_rev_iterator <span class='attr'>[C1]</span>&#160;<span class='sym_p'><span>(&#160;UTFString::_const_rev_iterator const&amp; <span class='color_p'>i</span></span>&#160;)</span></span>
+<br/>
+<div id="c_411" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString19_const_rev_iteratorC1ERKS1_</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_412')">
+UTFString::_const_rev_iterator::_const_rev_iterator <span class='attr'>[C2]</span>&#160;<span class='sym_p'><span>(&#160;UTFString::_const_rev_iterator const&amp; <span class='color_p'>i</span></span>&#160;)</span></span>
+<br/>
+<div id="c_412" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString19_const_rev_iteratorC2ERKS1_</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_413')">
+UTFString::_const_rev_iterator::_const_rev_iterator <span class='attr'>[C1]</span>&#160;<span class='sym_p'><span>(&#160;UTFString::_rev_iterator const&amp; <span class='color_p'>i</span></span>&#160;)</span></span>
+<br/>
+<div id="c_413" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString19_const_rev_iteratorC1ERKNS0_13_rev_iteratorE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_414')">
+UTFString::_const_rev_iterator::_const_rev_iterator <span class='attr'>[C2]</span>&#160;<span class='sym_p'><span>(&#160;UTFString::_rev_iterator const&amp; <span class='color_p'>i</span></span>&#160;)</span></span>
+<br/>
+<div id="c_414" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString19_const_rev_iteratorC2ERKNS0_13_rev_iteratorE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_415')">
+UTFString::_const_rev_iterator::operator*&#160;<span class='sym_p'>(&#160;)</span> const</span>
+<br/>
+<div id="c_415" style="display:none;">
+<span class='mngl'>_ZNK4Ogre9UTFString19_const_rev_iteratordeEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_416')">
+UTFString::_const_rev_iterator::operator+&#160;<span class='sym_p'><span>(&#160;std::iterator&lt;std::random_access_iterator_tag, unsigned short, long, unsigned short*, unsigned short&amp;&gt;::difference_type <span class='color_p'>n</span></span>&#160;)</span></span>
+<br/>
+<div id="c_416" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString19_const_rev_iteratorplEl</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_417')">
+UTFString::_const_rev_iterator::operator++&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_417" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString19_const_rev_iteratorppEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_418')">
+UTFString::_const_rev_iterator::operator++&#160;<span class='sym_p'><span>(&#160;int <span class='color_p'>p1</span></span>&#160;)</span></span>
+<br/>
+<div id="c_418" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString19_const_rev_iteratorppEi</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_419')">
+UTFString::_const_rev_iterator::operator+=&#160;<span class='sym_p'><span>(&#160;std::iterator&lt;std::random_access_iterator_tag, unsigned short, long, unsigned short*, unsigned short&amp;&gt;::difference_type <span class='color_p'>n</span></span>&#160;)</span></span>
+<br/>
+<div id="c_419" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString19_const_rev_iteratorpLEl</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_420')">
+UTFString::_const_rev_iterator::operator-&#160;<span class='sym_p'><span>(&#160;std::iterator&lt;std::random_access_iterator_tag, unsigned short, long, unsigned short*, unsigned short&amp;&gt;::difference_type <span class='color_p'>n</span></span>&#160;)</span></span>
+<br/>
+<div id="c_420" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString19_const_rev_iteratormiEl</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_421')">
+UTFString::_const_rev_iterator::operator--&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_421" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString19_const_rev_iteratormmEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_422')">
+UTFString::_const_rev_iterator::operator--&#160;<span class='sym_p'><span>(&#160;int <span class='color_p'>p1</span></span>&#160;)</span></span>
+<br/>
+<div id="c_422" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString19_const_rev_iteratormmEi</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_423')">
+UTFString::_const_rev_iterator::operator-=&#160;<span class='sym_p'><span>(&#160;std::iterator&lt;std::random_access_iterator_tag, unsigned short, long, unsigned short*, unsigned short&amp;&gt;::difference_type <span class='color_p'>n</span></span>&#160;)</span></span>
+<br/>
+<div id="c_423" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString19_const_rev_iteratormIEl</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_424')">
+UTFString::_const_rev_iterator::operator&#160;=&#160;<span class='sym_p'><span>(&#160;UTFString::_const_rev_iterator const&amp; <span class='color_p'>rhs</span></span>&#160;)</span></span>
+<br/>
+<div id="c_424" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString19_const_rev_iteratoraSERKS1_</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_425')">
+UTFString::_const_rev_iterator::operator[&#160;]&#160;<span class='sym_p'><span>(&#160;std::iterator&lt;std::random_access_iterator_tag, unsigned short, long, unsigned short*, unsigned short&amp;&gt;::difference_type <span class='color_p'>n</span></span>&#160;)</span> const</span>
+<br/>
+<div id="c_425" style="display:none;">
+<span class='mngl'>_ZNK4Ogre9UTFString19_const_rev_iteratorixEl</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_426')">
+UTFString::_fwd_iterator::_fwd_iterator <span class='attr'>[C1]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_426" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString13_fwd_iteratorC1Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_427')">
+UTFString::_fwd_iterator::_fwd_iterator <span class='attr'>[C2]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_427" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString13_fwd_iteratorC2Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_428')">
+UTFString::_fwd_iterator::_fwd_iterator <span class='attr'>[C1]</span>&#160;<span class='sym_p'><span>(&#160;UTFString::_fwd_iterator const&amp; <span class='color_p'>i</span></span>&#160;)</span></span>
+<br/>
+<div id="c_428" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString13_fwd_iteratorC1ERKS1_</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_429')">
+UTFString::_fwd_iterator::_fwd_iterator <span class='attr'>[C2]</span>&#160;<span class='sym_p'><span>(&#160;UTFString::_fwd_iterator const&amp; <span class='color_p'>i</span></span>&#160;)</span></span>
+<br/>
+<div id="c_429" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString13_fwd_iteratorC2ERKS1_</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_430')">
+UTFString::_fwd_iterator::getCharacter&#160;<span class='sym_p'>(&#160;)</span> const</span>
+<br/>
+<div id="c_430" style="display:none;">
+<span class='mngl'>_ZNK4Ogre9UTFString13_fwd_iterator12getCharacterEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_431')">
+UTFString::_fwd_iterator::moveNext&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_431" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString13_fwd_iterator8moveNextEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_432')">
+UTFString::_fwd_iterator::movePrev&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_432" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString13_fwd_iterator8movePrevEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_433')">
+UTFString::_fwd_iterator::operator*&#160;<span class='sym_p'>(&#160;)</span> const</span>
+<br/>
+<div id="c_433" style="display:none;">
+<span class='mngl'>_ZNK4Ogre9UTFString13_fwd_iteratordeEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_434')">
+UTFString::_fwd_iterator::operator+&#160;<span class='sym_p'><span>(&#160;std::iterator&lt;std::random_access_iterator_tag, unsigned short, long, unsigned short*, unsigned short&amp;&gt;::difference_type <span class='color_p'>n</span></span>&#160;)</span></span>
+<br/>
+<div id="c_434" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString13_fwd_iteratorplEl</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_435')">
+UTFString::_fwd_iterator::operator++&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_435" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString13_fwd_iteratorppEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_436')">
+UTFString::_fwd_iterator::operator++&#160;<span class='sym_p'><span>(&#160;int <span class='color_p'>p1</span></span>&#160;)</span></span>
+<br/>
+<div id="c_436" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString13_fwd_iteratorppEi</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_437')">
+UTFString::_fwd_iterator::operator+=&#160;<span class='sym_p'><span>(&#160;std::iterator&lt;std::random_access_iterator_tag, unsigned short, long, unsigned short*, unsigned short&amp;&gt;::difference_type <span class='color_p'>n</span></span>&#160;)</span></span>
+<br/>
+<div id="c_437" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString13_fwd_iteratorpLEl</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_438')">
+UTFString::_fwd_iterator::operator-&#160;<span class='sym_p'><span>(&#160;std::iterator&lt;std::random_access_iterator_tag, unsigned short, long, unsigned short*, unsigned short&amp;&gt;::difference_type <span class='color_p'>n</span></span>&#160;)</span></span>
+<br/>
+<div id="c_438" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString13_fwd_iteratormiEl</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_439')">
+UTFString::_fwd_iterator::operator--&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_439" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString13_fwd_iteratormmEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_440')">
+UTFString::_fwd_iterator::operator--&#160;<span class='sym_p'><span>(&#160;int <span class='color_p'>p1</span></span>&#160;)</span></span>
+<br/>
+<div id="c_440" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString13_fwd_iteratormmEi</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_441')">
+UTFString::_fwd_iterator::operator-=&#160;<span class='sym_p'><span>(&#160;std::iterator&lt;std::random_access_iterator_tag, unsigned short, long, unsigned short*, unsigned short&amp;&gt;::difference_type <span class='color_p'>n</span></span>&#160;)</span></span>
+<br/>
+<div id="c_441" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString13_fwd_iteratormIEl</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_442')">
+UTFString::_fwd_iterator::operator&#160;=&#160;<span class='sym_p'><span>(&#160;UTFString::_fwd_iterator const&amp; <span class='color_p'>rhs</span></span>&#160;)</span></span>
+<br/>
+<div id="c_442" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString13_fwd_iteratoraSERKS1_</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_443')">
+UTFString::_fwd_iterator::operator[&#160;]&#160;<span class='sym_p'><span>(&#160;std::iterator&lt;std::random_access_iterator_tag, unsigned short, long, unsigned short*, unsigned short&amp;&gt;::difference_type <span class='color_p'>n</span></span>&#160;)</span> const</span>
+<br/>
+<div id="c_443" style="display:none;">
+<span class='mngl'>_ZNK4Ogre9UTFString13_fwd_iteratorixEl</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_444')">
+UTFString::_fwd_iterator::setCharacter&#160;<span class='sym_p'><span>(&#160;UTFString::unicode_char <span class='color_p'>uc</span></span>&#160;)</span></span>
+<br/>
+<div id="c_444" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString13_fwd_iterator12setCharacterEj</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_445')">
+UTFString::_rev_iterator::_rev_iterator <span class='attr'>[C1]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_445" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString13_rev_iteratorC1Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_446')">
+UTFString::_rev_iterator::_rev_iterator <span class='attr'>[C2]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_446" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString13_rev_iteratorC2Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_447')">
+UTFString::_rev_iterator::_rev_iterator <span class='attr'>[C1]</span>&#160;<span class='sym_p'><span>(&#160;UTFString::_rev_iterator const&amp; <span class='color_p'>i</span></span>&#160;)</span></span>
+<br/>
+<div id="c_447" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString13_rev_iteratorC1ERKS1_</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_448')">
+UTFString::_rev_iterator::_rev_iterator <span class='attr'>[C2]</span>&#160;<span class='sym_p'><span>(&#160;UTFString::_rev_iterator const&amp; <span class='color_p'>i</span></span>&#160;)</span></span>
+<br/>
+<div id="c_448" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString13_rev_iteratorC2ERKS1_</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_449')">
+UTFString::_rev_iterator::operator*&#160;<span class='sym_p'>(&#160;)</span> const</span>
+<br/>
+<div id="c_449" style="display:none;">
+<span class='mngl'>_ZNK4Ogre9UTFString13_rev_iteratordeEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_450')">
+UTFString::_rev_iterator::operator+&#160;<span class='sym_p'><span>(&#160;std::iterator&lt;std::random_access_iterator_tag, unsigned short, long, unsigned short*, unsigned short&amp;&gt;::difference_type <span class='color_p'>n</span></span>&#160;)</span></span>
+<br/>
+<div id="c_450" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString13_rev_iteratorplEl</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_451')">
+UTFString::_rev_iterator::operator++&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_451" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString13_rev_iteratorppEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_452')">
+UTFString::_rev_iterator::operator++&#160;<span class='sym_p'><span>(&#160;int <span class='color_p'>p1</span></span>&#160;)</span></span>
+<br/>
+<div id="c_452" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString13_rev_iteratorppEi</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_453')">
+UTFString::_rev_iterator::operator+=&#160;<span class='sym_p'><span>(&#160;std::iterator&lt;std::random_access_iterator_tag, unsigned short, long, unsigned short*, unsigned short&amp;&gt;::difference_type <span class='color_p'>n</span></span>&#160;)</span></span>
+<br/>
+<div id="c_453" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString13_rev_iteratorpLEl</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_454')">
+UTFString::_rev_iterator::operator-&#160;<span class='sym_p'><span>(&#160;std::iterator&lt;std::random_access_iterator_tag, unsigned short, long, unsigned short*, unsigned short&amp;&gt;::difference_type <span class='color_p'>n</span></span>&#160;)</span></span>
+<br/>
+<div id="c_454" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString13_rev_iteratormiEl</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_455')">
+UTFString::_rev_iterator::operator--&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_455" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString13_rev_iteratormmEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_456')">
+UTFString::_rev_iterator::operator--&#160;<span class='sym_p'><span>(&#160;int <span class='color_p'>p1</span></span>&#160;)</span></span>
+<br/>
+<div id="c_456" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString13_rev_iteratormmEi</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_457')">
+UTFString::_rev_iterator::operator-=&#160;<span class='sym_p'><span>(&#160;std::iterator&lt;std::random_access_iterator_tag, unsigned short, long, unsigned short*, unsigned short&amp;&gt;::difference_type <span class='color_p'>n</span></span>&#160;)</span></span>
+<br/>
+<div id="c_457" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString13_rev_iteratormIEl</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_458')">
+UTFString::_rev_iterator::operator&#160;=&#160;<span class='sym_p'><span>(&#160;UTFString::_rev_iterator const&amp; <span class='color_p'>rhs</span></span>&#160;)</span></span>
+<br/>
+<div id="c_458" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString13_rev_iteratoraSERKS1_</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_459')">
+UTFString::_rev_iterator::operator[&#160;]&#160;<span class='sym_p'><span>(&#160;std::iterator&lt;std::random_access_iterator_tag, unsigned short, long, unsigned short*, unsigned short&amp;&gt;::difference_type <span class='color_p'>n</span></span>&#160;)</span> const</span>
+<br/>
+<div id="c_459" style="display:none;">
+<span class='mngl'>_ZNK4Ogre9UTFString13_rev_iteratorixEl</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_460')">
+UTFString::_utf16_char_length&#160;<span class='sym_p'><span>(&#160;UTFString::code_point <span class='color_p'>cp</span></span>&#160;)</span> <span class='attr'>[static]</span></span>
+<br/>
+<div id="c_460" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString18_utf16_char_lengthEt</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_461')">
+UTFString::_utf16_char_length&#160;<span class='sym_p'><span>(&#160;UTFString::unicode_char <span class='color_p'>uc</span></span>&#160;)</span> <span class='attr'>[static]</span></span>
+<br/>
+<div id="c_461" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString18_utf16_char_lengthEj</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_462')">
+UTFString::_utf16_independent_char&#160;<span class='sym_p'><span>(&#160;UTFString::code_point <span class='color_p'>cp</span></span>&#160;)</span> <span class='attr'>[static]</span></span>
+<br/>
+<div id="c_462" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString23_utf16_independent_charEt</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_463')">
+UTFString::_utf16_surrogate_follow&#160;<span class='sym_p'><span>(&#160;UTFString::code_point <span class='color_p'>cp</span></span>&#160;)</span> <span class='attr'>[static]</span></span>
+<br/>
+<div id="c_463" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString23_utf16_surrogate_followEt</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_464')">
+UTFString::_utf16_surrogate_lead&#160;<span class='sym_p'><span>(&#160;UTFString::code_point <span class='color_p'>cp</span></span>&#160;)</span> <span class='attr'>[static]</span></span>
+<br/>
+<div id="c_464" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString21_utf16_surrogate_leadEt</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_465')">
+UTFString::_utf16_to_utf32&#160;<span class='sym_p'><span>(&#160;UTFString::code_point const* <span class='color_p'>in_cp</span></span>, <span>UTFString::unicode_char&amp; <span class='color_p'>out_uc</span></span>&#160;)</span> <span class='attr'>[static]</span></span>
+<br/>
+<div id="c_465" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString15_utf16_to_utf32EPKtRj</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_466')">
+UTFString::_utf32_to_utf16&#160;<span class='sym_p'><span>(&#160;UTFString::unicode_char const&amp; <span class='color_p'>in_uc</span></span>, <span>UTFString::code_point* <span class='color_p'>out_cp</span></span>&#160;)</span> <span class='attr'>[static]</span></span>
+<br/>
+<div id="c_466" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString15_utf32_to_utf16ERKjPt</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_467')">
+UTFString::_utf32_to_utf8&#160;<span class='sym_p'><span>(&#160;UTFString::unicode_char const&amp; <span class='color_p'>in_uc</span></span>, <span>unsigned char* <span class='color_p'>out_cp</span></span>&#160;)</span> <span class='attr'>[static]</span></span>
+<br/>
+<div id="c_467" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString14_utf32_to_utf8ERKjPh</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_468')">
+UTFString::_utf8_char_length&#160;<span class='sym_p'><span>(&#160;UTFString::unicode_char <span class='color_p'>uc</span></span>&#160;)</span> <span class='attr'>[static]</span></span>
+<br/>
+<div id="c_468" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString17_utf8_char_lengthEj</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_469')">
+UTFString::_utf8_char_length&#160;<span class='sym_p'><span>(&#160;unsigned char <span class='color_p'>cp</span></span>&#160;)</span> <span class='attr'>[static]</span></span>
+<br/>
+<div id="c_469" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString17_utf8_char_lengthEh</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_470')">
+UTFString::_utf8_start_char&#160;<span class='sym_p'><span>(&#160;unsigned char <span class='color_p'>cp</span></span>&#160;)</span> <span class='attr'>[static]</span></span>
+<br/>
+<div id="c_470" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString16_utf8_start_charEh</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_471')">
+UTFString::_utf8_to_utf32&#160;<span class='sym_p'><span>(&#160;unsigned char const* <span class='color_p'>in_cp</span></span>, <span>UTFString::unicode_char&amp; <span class='color_p'>out_uc</span></span>&#160;)</span> <span class='attr'>[static]</span></span>
+<br/>
+<div id="c_471" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString14_utf8_to_utf32EPKhRj</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_472')">
+UTFString::_verifyUTF8&#160;<span class='sym_p'><span>(&#160;std::string const&amp; <span class='color_p'>str</span></span>&#160;)</span> <span class='attr'>[static]</span></span>
+<br/>
+<div id="c_472" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString11_verifyUTF8ERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_473')">
+UTFString::_verifyUTF8&#160;<span class='sym_p'><span>(&#160;unsigned char const* <span class='color_p'>c_str</span></span>&#160;)</span> <span class='attr'>[static]</span></span>
+<br/>
+<div id="c_473" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString11_verifyUTF8EPKh</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_474')">
+UTFString::append&#160;<span class='sym_p'><span>(&#160;char const* <span class='color_p'>str</span></span>, <span>UTFString::size_type <span class='color_p'>num</span></span>&#160;)</span></span>
+<br/>
+<div id="c_474" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString6appendEPKcm</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_475')">
+UTFString::append&#160;<span class='sym_p'><span>(&#160;UTFString const&amp; <span class='color_p'>str</span></span>&#160;)</span></span>
+<br/>
+<div id="c_475" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString6appendERKS0_</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_476')">
+UTFString::append&#160;<span class='sym_p'><span>(&#160;UTFString const&amp; <span class='color_p'>str</span></span>, <span>UTFString::size_type <span class='color_p'>index</span></span>, <span>UTFString::size_type <span class='color_p'>len</span></span>&#160;)</span></span>
+<br/>
+<div id="c_476" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString6appendERKS0_mm</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_477')">
+UTFString::append&#160;<span class='sym_p'><span>(&#160;UTFString::code_point const* <span class='color_p'>str</span></span>&#160;)</span></span>
+<br/>
+<div id="c_477" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString6appendEPKt</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_478')">
+UTFString::append&#160;<span class='sym_p'><span>(&#160;UTFString::code_point const* <span class='color_p'>str</span></span>, <span>UTFString::size_type <span class='color_p'>num</span></span>&#160;)</span></span>
+<br/>
+<div id="c_478" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString6appendEPKtm</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_479')">
+UTFString::append&#160;<span class='sym_p'><span>(&#160;UTFString::iterator <span class='color_p'>start</span></span>, <span>UTFString::iterator <span class='color_p'>last</span></span>&#160;)</span></span>
+<br/>
+<div id="c_479" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString6appendENS0_13_fwd_iteratorES1_</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_480')">
+UTFString::append&#160;<span class='sym_p'><span>(&#160;UTFString::size_type <span class='color_p'>num</span></span>, <span>char <span class='color_p'>ch</span></span>&#160;)</span></span>
+<br/>
+<div id="c_480" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString6appendEmc</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_481')">
+UTFString::append&#160;<span class='sym_p'><span>(&#160;UTFString::size_type <span class='color_p'>num</span></span>, <span>UTFString::code_point <span class='color_p'>ch</span></span>&#160;)</span></span>
+<br/>
+<div id="c_481" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString6appendEmt</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_482')">
+UTFString::append&#160;<span class='sym_p'><span>(&#160;UTFString::size_type <span class='color_p'>num</span></span>, <span>UTFString::unicode_char <span class='color_p'>ch</span></span>&#160;)</span></span>
+<br/>
+<div id="c_482" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString6appendEmj</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_483')">
+UTFString::append&#160;<span class='sym_p'><span>(&#160;UTFString::size_type <span class='color_p'>num</span></span>, <span>wchar_t <span class='color_p'>ch</span></span>&#160;)</span></span>
+<br/>
+<div id="c_483" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString6appendEmw</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_484')">
+UTFString::append&#160;<span class='sym_p'><span>(&#160;wchar_t const* <span class='color_p'>w_str</span></span>, <span>UTFString::size_type <span class='color_p'>num</span></span>&#160;)</span></span>
+<br/>
+<div id="c_484" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString6appendEPKwm</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_485')">
+UTFString::assign&#160;<span class='sym_p'><span>(&#160;char const* <span class='color_p'>str</span></span>&#160;)</span></span>
+<br/>
+<div id="c_485" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString6assignEPKc</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_486')">
+UTFString::assign&#160;<span class='sym_p'><span>(&#160;char const* <span class='color_p'>str</span></span>, <span>UTFString::size_type <span class='color_p'>num</span></span>&#160;)</span></span>
+<br/>
+<div id="c_486" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString6assignEPKcm</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_487')">
+UTFString::assign&#160;<span class='sym_p'><span>(&#160;UTFString const&amp; <span class='color_p'>str</span></span>&#160;)</span></span>
+<br/>
+<div id="c_487" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString6assignERKS0_</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_488')">
+UTFString::assign&#160;<span class='sym_p'><span>(&#160;UTFString const&amp; <span class='color_p'>str</span></span>, <span>UTFString::size_type <span class='color_p'>index</span></span>, <span>UTFString::size_type <span class='color_p'>len</span></span>&#160;)</span></span>
+<br/>
+<div id="c_488" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString6assignERKS0_mm</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_489')">
+UTFString::assign&#160;<span class='sym_p'><span>(&#160;UTFString::code_point const* <span class='color_p'>str</span></span>&#160;)</span></span>
+<br/>
+<div id="c_489" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString6assignEPKt</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_490')">
+UTFString::assign&#160;<span class='sym_p'><span>(&#160;UTFString::code_point const* <span class='color_p'>str</span></span>, <span>UTFString::size_type <span class='color_p'>num</span></span>&#160;)</span></span>
+<br/>
+<div id="c_490" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString6assignEPKtm</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_491')">
+UTFString::assign&#160;<span class='sym_p'><span>(&#160;UTFString::iterator <span class='color_p'>start</span></span>, <span>UTFString::iterator <span class='color_p'>last</span></span>&#160;)</span></span>
+<br/>
+<div id="c_491" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString6assignENS0_13_fwd_iteratorES1_</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_492')">
+UTFString::assign&#160;<span class='sym_p'><span>(&#160;UTFString::size_type <span class='color_p'>num</span></span>, <span>UTFString::code_point const&amp; <span class='color_p'>ch</span></span>&#160;)</span></span>
+<br/>
+<div id="c_492" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString6assignEmRKt</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_493')">
+UTFString::assign&#160;<span class='sym_p'><span>(&#160;std::string const&amp; <span class='color_p'>str</span></span>&#160;)</span></span>
+<br/>
+<div id="c_493" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString6assignERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_494')">
+UTFString::assign&#160;<span class='sym_p'><span>(&#160;std::wstring const&amp; <span class='color_p'>wstr</span></span>&#160;)</span></span>
+<br/>
+<div id="c_494" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString6assignERKNSt7__cxx1112basic_stringIwSt11char_traitsIwESaIwEEE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_495')">
+UTFString::assign&#160;<span class='sym_p'><span>(&#160;wchar_t const* <span class='color_p'>w_str</span></span>&#160;)</span></span>
+<br/>
+<div id="c_495" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString6assignEPKw</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_496')">
+UTFString::assign&#160;<span class='sym_p'><span>(&#160;wchar_t const* <span class='color_p'>w_str</span></span>, <span>UTFString::size_type <span class='color_p'>num</span></span>&#160;)</span></span>
+<br/>
+<div id="c_496" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString6assignEPKwm</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_497')">
+UTFString::asUTF32&#160;<span class='sym_p'>(&#160;)</span> const</span>
+<br/>
+<div id="c_497" style="display:none;">
+<span class='mngl'>_ZNK4Ogre9UTFString7asUTF32B5cxx11Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_498')">
+UTFString::asUTF32_c_str&#160;<span class='sym_p'>(&#160;)</span> const</span>
+<br/>
+<div id="c_498" style="display:none;">
+<span class='mngl'>_ZNK4Ogre9UTFString13asUTF32_c_strEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_499')">
+UTFString::asUTF8&#160;<span class='sym_p'>(&#160;)</span> const</span>
+<br/>
+<div id="c_499" style="display:none;">
+<span class='mngl'>_ZNK4Ogre9UTFString6asUTF8B5cxx11Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_500')">
+UTFString::asUTF8_c_str&#160;<span class='sym_p'>(&#160;)</span> const</span>
+<br/>
+<div id="c_500" style="display:none;">
+<span class='mngl'>_ZNK4Ogre9UTFString12asUTF8_c_strEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_501')">
+UTFString::asWStr&#160;<span class='sym_p'>(&#160;)</span> const</span>
+<br/>
+<div id="c_501" style="display:none;">
+<span class='mngl'>_ZNK4Ogre9UTFString6asWStrB5cxx11Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_502')">
+UTFString::asWStr_c_str&#160;<span class='sym_p'>(&#160;)</span> const</span>
+<br/>
+<div id="c_502" style="display:none;">
+<span class='mngl'>_ZNK4Ogre9UTFString12asWStr_c_strEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_503')">
+UTFString::at&#160;<span class='sym_p'><span>(&#160;UTFString::size_type <span class='color_p'>loc</span></span>&#160;)</span></span>
+<br/>
+<div id="c_503" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString2atEm</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_504')">
+UTFString::at&#160;<span class='sym_p'><span>(&#160;UTFString::size_type <span class='color_p'>loc</span></span>&#160;)</span> const</span>
+<br/>
+<div id="c_504" style="display:none;">
+<span class='mngl'>_ZNK4Ogre9UTFString2atEm</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_505')">
+UTFString::begin&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_505" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString5beginEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_506')">
+UTFString::begin&#160;<span class='sym_p'>(&#160;)</span> const</span>
+<br/>
+<div id="c_506" style="display:none;">
+<span class='mngl'>_ZNK4Ogre9UTFString5beginEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_507')">
+UTFString::c_str&#160;<span class='sym_p'>(&#160;)</span> const</span>
+<br/>
+<div id="c_507" style="display:none;">
+<span class='mngl'>_ZNK4Ogre9UTFString5c_strEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_508')">
+UTFString::capacity&#160;<span class='sym_p'>(&#160;)</span> const</span>
+<br/>
+<div id="c_508" style="display:none;">
+<span class='mngl'>_ZNK4Ogre9UTFString8capacityEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_509')">
+UTFString::clear&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_509" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString5clearEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_510')">
+UTFString::compare&#160;<span class='sym_p'><span>(&#160;UTFString const&amp; <span class='color_p'>str</span></span>&#160;)</span> const</span>
+<br/>
+<div id="c_510" style="display:none;">
+<span class='mngl'>_ZNK4Ogre9UTFString7compareERKS0_</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_511')">
+UTFString::compare&#160;<span class='sym_p'><span>(&#160;UTFString::code_point const* <span class='color_p'>str</span></span>&#160;)</span> const</span>
+<br/>
+<div id="c_511" style="display:none;">
+<span class='mngl'>_ZNK4Ogre9UTFString7compareEPKt</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_512')">
+UTFString::compare&#160;<span class='sym_p'><span>(&#160;UTFString::size_type <span class='color_p'>index</span></span>, <span>UTFString::size_type <span class='color_p'>inLength</span></span>, <span>char const* <span class='color_p'>str</span></span>, <span>UTFString::size_type <span class='color_p'>length2</span></span>&#160;)</span> const</span>
+<br/>
+<div id="c_512" style="display:none;">
+<span class='mngl'>_ZNK4Ogre9UTFString7compareEmmPKcm</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_513')">
+UTFString::compare&#160;<span class='sym_p'><span>(&#160;UTFString::size_type <span class='color_p'>index</span></span>, <span>UTFString::size_type <span class='color_p'>inLength</span></span>, <span>UTFString const&amp; <span class='color_p'>str</span></span>&#160;)</span> const</span>
+<br/>
+<div id="c_513" style="display:none;">
+<span class='mngl'>_ZNK4Ogre9UTFString7compareEmmRKS0_</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_514')">
+UTFString::compare&#160;<span class='sym_p'><span>(&#160;UTFString::size_type <span class='color_p'>index</span></span>, <span>UTFString::size_type <span class='color_p'>inLength</span></span>, <span>UTFString const&amp; <span class='color_p'>str</span></span>, <span>UTFString::size_type <span class='color_p'>index2</span></span>, <span>UTFString::size_type <span class='color_p'>length2</span></span>&#160;)</span> const</span>
+<br/>
+<div id="c_514" style="display:none;">
+<span class='mngl'>_ZNK4Ogre9UTFString7compareEmmRKS0_mm</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_515')">
+UTFString::compare&#160;<span class='sym_p'><span>(&#160;UTFString::size_type <span class='color_p'>index</span></span>, <span>UTFString::size_type <span class='color_p'>inLength</span></span>, <span>UTFString::code_point const* <span class='color_p'>str</span></span>, <span>UTFString::size_type <span class='color_p'>length2</span></span>&#160;)</span> const</span>
+<br/>
+<div id="c_515" style="display:none;">
+<span class='mngl'>_ZNK4Ogre9UTFString7compareEmmPKtm</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_516')">
+UTFString::compare&#160;<span class='sym_p'><span>(&#160;UTFString::size_type <span class='color_p'>index</span></span>, <span>UTFString::size_type <span class='color_p'>inLength</span></span>, <span>wchar_t const* <span class='color_p'>w_str</span></span>, <span>UTFString::size_type <span class='color_p'>length2</span></span>&#160;)</span> const</span>
+<br/>
+<div id="c_516" style="display:none;">
+<span class='mngl'>_ZNK4Ogre9UTFString7compareEmmPKwm</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_517')">
+UTFString::data&#160;<span class='sym_p'>(&#160;)</span> const</span>
+<br/>
+<div id="c_517" style="display:none;">
+<span class='mngl'>_ZNK4Ogre9UTFString4dataEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_518')">
+UTFString::empty&#160;<span class='sym_p'>(&#160;)</span> const</span>
+<br/>
+<div id="c_518" style="display:none;">
+<span class='mngl'>_ZNK4Ogre9UTFString5emptyEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_519')">
+UTFString::end&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_519" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString3endEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_520')">
+UTFString::end&#160;<span class='sym_p'>(&#160;)</span> const</span>
+<br/>
+<div id="c_520" style="display:none;">
+<span class='mngl'>_ZNK4Ogre9UTFString3endEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_521')">
+UTFString::erase&#160;<span class='sym_p'><span>(&#160;UTFString::iterator <span class='color_p'>loc</span></span>&#160;)</span></span>
+<br/>
+<div id="c_521" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString5eraseENS0_13_fwd_iteratorE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_522')">
+UTFString::erase&#160;<span class='sym_p'><span>(&#160;UTFString::iterator <span class='color_p'>start</span></span>, <span>UTFString::iterator <span class='color_p'>last</span></span>&#160;)</span></span>
+<br/>
+<div id="c_522" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString5eraseENS0_13_fwd_iteratorES1_</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_523')">
+UTFString::erase&#160;<span class='sym_p'><span>(&#160;UTFString::size_type <span class='color_p'>index</span></span>, <span>UTFString::size_type <span class='color_p'>num</span></span>&#160;)</span></span>
+<br/>
+<div id="c_523" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString5eraseEmm</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_524')">
+UTFString::find&#160;<span class='sym_p'><span>(&#160;char const* <span class='color_p'>str</span></span>, <span>UTFString::size_type <span class='color_p'>index</span></span>, <span>UTFString::size_type <span class='color_p'>inLength</span></span>&#160;)</span> const</span>
+<br/>
+<div id="c_524" style="display:none;">
+<span class='mngl'>_ZNK4Ogre9UTFString4findEPKcmm</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_525')">
+UTFString::find&#160;<span class='sym_p'><span>(&#160;char <span class='color_p'>ch</span></span>, <span>UTFString::size_type <span class='color_p'>index</span></span>&#160;)</span> const</span>
+<br/>
+<div id="c_525" style="display:none;">
+<span class='mngl'>_ZNK4Ogre9UTFString4findEcm</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_526')">
+UTFString::find&#160;<span class='sym_p'><span>(&#160;UTFString const&amp; <span class='color_p'>str</span></span>, <span>UTFString::size_type <span class='color_p'>index</span></span>&#160;)</span> const</span>
+<br/>
+<div id="c_526" style="display:none;">
+<span class='mngl'>_ZNK4Ogre9UTFString4findERKS0_m</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_527')">
+UTFString::find&#160;<span class='sym_p'><span>(&#160;UTFString::code_point const* <span class='color_p'>cp_str</span></span>, <span>UTFString::size_type <span class='color_p'>index</span></span>, <span>UTFString::size_type <span class='color_p'>inLength</span></span>&#160;)</span> const</span>
+<br/>
+<div id="c_527" style="display:none;">
+<span class='mngl'>_ZNK4Ogre9UTFString4findEPKtmm</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_528')">
+UTFString::find&#160;<span class='sym_p'><span>(&#160;UTFString::code_point <span class='color_p'>ch</span></span>, <span>UTFString::size_type <span class='color_p'>index</span></span>&#160;)</span> const</span>
+<br/>
+<div id="c_528" style="display:none;">
+<span class='mngl'>_ZNK4Ogre9UTFString4findEtm</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_529')">
+UTFString::find&#160;<span class='sym_p'><span>(&#160;UTFString::unicode_char <span class='color_p'>ch</span></span>, <span>UTFString::size_type <span class='color_p'>index</span></span>&#160;)</span> const</span>
+<br/>
+<div id="c_529" style="display:none;">
+<span class='mngl'>_ZNK4Ogre9UTFString4findEjm</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_530')">
+UTFString::find&#160;<span class='sym_p'><span>(&#160;wchar_t const* <span class='color_p'>w_str</span></span>, <span>UTFString::size_type <span class='color_p'>index</span></span>, <span>UTFString::size_type <span class='color_p'>inLength</span></span>&#160;)</span> const</span>
+<br/>
+<div id="c_530" style="display:none;">
+<span class='mngl'>_ZNK4Ogre9UTFString4findEPKwmm</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_531')">
+UTFString::find&#160;<span class='sym_p'><span>(&#160;wchar_t <span class='color_p'>ch</span></span>, <span>UTFString::size_type <span class='color_p'>index</span></span>&#160;)</span> const</span>
+<br/>
+<div id="c_531" style="display:none;">
+<span class='mngl'>_ZNK4Ogre9UTFString4findEwm</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_532')">
+UTFString::find_first_not_of&#160;<span class='sym_p'><span>(&#160;char <span class='color_p'>ch</span></span>, <span>UTFString::size_type <span class='color_p'>index</span></span>&#160;)</span> const</span>
+<br/>
+<div id="c_532" style="display:none;">
+<span class='mngl'>_ZNK4Ogre9UTFString17find_first_not_ofEcm</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_533')">
+UTFString::find_first_not_of&#160;<span class='sym_p'><span>(&#160;UTFString const&amp; <span class='color_p'>str</span></span>, <span>UTFString::size_type <span class='color_p'>index</span></span>, <span>UTFString::size_type <span class='color_p'>num</span></span>&#160;)</span> const</span>
+<br/>
+<div id="c_533" style="display:none;">
+<span class='mngl'>_ZNK4Ogre9UTFString17find_first_not_ofERKS0_mm</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_534')">
+UTFString::find_first_not_of&#160;<span class='sym_p'><span>(&#160;UTFString::code_point <span class='color_p'>ch</span></span>, <span>UTFString::size_type <span class='color_p'>index</span></span>&#160;)</span> const</span>
+<br/>
+<div id="c_534" style="display:none;">
+<span class='mngl'>_ZNK4Ogre9UTFString17find_first_not_ofEtm</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_535')">
+UTFString::find_first_not_of&#160;<span class='sym_p'><span>(&#160;UTFString::unicode_char <span class='color_p'>ch</span></span>, <span>UTFString::size_type <span class='color_p'>index</span></span>&#160;)</span> const</span>
+<br/>
+<div id="c_535" style="display:none;">
+<span class='mngl'>_ZNK4Ogre9UTFString17find_first_not_ofEjm</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_536')">
+UTFString::find_first_not_of&#160;<span class='sym_p'><span>(&#160;wchar_t <span class='color_p'>ch</span></span>, <span>UTFString::size_type <span class='color_p'>index</span></span>&#160;)</span> const</span>
+<br/>
+<div id="c_536" style="display:none;">
+<span class='mngl'>_ZNK4Ogre9UTFString17find_first_not_ofEwm</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_537')">
+UTFString::find_first_of&#160;<span class='sym_p'><span>(&#160;char <span class='color_p'>ch</span></span>, <span>UTFString::size_type <span class='color_p'>index</span></span>&#160;)</span> const</span>
+<br/>
+<div id="c_537" style="display:none;">
+<span class='mngl'>_ZNK4Ogre9UTFString13find_first_ofEcm</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_538')">
+UTFString::find_first_of&#160;<span class='sym_p'><span>(&#160;UTFString const&amp; <span class='color_p'>str</span></span>, <span>UTFString::size_type <span class='color_p'>index</span></span>, <span>UTFString::size_type <span class='color_p'>num</span></span>&#160;)</span> const</span>
+<br/>
+<div id="c_538" style="display:none;">
+<span class='mngl'>_ZNK4Ogre9UTFString13find_first_ofERKS0_mm</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_539')">
+UTFString::find_first_of&#160;<span class='sym_p'><span>(&#160;UTFString::code_point <span class='color_p'>ch</span></span>, <span>UTFString::size_type <span class='color_p'>index</span></span>&#160;)</span> const</span>
+<br/>
+<div id="c_539" style="display:none;">
+<span class='mngl'>_ZNK4Ogre9UTFString13find_first_ofEtm</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_540')">
+UTFString::find_first_of&#160;<span class='sym_p'><span>(&#160;UTFString::unicode_char <span class='color_p'>ch</span></span>, <span>UTFString::size_type <span class='color_p'>index</span></span>&#160;)</span> const</span>
+<br/>
+<div id="c_540" style="display:none;">
+<span class='mngl'>_ZNK4Ogre9UTFString13find_first_ofEjm</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_541')">
+UTFString::find_first_of&#160;<span class='sym_p'><span>(&#160;wchar_t <span class='color_p'>ch</span></span>, <span>UTFString::size_type <span class='color_p'>index</span></span>&#160;)</span> const</span>
+<br/>
+<div id="c_541" style="display:none;">
+<span class='mngl'>_ZNK4Ogre9UTFString13find_first_ofEwm</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_542')">
+UTFString::find_last_not_of&#160;<span class='sym_p'><span>(&#160;char <span class='color_p'>ch</span></span>, <span>UTFString::size_type <span class='color_p'>index</span></span>&#160;)</span> const</span>
+<br/>
+<div id="c_542" style="display:none;">
+<span class='mngl'>_ZNK4Ogre9UTFString16find_last_not_ofEcm</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_543')">
+UTFString::find_last_not_of&#160;<span class='sym_p'><span>(&#160;UTFString const&amp; <span class='color_p'>str</span></span>, <span>UTFString::size_type <span class='color_p'>index</span></span>, <span>UTFString::size_type <span class='color_p'>num</span></span>&#160;)</span> const</span>
+<br/>
+<div id="c_543" style="display:none;">
+<span class='mngl'>_ZNK4Ogre9UTFString16find_last_not_ofERKS0_mm</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_544')">
+UTFString::find_last_not_of&#160;<span class='sym_p'><span>(&#160;UTFString::code_point <span class='color_p'>ch</span></span>, <span>UTFString::size_type <span class='color_p'>index</span></span>&#160;)</span> const</span>
+<br/>
+<div id="c_544" style="display:none;">
+<span class='mngl'>_ZNK4Ogre9UTFString16find_last_not_ofEtm</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_545')">
+UTFString::find_last_not_of&#160;<span class='sym_p'><span>(&#160;UTFString::unicode_char <span class='color_p'>ch</span></span>, <span>UTFString::size_type <span class='color_p'>index</span></span>&#160;)</span> const</span>
+<br/>
+<div id="c_545" style="display:none;">
+<span class='mngl'>_ZNK4Ogre9UTFString16find_last_not_ofEjm</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_546')">
+UTFString::find_last_not_of&#160;<span class='sym_p'><span>(&#160;wchar_t <span class='color_p'>ch</span></span>, <span>UTFString::size_type <span class='color_p'>index</span></span>&#160;)</span> const</span>
+<br/>
+<div id="c_546" style="display:none;">
+<span class='mngl'>_ZNK4Ogre9UTFString16find_last_not_ofEwm</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_547')">
+UTFString::find_last_of&#160;<span class='sym_p'><span>(&#160;UTFString const&amp; <span class='color_p'>str</span></span>, <span>UTFString::size_type <span class='color_p'>index</span></span>, <span>UTFString::size_type <span class='color_p'>num</span></span>&#160;)</span> const</span>
+<br/>
+<div id="c_547" style="display:none;">
+<span class='mngl'>_ZNK4Ogre9UTFString12find_last_ofERKS0_mm</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_548')">
+UTFString::find_last_of&#160;<span class='sym_p'><span>(&#160;UTFString::code_point <span class='color_p'>ch</span></span>, <span>UTFString::size_type <span class='color_p'>index</span></span>&#160;)</span> const</span>
+<br/>
+<div id="c_548" style="display:none;">
+<span class='mngl'>_ZNK4Ogre9UTFString12find_last_ofEtm</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_549')">
+UTFString::find_last_of&#160;<span class='sym_p'><span>(&#160;UTFString::unicode_char <span class='color_p'>ch</span></span>, <span>UTFString::size_type <span class='color_p'>index</span></span>&#160;)</span> const</span>
+<br/>
+<div id="c_549" style="display:none;">
+<span class='mngl'>_ZNK4Ogre9UTFString12find_last_ofEjm</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_550')">
+UTFString::find_last_of&#160;<span class='sym_p'><span>(&#160;wchar_t <span class='color_p'>ch</span></span>, <span>UTFString::size_type <span class='color_p'>index</span></span>&#160;)</span> const</span>
+<br/>
+<div id="c_550" style="display:none;">
+<span class='mngl'>_ZNK4Ogre9UTFString12find_last_ofEwm</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_551')">
+UTFString::getChar&#160;<span class='sym_p'><span>(&#160;UTFString::size_type <span class='color_p'>loc</span></span>&#160;)</span> const</span>
+<br/>
+<div id="c_551" style="display:none;">
+<span class='mngl'>_ZNK4Ogre9UTFString7getCharEm</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_552')">
+UTFString::insert&#160;<span class='sym_p'><span>(&#160;UTFString::iterator <span class='color_p'>i</span></span>, <span>UTFString::code_point const&amp; <span class='color_p'>ch</span></span>&#160;)</span></span>
+<br/>
+<div id="c_552" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString6insertENS0_13_fwd_iteratorERKt</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_553')">
+UTFString::insert&#160;<span class='sym_p'><span>(&#160;UTFString::iterator <span class='color_p'>i</span></span>, <span>UTFString::iterator <span class='color_p'>start</span></span>, <span>UTFString::iterator <span class='color_p'>last</span></span>&#160;)</span></span>
+<br/>
+<div id="c_553" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString6insertENS0_13_fwd_iteratorES1_S1_</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_554')">
+UTFString::insert&#160;<span class='sym_p'><span>(&#160;UTFString::iterator <span class='color_p'>i</span></span>, <span>UTFString::size_type <span class='color_p'>num</span></span>, <span>char const&amp; <span class='color_p'>ch</span></span>&#160;)</span></span>
+<br/>
+<div id="c_554" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString6insertENS0_13_fwd_iteratorEmRKc</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_555')">
+UTFString::insert&#160;<span class='sym_p'><span>(&#160;UTFString::iterator <span class='color_p'>i</span></span>, <span>UTFString::size_type <span class='color_p'>num</span></span>, <span>UTFString::code_point const&amp; <span class='color_p'>ch</span></span>&#160;)</span></span>
+<br/>
+<div id="c_555" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString6insertENS0_13_fwd_iteratorEmRKt</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_556')">
+UTFString::insert&#160;<span class='sym_p'><span>(&#160;UTFString::iterator <span class='color_p'>i</span></span>, <span>UTFString::size_type <span class='color_p'>num</span></span>, <span>UTFString::unicode_char const&amp; <span class='color_p'>ch</span></span>&#160;)</span></span>
+<br/>
+<div id="c_556" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString6insertENS0_13_fwd_iteratorEmRKj</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_557')">
+UTFString::insert&#160;<span class='sym_p'><span>(&#160;UTFString::iterator <span class='color_p'>i</span></span>, <span>UTFString::size_type <span class='color_p'>num</span></span>, <span>wchar_t const&amp; <span class='color_p'>ch</span></span>&#160;)</span></span>
+<br/>
+<div id="c_557" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString6insertENS0_13_fwd_iteratorEmRKw</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_558')">
+UTFString::insert&#160;<span class='sym_p'><span>(&#160;UTFString::size_type <span class='color_p'>index</span></span>, <span>char const* <span class='color_p'>str</span></span>, <span>UTFString::size_type <span class='color_p'>num</span></span>&#160;)</span></span>
+<br/>
+<div id="c_558" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString6insertEmPKcm</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_559')">
+UTFString::insert&#160;<span class='sym_p'><span>(&#160;UTFString::size_type <span class='color_p'>index</span></span>, <span>UTFString const&amp; <span class='color_p'>str</span></span>&#160;)</span></span>
+<br/>
+<div id="c_559" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString6insertEmRKS0_</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_560')">
+UTFString::insert&#160;<span class='sym_p'><span>(&#160;UTFString::size_type <span class='color_p'>index1</span></span>, <span>UTFString const&amp; <span class='color_p'>str</span></span>, <span>UTFString::size_type <span class='color_p'>index2</span></span>, <span>UTFString::size_type <span class='color_p'>num</span></span>&#160;)</span></span>
+<br/>
+<div id="c_560" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString6insertEmRKS0_mm</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_561')">
+UTFString::insert&#160;<span class='sym_p'><span>(&#160;UTFString::size_type <span class='color_p'>index</span></span>, <span>UTFString::code_point const* <span class='color_p'>str</span></span>, <span>UTFString::size_type <span class='color_p'>num</span></span>&#160;)</span></span>
+<br/>
+<div id="c_561" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString6insertEmPKtm</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_562')">
+UTFString::insert&#160;<span class='sym_p'><span>(&#160;UTFString::size_type <span class='color_p'>index</span></span>, <span>UTFString::size_type <span class='color_p'>num</span></span>, <span>char <span class='color_p'>ch</span></span>&#160;)</span></span>
+<br/>
+<div id="c_562" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString6insertEmmc</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_563')">
+UTFString::insert&#160;<span class='sym_p'><span>(&#160;UTFString::size_type <span class='color_p'>index</span></span>, <span>UTFString::size_type <span class='color_p'>num</span></span>, <span>UTFString::code_point <span class='color_p'>ch</span></span>&#160;)</span></span>
+<br/>
+<div id="c_563" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString6insertEmmt</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_564')">
+UTFString::insert&#160;<span class='sym_p'><span>(&#160;UTFString::size_type <span class='color_p'>index</span></span>, <span>UTFString::size_type <span class='color_p'>num</span></span>, <span>UTFString::unicode_char <span class='color_p'>ch</span></span>&#160;)</span></span>
+<br/>
+<div id="c_564" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString6insertEmmj</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_565')">
+UTFString::insert&#160;<span class='sym_p'><span>(&#160;UTFString::size_type <span class='color_p'>index</span></span>, <span>UTFString::size_type <span class='color_p'>num</span></span>, <span>wchar_t <span class='color_p'>ch</span></span>&#160;)</span></span>
+<br/>
+<div id="c_565" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString6insertEmmw</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_566')">
+UTFString::insert&#160;<span class='sym_p'><span>(&#160;UTFString::size_type <span class='color_p'>index</span></span>, <span>wchar_t const* <span class='color_p'>w_str</span></span>, <span>UTFString::size_type <span class='color_p'>num</span></span>&#160;)</span></span>
+<br/>
+<div id="c_566" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString6insertEmPKwm</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_567')">
+UTFString::inString&#160;<span class='sym_p'><span>(&#160;UTFString::unicode_char <span class='color_p'>ch</span></span>&#160;)</span> const</span>
+<br/>
+<div id="c_567" style="display:none;">
+<span class='mngl'>_ZNK4Ogre9UTFString8inStringEj</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_568')">
+UTFString::length&#160;<span class='sym_p'>(&#160;)</span> const</span>
+<br/>
+<div id="c_568" style="display:none;">
+<span class='mngl'>_ZNK4Ogre9UTFString6lengthEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_569')">
+UTFString::length_Characters&#160;<span class='sym_p'>(&#160;)</span> const</span>
+<br/>
+<div id="c_569" style="display:none;">
+<span class='mngl'>_ZNK4Ogre9UTFString17length_CharactersEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_570')">
+UTFString::max_size&#160;<span class='sym_p'>(&#160;)</span> const</span>
+<br/>
+<div id="c_570" style="display:none;">
+<span class='mngl'>_ZNK4Ogre9UTFString8max_sizeEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_571')">
+UTFString::operator std::string&#160;<span class='sym_p'>(&#160;)</span> const</span>
+<br/>
+<div id="c_571" style="display:none;">
+<span class='mngl'>_ZNK4Ogre9UTFStringcvNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEEEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_572')">
+UTFString::operator std::wstring&#160;<span class='sym_p'>(&#160;)</span> const</span>
+<br/>
+<div id="c_572" style="display:none;">
+<span class='mngl'>_ZNK4Ogre9UTFStringcvNSt7__cxx1112basic_stringIwSt11char_traitsIwESaIwEEEEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_573')">
+UTFString::operator!=&#160;<span class='sym_p'><span>(&#160;UTFString const&amp; <span class='color_p'>right</span></span>&#160;)</span> const</span>
+<br/>
+<div id="c_573" style="display:none;">
+<span class='mngl'>_ZNK4Ogre9UTFStringneERKS0_</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_574')">
+UTFString::operator&lt;&#160;<span class='sym_p'><span>(&#160;UTFString const&amp; <span class='color_p'>right</span></span>&#160;)</span> const</span>
+<br/>
+<div id="c_574" style="display:none;">
+<span class='mngl'>_ZNK4Ogre9UTFStringltERKS0_</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_575')">
+UTFString::operator&lt;=&#160;<span class='sym_p'><span>(&#160;UTFString const&amp; <span class='color_p'>right</span></span>&#160;)</span> const</span>
+<br/>
+<div id="c_575" style="display:none;">
+<span class='mngl'>_ZNK4Ogre9UTFStringleERKS0_</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_576')">
+UTFString::operator&#160;=&#160;<span class='sym_p'><span>(&#160;char <span class='color_p'>ch</span></span>&#160;)</span></span>
+<br/>
+<div id="c_576" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFStringaSEc</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_577')">
+UTFString::operator&#160;=&#160;<span class='sym_p'><span>(&#160;UTFString const&amp; <span class='color_p'>s</span></span>&#160;)</span></span>
+<br/>
+<div id="c_577" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFStringaSERKS0_</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_578')">
+UTFString::operator&#160;=&#160;<span class='sym_p'><span>(&#160;UTFString::code_point <span class='color_p'>ch</span></span>&#160;)</span></span>
+<br/>
+<div id="c_578" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFStringaSEt</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_579')">
+UTFString::operator&#160;=&#160;<span class='sym_p'><span>(&#160;UTFString::unicode_char <span class='color_p'>ch</span></span>&#160;)</span></span>
+<br/>
+<div id="c_579" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFStringaSEj</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_580')">
+UTFString::operator&#160;=&#160;<span class='sym_p'><span>(&#160;wchar_t <span class='color_p'>ch</span></span>&#160;)</span></span>
+<br/>
+<div id="c_580" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFStringaSEw</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_581')">
+UTFString::operator&#160;==&#160;<span class='sym_p'><span>(&#160;UTFString const&amp; <span class='color_p'>right</span></span>&#160;)</span> const</span>
+<br/>
+<div id="c_581" style="display:none;">
+<span class='mngl'>_ZNK4Ogre9UTFStringeqERKS0_</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_582')">
+UTFString::operator&gt;&#160;<span class='sym_p'><span>(&#160;UTFString const&amp; <span class='color_p'>right</span></span>&#160;)</span> const</span>
+<br/>
+<div id="c_582" style="display:none;">
+<span class='mngl'>_ZNK4Ogre9UTFStringgtERKS0_</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_583')">
+UTFString::operator&gt;=&#160;<span class='sym_p'><span>(&#160;UTFString const&amp; <span class='color_p'>right</span></span>&#160;)</span> const</span>
+<br/>
+<div id="c_583" style="display:none;">
+<span class='mngl'>_ZNK4Ogre9UTFStringgeERKS0_</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_584')">
+UTFString::operator[&#160;]&#160;<span class='sym_p'><span>(&#160;UTFString::size_type <span class='color_p'>index</span></span>&#160;)</span></span>
+<br/>
+<div id="c_584" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFStringixEm</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_585')">
+UTFString::operator[&#160;]&#160;<span class='sym_p'><span>(&#160;UTFString::size_type <span class='color_p'>index</span></span>&#160;)</span> const</span>
+<br/>
+<div id="c_585" style="display:none;">
+<span class='mngl'>_ZNK4Ogre9UTFStringixEm</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_586')">
+UTFString::push_back&#160;<span class='sym_p'><span>(&#160;char <span class='color_p'>val</span></span>&#160;)</span></span>
+<br/>
+<div id="c_586" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString9push_backEc</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_587')">
+UTFString::push_back&#160;<span class='sym_p'><span>(&#160;UTFString::code_point <span class='color_p'>val</span></span>&#160;)</span></span>
+<br/>
+<div id="c_587" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString9push_backEt</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_588')">
+UTFString::push_back&#160;<span class='sym_p'><span>(&#160;UTFString::unicode_char <span class='color_p'>val</span></span>&#160;)</span></span>
+<br/>
+<div id="c_588" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString9push_backEj</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_589')">
+UTFString::push_back&#160;<span class='sym_p'><span>(&#160;wchar_t <span class='color_p'>val</span></span>&#160;)</span></span>
+<br/>
+<div id="c_589" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString9push_backEw</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_590')">
+UTFString::rbegin&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_590" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString6rbeginEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_591')">
+UTFString::rbegin&#160;<span class='sym_p'>(&#160;)</span> const</span>
+<br/>
+<div id="c_591" style="display:none;">
+<span class='mngl'>_ZNK4Ogre9UTFString6rbeginEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_592')">
+UTFString::rend&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_592" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString4rendEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_593')">
+UTFString::rend&#160;<span class='sym_p'>(&#160;)</span> const</span>
+<br/>
+<div id="c_593" style="display:none;">
+<span class='mngl'>_ZNK4Ogre9UTFString4rendEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_594')">
+UTFString::replace&#160;<span class='sym_p'><span>(&#160;UTFString::iterator <span class='color_p'>start</span></span>, <span>UTFString::iterator <span class='color_p'>last</span></span>, <span>UTFString const&amp; <span class='color_p'>str</span></span>, <span>UTFString::size_type <span class='color_p'>num</span></span>&#160;)</span></span>
+<br/>
+<div id="c_594" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString7replaceENS0_13_fwd_iteratorES1_RKS0_m</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_595')">
+UTFString::replace&#160;<span class='sym_p'><span>(&#160;UTFString::iterator <span class='color_p'>start</span></span>, <span>UTFString::iterator <span class='color_p'>last</span></span>, <span>UTFString::size_type <span class='color_p'>num</span></span>, <span>UTFString::code_point <span class='color_p'>ch</span></span>&#160;)</span></span>
+<br/>
+<div id="c_595" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString7replaceENS0_13_fwd_iteratorES1_mt</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_596')">
+UTFString::replace&#160;<span class='sym_p'><span>(&#160;UTFString::size_type <span class='color_p'>index1</span></span>, <span>UTFString::size_type <span class='color_p'>num1</span></span>, <span>UTFString const&amp; <span class='color_p'>str</span></span>&#160;)</span></span>
+<br/>
+<div id="c_596" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString7replaceEmmRKS0_</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_597')">
+UTFString::replace&#160;<span class='sym_p'><span>(&#160;UTFString::size_type <span class='color_p'>index1</span></span>, <span>UTFString::size_type <span class='color_p'>num1</span></span>, <span>UTFString const&amp; <span class='color_p'>str</span></span>, <span>UTFString::size_type <span class='color_p'>num2</span></span>&#160;)</span></span>
+<br/>
+<div id="c_597" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString7replaceEmmRKS0_m</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_598')">
+UTFString::replace&#160;<span class='sym_p'><span>(&#160;UTFString::size_type <span class='color_p'>index1</span></span>, <span>UTFString::size_type <span class='color_p'>num1</span></span>, <span>UTFString const&amp; <span class='color_p'>str</span></span>, <span>UTFString::size_type <span class='color_p'>index2</span></span>, <span>UTFString::size_type <span class='color_p'>num2</span></span>&#160;)</span></span>
+<br/>
+<div id="c_598" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString7replaceEmmRKS0_mm</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_599')">
+UTFString::replace&#160;<span class='sym_p'><span>(&#160;UTFString::size_type <span class='color_p'>index</span></span>, <span>UTFString::size_type <span class='color_p'>num1</span></span>, <span>UTFString::size_type <span class='color_p'>num2</span></span>, <span>UTFString::code_point <span class='color_p'>ch</span></span>&#160;)</span></span>
+<br/>
+<div id="c_599" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString7replaceEmmmt</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_600')">
+UTFString::reserve&#160;<span class='sym_p'><span>(&#160;UTFString::size_type <span class='color_p'>inSize</span></span>&#160;)</span></span>
+<br/>
+<div id="c_600" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString7reserveEm</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_601')">
+UTFString::resize&#160;<span class='sym_p'><span>(&#160;UTFString::size_type <span class='color_p'>num</span></span>, <span>UTFString::code_point const&amp; <span class='color_p'>val</span></span>&#160;)</span></span>
+<br/>
+<div id="c_601" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString6resizeEmRKt</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_602')">
+UTFString::rfind&#160;<span class='sym_p'><span>(&#160;char const* <span class='color_p'>str</span></span>, <span>UTFString::size_type <span class='color_p'>index</span></span>, <span>UTFString::size_type <span class='color_p'>num</span></span>&#160;)</span> const</span>
+<br/>
+<div id="c_602" style="display:none;">
+<span class='mngl'>_ZNK4Ogre9UTFString5rfindEPKcmm</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_603')">
+UTFString::rfind&#160;<span class='sym_p'><span>(&#160;char <span class='color_p'>ch</span></span>, <span>UTFString::size_type <span class='color_p'>index</span></span>&#160;)</span> const</span>
+<br/>
+<div id="c_603" style="display:none;">
+<span class='mngl'>_ZNK4Ogre9UTFString5rfindEcm</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_604')">
+UTFString::rfind&#160;<span class='sym_p'><span>(&#160;UTFString const&amp; <span class='color_p'>str</span></span>, <span>UTFString::size_type <span class='color_p'>index</span></span>&#160;)</span> const</span>
+<br/>
+<div id="c_604" style="display:none;">
+<span class='mngl'>_ZNK4Ogre9UTFString5rfindERKS0_m</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_605')">
+UTFString::rfind&#160;<span class='sym_p'><span>(&#160;UTFString::code_point const* <span class='color_p'>cp_str</span></span>, <span>UTFString::size_type <span class='color_p'>index</span></span>, <span>UTFString::size_type <span class='color_p'>num</span></span>&#160;)</span> const</span>
+<br/>
+<div id="c_605" style="display:none;">
+<span class='mngl'>_ZNK4Ogre9UTFString5rfindEPKtmm</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_606')">
+UTFString::rfind&#160;<span class='sym_p'><span>(&#160;UTFString::code_point <span class='color_p'>ch</span></span>, <span>UTFString::size_type <span class='color_p'>index</span></span>&#160;)</span> const</span>
+<br/>
+<div id="c_606" style="display:none;">
+<span class='mngl'>_ZNK4Ogre9UTFString5rfindEtm</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_607')">
+UTFString::rfind&#160;<span class='sym_p'><span>(&#160;UTFString::unicode_char <span class='color_p'>ch</span></span>, <span>UTFString::size_type <span class='color_p'>index</span></span>&#160;)</span> const</span>
+<br/>
+<div id="c_607" style="display:none;">
+<span class='mngl'>_ZNK4Ogre9UTFString5rfindEjm</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_608')">
+UTFString::rfind&#160;<span class='sym_p'><span>(&#160;wchar_t const* <span class='color_p'>w_str</span></span>, <span>UTFString::size_type <span class='color_p'>index</span></span>, <span>UTFString::size_type <span class='color_p'>num</span></span>&#160;)</span> const</span>
+<br/>
+<div id="c_608" style="display:none;">
+<span class='mngl'>_ZNK4Ogre9UTFString5rfindEPKwmm</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_609')">
+UTFString::rfind&#160;<span class='sym_p'><span>(&#160;wchar_t <span class='color_p'>ch</span></span>, <span>UTFString::size_type <span class='color_p'>index</span></span>&#160;)</span> const</span>
+<br/>
+<div id="c_609" style="display:none;">
+<span class='mngl'>_ZNK4Ogre9UTFString5rfindEwm</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_610')">
+UTFString::setChar&#160;<span class='sym_p'><span>(&#160;UTFString::size_type <span class='color_p'>loc</span></span>, <span>UTFString::unicode_char <span class='color_p'>ch</span></span>&#160;)</span></span>
+<br/>
+<div id="c_610" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString7setCharEmj</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_611')">
+UTFString::size&#160;<span class='sym_p'>(&#160;)</span> const</span>
+<br/>
+<div id="c_611" style="display:none;">
+<span class='mngl'>_ZNK4Ogre9UTFString4sizeEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_612')">
+UTFString::substr&#160;<span class='sym_p'><span>(&#160;UTFString::size_type <span class='color_p'>index</span></span>, <span>UTFString::size_type <span class='color_p'>num</span></span>&#160;)</span> const</span>
+<br/>
+<div id="c_612" style="display:none;">
+<span class='mngl'>_ZNK4Ogre9UTFString6substrEmm</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_613')">
+UTFString::swap&#160;<span class='sym_p'><span>(&#160;UTFString&amp; <span class='color_p'>from</span></span>&#160;)</span></span>
+<br/>
+<div id="c_613" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFString4swapERS0_</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_614')">
+UTFString::UTFString <span class='attr'>[C1]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_614" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFStringC1Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_615')">
+UTFString::UTFString <span class='attr'>[C2]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_615" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFStringC2Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_616')">
+UTFString::UTFString <span class='attr'>[C1]</span>&#160;<span class='sym_p'><span>(&#160;char const* <span class='color_p'>str</span></span>&#160;)</span></span>
+<br/>
+<div id="c_616" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFStringC1EPKc</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_617')">
+UTFString::UTFString <span class='attr'>[C2]</span>&#160;<span class='sym_p'><span>(&#160;char const* <span class='color_p'>str</span></span>&#160;)</span></span>
+<br/>
+<div id="c_617" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFStringC2EPKc</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_618')">
+UTFString::UTFString <span class='attr'>[C1]</span>&#160;<span class='sym_p'><span>(&#160;char const* <span class='color_p'>str</span></span>, <span>UTFString::size_type <span class='color_p'>inLength</span></span>&#160;)</span></span>
+<br/>
+<div id="c_618" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFStringC1EPKcm</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_619')">
+UTFString::UTFString <span class='attr'>[C2]</span>&#160;<span class='sym_p'><span>(&#160;char const* <span class='color_p'>str</span></span>, <span>UTFString::size_type <span class='color_p'>inLength</span></span>&#160;)</span></span>
+<br/>
+<div id="c_619" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFStringC2EPKcm</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_620')">
+UTFString::UTFString <span class='attr'>[C1]</span>&#160;<span class='sym_p'><span>(&#160;UTFString const&amp; <span class='color_p'>copy</span></span>&#160;)</span></span>
+<br/>
+<div id="c_620" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFStringC1ERKS0_</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_621')">
+UTFString::UTFString <span class='attr'>[C2]</span>&#160;<span class='sym_p'><span>(&#160;UTFString const&amp; <span class='color_p'>copy</span></span>&#160;)</span></span>
+<br/>
+<div id="c_621" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFStringC2ERKS0_</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_622')">
+UTFString::UTFString <span class='attr'>[C1]</span>&#160;<span class='sym_p'><span>(&#160;UTFString const&amp; <span class='color_p'>str</span></span>, <span>UTFString::size_type <span class='color_p'>index</span></span>, <span>UTFString::size_type <span class='color_p'>inLength</span></span>&#160;)</span></span>
+<br/>
+<div id="c_622" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFStringC1ERKS0_mm</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_623')">
+UTFString::UTFString <span class='attr'>[C2]</span>&#160;<span class='sym_p'><span>(&#160;UTFString const&amp; <span class='color_p'>str</span></span>, <span>UTFString::size_type <span class='color_p'>index</span></span>, <span>UTFString::size_type <span class='color_p'>inLength</span></span>&#160;)</span></span>
+<br/>
+<div id="c_623" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFStringC2ERKS0_mm</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_624')">
+UTFString::UTFString <span class='attr'>[C1]</span>&#160;<span class='sym_p'><span>(&#160;UTFString::code_point const* <span class='color_p'>str</span></span>&#160;)</span></span>
+<br/>
+<div id="c_624" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFStringC1EPKt</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_625')">
+UTFString::UTFString <span class='attr'>[C2]</span>&#160;<span class='sym_p'><span>(&#160;UTFString::code_point const* <span class='color_p'>str</span></span>&#160;)</span></span>
+<br/>
+<div id="c_625" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFStringC2EPKt</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_626')">
+UTFString::UTFString <span class='attr'>[C1]</span>&#160;<span class='sym_p'><span>(&#160;UTFString::code_point const* <span class='color_p'>str</span></span>, <span>UTFString::size_type <span class='color_p'>inLength</span></span>&#160;)</span></span>
+<br/>
+<div id="c_626" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFStringC1EPKtm</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_627')">
+UTFString::UTFString <span class='attr'>[C2]</span>&#160;<span class='sym_p'><span>(&#160;UTFString::code_point const* <span class='color_p'>str</span></span>, <span>UTFString::size_type <span class='color_p'>inLength</span></span>&#160;)</span></span>
+<br/>
+<div id="c_627" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFStringC2EPKtm</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_628')">
+UTFString::UTFString <span class='attr'>[C1]</span>&#160;<span class='sym_p'><span>(&#160;UTFString::size_type <span class='color_p'>inLength</span></span>, <span>UTFString::code_point const&amp; <span class='color_p'>ch</span></span>&#160;)</span></span>
+<br/>
+<div id="c_628" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFStringC1EmRKt</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_629')">
+UTFString::UTFString <span class='attr'>[C2]</span>&#160;<span class='sym_p'><span>(&#160;UTFString::size_type <span class='color_p'>inLength</span></span>, <span>UTFString::code_point const&amp; <span class='color_p'>ch</span></span>&#160;)</span></span>
+<br/>
+<div id="c_629" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFStringC2EmRKt</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_630')">
+UTFString::UTFString <span class='attr'>[C1]</span>&#160;<span class='sym_p'><span>(&#160;std::string const&amp; <span class='color_p'>str</span></span>&#160;)</span></span>
+<br/>
+<div id="c_630" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFStringC1ERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_631')">
+UTFString::UTFString <span class='attr'>[C2]</span>&#160;<span class='sym_p'><span>(&#160;std::string const&amp; <span class='color_p'>str</span></span>&#160;)</span></span>
+<br/>
+<div id="c_631" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFStringC2ERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_632')">
+UTFString::UTFString <span class='attr'>[C1]</span>&#160;<span class='sym_p'><span>(&#160;std::wstring const&amp; <span class='color_p'>wstr</span></span>&#160;)</span></span>
+<br/>
+<div id="c_632" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFStringC1ERKNSt7__cxx1112basic_stringIwSt11char_traitsIwESaIwEEE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_633')">
+UTFString::UTFString <span class='attr'>[C2]</span>&#160;<span class='sym_p'><span>(&#160;std::wstring const&amp; <span class='color_p'>wstr</span></span>&#160;)</span></span>
+<br/>
+<div id="c_633" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFStringC2ERKNSt7__cxx1112basic_stringIwSt11char_traitsIwESaIwEEE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_634')">
+UTFString::UTFString <span class='attr'>[C1]</span>&#160;<span class='sym_p'><span>(&#160;wchar_t const* <span class='color_p'>w_str</span></span>&#160;)</span></span>
+<br/>
+<div id="c_634" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFStringC1EPKw</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_635')">
+UTFString::UTFString <span class='attr'>[C2]</span>&#160;<span class='sym_p'><span>(&#160;wchar_t const* <span class='color_p'>w_str</span></span>&#160;)</span></span>
+<br/>
+<div id="c_635" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFStringC2EPKw</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_636')">
+UTFString::UTFString <span class='attr'>[C1]</span>&#160;<span class='sym_p'><span>(&#160;wchar_t const* <span class='color_p'>w_str</span></span>, <span>UTFString::size_type <span class='color_p'>inLength</span></span>&#160;)</span></span>
+<br/>
+<div id="c_636" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFStringC1EPKwm</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_637')">
+UTFString::UTFString <span class='attr'>[C2]</span>&#160;<span class='sym_p'><span>(&#160;wchar_t const* <span class='color_p'>w_str</span></span>, <span>UTFString::size_type <span class='color_p'>inLength</span></span>&#160;)</span></span>
+<br/>
+<div id="c_637" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFStringC2EPKwm</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_638')">
+UTFString::~UTFString <span class='attr'>[D1]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_638" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFStringD1Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_639')">
+UTFString::~UTFString <span class='attr'>[D2]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_639" style="display:none;">
+<span class='mngl'>_ZN4Ogre9UTFStringD2Ev</span>
+<br/>
+<br/>
+</div>
+
+<br/>
+<a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='Removed'></a><a name='Withdrawn'></a><h2>Removed Symbols <span class='failed'>&nbsp;79&nbsp;</span></h2><hr/>
+<span class='h_name'>OgreFont.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_640')">
+Font::Font <span class='attr'>[C1]</span>&#160;<span class='sym_p'><span>(&#160;ResourceManager* <span class='color_p'>creator</span></span>, <span>String const&amp; <span class='color_p'>name</span></span>, <span>unsigned long long <span class='color_p'>handle</span></span>, <span>String const&amp; <span class='color_p'>group</span></span>, <span>bool <span class='color_p'>isManual</span></span>, <span>ManualResourceLoader* <span class='color_p'>loader</span></span>&#160;)</span></span>
+<br/>
+<div id="c_640" style="display:none;">
+<span class='mngl'>_ZN4Ogre4FontC1EPNS_15ResourceManagerERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEEySA_bPNS_20ManualResourceLoaderE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_641')">
+Font::Font <span class='attr'>[C2]</span>&#160;<span class='sym_p'><span>(&#160;ResourceManager* <span class='color_p'>creator</span></span>, <span>String const&amp; <span class='color_p'>name</span></span>, <span>unsigned long long <span class='color_p'>handle</span></span>, <span>String const&amp; <span class='color_p'>group</span></span>, <span>bool <span class='color_p'>isManual</span></span>, <span>ManualResourceLoader* <span class='color_p'>loader</span></span>&#160;)</span></span>
+<br/>
+<div id="c_641" style="display:none;">
+<span class='mngl'>_ZN4Ogre4FontC2EPNS_15ResourceManagerERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEEySA_bPNS_20ManualResourceLoaderE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_642')">
+Font::getCharacterSpacer&#160;<span class='sym_p'>(&#160;)</span> const</span>
+<br/>
+<div id="c_642" style="display:none;">
+<span class='mngl'>_ZNK4Ogre4Font18getCharacterSpacerEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_643')">
+Font::setCharacterSpacer&#160;<span class='sym_p'><span>(&#160;uint <span class='color_p'>charSpacer</span></span>&#160;)</span></span>
+<br/>
+<div id="c_643" style="display:none;">
+<span class='mngl'>_ZN4Ogre4Font18setCharacterSpacerEj</span>
+<br/>
+<br/>
+</div>
+
+<br/>
+<span class='h_name'>OgreFontManager.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_644')">
+FontManager::createImpl&#160;<span class='sym_p'><span>(&#160;String const&amp; <span class='color_p'>name</span></span>, <span>unsigned long long <span class='color_p'>handle</span></span>, <span>String const&amp; <span class='color_p'>group</span></span>, <span>bool <span class='color_p'>isManual</span></span>, <span>ManualResourceLoader* <span class='color_p'>loader</span></span>, <span>NameValuePairList const* <span class='color_p'>params</span></span>&#160;)</span></span>
+<br/>
+<div id="c_644" style="display:none;">
+<span class='mngl'>_ZN4Ogre11FontManager10createImplERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEEyS8_bPNS_20ManualResourceLoaderEPKSt3mapIS6_S6_St4lessIS6_ESaISt4pairIS7_S6_EEE</span>
+<br/>
+<br/>
+</div>
+
+<br/>
+<span class='h_name'>OgreOverlayElement.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_645')">
+OverlayElement::getCaption&#160;<span class='sym_p'>(&#160;)</span> const</span>
+<br/>
+<div id="c_645" style="display:none;">
+<span class='mngl'>_ZNK4Ogre14OverlayElement10getCaptionEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_646')">
+OverlayElement::getHorizontalAlignment&#160;<span class='sym_p'>(&#160;)</span> const</span>
+<br/>
+<div id="c_646" style="display:none;">
+<span class='mngl'>_ZNK4Ogre14OverlayElement22getHorizontalAlignmentEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_647')">
+OverlayElement::getMetricsMode&#160;<span class='sym_p'>(&#160;)</span> const</span>
+<br/>
+<div id="c_647" style="display:none;">
+<span class='mngl'>_ZNK4Ogre14OverlayElement14getMetricsModeEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_648')">
+OverlayElement::getParent&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_648" style="display:none;">
+<span class='mngl'>_ZN4Ogre14OverlayElement9getParentEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_649')">
+OverlayElement::getVerticalAlignment&#160;<span class='sym_p'>(&#160;)</span> const</span>
+<br/>
+<div id="c_649" style="display:none;">
+<span class='mngl'>_ZNK4Ogre14OverlayElement20getVerticalAlignmentEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_650')">
+OverlayElement::hide&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_650" style="display:none;">
+<span class='mngl'>_ZN4Ogre14OverlayElement4hideEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_651')">
+OverlayElement::msCaptionCmd <span class='attr'>[data]</span></span>
+<br/>
+<div id="c_651" style="display:none;">
+<span class='mngl'>_ZN4Ogre14OverlayElement12msCaptionCmdE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_652')">
+OverlayElement::msHeightCmd <span class='attr'>[data]</span></span>
+<br/>
+<div id="c_652" style="display:none;">
+<span class='mngl'>_ZN4Ogre14OverlayElement11msHeightCmdE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_653')">
+OverlayElement::msHorizontalAlignCmd <span class='attr'>[data]</span></span>
+<br/>
+<div id="c_653" style="display:none;">
+<span class='mngl'>_ZN4Ogre14OverlayElement20msHorizontalAlignCmdE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_654')">
+OverlayElement::msLeftCmd <span class='attr'>[data]</span></span>
+<br/>
+<div id="c_654" style="display:none;">
+<span class='mngl'>_ZN4Ogre14OverlayElement9msLeftCmdE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_655')">
+OverlayElement::msMaterialCmd <span class='attr'>[data]</span></span>
+<br/>
+<div id="c_655" style="display:none;">
+<span class='mngl'>_ZN4Ogre14OverlayElement13msMaterialCmdE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_656')">
+OverlayElement::msMetricsModeCmd <span class='attr'>[data]</span></span>
+<br/>
+<div id="c_656" style="display:none;">
+<span class='mngl'>_ZN4Ogre14OverlayElement16msMetricsModeCmdE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_657')">
+OverlayElement::msTopCmd <span class='attr'>[data]</span></span>
+<br/>
+<div id="c_657" style="display:none;">
+<span class='mngl'>_ZN4Ogre14OverlayElement8msTopCmdE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_658')">
+OverlayElement::msVerticalAlignCmd <span class='attr'>[data]</span></span>
+<br/>
+<div id="c_658" style="display:none;">
+<span class='mngl'>_ZN4Ogre14OverlayElement18msVerticalAlignCmdE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_659')">
+OverlayElement::msVisibleCmd <span class='attr'>[data]</span></span>
+<br/>
+<div id="c_659" style="display:none;">
+<span class='mngl'>_ZN4Ogre14OverlayElement12msVisibleCmdE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_660')">
+OverlayElement::msWidthCmd <span class='attr'>[data]</span></span>
+<br/>
+<div id="c_660" style="display:none;">
+<span class='mngl'>_ZN4Ogre14OverlayElement10msWidthCmdE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_661')">
+OverlayElement::setEnabled&#160;<span class='sym_p'><span>(&#160;bool <span class='color_p'>b</span></span>&#160;)</span></span>
+<br/>
+<div id="c_661" style="display:none;">
+<span class='mngl'>_ZN4Ogre14OverlayElement10setEnabledEb</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_662')">
+OverlayElement::show&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_662" style="display:none;">
+<span class='mngl'>_ZN4Ogre14OverlayElement4showEv</span>
+<br/>
+<br/>
+</div>
+
+<br/>
+<span class='h_name'>OgreOverlayElementCommands.h</span><br/>
+<span class='ns'>namespace <b>Ogre::OverlayElementCommands</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_663')">
+CmdCaption::doGet&#160;<span class='sym_p'><span>(&#160;void const* <span class='color_p'>target</span></span>&#160;)</span> const</span>
+<br/>
+<div id="c_663" style="display:none;">
+<span class='mngl'>_ZNK4Ogre22OverlayElementCommands10CmdCaption5doGetB5cxx11EPKv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_664')">
+CmdCaption::doSet&#160;<span class='sym_p'><span>(&#160;void* <span class='color_p'>target</span></span>, <span>Ogre::String const&amp; <span class='color_p'>val</span></span>&#160;)</span></span>
+<br/>
+<div id="c_664" style="display:none;">
+<span class='mngl'>_ZN4Ogre22OverlayElementCommands10CmdCaption5doSetEPvRKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_665')">
+CmdCaption::~CmdCaption <span class='attr'>[D0]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_665" style="display:none;">
+<span class='mngl'>_ZN4Ogre22OverlayElementCommands10CmdCaptionD0Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_666')">
+CmdCaption::~CmdCaption <span class='attr'>[D1]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_666" style="display:none;">
+<span class='mngl'>_ZN4Ogre22OverlayElementCommands10CmdCaptionD1Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_667')">
+CmdCaption::~CmdCaption <span class='attr'>[D2]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_667" style="display:none;">
+<span class='mngl'>_ZN4Ogre22OverlayElementCommands10CmdCaptionD2Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_668')">
+CmdHeight::doGet&#160;<span class='sym_p'><span>(&#160;void const* <span class='color_p'>target</span></span>&#160;)</span> const</span>
+<br/>
+<div id="c_668" style="display:none;">
+<span class='mngl'>_ZNK4Ogre22OverlayElementCommands9CmdHeight5doGetB5cxx11EPKv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_669')">
+CmdHeight::doSet&#160;<span class='sym_p'><span>(&#160;void* <span class='color_p'>target</span></span>, <span>Ogre::String const&amp; <span class='color_p'>val</span></span>&#160;)</span></span>
+<br/>
+<div id="c_669" style="display:none;">
+<span class='mngl'>_ZN4Ogre22OverlayElementCommands9CmdHeight5doSetEPvRKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_670')">
+CmdHeight::~CmdHeight <span class='attr'>[D0]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_670" style="display:none;">
+<span class='mngl'>_ZN4Ogre22OverlayElementCommands9CmdHeightD0Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_671')">
+CmdHeight::~CmdHeight <span class='attr'>[D1]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_671" style="display:none;">
+<span class='mngl'>_ZN4Ogre22OverlayElementCommands9CmdHeightD1Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_672')">
+CmdHeight::~CmdHeight <span class='attr'>[D2]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_672" style="display:none;">
+<span class='mngl'>_ZN4Ogre22OverlayElementCommands9CmdHeightD2Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_673')">
+CmdHorizontalAlign::doGet&#160;<span class='sym_p'><span>(&#160;void const* <span class='color_p'>target</span></span>&#160;)</span> const</span>
+<br/>
+<div id="c_673" style="display:none;">
+<span class='mngl'>_ZNK4Ogre22OverlayElementCommands18CmdHorizontalAlign5doGetB5cxx11EPKv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_674')">
+CmdHorizontalAlign::doSet&#160;<span class='sym_p'><span>(&#160;void* <span class='color_p'>target</span></span>, <span>Ogre::String const&amp; <span class='color_p'>val</span></span>&#160;)</span></span>
+<br/>
+<div id="c_674" style="display:none;">
+<span class='mngl'>_ZN4Ogre22OverlayElementCommands18CmdHorizontalAlign5doSetEPvRKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_675')">
+CmdHorizontalAlign::~CmdHorizontalAlign <span class='attr'>[D0]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_675" style="display:none;">
+<span class='mngl'>_ZN4Ogre22OverlayElementCommands18CmdHorizontalAlignD0Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_676')">
+CmdHorizontalAlign::~CmdHorizontalAlign <span class='attr'>[D1]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_676" style="display:none;">
+<span class='mngl'>_ZN4Ogre22OverlayElementCommands18CmdHorizontalAlignD1Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_677')">
+CmdHorizontalAlign::~CmdHorizontalAlign <span class='attr'>[D2]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_677" style="display:none;">
+<span class='mngl'>_ZN4Ogre22OverlayElementCommands18CmdHorizontalAlignD2Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_678')">
+CmdLeft::doGet&#160;<span class='sym_p'><span>(&#160;void const* <span class='color_p'>target</span></span>&#160;)</span> const</span>
+<br/>
+<div id="c_678" style="display:none;">
+<span class='mngl'>_ZNK4Ogre22OverlayElementCommands7CmdLeft5doGetB5cxx11EPKv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_679')">
+CmdLeft::doSet&#160;<span class='sym_p'><span>(&#160;void* <span class='color_p'>target</span></span>, <span>Ogre::String const&amp; <span class='color_p'>val</span></span>&#160;)</span></span>
+<br/>
+<div id="c_679" style="display:none;">
+<span class='mngl'>_ZN4Ogre22OverlayElementCommands7CmdLeft5doSetEPvRKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_680')">
+CmdLeft::~CmdLeft <span class='attr'>[D0]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_680" style="display:none;">
+<span class='mngl'>_ZN4Ogre22OverlayElementCommands7CmdLeftD0Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_681')">
+CmdLeft::~CmdLeft <span class='attr'>[D1]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_681" style="display:none;">
+<span class='mngl'>_ZN4Ogre22OverlayElementCommands7CmdLeftD1Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_682')">
+CmdLeft::~CmdLeft <span class='attr'>[D2]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_682" style="display:none;">
+<span class='mngl'>_ZN4Ogre22OverlayElementCommands7CmdLeftD2Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_683')">
+CmdMaterial::doGet&#160;<span class='sym_p'><span>(&#160;void const* <span class='color_p'>target</span></span>&#160;)</span> const</span>
+<br/>
+<div id="c_683" style="display:none;">
+<span class='mngl'>_ZNK4Ogre22OverlayElementCommands11CmdMaterial5doGetB5cxx11EPKv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_684')">
+CmdMaterial::doSet&#160;<span class='sym_p'><span>(&#160;void* <span class='color_p'>target</span></span>, <span>Ogre::String const&amp; <span class='color_p'>val</span></span>&#160;)</span></span>
+<br/>
+<div id="c_684" style="display:none;">
+<span class='mngl'>_ZN4Ogre22OverlayElementCommands11CmdMaterial5doSetEPvRKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_685')">
+CmdMaterial::~CmdMaterial <span class='attr'>[D0]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_685" style="display:none;">
+<span class='mngl'>_ZN4Ogre22OverlayElementCommands11CmdMaterialD0Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_686')">
+CmdMaterial::~CmdMaterial <span class='attr'>[D1]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_686" style="display:none;">
+<span class='mngl'>_ZN4Ogre22OverlayElementCommands11CmdMaterialD1Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_687')">
+CmdMaterial::~CmdMaterial <span class='attr'>[D2]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_687" style="display:none;">
+<span class='mngl'>_ZN4Ogre22OverlayElementCommands11CmdMaterialD2Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_688')">
+CmdMetricsMode::doGet&#160;<span class='sym_p'><span>(&#160;void const* <span class='color_p'>target</span></span>&#160;)</span> const</span>
+<br/>
+<div id="c_688" style="display:none;">
+<span class='mngl'>_ZNK4Ogre22OverlayElementCommands14CmdMetricsMode5doGetB5cxx11EPKv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_689')">
+CmdMetricsMode::doSet&#160;<span class='sym_p'><span>(&#160;void* <span class='color_p'>target</span></span>, <span>Ogre::String const&amp; <span class='color_p'>val</span></span>&#160;)</span></span>
+<br/>
+<div id="c_689" style="display:none;">
+<span class='mngl'>_ZN4Ogre22OverlayElementCommands14CmdMetricsMode5doSetEPvRKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_690')">
+CmdMetricsMode::~CmdMetricsMode <span class='attr'>[D0]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_690" style="display:none;">
+<span class='mngl'>_ZN4Ogre22OverlayElementCommands14CmdMetricsModeD0Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_691')">
+CmdMetricsMode::~CmdMetricsMode <span class='attr'>[D1]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_691" style="display:none;">
+<span class='mngl'>_ZN4Ogre22OverlayElementCommands14CmdMetricsModeD1Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_692')">
+CmdMetricsMode::~CmdMetricsMode <span class='attr'>[D2]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_692" style="display:none;">
+<span class='mngl'>_ZN4Ogre22OverlayElementCommands14CmdMetricsModeD2Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_693')">
+CmdTop::doGet&#160;<span class='sym_p'><span>(&#160;void const* <span class='color_p'>target</span></span>&#160;)</span> const</span>
+<br/>
+<div id="c_693" style="display:none;">
+<span class='mngl'>_ZNK4Ogre22OverlayElementCommands6CmdTop5doGetB5cxx11EPKv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_694')">
+CmdTop::doSet&#160;<span class='sym_p'><span>(&#160;void* <span class='color_p'>target</span></span>, <span>Ogre::String const&amp; <span class='color_p'>val</span></span>&#160;)</span></span>
+<br/>
+<div id="c_694" style="display:none;">
+<span class='mngl'>_ZN4Ogre22OverlayElementCommands6CmdTop5doSetEPvRKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_695')">
+CmdTop::~CmdTop <span class='attr'>[D0]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_695" style="display:none;">
+<span class='mngl'>_ZN4Ogre22OverlayElementCommands6CmdTopD0Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_696')">
+CmdTop::~CmdTop <span class='attr'>[D1]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_696" style="display:none;">
+<span class='mngl'>_ZN4Ogre22OverlayElementCommands6CmdTopD1Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_697')">
+CmdTop::~CmdTop <span class='attr'>[D2]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_697" style="display:none;">
+<span class='mngl'>_ZN4Ogre22OverlayElementCommands6CmdTopD2Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_698')">
+CmdVerticalAlign::doGet&#160;<span class='sym_p'><span>(&#160;void const* <span class='color_p'>target</span></span>&#160;)</span> const</span>
+<br/>
+<div id="c_698" style="display:none;">
+<span class='mngl'>_ZNK4Ogre22OverlayElementCommands16CmdVerticalAlign5doGetB5cxx11EPKv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_699')">
+CmdVerticalAlign::doSet&#160;<span class='sym_p'><span>(&#160;void* <span class='color_p'>target</span></span>, <span>Ogre::String const&amp; <span class='color_p'>val</span></span>&#160;)</span></span>
+<br/>
+<div id="c_699" style="display:none;">
+<span class='mngl'>_ZN4Ogre22OverlayElementCommands16CmdVerticalAlign5doSetEPvRKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_700')">
+CmdVerticalAlign::~CmdVerticalAlign <span class='attr'>[D0]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_700" style="display:none;">
+<span class='mngl'>_ZN4Ogre22OverlayElementCommands16CmdVerticalAlignD0Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_701')">
+CmdVerticalAlign::~CmdVerticalAlign <span class='attr'>[D1]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_701" style="display:none;">
+<span class='mngl'>_ZN4Ogre22OverlayElementCommands16CmdVerticalAlignD1Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_702')">
+CmdVerticalAlign::~CmdVerticalAlign <span class='attr'>[D2]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_702" style="display:none;">
+<span class='mngl'>_ZN4Ogre22OverlayElementCommands16CmdVerticalAlignD2Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_703')">
+CmdVisible::doGet&#160;<span class='sym_p'><span>(&#160;void const* <span class='color_p'>target</span></span>&#160;)</span> const</span>
+<br/>
+<div id="c_703" style="display:none;">
+<span class='mngl'>_ZNK4Ogre22OverlayElementCommands10CmdVisible5doGetB5cxx11EPKv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_704')">
+CmdVisible::doSet&#160;<span class='sym_p'><span>(&#160;void* <span class='color_p'>target</span></span>, <span>Ogre::String const&amp; <span class='color_p'>val</span></span>&#160;)</span></span>
+<br/>
+<div id="c_704" style="display:none;">
+<span class='mngl'>_ZN4Ogre22OverlayElementCommands10CmdVisible5doSetEPvRKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_705')">
+CmdVisible::~CmdVisible <span class='attr'>[D0]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_705" style="display:none;">
+<span class='mngl'>_ZN4Ogre22OverlayElementCommands10CmdVisibleD0Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_706')">
+CmdVisible::~CmdVisible <span class='attr'>[D1]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_706" style="display:none;">
+<span class='mngl'>_ZN4Ogre22OverlayElementCommands10CmdVisibleD1Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_707')">
+CmdVisible::~CmdVisible <span class='attr'>[D2]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_707" style="display:none;">
+<span class='mngl'>_ZN4Ogre22OverlayElementCommands10CmdVisibleD2Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_708')">
+CmdWidth::doGet&#160;<span class='sym_p'><span>(&#160;void const* <span class='color_p'>target</span></span>&#160;)</span> const</span>
+<br/>
+<div id="c_708" style="display:none;">
+<span class='mngl'>_ZNK4Ogre22OverlayElementCommands8CmdWidth5doGetB5cxx11EPKv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_709')">
+CmdWidth::doSet&#160;<span class='sym_p'><span>(&#160;void* <span class='color_p'>target</span></span>, <span>Ogre::String const&amp; <span class='color_p'>val</span></span>&#160;)</span></span>
+<br/>
+<div id="c_709" style="display:none;">
+<span class='mngl'>_ZN4Ogre22OverlayElementCommands8CmdWidth5doSetEPvRKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_710')">
+CmdWidth::~CmdWidth <span class='attr'>[D0]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_710" style="display:none;">
+<span class='mngl'>_ZN4Ogre22OverlayElementCommands8CmdWidthD0Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_711')">
+CmdWidth::~CmdWidth <span class='attr'>[D1]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_711" style="display:none;">
+<span class='mngl'>_ZN4Ogre22OverlayElementCommands8CmdWidthD1Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_712')">
+CmdWidth::~CmdWidth <span class='attr'>[D2]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_712" style="display:none;">
+<span class='mngl'>_ZN4Ogre22OverlayElementCommands8CmdWidthD2Ev</span>
+<br/>
+<br/>
+</div>
+
+<br/>
+<span class='h_name'>OgreOverlayManager.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_713')">
+OverlayManager::parseAttrib&#160;<span class='sym_p'><span>(&#160;String const&amp; <span class='color_p'>line</span></span>, <span>Overlay* <span class='color_p'>pOverlay</span></span>&#160;)</span></span>
+<br/>
+<div id="c_713" style="display:none;">
+<span class='mngl'>_ZN4Ogre14OverlayManager11parseAttribERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEEPNS_7OverlayE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_714')">
+OverlayManager::parseChildren&#160;<span class='sym_p'><span>(&#160;DataStreamPtr&amp; <span class='color_p'>stream</span></span>, <span>String const&amp; <span class='color_p'>line</span></span>, <span>int&amp; <span class='color_p'>l</span></span>, <span>Overlay* <span class='color_p'>pOverlay</span></span>, <span>bool <span class='color_p'>isATemplate</span></span>, <span>OverlayContainer* <span class='color_p'>parent</span></span>&#160;)</span></span>
+<br/>
+<div id="c_714" style="display:none;">
+<span class='mngl'>_ZN4Ogre14OverlayManager13parseChildrenERNS_9SharedPtrINS_10DataStreamEEERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEERiPNS_7OverlayEbPNS_16OverlayContainerE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_715')">
+OverlayManager::parseElementAttrib&#160;<span class='sym_p'><span>(&#160;String const&amp; <span class='color_p'>line</span></span>, <span>Overlay* <span class='color_p'>pOverlay</span></span>, <span>OverlayElement* <span class='color_p'>pElement</span></span>&#160;)</span></span>
+<br/>
+<div id="c_715" style="display:none;">
+<span class='mngl'>_ZN4Ogre14OverlayManager18parseElementAttribERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEEPNS_7OverlayEPNS_14OverlayElementE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_716')">
+OverlayManager::parseNewElement&#160;<span class='sym_p'><span>(&#160;DataStreamPtr&amp; <span class='color_p'>stream</span></span>, <span>int&amp; <span class='color_p'>l</span></span>, <span>String&amp; <span class='color_p'>elemType</span></span>, <span>String&amp; <span class='color_p'>elemName</span></span>, <span>Overlay* <span class='color_p'>pOverlay</span></span>, <span>bool <span class='color_p'>isATemplate</span></span>, <span>String <span class='color_p'>templateName</span></span>, <span>OverlayContainer* <span class='color_p'>container</span></span>&#160;)</span></span>
+<br/>
+<div id="c_716" style="display:none;">
+<span class='mngl'>_ZN4Ogre14OverlayManager15parseNewElementERNS_9SharedPtrINS_10DataStreamEEERiRNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEESC_PNS_7OverlayEbSB_PNS_16OverlayContainerE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_717')">
+OverlayManager::skipToNextCloseBrace&#160;<span class='sym_p'><span>(&#160;DataStreamPtr&amp; <span class='color_p'>stream</span></span>, <span>int&amp; <span class='color_p'>l</span></span>&#160;)</span></span>
+<br/>
+<div id="c_717" style="display:none;">
+<span class='mngl'>_ZN4Ogre14OverlayManager20skipToNextCloseBraceERNS_9SharedPtrINS_10DataStreamEEERi</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_718')">
+OverlayManager::skipToNextOpenBrace&#160;<span class='sym_p'><span>(&#160;DataStreamPtr&amp; <span class='color_p'>stream</span></span>, <span>int&amp; <span class='color_p'>l</span></span>&#160;)</span></span>
+<br/>
+<div id="c_718" style="display:none;">
+<span class='mngl'>_ZN4Ogre14OverlayManager19skipToNextOpenBraceERNS_9SharedPtrINS_10DataStreamEEERi</span>
+<br/>
+<br/>
+</div>
+
+<br/>
+<a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='High_Risk_Problems'></a><a name='Type_Problems_High'></a>
+<h2>Problems with Data Types, High Severity <span class='failed'>&nbsp;8&nbsp;</span></h2><hr/>
+<span class='h_name'>OgreFont.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_719')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> Font <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_719" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Field <b>mCharacterSpacer</b> has been removed from this type.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>Font</b>' has no member named '<b>mCharacterSpacer</b>'.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_720')">
+[+] affected symbols: 15 (2.4%)</span>
+<div id="c_720" style="display:none;">
+<div class='affected'><span class='iname_a'>Font::unloadImpl&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Font&#39; class.</div>
+<span class='iname_a'>Font::loadResource&#160;<span class='sym_p'><span>(&#160;Resource* <i>res</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Font&#39; class.</div>
+<span class='iname_a'>Font::setTrueTypeSize&#160;<span class='sym_p'><span>(&#160;Real <i>ttfSize</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Font&#39; class.</div>
+<span class='iname_a'>Font::createTextureFromFont&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Font&#39; class.</div>
+<span class='iname_a'>Font::setTrueTypeResolution&#160;<span class='sym_p'><span>(&#160;uint <i>ttfResolution</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Font&#39; class.</div>
+<span class='iname_a'>Font::setType&#160;<span class='sym_p'><span>(&#160;enum FontType <i>ftype</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Font&#39; class.</div>
+<span class='iname_a'>Font::loadImpl&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Font&#39; class.</div>
+<span class='iname_a'>Font::setSource&#160;<span class='sym_p'><span>(&#160;String const&amp; <i>source</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Font&#39; class.</div>
+<span class='iname_a'>Font::~Font&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This destructor is from &#39;Font&#39; class.</div>
+<span class='iname_a'>Font::getGlyphInfo&#160;<span class='sym_p'><span>(&#160;Font::CodePoint <i>id</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Font&#39; class.</div>
+ <b>...</b>
+<br/>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<span class='h_name'>OgreProfiler.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_721')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> ProfileSessionListener <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_721" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Field <b>mDisplayMode</b> has been removed from this type.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>ProfileSessionListener</b>' has no member named '<b>mDisplayMode</b>'.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_722')">
+[+] affected symbols: 2 (0.3%)</span>
+<div id="c_722" style="display:none;">
+<div class='affected'><span class='iname_a'>ProfileSessionListener::ProfileSessionListener&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This constructor is from &#39;ProfileSessionListener&#39; class.</div>
+<span class='iname_a'>ProfileSessionListener::~ProfileSessionListener&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This destructor is from &#39;ProfileSessionListener&#39; class.</div>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<span class='h_name'>OgreRenderable.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_723')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> Renderable <span class='failed'>&nbsp;5&nbsp;</span></span>
+<br/>
+<div id="c_723" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Pure virtual method <span class='iname_b'>getRenderOperation&#160;<span class='sym_pd'><span>(&#160;RenderOperation&amp;</span>&#160;)</span></span> has been removed from this class.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>Pure virtual method <span class='iname_b'>getMaterial&#160;<span class='sym_pd'>(&#160;)</span> const</span> has been removed from this class.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>3</th>
+<td>Pure virtual method <span class='iname_b'>getWorldTransforms&#160;<span class='sym_pd'><span>(&#160;Matrix4*</span>&#160;)</span> const</span> has been removed from this class.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>4</th>
+<td>Pure virtual method <span class='iname_b'>getSquaredViewDepth&#160;<span class='sym_pd'><span>(&#160;Camera const*</span>&#160;)</span> const</span> has been removed from this class.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>5</th>
+<td>Pure virtual method <span class='iname_b'>getLights&#160;<span class='sym_pd'>(&#160;)</span> const</span> has been removed from this class.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_724')">
+[+] affected symbols: 2 (0.3%)</span>
+<div id="c_724" style="display:none;">
+<div class='affected'><span class='iname_a'>Renderable::Renderable&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This constructor is from &#39;Renderable&#39; class.</div>
+<span class='iname_a'>Renderable::~Renderable&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This destructor is from &#39;Renderable&#39; class.</div>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<span class='h_name'>OgreTextAreaOverlayElement.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_725')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> TextAreaOverlayElement <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_725" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Field <b>mSpaceWidthOverridden</b> has been removed from this type.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>TextAreaOverlayElement</b>' has no member named '<b>mSpaceWidthOverridden</b>'.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_726')">
+[+] affected symbols: 28 (4.4%)</span>
+<div id="c_726" style="display:none;">
+<div class='affected'><span class='iname_a'>TextAreaOverlayElement::initialise&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;TextAreaOverlayElement&#39; class.</div>
+<span class='iname_a'>TextAreaOverlayElement::setCaption&#160;<span class='sym_p'><span>(&#160;DisplayString const&amp; <i>caption</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;TextAreaOverlayElement&#39; class.</div>
+<span class='iname_a'>TextAreaOverlayElement::setFontName&#160;<span class='sym_p'><span>(&#160;String const&amp; <i>font</i></span>, <span>String const&amp; <i>group</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;TextAreaOverlayElement&#39; class.</div>
+<span class='iname_a'>TextAreaOverlayElement::setColourTop&#160;<span class='sym_p'><span>(&#160;ColourValue const&amp; <i>col</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;TextAreaOverlayElement&#39; class.</div>
+<span class='iname_a'>TextAreaOverlayElement::setCharHeight&#160;<span class='sym_p'><span>(&#160;Real <i>height</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;TextAreaOverlayElement&#39; class.</div>
+<span class='iname_a'>TextAreaOverlayElement::setSpaceWidth&#160;<span class='sym_p'><span>(&#160;Real <i>width</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;TextAreaOverlayElement&#39; class.</div>
+<span class='iname_a'>TextAreaOverlayElement::updateColours&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;TextAreaOverlayElement&#39; class.</div>
+<span class='iname_a'>TextAreaOverlayElement::setMetricsMode&#160;<span class='sym_p'><span>(&#160;enum GuiMetricsMode <i>gmm</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;TextAreaOverlayElement&#39; class.</div>
+<span class='iname_a'>TextAreaOverlayElement::setColourBottom&#160;<span class='sym_p'><span>(&#160;ColourValue const&amp; <i>col</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;TextAreaOverlayElement&#39; class.</div>
+<span class='iname_a'>TextAreaOverlayElement::addBaseParameters&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;TextAreaOverlayElement&#39; class.</div>
+ <b>...</b>
+<br/>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='Medium_Risk_Problems'></a><a name='Symbol_Problems_Medium'></a><a name='Interface_Problems_Medium'></a>
+<h2>Problems with Symbols, Medium Severity <span class='failed'>&nbsp;3&nbsp;</span></h2><hr/>
+<span class='h_name'>OgreFont.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_727')">
+<span class='ext'>[+]</span> Font::Font <span class='attr'>[C1]</span>&#160;<span class='sym_p'><span>(&#160;ResourceManager* <span class='color_p'>creator</span></span>, <span>String const&amp; <span class='color_p'>name</span></span>, <span>unsigned long long <span class='color_p'>handle</span></span>, <span>String const&amp; <span class='color_p'>group</span></span>, <span>bool <span class='color_p'>isManual</span></span>, <span>ManualResourceLoader* <span class='color_p'>loader</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_727" style="display:none;">
+
+
+<span class='new_sign_lbl'>&#8675;</span>
+<br/>
+<span class='new_sign'>Font::Font <span class='attr'>[C1]</span>&#160;<span class='sym_p'><span>(&#160;ResourceManager* <span class='color_p'>creator</span></span>, <span>String const&amp; <span class='color_p'>name</span></span>, <span>unsigned long <span class='color_p'>handle</span></span>, <span>String const&amp; <span class='color_p'>group</span></span>, <span>bool <span class='color_p'>isManual</span></span>, <span>ManualResourceLoader* <span class='color_p'>loader</span></span>&#160;)</span></span><br/>
+<span class='mngl pleft'>_ZN4Ogre4FontC1EPNS_15ResourceManagerERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEEySA_bPNS_20ManualResourceLoaderE</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>Parameters list has been changed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+</table>
+<br/>
+</div>
+<span class="section" onclick="javascript:showContent(this, 'c_728')">
+<span class='ext'>[+]</span> Font::Font <span class='attr'>[C2]</span>&#160;<span class='sym_p'><span>(&#160;ResourceManager* <span class='color_p'>creator</span></span>, <span>String const&amp; <span class='color_p'>name</span></span>, <span>unsigned long long <span class='color_p'>handle</span></span>, <span>String const&amp; <span class='color_p'>group</span></span>, <span>bool <span class='color_p'>isManual</span></span>, <span>ManualResourceLoader* <span class='color_p'>loader</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_728" style="display:none;">
+
+
+<span class='new_sign_lbl'>&#8675;</span>
+<br/>
+<span class='new_sign'>Font::Font <span class='attr'>[C2]</span>&#160;<span class='sym_p'><span>(&#160;ResourceManager* <span class='color_p'>creator</span></span>, <span>String const&amp; <span class='color_p'>name</span></span>, <span>unsigned long <span class='color_p'>handle</span></span>, <span>String const&amp; <span class='color_p'>group</span></span>, <span>bool <span class='color_p'>isManual</span></span>, <span>ManualResourceLoader* <span class='color_p'>loader</span></span>&#160;)</span></span><br/>
+<span class='mngl pleft'>_ZN4Ogre4FontC2EPNS_15ResourceManagerERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEEySA_bPNS_20ManualResourceLoaderE</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>Parameters list has been changed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+</table>
+<br/>
+</div>
+<br/>
+<span class='h_name'>OgreFontManager.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_729')">
+<span class='ext'>[+]</span> FontManager::createImpl&#160;<span class='sym_p'><span>(&#160;String const&amp; <span class='color_p'>name</span></span>, <span>unsigned long long <span class='color_p'>handle</span></span>, <span>String const&amp; <span class='color_p'>group</span></span>, <span>bool <span class='color_p'>isManual</span></span>, <span>ManualResourceLoader* <span class='color_p'>loader</span></span>, <span>NameValuePairList const* <span class='color_p'>params</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_729" style="display:none;">
+
+
+<span class='new_sign_lbl'>&#8675;</span>
+<br/>
+<span class='new_sign'>FontManager::createImpl&#160;<span class='sym_p'><span>(&#160;String const&amp; <span class='color_p'>name</span></span>, <span>unsigned long <span class='color_p'>handle</span></span>, <span>String const&amp; <span class='color_p'>group</span></span>, <span>bool <span class='color_p'>isManual</span></span>, <span>ManualResourceLoader* <span class='color_p'>loader</span></span>, <span>NameValuePairList const* <span class='color_p'>params</span></span>&#160;)</span></span><br/>
+<span class='mngl pleft'>_ZN4Ogre11FontManager10createImplERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEEyS8_bPNS_20ManualResourceLoaderEPKSt3mapIS6_S6_St4lessIS6_ESaISt4pairIS7_S6_EEE</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>Parameters list has been changed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+</table>
+<br/>
+</div>
+<br/>
+<a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='Low_Risk_Problems'></a><a name='Type_Problems_Low'></a>
+<h2>Problems with Data Types, Low Severity <span class='warning'>&nbsp;3&nbsp;</span></h2><hr/>
+<span class='h_name'>OgreOverlayManager.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_730')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> OverlayManager <span class='warning'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_730" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Field <b>mPixelRatio</b> has been added to this type.</td>
+<td>This field will not be initialized or used by old client applications.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_731')">
+[+] affected symbols: 33 (5.2%)</span>
+<div id="c_731" style="display:none;">
+<div class='affected'><span class='iname_a'>OverlayManager::destroyAll&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;OverlayManager&#39; class.</div>
+<span class='iname_a'>OverlayManager::parseScript&#160;<span class='sym_p'><span>(&#160;DataStreamPtr&amp; <i>stream</i></span>, <span>String const&amp; <i>groupName</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;OverlayManager&#39; class.</div>
+<span class='iname_a'>OverlayManager::getElementMap&#160;<span class='sym_p'><span>(&#160;bool <i>isATemplate</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;OverlayManager&#39; class.</div>
+<span class='iname_a'>OverlayManager::getSingletonPtr&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>Return value (pointer) has base type &#39;OverlayManager&#39;.</div>
+<span class='iname_a'>OverlayManager::getOverlayElement&#160;<span class='sym_p'><span>(&#160;String const&amp; <i>name</i></span>, <span>bool <i>isATemplate</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;OverlayManager&#39; class.</div>
+<span class='iname_a'>OverlayManager::hasOverlayElement&#160;<span class='sym_p'><span>(&#160;String const&amp; <i>name</i></span>, <span>bool <i>isATemplate</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;OverlayManager&#39; class.</div>
+<span class='iname_a'>OverlayManager::getOverlayIterator&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;OverlayManager&#39; class.</div>
+<span class='iname_a'>OverlayManager::destroyOverlayElement&#160;<span class='sym_p'><span>(&#160;OverlayElement* <i>pInstance</i></span>, <span>bool <i>isATemplate</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;OverlayManager&#39; class.</div>
+<span class='iname_a'>OverlayManager::destroyOverlayElement&#160;<span class='sym_p'><span>(&#160;String const&amp; <i>instanceName</i></span>, <span>bool <i>isATemplate</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;OverlayManager&#39; class.</div>
+<span class='iname_a'>OverlayManager::getOverlayElementImpl&#160;<span class='sym_p'><span>(&#160;String const&amp; <i>name</i></span>, <span>OverlayManager::ElementMap&amp; <i>elementMap</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;OverlayManager&#39; class.</div>
+ <b>...</b>
+<br/>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<span class='h_name'>OgreOverlaySystem.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_732')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> OverlaySystem <span class='warning'>&nbsp;2&nbsp;</span></span>
+<br/>
+<div id="c_732" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Base class <b>Singleton&lt;OverlaySystem&gt;</b> has been added.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>Base class <b>AllocatedObject&lt;0&gt;</b> has been removed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_733')">
+[+] affected symbols: 4 (0.6%)</span>
+<div id="c_733" style="display:none;">
+<div class='affected'><span class='iname_a'>OverlaySystem::eventOccurred&#160;<span class='sym_p'><span>(&#160;String const&amp; <i>eventName</i></span>, <span>NameValuePairList const* <i>parameters</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;OverlaySystem&#39; class.</div>
+<span class='iname_a'>OverlaySystem::renderQueueStarted&#160;<span class='sym_p'><span>(&#160;uint8 <i>queueGroupId</i></span>, <span>String const&amp; <i>invocation</i></span>, <span>bool&amp; <i>skipThisInvocation</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;OverlaySystem&#39; class.</div>
+<span class='iname_a'>OverlaySystem::OverlaySystem&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This constructor is from &#39;OverlaySystem&#39; class.</div>
+<span class='iname_a'>OverlaySystem::~OverlaySystem&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This destructor is from &#39;OverlaySystem&#39; class.</div>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='Headers'></a><h2>Header Files <span class='gray'>&nbsp;41&nbsp;</span></h2><hr/>
+<div class='h_list'>
+OgreAny.h<br/>
+OgreBorderPanelOverlayElement.h<br/>
+OgreColourValue.h<br/>
+OgreCommon.h<br/>
+OgreFont.h<br/>
+OgreFontManager.h<br/>
+OgreFrustum.h<br/>
+OgreHardwareVertexBuffer.h<br/>
+OgreIteratorWrapper.h<br/>
+OgreMath.h<br/>
+OgreMatrix4.h<br/>
+OgreMemoryAllocatorConfig.h<br/>
+OgreOverlay.h<br/>
+OgreOverlayContainer.h<br/>
+OgreOverlayElement.h<br/>
+OgreOverlayElementCommands.h<br/>
+OgreOverlayElementFactory.h<br/>
+OgreOverlayManager.h<br/>
+OgreOverlayProfileSessionListener.h<br/>
+OgreOverlaySystem.h<br/>
+OgrePanelOverlayElement.h<br/>
+OgrePlatform.h<br/>
+OgrePrerequisites.h<br/>
+OgreProfiler.h<br/>
+OgreRenderable.h<br/>
+OgreRenderOperation.h<br/>
+OgreRenderQueueListener.h<br/>
+OgreRenderSystem.h<br/>
+OgreResource.h<br/>
+OgreScriptCompiler.h<br/>
+OgreScriptLoader.h<br/>
+OgreScriptTranslator.h<br/>
+OgreSharedPtr.h<br/>
+OgreSingleton.h<br/>
+OgreStringInterface.h<br/>
+OgreStringVector.h<br/>
+OgreTextAreaOverlayElement.h<br/>
+OgreUserObjectBindings.h<br/>
+OgreUTFString.h<br/>
+OgreVector.h<br/>
+OgreVertexIndexData.h<br/>
+</div>
+<br/><a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='Sources'></a><h2>Source Files <span class='gray'>&nbsp;13&nbsp;</span></h2><hr/>
+<div class='h_list'>
+OgreBorderPanelOverlayElement.cpp<br/>
+OgreFont.cpp<br/>
+OgreFontManager.cpp<br/>
+OgreOverlay.cpp<br/>
+OgreOverlayContainer.cpp<br/>
+OgreOverlayElement.cpp<br/>
+OgreOverlayElementCommands.cpp<br/>
+OgreOverlayElementFactory.cpp<br/>
+OgreOverlayManager.cpp<br/>
+OgreOverlayProfileSessionListener.cpp<br/>
+OgreOverlaySystem.cpp<br/>
+OgrePanelOverlayElement.cpp<br/>
+OgreTextAreaOverlayElement.cpp<br/>
+</div>
+<br/><a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='Libs'></a><h2>Objects <span class='gray'>&nbsp;1&nbsp;</span></h2><hr/>
+<div class='lib_list'>
+libOgreOverlay.so.1.11.6<br/>
+</div>
+<br/><a class='top_ref' href='#Top'>to the top</a><br/>
+</div>
+<br/><br/><br/>
+<hr/>
+<div class='footer' align='right'><i>Generated by <a href='https://github.com/lvc/abi-compliance-checker'>ABI Compliance Checker</a> 2.3 &#160;</i>
+</div>
+<br/>
+
+</body></html>

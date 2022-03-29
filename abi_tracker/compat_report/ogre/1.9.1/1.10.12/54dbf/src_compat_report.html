@@ -1,0 +1,2184 @@
+<!-- verdict:incompatible;affected:7.4;added:32;removed:40;type_problems_high:10;type_problems_medium:1;type_problems_low:16;interface_problems_high:0;interface_problems_medium:10;interface_problems_low:1;changed_constants:0;type_changes_other:15;interface_changes_other:1;tool_version:2.3 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta name="keywords" content="libOgreTerrain, source compatibility, API, report" />
+<meta name="description" content="Source compatibility report for the libOgreTerrain object between 1.9.1 and 1.10.12 versions" />
+<title>libOgreTerrain: 1.9.1 to 1.10.12 source compatibility report</title>
+<style type="text/css">
+body {
+    font-family:Arial, sans-serif;
+    background-color:White;
+    color:Black;
+}
+hr {
+    color:Black;
+    background-color:Black;
+    height:1px;
+    border:0;
+}
+h1 {
+    margin-bottom:0px;
+    padding-bottom:0px;
+    font-size:1.625em;
+}
+h2 {
+    margin-bottom:0px;
+    padding-bottom:0px;
+    font-size:1.25em;
+    white-space:nowrap;
+}
+span.section {
+    font-weight:bold;
+    cursor:pointer;
+    color:#003E69;
+    white-space:nowrap;
+    margin-left:0.3125em;
+}
+span.new_sign {
+    font-weight:bold;
+    margin-left:1.65em;
+    color:#003E69;
+}
+span.new_sign_lbl {
+    margin-left:3em;
+    font-size:1em;
+    color:Black;
+}
+span:hover.section {
+    color:#336699;
+}
+span.sect_aff {
+    cursor:pointer;
+    padding-left:1.55em;
+    font-size:0.875em;
+    color:#cc3300;
+}
+span.sect_info {
+    cursor:pointer;
+    padding-left:1.55em;
+    font-size:0.875em;
+    color:Black;
+}
+span.ext {
+    font-weight:normal;
+}
+span.h_name {
+    color:#cc3300;
+    font-size:0.875em;
+    font-weight:bold;
+}
+div.h_list, div.lib_list {
+    font-size:0.94em;
+    padding-left:0.4em;
+}
+span.ns {
+    color:#408080;
+    font-size:0.94em;
+}
+span.lib_name {
+    color:Green;
+    font-size:0.875em;
+    font-weight:bold;
+}
+span.iname {
+    font-weight:bold;
+    color:#003E69;
+    margin-left:0.3125em;
+}
+span.iname_b {
+    font-weight:bold;
+}
+span.iname_a {
+    color:#333333;
+    font-weight:bold;
+    font-size:0.94em;
+}
+span.sym_p {
+    font-weight:normal;
+    white-space:normal;
+}
+span.sym_pd {
+    white-space:normal;
+}
+span.sym_p span, span.sym_pd span {
+    white-space:nowrap;
+}
+div.affect {
+    padding-left:1em;
+    padding-bottom:10px;
+    font-size:0.87em;
+    font-style:italic;
+    line-height:0.9em;
+}
+div.affected {
+    padding-left:1.9em;
+    padding-top:10px;
+}
+table.ptable {
+    border-collapse:collapse;
+    border:1px outset black;
+    margin-left:0.95em;
+    margin-top:3px;
+    margin-bottom:3px;
+    width:56.25em;
+}
+table.ptable td {
+    border:1px solid gray;
+    padding:3px;
+    font-size:0.875em;
+    text-align:left;
+    vertical-align:top;
+    max-width:28em;
+    word-wrap:break-word;
+}
+table.ptable th.pn {
+    width:2%;
+}
+table.ptable th.chg {
+    width:47%;
+}
+table.vtable {
+    border-collapse:collapse;
+    border:1px outset black;
+    margin-left:1.9em;
+    margin-top:0.7em;
+}
+table.vtable td {
+    border:1px solid gray;
+    padding:3px;
+    font-size:0.875em;
+    vertical-align:top;
+    max-width:450px;
+    word-wrap:break-word;
+}
+table.ptable th, table.vtable th {
+    background-color:#eeeeee;
+    font-weight:bold;
+    color:#333333;
+    font-family:Verdana, Arial;
+    font-size:0.875em;
+    border:1px solid gray;
+    text-align:center;
+    vertical-align:top;
+    white-space:nowrap;
+    padding:3px;
+}
+table.summary {
+    border-collapse:collapse;
+    border:1px outset black;
+}
+table.summary th {
+    background-color:#eeeeee;
+    font-weight:normal;
+    text-align:left;
+    font-size:0.94em;
+    white-space:nowrap;
+    border:1px inset gray;
+    padding:3px;
+}
+table.summary td {
+    text-align:right;
+    white-space:nowrap;
+    border:1px inset gray;
+    padding:3px 5px 3px 10px;
+}
+span.mngl {
+    padding-left:1em;
+    font-size:0.875em;
+    cursor:text;
+    color:#444444;
+    font-weight:bold;
+}
+span.pleft {
+    padding-left:2.5em;
+}
+span.sym_ver {
+    color:#333333;
+    white-space:nowrap;
+    font-family:"DejaVu Sans Mono", Monospace;
+}
+span.attr {
+    color:#333333;
+    font-weight:normal;
+}
+span.color_p {
+    font-style:italic;
+    color:Brown;
+}
+span.p {
+    font-style:italic;
+}
+span.fp {
+    font-style:italic;
+    background-color:#DCDCDC;
+}
+span.ttype {
+    font-weight:normal;
+}
+span.nowrap {
+    white-space:nowrap;
+}
+span.value {
+    font-weight:bold;
+}
+.passed {
+    background-color:#CCFFCC;
+    font-weight:normal;
+}
+.warning {
+    background-color:#F4F4AF;
+    font-weight:normal;
+}
+.failed {
+    background-color:#FFCCCC;
+    font-weight:normal;
+}
+.new {
+    background-color:#C6DEFF;
+    font-weight:normal;
+}
+.compatible {
+    background-color:#CCFFCC;
+    font-weight:normal;
+}
+.almost_compatible {
+    background-color:#FFDAA3;
+    font-weight:normal;
+}
+.incompatible {
+    background-color:#FFCCCC;
+    font-weight:normal;
+}
+.gray {
+    background-color:#DCDCDC;
+    font-weight:normal;
+}
+.top_ref {
+    font-size:0.69em;
+}
+.footer {
+    font-size:0.75em;
+}
+</style>
+<script type="text/javascript" language="JavaScript">
+<!--
+function showContent(header, id)
+{
+    e = document.getElementById(id);
+    if(e.style.display == 'none')
+    {
+        e.style.display = 'block';
+        e.style.visibility = 'visible';
+        header.innerHTML = header.innerHTML.replace(/\[[^0-9 ]\]/gi,"[&minus;]");
+    }
+    else
+    {
+        e.style.display = 'none';
+        e.style.visibility = 'hidden';
+        header.innerHTML = header.innerHTML.replace(/\[[^0-9 ]\]/gi,"[+]");
+    }
+}
+-->
+</script>
+</head>
+
+<body>
+<div><a name='Top'></a>
+<h1>Source compatibility report for the <span style='color:Blue;'>libOgreTerrain.so</span> object between <span style='color:Red;'>1.9.1</span> and <span style='color:Red;'>1.10.12</span> versions</h1>
+
+<h2>Test Info</h2><hr/>
+<table class='summary'>
+<tr><th>Module Name</th><td>libOgreTerrain</td></tr>
+<tr><th>Version #1</th><td>1.9.1</td></tr>
+<tr><th>Version #2</th><td>1.10.12</td></tr>
+<tr><th>Arch</th><td>x86_64</td></tr>
+</table>
+<h2>Test Results</h2><hr/>
+<table class='summary'><tr><th>Total Header Files</th><td><a href='#Headers' style='color:Blue;'>46</a></td></tr>
+<tr><th>Total Source Files</th><td><a href='#Sources' style='color:Blue;'>14</a></td></tr>
+<tr><th>Total Objects</th><td><a href='#Libs' style='color:Blue;'>1</a></td></tr>
+<tr><th>Total Symbols / Types</th><td>799 / 162</td></tr>
+<tr><th>Compatibility</th>
+<td class='warning'>92.6%</td>
+</tr>
+</table>
+<h2>Problem Summary</h2><hr/>
+<table class='summary'><tr><th></th><th style='text-align:center;'>Severity</th><th style='text-align:center;'>Count</th></tr><tr><th>Added Symbols</th><td>-</td><td class='new'><a href='#Added' style='color:Blue;'>32</a></td></tr>
+<tr><th>Removed Symbols</th><td>High</td><td class='failed'><a href='#Removed' style='color:Blue;'>40</a></td></tr>
+<tr><th rowspan='3'>Problems with<br/>Data Types</th><td>High</td><td class='failed'><a href='#Type_Problems_High' style='color:Blue;'>10</a></td></tr>
+<tr><td>Medium</td><td class='failed'><a href='#Type_Problems_Medium' style='color:Blue;'>1</a></td></tr>
+<tr><td>Low</td><td class='warning'><a href='#Type_Problems_Low' style='color:Blue;'>16</a></td></tr>
+<tr><th rowspan='3'>Problems with<br/>Symbols</th><td>High</td><td>0</td></tr>
+<tr><td>Medium</td><td class='failed'><a href='#Symbol_Problems_Medium' style='color:Blue;'>10</a></td></tr>
+<tr><td>Low</td><td class='warning'><a href='#Symbol_Problems_Low' style='color:Blue;'>1</a></td></tr>
+<tr><th>Problems with<br/>Constants</th><td>Low</td><td>0</td></tr>
+<tr><th>Other Changes<br/>in Data Types</th><td>-</td><td class='passed'><a href='#Other_Changes_In_Types' style='color:Blue;'>15</a></td></tr>
+<tr><th>Other Changes<br/>in Symbols</th><td>-</td><td class='passed'><a href='#Other_Changes_In_Symbols' style='color:Blue;'>1</a></td></tr>
+</table>
+
+<a name='Added'></a><h2>Added Symbols <span class='new'>&nbsp;32&nbsp;</span></h2><hr/>
+<span class='h_name'>OgreTerrain.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_168')">
+Terrain::_populateIndexBuffer&#160;<span class='sym_p'><span>(&#160;uint16* <span class='color_p'>pI</span></span>, <span>uint16 <span class='color_p'>batchSize</span></span>, <span>uint16 <span class='color_p'>vdatasize</span></span>, <span>uint16 <span class='color_p'>vertexIncrement</span></span>, <span>uint16 <span class='color_p'>xoffset</span></span>, <span>uint16 <span class='color_p'>yoffset</span></span>, <span>uint16 <span class='color_p'>numSkirtRowsCols</span></span>, <span>uint16 <span class='color_p'>skirtRowColSkip</span></span>&#160;)</span> <span class='attr'>[static]</span></span>
+<br/>
+<div id="c_168" style="display:none;">
+<span class='mngl'>_ZN4Ogre7Terrain20_populateIndexBufferEPtttttttt</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_169')">
+Terrain::DefaultGpuBufferAllocator::allocateVertexBuffers&#160;<span class='sym_p'><span>(&#160;Terrain* <span class='color_p'>forTerrain</span></span>, <span>size_t <span class='color_p'>numVertices</span></span>, <span>HardwareVertexBufferSharedPtr&amp; <span class='color_p'>destPos</span></span>, <span>HardwareVertexBufferSharedPtr&amp; <span class='color_p'>destDelta</span></span>&#160;)</span></span>
+<br/>
+<div id="c_169" style="display:none;">
+<span class='mngl'>_ZN4Ogre7Terrain25DefaultGpuBufferAllocator21allocateVertexBuffersEPS0_mRSt10shared_ptrINS_20HardwareVertexBufferEES6_</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_170')">
+Terrain::DefaultGpuBufferAllocator::freeVertexBuffers&#160;<span class='sym_p'><span>(&#160;HardwareVertexBufferSharedPtr const&amp; <span class='color_p'>posbuf</span></span>, <span>HardwareVertexBufferSharedPtr const&amp; <span class='color_p'>deltabuf</span></span>&#160;)</span></span>
+<br/>
+<div id="c_170" style="display:none;">
+<span class='mngl'>_ZN4Ogre7Terrain25DefaultGpuBufferAllocator17freeVertexBuffersERKSt10shared_ptrINS_20HardwareVertexBufferEES6_</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_171')">
+Terrain::DefaultGpuBufferAllocator::getVertexBuffer&#160;<span class='sym_p'><span>(&#160;list&lt;std::shared_ptr&lt;HardwareVertexBuffer&gt; &gt;::type&amp; <span class='color_p'>list</span></span>, <span>size_t <span class='color_p'>vertexSize</span></span>, <span>size_t <span class='color_p'>numVertices</span></span>&#160;)</span></span>
+<br/>
+<div id="c_171" style="display:none;">
+<span class='mngl'>_ZN4Ogre7Terrain25DefaultGpuBufferAllocator15getVertexBufferERNSt7__cxx114listISt10shared_ptrINS_20HardwareVertexBufferEESaIS6_EEEmm</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_172')">
+Terrain::prepare&#160;<span class='sym_p'><span>(&#160;std::shared_ptr&lt;DataStream&gt;&amp; <span class='color_p'>stream</span></span>&#160;)</span></span>
+<br/>
+<div id="c_172" style="display:none;">
+<span class='mngl'>_ZN4Ogre7Terrain7prepareERSt10shared_ptrINS_10DataStreamEE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_173')">
+TerrainGlobalOptions::setDefaultMaterialGenerator&#160;<span class='sym_p'><span>(&#160;std::shared_ptr&lt;DataStream&gt; <span class='color_p'>gen</span></span>&#160;)</span></span>
+<br/>
+<div id="c_173" style="display:none;">
+<span class='mngl'>_ZN4Ogre20TerrainGlobalOptions27setDefaultMaterialGeneratorESt10shared_ptrINS_24TerrainMaterialGeneratorEE</span>
+<br/>
+<br/>
+</div>
+
+<br/>
+<span class='h_name'>OgreTerrainGroup.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_174')">
+TerrainGroup::freeTerrainSlotInstance&#160;<span class='sym_p'><span>(&#160;struct TerrainGroup::TerrainSlot* <span class='color_p'>slot</span></span>&#160;)</span></span>
+<br/>
+<div id="c_174" style="display:none;">
+<span class='mngl'>_ZN4Ogre12TerrainGroup23freeTerrainSlotInstanceEPNS0_11TerrainSlotE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_175')">
+TerrainGroup::getNumTerrainPrepareRequests&#160;<span class='sym_p'>(&#160;)</span> const</span>
+<br/>
+<div id="c_175" style="display:none;">
+<span class='mngl'>_ZNK4Ogre12TerrainGroup28getNumTerrainPrepareRequestsEv</span>
+<br/>
+<br/>
+</div>
+
+<br/>
+<span class='h_name'>OgreTerrainLayerBlendMap.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_176')">
+TerrainLayerBlendMap::loadImage&#160;<span class='sym_p'><span>(&#160;std::shared_ptr&lt;DataStream&gt;&amp; <span class='color_p'>stream</span></span>, <span>String const&amp; <span class='color_p'>ext</span></span>&#160;)</span></span>
+<br/>
+<div id="c_176" style="display:none;">
+<span class='mngl'>_ZN4Ogre20TerrainLayerBlendMap9loadImageERSt10shared_ptrINS_10DataStreamEERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE</span>
+<br/>
+<br/>
+</div>
+
+<br/>
+<span class='h_name'>OgreTerrainLodManager.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_177')">
+TerrainLodManager::TerrainLodManager <span class='attr'>[C1]</span>&#160;<span class='sym_p'><span>(&#160;Terrain* <span class='color_p'>t</span></span>, <span>std::shared_ptr&lt;DataStream&gt;&amp; <span class='color_p'>stream</span></span>&#160;)</span></span>
+<br/>
+<div id="c_177" style="display:none;">
+<span class='mngl'>_ZN4Ogre17TerrainLodManagerC1EPNS_7TerrainERSt10shared_ptrINS_10DataStreamEE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_178')">
+TerrainLodManager::TerrainLodManager <span class='attr'>[C2]</span>&#160;<span class='sym_p'><span>(&#160;Terrain* <span class='color_p'>t</span></span>, <span>std::shared_ptr&lt;DataStream&gt;&amp; <span class='color_p'>stream</span></span>&#160;)</span></span>
+<br/>
+<div id="c_178" style="display:none;">
+<span class='mngl'>_ZN4Ogre17TerrainLodManagerC2EPNS_7TerrainERSt10shared_ptrINS_10DataStreamEE</span>
+<br/>
+<br/>
+</div>
+
+<br/>
+<span class='h_name'>OgreTerrainMaterialGenerator.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_179')">
+TerrainMaterialGenerator::_renderCompositeMap&#160;<span class='sym_p'><span>(&#160;size_t <span class='color_p'>size</span></span>, <span>Rect const&amp; <span class='color_p'>rect</span></span>, <span>std::shared_ptr&lt;DataStream&gt;const&amp; <span class='color_p'>mat</span></span>, <span>std::shared_ptr&lt;DataStream&gt;const&amp; <span class='color_p'>destCompositeMap</span></span>&#160;)</span></span>
+<br/>
+<div id="c_179" style="display:none;">
+<span class='mngl'>_ZN4Ogre24TerrainMaterialGenerator19_renderCompositeMapEmRKNS_5TRectIlEERKSt10shared_ptrINS_8MaterialEERKS5_INS_7TextureEE</span>
+<br/>
+<br/>
+</div>
+
+<br/>
+<span class='h_name'>OgreTerrainMaterialGeneratorA.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_180')">
+TerrainMaterialGeneratorA::SM2Profile::addTechnique&#160;<span class='sym_p'><span>(&#160;std::shared_ptr&lt;DataStream&gt;const&amp; <span class='color_p'>mat</span></span>, <span>Terrain const* <span class='color_p'>terrain</span></span>, <span>enum TerrainMaterialGeneratorA::SM2Profile::TechniqueType <span class='color_p'>tt</span></span>&#160;)</span></span>
+<br/>
+<div id="c_180" style="display:none;">
+<span class='mngl'>_ZN4Ogre25TerrainMaterialGeneratorA10SM2Profile12addTechniqueERKSt10shared_ptrINS_8MaterialEEPKNS_7TerrainENS1_13TechniqueTypeE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_181')">
+TerrainMaterialGeneratorA::SM2Profile::ShaderHelper::defaultFpParams&#160;<span class='sym_p'><span>(&#160;TerrainMaterialGeneratorA::SM2Profile const* <span class='color_p'>prof</span></span>, <span>Terrain const* <span class='color_p'>terrain</span></span>, <span>enum TerrainMaterialGeneratorA::SM2Profile::TechniqueType <span class='color_p'>tt</span></span>, <span>std::shared_ptr&lt;DataStream&gt;const&amp; <span class='color_p'>prog</span></span>&#160;)</span></span>
+<br/>
+<div id="c_181" style="display:none;">
+<span class='mngl'>_ZN4Ogre25TerrainMaterialGeneratorA10SM2Profile12ShaderHelper15defaultFpParamsEPKS1_PKNS_7TerrainENS1_13TechniqueTypeERKSt10shared_ptrINS_19HighLevelGpuProgramEE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_182')">
+TerrainMaterialGeneratorA::SM2Profile::ShaderHelper::defaultVpParams&#160;<span class='sym_p'><span>(&#160;TerrainMaterialGeneratorA::SM2Profile const* <span class='color_p'>prof</span></span>, <span>Terrain const* <span class='color_p'>terrain</span></span>, <span>enum TerrainMaterialGeneratorA::SM2Profile::TechniqueType <span class='color_p'>tt</span></span>, <span>std::shared_ptr&lt;DataStream&gt;const&amp; <span class='color_p'>prog</span></span>&#160;)</span></span>
+<br/>
+<div id="c_182" style="display:none;">
+<span class='mngl'>_ZN4Ogre25TerrainMaterialGeneratorA10SM2Profile12ShaderHelper15defaultVpParamsEPKS1_PKNS_7TerrainENS1_13TechniqueTypeERKSt10shared_ptrINS_19HighLevelGpuProgramEE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_183')">
+TerrainMaterialGeneratorA::SM2Profile::ShaderHelper::updateFpParams&#160;<span class='sym_p'><span>(&#160;TerrainMaterialGeneratorA::SM2Profile const* <span class='color_p'>prof</span></span>, <span>Terrain const* <span class='color_p'>terrain</span></span>, <span>enum TerrainMaterialGeneratorA::SM2Profile::TechniqueType <span class='color_p'>tt</span></span>, <span>std::shared_ptr&lt;DataStream&gt;const&amp; <span class='color_p'>params</span></span>&#160;)</span></span>
+<br/>
+<div id="c_183" style="display:none;">
+<span class='mngl'>_ZN4Ogre25TerrainMaterialGeneratorA10SM2Profile12ShaderHelper14updateFpParamsEPKS1_PKNS_7TerrainENS1_13TechniqueTypeERKSt10shared_ptrINS_20GpuProgramParametersEE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_184')">
+TerrainMaterialGeneratorA::SM2Profile::ShaderHelper::updateParams&#160;<span class='sym_p'><span>(&#160;TerrainMaterialGeneratorA::SM2Profile const* <span class='color_p'>prof</span></span>, <span>std::shared_ptr&lt;DataStream&gt;const&amp; <span class='color_p'>mat</span></span>, <span>Terrain const* <span class='color_p'>terrain</span></span>, <span>bool <span class='color_p'>compositeMap</span></span>&#160;)</span></span>
+<br/>
+<div id="c_184" style="display:none;">
+<span class='mngl'>_ZN4Ogre25TerrainMaterialGeneratorA10SM2Profile12ShaderHelper12updateParamsEPKS1_RKSt10shared_ptrINS_8MaterialEEPKNS_7TerrainEb</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_185')">
+TerrainMaterialGeneratorA::SM2Profile::ShaderHelper::updateVpParams&#160;<span class='sym_p'><span>(&#160;TerrainMaterialGeneratorA::SM2Profile const* <span class='color_p'>prof</span></span>, <span>Terrain const* <span class='color_p'>terrain</span></span>, <span>enum TerrainMaterialGeneratorA::SM2Profile::TechniqueType <span class='color_p'>tt</span></span>, <span>std::shared_ptr&lt;DataStream&gt;const&amp; <span class='color_p'>params</span></span>&#160;)</span></span>
+<br/>
+<div id="c_185" style="display:none;">
+<span class='mngl'>_ZN4Ogre25TerrainMaterialGeneratorA10SM2Profile12ShaderHelper14updateVpParamsEPKS1_PKNS_7TerrainENS1_13TechniqueTypeERKSt10shared_ptrINS_20GpuProgramParametersEE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_186')">
+TerrainMaterialGeneratorA::SM2Profile::ShaderHelperHLSL::generateFpDynamicShadows&#160;<span class='sym_p'><span>(&#160;TerrainMaterialGeneratorA::SM2Profile const* <span class='color_p'>prof</span></span>, <span>Terrain const* <span class='color_p'>terrain</span></span>, <span>enum TerrainMaterialGeneratorA::SM2Profile::TechniqueType <span class='color_p'>tt</span></span>, <span>StringStream&amp; <span class='color_p'>outStream</span></span>&#160;)</span></span>
+<br/>
+<div id="c_186" style="display:none;">
+<span class='mngl'>_ZN4Ogre25TerrainMaterialGeneratorA10SM2Profile16ShaderHelperHLSL24generateFpDynamicShadowsEPKS1_PKNS_7TerrainENS1_13TechniqueTypeERNSt7__cxx1118basic_stringstreamIcSt11char_traitsIcESaIcEEE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_187')">
+TerrainMaterialGeneratorA::SM2Profile::ShaderHelperHLSL::generateFpDynamicShadowsHelpers&#160;<span class='sym_p'><span>(&#160;TerrainMaterialGeneratorA::SM2Profile const* <span class='color_p'>prof</span></span>, <span>Terrain const* <span class='color_p'>terrain</span></span>, <span>enum TerrainMaterialGeneratorA::SM2Profile::TechniqueType <span class='color_p'>tt</span></span>, <span>StringStream&amp; <span class='color_p'>outStream</span></span>&#160;)</span></span>
+<br/>
+<div id="c_187" style="display:none;">
+<span class='mngl'>_ZN4Ogre25TerrainMaterialGeneratorA10SM2Profile16ShaderHelperHLSL31generateFpDynamicShadowsHelpersEPKS1_PKNS_7TerrainENS1_13TechniqueTypeERNSt7__cxx1118basic_stringstreamIcSt11char_traitsIcESaIcEEE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_188')">
+TerrainMaterialGeneratorA::SM2Profile::ShaderHelperHLSL::generateFpDynamicShadowsParams&#160;<span class='sym_p'><span>(&#160;uint* <span class='color_p'>texCoord</span></span>, <span>uint* <span class='color_p'>sampler</span></span>, <span>TerrainMaterialGeneratorA::SM2Profile const* <span class='color_p'>prof</span></span>, <span>Terrain const* <span class='color_p'>terrain</span></span>, <span>enum TerrainMaterialGeneratorA::SM2Profile::TechniqueType <span class='color_p'>tt</span></span>, <span>StringStream&amp; <span class='color_p'>outStream</span></span>&#160;)</span></span>
+<br/>
+<div id="c_188" style="display:none;">
+<span class='mngl'>_ZN4Ogre25TerrainMaterialGeneratorA10SM2Profile16ShaderHelperHLSL30generateFpDynamicShadowsParamsEPjS3_PKS1_PKNS_7TerrainENS1_13TechniqueTypeERNSt7__cxx1118basic_stringstreamIcSt11char_traitsIcESaIcEEE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_189')">
+TerrainMaterialGeneratorA::SM2Profile::ShaderHelperHLSL::generateFpFooter&#160;<span class='sym_p'><span>(&#160;TerrainMaterialGeneratorA::SM2Profile const* <span class='color_p'>prof</span></span>, <span>Terrain const* <span class='color_p'>terrain</span></span>, <span>enum TerrainMaterialGeneratorA::SM2Profile::TechniqueType <span class='color_p'>tt</span></span>, <span>StringStream&amp; <span class='color_p'>outStream</span></span>&#160;)</span></span>
+<br/>
+<div id="c_189" style="display:none;">
+<span class='mngl'>_ZN4Ogre25TerrainMaterialGeneratorA10SM2Profile16ShaderHelperHLSL16generateFpFooterEPKS1_PKNS_7TerrainENS1_13TechniqueTypeERNSt7__cxx1118basic_stringstreamIcSt11char_traitsIcESaIcEEE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_190')">
+TerrainMaterialGeneratorA::SM2Profile::ShaderHelperHLSL::generateFpHeader&#160;<span class='sym_p'><span>(&#160;TerrainMaterialGeneratorA::SM2Profile const* <span class='color_p'>prof</span></span>, <span>Terrain const* <span class='color_p'>terrain</span></span>, <span>enum TerrainMaterialGeneratorA::SM2Profile::TechniqueType <span class='color_p'>tt</span></span>, <span>StringStream&amp; <span class='color_p'>outStream</span></span>&#160;)</span></span>
+<br/>
+<div id="c_190" style="display:none;">
+<span class='mngl'>_ZN4Ogre25TerrainMaterialGeneratorA10SM2Profile16ShaderHelperHLSL16generateFpHeaderEPKS1_PKNS_7TerrainENS1_13TechniqueTypeERNSt7__cxx1118basic_stringstreamIcSt11char_traitsIcESaIcEEE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_191')">
+TerrainMaterialGeneratorA::SM2Profile::ShaderHelperHLSL::generateFpLayer&#160;<span class='sym_p'><span>(&#160;TerrainMaterialGeneratorA::SM2Profile const* <span class='color_p'>prof</span></span>, <span>Terrain const* <span class='color_p'>terrain</span></span>, <span>enum TerrainMaterialGeneratorA::SM2Profile::TechniqueType <span class='color_p'>tt</span></span>, <span>uint <span class='color_p'>layer</span></span>, <span>StringStream&amp; <span class='color_p'>outStream</span></span>&#160;)</span></span>
+<br/>
+<div id="c_191" style="display:none;">
+<span class='mngl'>_ZN4Ogre25TerrainMaterialGeneratorA10SM2Profile16ShaderHelperHLSL15generateFpLayerEPKS1_PKNS_7TerrainENS1_13TechniqueTypeEjRNSt7__cxx1118basic_stringstreamIcSt11char_traitsIcESaIcEEE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_192')">
+TerrainMaterialGeneratorA::SM2Profile::ShaderHelperHLSL::generateVpDynamicShadows&#160;<span class='sym_p'><span>(&#160;TerrainMaterialGeneratorA::SM2Profile const* <span class='color_p'>prof</span></span>, <span>Terrain const* <span class='color_p'>terrain</span></span>, <span>enum TerrainMaterialGeneratorA::SM2Profile::TechniqueType <span class='color_p'>tt</span></span>, <span>StringStream&amp; <span class='color_p'>outStream</span></span>&#160;)</span></span>
+<br/>
+<div id="c_192" style="display:none;">
+<span class='mngl'>_ZN4Ogre25TerrainMaterialGeneratorA10SM2Profile16ShaderHelperHLSL24generateVpDynamicShadowsEPKS1_PKNS_7TerrainENS1_13TechniqueTypeERNSt7__cxx1118basic_stringstreamIcSt11char_traitsIcESaIcEEE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_193')">
+TerrainMaterialGeneratorA::SM2Profile::ShaderHelperHLSL::generateVpDynamicShadowsParams&#160;<span class='sym_p'><span>(&#160;uint <span class='color_p'>texCoord</span></span>, <span>TerrainMaterialGeneratorA::SM2Profile const* <span class='color_p'>prof</span></span>, <span>Terrain const* <span class='color_p'>terrain</span></span>, <span>enum TerrainMaterialGeneratorA::SM2Profile::TechniqueType <span class='color_p'>tt</span></span>, <span>StringStream&amp; <span class='color_p'>outStream</span></span>&#160;)</span></span>
+<br/>
+<div id="c_193" style="display:none;">
+<span class='mngl'>_ZN4Ogre25TerrainMaterialGeneratorA10SM2Profile16ShaderHelperHLSL30generateVpDynamicShadowsParamsEjPKS1_PKNS_7TerrainENS1_13TechniqueTypeERNSt7__cxx1118basic_stringstreamIcSt11char_traitsIcESaIcEEE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_194')">
+TerrainMaterialGeneratorA::SM2Profile::ShaderHelperHLSL::generateVpFooter&#160;<span class='sym_p'><span>(&#160;TerrainMaterialGeneratorA::SM2Profile const* <span class='color_p'>prof</span></span>, <span>Terrain const* <span class='color_p'>terrain</span></span>, <span>enum TerrainMaterialGeneratorA::SM2Profile::TechniqueType <span class='color_p'>tt</span></span>, <span>StringStream&amp; <span class='color_p'>outStream</span></span>&#160;)</span></span>
+<br/>
+<div id="c_194" style="display:none;">
+<span class='mngl'>_ZN4Ogre25TerrainMaterialGeneratorA10SM2Profile16ShaderHelperHLSL16generateVpFooterEPKS1_PKNS_7TerrainENS1_13TechniqueTypeERNSt7__cxx1118basic_stringstreamIcSt11char_traitsIcESaIcEEE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_195')">
+TerrainMaterialGeneratorA::SM2Profile::ShaderHelperHLSL::generateVpHeader&#160;<span class='sym_p'><span>(&#160;TerrainMaterialGeneratorA::SM2Profile const* <span class='color_p'>prof</span></span>, <span>Terrain const* <span class='color_p'>terrain</span></span>, <span>enum TerrainMaterialGeneratorA::SM2Profile::TechniqueType <span class='color_p'>tt</span></span>, <span>StringStream&amp; <span class='color_p'>outStream</span></span>&#160;)</span></span>
+<br/>
+<div id="c_195" style="display:none;">
+<span class='mngl'>_ZN4Ogre25TerrainMaterialGeneratorA10SM2Profile16ShaderHelperHLSL16generateVpHeaderEPKS1_PKNS_7TerrainENS1_13TechniqueTypeERNSt7__cxx1118basic_stringstreamIcSt11char_traitsIcESaIcEEE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_196')">
+TerrainMaterialGeneratorA::SM2Profile::ShaderHelperHLSL::generateVpLayer&#160;<span class='sym_p'><span>(&#160;TerrainMaterialGeneratorA::SM2Profile const* <span class='color_p'>prof</span></span>, <span>Terrain const* <span class='color_p'>terrain</span></span>, <span>enum TerrainMaterialGeneratorA::SM2Profile::TechniqueType <span class='color_p'>tt</span></span>, <span>uint <span class='color_p'>layer</span></span>, <span>StringStream&amp; <span class='color_p'>outStream</span></span>&#160;)</span></span>
+<br/>
+<div id="c_196" style="display:none;">
+<span class='mngl'>_ZN4Ogre25TerrainMaterialGeneratorA10SM2Profile16ShaderHelperHLSL15generateVpLayerEPKS1_PKNS_7TerrainENS1_13TechniqueTypeEjRNSt7__cxx1118basic_stringstreamIcSt11char_traitsIcESaIcEEE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_197')">
+TerrainMaterialGeneratorA::SM2Profile::updateParams&#160;<span class='sym_p'><span>(&#160;std::shared_ptr&lt;DataStream&gt;const&amp; <span class='color_p'>mat</span></span>, <span>Terrain const* <span class='color_p'>terrain</span></span>&#160;)</span></span>
+<br/>
+<div id="c_197" style="display:none;">
+<span class='mngl'>_ZN4Ogre25TerrainMaterialGeneratorA10SM2Profile12updateParamsERKSt10shared_ptrINS_8MaterialEEPKNS_7TerrainE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_198')">
+TerrainMaterialGeneratorA::SM2Profile::updateParamsForCompositeMap&#160;<span class='sym_p'><span>(&#160;std::shared_ptr&lt;DataStream&gt;const&amp; <span class='color_p'>mat</span></span>, <span>Terrain const* <span class='color_p'>terrain</span></span>&#160;)</span></span>
+<br/>
+<div id="c_198" style="display:none;">
+<span class='mngl'>_ZN4Ogre25TerrainMaterialGeneratorA10SM2Profile27updateParamsForCompositeMapERKSt10shared_ptrINS_8MaterialEEPKNS_7TerrainE</span>
+<br/>
+<br/>
+</div>
+
+<br/>
+<span class='h_name'>OgreTerrainQuadTreeNode.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_199')">
+TerrainQuadTreeNode::updateVertexBuffer&#160;<span class='sym_p'><span>(&#160;HardwareVertexBufferSharedPtr&amp; <span class='color_p'>posbuf</span></span>, <span>HardwareVertexBufferSharedPtr&amp; <span class='color_p'>deltabuf</span></span>, <span>Rect const&amp; <span class='color_p'>rect</span></span>&#160;)</span></span>
+<br/>
+<div id="c_199" style="display:none;">
+<span class='mngl'>_ZN4Ogre19TerrainQuadTreeNode18updateVertexBufferERSt10shared_ptrINS_20HardwareVertexBufferEES4_RKNS_5TRectIlEE</span>
+<br/>
+<br/>
+</div>
+
+<br/>
+<a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='Removed'></a><a name='Withdrawn'></a><h2>Removed Symbols <span class='failed'>&nbsp;40&nbsp;</span></h2><hr/>
+<span class='h_name'>OgreSharedPtr.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_200')">
+SharedPtrInfo::~SharedPtrInfo <span class='attr'>[D0]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_200" style="display:none;">
+<span class='mngl'>_ZN4Ogre13SharedPtrInfoD0Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_201')">
+SharedPtrInfo::~SharedPtrInfo <span class='attr'>[D1]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_201" style="display:none;">
+<span class='mngl'>_ZN4Ogre13SharedPtrInfoD1Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_202')">
+SharedPtrInfo::~SharedPtrInfo <span class='attr'>[D2]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_202" style="display:none;">
+<span class='mngl'>_ZN4Ogre13SharedPtrInfoD2Ev</span>
+<br/>
+<br/>
+</div>
+
+<br/>
+<span class='h_name'>OgreTerrain.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_203')">
+Terrain::_populateIndexBuffer&#160;<span class='sym_p'><span>(&#160;uint16* <span class='color_p'>pI</span></span>, <span>uint16 <span class='color_p'>batchSize</span></span>, <span>uint16 <span class='color_p'>vdatasize</span></span>, <span>size_t <span class='color_p'>vertexIncrement</span></span>, <span>uint16 <span class='color_p'>xoffset</span></span>, <span>uint16 <span class='color_p'>yoffset</span></span>, <span>uint16 <span class='color_p'>numSkirtRowsCols</span></span>, <span>uint16 <span class='color_p'>skirtRowColSkip</span></span>&#160;)</span> <span class='attr'>[static]</span></span>
+<br/>
+<div id="c_203" style="display:none;">
+<span class='mngl'>_ZN4Ogre7Terrain20_populateIndexBufferEPtttmtttt</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_204')">
+Terrain::DefaultGpuBufferAllocator::allocateVertexBuffers&#160;<span class='sym_p'><span>(&#160;Terrain* <span class='color_p'>forTerrain</span></span>, <span>size_t <span class='color_p'>numVertices</span></span>, <span>HardwareVertexBufferSharedPtr&amp; <span class='color_p'>destPos</span></span>, <span>HardwareVertexBufferSharedPtr&amp; <span class='color_p'>destDelta</span></span>&#160;)</span></span>
+<br/>
+<div id="c_204" style="display:none;">
+<span class='mngl'>_ZN4Ogre7Terrain25DefaultGpuBufferAllocator21allocateVertexBuffersEPS0_mRNS_29HardwareVertexBufferSharedPtrES4_</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_205')">
+Terrain::DefaultGpuBufferAllocator::freeVertexBuffers&#160;<span class='sym_p'><span>(&#160;HardwareVertexBufferSharedPtr const&amp; <span class='color_p'>posbuf</span></span>, <span>HardwareVertexBufferSharedPtr const&amp; <span class='color_p'>deltabuf</span></span>&#160;)</span></span>
+<br/>
+<div id="c_205" style="display:none;">
+<span class='mngl'>_ZN4Ogre7Terrain25DefaultGpuBufferAllocator17freeVertexBuffersERKNS_29HardwareVertexBufferSharedPtrES4_</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_206')">
+Terrain::DefaultGpuBufferAllocator::getVertexBuffer&#160;<span class='sym_p'><span>(&#160;list&lt;HardwareVertexBufferSharedPtr, STLAllocator&lt;HardwareVertexBufferSharedPtr, CategorisedAllocPolicy&lt;(MemoryCategory)0&gt; &gt; &gt;::type&amp; <span class='color_p'>list</span></span>, <span>size_t <span class='color_p'>vertexSize</span></span>, <span>size_t <span class='color_p'>numVertices</span></span>&#160;)</span></span>
+<br/>
+<div id="c_206" style="display:none;">
+<span class='mngl'>_ZN4Ogre7Terrain25DefaultGpuBufferAllocator15getVertexBufferERNSt7__cxx114listINS_29HardwareVertexBufferSharedPtrESaIS4_EEEmm</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_207')">
+Terrain::prepare&#160;<span class='sym_p'><span>(&#160;SharedPtr&lt;DataStream&gt;&amp; <span class='color_p'>stream</span></span>&#160;)</span></span>
+<br/>
+<div id="c_207" style="display:none;">
+<span class='mngl'>_ZN4Ogre7Terrain7prepareERNS_9SharedPtrINS_10DataStreamEEE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_208')">
+TerrainGlobalOptions::setDefaultMaterialGenerator&#160;<span class='sym_p'><span>(&#160;SharedPtr&lt;TerrainMaterialGenerator&gt; <span class='color_p'>gen</span></span>&#160;)</span></span>
+<br/>
+<div id="c_208" style="display:none;">
+<span class='mngl'>_ZN4Ogre20TerrainGlobalOptions27setDefaultMaterialGeneratorENS_9SharedPtrINS_24TerrainMaterialGeneratorEEE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_209')">
+TerrainGlobalOptions::~TerrainGlobalOptions <span class='attr'>[D0]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_209" style="display:none;">
+<span class='mngl'>_ZN4Ogre20TerrainGlobalOptionsD0Ev</span>
+<br/>
+<br/>
+</div>
+
+<br/>
+<span class='h_name'>OgreTerrainGroup.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_210')">
+TerrainGroup::LoadRequest::loadingTaskNum <span class='attr'>[data]</span></span>
+<br/>
+<div id="c_210" style="display:none;">
+<span class='mngl'>_ZN4Ogre12TerrainGroup11LoadRequest14loadingTaskNumE</span>
+<br/>
+<br/>
+</div>
+
+<br/>
+<span class='h_name'>OgreTerrainLayerBlendMap.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_211')">
+TerrainLayerBlendMap::loadImage&#160;<span class='sym_p'><span>(&#160;SharedPtr&lt;DataStream&gt;&amp; <span class='color_p'>stream</span></span>, <span>String const&amp; <span class='color_p'>ext</span></span>&#160;)</span></span>
+<br/>
+<div id="c_211" style="display:none;">
+<span class='mngl'>_ZN4Ogre20TerrainLayerBlendMap9loadImageERNS_9SharedPtrINS_10DataStreamEEERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE</span>
+<br/>
+<br/>
+</div>
+
+<br/>
+<span class='h_name'>OgreTerrainLodManager.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_212')">
+TerrainLodManager::TerrainLodManager <span class='attr'>[C1]</span>&#160;<span class='sym_p'><span>(&#160;Terrain* <span class='color_p'>t</span></span>, <span>SharedPtr&lt;DataStream&gt;&amp; <span class='color_p'>stream</span></span>&#160;)</span></span>
+<br/>
+<div id="c_212" style="display:none;">
+<span class='mngl'>_ZN4Ogre17TerrainLodManagerC1EPNS_7TerrainERNS_9SharedPtrINS_10DataStreamEEE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_213')">
+TerrainLodManager::TerrainLodManager <span class='attr'>[C2]</span>&#160;<span class='sym_p'><span>(&#160;Terrain* <span class='color_p'>t</span></span>, <span>SharedPtr&lt;DataStream&gt;&amp; <span class='color_p'>stream</span></span>&#160;)</span></span>
+<br/>
+<div id="c_213" style="display:none;">
+<span class='mngl'>_ZN4Ogre17TerrainLodManagerC2EPNS_7TerrainERNS_9SharedPtrINS_10DataStreamEEE</span>
+<br/>
+<br/>
+</div>
+
+<br/>
+<span class='h_name'>OgreTerrainMaterialGenerator.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_214')">
+TerrainMaterialGenerator::_renderCompositeMap&#160;<span class='sym_p'><span>(&#160;size_t <span class='color_p'>size</span></span>, <span>Rect const&amp; <span class='color_p'>rect</span></span>, <span>SharedPtr&lt;Material&gt;const&amp; <span class='color_p'>mat</span></span>, <span>SharedPtr&lt;Texture&gt;const&amp; <span class='color_p'>destCompositeMap</span></span>&#160;)</span></span>
+<br/>
+<div id="c_214" style="display:none;">
+<span class='mngl'>_ZN4Ogre24TerrainMaterialGenerator19_renderCompositeMapEmRKNS_5TRectIlEERKNS_9SharedPtrINS_8MaterialEEERKNS5_INS_7TextureEEE</span>
+<br/>
+<br/>
+</div>
+
+<br/>
+<span class='h_name'>OgreTerrainMaterialGeneratorA.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_215')">
+TerrainMaterialGeneratorA::SM2Profile::addTechnique&#160;<span class='sym_p'><span>(&#160;SharedPtr&lt;Material&gt;const&amp; <span class='color_p'>mat</span></span>, <span>Terrain const* <span class='color_p'>terrain</span></span>, <span>enum TerrainMaterialGeneratorA::SM2Profile::TechniqueType <span class='color_p'>tt</span></span>&#160;)</span></span>
+<br/>
+<div id="c_215" style="display:none;">
+<span class='mngl'>_ZN4Ogre25TerrainMaterialGeneratorA10SM2Profile12addTechniqueERKNS_9SharedPtrINS_8MaterialEEEPKNS_7TerrainENS1_13TechniqueTypeE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_216')">
+TerrainMaterialGeneratorA::SM2Profile::ShaderHelper::defaultFpParams&#160;<span class='sym_p'><span>(&#160;TerrainMaterialGeneratorA::SM2Profile const* <span class='color_p'>prof</span></span>, <span>Terrain const* <span class='color_p'>terrain</span></span>, <span>enum TerrainMaterialGeneratorA::SM2Profile::TechniqueType <span class='color_p'>tt</span></span>, <span>SharedPtr&lt;HighLevelGpuProgram&gt;const&amp; <span class='color_p'>prog</span></span>&#160;)</span></span>
+<br/>
+<div id="c_216" style="display:none;">
+<span class='mngl'>_ZN4Ogre25TerrainMaterialGeneratorA10SM2Profile12ShaderHelper15defaultFpParamsEPKS1_PKNS_7TerrainENS1_13TechniqueTypeERKNS_9SharedPtrINS_19HighLevelGpuProgramEEE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_217')">
+TerrainMaterialGeneratorA::SM2Profile::ShaderHelper::defaultVpParams&#160;<span class='sym_p'><span>(&#160;TerrainMaterialGeneratorA::SM2Profile const* <span class='color_p'>prof</span></span>, <span>Terrain const* <span class='color_p'>terrain</span></span>, <span>enum TerrainMaterialGeneratorA::SM2Profile::TechniqueType <span class='color_p'>tt</span></span>, <span>SharedPtr&lt;HighLevelGpuProgram&gt;const&amp; <span class='color_p'>prog</span></span>&#160;)</span></span>
+<br/>
+<div id="c_217" style="display:none;">
+<span class='mngl'>_ZN4Ogre25TerrainMaterialGeneratorA10SM2Profile12ShaderHelper15defaultVpParamsEPKS1_PKNS_7TerrainENS1_13TechniqueTypeERKNS_9SharedPtrINS_19HighLevelGpuProgramEEE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_218')">
+TerrainMaterialGeneratorA::SM2Profile::ShaderHelper::updateFpParams&#160;<span class='sym_p'><span>(&#160;TerrainMaterialGeneratorA::SM2Profile const* <span class='color_p'>prof</span></span>, <span>Terrain const* <span class='color_p'>terrain</span></span>, <span>enum TerrainMaterialGeneratorA::SM2Profile::TechniqueType <span class='color_p'>tt</span></span>, <span>SharedPtr&lt;GpuProgramParameters&gt;const&amp; <span class='color_p'>params</span></span>&#160;)</span></span>
+<br/>
+<div id="c_218" style="display:none;">
+<span class='mngl'>_ZN4Ogre25TerrainMaterialGeneratorA10SM2Profile12ShaderHelper14updateFpParamsEPKS1_PKNS_7TerrainENS1_13TechniqueTypeERKNS_9SharedPtrINS_20GpuProgramParametersEEE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_219')">
+TerrainMaterialGeneratorA::SM2Profile::ShaderHelper::updateParams&#160;<span class='sym_p'><span>(&#160;TerrainMaterialGeneratorA::SM2Profile const* <span class='color_p'>prof</span></span>, <span>SharedPtr&lt;Material&gt;const&amp; <span class='color_p'>mat</span></span>, <span>Terrain const* <span class='color_p'>terrain</span></span>, <span>bool <span class='color_p'>compositeMap</span></span>&#160;)</span></span>
+<br/>
+<div id="c_219" style="display:none;">
+<span class='mngl'>_ZN4Ogre25TerrainMaterialGeneratorA10SM2Profile12ShaderHelper12updateParamsEPKS1_RKNS_9SharedPtrINS_8MaterialEEEPKNS_7TerrainEb</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_220')">
+TerrainMaterialGeneratorA::SM2Profile::ShaderHelper::updateVpParams&#160;<span class='sym_p'><span>(&#160;TerrainMaterialGeneratorA::SM2Profile const* <span class='color_p'>prof</span></span>, <span>Terrain const* <span class='color_p'>terrain</span></span>, <span>enum TerrainMaterialGeneratorA::SM2Profile::TechniqueType <span class='color_p'>tt</span></span>, <span>SharedPtr&lt;GpuProgramParameters&gt;const&amp; <span class='color_p'>params</span></span>&#160;)</span></span>
+<br/>
+<div id="c_220" style="display:none;">
+<span class='mngl'>_ZN4Ogre25TerrainMaterialGeneratorA10SM2Profile12ShaderHelper14updateVpParamsEPKS1_PKNS_7TerrainENS1_13TechniqueTypeERKNS_9SharedPtrINS_20GpuProgramParametersEEE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_221')">
+TerrainMaterialGeneratorA::SM2Profile::ShaderHelperGLSLES::createFragmentProgram&#160;<span class='sym_p'><span>(&#160;TerrainMaterialGeneratorA::SM2Profile const* <span class='color_p'>prof</span></span>, <span>Terrain const* <span class='color_p'>terrain</span></span>, <span>enum TerrainMaterialGeneratorA::SM2Profile::TechniqueType <span class='color_p'>tt</span></span>&#160;)</span></span>
+<br/>
+<div id="c_221" style="display:none;">
+<span class='mngl'>_ZN4Ogre25TerrainMaterialGeneratorA10SM2Profile18ShaderHelperGLSLES21createFragmentProgramEPKS1_PKNS_7TerrainENS1_13TechniqueTypeE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_222')">
+TerrainMaterialGeneratorA::SM2Profile::ShaderHelperGLSLES::createVertexProgram&#160;<span class='sym_p'><span>(&#160;TerrainMaterialGeneratorA::SM2Profile const* <span class='color_p'>prof</span></span>, <span>Terrain const* <span class='color_p'>terrain</span></span>, <span>enum TerrainMaterialGeneratorA::SM2Profile::TechniqueType <span class='color_p'>tt</span></span>&#160;)</span></span>
+<br/>
+<div id="c_222" style="display:none;">
+<span class='mngl'>_ZN4Ogre25TerrainMaterialGeneratorA10SM2Profile18ShaderHelperGLSLES19createVertexProgramEPKS1_PKNS_7TerrainENS1_13TechniqueTypeE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_223')">
+TerrainMaterialGeneratorA::SM2Profile::ShaderHelperGLSLES::generateFpDynamicShadows&#160;<span class='sym_p'><span>(&#160;TerrainMaterialGeneratorA::SM2Profile const* <span class='color_p'>prof</span></span>, <span>Terrain const* <span class='color_p'>terrain</span></span>, <span>enum TerrainMaterialGeneratorA::SM2Profile::TechniqueType <span class='color_p'>tt</span></span>, <span>StringUtil::StrStreamType&amp; <span class='color_p'>outStream</span></span>&#160;)</span></span>
+<br/>
+<div id="c_223" style="display:none;">
+<span class='mngl'>_ZN4Ogre25TerrainMaterialGeneratorA10SM2Profile18ShaderHelperGLSLES24generateFpDynamicShadowsEPKS1_PKNS_7TerrainENS1_13TechniqueTypeERNSt7__cxx1118basic_stringstreamIcSt11char_traitsIcESaIcEEE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_224')">
+TerrainMaterialGeneratorA::SM2Profile::ShaderHelperGLSLES::generateFpDynamicShadowsHelpers&#160;<span class='sym_p'><span>(&#160;TerrainMaterialGeneratorA::SM2Profile const* <span class='color_p'>prof</span></span>, <span>Terrain const* <span class='color_p'>terrain</span></span>, <span>enum TerrainMaterialGeneratorA::SM2Profile::TechniqueType <span class='color_p'>tt</span></span>, <span>StringUtil::StrStreamType&amp; <span class='color_p'>outStream</span></span>&#160;)</span></span>
+<br/>
+<div id="c_224" style="display:none;">
+<span class='mngl'>_ZN4Ogre25TerrainMaterialGeneratorA10SM2Profile18ShaderHelperGLSLES31generateFpDynamicShadowsHelpersEPKS1_PKNS_7TerrainENS1_13TechniqueTypeERNSt7__cxx1118basic_stringstreamIcSt11char_traitsIcESaIcEEE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_225')">
+TerrainMaterialGeneratorA::SM2Profile::ShaderHelperGLSLES::generateFpDynamicShadowsParams&#160;<span class='sym_p'><span>(&#160;uint* <span class='color_p'>texCoord</span></span>, <span>uint* <span class='color_p'>sampler</span></span>, <span>TerrainMaterialGeneratorA::SM2Profile const* <span class='color_p'>prof</span></span>, <span>Terrain const* <span class='color_p'>terrain</span></span>, <span>enum TerrainMaterialGeneratorA::SM2Profile::TechniqueType <span class='color_p'>tt</span></span>, <span>StringUtil::StrStreamType&amp; <span class='color_p'>outStream</span></span>&#160;)</span></span>
+<br/>
+<div id="c_225" style="display:none;">
+<span class='mngl'>_ZN4Ogre25TerrainMaterialGeneratorA10SM2Profile18ShaderHelperGLSLES30generateFpDynamicShadowsParamsEPjS3_PKS1_PKNS_7TerrainENS1_13TechniqueTypeERNSt7__cxx1118basic_stringstreamIcSt11char_traitsIcESaIcEEE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_226')">
+TerrainMaterialGeneratorA::SM2Profile::ShaderHelperGLSLES::generateFpFooter&#160;<span class='sym_p'><span>(&#160;TerrainMaterialGeneratorA::SM2Profile const* <span class='color_p'>prof</span></span>, <span>Terrain const* <span class='color_p'>terrain</span></span>, <span>enum TerrainMaterialGeneratorA::SM2Profile::TechniqueType <span class='color_p'>tt</span></span>, <span>StringUtil::StrStreamType&amp; <span class='color_p'>outStream</span></span>&#160;)</span></span>
+<br/>
+<div id="c_226" style="display:none;">
+<span class='mngl'>_ZN4Ogre25TerrainMaterialGeneratorA10SM2Profile18ShaderHelperGLSLES16generateFpFooterEPKS1_PKNS_7TerrainENS1_13TechniqueTypeERNSt7__cxx1118basic_stringstreamIcSt11char_traitsIcESaIcEEE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_227')">
+TerrainMaterialGeneratorA::SM2Profile::ShaderHelperGLSLES::generateFpHeader&#160;<span class='sym_p'><span>(&#160;TerrainMaterialGeneratorA::SM2Profile const* <span class='color_p'>prof</span></span>, <span>Terrain const* <span class='color_p'>terrain</span></span>, <span>enum TerrainMaterialGeneratorA::SM2Profile::TechniqueType <span class='color_p'>tt</span></span>, <span>StringUtil::StrStreamType&amp; <span class='color_p'>outStream</span></span>&#160;)</span></span>
+<br/>
+<div id="c_227" style="display:none;">
+<span class='mngl'>_ZN4Ogre25TerrainMaterialGeneratorA10SM2Profile18ShaderHelperGLSLES16generateFpHeaderEPKS1_PKNS_7TerrainENS1_13TechniqueTypeERNSt7__cxx1118basic_stringstreamIcSt11char_traitsIcESaIcEEE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_228')">
+TerrainMaterialGeneratorA::SM2Profile::ShaderHelperGLSLES::generateFpLayer&#160;<span class='sym_p'><span>(&#160;TerrainMaterialGeneratorA::SM2Profile const* <span class='color_p'>prof</span></span>, <span>Terrain const* <span class='color_p'>terrain</span></span>, <span>enum TerrainMaterialGeneratorA::SM2Profile::TechniqueType <span class='color_p'>tt</span></span>, <span>uint <span class='color_p'>layer</span></span>, <span>StringUtil::StrStreamType&amp; <span class='color_p'>outStream</span></span>&#160;)</span></span>
+<br/>
+<div id="c_228" style="display:none;">
+<span class='mngl'>_ZN4Ogre25TerrainMaterialGeneratorA10SM2Profile18ShaderHelperGLSLES15generateFpLayerEPKS1_PKNS_7TerrainENS1_13TechniqueTypeEjRNSt7__cxx1118basic_stringstreamIcSt11char_traitsIcESaIcEEE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_229')">
+TerrainMaterialGeneratorA::SM2Profile::ShaderHelperGLSLES::generateVpDynamicShadows&#160;<span class='sym_p'><span>(&#160;TerrainMaterialGeneratorA::SM2Profile const* <span class='color_p'>prof</span></span>, <span>Terrain const* <span class='color_p'>terrain</span></span>, <span>enum TerrainMaterialGeneratorA::SM2Profile::TechniqueType <span class='color_p'>tt</span></span>, <span>StringUtil::StrStreamType&amp; <span class='color_p'>outStream</span></span>&#160;)</span></span>
+<br/>
+<div id="c_229" style="display:none;">
+<span class='mngl'>_ZN4Ogre25TerrainMaterialGeneratorA10SM2Profile18ShaderHelperGLSLES24generateVpDynamicShadowsEPKS1_PKNS_7TerrainENS1_13TechniqueTypeERNSt7__cxx1118basic_stringstreamIcSt11char_traitsIcESaIcEEE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_230')">
+TerrainMaterialGeneratorA::SM2Profile::ShaderHelperGLSLES::generateVpDynamicShadowsParams&#160;<span class='sym_p'><span>(&#160;uint <span class='color_p'>texCoord</span></span>, <span>TerrainMaterialGeneratorA::SM2Profile const* <span class='color_p'>prof</span></span>, <span>Terrain const* <span class='color_p'>terrain</span></span>, <span>enum TerrainMaterialGeneratorA::SM2Profile::TechniqueType <span class='color_p'>tt</span></span>, <span>StringUtil::StrStreamType&amp; <span class='color_p'>outStream</span></span>&#160;)</span></span>
+<br/>
+<div id="c_230" style="display:none;">
+<span class='mngl'>_ZN4Ogre25TerrainMaterialGeneratorA10SM2Profile18ShaderHelperGLSLES30generateVpDynamicShadowsParamsEjPKS1_PKNS_7TerrainENS1_13TechniqueTypeERNSt7__cxx1118basic_stringstreamIcSt11char_traitsIcESaIcEEE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_231')">
+TerrainMaterialGeneratorA::SM2Profile::ShaderHelperGLSLES::generateVpFooter&#160;<span class='sym_p'><span>(&#160;TerrainMaterialGeneratorA::SM2Profile const* <span class='color_p'>prof</span></span>, <span>Terrain const* <span class='color_p'>terrain</span></span>, <span>enum TerrainMaterialGeneratorA::SM2Profile::TechniqueType <span class='color_p'>tt</span></span>, <span>StringUtil::StrStreamType&amp; <span class='color_p'>outStream</span></span>&#160;)</span></span>
+<br/>
+<div id="c_231" style="display:none;">
+<span class='mngl'>_ZN4Ogre25TerrainMaterialGeneratorA10SM2Profile18ShaderHelperGLSLES16generateVpFooterEPKS1_PKNS_7TerrainENS1_13TechniqueTypeERNSt7__cxx1118basic_stringstreamIcSt11char_traitsIcESaIcEEE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_232')">
+TerrainMaterialGeneratorA::SM2Profile::ShaderHelperGLSLES::generateVpHeader&#160;<span class='sym_p'><span>(&#160;TerrainMaterialGeneratorA::SM2Profile const* <span class='color_p'>prof</span></span>, <span>Terrain const* <span class='color_p'>terrain</span></span>, <span>enum TerrainMaterialGeneratorA::SM2Profile::TechniqueType <span class='color_p'>tt</span></span>, <span>StringUtil::StrStreamType&amp; <span class='color_p'>outStream</span></span>&#160;)</span></span>
+<br/>
+<div id="c_232" style="display:none;">
+<span class='mngl'>_ZN4Ogre25TerrainMaterialGeneratorA10SM2Profile18ShaderHelperGLSLES16generateVpHeaderEPKS1_PKNS_7TerrainENS1_13TechniqueTypeERNSt7__cxx1118basic_stringstreamIcSt11char_traitsIcESaIcEEE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_233')">
+TerrainMaterialGeneratorA::SM2Profile::ShaderHelperGLSLES::generateVpLayer&#160;<span class='sym_p'><span>(&#160;TerrainMaterialGeneratorA::SM2Profile const* <span class='color_p'>prof</span></span>, <span>Terrain const* <span class='color_p'>terrain</span></span>, <span>enum TerrainMaterialGeneratorA::SM2Profile::TechniqueType <span class='color_p'>tt</span></span>, <span>uint <span class='color_p'>layer</span></span>, <span>StringUtil::StrStreamType&amp; <span class='color_p'>outStream</span></span>&#160;)</span></span>
+<br/>
+<div id="c_233" style="display:none;">
+<span class='mngl'>_ZN4Ogre25TerrainMaterialGeneratorA10SM2Profile18ShaderHelperGLSLES15generateVpLayerEPKS1_PKNS_7TerrainENS1_13TechniqueTypeEjRNSt7__cxx1118basic_stringstreamIcSt11char_traitsIcESaIcEEE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_234')">
+TerrainMaterialGeneratorA::SM2Profile::ShaderHelperGLSLES::~ShaderHelperGLSLES <span class='attr'>[D0]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_234" style="display:none;">
+<span class='mngl'>_ZN4Ogre25TerrainMaterialGeneratorA10SM2Profile18ShaderHelperGLSLESD0Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_235')">
+TerrainMaterialGeneratorA::SM2Profile::ShaderHelperGLSLES::~ShaderHelperGLSLES <span class='attr'>[D1]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_235" style="display:none;">
+<span class='mngl'>_ZN4Ogre25TerrainMaterialGeneratorA10SM2Profile18ShaderHelperGLSLESD1Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_236')">
+TerrainMaterialGeneratorA::SM2Profile::ShaderHelperGLSLES::~ShaderHelperGLSLES <span class='attr'>[D2]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_236" style="display:none;">
+<span class='mngl'>_ZN4Ogre25TerrainMaterialGeneratorA10SM2Profile18ShaderHelperGLSLESD2Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_237')">
+TerrainMaterialGeneratorA::SM2Profile::updateParams&#160;<span class='sym_p'><span>(&#160;SharedPtr&lt;Material&gt;const&amp; <span class='color_p'>mat</span></span>, <span>Terrain const* <span class='color_p'>terrain</span></span>&#160;)</span></span>
+<br/>
+<div id="c_237" style="display:none;">
+<span class='mngl'>_ZN4Ogre25TerrainMaterialGeneratorA10SM2Profile12updateParamsERKNS_9SharedPtrINS_8MaterialEEEPKNS_7TerrainE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_238')">
+TerrainMaterialGeneratorA::SM2Profile::updateParamsForCompositeMap&#160;<span class='sym_p'><span>(&#160;SharedPtr&lt;Material&gt;const&amp; <span class='color_p'>mat</span></span>, <span>Terrain const* <span class='color_p'>terrain</span></span>&#160;)</span></span>
+<br/>
+<div id="c_238" style="display:none;">
+<span class='mngl'>_ZN4Ogre25TerrainMaterialGeneratorA10SM2Profile27updateParamsForCompositeMapERKNS_9SharedPtrINS_8MaterialEEEPKNS_7TerrainE</span>
+<br/>
+<br/>
+</div>
+
+<br/>
+<span class='h_name'>OgreTerrainQuadTreeNode.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_239')">
+TerrainQuadTreeNode::updateVertexBuffer&#160;<span class='sym_p'><span>(&#160;HardwareVertexBufferSharedPtr&amp; <span class='color_p'>posbuf</span></span>, <span>HardwareVertexBufferSharedPtr&amp; <span class='color_p'>deltabuf</span></span>, <span>Rect const&amp; <span class='color_p'>rect</span></span>&#160;)</span></span>
+<br/>
+<div id="c_239" style="display:none;">
+<span class='mngl'>_ZN4Ogre19TerrainQuadTreeNode18updateVertexBufferERNS_29HardwareVertexBufferSharedPtrES2_RKNS_5TRectIlEE</span>
+<br/>
+<br/>
+</div>
+
+<br/>
+<a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='High_Risk_Problems'></a><a name='Type_Problems_High'></a>
+<h2>Problems with Data Types, High Severity <span class='failed'>&nbsp;10&nbsp;</span></h2><hr/>
+<span class='h_name'>OgreRenderable.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_240')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> Renderable <span class='failed'>&nbsp;6&nbsp;</span></span>
+<br/>
+<div id="c_240" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Pure virtual method <span class='iname_b'>setUserAny&#160;<span class='sym_pd'><span>(&#160;Any const&amp;</span>&#160;)</span></span> has been removed from this class.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>Pure virtual method <span class='iname_b'>setPolygonModeOverrideable&#160;<span class='sym_pd'><span>(&#160;bool</span>&#160;)</span></span> has been removed from this class.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>3</th>
+<td>Pure virtual method <span class='iname_b'>getUserAny&#160;<span class='sym_pd'>(&#160;)</span> const</span> has been removed from this class.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>4</th>
+<td>Pure virtual method <span class='iname_b'>getRenderSystemData&#160;<span class='sym_pd'>(&#160;)</span> const</span> has been removed from this class.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>5</th>
+<td>Pure virtual method <span class='iname_b'>setRenderSystemData&#160;<span class='sym_pd'><span>(&#160;Renderable::RenderSystemData*</span>&#160;)</span> const</span> has been removed from this class.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>6</th>
+<td>Pure virtual method <span class='iname_b'>getPolygonModeOverrideable&#160;<span class='sym_pd'>(&#160;)</span> const</span> has been removed from this class.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_241')">
+[+] affected symbols: 13 (1.6%)</span>
+<div id="c_241" style="display:none;">
+<div class='affected'><span class='iname_a'>Renderable::postRender&#160;<span class='sym_p'><span>(&#160;SceneManager* <i>p1</i></span>, <span>RenderSystem* <i>p2</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Renderable&#39; class.</div>
+<span class='iname_a'>Renderable::getRenderOperation&#160;<span class='sym_p'><span>(&#160;RenderOperation&amp; <i>p1</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Renderable&#39; class.</div>
+<span class='iname_a'>Renderable::preRender&#160;<span class='sym_p'><span>(&#160;SceneManager* <i>p1</i></span>, <span>RenderSystem* <i>p2</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Renderable&#39; class.</div>
+<span class='iname_a'>Renderable::Renderable&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This constructor is from &#39;Renderable&#39; class.</div>
+<span class='iname_a'>Renderable::~Renderable&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This destructor is from &#39;Renderable&#39; class.</div>
+<span class='iname_a'>Renderable::getMaterial&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Renderable&#39; class.</div>
+<span class='iname_a'>Renderable::getTechnique&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Renderable&#39; class.</div>
+<span class='iname_a'>Renderable::getCastsShadows&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Renderable&#39; class.</div>
+<span class='iname_a'>Renderable::getWorldTransforms&#160;<span class='sym_p'><span>(&#160;Matrix4* <i>p1</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Renderable&#39; class.</div>
+<span class='iname_a'>Renderable::getSquaredViewDepth&#160;<span class='sym_p'><span>(&#160;Camera const* <i>p1</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Renderable&#39; class.</div>
+ <b>...</b>
+<br/>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<span class='h_name'>OgreTerrain.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_242')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> Terrain::GpuBufferAllocator <span class='failed'>&nbsp;4&nbsp;</span></span>
+<br/>
+<div id="c_242" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Pure virtual method <span class='iname_b'>freeVertexBuffers&#160;<span class='sym_pd'><span>(&#160;HardwareVertexBufferSharedPtr const&amp;</span>, <span>HardwareVertexBufferSharedPtr const&amp;</span>&#160;)</span></span> has been added to this class.</td>
+<td>Recompilation of a client program may be broken with the error message: cannot allocate an object of abstract type <b>Terrain::GpuBufferAllocator</b> because the following virtual functions are pure within <b>Terrain::GpuBufferAllocator</b>: virtual <span class='iname_b'>freeVertexBuffers&#160;<span class='sym_pd'><span>(&#160;HardwareVertexBufferSharedPtr const&amp;</span>, <span>HardwareVertexBufferSharedPtr const&amp;</span>&#160;)</span></span>.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>Pure virtual method <span class='iname_b'>allocateVertexBuffers&#160;<span class='sym_pd'><span>(&#160;Terrain*</span>, <span>size_t</span>, <span>HardwareVertexBufferSharedPtr&amp;</span>, <span>HardwareVertexBufferSharedPtr&amp;</span>&#160;)</span></span> has been added to this class.</td>
+<td>Recompilation of a client program may be broken with the error message: cannot allocate an object of abstract type <b>Terrain::GpuBufferAllocator</b> because the following virtual functions are pure within <b>Terrain::GpuBufferAllocator</b>: virtual <span class='iname_b'>allocateVertexBuffers&#160;<span class='sym_pd'><span>(&#160;Terrain*</span>, <span>size_t</span>, <span>HardwareVertexBufferSharedPtr&amp;</span>, <span>HardwareVertexBufferSharedPtr&amp;</span>&#160;)</span></span>.</td>
+</tr>
+<tr>
+<th>3</th>
+<td>Pure virtual method <span class='iname_b'>freeVertexBuffers&#160;<span class='sym_pd'><span>(&#160;HardwareVertexBufferSharedPtr const&amp;</span>, <span>HardwareVertexBufferSharedPtr const&amp;</span>&#160;)</span></span> has been removed from this class.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>4</th>
+<td>Pure virtual method <span class='iname_b'>allocateVertexBuffers&#160;<span class='sym_pd'><span>(&#160;Terrain*</span>, <span>size_t</span>, <span>HardwareVertexBufferSharedPtr&amp;</span>, <span>HardwareVertexBufferSharedPtr&amp;</span>&#160;)</span></span> has been removed from this class.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_243')">
+[+] affected symbols: 4 (0.5%)</span>
+<div id="c_243" style="display:none;">
+<div class='affected'><span class='iname_a'>Terrain::GpuBufferAllocator::freeAllBuffers&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Terrain::GpuBufferAllocator&#39; class.</div>
+<span class='iname_a'>Terrain::GpuBufferAllocator::getSharedIndexBuffer&#160;<span class='sym_p'><span>(&#160;uint16 <i>p1</i></span>, <span>uint16 <i>p2</i></span>, <span>size_t <i>p3</i></span>, <span>uint16 <i>p4</i></span>, <span>uint16 <i>p5</i></span>, <span>uint16 <i>p6</i></span>, <span>uint16 <i>p7</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Terrain::GpuBufferAllocator&#39; class.</div>
+<span class='iname_a'>Terrain::GpuBufferAllocator::GpuBufferAllocator&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This constructor is from &#39;Terrain::GpuBufferAllocator&#39; class.</div>
+<span class='iname_a'>Terrain::GpuBufferAllocator::~GpuBufferAllocator&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This destructor is from &#39;Terrain::GpuBufferAllocator&#39; class.</div>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='Medium_Risk_Problems'></a><a name='Type_Problems_Medium'></a>
+<h2>Problems with Data Types, Medium Severity <span class='failed'>&nbsp;1&nbsp;</span></h2><hr/>
+<span class='h_name'>OgreRenderable.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_244')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> Renderable <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_244" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>The pointer level of field <b>mRenderSystemData</b> has been increased from <b>1</b> to <b>0</b>.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_245')">
+[+] affected symbols: 5 (0.6%)</span>
+<div id="c_245" style="display:none;">
+<div class='affected'><span class='iname_a'>Renderable::Renderable&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This constructor is from &#39;Renderable&#39; class.</div>
+<span class='iname_a'>Renderable::~Renderable&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This destructor is from &#39;Renderable&#39; class.</div>
+<span class='iname_a'>TerrainQuadTreeNode::_getRenderable&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>Return value (pointer) has base type &#39;Renderable&#39;.</div>
+<span class='iname_a'>TerrainQuadTreeNode::getRenderOperation&#160;<span class='sym_p'><span>(&#160;RenderOperation&amp; <span class='fp'>op</span></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;op.srcRenderable&#39; in 1st parameter &#39;op&#39; (reference) has base type &#39;Renderable&#39;.</div>
+<span class='iname_a'>TerrainQuadTreeNode::Rend::getRenderOperation&#160;<span class='sym_p'><span>(&#160;RenderOperation&amp; <span class='fp'>op</span></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;op.srcRenderable&#39; in 1st parameter &#39;op&#39; (reference) has base type &#39;Renderable&#39;.</div>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='Symbol_Problems_Medium'></a><a name='Interface_Problems_Medium'></a>
+<h2>Problems with Symbols, Medium Severity <span class='failed'>&nbsp;10&nbsp;</span></h2><hr/>
+<span class='h_name'>OgreTerrain.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_246')">
+<span class='ext'>[+]</span> Terrain::_populateIndexBuffer&#160;<span class='sym_p'><span>(&#160;uint16* <span class='color_p'>pI</span></span>, <span>uint16 <span class='color_p'>batchSize</span></span>, <span>uint16 <span class='color_p'>vdatasize</span></span>, <span>size_t <span class='color_p'>vertexIncrement</span></span>, <span>uint16 <span class='color_p'>xoffset</span></span>, <span>uint16 <span class='color_p'>yoffset</span></span>, <span>uint16 <span class='color_p'>numSkirtRowsCols</span></span>, <span>uint16 <span class='color_p'>skirtRowColSkip</span></span>&#160;)</span> <span class='attr'>[static]</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_246" style="display:none;">
+
+
+<span class='new_sign_lbl'>&#8675;</span>
+<br/>
+<span class='new_sign'>Terrain::_populateIndexBuffer&#160;<span class='sym_p'><span>(&#160;uint16* <span class='color_p'>pI</span></span>, <span>uint16 <span class='color_p'>batchSize</span></span>, <span>uint16 <span class='color_p'>vdatasize</span></span>, <span>uint16 <span class='color_p'>vertexIncrement</span></span>, <span>uint16 <span class='color_p'>xoffset</span></span>, <span>uint16 <span class='color_p'>yoffset</span></span>, <span>uint16 <span class='color_p'>numSkirtRowsCols</span></span>, <span>uint16 <span class='color_p'>skirtRowColSkip</span></span>&#160;)</span> <span class='attr'>[static]</span></span><br/>
+<span class='mngl pleft'>_ZN4Ogre7Terrain20_populateIndexBufferEPtttmtttt</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>Parameters list has been changed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+</table>
+<br/>
+</div>
+<span class="section" onclick="javascript:showContent(this, 'c_247')">
+<span class='ext'>[+]</span> Terrain::DefaultGpuBufferAllocator::getVertexBuffer&#160;<span class='sym_p'><span>(&#160;list&lt;HardwareVertexBufferSharedPtr, STLAllocator&lt;HardwareVertexBufferSharedPtr, CategorisedAllocPolicy&lt;(MemoryCategory)0&gt; &gt; &gt;::type&amp; <span class='color_p'>list</span></span>, <span>size_t <span class='color_p'>vertexSize</span></span>, <span>size_t <span class='color_p'>numVertices</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_247" style="display:none;">
+
+
+<span class='new_sign_lbl'>&#8675;</span>
+<br/>
+<span class='new_sign'>Terrain::DefaultGpuBufferAllocator::getVertexBuffer&#160;<span class='sym_p'><span>(&#160;list&lt;std::shared_ptr&lt;HardwareVertexBuffer&gt; &gt;::type&amp; <span class='color_p'>list</span></span>, <span>size_t <span class='color_p'>vertexSize</span></span>, <span>size_t <span class='color_p'>numVertices</span></span>&#160;)</span></span><br/>
+<span class='mngl pleft'>_ZN4Ogre7Terrain25DefaultGpuBufferAllocator15getVertexBufferERNSt7__cxx114listINS_29HardwareVertexBufferSharedPtrESaIS4_EEEmm</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>Parameters list has been changed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+</table>
+<br/>
+</div>
+<span class="section" onclick="javascript:showContent(this, 'c_248')">
+<span class='ext'>[+]</span> Terrain::prepare&#160;<span class='sym_p'><span>(&#160;SharedPtr&lt;DataStream&gt;&amp; <span class='color_p'>stream</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_248" style="display:none;">
+
+
+<span class='new_sign_lbl'>&#8675;</span>
+<br/>
+<span class='new_sign'>Terrain::prepare&#160;<span class='sym_p'><span>(&#160;std::shared_ptr&lt;DataStream&gt;&amp; <span class='color_p'>stream</span></span>&#160;)</span></span><br/>
+<span class='mngl pleft'>_ZN4Ogre7Terrain7prepareERNS_9SharedPtrINS_10DataStreamEEE</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>Parameters list has been changed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+</table>
+<br/>
+</div>
+<span class="section" onclick="javascript:showContent(this, 'c_249')">
+<span class='ext'>[+]</span> TerrainGlobalOptions::setDefaultMaterialGenerator&#160;<span class='sym_p'><span>(&#160;SharedPtr&lt;TerrainMaterialGenerator&gt; <span class='color_p'>gen</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_249" style="display:none;">
+
+
+<span class='new_sign_lbl'>&#8675;</span>
+<br/>
+<span class='new_sign'>TerrainGlobalOptions::setDefaultMaterialGenerator&#160;<span class='sym_p'><span>(&#160;std::shared_ptr&lt;DataStream&gt; <span class='color_p'>gen</span></span>&#160;)</span></span><br/>
+<span class='mngl pleft'>_ZN4Ogre20TerrainGlobalOptions27setDefaultMaterialGeneratorENS_9SharedPtrINS_24TerrainMaterialGeneratorEEE</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>Parameters list has been changed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+</table>
+<br/>
+</div>
+<br/>
+<span class='h_name'>OgreTerrainLayerBlendMap.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_250')">
+<span class='ext'>[+]</span> TerrainLayerBlendMap::loadImage&#160;<span class='sym_p'><span>(&#160;SharedPtr&lt;DataStream&gt;&amp; <span class='color_p'>stream</span></span>, <span>String const&amp; <span class='color_p'>ext</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_250" style="display:none;">
+
+
+<span class='new_sign_lbl'>&#8675;</span>
+<br/>
+<span class='new_sign'>TerrainLayerBlendMap::loadImage&#160;<span class='sym_p'><span>(&#160;std::shared_ptr&lt;DataStream&gt;&amp; <span class='color_p'>stream</span></span>, <span>String const&amp; <span class='color_p'>ext</span></span>&#160;)</span></span><br/>
+<span class='mngl pleft'>_ZN4Ogre20TerrainLayerBlendMap9loadImageERNS_9SharedPtrINS_10DataStreamEEERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>Parameters list has been changed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+</table>
+<br/>
+</div>
+<br/>
+<span class='h_name'>OgreTerrainLodManager.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_251')">
+<span class='ext'>[+]</span> TerrainLodManager::TerrainLodManager <span class='attr'>[C1]</span>&#160;<span class='sym_p'><span>(&#160;Terrain* <span class='color_p'>t</span></span>, <span>SharedPtr&lt;DataStream&gt;&amp; <span class='color_p'>stream</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_251" style="display:none;">
+
+
+<span class='new_sign_lbl'>&#8675;</span>
+<br/>
+<span class='new_sign'>TerrainLodManager::TerrainLodManager <span class='attr'>[C1]</span>&#160;<span class='sym_p'><span>(&#160;Terrain* <span class='color_p'>t</span></span>, <span>std::shared_ptr&lt;DataStream&gt;&amp; <span class='color_p'>stream</span></span>&#160;)</span></span><br/>
+<span class='mngl pleft'>_ZN4Ogre17TerrainLodManagerC1EPNS_7TerrainERNS_9SharedPtrINS_10DataStreamEEE</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>Parameters list has been changed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+</table>
+<br/>
+</div>
+<span class="section" onclick="javascript:showContent(this, 'c_252')">
+<span class='ext'>[+]</span> TerrainLodManager::TerrainLodManager <span class='attr'>[C2]</span>&#160;<span class='sym_p'><span>(&#160;Terrain* <span class='color_p'>t</span></span>, <span>SharedPtr&lt;DataStream&gt;&amp; <span class='color_p'>stream</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_252" style="display:none;">
+
+
+<span class='new_sign_lbl'>&#8675;</span>
+<br/>
+<span class='new_sign'>TerrainLodManager::TerrainLodManager <span class='attr'>[C2]</span>&#160;<span class='sym_p'><span>(&#160;Terrain* <span class='color_p'>t</span></span>, <span>std::shared_ptr&lt;DataStream&gt;&amp; <span class='color_p'>stream</span></span>&#160;)</span></span><br/>
+<span class='mngl pleft'>_ZN4Ogre17TerrainLodManagerC2EPNS_7TerrainERNS_9SharedPtrINS_10DataStreamEEE</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>Parameters list has been changed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+</table>
+<br/>
+</div>
+<br/>
+<span class='h_name'>OgreTerrainMaterialGeneratorA.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_253')">
+<span class='ext'>[+]</span> TerrainMaterialGeneratorA::SM2Profile::addTechnique&#160;<span class='sym_p'><span>(&#160;SharedPtr&lt;Material&gt;const&amp; <span class='color_p'>mat</span></span>, <span>Terrain const* <span class='color_p'>terrain</span></span>, <span>enum TerrainMaterialGeneratorA::SM2Profile::TechniqueType <span class='color_p'>tt</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_253" style="display:none;">
+
+
+<span class='new_sign_lbl'>&#8675;</span>
+<br/>
+<span class='new_sign'>TerrainMaterialGeneratorA::SM2Profile::addTechnique&#160;<span class='sym_p'><span>(&#160;std::shared_ptr&lt;DataStream&gt;const&amp; <span class='color_p'>mat</span></span>, <span>Terrain const* <span class='color_p'>terrain</span></span>, <span>enum TerrainMaterialGeneratorA::SM2Profile::TechniqueType <span class='color_p'>tt</span></span>&#160;)</span></span><br/>
+<span class='mngl pleft'>_ZN4Ogre25TerrainMaterialGeneratorA10SM2Profile12addTechniqueERKNS_9SharedPtrINS_8MaterialEEEPKNS_7TerrainENS1_13TechniqueTypeE</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>Parameters list has been changed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+</table>
+<br/>
+</div>
+<span class="section" onclick="javascript:showContent(this, 'c_254')">
+<span class='ext'>[+]</span> TerrainMaterialGeneratorA::SM2Profile::ShaderHelper::defaultFpParams&#160;<span class='sym_p'><span>(&#160;TerrainMaterialGeneratorA::SM2Profile const* <span class='color_p'>prof</span></span>, <span>Terrain const* <span class='color_p'>terrain</span></span>, <span>enum TerrainMaterialGeneratorA::SM2Profile::TechniqueType <span class='color_p'>tt</span></span>, <span>SharedPtr&lt;HighLevelGpuProgram&gt;const&amp; <span class='color_p'>prog</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_254" style="display:none;">
+
+
+<span class='new_sign_lbl'>&#8675;</span>
+<br/>
+<span class='new_sign'>TerrainMaterialGeneratorA::SM2Profile::ShaderHelper::defaultFpParams&#160;<span class='sym_p'><span>(&#160;TerrainMaterialGeneratorA::SM2Profile const* <span class='color_p'>prof</span></span>, <span>Terrain const* <span class='color_p'>terrain</span></span>, <span>enum TerrainMaterialGeneratorA::SM2Profile::TechniqueType <span class='color_p'>tt</span></span>, <span>std::shared_ptr&lt;DataStream&gt;const&amp; <span class='color_p'>prog</span></span>&#160;)</span></span><br/>
+<span class='mngl pleft'>_ZN4Ogre25TerrainMaterialGeneratorA10SM2Profile12ShaderHelper15defaultFpParamsEPKS1_PKNS_7TerrainENS1_13TechniqueTypeERKNS_9SharedPtrINS_19HighLevelGpuProgramEEE</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>Parameters list has been changed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+</table>
+<br/>
+</div>
+<span class="section" onclick="javascript:showContent(this, 'c_255')">
+<span class='ext'>[+]</span> TerrainMaterialGeneratorA::SM2Profile::ShaderHelper::updateVpParams&#160;<span class='sym_p'><span>(&#160;TerrainMaterialGeneratorA::SM2Profile const* <span class='color_p'>prof</span></span>, <span>Terrain const* <span class='color_p'>terrain</span></span>, <span>enum TerrainMaterialGeneratorA::SM2Profile::TechniqueType <span class='color_p'>tt</span></span>, <span>SharedPtr&lt;GpuProgramParameters&gt;const&amp; <span class='color_p'>params</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_255" style="display:none;">
+
+
+<span class='new_sign_lbl'>&#8675;</span>
+<br/>
+<span class='new_sign'>TerrainMaterialGeneratorA::SM2Profile::ShaderHelper::updateVpParams&#160;<span class='sym_p'><span>(&#160;TerrainMaterialGeneratorA::SM2Profile const* <span class='color_p'>prof</span></span>, <span>Terrain const* <span class='color_p'>terrain</span></span>, <span>enum TerrainMaterialGeneratorA::SM2Profile::TechniqueType <span class='color_p'>tt</span></span>, <span>std::shared_ptr&lt;DataStream&gt;const&amp; <span class='color_p'>params</span></span>&#160;)</span></span><br/>
+<span class='mngl pleft'>_ZN4Ogre25TerrainMaterialGeneratorA10SM2Profile12ShaderHelper14updateVpParamsEPKS1_PKNS_7TerrainENS1_13TechniqueTypeERKNS_9SharedPtrINS_20GpuProgramParametersEEE</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>Parameters list has been changed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+</table>
+<br/>
+</div>
+<br/>
+<a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='Low_Risk_Problems'></a><a name='Type_Problems_Low'></a>
+<h2>Problems with Data Types, Low Severity <span class='warning'>&nbsp;16&nbsp;</span></h2><hr/>
+<span class='h_name'>OgreHardwareIndexBuffer.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_256')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> HardwareIndexBufferSharedPtr <span class='warning'>&nbsp;2&nbsp;</span></span>
+<br/>
+<div id="c_256" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Base class <span class='value'>std::__shared_ptr&lt;DataStream, 2&gt;</span> has been added.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>Base class <b>SharedPtr&lt;HardwareIndexBuffer&gt;</b> has been removed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_257')">
+[+] affected symbols: 4 (0.5%)</span>
+<div id="c_257" style="display:none;">
+<div class='affected'><span class='iname_a'>HardwareIndexBufferSharedPtr::HardwareIndexBufferSharedPtr&#160;<span class='sym_p'><span>(&#160;HardwareIndexBufferSharedPtr&amp;& <i>p1</i></span>&#160;)</span></span><br/>
+<div class='affect'>This constructor is from &#39;HardwareIndexBufferSharedPtr&#39; class.</div>
+<span class='iname_a'>HardwareIndexBufferSharedPtr::HardwareIndexBufferSharedPtr&#160;<span class='sym_p'><span>(&#160;HardwareIndexBufferSharedPtr const&amp; <i>p1</i></span>&#160;)</span></span><br/>
+<div class='affect'>This constructor is from &#39;HardwareIndexBufferSharedPtr&#39; class.</div>
+<span class='iname_a'>HardwareIndexBufferSharedPtr::HardwareIndexBufferSharedPtr&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This constructor is from &#39;HardwareIndexBufferSharedPtr&#39; class.</div>
+<span class='iname_a'>HardwareIndexBufferSharedPtr::~HardwareIndexBufferSharedPtr&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This destructor is from &#39;HardwareIndexBufferSharedPtr&#39; class.</div>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<span class='h_name'>OgreHardwareVertexBuffer.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_258')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> HardwareVertexBufferSharedPtr <span class='warning'>&nbsp;2&nbsp;</span></span>
+<br/>
+<div id="c_258" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Base class <span class='value'>std::__shared_ptr&lt;DataStream, 2&gt;</span> has been added.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>Base class <b>SharedPtr&lt;HardwareVertexBuffer&gt;</b> has been removed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_259')">
+[+] affected symbols: 4 (0.5%)</span>
+<div id="c_259" style="display:none;">
+<div class='affected'><span class='iname_a'>HardwareVertexBufferSharedPtr::HardwareVertexBufferSharedPtr&#160;<span class='sym_p'><span>(&#160;HardwareVertexBufferSharedPtr&amp;& <i>p1</i></span>&#160;)</span></span><br/>
+<div class='affect'>This constructor is from &#39;HardwareVertexBufferSharedPtr&#39; class.</div>
+<span class='iname_a'>HardwareVertexBufferSharedPtr::HardwareVertexBufferSharedPtr&#160;<span class='sym_p'><span>(&#160;HardwareVertexBufferSharedPtr const&amp; <i>p1</i></span>&#160;)</span></span><br/>
+<div class='affect'>This constructor is from &#39;HardwareVertexBufferSharedPtr&#39; class.</div>
+<span class='iname_a'>HardwareVertexBufferSharedPtr::HardwareVertexBufferSharedPtr&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This constructor is from &#39;HardwareVertexBufferSharedPtr&#39; class.</div>
+<span class='iname_a'>HardwareVertexBufferSharedPtr::~HardwareVertexBufferSharedPtr&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This destructor is from &#39;HardwareVertexBufferSharedPtr&#39; class.</div>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<span class='h_name'>OgrePrerequisites.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_260')">
+<span class='ext'>[+]</span> <span class='ttype'>typedef</span> HighLevelGpuProgramPtr <span class='warning'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_260" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Base type has been changed from <b>SharedPtr&lt;HighLevelGpuProgram&gt;</b> to <b>SharedPtr</b>.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_261')">
+[+] affected symbols: 8 (1%)</span>
+<div id="c_261" style="display:none;">
+<div class='affected'><span class='iname_a'>TerrainMaterialGeneratorA::SM2Profile::ShaderHelper::generateVertexProgram&#160;<span class='sym_p'><span>(&#160;TerrainMaterialGeneratorA::SM2Profile const* <i>prof</i></span>, <span>Terrain const* <i>terrain</i></span>, <span>enum TerrainMaterialGeneratorA::SM2Profile::TechniqueType <i>tt</i></span>&#160;)</span></span><br/>
+<div class='affect'>Return value is of type &#39;HighLevelGpuProgramPtr&#39;.</div>
+<span class='iname_a'>TerrainMaterialGeneratorA::SM2Profile::ShaderHelper::generateFragmentProgram&#160;<span class='sym_p'><span>(&#160;TerrainMaterialGeneratorA::SM2Profile const* <i>prof</i></span>, <span>Terrain const* <i>terrain</i></span>, <span>enum TerrainMaterialGeneratorA::SM2Profile::TechniqueType <i>tt</i></span>&#160;)</span></span><br/>
+<div class='affect'>Return value is of type &#39;HighLevelGpuProgramPtr&#39;.</div>
+<span class='iname_a'>TerrainMaterialGeneratorA::SM2Profile::ShaderHelperCg::createVertexProgram&#160;<span class='sym_p'><span>(&#160;TerrainMaterialGeneratorA::SM2Profile const* <i>prof</i></span>, <span>Terrain const* <i>terrain</i></span>, <span>enum TerrainMaterialGeneratorA::SM2Profile::TechniqueType <i>tt</i></span>&#160;)</span></span><br/>
+<div class='affect'>Return value is of type &#39;HighLevelGpuProgramPtr&#39;.</div>
+<span class='iname_a'>TerrainMaterialGeneratorA::SM2Profile::ShaderHelperCg::createFragmentProgram&#160;<span class='sym_p'><span>(&#160;TerrainMaterialGeneratorA::SM2Profile const* <i>prof</i></span>, <span>Terrain const* <i>terrain</i></span>, <span>enum TerrainMaterialGeneratorA::SM2Profile::TechniqueType <i>tt</i></span>&#160;)</span></span><br/>
+<div class='affect'>Return value is of type &#39;HighLevelGpuProgramPtr&#39;.</div>
+<span class='iname_a'>TerrainMaterialGeneratorA::SM2Profile::ShaderHelperGLSL::createVertexProgram&#160;<span class='sym_p'><span>(&#160;TerrainMaterialGeneratorA::SM2Profile const* <i>prof</i></span>, <span>Terrain const* <i>terrain</i></span>, <span>enum TerrainMaterialGeneratorA::SM2Profile::TechniqueType <i>tt</i></span>&#160;)</span></span><br/>
+<div class='affect'>Return value is of type &#39;HighLevelGpuProgramPtr&#39;.</div>
+<span class='iname_a'>TerrainMaterialGeneratorA::SM2Profile::ShaderHelperGLSL::createFragmentProgram&#160;<span class='sym_p'><span>(&#160;TerrainMaterialGeneratorA::SM2Profile const* <i>prof</i></span>, <span>Terrain const* <i>terrain</i></span>, <span>enum TerrainMaterialGeneratorA::SM2Profile::TechniqueType <i>tt</i></span>&#160;)</span></span><br/>
+<div class='affect'>Return value is of type &#39;HighLevelGpuProgramPtr&#39;.</div>
+<span class='iname_a'>TerrainMaterialGeneratorA::SM2Profile::ShaderHelperHLSL::createVertexProgram&#160;<span class='sym_p'><span>(&#160;TerrainMaterialGeneratorA::SM2Profile const* <i>prof</i></span>, <span>Terrain const* <i>terrain</i></span>, <span>enum TerrainMaterialGeneratorA::SM2Profile::TechniqueType <i>tt</i></span>&#160;)</span></span><br/>
+<div class='affect'>Return value is of type &#39;HighLevelGpuProgramPtr&#39;.</div>
+<span class='iname_a'>TerrainMaterialGeneratorA::SM2Profile::ShaderHelperHLSL::createFragmentProgram&#160;<span class='sym_p'><span>(&#160;TerrainMaterialGeneratorA::SM2Profile const* <i>prof</i></span>, <span>Terrain const* <i>terrain</i></span>, <span>enum TerrainMaterialGeneratorA::SM2Profile::TechniqueType <i>tt</i></span>&#160;)</span></span><br/>
+<div class='affect'>Return value is of type &#39;HighLevelGpuProgramPtr&#39;.</div>
+</div>
+</div>
+<br/><br/></div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_262')">
+<span class='ext'>[+]</span> <span class='ttype'>typedef</span> MaterialPtr <span class='warning'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_262" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Base type has been changed from <b>SharedPtr&lt;Material&gt;</b> to <b>SharedPtr</b>.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_263')">
+[+] affected symbols: 258 (32.3%)</span>
+<div id="c_263" style="display:none;">
+<div class='affected'><span class='iname_a'>TerrainGroup::TerrainSlot::freeInstance&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.instance.mMaterial&#39; in the object of this method is of type &#39;MaterialPtr&#39;.</div>
+<span class='iname_a'>TerrainGroup::TerrainSlot::TerrainSlot&#160;<span class='sym_p'><span>(&#160;long <i>_x</i></span>, <span>long <i>_y</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.instance.mMaterial&#39; in the object of this method is of type &#39;MaterialPtr&#39;.</div>
+<span class='iname_a'>TerrainGroup::TerrainSlot::~TerrainSlot&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.instance.mMaterial&#39; in the object of this method is of type &#39;MaterialPtr&#39;.</div>
+<span class='iname_a'>TerrainGroup::getTerrainSlot&#160;<span class='sym_p'><span>(&#160;long <i>x</i></span>, <span>long <i>y</i></span>, <span>bool <i>createIfMissing</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;retval.instance.mMaterial&#39; in the return value (pointer) is of type &#39;MaterialPtr&#39;.</div>
+<span class='iname_a'>TerrainGroup::loadTerrainImpl&#160;<span class='sym_p'><span>(&#160;struct TerrainGroup::TerrainSlot* <span class='fp'>slot</span></span>, <span>bool <i>synchronous</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;slot.instance.mMaterial&#39; in 1st parameter &#39;slot&#39; (pointer) is of type &#39;MaterialPtr&#39;.</div>
+<span class='iname_a'>TerrainGroup::connectNeighbour&#160;<span class='sym_p'><span>(&#160;struct TerrainGroup::TerrainSlot* <span class='fp'>slot</span></span>, <span>long <i>offsetx</i></span>, <span>long <i>offsety</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;slot.instance.mMaterial&#39; in 1st parameter &#39;slot&#39; (pointer) is of type &#39;MaterialPtr&#39;.</div>
+<span class='iname_a'>TerrainGroup::getHeightAtWorldPosition&#160;<span class='sym_p'><span>(&#160;Real <i>x</i></span>, <span>Real <i>y</i></span>, <span>Real <i>z</i></span>, <span>Terrain** <span class='fp'>ppTerrain</span></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;ppTerrain.mCompositeMapMaterial&#39; in 4th parameter &#39;ppTerrain&#39; (pointer) is of type &#39;MaterialPtr&#39;.</div>
+<span class='iname_a'>TerrainGroup::getHeightAtWorldPosition&#160;<span class='sym_p'><span>(&#160;Vector3 const&amp; <i>pos</i></span>, <span>Terrain** <span class='fp'>ppTerrain</span></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;ppTerrain.mCompositeMapMaterial&#39; in 2nd parameter &#39;ppTerrain&#39; (pointer) is of type &#39;MaterialPtr&#39;.</div>
+<span class='iname_a'>TerrainGroup::RayResult::RayResult&#160;<span class='sym_p'><span>(&#160;bool <i>_hit</i></span>, <span>Terrain* <span class='fp'>_terrain</span></span>, <span>Vector3 const&amp; <i>_pos</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;_terrain.mCompositeMapMaterial&#39; in 2nd parameter &#39;_terrain&#39; (pointer) is of type &#39;MaterialPtr&#39;.</div>
+<span class='iname_a'>TerrainLodManager::TerrainLodManager&#160;<span class='sym_p'><span>(&#160;Terrain* <span class='fp'>t</span></span>, <span>String const&amp; <i>filename</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;t.mCompositeMapMaterial&#39; in 1st parameter &#39;t&#39; (pointer) is of type &#39;MaterialPtr&#39;.</div>
+ <b>...</b>
+<br/>
+</div>
+</div>
+<br/><br/></div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_264')">
+<span class='ext'>[+]</span> <span class='ttype'>typedef</span> TexturePtr <span class='warning'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_264" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Base type has been changed from <b>SharedPtr&lt;Texture&gt;</b> to <b>SharedPtr</b>.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_265')">
+[+] affected symbols: 256 (32%)</span>
+<div id="c_265" style="display:none;">
+<div class='affected'><span class='iname_a'>TerrainGroup::TerrainSlot::freeInstance&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.instance.mLightmap&#39; in the object of this method is of type &#39;TexturePtr&#39;.</div>
+<span class='iname_a'>TerrainGroup::TerrainSlot::TerrainSlot&#160;<span class='sym_p'><span>(&#160;long <i>_x</i></span>, <span>long <i>_y</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.instance.mLightmap&#39; in the object of this method is of type &#39;TexturePtr&#39;.</div>
+<span class='iname_a'>TerrainGroup::TerrainSlot::~TerrainSlot&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.instance.mLightmap&#39; in the object of this method is of type &#39;TexturePtr&#39;.</div>
+<span class='iname_a'>TerrainGroup::getTerrainSlot&#160;<span class='sym_p'><span>(&#160;long <i>x</i></span>, <span>long <i>y</i></span>, <span>bool <i>createIfMissing</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;retval.instance.mLightmap&#39; in the return value (pointer) is of type &#39;TexturePtr&#39;.</div>
+<span class='iname_a'>TerrainGroup::loadTerrainImpl&#160;<span class='sym_p'><span>(&#160;struct TerrainGroup::TerrainSlot* <span class='fp'>slot</span></span>, <span>bool <i>synchronous</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;slot.instance.mLightmap&#39; in 1st parameter &#39;slot&#39; (pointer) is of type &#39;TexturePtr&#39;.</div>
+<span class='iname_a'>TerrainGroup::connectNeighbour&#160;<span class='sym_p'><span>(&#160;struct TerrainGroup::TerrainSlot* <span class='fp'>slot</span></span>, <span>long <i>offsetx</i></span>, <span>long <i>offsety</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;slot.instance.mLightmap&#39; in 1st parameter &#39;slot&#39; (pointer) is of type &#39;TexturePtr&#39;.</div>
+<span class='iname_a'>TerrainGroup::getHeightAtWorldPosition&#160;<span class='sym_p'><span>(&#160;Real <i>x</i></span>, <span>Real <i>y</i></span>, <span>Real <i>z</i></span>, <span>Terrain** <span class='fp'>ppTerrain</span></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;ppTerrain.mColourMap&#39; in 4th parameter &#39;ppTerrain&#39; (pointer) is of type &#39;TexturePtr&#39;.</div>
+<span class='iname_a'>TerrainGroup::getHeightAtWorldPosition&#160;<span class='sym_p'><span>(&#160;Vector3 const&amp; <i>pos</i></span>, <span>Terrain** <span class='fp'>ppTerrain</span></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;ppTerrain.mColourMap&#39; in 2nd parameter &#39;ppTerrain&#39; (pointer) is of type &#39;TexturePtr&#39;.</div>
+<span class='iname_a'>TerrainGroup::RayResult::RayResult&#160;<span class='sym_p'><span>(&#160;bool <i>_hit</i></span>, <span>Terrain* <span class='fp'>_terrain</span></span>, <span>Vector3 const&amp; <i>_pos</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;_terrain.mColourMap&#39; in 2nd parameter &#39;_terrain&#39; (pointer) is of type &#39;TexturePtr&#39;.</div>
+<span class='iname_a'>TerrainLodManager::TerrainLodManager&#160;<span class='sym_p'><span>(&#160;Terrain* <span class='fp'>t</span></span>, <span>String const&amp; <i>filename</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;t.mColourMap&#39; in 1st parameter &#39;t&#39; (pointer) is of type &#39;TexturePtr&#39;.</div>
+ <b>...</b>
+<br/>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<span class='h_name'>OgreRenderable.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_266')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> Renderable <span class='warning'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_266" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Type of field <b>mRenderSystemData</b> has been changed from <b>Renderable::RenderSystemData*</b> to <b>Renderable::RenderSystemDataPtr</b>.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_267')">
+[+] affected symbols: 5 (0.6%)</span>
+<div id="c_267" style="display:none;">
+<div class='affected'><span class='iname_a'>Renderable::Renderable&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This constructor is from &#39;Renderable&#39; class.</div>
+<span class='iname_a'>Renderable::~Renderable&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This destructor is from &#39;Renderable&#39; class.</div>
+<span class='iname_a'>TerrainQuadTreeNode::_getRenderable&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>Return value (pointer) has base type &#39;Renderable&#39;.</div>
+<span class='iname_a'>TerrainQuadTreeNode::getRenderOperation&#160;<span class='sym_p'><span>(&#160;RenderOperation&amp; <span class='fp'>op</span></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;op.srcRenderable&#39; in 1st parameter &#39;op&#39; (reference) has base type &#39;Renderable&#39;.</div>
+<span class='iname_a'>TerrainQuadTreeNode::Rend::getRenderOperation&#160;<span class='sym_p'><span>(&#160;RenderOperation&amp; <span class='fp'>op</span></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;op.srcRenderable&#39; in 1st parameter &#39;op&#39; (reference) has base type &#39;Renderable&#39;.</div>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<span class='h_name'>OgreRenderOperation.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_268')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> RenderOperation <span class='warning'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_268" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Field <b>renderToVertexBuffer</b> has been added to this type.</td>
+<td>This field will not be initialized or used by old client applications.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_269')">
+[+] affected symbols: 2 (0.3%)</span>
+<div id="c_269" style="display:none;">
+<div class='affected'><span class='iname_a'>TerrainQuadTreeNode::getRenderOperation&#160;<span class='sym_p'><span>(&#160;RenderOperation&amp; <span class='fp'>op</span></span>&#160;)</span></span><br/>
+<div class='affect'>1st parameter &#39;op&#39; (reference) has base type &#39;RenderOperation&#39;.</div>
+<span class='iname_a'>TerrainQuadTreeNode::Rend::getRenderOperation&#160;<span class='sym_p'><span>(&#160;RenderOperation&amp; <span class='fp'>op</span></span>&#160;)</span></span><br/>
+<div class='affect'>1st parameter &#39;op&#39; (reference) has base type &#39;RenderOperation&#39;.</div>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<span class='h_name'>OgreStringVector.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_270')">
+<span class='ext'>[+]</span> <span class='ttype'>typedef</span> StringVector <span class='warning'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_270" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Base type has been changed from <span class='value'>vector&lt;std::__cxx11::basic_string&lt;char&gt;, STLAllocator&lt;std::__cxx11::basic_string&lt;char, std::char_traits&lt;char&gt;, std::allocator&lt;char&gt; &gt;, CategorisedAllocPolicy&lt;(MemoryCategory)0&gt; &gt; &gt;::type</span> to <span class='value'>vector&lt;std::__cxx11::basic_string&lt;char&gt; &gt;::type</span>.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_271')">
+[+] affected symbols: 3 (0.4%)</span>
+<div id="c_271" style="display:none;">
+<div class='affected'><span class='iname_a'>Terrain::replaceLayer&#160;<span class='sym_p'><span>(&#160;uint8 <i>index</i></span>, <span>bool <i>keepBlends</i></span>, <span>Real <i>worldSize</i></span>, <span>vector&lt;std::__cxx11::basic_string&lt;char&gt;, STLAllocator&lt;std::__cxx11::basic_string&lt;char, std::char_traits&lt;char&gt;, std::allocator&lt;char&gt; &gt;, CategorisedAllocPolicy&lt;(MemoryCategory)0&gt; &gt; &gt;::type const* <span class='fp'>textureNames</span></span>&#160;)</span></span><br/>
+<div class='affect'>4th parameter &#39;textureNames&#39; (pointer) has base type &#39;StringVector&#39;.</div>
+<span class='iname_a'>Terrain::addLayer&#160;<span class='sym_p'><span>(&#160;Real <i>worldSize</i></span>, <span>vector&lt;std::__cxx11::basic_string&lt;char&gt;, STLAllocator&lt;std::__cxx11::basic_string&lt;char, std::char_traits&lt;char&gt;, std::allocator&lt;char&gt; &gt;, CategorisedAllocPolicy&lt;(MemoryCategory)0&gt; &gt; &gt;::type const* <span class='fp'>textureNames</span></span>&#160;)</span></span><br/>
+<div class='affect'>2nd parameter &#39;textureNames&#39; (pointer) has base type &#39;StringVector&#39;.</div>
+<span class='iname_a'>Terrain::addLayer&#160;<span class='sym_p'><span>(&#160;uint8 <i>index</i></span>, <span>Real <i>worldSize</i></span>, <span>vector&lt;std::__cxx11::basic_string&lt;char&gt;, STLAllocator&lt;std::__cxx11::basic_string&lt;char, std::char_traits&lt;char&gt;, std::allocator&lt;char&gt; &gt;, CategorisedAllocPolicy&lt;(MemoryCategory)0&gt; &gt; &gt;::type const* <span class='fp'>textureNames</span></span>&#160;)</span></span><br/>
+<div class='affect'>3rd parameter &#39;textureNames&#39; (pointer) has base type &#39;StringVector&#39;.</div>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<span class='h_name'>OgreTerrain.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_272')">
+<span class='ext'>[+]</span> <span class='ttype'>typedef</span> Terrain::LayerInstanceList <span class='warning'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_272" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Base type has been changed from <span class='value'>vector&lt;Terrain::LayerInstance, STLAllocator&lt;Terrain::LayerInstance, CategorisedAllocPolicy&lt;(MemoryCategory)0&gt; &gt; &gt;::type</span> to <b>vector&lt;Terrain::LayerInstance&gt;::type</b>.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_273')">
+[+] affected symbols: 4 (0.5%)</span>
+<div id="c_273" style="display:none;">
+<div class='affected'><span class='iname_a'>TerrainGroup::defineTerrain&#160;<span class='sym_p'><span>(&#160;long <i>x</i></span>, <span>long <i>y</i></span>, <span>float const* <i>pFloat</i></span>, <span>vector&lt;Terrain::LayerInstance, STLAllocator&lt;Terrain::LayerInstance, CategorisedAllocPolicy&lt;(MemoryCategory)0&gt; &gt; &gt;::type const* <span class='fp'>layers</span></span>&#160;)</span></span><br/>
+<div class='affect'>4th parameter &#39;layers&#39; (pointer) has base type &#39;Terrain::LayerInstanceList&#39;.</div>
+<span class='iname_a'>TerrainGroup::defineTerrain&#160;<span class='sym_p'><span>(&#160;long <i>x</i></span>, <span>long <i>y</i></span>, <span>Image const* <i>img</i></span>, <span>vector&lt;Terrain::LayerInstance, STLAllocator&lt;Terrain::LayerInstance, CategorisedAllocPolicy&lt;(MemoryCategory)0&gt; &gt; &gt;::type const* <span class='fp'>layers</span></span>&#160;)</span></span><br/>
+<div class='affect'>4th parameter &#39;layers&#39; (pointer) has base type &#39;Terrain::LayerInstanceList&#39;.</div>
+<span class='iname_a'>Terrain::readLayerInstanceList&#160;<span class='sym_p'><span>(&#160;StreamSerialiser&amp; <i>stream</i></span>, <span>size_t <i>numSamplers</i></span>, <span>vector&lt;Terrain::LayerInstance, STLAllocator&lt;Terrain::LayerInstance, CategorisedAllocPolicy&lt;(MemoryCategory)0&gt; &gt; &gt;::type&amp; <span class='fp'>targetlayers</span></span>&#160;)</span></span><br/>
+<div class='affect'>3rd parameter &#39;targetlayers&#39; (reference) has base type &#39;Terrain::LayerInstanceList&#39;.</div>
+<span class='iname_a'>Terrain::writeLayerInstanceList&#160;<span class='sym_p'><span>(&#160;vector&lt;Terrain::LayerInstance, STLAllocator&lt;Terrain::LayerInstance, CategorisedAllocPolicy&lt;(MemoryCategory)0&gt; &gt; &gt;::type const&amp; <span class='fp'>layers</span></span>, <span>StreamSerialiser&amp; <i>stream</i></span>&#160;)</span></span><br/>
+<div class='affect'>1st parameter &#39;layers&#39; (reference) has base type &#39;Terrain::LayerInstanceList&#39;.</div>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<span class='h_name'>OgreTerrainGroup.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_274')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> TerrainGroup <span class='warning'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_274" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Field <b>mTerrainPrepareRequests</b> has been added to this type.</td>
+<td>This field will not be initialized or used by old client applications.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_275')">
+[+] affected symbols: 87 (10.9%)</span>
+<div id="c_275" style="display:none;">
+<div class='affected'><span class='iname_a'>TerrainGroup::loadTerrain&#160;<span class='sym_p'><span>(&#160;long <i>x</i></span>, <span>long <i>y</i></span>, <span>bool <i>synchronous</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;TerrainGroup&#39; class.</div>
+<span class='iname_a'>TerrainGroup::unpackIndex&#160;<span class='sym_p'><span>(&#160;uint32 <i>key</i></span>, <span>long* <i>x</i></span>, <span>long* <i>y</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;TerrainGroup&#39; class.</div>
+<span class='iname_a'>TerrainGroup::autoUpdateLod&#160;<span class='sym_p'><span>(&#160;long <i>x</i></span>, <span>long <i>y</i></span>, <span>bool <i>synchronous</i></span>, <span>Any const&amp; <i>data</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;TerrainGroup&#39; class.</div>
+<span class='iname_a'>TerrainGroup::defineTerrain&#160;<span class='sym_p'><span>(&#160;long <i>x</i></span>, <span>long <i>y</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;TerrainGroup&#39; class.</div>
+<span class='iname_a'>TerrainGroup::defineTerrain&#160;<span class='sym_p'><span>(&#160;long <i>x</i></span>, <span>long <i>y</i></span>, <span>float <i>constantHeight</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;TerrainGroup&#39; class.</div>
+<span class='iname_a'>TerrainGroup::defineTerrain&#160;<span class='sym_p'><span>(&#160;long <i>x</i></span>, <span>long <i>y</i></span>, <span>float const* <i>pFloat</i></span>, <span>vector&lt;Terrain::LayerInstance, STLAllocator&lt;Terrain::LayerInstance, CategorisedAllocPolicy&lt;(MemoryCategory)0&gt; &gt; &gt;::type const* <i>layers</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;TerrainGroup&#39; class.</div>
+<span class='iname_a'>TerrainGroup::defineTerrain&#160;<span class='sym_p'><span>(&#160;long <i>x</i></span>, <span>long <i>y</i></span>, <span>Image const* <i>img</i></span>, <span>vector&lt;Terrain::LayerInstance, STLAllocator&lt;Terrain::LayerInstance, CategorisedAllocPolicy&lt;(MemoryCategory)0&gt; &gt; &gt;::type const* <i>layers</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;TerrainGroup&#39; class.</div>
+<span class='iname_a'>TerrainGroup::defineTerrain&#160;<span class='sym_p'><span>(&#160;long <i>x</i></span>, <span>long <i>y</i></span>, <span>struct Terrain::ImportData const* <i>importData</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;TerrainGroup&#39; class.</div>
+<span class='iname_a'>TerrainGroup::defineTerrain&#160;<span class='sym_p'><span>(&#160;long <i>x</i></span>, <span>long <i>y</i></span>, <span>String const&amp; <i>filename</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;TerrainGroup&#39; class.</div>
+<span class='iname_a'>TerrainGroup::handleRequest&#160;<span class='sym_p'><span>(&#160;WorkQueue::Request const* <i>req</i></span>, <span>WorkQueue const* <i>srcQ</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;TerrainGroup&#39; class.</div>
+ <b>...</b>
+<br/>
+</div>
+</div>
+<br/><br/></div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_276')">
+<span class='ext'>[+]</span> <span class='ttype'>typedef</span> TerrainGroup::TerrainList <span class='warning'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_276" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Base type has been changed from <span class='value'>vector&lt;Terrain*, STLAllocator&lt;Terrain*, CategorisedAllocPolicy&lt;(MemoryCategory)0&gt; &gt; &gt;::type</span> to <b>vector&lt;Terrain*&gt;::type</b>.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_277')">
+[+] affected symbols: 2 (0.3%)</span>
+<div id="c_277" style="display:none;">
+<div class='affected'><span class='iname_a'>TerrainGroup::boxIntersects&#160;<span class='sym_p'><span>(&#160;AxisAlignedBox const&amp; <i>box</i></span>, <span>vector&lt;Terrain*, STLAllocator&lt;Terrain*, CategorisedAllocPolicy&lt;(MemoryCategory)0&gt; &gt; &gt;::type* <span class='fp'>resultList</span></span>&#160;)</span></span><br/>
+<div class='affect'>2nd parameter &#39;resultList&#39; (pointer) has base type &#39;TerrainGroup::TerrainList&#39;.</div>
+<span class='iname_a'>TerrainGroup::sphereIntersects&#160;<span class='sym_p'><span>(&#160;Sphere const&amp; <i>sphere</i></span>, <span>vector&lt;Terrain*, STLAllocator&lt;Terrain*, CategorisedAllocPolicy&lt;(MemoryCategory)0&gt; &gt; &gt;::type* <span class='fp'>resultList</span></span>&#160;)</span></span><br/>
+<div class='affect'>2nd parameter &#39;resultList&#39; (pointer) has base type &#39;TerrainGroup::TerrainList&#39;.</div>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<span class='h_name'>OgreTerrainMaterialGenerator.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_278')">
+<span class='ext'>[+]</span> <span class='ttype'>typedef</span> TerrainMaterialGeneratorPtr <span class='warning'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_278" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Base type has been changed from <b>SharedPtr&lt;TerrainMaterialGenerator&gt;</b> to <b>SharedPtr</b>.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_279')">
+[+] affected symbols: 262 (32.8%)</span>
+<div id="c_279" style="display:none;">
+<div class='affected'><span class='iname_a'>TerrainGroup::TerrainSlot::freeInstance&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.instance.mMaterialGenerator&#39; in the object of this method is of type &#39;TerrainMaterialGeneratorPtr&#39;.</div>
+<span class='iname_a'>TerrainGroup::TerrainSlot::TerrainSlot&#160;<span class='sym_p'><span>(&#160;long <i>_x</i></span>, <span>long <i>_y</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.instance.mMaterialGenerator&#39; in the object of this method is of type &#39;TerrainMaterialGeneratorPtr&#39;.</div>
+<span class='iname_a'>TerrainGroup::TerrainSlot::~TerrainSlot&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.instance.mMaterialGenerator&#39; in the object of this method is of type &#39;TerrainMaterialGeneratorPtr&#39;.</div>
+<span class='iname_a'>TerrainGroup::getTerrainSlot&#160;<span class='sym_p'><span>(&#160;long <i>x</i></span>, <span>long <i>y</i></span>, <span>bool <i>createIfMissing</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;retval.instance.mMaterialGenerator&#39; in the return value (pointer) is of type &#39;TerrainMaterialGeneratorPtr&#39;.</div>
+<span class='iname_a'>TerrainGroup::loadTerrainImpl&#160;<span class='sym_p'><span>(&#160;struct TerrainGroup::TerrainSlot* <span class='fp'>slot</span></span>, <span>bool <i>synchronous</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;slot.instance.mMaterialGenerator&#39; in 1st parameter &#39;slot&#39; (pointer) is of type &#39;TerrainMaterialGeneratorPtr&#39;.</div>
+<span class='iname_a'>TerrainGroup::connectNeighbour&#160;<span class='sym_p'><span>(&#160;struct TerrainGroup::TerrainSlot* <span class='fp'>slot</span></span>, <span>long <i>offsetx</i></span>, <span>long <i>offsety</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;slot.instance.mMaterialGenerator&#39; in 1st parameter &#39;slot&#39; (pointer) is of type &#39;TerrainMaterialGeneratorPtr&#39;.</div>
+<span class='iname_a'>TerrainGroup::getHeightAtWorldPosition&#160;<span class='sym_p'><span>(&#160;Real <i>x</i></span>, <span>Real <i>y</i></span>, <span>Real <i>z</i></span>, <span>Terrain** <span class='fp'>ppTerrain</span></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;ppTerrain.mMaterialGenerator&#39; in 4th parameter &#39;ppTerrain&#39; (pointer) is of type &#39;TerrainMaterialGeneratorPtr&#39;.</div>
+<span class='iname_a'>TerrainGroup::getHeightAtWorldPosition&#160;<span class='sym_p'><span>(&#160;Vector3 const&amp; <i>pos</i></span>, <span>Terrain** <span class='fp'>ppTerrain</span></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;ppTerrain.mMaterialGenerator&#39; in 2nd parameter &#39;ppTerrain&#39; (pointer) is of type &#39;TerrainMaterialGeneratorPtr&#39;.</div>
+<span class='iname_a'>TerrainGroup::RayResult::RayResult&#160;<span class='sym_p'><span>(&#160;bool <i>_hit</i></span>, <span>Terrain* <span class='fp'>_terrain</span></span>, <span>Vector3 const&amp; <i>_pos</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;_terrain.mMaterialGenerator&#39; in 2nd parameter &#39;_terrain&#39; (pointer) is of type &#39;TerrainMaterialGeneratorPtr&#39;.</div>
+<span class='iname_a'>TerrainLodManager::TerrainLodManager&#160;<span class='sym_p'><span>(&#160;Terrain* <span class='fp'>t</span></span>, <span>String const&amp; <i>filename</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;t.mMaterialGenerator&#39; in 1st parameter &#39;t&#39; (pointer) is of type &#39;TerrainMaterialGeneratorPtr&#39;.</div>
+ <b>...</b>
+<br/>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<span class='h_name'>OgreVertexIndexData.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_280')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> IndexData <span class='warning'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_280" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Base type of field <b>indexBuffer</b> has been changed from <b>HardwareIndexBufferSharedPtr</b> to <b>std::shared_ptr&lt;DataStream&gt;</b>.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_281')">
+[+] affected symbols: 4 (0.5%)</span>
+<div id="c_281" style="display:none;">
+<div class='affected'><span class='iname_a'>TerrainQuadTreeNode::populateIndexData&#160;<span class='sym_p'><span>(&#160;uint16 <i>batchSize</i></span>, <span>IndexData* <span class='fp'>destData</span></span>&#160;)</span></span><br/>
+<div class='affect'>2nd parameter &#39;destData&#39; (pointer) has base type &#39;IndexData&#39;.</div>
+<span class='iname_a'>TerrainQuadTreeNode::getRenderOperation&#160;<span class='sym_p'><span>(&#160;RenderOperation&amp; <span class='fp'>op</span></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;op.indexData&#39; in 1st parameter &#39;op&#39; (reference) has base type &#39;IndexData&#39;.</div>
+<span class='iname_a'>TerrainQuadTreeNode::Rend::getRenderOperation&#160;<span class='sym_p'><span>(&#160;RenderOperation&amp; <span class='fp'>op</span></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;op.indexData&#39; in 1st parameter &#39;op&#39; (reference) has base type &#39;IndexData&#39;.</div>
+<span class='iname_a'>TerrainQuadTreeNode::LodLevel::LodLevel&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.gpuIndexData&#39; in the object of this method has base type &#39;IndexData&#39;.</div>
+</div>
+</div>
+<br/><br/></div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_282')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> VertexData <span class='warning'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_282" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Base type of field <b>hardwareShadowVolWBuffer</b> has been changed from <b>HardwareVertexBufferSharedPtr</b> to <b>std::shared_ptr&lt;DataStream&gt;</b>.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_283')">
+[+] affected symbols: 300 (37.5%)</span>
+<div id="c_283" style="display:none;">
+<div class='affected'><span class='iname_a'>TerrainGroup::TerrainSlot::freeInstance&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.instance.mQuadTree.mVertexDataRecord.cpuVertexData&#39; in the object of this method has base type &#39;VertexData&#39;.</div>
+<span class='iname_a'>TerrainGroup::TerrainSlot::TerrainSlot&#160;<span class='sym_p'><span>(&#160;long <i>_x</i></span>, <span>long <i>_y</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.instance.mQuadTree.mVertexDataRecord.cpuVertexData&#39; in the object of this method has base type &#39;VertexData&#39;.</div>
+<span class='iname_a'>TerrainGroup::TerrainSlot::~TerrainSlot&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.instance.mQuadTree.mVertexDataRecord.cpuVertexData&#39; in the object of this method has base type &#39;VertexData&#39;.</div>
+<span class='iname_a'>TerrainGroup::getTerrainSlot&#160;<span class='sym_p'><span>(&#160;long <i>x</i></span>, <span>long <i>y</i></span>, <span>bool <i>createIfMissing</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;retval.instance.mQuadTree.mVertexDataRecord.cpuVertexData&#39; in the return value (pointer) has base type &#39;VertexData&#39;.</div>
+<span class='iname_a'>TerrainGroup::loadTerrainImpl&#160;<span class='sym_p'><span>(&#160;struct TerrainGroup::TerrainSlot* <span class='fp'>slot</span></span>, <span>bool <i>synchronous</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;slot.instance.mQuadTree.mVertexDataRecord.cpuVertexData&#39; in 1st parameter &#39;slot&#39; (pointer) has base type &#39;VertexData&#39;.</div>
+<span class='iname_a'>TerrainGroup::connectNeighbour&#160;<span class='sym_p'><span>(&#160;struct TerrainGroup::TerrainSlot* <span class='fp'>slot</span></span>, <span>long <i>offsetx</i></span>, <span>long <i>offsety</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;slot.instance.mQuadTree.mVertexDataRecord.cpuVertexData&#39; in 1st parameter &#39;slot&#39; (pointer) has base type &#39;VertexData&#39;.</div>
+<span class='iname_a'>TerrainGroup::getHeightAtWorldPosition&#160;<span class='sym_p'><span>(&#160;Real <i>x</i></span>, <span>Real <i>y</i></span>, <span>Real <i>z</i></span>, <span>Terrain** <span class='fp'>ppTerrain</span></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;ppTerrain.mQuadTree.mVertexDataRecord.cpuVertexData&#39; in 4th parameter &#39;ppTerrain&#39; (pointer) has base type &#39;VertexData&#39;.</div>
+<span class='iname_a'>TerrainGroup::getHeightAtWorldPosition&#160;<span class='sym_p'><span>(&#160;Vector3 const&amp; <i>pos</i></span>, <span>Terrain** <span class='fp'>ppTerrain</span></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;ppTerrain.mQuadTree.mVertexDataRecord.cpuVertexData&#39; in 2nd parameter &#39;ppTerrain&#39; (pointer) has base type &#39;VertexData&#39;.</div>
+<span class='iname_a'>TerrainGroup::RayResult::RayResult&#160;<span class='sym_p'><span>(&#160;bool <i>_hit</i></span>, <span>Terrain* <span class='fp'>_terrain</span></span>, <span>Vector3 const&amp; <i>_pos</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;_terrain.mQuadTree.mVertexDataRecord.cpuVertexData&#39; in 2nd parameter &#39;_terrain&#39; (pointer) has base type &#39;VertexData&#39;.</div>
+<span class='iname_a'>TerrainLodManager::TerrainLodManager&#160;<span class='sym_p'><span>(&#160;Terrain* <span class='fp'>t</span></span>, <span>String const&amp; <i>filename</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;t.mQuadTree.mVertexDataRecord.cpuVertexData&#39; in 1st parameter &#39;t&#39; (pointer) has base type &#39;VertexData&#39;.</div>
+ <b>...</b>
+<br/>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='Symbol_Problems_Low'></a><a name='Interface_Problems_Low'></a>
+<h2>Problems with Symbols, Low Severity <span class='warning'>&nbsp;1&nbsp;</span></h2><hr/>
+<span class='h_name'>OgreTerrain.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_284')">
+<span class='ext'>[+]</span> Terrain::DefaultGpuBufferAllocator::getSharedIndexBuffer&#160;<span class='sym_p'><span>(&#160;uint16 <span class='color_p'>batchSize</span></span>, <span>uint16 <span class='color_p'>vdatasize</span></span>, <span>size_t <span class='color_p'>vertexIncrement</span></span>, <span>uint16 <span class='color_p'>xoffset</span></span>, <span>uint16 <span class='color_p'>yoffset</span></span>, <span>uint16 <span class='color_p'>numSkirtRowsCols</span></span>, <span>uint16 <span class='color_p'>skirtRowColSkip</span></span>&#160;)</span> <span class='warning'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_284" style="display:none;">
+
+<span class='mngl pleft'>_ZN4Ogre7Terrain25DefaultGpuBufferAllocator20getSharedIndexBufferEttmtttt</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>Base type of return value has been changed from <b>HardwareIndexBufferSharedPtr</b> to <b>std::shared_ptr&lt;DataStream&gt;</b>.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+</table>
+<br/>
+</div>
+<br/>
+<a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='Other_Changes'></a><a name='Other_Changes_In_Types'></a>
+<h2>Other Changes in Data Types <span class='passed'>&nbsp;15&nbsp;</span></h2><hr/>
+<span class='h_name'>OgrePixelFormat.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_285')">
+<span class='ext'>[+]</span> <span class='ttype'>enum</span> PixelFormat <span class='passed'>&nbsp;15&nbsp;</span></span>
+<br/>
+<div id="c_285" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>The member <b>PF_ASTC_RGBA_10X10_LDR</b> with value <b>106</b> has been added.</td>
+<td>No effect.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>The member <b>PF_ASTC_RGBA_10X5_LDR</b> with value <b>103</b> has been added.</td>
+<td>No effect.</td>
+</tr>
+<tr>
+<th>3</th>
+<td>The member <b>PF_ASTC_RGBA_10X6_LDR</b> with value <b>104</b> has been added.</td>
+<td>No effect.</td>
+</tr>
+<tr>
+<th>4</th>
+<td>The member <b>PF_ASTC_RGBA_10X8_LDR</b> with value <b>105</b> has been added.</td>
+<td>No effect.</td>
+</tr>
+<tr>
+<th>5</th>
+<td>The member <b>PF_ASTC_RGBA_12X10_LDR</b> with value <b>107</b> has been added.</td>
+<td>No effect.</td>
+</tr>
+<tr>
+<th>6</th>
+<td>The member <b>PF_ASTC_RGBA_12X12_LDR</b> with value <b>108</b> has been added.</td>
+<td>No effect.</td>
+</tr>
+<tr>
+<th>7</th>
+<td>The member <b>PF_ASTC_RGBA_4X4_LDR</b> with value <b>95</b> has been added.</td>
+<td>No effect.</td>
+</tr>
+<tr>
+<th>8</th>
+<td>The member <b>PF_ASTC_RGBA_5X4_LDR</b> with value <b>96</b> has been added.</td>
+<td>No effect.</td>
+</tr>
+<tr>
+<th>9</th>
+<td>The member <b>PF_ASTC_RGBA_5X5_LDR</b> with value <b>97</b> has been added.</td>
+<td>No effect.</td>
+</tr>
+<tr>
+<th>10</th>
+<td>The member <b>PF_ASTC_RGBA_6X5_LDR</b> with value <b>98</b> has been added.</td>
+<td>No effect.</td>
+</tr>
+<tr>
+<th>11</th>
+<td>The member <b>PF_ASTC_RGBA_6X6_LDR</b> with value <b>99</b> has been added.</td>
+<td>No effect.</td>
+</tr>
+<tr>
+<th>12</th>
+<td>The member <b>PF_ASTC_RGBA_8X5_LDR</b> with value <b>100</b> has been added.</td>
+<td>No effect.</td>
+</tr>
+<tr>
+<th>13</th>
+<td>The member <b>PF_ASTC_RGBA_8X6_LDR</b> with value <b>101</b> has been added.</td>
+<td>No effect.</td>
+</tr>
+<tr>
+<th>14</th>
+<td>The member <b>PF_ASTC_RGBA_8X8_LDR</b> with value <b>102</b> has been added.</td>
+<td>No effect.</td>
+</tr>
+<tr>
+<th>15</th>
+<td>Value of member <b>PF_COUNT</b> has been changed from <b>95</b> to <b>109</b>.</td>
+<td>No effect.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_286')">
+[+] affected symbols: 264 (33%)</span>
+<div id="c_286" style="display:none;">
+<div class='affected'><span class='iname_a'>TerrainGroup::TerrainSlot::freeInstance&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.instance.mCpuTerrainNormalMap.format&#39; in the object of this method is of type &#39;enum PixelFormat&#39;.</div>
+<span class='iname_a'>TerrainGroup::TerrainSlot::TerrainSlot&#160;<span class='sym_p'><span>(&#160;long <i>_x</i></span>, <span>long <i>_y</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.instance.mCpuTerrainNormalMap.format&#39; in the object of this method is of type &#39;enum PixelFormat&#39;.</div>
+<span class='iname_a'>TerrainGroup::TerrainSlot::~TerrainSlot&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.instance.mCpuTerrainNormalMap.format&#39; in the object of this method is of type &#39;enum PixelFormat&#39;.</div>
+<span class='iname_a'>TerrainGroup::getTerrainSlot&#160;<span class='sym_p'><span>(&#160;long <i>x</i></span>, <span>long <i>y</i></span>, <span>bool <i>createIfMissing</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;retval.instance.mCpuTerrainNormalMap.format&#39; in the return value (pointer) is of type &#39;enum PixelFormat&#39;.</div>
+<span class='iname_a'>TerrainGroup::loadTerrainImpl&#160;<span class='sym_p'><span>(&#160;struct TerrainGroup::TerrainSlot* <span class='fp'>slot</span></span>, <span>bool <i>synchronous</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;slot.instance.mCpuTerrainNormalMap.format&#39; in 1st parameter &#39;slot&#39; (pointer) is of type &#39;enum PixelFormat&#39;.</div>
+<span class='iname_a'>TerrainGroup::connectNeighbour&#160;<span class='sym_p'><span>(&#160;struct TerrainGroup::TerrainSlot* <span class='fp'>slot</span></span>, <span>long <i>offsetx</i></span>, <span>long <i>offsety</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;slot.instance.mCpuTerrainNormalMap.format&#39; in 1st parameter &#39;slot&#39; (pointer) is of type &#39;enum PixelFormat&#39;.</div>
+<span class='iname_a'>TerrainGroup::getHeightAtWorldPosition&#160;<span class='sym_p'><span>(&#160;Real <i>x</i></span>, <span>Real <i>y</i></span>, <span>Real <i>z</i></span>, <span>Terrain** <span class='fp'>ppTerrain</span></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;ppTerrain.mCpuTerrainNormalMap.format&#39; in 4th parameter &#39;ppTerrain&#39; (pointer) is of type &#39;enum PixelFormat&#39;.</div>
+<span class='iname_a'>TerrainGroup::getHeightAtWorldPosition&#160;<span class='sym_p'><span>(&#160;Vector3 const&amp; <i>pos</i></span>, <span>Terrain** <span class='fp'>ppTerrain</span></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;ppTerrain.mCpuTerrainNormalMap.format&#39; in 2nd parameter &#39;ppTerrain&#39; (pointer) is of type &#39;enum PixelFormat&#39;.</div>
+<span class='iname_a'>TerrainGroup::RayResult::RayResult&#160;<span class='sym_p'><span>(&#160;bool <i>_hit</i></span>, <span>Terrain* <span class='fp'>_terrain</span></span>, <span>Vector3 const&amp; <i>_pos</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;_terrain.mCpuTerrainNormalMap.format&#39; in 2nd parameter &#39;_terrain&#39; (pointer) is of type &#39;enum PixelFormat&#39;.</div>
+<span class='iname_a'>TerrainLodManager::TerrainLodManager&#160;<span class='sym_p'><span>(&#160;Terrain* <span class='fp'>t</span></span>, <span>String const&amp; <i>filename</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;t.mCpuTerrainNormalMap.format&#39; in 1st parameter &#39;t&#39; (pointer) is of type &#39;enum PixelFormat&#39;.</div>
+ <b>...</b>
+<br/>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='Other_Changes_In_Symbols'></a><a name='Other_Changes_In_Interfaces'></a>
+<h2>Other Changes in Symbols <span class='passed'>&nbsp;1&nbsp;</span></h2><hr/>
+<span class='h_name'>OgreTerrain.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_287')">
+<span class='ext'>[+]</span> Terrain::TERRAIN_GENERATE_MATERIAL_INTERVAL_MS <span class='attr'>[data]</span> <span class='passed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_287" style="display:none;">
+
+<span class='mngl pleft'>_ZN4Ogre7Terrain37TERRAIN_GENERATE_MATERIAL_INTERVAL_MSE</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>The initial value of this global data has been changed from <b>100</b> to <b>400</b>.</td>
+<td>No effect.</td>
+</tr>
+</table>
+<br/>
+</div>
+<br/>
+<a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='Headers'></a><h2>Header Files <span class='gray'>&nbsp;46&nbsp;</span></h2><hr/>
+<div class='h_list'>
+OgreAny.h<br/>
+OgreAtomicScalar.h<br/>
+OgreAxisAlignedBox.h<br/>
+OgreColourValue.h<br/>
+OgreCommon.h<br/>
+OgreDataStream.h<br/>
+OgreGpuProgramParams.h<br/>
+OgreHardwareIndexBuffer.h<br/>
+OgreHardwareVertexBuffer.h<br/>
+OgreIteratorWrapper.h<br/>
+OgreMatrix4.h<br/>
+OgreMemoryAllocatedObject.h<br/>
+OgreMemoryAllocatorConfig.h<br/>
+OgreMemoryStdAlloc.h<br/>
+OgreNameGenerator.h<br/>
+OgrePagedWorldSection.h<br/>
+OgrePagingPrerequisites.h<br/>
+OgrePass.h<br/>
+OgrePixelFormat.h<br/>
+OgrePlatform.h<br/>
+OgrePrerequisites.h<br/>
+OgreRay.h<br/>
+OgreRenderable.h<br/>
+OgreRenderOperation.h<br/>
+OgreRenderSystemCapabilities.h<br/>
+OgreSceneManager.h<br/>
+OgreSharedPtr.h<br/>
+OgreSingleton.h<br/>
+OgreSphere.h<br/>
+OgreString.h<br/>
+OgreStringVector.h<br/>
+OgreTechnique.h<br/>
+OgreTerrain.h<br/>
+OgreTerrainAutoUpdateLod.h<br/>
+OgreTerrainGroup.h<br/>
+OgreTerrainLayerBlendMap.h<br/>
+OgreTerrainLodManager.h<br/>
+OgreTerrainMaterialGenerator.h<br/>
+OgreTerrainMaterialGeneratorA.h<br/>
+OgreTerrainPagedWorldSection.h<br/>
+OgreTerrainPaging.h<br/>
+OgreTerrainQuadTreeNode.h<br/>
+OgreVector3.h<br/>
+OgreVector4.h<br/>
+OgreVertexIndexData.h<br/>
+OgreWorkQueue.h<br/>
+</div>
+<br/><a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='Sources'></a><h2>Source Files <span class='gray'>&nbsp;14&nbsp;</span></h2><hr/>
+<div class='h_list'>
+OgreTerrain.cpp<br/>
+OgreTerrainAutoUpdateLod.cpp<br/>
+OgreTerrainGroup.cpp<br/>
+OgreTerrainLayerBlendMap.cpp<br/>
+OgreTerrainLodManager.cpp<br/>
+OgreTerrainMaterialGenerator.cpp<br/>
+OgreTerrainMaterialGeneratorA.cpp<br/>
+OgreTerrainMaterialShaderHelperCg.cpp<br/>
+OgreTerrainMaterialShaderHelperGLSL.cpp<br/>
+OgreTerrainMaterialShaderHelperGLSLES.cpp<br/>
+OgreTerrainMaterialShaderHelperHLSL.cpp<br/>
+OgreTerrainPagedWorldSection.cpp<br/>
+OgreTerrainPaging.cpp<br/>
+OgreTerrainQuadTreeNode.cpp<br/>
+</div>
+<br/><a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='Libs'></a><h2>Objects <span class='gray'>&nbsp;1&nbsp;</span></h2><hr/>
+<div class='lib_list'>
+libOgreTerrain.so.1.9.0<br/>
+</div>
+<br/><a class='top_ref' href='#Top'>to the top</a><br/>
+</div>
+<br/><br/><br/>
+<hr/>
+<div class='footer' align='right'><i>Generated by <a href='https://github.com/lvc/abi-compliance-checker'>ABI Compliance Checker</a> 2.3 &#160;</i>
+</div>
+<br/>
+
+</body></html>

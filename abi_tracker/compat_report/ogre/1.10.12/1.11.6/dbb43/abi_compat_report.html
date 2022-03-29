@@ -1,0 +1,2745 @@
+<!-- verdict:incompatible;affected:43.6;added:19;removed:19;type_problems_high:1;type_problems_medium:16;type_problems_low:37;interface_problems_high:2;interface_problems_medium:0;interface_problems_low:0;changed_constants:0;tool_version:2.3 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta name="keywords" content="libOgrePaging, binary compatibility, API, report" />
+<meta name="description" content="Binary compatibility report for the libOgrePaging object between 1.10.12 and 1.11.6 versions on x86_64" />
+<title>libOgrePaging: 1.10.12 to 1.11.6 binary compatibility report</title>
+<style type="text/css">
+body {
+    font-family:Arial, sans-serif;
+    background-color:White;
+    color:Black;
+}
+hr {
+    color:Black;
+    background-color:Black;
+    height:1px;
+    border:0;
+}
+h1 {
+    margin-bottom:0px;
+    padding-bottom:0px;
+    font-size:1.625em;
+}
+h2 {
+    margin-bottom:0px;
+    padding-bottom:0px;
+    font-size:1.25em;
+    white-space:nowrap;
+}
+span.section {
+    font-weight:bold;
+    cursor:pointer;
+    color:#003E69;
+    white-space:nowrap;
+    margin-left:0.3125em;
+}
+span.new_sign {
+    font-weight:bold;
+    margin-left:1.65em;
+    color:#003E69;
+}
+span.new_sign_lbl {
+    margin-left:3em;
+    font-size:1em;
+    color:Black;
+}
+span:hover.section {
+    color:#336699;
+}
+span.sect_aff {
+    cursor:pointer;
+    padding-left:1.55em;
+    font-size:0.875em;
+    color:#cc3300;
+}
+span.sect_info {
+    cursor:pointer;
+    padding-left:1.55em;
+    font-size:0.875em;
+    color:Black;
+}
+span.ext {
+    font-weight:normal;
+}
+span.h_name {
+    color:#cc3300;
+    font-size:0.875em;
+    font-weight:bold;
+}
+div.h_list, div.lib_list {
+    font-size:0.94em;
+    padding-left:0.4em;
+}
+span.ns {
+    color:#408080;
+    font-size:0.94em;
+}
+span.lib_name {
+    color:Green;
+    font-size:0.875em;
+    font-weight:bold;
+}
+span.iname {
+    font-weight:bold;
+    color:#003E69;
+    margin-left:0.3125em;
+}
+span.iname_b {
+    font-weight:bold;
+}
+span.iname_a {
+    color:#333333;
+    font-weight:bold;
+    font-size:0.94em;
+}
+span.sym_p {
+    font-weight:normal;
+    white-space:normal;
+}
+span.sym_pd {
+    white-space:normal;
+}
+span.sym_p span, span.sym_pd span {
+    white-space:nowrap;
+}
+div.affect {
+    padding-left:1em;
+    padding-bottom:10px;
+    font-size:0.87em;
+    font-style:italic;
+    line-height:0.9em;
+}
+div.affected {
+    padding-left:1.9em;
+    padding-top:10px;
+}
+table.ptable {
+    border-collapse:collapse;
+    border:1px outset black;
+    margin-left:0.95em;
+    margin-top:3px;
+    margin-bottom:3px;
+    width:56.25em;
+}
+table.ptable td {
+    border:1px solid gray;
+    padding:3px;
+    font-size:0.875em;
+    text-align:left;
+    vertical-align:top;
+    max-width:28em;
+    word-wrap:break-word;
+}
+table.ptable th.pn {
+    width:2%;
+}
+table.ptable th.chg {
+    width:47%;
+}
+table.vtable {
+    border-collapse:collapse;
+    border:1px outset black;
+    margin-left:1.9em;
+    margin-top:0.7em;
+}
+table.vtable td {
+    border:1px solid gray;
+    padding:3px;
+    font-size:0.875em;
+    vertical-align:top;
+    max-width:450px;
+    word-wrap:break-word;
+}
+table.ptable th, table.vtable th {
+    background-color:#eeeeee;
+    font-weight:bold;
+    color:#333333;
+    font-family:Verdana, Arial;
+    font-size:0.875em;
+    border:1px solid gray;
+    text-align:center;
+    vertical-align:top;
+    white-space:nowrap;
+    padding:3px;
+}
+table.summary {
+    border-collapse:collapse;
+    border:1px outset black;
+}
+table.summary th {
+    background-color:#eeeeee;
+    font-weight:normal;
+    text-align:left;
+    font-size:0.94em;
+    white-space:nowrap;
+    border:1px inset gray;
+    padding:3px;
+}
+table.summary td {
+    text-align:right;
+    white-space:nowrap;
+    border:1px inset gray;
+    padding:3px 5px 3px 10px;
+}
+span.mngl {
+    padding-left:1em;
+    font-size:0.875em;
+    cursor:text;
+    color:#444444;
+    font-weight:bold;
+}
+span.pleft {
+    padding-left:2.5em;
+}
+span.sym_ver {
+    color:#333333;
+    white-space:nowrap;
+    font-family:"DejaVu Sans Mono", Monospace;
+}
+span.attr {
+    color:#333333;
+    font-weight:normal;
+}
+span.color_p {
+    font-style:italic;
+    color:Brown;
+}
+span.p {
+    font-style:italic;
+}
+span.fp {
+    font-style:italic;
+    background-color:#DCDCDC;
+}
+span.ttype {
+    font-weight:normal;
+}
+span.nowrap {
+    white-space:nowrap;
+}
+span.value {
+    font-weight:bold;
+}
+.passed {
+    background-color:#CCFFCC;
+    font-weight:normal;
+}
+.warning {
+    background-color:#F4F4AF;
+    font-weight:normal;
+}
+.failed {
+    background-color:#FFCCCC;
+    font-weight:normal;
+}
+.new {
+    background-color:#C6DEFF;
+    font-weight:normal;
+}
+.compatible {
+    background-color:#CCFFCC;
+    font-weight:normal;
+}
+.almost_compatible {
+    background-color:#FFDAA3;
+    font-weight:normal;
+}
+.incompatible {
+    background-color:#FFCCCC;
+    font-weight:normal;
+}
+.gray {
+    background-color:#DCDCDC;
+    font-weight:normal;
+}
+.top_ref {
+    font-size:0.69em;
+}
+.footer {
+    font-size:0.75em;
+}
+</style>
+<script type="text/javascript" language="JavaScript">
+<!--
+function showContent(header, id)
+{
+    e = document.getElementById(id);
+    if(e.style.display == 'none')
+    {
+        e.style.display = 'block';
+        e.style.visibility = 'visible';
+        header.innerHTML = header.innerHTML.replace(/\[[^0-9 ]\]/gi,"[&minus;]");
+    }
+    else
+    {
+        e.style.display = 'none';
+        e.style.visibility = 'hidden';
+        header.innerHTML = header.innerHTML.replace(/\[[^0-9 ]\]/gi,"[+]");
+    }
+}
+-->
+</script>
+</head>
+
+<body>
+<div><a name='Top'></a>
+<h1>Binary compatibility report for the <span style='color:Blue;'>libOgrePaging.so</span> object between <span style='color:Red;'>1.10.12</span> and <span style='color:Red;'>1.11.6</span> versions on <span style='color:Blue;'>x86_64</span></h1>
+
+<h2>Test Info</h2><hr/>
+<table class='summary'>
+<tr><th>Module Name</th><td>libOgrePaging</td></tr>
+<tr><th>Version #1</th><td>1.10.12</td></tr>
+<tr><th>Version #2</th><td>1.11.6</td></tr>
+<tr><th>Arch</th><td>x86_64</td></tr>
+<tr><th>GCC Version</th><td>9.4.0</td></tr>
+</table>
+<h2>Test Results</h2><hr/>
+<table class='summary'><tr><th>Total Header Files</th><td><a href='#Headers' style='color:Blue;'>27</a></td></tr>
+<tr><th>Total Source Files</th><td><a href='#Sources' style='color:Blue;'>9</a></td></tr>
+<tr><th>Total Objects</th><td><a href='#Libs' style='color:Blue;'>1</a></td></tr>
+<tr><th>Total Symbols / Types</th><td>287 / 71</td></tr>
+<tr><th>Compatibility</th>
+<td class='incompatible'>56.4%</td>
+</tr>
+</table>
+<h2>Problem Summary</h2><hr/>
+<table class='summary'><tr><th></th><th style='text-align:center;'>Severity</th><th style='text-align:center;'>Count</th></tr><tr><th>Added Symbols</th><td>-</td><td class='new'><a href='#Added' style='color:Blue;'>19</a></td></tr>
+<tr><th>Removed Symbols</th><td>High</td><td class='failed'><a href='#Removed' style='color:Blue;'>19</a></td></tr>
+<tr><th rowspan='3'>Problems with<br/>Data Types</th><td>High</td><td class='failed'><a href='#Type_Problems_High' style='color:Blue;'>1</a></td></tr>
+<tr><td>Medium</td><td class='failed'><a href='#Type_Problems_Medium' style='color:Blue;'>16</a></td></tr>
+<tr><td>Low</td><td class='warning'><a href='#Type_Problems_Low' style='color:Blue;'>37</a></td></tr>
+<tr><th rowspan='3'>Problems with<br/>Symbols</th><td>High</td><td class='failed'><a href='#Symbol_Problems_High' style='color:Blue;'>2</a></td></tr>
+<tr><td>Medium</td><td>0</td></tr>
+<tr><td>Low</td><td>0</td></tr>
+<tr><th>Problems with<br/>Constants</th><td>Low</td><td>0</td></tr>
+</table>
+
+<a name='Added'></a><h2>Added Symbols <span class='new'>&nbsp;19&nbsp;</span></h2><hr/>
+<span class='h_name'>OgreGrid2DPageStrategy.h</span>, <span class='lib_name'>libOgrePaging.so.1.11.6</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_1')">
+Grid2DPageStrategy::getPageID&#160;<span class='sym_p'><span>(&#160;Vector3 const&amp; <span class='color_p'>worldPos</span></span>, <span>PagedWorldSection* <span class='color_p'>section</span></span>&#160;)</span></span>
+<br/>
+<div id="c_1" style="display:none;">
+<span class='mngl'>_ZN4Ogre18Grid2DPageStrategy9getPageIDERKNS_6VectorILi3EfEEPNS_17PagedWorldSectionE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_2')">
+Grid2DPageStrategyData::convertGridToWorldSpace&#160;<span class='sym_p'><span>(&#160;Vector2 const&amp; <span class='color_p'>grid</span></span>, <span>Vector3&amp; <span class='color_p'>world</span></span>&#160;)</span></span>
+<br/>
+<div id="c_2" style="display:none;">
+<span class='mngl'>_ZN4Ogre22Grid2DPageStrategyData23convertGridToWorldSpaceERKNS_6VectorILi2EfEERNS1_ILi3EfEE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_3')">
+Grid2DPageStrategyData::convertWorldToGridSpace&#160;<span class='sym_p'><span>(&#160;Vector3 const&amp; <span class='color_p'>world</span></span>, <span>Vector2&amp; <span class='color_p'>grid</span></span>&#160;)</span></span>
+<br/>
+<div id="c_3" style="display:none;">
+<span class='mngl'>_ZN4Ogre22Grid2DPageStrategyData23convertWorldToGridSpaceERKNS_6VectorILi3EfEERNS1_ILi2EfEE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_4')">
+Grid2DPageStrategyData::determineGridLocation&#160;<span class='sym_p'><span>(&#160;Vector2 const&amp; <span class='color_p'>gridpos</span></span>, <span>int32* <span class='color_p'>x</span></span>, <span>int32* <span class='color_p'>y</span></span>&#160;)</span></span>
+<br/>
+<div id="c_4" style="display:none;">
+<span class='mngl'>_ZN4Ogre22Grid2DPageStrategyData21determineGridLocationERKNS_6VectorILi2EfEEPiS5_</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_5')">
+Grid2DPageStrategyData::getBottomLeftGridSpace&#160;<span class='sym_p'><span>(&#160;int32 <span class='color_p'>x</span></span>, <span>int32 <span class='color_p'>y</span></span>, <span>Vector2&amp; <span class='color_p'>bl</span></span>&#160;)</span></span>
+<br/>
+<div id="c_5" style="display:none;">
+<span class='mngl'>_ZN4Ogre22Grid2DPageStrategyData22getBottomLeftGridSpaceEiiRNS_6VectorILi2EfEE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_6')">
+Grid2DPageStrategyData::getCornersGridSpace&#160;<span class='sym_p'><span>(&#160;int32 <span class='color_p'>x</span></span>, <span>int32 <span class='color_p'>y</span></span>, <span>Vector2* <span class='color_p'>pFourPoints</span></span>&#160;)</span></span>
+<br/>
+<div id="c_6" style="display:none;">
+<span class='mngl'>_ZN4Ogre22Grid2DPageStrategyData19getCornersGridSpaceEiiPNS_6VectorILi2EfEE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_7')">
+Grid2DPageStrategyData::getMidPointGridSpace&#160;<span class='sym_p'><span>(&#160;int32 <span class='color_p'>x</span></span>, <span>int32 <span class='color_p'>y</span></span>, <span>Vector2&amp; <span class='color_p'>mid</span></span>&#160;)</span></span>
+<br/>
+<div id="c_7" style="display:none;">
+<span class='mngl'>_ZN4Ogre22Grid2DPageStrategyData20getMidPointGridSpaceEiiRNS_6VectorILi2EfEE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_8')">
+Grid2DPageStrategyData::setOrigin&#160;<span class='sym_p'><span>(&#160;Vector3 const&amp; <span class='color_p'>worldOrigin</span></span>&#160;)</span></span>
+<br/>
+<div id="c_8" style="display:none;">
+<span class='mngl'>_ZN4Ogre22Grid2DPageStrategyData9setOriginERKNS_6VectorILi3EfEE</span>
+<br/>
+<br/>
+</div>
+
+<br/>
+<span class='h_name'>OgreGrid3DPageStrategy.h</span>, <span class='lib_name'>libOgrePaging.so.1.11.6</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_9')">
+Grid3DPageStrategy::getPageID&#160;<span class='sym_p'><span>(&#160;Vector3 const&amp; <span class='color_p'>pos</span></span>, <span>PagedWorldSection* <span class='color_p'>section</span></span>&#160;)</span></span>
+<br/>
+<div id="c_9" style="display:none;">
+<span class='mngl'>_ZN4Ogre18Grid3DPageStrategy9getPageIDERKNS_6VectorILi3EfEEPNS_17PagedWorldSectionE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_10')">
+Grid3DPageStrategyData::determineGridLocation&#160;<span class='sym_p'><span>(&#160;Vector3 const&amp; <span class='color_p'>pos</span></span>, <span>int32* <span class='color_p'>x</span></span>, <span>int32* <span class='color_p'>y</span></span>, <span>int32* <span class='color_p'>z</span></span>&#160;)</span></span>
+<br/>
+<div id="c_10" style="display:none;">
+<span class='mngl'>_ZN4Ogre22Grid3DPageStrategyData21determineGridLocationERKNS_6VectorILi3EfEEPiS5_S5_</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_11')">
+Grid3DPageStrategyData::getBottomLeftGridSpace&#160;<span class='sym_p'><span>(&#160;int32 <span class='color_p'>x</span></span>, <span>int32 <span class='color_p'>y</span></span>, <span>int32 <span class='color_p'>z</span></span>, <span>Vector3&amp; <span class='color_p'>bl</span></span>&#160;)</span></span>
+<br/>
+<div id="c_11" style="display:none;">
+<span class='mngl'>_ZN4Ogre22Grid3DPageStrategyData22getBottomLeftGridSpaceEiiiRNS_6VectorILi3EfEE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_12')">
+Grid3DPageStrategyData::getCornersGridSpace&#160;<span class='sym_p'><span>(&#160;int32 <span class='color_p'>x</span></span>, <span>int32 <span class='color_p'>y</span></span>, <span>int32 <span class='color_p'>z</span></span>, <span>Vector3* <span class='color_p'>pEightPoints</span></span>&#160;)</span></span>
+<br/>
+<div id="c_12" style="display:none;">
+<span class='mngl'>_ZN4Ogre22Grid3DPageStrategyData19getCornersGridSpaceEiiiPNS_6VectorILi3EfEE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_13')">
+Grid3DPageStrategyData::getMidPointGridSpace&#160;<span class='sym_p'><span>(&#160;int32 <span class='color_p'>x</span></span>, <span>int32 <span class='color_p'>y</span></span>, <span>int32 <span class='color_p'>z</span></span>, <span>Vector3&amp; <span class='color_p'>mid</span></span>&#160;)</span></span>
+<br/>
+<div id="c_13" style="display:none;">
+<span class='mngl'>_ZN4Ogre22Grid3DPageStrategyData20getMidPointGridSpaceEiiiRNS_6VectorILi3EfEE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_14')">
+Grid3DPageStrategyData::setCellSize&#160;<span class='sym_p'><span>(&#160;Vector3 const&amp; <span class='color_p'>sz</span></span>&#160;)</span></span>
+<br/>
+<div id="c_14" style="display:none;">
+<span class='mngl'>_ZN4Ogre22Grid3DPageStrategyData11setCellSizeERKNS_6VectorILi3EfEE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_15')">
+Grid3DPageStrategyData::setOrigin&#160;<span class='sym_p'><span>(&#160;Vector3 const&amp; <span class='color_p'>origin</span></span>&#160;)</span></span>
+<br/>
+<div id="c_15" style="display:none;">
+<span class='mngl'>_ZN4Ogre22Grid3DPageStrategyData9setOriginERKNS_6VectorILi3EfEE</span>
+<br/>
+<br/>
+</div>
+
+<br/>
+<span class='h_name'>OgrePagedWorldSection.h</span>, <span class='lib_name'>libOgrePaging.so.1.11.6</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_16')">
+PagedWorldSection::getPageID&#160;<span class='sym_p'><span>(&#160;Vector3 const&amp; <span class='color_p'>worldPos</span></span>&#160;)</span></span>
+<br/>
+<div id="c_16" style="display:none;">
+<span class='mngl'>_ZN4Ogre17PagedWorldSection9getPageIDERKNS_6VectorILi3EfEE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_17')">
+PagedWorldSection::loadOrCreatePage&#160;<span class='sym_p'><span>(&#160;Vector3 const&amp; <span class='color_p'>worldPos</span></span>&#160;)</span></span>
+<br/>
+<div id="c_17" style="display:none;">
+<span class='mngl'>_ZN4Ogre17PagedWorldSection16loadOrCreatePageERKNS_6VectorILi3EfEE</span>
+<br/>
+<br/>
+</div>
+
+<br/>
+<span class='h_name'>OgrePageManager.h</span>, <span class='lib_name'>libOgrePaging.so.1.11.6</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_18')">
+PageManager::loadWorld&#160;<span class='sym_p'><span>(&#160;SharedPtr&lt;DataStream&gt;const&amp; <span class='color_p'>stream</span></span>, <span>String const&amp; <span class='color_p'>name</span></span>&#160;)</span></span>
+<br/>
+<div id="c_18" style="display:none;">
+<span class='mngl'>_ZN4Ogre11PageManager9loadWorldERKNS_9SharedPtrINS_10DataStreamEEERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_19')">
+PageManager::saveWorld&#160;<span class='sym_p'><span>(&#160;PagedWorld* <span class='color_p'>world</span></span>, <span>SharedPtr&lt;DataStream&gt;const&amp; <span class='color_p'>stream</span></span>&#160;)</span></span>
+<br/>
+<div id="c_19" style="display:none;">
+<span class='mngl'>_ZN4Ogre11PageManager9saveWorldEPNS_10PagedWorldERKNS_9SharedPtrINS_10DataStreamEEE</span>
+<br/>
+<br/>
+</div>
+
+<br/>
+<a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='Removed'></a><a name='Withdrawn'></a><h2>Removed Symbols <span class='failed'>&nbsp;19&nbsp;</span></h2><hr/>
+<span class='h_name'>OgreGrid2DPageStrategy.h</span>, <span class='lib_name'>libOgrePaging.so.1.10.12</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_20')">
+Grid2DPageStrategy::getPageID&#160;<span class='sym_p'><span>(&#160;Vector3 const&amp; <span class='color_p'>worldPos</span></span>, <span>PagedWorldSection* <span class='color_p'>section</span></span>&#160;)</span></span>
+<br/>
+<div id="c_20" style="display:none;">
+<span class='mngl'>_ZN4Ogre18Grid2DPageStrategy9getPageIDERKNS_7Vector3EPNS_17PagedWorldSectionE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_21')">
+Grid2DPageStrategyData::convertGridToWorldSpace&#160;<span class='sym_p'><span>(&#160;Vector2 const&amp; <span class='color_p'>grid</span></span>, <span>Vector3&amp; <span class='color_p'>world</span></span>&#160;)</span></span>
+<br/>
+<div id="c_21" style="display:none;">
+<span class='mngl'>_ZN4Ogre22Grid2DPageStrategyData23convertGridToWorldSpaceERKNS_7Vector2ERNS_7Vector3E</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_22')">
+Grid2DPageStrategyData::convertWorldToGridSpace&#160;<span class='sym_p'><span>(&#160;Vector3 const&amp; <span class='color_p'>world</span></span>, <span>Vector2&amp; <span class='color_p'>grid</span></span>&#160;)</span></span>
+<br/>
+<div id="c_22" style="display:none;">
+<span class='mngl'>_ZN4Ogre22Grid2DPageStrategyData23convertWorldToGridSpaceERKNS_7Vector3ERNS_7Vector2E</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_23')">
+Grid2DPageStrategyData::determineGridLocation&#160;<span class='sym_p'><span>(&#160;Vector2 const&amp; <span class='color_p'>gridpos</span></span>, <span>int32* <span class='color_p'>x</span></span>, <span>int32* <span class='color_p'>y</span></span>&#160;)</span></span>
+<br/>
+<div id="c_23" style="display:none;">
+<span class='mngl'>_ZN4Ogre22Grid2DPageStrategyData21determineGridLocationERKNS_7Vector2EPiS4_</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_24')">
+Grid2DPageStrategyData::getBottomLeftGridSpace&#160;<span class='sym_p'><span>(&#160;int32 <span class='color_p'>x</span></span>, <span>int32 <span class='color_p'>y</span></span>, <span>Vector2&amp; <span class='color_p'>bl</span></span>&#160;)</span></span>
+<br/>
+<div id="c_24" style="display:none;">
+<span class='mngl'>_ZN4Ogre22Grid2DPageStrategyData22getBottomLeftGridSpaceEiiRNS_7Vector2E</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_25')">
+Grid2DPageStrategyData::getCornersGridSpace&#160;<span class='sym_p'><span>(&#160;int32 <span class='color_p'>x</span></span>, <span>int32 <span class='color_p'>y</span></span>, <span>Vector2* <span class='color_p'>pFourPoints</span></span>&#160;)</span></span>
+<br/>
+<div id="c_25" style="display:none;">
+<span class='mngl'>_ZN4Ogre22Grid2DPageStrategyData19getCornersGridSpaceEiiPNS_7Vector2E</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_26')">
+Grid2DPageStrategyData::getMidPointGridSpace&#160;<span class='sym_p'><span>(&#160;int32 <span class='color_p'>x</span></span>, <span>int32 <span class='color_p'>y</span></span>, <span>Vector2&amp; <span class='color_p'>mid</span></span>&#160;)</span></span>
+<br/>
+<div id="c_26" style="display:none;">
+<span class='mngl'>_ZN4Ogre22Grid2DPageStrategyData20getMidPointGridSpaceEiiRNS_7Vector2E</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_27')">
+Grid2DPageStrategyData::setOrigin&#160;<span class='sym_p'><span>(&#160;Vector3 const&amp; <span class='color_p'>worldOrigin</span></span>&#160;)</span></span>
+<br/>
+<div id="c_27" style="display:none;">
+<span class='mngl'>_ZN4Ogre22Grid2DPageStrategyData9setOriginERKNS_7Vector3E</span>
+<br/>
+<br/>
+</div>
+
+<br/>
+<span class='h_name'>OgreGrid3DPageStrategy.h</span>, <span class='lib_name'>libOgrePaging.so.1.10.12</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_28')">
+Grid3DPageStrategy::getPageID&#160;<span class='sym_p'><span>(&#160;Vector3 const&amp; <span class='color_p'>pos</span></span>, <span>PagedWorldSection* <span class='color_p'>section</span></span>&#160;)</span></span>
+<br/>
+<div id="c_28" style="display:none;">
+<span class='mngl'>_ZN4Ogre18Grid3DPageStrategy9getPageIDERKNS_7Vector3EPNS_17PagedWorldSectionE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_29')">
+Grid3DPageStrategyData::determineGridLocation&#160;<span class='sym_p'><span>(&#160;Vector3 const&amp; <span class='color_p'>pos</span></span>, <span>int32* <span class='color_p'>x</span></span>, <span>int32* <span class='color_p'>y</span></span>, <span>int32* <span class='color_p'>z</span></span>&#160;)</span></span>
+<br/>
+<div id="c_29" style="display:none;">
+<span class='mngl'>_ZN4Ogre22Grid3DPageStrategyData21determineGridLocationERKNS_7Vector3EPiS4_S4_</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_30')">
+Grid3DPageStrategyData::getBottomLeftGridSpace&#160;<span class='sym_p'><span>(&#160;int32 <span class='color_p'>x</span></span>, <span>int32 <span class='color_p'>y</span></span>, <span>int32 <span class='color_p'>z</span></span>, <span>Vector3&amp; <span class='color_p'>bl</span></span>&#160;)</span></span>
+<br/>
+<div id="c_30" style="display:none;">
+<span class='mngl'>_ZN4Ogre22Grid3DPageStrategyData22getBottomLeftGridSpaceEiiiRNS_7Vector3E</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_31')">
+Grid3DPageStrategyData::getCornersGridSpace&#160;<span class='sym_p'><span>(&#160;int32 <span class='color_p'>x</span></span>, <span>int32 <span class='color_p'>y</span></span>, <span>int32 <span class='color_p'>z</span></span>, <span>Vector3* <span class='color_p'>pEightPoints</span></span>&#160;)</span></span>
+<br/>
+<div id="c_31" style="display:none;">
+<span class='mngl'>_ZN4Ogre22Grid3DPageStrategyData19getCornersGridSpaceEiiiPNS_7Vector3E</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_32')">
+Grid3DPageStrategyData::getMidPointGridSpace&#160;<span class='sym_p'><span>(&#160;int32 <span class='color_p'>x</span></span>, <span>int32 <span class='color_p'>y</span></span>, <span>int32 <span class='color_p'>z</span></span>, <span>Vector3&amp; <span class='color_p'>mid</span></span>&#160;)</span></span>
+<br/>
+<div id="c_32" style="display:none;">
+<span class='mngl'>_ZN4Ogre22Grid3DPageStrategyData20getMidPointGridSpaceEiiiRNS_7Vector3E</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_33')">
+Grid3DPageStrategyData::setCellSize&#160;<span class='sym_p'><span>(&#160;Vector3 const&amp; <span class='color_p'>sz</span></span>&#160;)</span></span>
+<br/>
+<div id="c_33" style="display:none;">
+<span class='mngl'>_ZN4Ogre22Grid3DPageStrategyData11setCellSizeERKNS_7Vector3E</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_34')">
+Grid3DPageStrategyData::setOrigin&#160;<span class='sym_p'><span>(&#160;Vector3 const&amp; <span class='color_p'>origin</span></span>&#160;)</span></span>
+<br/>
+<div id="c_34" style="display:none;">
+<span class='mngl'>_ZN4Ogre22Grid3DPageStrategyData9setOriginERKNS_7Vector3E</span>
+<br/>
+<br/>
+</div>
+
+<br/>
+<span class='h_name'>OgrePagedWorldSection.h</span>, <span class='lib_name'>libOgrePaging.so.1.10.12</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_35')">
+PagedWorldSection::getPageID&#160;<span class='sym_p'><span>(&#160;Vector3 const&amp; <span class='color_p'>worldPos</span></span>&#160;)</span></span>
+<br/>
+<div id="c_35" style="display:none;">
+<span class='mngl'>_ZN4Ogre17PagedWorldSection9getPageIDERKNS_7Vector3E</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_36')">
+PagedWorldSection::loadOrCreatePage&#160;<span class='sym_p'><span>(&#160;Vector3 const&amp; <span class='color_p'>worldPos</span></span>&#160;)</span></span>
+<br/>
+<div id="c_36" style="display:none;">
+<span class='mngl'>_ZN4Ogre17PagedWorldSection16loadOrCreatePageERKNS_7Vector3E</span>
+<br/>
+<br/>
+</div>
+
+<br/>
+<span class='h_name'>OgrePageManager.h</span>, <span class='lib_name'>libOgrePaging.so.1.10.12</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_37')">
+PageManager::loadWorld&#160;<span class='sym_p'><span>(&#160;std::shared_ptr&lt;DataStream&gt;const&amp; <span class='color_p'>stream</span></span>, <span>String const&amp; <span class='color_p'>name</span></span>&#160;)</span></span>
+<br/>
+<div id="c_37" style="display:none;">
+<span class='mngl'>_ZN4Ogre11PageManager9loadWorldERKSt10shared_ptrINS_10DataStreamEERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_38')">
+PageManager::saveWorld&#160;<span class='sym_p'><span>(&#160;PagedWorld* <span class='color_p'>world</span></span>, <span>std::shared_ptr&lt;DataStream&gt;const&amp; <span class='color_p'>stream</span></span>&#160;)</span></span>
+<br/>
+<div id="c_38" style="display:none;">
+<span class='mngl'>_ZN4Ogre11PageManager9saveWorldEPNS_10PagedWorldERKSt10shared_ptrINS_10DataStreamEE</span>
+<br/>
+<br/>
+</div>
+
+<br/>
+<a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='High_Risk_Problems'></a><a name='Type_Problems_High'></a>
+<h2>Problems with Data Types, High Severity <span class='failed'>&nbsp;1&nbsp;</span></h2><hr/>
+<span class='h_name'>OgrePagedWorldSection.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_39')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> PagedWorldSection <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_39" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Size of this class has been changed from <b>168</b> bytes to <b>160</b> bytes.</td>
+<td>1) The class has only inline or auto-generated constructors which will be copied to applications at compile time and will allocate an older memory layout. Call of any exported method of this class may access a memory outside the allocated objects or inside the older memory structure and result in crash or incorrect behavior of applications.<br/>2) The memory layout and size of subclasses will be changed.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_40')">
+[+] affected symbols: 94 (32.8%)</span>
+<div id="c_40" style="display:none;">
+<div class='affected'><span class='iname_a'>PagedWorld::getSection&#160;<span class='sym_p'><span>(&#160;String const&amp; <i>name</i></span>&#160;)</span></span><br/>
+<div class='affect'>Return value (pointer) has base type &#39;PagedWorldSection&#39;.</div>
+<span class='iname_a'>PagedWorld::createSection&#160;<span class='sym_p'><span>(&#160;PageStrategy* <i>strategy</i></span>, <span>SceneManager* <i>sceneMgr</i></span>, <span>String const&amp; <i>sectionName</i></span>&#160;)</span></span><br/>
+<div class='affect'>Return value (pointer) has base type &#39;PagedWorldSection&#39;.</div>
+<span class='iname_a'>PagedWorld::createSection&#160;<span class='sym_p'><span>(&#160;SceneManager* <i>sceneMgr</i></span>, <span>String const&amp; <i>typeName</i></span>, <span>String const&amp; <i>sectionName</i></span>&#160;)</span></span><br/>
+<div class='affect'>Return value (pointer) has base type &#39;PagedWorldSection&#39;.</div>
+<span class='iname_a'>PagedWorld::createSection&#160;<span class='sym_p'><span>(&#160;String const&amp; <i>strategyName</i></span>, <span>SceneManager* <i>sceneMgr</i></span>, <span>String const&amp; <i>sectionName</i></span>&#160;)</span></span><br/>
+<div class='affect'>Return value (pointer) has base type &#39;PagedWorldSection&#39;.</div>
+<span class='iname_a'>PagedWorld::destroySection&#160;<span class='sym_p'><span>(&#160;PagedWorldSection* <span class='fp'>sec</span></span>&#160;)</span></span><br/>
+<div class='affect'>1st parameter &#39;sec&#39; (pointer) has base type &#39;PagedWorldSection&#39;.</div>
+<span class='iname_a'>PagedWorld::_readPageStream&#160;<span class='sym_p'><span>(&#160;PageID <i>pageID</i></span>, <span>PagedWorldSection* <span class='fp'>section</span></span>&#160;)</span></span><br/>
+<div class='affect'>2nd parameter &#39;section&#39; (pointer) has base type &#39;PagedWorldSection&#39;.</div>
+<span class='iname_a'>PagedWorld::_writePageStream&#160;<span class='sym_p'><span>(&#160;PageID <i>pageID</i></span>, <span>PagedWorldSection* <span class='fp'>section</span></span>&#160;)</span></span><br/>
+<div class='affect'>2nd parameter &#39;section&#39; (pointer) has base type &#39;PagedWorldSection&#39;.</div>
+<span class='iname_a'>PagedWorld::_loadProceduralPage&#160;<span class='sym_p'><span>(&#160;Page* <span class='fp'>page</span></span>, <span>PagedWorldSection* <i>section</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;page.mParent&#39; in 1st parameter &#39;page&#39; (pointer) has base type &#39;PagedWorldSection&#39;.</div>
+<span class='iname_a'>PagedWorld::_unloadProceduralPage&#160;<span class='sym_p'><span>(&#160;Page* <span class='fp'>page</span></span>, <span>PagedWorldSection* <i>section</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;page.mParent&#39; in 1st parameter &#39;page&#39; (pointer) has base type &#39;PagedWorldSection&#39;.</div>
+<span class='iname_a'>PagedWorld::_prepareProceduralPage&#160;<span class='sym_p'><span>(&#160;Page* <span class='fp'>page</span></span>, <span>PagedWorldSection* <i>section</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;page.mParent&#39; in 1st parameter &#39;page&#39; (pointer) has base type &#39;PagedWorldSection&#39;.</div>
+ <b>...</b>
+<br/>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='Symbol_Problems_High'></a><a name='Interface_Problems_High'></a>
+<h2>Problems with Symbols, High Severity <span class='failed'>&nbsp;2&nbsp;</span></h2><hr/>
+<span class='h_name'>OgrePageManager.h</span>, <span class='lib_name'>libOgrePaging.so.1.10.12</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_41')">
+<span class='ext'>[+]</span> PageManager::loadWorld&#160;<span class='sym_p'><span>(&#160;std::shared_ptr&lt;DataStream&gt;const&amp; <span class='color_p'>stream</span></span>, <span>String const&amp; <span class='color_p'>name</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_41" style="display:none;">
+
+
+<span class='new_sign_lbl'>&#8675;</span>
+<br/>
+<span class='new_sign'>PageManager::loadWorld&#160;<span class='sym_p'><span>(&#160;SharedPtr&lt;DataStream&gt;const&amp; <span class='color_p'>stream</span></span>, <span>String const&amp; <span class='color_p'>name</span></span>&#160;)</span></span><br/>
+<span class='mngl pleft'>_ZN4Ogre11PageManager9loadWorldERKSt10shared_ptrINS_10DataStreamEERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>Parameters list has been changed.</td>
+<td>The name of the appropriate symbol for this function on binary level has been changed from <b>_ZN4Ogre11PageManager9loadWorldERKSt10shared_ptrINS_10DataStreamEERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE</b> to <b>_ZN4Ogre11PageManager9loadWorldERKNS_9SharedPtrINS_10DataStreamEEERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE</b>. This may cause undefined reference linker error in old client applications.</td>
+</tr>
+</table>
+<br/>
+</div>
+<span class="section" onclick="javascript:showContent(this, 'c_42')">
+<span class='ext'>[+]</span> PageManager::saveWorld&#160;<span class='sym_p'><span>(&#160;PagedWorld* <span class='color_p'>world</span></span>, <span>std::shared_ptr&lt;DataStream&gt;const&amp; <span class='color_p'>stream</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_42" style="display:none;">
+
+
+<span class='new_sign_lbl'>&#8675;</span>
+<br/>
+<span class='new_sign'>PageManager::saveWorld&#160;<span class='sym_p'><span>(&#160;PagedWorld* <span class='color_p'>world</span></span>, <span>SharedPtr&lt;DataStream&gt;const&amp; <span class='color_p'>stream</span></span>&#160;)</span></span><br/>
+<span class='mngl pleft'>_ZN4Ogre11PageManager9saveWorldEPNS_10PagedWorldERKSt10shared_ptrINS_10DataStreamEE</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>Parameters list has been changed.</td>
+<td>The name of the appropriate symbol for this function on binary level has been changed from <b>_ZN4Ogre11PageManager9saveWorldEPNS_10PagedWorldERKSt10shared_ptrINS_10DataStreamEE</b> to <b>_ZN4Ogre11PageManager9saveWorldEPNS_10PagedWorldERKNS_9SharedPtrINS_10DataStreamEEE</b>. This may cause undefined reference linker error in old client applications.</td>
+</tr>
+</table>
+<br/>
+</div>
+<br/>
+<a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='Medium_Risk_Problems'></a><a name='Type_Problems_Medium'></a>
+<h2>Problems with Data Types, Medium Severity <span class='failed'>&nbsp;16&nbsp;</span></h2><hr/>
+<span class='h_name'>OgreAxisAlignedBox.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_43')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> AxisAlignedBox <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_43" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Field <b>mCorners</b> has been removed from this type.</td>
+<td>1) Applications will access incorrect memory when attempting to access this field.<br/>2) Size of the inclusive type has been changed.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_44')">
+[+] affected symbols: 94 (32.8%)</span>
+<div id="c_44" style="display:none;">
+<div class='affected'><span class='iname_a'>PagedWorld::getSection&#160;<span class='sym_p'><span>(&#160;String const&amp; <i>name</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;retval.mAABB&#39; in the return value (pointer) is of type &#39;AxisAlignedBox&#39;.</div>
+<span class='iname_a'>PagedWorld::createSection&#160;<span class='sym_p'><span>(&#160;PageStrategy* <i>strategy</i></span>, <span>SceneManager* <i>sceneMgr</i></span>, <span>String const&amp; <i>sectionName</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;retval.mAABB&#39; in the return value (pointer) is of type &#39;AxisAlignedBox&#39;.</div>
+<span class='iname_a'>PagedWorld::createSection&#160;<span class='sym_p'><span>(&#160;SceneManager* <i>sceneMgr</i></span>, <span>String const&amp; <i>typeName</i></span>, <span>String const&amp; <i>sectionName</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;retval.mAABB&#39; in the return value (pointer) is of type &#39;AxisAlignedBox&#39;.</div>
+<span class='iname_a'>PagedWorld::createSection&#160;<span class='sym_p'><span>(&#160;String const&amp; <i>strategyName</i></span>, <span>SceneManager* <i>sceneMgr</i></span>, <span>String const&amp; <i>sectionName</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;retval.mAABB&#39; in the return value (pointer) is of type &#39;AxisAlignedBox&#39;.</div>
+<span class='iname_a'>PagedWorld::destroySection&#160;<span class='sym_p'><span>(&#160;PagedWorldSection* <span class='fp'>sec</span></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;sec.mAABB&#39; in 1st parameter &#39;sec&#39; (pointer) is of type &#39;AxisAlignedBox&#39;.</div>
+<span class='iname_a'>PagedWorld::_readPageStream&#160;<span class='sym_p'><span>(&#160;PageID <i>pageID</i></span>, <span>PagedWorldSection* <span class='fp'>section</span></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;section.mAABB&#39; in 2nd parameter &#39;section&#39; (pointer) is of type &#39;AxisAlignedBox&#39;.</div>
+<span class='iname_a'>PagedWorld::_writePageStream&#160;<span class='sym_p'><span>(&#160;PageID <i>pageID</i></span>, <span>PagedWorldSection* <span class='fp'>section</span></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;section.mAABB&#39; in 2nd parameter &#39;section&#39; (pointer) is of type &#39;AxisAlignedBox&#39;.</div>
+<span class='iname_a'>PagedWorld::_loadProceduralPage&#160;<span class='sym_p'><span>(&#160;Page* <span class='fp'>page</span></span>, <span>PagedWorldSection* <i>section</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;page.mParent.mAABB&#39; in 1st parameter &#39;page&#39; (pointer) is of type &#39;AxisAlignedBox&#39;.</div>
+<span class='iname_a'>PagedWorld::_unloadProceduralPage&#160;<span class='sym_p'><span>(&#160;Page* <span class='fp'>page</span></span>, <span>PagedWorldSection* <i>section</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;page.mParent.mAABB&#39; in 1st parameter &#39;page&#39; (pointer) is of type &#39;AxisAlignedBox&#39;.</div>
+<span class='iname_a'>PagedWorld::_prepareProceduralPage&#160;<span class='sym_p'><span>(&#160;Page* <span class='fp'>page</span></span>, <span>PagedWorldSection* <i>section</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;page.mParent.mAABB&#39; in 1st parameter &#39;page&#39; (pointer) is of type &#39;AxisAlignedBox&#39;.</div>
+ <b>...</b>
+<br/>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<span class='h_name'>OgreGrid2DPageStrategy.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_45')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> Grid2DPageStrategyData <span class='failed'>&nbsp;6&nbsp;</span></span>
+<br/>
+<div id="c_45" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Virtual method <span class='iname_b'>getCornersGridSpace&#160;<span class='sym_pd'><span>(&#160;int32</span>, <span>int32</span>, <span>Vector2*</span>&#160;)</span></span> has been added to this class instead of <span class='iname_b'>getCornersGridSpace&#160;<span class='sym_pd'><span>(&#160;int32</span>, <span>int32</span>, <span>Vector2*</span>&#160;)</span></span>.</td>
+<td>Applications will pass parameters of older replaced method to newly added <b>virtual</b> method. This may result in crash or incorrect behavior of applications.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>Virtual method <span class='iname_b'>getMidPointGridSpace&#160;<span class='sym_pd'><span>(&#160;int32</span>, <span>int32</span>, <span>Vector2&amp;</span>&#160;)</span></span> has been added to this class instead of <span class='iname_b'>getMidPointGridSpace&#160;<span class='sym_pd'><span>(&#160;int32</span>, <span>int32</span>, <span>Vector2&amp;</span>&#160;)</span></span>.</td>
+<td>Applications will pass parameters of older replaced method to newly added <b>virtual</b> method. This may result in crash or incorrect behavior of applications.</td>
+</tr>
+<tr>
+<th>3</th>
+<td>Virtual method <span class='iname_b'>getBottomLeftGridSpace&#160;<span class='sym_pd'><span>(&#160;int32</span>, <span>int32</span>, <span>Vector2&amp;</span>&#160;)</span></span> has been added to this class instead of <span class='iname_b'>getBottomLeftGridSpace&#160;<span class='sym_pd'><span>(&#160;int32</span>, <span>int32</span>, <span>Vector2&amp;</span>&#160;)</span></span>.</td>
+<td>Applications will pass parameters of older replaced method to newly added <b>virtual</b> method. This may result in crash or incorrect behavior of applications.</td>
+</tr>
+<tr>
+<th>4</th>
+<td>Virtual method <span class='iname_b'>convertGridToWorldSpace&#160;<span class='sym_pd'><span>(&#160;Vector2 const&amp;</span>, <span>Vector3&amp;</span>&#160;)</span></span> has been added to this class instead of <span class='iname_b'>convertGridToWorldSpace&#160;<span class='sym_pd'><span>(&#160;Vector2 const&amp;</span>, <span>Vector3&amp;</span>&#160;)</span></span>.</td>
+<td>Applications will pass parameters of older replaced method to newly added <b>virtual</b> method. This may result in crash or incorrect behavior of applications.</td>
+</tr>
+<tr>
+<th>5</th>
+<td>Virtual method <span class='iname_b'>convertWorldToGridSpace&#160;<span class='sym_pd'><span>(&#160;Vector3 const&amp;</span>, <span>Vector2&amp;</span>&#160;)</span></span> has been added to this class instead of <span class='iname_b'>convertWorldToGridSpace&#160;<span class='sym_pd'><span>(&#160;Vector3 const&amp;</span>, <span>Vector2&amp;</span>&#160;)</span></span>.</td>
+<td>Applications will pass parameters of older replaced method to newly added <b>virtual</b> method. This may result in crash or incorrect behavior of applications.</td>
+</tr>
+<tr>
+<th>6</th>
+<td>Virtual method <span class='iname_b'>setOrigin&#160;<span class='sym_pd'><span>(&#160;Vector3 const&amp;</span>&#160;)</span></span> has been added to this class instead of <span class='iname_b'>setOrigin&#160;<span class='sym_pd'><span>(&#160;Vector3 const&amp;</span>&#160;)</span></span>.</td>
+<td>Applications will pass parameters of older replaced method to newly added <b>virtual</b> method. This may result in crash or incorrect behavior of applications.</td>
+</tr>
+</table>
+<span class="sect_info" onclick="javascript:showContent(this, 'c_46')">
+[+] show v-table (old and new)</span>
+<br/>
+<div id="c_46" style="display:none;">
+<table class='vtable'><tr><th>Offset</th><th>Virtual Table (Old) - 32 entries</th><th>Virtual Table (New) - 32 entries</th></tr><tr><th>0</th>
+<td>(int (*)(...)) 0</td>
+<td>(int (*)(...)) 0</td></tr>
+<tr><th>8</th>
+<td>(int (*)(...)) (&amp; typeinfo for Grid2DPageStrategyData)</td>
+<td>(int (*)(...)) (&amp; typeinfo for Grid2DPageStrategyData)</td></tr>
+<tr><th>16</th>
+<td>~Grid2DPageStrategyData</td>
+<td>~Grid2DPageStrategyData</td></tr>
+<tr><th>24</th>
+<td>~Grid2DPageStrategyData</td>
+<td>~Grid2DPageStrategyData</td></tr>
+<tr><th>32</th>
+<td>Grid2DPageStrategyData::load(StreamSerialiser&amp;)</td>
+<td>Grid2DPageStrategyData::load(StreamSerialiser&amp;)</td></tr>
+<tr><th>40</th>
+<td>Grid2DPageStrategyData::save(StreamSerialiser&amp;)</td>
+<td>Grid2DPageStrategyData::save(StreamSerialiser&amp;)</td></tr>
+<tr><th>48</th>
+<td>Grid2DPageStrategyData::setMode(Grid2DMode)</td>
+<td>Grid2DPageStrategyData::setMode(Grid2DMode)</td></tr>
+<tr><th>56</th>
+<td>(int (*)(...)) 0x10afe</td>
+<td>(int (*)(...)) 0x10bd4</td></tr>
+<tr><th>64</th>
+<td class='failed'>Grid2DPageStrategyData::setOrigin(Vector3 const&amp;)</td>
+<td class='failed'>Grid2DPageStrategyData::setOrigin(Vector&lt;3, float&gt; const&amp;)</td></tr>
+<tr><th>72</th>
+<td>(int (*)(...)) 0x10b06</td>
+<td>(int (*)(...)) 0x10bdc</td></tr>
+<tr><th>80</th>
+<td>Grid2DPageStrategyData::setCellSize(float)</td>
+<td>Grid2DPageStrategyData::setCellSize(float)</td></tr>
+<tr><th>88</th>
+<td>(int (*)(...)) 0x10b10</td>
+<td>(int (*)(...)) 0x10be6</td></tr>
+<tr><th>96</th>
+<td>Grid2DPageStrategyData::setLoadRadius(float)</td>
+<td>Grid2DPageStrategyData::setLoadRadius(float)</td></tr>
+<tr><th>104</th>
+<td>(int (*)(...)) 0x10b1a</td>
+<td>(int (*)(...)) 0x10bf0</td></tr>
+<tr><th>112</th>
+<td>Grid2DPageStrategyData::setHoldRadius(float)</td>
+<td>Grid2DPageStrategyData::setHoldRadius(float)</td></tr>
+<tr><th>120</th>
+<td>(int (*)(...)) 0x10b24</td>
+<td>(int (*)(...)) 0x10bfa</td></tr>
+<tr><th>128</th>
+<td>(int (*)(...)) 0x10b2e</td>
+<td>(int (*)(...)) 0x10c04</td></tr>
+<tr><th>136</th>
+<td>(int (*)(...)) 0x10b38</td>
+<td>(int (*)(...)) 0x10c0e</td></tr>
+<tr><th>144</th>
+<td>Grid2DPageStrategyData::setCellRange(int, int, int, int)</td>
+<td>Grid2DPageStrategyData::setCellRange(int, int, int, int)</td></tr>
+<tr><th>152</th>
+<td>Grid2DPageStrategyData::setCellRangeMinX(int)</td>
+<td>Grid2DPageStrategyData::setCellRangeMinX(int)</td></tr>
+<tr><th>160</th>
+<td>Grid2DPageStrategyData::setCellRangeMinY(int)</td>
+<td>Grid2DPageStrategyData::setCellRangeMinY(int)</td></tr>
+<tr><th>168</th>
+<td>Grid2DPageStrategyData::setCellRangeMaxX(int)</td>
+<td>Grid2DPageStrategyData::setCellRangeMaxX(int)</td></tr>
+<tr><th>176</th>
+<td>Grid2DPageStrategyData::setCellRangeMaxY(int)</td>
+<td>Grid2DPageStrategyData::setCellRangeMaxY(int)</td></tr>
+<tr><th>184</th>
+<td>(int (*)(...)) 0x10b42</td>
+<td>(int (*)(...)) 0x10c18</td></tr>
+<tr><th>192</th>
+<td>(int (*)(...)) 0x10b4a</td>
+<td>(int (*)(...)) 0x10c20</td></tr>
+<tr><th>200</th>
+<td>(int (*)(...)) 0x10b52</td>
+<td>(int (*)(...)) 0x10c28</td></tr>
+<tr><th>208</th>
+<td>(int (*)(...)) 0x10b5a</td>
+<td>(int (*)(...)) 0x10c30</td></tr>
+<tr><th>216</th>
+<td class='failed'>Grid2DPageStrategyData::convertWorldToGridSpace(Vector3 const&amp;, Vector2&amp;)</td>
+<td class='failed'>Grid2DPageStrategyData::convertWorldToGridSpace(Vector&lt;3, float&gt; const&amp;, Vector&lt;2, float&gt;&amp;)</td></tr>
+<tr><th>224</th>
+<td class='failed'>Grid2DPageStrategyData::convertGridToWorldSpace(Vector2 const&amp;, Vector3&amp;)</td>
+<td class='failed'>Grid2DPageStrategyData::convertGridToWorldSpace(Vector&lt;2, float&gt; const&amp;, Vector&lt;3, float&gt;&amp;)</td></tr>
+<tr><th>232</th>
+<td class='failed'>Grid2DPageStrategyData::getMidPointGridSpace(int, int, Vector2&amp;)</td>
+<td class='failed'>Grid2DPageStrategyData::getMidPointGridSpace(int, int, Vector&lt;2, float&gt;&amp;)</td></tr>
+<tr><th>240</th>
+<td class='failed'>Grid2DPageStrategyData::getBottomLeftGridSpace(int, int, Vector2&amp;)</td>
+<td class='failed'>Grid2DPageStrategyData::getBottomLeftGridSpace(int, int, Vector&lt;2, float&gt;&amp;)</td></tr>
+<tr><th>248</th>
+<td class='failed'>Grid2DPageStrategyData::getCornersGridSpace(int, int, Vector2*)</td>
+<td class='failed'>Grid2DPageStrategyData::getCornersGridSpace(int, int, Vector&lt;2, float&gt;*)</td></tr>
+</table><br/>
+</div>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_47')">
+[+] affected symbols: 6 (2.1%)</span>
+<div id="c_47" style="display:none;">
+<div class='affected'><span class='iname_a'>Grid2DPageStrategyData::getCornersGridSpace&#160;<span class='sym_p'><span>(&#160;int32 <i>x</i></span>, <span>int32 <i>y</i></span>, <span>Vector2* <i>pFourPoints</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Grid2DPageStrategyData&#39; class.</div>
+<span class='iname_a'>Grid2DPageStrategyData::getMidPointGridSpace&#160;<span class='sym_p'><span>(&#160;int32 <i>x</i></span>, <span>int32 <i>y</i></span>, <span>Vector2&amp; <i>mid</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Grid2DPageStrategyData&#39; class.</div>
+<span class='iname_a'>Grid2DPageStrategyData::getBottomLeftGridSpace&#160;<span class='sym_p'><span>(&#160;int32 <i>x</i></span>, <span>int32 <i>y</i></span>, <span>Vector2&amp; <i>bl</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Grid2DPageStrategyData&#39; class.</div>
+<span class='iname_a'>Grid2DPageStrategyData::convertGridToWorldSpace&#160;<span class='sym_p'><span>(&#160;Vector2 const&amp; <i>grid</i></span>, <span>Vector3&amp; <i>world</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Grid2DPageStrategyData&#39; class.</div>
+<span class='iname_a'>Grid2DPageStrategyData::convertWorldToGridSpace&#160;<span class='sym_p'><span>(&#160;Vector3 const&amp; <i>world</i></span>, <span>Vector2&amp; <i>grid</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Grid2DPageStrategyData&#39; class.</div>
+<span class='iname_a'>Grid2DPageStrategyData::setOrigin&#160;<span class='sym_p'><span>(&#160;Vector3 const&amp; <i>worldOrigin</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Grid2DPageStrategyData&#39; class.</div>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<span class='h_name'>OgreGrid3DPageStrategy.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_48')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> Grid3DPageStrategyData <span class='failed'>&nbsp;5&nbsp;</span></span>
+<br/>
+<div id="c_48" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Virtual method <span class='iname_b'>setCellSize&#160;<span class='sym_pd'><span>(&#160;Vector3 const&amp;</span>&#160;)</span></span> has been added to this class instead of <span class='iname_b'>setCellSize&#160;<span class='sym_pd'><span>(&#160;Vector3 const&amp;</span>&#160;)</span></span>.</td>
+<td>Applications will pass parameters of older replaced method to newly added <b>virtual</b> method. This may result in crash or incorrect behavior of applications.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>Virtual method <span class='iname_b'>getCornersGridSpace&#160;<span class='sym_pd'><span>(&#160;int32</span>, <span>int32</span>, <span>int32</span>, <span>Vector3*</span>&#160;)</span></span> has been added to this class instead of <span class='iname_b'>getCornersGridSpace&#160;<span class='sym_pd'><span>(&#160;int32</span>, <span>int32</span>, <span>int32</span>, <span>Vector3*</span>&#160;)</span></span>.</td>
+<td>Applications will pass parameters of older replaced method to newly added <b>virtual</b> method. This may result in crash or incorrect behavior of applications.</td>
+</tr>
+<tr>
+<th>3</th>
+<td>Virtual method <span class='iname_b'>getMidPointGridSpace&#160;<span class='sym_pd'><span>(&#160;int32</span>, <span>int32</span>, <span>int32</span>, <span>Vector3&amp;</span>&#160;)</span></span> has been added to this class instead of <span class='iname_b'>getMidPointGridSpace&#160;<span class='sym_pd'><span>(&#160;int32</span>, <span>int32</span>, <span>int32</span>, <span>Vector3&amp;</span>&#160;)</span></span>.</td>
+<td>Applications will pass parameters of older replaced method to newly added <b>virtual</b> method. This may result in crash or incorrect behavior of applications.</td>
+</tr>
+<tr>
+<th>4</th>
+<td>Virtual method <span class='iname_b'>getBottomLeftGridSpace&#160;<span class='sym_pd'><span>(&#160;int32</span>, <span>int32</span>, <span>int32</span>, <span>Vector3&amp;</span>&#160;)</span></span> has been added to this class instead of <span class='iname_b'>getBottomLeftGridSpace&#160;<span class='sym_pd'><span>(&#160;int32</span>, <span>int32</span>, <span>int32</span>, <span>Vector3&amp;</span>&#160;)</span></span>.</td>
+<td>Applications will pass parameters of older replaced method to newly added <b>virtual</b> method. This may result in crash or incorrect behavior of applications.</td>
+</tr>
+<tr>
+<th>5</th>
+<td>Virtual method <span class='iname_b'>setOrigin&#160;<span class='sym_pd'><span>(&#160;Vector3 const&amp;</span>&#160;)</span></span> has been added to this class instead of <span class='iname_b'>setOrigin&#160;<span class='sym_pd'><span>(&#160;Vector3 const&amp;</span>&#160;)</span></span>.</td>
+<td>Applications will pass parameters of older replaced method to newly added <b>virtual</b> method. This may result in crash or incorrect behavior of applications.</td>
+</tr>
+</table>
+<span class="sect_info" onclick="javascript:showContent(this, 'c_49')">
+[+] show v-table (old and new)</span>
+<br/>
+<div id="c_49" style="display:none;">
+<table class='vtable'><tr><th>Offset</th><th>Virtual Table (Old) - 30 entries</th><th>Virtual Table (New) - 30 entries</th></tr><tr><th>0</th>
+<td>(int (*)(...)) 0</td>
+<td>(int (*)(...)) 0</td></tr>
+<tr><th>8</th>
+<td>(int (*)(...)) (&amp; typeinfo for Grid3DPageStrategyData)</td>
+<td>(int (*)(...)) (&amp; typeinfo for Grid3DPageStrategyData)</td></tr>
+<tr><th>16</th>
+<td>~Grid3DPageStrategyData</td>
+<td>~Grid3DPageStrategyData</td></tr>
+<tr><th>24</th>
+<td>~Grid3DPageStrategyData</td>
+<td>~Grid3DPageStrategyData</td></tr>
+<tr><th>32</th>
+<td>Grid3DPageStrategyData::load(StreamSerialiser&amp;)</td>
+<td>Grid3DPageStrategyData::load(StreamSerialiser&amp;)</td></tr>
+<tr><th>40</th>
+<td>Grid3DPageStrategyData::save(StreamSerialiser&amp;)</td>
+<td>Grid3DPageStrategyData::save(StreamSerialiser&amp;)</td></tr>
+<tr><th>48</th>
+<td class='failed'>Grid3DPageStrategyData::setOrigin(Vector3 const&amp;)</td>
+<td class='failed'>Grid3DPageStrategyData::setOrigin(Vector&lt;3, float&gt; const&amp;)</td></tr>
+<tr><th>56</th>
+<td>(int (*)(...)) 0x12b3a</td>
+<td>(int (*)(...)) 0x12fe8</td></tr>
+<tr><th>64</th>
+<td class='failed'>Grid3DPageStrategyData::setCellSize(Vector3 const&amp;)</td>
+<td class='failed'>Grid3DPageStrategyData::setCellSize(Vector&lt;3, float&gt; const&amp;)</td></tr>
+<tr><th>72</th>
+<td>(int (*)(...)) 0x12b44</td>
+<td>(int (*)(...)) 0x12ff2</td></tr>
+<tr><th>80</th>
+<td>Grid3DPageStrategyData::setLoadRadius(float)</td>
+<td>Grid3DPageStrategyData::setLoadRadius(float)</td></tr>
+<tr><th>88</th>
+<td>(int (*)(...)) 0x12b5c</td>
+<td>(int (*)(...)) 0x1300a</td></tr>
+<tr><th>96</th>
+<td>Grid3DPageStrategyData::setHoldRadius(float)</td>
+<td>Grid3DPageStrategyData::setHoldRadius(float)</td></tr>
+<tr><th>104</th>
+<td>(int (*)(...)) 0x12b66</td>
+<td>(int (*)(...)) 0x13014</td></tr>
+<tr><th>112</th>
+<td>Grid3DPageStrategyData::setCellRange(int, int, int, int, int, int)</td>
+<td>Grid3DPageStrategyData::setCellRange(int, int, int, int, int, int)</td></tr>
+<tr><th>120</th>
+<td>Grid3DPageStrategyData::setCellRangeMinX(int)</td>
+<td>Grid3DPageStrategyData::setCellRangeMinX(int)</td></tr>
+<tr><th>128</th>
+<td>Grid3DPageStrategyData::setCellRangeMinY(int)</td>
+<td>Grid3DPageStrategyData::setCellRangeMinY(int)</td></tr>
+<tr><th>136</th>
+<td>Grid3DPageStrategyData::setCellRangeMinZ(int)</td>
+<td>Grid3DPageStrategyData::setCellRangeMinZ(int)</td></tr>
+<tr><th>144</th>
+<td>Grid3DPageStrategyData::setCellRangeMaxX(int)</td>
+<td>Grid3DPageStrategyData::setCellRangeMaxX(int)</td></tr>
+<tr><th>152</th>
+<td>Grid3DPageStrategyData::setCellRangeMaxY(int)</td>
+<td>Grid3DPageStrategyData::setCellRangeMaxY(int)</td></tr>
+<tr><th>160</th>
+<td>Grid3DPageStrategyData::setCellRangeMaxZ(int)</td>
+<td>Grid3DPageStrategyData::setCellRangeMaxZ(int)</td></tr>
+<tr><th>168</th>
+<td>(int (*)(...)) 0x12b70</td>
+<td>(int (*)(...)) 0x1301e</td></tr>
+<tr><th>176</th>
+<td>(int (*)(...)) 0x12b78</td>
+<td>(int (*)(...)) 0x13026</td></tr>
+<tr><th>184</th>
+<td>(int (*)(...)) 0x12b80</td>
+<td>(int (*)(...)) 0x1302e</td></tr>
+<tr><th>192</th>
+<td>(int (*)(...)) 0x12b88</td>
+<td>(int (*)(...)) 0x13036</td></tr>
+<tr><th>200</th>
+<td>(int (*)(...)) 0x12b90</td>
+<td>(int (*)(...)) 0x1303e</td></tr>
+<tr><th>208</th>
+<td>(int (*)(...)) 0x12b98</td>
+<td>(int (*)(...)) 0x13046</td></tr>
+<tr><th>216</th>
+<td class='failed'>Grid3DPageStrategyData::getMidPointGridSpace(int, int, int, Vector3&amp;)</td>
+<td class='failed'>Grid3DPageStrategyData::getMidPointGridSpace(int, int, int, Vector&lt;3, float&gt;&amp;)</td></tr>
+<tr><th>224</th>
+<td class='failed'>Grid3DPageStrategyData::getBottomLeftGridSpace(int, int, int, Vector3&amp;)</td>
+<td class='failed'>Grid3DPageStrategyData::getBottomLeftGridSpace(int, int, int, Vector&lt;3, float&gt;&amp;)</td></tr>
+<tr><th>232</th>
+<td class='failed'>Grid3DPageStrategyData::getCornersGridSpace(int, int, int, Vector3*)</td>
+<td class='failed'>Grid3DPageStrategyData::getCornersGridSpace(int, int, int, Vector&lt;3, float&gt;*)</td></tr>
+</table><br/>
+</div>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_50')">
+[+] affected symbols: 5 (1.7%)</span>
+<div id="c_50" style="display:none;">
+<div class='affected'><span class='iname_a'>Grid3DPageStrategyData::setCellSize&#160;<span class='sym_p'><span>(&#160;Vector3 const&amp; <i>sz</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Grid3DPageStrategyData&#39; class.</div>
+<span class='iname_a'>Grid3DPageStrategyData::getCornersGridSpace&#160;<span class='sym_p'><span>(&#160;int32 <i>x</i></span>, <span>int32 <i>y</i></span>, <span>int32 <i>z</i></span>, <span>Vector3* <i>pEightPoints</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Grid3DPageStrategyData&#39; class.</div>
+<span class='iname_a'>Grid3DPageStrategyData::getMidPointGridSpace&#160;<span class='sym_p'><span>(&#160;int32 <i>x</i></span>, <span>int32 <i>y</i></span>, <span>int32 <i>z</i></span>, <span>Vector3&amp; <i>mid</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Grid3DPageStrategyData&#39; class.</div>
+<span class='iname_a'>Grid3DPageStrategyData::getBottomLeftGridSpace&#160;<span class='sym_p'><span>(&#160;int32 <i>x</i></span>, <span>int32 <i>y</i></span>, <span>int32 <i>z</i></span>, <span>Vector3&amp; <i>bl</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Grid3DPageStrategyData&#39; class.</div>
+<span class='iname_a'>Grid3DPageStrategyData::setOrigin&#160;<span class='sym_p'><span>(&#160;Vector3 const&amp; <i>origin</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Grid3DPageStrategyData&#39; class.</div>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<span class='h_name'>OgrePagedWorldSection.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_51')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> PagedWorldSection <span class='failed'>&nbsp;3&nbsp;</span></span>
+<br/>
+<div id="c_51" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Size of field <b>mAABB</b> has been changed from <b>40</b> bytes to <b>28</b> bytes.</td>
+<td>1) Size of the inclusive type has been changed.<br/>2) Previous accesses of applications and library functions to this field and fields at higher positions of the structure definition may be broken.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>Virtual method <span class='iname_b'>loadOrCreatePage&#160;<span class='sym_pd'><span>(&#160;Vector3 const&amp;</span>&#160;)</span></span> has been added to this class instead of <span class='iname_b'>loadOrCreatePage&#160;<span class='sym_pd'><span>(&#160;Vector3 const&amp;</span>&#160;)</span></span>.</td>
+<td>Applications will pass parameters of older replaced method to newly added <b>virtual</b> method. This may result in crash or incorrect behavior of applications.</td>
+</tr>
+<tr>
+<th>3</th>
+<td>Virtual method <span class='iname_b'>getPageID&#160;<span class='sym_pd'><span>(&#160;Vector3 const&amp;</span>&#160;)</span></span> has been added to this class instead of <span class='iname_b'>getPageID&#160;<span class='sym_pd'><span>(&#160;Vector3 const&amp;</span>&#160;)</span></span>.</td>
+<td>Applications will pass parameters of older replaced method to newly added <b>virtual</b> method. This may result in crash or incorrect behavior of applications.</td>
+</tr>
+</table>
+<span class="sect_info" onclick="javascript:showContent(this, 'c_52')">
+[+] show v-table (old and new)</span>
+<br/>
+<div id="c_52" style="display:none;">
+<table class='vtable'><tr><th>Offset</th><th>Virtual Table (Old) - 39 entries</th><th>Virtual Table (New) - 39 entries</th></tr><tr><th>0</th>
+<td>(int (*)(...)) 0</td>
+<td>(int (*)(...)) 0</td></tr>
+<tr><th>8</th>
+<td>(int (*)(...)) (&amp; typeinfo for PagedWorldSection)</td>
+<td>(int (*)(...)) (&amp; typeinfo for PagedWorldSection)</td></tr>
+<tr><th>16</th>
+<td>(int (*)(...)) 0x1fef0</td>
+<td>(int (*)(...)) 0x1fda6</td></tr>
+<tr><th>24</th>
+<td>(int (*)(...)) 0x1fef6</td>
+<td>(int (*)(...)) 0x1fdac</td></tr>
+<tr><th>32</th>
+<td>~PagedWorldSection</td>
+<td>~PagedWorldSection</td></tr>
+<tr><th>40</th>
+<td>~PagedWorldSection</td>
+<td>~PagedWorldSection</td></tr>
+<tr><th>48</th>
+<td>(int (*)(...)) 0x1fefc</td>
+<td>(int (*)(...)) 0x1fdb2</td></tr>
+<tr><th>56</th>
+<td>(int (*)(...)) 0x1ff06</td>
+<td>(int (*)(...)) 0x1fdbc</td></tr>
+<tr><th>64</th>
+<td>PagedWorldSection::setStrategy(PageStrategy*)</td>
+<td>PagedWorldSection::setStrategy(PageStrategy*)</td></tr>
+<tr><th>72</th>
+<td>PagedWorldSection::setStrategy(std::__cxx11::basic_string&lt;char, std::char_traits&lt;char&gt;, std::allocator&lt;char&gt; &gt; const&amp;)</td>
+<td>PagedWorldSection::setStrategy(std::__cxx11::basic_string&lt;char, std::char_traits&lt;char&gt;, std::allocator&lt;char&gt; &gt; const&amp;)</td></tr>
+<tr><th>80</th>
+<td>PagedWorldSection::setSceneManager(SceneManager*)</td>
+<td>PagedWorldSection::setSceneManager(SceneManager*)</td></tr>
+<tr><th>88</th>
+<td>PagedWorldSection::setSceneManager(std::__cxx11::basic_string&lt;char, std::char_traits&lt;char&gt;, std::allocator&lt;char&gt; &gt; const&amp;)</td>
+<td>PagedWorldSection::setSceneManager(std::__cxx11::basic_string&lt;char, std::char_traits&lt;char&gt;, std::allocator&lt;char&gt; &gt; const&amp;)</td></tr>
+<tr><th>96</th>
+<td>(int (*)(...)) 0x1ff10</td>
+<td>(int (*)(...)) 0x1fdc6</td></tr>
+<tr><th>104</th>
+<td>(int (*)(...)) 0x1ff1c</td>
+<td>(int (*)(...)) 0x1fdd2</td></tr>
+<tr><th>112</th>
+<td>(int (*)(...)) 0x1ff26</td>
+<td>(int (*)(...)) 0x1fddc</td></tr>
+<tr><th>120</th>
+<td>PagedWorldSection::setBoundingBox(AxisAlignedBox const&amp;)</td>
+<td>PagedWorldSection::setBoundingBox(AxisAlignedBox const&amp;)</td></tr>
+<tr><th>128</th>
+<td>PagedWorldSection::getBoundingBox() const</td>
+<td>PagedWorldSection::getBoundingBox() const</td></tr>
+<tr><th>136</th>
+<td>PagedWorldSection::load(StreamSerialiser&amp;)</td>
+<td>PagedWorldSection::load(StreamSerialiser&amp;)</td></tr>
+<tr><th>144</th>
+<td>PagedWorldSection::save(StreamSerialiser&amp;)</td>
+<td>PagedWorldSection::save(StreamSerialiser&amp;)</td></tr>
+<tr><th>152</th>
+<td>PagedWorldSection::frameStart(float)</td>
+<td>PagedWorldSection::frameStart(float)</td></tr>
+<tr><th>160</th>
+<td>PagedWorldSection::frameEnd(float)</td>
+<td>PagedWorldSection::frameEnd(float)</td></tr>
+<tr><th>168</th>
+<td>PagedWorldSection::notifyCamera(Camera*)</td>
+<td>PagedWorldSection::notifyCamera(Camera*)</td></tr>
+<tr><th>176</th>
+<td class='failed'>PagedWorldSection::loadOrCreatePage(Vector3 const&amp;)</td>
+<td class='failed'>PagedWorldSection::loadOrCreatePage(Vector&lt;3, float&gt; const&amp;)</td></tr>
+<tr><th>184</th>
+<td class='failed'>PagedWorldSection::getPageID(Vector3 const&amp;)</td>
+<td class='failed'>PagedWorldSection::getPageID(Vector&lt;3, float&gt; const&amp;)</td></tr>
+<tr><th>192</th>
+<td>PagedWorldSection::loadPage(unsigned int, bool)</td>
+<td>PagedWorldSection::loadPage(unsigned int, bool)</td></tr>
+<tr><th>200</th>
+<td>PagedWorldSection::unloadPage(unsigned int, bool)</td>
+<td>PagedWorldSection::unloadPage(unsigned int, bool)</td></tr>
+<tr><th>208</th>
+<td>PagedWorldSection::unloadPage(Page*, bool)</td>
+<td>PagedWorldSection::unloadPage(Page*, bool)</td></tr>
+<tr><th>216</th>
+<td>PagedWorldSection::_prepareProceduralPage(Page*)</td>
+<td>PagedWorldSection::_prepareProceduralPage(Page*)</td></tr>
+<tr><th>224</th>
+<td>PagedWorldSection::_loadProceduralPage(Page*)</td>
+<td>PagedWorldSection::_loadProceduralPage(Page*)</td></tr>
+<tr><th>232</th>
+<td>PagedWorldSection::_unloadProceduralPage(Page*)</td>
+<td>PagedWorldSection::_unloadProceduralPage(Page*)</td></tr>
+<tr><th>240</th>
+<td>PagedWorldSection::_unprepareProceduralPage(Page*)</td>
+<td>PagedWorldSection::_unprepareProceduralPage(Page*)</td></tr>
+<tr><th>248</th>
+<td>PagedWorldSection::holdPage(unsigned int)</td>
+<td>PagedWorldSection::holdPage(unsigned int)</td></tr>
+<tr><th>256</th>
+<td>PagedWorldSection::getPage(unsigned int)</td>
+<td>PagedWorldSection::getPage(unsigned int)</td></tr>
+<tr><th>264</th>
+<td>PagedWorldSection::removeAllPages()</td>
+<td>PagedWorldSection::removeAllPages()</td></tr>
+<tr><th>272</th>
+<td>(int (*)(...)) 0x1ff30</td>
+<td>(int (*)(...)) 0x1fde6</td></tr>
+<tr><th>280</th>
+<td>(int (*)(...)) 0x1ff3c</td>
+<td>(int (*)(...)) 0x1fdf2</td></tr>
+<tr><th>288</th>
+<td>PagedWorldSection::_readPageStream(unsigned int)</td>
+<td>PagedWorldSection::_readPageStream(unsigned int)</td></tr>
+<tr><th>296</th>
+<td>PagedWorldSection::_writePageStream(unsigned int)</td>
+<td>PagedWorldSection::_writePageStream(unsigned int)</td></tr>
+<tr><th>304</th>
+<td>PagedWorldSection::getType[abi:cxx11]()</td>
+<td>PagedWorldSection::getType[abi:cxx11]()</td></tr>
+</table><br/>
+</div>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_53')">
+[+] affected symbols: 96 (33.4%)</span>
+<div id="c_53" style="display:none;">
+<div class='affected'><span class='iname_a'>PagedWorld::getSection&#160;<span class='sym_p'><span>(&#160;String const&amp; <i>name</i></span>&#160;)</span></span><br/>
+<div class='affect'>Return value (pointer) has base type &#39;PagedWorldSection&#39;.</div>
+<span class='iname_a'>PagedWorld::createSection&#160;<span class='sym_p'><span>(&#160;PageStrategy* <i>strategy</i></span>, <span>SceneManager* <i>sceneMgr</i></span>, <span>String const&amp; <i>sectionName</i></span>&#160;)</span></span><br/>
+<div class='affect'>Return value (pointer) has base type &#39;PagedWorldSection&#39;.</div>
+<span class='iname_a'>PagedWorld::createSection&#160;<span class='sym_p'><span>(&#160;SceneManager* <i>sceneMgr</i></span>, <span>String const&amp; <i>typeName</i></span>, <span>String const&amp; <i>sectionName</i></span>&#160;)</span></span><br/>
+<div class='affect'>Return value (pointer) has base type &#39;PagedWorldSection&#39;.</div>
+<span class='iname_a'>PagedWorld::createSection&#160;<span class='sym_p'><span>(&#160;String const&amp; <i>strategyName</i></span>, <span>SceneManager* <i>sceneMgr</i></span>, <span>String const&amp; <i>sectionName</i></span>&#160;)</span></span><br/>
+<div class='affect'>Return value (pointer) has base type &#39;PagedWorldSection&#39;.</div>
+<span class='iname_a'>PagedWorld::destroySection&#160;<span class='sym_p'><span>(&#160;PagedWorldSection* <span class='fp'>sec</span></span>&#160;)</span></span><br/>
+<div class='affect'>1st parameter &#39;sec&#39; (pointer) has base type &#39;PagedWorldSection&#39;.</div>
+<span class='iname_a'>PagedWorld::_readPageStream&#160;<span class='sym_p'><span>(&#160;PageID <i>pageID</i></span>, <span>PagedWorldSection* <span class='fp'>section</span></span>&#160;)</span></span><br/>
+<div class='affect'>2nd parameter &#39;section&#39; (pointer) has base type &#39;PagedWorldSection&#39;.</div>
+<span class='iname_a'>PagedWorld::_writePageStream&#160;<span class='sym_p'><span>(&#160;PageID <i>pageID</i></span>, <span>PagedWorldSection* <span class='fp'>section</span></span>&#160;)</span></span><br/>
+<div class='affect'>2nd parameter &#39;section&#39; (pointer) has base type &#39;PagedWorldSection&#39;.</div>
+<span class='iname_a'>PagedWorld::_loadProceduralPage&#160;<span class='sym_p'><span>(&#160;Page* <span class='fp'>page</span></span>, <span>PagedWorldSection* <i>section</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;page.mParent&#39; in 1st parameter &#39;page&#39; (pointer) has base type &#39;PagedWorldSection&#39;.</div>
+<span class='iname_a'>PagedWorld::_unloadProceduralPage&#160;<span class='sym_p'><span>(&#160;Page* <span class='fp'>page</span></span>, <span>PagedWorldSection* <i>section</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;page.mParent&#39; in 1st parameter &#39;page&#39; (pointer) has base type &#39;PagedWorldSection&#39;.</div>
+<span class='iname_a'>PagedWorld::_prepareProceduralPage&#160;<span class='sym_p'><span>(&#160;Page* <span class='fp'>page</span></span>, <span>PagedWorldSection* <i>section</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;page.mParent&#39; in 1st parameter &#39;page&#39; (pointer) has base type &#39;PagedWorldSection&#39;.</div>
+ <b>...</b>
+<br/>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<span class='h_name'>OgrePageStrategy.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_54')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> PageStrategy <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_54" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Pure virtual method <span class='iname_b'>getPageID&#160;<span class='sym_pd'><span>(&#160;Vector3 const&amp;</span>, <span>PagedWorldSection*</span>&#160;)</span></span> has been added to this class instead of <span class='iname_b'>getPageID&#160;<span class='sym_pd'><span>(&#160;Vector3 const&amp;</span>, <span>PagedWorldSection*</span>&#160;)</span></span>.</td>
+<td>Applications will provide an older method to the library instead of expected newely added <b>virtual</b> method. This may result in crash or incorrect behavior of applications.</td>
+</tr>
+</table>
+<span class="sect_info" onclick="javascript:showContent(this, 'c_55')">
+[+] show v-table (old and new)</span>
+<br/>
+<div id="c_55" style="display:none;">
+<table class='vtable'><tr><th>Offset</th><th>Virtual Table (Old) - 11 entries</th><th>Virtual Table (New) - 11 entries</th></tr><tr><th>0</th>
+<td>(int (*)(...)) 0</td>
+<td>(int (*)(...)) 0</td></tr>
+<tr><th>8</th>
+<td>(int (*)(...)) (&amp; typeinfo for PageStrategy)</td>
+<td>(int (*)(...)) (&amp; typeinfo for PageStrategy)</td></tr>
+<tr><th>16</th>
+<td>(int (*)(...))0</td>
+<td>(int (*)(...))0</td></tr>
+<tr><th>24</th>
+<td>(int (*)(...))0</td>
+<td>(int (*)(...))0</td></tr>
+<tr><th>32</th>
+<td>(int (*)(...)) 0x10aec</td>
+<td>(int (*)(...)) 0x10bc2</td></tr>
+<tr><th>40</th>
+<td>(int (*)(...)) 0x10af2</td>
+<td>(int (*)(...)) 0x10bc8</td></tr>
+<tr><th>48</th>
+<td>(int (*)(...)) 0x10af8</td>
+<td>(int (*)(...)) 0x10bce</td></tr>
+<tr><th>56</th>
+<td>__cxa_pure_virtual</td>
+<td>__cxa_pure_virtual</td></tr>
+<tr><th>64</th>
+<td>__cxa_pure_virtual</td>
+<td>__cxa_pure_virtual</td></tr>
+<tr><th>72</th>
+<td>__cxa_pure_virtual</td>
+<td>__cxa_pure_virtual</td></tr>
+<tr><th>80</th>
+<td>__cxa_pure_virtual</td>
+<td>__cxa_pure_virtual</td></tr>
+</table><br/>
+</div>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_56')">
+[+] affected symbols: 2 (0.7%)</span>
+<div id="c_56" style="display:none;">
+<div class='affected'><span class='iname_a'>Grid2DPageStrategy::getPageID&#160;<span class='sym_p'><span>(&#160;Vector3 const&amp; <i>worldPos</i></span>, <span>PagedWorldSection* <i>section</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from derived class &#39;Grid2DPageStrategy&#39;.</div>
+<span class='iname_a'>Grid3DPageStrategy::getPageID&#160;<span class='sym_p'><span>(&#160;Vector3 const&amp; <i>pos</i></span>, <span>PagedWorldSection* <i>section</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from derived class &#39;Grid3DPageStrategy&#39;.</div>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='Low_Risk_Problems'></a><a name='Type_Problems_Low'></a>
+<h2>Problems with Data Types, Low Severity <span class='warning'>&nbsp;37&nbsp;</span></h2><hr/>
+<span class='h_name'>OgreAxisAlignedBox.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_57')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> AxisAlignedBox <span class='warning'>&nbsp;3&nbsp;</span></span>
+<br/>
+<div id="c_57" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Size of this type has been changed from <b>40</b> bytes to <b>28</b> bytes.</td>
+<td>The fields or parameters of such data type may be incorrectly initialized or accessed by old client applications.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>Base type of field <b>mMaximum</b> has been changed from <b>Vector3</b> to <span class='value'>Vector&lt;3, float&gt;</span>.</td>
+<td>Replacement of field base type may indicate a change in the semantic meaning of the field.</td>
+</tr>
+<tr>
+<th>3</th>
+<td>Base type of field <b>mMinimum</b> has been changed from <b>Vector3</b> to <span class='value'>Vector&lt;3, float&gt;</span>.</td>
+<td>Replacement of field base type may indicate a change in the semantic meaning of the field.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_58')">
+[+] affected symbols: 94 (32.8%)</span>
+<div id="c_58" style="display:none;">
+<div class='affected'><span class='iname_a'>PagedWorld::getSection&#160;<span class='sym_p'><span>(&#160;String const&amp; <i>name</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;retval.mAABB&#39; in the return value (pointer) is of type &#39;AxisAlignedBox&#39;.</div>
+<span class='iname_a'>PagedWorld::createSection&#160;<span class='sym_p'><span>(&#160;PageStrategy* <i>strategy</i></span>, <span>SceneManager* <i>sceneMgr</i></span>, <span>String const&amp; <i>sectionName</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;retval.mAABB&#39; in the return value (pointer) is of type &#39;AxisAlignedBox&#39;.</div>
+<span class='iname_a'>PagedWorld::createSection&#160;<span class='sym_p'><span>(&#160;SceneManager* <i>sceneMgr</i></span>, <span>String const&amp; <i>typeName</i></span>, <span>String const&amp; <i>sectionName</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;retval.mAABB&#39; in the return value (pointer) is of type &#39;AxisAlignedBox&#39;.</div>
+<span class='iname_a'>PagedWorld::createSection&#160;<span class='sym_p'><span>(&#160;String const&amp; <i>strategyName</i></span>, <span>SceneManager* <i>sceneMgr</i></span>, <span>String const&amp; <i>sectionName</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;retval.mAABB&#39; in the return value (pointer) is of type &#39;AxisAlignedBox&#39;.</div>
+<span class='iname_a'>PagedWorld::destroySection&#160;<span class='sym_p'><span>(&#160;PagedWorldSection* <span class='fp'>sec</span></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;sec.mAABB&#39; in 1st parameter &#39;sec&#39; (pointer) is of type &#39;AxisAlignedBox&#39;.</div>
+<span class='iname_a'>PagedWorld::_readPageStream&#160;<span class='sym_p'><span>(&#160;PageID <i>pageID</i></span>, <span>PagedWorldSection* <span class='fp'>section</span></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;section.mAABB&#39; in 2nd parameter &#39;section&#39; (pointer) is of type &#39;AxisAlignedBox&#39;.</div>
+<span class='iname_a'>PagedWorld::_writePageStream&#160;<span class='sym_p'><span>(&#160;PageID <i>pageID</i></span>, <span>PagedWorldSection* <span class='fp'>section</span></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;section.mAABB&#39; in 2nd parameter &#39;section&#39; (pointer) is of type &#39;AxisAlignedBox&#39;.</div>
+<span class='iname_a'>PagedWorld::_loadProceduralPage&#160;<span class='sym_p'><span>(&#160;Page* <span class='fp'>page</span></span>, <span>PagedWorldSection* <i>section</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;page.mParent.mAABB&#39; in 1st parameter &#39;page&#39; (pointer) is of type &#39;AxisAlignedBox&#39;.</div>
+<span class='iname_a'>PagedWorld::_unloadProceduralPage&#160;<span class='sym_p'><span>(&#160;Page* <span class='fp'>page</span></span>, <span>PagedWorldSection* <i>section</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;page.mParent.mAABB&#39; in 1st parameter &#39;page&#39; (pointer) is of type &#39;AxisAlignedBox&#39;.</div>
+<span class='iname_a'>PagedWorld::_prepareProceduralPage&#160;<span class='sym_p'><span>(&#160;Page* <span class='fp'>page</span></span>, <span>PagedWorldSection* <i>section</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;page.mParent.mAABB&#39; in 1st parameter &#39;page&#39; (pointer) is of type &#39;AxisAlignedBox&#39;.</div>
+ <b>...</b>
+<br/>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<span class='h_name'>OgreGrid2DPageStrategy.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_59')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> Grid2DPageStrategyData <span class='warning'>&nbsp;2&nbsp;</span></span>
+<br/>
+<div id="c_59" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Base type of field <b>mOrigin</b> has been changed from <b>Vector2</b> to <span class='value'>Vector&lt;2, float&gt;</span>.</td>
+<td>Replacement of field base type may indicate a change in the semantic meaning of the field.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>Base type of field <b>mWorldOrigin</b> has been changed from <b>Vector3</b> to <span class='value'>Vector&lt;3, float&gt;</span>.</td>
+<td>Replacement of field base type may indicate a change in the semantic meaning of the field.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_60')">
+[+] affected symbols: 16 (5.6%)</span>
+<div id="c_60" style="display:none;">
+<div class='affected'><span class='iname_a'>Grid2DPageStrategyData::setCellSize&#160;<span class='sym_p'><span>(&#160;Real <i>sz</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Grid2DPageStrategyData&#39; class.</div>
+<span class='iname_a'>Grid2DPageStrategyData::setCellRange&#160;<span class='sym_p'><span>(&#160;int32 <i>minX</i></span>, <span>int32 <i>minY</i></span>, <span>int32 <i>maxX</i></span>, <span>int32 <i>maxY</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Grid2DPageStrategyData&#39; class.</div>
+<span class='iname_a'>Grid2DPageStrategyData::calculateCell&#160;<span class='sym_p'><span>(&#160;PageID <i>inPageID</i></span>, <span>int32* <i>x</i></span>, <span>int32* <i>y</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Grid2DPageStrategyData&#39; class.</div>
+<span class='iname_a'>Grid2DPageStrategyData::setHoldRadius&#160;<span class='sym_p'><span>(&#160;Real <i>sz</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Grid2DPageStrategyData&#39; class.</div>
+<span class='iname_a'>Grid2DPageStrategyData::setLoadRadius&#160;<span class='sym_p'><span>(&#160;Real <i>sz</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Grid2DPageStrategyData&#39; class.</div>
+<span class='iname_a'>Grid2DPageStrategyData::calculatePageID&#160;<span class='sym_p'><span>(&#160;int32 <i>x</i></span>, <span>int32 <i>y</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Grid2DPageStrategyData&#39; class.</div>
+<span class='iname_a'>Grid2DPageStrategyData::setCellRangeMaxX&#160;<span class='sym_p'><span>(&#160;int32 <i>maxX</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Grid2DPageStrategyData&#39; class.</div>
+<span class='iname_a'>Grid2DPageStrategyData::setCellRangeMaxY&#160;<span class='sym_p'><span>(&#160;int32 <i>maxY</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Grid2DPageStrategyData&#39; class.</div>
+<span class='iname_a'>Grid2DPageStrategyData::setCellRangeMinX&#160;<span class='sym_p'><span>(&#160;int32 <i>minX</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Grid2DPageStrategyData&#39; class.</div>
+<span class='iname_a'>Grid2DPageStrategyData::setCellRangeMinY&#160;<span class='sym_p'><span>(&#160;int32 <i>minY</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Grid2DPageStrategyData&#39; class.</div>
+ <b>...</b>
+<br/>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<span class='h_name'>OgreGrid3DPageStrategy.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_61')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> Grid3DPageStrategyData <span class='warning'>&nbsp;3&nbsp;</span></span>
+<br/>
+<div id="c_61" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Base type of field <b>mCellSize</b> has been changed from <b>Vector3</b> to <span class='value'>Vector&lt;3, float&gt;</span>.</td>
+<td>Replacement of field base type may indicate a change in the semantic meaning of the field.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>Base type of field <b>mOrigin</b> has been changed from <b>Vector3</b> to <span class='value'>Vector&lt;3, float&gt;</span>.</td>
+<td>Replacement of field base type may indicate a change in the semantic meaning of the field.</td>
+</tr>
+<tr>
+<th>3</th>
+<td>Base type of field <b>mWorldOrigin</b> has been changed from <b>Vector3</b> to <span class='value'>Vector&lt;3, float&gt;</span>.</td>
+<td>Replacement of field base type may indicate a change in the semantic meaning of the field.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_62')">
+[+] affected symbols: 15 (5.2%)</span>
+<div id="c_62" style="display:none;">
+<div class='affected'><span class='iname_a'>Grid3DPageStrategyData::setCellRange&#160;<span class='sym_p'><span>(&#160;int32 <i>minX</i></span>, <span>int32 <i>minY</i></span>, <span>int32 <i>minZ</i></span>, <span>int32 <i>maxX</i></span>, <span>int32 <i>maxY</i></span>, <span>int32 <i>maxZ</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Grid3DPageStrategyData&#39; class.</div>
+<span class='iname_a'>Grid3DPageStrategyData::calculateCell&#160;<span class='sym_p'><span>(&#160;PageID <i>inPageID</i></span>, <span>int32* <i>x</i></span>, <span>int32* <i>y</i></span>, <span>int32* <i>z</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Grid3DPageStrategyData&#39; class.</div>
+<span class='iname_a'>Grid3DPageStrategyData::setHoldRadius&#160;<span class='sym_p'><span>(&#160;Real <i>sz</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Grid3DPageStrategyData&#39; class.</div>
+<span class='iname_a'>Grid3DPageStrategyData::setLoadRadius&#160;<span class='sym_p'><span>(&#160;Real <i>sz</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Grid3DPageStrategyData&#39; class.</div>
+<span class='iname_a'>Grid3DPageStrategyData::calculatePageID&#160;<span class='sym_p'><span>(&#160;int32 <i>x</i></span>, <span>int32 <i>y</i></span>, <span>int32 <i>z</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Grid3DPageStrategyData&#39; class.</div>
+<span class='iname_a'>Grid3DPageStrategyData::setCellRangeMaxX&#160;<span class='sym_p'><span>(&#160;int32 <i>maxX</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Grid3DPageStrategyData&#39; class.</div>
+<span class='iname_a'>Grid3DPageStrategyData::setCellRangeMaxY&#160;<span class='sym_p'><span>(&#160;int32 <i>maxY</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Grid3DPageStrategyData&#39; class.</div>
+<span class='iname_a'>Grid3DPageStrategyData::setCellRangeMaxZ&#160;<span class='sym_p'><span>(&#160;int32 <i>maxZ</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Grid3DPageStrategyData&#39; class.</div>
+<span class='iname_a'>Grid3DPageStrategyData::setCellRangeMinX&#160;<span class='sym_p'><span>(&#160;int32 <i>minX</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Grid3DPageStrategyData&#39; class.</div>
+<span class='iname_a'>Grid3DPageStrategyData::setCellRangeMinY&#160;<span class='sym_p'><span>(&#160;int32 <i>minY</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Grid3DPageStrategyData&#39; class.</div>
+ <b>...</b>
+<br/>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<span class='h_name'>OgrePage.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_63')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> Page <span class='warning'>&nbsp;2&nbsp;</span></span>
+<br/>
+<div id="c_63" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Base class <b>AllocatedObject&lt;0&gt;</b> has been added.</td>
+<td>Possible incorrect access of applications to the memory occupied by the base classes.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>Base class <span class='value'>AllocatedObject&lt;CategorisedAllocPolicy&lt;0&gt; &gt;</span> has been removed.</td>
+<td>Possible incorrect access of applications to the memory occupied by the base classes.</td>
+</tr>
+</table>
+<span class="sect_info" onclick="javascript:showContent(this, 'c_64')">
+[+] show v-table (old and new)</span>
+<br/>
+<div id="c_64" style="display:none;">
+<table class='vtable'><tr><th>Offset</th><th>Virtual Table (Old) - 35 entries</th><th>Virtual Table (New) - 35 entries</th></tr><tr><th>0</th>
+<td>(int (*)(...)) 0</td>
+<td>(int (*)(...)) 0</td></tr>
+<tr><th>8</th>
+<td>(int (*)(...)) (&amp; typeinfo for Page)</td>
+<td>(int (*)(...)) (&amp; typeinfo for Page)</td></tr>
+<tr><th>16</th>
+<td>~Page</td>
+<td>~Page</td></tr>
+<tr><th>24</th>
+<td>~Page</td>
+<td>~Page</td></tr>
+<tr><th>32</th>
+<td>Page::canHandleRequest(WorkQueue::Request const*, WorkQueue const*)</td>
+<td>Page::canHandleRequest(WorkQueue::Request const*, WorkQueue const*)</td></tr>
+<tr><th>40</th>
+<td>Page::handleRequest(WorkQueue::Request const*, WorkQueue const*)</td>
+<td>Page::handleRequest(WorkQueue::Request const*, WorkQueue const*)</td></tr>
+<tr><th>48</th>
+<td>Page::prepareImpl(Page::PageData*)</td>
+<td>Page::prepareImpl(Page::PageData*)</td></tr>
+<tr><th>56</th>
+<td>Page::prepareImpl(StreamSerialiser&amp;, Page::PageData*)</td>
+<td>Page::prepareImpl(StreamSerialiser&amp;, Page::PageData*)</td></tr>
+<tr><th>64</th>
+<td>Page::loadImpl()</td>
+<td>Page::loadImpl()</td></tr>
+<tr><th>72</th>
+<td>(int (*)(...)) 0x14bca</td>
+<td>(int (*)(...)) 0x150ae</td></tr>
+<tr><th>80</th>
+<td>(int (*)(...)) 0x14bd2</td>
+<td>(int (*)(...)) 0x150b6</td></tr>
+<tr><th>88</th>
+<td>(int (*)(...)) 0x14bdc</td>
+<td>(int (*)(...)) 0x150c0</td></tr>
+<tr><th>96</th>
+<td>Page::touch()</td>
+<td>Page::touch()</td></tr>
+<tr><th>104</th>
+<td>Page::load(bool)</td>
+<td>Page::load(bool)</td></tr>
+<tr><th>112</th>
+<td>Page::unload()</td>
+<td>Page::unload()</td></tr>
+<tr><th>120</th>
+<td>Page::isHeld() const</td>
+<td>Page::isHeld() const</td></tr>
+<tr><th>128</th>
+<td>Page::save()</td>
+<td>Page::save()</td></tr>
+<tr><th>136</th>
+<td>Page::save(std::__cxx11::basic_string&lt;char, std::char_traits&lt;char&gt;, std::allocator&lt;char&gt; &gt; const&amp;)</td>
+<td>Page::save(std::__cxx11::basic_string&lt;char, std::char_traits&lt;char&gt;, std::allocator&lt;char&gt; &gt; const&amp;)</td></tr>
+<tr><th>144</th>
+<td>Page::save(StreamSerialiser&amp;)</td>
+<td>Page::save(StreamSerialiser&amp;)</td></tr>
+<tr><th>152</th>
+<td>Page::frameStart(float)</td>
+<td>Page::frameStart(float)</td></tr>
+<tr><th>160</th>
+<td>Page::frameEnd(float)</td>
+<td>Page::frameEnd(float)</td></tr>
+<tr><th>168</th>
+<td>Page::notifyCamera(Camera*)</td>
+<td>Page::notifyCamera(Camera*)</td></tr>
+<tr><th>176</th>
+<td>Page::createContentCollection(std::__cxx11::basic_string&lt;char, std::char_traits&lt;char&gt;, std::allocator&lt;char&gt; &gt; const&amp;)</td>
+<td>Page::createContentCollection(std::__cxx11::basic_string&lt;char, std::char_traits&lt;char&gt;, std::allocator&lt;char&gt; &gt; const&amp;)</td></tr>
+<tr><th>184</th>
+<td>Page::destroyContentCollection(PageContentCollection*)</td>
+<td>Page::destroyContentCollection(PageContentCollection*)</td></tr>
+<tr><th>192</th>
+<td>Page::destroyAllContentCollections()</td>
+<td>Page::destroyAllContentCollections()</td></tr>
+<tr><th>200</th>
+<td>Page::getContentCollectionCount() const</td>
+<td>Page::getContentCollectionCount() const</td></tr>
+<tr><th>208</th>
+<td>Page::getContentCollection(unsigned long)</td>
+<td>Page::getContentCollection(unsigned long)</td></tr>
+<tr><th>216</th>
+<td>Page::canHandleResponse(WorkQueue::Response const*, WorkQueue const*)</td>
+<td>Page::canHandleResponse(WorkQueue::Response const*, WorkQueue const*)</td></tr>
+<tr><th>224</th>
+<td>Page::handleResponse(WorkQueue::Response const*, WorkQueue const*)</td>
+<td>Page::handleResponse(WorkQueue::Response const*, WorkQueue const*)</td></tr>
+<tr><th>232</th>
+<td>(int (*)(...)) -0x00000000000008</td>
+<td>(int (*)(...)) -0x00000000000008</td></tr>
+<tr><th>240</th>
+<td>(int (*)(...)) (&amp; typeinfo for Page)</td>
+<td>(int (*)(...)) (&amp; typeinfo for Page)</td></tr>
+<tr><th>248</th>
+<td>non-virtual thunk to ~Page</td>
+<td>non-virtual thunk to ~Page</td></tr>
+<tr><th>256</th>
+<td>non-virtual thunk to ~Page</td>
+<td>non-virtual thunk to ~Page</td></tr>
+<tr><th>264</th>
+<td>non-virtual thunk to Page::canHandleResponse(WorkQueue::Response const*, WorkQueue const*)</td>
+<td>non-virtual thunk to Page::canHandleResponse(WorkQueue::Response const*, WorkQueue const*)</td></tr>
+<tr><th>272</th>
+<td>non-virtual thunk to Page::handleResponse(WorkQueue::Response const*, WorkQueue const*)</td>
+<td>non-virtual thunk to Page::handleResponse(WorkQueue::Response const*, WorkQueue const*)</td></tr>
+</table><br/>
+</div>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_65')">
+[+] affected symbols: 34 (11.8%)</span>
+<div id="c_65" style="display:none;">
+<div class='affected'><span class='iname_a'>Page::frameStart&#160;<span class='sym_p'><span>(&#160;Real <i>timeSinceLastFrame</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Page&#39; class.</div>
+<span class='iname_a'>Page::prepareImpl&#160;<span class='sym_p'><span>(&#160;struct Page::PageData* <i>dataToPopulate</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Page&#39; class.</div>
+<span class='iname_a'>Page::prepareImpl&#160;<span class='sym_p'><span>(&#160;StreamSerialiser&amp; <i>stream</i></span>, <span>struct Page::PageData* <i>dataToPopulate</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Page&#39; class.</div>
+<span class='iname_a'>Page::notifyCamera&#160;<span class='sym_p'><span>(&#160;Camera* <i>cam</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Page&#39; class.</div>
+<span class='iname_a'>Page::CHUNK_VERSION <span class='attr'>[data]</span></span><br/>
+<div class='affect'>This method is from &#39;Page&#39; class.</div>
+<span class='iname_a'>Page::handleRequest&#160;<span class='sym_p'><span>(&#160;WorkQueue::Request const* <i>req</i></span>, <span>WorkQueue const* <i>srcQ</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Page&#39; class.</div>
+<span class='iname_a'>Page::handleResponse&#160;<span class='sym_p'><span>(&#160;struct WorkQueue::Response const* <i>res</i></span>, <span>WorkQueue const* <i>srcQ</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Page&#39; class.</div>
+<span class='iname_a'>Page::canHandleRequest&#160;<span class='sym_p'><span>(&#160;WorkQueue::Request const* <i>req</i></span>, <span>WorkQueue const* <i>srcQ</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Page&#39; class.</div>
+<span class='iname_a'>Page::canHandleResponse&#160;<span class='sym_p'><span>(&#160;struct WorkQueue::Response const* <i>res</i></span>, <span>WorkQueue const* <i>srcQ</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Page&#39; class.</div>
+<span class='iname_a'>Page::updateDebugDisplay&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Page&#39; class.</div>
+ <b>...</b>
+<br/>
+</div>
+</div>
+<br/><br/></div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_66')">
+<span class='ext'>[+]</span> <span class='ttype'>typedef</span> Page::ContentCollectionList <span class='warning'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_66" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Base type has been changed from <b>vector&lt;PageContentCollection*&gt;::type</b> to <b>std::vector&lt;PageContentCollection*&gt;</b>.</td>
+<td>Replacement of the base data type may indicate a change in its semantic meaning.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_67')">
+[+] affected symbols: 1 (0.3%)</span>
+<div id="c_67" style="display:none;">
+<div class='affected'><span class='iname_a'>Page::getContentCollectionList&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>Return value (reference) has base type &#39;Page::ContentCollectionList&#39;.</div>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<span class='h_name'>OgrePageContent.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_68')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> PageContent <span class='warning'>&nbsp;2&nbsp;</span></span>
+<br/>
+<div id="c_68" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Base class <b>AllocatedObject&lt;0&gt;</b> has been added.</td>
+<td>Possible incorrect access of applications to the memory occupied by the base classes.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>Base class <span class='value'>AllocatedObject&lt;CategorisedAllocPolicy&lt;(MemoryCategory)0&gt; &gt;</span> has been removed.</td>
+<td>Possible incorrect access of applications to the memory occupied by the base classes.</td>
+</tr>
+</table>
+<span class="sect_info" onclick="javascript:showContent(this, 'c_69')">
+[+] show v-table (old and new)</span>
+<br/>
+<div id="c_69" style="display:none;">
+<table class='vtable'><tr><th>Offset</th><th>Virtual Table (Old) - 14 entries</th><th>Virtual Table (New) - 14 entries</th></tr><tr><th>0</th>
+<td>(int (*)(...)) 0</td>
+<td>(int (*)(...)) 0</td></tr>
+<tr><th>8</th>
+<td>(int (*)(...)) (&amp; typeinfo for PageContent)</td>
+<td>(int (*)(...)) (&amp; typeinfo for PageContent)</td></tr>
+<tr><th>16</th>
+<td>(int (*)(...))0</td>
+<td>(int (*)(...))0</td></tr>
+<tr><th>24</th>
+<td>(int (*)(...))0</td>
+<td>(int (*)(...))0</td></tr>
+<tr><th>32</th>
+<td>PageContent::_notifyAttached(PageContentCollection*)</td>
+<td>PageContent::_notifyAttached(PageContentCollection*)</td></tr>
+<tr><th>40</th>
+<td>PageContent::getType[abi:cxx11]() const</td>
+<td>PageContent::getType[abi:cxx11]() const</td></tr>
+<tr><th>48</th>
+<td>__cxa_pure_virtual</td>
+<td>__cxa_pure_virtual</td></tr>
+<tr><th>56</th>
+<td>(int (*)(...)) 0x16ba0</td>
+<td>(int (*)(...)) 0x16c16</td></tr>
+<tr><th>64</th>
+<td>(int (*)(...)) 0x16ba6</td>
+<td>(int (*)(...)) 0x16c1c</td></tr>
+<tr><th>72</th>
+<td>(int (*)(...)) 0x16bac</td>
+<td>(int (*)(...)) 0x16c22</td></tr>
+<tr><th>80</th>
+<td>__cxa_pure_virtual</td>
+<td>__cxa_pure_virtual</td></tr>
+<tr><th>88</th>
+<td>__cxa_pure_virtual</td>
+<td>__cxa_pure_virtual</td></tr>
+<tr><th>96</th>
+<td>__cxa_pure_virtual</td>
+<td>__cxa_pure_virtual</td></tr>
+<tr><th>104</th>
+<td>__cxa_pure_virtual</td>
+<td>__cxa_pure_virtual</td></tr>
+</table><br/>
+</div>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_70')">
+[+] affected symbols: 11 (3.8%)</span>
+<div id="c_70" style="display:none;">
+<div class='affected'><span class='iname_a'>PageContent::_notifyAttached&#160;<span class='sym_p'><span>(&#160;PageContentCollection* <i>parent</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;PageContent&#39; class.</div>
+<span class='iname_a'>PageContent::load&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;PageContent&#39; class.</div>
+<span class='iname_a'>PageContent::save&#160;<span class='sym_p'><span>(&#160;StreamSerialiser&amp; <i>p1</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;PageContent&#39; class.</div>
+<span class='iname_a'>PageContent::unload&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;PageContent&#39; class.</div>
+<span class='iname_a'>PageContent::prepare&#160;<span class='sym_p'><span>(&#160;StreamSerialiser&amp; <i>p1</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;PageContent&#39; class.</div>
+<span class='iname_a'>PageContent::unprepare&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;PageContent&#39; class.</div>
+<span class='iname_a'>PageContent::PageContent&#160;<span class='sym_p'><span>(&#160;PageContentFactory* <i>creator</i></span>&#160;)</span></span><br/>
+<div class='affect'>This constructor is from &#39;PageContent&#39; class.</div>
+<span class='iname_a'>PageContent::~PageContent&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This destructor is from &#39;PageContent&#39; class.</div>
+<span class='iname_a'>PageContent::getManager&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;PageContent&#39; class.</div>
+<span class='iname_a'>PageContent::getSceneManager&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;PageContent&#39; class.</div>
+ <b>...</b>
+<br/>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<span class='h_name'>OgrePageContentCollection.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_71')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> PageContentCollection <span class='warning'>&nbsp;2&nbsp;</span></span>
+<br/>
+<div id="c_71" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Base class <b>AllocatedObject&lt;0&gt;</b> has been added.</td>
+<td>Possible incorrect access of applications to the memory occupied by the base classes.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>Base class <span class='value'>AllocatedObject&lt;CategorisedAllocPolicy&lt;0&gt; &gt;</span> has been removed.</td>
+<td>Possible incorrect access of applications to the memory occupied by the base classes.</td>
+</tr>
+</table>
+<span class="sect_info" onclick="javascript:showContent(this, 'c_72')">
+[+] show v-table (old and new)</span>
+<br/>
+<div id="c_72" style="display:none;">
+<table class='vtable'><tr><th>Offset</th><th>Virtual Table (Old) - 14 entries</th><th>Virtual Table (New) - 14 entries</th></tr><tr><th>0</th>
+<td>(int (*)(...)) 0</td>
+<td>(int (*)(...)) 0</td></tr>
+<tr><th>8</th>
+<td>(int (*)(...)) (&amp; typeinfo for PageContentCollection)</td>
+<td>(int (*)(...)) (&amp; typeinfo for PageContentCollection)</td></tr>
+<tr><th>16</th>
+<td>(int (*)(...))0</td>
+<td>(int (*)(...))0</td></tr>
+<tr><th>24</th>
+<td>(int (*)(...))0</td>
+<td>(int (*)(...))0</td></tr>
+<tr><th>32</th>
+<td>PageContentCollection::getType[abi:cxx11]() const</td>
+<td>PageContentCollection::getType[abi:cxx11]() const</td></tr>
+<tr><th>40</th>
+<td>PageContentCollection::_notifyAttached(Page*)</td>
+<td>PageContentCollection::_notifyAttached(Page*)</td></tr>
+<tr><th>48</th>
+<td>__cxa_pure_virtual</td>
+<td>__cxa_pure_virtual</td></tr>
+<tr><th>56</th>
+<td>__cxa_pure_virtual</td>
+<td>__cxa_pure_virtual</td></tr>
+<tr><th>64</th>
+<td>__cxa_pure_virtual</td>
+<td>__cxa_pure_virtual</td></tr>
+<tr><th>72</th>
+<td>__cxa_pure_virtual</td>
+<td>__cxa_pure_virtual</td></tr>
+<tr><th>80</th>
+<td>__cxa_pure_virtual</td>
+<td>__cxa_pure_virtual</td></tr>
+<tr><th>88</th>
+<td>__cxa_pure_virtual</td>
+<td>__cxa_pure_virtual</td></tr>
+<tr><th>96</th>
+<td>__cxa_pure_virtual</td>
+<td>__cxa_pure_virtual</td></tr>
+<tr><th>104</th>
+<td>__cxa_pure_virtual</td>
+<td>__cxa_pure_virtual</td></tr>
+</table><br/>
+</div>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_73')">
+[+] affected symbols: 28 (9.8%)</span>
+<div id="c_73" style="display:none;">
+<div class='affected'><span class='iname_a'>PageContentCollection::frameStart&#160;<span class='sym_p'><span>(&#160;Real <i>p1</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;PageContentCollection&#39; class.</div>
+<span class='iname_a'>PageContentCollection::notifyCamera&#160;<span class='sym_p'><span>(&#160;Camera* <i>p1</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;PageContentCollection&#39; class.</div>
+<span class='iname_a'>PageContentCollection::CHUNK_VERSION <span class='attr'>[data]</span></span><br/>
+<div class='affect'>This method is from &#39;PageContentCollection&#39; class.</div>
+<span class='iname_a'>PageContentCollection::_notifyAttached&#160;<span class='sym_p'><span>(&#160;Page* <i>parent</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;PageContentCollection&#39; class.</div>
+<span class='iname_a'>PageContentCollection::load&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;PageContentCollection&#39; class.</div>
+<span class='iname_a'>PageContentCollection::save&#160;<span class='sym_p'><span>(&#160;StreamSerialiser&amp; <i>p1</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;PageContentCollection&#39; class.</div>
+<span class='iname_a'>PageContentCollection::unload&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;PageContentCollection&#39; class.</div>
+<span class='iname_a'>PageContentCollection::prepare&#160;<span class='sym_p'><span>(&#160;StreamSerialiser&amp; <i>p1</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;PageContentCollection&#39; class.</div>
+<span class='iname_a'>PageContentCollection::CHUNK_ID <span class='attr'>[data]</span></span><br/>
+<div class='affect'>This method is from &#39;PageContentCollection&#39; class.</div>
+<span class='iname_a'>PageContentCollection::frameEnd&#160;<span class='sym_p'><span>(&#160;Real <i>p1</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;PageContentCollection&#39; class.</div>
+ <b>...</b>
+<br/>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<span class='h_name'>OgrePageContentCollectionFactory.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_74')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> PageContentCollectionFactory <span class='warning'>&nbsp;2&nbsp;</span></span>
+<br/>
+<div id="c_74" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Base class <b>AllocatedObject&lt;0&gt;</b> has been added.</td>
+<td>Possible incorrect access of applications to the memory occupied by the base classes.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>Base class <span class='value'>AllocatedObject&lt;CategorisedAllocPolicy&lt;0&gt; &gt;</span> has been removed.</td>
+<td>Possible incorrect access of applications to the memory occupied by the base classes.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_75')">
+[+] affected symbols: 4 (1.4%)</span>
+<div id="c_75" style="display:none;">
+<div class='affected'><span class='iname_a'>PageContentCollectionFactory::createInstance&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;PageContentCollectionFactory&#39; class.</div>
+<span class='iname_a'>PageContentCollectionFactory::destroyInstance&#160;<span class='sym_p'><span>(&#160;PageContentCollection* <i>p1</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;PageContentCollectionFactory&#39; class.</div>
+<span class='iname_a'>SimplePageContentCollectionFactory::FACTORY_NAME <span class='attr'>[data]</span></span><br/>
+<div class='affect'>This method is from derived class &#39;SimplePageContentCollectionFactory&#39;.</div>
+<span class='iname_a'>PageContentCollectionFactory::getName&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;PageContentCollectionFactory&#39; class.</div>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<span class='h_name'>OgrePageContentFactory.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_76')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> PageContentFactory <span class='warning'>&nbsp;2&nbsp;</span></span>
+<br/>
+<div id="c_76" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Base class <b>AllocatedObject&lt;0&gt;</b> has been added.</td>
+<td>Possible incorrect access of applications to the memory occupied by the base classes.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>Base class <span class='value'>AllocatedObject&lt;CategorisedAllocPolicy&lt;(MemoryCategory)0&gt; &gt;</span> has been removed.</td>
+<td>Possible incorrect access of applications to the memory occupied by the base classes.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_77')">
+[+] affected symbols: 3 (1%)</span>
+<div id="c_77" style="display:none;">
+<div class='affected'><span class='iname_a'>PageContentFactory::createInstance&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;PageContentFactory&#39; class.</div>
+<span class='iname_a'>PageContentFactory::destroyInstance&#160;<span class='sym_p'><span>(&#160;PageContent* <i>p1</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;PageContentFactory&#39; class.</div>
+<span class='iname_a'>PageContentFactory::getName&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;PageContentFactory&#39; class.</div>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<span class='h_name'>OgrePagedWorld.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_78')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> PagedWorld <span class='warning'>&nbsp;2&nbsp;</span></span>
+<br/>
+<div id="c_78" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Base class <b>AllocatedObject&lt;0&gt;</b> has been added.</td>
+<td>Possible incorrect access of applications to the memory occupied by the base classes.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>Base class <span class='value'>AllocatedObject&lt;CategorisedAllocPolicy&lt;0&gt; &gt;</span> has been removed.</td>
+<td>Possible incorrect access of applications to the memory occupied by the base classes.</td>
+</tr>
+</table>
+<span class="sect_info" onclick="javascript:showContent(this, 'c_79')">
+[+] show v-table (old and new)</span>
+<br/>
+<div id="c_79" style="display:none;">
+<table class='vtable'><tr><th>Offset</th><th>Virtual Table (Old) - 11 entries</th><th>Virtual Table (New) - 11 entries</th></tr><tr><th>0</th>
+<td>(int (*)(...)) 0</td>
+<td>(int (*)(...)) 0</td></tr>
+<tr><th>8</th>
+<td>(int (*)(...)) (&amp; typeinfo for PagedWorld)</td>
+<td>(int (*)(...)) (&amp; typeinfo for PagedWorld)</td></tr>
+<tr><th>16</th>
+<td>~PagedWorld</td>
+<td>~PagedWorld</td></tr>
+<tr><th>24</th>
+<td>~PagedWorld</td>
+<td>~PagedWorld</td></tr>
+<tr><th>32</th>
+<td>PagedWorld::_prepareProceduralPage(Page*, PagedWorldSection*)</td>
+<td>PagedWorld::_prepareProceduralPage(Page*, PagedWorldSection*)</td></tr>
+<tr><th>40</th>
+<td>PagedWorld::_loadProceduralPage(Page*, PagedWorldSection*)</td>
+<td>PagedWorld::_loadProceduralPage(Page*, PagedWorldSection*)</td></tr>
+<tr><th>48</th>
+<td>PagedWorld::_unloadProceduralPage(Page*, PagedWorldSection*)</td>
+<td>PagedWorld::_unloadProceduralPage(Page*, PagedWorldSection*)</td></tr>
+<tr><th>56</th>
+<td>PagedWorld::_unprepareProceduralPage(Page*, PagedWorldSection*)</td>
+<td>PagedWorld::_unprepareProceduralPage(Page*, PagedWorldSection*)</td></tr>
+<tr><th>64</th>
+<td>PagedWorld::frameStart(float)</td>
+<td>PagedWorld::frameStart(float)</td></tr>
+<tr><th>72</th>
+<td>PagedWorld::frameEnd(float)</td>
+<td>PagedWorld::frameEnd(float)</td></tr>
+<tr><th>80</th>
+<td>PagedWorld::notifyCamera(Camera*)</td>
+<td>PagedWorld::notifyCamera(Camera*)</td></tr>
+</table><br/>
+</div>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_80')">
+[+] affected symbols: 23 (8%)</span>
+<div id="c_80" style="display:none;">
+<div class='affected'><span class='iname_a'>PagedWorld::frameStart&#160;<span class='sym_p'><span>(&#160;Real <i>t</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;PagedWorld&#39; class.</div>
+<span class='iname_a'>PagedWorld::getSection&#160;<span class='sym_p'><span>(&#160;String const&amp; <i>name</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;PagedWorld&#39; class.</div>
+<span class='iname_a'>PagedWorld::notifyCamera&#160;<span class='sym_p'><span>(&#160;Camera* <i>cam</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;PagedWorld&#39; class.</div>
+<span class='iname_a'>PagedWorld::CHUNK_VERSION <span class='attr'>[data]</span></span><br/>
+<div class='affect'>This method is from &#39;PagedWorld&#39; class.</div>
+<span class='iname_a'>PagedWorld::createSection&#160;<span class='sym_p'><span>(&#160;PageStrategy* <i>strategy</i></span>, <span>SceneManager* <i>sceneMgr</i></span>, <span>String const&amp; <i>sectionName</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;PagedWorld&#39; class.</div>
+<span class='iname_a'>PagedWorld::createSection&#160;<span class='sym_p'><span>(&#160;SceneManager* <i>sceneMgr</i></span>, <span>String const&amp; <i>typeName</i></span>, <span>String const&amp; <i>sectionName</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;PagedWorld&#39; class.</div>
+<span class='iname_a'>PagedWorld::createSection&#160;<span class='sym_p'><span>(&#160;String const&amp; <i>strategyName</i></span>, <span>SceneManager* <i>sceneMgr</i></span>, <span>String const&amp; <i>sectionName</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;PagedWorld&#39; class.</div>
+<span class='iname_a'>PagedWorld::destroySection&#160;<span class='sym_p'><span>(&#160;PagedWorldSection* <i>sec</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;PagedWorld&#39; class.</div>
+<span class='iname_a'>PagedWorld::destroySection&#160;<span class='sym_p'><span>(&#160;String const&amp; <i>name</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;PagedWorld&#39; class.</div>
+<span class='iname_a'>PagedWorld::_readPageStream&#160;<span class='sym_p'><span>(&#160;PageID <i>pageID</i></span>, <span>PagedWorldSection* <i>section</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;PagedWorld&#39; class.</div>
+ <b>...</b>
+<br/>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<span class='h_name'>OgrePagedWorldSection.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_81')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> PagedWorldSection <span class='warning'>&nbsp;2&nbsp;</span></span>
+<br/>
+<div id="c_81" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Base class <b>AllocatedObject&lt;0&gt;</b> has been added.</td>
+<td>Possible incorrect access of applications to the memory occupied by the base classes.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>Base class <span class='value'>AllocatedObject&lt;CategorisedAllocPolicy&lt;0&gt; &gt;</span> has been removed.</td>
+<td>Possible incorrect access of applications to the memory occupied by the base classes.</td>
+</tr>
+</table>
+<span class="sect_info" onclick="javascript:showContent(this, 'c_82')">
+[+] show v-table (old and new)</span>
+<br/>
+<div id="c_82" style="display:none;">
+<table class='vtable'><tr><th>Offset</th><th>Virtual Table (Old) - 39 entries</th><th>Virtual Table (New) - 39 entries</th></tr><tr><th>0</th>
+<td>(int (*)(...)) 0</td>
+<td>(int (*)(...)) 0</td></tr>
+<tr><th>8</th>
+<td>(int (*)(...)) (&amp; typeinfo for PagedWorldSection)</td>
+<td>(int (*)(...)) (&amp; typeinfo for PagedWorldSection)</td></tr>
+<tr><th>16</th>
+<td>(int (*)(...)) 0x1fef0</td>
+<td>(int (*)(...)) 0x1fda6</td></tr>
+<tr><th>24</th>
+<td>(int (*)(...)) 0x1fef6</td>
+<td>(int (*)(...)) 0x1fdac</td></tr>
+<tr><th>32</th>
+<td>~PagedWorldSection</td>
+<td>~PagedWorldSection</td></tr>
+<tr><th>40</th>
+<td>~PagedWorldSection</td>
+<td>~PagedWorldSection</td></tr>
+<tr><th>48</th>
+<td>(int (*)(...)) 0x1fefc</td>
+<td>(int (*)(...)) 0x1fdb2</td></tr>
+<tr><th>56</th>
+<td>(int (*)(...)) 0x1ff06</td>
+<td>(int (*)(...)) 0x1fdbc</td></tr>
+<tr><th>64</th>
+<td>PagedWorldSection::setStrategy(PageStrategy*)</td>
+<td>PagedWorldSection::setStrategy(PageStrategy*)</td></tr>
+<tr><th>72</th>
+<td>PagedWorldSection::setStrategy(std::__cxx11::basic_string&lt;char, std::char_traits&lt;char&gt;, std::allocator&lt;char&gt; &gt; const&amp;)</td>
+<td>PagedWorldSection::setStrategy(std::__cxx11::basic_string&lt;char, std::char_traits&lt;char&gt;, std::allocator&lt;char&gt; &gt; const&amp;)</td></tr>
+<tr><th>80</th>
+<td>PagedWorldSection::setSceneManager(SceneManager*)</td>
+<td>PagedWorldSection::setSceneManager(SceneManager*)</td></tr>
+<tr><th>88</th>
+<td>PagedWorldSection::setSceneManager(std::__cxx11::basic_string&lt;char, std::char_traits&lt;char&gt;, std::allocator&lt;char&gt; &gt; const&amp;)</td>
+<td>PagedWorldSection::setSceneManager(std::__cxx11::basic_string&lt;char, std::char_traits&lt;char&gt;, std::allocator&lt;char&gt; &gt; const&amp;)</td></tr>
+<tr><th>96</th>
+<td>(int (*)(...)) 0x1ff10</td>
+<td>(int (*)(...)) 0x1fdc6</td></tr>
+<tr><th>104</th>
+<td>(int (*)(...)) 0x1ff1c</td>
+<td>(int (*)(...)) 0x1fdd2</td></tr>
+<tr><th>112</th>
+<td>(int (*)(...)) 0x1ff26</td>
+<td>(int (*)(...)) 0x1fddc</td></tr>
+<tr><th>120</th>
+<td>PagedWorldSection::setBoundingBox(AxisAlignedBox const&amp;)</td>
+<td>PagedWorldSection::setBoundingBox(AxisAlignedBox const&amp;)</td></tr>
+<tr><th>128</th>
+<td>PagedWorldSection::getBoundingBox() const</td>
+<td>PagedWorldSection::getBoundingBox() const</td></tr>
+<tr><th>136</th>
+<td>PagedWorldSection::load(StreamSerialiser&amp;)</td>
+<td>PagedWorldSection::load(StreamSerialiser&amp;)</td></tr>
+<tr><th>144</th>
+<td>PagedWorldSection::save(StreamSerialiser&amp;)</td>
+<td>PagedWorldSection::save(StreamSerialiser&amp;)</td></tr>
+<tr><th>152</th>
+<td>PagedWorldSection::frameStart(float)</td>
+<td>PagedWorldSection::frameStart(float)</td></tr>
+<tr><th>160</th>
+<td>PagedWorldSection::frameEnd(float)</td>
+<td>PagedWorldSection::frameEnd(float)</td></tr>
+<tr><th>168</th>
+<td>PagedWorldSection::notifyCamera(Camera*)</td>
+<td>PagedWorldSection::notifyCamera(Camera*)</td></tr>
+<tr><th>176</th>
+<td class='failed'>PagedWorldSection::loadOrCreatePage(Vector3 const&amp;)</td>
+<td class='failed'>PagedWorldSection::loadOrCreatePage(Vector&lt;3, float&gt; const&amp;)</td></tr>
+<tr><th>184</th>
+<td class='failed'>PagedWorldSection::getPageID(Vector3 const&amp;)</td>
+<td class='failed'>PagedWorldSection::getPageID(Vector&lt;3, float&gt; const&amp;)</td></tr>
+<tr><th>192</th>
+<td>PagedWorldSection::loadPage(unsigned int, bool)</td>
+<td>PagedWorldSection::loadPage(unsigned int, bool)</td></tr>
+<tr><th>200</th>
+<td>PagedWorldSection::unloadPage(unsigned int, bool)</td>
+<td>PagedWorldSection::unloadPage(unsigned int, bool)</td></tr>
+<tr><th>208</th>
+<td>PagedWorldSection::unloadPage(Page*, bool)</td>
+<td>PagedWorldSection::unloadPage(Page*, bool)</td></tr>
+<tr><th>216</th>
+<td>PagedWorldSection::_prepareProceduralPage(Page*)</td>
+<td>PagedWorldSection::_prepareProceduralPage(Page*)</td></tr>
+<tr><th>224</th>
+<td>PagedWorldSection::_loadProceduralPage(Page*)</td>
+<td>PagedWorldSection::_loadProceduralPage(Page*)</td></tr>
+<tr><th>232</th>
+<td>PagedWorldSection::_unloadProceduralPage(Page*)</td>
+<td>PagedWorldSection::_unloadProceduralPage(Page*)</td></tr>
+<tr><th>240</th>
+<td>PagedWorldSection::_unprepareProceduralPage(Page*)</td>
+<td>PagedWorldSection::_unprepareProceduralPage(Page*)</td></tr>
+<tr><th>248</th>
+<td>PagedWorldSection::holdPage(unsigned int)</td>
+<td>PagedWorldSection::holdPage(unsigned int)</td></tr>
+<tr><th>256</th>
+<td>PagedWorldSection::getPage(unsigned int)</td>
+<td>PagedWorldSection::getPage(unsigned int)</td></tr>
+<tr><th>264</th>
+<td>PagedWorldSection::removeAllPages()</td>
+<td>PagedWorldSection::removeAllPages()</td></tr>
+<tr><th>272</th>
+<td>(int (*)(...)) 0x1ff30</td>
+<td>(int (*)(...)) 0x1fde6</td></tr>
+<tr><th>280</th>
+<td>(int (*)(...)) 0x1ff3c</td>
+<td>(int (*)(...)) 0x1fdf2</td></tr>
+<tr><th>288</th>
+<td>PagedWorldSection::_readPageStream(unsigned int)</td>
+<td>PagedWorldSection::_readPageStream(unsigned int)</td></tr>
+<tr><th>296</th>
+<td>PagedWorldSection::_writePageStream(unsigned int)</td>
+<td>PagedWorldSection::_writePageStream(unsigned int)</td></tr>
+<tr><th>304</th>
+<td>PagedWorldSection::getType[abi:cxx11]()</td>
+<td>PagedWorldSection::getType[abi:cxx11]()</td></tr>
+</table><br/>
+</div>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_83')">
+[+] affected symbols: 30 (10.5%)</span>
+<div id="c_83" style="display:none;">
+<div class='affected'><span class='iname_a'>PagedWorldSection::frameStart&#160;<span class='sym_p'><span>(&#160;Real <i>timeSinceLastFrame</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;PagedWorldSection&#39; class.</div>
+<span class='iname_a'>PagedWorldSection::unloadPage&#160;<span class='sym_p'><span>(&#160;PageID <i>pageID</i></span>, <span>bool <i>sync</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;PagedWorldSection&#39; class.</div>
+<span class='iname_a'>PagedWorldSection::unloadPage&#160;<span class='sym_p'><span>(&#160;Page* <i>p</i></span>, <span>bool <i>sync</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;PagedWorldSection&#39; class.</div>
+<span class='iname_a'>PagedWorldSection::setStrategy&#160;<span class='sym_p'><span>(&#160;PageStrategy* <i>strat</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;PagedWorldSection&#39; class.</div>
+<span class='iname_a'>PagedWorldSection::setStrategy&#160;<span class='sym_p'><span>(&#160;String const&amp; <i>stratName</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;PagedWorldSection&#39; class.</div>
+<span class='iname_a'>PagedWorldSection::notifyCamera&#160;<span class='sym_p'><span>(&#160;Camera* <i>cam</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;PagedWorldSection&#39; class.</div>
+<span class='iname_a'>PagedWorldSection::CHUNK_VERSION <span class='attr'>[data]</span></span><br/>
+<div class='affect'>This method is from &#39;PagedWorldSection&#39; class.</div>
+<span class='iname_a'>PagedWorldSection::removeAllPages&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;PagedWorldSection&#39; class.</div>
+<span class='iname_a'>PagedWorldSection::setBoundingBox&#160;<span class='sym_p'><span>(&#160;AxisAlignedBox const&amp; <i>box</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;PagedWorldSection&#39; class.</div>
+<span class='iname_a'>PagedWorldSection::_readPageStream&#160;<span class='sym_p'><span>(&#160;PageID <i>pageID</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;PagedWorldSection&#39; class.</div>
+ <b>...</b>
+<br/>
+</div>
+</div>
+<br/><br/></div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_84')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> PagedWorldSectionFactory <span class='warning'>&nbsp;2&nbsp;</span></span>
+<br/>
+<div id="c_84" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Base class <b>AllocatedObject&lt;0&gt;</b> has been added.</td>
+<td>Possible incorrect access of applications to the memory occupied by the base classes.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>Base class <span class='value'>AllocatedObject&lt;CategorisedAllocPolicy&lt;0&gt; &gt;</span> has been removed.</td>
+<td>Possible incorrect access of applications to the memory occupied by the base classes.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_85')">
+[+] affected symbols: 3 (1%)</span>
+<div id="c_85" style="display:none;">
+<div class='affected'><span class='iname_a'>PagedWorldSectionFactory::createInstance&#160;<span class='sym_p'><span>(&#160;String const&amp; <i>p1</i></span>, <span>PagedWorld* <i>p2</i></span>, <span>SceneManager* <i>p3</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;PagedWorldSectionFactory&#39; class.</div>
+<span class='iname_a'>PagedWorldSectionFactory::destroyInstance&#160;<span class='sym_p'><span>(&#160;PagedWorldSection* <i>p1</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;PagedWorldSectionFactory&#39; class.</div>
+<span class='iname_a'>PagedWorldSectionFactory::getName&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;PagedWorldSectionFactory&#39; class.</div>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<span class='h_name'>OgrePageManager.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_86')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> PageManager <span class='warning'>&nbsp;2&nbsp;</span></span>
+<br/>
+<div id="c_86" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Base class <b>AllocatedObject&lt;0&gt;</b> has been added.</td>
+<td>Possible incorrect access of applications to the memory occupied by the base classes.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>Base class <span class='value'>AllocatedObject&lt;CategorisedAllocPolicy&lt;0&gt; &gt;</span> has been removed.</td>
+<td>Possible incorrect access of applications to the memory occupied by the base classes.</td>
+</tr>
+</table>
+<span class="sect_info" onclick="javascript:showContent(this, 'c_87')">
+[+] show v-table (old and new)</span>
+<br/>
+<div id="c_87" style="display:none;">
+<table class='vtable'><tr><th>Offset</th><th>Virtual Table (Old) - 8 entries</th><th>Virtual Table (New) - 8 entries</th></tr><tr><th>0</th>
+<td>(int (*)(...)) 0</td>
+<td>(int (*)(...)) 0</td></tr>
+<tr><th>8</th>
+<td>(int (*)(...)) (&amp; typeinfo for PageManager)</td>
+<td>(int (*)(...)) (&amp; typeinfo for PageManager)</td></tr>
+<tr><th>16</th>
+<td>~PageManager</td>
+<td>~PageManager</td></tr>
+<tr><th>24</th>
+<td>~PageManager</td>
+<td>~PageManager</td></tr>
+<tr><th>32</th>
+<td>PageManager::_prepareProceduralPage(Page*, PagedWorldSection*)</td>
+<td>PageManager::_prepareProceduralPage(Page*, PagedWorldSection*)</td></tr>
+<tr><th>40</th>
+<td>PageManager::_loadProceduralPage(Page*, PagedWorldSection*)</td>
+<td>PageManager::_loadProceduralPage(Page*, PagedWorldSection*)</td></tr>
+<tr><th>48</th>
+<td>PageManager::_unloadProceduralPage(Page*, PagedWorldSection*)</td>
+<td>PageManager::_unloadProceduralPage(Page*, PagedWorldSection*)</td></tr>
+<tr><th>56</th>
+<td>PageManager::_unprepareProceduralPage(Page*, PagedWorldSection*)</td>
+<td>PageManager::_unprepareProceduralPage(Page*, PagedWorldSection*)</td></tr>
+</table><br/>
+</div>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_88')">
+[+] affected symbols: 43 (15%)</span>
+<div id="c_88" style="display:none;">
+<div class='affected'><span class='iname_a'>PageManager::addStrategy&#160;<span class='sym_p'><span>(&#160;PageStrategy* <i>strategy</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;PageManager&#39; class.</div>
+<span class='iname_a'>PageManager::createWorld&#160;<span class='sym_p'><span>(&#160;String const&amp; <i>name</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;PageManager&#39; class.</div>
+<span class='iname_a'>PageManager::getStrategy&#160;<span class='sym_p'><span>(&#160;String const&amp; <i>name</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;PageManager&#39; class.</div>
+<span class='iname_a'>PageManager::destroyWorld&#160;<span class='sym_p'><span>(&#160;PagedWorld* <i>world</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;PageManager&#39; class.</div>
+<span class='iname_a'>PageManager::destroyWorld&#160;<span class='sym_p'><span>(&#160;String const&amp; <i>name</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;PageManager&#39; class.</div>
+<span class='iname_a'>PageManager::removeCamera&#160;<span class='sym_p'><span>(&#160;Camera* <i>c</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;PageManager&#39; class.</div>
+<span class='iname_a'>PageManager::createContent&#160;<span class='sym_p'><span>(&#160;String const&amp; <i>typeName</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;PageManager&#39; class.</div>
+<span class='iname_a'>PageManager::destroyContent&#160;<span class='sym_p'><span>(&#160;PageContent* <i>c</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;PageManager&#39; class.</div>
+<span class='iname_a'>PageManager::removeStrategy&#160;<span class='sym_p'><span>(&#160;PageStrategy* <i>strategy</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;PageManager&#39; class.</div>
+<span class='iname_a'>PageManager::_readPageStream&#160;<span class='sym_p'><span>(&#160;PageID <i>pageID</i></span>, <span>PagedWorldSection* <i>section</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;PageManager&#39; class.</div>
+ <b>...</b>
+<br/>
+</div>
+</div>
+<br/><br/></div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_89')">
+<span class='ext'>[+]</span> <span class='ttype'>typedef</span> PageManager::CameraList <span class='warning'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_89" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Base type has been changed from <b>vector&lt;Camera*&gt;::type</b> to <b>std::vector&lt;Camera*&gt;</b>.</td>
+<td>Replacement of the base data type may indicate a change in its semantic meaning.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_90')">
+[+] affected symbols: 141 (49.1%)</span>
+<div id="c_90" style="display:none;">
+<div class='affected'><span class='iname_a'>PagedWorld::frameStart&#160;<span class='sym_p'><span>(&#160;Real <i>t</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mManager.mEventRouter.pCameraList&#39; in the object of this method has base type &#39;PageManager::CameraList&#39;.</div>
+<span class='iname_a'>PagedWorld::getSection&#160;<span class='sym_p'><span>(&#160;String const&amp; <i>name</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;retval.mParent.mManager.mEventRouter.pCameraList&#39; in the return value (pointer) has base type &#39;PageManager::CameraList&#39;.</div>
+<span class='iname_a'>PagedWorld::notifyCamera&#160;<span class='sym_p'><span>(&#160;Camera* <i>cam</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mManager.mEventRouter.pCameraList&#39; in the object of this method has base type &#39;PageManager::CameraList&#39;.</div>
+<span class='iname_a'>PagedWorld::createSection&#160;<span class='sym_p'><span>(&#160;PageStrategy* <span class='fp'>strategy</span></span>, <span>SceneManager* <i>sceneMgr</i></span>, <span>String const&amp; <i>sectionName</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;strategy.mManager.mEventRouter.pCameraList&#39; in 1st parameter &#39;strategy&#39; (pointer) has base type &#39;PageManager::CameraList&#39;.</div>
+<span class='iname_a'>PagedWorld::createSection&#160;<span class='sym_p'><span>(&#160;SceneManager* <i>sceneMgr</i></span>, <span>String const&amp; <i>typeName</i></span>, <span>String const&amp; <i>sectionName</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;retval.mParent.mManager.mEventRouter.pCameraList&#39; in the return value (pointer) has base type &#39;PageManager::CameraList&#39;.</div>
+<span class='iname_a'>PagedWorld::createSection&#160;<span class='sym_p'><span>(&#160;String const&amp; <i>strategyName</i></span>, <span>SceneManager* <i>sceneMgr</i></span>, <span>String const&amp; <i>sectionName</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;retval.mParent.mManager.mEventRouter.pCameraList&#39; in the return value (pointer) has base type &#39;PageManager::CameraList&#39;.</div>
+<span class='iname_a'>PagedWorld::destroySection&#160;<span class='sym_p'><span>(&#160;PagedWorldSection* <span class='fp'>sec</span></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;sec.mParent.mManager.mEventRouter.pCameraList&#39; in 1st parameter &#39;sec&#39; (pointer) has base type &#39;PageManager::CameraList&#39;.</div>
+<span class='iname_a'>PagedWorld::destroySection&#160;<span class='sym_p'><span>(&#160;String const&amp; <i>name</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mManager.mEventRouter.pCameraList&#39; in the object of this method has base type &#39;PageManager::CameraList&#39;.</div>
+<span class='iname_a'>PagedWorld::_readPageStream&#160;<span class='sym_p'><span>(&#160;PageID <i>pageID</i></span>, <span>PagedWorldSection* <span class='fp'>section</span></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;section.mParent.mManager.mEventRouter.pCameraList&#39; in 2nd parameter &#39;section&#39; (pointer) has base type &#39;PageManager::CameraList&#39;.</div>
+<span class='iname_a'>PagedWorld::_writePageStream&#160;<span class='sym_p'><span>(&#160;PageID <i>pageID</i></span>, <span>PagedWorldSection* <span class='fp'>section</span></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;section.mParent.mManager.mEventRouter.pCameraList&#39; in 2nd parameter &#39;section&#39; (pointer) has base type &#39;PageManager::CameraList&#39;.</div>
+ <b>...</b>
+<br/>
+</div>
+</div>
+<br/><br/></div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_91')">
+<span class='ext'>[+]</span> <span class='ttype'>typedef</span> PageManager::ContentCollectionFactoryMap <span class='warning'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_91" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Base type has been changed from <span class='value'>map&lt;std::__cxx11::basic_string&lt;char&gt;, PageContentCollectionFactory*, std::less&lt;std::__cxx11::basic_string&lt;char&gt; &gt; &gt;::type</span> to <span class='value'>std::map&lt;std::__cxx11::basic_string&lt;char&gt;, PageContentCollectionFactory*&gt;</span>.</td>
+<td>Replacement of the base data type may indicate a change in its semantic meaning.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_92')">
+[+] affected symbols: 1 (0.3%)</span>
+<div id="c_92" style="display:none;">
+<div class='affected'><span class='iname_a'>PageManager::getContentCollectionFactories&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>Return value (reference) has base type &#39;PageManager::ContentCollectionFactoryMap&#39;.</div>
+</div>
+</div>
+<br/><br/></div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_93')">
+<span class='ext'>[+]</span> <span class='ttype'>typedef</span> PageManager::ContentFactoryMap <span class='warning'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_93" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Base type has been changed from <span class='value'>map&lt;std::__cxx11::basic_string&lt;char&gt;, PageContentFactory*, std::less&lt;std::__cxx11::basic_string&lt;char&gt; &gt; &gt;::type</span> to <span class='value'>std::map&lt;std::__cxx11::basic_string&lt;char&gt;, PageContentFactory*&gt;</span>.</td>
+<td>Replacement of the base data type may indicate a change in its semantic meaning.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_94')">
+[+] affected symbols: 1 (0.3%)</span>
+<div id="c_94" style="display:none;">
+<div class='affected'><span class='iname_a'>PageManager::getContentFactories&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>Return value (reference) has base type &#39;PageManager::ContentFactoryMap&#39;.</div>
+</div>
+</div>
+<br/><br/></div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_95')">
+<span class='ext'>[+]</span> <span class='ttype'>typedef</span> PageManager::StrategyMap <span class='warning'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_95" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Base type has been changed from <span class='value'>map&lt;std::__cxx11::basic_string&lt;char&gt;, PageStrategy*, std::less&lt;std::__cxx11::basic_string&lt;char&gt; &gt; &gt;::type</span> to <span class='value'>std::map&lt;std::__cxx11::basic_string&lt;char&gt;, PageStrategy*&gt;</span>.</td>
+<td>Replacement of the base data type may indicate a change in its semantic meaning.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_96')">
+[+] affected symbols: 1 (0.3%)</span>
+<div id="c_96" style="display:none;">
+<div class='affected'><span class='iname_a'>PageManager::getStrategies&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>Return value (reference) has base type &#39;PageManager::StrategyMap&#39;.</div>
+</div>
+</div>
+<br/><br/></div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_97')">
+<span class='ext'>[+]</span> <span class='ttype'>typedef</span> PageManager::WorldMap <span class='warning'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_97" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Base type has been changed from <span class='value'>map&lt;std::__cxx11::basic_string&lt;char&gt;, PagedWorld*, std::less&lt;std::__cxx11::basic_string&lt;char&gt; &gt; &gt;::type</span> to <span class='value'>std::map&lt;std::__cxx11::basic_string&lt;char&gt;, PagedWorld*&gt;</span>.</td>
+<td>Replacement of the base data type may indicate a change in its semantic meaning.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_98')">
+[+] affected symbols: 141 (49.1%)</span>
+<div id="c_98" style="display:none;">
+<div class='affected'><span class='iname_a'>PagedWorld::frameStart&#160;<span class='sym_p'><span>(&#160;Real <i>t</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mManager.mEventRouter.pWorldMap&#39; in the object of this method has base type &#39;PageManager::WorldMap&#39;.</div>
+<span class='iname_a'>PagedWorld::getSection&#160;<span class='sym_p'><span>(&#160;String const&amp; <i>name</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;retval.mParent.mManager.mEventRouter.pWorldMap&#39; in the return value (pointer) has base type &#39;PageManager::WorldMap&#39;.</div>
+<span class='iname_a'>PagedWorld::notifyCamera&#160;<span class='sym_p'><span>(&#160;Camera* <i>cam</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mManager.mEventRouter.pWorldMap&#39; in the object of this method has base type &#39;PageManager::WorldMap&#39;.</div>
+<span class='iname_a'>PagedWorld::createSection&#160;<span class='sym_p'><span>(&#160;PageStrategy* <span class='fp'>strategy</span></span>, <span>SceneManager* <i>sceneMgr</i></span>, <span>String const&amp; <i>sectionName</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;strategy.mManager.mEventRouter.pWorldMap&#39; in 1st parameter &#39;strategy&#39; (pointer) has base type &#39;PageManager::WorldMap&#39;.</div>
+<span class='iname_a'>PagedWorld::createSection&#160;<span class='sym_p'><span>(&#160;SceneManager* <i>sceneMgr</i></span>, <span>String const&amp; <i>typeName</i></span>, <span>String const&amp; <i>sectionName</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;retval.mParent.mManager.mEventRouter.pWorldMap&#39; in the return value (pointer) has base type &#39;PageManager::WorldMap&#39;.</div>
+<span class='iname_a'>PagedWorld::createSection&#160;<span class='sym_p'><span>(&#160;String const&amp; <i>strategyName</i></span>, <span>SceneManager* <i>sceneMgr</i></span>, <span>String const&amp; <i>sectionName</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;retval.mParent.mManager.mEventRouter.pWorldMap&#39; in the return value (pointer) has base type &#39;PageManager::WorldMap&#39;.</div>
+<span class='iname_a'>PagedWorld::destroySection&#160;<span class='sym_p'><span>(&#160;PagedWorldSection* <span class='fp'>sec</span></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;sec.mParent.mManager.mEventRouter.pWorldMap&#39; in 1st parameter &#39;sec&#39; (pointer) has base type &#39;PageManager::WorldMap&#39;.</div>
+<span class='iname_a'>PagedWorld::destroySection&#160;<span class='sym_p'><span>(&#160;String const&amp; <i>name</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mManager.mEventRouter.pWorldMap&#39; in the object of this method has base type &#39;PageManager::WorldMap&#39;.</div>
+<span class='iname_a'>PagedWorld::_readPageStream&#160;<span class='sym_p'><span>(&#160;PageID <i>pageID</i></span>, <span>PagedWorldSection* <span class='fp'>section</span></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;section.mParent.mManager.mEventRouter.pWorldMap&#39; in 2nd parameter &#39;section&#39; (pointer) has base type &#39;PageManager::WorldMap&#39;.</div>
+<span class='iname_a'>PagedWorld::_writePageStream&#160;<span class='sym_p'><span>(&#160;PageID <i>pageID</i></span>, <span>PagedWorldSection* <span class='fp'>section</span></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;section.mParent.mManager.mEventRouter.pWorldMap&#39; in 2nd parameter &#39;section&#39; (pointer) has base type &#39;PageManager::WorldMap&#39;.</div>
+ <b>...</b>
+<br/>
+</div>
+</div>
+<br/><br/></div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_99')">
+<span class='ext'>[+]</span> <span class='ttype'>typedef</span> PageManager::WorldSectionFactoryMap <span class='warning'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_99" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Base type has been changed from <span class='value'>map&lt;std::__cxx11::basic_string&lt;char&gt;, PagedWorldSectionFactory*, std::less&lt;std::__cxx11::basic_string&lt;char&gt; &gt; &gt;::type</span> to <span class='value'>std::map&lt;std::__cxx11::basic_string&lt;char&gt;, PagedWorldSectionFactory*&gt;</span>.</td>
+<td>Replacement of the base data type may indicate a change in its semantic meaning.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_100')">
+[+] affected symbols: 1 (0.3%)</span>
+<div id="c_100" style="display:none;">
+<div class='affected'><span class='iname_a'>PageManager::getWorldSectionFactories&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>Return value (reference) has base type &#39;PageManager::WorldSectionFactoryMap&#39;.</div>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<span class='h_name'>OgrePageStrategy.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_101')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> PageStrategy <span class='warning'>&nbsp;2&nbsp;</span></span>
+<br/>
+<div id="c_101" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Base class <b>AllocatedObject&lt;0&gt;</b> has been added.</td>
+<td>Possible incorrect access of applications to the memory occupied by the base classes.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>Base class <span class='value'>AllocatedObject&lt;CategorisedAllocPolicy&lt;0&gt; &gt;</span> has been removed.</td>
+<td>Possible incorrect access of applications to the memory occupied by the base classes.</td>
+</tr>
+</table>
+<span class="sect_info" onclick="javascript:showContent(this, 'c_102')">
+[+] show v-table (old and new)</span>
+<br/>
+<div id="c_102" style="display:none;">
+<table class='vtable'><tr><th>Offset</th><th>Virtual Table (Old) - 11 entries</th><th>Virtual Table (New) - 11 entries</th></tr><tr><th>0</th>
+<td>(int (*)(...)) 0</td>
+<td>(int (*)(...)) 0</td></tr>
+<tr><th>8</th>
+<td>(int (*)(...)) (&amp; typeinfo for PageStrategy)</td>
+<td>(int (*)(...)) (&amp; typeinfo for PageStrategy)</td></tr>
+<tr><th>16</th>
+<td>(int (*)(...))0</td>
+<td>(int (*)(...))0</td></tr>
+<tr><th>24</th>
+<td>(int (*)(...))0</td>
+<td>(int (*)(...))0</td></tr>
+<tr><th>32</th>
+<td>(int (*)(...)) 0x10aec</td>
+<td>(int (*)(...)) 0x10bc2</td></tr>
+<tr><th>40</th>
+<td>(int (*)(...)) 0x10af2</td>
+<td>(int (*)(...)) 0x10bc8</td></tr>
+<tr><th>48</th>
+<td>(int (*)(...)) 0x10af8</td>
+<td>(int (*)(...)) 0x10bce</td></tr>
+<tr><th>56</th>
+<td>__cxa_pure_virtual</td>
+<td>__cxa_pure_virtual</td></tr>
+<tr><th>64</th>
+<td>__cxa_pure_virtual</td>
+<td>__cxa_pure_virtual</td></tr>
+<tr><th>72</th>
+<td>__cxa_pure_virtual</td>
+<td>__cxa_pure_virtual</td></tr>
+<tr><th>80</th>
+<td>__cxa_pure_virtual</td>
+<td>__cxa_pure_virtual</td></tr>
+</table><br/>
+</div>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_103')">
+[+] affected symbols: 18 (6.3%)</span>
+<div id="c_103" style="display:none;">
+<div class='affected'><span class='iname_a'>PageStrategy::createData&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;PageStrategy&#39; class.</div>
+<span class='iname_a'>PageStrategy::destroyData&#160;<span class='sym_p'><span>(&#160;PageStrategyData* <i>p1</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;PageStrategy&#39; class.</div>
+<span class='iname_a'>PageStrategy::updateDebugDisplay&#160;<span class='sym_p'><span>(&#160;Page* <i>p1</i></span>, <span>SceneNode* <i>p2</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;PageStrategy&#39; class.</div>
+<span class='iname_a'>PageStrategy::getPageID&#160;<span class='sym_p'><span>(&#160;Vector3 const&amp; <i>p1</i></span>, <span>PagedWorldSection* <i>p2</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;PageStrategy&#39; class.</div>
+<span class='iname_a'>Grid2DPageStrategy::createData&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This method is from derived class &#39;Grid2DPageStrategy&#39;.</div>
+<span class='iname_a'>Grid2DPageStrategy::destroyData&#160;<span class='sym_p'><span>(&#160;PageStrategyData* <i>d</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from derived class &#39;Grid2DPageStrategy&#39;.</div>
+<span class='iname_a'>Grid2DPageStrategy::notifyCamera&#160;<span class='sym_p'><span>(&#160;Camera* <i>cam</i></span>, <span>PagedWorldSection* <i>section</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from derived class &#39;Grid2DPageStrategy&#39;.</div>
+<span class='iname_a'>Grid2DPageStrategy::updateDebugDisplay&#160;<span class='sym_p'><span>(&#160;Page* <i>p</i></span>, <span>SceneNode* <i>sn</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from derived class &#39;Grid2DPageStrategy&#39;.</div>
+<span class='iname_a'>Grid2DPageStrategy::getPageID&#160;<span class='sym_p'><span>(&#160;Vector3 const&amp; <i>worldPos</i></span>, <span>PagedWorldSection* <i>section</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from derived class &#39;Grid2DPageStrategy&#39;.</div>
+<span class='iname_a'>Grid2DPageStrategy::Grid2DPageStrategy&#160;<span class='sym_p'><span>(&#160;PageManager* <i>manager</i></span>&#160;)</span></span><br/>
+<div class='affect'>This constructor is from derived class &#39;Grid2DPageStrategy&#39;.</div>
+ <b>...</b>
+<br/>
+</div>
+</div>
+<br/><br/></div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_104')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> PageStrategyData <span class='warning'>&nbsp;2&nbsp;</span></span>
+<br/>
+<div id="c_104" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Base class <b>AllocatedObject&lt;0&gt;</b> has been added.</td>
+<td>Possible incorrect access of applications to the memory occupied by the base classes.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>Base class <span class='value'>AllocatedObject&lt;CategorisedAllocPolicy&lt;0&gt; &gt;</span> has been removed.</td>
+<td>Possible incorrect access of applications to the memory occupied by the base classes.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_105')">
+[+] affected symbols: 50 (17.4%)</span>
+<div id="c_105" style="display:none;">
+<div class='affected'><span class='iname_a'>PageStrategyData::load&#160;<span class='sym_p'><span>(&#160;StreamSerialiser&amp; <i>p1</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;PageStrategyData&#39; class.</div>
+<span class='iname_a'>PageStrategyData::save&#160;<span class='sym_p'><span>(&#160;StreamSerialiser&amp; <i>p1</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;PageStrategyData&#39; class.</div>
+<span class='iname_a'>Grid2DPageStrategyData::setCellSize&#160;<span class='sym_p'><span>(&#160;Real <i>sz</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from derived class &#39;Grid2DPageStrategyData&#39;.</div>
+<span class='iname_a'>Grid2DPageStrategyData::setCellRange&#160;<span class='sym_p'><span>(&#160;int32 <i>minX</i></span>, <span>int32 <i>minY</i></span>, <span>int32 <i>maxX</i></span>, <span>int32 <i>maxY</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from derived class &#39;Grid2DPageStrategyData&#39;.</div>
+<span class='iname_a'>Grid2DPageStrategyData::calculateCell&#160;<span class='sym_p'><span>(&#160;PageID <i>inPageID</i></span>, <span>int32* <i>x</i></span>, <span>int32* <i>y</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from derived class &#39;Grid2DPageStrategyData&#39;.</div>
+<span class='iname_a'>Grid2DPageStrategyData::CHUNK_VERSION <span class='attr'>[data]</span></span><br/>
+<div class='affect'>This method is from derived class &#39;Grid2DPageStrategyData&#39;.</div>
+<span class='iname_a'>Grid2DPageStrategyData::setHoldRadius&#160;<span class='sym_p'><span>(&#160;Real <i>sz</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from derived class &#39;Grid2DPageStrategyData&#39;.</div>
+<span class='iname_a'>Grid2DPageStrategyData::setLoadRadius&#160;<span class='sym_p'><span>(&#160;Real <i>sz</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from derived class &#39;Grid2DPageStrategyData&#39;.</div>
+<span class='iname_a'>Grid2DPageStrategyData::calculatePageID&#160;<span class='sym_p'><span>(&#160;int32 <i>x</i></span>, <span>int32 <i>y</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from derived class &#39;Grid2DPageStrategyData&#39;.</div>
+<span class='iname_a'>Grid2DPageStrategyData::setCellRangeMaxX&#160;<span class='sym_p'><span>(&#160;int32 <i>maxX</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from derived class &#39;Grid2DPageStrategyData&#39;.</div>
+ <b>...</b>
+<br/>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='Headers'></a><h2>Header Files <span class='gray'>&nbsp;27&nbsp;</span></h2><hr/>
+<div class='h_list'>
+OgreAny.h<br/>
+OgreAxisAlignedBox.h<br/>
+OgreCamera.h<br/>
+OgreCommon.h<br/>
+OgreFrameListener.h<br/>
+OgreGrid2DPageStrategy.h<br/>
+OgreGrid3DPageStrategy.h<br/>
+OgreMemoryAllocatedObject.h<br/>
+OgreMemoryAllocatorConfig.h<br/>
+OgreMemoryStdAlloc.h<br/>
+OgreNameGenerator.h<br/>
+OgrePage.h<br/>
+OgrePageContent.h<br/>
+OgrePageContentCollection.h<br/>
+OgrePageContentCollectionFactory.h<br/>
+OgrePageContentFactory.h<br/>
+OgrePagedWorld.h<br/>
+OgrePagedWorldSection.h<br/>
+OgrePageManager.h<br/>
+OgrePageStrategy.h<br/>
+OgrePagingPrerequisites.h<br/>
+OgrePlatform.h<br/>
+OgrePrerequisites.h<br/>
+OgreSimplePageContentCollection.h<br/>
+OgreVector2.h<br/>
+OgreVector3.h<br/>
+OgreWorkQueue.h<br/>
+</div>
+<br/><a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='Sources'></a><h2>Source Files <span class='gray'>&nbsp;9&nbsp;</span></h2><hr/>
+<div class='h_list'>
+OgreGrid2DPageStrategy.cpp<br/>
+OgreGrid3DPageStrategy.cpp<br/>
+OgrePage.cpp<br/>
+OgrePageContent.cpp<br/>
+OgrePageContentCollection.cpp<br/>
+OgrePagedWorld.cpp<br/>
+OgrePagedWorldSection.cpp<br/>
+OgrePageManager.cpp<br/>
+OgreSimplePageContentCollection.cpp<br/>
+</div>
+<br/><a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='Libs'></a><h2>Objects <span class='gray'>&nbsp;1&nbsp;</span></h2><hr/>
+<div class='lib_list'>
+libOgrePaging.so.1.10.12<br/>
+</div>
+<br/><a class='top_ref' href='#Top'>to the top</a><br/>
+</div>
+<br/><br/><br/>
+<hr/>
+<div class='footer' align='right'><i>Generated by <a href='https://github.com/lvc/abi-compliance-checker'>ABI Compliance Checker</a> 2.3 &#160;</i>
+</div>
+<br/>
+
+</body></html>

@@ -1,0 +1,2090 @@
+<!-- verdict:incompatible;affected:28.4;added:11;removed:12;type_problems_high:1;type_problems_medium:4;type_problems_low:19;interface_problems_high:9;interface_problems_medium:0;interface_problems_low:0;changed_constants:0;type_changes_other:5;tool_version:2.3 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta name="keywords" content="libOgreOverlay, binary compatibility, API, report" />
+<meta name="description" content="Binary compatibility report for the libOgreOverlay object between 1.10.12 and 1.11.6 versions on x86_64" />
+<title>libOgreOverlay: 1.10.12 to 1.11.6 binary compatibility report</title>
+<style type="text/css">
+body {
+    font-family:Arial, sans-serif;
+    background-color:White;
+    color:Black;
+}
+hr {
+    color:Black;
+    background-color:Black;
+    height:1px;
+    border:0;
+}
+h1 {
+    margin-bottom:0px;
+    padding-bottom:0px;
+    font-size:1.625em;
+}
+h2 {
+    margin-bottom:0px;
+    padding-bottom:0px;
+    font-size:1.25em;
+    white-space:nowrap;
+}
+span.section {
+    font-weight:bold;
+    cursor:pointer;
+    color:#003E69;
+    white-space:nowrap;
+    margin-left:0.3125em;
+}
+span.new_sign {
+    font-weight:bold;
+    margin-left:1.65em;
+    color:#003E69;
+}
+span.new_sign_lbl {
+    margin-left:3em;
+    font-size:1em;
+    color:Black;
+}
+span:hover.section {
+    color:#336699;
+}
+span.sect_aff {
+    cursor:pointer;
+    padding-left:1.55em;
+    font-size:0.875em;
+    color:#cc3300;
+}
+span.sect_info {
+    cursor:pointer;
+    padding-left:1.55em;
+    font-size:0.875em;
+    color:Black;
+}
+span.ext {
+    font-weight:normal;
+}
+span.h_name {
+    color:#cc3300;
+    font-size:0.875em;
+    font-weight:bold;
+}
+div.h_list, div.lib_list {
+    font-size:0.94em;
+    padding-left:0.4em;
+}
+span.ns {
+    color:#408080;
+    font-size:0.94em;
+}
+span.lib_name {
+    color:Green;
+    font-size:0.875em;
+    font-weight:bold;
+}
+span.iname {
+    font-weight:bold;
+    color:#003E69;
+    margin-left:0.3125em;
+}
+span.iname_b {
+    font-weight:bold;
+}
+span.iname_a {
+    color:#333333;
+    font-weight:bold;
+    font-size:0.94em;
+}
+span.sym_p {
+    font-weight:normal;
+    white-space:normal;
+}
+span.sym_pd {
+    white-space:normal;
+}
+span.sym_p span, span.sym_pd span {
+    white-space:nowrap;
+}
+div.affect {
+    padding-left:1em;
+    padding-bottom:10px;
+    font-size:0.87em;
+    font-style:italic;
+    line-height:0.9em;
+}
+div.affected {
+    padding-left:1.9em;
+    padding-top:10px;
+}
+table.ptable {
+    border-collapse:collapse;
+    border:1px outset black;
+    margin-left:0.95em;
+    margin-top:3px;
+    margin-bottom:3px;
+    width:56.25em;
+}
+table.ptable td {
+    border:1px solid gray;
+    padding:3px;
+    font-size:0.875em;
+    text-align:left;
+    vertical-align:top;
+    max-width:28em;
+    word-wrap:break-word;
+}
+table.ptable th.pn {
+    width:2%;
+}
+table.ptable th.chg {
+    width:47%;
+}
+table.vtable {
+    border-collapse:collapse;
+    border:1px outset black;
+    margin-left:1.9em;
+    margin-top:0.7em;
+}
+table.vtable td {
+    border:1px solid gray;
+    padding:3px;
+    font-size:0.875em;
+    vertical-align:top;
+    max-width:450px;
+    word-wrap:break-word;
+}
+table.ptable th, table.vtable th {
+    background-color:#eeeeee;
+    font-weight:bold;
+    color:#333333;
+    font-family:Verdana, Arial;
+    font-size:0.875em;
+    border:1px solid gray;
+    text-align:center;
+    vertical-align:top;
+    white-space:nowrap;
+    padding:3px;
+}
+table.summary {
+    border-collapse:collapse;
+    border:1px outset black;
+}
+table.summary th {
+    background-color:#eeeeee;
+    font-weight:normal;
+    text-align:left;
+    font-size:0.94em;
+    white-space:nowrap;
+    border:1px inset gray;
+    padding:3px;
+}
+table.summary td {
+    text-align:right;
+    white-space:nowrap;
+    border:1px inset gray;
+    padding:3px 5px 3px 10px;
+}
+span.mngl {
+    padding-left:1em;
+    font-size:0.875em;
+    cursor:text;
+    color:#444444;
+    font-weight:bold;
+}
+span.pleft {
+    padding-left:2.5em;
+}
+span.sym_ver {
+    color:#333333;
+    white-space:nowrap;
+    font-family:"DejaVu Sans Mono", Monospace;
+}
+span.attr {
+    color:#333333;
+    font-weight:normal;
+}
+span.color_p {
+    font-style:italic;
+    color:Brown;
+}
+span.p {
+    font-style:italic;
+}
+span.fp {
+    font-style:italic;
+    background-color:#DCDCDC;
+}
+span.ttype {
+    font-weight:normal;
+}
+span.nowrap {
+    white-space:nowrap;
+}
+span.value {
+    font-weight:bold;
+}
+.passed {
+    background-color:#CCFFCC;
+    font-weight:normal;
+}
+.warning {
+    background-color:#F4F4AF;
+    font-weight:normal;
+}
+.failed {
+    background-color:#FFCCCC;
+    font-weight:normal;
+}
+.new {
+    background-color:#C6DEFF;
+    font-weight:normal;
+}
+.compatible {
+    background-color:#CCFFCC;
+    font-weight:normal;
+}
+.almost_compatible {
+    background-color:#FFDAA3;
+    font-weight:normal;
+}
+.incompatible {
+    background-color:#FFCCCC;
+    font-weight:normal;
+}
+.gray {
+    background-color:#DCDCDC;
+    font-weight:normal;
+}
+.top_ref {
+    font-size:0.69em;
+}
+.footer {
+    font-size:0.75em;
+}
+</style>
+<script type="text/javascript" language="JavaScript">
+<!--
+function showContent(header, id)
+{
+    e = document.getElementById(id);
+    if(e.style.display == 'none')
+    {
+        e.style.display = 'block';
+        e.style.visibility = 'visible';
+        header.innerHTML = header.innerHTML.replace(/\[[^0-9 ]\]/gi,"[&minus;]");
+    }
+    else
+    {
+        e.style.display = 'none';
+        e.style.visibility = 'hidden';
+        header.innerHTML = header.innerHTML.replace(/\[[^0-9 ]\]/gi,"[+]");
+    }
+}
+-->
+</script>
+</head>
+
+<body>
+<div><a name='Top'></a>
+<h1>Binary compatibility report for the <span style='color:Blue;'>libOgreOverlay.so</span> object between <span style='color:Red;'>1.10.12</span> and <span style='color:Red;'>1.11.6</span> versions on <span style='color:Blue;'>x86_64</span></h1>
+
+<h2>Test Info</h2><hr/>
+<table class='summary'>
+<tr><th>Module Name</th><td>libOgreOverlay</td></tr>
+<tr><th>Version #1</th><td>1.10.12</td></tr>
+<tr><th>Version #2</th><td>1.11.6</td></tr>
+<tr><th>Arch</th><td>x86_64</td></tr>
+<tr><th>GCC Version</th><td>9.4.0</td></tr>
+</table>
+<h2>Test Results</h2><hr/>
+<table class='summary'><tr><th>Total Header Files</th><td><a href='#Headers' style='color:Blue;'>41</a></td></tr>
+<tr><th>Total Source Files</th><td><a href='#Sources' style='color:Blue;'>13</a></td></tr>
+<tr><th>Total Objects</th><td><a href='#Libs' style='color:Blue;'>1</a></td></tr>
+<tr><th>Total Symbols / Types</th><td>368 / 141</td></tr>
+<tr><th>Compatibility</th>
+<td class='incompatible'>71.6%</td>
+</tr>
+</table>
+<h2>Problem Summary</h2><hr/>
+<table class='summary'><tr><th></th><th style='text-align:center;'>Severity</th><th style='text-align:center;'>Count</th></tr><tr><th>Added Symbols</th><td>-</td><td class='new'><a href='#Added' style='color:Blue;'>11</a></td></tr>
+<tr><th>Removed Symbols</th><td>High</td><td class='failed'><a href='#Removed' style='color:Blue;'>12</a></td></tr>
+<tr><th rowspan='3'>Problems with<br/>Data Types</th><td>High</td><td class='failed'><a href='#Type_Problems_High' style='color:Blue;'>1</a></td></tr>
+<tr><td>Medium</td><td class='failed'><a href='#Type_Problems_Medium' style='color:Blue;'>4</a></td></tr>
+<tr><td>Low</td><td class='warning'><a href='#Type_Problems_Low' style='color:Blue;'>19</a></td></tr>
+<tr><th rowspan='3'>Problems with<br/>Symbols</th><td>High</td><td class='failed'><a href='#Symbol_Problems_High' style='color:Blue;'>9</a></td></tr>
+<tr><td>Medium</td><td>0</td></tr>
+<tr><td>Low</td><td>0</td></tr>
+<tr><th>Problems with<br/>Constants</th><td>Low</td><td>0</td></tr>
+<tr><th>Other Changes<br/>in Data Types</th><td>-</td><td class='passed'><a href='#Other_Changes_In_Types' style='color:Blue;'>5</a></td></tr>
+</table>
+
+<a name='Added'></a><h2>Added Symbols <span class='new'>&nbsp;11&nbsp;</span></h2><hr/>
+<span class='h_name'>OgreBorderPanelOverlayElement.h</span>, <span class='lib_name'>libOgreOverlay.so.1.11.6</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_1')">
+BorderPanelOverlayElement::setBorderMaterialName&#160;<span class='sym_p'><span>(&#160;String const&amp; <span class='color_p'>name</span></span>, <span>String const&amp; <span class='color_p'>group</span></span>&#160;)</span></span>
+<br/>
+<div id="c_1" style="display:none;">
+<span class='mngl'>_ZN4Ogre25BorderPanelOverlayElement21setBorderMaterialNameERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEES8_</span>
+<br/>
+<br/>
+</div>
+
+<br/>
+<span class='h_name'>OgreFontManager.h</span>, <span class='lib_name'>libOgreOverlay.so.1.11.6</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_2')">
+FontManager::parseScript&#160;<span class='sym_p'><span>(&#160;SharedPtr&lt;DataStream&gt;&amp; <span class='color_p'>stream</span></span>, <span>String const&amp; <span class='color_p'>groupName</span></span>&#160;)</span></span>
+<br/>
+<div id="c_2" style="display:none;">
+<span class='mngl'>_ZN4Ogre11FontManager11parseScriptERNS_9SharedPtrINS_10DataStreamEEERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE</span>
+<br/>
+<br/>
+</div>
+
+<br/>
+<span class='h_name'>OgreOverlayElement.h</span>, <span class='lib_name'>libOgreOverlay.so.1.11.6</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_3')">
+OverlayElement::DEFAULT_RESOURCE_GROUP <span class='attr'>[data]</span></span>
+<br/>
+<div id="c_3" style="display:none;">
+<span class='mngl'>_ZN4Ogre14OverlayElement22DEFAULT_RESOURCE_GROUPB5cxx11E</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_4')">
+OverlayElement::setMaterial&#160;<span class='sym_p'><span>(&#160;SharedPtr&lt;Material&gt;const&amp; <span class='color_p'>mat</span></span>&#160;)</span></span>
+<br/>
+<div id="c_4" style="display:none;">
+<span class='mngl'>_ZN4Ogre14OverlayElement11setMaterialERKNS_9SharedPtrINS_8MaterialEEE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_5')">
+OverlayElement::setMaterialName&#160;<span class='sym_p'><span>(&#160;String const&amp; <span class='color_p'>matName</span></span>, <span>String const&amp; <span class='color_p'>group</span></span>&#160;)</span></span>
+<br/>
+<div id="c_5" style="display:none;">
+<span class='mngl'>_ZN4Ogre14OverlayElement15setMaterialNameERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEES8_</span>
+<br/>
+<br/>
+</div>
+
+<br/>
+<span class='h_name'>OgreOverlayManager.h</span>, <span class='lib_name'>libOgreOverlay.so.1.11.6</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_6')">
+OverlayManager::parseChildren&#160;<span class='sym_p'><span>(&#160;SharedPtr&lt;DataStream&gt;&amp; <span class='color_p'>stream</span></span>, <span>String const&amp; <span class='color_p'>line</span></span>, <span>int&amp; <span class='color_p'>l</span></span>, <span>Overlay* <span class='color_p'>pOverlay</span></span>, <span>bool <span class='color_p'>isATemplate</span></span>, <span>OverlayContainer* <span class='color_p'>parent</span></span>&#160;)</span></span>
+<br/>
+<div id="c_6" style="display:none;">
+<span class='mngl'>_ZN4Ogre14OverlayManager13parseChildrenERNS_9SharedPtrINS_10DataStreamEEERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEERiPNS_7OverlayEbPNS_16OverlayContainerE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_7')">
+OverlayManager::parseNewElement&#160;<span class='sym_p'><span>(&#160;SharedPtr&lt;DataStream&gt;&amp; <span class='color_p'>stream</span></span>, <span>int&amp; <span class='color_p'>l</span></span>, <span>String&amp; <span class='color_p'>elemType</span></span>, <span>String&amp; <span class='color_p'>elemName</span></span>, <span>Overlay* <span class='color_p'>pOverlay</span></span>, <span>bool <span class='color_p'>isATemplate</span></span>, <span>String <span class='color_p'>templateName</span></span>, <span>OverlayContainer* <span class='color_p'>container</span></span>&#160;)</span></span>
+<br/>
+<div id="c_7" style="display:none;">
+<span class='mngl'>_ZN4Ogre14OverlayManager15parseNewElementERNS_9SharedPtrINS_10DataStreamEEERiRNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEESC_PNS_7OverlayEbSB_PNS_16OverlayContainerE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_8')">
+OverlayManager::parseScript&#160;<span class='sym_p'><span>(&#160;SharedPtr&lt;DataStream&gt;&amp; <span class='color_p'>stream</span></span>, <span>String const&amp; <span class='color_p'>groupName</span></span>&#160;)</span></span>
+<br/>
+<div id="c_8" style="display:none;">
+<span class='mngl'>_ZN4Ogre14OverlayManager11parseScriptERNS_9SharedPtrINS_10DataStreamEEERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_9')">
+OverlayManager::skipToNextCloseBrace&#160;<span class='sym_p'><span>(&#160;SharedPtr&lt;DataStream&gt;&amp; <span class='color_p'>stream</span></span>, <span>int&amp; <span class='color_p'>l</span></span>&#160;)</span></span>
+<br/>
+<div id="c_9" style="display:none;">
+<span class='mngl'>_ZN4Ogre14OverlayManager20skipToNextCloseBraceERNS_9SharedPtrINS_10DataStreamEEERi</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_10')">
+OverlayManager::skipToNextOpenBrace&#160;<span class='sym_p'><span>(&#160;SharedPtr&lt;DataStream&gt;&amp; <span class='color_p'>stream</span></span>, <span>int&amp; <span class='color_p'>l</span></span>&#160;)</span></span>
+<br/>
+<div id="c_10" style="display:none;">
+<span class='mngl'>_ZN4Ogre14OverlayManager19skipToNextOpenBraceERNS_9SharedPtrINS_10DataStreamEEERi</span>
+<br/>
+<br/>
+</div>
+
+<br/>
+<span class='h_name'>OgreTextAreaOverlayElement.h</span>, <span class='lib_name'>libOgreOverlay.so.1.11.6</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_11')">
+TextAreaOverlayElement::setFontName&#160;<span class='sym_p'><span>(&#160;String const&amp; <span class='color_p'>font</span></span>, <span>String const&amp; <span class='color_p'>group</span></span>&#160;)</span></span>
+<br/>
+<div id="c_11" style="display:none;">
+<span class='mngl'>_ZN4Ogre22TextAreaOverlayElement11setFontNameERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEES8_</span>
+<br/>
+<br/>
+</div>
+
+<br/>
+<a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='Removed'></a><a name='Withdrawn'></a><h2>Removed Symbols <span class='failed'>&nbsp;12&nbsp;</span></h2><hr/>
+<span class='h_name'>OgreBorderPanelOverlayElement.h</span>, <span class='lib_name'>libOgreOverlay.so.1.10.12</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_12')">
+BorderPanelOverlayElement::setBorderMaterialName&#160;<span class='sym_p'><span>(&#160;String const&amp; <span class='color_p'>name</span></span>&#160;)</span></span>
+<br/>
+<div id="c_12" style="display:none;">
+<span class='mngl'>_ZN4Ogre25BorderPanelOverlayElement21setBorderMaterialNameERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE</span>
+<br/>
+<br/>
+</div>
+
+<br/>
+<span class='h_name'>OgreFontManager.h</span>, <span class='lib_name'>libOgreOverlay.so.1.10.12</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_13')">
+FontManager::logBadAttrib&#160;<span class='sym_p'><span>(&#160;String const&amp; <span class='color_p'>line</span></span>, <span>std::shared_ptr&lt;DataStream&gt;&amp; <span class='color_p'>pFont</span></span>&#160;)</span></span>
+<br/>
+<div id="c_13" style="display:none;">
+<span class='mngl'>_ZN4Ogre11FontManager12logBadAttribERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEERSt10shared_ptrINS_4FontEE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_14')">
+FontManager::parseAttribute&#160;<span class='sym_p'><span>(&#160;String const&amp; <span class='color_p'>line</span></span>, <span>std::shared_ptr&lt;DataStream&gt;&amp; <span class='color_p'>pFont</span></span>&#160;)</span></span>
+<br/>
+<div id="c_14" style="display:none;">
+<span class='mngl'>_ZN4Ogre11FontManager14parseAttributeERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEERSt10shared_ptrINS_4FontEE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_15')">
+FontManager::parseScript&#160;<span class='sym_p'><span>(&#160;std::shared_ptr&lt;DataStream&gt;&amp; <span class='color_p'>stream</span></span>, <span>String const&amp; <span class='color_p'>groupName</span></span>&#160;)</span></span>
+<br/>
+<div id="c_15" style="display:none;">
+<span class='mngl'>_ZN4Ogre11FontManager11parseScriptERSt10shared_ptrINS_10DataStreamEERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE</span>
+<br/>
+<br/>
+</div>
+
+<br/>
+<span class='h_name'>OgreOverlayElement.h</span>, <span class='lib_name'>libOgreOverlay.so.1.10.12</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_16')">
+OverlayElement::setMaterial&#160;<span class='sym_p'><span>(&#160;std::shared_ptr&lt;DataStream&gt;const&amp; <span class='color_p'>mat</span></span>&#160;)</span></span>
+<br/>
+<div id="c_16" style="display:none;">
+<span class='mngl'>_ZN4Ogre14OverlayElement11setMaterialERKSt10shared_ptrINS_8MaterialEE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_17')">
+OverlayElement::setMaterialName&#160;<span class='sym_p'><span>(&#160;String const&amp; <span class='color_p'>matName</span></span>&#160;)</span></span>
+<br/>
+<div id="c_17" style="display:none;">
+<span class='mngl'>_ZN4Ogre14OverlayElement15setMaterialNameERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE</span>
+<br/>
+<br/>
+</div>
+
+<br/>
+<span class='h_name'>OgreOverlayManager.h</span>, <span class='lib_name'>libOgreOverlay.so.1.10.12</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_18')">
+OverlayManager::parseChildren&#160;<span class='sym_p'><span>(&#160;std::shared_ptr&lt;DataStream&gt;&amp; <span class='color_p'>stream</span></span>, <span>String const&amp; <span class='color_p'>line</span></span>, <span>Overlay* <span class='color_p'>pOverlay</span></span>, <span>bool <span class='color_p'>isATemplate</span></span>, <span>OverlayContainer* <span class='color_p'>parent</span></span>&#160;)</span></span>
+<br/>
+<div id="c_18" style="display:none;">
+<span class='mngl'>_ZN4Ogre14OverlayManager13parseChildrenERSt10shared_ptrINS_10DataStreamEERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEEPNS_7OverlayEbPNS_16OverlayContainerE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_19')">
+OverlayManager::parseNewElement&#160;<span class='sym_p'><span>(&#160;std::shared_ptr&lt;DataStream&gt;&amp; <span class='color_p'>stream</span></span>, <span>String&amp; <span class='color_p'>elemType</span></span>, <span>String&amp; <span class='color_p'>elemName</span></span>, <span>bool <span class='color_p'>isContainer</span></span>, <span>Overlay* <span class='color_p'>pOverlay</span></span>, <span>bool <span class='color_p'>isATemplate</span></span>, <span>String <span class='color_p'>templateName</span></span>, <span>OverlayContainer* <span class='color_p'>container</span></span>&#160;)</span></span>
+<br/>
+<div id="c_19" style="display:none;">
+<span class='mngl'>_ZN4Ogre14OverlayManager15parseNewElementERSt10shared_ptrINS_10DataStreamEERNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEESB_bPNS_7OverlayEbSA_PNS_16OverlayContainerE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_20')">
+OverlayManager::parseScript&#160;<span class='sym_p'><span>(&#160;std::shared_ptr&lt;DataStream&gt;&amp; <span class='color_p'>stream</span></span>, <span>String const&amp; <span class='color_p'>groupName</span></span>&#160;)</span></span>
+<br/>
+<div id="c_20" style="display:none;">
+<span class='mngl'>_ZN4Ogre14OverlayManager11parseScriptERSt10shared_ptrINS_10DataStreamEERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_21')">
+OverlayManager::skipToNextCloseBrace&#160;<span class='sym_p'><span>(&#160;std::shared_ptr&lt;DataStream&gt;&amp; <span class='color_p'>stream</span></span>&#160;)</span></span>
+<br/>
+<div id="c_21" style="display:none;">
+<span class='mngl'>_ZN4Ogre14OverlayManager20skipToNextCloseBraceERSt10shared_ptrINS_10DataStreamEE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_22')">
+OverlayManager::skipToNextOpenBrace&#160;<span class='sym_p'><span>(&#160;std::shared_ptr&lt;DataStream&gt;&amp; <span class='color_p'>stream</span></span>&#160;)</span></span>
+<br/>
+<div id="c_22" style="display:none;">
+<span class='mngl'>_ZN4Ogre14OverlayManager19skipToNextOpenBraceERSt10shared_ptrINS_10DataStreamEE</span>
+<br/>
+<br/>
+</div>
+
+<br/>
+<span class='h_name'>OgreTextAreaOverlayElement.h</span>, <span class='lib_name'>libOgreOverlay.so.1.10.12</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_23')">
+TextAreaOverlayElement::setFontName&#160;<span class='sym_p'><span>(&#160;String const&amp; <span class='color_p'>font</span></span>&#160;)</span></span>
+<br/>
+<div id="c_23" style="display:none;">
+<span class='mngl'>_ZN4Ogre22TextAreaOverlayElement11setFontNameERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE</span>
+<br/>
+<br/>
+</div>
+
+<br/>
+<a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='High_Risk_Problems'></a><a name='Type_Problems_High'></a>
+<h2>Problems with Data Types, High Severity <span class='failed'>&nbsp;1&nbsp;</span></h2><hr/>
+<span class='h_name'>OgreOverlayManager.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_24')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> OverlayManager <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_24" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Size of this class has been changed from <b>288</b> bytes to <b>296</b> bytes.</td>
+<td>1) The class has only inline or auto-generated constructors which will be copied to applications at compile time and will allocate an older memory layout. Call of any exported method of this class may access a memory outside the allocated objects or inside the older memory structure and result in crash or incorrect behavior of applications.<br/>2) The memory layout and size of subclasses will be changed.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_25')">
+[+] affected symbols: 33 (9%)</span>
+<div id="c_25" style="display:none;">
+<div class='affected'><span class='iname_a'>OverlayManager::destroyAll&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;OverlayManager&#39; class.</div>
+<span class='iname_a'>OverlayManager::parseAttrib&#160;<span class='sym_p'><span>(&#160;String const&amp; <i>line</i></span>, <span>Overlay* <i>pOverlay</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;OverlayManager&#39; class.</div>
+<span class='iname_a'>OverlayManager::getElementMap&#160;<span class='sym_p'><span>(&#160;bool <i>isATemplate</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;OverlayManager&#39; class.</div>
+<span class='iname_a'>OverlayManager::getSingletonPtr&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>Return value (pointer) has base type &#39;OverlayManager&#39;.</div>
+<span class='iname_a'>OverlayManager::getOverlayElement&#160;<span class='sym_p'><span>(&#160;String const&amp; <i>name</i></span>, <span>bool <i>isATemplate</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;OverlayManager&#39; class.</div>
+<span class='iname_a'>OverlayManager::hasOverlayElement&#160;<span class='sym_p'><span>(&#160;String const&amp; <i>name</i></span>, <span>bool <i>isATemplate</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;OverlayManager&#39; class.</div>
+<span class='iname_a'>OverlayManager::getOverlayIterator&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;OverlayManager&#39; class.</div>
+<span class='iname_a'>OverlayManager::parseElementAttrib&#160;<span class='sym_p'><span>(&#160;String const&amp; <i>line</i></span>, <span>Overlay* <i>pOverlay</i></span>, <span>OverlayElement* <i>pElement</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;OverlayManager&#39; class.</div>
+<span class='iname_a'>OverlayManager::destroyOverlayElement&#160;<span class='sym_p'><span>(&#160;OverlayElement* <i>pInstance</i></span>, <span>bool <i>isATemplate</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;OverlayManager&#39; class.</div>
+<span class='iname_a'>OverlayManager::destroyOverlayElement&#160;<span class='sym_p'><span>(&#160;String const&amp; <i>instanceName</i></span>, <span>bool <i>isATemplate</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;OverlayManager&#39; class.</div>
+ <b>...</b>
+<br/>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='Symbol_Problems_High'></a><a name='Interface_Problems_High'></a>
+<h2>Problems with Symbols, High Severity <span class='failed'>&nbsp;9&nbsp;</span></h2><hr/>
+<span class='h_name'>OgreBorderPanelOverlayElement.h</span>, <span class='lib_name'>libOgreOverlay.so.1.10.12</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_26')">
+<span class='ext'>[+]</span> BorderPanelOverlayElement::setBorderMaterialName&#160;<span class='sym_p'><span>(&#160;String const&amp; <span class='color_p'>name</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_26" style="display:none;">
+
+
+<span class='new_sign_lbl'>&#8675;</span>
+<br/>
+<span class='new_sign'>BorderPanelOverlayElement::setBorderMaterialName&#160;<span class='sym_p'><span>(&#160;String const&amp; <span class='color_p'>name</span></span>, <span>String const&amp; <span class='color_p'>group</span></span>&#160;)</span></span><br/>
+<span class='mngl pleft'>_ZN4Ogre25BorderPanelOverlayElement21setBorderMaterialNameERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>Parameters list has been changed.</td>
+<td>The name of the appropriate symbol for this function on binary level has been changed from <b>_ZN4Ogre25BorderPanelOverlayElement21setBorderMaterialNameERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE</b> to <b>_ZN4Ogre25BorderPanelOverlayElement21setBorderMaterialNameERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEES8_</b>. This may cause undefined reference linker error in old client applications.</td>
+</tr>
+</table>
+<br/>
+</div>
+<br/>
+<span class='h_name'>OgreFontManager.h</span>, <span class='lib_name'>libOgreOverlay.so.1.10.12</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_27')">
+<span class='ext'>[+]</span> FontManager::parseScript&#160;<span class='sym_p'><span>(&#160;std::shared_ptr&lt;DataStream&gt;&amp; <span class='color_p'>stream</span></span>, <span>String const&amp; <span class='color_p'>groupName</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_27" style="display:none;">
+
+
+<span class='new_sign_lbl'>&#8675;</span>
+<br/>
+<span class='new_sign'>FontManager::parseScript&#160;<span class='sym_p'><span>(&#160;SharedPtr&lt;DataStream&gt;&amp; <span class='color_p'>stream</span></span>, <span>String const&amp; <span class='color_p'>groupName</span></span>&#160;)</span></span><br/>
+<span class='mngl pleft'>_ZN4Ogre11FontManager11parseScriptERSt10shared_ptrINS_10DataStreamEERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>Parameters list has been changed.</td>
+<td>The name of the appropriate symbol for this function on binary level has been changed from <b>_ZN4Ogre11FontManager11parseScriptERSt10shared_ptrINS_10DataStreamEERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE</b> to <b>_ZN4Ogre11FontManager11parseScriptERNS_9SharedPtrINS_10DataStreamEEERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE</b>. This may cause undefined reference linker error in old client applications.</td>
+</tr>
+</table>
+<br/>
+</div>
+<br/>
+<span class='h_name'>OgreOverlayElement.h</span>, <span class='lib_name'>libOgreOverlay.so.1.10.12</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_28')">
+<span class='ext'>[+]</span> OverlayElement::setMaterial&#160;<span class='sym_p'><span>(&#160;std::shared_ptr&lt;DataStream&gt;const&amp; <span class='color_p'>mat</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_28" style="display:none;">
+
+
+<span class='new_sign_lbl'>&#8675;</span>
+<br/>
+<span class='new_sign'>OverlayElement::setMaterial&#160;<span class='sym_p'><span>(&#160;SharedPtr&lt;Material&gt;const&amp; <span class='color_p'>mat</span></span>&#160;)</span></span><br/>
+<span class='mngl pleft'>_ZN4Ogre14OverlayElement11setMaterialERKSt10shared_ptrINS_8MaterialEE</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>Parameters list has been changed.</td>
+<td>The name of the appropriate symbol for this function on binary level has been changed from <b>_ZN4Ogre14OverlayElement11setMaterialERKSt10shared_ptrINS_8MaterialEE</b> to <b>_ZN4Ogre14OverlayElement11setMaterialERKNS_9SharedPtrINS_8MaterialEEE</b>. This may cause undefined reference linker error in old client applications.</td>
+</tr>
+</table>
+<br/>
+</div>
+<span class="section" onclick="javascript:showContent(this, 'c_29')">
+<span class='ext'>[+]</span> OverlayElement::setMaterialName&#160;<span class='sym_p'><span>(&#160;String const&amp; <span class='color_p'>matName</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_29" style="display:none;">
+
+
+<span class='new_sign_lbl'>&#8675;</span>
+<br/>
+<span class='new_sign'>OverlayElement::setMaterialName&#160;<span class='sym_p'><span>(&#160;String const&amp; <span class='color_p'>matName</span></span>, <span>String const&amp; <span class='color_p'>group</span></span>&#160;)</span></span><br/>
+<span class='mngl pleft'>_ZN4Ogre14OverlayElement15setMaterialNameERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>Parameters list has been changed.</td>
+<td>The name of the appropriate symbol for this function on binary level has been changed from <b>_ZN4Ogre14OverlayElement15setMaterialNameERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE</b> to <b>_ZN4Ogre14OverlayElement15setMaterialNameERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEES8_</b>. This may cause undefined reference linker error in old client applications.</td>
+</tr>
+</table>
+<br/>
+</div>
+<br/>
+<span class='h_name'>OgreOverlayManager.h</span>, <span class='lib_name'>libOgreOverlay.so.1.10.12</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_30')">
+<span class='ext'>[+]</span> OverlayManager::parseChildren&#160;<span class='sym_p'><span>(&#160;std::shared_ptr&lt;DataStream&gt;&amp; <span class='color_p'>stream</span></span>, <span>String const&amp; <span class='color_p'>line</span></span>, <span>Overlay* <span class='color_p'>pOverlay</span></span>, <span>bool <span class='color_p'>isATemplate</span></span>, <span>OverlayContainer* <span class='color_p'>parent</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_30" style="display:none;">
+
+
+<span class='new_sign_lbl'>&#8675;</span>
+<br/>
+<span class='new_sign'>OverlayManager::parseChildren&#160;<span class='sym_p'><span>(&#160;SharedPtr&lt;DataStream&gt;&amp; <span class='color_p'>stream</span></span>, <span>String const&amp; <span class='color_p'>line</span></span>, <span>int&amp; <span class='color_p'>l</span></span>, <span>Overlay* <span class='color_p'>pOverlay</span></span>, <span>bool <span class='color_p'>isATemplate</span></span>, <span>OverlayContainer* <span class='color_p'>parent</span></span>&#160;)</span></span><br/>
+<span class='mngl pleft'>_ZN4Ogre14OverlayManager13parseChildrenERSt10shared_ptrINS_10DataStreamEERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEEPNS_7OverlayEbPNS_16OverlayContainerE</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>Parameters list has been changed.</td>
+<td>The name of the appropriate symbol for this function on binary level has been changed from <b>_ZN4Ogre14OverlayManager13parseChildrenERSt10shared_ptrINS_10DataStreamEERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEEPNS_7OverlayEbPNS_16OverlayContainerE</b> to <b>_ZN4Ogre14OverlayManager13parseChildrenERNS_9SharedPtrINS_10DataStreamEEERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEERiPNS_7OverlayEbPNS_16OverlayContainerE</b>. This may cause undefined reference linker error in old client applications.</td>
+</tr>
+</table>
+<br/>
+</div>
+<span class="section" onclick="javascript:showContent(this, 'c_31')">
+<span class='ext'>[+]</span> OverlayManager::parseNewElement&#160;<span class='sym_p'><span>(&#160;std::shared_ptr&lt;DataStream&gt;&amp; <span class='color_p'>stream</span></span>, <span>String&amp; <span class='color_p'>elemType</span></span>, <span>String&amp; <span class='color_p'>elemName</span></span>, <span>bool <span class='color_p'>isContainer</span></span>, <span>Overlay* <span class='color_p'>pOverlay</span></span>, <span>bool <span class='color_p'>isATemplate</span></span>, <span>String <span class='color_p'>templateName</span></span>, <span>OverlayContainer* <span class='color_p'>container</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_31" style="display:none;">
+
+
+<span class='new_sign_lbl'>&#8675;</span>
+<br/>
+<span class='new_sign'>OverlayManager::parseNewElement&#160;<span class='sym_p'><span>(&#160;SharedPtr&lt;DataStream&gt;&amp; <span class='color_p'>stream</span></span>, <span>int&amp; <span class='color_p'>l</span></span>, <span>String&amp; <span class='color_p'>elemType</span></span>, <span>String&amp; <span class='color_p'>elemName</span></span>, <span>Overlay* <span class='color_p'>pOverlay</span></span>, <span>bool <span class='color_p'>isATemplate</span></span>, <span>String <span class='color_p'>templateName</span></span>, <span>OverlayContainer* <span class='color_p'>container</span></span>&#160;)</span></span><br/>
+<span class='mngl pleft'>_ZN4Ogre14OverlayManager15parseNewElementERSt10shared_ptrINS_10DataStreamEERNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEESB_bPNS_7OverlayEbSA_PNS_16OverlayContainerE</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>Parameters list has been changed.</td>
+<td>The name of the appropriate symbol for this function on binary level has been changed from <b>_ZN4Ogre14OverlayManager15parseNewElementERSt10shared_ptrINS_10DataStreamEERNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEESB_bPNS_7OverlayEbSA_PNS_16OverlayContainerE</b> to <b>_ZN4Ogre14OverlayManager15parseNewElementERNS_9SharedPtrINS_10DataStreamEEERiRNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEESC_PNS_7OverlayEbSB_PNS_16OverlayContainerE</b>. This may cause undefined reference linker error in old client applications.</td>
+</tr>
+</table>
+<br/>
+</div>
+<span class="section" onclick="javascript:showContent(this, 'c_32')">
+<span class='ext'>[+]</span> OverlayManager::skipToNextCloseBrace&#160;<span class='sym_p'><span>(&#160;std::shared_ptr&lt;DataStream&gt;&amp; <span class='color_p'>stream</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_32" style="display:none;">
+
+
+<span class='new_sign_lbl'>&#8675;</span>
+<br/>
+<span class='new_sign'>OverlayManager::skipToNextCloseBrace&#160;<span class='sym_p'><span>(&#160;SharedPtr&lt;DataStream&gt;&amp; <span class='color_p'>stream</span></span>, <span>int&amp; <span class='color_p'>l</span></span>&#160;)</span></span><br/>
+<span class='mngl pleft'>_ZN4Ogre14OverlayManager20skipToNextCloseBraceERSt10shared_ptrINS_10DataStreamEE</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>Parameters list has been changed.</td>
+<td>The name of the appropriate symbol for this function on binary level has been changed from <b>_ZN4Ogre14OverlayManager20skipToNextCloseBraceERSt10shared_ptrINS_10DataStreamEE</b> to <b>_ZN4Ogre14OverlayManager20skipToNextCloseBraceERNS_9SharedPtrINS_10DataStreamEEERi</b>. This may cause undefined reference linker error in old client applications.</td>
+</tr>
+</table>
+<br/>
+</div>
+<span class="section" onclick="javascript:showContent(this, 'c_33')">
+<span class='ext'>[+]</span> OverlayManager::skipToNextOpenBrace&#160;<span class='sym_p'><span>(&#160;std::shared_ptr&lt;DataStream&gt;&amp; <span class='color_p'>stream</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_33" style="display:none;">
+
+
+<span class='new_sign_lbl'>&#8675;</span>
+<br/>
+<span class='new_sign'>OverlayManager::skipToNextOpenBrace&#160;<span class='sym_p'><span>(&#160;SharedPtr&lt;DataStream&gt;&amp; <span class='color_p'>stream</span></span>, <span>int&amp; <span class='color_p'>l</span></span>&#160;)</span></span><br/>
+<span class='mngl pleft'>_ZN4Ogre14OverlayManager19skipToNextOpenBraceERSt10shared_ptrINS_10DataStreamEE</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>Parameters list has been changed.</td>
+<td>The name of the appropriate symbol for this function on binary level has been changed from <b>_ZN4Ogre14OverlayManager19skipToNextOpenBraceERSt10shared_ptrINS_10DataStreamEE</b> to <b>_ZN4Ogre14OverlayManager19skipToNextOpenBraceERNS_9SharedPtrINS_10DataStreamEEERi</b>. This may cause undefined reference linker error in old client applications.</td>
+</tr>
+</table>
+<br/>
+</div>
+<br/>
+<span class='h_name'>OgreTextAreaOverlayElement.h</span>, <span class='lib_name'>libOgreOverlay.so.1.10.12</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_34')">
+<span class='ext'>[+]</span> TextAreaOverlayElement::setFontName&#160;<span class='sym_p'><span>(&#160;String const&amp; <span class='color_p'>font</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_34" style="display:none;">
+
+
+<span class='new_sign_lbl'>&#8675;</span>
+<br/>
+<span class='new_sign'>TextAreaOverlayElement::setFontName&#160;<span class='sym_p'><span>(&#160;String const&amp; <span class='color_p'>font</span></span>, <span>String const&amp; <span class='color_p'>group</span></span>&#160;)</span></span><br/>
+<span class='mngl pleft'>_ZN4Ogre22TextAreaOverlayElement11setFontNameERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>Parameters list has been changed.</td>
+<td>The name of the appropriate symbol for this function on binary level has been changed from <b>_ZN4Ogre22TextAreaOverlayElement11setFontNameERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE</b> to <b>_ZN4Ogre22TextAreaOverlayElement11setFontNameERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEES8_</b>. This may cause undefined reference linker error in old client applications.</td>
+</tr>
+</table>
+<br/>
+</div>
+<br/>
+<a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='Medium_Risk_Problems'></a><a name='Type_Problems_Medium'></a>
+<h2>Problems with Data Types, Medium Severity <span class='failed'>&nbsp;4&nbsp;</span></h2><hr/>
+<span class='h_name'>OgreFont.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_35')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> Font <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_35" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>The layout of v-table has been changed for <b>unknown</b> reason.</td>
+<td>Call of any method in this class may result in crash or incorrect behavior of applications.</td>
+</tr>
+</table>
+<span class="sect_info" onclick="javascript:showContent(this, 'c_36')">
+[+] show v-table (old and new)</span>
+<br/>
+<div id="c_36" style="display:none;">
+<table class='vtable'><tr><th>Offset</th><th>Virtual Table (Old) - 45 entries</th><th>Virtual Table (New) - 43 entries</th></tr><tr><th>0</th>
+<td>(int (*)(...)) 0</td>
+<td>(int (*)(...)) 0</td></tr>
+<tr><th>8</th>
+<td>(int (*)(...)) (&amp; typeinfo for Font)</td>
+<td>(int (*)(...)) (&amp; typeinfo for Font)</td></tr>
+<tr><th>16</th>
+<td>~Font</td>
+<td>~Font</td></tr>
+<tr><th>24</th>
+<td>~Font</td>
+<td>~Font</td></tr>
+<tr><th>32</th>
+<td>(int (*)(...)) 0x2baf8</td>
+<td>(int (*)(...)) 0x2b254</td></tr>
+<tr><th>40</th>
+<td>(int (*)(...)) 0x2bafe</td>
+<td>(int (*)(...)) 0x2b25a</td></tr>
+<tr><th>48</th>
+<td>(int (*)(...)) 0x2bb04</td>
+<td>(int (*)(...)) 0x2b260</td></tr>
+<tr><th>56</th>
+<td>(int (*)(...)) 0x2bb0a</td>
+<td>(int (*)(...)) 0x2b266</td></tr>
+<tr><th>64</th>
+<td>(int (*)(...)) 0x2bb10</td>
+<td>(int (*)(...)) 0x2b26c</td></tr>
+<tr><th>72</th>
+<td>(int (*)(...)) 0x2bb16</td>
+<td>(int (*)(...)) 0x2b272</td></tr>
+<tr><th>80</th>
+<td>Font::loadImpl()</td>
+<td>Font::loadImpl()</td></tr>
+<tr><th>88</th>
+<td>Font::unloadImpl()</td>
+<td>Font::unloadImpl()</td></tr>
+<tr><th>96</th>
+<td>Resource::prepare(bool)</td>
+<td>Resource::prepare(bool)</td></tr>
+<tr><th>104</th>
+<td>Resource::load(bool)</td>
+<td>Resource::load(bool)</td></tr>
+<tr><th>112</th>
+<td>Resource::reload(Resource::LoadingFlags)</td>
+<td>Resource::reload(Resource::LoadingFlags)</td></tr>
+<tr><th>120</th>
+<td>(int (*)(...)) 0x2bb1c</td>
+<td>(int (*)(...)) 0x2b278</td></tr>
+<tr><th>128</th>
+<td>(int (*)(...)) 0x2bb44</td>
+<td>(int (*)(...)) 0x2b2a0</td></tr>
+<tr><th>136</th>
+<td>(int (*)(...)) 0x2bb50</td>
+<td>Resource::unload()</td></tr>
+<tr><th>144</th>
+<td>Resource::unload()</td>
+<td>(int (*)(...)) 0x2b2ac</td></tr>
+<tr><th>152</th>
+<td>(int (*)(...)) 0x2bb5c</td>
+<td>Resource::touch()</td></tr>
+<tr><th>160</th>
+<td>Resource::touch()</td>
+<td>(int (*)(...)) 0x2b2b8</td></tr>
+<tr><th>168</th>
+<td>(int (*)(...)) 0x2bb68</td>
+<td>(int (*)(...)) 0x2b2c2</td></tr>
+<tr><th>176</th>
+<td>(int (*)(...)) 0x2bb72</td>
+<td>(int (*)(...)) 0x2b41c</td></tr>
+<tr><th>184</th>
+<td>(int (*)(...)) 0x2bccc</td>
+<td>(int (*)(...)) 0x2b40a</td></tr>
+<tr><th>192</th>
+<td>(int (*)(...)) 0x2bcba</td>
+<td>(int (*)(...)) 0x2b3f8</td></tr>
+<tr><th>200</th>
+<td>(int (*)(...)) 0x2bcde</td>
+<td>(int (*)(...)) 0x2b3ec</td></tr>
+<tr><th>208</th>
+<td>(int (*)(...)) 0x2bca8</td>
+<td>(int (*)(...)) 0x2b2cc</td></tr>
+<tr><th>216</th>
+<td>(int (*)(...)) 0x2bc9c</td>
+<td>(int (*)(...)) 0x2b2d8</td></tr>
+<tr><th>224</th>
+<td>(int (*)(...)) 0x2bb7c</td>
+<td>Resource::escalateLoading()</td></tr>
+<tr><th>232</th>
+<td>(int (*)(...)) 0x2bb88</td>
+<td>Resource::addListener(Resource::Listener*)</td></tr>
+<tr><th>240</th>
+<td class='failed'>Resource::escalateLoading()</td>
+<td class='failed'>Resource::removeListener(Resource::Listener*)</td></tr>
+<tr><th>248</th>
+<td>Resource::addListener(Resource::Listener*)</td>
+<td>(int (*)(...)) 0x2b2e4</td></tr>
+<tr><th>256</th>
+<td class='failed'>Resource::removeListener(Resource::Listener*)</td>
+<td class='failed'>Resource::changeGroupOwnership(std::__cxx11::basic_string&lt;char, std::char_traits&lt;char&gt;, std::allocator&lt;char&gt; &gt; const&amp;)</td></tr>
+<tr><th>264</th>
+<td>(int (*)(...)) 0x2bb94</td>
+<td>(int (*)(...)) 0x2b2ee</td></tr>
+<tr><th>272</th>
+<td class='failed'>Resource::changeGroupOwnership(std::__cxx11::basic_string&lt;char, std::char_traits&lt;char&gt;, std::allocator&lt;char&gt; &gt; const&amp;)</td>
+<td class='failed'>Resource::_dirtyState()</td></tr>
+<tr><th>280</th>
+<td>(int (*)(...)) 0x2bb9e</td>
+<td>(int (*)(...)) 0x2b300</td></tr>
+<tr><th>288</th>
+<td class='failed'>Resource::_dirtyState()</td>
+<td class='failed'>Font::loadResource(Resource*)</td></tr>
+<tr><th>296</th>
+<td>(int (*)(...)) 0x2bbb0</td>
+<td>(int (*)(...)) -0x000000000000f0</td></tr>
+<tr><th>304</th>
+<td class='failed'>Font::loadResource(Resource*)</td>
+<td class='failed'>(int (*)(...)) (&amp; typeinfo for Font)</td></tr>
+<tr><th>312</th>
+<td class='failed'>(int (*)(...)) -0x000000000000f8</td>
+<td class='failed'>non-virtual thunk to ~Font</td></tr>
+<tr><th>320</th>
+<td class='failed'>(int (*)(...)) (&amp; typeinfo for Font)</td>
+<td class='failed'>non-virtual thunk to ~Font</td></tr>
+<tr><th>328</th>
+<td>non-virtual thunk to ~Font</td>
+<td>(int (*)(...)) 0x2b2fa</td></tr>
+<tr><th>336</th>
+<td class='failed'>non-virtual thunk to ~Font</td>
+<td class='failed'>non-virtual thunk to Font::loadResource(Resource*)</td></tr>
+<tr><th>344</th>
+<td>(int (*)(...)) 0x2bbaa</td>
+<td></td></tr>
+<tr><th>352</th>
+<td class='failed'>non-virtual thunk to Font::loadResource(Resource*)</td>
+<td class='failed'></td></tr>
+</table><br/>
+</div>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_37')">
+[+] affected symbols: 24 (6.5%)</span>
+<div id="c_37" style="display:none;">
+<div class='affected'><span class='iname_a'>Font::unloadImpl&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Font&#39; class.</div>
+<span class='iname_a'>Font::msSourceCmd <span class='attr'>[data]</span></span><br/>
+<div class='affect'>This method is from &#39;Font&#39; class.</div>
+<span class='iname_a'>Font::loadResource&#160;<span class='sym_p'><span>(&#160;Resource* <i>res</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Font&#39; class.</div>
+<span class='iname_a'>Font::msCodePointsCmd <span class='attr'>[data]</span></span><br/>
+<div class='affect'>This method is from &#39;Font&#39; class.</div>
+<span class='iname_a'>Font::msResolutionCmd <span class='attr'>[data]</span></span><br/>
+<div class='affect'>This method is from &#39;Font&#39; class.</div>
+<span class='iname_a'>Font::setTrueTypeSize&#160;<span class='sym_p'><span>(&#160;Real <i>ttfSize</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Font&#39; class.</div>
+<span class='iname_a'>Font::setCharacterSpacer&#160;<span class='sym_p'><span>(&#160;uint <i>charSpacer</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Font&#39; class.</div>
+<span class='iname_a'>Font::msCharacterSpacerCmd <span class='attr'>[data]</span></span><br/>
+<div class='affect'>This method is from &#39;Font&#39; class.</div>
+<span class='iname_a'>Font::createTextureFromFont&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Font&#39; class.</div>
+<span class='iname_a'>Font::setTrueTypeResolution&#160;<span class='sym_p'><span>(&#160;uint <i>ttfResolution</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Font&#39; class.</div>
+ <b>...</b>
+<br/>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<span class='h_name'>OgreFontManager.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_38')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> FontManager <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_38" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Virtual method <span class='iname_b'>parseScript&#160;<span class='sym_pd'><span>(&#160;SharedPtr&lt;DataStream&gt;&amp;</span>, <span>String const&amp;</span>&#160;)</span></span> has been added to this class instead of <span class='iname_b'>parseScript&#160;<span class='sym_pd'><span>(&#160;std::shared_ptr&lt;DataStream&gt;&amp;</span>, <span>String const&amp;</span>&#160;)</span></span>.</td>
+<td>Applications will pass parameters of older replaced method to newly added <b>virtual</b> method. This may result in crash or incorrect behavior of applications.</td>
+</tr>
+</table>
+<span class="sect_info" onclick="javascript:showContent(this, 'c_39')">
+[+] show v-table (old and new)</span>
+<br/>
+<div id="c_39" style="display:none;">
+<table class='vtable'><tr><th>Offset</th><th>Virtual Table (Old) - 19 entries</th><th>Virtual Table (New) - 19 entries</th></tr><tr><th>0</th>
+<td>(int (*)(...)) 0</td>
+<td>(int (*)(...)) 0</td></tr>
+<tr><th>8</th>
+<td>(int (*)(...)) (&amp; typeinfo for FontManager)</td>
+<td>(int (*)(...)) (&amp; typeinfo for FontManager)</td></tr>
+<tr><th>16</th>
+<td>~FontManager</td>
+<td>~FontManager</td></tr>
+<tr><th>24</th>
+<td>~FontManager</td>
+<td>~FontManager</td></tr>
+<tr><th>32</th>
+<td>(int (*)(...)) 0x2de24</td>
+<td>(int (*)(...)) 0x2c55c</td></tr>
+<tr><th>40</th>
+<td class='failed'>FontManager::parseScript(std::shared_ptr&lt;DataStream&gt;&amp;, std::__cxx11::basic_string&lt;char, std::char_traits&lt;char&gt;, std::allocator&lt;char&gt; &gt; const&amp;)</td>
+<td class='failed'>FontManager::parseScript(SharedPtr&lt;DataStream&gt;&amp;, std::__cxx11::basic_string&lt;char, std::char_traits&lt;char&gt;, std::allocator&lt;char&gt; &gt; const&amp;)</td></tr>
+<tr><th>48</th>
+<td>(int (*)(...)) 0x2de30</td>
+<td>(int (*)(...)) 0x2c568</td></tr>
+<tr><th>56</th>
+<td>ResourceManager::unloadAll(Resource::LoadingFlags)</td>
+<td>ResourceManager::unloadAll(Resource::LoadingFlags)</td></tr>
+<tr><th>64</th>
+<td>ResourceManager::reloadAll(Resource::LoadingFlags)</td>
+<td>ResourceManager::reloadAll(Resource::LoadingFlags)</td></tr>
+<tr><th>72</th>
+<td>ResourceManager::removeAll()</td>
+<td>ResourceManager::removeAll()</td></tr>
+<tr><th>80</th>
+<td>ResourceManager::removeUnreferencedResources(bool)</td>
+<td>ResourceManager::removeUnreferencedResources(bool)</td></tr>
+<tr><th>88</th>
+<td>ResourceManager::getResourceByName(std::__cxx11::basic_string&lt;char, std::char_traits&lt;char&gt;, std::allocator&lt;char&gt; &gt; const&amp;, std::__cxx11::basic_string&lt;char, std::char_traits&lt;char&gt;, std::allocator&lt;char&gt; &gt; const&amp;)</td>
+<td>ResourceManager::getResourceByName(std::__cxx11::basic_string&lt;char, std::char_traits&lt;char&gt;, std::allocator&lt;char&gt; &gt; const&amp;, std::__cxx11::basic_string&lt;char, std::char_traits&lt;char&gt;, std::allocator&lt;char&gt; &gt; const&amp;)</td></tr>
+<tr><th>96</th>
+<td>ResourceManager::getByHandle(unsigned long long)</td>
+<td>ResourceManager::getByHandle(unsigned long long)</td></tr>
+<tr><th>104</th>
+<td>ResourceManager::_notifyResourceTouched(Resource*)</td>
+<td>ResourceManager::_notifyResourceTouched(Resource*)</td></tr>
+<tr><th>112</th>
+<td>ResourceManager::_notifyResourceLoaded(Resource*)</td>
+<td>ResourceManager::_notifyResourceLoaded(Resource*)</td></tr>
+<tr><th>120</th>
+<td>ResourceManager::_notifyResourceUnloaded(Resource*)</td>
+<td>ResourceManager::_notifyResourceUnloaded(Resource*)</td></tr>
+<tr><th>128</th>
+<td>FontManager::createImpl(std::__cxx11::basic_string&lt;char, std::char_traits&lt;char&gt;, std::allocator&lt;char&gt; &gt; const&amp;, unsigned long long, std::__cxx11::basic_string&lt;char, std::char_traits&lt;char&gt;, std::allocator&lt;char&gt; &gt; const&amp;, bool, ManualResourceLoader*, std::map&lt;std::__cxx11::basic_string&lt;char, std::char_traits&lt;char&gt;, std::allocator&lt;char&gt; &gt;, std::__cxx11::basic_string&lt;char, std::char_traits&lt;char&gt;, std::allocator&lt;char&gt; &gt;, std::less&lt;std::__cxx11::basic_string&lt;char, std::char_traits&lt;char&gt;, std::allocator&lt;char&gt; &gt; &gt;, std::allocator&lt;std::pair&lt;std::__cxx11::basic_string&lt;char, std::char_traits&lt;char&gt;, std::allocator&lt;char&gt; &gt; const, std::__cxx11::basic_string&lt;char, std::char_traits&lt;char&gt;, std::allocator&lt;char&gt; &gt; &gt; &gt; &gt; const*)</td>
+<td>FontManager::createImpl(std::__cxx11::basic_string&lt;char, std::char_traits&lt;char&gt;, std::allocator&lt;char&gt; &gt; const&amp;, unsigned long long, std::__cxx11::basic_string&lt;char, std::char_traits&lt;char&gt;, std::allocator&lt;char&gt; &gt; const&amp;, bool, ManualResourceLoader*, std::map&lt;std::__cxx11::basic_string&lt;char, std::char_traits&lt;char&gt;, std::allocator&lt;char&gt; &gt;, std::__cxx11::basic_string&lt;char, std::char_traits&lt;char&gt;, std::allocator&lt;char&gt; &gt;, std::less&lt;std::__cxx11::basic_string&lt;char, std::char_traits&lt;char&gt;, std::allocator&lt;char&gt; &gt; &gt;, std::allocator&lt;std::pair&lt;std::__cxx11::basic_string&lt;char, std::char_traits&lt;char&gt;, std::allocator&lt;char&gt; &gt; const, std::__cxx11::basic_string&lt;char, std::char_traits&lt;char&gt;, std::allocator&lt;char&gt; &gt; &gt; &gt; &gt; const*)</td></tr>
+<tr><th>136</th>
+<td class='failed'>ResourceManager::addImpl(std::shared_ptr&lt;Resource&gt;&amp;)</td>
+<td class='failed'>ResourceManager::addImpl(SharedPtr&lt;Resource&gt;&amp;)</td></tr>
+<tr><th>144</th>
+<td class='failed'>ResourceManager::removeImpl(std::shared_ptr&lt;Resource&gt; const&amp;)</td>
+<td class='failed'>ResourceManager::removeImpl(SharedPtr&lt;Resource&gt; const&amp;)</td></tr>
+</table><br/>
+</div>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_40')">
+[+] affected symbols: 1 (0.3%)</span>
+<div id="c_40" style="display:none;">
+<div class='affected'><span class='iname_a'>FontManager::parseScript&#160;<span class='sym_p'><span>(&#160;std::shared_ptr&lt;DataStream&gt;&amp; <i>stream</i></span>, <span>String const&amp; <i>groupName</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;FontManager&#39; class.</div>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<span class='h_name'>OgreRenderOperation.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_41')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> RenderOperation <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_41" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Field <b>renderToVertexBuffer</b> has been removed from the middle position of this structural type.</td>
+<td>1) Applications will access incorrect memory when attempting to access this field.<br/>2) Layout of structure fields has been changed and therefore fields at higher positions of the structure definition may be incorrectly accessed by applications.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_42')">
+[+] affected symbols: 77 (20.9%)</span>
+<div id="c_42" style="display:none;">
+<div class='affected'><span class='iname_a'>PanelOverlayElement::setTransparent&#160;<span class='sym_p'><span>(&#160;bool <i>inTransparent</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mRenderOp&#39; in the object of this method is of type &#39;RenderOperation&#39;.</div>
+<span class='iname_a'>PanelOverlayElement::getRenderOperation&#160;<span class='sym_p'><span>(&#160;RenderOperation&amp; <span class='fp'>op</span></span>&#160;)</span></span><br/>
+<div class='affect'>1st parameter &#39;op&#39; (reference) has base type &#39;RenderOperation&#39;.</div>
+<span class='iname_a'>PanelOverlayElement::updatePositionGeometry&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mRenderOp&#39; in the object of this method is of type &#39;RenderOperation&#39;.</div>
+<span class='iname_a'>PanelOverlayElement::setUV&#160;<span class='sym_p'><span>(&#160;Real <i>u1</i></span>, <span>Real <i>v1</i></span>, <span>Real <i>u2</i></span>, <span>Real <i>v2</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mRenderOp&#39; in the object of this method is of type &#39;RenderOperation&#39;.</div>
+<span class='iname_a'>PanelOverlayElement::setTiling&#160;<span class='sym_p'><span>(&#160;Real <i>x</i></span>, <span>Real <i>y</i></span>, <span>ushort <i>layer</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mRenderOp&#39; in the object of this method is of type &#39;RenderOperation&#39;.</div>
+<span class='iname_a'>PanelOverlayElement::PanelOverlayElement&#160;<span class='sym_p'><span>(&#160;String const&amp; <i>name</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mRenderOp&#39; in the object of this method is of type &#39;RenderOperation&#39;.</div>
+<span class='iname_a'>PanelOverlayElement::~PanelOverlayElement&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mRenderOp&#39; in the object of this method is of type &#39;RenderOperation&#39;.</div>
+<span class='iname_a'>TextAreaOverlayElement::initialise&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mRenderOp&#39; in the object of this method is of type &#39;RenderOperation&#39;.</div>
+<span class='iname_a'>TextAreaOverlayElement::setCaption&#160;<span class='sym_p'><span>(&#160;DisplayString const&amp; <i>caption</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mRenderOp&#39; in the object of this method is of type &#39;RenderOperation&#39;.</div>
+<span class='iname_a'>TextAreaOverlayElement::setColourTop&#160;<span class='sym_p'><span>(&#160;ColourValue const&amp; <i>col</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mRenderOp&#39; in the object of this method is of type &#39;RenderOperation&#39;.</div>
+ <b>...</b>
+<br/>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<span class='h_name'>OgreScriptLoader.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_43')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> ScriptLoader <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_43" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Pure virtual method <span class='iname_b'>parseScript&#160;<span class='sym_pd'><span>(&#160;SharedPtr&lt;DataStream&gt;&amp;</span>, <span>String const&amp;</span>&#160;)</span></span> has been added to this class instead of <span class='iname_b'>parseScript&#160;<span class='sym_pd'><span>(&#160;std::shared_ptr&lt;DataStream&gt;&amp;</span>, <span>String const&amp;</span>&#160;)</span></span>.</td>
+<td>Applications will provide an older method to the library instead of expected newely added <b>virtual</b> method. This may result in crash or incorrect behavior of applications.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_44')">
+[+] affected symbols: 1 (0.3%)</span>
+<div id="c_44" style="display:none;">
+<div class='affected'><span class='iname_a'>OverlayManager::parseScript&#160;<span class='sym_p'><span>(&#160;std::shared_ptr&lt;DataStream&gt;&amp; <i>stream</i></span>, <span>String const&amp; <i>groupName</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from derived class &#39;OverlayManager&#39;.</div>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='Low_Risk_Problems'></a><a name='Type_Problems_Low'></a>
+<h2>Problems with Data Types, Low Severity <span class='warning'>&nbsp;19&nbsp;</span></h2><hr/>
+<span class='h_name'>OgreCommon.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_45')">
+<span class='ext'>[+]</span> <span class='ttype'>typedef</span> NameValuePairList <span class='warning'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_45" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Base type has been changed from <span class='value'>map&lt;std::__cxx11::basic_string&lt;char&gt;, std::__cxx11::basic_string&lt;char&gt;, std::less&lt;std::__cxx11::basic_string&lt;char&gt; &gt; &gt;::type</span> to <span class='value'>std::map&lt;std::__cxx11::basic_string&lt;char&gt;, std::__cxx11::basic_string&lt;char&gt; &gt;</span>.</td>
+<td>Replacement of the base data type may indicate a change in its semantic meaning.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_46')">
+[+] affected symbols: 3 (0.8%)</span>
+<div id="c_46" style="display:none;">
+<div class='affected'><span class='iname_a'>FontManager::createImpl&#160;<span class='sym_p'><span>(&#160;String const&amp; <i>name</i></span>, <span>ResourceHandle <i>handle</i></span>, <span>String const&amp; <i>group</i></span>, <span>bool <i>isManual</i></span>, <span>ManualResourceLoader* <i>loader</i></span>, <span>map&lt;std::__cxx11::basic_string&lt;char&gt;, std::__cxx11::basic_string&lt;char&gt;, std::less&lt;std::__cxx11::basic_string&lt;char&gt; &gt; &gt;::type const* <span class='fp'>params</span></span>&#160;)</span></span><br/>
+<div class='affect'>6th parameter &#39;params&#39; (pointer) has base type &#39;NameValuePairList&#39;.</div>
+<span class='iname_a'>FontManager::create&#160;<span class='sym_p'><span>(&#160;String const&amp; <i>name</i></span>, <span>String const&amp; <i>group</i></span>, <span>bool <i>isManual</i></span>, <span>ManualResourceLoader* <i>loader</i></span>, <span>map&lt;std::__cxx11::basic_string&lt;char&gt;, std::__cxx11::basic_string&lt;char&gt;, std::less&lt;std::__cxx11::basic_string&lt;char&gt; &gt; &gt;::type const* <span class='fp'>createParams</span></span>&#160;)</span></span><br/>
+<div class='affect'>5th parameter &#39;createParams&#39; (pointer) has base type &#39;NameValuePairList&#39;.</div>
+<span class='iname_a'>OverlaySystem::eventOccurred&#160;<span class='sym_p'><span>(&#160;String const&amp; <i>eventName</i></span>, <span>map&lt;std::__cxx11::basic_string&lt;char&gt;, std::__cxx11::basic_string&lt;char&gt;, std::less&lt;std::__cxx11::basic_string&lt;char&gt; &gt; &gt;::type const* <span class='fp'>parameters</span></span>&#160;)</span></span><br/>
+<div class='affect'>2nd parameter &#39;parameters&#39; (pointer) has base type &#39;NameValuePairList&#39;.</div>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<span class='h_name'>OgreFont.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_47')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> Font <span class='warning'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_47" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Size of this type has been changed from <b>424</b> bytes to <b>416</b> bytes.</td>
+<td>The fields or parameters of such data type may be incorrectly initialized or accessed by old client applications.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_48')">
+[+] affected symbols: 18 (4.9%)</span>
+<div id="c_48" style="display:none;">
+<div class='affected'><span class='iname_a'>Font::unloadImpl&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Font&#39; class.</div>
+<span class='iname_a'>Font::loadResource&#160;<span class='sym_p'><span>(&#160;Resource* <i>res</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Font&#39; class.</div>
+<span class='iname_a'>Font::setTrueTypeSize&#160;<span class='sym_p'><span>(&#160;Real <i>ttfSize</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Font&#39; class.</div>
+<span class='iname_a'>Font::setCharacterSpacer&#160;<span class='sym_p'><span>(&#160;uint <i>charSpacer</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Font&#39; class.</div>
+<span class='iname_a'>Font::createTextureFromFont&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Font&#39; class.</div>
+<span class='iname_a'>Font::setTrueTypeResolution&#160;<span class='sym_p'><span>(&#160;uint <i>ttfResolution</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Font&#39; class.</div>
+<span class='iname_a'>Font::setType&#160;<span class='sym_p'><span>(&#160;enum FontType <i>ftype</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Font&#39; class.</div>
+<span class='iname_a'>Font::loadImpl&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Font&#39; class.</div>
+<span class='iname_a'>Font::setSource&#160;<span class='sym_p'><span>(&#160;String const&amp; <i>source</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Font&#39; class.</div>
+<span class='iname_a'>Font::Font&#160;<span class='sym_p'><span>(&#160;ResourceManager* <i>creator</i></span>, <span>String const&amp; <i>name</i></span>, <span>ResourceHandle <i>handle</i></span>, <span>String const&amp; <i>group</i></span>, <span>bool <i>isManual</i></span>, <span>ManualResourceLoader* <i>loader</i></span>&#160;)</span></span><br/>
+<div class='affect'>This constructor is from &#39;Font&#39; class.</div>
+ <b>...</b>
+<br/>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<span class='h_name'>OgreOverlay.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_49')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> Overlay <span class='warning'>&nbsp;2&nbsp;</span></span>
+<br/>
+<div id="c_49" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Base class <b>AllocatedObject&lt;0&gt;</b> has been added.</td>
+<td>Possible incorrect access of applications to the memory occupied by the base classes.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>Base class <span class='value'>AllocatedObject&lt;CategorisedAllocPolicy&lt;(MemoryCategory)4&gt; &gt;</span> has been removed.</td>
+<td>Possible incorrect access of applications to the memory occupied by the base classes.</td>
+</tr>
+</table>
+<span class="sect_info" onclick="javascript:showContent(this, 'c_50')">
+[+] show v-table (old and new)</span>
+<br/>
+<div id="c_50" style="display:none;">
+<table class='vtable'><tr><th>Offset</th><th>Virtual Table (Old) - 5 entries</th><th>Virtual Table (New) - 5 entries</th></tr><tr><th>0</th>
+<td>(int (*)(...)) 0</td>
+<td>(int (*)(...)) 0</td></tr>
+<tr><th>8</th>
+<td>(int (*)(...)) (&amp; typeinfo for Overlay)</td>
+<td>(int (*)(...)) (&amp; typeinfo for Overlay)</td></tr>
+<tr><th>16</th>
+<td>~Overlay</td>
+<td>~Overlay</td></tr>
+<tr><th>24</th>
+<td>~Overlay</td>
+<td>~Overlay</td></tr>
+<tr><th>32</th>
+<td>Overlay::findElementAt(float, float)</td>
+<td>Overlay::findElementAt(float, float)</td></tr>
+</table><br/>
+</div>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_51')">
+[+] affected symbols: 29 (7.9%)</span>
+<div id="c_51" style="display:none;">
+<div class='affected'><span class='iname_a'>Overlay::initialise&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Overlay&#39; class.</div>
+<span class='iname_a'>Overlay::assignZOrders&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Overlay&#39; class.</div>
+<span class='iname_a'>Overlay::findElementAt&#160;<span class='sym_p'><span>(&#160;Real <i>x</i></span>, <span>Real <i>y</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Overlay&#39; class.</div>
+<span class='iname_a'>Overlay::_findVisibleObjects&#160;<span class='sym_p'><span>(&#160;Camera* <i>cam</i></span>, <span>RenderQueue* <i>queue</i></span>, <span>Viewport* <i>vp</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Overlay&#39; class.</div>
+<span class='iname_a'>Overlay::hide&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Overlay&#39; class.</div>
+<span class='iname_a'>Overlay::show&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Overlay&#39; class.</div>
+<span class='iname_a'>Overlay::add2D&#160;<span class='sym_p'><span>(&#160;OverlayContainer* <i>cont</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Overlay&#39; class.</div>
+<span class='iname_a'>Overlay::add3D&#160;<span class='sym_p'><span>(&#160;SceneNode* <i>node</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Overlay&#39; class.</div>
+<span class='iname_a'>Overlay::clear&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Overlay&#39; class.</div>
+<span class='iname_a'>Overlay::rotate&#160;<span class='sym_p'><span>(&#160;Radian const&amp; <i>angle</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Overlay&#39; class.</div>
+ <b>...</b>
+<br/>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<span class='h_name'>OgreOverlayContainer.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_52')">
+<span class='ext'>[+]</span> <span class='ttype'>typedef</span> OverlayContainer::ChildContainerIterator <span class='warning'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_52" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Base type has been changed from <span class='value'>MapIterator&lt;std::map&lt;std::__cxx11::basic_string&lt;char&gt;, OverlayContainer*, std::less&lt;std::__cxx11::basic_string&lt;char&gt; &gt;, std::allocator&lt;std::pair&lt;const std::__cxx11::basic_string&lt;char, std::char_traits&lt;char&gt;, std::allocator&lt;char&gt; &gt;, OverlayContainer*&gt; &gt; &gt; &gt;</span> to <span class='value'>MapIterator&lt;std::map&lt;std::__cxx11::basic_string&lt;char&gt;, OverlayContainer*&gt; &gt;</span>.</td>
+<td>Replacement of the base data type may indicate a change in its semantic meaning.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_53')">
+[+] affected symbols: 1 (0.3%)</span>
+<div id="c_53" style="display:none;">
+<div class='affected'><span class='iname_a'>OverlayContainer::getChildContainerIterator&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>Return value is of type &#39;OverlayContainer::ChildContainerIterator&#39;.</div>
+</div>
+</div>
+<br/><br/></div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_54')">
+<span class='ext'>[+]</span> <span class='ttype'>typedef</span> OverlayContainer::ChildIterator <span class='warning'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_54" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Base type has been changed from <span class='value'>MapIterator&lt;std::map&lt;std::__cxx11::basic_string&lt;char&gt;, OverlayElement*, std::less&lt;std::__cxx11::basic_string&lt;char&gt; &gt;, std::allocator&lt;std::pair&lt;const std::__cxx11::basic_string&lt;char, std::char_traits&lt;char&gt;, std::allocator&lt;char&gt; &gt;, OverlayElement*&gt; &gt; &gt; &gt;</span> to <span class='value'>MapIterator&lt;std::map&lt;std::__cxx11::basic_string&lt;char&gt;, OverlayElement*&gt; &gt;</span>.</td>
+<td>Replacement of the base data type may indicate a change in its semantic meaning.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_55')">
+[+] affected symbols: 1 (0.3%)</span>
+<div id="c_55" style="display:none;">
+<div class='affected'><span class='iname_a'>OverlayContainer::getChildIterator&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>Return value is of type &#39;OverlayContainer::ChildIterator&#39;.</div>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<span class='h_name'>OgreOverlayElement.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_56')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> OverlayElement <span class='warning'>&nbsp;2&nbsp;</span></span>
+<br/>
+<div id="c_56" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Base class <b>AllocatedObject&lt;0&gt;</b> has been added.</td>
+<td>Possible incorrect access of applications to the memory occupied by the base classes.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>Base class <span class='value'>AllocatedObject&lt;CategorisedAllocPolicy&lt;(MemoryCategory)4&gt; &gt;</span> has been removed.</td>
+<td>Possible incorrect access of applications to the memory occupied by the base classes.</td>
+</tr>
+</table>
+<span class="sect_info" onclick="javascript:showContent(this, 'c_57')">
+[+] show v-table (old and new)</span>
+<br/>
+<div id="c_57" style="display:none;">
+<table class='vtable'><tr><th>Offset</th><th>Virtual Table (Old) - 65 entries</th><th>Virtual Table (New) - 65 entries</th></tr><tr><th>0</th>
+<td>(int (*)(...)) 0</td>
+<td>(int (*)(...)) 0</td></tr>
+<tr><th>8</th>
+<td>(int (*)(...)) (&amp; typeinfo for OverlayElement)</td>
+<td>(int (*)(...)) (&amp; typeinfo for OverlayElement)</td></tr>
+<tr><th>16</th>
+<td>(int (*)(...))0</td>
+<td>(int (*)(...))0</td></tr>
+<tr><th>24</th>
+<td>(int (*)(...))0</td>
+<td>(int (*)(...))0</td></tr>
+<tr><th>32</th>
+<td>__cxa_pure_virtual</td>
+<td>__cxa_pure_virtual</td></tr>
+<tr><th>40</th>
+<td>__cxa_pure_virtual</td>
+<td>__cxa_pure_virtual</td></tr>
+<tr><th>48</th>
+<td>OverlayElement::addBaseParameters()</td>
+<td>OverlayElement::addBaseParameters()</td></tr>
+<tr><th>56</th>
+<td>__cxa_pure_virtual</td>
+<td>__cxa_pure_virtual</td></tr>
+<tr><th>64</th>
+<td>(int (*)(...)) 0x300e8</td>
+<td>(int (*)(...)) 0x2e838</td></tr>
+<tr><th>72</th>
+<td>(int (*)(...)) 0x300ee</td>
+<td>(int (*)(...)) 0x2e83e</td></tr>
+<tr><th>80</th>
+<td>OverlayElement::show()</td>
+<td>OverlayElement::show()</td></tr>
+<tr><th>88</th>
+<td>OverlayElement::hide()</td>
+<td>OverlayElement::hide()</td></tr>
+<tr><th>96</th>
+<td>OverlayElement::setEnabled(bool)</td>
+<td>OverlayElement::setEnabled(bool)</td></tr>
+<tr><th>104</th>
+<td>OverlayElement::getMaterialName[abi:cxx11]() const</td>
+<td>OverlayElement::getMaterialName[abi:cxx11]() const</td></tr>
+<tr><th>112</th>
+<td>OverlayElement::getMaterial() const</td>
+<td>OverlayElement::getMaterial() const</td></tr>
+<tr><th>120</th>
+<td>OverlayElement::getWorldTransforms(Matrix4*) const</td>
+<td>OverlayElement::getWorldTransforms(Matrix4*) const</td></tr>
+<tr><th>128</th>
+<td>OverlayElement::_positionsOutOfDate()</td>
+<td>OverlayElement::_positionsOutOfDate()</td></tr>
+<tr><th>136</th>
+<td>OverlayElement::_update()</td>
+<td>OverlayElement::_update()</td></tr>
+<tr><th>144</th>
+<td>OverlayElement::_updateFromParent()</td>
+<td>OverlayElement::_updateFromParent()</td></tr>
+<tr><th>152</th>
+<td>OverlayElement::_notifyParent(OverlayContainer*, Overlay*)</td>
+<td>OverlayElement::_notifyParent(OverlayContainer*, Overlay*)</td></tr>
+<tr><th>160</th>
+<td>OverlayElement::_getDerivedLeft()</td>
+<td>OverlayElement::_getDerivedLeft()</td></tr>
+<tr><th>168</th>
+<td>OverlayElement::_getDerivedTop()</td>
+<td>OverlayElement::_getDerivedTop()</td></tr>
+<tr><th>176</th>
+<td>OverlayElement::_getRelativeWidth()</td>
+<td>OverlayElement::_getRelativeWidth()</td></tr>
+<tr><th>184</th>
+<td>OverlayElement::_getRelativeHeight()</td>
+<td>OverlayElement::_getRelativeHeight()</td></tr>
+<tr><th>192</th>
+<td>OverlayElement::_getClippingRegion(TRect&lt;float&gt;&amp;)</td>
+<td>OverlayElement::_getClippingRegion(TRect&lt;float&gt;&amp;)</td></tr>
+<tr><th>200</th>
+<td>OverlayElement::_notifyZOrder(unsigned short)</td>
+<td>OverlayElement::_notifyZOrder(unsigned short)</td></tr>
+<tr><th>208</th>
+<td>OverlayElement::_notifyWorldTransforms(Matrix4 const&amp;)</td>
+<td>OverlayElement::_notifyWorldTransforms(Matrix4 const&amp;)</td></tr>
+<tr><th>216</th>
+<td>OverlayElement::_notifyViewport()</td>
+<td>OverlayElement::_notifyViewport()</td></tr>
+<tr><th>224</th>
+<td>OverlayElement::_updateRenderQueue(RenderQueue*)</td>
+<td>OverlayElement::_updateRenderQueue(RenderQueue*)</td></tr>
+<tr><th>232</th>
+<td>__cxa_pure_virtual</td>
+<td>__cxa_pure_virtual</td></tr>
+<tr><th>240</th>
+<td>OverlayElement::setCaption(UTFString const&amp;)</td>
+<td>OverlayElement::setCaption(UTFString const&amp;)</td></tr>
+<tr><th>248</th>
+<td>OverlayElement::getCaption() const</td>
+<td>OverlayElement::getCaption() const</td></tr>
+<tr><th>256</th>
+<td>OverlayElement::setColour(ColourValue const&amp;)</td>
+<td>OverlayElement::setColour(ColourValue const&amp;)</td></tr>
+<tr><th>264</th>
+<td>OverlayElement::getColour() const</td>
+<td>OverlayElement::getColour() const</td></tr>
+<tr><th>272</th>
+<td>OverlayElement::setMetricsMode(GuiMetricsMode)</td>
+<td>OverlayElement::setMetricsMode(GuiMetricsMode)</td></tr>
+<tr><th>280</th>
+<td>OverlayElement::getMetricsMode() const</td>
+<td>OverlayElement::getMetricsMode() const</td></tr>
+<tr><th>288</th>
+<td>OverlayElement::setHorizontalAlignment(GuiHorizontalAlignment)</td>
+<td>OverlayElement::setHorizontalAlignment(GuiHorizontalAlignment)</td></tr>
+<tr><th>296</th>
+<td>OverlayElement::getHorizontalAlignment() const</td>
+<td>OverlayElement::getHorizontalAlignment() const</td></tr>
+<tr><th>304</th>
+<td>OverlayElement::setVerticalAlignment(GuiVerticalAlignment)</td>
+<td>OverlayElement::setVerticalAlignment(GuiVerticalAlignment)</td></tr>
+<tr><th>312</th>
+<td>OverlayElement::getVerticalAlignment() const</td>
+<td>OverlayElement::getVerticalAlignment() const</td></tr>
+<tr><th>320</th>
+<td>OverlayElement::contains(float, float) const</td>
+<td>OverlayElement::contains(float, float) const</td></tr>
+<tr><th>328</th>
+<td>OverlayElement::findElementAt(float, float)</td>
+<td>OverlayElement::findElementAt(float, float)</td></tr>
+<tr><th>336</th>
+<td>(int (*)(...)) 0x346a6</td>
+<td>(int (*)(...)) 0x328a8</td></tr>
+<tr><th>344</th>
+<td>(int (*)(...)) 0x24a2c</td>
+<td>(int (*)(...)) 0x24836</td></tr>
+<tr><th>352</th>
+<td>(int (*)(...)) 0x24a36</td>
+<td>(int (*)(...)) 0x24840</td></tr>
+<tr><th>360</th>
+<td>(int (*)(...)) 0x24a42</td>
+<td>(int (*)(...)) 0x2484c</td></tr>
+<tr><th>368</th>
+<td>(int (*)(...)) 0x24a4e</td>
+<td>(int (*)(...)) 0x24858</td></tr>
+<tr><th>376</th>
+<td>(int (*)(...)) 0x24cf6</td>
+<td>(int (*)(...)) 0x24b24</td></tr>
+<tr><th>384</th>
+<td>OverlayElement::copyFromTemplate(OverlayElement*)</td>
+<td>OverlayElement::copyFromTemplate(OverlayElement*)</td></tr>
+<tr><th>392</th>
+<td>OverlayElement::clone(std::__cxx11::basic_string&lt;char, std::char_traits&lt;char&gt;, std::allocator&lt;char&gt; &gt; const&amp;)</td>
+<td>OverlayElement::clone(std::__cxx11::basic_string&lt;char, std::char_traits&lt;char&gt;, std::allocator&lt;char&gt; &gt; const&amp;)</td></tr>
+<tr><th>400</th>
+<td>(int (*)(...)) -0x00000000000030</td>
+<td>(int (*)(...)) -0x00000000000030</td></tr>
+<tr><th>408</th>
+<td>(int (*)(...)) (&amp; typeinfo for OverlayElement)</td>
+<td>(int (*)(...)) (&amp; typeinfo for OverlayElement)</td></tr>
+<tr><th>416</th>
+<td>(int (*)(...))0</td>
+<td>(int (*)(...))0</td></tr>
+<tr><th>424</th>
+<td>(int (*)(...))0</td>
+<td>(int (*)(...))0</td></tr>
+<tr><th>432</th>
+<td>non-virtual thunk to OverlayElement::getMaterial() const</td>
+<td>non-virtual thunk to OverlayElement::getMaterial() const</td></tr>
+<tr><th>440</th>
+<td>(int (*)(...)) 0x24e30</td>
+<td>(int (*)(...)) 0x24c2c</td></tr>
+<tr><th>448</th>
+<td>__cxa_pure_virtual</td>
+<td>__cxa_pure_virtual</td></tr>
+<tr><th>456</th>
+<td>(int (*)(...)) 0x24a08</td>
+<td>(int (*)(...)) 0x24812</td></tr>
+<tr><th>464</th>
+<td>(int (*)(...)) 0x24a12</td>
+<td>(int (*)(...)) 0x2481c</td></tr>
+<tr><th>472</th>
+<td>non-virtual thunk to OverlayElement::getWorldTransforms(Matrix4*) const</td>
+<td>non-virtual thunk to OverlayElement::getWorldTransforms(Matrix4*) const</td></tr>
+<tr><th>480</th>
+<td>(int (*)(...)) 0x24a18</td>
+<td>(int (*)(...)) 0x24822</td></tr>
+<tr><th>488</th>
+<td>(int (*)(...)) 0x24a6e</td>
+<td>(int (*)(...)) 0x24878</td></tr>
+<tr><th>496</th>
+<td>(int (*)(...)) 0x24d85</td>
+<td>(int (*)(...)) 0x24ba8</td></tr>
+<tr><th>504</th>
+<td>(int (*)(...)) 0x24a22</td>
+<td>(int (*)(...)) 0x2482c</td></tr>
+<tr><th>512</th>
+<td>(int (*)(...)) 0x265a0</td>
+<td>(int (*)(...)) 0x26064</td></tr>
+</table><br/>
+</div>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_58')">
+[+] affected symbols: 181 (49.2%)</span>
+<div id="c_58" style="display:none;">
+<div class='affected'><span class='iname_a'>OverlayElement::_setHeight&#160;<span class='sym_p'><span>(&#160;Real <i>height</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;OverlayElement&#39; class.</div>
+<span class='iname_a'>OverlayElement::initialise&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;OverlayElement&#39; class.</div>
+<span class='iname_a'>OverlayElement::msWidthCmd <span class='attr'>[data]</span></span><br/>
+<div class='affect'>This method is from &#39;OverlayElement&#39; class.</div>
+<span class='iname_a'>OverlayElement::setCaption&#160;<span class='sym_p'><span>(&#160;DisplayString const&amp; <i>caption</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;OverlayElement&#39; class.</div>
+<span class='iname_a'>OverlayElement::setEnabled&#160;<span class='sym_p'><span>(&#160;bool <i>b</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;OverlayElement&#39; class.</div>
+<span class='iname_a'>OverlayElement::msHeightCmd <span class='attr'>[data]</span></span><br/>
+<div class='affect'>This method is from &#39;OverlayElement&#39; class.</div>
+<span class='iname_a'>OverlayElement::setMaterial&#160;<span class='sym_p'><span>(&#160;std::shared_ptr&lt;DataStream&gt;const&amp; <i>mat</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;OverlayElement&#39; class.</div>
+<span class='iname_a'>OverlayElement::setPosition&#160;<span class='sym_p'><span>(&#160;Real <i>left</i></span>, <span>Real <i>top</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;OverlayElement&#39; class.</div>
+<span class='iname_a'>OverlayElement::_setPosition&#160;<span class='sym_p'><span>(&#160;Real <i>left</i></span>, <span>Real <i>top</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;OverlayElement&#39; class.</div>
+<span class='iname_a'>OverlayElement::msCaptionCmd <span class='attr'>[data]</span></span><br/>
+<div class='affect'>This method is from &#39;OverlayElement&#39; class.</div>
+ <b>...</b>
+<br/>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<span class='h_name'>OgreOverlayElementFactory.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_59')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> OverlayElementFactory <span class='warning'>&nbsp;2&nbsp;</span></span>
+<br/>
+<div id="c_59" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Base class <b>AllocatedObject&lt;0&gt;</b> has been added.</td>
+<td>Possible incorrect access of applications to the memory occupied by the base classes.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>Base class <span class='value'>AllocatedObject&lt;CategorisedAllocPolicy&lt;(MemoryCategory)4&gt; &gt;</span> has been removed.</td>
+<td>Possible incorrect access of applications to the memory occupied by the base classes.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_60')">
+[+] affected symbols: 5 (1.4%)</span>
+<div id="c_60" style="display:none;">
+<div class='affected'><span class='iname_a'>OverlayElementFactory::createOverlayElement&#160;<span class='sym_p'><span>(&#160;String const&amp; <i>p1</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;OverlayElementFactory&#39; class.</div>
+<span class='iname_a'>OverlayElementFactory::getTypeName&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;OverlayElementFactory&#39; class.</div>
+<span class='iname_a'>PanelOverlayElementFactory::getTypeName&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This method is from derived class &#39;PanelOverlayElementFactory&#39;.</div>
+<span class='iname_a'>TextAreaOverlayElementFactory::getTypeName&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This method is from derived class &#39;TextAreaOverlayElementFactory&#39;.</div>
+<span class='iname_a'>BorderPanelOverlayElementFactory::getTypeName&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This method is from derived class &#39;BorderPanelOverlayElementFactory&#39;.</div>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<span class='h_name'>OgreOverlayManager.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_61')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> OverlayManager <span class='warning'>&nbsp;3&nbsp;</span></span>
+<br/>
+<div id="c_61" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Field <b>mTranslatorManager</b> has been added to this type.</td>
+<td>1) This field will not be initialized by old clients.<br/>2) Size of the inclusive type has been changed.<br/><br/><b>NOTE</b>: this field should be accessed only from the new library functions, otherwise it may result in crash or incorrect behavior of applications.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>Base class <b>AllocatedObject&lt;0&gt;</b> has been added.</td>
+<td>Possible incorrect access of applications to the memory occupied by the base classes.</td>
+</tr>
+<tr>
+<th>3</th>
+<td>Base class <span class='value'>AllocatedObject&lt;CategorisedAllocPolicy&lt;(MemoryCategory)4&gt; &gt;</span> has been removed.</td>
+<td>Possible incorrect access of applications to the memory occupied by the base classes.</td>
+</tr>
+</table>
+<span class="sect_info" onclick="javascript:showContent(this, 'c_62')">
+[+] show v-table (old and new)</span>
+<br/>
+<div id="c_62" style="display:none;">
+<table class='vtable'><tr><th>Offset</th><th>Virtual Table (Old) - 7 entries</th><th>Virtual Table (New) - 7 entries</th></tr><tr><th>0</th>
+<td>(int (*)(...)) 0</td>
+<td>(int (*)(...)) 0</td></tr>
+<tr><th>8</th>
+<td>(int (*)(...)) (&amp; typeinfo for OverlayManager)</td>
+<td>(int (*)(...)) (&amp; typeinfo for OverlayManager)</td></tr>
+<tr><th>16</th>
+<td>~OverlayManager</td>
+<td>~OverlayManager</td></tr>
+<tr><th>24</th>
+<td>~OverlayManager</td>
+<td>~OverlayManager</td></tr>
+<tr><th>32</th>
+<td>OverlayManager::getScriptPatterns[abi:cxx11]() const</td>
+<td>OverlayManager::getScriptPatterns[abi:cxx11]() const</td></tr>
+<tr><th>40</th>
+<td class='failed'>OverlayManager::parseScript(std::shared_ptr&lt;DataStream&gt;&amp;, std::__cxx11::basic_string&lt;char, std::char_traits&lt;char&gt;, std::allocator&lt;char&gt; &gt; const&amp;)</td>
+<td class='failed'>OverlayManager::parseScript(SharedPtr&lt;DataStream&gt;&amp;, std::__cxx11::basic_string&lt;char, std::char_traits&lt;char&gt;, std::allocator&lt;char&gt; &gt; const&amp;)</td></tr>
+<tr><th>48</th>
+<td>OverlayManager::getLoadingOrder() const</td>
+<td>OverlayManager::getLoadingOrder() const</td></tr>
+</table><br/>
+</div>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_63')">
+[+] affected symbols: 38 (10.3%)</span>
+<div id="c_63" style="display:none;">
+<div class='affected'><span class='iname_a'>OverlayManager::destroyAll&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;OverlayManager&#39; class.</div>
+<span class='iname_a'>OverlayManager::parseAttrib&#160;<span class='sym_p'><span>(&#160;String const&amp; <i>line</i></span>, <span>Overlay* <i>pOverlay</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;OverlayManager&#39; class.</div>
+<span class='iname_a'>OverlayManager::parseScript&#160;<span class='sym_p'><span>(&#160;std::shared_ptr&lt;DataStream&gt;&amp; <i>stream</i></span>, <span>String const&amp; <i>groupName</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;OverlayManager&#39; class.</div>
+<span class='iname_a'>OverlayManager::getElementMap&#160;<span class='sym_p'><span>(&#160;bool <i>isATemplate</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;OverlayManager&#39; class.</div>
+<span class='iname_a'>OverlayManager::parseChildren&#160;<span class='sym_p'><span>(&#160;std::shared_ptr&lt;DataStream&gt;&amp; <i>stream</i></span>, <span>String const&amp; <i>line</i></span>, <span>Overlay* <i>pOverlay</i></span>, <span>bool <i>isATemplate</i></span>, <span>OverlayContainer* <i>parent</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;OverlayManager&#39; class.</div>
+<span class='iname_a'>OverlayManager::getSingletonPtr&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;OverlayManager&#39; class.</div>
+<span class='iname_a'>OverlayManager::parseNewElement&#160;<span class='sym_p'><span>(&#160;std::shared_ptr&lt;DataStream&gt;&amp; <i>stream</i></span>, <span>String&amp; <i>elemType</i></span>, <span>String&amp; <i>elemName</i></span>, <span>bool <i>isContainer</i></span>, <span>Overlay* <i>pOverlay</i></span>, <span>bool <i>isATemplate</i></span>, <span>String <i>templateName</i></span>, <span>OverlayContainer* <i>container</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;OverlayManager&#39; class.</div>
+<span class='iname_a'>OverlayManager::getOverlayElement&#160;<span class='sym_p'><span>(&#160;String const&amp; <i>name</i></span>, <span>bool <i>isATemplate</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;OverlayManager&#39; class.</div>
+<span class='iname_a'>OverlayManager::hasOverlayElement&#160;<span class='sym_p'><span>(&#160;String const&amp; <i>name</i></span>, <span>bool <i>isATemplate</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;OverlayManager&#39; class.</div>
+<span class='iname_a'>OverlayManager::getOverlayIterator&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;OverlayManager&#39; class.</div>
+ <b>...</b>
+<br/>
+</div>
+</div>
+<br/><br/></div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_64')">
+<span class='ext'>[+]</span> <span class='ttype'>typedef</span> OverlayManager::ElementMap <span class='warning'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_64" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Base type has been changed from <span class='value'>map&lt;std::__cxx11::basic_string&lt;char&gt;, OverlayElement*, std::less&lt;std::__cxx11::basic_string&lt;char&gt; &gt; &gt;::type</span> to <span class='value'>std::map&lt;std::__cxx11::basic_string&lt;char&gt;, OverlayElement*&gt;</span>.</td>
+<td>Replacement of the base data type may indicate a change in its semantic meaning.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_65')">
+[+] affected symbols: 6 (1.6%)</span>
+<div id="c_65" style="display:none;">
+<div class='affected'><span class='iname_a'>OverlayManager::getElementMap&#160;<span class='sym_p'><span>(&#160;bool <i>isATemplate</i></span>&#160;)</span></span><br/>
+<div class='affect'>Return value (reference) has base type &#39;OverlayManager::ElementMap&#39;.</div>
+<span class='iname_a'>OverlayManager::getOverlayElementImpl&#160;<span class='sym_p'><span>(&#160;String const&amp; <i>name</i></span>, <span>map&lt;std::__cxx11::basic_string&lt;char&gt;, OverlayElement*, std::less&lt;std::__cxx11::basic_string&lt;char&gt; &gt; &gt;::type&amp; <span class='fp'>elementMap</span></span>&#160;)</span></span><br/>
+<div class='affect'>2nd parameter &#39;elementMap&#39; (reference) has base type &#39;OverlayManager::ElementMap&#39;.</div>
+<span class='iname_a'>OverlayManager::hasOverlayElementImpl&#160;<span class='sym_p'><span>(&#160;String const&amp; <i>name</i></span>, <span>map&lt;std::__cxx11::basic_string&lt;char&gt;, OverlayElement*, std::less&lt;std::__cxx11::basic_string&lt;char&gt; &gt; &gt;::type&amp; <span class='fp'>elementMap</span></span>&#160;)</span></span><br/>
+<div class='affect'>2nd parameter &#39;elementMap&#39; (reference) has base type &#39;OverlayManager::ElementMap&#39;.</div>
+<span class='iname_a'>OverlayManager::createOverlayElementImpl&#160;<span class='sym_p'><span>(&#160;String const&amp; <i>typeName</i></span>, <span>String const&amp; <i>instanceName</i></span>, <span>map&lt;std::__cxx11::basic_string&lt;char&gt;, OverlayElement*, std::less&lt;std::__cxx11::basic_string&lt;char&gt; &gt; &gt;::type&amp; <span class='fp'>elementMap</span></span>&#160;)</span></span><br/>
+<div class='affect'>3rd parameter &#39;elementMap&#39; (reference) has base type &#39;OverlayManager::ElementMap&#39;.</div>
+<span class='iname_a'>OverlayManager::destroyOverlayElementImpl&#160;<span class='sym_p'><span>(&#160;String const&amp; <i>instanceName</i></span>, <span>map&lt;std::__cxx11::basic_string&lt;char&gt;, OverlayElement*, std::less&lt;std::__cxx11::basic_string&lt;char&gt; &gt; &gt;::type&amp; <span class='fp'>elementMap</span></span>&#160;)</span></span><br/>
+<div class='affect'>2nd parameter &#39;elementMap&#39; (reference) has base type &#39;OverlayManager::ElementMap&#39;.</div>
+<span class='iname_a'>OverlayManager::destroyAllOverlayElementsImpl&#160;<span class='sym_p'><span>(&#160;map&lt;std::__cxx11::basic_string&lt;char&gt;, OverlayElement*, std::less&lt;std::__cxx11::basic_string&lt;char&gt; &gt; &gt;::type&amp; <span class='fp'>elementMap</span></span>&#160;)</span></span><br/>
+<div class='affect'>1st parameter &#39;elementMap&#39; (reference) has base type &#39;OverlayManager::ElementMap&#39;.</div>
+</div>
+</div>
+<br/><br/></div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_66')">
+<span class='ext'>[+]</span> <span class='ttype'>typedef</span> OverlayManager::OverlayMapIterator <span class='warning'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_66" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Base type has been changed from <span class='value'>MapIterator&lt;std::map&lt;std::__cxx11::basic_string&lt;char&gt;, Overlay*, std::less&lt;std::__cxx11::basic_string&lt;char&gt; &gt;, std::allocator&lt;std::pair&lt;const std::__cxx11::basic_string&lt;char, std::char_traits&lt;char&gt;, std::allocator&lt;char&gt; &gt;, Overlay*&gt; &gt; &gt; &gt;</span> to <span class='value'>MapIterator&lt;std::map&lt;std::__cxx11::basic_string&lt;char&gt;, Overlay*&gt; &gt;</span>.</td>
+<td>Replacement of the base data type may indicate a change in its semantic meaning.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_67')">
+[+] affected symbols: 1 (0.3%)</span>
+<div id="c_67" style="display:none;">
+<div class='affected'><span class='iname_a'>OverlayManager::getOverlayIterator&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>Return value is of type &#39;OverlayManager::OverlayMapIterator&#39;.</div>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<span class='h_name'>OgreOverlaySystem.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_68')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> OverlaySystem <span class='warning'>&nbsp;2&nbsp;</span></span>
+<br/>
+<div id="c_68" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Base class <b>AllocatedObject&lt;0&gt;</b> has been added.</td>
+<td>Possible incorrect access of applications to the memory occupied by the base classes.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>Base class <span class='value'>AllocatedObject&lt;CategorisedAllocPolicy&lt;(MemoryCategory)4&gt; &gt;</span> has been removed.</td>
+<td>Possible incorrect access of applications to the memory occupied by the base classes.</td>
+</tr>
+</table>
+<span class="sect_info" onclick="javascript:showContent(this, 'c_69')">
+[+] show v-table (old and new)</span>
+<br/>
+<div id="c_69" style="display:none;">
+<table class='vtable'><tr><th>Offset</th><th>Virtual Table (Old) - 14 entries</th><th>Virtual Table (New) - 14 entries</th></tr><tr><th>0</th>
+<td>(int (*)(...)) 0</td>
+<td>(int (*)(...)) 0</td></tr>
+<tr><th>8</th>
+<td>(int (*)(...)) (&amp; typeinfo for OverlaySystem)</td>
+<td>(int (*)(...)) (&amp; typeinfo for OverlaySystem)</td></tr>
+<tr><th>16</th>
+<td>~OverlaySystem</td>
+<td>~OverlaySystem</td></tr>
+<tr><th>24</th>
+<td>~OverlaySystem</td>
+<td>~OverlaySystem</td></tr>
+<tr><th>32</th>
+<td>(int (*)(...)) 0x3e8de</td>
+<td>(int (*)(...)) 0x3d458</td></tr>
+<tr><th>40</th>
+<td>(int (*)(...)) 0x3e8e4</td>
+<td>(int (*)(...)) 0x3d45e</td></tr>
+<tr><th>48</th>
+<td>OverlaySystem::renderQueueStarted(unsigned char, std::__cxx11::basic_string&lt;char, std::char_traits&lt;char&gt;, std::allocator&lt;char&gt; &gt; const&amp;, bool&amp;)</td>
+<td>OverlaySystem::renderQueueStarted(unsigned char, std::__cxx11::basic_string&lt;char, std::char_traits&lt;char&gt;, std::allocator&lt;char&gt; &gt; const&amp;, bool&amp;)</td></tr>
+<tr><th>56</th>
+<td>(int (*)(...)) 0x3e8ea</td>
+<td>(int (*)(...)) 0x3d464</td></tr>
+<tr><th>64</th>
+<td>OverlaySystem::eventOccurred(std::__cxx11::basic_string&lt;char, std::char_traits&lt;char&gt;, std::allocator&lt;char&gt; &gt; const&amp;, std::map&lt;std::__cxx11::basic_string&lt;char, std::char_traits&lt;char&gt;, std::allocator&lt;char&gt; &gt;, std::__cxx11::basic_string&lt;char, std::char_traits&lt;char&gt;, std::allocator&lt;char&gt; &gt;, std::less&lt;std::__cxx11::basic_string&lt;char, std::char_traits&lt;char&gt;, std::allocator&lt;char&gt; &gt; &gt;, std::allocator&lt;std::pair&lt;std::__cxx11::basic_string&lt;char, std::char_traits&lt;char&gt;, std::allocator&lt;char&gt; &gt; const, std::__cxx11::basic_string&lt;char, std::char_traits&lt;char&gt;, std::allocator&lt;char&gt; &gt; &gt; &gt; &gt; const*)</td>
+<td>OverlaySystem::eventOccurred(std::__cxx11::basic_string&lt;char, std::char_traits&lt;char&gt;, std::allocator&lt;char&gt; &gt; const&amp;, std::map&lt;std::__cxx11::basic_string&lt;char, std::char_traits&lt;char&gt;, std::allocator&lt;char&gt; &gt;, std::__cxx11::basic_string&lt;char, std::char_traits&lt;char&gt;, std::allocator&lt;char&gt; &gt;, std::less&lt;std::__cxx11::basic_string&lt;char, std::char_traits&lt;char&gt;, std::allocator&lt;char&gt; &gt; &gt;, std::allocator&lt;std::pair&lt;std::__cxx11::basic_string&lt;char, std::char_traits&lt;char&gt;, std::allocator&lt;char&gt; &gt; const, std::__cxx11::basic_string&lt;char, std::char_traits&lt;char&gt;, std::allocator&lt;char&gt; &gt; &gt; &gt; &gt; const*)</td></tr>
+<tr><th>72</th>
+<td>(int (*)(...)) -0x00000000000008</td>
+<td>(int (*)(...)) -0x00000000000008</td></tr>
+<tr><th>80</th>
+<td>(int (*)(...)) (&amp; typeinfo for OverlaySystem)</td>
+<td>(int (*)(...)) (&amp; typeinfo for OverlaySystem)</td></tr>
+<tr><th>88</th>
+<td>non-virtual thunk to ~OverlaySystem</td>
+<td>non-virtual thunk to ~OverlaySystem</td></tr>
+<tr><th>96</th>
+<td>non-virtual thunk to ~OverlaySystem</td>
+<td>non-virtual thunk to ~OverlaySystem</td></tr>
+<tr><th>104</th>
+<td>non-virtual thunk to OverlaySystem::eventOccurred(std::__cxx11::basic_string&lt;char, std::char_traits&lt;char&gt;, std::allocator&lt;char&gt; &gt; const&amp;, std::map&lt;std::__cxx11::basic_string&lt;char, std::char_traits&lt;char&gt;, std::allocator&lt;char&gt; &gt;, std::__cxx11::basic_string&lt;char, std::char_traits&lt;char&gt;, std::allocator&lt;char&gt; &gt;, std::less&lt;std::__cxx11::basic_string&lt;char, std::char_traits&lt;char&gt;, std::allocator&lt;char&gt; &gt; &gt;, std::allocator&lt;std::pair&lt;std::__cxx11::basic_string&lt;char, std::char_traits&lt;char&gt;, std::allocator&lt;char&gt; &gt; const, std::__cxx11::basic_string&lt;char, std::char_traits&lt;char&gt;, std::allocator&lt;char&gt; &gt; &gt; &gt; &gt; const*)</td>
+<td>non-virtual thunk to OverlaySystem::eventOccurred(std::__cxx11::basic_string&lt;char, std::char_traits&lt;char&gt;, std::allocator&lt;char&gt; &gt; const&amp;, std::map&lt;std::__cxx11::basic_string&lt;char, std::char_traits&lt;char&gt;, std::allocator&lt;char&gt; &gt;, std::__cxx11::basic_string&lt;char, std::char_traits&lt;char&gt;, std::allocator&lt;char&gt; &gt;, std::less&lt;std::__cxx11::basic_string&lt;char, std::char_traits&lt;char&gt;, std::allocator&lt;char&gt; &gt; &gt;, std::allocator&lt;std::pair&lt;std::__cxx11::basic_string&lt;char, std::char_traits&lt;char&gt;, std::allocator&lt;char&gt; &gt; const, std::__cxx11::basic_string&lt;char, std::char_traits&lt;char&gt;, std::allocator&lt;char&gt; &gt; &gt; &gt; &gt; const*)</td></tr>
+</table><br/>
+</div>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_70')">
+[+] affected symbols: 4 (1.1%)</span>
+<div id="c_70" style="display:none;">
+<div class='affected'><span class='iname_a'>OverlaySystem::eventOccurred&#160;<span class='sym_p'><span>(&#160;String const&amp; <i>eventName</i></span>, <span>map&lt;std::__cxx11::basic_string&lt;char&gt;, std::__cxx11::basic_string&lt;char&gt;, std::less&lt;std::__cxx11::basic_string&lt;char&gt; &gt; &gt;::type const* <i>parameters</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;OverlaySystem&#39; class.</div>
+<span class='iname_a'>OverlaySystem::renderQueueStarted&#160;<span class='sym_p'><span>(&#160;uint8 <i>queueGroupId</i></span>, <span>String const&amp; <i>invocation</i></span>, <span>bool&amp; <i>skipThisInvocation</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;OverlaySystem&#39; class.</div>
+<span class='iname_a'>OverlaySystem::OverlaySystem&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This constructor is from &#39;OverlaySystem&#39; class.</div>
+<span class='iname_a'>OverlaySystem::~OverlaySystem&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This destructor is from &#39;OverlaySystem&#39; class.</div>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<span class='h_name'>OgrePrerequisites.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_71')">
+<span class='ext'>[+]</span> <span class='ttype'>typedef</span> MaterialPtr <span class='warning'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_71" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Base type has been changed from <b>SharedPtr</b> to <b>SharedPtr&lt;Material&gt;</b>.</td>
+<td>Replacement of the base data type may indicate a change in its semantic meaning.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_72')">
+[+] affected symbols: 2 (0.5%)</span>
+<div id="c_72" style="display:none;">
+<div class='affected'><span class='iname_a'>OverlayElement::getMaterial&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>Return value (reference) has base type &#39;MaterialPtr&#39;.</div>
+<span class='iname_a'>TextAreaOverlayElement::getMaterial&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>Return value (reference) has base type &#39;MaterialPtr&#39;.</div>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<span class='h_name'>OgreStringVector.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_73')">
+<span class='ext'>[+]</span> <span class='ttype'>typedef</span> StringVector <span class='warning'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_73" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Base type has been changed from <span class='value'>vector&lt;std::__cxx11::basic_string&lt;char&gt; &gt;::type</span> to <span class='value'>std::vector&lt;std::__cxx11::basic_string&lt;char&gt; &gt;</span>.</td>
+<td>Replacement of the base data type may indicate a change in its semantic meaning.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_74')">
+[+] affected symbols: 1 (0.3%)</span>
+<div id="c_74" style="display:none;">
+<div class='affected'><span class='iname_a'>OverlayManager::getScriptPatterns&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>Return value (reference) has base type &#39;StringVector&#39;.</div>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='Other_Changes'></a><a name='Other_Changes_In_Types'></a>
+<h2>Other Changes in Data Types <span class='passed'>&nbsp;5&nbsp;</span></h2><hr/>
+<span class='h_name'>OgreRenderOperation.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_75')">
+<span class='ext'>[+]</span> <span class='ttype'>enum</span> RenderOperation::OperationType <span class='passed'>&nbsp;5&nbsp;</span></span>
+<br/>
+<div id="c_75" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>The member <b>OT_DETAIL_ADJACENCY_BIT</b> with value <b>64</b> has been added.</td>
+<td>No effect.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>The member <b>OT_LINE_LIST_ADJ</b> with value <b>66</b> has been added.</td>
+<td>No effect.</td>
+</tr>
+<tr>
+<th>3</th>
+<td>The member <b>OT_LINE_STRIP_ADJ</b> with value <b>67</b> has been added.</td>
+<td>No effect.</td>
+</tr>
+<tr>
+<th>4</th>
+<td>The member <b>OT_TRIANGLE_LIST_ADJ</b> with value <b>68</b> has been added.</td>
+<td>No effect.</td>
+</tr>
+<tr>
+<th>5</th>
+<td>The member <b>OT_TRIANGLE_STRIP_ADJ</b> with value <b>69</b> has been added.</td>
+<td>No effect.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_76')">
+[+] affected symbols: 77 (20.9%)</span>
+<div id="c_76" style="display:none;">
+<div class='affected'><span class='iname_a'>PanelOverlayElement::setTransparent&#160;<span class='sym_p'><span>(&#160;bool <i>inTransparent</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mRenderOp.operationType&#39; in the object of this method is of type &#39;enum RenderOperation::OperationType&#39;.</div>
+<span class='iname_a'>PanelOverlayElement::getRenderOperation&#160;<span class='sym_p'><span>(&#160;RenderOperation&amp; <span class='fp'>op</span></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;op.operationType&#39; in 1st parameter &#39;op&#39; (reference) is of type &#39;enum RenderOperation::OperationType&#39;.</div>
+<span class='iname_a'>PanelOverlayElement::updatePositionGeometry&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mRenderOp.operationType&#39; in the object of this method is of type &#39;enum RenderOperation::OperationType&#39;.</div>
+<span class='iname_a'>PanelOverlayElement::setUV&#160;<span class='sym_p'><span>(&#160;Real <i>u1</i></span>, <span>Real <i>v1</i></span>, <span>Real <i>u2</i></span>, <span>Real <i>v2</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mRenderOp.operationType&#39; in the object of this method is of type &#39;enum RenderOperation::OperationType&#39;.</div>
+<span class='iname_a'>PanelOverlayElement::setTiling&#160;<span class='sym_p'><span>(&#160;Real <i>x</i></span>, <span>Real <i>y</i></span>, <span>ushort <i>layer</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mRenderOp.operationType&#39; in the object of this method is of type &#39;enum RenderOperation::OperationType&#39;.</div>
+<span class='iname_a'>PanelOverlayElement::PanelOverlayElement&#160;<span class='sym_p'><span>(&#160;String const&amp; <i>name</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mRenderOp.operationType&#39; in the object of this method is of type &#39;enum RenderOperation::OperationType&#39;.</div>
+<span class='iname_a'>PanelOverlayElement::~PanelOverlayElement&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mRenderOp.operationType&#39; in the object of this method is of type &#39;enum RenderOperation::OperationType&#39;.</div>
+<span class='iname_a'>TextAreaOverlayElement::initialise&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mRenderOp.operationType&#39; in the object of this method is of type &#39;enum RenderOperation::OperationType&#39;.</div>
+<span class='iname_a'>TextAreaOverlayElement::setCaption&#160;<span class='sym_p'><span>(&#160;DisplayString const&amp; <i>caption</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mRenderOp.operationType&#39; in the object of this method is of type &#39;enum RenderOperation::OperationType&#39;.</div>
+<span class='iname_a'>TextAreaOverlayElement::setColourTop&#160;<span class='sym_p'><span>(&#160;ColourValue const&amp; <i>col</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mRenderOp.operationType&#39; in the object of this method is of type &#39;enum RenderOperation::OperationType&#39;.</div>
+ <b>...</b>
+<br/>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='Headers'></a><h2>Header Files <span class='gray'>&nbsp;41&nbsp;</span></h2><hr/>
+<div class='h_list'>
+OgreAny.h<br/>
+OgreBorderPanelOverlayElement.h<br/>
+OgreColourValue.h<br/>
+OgreCommon.h<br/>
+OgreFont.h<br/>
+OgreFontManager.h<br/>
+OgreFrustum.h<br/>
+OgreHardwareVertexBuffer.h<br/>
+OgreIteratorWrapper.h<br/>
+OgreMath.h<br/>
+OgreMatrix4.h<br/>
+OgreMemoryAllocatedObject.h<br/>
+OgreMemoryAllocatorConfig.h<br/>
+OgreMemoryStdAlloc.h<br/>
+OgreMemorySTLAllocator.h<br/>
+OgreOverlay.h<br/>
+OgreOverlayContainer.h<br/>
+OgreOverlayElement.h<br/>
+OgreOverlayElementCommands.h<br/>
+OgreOverlayElementFactory.h<br/>
+OgreOverlayManager.h<br/>
+OgreOverlayProfileSessionListener.h<br/>
+OgreOverlaySystem.h<br/>
+OgrePanelOverlayElement.h<br/>
+OgrePlatform.h<br/>
+OgrePrerequisites.h<br/>
+OgreProfiler.h<br/>
+OgreRenderable.h<br/>
+OgreRenderOperation.h<br/>
+OgreRenderQueueListener.h<br/>
+OgreRenderSystem.h<br/>
+OgreResource.h<br/>
+OgreScriptLoader.h<br/>
+OgreSingleton.h<br/>
+OgreStringInterface.h<br/>
+OgreStringVector.h<br/>
+OgreTextAreaOverlayElement.h<br/>
+OgreUserObjectBindings.h<br/>
+OgreUTFString.h<br/>
+OgreVector4.h<br/>
+OgreVertexIndexData.h<br/>
+</div>
+<br/><a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='Sources'></a><h2>Source Files <span class='gray'>&nbsp;13&nbsp;</span></h2><hr/>
+<div class='h_list'>
+OgreBorderPanelOverlayElement.cpp<br/>
+OgreFont.cpp<br/>
+OgreFontManager.cpp<br/>
+OgreOverlay.cpp<br/>
+OgreOverlayContainer.cpp<br/>
+OgreOverlayElement.cpp<br/>
+OgreOverlayElementCommands.cpp<br/>
+OgreOverlayElementFactory.cpp<br/>
+OgreOverlayManager.cpp<br/>
+OgreOverlayProfileSessionListener.cpp<br/>
+OgreOverlaySystem.cpp<br/>
+OgrePanelOverlayElement.cpp<br/>
+OgreTextAreaOverlayElement.cpp<br/>
+</div>
+<br/><a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='Libs'></a><h2>Objects <span class='gray'>&nbsp;1&nbsp;</span></h2><hr/>
+<div class='lib_list'>
+libOgreOverlay.so.1.10.12<br/>
+</div>
+<br/><a class='top_ref' href='#Top'>to the top</a><br/>
+</div>
+<br/><br/><br/>
+<hr/>
+<div class='footer' align='right'><i>Generated by <a href='https://github.com/lvc/abi-compliance-checker'>ABI Compliance Checker</a> 2.3 &#160;</i>
+</div>
+<br/>
+
+</body></html>

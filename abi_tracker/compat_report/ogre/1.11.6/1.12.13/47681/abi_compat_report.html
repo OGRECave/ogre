@@ -1,0 +1,2324 @@
+<!-- verdict:incompatible;affected:65.1;added:4;removed:35;type_problems_high:12;type_problems_medium:44;type_problems_low:7;interface_problems_high:1;interface_problems_medium:0;interface_problems_low:0;changed_constants:0;type_changes_other:2;tool_version:2.3 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta name="keywords" content="libOgreTerrain, binary compatibility, API, report" />
+<meta name="description" content="Binary compatibility report for the libOgreTerrain object between 1.11.6 and 1.12.13 versions on x86_64" />
+<title>libOgreTerrain: 1.11.6 to 1.12.13 binary compatibility report</title>
+<style type="text/css">
+body {
+    font-family:Arial, sans-serif;
+    background-color:White;
+    color:Black;
+}
+hr {
+    color:Black;
+    background-color:Black;
+    height:1px;
+    border:0;
+}
+h1 {
+    margin-bottom:0px;
+    padding-bottom:0px;
+    font-size:1.625em;
+}
+h2 {
+    margin-bottom:0px;
+    padding-bottom:0px;
+    font-size:1.25em;
+    white-space:nowrap;
+}
+span.section {
+    font-weight:bold;
+    cursor:pointer;
+    color:#003E69;
+    white-space:nowrap;
+    margin-left:0.3125em;
+}
+span.new_sign {
+    font-weight:bold;
+    margin-left:1.65em;
+    color:#003E69;
+}
+span.new_sign_lbl {
+    margin-left:3em;
+    font-size:1em;
+    color:Black;
+}
+span:hover.section {
+    color:#336699;
+}
+span.sect_aff {
+    cursor:pointer;
+    padding-left:1.55em;
+    font-size:0.875em;
+    color:#cc3300;
+}
+span.sect_info {
+    cursor:pointer;
+    padding-left:1.55em;
+    font-size:0.875em;
+    color:Black;
+}
+span.ext {
+    font-weight:normal;
+}
+span.h_name {
+    color:#cc3300;
+    font-size:0.875em;
+    font-weight:bold;
+}
+div.h_list, div.lib_list {
+    font-size:0.94em;
+    padding-left:0.4em;
+}
+span.ns {
+    color:#408080;
+    font-size:0.94em;
+}
+span.lib_name {
+    color:Green;
+    font-size:0.875em;
+    font-weight:bold;
+}
+span.iname {
+    font-weight:bold;
+    color:#003E69;
+    margin-left:0.3125em;
+}
+span.iname_b {
+    font-weight:bold;
+}
+span.iname_a {
+    color:#333333;
+    font-weight:bold;
+    font-size:0.94em;
+}
+span.sym_p {
+    font-weight:normal;
+    white-space:normal;
+}
+span.sym_pd {
+    white-space:normal;
+}
+span.sym_p span, span.sym_pd span {
+    white-space:nowrap;
+}
+div.affect {
+    padding-left:1em;
+    padding-bottom:10px;
+    font-size:0.87em;
+    font-style:italic;
+    line-height:0.9em;
+}
+div.affected {
+    padding-left:1.9em;
+    padding-top:10px;
+}
+table.ptable {
+    border-collapse:collapse;
+    border:1px outset black;
+    margin-left:0.95em;
+    margin-top:3px;
+    margin-bottom:3px;
+    width:56.25em;
+}
+table.ptable td {
+    border:1px solid gray;
+    padding:3px;
+    font-size:0.875em;
+    text-align:left;
+    vertical-align:top;
+    max-width:28em;
+    word-wrap:break-word;
+}
+table.ptable th.pn {
+    width:2%;
+}
+table.ptable th.chg {
+    width:47%;
+}
+table.vtable {
+    border-collapse:collapse;
+    border:1px outset black;
+    margin-left:1.9em;
+    margin-top:0.7em;
+}
+table.vtable td {
+    border:1px solid gray;
+    padding:3px;
+    font-size:0.875em;
+    vertical-align:top;
+    max-width:450px;
+    word-wrap:break-word;
+}
+table.ptable th, table.vtable th {
+    background-color:#eeeeee;
+    font-weight:bold;
+    color:#333333;
+    font-family:Verdana, Arial;
+    font-size:0.875em;
+    border:1px solid gray;
+    text-align:center;
+    vertical-align:top;
+    white-space:nowrap;
+    padding:3px;
+}
+table.summary {
+    border-collapse:collapse;
+    border:1px outset black;
+}
+table.summary th {
+    background-color:#eeeeee;
+    font-weight:normal;
+    text-align:left;
+    font-size:0.94em;
+    white-space:nowrap;
+    border:1px inset gray;
+    padding:3px;
+}
+table.summary td {
+    text-align:right;
+    white-space:nowrap;
+    border:1px inset gray;
+    padding:3px 5px 3px 10px;
+}
+span.mngl {
+    padding-left:1em;
+    font-size:0.875em;
+    cursor:text;
+    color:#444444;
+    font-weight:bold;
+}
+span.pleft {
+    padding-left:2.5em;
+}
+span.sym_ver {
+    color:#333333;
+    white-space:nowrap;
+    font-family:"DejaVu Sans Mono", Monospace;
+}
+span.attr {
+    color:#333333;
+    font-weight:normal;
+}
+span.color_p {
+    font-style:italic;
+    color:Brown;
+}
+span.p {
+    font-style:italic;
+}
+span.fp {
+    font-style:italic;
+    background-color:#DCDCDC;
+}
+span.ttype {
+    font-weight:normal;
+}
+span.nowrap {
+    white-space:nowrap;
+}
+span.value {
+    font-weight:bold;
+}
+.passed {
+    background-color:#CCFFCC;
+    font-weight:normal;
+}
+.warning {
+    background-color:#F4F4AF;
+    font-weight:normal;
+}
+.failed {
+    background-color:#FFCCCC;
+    font-weight:normal;
+}
+.new {
+    background-color:#C6DEFF;
+    font-weight:normal;
+}
+.compatible {
+    background-color:#CCFFCC;
+    font-weight:normal;
+}
+.almost_compatible {
+    background-color:#FFDAA3;
+    font-weight:normal;
+}
+.incompatible {
+    background-color:#FFCCCC;
+    font-weight:normal;
+}
+.gray {
+    background-color:#DCDCDC;
+    font-weight:normal;
+}
+.top_ref {
+    font-size:0.69em;
+}
+.footer {
+    font-size:0.75em;
+}
+</style>
+<script type="text/javascript" language="JavaScript">
+<!--
+function showContent(header, id)
+{
+    e = document.getElementById(id);
+    if(e.style.display == 'none')
+    {
+        e.style.display = 'block';
+        e.style.visibility = 'visible';
+        header.innerHTML = header.innerHTML.replace(/\[[^0-9 ]\]/gi,"[&minus;]");
+    }
+    else
+    {
+        e.style.display = 'none';
+        e.style.visibility = 'hidden';
+        header.innerHTML = header.innerHTML.replace(/\[[^0-9 ]\]/gi,"[+]");
+    }
+}
+-->
+</script>
+</head>
+
+<body>
+<div><a name='Top'></a>
+<h1>Binary compatibility report for the <span style='color:Blue;'>libOgreTerrain.so</span> object between <span style='color:Red;'>1.11.6</span> and <span style='color:Red;'>1.12.13</span> versions on <span style='color:Blue;'>x86_64</span></h1>
+
+<h2>Test Info</h2><hr/>
+<table class='summary'>
+<tr><th>Module Name</th><td>libOgreTerrain</td></tr>
+<tr><th>Version #1</th><td>1.11.6</td></tr>
+<tr><th>Version #2</th><td>1.12.13</td></tr>
+<tr><th>Arch</th><td>x86_64</td></tr>
+<tr><th>GCC Version</th><td>9.4.0</td></tr>
+</table>
+<h2>Test Results</h2><hr/>
+<table class='summary'><tr><th>Total Header Files</th><td><a href='#Headers' style='color:Blue;'>46</a></td></tr>
+<tr><th>Total Source Files</th><td><a href='#Sources' style='color:Blue;'>10</a></td></tr>
+<tr><th>Total Objects</th><td><a href='#Libs' style='color:Blue;'>1</a></td></tr>
+<tr><th>Total Symbols / Types</th><td>487 / 149</td></tr>
+<tr><th>Compatibility</th>
+<td class='incompatible'>34.9%</td>
+</tr>
+</table>
+<h2>Problem Summary</h2><hr/>
+<table class='summary'><tr><th></th><th style='text-align:center;'>Severity</th><th style='text-align:center;'>Count</th></tr><tr><th>Added Symbols</th><td>-</td><td class='new'><a href='#Added' style='color:Blue;'>4</a></td></tr>
+<tr><th>Removed Symbols</th><td>High</td><td class='failed'><a href='#Removed' style='color:Blue;'>35</a></td></tr>
+<tr><th rowspan='3'>Problems with<br/>Data Types</th><td>High</td><td class='failed'><a href='#Type_Problems_High' style='color:Blue;'>12</a></td></tr>
+<tr><td>Medium</td><td class='failed'><a href='#Type_Problems_Medium' style='color:Blue;'>44</a></td></tr>
+<tr><td>Low</td><td class='warning'><a href='#Type_Problems_Low' style='color:Blue;'>7</a></td></tr>
+<tr><th rowspan='3'>Problems with<br/>Symbols</th><td>High</td><td class='failed'><a href='#Symbol_Problems_High' style='color:Blue;'>1</a></td></tr>
+<tr><td>Medium</td><td>0</td></tr>
+<tr><td>Low</td><td>0</td></tr>
+<tr><th>Problems with<br/>Constants</th><td>Low</td><td>0</td></tr>
+<tr><th>Other Changes<br/>in Data Types</th><td>-</td><td class='passed'><a href='#Other_Changes_In_Types' style='color:Blue;'>2</a></td></tr>
+</table>
+
+<a name='Added'></a><h2>Added Symbols <span class='new'>&nbsp;4&nbsp;</span></h2><hr/>
+<span class='h_name'>OgreTerrain.h</span>, <span class='lib_name'>libOgreTerrain.so.1.12.13</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_1')">
+Terrain::getPointTransform&#160;<span class='sym_p'>(&#160;)</span> const</span>
+<br/>
+<div id="c_1" style="display:none;">
+<span class='mngl'>_ZNK4Ogre7Terrain17getPointTransformEv</span>
+<br/>
+<br/>
+</div>
+
+<br/>
+<span class='h_name'>OgreTerrainQuadTreeNode.h</span>, <span class='lib_name'>libOgreTerrain.so.1.12.13</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_2')">
+TerrainQuadTreeNode::_updateRenderQueue&#160;<span class='sym_p'><span>(&#160;RenderQueue* <span class='color_p'>queue</span></span>&#160;)</span></span>
+<br/>
+<div id="c_2" style="display:none;">
+<span class='mngl'>_ZN4Ogre19TerrainQuadTreeNode18_updateRenderQueueEPNS_11RenderQueueE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_3')">
+TerrainQuadTreeNode::getMovableType&#160;<span class='sym_p'>(&#160;)</span> const</span>
+<br/>
+<div id="c_3" style="display:none;">
+<span class='mngl'>_ZNK4Ogre19TerrainQuadTreeNode14getMovableTypeB5cxx11Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_4')">
+TerrainQuadTreeNode::isVisible&#160;<span class='sym_p'>(&#160;)</span> const</span>
+<br/>
+<div id="c_4" style="display:none;">
+<span class='mngl'>_ZNK4Ogre19TerrainQuadTreeNode9isVisibleEv</span>
+<br/>
+<br/>
+</div>
+
+<br/>
+<a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='Removed'></a><a name='Withdrawn'></a><h2>Removed Symbols <span class='failed'>&nbsp;35&nbsp;</span></h2><hr/>
+<span class='h_name'>OgreRenderable.h</span>, <span class='lib_name'>libOgreTerrain.so.1.11.6</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_5')">
+vtable for Renderable <span class='attr'>[data]</span></span>
+<br/>
+<div id="c_5" style="display:none;">
+<span class='mngl'>_ZTVN4Ogre10RenderableE</span>
+<br/>
+<br/>
+</div>
+
+<br/>
+<span class='h_name'>OgreTerrain.h</span>, <span class='lib_name'>libOgreTerrain.so.1.11.6</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_6')">
+Terrain::checkQuadIntersection&#160;<span class='sym_p'><span>(&#160;int <span class='color_p'>x</span></span>, <span>int <span class='color_p'>z</span></span>, <span>Ray const&amp; <span class='color_p'>ray</span></span>&#160;)</span></span>
+<br/>
+<div id="c_6" style="display:none;">
+<span class='mngl'>_ZN4Ogre7Terrain21checkQuadIntersectionEiiRKNS_3RayE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_7')">
+Terrain::getBlendTextureCount&#160;<span class='sym_p'><span>(&#160;uint8 <span class='color_p'>numLayers</span></span>&#160;)</span> const</span>
+<br/>
+<div id="c_7" style="display:none;">
+<span class='mngl'>_ZNK4Ogre7Terrain20getBlendTextureCountEh</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_8')">
+Terrain::getBlendTextureFormat&#160;<span class='sym_p'><span>(&#160;uint8 <span class='color_p'>textureIndex</span></span>, <span>uint8 <span class='color_p'>numLayers</span></span>&#160;)</span> const</span>
+<br/>
+<div id="c_8" style="display:none;">
+<span class='mngl'>_ZNK4Ogre7Terrain21getBlendTextureFormatEhh</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_9')">
+Terrain::getPointTransform&#160;<span class='sym_p'><span>(&#160;Matrix4* <span class='color_p'>outXform</span></span>&#160;)</span> const</span>
+<br/>
+<div id="c_9" style="display:none;">
+<span class='mngl'>_ZNK4Ogre7Terrain17getPointTransformEPNS_7Matrix4E</span>
+<br/>
+<br/>
+</div>
+
+<br/>
+<span class='h_name'>OgreTerrainQuadTreeNode.h</span>, <span class='lib_name'>libOgreTerrain.so.1.11.6</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_10')">
+TerrainQuadTreeNode::_getRenderable&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_10" style="display:none;">
+<span class='mngl'>_ZN4Ogre19TerrainQuadTreeNode14_getRenderableEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_11')">
+TerrainQuadTreeNode::Movable::_updateRenderQueue&#160;<span class='sym_p'><span>(&#160;RenderQueue* <span class='color_p'>queue</span></span>&#160;)</span></span>
+<br/>
+<div id="c_11" style="display:none;">
+<span class='mngl'>_ZN4Ogre19TerrainQuadTreeNode7Movable18_updateRenderQueueEPNS_11RenderQueueE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_12')">
+TerrainQuadTreeNode::Movable::getBoundingBox&#160;<span class='sym_p'>(&#160;)</span> const</span>
+<br/>
+<div id="c_12" style="display:none;">
+<span class='mngl'>_ZNK4Ogre19TerrainQuadTreeNode7Movable14getBoundingBoxEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_13')">
+TerrainQuadTreeNode::Movable::getBoundingRadius&#160;<span class='sym_p'>(&#160;)</span> const</span>
+<br/>
+<div id="c_13" style="display:none;">
+<span class='mngl'>_ZNK4Ogre19TerrainQuadTreeNode7Movable17getBoundingRadiusEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_14')">
+TerrainQuadTreeNode::Movable::getCastShadows&#160;<span class='sym_p'>(&#160;)</span> const</span>
+<br/>
+<div id="c_14" style="display:none;">
+<span class='mngl'>_ZNK4Ogre19TerrainQuadTreeNode7Movable14getCastShadowsEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_15')">
+TerrainQuadTreeNode::Movable::getMovableType&#160;<span class='sym_p'>(&#160;)</span> const</span>
+<br/>
+<div id="c_15" style="display:none;">
+<span class='mngl'>_ZNK4Ogre19TerrainQuadTreeNode7Movable14getMovableTypeB5cxx11Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_16')">
+TerrainQuadTreeNode::Movable::getQueryFlags&#160;<span class='sym_p'>(&#160;)</span> const</span>
+<br/>
+<div id="c_16" style="display:none;">
+<span class='mngl'>_ZNK4Ogre19TerrainQuadTreeNode7Movable13getQueryFlagsEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_17')">
+TerrainQuadTreeNode::Movable::getVisibilityFlags&#160;<span class='sym_p'>(&#160;)</span> const</span>
+<br/>
+<div id="c_17" style="display:none;">
+<span class='mngl'>_ZNK4Ogre19TerrainQuadTreeNode7Movable18getVisibilityFlagsEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_18')">
+TerrainQuadTreeNode::Movable::isVisible&#160;<span class='sym_p'>(&#160;)</span> const</span>
+<br/>
+<div id="c_18" style="display:none;">
+<span class='mngl'>_ZNK4Ogre19TerrainQuadTreeNode7Movable9isVisibleEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_19')">
+TerrainQuadTreeNode::Movable::Movable <span class='attr'>[C1]</span>&#160;<span class='sym_p'><span>(&#160;TerrainQuadTreeNode* <span class='color_p'>parent</span></span>&#160;)</span></span>
+<br/>
+<div id="c_19" style="display:none;">
+<span class='mngl'>_ZN4Ogre19TerrainQuadTreeNode7MovableC1EPS0_</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_20')">
+TerrainQuadTreeNode::Movable::Movable <span class='attr'>[C2]</span>&#160;<span class='sym_p'><span>(&#160;TerrainQuadTreeNode* <span class='color_p'>parent</span></span>&#160;)</span></span>
+<br/>
+<div id="c_20" style="display:none;">
+<span class='mngl'>_ZN4Ogre19TerrainQuadTreeNode7MovableC2EPS0_</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_21')">
+TerrainQuadTreeNode::Movable::visitRenderables&#160;<span class='sym_p'><span>(&#160;Renderable::Visitor* <span class='color_p'>visitor</span></span>, <span>bool <span class='color_p'>debugRenderables</span></span>&#160;)</span></span>
+<br/>
+<div id="c_21" style="display:none;">
+<span class='mngl'>_ZN4Ogre19TerrainQuadTreeNode7Movable16visitRenderablesEPNS_10Renderable7VisitorEb</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_22')">
+TerrainQuadTreeNode::Movable::~Movable <span class='attr'>[D0]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_22" style="display:none;">
+<span class='mngl'>_ZN4Ogre19TerrainQuadTreeNode7MovableD0Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_23')">
+TerrainQuadTreeNode::Movable::~Movable <span class='attr'>[D1]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_23" style="display:none;">
+<span class='mngl'>_ZN4Ogre19TerrainQuadTreeNode7MovableD1Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_24')">
+TerrainQuadTreeNode::Movable::~Movable <span class='attr'>[D2]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_24" style="display:none;">
+<span class='mngl'>_ZN4Ogre19TerrainQuadTreeNode7MovableD2Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_25')">
+TerrainQuadTreeNode::Rend::getCastsShadows&#160;<span class='sym_p'>(&#160;)</span> const</span>
+<br/>
+<div id="c_25" style="display:none;">
+<span class='mngl'>_ZNK4Ogre19TerrainQuadTreeNode4Rend15getCastsShadowsEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_26')">
+TerrainQuadTreeNode::Rend::getLights&#160;<span class='sym_p'>(&#160;)</span> const</span>
+<br/>
+<div id="c_26" style="display:none;">
+<span class='mngl'>_ZNK4Ogre19TerrainQuadTreeNode4Rend9getLightsEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_27')">
+TerrainQuadTreeNode::Rend::getMaterial&#160;<span class='sym_p'>(&#160;)</span> const</span>
+<br/>
+<div id="c_27" style="display:none;">
+<span class='mngl'>_ZNK4Ogre19TerrainQuadTreeNode4Rend11getMaterialEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_28')">
+TerrainQuadTreeNode::Rend::getRenderOperation&#160;<span class='sym_p'><span>(&#160;RenderOperation&amp; <span class='color_p'>op</span></span>&#160;)</span></span>
+<br/>
+<div id="c_28" style="display:none;">
+<span class='mngl'>_ZN4Ogre19TerrainQuadTreeNode4Rend18getRenderOperationERNS_15RenderOperationE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_29')">
+TerrainQuadTreeNode::Rend::getSquaredViewDepth&#160;<span class='sym_p'><span>(&#160;Camera const* <span class='color_p'>cam</span></span>&#160;)</span> const</span>
+<br/>
+<div id="c_29" style="display:none;">
+<span class='mngl'>_ZNK4Ogre19TerrainQuadTreeNode4Rend19getSquaredViewDepthEPKNS_6CameraE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_30')">
+TerrainQuadTreeNode::Rend::getTechnique&#160;<span class='sym_p'>(&#160;)</span> const</span>
+<br/>
+<div id="c_30" style="display:none;">
+<span class='mngl'>_ZNK4Ogre19TerrainQuadTreeNode4Rend12getTechniqueEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_31')">
+TerrainQuadTreeNode::Rend::getWorldTransforms&#160;<span class='sym_p'><span>(&#160;Matrix4* <span class='color_p'>xform</span></span>&#160;)</span> const</span>
+<br/>
+<div id="c_31" style="display:none;">
+<span class='mngl'>_ZNK4Ogre19TerrainQuadTreeNode4Rend18getWorldTransformsEPNS_7Matrix4E</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_32')">
+TerrainQuadTreeNode::Rend::Rend <span class='attr'>[C1]</span>&#160;<span class='sym_p'><span>(&#160;TerrainQuadTreeNode* <span class='color_p'>parent</span></span>&#160;)</span></span>
+<br/>
+<div id="c_32" style="display:none;">
+<span class='mngl'>_ZN4Ogre19TerrainQuadTreeNode4RendC1EPS0_</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_33')">
+TerrainQuadTreeNode::Rend::Rend <span class='attr'>[C2]</span>&#160;<span class='sym_p'><span>(&#160;TerrainQuadTreeNode* <span class='color_p'>parent</span></span>&#160;)</span></span>
+<br/>
+<div id="c_33" style="display:none;">
+<span class='mngl'>_ZN4Ogre19TerrainQuadTreeNode4RendC2EPS0_</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_34')">
+TerrainQuadTreeNode::Rend::~Rend <span class='attr'>[D0]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_34" style="display:none;">
+<span class='mngl'>_ZN4Ogre19TerrainQuadTreeNode4RendD0Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_35')">
+TerrainQuadTreeNode::Rend::~Rend <span class='attr'>[D1]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_35" style="display:none;">
+<span class='mngl'>_ZN4Ogre19TerrainQuadTreeNode4RendD1Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_36')">
+TerrainQuadTreeNode::Rend::~Rend <span class='attr'>[D2]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_36" style="display:none;">
+<span class='mngl'>_ZN4Ogre19TerrainQuadTreeNode4RendD2Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_37')">
+TerrainQuadTreeNode::updateRenderQueue&#160;<span class='sym_p'><span>(&#160;RenderQueue* <span class='color_p'>queue</span></span>&#160;)</span></span>
+<br/>
+<div id="c_37" style="display:none;">
+<span class='mngl'>_ZN4Ogre19TerrainQuadTreeNode17updateRenderQueueEPNS_11RenderQueueE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_38')">
+vtable for TerrainQuadTreeNode::Movable <span class='attr'>[data]</span></span>
+<br/>
+<div id="c_38" style="display:none;">
+<span class='mngl'>_ZTVN4Ogre19TerrainQuadTreeNode7MovableE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_39')">
+vtable for TerrainQuadTreeNode::Rend <span class='attr'>[data]</span></span>
+<br/>
+<div id="c_39" style="display:none;">
+<span class='mngl'>_ZTVN4Ogre19TerrainQuadTreeNode4RendE</span>
+<br/>
+<br/>
+</div>
+
+<br/>
+<a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='High_Risk_Problems'></a><a name='Type_Problems_High'></a>
+<h2>Problems with Data Types, High Severity <span class='failed'>&nbsp;12&nbsp;</span></h2><hr/>
+<span class='h_name'>OgreTerrain.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_40')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> Terrain <span class='failed'>&nbsp;4&nbsp;</span></span>
+<br/>
+<div id="c_40" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Field <b>mCpuColourMapStorage</b> has been removed from the middle position of this structural type.</td>
+<td>1) Previous accesses of applications to the removed field will be incorrect.<br/>2) Layout of structure fields has been changed and therefore fields at higher positions of the structure definition may be incorrectly accessed by applications.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>Field <b>mCpuCompositeMapStorage</b> has been removed from the middle position of this structural type.</td>
+<td>1) Previous accesses of applications to the removed field will be incorrect.<br/>2) Layout of structure fields has been changed and therefore fields at higher positions of the structure definition may be incorrectly accessed by applications.</td>
+</tr>
+<tr>
+<th>3</th>
+<td>Field <b>mCpuLightmapStorage</b> has been removed from the middle position of this structural type.</td>
+<td>1) Previous accesses of applications to the removed field will be incorrect.<br/>2) Layout of structure fields has been changed and therefore fields at higher positions of the structure definition may be incorrectly accessed by applications.</td>
+</tr>
+<tr>
+<th>4</th>
+<td>Size of this class has been increased from <b>968</b> bytes to <b>1160</b> bytes.</td>
+<td>1) An object of this class can be allocated by the applications and old size will be hardcoded at the compile time. Call of any exported constructor will break the memory of neighboring objects on the stack or heap.<br/>2) The memory layout and size of subclasses will be changed.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_41')">
+[+] affected symbols: 216 (44.4%)</span>
+<div id="c_41" style="display:none;">
+<div class='affected'><span class='iname_a'>TerrainGroup::TerrainSlot::freeInstance&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.instance&#39; in the object of this method has base type &#39;Terrain&#39;.</div>
+<span class='iname_a'>TerrainGroup::TerrainSlot::~TerrainSlot&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.instance&#39; in the object of this method has base type &#39;Terrain&#39;.</div>
+<span class='iname_a'>TerrainGroup::getTerrainSlot&#160;<span class='sym_p'><span>(&#160;long <i>x</i></span>, <span>long <i>y</i></span>, <span>bool <i>createIfMissing</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;retval.instance&#39; in the return value (pointer) has base type &#39;Terrain&#39;.</div>
+<span class='iname_a'>TerrainGroup::loadTerrainImpl&#160;<span class='sym_p'><span>(&#160;struct TerrainGroup::TerrainSlot* <span class='fp'>slot</span></span>, <span>bool <i>synchronous</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;slot.instance&#39; in 1st parameter &#39;slot&#39; (pointer) has base type &#39;Terrain&#39;.</div>
+<span class='iname_a'>TerrainGroup::connectNeighbour&#160;<span class='sym_p'><span>(&#160;struct TerrainGroup::TerrainSlot* <span class='fp'>slot</span></span>, <span>long <i>offsetx</i></span>, <span>long <i>offsety</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;slot.instance&#39; in 1st parameter &#39;slot&#39; (pointer) has base type &#39;Terrain&#39;.</div>
+<span class='iname_a'>TerrainGroup::freeTerrainSlotInstance&#160;<span class='sym_p'><span>(&#160;struct TerrainGroup::TerrainSlot* <span class='fp'>slot</span></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;slot.instance&#39; in 1st parameter &#39;slot&#39; (pointer) has base type &#39;Terrain&#39;.</div>
+<span class='iname_a'>TerrainGroup::getHeightAtWorldPosition&#160;<span class='sym_p'><span>(&#160;Real <i>x</i></span>, <span>Real <i>y</i></span>, <span>Real <i>z</i></span>, <span>Terrain** <span class='fp'>ppTerrain</span></span>&#160;)</span></span><br/>
+<div class='affect'>4th parameter &#39;ppTerrain&#39; (pointer) has base type &#39;Terrain&#39;.</div>
+<span class='iname_a'>TerrainGroup::getHeightAtWorldPosition&#160;<span class='sym_p'><span>(&#160;Vector3 const&amp; <i>pos</i></span>, <span>Terrain** <span class='fp'>ppTerrain</span></span>&#160;)</span></span><br/>
+<div class='affect'>2nd parameter &#39;ppTerrain&#39; (pointer) has base type &#39;Terrain&#39;.</div>
+<span class='iname_a'>TerrainLodManager::TerrainLodManager&#160;<span class='sym_p'><span>(&#160;Terrain* <span class='fp'>t</span></span>, <span>String const&amp; <i>filename</i></span>&#160;)</span></span><br/>
+<div class='affect'>1st parameter &#39;t&#39; (pointer) has base type &#39;Terrain&#39;.</div>
+<span class='iname_a'>TerrainLodManager::TerrainLodManager&#160;<span class='sym_p'><span>(&#160;Terrain* <span class='fp'>t</span></span>, <span>DataStreamPtr&amp; <i>stream</i></span>&#160;)</span></span><br/>
+<div class='affect'>1st parameter &#39;t&#39; (pointer) has base type &#39;Terrain&#39;.</div>
+ <b>...</b>
+<br/>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<span class='h_name'>OgreTerrainLayerBlendMap.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_42')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> TerrainLayerBlendMap <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_42" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Size of this class has been changed from <b>64</b> bytes to <b>112</b> bytes.</td>
+<td>1) The class has only inline or auto-generated constructors which will be copied to applications at compile time and will allocate an older memory layout. Call of any exported method of this class may access a memory outside the allocated objects or inside the older memory structure and result in crash or incorrect behavior of applications.<br/>2) The memory layout and size of subclasses will be changed.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_43')">
+[+] affected symbols: 21 (4.3%)</span>
+<div id="c_43" style="display:none;">
+<div class='affected'><span class='iname_a'>TerrainLayerBlendMap::getBlendValue&#160;<span class='sym_p'><span>(&#160;size_t <i>x</i></span>, <span>size_t <i>y</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;TerrainLayerBlendMap&#39; class.</div>
+<span class='iname_a'>TerrainLayerBlendMap::setBlendValue&#160;<span class='sym_p'><span>(&#160;size_t <i>x</i></span>, <span>size_t <i>y</i></span>, <span>float <i>val</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;TerrainLayerBlendMap&#39; class.</div>
+<span class='iname_a'>TerrainLayerBlendMap::getBlendPointer&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;TerrainLayerBlendMap&#39; class.</div>
+<span class='iname_a'>TerrainLayerBlendMap::convertImageToUVSpace&#160;<span class='sym_p'><span>(&#160;size_t <i>x</i></span>, <span>size_t <i>y</i></span>, <span>Real* <i>outX</i></span>, <span>Real* <i>outY</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;TerrainLayerBlendMap&#39; class.</div>
+<span class='iname_a'>TerrainLayerBlendMap::convertUVToImageSpace&#160;<span class='sym_p'><span>(&#160;Real <i>x</i></span>, <span>Real <i>y</i></span>, <span>size_t* <i>outX</i></span>, <span>size_t* <i>outY</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;TerrainLayerBlendMap&#39; class.</div>
+<span class='iname_a'>TerrainLayerBlendMap::convertUVToWorldSpace&#160;<span class='sym_p'><span>(&#160;Real <i>x</i></span>, <span>Real <i>y</i></span>, <span>Vector3* <i>outWorldPos</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;TerrainLayerBlendMap&#39; class.</div>
+<span class='iname_a'>TerrainLayerBlendMap::convertWorldToUVSpace&#160;<span class='sym_p'><span>(&#160;Vector3 const&amp; <i>worldPos</i></span>, <span>Real* <i>outX</i></span>, <span>Real* <i>outY</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;TerrainLayerBlendMap&#39; class.</div>
+<span class='iname_a'>TerrainLayerBlendMap::convertImageToTerrainSpace&#160;<span class='sym_p'><span>(&#160;size_t <i>x</i></span>, <span>size_t <i>y</i></span>, <span>Real* <i>outX</i></span>, <span>Real* <i>outY</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;TerrainLayerBlendMap&#39; class.</div>
+<span class='iname_a'>TerrainLayerBlendMap::convertTerrainToImageSpace&#160;<span class='sym_p'><span>(&#160;Real <i>x</i></span>, <span>Real <i>y</i></span>, <span>size_t* <i>outX</i></span>, <span>size_t* <i>outY</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;TerrainLayerBlendMap&#39; class.</div>
+<span class='iname_a'>TerrainLayerBlendMap::blit&#160;<span class='sym_p'><span>(&#160;PixelBox const&amp; <i>src</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;TerrainLayerBlendMap&#39; class.</div>
+ <b>...</b>
+<br/>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<span class='h_name'>OgreTerrainMaterialGenerator.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_44')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> TerrainMaterialGenerator <span class='failed'>&nbsp;2&nbsp;</span></span>
+<br/>
+<div id="c_44" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Field <b>mCamNode</b> has been removed from the middle position of this structural type.</td>
+<td>1) Previous accesses of applications to the removed field will be incorrect.<br/>2) Layout of structure fields has been changed and therefore fields at higher positions of the structure definition may be incorrectly accessed by applications.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>Size of this class has been changed from <b>160</b> bytes to <b>152</b> bytes.</td>
+<td>1) The class has only inline or auto-generated constructors which will be copied to applications at compile time and will allocate an older memory layout. Call of any exported method of this class may access a memory outside the allocated objects or inside the older memory structure and result in crash or incorrect behavior of applications.<br/>2) The memory layout and size of subclasses will be changed.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_45')">
+[+] affected symbols: 6 (1.2%)</span>
+<div id="c_45" style="display:none;">
+<div class='affected'><span class='iname_a'>TerrainMaterialGenerator::_renderCompositeMap&#160;<span class='sym_p'><span>(&#160;size_t <i>size</i></span>, <span>Rect const&amp; <i>rect</i></span>, <span>MaterialPtr const&amp; <i>mat</i></span>, <span>TexturePtr const&amp; <i>destCompositeMap</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;TerrainMaterialGenerator&#39; class.</div>
+<span class='iname_a'>TerrainMaterialGenerator::TerrainMaterialGenerator&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This constructor is from &#39;TerrainMaterialGenerator&#39; class.</div>
+<span class='iname_a'>TerrainMaterialGenerator::~TerrainMaterialGenerator&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This destructor is from &#39;TerrainMaterialGenerator&#39; class.</div>
+<span class='iname_a'>TerrainMaterialGeneratorA::SM2Profile::SM2Profile&#160;<span class='sym_p'><span>(&#160;TerrainMaterialGenerator* <span class='fp'>parent</span></span>, <span>String const&amp; <i>name</i></span>, <span>String const&amp; <i>desc</i></span>&#160;)</span></span><br/>
+<div class='affect'>1st parameter &#39;parent&#39; (pointer) has base type &#39;TerrainMaterialGenerator&#39;.</div>
+<span class='iname_a'>TerrainMaterialGeneratorA::TerrainMaterialGeneratorA&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This constructor is from derived class &#39;TerrainMaterialGeneratorA&#39;.</div>
+<span class='iname_a'>TerrainMaterialGeneratorA::~TerrainMaterialGeneratorA&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This destructor is from derived class &#39;TerrainMaterialGeneratorA&#39;.</div>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<span class='h_name'>OgreTerrainMaterialGeneratorA.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_46')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> TerrainMaterialGeneratorA <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_46" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Size of this class has been changed from <b>160</b> bytes to <b>152</b> bytes.</td>
+<td>1) The class has only inline or auto-generated constructors which will be copied to applications at compile time and will allocate an older memory layout. Call of any exported method of this class may access a memory outside the allocated objects or inside the older memory structure and result in crash or incorrect behavior of applications.<br/>2) The memory layout and size of subclasses will be changed.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_47')">
+[+] affected symbols: 2 (0.4%)</span>
+<div id="c_47" style="display:none;">
+<div class='affected'><span class='iname_a'>TerrainMaterialGeneratorA::TerrainMaterialGeneratorA&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This constructor is from &#39;TerrainMaterialGeneratorA&#39; class.</div>
+<span class='iname_a'>TerrainMaterialGeneratorA::~TerrainMaterialGeneratorA&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This destructor is from &#39;TerrainMaterialGeneratorA&#39; class.</div>
+</div>
+</div>
+<br/><br/></div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_48')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> TerrainMaterialGeneratorA::SM2Profile <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_48" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Size of this class has been changed from <b>144</b> bytes to <b>112</b> bytes.</td>
+<td>1) The class has only inline or auto-generated constructors which will be copied to applications at compile time and will allocate an older memory layout. Call of any exported method of this class may access a memory outside the allocated objects or inside the older memory structure and result in crash or incorrect behavior of applications.<br/>2) The memory layout and size of subclasses will be changed.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_49')">
+[+] affected symbols: 19 (3.9%)</span>
+<div id="c_49" style="display:none;">
+<div class='affected'><span class='iname_a'>TerrainMaterialGeneratorA::SM2Profile::addTechnique&#160;<span class='sym_p'><span>(&#160;MaterialPtr const&amp; <i>mat</i></span>, <span>Terrain const* <i>terrain</i></span>, <span>enum TechniqueType <i>tt</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;TerrainMaterialGeneratorA::SM2Profile&#39; class.</div>
+<span class='iname_a'>TerrainMaterialGeneratorA::SM2Profile::updateParams&#160;<span class='sym_p'><span>(&#160;MaterialPtr const&amp; <i>mat</i></span>, <span>Terrain const* <i>terrain</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;TerrainMaterialGeneratorA::SM2Profile&#39; class.</div>
+<span class='iname_a'>TerrainMaterialGeneratorA::SM2Profile::requestOptions&#160;<span class='sym_p'><span>(&#160;Terrain* <i>terrain</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;TerrainMaterialGeneratorA::SM2Profile&#39; class.</div>
+<span class='iname_a'>TerrainMaterialGeneratorA::SM2Profile::setLightmapEnabled&#160;<span class='sym_p'><span>(&#160;bool <i>enabled</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;TerrainMaterialGeneratorA::SM2Profile&#39; class.</div>
+<span class='iname_a'>TerrainMaterialGeneratorA::SM2Profile::setCompositeMapEnabled&#160;<span class='sym_p'><span>(&#160;bool <i>enabled</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;TerrainMaterialGeneratorA::SM2Profile&#39; class.</div>
+<span class='iname_a'>TerrainMaterialGeneratorA::SM2Profile::generateForCompositeMap&#160;<span class='sym_p'><span>(&#160;Terrain const* <i>terrain</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;TerrainMaterialGeneratorA::SM2Profile&#39; class.</div>
+<span class='iname_a'>TerrainMaterialGeneratorA::SM2Profile::setGlobalColourMapEnabled&#160;<span class='sym_p'><span>(&#160;bool <i>enabled</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;TerrainMaterialGeneratorA::SM2Profile&#39; class.</div>
+<span class='iname_a'>TerrainMaterialGeneratorA::SM2Profile::updateParamsForCompositeMap&#160;<span class='sym_p'><span>(&#160;MaterialPtr const&amp; <i>mat</i></span>, <span>Terrain const* <i>terrain</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;TerrainMaterialGeneratorA::SM2Profile&#39; class.</div>
+<span class='iname_a'>TerrainMaterialGeneratorA::SM2Profile::setReceiveDynamicShadowsPSSM&#160;<span class='sym_p'><span>(&#160;PSSMShadowCameraSetup* <i>pssmSettings</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;TerrainMaterialGeneratorA::SM2Profile&#39; class.</div>
+<span class='iname_a'>TerrainMaterialGeneratorA::SM2Profile::setReceiveDynamicShadowsDepth&#160;<span class='sym_p'><span>(&#160;bool <i>enabled</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;TerrainMaterialGeneratorA::SM2Profile&#39; class.</div>
+ <b>...</b>
+<br/>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<span class='h_name'>OgreTerrainQuadTreeNode.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_50')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> TerrainQuadTreeNode <span class='failed'>&nbsp;3&nbsp;</span></span>
+<br/>
+<div id="c_50" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Field <b>mMovable</b> has been removed from the middle position of this structural type.</td>
+<td>1) Previous accesses of applications to the removed field will be incorrect.<br/>2) Layout of structure fields has been changed and therefore fields at higher positions of the structure definition may be incorrectly accessed by applications.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>Size of this class has been changed from <b>208</b> bytes to <b>504</b> bytes.</td>
+<td>1) The class has only inline or auto-generated constructors which will be copied to applications at compile time and will allocate an older memory layout. Call of any exported method of this class may access a memory outside the allocated objects or inside the older memory structure and result in crash or incorrect behavior of applications.<br/>2) The memory layout and size of subclasses will be changed.</td>
+</tr>
+<tr>
+<th>3</th>
+<td>Base class <b>Renderable</b> has been added.</td>
+<td>The layout of v-table in this class has been changed.</td>
+</tr>
+</table>
+<span class="sect_info" onclick="javascript:showContent(this, 'c_51')">
+[+] show v-table (old and new)</span>
+<br/>
+<div id="c_51" style="display:none;">
+<table class='vtable'><tr><th>Offset</th><th>Virtual Table (Old) - 4 entries</th><th>Virtual Table (New) - 64 entries</th></tr><tr><th>0</th>
+<td>(int (*)(...)) 0</td>
+<td>(int (*)(...)) 0</td></tr>
+<tr><th>8</th>
+<td>(int (*)(...)) (&amp; typeinfo for TerrainQuadTreeNode)</td>
+<td>(int (*)(...)) (&amp; typeinfo for TerrainQuadTreeNode)</td></tr>
+<tr><th>16</th>
+<td>~TerrainQuadTreeNode</td>
+<td>~TerrainQuadTreeNode</td></tr>
+<tr><th>24</th>
+<td>~TerrainQuadTreeNode</td>
+<td>~TerrainQuadTreeNode</td></tr>
+<tr><th>32</th>
+<td></td>
+<td class='warning'>TerrainQuadTreeNode::getMaterial() const</td></tr>
+<tr><th>40</th>
+<td></td>
+<td class='warning'>TerrainQuadTreeNode::getTechnique() const</td></tr>
+<tr><th>48</th>
+<td></td>
+<td class='warning'>TerrainQuadTreeNode::getRenderOperation(RenderOperation&amp;)</td></tr>
+<tr><th>56</th>
+<td></td>
+<td>(int (*)(...)) 0x58c42</td></tr>
+<tr><th>64</th>
+<td></td>
+<td>(int (*)(...)) 0x58c4c</td></tr>
+<tr><th>72</th>
+<td></td>
+<td class='warning'>TerrainQuadTreeNode::getWorldTransforms(Matrix4*) const</td></tr>
+<tr><th>80</th>
+<td></td>
+<td>(int (*)(...)) 0x58c52</td></tr>
+<tr><th>88</th>
+<td></td>
+<td class='warning'>TerrainQuadTreeNode::getSquaredViewDepth(Camera const*) const</td></tr>
+<tr><th>96</th>
+<td></td>
+<td class='warning'>TerrainQuadTreeNode::getLights() const</td></tr>
+<tr><th>104</th>
+<td></td>
+<td class='warning'>TerrainQuadTreeNode::getCastsShadows() const</td></tr>
+<tr><th>112</th>
+<td></td>
+<td class='warning'>Renderable::_updateCustomGpuParameter(GpuProgramParameters::AutoConstantEntry const&amp;, GpuProgramParameters*) const</td></tr>
+<tr><th>120</th>
+<td></td>
+<td>(int (*)(...)) 0x58d4a</td></tr>
+<tr><th>128</th>
+<td></td>
+<td class='warning'>TerrainQuadTreeNode::getBoundingRadius() const</td></tr>
+<tr><th>136</th>
+<td></td>
+<td class='warning'>TerrainQuadTreeNode::isVisible() const</td></tr>
+<tr><th>144</th>
+<td></td>
+<td class='warning'>TerrainQuadTreeNode::getMovableType[abi:cxx11]() const</td></tr>
+<tr><th>152</th>
+<td></td>
+<td class='warning'>TerrainQuadTreeNode::_updateRenderQueue(RenderQueue*)</td></tr>
+<tr><th>160</th>
+<td></td>
+<td class='warning'>TerrainQuadTreeNode::visitRenderables(Renderable::Visitor*, bool)</td></tr>
+<tr><th>168</th>
+<td></td>
+<td class='warning'>(int (*)(...)) -0x00000000000058</td></tr>
+<tr><th>176</th>
+<td></td>
+<td class='warning'>(int (*)(...)) (&amp; typeinfo for TerrainQuadTreeNode)</td></tr>
+<tr><th>184</th>
+<td></td>
+<td class='warning'>non-virtual thunk to ~TerrainQuadTreeNode</td></tr>
+<tr><th>192</th>
+<td></td>
+<td class='warning'>non-virtual thunk to ~TerrainQuadTreeNode</td></tr>
+<tr><th>200</th>
+<td></td>
+<td>(int (*)(...)) 0x58d3a</td></tr>
+<tr><th>208</th>
+<td></td>
+<td>(int (*)(...)) 0x58d30</td></tr>
+<tr><th>216</th>
+<td></td>
+<td class='warning'>MovableObject::getWorldBoundingBox(bool) const</td></tr>
+<tr><th>224</th>
+<td></td>
+<td class='warning'>MovableObject::getLightCapBounds() const</td></tr>
+<tr><th>232</th>
+<td></td>
+<td class='warning'>MovableObject::getDarkCapBounds(Light const&amp;, float) const</td></tr>
+<tr><th>240</th>
+<td></td>
+<td class='warning'>MovableObject::getShadowVolumeRenderableList(ShadowTechnique, Light const*, SharedPtr&lt;HardwareIndexBuffer&gt;*, unsigned long*, bool, float, unsigned long)</td></tr>
+<tr><th>248</th>
+<td></td>
+<td>(int (*)(...)) 0x58eac</td></tr>
+<tr><th>256</th>
+<td></td>
+<td class='warning'>MovableObject::getPointExtrusionDistance(Light const*) const</td></tr>
+<tr><th>264</th>
+<td></td>
+<td class='warning'>ShadowCaster::updateEdgeListLightFacing(EdgeData*, Vector&lt;4, float&gt; const&amp;)</td></tr>
+<tr><th>272</th>
+<td></td>
+<td class='warning'>ShadowCaster::generateShadowVolume(EdgeData*, SharedPtr&lt;HardwareIndexBuffer&gt; const&amp;, unsigned long&amp;, Light const*, std::vector&lt;ShadowRenderable*, std::allocator&lt;ShadowRenderable*&gt; &gt;&amp;, unsigned long)</td></tr>
+<tr><th>280</th>
+<td></td>
+<td class='warning'>ShadowCaster::extrudeBounds(AxisAlignedBox&amp;, Vector&lt;4, float&gt; const&amp;, float) const</td></tr>
+<tr><th>288</th>
+<td></td>
+<td>(int (*)(...)) 0x58d00</td></tr>
+<tr><th>296</th>
+<td></td>
+<td>(int (*)(...)) 0x58d0a</td></tr>
+<tr><th>304</th>
+<td></td>
+<td>(int (*)(...)) 0x58d14</td></tr>
+<tr><th>312</th>
+<td></td>
+<td>(int (*)(...)) 0x58d1a</td></tr>
+<tr><th>320</th>
+<td></td>
+<td class='warning'>non-virtual thunk to TerrainQuadTreeNode::getMovableType[abi:cxx11]() const</td></tr>
+<tr><th>328</th>
+<td></td>
+<td class='warning'>MovableObject::_notifyAttached(Node*, bool)</td></tr>
+<tr><th>336</th>
+<td></td>
+<td class='warning'>MovableObject::isInScene() const</td></tr>
+<tr><th>344</th>
+<td></td>
+<td class='warning'>MovableObject::_notifyMoved()</td></tr>
+<tr><th>352</th>
+<td></td>
+<td class='warning'>MovableObject::_notifyCurrentCamera(Camera*)</td></tr>
+<tr><th>360</th>
+<td></td>
+<td>(int (*)(...)) 0x58d56</td></tr>
+<tr><th>368</th>
+<td></td>
+<td class='warning'>non-virtual thunk to TerrainQuadTreeNode::getBoundingRadius() const</td></tr>
+<tr><th>376</th>
+<td></td>
+<td class='warning'>MovableObject::getWorldBoundingSphere(bool) const</td></tr>
+<tr><th>384</th>
+<td></td>
+<td class='warning'>non-virtual thunk to TerrainQuadTreeNode::_updateRenderQueue(RenderQueue*)</td></tr>
+<tr><th>392</th>
+<td></td>
+<td class='warning'>non-virtual thunk to TerrainQuadTreeNode::isVisible() const</td></tr>
+<tr><th>400</th>
+<td></td>
+<td class='warning'>MovableObject::setRenderQueueGroup(unsigned char)</td></tr>
+<tr><th>408</th>
+<td></td>
+<td class='warning'>MovableObject::setRenderQueueGroupAndPriority(unsigned char, unsigned short)</td></tr>
+<tr><th>416</th>
+<td></td>
+<td class='warning'>MovableObject::_getParentNodeFullTransform() const</td></tr>
+<tr><th>424</th>
+<td></td>
+<td>(int (*)(...)) 0x58d20</td></tr>
+<tr><th>432</th>
+<td></td>
+<td>(int (*)(...)) 0x58d28</td></tr>
+<tr><th>440</th>
+<td></td>
+<td class='warning'>MovableObject::getTypeFlags() const</td></tr>
+<tr><th>448</th>
+<td></td>
+<td class='warning'>non-virtual thunk to TerrainQuadTreeNode::visitRenderables(Renderable::Visitor*, bool)</td></tr>
+<tr><th>456</th>
+<td></td>
+<td class='warning'>(int (*)(...)) -0x00000000000060</td></tr>
+<tr><th>464</th>
+<td></td>
+<td class='warning'>(int (*)(...)) (&amp; typeinfo for TerrainQuadTreeNode)</td></tr>
+<tr><th>472</th>
+<td></td>
+<td>(int (*)(...)) 0x58cee</td></tr>
+<tr><th>480</th>
+<td></td>
+<td>(int (*)(...)) 0x58cfa</td></tr>
+<tr><th>488</th>
+<td></td>
+<td class='warning'>non-virtual thunk to ~TerrainQuadTreeNode</td></tr>
+<tr><th>496</th>
+<td></td>
+<td class='warning'>non-virtual thunk to ~TerrainQuadTreeNode</td></tr>
+<tr><th>504</th>
+<td></td>
+<td>(int (*)(...)) 0x58f30</td></tr>
+</table><br/>
+</div>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_52')">
+[+] affected symbols: 246 (50.5%)</span>
+<div id="c_52" style="display:none;">
+<div class='affected'><span class='iname_a'>TerrainGroup::TerrainSlot::freeInstance&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.instance.mQuadTree&#39; in the object of this method has base type &#39;TerrainQuadTreeNode&#39;.</div>
+<span class='iname_a'>TerrainGroup::TerrainSlot::~TerrainSlot&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.instance.mQuadTree&#39; in the object of this method has base type &#39;TerrainQuadTreeNode&#39;.</div>
+<span class='iname_a'>TerrainGroup::getTerrainSlot&#160;<span class='sym_p'><span>(&#160;long <i>x</i></span>, <span>long <i>y</i></span>, <span>bool <i>createIfMissing</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;retval.instance.mQuadTree&#39; in the return value (pointer) has base type &#39;TerrainQuadTreeNode&#39;.</div>
+<span class='iname_a'>TerrainGroup::loadTerrainImpl&#160;<span class='sym_p'><span>(&#160;struct TerrainGroup::TerrainSlot* <span class='fp'>slot</span></span>, <span>bool <i>synchronous</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;slot.instance.mQuadTree&#39; in 1st parameter &#39;slot&#39; (pointer) has base type &#39;TerrainQuadTreeNode&#39;.</div>
+<span class='iname_a'>TerrainGroup::connectNeighbour&#160;<span class='sym_p'><span>(&#160;struct TerrainGroup::TerrainSlot* <span class='fp'>slot</span></span>, <span>long <i>offsetx</i></span>, <span>long <i>offsety</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;slot.instance.mQuadTree&#39; in 1st parameter &#39;slot&#39; (pointer) has base type &#39;TerrainQuadTreeNode&#39;.</div>
+<span class='iname_a'>TerrainGroup::freeTerrainSlotInstance&#160;<span class='sym_p'><span>(&#160;struct TerrainGroup::TerrainSlot* <span class='fp'>slot</span></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;slot.instance.mQuadTree&#39; in 1st parameter &#39;slot&#39; (pointer) has base type &#39;TerrainQuadTreeNode&#39;.</div>
+<span class='iname_a'>TerrainGroup::getHeightAtWorldPosition&#160;<span class='sym_p'><span>(&#160;Real <i>x</i></span>, <span>Real <i>y</i></span>, <span>Real <i>z</i></span>, <span>Terrain** <span class='fp'>ppTerrain</span></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;ppTerrain.mQuadTree&#39; in 4th parameter &#39;ppTerrain&#39; (pointer) has base type &#39;TerrainQuadTreeNode&#39;.</div>
+<span class='iname_a'>TerrainGroup::getHeightAtWorldPosition&#160;<span class='sym_p'><span>(&#160;Vector3 const&amp; <i>pos</i></span>, <span>Terrain** <span class='fp'>ppTerrain</span></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;ppTerrain.mQuadTree&#39; in 2nd parameter &#39;ppTerrain&#39; (pointer) has base type &#39;TerrainQuadTreeNode&#39;.</div>
+<span class='iname_a'>TerrainLodManager::TerrainLodManager&#160;<span class='sym_p'><span>(&#160;Terrain* <span class='fp'>t</span></span>, <span>String const&amp; <i>filename</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;t.mQuadTree&#39; in 1st parameter &#39;t&#39; (pointer) has base type &#39;TerrainQuadTreeNode&#39;.</div>
+<span class='iname_a'>TerrainLodManager::TerrainLodManager&#160;<span class='sym_p'><span>(&#160;Terrain* <span class='fp'>t</span></span>, <span>DataStreamPtr&amp; <i>stream</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;t.mQuadTree&#39; in 1st parameter &#39;t&#39; (pointer) has base type &#39;TerrainQuadTreeNode&#39;.</div>
+ <b>...</b>
+<br/>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='Symbol_Problems_High'></a><a name='Interface_Problems_High'></a>
+<h2>Problems with Symbols, High Severity <span class='failed'>&nbsp;1&nbsp;</span></h2><hr/>
+<span class='h_name'>OgreTerrain.h</span>, <span class='lib_name'>libOgreTerrain.so.1.11.6</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_53')">
+<span class='ext'>[+]</span> Terrain::getPointTransform&#160;<span class='sym_p'><span>(&#160;Matrix4* <span class='color_p'>outXform</span></span>&#160;)</span> const <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_53" style="display:none;">
+
+
+<span class='new_sign_lbl'>&#8675;</span>
+<br/>
+<span class='new_sign'>Terrain::getPointTransform&#160;<span class='sym_p'>(&#160;)</span> const</span><br/>
+<span class='mngl pleft'>_ZNK4Ogre7Terrain17getPointTransformEPNS_7Matrix4E</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>Parameters list has been changed.</td>
+<td>The name of the appropriate symbol for this function on binary level has been changed from <b>_ZNK4Ogre7Terrain17getPointTransformEPNS_7Matrix4E</b> to <b>_ZNK4Ogre7Terrain17getPointTransformEv</b>. This may cause undefined reference linker error in old client applications.</td>
+</tr>
+</table>
+<br/>
+</div>
+<br/>
+<a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='Medium_Risk_Problems'></a><a name='Type_Problems_Medium'></a>
+<h2>Problems with Data Types, Medium Severity <span class='failed'>&nbsp;44&nbsp;</span></h2><hr/>
+<span class='h_name'>OgreTerrain.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_54')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> Terrain <span class='failed'>&nbsp;28&nbsp;</span></span>
+<br/>
+<div id="c_54" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Field <b>mCpuColourMap</b> has been added at the middle position of this structural type.</td>
+<td>1) Size of the inclusive type has been changed.<br/>2) Layout of structure fields has been changed and therefore fields at higher positions of the structure definition may be incorrectly accessed by applications.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>Field <b>mCpuCompositeMap</b> has been added at the middle position of this structural type.</td>
+<td>1) Size of the inclusive type has been changed.<br/>2) Layout of structure fields has been changed and therefore fields at higher positions of the structure definition may be incorrectly accessed by applications.</td>
+</tr>
+<tr>
+<th>3</th>
+<td>Field <b>mCpuLightmap</b> has been added at the middle position of this structural type.</td>
+<td>1) Size of the inclusive type has been changed.<br/>2) Layout of structure fields has been changed and therefore fields at higher positions of the structure definition may be incorrectly accessed by applications.</td>
+</tr>
+<tr>
+<th>4</th>
+<td>Type of field <b>mCpuTerrainNormalMap</b> has been changed from <span class='nowrap'><b>PixelBox*</b> (<b>8</b> bytes)</span> to <span class='nowrap'><b>Image</b> (<b>56</b> bytes)</span>.</td>
+<td>1) Size of the inclusive type has been changed.<br/>2) Previous accesses of applications and library functions to this field and fields at higher positions of the structure definition may be broken.</td>
+</tr>
+<tr>
+<th>5</th>
+<td>The relative position of field <b>mColourMap</b> has been changed from <b>49</b> to <b>48</b>.</td>
+<td>1) Applications will access incorrect memory when attempting to access this field.<br/>2) Size of the inclusive type has been changed.</td>
+</tr>
+<tr>
+<th>6</th>
+<td>The relative position of field <b>mCompositeMap</b> has been changed from <b>55</b> to <b>54</b>.</td>
+<td>1) Applications will access incorrect memory when attempting to access this field.<br/>2) Size of the inclusive type has been changed.</td>
+</tr>
+<tr>
+<th>7</th>
+<td>The relative position of field <b>mCompositeMapDirtyRect</b> has been changed from <b>56</b> to <b>55</b>.</td>
+<td>1) Applications will access incorrect memory when attempting to access this field.<br/>2) Size of the inclusive type has been changed.</td>
+</tr>
+<tr>
+<th>8</th>
+<td>The relative position of field <b>mCompositeMapDirtyRectLightmapUpdate</b> has been changed from <b>59</b> to <b>58</b>.</td>
+<td>1) Applications will access incorrect memory when attempting to access this field.<br/>2) Size of the inclusive type has been changed.</td>
+</tr>
+<tr>
+<th>9</th>
+<td>The relative position of field <b>mCompositeMapMaterial</b> has been changed from <b>60</b> to <b>59</b>.</td>
+<td>1) Applications will access incorrect memory when attempting to access this field.<br/>2) Size of the inclusive type has been changed.</td>
+</tr>
+<tr>
+<th>10</th>
+<td>The relative position of field <b>mCompositeMapRequired</b> has been changed from <b>65</b> to <b>66</b>.</td>
+<td>1) Applications will access incorrect memory when attempting to access this field.<br/>2) Size of the inclusive type has been changed.</td>
+</tr>
+<tr>
+<th>11</th>
+<td>The relative position of field <b>mCompositeMapSize</b> has been changed from <b>53</b> to <b>52</b>.</td>
+<td>1) Applications will access incorrect memory when attempting to access this field.<br/>2) Size of the inclusive type has been changed.</td>
+</tr>
+<tr>
+<th>12</th>
+<td>The relative position of field <b>mCompositeMapUpdateCountdown</b> has been changed from <b>57</b> to <b>56</b>.</td>
+<td>1) Applications will access incorrect memory when attempting to access this field.<br/>2) Size of the inclusive type has been changed.</td>
+</tr>
+<tr>
+<th>13</th>
+<td>The relative position of field <b>mCpuBlendMapStorage</b> has been changed from <b>44</b> to <b>60</b>.</td>
+<td>1) Applications will access incorrect memory when attempting to access this field.<br/>2) Size of the inclusive type has been changed.</td>
+</tr>
+<tr>
+<th>14</th>
+<td>The relative position of field <b>mCpuTerrainNormalMap</b> has been changed from <b>67</b> to <b>61</b>.</td>
+<td>1) Applications will access incorrect memory when attempting to access this field.<br/>2) Size of the inclusive type has been changed.</td>
+</tr>
+<tr>
+<th>15</th>
+<td>The relative position of field <b>mGlobalColourMapEnabled</b> has been changed from <b>48</b> to <b>47</b>.</td>
+<td>1) Applications will access incorrect memory when attempting to access this field.<br/>2) Size of the inclusive type has been changed.</td>
+</tr>
+<tr>
+<th>16</th>
+<td>The relative position of field <b>mGlobalColourMapSize</b> has been changed from <b>47</b> to <b>46</b>.</td>
+<td>1) Applications will access incorrect memory when attempting to access this field.<br/>2) Size of the inclusive type has been changed.</td>
+</tr>
+<tr>
+<th>17</th>
+<td>The relative position of field <b>mLightmap</b> has been changed from <b>52</b> to <b>51</b>.</td>
+<td>1) Applications will access incorrect memory when attempting to access this field.<br/>2) Size of the inclusive type has been changed.</td>
+</tr>
+<tr>
+<th>18</th>
+<td>The relative position of field <b>mLightmapSize</b> has been changed from <b>50</b> to <b>49</b>.</td>
+<td>1) Applications will access incorrect memory when attempting to access this field.<br/>2) Size of the inclusive type has been changed.</td>
+</tr>
+<tr>
+<th>19</th>
+<td>The relative position of field <b>mTerrainNormalMap</b> has been changed from <b>66</b> to <b>67</b>.</td>
+<td>1) Applications will access incorrect memory when attempting to access this field.<br/>2) Size of the inclusive type has been changed.</td>
+</tr>
+<tr>
+<th>20</th>
+<td>The relative position of field <b>mBlendTextureList</b> has been changed from <b>45</b> to <b>44</b>.</td>
+<td>Applications will access incorrect memory when attempting to access this field.</td>
+</tr>
+<tr>
+<th>21</th>
+<td>The relative position of field <b>mCompositeMapSizeActual</b> has been changed from <b>54</b> to <b>53</b>.</td>
+<td>Applications will access incorrect memory when attempting to access this field.</td>
+</tr>
+<tr>
+<th>22</th>
+<td>The relative position of field <b>mLastMillis</b> has been changed from <b>58</b> to <b>57</b>.</td>
+<td>Applications will access incorrect memory when attempting to access this field.</td>
+</tr>
+<tr>
+<th>23</th>
+<td>The relative position of field <b>mLayerBlendMapList</b> has been changed from <b>46</b> to <b>45</b>.</td>
+<td>Applications will access incorrect memory when attempting to access this field.</td>
+</tr>
+<tr>
+<th>24</th>
+<td>The relative position of field <b>mLightMapRequired</b> has been changed from <b>63</b> to <b>64</b>.</td>
+<td>Applications will access incorrect memory when attempting to access this field.</td>
+</tr>
+<tr>
+<th>25</th>
+<td>The relative position of field <b>mLightMapShadowsOnly</b> has been changed from <b>64</b> to <b>65</b>.</td>
+<td>Applications will access incorrect memory when attempting to access this field.</td>
+</tr>
+<tr>
+<th>26</th>
+<td>The relative position of field <b>mLightmapSizeActual</b> has been changed from <b>51</b> to <b>50</b>.</td>
+<td>Applications will access incorrect memory when attempting to access this field.</td>
+</tr>
+<tr>
+<th>27</th>
+<td>The relative position of field <b>mLodMorphRequired</b> has been changed from <b>61</b> to <b>62</b>.</td>
+<td>Applications will access incorrect memory when attempting to access this field.</td>
+</tr>
+<tr>
+<th>28</th>
+<td>The relative position of field <b>mNormalMapRequired</b> has been changed from <b>62</b> to <b>63</b>.</td>
+<td>Applications will access incorrect memory when attempting to access this field.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_55')">
+[+] affected symbols: 216 (44.4%)</span>
+<div id="c_55" style="display:none;">
+<div class='affected'><span class='iname_a'>TerrainGroup::TerrainSlot::freeInstance&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.instance&#39; in the object of this method has base type &#39;Terrain&#39;.</div>
+<span class='iname_a'>TerrainGroup::TerrainSlot::~TerrainSlot&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.instance&#39; in the object of this method has base type &#39;Terrain&#39;.</div>
+<span class='iname_a'>TerrainGroup::getTerrainSlot&#160;<span class='sym_p'><span>(&#160;long <i>x</i></span>, <span>long <i>y</i></span>, <span>bool <i>createIfMissing</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;retval.instance&#39; in the return value (pointer) has base type &#39;Terrain&#39;.</div>
+<span class='iname_a'>TerrainGroup::loadTerrainImpl&#160;<span class='sym_p'><span>(&#160;struct TerrainGroup::TerrainSlot* <span class='fp'>slot</span></span>, <span>bool <i>synchronous</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;slot.instance&#39; in 1st parameter &#39;slot&#39; (pointer) has base type &#39;Terrain&#39;.</div>
+<span class='iname_a'>TerrainGroup::connectNeighbour&#160;<span class='sym_p'><span>(&#160;struct TerrainGroup::TerrainSlot* <span class='fp'>slot</span></span>, <span>long <i>offsetx</i></span>, <span>long <i>offsety</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;slot.instance&#39; in 1st parameter &#39;slot&#39; (pointer) has base type &#39;Terrain&#39;.</div>
+<span class='iname_a'>TerrainGroup::freeTerrainSlotInstance&#160;<span class='sym_p'><span>(&#160;struct TerrainGroup::TerrainSlot* <span class='fp'>slot</span></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;slot.instance&#39; in 1st parameter &#39;slot&#39; (pointer) has base type &#39;Terrain&#39;.</div>
+<span class='iname_a'>TerrainGroup::getHeightAtWorldPosition&#160;<span class='sym_p'><span>(&#160;Real <i>x</i></span>, <span>Real <i>y</i></span>, <span>Real <i>z</i></span>, <span>Terrain** <span class='fp'>ppTerrain</span></span>&#160;)</span></span><br/>
+<div class='affect'>4th parameter &#39;ppTerrain&#39; (pointer) has base type &#39;Terrain&#39;.</div>
+<span class='iname_a'>TerrainGroup::getHeightAtWorldPosition&#160;<span class='sym_p'><span>(&#160;Vector3 const&amp; <i>pos</i></span>, <span>Terrain** <span class='fp'>ppTerrain</span></span>&#160;)</span></span><br/>
+<div class='affect'>2nd parameter &#39;ppTerrain&#39; (pointer) has base type &#39;Terrain&#39;.</div>
+<span class='iname_a'>TerrainLodManager::TerrainLodManager&#160;<span class='sym_p'><span>(&#160;Terrain* <span class='fp'>t</span></span>, <span>String const&amp; <i>filename</i></span>&#160;)</span></span><br/>
+<div class='affect'>1st parameter &#39;t&#39; (pointer) has base type &#39;Terrain&#39;.</div>
+<span class='iname_a'>TerrainLodManager::TerrainLodManager&#160;<span class='sym_p'><span>(&#160;Terrain* <span class='fp'>t</span></span>, <span>DataStreamPtr&amp; <i>stream</i></span>&#160;)</span></span><br/>
+<div class='affect'>1st parameter &#39;t&#39; (pointer) has base type &#39;Terrain&#39;.</div>
+ <b>...</b>
+<br/>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<span class='h_name'>OgreTerrainLayerBlendMap.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_56')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> TerrainLayerBlendMap <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_56" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Type of field <b>mData</b> has been changed from <span class='nowrap'><b>float*</b> (<b>8</b> bytes)</span> to <span class='nowrap'><b>Image</b> (<b>56</b> bytes)</span>.</td>
+<td>1) This field may be incorrectly initialized or accessed by applications.<br/>2) Size of the inclusive type has been changed.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_57')">
+[+] affected symbols: 21 (4.3%)</span>
+<div id="c_57" style="display:none;">
+<div class='affected'><span class='iname_a'>TerrainLayerBlendMap::getBlendValue&#160;<span class='sym_p'><span>(&#160;size_t <i>x</i></span>, <span>size_t <i>y</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;TerrainLayerBlendMap&#39; class.</div>
+<span class='iname_a'>TerrainLayerBlendMap::setBlendValue&#160;<span class='sym_p'><span>(&#160;size_t <i>x</i></span>, <span>size_t <i>y</i></span>, <span>float <i>val</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;TerrainLayerBlendMap&#39; class.</div>
+<span class='iname_a'>TerrainLayerBlendMap::getBlendPointer&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;TerrainLayerBlendMap&#39; class.</div>
+<span class='iname_a'>TerrainLayerBlendMap::convertImageToUVSpace&#160;<span class='sym_p'><span>(&#160;size_t <i>x</i></span>, <span>size_t <i>y</i></span>, <span>Real* <i>outX</i></span>, <span>Real* <i>outY</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;TerrainLayerBlendMap&#39; class.</div>
+<span class='iname_a'>TerrainLayerBlendMap::convertUVToImageSpace&#160;<span class='sym_p'><span>(&#160;Real <i>x</i></span>, <span>Real <i>y</i></span>, <span>size_t* <i>outX</i></span>, <span>size_t* <i>outY</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;TerrainLayerBlendMap&#39; class.</div>
+<span class='iname_a'>TerrainLayerBlendMap::convertUVToWorldSpace&#160;<span class='sym_p'><span>(&#160;Real <i>x</i></span>, <span>Real <i>y</i></span>, <span>Vector3* <i>outWorldPos</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;TerrainLayerBlendMap&#39; class.</div>
+<span class='iname_a'>TerrainLayerBlendMap::convertWorldToUVSpace&#160;<span class='sym_p'><span>(&#160;Vector3 const&amp; <i>worldPos</i></span>, <span>Real* <i>outX</i></span>, <span>Real* <i>outY</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;TerrainLayerBlendMap&#39; class.</div>
+<span class='iname_a'>TerrainLayerBlendMap::convertImageToTerrainSpace&#160;<span class='sym_p'><span>(&#160;size_t <i>x</i></span>, <span>size_t <i>y</i></span>, <span>Real* <i>outX</i></span>, <span>Real* <i>outY</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;TerrainLayerBlendMap&#39; class.</div>
+<span class='iname_a'>TerrainLayerBlendMap::convertTerrainToImageSpace&#160;<span class='sym_p'><span>(&#160;Real <i>x</i></span>, <span>Real <i>y</i></span>, <span>size_t* <i>outX</i></span>, <span>size_t* <i>outY</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;TerrainLayerBlendMap&#39; class.</div>
+<span class='iname_a'>TerrainLayerBlendMap::blit&#160;<span class='sym_p'><span>(&#160;PixelBox const&amp; <i>src</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;TerrainLayerBlendMap&#39; class.</div>
+ <b>...</b>
+<br/>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<span class='h_name'>OgreTerrainMaterialGeneratorA.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_58')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> TerrainMaterialGeneratorA::SM2Profile <span class='failed'>&nbsp;3&nbsp;</span></span>
+<br/>
+<div id="c_58" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Field <b>mSM3Available</b> has been removed from this type.</td>
+<td>1) Applications will access incorrect memory when attempting to access this field.<br/>2) Size of the inclusive type has been changed.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>Field <b>mSM4Available</b> has been removed from this type.</td>
+<td>1) Applications will access incorrect memory when attempting to access this field.<br/>2) Size of the inclusive type has been changed.</td>
+</tr>
+<tr>
+<th>3</th>
+<td>Field <b>mShaderLanguage</b> has been removed from this type.</td>
+<td>1) Applications will access incorrect memory when attempting to access this field.<br/>2) Size of the inclusive type has been changed.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_59')">
+[+] affected symbols: 19 (3.9%)</span>
+<div id="c_59" style="display:none;">
+<div class='affected'><span class='iname_a'>TerrainMaterialGeneratorA::SM2Profile::addTechnique&#160;<span class='sym_p'><span>(&#160;MaterialPtr const&amp; <i>mat</i></span>, <span>Terrain const* <i>terrain</i></span>, <span>enum TechniqueType <i>tt</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;TerrainMaterialGeneratorA::SM2Profile&#39; class.</div>
+<span class='iname_a'>TerrainMaterialGeneratorA::SM2Profile::updateParams&#160;<span class='sym_p'><span>(&#160;MaterialPtr const&amp; <i>mat</i></span>, <span>Terrain const* <i>terrain</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;TerrainMaterialGeneratorA::SM2Profile&#39; class.</div>
+<span class='iname_a'>TerrainMaterialGeneratorA::SM2Profile::requestOptions&#160;<span class='sym_p'><span>(&#160;Terrain* <i>terrain</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;TerrainMaterialGeneratorA::SM2Profile&#39; class.</div>
+<span class='iname_a'>TerrainMaterialGeneratorA::SM2Profile::setLightmapEnabled&#160;<span class='sym_p'><span>(&#160;bool <i>enabled</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;TerrainMaterialGeneratorA::SM2Profile&#39; class.</div>
+<span class='iname_a'>TerrainMaterialGeneratorA::SM2Profile::setCompositeMapEnabled&#160;<span class='sym_p'><span>(&#160;bool <i>enabled</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;TerrainMaterialGeneratorA::SM2Profile&#39; class.</div>
+<span class='iname_a'>TerrainMaterialGeneratorA::SM2Profile::generateForCompositeMap&#160;<span class='sym_p'><span>(&#160;Terrain const* <i>terrain</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;TerrainMaterialGeneratorA::SM2Profile&#39; class.</div>
+<span class='iname_a'>TerrainMaterialGeneratorA::SM2Profile::setGlobalColourMapEnabled&#160;<span class='sym_p'><span>(&#160;bool <i>enabled</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;TerrainMaterialGeneratorA::SM2Profile&#39; class.</div>
+<span class='iname_a'>TerrainMaterialGeneratorA::SM2Profile::updateParamsForCompositeMap&#160;<span class='sym_p'><span>(&#160;MaterialPtr const&amp; <i>mat</i></span>, <span>Terrain const* <i>terrain</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;TerrainMaterialGeneratorA::SM2Profile&#39; class.</div>
+<span class='iname_a'>TerrainMaterialGeneratorA::SM2Profile::setReceiveDynamicShadowsPSSM&#160;<span class='sym_p'><span>(&#160;PSSMShadowCameraSetup* <i>pssmSettings</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;TerrainMaterialGeneratorA::SM2Profile&#39; class.</div>
+<span class='iname_a'>TerrainMaterialGeneratorA::SM2Profile::setReceiveDynamicShadowsDepth&#160;<span class='sym_p'><span>(&#160;bool <i>enabled</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;TerrainMaterialGeneratorA::SM2Profile&#39; class.</div>
+ <b>...</b>
+<br/>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<span class='h_name'>OgreTerrainQuadTreeNode.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_60')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> TerrainQuadTreeNode <span class='failed'>&nbsp;12&nbsp;</span></span>
+<br/>
+<div id="c_60" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Field <b>mRend</b> has been removed from this type.</td>
+<td>1) Applications will access incorrect memory when attempting to access this field.<br/>2) Size of the inclusive type has been changed.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>Virtual method <span class='iname_b'>_updateRenderQueue&#160;<span class='sym_pd'><span>(&#160;RenderQueue*</span>&#160;)</span></span> has been added to this class.</td>
+<td>The layout of v-table has been changed. This leaf class has no exported constructors and therefore applications will copy an old v-table of the class that will not contain a pointer to added <b>virtual</b> method. Call of any method in this class may result in crash or incorrect behavior of applications.<br/><br/><b>NOTE</b>: if new virtual method is called only from other new methods, then binary compatibility should not be affected.</td>
+</tr>
+<tr>
+<th>3</th>
+<td>Virtual method <span class='iname_b'>getBoundingRadius&#160;<span class='sym_pd'>(&#160;)</span> const</span> has been added to this class.</td>
+<td>The layout of v-table has been changed. This leaf class has no exported constructors and therefore applications will copy an old v-table of the class that will not contain a pointer to added <b>virtual</b> method. Call of any method in this class may result in crash or incorrect behavior of applications.<br/><br/><b>NOTE</b>: if new virtual method is called only from other new methods, then binary compatibility should not be affected.</td>
+</tr>
+<tr>
+<th>4</th>
+<td>Virtual method <span class='iname_b'>getCastsShadows&#160;<span class='sym_pd'>(&#160;)</span> const</span> has been added to this class.</td>
+<td>The layout of v-table has been changed. This leaf class has no exported constructors and therefore applications will copy an old v-table of the class that will not contain a pointer to added <b>virtual</b> method. Call of any method in this class may result in crash or incorrect behavior of applications.<br/><br/><b>NOTE</b>: if new virtual method is called only from other new methods, then binary compatibility should not be affected.</td>
+</tr>
+<tr>
+<th>5</th>
+<td>Virtual method <span class='iname_b'>getLights&#160;<span class='sym_pd'>(&#160;)</span> const</span> has been added to this class.</td>
+<td>The layout of v-table has been changed. This leaf class has no exported constructors and therefore applications will copy an old v-table of the class that will not contain a pointer to added <b>virtual</b> method. Call of any method in this class may result in crash or incorrect behavior of applications.<br/><br/><b>NOTE</b>: if new virtual method is called only from other new methods, then binary compatibility should not be affected.</td>
+</tr>
+<tr>
+<th>6</th>
+<td>Virtual method <span class='iname_b'>getMovableType&#160;<span class='sym_pd'>(&#160;)</span> const</span> has been added to this class.</td>
+<td>The layout of v-table has been changed. This leaf class has no exported constructors and therefore applications will copy an old v-table of the class that will not contain a pointer to added <b>virtual</b> method. Call of any method in this class may result in crash or incorrect behavior of applications.<br/><br/><b>NOTE</b>: if new virtual method is called only from other new methods, then binary compatibility should not be affected.</td>
+</tr>
+<tr>
+<th>7</th>
+<td>Virtual method <span class='iname_b'>getRenderOperation&#160;<span class='sym_pd'><span>(&#160;RenderOperation&amp;</span>&#160;)</span></span> has been added to this class.</td>
+<td>The layout of v-table has been changed. This leaf class has no exported constructors and therefore applications will copy an old v-table of the class that will not contain a pointer to added <b>virtual</b> method. Call of any method in this class may result in crash or incorrect behavior of applications.<br/><br/><b>NOTE</b>: if new virtual method is called only from other new methods, then binary compatibility should not be affected.</td>
+</tr>
+<tr>
+<th>8</th>
+<td>Virtual method <span class='iname_b'>getSquaredViewDepth&#160;<span class='sym_pd'><span>(&#160;Camera const*</span>&#160;)</span> const</span> has been added to this class.</td>
+<td>The layout of v-table has been changed. This leaf class has no exported constructors and therefore applications will copy an old v-table of the class that will not contain a pointer to added <b>virtual</b> method. Call of any method in this class may result in crash or incorrect behavior of applications.<br/><br/><b>NOTE</b>: if new virtual method is called only from other new methods, then binary compatibility should not be affected.</td>
+</tr>
+<tr>
+<th>9</th>
+<td>Virtual method <span class='iname_b'>getTechnique&#160;<span class='sym_pd'>(&#160;)</span> const</span> has been added to this class.</td>
+<td>The layout of v-table has been changed. This leaf class has no exported constructors and therefore applications will copy an old v-table of the class that will not contain a pointer to added <b>virtual</b> method. Call of any method in this class may result in crash or incorrect behavior of applications.<br/><br/><b>NOTE</b>: if new virtual method is called only from other new methods, then binary compatibility should not be affected.</td>
+</tr>
+<tr>
+<th>10</th>
+<td>Virtual method <span class='iname_b'>getWorldTransforms&#160;<span class='sym_pd'><span>(&#160;Matrix4*</span>&#160;)</span> const</span> has been added to this class.</td>
+<td>The layout of v-table has been changed. This leaf class has no exported constructors and therefore applications will copy an old v-table of the class that will not contain a pointer to added <b>virtual</b> method. Call of any method in this class may result in crash or incorrect behavior of applications.<br/><br/><b>NOTE</b>: if new virtual method is called only from other new methods, then binary compatibility should not be affected.</td>
+</tr>
+<tr>
+<th>11</th>
+<td>Virtual method <span class='iname_b'>isVisible&#160;<span class='sym_pd'>(&#160;)</span> const</span> has been added to this class.</td>
+<td>The layout of v-table has been changed. This leaf class has no exported constructors and therefore applications will copy an old v-table of the class that will not contain a pointer to added <b>virtual</b> method. Call of any method in this class may result in crash or incorrect behavior of applications.<br/><br/><b>NOTE</b>: if new virtual method is called only from other new methods, then binary compatibility should not be affected.</td>
+</tr>
+<tr>
+<th>12</th>
+<td>Virtual method <span class='iname_b'>visitRenderables&#160;<span class='sym_pd'><span>(&#160;Renderable::Visitor*</span>, <span>bool</span>&#160;)</span></span> has been added to this class.</td>
+<td>The layout of v-table has been changed. This leaf class has no exported constructors and therefore applications will copy an old v-table of the class that will not contain a pointer to added <b>virtual</b> method. Call of any method in this class may result in crash or incorrect behavior of applications.<br/><br/><b>NOTE</b>: if new virtual method is called only from other new methods, then binary compatibility should not be affected.</td>
+</tr>
+</table>
+<span class="sect_info" onclick="javascript:showContent(this, 'c_61')">
+[+] show v-table (old and new)</span>
+<br/>
+<div id="c_61" style="display:none;">
+<table class='vtable'><tr><th>Offset</th><th>Virtual Table (Old) - 4 entries</th><th>Virtual Table (New) - 64 entries</th></tr><tr><th>0</th>
+<td>(int (*)(...)) 0</td>
+<td>(int (*)(...)) 0</td></tr>
+<tr><th>8</th>
+<td>(int (*)(...)) (&amp; typeinfo for TerrainQuadTreeNode)</td>
+<td>(int (*)(...)) (&amp; typeinfo for TerrainQuadTreeNode)</td></tr>
+<tr><th>16</th>
+<td>~TerrainQuadTreeNode</td>
+<td>~TerrainQuadTreeNode</td></tr>
+<tr><th>24</th>
+<td>~TerrainQuadTreeNode</td>
+<td>~TerrainQuadTreeNode</td></tr>
+<tr><th>32</th>
+<td></td>
+<td class='warning'>TerrainQuadTreeNode::getMaterial() const</td></tr>
+<tr><th>40</th>
+<td></td>
+<td class='warning'>TerrainQuadTreeNode::getTechnique() const</td></tr>
+<tr><th>48</th>
+<td></td>
+<td class='warning'>TerrainQuadTreeNode::getRenderOperation(RenderOperation&amp;)</td></tr>
+<tr><th>56</th>
+<td></td>
+<td>(int (*)(...)) 0x58c42</td></tr>
+<tr><th>64</th>
+<td></td>
+<td>(int (*)(...)) 0x58c4c</td></tr>
+<tr><th>72</th>
+<td></td>
+<td class='warning'>TerrainQuadTreeNode::getWorldTransforms(Matrix4*) const</td></tr>
+<tr><th>80</th>
+<td></td>
+<td>(int (*)(...)) 0x58c52</td></tr>
+<tr><th>88</th>
+<td></td>
+<td class='warning'>TerrainQuadTreeNode::getSquaredViewDepth(Camera const*) const</td></tr>
+<tr><th>96</th>
+<td></td>
+<td class='warning'>TerrainQuadTreeNode::getLights() const</td></tr>
+<tr><th>104</th>
+<td></td>
+<td class='warning'>TerrainQuadTreeNode::getCastsShadows() const</td></tr>
+<tr><th>112</th>
+<td></td>
+<td class='warning'>Renderable::_updateCustomGpuParameter(GpuProgramParameters::AutoConstantEntry const&amp;, GpuProgramParameters*) const</td></tr>
+<tr><th>120</th>
+<td></td>
+<td>(int (*)(...)) 0x58d4a</td></tr>
+<tr><th>128</th>
+<td></td>
+<td class='warning'>TerrainQuadTreeNode::getBoundingRadius() const</td></tr>
+<tr><th>136</th>
+<td></td>
+<td class='warning'>TerrainQuadTreeNode::isVisible() const</td></tr>
+<tr><th>144</th>
+<td></td>
+<td class='warning'>TerrainQuadTreeNode::getMovableType[abi:cxx11]() const</td></tr>
+<tr><th>152</th>
+<td></td>
+<td class='warning'>TerrainQuadTreeNode::_updateRenderQueue(RenderQueue*)</td></tr>
+<tr><th>160</th>
+<td></td>
+<td class='warning'>TerrainQuadTreeNode::visitRenderables(Renderable::Visitor*, bool)</td></tr>
+<tr><th>168</th>
+<td></td>
+<td class='warning'>(int (*)(...)) -0x00000000000058</td></tr>
+<tr><th>176</th>
+<td></td>
+<td class='warning'>(int (*)(...)) (&amp; typeinfo for TerrainQuadTreeNode)</td></tr>
+<tr><th>184</th>
+<td></td>
+<td class='warning'>non-virtual thunk to ~TerrainQuadTreeNode</td></tr>
+<tr><th>192</th>
+<td></td>
+<td class='warning'>non-virtual thunk to ~TerrainQuadTreeNode</td></tr>
+<tr><th>200</th>
+<td></td>
+<td>(int (*)(...)) 0x58d3a</td></tr>
+<tr><th>208</th>
+<td></td>
+<td>(int (*)(...)) 0x58d30</td></tr>
+<tr><th>216</th>
+<td></td>
+<td class='warning'>MovableObject::getWorldBoundingBox(bool) const</td></tr>
+<tr><th>224</th>
+<td></td>
+<td class='warning'>MovableObject::getLightCapBounds() const</td></tr>
+<tr><th>232</th>
+<td></td>
+<td class='warning'>MovableObject::getDarkCapBounds(Light const&amp;, float) const</td></tr>
+<tr><th>240</th>
+<td></td>
+<td class='warning'>MovableObject::getShadowVolumeRenderableList(ShadowTechnique, Light const*, SharedPtr&lt;HardwareIndexBuffer&gt;*, unsigned long*, bool, float, unsigned long)</td></tr>
+<tr><th>248</th>
+<td></td>
+<td>(int (*)(...)) 0x58eac</td></tr>
+<tr><th>256</th>
+<td></td>
+<td class='warning'>MovableObject::getPointExtrusionDistance(Light const*) const</td></tr>
+<tr><th>264</th>
+<td></td>
+<td class='warning'>ShadowCaster::updateEdgeListLightFacing(EdgeData*, Vector&lt;4, float&gt; const&amp;)</td></tr>
+<tr><th>272</th>
+<td></td>
+<td class='warning'>ShadowCaster::generateShadowVolume(EdgeData*, SharedPtr&lt;HardwareIndexBuffer&gt; const&amp;, unsigned long&amp;, Light const*, std::vector&lt;ShadowRenderable*, std::allocator&lt;ShadowRenderable*&gt; &gt;&amp;, unsigned long)</td></tr>
+<tr><th>280</th>
+<td></td>
+<td class='warning'>ShadowCaster::extrudeBounds(AxisAlignedBox&amp;, Vector&lt;4, float&gt; const&amp;, float) const</td></tr>
+<tr><th>288</th>
+<td></td>
+<td>(int (*)(...)) 0x58d00</td></tr>
+<tr><th>296</th>
+<td></td>
+<td>(int (*)(...)) 0x58d0a</td></tr>
+<tr><th>304</th>
+<td></td>
+<td>(int (*)(...)) 0x58d14</td></tr>
+<tr><th>312</th>
+<td></td>
+<td>(int (*)(...)) 0x58d1a</td></tr>
+<tr><th>320</th>
+<td></td>
+<td class='warning'>non-virtual thunk to TerrainQuadTreeNode::getMovableType[abi:cxx11]() const</td></tr>
+<tr><th>328</th>
+<td></td>
+<td class='warning'>MovableObject::_notifyAttached(Node*, bool)</td></tr>
+<tr><th>336</th>
+<td></td>
+<td class='warning'>MovableObject::isInScene() const</td></tr>
+<tr><th>344</th>
+<td></td>
+<td class='warning'>MovableObject::_notifyMoved()</td></tr>
+<tr><th>352</th>
+<td></td>
+<td class='warning'>MovableObject::_notifyCurrentCamera(Camera*)</td></tr>
+<tr><th>360</th>
+<td></td>
+<td>(int (*)(...)) 0x58d56</td></tr>
+<tr><th>368</th>
+<td></td>
+<td class='warning'>non-virtual thunk to TerrainQuadTreeNode::getBoundingRadius() const</td></tr>
+<tr><th>376</th>
+<td></td>
+<td class='warning'>MovableObject::getWorldBoundingSphere(bool) const</td></tr>
+<tr><th>384</th>
+<td></td>
+<td class='warning'>non-virtual thunk to TerrainQuadTreeNode::_updateRenderQueue(RenderQueue*)</td></tr>
+<tr><th>392</th>
+<td></td>
+<td class='warning'>non-virtual thunk to TerrainQuadTreeNode::isVisible() const</td></tr>
+<tr><th>400</th>
+<td></td>
+<td class='warning'>MovableObject::setRenderQueueGroup(unsigned char)</td></tr>
+<tr><th>408</th>
+<td></td>
+<td class='warning'>MovableObject::setRenderQueueGroupAndPriority(unsigned char, unsigned short)</td></tr>
+<tr><th>416</th>
+<td></td>
+<td class='warning'>MovableObject::_getParentNodeFullTransform() const</td></tr>
+<tr><th>424</th>
+<td></td>
+<td>(int (*)(...)) 0x58d20</td></tr>
+<tr><th>432</th>
+<td></td>
+<td>(int (*)(...)) 0x58d28</td></tr>
+<tr><th>440</th>
+<td></td>
+<td class='warning'>MovableObject::getTypeFlags() const</td></tr>
+<tr><th>448</th>
+<td></td>
+<td class='warning'>non-virtual thunk to TerrainQuadTreeNode::visitRenderables(Renderable::Visitor*, bool)</td></tr>
+<tr><th>456</th>
+<td></td>
+<td class='warning'>(int (*)(...)) -0x00000000000060</td></tr>
+<tr><th>464</th>
+<td></td>
+<td class='warning'>(int (*)(...)) (&amp; typeinfo for TerrainQuadTreeNode)</td></tr>
+<tr><th>472</th>
+<td></td>
+<td>(int (*)(...)) 0x58cee</td></tr>
+<tr><th>480</th>
+<td></td>
+<td>(int (*)(...)) 0x58cfa</td></tr>
+<tr><th>488</th>
+<td></td>
+<td class='warning'>non-virtual thunk to ~TerrainQuadTreeNode</td></tr>
+<tr><th>496</th>
+<td></td>
+<td class='warning'>non-virtual thunk to ~TerrainQuadTreeNode</td></tr>
+<tr><th>504</th>
+<td></td>
+<td>(int (*)(...)) 0x58f30</td></tr>
+</table><br/>
+</div>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_62')">
+[+] affected symbols: 242 (49.7%)</span>
+<div id="c_62" style="display:none;">
+<div class='affected'><span class='iname_a'>TerrainGroup::TerrainSlot::freeInstance&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.instance.mQuadTree&#39; in the object of this method has base type &#39;TerrainQuadTreeNode&#39;.</div>
+<span class='iname_a'>TerrainGroup::TerrainSlot::~TerrainSlot&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.instance.mQuadTree&#39; in the object of this method has base type &#39;TerrainQuadTreeNode&#39;.</div>
+<span class='iname_a'>TerrainGroup::getTerrainSlot&#160;<span class='sym_p'><span>(&#160;long <i>x</i></span>, <span>long <i>y</i></span>, <span>bool <i>createIfMissing</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;retval.instance.mQuadTree&#39; in the return value (pointer) has base type &#39;TerrainQuadTreeNode&#39;.</div>
+<span class='iname_a'>TerrainGroup::loadTerrainImpl&#160;<span class='sym_p'><span>(&#160;struct TerrainGroup::TerrainSlot* <span class='fp'>slot</span></span>, <span>bool <i>synchronous</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;slot.instance.mQuadTree&#39; in 1st parameter &#39;slot&#39; (pointer) has base type &#39;TerrainQuadTreeNode&#39;.</div>
+<span class='iname_a'>TerrainGroup::connectNeighbour&#160;<span class='sym_p'><span>(&#160;struct TerrainGroup::TerrainSlot* <span class='fp'>slot</span></span>, <span>long <i>offsetx</i></span>, <span>long <i>offsety</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;slot.instance.mQuadTree&#39; in 1st parameter &#39;slot&#39; (pointer) has base type &#39;TerrainQuadTreeNode&#39;.</div>
+<span class='iname_a'>TerrainGroup::freeTerrainSlotInstance&#160;<span class='sym_p'><span>(&#160;struct TerrainGroup::TerrainSlot* <span class='fp'>slot</span></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;slot.instance.mQuadTree&#39; in 1st parameter &#39;slot&#39; (pointer) has base type &#39;TerrainQuadTreeNode&#39;.</div>
+<span class='iname_a'>TerrainGroup::getHeightAtWorldPosition&#160;<span class='sym_p'><span>(&#160;Real <i>x</i></span>, <span>Real <i>y</i></span>, <span>Real <i>z</i></span>, <span>Terrain** <span class='fp'>ppTerrain</span></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;ppTerrain.mQuadTree&#39; in 4th parameter &#39;ppTerrain&#39; (pointer) has base type &#39;TerrainQuadTreeNode&#39;.</div>
+<span class='iname_a'>TerrainGroup::getHeightAtWorldPosition&#160;<span class='sym_p'><span>(&#160;Vector3 const&amp; <i>pos</i></span>, <span>Terrain** <span class='fp'>ppTerrain</span></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;ppTerrain.mQuadTree&#39; in 2nd parameter &#39;ppTerrain&#39; (pointer) has base type &#39;TerrainQuadTreeNode&#39;.</div>
+<span class='iname_a'>TerrainLodManager::TerrainLodManager&#160;<span class='sym_p'><span>(&#160;Terrain* <span class='fp'>t</span></span>, <span>String const&amp; <i>filename</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;t.mQuadTree&#39; in 1st parameter &#39;t&#39; (pointer) has base type &#39;TerrainQuadTreeNode&#39;.</div>
+<span class='iname_a'>TerrainLodManager::TerrainLodManager&#160;<span class='sym_p'><span>(&#160;Terrain* <span class='fp'>t</span></span>, <span>DataStreamPtr&amp; <i>stream</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;t.mQuadTree&#39; in 1st parameter &#39;t&#39; (pointer) has base type &#39;TerrainQuadTreeNode&#39;.</div>
+ <b>...</b>
+<br/>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='Low_Risk_Problems'></a><a name='Type_Problems_Low'></a>
+<h2>Problems with Data Types, Low Severity <span class='warning'>&nbsp;7&nbsp;</span></h2><hr/>
+<span class='h_name'>OgrePixelFormat.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_63')">
+<span class='ext'>[+]</span> <span class='ttype'>enum</span> PixelFormat <span class='warning'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_63" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Value of member <b>PF_COUNT</b> has been changed from <b>108</b> to <b>109</b>.</td>
+<td>Applications may execute a wrong branch of code in the library and therefore change the behavior.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_64')">
+[+] affected symbols: 104 (21.4%)</span>
+<div id="c_64" style="display:none;">
+<div class='affected'><span class='iname_a'>TerrainGroup::loadTerrain&#160;<span class='sym_p'><span>(&#160;long <i>x</i></span>, <span>long <i>y</i></span>, <span>bool <i>synchronous</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mDefaultImportData.inputImage.mFormat&#39; in the object of this method is of type &#39;enum PixelFormat&#39;.</div>
+<span class='iname_a'>TerrainGroup::TerrainSlot::freeInstance&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.def.importData.inputImage.mFormat&#39; in the object of this method is of type &#39;enum PixelFormat&#39;.</div>
+<span class='iname_a'>TerrainGroup::TerrainSlot::~TerrainSlot&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.def.importData.inputImage.mFormat&#39; in the object of this method is of type &#39;enum PixelFormat&#39;.</div>
+<span class='iname_a'>TerrainGroup::unpackIndex&#160;<span class='sym_p'><span>(&#160;uint32 <i>key</i></span>, <span>long* <i>x</i></span>, <span>long* <i>y</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mDefaultImportData.inputImage.mFormat&#39; in the object of this method is of type &#39;enum PixelFormat&#39;.</div>
+<span class='iname_a'>TerrainGroup::autoUpdateLod&#160;<span class='sym_p'><span>(&#160;long <i>x</i></span>, <span>long <i>y</i></span>, <span>bool <i>synchronous</i></span>, <span>Any const&amp; <i>data</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mDefaultImportData.inputImage.mFormat&#39; in the object of this method is of type &#39;enum PixelFormat&#39;.</div>
+<span class='iname_a'>TerrainGroup::defineTerrain&#160;<span class='sym_p'><span>(&#160;long <i>x</i></span>, <span>long <i>y</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mDefaultImportData.inputImage.mFormat&#39; in the object of this method is of type &#39;enum PixelFormat&#39;.</div>
+<span class='iname_a'>TerrainGroup::defineTerrain&#160;<span class='sym_p'><span>(&#160;long <i>x</i></span>, <span>long <i>y</i></span>, <span>float <i>constantHeight</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mDefaultImportData.inputImage.mFormat&#39; in the object of this method is of type &#39;enum PixelFormat&#39;.</div>
+<span class='iname_a'>TerrainGroup::defineTerrain&#160;<span class='sym_p'><span>(&#160;long <i>x</i></span>, <span>long <i>y</i></span>, <span>float const* <i>pFloat</i></span>, <span>Terrain::LayerInstanceList const* <i>layers</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mDefaultImportData.inputImage.mFormat&#39; in the object of this method is of type &#39;enum PixelFormat&#39;.</div>
+<span class='iname_a'>TerrainGroup::defineTerrain&#160;<span class='sym_p'><span>(&#160;long <i>x</i></span>, <span>long <i>y</i></span>, <span>Image const* <span class='fp'>img</span></span>, <span>Terrain::LayerInstanceList const* <i>layers</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;img.mFormat&#39; in 3rd parameter &#39;img&#39; (pointer) is of type &#39;enum PixelFormat&#39;.</div>
+<span class='iname_a'>TerrainGroup::defineTerrain&#160;<span class='sym_p'><span>(&#160;long <i>x</i></span>, <span>long <i>y</i></span>, <span>struct Terrain::ImportData const* <span class='fp'>importData</span></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;importData.inputImage.mFormat&#39; in 3rd parameter &#39;importData&#39; (pointer) is of type &#39;enum PixelFormat&#39;.</div>
+ <b>...</b>
+<br/>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<span class='h_name'>OgreTerrain.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_65')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> Terrain <span class='warning'>&nbsp;2&nbsp;</span></span>
+<br/>
+<div id="c_65" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>The pointer level of field <b>mCpuTerrainNormalMap</b> has been decreased from <b>1</b> to <b>0</b>.</td>
+<td>The library functions will treat the value of this field as the lower-dimension array and will not read all elements. This may change the behavior of applications.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>Type of field <b>mCpuBlendMapStorage</b> has been changed from <b>Terrain::BytePointerList</b> to <b>Terrain::ImageList</b>.</td>
+<td>Replacement of the field data type may indicate a change in the semantic meaning of the field.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_66')">
+[+] affected symbols: 216 (44.4%)</span>
+<div id="c_66" style="display:none;">
+<div class='affected'><span class='iname_a'>TerrainGroup::TerrainSlot::freeInstance&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.instance&#39; in the object of this method has base type &#39;Terrain&#39;.</div>
+<span class='iname_a'>TerrainGroup::TerrainSlot::~TerrainSlot&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.instance&#39; in the object of this method has base type &#39;Terrain&#39;.</div>
+<span class='iname_a'>TerrainGroup::getTerrainSlot&#160;<span class='sym_p'><span>(&#160;long <i>x</i></span>, <span>long <i>y</i></span>, <span>bool <i>createIfMissing</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;retval.instance&#39; in the return value (pointer) has base type &#39;Terrain&#39;.</div>
+<span class='iname_a'>TerrainGroup::loadTerrainImpl&#160;<span class='sym_p'><span>(&#160;struct TerrainGroup::TerrainSlot* <span class='fp'>slot</span></span>, <span>bool <i>synchronous</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;slot.instance&#39; in 1st parameter &#39;slot&#39; (pointer) has base type &#39;Terrain&#39;.</div>
+<span class='iname_a'>TerrainGroup::connectNeighbour&#160;<span class='sym_p'><span>(&#160;struct TerrainGroup::TerrainSlot* <span class='fp'>slot</span></span>, <span>long <i>offsetx</i></span>, <span>long <i>offsety</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;slot.instance&#39; in 1st parameter &#39;slot&#39; (pointer) has base type &#39;Terrain&#39;.</div>
+<span class='iname_a'>TerrainGroup::freeTerrainSlotInstance&#160;<span class='sym_p'><span>(&#160;struct TerrainGroup::TerrainSlot* <span class='fp'>slot</span></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;slot.instance&#39; in 1st parameter &#39;slot&#39; (pointer) has base type &#39;Terrain&#39;.</div>
+<span class='iname_a'>TerrainGroup::getHeightAtWorldPosition&#160;<span class='sym_p'><span>(&#160;Real <i>x</i></span>, <span>Real <i>y</i></span>, <span>Real <i>z</i></span>, <span>Terrain** <span class='fp'>ppTerrain</span></span>&#160;)</span></span><br/>
+<div class='affect'>4th parameter &#39;ppTerrain&#39; (pointer) has base type &#39;Terrain&#39;.</div>
+<span class='iname_a'>TerrainGroup::getHeightAtWorldPosition&#160;<span class='sym_p'><span>(&#160;Vector3 const&amp; <i>pos</i></span>, <span>Terrain** <span class='fp'>ppTerrain</span></span>&#160;)</span></span><br/>
+<div class='affect'>2nd parameter &#39;ppTerrain&#39; (pointer) has base type &#39;Terrain&#39;.</div>
+<span class='iname_a'>TerrainLodManager::TerrainLodManager&#160;<span class='sym_p'><span>(&#160;Terrain* <span class='fp'>t</span></span>, <span>String const&amp; <i>filename</i></span>&#160;)</span></span><br/>
+<div class='affect'>1st parameter &#39;t&#39; (pointer) has base type &#39;Terrain&#39;.</div>
+<span class='iname_a'>TerrainLodManager::TerrainLodManager&#160;<span class='sym_p'><span>(&#160;Terrain* <span class='fp'>t</span></span>, <span>DataStreamPtr&amp; <i>stream</i></span>&#160;)</span></span><br/>
+<div class='affect'>1st parameter &#39;t&#39; (pointer) has base type &#39;Terrain&#39;.</div>
+ <b>...</b>
+<br/>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<span class='h_name'>OgreTerrainLayerBlendMap.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_67')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> TerrainLayerBlendMap <span class='warning'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_67" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>The pointer level of field <b>mData</b> has been decreased from <b>1</b> to <b>0</b>.</td>
+<td>The library functions will treat the value of this field as the lower-dimension array and will not read all elements. This may change the behavior of applications.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_68')">
+[+] affected symbols: 21 (4.3%)</span>
+<div id="c_68" style="display:none;">
+<div class='affected'><span class='iname_a'>TerrainLayerBlendMap::getBlendValue&#160;<span class='sym_p'><span>(&#160;size_t <i>x</i></span>, <span>size_t <i>y</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;TerrainLayerBlendMap&#39; class.</div>
+<span class='iname_a'>TerrainLayerBlendMap::setBlendValue&#160;<span class='sym_p'><span>(&#160;size_t <i>x</i></span>, <span>size_t <i>y</i></span>, <span>float <i>val</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;TerrainLayerBlendMap&#39; class.</div>
+<span class='iname_a'>TerrainLayerBlendMap::getBlendPointer&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;TerrainLayerBlendMap&#39; class.</div>
+<span class='iname_a'>TerrainLayerBlendMap::convertImageToUVSpace&#160;<span class='sym_p'><span>(&#160;size_t <i>x</i></span>, <span>size_t <i>y</i></span>, <span>Real* <i>outX</i></span>, <span>Real* <i>outY</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;TerrainLayerBlendMap&#39; class.</div>
+<span class='iname_a'>TerrainLayerBlendMap::convertUVToImageSpace&#160;<span class='sym_p'><span>(&#160;Real <i>x</i></span>, <span>Real <i>y</i></span>, <span>size_t* <i>outX</i></span>, <span>size_t* <i>outY</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;TerrainLayerBlendMap&#39; class.</div>
+<span class='iname_a'>TerrainLayerBlendMap::convertUVToWorldSpace&#160;<span class='sym_p'><span>(&#160;Real <i>x</i></span>, <span>Real <i>y</i></span>, <span>Vector3* <i>outWorldPos</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;TerrainLayerBlendMap&#39; class.</div>
+<span class='iname_a'>TerrainLayerBlendMap::convertWorldToUVSpace&#160;<span class='sym_p'><span>(&#160;Vector3 const&amp; <i>worldPos</i></span>, <span>Real* <i>outX</i></span>, <span>Real* <i>outY</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;TerrainLayerBlendMap&#39; class.</div>
+<span class='iname_a'>TerrainLayerBlendMap::convertImageToTerrainSpace&#160;<span class='sym_p'><span>(&#160;size_t <i>x</i></span>, <span>size_t <i>y</i></span>, <span>Real* <i>outX</i></span>, <span>Real* <i>outY</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;TerrainLayerBlendMap&#39; class.</div>
+<span class='iname_a'>TerrainLayerBlendMap::convertTerrainToImageSpace&#160;<span class='sym_p'><span>(&#160;Real <i>x</i></span>, <span>Real <i>y</i></span>, <span>size_t* <i>outX</i></span>, <span>size_t* <i>outY</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;TerrainLayerBlendMap&#39; class.</div>
+<span class='iname_a'>TerrainLayerBlendMap::blit&#160;<span class='sym_p'><span>(&#160;PixelBox const&amp; <i>src</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;TerrainLayerBlendMap&#39; class.</div>
+ <b>...</b>
+<br/>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<span class='h_name'>OgreTerrainMaterialGenerator.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_69')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> TerrainMaterialGenerator <span class='warning'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_69" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Base type of field <b>mCompositeMapPlane</b> has been changed from <b>ManualObject</b> to <b>Rectangle2D</b>.</td>
+<td>Replacement of field base type may indicate a change in the semantic meaning of the field.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_70')">
+[+] affected symbols: 4 (0.8%)</span>
+<div id="c_70" style="display:none;">
+<div class='affected'><span class='iname_a'>TerrainMaterialGenerator::_renderCompositeMap&#160;<span class='sym_p'><span>(&#160;size_t <i>size</i></span>, <span>Rect const&amp; <i>rect</i></span>, <span>MaterialPtr const&amp; <i>mat</i></span>, <span>TexturePtr const&amp; <i>destCompositeMap</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;TerrainMaterialGenerator&#39; class.</div>
+<span class='iname_a'>TerrainMaterialGenerator::TerrainMaterialGenerator&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This constructor is from &#39;TerrainMaterialGenerator&#39; class.</div>
+<span class='iname_a'>TerrainMaterialGenerator::~TerrainMaterialGenerator&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This destructor is from &#39;TerrainMaterialGenerator&#39; class.</div>
+<span class='iname_a'>TerrainMaterialGeneratorA::SM2Profile::SM2Profile&#160;<span class='sym_p'><span>(&#160;TerrainMaterialGenerator* <span class='fp'>parent</span></span>, <span>String const&amp; <i>name</i></span>, <span>String const&amp; <i>desc</i></span>&#160;)</span></span><br/>
+<div class='affect'>1st parameter &#39;parent&#39; (pointer) has base type &#39;TerrainMaterialGenerator&#39;.</div>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<span class='h_name'>OgreTerrainQuadTreeNode.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_71')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> TerrainQuadTreeNode <span class='warning'>&nbsp;2&nbsp;</span></span>
+<br/>
+<div id="c_71" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Base class <b>MovableObject</b> has been added.</td>
+<td>Possible incorrect access of applications to the memory occupied by the base classes.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>Base class <b>AllocatedObject&lt;0&gt;</b> has been removed.</td>
+<td>Possible incorrect access of applications to the memory occupied by the base classes.</td>
+</tr>
+</table>
+<span class="sect_info" onclick="javascript:showContent(this, 'c_72')">
+[+] show v-table (old and new)</span>
+<br/>
+<div id="c_72" style="display:none;">
+<table class='vtable'><tr><th>Offset</th><th>Virtual Table (Old) - 4 entries</th><th>Virtual Table (New) - 64 entries</th></tr><tr><th>0</th>
+<td>(int (*)(...)) 0</td>
+<td>(int (*)(...)) 0</td></tr>
+<tr><th>8</th>
+<td>(int (*)(...)) (&amp; typeinfo for TerrainQuadTreeNode)</td>
+<td>(int (*)(...)) (&amp; typeinfo for TerrainQuadTreeNode)</td></tr>
+<tr><th>16</th>
+<td>~TerrainQuadTreeNode</td>
+<td>~TerrainQuadTreeNode</td></tr>
+<tr><th>24</th>
+<td>~TerrainQuadTreeNode</td>
+<td>~TerrainQuadTreeNode</td></tr>
+<tr><th>32</th>
+<td></td>
+<td class='warning'>TerrainQuadTreeNode::getMaterial() const</td></tr>
+<tr><th>40</th>
+<td></td>
+<td class='warning'>TerrainQuadTreeNode::getTechnique() const</td></tr>
+<tr><th>48</th>
+<td></td>
+<td class='warning'>TerrainQuadTreeNode::getRenderOperation(RenderOperation&amp;)</td></tr>
+<tr><th>56</th>
+<td></td>
+<td>(int (*)(...)) 0x58c42</td></tr>
+<tr><th>64</th>
+<td></td>
+<td>(int (*)(...)) 0x58c4c</td></tr>
+<tr><th>72</th>
+<td></td>
+<td class='warning'>TerrainQuadTreeNode::getWorldTransforms(Matrix4*) const</td></tr>
+<tr><th>80</th>
+<td></td>
+<td>(int (*)(...)) 0x58c52</td></tr>
+<tr><th>88</th>
+<td></td>
+<td class='warning'>TerrainQuadTreeNode::getSquaredViewDepth(Camera const*) const</td></tr>
+<tr><th>96</th>
+<td></td>
+<td class='warning'>TerrainQuadTreeNode::getLights() const</td></tr>
+<tr><th>104</th>
+<td></td>
+<td class='warning'>TerrainQuadTreeNode::getCastsShadows() const</td></tr>
+<tr><th>112</th>
+<td></td>
+<td class='warning'>Renderable::_updateCustomGpuParameter(GpuProgramParameters::AutoConstantEntry const&amp;, GpuProgramParameters*) const</td></tr>
+<tr><th>120</th>
+<td></td>
+<td>(int (*)(...)) 0x58d4a</td></tr>
+<tr><th>128</th>
+<td></td>
+<td class='warning'>TerrainQuadTreeNode::getBoundingRadius() const</td></tr>
+<tr><th>136</th>
+<td></td>
+<td class='warning'>TerrainQuadTreeNode::isVisible() const</td></tr>
+<tr><th>144</th>
+<td></td>
+<td class='warning'>TerrainQuadTreeNode::getMovableType[abi:cxx11]() const</td></tr>
+<tr><th>152</th>
+<td></td>
+<td class='warning'>TerrainQuadTreeNode::_updateRenderQueue(RenderQueue*)</td></tr>
+<tr><th>160</th>
+<td></td>
+<td class='warning'>TerrainQuadTreeNode::visitRenderables(Renderable::Visitor*, bool)</td></tr>
+<tr><th>168</th>
+<td></td>
+<td class='warning'>(int (*)(...)) -0x00000000000058</td></tr>
+<tr><th>176</th>
+<td></td>
+<td class='warning'>(int (*)(...)) (&amp; typeinfo for TerrainQuadTreeNode)</td></tr>
+<tr><th>184</th>
+<td></td>
+<td class='warning'>non-virtual thunk to ~TerrainQuadTreeNode</td></tr>
+<tr><th>192</th>
+<td></td>
+<td class='warning'>non-virtual thunk to ~TerrainQuadTreeNode</td></tr>
+<tr><th>200</th>
+<td></td>
+<td>(int (*)(...)) 0x58d3a</td></tr>
+<tr><th>208</th>
+<td></td>
+<td>(int (*)(...)) 0x58d30</td></tr>
+<tr><th>216</th>
+<td></td>
+<td class='warning'>MovableObject::getWorldBoundingBox(bool) const</td></tr>
+<tr><th>224</th>
+<td></td>
+<td class='warning'>MovableObject::getLightCapBounds() const</td></tr>
+<tr><th>232</th>
+<td></td>
+<td class='warning'>MovableObject::getDarkCapBounds(Light const&amp;, float) const</td></tr>
+<tr><th>240</th>
+<td></td>
+<td class='warning'>MovableObject::getShadowVolumeRenderableList(ShadowTechnique, Light const*, SharedPtr&lt;HardwareIndexBuffer&gt;*, unsigned long*, bool, float, unsigned long)</td></tr>
+<tr><th>248</th>
+<td></td>
+<td>(int (*)(...)) 0x58eac</td></tr>
+<tr><th>256</th>
+<td></td>
+<td class='warning'>MovableObject::getPointExtrusionDistance(Light const*) const</td></tr>
+<tr><th>264</th>
+<td></td>
+<td class='warning'>ShadowCaster::updateEdgeListLightFacing(EdgeData*, Vector&lt;4, float&gt; const&amp;)</td></tr>
+<tr><th>272</th>
+<td></td>
+<td class='warning'>ShadowCaster::generateShadowVolume(EdgeData*, SharedPtr&lt;HardwareIndexBuffer&gt; const&amp;, unsigned long&amp;, Light const*, std::vector&lt;ShadowRenderable*, std::allocator&lt;ShadowRenderable*&gt; &gt;&amp;, unsigned long)</td></tr>
+<tr><th>280</th>
+<td></td>
+<td class='warning'>ShadowCaster::extrudeBounds(AxisAlignedBox&amp;, Vector&lt;4, float&gt; const&amp;, float) const</td></tr>
+<tr><th>288</th>
+<td></td>
+<td>(int (*)(...)) 0x58d00</td></tr>
+<tr><th>296</th>
+<td></td>
+<td>(int (*)(...)) 0x58d0a</td></tr>
+<tr><th>304</th>
+<td></td>
+<td>(int (*)(...)) 0x58d14</td></tr>
+<tr><th>312</th>
+<td></td>
+<td>(int (*)(...)) 0x58d1a</td></tr>
+<tr><th>320</th>
+<td></td>
+<td class='warning'>non-virtual thunk to TerrainQuadTreeNode::getMovableType[abi:cxx11]() const</td></tr>
+<tr><th>328</th>
+<td></td>
+<td class='warning'>MovableObject::_notifyAttached(Node*, bool)</td></tr>
+<tr><th>336</th>
+<td></td>
+<td class='warning'>MovableObject::isInScene() const</td></tr>
+<tr><th>344</th>
+<td></td>
+<td class='warning'>MovableObject::_notifyMoved()</td></tr>
+<tr><th>352</th>
+<td></td>
+<td class='warning'>MovableObject::_notifyCurrentCamera(Camera*)</td></tr>
+<tr><th>360</th>
+<td></td>
+<td>(int (*)(...)) 0x58d56</td></tr>
+<tr><th>368</th>
+<td></td>
+<td class='warning'>non-virtual thunk to TerrainQuadTreeNode::getBoundingRadius() const</td></tr>
+<tr><th>376</th>
+<td></td>
+<td class='warning'>MovableObject::getWorldBoundingSphere(bool) const</td></tr>
+<tr><th>384</th>
+<td></td>
+<td class='warning'>non-virtual thunk to TerrainQuadTreeNode::_updateRenderQueue(RenderQueue*)</td></tr>
+<tr><th>392</th>
+<td></td>
+<td class='warning'>non-virtual thunk to TerrainQuadTreeNode::isVisible() const</td></tr>
+<tr><th>400</th>
+<td></td>
+<td class='warning'>MovableObject::setRenderQueueGroup(unsigned char)</td></tr>
+<tr><th>408</th>
+<td></td>
+<td class='warning'>MovableObject::setRenderQueueGroupAndPriority(unsigned char, unsigned short)</td></tr>
+<tr><th>416</th>
+<td></td>
+<td class='warning'>MovableObject::_getParentNodeFullTransform() const</td></tr>
+<tr><th>424</th>
+<td></td>
+<td>(int (*)(...)) 0x58d20</td></tr>
+<tr><th>432</th>
+<td></td>
+<td>(int (*)(...)) 0x58d28</td></tr>
+<tr><th>440</th>
+<td></td>
+<td class='warning'>MovableObject::getTypeFlags() const</td></tr>
+<tr><th>448</th>
+<td></td>
+<td class='warning'>non-virtual thunk to TerrainQuadTreeNode::visitRenderables(Renderable::Visitor*, bool)</td></tr>
+<tr><th>456</th>
+<td></td>
+<td class='warning'>(int (*)(...)) -0x00000000000060</td></tr>
+<tr><th>464</th>
+<td></td>
+<td class='warning'>(int (*)(...)) (&amp; typeinfo for TerrainQuadTreeNode)</td></tr>
+<tr><th>472</th>
+<td></td>
+<td>(int (*)(...)) 0x58cee</td></tr>
+<tr><th>480</th>
+<td></td>
+<td>(int (*)(...)) 0x58cfa</td></tr>
+<tr><th>488</th>
+<td></td>
+<td class='warning'>non-virtual thunk to ~TerrainQuadTreeNode</td></tr>
+<tr><th>496</th>
+<td></td>
+<td class='warning'>non-virtual thunk to ~TerrainQuadTreeNode</td></tr>
+<tr><th>504</th>
+<td></td>
+<td>(int (*)(...)) 0x58f30</td></tr>
+</table><br/>
+</div>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_73')">
+[+] affected symbols: 39 (8%)</span>
+<div id="c_73" style="display:none;">
+<div class='affected'><span class='iname_a'>TerrainQuadTreeNode::resetBounds&#160;<span class='sym_p'><span>(&#160;Rect const&amp; <i>rect</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;TerrainQuadTreeNode&#39; class.</div>
+<span class='iname_a'>TerrainQuadTreeNode::DELTA_BUFFER <span class='attr'>[data]</span></span><br/>
+<div class='affect'>This method is from &#39;TerrainQuadTreeNode&#39; class.</div>
+<span class='iname_a'>TerrainQuadTreeNode::setCurrentLod&#160;<span class='sym_p'><span>(&#160;int <i>lod</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;TerrainQuadTreeNode&#39; class.</div>
+<span class='iname_a'>TerrainQuadTreeNode::_getRenderable&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;TerrainQuadTreeNode&#39; class.</div>
+<span class='iname_a'>TerrainQuadTreeNode::writePosVertex&#160;<span class='sym_p'><span>(&#160;bool <i>compress</i></span>, <span>uint16 <i>x</i></span>, <span>uint16 <i>y</i></span>, <span>float <i>height</i></span>, <span>Vector3 const&amp; <i>pos</i></span>, <span>float <i>uvScale</i></span>, <span>float** <i>ppPos</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;TerrainQuadTreeNode&#39; class.</div>
+<span class='iname_a'>TerrainQuadTreeNode::mergeIntoBounds&#160;<span class='sym_p'><span>(&#160;long <i>x</i></span>, <span>long <i>y</i></span>, <span>Vector3 const&amp; <i>pos</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;TerrainQuadTreeNode&#39; class.</div>
+<span class='iname_a'>TerrainQuadTreeNode::POSITION_BUFFER <span class='attr'>[data]</span></span><br/>
+<div class='affect'>This method is from &#39;TerrainQuadTreeNode&#39; class.</div>
+<span class='iname_a'>TerrainQuadTreeNode::rectContainsNode&#160;<span class='sym_p'><span>(&#160;Rect const&amp; <i>rect</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;TerrainQuadTreeNode&#39; class.</div>
+<span class='iname_a'>TerrainQuadTreeNode::setLodTransition&#160;<span class='sym_p'><span>(&#160;float <i>t</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;TerrainQuadTreeNode&#39; class.</div>
+<span class='iname_a'>TerrainQuadTreeNode::visitRenderables&#160;<span class='sym_p'><span>(&#160;Renderable::Visitor* <i>visitor</i></span>, <span>bool <i>debugRenderables</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;TerrainQuadTreeNode&#39; class.</div>
+ <b>...</b>
+<br/>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='Other_Changes'></a><a name='Other_Changes_In_Types'></a>
+<h2>Other Changes in Data Types <span class='passed'>&nbsp;2&nbsp;</span></h2><hr/>
+<span class='h_name'>OgrePixelFormat.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_74')">
+<span class='ext'>[+]</span> <span class='ttype'>enum</span> PixelFormat <span class='passed'>&nbsp;2&nbsp;</span></span>
+<br/>
+<div id="c_74" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>The member <b>PF_DEPTH32F</b> with value <b>108</b> has been added.</td>
+<td>No effect.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>The member <b>PF_R8G8</b> with value <b>77</b> has been added.</td>
+<td>No effect.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_75')">
+[+] affected symbols: 104 (21.4%)</span>
+<div id="c_75" style="display:none;">
+<div class='affected'><span class='iname_a'>TerrainGroup::loadTerrain&#160;<span class='sym_p'><span>(&#160;long <i>x</i></span>, <span>long <i>y</i></span>, <span>bool <i>synchronous</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mDefaultImportData.inputImage.mFormat&#39; in the object of this method is of type &#39;enum PixelFormat&#39;.</div>
+<span class='iname_a'>TerrainGroup::TerrainSlot::freeInstance&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.def.importData.inputImage.mFormat&#39; in the object of this method is of type &#39;enum PixelFormat&#39;.</div>
+<span class='iname_a'>TerrainGroup::TerrainSlot::~TerrainSlot&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.def.importData.inputImage.mFormat&#39; in the object of this method is of type &#39;enum PixelFormat&#39;.</div>
+<span class='iname_a'>TerrainGroup::unpackIndex&#160;<span class='sym_p'><span>(&#160;uint32 <i>key</i></span>, <span>long* <i>x</i></span>, <span>long* <i>y</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mDefaultImportData.inputImage.mFormat&#39; in the object of this method is of type &#39;enum PixelFormat&#39;.</div>
+<span class='iname_a'>TerrainGroup::autoUpdateLod&#160;<span class='sym_p'><span>(&#160;long <i>x</i></span>, <span>long <i>y</i></span>, <span>bool <i>synchronous</i></span>, <span>Any const&amp; <i>data</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mDefaultImportData.inputImage.mFormat&#39; in the object of this method is of type &#39;enum PixelFormat&#39;.</div>
+<span class='iname_a'>TerrainGroup::defineTerrain&#160;<span class='sym_p'><span>(&#160;long <i>x</i></span>, <span>long <i>y</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mDefaultImportData.inputImage.mFormat&#39; in the object of this method is of type &#39;enum PixelFormat&#39;.</div>
+<span class='iname_a'>TerrainGroup::defineTerrain&#160;<span class='sym_p'><span>(&#160;long <i>x</i></span>, <span>long <i>y</i></span>, <span>float <i>constantHeight</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mDefaultImportData.inputImage.mFormat&#39; in the object of this method is of type &#39;enum PixelFormat&#39;.</div>
+<span class='iname_a'>TerrainGroup::defineTerrain&#160;<span class='sym_p'><span>(&#160;long <i>x</i></span>, <span>long <i>y</i></span>, <span>float const* <i>pFloat</i></span>, <span>Terrain::LayerInstanceList const* <i>layers</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mDefaultImportData.inputImage.mFormat&#39; in the object of this method is of type &#39;enum PixelFormat&#39;.</div>
+<span class='iname_a'>TerrainGroup::defineTerrain&#160;<span class='sym_p'><span>(&#160;long <i>x</i></span>, <span>long <i>y</i></span>, <span>Image const* <span class='fp'>img</span></span>, <span>Terrain::LayerInstanceList const* <i>layers</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;img.mFormat&#39; in 3rd parameter &#39;img&#39; (pointer) is of type &#39;enum PixelFormat&#39;.</div>
+<span class='iname_a'>TerrainGroup::defineTerrain&#160;<span class='sym_p'><span>(&#160;long <i>x</i></span>, <span>long <i>y</i></span>, <span>struct Terrain::ImportData const* <span class='fp'>importData</span></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;importData.inputImage.mFormat&#39; in 3rd parameter &#39;importData&#39; (pointer) is of type &#39;enum PixelFormat&#39;.</div>
+ <b>...</b>
+<br/>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='Headers'></a><h2>Header Files <span class='gray'>&nbsp;46&nbsp;</span></h2><hr/>
+<div class='h_list'>
+OgreAny.h<br/>
+OgreAxisAlignedBox.h<br/>
+OgreBlendMode.h<br/>
+OgreColourValue.h<br/>
+OgreCommon.h<br/>
+OgreConfigFile.h<br/>
+OgreGpuProgramParams.h<br/>
+OgreHardwareVertexBuffer.h<br/>
+OgreImage.h<br/>
+OgreIteratorWrapper.h<br/>
+OgreLight.h<br/>
+OgreMath.h<br/>
+OgreMatrix4.h<br/>
+OgreMemoryAllocatorConfig.h<br/>
+OgreNameGenerator.h<br/>
+OgrePagedWorldSection.h<br/>
+OgrePagingPrerequisites.h<br/>
+OgrePass.h<br/>
+OgrePixelFormat.h<br/>
+OgrePlatform.h<br/>
+OgrePrerequisites.h<br/>
+OgreRay.h<br/>
+OgreRenderable.h<br/>
+OgreRenderOperation.h<br/>
+OgreRenderSystemCapabilities.h<br/>
+OgreSceneManager.h<br/>
+OgreSharedPtr.h<br/>
+OgreSingleton.h<br/>
+OgreSphere.h<br/>
+OgreStringVector.h<br/>
+OgreTechnique.h<br/>
+OgreTerrain.h<br/>
+OgreTerrainAutoUpdateLod.h<br/>
+OgreTerrainGroup.h<br/>
+OgreTerrainLayerBlendMap.h<br/>
+OgreTerrainLodManager.h<br/>
+OgreTerrainMaterialGenerator.h<br/>
+OgreTerrainMaterialGeneratorA.h<br/>
+OgreTerrainPagedWorldSection.h<br/>
+OgreTerrainPaging.h<br/>
+OgreTerrainQuadTreeNode.h<br/>
+OgreTextureUnitState.h<br/>
+OgreUserObjectBindings.h<br/>
+OgreVector.h<br/>
+OgreVertexIndexData.h<br/>
+OgreWorkQueue.h<br/>
+</div>
+<br/><a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='Sources'></a><h2>Source Files <span class='gray'>&nbsp;10&nbsp;</span></h2><hr/>
+<div class='h_list'>
+OgreTerrain.cpp<br/>
+OgreTerrainAutoUpdateLod.cpp<br/>
+OgreTerrainGroup.cpp<br/>
+OgreTerrainLayerBlendMap.cpp<br/>
+OgreTerrainLodManager.cpp<br/>
+OgreTerrainMaterialGenerator.cpp<br/>
+OgreTerrainMaterialGeneratorA.cpp<br/>
+OgreTerrainPagedWorldSection.cpp<br/>
+OgreTerrainPaging.cpp<br/>
+OgreTerrainQuadTreeNode.cpp<br/>
+</div>
+<br/><a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='Libs'></a><h2>Objects <span class='gray'>&nbsp;1&nbsp;</span></h2><hr/>
+<div class='lib_list'>
+libOgreTerrain.so.1.11.6<br/>
+</div>
+<br/><a class='top_ref' href='#Top'>to the top</a><br/>
+</div>
+<br/><br/><br/>
+<hr/>
+<div class='footer' align='right'><i>Generated by <a href='https://github.com/lvc/abi-compliance-checker'>ABI Compliance Checker</a> 2.3 &#160;</i>
+</div>
+<br/>
+
+</body></html>

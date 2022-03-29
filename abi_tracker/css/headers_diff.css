@@ -1,0 +1,33 @@
+.diff_tbl tr { } 
+.diff_tbl td {
+    white-space: pre;
+    font-family: "DejaVu Sans Mono", "Droid Sans Mono", Monaco, Monospace;
+    vertical-align: top;
+    font-size: 14px;
+}
+
+.diff_tbl th {
+    font-size: 16px;
+    text-align:center;
+}
+
+.small  { font-size: 0.6em; font-style: italic; font-family: Verdana, Helvetica, sans-serif; } 
+.left   { background-color: #EEE; } 
+.right  { background-color: #FFF; } 
+.diff   { background-color: #CCF; } 
+.lblock { background-color: #BFB; } 
+.rblock { background-color: #FF8; } 
+.insert { background-color: #8FF; } 
+.delete { background-color: #ACF; } 
+.void   { background-color: #FFB; } 
+.cont   { background-color: #EEE; } 
+.linebr { background-color: #AAA; } 
+.lineno { color: red; background-color: #FFF; font-size: 0.7em; text-align: right; padding: 0 2px; } 
+.elipsis{ background-color: #AAA; } 
+.left .cont { background-color: #DDD; } 
+.right .cont { background-color: #EEE; } 
+.lblock .cont { background-color: #9D9; } 
+.rblock .cont { background-color: #DD6; } 
+.insert .cont { background-color: #0DD; } 
+.delete .cont { background-color: #8AD; } 
+.stats, .stats td, .stats th { background-color: #EEE; padding: 2px 0; }
