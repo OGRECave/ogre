@@ -1,0 +1,542 @@
+<!-- verdict:incompatible;affected:0.8;added:0;removed:0;type_problems_high:0;type_problems_medium:2;type_problems_low:2;interface_problems_high:0;interface_problems_medium:0;interface_problems_low:4;changed_constants:0;tool_version:2.3 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta name="keywords" content="libOgrePaging, binary compatibility, API, report" />
+<meta name="description" content="Binary compatibility report for the libOgrePaging object between 1.8.1 and 1.9.1 versions on x86_64" />
+<title>libOgrePaging: 1.8.1 to 1.9.1 binary compatibility report</title>
+<style type="text/css">
+body {
+    font-family:Arial, sans-serif;
+    background-color:White;
+    color:Black;
+}
+hr {
+    color:Black;
+    background-color:Black;
+    height:1px;
+    border:0;
+}
+h1 {
+    margin-bottom:0px;
+    padding-bottom:0px;
+    font-size:1.625em;
+}
+h2 {
+    margin-bottom:0px;
+    padding-bottom:0px;
+    font-size:1.25em;
+    white-space:nowrap;
+}
+span.section {
+    font-weight:bold;
+    cursor:pointer;
+    color:#003E69;
+    white-space:nowrap;
+    margin-left:0.3125em;
+}
+span.new_sign {
+    font-weight:bold;
+    margin-left:1.65em;
+    color:#003E69;
+}
+span.new_sign_lbl {
+    margin-left:3em;
+    font-size:1em;
+    color:Black;
+}
+span:hover.section {
+    color:#336699;
+}
+span.sect_aff {
+    cursor:pointer;
+    padding-left:1.55em;
+    font-size:0.875em;
+    color:#cc3300;
+}
+span.sect_info {
+    cursor:pointer;
+    padding-left:1.55em;
+    font-size:0.875em;
+    color:Black;
+}
+span.ext {
+    font-weight:normal;
+}
+span.h_name {
+    color:#cc3300;
+    font-size:0.875em;
+    font-weight:bold;
+}
+div.h_list, div.lib_list {
+    font-size:0.94em;
+    padding-left:0.4em;
+}
+span.ns {
+    color:#408080;
+    font-size:0.94em;
+}
+span.lib_name {
+    color:Green;
+    font-size:0.875em;
+    font-weight:bold;
+}
+span.iname {
+    font-weight:bold;
+    color:#003E69;
+    margin-left:0.3125em;
+}
+span.iname_b {
+    font-weight:bold;
+}
+span.iname_a {
+    color:#333333;
+    font-weight:bold;
+    font-size:0.94em;
+}
+span.sym_p {
+    font-weight:normal;
+    white-space:normal;
+}
+span.sym_pd {
+    white-space:normal;
+}
+span.sym_p span, span.sym_pd span {
+    white-space:nowrap;
+}
+div.affect {
+    padding-left:1em;
+    padding-bottom:10px;
+    font-size:0.87em;
+    font-style:italic;
+    line-height:0.9em;
+}
+div.affected {
+    padding-left:1.9em;
+    padding-top:10px;
+}
+table.ptable {
+    border-collapse:collapse;
+    border:1px outset black;
+    margin-left:0.95em;
+    margin-top:3px;
+    margin-bottom:3px;
+    width:56.25em;
+}
+table.ptable td {
+    border:1px solid gray;
+    padding:3px;
+    font-size:0.875em;
+    text-align:left;
+    vertical-align:top;
+    max-width:28em;
+    word-wrap:break-word;
+}
+table.ptable th.pn {
+    width:2%;
+}
+table.ptable th.chg {
+    width:47%;
+}
+table.vtable {
+    border-collapse:collapse;
+    border:1px outset black;
+    margin-left:1.9em;
+    margin-top:0.7em;
+}
+table.vtable td {
+    border:1px solid gray;
+    padding:3px;
+    font-size:0.875em;
+    vertical-align:top;
+    max-width:450px;
+    word-wrap:break-word;
+}
+table.ptable th, table.vtable th {
+    background-color:#eeeeee;
+    font-weight:bold;
+    color:#333333;
+    font-family:Verdana, Arial;
+    font-size:0.875em;
+    border:1px solid gray;
+    text-align:center;
+    vertical-align:top;
+    white-space:nowrap;
+    padding:3px;
+}
+table.summary {
+    border-collapse:collapse;
+    border:1px outset black;
+}
+table.summary th {
+    background-color:#eeeeee;
+    font-weight:normal;
+    text-align:left;
+    font-size:0.94em;
+    white-space:nowrap;
+    border:1px inset gray;
+    padding:3px;
+}
+table.summary td {
+    text-align:right;
+    white-space:nowrap;
+    border:1px inset gray;
+    padding:3px 5px 3px 10px;
+}
+span.mngl {
+    padding-left:1em;
+    font-size:0.875em;
+    cursor:text;
+    color:#444444;
+    font-weight:bold;
+}
+span.pleft {
+    padding-left:2.5em;
+}
+span.sym_ver {
+    color:#333333;
+    white-space:nowrap;
+    font-family:"DejaVu Sans Mono", Monospace;
+}
+span.attr {
+    color:#333333;
+    font-weight:normal;
+}
+span.color_p {
+    font-style:italic;
+    color:Brown;
+}
+span.p {
+    font-style:italic;
+}
+span.fp {
+    font-style:italic;
+    background-color:#DCDCDC;
+}
+span.ttype {
+    font-weight:normal;
+}
+span.nowrap {
+    white-space:nowrap;
+}
+span.value {
+    font-weight:bold;
+}
+.passed {
+    background-color:#CCFFCC;
+    font-weight:normal;
+}
+.warning {
+    background-color:#F4F4AF;
+    font-weight:normal;
+}
+.failed {
+    background-color:#FFCCCC;
+    font-weight:normal;
+}
+.new {
+    background-color:#C6DEFF;
+    font-weight:normal;
+}
+.compatible {
+    background-color:#CCFFCC;
+    font-weight:normal;
+}
+.almost_compatible {
+    background-color:#FFDAA3;
+    font-weight:normal;
+}
+.incompatible {
+    background-color:#FFCCCC;
+    font-weight:normal;
+}
+.gray {
+    background-color:#DCDCDC;
+    font-weight:normal;
+}
+.top_ref {
+    font-size:0.69em;
+}
+.footer {
+    font-size:0.75em;
+}
+</style>
+<script type="text/javascript" language="JavaScript">
+<!--
+function showContent(header, id)
+{
+    e = document.getElementById(id);
+    if(e.style.display == 'none')
+    {
+        e.style.display = 'block';
+        e.style.visibility = 'visible';
+        header.innerHTML = header.innerHTML.replace(/\[[^0-9 ]\]/gi,"[&minus;]");
+    }
+    else
+    {
+        e.style.display = 'none';
+        e.style.visibility = 'hidden';
+        header.innerHTML = header.innerHTML.replace(/\[[^0-9 ]\]/gi,"[+]");
+    }
+}
+-->
+</script>
+</head>
+
+<body>
+<div><a name='Top'></a>
+<h1>Binary compatibility report for the <span style='color:Blue;'>libOgrePaging.so</span> object between <span style='color:Red;'>1.8.1</span> and <span style='color:Red;'>1.9.1</span> versions on <span style='color:Blue;'>x86_64</span></h1>
+
+<h2>Test Info</h2><hr/>
+<table class='summary'>
+<tr><th>Module Name</th><td>libOgrePaging</td></tr>
+<tr><th>Version #1</th><td>1.8.1</td></tr>
+<tr><th>Version #2</th><td>1.9.1</td></tr>
+<tr><th>Arch</th><td>x86_64</td></tr>
+<tr><th>GCC Version</th><td>9.4.0</td></tr>
+</table>
+<h2>Test Results</h2><hr/>
+<table class='summary'><tr><th>Total Header Files</th><td><a href='#Headers' style='color:Blue;'>28</a></td></tr>
+<tr><th>Total Source Files</th><td><a href='#Sources' style='color:Blue;'>9</a></td></tr>
+<tr><th>Total Objects</th><td><a href='#Libs' style='color:Blue;'>1</a></td></tr>
+<tr><th>Total Symbols / Types</th><td>257 / 72</td></tr>
+<tr><th>Compatibility</th>
+<td class='warning'>99.2%</td>
+</tr>
+</table>
+<h2>Problem Summary</h2><hr/>
+<table class='summary'><tr><th></th><th style='text-align:center;'>Severity</th><th style='text-align:center;'>Count</th></tr><tr><th>Added Symbols</th><td>-</td><td>0</td></tr>
+<tr><th>Removed Symbols</th><td>High</td><td>0</td></tr>
+<tr><th rowspan='3'>Problems with<br/>Data Types</th><td>High</td><td>0</td></tr>
+<tr><td>Medium</td><td class='failed'><a href='#Type_Problems_Medium' style='color:Blue;'>2</a></td></tr>
+<tr><td>Low</td><td class='warning'><a href='#Type_Problems_Low' style='color:Blue;'>2</a></td></tr>
+<tr><th rowspan='3'>Problems with<br/>Symbols</th><td>High</td><td>0</td></tr>
+<tr><td>Medium</td><td>0</td></tr>
+<tr><td>Low</td><td class='warning'><a href='#Symbol_Problems_Low' style='color:Blue;'>4</a></td></tr>
+<tr><th>Problems with<br/>Constants</th><td>Low</td><td>0</td></tr>
+</table>
+
+<a name='Medium_Risk_Problems'></a><a name='Type_Problems_Medium'></a>
+<h2>Problems with Data Types, Medium Severity <span class='failed'>&nbsp;2&nbsp;</span></h2><hr/>
+<span class='h_name'>OgreSharedPtr.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_1')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> SharedPtr&lt;DataStream&gt; <span class='failed'>&nbsp;2&nbsp;</span></span>
+<br/>
+<div id="c_1" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Field <b>pUseCount</b> has been removed from this type.</td>
+<td>1) Applications will access incorrect memory when attempting to access this field.<br/>2) Size of the inclusive type has been changed.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>Field <b>useFreeMethod</b> has been removed from this type.</td>
+<td>1) Applications will access incorrect memory when attempting to access this field.<br/>2) Size of the inclusive type has been changed.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_2')">
+[+] affected symbols: 4 (1.6%)</span>
+<div id="c_2" style="display:none;">
+<div class='affected'><span class='iname_a'>PagedWorld::load&#160;<span class='sym_p'><span>(&#160;DataStreamPtr const&amp; <span class='fp'>stream</span></span>&#160;)</span></span><br/>
+<div class='affect'>1st parameter &#39;stream&#39; (reference) has base type &#39;SharedPtr&lt;DataStream&gt;&#39;.</div>
+<span class='iname_a'>PagedWorld::save&#160;<span class='sym_p'><span>(&#160;DataStreamPtr const&amp; <span class='fp'>stream</span></span>&#160;)</span></span><br/>
+<div class='affect'>1st parameter &#39;stream&#39; (reference) has base type &#39;SharedPtr&lt;DataStream&gt;&#39;.</div>
+<span class='iname_a'>PageManager::loadWorld&#160;<span class='sym_p'><span>(&#160;DataStreamPtr const&amp; <span class='fp'>stream</span></span>, <span>String const&amp; <i>name</i></span>&#160;)</span></span><br/>
+<div class='affect'>1st parameter &#39;stream&#39; (reference) has base type &#39;SharedPtr&lt;DataStream&gt;&#39;.</div>
+<span class='iname_a'>PageManager::saveWorld&#160;<span class='sym_p'><span>(&#160;PagedWorld* <i>world</i></span>, <span>DataStreamPtr const&amp; <span class='fp'>stream</span></span>&#160;)</span></span><br/>
+<div class='affect'>2nd parameter &#39;stream&#39; (reference) has base type &#39;SharedPtr&lt;DataStream&gt;&#39;.</div>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='Low_Risk_Problems'></a><a name='Type_Problems_Low'></a>
+<h2>Problems with Data Types, Low Severity <span class='warning'>&nbsp;2&nbsp;</span></h2><hr/>
+<span class='h_name'>OgreSharedPtr.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_3')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> SharedPtr&lt;DataStream&gt; <span class='warning'>&nbsp;2&nbsp;</span></span>
+<br/>
+<div id="c_3" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Field <b>pInfo</b> has been added to this type.</td>
+<td>1) This field will not be initialized by old clients.<br/>2) Size of the inclusive type has been changed.<br/><br/><b>NOTE</b>: this field should be accessed only from the new library functions, otherwise it may result in crash or incorrect behavior of applications.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>Size of this type has been changed from <b>32</b> bytes to <b>16</b> bytes.</td>
+<td>The fields or parameters of such data type may be incorrectly initialized or accessed by old client applications.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_4')">
+[+] affected symbols: 4 (1.6%)</span>
+<div id="c_4" style="display:none;">
+<div class='affected'><span class='iname_a'>PagedWorld::load&#160;<span class='sym_p'><span>(&#160;DataStreamPtr const&amp; <span class='fp'>stream</span></span>&#160;)</span></span><br/>
+<div class='affect'>1st parameter &#39;stream&#39; (reference) has base type &#39;SharedPtr&lt;DataStream&gt;&#39;.</div>
+<span class='iname_a'>PagedWorld::save&#160;<span class='sym_p'><span>(&#160;DataStreamPtr const&amp; <span class='fp'>stream</span></span>&#160;)</span></span><br/>
+<div class='affect'>1st parameter &#39;stream&#39; (reference) has base type &#39;SharedPtr&lt;DataStream&gt;&#39;.</div>
+<span class='iname_a'>PageManager::loadWorld&#160;<span class='sym_p'><span>(&#160;DataStreamPtr const&amp; <span class='fp'>stream</span></span>, <span>String const&amp; <i>name</i></span>&#160;)</span></span><br/>
+<div class='affect'>1st parameter &#39;stream&#39; (reference) has base type &#39;SharedPtr&lt;DataStream&gt;&#39;.</div>
+<span class='iname_a'>PageManager::saveWorld&#160;<span class='sym_p'><span>(&#160;PagedWorld* <i>world</i></span>, <span>DataStreamPtr const&amp; <span class='fp'>stream</span></span>&#160;)</span></span><br/>
+<div class='affect'>2nd parameter &#39;stream&#39; (reference) has base type &#39;SharedPtr&lt;DataStream&gt;&#39;.</div>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='Symbol_Problems_Low'></a><a name='Interface_Problems_Low'></a>
+<h2>Problems with Symbols, Low Severity <span class='warning'>&nbsp;4&nbsp;</span></h2><hr/>
+<span class='h_name'>OgrePagedWorld.h</span>, <span class='lib_name'>libOgrePaging.so.1.8.1</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_5')">
+<span class='ext'>[+]</span> PagedWorld::load&#160;<span class='sym_p'><span>(&#160;DataStreamPtr const&amp; <span class='color_p'>stream</span></span>&#160;)</span> <span class='warning'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_5" style="display:none;">
+
+<span class='mngl pleft'>_ZN4Ogre10PagedWorld4loadERKNS_9SharedPtrINS_10DataStreamEEE</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>This method became <b>private</b>.</td>
+<td>Old applications will continue using this method, but it may require a different initialization of the environment and parameters.</td>
+</tr>
+</table>
+<br/>
+</div>
+<span class="section" onclick="javascript:showContent(this, 'c_6')">
+<span class='ext'>[+]</span> PagedWorld::load&#160;<span class='sym_p'><span>(&#160;StreamSerialiser&amp; <span class='color_p'>ser</span></span>&#160;)</span> <span class='warning'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_6" style="display:none;">
+
+<span class='mngl pleft'>_ZN4Ogre10PagedWorld4loadERNS_16StreamSerialiserE</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>This method became <b>private</b>.</td>
+<td>Old applications will continue using this method, but it may require a different initialization of the environment and parameters.</td>
+</tr>
+</table>
+<br/>
+</div>
+<span class="section" onclick="javascript:showContent(this, 'c_7')">
+<span class='ext'>[+]</span> PagedWorld::save&#160;<span class='sym_p'><span>(&#160;DataStreamPtr const&amp; <span class='color_p'>stream</span></span>&#160;)</span> <span class='warning'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_7" style="display:none;">
+
+<span class='mngl pleft'>_ZN4Ogre10PagedWorld4saveERKNS_9SharedPtrINS_10DataStreamEEE</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>This method became <b>private</b>.</td>
+<td>Old applications will continue using this method, but it may require a different initialization of the environment and parameters.</td>
+</tr>
+</table>
+<br/>
+</div>
+<span class="section" onclick="javascript:showContent(this, 'c_8')">
+<span class='ext'>[+]</span> PagedWorld::save&#160;<span class='sym_p'><span>(&#160;String const&amp; <span class='color_p'>filename</span></span>&#160;)</span> <span class='warning'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_8" style="display:none;">
+
+<span class='mngl pleft'>_ZN4Ogre10PagedWorld4saveERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>This method became <b>private</b>.</td>
+<td>Old applications will continue using this method, but it may require a different initialization of the environment and parameters.</td>
+</tr>
+</table>
+<br/>
+</div>
+<br/>
+<a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='Headers'></a><h2>Header Files <span class='gray'>&nbsp;28&nbsp;</span></h2><hr/>
+<div class='h_list'>
+OgreAny.h<br/>
+OgreAxisAlignedBox.h<br/>
+OgreCamera.h<br/>
+OgreCommon.h<br/>
+OgreDataStream.h<br/>
+OgreFrameListener.h<br/>
+OgreGrid2DPageStrategy.h<br/>
+OgreGrid3DPageStrategy.h<br/>
+OgreMemoryAllocatedObject.h<br/>
+OgreMemoryAllocatorConfig.h<br/>
+OgreMemoryStdAlloc.h<br/>
+OgrePage.h<br/>
+OgrePageContent.h<br/>
+OgrePageContentCollection.h<br/>
+OgrePageContentCollectionFactory.h<br/>
+OgrePageContentFactory.h<br/>
+OgrePagedWorld.h<br/>
+OgrePagedWorldSection.h<br/>
+OgrePageManager.h<br/>
+OgrePageStrategy.h<br/>
+OgrePagingPrerequisites.h<br/>
+OgrePlatform.h<br/>
+OgrePrerequisites.h<br/>
+OgreSharedPtr.h<br/>
+OgreSimplePageContentCollection.h<br/>
+OgreVector2.h<br/>
+OgreVector3.h<br/>
+OgreWorkQueue.h<br/>
+</div>
+<br/><a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='Sources'></a><h2>Source Files <span class='gray'>&nbsp;9&nbsp;</span></h2><hr/>
+<div class='h_list'>
+OgreGrid2DPageStrategy.cpp<br/>
+OgreGrid3DPageStrategy.cpp<br/>
+OgrePage.cpp<br/>
+OgrePageContent.cpp<br/>
+OgrePageContentCollection.cpp<br/>
+OgrePagedWorld.cpp<br/>
+OgrePagedWorldSection.cpp<br/>
+OgrePageManager.cpp<br/>
+OgreSimplePageContentCollection.cpp<br/>
+</div>
+<br/><a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='Libs'></a><h2>Objects <span class='gray'>&nbsp;1&nbsp;</span></h2><hr/>
+<div class='lib_list'>
+libOgrePaging.so.1.8.1<br/>
+</div>
+<br/><a class='top_ref' href='#Top'>to the top</a><br/>
+</div>
+<br/><br/><br/>
+<hr/>
+<div class='footer' align='right'><i>Generated by <a href='https://github.com/lvc/abi-compliance-checker'>ABI Compliance Checker</a> 2.3 &#160;</i>
+</div>
+<br/>
+
+</body></html>

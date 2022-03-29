@@ -1,0 +1,82 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+    <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="keywords" content="OGRE, ABI, changes, compatibility, report" />
+    <meta name="description" content="ABI changes/compatibility report between 1.8.1 and 1.9.1 versions of the ogre" />
+    <link rel="stylesheet" type="text/css" href="../../../../css/common.css?v=1.3" />
+    <link rel="stylesheet" type="text/css" href="../../../../css/report.css?v=1.1.1" />
+    
+    <title>
+        OGRE: Objects ABI report between 1.8.1 and 1.9.1 versions
+    </title>
+    
+    </head>
+
+<body>
+<table cellpadding='0' cellspacing='0'>
+<tr><td align='center'><h1 class='tool'><a title='ABI tracker for OGRE' href='../../../../timeline/ogre/index.html' class='tool'>ABI<br/>Tracker</a></h1></td><td width='30px;'></td><td><h1>(OGRE)</h1></td></tr>
+</table>
+<hr/>
+<br/>
+<br/>
+<h1>Objects ABI report: <span class='version'>1.8.1</span> vs <span class='version'>1.9.1</span></h1>
+<br/>
+<br/>
+<!-- content -->
+<table class='summary'>
+<tr><th rowspan='2'>Object</th>
+<th colspan='2'>Backward<br/>Compat.</th>
+<th rowspan='2'>Added<br/>Symbols</th>
+<th rowspan='2'>Removed<br/>Symbols</th>
+</tr>
+<tr><th title='Binary compatibility' class='bc'>BC</th>
+<th title='Source compatibility' class='sc'>SC</th>
+</tr>
+<tr>
+<td class='object'>libOgreOverlay.so.1.9.0</td>
+<td colspan='4' class='added'>Added to package</td>
+</tr>
+<tr>
+<td class='object'>libOgreVolume.so.1.9.0</td>
+<td colspan='4' class='added'>Added to package</td>
+</tr>
+<tr>
+<td class='object'>libOgreMain.so.1.8.1<br/><br/><span class='incompatible'>(changed SONAME from<br/>"libOgreMain.so.1.8.1"<br/>to<br/>"libOgreMain.so.1.9.0")</span></td>
+<td class='incompatible'><a href='../../../../compat_report/ogre/1.8.1/1.9.1/6cca5/abi_compat_report.html'>36.6%</a></td>
+<td class='incompatible'><a href='../../../../compat_report/ogre/1.8.1/1.9.1/6cca5/src_compat_report.html'>61.2%</a></td>
+<td class='added'><a class='num' href='../../../../compat_report/ogre/1.8.1/1.9.1/6cca5/abi_compat_report.html#Added'>356 new</a></td>
+<td class='removed'><a class='num' href='../../../../compat_report/ogre/1.8.1/1.9.1/6cca5/abi_compat_report.html#Removed'>539 removed</a></td>
+</tr>
+<tr>
+<td class='object'>libOgrePaging.so.1.8.1<br/><br/><span class='incompatible'>(changed SONAME from<br/>"libOgrePaging.so.1.8.1"<br/>to<br/>"libOgrePaging.so.1.9.0")</span></td>
+<td class='warning'><a href='../../../../compat_report/ogre/1.8.1/1.9.1/9ddf8/abi_compat_report.html'>99.2%</a></td>
+<td class='warning'><a href='../../../../compat_report/ogre/1.8.1/1.9.1/9ddf8/src_compat_report.html'>97.4%</a></td>
+<td class='ok'>0</td>
+<td class='ok'>0</td>
+</tr>
+<tr>
+<td class='object'>libOgreRTShaderSystem.so.1.8.1<br/><br/><span class='incompatible'>(changed SONAME from<br/>"libOgreRTShaderSystem.so.1.8.1"<br/>to<br/>"libOgreRTShaderSystem.so.1.9.0")</span></td>
+<td class='incompatible'><a href='../../../../compat_report/ogre/1.8.1/1.9.1/3c06c/abi_compat_report.html'>38.6%</a></td>
+<td class='incompatible'><a href='../../../../compat_report/ogre/1.8.1/1.9.1/3c06c/src_compat_report.html'>52.6%</a></td>
+<td class='added'><a class='num' href='../../../../compat_report/ogre/1.8.1/1.9.1/3c06c/abi_compat_report.html#Added'>57 new</a></td>
+<td class='removed'><a class='num' href='../../../../compat_report/ogre/1.8.1/1.9.1/3c06c/abi_compat_report.html#Removed'>19 removed</a></td>
+</tr>
+<tr>
+<td class='object'>libOgreTerrain.so.1.8.1<br/><br/><span class='incompatible'>(changed SONAME from<br/>"libOgreTerrain.so.1.8.1"<br/>to<br/>"libOgreTerrain.so.1.9.0")</span></td>
+<td class='incompatible'><a href='../../../../compat_report/ogre/1.8.1/1.9.1/b9e50/abi_compat_report.html'>33.9%</a></td>
+<td class='incompatible'><a href='../../../../compat_report/ogre/1.8.1/1.9.1/b9e50/src_compat_report.html'>55%</a></td>
+<td class='added'><a class='num' href='../../../../compat_report/ogre/1.8.1/1.9.1/b9e50/abi_compat_report.html#Added'>119 new</a></td>
+<td class='removed'><a class='num' href='../../../../compat_report/ogre/1.8.1/1.9.1/b9e50/abi_compat_report.html#Removed'>46 removed</a></td>
+</tr>
+</table>
+<!-- content end -->
+<br/>
+<br/>
+<hr/>
+<div align='right'><a class='home' title="Andrey Ponomarenko's ABI laboratory" href='https://github.com/lvc'>github.com/lvc</a></div>
+<br/>
+
+</body>
+</html>

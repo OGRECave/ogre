@@ -1,0 +1,11 @@
+{
+  "Affected": "63.4",
+  "Added": 356,
+  "Removed": 539,
+  "TotalProblems": 732,
+  "Source_Affected": "38.8",
+  "Source_TotalProblems": "404",
+  "Source_ReportPath": "compat_report/ogre/1.8.1/1.9.1/6cca5/src_compat_report.html",
+  "Object1": "lib/libOgreMain.so.1.8.1",
+  "Object2": "lib/libOgreMain.so.1.9.0"
+}

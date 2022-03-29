@@ -1,0 +1,1648 @@
+<!-- verdict:incompatible;affected:11.1;added:4;removed:1;type_problems_high:3;type_problems_medium:3;type_problems_low:7;interface_problems_high:1;interface_problems_medium:0;interface_problems_low:0;changed_constants:0;type_changes_other:1;tool_version:2.3 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta name="keywords" content="libOgreVolume, binary compatibility, API, report" />
+<meta name="description" content="Binary compatibility report for the libOgreVolume object between 1.9.1 and 1.10.12 versions on x86_64" />
+<title>libOgreVolume: 1.9.1 to 1.10.12 binary compatibility report</title>
+<style type="text/css">
+body {
+    font-family:Arial, sans-serif;
+    background-color:White;
+    color:Black;
+}
+hr {
+    color:Black;
+    background-color:Black;
+    height:1px;
+    border:0;
+}
+h1 {
+    margin-bottom:0px;
+    padding-bottom:0px;
+    font-size:1.625em;
+}
+h2 {
+    margin-bottom:0px;
+    padding-bottom:0px;
+    font-size:1.25em;
+    white-space:nowrap;
+}
+span.section {
+    font-weight:bold;
+    cursor:pointer;
+    color:#003E69;
+    white-space:nowrap;
+    margin-left:0.3125em;
+}
+span.new_sign {
+    font-weight:bold;
+    margin-left:1.65em;
+    color:#003E69;
+}
+span.new_sign_lbl {
+    margin-left:3em;
+    font-size:1em;
+    color:Black;
+}
+span:hover.section {
+    color:#336699;
+}
+span.sect_aff {
+    cursor:pointer;
+    padding-left:1.55em;
+    font-size:0.875em;
+    color:#cc3300;
+}
+span.sect_info {
+    cursor:pointer;
+    padding-left:1.55em;
+    font-size:0.875em;
+    color:Black;
+}
+span.ext {
+    font-weight:normal;
+}
+span.h_name {
+    color:#cc3300;
+    font-size:0.875em;
+    font-weight:bold;
+}
+div.h_list, div.lib_list {
+    font-size:0.94em;
+    padding-left:0.4em;
+}
+span.ns {
+    color:#408080;
+    font-size:0.94em;
+}
+span.lib_name {
+    color:Green;
+    font-size:0.875em;
+    font-weight:bold;
+}
+span.iname {
+    font-weight:bold;
+    color:#003E69;
+    margin-left:0.3125em;
+}
+span.iname_b {
+    font-weight:bold;
+}
+span.iname_a {
+    color:#333333;
+    font-weight:bold;
+    font-size:0.94em;
+}
+span.sym_p {
+    font-weight:normal;
+    white-space:normal;
+}
+span.sym_pd {
+    white-space:normal;
+}
+span.sym_p span, span.sym_pd span {
+    white-space:nowrap;
+}
+div.affect {
+    padding-left:1em;
+    padding-bottom:10px;
+    font-size:0.87em;
+    font-style:italic;
+    line-height:0.9em;
+}
+div.affected {
+    padding-left:1.9em;
+    padding-top:10px;
+}
+table.ptable {
+    border-collapse:collapse;
+    border:1px outset black;
+    margin-left:0.95em;
+    margin-top:3px;
+    margin-bottom:3px;
+    width:56.25em;
+}
+table.ptable td {
+    border:1px solid gray;
+    padding:3px;
+    font-size:0.875em;
+    text-align:left;
+    vertical-align:top;
+    max-width:28em;
+    word-wrap:break-word;
+}
+table.ptable th.pn {
+    width:2%;
+}
+table.ptable th.chg {
+    width:47%;
+}
+table.vtable {
+    border-collapse:collapse;
+    border:1px outset black;
+    margin-left:1.9em;
+    margin-top:0.7em;
+}
+table.vtable td {
+    border:1px solid gray;
+    padding:3px;
+    font-size:0.875em;
+    vertical-align:top;
+    max-width:450px;
+    word-wrap:break-word;
+}
+table.ptable th, table.vtable th {
+    background-color:#eeeeee;
+    font-weight:bold;
+    color:#333333;
+    font-family:Verdana, Arial;
+    font-size:0.875em;
+    border:1px solid gray;
+    text-align:center;
+    vertical-align:top;
+    white-space:nowrap;
+    padding:3px;
+}
+table.summary {
+    border-collapse:collapse;
+    border:1px outset black;
+}
+table.summary th {
+    background-color:#eeeeee;
+    font-weight:normal;
+    text-align:left;
+    font-size:0.94em;
+    white-space:nowrap;
+    border:1px inset gray;
+    padding:3px;
+}
+table.summary td {
+    text-align:right;
+    white-space:nowrap;
+    border:1px inset gray;
+    padding:3px 5px 3px 10px;
+}
+span.mngl {
+    padding-left:1em;
+    font-size:0.875em;
+    cursor:text;
+    color:#444444;
+    font-weight:bold;
+}
+span.pleft {
+    padding-left:2.5em;
+}
+span.sym_ver {
+    color:#333333;
+    white-space:nowrap;
+    font-family:"DejaVu Sans Mono", Monospace;
+}
+span.attr {
+    color:#333333;
+    font-weight:normal;
+}
+span.color_p {
+    font-style:italic;
+    color:Brown;
+}
+span.p {
+    font-style:italic;
+}
+span.fp {
+    font-style:italic;
+    background-color:#DCDCDC;
+}
+span.ttype {
+    font-weight:normal;
+}
+span.nowrap {
+    white-space:nowrap;
+}
+span.value {
+    font-weight:bold;
+}
+.passed {
+    background-color:#CCFFCC;
+    font-weight:normal;
+}
+.warning {
+    background-color:#F4F4AF;
+    font-weight:normal;
+}
+.failed {
+    background-color:#FFCCCC;
+    font-weight:normal;
+}
+.new {
+    background-color:#C6DEFF;
+    font-weight:normal;
+}
+.compatible {
+    background-color:#CCFFCC;
+    font-weight:normal;
+}
+.almost_compatible {
+    background-color:#FFDAA3;
+    font-weight:normal;
+}
+.incompatible {
+    background-color:#FFCCCC;
+    font-weight:normal;
+}
+.gray {
+    background-color:#DCDCDC;
+    font-weight:normal;
+}
+.top_ref {
+    font-size:0.69em;
+}
+.footer {
+    font-size:0.75em;
+}
+</style>
+<script type="text/javascript" language="JavaScript">
+<!--
+function showContent(header, id)
+{
+    e = document.getElementById(id);
+    if(e.style.display == 'none')
+    {
+        e.style.display = 'block';
+        e.style.visibility = 'visible';
+        header.innerHTML = header.innerHTML.replace(/\[[^0-9 ]\]/gi,"[&minus;]");
+    }
+    else
+    {
+        e.style.display = 'none';
+        e.style.visibility = 'hidden';
+        header.innerHTML = header.innerHTML.replace(/\[[^0-9 ]\]/gi,"[+]");
+    }
+}
+-->
+</script>
+</head>
+
+<body>
+<div><a name='Top'></a>
+<h1>Binary compatibility report for the <span style='color:Blue;'>libOgreVolume.so</span> object between <span style='color:Red;'>1.9.1</span> and <span style='color:Red;'>1.10.12</span> versions on <span style='color:Blue;'>x86_64</span></h1>
+
+<h2>Test Info</h2><hr/>
+<table class='summary'>
+<tr><th>Module Name</th><td>libOgreVolume</td></tr>
+<tr><th>Version #1</th><td>1.9.1</td></tr>
+<tr><th>Version #2</th><td>1.10.12</td></tr>
+<tr><th>Arch</th><td>x86_64</td></tr>
+<tr><th>GCC Version</th><td>9.4.0</td></tr>
+</table>
+<h2>Test Results</h2><hr/>
+<table class='summary'><tr><th>Total Header Files</th><td><a href='#Headers' style='color:Blue;'>36</a></td></tr>
+<tr><th>Total Source Files</th><td><a href='#Sources' style='color:Blue;'>15</a></td></tr>
+<tr><th>Total Objects</th><td><a href='#Libs' style='color:Blue;'>1</a></td></tr>
+<tr><th>Total Symbols / Types</th><td>211 / 86</td></tr>
+<tr><th>Compatibility</th>
+<td class='almost_compatible'>88.9%</td>
+</tr>
+</table>
+<h2>Problem Summary</h2><hr/>
+<table class='summary'><tr><th></th><th style='text-align:center;'>Severity</th><th style='text-align:center;'>Count</th></tr><tr><th>Added Symbols</th><td>-</td><td class='new'><a href='#Added' style='color:Blue;'>4</a></td></tr>
+<tr><th>Removed Symbols</th><td>High</td><td class='failed'><a href='#Removed' style='color:Blue;'>1</a></td></tr>
+<tr><th rowspan='3'>Problems with<br/>Data Types</th><td>High</td><td class='failed'><a href='#Type_Problems_High' style='color:Blue;'>3</a></td></tr>
+<tr><td>Medium</td><td class='failed'><a href='#Type_Problems_Medium' style='color:Blue;'>3</a></td></tr>
+<tr><td>Low</td><td class='warning'><a href='#Type_Problems_Low' style='color:Blue;'>7</a></td></tr>
+<tr><th rowspan='3'>Problems with<br/>Symbols</th><td>High</td><td class='failed'><a href='#Symbol_Problems_High' style='color:Blue;'>1</a></td></tr>
+<tr><td>Medium</td><td>0</td></tr>
+<tr><td>Low</td><td>0</td></tr>
+<tr><th>Problems with<br/>Constants</th><td>Low</td><td>0</td></tr>
+<tr><th>Other Changes<br/>in Data Types</th><td>-</td><td class='passed'><a href='#Other_Changes_In_Types' style='color:Blue;'>1</a></td></tr>
+</table>
+
+<a name='Added'></a><h2>Added Symbols <span class='new'>&nbsp;4&nbsp;</span></h2><hr/>
+<span class='h_name'>OgreRenderable.h</span>, <span class='lib_name'>libOgreVolume.so.1.10.12</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_1')">
+vtable for Renderable <span class='attr'>[data]</span></span>
+<br/>
+<div id="c_1" style="display:none;">
+<span class='mngl'>_ZTVN4Ogre10RenderableE</span>
+<br/>
+<br/>
+</div>
+
+<br/>
+<span class='h_name'>OgreVolumeChunk.h</span>, <span class='lib_name'>libOgreVolume.so.1.10.12</span><br/>
+<span class='ns'>namespace <b>Ogre::Volume</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_2')">
+Chunk::setMaterial&#160;<span class='sym_p'><span>(&#160;std::shared_ptr&lt;Ogre::DataStream&gt;const&amp; <span class='color_p'>mat</span></span>&#160;)</span></span>
+<br/>
+<div id="c_2" style="display:none;">
+<span class='mngl'>_ZN4Ogre6Volume5Chunk11setMaterialERKSt10shared_ptrINS_8MaterialEE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_3')">
+Chunk::setMaterialOfLevel&#160;<span class='sym_p'><span>(&#160;size_t <span class='color_p'>level</span></span>, <span>std::shared_ptr&lt;Ogre::DataStream&gt;const&amp; <span class='color_p'>mat</span></span>&#160;)</span></span>
+<br/>
+<div id="c_3" style="display:none;">
+<span class='mngl'>_ZN4Ogre6Volume5Chunk18setMaterialOfLevelEmRKSt10shared_ptrINS_8MaterialEE</span>
+<br/>
+<br/>
+</div>
+
+<br/>
+<span class='h_name'>OgreVolumeOctreeNodeSplitPolicy.h</span>, <span class='lib_name'>libOgreVolume.so.1.10.12</span><br/>
+<span class='ns'>namespace <b>Ogre::Volume</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_4')">
+vtable for OctreeNodeSplitPolicy <span class='attr'>[data]</span></span>
+<br/>
+<div id="c_4" style="display:none;">
+<span class='mngl'>_ZTVN4Ogre6Volume21OctreeNodeSplitPolicyE</span>
+<br/>
+<br/>
+</div>
+
+<br/>
+<a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='Removed'></a><a name='Withdrawn'></a><h2>Removed Symbols <span class='failed'>&nbsp;1&nbsp;</span></h2><hr/>
+<span class='h_name'>OgreVolumeChunk.h</span>, <span class='lib_name'>libOgreVolume.so.1.9.0</span><br/>
+<span class='ns'>namespace <b>Ogre::Volume</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_5')">
+Chunk::setMaterial&#160;<span class='sym_p'><span>(&#160;Ogre::String const&amp; <span class='color_p'>matName</span></span>&#160;)</span></span>
+<br/>
+<div id="c_5" style="display:none;">
+<span class='mngl'>_ZN4Ogre6Volume5Chunk11setMaterialERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE</span>
+<br/>
+<br/>
+</div>
+
+<br/>
+<a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='High_Risk_Problems'></a><a name='Type_Problems_High'></a>
+<h2>Problems with Data Types, High Severity <span class='failed'>&nbsp;3&nbsp;</span></h2><hr/>
+<span class='h_name'>OgreVolumeChunk.h</span><br/>
+<span class='ns'>namespace <b>Ogre::Volume</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_6')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> Chunk <span class='failed'>&nbsp;2&nbsp;</span></span>
+<br/>
+<div id="c_6" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Virtual method <span class='iname_b'>setMaterial&#160;<span class='sym_pd'><span>(&#160;Ogre::String const&amp;</span>&#160;)</span></span> has been removed from this class.</td>
+<td>The layout of v-table has been changed. Call of this virtual method or any virtual method at higher position in this class or its subclasses may result in crash or incorrect behavior of applications.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>Virtual method <span class='iname_b'>setMaterialOfLevel&#160;<span class='sym_pd'><span>(&#160;size_t</span>, <span>Ogre::String const&amp;</span>&#160;)</span></span> has been removed from this class.</td>
+<td>The layout of v-table has been changed. Call of this virtual method or any virtual method at higher position in this class or its subclasses may result in crash or incorrect behavior of applications.</td>
+</tr>
+</table>
+<span class="sect_info" onclick="javascript:showContent(this, 'c_7')">
+[+] show v-table (old and new)</span>
+<br/>
+<div id="c_7" style="display:none;">
+<table class='vtable'><tr><th>Offset</th><th>Virtual Table (Old) - 125 entries</th><th>Virtual Table (New) - 88 entries</th></tr><tr><th>0</th>
+<td>(int (*)(...)) 0</td>
+<td>(int (*)(...)) 0</td></tr>
+<tr><th>8</th>
+<td>(int (*)(...)) (&amp; typeinfo for Chunk)</td>
+<td>(int (*)(...)) (&amp; typeinfo for Chunk)</td></tr>
+<tr><th>16</th>
+<td>~Chunk</td>
+<td>~Chunk</td></tr>
+<tr><th>24</th>
+<td>~Chunk</td>
+<td>~Chunk</td></tr>
+<tr><th>32</th>
+<td>(int (*)(...)) 0x18f1e</td>
+<td>(int (*)(...)) 0x1a3e8</td></tr>
+<tr><th>40</th>
+<td>(int (*)(...)) 0x18f0a</td>
+<td>(int (*)(...)) 0x1a3d4</td></tr>
+<tr><th>48</th>
+<td>(int (*)(...)) 0x18f14</td>
+<td>(int (*)(...)) 0x1a3de</td></tr>
+<tr><th>56</th>
+<td>Ogre::MovableObject::getWorldBoundingBox(bool) const</td>
+<td>Ogre::MovableObject::getWorldBoundingBox(bool) const</td></tr>
+<tr><th>64</th>
+<td>Ogre::MovableObject::getLightCapBounds() const</td>
+<td>Ogre::MovableObject::getLightCapBounds() const</td></tr>
+<tr><th>72</th>
+<td>Ogre::MovableObject::getDarkCapBounds(Ogre::Light const&amp;, float) const</td>
+<td>Ogre::MovableObject::getDarkCapBounds(Ogre::Light const&amp;, float) const</td></tr>
+<tr><th>80</th>
+<td class='failed'>Ogre::MovableObject::getShadowVolumeRenderableIterator(Ogre::ShadowTechnique, Ogre::Light const*, Ogre::HardwareIndexBufferSharedPtr*, unsigned long*, bool, float, unsigned long)</td>
+<td class='failed'>Ogre::MovableObject::getShadowVolumeRenderableIterator(Ogre::ShadowTechnique, Ogre::Light const*, std::shared_ptr&lt;Ogre::HardwareIndexBuffer&gt;*, unsigned long*, bool, float, unsigned long)</td></tr>
+<tr><th>88</th>
+<td>Ogre::MovableObject::getPointExtrusionDistance(Ogre::Light const*) const</td>
+<td>Ogre::MovableObject::getPointExtrusionDistance(Ogre::Light const*) const</td></tr>
+<tr><th>96</th>
+<td>Ogre::ShadowCaster::updateEdgeListLightFacing(Ogre::EdgeData*, Ogre::Vector4 const&amp;)</td>
+<td>Ogre::ShadowCaster::updateEdgeListLightFacing(Ogre::EdgeData*, Ogre::Vector4 const&amp;)</td></tr>
+<tr><th>104</th>
+<td class='failed'>Ogre::ShadowCaster::generateShadowVolume(Ogre::EdgeData*, Ogre::HardwareIndexBufferSharedPtr const&amp;, unsigned long&amp;, Ogre::Light const*, std::vector&lt;Ogre::ShadowRenderable*, std::allocator&lt;Ogre::ShadowRenderable*&gt; &gt;&amp;, unsigned long)</td>
+<td class='failed'>Ogre::ShadowCaster::generateShadowVolume(Ogre::EdgeData*, std::shared_ptr&lt;Ogre::HardwareIndexBuffer&gt; const&amp;, unsigned long&amp;, Ogre::Light const*, std::vector&lt;Ogre::ShadowRenderable*, std::allocator&lt;Ogre::ShadowRenderable*&gt; &gt;&amp;, unsigned long)</td></tr>
+<tr><th>112</th>
+<td>Ogre::ShadowCaster::extrudeBounds(Ogre::AxisAlignedBox&amp;, Ogre::Vector4 const&amp;, float) const</td>
+<td>Ogre::ShadowCaster::extrudeBounds(Ogre::AxisAlignedBox&amp;, Ogre::Vector4 const&amp;, float) const</td></tr>
+<tr><th>120</th>
+<td>(int (*)(...)) 0x18e28</td>
+<td>(int (*)(...)) 0x1a3b4</td></tr>
+<tr><th>128</th>
+<td>(int (*)(...)) 0x18e32</td>
+<td>(int (*)(...)) 0x1a3be</td></tr>
+<tr><th>136</th>
+<td>(int (*)(...)) 0x18e3c</td>
+<td>(int (*)(...)) 0x1a3c8</td></tr>
+<tr><th>144</th>
+<td>(int (*)(...)) 0x18e46</td>
+<td>(int (*)(...)) 0x1a3ce</td></tr>
+<tr><th>152</th>
+<td>(int (*)(...)) 0x18e50</td>
+<td>Chunk::getMovableType[abi:cxx11]() const</td></tr>
+<tr><th>160</th>
+<td class='failed'>Chunk::getMovableType[abi:cxx11]() const</td>
+<td class='failed'>Ogre::MovableObject::_notifyAttached(Ogre::Node*, bool)</td></tr>
+<tr><th>168</th>
+<td class='failed'>Ogre::MovableObject::getParentNode() const</td>
+<td class='failed'>Ogre::MovableObject::isInScene() const</td></tr>
+<tr><th>176</th>
+<td class='failed'>Ogre::MovableObject::getParentSceneNode() const</td>
+<td class='failed'>Ogre::MovableObject::_notifyMoved()</td></tr>
+<tr><th>184</th>
+<td>(int (*)(...)) 0x18e5a</td>
+<td>Ogre::SimpleRenderable::_notifyCurrentCamera(Ogre::Camera*)</td></tr>
+<tr><th>192</th>
+<td class='failed'>Ogre::MovableObject::_notifyAttached(Ogre::Node*, bool)</td>
+<td class='failed'>Ogre::SimpleRenderable::getBoundingBox() const</td></tr>
+<tr><th>200</th>
+<td class='failed'>Ogre::MovableObject::isAttached() const</td>
+<td class='failed'>Chunk::getBoundingRadius() const</td></tr>
+<tr><th>208</th>
+<td class='failed'>Ogre::MovableObject::detachFromParent()</td>
+<td class='failed'>Ogre::MovableObject::getWorldBoundingSphere(bool) const</td></tr>
+<tr><th>216</th>
+<td class='failed'>Ogre::MovableObject::isInScene() const</td>
+<td class='failed'>Ogre::SimpleRenderable::_updateRenderQueue(Ogre::RenderQueue*)</td></tr>
+<tr><th>224</th>
+<td class='failed'>Ogre::MovableObject::_notifyMoved()</td>
+<td class='failed'>Ogre::MovableObject::isVisible() const</td></tr>
+<tr><th>232</th>
+<td class='failed'>Ogre::SimpleRenderable::_notifyCurrentCamera(Ogre::Camera*)</td>
+<td class='failed'>Ogre::MovableObject::setRenderQueueGroup(unsigned char)</td></tr>
+<tr><th>240</th>
+<td class='failed'>Ogre::SimpleRenderable::getBoundingBox() const</td>
+<td class='failed'>Ogre::MovableObject::setRenderQueueGroupAndPriority(unsigned char, unsigned short)</td></tr>
+<tr><th>248</th>
+<td class='failed'>Chunk::getBoundingRadius() const</td>
+<td class='failed'>Ogre::MovableObject::_getParentNodeFullTransform() const</td></tr>
+<tr><th>256</th>
+<td class='failed'>Ogre::MovableObject::getWorldBoundingSphere(bool) const</td>
+<td class='failed'>Ogre::MovableObject::getTypeFlags() const</td></tr>
+<tr><th>264</th>
+<td class='failed'>Ogre::SimpleRenderable::_updateRenderQueue(Ogre::RenderQueue*)</td>
+<td class='failed'>Ogre::SimpleRenderable::visitRenderables(Ogre::Renderable::Visitor*, bool)</td></tr>
+<tr><th>272</th>
+<td class='failed'>Ogre::MovableObject::setVisible(bool)</td>
+<td class='failed'>Ogre::SimpleRenderable::setMaterial(std::__cxx11::basic_string&lt;char, std::char_traits&lt;char&gt;, std::allocator&lt;char&gt; &gt; const&amp;)</td></tr>
+<tr><th>280</th>
+<td class='failed'>Ogre::MovableObject::getVisible() const</td>
+<td class='failed'>Chunk::setMaterial(std::shared_ptr&lt;Ogre::Material&gt; const&amp;)</td></tr>
+<tr><th>288</th>
+<td class='failed'>Ogre::MovableObject::isVisible() const</td>
+<td class='failed'>Ogre::SimpleRenderable::getMaterial() const</td></tr>
+<tr><th>296</th>
+<td>(int (*)(...)) 0x18e64</td>
+<td>Ogre::SimpleRenderable::setRenderOperation(Ogre::RenderOperation const&amp;)</td></tr>
+<tr><th>304</th>
+<td>(int (*)(...)) 0x18e78</td>
+<td>Ogre::SimpleRenderable::getRenderOperation(Ogre::RenderOperation&amp;)</td></tr>
+<tr><th>312</th>
+<td>(int (*)(...)) 0x18e82</td>
+<td>Ogre::SimpleRenderable::getWorldTransforms(Ogre::Matrix4*) const</td></tr>
+<tr><th>320</th>
+<td>(int (*)(...)) 0x18e8c</td>
+<td>Ogre::SimpleRenderable::getLights() const</td></tr>
+<tr><th>328</th>
+<td>(int (*)(...)) 0x19046</td>
+<td>Chunk::loadChunk(Ogre::SceneNode*, Ogre::Vector3 const&amp;, Ogre::Vector3 const&amp;, Ogre::Vector3 const&amp;, Ogre::Vector3 const&amp;, unsigned long, unsigned long)</td></tr>
+<tr><th>336</th>
+<td>(int (*)(...)) 0x1901a</td>
+<td>Chunk::contributesToVolumeMesh(Ogre::Vector3 const&amp;, Ogre::Vector3 const&amp;) const</td></tr>
+<tr><th>344</th>
+<td class='failed'>Ogre::MovableObject::setRenderQueueGroup(unsigned char)</td>
+<td class='failed'>Chunk::loadChildren(Ogre::SceneNode*, Ogre::Vector3 const&amp;, Ogre::Vector3 const&amp;, Ogre::Vector3 const&amp;, Ogre::Vector3 const&amp;, unsigned long, unsigned long)</td></tr>
+<tr><th>352</th>
+<td class='failed'>Ogre::MovableObject::setRenderQueueGroupAndPriority(unsigned char, unsigned short)</td>
+<td class='failed'>Chunk::doLoad(Ogre::SceneNode*, Ogre::Vector3 const&amp;, Ogre::Vector3 const&amp;, Ogre::Vector3 const&amp;, Ogre::Vector3 const&amp;, unsigned long, unsigned long)</td></tr>
+<tr><th>360</th>
+<td class='failed'>Ogre::MovableObject::getRenderQueueGroup() const</td>
+<td class='failed'>Chunk::prepareGeometry(unsigned long, OctreeNode*, DualGridGenerator*, MeshBuilder*, Ogre::Vector3 const&amp;, Ogre::Vector3 const&amp;)</td></tr>
+<tr><th>368</th>
+<td class='failed'>Ogre::MovableObject::_getParentNodeFullTransform() const</td>
+<td class='failed'>Chunk::loadGeometry(MeshBuilder*, DualGridGenerator*, OctreeNode*, unsigned long, bool)</td></tr>
+<tr><th>376</th>
+<td>(int (*)(...)) 0x18e96</td>
+<td>Chunk::getSquaredViewDepth(Ogre::Camera const*) const</td></tr>
+<tr><th>384</th>
+<td>(int (*)(...)) 0x18e9e</td>
+<td>Chunk::load(Ogre::SceneNode*, Ogre::Vector3 const&amp;, Ogre::Vector3 const&amp;, unsigned long, ChunkParameters const*)</td></tr>
+<tr><th>392</th>
+<td>(int (*)(...)) 0x18ea6</td>
+<td>Chunk::load(Ogre::SceneNode*, Ogre::SceneManager*, std::__cxx11::basic_string&lt;char, std::char_traits&lt;char&gt;, std::allocator&lt;char&gt; &gt; const&amp;, bool, MeshBuilderCallback*, std::__cxx11::basic_string&lt;char, std::char_traits&lt;char&gt;, std::allocator&lt;char&gt; &gt; const&amp;)</td></tr>
+<tr><th>400</th>
+<td>(int (*)(...)) 0x18eb0</td>
+<td>Chunk::setDualGridVisible(bool)</td></tr>
+<tr><th>408</th>
+<td>(int (*)(...)) 0x18eb8</td>
+<td>Chunk::getDualGridVisible() const</td></tr>
+<tr><th>416</th>
+<td>(int (*)(...)) 0x18ec0</td>
+<td>Chunk::setOctreeVisible(bool)</td></tr>
+<tr><th>424</th>
+<td>(int (*)(...)) 0x18ec8</td>
+<td>Chunk::getOctreeVisible() const</td></tr>
+<tr><th>432</th>
+<td>(int (*)(...)) 0x18ed2</td>
+<td>Chunk::setVolumeVisible(bool)</td></tr>
+<tr><th>440</th>
+<td>(int (*)(...)) 0x18eda</td>
+<td>Chunk::getVolumeVisible() const</td></tr>
+<tr><th>448</th>
+<td>(int (*)(...)) 0x18ee6</td>
+<td>Chunk::frameStarted(Ogre::FrameEvent const&amp;)</td></tr>
+<tr><th>456</th>
+<td class='failed'>Ogre::MovableObject::queryLights() const</td>
+<td class='failed'>Chunk::createInstance()</td></tr>
+<tr><th>464</th>
+<td>(int (*)(...)) 0x18ef2</td>
+<td>Chunk::getChunksOfLevel(unsigned long, std::vector&lt;Chunk const*, std::allocator&lt;Chunk const*&gt; &gt;&amp;) const</td></tr>
+<tr><th>472</th>
+<td class='failed'>Ogre::MovableObject::setLightMask(unsigned int)</td>
+<td class='failed'>(int (*)(...)) -0x00000000000008</td></tr>
+<tr><th>480</th>
+<td>(int (*)(...)) 0x18efe</td>
+<td>(int (*)(...)) (&amp; typeinfo for Chunk)</td></tr>
+<tr><th>488</th>
+<td>Ogre::MovableObject::getTypeFlags() const</td>
+<td>(int (*)(...)) 0x1a3a2</td></tr>
+<tr><th>496</th>
+<td>Ogre::SimpleRenderable::visitRenderables(Ogre::Renderable::Visitor*, bool)</td>
+<td>(int (*)(...)) 0x1a3ae</td></tr>
+<tr><th>504</th>
+<td>(int (*)(...)) 0x18f2a</td>
+<td>non-virtual thunk to ~Chunk</td></tr>
+<tr><th>512</th>
+<td>(int (*)(...)) 0x18f34</td>
+<td>non-virtual thunk to ~Chunk</td></tr>
+<tr><th>520</th>
+<td>Chunk::setMaterial(std::__cxx11::basic_string&lt;char, std::char_traits&lt;char&gt;, std::allocator&lt;char&gt; &gt; const&amp;)</td>
+<td>(int (*)(...)) 0x1b754</td></tr>
+<tr><th>528</th>
+<td class='failed'>Ogre::SimpleRenderable::getMaterial() const</td>
+<td class='failed'>(int (*)(...)) -0x00000000000120</td></tr>
+<tr><th>536</th>
+<td class='failed'>Ogre::SimpleRenderable::setRenderOperation(Ogre::RenderOperation const&amp;)</td>
+<td class='failed'>(int (*)(...)) (&amp; typeinfo for Chunk)</td></tr>
+<tr><th>544</th>
+<td class='failed'>Ogre::SimpleRenderable::getRenderOperation(Ogre::RenderOperation&amp;)</td>
+<td class='failed'>non-virtual thunk to ~Chunk</td></tr>
+<tr><th>552</th>
+<td class='failed'>Ogre::SimpleRenderable::getWorldTransforms(Ogre::Matrix4*) const</td>
+<td class='failed'>non-virtual thunk to ~Chunk</td></tr>
+<tr><th>560</th>
+<td class='failed'>Ogre::SimpleRenderable::getLights() const</td>
+<td class='failed'>non-virtual thunk to Ogre::SimpleRenderable::getMaterial() const</td></tr>
+<tr><th>568</th>
+<td>Chunk::loadChunk(Ogre::SceneNode*, Ogre::Vector3 const&amp;, Ogre::Vector3 const&amp;, Ogre::Vector3 const&amp;, Ogre::Vector3 const&amp;, unsigned long, unsigned long)</td>
+<td>(int (*)(...)) 0x1a408</td></tr>
+<tr><th>576</th>
+<td class='failed'>Chunk::contributesToVolumeMesh(Ogre::Vector3 const&amp;, Ogre::Vector3 const&amp;) const</td>
+<td class='failed'>non-virtual thunk to Ogre::SimpleRenderable::getRenderOperation(Ogre::RenderOperation&amp;)</td></tr>
+<tr><th>584</th>
+<td>Chunk::loadChildren(Ogre::SceneNode*, Ogre::Vector3 const&amp;, Ogre::Vector3 const&amp;, Ogre::Vector3 const&amp;, Ogre::Vector3 const&amp;, unsigned long, unsigned long)</td>
+<td>(int (*)(...)) 0x1a37e</td></tr>
+<tr><th>592</th>
+<td>Chunk::doLoad(Ogre::SceneNode*, Ogre::Vector3 const&amp;, Ogre::Vector3 const&amp;, Ogre::Vector3 const&amp;, Ogre::Vector3 const&amp;, unsigned long, unsigned long)</td>
+<td>(int (*)(...)) 0x1a388</td></tr>
+<tr><th>600</th>
+<td class='failed'>Chunk::prepareGeometry(unsigned long, OctreeNode*, DualGridGenerator*, MeshBuilder*, Ogre::Vector3 const&amp;, Ogre::Vector3 const&amp;)</td>
+<td class='failed'>non-virtual thunk to Ogre::SimpleRenderable::getWorldTransforms(Ogre::Matrix4*) const</td></tr>
+<tr><th>608</th>
+<td>Chunk::loadGeometry(MeshBuilder*, DualGridGenerator*, OctreeNode*, unsigned long, bool)</td>
+<td>(int (*)(...)) 0x1a38e</td></tr>
+<tr><th>616</th>
+<td class='failed'>Chunk::getSquaredViewDepth(Ogre::Camera const*) const</td>
+<td class='failed'>non-virtual thunk to Chunk::getSquaredViewDepth(Ogre::Camera const*) const</td></tr>
+<tr><th>624</th>
+<td class='failed'>Chunk::load(Ogre::SceneNode*, Ogre::Vector3 const&amp;, Ogre::Vector3 const&amp;, unsigned long, ChunkParameters const*)</td>
+<td class='failed'>non-virtual thunk to Ogre::SimpleRenderable::getLights() const</td></tr>
+<tr><th>632</th>
+<td>Chunk::load(Ogre::SceneNode*, Ogre::SceneManager*, std::__cxx11::basic_string&lt;char, std::char_traits&lt;char&gt;, std::allocator&lt;char&gt; &gt; const&amp;, bool, MeshBuilderCallback*, std::__cxx11::basic_string&lt;char, std::char_traits&lt;char&gt;, std::allocator&lt;char&gt; &gt; const&amp;)</td>
+<td>(int (*)(...)) 0x1a398</td></tr>
+<tr><th>640</th>
+<td>Chunk::setDualGridVisible(bool)</td>
+<td>(int (*)(...)) 0x1bb3c</td></tr>
+<tr><th>648</th>
+<td class='failed'>Chunk::getDualGridVisible() const</td>
+<td class='failed'>(int (*)(...)) -0x00000000000230</td></tr>
+<tr><th>656</th>
+<td class='failed'>Chunk::setOctreeVisible(bool)</td>
+<td class='failed'>(int (*)(...)) (&amp; typeinfo for Chunk)</td></tr>
+<tr><th>664</th>
+<td class='failed'>Chunk::getOctreeVisible() const</td>
+<td class='failed'>non-virtual thunk to Chunk::frameStarted(Ogre::FrameEvent const&amp;)</td></tr>
+<tr><th>672</th>
+<td>Chunk::setVolumeVisible(bool)</td>
+<td>(int (*)(...)) 0x1a3f4</td></tr>
+<tr><th>680</th>
+<td>Chunk::getVolumeVisible() const</td>
+<td>(int (*)(...)) 0x1a3fe</td></tr>
+<tr><th>688</th>
+<td class='failed'>Chunk::frameStarted(Ogre::FrameEvent const&amp;)</td>
+<td class='failed'>non-virtual thunk to ~Chunk</td></tr>
+<tr><th>696</th>
+<td class='failed'>Chunk::createInstance()</td>
+<td class='failed'>non-virtual thunk to ~Chunk</td></tr>
+<tr><th>704</th>
+<td class='failed'>Chunk::setMaterialOfLevel(unsigned long, std::__cxx11::basic_string&lt;char, std::char_traits&lt;char&gt;, std::allocator&lt;char&gt; &gt; const&amp;)</td>
+<td class='failed'></td></tr>
+<tr><th>712</th>
+<td class='failed'>Chunk::getChunksOfLevel(unsigned long, std::vector&lt;Chunk const*, std::allocator&lt;Chunk const*&gt; &gt;&amp;) const</td>
+<td class='failed'></td></tr>
+<tr><th>720</th>
+<td class='failed'>(int (*)(...)) -0x00000000000008</td>
+<td class='failed'></td></tr>
+<tr><th>728</th>
+<td class='failed'>(int (*)(...)) (&amp; typeinfo for Chunk)</td>
+<td class='failed'></td></tr>
+<tr><th>736</th>
+<td>(int (*)(...)) 0x18e16</td>
+<td></td></tr>
+<tr><th>744</th>
+<td>(int (*)(...)) 0x18e22</td>
+<td></td></tr>
+<tr><th>752</th>
+<td class='failed'>non-virtual thunk to ~Chunk</td>
+<td class='failed'></td></tr>
+<tr><th>760</th>
+<td class='failed'>non-virtual thunk to ~Chunk</td>
+<td class='failed'></td></tr>
+<tr><th>768</th>
+<td>(int (*)(...)) 0x19d12</td>
+<td></td></tr>
+<tr><th>776</th>
+<td class='failed'>(int (*)(...)) -0x00000000000128</td>
+<td class='failed'></td></tr>
+<tr><th>784</th>
+<td class='failed'>(int (*)(...)) (&amp; typeinfo for Chunk)</td>
+<td class='failed'></td></tr>
+<tr><th>792</th>
+<td class='failed'>non-virtual thunk to ~Chunk</td>
+<td class='failed'></td></tr>
+<tr><th>800</th>
+<td class='failed'>non-virtual thunk to ~Chunk</td>
+<td class='failed'></td></tr>
+<tr><th>808</th>
+<td class='failed'>non-virtual thunk to Ogre::SimpleRenderable::getMaterial() const</td>
+<td class='failed'></td></tr>
+<tr><th>816</th>
+<td>(int (*)(...)) 0x1905c</td>
+<td></td></tr>
+<tr><th>824</th>
+<td class='failed'>non-virtual thunk to Ogre::SimpleRenderable::getRenderOperation(Ogre::RenderOperation&amp;)</td>
+<td class='failed'></td></tr>
+<tr><th>832</th>
+<td>(int (*)(...)) 0x18dca</td>
+<td></td></tr>
+<tr><th>840</th>
+<td>(int (*)(...)) 0x18dd4</td>
+<td></td></tr>
+<tr><th>848</th>
+<td class='failed'>non-virtual thunk to Ogre::SimpleRenderable::getWorldTransforms(Ogre::Matrix4*) const</td>
+<td class='failed'></td></tr>
+<tr><th>856</th>
+<td>(int (*)(...)) 0x18dda</td>
+<td></td></tr>
+<tr><th>864</th>
+<td class='failed'>non-virtual thunk to Chunk::getSquaredViewDepth(Ogre::Camera const*) const</td>
+<td class='failed'></td></tr>
+<tr><th>872</th>
+<td class='failed'>non-virtual thunk to Ogre::SimpleRenderable::getLights() const</td>
+<td class='failed'></td></tr>
+<tr><th>880</th>
+<td>(int (*)(...)) 0x18de4</td>
+<td></td></tr>
+<tr><th>888</th>
+<td>(int (*)(...)) 0x19f92</td>
+<td></td></tr>
+<tr><th>896</th>
+<td>(int (*)(...)) 0x18dee</td>
+<td></td></tr>
+<tr><th>904</th>
+<td>(int (*)(...)) 0x18df8</td>
+<td></td></tr>
+<tr><th>912</th>
+<td>(int (*)(...)) 0x19030</td>
+<td></td></tr>
+<tr><th>920</th>
+<td>(int (*)(...)) 0x19004</td>
+<td></td></tr>
+<tr><th>928</th>
+<td>(int (*)(...)) 0x18e02</td>
+<td></td></tr>
+<tr><th>936</th>
+<td>(int (*)(...)) 0x18e0c</td>
+<td></td></tr>
+<tr><th>944</th>
+<td class='failed'>(int (*)(...)) -0x00000000000258</td>
+<td class='failed'></td></tr>
+<tr><th>952</th>
+<td class='failed'>(int (*)(...)) (&amp; typeinfo for Chunk)</td>
+<td class='failed'></td></tr>
+<tr><th>960</th>
+<td class='failed'>non-virtual thunk to Chunk::frameStarted(Ogre::FrameEvent const&amp;)</td>
+<td class='failed'></td></tr>
+<tr><th>968</th>
+<td>(int (*)(...)) 0x18f3e</td>
+<td></td></tr>
+<tr><th>976</th>
+<td>(int (*)(...)) 0x18f48</td>
+<td></td></tr>
+<tr><th>984</th>
+<td class='failed'>non-virtual thunk to ~Chunk</td>
+<td class='failed'></td></tr>
+<tr><th>992</th>
+<td class='failed'>non-virtual thunk to ~Chunk</td>
+<td class='failed'></td></tr>
+</table><br/>
+</div>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_8')">
+[+] affected symbols: 20 (9.5%)</span>
+<div id="c_8" style="display:none;">
+<div class='affected'><span class='iname_a'>Chunk::setMaterial&#160;<span class='sym_p'><span>(&#160;Ogre::String const&amp; <i>matName</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Chunk&#39; class.</div>
+<span class='iname_a'>Chunk::frameStarted&#160;<span class='sym_p'><span>(&#160;struct Ogre::FrameEvent const&amp; <i>evt</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Chunk&#39; class.</div>
+<span class='iname_a'>Chunk::loadChildren&#160;<span class='sym_p'><span>(&#160;Ogre::SceneNode* <i>parent</i></span>, <span>Ogre::Vector3 const&amp; <i>from</i></span>, <span>Ogre::Vector3 const&amp; <i>to</i></span>, <span>Ogre::Vector3 const&amp; <i>totalFrom</i></span>, <span>Ogre::Vector3 const&amp; <i>totalTo</i></span>, <span>size_t const <i>level</i></span>, <span>size_t const <i>maxLevels</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Chunk&#39; class.</div>
+<span class='iname_a'>Chunk::loadGeometry&#160;<span class='sym_p'><span>(&#160;MeshBuilder* <i>meshBuilder</i></span>, <span>DualGridGenerator* <i>dualGridGenerator</i></span>, <span>OctreeNode* <i>root</i></span>, <span>size_t <i>level</i></span>, <span>bool <i>isUpdate</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Chunk&#39; class.</div>
+<span class='iname_a'>Chunk::createInstance&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Chunk&#39; class.</div>
+<span class='iname_a'>Chunk::prepareGeometry&#160;<span class='sym_p'><span>(&#160;size_t <i>level</i></span>, <span>OctreeNode* <i>root</i></span>, <span>DualGridGenerator* <i>dualGridGenerator</i></span>, <span>MeshBuilder* <i>meshBuilder</i></span>, <span>Ogre::Vector3 const&amp; <i>totalFrom</i></span>, <span>Ogre::Vector3 const&amp; <i>totalTo</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Chunk&#39; class.</div>
+<span class='iname_a'>Chunk::setOctreeVisible&#160;<span class='sym_p'><span>(&#160;bool const <i>visible</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Chunk&#39; class.</div>
+<span class='iname_a'>Chunk::setVolumeVisible&#160;<span class='sym_p'><span>(&#160;bool <i>visible</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Chunk&#39; class.</div>
+<span class='iname_a'>Chunk::setDualGridVisible&#160;<span class='sym_p'><span>(&#160;bool const <i>visible</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Chunk&#39; class.</div>
+<span class='iname_a'>Chunk::setMaterialOfLevel&#160;<span class='sym_p'><span>(&#160;size_t <i>level</i></span>, <span>Ogre::String const&amp; <i>matName</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Chunk&#39; class.</div>
+ <b>...</b>
+<br/>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<span class='h_name'>OgreVolumeOctreeNodeSplitPolicy.h</span><br/>
+<span class='ns'>namespace <b>Ogre::Volume</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_9')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> OctreeNodeSplitPolicy <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_9" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Size of this class has been increased from <b>16</b> bytes to <b>24</b> bytes.</td>
+<td>1) An object of this class can be allocated by the applications and old size will be hardcoded at the compile time. Call of any exported constructor will break the memory of neighboring objects on the stack or heap.<br/>2) The memory layout and size of subclasses will be changed.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_10')">
+[+] affected symbols: 2 (0.9%)</span>
+<div id="c_10" style="display:none;">
+<div class='affected'><span class='iname_a'>OctreeNodeSplitPolicy::OctreeNodeSplitPolicy&#160;<span class='sym_p'><span>(&#160;Source const* <i>src</i></span>, <span>Ogre::Real const <i>maxCellSize</i></span>&#160;)</span></span><br/>
+<div class='affect'>This constructor is from &#39;OctreeNodeSplitPolicy&#39; class.</div>
+<span class='iname_a'>OctreeNodeSplitPolicy::doSplit&#160;<span class='sym_p'><span>(&#160;OctreeNode* <i>node</i></span>, <span>Ogre::Real const <i>geometricError</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;OctreeNodeSplitPolicy&#39; class.</div>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='Symbol_Problems_High'></a><a name='Interface_Problems_High'></a>
+<h2>Problems with Symbols, High Severity <span class='failed'>&nbsp;1&nbsp;</span></h2><hr/>
+<span class='h_name'>OgreVolumeChunk.h</span>, <span class='lib_name'>libOgreVolume.so.1.9.0</span><br/>
+<span class='ns'>namespace <b>Ogre::Volume</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_11')">
+<span class='ext'>[+]</span> Chunk::setMaterial&#160;<span class='sym_p'><span>(&#160;Ogre::String const&amp; <span class='color_p'>matName</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_11" style="display:none;">
+
+
+<span class='new_sign_lbl'>&#8675;</span>
+<br/>
+<span class='new_sign'>Chunk::setMaterial&#160;<span class='sym_p'><span>(&#160;std::shared_ptr&lt;Ogre::DataStream&gt;const&amp; <span class='color_p'>mat</span></span>&#160;)</span></span><br/>
+<span class='mngl pleft'>_ZN4Ogre6Volume5Chunk11setMaterialERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>Parameters list has been changed.</td>
+<td>The name of the appropriate symbol for this function on binary level has been changed from <b>_ZN4Ogre6Volume5Chunk11setMaterialERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE</b> to <b>_ZN4Ogre6Volume5Chunk11setMaterialERKSt10shared_ptrINS_8MaterialEE</b>. This may cause undefined reference linker error in old client applications.</td>
+</tr>
+</table>
+<br/>
+</div>
+<br/>
+<a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='Medium_Risk_Problems'></a><a name='Type_Problems_Medium'></a>
+<h2>Problems with Data Types, Medium Severity <span class='failed'>&nbsp;3&nbsp;</span></h2><hr/>
+<span class='h_name'>OgreRenderable.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_12')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> Renderable <span class='failed'>&nbsp;2&nbsp;</span></span>
+<br/>
+<div id="c_12" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Size of field <b>mUserObjectBindings</b> has been changed from <b>0</b> bytes to <b>8</b> bytes.</td>
+<td>Previous accesses of applications and library functions to this field and fields at higher positions of the structure definition may be broken.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>Type of field <b>mRenderSystemData</b> has been changed from <span class='nowrap'><b>Renderable::RenderSystemData*</b> (<b>8</b> bytes)</span> to <span class='nowrap'><b>Renderable::RenderSystemDataPtr</b> (<b>16</b> bytes)</span>.</td>
+<td>This field may be incorrectly initialized or accessed by applications.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_13')">
+[+] affected symbols: 1 (0.5%)</span>
+<div id="c_13" style="display:none;">
+<div class='affected'><span class='iname_a'>Volume::MeshBuilder::generateBuffers&#160;<span class='sym_p'><span>(&#160;RenderOperation&amp; <span class='fp'>operation</span></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;operation.srcRenderable&#39; in 1st parameter &#39;operation&#39; (reference) has base type &#39;Renderable&#39;.</div>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<span class='h_name'>OgreRenderOperation.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_14')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> RenderOperation <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_14" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Field <b>renderToVertexBuffer</b> has been added at the middle position of this structural type.</td>
+<td>Layout of structure fields has been changed and therefore fields at higher positions of the structure definition may be incorrectly accessed by applications.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_15')">
+[+] affected symbols: 1 (0.5%)</span>
+<div id="c_15" style="display:none;">
+<div class='affected'><span class='iname_a'>Volume::MeshBuilder::generateBuffers&#160;<span class='sym_p'><span>(&#160;RenderOperation&amp; <span class='fp'>operation</span></span>&#160;)</span></span><br/>
+<div class='affect'>1st parameter &#39;operation&#39; (reference) has base type &#39;RenderOperation&#39;.</div>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='Low_Risk_Problems'></a><a name='Type_Problems_Low'></a>
+<h2>Problems with Data Types, Low Severity <span class='warning'>&nbsp;7&nbsp;</span></h2><hr/>
+<span class='h_name'>OgreRenderable.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_16')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> Renderable <span class='warning'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_16" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>The pointer level of field <b>mRenderSystemData</b> has been decreased from <b>1</b> to <b>0</b>.</td>
+<td>The library functions will treat the value of this field as the lower-dimension array and will not read all elements. This may change the behavior of applications.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_17')">
+[+] affected symbols: 1 (0.5%)</span>
+<div id="c_17" style="display:none;">
+<div class='affected'><span class='iname_a'>Volume::MeshBuilder::generateBuffers&#160;<span class='sym_p'><span>(&#160;RenderOperation&amp; <span class='fp'>operation</span></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;operation.srcRenderable&#39; in 1st parameter &#39;operation&#39; (reference) has base type &#39;Renderable&#39;.</div>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<span class='h_name'>OgreVertexIndexData.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_18')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> IndexData <span class='warning'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_18" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Base type of field <b>indexBuffer</b> has been changed from <b>HardwareIndexBufferSharedPtr</b> to <b>std::shared_ptr&lt;DataStream&gt;</b>.</td>
+<td>Replacement of field base type may indicate a change in the semantic meaning of the field.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_19')">
+[+] affected symbols: 1 (0.5%)</span>
+<div id="c_19" style="display:none;">
+<div class='affected'><span class='iname_a'>Volume::MeshBuilder::generateBuffers&#160;<span class='sym_p'><span>(&#160;RenderOperation&amp; <span class='fp'>operation</span></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;operation.indexData&#39; in 1st parameter &#39;operation&#39; (reference) has base type &#39;IndexData&#39;.</div>
+</div>
+</div>
+<br/><br/></div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_20')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> VertexData <span class='warning'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_20" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Base type of field <b>hardwareShadowVolWBuffer</b> has been changed from <b>HardwareVertexBufferSharedPtr</b> to <b>std::shared_ptr&lt;DataStream&gt;</b>.</td>
+<td>Replacement of field base type may indicate a change in the semantic meaning of the field.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_21')">
+[+] affected symbols: 1 (0.5%)</span>
+<div id="c_21" style="display:none;">
+<div class='affected'><span class='iname_a'>Volume::MeshBuilder::generateBuffers&#160;<span class='sym_p'><span>(&#160;RenderOperation&amp; <span class='fp'>operation</span></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;operation.vertexData&#39; in 1st parameter &#39;operation&#39; (reference) has base type &#39;VertexData&#39;.</div>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<span class='h_name'>OgreVolumeChunk.h</span><br/>
+<span class='ns'>namespace <b>Ogre::Volume</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_22')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> Chunk <span class='warning'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_22" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Size of this type has been changed from <b>664</b> bytes to <b>624</b> bytes.</td>
+<td>The fields or parameters of such data type may be incorrectly initialized or accessed by old client applications.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_23')">
+[+] affected symbols: 24 (11.4%)</span>
+<div id="c_23" style="display:none;">
+<div class='affected'><span class='iname_a'>Chunk::frameStarted&#160;<span class='sym_p'><span>(&#160;struct Ogre::FrameEvent const&amp; <i>evt</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Chunk&#39; class.</div>
+<span class='iname_a'>Chunk::loadChildren&#160;<span class='sym_p'><span>(&#160;Ogre::SceneNode* <i>parent</i></span>, <span>Ogre::Vector3 const&amp; <i>from</i></span>, <span>Ogre::Vector3 const&amp; <i>to</i></span>, <span>Ogre::Vector3 const&amp; <i>totalFrom</i></span>, <span>Ogre::Vector3 const&amp; <i>totalTo</i></span>, <span>size_t const <i>level</i></span>, <span>size_t const <i>maxLevels</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Chunk&#39; class.</div>
+<span class='iname_a'>Chunk::loadGeometry&#160;<span class='sym_p'><span>(&#160;MeshBuilder* <i>meshBuilder</i></span>, <span>DualGridGenerator* <i>dualGridGenerator</i></span>, <span>OctreeNode* <i>root</i></span>, <span>size_t <i>level</i></span>, <span>bool <i>isUpdate</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Chunk&#39; class.</div>
+<span class='iname_a'>Chunk::createInstance&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>Return value (pointer) has base type &#39;Chunk&#39;.</div>
+<span class='iname_a'>Chunk::prepareGeometry&#160;<span class='sym_p'><span>(&#160;size_t <i>level</i></span>, <span>OctreeNode* <i>root</i></span>, <span>DualGridGenerator* <i>dualGridGenerator</i></span>, <span>MeshBuilder* <i>meshBuilder</i></span>, <span>Ogre::Vector3 const&amp; <i>totalFrom</i></span>, <span>Ogre::Vector3 const&amp; <i>totalTo</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Chunk&#39; class.</div>
+<span class='iname_a'>Chunk::setOctreeVisible&#160;<span class='sym_p'><span>(&#160;bool const <i>visible</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Chunk&#39; class.</div>
+<span class='iname_a'>Chunk::setVolumeVisible&#160;<span class='sym_p'><span>(&#160;bool <i>visible</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Chunk&#39; class.</div>
+<span class='iname_a'>Chunk::getChunkParameters&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Chunk&#39; class.</div>
+<span class='iname_a'>Chunk::setDualGridVisible&#160;<span class='sym_p'><span>(&#160;bool const <i>visible</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Chunk&#39; class.</div>
+<span class='iname_a'>Chunk::setMaterialOfLevel&#160;<span class='sym_p'><span>(&#160;size_t <i>level</i></span>, <span>Ogre::String const&amp; <i>matName</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Chunk&#39; class.</div>
+ <b>...</b>
+<br/>
+</div>
+</div>
+<br/><br/></div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_24')">
+<span class='ext'>[+]</span> <span class='ttype'>typedef</span> Chunk::VecChunk <span class='warning'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_24" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Base type has been changed from <span class='value'>Ogre::vector&lt;Chunk const*, Ogre::STLAllocator&lt;Chunk const*, Ogre::CategorisedAllocPolicy&lt;(Ogre::MemoryCategory)0&gt; &gt; &gt;::type</span> to <span class='value'>Ogre::vector&lt;Chunk const*&gt;::type</span>.</td>
+<td>Replacement of the base data type may indicate a change in its semantic meaning.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_25')">
+[+] affected symbols: 1 (0.5%)</span>
+<div id="c_25" style="display:none;">
+<div class='affected'><span class='iname_a'>Chunk::getChunksOfLevel&#160;<span class='sym_p'><span>(&#160;size_t const <i>level</i></span>, <span>Ogre::vector&lt;Chunk const*, Ogre::STLAllocator&lt;Chunk const*, Ogre::CategorisedAllocPolicy&lt;(Ogre::MemoryCategory)0&gt; &gt; &gt;::type&amp; <span class='fp'>result</span></span>&#160;)</span></span><br/>
+<div class='affect'>2nd parameter &#39;result&#39; (reference) has base type &#39;Chunk::VecChunk&#39;.</div>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<span class='h_name'>OgreVolumeIsoSurface.h</span><br/>
+<span class='ns'>namespace <b>Ogre::Volume</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_26')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> IsoSurface <span class='warning'>&nbsp;2&nbsp;</span></span>
+<br/>
+<div id="c_26" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Base class <span class='value'>Ogre::AllocatedObject&lt;Ogre::CategorisedAllocPolicy&lt;(Ogre::MemoryCategory)0&gt; &gt;</span> has been added.</td>
+<td>Possible incorrect access of applications to the memory occupied by the base classes.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>Base class <span class='value'>Ogre::AllocatedObject&lt;Ogre::CategorisedAllocPolicy&lt;0&gt; &gt;</span> has been removed.</td>
+<td>Possible incorrect access of applications to the memory occupied by the base classes.</td>
+</tr>
+</table>
+<span class="sect_info" onclick="javascript:showContent(this, 'c_27')">
+[+] show v-table (old and new)</span>
+<br/>
+<div id="c_27" style="display:none;">
+<table class='vtable'><tr><th>Offset</th><th>Virtual Table (Old) - 6 entries</th><th>Virtual Table (New) - 6 entries</th></tr><tr><th>0</th>
+<td>(int (*)(...)) 0</td>
+<td>(int (*)(...)) 0</td></tr>
+<tr><th>8</th>
+<td>(int (*)(...)) (&amp; typeinfo for IsoSurface)</td>
+<td>(int (*)(...)) (&amp; typeinfo for IsoSurface)</td></tr>
+<tr><th>16</th>
+<td>(int (*)(...))0</td>
+<td>(int (*)(...))0</td></tr>
+<tr><th>24</th>
+<td>(int (*)(...))0</td>
+<td>(int (*)(...))0</td></tr>
+<tr><th>32</th>
+<td>__cxa_pure_virtual</td>
+<td>__cxa_pure_virtual</td></tr>
+<tr><th>40</th>
+<td>__cxa_pure_virtual</td>
+<td>__cxa_pure_virtual</td></tr>
+</table><br/>
+</div>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_28')">
+[+] affected symbols: 14 (6.6%)</span>
+<div id="c_28" style="display:none;">
+<div class='affected'><span class='iname_a'>IsoSurface::MS_CORNERS_TOP <span class='attr'>[data]</span></span><br/>
+<div class='affect'>This method is from &#39;IsoSurface&#39; class.</div>
+<span class='iname_a'>IsoSurface::MS_CORNERS_BACK <span class='attr'>[data]</span></span><br/>
+<div class='affect'>This method is from &#39;IsoSurface&#39; class.</div>
+<span class='iname_a'>IsoSurface::MS_CORNERS_LEFT <span class='attr'>[data]</span></span><br/>
+<div class='affect'>This method is from &#39;IsoSurface&#39; class.</div>
+<span class='iname_a'>IsoSurface::MS_CORNERS_FRONT <span class='attr'>[data]</span></span><br/>
+<div class='affect'>This method is from &#39;IsoSurface&#39; class.</div>
+<span class='iname_a'>IsoSurface::MS_CORNERS_RIGHT <span class='attr'>[data]</span></span><br/>
+<div class='affect'>This method is from &#39;IsoSurface&#39; class.</div>
+<span class='iname_a'>IsoSurface::MS_CORNERS_BOTTOM <span class='attr'>[data]</span></span><br/>
+<div class='affect'>This method is from &#39;IsoSurface&#39; class.</div>
+<span class='iname_a'>IsoSurface::ISO_LEVEL <span class='attr'>[data]</span></span><br/>
+<div class='affect'>This method is from &#39;IsoSurface&#39; class.</div>
+<span class='iname_a'>IsoSurface::IsoSurface&#160;<span class='sym_p'><span>(&#160;Source const* <i>src</i></span>&#160;)</span></span><br/>
+<div class='affect'>This constructor is from &#39;IsoSurface&#39; class.</div>
+<span class='iname_a'>IsoSurface::~IsoSurface&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This destructor is from &#39;IsoSurface&#39; class.</div>
+<span class='iname_a'>IsoSurfaceMC::IsoSurfaceMC&#160;<span class='sym_p'><span>(&#160;Source const* <i>src</i></span>&#160;)</span></span><br/>
+<div class='affect'>This constructor is from derived class &#39;IsoSurfaceMC&#39;.</div>
+ <b>...</b>
+<br/>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='Other_Changes'></a><a name='Other_Changes_In_Types'></a>
+<h2>Other Changes in Data Types <span class='passed'>&nbsp;1&nbsp;</span></h2><hr/>
+<span class='h_name'>OgreVolumeChunk.h</span><br/>
+<span class='ns'>namespace <b>Ogre::Volume</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_29')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> Chunk <span class='passed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_29" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Virtual method <span class='iname_b'>setMaterial&#160;<span class='sym_pd'><span>(&#160;std::shared_ptr&lt;Ogre::DataStream&gt;const&amp;</span>&#160;)</span></span> has been added to this class.</td>
+<td>No effect. You can add virtual functions at end of leaf classes with exported constructors.</td>
+</tr>
+</table>
+<span class="sect_info" onclick="javascript:showContent(this, 'c_30')">
+[+] show v-table (old and new)</span>
+<br/>
+<div id="c_30" style="display:none;">
+<table class='vtable'><tr><th>Offset</th><th>Virtual Table (Old) - 125 entries</th><th>Virtual Table (New) - 88 entries</th></tr><tr><th>0</th>
+<td>(int (*)(...)) 0</td>
+<td>(int (*)(...)) 0</td></tr>
+<tr><th>8</th>
+<td>(int (*)(...)) (&amp; typeinfo for Chunk)</td>
+<td>(int (*)(...)) (&amp; typeinfo for Chunk)</td></tr>
+<tr><th>16</th>
+<td>~Chunk</td>
+<td>~Chunk</td></tr>
+<tr><th>24</th>
+<td>~Chunk</td>
+<td>~Chunk</td></tr>
+<tr><th>32</th>
+<td>(int (*)(...)) 0x18f1e</td>
+<td>(int (*)(...)) 0x1a3e8</td></tr>
+<tr><th>40</th>
+<td>(int (*)(...)) 0x18f0a</td>
+<td>(int (*)(...)) 0x1a3d4</td></tr>
+<tr><th>48</th>
+<td>(int (*)(...)) 0x18f14</td>
+<td>(int (*)(...)) 0x1a3de</td></tr>
+<tr><th>56</th>
+<td>Ogre::MovableObject::getWorldBoundingBox(bool) const</td>
+<td>Ogre::MovableObject::getWorldBoundingBox(bool) const</td></tr>
+<tr><th>64</th>
+<td>Ogre::MovableObject::getLightCapBounds() const</td>
+<td>Ogre::MovableObject::getLightCapBounds() const</td></tr>
+<tr><th>72</th>
+<td>Ogre::MovableObject::getDarkCapBounds(Ogre::Light const&amp;, float) const</td>
+<td>Ogre::MovableObject::getDarkCapBounds(Ogre::Light const&amp;, float) const</td></tr>
+<tr><th>80</th>
+<td class='failed'>Ogre::MovableObject::getShadowVolumeRenderableIterator(Ogre::ShadowTechnique, Ogre::Light const*, Ogre::HardwareIndexBufferSharedPtr*, unsigned long*, bool, float, unsigned long)</td>
+<td class='failed'>Ogre::MovableObject::getShadowVolumeRenderableIterator(Ogre::ShadowTechnique, Ogre::Light const*, std::shared_ptr&lt;Ogre::HardwareIndexBuffer&gt;*, unsigned long*, bool, float, unsigned long)</td></tr>
+<tr><th>88</th>
+<td>Ogre::MovableObject::getPointExtrusionDistance(Ogre::Light const*) const</td>
+<td>Ogre::MovableObject::getPointExtrusionDistance(Ogre::Light const*) const</td></tr>
+<tr><th>96</th>
+<td>Ogre::ShadowCaster::updateEdgeListLightFacing(Ogre::EdgeData*, Ogre::Vector4 const&amp;)</td>
+<td>Ogre::ShadowCaster::updateEdgeListLightFacing(Ogre::EdgeData*, Ogre::Vector4 const&amp;)</td></tr>
+<tr><th>104</th>
+<td class='failed'>Ogre::ShadowCaster::generateShadowVolume(Ogre::EdgeData*, Ogre::HardwareIndexBufferSharedPtr const&amp;, unsigned long&amp;, Ogre::Light const*, std::vector&lt;Ogre::ShadowRenderable*, std::allocator&lt;Ogre::ShadowRenderable*&gt; &gt;&amp;, unsigned long)</td>
+<td class='failed'>Ogre::ShadowCaster::generateShadowVolume(Ogre::EdgeData*, std::shared_ptr&lt;Ogre::HardwareIndexBuffer&gt; const&amp;, unsigned long&amp;, Ogre::Light const*, std::vector&lt;Ogre::ShadowRenderable*, std::allocator&lt;Ogre::ShadowRenderable*&gt; &gt;&amp;, unsigned long)</td></tr>
+<tr><th>112</th>
+<td>Ogre::ShadowCaster::extrudeBounds(Ogre::AxisAlignedBox&amp;, Ogre::Vector4 const&amp;, float) const</td>
+<td>Ogre::ShadowCaster::extrudeBounds(Ogre::AxisAlignedBox&amp;, Ogre::Vector4 const&amp;, float) const</td></tr>
+<tr><th>120</th>
+<td>(int (*)(...)) 0x18e28</td>
+<td>(int (*)(...)) 0x1a3b4</td></tr>
+<tr><th>128</th>
+<td>(int (*)(...)) 0x18e32</td>
+<td>(int (*)(...)) 0x1a3be</td></tr>
+<tr><th>136</th>
+<td>(int (*)(...)) 0x18e3c</td>
+<td>(int (*)(...)) 0x1a3c8</td></tr>
+<tr><th>144</th>
+<td>(int (*)(...)) 0x18e46</td>
+<td>(int (*)(...)) 0x1a3ce</td></tr>
+<tr><th>152</th>
+<td>(int (*)(...)) 0x18e50</td>
+<td>Chunk::getMovableType[abi:cxx11]() const</td></tr>
+<tr><th>160</th>
+<td class='failed'>Chunk::getMovableType[abi:cxx11]() const</td>
+<td class='failed'>Ogre::MovableObject::_notifyAttached(Ogre::Node*, bool)</td></tr>
+<tr><th>168</th>
+<td class='failed'>Ogre::MovableObject::getParentNode() const</td>
+<td class='failed'>Ogre::MovableObject::isInScene() const</td></tr>
+<tr><th>176</th>
+<td class='failed'>Ogre::MovableObject::getParentSceneNode() const</td>
+<td class='failed'>Ogre::MovableObject::_notifyMoved()</td></tr>
+<tr><th>184</th>
+<td>(int (*)(...)) 0x18e5a</td>
+<td>Ogre::SimpleRenderable::_notifyCurrentCamera(Ogre::Camera*)</td></tr>
+<tr><th>192</th>
+<td class='failed'>Ogre::MovableObject::_notifyAttached(Ogre::Node*, bool)</td>
+<td class='failed'>Ogre::SimpleRenderable::getBoundingBox() const</td></tr>
+<tr><th>200</th>
+<td class='failed'>Ogre::MovableObject::isAttached() const</td>
+<td class='failed'>Chunk::getBoundingRadius() const</td></tr>
+<tr><th>208</th>
+<td class='failed'>Ogre::MovableObject::detachFromParent()</td>
+<td class='failed'>Ogre::MovableObject::getWorldBoundingSphere(bool) const</td></tr>
+<tr><th>216</th>
+<td class='failed'>Ogre::MovableObject::isInScene() const</td>
+<td class='failed'>Ogre::SimpleRenderable::_updateRenderQueue(Ogre::RenderQueue*)</td></tr>
+<tr><th>224</th>
+<td class='failed'>Ogre::MovableObject::_notifyMoved()</td>
+<td class='failed'>Ogre::MovableObject::isVisible() const</td></tr>
+<tr><th>232</th>
+<td class='failed'>Ogre::SimpleRenderable::_notifyCurrentCamera(Ogre::Camera*)</td>
+<td class='failed'>Ogre::MovableObject::setRenderQueueGroup(unsigned char)</td></tr>
+<tr><th>240</th>
+<td class='failed'>Ogre::SimpleRenderable::getBoundingBox() const</td>
+<td class='failed'>Ogre::MovableObject::setRenderQueueGroupAndPriority(unsigned char, unsigned short)</td></tr>
+<tr><th>248</th>
+<td class='failed'>Chunk::getBoundingRadius() const</td>
+<td class='failed'>Ogre::MovableObject::_getParentNodeFullTransform() const</td></tr>
+<tr><th>256</th>
+<td class='failed'>Ogre::MovableObject::getWorldBoundingSphere(bool) const</td>
+<td class='failed'>Ogre::MovableObject::getTypeFlags() const</td></tr>
+<tr><th>264</th>
+<td class='failed'>Ogre::SimpleRenderable::_updateRenderQueue(Ogre::RenderQueue*)</td>
+<td class='failed'>Ogre::SimpleRenderable::visitRenderables(Ogre::Renderable::Visitor*, bool)</td></tr>
+<tr><th>272</th>
+<td class='failed'>Ogre::MovableObject::setVisible(bool)</td>
+<td class='failed'>Ogre::SimpleRenderable::setMaterial(std::__cxx11::basic_string&lt;char, std::char_traits&lt;char&gt;, std::allocator&lt;char&gt; &gt; const&amp;)</td></tr>
+<tr><th>280</th>
+<td class='failed'>Ogre::MovableObject::getVisible() const</td>
+<td class='failed'>Chunk::setMaterial(std::shared_ptr&lt;Ogre::Material&gt; const&amp;)</td></tr>
+<tr><th>288</th>
+<td class='failed'>Ogre::MovableObject::isVisible() const</td>
+<td class='failed'>Ogre::SimpleRenderable::getMaterial() const</td></tr>
+<tr><th>296</th>
+<td>(int (*)(...)) 0x18e64</td>
+<td>Ogre::SimpleRenderable::setRenderOperation(Ogre::RenderOperation const&amp;)</td></tr>
+<tr><th>304</th>
+<td>(int (*)(...)) 0x18e78</td>
+<td>Ogre::SimpleRenderable::getRenderOperation(Ogre::RenderOperation&amp;)</td></tr>
+<tr><th>312</th>
+<td>(int (*)(...)) 0x18e82</td>
+<td>Ogre::SimpleRenderable::getWorldTransforms(Ogre::Matrix4*) const</td></tr>
+<tr><th>320</th>
+<td>(int (*)(...)) 0x18e8c</td>
+<td>Ogre::SimpleRenderable::getLights() const</td></tr>
+<tr><th>328</th>
+<td>(int (*)(...)) 0x19046</td>
+<td>Chunk::loadChunk(Ogre::SceneNode*, Ogre::Vector3 const&amp;, Ogre::Vector3 const&amp;, Ogre::Vector3 const&amp;, Ogre::Vector3 const&amp;, unsigned long, unsigned long)</td></tr>
+<tr><th>336</th>
+<td>(int (*)(...)) 0x1901a</td>
+<td>Chunk::contributesToVolumeMesh(Ogre::Vector3 const&amp;, Ogre::Vector3 const&amp;) const</td></tr>
+<tr><th>344</th>
+<td class='failed'>Ogre::MovableObject::setRenderQueueGroup(unsigned char)</td>
+<td class='failed'>Chunk::loadChildren(Ogre::SceneNode*, Ogre::Vector3 const&amp;, Ogre::Vector3 const&amp;, Ogre::Vector3 const&amp;, Ogre::Vector3 const&amp;, unsigned long, unsigned long)</td></tr>
+<tr><th>352</th>
+<td class='failed'>Ogre::MovableObject::setRenderQueueGroupAndPriority(unsigned char, unsigned short)</td>
+<td class='failed'>Chunk::doLoad(Ogre::SceneNode*, Ogre::Vector3 const&amp;, Ogre::Vector3 const&amp;, Ogre::Vector3 const&amp;, Ogre::Vector3 const&amp;, unsigned long, unsigned long)</td></tr>
+<tr><th>360</th>
+<td class='failed'>Ogre::MovableObject::getRenderQueueGroup() const</td>
+<td class='failed'>Chunk::prepareGeometry(unsigned long, OctreeNode*, DualGridGenerator*, MeshBuilder*, Ogre::Vector3 const&amp;, Ogre::Vector3 const&amp;)</td></tr>
+<tr><th>368</th>
+<td class='failed'>Ogre::MovableObject::_getParentNodeFullTransform() const</td>
+<td class='failed'>Chunk::loadGeometry(MeshBuilder*, DualGridGenerator*, OctreeNode*, unsigned long, bool)</td></tr>
+<tr><th>376</th>
+<td>(int (*)(...)) 0x18e96</td>
+<td>Chunk::getSquaredViewDepth(Ogre::Camera const*) const</td></tr>
+<tr><th>384</th>
+<td>(int (*)(...)) 0x18e9e</td>
+<td>Chunk::load(Ogre::SceneNode*, Ogre::Vector3 const&amp;, Ogre::Vector3 const&amp;, unsigned long, ChunkParameters const*)</td></tr>
+<tr><th>392</th>
+<td>(int (*)(...)) 0x18ea6</td>
+<td>Chunk::load(Ogre::SceneNode*, Ogre::SceneManager*, std::__cxx11::basic_string&lt;char, std::char_traits&lt;char&gt;, std::allocator&lt;char&gt; &gt; const&amp;, bool, MeshBuilderCallback*, std::__cxx11::basic_string&lt;char, std::char_traits&lt;char&gt;, std::allocator&lt;char&gt; &gt; const&amp;)</td></tr>
+<tr><th>400</th>
+<td>(int (*)(...)) 0x18eb0</td>
+<td>Chunk::setDualGridVisible(bool)</td></tr>
+<tr><th>408</th>
+<td>(int (*)(...)) 0x18eb8</td>
+<td>Chunk::getDualGridVisible() const</td></tr>
+<tr><th>416</th>
+<td>(int (*)(...)) 0x18ec0</td>
+<td>Chunk::setOctreeVisible(bool)</td></tr>
+<tr><th>424</th>
+<td>(int (*)(...)) 0x18ec8</td>
+<td>Chunk::getOctreeVisible() const</td></tr>
+<tr><th>432</th>
+<td>(int (*)(...)) 0x18ed2</td>
+<td>Chunk::setVolumeVisible(bool)</td></tr>
+<tr><th>440</th>
+<td>(int (*)(...)) 0x18eda</td>
+<td>Chunk::getVolumeVisible() const</td></tr>
+<tr><th>448</th>
+<td>(int (*)(...)) 0x18ee6</td>
+<td>Chunk::frameStarted(Ogre::FrameEvent const&amp;)</td></tr>
+<tr><th>456</th>
+<td class='failed'>Ogre::MovableObject::queryLights() const</td>
+<td class='failed'>Chunk::createInstance()</td></tr>
+<tr><th>464</th>
+<td>(int (*)(...)) 0x18ef2</td>
+<td>Chunk::getChunksOfLevel(unsigned long, std::vector&lt;Chunk const*, std::allocator&lt;Chunk const*&gt; &gt;&amp;) const</td></tr>
+<tr><th>472</th>
+<td class='failed'>Ogre::MovableObject::setLightMask(unsigned int)</td>
+<td class='failed'>(int (*)(...)) -0x00000000000008</td></tr>
+<tr><th>480</th>
+<td>(int (*)(...)) 0x18efe</td>
+<td>(int (*)(...)) (&amp; typeinfo for Chunk)</td></tr>
+<tr><th>488</th>
+<td>Ogre::MovableObject::getTypeFlags() const</td>
+<td>(int (*)(...)) 0x1a3a2</td></tr>
+<tr><th>496</th>
+<td>Ogre::SimpleRenderable::visitRenderables(Ogre::Renderable::Visitor*, bool)</td>
+<td>(int (*)(...)) 0x1a3ae</td></tr>
+<tr><th>504</th>
+<td>(int (*)(...)) 0x18f2a</td>
+<td>non-virtual thunk to ~Chunk</td></tr>
+<tr><th>512</th>
+<td>(int (*)(...)) 0x18f34</td>
+<td>non-virtual thunk to ~Chunk</td></tr>
+<tr><th>520</th>
+<td>Chunk::setMaterial(std::__cxx11::basic_string&lt;char, std::char_traits&lt;char&gt;, std::allocator&lt;char&gt; &gt; const&amp;)</td>
+<td>(int (*)(...)) 0x1b754</td></tr>
+<tr><th>528</th>
+<td class='failed'>Ogre::SimpleRenderable::getMaterial() const</td>
+<td class='failed'>(int (*)(...)) -0x00000000000120</td></tr>
+<tr><th>536</th>
+<td class='failed'>Ogre::SimpleRenderable::setRenderOperation(Ogre::RenderOperation const&amp;)</td>
+<td class='failed'>(int (*)(...)) (&amp; typeinfo for Chunk)</td></tr>
+<tr><th>544</th>
+<td class='failed'>Ogre::SimpleRenderable::getRenderOperation(Ogre::RenderOperation&amp;)</td>
+<td class='failed'>non-virtual thunk to ~Chunk</td></tr>
+<tr><th>552</th>
+<td class='failed'>Ogre::SimpleRenderable::getWorldTransforms(Ogre::Matrix4*) const</td>
+<td class='failed'>non-virtual thunk to ~Chunk</td></tr>
+<tr><th>560</th>
+<td class='failed'>Ogre::SimpleRenderable::getLights() const</td>
+<td class='failed'>non-virtual thunk to Ogre::SimpleRenderable::getMaterial() const</td></tr>
+<tr><th>568</th>
+<td>Chunk::loadChunk(Ogre::SceneNode*, Ogre::Vector3 const&amp;, Ogre::Vector3 const&amp;, Ogre::Vector3 const&amp;, Ogre::Vector3 const&amp;, unsigned long, unsigned long)</td>
+<td>(int (*)(...)) 0x1a408</td></tr>
+<tr><th>576</th>
+<td class='failed'>Chunk::contributesToVolumeMesh(Ogre::Vector3 const&amp;, Ogre::Vector3 const&amp;) const</td>
+<td class='failed'>non-virtual thunk to Ogre::SimpleRenderable::getRenderOperation(Ogre::RenderOperation&amp;)</td></tr>
+<tr><th>584</th>
+<td>Chunk::loadChildren(Ogre::SceneNode*, Ogre::Vector3 const&amp;, Ogre::Vector3 const&amp;, Ogre::Vector3 const&amp;, Ogre::Vector3 const&amp;, unsigned long, unsigned long)</td>
+<td>(int (*)(...)) 0x1a37e</td></tr>
+<tr><th>592</th>
+<td>Chunk::doLoad(Ogre::SceneNode*, Ogre::Vector3 const&amp;, Ogre::Vector3 const&amp;, Ogre::Vector3 const&amp;, Ogre::Vector3 const&amp;, unsigned long, unsigned long)</td>
+<td>(int (*)(...)) 0x1a388</td></tr>
+<tr><th>600</th>
+<td class='failed'>Chunk::prepareGeometry(unsigned long, OctreeNode*, DualGridGenerator*, MeshBuilder*, Ogre::Vector3 const&amp;, Ogre::Vector3 const&amp;)</td>
+<td class='failed'>non-virtual thunk to Ogre::SimpleRenderable::getWorldTransforms(Ogre::Matrix4*) const</td></tr>
+<tr><th>608</th>
+<td>Chunk::loadGeometry(MeshBuilder*, DualGridGenerator*, OctreeNode*, unsigned long, bool)</td>
+<td>(int (*)(...)) 0x1a38e</td></tr>
+<tr><th>616</th>
+<td class='failed'>Chunk::getSquaredViewDepth(Ogre::Camera const*) const</td>
+<td class='failed'>non-virtual thunk to Chunk::getSquaredViewDepth(Ogre::Camera const*) const</td></tr>
+<tr><th>624</th>
+<td class='failed'>Chunk::load(Ogre::SceneNode*, Ogre::Vector3 const&amp;, Ogre::Vector3 const&amp;, unsigned long, ChunkParameters const*)</td>
+<td class='failed'>non-virtual thunk to Ogre::SimpleRenderable::getLights() const</td></tr>
+<tr><th>632</th>
+<td>Chunk::load(Ogre::SceneNode*, Ogre::SceneManager*, std::__cxx11::basic_string&lt;char, std::char_traits&lt;char&gt;, std::allocator&lt;char&gt; &gt; const&amp;, bool, MeshBuilderCallback*, std::__cxx11::basic_string&lt;char, std::char_traits&lt;char&gt;, std::allocator&lt;char&gt; &gt; const&amp;)</td>
+<td>(int (*)(...)) 0x1a398</td></tr>
+<tr><th>640</th>
+<td>Chunk::setDualGridVisible(bool)</td>
+<td>(int (*)(...)) 0x1bb3c</td></tr>
+<tr><th>648</th>
+<td class='failed'>Chunk::getDualGridVisible() const</td>
+<td class='failed'>(int (*)(...)) -0x00000000000230</td></tr>
+<tr><th>656</th>
+<td class='failed'>Chunk::setOctreeVisible(bool)</td>
+<td class='failed'>(int (*)(...)) (&amp; typeinfo for Chunk)</td></tr>
+<tr><th>664</th>
+<td class='failed'>Chunk::getOctreeVisible() const</td>
+<td class='failed'>non-virtual thunk to Chunk::frameStarted(Ogre::FrameEvent const&amp;)</td></tr>
+<tr><th>672</th>
+<td>Chunk::setVolumeVisible(bool)</td>
+<td>(int (*)(...)) 0x1a3f4</td></tr>
+<tr><th>680</th>
+<td>Chunk::getVolumeVisible() const</td>
+<td>(int (*)(...)) 0x1a3fe</td></tr>
+<tr><th>688</th>
+<td class='failed'>Chunk::frameStarted(Ogre::FrameEvent const&amp;)</td>
+<td class='failed'>non-virtual thunk to ~Chunk</td></tr>
+<tr><th>696</th>
+<td class='failed'>Chunk::createInstance()</td>
+<td class='failed'>non-virtual thunk to ~Chunk</td></tr>
+<tr><th>704</th>
+<td class='failed'>Chunk::setMaterialOfLevel(unsigned long, std::__cxx11::basic_string&lt;char, std::char_traits&lt;char&gt;, std::allocator&lt;char&gt; &gt; const&amp;)</td>
+<td class='failed'></td></tr>
+<tr><th>712</th>
+<td class='failed'>Chunk::getChunksOfLevel(unsigned long, std::vector&lt;Chunk const*, std::allocator&lt;Chunk const*&gt; &gt;&amp;) const</td>
+<td class='failed'></td></tr>
+<tr><th>720</th>
+<td class='failed'>(int (*)(...)) -0x00000000000008</td>
+<td class='failed'></td></tr>
+<tr><th>728</th>
+<td class='failed'>(int (*)(...)) (&amp; typeinfo for Chunk)</td>
+<td class='failed'></td></tr>
+<tr><th>736</th>
+<td>(int (*)(...)) 0x18e16</td>
+<td></td></tr>
+<tr><th>744</th>
+<td>(int (*)(...)) 0x18e22</td>
+<td></td></tr>
+<tr><th>752</th>
+<td class='failed'>non-virtual thunk to ~Chunk</td>
+<td class='failed'></td></tr>
+<tr><th>760</th>
+<td class='failed'>non-virtual thunk to ~Chunk</td>
+<td class='failed'></td></tr>
+<tr><th>768</th>
+<td>(int (*)(...)) 0x19d12</td>
+<td></td></tr>
+<tr><th>776</th>
+<td class='failed'>(int (*)(...)) -0x00000000000128</td>
+<td class='failed'></td></tr>
+<tr><th>784</th>
+<td class='failed'>(int (*)(...)) (&amp; typeinfo for Chunk)</td>
+<td class='failed'></td></tr>
+<tr><th>792</th>
+<td class='failed'>non-virtual thunk to ~Chunk</td>
+<td class='failed'></td></tr>
+<tr><th>800</th>
+<td class='failed'>non-virtual thunk to ~Chunk</td>
+<td class='failed'></td></tr>
+<tr><th>808</th>
+<td class='failed'>non-virtual thunk to Ogre::SimpleRenderable::getMaterial() const</td>
+<td class='failed'></td></tr>
+<tr><th>816</th>
+<td>(int (*)(...)) 0x1905c</td>
+<td></td></tr>
+<tr><th>824</th>
+<td class='failed'>non-virtual thunk to Ogre::SimpleRenderable::getRenderOperation(Ogre::RenderOperation&amp;)</td>
+<td class='failed'></td></tr>
+<tr><th>832</th>
+<td>(int (*)(...)) 0x18dca</td>
+<td></td></tr>
+<tr><th>840</th>
+<td>(int (*)(...)) 0x18dd4</td>
+<td></td></tr>
+<tr><th>848</th>
+<td class='failed'>non-virtual thunk to Ogre::SimpleRenderable::getWorldTransforms(Ogre::Matrix4*) const</td>
+<td class='failed'></td></tr>
+<tr><th>856</th>
+<td>(int (*)(...)) 0x18dda</td>
+<td></td></tr>
+<tr><th>864</th>
+<td class='failed'>non-virtual thunk to Chunk::getSquaredViewDepth(Ogre::Camera const*) const</td>
+<td class='failed'></td></tr>
+<tr><th>872</th>
+<td class='failed'>non-virtual thunk to Ogre::SimpleRenderable::getLights() const</td>
+<td class='failed'></td></tr>
+<tr><th>880</th>
+<td>(int (*)(...)) 0x18de4</td>
+<td></td></tr>
+<tr><th>888</th>
+<td>(int (*)(...)) 0x19f92</td>
+<td></td></tr>
+<tr><th>896</th>
+<td>(int (*)(...)) 0x18dee</td>
+<td></td></tr>
+<tr><th>904</th>
+<td>(int (*)(...)) 0x18df8</td>
+<td></td></tr>
+<tr><th>912</th>
+<td>(int (*)(...)) 0x19030</td>
+<td></td></tr>
+<tr><th>920</th>
+<td>(int (*)(...)) 0x19004</td>
+<td></td></tr>
+<tr><th>928</th>
+<td>(int (*)(...)) 0x18e02</td>
+<td></td></tr>
+<tr><th>936</th>
+<td>(int (*)(...)) 0x18e0c</td>
+<td></td></tr>
+<tr><th>944</th>
+<td class='failed'>(int (*)(...)) -0x00000000000258</td>
+<td class='failed'></td></tr>
+<tr><th>952</th>
+<td class='failed'>(int (*)(...)) (&amp; typeinfo for Chunk)</td>
+<td class='failed'></td></tr>
+<tr><th>960</th>
+<td class='failed'>non-virtual thunk to Chunk::frameStarted(Ogre::FrameEvent const&amp;)</td>
+<td class='failed'></td></tr>
+<tr><th>968</th>
+<td>(int (*)(...)) 0x18f3e</td>
+<td></td></tr>
+<tr><th>976</th>
+<td>(int (*)(...)) 0x18f48</td>
+<td></td></tr>
+<tr><th>984</th>
+<td class='failed'>non-virtual thunk to ~Chunk</td>
+<td class='failed'></td></tr>
+<tr><th>992</th>
+<td class='failed'>non-virtual thunk to ~Chunk</td>
+<td class='failed'></td></tr>
+</table><br/>
+</div>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_31')">
+[+] affected symbols: 24 (11.4%)</span>
+<div id="c_31" style="display:none;">
+<div class='affected'><span class='iname_a'>Chunk::frameStarted&#160;<span class='sym_p'><span>(&#160;struct Ogre::FrameEvent const&amp; <i>evt</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Chunk&#39; class.</div>
+<span class='iname_a'>Chunk::loadChildren&#160;<span class='sym_p'><span>(&#160;Ogre::SceneNode* <i>parent</i></span>, <span>Ogre::Vector3 const&amp; <i>from</i></span>, <span>Ogre::Vector3 const&amp; <i>to</i></span>, <span>Ogre::Vector3 const&amp; <i>totalFrom</i></span>, <span>Ogre::Vector3 const&amp; <i>totalTo</i></span>, <span>size_t const <i>level</i></span>, <span>size_t const <i>maxLevels</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Chunk&#39; class.</div>
+<span class='iname_a'>Chunk::loadGeometry&#160;<span class='sym_p'><span>(&#160;MeshBuilder* <i>meshBuilder</i></span>, <span>DualGridGenerator* <i>dualGridGenerator</i></span>, <span>OctreeNode* <i>root</i></span>, <span>size_t <i>level</i></span>, <span>bool <i>isUpdate</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Chunk&#39; class.</div>
+<span class='iname_a'>Chunk::createInstance&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Chunk&#39; class.</div>
+<span class='iname_a'>Chunk::prepareGeometry&#160;<span class='sym_p'><span>(&#160;size_t <i>level</i></span>, <span>OctreeNode* <i>root</i></span>, <span>DualGridGenerator* <i>dualGridGenerator</i></span>, <span>MeshBuilder* <i>meshBuilder</i></span>, <span>Ogre::Vector3 const&amp; <i>totalFrom</i></span>, <span>Ogre::Vector3 const&amp; <i>totalTo</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Chunk&#39; class.</div>
+<span class='iname_a'>Chunk::setOctreeVisible&#160;<span class='sym_p'><span>(&#160;bool const <i>visible</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Chunk&#39; class.</div>
+<span class='iname_a'>Chunk::setVolumeVisible&#160;<span class='sym_p'><span>(&#160;bool <i>visible</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Chunk&#39; class.</div>
+<span class='iname_a'>Chunk::getChunkParameters&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Chunk&#39; class.</div>
+<span class='iname_a'>Chunk::setDualGridVisible&#160;<span class='sym_p'><span>(&#160;bool const <i>visible</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Chunk&#39; class.</div>
+<span class='iname_a'>Chunk::setMaterialOfLevel&#160;<span class='sym_p'><span>(&#160;size_t <i>level</i></span>, <span>Ogre::String const&amp; <i>matName</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Chunk&#39; class.</div>
+ <b>...</b>
+<br/>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='Headers'></a><h2>Header Files <span class='gray'>&nbsp;36&nbsp;</span></h2><hr/>
+<div class='h_list'>
+OgreAny.h<br/>
+OgreAtomicScalar.h<br/>
+OgreAxisAlignedBox.h<br/>
+OgreCommon.h<br/>
+OgreFrameListener.h<br/>
+OgreHardwareIndexBuffer.h<br/>
+OgreHardwareVertexBuffer.h<br/>
+OgreMatrix4.h<br/>
+OgreMemoryAllocatedObject.h<br/>
+OgreMemoryAllocatorConfig.h<br/>
+OgreMemoryStdAlloc.h<br/>
+OgrePlatform.h<br/>
+OgrePrerequisites.h<br/>
+OgreRay.h<br/>
+OgreRenderable.h<br/>
+OgreRenderOperation.h<br/>
+OgreSharedPtr.h<br/>
+OgreVector3.h<br/>
+OgreVector4.h<br/>
+OgreVertexIndexData.h<br/>
+OgreVolumeCacheSource.h<br/>
+OgreVolumeChunk.h<br/>
+OgreVolumeChunkHandler.h<br/>
+OgreVolumeCSGSource.h<br/>
+OgreVolumeDualGridGenerator.h<br/>
+OgreVolumeGridSource.h<br/>
+OgreVolumeHalfFloatGridSource.h<br/>
+OgreVolumeIsoSurface.h<br/>
+OgreVolumeIsoSurfaceMC.h<br/>
+OgreVolumeMeshBuilder.h<br/>
+OgreVolumeOctreeNode.h<br/>
+OgreVolumeOctreeNodeSplitPolicy.h<br/>
+OgreVolumeSimplexNoise.h<br/>
+OgreVolumeSource.h<br/>
+OgreVolumeTextureSource.h<br/>
+OgreWorkQueue.h<br/>
+</div>
+<br/><a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='Sources'></a><h2>Source Files <span class='gray'>&nbsp;15&nbsp;</span></h2><hr/>
+<div class='h_list'>
+OgreVolumeCacheSource.cpp<br/>
+OgreVolumeChunk.cpp<br/>
+OgreVolumeChunkHandler.cpp<br/>
+OgreVolumeCSGSource.cpp<br/>
+OgreVolumeDualGridGenerator.cpp<br/>
+OgreVolumeGridSource.cpp<br/>
+OgreVolumeHalfFloatGridSource.cpp<br/>
+OgreVolumeIsoSurface.cpp<br/>
+OgreVolumeIsoSurfaceMC.cpp<br/>
+OgreVolumeMeshBuilder.cpp<br/>
+OgreVolumeOctreeNode.cpp<br/>
+OgreVolumeOctreeNodeSplitPolicy.cpp<br/>
+OgreVolumeSimplexNoise.cpp<br/>
+OgreVolumeSource.cpp<br/>
+OgreVolumeTextureSource.cpp<br/>
+</div>
+<br/><a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='Libs'></a><h2>Objects <span class='gray'>&nbsp;1&nbsp;</span></h2><hr/>
+<div class='lib_list'>
+libOgreVolume.so.1.9.0<br/>
+</div>
+<br/><a class='top_ref' href='#Top'>to the top</a><br/>
+</div>
+<br/><br/><br/>
+<hr/>
+<div class='footer' align='right'><i>Generated by <a href='https://github.com/lvc/abi-compliance-checker'>ABI Compliance Checker</a> 2.3 &#160;</i>
+</div>
+<br/>
+
+</body></html>

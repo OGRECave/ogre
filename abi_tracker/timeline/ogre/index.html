@@ -1,0 +1,124 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+    <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="keywords" content="ogre, ABI, API, compatibility, report" />
+    <meta name="description" content="API/ABI compatibility analysis reports for OGRE" />
+    <link rel="stylesheet" type="text/css" href="../../css/common.css?v=1.3" />
+    <link rel="stylesheet" type="text/css" href="../../css/report.css?v=1.1.1" />
+    <link rel='alternate' type='application/rss+xml' href='../../rss/ogre/feed.rss' />
+    
+    <title>
+        OGRE: API/ABI changes review
+    </title>
+    
+    </head>
+<body>
+<table cellpadding='0' cellspacing='0'>
+<tr><td align='center'><h1 class='tool'><a title='ABI tracker for OGRE' href='../../timeline/ogre/index.html' class='tool'>ABI<br/>Tracker</a></h1></td><td width='30px;'></td><td><h1>(OGRE)</h1></td></tr>
+</table>
+<hr/>
+<br/>
+<br/>
+<h1>API/ABI changes review <a rel='alternate' type='application/rss+xml' href='../../rss/ogre/feed.rss' title='RSS: subscribe for ABI reports'><img src='../../images/RSS.png' class='rss' alt='RSS' /></a></h1>
+<!-- content -->
+<p>
+<img src='../../graph/ogre/graph.svg?v=1.1' alt='Timeline of ABI changes' />
+</p>
+<p></p>
+<table cellpadding='3' class='summary'>
+<tr>
+<th rowspan='2'>Version</th>
+<th rowspan='2'>Date</th>
+<th rowspan='2'>Soname</th>
+<th colspan='2'>Backward<br/>Compat.</th>
+<th rowspan='2'>Added<br/>Symbols</th>
+<th rowspan='2'>Removed<br/>Symbols</th>
+<th rowspan='2'>Headers<br/>Diff</th>
+</tr>
+<tr>
+<th title='Binary compatibility' class='bc'>BC</th>
+<th title='Source compatibility' class='sc'>SC</th>
+</tr>
+<tr id='v13.4.1'><td title='ogre-13.4.1.tar.gz'>13.4.1</td>
+<td>2022-06-20</td>
+<td class='sover'>13.4</td>
+<td class='incompatible'><a href='../../objects_report/ogre/1.12.13/13.4.1/report.html'>37.78%</a><br/>
+<br/>
+<span class='note'><span class='incompatible'>changed SONAME</span></span>
+</td>
+<td class='incompatible'><a href='../../objects_report/ogre/1.12.13/13.4.1/report.html'>49.26%</a></td>
+<td class='added'><a class='num' href='../../objects_report/ogre/1.12.13/13.4.1/report.html'>214 new</a></td>
+<td class='removed'><a class='num' href='../../objects_report/ogre/1.12.13/13.4.1/report.html'>1264 removed</a></td>
+<td>N/A</td>
+</tr>
+<tr id='v1.12.13'><td title='ogre-1.12.13.tar.gz'>1.12.13</td>
+<td>2021-08-04</td>
+<td class='sover'>1.12.13</td>
+<td class='incompatible'><a href='../../objects_report/ogre/1.11.6/1.12.13/report.html'>50.96%</a><br/>
+<br/>
+<span class='note'><span class='incompatible'>changed SONAME</span></span>
+</td>
+<td class='incompatible'><a href='../../objects_report/ogre/1.11.6/1.12.13/report.html'>68.41%</a></td>
+<td class='added'><a class='num' href='../../objects_report/ogre/1.11.6/1.12.13/report.html'>629 new</a></td>
+<td class='removed'><a class='num' href='../../objects_report/ogre/1.11.6/1.12.13/report.html'>945 removed</a></td>
+<td>N/A</td>
+</tr>
+<tr id='v1.11.6'><td title='ogre-1.11.6.tar.gz'>1.11.6</td>
+<td>2019-04-24</td>
+<td class='sover'>1.11.6</td>
+<td class='incompatible'><a href='../../objects_report/ogre/1.10.12/1.11.6/report.html'>37.52%</a><br/>
+<br/>
+<span class='note'><span class='incompatible'>changed SONAME</span></span>
+</td>
+<td class='incompatible'><a href='../../objects_report/ogre/1.10.12/1.11.6/report.html'>57.62%</a></td>
+<td class='added'><a class='num' href='../../objects_report/ogre/1.10.12/1.11.6/report.html'>806 new</a></td>
+<td class='removed'><a class='num' href='../../objects_report/ogre/1.10.12/1.11.6/report.html'>1284 removed</a></td>
+<td>N/A</td>
+</tr>
+<tr id='v1.10.12'><td title='ogre-1.10.12.tar.gz'>1.10.12</td>
+<td>2018-04-23</td>
+<td class='sover'>1.10.12</td>
+<td class='incompatible'><a href='../../objects_report/ogre/1.9.1/1.10.12/report.html'>40.08%</a><br/>
+<br/>
+<span class='note'><span class='incompatible'>changed SONAME</span><br/><span class='added'>added 3 objects</span></span>
+</td>
+<td class='incompatible'><a href='../../objects_report/ogre/1.9.1/1.10.12/report.html'>70.26%</a></td>
+<td class='added'><a class='num' href='../../objects_report/ogre/1.9.1/1.10.12/report.html'>744 new</a></td>
+<td class='removed'><a class='num' href='../../objects_report/ogre/1.9.1/1.10.12/report.html'>676 removed</a></td>
+<td>N/A</td>
+</tr>
+<tr id='v1.9.1'><td title='ogre-1.9.1.tar.gz'>1.9.1</td>
+<td>2016-02-09</td>
+<td class='sover'>1.9.0</td>
+<td class='incompatible'><a href='../../objects_report/ogre/1.8.1/1.9.1/report.html'>38.75%</a><br/>
+<br/>
+<span class='note'><span class='incompatible'>changed SONAME</span><br/><span class='added'>added 2 objects</span></span>
+</td>
+<td class='incompatible'><a href='../../objects_report/ogre/1.8.1/1.9.1/report.html'>61.29%</a></td>
+<td class='added'><a class='num' href='../../objects_report/ogre/1.8.1/1.9.1/report.html'>532 new</a></td>
+<td class='removed'><a class='num' href='../../objects_report/ogre/1.8.1/1.9.1/report.html'>604 removed</a></td>
+<td>N/A</td>
+</tr>
+<tr id='v1.8.1'><td title='ogre-1.8.1.tar.gz'>1.8.1</td>
+<td>2012-09-02</td>
+<td class='sover'>1.8.1</td>
+<td>N/A</td>
+<td>N/A</td>
+<td>N/A</td>
+<td>N/A</td>
+<td>N/A</td>
+</tr>
+</table>
+<p></p>
+Maintained by <a href='https://www.ogre3d.org/'>paroj</a>. Last updated on Fri Jul  1 21:08 2022.<br/>
+<br/>
+Generated by <a href='https://github.com/lvc/abi-tracker'>ABI Tracker</a>, <a href='https://github.com/lvc/abi-compliance-checker'>ABICC</a> and <a href='https://github.com/lvc/abi-dumper'>ABI Dumper</a> tools.
+<!-- content end -->
+<br/>
+<br/>
+<hr/>
+<div align='right'><a class='home' title="Andrey Ponomarenko's ABI laboratory" href='https://abi-laboratory.pro/'>abi-laboratory.pro</a></div>
+<br/>
+</body></html>

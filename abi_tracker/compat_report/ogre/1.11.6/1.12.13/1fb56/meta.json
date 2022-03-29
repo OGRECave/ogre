@@ -1,0 +1,11 @@
+{
+  "Affected": "39.4",
+  "Added": 275,
+  "Removed": 60,
+  "TotalProblems": 28,
+  "Source_Affected": "21.4",
+  "Source_TotalProblems": "14",
+  "Source_ReportPath": "compat_report/ogre/1.11.6/1.12.13/1fb56/src_compat_report.html",
+  "Object1": "lib/libOgreOverlay.so.1.11.6",
+  "Object2": "lib/libOgreOverlay.so.1.12.13"
+}

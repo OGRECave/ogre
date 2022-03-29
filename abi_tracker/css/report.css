@@ -1,0 +1,91 @@
+table.summary {
+    border-collapse:collapse;
+    table-layout:fixed;
+}
+table.summary td, table.summary th {
+    font-family:VeraMono, "DejaVu Sans Mono", "Monaco", monospace;
+    font-size:0.94em;
+}
+table.summary tr, table.summary td, table.summary th
+{
+    border:1px solid #777777;
+    border-collapse:collapse;
+    padding:0.2em;
+    padding-left:7px;
+    padding-right:7px;
+    text-align:center;
+}
+table.summary th {
+    background:#f2f2f2;
+    white-space:nowrap;
+}
+table.summary td {
+    padding-top:20px;
+    padding-bottom:20px;
+    white-space:nowrap;
+}
+a.num:not(:hover) {
+    color:#000000;
+    text-decoration:none;
+}
+a.num:hover {
+    text-decoration:underline;
+}
+a.info {
+    text-decoration:none;
+}
+.note {
+    font-size:0.82em;
+}
+.ok {
+    background-color:#CCFFCC;
+}
+.warning {
+    background-color:#F4F4AF;
+}
+.almost_compatible {
+    background-color:#FFDAA3;
+}
+.incompatible, .removed {
+    background-color:#FFCCCC;
+}
+.added {
+    background-color:#C6DEFF;
+}
+table.summary td.object {
+    text-align:left;
+    max-width:24em;
+    white-space:normal;
+    word-wrap:break-word;
+}
+table.list td {
+    max-width:6.65em;
+    min-width:6em;
+    white-space:normal;
+    word-wrap:break-word;
+}
+table.summary td.comment {
+    text-align:center;
+    max-width:50px;
+    white-space:normal;
+    word-wrap:break-word;
+}
+table.summary td.sover {
+    max-width:10em;
+    white-space:normal;
+    word-wrap:break-word;
+}
+table.summary th.bc {
+    min-width:3em;
+}
+table.summary th.sc {
+    min-width:3em;
+}
+.highlight tr:hover {
+    background-color:#E0E0E0;
+    cursor:pointer;
+}
+.rss {
+    height:1.2em;
+    vertical-align:top;
+}

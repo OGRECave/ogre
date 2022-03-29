@@ -1,0 +1,1470 @@
+<!-- verdict:incompatible;affected:13.7;added:40;removed:29;type_problems_high:20;type_problems_medium:8;type_problems_low:11;interface_problems_high:0;interface_problems_medium:1;interface_problems_low:0;changed_constants:0;tool_version:2.3 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta name="keywords" content="libOgreBites, source compatibility, API, report" />
+<meta name="description" content="Source compatibility report for the libOgreBites object between 1.11.6 and 1.12.13 versions" />
+<title>libOgreBites: 1.11.6 to 1.12.13 source compatibility report</title>
+<style type="text/css">
+body {
+    font-family:Arial, sans-serif;
+    background-color:White;
+    color:Black;
+}
+hr {
+    color:Black;
+    background-color:Black;
+    height:1px;
+    border:0;
+}
+h1 {
+    margin-bottom:0px;
+    padding-bottom:0px;
+    font-size:1.625em;
+}
+h2 {
+    margin-bottom:0px;
+    padding-bottom:0px;
+    font-size:1.25em;
+    white-space:nowrap;
+}
+span.section {
+    font-weight:bold;
+    cursor:pointer;
+    color:#003E69;
+    white-space:nowrap;
+    margin-left:0.3125em;
+}
+span.new_sign {
+    font-weight:bold;
+    margin-left:1.65em;
+    color:#003E69;
+}
+span.new_sign_lbl {
+    margin-left:3em;
+    font-size:1em;
+    color:Black;
+}
+span:hover.section {
+    color:#336699;
+}
+span.sect_aff {
+    cursor:pointer;
+    padding-left:1.55em;
+    font-size:0.875em;
+    color:#cc3300;
+}
+span.sect_info {
+    cursor:pointer;
+    padding-left:1.55em;
+    font-size:0.875em;
+    color:Black;
+}
+span.ext {
+    font-weight:normal;
+}
+span.h_name {
+    color:#cc3300;
+    font-size:0.875em;
+    font-weight:bold;
+}
+div.h_list, div.lib_list {
+    font-size:0.94em;
+    padding-left:0.4em;
+}
+span.ns {
+    color:#408080;
+    font-size:0.94em;
+}
+span.lib_name {
+    color:Green;
+    font-size:0.875em;
+    font-weight:bold;
+}
+span.iname {
+    font-weight:bold;
+    color:#003E69;
+    margin-left:0.3125em;
+}
+span.iname_b {
+    font-weight:bold;
+}
+span.iname_a {
+    color:#333333;
+    font-weight:bold;
+    font-size:0.94em;
+}
+span.sym_p {
+    font-weight:normal;
+    white-space:normal;
+}
+span.sym_pd {
+    white-space:normal;
+}
+span.sym_p span, span.sym_pd span {
+    white-space:nowrap;
+}
+div.affect {
+    padding-left:1em;
+    padding-bottom:10px;
+    font-size:0.87em;
+    font-style:italic;
+    line-height:0.9em;
+}
+div.affected {
+    padding-left:1.9em;
+    padding-top:10px;
+}
+table.ptable {
+    border-collapse:collapse;
+    border:1px outset black;
+    margin-left:0.95em;
+    margin-top:3px;
+    margin-bottom:3px;
+    width:56.25em;
+}
+table.ptable td {
+    border:1px solid gray;
+    padding:3px;
+    font-size:0.875em;
+    text-align:left;
+    vertical-align:top;
+    max-width:28em;
+    word-wrap:break-word;
+}
+table.ptable th.pn {
+    width:2%;
+}
+table.ptable th.chg {
+    width:47%;
+}
+table.vtable {
+    border-collapse:collapse;
+    border:1px outset black;
+    margin-left:1.9em;
+    margin-top:0.7em;
+}
+table.vtable td {
+    border:1px solid gray;
+    padding:3px;
+    font-size:0.875em;
+    vertical-align:top;
+    max-width:450px;
+    word-wrap:break-word;
+}
+table.ptable th, table.vtable th {
+    background-color:#eeeeee;
+    font-weight:bold;
+    color:#333333;
+    font-family:Verdana, Arial;
+    font-size:0.875em;
+    border:1px solid gray;
+    text-align:center;
+    vertical-align:top;
+    white-space:nowrap;
+    padding:3px;
+}
+table.summary {
+    border-collapse:collapse;
+    border:1px outset black;
+}
+table.summary th {
+    background-color:#eeeeee;
+    font-weight:normal;
+    text-align:left;
+    font-size:0.94em;
+    white-space:nowrap;
+    border:1px inset gray;
+    padding:3px;
+}
+table.summary td {
+    text-align:right;
+    white-space:nowrap;
+    border:1px inset gray;
+    padding:3px 5px 3px 10px;
+}
+span.mngl {
+    padding-left:1em;
+    font-size:0.875em;
+    cursor:text;
+    color:#444444;
+    font-weight:bold;
+}
+span.pleft {
+    padding-left:2.5em;
+}
+span.sym_ver {
+    color:#333333;
+    white-space:nowrap;
+    font-family:"DejaVu Sans Mono", Monospace;
+}
+span.attr {
+    color:#333333;
+    font-weight:normal;
+}
+span.color_p {
+    font-style:italic;
+    color:Brown;
+}
+span.p {
+    font-style:italic;
+}
+span.fp {
+    font-style:italic;
+    background-color:#DCDCDC;
+}
+span.ttype {
+    font-weight:normal;
+}
+span.nowrap {
+    white-space:nowrap;
+}
+span.value {
+    font-weight:bold;
+}
+.passed {
+    background-color:#CCFFCC;
+    font-weight:normal;
+}
+.warning {
+    background-color:#F4F4AF;
+    font-weight:normal;
+}
+.failed {
+    background-color:#FFCCCC;
+    font-weight:normal;
+}
+.new {
+    background-color:#C6DEFF;
+    font-weight:normal;
+}
+.compatible {
+    background-color:#CCFFCC;
+    font-weight:normal;
+}
+.almost_compatible {
+    background-color:#FFDAA3;
+    font-weight:normal;
+}
+.incompatible {
+    background-color:#FFCCCC;
+    font-weight:normal;
+}
+.gray {
+    background-color:#DCDCDC;
+    font-weight:normal;
+}
+.top_ref {
+    font-size:0.69em;
+}
+.footer {
+    font-size:0.75em;
+}
+</style>
+<script type="text/javascript" language="JavaScript">
+<!--
+function showContent(header, id)
+{
+    e = document.getElementById(id);
+    if(e.style.display == 'none')
+    {
+        e.style.display = 'block';
+        e.style.visibility = 'visible';
+        header.innerHTML = header.innerHTML.replace(/\[[^0-9 ]\]/gi,"[&minus;]");
+    }
+    else
+    {
+        e.style.display = 'none';
+        e.style.visibility = 'hidden';
+        header.innerHTML = header.innerHTML.replace(/\[[^0-9 ]\]/gi,"[+]");
+    }
+}
+-->
+</script>
+</head>
+
+<body>
+<div><a name='Top'></a>
+<h1>Source compatibility report for the <span style='color:Blue;'>libOgreBites.so</span> object between <span style='color:Red;'>1.11.6</span> and <span style='color:Red;'>1.12.13</span> versions</h1>
+
+<h2>Test Info</h2><hr/>
+<table class='summary'>
+<tr><th>Module Name</th><td>libOgreBites</td></tr>
+<tr><th>Version #1</th><td>1.11.6</td></tr>
+<tr><th>Version #2</th><td>1.12.13</td></tr>
+<tr><th>Arch</th><td>x86_64</td></tr>
+</table>
+<h2>Test Results</h2><hr/>
+<table class='summary'><tr><th>Total Header Files</th><td><a href='#Headers' style='color:Blue;'>63</a></td></tr>
+<tr><th>Total Source Files</th><td><a href='#Sources' style='color:Blue;'>8</a></td></tr>
+<tr><th>Total Objects</th><td><a href='#Libs' style='color:Blue;'>1</a></td></tr>
+<tr><th>Total Symbols / Types</th><td>354 / 113</td></tr>
+<tr><th>Compatibility</th>
+<td class='almost_compatible'>86.3%</td>
+</tr>
+</table>
+<h2>Problem Summary</h2><hr/>
+<table class='summary'><tr><th></th><th style='text-align:center;'>Severity</th><th style='text-align:center;'>Count</th></tr><tr><th>Added Symbols</th><td>-</td><td class='new'><a href='#Added' style='color:Blue;'>40</a></td></tr>
+<tr><th>Removed Symbols</th><td>High</td><td class='failed'><a href='#Removed' style='color:Blue;'>29</a></td></tr>
+<tr><th rowspan='3'>Problems with<br/>Data Types</th><td>High</td><td class='failed'><a href='#Type_Problems_High' style='color:Blue;'>20</a></td></tr>
+<tr><td>Medium</td><td class='failed'><a href='#Type_Problems_Medium' style='color:Blue;'>8</a></td></tr>
+<tr><td>Low</td><td class='warning'><a href='#Type_Problems_Low' style='color:Blue;'>11</a></td></tr>
+<tr><th rowspan='3'>Problems with<br/>Symbols</th><td>High</td><td>0</td></tr>
+<tr><td>Medium</td><td class='failed'><a href='#Symbol_Problems_Medium' style='color:Blue;'>1</a></td></tr>
+<tr><td>Low</td><td>0</td></tr>
+<tr><th>Problems with<br/>Constants</th><td>Low</td><td>0</td></tr>
+</table>
+
+<a name='Added'></a><h2>Added Symbols <span class='new'>&nbsp;40&nbsp;</span></h2><hr/>
+<span class='h_name'>OgreApplicationContext.h</span><br/>
+<span class='ns'>namespace <b>OgreBites</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_91')">
+ApplicationContextSDL::_destroyWindow&#160;<span class='sym_p'><span>(&#160;struct NativeWindowPair const&amp; <span class='color_p'>win</span></span>&#160;)</span></span>
+<br/>
+<div id="c_91" style="display:none;">
+<span class='mngl'>_ZN9OgreBites21ApplicationContextSDL14_destroyWindowERKNS_16NativeWindowPairE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_92')">
+ApplicationContextSDL::addInputListener&#160;<span class='sym_p'><span>(&#160;NativeWindowType* <span class='color_p'>win</span></span>, <span>struct InputListener* <span class='color_p'>lis</span></span>&#160;)</span></span>
+<br/>
+<div id="c_92" style="display:none;">
+<span class='mngl'>_ZN9OgreBites21ApplicationContextSDL16addInputListenerEP10SDL_WindowPNS_13InputListenerE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_93')">
+ApplicationContextSDL::ApplicationContextSDL <span class='attr'>[C1]</span>&#160;<span class='sym_p'><span>(&#160;Ogre::String const&amp; <span class='color_p'>appName</span></span>&#160;)</span></span>
+<br/>
+<div id="c_93" style="display:none;">
+<span class='mngl'>_ZN9OgreBites21ApplicationContextSDLC1ERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_94')">
+ApplicationContextSDL::ApplicationContextSDL <span class='attr'>[C2]</span>&#160;<span class='sym_p'><span>(&#160;Ogre::String const&amp; <span class='color_p'>appName</span></span>&#160;)</span></span>
+<br/>
+<div id="c_94" style="display:none;">
+<span class='mngl'>_ZN9OgreBites21ApplicationContextSDLC2ERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_95')">
+ApplicationContextSDL::createWindow&#160;<span class='sym_p'><span>(&#160;Ogre::String const&amp; <span class='color_p'>name</span></span>, <span>Ogre::uint32 <span class='color_p'>w</span></span>, <span>Ogre::uint32 <span class='color_p'>h</span></span>, <span>Ogre::NameValuePairList <span class='color_p'>miscParams</span></span>&#160;)</span></span>
+<br/>
+<div id="c_95" style="display:none;">
+<span class='mngl'>_ZN9OgreBites21ApplicationContextSDL12createWindowERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEEjjSt3mapIS6_S6_St4lessIS6_ESaISt4pairIS7_S6_EEE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_96')">
+ApplicationContextSDL::pollEvents&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_96" style="display:none;">
+<span class='mngl'>_ZN9OgreBites21ApplicationContextSDL10pollEventsEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_97')">
+ApplicationContextSDL::removeInputListener&#160;<span class='sym_p'><span>(&#160;NativeWindowType* <span class='color_p'>win</span></span>, <span>struct InputListener* <span class='color_p'>lis</span></span>&#160;)</span></span>
+<br/>
+<div id="c_97" style="display:none;">
+<span class='mngl'>_ZN9OgreBites21ApplicationContextSDL19removeInputListenerEP10SDL_WindowPNS_13InputListenerE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_98')">
+ApplicationContextSDL::setWindowGrab&#160;<span class='sym_p'><span>(&#160;NativeWindowType* <span class='color_p'>win</span></span>, <span>bool <span class='color_p'>_grab</span></span>&#160;)</span></span>
+<br/>
+<div id="c_98" style="display:none;">
+<span class='mngl'>_ZN9OgreBites21ApplicationContextSDL13setWindowGrabEP10SDL_Windowb</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_99')">
+ApplicationContextSDL::shutdown&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_99" style="display:none;">
+<span class='mngl'>_ZN9OgreBites21ApplicationContextSDL8shutdownEv</span>
+<br/>
+<br/>
+</div>
+
+<br/>
+<span class='h_name'>OgreApplicationContextBase.h</span><br/>
+<span class='ns'>namespace <b>OgreBites</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_100')">
+ApplicationContextBase::_destroyWindow&#160;<span class='sym_p'><span>(&#160;struct NativeWindowPair const&amp; <span class='color_p'>win</span></span>&#160;)</span></span>
+<br/>
+<div id="c_100" style="display:none;">
+<span class='mngl'>_ZN9OgreBites22ApplicationContextBase14_destroyWindowERKNS_16NativeWindowPairE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_101')">
+ApplicationContextBase::_fireInputEvent&#160;<span class='sym_p'><span>(&#160;union Event const&amp; <span class='color_p'>event</span></span>, <span>uint32_t <span class='color_p'>windowID</span></span>&#160;)</span> const</span>
+<br/>
+<div id="c_101" style="display:none;">
+<span class='mngl'>_ZNK9OgreBites22ApplicationContextBase15_fireInputEventERKNS_5EventEj</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_102')">
+ApplicationContextBase::addInputListener&#160;<span class='sym_p'><span>(&#160;NativeWindowType* <span class='color_p'>win</span></span>, <span>struct InputListener* <span class='color_p'>lis</span></span>&#160;)</span></span>
+<br/>
+<div id="c_102" style="display:none;">
+<span class='mngl'>_ZN9OgreBites22ApplicationContextBase16addInputListenerEP10SDL_WindowPNS_13InputListenerE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_103')">
+ApplicationContextBase::ApplicationContextBase <span class='attr'>[C1]</span>&#160;<span class='sym_p'><span>(&#160;Ogre::String const&amp; <span class='color_p'>appName</span></span>&#160;)</span></span>
+<br/>
+<div id="c_103" style="display:none;">
+<span class='mngl'>_ZN9OgreBites22ApplicationContextBaseC1ERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_104')">
+ApplicationContextBase::ApplicationContextBase <span class='attr'>[C2]</span>&#160;<span class='sym_p'><span>(&#160;Ogre::String const&amp; <span class='color_p'>appName</span></span>&#160;)</span></span>
+<br/>
+<div id="c_104" style="display:none;">
+<span class='mngl'>_ZN9OgreBites22ApplicationContextBaseC2ERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_105')">
+ApplicationContextBase::closeApp&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_105" style="display:none;">
+<span class='mngl'>_ZN9OgreBites22ApplicationContextBase8closeAppEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_106')">
+ApplicationContextBase::createDummyScene&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_106" style="display:none;">
+<span class='mngl'>_ZN9OgreBites22ApplicationContextBase16createDummySceneEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_107')">
+ApplicationContextBase::createRoot&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_107" style="display:none;">
+<span class='mngl'>_ZN9OgreBites22ApplicationContextBase10createRootEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_108')">
+ApplicationContextBase::createWindow&#160;<span class='sym_p'><span>(&#160;Ogre::String const&amp; <span class='color_p'>name</span></span>, <span>Ogre::uint32 <span class='color_p'>w</span></span>, <span>Ogre::uint32 <span class='color_p'>h</span></span>, <span>Ogre::NameValuePairList <span class='color_p'>miscParams</span></span>&#160;)</span></span>
+<br/>
+<div id="c_108" style="display:none;">
+<span class='mngl'>_ZN9OgreBites22ApplicationContextBase12createWindowERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEEjjSt3mapIS6_S6_St4lessIS6_ESaISt4pairIS7_S6_EEE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_109')">
+ApplicationContextBase::destroyDummyScene&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_109" style="display:none;">
+<span class='mngl'>_ZN9OgreBites22ApplicationContextBase17destroyDummySceneEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_110')">
+ApplicationContextBase::destroyRTShaderSystem&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_110" style="display:none;">
+<span class='mngl'>_ZN9OgreBites22ApplicationContextBase21destroyRTShaderSystemEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_111')">
+ApplicationContextBase::destroyWindow&#160;<span class='sym_p'><span>(&#160;Ogre::String const&amp; <span class='color_p'>name</span></span>&#160;)</span></span>
+<br/>
+<div id="c_111" style="display:none;">
+<span class='mngl'>_ZN9OgreBites22ApplicationContextBase13destroyWindowERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_112')">
+ApplicationContextBase::enableShaderCache&#160;<span class='sym_p'>(&#160;)</span> const</span>
+<br/>
+<div id="c_112" style="display:none;">
+<span class='mngl'>_ZNK9OgreBites22ApplicationContextBase17enableShaderCacheEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_113')">
+ApplicationContextBase::frameRenderingQueued&#160;<span class='sym_p'><span>(&#160;struct Ogre::FrameEvent const&amp; <span class='color_p'>evt</span></span>&#160;)</span></span>
+<br/>
+<div id="c_113" style="display:none;">
+<span class='mngl'>_ZN9OgreBites22ApplicationContextBase20frameRenderingQueuedERKN4Ogre10FrameEventE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_114')">
+ApplicationContextBase::getDefaultMediaDir&#160;<span class='sym_p'>(&#160;)</span> <span class='attr'>[static]</span></span>
+<br/>
+<div id="c_114" style="display:none;">
+<span class='mngl'>_ZN9OgreBites22ApplicationContextBase18getDefaultMediaDirB5cxx11Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_115')">
+ApplicationContextBase::initApp&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_115" style="display:none;">
+<span class='mngl'>_ZN9OgreBites22ApplicationContextBase7initAppEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_116')">
+ApplicationContextBase::initialiseRTShaderSystem&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_116" style="display:none;">
+<span class='mngl'>_ZN9OgreBites22ApplicationContextBase24initialiseRTShaderSystemEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_117')">
+ApplicationContextBase::loadResources&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_117" style="display:none;">
+<span class='mngl'>_ZN9OgreBites22ApplicationContextBase13loadResourcesEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_118')">
+ApplicationContextBase::locateResources&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_118" style="display:none;">
+<span class='mngl'>_ZN9OgreBites22ApplicationContextBase15locateResourcesEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_119')">
+ApplicationContextBase::oneTimeConfig&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_119" style="display:none;">
+<span class='mngl'>_ZN9OgreBites22ApplicationContextBase13oneTimeConfigEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_120')">
+ApplicationContextBase::pollEvents&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_120" style="display:none;">
+<span class='mngl'>_ZN9OgreBites22ApplicationContextBase10pollEventsEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_121')">
+ApplicationContextBase::reconfigure&#160;<span class='sym_p'><span>(&#160;Ogre::String const&amp; <span class='color_p'>renderer</span></span>, <span>Ogre::NameValuePairList&amp; <span class='color_p'>options</span></span>&#160;)</span></span>
+<br/>
+<div id="c_121" style="display:none;">
+<span class='mngl'>_ZN9OgreBites22ApplicationContextBase11reconfigureERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEERSt3mapIS6_S6_St4lessIS6_ESaISt4pairIS7_S6_EEE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_122')">
+ApplicationContextBase::removeInputListener&#160;<span class='sym_p'><span>(&#160;NativeWindowType* <span class='color_p'>win</span></span>, <span>struct InputListener* <span class='color_p'>lis</span></span>&#160;)</span></span>
+<br/>
+<div id="c_122" style="display:none;">
+<span class='mngl'>_ZN9OgreBites22ApplicationContextBase19removeInputListenerEP10SDL_WindowPNS_13InputListenerE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_123')">
+ApplicationContextBase::setRTSSWriteShadersToDisk&#160;<span class='sym_p'><span>(&#160;bool <span class='color_p'>write</span></span>&#160;)</span></span>
+<br/>
+<div id="c_123" style="display:none;">
+<span class='mngl'>_ZN9OgreBites22ApplicationContextBase25setRTSSWriteShadersToDiskEb</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_124')">
+ApplicationContextBase::setup&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_124" style="display:none;">
+<span class='mngl'>_ZN9OgreBites22ApplicationContextBase5setupEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_125')">
+ApplicationContextBase::shutdown&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_125" style="display:none;">
+<span class='mngl'>_ZN9OgreBites22ApplicationContextBase8shutdownEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_126')">
+ApplicationContextBase::~ApplicationContextBase <span class='attr'>[D0]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_126" style="display:none;">
+<span class='mngl'>_ZN9OgreBites22ApplicationContextBaseD0Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_127')">
+ApplicationContextBase::~ApplicationContextBase <span class='attr'>[D1]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_127" style="display:none;">
+<span class='mngl'>_ZN9OgreBites22ApplicationContextBaseD1Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_128')">
+ApplicationContextBase::~ApplicationContextBase <span class='attr'>[D2]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_128" style="display:none;">
+<span class='mngl'>_ZN9OgreBites22ApplicationContextBaseD2Ev</span>
+<br/>
+<br/>
+</div>
+
+<br/>
+<span class='h_name'>OgreCameraMan.h</span><br/>
+<span class='ns'>namespace <b>OgreBites</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_129')">
+CameraMan::setYawPitchDist&#160;<span class='sym_p'><span>(&#160;Ogre::Radian const&amp; <span class='color_p'>yaw</span></span>, <span>Ogre::Radian const&amp; <span class='color_p'>pitch</span></span>, <span>Ogre::Real <span class='color_p'>dist</span></span>&#160;)</span></span>
+<br/>
+<div id="c_129" style="display:none;">
+<span class='mngl'>_ZN9OgreBites9CameraMan15setYawPitchDistERKN4Ogre6RadianES4_f</span>
+<br/>
+<br/>
+</div>
+
+<br/>
+<span class='h_name'>OgreTrays.h</span><br/>
+<span class='ns'>namespace <b>OgreBites</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_130')">
+TrayManager::mouseWheelRolled&#160;<span class='sym_p'><span>(&#160;struct MouseWheelEvent const&amp; <span class='color_p'>evt</span></span>&#160;)</span></span>
+<br/>
+<div id="c_130" style="display:none;">
+<span class='mngl'>_ZN9OgreBites11TrayManager16mouseWheelRolledERKNS_15MouseWheelEventE</span>
+<br/>
+<br/>
+</div>
+
+<br/>
+<a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='Removed'></a><a name='Withdrawn'></a><h2>Removed Symbols <span class='failed'>&nbsp;29&nbsp;</span></h2><hr/>
+<span class='h_name'>OgreApplicationContext.h</span><br/>
+<span class='ns'>namespace <b>OgreBites</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_131')">
+ApplicationContext::_fireInputEvent&#160;<span class='sym_p'><span>(&#160;union Event const&amp; <span class='color_p'>event</span></span>, <span>uint32_t <span class='color_p'>windowID</span></span>&#160;)</span> const</span>
+<br/>
+<div id="c_131" style="display:none;">
+<span class='mngl'>_ZNK9OgreBites18ApplicationContext15_fireInputEventERKNS_5EventEj</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_132')">
+ApplicationContext::addInputListener&#160;<span class='sym_p'><span>(&#160;NativeWindowType* <span class='color_p'>win</span></span>, <span>struct InputListener* <span class='color_p'>lis</span></span>&#160;)</span></span>
+<br/>
+<div id="c_132" style="display:none;">
+<span class='mngl'>_ZN9OgreBites18ApplicationContext16addInputListenerEP10SDL_WindowPNS_13InputListenerE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_133')">
+ApplicationContext::ApplicationContext <span class='attr'>[C1]</span>&#160;<span class='sym_p'><span>(&#160;Ogre::String const&amp; <span class='color_p'>appName</span></span>, <span>bool <span class='color_p'>p2</span></span>&#160;)</span></span>
+<br/>
+<div id="c_133" style="display:none;">
+<span class='mngl'>_ZN9OgreBites18ApplicationContextC1ERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEEb</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_134')">
+ApplicationContext::ApplicationContext <span class='attr'>[C2]</span>&#160;<span class='sym_p'><span>(&#160;Ogre::String const&amp; <span class='color_p'>appName</span></span>, <span>bool <span class='color_p'>p2</span></span>&#160;)</span></span>
+<br/>
+<div id="c_134" style="display:none;">
+<span class='mngl'>_ZN9OgreBites18ApplicationContextC2ERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEEb</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_135')">
+ApplicationContext::closeApp&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_135" style="display:none;">
+<span class='mngl'>_ZN9OgreBites18ApplicationContext8closeAppEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_136')">
+ApplicationContext::createDummyScene&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_136" style="display:none;">
+<span class='mngl'>_ZN9OgreBites18ApplicationContext16createDummySceneEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_137')">
+ApplicationContext::createRoot&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_137" style="display:none;">
+<span class='mngl'>_ZN9OgreBites18ApplicationContext10createRootEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_138')">
+ApplicationContext::createWindow&#160;<span class='sym_p'><span>(&#160;Ogre::String const&amp; <span class='color_p'>name</span></span>, <span>Ogre::uint32 <span class='color_p'>w</span></span>, <span>Ogre::uint32 <span class='color_p'>h</span></span>, <span>Ogre::NameValuePairList <span class='color_p'>miscParams</span></span>&#160;)</span></span>
+<br/>
+<div id="c_138" style="display:none;">
+<span class='mngl'>_ZN9OgreBites18ApplicationContext12createWindowERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEEjjSt3mapIS6_S6_St4lessIS6_ESaISt4pairIS7_S6_EEE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_139')">
+ApplicationContext::destroyDummyScene&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_139" style="display:none;">
+<span class='mngl'>_ZN9OgreBites18ApplicationContext17destroyDummySceneEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_140')">
+ApplicationContext::destroyRTShaderSystem&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_140" style="display:none;">
+<span class='mngl'>_ZN9OgreBites18ApplicationContext21destroyRTShaderSystemEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_141')">
+ApplicationContext::enableShaderCache&#160;<span class='sym_p'>(&#160;)</span> const</span>
+<br/>
+<div id="c_141" style="display:none;">
+<span class='mngl'>_ZNK9OgreBites18ApplicationContext17enableShaderCacheEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_142')">
+ApplicationContext::frameRenderingQueued&#160;<span class='sym_p'><span>(&#160;struct Ogre::FrameEvent const&amp; <span class='color_p'>evt</span></span>&#160;)</span></span>
+<br/>
+<div id="c_142" style="display:none;">
+<span class='mngl'>_ZN9OgreBites18ApplicationContext20frameRenderingQueuedERKN4Ogre10FrameEventE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_143')">
+ApplicationContext::getDefaultMediaDir&#160;<span class='sym_p'>(&#160;)</span> <span class='attr'>[static]</span></span>
+<br/>
+<div id="c_143" style="display:none;">
+<span class='mngl'>_ZN9OgreBites18ApplicationContext18getDefaultMediaDirB5cxx11Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_144')">
+ApplicationContext::initApp&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_144" style="display:none;">
+<span class='mngl'>_ZN9OgreBites18ApplicationContext7initAppEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_145')">
+ApplicationContext::initialiseRTShaderSystem&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_145" style="display:none;">
+<span class='mngl'>_ZN9OgreBites18ApplicationContext24initialiseRTShaderSystemEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_146')">
+ApplicationContext::loadResources&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_146" style="display:none;">
+<span class='mngl'>_ZN9OgreBites18ApplicationContext13loadResourcesEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_147')">
+ApplicationContext::locateResources&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_147" style="display:none;">
+<span class='mngl'>_ZN9OgreBites18ApplicationContext15locateResourcesEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_148')">
+ApplicationContext::oneTimeConfig&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_148" style="display:none;">
+<span class='mngl'>_ZN9OgreBites18ApplicationContext13oneTimeConfigEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_149')">
+ApplicationContext::pollEvents&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_149" style="display:none;">
+<span class='mngl'>_ZN9OgreBites18ApplicationContext10pollEventsEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_150')">
+ApplicationContext::reconfigure&#160;<span class='sym_p'><span>(&#160;Ogre::String const&amp; <span class='color_p'>renderer</span></span>, <span>Ogre::NameValuePairList&amp; <span class='color_p'>options</span></span>&#160;)</span></span>
+<br/>
+<div id="c_150" style="display:none;">
+<span class='mngl'>_ZN9OgreBites18ApplicationContext11reconfigureERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEERSt3mapIS6_S6_St4lessIS6_ESaISt4pairIS7_S6_EEE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_151')">
+ApplicationContext::removeInputListener&#160;<span class='sym_p'><span>(&#160;NativeWindowType* <span class='color_p'>win</span></span>, <span>struct InputListener* <span class='color_p'>lis</span></span>&#160;)</span></span>
+<br/>
+<div id="c_151" style="display:none;">
+<span class='mngl'>_ZN9OgreBites18ApplicationContext19removeInputListenerEP10SDL_WindowPNS_13InputListenerE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_152')">
+ApplicationContext::setRTSSWriteShadersToDisk&#160;<span class='sym_p'><span>(&#160;bool <span class='color_p'>write</span></span>&#160;)</span></span>
+<br/>
+<div id="c_152" style="display:none;">
+<span class='mngl'>_ZN9OgreBites18ApplicationContext25setRTSSWriteShadersToDiskEb</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_153')">
+ApplicationContext::setup&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_153" style="display:none;">
+<span class='mngl'>_ZN9OgreBites18ApplicationContext5setupEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_154')">
+ApplicationContext::setWindowGrab&#160;<span class='sym_p'><span>(&#160;NativeWindowType* <span class='color_p'>win</span></span>, <span>bool <span class='color_p'>_grab</span></span>&#160;)</span></span>
+<br/>
+<div id="c_154" style="display:none;">
+<span class='mngl'>_ZN9OgreBites18ApplicationContext13setWindowGrabEP10SDL_Windowb</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_155')">
+ApplicationContext::shutdown&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_155" style="display:none;">
+<span class='mngl'>_ZN9OgreBites18ApplicationContext8shutdownEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_156')">
+ApplicationContext::~ApplicationContext <span class='attr'>[D0]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_156" style="display:none;">
+<span class='mngl'>_ZN9OgreBites18ApplicationContextD0Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_157')">
+ApplicationContext::~ApplicationContext <span class='attr'>[D1]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_157" style="display:none;">
+<span class='mngl'>_ZN9OgreBites18ApplicationContextD1Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_158')">
+ApplicationContext::~ApplicationContext <span class='attr'>[D2]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_158" style="display:none;">
+<span class='mngl'>_ZN9OgreBites18ApplicationContextD2Ev</span>
+<br/>
+<br/>
+</div>
+
+<br/>
+<span class='h_name'>OgreCameraMan.h</span><br/>
+<span class='ns'>namespace <b>OgreBites</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_159')">
+CameraMan::setYawPitchDist&#160;<span class='sym_p'><span>(&#160;Ogre::Radian <span class='color_p'>yaw</span></span>, <span>Ogre::Radian <span class='color_p'>pitch</span></span>, <span>Ogre::Real <span class='color_p'>dist</span></span>&#160;)</span></span>
+<br/>
+<div id="c_159" style="display:none;">
+<span class='mngl'>_ZN9OgreBites9CameraMan15setYawPitchDistEN4Ogre6RadianES2_f</span>
+<br/>
+<br/>
+</div>
+
+<br/>
+<a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='High_Risk_Problems'></a><a name='Type_Problems_High'></a>
+<h2>Problems with Data Types, High Severity <span class='failed'>&nbsp;20&nbsp;</span></h2><hr/>
+<span class='h_name'>OgreResourceGroupManager.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_160')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> ResourceGroupListener <span class='failed'>&nbsp;18&nbsp;</span></span>
+<br/>
+<div id="c_160" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Pure virtual method <span class='iname_b'>resourceRemove&#160;<span class='sym_pd'><span>(&#160;ResourcePtr const&amp;</span>&#160;)</span></span> has been removed from this class.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>Pure virtual method <span class='iname_b'>resourceCreated&#160;<span class='sym_pd'><span>(&#160;ResourcePtr const&amp;</span>&#160;)</span></span> has been removed from this class.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>3</th>
+<td>Pure virtual method <span class='iname_b'>scriptParseEnded&#160;<span class='sym_pd'><span>(&#160;String const&amp;</span>, <span>bool</span>&#160;)</span></span> has been removed from this class.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>4</th>
+<td>Pure virtual method <span class='iname_b'>resourceLoadEnded&#160;<span class='sym_pd'>(&#160;)</span></span> has been removed from this class.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>5</th>
+<td>Pure virtual method <span class='iname_b'>scriptParseStarted&#160;<span class='sym_pd'><span>(&#160;String const&amp;</span>, <span>bool&amp;</span>&#160;)</span></span> has been removed from this class.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>6</th>
+<td>Pure virtual method <span class='iname_b'>resourceLoadStarted&#160;<span class='sym_pd'><span>(&#160;ResourcePtr const&amp;</span>&#160;)</span></span> has been removed from this class.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>7</th>
+<td>Pure virtual method <span class='iname_b'>resourcePrepareEnded&#160;<span class='sym_pd'>(&#160;)</span></span> has been removed from this class.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>8</th>
+<td>Pure virtual method <span class='iname_b'>resourceGroupLoadEnded&#160;<span class='sym_pd'><span>(&#160;String const&amp;</span>&#160;)</span></span> has been removed from this class.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>9</th>
+<td>Pure virtual method <span class='iname_b'>resourcePrepareStarted&#160;<span class='sym_pd'><span>(&#160;ResourcePtr const&amp;</span>&#160;)</span></span> has been removed from this class.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>10</th>
+<td>Pure virtual method <span class='iname_b'>worldGeometryStageEnded&#160;<span class='sym_pd'>(&#160;)</span></span> has been removed from this class.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>11</th>
+<td>Pure virtual method <span class='iname_b'>resourceGroupLoadStarted&#160;<span class='sym_pd'><span>(&#160;String const&amp;</span>, <span>size_t</span>&#160;)</span></span> has been removed from this class.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>12</th>
+<td>Pure virtual method <span class='iname_b'>resourceGroupPrepareEnded&#160;<span class='sym_pd'><span>(&#160;String const&amp;</span>&#160;)</span></span> has been removed from this class.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>13</th>
+<td>Pure virtual method <span class='iname_b'>worldGeometryStageStarted&#160;<span class='sym_pd'><span>(&#160;String const&amp;</span>&#160;)</span></span> has been removed from this class.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>14</th>
+<td>Pure virtual method <span class='iname_b'>resourceGroupPrepareStarted&#160;<span class='sym_pd'><span>(&#160;String const&amp;</span>, <span>size_t</span>&#160;)</span></span> has been removed from this class.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>15</th>
+<td>Pure virtual method <span class='iname_b'>resourceGroupScriptingEnded&#160;<span class='sym_pd'><span>(&#160;String const&amp;</span>&#160;)</span></span> has been removed from this class.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>16</th>
+<td>Pure virtual method <span class='iname_b'>resourceGroupScriptingStarted&#160;<span class='sym_pd'><span>(&#160;String const&amp;</span>, <span>size_t</span>&#160;)</span></span> has been removed from this class.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>17</th>
+<td>Pure virtual method <span class='iname_b'>worldGeometryPrepareStageEnded&#160;<span class='sym_pd'>(&#160;)</span></span> has been removed from this class.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>18</th>
+<td>Pure virtual method <span class='iname_b'>worldGeometryPrepareStageStarted&#160;<span class='sym_pd'><span>(&#160;String const&amp;</span>&#160;)</span></span> has been removed from this class.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_161')">
+[+] affected symbols: 2 (0.6%)</span>
+<div id="c_161" style="display:none;">
+<div class='affected'><span class='iname_a'>ResourceGroupListener::ResourceGroupListener&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This constructor is from &#39;ResourceGroupListener&#39; class.</div>
+<span class='iname_a'>ResourceGroupListener::~ResourceGroupListener&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This destructor is from &#39;ResourceGroupListener&#39; class.</div>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<span class='h_name'>OgreRoot.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_162')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> Root <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_162" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Field <b>mSceneManagerStack</b> has been removed from this type.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>Root</b>' has no member named '<b>mSceneManagerStack</b>'.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_163')">
+[+] affected symbols: 4 (1.1%)</span>
+<div id="c_163" style="display:none;">
+<div class='affected'><span class='iname_a'>OgreBites::AdvancedRenderControls::keyPressed&#160;<span class='sym_p'><span>(&#160;struct OgreBites::KeyboardEvent const&amp; <i>evt</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mRoot&#39; in the object of this method has base type &#39;Root&#39;.</div>
+<span class='iname_a'>OgreBites::AdvancedRenderControls::frameRendered&#160;<span class='sym_p'><span>(&#160;struct FrameEvent const&amp; <i>evt</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mRoot&#39; in the object of this method has base type &#39;Root&#39;.</div>
+<span class='iname_a'>OgreBites::AdvancedRenderControls::AdvancedRenderControls&#160;<span class='sym_p'><span>(&#160;OgreBites::TrayManager* <i>trayMgr</i></span>, <span>Camera* <i>cam</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mRoot&#39; in the object of this method has base type &#39;Root&#39;.</div>
+<span class='iname_a'>OgreBites::AdvancedRenderControls::~AdvancedRenderControls&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mRoot&#39; in the object of this method has base type &#39;Root&#39;.</div>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<span class='h_name'>OgreShaderGenerator.h</span><br/>
+<span class='ns'>namespace <b>Ogre::RTShader</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_164')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> ShaderGenerator <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_164" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Field <b>mSubRenderStateExFactories</b> has been removed from this type.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>ShaderGenerator</b>' has no member named '<b>mSubRenderStateExFactories</b>'.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_165')">
+[+] affected symbols: 9 (2.5%)</span>
+<div id="c_165" style="display:none;">
+<div class='affected'><span class='iname_a'>OgreBites::AdvancedRenderControls::keyPressed&#160;<span class='sym_p'><span>(&#160;struct OgreBites::KeyboardEvent const&amp; <i>evt</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mShaderGenerator&#39; in the object of this method has base type &#39;ShaderGenerator&#39;.</div>
+<span class='iname_a'>OgreBites::AdvancedRenderControls::frameRendered&#160;<span class='sym_p'><span>(&#160;struct Ogre::FrameEvent const&amp; <i>evt</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mShaderGenerator&#39; in the object of this method has base type &#39;ShaderGenerator&#39;.</div>
+<span class='iname_a'>OgreBites::AdvancedRenderControls::AdvancedRenderControls&#160;<span class='sym_p'><span>(&#160;OgreBites::TrayManager* <i>trayMgr</i></span>, <span>Ogre::Camera* <i>cam</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mShaderGenerator&#39; in the object of this method has base type &#39;ShaderGenerator&#39;.</div>
+<span class='iname_a'>OgreBites::AdvancedRenderControls::~AdvancedRenderControls&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mShaderGenerator&#39; in the object of this method has base type &#39;ShaderGenerator&#39;.</div>
+<span class='iname_a'>OgreBites::SGTechniqueResolverListener::handleSchemeNotFound&#160;<span class='sym_p'><span>(&#160;unsigned short <i>schemeIndex</i></span>, <span>Ogre::String const&amp; <i>schemeName</i></span>, <span>Ogre::Material* <i>originalMaterial</i></span>, <span>unsigned short <i>lodIndex</i></span>, <span>Ogre::Renderable const* <i>rend</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mShaderGenerator&#39; in the object of this method has base type &#39;ShaderGenerator&#39;.</div>
+<span class='iname_a'>OgreBites::SGTechniqueResolverListener::afterIlluminationPassesCreated&#160;<span class='sym_p'><span>(&#160;Ogre::Technique* <i>tech</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mShaderGenerator&#39; in the object of this method has base type &#39;ShaderGenerator&#39;.</div>
+<span class='iname_a'>OgreBites::SGTechniqueResolverListener::beforeIlluminationPassesCleared&#160;<span class='sym_p'><span>(&#160;Ogre::Technique* <i>tech</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mShaderGenerator&#39; in the object of this method has base type &#39;ShaderGenerator&#39;.</div>
+<span class='iname_a'>OgreBites::SGTechniqueResolverListener::SGTechniqueResolverListener&#160;<span class='sym_p'><span>(&#160;ShaderGenerator* <span class='fp'>pShaderGenerator</span></span>&#160;)</span></span><br/>
+<div class='affect'>1st parameter &#39;pShaderGenerator&#39; (pointer) has base type &#39;ShaderGenerator&#39;.</div>
+<span class='iname_a'>OgreBites::SGTechniqueResolverListener::~SGTechniqueResolverListener&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mShaderGenerator&#39; in the object of this method has base type &#39;ShaderGenerator&#39;.</div>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='Medium_Risk_Problems'></a><a name='Type_Problems_Medium'></a>
+<h2>Problems with Data Types, Medium Severity <span class='failed'>&nbsp;8&nbsp;</span></h2><hr/>
+<span class='h_name'>OgreShaderGenerator.h</span><br/>
+<span class='ns'>namespace <b>Ogre::RTShader</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_166')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> ShaderGenerator <span class='failed'>&nbsp;8&nbsp;</span></span>
+<br/>
+<div id="c_166" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>The pointer level of field <b>mFFPRenderStateBuilder</b> has been increased from <b>1</b> to <b>0</b>.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>The pointer level of field <b>mMaterialSerializerListener</b> has been increased from <b>1</b> to <b>0</b>.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>3</th>
+<td>The pointer level of field <b>mProgramManager</b> has been increased from <b>1</b> to <b>0</b>.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>4</th>
+<td>The pointer level of field <b>mProgramWriterManager</b> has been increased from <b>1</b> to <b>0</b>.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>5</th>
+<td>The pointer level of field <b>mRenderObjectListener</b> has been increased from <b>1</b> to <b>0</b>.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>6</th>
+<td>The pointer level of field <b>mResourceGroupListener</b> has been increased from <b>1</b> to <b>0</b>.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>7</th>
+<td>The pointer level of field <b>mSceneManagerListener</b> has been increased from <b>1</b> to <b>0</b>.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>8</th>
+<td>The pointer level of field <b>mScriptTranslatorManager</b> has been increased from <b>1</b> to <b>0</b>.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_167')">
+[+] affected symbols: 9 (2.5%)</span>
+<div id="c_167" style="display:none;">
+<div class='affected'><span class='iname_a'>OgreBites::AdvancedRenderControls::keyPressed&#160;<span class='sym_p'><span>(&#160;struct OgreBites::KeyboardEvent const&amp; <i>evt</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mShaderGenerator&#39; in the object of this method has base type &#39;ShaderGenerator&#39;.</div>
+<span class='iname_a'>OgreBites::AdvancedRenderControls::frameRendered&#160;<span class='sym_p'><span>(&#160;struct Ogre::FrameEvent const&amp; <i>evt</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mShaderGenerator&#39; in the object of this method has base type &#39;ShaderGenerator&#39;.</div>
+<span class='iname_a'>OgreBites::AdvancedRenderControls::AdvancedRenderControls&#160;<span class='sym_p'><span>(&#160;OgreBites::TrayManager* <i>trayMgr</i></span>, <span>Ogre::Camera* <i>cam</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mShaderGenerator&#39; in the object of this method has base type &#39;ShaderGenerator&#39;.</div>
+<span class='iname_a'>OgreBites::AdvancedRenderControls::~AdvancedRenderControls&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mShaderGenerator&#39; in the object of this method has base type &#39;ShaderGenerator&#39;.</div>
+<span class='iname_a'>OgreBites::SGTechniqueResolverListener::handleSchemeNotFound&#160;<span class='sym_p'><span>(&#160;unsigned short <i>schemeIndex</i></span>, <span>Ogre::String const&amp; <i>schemeName</i></span>, <span>Ogre::Material* <i>originalMaterial</i></span>, <span>unsigned short <i>lodIndex</i></span>, <span>Ogre::Renderable const* <i>rend</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mShaderGenerator&#39; in the object of this method has base type &#39;ShaderGenerator&#39;.</div>
+<span class='iname_a'>OgreBites::SGTechniqueResolverListener::afterIlluminationPassesCreated&#160;<span class='sym_p'><span>(&#160;Ogre::Technique* <i>tech</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mShaderGenerator&#39; in the object of this method has base type &#39;ShaderGenerator&#39;.</div>
+<span class='iname_a'>OgreBites::SGTechniqueResolverListener::beforeIlluminationPassesCleared&#160;<span class='sym_p'><span>(&#160;Ogre::Technique* <i>tech</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mShaderGenerator&#39; in the object of this method has base type &#39;ShaderGenerator&#39;.</div>
+<span class='iname_a'>OgreBites::SGTechniqueResolverListener::SGTechniqueResolverListener&#160;<span class='sym_p'><span>(&#160;ShaderGenerator* <span class='fp'>pShaderGenerator</span></span>&#160;)</span></span><br/>
+<div class='affect'>1st parameter &#39;pShaderGenerator&#39; (pointer) has base type &#39;ShaderGenerator&#39;.</div>
+<span class='iname_a'>OgreBites::SGTechniqueResolverListener::~SGTechniqueResolverListener&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mShaderGenerator&#39; in the object of this method has base type &#39;ShaderGenerator&#39;.</div>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='Symbol_Problems_Medium'></a><a name='Interface_Problems_Medium'></a>
+<h2>Problems with Symbols, Medium Severity <span class='failed'>&nbsp;1&nbsp;</span></h2><hr/>
+<span class='h_name'>OgreCameraMan.h</span><br/>
+<span class='ns'>namespace <b>OgreBites</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_168')">
+<span class='ext'>[+]</span> CameraMan::setYawPitchDist&#160;<span class='sym_p'><span>(&#160;Ogre::Radian <span class='color_p'>yaw</span></span>, <span>Ogre::Radian <span class='color_p'>pitch</span></span>, <span>Ogre::Real <span class='color_p'>dist</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_168" style="display:none;">
+
+
+<span class='new_sign_lbl'>&#8675;</span>
+<br/>
+<span class='new_sign'>CameraMan::setYawPitchDist&#160;<span class='sym_p'><span>(&#160;Ogre::Radian const&amp; <span class='color_p'>yaw</span></span>, <span>Ogre::Radian const&amp; <span class='color_p'>pitch</span></span>, <span>Ogre::Real <span class='color_p'>dist</span></span>&#160;)</span></span><br/>
+<span class='mngl pleft'>_ZN9OgreBites9CameraMan15setYawPitchDistEN4Ogre6RadianES2_f</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>Parameters list has been changed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+</table>
+<br/>
+</div>
+<br/>
+<a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='Low_Risk_Problems'></a><a name='Type_Problems_Low'></a>
+<h2>Problems with Data Types, Low Severity <span class='warning'>&nbsp;11&nbsp;</span></h2><hr/>
+<span class='h_name'>OgreRoot.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_169')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> Root <span class='warning'>&nbsp;2&nbsp;</span></span>
+<br/>
+<div id="c_169" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Field <b>mCurrentSceneManager</b> has been added to this type.</td>
+<td>This field will not be initialized or used by old client applications.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>Field <b>mStaticGeometryFactory</b> has been added to this type.</td>
+<td>This field will not be initialized or used by old client applications.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_170')">
+[+] affected symbols: 4 (1.1%)</span>
+<div id="c_170" style="display:none;">
+<div class='affected'><span class='iname_a'>OgreBites::AdvancedRenderControls::keyPressed&#160;<span class='sym_p'><span>(&#160;struct OgreBites::KeyboardEvent const&amp; <i>evt</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mRoot&#39; in the object of this method has base type &#39;Root&#39;.</div>
+<span class='iname_a'>OgreBites::AdvancedRenderControls::frameRendered&#160;<span class='sym_p'><span>(&#160;struct FrameEvent const&amp; <i>evt</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mRoot&#39; in the object of this method has base type &#39;Root&#39;.</div>
+<span class='iname_a'>OgreBites::AdvancedRenderControls::AdvancedRenderControls&#160;<span class='sym_p'><span>(&#160;OgreBites::TrayManager* <i>trayMgr</i></span>, <span>Camera* <i>cam</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mRoot&#39; in the object of this method has base type &#39;Root&#39;.</div>
+<span class='iname_a'>OgreBites::AdvancedRenderControls::~AdvancedRenderControls&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mRoot&#39; in the object of this method has base type &#39;Root&#39;.</div>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<span class='h_name'>OgreShaderGenerator.h</span><br/>
+<span class='ns'>namespace <b>Ogre::RTShader</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_171')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> ShaderGenerator <span class='warning'>&nbsp;9&nbsp;</span></span>
+<br/>
+<div id="c_171" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Field <b>mBuiltinSRSFactories</b> has been added to this type.</td>
+<td>This field will not be initialized or used by old client applications.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>Type of field <b>mFFPRenderStateBuilder</b> has been changed from <b>FFPRenderStateBuilder*</b> to <span class='value'>std::unique_ptr&lt;FFPRenderStateBuilder, std::default_delete&lt;FFPRenderStateBuilder&gt; &gt;</span>.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>3</th>
+<td>Type of field <b>mMaterialSerializerListener</b> has been changed from <b>SGMaterialSerializerListener*</b> to <span class='value'>std::unique_ptr&lt;SGMaterialSerializerListener, std::default_delete&lt;SGMaterialSerializerListener&gt; &gt;</span>.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>4</th>
+<td>Type of field <b>mProgramManager</b> has been changed from <b>ProgramManager*</b> to <span class='value'>std::unique_ptr&lt;ProgramManager, std::default_delete&lt;ProgramManager&gt; &gt;</span>.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>5</th>
+<td>Type of field <b>mProgramWriterManager</b> has been changed from <b>ProgramWriterManager*</b> to <span class='value'>std::unique_ptr&lt;ProgramWriterManager, std::default_delete&lt;ProgramWriterManager&gt; &gt;</span>.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>6</th>
+<td>Type of field <b>mRenderObjectListener</b> has been changed from <b>ShaderGenerator::SGRenderObjectListener*</b> to <span class='value'>std::unique_ptr&lt;SGRenderObjectListener, std::default_delete&lt;SGRenderObjectListener&gt; &gt;</span>.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>7</th>
+<td>Type of field <b>mResourceGroupListener</b> has been changed from <b>ShaderGenerator::SGResourceGroupListener*</b> to <span class='value'>std::unique_ptr&lt;SGResourceGroupListener, std::default_delete&lt;SGResourceGroupListener&gt; &gt;</span>.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>8</th>
+<td>Type of field <b>mSceneManagerListener</b> has been changed from <b>ShaderGenerator::SGSceneManagerListener*</b> to <span class='value'>std::unique_ptr&lt;SGSceneManagerListener, std::default_delete&lt;SGSceneManagerListener&gt; &gt;</span>.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>9</th>
+<td>Type of field <b>mScriptTranslatorManager</b> has been changed from <b>ShaderGenerator::SGScriptTranslatorManager*</b> to <span class='value'>std::unique_ptr&lt;SGScriptTranslatorManager, std::default_delete&lt;SGScriptTranslatorManager&gt; &gt;</span>.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_172')">
+[+] affected symbols: 9 (2.5%)</span>
+<div id="c_172" style="display:none;">
+<div class='affected'><span class='iname_a'>OgreBites::AdvancedRenderControls::keyPressed&#160;<span class='sym_p'><span>(&#160;struct OgreBites::KeyboardEvent const&amp; <i>evt</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mShaderGenerator&#39; in the object of this method has base type &#39;ShaderGenerator&#39;.</div>
+<span class='iname_a'>OgreBites::AdvancedRenderControls::frameRendered&#160;<span class='sym_p'><span>(&#160;struct Ogre::FrameEvent const&amp; <i>evt</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mShaderGenerator&#39; in the object of this method has base type &#39;ShaderGenerator&#39;.</div>
+<span class='iname_a'>OgreBites::AdvancedRenderControls::AdvancedRenderControls&#160;<span class='sym_p'><span>(&#160;OgreBites::TrayManager* <i>trayMgr</i></span>, <span>Ogre::Camera* <i>cam</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mShaderGenerator&#39; in the object of this method has base type &#39;ShaderGenerator&#39;.</div>
+<span class='iname_a'>OgreBites::AdvancedRenderControls::~AdvancedRenderControls&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mShaderGenerator&#39; in the object of this method has base type &#39;ShaderGenerator&#39;.</div>
+<span class='iname_a'>OgreBites::SGTechniqueResolverListener::handleSchemeNotFound&#160;<span class='sym_p'><span>(&#160;unsigned short <i>schemeIndex</i></span>, <span>Ogre::String const&amp; <i>schemeName</i></span>, <span>Ogre::Material* <i>originalMaterial</i></span>, <span>unsigned short <i>lodIndex</i></span>, <span>Ogre::Renderable const* <i>rend</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mShaderGenerator&#39; in the object of this method has base type &#39;ShaderGenerator&#39;.</div>
+<span class='iname_a'>OgreBites::SGTechniqueResolverListener::afterIlluminationPassesCreated&#160;<span class='sym_p'><span>(&#160;Ogre::Technique* <i>tech</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mShaderGenerator&#39; in the object of this method has base type &#39;ShaderGenerator&#39;.</div>
+<span class='iname_a'>OgreBites::SGTechniqueResolverListener::beforeIlluminationPassesCleared&#160;<span class='sym_p'><span>(&#160;Ogre::Technique* <i>tech</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mShaderGenerator&#39; in the object of this method has base type &#39;ShaderGenerator&#39;.</div>
+<span class='iname_a'>OgreBites::SGTechniqueResolverListener::SGTechniqueResolverListener&#160;<span class='sym_p'><span>(&#160;ShaderGenerator* <span class='fp'>pShaderGenerator</span></span>&#160;)</span></span><br/>
+<div class='affect'>1st parameter &#39;pShaderGenerator&#39; (pointer) has base type &#39;ShaderGenerator&#39;.</div>
+<span class='iname_a'>OgreBites::SGTechniqueResolverListener::~SGTechniqueResolverListener&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mShaderGenerator&#39; in the object of this method has base type &#39;ShaderGenerator&#39;.</div>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='Headers'></a><h2>Header Files <span class='gray'>&nbsp;63&nbsp;</span></h2><hr/>
+<div class='h_list'>
+OgreAdvancedRenderControls.h<br/>
+OgreAny.h<br/>
+OgreApplicationContext.h<br/>
+OgreAutoParamDataSource.h<br/>
+OgreAxisAlignedBox.h<br/>
+OgreBitesConfigDialog.h<br/>
+OgreBlendMode.h<br/>
+OgreCameraMan.h<br/>
+OgreColourValue.h<br/>
+OgreCommon.h<br/>
+OgreConfigDialog.h<br/>
+OgreController.h<br/>
+OgreControllerManager.h<br/>
+OgreFileSystemLayer.h<br/>
+OgreFrameListener.h<br/>
+OgreGpuProgramParams.h<br/>
+OgreHardwareVertexBuffer.h<br/>
+OgreInput.h<br/>
+OgreLight.h<br/>
+OgreLog.h<br/>
+OgreLogManager.h<br/>
+OgreMaterialManager.h<br/>
+OgreMath.h<br/>
+OgreMatrix4.h<br/>
+OgreMemoryAllocatorConfig.h<br/>
+OgreMovableObject.h<br/>
+OgreNode.h<br/>
+OgreOverlayElement.h<br/>
+OgrePass.h<br/>
+OgrePlatform.h<br/>
+OgrePlugin.h<br/>
+OgrePrerequisites.h<br/>
+OgreRay.h<br/>
+OgreRenderable.h<br/>
+OgreRenderObjectListener.h<br/>
+OgreRenderOperation.h<br/>
+OgreRenderSystemCapabilities.h<br/>
+OgreResourceGroupManager.h<br/>
+OgreRoot.h<br/>
+OgreSceneManager.h<br/>
+OgreSceneManagerEnumerator.h<br/>
+OgreScriptCompiler.h<br/>
+OgreScriptTranslator.h<br/>
+OgreSGTechniqueResolverListener.h<br/>
+OgreShaderGenerator.h<br/>
+OgreShaderPrerequisites.h<br/>
+OgreShaderProgramManager.h<br/>
+OgreShaderProgramWriter.h<br/>
+OgreShaderRenderState.h<br/>
+OgreSharedPtr.h<br/>
+OgreSingleton.h<br/>
+OgreStaticPluginLoader.h<br/>
+OgreStringVector.h<br/>
+OgreTechnique.h<br/>
+OgreTextAreaOverlayElement.h<br/>
+OgreTextureUnitState.h<br/>
+OgreTimer.h<br/>
+OgreTrays.h<br/>
+OgreUserObjectBindings.h<br/>
+OgreUTFString.h<br/>
+OgreVector.h<br/>
+OgreVertexIndexData.h<br/>
+OgreWindowEventUtilities.h<br/>
+</div>
+<br/><a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='Sources'></a><h2>Source Files <span class='gray'>&nbsp;8&nbsp;</span></h2><hr/>
+<div class='h_list'>
+OgreAdvancedRenderControls.cpp<br/>
+OgreApplicationContext.cpp<br/>
+OgreBitesConfigDialog.cpp<br/>
+OgreCameraMan.cpp<br/>
+OgreSGTechniqueResolverListener.cpp<br/>
+OgreStaticPluginLoader.cpp<br/>
+OgreTrays.cpp<br/>
+OgreWindowEventUtilities.cpp<br/>
+</div>
+<br/><a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='Libs'></a><h2>Objects <span class='gray'>&nbsp;1&nbsp;</span></h2><hr/>
+<div class='lib_list'>
+libOgreBites.so.1.11.6<br/>
+</div>
+<br/><a class='top_ref' href='#Top'>to the top</a><br/>
+</div>
+<br/><br/><br/>
+<hr/>
+<div class='footer' align='right'><i>Generated by <a href='https://github.com/lvc/abi-compliance-checker'>ABI Compliance Checker</a> 2.3 &#160;</i>
+</div>
+<br/>
+
+</body></html>

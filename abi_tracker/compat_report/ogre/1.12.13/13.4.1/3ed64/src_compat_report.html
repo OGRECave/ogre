@@ -1,0 +1,3074 @@
+<!-- verdict:incompatible;affected:23;added:41;removed:40;type_problems_high:9;type_problems_medium:97;type_problems_low:3;interface_problems_high:1;interface_problems_medium:38;interface_problems_low:0;changed_constants:0;type_changes_other:9;tool_version:2.3 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta name="keywords" content="libOgreBites, source compatibility, API, report" />
+<meta name="description" content="Source compatibility report for the libOgreBites object between 1.12.13 and 13.4.1 versions" />
+<title>libOgreBites: 1.12.13 to 13.4.1 source compatibility report</title>
+<style type="text/css">
+body {
+    font-family:Arial, sans-serif;
+    background-color:White;
+    color:Black;
+}
+hr {
+    color:Black;
+    background-color:Black;
+    height:1px;
+    border:0;
+}
+h1 {
+    margin-bottom:0px;
+    padding-bottom:0px;
+    font-size:1.625em;
+}
+h2 {
+    margin-bottom:0px;
+    padding-bottom:0px;
+    font-size:1.25em;
+    white-space:nowrap;
+}
+span.section {
+    font-weight:bold;
+    cursor:pointer;
+    color:#003E69;
+    white-space:nowrap;
+    margin-left:0.3125em;
+}
+span.new_sign {
+    font-weight:bold;
+    margin-left:1.65em;
+    color:#003E69;
+}
+span.new_sign_lbl {
+    margin-left:3em;
+    font-size:1em;
+    color:Black;
+}
+span:hover.section {
+    color:#336699;
+}
+span.sect_aff {
+    cursor:pointer;
+    padding-left:1.55em;
+    font-size:0.875em;
+    color:#cc3300;
+}
+span.sect_info {
+    cursor:pointer;
+    padding-left:1.55em;
+    font-size:0.875em;
+    color:Black;
+}
+span.ext {
+    font-weight:normal;
+}
+span.h_name {
+    color:#cc3300;
+    font-size:0.875em;
+    font-weight:bold;
+}
+div.h_list, div.lib_list {
+    font-size:0.94em;
+    padding-left:0.4em;
+}
+span.ns {
+    color:#408080;
+    font-size:0.94em;
+}
+span.lib_name {
+    color:Green;
+    font-size:0.875em;
+    font-weight:bold;
+}
+span.iname {
+    font-weight:bold;
+    color:#003E69;
+    margin-left:0.3125em;
+}
+span.iname_b {
+    font-weight:bold;
+}
+span.iname_a {
+    color:#333333;
+    font-weight:bold;
+    font-size:0.94em;
+}
+span.sym_p {
+    font-weight:normal;
+    white-space:normal;
+}
+span.sym_pd {
+    white-space:normal;
+}
+span.sym_p span, span.sym_pd span {
+    white-space:nowrap;
+}
+div.affect {
+    padding-left:1em;
+    padding-bottom:10px;
+    font-size:0.87em;
+    font-style:italic;
+    line-height:0.9em;
+}
+div.affected {
+    padding-left:1.9em;
+    padding-top:10px;
+}
+table.ptable {
+    border-collapse:collapse;
+    border:1px outset black;
+    margin-left:0.95em;
+    margin-top:3px;
+    margin-bottom:3px;
+    width:56.25em;
+}
+table.ptable td {
+    border:1px solid gray;
+    padding:3px;
+    font-size:0.875em;
+    text-align:left;
+    vertical-align:top;
+    max-width:28em;
+    word-wrap:break-word;
+}
+table.ptable th.pn {
+    width:2%;
+}
+table.ptable th.chg {
+    width:47%;
+}
+table.vtable {
+    border-collapse:collapse;
+    border:1px outset black;
+    margin-left:1.9em;
+    margin-top:0.7em;
+}
+table.vtable td {
+    border:1px solid gray;
+    padding:3px;
+    font-size:0.875em;
+    vertical-align:top;
+    max-width:450px;
+    word-wrap:break-word;
+}
+table.ptable th, table.vtable th {
+    background-color:#eeeeee;
+    font-weight:bold;
+    color:#333333;
+    font-family:Verdana, Arial;
+    font-size:0.875em;
+    border:1px solid gray;
+    text-align:center;
+    vertical-align:top;
+    white-space:nowrap;
+    padding:3px;
+}
+table.summary {
+    border-collapse:collapse;
+    border:1px outset black;
+}
+table.summary th {
+    background-color:#eeeeee;
+    font-weight:normal;
+    text-align:left;
+    font-size:0.94em;
+    white-space:nowrap;
+    border:1px inset gray;
+    padding:3px;
+}
+table.summary td {
+    text-align:right;
+    white-space:nowrap;
+    border:1px inset gray;
+    padding:3px 5px 3px 10px;
+}
+span.mngl {
+    padding-left:1em;
+    font-size:0.875em;
+    cursor:text;
+    color:#444444;
+    font-weight:bold;
+}
+span.pleft {
+    padding-left:2.5em;
+}
+span.sym_ver {
+    color:#333333;
+    white-space:nowrap;
+    font-family:"DejaVu Sans Mono", Monospace;
+}
+span.attr {
+    color:#333333;
+    font-weight:normal;
+}
+span.color_p {
+    font-style:italic;
+    color:Brown;
+}
+span.p {
+    font-style:italic;
+}
+span.fp {
+    font-style:italic;
+    background-color:#DCDCDC;
+}
+span.ttype {
+    font-weight:normal;
+}
+span.nowrap {
+    white-space:nowrap;
+}
+span.value {
+    font-weight:bold;
+}
+.passed {
+    background-color:#CCFFCC;
+    font-weight:normal;
+}
+.warning {
+    background-color:#F4F4AF;
+    font-weight:normal;
+}
+.failed {
+    background-color:#FFCCCC;
+    font-weight:normal;
+}
+.new {
+    background-color:#C6DEFF;
+    font-weight:normal;
+}
+.compatible {
+    background-color:#CCFFCC;
+    font-weight:normal;
+}
+.almost_compatible {
+    background-color:#FFDAA3;
+    font-weight:normal;
+}
+.incompatible {
+    background-color:#FFCCCC;
+    font-weight:normal;
+}
+.gray {
+    background-color:#DCDCDC;
+    font-weight:normal;
+}
+.top_ref {
+    font-size:0.69em;
+}
+.footer {
+    font-size:0.75em;
+}
+</style>
+<script type="text/javascript" language="JavaScript">
+<!--
+function showContent(header, id)
+{
+    e = document.getElementById(id);
+    if(e.style.display == 'none')
+    {
+        e.style.display = 'block';
+        e.style.visibility = 'visible';
+        header.innerHTML = header.innerHTML.replace(/\[[^0-9 ]\]/gi,"[&minus;]");
+    }
+    else
+    {
+        e.style.display = 'none';
+        e.style.visibility = 'hidden';
+        header.innerHTML = header.innerHTML.replace(/\[[^0-9 ]\]/gi,"[+]");
+    }
+}
+-->
+</script>
+</head>
+
+<body>
+<div><a name='Top'></a>
+<h1>Source compatibility report for the <span style='color:Blue;'>libOgreBites.so</span> object between <span style='color:Red;'>1.12.13</span> and <span style='color:Red;'>13.4.1</span> versions</h1>
+
+<h2>Test Info</h2><hr/>
+<table class='summary'>
+<tr><th>Module Name</th><td>libOgreBites</td></tr>
+<tr><th>Version #1</th><td>1.12.13</td></tr>
+<tr><th>Version #2</th><td>13.4.1</td></tr>
+<tr><th>Arch</th><td>x86_64</td></tr>
+</table>
+<h2>Test Results</h2><hr/>
+<table class='summary'><tr><th>Total Header Files</th><td><a href='#Headers' style='color:Blue;'>54</a></td></tr>
+<tr><th>Total Source Files</th><td><a href='#Sources' style='color:Blue;'>9</a></td></tr>
+<tr><th>Total Objects</th><td><a href='#Libs' style='color:Blue;'>1</a></td></tr>
+<tr><th>Total Symbols / Types</th><td>331 / 131</td></tr>
+<tr><th>Compatibility</th>
+<td class='incompatible'>77%</td>
+</tr>
+</table>
+<h2>Problem Summary</h2><hr/>
+<table class='summary'><tr><th></th><th style='text-align:center;'>Severity</th><th style='text-align:center;'>Count</th></tr><tr><th>Added Symbols</th><td>-</td><td class='new'><a href='#Added' style='color:Blue;'>41</a></td></tr>
+<tr><th>Removed Symbols</th><td>High</td><td class='failed'><a href='#Removed' style='color:Blue;'>40</a></td></tr>
+<tr><th rowspan='3'>Problems with<br/>Data Types</th><td>High</td><td class='failed'><a href='#Type_Problems_High' style='color:Blue;'>9</a></td></tr>
+<tr><td>Medium</td><td class='failed'><a href='#Type_Problems_Medium' style='color:Blue;'>97</a></td></tr>
+<tr><td>Low</td><td class='warning'><a href='#Type_Problems_Low' style='color:Blue;'>3</a></td></tr>
+<tr><th rowspan='3'>Problems with<br/>Symbols</th><td>High</td><td class='failed'><a href='#Symbol_Problems_High' style='color:Blue;'>1</a></td></tr>
+<tr><td>Medium</td><td class='failed'><a href='#Symbol_Problems_Medium' style='color:Blue;'>38</a></td></tr>
+<tr><td>Low</td><td>0</td></tr>
+<tr><th>Problems with<br/>Constants</th><td>Low</td><td>0</td></tr>
+<tr><th>Other Changes<br/>in Data Types</th><td>-</td><td class='passed'><a href='#Other_Changes_In_Types' style='color:Blue;'>9</a></td></tr>
+</table>
+
+<a name='Added'></a><h2>Added Symbols <span class='new'>&nbsp;41&nbsp;</span></h2><hr/>
+<span class='h_name'>OgreApplicationContext.h</span><br/>
+<span class='ns'>namespace <b>OgreBites</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_155')">
+ApplicationContextSDL::getDisplayDPI&#160;<span class='sym_p'>(&#160;)</span> const</span>
+<br/>
+<div id="c_155" style="display:none;">
+<span class='mngl'>_ZNK9OgreBites21ApplicationContextSDL13getDisplayDPIEv</span>
+<br/>
+<br/>
+</div>
+
+<br/>
+<span class='h_name'>OgreTrays.h</span><br/>
+<span class='ns'>namespace <b>OgreBites</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_156')">
+Button::Button <span class='attr'>[C1]</span>&#160;<span class='sym_p'><span>(&#160;Ogre::String const&amp; <span class='color_p'>name</span></span>, <span>std::__cxx11::basic_string&lt;char&gt;const&amp; <span class='color_p'>caption</span></span>, <span>Ogre::Real <span class='color_p'>width</span></span>&#160;)</span></span>
+<br/>
+<div id="c_156" style="display:none;">
+<span class='mngl'>_ZN9OgreBites6ButtonC1ERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEES8_f</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_157')">
+Button::Button <span class='attr'>[C2]</span>&#160;<span class='sym_p'><span>(&#160;Ogre::String const&amp; <span class='color_p'>name</span></span>, <span>std::__cxx11::basic_string&lt;char&gt;const&amp; <span class='color_p'>caption</span></span>, <span>Ogre::Real <span class='color_p'>width</span></span>&#160;)</span></span>
+<br/>
+<div id="c_157" style="display:none;">
+<span class='mngl'>_ZN9OgreBites6ButtonC2ERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEES8_f</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_158')">
+Button::setCaption&#160;<span class='sym_p'><span>(&#160;std::__cxx11::basic_string&lt;char&gt;const&amp; <span class='color_p'>caption</span></span>&#160;)</span></span>
+<br/>
+<div id="c_158" style="display:none;">
+<span class='mngl'>_ZN9OgreBites6Button10setCaptionERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_159')">
+CheckBox::CheckBox <span class='attr'>[C1]</span>&#160;<span class='sym_p'><span>(&#160;Ogre::String const&amp; <span class='color_p'>name</span></span>, <span>std::__cxx11::basic_string&lt;char&gt;const&amp; <span class='color_p'>caption</span></span>, <span>Ogre::Real <span class='color_p'>width</span></span>&#160;)</span></span>
+<br/>
+<div id="c_159" style="display:none;">
+<span class='mngl'>_ZN9OgreBites8CheckBoxC1ERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEES8_f</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_160')">
+CheckBox::CheckBox <span class='attr'>[C2]</span>&#160;<span class='sym_p'><span>(&#160;Ogre::String const&amp; <span class='color_p'>name</span></span>, <span>std::__cxx11::basic_string&lt;char&gt;const&amp; <span class='color_p'>caption</span></span>, <span>Ogre::Real <span class='color_p'>width</span></span>&#160;)</span></span>
+<br/>
+<div id="c_160" style="display:none;">
+<span class='mngl'>_ZN9OgreBites8CheckBoxC2ERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEES8_f</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_161')">
+CheckBox::setCaption&#160;<span class='sym_p'><span>(&#160;std::__cxx11::basic_string&lt;char&gt;const&amp; <span class='color_p'>caption</span></span>&#160;)</span></span>
+<br/>
+<div id="c_161" style="display:none;">
+<span class='mngl'>_ZN9OgreBites8CheckBox10setCaptionERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_162')">
+Label::Label <span class='attr'>[C1]</span>&#160;<span class='sym_p'><span>(&#160;Ogre::String const&amp; <span class='color_p'>name</span></span>, <span>std::__cxx11::basic_string&lt;char&gt;const&amp; <span class='color_p'>caption</span></span>, <span>Ogre::Real <span class='color_p'>width</span></span>&#160;)</span></span>
+<br/>
+<div id="c_162" style="display:none;">
+<span class='mngl'>_ZN9OgreBites5LabelC1ERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEES8_f</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_163')">
+Label::Label <span class='attr'>[C2]</span>&#160;<span class='sym_p'><span>(&#160;Ogre::String const&amp; <span class='color_p'>name</span></span>, <span>std::__cxx11::basic_string&lt;char&gt;const&amp; <span class='color_p'>caption</span></span>, <span>Ogre::Real <span class='color_p'>width</span></span>&#160;)</span></span>
+<br/>
+<div id="c_163" style="display:none;">
+<span class='mngl'>_ZN9OgreBites5LabelC2ERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEES8_f</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_164')">
+ParamsPanel::getParamValue&#160;<span class='sym_p'><span>(&#160;std::__cxx11::basic_string&lt;char&gt;const&amp; <span class='color_p'>paramName</span></span>&#160;)</span></span>
+<br/>
+<div id="c_164" style="display:none;">
+<span class='mngl'>_ZN9OgreBites11ParamsPanel13getParamValueERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_165')">
+ParamsPanel::getParamValue&#160;<span class='sym_p'><span>(&#160;unsigned int <span class='color_p'>index</span></span>&#160;)</span></span>
+<br/>
+<div id="c_165" style="display:none;">
+<span class='mngl'>_ZN9OgreBites11ParamsPanel13getParamValueB5cxx11Ej</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_166')">
+ParamsPanel::setParamValue&#160;<span class='sym_p'><span>(&#160;std::__cxx11::basic_string&lt;char&gt;const&amp; <span class='color_p'>paramName</span></span>, <span>std::__cxx11::basic_string&lt;char&gt;const&amp; <span class='color_p'>paramValue</span></span>&#160;)</span></span>
+<br/>
+<div id="c_166" style="display:none;">
+<span class='mngl'>_ZN9OgreBites11ParamsPanel13setParamValueERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEES8_</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_167')">
+ProgressBar::ProgressBar <span class='attr'>[C1]</span>&#160;<span class='sym_p'><span>(&#160;Ogre::String const&amp; <span class='color_p'>name</span></span>, <span>std::__cxx11::basic_string&lt;char&gt;const&amp; <span class='color_p'>caption</span></span>, <span>Ogre::Real <span class='color_p'>width</span></span>, <span>Ogre::Real <span class='color_p'>commentBoxWidth</span></span>&#160;)</span></span>
+<br/>
+<div id="c_167" style="display:none;">
+<span class='mngl'>_ZN9OgreBites11ProgressBarC1ERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEES8_ff</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_168')">
+ProgressBar::ProgressBar <span class='attr'>[C2]</span>&#160;<span class='sym_p'><span>(&#160;Ogre::String const&amp; <span class='color_p'>name</span></span>, <span>std::__cxx11::basic_string&lt;char&gt;const&amp; <span class='color_p'>caption</span></span>, <span>Ogre::Real <span class='color_p'>width</span></span>, <span>Ogre::Real <span class='color_p'>commentBoxWidth</span></span>&#160;)</span></span>
+<br/>
+<div id="c_168" style="display:none;">
+<span class='mngl'>_ZN9OgreBites11ProgressBarC2ERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEES8_ff</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_169')">
+SelectMenu::containsItem&#160;<span class='sym_p'><span>(&#160;std::__cxx11::basic_string&lt;char&gt;const&amp; <span class='color_p'>item</span></span>&#160;)</span></span>
+<br/>
+<div id="c_169" style="display:none;">
+<span class='mngl'>_ZN9OgreBites10SelectMenu12containsItemERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_170')">
+SelectMenu::getSelectedItem&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_170" style="display:none;">
+<span class='mngl'>_ZN9OgreBites10SelectMenu15getSelectedItemB5cxx11Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_171')">
+SelectMenu::removeItem&#160;<span class='sym_p'><span>(&#160;std::__cxx11::basic_string&lt;char&gt;const&amp; <span class='color_p'>item</span></span>&#160;)</span></span>
+<br/>
+<div id="c_171" style="display:none;">
+<span class='mngl'>_ZN9OgreBites10SelectMenu10removeItemERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_172')">
+SelectMenu::selectItem&#160;<span class='sym_p'><span>(&#160;std::__cxx11::basic_string&lt;char&gt;const&amp; <span class='color_p'>item</span></span>, <span>bool <span class='color_p'>notifyListener</span></span>&#160;)</span></span>
+<br/>
+<div id="c_172" style="display:none;">
+<span class='mngl'>_ZN9OgreBites10SelectMenu10selectItemERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEEb</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_173')">
+SelectMenu::SelectMenu <span class='attr'>[C1]</span>&#160;<span class='sym_p'><span>(&#160;Ogre::String const&amp; <span class='color_p'>name</span></span>, <span>std::__cxx11::basic_string&lt;char&gt;const&amp; <span class='color_p'>caption</span></span>, <span>Ogre::Real <span class='color_p'>width</span></span>, <span>Ogre::Real <span class='color_p'>boxWidth</span></span>, <span>size_t <span class='color_p'>maxItemsShown</span></span>&#160;)</span></span>
+<br/>
+<div id="c_173" style="display:none;">
+<span class='mngl'>_ZN9OgreBites10SelectMenuC1ERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEES8_ffm</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_174')">
+SelectMenu::SelectMenu <span class='attr'>[C2]</span>&#160;<span class='sym_p'><span>(&#160;Ogre::String const&amp; <span class='color_p'>name</span></span>, <span>std::__cxx11::basic_string&lt;char&gt;const&amp; <span class='color_p'>caption</span></span>, <span>Ogre::Real <span class='color_p'>width</span></span>, <span>Ogre::Real <span class='color_p'>boxWidth</span></span>, <span>size_t <span class='color_p'>maxItemsShown</span></span>&#160;)</span></span>
+<br/>
+<div id="c_174" style="display:none;">
+<span class='mngl'>_ZN9OgreBites10SelectMenuC2ERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEES8_ffm</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_175')">
+SelectMenu::setCaption&#160;<span class='sym_p'><span>(&#160;std::__cxx11::basic_string&lt;char&gt;const&amp; <span class='color_p'>caption</span></span>&#160;)</span></span>
+<br/>
+<div id="c_175" style="display:none;">
+<span class='mngl'>_ZN9OgreBites10SelectMenu10setCaptionERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_176')">
+Slider::setCaption&#160;<span class='sym_p'><span>(&#160;std::__cxx11::basic_string&lt;char&gt;const&amp; <span class='color_p'>caption</span></span>&#160;)</span></span>
+<br/>
+<div id="c_176" style="display:none;">
+<span class='mngl'>_ZN9OgreBites6Slider10setCaptionERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_177')">
+Slider::Slider <span class='attr'>[C1]</span>&#160;<span class='sym_p'><span>(&#160;Ogre::String const&amp; <span class='color_p'>name</span></span>, <span>std::__cxx11::basic_string&lt;char&gt;const&amp; <span class='color_p'>caption</span></span>, <span>Ogre::Real <span class='color_p'>width</span></span>, <span>Ogre::Real <span class='color_p'>trackWidth</span></span>, <span>Ogre::Real <span class='color_p'>valueBoxWidth</span></span>, <span>Ogre::Real <span class='color_p'>minValue</span></span>, <span>Ogre::Real <span class='color_p'>maxValue</span></span>, <span>unsigned int <span class='color_p'>snaps</span></span>&#160;)</span></span>
+<br/>
+<div id="c_177" style="display:none;">
+<span class='mngl'>_ZN9OgreBites6SliderC1ERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEES8_fffffj</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_178')">
+Slider::Slider <span class='attr'>[C2]</span>&#160;<span class='sym_p'><span>(&#160;Ogre::String const&amp; <span class='color_p'>name</span></span>, <span>std::__cxx11::basic_string&lt;char&gt;const&amp; <span class='color_p'>caption</span></span>, <span>Ogre::Real <span class='color_p'>width</span></span>, <span>Ogre::Real <span class='color_p'>trackWidth</span></span>, <span>Ogre::Real <span class='color_p'>valueBoxWidth</span></span>, <span>Ogre::Real <span class='color_p'>minValue</span></span>, <span>Ogre::Real <span class='color_p'>maxValue</span></span>, <span>unsigned int <span class='color_p'>snaps</span></span>&#160;)</span></span>
+<br/>
+<div id="c_178" style="display:none;">
+<span class='mngl'>_ZN9OgreBites6SliderC2ERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEES8_fffffj</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_179')">
+TextBox::setText&#160;<span class='sym_p'><span>(&#160;std::__cxx11::basic_string&lt;char&gt;const&amp; <span class='color_p'>text</span></span>&#160;)</span></span>
+<br/>
+<div id="c_179" style="display:none;">
+<span class='mngl'>_ZN9OgreBites7TextBox7setTextERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_180')">
+TextBox::TextBox <span class='attr'>[C1]</span>&#160;<span class='sym_p'><span>(&#160;Ogre::String const&amp; <span class='color_p'>name</span></span>, <span>std::__cxx11::basic_string&lt;char&gt;const&amp; <span class='color_p'>caption</span></span>, <span>Ogre::Real <span class='color_p'>width</span></span>, <span>Ogre::Real <span class='color_p'>height</span></span>&#160;)</span></span>
+<br/>
+<div id="c_180" style="display:none;">
+<span class='mngl'>_ZN9OgreBites7TextBoxC1ERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEES8_ff</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_181')">
+TextBox::TextBox <span class='attr'>[C2]</span>&#160;<span class='sym_p'><span>(&#160;Ogre::String const&amp; <span class='color_p'>name</span></span>, <span>std::__cxx11::basic_string&lt;char&gt;const&amp; <span class='color_p'>caption</span></span>, <span>Ogre::Real <span class='color_p'>width</span></span>, <span>Ogre::Real <span class='color_p'>height</span></span>&#160;)</span></span>
+<br/>
+<div id="c_181" style="display:none;">
+<span class='mngl'>_ZN9OgreBites7TextBoxC2ERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEES8_ff</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_182')">
+TrayManager::createCheckBox&#160;<span class='sym_p'><span>(&#160;enum TrayLocation <span class='color_p'>trayLoc</span></span>, <span>Ogre::String const&amp; <span class='color_p'>name</span></span>, <span>std::__cxx11::basic_string&lt;char&gt;const&amp; <span class='color_p'>caption</span></span>, <span>Ogre::Real <span class='color_p'>width</span></span>&#160;)</span></span>
+<br/>
+<div id="c_182" style="display:none;">
+<span class='mngl'>_ZN9OgreBites11TrayManager14createCheckBoxENS_12TrayLocationERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEES9_f</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_183')">
+TrayManager::createLabel&#160;<span class='sym_p'><span>(&#160;enum TrayLocation <span class='color_p'>trayLoc</span></span>, <span>Ogre::String const&amp; <span class='color_p'>name</span></span>, <span>std::__cxx11::basic_string&lt;char&gt;const&amp; <span class='color_p'>caption</span></span>, <span>Ogre::Real <span class='color_p'>width</span></span>&#160;)</span></span>
+<br/>
+<div id="c_183" style="display:none;">
+<span class='mngl'>_ZN9OgreBites11TrayManager11createLabelENS_12TrayLocationERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEES9_f</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_184')">
+TrayManager::createLongSelectMenu&#160;<span class='sym_p'><span>(&#160;enum TrayLocation <span class='color_p'>trayLoc</span></span>, <span>Ogre::String const&amp; <span class='color_p'>name</span></span>, <span>std::__cxx11::basic_string&lt;char&gt;const&amp; <span class='color_p'>caption</span></span>, <span>Ogre::Real <span class='color_p'>width</span></span>, <span>Ogre::Real <span class='color_p'>boxWidth</span></span>, <span>unsigned int <span class='color_p'>maxItemsShown</span></span>, <span>Ogre::StringVector const&amp; <span class='color_p'>items</span></span>&#160;)</span></span>
+<br/>
+<div id="c_184" style="display:none;">
+<span class='mngl'>_ZN9OgreBites11TrayManager20createLongSelectMenuENS_12TrayLocationERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEES9_ffjRKSt6vectorIS7_SaIS7_EE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_185')">
+TrayManager::createLongSelectMenu&#160;<span class='sym_p'><span>(&#160;enum TrayLocation <span class='color_p'>trayLoc</span></span>, <span>Ogre::String const&amp; <span class='color_p'>name</span></span>, <span>std::__cxx11::basic_string&lt;char&gt;const&amp; <span class='color_p'>caption</span></span>, <span>Ogre::Real <span class='color_p'>boxWidth</span></span>, <span>unsigned int <span class='color_p'>maxItemsShown</span></span>, <span>Ogre::StringVector const&amp; <span class='color_p'>items</span></span>&#160;)</span></span>
+<br/>
+<div id="c_185" style="display:none;">
+<span class='mngl'>_ZN9OgreBites11TrayManager20createLongSelectMenuENS_12TrayLocationERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEES9_fjRKSt6vectorIS7_SaIS7_EE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_186')">
+TrayManager::createLongSlider&#160;<span class='sym_p'><span>(&#160;enum TrayLocation <span class='color_p'>trayLoc</span></span>, <span>Ogre::String const&amp; <span class='color_p'>name</span></span>, <span>std::__cxx11::basic_string&lt;char&gt;const&amp; <span class='color_p'>caption</span></span>, <span>Ogre::Real <span class='color_p'>width</span></span>, <span>Ogre::Real <span class='color_p'>trackWidth</span></span>, <span>Ogre::Real <span class='color_p'>valueBoxWidth</span></span>, <span>Ogre::Real <span class='color_p'>minValue</span></span>, <span>Ogre::Real <span class='color_p'>maxValue</span></span>, <span>unsigned int <span class='color_p'>snaps</span></span>&#160;)</span></span>
+<br/>
+<div id="c_186" style="display:none;">
+<span class='mngl'>_ZN9OgreBites11TrayManager16createLongSliderENS_12TrayLocationERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEES9_fffffj</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_187')">
+TrayManager::createLongSlider&#160;<span class='sym_p'><span>(&#160;enum TrayLocation <span class='color_p'>trayLoc</span></span>, <span>Ogre::String const&amp; <span class='color_p'>name</span></span>, <span>std::__cxx11::basic_string&lt;char&gt;const&amp; <span class='color_p'>caption</span></span>, <span>Ogre::Real <span class='color_p'>trackWidth</span></span>, <span>Ogre::Real <span class='color_p'>valueBoxWidth</span></span>, <span>Ogre::Real <span class='color_p'>minValue</span></span>, <span>Ogre::Real <span class='color_p'>maxValue</span></span>, <span>unsigned int <span class='color_p'>snaps</span></span>&#160;)</span></span>
+<br/>
+<div id="c_187" style="display:none;">
+<span class='mngl'>_ZN9OgreBites11TrayManager16createLongSliderENS_12TrayLocationERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEES9_ffffj</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_188')">
+TrayManager::createProgressBar&#160;<span class='sym_p'><span>(&#160;enum TrayLocation <span class='color_p'>trayLoc</span></span>, <span>Ogre::String const&amp; <span class='color_p'>name</span></span>, <span>std::__cxx11::basic_string&lt;char&gt;const&amp; <span class='color_p'>caption</span></span>, <span>Ogre::Real <span class='color_p'>width</span></span>, <span>Ogre::Real <span class='color_p'>commentBoxWidth</span></span>&#160;)</span></span>
+<br/>
+<div id="c_188" style="display:none;">
+<span class='mngl'>_ZN9OgreBites11TrayManager17createProgressBarENS_12TrayLocationERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEES9_ff</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_189')">
+TrayManager::createTextBox&#160;<span class='sym_p'><span>(&#160;enum TrayLocation <span class='color_p'>trayLoc</span></span>, <span>Ogre::String const&amp; <span class='color_p'>name</span></span>, <span>std::__cxx11::basic_string&lt;char&gt;const&amp; <span class='color_p'>caption</span></span>, <span>Ogre::Real <span class='color_p'>width</span></span>, <span>Ogre::Real <span class='color_p'>height</span></span>&#160;)</span></span>
+<br/>
+<div id="c_189" style="display:none;">
+<span class='mngl'>_ZN9OgreBites11TrayManager13createTextBoxENS_12TrayLocationERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEES9_ff</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_190')">
+TrayManager::createThickSelectMenu&#160;<span class='sym_p'><span>(&#160;enum TrayLocation <span class='color_p'>trayLoc</span></span>, <span>Ogre::String const&amp; <span class='color_p'>name</span></span>, <span>std::__cxx11::basic_string&lt;char&gt;const&amp; <span class='color_p'>caption</span></span>, <span>Ogre::Real <span class='color_p'>width</span></span>, <span>unsigned int <span class='color_p'>maxItemsShown</span></span>, <span>Ogre::StringVector const&amp; <span class='color_p'>items</span></span>&#160;)</span></span>
+<br/>
+<div id="c_190" style="display:none;">
+<span class='mngl'>_ZN9OgreBites11TrayManager21createThickSelectMenuENS_12TrayLocationERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEES9_fjRKSt6vectorIS7_SaIS7_EE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_191')">
+TrayManager::createThickSlider&#160;<span class='sym_p'><span>(&#160;enum TrayLocation <span class='color_p'>trayLoc</span></span>, <span>Ogre::String const&amp; <span class='color_p'>name</span></span>, <span>std::__cxx11::basic_string&lt;char&gt;const&amp; <span class='color_p'>caption</span></span>, <span>Ogre::Real <span class='color_p'>width</span></span>, <span>Ogre::Real <span class='color_p'>valueBoxWidth</span></span>, <span>Ogre::Real <span class='color_p'>minValue</span></span>, <span>Ogre::Real <span class='color_p'>maxValue</span></span>, <span>unsigned int <span class='color_p'>snaps</span></span>&#160;)</span></span>
+<br/>
+<div id="c_191" style="display:none;">
+<span class='mngl'>_ZN9OgreBites11TrayManager17createThickSliderENS_12TrayLocationERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEES9_ffffj</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_192')">
+TrayManager::showOkDialog&#160;<span class='sym_p'><span>(&#160;std::__cxx11::basic_string&lt;char&gt;const&amp; <span class='color_p'>caption</span></span>, <span>std::__cxx11::basic_string&lt;char&gt;const&amp; <span class='color_p'>message</span></span>&#160;)</span></span>
+<br/>
+<div id="c_192" style="display:none;">
+<span class='mngl'>_ZN9OgreBites11TrayManager12showOkDialogERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEES8_</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_193')">
+TrayManager::showYesNoDialog&#160;<span class='sym_p'><span>(&#160;std::__cxx11::basic_string&lt;char&gt;const&amp; <span class='color_p'>caption</span></span>, <span>std::__cxx11::basic_string&lt;char&gt;const&amp; <span class='color_p'>question</span></span>&#160;)</span></span>
+<br/>
+<div id="c_193" style="display:none;">
+<span class='mngl'>_ZN9OgreBites11TrayManager15showYesNoDialogERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEES8_</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_194')">
+Widget::fitCaptionToArea&#160;<span class='sym_p'><span>(&#160;std::__cxx11::basic_string&lt;char&gt;const&amp; <span class='color_p'>caption</span></span>, <span>Ogre::TextAreaOverlayElement* <span class='color_p'>area</span></span>, <span>Ogre::Real <span class='color_p'>maxWidth</span></span>&#160;)</span> <span class='attr'>[static]</span></span>
+<br/>
+<div id="c_194" style="display:none;">
+<span class='mngl'>_ZN9OgreBites6Widget16fitCaptionToAreaERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEEPN4Ogre22TextAreaOverlayElementEf</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_195')">
+Widget::getCaptionWidth&#160;<span class='sym_p'><span>(&#160;std::__cxx11::basic_string&lt;char&gt;const&amp; <span class='color_p'>caption</span></span>, <span>Ogre::TextAreaOverlayElement* <span class='color_p'>area</span></span>&#160;)</span> <span class='attr'>[static]</span></span>
+<br/>
+<div id="c_195" style="display:none;">
+<span class='mngl'>_ZN9OgreBites6Widget15getCaptionWidthERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEEPN4Ogre22TextAreaOverlayElementE</span>
+<br/>
+<br/>
+</div>
+
+<br/>
+<a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='Removed'></a><a name='Withdrawn'></a><h2>Removed Symbols <span class='failed'>&nbsp;40&nbsp;</span></h2><hr/>
+<span class='h_name'>OgreTrays.h</span><br/>
+<span class='ns'>namespace <b>OgreBites</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_196')">
+Button::Button <span class='attr'>[C1]</span>&#160;<span class='sym_p'><span>(&#160;Ogre::String const&amp; <span class='color_p'>name</span></span>, <span>Ogre::UTFString const&amp; <span class='color_p'>caption</span></span>, <span>Ogre::Real <span class='color_p'>width</span></span>&#160;)</span></span>
+<br/>
+<div id="c_196" style="display:none;">
+<span class='mngl'>_ZN9OgreBites6ButtonC1ERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEERKN4Ogre9UTFStringEf</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_197')">
+Button::Button <span class='attr'>[C2]</span>&#160;<span class='sym_p'><span>(&#160;Ogre::String const&amp; <span class='color_p'>name</span></span>, <span>Ogre::UTFString const&amp; <span class='color_p'>caption</span></span>, <span>Ogre::Real <span class='color_p'>width</span></span>&#160;)</span></span>
+<br/>
+<div id="c_197" style="display:none;">
+<span class='mngl'>_ZN9OgreBites6ButtonC2ERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEERKN4Ogre9UTFStringEf</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_198')">
+Button::setCaption&#160;<span class='sym_p'><span>(&#160;Ogre::UTFString const&amp; <span class='color_p'>caption</span></span>&#160;)</span></span>
+<br/>
+<div id="c_198" style="display:none;">
+<span class='mngl'>_ZN9OgreBites6Button10setCaptionERKN4Ogre9UTFStringE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_199')">
+CheckBox::CheckBox <span class='attr'>[C1]</span>&#160;<span class='sym_p'><span>(&#160;Ogre::String const&amp; <span class='color_p'>name</span></span>, <span>Ogre::UTFString const&amp; <span class='color_p'>caption</span></span>, <span>Ogre::Real <span class='color_p'>width</span></span>&#160;)</span></span>
+<br/>
+<div id="c_199" style="display:none;">
+<span class='mngl'>_ZN9OgreBites8CheckBoxC1ERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEERKN4Ogre9UTFStringEf</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_200')">
+CheckBox::CheckBox <span class='attr'>[C2]</span>&#160;<span class='sym_p'><span>(&#160;Ogre::String const&amp; <span class='color_p'>name</span></span>, <span>Ogre::UTFString const&amp; <span class='color_p'>caption</span></span>, <span>Ogre::Real <span class='color_p'>width</span></span>&#160;)</span></span>
+<br/>
+<div id="c_200" style="display:none;">
+<span class='mngl'>_ZN9OgreBites8CheckBoxC2ERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEERKN4Ogre9UTFStringEf</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_201')">
+CheckBox::setCaption&#160;<span class='sym_p'><span>(&#160;Ogre::UTFString const&amp; <span class='color_p'>caption</span></span>&#160;)</span></span>
+<br/>
+<div id="c_201" style="display:none;">
+<span class='mngl'>_ZN9OgreBites8CheckBox10setCaptionERKN4Ogre9UTFStringE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_202')">
+Label::Label <span class='attr'>[C1]</span>&#160;<span class='sym_p'><span>(&#160;Ogre::String const&amp; <span class='color_p'>name</span></span>, <span>Ogre::UTFString const&amp; <span class='color_p'>caption</span></span>, <span>Ogre::Real <span class='color_p'>width</span></span>&#160;)</span></span>
+<br/>
+<div id="c_202" style="display:none;">
+<span class='mngl'>_ZN9OgreBites5LabelC1ERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEERKN4Ogre9UTFStringEf</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_203')">
+Label::Label <span class='attr'>[C2]</span>&#160;<span class='sym_p'><span>(&#160;Ogre::String const&amp; <span class='color_p'>name</span></span>, <span>Ogre::UTFString const&amp; <span class='color_p'>caption</span></span>, <span>Ogre::Real <span class='color_p'>width</span></span>&#160;)</span></span>
+<br/>
+<div id="c_203" style="display:none;">
+<span class='mngl'>_ZN9OgreBites5LabelC2ERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEERKN4Ogre9UTFStringEf</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_204')">
+ParamsPanel::getParamValue&#160;<span class='sym_p'><span>(&#160;Ogre::UTFString const&amp; <span class='color_p'>paramName</span></span>&#160;)</span></span>
+<br/>
+<div id="c_204" style="display:none;">
+<span class='mngl'>_ZN9OgreBites11ParamsPanel13getParamValueERKN4Ogre9UTFStringE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_205')">
+ParamsPanel::getParamValue&#160;<span class='sym_p'><span>(&#160;unsigned int <span class='color_p'>index</span></span>&#160;)</span></span>
+<br/>
+<div id="c_205" style="display:none;">
+<span class='mngl'>_ZN9OgreBites11ParamsPanel13getParamValueEj</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_206')">
+ParamsPanel::setParamValue&#160;<span class='sym_p'><span>(&#160;Ogre::UTFString const&amp; <span class='color_p'>paramName</span></span>, <span>Ogre::UTFString const&amp; <span class='color_p'>paramValue</span></span>&#160;)</span></span>
+<br/>
+<div id="c_206" style="display:none;">
+<span class='mngl'>_ZN9OgreBites11ParamsPanel13setParamValueERKN4Ogre9UTFStringES4_</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_207')">
+ProgressBar::ProgressBar <span class='attr'>[C1]</span>&#160;<span class='sym_p'><span>(&#160;Ogre::String const&amp; <span class='color_p'>name</span></span>, <span>Ogre::UTFString const&amp; <span class='color_p'>caption</span></span>, <span>Ogre::Real <span class='color_p'>width</span></span>, <span>Ogre::Real <span class='color_p'>commentBoxWidth</span></span>&#160;)</span></span>
+<br/>
+<div id="c_207" style="display:none;">
+<span class='mngl'>_ZN9OgreBites11ProgressBarC1ERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEERKN4Ogre9UTFStringEff</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_208')">
+ProgressBar::ProgressBar <span class='attr'>[C2]</span>&#160;<span class='sym_p'><span>(&#160;Ogre::String const&amp; <span class='color_p'>name</span></span>, <span>Ogre::UTFString const&amp; <span class='color_p'>caption</span></span>, <span>Ogre::Real <span class='color_p'>width</span></span>, <span>Ogre::Real <span class='color_p'>commentBoxWidth</span></span>&#160;)</span></span>
+<br/>
+<div id="c_208" style="display:none;">
+<span class='mngl'>_ZN9OgreBites11ProgressBarC2ERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEERKN4Ogre9UTFStringEff</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_209')">
+SelectMenu::containsItem&#160;<span class='sym_p'><span>(&#160;Ogre::UTFString const&amp; <span class='color_p'>item</span></span>&#160;)</span></span>
+<br/>
+<div id="c_209" style="display:none;">
+<span class='mngl'>_ZN9OgreBites10SelectMenu12containsItemERKN4Ogre9UTFStringE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_210')">
+SelectMenu::getSelectedItem&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_210" style="display:none;">
+<span class='mngl'>_ZN9OgreBites10SelectMenu15getSelectedItemEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_211')">
+SelectMenu::removeItem&#160;<span class='sym_p'><span>(&#160;Ogre::UTFString const&amp; <span class='color_p'>item</span></span>&#160;)</span></span>
+<br/>
+<div id="c_211" style="display:none;">
+<span class='mngl'>_ZN9OgreBites10SelectMenu10removeItemERKN4Ogre9UTFStringE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_212')">
+SelectMenu::selectItem&#160;<span class='sym_p'><span>(&#160;Ogre::UTFString const&amp; <span class='color_p'>item</span></span>, <span>bool <span class='color_p'>notifyListener</span></span>&#160;)</span></span>
+<br/>
+<div id="c_212" style="display:none;">
+<span class='mngl'>_ZN9OgreBites10SelectMenu10selectItemERKN4Ogre9UTFStringEb</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_213')">
+SelectMenu::SelectMenu <span class='attr'>[C1]</span>&#160;<span class='sym_p'><span>(&#160;Ogre::String const&amp; <span class='color_p'>name</span></span>, <span>Ogre::UTFString const&amp; <span class='color_p'>caption</span></span>, <span>Ogre::Real <span class='color_p'>width</span></span>, <span>Ogre::Real <span class='color_p'>boxWidth</span></span>, <span>size_t <span class='color_p'>maxItemsShown</span></span>&#160;)</span></span>
+<br/>
+<div id="c_213" style="display:none;">
+<span class='mngl'>_ZN9OgreBites10SelectMenuC1ERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEERKN4Ogre9UTFStringEffm</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_214')">
+SelectMenu::SelectMenu <span class='attr'>[C2]</span>&#160;<span class='sym_p'><span>(&#160;Ogre::String const&amp; <span class='color_p'>name</span></span>, <span>Ogre::UTFString const&amp; <span class='color_p'>caption</span></span>, <span>Ogre::Real <span class='color_p'>width</span></span>, <span>Ogre::Real <span class='color_p'>boxWidth</span></span>, <span>size_t <span class='color_p'>maxItemsShown</span></span>&#160;)</span></span>
+<br/>
+<div id="c_214" style="display:none;">
+<span class='mngl'>_ZN9OgreBites10SelectMenuC2ERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEERKN4Ogre9UTFStringEffm</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_215')">
+SelectMenu::setCaption&#160;<span class='sym_p'><span>(&#160;Ogre::UTFString const&amp; <span class='color_p'>caption</span></span>&#160;)</span></span>
+<br/>
+<div id="c_215" style="display:none;">
+<span class='mngl'>_ZN9OgreBites10SelectMenu10setCaptionERKN4Ogre9UTFStringE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_216')">
+Slider::setCaption&#160;<span class='sym_p'><span>(&#160;Ogre::UTFString const&amp; <span class='color_p'>caption</span></span>&#160;)</span></span>
+<br/>
+<div id="c_216" style="display:none;">
+<span class='mngl'>_ZN9OgreBites6Slider10setCaptionERKN4Ogre9UTFStringE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_217')">
+Slider::Slider <span class='attr'>[C1]</span>&#160;<span class='sym_p'><span>(&#160;Ogre::String const&amp; <span class='color_p'>name</span></span>, <span>Ogre::UTFString const&amp; <span class='color_p'>caption</span></span>, <span>Ogre::Real <span class='color_p'>width</span></span>, <span>Ogre::Real <span class='color_p'>trackWidth</span></span>, <span>Ogre::Real <span class='color_p'>valueBoxWidth</span></span>, <span>Ogre::Real <span class='color_p'>minValue</span></span>, <span>Ogre::Real <span class='color_p'>maxValue</span></span>, <span>unsigned int <span class='color_p'>snaps</span></span>&#160;)</span></span>
+<br/>
+<div id="c_217" style="display:none;">
+<span class='mngl'>_ZN9OgreBites6SliderC1ERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEERKN4Ogre9UTFStringEfffffj</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_218')">
+Slider::Slider <span class='attr'>[C2]</span>&#160;<span class='sym_p'><span>(&#160;Ogre::String const&amp; <span class='color_p'>name</span></span>, <span>Ogre::UTFString const&amp; <span class='color_p'>caption</span></span>, <span>Ogre::Real <span class='color_p'>width</span></span>, <span>Ogre::Real <span class='color_p'>trackWidth</span></span>, <span>Ogre::Real <span class='color_p'>valueBoxWidth</span></span>, <span>Ogre::Real <span class='color_p'>minValue</span></span>, <span>Ogre::Real <span class='color_p'>maxValue</span></span>, <span>unsigned int <span class='color_p'>snaps</span></span>&#160;)</span></span>
+<br/>
+<div id="c_218" style="display:none;">
+<span class='mngl'>_ZN9OgreBites6SliderC2ERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEERKN4Ogre9UTFStringEfffffj</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_219')">
+TextBox::setText&#160;<span class='sym_p'><span>(&#160;Ogre::UTFString const&amp; <span class='color_p'>text</span></span>&#160;)</span></span>
+<br/>
+<div id="c_219" style="display:none;">
+<span class='mngl'>_ZN9OgreBites7TextBox7setTextERKN4Ogre9UTFStringE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_220')">
+TextBox::TextBox <span class='attr'>[C1]</span>&#160;<span class='sym_p'><span>(&#160;Ogre::String const&amp; <span class='color_p'>name</span></span>, <span>Ogre::UTFString const&amp; <span class='color_p'>caption</span></span>, <span>Ogre::Real <span class='color_p'>width</span></span>, <span>Ogre::Real <span class='color_p'>height</span></span>&#160;)</span></span>
+<br/>
+<div id="c_220" style="display:none;">
+<span class='mngl'>_ZN9OgreBites7TextBoxC1ERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEERKN4Ogre9UTFStringEff</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_221')">
+TextBox::TextBox <span class='attr'>[C2]</span>&#160;<span class='sym_p'><span>(&#160;Ogre::String const&amp; <span class='color_p'>name</span></span>, <span>Ogre::UTFString const&amp; <span class='color_p'>caption</span></span>, <span>Ogre::Real <span class='color_p'>width</span></span>, <span>Ogre::Real <span class='color_p'>height</span></span>&#160;)</span></span>
+<br/>
+<div id="c_221" style="display:none;">
+<span class='mngl'>_ZN9OgreBites7TextBoxC2ERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEERKN4Ogre9UTFStringEff</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_222')">
+TrayManager::createCheckBox&#160;<span class='sym_p'><span>(&#160;enum TrayLocation <span class='color_p'>trayLoc</span></span>, <span>Ogre::String const&amp; <span class='color_p'>name</span></span>, <span>Ogre::UTFString const&amp; <span class='color_p'>caption</span></span>, <span>Ogre::Real <span class='color_p'>width</span></span>&#160;)</span></span>
+<br/>
+<div id="c_222" style="display:none;">
+<span class='mngl'>_ZN9OgreBites11TrayManager14createCheckBoxENS_12TrayLocationERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEERKN4Ogre9UTFStringEf</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_223')">
+TrayManager::createLabel&#160;<span class='sym_p'><span>(&#160;enum TrayLocation <span class='color_p'>trayLoc</span></span>, <span>Ogre::String const&amp; <span class='color_p'>name</span></span>, <span>Ogre::UTFString const&amp; <span class='color_p'>caption</span></span>, <span>Ogre::Real <span class='color_p'>width</span></span>&#160;)</span></span>
+<br/>
+<div id="c_223" style="display:none;">
+<span class='mngl'>_ZN9OgreBites11TrayManager11createLabelENS_12TrayLocationERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEERKN4Ogre9UTFStringEf</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_224')">
+TrayManager::createLongSelectMenu&#160;<span class='sym_p'><span>(&#160;enum TrayLocation <span class='color_p'>trayLoc</span></span>, <span>Ogre::String const&amp; <span class='color_p'>name</span></span>, <span>Ogre::UTFString const&amp; <span class='color_p'>caption</span></span>, <span>Ogre::Real <span class='color_p'>width</span></span>, <span>Ogre::Real <span class='color_p'>boxWidth</span></span>, <span>unsigned int <span class='color_p'>maxItemsShown</span></span>, <span>Ogre::StringVector const&amp; <span class='color_p'>items</span></span>&#160;)</span></span>
+<br/>
+<div id="c_224" style="display:none;">
+<span class='mngl'>_ZN9OgreBites11TrayManager20createLongSelectMenuENS_12TrayLocationERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEERKN4Ogre9UTFStringEffjRKSt6vectorIS7_SaIS7_EE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_225')">
+TrayManager::createLongSelectMenu&#160;<span class='sym_p'><span>(&#160;enum TrayLocation <span class='color_p'>trayLoc</span></span>, <span>Ogre::String const&amp; <span class='color_p'>name</span></span>, <span>Ogre::UTFString const&amp; <span class='color_p'>caption</span></span>, <span>Ogre::Real <span class='color_p'>boxWidth</span></span>, <span>unsigned int <span class='color_p'>maxItemsShown</span></span>, <span>Ogre::StringVector const&amp; <span class='color_p'>items</span></span>&#160;)</span></span>
+<br/>
+<div id="c_225" style="display:none;">
+<span class='mngl'>_ZN9OgreBites11TrayManager20createLongSelectMenuENS_12TrayLocationERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEERKN4Ogre9UTFStringEfjRKSt6vectorIS7_SaIS7_EE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_226')">
+TrayManager::createLongSlider&#160;<span class='sym_p'><span>(&#160;enum TrayLocation <span class='color_p'>trayLoc</span></span>, <span>Ogre::String const&amp; <span class='color_p'>name</span></span>, <span>Ogre::UTFString const&amp; <span class='color_p'>caption</span></span>, <span>Ogre::Real <span class='color_p'>width</span></span>, <span>Ogre::Real <span class='color_p'>trackWidth</span></span>, <span>Ogre::Real <span class='color_p'>valueBoxWidth</span></span>, <span>Ogre::Real <span class='color_p'>minValue</span></span>, <span>Ogre::Real <span class='color_p'>maxValue</span></span>, <span>unsigned int <span class='color_p'>snaps</span></span>&#160;)</span></span>
+<br/>
+<div id="c_226" style="display:none;">
+<span class='mngl'>_ZN9OgreBites11TrayManager16createLongSliderENS_12TrayLocationERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEERKN4Ogre9UTFStringEfffffj</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_227')">
+TrayManager::createLongSlider&#160;<span class='sym_p'><span>(&#160;enum TrayLocation <span class='color_p'>trayLoc</span></span>, <span>Ogre::String const&amp; <span class='color_p'>name</span></span>, <span>Ogre::UTFString const&amp; <span class='color_p'>caption</span></span>, <span>Ogre::Real <span class='color_p'>trackWidth</span></span>, <span>Ogre::Real <span class='color_p'>valueBoxWidth</span></span>, <span>Ogre::Real <span class='color_p'>minValue</span></span>, <span>Ogre::Real <span class='color_p'>maxValue</span></span>, <span>unsigned int <span class='color_p'>snaps</span></span>&#160;)</span></span>
+<br/>
+<div id="c_227" style="display:none;">
+<span class='mngl'>_ZN9OgreBites11TrayManager16createLongSliderENS_12TrayLocationERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEERKN4Ogre9UTFStringEffffj</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_228')">
+TrayManager::createProgressBar&#160;<span class='sym_p'><span>(&#160;enum TrayLocation <span class='color_p'>trayLoc</span></span>, <span>Ogre::String const&amp; <span class='color_p'>name</span></span>, <span>Ogre::UTFString const&amp; <span class='color_p'>caption</span></span>, <span>Ogre::Real <span class='color_p'>width</span></span>, <span>Ogre::Real <span class='color_p'>commentBoxWidth</span></span>&#160;)</span></span>
+<br/>
+<div id="c_228" style="display:none;">
+<span class='mngl'>_ZN9OgreBites11TrayManager17createProgressBarENS_12TrayLocationERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEERKN4Ogre9UTFStringEff</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_229')">
+TrayManager::createTextBox&#160;<span class='sym_p'><span>(&#160;enum TrayLocation <span class='color_p'>trayLoc</span></span>, <span>Ogre::String const&amp; <span class='color_p'>name</span></span>, <span>Ogre::UTFString const&amp; <span class='color_p'>caption</span></span>, <span>Ogre::Real <span class='color_p'>width</span></span>, <span>Ogre::Real <span class='color_p'>height</span></span>&#160;)</span></span>
+<br/>
+<div id="c_229" style="display:none;">
+<span class='mngl'>_ZN9OgreBites11TrayManager13createTextBoxENS_12TrayLocationERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEERKN4Ogre9UTFStringEff</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_230')">
+TrayManager::createThickSelectMenu&#160;<span class='sym_p'><span>(&#160;enum TrayLocation <span class='color_p'>trayLoc</span></span>, <span>Ogre::String const&amp; <span class='color_p'>name</span></span>, <span>Ogre::UTFString const&amp; <span class='color_p'>caption</span></span>, <span>Ogre::Real <span class='color_p'>width</span></span>, <span>unsigned int <span class='color_p'>maxItemsShown</span></span>, <span>Ogre::StringVector const&amp; <span class='color_p'>items</span></span>&#160;)</span></span>
+<br/>
+<div id="c_230" style="display:none;">
+<span class='mngl'>_ZN9OgreBites11TrayManager21createThickSelectMenuENS_12TrayLocationERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEERKN4Ogre9UTFStringEfjRKSt6vectorIS7_SaIS7_EE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_231')">
+TrayManager::createThickSlider&#160;<span class='sym_p'><span>(&#160;enum TrayLocation <span class='color_p'>trayLoc</span></span>, <span>Ogre::String const&amp; <span class='color_p'>name</span></span>, <span>Ogre::UTFString const&amp; <span class='color_p'>caption</span></span>, <span>Ogre::Real <span class='color_p'>width</span></span>, <span>Ogre::Real <span class='color_p'>valueBoxWidth</span></span>, <span>Ogre::Real <span class='color_p'>minValue</span></span>, <span>Ogre::Real <span class='color_p'>maxValue</span></span>, <span>unsigned int <span class='color_p'>snaps</span></span>&#160;)</span></span>
+<br/>
+<div id="c_231" style="display:none;">
+<span class='mngl'>_ZN9OgreBites11TrayManager17createThickSliderENS_12TrayLocationERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEERKN4Ogre9UTFStringEffffj</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_232')">
+TrayManager::showOkDialog&#160;<span class='sym_p'><span>(&#160;Ogre::UTFString const&amp; <span class='color_p'>caption</span></span>, <span>Ogre::UTFString const&amp; <span class='color_p'>message</span></span>&#160;)</span></span>
+<br/>
+<div id="c_232" style="display:none;">
+<span class='mngl'>_ZN9OgreBites11TrayManager12showOkDialogERKN4Ogre9UTFStringES4_</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_233')">
+TrayManager::showYesNoDialog&#160;<span class='sym_p'><span>(&#160;Ogre::UTFString const&amp; <span class='color_p'>caption</span></span>, <span>Ogre::UTFString const&amp; <span class='color_p'>question</span></span>&#160;)</span></span>
+<br/>
+<div id="c_233" style="display:none;">
+<span class='mngl'>_ZN9OgreBites11TrayManager15showYesNoDialogERKN4Ogre9UTFStringES4_</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_234')">
+Widget::fitCaptionToArea&#160;<span class='sym_p'><span>(&#160;Ogre::UTFString const&amp; <span class='color_p'>caption</span></span>, <span>Ogre::TextAreaOverlayElement* <span class='color_p'>area</span></span>, <span>Ogre::Real <span class='color_p'>maxWidth</span></span>&#160;)</span> <span class='attr'>[static]</span></span>
+<br/>
+<div id="c_234" style="display:none;">
+<span class='mngl'>_ZN9OgreBites6Widget16fitCaptionToAreaERKN4Ogre9UTFStringEPNS1_22TextAreaOverlayElementEf</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_235')">
+Widget::getCaptionWidth&#160;<span class='sym_p'><span>(&#160;Ogre::UTFString const&amp; <span class='color_p'>caption</span></span>, <span>Ogre::TextAreaOverlayElement* <span class='color_p'>area</span></span>&#160;)</span> <span class='attr'>[static]</span></span>
+<br/>
+<div id="c_235" style="display:none;">
+<span class='mngl'>_ZN9OgreBites6Widget15getCaptionWidthERKN4Ogre9UTFStringEPNS1_22TextAreaOverlayElementE</span>
+<br/>
+<br/>
+</div>
+
+<br/>
+<a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='High_Risk_Problems'></a><a name='Type_Problems_High'></a>
+<h2>Problems with Data Types, High Severity <span class='failed'>&nbsp;9&nbsp;</span></h2><hr/>
+<span class='h_name'>OgreRoot.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_236')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> Root <span class='failed'>&nbsp;3&nbsp;</span></span>
+<br/>
+<div id="c_236" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Field <b>mRQSequenceMap</b> has been removed from this type.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>Root</b>' has no member named '<b>mRQSequenceMap</b>'.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>Field <b>mSceneLoaderManager</b> has been removed from this type.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>Root</b>' has no member named '<b>mSceneLoaderManager</b>'.</td>
+</tr>
+<tr>
+<th>3</th>
+<td>Field <b>mHighLevelGpuProgramManager</b> has been renamed to <b>mGpuProgramManager</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: <b>Root</b> has no member named <b>mHighLevelGpuProgramManager</b>.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_237')">
+[+] affected symbols: 29 (8.8%)</span>
+<div id="c_237" style="display:none;">
+<div class='affected'><span class='iname_a'>OgreBites::AdvancedRenderControls::keyPressed&#160;<span class='sym_p'><span>(&#160;struct OgreBites::KeyboardEvent const&amp; <i>evt</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mRoot&#39; in the object of this method has base type &#39;Root&#39;.</div>
+<span class='iname_a'>OgreBites::AdvancedRenderControls::frameRendered&#160;<span class='sym_p'><span>(&#160;struct FrameEvent const&amp; <i>evt</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mRoot&#39; in the object of this method has base type &#39;Root&#39;.</div>
+<span class='iname_a'>OgreBites::AdvancedRenderControls::AdvancedRenderControls&#160;<span class='sym_p'><span>(&#160;OgreBites::TrayManager* <i>trayMgr</i></span>, <span>Camera* <i>cam</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mRoot&#39; in the object of this method has base type &#39;Root&#39;.</div>
+<span class='iname_a'>OgreBites::AdvancedRenderControls::~AdvancedRenderControls&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mRoot&#39; in the object of this method has base type &#39;Root&#39;.</div>
+<span class='iname_a'>OgreBites::ApplicationContextBase::createRoot&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mRoot&#39; in the object of this method has base type &#39;Root&#39;.</div>
+<span class='iname_a'>OgreBites::ApplicationContextBase::pollEvents&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mRoot&#39; in the object of this method has base type &#39;Root&#39;.</div>
+<span class='iname_a'>OgreBites::ApplicationContextBase::reconfigure&#160;<span class='sym_p'><span>(&#160;String const&amp; <i>renderer</i></span>, <span>NameValuePairList&amp; <i>options</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mRoot&#39; in the object of this method has base type &#39;Root&#39;.</div>
+<span class='iname_a'>OgreBites::ApplicationContextBase::createWindow&#160;<span class='sym_p'><span>(&#160;String const&amp; <i>name</i></span>, <span>uint32 <i>w</i></span>, <span>uint32 <i>h</i></span>, <span>NameValuePairList <i>miscParams</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mRoot&#39; in the object of this method has base type &#39;Root&#39;.</div>
+<span class='iname_a'>OgreBites::ApplicationContextBase::destroyWindow&#160;<span class='sym_p'><span>(&#160;String const&amp; <i>name</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mRoot&#39; in the object of this method has base type &#39;Root&#39;.</div>
+<span class='iname_a'>OgreBites::ApplicationContextBase::loadResources&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mRoot&#39; in the object of this method has base type &#39;Root&#39;.</div>
+ <b>...</b>
+<br/>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<span class='h_name'>OgreShaderGenerator.h</span><br/>
+<span class='ns'>namespace <b>Ogre::RTShader</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_238')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> ShaderGenerator <span class='failed'>&nbsp;2&nbsp;</span></span>
+<br/>
+<div id="c_238" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Field <b>mFragmentShaderProfilesList</b> has been removed from this type.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>ShaderGenerator</b>' has no member named '<b>mFragmentShaderProfilesList</b>'.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>Field <b>mVertexShaderProfilesList</b> has been removed from this type.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>ShaderGenerator</b>' has no member named '<b>mVertexShaderProfilesList</b>'.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_239')">
+[+] affected symbols: 34 (10.3%)</span>
+<div id="c_239" style="display:none;">
+<div class='affected'><span class='iname_a'>OgreBites::AdvancedRenderControls::keyPressed&#160;<span class='sym_p'><span>(&#160;struct OgreBites::KeyboardEvent const&amp; <i>evt</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mShaderGenerator&#39; in the object of this method has base type &#39;ShaderGenerator&#39;.</div>
+<span class='iname_a'>OgreBites::AdvancedRenderControls::frameRendered&#160;<span class='sym_p'><span>(&#160;struct Ogre::FrameEvent const&amp; <i>evt</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mShaderGenerator&#39; in the object of this method has base type &#39;ShaderGenerator&#39;.</div>
+<span class='iname_a'>OgreBites::AdvancedRenderControls::AdvancedRenderControls&#160;<span class='sym_p'><span>(&#160;OgreBites::TrayManager* <i>trayMgr</i></span>, <span>Ogre::Camera* <i>cam</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mShaderGenerator&#39; in the object of this method has base type &#39;ShaderGenerator&#39;.</div>
+<span class='iname_a'>OgreBites::AdvancedRenderControls::~AdvancedRenderControls&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mShaderGenerator&#39; in the object of this method has base type &#39;ShaderGenerator&#39;.</div>
+<span class='iname_a'>OgreBites::ApplicationContextBase::createRoot&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mMaterialMgrListener.mShaderGenerator&#39; in the object of this method has base type &#39;ShaderGenerator&#39;.</div>
+<span class='iname_a'>OgreBites::ApplicationContextBase::pollEvents&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mMaterialMgrListener.mShaderGenerator&#39; in the object of this method has base type &#39;ShaderGenerator&#39;.</div>
+<span class='iname_a'>OgreBites::ApplicationContextBase::reconfigure&#160;<span class='sym_p'><span>(&#160;Ogre::String const&amp; <i>renderer</i></span>, <span>Ogre::NameValuePairList&amp; <i>options</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mMaterialMgrListener.mShaderGenerator&#39; in the object of this method has base type &#39;ShaderGenerator&#39;.</div>
+<span class='iname_a'>OgreBites::ApplicationContextBase::createWindow&#160;<span class='sym_p'><span>(&#160;Ogre::String const&amp; <i>name</i></span>, <span>Ogre::uint32 <i>w</i></span>, <span>Ogre::uint32 <i>h</i></span>, <span>Ogre::NameValuePairList <i>miscParams</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mMaterialMgrListener.mShaderGenerator&#39; in the object of this method has base type &#39;ShaderGenerator&#39;.</div>
+<span class='iname_a'>OgreBites::ApplicationContextBase::destroyWindow&#160;<span class='sym_p'><span>(&#160;Ogre::String const&amp; <i>name</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mMaterialMgrListener.mShaderGenerator&#39; in the object of this method has base type &#39;ShaderGenerator&#39;.</div>
+<span class='iname_a'>OgreBites::ApplicationContextBase::loadResources&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mMaterialMgrListener.mShaderGenerator&#39; in the object of this method has base type &#39;ShaderGenerator&#39;.</div>
+ <b>...</b>
+<br/>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<span class='h_name'>OgreTrays.h</span><br/>
+<span class='ns'>namespace <b>OgreBites</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_240')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> TrayListener <span class='failed'>&nbsp;4&nbsp;</span></span>
+<br/>
+<div id="c_240" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Pure virtual method <span class='iname_b'>okDialogClosed&#160;<span class='sym_pd'><span>(&#160;std::__cxx11::basic_string&lt;char&gt;const&amp;</span>&#160;)</span></span> has been added to this class.</td>
+<td>Recompilation of a client program may be broken with the error message: cannot allocate an object of abstract type <b>TrayListener</b> because the following virtual functions are pure within <b>TrayListener</b>: virtual <span class='iname_b'>okDialogClosed&#160;<span class='sym_pd'><span>(&#160;std::__cxx11::basic_string&lt;char&gt;const&amp;</span>&#160;)</span></span>.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>Pure virtual method <span class='iname_b'>yesNoDialogClosed&#160;<span class='sym_pd'><span>(&#160;std::__cxx11::basic_string&lt;char&gt;const&amp;</span>, <span>bool</span>&#160;)</span></span> has been added to this class.</td>
+<td>Recompilation of a client program may be broken with the error message: cannot allocate an object of abstract type <b>TrayListener</b> because the following virtual functions are pure within <b>TrayListener</b>: virtual <span class='iname_b'>yesNoDialogClosed&#160;<span class='sym_pd'><span>(&#160;std::__cxx11::basic_string&lt;char&gt;const&amp;</span>, <span>bool</span>&#160;)</span></span>.</td>
+</tr>
+<tr>
+<th>3</th>
+<td>Pure virtual method <span class='iname_b'>okDialogClosed&#160;<span class='sym_pd'><span>(&#160;Ogre::UTFString const&amp;</span>&#160;)</span></span> has been removed from this class.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>4</th>
+<td>Pure virtual method <span class='iname_b'>yesNoDialogClosed&#160;<span class='sym_pd'><span>(&#160;Ogre::UTFString const&amp;</span>, <span>bool</span>&#160;)</span></span> has been removed from this class.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_241')">
+[+] affected symbols: 7 (2.1%)</span>
+<div id="c_241" style="display:none;">
+<div class='affected'><span class='iname_a'>TrayListener::sliderMoved&#160;<span class='sym_p'><span>(&#160;Slider* <i>p1</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;TrayListener&#39; class.</div>
+<span class='iname_a'>TrayListener::itemSelected&#160;<span class='sym_p'><span>(&#160;SelectMenu* <i>p1</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;TrayListener&#39; class.</div>
+<span class='iname_a'>TrayListener::checkBoxToggled&#160;<span class='sym_p'><span>(&#160;CheckBox* <i>p1</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;TrayListener&#39; class.</div>
+<span class='iname_a'>TrayListener::labelHit&#160;<span class='sym_p'><span>(&#160;Label* <i>p1</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;TrayListener&#39; class.</div>
+<span class='iname_a'>TrayListener::buttonHit&#160;<span class='sym_p'><span>(&#160;Button* <i>p1</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;TrayListener&#39; class.</div>
+<span class='iname_a'>TrayListener::TrayListener&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This constructor is from &#39;TrayListener&#39; class.</div>
+<span class='iname_a'>TrayListener::~TrayListener&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This destructor is from &#39;TrayListener&#39; class.</div>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='Symbol_Problems_High'></a><a name='Interface_Problems_High'></a>
+<h2>Problems with Symbols, High Severity <span class='failed'>&nbsp;1&nbsp;</span></h2><hr/>
+<span class='h_name'>OgreMovableObject.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_242')">
+<span class='ext'>[+]</span> MovableObjectFactory::createInstanceImpl&#160;<span class='sym_p'><span>(&#160;String const&amp; <span class='color_p'>p1</span></span>, <span>NameValuePairList const* <span class='color_p'>p2</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_242" style="display:none;">
+
+<span class='mngl pleft'>_ZN4Ogre20MovableObjectFactory18createInstanceImplERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEEPKSt3mapIS6_S6_St4lessIS6_ESaISt4pairIS7_S6_EEE</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>This method became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>_ZN4Ogre20MovableObjectFactory18createInstanceImplERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEEPKSt3mapIS6_S6_St4lessIS6_ESaISt4pairIS7_S6_EEE</b>' is private.</td>
+</tr>
+</table>
+<br/>
+</div>
+<br/>
+<a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='Medium_Risk_Problems'></a><a name='Type_Problems_Medium'></a>
+<h2>Problems with Data Types, Medium Severity <span class='failed'>&nbsp;97&nbsp;</span></h2><hr/>
+<span class='h_name'>OgreRay.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_243')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> Ray <span class='failed'>&nbsp;2&nbsp;</span></span>
+<br/>
+<div id="c_243" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Field <b>mDirection</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>Ray</b>::<b>mDirection</b>' is private.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>Field <b>mOrigin</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>Ray</b>::<b>mOrigin</b>' is private.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_244')">
+[+] affected symbols: 2 (0.6%)</span>
+<div id="c_244" style="display:none;">
+<div class='affected'><span class='iname_a'>OgreBites::TrayManager::getCursorRay&#160;<span class='sym_p'><span>(&#160;Camera* <i>cam</i></span>&#160;)</span></span><br/>
+<div class='affect'>Return value is of type &#39;Ray&#39;.</div>
+<span class='iname_a'>OgreBites::TrayManager::screenToScene&#160;<span class='sym_p'><span>(&#160;Camera* <i>cam</i></span>, <span>Vector2 const&amp; <i>pt</i></span>&#160;)</span></span><br/>
+<div class='affect'>Return value is of type &#39;Ray&#39;.</div>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<span class='h_name'>OgreRoot.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_245')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> Root <span class='failed'>&nbsp;53&nbsp;</span></span>
+<br/>
+<div id="c_245" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Field <b>mActiveRenderer</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>Root</b>::<b>mActiveRenderer</b>' is private.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>Field <b>mAddedFrameListeners</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>Root</b>::<b>mAddedFrameListeners</b>' is private.</td>
+</tr>
+<tr>
+<th>3</th>
+<td>Field <b>mArchiveManager</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>Root</b>::<b>mArchiveManager</b>' is private.</td>
+</tr>
+<tr>
+<th>4</th>
+<td>Field <b>mAutoWindow</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>Root</b>::<b>mAutoWindow</b>' is private.</td>
+</tr>
+<tr>
+<th>5</th>
+<td>Field <b>mBillboardChainFactory</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>Root</b>::<b>mBillboardChainFactory</b>' is private.</td>
+</tr>
+<tr>
+<th>6</th>
+<td>Field <b>mBillboardSetFactory</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>Root</b>::<b>mBillboardSetFactory</b>' is private.</td>
+</tr>
+<tr>
+<th>7</th>
+<td>Field <b>mCompilerManager</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>Root</b>::<b>mCompilerManager</b>' is private.</td>
+</tr>
+<tr>
+<th>8</th>
+<td>Field <b>mCompositorManager</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>Root</b>::<b>mCompositorManager</b>' is private.</td>
+</tr>
+<tr>
+<th>9</th>
+<td>Field <b>mConfigFileName</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>Root</b>::<b>mConfigFileName</b>' is private.</td>
+</tr>
+<tr>
+<th>10</th>
+<td>Field <b>mControllerManager</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>Root</b>::<b>mControllerManager</b>' is private.</td>
+</tr>
+<tr>
+<th>11</th>
+<td>Field <b>mCurrentSceneManager</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>Root</b>::<b>mCurrentSceneManager</b>' is private.</td>
+</tr>
+<tr>
+<th>12</th>
+<td>Field <b>mDefaultMinPixelSize</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>Root</b>::<b>mDefaultMinPixelSize</b>' is private.</td>
+</tr>
+<tr>
+<th>13</th>
+<td>Field <b>mDynLibManager</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>Root</b>::<b>mDynLibManager</b>' is private.</td>
+</tr>
+<tr>
+<th>14</th>
+<td>Field <b>mEmbeddedZipArchiveFactory</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>Root</b>::<b>mEmbeddedZipArchiveFactory</b>' is private.</td>
+</tr>
+<tr>
+<th>15</th>
+<td>Field <b>mEntityFactory</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>Root</b>::<b>mEntityFactory</b>' is private.</td>
+</tr>
+<tr>
+<th>16</th>
+<td>Field <b>mEventTimes</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>Root</b>::<b>mEventTimes</b>' is private.</td>
+</tr>
+<tr>
+<th>17</th>
+<td>Field <b>mExternalTextureSourceManager</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>Root</b>::<b>mExternalTextureSourceManager</b>' is private.</td>
+</tr>
+<tr>
+<th>18</th>
+<td>Field <b>mFileSystemArchiveFactory</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>Root</b>::<b>mFileSystemArchiveFactory</b>' is private.</td>
+</tr>
+<tr>
+<th>19</th>
+<td>Field <b>mFirstTimePostWindowInit</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>Root</b>::<b>mFirstTimePostWindowInit</b>' is private.</td>
+</tr>
+<tr>
+<th>20</th>
+<td>Field <b>mFrameListeners</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>Root</b>::<b>mFrameListeners</b>' is private.</td>
+</tr>
+<tr>
+<th>21</th>
+<td>Field <b>mFrameSmoothingTime</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>Root</b>::<b>mFrameSmoothingTime</b>' is private.</td>
+</tr>
+<tr>
+<th>22</th>
+<td>Field <b>mIsBlendIndicesGpuRedundant</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>Root</b>::<b>mIsBlendIndicesGpuRedundant</b>' is private.</td>
+</tr>
+<tr>
+<th>23</th>
+<td>Field <b>mIsBlendWeightsGpuRedundant</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>Root</b>::<b>mIsBlendWeightsGpuRedundant</b>' is private.</td>
+</tr>
+<tr>
+<th>24</th>
+<td>Field <b>mIsInitialised</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>Root</b>::<b>mIsInitialised</b>' is private.</td>
+</tr>
+<tr>
+<th>25</th>
+<td>Field <b>mLightFactory</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>Root</b>::<b>mLightFactory</b>' is private.</td>
+</tr>
+<tr>
+<th>26</th>
+<td>Field <b>mLodStrategyManager</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>Root</b>::<b>mLodStrategyManager</b>' is private.</td>
+</tr>
+<tr>
+<th>27</th>
+<td>Field <b>mLogManager</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>Root</b>::<b>mLogManager</b>' is private.</td>
+</tr>
+<tr>
+<th>28</th>
+<td>Field <b>mManualObjectFactory</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>Root</b>::<b>mManualObjectFactory</b>' is private.</td>
+</tr>
+<tr>
+<th>29</th>
+<td>Field <b>mMaterialManager</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>Root</b>::<b>mMaterialManager</b>' is private.</td>
+</tr>
+<tr>
+<th>30</th>
+<td>Field <b>mMeshManager</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>Root</b>::<b>mMeshManager</b>' is private.</td>
+</tr>
+<tr>
+<th>31</th>
+<td>Field <b>mMovableObjectFactoryMap</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>Root</b>::<b>mMovableObjectFactoryMap</b>' is private.</td>
+</tr>
+<tr>
+<th>32</th>
+<td>Field <b>mNextFrame</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>Root</b>::<b>mNextFrame</b>' is private.</td>
+</tr>
+<tr>
+<th>33</th>
+<td>Field <b>mNextMovableObjectTypeFlag</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>Root</b>::<b>mNextMovableObjectTypeFlag</b>' is private.</td>
+</tr>
+<tr>
+<th>34</th>
+<td>Field <b>mParticleManager</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>Root</b>::<b>mParticleManager</b>' is private.</td>
+</tr>
+<tr>
+<th>35</th>
+<td>Field <b>mPluginLibs</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>Root</b>::<b>mPluginLibs</b>' is private.</td>
+</tr>
+<tr>
+<th>36</th>
+<td>Field <b>mPlugins</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>Root</b>::<b>mPlugins</b>' is private.</td>
+</tr>
+<tr>
+<th>37</th>
+<td>Field <b>mProfiler</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>Root</b>::<b>mProfiler</b>' is private.</td>
+</tr>
+<tr>
+<th>38</th>
+<td>Field <b>mQueuedEnd</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>Root</b>::<b>mQueuedEnd</b>' is private.</td>
+</tr>
+<tr>
+<th>39</th>
+<td>Field <b>mRemoveQueueStructuresOnClear</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>Root</b>::<b>mRemoveQueueStructuresOnClear</b>' is private.</td>
+</tr>
+<tr>
+<th>40</th>
+<td>Field <b>mRemovedFrameListeners</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>Root</b>::<b>mRemovedFrameListeners</b>' is private.</td>
+</tr>
+<tr>
+<th>41</th>
+<td>Field <b>mRenderSystemCapabilitiesManager</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>Root</b>::<b>mRenderSystemCapabilitiesManager</b>' is private.</td>
+</tr>
+<tr>
+<th>42</th>
+<td>Field <b>mRenderers</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>Root</b>::<b>mRenderers</b>' is private.</td>
+</tr>
+<tr>
+<th>43</th>
+<td>Field <b>mResourceBackgroundQueue</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>Root</b>::<b>mResourceBackgroundQueue</b>' is private.</td>
+</tr>
+<tr>
+<th>44</th>
+<td>Field <b>mResourceGroupManager</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>Root</b>::<b>mResourceGroupManager</b>' is private.</td>
+</tr>
+<tr>
+<th>45</th>
+<td>Field <b>mRibbonTrailFactory</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>Root</b>::<b>mRibbonTrailFactory</b>' is private.</td>
+</tr>
+<tr>
+<th>46</th>
+<td>Field <b>mSceneManagerEnum</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>Root</b>::<b>mSceneManagerEnum</b>' is private.</td>
+</tr>
+<tr>
+<th>47</th>
+<td>Field <b>mShadowTextureManager</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>Root</b>::<b>mShadowTextureManager</b>' is private.</td>
+</tr>
+<tr>
+<th>48</th>
+<td>Field <b>mSkeletonManager</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>Root</b>::<b>mSkeletonManager</b>' is private.</td>
+</tr>
+<tr>
+<th>49</th>
+<td>Field <b>mStaticGeometryFactory</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>Root</b>::<b>mStaticGeometryFactory</b>' is private.</td>
+</tr>
+<tr>
+<th>50</th>
+<td>Field <b>mTimer</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>Root</b>::<b>mTimer</b>' is private.</td>
+</tr>
+<tr>
+<th>51</th>
+<td>Field <b>mVersion</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>Root</b>::<b>mVersion</b>' is private.</td>
+</tr>
+<tr>
+<th>52</th>
+<td>Field <b>mWorkQueue</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>Root</b>::<b>mWorkQueue</b>' is private.</td>
+</tr>
+<tr>
+<th>53</th>
+<td>Field <b>mZipArchiveFactory</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>Root</b>::<b>mZipArchiveFactory</b>' is private.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_246')">
+[+] affected symbols: 29 (8.8%)</span>
+<div id="c_246" style="display:none;">
+<div class='affected'><span class='iname_a'>OgreBites::AdvancedRenderControls::keyPressed&#160;<span class='sym_p'><span>(&#160;struct OgreBites::KeyboardEvent const&amp; <i>evt</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mRoot&#39; in the object of this method has base type &#39;Root&#39;.</div>
+<span class='iname_a'>OgreBites::AdvancedRenderControls::frameRendered&#160;<span class='sym_p'><span>(&#160;struct FrameEvent const&amp; <i>evt</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mRoot&#39; in the object of this method has base type &#39;Root&#39;.</div>
+<span class='iname_a'>OgreBites::AdvancedRenderControls::AdvancedRenderControls&#160;<span class='sym_p'><span>(&#160;OgreBites::TrayManager* <i>trayMgr</i></span>, <span>Camera* <i>cam</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mRoot&#39; in the object of this method has base type &#39;Root&#39;.</div>
+<span class='iname_a'>OgreBites::AdvancedRenderControls::~AdvancedRenderControls&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mRoot&#39; in the object of this method has base type &#39;Root&#39;.</div>
+<span class='iname_a'>OgreBites::ApplicationContextBase::createRoot&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mRoot&#39; in the object of this method has base type &#39;Root&#39;.</div>
+<span class='iname_a'>OgreBites::ApplicationContextBase::pollEvents&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mRoot&#39; in the object of this method has base type &#39;Root&#39;.</div>
+<span class='iname_a'>OgreBites::ApplicationContextBase::reconfigure&#160;<span class='sym_p'><span>(&#160;String const&amp; <i>renderer</i></span>, <span>NameValuePairList&amp; <i>options</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mRoot&#39; in the object of this method has base type &#39;Root&#39;.</div>
+<span class='iname_a'>OgreBites::ApplicationContextBase::createWindow&#160;<span class='sym_p'><span>(&#160;String const&amp; <i>name</i></span>, <span>uint32 <i>w</i></span>, <span>uint32 <i>h</i></span>, <span>NameValuePairList <i>miscParams</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mRoot&#39; in the object of this method has base type &#39;Root&#39;.</div>
+<span class='iname_a'>OgreBites::ApplicationContextBase::destroyWindow&#160;<span class='sym_p'><span>(&#160;String const&amp; <i>name</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mRoot&#39; in the object of this method has base type &#39;Root&#39;.</div>
+<span class='iname_a'>OgreBites::ApplicationContextBase::loadResources&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mRoot&#39; in the object of this method has base type &#39;Root&#39;.</div>
+ <b>...</b>
+<br/>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<span class='h_name'>OgreShaderGenerator.h</span><br/>
+<span class='ns'>namespace <b>Ogre::RTShader</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_247')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> ShaderGenerator <span class='failed'>&nbsp;27&nbsp;</span></span>
+<br/>
+<div id="c_247" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Field <b>ID_RT_SHADER_SYSTEM</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>ShaderGenerator</b>::<b>ID_RT_SHADER_SYSTEM</b>' is private.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>Field <b>mActiveSceneMgr</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>ShaderGenerator</b>::<b>mActiveSceneMgr</b>' is private.</td>
+</tr>
+<tr>
+<th>3</th>
+<td>Field <b>mActiveViewportValid</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>ShaderGenerator</b>::<b>mActiveViewportValid</b>' is private.</td>
+</tr>
+<tr>
+<th>4</th>
+<td>Field <b>mBuiltinSRSFactories</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>ShaderGenerator</b>::<b>mBuiltinSRSFactories</b>' is private.</td>
+</tr>
+<tr>
+<th>5</th>
+<td>Field <b>mCoreScriptTranslator</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>ShaderGenerator</b>::<b>mCoreScriptTranslator</b>' is private.</td>
+</tr>
+<tr>
+<th>6</th>
+<td>Field <b>mCreateShaderOverProgrammablePass</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>ShaderGenerator</b>::<b>mCreateShaderOverProgrammablePass</b>' is private.</td>
+</tr>
+<tr>
+<th>7</th>
+<td>Field <b>mFFPRenderStateBuilder</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>ShaderGenerator</b>::<b>mFFPRenderStateBuilder</b>' is private.</td>
+</tr>
+<tr>
+<th>8</th>
+<td>Field <b>mFSLayer</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>ShaderGenerator</b>::<b>mFSLayer</b>' is private.</td>
+</tr>
+<tr>
+<th>9</th>
+<td>Field <b>mFragmentShaderProfiles</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>ShaderGenerator</b>::<b>mFragmentShaderProfiles</b>' is private.</td>
+</tr>
+<tr>
+<th>10</th>
+<td>Field <b>mIsFinalizing</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>ShaderGenerator</b>::<b>mIsFinalizing</b>' is private.</td>
+</tr>
+<tr>
+<th>11</th>
+<td>Field <b>mLightCount</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>ShaderGenerator</b>::<b>mLightCount</b>' is private.</td>
+</tr>
+<tr>
+<th>12</th>
+<td>Field <b>mMaterialEntriesMap</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>ShaderGenerator</b>::<b>mMaterialEntriesMap</b>' is private.</td>
+</tr>
+<tr>
+<th>13</th>
+<td>Field <b>mMaterialSerializerListener</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>ShaderGenerator</b>::<b>mMaterialSerializerListener</b>' is private.</td>
+</tr>
+<tr>
+<th>14</th>
+<td>Field <b>mProgramManager</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>ShaderGenerator</b>::<b>mProgramManager</b>' is private.</td>
+</tr>
+<tr>
+<th>15</th>
+<td>Field <b>mProgramWriterManager</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>ShaderGenerator</b>::<b>mProgramWriterManager</b>' is private.</td>
+</tr>
+<tr>
+<th>16</th>
+<td>Field <b>mRenderObjectListener</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>ShaderGenerator</b>::<b>mRenderObjectListener</b>' is private.</td>
+</tr>
+<tr>
+<th>17</th>
+<td>Field <b>mResourceGroupListener</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>ShaderGenerator</b>::<b>mResourceGroupListener</b>' is private.</td>
+</tr>
+<tr>
+<th>18</th>
+<td>Field <b>mSceneManagerListener</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>ShaderGenerator</b>::<b>mSceneManagerListener</b>' is private.</td>
+</tr>
+<tr>
+<th>19</th>
+<td>Field <b>mSceneManagerMap</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>ShaderGenerator</b>::<b>mSceneManagerMap</b>' is private.</td>
+</tr>
+<tr>
+<th>20</th>
+<td>Field <b>mSchemeEntriesMap</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>ShaderGenerator</b>::<b>mSchemeEntriesMap</b>' is private.</td>
+</tr>
+<tr>
+<th>21</th>
+<td>Field <b>mScriptTranslatorManager</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>ShaderGenerator</b>::<b>mScriptTranslatorManager</b>' is private.</td>
+</tr>
+<tr>
+<th>22</th>
+<td>Field <b>mShaderCachePath</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>ShaderGenerator</b>::<b>mShaderCachePath</b>' is private.</td>
+</tr>
+<tr>
+<th>23</th>
+<td>Field <b>mShaderLanguage</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>ShaderGenerator</b>::<b>mShaderLanguage</b>' is private.</td>
+</tr>
+<tr>
+<th>24</th>
+<td>Field <b>mSubRenderStateFactories</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>ShaderGenerator</b>::<b>mSubRenderStateFactories</b>' is private.</td>
+</tr>
+<tr>
+<th>25</th>
+<td>Field <b>mTechniqueEntriesMap</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>ShaderGenerator</b>::<b>mTechniqueEntriesMap</b>' is private.</td>
+</tr>
+<tr>
+<th>26</th>
+<td>Field <b>mVSOutputCompactPolicy</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>ShaderGenerator</b>::<b>mVSOutputCompactPolicy</b>' is private.</td>
+</tr>
+<tr>
+<th>27</th>
+<td>Field <b>mVertexShaderProfiles</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>ShaderGenerator</b>::<b>mVertexShaderProfiles</b>' is private.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_248')">
+[+] affected symbols: 34 (10.3%)</span>
+<div id="c_248" style="display:none;">
+<div class='affected'><span class='iname_a'>OgreBites::AdvancedRenderControls::keyPressed&#160;<span class='sym_p'><span>(&#160;struct OgreBites::KeyboardEvent const&amp; <i>evt</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mShaderGenerator&#39; in the object of this method has base type &#39;ShaderGenerator&#39;.</div>
+<span class='iname_a'>OgreBites::AdvancedRenderControls::frameRendered&#160;<span class='sym_p'><span>(&#160;struct Ogre::FrameEvent const&amp; <i>evt</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mShaderGenerator&#39; in the object of this method has base type &#39;ShaderGenerator&#39;.</div>
+<span class='iname_a'>OgreBites::AdvancedRenderControls::AdvancedRenderControls&#160;<span class='sym_p'><span>(&#160;OgreBites::TrayManager* <i>trayMgr</i></span>, <span>Ogre::Camera* <i>cam</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mShaderGenerator&#39; in the object of this method has base type &#39;ShaderGenerator&#39;.</div>
+<span class='iname_a'>OgreBites::AdvancedRenderControls::~AdvancedRenderControls&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mShaderGenerator&#39; in the object of this method has base type &#39;ShaderGenerator&#39;.</div>
+<span class='iname_a'>OgreBites::ApplicationContextBase::createRoot&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mMaterialMgrListener.mShaderGenerator&#39; in the object of this method has base type &#39;ShaderGenerator&#39;.</div>
+<span class='iname_a'>OgreBites::ApplicationContextBase::pollEvents&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mMaterialMgrListener.mShaderGenerator&#39; in the object of this method has base type &#39;ShaderGenerator&#39;.</div>
+<span class='iname_a'>OgreBites::ApplicationContextBase::reconfigure&#160;<span class='sym_p'><span>(&#160;Ogre::String const&amp; <i>renderer</i></span>, <span>Ogre::NameValuePairList&amp; <i>options</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mMaterialMgrListener.mShaderGenerator&#39; in the object of this method has base type &#39;ShaderGenerator&#39;.</div>
+<span class='iname_a'>OgreBites::ApplicationContextBase::createWindow&#160;<span class='sym_p'><span>(&#160;Ogre::String const&amp; <i>name</i></span>, <span>Ogre::uint32 <i>w</i></span>, <span>Ogre::uint32 <i>h</i></span>, <span>Ogre::NameValuePairList <i>miscParams</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mMaterialMgrListener.mShaderGenerator&#39; in the object of this method has base type &#39;ShaderGenerator&#39;.</div>
+<span class='iname_a'>OgreBites::ApplicationContextBase::destroyWindow&#160;<span class='sym_p'><span>(&#160;Ogre::String const&amp; <i>name</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mMaterialMgrListener.mShaderGenerator&#39; in the object of this method has base type &#39;ShaderGenerator&#39;.</div>
+<span class='iname_a'>OgreBites::ApplicationContextBase::loadResources&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mMaterialMgrListener.mShaderGenerator&#39; in the object of this method has base type &#39;ShaderGenerator&#39;.</div>
+ <b>...</b>
+<br/>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<span class='h_name'>OgreTechnique.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_249')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> Technique <span class='failed'>&nbsp;15&nbsp;</span></span>
+<br/>
+<div id="c_249" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Field <b>mGPUDeviceNameRules</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>Technique</b>::<b>mGPUDeviceNameRules</b>' is private.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>Field <b>mGPUVendorRules</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>Technique</b>::<b>mGPUVendorRules</b>' is private.</td>
+</tr>
+<tr>
+<th>3</th>
+<td>Field <b>mIlluminationPasses</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>Technique</b>::<b>mIlluminationPasses</b>' is private.</td>
+</tr>
+<tr>
+<th>4</th>
+<td>Field <b>mIlluminationPassesCompilationPhase</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>Technique</b>::<b>mIlluminationPassesCompilationPhase</b>' is private.</td>
+</tr>
+<tr>
+<th>5</th>
+<td>Field <b>mIsSupported</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>Technique</b>::<b>mIsSupported</b>' is private.</td>
+</tr>
+<tr>
+<th>6</th>
+<td>Field <b>mLodIndex</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>Technique</b>::<b>mLodIndex</b>' is private.</td>
+</tr>
+<tr>
+<th>7</th>
+<td>Field <b>mName</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>Technique</b>::<b>mName</b>' is private.</td>
+</tr>
+<tr>
+<th>8</th>
+<td>Field <b>mParent</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>Technique</b>::<b>mParent</b>' is private.</td>
+</tr>
+<tr>
+<th>9</th>
+<td>Field <b>mPasses</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>Technique</b>::<b>mPasses</b>' is private.</td>
+</tr>
+<tr>
+<th>10</th>
+<td>Field <b>mSchemeIndex</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>Technique</b>::<b>mSchemeIndex</b>' is private.</td>
+</tr>
+<tr>
+<th>11</th>
+<td>Field <b>mShadowCasterMaterial</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>Technique</b>::<b>mShadowCasterMaterial</b>' is private.</td>
+</tr>
+<tr>
+<th>12</th>
+<td>Field <b>mShadowCasterMaterialName</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>Technique</b>::<b>mShadowCasterMaterialName</b>' is private.</td>
+</tr>
+<tr>
+<th>13</th>
+<td>Field <b>mShadowReceiverMaterial</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>Technique</b>::<b>mShadowReceiverMaterial</b>' is private.</td>
+</tr>
+<tr>
+<th>14</th>
+<td>Field <b>mShadowReceiverMaterialName</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>Technique</b>::<b>mShadowReceiverMaterialName</b>' is private.</td>
+</tr>
+<tr>
+<th>15</th>
+<td>Field <b>mUserObjectBindings</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>Technique</b>::<b>mUserObjectBindings</b>' is private.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_250')">
+[+] affected symbols: 3 (0.9%)</span>
+<div id="c_250" style="display:none;">
+<div class='affected'><span class='iname_a'>OgreBites::SGTechniqueResolverListener::handleSchemeNotFound&#160;<span class='sym_p'><span>(&#160;unsigned short <i>schemeIndex</i></span>, <span>String const&amp; <i>schemeName</i></span>, <span>Material* <i>originalMaterial</i></span>, <span>unsigned short <i>lodIndex</i></span>, <span>Renderable const* <i>rend</i></span>&#160;)</span></span><br/>
+<div class='affect'>Return value (pointer) has base type &#39;Technique&#39;.</div>
+<span class='iname_a'>OgreBites::SGTechniqueResolverListener::afterIlluminationPassesCreated&#160;<span class='sym_p'><span>(&#160;Technique* <span class='fp'>tech</span></span>&#160;)</span></span><br/>
+<div class='affect'>1st parameter &#39;tech&#39; (pointer) has base type &#39;Technique&#39;.</div>
+<span class='iname_a'>OgreBites::SGTechniqueResolverListener::beforeIlluminationPassesCleared&#160;<span class='sym_p'><span>(&#160;Technique* <span class='fp'>tech</span></span>&#160;)</span></span><br/>
+<div class='affect'>1st parameter &#39;tech&#39; (pointer) has base type &#39;Technique&#39;.</div>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='Symbol_Problems_Medium'></a><a name='Interface_Problems_Medium'></a>
+<h2>Problems with Symbols, Medium Severity <span class='failed'>&nbsp;38&nbsp;</span></h2><hr/>
+<span class='h_name'>OgreTrays.h</span><br/>
+<span class='ns'>namespace <b>OgreBites</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_251')">
+<span class='ext'>[+]</span> Button::Button <span class='attr'>[C1]</span>&#160;<span class='sym_p'><span>(&#160;Ogre::String const&amp; <span class='color_p'>name</span></span>, <span>Ogre::UTFString const&amp; <span class='color_p'>caption</span></span>, <span>Ogre::Real <span class='color_p'>width</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_251" style="display:none;">
+
+
+<span class='new_sign_lbl'>&#8675;</span>
+<br/>
+<span class='new_sign'>Button::Button <span class='attr'>[C1]</span>&#160;<span class='sym_p'><span>(&#160;Ogre::String const&amp; <span class='color_p'>name</span></span>, <span>std::__cxx11::basic_string&lt;char&gt;const&amp; <span class='color_p'>caption</span></span>, <span>Ogre::Real <span class='color_p'>width</span></span>&#160;)</span></span><br/>
+<span class='mngl pleft'>_ZN9OgreBites6ButtonC1ERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEERKN4Ogre9UTFStringEf</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>Parameters list has been changed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+</table>
+<br/>
+</div>
+<span class="section" onclick="javascript:showContent(this, 'c_252')">
+<span class='ext'>[+]</span> Button::Button <span class='attr'>[C2]</span>&#160;<span class='sym_p'><span>(&#160;Ogre::String const&amp; <span class='color_p'>name</span></span>, <span>Ogre::UTFString const&amp; <span class='color_p'>caption</span></span>, <span>Ogre::Real <span class='color_p'>width</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_252" style="display:none;">
+
+
+<span class='new_sign_lbl'>&#8675;</span>
+<br/>
+<span class='new_sign'>Button::Button <span class='attr'>[C2]</span>&#160;<span class='sym_p'><span>(&#160;Ogre::String const&amp; <span class='color_p'>name</span></span>, <span>std::__cxx11::basic_string&lt;char&gt;const&amp; <span class='color_p'>caption</span></span>, <span>Ogre::Real <span class='color_p'>width</span></span>&#160;)</span></span><br/>
+<span class='mngl pleft'>_ZN9OgreBites6ButtonC2ERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEERKN4Ogre9UTFStringEf</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>Parameters list has been changed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+</table>
+<br/>
+</div>
+<span class="section" onclick="javascript:showContent(this, 'c_253')">
+<span class='ext'>[+]</span> Button::setCaption&#160;<span class='sym_p'><span>(&#160;Ogre::UTFString const&amp; <span class='color_p'>caption</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_253" style="display:none;">
+
+
+<span class='new_sign_lbl'>&#8675;</span>
+<br/>
+<span class='new_sign'>Button::setCaption&#160;<span class='sym_p'><span>(&#160;std::__cxx11::basic_string&lt;char&gt;const&amp; <span class='color_p'>caption</span></span>&#160;)</span></span><br/>
+<span class='mngl pleft'>_ZN9OgreBites6Button10setCaptionERKN4Ogre9UTFStringE</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>Parameters list has been changed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+</table>
+<br/>
+</div>
+<span class="section" onclick="javascript:showContent(this, 'c_254')">
+<span class='ext'>[+]</span> CheckBox::CheckBox <span class='attr'>[C1]</span>&#160;<span class='sym_p'><span>(&#160;Ogre::String const&amp; <span class='color_p'>name</span></span>, <span>Ogre::UTFString const&amp; <span class='color_p'>caption</span></span>, <span>Ogre::Real <span class='color_p'>width</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_254" style="display:none;">
+
+
+<span class='new_sign_lbl'>&#8675;</span>
+<br/>
+<span class='new_sign'>CheckBox::CheckBox <span class='attr'>[C1]</span>&#160;<span class='sym_p'><span>(&#160;Ogre::String const&amp; <span class='color_p'>name</span></span>, <span>std::__cxx11::basic_string&lt;char&gt;const&amp; <span class='color_p'>caption</span></span>, <span>Ogre::Real <span class='color_p'>width</span></span>&#160;)</span></span><br/>
+<span class='mngl pleft'>_ZN9OgreBites8CheckBoxC1ERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEERKN4Ogre9UTFStringEf</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>Parameters list has been changed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+</table>
+<br/>
+</div>
+<span class="section" onclick="javascript:showContent(this, 'c_255')">
+<span class='ext'>[+]</span> CheckBox::CheckBox <span class='attr'>[C2]</span>&#160;<span class='sym_p'><span>(&#160;Ogre::String const&amp; <span class='color_p'>name</span></span>, <span>Ogre::UTFString const&amp; <span class='color_p'>caption</span></span>, <span>Ogre::Real <span class='color_p'>width</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_255" style="display:none;">
+
+
+<span class='new_sign_lbl'>&#8675;</span>
+<br/>
+<span class='new_sign'>CheckBox::CheckBox <span class='attr'>[C2]</span>&#160;<span class='sym_p'><span>(&#160;Ogre::String const&amp; <span class='color_p'>name</span></span>, <span>std::__cxx11::basic_string&lt;char&gt;const&amp; <span class='color_p'>caption</span></span>, <span>Ogre::Real <span class='color_p'>width</span></span>&#160;)</span></span><br/>
+<span class='mngl pleft'>_ZN9OgreBites8CheckBoxC2ERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEERKN4Ogre9UTFStringEf</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>Parameters list has been changed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+</table>
+<br/>
+</div>
+<span class="section" onclick="javascript:showContent(this, 'c_256')">
+<span class='ext'>[+]</span> CheckBox::setCaption&#160;<span class='sym_p'><span>(&#160;Ogre::UTFString const&amp; <span class='color_p'>caption</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_256" style="display:none;">
+
+
+<span class='new_sign_lbl'>&#8675;</span>
+<br/>
+<span class='new_sign'>CheckBox::setCaption&#160;<span class='sym_p'><span>(&#160;std::__cxx11::basic_string&lt;char&gt;const&amp; <span class='color_p'>caption</span></span>&#160;)</span></span><br/>
+<span class='mngl pleft'>_ZN9OgreBites8CheckBox10setCaptionERKN4Ogre9UTFStringE</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>Parameters list has been changed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+</table>
+<br/>
+</div>
+<span class="section" onclick="javascript:showContent(this, 'c_257')">
+<span class='ext'>[+]</span> Label::Label <span class='attr'>[C1]</span>&#160;<span class='sym_p'><span>(&#160;Ogre::String const&amp; <span class='color_p'>name</span></span>, <span>Ogre::UTFString const&amp; <span class='color_p'>caption</span></span>, <span>Ogre::Real <span class='color_p'>width</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_257" style="display:none;">
+
+
+<span class='new_sign_lbl'>&#8675;</span>
+<br/>
+<span class='new_sign'>Label::Label <span class='attr'>[C1]</span>&#160;<span class='sym_p'><span>(&#160;Ogre::String const&amp; <span class='color_p'>name</span></span>, <span>std::__cxx11::basic_string&lt;char&gt;const&amp; <span class='color_p'>caption</span></span>, <span>Ogre::Real <span class='color_p'>width</span></span>&#160;)</span></span><br/>
+<span class='mngl pleft'>_ZN9OgreBites5LabelC1ERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEERKN4Ogre9UTFStringEf</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>Parameters list has been changed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+</table>
+<br/>
+</div>
+<span class="section" onclick="javascript:showContent(this, 'c_258')">
+<span class='ext'>[+]</span> Label::Label <span class='attr'>[C2]</span>&#160;<span class='sym_p'><span>(&#160;Ogre::String const&amp; <span class='color_p'>name</span></span>, <span>Ogre::UTFString const&amp; <span class='color_p'>caption</span></span>, <span>Ogre::Real <span class='color_p'>width</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_258" style="display:none;">
+
+
+<span class='new_sign_lbl'>&#8675;</span>
+<br/>
+<span class='new_sign'>Label::Label <span class='attr'>[C2]</span>&#160;<span class='sym_p'><span>(&#160;Ogre::String const&amp; <span class='color_p'>name</span></span>, <span>std::__cxx11::basic_string&lt;char&gt;const&amp; <span class='color_p'>caption</span></span>, <span>Ogre::Real <span class='color_p'>width</span></span>&#160;)</span></span><br/>
+<span class='mngl pleft'>_ZN9OgreBites5LabelC2ERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEERKN4Ogre9UTFStringEf</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>Parameters list has been changed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+</table>
+<br/>
+</div>
+<span class="section" onclick="javascript:showContent(this, 'c_259')">
+<span class='ext'>[+]</span> ParamsPanel::getParamValue&#160;<span class='sym_p'><span>(&#160;Ogre::UTFString const&amp; <span class='color_p'>paramName</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_259" style="display:none;">
+
+
+<span class='new_sign_lbl'>&#8675;</span>
+<br/>
+<span class='new_sign'>ParamsPanel::getParamValue&#160;<span class='sym_p'><span>(&#160;std::__cxx11::basic_string&lt;char&gt;const&amp; <span class='color_p'>paramName</span></span>&#160;)</span></span><br/>
+<span class='mngl pleft'>_ZN9OgreBites11ParamsPanel13getParamValueERKN4Ogre9UTFStringE</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>Parameters list has been changed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+</table>
+<br/>
+</div>
+<span class="section" onclick="javascript:showContent(this, 'c_260')">
+<span class='ext'>[+]</span> ParamsPanel::setParamValue&#160;<span class='sym_p'><span>(&#160;Ogre::UTFString const&amp; <span class='color_p'>paramName</span></span>, <span>Ogre::UTFString const&amp; <span class='color_p'>paramValue</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_260" style="display:none;">
+
+
+<span class='new_sign_lbl'>&#8675;</span>
+<br/>
+<span class='new_sign'>ParamsPanel::setParamValue&#160;<span class='sym_p'><span>(&#160;std::__cxx11::basic_string&lt;char&gt;const&amp; <span class='color_p'>paramName</span></span>, <span>std::__cxx11::basic_string&lt;char&gt;const&amp; <span class='color_p'>paramValue</span></span>&#160;)</span></span><br/>
+<span class='mngl pleft'>_ZN9OgreBites11ParamsPanel13setParamValueERKN4Ogre9UTFStringES4_</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>Parameters list has been changed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+</table>
+<br/>
+</div>
+<span class="section" onclick="javascript:showContent(this, 'c_261')">
+<span class='ext'>[+]</span> ProgressBar::ProgressBar <span class='attr'>[C1]</span>&#160;<span class='sym_p'><span>(&#160;Ogre::String const&amp; <span class='color_p'>name</span></span>, <span>Ogre::UTFString const&amp; <span class='color_p'>caption</span></span>, <span>Ogre::Real <span class='color_p'>width</span></span>, <span>Ogre::Real <span class='color_p'>commentBoxWidth</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_261" style="display:none;">
+
+
+<span class='new_sign_lbl'>&#8675;</span>
+<br/>
+<span class='new_sign'>ProgressBar::ProgressBar <span class='attr'>[C1]</span>&#160;<span class='sym_p'><span>(&#160;Ogre::String const&amp; <span class='color_p'>name</span></span>, <span>std::__cxx11::basic_string&lt;char&gt;const&amp; <span class='color_p'>caption</span></span>, <span>Ogre::Real <span class='color_p'>width</span></span>, <span>Ogre::Real <span class='color_p'>commentBoxWidth</span></span>&#160;)</span></span><br/>
+<span class='mngl pleft'>_ZN9OgreBites11ProgressBarC1ERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEERKN4Ogre9UTFStringEff</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>Parameters list has been changed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+</table>
+<br/>
+</div>
+<span class="section" onclick="javascript:showContent(this, 'c_262')">
+<span class='ext'>[+]</span> ProgressBar::ProgressBar <span class='attr'>[C2]</span>&#160;<span class='sym_p'><span>(&#160;Ogre::String const&amp; <span class='color_p'>name</span></span>, <span>Ogre::UTFString const&amp; <span class='color_p'>caption</span></span>, <span>Ogre::Real <span class='color_p'>width</span></span>, <span>Ogre::Real <span class='color_p'>commentBoxWidth</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_262" style="display:none;">
+
+
+<span class='new_sign_lbl'>&#8675;</span>
+<br/>
+<span class='new_sign'>ProgressBar::ProgressBar <span class='attr'>[C2]</span>&#160;<span class='sym_p'><span>(&#160;Ogre::String const&amp; <span class='color_p'>name</span></span>, <span>std::__cxx11::basic_string&lt;char&gt;const&amp; <span class='color_p'>caption</span></span>, <span>Ogre::Real <span class='color_p'>width</span></span>, <span>Ogre::Real <span class='color_p'>commentBoxWidth</span></span>&#160;)</span></span><br/>
+<span class='mngl pleft'>_ZN9OgreBites11ProgressBarC2ERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEERKN4Ogre9UTFStringEff</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>Parameters list has been changed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+</table>
+<br/>
+</div>
+<span class="section" onclick="javascript:showContent(this, 'c_263')">
+<span class='ext'>[+]</span> SelectMenu::containsItem&#160;<span class='sym_p'><span>(&#160;Ogre::UTFString const&amp; <span class='color_p'>item</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_263" style="display:none;">
+
+
+<span class='new_sign_lbl'>&#8675;</span>
+<br/>
+<span class='new_sign'>SelectMenu::containsItem&#160;<span class='sym_p'><span>(&#160;std::__cxx11::basic_string&lt;char&gt;const&amp; <span class='color_p'>item</span></span>&#160;)</span></span><br/>
+<span class='mngl pleft'>_ZN9OgreBites10SelectMenu12containsItemERKN4Ogre9UTFStringE</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>Parameters list has been changed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+</table>
+<br/>
+</div>
+<span class="section" onclick="javascript:showContent(this, 'c_264')">
+<span class='ext'>[+]</span> SelectMenu::removeItem&#160;<span class='sym_p'><span>(&#160;Ogre::UTFString const&amp; <span class='color_p'>item</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_264" style="display:none;">
+
+
+<span class='new_sign_lbl'>&#8675;</span>
+<br/>
+<span class='new_sign'>SelectMenu::removeItem&#160;<span class='sym_p'><span>(&#160;std::__cxx11::basic_string&lt;char&gt;const&amp; <span class='color_p'>item</span></span>&#160;)</span></span><br/>
+<span class='mngl pleft'>_ZN9OgreBites10SelectMenu10removeItemERKN4Ogre9UTFStringE</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>Parameters list has been changed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+</table>
+<br/>
+</div>
+<span class="section" onclick="javascript:showContent(this, 'c_265')">
+<span class='ext'>[+]</span> SelectMenu::selectItem&#160;<span class='sym_p'><span>(&#160;Ogre::UTFString const&amp; <span class='color_p'>item</span></span>, <span>bool <span class='color_p'>notifyListener</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_265" style="display:none;">
+
+
+<span class='new_sign_lbl'>&#8675;</span>
+<br/>
+<span class='new_sign'>SelectMenu::selectItem&#160;<span class='sym_p'><span>(&#160;std::__cxx11::basic_string&lt;char&gt;const&amp; <span class='color_p'>item</span></span>, <span>bool <span class='color_p'>notifyListener</span></span>&#160;)</span></span><br/>
+<span class='mngl pleft'>_ZN9OgreBites10SelectMenu10selectItemERKN4Ogre9UTFStringEb</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>Parameters list has been changed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+</table>
+<br/>
+</div>
+<span class="section" onclick="javascript:showContent(this, 'c_266')">
+<span class='ext'>[+]</span> SelectMenu::SelectMenu <span class='attr'>[C1]</span>&#160;<span class='sym_p'><span>(&#160;Ogre::String const&amp; <span class='color_p'>name</span></span>, <span>Ogre::UTFString const&amp; <span class='color_p'>caption</span></span>, <span>Ogre::Real <span class='color_p'>width</span></span>, <span>Ogre::Real <span class='color_p'>boxWidth</span></span>, <span>size_t <span class='color_p'>maxItemsShown</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_266" style="display:none;">
+
+
+<span class='new_sign_lbl'>&#8675;</span>
+<br/>
+<span class='new_sign'>SelectMenu::SelectMenu <span class='attr'>[C1]</span>&#160;<span class='sym_p'><span>(&#160;Ogre::String const&amp; <span class='color_p'>name</span></span>, <span>std::__cxx11::basic_string&lt;char&gt;const&amp; <span class='color_p'>caption</span></span>, <span>Ogre::Real <span class='color_p'>width</span></span>, <span>Ogre::Real <span class='color_p'>boxWidth</span></span>, <span>size_t <span class='color_p'>maxItemsShown</span></span>&#160;)</span></span><br/>
+<span class='mngl pleft'>_ZN9OgreBites10SelectMenuC1ERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEERKN4Ogre9UTFStringEffm</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>Parameters list has been changed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+</table>
+<br/>
+</div>
+<span class="section" onclick="javascript:showContent(this, 'c_267')">
+<span class='ext'>[+]</span> SelectMenu::SelectMenu <span class='attr'>[C2]</span>&#160;<span class='sym_p'><span>(&#160;Ogre::String const&amp; <span class='color_p'>name</span></span>, <span>Ogre::UTFString const&amp; <span class='color_p'>caption</span></span>, <span>Ogre::Real <span class='color_p'>width</span></span>, <span>Ogre::Real <span class='color_p'>boxWidth</span></span>, <span>size_t <span class='color_p'>maxItemsShown</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_267" style="display:none;">
+
+
+<span class='new_sign_lbl'>&#8675;</span>
+<br/>
+<span class='new_sign'>SelectMenu::SelectMenu <span class='attr'>[C2]</span>&#160;<span class='sym_p'><span>(&#160;Ogre::String const&amp; <span class='color_p'>name</span></span>, <span>std::__cxx11::basic_string&lt;char&gt;const&amp; <span class='color_p'>caption</span></span>, <span>Ogre::Real <span class='color_p'>width</span></span>, <span>Ogre::Real <span class='color_p'>boxWidth</span></span>, <span>size_t <span class='color_p'>maxItemsShown</span></span>&#160;)</span></span><br/>
+<span class='mngl pleft'>_ZN9OgreBites10SelectMenuC2ERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEERKN4Ogre9UTFStringEffm</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>Parameters list has been changed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+</table>
+<br/>
+</div>
+<span class="section" onclick="javascript:showContent(this, 'c_268')">
+<span class='ext'>[+]</span> SelectMenu::setCaption&#160;<span class='sym_p'><span>(&#160;Ogre::UTFString const&amp; <span class='color_p'>caption</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_268" style="display:none;">
+
+
+<span class='new_sign_lbl'>&#8675;</span>
+<br/>
+<span class='new_sign'>SelectMenu::setCaption&#160;<span class='sym_p'><span>(&#160;std::__cxx11::basic_string&lt;char&gt;const&amp; <span class='color_p'>caption</span></span>&#160;)</span></span><br/>
+<span class='mngl pleft'>_ZN9OgreBites10SelectMenu10setCaptionERKN4Ogre9UTFStringE</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>Parameters list has been changed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+</table>
+<br/>
+</div>
+<span class="section" onclick="javascript:showContent(this, 'c_269')">
+<span class='ext'>[+]</span> Slider::setCaption&#160;<span class='sym_p'><span>(&#160;Ogre::UTFString const&amp; <span class='color_p'>caption</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_269" style="display:none;">
+
+
+<span class='new_sign_lbl'>&#8675;</span>
+<br/>
+<span class='new_sign'>Slider::setCaption&#160;<span class='sym_p'><span>(&#160;std::__cxx11::basic_string&lt;char&gt;const&amp; <span class='color_p'>caption</span></span>&#160;)</span></span><br/>
+<span class='mngl pleft'>_ZN9OgreBites6Slider10setCaptionERKN4Ogre9UTFStringE</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>Parameters list has been changed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+</table>
+<br/>
+</div>
+<span class="section" onclick="javascript:showContent(this, 'c_270')">
+<span class='ext'>[+]</span> Slider::Slider <span class='attr'>[C1]</span>&#160;<span class='sym_p'><span>(&#160;Ogre::String const&amp; <span class='color_p'>name</span></span>, <span>Ogre::UTFString const&amp; <span class='color_p'>caption</span></span>, <span>Ogre::Real <span class='color_p'>width</span></span>, <span>Ogre::Real <span class='color_p'>trackWidth</span></span>, <span>Ogre::Real <span class='color_p'>valueBoxWidth</span></span>, <span>Ogre::Real <span class='color_p'>minValue</span></span>, <span>Ogre::Real <span class='color_p'>maxValue</span></span>, <span>unsigned int <span class='color_p'>snaps</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_270" style="display:none;">
+
+
+<span class='new_sign_lbl'>&#8675;</span>
+<br/>
+<span class='new_sign'>Slider::Slider <span class='attr'>[C1]</span>&#160;<span class='sym_p'><span>(&#160;Ogre::String const&amp; <span class='color_p'>name</span></span>, <span>std::__cxx11::basic_string&lt;char&gt;const&amp; <span class='color_p'>caption</span></span>, <span>Ogre::Real <span class='color_p'>width</span></span>, <span>Ogre::Real <span class='color_p'>trackWidth</span></span>, <span>Ogre::Real <span class='color_p'>valueBoxWidth</span></span>, <span>Ogre::Real <span class='color_p'>minValue</span></span>, <span>Ogre::Real <span class='color_p'>maxValue</span></span>, <span>unsigned int <span class='color_p'>snaps</span></span>&#160;)</span></span><br/>
+<span class='mngl pleft'>_ZN9OgreBites6SliderC1ERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEERKN4Ogre9UTFStringEfffffj</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>Parameters list has been changed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+</table>
+<br/>
+</div>
+<span class="section" onclick="javascript:showContent(this, 'c_271')">
+<span class='ext'>[+]</span> Slider::Slider <span class='attr'>[C2]</span>&#160;<span class='sym_p'><span>(&#160;Ogre::String const&amp; <span class='color_p'>name</span></span>, <span>Ogre::UTFString const&amp; <span class='color_p'>caption</span></span>, <span>Ogre::Real <span class='color_p'>width</span></span>, <span>Ogre::Real <span class='color_p'>trackWidth</span></span>, <span>Ogre::Real <span class='color_p'>valueBoxWidth</span></span>, <span>Ogre::Real <span class='color_p'>minValue</span></span>, <span>Ogre::Real <span class='color_p'>maxValue</span></span>, <span>unsigned int <span class='color_p'>snaps</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_271" style="display:none;">
+
+
+<span class='new_sign_lbl'>&#8675;</span>
+<br/>
+<span class='new_sign'>Slider::Slider <span class='attr'>[C2]</span>&#160;<span class='sym_p'><span>(&#160;Ogre::String const&amp; <span class='color_p'>name</span></span>, <span>std::__cxx11::basic_string&lt;char&gt;const&amp; <span class='color_p'>caption</span></span>, <span>Ogre::Real <span class='color_p'>width</span></span>, <span>Ogre::Real <span class='color_p'>trackWidth</span></span>, <span>Ogre::Real <span class='color_p'>valueBoxWidth</span></span>, <span>Ogre::Real <span class='color_p'>minValue</span></span>, <span>Ogre::Real <span class='color_p'>maxValue</span></span>, <span>unsigned int <span class='color_p'>snaps</span></span>&#160;)</span></span><br/>
+<span class='mngl pleft'>_ZN9OgreBites6SliderC2ERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEERKN4Ogre9UTFStringEfffffj</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>Parameters list has been changed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+</table>
+<br/>
+</div>
+<span class="section" onclick="javascript:showContent(this, 'c_272')">
+<span class='ext'>[+]</span> TextBox::setText&#160;<span class='sym_p'><span>(&#160;Ogre::UTFString const&amp; <span class='color_p'>text</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_272" style="display:none;">
+
+
+<span class='new_sign_lbl'>&#8675;</span>
+<br/>
+<span class='new_sign'>TextBox::setText&#160;<span class='sym_p'><span>(&#160;std::__cxx11::basic_string&lt;char&gt;const&amp; <span class='color_p'>text</span></span>&#160;)</span></span><br/>
+<span class='mngl pleft'>_ZN9OgreBites7TextBox7setTextERKN4Ogre9UTFStringE</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>Parameters list has been changed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+</table>
+<br/>
+</div>
+<span class="section" onclick="javascript:showContent(this, 'c_273')">
+<span class='ext'>[+]</span> TextBox::TextBox <span class='attr'>[C1]</span>&#160;<span class='sym_p'><span>(&#160;Ogre::String const&amp; <span class='color_p'>name</span></span>, <span>Ogre::UTFString const&amp; <span class='color_p'>caption</span></span>, <span>Ogre::Real <span class='color_p'>width</span></span>, <span>Ogre::Real <span class='color_p'>height</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_273" style="display:none;">
+
+
+<span class='new_sign_lbl'>&#8675;</span>
+<br/>
+<span class='new_sign'>TextBox::TextBox <span class='attr'>[C1]</span>&#160;<span class='sym_p'><span>(&#160;Ogre::String const&amp; <span class='color_p'>name</span></span>, <span>std::__cxx11::basic_string&lt;char&gt;const&amp; <span class='color_p'>caption</span></span>, <span>Ogre::Real <span class='color_p'>width</span></span>, <span>Ogre::Real <span class='color_p'>height</span></span>&#160;)</span></span><br/>
+<span class='mngl pleft'>_ZN9OgreBites7TextBoxC1ERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEERKN4Ogre9UTFStringEff</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>Parameters list has been changed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+</table>
+<br/>
+</div>
+<span class="section" onclick="javascript:showContent(this, 'c_274')">
+<span class='ext'>[+]</span> TextBox::TextBox <span class='attr'>[C2]</span>&#160;<span class='sym_p'><span>(&#160;Ogre::String const&amp; <span class='color_p'>name</span></span>, <span>Ogre::UTFString const&amp; <span class='color_p'>caption</span></span>, <span>Ogre::Real <span class='color_p'>width</span></span>, <span>Ogre::Real <span class='color_p'>height</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_274" style="display:none;">
+
+
+<span class='new_sign_lbl'>&#8675;</span>
+<br/>
+<span class='new_sign'>TextBox::TextBox <span class='attr'>[C2]</span>&#160;<span class='sym_p'><span>(&#160;Ogre::String const&amp; <span class='color_p'>name</span></span>, <span>std::__cxx11::basic_string&lt;char&gt;const&amp; <span class='color_p'>caption</span></span>, <span>Ogre::Real <span class='color_p'>width</span></span>, <span>Ogre::Real <span class='color_p'>height</span></span>&#160;)</span></span><br/>
+<span class='mngl pleft'>_ZN9OgreBites7TextBoxC2ERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEERKN4Ogre9UTFStringEff</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>Parameters list has been changed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+</table>
+<br/>
+</div>
+<span class="section" onclick="javascript:showContent(this, 'c_275')">
+<span class='ext'>[+]</span> TrayManager::createCheckBox&#160;<span class='sym_p'><span>(&#160;enum TrayLocation <span class='color_p'>trayLoc</span></span>, <span>Ogre::String const&amp; <span class='color_p'>name</span></span>, <span>Ogre::UTFString const&amp; <span class='color_p'>caption</span></span>, <span>Ogre::Real <span class='color_p'>width</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_275" style="display:none;">
+
+
+<span class='new_sign_lbl'>&#8675;</span>
+<br/>
+<span class='new_sign'>TrayManager::createCheckBox&#160;<span class='sym_p'><span>(&#160;enum TrayLocation <span class='color_p'>trayLoc</span></span>, <span>Ogre::String const&amp; <span class='color_p'>name</span></span>, <span>std::__cxx11::basic_string&lt;char&gt;const&amp; <span class='color_p'>caption</span></span>, <span>Ogre::Real <span class='color_p'>width</span></span>&#160;)</span></span><br/>
+<span class='mngl pleft'>_ZN9OgreBites11TrayManager14createCheckBoxENS_12TrayLocationERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEERKN4Ogre9UTFStringEf</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>Parameters list has been changed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+</table>
+<br/>
+</div>
+<span class="section" onclick="javascript:showContent(this, 'c_276')">
+<span class='ext'>[+]</span> TrayManager::createLabel&#160;<span class='sym_p'><span>(&#160;enum TrayLocation <span class='color_p'>trayLoc</span></span>, <span>Ogre::String const&amp; <span class='color_p'>name</span></span>, <span>Ogre::UTFString const&amp; <span class='color_p'>caption</span></span>, <span>Ogre::Real <span class='color_p'>width</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_276" style="display:none;">
+
+
+<span class='new_sign_lbl'>&#8675;</span>
+<br/>
+<span class='new_sign'>TrayManager::createLabel&#160;<span class='sym_p'><span>(&#160;enum TrayLocation <span class='color_p'>trayLoc</span></span>, <span>Ogre::String const&amp; <span class='color_p'>name</span></span>, <span>std::__cxx11::basic_string&lt;char&gt;const&amp; <span class='color_p'>caption</span></span>, <span>Ogre::Real <span class='color_p'>width</span></span>&#160;)</span></span><br/>
+<span class='mngl pleft'>_ZN9OgreBites11TrayManager11createLabelENS_12TrayLocationERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEERKN4Ogre9UTFStringEf</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>Parameters list has been changed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+</table>
+<br/>
+</div>
+<span class="section" onclick="javascript:showContent(this, 'c_277')">
+<span class='ext'>[+]</span> TrayManager::createLongSelectMenu&#160;<span class='sym_p'><span>(&#160;enum TrayLocation <span class='color_p'>trayLoc</span></span>, <span>Ogre::String const&amp; <span class='color_p'>name</span></span>, <span>Ogre::UTFString const&amp; <span class='color_p'>caption</span></span>, <span>Ogre::Real <span class='color_p'>width</span></span>, <span>Ogre::Real <span class='color_p'>boxWidth</span></span>, <span>unsigned int <span class='color_p'>maxItemsShown</span></span>, <span>Ogre::StringVector const&amp; <span class='color_p'>items</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_277" style="display:none;">
+
+
+<span class='new_sign_lbl'>&#8675;</span>
+<br/>
+<span class='new_sign'>TrayManager::createLongSelectMenu&#160;<span class='sym_p'><span>(&#160;enum TrayLocation <span class='color_p'>trayLoc</span></span>, <span>Ogre::String const&amp; <span class='color_p'>name</span></span>, <span>std::__cxx11::basic_string&lt;char&gt;const&amp; <span class='color_p'>caption</span></span>, <span>Ogre::Real <span class='color_p'>width</span></span>, <span>Ogre::Real <span class='color_p'>boxWidth</span></span>, <span>unsigned int <span class='color_p'>maxItemsShown</span></span>, <span>Ogre::StringVector const&amp; <span class='color_p'>items</span></span>&#160;)</span></span><br/>
+<span class='mngl pleft'>_ZN9OgreBites11TrayManager20createLongSelectMenuENS_12TrayLocationERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEERKN4Ogre9UTFStringEffjRKSt6vectorIS7_SaIS7_EE</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>Parameters list has been changed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+</table>
+<br/>
+</div>
+<span class="section" onclick="javascript:showContent(this, 'c_278')">
+<span class='ext'>[+]</span> TrayManager::createLongSelectMenu&#160;<span class='sym_p'><span>(&#160;enum TrayLocation <span class='color_p'>trayLoc</span></span>, <span>Ogre::String const&amp; <span class='color_p'>name</span></span>, <span>Ogre::UTFString const&amp; <span class='color_p'>caption</span></span>, <span>Ogre::Real <span class='color_p'>boxWidth</span></span>, <span>unsigned int <span class='color_p'>maxItemsShown</span></span>, <span>Ogre::StringVector const&amp; <span class='color_p'>items</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_278" style="display:none;">
+
+
+<span class='new_sign_lbl'>&#8675;</span>
+<br/>
+<span class='new_sign'>TrayManager::createLongSelectMenu&#160;<span class='sym_p'><span>(&#160;enum TrayLocation <span class='color_p'>trayLoc</span></span>, <span>Ogre::String const&amp; <span class='color_p'>name</span></span>, <span>std::__cxx11::basic_string&lt;char&gt;const&amp; <span class='color_p'>caption</span></span>, <span>Ogre::Real <span class='color_p'>width</span></span>, <span>Ogre::Real <span class='color_p'>boxWidth</span></span>, <span>unsigned int <span class='color_p'>maxItemsShown</span></span>, <span>Ogre::StringVector const&amp; <span class='color_p'>items</span></span>&#160;)</span></span><br/>
+<span class='mngl pleft'>_ZN9OgreBites11TrayManager20createLongSelectMenuENS_12TrayLocationERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEERKN4Ogre9UTFStringEfjRKSt6vectorIS7_SaIS7_EE</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>Parameters list has been changed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+</table>
+<br/>
+</div>
+<span class="section" onclick="javascript:showContent(this, 'c_279')">
+<span class='ext'>[+]</span> TrayManager::createLongSlider&#160;<span class='sym_p'><span>(&#160;enum TrayLocation <span class='color_p'>trayLoc</span></span>, <span>Ogre::String const&amp; <span class='color_p'>name</span></span>, <span>Ogre::UTFString const&amp; <span class='color_p'>caption</span></span>, <span>Ogre::Real <span class='color_p'>width</span></span>, <span>Ogre::Real <span class='color_p'>trackWidth</span></span>, <span>Ogre::Real <span class='color_p'>valueBoxWidth</span></span>, <span>Ogre::Real <span class='color_p'>minValue</span></span>, <span>Ogre::Real <span class='color_p'>maxValue</span></span>, <span>unsigned int <span class='color_p'>snaps</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_279" style="display:none;">
+
+
+<span class='new_sign_lbl'>&#8675;</span>
+<br/>
+<span class='new_sign'>TrayManager::createLongSlider&#160;<span class='sym_p'><span>(&#160;enum TrayLocation <span class='color_p'>trayLoc</span></span>, <span>Ogre::String const&amp; <span class='color_p'>name</span></span>, <span>std::__cxx11::basic_string&lt;char&gt;const&amp; <span class='color_p'>caption</span></span>, <span>Ogre::Real <span class='color_p'>width</span></span>, <span>Ogre::Real <span class='color_p'>trackWidth</span></span>, <span>Ogre::Real <span class='color_p'>valueBoxWidth</span></span>, <span>Ogre::Real <span class='color_p'>minValue</span></span>, <span>Ogre::Real <span class='color_p'>maxValue</span></span>, <span>unsigned int <span class='color_p'>snaps</span></span>&#160;)</span></span><br/>
+<span class='mngl pleft'>_ZN9OgreBites11TrayManager16createLongSliderENS_12TrayLocationERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEERKN4Ogre9UTFStringEfffffj</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>Parameters list has been changed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+</table>
+<br/>
+</div>
+<span class="section" onclick="javascript:showContent(this, 'c_280')">
+<span class='ext'>[+]</span> TrayManager::createLongSlider&#160;<span class='sym_p'><span>(&#160;enum TrayLocation <span class='color_p'>trayLoc</span></span>, <span>Ogre::String const&amp; <span class='color_p'>name</span></span>, <span>Ogre::UTFString const&amp; <span class='color_p'>caption</span></span>, <span>Ogre::Real <span class='color_p'>trackWidth</span></span>, <span>Ogre::Real <span class='color_p'>valueBoxWidth</span></span>, <span>Ogre::Real <span class='color_p'>minValue</span></span>, <span>Ogre::Real <span class='color_p'>maxValue</span></span>, <span>unsigned int <span class='color_p'>snaps</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_280" style="display:none;">
+
+
+<span class='new_sign_lbl'>&#8675;</span>
+<br/>
+<span class='new_sign'>TrayManager::createLongSlider&#160;<span class='sym_p'><span>(&#160;enum TrayLocation <span class='color_p'>trayLoc</span></span>, <span>Ogre::String const&amp; <span class='color_p'>name</span></span>, <span>std::__cxx11::basic_string&lt;char&gt;const&amp; <span class='color_p'>caption</span></span>, <span>Ogre::Real <span class='color_p'>width</span></span>, <span>Ogre::Real <span class='color_p'>trackWidth</span></span>, <span>Ogre::Real <span class='color_p'>valueBoxWidth</span></span>, <span>Ogre::Real <span class='color_p'>minValue</span></span>, <span>Ogre::Real <span class='color_p'>maxValue</span></span>, <span>unsigned int <span class='color_p'>snaps</span></span>&#160;)</span></span><br/>
+<span class='mngl pleft'>_ZN9OgreBites11TrayManager16createLongSliderENS_12TrayLocationERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEERKN4Ogre9UTFStringEffffj</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>Parameters list has been changed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+</table>
+<br/>
+</div>
+<span class="section" onclick="javascript:showContent(this, 'c_281')">
+<span class='ext'>[+]</span> TrayManager::createProgressBar&#160;<span class='sym_p'><span>(&#160;enum TrayLocation <span class='color_p'>trayLoc</span></span>, <span>Ogre::String const&amp; <span class='color_p'>name</span></span>, <span>Ogre::UTFString const&amp; <span class='color_p'>caption</span></span>, <span>Ogre::Real <span class='color_p'>width</span></span>, <span>Ogre::Real <span class='color_p'>commentBoxWidth</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_281" style="display:none;">
+
+
+<span class='new_sign_lbl'>&#8675;</span>
+<br/>
+<span class='new_sign'>TrayManager::createProgressBar&#160;<span class='sym_p'><span>(&#160;enum TrayLocation <span class='color_p'>trayLoc</span></span>, <span>Ogre::String const&amp; <span class='color_p'>name</span></span>, <span>std::__cxx11::basic_string&lt;char&gt;const&amp; <span class='color_p'>caption</span></span>, <span>Ogre::Real <span class='color_p'>width</span></span>, <span>Ogre::Real <span class='color_p'>commentBoxWidth</span></span>&#160;)</span></span><br/>
+<span class='mngl pleft'>_ZN9OgreBites11TrayManager17createProgressBarENS_12TrayLocationERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEERKN4Ogre9UTFStringEff</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>Parameters list has been changed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+</table>
+<br/>
+</div>
+<span class="section" onclick="javascript:showContent(this, 'c_282')">
+<span class='ext'>[+]</span> TrayManager::createTextBox&#160;<span class='sym_p'><span>(&#160;enum TrayLocation <span class='color_p'>trayLoc</span></span>, <span>Ogre::String const&amp; <span class='color_p'>name</span></span>, <span>Ogre::UTFString const&amp; <span class='color_p'>caption</span></span>, <span>Ogre::Real <span class='color_p'>width</span></span>, <span>Ogre::Real <span class='color_p'>height</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_282" style="display:none;">
+
+
+<span class='new_sign_lbl'>&#8675;</span>
+<br/>
+<span class='new_sign'>TrayManager::createTextBox&#160;<span class='sym_p'><span>(&#160;enum TrayLocation <span class='color_p'>trayLoc</span></span>, <span>Ogre::String const&amp; <span class='color_p'>name</span></span>, <span>std::__cxx11::basic_string&lt;char&gt;const&amp; <span class='color_p'>caption</span></span>, <span>Ogre::Real <span class='color_p'>width</span></span>, <span>Ogre::Real <span class='color_p'>height</span></span>&#160;)</span></span><br/>
+<span class='mngl pleft'>_ZN9OgreBites11TrayManager13createTextBoxENS_12TrayLocationERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEERKN4Ogre9UTFStringEff</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>Parameters list has been changed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+</table>
+<br/>
+</div>
+<span class="section" onclick="javascript:showContent(this, 'c_283')">
+<span class='ext'>[+]</span> TrayManager::createThickSelectMenu&#160;<span class='sym_p'><span>(&#160;enum TrayLocation <span class='color_p'>trayLoc</span></span>, <span>Ogre::String const&amp; <span class='color_p'>name</span></span>, <span>Ogre::UTFString const&amp; <span class='color_p'>caption</span></span>, <span>Ogre::Real <span class='color_p'>width</span></span>, <span>unsigned int <span class='color_p'>maxItemsShown</span></span>, <span>Ogre::StringVector const&amp; <span class='color_p'>items</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_283" style="display:none;">
+
+
+<span class='new_sign_lbl'>&#8675;</span>
+<br/>
+<span class='new_sign'>TrayManager::createThickSelectMenu&#160;<span class='sym_p'><span>(&#160;enum TrayLocation <span class='color_p'>trayLoc</span></span>, <span>Ogre::String const&amp; <span class='color_p'>name</span></span>, <span>std::__cxx11::basic_string&lt;char&gt;const&amp; <span class='color_p'>caption</span></span>, <span>Ogre::Real <span class='color_p'>width</span></span>, <span>unsigned int <span class='color_p'>maxItemsShown</span></span>, <span>Ogre::StringVector const&amp; <span class='color_p'>items</span></span>&#160;)</span></span><br/>
+<span class='mngl pleft'>_ZN9OgreBites11TrayManager21createThickSelectMenuENS_12TrayLocationERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEERKN4Ogre9UTFStringEfjRKSt6vectorIS7_SaIS7_EE</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>Parameters list has been changed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+</table>
+<br/>
+</div>
+<span class="section" onclick="javascript:showContent(this, 'c_284')">
+<span class='ext'>[+]</span> TrayManager::createThickSlider&#160;<span class='sym_p'><span>(&#160;enum TrayLocation <span class='color_p'>trayLoc</span></span>, <span>Ogre::String const&amp; <span class='color_p'>name</span></span>, <span>Ogre::UTFString const&amp; <span class='color_p'>caption</span></span>, <span>Ogre::Real <span class='color_p'>width</span></span>, <span>Ogre::Real <span class='color_p'>valueBoxWidth</span></span>, <span>Ogre::Real <span class='color_p'>minValue</span></span>, <span>Ogre::Real <span class='color_p'>maxValue</span></span>, <span>unsigned int <span class='color_p'>snaps</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_284" style="display:none;">
+
+
+<span class='new_sign_lbl'>&#8675;</span>
+<br/>
+<span class='new_sign'>TrayManager::createThickSlider&#160;<span class='sym_p'><span>(&#160;enum TrayLocation <span class='color_p'>trayLoc</span></span>, <span>Ogre::String const&amp; <span class='color_p'>name</span></span>, <span>std::__cxx11::basic_string&lt;char&gt;const&amp; <span class='color_p'>caption</span></span>, <span>Ogre::Real <span class='color_p'>width</span></span>, <span>Ogre::Real <span class='color_p'>valueBoxWidth</span></span>, <span>Ogre::Real <span class='color_p'>minValue</span></span>, <span>Ogre::Real <span class='color_p'>maxValue</span></span>, <span>unsigned int <span class='color_p'>snaps</span></span>&#160;)</span></span><br/>
+<span class='mngl pleft'>_ZN9OgreBites11TrayManager17createThickSliderENS_12TrayLocationERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEERKN4Ogre9UTFStringEffffj</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>Parameters list has been changed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+</table>
+<br/>
+</div>
+<span class="section" onclick="javascript:showContent(this, 'c_285')">
+<span class='ext'>[+]</span> TrayManager::showOkDialog&#160;<span class='sym_p'><span>(&#160;Ogre::UTFString const&amp; <span class='color_p'>caption</span></span>, <span>Ogre::UTFString const&amp; <span class='color_p'>message</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_285" style="display:none;">
+
+
+<span class='new_sign_lbl'>&#8675;</span>
+<br/>
+<span class='new_sign'>TrayManager::showOkDialog&#160;<span class='sym_p'><span>(&#160;std::__cxx11::basic_string&lt;char&gt;const&amp; <span class='color_p'>caption</span></span>, <span>std::__cxx11::basic_string&lt;char&gt;const&amp; <span class='color_p'>message</span></span>&#160;)</span></span><br/>
+<span class='mngl pleft'>_ZN9OgreBites11TrayManager12showOkDialogERKN4Ogre9UTFStringES4_</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>Parameters list has been changed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+</table>
+<br/>
+</div>
+<span class="section" onclick="javascript:showContent(this, 'c_286')">
+<span class='ext'>[+]</span> TrayManager::showYesNoDialog&#160;<span class='sym_p'><span>(&#160;Ogre::UTFString const&amp; <span class='color_p'>caption</span></span>, <span>Ogre::UTFString const&amp; <span class='color_p'>question</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_286" style="display:none;">
+
+
+<span class='new_sign_lbl'>&#8675;</span>
+<br/>
+<span class='new_sign'>TrayManager::showYesNoDialog&#160;<span class='sym_p'><span>(&#160;std::__cxx11::basic_string&lt;char&gt;const&amp; <span class='color_p'>caption</span></span>, <span>std::__cxx11::basic_string&lt;char&gt;const&amp; <span class='color_p'>question</span></span>&#160;)</span></span><br/>
+<span class='mngl pleft'>_ZN9OgreBites11TrayManager15showYesNoDialogERKN4Ogre9UTFStringES4_</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>Parameters list has been changed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+</table>
+<br/>
+</div>
+<span class="section" onclick="javascript:showContent(this, 'c_287')">
+<span class='ext'>[+]</span> Widget::fitCaptionToArea&#160;<span class='sym_p'><span>(&#160;Ogre::UTFString const&amp; <span class='color_p'>caption</span></span>, <span>Ogre::TextAreaOverlayElement* <span class='color_p'>area</span></span>, <span>Ogre::Real <span class='color_p'>maxWidth</span></span>&#160;)</span> <span class='attr'>[static]</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_287" style="display:none;">
+
+
+<span class='new_sign_lbl'>&#8675;</span>
+<br/>
+<span class='new_sign'>Widget::fitCaptionToArea&#160;<span class='sym_p'><span>(&#160;std::__cxx11::basic_string&lt;char&gt;const&amp; <span class='color_p'>caption</span></span>, <span>Ogre::TextAreaOverlayElement* <span class='color_p'>area</span></span>, <span>Ogre::Real <span class='color_p'>maxWidth</span></span>&#160;)</span> <span class='attr'>[static]</span></span><br/>
+<span class='mngl pleft'>_ZN9OgreBites6Widget16fitCaptionToAreaERKN4Ogre9UTFStringEPNS1_22TextAreaOverlayElementEf</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>Parameters list has been changed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+</table>
+<br/>
+</div>
+<span class="section" onclick="javascript:showContent(this, 'c_288')">
+<span class='ext'>[+]</span> Widget::getCaptionWidth&#160;<span class='sym_p'><span>(&#160;Ogre::UTFString const&amp; <span class='color_p'>caption</span></span>, <span>Ogre::TextAreaOverlayElement* <span class='color_p'>area</span></span>&#160;)</span> <span class='attr'>[static]</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_288" style="display:none;">
+
+
+<span class='new_sign_lbl'>&#8675;</span>
+<br/>
+<span class='new_sign'>Widget::getCaptionWidth&#160;<span class='sym_p'><span>(&#160;std::__cxx11::basic_string&lt;char&gt;const&amp; <span class='color_p'>caption</span></span>, <span>Ogre::TextAreaOverlayElement* <span class='color_p'>area</span></span>&#160;)</span> <span class='attr'>[static]</span></span><br/>
+<span class='mngl pleft'>_ZN9OgreBites6Widget15getCaptionWidthERKN4Ogre9UTFStringEPNS1_22TextAreaOverlayElementE</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>Parameters list has been changed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+</table>
+<br/>
+</div>
+<br/>
+<a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='Low_Risk_Problems'></a><a name='Type_Problems_Low'></a>
+<h2>Problems with Data Types, Low Severity <span class='warning'>&nbsp;3&nbsp;</span></h2><hr/>
+<span class='h_name'>OgreCommon.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_289')">
+<span class='ext'>[+]</span> <span class='ttype'>typedef</span> String <span class='warning'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_289" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Base type has been changed from <b>_StringBase</b> to <b>std::string</b>.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_290')">
+[+] affected symbols: 20 (6%)</span>
+<div id="c_290" style="display:none;">
+<div class='affected'><span class='iname_a'>FileSystemLayer::FileSystemLayer&#160;<span class='sym_p'><span>(&#160;String const&amp; <span class='fp'>subdir</span></span>&#160;)</span></span><br/>
+<div class='affect'>1st parameter &#39;subdir&#39; (reference) has base type &#39;String&#39;.</div>
+<span class='iname_a'>OgreBites::DecorWidget::DecorWidget&#160;<span class='sym_p'><span>(&#160;String const&amp; <span class='fp'>name</span></span>, <span>String const&amp; <i>templateName</i></span>&#160;)</span></span><br/>
+<div class='affect'>1st parameter &#39;name&#39; (reference) has base type &#39;String&#39;.</div>
+<span class='iname_a'>OgreBites::ParamsPanel::ParamsPanel&#160;<span class='sym_p'><span>(&#160;String const&amp; <span class='fp'>name</span></span>, <span>Real <i>width</i></span>, <span>unsigned int <i>lines</i></span>&#160;)</span></span><br/>
+<div class='affect'>1st parameter &#39;name&#39; (reference) has base type &#39;String&#39;.</div>
+<span class='iname_a'>OgreBites::TrayManager::showCursor&#160;<span class='sym_p'><span>(&#160;String const&amp; <span class='fp'>materialName</span></span>&#160;)</span></span><br/>
+<div class='affect'>1st parameter &#39;materialName&#39; (reference) has base type &#39;String&#39;.</div>
+<span class='iname_a'>OgreBites::TrayManager::createButton&#160;<span class='sym_p'><span>(&#160;enum OgreBites::TrayLocation <i>trayLoc</i></span>, <span>String const&amp; <i>name</i></span>, <span>String const&amp; <span class='fp'>caption</span></span>, <span>Real <i>width</i></span>&#160;)</span></span><br/>
+<div class='affect'>3rd parameter &#39;caption&#39; (reference) has base type &#39;String&#39;.</div>
+<span class='iname_a'>OgreBites::TrayManager::showBackdrop&#160;<span class='sym_p'><span>(&#160;String const&amp; <span class='fp'>materialName</span></span>&#160;)</span></span><br/>
+<div class='affect'>1st parameter &#39;materialName&#39; (reference) has base type &#39;String&#39;.</div>
+<span class='iname_a'>OgreBites::TrayManager::createSeparator&#160;<span class='sym_p'><span>(&#160;enum OgreBites::TrayLocation <i>trayLoc</i></span>, <span>String const&amp; <span class='fp'>name</span></span>, <span>Real <i>width</i></span>&#160;)</span></span><br/>
+<div class='affect'>2nd parameter &#39;name&#39; (reference) has base type &#39;String&#39;.</div>
+<span class='iname_a'>OgreBites::TrayManager::createDecorWidget&#160;<span class='sym_p'><span>(&#160;enum OgreBites::TrayLocation <i>trayLoc</i></span>, <span>String const&amp; <span class='fp'>name</span></span>, <span>String const&amp; <i>templateName</i></span>&#160;)</span></span><br/>
+<div class='affect'>2nd parameter &#39;name&#39; (reference) has base type &#39;String&#39;.</div>
+<span class='iname_a'>OgreBites::TrayManager::createParamsPanel&#160;<span class='sym_p'><span>(&#160;enum OgreBites::TrayLocation <i>trayLoc</i></span>, <span>String const&amp; <span class='fp'>name</span></span>, <span>Real <i>width</i></span>, <span>unsigned int <i>lines</i></span>&#160;)</span></span><br/>
+<div class='affect'>2nd parameter &#39;name&#39; (reference) has base type &#39;String&#39;.</div>
+<span class='iname_a'>OgreBites::TrayManager::getWidget&#160;<span class='sym_p'><span>(&#160;enum OgreBites::TrayLocation <i>trayLoc</i></span>, <span>String const&amp; <span class='fp'>name</span></span>&#160;)</span></span><br/>
+<div class='affect'>2nd parameter &#39;name&#39; (reference) has base type &#39;String&#39;.</div>
+ <b>...</b>
+<br/>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<span class='h_name'>OgreOverlayElement.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_291')">
+<span class='ext'>[+]</span> <span class='ttype'>typedef</span> DisplayString <span class='warning'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_291" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Base type has been changed from <b>UTFString</b> to <b>String</b> of different format.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_292')">
+[+] affected symbols: 56 (16.9%)</span>
+<div id="c_292" style="display:none;">
+<div class='affected'><span class='iname_a'>OgreBites::TrayManager::hideCursor&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mDialog.mText&#39; in the object of this method is of type &#39;DisplayString&#39;.</div>
+<span class='iname_a'>OgreBites::TrayManager::mouseMoved&#160;<span class='sym_p'><span>(&#160;struct OgreBites::MouseMotionEvent const&amp; <i>evt</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mDialog.mText&#39; in the object of this method is of type &#39;DisplayString&#39;.</div>
+<span class='iname_a'>OgreBites::TrayManager::showCursor&#160;<span class='sym_p'><span>(&#160;String const&amp; <i>materialName</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mDialog.mText&#39; in the object of this method is of type &#39;DisplayString&#39;.</div>
+<span class='iname_a'>OgreBites::TrayManager::adjustTrays&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mDialog.mText&#39; in the object of this method is of type &#39;DisplayString&#39;.</div>
+<span class='iname_a'>OgreBites::TrayManager::closeDialog&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mDialog.mText&#39; in the object of this method is of type &#39;DisplayString&#39;.</div>
+<span class='iname_a'>OgreBites::TrayManager::createButton&#160;<span class='sym_p'><span>(&#160;enum OgreBites::TrayLocation <i>trayLoc</i></span>, <span>String const&amp; <i>name</i></span>, <span>String const&amp; <i>caption</i></span>, <span>Real <i>width</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mDialog.mText&#39; in the object of this method is of type &#39;DisplayString&#39;.</div>
+<span class='iname_a'>OgreBites::TrayManager::getCursorRay&#160;<span class='sym_p'><span>(&#160;Camera* <i>cam</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mDialog.mText&#39; in the object of this method is of type &#39;DisplayString&#39;.</div>
+<span class='iname_a'>OgreBites::TrayManager::mousePressed&#160;<span class='sym_p'><span>(&#160;struct OgreBites::MouseButtonEvent const&amp; <i>evt</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mDialog.mText&#39; in the object of this method is of type &#39;DisplayString&#39;.</div>
+<span class='iname_a'>OgreBites::TrayManager::showBackdrop&#160;<span class='sym_p'><span>(&#160;String const&amp; <i>materialName</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mDialog.mText&#39; in the object of this method is of type &#39;DisplayString&#39;.</div>
+<span class='iname_a'>OgreBites::TrayManager::windowUpdate&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mDialog.mText&#39; in the object of this method is of type &#39;DisplayString&#39;.</div>
+ <b>...</b>
+<br/>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<span class='h_name'>OgrePlatform.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_293')">
+<span class='ext'>[+]</span> <span class='ttype'>typedef</span> uint32 <span class='warning'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_293" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Base type has been changed from <span class='value'>unsigned int</span> to <b>uint32_t</b>.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_294')">
+[+] affected symbols: 35 (10.6%)</span>
+<div id="c_294" style="display:none;">
+<div class='affected'><span class='iname_a'>OgreBites::ApplicationContextSDL::createWindow&#160;<span class='sym_p'><span>(&#160;String const&amp; <i>name</i></span>, <span>uint32 <i>w</i></span>, <span>uint32 <span class='fp'>h</span></span>, <span>NameValuePairList <i>miscParams</i></span>&#160;)</span></span><br/>
+<div class='affect'>3rd parameter &#39;h&#39; is of type &#39;uint32&#39;.</div>
+<span class='iname_a'>OgreBites::AdvancedRenderControls::keyPressed&#160;<span class='sym_p'><span>(&#160;struct OgreBites::KeyboardEvent const&amp; <i>evt</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mRoot.mNextMovableObjectTypeFlag&#39; in the object of this method is of type &#39;uint32&#39;.</div>
+<span class='iname_a'>OgreBites::AdvancedRenderControls::frameRendered&#160;<span class='sym_p'><span>(&#160;struct FrameEvent const&amp; <i>evt</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mRoot.mNextMovableObjectTypeFlag&#39; in the object of this method is of type &#39;uint32&#39;.</div>
+<span class='iname_a'>OgreBites::AdvancedRenderControls::AdvancedRenderControls&#160;<span class='sym_p'><span>(&#160;OgreBites::TrayManager* <i>trayMgr</i></span>, <span>Camera* <i>cam</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mRoot.mNextMovableObjectTypeFlag&#39; in the object of this method is of type &#39;uint32&#39;.</div>
+<span class='iname_a'>OgreBites::AdvancedRenderControls::~AdvancedRenderControls&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mRoot.mNextMovableObjectTypeFlag&#39; in the object of this method is of type &#39;uint32&#39;.</div>
+<span class='iname_a'>OgreBites::ApplicationContextBase::createRoot&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mMaterialMgrListener.mShaderGenerator.ID_RT_SHADER_SYSTEM&#39; in the object of this method is of type &#39;uint32&#39;.</div>
+<span class='iname_a'>OgreBites::ApplicationContextBase::pollEvents&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mMaterialMgrListener.mShaderGenerator.ID_RT_SHADER_SYSTEM&#39; in the object of this method is of type &#39;uint32&#39;.</div>
+<span class='iname_a'>OgreBites::ApplicationContextBase::reconfigure&#160;<span class='sym_p'><span>(&#160;String const&amp; <i>renderer</i></span>, <span>NameValuePairList&amp; <i>options</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mMaterialMgrListener.mShaderGenerator.ID_RT_SHADER_SYSTEM&#39; in the object of this method is of type &#39;uint32&#39;.</div>
+<span class='iname_a'>OgreBites::ApplicationContextBase::createWindow&#160;<span class='sym_p'><span>(&#160;String const&amp; <i>name</i></span>, <span>uint32 <i>w</i></span>, <span>uint32 <span class='fp'>h</span></span>, <span>NameValuePairList <i>miscParams</i></span>&#160;)</span></span><br/>
+<div class='affect'>3rd parameter &#39;h&#39; is of type &#39;uint32&#39;.</div>
+<span class='iname_a'>OgreBites::ApplicationContextBase::destroyWindow&#160;<span class='sym_p'><span>(&#160;String const&amp; <i>name</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mMaterialMgrListener.mShaderGenerator.ID_RT_SHADER_SYSTEM&#39; in the object of this method is of type &#39;uint32&#39;.</div>
+ <b>...</b>
+<br/>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='Other_Changes'></a><a name='Other_Changes_In_Types'></a>
+<h2>Other Changes in Data Types <span class='passed'>&nbsp;9&nbsp;</span></h2><hr/>
+<span class='h_name'>OgreTechnique.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_295')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> Technique <span class='passed'>&nbsp;9&nbsp;</span></span>
+<br/>
+<div id="c_295" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>The relative position of field <b>mIsSupported</b> has been changed from <b>12</b> to <b>4</b>.</td>
+<td>No effect.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>The relative position of field <b>mLodIndex</b> has been changed from <b>4</b> to <b>5</b>.</td>
+<td>No effect.</td>
+</tr>
+<tr>
+<th>3</th>
+<td>The relative position of field <b>mName</b> has been changed from <b>6</b> to <b>7</b>.</td>
+<td>No effect.</td>
+</tr>
+<tr>
+<th>4</th>
+<td>The relative position of field <b>mSchemeIndex</b> has been changed from <b>5</b> to <b>6</b>.</td>
+<td>No effect.</td>
+</tr>
+<tr>
+<th>5</th>
+<td>The relative position of field <b>mShadowCasterMaterial</b> has been changed from <b>7</b> to <b>8</b>.</td>
+<td>No effect.</td>
+</tr>
+<tr>
+<th>6</th>
+<td>The relative position of field <b>mShadowCasterMaterialName</b> has been changed from <b>8</b> to <b>9</b>.</td>
+<td>No effect.</td>
+</tr>
+<tr>
+<th>7</th>
+<td>The relative position of field <b>mShadowReceiverMaterial</b> has been changed from <b>9</b> to <b>10</b>.</td>
+<td>No effect.</td>
+</tr>
+<tr>
+<th>8</th>
+<td>The relative position of field <b>mShadowReceiverMaterialName</b> has been changed from <b>10</b> to <b>11</b>.</td>
+<td>No effect.</td>
+</tr>
+<tr>
+<th>9</th>
+<td>The relative position of field <b>mUserObjectBindings</b> has been changed from <b>11</b> to <b>12</b>.</td>
+<td>No effect.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_296')">
+[+] affected symbols: 3 (0.9%)</span>
+<div id="c_296" style="display:none;">
+<div class='affected'><span class='iname_a'>OgreBites::SGTechniqueResolverListener::handleSchemeNotFound&#160;<span class='sym_p'><span>(&#160;unsigned short <i>schemeIndex</i></span>, <span>String const&amp; <i>schemeName</i></span>, <span>Material* <i>originalMaterial</i></span>, <span>unsigned short <i>lodIndex</i></span>, <span>Renderable const* <i>rend</i></span>&#160;)</span></span><br/>
+<div class='affect'>Return value (pointer) has base type &#39;Technique&#39;.</div>
+<span class='iname_a'>OgreBites::SGTechniqueResolverListener::afterIlluminationPassesCreated&#160;<span class='sym_p'><span>(&#160;Technique* <span class='fp'>tech</span></span>&#160;)</span></span><br/>
+<div class='affect'>1st parameter &#39;tech&#39; (pointer) has base type &#39;Technique&#39;.</div>
+<span class='iname_a'>OgreBites::SGTechniqueResolverListener::beforeIlluminationPassesCleared&#160;<span class='sym_p'><span>(&#160;Technique* <span class='fp'>tech</span></span>&#160;)</span></span><br/>
+<div class='affect'>1st parameter &#39;tech&#39; (pointer) has base type &#39;Technique&#39;.</div>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='Headers'></a><h2>Header Files <span class='gray'>&nbsp;54&nbsp;</span></h2><hr/>
+<div class='h_list'>
+OgreAdvancedRenderControls.h<br/>
+OgreAny.h<br/>
+OgreApplicationContext.h<br/>
+OgreApplicationContextBase.h<br/>
+OgreBitesConfigDialog.h<br/>
+OgreBlendMode.h<br/>
+OgreCameraMan.h<br/>
+OgreColourValue.h<br/>
+OgreCommon.h<br/>
+OgreConfigDialog.h<br/>
+OgreController.h<br/>
+OgreControllerManager.h<br/>
+OgreFileSystemLayer.h<br/>
+OgreFrameListener.h<br/>
+OgreInput.h<br/>
+OgreLight.h<br/>
+OgreLog.h<br/>
+OgreLogManager.h<br/>
+OgreMaterialManager.h<br/>
+OgreMath.h<br/>
+OgreMatrix4.h<br/>
+OgreMemoryAllocatorConfig.h<br/>
+OgreMovableObject.h<br/>
+OgreNode.h<br/>
+OgreOverlayElement.h<br/>
+OgrePass.h<br/>
+OgrePlatform.h<br/>
+OgrePlugin.h<br/>
+OgrePrerequisites.h<br/>
+OgreProfiler.h<br/>
+OgreRay.h<br/>
+OgreRenderSystemCapabilities.h<br/>
+OgreResourceGroupManager.h<br/>
+OgreRoot.h<br/>
+OgreSceneManager.h<br/>
+OgreSceneManagerEnumerator.h<br/>
+OgreSGTechniqueResolverListener.h<br/>
+OgreShaderGenerator.h<br/>
+OgreShaderPrerequisites.h<br/>
+OgreShaderProgramManager.h<br/>
+OgreShaderProgramWriter.h<br/>
+OgreSharedPtr.h<br/>
+OgreSingleton.h<br/>
+OgreStaticPluginLoader.h<br/>
+OgreStringVector.h<br/>
+OgreTechnique.h<br/>
+OgreTextAreaOverlayElement.h<br/>
+OgreTextureUnitState.h<br/>
+OgreTimer.h<br/>
+OgreTrays.h<br/>
+OgreUserObjectBindings.h<br/>
+OgreUTFString.h<br/>
+OgreVector.h<br/>
+OgreWindowEventUtilities.h<br/>
+</div>
+<br/><a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='Sources'></a><h2>Source Files <span class='gray'>&nbsp;9&nbsp;</span></h2><hr/>
+<div class='h_list'>
+OgreAdvancedRenderControls.cpp<br/>
+OgreApplicationContextBase.cpp<br/>
+OgreApplicationContextSDL.cpp<br/>
+OgreBitesConfigDialog.cpp<br/>
+OgreCameraMan.cpp<br/>
+OgreSGTechniqueResolverListener.cpp<br/>
+OgreStaticPluginLoader.cpp<br/>
+OgreTrays.cpp<br/>
+OgreWindowEventUtilities.cpp<br/>
+</div>
+<br/><a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='Libs'></a><h2>Objects <span class='gray'>&nbsp;1&nbsp;</span></h2><hr/>
+<div class='lib_list'>
+libOgreBites.so.1.12.13<br/>
+</div>
+<br/><a class='top_ref' href='#Top'>to the top</a><br/>
+</div>
+<br/><br/><br/>
+<hr/>
+<div class='footer' align='right'><i>Generated by <a href='https://github.com/lvc/abi-compliance-checker'>ABI Compliance Checker</a> 2.3 &#160;</i>
+</div>
+<br/>
+
+</body></html>

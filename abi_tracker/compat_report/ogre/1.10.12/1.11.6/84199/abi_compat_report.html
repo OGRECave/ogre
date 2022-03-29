@@ -1,0 +1,468 @@
+<!-- verdict:incompatible;affected:7.7;added:0;removed:1;type_problems_high:0;type_problems_medium:0;type_problems_low:5;interface_problems_high:0;interface_problems_medium:0;interface_problems_low:0;changed_constants:0;tool_version:2.3 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta name="keywords" content="libOgreProperty, binary compatibility, API, report" />
+<meta name="description" content="Binary compatibility report for the libOgreProperty object between 1.10.12 and 1.11.6 versions on x86_64" />
+<title>libOgreProperty: 1.10.12 to 1.11.6 binary compatibility report</title>
+<style type="text/css">
+body {
+    font-family:Arial, sans-serif;
+    background-color:White;
+    color:Black;
+}
+hr {
+    color:Black;
+    background-color:Black;
+    height:1px;
+    border:0;
+}
+h1 {
+    margin-bottom:0px;
+    padding-bottom:0px;
+    font-size:1.625em;
+}
+h2 {
+    margin-bottom:0px;
+    padding-bottom:0px;
+    font-size:1.25em;
+    white-space:nowrap;
+}
+span.section {
+    font-weight:bold;
+    cursor:pointer;
+    color:#003E69;
+    white-space:nowrap;
+    margin-left:0.3125em;
+}
+span.new_sign {
+    font-weight:bold;
+    margin-left:1.65em;
+    color:#003E69;
+}
+span.new_sign_lbl {
+    margin-left:3em;
+    font-size:1em;
+    color:Black;
+}
+span:hover.section {
+    color:#336699;
+}
+span.sect_aff {
+    cursor:pointer;
+    padding-left:1.55em;
+    font-size:0.875em;
+    color:#cc3300;
+}
+span.sect_info {
+    cursor:pointer;
+    padding-left:1.55em;
+    font-size:0.875em;
+    color:Black;
+}
+span.ext {
+    font-weight:normal;
+}
+span.h_name {
+    color:#cc3300;
+    font-size:0.875em;
+    font-weight:bold;
+}
+div.h_list, div.lib_list {
+    font-size:0.94em;
+    padding-left:0.4em;
+}
+span.ns {
+    color:#408080;
+    font-size:0.94em;
+}
+span.lib_name {
+    color:Green;
+    font-size:0.875em;
+    font-weight:bold;
+}
+span.iname {
+    font-weight:bold;
+    color:#003E69;
+    margin-left:0.3125em;
+}
+span.iname_b {
+    font-weight:bold;
+}
+span.iname_a {
+    color:#333333;
+    font-weight:bold;
+    font-size:0.94em;
+}
+span.sym_p {
+    font-weight:normal;
+    white-space:normal;
+}
+span.sym_pd {
+    white-space:normal;
+}
+span.sym_p span, span.sym_pd span {
+    white-space:nowrap;
+}
+div.affect {
+    padding-left:1em;
+    padding-bottom:10px;
+    font-size:0.87em;
+    font-style:italic;
+    line-height:0.9em;
+}
+div.affected {
+    padding-left:1.9em;
+    padding-top:10px;
+}
+table.ptable {
+    border-collapse:collapse;
+    border:1px outset black;
+    margin-left:0.95em;
+    margin-top:3px;
+    margin-bottom:3px;
+    width:56.25em;
+}
+table.ptable td {
+    border:1px solid gray;
+    padding:3px;
+    font-size:0.875em;
+    text-align:left;
+    vertical-align:top;
+    max-width:28em;
+    word-wrap:break-word;
+}
+table.ptable th.pn {
+    width:2%;
+}
+table.ptable th.chg {
+    width:47%;
+}
+table.vtable {
+    border-collapse:collapse;
+    border:1px outset black;
+    margin-left:1.9em;
+    margin-top:0.7em;
+}
+table.vtable td {
+    border:1px solid gray;
+    padding:3px;
+    font-size:0.875em;
+    vertical-align:top;
+    max-width:450px;
+    word-wrap:break-word;
+}
+table.ptable th, table.vtable th {
+    background-color:#eeeeee;
+    font-weight:bold;
+    color:#333333;
+    font-family:Verdana, Arial;
+    font-size:0.875em;
+    border:1px solid gray;
+    text-align:center;
+    vertical-align:top;
+    white-space:nowrap;
+    padding:3px;
+}
+table.summary {
+    border-collapse:collapse;
+    border:1px outset black;
+}
+table.summary th {
+    background-color:#eeeeee;
+    font-weight:normal;
+    text-align:left;
+    font-size:0.94em;
+    white-space:nowrap;
+    border:1px inset gray;
+    padding:3px;
+}
+table.summary td {
+    text-align:right;
+    white-space:nowrap;
+    border:1px inset gray;
+    padding:3px 5px 3px 10px;
+}
+span.mngl {
+    padding-left:1em;
+    font-size:0.875em;
+    cursor:text;
+    color:#444444;
+    font-weight:bold;
+}
+span.pleft {
+    padding-left:2.5em;
+}
+span.sym_ver {
+    color:#333333;
+    white-space:nowrap;
+    font-family:"DejaVu Sans Mono", Monospace;
+}
+span.attr {
+    color:#333333;
+    font-weight:normal;
+}
+span.color_p {
+    font-style:italic;
+    color:Brown;
+}
+span.p {
+    font-style:italic;
+}
+span.fp {
+    font-style:italic;
+    background-color:#DCDCDC;
+}
+span.ttype {
+    font-weight:normal;
+}
+span.nowrap {
+    white-space:nowrap;
+}
+span.value {
+    font-weight:bold;
+}
+.passed {
+    background-color:#CCFFCC;
+    font-weight:normal;
+}
+.warning {
+    background-color:#F4F4AF;
+    font-weight:normal;
+}
+.failed {
+    background-color:#FFCCCC;
+    font-weight:normal;
+}
+.new {
+    background-color:#C6DEFF;
+    font-weight:normal;
+}
+.compatible {
+    background-color:#CCFFCC;
+    font-weight:normal;
+}
+.almost_compatible {
+    background-color:#FFDAA3;
+    font-weight:normal;
+}
+.incompatible {
+    background-color:#FFCCCC;
+    font-weight:normal;
+}
+.gray {
+    background-color:#DCDCDC;
+    font-weight:normal;
+}
+.top_ref {
+    font-size:0.69em;
+}
+.footer {
+    font-size:0.75em;
+}
+</style>
+<script type="text/javascript" language="JavaScript">
+<!--
+function showContent(header, id)
+{
+    e = document.getElementById(id);
+    if(e.style.display == 'none')
+    {
+        e.style.display = 'block';
+        e.style.visibility = 'visible';
+        header.innerHTML = header.innerHTML.replace(/\[[^0-9 ]\]/gi,"[&minus;]");
+    }
+    else
+    {
+        e.style.display = 'none';
+        e.style.visibility = 'hidden';
+        header.innerHTML = header.innerHTML.replace(/\[[^0-9 ]\]/gi,"[+]");
+    }
+}
+-->
+</script>
+</head>
+
+<body>
+<div><a name='Top'></a>
+<h1>Binary compatibility report for the <span style='color:Blue;'>libOgreProperty.so</span> object between <span style='color:Red;'>1.10.12</span> and <span style='color:Red;'>1.11.6</span> versions on <span style='color:Blue;'>x86_64</span></h1>
+
+<h2>Test Info</h2><hr/>
+<table class='summary'>
+<tr><th>Module Name</th><td>libOgreProperty</td></tr>
+<tr><th>Version #1</th><td>1.10.12</td></tr>
+<tr><th>Version #2</th><td>1.11.6</td></tr>
+<tr><th>Arch</th><td>x86_64</td></tr>
+<tr><th>GCC Version</th><td>9.4.0</td></tr>
+</table>
+<h2>Test Results</h2><hr/>
+<table class='summary'><tr><th>Total Header Files</th><td><a href='#Headers' style='color:Blue;'>14</a></td></tr>
+<tr><th>Total Source Files</th><td><a href='#Sources' style='color:Blue;'>1</a></td></tr>
+<tr><th>Total Objects</th><td><a href='#Libs' style='color:Blue;'>1</a></td></tr>
+<tr><th>Total Symbols / Types</th><td>13 / 13</td></tr>
+<tr><th>Compatibility</th>
+<td class='warning'>92.3%</td>
+</tr>
+</table>
+<h2>Problem Summary</h2><hr/>
+<table class='summary'><tr><th></th><th style='text-align:center;'>Severity</th><th style='text-align:center;'>Count</th></tr><tr><th>Added Symbols</th><td>-</td><td>0</td></tr>
+<tr><th>Removed Symbols</th><td>High</td><td class='failed'><a href='#Removed' style='color:Blue;'>1</a></td></tr>
+<tr><th rowspan='3'>Problems with<br/>Data Types</th><td>High</td><td>0</td></tr>
+<tr><td>Medium</td><td>0</td></tr>
+<tr><td>Low</td><td class='warning'><a href='#Type_Problems_Low' style='color:Blue;'>5</a></td></tr>
+<tr><th rowspan='3'>Problems with<br/>Symbols</th><td>High</td><td>0</td></tr>
+<tr><td>Medium</td><td>0</td></tr>
+<tr><td>Low</td><td>0</td></tr>
+<tr><th>Problems with<br/>Constants</th><td>Low</td><td>0</td></tr>
+</table>
+
+<a name='Removed'></a><a name='Withdrawn'></a><h2>Removed Symbols <span class='failed'>&nbsp;1&nbsp;</span></h2><hr/>
+<span class='h_name'>OgreProperty.h</span>, <span class='lib_name'>libOgreProperty.so.1.10.12</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_1')">
+PropertySet::getPropertyIterator&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_1" style="display:none;">
+<span class='mngl'>_ZN4Ogre11PropertySet19getPropertyIteratorB5cxx11Ev</span>
+<br/>
+<br/>
+</div>
+
+<br/>
+<a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='Low_Risk_Problems'></a><a name='Type_Problems_Low'></a>
+<h2>Problems with Data Types, Low Severity <span class='warning'>&nbsp;5&nbsp;</span></h2><hr/>
+<span class='h_name'>OgreProperty.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_2')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> PropertyBase <span class='warning'>&nbsp;2&nbsp;</span></span>
+<br/>
+<div id="c_2" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Base class <b>AllocatedObject&lt;0&gt;</b> has been added.</td>
+<td>Possible incorrect access of applications to the memory occupied by the base classes.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>Base class <span class='value'>AllocatedObject&lt;CategorisedAllocPolicy&lt;0&gt; &gt;</span> has been removed.</td>
+<td>Possible incorrect access of applications to the memory occupied by the base classes.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_3')">
+[+] affected symbols: 1 (7.7%)</span>
+<div id="c_3" style="display:none;">
+<div class='affected'><span class='iname_a'>PropertyBase::getValue&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;PropertyBase&#39; class.</div>
+</div>
+</div>
+<br/><br/></div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_4')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> PropertySet <span class='warning'>&nbsp;2&nbsp;</span></span>
+<br/>
+<div id="c_4" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Base class <b>AllocatedObject&lt;0&gt;</b> has been added.</td>
+<td>Possible incorrect access of applications to the memory occupied by the base classes.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>Base class <span class='value'>AllocatedObject&lt;CategorisedAllocPolicy&lt;0&gt; &gt;</span> has been removed.</td>
+<td>Possible incorrect access of applications to the memory occupied by the base classes.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_5')">
+[+] affected symbols: 9 (69.2%)</span>
+<div id="c_5" style="display:none;">
+<div class='affected'><span class='iname_a'>PropertySet::addProperty&#160;<span class='sym_p'><span>(&#160;PropertyBase* <i>prop</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;PropertySet&#39; class.</div>
+<span class='iname_a'>PropertySet::setValueMap&#160;<span class='sym_p'><span>(&#160;map&lt;std::__cxx11::basic_string&lt;char&gt;, PropertyValue, std::less&lt;std::__cxx11::basic_string&lt;char&gt; &gt; &gt;::type const&amp; <i>values</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;PropertySet&#39; class.</div>
+<span class='iname_a'>PropertySet::removeProperty&#160;<span class='sym_p'><span>(&#160;String const&amp; <i>name</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;PropertySet&#39; class.</div>
+<span class='iname_a'>PropertySet::getPropertyIterator&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;PropertySet&#39; class.</div>
+<span class='iname_a'>PropertySet::PropertySet&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This constructor is from &#39;PropertySet&#39; class.</div>
+<span class='iname_a'>PropertySet::~PropertySet&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This destructor is from &#39;PropertySet&#39; class.</div>
+<span class='iname_a'>PropertySet::getProperty&#160;<span class='sym_p'><span>(&#160;String const&amp; <i>name</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;PropertySet&#39; class.</div>
+<span class='iname_a'>PropertySet::getValueMap&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;PropertySet&#39; class.</div>
+<span class='iname_a'>PropertySet::hasProperty&#160;<span class='sym_p'><span>(&#160;String const&amp; <i>name</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;PropertySet&#39; class.</div>
+</div>
+</div>
+<br/><br/></div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_6')">
+<span class='ext'>[+]</span> <span class='ttype'>typedef</span> PropertyValueMap <span class='warning'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_6" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Base type has been changed from <span class='value'>map&lt;std::__cxx11::basic_string&lt;char&gt;, PropertyValue, std::less&lt;std::__cxx11::basic_string&lt;char&gt; &gt; &gt;::type</span> to <span class='value'>std::map&lt;std::__cxx11::basic_string&lt;char&gt;, PropertyValue&gt;</span>.</td>
+<td>Replacement of the base data type may indicate a change in its semantic meaning.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_7')">
+[+] affected symbols: 1 (7.7%)</span>
+<div id="c_7" style="display:none;">
+<div class='affected'><span class='iname_a'>PropertySet::setValueMap&#160;<span class='sym_p'><span>(&#160;map&lt;std::__cxx11::basic_string&lt;char&gt;, PropertyValue, std::less&lt;std::__cxx11::basic_string&lt;char&gt; &gt; &gt;::type const&amp; <span class='fp'>values</span></span>&#160;)</span></span><br/>
+<div class='affect'>1st parameter &#39;values&#39; (reference) has base type &#39;PropertyValueMap&#39;.</div>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='Headers'></a><h2>Header Files <span class='gray'>&nbsp;14&nbsp;</span></h2><hr/>
+<div class='h_list'>
+OgreAny.h<br/>
+OgreColourValue.h<br/>
+OgreIteratorWrapper.h<br/>
+OgreMatrix3.h<br/>
+OgreMatrix4.h<br/>
+OgreMemoryAllocatedObject.h<br/>
+OgreMemoryAllocatorConfig.h<br/>
+OgreMemoryStdAlloc.h<br/>
+OgrePrerequisites.h<br/>
+OgreProperty.h<br/>
+OgreQuaternion.h<br/>
+OgreVector2.h<br/>
+OgreVector3.h<br/>
+OgreVector4.h<br/>
+</div>
+<br/><a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='Sources'></a><h2>Source Files <span class='gray'>&nbsp;1&nbsp;</span></h2><hr/>
+<div class='h_list'>
+OgreProperty.cpp<br/>
+</div>
+<br/><a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='Libs'></a><h2>Objects <span class='gray'>&nbsp;1&nbsp;</span></h2><hr/>
+<div class='lib_list'>
+libOgreProperty.so.1.10.12<br/>
+</div>
+<br/><a class='top_ref' href='#Top'>to the top</a><br/>
+</div>
+<br/><br/><br/>
+<hr/>
+<div class='footer' align='right'><i>Generated by <a href='https://github.com/lvc/abi-compliance-checker'>ABI Compliance Checker</a> 2.3 &#160;</i>
+</div>
+<br/>
+
+</body></html>
