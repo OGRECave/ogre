@@ -71,6 +71,7 @@ namespace Ogre {
             void doSet(void* target, const String& val);
         };
 
+        typedef std::vector<D3D11_SIGNATURE_PARAMETER_DESC> D3d11ShaderParameters;
     protected:
 
         static CmdTarget msCmdTarget;
@@ -117,7 +118,6 @@ namespace Ogre {
         typedef std::map<String, unsigned int>::const_iterator SlotIterator;
         SlotMap mSlotMap;
 
-        typedef std::vector<D3D11_SIGNATURE_PARAMETER_DESC> D3d11ShaderParameters;
         typedef D3d11ShaderParameters::iterator D3d11ShaderParametersIter; 
 
 
@@ -219,13 +219,9 @@ namespace Ogre {
         void reinterpretGSForStreamOut(void);
         bool mReinterpretingGS;
         
-        unsigned int getNumInputs(void)const;
-        unsigned int getNumOutputs(void)const;
-
         uint32 getNameForMicrocodeCache();
 
-        const D3D11_SIGNATURE_PARAMETER_DESC & getInputParamDesc(unsigned int index) const;
-        const D3D11_SIGNATURE_PARAMETER_DESC & getOutputParamDesc(unsigned int index) const;    
+        const D3d11ShaderParameters& getInputParams() const { return mD3d11ShaderInputParameters; }
     };
 }
 

@@ -1454,17 +1454,6 @@ namespace Ogre {
         mReinterpretingGS = false;
     }
 
-    const D3D11_SIGNATURE_PARAMETER_DESC & D3D11HLSLProgram::getInputParamDesc(unsigned int index) const
-    {
-        assert(index<mD3d11ShaderInputParameters.size());
-        return mD3d11ShaderInputParameters[index];
-    }
-    const D3D11_SIGNATURE_PARAMETER_DESC & D3D11HLSLProgram::getOutputParamDesc(unsigned int index) const
-    {
-        assert(index<mD3d11ShaderOutputParameters.size());
-        return mD3d11ShaderOutputParameters[index];
-    }
-
     static unsigned int getComponentCount(BYTE mask)
     {
         unsigned int compCount = 0;
@@ -1487,40 +1476,33 @@ namespace Ogre {
             HRESULT hr;
             if (mReinterpretingGS)
             {
-                D3D11_SO_DECLARATION_ENTRY* soDeclarations = new D3D11_SO_DECLARATION_ENTRY[mD3d11ShaderOutputParameters.size()];
+                std::vector<D3D11_SO_DECLARATION_ENTRY> soDeclarations;
                 int totalComp = 0;
-                for(unsigned int i = 0; i < getNumOutputs(); ++i)
+                for(D3D11_SIGNATURE_PARAMETER_DESC pDesc : mD3d11ShaderOutputParameters)
                 {
-                    D3D11_SIGNATURE_PARAMETER_DESC pDesc = getOutputParamDesc(i);
+                    D3D11_SO_DECLARATION_ENTRY soDecl = {};
 
-                    soDeclarations[i].Stream = 0;
-                    soDeclarations[i].SemanticName = pDesc.SemanticName;
-                    soDeclarations[i].SemanticIndex= pDesc.SemanticIndex;
+                    soDecl.SemanticName = pDesc.SemanticName;
+                    soDecl.SemanticIndex= pDesc.SemanticIndex;
+                    soDecl.ComponentCount = getComponentCount(pDesc.Mask);
 
-                    int compCount = getComponentCount(pDesc.Mask);
-                    soDeclarations[i].StartComponent = 0;
-                    soDeclarations[i].ComponentCount = compCount;
-                    soDeclarations[i].OutputSlot = 0;
+                    soDeclarations.push_back(soDecl);
 
-                    totalComp += compCount;
+                    totalComp += soDecl.ComponentCount;
                 }
 
                 // Create the shader
-                UINT bufferStrides[1];
-                bufferStrides[0] = totalComp*sizeof(float);
+                UINT bufferStrides[1] = {totalComp * UINT(sizeof(float))};
                 hr = mDevice->CreateGeometryShaderWithStreamOutput( 
                     &mMicroCode[0], 
                     mMicroCode.size(),
-                    soDeclarations,
-                    mD3d11ShaderOutputParameters.size(),
+                    soDeclarations.data(),
+                    soDeclarations.size(),
                     bufferStrides,
                     1,
                     D3D11_SO_NO_RASTERIZED_STREAM,
                     mDevice.GetClassLinkage(),
                     mGeometryShader.ReleaseAndGetAddressOf());
-
-                delete [] soDeclarations;
-
             }
             else
             {
@@ -1720,16 +1702,6 @@ namespace Ogre {
     { 
         assert(mMicroCode.size() > 0);
         return mMicroCode; 
-    }
-    //-----------------------------------------------------------------------------
-    unsigned int D3D11HLSLProgram::getNumInputs( void ) const
-    {
-        return mD3d11ShaderInputParameters.size();
-    }
-    //-----------------------------------------------------------------------------
-    unsigned int D3D11HLSLProgram::getNumOutputs( void ) const
-    {
-        return mD3d11ShaderOutputParameters.size();
     }
     //-----------------------------------------------------------------------------
     uint32 D3D11HLSLProgram::getNameForMicrocodeCache()
