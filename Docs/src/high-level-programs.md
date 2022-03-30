@@ -265,8 +265,8 @@ refer to the following table for the location indices and names to use:
 | Ogre::VES_POSITION | vertex | 0 | gl_Vertex |
 | Ogre::VES_BLEND_WEIGHTS | blendWeights | 1 | n/a |
 | Ogre::VES_NORMAL | normal | 2 | gl_Normal |
-| Ogre::VES_DIFFUSE | colour | 3 | gl_Color |
-| Ogre::VES_SPECULAR | secondary_colour | 4 | gl_SecondaryColor |
+| Ogre::VES_COLOUR | colour | 3 | gl_Color |
+| Ogre::VES_COLOUR2 | secondary_colour | 4 | gl_SecondaryColor |
 | Ogre::VES_BLEND_INDICES | blendIndices | 7 | n/a |
 | Ogre::VES_TEXTURE_COORDINATES | uv0 - uv7 | 8-15 | gl_MultiTexCoord0 - gl_MultiTexCoord7 |
 | Ogre::VES_TANGENT | tangent | 14 | n/a |

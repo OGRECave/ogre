@@ -417,10 +417,9 @@ namespace Ogre {
         void modifyElement(unsigned short elem_index, unsigned short source, size_t offset, VertexElementType theType,
             VertexElementSemantic semantic, unsigned short index = 0);
 
-        /** Finds a VertexElement with the given semantic, and index if there is more than
-            one element with the same semantic.
-        @remarks
-            If the element is not found, this method returns null.
+        /** Finds a VertexElement with the given semantic and index
+
+            @return The VertexElement or null, if the element is not found
         */
         const VertexElement* findElementBySemantic(VertexElementSemantic sem, unsigned short index = 0) const;
         /** Based on the current elements, gets the size of the vertex for a given buffer source.
