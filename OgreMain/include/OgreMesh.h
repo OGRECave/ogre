@@ -37,6 +37,7 @@ THE SOFTWARE.
 #include "OgreAnimationTrack.h"
 #include "OgreHeaderPrefix.h"
 #include "OgreSharedPtr.h"
+#include "OgreUserObjectBindings.h"
 
 
 namespace Ogre {
@@ -129,6 +130,8 @@ namespace Ogre {
         DataStreamPtr mFreshFromDisk;
 
         SubMeshNameMap mSubMeshNameMap ;
+
+        UserObjectBindings mUserObjectBindings;
 
         /// Local bounding box volume.
         AxisAlignedBox mAABB;
@@ -938,6 +941,11 @@ namespace Ogre {
         /** Set the lod strategy used by this mesh. */
         void setLodStrategy(LodStrategy *lodStrategy);
 #endif
+
+        /// @copydoc UserObjectBindings
+        UserObjectBindings& getUserObjectBindings() { return mUserObjectBindings; }
+        /// @overload
+        const UserObjectBindings& getUserObjectBindings() const { return mUserObjectBindings; }
     };
 
     /** A way of recording the way each LODs is recorded this Mesh. */

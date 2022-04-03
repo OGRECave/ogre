@@ -409,57 +409,7 @@ namespace Ogre {
             const String& group, bool isManual, ManualResourceLoader* loader, 
             const NameValuePairList* createParams);
     
-        /** Enum identifying the types of manual mesh built by this manager */
-        enum MeshBuildType
-        {
-            MBT_PLANE,
-            MBT_CURVED_ILLUSION_PLANE,
-            MBT_CURVED_PLANE
-        };
-        /** Saved parameters used to (re)build a manual mesh built by this class */
-        struct MeshBuildParams
-        {
-            MeshBuildType type;
-            Plane plane;
-            Real width;
-            Real height;
-            Real curvature;
-            int xsegments;
-            int ysegments;
-            bool normals;
-            unsigned short numTexCoordSets;
-            Real xTile;
-            Real yTile;
-            Vector3 upVector;
-            Quaternion orientation;
-            HardwareBuffer::Usage vertexBufferUsage;
-            HardwareBuffer::Usage indexBufferUsage;
-            bool vertexShadowBuffer;
-            bool indexShadowBuffer;
-            int ySegmentsToKeep;
-        };
-
-        struct PrefabLoader : public ManualResourceLoader
-        {
-            /** Map from resource pointer to parameter set */
-            typedef std::map<Resource*, MeshBuildParams> MeshBuildParamsMap;
-            MeshBuildParamsMap mMeshBuildParams;
-
-            /** Utility method for tessellating 2D meshes.
-            */
-            static void tesselate2DMesh(SubMesh* pSub, unsigned short meshWidth, unsigned short meshHeight,
-                bool doubleSided = false,
-                HardwareBuffer::Usage indexBufferUsage = HardwareBuffer::HBU_STATIC_WRITE_ONLY,
-                bool indexSysMem = false);
-            /** Utility method for manual loading a plane */
-            static void loadManualPlane(Mesh* pMesh, MeshBuildParams& params);
-            /** Utility method for manual loading a curved plane */
-            static void loadManualCurvedPlane(Mesh* pMesh, MeshBuildParams& params);
-            /** Utility method for manual loading a curved illusion plane */
-            static void loadManualCurvedIllusionPlane(Mesh* pMesh, MeshBuildParams& params);
-
-            void loadResource(Resource* res);
-        } mPrefabLoader;
+        std::unique_ptr<ManualResourceLoader> mPrefabLoader;
 
         // element type for blend weights in vertex buffer (VET_UBYTE4, VET_USHORT1, or VET_FLOAT1)
         VertexElementType mBlendWeightsBaseElementType;
