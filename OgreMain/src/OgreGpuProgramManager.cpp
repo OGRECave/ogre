@@ -102,22 +102,8 @@ namespace {
                         "You must supply 'language' or 'syntax' and 'type' parameters");
         }
 
-        auto ret = getFactory(langIt->second)->create(this, name, handle, group, isManual, loader);
-
-        if (typeIt->second == "vertex_program")
-        {
-            ret->setType(GPT_VERTEX_PROGRAM);
-        }
-        else if (typeIt->second == "geometry_program")
-        {
-            ret->setType(GPT_GEOMETRY_PROGRAM);
-        }
-        else
-        {
-            ret->setType(GPT_FRAGMENT_PROGRAM);
-        }
-
-        return ret;
+        // "syntax" and "type" will be applied by ResourceManager::createResource
+        return getFactory(langIt->second)->create(this, name, handle, group, isManual, loader);
     }
 
     //-----------------------------------------------------------------------
