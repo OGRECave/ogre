@@ -1539,16 +1539,10 @@ namespace Ogre {
          */
         static HashFunc* getBuiltinHashFunction(BuiltinHashFunction builtin);
 
-        /** Return an instance of user objects binding associated with this class.
-            You can use it to associate one or more custom objects with this class instance.
-            @see UserObjectBindings::setUserAny.
-        */
+        /// @copydoc UserObjectBindings
         UserObjectBindings&     getUserObjectBindings() { return mUserObjectBindings; }
 
-        /** Return an instance of user objects binding associated with this class.
-            You can use it to associate one or more custom objects with this class instance.
-            @see UserObjectBindings::setUserAny.
-        */
+        /// @overload
         const UserObjectBindings& getUserObjectBindings() const { return mUserObjectBindings; }
      private:
         std::unique_ptr<GpuProgramUsage>& getProgramUsage(GpuProgramType programType);
