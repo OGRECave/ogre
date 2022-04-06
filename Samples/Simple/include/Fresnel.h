@@ -213,7 +213,7 @@ protected:
         mFishSplines.clear();
 
         MeshManager::getSingleton().remove("water", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
-        MaterialManager::getSingleton().unload("Examples/FresnelReflectionRefraction");
+        MaterialManager::getSingleton().unload("Examples/FresnelReflectionRefraction", RGN_DEFAULT);
     }
 
     const unsigned int NUM_FISH;
