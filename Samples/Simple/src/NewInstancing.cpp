@@ -105,10 +105,10 @@ void Sample_NewInstancing::setupContent()
 {
 #ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
     // Make this viewport work with shader generator scheme.
-    mViewport->setMaterialScheme(RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+    mViewport->setMaterialScheme(MSN_SHADERGEN);
     RTShader::ShaderGenerator& rtShaderGen = RTShader::ShaderGenerator::getSingleton();
-    RTShader::RenderState* schemRenderState = rtShaderGen.getRenderState(RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
-    RTShader::SubRenderState* subRenderState = rtShaderGen.createSubRenderState<RTShader::IntegratedPSSM3>();
+    RTShader::RenderState* schemRenderState = rtShaderGen.getRenderState(MSN_SHADERGEN);
+    RTShader::SubRenderState* subRenderState = rtShaderGen.createSubRenderState("SGX_IntegratedPSSM3");
     schemRenderState->addTemplateSubRenderState(subRenderState);
 
     //Add the hardware skinning to the shader generator default render state
@@ -119,8 +119,7 @@ void Sample_NewInstancing::setupContent()
     RTShader::HardwareSkinningFactory::getSingleton().setMaxCalculableBoneCount(80);
 
     // re-generate shaders to include new SRSs
-    rtShaderGen.invalidateScheme(RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
-    rtShaderGen.validateScheme(RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+    rtShaderGen.invalidateScheme(MSN_SHADERGEN);
 
     // update scheme for FFP supporting rendersystems
     MaterialManager::getSingleton().setActiveScheme(mViewport->getMaterialScheme());

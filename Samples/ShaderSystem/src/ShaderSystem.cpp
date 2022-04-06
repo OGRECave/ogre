@@ -319,8 +319,7 @@ void Sample_ShaderSystem::setupContent()
     childNode->attachObject(mLayeredBlendingEntity);
 
     // Grab the render state of the material.
-    auto renderState = mShaderGenerator->getRenderState(RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME,
-                                                        "RTSS/LayeredBlending", RGN_INTERNAL, 0);
+    auto renderState = mShaderGenerator->getRenderState(MSN_SHADERGEN, "RTSS/LayeredBlending", RGN_INTERNAL, 0);
 
     if (renderState)
     {           
@@ -355,7 +354,7 @@ void Sample_ShaderSystem::setupContent()
             || Root::getSingletonPtr()->getRenderSystem()->getNativeShadingLanguageVersion() >= 300)
     {
         RTShader::RenderState* pMainRenderState =
-            RTShader::ShaderGenerator::getSingleton().createOrRetrieveRenderState(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME).first;
+            RTShader::ShaderGenerator::getSingleton().createOrRetrieveRenderState(MSN_SHADERGEN).first;
         pMainRenderState->addTemplateSubRenderState(
             mShaderGenerator->createSubRenderState<RTShader::TextureAtlasSampler>());
 
@@ -370,7 +369,7 @@ void Sample_ShaderSystem::setupContent()
     createPointLight();
     createSpotLight();
 
-    RenderState* schemRenderState = mShaderGenerator->getRenderState(RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+    RenderState* schemRenderState = mShaderGenerator->getRenderState(MSN_SHADERGEN);
 
     // Take responsibility for updating the light count manually.
     schemRenderState->setLightCountAutoUpdate(false);
@@ -382,7 +381,7 @@ void Sample_ShaderSystem::setupContent()
     mCameraNode->lookAt(Vector3(0.0, 150.0, 0.0), Node::TS_PARENT);
 
     // Make this viewport work with shader generator scheme.
-    mViewport->setMaterialScheme(RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+    mViewport->setMaterialScheme(MSN_SHADERGEN);
     
     // a friendly reminder
     StringVector names;
@@ -551,7 +550,7 @@ void Sample_ShaderSystem::setPerPixelFogEnable( bool enable )
         mPerPixelFogEnable = enable;
 
         // Grab the scheme render state.
-        RenderState* schemRenderState = mShaderGenerator->getRenderState(RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+        RenderState* schemRenderState = mShaderGenerator->getRenderState(MSN_SHADERGEN);
         const SubRenderStateList& subRenderStateList = schemRenderState->getSubRenderStates();
         SubRenderStateListConstIterator it = subRenderStateList.begin();
         SubRenderStateListConstIterator itEnd = subRenderStateList.end();
@@ -581,7 +580,7 @@ void Sample_ShaderSystem::setPerPixelFogEnable( bool enable )
         fogSubRenderState->setParameter("calc_mode", mPerPixelFogEnable ? "per_pixel" : "per_vertex");
 
         // Invalidate the scheme in order to re-generate all shaders based technique related to this scheme.
-        mShaderGenerator->invalidateScheme(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+        mShaderGenerator->invalidateScheme(Ogre::MSN_SHADERGEN);
     }
 #endif
 
@@ -592,7 +591,7 @@ void Sample_ShaderSystem::setAtlasBorderMode( bool enable )
 #ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
     TextureAtlasSamplerFactory::getSingleton().setDefaultAtlasingAttributes(
         TextureAtlasSamplerFactory::ipmRelative, 1, enable);
-    mShaderGenerator->invalidateScheme(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+    mShaderGenerator->invalidateScheme(Ogre::MSN_SHADERGEN);
 #endif
 }
 
@@ -619,11 +618,8 @@ void Sample_ShaderSystem::generateShaders(Entity* entity)
         bool success;
 
         // Create the shader based technique of this material.
-        success = mShaderGenerator->createShaderBasedTechnique(*curMaterial,
-                            MaterialManager::DEFAULT_SCHEME_NAME,
-                            RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+        success = mShaderGenerator->createShaderBasedTechnique(*curMaterial, MSN_DEFAULT, MSN_SHADERGEN);
 
-        
         // Setup custom shader sub render states according to current setup.
         if (success)
         {                   
@@ -644,7 +640,7 @@ void Sample_ShaderSystem::generateShaders(Entity* entity)
             // Grab the first pass render state. 
             // NOTE: For more complicated samples iterate over the passes and build each one of them as desired.
             RTShader::RenderState* renderState = mShaderGenerator->getRenderState(
-                RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME, *curMaterial);
+                MSN_SHADERGEN, *curMaterial);
 
             // Remove all sub render states.
             renderState->reset();
@@ -729,7 +725,7 @@ void Sample_ShaderSystem::generateShaders(Entity* entity)
             }
                                 
             // Invalidate this material in order to re-generate its shaders.
-            mShaderGenerator->invalidateMaterial(RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME,
+            mShaderGenerator->invalidateMaterial(MSN_SHADERGEN,
                                                  *curMaterial);
         }
     }
@@ -930,7 +926,7 @@ void Sample_ShaderSystem::updateLightState(const String& lightName, bool visible
             mSceneMgr->getLight(lightName)->setVisible(visible);
         }   
 
-        RenderState* schemRenderState = mShaderGenerator->getRenderState(RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+        RenderState* schemRenderState = mShaderGenerator->getRenderState(MSN_SHADERGEN);
         
         Vector3i lightCount(0, 0, 0);
 
@@ -957,7 +953,7 @@ void Sample_ShaderSystem::updateLightState(const String& lightName, bool visible
         
 
         // Invalidate the scheme in order to re-generate all shaders based technique related to this scheme.
-        mShaderGenerator->invalidateScheme(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+        mShaderGenerator->invalidateScheme(Ogre::MSN_SHADERGEN);
     }
 }
 
@@ -965,7 +961,7 @@ void Sample_ShaderSystem::updateLightState(const String& lightName, bool visible
 void Sample_ShaderSystem::applyShadowType(int menuIndex)
 {
     // Grab the scheme render state.                                                
-    Ogre::RTShader::RenderState* schemRenderState = mShaderGenerator->getRenderState(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+    Ogre::RTShader::RenderState* schemRenderState = mShaderGenerator->getRenderState(Ogre::MSN_SHADERGEN);
 
 
     // No shadow
@@ -1046,7 +1042,7 @@ void Sample_ShaderSystem::applyShadowType(int menuIndex)
 #endif
 
     // Invalidate the scheme in order to re-generate all shaders based technique related to this scheme.
-    mShaderGenerator->invalidateScheme(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+    mShaderGenerator->invalidateScheme(Ogre::MSN_SHADERGEN);
 }
 
 //-----------------------------------------------------------------------
@@ -1056,15 +1052,13 @@ void Sample_ShaderSystem::exportRTShaderSystemMaterial(const String& fileName, c
     MaterialPtr materialPtr = MaterialManager::getSingleton().getByName(materialName);
 
     // Create shader based technique.
-    bool success = mShaderGenerator->createShaderBasedTechnique(*materialPtr,
-        MaterialManager::DEFAULT_SCHEME_NAME,
-        RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+    bool success = mShaderGenerator->createShaderBasedTechnique(*materialPtr, MSN_DEFAULT, MSN_SHADERGEN);
 
     // Case creation of shader based technique succeeded.
     if (success)
     {
         // Force shader generation of the given material.
-        RTShader::ShaderGenerator::getSingleton().validateMaterial(RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME, *materialPtr);
+        RTShader::ShaderGenerator::getSingleton().validateMaterial(MSN_SHADERGEN, *materialPtr);
 
         // Grab the RTSS material serializer listener.
         MaterialSerializer::Listener* matRTSSListener = RTShader::ShaderGenerator::getSingleton().getMaterialSerializerListener();
@@ -1195,7 +1189,7 @@ void Sample_ShaderSystem::updateTargetObjInfo()
     
     mTargetObjMatName->setCaption(targetObjMaterialName);
 
-    if (mViewport->getMaterialScheme() == RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME)
+    if (mViewport->getMaterialScheme() == MSN_SHADERGEN)
     {       
         MaterialPtr matMainEnt        = MaterialManager::getSingleton().getByName(targetObjMaterialName);
 
@@ -1207,7 +1201,7 @@ void Sample_ShaderSystem::updateTargetObjInfo()
             {
                 Technique* curTech = matMainEnt->getTechnique(i);
 
-                if (curTech->getSchemeName() == RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME)
+                if (curTech->getSchemeName() == MSN_SHADERGEN)
                 {
                     shaderGeneratedTech = curTech;
                     break;
@@ -1250,7 +1244,7 @@ void Sample_ShaderSystem::changeTextureLayerBlendMode()
 
     
     mLayerBlendSubRS->setBlendMode(1, nextBlendMode);
-    mShaderGenerator->invalidateMaterial(RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME,
+    mShaderGenerator->invalidateMaterial(MSN_SHADERGEN,
                                          "RTSS/LayeredBlending", RGN_INTERNAL);
 
     // Update the caption.
@@ -1425,13 +1419,13 @@ void Sample_ShaderSystem::destroyInstancedViewports()
 {
     if (mInstancedViewportsSubRenderState)
     {
-        Ogre::RTShader::RenderState* renderState = mShaderGenerator->getRenderState(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+        Ogre::RTShader::RenderState* renderState = mShaderGenerator->getRenderState(Ogre::MSN_SHADERGEN);
         renderState->removeSubRenderState(mInstancedViewportsSubRenderState);
         mInstancedViewportsSubRenderState = NULL;
     }
 
-    mShaderGenerator->invalidateScheme(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
-    mShaderGenerator->validateScheme(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+    mShaderGenerator->invalidateScheme(Ogre::MSN_SHADERGEN);
+    mShaderGenerator->validateScheme(Ogre::MSN_SHADERGEN);
 
     destroyInstancedViewportsFactory();
 
@@ -1462,12 +1456,12 @@ void Sample_ShaderSystem::createInstancedViewports()
     Ogre::RTShader::ShaderExInstancedViewports* shaderExInstancedViewports 
         = static_cast<Ogre::RTShader::ShaderExInstancedViewports*>(mInstancedViewportsSubRenderState);
     shaderExInstancedViewports->setMonitorsCount(monitorCount);
-    Ogre::RTShader::RenderState* renderState = mShaderGenerator->getRenderState(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+    Ogre::RTShader::RenderState* renderState = mShaderGenerator->getRenderState(Ogre::MSN_SHADERGEN);
     renderState->addTemplateSubRenderState(mInstancedViewportsSubRenderState);
 
     // Invalidate the scheme in order to re-generate all shaders based technique related to this scheme.
-    mShaderGenerator->invalidateScheme(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
-    mShaderGenerator->validateScheme(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+    mShaderGenerator->invalidateScheme(Ogre::MSN_SHADERGEN);
+    mShaderGenerator->validateScheme(Ogre::MSN_SHADERGEN);
 }
 
 void Sample_ShaderSystem::createMaterialForTexture( const String & texName, bool isTextureAtlasTexture )

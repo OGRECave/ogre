@@ -440,7 +440,7 @@ public:
     */
     const String& getRTShaderScheme(size_t index) const;
 
-    /// Default material scheme of the shader generator.
+    /// same as @ref MSN_SHADERGEN
     static String DEFAULT_SCHEME_NAME;
 
 private:

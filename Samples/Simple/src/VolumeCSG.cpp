@@ -40,7 +40,7 @@ using namespace Ogre::Volume;
 void Sample_VolumeCSG::setupContent(void)
 {
     setupControls();
-    setupShaderGenerator();
+    mViewport->setMaterialScheme(MSN_SHADERGEN);
     Real size = (Real)31.0;
     Vector3 to(size);
             
@@ -125,23 +125,6 @@ void Sample_VolumeCSG::setupControls(void)
 }
     
 //-----------------------------------------------------------------------
-
-void Sample_VolumeCSG::setupShaderGenerator()
-{
-    RTShader::ShaderGenerator* mGen = RTShader::ShaderGenerator::getSingletonPtr();
-        
-    RTShader::RenderState* pMainRenderState = 
-        mGen->createOrRetrieveRenderState(RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME).first;
-    pMainRenderState->reset();
-            
-    mGen->invalidateScheme(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
-
-    // Make this viewport work with shader generator scheme.
-    mViewport->setMaterialScheme(RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
-}
-    
-//-----------------------------------------------------------------------
-
 void Sample_VolumeCSG::cleanupContent(void)
 {   
     OGRE_DELETE mVolumeRoot;
@@ -190,15 +173,4 @@ bool Sample_VolumeCSG::frameRenderingQueued(const Ogre::FrameEvent& evt)
     );
     mCameraNode->lookAt(center, Node::TS_PARENT);
     return SdkSample::frameRenderingQueued(evt);
-}
-
-//-----------------------------------------------------------------------
-
-void Sample_VolumeCSG::_shutdown()
-{
-    RTShader::RenderState* pMainRenderState = 
-        RTShader::ShaderGenerator::getSingleton().createOrRetrieveRenderState(RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME).first;
-    pMainRenderState->reset();
-        
-    SdkSample::_shutdown();
 }

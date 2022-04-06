@@ -72,7 +72,7 @@ public:
         delete SegmentedDynamicLightManager::getSingletonPtr();
 
         RTShader::RenderState* pMainRenderState = 
-            RTShader::ShaderGenerator::getSingleton().createOrRetrieveRenderState(RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME).first;
+            RTShader::ShaderGenerator::getSingleton().createOrRetrieveRenderState(MSN_SHADERGEN).first;
         pMainRenderState->reset();
         
         if (mSRSSegLightFactory)
@@ -160,7 +160,7 @@ protected:
         RTShader::ShaderGenerator* mGen = RTShader::ShaderGenerator::getSingletonPtr();
 
         RTShader::RenderState* pMainRenderState = 
-            mGen->createOrRetrieveRenderState(RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME).first;
+            mGen->createOrRetrieveRenderState(MSN_SHADERGEN).first;
         pMainRenderState->reset();
 
         // If we are using segmented lighting, no auto light update required. (prevent constant invalidation)
@@ -171,10 +171,10 @@ protected:
         pMainRenderState->addTemplateSubRenderState(
             mGen->createSubRenderState<RTShaderSRSSegmentedLights>());
 
-        mGen->invalidateScheme(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+        mGen->invalidateScheme(Ogre::MSN_SHADERGEN);
 
         // Make this viewport work with shader generator scheme.
-        mViewport->setMaterialScheme(RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+        mViewport->setMaterialScheme(MSN_SHADERGEN);
     }
 
 
@@ -272,7 +272,7 @@ protected:
         bool needInvalidate = SegmentedDynamicLightManager::getSingleton().setDebugMode(state);
         if (needInvalidate)
         {
-            RTShader::ShaderGenerator::getSingleton().invalidateScheme(RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+            RTShader::ShaderGenerator::getSingleton().invalidateScheme(MSN_SHADERGEN);
         }
     }
 

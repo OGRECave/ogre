@@ -35,7 +35,7 @@ public:
     virtual void _shutdown()
     {
         RTShader::RenderState* pMainRenderState = 
-            RTShader::ShaderGenerator::getSingleton().createOrRetrieveRenderState(RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME).first;
+            RTShader::ShaderGenerator::getSingleton().createOrRetrieveRenderState(MSN_SHADERGEN).first;
         pMainRenderState->reset();
         
         if (mSRSTextureFogFactory)
@@ -110,7 +110,7 @@ protected:
         RTShader::ShaderGenerator* mGen = RTShader::ShaderGenerator::getSingletonPtr();
 
         RTShader::RenderState* pMainRenderState = 
-            mGen->createOrRetrieveRenderState(RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME).first;
+            mGen->createOrRetrieveRenderState(MSN_SHADERGEN).first;
         pMainRenderState->reset();
 
         mSRSTextureFogFactory = new RTShaderSRSTexturedFogFactory;
@@ -121,10 +121,10 @@ protected:
 
         
         
-        mGen->invalidateScheme(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+        mGen->invalidateScheme(Ogre::MSN_SHADERGEN);
 
         // Make this viewport work with shader generator scheme.
-        mViewport->setMaterialScheme(RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+        mViewport->setMaterialScheme(MSN_SHADERGEN);
     }
 
 
@@ -151,7 +151,7 @@ protected:
             }
             mSRSTextureFogFactory->setBackgroundTextureName(textureName);
             RTShader::ShaderGenerator* gen = RTShader::ShaderGenerator::getSingletonPtr();
-            gen->invalidateScheme(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+            gen->invalidateScheme(Ogre::MSN_SHADERGEN);
         }
     }
         

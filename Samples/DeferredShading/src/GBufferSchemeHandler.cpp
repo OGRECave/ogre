@@ -27,7 +27,7 @@ Technique* GBufferSchemeHandler::handleSchemeNotFound(unsigned short schemeIndex
 {
     Ogre::MaterialManager& matMgr = Ogre::MaterialManager::getSingleton();
     String curSchemeName = matMgr.getActiveScheme();
-    matMgr.setActiveScheme(MaterialManager::DEFAULT_SCHEME_NAME);
+    matMgr.setActiveScheme(MSN_DEFAULT);
     Technique* originalTechnique = originalMaterial->getBestTechnique(lodIndex, rend);
     matMgr.setActiveScheme(curSchemeName);
 

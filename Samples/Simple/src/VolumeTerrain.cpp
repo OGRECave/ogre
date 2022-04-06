@@ -63,11 +63,8 @@ void Sample_VolumeTerrain::setupContent(void)
     mVolumeRoot->load(mVolumeRootNode, mSceneMgr, "volumeTerrain.cfg", true);
     LogManager::getSingleton().stream() << "Loaded volume terrain in " << t.getMillisecondsCPU() << " ms";
 
-#if defined(INCLUDE_RTSHADER_SYSTEM)
     // Make this viewport work with shader generator scheme.
-    mShaderGenerator->invalidateScheme(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
-    mViewport->setMaterialScheme(RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
-#endif
+    mViewport->setMaterialScheme(MSN_SHADERGEN);
 
     // Camera
     mCameraNode->setPosition((Real)3264, (Real)2700, (Real)3264);

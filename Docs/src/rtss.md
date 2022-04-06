@@ -247,11 +247,10 @@ rtshader_system
 becomes
 ```cpp
 using namespace Ogre::RTShader;
-auto& dstScheme = ShaderGenerator::DEFAULT_SCHEME_NAME;
 ShaderGenerator* shaderGen = ShaderGenerator::getSingletonPtr();
 
-shaderGen->createShaderBasedTechnique(mat->getTechnique(0), dstScheme);
-RenderState* rs = shaderGen->getRenderState(dstScheme, *mat, 0);
+shaderGen->createShaderBasedTechnique(mat->getTechnique(0), MSN_SHADERGEN);
+RenderState* rs = shaderGen->getRenderState(MSN_SHADERGEN, *mat, 0);
 SubRenderState* srs = shaderGen->createSubRenderState("NormalMap");
 rs->addTemplateSubRenderState(srs);
 
@@ -419,10 +418,10 @@ To use the generated technique set the change material scheme of your viewport(s
 
 ```cpp
 // Create shader based technique from the default technique of the given material.
-mShaderGenerator->createShaderBasedTechnique("Examples/BeachStones", Ogre::MaterialManager::DEFAULT_SCHEME_NAME, Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+mShaderGenerator->createShaderBasedTechnique("Examples/BeachStones", Ogre::MSN_DEFAULT, Ogre::MSN_SHADERGEN);
 
 // Apply the shader generated based techniques.
-mViewport->setMaterialScheme(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+mViewport->setMaterialScheme(Ogre::MSN_SHADERGEN);
 ```
 
 @note you can automate the shader generation process for all materials. First set the viewport scheme to the destination scheme of the RTSS shaders. Second register to the `Ogre::MaterialManager::Listener` implementing `handleSchemeNotFound()` - e.g. OgreBites::SGTechniqueResolverListener
