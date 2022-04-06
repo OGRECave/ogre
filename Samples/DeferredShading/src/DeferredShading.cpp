@@ -142,7 +142,7 @@ void DeferredShadingSystem::setActive(bool active)
 
         RTShader::ShaderGenerator& rtShaderGen = RTShader::ShaderGenerator::getSingleton();
         // we do lights ourselves if active
-        rtShaderGen.getRenderState(RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME)->setLightCountAutoUpdate(!mActive);
+        rtShaderGen.getRenderState(MSN_SHADERGEN)->setLightCountAutoUpdate(!mActive);
 
         // mCurrentMode could have changed with a prior call to setMode, so iterate all
         setMode(mCurrentMode);

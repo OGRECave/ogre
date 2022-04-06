@@ -976,7 +976,6 @@ MaterialPtr AssimpLoader::createMaterial(const aiMaterial* mat, const Ogre::Stri
     }
 
 #ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
-    auto& dstScheme = RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME;
     auto shaderGen = RTShader::ShaderGenerator::getSingletonPtr();
 
     if(!shaderGen)
@@ -989,8 +988,8 @@ MaterialPtr AssimpLoader::createMaterial(const aiMaterial* mat, const Ogre::Stri
             LogManager::getSingleton().logMessage("Found normal map: " + String(path.data));
         }
 
-        shaderGen->createShaderBasedTechnique(omat->getTechnique(0), dstScheme);
-        auto rs = shaderGen->getRenderState(dstScheme, *omat, 0);
+        shaderGen->createShaderBasedTechnique(omat->getTechnique(0), MSN_SHADERGEN);
+        auto rs = shaderGen->getRenderState(MSN_SHADERGEN, *omat, 0);
         auto srs = shaderGen->createSubRenderState("NormalMap");
 
         StringUtil::splitFilename(String(path.data), basename, outPath);
@@ -1005,8 +1004,8 @@ MaterialPtr AssimpLoader::createMaterial(const aiMaterial* mat, const Ogre::Stri
             LogManager::getSingleton().logMessage("Found metal roughness map: " + String(path.data));
         }
 
-        shaderGen->createShaderBasedTechnique(omat->getTechnique(0), dstScheme);
-        auto rs = shaderGen->getRenderState(dstScheme, *omat, 0);
+        shaderGen->createShaderBasedTechnique(omat->getTechnique(0), MSN_SHADERGEN);
+        auto rs = shaderGen->getRenderState(MSN_SHADERGEN, *omat, 0);
         auto srs = shaderGen->createSubRenderState("CookTorranceLighting");
 
         StringUtil::splitFilename(String(path.data), basename, outPath);

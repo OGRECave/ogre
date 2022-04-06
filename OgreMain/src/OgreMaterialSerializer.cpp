@@ -233,8 +233,7 @@ namespace Ogre
             }
 
             // Scheme name
-            if (mDefaults ||
-                pTech->getSchemeName() != MaterialManager::DEFAULT_SCHEME_NAME)
+            if (mDefaults || pTech->getSchemeName() != MSN_DEFAULT)
             {
                 writeAttribute(2, "scheme");
                 writeValue(quoteWord(pTech->getSchemeName()));

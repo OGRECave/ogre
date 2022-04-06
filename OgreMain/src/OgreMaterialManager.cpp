@@ -30,6 +30,8 @@ THE SOFTWARE.
 
 
 namespace Ogre {
+    const String MSN_DEFAULT = "Default";
+    const String MSN_SHADERGEN = "ShaderGeneratorDefaultScheme";
 
     //-----------------------------------------------------------------------
     template<> MaterialManager* Singleton<MaterialManager>::msSingleton = 0;
@@ -41,7 +43,7 @@ namespace Ogre {
     {
         assert( msSingleton );  return ( *msSingleton );
     }
-    String MaterialManager::DEFAULT_SCHEME_NAME = "Default";
+    String MaterialManager::DEFAULT_SCHEME_NAME = MSN_DEFAULT;
     //-----------------------------------------------------------------------
     MaterialManager::MaterialManager()
     {
@@ -57,7 +59,7 @@ namespace Ogre {
 
         // Default scheme
         mActiveSchemeIndex = 0;
-        mActiveSchemeName = DEFAULT_SCHEME_NAME;
+        mActiveSchemeName = MSN_DEFAULT;
         mSchemes[mActiveSchemeName] = 0;
 
     }
@@ -179,7 +181,7 @@ namespace Ogre {
             if (i->second == index)
                 return i->first;
         }
-        return DEFAULT_SCHEME_NAME;
+        return MSN_DEFAULT;
     }
     //-----------------------------------------------------------------------
     void MaterialManager::setActiveScheme(const String& schemeName)

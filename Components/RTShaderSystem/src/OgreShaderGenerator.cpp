@@ -109,7 +109,7 @@ protected:
     ShaderGenerator* mOwner;
 };
 
-String ShaderGenerator::DEFAULT_SCHEME_NAME     = "ShaderGeneratorDefaultScheme";
+String ShaderGenerator::DEFAULT_SCHEME_NAME     = MSN_SHADERGEN;
 String ShaderGenerator::SGTechnique::UserKey    = "SGTechnique";
 
 //-----------------------------------------------------------------------
@@ -211,7 +211,7 @@ bool ShaderGenerator::_initialize()
     ID_RT_SHADER_SYSTEM = ScriptCompilerManager::getSingleton().registerCustomWordId("rtshader_system");
 
     // Create the default scheme.
-    createScheme(DEFAULT_SCHEME_NAME);
+    createScheme(MSN_SHADERGEN);
 	
 	mResourceGroupListener.reset(new SGResourceGroupListener(this));
 	ResourceGroupManager::getSingleton().addResourceGroupListener(mResourceGroupListener.get());
@@ -646,7 +646,7 @@ void ShaderGenerator::removeSceneManager(SceneManager* sceneMgr)
             mActiveSceneMgr = NULL;
 
             // force refresh global scene manager material
-            invalidateMaterial(DEFAULT_SCHEME_NAME, "Ogre/TextureShadowReceiver", RGN_INTERNAL);
+            invalidateMaterial(MSN_SHADERGEN, "Ogre/TextureShadowReceiver", RGN_INTERNAL);
         }
     }
 }

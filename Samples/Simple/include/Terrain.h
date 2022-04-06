@@ -568,7 +568,7 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
         matProfile->setReceiveDynamicShadowsEnabled(enabled);
         matProfile->setReceiveDynamicShadowsLowLod(SHADOWS_IN_LOW_LOD_MATERIAL);
 
-        RTShader::RenderState* schemRenderState = mShaderGenerator->getRenderState(RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+        RTShader::RenderState* schemRenderState = mShaderGenerator->getRenderState(MSN_SHADERGEN);
 
         for (auto srs : schemRenderState->getSubRenderStates())
         {
@@ -639,7 +639,7 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
             mSceneMgr->setShadowTechnique(SHADOWTYPE_NONE);
         }
 
-        mShaderGenerator->invalidateScheme(RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+        mShaderGenerator->invalidateScheme(MSN_SHADERGEN);
     }
 
     /*-----------------------------------------------------------------------------
@@ -649,7 +649,7 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
     {
         SdkSample::setupView();
         // Make this viewport work with shader generator scheme.
-        mViewport->setMaterialScheme(RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+        mViewport->setMaterialScheme(MSN_SHADERGEN);
 
         //! [camera_setup]
         mCameraNode->setPosition(mTerrainPos + Vector3(1683, 50, 2116));

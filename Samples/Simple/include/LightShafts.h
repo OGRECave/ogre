@@ -102,10 +102,10 @@ public:
     {
 #ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
         // Make this viewport work with shader generator scheme.
-        mViewport->setMaterialScheme(RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+        mViewport->setMaterialScheme(MSN_SHADERGEN);
         RTShader::ShaderGenerator& rtShaderGen = RTShader::ShaderGenerator::getSingleton();
-        RTShader::RenderState* schemRenderState = rtShaderGen.getRenderState(RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
-        RTShader::SubRenderState* subRenderState = rtShaderGen.createSubRenderState<RTShader::IntegratedPSSM3>();
+        RTShader::RenderState* schemRenderState = rtShaderGen.getRenderState(MSN_SHADERGEN);
+        RTShader::SubRenderState* subRenderState = rtShaderGen.createSubRenderState("SGX_IntegratedPSSM3");
         schemRenderState->addTemplateSubRenderState(subRenderState);
 #endif
         mSceneMgr->setShadowTechnique(SHADOWTYPE_TEXTURE_MODULATIVE_INTEGRATED);
