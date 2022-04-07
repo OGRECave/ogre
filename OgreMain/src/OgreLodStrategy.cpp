@@ -85,34 +85,18 @@ namespace Ogre {
         return true;
     }
     //---------------------------------------------------------------------
-    struct LodUsageSortLess :
-    public std::binary_function<const MeshLodUsage&, const MeshLodUsage&, bool>
-    {
-        bool operator() (const MeshLodUsage& mesh1, const MeshLodUsage& mesh2)
-        {
-            // Sort ascending
-            return mesh1.value < mesh2.value;
-        }
-    };
     void LodStrategy::sortAscending(Mesh::MeshLodUsageList& meshLodUsageList)
     {
         // Perform standard sort
-        std::sort(meshLodUsageList.begin(), meshLodUsageList.end(), LodUsageSortLess());
+        std::sort(meshLodUsageList.begin(), meshLodUsageList.end(),
+                  [](const MeshLodUsage& mesh1, const MeshLodUsage& mesh2) { return mesh1.value < mesh2.value; });
     }
     //---------------------------------------------------------------------
-    struct LodUsageSortGreater :
-    public std::binary_function<const MeshLodUsage&, const MeshLodUsage&, bool>
-    {
-        bool operator() (const MeshLodUsage& mesh1, const MeshLodUsage& mesh2)
-        {
-            // Sort descending
-            return mesh1.value > mesh2.value;
-        }
-    };
     void LodStrategy::sortDescending(Mesh::MeshLodUsageList& meshLodUsageList)
     {
         // Perform standard sort
-        std::sort(meshLodUsageList.begin(), meshLodUsageList.end(), LodUsageSortGreater());
+        std::sort(meshLodUsageList.begin(), meshLodUsageList.end(),
+                  [](const MeshLodUsage& mesh1, const MeshLodUsage& mesh2) { return mesh1.value > mesh2.value; });
     }
     //---------------------------------------------------------------------
     ushort LodStrategy::getIndexAscending(Real value, const Mesh::MeshLodUsageList& meshLodUsageList)
