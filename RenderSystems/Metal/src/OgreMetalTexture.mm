@@ -40,11 +40,6 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-    static uint32 getMaxMipmapCount(uint32 w, uint32 h, uint32 d) {
-        // see ARB_texture_non_power_of_two
-        return Bitwise::mostSignificantBitSet(std::max(w, std::max(h, d)));
-    }
-
     MetalTexture::MetalTexture( ResourceManager* creator, const String& name, ResourceHandle handle,
                                 const String& group, bool isManual, ManualResourceLoader* loader,
                                 MetalDevice *device ) :
@@ -87,16 +82,8 @@ namespace Ogre
         mFormat = TextureManager::getSingleton().getNativeFormat( mTextureType, mFormat, mUsage );
         const MTLTextureType texTarget = getMetalTextureTarget();
 
-        // Check requested number of mipmaps
-        const size_t maxMips = getMaxMipmapCount( mWidth, mHeight,
-                                                             mTextureType == TEX_TYPE_3D ? mDepth : 1 );
-
-        if( (PixelUtil::isCompressed(mFormat) && (mNumMipmaps == 0)) || mTextureType == TEX_TYPE_1D )
-            mNumRequestedMipmaps = 0;
-
-        mNumMipmaps = mNumRequestedMipmaps;
-        if( mNumMipmaps > maxMips )
-            mNumMipmaps = maxMips;
+        if(mTextureType == TEX_TYPE_1D )
+            mNumMipmaps = mNumRequestedMipmaps = 0;
 
         // If we can do automip generation and the user desires this, do so
         mMipmapsHardwareGenerated = !PixelUtil::isCompressed( mFormat );
@@ -152,7 +139,7 @@ namespace Ogre
         createSurfaceList();
 
         if( (mUsage & TU_AUTOMIPMAP) &&
-            mNumRequestedMipmaps && mMipmapsHardwareGenerated )
+            mNumMipmaps && mMipmapsHardwareGenerated )
         {
             __unsafe_unretained id<MTLBlitCommandEncoder> blitEncoder = mDevice->getBlitEncoder();
             [blitEncoder generateMipmapsForTexture:mTexture];
