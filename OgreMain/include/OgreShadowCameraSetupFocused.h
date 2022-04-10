@@ -56,10 +56,6 @@ namespace Ogre {
     */
     class _OgreExport FocusedShadowCameraSetup : public DefaultShadowCameraSetup
     {
-        /** Temporary preallocated camera to set up a light frustum for clipping in FocusedShadowCameraSetup::calculateB.
-        */
-        SceneNode mLightFrustumCameraNode;
-        std::unique_ptr<Camera> mLightFrustumCamera;
         // Persistent calculations to prevent reallocation
         mutable ConvexBody mBodyB;
         /// Use tighter focus region?
@@ -75,6 +71,7 @@ namespace Ogre {
         static const Matrix4 msNormalToLightSpace;
         static const Matrix4 msLightSpaceToNormal;
 
+        mutable const Camera* mLightFrustumCamera;
         mutable bool mLightFrustumCameraCalculated;
 
         /** Internal class holding a point list representation of a convex body.

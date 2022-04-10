@@ -205,11 +205,10 @@ namespace Ogre
         OgreAssert(cam != NULL, "Camera (viewer) is NULL");
         OgreAssert(light != NULL, "Light is NULL");
         OgreAssert(texCam != NULL, "Camera (texture) is NULL");
-        mLightFrustumCameraCalculated = false;
-
 
         // calculate standard shadow mapping matrix
         DefaultShadowCameraSetup::getShadowCamera(sm, cam, vp, light, texCam, iteration);
+        mLightFrustumCamera = texCam;
 
         // if the direction of the light and the direction of the camera tend to be parallel,
         // then tweak up the adjust factor
