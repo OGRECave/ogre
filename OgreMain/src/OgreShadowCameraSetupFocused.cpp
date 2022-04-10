@@ -47,12 +47,10 @@ namespace Ogre
         0,  0,  0,  1); // w
 
     FocusedShadowCameraSetup::FocusedShadowCameraSetup(bool useAggressiveRegion)
-        : mLightFrustumCameraNode(NULL)
-        , mLightFrustumCamera(OGRE_NEW Camera("TEMP LIGHT INTERSECT CAM", NULL))
-        , mUseAggressiveRegion(useAggressiveRegion)
-        , mLightFrustumCameraCalculated(false)
+        : mUseAggressiveRegion(useAggressiveRegion)
+        , mLightFrustumCamera(NULL)
+        , mLightFrustumCameraCalculated(true)
     {
-        mLightFrustumCamera->_notifyAttached(&mLightFrustumCameraNode);
     }
 
     FocusedShadowCameraSetup::~FocusedShadowCameraSetup() {}
@@ -112,12 +110,6 @@ namespace Ogre
             mBodyB.clip(sceneBB);
 
             // clip with the light frustum
-            // set up light camera to clip with the resulting frustum planes
-            if (!mLightFrustumCameraCalculated)
-            {
-                DefaultShadowCameraSetup::getShadowCamera(&sm, &cam, NULL, &light, mLightFrustumCamera.get(), 0);
-                mLightFrustumCameraCalculated = true;
-            }
             mBodyB.clip(*mLightFrustumCamera);
 
             // extract bodyB vertices
@@ -165,12 +157,6 @@ namespace Ogre
         if (light.getType() != Light::LT_DIRECTIONAL)
         {
             // clip with the light frustum
-            // set up light camera to clip the resulting frustum
-            if (!mLightFrustumCameraCalculated)
-            {
-                DefaultShadowCameraSetup::getShadowCamera(&sm, &cam, NULL, &light, mLightFrustumCamera.get(), 0);
-                mLightFrustumCameraCalculated = true;
-            }
             bodyLVS.clip(*mLightFrustumCamera);
         }
 
@@ -275,13 +261,13 @@ namespace Ogre
         OgreAssert(cam != NULL, "Camera (viewer) is NULL");
         OgreAssert(light != NULL, "Light is NULL");
         OgreAssert(texCam != NULL, "Camera (texture) is NULL");
-        mLightFrustumCameraCalculated = false;
 
         texCam->setNearClipDistance(light->_deriveShadowNearClipDistance(cam));
         texCam->setFarClipDistance(light->_deriveShadowFarClipDistance());
 
         // calculate standard shadow mapping matrix
         DefaultShadowCameraSetup::getShadowCamera(sm, cam, vp, light, texCam, iteration);
+        mLightFrustumCamera = texCam;
 
         // build scene bounding box
         const VisibleObjectsBoundsInfo& visInfo = sm->getVisibleObjectsBoundsInfo(texCam);
