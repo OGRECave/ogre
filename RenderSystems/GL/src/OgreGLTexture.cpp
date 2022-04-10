@@ -105,12 +105,6 @@ namespace Ogre {
 
         // Adjust format if required
         mFormat = TextureManager::getSingleton().getNativeFormat(mTextureType, mFormat, mUsage);
-        
-        // Check requested number of mipmaps
-        uint32 maxMips = getMaxMipmaps();
-        mNumMipmaps = mNumRequestedMipmaps;
-        if(mNumMipmaps>maxMips)
-            mNumMipmaps = maxMips;
 
         // Check if we can do HW mipmap generation
         mMipmapsHardwareGenerated = true;
@@ -125,7 +119,7 @@ namespace Ogre {
         mRenderSystem->_getStateCacheManager()->setTexParameteri(getGLTextureTarget(), GL_TEXTURE_MAX_LEVEL,
                                                                  mNumMipmaps);
 
-        if ((mUsage & TU_AUTOMIPMAP) && mNumRequestedMipmaps)
+        if ((mUsage & TU_AUTOMIPMAP) && mNumMipmaps)
         {
             mRenderSystem->_getStateCacheManager()->setTexParameteri( getGLTextureTarget(), GL_GENERATE_MIPMAP, GL_TRUE );
         }

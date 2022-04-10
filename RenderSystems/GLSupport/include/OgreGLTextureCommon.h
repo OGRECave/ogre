@@ -50,13 +50,6 @@ public:
     void getCustomAttribute(const String& name, void* pData);
 
 protected:
-    /** Returns the maximum number of Mipmaps that can be generated until we reach
-        the mininum format possible. This does not count the base level.
-
-        @return how many times we can divide this texture in 2 until we reach 1x1.
-    */
-    uint32 getMaxMipmaps();
-
     uint mTextureID;
 };
 

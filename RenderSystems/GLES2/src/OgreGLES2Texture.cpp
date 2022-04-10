@@ -96,16 +96,6 @@ namespace Ogre {
         mFormat = TextureManager::getSingleton().getNativeFormat(mTextureType, mFormat, mUsage);
         GLenum texTarget = getGLES2TextureTarget();
 
-        // Check requested number of mipmaps
-        uint32 maxMips = getMaxMipmaps();
-        
-        if(PixelUtil::isCompressed(mFormat) && (mNumMipmaps == 0))
-            mNumRequestedMipmaps = 0;
-        
-        mNumMipmaps = mNumRequestedMipmaps;
-        if (mNumMipmaps > maxMips)
-            mNumMipmaps = maxMips;
-
         // Generate texture name
         OGRE_CHECK_GL_ERROR(glGenTextures(1, &mTextureID));
 
@@ -120,7 +110,7 @@ namespace Ogre {
 
         // glGenerateMipmap require all mip levels to be prepared. So override how many this texture has.
         if((mUsage & TU_AUTOMIPMAP) && mMipmapsHardwareGenerated && mNumRequestedMipmaps)
-            mNumMipmaps = maxMips;
+            mNumMipmaps = getMaxMipmaps();
 
         if(mRenderSystem->hasMinGLVersion(3, 0) || mRenderSystem->checkExtension("GL_APPLE_texture_max_level"))
             mRenderSystem->_getStateCacheManager()->setTexParameteri(texTarget, GL_TEXTURE_MAX_LEVEL_APPLE, mNumRequestedMipmaps ? mNumMipmaps + 1 : 0);

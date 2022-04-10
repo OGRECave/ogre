@@ -193,7 +193,7 @@ namespace Ogre
         assert(mSrcWidth > 0 || mSrcHeight > 0);
 
         // determine total number of mipmaps including main one (d3d11 convention)
-        UINT numMips = (mNumRequestedMipmaps == MIP_UNLIMITED || (1U << mNumRequestedMipmaps) > mSrcWidth) ? 0 : mNumRequestedMipmaps + 1;
+        UINT numMips = (mNumMipmaps == MIP_UNLIMITED || (1U << mNumMipmaps) > mSrcWidth) ? 0 : mNumMipmaps + 1;
 
         D3D11_TEXTURE1D_DESC desc;
         desc.Width          = static_cast<UINT>(mSrcWidth);
@@ -257,7 +257,7 @@ namespace Ogre
         assert(mSrcWidth > 0 || mSrcHeight > 0);
 
         // determine total number of mipmaps including main one (d3d11 convention)
-        UINT numMips = (mNumRequestedMipmaps == MIP_UNLIMITED || (1U << mNumRequestedMipmaps) > std::max(mSrcWidth, mSrcHeight)) ? 0 : mNumRequestedMipmaps + 1;
+        UINT numMips = (mNumMipmaps == MIP_UNLIMITED || (1U << mNumMipmaps) > std::max(mSrcWidth, mSrcHeight)) ? 0 : mNumMipmaps + 1;
         if(D3D11Mappings::_isBinaryCompressedFormat(mD3DFormat) && numMips > 1)
             numMips = std::max(1U, numMips - 2);
 
@@ -391,7 +391,7 @@ namespace Ogre
         assert(mWidth > 0 && mHeight > 0 && mDepth>0);
 
         // determine total number of mipmaps including main one (d3d11 convention)
-        UINT numMips = (mNumRequestedMipmaps == MIP_UNLIMITED || (1U << mNumRequestedMipmaps) > std::max(std::max(mSrcWidth, mSrcHeight), mDepth)) ? 0 : mNumRequestedMipmaps + 1;
+        UINT numMips = (mNumMipmaps == MIP_UNLIMITED || (1U << mNumMipmaps) > std::max(std::max(mSrcWidth, mSrcHeight), mDepth)) ? 0 : mNumMipmaps + 1;
 
         D3D11_TEXTURE3D_DESC desc;
         desc.Width          = static_cast<UINT>(mSrcWidth);
