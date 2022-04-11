@@ -1515,7 +1515,7 @@ namespace Ogre
 
             writeGpuProgramParameter("param_named", 
                                      paramName, autoEntry, defaultAutoEntry, 
-                                     def.isFloat(), def.isDouble(), (def.isInt() || def.isSampler()), def.isUnsignedInt(),
+                                     def.isFloat(), def.isDouble(), def.isInt(), def.isUnsignedInt(), def.isSampler(),
                                      def.physicalIndex, def.elementSize * def.arraySize,
                                      params, defaultParams, level, useMainBuffer);
         }
@@ -1552,7 +1552,7 @@ namespace Ogre
 
                 writeGpuProgramParameter("param_indexed", 
                                          StringConverter::toString(logicalIndex), autoEntry, 
-                                         defaultAutoEntry, true, false, false, false,
+                                         defaultAutoEntry, true, false, false, false, false,
                                          logicalUse.physicalIndex, logicalUse.currentSize,
                                          params, defaultParams, level, useMainBuffer);
             }
@@ -1563,7 +1563,7 @@ namespace Ogre
         const String& commandName, const String& identifier, 
         const GpuProgramParameters::AutoConstantEntry* autoEntry, 
         const GpuProgramParameters::AutoConstantEntry* defaultAutoEntry, 
-        bool isFloat, bool isDouble, bool isInt, bool isUnsignedInt,
+        bool isFloat, bool isDouble, bool isInt, bool isUnsignedInt, bool isRegister,
         size_t physicalIndex, size_t physicalSize,
         const GpuProgramParametersSharedPtr& params, GpuProgramParameters* defaultParams,
         const ushort level, const bool useMainBuffer)
@@ -1598,7 +1598,13 @@ namespace Ogre
                 // compare the non-auto (raw buffer) values
                 // param buffers are always initialised with all zeros
                 // so unset == unset
-                if (isFloat)
+                if (isRegister) {
+                    different = memcmp(
+                            params->getRegPointer(physicalIndex),
+                            defaultParams->getRegPointer(physicalIndex),
+                            sizeof(int) * physicalSize) != 0;
+                }
+                else if (isFloat)
                 {
                     different = memcmp(
                         params->getFloatPointer(physicalIndex), 
@@ -1684,7 +1690,19 @@ namespace Ogre
                 if (physicalSize > 1)
                     countLabel = StringConverter::toString(physicalSize);
 
-                if (isFloat)
+                if (isRegister)
+                {
+                    // Get pointer to start of values
+                    const int* pInt = params->getRegPointer(physicalIndex);
+
+                    writeValue("int" + countLabel, useMainBuffer);
+                    // iterate through real constants
+                    for (size_t f = 0; f < physicalSize; ++f)
+                    {
+                        writeValue(StringConverter::toString(*pInt++), useMainBuffer);
+                    }
+                }
+                else if (isFloat)
                 {
                     // Get pointer to start of values
                     const float* pFloat = params->getFloatPointer(physicalIndex);
