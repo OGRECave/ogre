@@ -30,7 +30,7 @@ THE SOFTWARE.
 #include <iostream>
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_WINRT
-#   include <windows.h>
+#   include <debugapi.h>
 #   if _WIN32_WINNT >= _WIN32_WINNT_VISTA
 #       include <werapi.h>
 #   endif

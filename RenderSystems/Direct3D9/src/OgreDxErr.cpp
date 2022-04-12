@@ -70,7 +70,7 @@ A "contributor" is any person that distributes its contribution under this licen
 #if !defined(NOMINMAX)
 #define NOMINMAX
 #endif
-#include <windows.h>
+#include <windef.h>
 
 #ifndef __MINGW32__
 #pragma warning( disable : 4005 ) // warning C4005: 'xxx': macro redefinition
@@ -3336,7 +3336,7 @@ const WCHAR* WINAPI DXGetErrorStringW( _In_ HRESULT hr )
         CHK_ERRA(DSERR_BADSENDBUFFERGUID)
         CHK_ERRA(DSERR_OBJECTNOTFOUND)
 
-    	CHK_ERRA(DSERR_FXUNAVAILABLE)
+        CHK_ERRA(DSERR_FXUNAVAILABLE)
 
 #endif // !WINAPI_FAMILY || WINAPI_FAMILY == WINAPI_FAMILY_DESKTOP_APP
 
@@ -3532,7 +3532,7 @@ void WINAPI DXGetErrorDescriptionW( _In_ HRESULT hr, _Out_cap_(count) WCHAR* des
     // First try to see if FormatMessage knows this hr
     UINT icount = static_cast<UINT>( std::min<size_t>( count, 32767 ) );
 
-    DWORD result = FormatMessageW( FORMAT_MESSAGE_FROM_SYSTEM, nullptr, hr, 
+    DWORD result = FormatMessageW( FORMAT_MESSAGE_FROM_SYSTEM, nullptr, hr,
                                    MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), desc, icount, nullptr );
 
     if (result > 0)

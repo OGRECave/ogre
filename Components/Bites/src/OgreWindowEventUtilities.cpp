@@ -35,7 +35,7 @@ THE SOFTWARE.
 #  if !defined(NOMINMAX) && defined(_MSC_VER)
 #   define NOMINMAX // required to stop windows.h messing up std::min
 #  endif
-#  include <windows.h>
+#  include <windef.h>
 #elif OGRE_PLATFORM == OGRE_PLATFORM_LINUX
 #include <X11/Xlib.h>
 #endif

@@ -42,7 +42,7 @@ THE SOFTWARE.
 #  if !defined(NOMINMAX) && defined(_MSC_VER)
 #   define NOMINMAX // required to stop windows.h messing up std::min
 #  endif
-#  include <windows.h>
+#  include <fileapi.h>
 #  include <direct.h>
 #  include <io.h>
 //#  define _OGRE_FILESYSTEM_ARCHIVE_UNICODE // base path and resources subpathes expected to be in UTF-8 and wchar_t file IO routines are used

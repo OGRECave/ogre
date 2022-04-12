@@ -31,6 +31,8 @@
 #include "OgreWin32Prerequisites.h"
 #include "OgreGLNativeSupport.h"
 
+#include <winuser.h>
+
 namespace Ogre
 {
     

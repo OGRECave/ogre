@@ -36,6 +36,8 @@
 #include "OgreWin32Window.h"
 #include "OgreGLUtil.h"
 
+#include <windows.h>
+
 #include <GL/gl.h>
 #include <GL/wglext.h>
 

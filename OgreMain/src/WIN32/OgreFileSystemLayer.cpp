@@ -28,7 +28,16 @@
 #include "OgreStableHeaders.h"
 #include "OgreFileSystemLayer.h"
 #define WIN32_LEAN_AND_MEAN
-#include <windows.h>
+
+#if OGRE_CPU == OGRE_CPU_ARM
+#define _ARM_
+#elif OGRE_ARCH_TYPE == OGRE_ARCHITECTURE_64
+#define _AMD64_
+#else
+#define _X86_
+#endif
+
+#include <libloaderapi.h>
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
 #  include <shlobj.h>
 #endif

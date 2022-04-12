@@ -44,6 +44,8 @@ THE SOFTWARE.
 
 #include "OgreGLRenderSystemCommon.h"
 
+#include <windows.h>
+
 namespace Ogre {
 
     #define _MAX_CLASS_NAME_ 128

@@ -29,7 +29,7 @@ THE SOFTWARE.
 #define __OgreWin32Prerequisites_H__
 
 #include "OgrePlatform.h"
-#include <windows.h>
+#include <windef.h>
 #include <wingdi.h>
 #define WGL_WGLEXT_PROTOTYPES
 
