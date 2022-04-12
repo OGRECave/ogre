@@ -524,7 +524,6 @@ namespace Ogre {
     //-----------------------------------------------------------------------------
     void Technique::_load(void)
     {
-        assert (mIsSupported && "This technique is not supported");
         // Load each pass
         Passes::iterator i, iend;
         iend = mPasses.end();
@@ -1034,6 +1033,8 @@ namespace Ogre {
     void  Technique::setShadowCasterMaterial(const Ogre::String &name) 
     { 
         setShadowCasterMaterial(MaterialManager::getSingleton().getByName(name));
+        // remember the name, even if it is not created yet
+        mShadowCasterMaterialName = name;
     }
     //-----------------------------------------------------------------------
     Ogre::MaterialPtr  Technique::getShadowReceiverMaterial() const 
