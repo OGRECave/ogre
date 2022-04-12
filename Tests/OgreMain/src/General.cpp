@@ -436,3 +436,18 @@ TEST_F(SkeletonTests, linkedSkeletonAnimationSource)
     entity->refreshAvailableAnimationState();
     EXPECT_TRUE(entity->getAnimationState("Stealth")); // animation from ninja.sekeleton
 }
+
+TEST(MaterialLoading, LateShadowCaster)
+{
+    Root root("");
+    auto tech = MaterialManager::getSingleton().create("Material", RGN_DEFAULT)->createTechnique();
+    tech->setShadowCasterMaterial("Caster");
+    EXPECT_FALSE(tech->getShadowCasterMaterial());
+
+    MaterialManager::getSingleton().create("Caster", RGN_DEFAULT);
+
+    // force call _load() due to missing rendersystem
+    tech->_load();
+
+    EXPECT_TRUE(tech->getShadowCasterMaterial());
+}
