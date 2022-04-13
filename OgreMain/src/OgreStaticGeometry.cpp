@@ -813,6 +813,21 @@ namespace Ogre {
         if (mLodStrategy == 0)
             return;
 
+        // Determine whether to still render
+        mBeyondFarDistance = false;
+
+        Real renderingDist = mParent->getRenderingDistance();
+        if (renderingDist > 0 && cam->getUseRenderingDistance())
+        {
+            // Max distance to still render
+            Real maxDist = renderingDist + mBoundingRadius;
+            if (mSquaredViewDepth > Math::Sqr(maxDist))
+            {
+                mBeyondFarDistance = true;
+                return;
+            }
+        }
+
         // Sanity check
         assert(!mLodValues.empty());
 
