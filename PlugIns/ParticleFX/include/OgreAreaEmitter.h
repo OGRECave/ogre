@@ -37,7 +37,7 @@ namespace Ogre {
     *  @{
     */
     /** \defgroup ParticleFX ParticleFX
-    * Particle Effects (Emmiters, Affectors)
+    * Provides Emmiter and Affector implementations for ParticleSystem
     *  @{
     */
 

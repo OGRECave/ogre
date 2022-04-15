@@ -42,7 +42,11 @@ namespace Ogre {
     *  @{
     */
     /** \defgroup FreeImageCodec FreeImageCodec
-    * %Codec specialized in images loaded using [FreeImage](https://freeimage.sourceforge.io/)
+    * %Codec for loading generic image formats (e.g. jpg, png) using [FreeImage](https://freeimage.sourceforge.io/)
+    *
+    * This Codec is well-suited for files that are outside of your control. This merely wraps the original libraries,
+    * so all format variants are supported and security-vulnerabilities are mitigated.
+    * The downside that all external dependencies are required and there might be superfluous pixel conversions.
     *  @{
     */
     class FreeImageCodec : public ImageCodec
