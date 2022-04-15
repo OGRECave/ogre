@@ -21,6 +21,14 @@ namespace Ogre
 class SceneManager;
 class SceneNode;
 
+/** \addtogroup Plugins Plugins
+*  @{
+*/
+/** \defgroup DotSceneCodec DotSceneCodec
+ *
+ * %Codec for loading and saving the SceneNode hierarchy in .scene files.
+ * @{
+ */
 class _OgreDotScenePluginExport DotSceneLoader
 {
 public:
@@ -82,5 +90,7 @@ class _OgreDotScenePluginExport DotScenePlugin : public Plugin
 private:
     Codec* mCodec;
 };
+/** @} */
+/** @} */
 } // namespace Ogre
 #endif // DOT_SCENELOADER_H

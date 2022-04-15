@@ -16,14 +16,14 @@ namespace Ogre
 /** \addtogroup Plugins
  *  @{
  */
-/** \addtogroup GLSLangProgramManager
+/** \defgroup GLSLangProgramManager GLSLangProgramManager
+ *  GLslang can be used to compile common, high-level GLSL/ HLSL code down to SPIRV assembler
+ *  language for both GL and Vulkan.
  *  @{
  */
 /** Specialisation of HighLevelGpuProgram to provide support for the GLSLang compiler by Khronos.
-@remarks
-    GLslang can be used to compile common, high-level, C-like code down to SPIRV assembler
-    language for both GL and Vulkan. The
-    program will then negotiate with the renderer to compile the appropriate program
+
+    The program will negotiate with the renderer to compile the appropriate program
     for the API and graphics card capabilities.
 */
 class GLSLangProgram : public HighLevelGpuProgram
