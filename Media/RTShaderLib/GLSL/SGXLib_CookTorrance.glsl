@@ -93,7 +93,7 @@ float getAngleAttenuation(const vec3 params, const vec3 lightDir, const vec3 toL
     return pow(fSpotE, params.z);
 }
 
-void PBR_Light(
+void evaluateLight(
                 in vec3 vNormal,
                 in vec3 viewPos,
                 in vec4 lightPos,
@@ -101,8 +101,9 @@ void PBR_Light(
                 in vec4 pointParams,
                 in vec4 vLightDirView,
                 in vec4 spotParams,
-                in vec3 baseColor,
-                in vec2 mrParam,
+                in vec3 diffuseColor,
+                in vec3 f0,
+                in float roughness,
                 inout vec3 vOutColour)
 {
     vec3 vLightView = lightPos.xyz;
@@ -124,22 +125,6 @@ void PBR_Light(
 
     if(NoL <= 0.0)
         return; // not lit by this light
-
-    float perceptualRoughness = mrParam.x;
-    float metallic = saturate(mrParam.y);
-
-    // TODO: some of this can be precomputed for multiple lights
-
-    // Clamp the roughness to a minimum value to avoid divisions by 0 during lighting
-    perceptualRoughness = clamp(perceptualRoughness, MIN_PERCEPTUAL_ROUGHNESS, 1.0);
-    // Remaps the roughness to a perceptually linear roughness (roughness^2)
-    float roughness = perceptualRoughnessToRoughness(perceptualRoughness);
-
-    // gamma to linear
-    baseColor = pow(baseColor, vec3_splat(2.2));
-
-    vec3 f0 = computeF0(baseColor, metallic, 0.04);
-    vec3 diffuseColor = computeDiffuseColor(baseColor, metallic);
 
     // https://google.github.io/filament/Filament.md.html#toc5.6.2
     float f90 = saturate(dot(f0, vec3_splat(50.0 * 0.33)));
@@ -172,5 +157,42 @@ void PBR_Light(
 
     // linear to gamma
     color = pow(color, vec3_splat(1.0/2.2));
-    vOutColour = saturate(vOutColour + color);
+    vOutColour += color;
 }
+
+#if LIGHT_COUNT > 0
+void PBR_Lights(
+                in vec3 vNormal,
+                in vec3 viewPos,
+                in vec4 lightPos[LIGHT_COUNT],
+                in vec4 lightColor[LIGHT_COUNT],
+                in vec4 pointParams[LIGHT_COUNT],
+                in vec4 vLightDirView[LIGHT_COUNT],
+                in vec4 spotParams[LIGHT_COUNT],
+                in vec3 baseColor,
+                in vec2 mrParam,
+                inout vec3 vOutColour)
+{
+    // gamma to linear
+    baseColor = pow(baseColor, vec3_splat(2.2));
+
+    float perceptualRoughness = mrParam.x;
+    float metallic = saturate(mrParam.y);
+
+    // Clamp the roughness to a minimum value to avoid divisions by 0 during lighting
+    perceptualRoughness = clamp(perceptualRoughness, MIN_PERCEPTUAL_ROUGHNESS, 1.0);
+    // Remaps the roughness to a perceptually linear roughness (roughness^2)
+    float roughness = perceptualRoughnessToRoughness(perceptualRoughness);
+
+    vec3 f0 = computeF0(baseColor, metallic, 0.04);
+    vec3 diffuseColor = computeDiffuseColor(baseColor, metallic);
+
+    for(int i = 0; i < LIGHT_COUNT; i++)
+    {
+        evaluateLight(vNormal, viewPos, lightPos[i], lightColor[i].xyz, pointParams[i], vLightDirView[i], spotParams[i],
+                      diffuseColor, f0, roughness, vOutColour);
+    }
+
+    vOutColour = saturate(vOutColour);
+}
+#endif
