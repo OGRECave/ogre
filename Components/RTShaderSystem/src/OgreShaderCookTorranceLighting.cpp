@@ -33,6 +33,7 @@ bool CookTorranceLighting::createCpuSubPrograms(ProgramSet* programSet)
     psProgram->addDependency(FFP_LIB_TRANSFORM);
     psProgram->addDependency(FFP_LIB_TEXTURING);
     psProgram->addDependency("SGXLib_CookTorrance");
+    psProgram->addPreprocessorDefines(StringUtil::format("LIGHT_COUNT=%d", mLightCount));
 
     // Resolve texture coordinates.
     auto vsInTexcoord = vsMain->resolveInputParameter(Parameter::SPC_TEXTURE_COORDINATE0, GCT_FLOAT2);
@@ -103,17 +104,17 @@ bool CookTorranceLighting::createCpuSubPrograms(ProgramSet* programSet)
     auto litResult = psMain->resolveLocalParameter(GCT_FLOAT3, "litResult");
     fstage.assign(Vector3(0), litResult);
 
-    for (int i = 0; i < mLightCount; i++)
+    if(mLightCount > 0)
     {
-        auto lightPos = psProgram->resolveParameter(GpuProgramParameters::ACT_LIGHT_POSITION_VIEW_SPACE, i);
-        auto lightDiffuse = psProgram->resolveParameter(GpuProgramParameters::ACT_LIGHT_DIFFUSE_COLOUR, i);
-        auto pointParams = psProgram->resolveParameter(GpuProgramParameters::ACT_LIGHT_ATTENUATION, i);
-        auto spotParams = psProgram->resolveParameter(GpuProgramParameters::ACT_SPOTLIGHT_PARAMS, i);
-        auto lightDirView = psProgram->resolveParameter(GpuProgramParameters::ACT_LIGHT_DIRECTION_VIEW_SPACE, i);
+        auto lightPos = psProgram->resolveParameter(GpuProgramParameters::ACT_LIGHT_POSITION_VIEW_SPACE_ARRAY, mLightCount);
+        auto lightDiffuse = psProgram->resolveParameter(GpuProgramParameters::ACT_LIGHT_DIFFUSE_COLOUR_ARRAY, mLightCount);
+        auto pointParams = psProgram->resolveParameter(GpuProgramParameters::ACT_LIGHT_ATTENUATION_ARRAY, mLightCount);
+        auto spotParams = psProgram->resolveParameter(GpuProgramParameters::ACT_SPOTLIGHT_PARAMS_ARRAY, mLightCount);
+        auto lightDirView = psProgram->resolveParameter(GpuProgramParameters::ACT_LIGHT_DIRECTION_VIEW_SPACE_ARRAY, mLightCount);
 
-        fstage.callFunction("PBR_Light", {In(viewNormal), In(viewPos), In(lightPos), In(lightDiffuse).xyz(),
-                                          In(pointParams), In(lightDirView), In(spotParams), In(outDiffuse).xyz(),
-                                          mrparams, InOut(litResult)});
+        fstage.callFunction("PBR_Lights", {In(viewNormal), In(viewPos), In(lightPos), In(lightDiffuse),
+                                            In(pointParams), In(lightDirView), In(spotParams), In(outDiffuse).xyz(),
+                                            mrparams, InOut(litResult)});
     }
 
     fstage.assign(litResult, Out(outDiffuse).xyz());
