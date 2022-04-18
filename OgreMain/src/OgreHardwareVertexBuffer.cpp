@@ -284,11 +284,6 @@ namespace Ogre {
             "VertexElement::multiplyTypeCount");
     }
     //--------------------------------------------------------------------------
-    VertexElementType VertexElement::getBestColourVertexElementType(void)
-    {
-        return VET_UBYTE4_NORM;
-    }
-    //--------------------------------------------------------------------------
     void VertexElement::convertColourValue(VertexElementType srcType, 
         VertexElementType dstType, uint32* ptr)
     {
@@ -371,14 +366,7 @@ namespace Ogre {
         size_t offset, VertexElementType theType,
         VertexElementSemantic semantic, unsigned short index)
     {
-        // Refine colour type to a specific type
-        if (theType == VET_COLOUR)
-        {
-            theType = VertexElement::getBestColourVertexElementType();
-        }
-        mElementList.push_back(
-            VertexElement(source, offset, theType, semantic, index));
-
+        mElementList.push_back(VertexElement(source, offset, theType, semantic, index));
         notifyChanged();
         return mElementList.back();
     }
