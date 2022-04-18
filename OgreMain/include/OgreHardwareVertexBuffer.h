@@ -238,8 +238,8 @@ namespace Ogre {
             return src.getAsABGR();
         }
 
-        /** Utility method to get the most appropriate packed colour vertex element format. */
-        static VertexElementType getBestColourVertexElementType(void);
+        /// @deprecated use VET_UBYTE4_NORM
+        OGRE_DEPRECATED static VertexElementType getBestColourVertexElementType() { return VET_UBYTE4_NORM; }
 
         inline bool operator== (const VertexElement& rhs) const
         {
