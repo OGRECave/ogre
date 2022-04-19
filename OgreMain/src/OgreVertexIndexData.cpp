@@ -30,6 +30,11 @@ THE SOFTWARE.
 #include "OgreHardwareVertexBuffer.h"
 
 namespace Ogre {
+    static void swapPackedRB(uint32* ptr)
+    {
+        auto cptr = (uint8*)ptr;
+        std::swap(cptr[0], cptr[2]);
+    }
 
     //-----------------------------------------------------------------------
     VertexData::VertexData(HardwareBufferManagerBase* mgr)
@@ -600,7 +605,7 @@ namespace Ogre {
                         {
                             uint32* pRGBA;
                             elem.baseVertexPointerToElement(pBase, &pRGBA);
-                            VertexElement::convertColourValue(_DETAIL_SWAP_RB, destType, pRGBA);
+                            swapPackedRB(pRGBA);
                         }
                     }
                     pBase = static_cast<void*>(

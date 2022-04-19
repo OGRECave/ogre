@@ -1098,9 +1098,8 @@ namespace Ogre {
                         }
                         elem.baseVertexPointerToElement(pVert, &pCol);
                         {
-                            ColourValue cv;
-                            cv = StringConverter::parseColourValue(xmlElem.attribute("value").value());
-                            *pCol++ = VertexElement::convertColourValue(cv, mColourElementType);
+                            auto cv = StringConverter::parseColourValue(xmlElem.attribute("value").value());
+                            *pCol++ = cv.getAsABGR();
                         }
                         break;
                     case VES_SPECULAR:
@@ -1112,9 +1111,8 @@ namespace Ogre {
                         }
                         elem.baseVertexPointerToElement(pVert, &pCol);
                         {
-                            ColourValue cv;
-                            cv = StringConverter::parseColourValue(xmlElem.attribute("value").value());
-                            *pCol++ = VertexElement::convertColourValue(cv, mColourElementType);
+                            auto cv = StringConverter::parseColourValue(xmlElem.attribute("value").value());
+                            *pCol++ = cv.getAsABGR();
                         }
                         break;
                     case VES_TEXTURE_COORDINATES:
