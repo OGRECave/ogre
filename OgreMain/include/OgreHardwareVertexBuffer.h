@@ -219,21 +219,11 @@ namespace Ogre {
         */
         static VertexElementType getBaseType(VertexElementType multiType);
 
-        /** Utility method for converting colour from
-            one packed 32-bit colour type to another.
-        @param srcType The source type
-        @param dstType The destination type
-        @param ptr Read / write value to change
-        */
-        static void convertColourValue(VertexElementType srcType,
-            VertexElementType dstType, uint32* ptr);
+        /// @deprecated do not use
+        OGRE_DEPRECATED static void convertColourValue(VertexElementType srcType, VertexElementType dstType, uint32* ptr);
 
-        /** Utility method for converting colour to
-            a packed 32-bit colour type.
-        @param src source colour
-        @param dst The destination type
-        */
-        static uint32 convertColourValue(const ColourValue& src, VertexElementType dst)
+        /// @deprecated use ColourValue::getAsABGR()
+        OGRE_DEPRECATED static uint32 convertColourValue(const ColourValue& src, VertexElementType)
         {
             return src.getAsABGR();
         }

@@ -511,6 +511,8 @@ ADD_REPR(ColourValue)
 %template(SceneQueryResultMovableList) std::list<Ogre::MovableObject*>;
 #endif
 
+%ignore *::convertColourValue; // deprecated
+
 %include "OgreNameGenerator.h"
 %include "OgreController.h"
 %ignore Ogre::RenderSystemCapabilities::setVertexTextureUnitsShared;
@@ -695,7 +697,6 @@ SHARED_PTR(Material);
 %ignore Ogre::RenderSystem::_setVertexTexture;
 %ignore Ogre::RenderSystem::_setProjectionMatrix;
 %ignore Ogre::RenderSystem::getRenderTargetIterator;
-%ignore Ogre::RenderSystem::convertColourValue;
 %ignore Ogre::RenderSystem::getColourVertexElementType;
 %ignore Ogre::RenderSystem::setStencilCheckEnabled;
 %ignore Ogre::RenderSystem::setStencilBufferParams;
@@ -890,7 +891,6 @@ SHARED_PTR(Mesh);
 %ignore Ogre::Root::createSceneManager(uint16);
 %ignore Ogre::Root::createSceneManager(uint16, const String&);
 %ignore Ogre::Root::getMovableObjectFactoryIterator;
-%ignore Ogre::Root::convertColourValue;
 %ignore Ogre::Root::getDisplayMonitorCount;
 %include "OgreRoot.h"
 // dont wrap: platform specific
