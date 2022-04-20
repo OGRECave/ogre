@@ -942,6 +942,8 @@ namespace Ogre {
         void setLodStrategy(LodStrategy *lodStrategy);
 #endif
 
+        void _convertVertexElement(VertexElementSemantic semantic, VertexElementType dstType);
+
         /// @copydoc UserObjectBindings
         UserObjectBindings& getUserObjectBindings() { return mUserObjectBindings; }
         /// @overload

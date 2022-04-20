@@ -53,6 +53,7 @@ void help(void)
     cout << "Usage: OgreMeshUpgrader [opts] sourcefile [destfile] " << endl;
     cout << "-i             = Interactive mode, prompt for options" << endl;
     cout << "-autogen       = Generate autoconfigured LOD. No more LOD options needed!" << endl;
+    cout << "-pack          = Pack normals and tangents as int_10_10_10_2" << endl;
     cout << "-l lodlevels   = number of LOD levels" << endl;
     cout << "-d loddist     = distance increment to reduce LOD" << endl;
     cout << "-p lodpercent  = Percentage triangle reduction amount per LOD" << endl;
@@ -87,6 +88,7 @@ struct UpgradeOptions {
     bool tangentSplitRotated;
     bool dontReorganise;
     bool lodAutoconfigure;
+    bool packNormalsTangents;
     unsigned short numLods;
     Real lodDist;
     Real lodPercent;
@@ -126,6 +128,8 @@ void parseOpts(UnaryOptionList& unOpts, BinaryOptionList& binOpts)
     opts.dontReorganise = false;
     opts.endian = Serializer::ENDIAN_NATIVE;
 
+    opts.packNormalsTangents = false;
+
     opts.lodAutoconfigure = false;
     opts.lodDist = 500;
     opts.lodFixed = 0;
@@ -142,6 +146,7 @@ void parseOpts(UnaryOptionList& unOpts, BinaryOptionList& binOpts)
     opts.lodAutoconfigure = unOpts["-autogen"];
     opts.interactive = unOpts["-i"];
     opts.dontReorganise = unOpts["-r"];
+    opts.packNormalsTangents = unOpts["-pack"];
 
     // Unary options (true/false options that don't take a parameter)
     if (unOpts["-b"]) {
@@ -928,6 +933,7 @@ int main(int numargs, char** args)
         unOptList["-r"] = false;
         unOptList["-byte"] = true; // this is the only option now, dont error if specified
         unOptList["-autogen"] = false;
+        unOptList["-pack"] = false;
         unOptList["-b"] = false;
         binOptList["-l"] = "";
         binOptList["-d"] = "";
@@ -1083,6 +1089,12 @@ int main(int numargs, char** args)
                     opts.tangentUseParity);
                 logMgr->logMessage("Generating tangent vectors... success");
             }
+        }
+
+        if(opts.packNormalsTangents)
+        {
+            mesh->_convertVertexElement(VES_NORMAL, VET_INT_10_10_10_2_NORM);
+            mesh->_convertVertexElement(VES_TANGENT, VET_INT_10_10_10_2_NORM);
         }
 
         if (opts.recalcBounds) {

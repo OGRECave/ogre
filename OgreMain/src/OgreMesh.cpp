@@ -2464,5 +2464,14 @@ namespace Ogre {
     }
 #endif
 
+    void Mesh::_convertVertexElement(VertexElementSemantic semantic, VertexElementType dstType)
+    {
+        if (sharedVertexData)
+            sharedVertexData->convertVertexElement(semantic, dstType);
+
+        for (auto s : getSubMeshes())
+            if (s->vertexData)
+                s->vertexData->convertVertexElement(semantic, dstType);
+    }
 }
 
