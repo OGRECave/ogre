@@ -324,21 +324,20 @@ namespace Ogre {
         }
     }
     //-----------------------------------------------------------------------
-    void VertexData::reorganiseBuffers(VertexDeclaration* newDeclaration, 
-        const BufferUsageList& bufferUsages, HardwareBufferManagerBase* mgr)
+    void VertexData::reorganiseBuffers(VertexDeclaration* newDeclaration, const BufferUsageList& bufferUsages,
+                                       HardwareBufferManagerBase* mgr)
     {
         HardwareBufferManagerBase* pManager = mgr ? mgr : mMgr;
         // Firstly, close up any gaps in the buffer sources which might have arisen
         newDeclaration->closeGapsInSource();
 
         // Build up a list of both old and new elements in each buffer
-        unsigned short buf = 0;
-        std::vector<void*> oldBufferLocks;
+        std::vector<uint8*> oldBufferLocks;
         std::vector<size_t> oldBufferVertexSizes;
-        std::vector<void*> newBufferLocks;
+        std::vector<uint8*> newBufferLocks;
         std::vector<size_t> newBufferVertexSizes;
         VertexBufferBinding* newBinding = pManager->createVertexBufferBinding();
-        const VertexBufferBinding::VertexBufferBindingMap& oldBindingMap = vertexBufferBinding->getBindings();
+        const auto& oldBindingMap = vertexBufferBinding->getBindings();
         VertexBufferBinding::VertexBufferBindingMap::const_iterator itBinding;
 
         // Pre-allocate old buffer locks
@@ -352,90 +351,64 @@ namespace Ogre {
         bool useShadowBuffer = false;
 
         // Lock all the old buffers for reading
-        for (itBinding = oldBindingMap.begin(); itBinding != oldBindingMap.end(); ++itBinding)
+        for (const auto& it : oldBindingMap)
         {
-            assert(itBinding->second->getNumVertices() >= vertexCount);
+            assert(it.second->getNumVertices() >= vertexCount);
 
-            oldBufferVertexSizes[itBinding->first] =
-                itBinding->second->getVertexSize();
-            oldBufferLocks[itBinding->first] =
-                itBinding->second->lock(
-                    HardwareBuffer::HBL_READ_ONLY);
+            oldBufferVertexSizes[it.first] = it.second->getVertexSize();
+            oldBufferLocks[it.first] = (uint8*)it.second->lock(HardwareBuffer::HBL_READ_ONLY);
 
-            useShadowBuffer |= itBinding->second->hasShadowBuffer();
+            useShadowBuffer |= it.second->hasShadowBuffer();
         }
         
         // Create new buffers and lock all for writing
-        buf = 0;
+        uint16 buf = 0;
         while (!newDeclaration->findElementsBySource(buf).empty())
         {
             size_t vertexSize = newDeclaration->getVertexSize(buf);
 
-            HardwareVertexBufferSharedPtr vbuf = 
-                pManager->createVertexBuffer(
-                    vertexSize,
-                    vertexCount, 
-                    bufferUsages[buf], useShadowBuffer);
+            auto vbuf = pManager->createVertexBuffer(vertexSize, vertexCount, bufferUsages[buf], useShadowBuffer);
             newBinding->setBinding(buf, vbuf);
 
             newBufferVertexSizes.push_back(vertexSize);
-            newBufferLocks.push_back(
-                vbuf->lock(HardwareBuffer::HBL_DISCARD));
+            newBufferLocks.push_back((uint8*)vbuf->lock(HardwareBuffer::HBL_DISCARD));
             buf++;
         }
 
         // Map from new to old elements
-        typedef std::map<const VertexElement*, const VertexElement*> NewToOldElementMap;
-        NewToOldElementMap newToOldElementMap;
-        const VertexDeclaration::VertexElementList& newElemList = newDeclaration->getElements();
-        VertexDeclaration::VertexElementList::const_iterator ei, eiend;
-        eiend = newElemList.end();
-        for (ei = newElemList.begin(); ei != eiend; ++ei)
+        std::map<const VertexElement*, const VertexElement*>  newToOldElementMap;
+        const auto& newElemList = newDeclaration->getElements();
+        for (const auto& newElem : newElemList)
         {
             // Find corresponding old element
-            const VertexElement* oldElem = 
-                vertexDeclaration->findElementBySemantic(
-                    (*ei).getSemantic(), (*ei).getIndex());
+            auto oldElem = vertexDeclaration->findElementBySemantic(newElem.getSemantic(), newElem.getIndex());
             if (!oldElem)
             {
                 // Error, cannot create new elements with this method
-                OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
-                    "Element not found in old vertex declaration", 
-                    "VertexData::reorganiseBuffers");
+                OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "Element not found in old vertex declaration");
             }
-            newToOldElementMap[&(*ei)] = oldElem;
+            newToOldElementMap[&newElem] = oldElem;
         }
         // Now iterate over the new buffers, pulling data out of the old ones
         // For each vertex
         for (size_t v = 0; v < vertexCount; ++v)
         {
             // For each (new) element
-            for (ei = newElemList.begin(); ei != eiend; ++ei)
+            for (const auto& newElem : newElemList)
             {
-                const VertexElement* newElem = &(*ei);
-                NewToOldElementMap::iterator noi = newToOldElementMap.find(newElem);
-                const VertexElement* oldElem = noi->second;
-                unsigned short oldBufferNo = oldElem->getSource();
-                unsigned short newBufferNo = newElem->getSource();
-                void* pSrcBase = static_cast<void*>(
-                    static_cast<unsigned char*>(oldBufferLocks[oldBufferNo])
-                    + v * oldBufferVertexSizes[oldBufferNo]);
-                void* pDstBase = static_cast<void*>(
-                    static_cast<unsigned char*>(newBufferLocks[newBufferNo])
-                    + v * newBufferVertexSizes[newBufferNo]);
-                void *pSrc, *pDst;
-                oldElem->baseVertexPointerToElement(pSrcBase, &pSrc);
-                newElem->baseVertexPointerToElement(pDstBase, &pDst);
-                
-                memcpy(pDst, pSrc, newElem->getSize());
-                
+                const VertexElement* oldElem = newToOldElementMap[&newElem];
+                auto oldBufferNo = oldElem->getSource();
+                auto newBufferNo = newElem.getSource();
+                auto pSrc = oldBufferLocks[oldBufferNo] + v * oldBufferVertexSizes[oldBufferNo];
+                auto pDst = newBufferLocks[newBufferNo] + v * newBufferVertexSizes[newBufferNo];
+                memcpy(pDst + newElem.getOffset(), pSrc + oldElem->getOffset(), newElem.getSize());
             }
         }
 
         // Unlock all buffers
-        for (itBinding = oldBindingMap.begin(); itBinding != oldBindingMap.end(); ++itBinding)
+        for (const auto& it : oldBindingMap)
         {
-            itBinding->second->unlock();
+            it.second->unlock();
         }
         for (buf = 0; buf < newBinding->getBufferCount(); ++buf)
         {
