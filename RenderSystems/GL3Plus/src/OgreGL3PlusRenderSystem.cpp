@@ -432,6 +432,7 @@ namespace Ogre {
                 rsc->setCapability(RSC_CAN_GET_COMPILED_SHADER_BUFFER);
         }
 
+        rsc->setCapability(RSC_VERTEX_FORMAT_INT_10_10_10_2);
         rsc->setCapability(RSC_VERTEX_BUFFER_INSTANCE_DATA);
 
         // Check for Float textures
@@ -1848,6 +1849,7 @@ namespace Ogre {
         case VET_USHORT2_NORM:
         case VET_SHORT4_NORM:
         case VET_USHORT4_NORM:
+        case VET_INT_10_10_10_2_NORM:
             normalised = GL_TRUE;
             break;
         default:
