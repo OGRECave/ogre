@@ -597,6 +597,7 @@ namespace Ogre
         rsc->setCapability( RSC_ALPHA_TO_COVERAGE );
         rsc->setCapability( RSC_HW_GAMMA );
         rsc->setCapability( RSC_VERTEX_BUFFER_INSTANCE_DATA );
+        rsc->setCapability(RSC_VERTEX_FORMAT_INT_10_10_10_2);
         rsc->setMaxPointSize( 256 );
 
         //rsc->setMaximumResolutions( 16384, 4096, 16384 );

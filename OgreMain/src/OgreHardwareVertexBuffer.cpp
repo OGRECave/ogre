@@ -177,6 +177,8 @@ namespace Ogre {
         case VET_UBYTE4_NORM:
         case _DETAIL_SWAP_RB:
             return sizeof(char)*4;
+        case VET_INT_10_10_10_2_NORM:
+            return 4;
         }
         return 0;
     }
@@ -221,6 +223,7 @@ namespace Ogre {
         case VET_BYTE4_NORM:
         case VET_UBYTE4_NORM:
         case _DETAIL_SWAP_RB:
+        case VET_INT_10_10_10_2_NORM:
             return 4;
         }
         OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Invalid type", 
@@ -284,15 +287,13 @@ namespace Ogre {
             "VertexElement::multiplyTypeCount");
     }
     //--------------------------------------------------------------------------
-    void VertexElement::convertColourValue(VertexElementType srcType, 
-        VertexElementType dstType, uint32* ptr)
+    void VertexElement::convertColourValue(VertexElementType srcType, VertexElementType dstType, uint32* ptr)
     {
         if (srcType == dstType)
             return;
 
         // Conversion between ARGB and ABGR is always a case of flipping R/B
-        *ptr = 
-           ((*ptr&0x00FF0000)>>16)|((*ptr&0x000000FF)<<16)|(*ptr&0xFF00FF00);               
+        *ptr = ((*ptr & 0x00FF0000) >> 16) | ((*ptr & 0x000000FF) << 16) | (*ptr & 0xFF00FF00);
     }
     //-----------------------------------------------------------------------------
     VertexElementType VertexElement::getBaseType(VertexElementType multiType)
@@ -344,6 +345,8 @@ namespace Ogre {
             case VET_UBYTE4_NORM:
             case _DETAIL_SWAP_RB:
                 return VET_UBYTE4_NORM;
+            case VET_INT_10_10_10_2_NORM:
+                return VET_INT_10_10_10_2_NORM;
         };
         // To keep compiler happy
         return VET_FLOAT1;

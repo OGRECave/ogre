@@ -447,6 +447,9 @@ namespace Ogre {
                 rsc->setCapability(RSC_CAN_GET_COMPILED_SHADER_BUFFER);
         }
 
+        if(hasMinGLVersion(3, 0))
+            rsc->setCapability(RSC_VERTEX_FORMAT_INT_10_10_10_2);
+
         if (hasMinGLVersion(3, 0) || checkExtension("GL_EXT_instanced_arrays"))
         {
             rsc->setCapability(RSC_VERTEX_BUFFER_INSTANCE_DATA);
