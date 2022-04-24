@@ -47,35 +47,35 @@ namespace {
 
 void help(void)
 {
-    // Print help message
-    cout << endl << "OgreMeshUpgrader: Upgrades or downgrades .mesh file versions." << endl;
-    cout << "Provided for OGRE by Steve Streeting 2004-2014" << endl << endl;
-    cout << "Usage: OgreMeshUpgrader [opts] sourcefile [destfile] " << endl;
-    cout << "-i             = Interactive mode, prompt for options" << endl;
-    cout << "-autogen       = Generate autoconfigured LOD. No more LOD options needed!" << endl;
-    cout << "-pack          = Pack normals and tangents as int_10_10_10_2" << endl;
-    cout << "-l lodlevels   = number of LOD levels" << endl;
-    cout << "-d loddist     = distance increment to reduce LOD" << endl;
-    cout << "-p lodpercent  = Percentage triangle reduction amount per LOD" << endl;
-    cout << "-f lodnumtris  = Fixed vertex reduction per LOD" << endl;
-    cout << "-e         = DON'T generate edge lists (for stencil shadows)" << endl;
-    cout << "-t         = Generate tangents (for normal mapping)" << endl;
-    cout << "-td [uvw|tangent]" << endl;
-    cout << "           = Tangent vertex semantic destination (default tangent)" << endl;
-    cout << "-ts [3|4]      = Tangent size (3 or 4 components, 4 includes parity, default 3)" << endl;
-    cout << "-tm            = Split tangent vertices at UV mirror points" << endl;
-    cout << "-tr            = Split tangent vertices where basis is rotated > 90 degrees" << endl;
-    cout << "-r         = DON'T reorganise buffers to recommended format" << endl;
-    cout << "-E endian  = Set endian mode 'big' 'little' or 'native' (default)" << endl;
-    cout << "-b         = Recalculate bounding box (static meshes only)" << endl;
-    cout << "-V version = Specify OGRE version format to write instead of latest" << endl;
-    cout << "             Options are: 1.10, 1.8, 1.7, 1.4, 1.0" << endl;
-    cout << "-log filename  = name of the log file (default: 'OgreMeshUpgrader.log')" << endl;
-    cout << "sourcefile = name of file to convert" << endl;
-    cout << "destfile   = optional name of file to write to. If you don't" << endl;
-    cout << "             specify this OGRE overwrites the existing file." << endl;
+    cout <<
+R"HELP(Usage: OgreMeshUpgrader [opts] sourcefile [destfile]
 
-    cout << endl;
+  Upgrades or downgrades .mesh file versions.
+
+-i             = Interactive mode, prompt for options
+-pack          = Pack normals and tangents as int_10_10_10_2
+-autogen       = Generate autoconfigured LOD. No LOD options needed
+-l lodlevels   = number of LOD levels
+-d loddist     = distance increment to reduce LOD
+-p lodpercent  = Percentage triangle reduction amount per LOD
+-f lodnumtris  = Fixed vertex reduction per LOD
+-e             = DON'T generate edge lists (for stencil shadows)
+-t             = Generate tangents (for normal mapping)
+-td [uvw|tangent]
+               = Tangent vertex semantic destination (default: tangent)
+-ts [3|4]      = Tangent size (4 includes parity, default: 3)
+-tm            = Split tangent vertices at UV mirror points
+-tr            = Split tangent vertices where basis is rotated > 90 degrees
+-r             = DON'T reorganise buffers to recommended format
+-E endian      = Set endian mode 'big' 'little' or 'native' (default)
+-b             = Recalculate bounding box (static meshes only)
+-V version     = Specify OGRE version format to write instead of latest
+                 Options are: 1.10, 1.8, 1.7, 1.4, 1.0
+-log filename  = name of the log file (default: 'OgreMeshUpgrader.log')
+sourcefile     = name of file to convert
+destfile       = optional name of file to write to. If you don't
+                 specify this OGRE overwrites the existing file.
+)HELP";
 }
 
 struct UpgradeOptions {

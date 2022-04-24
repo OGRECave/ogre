@@ -88,31 +88,29 @@ void print_version(void)
 void help(void)
 {
     // Print help message
-    cout << endl << "OgreXMLConvert: Converts data between XML and OGRE binary formats." << endl;
-    cout << "Provided for OGRE by Steve Streeting" << endl << endl;
-    cout << "Usage: OgreXMLConverter [options] sourcefile [destfile] " << endl;
-    cout << endl << "Available options:" << endl;
-    cout << "-v             = Display version information" << endl;
-    cout << "-merge [n0,n1] = Merge texcoordn0 with texcoordn1. The , separator must be" << endl;
-    cout << "                 present, otherwise only n0 is provided assuming n1 = n0+1;" << endl;
-    cout << "                 n0 and n1 must be in the same buffer source & adjacent" << endl;
-    cout << "                 to each other for the merge to work." << endl;
-    cout << "-o             = DON'T optimise out redundant tracks & keyframes" << endl;
-    cout << "-d3d           = Use packed argb colour format (default on Windows)" << endl;
-    cout << "-gl            = Use packed abgr colour format (default on non-Windows)" << endl;
-    cout << "-byte          = Use ubyte4 colour format (default since 1.13)" << endl;
-    cout << "-E endian      = Set endian mode 'big' 'little' or 'native' (default)" << endl;
-    cout << "-x num         = Generate no more than num eXtremes for every submesh (default 0)" << endl;
-    cout << "-q             = Quiet mode, less output" << endl;
-    cout << "-log filename  = name of the log file (default: 'OgreXMLConverter.log')" << endl;
-    cout << "sourcefile     = name of file to convert" << endl;
-    cout << "destfile       = optional name of file to write to. If you don't" << endl;
-    cout << "                 specify this OGRE works it out through the extension " << endl;
-    cout << "                 and the XML contents if the source is XML. For example" << endl;
-    cout << "                 test.mesh becomes test.xml, test.xml becomes test.mesh " << endl;
-    cout << "                 if the XML document root is <mesh> etc."  << endl;
+    cout <<
+R"HELP(Usage: OgreXMLConverter [options] sourcefile [destfile]
 
-    cout << endl;
+  Converts data between XML and OGRE binary formats.
+
+Available options:
+-v             = Display version information
+-merge [n0,n1] = Merge texcoordn0 with texcoordn1. The , separator must be
+                 present, otherwise only n0 is provided assuming n1 = n0+1;
+                 n0 and n1 must be in the same buffer source & adjacent
+                 to each other for the merge to work.
+-o             = DON'T optimise out redundant tracks & keyframes
+-E endian      = Set endian mode 'big' 'little' or 'native' (default)
+-x num         = Generate no more than num eXtremes for every submesh (default 0)
+-q             = Quiet mode, less output
+-log filename  = name of the log file (default: 'OgreXMLConverter.log')
+sourcefile     = name of file to convert
+destfile       = optional name of file to write to. If you don't
+                 specify this OGRE works it out through the extension
+                 and the XML contents if the source is XML. For example
+                 test.mesh becomes test.xml, test.xml becomes test.mesh
+                 if the XML document root is <mesh> etc.
+)HELP";
 }
 
 

@@ -68,22 +68,24 @@ DefaultTextureManager* texMgr = 0;
 
 void help(void)
 {
-    // Print help message
-    std::cout << std::endl << "OgreAssimpConverter: Converts data from model formats supported by Assimp" << std::endl;
-    std::cout << "to OGRE binary formats (mesh and skeleton) and material script." << std::endl;
-    std::cout << std::endl << "Usage: OgreAssimpConverter [options] sourcefile [destination] " << std::endl;
-    std::cout << std::endl << "Available options:" << std::endl;
-    std::cout << "-q                  = Quiet mode, less output" << std::endl;
-    std::cout << "-log filename       = name of the log file (default: 'OgreAssimp.log')" << std::endl;
-    std::cout << "-aniSpeedMod value  = Factor to scale the animation speed - (default: '1.0')" << std::endl;
-    std::cout << "                      (double between 0 and 1)" << std::endl;
-    std::cout << "-3ds_ani_fix        = Fix for the fact that 3ds max exports the animation over a" << std::endl;
-    std::cout << "                      longer time frame than the animation actually plays for" << std::endl;
-    std::cout << "-max_edge_angle deg = When normals are generated, max angle between two faces to smooth over" << std::endl;
-    std::cout << "sourcefile          = name of file to convert" << std::endl;
-    std::cout << "destination         = optional name of directory to write to. If you don't" << std::endl;
-    std::cout << "                      specify this the converter will use the same directory as the sourcefile."  << std::endl;
-    std::cout << std::endl;
+    std::cout <<
+R"HELP(Usage: OgreAssimpConverter [options] sourcefile [destination]
+
+  Converts 3D-formats supported by assimp to native OGRE formats
+
+Available options:
+-q                  = Quiet mode, less output
+-log filename       = name of the log file (default: 'OgreAssimp.log')
+-aniSpeedMod [0..1] = Factor to scale the animation speed (default: 1.0)
+-3ds_ani_fix        = Fix for 3ds max, which exports the animation over a
+                      longer time frame than the animation actually plays
+-max_edge_angle deg = When normals are generated, max angle between
+                      two faces to smooth over
+sourcefile          = name of file to convert
+destination         = optional name of directory to write to. If you don't
+                      specify this the converter will use the same
+                      directory as the sourcefile.
+)HELP";
 }
 
 struct AssOptions
