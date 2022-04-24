@@ -13,3 +13,6 @@ if (OGRE_PROJECT_FOLDERS)
 	set_property(TARGET OgreAssimpConverter PROPERTY FOLDER Tools)
 endif ()
 ogre_config_tool(OgreAssimpConverter)
+
+set_property(TARGET OgreAssimpConverter PROPERTY
+	INSTALL_RPATH "$ORIGIN/../${OGRE_PLUGINS_PATH}")
