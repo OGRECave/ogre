@@ -27,13 +27,10 @@ THE SOFTWARE.
 */
 
 #include "Ogre.h"
-#include "OgreMeshSerializer.h"
-#include "OgreSkeletonSerializer.h"
 #include "OgreDefaultHardwareBufferManager.h"
 #include "OgreMeshLodGenerator.h"
 #include "OgreDistanceLodStrategy.h"
 #include "OgreLodStrategyManager.h"
-#include "OgreHardwareVertexBuffer.h"
 #include "OgrePixelCountLodStrategy.h"
 #include "OgreLodConfig.h"
 
@@ -100,23 +97,10 @@ struct UpgradeOptions {
     String logFile;
 };
 
-// Crappy globals
-// NB some of these are not directly used, but are required to
-//   instantiate the singletons used in the dlls
-LogManager* logMgr = 0;
-Math* mth = 0;
-LodStrategyManager* lodMgr = 0;
-MaterialManager* matMgr = 0;
-SkeletonManager* skelMgr = 0;
-MeshSerializer* meshSerializer = 0;
-SkeletonSerializer* skeletonSerializer = 0;
-DefaultHardwareBufferManager *bufferManager = 0;
-ResourceGroupManager* rgm = 0;
-MeshManager* meshMgr = 0;
-UpgradeOptions opts;
-
-void parseOpts(UnaryOptionList& unOpts, BinaryOptionList& binOpts)
+UpgradeOptions parseOpts(UnaryOptionList& unOpts, BinaryOptionList& binOpts)
 {
+    UpgradeOptions opts;
+
     // Defaults
     opts.interactive = false;
     opts.suppressEdgeLists = false;
@@ -221,9 +205,11 @@ void parseOpts(UnaryOptionList& unOpts, BinaryOptionList& binOpts)
         } else if (bi->second == "1.0") {
             opts.targetVersion = MESH_VERSION_1_0;
         } else {
-            logMgr->logError("Unrecognised target mesh version '" + bi->second + "'");
+            LogManager::getSingleton().logError("Unrecognised target mesh version '" + bi->second + "'");
         }
     }
+
+    return opts;
 }
 
 String describeSemantic(VertexElementSemantic sem)
@@ -436,7 +422,7 @@ void reorganiseVertexBuffers(const String& desc, Mesh& mesh, SubMesh* sm, Vertex
 }
 
 // Utility function to allow the user to modify the layout of vertex buffers.
-void reorganiseVertexBuffers(Mesh& mesh)
+void reorganiseVertexBuffers(const UpgradeOptions& opts, Mesh& mesh)
 {
     // Make sure animation types up to date
     mesh._determineAnimationTypes();
@@ -488,7 +474,7 @@ void reorganiseVertexBuffers(Mesh& mesh)
     }
 }
 
-void vertexBufferReorg(Mesh& mesh)
+void vertexBufferReorg(const UpgradeOptions& opts, Mesh& mesh)
 {
     String response;
 
@@ -500,7 +486,7 @@ void vertexBufferReorg(Mesh& mesh)
             cin >> response;
             StringUtil::toLowerCase(response);
             if (response == "y") {
-                reorganiseVertexBuffers(mesh);
+                reorganiseVertexBuffers(opts, mesh);
             } else if (response == "n") {
                 // Do nothing
             } else {
@@ -509,7 +495,7 @@ void vertexBufferReorg(Mesh& mesh)
             }
         }
     } else if (!opts.dontReorganise) {
-                reorganiseVertexBuffers(mesh);
+                reorganiseVertexBuffers(opts, mesh);
             }
 }
 
@@ -557,6 +543,7 @@ void recalcBounds(Mesh* mesh)
 
 void printLodConfig(const LodConfig& lodConfig)
 {
+    auto logMgr = LogManager::getSingletonPtr();
     logMgr->logMessage("LOD config summary:");
     logMgr->logMessage(" - lodConfig.strategy=" + lodConfig.strategy->getName());
     String reductionMethod("Unknown");
@@ -597,7 +584,7 @@ size_t getUniqueVertexCount(MeshPtr mesh)
     return lodConfig.levels[0].outUniqueVertexCount;
 }
 
-void buildLod(MeshPtr& mesh)
+void buildLod(UpgradeOptions& opts, MeshPtr& mesh)
 {
     String response;
 
@@ -824,9 +811,9 @@ void buildLod(MeshPtr& mesh)
     }
     printLodConfig(lodConfig);
 
-    logMgr->logMessage("Generating LOD levels...");
+    LogManager::getSingleton().logMessage("Generating LOD levels...");
     gen.generateLodLevels(lodConfig);
-    logMgr->logMessage("Generating LOD levels... success");
+    LogManager::getSingleton().logMessage("Generating LOD levels... success");
 }
 
 void checkColour(VertexData* vdata, bool& hasColour, bool& hasAmbiguousColour,
@@ -915,13 +902,13 @@ int main(int numargs, char** args)
     }
 
     int retCode = 0;
+
+    LogManager logMgr;
+    // this log catches output from the parseArgs call and routes it to stdout only
+    logMgr.createLog("Temporary log", true, true, true);
+
     try
     {
-        logMgr = new LogManager();
-        //logMgr->createLog("OgreMeshUpgrader.log", true);
-        // this log catches output from the parseArgs call and routes it to stdout only
-        logMgr->createLog("Temporary log", false, true, true);
-
         UnaryOptionList unOptList;
         BinaryOptionList binOptList;
 
@@ -946,30 +933,26 @@ int main(int numargs, char** args)
         binOptList["-log"] = "OgreMeshUpgrader.log";
 
         int startIdx = findCommandLineOpts(numargs, args, unOptList, binOptList);
-        parseOpts(unOptList, binOptList);
+        auto opts = parseOpts(unOptList, binOptList);
+
+        logMgr.setDefaultLog(NULL); // swallow startup messages
+        Root root("", "", "");
+        // get rid of the temporary log as we use the new log now
+        logMgr.destroyLog("Temporary log");
 
         // use the log specified by the cmdline params
-        logMgr->setDefaultLog(logMgr->createLog(opts.logFile, true, true));
-
-        // get rid of the temporary log as we use the new log now
-        logMgr->destroyLog("Temporary log");
+        logMgr.setDefaultLog(logMgr.createLog(opts.logFile, true, true));
 
         String source(args[startIdx]);
 
-        rgm = new ResourceGroupManager();
-        mth = new Math();
-        lodMgr = new LodStrategyManager();
-        matMgr = new MaterialManager();
-        matMgr->initialise();
-        skelMgr = new SkeletonManager();
-        meshSerializer = new MeshSerializer();
+        MaterialManager::getSingleton().initialise();
+        MeshSerializer meshSerializer;
         MeshResourceCreator resCreator;
-        meshSerializer->setListener(&resCreator);
-        skeletonSerializer = new SkeletonSerializer();
-        bufferManager = new DefaultHardwareBufferManager(); // needed because we don't have a rendersystem
-        meshMgr = new MeshManager();
+        meshSerializer.setListener(&resCreator);
+        SkeletonSerializer skeletonSerializer;
+        DefaultHardwareBufferManager bufferManager; // needed because we don't have a rendersystem
         // don't pad during upgrade
-        meshMgr->setBoundsPaddingFactor(0.0f);
+        MeshManager::getSingleton().setBoundsPaddingFactor(0.0f);
 
         // Load the mesh
         struct stat tagStat;
@@ -987,12 +970,11 @@ int main(int numargs, char** args)
                 "Unexpected error while reading file " + source, "OgreMeshUpgrader");
         fclose( pFile );
 
-        MeshPtr meshPtr = MeshManager::getSingleton().createManual("conversion",
-                                                                   ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+        MeshPtr meshPtr = MeshManager::getSingleton().createManual("conversion", RGN_DEFAULT);
         Mesh* mesh = meshPtr.get();
 
         DataStreamPtr stream(memstream);
-        meshSerializer->importMesh(stream, mesh);
+        meshSerializer.importMesh(stream, mesh);
 
         // Write out the converted mesh
         String dest;
@@ -1004,12 +986,12 @@ int main(int numargs, char** args)
 
         String response;
 
-        vertexBufferReorg(*mesh);
+        vertexBufferReorg(opts, *mesh);
 
         // Deal with VET_COLOUR ambiguities
         resolveColourAmbiguities(mesh);
 
-        buildLod(meshPtr);
+        buildLod(opts, meshPtr);
 
         if (opts.interactive) {
             do {
@@ -1032,9 +1014,9 @@ int main(int numargs, char** args)
         } else {
         // Make sure we generate edge lists, provided they are not deliberately disabled
             if (!opts.suppressEdgeLists) {
-                logMgr->logMessage("Generating edge lists...");
+                logMgr.logMessage("Generating edge lists...");
                 mesh->buildEdgeList();
-                logMgr->logMessage("Generating edge lists... success");
+                logMgr.logMessage("Generating edge lists... success");
             } else {
                 mesh->freeEdgeList();
 			}
@@ -1083,11 +1065,11 @@ int main(int numargs, char** args)
 
             }
             if (opts.generateTangents) {
-                logMgr->logMessage("Generating tangent vectors...");
+                logMgr.logMessage("Generating tangent vectors...");
                 mesh->buildTangentVectors(opts.tangentSemantic, srcTex, destTex,
                     opts.tangentSplitMirrored, opts.tangentSplitRotated,
                     opts.tangentUseParity);
-                logMgr->logMessage("Generating tangent vectors... success");
+                logMgr.logMessage("Generating tangent vectors... success");
             }
         }
 
@@ -1101,23 +1083,15 @@ int main(int numargs, char** args)
             recalcBounds(mesh);
         }
 
-        meshSerializer->exportMesh(mesh, dest, opts.targetVersion, opts.endian);
+        meshSerializer.exportMesh(mesh, dest, opts.targetVersion, opts.endian);
+
+        logMgr.setDefaultLog(NULL); // swallow shutdown messages
     }
     catch (Exception& e)
     {
-        cout << " !!! Exception caught: " << e.getDescription() << endl;
+        LogManager::getSingleton().logError(e.getDescription());
         retCode = 1;
     }
-
-    delete meshMgr;
-    delete skeletonSerializer;
-    delete meshSerializer;
-    delete skelMgr;
-    delete matMgr;
-    delete lodMgr;
-    delete mth;
-    delete rgm;
-    delete logMgr;
 
     return retCode;
 }
