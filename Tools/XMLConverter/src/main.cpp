@@ -29,12 +29,9 @@ THE SOFTWARE.
 
 #include "Ogre.h"
 #include "OgreXMLMeshSerializer.h"
-#include "OgreMeshSerializer.h"
 #include "OgreXMLSkeletonSerializer.h"
-#include "OgreSkeletonSerializer.h"
 #include "OgreXMLPrerequisites.h"
 #include "OgreDefaultHardwareBufferManager.h"
-#include "OgreLodStrategyManager.h"
 #include <iostream>
 
 using namespace std;
@@ -59,22 +56,6 @@ struct XmlOptions
     bool quietMode;
     Serializer::Endian endian;
 };
-
-// Crappy globals
-// NB some of these are not directly used, but are required to
-//   instantiate the singletons used in the dlls
-LogManager* logMgr = 0;
-Math* mth = 0;
-LodStrategyManager *lodMgr = 0;
-MaterialManager* matMgr = 0;
-SkeletonManager* skelMgr = 0;
-MeshSerializer* meshSerializer = 0;
-XMLMeshSerializer* xmlMeshSerializer = 0;
-SkeletonSerializer* skeletonSerializer = 0;
-XMLSkeletonSerializer* xmlSkeletonSerializer = 0;
-DefaultHardwareBufferManager *bufferManager = 0;
-MeshManager* meshMgr = 0;
-ResourceGroupManager* rgm = 0;
 
 void print_version(void)
 {
@@ -221,13 +202,13 @@ XmlOptions parseArgs(int numArgs, char **args)
     if (numArgs > startIndex+1)
         dest = args[startIndex+1];
     if (numArgs > startIndex+2) {
-        logMgr->logError("Too many command-line arguments supplied");
+        LogManager::getSingleton().logError("Too many command-line arguments supplied");
         exit(1);
     }
 
     if (!source)
     {
-        logMgr->logError("Missing source file");
+        LogManager::getSingleton().logError("Missing source file");
         exit(1);
     }
     // Work out what kind of conversion this is
@@ -279,34 +260,31 @@ XmlOptions parseArgs(int numArgs, char **args)
     return opts;
 }
 
-void meshToXML(XmlOptions opts)
+void meshToXML(XmlOptions opts, MeshSerializer& meshSerializer)
 {
-    std::ifstream ifs;
-    ifs.open(opts.source.c_str(), std::ios_base::in | std::ios_base::binary);
+    auto stream = Root::openFileStream(opts.source);
 
-    if (!ifs.good())
+    if (!stream)
     {
-        logMgr->logError("Unable to load file " + opts.source);
+        LogManager::getSingleton().logError("Unable to load file " + opts.source);
         exit(1);
     }
-
-    // pass false for freeOnClose to FileStreamDataStream since ifs is created on stack
-    DataStreamPtr stream(new FileStreamDataStream(opts.source, &ifs, false));
 
     MeshPtr mesh = MeshManager::getSingleton().create("conversion", 
         ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
     
 
-    meshSerializer->importMesh(stream, mesh.get());
+    meshSerializer.importMesh(stream, mesh.get());
    
-    xmlMeshSerializer->exportMesh(mesh.get(), opts.dest);
+    XMLMeshSerializer xmlMeshSerializer;
+    xmlMeshSerializer.exportMesh(mesh.get(), opts.dest);
 
     // Clean up the conversion mesh
     MeshManager::getSingleton().remove("conversion",
                                        ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
 }
 
-void XMLToBinary(XmlOptions opts)
+void XMLToBinary(XmlOptions opts, MeshSerializer& meshSerializer)
 {
     // Read root element and decide from there what type
     String response;
@@ -315,7 +293,7 @@ void XMLToBinary(XmlOptions opts)
     // Some double-parsing here but never mind
     if (!doc.load_file(opts.source.c_str()))
     {
-        logMgr->logError("Unable to load file " + opts.source);
+        LogManager::getSingleton().logError("Unable to load file " + opts.source);
         exit (1);
     }
     pugi::xml_node root = doc.document_element();
@@ -324,7 +302,8 @@ void XMLToBinary(XmlOptions opts)
         MeshPtr newMesh = MeshManager::getSingleton().createManual("conversion", 
             ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
 
-        xmlMeshSerializer->importMesh(opts.source, newMesh.get());
+        XMLMeshSerializer xmlMeshSerializer;
+        xmlMeshSerializer.importMesh(opts.source, newMesh.get());
 
         if( opts.mergeTexcoordResult != opts.mergeTexcoordToDestroy )
         {
@@ -340,52 +319,48 @@ void XMLToBinary(XmlOptions opts)
             }
         }
 
-        meshSerializer->exportMesh(newMesh.get(), opts.dest, opts.endian);
+        meshSerializer.exportMesh(newMesh.get(), opts.dest, opts.endian);
 
         // Clean up the conversion mesh
-        MeshManager::getSingleton().remove("conversion",
-                                           ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+        MeshManager::getSingleton().remove("conversion", RGN_DEFAULT);
     }
     else if (StringUtil::startsWith("skeleton", root.name()))
     {
-        SkeletonPtr newSkel = SkeletonManager::getSingleton().create("conversion", 
-            ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
-        xmlSkeletonSerializer->importSkeleton(opts.source, newSkel.get());
+        SkeletonPtr newSkel = SkeletonManager::getSingleton().create("conversion", RGN_DEFAULT);
+
+        XMLSkeletonSerializer xmlSkeletonSerializer;
+        xmlSkeletonSerializer.importSkeleton(opts.source, newSkel.get());
         if (opts.optimiseAnimations)
         {
             newSkel->optimiseAllAnimations();
         }
-        skeletonSerializer->exportSkeleton(newSkel.get(), opts.dest, SKELETON_VERSION_LATEST, opts.endian);
+        SkeletonSerializer skeletonSerializer;
+        skeletonSerializer.exportSkeleton(newSkel.get(), opts.dest, SKELETON_VERSION_LATEST, opts.endian);
 
         // Clean up the conversion skeleton
-        SkeletonManager::getSingleton().remove("conversion",
-                                               ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+        SkeletonManager::getSingleton().remove("conversion", RGN_DEFAULT);
     }
 }
 
 void skeletonToXML(XmlOptions opts)
 {
-
-    std::ifstream ifs;
-    ifs.open(opts.source.c_str(), std::ios_base::in | std::ios_base::binary);
-    if (!ifs.good())
+    auto stream = Root::openFileStream(opts.source);
+    if (!stream)
     {
-        logMgr->logError("Unable to load file " + opts.source);
+        LogManager::getSingleton().logError("Unable to load file " + opts.source);
         exit(1);
     }
 
-    SkeletonPtr skel = SkeletonManager::getSingleton().create("conversion", 
-        ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+    SkeletonPtr skel = SkeletonManager::getSingleton().create("conversion", RGN_DEFAULT);
 
-    // pass false for freeOnClose to FileStreamDataStream since ifs is created locally on stack
-    DataStreamPtr stream(new FileStreamDataStream(opts.source, &ifs, false));
-    skeletonSerializer->importSkeleton(stream, skel.get());
-   
-    xmlSkeletonSerializer->exportSkeleton(skel.get(), opts.dest);
+    SkeletonSerializer skeletonSerializer;
+    skeletonSerializer.importSkeleton(stream, skel.get());
+
+    XMLSkeletonSerializer xmlSkeletonSerializer;
+    xmlSkeletonSerializer.exportSkeleton(skel.get(), opts.dest);
 
     // Clean up the conversion skeleton
-    SkeletonManager::getSingleton().remove("conversion",
-                                           ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+    SkeletonManager::getSingleton().remove("conversion", RGN_DEFAULT);
 }
 
 struct MeshResourceCreator : public MeshSerializerListener
@@ -431,39 +406,31 @@ int main(int numargs, char** args)
     // Assume success
     int retCode = 0;
 
+    LogManager logMgr;
+    // this log catches output from the parseArgs call and routes it to stdout only
+    logMgr.createLog("Temporary log", true, true, true);
+    XmlOptions opts = parseArgs(numargs, args);
+
     try 
     {
-        logMgr = new LogManager();
-
-        // this log catches output from the parseArgs call and routes it to stdout only
-        logMgr->createLog("Temporary log", false, true, true); 
-
-        XmlOptions opts = parseArgs(numargs, args);
-        // use the log specified by the cmdline params
-        logMgr->setDefaultLog(logMgr->createLog(opts.logFile, false, !opts.quietMode)); 
+        logMgr.setDefaultLog(NULL); // swallow startup messages
+        Root root("", "", "");
         // get rid of the temporary log as we use the new log now
-        logMgr->destroyLog("Temporary log");
+        logMgr.destroyLog("Temporary log");
 
-        rgm = new ResourceGroupManager();
-        mth = new Math();
-        lodMgr = new LodStrategyManager();
-        meshMgr = new MeshManager();
-        matMgr = new MaterialManager();
-        matMgr->initialise();
-        skelMgr = new SkeletonManager();
-        meshSerializer = new MeshSerializer();
+        // use the log specified by the cmdline params
+        logMgr.setDefaultLog(logMgr.createLog(opts.logFile, false, !opts.quietMode));
+
+        MaterialManager::getSingleton().initialise();
+
+        MeshSerializer meshSerializer;
         MeshResourceCreator resCreator;
-        meshSerializer->setListener(&resCreator);
-        xmlMeshSerializer = new XMLMeshSerializer();
-        skeletonSerializer = new SkeletonSerializer();
-        xmlSkeletonSerializer = new XMLSkeletonSerializer();
-        bufferManager = new DefaultHardwareBufferManager(); // needed because we don't have a rendersystem
-
-
+        meshSerializer.setListener(&resCreator);
+        DefaultHardwareBufferManager bufferManager; // needed because we don't have a rendersystem
 
         if (opts.sourceExt == "mesh")
         {
-            meshToXML(opts);
+            meshToXML(opts, meshSerializer);
         }
         else if (opts.sourceExt == "skeleton")
         {
@@ -471,14 +438,15 @@ int main(int numargs, char** args)
         }
         else if (opts.sourceExt == "xml")
         {
-            XMLToBinary(opts);
+            XMLToBinary(opts, meshSerializer);
         }
         else
         {
-            logMgr->logError("Unknown input type: " + opts.sourceExt);
+            logMgr.logError("Unknown input type: " + opts.sourceExt);
             retCode = 1;
         }
 
+        logMgr.setDefaultLog(NULL); // swallow shutdown messages
     }
     catch(Exception& e)
     {
@@ -486,22 +454,6 @@ int main(int numargs, char** args)
         retCode = 1;
     }
 
-    Pass::processPendingPassUpdates(); // make sure passes are cleaned up
-
-    delete xmlSkeletonSerializer;
-    delete skeletonSerializer;
-    delete xmlMeshSerializer;
-    delete meshSerializer;
-    delete skelMgr;
-    delete matMgr;
-    delete meshMgr;
-    delete bufferManager;
-    delete lodMgr;
-    delete mth;
-    delete rgm;
-    delete logMgr;
-
     return retCode;
-
 }
 
