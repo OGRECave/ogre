@@ -251,22 +251,45 @@ Overlays are only really designed for non-interactive screen elements, although 
 
 There are a number of mesh tools available with OGRE to help you manipulate your meshes.
 
-<dl compact="compact">
-<dt>[Exporters](@ref Exporters)</dt> <dd>
+@tableofcontents
 
-For getting data out of modellers and into OGRE.
+# XMLConverter {#XMLConverter}
 
-</dd> <dt>[XMLConverter](@ref XMLConverter)</dt> <dd>
+This tool can convert binary .mesh and .skeleton files to XML and back again - this is a very useful tool for debugging the contents of meshes, or for exchanging mesh data easily - many of the modeller mesh exporters export to XML because it is simpler to do, and @c OgreXMLConverter can then produce a binary from it.
 
-For converting meshes and skeletons to/from XML.
+@par Usage
+```
+OgreXMLConverter [options] sourcefile [destfile]
+```
 
-</dd> <dt>[MeshUpgrader](@ref MeshUpgrader)</dt> <dd>
+Run the tool with no arguments to see the available options.
 
-For upgrading binary meshes from one version of OGRE to another.
+# MeshUpgrader {#MeshUpgrader}
 
-</dd> </dl>
+This tool is provided to allow you to upgrade your meshes when the binary format changes - sometimes we alter it to add new features and as such you need to keep your own assets up to date.
+Furthermore, @c OgreMeshUpgrader can generate additional information for the mesh, like bounding regions and level-of-detail reduction.
+See the @ref meshlod-generator Tutorial for details.
 
+@par Usage
+```
+OgreMeshUpgrader [options] sourcefile [destfile]
+```
 
+Run the tool with no arguments to see the available options.
+
+@note
+The OGRE release notes will notify you when meshes should be upgraded with a new release.
+
+# AssimpConverter {#AssimpConverter}
+
+This tool converts 3D-formats supported by [assimp](https://assimp-docs.readthedocs.io/en/stable/about/introduction.html) to native OGRE .mesh .skeleton and .material files.
+
+@par Usage
+```
+OgreAssimpConverter [options] sourcefile [destination]
+```
+
+Run the tool with no arguments to see the available options.
 
 # Exporters {#Exporters}
 
@@ -290,45 +313,14 @@ Full documentation for each exporter is provided along with the exporter itself,
 
 ## A Note About empty Material Names
 
-It is highly recommended for any mesh files to have a material name set, otherwise most mesh tools will fail with an exception.
+All mesh files are required to have a material name set, otherwise most mesh tools will fail with an exception.
 Even if they don't, the exception will happen deep inside the render-loop which is way harder to debug  (unless you set the material programmatically).
 
 To set a material name for the mesh, you have these options:
 
  - Re-export the mesh from your preferred DCC (Digital Content Creator) exporter, making sure that a material has been assigned.
- - Edit the mesh.xml file to set a material name and reprocess the xml with OgreXMLConverter.
- - Edit the mesh file with MeshMagick [MeshMagick](https://github.com/OGRECave/meshmagick) to set a material name
-
-# XMLConverter {#XMLConverter}
-
-The OgreXMLConverter tool can converter binary .mesh and .skeleton files to XML and back again - this is a very useful tool for debugging the contents of meshes, or for exchanging mesh data easily - many of the modeller mesh exporters export to XML because it is simpler to do, and OgreXMLConverter can then produce a binary from it.
-
-@par Syntax
-```
-OgreXMLConverter [options] sourcefile [destfile] 
-```
-
-@param sourcefile name of file to convert
-@param destfile optional name of file to write to. If you don't
-specify this OGRE works it out through the extension
-and the XML contents if the source is XML. For example
-test.mesh becomes test.xml, test.xml becomes test.mesh
-if the XML document root is mesh etc.
-
-# MeshUpgrader {#MeshUpgrader}
-
-This tool is provided to allow you to upgrade your meshes when the binary format changes - sometimes we alter it to add new features and as such you need to keep your own assets up to date.
-Furthermore, OgreMeshUpgrader can generate additional information for the mesh, like bounding regions and level-of-detail reduction.
-
-@par Syntax
-```
-OgreMeshUpgrader [options] sourcefile [destfile]
-```
-
-@note
-The OGRE release notes will notify you when meshes should be upgraded with a new release.
-
-When specifying the `-i` option, you will be prompted to (re)generate level-of-detail(LOD) information for the mesh - you can choose to skip this part if you wish, but doing it will allow you to make your mesh reduce in detail automatically when it is loaded into the engine. The engine uses a complex algorithm to determine the best parts of the mesh to reduce in detail depending on many factors such as the curvature of the surface, the edges of the mesh and seams at the edges of textures and smoothing groups - taking advantage of it is advised to make your meshes more scalable in real scenes.
+ - Edit the mesh.xml file to set a material name and reprocess the xml with @c OgreXMLConverter.
+ - Edit the mesh file with [MeshMagick](https://github.com/OGRECave/meshmagick) to set a material name
 
 @page Shadows Shadows
 
