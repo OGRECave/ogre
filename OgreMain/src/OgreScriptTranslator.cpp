@@ -2378,8 +2378,9 @@ namespace Ogre{
         if(!caster_mat)
         {
             auto src_mat = pass->getParent()->getParent();
-            // only first pass of this will be used
-            caster_mat = src_mat->clone(src_mat->getName()+"/CasterFallback");
+            // only first pass of this will be used. The caster material is technique specific.
+            caster_mat = src_mat->clone(
+                StringUtil::format("%s/%p/CasterFallback", src_mat->getName().c_str(), pass->getParent()));
             pass->getParent()->setShadowCasterMaterial(caster_mat);
         }
         auto caster_pass = caster_mat->getTechnique(0)->getPass(0);
