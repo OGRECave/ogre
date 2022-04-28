@@ -123,7 +123,7 @@ endif ()
 
 # Set compiler specific build flags
 if (NOT ANDROID AND NOT EMSCRIPTEN AND UNIX OR MINGW)
-  if (CMAKE_SYSTEM_PROCESSOR MATCHES "x86|X86|amd64|AMD64") 
+  if (CMAKE_SYSTEM_PROCESSOR MATCHES "x86|X86|amd64|AMD64")
     include(CheckCXXCompilerFlag)
     check_cxx_compiler_flag(-msse OGRE_GCC_HAS_SSE)
     if (OGRE_GCC_HAS_SSE)
