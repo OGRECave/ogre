@@ -512,16 +512,6 @@ namespace Ogre {
             case PF_A8:
                 ((uint8*)dest)[0] = (uint8)Bitwise::floatToFixed(r, 8);
                 break;
-            case PF_A2B10G10R10:
-            {
-                const uint16 ir = static_cast<uint16>( Math::saturate( r ) * 1023.0f + 0.5f );
-                const uint16 ig = static_cast<uint16>( Math::saturate( g ) * 1023.0f + 0.5f );
-                const uint16 ib = static_cast<uint16>( Math::saturate( b ) * 1023.0f + 0.5f );
-                const uint16 ia = static_cast<uint16>( Math::saturate( a ) * 3.0f + 0.5f );
-
-                ((uint32*)dest)[0] = (ia << 30u) | (ir << 20u) | (ig << 10u) | (ib);
-                break;
-            }
             default:
                 // Not yet supported
                 OGRE_EXCEPT(
