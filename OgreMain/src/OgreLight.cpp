@@ -751,7 +751,7 @@ namespace Ogre {
     void Light::_setCameraRelative(Camera* cam)
     {
         mCameraToBeRelativeTo = cam;
-#ifdef OGRE_NODELESS_POSITONING
+#ifdef OGRE_NODELESS_POSITIONING
         mDerivedCamRelativeDirty = true;
 #endif
     }
