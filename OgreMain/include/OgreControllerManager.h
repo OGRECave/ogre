@@ -56,7 +56,7 @@ namespace Ogre {
     class _OgreExport ControllerManager : public Singleton<ControllerManager>, public ControllerAlloc
     {
     private:
-        typedef std::set<Controller<Real>*> ControllerList;
+        typedef std::set<ControllerReal*> ControllerList;
         ControllerList mControllers;
 
         /// Global predefined controller
@@ -74,13 +74,12 @@ namespace Ogre {
 
         /** Creates a new controller and registers it with the manager.
         */
-        Controller<Real>* createController(const ControllerValueRealPtr& src,
+        ControllerReal* createController(const ControllerValueRealPtr& src,
             const ControllerValueRealPtr& dest, const ControllerFunctionRealPtr& func);
 
         /** Creates a new controller use frame time source and passthrough controller function.
         */
-        Controller<Real>* createFrameTimePassthroughController(
-            const ControllerValueRealPtr& dest);
+        ControllerReal* createFrameTimePassthroughController(const ControllerValueRealPtr& dest);
 
         /** Destroys all the controllers in existence.
         */
@@ -114,7 +113,7 @@ namespace Ogre {
         @param sequenceTime
             The amount of time in seconds it will take to loop through all the frames.
         */
-        Controller<Real>* createTextureAnimator(TextureUnitState* layer, Real sequenceTime);
+        ControllerReal* createTextureAnimator(TextureUnitState* layer, Real sequenceTime);
 
         /** Creates a basic time-based texture uv coordinate modifier designed for creating scrolling textures.
 
@@ -128,7 +127,7 @@ namespace Ogre {
         @param speed
             Speed of horizontal (u-coord) and vertical (v-coord) scroll, in complete wraps per second.
         */
-        Controller<Real>* createTextureUVScroller(TextureUnitState* layer, Real speed);
+        ControllerReal* createTextureUVScroller(TextureUnitState* layer, Real speed);
 
         /** Creates a basic time-based texture u coordinate modifier designed for creating scrolling textures.
 
@@ -140,7 +139,7 @@ namespace Ogre {
         @param uSpeed
             Speed of horizontal (u-coord) scroll, in complete wraps per second.
         */
-        Controller<Real>* createTextureUScroller(TextureUnitState* layer, Real uSpeed);
+        ControllerReal* createTextureUScroller(TextureUnitState* layer, Real uSpeed);
 
         /** Creates a basic time-based texture v coordinate modifier designed for creating scrolling textures.
 
@@ -152,7 +151,7 @@ namespace Ogre {
         @param vSpeed
             Speed of vertical (v-coord) scroll, in complete wraps per second.
         */
-        Controller<Real>* createTextureVScroller(TextureUnitState* layer, Real vSpeed);
+        ControllerReal* createTextureVScroller(TextureUnitState* layer, Real vSpeed);
 
         /** Creates a basic time-based texture coordinate modifier designed for creating rotating textures.
 
@@ -164,7 +163,7 @@ namespace Ogre {
         @param speed
             Speed of rotation, in complete anticlockwise revolutions per second.
         */
-        Controller<Real>* createTextureRotater(TextureUnitState* layer, Real speed);
+        ControllerReal* createTextureRotater(TextureUnitState* layer, Real speed);
 
         /** Creates a very flexible time-based texture transformation which can alter the scale, position or
             rotation of a texture based on a wave function.
@@ -183,7 +182,7 @@ namespace Ogre {
         @param amplitude
             Scales the output so that instead of lying within 0..1 it lies within 0..1*amplitude for exaggerated effects.
         */
-        Controller<Real>* createTextureWaveTransformer(TextureUnitState* layer, TextureUnitState::TextureTransformType ttype,
+        ControllerReal* createTextureWaveTransformer(TextureUnitState* layer, TextureUnitState::TextureTransformType ttype,
             WaveformType waveType, Real base = 0, Real frequency = 1, Real phase = 0, Real amplitude = 1);
 
         /** Creates a controller for passing a frame time value through to a vertex / fragment program parameter.
@@ -198,12 +197,12 @@ namespace Ogre {
         @param timeFactor
             The factor by which to adjust the time elapsed by before passing it to the program.
         */
-        Controller<Real>* createGpuProgramTimerParam(GpuProgramParametersPtr params, size_t paramIndex,
-                                                     Real timeFactor = 1.0f);
+        ControllerReal* createGpuProgramTimerParam(GpuProgramParametersPtr params, size_t paramIndex,
+                                                   Real timeFactor = 1.0f);
 
         /** Removes & destroys the controller passed in as a pointer.
         */
-        void destroyController(Controller<Real>* controller);
+        void destroyController(ControllerReal* controller);
 
         /** Return relative speed of time as perceived by time based controllers.
 

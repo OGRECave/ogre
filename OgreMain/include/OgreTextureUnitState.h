@@ -320,7 +320,7 @@ namespace Ogre {
             Real frequency;
             Real phase;
             Real amplitude;
-            Controller<Real>* controller;
+            ControllerReal* controller;
             const Frustum* frustum;
         };
 
@@ -1068,7 +1068,7 @@ namespace Ogre {
         /** Gets the animation controller (as created because of setAnimatedTexture)
             if it exists.
         */
-        Controller<Real>* _getAnimController() const { return mAnimController; }
+        ControllerReal* _getAnimController() const { return mAnimController; }
 
         /// return a sampler local to this TUS instead of the shared global one
         const SamplerPtr& _getLocalSampler();
@@ -1122,7 +1122,7 @@ private:
         // preserving even if assign from others
         //
         Pass* mParent;
-        Controller<Real>* mAnimController;
+        ControllerReal* mAnimController;
         //-----------------------------------------------------------------------------
 
 

@@ -86,6 +86,7 @@ namespace Ogre {
     class ColourValue;
     class ConfigDialog;
     template <typename T> class Controller;
+    typedef Controller<Real> ControllerReal;
     template <typename T> class ControllerFunction;
     class ControllerManager;
     template <typename T> class ControllerValue;

@@ -99,7 +99,7 @@ protected:
     ColourValue mMaxLightColour;
     Real mMinFlareSize;
     Real mMaxFlareSize;
-    Controller<Real>* mController;
+    ControllerReal* mController;
 
     enum ShadowProjection
     {

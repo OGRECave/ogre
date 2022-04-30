@@ -567,7 +567,7 @@ namespace Ogre {
         /// Last frame in which known to be visible
         unsigned long mLastVisibleFrame;
         /// Controller for time update
-        Controller<Real>* mTimeController;
+        ControllerReal* mTimeController;
         /// Indication whether the emitted emitter pool (= pool with particle emitters that are emitted) is initialised
         bool mEmittedEmitterPoolInitialised;
         /// Used to control if the particle system should emit particles or not.
