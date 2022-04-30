@@ -67,8 +67,10 @@ namespace Ogre {
         Real getValue(void) const;
         void setValue(Real value);
         Real getTimeFactor(void) const;
+        /// @copydoc ControllerManager::setTimeFactor
         void setTimeFactor(Real tf);
         Real getFrameDelay(void) const;
+        /// @copydoc ControllerManager::setFrameDelay
         void setFrameDelay(Real fd);
         Real getElapsedTime(void) const;
         void setElapsedTime(Real elapsedTime);
