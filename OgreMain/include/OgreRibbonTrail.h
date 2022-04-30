@@ -204,7 +204,7 @@ namespace Ogre {
         /// Delta width of the ribbon
         RealList mDeltaWidth;
         /// controller used to hook up frame time to fader
-        Controller<Real>* mFadeController;
+        ControllerReal* mFadeController;
         /// controller value for hooking up frame time to fader
         ControllerValueRealPtr mTimeControllerValue;
 

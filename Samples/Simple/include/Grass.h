@@ -315,7 +315,7 @@ class _OgreSampleClassExport Sample_Grass : public SdkSample
 
  StaticGeometry* mField;
  AnimationState* mLightAnimState;
- Controller<Real>* mLightController;
+ ControllerReal* mLightController;
 };
 
 #endif
