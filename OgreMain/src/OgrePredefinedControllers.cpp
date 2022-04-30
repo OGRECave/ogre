@@ -63,25 +63,6 @@ namespace Ogre
         return true;
     }
     //-----------------------------------------------------------------------
-    bool FrameTimeControllerValue::frameEnded(const FrameEvent &evt)
-    {
-        return true;
-    }
-    //-----------------------------------------------------------------------
-    Real FrameTimeControllerValue::getValue() const
-    {
-        return mFrameTime;
-    }
-    //-----------------------------------------------------------------------
-    void FrameTimeControllerValue::setValue(Real value)
-    {
-        // Do nothing - value is set from frame listener
-    }
-    //-----------------------------------------------------------------------
-    Real FrameTimeControllerValue::getTimeFactor(void) const {
-        return mTimeFactor;
-    }
-    //-----------------------------------------------------------------------
     void FrameTimeControllerValue::setTimeFactor(Real tf) {
         if(tf >= 0) 
         {
@@ -90,23 +71,9 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------
-    Real FrameTimeControllerValue::getFrameDelay(void) const {
-        return mFrameDelay;
-    }
-    //-----------------------------------------------------------------------
     void FrameTimeControllerValue::setFrameDelay(Real fd) {
         mTimeFactor = 0;
         mFrameDelay = fd;
-    }
-    //-----------------------------------------------------------------------
-    Real FrameTimeControllerValue::getElapsedTime(void) const
-    {
-        return mElapsedTime;
-    }
-    //-----------------------------------------------------------------------
-    void FrameTimeControllerValue::setElapsedTime(Real elapsedTime)
-    {
-        mElapsedTime = elapsedTime;
     }
     //-----------------------------------------------------------------------
     // TextureFrameControllerValue
