@@ -173,6 +173,9 @@ void PBR_Lights(
                 in vec2 mrParam,
                 inout vec3 vOutColour)
 {
+    // assume ambient in vOutColour
+    vOutColour = vOutColour * baseColor;
+
     // gamma to linear
     baseColor = pow(baseColor, vec3_splat(2.2));
 
