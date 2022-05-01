@@ -101,8 +101,9 @@ bool CookTorranceLighting::createCpuSubPrograms(ProgramSet* programSet)
         mrparams = In(specular).xy();
     }
 
+    auto sceneCol = psProgram->resolveParameter(GpuProgramParameters::ACT_DERIVED_SCENE_COLOUR);
     auto litResult = psMain->resolveLocalParameter(GCT_FLOAT3, "litResult");
-    fstage.assign(Vector3(0), litResult);
+    fstage.assign(In(sceneCol).xyz(), litResult);
 
     if(mLightCount > 0)
     {
@@ -117,7 +118,8 @@ bool CookTorranceLighting::createCpuSubPrograms(ProgramSet* programSet)
                                             mrparams, InOut(litResult)});
     }
 
-    fstage.assign(litResult, Out(outDiffuse).xyz());
+    fstage.assign(In(sceneCol).w(), Out(outDiffuse).w());
+    fstage.assign(In(litResult).xyz(), Out(outDiffuse).xyz());
 
     return true;
 }
