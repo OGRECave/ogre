@@ -269,6 +269,25 @@ bool FFPLighting::addFunctionInvocations(ProgramSet* programSet)
         addIlluminationInvocation(&lp, stage);
     }
 
+    auto psProgram = programSet->getCpuProgram(GPT_FRAGMENT_PROGRAM);
+    auto psMain = psProgram->getMain();
+    if (auto shadowFactor = psMain->getLocalParameter("lShadowFactor"))
+    {
+        auto ambient = psProgram->resolveParameter(GpuProgramParameters::ACT_DERIVED_SCENE_COLOUR);
+        auto psOutDiffuse = psMain->resolveOutputParameter(Parameter::SPC_COLOR_DIFFUSE);
+
+        auto fstage = psMain->getStage(FFP_PS_COLOUR_BEGIN);
+        fstage.callFunction("SGX_ApplyShadowFactor_Diffuse",
+                            {In(ambient), In(psOutDiffuse), In(shadowFactor), Out(psOutDiffuse)});
+        if (mSpecularEnable)
+        {
+            auto psSpecular = psMain->getInputParameter(Parameter::SPC_COLOR_SPECULAR);
+            if (!psSpecular)
+                psMain->getLocalParameter(Parameter::SPC_COLOR_SPECULAR);
+            fstage.mul(psSpecular, shadowFactor, psSpecular);
+        }
+    }
+
     return true;
 }
 
@@ -457,6 +476,11 @@ bool FFPLighting::preAddToRenderState(const RenderState* renderState, Pass* srcP
 				"Using iterative lighting method with RT Shader System requires specifying explicit light type.",
 				"FFPLighting::preAddToRenderState");			
 		}
+	}
+
+	if(srcPass->getMaxSimultaneousLights() == 0)
+	{
+		lightCount = Vector3i(0);
 	}
 
 	setLightCount(lightCount);

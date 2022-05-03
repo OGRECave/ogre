@@ -175,14 +175,6 @@ protected:
     ParameterPtr mPSInDepth;
     // Pixel shader local computed shadow colour parameter.
     ParameterPtr mPSLocalShadowFactor;
-    // Pixel shader in/local diffuse colour parameter.
-    ParameterPtr mPSDiffuse;
-    // Pixel shader output diffuse colour parameter.
-    ParameterPtr mPSOutDiffuse;
-    // Pixel shader in/local specular colour parameter.
-    ParameterPtr mPSSpecualr;
-    // Derived scene colour (ambient term).
-    UniformParameterPtr mPSDerivedSceneColour;
 
     float mPCFxSamples;
     bool mUseTextureCompare;
