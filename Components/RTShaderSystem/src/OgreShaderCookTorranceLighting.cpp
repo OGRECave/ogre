@@ -102,8 +102,16 @@ bool CookTorranceLighting::createCpuSubPrograms(ProgramSet* programSet)
     }
 
     auto sceneCol = psProgram->resolveParameter(GpuProgramParameters::ACT_DERIVED_SCENE_COLOUR);
-    auto litResult = psMain->resolveLocalParameter(GCT_FLOAT3, "litResult");
-    fstage.assign(In(sceneCol).xyz(), litResult);
+    auto litResult = psMain->resolveLocalParameter(GCT_FLOAT4, "litResult");
+    auto ambient = psMain->resolveLocalParameter(GCT_FLOAT4, "ambient");
+    auto diffuse = psProgram->resolveParameter(GpuProgramParameters::ACT_SURFACE_DIFFUSE_COLOUR);
+
+    fstage.mul(diffuse, outDiffuse, outDiffuse);
+
+    fstage.assign(Vector4(0), litResult);
+    fstage.assign(sceneCol, ambient);
+
+    fstage.mul(ambient, outDiffuse, ambient);
 
     if(mLightCount > 0)
     {
@@ -115,11 +123,14 @@ bool CookTorranceLighting::createCpuSubPrograms(ProgramSet* programSet)
 
         fstage.callFunction("PBR_Lights", {In(viewNormal), In(viewPos), In(lightPos), In(lightDiffuse),
                                             In(pointParams), In(lightDirView), In(spotParams), In(outDiffuse).xyz(),
-                                            mrparams, InOut(litResult)});
+                                            mrparams, InOut(litResult).xyz()});
     }
 
-    fstage.assign(In(sceneCol).w(), Out(outDiffuse).w());
-    fstage.assign(In(litResult).xyz(), Out(outDiffuse).xyz());
+    fstage.add(ambient, litResult, outDiffuse);
+
+    if (auto shadowFactor = psMain->getLocalParameter("lShadowFactor"))
+        fstage.callFunction("SGX_ApplyShadowFactor_Diffuse",
+                            {In(ambient), In(outDiffuse), In(shadowFactor), Out(outDiffuse)});
 
     return true;
 }
