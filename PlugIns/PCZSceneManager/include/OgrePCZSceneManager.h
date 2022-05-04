@@ -107,14 +107,8 @@ namespace Ogre
                                      PCZSceneNode * parentNode,
                                      const String &filename);
 
-        /// override this to ensure specialised PCZSceneNode is used.
-        virtual SceneNode* createSceneNodeImpl(void);
-        /// override this to ensure their specialised PCZSceneNode is used.
-        virtual SceneNode* createSceneNodeImpl(const String& name);
-        /** Creates a PCZSceneNode  */
-        virtual SceneNode * createSceneNode ( void );
-        /** Creates a PCZSceneNode */
-        virtual SceneNode * createSceneNode ( const String &name );
+        SceneNode* createSceneNodeImpl(void) override;
+        SceneNode* createSceneNodeImpl(const String& name) override;
         /** Creates a specialized PCZCamera */
         virtual Camera * createCamera( const String &name );
 
