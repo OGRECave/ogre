@@ -1901,28 +1901,24 @@ void SceneManager::ShadowRenderer::fireShadowTexturesPreReceiver(Light* light, F
         (*i)->shadowTextureReceiverPreViewProj(light, f);
     }
 }
-void SceneManager::ShadowRenderer::sortLightsAffectingFrustum(LightList& lightList)
+void SceneManager::ShadowRenderer::sortLightsAffectingFrustum(LightList& lightList) const
 {
     if ((mShadowTechnique & SHADOWDETAILTYPE_TEXTURE) == 0)
         return;
     // Sort the lights if using texture shadows, since the first 'n' will be
     // used to generate shadow textures and we should pick the most appropriate
 
+    ListenerList listenersCopy = mListeners; // copy in case of listeners removing themselves
+
     // Allow a Listener to override light sorting
     // Reverse iterate so last takes precedence
-    bool overridden = false;
-    ListenerList listenersCopy = mListeners;
-    for (ListenerList::reverse_iterator ri = listenersCopy.rbegin();
-        ri != listenersCopy.rend(); ++ri)
+    for (auto ri = listenersCopy.rbegin(); ri != listenersCopy.rend(); ++ri)
     {
-        overridden = (*ri)->sortLightsAffectingFrustum(lightList);
-        if (overridden)
-            break;
+        if((*ri)->sortLightsAffectingFrustum(lightList))
+            return;
     }
-    if (!overridden)
-    {
-        // default sort (stable to preserve directional light ordering
-        std::stable_sort(lightList.begin(), lightList.end(), lightsForShadowTextureLess());
-    }
+
+    // default sort (stable to preserve directional light ordering
+    std::stable_sort(lightList.begin(), lightList.end(), lightsForShadowTextureLess());
 }
 }

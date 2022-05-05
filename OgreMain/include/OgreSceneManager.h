@@ -847,7 +847,7 @@ namespace Ogre {
             void fireShadowTexturesPreCaster(Light* light, Camera* camera, size_t iteration);
             /// Internal method for firing the pre receiver texture shadows event
             void fireShadowTexturesPreReceiver(Light* light, Frustum* f);
-            void sortLightsAffectingFrustum(LightList& lightList);
+            void sortLightsAffectingFrustum(LightList& lightList) const;
         } mShadowRenderer;
 
         /** Internal method to validate whether a Pass should be allowed to render.
