@@ -56,7 +56,8 @@ namespace Ogre
 
     D3D11DeviceResourceManager::~D3D11DeviceResourceManager()
     {
-        assert(mResources.empty());
+        OgreAssertDbg(mResources.empty(),
+                      "Not all resources have been released! Are you holding on to a reference somewhere?");
         assert(gs_D3D11DeviceResourceManager == this);
         gs_D3D11DeviceResourceManager = NULL;
     }
