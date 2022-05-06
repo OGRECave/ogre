@@ -3856,9 +3856,10 @@ void SceneManager::useLights(const LightList* lights, ushort limit)
     static LightList NULL_LIGHTS;
     lights = lights ? lights : &NULL_LIGHTS;
 
-    if(lights->getHash() != mLastLightHash)
+    auto hash = FastHash((const char*)lights->data(), lights->size() * sizeof(Light*));
+    if(hash != mLastLightHash)
     {
-        mLastLightHash = lights->getHash();
+        mLastLightHash = hash;
 
         // Update any automatic gpu params for lights
         // Other bits of information will have to be looked up
