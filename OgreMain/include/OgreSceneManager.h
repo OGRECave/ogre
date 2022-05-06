@@ -960,7 +960,7 @@ namespace Ogre {
             RealRect scissorRect;
             PlaneList clipPlanes;
             bool scissorValid;
-            unsigned long clipPlanesValid;
+            bool clipPlanesValid;
             LightClippingInfo() : scissorValid(false), clipPlanesValid(false) {}
 
         };
