@@ -331,24 +331,24 @@ bool SceneManager::lightLess::operator()(const Light* a, const Light* b) const
     return a->tempSquareDist < b->tempSquareDist;
 }
 //-----------------------------------------------------------------------
-void SceneManager::_populateLightList(const Vector3& position, Real radius, 
-                                      LightList& destList, uint32 lightMask)
+void SceneManager::_populateLightList(const Vector3& position, Real radius, LightList& destList, uint32 lightMask)
 {
     // Really basic trawl of the lights, then sort
     // Subclasses could do something smarter
 
-    // Pick up the lights that affecting frustum only, which should has been
-    // cached, so better than take all lights in the scene into account.
-    const LightList& candidateLights = _getLightsAffectingFrustum();
-
     // Pre-allocate memory
     destList.clear();
-    destList.reserve(candidateLights.size());
+    destList.reserve(mLightsAffectingFrustum.size());
 
     size_t lightIndex = 0;
     size_t numShadowTextures = isShadowTechniqueTextureBased() ? getShadowTextureConfigList().size() : 0;
+    size_t numShadowCastingLights = 0;
 
-    for (Light* lt : candidateLights)
+    // Pick up the lights that affecting frustum only, which should has been
+    // cached, so better than take all lights in the scene into account.
+    // this is partitioned as: | shadow casting lights | other lights |
+    // NOTE: no shadow casting lights might be in frustum, so we cannot rely on numShadowTextures
+    for (Light* lt : mLightsAffectingFrustum)
     {
         // check whether or not this light is suppose to be taken into consideration for the current light mask set for this operation
         if(!(lt->getLightMask() & lightMask))
@@ -358,11 +358,13 @@ void SceneManager::_populateLightList(const Vector3& position, Real radius,
         lt->_calcTempSquareDist(position);
 
         // only add in-range lights, but ensure texture shadow casters are there
-        // note: in this case the first numShadowTextures canditate lights are casters
-        if (lightIndex++ < numShadowTextures || lt->isInLightRange(Sphere(position, radius)))
+        if ((lt->getCastShadows() && lightIndex < numShadowTextures) || lt->isInLightRange(Sphere(position, radius)))
         {
             destList.push_back(lt);
         }
+
+        numShadowCastingLights += int(lt->getCastShadows());
+        lightIndex++;
     }
 
     auto start = destList.begin();
@@ -370,7 +372,7 @@ void SceneManager::_populateLightList(const Vector3& position, Real radius,
     // the first few lights unchanged from the frustum list, matching the
     // texture shadows that were generated
     // Thus we only allow object-relative sorting on the remainder of the list
-    std::advance(start, std::min(numShadowTextures, destList.size()));
+    std::advance(start, std::min(numShadowCastingLights, destList.size()));
     // Sort (stable to guarantee ordering on directional lights)
     std::stable_sort(start, destList.end(), lightLess());
 
