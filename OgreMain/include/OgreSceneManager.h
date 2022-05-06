@@ -1328,7 +1328,10 @@ namespace Ogre {
         void _populateLightList(const Vector3& position, Real radius, LightList& destList, uint32 lightMask = 0xFFFFFFFF);
 
         /// @overload
-        void _populateLightList(const SceneNode* sn, Real radius, LightList& destList, uint32 lightMask = 0xFFFFFFFF);
+        void _populateLightList(const SceneNode* sn, Real radius, LightList& destList, uint32 lightMask = 0xFFFFFFFF)
+        {
+            _populateLightList(sn->_getDerivedPosition(), radius, destList, lightMask);
+        }
         /// @}
 
         /// @name Scene Nodes
