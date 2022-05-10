@@ -1595,7 +1595,7 @@ namespace Ogre {
                 // Clone without copying data, don't remove any blending info
                 // (since if we skeletally animate too, we need it)
                 mSoftwareVertexAnimVertexData.reset(mMesh->sharedVertexData->clone(false));
-                extractTempBufferInfo(mSoftwareVertexAnimVertexData.get(), &mTempVertexAnimInfo);
+                mTempVertexAnimInfo.extractFrom(mSoftwareVertexAnimVertexData.get());
 
                 // Also clone for hardware usage, don't remove blend info since we'll
                 // need it if we also hardware skeletally animate
@@ -1612,9 +1612,8 @@ namespace Ogre {
                 // Prepare temp vertex data if needed
                 // Clone without copying data, remove blending info
                 // (since blend is performed in software)
-                mSkelAnimVertexData.reset(
-                    cloneVertexDataRemoveBlendInfo(mMesh->sharedVertexData));
-                extractTempBufferInfo(mSkelAnimVertexData.get(), &mTempSkelAnimInfo);
+                mSkelAnimVertexData.reset(cloneVertexDataRemoveBlendInfo(mMesh->sharedVertexData));
+                mTempSkelAnimInfo.extractFrom(mSkelAnimVertexData.get());
             }
 
         }
@@ -1630,11 +1629,6 @@ namespace Ogre {
 
         // It's prepared for shadow volumes only if mesh has been prepared for shadow volumes.
         mPreparedForShadowVolumes = mMesh->isPreparedForShadowVolumes();
-    }
-    //-----------------------------------------------------------------------
-    void Entity::extractTempBufferInfo(VertexData* sourceData, TempBlendedBufferInfo* info)
-    {
-        info->extractFrom(sourceData);
     }
     //-----------------------------------------------------------------------
     VertexData* Entity::cloneVertexDataRemoveBlendInfo(const VertexData* source)
