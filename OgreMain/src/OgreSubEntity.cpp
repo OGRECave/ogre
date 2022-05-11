@@ -301,7 +301,7 @@ namespace Ogre {
                 // Prepare temp vertex data if needed
                 // Clone without copying data, remove blending info
                 // (since blend is performed in software)
-                mSkelAnimVertexData.reset(mParentEntity->cloneVertexDataRemoveBlendInfo(mSubMesh->vertexData));
+                mSkelAnimVertexData.reset(mSubMesh->vertexData->_cloneRemovingBlendData());
                 mTempSkelAnimInfo.extractFrom(mSkelAnimVertexData.get());
             }
         }

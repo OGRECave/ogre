@@ -1612,7 +1612,7 @@ namespace Ogre {
                 // Prepare temp vertex data if needed
                 // Clone without copying data, remove blending info
                 // (since blend is performed in software)
-                mSkelAnimVertexData.reset(cloneVertexDataRemoveBlendInfo(mMesh->sharedVertexData));
+                mSkelAnimVertexData.reset(mMesh->sharedVertexData->_cloneRemovingBlendData());
                 mTempSkelAnimInfo.extractFrom(mSkelAnimVertexData.get());
             }
 
@@ -1629,52 +1629,6 @@ namespace Ogre {
 
         // It's prepared for shadow volumes only if mesh has been prepared for shadow volumes.
         mPreparedForShadowVolumes = mMesh->isPreparedForShadowVolumes();
-    }
-    //-----------------------------------------------------------------------
-    VertexData* Entity::cloneVertexDataRemoveBlendInfo(const VertexData* source)
-    {
-        // Clone without copying data
-        VertexData* ret = source->clone(false);
-        bool removeIndices = Ogre::Root::getSingleton().isBlendIndicesGpuRedundant();
-        bool removeWeights = Ogre::Root::getSingleton().isBlendWeightsGpuRedundant();
-         
-        unsigned short safeSource = 0xFFFF;
-        const VertexElement* blendIndexElem =
-            source->vertexDeclaration->findElementBySemantic(VES_BLEND_INDICES);
-        if (blendIndexElem)
-        {
-            //save the source in order to prevent the next stage from unbinding it.
-            safeSource = blendIndexElem->getSource();
-            if (removeIndices)
-            {
-                // Remove buffer reference
-                ret->vertexBufferBinding->unsetBinding(blendIndexElem->getSource());
-            }
-        }
-        if (removeWeights)
-        {
-            // Remove blend weights
-            const VertexElement* blendWeightElem =
-                source->vertexDeclaration->findElementBySemantic(VES_BLEND_WEIGHTS);
-            if (blendWeightElem &&
-                blendWeightElem->getSource() != safeSource)
-            {
-                // Remove buffer reference
-                ret->vertexBufferBinding->unsetBinding(blendWeightElem->getSource());
-            }
-        }
-
-        // remove elements from declaration
-        if (removeIndices)
-            ret->vertexDeclaration->removeElement(VES_BLEND_INDICES);
-        if (removeWeights)
-            ret->vertexDeclaration->removeElement(VES_BLEND_WEIGHTS);
-
-        // Close gaps in bindings for effective and safely
-        if (removeWeights || removeIndices)
-            ret->closeGapsInBindings();
-
-        return ret;
     }
     //-----------------------------------------------------------------------
     EdgeData* Entity::getEdgeList(void)
