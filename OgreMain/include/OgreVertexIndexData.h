@@ -251,8 +251,8 @@ namespace Ogre {
         */
         ushort allocateHardwareAnimationElements(ushort count, bool animateNormals);
 
-
-
+        /** Internal method to clone vertex data definitions but to remove blend buffers. */
+        VertexData* _cloneRemovingBlendData() const;
     };
 
     /** Summary class collecting together index data source information. */

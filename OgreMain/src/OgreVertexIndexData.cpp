@@ -705,6 +705,43 @@ namespace Ogre {
         
         return supportedCount;
     }
+    VertexData* VertexData::_cloneRemovingBlendData() const
+    {
+        // Clone without copying data
+        VertexData* ret = clone(false);
+        bool removeIndices = Root::getSingleton().isBlendIndicesGpuRedundant();
+        bool removeWeights = Root::getSingleton().isBlendWeightsGpuRedundant();
+
+        unsigned short safeSource = 0xFFFF;
+        auto blendIndexElem = vertexDeclaration->findElementBySemantic(VES_BLEND_INDICES);
+        if (blendIndexElem && removeIndices)
+        {
+            //save the source in order to prevent the next stage from unbinding it.
+            safeSource = blendIndexElem->getSource();
+            // Remove buffer reference
+            ret->vertexBufferBinding->unsetBinding(blendIndexElem->getSource());
+        }
+
+        // Remove blend weights
+        const VertexElement* blendWeightElem = vertexDeclaration->findElementBySemantic(VES_BLEND_WEIGHTS);
+        if (removeWeights && blendWeightElem && blendWeightElem->getSource() != safeSource)
+        {
+            // Remove buffer reference
+            ret->vertexBufferBinding->unsetBinding(blendWeightElem->getSource());
+        }
+
+        // remove elements from declaration
+        if (removeIndices)
+            ret->vertexDeclaration->removeElement(VES_BLEND_INDICES);
+        if (removeWeights)
+            ret->vertexDeclaration->removeElement(VES_BLEND_WEIGHTS);
+
+        // Close gaps in bindings for effective and safely
+        if (removeWeights || removeIndices)
+            ret->closeGapsInBindings();
+
+        return ret;
+    }
     //-----------------------------------------------------------------------
     //-----------------------------------------------------------------------
     IndexData::IndexData()

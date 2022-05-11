@@ -65,7 +65,6 @@ namespace Ogre
         void setupVertices( const SubMesh* baseSubMesh );
         void setupIndices( const SubMesh* baseSubMesh );
 
-        void removeBlendData();
         virtual bool checkSubMeshCompatibility( const SubMesh* baseSubMesh );
 
         size_t updateVertexBuffer( Camera *currentCamera );
