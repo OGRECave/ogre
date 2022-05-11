@@ -75,10 +75,11 @@ namespace Ogre {
         // Post-blended 
         HardwareVertexBufferSharedPtr destPositionBuffer;
         HardwareVertexBufferSharedPtr destNormalBuffer;
-        /// Both positions and normals are contained in the same buffer.
-        bool posNormalShareBuffer;
         unsigned short posBindIndex;
         unsigned short normBindIndex;
+        /// Both positions and normals are contained in the same buffer.
+        bool posNormalShareBuffer;
+        bool posNormalExtraData;
         bool bindPositions;
         bool bindNormals;
 

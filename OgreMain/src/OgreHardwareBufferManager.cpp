@@ -446,11 +446,12 @@ namespace Ogre {
 
         posBindIndex = posElem->getSource();
         srcPositionBuffer = bind->getBuffer(posBindIndex);
+        srcNormalBuffer.reset();
 
         if (!normElem)
         {
             posNormalShareBuffer = false;
-            srcNormalBuffer.reset();
+            posNormalExtraData = posElem->getSize() != srcPositionBuffer->getVertexSize();
         }
         else
         {
@@ -458,10 +459,11 @@ namespace Ogre {
             if (normBindIndex == posBindIndex)
             {
                 posNormalShareBuffer = true;
-                srcNormalBuffer.reset();
+                posNormalExtraData = (posElem->getSize() + normElem->getSize()) != srcPositionBuffer->getVertexSize();
             }
             else
             {
+                posNormalExtraData = false;
                 posNormalShareBuffer = false;
                 srcNormalBuffer = bind->getBuffer(normBindIndex);
             }
@@ -476,7 +478,7 @@ namespace Ogre {
         if (positions && !destPositionBuffer)
         {
             destPositionBuffer = srcPositionBuffer->getManager()->allocateVertexBufferCopy(srcPositionBuffer, 
-                HardwareBufferManagerBase::BLT_AUTOMATIC_RELEASE, this);
+                HardwareBufferManagerBase::BLT_AUTOMATIC_RELEASE, this, posNormalExtraData);
         }
         if (normals && !posNormalShareBuffer && srcNormalBuffer && !destNormalBuffer)
         {
