@@ -315,8 +315,8 @@ namespace Ogre
 
             mInitialized = true;
 
-            mDefaultVP = HighLevelGpuProgramManager::getSingleton().createProgram("MetalDefaultVP", RGN_INTERNAL, "metal", GPT_VERTEX_PROGRAM);
-            mDefaultFP = HighLevelGpuProgramManager::getSingleton().createProgram("MetalDefaultFP", RGN_INTERNAL, "metal", GPT_FRAGMENT_PROGRAM);
+            mDefaultVP = GpuProgramManager::getSingleton().createProgram("MetalDefaultVP", RGN_INTERNAL, "metal", GPT_VERTEX_PROGRAM).get();
+            mDefaultFP = GpuProgramManager::getSingleton().createProgram("MetalDefaultFP", RGN_INTERNAL, "metal", GPT_FRAGMENT_PROGRAM).get();
             mDefaultVP->setSourceFile("DefaultShaders.metal");
             mDefaultVP->setParameter("entry_point", "default_vp");
             mDefaultFP->setSourceFile("DefaultShaders.metal");
@@ -352,8 +352,8 @@ namespace Ogre
             }
         }
 
-        bindGpuProgram(mDefaultVP.get());
-        bindGpuProgram(mDefaultFP.get());
+        bindGpuProgram(mDefaultVP);
+        bindGpuProgram(mDefaultFP);
 
         return mDefaultVP->getDefaultParameters();
     }
