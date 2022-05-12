@@ -5031,6 +5031,11 @@ namespace Ogre{
         else if(obj->id == ID_TARGET_OUTPUT)
         {
             mTarget = technique->getOutputTargetPass();
+            if (!mTarget->getPasses().empty() || mTarget->getInputMode() != CompositionTargetPass::IM_NONE)
+            {
+                compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, obj->file, obj->line,
+                                   "target_output can only be used once per technique");
+            }
         }
         obj->context = mTarget;
 
