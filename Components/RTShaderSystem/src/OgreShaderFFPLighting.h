@@ -118,8 +118,6 @@ protected:
         UniformParameterPtr mSpecularColour;
 
         // for normal mapping:
-        /// light position direction (texture space for normal mapping, else same as mToLightDir).
-        ParameterPtr mToLight;
         /// light direction (texture space for normal mapping, else same as mDirection).
         ParameterPtr mPSInDirection;
 
@@ -211,10 +209,6 @@ protected:
     ParameterPtr mViewNormal;
     // Transformed view position
     ParameterPtr mViewPos;
-    // Transformed direction to light
-    ParameterPtr mToLight;
-    // Transformed direction to view
-    ParameterPtr mToView;
     // Vertex shader input position parameter.
     ParameterPtr mVSInPosition;
     // Vertex shader input normal.

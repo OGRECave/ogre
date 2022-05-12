@@ -265,8 +265,8 @@ refer to the following table for the location indices and names to use:
 | Ogre::VES_POSITION | vertex | 0 | gl_Vertex |
 | Ogre::VES_BLEND_WEIGHTS | blendWeights | 1 | n/a |
 | Ogre::VES_NORMAL | normal | 2 | gl_Normal |
-| Ogre::VES_DIFFUSE | colour | 3 | gl_Color |
-| Ogre::VES_SPECULAR | secondary_colour | 4 | gl_SecondaryColor |
+| Ogre::VES_COLOUR | colour | 3 | gl_Color |
+| Ogre::VES_COLOUR2 | secondary_colour | 4 | gl_SecondaryColor |
 | Ogre::VES_BLEND_INDICES | blendIndices | 7 | n/a |
 | Ogre::VES_TEXTURE_COORDINATES | uv0 - uv7 | 8-15 | gl_MultiTexCoord0 - gl_MultiTexCoord7 |
 | Ogre::VES_TANGENT | tangent | 14 | n/a |
@@ -524,7 +524,7 @@ material SupportHLSLandGLSLwithUnified
 }
 ```
 
-At runtime, when myVertexProgram or myFragmentProgram are used, OGRE automatically picks a real program to delegate to based on what’s supported on the current hardware / rendersystem. If none of the delegates are supported, the entire technique referencing the unified program is marked as unsupported and the next technique in the material is checked fro fallback, just like normal. As your materials get larger, and you find you need to support HLSL and GLSL specifically (or need to write multiple interface-compatible versions of a program for whatever other reason), unified programs can really help reduce duplication.
+At runtime, when myVertexProgram or myFragmentProgram are used, OGRE automatically picks a real program to delegate to based on what’s supported on the current hardware / rendersystem. If none of the delegates are supported, the entire technique referencing the unified program is marked as unsupported and the next technique in the material is checked for fallback, just like normal. As your materials get larger, and you find you need to support HLSL and GLSL specifically (or need to write multiple interface-compatible versions of a program for whatever other reason), unified programs can really help reduce duplication.
 
 # Parameter specification {#Program-Parameter-Specification}
 
@@ -784,6 +784,34 @@ Again as at the time of writing, the types of texture you can use in a vertex pr
 ## Hardware limitations
 
 As at the time of writing (early Q3 2006), ATI do not support texture fetch in their current crop of cards (Radeon X1n00). nVidia do support it in both their 6n00 and 7n00 range. ATI support an alternative called ’Render to Vertex Buffer’, but this is not standardised at this time and is very much different in its implementation, so cannot be considered to be a drop-in replacement. This is the case even though the Radeon X1n00 cards claim to support vs\_3\_0 (which requires vertex texture fetch).
+
+# Programmatic creation {#GpuProgram-API}
+
+In case you need to create GPU Programs programmatically, see the following example for how the script is mapped to the API.
+
+```cpp
+vertex_program glTF2/PBR_vs glsl
+{
+	source pbr-vert.glsl
+    preprocessor_defines HAS_NORMALS,HAS_TANGENTS
+    default_params
+    {
+        param_named_auto u_MVPMatrix worldviewproj_matrix
+    }
+}
+```
+becomes
+```cpp
+using namespace Ogre;
+GpuProgramManager& mgr = GpuProgramManager::getSingleton();
+
+GpuProgramPtr vertex_program = mgr.createProgram("glTF2/PBR_vs", RGN_DEFAULT, "glsl", GPT_VERTEX_PROGRAM);
+vertex_program->setSource("pbr-vert.glsl");
+vertex_program->setParameter("preprocessor_defines", "HAS_NORMALS,HAS_TANGENTS");
+
+GpuProgramParametersPtr params = vertex_program->getDefaultParameters();
+params->setNamedAutoConstant("u_MVPMatrix", GpuProgramParameters::ACT_WORLDVIEWPROJ_MATRIX);
+```
 
 @page Cross-platform-Shaders Cross-platform Shaders
 

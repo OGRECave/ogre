@@ -276,6 +276,9 @@ namespace Ogre {
         */
         MaterialPtr clone(const String& newName, const String& newGroup = BLANKSTRING) const;
 
+        // needed because of deprecated variant below
+        MaterialPtr clone(const String& newName, const char* newGroup) const { return clone(newName, String(newGroup)); }
+
         /// @deprecated use clone(const String&, const String&)
         OGRE_DEPRECATED MaterialPtr clone(const String& newName, bool changeGroup,
                                           const String& newGroup = BLANKSTRING) const
@@ -622,7 +625,7 @@ namespace Ogre {
         /// @deprecated use getLodValues()
         OGRE_DEPRECATED LodValueIterator getLodValueIterator(void) const;
 
-        /** Gets the user-defined list of values which are internally transfomed by the LodStrategy.
+        /** Gets the user-defined list of values which are internally transformed by the LodStrategy.
         @remarks
             Note that the iterator returned from this method is not totally analogous to 
             the one passed in by calling setLodLevels - the list includes a zero

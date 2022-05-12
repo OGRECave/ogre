@@ -36,7 +36,7 @@ THE SOFTWARE.
 #include "OgreRenderable.h"
 
 namespace Ogre {
-
+    class ParticleVisualData;
     /** \addtogroup Core
     *  @{
     */
@@ -83,22 +83,10 @@ namespace Ogre {
         virtual void _notifyParticleMoved(std::vector<Particle*>& currentParticles) {}
         /** Optional callback notified when particles cleared */
         virtual void _notifyParticleCleared(std::vector<Particle*>& currentParticles) {}
-        /** Create a new ParticleVisualData instance for attachment to a particle.
-        @remarks
-            If this renderer needs additional data in each particle, then this should
-            be held in an instance of a subclass of ParticleVisualData, and this method
-            should be overridden to return a new instance of it. The default
-            behaviour is to return null.
-        */
-        virtual ParticleVisualData* _createVisualData(void) { return 0; }
-        /** Destroy a ParticleVisualData instance.
-        @remarks
-            If this renderer needs additional data in each particle, then this should
-            be held in an instance of a subclass of ParticleVisualData, and this method
-            should be overridden to destroy an instance of it. The default
-            behaviour is to do nothing.
-        */
-        virtual void _destroyVisualData(ParticleVisualData* vis) { assert (vis == 0); }
+        /// @deprecated do not use
+        OGRE_DEPRECATED ParticleVisualData* _createVisualData(void) { return 0; }
+        /// @deprecated do not use
+        OGRE_DEPRECATED void _destroyVisualData(ParticleVisualData*) {}
 
         /** Sets which render queue group this renderer should target with it's
             output.

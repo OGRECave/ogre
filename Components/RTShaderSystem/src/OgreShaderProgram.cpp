@@ -134,13 +134,13 @@ UniformParameterPtr Program::resolveParameter(GpuProgramParameters::AutoConstant
     // Check if parameter already exists.
     param = getParameterByAutoType(autoType);
 
-    uint32 size = 0;
-    if(isArray(autoType)) std::swap(size, data); // for array autotypes the extra parameter is the size
-
     if (param && param->getAutoConstantIntData() == data)
     {
         return param;
     }
+
+    uint32 size = 0;
+    if(isArray(autoType)) std::swap(size, data); // for array autotypes the extra parameter is the size
     
     // Create new parameter
     param = UniformParameterPtr(OGRE_NEW UniformParameter(autoType, data, size));

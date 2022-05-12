@@ -98,7 +98,7 @@ namespace Ogre
     TerrainGlobalOptions::TerrainGlobalOptions()
         : mSkirtSize(30)
         , mLightMapDir(Vector3(1, -1, 0).normalisedCopy())
-        , mCastsShadows(false)
+        , mCastsShadows(true)
         , mMaxPixelError(3.0)
         , mRenderQueueGroup(RENDER_QUEUE_MAIN)
         , mVisibilityFlags(0xFFFFFFFF)
@@ -3741,19 +3741,12 @@ namespace Ogre
                 return NEIGHBOUR_EAST;
         }
 
+        // x == 0, given the check above
         if (y < 0)
-        {
-            if (x == 0)
-                return NEIGHBOUR_SOUTH;
-        }
+            return NEIGHBOUR_SOUTH;
         else if (y > 0)
-        {
-            if (x == 0)
-                return NEIGHBOUR_NORTH;
-        }
-
+            return NEIGHBOUR_NORTH;
         return NEIGHBOUR_NORTH;
-
     }
     //---------------------------------------------------------------------
     void Terrain::notifyNeighbours()

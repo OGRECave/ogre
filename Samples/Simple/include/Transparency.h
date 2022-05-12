@@ -68,7 +68,7 @@ protected:
     {
 #ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
         // Need RTSS for WBOIT
-        mViewport->setMaterialScheme(RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+        mViewport->setMaterialScheme(MSN_SHADERGEN);
         MaterialManager::getSingleton().setActiveScheme(mViewport->getMaterialScheme());
 #endif
         mSceneMgr->setSkyBox(true, "Examples/TrippySkyBox");

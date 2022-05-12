@@ -181,6 +181,7 @@ namespace Ogre
         // rsc->setCapability(RSC_TEXTURE_SIGNED_INT);
         rsc->setCapability(RSC_VERTEX_PROGRAM);
         rsc->setCapability(RSC_VERTEX_BUFFER_INSTANCE_DATA);
+        rsc->setCapability(RSC_VERTEX_FORMAT_INT_10_10_10_2);
         rsc->setCapability(RSC_MIPMAP_LOD_BIAS);
         rsc->setCapability(RSC_ALPHA_TO_COVERAGE);
         rsc->setMaxPointSize(256);
@@ -314,8 +315,8 @@ namespace Ogre
 
             mInitialized = true;
 
-            mDefaultVP = HighLevelGpuProgramManager::getSingleton().createProgram("MetalDefaultVP", RGN_INTERNAL, "metal", GPT_VERTEX_PROGRAM);
-            mDefaultFP = HighLevelGpuProgramManager::getSingleton().createProgram("MetalDefaultFP", RGN_INTERNAL, "metal", GPT_FRAGMENT_PROGRAM);
+            mDefaultVP = GpuProgramManager::getSingleton().createProgram("MetalDefaultVP", RGN_INTERNAL, "metal", GPT_VERTEX_PROGRAM).get();
+            mDefaultFP = GpuProgramManager::getSingleton().createProgram("MetalDefaultFP", RGN_INTERNAL, "metal", GPT_FRAGMENT_PROGRAM).get();
             mDefaultVP->setSourceFile("DefaultShaders.metal");
             mDefaultVP->setParameter("entry_point", "default_vp");
             mDefaultFP->setSourceFile("DefaultShaders.metal");
@@ -351,8 +352,8 @@ namespace Ogre
             }
         }
 
-        bindGpuProgram(mDefaultVP.get());
-        bindGpuProgram(mDefaultFP.get());
+        bindGpuProgram(mDefaultVP);
+        bindGpuProgram(mDefaultFP);
 
         return mDefaultVP->getDefaultParameters();
     }

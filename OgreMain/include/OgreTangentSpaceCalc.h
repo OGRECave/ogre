@@ -99,7 +99,7 @@ namespace Ogre
             The default element format to use is VET_FLOAT3 which is enough to accurately 
             deal with tangents that do not involve any texture coordinate mirroring. 
             If you wish to allow UV mirroring in your model, you must enable 4-component
-            tangents using this method, and the 'w' co-ordinate will be populated
+            tangents using this method, and the 'w' coordinate will be populated
             with the parity of the triangle (+1 or -1), which will allow you to generate
             the bitangent properly.
         @param enabled true to enable 4-component tangents (default false). If you enable

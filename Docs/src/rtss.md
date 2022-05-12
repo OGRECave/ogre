@@ -29,6 +29,9 @@ Here are the attributes you can use in a `rtshader_system` block of a `pass {}`:
 
 - [transform_stage](#transform_stage)
 - [lighting_stage](#lighting_stage)
+- [gbuffer](#gbuffer)
+- [normal_map](#normal_map)
+- [metal_roughness](#metal_roughness)
 - [fog_stage](#fog_stage)
 - [light_count](#light_count)
 - [triplanarTexturing](#triplanarTexturing)
@@ -59,21 +62,77 @@ Example: `transform_stage instanced 1`
 Force a specific lighting model.
 
 @par
-Format: `lighting_stage <ffp|per_pixel|normal_map|gbuffer> [two_sided] [normalised]`
+Format: `lighting_stage <ffp|per_pixel> [two_sided] [normalised]`
 @par
-Format2: `lighting_stage normal_map <texturename> [tangent_space|object_space|parallax] [coordinateIndex] [samplerName]`
+Example: `lighting_stage ffp two_sided`
+
+@param two_sided compute lighting on both sides of the surface, when culling is disabled.
+@param normalised normalise the blinn-phong reflection model to make it energy conserving - see [this for details](http://www.rorydriscoll.com/2009/01/25/energy-conservation-in-games/)
+
+<a name="gbuffer"></a>
+
+## gbuffer
+
+Redirects intermediate lighting results into gbuffers for e.g. deferred shading.
+
 @par
-Format3: `lighting_stage gbuffer <target_layout> [target_layout]`
+Format: `lighting_stage gbuffer <target_layout> [target_layout]`
+@par
+Example: `lighting_stage gbuffer normal_viewdepth diffuse_specular`
+
+@param target_layout with @c gbuffer, this specifies the data to be written into one or two MRT targets. Possible values are @c depth, @c normal, @c viewpos, @c normal_viewdepth and @c diffuse_specular
+
+<a name="normal_map"></a>
+
+## normal_map
+
+Use a normal map for lighting computations
+
+@par
+Format: `lighting_stage normal_map <texture> [normalmap_space] [texcoord_index] [sampler]`
 @par
 Example: `lighting_stage normal_map Panels_Normal_Tangent.png tangent_space 0 SamplerToUse`
 
-@param two_sided compute lighting on both sides of the surface, when culling is disabled.
-@param normalised with @c ffp or @c per_pixel normalise the blinn-phong reflection model to make it energy conserving - see [this for details](http://www.rorydriscoll.com/2009/01/25/energy-conservation-in-games/)
-@param texturename normal map to use with @c normal_map
-@param target_layout with @c gbuffer, this specifies the data to be written into one or two MRT targets. Possible values are @c depth, @c normal, @c viewpos, @c normal_viewdepth and @c diffuse_specular
+@param texture normal map name to use
+@param normalmap_space <dl compact="compact">
+<dt>tangent_space</dt>
+<dd>Normal map contains normal data in tangent space.
+This is the default normal mapping behavior and it requires that the
+target mesh will have valid tangents within its vertex data.</dd>
+<dt>object_space</dt>
+<dd>Normal map contains normal data in object local space.
+This normal mapping technique has the advantages of better visualization results,
+lack of artifacts that comes from texture mirroring usage, it doesn't requires tangent
+and it also saves some instruction in the vertex shader stage.
+The main drawback of using this kind of normal map is that the target object must be static
+in terms of local space rotations and translations.</dd>
+<dt>parallax</dt>
+<dd>Normal map contains normal data in parallax corrected tangent space
+The restrictions of @c tangent_space apply. Additionally the alpha
+channel of the normal texture is expected to contain height displacement data.
+This is used for parallax corrected rendering.</dd>
+</dl>
+@param texcoord_index the start texcoord attribute index to read the uv coordinates from
+@param sampler the [Sampler](@ref Samplers) to use for the normal map
 
-@see Ogre::RTShader::NormalMapLighting::NormalMapSpace
-@see @ref Samplers
+
+<a name="metal_roughness"></a>
+
+## metal_roughness
+
+Use metal roughness parametrisation for lighting computations.
+
+By default, metalness is read from `specular[0]` and roughness from `specular[1]`.
+
+@par
+Format: `lighting_stage metal_roughness [texture <texturename>]`
+@par
+Example: `lighting_stage metal_roughness texture Default_metalRoughness.jpg`
+
+@param texturename texture for spatially varying parametrization.
+[In accordance to the glTF2.0 specification](https://www.khronos.org/registry/glTF/specs/2.0/glTF-2.0.html#_material_pbrmetallicroughness_metallicroughnesstexture), metalness is sampled from the B channel and roughness from the G channel.
+
+@note Using this option switches the lighting equations from Blinn-Phong to the Cook-Torrance PBR model [using the equations described by Filament](https://google.github.io/filament/Filament.html#materialsystem/standardmodelsummary).
 
 <a name="fog_stage"></a>
 
@@ -82,9 +141,11 @@ Example: `lighting_stage normal_map Panels_Normal_Tangent.png tangent_space 0 Sa
 Force a specific fog calculation
 
 @par
-Format: `fog_stage ffp <per_vertex|per_pixel>`
+Format: `fog_stage ffp <calc_mode>`
 @par
 Example: `fog_stage ffp per_pixel`
+
+@param calc_mode either `per_vertex` or `per_pixel`
 
 <a name="light_count"></a>
 
@@ -117,7 +178,9 @@ Valid values are [0; 0.57] not bigger to avoid division by zero
 ## integrated_pssm4
 Integrated PSSM shadow receiver with 2 splits. Custom split points.
 @par
-Format: `integrated_pssm4 <znear> <sp0> <sp1> <zfar>`
+Format: `integrated_pssm4 <znear> <sp0> <sp1> <zfar> [debug] [filter]`
+@param debug visualize the active shadow-splits in the scene
+@param filter one of `pcf4, pcf16` (default: @c pcf4)
 
 <a name="hardware_skinning"></a>
 
@@ -170,6 +233,29 @@ Example: `source_modifier src1_inverse_modulate custom 2`
 
 @param operation one of `src1_modulate, src2_modulate, src1_inverse_modulate, src2_inverse_modulate`
 @param parameterNum number of the custom shader parameter that controls the operation
+
+# Setting properties programmatically {#RTSS-Props-API}
+
+In case you need to set the properties programmatically, see the following example for how the script is mapped to the API.
+
+```cpp
+rtshader_system
+{
+	lighting_stage normal_map Default_normal.jpg
+}
+```
+becomes
+```cpp
+using namespace Ogre::RTShader;
+ShaderGenerator* shaderGen = ShaderGenerator::getSingletonPtr();
+
+shaderGen->createShaderBasedTechnique(mat->getTechnique(0), MSN_SHADERGEN);
+RenderState* rs = shaderGen->getRenderState(MSN_SHADERGEN, *mat, 0);
+SubRenderState* srs = shaderGen->createSubRenderState("NormalMap");
+rs->addTemplateSubRenderState(srs);
+
+srs->setParameter("texture", "Default_normal.jpg");
+```
 
 # System overview {#rtss_overview}
 
@@ -332,10 +418,10 @@ To use the generated technique set the change material scheme of your viewport(s
 
 ```cpp
 // Create shader based technique from the default technique of the given material.
-mShaderGenerator->createShaderBasedTechnique("Examples/BeachStones", Ogre::MaterialManager::DEFAULT_SCHEME_NAME, Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+mShaderGenerator->createShaderBasedTechnique("Examples/BeachStones", Ogre::MSN_DEFAULT, Ogre::MSN_SHADERGEN);
 
 // Apply the shader generated based techniques.
-mViewport->setMaterialScheme(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+mViewport->setMaterialScheme(Ogre::MSN_SHADERGEN);
 ```
 
 @note you can automate the shader generation process for all materials. First set the viewport scheme to the destination scheme of the RTSS shaders. Second register to the `Ogre::MaterialManager::Listener` implementing `handleSchemeNotFound()` - e.g. OgreBites::SGTechniqueResolverListener
@@ -379,7 +465,7 @@ Therefore parameters are not resolved by name (except for local variables), but 
 @par
 You can think of the latter as an extension of the Cg/ HLSL Semantics to the actual content of the parameter.
 @par
-In case of the Ogre::RTShader::FFPTransform wee nned the world view projection matrix and vertex shader input and output position parameters.
+In case of the Ogre::RTShader::FFPTransform we need the world view projection matrix and vertex shader input and output position parameters.
 @par
 @snippet Components/RTShaderSystem/src/OgreShaderFFPTransform.cpp param_resolve
 
@@ -399,7 +485,7 @@ The arguments to the function are the ones you resolved in the first step and th
 You can add call as many functions as you need. The calls will appear in the same order in the generates shader source code.
 @note
 * The ordering of the function invocation is crucial. Use the Ogre::RTShader::FFPVertexShaderStage and Ogre::RTShader::FFPFragmentShaderStage enumarations to place your invocations in the desired global order.
-* Make sure the parameter semantic (in/out) in the SubRenderState code matches to your shader code implementation you supplied in the library file. GLSL will fail to link to libray functions if it won't be able to find a perfect function declaration match. 
+* Make sure the parameter semantic (in/out) in the SubRenderState code matches to your shader code implementation you supplied in the library file. GLSL will fail to link to library functions if it won't be able to find a perfect function declaration match.
 * Ogre::RTShader::SubRenderState::updateGpuProgramsParams - As the name suggest this method should be overridden only in case your SubRenderState should update some parameter it created before.
 * Ogre::RTShader::SubRenderState::preAddToRenderState(): this method called before adding this SubRenderState to a parent RenderState instances. It allows this SubRenderState to exclude itself from the list in case the source pass is not matching. I.E in case of SubRenderState that perform lighting calculations it can return false when the given source pass specifies that lighting calculations disabled for it.
 @snippet Components/RTShaderSystem/src/OgreShaderFFPLighting.cpp disable
@@ -407,7 +493,7 @@ This method also let the SubRenderState to opportunity to modify the destination
 
 Implementing the Ogre::RTShader::SubRenderStateFactory is much simpler and involves implementing the following methods
 * Ogre::RTShader::SubRenderStateFactory::createInstanceImpl(): This method should return instance for the SubRenderState sub class.
-* Ogre::RTShader::SubRenderStateFactory::createInstance(): This method should return instasnce for the SubRenderState sub class using the given script compiler parameters. Implemet this method if you want to be able to creat your custom shader extension from material script.
+* Ogre::RTShader::SubRenderStateFactory::createInstance(): This method should return instance for the SubRenderState sub class using the given script compiler parameters. Implement this method if you want to be able to create your custom shader extension from material script.
 * Ogre::RTShader::SubRenderStateFactory::writeInstance(): This method should write down the parameters of a given SubRenderState instance to material script file. Implement this method if you want to be able to export a material that contains your custom shader extension.
 
 ## Tips for debugging shaders {#debugging}

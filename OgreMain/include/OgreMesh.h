@@ -37,6 +37,7 @@ THE SOFTWARE.
 #include "OgreAnimationTrack.h"
 #include "OgreHeaderPrefix.h"
 #include "OgreSharedPtr.h"
+#include "OgreUserObjectBindings.h"
 
 
 namespace Ogre {
@@ -129,6 +130,8 @@ namespace Ogre {
         DataStreamPtr mFreshFromDisk;
 
         SubMeshNameMap mSubMeshNameMap ;
+
+        UserObjectBindings mUserObjectBindings;
 
         /// Local bounding box volume.
         AxisAlignedBox mAABB;
@@ -376,7 +379,7 @@ namespace Ogre {
 
         /** Manually set the bone bounding radius. 
         @remarks
-            This value is normally computed automatically, however it can be overriden with this method.
+            This value is normally computed automatically, however it can be overridden with this method.
         */
         void _setBoneBoundingRadius(Real radius);
 
@@ -529,22 +532,9 @@ namespace Ogre {
 
         /** Sets the manager for the vertex and index buffers to be used when loading
             this Mesh.
-        @remarks
-            By default, when loading the Mesh, static, write-only vertex and index buffers 
-            will be used where possible in order to improve rendering performance. 
-            However, such buffers cannot be manipulated on the fly by CPU code 
-            (although shader code can). If you wish to use the CPU to modify these buffers
-            and will never use it with GPU, you should call this method. Note,
-            however, that it only takes effect after the Mesh has been reloaded. Note that you
-            still have the option of manually repacing the buffers in this mesh with your
-            own if you see fit too, in which case you don't need to call this method since it
-            only affects buffers created by the mesh itself.
-        @par
-            You can define the approach to a Mesh by changing the default parameters to 
-            MeshManager::load if you wish; this means the Mesh is loaded with those options
-            the first time instead of you having to reload the mesh after changing these options.
+
         @param bufferManager
-            If set to @c DefaultHardwareBufferManager, the buffers will be created in system memory
+            If set to @ref DefaultHardwareBufferManager, the buffers will be created in system memory
             only, without hardware counterparts. Such mesh could not be rendered, but LODs could be
             generated for such mesh, it could be cloned, transformed and serialized.
         */
@@ -552,52 +542,33 @@ namespace Ogre {
         HardwareBufferManagerBase* getHardwareBufferManager();
         /** Sets the policy for the vertex buffers to be used when loading
             this Mesh.
-        @remarks
-            By default, when loading the Mesh, static, write-only vertex and index buffers 
+
+            By default, when loading the %Mesh, static, write-only vertex and index buffers
             will be used where possible in order to improve rendering performance. 
             However, such buffers
             cannot be manipulated on the fly by CPU code (although shader code can). If you
-            wish to use the CPU to modify these buffers, you should call this method. Note,
-            however, that it only takes effect after the Mesh has been reloaded. Note that you
-            still have the option of manually repacing the buffers in this mesh with your
+            wish to use the CPU to modify these buffers, you should call this method.
+
+            @note This only takes effect after the Mesh has been reloaded. Also, you
+            still have the option of manually replacing the buffers in this mesh with your
             own if you see fit too, in which case you don't need to call this method since it
             only affects buffers created by the mesh itself.
-        @par
-            You can define the approach to a Mesh by changing the default parameters to 
+
+            You can define the approach to a %Mesh by changing the default parameters to
             MeshManager::load if you wish; this means the Mesh is loaded with those options
             the first time instead of you having to reload the mesh after changing these options.
         @param usage
-            The usage flags, which by default are 
-            HardwareBuffer::HBU_STATIC_WRITE_ONLY
+            The usage flag, which by default is #HBU_GPU_ONLY
         @param shadowBuffer
             If set to @c true, the vertex buffers will be created with a
             system memory shadow buffer. You should set this if you want to be able to
-            read from the buffer, because reading from a hardware buffer is a no-no.
+            read from the buffer
         */
         void setVertexBufferPolicy(HardwareBuffer::Usage usage, bool shadowBuffer = false);
         /** Sets the policy for the index buffers to be used when loading
             this Mesh.
-        @remarks
-            By default, when loading the Mesh, static, write-only vertex and index buffers 
-            will be used where possible in order to improve rendering performance. 
-            However, such buffers
-            cannot be manipulated on the fly by CPU code (although shader code can). If you
-            wish to use the CPU to modify these buffers, you should call this method. Note,
-            however, that it only takes effect after the Mesh has been reloaded. Note that you
-            still have the option of manually repacing the buffers in this mesh with your
-            own if you see fit too, in which case you don't need to call this method since it
-            only affects buffers created by the mesh itself.
-        @par
-            You can define the approach to a Mesh by changing the default parameters to 
-            MeshManager::load if you wish; this means the Mesh is loaded with those options
-            the first time instead of you having to reload the mesh after changing these options.
-        @param usage
-            The usage flags, which by default are 
-            HardwareBuffer::HBU_STATIC_WRITE_ONLY
-        @param shadowBuffer
-            If set to @c true, the index buffers will be created with a
-            system memory shadow buffer. You should set this if you want to be able to
-            read from the buffer, because reading from a hardware buffer is a no-no.
+
+            @copydetails setVertexBufferPolicy
         */
         void setIndexBufferPolicy(HardwareBuffer::Usage usage, bool shadowBuffer = false);
         /** Gets the usage setting for this meshes vertex buffers. */
@@ -703,7 +674,7 @@ namespace Ogre {
             This helper method will suggest source and destination texture coordinate sets
             for a call to buildTangentVectors. It will detect when there are inappropriate
             conditions (such as multiple geometry sets which don't agree). 
-            Moreover, it will return 'true' if it detects that there are aleady 3D 
+            Moreover, it will return 'true' if it detects that there are already 3D
             coordinates in the mesh, and therefore tangents may have been prepared already.
         @param targetSemantic
             The semantic you intend to use to store the tangents
@@ -970,6 +941,13 @@ namespace Ogre {
         /** Set the lod strategy used by this mesh. */
         void setLodStrategy(LodStrategy *lodStrategy);
 #endif
+
+        void _convertVertexElement(VertexElementSemantic semantic, VertexElementType dstType);
+
+        /// @copydoc UserObjectBindings
+        UserObjectBindings& getUserObjectBindings() { return mUserObjectBindings; }
+        /// @overload
+        const UserObjectBindings& getUserObjectBindings() const { return mUserObjectBindings; }
     };
 
     /** A way of recording the way each LODs is recorded this Mesh. */

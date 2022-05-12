@@ -313,10 +313,17 @@ namespace Ogre {
 
     }
     //-----------------------------------------------------------------------------
+    uint32 Texture::getMaxMipmaps() const {
+        // see ARB_texture_non_power_of_two
+        return Bitwise::mostSignificantBitSet(std::max(mWidth, std::max(mHeight, mDepth)));
+    }
     void Texture::createInternalResources(void)
     {
         if (!mInternalResourcesCreated)
         {
+            // Check requested number of mipmaps
+            mNumMipmaps = std::min(mNumMipmaps, getMaxMipmaps());
+
             createInternalResourcesImpl();
             mInternalResourcesCreated = true;
 

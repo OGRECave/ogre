@@ -1,7 +1,4 @@
 uniform float inverseShadowmapSize;
-uniform float fixedDepthBias;
-uniform float gradientClamp;
-uniform float gradientScaleBias;
 uniform vec4 lightColour;
 
 uniform sampler2D shadowMap;
@@ -35,7 +32,8 @@ void main()
 	shadowUV.z = shadowUV.z * 0.5 + 0.5; // convert -1..1 to 0..1
 #endif
 
-    // gradient calculation
+	// shadowUV.z contains lightspace position of current object
+#if PCF
   	float pixeloffset = inverseShadowmapSize;
     vec4 depths = vec4(
     	texture2D(shadowMap, shadowUV.xy + vec2(-pixeloffset, 0)).x,
@@ -43,19 +41,8 @@ void main()
     	texture2D(shadowMap, shadowUV.xy + vec2(0, -pixeloffset)).x,
     	texture2D(shadowMap, shadowUV.xy + vec2(0, +pixeloffset)).x);
 
-	vec2 differences = abs( depths.yw - depths.xz );
-	float gradient = min(gradientClamp, max(differences.x, differences.y));
-	float gradientFactor = gradient * gradientScaleBias;
-
-	// visibility function
-	float depthAdjust = gradientFactor + (fixedDepthBias * centerdepth);
-	float finalCenterDepth = centerdepth + depthAdjust;
-
-	// shadowUV.z contains lightspace position of current object
-#if PCF
 	// use depths from prev, calculate diff
-	depths += depthAdjust;
-	float final = (finalCenterDepth > shadowUV.z) ? 1.0 : 0.0;
+	float final = (centerdepth > shadowUV.z) ? 1.0 : 0.0;
 	final += (depths.x > shadowUV.z) ? 1.0 : 0.0;
 	final += (depths.y > shadowUV.z) ? 1.0 : 0.0;
 	final += (depths.z > shadowUV.z) ? 1.0 : 0.0;
@@ -66,7 +53,7 @@ void main()
 	gl_FragColor = vec4(vertexColour.xyz * final, 1.0);
 	
 #else
-	gl_FragColor = (finalCenterDepth > shadowUV.z) ? vertexColour : vec4(0.0, 0.0, 0.0, 1.0);
+	gl_FragColor = (centerdepth > shadowUV.z) ? vertexColour : vec4(0.0, 0.0, 0.0, 1.0);
 #endif
 }
 

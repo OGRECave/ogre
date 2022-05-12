@@ -42,9 +42,7 @@ namespace Ogre {
     */
 
     /** Class that provides convenient interface to establish a linkage between
-    custom user application objects and Ogre core classes.
-    Any instance of Ogre class that will derive from this class could be associated with custom
-    application object using this class interface.
+    custom user application objects and %Ogre core classes.
     */
     class _OgreExport UserObjectBindings : public GeneralAllocatedObject
     {

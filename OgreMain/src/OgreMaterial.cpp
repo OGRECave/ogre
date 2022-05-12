@@ -193,6 +193,14 @@ namespace Ogre {
         newMat->mName = newName;
         newMat->mHandle = newHandle;
 
+        //if we're cloning from a loaded material, notify the creator or otherwise size won't be right
+        if (newMat->getLoadingState() == LOADSTATE_LOADED)
+        {
+            // Notify manager
+            if (mCreator)
+                mCreator->_notifyResourceLoaded(newMat.get());
+        }
+
         return newMat;
     }
     //-----------------------------------------------------------------------
@@ -305,8 +313,7 @@ namespace Ogre {
             Technique* ret = 0;
             MaterialManager& matMgr = MaterialManager::getSingleton();
             // get scheme
-            BestTechniquesBySchemeList::iterator si = 
-                mBestTechniquesBySchemeList.find(matMgr._getActiveSchemeIndex());
+            auto si = mBestTechniquesBySchemeList.find(matMgr._getActiveSchemeIndex());
             // scheme not found?
             if (si == mBestTechniquesBySchemeList.end())
             {
@@ -315,6 +322,7 @@ namespace Ogre {
                 if (ret)
                     return ret;
 
+                OgreAssert(!mBestTechniquesBySchemeList.empty(), "handleSchemeNotFound() must not remove techniques");
                 // Nope, use default
                 // get the first item, will be 0 (the default) if default
                 // scheme techniques exist, otherwise the earliest defined
@@ -322,13 +330,12 @@ namespace Ogre {
             }
 
             // get LOD
-            LodTechniques::iterator li = si->second.find(lodIndex);
+            auto li = si->second.find(lodIndex);
             // LOD not found? 
             if (li == si->second.end())
             {
                 // Use the next LOD level up
-                for (LodTechniques::reverse_iterator rli = si->second.rbegin();
-                    rli != si->second.rend(); ++rli)
+                for (auto rli = si->second.rbegin(); rli != si->second.rend(); ++rli)
                 {
                     if (rli->second->getLodIndex() < lodIndex)
                     {
@@ -362,9 +369,7 @@ namespace Ogre {
         Techniques::iterator i = mTechniques.begin() + index;
         OGRE_DELETE(*i);
         mTechniques.erase(i);
-        mSupportedTechniques.clear();
         clearBestTechniqueList();
-        mCompilationRequired = true;
     }
     //-----------------------------------------------------------------------
     void Material::removeAllTechniques(void)
@@ -376,9 +381,7 @@ namespace Ogre {
             OGRE_DELETE(*i);
         }
         mTechniques.clear();
-        mSupportedTechniques.clear();
         clearBestTechniqueList();
-        mCompilationRequired = true;
     }
     //-----------------------------------------------------------------------
     Material::TechniqueIterator Material::getTechniqueIterator(void) 
@@ -407,7 +410,6 @@ namespace Ogre {
     void Material::compile(bool autoManageTextureUnits)
     {
         // Compile each technique, then add it to the list of supported techniques
-        mSupportedTechniques.clear();
         clearBestTechniqueList();
         mUnsupportedReasons.clear();
 
@@ -448,58 +450,28 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void Material::clearBestTechniqueList(void)
     {
+        mSupportedTechniques.clear();
         mBestTechniquesBySchemeList.clear();
+        mCompilationRequired = true;
     }
     //-----------------------------------------------------------------------
-    void Material::setPointSize(Real ps)
-    {
-        Techniques::iterator i, iend;
-        iend = mTechniques.end();
-        for (i = mTechniques.begin(); i != iend; ++i)
-        {
-            (*i)->setPointSize(ps);
-        }
-
-    }
+    #define ALL_TECHNIQUES(fncall) for(auto t : mTechniques) t->fncall
+    void Material::setPointSize(Real ps) { ALL_TECHNIQUES(setPointSize(ps)); }
     //-----------------------------------------------------------------------
-    void Material::setAmbient(float red, float green, float blue)
-    {
-        setAmbient(ColourValue(red, green, blue));
-    }
+    void Material::setAmbient(float red, float green, float blue) { setAmbient(ColourValue(red, green, blue)); }
     //-----------------------------------------------------------------------
-    void Material::setAmbient(const ColourValue& ambient)
-    {
-        Techniques::iterator i, iend;
-        iend = mTechniques.end();
-        for (i = mTechniques.begin(); i != iend; ++i)
-        {
-            (*i)->setAmbient(ambient);
-        }
-    }
+    void Material::setAmbient(const ColourValue& ambient) { ALL_TECHNIQUES(setAmbient(ambient)); }
     //-----------------------------------------------------------------------
     void Material::setDiffuse(float red, float green, float blue, float alpha)
     {
-        Techniques::iterator i, iend;
-        iend = mTechniques.end();
-        for (i = mTechniques.begin(); i != iend; ++i)
-        {
-            (*i)->setDiffuse(red, green, blue, alpha);
-        }
+        ALL_TECHNIQUES(setDiffuse(red, green, blue, alpha));
     }
     //-----------------------------------------------------------------------
-    void Material::setDiffuse(const ColourValue& diffuse)
-    {
-        setDiffuse(diffuse.r, diffuse.g, diffuse.b, diffuse.a);
-    }
+    void Material::setDiffuse(const ColourValue& diffuse) { setDiffuse(diffuse.r, diffuse.g, diffuse.b, diffuse.a); }
     //-----------------------------------------------------------------------
     void Material::setSpecular(float red, float green, float blue, float alpha)
     {
-        Techniques::iterator i, iend;
-        iend = mTechniques.end();
-        for (i = mTechniques.begin(); i != iend; ++i)
-        {
-            (*i)->setSpecular(red, green, blue, alpha);
-        }
+        ALL_TECHNIQUES(setSpecular(red, green, blue, alpha));
     }
     //-----------------------------------------------------------------------
     void Material::setSpecular(const ColourValue& specular)
@@ -507,202 +479,71 @@ namespace Ogre {
         setSpecular(specular.r, specular.g, specular.b, specular.a);
     }
     //-----------------------------------------------------------------------
-    void Material::setShininess(Real val)
-    {
-        Techniques::iterator i, iend;
-        iend = mTechniques.end();
-        for (i = mTechniques.begin(); i != iend; ++i)
-        {
-            (*i)->setShininess(val);
-        }
-    }
+    void Material::setShininess(Real val) { ALL_TECHNIQUES(setShininess(val)); }
     //-----------------------------------------------------------------------
     void Material::setSelfIllumination(float red, float green, float blue)
     {
-        setSelfIllumination(ColourValue(red, green, blue));   
+        setSelfIllumination(ColourValue(red, green, blue));
     }
     //-----------------------------------------------------------------------
-    void Material::setSelfIllumination(const ColourValue& selfIllum)
-    {
-        Techniques::iterator i, iend;
-        iend = mTechniques.end();
-        for (i = mTechniques.begin(); i != iend; ++i)
-        {
-            (*i)->setSelfIllumination(selfIllum);
-        }
-    }
+    void Material::setSelfIllumination(const ColourValue& selfIllum) { ALL_TECHNIQUES(setSelfIllumination(selfIllum)); }
     //-----------------------------------------------------------------------
-    void Material::setDepthCheckEnabled(bool enabled)
-    {
-        Techniques::iterator i, iend;
-        iend = mTechniques.end();
-        for (i = mTechniques.begin(); i != iend; ++i)
-        {
-            (*i)->setDepthCheckEnabled(enabled);
-        }
-    }
+    void Material::setDepthCheckEnabled(bool enabled) { ALL_TECHNIQUES(setDepthCheckEnabled(enabled)); }
     //-----------------------------------------------------------------------
-    void Material::setDepthWriteEnabled(bool enabled)
-    {
-        Techniques::iterator i, iend;
-        iend = mTechniques.end();
-        for (i = mTechniques.begin(); i != iend; ++i)
-        {
-            (*i)->setDepthWriteEnabled(enabled);
-        }
-    }
+    void Material::setDepthWriteEnabled(bool enabled) { ALL_TECHNIQUES(setDepthWriteEnabled(enabled)); }
     //-----------------------------------------------------------------------
-    void Material::setDepthFunction( CompareFunction func )
-    {
-        Techniques::iterator i, iend;
-        iend = mTechniques.end();
-        for (i = mTechniques.begin(); i != iend; ++i)
-        {
-            (*i)->setDepthFunction(func);
-        }
-    }
+    void Material::setDepthFunction(CompareFunction func) { ALL_TECHNIQUES(setDepthFunction(func)); }
     //-----------------------------------------------------------------------
-    void Material::setColourWriteEnabled(bool enabled)
-    {
-        Techniques::iterator i, iend;
-        iend = mTechniques.end();
-        for (i = mTechniques.begin(); i != iend; ++i)
-        {
-            (*i)->setColourWriteEnabled(enabled);
-        }
-    }
+    void Material::setColourWriteEnabled(bool enabled) { ALL_TECHNIQUES(setColourWriteEnabled(enabled)); }
     //-----------------------------------------------------------------------
     void Material::setColourWriteEnabled(bool red, bool green, bool blue, bool alpha)
     {
-        Techniques::iterator i, iend;
-        iend = mTechniques.end();
-        for (i = mTechniques.begin(); i != iend; ++i)
-        {
-            (*i)->setColourWriteEnabled(red, green, blue, alpha);
-        }
+        ALL_TECHNIQUES(setColourWriteEnabled(red, green, blue, alpha));
     }
     //-----------------------------------------------------------------------
-    void Material::setCullingMode( CullingMode mode )
-    {
-        Techniques::iterator i, iend;
-        iend = mTechniques.end();
-        for (i = mTechniques.begin(); i != iend; ++i)
-        {
-            (*i)->setCullingMode(mode);
-        }
-    }
+    void Material::setCullingMode(CullingMode mode) { ALL_TECHNIQUES(setCullingMode(mode)); }
     //-----------------------------------------------------------------------
-    void Material::setManualCullingMode( ManualCullingMode mode )
-    {
-        Techniques::iterator i, iend;
-        iend = mTechniques.end();
-        for (i = mTechniques.begin(); i != iend; ++i)
-        {
-            (*i)->setManualCullingMode(mode);
-        }
-    }
+    void Material::setManualCullingMode(ManualCullingMode mode) { ALL_TECHNIQUES(setManualCullingMode(mode)); }
     //-----------------------------------------------------------------------
-    void Material::setLightingEnabled(bool enabled)
-    {
-        Techniques::iterator i, iend;
-        iend = mTechniques.end();
-        for (i = mTechniques.begin(); i != iend; ++i)
-        {
-            (*i)->setLightingEnabled(enabled);
-        }
-    }
+    void Material::setLightingEnabled(bool enabled) { ALL_TECHNIQUES(setLightingEnabled(enabled)); }
     //-----------------------------------------------------------------------
-    void Material::setShadingMode( ShadeOptions mode )
-    {
-        Techniques::iterator i, iend;
-        iend = mTechniques.end();
-        for (i = mTechniques.begin(); i != iend; ++i)
-        {
-            (*i)->setShadingMode(mode);
-        }
-    }
+    void Material::setShadingMode(ShadeOptions mode) { ALL_TECHNIQUES(setShadingMode(mode)); }
     //-----------------------------------------------------------------------
-    void Material::setFog(bool overrideScene, FogMode mode, const ColourValue& colour,
-        Real expDensity, Real linearStart, Real linearEnd)
+    void Material::setFog(bool overrideScene, FogMode mode, const ColourValue& colour, Real expDensity,
+                          Real linearStart, Real linearEnd)
     {
-        Techniques::iterator i, iend;
-        iend = mTechniques.end();
-        for (i = mTechniques.begin(); i != iend; ++i)
-        {
-            (*i)->setFog(overrideScene, mode, colour, expDensity, linearStart, linearEnd);
-        }
+        ALL_TECHNIQUES(setFog(overrideScene, mode, colour, expDensity, linearStart, linearEnd));
     }
     //-----------------------------------------------------------------------
     void Material::setDepthBias(float constantBias, float slopeScaleBias)
     {
-        Techniques::iterator i, iend;
-        iend = mTechniques.end();
-        for (i = mTechniques.begin(); i != iend; ++i)
-        {
-            (*i)->setDepthBias(constantBias, slopeScaleBias);
-        }
+        ALL_TECHNIQUES(setDepthBias(constantBias, slopeScaleBias));
     }
     //-----------------------------------------------------------------------
     void Material::setTextureFiltering(TextureFilterOptions filterType)
     {
-        Techniques::iterator i, iend;
-        iend = mTechniques.end();
-        for (i = mTechniques.begin(); i != iend; ++i)
-        {
-            (*i)->setTextureFiltering(filterType);
-        }
+        ALL_TECHNIQUES(setTextureFiltering(filterType));
     }
     // --------------------------------------------------------------------
-    void Material::setTextureAnisotropy(int maxAniso)
+    void Material::setTextureAnisotropy(int maxAniso) { ALL_TECHNIQUES(setTextureAnisotropy(maxAniso)); }
+    // --------------------------------------------------------------------
+    void Material::setSceneBlending(const SceneBlendType sbt) { ALL_TECHNIQUES(setSceneBlending(sbt)); }
+    // --------------------------------------------------------------------
+    void Material::setSeparateSceneBlending(const SceneBlendType sbt, const SceneBlendType sbta)
     {
-        Techniques::iterator i, iend;
-        iend = mTechniques.end();
-        for (i = mTechniques.begin(); i != iend; ++i)
-        {
-            (*i)->setTextureAnisotropy(maxAniso);
-        }
+        ALL_TECHNIQUES(setSeparateSceneBlending(sbt, sbta));
     }
     // --------------------------------------------------------------------
-    void Material::setSceneBlending( const SceneBlendType sbt )
+    void Material::setSceneBlending(const SceneBlendFactor sourceFactor, const SceneBlendFactor destFactor)
     {
-        Techniques::iterator i, iend;
-        iend = mTechniques.end();
-        for (i = mTechniques.begin(); i != iend; ++i)
-        {
-            (*i)->setSceneBlending(sbt);
-        }
-    }
-    // --------------------------------------------------------------------
-    void Material::setSeparateSceneBlending( const SceneBlendType sbt, const SceneBlendType sbta )
-    {
-        Techniques::iterator i, iend;
-        iend = mTechniques.end();
-        for (i = mTechniques.begin(); i != iend; ++i)
-        {
-            (*i)->setSeparateSceneBlending(sbt, sbta);
-        }
-    }
-    // --------------------------------------------------------------------
-    void Material::setSceneBlending( const SceneBlendFactor sourceFactor, 
-        const SceneBlendFactor destFactor)
-    {
-        Techniques::iterator i, iend;
-        iend = mTechniques.end();
-        for (i = mTechniques.begin(); i != iend; ++i)
-        {
-            (*i)->setSceneBlending(sourceFactor, destFactor);
-        }
+        ALL_TECHNIQUES(setSceneBlending(sourceFactor, destFactor));
     }
     // --------------------------------------------------------------------
     void Material::setSeparateSceneBlending( const SceneBlendFactor sourceFactor, const SceneBlendFactor destFactor, const SceneBlendFactor sourceFactorAlpha, const SceneBlendFactor destFactorAlpha)
     {
-        Techniques::iterator i, iend;
-        iend = mTechniques.end();
-        for (i = mTechniques.begin(); i != iend; ++i)
-        {
-            (*i)->setSeparateSceneBlending(sourceFactor, destFactor, sourceFactorAlpha, destFactorAlpha);
-        }
+        ALL_TECHNIQUES(setSeparateSceneBlending(sourceFactor, destFactor, sourceFactorAlpha, destFactorAlpha));
     }
+    #undef ALL_TECHNIQUES
     // --------------------------------------------------------------------
     void Material::_notifyNeedsRecompile(void)
     {

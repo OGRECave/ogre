@@ -209,15 +209,6 @@ bool PerPixelLighting::resolvePerLightParameters(ProgramSet* programSet)
         mVSOutViewPos = vsMain->resolveOutputParameter(Parameter::SPC_POSITION_VIEW_SPACE);
 
         mViewPos = psMain->resolveInputParameter(mVSOutViewPos);
-        mToLight = psMain->resolveLocalParameter(Parameter::SPC_LIGHTDIRECTION_VIEW_SPACE0);
-        mToView = psMain->resolveLocalParameter(Parameter::SPC_POSTOCAMERA_VIEW_SPACE);
-
-        for (auto& l : mLightParamsList)
-        {
-            if(l.mType != Light::LT_POINT && l.mType != Light::LT_SPOTLIGHT)
-                continue;
-            l.mToLight = mToLight;
-        }
     }
 
     if(mTwoSidedLighting)
@@ -261,9 +252,6 @@ bool PerPixelLighting::addFunctionInvocations(ProgramSet* programSet)
     // Add the global illumination functions.
     addPSGlobalIlluminationInvocation(stage);
 
-    if (mToView)
-        stage.mul(Vector3(-1), mViewPos, mToView);
-
     if(mFrontFacing)
         stage.callFunction("SGX_Flip_Backface_Normal", mFrontFacing, mTargetFlipped, mViewNormal);
 
@@ -271,6 +259,14 @@ bool PerPixelLighting::addFunctionInvocations(ProgramSet* programSet)
     for (const auto& lp : mLightParamsList)
     {
         addIlluminationInvocation(&lp, stage);
+    }
+
+    if (auto shadowFactor = psMain->getLocalParameter("lShadowFactor"))
+    {
+        stage.callFunction("SGX_ApplyShadowFactor_Diffuse",
+                            {In(mDerivedSceneColour), In(mOutDiffuse), In(shadowFactor), Out(mOutDiffuse)});
+        if(mSpecularEnable)
+            stage.mul(mOutSpecular, shadowFactor, mOutSpecular);
     }
 
     // Assign back temporary variables

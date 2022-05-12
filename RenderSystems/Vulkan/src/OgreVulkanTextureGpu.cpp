@@ -198,9 +198,6 @@ namespace Ogre
         // Adjust format if required.
         mFormat = TextureManager::getSingleton().getNativeFormat(mTextureType, mFormat, mUsage);
 
-        mNumMipmaps =
-            std::min(mNumMipmaps, Bitwise::mostSignificantBitSet(std::max(mWidth, std::max(mHeight, mDepth))));
-
         VkImageCreateInfo imageInfo = {VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO};
         imageInfo.imageType = getVulkanTextureType();
         imageInfo.extent.width = getWidth();

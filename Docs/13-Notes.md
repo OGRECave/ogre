@@ -48,6 +48,26 @@ Consequently, most protected members are private now.
 
 Nevertheless, there is fallback code so you still can use old `.material` files. Here, a caster/ receiver material will be generated on demand. However, you are highly encouraged to define those explicitly.
 
+### `texture_alias` API removed
+Texture aliases were a restricted version of Script Variables, which you should instead.
+I.e. replace
+
+```cpp
+texture_alias DiffuseMap
+// and
+set_texture_alias	DiffuseMap	r2skin.jpg
+```
+
+by
+
+```cpp
+texture $DiffuseMap
+// and
+set     $DiffuseMap r2skin.jpg
+```
+
+There is limited backward compatibility for material scripts, where `texture_alias` will set the texture unit name and later `set_texture_alias` is applied based on that.
+
 ### Other
 - Size of the Particle class was reduced by 12% which results in about 13% faster rendering
 - Frustum is not a Renderable any more. Rendering Frusta is now done by the DebugDrawer.
@@ -77,9 +97,36 @@ There is now a  RTSS stage for Weighted, blended Order Independent Transparency,
 See the transparency Sample for how to integrate it into your pipeline.
 
 The RTSS Normal Map stage, is no longer a lighting stage but only does normal mapping.
-This allows using it with per-pixel lighting as before, but also enables combining it with the GBuffer stage to enable normal mapping in the GBuffer
+This allows using it with per-pixel lighting as before, but also enables combining it with the GBuffer stage to enable normal mapping in the GBuffer.
+
+**ACTION REQUIRED** Direct specification of sampler parameters via `lighting_stage normal_map ...` is no longer supported and the additional parameters will be interpreted as a sampler reference.
 
 The PSSM3 stage now also supports colour shadows in addition to depth shadows. Colour shadows are automatically used for `PCT_BYTE` texture formats.
+Since 13.3, the PSSM3 stage supports the "Reversed Z-Buffer" RenderSystem option.
+
+### PBR Material support (since 13.3)
+
+The RTSS can now be used to create a PBR pipeline. To enable it via material scripts, specify
+
+```nginx
+rtshader_system
+{
+   lighting_stage metal_roughness texture Default_metalRoughness.jpg
+}
+```
+
+The parameters are expected to be in the green and blue channels (as per glTF2.0) and lighting will be done according to the [Filament equations](https://google.github.io/filament/Filament.md.html#materialsystem).
+
+Alternatively, you can use material-wide settings, by skipping the texture part like:
+
+```nginx
+rtshader_system
+{
+   lighting_stage metal_roughness
+}
+```
+
+Here, metalness is read from `specular[0]` and roughness from `specular[1]`.
 
 ## DotScene
 The Plugin now supports exporting via a generic `SceneNode::saveChildren` API. This allows you to dump your dynamically generated Scene to file and later inspect it with ogre-meshviewer, which also got improved .scene support.

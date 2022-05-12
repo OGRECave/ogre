@@ -48,6 +48,11 @@ vec4 texture2DLod(sampler2D s, vec2 v, float lod) { return tex2Dlod(s, vec4(v.x,
 #define mix lerp
 #define fract frac
 
+float mod(float _a, float _b) { return _a - _b * floor(_a / _b); }
+vec2  mod(vec2  _a, vec2  _b) { return _a - _b * floor(_a / _b); }
+vec3  mod(vec3  _a, vec3  _b) { return _a - _b * floor(_a / _b); }
+vec4  mod(vec4  _a, vec4  _b) { return _a - _b * floor(_a / _b); }
+
 vec2 vec2_splat(float x) { return vec2(x, x); }
 vec3 vec3_splat(float x) { return vec3(x, x, x); }
 vec4 vec4_splat(float x) { return vec4(x, x, x, x); }
@@ -162,3 +167,16 @@ mat3 mtxFromCols(vec3 a, vec3 b, vec3 c)
 #endif
 
 #define OGRE_UNIFORMS(params) OGRE_UNIFORMS_BEGIN params OGRE_UNIFORMS_END
+
+// GL_EXT_shader_explicit_arithmetic_types polyfill
+#ifdef OGRE_GLSLES
+#define float32_t highp float
+#define f32vec2 highp vec2
+#define f32vec3 highp vec3
+#define f32vec4 highp vec4
+#else
+#define float32_t float
+#define f32vec2 vec2
+#define f32vec3 vec3
+#define f32vec4 vec4
+#endif

@@ -205,13 +205,11 @@ namespace Ogre
         OgreAssert(cam != NULL, "Camera (viewer) is NULL");
         OgreAssert(light != NULL, "Light is NULL");
         OgreAssert(texCam != NULL, "Camera (texture) is NULL");
-        mLightFrustumCameraCalculated = false;
-
 
         // calculate standard shadow mapping matrix
-        Affine3 LView; Matrix4 LProj;
-        calculateShadowMappingMatrix(*sm, *cam, *light, &LView, &LProj, NULL);
-        
+        DefaultShadowCameraSetup::getShadowCamera(sm, cam, vp, light, texCam, iteration);
+        mLightFrustumCamera = texCam;
+
         // if the direction of the light and the direction of the camera tend to be parallel,
         // then tweak up the adjust factor
         Real dot = Math::Abs(cam->getDerivedDirection().dotProduct(light->getDerivedDirection()));
@@ -234,8 +232,6 @@ namespace Ogre
         // return the standard shadow mapping matrix
         if (sceneBB.isNull())
         {
-            texCam->setCustomViewMatrix(true, LView);
-            texCam->setCustomProjectionMatrix(true, LProj);
             return;
         }
 
@@ -247,9 +243,16 @@ namespace Ogre
         // simply return the standard shadow mapping matrix
         if (mPointListBodyB.getPointCount() == 0)
         {
-            texCam->setCustomViewMatrix(true, LView);
-            texCam->setCustomProjectionMatrix(true, LProj);
             return;
+        }
+
+        auto LView = texCam->getViewMatrix();
+        auto LProj = texCam->getProjectionMatrix();
+
+        if(texCam->getProjectionType() == PT_ORTHOGRAPHIC)
+        {
+            // this is wrong, but masks another error where the frustum gets stuck on a single object
+            LProj = Affine3::getScale(1, 1, -1);
         }
 
         // transform to light space: y -> -z, z -> y

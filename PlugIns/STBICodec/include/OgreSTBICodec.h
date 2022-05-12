@@ -38,7 +38,10 @@ namespace Ogre {
     *  @{
     */
     /** \defgroup STBIImageCodec STBIImageCodec
-    * %Codec specialized in images loaded using stb image (https://github.com/nothings/stb).
+    * %Codec for loading generic image formats (e.g. jpg, png) using [stb_image](https://github.com/nothings/stb)
+    *
+    * This Codec is ideal for files, that you are in control of. There are no external dependencies and no superfluous pixel conversions.
+    * The downside is that not all format variants are supported and the code is more vulnerable to malicious files.
     * @{
     */
     class STBIImageCodec : public ImageCodec

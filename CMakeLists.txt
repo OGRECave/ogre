@@ -41,7 +41,7 @@ if(POLICY CMP0078)
   cmake_policy(SET CMP0078 OLD)
 endif()
 if(POLICY CMP0086)
-  cmake_policy(SET CMP0086 OLD)
+  cmake_policy(SET CMP0086 NEW)
 endif()
 
 if (APPLE AND NOT ANDROID)
@@ -67,7 +67,7 @@ if (APPLE AND NOT ANDROID)
   add_definitions(-D__ASSERT_MACROS_DEFINE_VERSIONS_WITHOUT_UNDERSCORES=0)
 endif ()
 
-project(OGRE VERSION 13.3.0)
+project(OGRE VERSION 13.4.0)
 
 # extra version info
 set(OGRE_VERSION_SUFFIX "")
@@ -123,11 +123,13 @@ endif ()
 
 # Set compiler specific build flags
 if (NOT ANDROID AND NOT EMSCRIPTEN AND UNIX OR MINGW)
-  include(CheckCXXCompilerFlag)
-  check_cxx_compiler_flag(-msse OGRE_GCC_HAS_SSE)
-  if (OGRE_GCC_HAS_SSE)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse")
-  endif ()
+  if (CMAKE_SYSTEM_PROCESSOR MATCHES "x86|X86|amd64|AMD64")
+    include(CheckCXXCompilerFlag)
+    check_cxx_compiler_flag(-msse OGRE_GCC_HAS_SSE)
+    if (OGRE_GCC_HAS_SSE)
+      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse")
+    endif ()
+  endif()
 endif()
 
 if(UNIX)
@@ -512,4 +514,4 @@ include(Packaging)
 
 
 # Show feature summary
-include(FeatureSummary)
+include(OgreFeatureSummary)

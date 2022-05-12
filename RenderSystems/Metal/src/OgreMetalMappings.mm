@@ -342,6 +342,7 @@ namespace Ogre
         case VET_USHORT4_NORM:          return MTLVertexFormatUShort4Normalized;
         //case VET_HALF2:                 return MTLVertexFormatHalf2;
         //case VET_HALF4:                 return MTLVertexFormatHalf4;
+        case VET_INT_10_10_10_2_NORM:   return MTLVertexFormatInt1010102Normalized;
 
         case VET_DOUBLE1:
         case VET_DOUBLE2:

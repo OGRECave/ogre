@@ -691,16 +691,10 @@ namespace Ogre {
         const GPUDeviceNameRuleList& getGPUDeviceNameRules() const { return mGPUDeviceNameRules; }
         /// @}
 
-        /** Return an instance of user objects binding associated with this class.
-        You can use it to associate one or more custom objects with this class instance.
-        @see UserObjectBindings::setUserAny.
-        */
+        /// @copydoc UserObjectBindings
         UserObjectBindings& getUserObjectBindings() { return mUserObjectBindings; }
 
-        /** Return an instance of user objects binding associated with this class.
-        You can use it to associate one or more custom objects with this class instance.
-        @see UserObjectBindings::setUserAny.        
-        */
+        /// @overload
         const UserObjectBindings& getUserObjectBindings() const { return mUserObjectBindings; }
 
     };

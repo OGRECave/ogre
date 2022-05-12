@@ -209,73 +209,32 @@ void SceneManager::SkyBoxRenderer::setSkyBox(
         }
 
         mSkyBoxObj->setRenderQueueGroup(renderQueue);
-        mSkyBoxObj->begin(materialName, RenderOperation::OT_TRIANGLE_LIST, groupName);
+        mSkyBoxObj->begin(materialName, RenderOperation::OT_TRIANGLE_STRIP, groupName);
 
-        // Set up the box (6 planes)
-        for (uint16 i = 0; i < 6; ++i)
+        // rendering cube, only using 14 vertices
+        const Vector3 cube_strip[14] = {
+            {-1.f, 1.f, 1.f},   // Front-top-left
+            {1.f, 1.f, 1.f},    // Front-top-right
+            {-1.f, -1.f, 1.f},  // Front-bottom-left
+            {1.f, -1.f, 1.f},   // Front-bottom-right
+            {1.f, -1.f, -1.f},  // Back-bottom-right
+            {1.f, 1.f, 1.f},    // Front-top-right
+            {1.f, 1.f, -1.f},   // Back-top-right
+            {-1.f, 1.f, 1.f},   // Front-top-left
+            {-1.f, 1.f, -1.f},  // Back-top-left
+            {-1.f, -1.f, 1.f},  // Front-bottom-left
+            {-1.f, -1.f, -1.f}, // Back-bottom-left
+            {1.f, -1.f, -1.f},  // Back-bottom-right
+            {-1.f, 1.f, -1.f},  // Back-top-left
+            {1.f, 1.f, -1.f}    // Back-top-right
+        };
+
+        for (const auto& vtx : cube_strip)
         {
-            Vector3 middle;
-            Vector3 up, right;
-
-            switch(i)
-            {
-            case BP_FRONT:
-                middle = Vector3(0, 0, -distance);
-                up = Vector3::UNIT_Y * distance;
-                right = Vector3::UNIT_X * distance;
-                break;
-            case BP_BACK:
-                middle = Vector3(0, 0, distance);
-                up = Vector3::UNIT_Y * distance;
-                right = Vector3::NEGATIVE_UNIT_X * distance;
-                break;
-            case BP_LEFT:
-                middle = Vector3(-distance, 0, 0);
-                up = Vector3::UNIT_Y * distance;
-                right = Vector3::NEGATIVE_UNIT_Z * distance;
-                break;
-            case BP_RIGHT:
-                middle = Vector3(distance, 0, 0);
-                up = Vector3::UNIT_Y * distance;
-                right = Vector3::UNIT_Z * distance;
-                break;
-            case BP_UP:
-                middle = Vector3(0, distance, 0);
-                up = Vector3::UNIT_Z * distance;
-                right = Vector3::UNIT_X * distance;
-                break;
-            case BP_DOWN:
-                middle = Vector3(0, -distance, 0);
-                up = Vector3::NEGATIVE_UNIT_Z * distance;
-                right = Vector3::UNIT_X * distance;
-                break;
-            }
-
-            // 3D cubic texture
+            mSkyBoxObj->position(orientation * (vtx * distance));
             // Note UVs mirrored front/back
-            // I could save a few vertices here by sharing the corners
-            // since 3D coords will function correctly but it's really not worth
-            // making the code more complicated for the sake of 16 verts
-            // top left
-            Vector3 pos = middle + up - right;
-            mSkyBoxObj->position(orientation * pos);
-            mSkyBoxObj->textureCoord(pos.normalisedCopy() * Vector3(1,1,-1));
-            // bottom left
-            pos = middle - up - right;
-            mSkyBoxObj->position(orientation * pos);
-            mSkyBoxObj->textureCoord(pos.normalisedCopy() * Vector3(1,1,-1));
-            // bottom right
-            pos = middle - up + right;
-            mSkyBoxObj->position(orientation * pos);
-            mSkyBoxObj->textureCoord(pos.normalisedCopy() * Vector3(1,1,-1));
-            // top right
-            pos = middle + up + right;
-            mSkyBoxObj->position(orientation * pos);
-            mSkyBoxObj->textureCoord(pos.normalisedCopy() * Vector3(1,1,-1));
-
-            uint16 base = i * 4;
-            mSkyBoxObj->quad(base, base+1, base+2, base+3);
-        } // for each plane
+            mSkyBoxObj->textureCoord(vtx.normalisedCopy() * Vector3(1, 1, -1));
+        }
 
         mSkyBoxObj->end();
     }

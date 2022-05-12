@@ -79,10 +79,8 @@ protected:
 
     void setupContent()
     {
-#ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
         // Make this viewport work with shader generator scheme.
-        mViewport->setMaterialScheme(RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
-#endif
+        mViewport->setMaterialScheme(MSN_SHADERGEN);
 
         // create our main node to attach our entities to
         mObjectNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();

@@ -31,7 +31,7 @@ after_build:
   - 7z a ogre-sdk-%APPVEYOR_REPO_TAG_NAME%-msvc141-x64.zip ./build/sdk/*
   - SET PATH=C:\Python37-x64;C:\Python37-x64\Scripts;%PATH%
   - pip install --upgrade cloudsmith-cli
-  - IF "%APPVEYOR_PULL_REQUEST_NUMBER%" == "" cloudsmith push raw ogrecave/ogre ogre-sdk-%APPVEYOR_REPO_TAG_NAME%-msvc141-x64.zip --republish -k %CS_APIKEY%
+  - IF "%APPVEYOR_PULL_REQUEST_NUMBER%" == "" cloudsmith push raw ogrecave/ogre ogre-sdk-%APPVEYOR_REPO_TAG_NAME%-msvc141-x64.zip --republish --version %APPVEYOR_REPO_TAG_NAME% -k %CS_APIKEY%
 artifacts:
   - path: ogre-sdk-master-msvc141-x64.zip
     name: ogre-sdk-master-msvc141-x64

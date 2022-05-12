@@ -75,10 +75,11 @@ namespace Ogre {
         // Post-blended 
         HardwareVertexBufferSharedPtr destPositionBuffer;
         HardwareVertexBufferSharedPtr destNormalBuffer;
-        /// Both positions and normals are contained in the same buffer.
-        bool posNormalShareBuffer;
         unsigned short posBindIndex;
         unsigned short normBindIndex;
+        /// Both positions and normals are contained in the same buffer.
+        bool posNormalShareBuffer;
+        bool posNormalExtraData;
         bool bindPositions;
         bool bindNormals;
 
@@ -127,9 +128,9 @@ namespace Ogre {
         OGRE_MUTEX(mVertexBufferBindingsMutex);
 
         /// Internal method for destroys all vertex declarations.
-        virtual void destroyAllDeclarations(void);
+        void destroyAllDeclarations(void);
         /// Internal method for destroys all vertex buffer bindings.
-        virtual void destroyAllBindings(void);
+        void destroyAllBindings(void);
 
         /// Internal method for creates a new vertex declaration, may be overridden by certain rendering APIs.
         virtual VertexDeclaration* createVertexDeclarationImpl(void);

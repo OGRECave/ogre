@@ -62,16 +62,17 @@ namespace Ogre {
 
         static ControllerValueRealPtr create() { return std::make_shared<FrameTimeControllerValue>(); }
 
-        bool frameEnded(const FrameEvent &evt);
-        bool frameStarted(const FrameEvent &evt);
-        Real getValue(void) const;
-        void setValue(Real value);
-        Real getTimeFactor(void) const;
+        bool frameStarted(const FrameEvent &evt) override;
+        Real getValue(void) const override { return mFrameTime; }
+        void setValue(Real value) override { /* Do nothing - value is set from frame listener */ }
+        Real getTimeFactor(void) const { return mTimeFactor; }
+        /// @copydoc ControllerManager::setTimeFactor
         void setTimeFactor(Real tf);
-        Real getFrameDelay(void) const;
+        Real getFrameDelay(void) const { return mFrameDelay; }
+        /// @copydoc ControllerManager::setFrameDelay
         void setFrameDelay(Real fd);
-        Real getElapsedTime(void) const;
-        void setElapsedTime(Real elapsedTime);
+        Real getElapsedTime(void) const { return mElapsedTime; }
+        void setElapsedTime(Real elapsedTime) { mElapsedTime = elapsedTime; }
     };
 
     //-----------------------------------------------------------------------

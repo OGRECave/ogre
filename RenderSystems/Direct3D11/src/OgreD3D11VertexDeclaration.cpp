@@ -66,34 +66,26 @@ namespace Ogre {
     D3D11_INPUT_ELEMENT_DESC * D3D11VertexDeclaration::getD3DVertexDeclaration(D3D11HLSLProgram* boundVertexProgram, VertexBufferBinding* binding)
     {
         // Create D3D elements
-        size_t iNumElements = boundVertexProgram->getNumInputs();
-
         if (mD3delems.find(boundVertexProgram) == mD3delems.end())
         {
             std::vector<D3D11_INPUT_ELEMENT_DESC> D3delems;
 
-            unsigned int idx;
-            for (idx = 0; idx < iNumElements; ++idx)
+            for (const D3D11_SIGNATURE_PARAMETER_DESC& inputDesc : boundVertexProgram->getInputParams())
             {
-                D3D11_SIGNATURE_PARAMETER_DESC inputDesc = boundVertexProgram->getInputParamDesc(idx);
-                VertexElementList::const_iterator i, iend;
-                iend = mElementList.end();
-                bool found = false;
-                for (i = mElementList.begin(); i != iend; ++i)
+                D3D11_INPUT_ELEMENT_DESC elem = {};
+                for (const auto& e : mElementList)
                 {
-                    LPCSTR semanticName         = D3D11Mappings::get(i->getSemantic());
-                    UINT semanticIndex          = i->getIndex();
-                    if(
-                        strcmp(semanticName, inputDesc.SemanticName) == 0
-                        && semanticIndex == inputDesc.SemanticIndex
-                      )
+                    LPCSTR semanticName         = D3D11Mappings::get(e.getSemantic());
+                    if (strcmp(semanticName, inputDesc.SemanticName) == 0 && e.getIndex() == inputDesc.SemanticIndex)
                     {
-                        found = true;
+                        elem.Format                = D3D11Mappings::get(e.getType());
+                        elem.InputSlot             = e.getSource();
+                        elem.AlignedByteOffset     = static_cast<WORD>(e.getOffset());
                         break;
                     }
                 }
 
-                if (!found)
+                if (elem.Format == DXGI_FORMAT_UNKNOWN)
                 {
                     OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
                                 StringUtil::format("No VertexElement for semantic %s%d in shader %s found",
@@ -101,17 +93,12 @@ namespace Ogre {
                                                    boundVertexProgram->getName().c_str()));
                 }
 
-                D3D11_INPUT_ELEMENT_DESC elem = {};
                 elem.SemanticName          = inputDesc.SemanticName;
                 elem.SemanticIndex         = inputDesc.SemanticIndex;
-                elem.Format                = D3D11Mappings::get(i->getType());
-                elem.InputSlot             = i->getSource();
-                elem.AlignedByteOffset     = static_cast<WORD>(i->getOffset());
                 elem.InputSlotClass        = D3D11_INPUT_PER_VERTEX_DATA;
                 elem.InstanceDataStepRate  = 0;
 
-                VertexBufferBinding::VertexBufferBindingMap::const_iterator foundIter;
-                foundIter = binding->getBindings().find(i->getSource());
+                auto foundIter = binding->getBindings().find(elem.InputSlot);
                 if ( foundIter != binding->getBindings().end() )
                 {
                     HardwareVertexBufferSharedPtr bufAtSlot = foundIter->second;
@@ -158,7 +145,7 @@ namespace Ogre {
             //  pVertexDecl->Format = DXGI_FORMAT_R16G16_FLOAT;
             HRESULT hr = mlpD3DDevice->CreateInputLayout( 
                 pVertexDecl, 
-                boundVertexProgram->getNumInputs(), 
+                boundVertexProgram->getInputParams().size(),
                 &vSBuf[0], 
                 vSBuf.size(),
                 pVertexLayout.ReleaseAndGetAddressOf() );

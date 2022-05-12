@@ -74,7 +74,7 @@ jobs:
       run: |
         test ! -n "$CLOUDSMITH_API_KEY" && exit 0
         pip3 install --upgrade cloudsmith-cli
-        ~/.local/bin/cloudsmith push raw ogrecave/ogre build/OgreJNI/ogre-sdk-android-*-arm64-v8a.zip --republish -k $CLOUDSMITH_API_KEY
+        ~/.local/bin/cloudsmith push raw ogrecave/ogre build/OgreJNI/ogre-sdk-android-*-arm64-v8a.zip --republish --version ${{ steps.package.outputs.ver }} -k $CLOUDSMITH_API_KEY
       env:
         CLOUDSMITH_API_KEY: ${{ secrets.CLOUDSMITH_API_KEY }}
   macos:

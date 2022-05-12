@@ -73,7 +73,7 @@ namespace Ogre
             ~ 100 points per inch (probably 96 on Windows and 72 on Mac), that is independent
             of pixel density of real display, and are used through the all windowing system.
 
-            Sometimes, such view points are choosen bigger for output devices that are viewed
+            Sometimes, such view points are chosen bigger for output devices that are viewed
             from larger distances, like 30" TV comparing to 30" monitor, therefore maintaining
             constant points angular density rather than constant linear density.
 

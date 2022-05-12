@@ -206,7 +206,7 @@ namespace Ogre {
             size_t numVertices) = 0;
     };
 
-    /** Returns raw offseted of the given pointer.
+    /** Returns raw offsetted of the given pointer.
     @note
         The offset are in bytes, no matter what type of the pointer.
     */

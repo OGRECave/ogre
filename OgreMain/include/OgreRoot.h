@@ -291,7 +291,7 @@ namespace Ogre
                 This method indicates to OGRE which rendering system is to be
                 used (e.g. Direct3D, OpenGL etc). This is called
                 automatically by the default config dialog, and when settings
-                are restored from a previous configuraion. If used manually
+                are restored from a previous configuration. If used manually
                 it could be used to set the renderer from a custom settings
                 dialog. Once this has been done, the renderer can be
                 initialised using Root::initialise.
@@ -427,7 +427,7 @@ namespace Ogre
                 will be called every frame.
             @par
                 See the FrameListener class for more details on the specifics
-                It is imperitive that the instance passed to this method is
+                It is imperative that the instance passed to this method is
                 not destroyed before either the rendering loop ends, or the
                 class is removed from the listening list using
                 removeFrameListener.

@@ -200,6 +200,7 @@ protected:
     /// @deprecated do not use
     OGRE_DEPRECATED bool isProcessingNeeded(TextureUnitState* texUnitState) { return true; }
 
+    bool setParameter(const String& name, const String& value) override;
 
 // Attributes.
 protected:
@@ -223,6 +224,7 @@ protected:
     ParameterPtr mPSSpecular;
 
     bool mIsPointSprite;
+    bool mLateAddBlend;
 };
 
 

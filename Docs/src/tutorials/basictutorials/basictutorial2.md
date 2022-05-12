@@ -20,7 +20,7 @@ like a SceneNode.
 You should attach the camera to a Ogre::SceneNode and do all transformation with this node.
 
 # Creating a Camera {#bt2CreatingaCamera}
-We will now cover camera creation part which we just applied in previous tutorial. We remeber that now we need to have SceneNode for camera. The first step will be doing is creating that SceneNode and asking the SceneManager to create a new Camera. Add the following to create SceneNode and Camera:
+We will now cover camera creation part which we just applied in previous tutorial. We remember that now we need to have SceneNode for camera. The first step will be doing is creating that SceneNode and asking the SceneManager to create a new Camera. Add the following to create SceneNode and Camera:
 
 @snippet Samples/Tutorials/BasicTutorial2.cpp cameracreate
 You can retrieve the Camera by name using the SceneManager's getCamera method.

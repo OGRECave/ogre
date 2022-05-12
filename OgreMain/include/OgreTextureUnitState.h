@@ -45,7 +45,7 @@ namespace Ogre {
 
     /** Class which determines how a TextureUnitState accesses data from a Texture
 
-        There are a number of parameters affecting how texture data is featched.
+        There are a number of parameters affecting how texture data is fetched.
         Most notably @ref FilterOptions and @ref TextureAddressingMode.
      */
     class _OgreExport Sampler {
@@ -320,7 +320,7 @@ namespace Ogre {
             Real frequency;
             Real phase;
             Real amplitude;
-            Controller<Real>* controller;
+            ControllerReal* controller;
             const Frustum* frustum;
         };
 
@@ -651,7 +651,11 @@ namespace Ogre {
 
         /// get the associated sampler
         const SamplerPtr& getSampler() const { return mSampler; }
-        void setSampler(const SamplerPtr& sampler) { mSampler = sampler; }
+        void setSampler(const SamplerPtr& sampler)
+        {
+            OgreAssert(sampler, "sampler must not be NULL");
+            mSampler = sampler;
+        }
 
         /// @copydoc Sampler::setAddressingMode
         const Sampler::UVWAddressingMode& getTextureAddressingMode(void) const
@@ -1006,7 +1010,7 @@ namespace Ogre {
         */
         void setCompositorReference(const String& compositorName, const String& textureName, size_t mrtIndex = 0);
 
-        /** Gets the name of the compositor that this texture referneces. */
+        /** Gets the name of the compositor that this texture references. */
         const String& getReferencedCompositorName() const { return mCompositorRefName; }
         /** Gets the name of the texture in the compositor that this texture references. */
         const String& getReferencedTextureName() const { return mCompositorRefTexName; }
@@ -1035,7 +1039,7 @@ namespace Ogre {
         /** Set the name of the Texture Unit State.
 
             The name of the Texture Unit State is optional.  Its useful in material scripts where a material could inherit
-            from another material and only want to modify a particalar Texture Unit State.
+            from another material and only want to modify a particular Texture Unit State.
         */
         void setName(const String& name);
         /// Get the name of the Texture Unit State.
@@ -1064,7 +1068,7 @@ namespace Ogre {
         /** Gets the animation controller (as created because of setAnimatedTexture)
             if it exists.
         */
-        Controller<Real>* _getAnimController() const { return mAnimController; }
+        ControllerReal* _getAnimController() const { return mAnimController; }
 
         /// return a sampler local to this TUS instead of the shared global one
         const SamplerPtr& _getLocalSampler();
@@ -1089,7 +1093,7 @@ private:
         Radian mRotate;
         mutable Matrix4 mTexModMatrix;
 
-        /// Binding type (fragment, vertex, tesselation hull and domain pipeline).
+        /// Binding type (fragment, vertex, tessellation hull and domain pipeline).
         BindingType mBindingType;
         /// Content type of texture (normal loaded texture, auto-texture).
         ContentType mContentType;
@@ -1118,7 +1122,7 @@ private:
         // preserving even if assign from others
         //
         Pass* mParent;
-        Controller<Real>* mAnimController;
+        ControllerReal* mAnimController;
         //-----------------------------------------------------------------------------
 
 

@@ -89,7 +89,7 @@ void SGScriptTranslator::translateTextureUnit(ScriptCompiler* compiler, const Ab
 
     // Make sure the scheme name is valid - use default if none exists.
     if (dstTechniqueSchemeName.empty()) 
-        dstTechniqueSchemeName = ShaderGenerator::DEFAULT_SCHEME_NAME;  
+        dstTechniqueSchemeName = MSN_SHADERGEN;
 
 
     //check if technique already created
@@ -156,7 +156,7 @@ void SGScriptTranslator::translatePass(ScriptCompiler* compiler, const AbstractN
 
     // Make sure the scheme name is valid - use default if none exists.
     if (dstTechniqueSchemeName.empty()) 
-        dstTechniqueSchemeName = ShaderGenerator::DEFAULT_SCHEME_NAME;  
+        dstTechniqueSchemeName = MSN_SHADERGEN;
 
 
     // Create the shader based technique.

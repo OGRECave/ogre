@@ -203,6 +203,8 @@ namespace Ogre
         //    return VK_FORMAT_R16G16_SFLOAT;
         //case VET_HALF4:
         //    return VK_FORMAT_R16G16B16A16_SFLOAT;
+        case VET_INT_10_10_10_2_NORM:
+            return VK_FORMAT_A2B10G10R10_SNORM_PACK32;
         default:
         case VET_DOUBLE1:
         case VET_DOUBLE2:

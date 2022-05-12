@@ -86,6 +86,7 @@ namespace Ogre {
     class ColourValue;
     class ConfigDialog;
     template <typename T> class Controller;
+    typedef Controller<Real> ControllerReal;
     template <typename T> class ControllerFunction;
     class ControllerManager;
     template <typename T> class ControllerValue;
@@ -166,7 +167,6 @@ namespace Ogre {
     class ParticleSystemRenderer;
     template<typename T> class FactoryObj;
     typedef FactoryObj<ParticleSystemRenderer> ParticleSystemRendererFactory;
-    class ParticleVisualData;
     class Pass;
     class PatchMesh;
     class PixelBox;

@@ -36,7 +36,6 @@ def main():
     rect = scn_mgr.createScreenSpaceRect(True)
     rect.setCorners(-0.5, 0.5, 0.5, -0.5) # in normalized screen space
     rect.setMaterial(mat)
-    rect.setBoundingBox(Ogre.AxisAlignedBox.BOX_INFINITE)
 
     scn_mgr.getRootSceneNode().createChildSceneNode().attachObject(rect)
     ## [apply_to_rect]

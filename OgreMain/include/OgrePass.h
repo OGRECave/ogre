@@ -836,7 +836,7 @@ namespace Ogre {
         /** Sets the culling mode for this pass based on the 'vertex winding'.
             A typical way for the rendering engine to cull triangles is based on the 'vertex winding' of
             triangles. Vertex winding refers to the direction in which the vertices are passed or indexed
-            to in the rendering operation as viewed from the camera, and will wither be clockwise or
+            to in the rendering operation as viewed from the camera, and will either be clockwise or
             anticlockwise (that's 'counterclockwise' for you Americans out there ;) The default is
             Ogre::CULL_CLOCKWISE i.e. that only triangles whose vertices are passed/indexed in anticlockwise order
             are rendered - this is a common approach and is used in 3D studio models for example. You can
@@ -1457,13 +1457,9 @@ namespace Ogre {
             Generally the smaller your lights are the more chance you’ll see a benefit rather than
             a penalty from clipping.
 
-            @note A specific note about OpenGL: user clip planes are completely ignored when you use
-            an ARB vertex program. This means light clip planes won’t help much if you use ARB
-            vertex programs on GL, although OGRE will perform some optimisation of its own, in that
-            if it sees that the clip volume is completely off-screen, it won’t perform a render at
-            all. When using GLSL, user clipping can be used but you have to use gl_ClipVertex in your
-            shader, see the GLSL documentation for more information. In Direct3D user clip planes are
-            always respected.
+            @note Only has an effect with the fixed-function pipeline. Exceptions:
+            - with D3D9, clip planes are even available when shaders are used
+            - with GL1, shaders must write to gl_ClipVertex
         */
         void setLightClipPlanesEnabled(bool enabled) { mLightClipPlanes = enabled; }
         /** Gets whether or not this pass will be clipped by user clips planes
@@ -1543,16 +1539,10 @@ namespace Ogre {
          */
         static HashFunc* getBuiltinHashFunction(BuiltinHashFunction builtin);
 
-        /** Return an instance of user objects binding associated with this class.
-            You can use it to associate one or more custom objects with this class instance.
-            @see UserObjectBindings::setUserAny.
-        */
+        /// @copydoc UserObjectBindings
         UserObjectBindings&     getUserObjectBindings() { return mUserObjectBindings; }
 
-        /** Return an instance of user objects binding associated with this class.
-            You can use it to associate one or more custom objects with this class instance.
-            @see UserObjectBindings::setUserAny.
-        */
+        /// @overload
         const UserObjectBindings& getUserObjectBindings() const { return mUserObjectBindings; }
      private:
         std::unique_ptr<GpuProgramUsage>& getProgramUsage(GpuProgramType programType);

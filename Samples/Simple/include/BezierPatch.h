@@ -25,7 +25,7 @@ public:
 #ifdef INCLUDE_RTSHADER_SYSTEM
         Material* mat = mPatchPass->getParent()->getParent();
         // Invalidate material in order to reflect polygon mode change in the generated shader based pass.
-        mShaderGenerator->invalidateMaterial(RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME, *mat);
+        mShaderGenerator->invalidateMaterial(MSN_SHADERGEN, *mat);
 #endif
     }
 

@@ -155,7 +155,7 @@ namespace Ogre {
             return n;
         }
         /** Determines whether the number is power-of-two or not.
-            @note 0 and 1 are tread as power of two.
+            @note 0 and 1 are treat as power of two.
         */
         template<typename T>
         static OGRE_FORCE_INLINE bool isPO2(T n)

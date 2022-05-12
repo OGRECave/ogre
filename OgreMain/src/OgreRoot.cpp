@@ -959,7 +959,7 @@ namespace Ogre {
         {
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_WINRT
             pluginDir += "\\";
-#elif OGRE_PLATFORM == OGRE_PLATFORM_LINUX
+#else
             pluginDir += "/";
 #endif
         }
@@ -1050,7 +1050,10 @@ namespace Ogre {
     //---------------------------------------------------------------------
     DataStreamPtr Root::openFileStream(const String& filename, const String& groupName)
     {
-        auto ret = ResourceGroupManager::getSingleton().openResource(filename, groupName, NULL, false);
+        DataStreamPtr ret;
+        if(auto rgm = ResourceGroupManager::getSingletonPtr())
+            ret = rgm->openResource(filename, groupName, NULL, false);
+
         if(ret)
             return ret;
 

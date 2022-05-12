@@ -46,6 +46,10 @@ THE SOFTWARE.
 
 #include <OgreCodec.h>
 
+#ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
+#include <OgreShaderGenerator.h>
+#endif
+
 namespace Ogre
 {
 
@@ -72,7 +76,8 @@ struct OgreIOStream : public Assimp::IOStream
 
     size_t Read(void* pvBuffer, size_t pSize, size_t pCount)
     {
-        return stream->read(pvBuffer, pSize * pCount);
+        size_t bytes = stream->read(pvBuffer, pSize * pCount);
+        return bytes / pSize;
     }
     size_t Tell() const { return stream->tell(); }
     size_t FileSize() const { return stream->size(); }
@@ -111,8 +116,12 @@ struct OgreIOSystem : public Assimp::IOSystem
         String file = StringUtil::normalizeFilePath(pFile, false);
         DataStreamPtr res;
         if (file == source->getName())
+        {
             res = source;
-
+            // glTF2 importer wants to open files multiple times
+            // while this is not fully correct, this makes it happy
+            source->seek(0);
+        }
         if (!res)
             res = ResourceGroupManager::getSingleton().openResource(file, _group, NULL, false);
 
@@ -353,6 +362,10 @@ bool AssimpLoader::_load(const char* name, Assimp::Importer& importer, Mesh* mes
 {
     uint32 flags = aiProcessPreset_TargetRealtime_Fast | aiProcess_TransformUVCoords | aiProcess_FlipUVs;
     flags &= ~(aiProcess_JoinIdenticalVertices | aiProcess_CalcTangentSpace); // optimize for fast loading
+
+    if(StringUtil::endsWith(name, ".gltf") || StringUtil::endsWith(name, ".glb"))
+        flags |= aiProcess_JoinIdenticalVertices;
+
     flags |= options.postProcessSteps;
     importer.SetPropertyFloat("PP_GSN_MAX_SMOOTHING_ANGLE", options.maxEdgeAngle);
     const aiScene* scene = importer.ReadFile(name, flags);
@@ -934,6 +947,8 @@ MaterialPtr AssimpLoader::createMaterial(const aiMaterial* mat, const Ogre::Stri
         }
     }
 
+    String basename;
+    String outPath;
     if (mat->GetTexture(type, 0, &path) == AI_SUCCESS)
     {
         if (!mQuietMode)
@@ -941,23 +956,67 @@ MaterialPtr AssimpLoader::createMaterial(const aiMaterial* mat, const Ogre::Stri
             LogManager::getSingleton().logMessage("Found texture " + String(path.data) + " for channel " +
                                                   StringConverter::toString(uvindex));
         }
-        if (AI_SUCCESS == aiGetMaterialString(mat, AI_MATKEY_TEXTURE_DIFFUSE(0), &szPath))
-        {
-            if (!mQuietMode)
-            {
-                LogManager::getSingleton().logMessage("Using aiGetMaterialString : Found texture " +
-                                                      String(szPath.data) + " for channel " +
-                                                      StringConverter::toString(uvindex));
-            }
-        }
 
-        String basename;
-        String outPath;
-        StringUtil::splitFilename(String(szPath.data), basename, outPath);
+        StringUtil::splitFilename(String(path.data), basename, outPath);
         omat->getTechnique(0)->getPass(0)->createTextureUnitState(basename);
 
         // TODO: save embedded images to file
     }
+
+    if (mat->GetTexture(aiTextureType_EMISSIVE, 0, &path) == AI_SUCCESS)
+    {
+        if (!mQuietMode)
+        {
+            LogManager::getSingleton().logMessage("Found emissive map: " + String(path.data));
+        }
+
+        StringUtil::splitFilename(String(path.data), basename, outPath);
+        auto tus = omat->getTechnique(0)->getPass(0)->createTextureUnitState(basename);
+        tus->setColourOperation(LBO_ADD);
+    }
+
+#ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
+    auto shaderGen = RTShader::ShaderGenerator::getSingletonPtr();
+
+    if(!shaderGen)
+        return omat;
+
+    if (mat->GetTexture(aiTextureType_NORMALS, 0, &path) == AI_SUCCESS)
+    {
+        if (!mQuietMode)
+        {
+            LogManager::getSingleton().logMessage("Found normal map: " + String(path.data));
+        }
+
+        shaderGen->createShaderBasedTechnique(omat->getTechnique(0), MSN_SHADERGEN);
+        auto rs = shaderGen->getRenderState(MSN_SHADERGEN, *omat, 0);
+        auto srs = shaderGen->createSubRenderState("NormalMap");
+
+        StringUtil::splitFilename(String(path.data), basename, outPath);
+        srs->setParameter("texture", basename);
+        rs->addTemplateSubRenderState(srs);
+    }
+
+    if (mat->GetTexture(aiTextureType_UNKNOWN, 0, &path) == AI_SUCCESS)
+    {
+        if (!mQuietMode)
+        {
+            LogManager::getSingleton().logMessage("Found metal roughness map: " + String(path.data));
+        }
+
+        shaderGen->createShaderBasedTechnique(omat->getTechnique(0), MSN_SHADERGEN);
+        auto rs = shaderGen->getRenderState(MSN_SHADERGEN, *omat, 0);
+        auto srs = shaderGen->createSubRenderState("CookTorranceLighting");
+
+        StringUtil::splitFilename(String(path.data), basename, outPath);
+        srs->setParameter("texture", basename);
+        rs->addTemplateSubRenderState(srs);
+
+        srs = shaderGen->createSubRenderState("FFP_Texturing");
+        srs->setParameter("late_add_blend", "true");
+        rs->addTemplateSubRenderState(srs);
+    }
+#endif
 
     return omat;
 }

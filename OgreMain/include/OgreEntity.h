@@ -149,12 +149,6 @@ namespace Ogre {
         */
         SubEntity* findSubEntityForVertexData(const VertexData* orig);
 
-        /** Internal method for extracting metadata out of source vertex data
-            for fast assignment of temporary buffers later.
-        */
-        void extractTempBufferInfo(VertexData* sourceData, TempBlendedBufferInfo* info);
-        /** Internal method to clone vertex data definitions but to remove blend buffers. */
-        VertexData* cloneVertexDataRemoveBlendInfo(const VertexData* source);
         /** Internal method for preparing this Entity for use in animation. */
         void prepareTempBlendBuffers(void);
         /** Mark all vertex data as so far unanimated.

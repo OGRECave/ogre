@@ -19,14 +19,15 @@ material DamagedHelmet_Filament : Filament
     set $MetalRoughness Default_metalRoughness.jpg
 }
 
-material DamagedHelmet_FFP {
+material DamagedHelmet_RTSS {
     technique
     {
         pass
         {
+            // ignored - just in case you want to try the FFP look
             ambient 0.8 0.8 0.8 1.0
             diffuse 0.64 0.64 0.64 1.0
-            specular 1 1 1 1.0 12.5
+            specular 0.64 0.64 0.64 256
 
             // albedo - simple
             texture_unit
@@ -34,25 +35,19 @@ material DamagedHelmet_FFP {
                 texture Default_albedo.jpg
             }
 
-			// reflections
-			texture_unit
-			{
-				texture specular.jpg cubic
-				env_map cubic_reflection
-				colour_op_ex blend_manual src_texture src_current 0.2
-			}
-
-            // emissive - also simple, just add on top
+            // emissive - also see rtshader_system section below
 			texture_unit
 			{
 				texture Default_emissive.jpg
 				colour_op add
 			}
 
-            // normal map - requires RTSS
+            // additional maps - requires RTSS
             rtshader_system
             {
+                lighting_stage metal_roughness texture Default_metalRoughness.jpg
                 lighting_stage normal_map Default_normal.jpg
+                texturing_stage late_add_blend // needed for emissive to work
             }
         }
     }

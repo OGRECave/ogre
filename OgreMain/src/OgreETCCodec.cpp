@@ -235,7 +235,6 @@ namespace Ogre {
         // Now deal with the data
         void *destPtr = output->getPtr();
         stream->read(destPtr, imgData->size);
-        destPtr = static_cast<void*>(static_cast<uchar*>(destPtr));
 
         DecodeResult ret;
         ret.first = output;

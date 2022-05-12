@@ -69,10 +69,6 @@ protected:
     */
     virtual void setupControls(void);
 
-    /** Sets up the shader generator.
-    */
-    virtual void setupShaderGenerator(void);
-
     /** Is called when the sample is stopped.
     */
     virtual void cleanupContent(void);
@@ -89,10 +85,6 @@ public:
     /** Overridden from SdkSample.
     */
     virtual bool frameRenderingQueued(const Ogre::FrameEvent& evt);
-
-    /** Overridden from SdkSample.
-    */
-    virtual void _shutdown();
 };
 
 #endif

@@ -93,7 +93,7 @@ namespace Ogre
         /// Supports 32bit hardware index buffers
         RSC_32BIT_INDEX             = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 8),
         /// Supports vertex programs (vertex shaders)
-        /// @deprecated All targetted APIs by Ogre support this feature
+        /// @deprecated All targeted APIs by Ogre support this feature
         RSC_VERTEX_PROGRAM          = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 9),
         /// Supports hardware tessellation domain programs
         RSC_TESSELLATION_DOMAIN_PROGRAM = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 10),
@@ -170,6 +170,8 @@ namespace Ogre
         RSC_VERTEX_BUFFER_INSTANCE_DATA = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 16),
         /// Supports hardware tessellation hull programs
         RSC_TESSELLATION_HULL_PROGRAM = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 17),
+        /// Supports #VET_INT_10_10_10_2_NORM
+        RSC_VERTEX_FORMAT_INT_10_10_10_2 = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 18),
 
         // ***** DirectX specific caps *****
         /// Is DirectX feature "per stage constants" supported

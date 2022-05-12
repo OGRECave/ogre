@@ -780,22 +780,15 @@ namespace Ogre{
         int n = 0;
         while (i != end && n < 16)
         {
-            if (i != end)
-            {
-                Real r = 0;
-                if (getReal(*i, &r))
-                    (*m)[n/4][n%4] = r;
-                else
-                    return false;
-            }
-            else
-            {
+            Real r = 0;
+            if (!getReal(*i, &r))
                 return false;
-            }
+
+            (*m)[n/4][n%4] = r;
             ++i;
             ++n;
         }
-        return true;
+        return n == 16;
     }
     //-------------------------------------------------------------------------
     bool ScriptTranslator::getInts(AbstractNodeList::const_iterator i, AbstractNodeList::const_iterator end, int *vals, int count)
@@ -1103,18 +1096,12 @@ namespace Ogre{
         if(!processed)
         {
             mMaterial = MaterialManager::getSingleton().create(obj->name, compiler->getResourceGroup()).get();
-
-            if(!mMaterial) // duplicate definition resolved by "use previous"
-                return;
         }
-        else
+
+        if(!mMaterial)
         {
-            if(!mMaterial)
-            {
-                compiler->addError(ScriptCompiler::CE_OBJECTALLOCATIONERROR, obj->file, obj->line,
-                                   "failed to find or create material \"" + obj->name + "\"");
-                return;
-            }
+            compiler->addError(ScriptCompiler::CE_OBJECTALLOCATIONERROR, obj->file, obj->line, obj->name);
+            return;
         }
 
         mMaterial->removeAllTechniques();
@@ -2391,8 +2378,9 @@ namespace Ogre{
         if(!caster_mat)
         {
             auto src_mat = pass->getParent()->getParent();
-            // only first pass of this will be used
-            caster_mat = src_mat->clone(src_mat->getName()+"/CasterFallback");
+            // only first pass of this will be used. The caster material is technique specific.
+            caster_mat = src_mat->clone(
+                StringUtil::format("%s/%p/CasterFallback", src_mat->getName().c_str(), pass->getParent()));
             pass->getParent()->setShadowCasterMaterial(caster_mat);
         }
         auto caster_pass = caster_mat->getTechnique(0)->getPass(0);
@@ -3684,11 +3672,9 @@ namespace Ogre{
                 prog->setSourceFile(source);
         }
 
-        // Check that allocation worked
-        if(prog == 0)
+        if(!prog)
         {
-            compiler->addError(ScriptCompiler::CE_OBJECTALLOCATIONERROR, obj->file, obj->line,
-                               "GPU program \"" + obj->name + "\" could not be created");
+            compiler->addError(ScriptCompiler::CE_OBJECTALLOCATIONERROR, obj->file, obj->line, obj->name);
             return;
         }
 
@@ -4303,7 +4289,7 @@ namespace Ogre{
 
         if (!sharedParams)
         {
-            compiler->addError(ScriptCompiler::CE_OBJECTALLOCATIONERROR, obj->file, obj->line);
+            compiler->addError(ScriptCompiler::CE_OBJECTALLOCATIONERROR, obj->file, obj->line, obj->name);
             return;
         }
 
@@ -4464,7 +4450,7 @@ namespace Ogre{
 
         if(!mSystem)
         {
-            compiler->addError(ScriptCompiler::CE_OBJECTALLOCATIONERROR, obj->file, obj->line);
+            compiler->addError(ScriptCompiler::CE_OBJECTALLOCATIONERROR, obj->file, obj->line, obj->name);
             return;
         }
 
@@ -4727,9 +4713,9 @@ namespace Ogre{
             mCompositor = CompositorManager::getSingleton().create(obj->name, compiler->getResourceGroup()).get();
         }
 
-        if(mCompositor == 0)
+        if(!mCompositor)
         {
-            compiler->addError(ScriptCompiler::CE_OBJECTALLOCATIONERROR, obj->file, obj->line);
+            compiler->addError(ScriptCompiler::CE_OBJECTALLOCATIONERROR, obj->file, obj->line, obj->name);
             return;
         }
 

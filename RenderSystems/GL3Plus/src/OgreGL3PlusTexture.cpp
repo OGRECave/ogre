@@ -84,16 +84,6 @@ namespace Ogre {
         // Adjust format if required.
         mFormat = TextureManager::getSingleton().getNativeFormat(mTextureType, mFormat, mUsage);
 
-        // Check requested number of mipmaps.
-        uint32 maxMips = getMaxMipmaps();
-
-        if (PixelUtil::isCompressed(mFormat) && (mNumMipmaps == 0))
-            mNumRequestedMipmaps = 0;
-
-        mNumMipmaps = mNumRequestedMipmaps;
-        if (mNumMipmaps > maxMips)
-            mNumMipmaps = maxMips;
-
         // Create a texture object and identify its GL type.
         OGRE_CHECK_GL_ERROR(glGenTextures(1, &mTextureID));
         GLenum texTarget = getGL3PlusTextureTarget();

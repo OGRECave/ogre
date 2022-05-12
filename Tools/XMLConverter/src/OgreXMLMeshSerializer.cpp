@@ -54,12 +54,11 @@ namespace Ogre {
     {
     }
     //---------------------------------------------------------------------
-    void XMLMeshSerializer::importMesh(const String& filename, 
-        VertexElementType colourElementType, Mesh* pMesh)
+    void XMLMeshSerializer::importMesh(const String& filename, Mesh* pMesh)
     {
         LogManager::getSingleton().logMessage("XMLMeshSerializer reading mesh data from " + filename + "...");
         mMesh = pMesh;
-        mColourElementType = colourElementType;
+        mColourElementType = VET_UBYTE4_NORM;
         pugi::xml_document mXMLDoc;
         mXMLDoc.load_file(filename.c_str());
 
@@ -1098,9 +1097,8 @@ namespace Ogre {
                         }
                         elem.baseVertexPointerToElement(pVert, &pCol);
                         {
-                            ColourValue cv;
-                            cv = StringConverter::parseColourValue(xmlElem.attribute("value").value());
-                            *pCol++ = VertexElement::convertColourValue(cv, mColourElementType);
+                            auto cv = StringConverter::parseColourValue(xmlElem.attribute("value").value());
+                            *pCol++ = cv.getAsABGR();
                         }
                         break;
                     case VES_SPECULAR:
@@ -1112,9 +1110,8 @@ namespace Ogre {
                         }
                         elem.baseVertexPointerToElement(pVert, &pCol);
                         {
-                            ColourValue cv;
-                            cv = StringConverter::parseColourValue(xmlElem.attribute("value").value());
-                            *pCol++ = VertexElement::convertColourValue(cv, mColourElementType);
+                            auto cv = StringConverter::parseColourValue(xmlElem.attribute("value").value());
+                            *pCol++ = cv.getAsABGR();
                         }
                         break;
                     case VES_TEXTURE_COORDINATES:

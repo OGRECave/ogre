@@ -33,17 +33,19 @@ if(DOXYGEN_FOUND)
 
     file(GLOB TUTORIALS ${PROJECT_SOURCE_DIR}/Docs/src/tutorials/*.md)
     file(GLOB BASIC_TUTORIALS ${PROJECT_SOURCE_DIR}/Docs/src/tutorials/basictutorials/*.md)
+    file(GLOB COMPONENTS ${PROJECT_SOURCE_DIR}/Components/*/include)
+    file(GLOB PLUGINS ${PROJECT_SOURCE_DIR}/PlugIns/*/include)
 
     set(CMAKE_DOXYGEN_INPUT_LIST
         ${PROJECT_SOURCE_DIR}/OgreMain/include
-        ${PROJECT_SOURCE_DIR}/Components
-        ${PROJECT_SOURCE_DIR}/PlugIns
+        ${COMPONENTS}
+        ${PLUGINS}
         ${PROJECT_SOURCE_DIR}/PlugIns/PCZSceneManager/docs/readme.md
         ${PROJECT_SOURCE_DIR}/RenderSystems
         ${BASIC_TUTORIALS}
         ${PROJECT_SOURCE_DIR}/Docs/src/apimainpage.md
         ${PROJECT_SOURCE_DIR}/Docs/src/manual.md
-        ${PROJECT_SOURCE_DIR}/Docs/src/OgreShadows.md
+        ${PROJECT_SOURCE_DIR}/Docs/src/ogre-shadows.md
         ${PROJECT_SOURCE_DIR}/Docs/src/scripts.md
         ${PROJECT_SOURCE_DIR}/Docs/src/material-scripts.md
         ${PROJECT_SOURCE_DIR}/Docs/src/high-level-programs.md

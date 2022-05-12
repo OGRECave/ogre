@@ -144,6 +144,9 @@ namespace Ogre {
         */
         void prepareForShadowVolume(void);
 
+        /// converts between #VET_FLOAT3 or #VET_FLOAT4 and #VET_INT_10_10_10_2_NORM
+        void convertVertexElement(VertexElementSemantic semantic, VertexElementType dstType);
+
         /** Additional shadow volume vertex buffer storage. 
         @remarks
             This additional buffer is only used where we have prepared this VertexData for
@@ -248,8 +251,8 @@ namespace Ogre {
         */
         ushort allocateHardwareAnimationElements(ushort count, bool animateNormals);
 
-
-
+        /** Internal method to clone vertex data definitions but to remove blend buffers. */
+        VertexData* _cloneRemovingBlendData() const;
     };
 
     /** Summary class collecting together index data source information. */

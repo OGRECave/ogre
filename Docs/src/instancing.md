@@ -87,7 +87,7 @@ However it's very fast on any modern GPU (GeForce 8, 9, 200, 300, 400, 500, 600,
 
 The advantage of VTF over ShaderBased is that it supports a very high max number of instances per batch; even if it's skeletally animated.
 
-Take note that you will need to set a `texture_unit` (preferrably the first one, for compatibility) including the shadow caster besides the texture (eg. diffuse, specular, normal maps) so that Ogre gets where to put the vertex texture.
+Take note that you will need to set a `texture_unit` (preferably the first one, for compatibility) including the shadow caster besides the texture (eg. diffuse, specular, normal maps) so that Ogre gets where to put the vertex texture.
 
 See `material Examples/Instancing/VTF` for an example on how to write the vertex shader and setup the material.
 Files:
@@ -247,7 +247,7 @@ for(uint16 i=0;i<mesh->getNumSubMeshes();++i )
 The second step lies in sharing the transform with one of the submeshes (which will be named 'master'; i.e. the first submesh) to improve performance and reduce RAM consumption when creating the Instanced Entities:
 
 ```cpp
-SceneNode *sceneNode;//Asumed to be valid ptr
+SceneNode *sceneNode; //Assumed to be valid ptr
 std::vector<InstancedEntity*>instancedEntities;
 for(size_t i=0;i<instanceManagers.size();++i )
 {
@@ -269,7 +269,7 @@ Because the transform is shared, animating the master InstancedEntity (in this e
 To destroy the instanced entities, use the normal procedure:
 
 ```cpp
-SceneNode *sceneNode;//Asumed to be valid ptr
+SceneNode *sceneNode; //Assumed to be valid ptr
 std::vector<InstancedEntity*>instancedEntities;
 for(size_t i=0;i<instanceManagers.size();++i )
 {
@@ -287,7 +287,7 @@ There are two kinds of fragmentation:
 1.  "Deletion" Fragmentation is when many instances have been created, spanning multiple batches; *and many of them got later removed* but they were all from different batches.
 	If there were 10 instances per batch, 100 instances created, then later 90 removed; it is possible that now there are 10 batches with one instance each (which equals 10 drawcalls); instead of being just 1 batch with 10 instances (which equals 1 drawcall).
 2.  "Culling" Fragmentation is also when many instances of different batches are all sparsed across the whole scene.
-    If they were defragmented, they would've been put together in the same batch (all instances sorted by proximity to each other should be in the same batch) to take advantage of hierachy culling optimizations.
+    If they were defragmented, they would've been put together in the same batch (all instances sorted by proximity to each other should be in the same batch) to take advantage of hierarchy culling optimizations.
 
 Defragmented batches can dramatically improve performance:
 

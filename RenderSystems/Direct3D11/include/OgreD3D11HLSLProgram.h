@@ -71,6 +71,7 @@ namespace Ogre {
             void doSet(void* target, const String& val);
         };
 
+        typedef std::vector<D3D11_SIGNATURE_PARAMETER_DESC> D3d11ShaderParameters;
     protected:
 
         static CmdTarget msCmdTarget;
@@ -91,7 +92,6 @@ namespace Ogre {
 
         void populateDef(D3D11_SHADER_TYPE_DESC& d3dDesc, GpuConstantDefinition& def) const;
 
-        String mTarget;
         bool mColumnMajorMatrices;
         bool mEnableBackwardsCompatibility;
 
@@ -118,7 +118,6 @@ namespace Ogre {
         typedef std::map<String, unsigned int>::const_iterator SlotIterator;
         SlotMap mSlotMap;
 
-        typedef std::vector<D3D11_SIGNATURE_PARAMETER_DESC> D3d11ShaderParameters;
         typedef D3d11ShaderParameters::iterator D3d11ShaderParametersIter; 
 
 
@@ -170,7 +169,7 @@ namespace Ogre {
         /** Sets the shader target to compile down to, e.g. 'vs_1_1'. */
         void setTarget(const String& target);
         /** Gets the shader target to compile down to, e.g. 'vs_1_1'. */
-        const String& getTarget(void) const { return mTarget; }
+        const String& getTarget(void) const { return mSyntaxCode; }
         /** Gets the shader target promoted to the first compatible, e.g. 'vs_4_0' or 'ps_4_0' if backward compatibility is enabled. */
         const char* getCompatibleTarget(void) const;
 
@@ -182,8 +181,6 @@ namespace Ogre {
         void setEnableBackwardsCompatibility(bool enableBackwardsCompatibility) { mEnableBackwardsCompatibility = enableBackwardsCompatibility; }
         /** Gets whether backwards compatibility is enabled. */
         bool getEnableBackwardsCompatibility(void) const { return mEnableBackwardsCompatibility; }
-        /// Overridden from GpuProgram
-        bool isSupported(void) const;
         /// Overridden from GpuProgram
         GpuProgramParametersSharedPtr createParameters(void);
         /// Overridden from GpuProgram
@@ -222,13 +219,9 @@ namespace Ogre {
         void reinterpretGSForStreamOut(void);
         bool mReinterpretingGS;
         
-        unsigned int getNumInputs(void)const;
-        unsigned int getNumOutputs(void)const;
-
         uint32 getNameForMicrocodeCache();
 
-        const D3D11_SIGNATURE_PARAMETER_DESC & getInputParamDesc(unsigned int index) const;
-        const D3D11_SIGNATURE_PARAMETER_DESC & getOutputParamDesc(unsigned int index) const;    
+        const D3d11ShaderParameters& getInputParams() const { return mD3d11ShaderInputParameters; }
     };
 }
 

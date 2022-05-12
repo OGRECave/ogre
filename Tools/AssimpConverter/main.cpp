@@ -36,12 +36,7 @@ THE SOFTWARE.
 #include <iostream>
 
 #include "Ogre.h"
-
-#include "OgreMeshSerializer.h"
-#include "OgreSkeletonSerializer.h"
 #include "OgreDefaultHardwareBufferManager.h"
-#include "OgreLodStrategyManager.h"
-#include "OgreScriptCompiler.h"
 
 #include "OgreAssimpLoader.h"
 #include <assimp/postprocess.h>
@@ -50,40 +45,27 @@ using namespace Ogre;
 
 namespace
 {
-// Crappy globals
-// NB some of these are not directly used, but are required to
-//   instantiate the singletons used in the dlls
-LogManager* logMgr = 0;
-Math* mth = 0;
-LodStrategyManager* lodMgr = 0;
-MaterialManager* matMgr = 0;
-SkeletonManager* skelMgr = 0;
-MeshSerializer* meshSerializer = 0;
-SkeletonSerializer* skeletonSerializer = 0;
-DefaultHardwareBufferManager* bufferManager = 0;
-MeshManager* meshMgr = 0;
-ResourceGroupManager* rgm = 0;
-ScriptCompilerManager* scmgr = 0;
-DefaultTextureManager* texMgr = 0;
 
 void help(void)
 {
-    // Print help message
-    std::cout << std::endl << "OgreAssimpConverter: Converts data from model formats supported by Assimp" << std::endl;
-    std::cout << "to OGRE binary formats (mesh and skeleton) and material script." << std::endl;
-    std::cout << std::endl << "Usage: OgreAssimpConverter [options] sourcefile [destination] " << std::endl;
-    std::cout << std::endl << "Available options:" << std::endl;
-    std::cout << "-q                  = Quiet mode, less output" << std::endl;
-    std::cout << "-log filename       = name of the log file (default: 'OgreAssimp.log')" << std::endl;
-    std::cout << "-aniSpeedMod value  = Factor to scale the animation speed - (default: '1.0')" << std::endl;
-    std::cout << "                      (double between 0 and 1)" << std::endl;
-    std::cout << "-3ds_ani_fix        = Fix for the fact that 3ds max exports the animation over a" << std::endl;
-    std::cout << "                      longer time frame than the animation actually plays for" << std::endl;
-    std::cout << "-max_edge_angle deg = When normals are generated, max angle between two faces to smooth over" << std::endl;
-    std::cout << "sourcefile          = name of file to convert" << std::endl;
-    std::cout << "destination         = optional name of directory to write to. If you don't" << std::endl;
-    std::cout << "                      specify this the converter will use the same directory as the sourcefile."  << std::endl;
-    std::cout << std::endl;
+    std::cout <<
+R"HELP(Usage: OgreAssimpConverter [options] sourcefile [destination]
+
+  Converts 3D-formats supported by assimp to native OGRE formats
+
+Available options:
+-q                  = Quiet mode, less output
+-log filename       = name of the log file (default: 'OgreAssimp.log')
+-aniSpeedMod [0..1] = Factor to scale the animation speed (default: 1.0)
+-3ds_ani_fix        = Fix for 3ds max, which exports the animation over a
+                      longer time frame than the animation actually plays
+-max_edge_angle deg = When normals are generated, max angle between
+                      two faces to smooth over
+sourcefile          = name of file to convert
+destination         = optional name of directory to write to. If you don't
+                      specify this the converter will use the same
+                      directory as the sourcefile.
+)HELP";
 }
 
 struct AssOptions
@@ -140,14 +122,14 @@ AssOptions parseArgs(int numArgs, char** args)
         dest = args[startIndex + 1];
     if (numArgs > startIndex + 2)
     {
-        logMgr->logError("Too many command-line arguments supplied");
+        LogManager::getSingleton().logError("Too many command-line arguments supplied");
         help();
         exit(1);
     }
 
     if (!source)
     {
-        logMgr->logError("Missing source file");
+        LogManager::getSingleton().logError("Missing source file");
         help();
         exit(1);
     }
@@ -187,31 +169,25 @@ int main(int numargs, char** args)
     // Assume success
     int retCode = 0;
 
+    LogManager logMgr;
+    // this log catches output from the parseArgs call and routes it to stdout only
+    logMgr.createLog("Temporary log", true, true, true);
+    AssOptions opts = parseArgs(numargs, args);
+
     try
     {
-        logMgr = new LogManager();
-
-        // this log catches output from the parseArgs call and routes it to stdout only
-        logMgr->createLog("Temporary log", false, true, true);
-
-        AssOptions opts = parseArgs(numargs, args);
-        // use the log specified by the cmdline params
-        logMgr->setDefaultLog(logMgr->createLog(opts.logFile, false, true));
+        logMgr.setDefaultLog(NULL); // swallow startup messages
+        Root root("", "", "");
         // get rid of the temporary log as we use the new log now
-        logMgr->destroyLog("Temporary log");
+        logMgr.destroyLog("Temporary log");
 
-        rgm = new ResourceGroupManager();
-        mth = new Math();
-        lodMgr = new LodStrategyManager();
-        meshMgr = new MeshManager();
-        matMgr = new MaterialManager();
-        matMgr->initialise();
-        skelMgr = new SkeletonManager();
-        meshSerializer = new MeshSerializer();
-        skeletonSerializer = new SkeletonSerializer();
-        bufferManager = new DefaultHardwareBufferManager(); // needed because we don't have a rendersystem
-        scmgr = new ScriptCompilerManager();
-        texMgr = new DefaultTextureManager();
+        // use the log specified by the cmdline params
+        logMgr.setDefaultLog(logMgr.createLog(opts.logFile, false, true));
+
+        MaterialManager::getSingleton().initialise();
+
+        DefaultHardwareBufferManager bufferManager; // needed because we don't have a rendersystem
+        DefaultTextureManager texMgr;
 
         String basename, ext, path;
         StringUtil::splitFullFilename(opts.source, basename, ext, path);
@@ -248,24 +224,14 @@ int main(int numargs, char** args)
 
         if (!exportNames.empty())
             ms.exportQueued(path + basename + ".material");
+
+        logMgr.setDefaultLog(NULL); // swallow shutdown messages
     }
     catch (Exception& e)
     {
-        logMgr->logError(e.getDescription() + " Aborting!");
+        LogManager::getSingleton().logError(e.getDescription());
         retCode = 1;
     }
-
-    delete skeletonSerializer;
-    delete meshSerializer;
-    delete matMgr;
-    delete meshMgr;
-    delete skelMgr;
-    delete bufferManager;
-    delete scmgr;
-    delete lodMgr;
-    delete mth;
-    delete rgm;
-    delete logMgr;
 
     return retCode;
 }

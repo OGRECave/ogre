@@ -543,8 +543,7 @@ namespace Ogre {
         }
 
         // Check if geometry shaders are supported
-        if (GLAD_GL_VERSION_2_0 &&
-            GLAD_GL_EXT_geometry_shader4)
+        if (hasMinGLVersion(3, 2) || (GLAD_GL_VERSION_2_0 && GLAD_GL_EXT_geometry_shader4))
         {
             rsc->setCapability(RSC_GEOMETRY_PROGRAM);
             GLint floatConstantCount = 0;

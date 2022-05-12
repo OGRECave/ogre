@@ -6,17 +6,16 @@ class SGResolver(Ogre.MaterialManager_Listener):
         Ogre.MaterialManager_Listener.__init__(self)
         self.shadergen = shadergen
 
-    def handleSchemeNotFound(self, idx, name, mat, lod_idx, rend):
-        if name != Ogre.RTShader.ShaderGenerator.DEFAULT_SCHEME_NAME:
+    def handleSchemeNotFound(self, idx, sname, mat, lod_idx, rend):
+        if sname != Ogre.MSN_SHADERGEN:
             return None
 
-        def_name = Ogre.MaterialManager.DEFAULT_SCHEME_NAME
-        succ = self.shadergen.createShaderBasedTechnique(mat, def_name, name)
+        succ = self.shadergen.createShaderBasedTechnique(mat, Ogre.MSN_DEFAULT, sname)
 
         if not succ:
             return None
 
-        self.shadergen.validateMaterial(name, mat.getName(), mat.getGroup())
+        self.shadergen.validateMaterial(sname, mat.getName(), mat.getGroup())
 
         return mat.getTechnique(1)
 
@@ -46,8 +45,8 @@ def main():
 
     rgm.initialiseAllResourceGroups()
 
-    rs = shadergen.getRenderState(Ogre.RTShader.ShaderGenerator.DEFAULT_SCHEME_NAME)
-    rs.addTemplateSubRenderState(shadergen.createSubRenderState(Ogre.RTShader.PerPixelLighting.Type))
+    rs = shadergen.getRenderState(Ogre.MSN_SHADERGEN)
+    rs.addTemplateSubRenderState(shadergen.createSubRenderState("SGX_PerPixelLighting"))
 
     scn_mgr = root.createSceneManager()
     shadergen.addSceneManager(scn_mgr)

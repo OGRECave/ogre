@@ -48,8 +48,7 @@ class _OgreSampleClassExport Sample_AtomicCounters : public SdkSample
         float h = 480.0 / mWindow->getHeight();
 
         auto rect = mSceneMgr->createScreenSpaceRect();
-        rect->setCorners(-w, h, w, -h);
-        rect->setBoundingBox(AxisAlignedBox::BOX_INFINITE);
+        rect->setCorners(-w, h, w, -h, false);
 
         MaterialPtr mat = MaterialManager::getSingleton().getByName("Example/RasterizationOrder");
         rect->setMaterial(mat);

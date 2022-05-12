@@ -51,19 +51,11 @@ namespace Ogre {
         shadow map on the visible areas of the scene. This results in better
         shadow map texel usage, at the expense of some 'swimming' of the shadow
         texture on receivers as the basis is constantly being reevaluated.
-    @note
+
         Original implementation by Matthias Fink <matthias.fink@web.de>, 2006.
     */
-    class _OgreExport FocusedShadowCameraSetup : public ShadowCameraSetup
+    class _OgreExport FocusedShadowCameraSetup : public DefaultShadowCameraSetup
     {
-        /** Temporary preallocated frustum to set up a projection matrix in
-            calculateShadowMappingMatrix().
-        */
-        std::unique_ptr<Frustum> mTempFrustum;
-        /** Temporary preallocated camera to set up a light frustum for clipping in FocusedShadowCameraSetup::calculateB.
-        */
-        SceneNode mLightFrustumCameraNode;
-        std::unique_ptr<Camera> mLightFrustumCamera;
         // Persistent calculations to prevent reallocation
         mutable ConvexBody mBodyB;
         /// Use tighter focus region?
@@ -79,6 +71,7 @@ namespace Ogre {
         static const Matrix4 msNormalToLightSpace;
         static const Matrix4 msLightSpaceToNormal;
 
+        mutable const Camera* mLightFrustumCamera;
         mutable bool mLightFrustumCameraCalculated;
 
         /** Internal class holding a point list representation of a convex body.
@@ -146,27 +139,7 @@ namespace Ogre {
         mutable PointListBody mPointListBodyLVS;
 
     protected:
-        /** Calculates the standard shadow mapping matrix.
-        @remarks
-            Provides the view and projection matrix for standard shadow mapping.
-        @note
-            You can choose which things you want to have: view matrix and/or projection 
-            matrix and/or shadow camera. Passing a NULL value as parameter ignores the
-            generation of this specific value.
-        @param sm
-            Scene manager.
-        @param cam
-            Currently active camera.
-        @param light
-            Currently active light.
-        @param out_view
-            Calculated uniform view shadow mapping matrix (may be @c NULL).
-        @param out_proj
-            Calculated uniform projection shadow mapping matrix (may be @c NULL).
-        @param out_cam
-            Calculated uniform shadow camera (may be @c NULL).
-        */
-        void calculateShadowMappingMatrix(const SceneManager& sm, const Camera& cam, 
+        OGRE_DEPRECATED void calculateShadowMappingMatrix(const SceneManager& sm, const Camera& cam,
             const Light& light, Affine3 *out_view,
             Matrix4 *out_proj, Frustum *out_cam) const;
 

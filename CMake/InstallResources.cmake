@@ -32,8 +32,8 @@ endif()
 
 if (NOT OGRE_PLUGINS_PATH)
   if (WIN32)
-    set(OGRE_PLUGINS_PATH "bin")
-    set(OGRE_PLUGIN_DIR_REL "${CMAKE_INSTALL_PREFIX}/bin")
+    set(OGRE_PLUGINS_PATH "${OGRE_BIN_DIRECTORY}")
+    set(OGRE_PLUGIN_DIR_REL "${CMAKE_INSTALL_PREFIX}/${OGRE_BIN_DIRECTORY}")
   else ()
     set(OGRE_PLUGINS_PATH "${OGRE_LIB_DIRECTORY}/OGRE")
     set(OGRE_PLUGIN_DIR_REL "${CMAKE_INSTALL_PREFIX}/${OGRE_LIB_DIRECTORY}/OGRE")
@@ -44,7 +44,7 @@ endif()
 
 if (NOT OGRE_CFG_INSTALL_PATH)
   if (WIN32 OR APPLE)
-    set(OGRE_CFG_INSTALL_PATH "bin")
+    set(OGRE_CFG_INSTALL_PATH "${OGRE_BIN_DIRECTORY}")
   elseif (UNIX)
     set(OGRE_CFG_INSTALL_PATH "share/OGRE")
   endif()
@@ -167,15 +167,12 @@ set(OGRE_CORE_MEDIA_DIR "${OGRE_MEDIA_DIR_REL}")
 configure_file(${OGRE_TEMPLATES_DIR}/resources.cfg.in ${PROJECT_BINARY_DIR}/inst/bin/resources.cfg)
 configure_file(${OGRE_TEMPLATES_DIR}/plugins.cfg.in ${PROJECT_BINARY_DIR}/inst/bin/plugins.cfg)
 configure_file(${OGRE_TEMPLATES_DIR}/samples.cfg.in ${PROJECT_BINARY_DIR}/inst/bin/samples.cfg)
-configure_file(${OGRE_TEMPLATES_DIR}/tests.cfg.in ${PROJECT_BINARY_DIR}/inst/bin/tests.cfg)
-
 
 # install resource files
 install(FILES 
   ${PROJECT_BINARY_DIR}/inst/bin/resources.cfg
   ${PROJECT_BINARY_DIR}/inst/bin/plugins.cfg
   ${PROJECT_BINARY_DIR}/inst/bin/samples.cfg
-  ${PROJECT_BINARY_DIR}/inst/bin/tests.cfg
   DESTINATION "${OGRE_CFG_INSTALL_PATH}"
 )
 
@@ -220,11 +217,6 @@ elseif (MSVC AND NOT NMAKE)
   configure_file(${OGRE_TEMPLATES_DIR}/samples.cfg.in ${PROJECT_BINARY_DIR}/bin/relwithdebinfo/samples.cfg)
   configure_file(${OGRE_TEMPLATES_DIR}/samples.cfg.in ${PROJECT_BINARY_DIR}/bin/minsizerel/samples.cfg)
   configure_file(${OGRE_TEMPLATES_DIR}/samples.cfg.in ${PROJECT_BINARY_DIR}/bin/debug/samples.cfg)
-
-  configure_file(${OGRE_TEMPLATES_DIR}/tests.cfg.in ${PROJECT_BINARY_DIR}/bin/release/tests.cfg)
-  configure_file(${OGRE_TEMPLATES_DIR}/tests.cfg.in ${PROJECT_BINARY_DIR}/bin/relwithdebinfo/tests.cfg)
-  configure_file(${OGRE_TEMPLATES_DIR}/tests.cfg.in ${PROJECT_BINARY_DIR}/bin/minsizerel/tests.cfg)
-  configure_file(${OGRE_TEMPLATES_DIR}/tests.cfg.in ${PROJECT_BINARY_DIR}/bin/debug/tests.cfg)
 else() # other OS only need one cfg file
   # create resources.cfg
   configure_file(${OGRE_TEMPLATES_DIR}/resources.cfg.in ${PROJECT_BINARY_DIR}/bin/resources.cfg)
@@ -232,8 +224,6 @@ else() # other OS only need one cfg file
   configure_file(${OGRE_TEMPLATES_DIR}/plugins.cfg.in ${PROJECT_BINARY_DIR}/bin/plugins.cfg)
   # create samples.cfg
   configure_file(${OGRE_TEMPLATES_DIR}/samples.cfg.in ${PROJECT_BINARY_DIR}/bin/samples.cfg)
-  # create tests.cfg
-  configure_file(${OGRE_TEMPLATES_DIR}/tests.cfg.in ${PROJECT_BINARY_DIR}/bin/tests.cfg)
 endif ()
 
 
@@ -248,17 +238,9 @@ if (NOT OGRE_CMAKE_DIR)
   endif()
 endif()
 
-if (NOT OGRE_PLUGIN_DIR_CMAKE)
-  if(WIN32)
-    set(OGRE_PLUGIN_DIR_CMAKE "bin")
-  else()
-    set(OGRE_PLUGIN_DIR_CMAKE "${OGRE_LIB_DIRECTORY}/OGRE")
-  endif()
-endif()
-
 configure_package_config_file(${OGRE_TEMPLATES_DIR}/OGREConfig.cmake.in ${PROJECT_BINARY_DIR}/cmake/OGREConfig.cmake
     INSTALL_DESTINATION ${OGRE_CMAKE_DIR}
-    PATH_VARS OGRE_MEDIA_PATH OGRE_PLUGIN_DIR_CMAKE OGRE_CFG_INSTALL_PATH CMAKE_INSTALL_PREFIX)
+    PATH_VARS OGRE_MEDIA_PATH OGRE_PLUGINS_PATH OGRE_CFG_INSTALL_PATH CMAKE_INSTALL_PREFIX)
 write_basic_package_version_file(
     ${PROJECT_BINARY_DIR}/cmake/OGREConfigVersion.cmake 
     VERSION ${OGRE_VERSION} 

@@ -71,15 +71,13 @@ namespace Ogre {
                 break;
             }
 
-            // Default precision declaration is required in fragment and vertex shaders.
-            os << "precision highp float;" << std::endl;
-            os << "precision highp int;" << std::endl;
-
-            if(mGLSLVersion > 100)
+            if(program->getType() == GPT_FRAGMENT_PROGRAM && mGLSLVersion > 100)
             {
                 // sampler3D has no default precision
-                os << "precision highp sampler3D;" << std::endl;
-                os << "precision highp sampler2DShadow;" << std::endl;
+                os << "precision lowp sampler3D;" << std::endl;
+                os << "precision lowp sampler2DShadow;" << std::endl;
+                // also write float precision, as auto shader-patching is off if it sees "precision"
+                os << "precision mediump float;" << std::endl;
             }
 
             // Generate source code header.

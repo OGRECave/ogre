@@ -48,8 +48,8 @@ struct FireworkParticle
 
     void Sample_ParticleGS::createProceduralParticleSystem()
     {
-        mParticleSystem = static_cast<ProceduralManualObject*>
-            (mSceneMgr->createMovableObject("ParticleGSEntity", ProceduralManualObjectFactory::FACTORY_TYPE_NAME));
+        mParticleSystem = new ProceduralManualObject();
+        mParticleSystem->_notifyManager(mSceneMgr);
         MaterialPtr mat = MaterialManager::getSingleton().getByName("Ogre/ParticleGS/Display", "General");
         mParticleSystem->setMaterial(mat);
 
@@ -64,9 +64,16 @@ struct FireworkParticle
         particleSystemSeed->end();
 
         // Generate the RenderToBufferObject.
-        RenderToVertexBufferSharedPtr r2vb =
-            HardwareBufferManager::getSingleton().createRenderToVertexBuffer();
+        auto r2vb = HardwareBufferManager::getSingleton().createRenderToVertexBuffer();
         r2vb->setRenderToBufferMaterialName("Ogre/ParticleGS/Generate");
+
+        // Apply the random texture.
+        TexturePtr randomTexture = RandomTools::generateRandomVelocityTexture();
+        r2vb->getRenderToBufferMaterial()
+            ->getTechnique(0)
+            ->getPass(0)
+            ->getTextureUnitState("RandomTexture")
+            ->setTexture(randomTexture);
 
         r2vb->setOperationType(RenderOperation::OT_POINT_LIST);
         r2vb->setMaxVertexCount(16000);
@@ -83,23 +90,9 @@ struct FireworkParticle
         // Velocity
         vertexDecl->addElement(0, offset, VET_FLOAT3, VES_TEXTURE_COORDINATES, 2).getSize();
 
-        // Apply the random texture.
-        TexturePtr randomTexture = RandomTools::generateRandomVelocityTexture();
-        r2vb->getRenderToBufferMaterial()->getBestTechnique()->getPass(0)->
-            getTextureUnitState("RandomTexture")->setTextureName(
-                randomTexture->getName(), randomTexture->getTextureType());
-
         // Bind the two together.
+        r2vb->setSourceRenderable(particleSystemSeed->getSections()[0]);
         mParticleSystem->setRenderToVertexBuffer(r2vb);
-        mParticleSystem->setManualObject(particleSystemSeed);
-
-        // GpuProgramParametersSharedPtr geomParams = mParticleSystem->
-        //     getRenderToVertexBuffer()->getRenderToBufferMaterial()->
-        //     getBestTechnique()->getPass(0)->getGeometryProgramParameters();
-        // if (geomParams->_findNamedConstantDefinition("randomTexture"))
-        // {
-        //     geomParams->setNamedConstant("randomTexture", 0);
-        // }
 
         // Set bounds.
         AxisAlignedBox aabb;
@@ -119,9 +112,6 @@ struct FireworkParticle
         mCameraNode->lookAt(Vector3(0,35,0), Node::TS_PARENT);
 
         mSceneMgr->setAmbientLight(ColourValue(0.7, 0.7, 0.7));
-
-        mProceduralManualObjectFactory = OGRE_NEW ProceduralManualObjectFactory();
-        Root::getSingleton().addMovableObjectFactory(mProceduralManualObjectFactory);
 
         createProceduralParticleSystem();
         mSceneMgr->getRootSceneNode()->createChildSceneNode()->attachObject(mParticleSystem);
@@ -149,9 +139,8 @@ struct FireworkParticle
 
     void Sample_ParticleGS::cleanupContent()
     {
-        Root::getSingleton().removeMovableObjectFactory(mProceduralManualObjectFactory);
-        OGRE_DELETE mProceduralManualObjectFactory;
-        mProceduralManualObjectFactory = 0;
+        delete mParticleSystem;
+        mParticleSystem = 0;
 
         MeshManager::getSingleton().remove("Myplane", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
     }

@@ -151,13 +151,14 @@ namespace Ogre {
         VET_UINT2 = 25,
         VET_UINT3 = 26,
         VET_UINT4 = 27,
-        VET_BYTE4 = 28,  /// signed bytes
-        VET_BYTE4_NORM = 29,   /// signed bytes (normalized to -1..1)
-        VET_UBYTE4_NORM = 30,  /// unsigned bytes (normalized to 0..1)
-        VET_SHORT2_NORM = 31,  /// signed shorts (normalized to -1..1)
+        VET_BYTE4 = 28,  ///< signed bytes
+        VET_BYTE4_NORM = 29,   ///< signed bytes (normalized to -1..1)
+        VET_UBYTE4_NORM = 30,  ///< unsigned bytes (normalized to 0..1)
+        VET_SHORT2_NORM = 31,  ///< signed shorts (normalized to -1..1)
         VET_SHORT4_NORM = 32,
-        VET_USHORT2_NORM = 33, /// unsigned shorts (normalized to 0..1)
+        VET_USHORT2_NORM = 33, ///< unsigned shorts (normalized to 0..1)
         VET_USHORT4_NORM = 34,
+        VET_INT_10_10_10_2_NORM = 35, ///< signed int (normalized to 0..1)
         VET_COLOUR = VET_UBYTE4_NORM,  ///< @deprecated use VET_UBYTE4_NORM
         VET_COLOUR_ARGB = VET_UBYTE4_NORM,  ///< @deprecated use VET_UBYTE4_NORM
         VET_COLOUR_ABGR = VET_UBYTE4_NORM,  ///< @deprecated use VET_UBYTE4_NORM
@@ -219,27 +220,17 @@ namespace Ogre {
         */
         static VertexElementType getBaseType(VertexElementType multiType);
 
-        /** Utility method for converting colour from
-            one packed 32-bit colour type to another.
-        @param srcType The source type
-        @param dstType The destination type
-        @param ptr Read / write value to change
-        */
-        static void convertColourValue(VertexElementType srcType,
-            VertexElementType dstType, uint32* ptr);
+        /// @deprecated do not use
+        OGRE_DEPRECATED static void convertColourValue(VertexElementType srcType, VertexElementType dstType, uint32* ptr);
 
-        /** Utility method for converting colour to
-            a packed 32-bit colour type.
-        @param src source colour
-        @param dst The destination type
-        */
-        static uint32 convertColourValue(const ColourValue& src, VertexElementType dst)
+        /// @deprecated use ColourValue::getAsABGR()
+        OGRE_DEPRECATED static uint32 convertColourValue(const ColourValue& src, VertexElementType)
         {
             return src.getAsABGR();
         }
 
-        /** Utility method to get the most appropriate packed colour vertex element format. */
-        static VertexElementType getBestColourVertexElementType(void);
+        /// @deprecated use VET_UBYTE4_NORM
+        OGRE_DEPRECATED static VertexElementType getBestColourVertexElementType() { return VET_UBYTE4_NORM; }
 
         inline bool operator== (const VertexElement& rhs) const
         {
@@ -417,10 +408,9 @@ namespace Ogre {
         void modifyElement(unsigned short elem_index, unsigned short source, size_t offset, VertexElementType theType,
             VertexElementSemantic semantic, unsigned short index = 0);
 
-        /** Finds a VertexElement with the given semantic, and index if there is more than
-            one element with the same semantic.
-        @remarks
-            If the element is not found, this method returns null.
+        /** Finds a VertexElement with the given semantic and index
+
+            @return The VertexElement or null, if the element is not found
         */
         const VertexElement* findElementBySemantic(VertexElementSemantic sem, unsigned short index = 0) const;
         /** Based on the current elements, gets the size of the vertex for a given buffer source.

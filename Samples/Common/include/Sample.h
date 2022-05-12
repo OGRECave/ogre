@@ -277,8 +277,7 @@ namespace OgreBites
             mSceneMgr = Ogre::Root::getSingleton().createSceneManager();
 #ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
             mShaderGenerator->addSceneManager(mSceneMgr);
-            auto mainRenderState =
-                mShaderGenerator->getRenderState(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+            auto mainRenderState = mShaderGenerator->getRenderState(Ogre::MSN_SHADERGEN);
             // reset global light state
             mainRenderState->setLightCount(Ogre::Vector3i(0));
             mainRenderState->setLightCountAutoUpdate(true);

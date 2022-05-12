@@ -150,6 +150,8 @@ namespace Ogre {
             case VET_DOUBLE3:
             case VET_DOUBLE4:
                 return 0;
+            case VET_INT_10_10_10_2_NORM:
+                return GL_INT_2_10_10_10_REV;
         };
 
         OgreAssert(false, "unknown Vertex Element Type");

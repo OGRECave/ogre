@@ -374,6 +374,14 @@ namespace Ogre
         mOptions[optDevices.name] = optDevices;
         mOptions[optFSAA.name] = optFSAA;
         mOptions[optVideoMode.name] = optVideoMode;
+
+        ConfigOption opt;
+        opt.name = "Reversed Z-Buffer";
+        opt.possibleValues = {"No", "Yes"};
+        opt.currentValue = opt.possibleValues[0];
+        opt.immutable = false;
+
+        mOptions[opt.name] = opt;
     }
     //-------------------------------------------------------------------------
     void VulkanRenderSystem::setConfigOption( const String &name, const String &value )
@@ -387,6 +395,9 @@ namespace Ogre
         }
 
         it->second.currentValue = value;
+
+        if(name == "Reversed Z-Buffer")
+            mIsReverseDepthBufferEnabled = StringConverter::parseBool(value);
     }
     //-------------------------------------------------------------------------
     void VulkanRenderSystem::addInstanceDebugCallback( void )
@@ -572,7 +583,8 @@ namespace Ogre
         rsc->setCapability( RSC_32BIT_INDEX );
         rsc->setCapability( RSC_TWO_SIDED_STENCIL );
         rsc->setCapability( RSC_STENCIL_WRAP );
-        rsc->setCapability( RSC_USER_CLIP_PLANES );
+        if( mActiveDevice->mDeviceFeatures.shaderClipDistance )
+            rsc->setCapability( RSC_USER_CLIP_PLANES );
         rsc->setCapability( RSC_TEXTURE_3D );
         rsc->setCapability( RSC_NON_POWER_OF_2_TEXTURES );
         rsc->setCapability(RSC_VERTEX_TEXTURE_FETCH);
@@ -585,6 +597,7 @@ namespace Ogre
         rsc->setCapability( RSC_ALPHA_TO_COVERAGE );
         rsc->setCapability( RSC_HW_GAMMA );
         rsc->setCapability( RSC_VERTEX_BUFFER_INSTANCE_DATA );
+        rsc->setCapability(RSC_VERTEX_FORMAT_INT_10_10_10_2);
         rsc->setMaxPointSize( 256 );
 
         //rsc->setMaximumResolutions( 16384, 4096, 16384 );
@@ -1241,20 +1254,37 @@ namespace Ogre
             }
         }
 
-        // Convert depth range from [-1,+1] to [0,1]
-        dest[2][0] = (dest[2][0] + dest[3][0]) / 2;
-        dest[2][1] = (dest[2][1] + dest[3][1]) / 2;
-        dest[2][2] = (dest[2][2] + dest[3][2]) / 2;
-        dest[2][3] = (dest[2][3] + dest[3][3]) / 2;
+        if (mIsReverseDepthBufferEnabled)
+        {
+            // Convert depth range from [-1,+1] to [1,0]
+            dest[2][0] = (dest[2][0] - dest[3][0]) * -0.5f;
+            dest[2][1] = (dest[2][1] - dest[3][1]) * -0.5f;
+            dest[2][2] = (dest[2][2] - dest[3][2]) * -0.5f;
+            dest[2][3] = (dest[2][3] - dest[3][3]) * -0.5f;
+        }
+        else
+        {
+            // Convert depth range from [-1,+1] to [0,1]
+            dest[2][0] = (dest[2][0] + dest[3][0]) / 2;
+            dest[2][1] = (dest[2][1] + dest[3][1]) / 2;
+            dest[2][2] = (dest[2][2] + dest[3][2]) / 2;
+            dest[2][3] = (dest[2][3] + dest[3][3]) / 2;
+        }
     }
 
     void VulkanRenderSystem::_setCullingMode(CullingMode mode) { rasterState.cullMode = VulkanMappings::get(mode); }
 
     void VulkanRenderSystem::_setDepthBias(float constantBias, float slopeScaleBias)
     {
-        rasterState.depthBiasEnable = (constantBias + slopeScaleBias) != 0.0f;
+        rasterState.depthBiasEnable = (std::abs(constantBias) + std::abs(slopeScaleBias)) != 0.0f;
         rasterState.depthBiasConstantFactor = -constantBias;
         rasterState.depthBiasSlopeFactor = -slopeScaleBias;
+
+        if(mIsReverseDepthBufferEnabled)
+        {
+            rasterState.depthBiasConstantFactor *= -1;
+            rasterState.depthBiasSlopeFactor *= -1;
+        }
     }
 
     void VulkanRenderSystem::_setAlphaRejectSettings(CompareFunction func, unsigned char value, bool alphaToCoverage)

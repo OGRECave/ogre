@@ -117,11 +117,6 @@ namespace Ogre
     void ShaderHelperGLSL::generateVertexProgramSource(const SM2Profile* prof, const Terrain* terrain,
                                                                                    TechniqueType tt, StringStream& outStream)
     {
-        if(mLang == "glsles") {
-            outStream << "precision highp int;\n";
-            outStream << "precision highp float;\n";
-        }
-
         outStream << "#include <OgreUnifiedShader.h>\n";
         outStream << "#include <FFPLib_Fog.glsl>\n";
         outStream << "#include <TerrainTransforms.glsl>\n";
@@ -250,11 +245,6 @@ namespace Ogre
     void ShaderHelperGLSL::generateFpHeader(const SM2Profile* prof, const Terrain* terrain,
                                                                                    TechniqueType tt, StringStream& outStream)
     {
-        if(mLang == "glsles") {
-            outStream << "precision highp int;\n";
-            outStream << "precision highp float;\n";
-        }
-
         outStream << "#define USE_OGRE_FROM_FUTURE\n";
         outStream << "#include <OgreUnifiedShader.h>\n";
         // shader libs
@@ -337,7 +327,7 @@ namespace Ogre
         outStream << "MAIN_PARAMETERS\n"
                      "IN(vec4 oPosObj, TEXCOORD0)\n";
         uint texCoordSet = 1;
-        outStream << "IN(vec4 oUVMisc, TEXCOORD" << texCoordSet++ << ")\n";
+        outStream << "IN(f32vec4 oUVMisc, TEXCOORD" << texCoordSet++ << ")\n";
 
         if (prof->getParent()->getDebugLevel() && tt != RENDER_COMPOSITE_MAP)
         {
@@ -355,7 +345,7 @@ namespace Ogre
         outStream << "MAIN_DECLARATION\n"
             "{\n"
             "    float shadow = 1.0;\n"
-            "    vec2 uv = oUVMisc.xy;\n"
+            "    f32vec2 uv = oUVMisc.xy;\n"
             // base colour
             "    gl_FragColor = vec4(0,0,0,1);\n";
 
@@ -427,7 +417,7 @@ namespace Ogre
         String blendWeightStr = StringUtil::format("blendTexVal%d.%s", blendIdx, getChannel(layer-1));
 
         // generate UV
-        outStream << "    vec2 uv" << layer << " = uv * uvMul_" << uvMulIdx << "." << getChannel(layer) << ";\n";
+        outStream << "    vec2 uv" << layer << " = mod(uv * uvMul_" << uvMulIdx << "." << getChannel(layer) << ", 1.0);\n";
 
         // calculate lighting here if normal mapping
         if (prof->isLayerNormalMappingEnabled())
