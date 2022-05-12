@@ -358,7 +358,7 @@ namespace Ogre
         static inline Real Log (Real fValue) { return std::log(fValue); }
 
         /// Stored value of log(2) for frequent use
-        static constexpr Real LOG2 = 0.69314718055994530942;
+        static constexpr Real LOG2 = static_cast<Real> (0.69314718055994530942);
 
         static inline Real Log2 (Real fValue) { return std::log2(fValue); }
 
@@ -740,7 +740,7 @@ namespace Ogre
 
         static constexpr Real POS_INFINITY = std::numeric_limits<Real>::infinity();
         static constexpr Real NEG_INFINITY = -std::numeric_limits<Real>::infinity();
-        static constexpr Real PI = 3.14159265358979323846;
+        static constexpr Real PI = static_cast<Real> (3.14159265358979323846);
         static constexpr Real TWO_PI = Real( 2.0 * PI );
         static constexpr Real HALF_PI = Real( 0.5 * PI );
         static constexpr float fDeg2Rad = PI / Real(180.0);
