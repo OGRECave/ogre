@@ -137,40 +137,40 @@ namespace Ogre {
         /** Gets one of the relative dimensions of the viewport,
             a value between 0.0 and 1.0.
         */
-        float getLeft(void) const { return mRelLeft; }
+        float getLeft(void) const { return mRelRect.left; }
 
         /** Gets one of the relative dimensions of the viewport, a value
             between 0.0 and 1.0.
         */
-        float getTop(void) const { return mRelTop; }
+        float getTop(void) const { return mRelRect.top; }
 
         /** Gets one of the relative dimensions of the viewport, a value
             between 0.0 and 1.0.
         */
-        float getWidth(void) const { return mRelWidth; }
+        float getWidth(void) const { return mRelRect.width(); }
         /** Gets one of the relative dimensions of the viewport, a value
             between 0.0 and 1.0.
         */
-        float getHeight(void) const { return mRelHeight; }
+        float getHeight(void) const { return mRelRect.height(); }
         /** Gets one of the actual dimensions of the viewport, a value in
             pixels.
         */
 
-        int getActualLeft(void) const { return mActLeft; }
+        int getActualLeft(void) const { return mActRect.left; }
         /** Gets one of the actual dimensions of the viewport, a value in
             pixels.
         */
 
-        int getActualTop(void) const { return mActTop; }
+        int getActualTop(void) const { return mActRect.top; }
         /** Gets one of the actual dimensions of the viewport, a value in
             pixels.
         */
-        int getActualWidth(void) const { return mActWidth; }
+        int getActualWidth(void) const { return mActRect.width(); }
         /** Gets one of the actual dimensions of the viewport, a value in
             pixels.
         */
 
-        int getActualHeight(void) const { return mActHeight; }
+        int getActualHeight(void) const { return mActRect.height(); }
 
         /** Sets the dimensions (after creation).
             @param
@@ -273,7 +273,7 @@ namespace Ogre {
 
         /** Access to actual dimensions (based on target size).
         */
-        Rect getActualDimensions() const;
+        Rect getActualDimensions() const { return mActRect; }
 
         /// @deprecated
         OGRE_DEPRECATED void getActualDimensions(int& left, int& top, int& width, int& height) const;
@@ -381,9 +381,9 @@ namespace Ogre {
         Camera* mCamera;
         RenderTarget* mTarget;
         /// Relative dimensions, irrespective of target dimensions (0..1)
-        float mRelLeft, mRelTop, mRelWidth, mRelHeight;
+        FloatRect mRelRect;
         /// Actual dimensions, based on target dimensions
-        int mActLeft, mActTop, mActWidth, mActHeight;
+        Rect mActRect;
         /// Z-order
         int mZOrder;
         /// Background options
