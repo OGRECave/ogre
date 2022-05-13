@@ -35,10 +35,7 @@ namespace Ogre {
     Viewport::Viewport(Camera* cam, RenderTarget* target, float left, float top, float width, float height, int ZOrder)
         : mCamera(cam)
         , mTarget(target)
-        , mRelLeft(left)
-        , mRelTop(top)
-        , mRelWidth(width)
-        , mRelHeight(height)
+        , mRelRect(left, top, left + width, top + height)
         // Actual dimensions will update later
         , mZOrder(ZOrder)
         , mBackColour(ColourValue::Black)
@@ -58,8 +55,7 @@ namespace Ogre {
         LogManager::getSingleton().stream(LML_TRIVIAL)
             << "Creating viewport on target '" << target->getName() << "'"
             << ", rendering from camera '" << (cam != 0 ? cam->getName() : "NULL") << "'"
-            << ", relative dimensions " << std::ios::fixed << std::setprecision(2) 
-            << "L: " << left << " T: " << top << " W: " << width << " H: " << height
+            << ", relative dimensions " << mRelRect
             << " Z-order: " << ZOrder;
 #endif
 
@@ -108,10 +104,7 @@ namespace Ogre {
         Real height = (Real) mTarget->getHeight();
         Real width = (Real) mTarget->getWidth();
 
-        mActLeft = (int) (mRelLeft * width);
-        mActTop = (int) (mRelTop * height);
-        mActWidth = (int) (mRelWidth * width);
-        mActHeight = (int) (mRelHeight * height);
+        mActRect = Rect(mRelRect.left * width, mRelRect.top * height, mRelRect.right * width, mRelRect.bottom * height);
 
         // This will check if the cameras getAutoAspectRatio() property is set.
         // If it's true its aspect ratio is fit to the current viewport
@@ -122,7 +115,7 @@ namespace Ogre {
         if (mCamera) 
         {
             if (mCamera->getAutoAspectRatio())
-                mCamera->setAspectRatio((Real) mActWidth / (Real) mActHeight);
+                mCamera->setAspectRatio((float)mActRect.width() / (float)mActRect.height());
 
 #if OGRE_NO_VIEWPORT_ORIENTATIONMODE == 0
             mCamera->setOrientationMode(mOrientationMode);
@@ -130,11 +123,10 @@ namespace Ogre {
         }
 
         LogManager::getSingleton().stream(LML_TRIVIAL)
-            << "Viewport for camera '" << (mCamera != 0 ? mCamera->getName() : "NULL") << "'"
-            << ", actual dimensions "   << std::ios::fixed << std::setprecision(2) 
-            << "L: " << mActLeft << " T: " << mActTop << " W: " << mActWidth << " H: " << mActHeight;
+            << "Viewport for camera '" << (mCamera ? mCamera->getName() : "NULL") << "'"
+            << ", actual dimensions " << mActRect;
 
-         mUpdated = true;
+        mUpdated = true;
 
         for (ListenerList::iterator i = mListeners.begin(); i != mListeners.end(); ++i)
         {
@@ -144,10 +136,7 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void Viewport::setDimensions(float left, float top, float width, float height)
     {
-        mRelLeft = left;
-        mRelTop = top;
-        mRelWidth = width;
-        mRelHeight = height;
+        mRelRect = FloatRect(left, top, left + width, top + height);
         _updateDimensions();
     }
     //---------------------------------------------------------------------
@@ -243,17 +232,12 @@ namespace Ogre {
         }
     }
     //---------------------------------------------------------------------
-    Rect Viewport::getActualDimensions() const
-    {
-        return Rect(mActLeft, mActTop, mActLeft + mActWidth, mActTop + mActHeight);
-    }
-
     void Viewport::getActualDimensions(int &left, int&top, int &width, int &height) const
     {
-        left = mActLeft;
-        top = mActTop;
-        width = mActWidth;
-        height = mActHeight;
+        left = mActRect.left;
+        top = mActRect.top;
+        width = mActRect.width();
+        height = mActRect.height();
     }
     //---------------------------------------------------------------------
     unsigned int Viewport::_getNumRenderedFaces(void) const
@@ -279,7 +263,7 @@ namespace Ogre {
             // update aspect ratio of new camera if needed.
             if (cam->getAutoAspectRatio())
             {
-                cam->setAspectRatio((Real) mActWidth / (Real) mActHeight);
+                cam->setAspectRatio((float)mActRect.width() / (float)mActRect.height());
             }
 #if OGRE_NO_VIEWPORT_ORIENTATIONMODE == 0
             cam->setOrientationMode(mOrientationMode);
