@@ -63,13 +63,13 @@ namespace Ogre {
             virtual ~Listener() {}
 
             /** Notification of when a new camera is set to target listening Viewport. */
-            virtual void viewportCameraChanged(Viewport* viewport);
+            virtual void viewportCameraChanged(Viewport* viewport) {}
 
             /** Notification of when target listening Viewport's dimensions changed. */
-            virtual void viewportDimensionsChanged(Viewport* viewport);
+            virtual void viewportDimensionsChanged(Viewport* viewport) {}
 
             /** Notification of when target listening Viewport's is destroyed. */
-            virtual void viewportDestroyed(Viewport* viewport);
+            virtual void viewportDestroyed(Viewport* viewport) {}
         };
 
         /** The usual constructor.
@@ -87,12 +87,7 @@ namespace Ogre {
                 Relative Z-order on the target. Lower = further to
                 the front.
         */
-        Viewport(
-            Camera* camera,
-            RenderTarget* target,
-            Real left, Real top,
-            Real width, Real height,
-            int ZOrder);
+        Viewport(Camera* camera, RenderTarget* target, float left, float top, float width, float height, int ZOrder);
 
         /** Default destructor.
         */
@@ -128,56 +123,54 @@ namespace Ogre {
 
         /** Retrieves a pointer to the render target for this viewport.
         */
-        RenderTarget* getTarget(void) const;
+        RenderTarget* getTarget(void) const { return mTarget; }
 
         /** Retrieves a pointer to the camera for this viewport.
         */
-        Camera* getCamera(void) const;
+        Camera* getCamera(void) const { return mCamera; }
 
         /** Sets the camera to use for rendering to this viewport. */
         void setCamera(Camera* cam);
 
         /** Gets the Z-Order of this viewport. */
-        int getZOrder(void) const;
+        int getZOrder(void) const { return mZOrder; }
         /** Gets one of the relative dimensions of the viewport,
             a value between 0.0 and 1.0.
         */
-        Real getLeft(void) const;
+        float getLeft(void) const { return mRelLeft; }
 
         /** Gets one of the relative dimensions of the viewport, a value
             between 0.0 and 1.0.
         */
-        Real getTop(void) const;
+        float getTop(void) const { return mRelTop; }
 
         /** Gets one of the relative dimensions of the viewport, a value
             between 0.0 and 1.0.
         */
-
-        Real getWidth(void) const;
+        float getWidth(void) const { return mRelWidth; }
         /** Gets one of the relative dimensions of the viewport, a value
             between 0.0 and 1.0.
         */
-
-        Real getHeight(void) const;
+        float getHeight(void) const { return mRelHeight; }
         /** Gets one of the actual dimensions of the viewport, a value in
             pixels.
         */
 
-        int getActualLeft(void) const;
+        int getActualLeft(void) const { return mActLeft; }
         /** Gets one of the actual dimensions of the viewport, a value in
             pixels.
         */
 
-        int getActualTop(void) const;
+        int getActualTop(void) const { return mActTop; }
         /** Gets one of the actual dimensions of the viewport, a value in
             pixels.
         */
-        int getActualWidth(void) const;
+        int getActualWidth(void) const { return mActWidth; }
         /** Gets one of the actual dimensions of the viewport, a value in
             pixels.
         */
 
-        int getActualHeight(void) const;
+        int getActualHeight(void) const { return mActHeight; }
 
         /** Sets the dimensions (after creation).
             @param
@@ -192,7 +185,7 @@ namespace Ogre {
                 represented as real values between 0 and 1. i.e. the full
                 target area is 0, 0, 1, 1.
         */
-        void setDimensions(Real left, Real top, Real width, Real height);
+        void setDimensions(float left, float top, float width, float height);
 
         /** Set the orientation mode of the viewport.
         */
@@ -213,20 +206,20 @@ namespace Ogre {
         /** Sets the initial background colour of the viewport (before
             rendering).
         */
-        void setBackgroundColour(const ColourValue& colour);
+        void setBackgroundColour(const ColourValue& colour) { mBackColour = colour; }
 
         /** Gets the background colour.
         */
-        const ColourValue& getBackgroundColour(void) const;
+        const ColourValue& getBackgroundColour(void) const { return mBackColour; }
 
         /** Sets the initial depth buffer value of the viewport (before
             rendering). Default is 1
         */
-        void setDepthClear( float depth );
+        void setDepthClear( float depth ) { mDepthClearValue = depth; }
 
         /** Gets the default depth buffer value to which the viewport is cleared.
         */
-        float getDepthClear(void) const;
+        float getDepthClear(void) const { return mDepthClearValue; }
 
         /** Determines whether to clear the viewport before rendering.
         @remarks
@@ -241,10 +234,10 @@ namespace Ogre {
 
         /** Determines if the viewport is cleared before every frame.
         */
-        bool getClearEveryFrame(void) const;
+        bool getClearEveryFrame(void) const { return mClearEveryFrame; }
 
         /** Gets which buffers are to be cleared each frame. */
-        unsigned int getClearBuffers(void) const;
+        unsigned int getClearBuffers(void) const { return mClearBuffers; }
 
         /** Sets whether this viewport should be automatically updated 
             if Ogre's rendering loop or RenderTarget::update is being used.
@@ -257,11 +250,11 @@ namespace Ogre {
             render loop or when RenderTarget::update() is called. If false, the 
             viewport is only updated when its update() method is called explicitly.
         */
-        void setAutoUpdated(bool autoupdate);
+        void setAutoUpdated(bool autoupdate) { mIsAutoUpdated = autoupdate; }
         /** Gets whether this viewport is automatically updated if 
             Ogre's rendering loop or RenderTarget::update is being used.
         */
-        bool isAutoUpdated() const;
+        bool isAutoUpdated() const { return mIsAutoUpdated; }
 
         /** Set the material scheme which the viewport should use.
         @remarks
@@ -306,11 +299,11 @@ namespace Ogre {
             by calling this method.
         @param enabled If true, any overlays are displayed, if false they are not.
         */
-        void setOverlaysEnabled(bool enabled);
+        void setOverlaysEnabled(bool enabled) { mShowOverlays = enabled; }
 
         /** Returns whether or not Overlay objects (created in the SceneManager) are displayed in this
             viewport. */
-        bool getOverlaysEnabled(void) const;
+        bool getOverlaysEnabled(void) const { return mShowOverlays; }
 
         /** Tells this viewport whether it should display skies.
         @remarks
@@ -322,11 +315,11 @@ namespace Ogre {
             on this viewport by calling this method.
         @param enabled If true, any skies are displayed, if false they are not.
         */
-        void setSkiesEnabled(bool enabled);
+        void setSkiesEnabled(bool enabled) { mShowSkies = enabled; }
 
         /** Returns whether or not skies (created in the SceneManager) are displayed in this
             viewport. */
-        bool getSkiesEnabled(void) const;
+        bool getSkiesEnabled(void) const { return mShowSkies; }
 
         /** Tells this viewport whether it should display shadows.
         @remarks
@@ -336,11 +329,11 @@ namespace Ogre {
             viewport to save processing time where they are not required.
         @param enabled If true, any shadows are displayed, if false they are not.
         */
-        void setShadowsEnabled(bool enabled);
+        void setShadowsEnabled(bool enabled) { mShowShadows = enabled; }
 
         /** Returns whether or not shadows (defined in the SceneManager) are displayed in this
             viewport. */
-        bool getShadowsEnabled(void) const;
+        bool getShadowsEnabled(void) const { return mShowShadows; }
 
 
         /** Sets a per-viewport visibility mask.
@@ -379,10 +372,10 @@ namespace Ogre {
 			colourBuffer Specifies the particular buffer that will be
 			targeted by the render target.
 		*/
-		void setDrawBuffer(ColourBufferType colourBuffer);
+		void setDrawBuffer(ColourBufferType colourBuffer) { mColourBuffer = colourBuffer; }
 
 		/** Returns the current colour buffer type for this viewport.*/
-		ColourBufferType getDrawBuffer() const;
+		ColourBufferType getDrawBuffer() const { return mColourBuffer; }
 
     private:
         Camera* mCamera;
