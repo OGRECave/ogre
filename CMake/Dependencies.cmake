@@ -71,29 +71,29 @@ set(CMAKE_FRAMEWORK_PATH ${CMAKE_FRAMEWORK_PATH} ${OGRE_DEP_SEARCH_PATH})
 if(OGRE_BUILD_DEPENDENCIES AND NOT EXISTS ${OGREDEPS_PATH})
     message(STATUS "Building pugixml")
     file(DOWNLOAD
-        https://github.com/zeux/pugixml/releases/download/v1.10/pugixml-1.10.tar.gz
-        ${PROJECT_BINARY_DIR}/pugixml-1.10.tar.gz)
+        https://github.com/zeux/pugixml/releases/download/v1.12/pugixml-1.12.tar.gz
+        ${PROJECT_BINARY_DIR}/pugixml-1.12.tar.gz)
     execute_process(COMMAND ${CMAKE_COMMAND}
-        -E tar xf pugixml-1.10.tar.gz WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
+        -E tar xf pugixml-1.12.tar.gz WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
     execute_process(COMMAND ${BUILD_COMMAND_COMMON}
         -DCMAKE_POSITION_INDEPENDENT_CODE=TRUE # this will be linked into a shared lib
-        ${PROJECT_BINARY_DIR}/pugixml-1.10
-        WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/pugixml-1.10)
+        ${PROJECT_BINARY_DIR}/pugixml-1.12
+        WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/pugixml-1.12)
     execute_process(COMMAND ${CMAKE_COMMAND}
-        --build ${PROJECT_BINARY_DIR}/pugixml-1.10 ${BUILD_COMMAND_OPTS})
+        --build ${PROJECT_BINARY_DIR}/pugixml-1.12 ${BUILD_COMMAND_OPTS})
 
     #find_package(Freetype)
     if (NOT FREETYPE_FOUND)
         message(STATUS "Building freetype")
         file(DOWNLOAD
-            https://download.savannah.gnu.org/releases/freetype/freetype-2.10.1.tar.gz
-            ${PROJECT_BINARY_DIR}/freetype-2.10.1.tar.gz)
+            https://download.savannah.gnu.org/releases/freetype/freetype-2.12.1.tar.gz
+            ${PROJECT_BINARY_DIR}/freetype-2.12.1.tar.gz)
         execute_process(COMMAND ${CMAKE_COMMAND}
-            -E tar xf freetype-2.10.1.tar.gz WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
+            -E tar xf freetype-2.12.1.tar.gz WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
         # patch toolchain for iOS
         execute_process(COMMAND ${CMAKE_COMMAND} -E copy
             ${PROJECT_SOURCE_DIR}/CMake/toolchain/ios.toolchain.xcode.cmake
-            freetype-2.10.1/builds/cmake/iOS.cmake
+            freetype-2.12.1/builds/cmake/iOS.cmake
             WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
         execute_process(COMMAND ${BUILD_COMMAND_COMMON}
             -DBUILD_SHARED_LIBS=${OGREDEPS_SHARED}
@@ -101,25 +101,25 @@ if(OGRE_BUILD_DEPENDENCIES AND NOT EXISTS ${OGREDEPS_PATH})
             -DCMAKE_DISABLE_FIND_PACKAGE_HarfBuzz=TRUE
             -DCMAKE_DISABLE_FIND_PACKAGE_BZip2=TRUE
             # workaround for broken iOS toolchain in freetype
-            -DPROJECT_SOURCE_DIR=${PROJECT_BINARY_DIR}/freetype-2.10.1
-            ${PROJECT_BINARY_DIR}/freetype-2.10.1
-            WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/freetype-2.10.1/objs)
+            -DPROJECT_SOURCE_DIR=${PROJECT_BINARY_DIR}/freetype-2.12.1
+            ${PROJECT_BINARY_DIR}/freetype-2.12.1
+            WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/freetype-2.12.1/objs)
         execute_process(COMMAND ${CMAKE_COMMAND}
-            --build ${PROJECT_BINARY_DIR}/freetype-2.10.1/objs ${BUILD_COMMAND_OPTS})
+            --build ${PROJECT_BINARY_DIR}/freetype-2.12.1/objs ${BUILD_COMMAND_OPTS})
     endif()
 
     if(MSVC OR MINGW OR SKBUILD) # other platforms dont need this
         message(STATUS "Building SDL2")
         file(DOWNLOAD
-            https://libsdl.org/release/SDL2-2.0.20.tar.gz
-            ${PROJECT_BINARY_DIR}/SDL2-2.0.20.tar.gz)
+            https://libsdl.org/release/SDL2-2.0.22.tar.gz
+            ${PROJECT_BINARY_DIR}/SDL2-2.0.22.tar.gz)
         execute_process(COMMAND ${CMAKE_COMMAND} 
-            -E tar xf SDL2-2.0.20.tar.gz WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
+            -E tar xf SDL2-2.0.22.tar.gz WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
         execute_process(COMMAND ${CMAKE_COMMAND}
             -E make_directory ${PROJECT_BINARY_DIR}/SDL2-build)
         execute_process(COMMAND ${BUILD_COMMAND_COMMON}
             -DSDL_STATIC=FALSE
-            ${PROJECT_BINARY_DIR}/SDL2-2.0.20
+            ${PROJECT_BINARY_DIR}/SDL2-2.0.22
             WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/SDL2-build)
         execute_process(COMMAND ${CMAKE_COMMAND}
             --build ${PROJECT_BINARY_DIR}/SDL2-build ${BUILD_COMMAND_OPTS})
@@ -142,10 +142,10 @@ if(OGRE_BUILD_DEPENDENCIES AND NOT EXISTS ${OGREDEPS_PATH})
 
       message(STATUS "Building Assimp")
       file(DOWNLOAD
-          https://github.com/assimp/assimp/archive/v5.1.6.tar.gz
-          ${PROJECT_BINARY_DIR}/v5.1.6.tar.gz)
+          https://github.com/assimp/assimp/archive/v5.2.4.tar.gz
+          ${PROJECT_BINARY_DIR}/v5.2.4.tar.gz)
       execute_process(COMMAND ${CMAKE_COMMAND}
-          -E tar xf v5.1.6.tar.gz WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
+          -E tar xf v5.2.4.tar.gz WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
       execute_process(COMMAND ${BUILD_COMMAND_COMMON}
           -DZLIB_ROOT=${OGREDEPS_PATH}
           -DBUILD_SHARED_LIBS=OFF
@@ -153,10 +153,10 @@ if(OGRE_BUILD_DEPENDENCIES AND NOT EXISTS ${OGREDEPS_PATH})
           -DASSIMP_NO_EXPORT=TRUE
           -DASSIMP_BUILD_OGRE_IMPORTER=OFF
           -DASSIMP_BUILD_ASSIMP_TOOLS=OFF
-          ${PROJECT_BINARY_DIR}/assimp-5.1.6
-          WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/assimp-5.1.6)
+          ${PROJECT_BINARY_DIR}/assimp-5.2.4
+          WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/assimp-5.2.4)
       execute_process(COMMAND ${CMAKE_COMMAND}
-        --build ${PROJECT_BINARY_DIR}/assimp-5.1.6 ${BUILD_COMMAND_OPTS})
+        --build ${PROJECT_BINARY_DIR}/assimp-5.2.4 ${BUILD_COMMAND_OPTS})
     endif()
 endif()
 
