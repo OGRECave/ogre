@@ -204,7 +204,7 @@ namespace Ogre {
         HardwareBufferManagerBase();
         virtual ~HardwareBufferManagerBase();
         /** Create a hardware vertex buffer.
-        @remarks
+
             This method creates a new vertex buffer; this will act as a source of geometry
             data for rendering objects. Note that because the meaning of the contents of
             the vertex buffer depends on the usage, this method does not specify a
@@ -214,8 +214,8 @@ namespace Ogre {
             of the rendering pipeline, e.g. a position, or texture coordinates. This is done 
             using the VertexDeclaration class, which itself contains VertexElement structures
             referring to the source data.
-        @remarks Note that because vertex buffers can be shared, they are reference
-            counted so you do not need to worry about destroying themm this will be done
+            Note that because vertex buffers can be shared, they are reference
+            counted so you do not need to worry about destroying them this will be done
             automatically.
         @param vertexSize
             The size in bytes of each vertex in this buffer; you must calculate
@@ -223,15 +223,14 @@ namespace Ogre {
         @param numVerts
             The number of vertices in this buffer.
         @param usage
-            One or more members of the HardwareBuffer::Usage enumeration; you are
-            strongly advised to use HBU_STATIC_WRITE_ONLY wherever possible, if you need to 
-            update regularly, consider HBU_DYNAMIC_WRITE_ONLY and useShadowBuffer=true.
+            One or more members of the #HardwareBufferUsage enumeration; you are
+            strongly advised to use #HBU_GPU_ONLY wherever possible, if you need to
+            update regularly, consider #HBU_CPU_TO_GPU or useShadowBuffer=true.
         @param useShadowBuffer
             If set to @c true, this buffer will be 'shadowed' by one stored in 
             system memory rather than GPU memory. You should set this flag if you intend
             to read data back from the vertex buffer, because reading data from a buffer
-            in the GPU memory is very expensive, and is in fact impossible if you
-            specify HBU_DETAIL_WRITE_ONLY for the main buffer. If you use this option, all
+            in the GPU memory is very expensive. If you use this option, all
             reads and writes will be done to the shadow buffer, and the shadow buffer will
             be synchronised with the real buffer at an appropriate time.
         */
@@ -248,7 +247,7 @@ namespace Ogre {
         @param numIndexes
             The number of indexes in the buffer
         @param usage
-            One or more members of the HardwareBuffer::Usage enumeration.
+            One or more members of the #HardwareBufferUsage enumeration.
         @param useShadowBuffer
             If set to @c true, this buffer will be 'shadowed' by one stored in 
             system memory rather than GPU memory. You should set this flag if you intend

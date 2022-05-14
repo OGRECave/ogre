@@ -268,8 +268,8 @@ namespace Ogre {
             
             @param u is a combination of TU_STATIC, TU_DYNAMIC, TU_WRITE_ONLY 
                 TU_AUTOMIPMAP and TU_RENDERTARGET (see TextureUsage enum). You are
-                strongly advised to use HBU_STATIC_WRITE_ONLY wherever possible, if you need to 
-                update regularly, consider HBU_DYNAMIC_WRITE_ONLY.
+                strongly advised to use HBU_GPU_ONLY wherever possible, if you need to
+                update regularly, consider HBU_CPU_TO_GPU.
         */
         void setUsage(int u) { mUsage = u; }
 
