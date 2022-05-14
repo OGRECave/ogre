@@ -158,6 +158,32 @@ if(OGRE_BUILD_DEPENDENCIES AND NOT EXISTS ${OGREDEPS_PATH})
       execute_process(COMMAND ${CMAKE_COMMAND}
         --build ${PROJECT_BINARY_DIR}/assimp-5.2.4 ${BUILD_COMMAND_OPTS})
     endif()
+
+    message(STATUS "Building Bullet")
+    file(DOWNLOAD
+        https://github.com/bulletphysics/bullet3/archive/refs/tags/3.24.tar.gz
+        ${PROJECT_BINARY_DIR}/3.24.tar.gz)
+    execute_process(COMMAND ${CMAKE_COMMAND}
+        -E tar xf 3.24.tar.gz WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
+    execute_process(COMMAND ${BUILD_COMMAND_COMMON}
+        -DBUILD_SHARED_LIBS=OFF
+        -DINSTALL_LIBS=ON
+        -DCMAKE_POSITION_INDEPENDENT_CODE=ON
+        -DUSE_MSVC_RUNTIME_LIBRARY_DLL=ON
+        -DBUILD_PYBULLET=OFF
+        -DUSE_DOUBLE_PRECISION=OFF
+        -DBUILD_CPU_DEMOS=OFF
+        -DBUILD_BULLET2_DEMOS=OFF
+        -DBUILD_EXTRAS=OFF
+        -DBUILD_EGL=OFF
+        -DBUILD_ENET=OFF
+        -DBUILD_UNIT_TESTS=OFF
+        -DBUILD_CLSOCKET=OFF
+        ${PROJECT_BINARY_DIR}/bullet3-3.24
+        WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/bullet3-3.24)
+    execute_process(COMMAND ${CMAKE_COMMAND}
+        --build ${PROJECT_BINARY_DIR}/bullet3-3.24 ${BUILD_COMMAND_OPTS})
+    set(BULLET_ROOT ${OGREDEPS_PATH})
 endif()
 
 #######################################################################
@@ -249,6 +275,10 @@ macro_log_feature(ZLIB_FOUND "zlib" "Simple data compression library" "http://ww
 # Assimp
 find_package(assimp QUIET)
 macro_log_feature(assimp_FOUND "Assimp" "Needed for the AssimpLoader Plugin" "https://www.assimp.org/")
+
+# Bullet
+find_package(Bullet QUIET)
+macro_log_feature(BULLET_FOUND "Bullet" "Bullet physics" "https://pybullet.org")
 
 if(assimp_FOUND)
   # workaround horribly broken assimp cmake, fixed with assimp 5.1

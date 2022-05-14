@@ -78,9 +78,15 @@ if(OGRE_BUILD_COMPONENT_BITES)
 	list(APPEND SWIG_INPUT_MODULES ../Bites/include/OgreBites.i)
 endif()
 
+if(OGRE_BUILD_COMPONENT_BULLET)
+    include_directories("${BULLET_INCLUDE_DIRS}")
+    set_source_files_properties(../Bullet/include/OgreBullet.i PROPERTIES CPLUSPLUS ON)
+    list(APPEND SWIG_INPUT_MODULES ../Bullet/include/OgreBullet.i)
+endif()
+
 set(CMAKE_WARN_DEPRECATED OFF)
 swig_add_library(OgreJNI LANGUAGE java SOURCES ${SWIG_INPUT_MODULES})
-swig_link_libraries(OgreJNI OgreBites OgreOverlay OgreRTShaderSystem OgreTerrain OgreMain ${JNI_LIBRARIES})
+swig_link_libraries(OgreJNI OgreBites OgreBullet OgreOverlay OgreRTShaderSystem OgreTerrain OgreMain ${JNI_LIBRARIES})
 
 if(${Java_FOUND})
 	set(CLASS_OUTPUT_PATH "${PROJECT_BINARY_DIR}/java/classes")

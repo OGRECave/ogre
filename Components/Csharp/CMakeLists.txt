@@ -59,9 +59,15 @@ if(OGRE_BUILD_COMPONENT_BITES)
 	list(APPEND SWIG_INPUT_MODULES ../Bites/include/OgreBites.i)
 endif()
 
+if(OGRE_BUILD_COMPONENT_BULLET)
+    include_directories("${BULLET_INCLUDE_DIRS}")
+    set_source_files_properties(../Bullet/include/OgreBullet.i PROPERTIES CPLUSPLUS ON)
+    list(APPEND SWIG_INPUT_MODULES ../Bullet/include/OgreBullet.i)
+endif()
+
 set(CMAKE_WARN_DEPRECATED OFF)
 swig_add_library(libOgre LANGUAGE csharp SOURCES ${SWIG_INPUT_MODULES})
-SWIG_LINK_LIBRARIES(libOgre OgreBites OgreOverlay OgreRTShaderSystem OgreTerrain OgreMain)
+SWIG_LINK_LIBRARIES(libOgre OgreBites OgreBullet OgreOverlay OgreRTShaderSystem OgreTerrain OgreMain)
 
 set(CLI_DEST lib/cli/ogre-sharp-${OGRE_VERSION})
 install(TARGETS ${SWIG_MODULE_libOgre_REAL_NAME} LIBRARY DESTINATION ${CLI_DEST}/)
