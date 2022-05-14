@@ -65,8 +65,8 @@ namespace Ogre {
             size_t uMaxSubdivisionLevel = PatchSurface::AUTO_LEVEL, 
             size_t vMaxSubdivisionLevel = PatchSurface::AUTO_LEVEL,
             PatchSurface::VisibleSide visibleSide = PatchSurface::VS_FRONT,
-            HardwareBuffer::Usage vbUsage = HardwareBuffer::HBU_STATIC_WRITE_ONLY, 
-            HardwareBuffer::Usage ibUsage = HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY,
+            HardwareBuffer::Usage vbUsage = HBU_GPU_ONLY,
+            HardwareBuffer::Usage ibUsage = HBU_CPU_TO_GPU,
             bool vbUseShadow = false, bool ibUseShadow = false);
 
         /* Sets the current subdivision level as a proportion of full detail.

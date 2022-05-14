@@ -100,7 +100,7 @@ namespace Ogre {
             bool isManual, ManualResourceLoader* loader,
             const NameValuePairList* createParams,
             HardwareBuffer::Usage vertexBufferUsage,
-            HardwareBuffer::Usage indexBufferUsage = HardwareBuffer::HBU_STATIC_WRITE_ONLY, 
+            HardwareBuffer::Usage indexBufferUsage = HBU_GPU_ONLY,
             bool vertexBufferShadowed = false, bool indexBufferShadowed = false);
 
         /** Prepares a mesh for loading from a file.  This does the IO in advance of the call to load().
@@ -119,16 +119,16 @@ namespace Ogre {
                 copies for faster read access
         */
         MeshPtr prepare( const String& filename, const String& groupName,
-            HardwareBuffer::Usage vertexBufferUsage = HardwareBuffer::HBU_STATIC_WRITE_ONLY, 
-            HardwareBuffer::Usage indexBufferUsage = HardwareBuffer::HBU_STATIC_WRITE_ONLY, 
+            HardwareBuffer::Usage vertexBufferUsage = HBU_GPU_ONLY,
+            HardwareBuffer::Usage indexBufferUsage = HBU_GPU_ONLY,
             bool vertexBufferShadowed = false, bool indexBufferShadowed = false);
 
         /** Loads a mesh from a file, making it immediately available for use.
             @copydetails MeshManager::prepare
         */
         MeshPtr load( const String& filename, const String& groupName,
-            HardwareBuffer::Usage vertexBufferUsage = HardwareBuffer::HBU_STATIC_WRITE_ONLY, 
-            HardwareBuffer::Usage indexBufferUsage = HardwareBuffer::HBU_STATIC_WRITE_ONLY, 
+            HardwareBuffer::Usage vertexBufferUsage = HBU_GPU_ONLY,
+            HardwareBuffer::Usage indexBufferUsage = HBU_GPU_ONLY,
             bool vertexBufferShadowed = false, bool indexBufferShadowed = false);
 
 
@@ -193,8 +193,8 @@ namespace Ogre {
             int xsegments = 1, int ysegments = 1,
             bool normals = true, unsigned short numTexCoordSets = 1,
             Real uTile = 1.0f, Real vTile = 1.0f, const Vector3& upVector = Vector3::UNIT_Y,
-            HardwareBuffer::Usage vertexBufferUsage = HardwareBuffer::HBU_STATIC_WRITE_ONLY, 
-            HardwareBuffer::Usage indexBufferUsage = HardwareBuffer::HBU_STATIC_WRITE_ONLY,
+            HardwareBuffer::Usage vertexBufferUsage = HBU_GPU_ONLY,
+            HardwareBuffer::Usage indexBufferUsage = HBU_GPU_ONLY,
             bool vertexShadowBuffer = false, bool indexShadowBuffer = false);
 
         
@@ -255,8 +255,8 @@ namespace Ogre {
             bool normals = true, unsigned short numTexCoordSets = 1,
             Real uTile = 1.0f, Real vTile = 1.0f, const Vector3& upVector = Vector3::UNIT_Y,
             const Quaternion& orientation = Quaternion::IDENTITY,
-            HardwareBuffer::Usage vertexBufferUsage = HardwareBuffer::HBU_STATIC_WRITE_ONLY, 
-            HardwareBuffer::Usage indexBufferUsage = HardwareBuffer::HBU_STATIC_WRITE_ONLY,
+            HardwareBuffer::Usage vertexBufferUsage = HBU_GPU_ONLY,
+            HardwareBuffer::Usage indexBufferUsage = HBU_GPU_ONLY,
             bool vertexShadowBuffer = false, bool indexShadowBuffer = false, 
             int ySegmentsToKeep = -1);
 
@@ -307,8 +307,8 @@ namespace Ogre {
             int xsegments = 1, int ysegments = 1,
             bool normals = false, unsigned short numTexCoordSets = 1, 
             Real uTile = 1.0f, Real vTile = 1.0f, const Vector3& upVector = Vector3::UNIT_Y,
-            HardwareBuffer::Usage vertexBufferUsage = HardwareBuffer::HBU_STATIC_WRITE_ONLY, 
-            HardwareBuffer::Usage indexBufferUsage = HardwareBuffer::HBU_STATIC_WRITE_ONLY,
+            HardwareBuffer::Usage vertexBufferUsage = HBU_GPU_ONLY,
+            HardwareBuffer::Usage indexBufferUsage = HBU_GPU_ONLY,
             bool vertexShadowBuffer = false, bool indexShadowBuffer = false);
 
         /** Creates a Bezier patch based on an array of control vertices.
@@ -353,8 +353,8 @@ namespace Ogre {
             size_t uMaxSubdivisionLevel = PatchSurface::AUTO_LEVEL, 
             size_t vMaxSubdivisionLevel = PatchSurface::AUTO_LEVEL,
             PatchSurface::VisibleSide visibleSide = PatchSurface::VS_FRONT,
-            HardwareBuffer::Usage vbUsage = HardwareBuffer::HBU_STATIC_WRITE_ONLY, 
-            HardwareBuffer::Usage ibUsage = HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY,
+            HardwareBuffer::Usage vbUsage = HBU_GPU_ONLY,
+            HardwareBuffer::Usage ibUsage = HBU_CPU_TO_GPU,
             bool vbUseShadow = true, bool ibUseShadow = true);
         
         /** Tells the mesh manager that all future meshes should prepare themselves for

@@ -57,8 +57,8 @@ namespace Ogre {
 
     public:
 
-        Rectangle2D(bool includeTextureCoordinates = false, HardwareBuffer::Usage vBufUsage = HardwareBuffer::HBU_STATIC_WRITE_ONLY);
-        Rectangle2D(const String& name, bool includeTextureCoordinates = false, HardwareBuffer::Usage vBufUsage = HardwareBuffer::HBU_STATIC_WRITE_ONLY);
+        Rectangle2D(bool includeTextureCoordinates = false, HardwareBuffer::Usage vBufUsage = HBU_GPU_ONLY);
+        Rectangle2D(const String& name, bool includeTextureCoordinates = false, HardwareBuffer::Usage vBufUsage = HBU_GPU_ONLY);
         ~Rectangle2D();
 
         /** Sets the corners of the rectangle, in relative coordinates.
