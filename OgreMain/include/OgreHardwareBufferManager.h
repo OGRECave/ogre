@@ -228,11 +228,7 @@ namespace Ogre {
             update regularly, consider #HBU_CPU_TO_GPU or useShadowBuffer=true.
         @param useShadowBuffer
             If set to @c true, this buffer will be 'shadowed' by one stored in 
-            system memory rather than GPU memory. You should set this flag if you intend
-            to read data back from the vertex buffer, because reading data from a buffer
-            in the GPU memory is very expensive. If you use this option, all
-            reads and writes will be done to the shadow buffer, and the shadow buffer will
-            be synchronised with the real buffer at an appropriate time.
+            system memory rather than GPU memory. See @ref Shadow-Buffers.
         */
         virtual HardwareVertexBufferSharedPtr 
             createVertexBuffer(size_t vertexSize, size_t numVerts, HardwareBuffer::Usage usage, 
@@ -250,12 +246,7 @@ namespace Ogre {
             One or more members of the #HardwareBufferUsage enumeration.
         @param useShadowBuffer
             If set to @c true, this buffer will be 'shadowed' by one stored in 
-            system memory rather than GPU memory. You should set this flag if you intend
-            to read data back from the index buffer, because reading data from a buffer
-            in the GPU memory is very expensive, and is in fact impossible if you
-            specify HBU_DETAIL_WRITE_ONLY for the main buffer. If you use this option, all
-            reads and writes will be done to the shadow buffer, and the shadow buffer will
-            be synchronised with the real buffer at an appropriate time.
+            system memory rather than GPU memory. See @ref Shadow-Buffers.
         */
         virtual HardwareIndexBufferSharedPtr 
             createIndexBuffer(HardwareIndexBuffer::IndexType itype, size_t numIndexes, 
