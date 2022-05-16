@@ -4,21 +4,20 @@ The general premise with a hardware buffer is that it is an area of memory with 
 
 @tableofcontents
 
-<a name="The-Hardware-Buffer-Manager"></a> <a name="The-Hardware-Buffer-Manager-1"></a>
+<a name="The-Hardware-Buffer-Manager-1"></a>
 
-# The Hardware Buffer Manager
+# The Hardware Buffer Manager {#The-Hardware-Buffer-Manager}
 
 The HardwareBufferManager class is the factory hub of all the objects in the new geometry system. You create and destroy the majority of the objects you use to define geometry through this class. It’s a Singleton, so you access it by doing HardwareBufferManager::getSingleton() - however be aware that it is only guaranteed to exist after the RenderSystem has been initialised (after you call Root::initialise); this is because the objects created are invariably API-specific, although you will deal with them through one common interface.  For example:
 
 ```cpp
 Ogre::VertexDeclaration* decl = HardwareBufferManager::getSingleton().createVertexDeclaration();
 
-Ogre::HardwareVertexBufferSharedPtr vbuf = 
-    Ogre::HardwareBufferManager::getSingleton().createVertexBuffer(
-        3*sizeof(float), // size of one whole vertex
-        numVertices, // number of vertices
-        Ogre::HBU_GPU_ONLY, // usage
-        false); // no shadow buffer
+auto vbuf = Ogre::HardwareBufferManager::getSingleton().createVertexBuffer(
+    3 * sizeof(float),  // size of one whole vertex
+    numVertices,        // number of vertices
+    Ogre::HBU_GPU_ONLY, // usage
+    false);             // no shadow buffer
 ```
 
 Don’t worry about the details of the above, we’ll cover that in the later sections. The important thing to remember is to always create objects through the HardwareBufferManager, don’t use ’new’ (it won’t work anyway in most cases).
@@ -40,7 +39,9 @@ The following table shows how the descriptive usage names map to the legacy term
 
 # Shadow Buffers {#Shadow-Buffers}
 
-As discussed in the previous section, reading data back from a hardware buffer performs very badly. However, if you have a cast-iron need to read the contents of the vertex buffer, you should set the @c shadowBuffer parameter of @c createVertexBuffer or @c createIndexBuffer to @c true. This causes the hardware buffer to be backed with a 'staging' system-memory copy, which you can read from with no more penalty than reading ordinary memory. The catch is that when you write data into this buffer, it will first update the staging copy, then it will update the hardware buffer, as separate copying process - therefore this technique has an additional overhead when writing data. Don’t use it unless you really need it.
+Reading data from a buffer in the GPU memory is very expensive. However, if you have a cast-iron need to read the contents of the buffer, you should set the @c shadowBuffer parameter of @c createVertexBuffer or @c createIndexBuffer to @c true.
+This causes the hardware buffer to be shadowed with a *staging* system-memory copy, which will be synchronised with the GPU buffer at locking (@c HBL_READ_ONLY) or unlocking (@c HBL_WRITE_ONLY) time.
+You can read from with no more penalty than reading ordinary memory. The catch is that you now have two copies of the buffer - one in system memory and one on the GPU. Therefore do not use it, unless you need it.
 
 # Data Transfer {#Data-Transfer}
 In order to read or update a hardware buffer, you have to notify the card about it as it can have an effect on its rendering queue. %Ogre provides two ways of doing this as described below.
@@ -169,13 +170,13 @@ Firstly, lets look at how you create a vertex buffer:
 ```cpp
 HardwareVertexBufferPtr vbuf =
     Ogre::HardwareBufferManager::getSingleton().createVertexBuffer(
-        3*sizeof(float), // size of one whole vertex
-        numVertices, // number of vertices
-        Ogre::HBU_GPU_ONLY, // usage
-        false); // no shadow buffer
+    3 * sizeof(float),  // size of one whole vertex
+    numVertices,        // number of vertices
+    Ogre::HBU_GPU_ONLY, // usage
+    false);             // no shadow buffer
 ```
 
-Notice that we use [The Hardware Buffer Manager](#The-Hardware-Buffer-Manager) to create our vertex buffer, and that a class called HardwareVertexBufferSharedPtr is returned from the method, rather than a raw pointer. This is because vertex buffers are reference counted - you are able to use a single vertex buffer as a source for multiple pieces of geometry therefore a standard pointer would not be good enough, because you would not know when all the different users of it had finished with it. The HardwareVertexBufferSharedPtr class manages its own destruction by keeping a reference count of the number of times it is being used - when the last HardwareVertexBufferSharedPtr is destroyed, the buffer itself automatically destroys itself.
+Notice that we use @ref The-Hardware-Buffer-Manager to create our vertex buffer, and that a class called Ogre::HardwareVertexBufferPtr is returned from the method, rather than a raw pointer. This is because vertex buffers are reference counted - you are able to use a single vertex buffer as a source for multiple pieces of geometry therefore a standard pointer would not be good enough, because you would not know when all the different users of it had finished with it. The @c HardwareVertexBufferPtr class manages its own destruction by keeping a reference count of the number of times it is being used - when the last @c HardwareVertexBufferPtr is destroyed, the buffer itself automatically destroys itself.
 
 The parameters to the creation of a vertex buffer are as follows:
 
@@ -190,11 +191,11 @@ The number of vertices in this buffer. Remember, not all the vertices have to be
 
 </dd> <dt>usage</dt> <dd>
 
-This tells the system how you intend to use the buffer. See [Buffer Usage](#Buffer-Usage)
+This tells the system how you intend to use the buffer. See @ref Buffer-Usage
 
 </dd> <dt>useShadowBuffer</dt> <dd>
 
-Tells the system whether you want this buffer backed by a system-memory copy. See [Shadow Buffers](#Shadow-Buffers)
+Tells the system whether you want this buffer backed by a system-memory copy. See @ref Shadow-Buffers
 
 </dd> </dl>
 
@@ -274,7 +275,7 @@ The index buffer which is used to source the indexes.
 Index buffers are created using See [The Hardware Buffer Manager](#The-Hardware-Buffer-Manager) just like vertex buffers, here’s how:
 
 ```cpp
-HardwareIndexBufferSharedPtr ibuf = Ogre::HardwareBufferManager::getSingleton().
+HardwareIndexBufferPtr ibuf = Ogre::HardwareBufferManager::getSingleton().
     createIndexBuffer(
         HardwareIndexBuffer::IT_16BIT, // type of index
         numIndexes, // number of indexes
@@ -295,20 +296,20 @@ The number of indexes in the buffer. As with vertex buffers, you should consider
 
 </dd> <dt>usage</dt> <dd>
 
-This tells the system how you intend to use the buffer. See [Buffer Usage](#Buffer-Usage)
+This tells the system how you intend to use the buffer. See @ref Buffer-Usage
 
 </dd> <dt>useShadowBuffer</dt> <dd>
 
-Tells the system whether you want this buffer backed by a system-memory copy. See [Shadow Buffers](#Shadow-Buffers)
+Tells the system whether you want this buffer backed by a system-memory copy. See @ref Shadow-Buffers
 
 </dd> </dl>
 
 ## Updating Index Buffers {#Updating-Index-Buffers}
 
-Updating index buffers can only be done when you [lock the buffer](@ref Locking-buffers) for writing; Locking returns a void pointer, which must be cast to the appropriate type; with index buffers this is either an unsigned short (for 16-bit indexes) or an unsigned long (for 32-bit indexes). For example:
+Updating index buffers can only be done when you [lock the buffer](@ref Locking-buffers) for writing; Locking returns a void pointer, which must be cast to the appropriate type; with index buffers this is either an @c uint16 (for 16-bit indexes) or an @c uint32 (for 32-bit indexes). For example:
 
 ```cpp
-unsigned short* pIdx = static_cast<unsigned short*>(ibuf->lock(HardwareBuffer::HBL_DISCARD));
+uint16* pIdx = static_cast<uint16*>(ibuf->lock(Ogre::HardwareBuffer::HBL_DISCARD));
 ```
 
 You can then write to the buffer using the usual pointer semantics, just remember to unlock the buffer when you’re finished!
