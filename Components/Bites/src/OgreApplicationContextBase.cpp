@@ -403,6 +403,7 @@ void ApplicationContextBase::_fireInputEvent(const Event& event, uint32_t window
         case TEXTINPUT:
             l.textInput(event.text);
             break;
+        case JOYAXISMOTION:
         case CONTROLLERAXISMOTION:
             l.axisMoved(event.axis);
             break;
