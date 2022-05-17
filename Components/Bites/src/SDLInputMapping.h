@@ -68,6 +68,12 @@ namespace {
             out.type = OgreBites::TEXTINPUT;
             out.text.chars = in.text.text;
             break;
+        case SDL_JOYAXISMOTION:
+            out.type = OgreBites::JOYAXISMOTION;
+            out.axis.which = in.jaxis.which;
+            out.axis.axis = in.jaxis.axis;
+            out.axis.value = in.jaxis.value;
+            break;
         case SDL_CONTROLLERAXISMOTION:
             out.type = OgreBites::CONTROLLERAXISMOTION;
             out.axis.which = in.caxis.which;

@@ -156,6 +156,13 @@ void ApplicationContextSDL::pollEvents()
                 windowResized(win);
             }
             break;
+        case SDL_JOYDEVICEADDED:
+            if(!SDL_IsGameController(event.cdevice.which))
+            {
+                SDL_JoystickOpen(event.cdevice.which);
+                Ogre::LogManager::getSingleton().logMessage("Opened Joystick");
+            }
+            break;
         case SDL_CONTROLLERDEVICEADDED:
             if(auto c = SDL_GameControllerOpen(event.cdevice.which))
             {
