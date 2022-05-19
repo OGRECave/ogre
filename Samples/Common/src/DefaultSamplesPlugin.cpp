@@ -32,6 +32,9 @@
 #include "AtomicCounters.h"
 #include "BezierPatch.h"
 #include "BSP.h"
+#ifdef OGRE_BUILD_COMPONENT_BULLET
+#include "Bullet.h"
+#endif
 #include "CameraTrack.h"
 #include "CelShading.h"
 #include "CharacterSample.h"
@@ -97,6 +100,9 @@ DefaultSamplesPlugin::DefaultSamplesPlugin() : SamplePlugin("DefaultSamplesPlugi
 {
     addSample(new Sample_AtomicCounters);
     addSample(new Sample_BezierPatch);
+#ifdef OGRE_BUILD_COMPONENT_BULLET
+    addSample(new Sample_Bullet);
+#endif
     addSample(new Sample_CameraTrack);
     addSample(new Sample_Character);
     addSample(new CSMShadows);
