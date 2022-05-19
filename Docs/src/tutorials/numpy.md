@@ -5,6 +5,8 @@ However, with Python, you most likely do not only want to just use Ogre, but con
 For this, the Component uses standard python protocols, that offer exposing the API in a pythonic way.
 In this tutorial, we will look how %Ogre integrates with numpy.
 
+@note this tutorial can be [run live in Google Colab here](https://colab.research.google.com/github/OGRECave/ogre/blob/master/Samples/Python/numpy_sample.ipynb).
+
 We start with a simple 3 channel python array representing a green gradient:
 
 @snippet Samples/Python/numpy_sample.py numpy_image
