@@ -367,6 +367,10 @@ bool AssimpLoader::_load(const char* name, Assimp::Importer& importer, Mesh* mes
         flags |= aiProcess_JoinIdenticalVertices;
 
     flags |= options.postProcessSteps;
+
+    if((flags & (aiProcess_GenSmoothNormals | aiProcess_GenNormals)) != aiProcess_GenNormals)
+        flags &= ~aiProcess_GenNormals; // prefer smooth normals
+
     importer.SetPropertyFloat("PP_GSN_MAX_SMOOTHING_ANGLE", options.maxEdgeAngle);
     const aiScene* scene = importer.ReadFile(name, flags);
 
