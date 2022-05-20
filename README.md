@@ -39,10 +39,13 @@ A gold mine of tutorials, tips and code snippets which will help you get up to s
 
 For an exhaustive list, see the [features page](http://www.ogre3d.org/about/features) and try our Sample Browser. For a quick overview see below
 
-| Integrated Bump Mapping | Integrated shadows |
+| Integrated Bump and Offset Mapping | Integrated shadows |
 |----|----|
-| ![](Other/screenshots/bumpmap.jpg) | ![](Other/screenshots/shadows.jpg) |
+| ![](Other/screenshots/bumpmap.webp) | ![](Other/screenshots/shadows.jpg) |
 
+| Physically Based Shading | Particle Effects |
+|----|----|
+| ![](Other/screenshots/pbr.webp) | ![](Other/screenshots/particle.jpg) |
 
 | HW & SW skeletal animation | Multi-layer Terrain |
 |----|----|
@@ -52,9 +55,9 @@ For an exhaustive list, see the [features page](http://www.ogre3d.org/about/feat
 |----|----|
 | ![](Other/screenshots/compositor.jpg) | ![](Other/screenshots/volume.jpg) |
 
-| [Dear ImGui](https://github.com/ocornut/imgui) | Particle Effects |
+| [Dear ImGui](https://github.com/ocornut/imgui) | [Bullet Physics](https://pybullet.org/) Integration |
 |----|----|
-| ![](Other/screenshots/imgui.jpg) | ![](Other/screenshots/particle.jpg) |
+| ![](Other/screenshots/imgui.jpg) | ![](Other/screenshots/bullet.webp) |
 
 ## Who is using it?
 
