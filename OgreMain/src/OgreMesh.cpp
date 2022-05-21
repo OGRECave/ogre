@@ -55,7 +55,7 @@ namespace Ogre {
         mIndexBufferShadowBuffer(false),
         mPreparedForShadowVolumes(false),
         mEdgeListsBuilt(false),
-        mAutoBuildEdgeLists(true), // will be set to false by serializers of 1.30 and above
+        mAutoBuildEdgeLists(false), // will be set to true by serializers of 1.20 and below
         mSharedVertexDataAnimationType(VAT_NONE),
         mSharedVertexDataAnimationIncludesNormals(false),
         mAnimationTypesDirty(true),
