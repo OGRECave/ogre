@@ -89,14 +89,11 @@ namespace Ogre {
     void EdgeListBuilder::addIndexData(const IndexData* indexData, 
         size_t vertexSet, RenderOperation::OperationType opType)
     {
-        if (opType != RenderOperation::OT_TRIANGLE_LIST &&
-            opType != RenderOperation::OT_TRIANGLE_FAN &&
-            opType != RenderOperation::OT_TRIANGLE_STRIP)
-        {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-                "Only triangle list, fan and strip are supported to build edge list.",
-                "EdgeListBuilder::addIndexData");
-        }
+        OgreAssert(opType == RenderOperation::OT_TRIANGLE_LIST ||
+                   opType == RenderOperation::OT_TRIANGLE_FAN ||
+                   opType == RenderOperation::OT_TRIANGLE_STRIP,
+                   "Unsupported RenderOperation");
+        OgreAssert(indexData->indexCount, "Index data must not be empty");
 
         Geometry geometry;
         geometry.indexData = indexData;
