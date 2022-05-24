@@ -487,14 +487,12 @@ namespace Ogre
         {
             DefaultWorkQueueBase* mQueue;
 
-            WorkerFunc(DefaultWorkQueueBase* q) 
-                : mQueue(q) {}
+            WorkerFunc(DefaultWorkQueueBase* q) : mQueue(q) {}
 
-            void operator()();
+            void operator()() const { mQueue->_threadMain(); }
             
-            void operator()() const;
-
-            void run();
+            /// override for PoCo::Thread
+            void run() { operator()(); }
         };
         WorkerFunc* mWorkerFunc;
 
