@@ -429,31 +429,23 @@ namespace Ogre {
 
 
         /** Firing of loading complete event
-        @remarks
+
             You should call this from the thread that runs the main frame loop 
             to avoid having to make the receivers of this event thread-safe.
-            If you use Ogre's built in frame loop you don't need to call this
+            If you use %Ogre's built in frame loop you don't need to call this
             yourself.
-            @param wasBackgroundLoaded Whether this was a background loaded event
         */
-        void _fireLoadingComplete(bool wasBackgroundLoaded);
+        void _fireLoadingComplete(bool unused = false);
 
         /** Firing of preparing complete event
-        @remarks
-            You should call this from the thread that runs the main frame loop 
-            to avoid having to make the receivers of this event thread-safe.
-            If you use Ogre's built in frame loop you don't need to call this
-            yourself.
-            @param wasBackgroundLoaded Whether this was a background loaded event
+
+            @copydetails _fireLoadingComplete
         */
-        void _firePreparingComplete(bool wasBackgroundLoaded);
+        void _firePreparingComplete(bool unused = false);
 
         /** Firing of unloading complete event
-        @remarks
-        You should call this from the thread that runs the main frame loop 
-        to avoid having to make the receivers of this event thread-safe.
-        If you use Ogre's built in frame loop you don't need to call this
-        yourself.
+
+            @copydetails _fireLoadingComplete
         */
         void _fireUnloadingComplete(void);
     };

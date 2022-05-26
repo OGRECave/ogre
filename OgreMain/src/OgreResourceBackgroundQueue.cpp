@@ -469,11 +469,11 @@ namespace Ogre {
 
                 if (req.type == RT_LOAD_RESOURCE) 
                 {
-                    resresp.resource->_fireLoadingComplete( true );
+                    resresp.resource->_fireLoadingComplete();
                 } 
                 else 
                 {
-                    resresp.resource->_firePreparingComplete( true );
+                    resresp.resource->_firePreparingComplete();
                 }
             }
         }
