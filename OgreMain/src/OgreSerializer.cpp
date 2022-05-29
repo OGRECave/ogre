@@ -379,17 +379,6 @@ namespace Ogre {
 	        Bitwise::bswapChunks(pData, size, count);
         }
     }
-    
-    size_t Serializer::calcChunkHeaderSize()
-    {
-        return sizeof(uint16) + sizeof(uint32);
-    }
-
-    size_t Serializer::calcStringSize( const String& string )
-    {
-        // string + terminating \n character
-        return string.length() + 1;
-    }
 
     void Serializer::pushInnerChunk(const DataStreamPtr& stream)
     {
