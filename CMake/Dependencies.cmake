@@ -100,6 +100,7 @@ if(OGRE_BUILD_DEPENDENCIES AND NOT EXISTS ${OGREDEPS_PATH})
             -DCMAKE_DISABLE_FIND_PACKAGE_PNG=TRUE # disable third-party deps
             -DCMAKE_DISABLE_FIND_PACKAGE_HarfBuzz=TRUE
             -DCMAKE_DISABLE_FIND_PACKAGE_BZip2=TRUE
+            -DCMAKE_DISABLE_FIND_PACKAGE_BrotliDec=TRUE
             # workaround for broken iOS toolchain in freetype
             -DPROJECT_SOURCE_DIR=${PROJECT_BINARY_DIR}/freetype-2.12.1
             ${PROJECT_BINARY_DIR}/freetype-2.12.1
