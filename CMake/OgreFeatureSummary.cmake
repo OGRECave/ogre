@@ -191,6 +191,9 @@ endif()
 if (OGRE_CONFIG_THREADS GREATER 0)
 	set(_core "${_core}  + Multi-threaded WorkQueue\n")
 endif()
+if (OGRE_CONFIG_NODE_INHERIT_TRANSFORM)
+	set(_core "${_core}  + Non-uniform scaling & shearing of Nodes\n")
+endif()
 if (DEFINED _core)
 	set(_features "${_features}Building core features:\n${_core}")
 endif ()
@@ -231,7 +234,6 @@ else ()
 endif()
 # various true/false settings
 var_to_string(OGRE_CONFIG_DOUBLE _double)
-var_to_string(OGRE_CONFIG_NODE_INHERIT_TRANSFORM _inherit_transform)
 
 # build type
 if (OGRE_STATIC)
@@ -242,7 +244,6 @@ endif ()
 
 set(_features "${_features}Build type:                      ${_buildtype}\n")
 set(_features "${_features}Use double precision:            ${_double}\n")
-set(_features "${_features}Nodes inherit transform:         ${_inherit_transform}\n")
 set(_features "${_features}Assert mode:                     ${_assert}\n")
 
 
