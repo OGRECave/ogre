@@ -2328,26 +2328,28 @@ namespace Ogre
             _writeRawConstant(withArrayOffset(def, name), colour, def->elementSize);
     }
     //---------------------------------------------------------------------------
-    void GpuProgramParameters::setNamedConstant(const String& name,
-                                                const float *val, size_t count, size_t multiple)
+    template <typename T> void GpuProgramParameters::_setNamedConstant(const String& name, const T* val, size_t count)
     {
-        size_t rawCount = count * multiple;
         // look up, and throw an exception if we're not ignoring missing
-        const GpuConstantDefinition* def =
-            _findNamedConstantDefinition(name, !mIgnoreMissingParams);
-        if (def)
-            _writeRawConstants(withArrayOffset(def, name), val, rawCount);
+        const GpuConstantDefinition* def = _findNamedConstantDefinition(name, !mIgnoreMissingParams);
+
+        if (!def)
+            return;
+
+        if (count > def->arraySize * def->elementSize)
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+                        StringUtil::format("Too many values for parameter %s: %zu > %d", name.c_str(), count,
+                                           def->arraySize * def->elementSize));
+        _writeRawConstants(withArrayOffset(def, name), val, count);
+    }
+    void GpuProgramParameters::setNamedConstant(const String& name, const float* val, size_t count, size_t multiple)
+    {
+        _setNamedConstant(name, val, count * multiple);
     }
     //---------------------------------------------------------------------------
-    void GpuProgramParameters::setNamedConstant(const String& name,
-                                                const double *val, size_t count, size_t multiple)
+    void GpuProgramParameters::setNamedConstant(const String& name, const double* val, size_t count, size_t multiple)
     {
-        size_t rawCount = count * multiple;
-        // look up, and throw an exception if we're not ignoring missing
-        const GpuConstantDefinition* def =
-            _findNamedConstantDefinition(name, !mIgnoreMissingParams);
-        if (def)
-            _writeRawConstants(withArrayOffset(def, name), val, rawCount);
+        _setNamedConstant(name, val, count * multiple);
     }
     //---------------------------------------------------------------------------
     void GpuProgramParameters::setNamedConstant(const String& name,
@@ -2360,21 +2362,20 @@ namespace Ogre
         if(!def)
             return;
 
+        if (rawCount > def->arraySize * def->elementSize)
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+                        StringUtil::format("Too many values for parameter %s: %zu > %d", name.c_str(), count,
+                                           def->arraySize * def->elementSize));
+
         if (def->isSampler())
             _writeRegisters(withArrayOffset(def, name), val, rawCount);
         else
             _writeRawConstants(withArrayOffset(def, name), val, rawCount);
     }
     //---------------------------------------------------------------------------
-    void GpuProgramParameters::setNamedConstant(const String& name,
-                                                const uint *val, size_t count, size_t multiple)
+    void GpuProgramParameters::setNamedConstant(const String& name, const uint* val, size_t count, size_t multiple)
     {
-        size_t rawCount = count * multiple;
-        // look up, and throw an exception if we're not ignoring missing
-        const GpuConstantDefinition* def =
-            _findNamedConstantDefinition(name, !mIgnoreMissingParams);
-        if (def)
-            _writeRawConstants(withArrayOffset(def, name), val, rawCount);
+        _setNamedConstant(name, val, count * multiple);
     }
     //---------------------------------------------------------------------------
     void GpuProgramParameters::setNamedAutoConstant(const String& name,

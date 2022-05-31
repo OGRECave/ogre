@@ -1274,6 +1274,8 @@ namespace Ogre {
 
         GpuSharedParamUsageList mSharedParamSets;
 
+        template <typename T> void _setNamedConstant(const String& name, const T* val, size_t count);
+
     public:
         GpuProgramParameters();
         ~GpuProgramParameters();
