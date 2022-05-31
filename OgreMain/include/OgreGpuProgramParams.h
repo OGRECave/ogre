@@ -421,6 +421,7 @@ namespace Ogre {
 
         bool mDirty;
 
+        template <typename T> void _setNamedConstant(const String& name, const T* val, uint32 count);
     public:
         GpuSharedParameters(const String& name);
 

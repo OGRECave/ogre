@@ -487,75 +487,47 @@ namespace Ogre
     //---------------------------------------------------------------------
     void GpuSharedParameters::setNamedConstant(const String& name, const Matrix4& m)
     {
-        setNamedConstant(name, m[0], 16);
+        _setNamedConstant(name, m[0], 16);
     }
     //---------------------------------------------------------------------
     void GpuSharedParameters::setNamedConstant(const String& name, const Matrix4* m, uint32 numEntries)
     {
-        setNamedConstant(name, m[0][0], 16 * numEntries);
+        _setNamedConstant(name, m[0][0], 16 * numEntries);
     }
     //---------------------------------------------------------------------
     void GpuSharedParameters::setNamedConstant(const String& name, const ColourValue& colour)
     {
-        setNamedConstant(name, colour.ptr(), 4);
+        _setNamedConstant(name, colour.ptr(), 4);
     }
     //---------------------------------------------------------------------
-    void GpuSharedParameters::setNamedConstant(const String& name, const float *val, uint32 count)
+    template <typename T> void GpuSharedParameters::_setNamedConstant(const String& name, const T* val, uint32 count)
     {
         GpuConstantDefinitionMap::const_iterator i = mNamedConstants.map.find(name);
-        if (i != mNamedConstants.map.end())
-        {
-            const GpuConstantDefinition& def = i->second;
-            memcpy(&mConstants[def.physicalIndex], val,
-                   sizeof(float) * std::min(count, def.elementSize * def.arraySize));
-        }
+        if (i == mNamedConstants.map.end())
+            return; // ignore
 
+        const GpuConstantDefinition& def = i->second;
+        memcpy(&mConstants[def.physicalIndex], val, sizeof(float) * std::min(count, def.elementSize * def.arraySize));
         _markDirty();
     }
-    //---------------------------------------------------------------------
-    void GpuSharedParameters::setNamedConstant(const String& name, const double *val, uint32 count)
+    void GpuSharedParameters::setNamedConstant(const String& name, const float* val, uint32 count)
     {
-        GpuConstantDefinitionMap::const_iterator i = mNamedConstants.map.find(name);
-        if (i != mNamedConstants.map.end())
-        {
-            const GpuConstantDefinition& def = i->second;
-
-            count = std::min(count, def.elementSize * def.arraySize);
-            const double* src = val;
-            double* dst = (double*)&mConstants[def.physicalIndex];
-            for (size_t v = 0; v < count; ++v)
-            {
-                *dst++ = static_cast<double>(*src++);
-            }
-        }
-
-        _markDirty();
+        _setNamedConstant(name, val, count);
     }
     //---------------------------------------------------------------------
-    void GpuSharedParameters::setNamedConstant(const String& name, const int *val, uint32 count)
+    void GpuSharedParameters::setNamedConstant(const String& name, const double* val, uint32 count)
     {
-        GpuConstantDefinitionMap::const_iterator i = mNamedConstants.map.find(name);
-        if (i != mNamedConstants.map.end())
-        {
-            const GpuConstantDefinition& def = i->second;
-            memcpy(&mConstants[def.physicalIndex], val,
-                   sizeof(int) * std::min(count, def.elementSize * def.arraySize));
-        }
-
-        _markDirty();
+        _setNamedConstant(name, val, count);
     }
     //---------------------------------------------------------------------
-    void GpuSharedParameters::setNamedConstant(const String& name, const uint *val, uint32 count)
+    void GpuSharedParameters::setNamedConstant(const String& name, const int* val, uint32 count)
     {
-        GpuConstantDefinitionMap::const_iterator i = mNamedConstants.map.find(name);
-        if (i != mNamedConstants.map.end())
-        {
-            const GpuConstantDefinition& def = i->second;
-            memcpy(&mConstants[def.physicalIndex], val,
-                   sizeof(uint) * std::min(count, def.elementSize * def.arraySize));
-        }
-
-        _markDirty();
+        _setNamedConstant(name, val, count);
+    }
+    //---------------------------------------------------------------------
+    void GpuSharedParameters::setNamedConstant(const String& name, const uint* val, uint32 count)
+    {
+        _setNamedConstant(name, val, count);
     }
     //---------------------------------------------------------------------
     void GpuSharedParameters::_markClean()
