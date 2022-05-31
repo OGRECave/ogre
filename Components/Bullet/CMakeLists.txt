@@ -1,7 +1,8 @@
-add_library(OgreBullet ${OGRE_COMP_LIB_TYPE}
-    include/OgreBullet.h
-    ${PROJECT_BINARY_DIR}/include/OgreBulletExports.h
-    src/OgreBullet.cpp)
+set(HEADER_FILES
+  include/OgreBullet.h
+  ${PROJECT_BINARY_DIR}/include/OgreBulletExports.h)
+
+add_library(OgreBullet ${OGRE_COMP_LIB_TYPE} ${HEADER_FILES} src/OgreBullet.cpp)
 target_link_libraries(OgreBullet ${BULLET_LIBRARIES} OgreMain)
 target_include_directories(OgreBullet PUBLIC
   "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
@@ -14,3 +15,5 @@ generate_export_header(OgreBullet
 
 ogre_config_framework(OgreBullet)
 ogre_config_component(OgreBullet)
+
+install(FILES ${HEADER_FILES} DESTINATION include/OGRE/Bullet)
