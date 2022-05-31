@@ -3930,9 +3930,12 @@ namespace Ogre{
                                     }
                                     else
                                     {
-                                        compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line,
+                                        compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
                                                            "incorrect boolean constant declaration");
                                     }
+
+                                    compiler->addError(ScriptCompiler::CE_DEPRECATEDSYMBOL, prop->file, prop->line,
+                                                       "bool. Use uint instead");
                                 }
                                 else
                                 {
@@ -4350,6 +4353,8 @@ namespace Ogre{
             }
             case BCT_BOOL:
             {
+                compiler->addError(ScriptCompiler::CE_DEPRECATEDSYMBOL, prop->file, prop->line,
+                                   "bool. Use uint instead");
                 std::vector<bool> tmp;
                 if(_getVector(arrayStart, arrayEnd, tmp, arraySz))
                 {
