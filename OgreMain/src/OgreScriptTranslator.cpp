@@ -3767,6 +3767,33 @@ namespace Ogre{
         return dimensions; 
     }
     //-------------------------------------------------------------------------
+    template <typename T, typename It>
+    static void safeSetConstant(const GpuProgramParametersPtr& params, const String& name, size_t index, It arrayStart,
+                                It arrayEnd, size_t count, PropertyAbstractNode* prop, ScriptCompiler* compiler)
+    {
+        int roundedCount = (count + 3) / 4; // integer ceil
+        roundedCount *= 4;
+
+        std::vector<T> vals;
+        if (!_getVector(arrayStart, arrayEnd, vals, roundedCount))
+        {
+            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+            return;
+        }
+
+        try
+        {
+            if (!name.empty())
+                params->setNamedConstant(name, vals.data(), count, 1);
+            else
+                params->setConstant(index, vals.data(), roundedCount / 4);
+        }
+        catch (Exception& e)
+        {
+            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line, e.getDescription());
+        }
+    }
+
     void GpuProgramTranslator::translateProgramParameters(ScriptCompiler *compiler, GpuProgramParametersSharedPtr params, ObjectAbstractNode *obj)
     {
         uint32 animParametricsCount = 0;
@@ -3863,108 +3890,28 @@ namespace Ogre{
                                     params->clearAutoConstant(index);
 
                                 count = parseProgramParameterDimensions(atom1->value, type);
-                                int roundedCount = (count + 3) / 4; // integer ceil
-                                roundedCount *= 4;
 
                                 if (type == BCT_FLOAT)
                                 {
-                                    std::vector<float> vals;
-                                    if (_getVector(k, prop->values.end(), vals, roundedCount))
-                                    {
-                                        try
-                                        {
-                                            if (named)
-                                                params->setNamedConstant(name, vals.data(), count, 1);
-                                            else
-                                                params->setConstant(index, vals.data(), roundedCount/4);
-                                        }
-                                        catch (Exception& e)
-                                        {
-                                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                                               e.getDescription());
-                                        }
-                                    }
-                                    else
-                                    {
-                                        compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line,
-                                                           "incorrect float constant declaration");
-                                    }
+                                    safeSetConstant<float>(params, name, index, k, prop->values.cend(), count, prop, compiler);
                                 }
                                 else if (type == BCT_UINT)
                                 {
-                                    std::vector<uint> vals;
-                                    if (_getVector(k, prop->values.end(), vals, roundedCount))
-                                    {
-                                        try
-                                        {
-                                            if (named)
-                                                params->setNamedConstant(name, vals.data(), count, 1);
-                                            else
-                                                params->setConstant(index, vals.data(), roundedCount/4);
-                                        }
-                                        catch (Exception& e)
-                                        {
-                                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                                               e.getDescription());
-                                        }
-                                    }
-                                    else
-                                    {
-                                        compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line,
-                                                           "incorrect unsigned integer constant declaration");
-                                    }
+                                    safeSetConstant<uint>(params, name, index, k, prop->values.cend(), count, prop, compiler);
                                 }
                                 else if (type == BCT_INT)
                                 {
-                                    std::vector<int> vals;
-                                    if (_getVector(k, prop->values.end(), vals, roundedCount))
-                                    {
-                                        try
-                                        {
-                                            if (named)
-                                                params->setNamedConstant(name, vals.data(), count, 1);
-                                            else
-                                                params->setConstant(index, vals.data(), roundedCount/4);
-                                        }
-                                        catch (Exception& e)
-                                        {
-                                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file,
-                                                                prop->line, e.getDescription());
-                                        }
-                                    }
-                                    else
-                                    {
-                                        compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line,
-                                                           "incorrect integer constant declaration");
-                                    }
+                                    safeSetConstant<int>(params, name, index, k, prop->values.cend(), count, prop, compiler);
                                 }
                                 else if (type == BCT_DOUBLE)
                                 {
-                                    std::vector<double> vals;
-                                    if (_getVector(k, prop->values.end(), vals, roundedCount))
-                                    {
-                                        try
-                                        {
-                                            if (named)
-                                                params->setNamedConstant(name, vals.data(), count, 1);
-                                            else
-                                                params->setConstant(index, vals.data(), roundedCount/4);
-                                        }
-                                        catch (Exception& e)
-                                        {
-                                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                                               e.getDescription());
-                                        }
-                                    }
-                                    else
-                                    {
-                                        compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line,
-                                                           "incorrect double constant declaration");
-                                    }
+                                    safeSetConstant<double>(params, name, index, k, prop->values.cend(), count, prop, compiler);
                                 }                                
                                 else if (type == BCT_BOOL)
                                 {
                                     std::vector<bool> tmp;
+                                    int roundedCount = (count + 3) / 4; // integer ceil
+                                    roundedCount *= 4;
                                     if (_getVector(k, prop->values.end(), tmp, roundedCount))
                                     {
                                         std::vector<uint> vals(tmp.begin(), tmp.end());
