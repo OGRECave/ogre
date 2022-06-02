@@ -440,9 +440,9 @@ Don’t expect to be able to throw any scene using any hardware at the stencil s
 
  <a name="Stencil-Optimisations-Performed-By-Ogre"></a><a name="Stencil-Optimisations-Performed-By-Ogre-1"></a>
 
-## Stencil Optimisations Performed By %Ogre
+## Stencil optimisations performed by Ogre
 
-Despite all that, stencil shadows can look very nice (especially with [Additive Light Masking](#Additive-Light-Masking)) and can be fast if you respect the rules above. In addition, Ogre comes pre-packed with a lot of optimisations which help to make this as quick as possible. This section is more for developers or people interested in knowing something about the ’under the hood’ behaviour of Ogre.
+Despite all that, stencil shadows can look very nice (especially with @ref Additive-Light-Masking) and can be fast if you respect the rules above. In addition, %Ogre comes pre-packed with a lot of optimisations which help to make this as quick as possible. This section is more for developers or people interested in knowing something about the ’under the hood’ behaviour of %Ogre.
 
 <dl compact="compact">
 <dt>Vertex program extrusion</dt> <dd>
