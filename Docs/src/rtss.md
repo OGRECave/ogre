@@ -122,7 +122,7 @@ This is used for parallax corrected rendering.</dd>
 
 Use metal roughness parametrisation for lighting computations.
 
-By default, metalness is read from `specular[0]` and roughness from `specular[1]`.
+By default, roughness is read from `specular[0]` and metalness from `specular[1]`.
 
 @par
 Format: `lighting_stage metal_roughness [texture <texturename>]`
@@ -130,7 +130,7 @@ Format: `lighting_stage metal_roughness [texture <texturename>]`
 Example: `lighting_stage metal_roughness texture Default_metalRoughness.jpg`
 
 @param texturename texture for spatially varying parametrization.
-[In accordance to the glTF2.0 specification](https://www.khronos.org/registry/glTF/specs/2.0/glTF-2.0.html#_material_pbrmetallicroughness_metallicroughnesstexture), metalness is sampled from the B channel and roughness from the G channel.
+[In accordance to the glTF2.0 specification](https://www.khronos.org/registry/glTF/specs/2.0/glTF-2.0.html#_material_pbrmetallicroughness_metallicroughnesstexture), roughness is sampled from the G channel and metalness from the B channel.
 
 @note Using this option switches the lighting equations from Blinn-Phong to the Cook-Torrance PBR model [using the equations described by Filament](https://google.github.io/filament/Filament.html#materialsystem/standardmodelsummary).
 
