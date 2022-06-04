@@ -11,10 +11,10 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Docker Image
-      run: docker build SDK -t pypi38
+      run: docker build SDK -t pypi
     - name: Build
       run: |
-        docker run --rm -v `pwd`:/workspace -w /workspace pypi38
+        docker run --rm -v `pwd`:/workspace -w /workspace -e PYVER=cp38-cp38 pypi
         f=`ls *.whl`
         mv $f ${f/linux/manylinux2014}
         pip3 install twine
