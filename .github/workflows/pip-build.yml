@@ -14,7 +14,7 @@ jobs:
       run: docker build SDK -t pypi
     - name: Build
       run: |
-        docker run --rm -v `pwd`:/workspace -w /workspace -e PYVER=cp38-cp38 pypi
+        docker run -e PYVER=cp310-cp310 --rm -v `pwd`:/workspace pypi
         f=`ls *.whl`
         mv $f ${f/linux/manylinux2014}
         pip3 install twine
@@ -26,25 +26,25 @@ jobs:
     - uses: ilammy/msvc-dev-cmd@v1
       with:
         toolset: 14.1
-    - uses: actions/setup-python@v2
+    - uses: actions/setup-python@v3
       with:
-        python-version: 3.8
+        python-version: '3.10'
     - name: Install Dependencies
       run: choco install swig -y # need swig 4+ for python 3.8
     - name: Build
       run: |
+        python -m pip install --upgrade pip==22.0.4
         pip install setuptools wheel twine
         pip wheel . --verbose
-        python -m twine upload --repository pypi *.whl
   macos:
     runs-on: macos-10.15
     steps:
     - name: Install Dependencies
       run: brew update && brew install swig
     - uses: actions/checkout@v2
-    - uses: actions/setup-python@v2
+    - uses: actions/setup-python@v3
       with:
-        python-version: 3.8
+        python-version: '3.10'
     - name: Build
       run: |
         pip install setuptools wheel twine
