@@ -728,6 +728,8 @@ SHARED_PTR(Material);
   }
 }
 %include "OgreMovableObject.h"
+    %feature("flatnested") Ogre::BillboardChain::Element;
+    %rename(BillboardChain_Element) Ogre::BillboardChain::Element;
     %include "OgreBillboardChain.h"
         %ignore Ogre::RibbonTrail::getNodeIterator;
         %include "OgreRibbonTrail.h"
