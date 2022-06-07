@@ -214,6 +214,13 @@ namespace Ogre {
         mDynamic = dyn;
         mBuffersNeedRecreating = mIndexContentDirty = mVertexContentDirty = true;
     }
+    void BillboardChain::setAutoUpdate(bool autoUpdate)
+    {
+        mAutoUpdate = autoUpdate;
+        OGRE_IGNORE_DEPRECATED_BEGIN
+        setDynamic(autoUpdate);
+        OGRE_IGNORE_DEPRECATED_END
+    }
     //-----------------------------------------------------------------------
     void BillboardChain::addChainElement(size_t chainIndex,
         const BillboardChain::Element& dtls)
@@ -428,7 +435,7 @@ namespace Ogre {
     {
         setupBuffers();
 
-        if (!mVertexContentDirty && false) // TODO: mAutoUpdate flag like BillboardSet
+        if (!mVertexContentDirty && !mAutoUpdate)
             return;
 
         HardwareVertexBufferSharedPtr pBuffer =

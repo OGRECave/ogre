@@ -183,15 +183,20 @@ namespace Ogre {
         */
         virtual bool getUseVertexColours(void) const { return mUseVertexColour; }
 
-        /** Sets whether or not the buffers created for this object are suitable
-            for dynamic alteration.
-        */
-        virtual void setDynamic(bool dyn);
+        /// @deprecated do not use
+        OGRE_DEPRECATED void setDynamic(bool dyn);
 
-        /** Gets whether or not the buffers created for this object are suitable
-            for dynamic alteration.
+        /// @deprecated do not use
+        OGRE_DEPRECATED bool getDynamic(void) const { return mDynamic; }
+
+        /** Set the auto update state
+
+            @copydetails BillboardSet::setAutoUpdate
         */
-        virtual bool getDynamic(void) const { return mDynamic; }
+        void setAutoUpdate(bool autoUpdate);
+
+        /** Return the auto update state */
+        bool getAutoUpdate(void) const { return mAutoUpdate; }
         
         /** Add an element to the 'head' of a chain.
 
@@ -281,8 +286,10 @@ namespace Ogre {
         bool mUseTexCoords;
         /// Use vertex colour?
         bool mUseVertexColour;
-        /// Dynamic use?
+        /// @deprecated
         bool mDynamic;
+        /// Tell if vertex buffer should be update automatically.
+        bool mAutoUpdate;
         /// Vertex data
         std::unique_ptr<VertexData> mVertexData;
         /// Index data (to allow multiple unconnected chains)
