@@ -782,7 +782,7 @@ namespace Ogre {
         uint32 getTypeFlags(void) const;
 
         /** Set the auto update state of this billboard set.
-        @remarks
+
             This methods controls the updating policy of the vertex buffer.
             By default auto update is true so the vertex buffer is being update every time this billboard set
             is about to be rendered. This behavior best fit when the billboards of this set changes frequently.
