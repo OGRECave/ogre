@@ -3,6 +3,7 @@
 
 #include "SdkSample.h"
 #include "OgreBillboardChain.h"
+#include "OgreBillboardSet.h"
 #include <iostream>
 
 using namespace Ogre;
@@ -48,6 +49,14 @@ protected:
         chain->addChainElement(0, e);
         e.position = Vector3(1.0, 1.0, 1.0);
         chain->addChainElement(0, e);
+
+        auto set = mSceneMgr->createBillboardSet("set");
+        set->setMaterialName(mat->getName(), mat->getGroup());
+        mSceneMgr->getRootSceneNode()->attachObject(set);
+        set->setDefaultWidth(0.1);
+        set->setDefaultHeight(0.1);
+        set->createBillboard (-1, 0, 0, ColourValue::Green);
+        set->createBillboard (1, 0, 0, ColourValue::Blue);
 
         // use an orbit style camera
         mCameraMan->setStyle(CS_ORBIT);
