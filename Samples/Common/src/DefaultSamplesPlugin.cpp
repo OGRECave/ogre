@@ -31,6 +31,7 @@
 
 #include "AtomicCounters.h"
 #include "BezierPatch.h"
+#include "BillboardChain.h"
 #include "BSP.h"
 #ifdef OGRE_BUILD_COMPONENT_BULLET
 #include "Bullet.h"
@@ -100,6 +101,7 @@ DefaultSamplesPlugin::DefaultSamplesPlugin() : SamplePlugin("DefaultSamplesPlugi
 {
     addSample(new Sample_AtomicCounters);
     addSample(new Sample_BezierPatch);
+    addSample(new Sample_BillboardChain);
 #ifdef OGRE_BUILD_COMPONENT_BULLET
     addSample(new Sample_Bullet);
 #endif
