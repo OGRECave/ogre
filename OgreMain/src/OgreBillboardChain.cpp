@@ -430,11 +430,8 @@ namespace Ogre {
     void BillboardChain::updateVertexBuffer(Camera* cam)
     {
         setupBuffers();
-        
-        // The contents of the vertex buffer are correct if they are not dirty
-        // and the camera used to build the vertex buffer is still the current 
-        // camera.
-        if (!mVertexContentDirty && mVertexCameraUsed == cam)
+
+        if (!mVertexContentDirty && false) // TODO: mAutoUpdate flag like BillboardSet
             return;
 
         HardwareVertexBufferSharedPtr pBuffer =
