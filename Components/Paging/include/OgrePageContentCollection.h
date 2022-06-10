@@ -44,7 +44,7 @@ namespace Ogre
 
 
     /** Definition of the interface for a collection of PageContent instances. 
-    @remarks
+
         This class acts as a grouping level for PageContent instances. Rather than 
         PageContent instances being held in a list directly under Page, which might 
         be the most obvious solution, this intermediate class is here to allow

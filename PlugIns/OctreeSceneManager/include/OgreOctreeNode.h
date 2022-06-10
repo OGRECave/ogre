@@ -102,13 +102,13 @@ public:
         VisibleObjectsBoundsInfo* visibleBounds);
 
     /** Sets up the LegacyRenderOperation for rendering this scene node as geometry.
-    @remarks
+
     This will render the scenenode as a bounding box.
     */
     virtual void getRenderOperation( RenderOperation& op );
 
     /** Returns the local bounding box of this OctreeNode.
-    @remarks
+
     This is used to render the bounding box, rather then the global.
     */
     AxisAlignedBox & _getLocalAABB()
@@ -122,7 +122,7 @@ public:
 protected:
 
     /** Internal method for updating the bounds for this OctreeNode.
-    @remarks
+
     This method determines the bounds solely from the attached objects, not
     any children. If the node has changed its bounds, it is removed from its
     current octree, and reinserted into the tree.

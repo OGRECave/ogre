@@ -45,7 +45,7 @@ namespace Ogre {
 
     /** This class contains the information required to describe the edge connectivity of a
         given set of vertices and indexes. 
-    @remarks 
+
         This information is built using the EdgeListBuilder class. Note that for a given mesh,
         which can be made up of multiple submeshes, there are separate edge lists for when 
     */
@@ -134,7 +134,7 @@ namespace Ogre {
 
 
         /** Calculate the light facing state of the triangles in this edge list
-        @remarks
+
             This is normally the first stage of calculating a silhouette, i.e.
             establishing which tris are facing the light and which are facing
             away. This state is stored in the 'triangleLightFacings'.
@@ -159,7 +159,7 @@ namespace Ogre {
     };
 
     /** General utility class for building edge lists for geometry.
-    @remarks
+
         You can add multiple sets of vertex and index data to build and edge list. 
         Edges will be built between the various sets as well as within sets; this allows 
         you to use a model which is built from multiple SubMeshes each using 
@@ -173,13 +173,13 @@ namespace Ogre {
 
         EdgeListBuilder();
         /** Add a set of vertex geometry data to the edge builder. 
-        @remarks
+
             You must add at least one set of vertex data to the builder before invoking the
             build method.
         */
         void addVertexData(const VertexData* vertexData);
         /** Add a set of index geometry data to the edge builder. 
-        @remarks
+
             You must add at least one set of index data to the builder before invoking the
             build method.
         @param indexData The index information which describes the triangles.
@@ -192,7 +192,7 @@ namespace Ogre {
             RenderOperation::OperationType opType = RenderOperation::OT_TRIANGLE_LIST);
 
         /** Builds the edge information based on the information built up so far.
-        @remarks
+
             The caller takes responsibility for deleting the returned structure.
         */
         EdgeData* build(void);

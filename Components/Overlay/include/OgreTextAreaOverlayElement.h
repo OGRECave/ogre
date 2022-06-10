@@ -84,7 +84,7 @@ namespace Ogre
         void getRenderOperation(RenderOperation& op) override;
 
         /** Sets the colour of the text. 
-        @remarks
+
             This method establishes a constant colour for 
             the entire text. Also see setColourBottom and 
             setColourTop which allow you to set a colour gradient.
@@ -94,7 +94,7 @@ namespace Ogre
         /** Gets the colour of the text. */
         const ColourValue& getColour(void) const;
         /** Sets the colour of the bottom of the letters.
-        @remarks
+
             By setting a separate top and bottom colour, you
             can create a text area which has a graduated colour
             effect to it.
@@ -103,7 +103,7 @@ namespace Ogre
         /** Gets the colour of the bottom of the letters. */
         const ColourValue& getColourBottom(void) const;
         /** Sets the colour of the top of the letters.
-        @remarks
+
             By setting a separate top and bottom colour, you
             can create a text area which has a graduated colour
             effect to it.

@@ -48,7 +48,7 @@ namespace Ogre {
     };
 
     /** List of valid texture blending operations, for use with TextureUnitState::setColourOperation.
-        @remarks
+
             This list is a more limited list than LayerBlendOperationEx because it only
             includes operations that are supportable in both multipass and multitexture
             rendering and thus provides automatic fallback if multitexture hardware
@@ -123,7 +123,7 @@ namespace Ogre {
         LBS_MANUAL
     };
     /** Class which manages blending of both colour and alpha components.
-        @remarks
+
             This class is a utility class used by both TextureUnitState and
             RenderSystem to wrap up the details of a blending operation. This blending
             operation could be used for blending colour or alpha in a texture layer.

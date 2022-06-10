@@ -45,7 +45,7 @@ namespace Ogre {
     *  @{
     */
     /** Class for loading & managing textures.
-        @remarks
+
             Note that this class is abstract - the particular
             RenderSystem that is in use at the time will create
             a concrete subclass of this. Note that the concrete
@@ -314,7 +314,7 @@ namespace Ogre {
 
         /** Returns whether this render system can natively support the precise texture 
             format requested with the given usage options.
-        @remarks
+
             You can still create textures with this format even if this method returns
             false; the texture format will just be altered to one which the device does
             support.
@@ -343,7 +343,7 @@ namespace Ogre {
 
         /** Returns whether this render system has hardware filtering supported for the
             texture format requested with the given usage options.
-        @remarks
+
             Not all texture format are supports filtering by the hardware, i.e. some
             cards support floating point format, but it doesn't supports filtering on
             the floating point texture at all, or only a subset floating point formats

@@ -44,7 +44,7 @@ namespace Ogre
 
     /** Represents a section of the PagedWorld which uses a given PageStrategy, and
         which is made up of a generally localised set of Page instances.
-    @remarks
+
         The reason for PagedWorldSection is that you may wish to cater for multiple
         sections of your world which use a different approach to paging (ie a
         different PageStrategy), or which are significantly far apart or separate 
@@ -100,27 +100,27 @@ namespace Ogre
         /// Get the page strategy which this section is using
         virtual PageStrategy* getStrategy() const { return mStrategy; }
         /** Change the page strategy.
-        @remarks
+
             Doing this will invalidate any pages attached to this world section, and
             require the PageStrategyData to be repopulated.
         */
         virtual void setStrategy(PageStrategy* strat);
         /** Change the page strategy.
-        @remarks
+
             Doing this will invalidate any pages attached to this world section, and
             require the PageStrategyData to be repopulated.
         */
         virtual void setStrategy(const String& stratName);
 
         /** Change the SceneManager.
-        @remarks
+
         Doing this will invalidate any pages attached to this world section, and
         require the pages to be reloaded.
         */
         virtual void setSceneManager(SceneManager* sm);
         
         /** Change the SceneManager.
-        @remarks
+
         Doing this will invalidate any pages attached to this world section, and
         require the pages to be reloaded.
         @param smName The instance name of the SceneManager
@@ -154,7 +154,7 @@ namespace Ogre
 
         /** Load or create a page against this section covering the given world 
             space position. 
-        @remarks
+
             This method is designed mainly for editors - it will try to load
             an existing page if there is one, otherwise it will create a new one
             synchronously.
@@ -166,7 +166,7 @@ namespace Ogre
 
 
         /** Ask for a page to be loaded with the given (section-relative) PageID
-        @remarks
+
             You would not normally call this manually, the PageStrategy is in 
             charge of it usually.
             If this page is already loaded, this request will not load it again.
@@ -178,7 +178,7 @@ namespace Ogre
         virtual void loadPage(PageID pageID, bool forceSynchronous = false);
 
         /** Ask for a page to be unloaded with the given (section-relative) PageID
-        @remarks
+
             You would not normally call this manually, the PageStrategy is in 
             charge of it usually.
         @param pageID The page ID to unload
@@ -186,7 +186,7 @@ namespace Ogre
         */
         virtual void unloadPage(PageID pageID, bool forceSynchronous = false);
         /** Ask for a page to be unloaded with the given (section-relative) PageID
-        @remarks
+
         You would not normally call this manually, the PageStrategy is in 
         charge of it usually.
         @param p The Page to unload
@@ -194,7 +194,7 @@ namespace Ogre
         */
         virtual void unloadPage(Page* p, bool forceSynchronous = false);
         /** Give a section the opportunity to prepare page content procedurally. 
-        @remarks
+
         You should not call this method directly. This call may well happen in 
         a separate thread so it should not access GPU resources, use _loadProceduralPage
         for that
@@ -202,7 +202,7 @@ namespace Ogre
         */
         virtual bool _prepareProceduralPage(Page* page);
         /** Give a section the opportunity to prepare page content procedurally. 
-        @remarks
+
         You should not call this method directly. This call will happen in 
         the main render thread so it can access GPU resources. Use _prepareProceduralPage
         for background preparation.
@@ -210,7 +210,7 @@ namespace Ogre
         */
         virtual bool _loadProceduralPage(Page* page);
         /** Give a section  the opportunity to unload page content procedurally. 
-        @remarks
+
         You should not call this method directly. This call will happen in 
         the main render thread so it can access GPU resources. Use _unprepareProceduralPage
         for background preparation.
@@ -218,7 +218,7 @@ namespace Ogre
         */
         virtual bool _unloadProceduralPage(Page* page);
         /** Give a section  the opportunity to unprepare page content procedurally. 
-        @remarks
+
         You should not call this method directly. This call may well happen in 
         a separate thread so it should not access GPU resources, use _unloadProceduralPage
         for that
@@ -227,7 +227,7 @@ namespace Ogre
         virtual bool _unprepareProceduralPage(Page* page);
 
         /** Ask for a page to be kept in memory if it's loaded.
-        @remarks
+
             This method indicates that a page should be retained if it's already
             in memory, but if it's not then it won't trigger a load. This is useful
             for retaining pages that have just gone out of range, but which you
@@ -242,20 +242,20 @@ namespace Ogre
         virtual void holdPage(PageID pageID);
 
         /** Retrieves a Page.
-        @remarks
+
             This method will only return Page instances that are already loaded. It
             will return null if a page is not loaded. 
         */
         virtual Page* getPage(PageID pageID);
 
         /** Remove all pages immediately. 
-        @remarks
+
             Effectively 'resets' this section by deleting all pages. 
         */
         virtual void removeAllPages();
 
         /** Set the PageProvider which can provide streams Pages in this section. 
-        @remarks
+
             This is the top-level way that you can direct how Page data is loaded. 
             When data for a Page is requested for a PagedWorldSection, the following
             sequence of classes will be checked to see if they have a provider willing
@@ -272,7 +272,7 @@ namespace Ogre
 
         /** Get a serialiser set up to read Page data for the given PageID. 
         @param pageID The ID of the page being requested
-        @remarks
+
         The StreamSerialiser returned is the responsibility of the caller to
         delete. 
         */
@@ -280,7 +280,7 @@ namespace Ogre
 
         /** Get a serialiser set up to write Page data for the given PageID. 
         @param pageID The ID of the page being requested
-        @remarks
+
         The StreamSerialiser returned is the responsibility of the caller to
         delete. 
         */

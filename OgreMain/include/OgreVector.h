@@ -87,7 +87,7 @@ namespace Ogre
         }
 
         /** Generates a vector perpendicular to this vector (eg an 'up' vector).
-            @remarks
+
                 This method will return a vector which is perpendicular to this
                 vector. There are an infinite number of possibilities but this
                 method will guarantee to generate one of them. If you need more
@@ -97,7 +97,7 @@ namespace Ogre
 
         /** Generates a new random vector which deviates from this vector by a
             given angle in a random direction.
-            @remarks
+
                 This method assumes that the random number generator has already
                 been seeded appropriately.
             @param angle
@@ -110,7 +110,7 @@ namespace Ogre
         Vector2 randomDeviant(Radian angle) const;
 
         /**  Gets the oriented angle between 2 vectors.
-        @remarks
+
             Vectors do not have to be unit-length but must represent directions.
             The angle is comprised between 0 and 2 PI.
         */
@@ -135,7 +135,7 @@ namespace Ogre
 
         /** Calculates the cross-product of 2 vectors, i.e. the vector that
             lies perpendicular to them both.
-            @remarks
+
                 The cross-product is normally used to calculate the normal
                 vector of a plane, by calculating the cross-product of 2
                 non-equivalent vectors which lie on the plane (e.g. 2 edges
@@ -164,7 +164,7 @@ namespace Ogre
         Vector3 crossProduct( const Vector3& rkVector ) const;
 
         /** Generates a vector perpendicular to this vector (eg an 'up' vector).
-            @remarks
+
                 This method will return a vector which is perpendicular to this
                 vector. There are an infinite number of possibilities but this
                 method will guarantee to generate one of them. If you need more
@@ -182,7 +182,7 @@ namespace Ogre
         }
 
         /** Calculates the absolute dot (scalar) product of this vector with another.
-            @remarks
+
                 This function work similar dotProduct, except it use absolute value
                 of each component of the vector to computing.
             @param
@@ -203,7 +203,7 @@ namespace Ogre
 
         /** Generates a new random vector which deviates from this vector by a
             given angle in a random direction.
-            @remarks
+
                 This method assumes that the random number generator has already
                 been seeded appropriately.
             @param
@@ -224,7 +224,7 @@ namespace Ogre
 
         /** Gets the shortest arc quaternion to rotate this vector to the destination
             vector.
-        @remarks
+
             If you call this with a dest vector that is close to the inverse
             of this vector, we will rotate 180 degrees around the 'fallbackAxis'
             (if specified, or a generated axis if not) since in this case
@@ -407,7 +407,7 @@ namespace Ogre
 
         /** Sets this vector's components to the minimum of its own and the
             ones of the passed in vector.
-            @remarks
+
                 'Minimum' in this case means the combination of the lowest
                 value of x, y and z from both vectors. Lowest is taken just
                 numerically, not magnitude, so -1 < 0.
@@ -421,7 +421,7 @@ namespace Ogre
 
         /** Sets this vector's components to the maximum of its own and the
             ones of the passed in vector.
-            @remarks
+
                 'Maximum' in this case means the combination of the highest
                 value of x, y and z from both vectors. Highest is taken just
                 numerically, not magnitude, so 1 > -3.
@@ -434,7 +434,7 @@ namespace Ogre
         }
 
         /** Calculates the dot (scalar) product of this vector with another.
-            @remarks
+
                 The dot product can be used to calculate the angle between 2
                 vectors. If both are unit vectors, the dot product is the
                 cosine of the angle; otherwise the dot product must be
@@ -456,7 +456,7 @@ namespace Ogre
         }
 
         /** Returns the square of the length(magnitude) of the vector.
-            @remarks
+
                 This  method is for efficiency - calculating the actual
                 length of a vector requires a square root, which is expensive
                 in terms of the operations required. This method returns the
@@ -495,7 +495,7 @@ namespace Ogre
         }
 
         /** Returns the square of the distance to another vector.
-            @remarks
+
                 This method is for efficiency - calculating the actual
                 distance to another vector requires a square root, which is
                 expensive in terms of the operations required. This method
@@ -510,7 +510,7 @@ namespace Ogre
         }
 
         /** Normalises the vector.
-            @remarks
+
                 This method normalises the vector such that it's
                 length / magnitude is 1. The result is called a unit vector.
             @note
@@ -554,7 +554,7 @@ namespace Ogre
         }
 
         /** Gets the angle between 2 vectors.
-        @remarks
+
             Vectors do not have to be unit-length but must represent directions.
         */
         Radian angleBetween(const Vector& dest) const

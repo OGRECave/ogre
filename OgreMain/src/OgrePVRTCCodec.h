@@ -39,7 +39,7 @@ namespace Ogre {
 	*/
 
     /** Codec specialized in loading PVRTC (PowerVR) images.
-	@remarks
+
 		We implement our own codec here since we need to be able to keep PVRTC
 		data compressed if the card supports it.
     */

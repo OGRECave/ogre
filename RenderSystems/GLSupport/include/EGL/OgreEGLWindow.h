@@ -74,7 +74,7 @@ namespace Ogre {
             void setVSyncEnabled(bool vsync);
 
             /**
-               @remarks
+
                * Get custom attribute; the following attributes are valid:
                * WINDOW         The X NativeWindowType target for rendering.
                * GLCONTEXT      The Ogre GLContext used for rendering.

@@ -36,7 +36,7 @@ THE SOFTWARE.
 namespace Ogre {
 
     /** Class for serializing a Mesh to/from XML.
-    @remarks
+
         This class behaves the same way as MeshSerializer in the main project,
         but is here to allow conversions to / from XML. This class is 
         deliberately not included in the main project because <UL>

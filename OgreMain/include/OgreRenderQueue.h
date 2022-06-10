@@ -45,7 +45,7 @@ namespace Ogre {
     */
     /** Enumeration of queue groups, by which the application may group queued renderables
         so that they are rendered together with events in between
-    @remarks
+
         When passed into methods these are actually passed as a uint8 to allow you
         to use values in between if you want to.
     */
@@ -80,7 +80,7 @@ namespace Ogre {
     #define OGRE_RENDERABLE_DEFAULT_PRIORITY  Ogre::Renderable::DEFAULT_PRIORITY
 
     /** Class to manage the scene object rendering queue.
-        @remarks
+
             Objects are grouped by material to minimise rendering state changes. The map from
             material to renderable object is wrapped in a class for ease of use.
         @par
@@ -97,7 +97,7 @@ namespace Ogre {
         typedef std::unique_ptr<RenderQueueGroup> RenderQueueGroupMap[RENDER_QUEUE_COUNT];
 
         /** Class to listen in on items being added to the render queue. 
-        @remarks
+
             Use RenderQueue::setRenderableListener to get callbacks when an item
             is added to the render queue.
         */
@@ -108,7 +108,7 @@ namespace Ogre {
             virtual ~RenderableListener() {}
 
             /** Method called when a Renderable is added to the queue.
-            @remarks
+
                 You can use this event hook to alter the Technique used to
                 render a Renderable as the item is added to the queue. This is
                 a low-level way to override the material settings for a given
@@ -152,14 +152,14 @@ namespace Ogre {
         void clear(bool destroyPassMaps = false);
 
         /** Get a render queue group.
-        @remarks
+
             OGRE registers new queue groups as they are requested, 
             therefore this method will always return a valid group.
         */
         RenderQueueGroup* getQueueGroup(uint8 qid);
 
         /** Add a renderable object to the queue.
-        @remarks
+
             This methods adds a Renderable to the queue, which will be rendered later by 
             the SceneManager. This is the advanced version of the call which allows the renderable
             to be added to any queue.
@@ -183,7 +183,7 @@ namespace Ogre {
         void addRenderable(Renderable* pRend, uint8 groupID, ushort priority);
 
         /** Add a renderable object to the queue.
-        @remarks
+
             This methods adds a Renderable to the queue, which will be rendered later by 
             the SceneManager. This is the simplified version of the call which does not 
             require a priority to be specified. The queue priority is take from the
@@ -202,7 +202,7 @@ namespace Ogre {
         void addRenderable(Renderable* pRend, uint8 groupId);
 
         /** Add a renderable object to the queue.
-        @remarks
+
             This methods adds a Renderable to the queue, which will be rendered later by 
             the SceneManager. This is the simplified version of the call which does not 
             require a queue or priority to be specified. The queue group is taken from the
@@ -275,7 +275,7 @@ namespace Ogre {
         bool getShadowCastersCannotBeReceivers(void) const;
 
         /** Set a renderable listener on the queue.
-        @remarks
+
             There can only be a single renderable listener on the queue, since
             that listener has complete control over the techniques in use.
         */

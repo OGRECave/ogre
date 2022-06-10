@@ -91,14 +91,14 @@ namespace Ogre {
         uint32 getVisibilityMask();
 
         /** Set the material scheme used by this target pass.
-        @remarks
+
             Only applicable to targets that render the scene as
             one of their passes.
             @see Technique::setScheme.
         */
         void setMaterialScheme(const String& schemeName);
         /** Get the material scheme used by this target pass.
-        @remarks
+
             Only applicable to targets that render the scene as
             one of their passes.
             @see Technique::setScheme.
@@ -106,13 +106,13 @@ namespace Ogre {
         const String& getMaterialScheme(void) const;
         
         /** Set whether shadows are enabled in this target pass.
-        @remarks
+
             Only applicable to targets that render the scene as
             one of their passes.
         */
         void setShadowsEnabled(bool enabled);
         /** Get whether shadows are enabled in this target pass.
-        @remarks
+
             Only applicable to targets that render the scene as
             one of their passes.
         */

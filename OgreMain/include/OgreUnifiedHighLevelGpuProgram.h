@@ -44,7 +44,7 @@ namespace Ogre {
     /** Specialisation of HighLevelGpuProgram which just delegates its implementation
         to one other GpuProgram, allowing a single program definition
         to represent one supported program from a number of options
-    @remarks
+
         Whilst you can use Technique to implement several ways to render an object
         depending on hardware support, if the only reason to need multiple paths is
         because of the shader language supported, this can be
@@ -82,7 +82,7 @@ namespace Ogre {
         virtual size_t calculateSize(void) const;
 
         /** Adds a new delegate program to the list.
-        @remarks
+
             Delegates are tested in order so earlier ones are preferred.
         */
         void addDelegateProgram(const String& name);
@@ -97,7 +97,7 @@ namespace Ogre {
         const String& getLanguage(void) const;
 
         /** Creates a new parameters object compatible with this program definition. 
-        @remarks
+
         Unlike low-level assembly programs, parameters objects are specific to the
         program and therefore must be created from it rather than by the 
         HighLevelGpuProgramManager. This method creates a new instance of a parameters

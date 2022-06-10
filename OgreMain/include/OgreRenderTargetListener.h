@@ -57,7 +57,7 @@ namespace Ogre {
 
     /** A interface class defining a listener which can be used to receive
         notifications of RenderTarget events.
-        @remarks
+
             A 'listener' is an interface designed to be called back when
             particular events are called. This class defines the
             interface relating to RenderTarget events. In order to receive
@@ -87,7 +87,7 @@ namespace Ogre {
     public:
         virtual ~RenderTargetListener() {}
         /** Called just before a RenderTarget is about to be rendered into.
-        @remarks
+
             This event is raised just before any of the viewports on the target
             are rendered to. You can perform manual rendering operations here if
             you want, but please note that if the Viewport objects attached to this
@@ -101,7 +101,7 @@ namespace Ogre {
         { (void)evt; }
 
         /** Called just after a RenderTarget has been rendered to.
-        @remarks
+
             This event is called just after all the viewports attached to the target
             in question have been rendered to. You can perform your own manual rendering
             commands in this event handler if you like, these will be composited with
@@ -112,7 +112,7 @@ namespace Ogre {
         { (void)evt; }
 
         /** Called just before a Viewport on a RenderTarget is to be updated.
-        @remarks
+
             This method is called before each viewport on the RenderTarget is
             rendered to. You can use this to perform per-viewport settings changes,
             such as showing / hiding particular overlays.
@@ -121,7 +121,7 @@ namespace Ogre {
         { (void)evt; }
 
         /** Called just after a Viewport on a RenderTarget is to be updated.
-        @remarks
+
             This method is called after each viewport on the RenderTarget is
             rendered to. 
         */

@@ -133,7 +133,7 @@ namespace Ogre {
 
 #if defined(__OGRE_SIMD_ALIGN_STACK)
     /** Stack-align implementation of OptimisedUtil.
-    @remarks
+
         User code compiled by icc and gcc might not align stack
         properly, we need ensure stack align to a 16-bytes boundary
         when execute SSE function.

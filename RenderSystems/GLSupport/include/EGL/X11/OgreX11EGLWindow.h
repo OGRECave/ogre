@@ -57,7 +57,7 @@ namespace Ogre {
            virtual  ~X11EGLWindow();
 
             /**
-            @remarks
+
             * Get custom attribute; the following attributes are valid:
             * XDISPLAY        The X Display connection behind that context.
             * XWINDOW        The X NativeWindowType connection behind that context.

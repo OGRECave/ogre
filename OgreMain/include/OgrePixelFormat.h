@@ -466,7 +466,7 @@ namespace Ogre {
         /** Returns the size in bytes of an element of the given pixel format.
          @return
                The size in bytes of an element. See Remarks.
-         @remarks
+
                Passing PF_UNKNOWN will result in returning a size of 0 bytes.
         */
         static size_t getNumElemBytes( PixelFormat format );
@@ -474,7 +474,7 @@ namespace Ogre {
         /** Returns the size in bits of an element of the given pixel format.
           @return
                The size in bits of an element. See Remarks.
-           @remarks
+
                Passing PF_UNKNOWN will result in returning a size of 0 bits.
         */
         static size_t getNumElemBits( PixelFormat format );
@@ -491,7 +491,7 @@ namespace Ogre {
                 The format of the area
             @return
                 The size in bytes
-            @remarks
+
                 In case that the format is non-compressed, this simply returns
                 width * height * depth * PixelUtil::getNumElemBytes(format). In the compressed
                 case, this does serious magic.
@@ -502,7 +502,7 @@ namespace Ogre {
           @return
                A bitfield combination of PFF_HASALPHA, PFF_ISCOMPRESSED,
                PFF_FLOAT, PFF_DEPTH, PFF_NATIVEENDIAN, PFF_LUMINANCE
-          @remarks
+
                This replaces the separate functions for formatHasAlpha, formatIsFloat, ...
         */
         static unsigned int getFlags( PixelFormat format );

@@ -40,7 +40,7 @@ typedef unsigned int uint;
 
 
 /** Compiler2Pass is a generic compiler/assembler
-@remarks
+
     provides a tokenizer in pass 1 and relies on the subclass to provide the virtual method for pass 2
 
     PASS 1 - tokenize source: this is a simple brute force lexical scanner/analyzer that also parses
@@ -190,7 +190,7 @@ protected:
 
 
     /** process input source text using rulepath to determine allowed tokens
-    @remarks
+
         the method is reentrant and recursive
         if a non-terminal token is encountered in the current rule path then the method is
         called using the new rule path referenced by the non-terminal token

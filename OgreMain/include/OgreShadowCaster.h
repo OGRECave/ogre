@@ -43,7 +43,7 @@ namespace Ogre {
     *  @{
     */
     /** Class which represents the renderable aspects of a set of shadow volume faces. 
-    @remarks
+
         Note that for casters comprised of more than one set of vertex buffers (e.g. SubMeshes each
         using their own geometry), it will take more than one ShadowRenderable to render the 
         shadow volume. Therefore for shadow caster geometry, it is best to stick to one set of
@@ -79,7 +79,7 @@ namespace Ogre {
         Real getSquaredViewDepth(const Camera*) const override { return 0; /* not used */}
         const LightList& getLights(void) const override;
         /** Does this renderable require a separate light cap?
-        @remarks
+
             If possible, the light cap (when required) should be contained in the
             usual geometry of the shadow renderable. However, if for some reason
             the normal depth function (less than) could cause artefacts, then a
@@ -146,7 +146,7 @@ namespace Ogre {
         typedef VectorIterator<ShadowRenderableList> ShadowRenderableListIterator;
 
         /** Gets an list of the renderables required to render the shadow volume.
-        @remarks
+
             Shadowable geometry should ideally be designed such that there is only one
             ShadowRenderable required to render the the shadow; however this is not a necessary
             limitation and it can be exceeded if required.
@@ -173,7 +173,7 @@ namespace Ogre {
         static void clearShadowRenderableList(ShadowRenderableList& shadowRenderables);
 
         /** Utility method for extruding vertices based on a light. 
-        @remarks
+
             Unfortunately, because D3D cannot handle homogeneous (4D) position
             coordinates in the fixed-function pipeline (GL can, but we have to
             be cross-API), when we extrude in software we cannot extrude to 

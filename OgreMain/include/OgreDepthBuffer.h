@@ -69,7 +69,7 @@ namespace Ogre
                 same resolution. When it's set, it can be shared with RTTs as long as they have a
                 resolution less or equal than the depth buffer's.
 
-        @remarks
+
             Design discussion http://www.ogre3d.org/forums/viewtopic.php?f=4&t=53534&p=365582
      */
     class _OgreExport DepthBuffer : public RenderSysAlloc
@@ -101,7 +101,7 @@ namespace Ogre
 
         /** Returns whether the specified RenderTarget is compatible with this DepthBuffer
             That is, this DepthBuffer can be attached to that RenderTarget
-            @remarks
+
                 Most APIs impose the following restrictions:
                 Width & height must be equal or higher than the render target's
                 They must be of the same bit depth.
@@ -111,7 +111,7 @@ namespace Ogre
         virtual bool isCompatible( RenderTarget *renderTarget ) const;
 
         /** Called when a RenderTarget is attaches this DepthBuffer
-            @remarks
+
                 This function doesn't actually attach. It merely informs the DepthBuffer
                 which RenderTarget did attach. The real attachment happens in
                 RenderTarget::attachDepthBuffer()
@@ -120,7 +120,7 @@ namespace Ogre
         virtual void _notifyRenderTargetAttached( RenderTarget *renderTarget );
 
         /** Called when a RenderTarget is detaches from this DepthBuffer
-            @remarks
+
                 Same as DepthBuffer::_notifyRenderTargetAttached()
             @param renderTarget The RenderTarget that has just been detached
         */

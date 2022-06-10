@@ -144,7 +144,7 @@ namespace Ogre {
         IDirect3DCubeTexture9 *getCubeTexture();
 
         /** Indicates whether the hardware gamma is actually enabled and supported. 
-        @remarks
+
             Because hardware gamma might not actually be supported, we need to 
             ignore it sometimes. Because D3D doesn't encode sRGB in the format but
             as a sampler state, and we don't want to change the original requested

@@ -33,7 +33,7 @@ THE SOFTWARE.
 namespace Ogre {
 
     /** Default pass hash function.
-    @remarks
+
         Tries to minimise the number of texture changes.
     */
     struct MinTextureStateChangeHashFunc : public Pass::HashFunc
@@ -56,7 +56,7 @@ namespace Ogre {
     };
     MinTextureStateChangeHashFunc sMinTextureStateChangeHashFunc;
     /** Alternate pass hash function.
-    @remarks
+
         Tries to minimise the number of GPU program changes.
     */
     struct MinGpuProgramChangeHashFunc : public Pass::HashFunc

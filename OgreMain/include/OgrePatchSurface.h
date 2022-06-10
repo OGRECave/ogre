@@ -44,7 +44,7 @@ namespace Ogre {
     *  @{
     */
     /** A surface which is defined by curves of some kind to form a patch, e.g. a Bezier patch.
-        @remarks
+
             This object will take a list of control points with various assorted data, and will
             subdivide it into a patch mesh. Currently only Bezier curves are supported for defining
             the surface, but other techniques such as NURBS would follow the same basic approach.
@@ -76,7 +76,7 @@ namespace Ogre {
             VS_BOTH
         };
         /** Sets up the surface by defining it's control points, type and initial subdivision level.
-            @remarks
+
                 This method initialises the surface by passing it a set of control points. The type of curves to be used
                 are also defined here, although the only supported option currently is a bezier patch. You can also
                 specify a global subdivision level here if you like, although it is recommended that the parameter
@@ -136,7 +136,7 @@ namespace Ogre {
         Real getBoundingSphereRadius(void) const;
         /** Tells the system to build the mesh relating to the surface into externally created
             buffers.
-            @remarks
+
                 The VertexDeclaration of the vertex buffer must be identical to the one passed into
                 defineSurface.  In addition, there must be enough space in the buffer to 
                 accommodate the patch at full detail level; you should call getRequiredVertexCount
@@ -153,7 +153,7 @@ namespace Ogre {
             HardwareIndexBufferSharedPtr destIndexBuffer, size_t indexStart);
 
         /** Alters the level of subdivision for this surface.
-            @remarks
+
                 This method changes the proportionate detail level of the patch; since
                 the U and V directions can have different subdivision levels, this method
                 takes a single Real value where 0 is the minimum detail (the control points)

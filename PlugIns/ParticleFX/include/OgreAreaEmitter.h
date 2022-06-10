@@ -43,7 +43,7 @@ namespace Ogre {
 
     /** Particle emitter which emits particles randomly from points inside
         an area (box, sphere, ellipsoid whatever subclasses choose to be).
-    @remarks
+
         This is an empty superclass and needs to be subclassed. Basic particle
         emitter emits particles from/in an (unspecified) area. The
         initial direction of these particles can either be a single direction

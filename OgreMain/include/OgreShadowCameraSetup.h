@@ -41,7 +41,7 @@ namespace Ogre {
     */
     /** This class allows you to plug in new ways to define the camera setup when
         rendering and projecting shadow textures.
-    @remarks
+
         The default projection used when rendering shadow textures is a uniform
         frustum. This is pretty straight forward but doesn't make the best use of 
         the space in the shadow map since texels closer to the camera will be larger, 
@@ -77,7 +77,7 @@ namespace Ogre {
 
 
     /** Implements default shadow camera setup
-        @remarks
+
             This implements the default shadow camera setup algorithm.  This is what might
             be referred to as "normal" shadow mapping.  
     */

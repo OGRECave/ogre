@@ -42,7 +42,7 @@ namespace Ogre {
     */
 
     /** Particle emitter which emits particles randomly from points inside a ring (e.g. a tube).
-    @remarks
+
         This particle emitter emits particles from a ring-shaped area.
         The initial direction of these particles can either be a single
         direction (i.e. a line), a random scattering inside a cone, or a random

@@ -350,7 +350,7 @@ namespace Ogre {
         TextureUnitState( Pass* parent, const String& texName, unsigned int texCoordSet = 0);
 
         /** Get the name of current texture image for this layer.
-        @remarks
+
             This will either always be a single name for this layer,
             or will be the name of the current frame for an animated
             or otherwise multi-frame texture.
@@ -505,7 +505,7 @@ namespace Ogre {
         OGRE_DEPRECATED BindingType getBindingType(void) const;
 
         /** Set the type of content this TextureUnitState references.
-        @remarks
+
             The default is to reference a standard named texture, but this unit
             can also reference automated content like a shadow texture.
         */
@@ -863,7 +863,7 @@ namespace Ogre {
             Real manualBlend = 0.0);
 
         /** Generic method for setting up texture effects.
-        @remarks
+
             Allows you to specify effects directly by using the TextureEffectType enumeration. The
             arguments that go with it depend on the effect type. Only one effect of
             each type can be applied to a texture layer.
@@ -939,7 +939,7 @@ namespace Ogre {
 
 
         /** Enables or disables projective texturing on this texture unit.
-        @remarks
+
             Projective texturing allows you to generate texture coordinates 
             based on a Frustum, which gives the impression that a texture is
             being projected onto the surface. Note that once you have called

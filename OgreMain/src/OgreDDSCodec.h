@@ -45,7 +45,7 @@ namespace Ogre {
     struct DXTInterpolatedAlphaBlock;
 
     /** Codec specialized in loading DDS (Direct Draw Surface) images.
-    @remarks
+
         We implement our own codec here since we need to be able to keep DXT
         data compressed if the card supports it.
     */

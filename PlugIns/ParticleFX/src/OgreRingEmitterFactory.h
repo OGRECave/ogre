@@ -37,7 +37,7 @@ THE SOFTWARE.
 namespace Ogre {
 
     /** Factory class for particle emitter of type "Ring".
-    @remarks
+
         Creates instances of RingEmitter to be used in particle systems. 
     */
     class RingEmitterFactory : public ParticleEmitterFactory

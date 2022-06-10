@@ -183,7 +183,7 @@ namespace Ogre {
 
         /** Set alive/active flag. The compositor instance will create resources when alive,
             and destroy them when inactive.
-        @remarks
+
             Killing an instance means also disabling it: setAlive(false) implies
             setEnabled(false)
         */
@@ -224,7 +224,7 @@ namespace Ogre {
         const TexturePtr& getTextureInstance(const String& name, size_t mrtIndex);
 
         /** Get the render target for a given render texture name. 
-        @remarks
+
             You can use this to add listeners etc, but do not use it to update the
             targets manually or any other modifications, the compositor instance 
             is in charge of this.
@@ -261,7 +261,7 @@ namespace Ogre {
         void setTechnique(CompositionTechnique* tech, bool reuseTextures = true);
 
         /** Pick a technique to use to render this compositor based on a scheme. 
-        @remarks
+
             If there is no specific supported technique with this scheme name, 
             then the first supported technique with no specific scheme will be used.
         @see CompositionTechnique::setSchemeName
@@ -279,7 +279,7 @@ namespace Ogre {
         const String& getScheme() const { return mTechnique ? mTechnique->getSchemeName() : BLANKSTRING; }
 
         /** Notify this instance that the primary surface has been resized. 
-        @remarks
+
             This will allow the instance to recreate its resources that 
             are dependent on the size. 
         */

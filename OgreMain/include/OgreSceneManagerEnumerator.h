@@ -65,7 +65,7 @@ namespace Ogre {
     };
 
     /** Enumerates the SceneManager classes available to applications.
-        @remarks
+
             As described in the SceneManager class, SceneManagers are responsible
             for organising the scene and issuing rendering commands to the
             RenderSystem. Certain scene types can benefit from different
@@ -111,7 +111,7 @@ namespace Ogre {
         ~SceneManagerEnumerator();
 
         /** Register a new SceneManagerFactory. 
-        @remarks
+
             Plugins should call this to register as new SceneManager providers.
         */
         void addFactory(SceneManagerFactory* fact);
@@ -121,7 +121,7 @@ namespace Ogre {
         void removeFactory(SceneManagerFactory* fact);
 
         /** Get more information about a given type of SceneManager.
-        @remarks
+
             The metadata returned tells you a few things about a given type 
             of SceneManager, which can be created using a factory that has been
             registered already. 
@@ -145,7 +145,7 @@ namespace Ogre {
         OGRE_DEPRECATED MetaDataIterator getMetaDataIterator(void) const;
 
         /** Create a SceneManager instance of a given type.
-        @remarks
+
             You can use this method to create a SceneManager instance of a 
             given specific type. You may know this type already, or you may
             have discovered it by looking at the results from getMetaDataIterator.

@@ -36,7 +36,7 @@ THE SOFTWARE.
 namespace Ogre {
 
     /** Factory class for particle emitter of type "Point".
-    @remarks
+
         Creates instances of PointEmitter to be used in particle systems. 
     */
     class PointEmitterFactory : public ParticleEmitterFactory

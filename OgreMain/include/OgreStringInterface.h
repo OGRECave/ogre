@@ -157,10 +157,10 @@ namespace Ogre {
     
     /** Class defining the common interface which classes can use to 
         present a reflection-style, self-defining parameter set to callers.
-    @remarks
+
         This class also holds a static map of class name to parameter dictionaries
         for each subclass to use. See ParamDictionary for details. 
-    @remarks
+
         In order to use this class, each subclass must call createParamDictionary in their constructors
         which will create a parameter dictionary for the class if it does not exist yet.
     */
@@ -173,7 +173,7 @@ namespace Ogre {
 
     protected:
         /** Internal method for creating a parameter dictionary for the class, if it does not already exist.
-        @remarks
+
             This method will check to see if a parameter dictionary exist for this class yet,
             and if not will create one. NB you must supply the name of the class (RTTI is not 
             used or performance).
@@ -191,7 +191,7 @@ namespace Ogre {
         virtual ~StringInterface() {}
 
         /** Retrieves the parameter dictionary for this class. 
-        @remarks
+
             Only valid to call this after createParamDictionary.
         @return
             Pointer to ParamDictionary shared by all instances of this class
@@ -215,7 +215,7 @@ namespace Ogre {
         const ParameterList& getParameters(void) const;
 
         /** Generic parameter setting method.
-        @remarks
+
             Call this method with the name of a parameter and a string version of the value
             to set. The implementor will convert the string to a native type internally.
             If in doubt, check the parameter definition in the list returned from 
@@ -230,7 +230,7 @@ namespace Ogre {
         */
         bool setParameter(const String& name, const String& value);
         /** Generic multiple parameter setting method.
-        @remarks
+
             Call this method with a list of name / value pairs
             to set. The implementor will convert the string to a native type internally.
             If in doubt, check the parameter definition in the list returned from 
@@ -240,7 +240,7 @@ namespace Ogre {
         */
         void setParameterList(const NameValuePairList& paramList);
         /** Generic parameter retrieval method.
-        @remarks
+
             Call this method with the name of a parameter to retrieve a string-format value of
             the parameter in question. If in doubt, check the parameter definition in the
             list returned from getParameters for the type of this parameter. If you
@@ -252,7 +252,7 @@ namespace Ogre {
         */
         String getParameter(const String& name) const;
         /** Method for copying this object's parameters to another object.
-        @remarks
+
             This method takes the values of all the object's parameters and tries to set the
             same values on the destination object. This provides a completely type independent
             way to copy parameters to other objects. Note that because of the String manipulation 

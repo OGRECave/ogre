@@ -44,7 +44,7 @@ namespace Ogre {
     */
     /** Defines the interface which all components wishing to 
         supply OverlayElement subclasses must implement.
-    @remarks
+
         To allow the OverlayElement types available for inclusion on 
         overlays to be extended, OGRE allows external apps or plugins
         to register their ability to create custom OverlayElements with

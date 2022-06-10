@@ -54,7 +54,7 @@ namespace Ogre
         G2D_Y_Z = 2
     };
     /** Specialisation of PageStrategyData for Grid2DPageStrategy.
-    @remarks
+
         Structurally this data defines with a grid of pages, with the logical 
         origin in the middle of the entire grid.
         The grid cells are indexed from 0 as a 'centre' slot, supporting both 
@@ -204,7 +204,7 @@ namespace Ogre
         /// Get the (grid space) bottom-left of a cell
         virtual void getBottomLeftGridSpace(int32 x, int32 y, Vector2& bl);
         /** Get the (grid space) corners of a cell.
-        @remarks
+
             Populates pFourPoints in anticlockwise order from the bottom left point.
         */
         virtual void getCornersGridSpace(int32 x, int32 y, Vector2* pFourPoints);
@@ -219,7 +219,7 @@ namespace Ogre
 
 
     /** Page strategy which loads new pages based on a regular 2D grid.
-    @remarks
+
         The grid can be up to 65536 x 65536 cells in size. PageIDs are generated
         like this: (row * 65536) + col. The grid is centred around the grid origin, such 
         that the boundaries of the cell around that origin are [-CellSize/2, CellSize/2)

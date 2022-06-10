@@ -41,7 +41,7 @@ namespace Ogre {
     *  @{
     */
     /** Codec specialized in images.
-        @remarks
+
             The users implementing subclasses of ImageCodec are required to return
             a valid pointer to a ImageData class from the decode(...) function.
     */

@@ -247,7 +247,7 @@ namespace Ogre
     };
 
     /** This class stores the capabilities of the graphics card.
-    @remarks
+
     This information is set by the individual render systems.
     */
     class _OgreExport RenderSystemCapabilities : public RenderSysAlloc
@@ -556,7 +556,7 @@ namespace Ogre
             mNonPOW2TexturesLimited = l;
         }
         /** Are non-power of two textures limited in features?
-        @remarks
+
         If the RSC_NON_POWER_OF_2_TEXTURES capability is set, but this
         method returns true, you can use non power of 2 textures only if:
         <ul><li>You load them explicitly with no mip maps</li>

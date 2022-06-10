@@ -337,12 +337,12 @@ namespace Ogre {
 
         /** Parses all the available scripts found in the resource locations
         for the given group, for all ResourceManagers.
-        @remarks
+
             Called as part of initialiseResourceGroup
         */
         void parseResourceGroupScripts(ResourceGroup* grp) const;
         /** Create all the pre-declared resources.
-        @remarks
+
             Called as part of initialiseResourceGroup
         */
         void createDeclaredResources(ResourceGroup* grp);
@@ -497,7 +497,7 @@ namespace Ogre {
             bool reloadableOnly = true);
 
         /** Clears a resource group. 
-        @remarks
+
             This method unloads all resources in the group, but in addition it
             removes all those resources from their ResourceManagers, and then 
             clears all the members from the list. That means after calling this
@@ -515,7 +515,7 @@ namespace Ogre {
         void destroyResourceGroup(const String& name);
 
         /** Checks the status of a resource group.
-        @remarks
+
             Looks at the state of a resource group.
             If initialiseResourceGroup has been called for the resource
             group return true, otherwise return false.
@@ -524,7 +524,7 @@ namespace Ogre {
         bool isResourceGroupInitialised(const String& name) const;
 
         /** Checks the status of a resource group.
-        @remarks
+
             Looks at the state of a resource group.
             If loadResourceGroup has been called for the resource
             group return true, otherwise return false.
@@ -606,7 +606,7 @@ namespace Ogre {
             const String& groupName, ManualResourceLoader* loader,
             const NameValuePairList& loadParameters = NameValuePairList());
         /** Undeclare a resource.
-        @remarks
+
             Note that this will not cause it to be unloaded
             if it is already loaded, nor will it destroy a resource which has 
             already been created if initialiseResourceGroup has been called already.
@@ -751,7 +751,7 @@ namespace Ogre {
         StringVectorPtr findResourceLocation(const String& groupName, const String& pattern) const;
 
         /** Create a new resource file in a given group.
-        @remarks
+
             This method creates a new file in a resource group and passes you back a 
             writeable stream. 
         @param filename The name of the file to create
@@ -799,7 +799,7 @@ namespace Ogre {
         void removeResourceGroupListener(ResourceGroupListener* l);
 
         /** Sets the resource group that 'world' resources will use.
-        @remarks
+
             This is the group which should be used by SceneManagers implementing
             world geometry when looking for their resources. Defaults to the 
             DEFAULT_RESOURCE_GROUP_NAME but this can be altered.
@@ -823,7 +823,7 @@ namespace Ogre {
         uint32 getCustomStagesForResourceGroup(const String& group);
 
             /** Checks the status of a resource group.
-        @remarks
+
             Looks at the state of a resource group.
             If loadResourceGroup has been called for the resource
             group return true, otherwise return false.
@@ -838,7 +838,7 @@ namespace Ogre {
         /** Internal method for registering a ResourceManager (which should be
             a singleton). Creators of plugins can register new ResourceManagers
             this way if they wish.
-        @remarks
+
             ResourceManagers that wish to parse scripts must also call 
             _registerScriptLoader.
         @param resourceType String identifying the resource type, must be unique.
@@ -847,7 +847,7 @@ namespace Ogre {
         void _registerResourceManager(const String& resourceType, ResourceManager* rm);
 
         /** Internal method for unregistering a ResourceManager.
-        @remarks
+
             ResourceManagers that wish to parse scripts must also call 
             _unregisterScriptLoader.
         @param resourceType String identifying the resource type.

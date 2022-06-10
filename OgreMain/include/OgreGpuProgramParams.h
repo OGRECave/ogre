@@ -385,7 +385,7 @@ namespace Ogre {
     typedef std::vector<uchar> ConstantList;
 
     /** A group of manually updated parameters that are shared between many parameter sets.
-        @remarks
+
         Sometimes you want to set some common parameters across many otherwise
         different parameter sets, and keep them all in sync together. This class
         allows you to define a set of parameters that you can share across many
@@ -429,7 +429,7 @@ namespace Ogre {
         const String& getName() { return mName; }
 
         /** Add a new constant definition to this shared set of parameters.
-            @remarks
+
             Unlike GpuProgramParameters, where the parameter list is defined by the
             program being compiled, this shared parameter set is defined by the
             user. Only parameters which have been predefined here may be later
@@ -461,7 +461,7 @@ namespace Ogre {
 
         /** Mark the shared set as being clean (values successfully updated
             by the render system).
-            @remarks
+
             You do not need to call this yourself. The set is marked as clean
             whenever the render system updates dirty shared parameters.
         */
@@ -469,7 +469,7 @@ namespace Ogre {
 
         /** Mark the shared set as being dirty (values modified and not yet
             updated in render system).
-            @remarks
+
             You do not need to call this yourself. The set is marked as
             dirty whenever setNamedConstant or (non const) getFloatPointer
             et al are called.
@@ -585,7 +585,7 @@ namespace Ogre {
     };
 
     /** Collects together the program parameters used for a GpuProgram.
-        @remarks
+
         Gpu program state includes constant parameters used by the program, and
         bindings to render system state which is propagated into the constants
         by the engine automatically if requested.
@@ -1370,7 +1370,7 @@ namespace Ogre {
         */
         void setConstant(size_t index, const double *val, size_t count);
         /** Sets a multiple value constant integer parameter to the program.
-            @remarks
+
             Different types of GPU programs support different types of constant parameters.
             For example, it's relatively common to find that vertex programs only support
             floating point constants, and that fragment programs only support integer (fixed point)
@@ -1385,7 +1385,7 @@ namespace Ogre {
         */
         void setConstant(size_t index, const int *val, size_t count);
         /** Sets a multiple value constant unsigned integer parameter to the program.
-            @remarks
+
             Different types of GPU programs support different types of constant parameters.
             For example, it's relatively common to find that vertex programs only support
             floating point constants, and that fragment programs only support integer (fixed point)
@@ -1542,7 +1542,7 @@ namespace Ogre {
         const AutoConstantList& getAutoConstantList() const { return mAutoConstants; }
 
         /** Sets up a constant which will automatically be updated by the system.
-            @remarks
+
             Vertex and fragment programs often need parameters which are to do with the
             current render state, or particular values which may very well change over time,
             and often between objects which are being rendered. This feature allows you
@@ -1615,7 +1615,7 @@ namespace Ogre {
         */
         const AutoConstantEntry* _findRawAutoConstantEntryFloat(size_t physicalIndex) const;
         /** Sets up a constant which will automatically be updated by the system.
-            @remarks
+
             Vertex and fragment programs often need parameters which are to do with the
             current render state, or particular values which may very well change over time,
             and often between objects which are being rendered. This feature allows you
@@ -1730,7 +1730,7 @@ namespace Ogre {
                               size_t multiple = 4);
         /// @}
         /** Find a constant definition for a named parameter.
-            @remarks
+
             This method returns null if the named parameter did not exist, unlike
             getConstantDefinition which is more strict; unless you set the
             last parameter to true.
@@ -1750,7 +1750,7 @@ namespace Ogre {
         */
         size_t _getConstantPhysicalIndex(size_t logicalIndex, size_t requestedSize, uint16 variability, BaseConstantType type);
         /** Sets whether or not we need to transpose the matrices passed in from the rest of OGRE.
-            @remarks
+
             D3D uses transposed matrices compared to GL and OGRE; this is not important when you
             use programs which are written to process row-major matrices, such as those generated
             by Cg, but if you use a program written to D3D's matrix layout you will need to enable
@@ -1770,7 +1770,7 @@ namespace Ogre {
 
         /** Copies the values of all matching named constants (including auto constants) from
             another GpuProgramParameters object.
-            @remarks
+
             This method iterates over the named constants in another parameters object
             and copies across the values where they match. This method is safe to
             use when the 2 parameters objects came from different programs, but only
@@ -1805,14 +1805,14 @@ namespace Ogre {
         /// @name Shared Parameters
         /// @{
         /** Use a set of shared parameters in this parameters object.
-            @remarks
+
             Allows you to use a set of shared parameters to automatically update
             this parameter set.
         */
         void addSharedParameters(GpuSharedParametersPtr sharedParams);
 
         /** Use a set of shared parameters in this parameters object.
-            @remarks
+
             Allows you to use a set of shared parameters to automatically update
             this parameter set.
             @param sharedParamsName The name of a shared parameter set as defined in

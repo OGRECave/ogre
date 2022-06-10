@@ -40,7 +40,7 @@ namespace Ogre {
     *  @{
     */
     /** Specialisation of HighLevelGpuProgram to provide support for nVidia's CG language.
-    @remarks
+
         Cg can be used to compile common, high-level, C-like code down to assembler
         language for both GL and Direct3D, for multiple graphics cards. You must
         supply a list of profiles which your program must support using

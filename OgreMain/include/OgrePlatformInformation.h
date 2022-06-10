@@ -83,7 +83,7 @@ namespace Ogre {
 
 
     /** Class which provides the run-time platform information Ogre runs on.
-        @remarks
+
             Ogre is designed to be platform-independent, but some platform
             and run-time environment specific optimised functions are built-in
             to maximise performance, and those special optimised routines are

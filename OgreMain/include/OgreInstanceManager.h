@@ -179,7 +179,7 @@ namespace Ogre
         /** Sets the number of custom parameters per instance. Some techniques (i.e. HWInstancingBasic)
             support this, but not all of them. They also may have limitations to the max number. All
             instancing implementations assume each instance param is a Vector4 (4 floats).
-        @remarks
+
             This function cannot be called after the first batch has been created. Otherwise
             it will raise an exception. If the technique doesn't support custom params, it will
             raise an exception at the time of building the first InstanceBatch.
@@ -205,7 +205,7 @@ namespace Ogre
 
         /** Calculates the maximum (or the best amount, depending on flags) of instances
             per batch given the suggested size for the technique this manager was created for.
-        @remarks
+
             This is done automatically when creating an instanced entity, but this function in conjunction
             with @ref setInstancesPerBatch allows more flexible control over the amount of instances
             per batch
@@ -236,7 +236,7 @@ namespace Ogre
             This is called fragmentation. This function reparents the InstancedEntities
             to fewer batches, in this case leaving only one batch with 80 entities
 
-        @remarks
+
             This function takes time. Make sure to call this only when you're sure there's
             too much of fragmentation and you won't be creating more InstancedEntities soon
             Also in many cases cleanupEmptyBatches() ought to be enough
@@ -296,7 +296,7 @@ namespace Ogre
         { return InstanceBatchMapIterator( mInstanceBatches.begin(), mInstanceBatches.end() ); }
 
         /** Get non-updateable iterator over instance batches for given material
-        @remarks
+
             Each InstanceBatch pointer may be modified for low level usage (i.e.
             setCustomParameter), but there's no synchronization mechanism when
             multithreading or creating more instances, that's up to the user.

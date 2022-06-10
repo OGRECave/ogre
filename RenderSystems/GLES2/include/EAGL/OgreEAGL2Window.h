@@ -100,7 +100,7 @@ namespace Ogre {
             PixelFormat suggestPixelFormat() const { return PF_BYTE_RGBA; }
 
             /**
-               @remarks
+
                * Get custom attribute; the following attributes are valid:
                * WINDOW         The NativeWindowType target for rendering.
                * VIEW           The EAGLView object that is drawn into.

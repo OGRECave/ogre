@@ -91,7 +91,7 @@ namespace Ogre {
 
     /** A interface class defining a listener which can be used to receive
         notifications of LOD events.
-        @remarks
+
             A 'listener' is an interface designed to be called back when
             particular events are called. This class defines the
             interface relating to LOD events. In order to receive
@@ -122,7 +122,7 @@ namespace Ogre {
 
         /**
         Called before a movable object's LOD has changed.
-        @remarks
+
             Do not change the Ogre state from this method, 
             instead return true and perform changes in 
             postqueueMovableObjectLodChanged.
@@ -136,7 +136,7 @@ namespace Ogre {
 
         /**
         Called after a movable object's LOD has changed.
-        @remarks
+
             May be called even if not requested from prequeueMovableObjectLodChanged
             as only one event queue is maintained per SceneManger instance.
         */
@@ -145,7 +145,7 @@ namespace Ogre {
 
         /**
         Called before an entity's mesh LOD has changed.
-        @remarks
+
             Do not change the Ogre state from this method, 
             instead return true and perform changes in 
             postqueueEntityMeshLodChanged.
@@ -164,7 +164,7 @@ namespace Ogre {
 
         /**
         Called after an entity's mesh LOD has changed.
-        @remarks
+
             May be called even if not requested from prequeueEntityMeshLodChanged
             as only one event queue is maintained per SceneManger instance.
         */
@@ -173,7 +173,7 @@ namespace Ogre {
 
         /**
         Called before an entity's material LOD has changed.
-        @remarks
+
             Do not change the Ogre state from this method, 
             instead return true and perform changes in 
             postqueueMaterialLodChanged.
@@ -192,7 +192,7 @@ namespace Ogre {
 
         /**
         Called after an entity's material LOD has changed.
-        @remarks
+
             May be called even if not requested from prequeueEntityMaterialLodChanged
             as only one event queue is maintained per SceneManger instance.
         */

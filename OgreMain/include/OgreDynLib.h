@@ -50,7 +50,7 @@ namespace Ogre {
 #endif
 
     /** Resource holding data about a dynamic library.
-        @remarks
+
             This class holds the data required to get symbols from
             libraries loaded at run-time (i.e. from DLL's for so's)
         @author

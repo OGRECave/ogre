@@ -33,7 +33,7 @@ THE SOFTWARE.
 
 namespace Ogre {
     /** Specialisation of HighLevelGpuProgram to provide support for CG
-    @remarks
+
         Cg programs will be converted to GLSL        
     */
     class _OgreGLES2Export GLSLESCgProgram : public GLSLESProgram

@@ -73,7 +73,7 @@ namespace Ogre {
         */
         void setExternalMicrocode(const void* pMicrocode, size_t size);
         /** Tells the program to load from some externally created microcode instead of a file or source. 
-        @remarks
+
             add ref count to pMicrocode when setting
         */ 
         void setExternalMicrocode(ID3DXBuffer* pMicrocode);
@@ -108,7 +108,7 @@ namespace Ogre {
 
 
         /** Creates a new parameters object compatible with this program definition. 
-        @remarks
+
             It is recommended that you use this method of creating parameters objects
             rather than going direct to GpuProgramManager, because this method will
             populate any implementation-specific extras (like named parameters) where

@@ -44,7 +44,7 @@ namespace Ogre {
     typedef uint32 BGRA;
 
     /** Class representing colour.
-        @remarks
+
             Colour is represented as 4 components, each of which is a
             floating-point value from 0.0 to 1.0.
         @par

@@ -63,7 +63,7 @@ namespace Ogre {
         virtual ~ArchiveManager();
 
         /** Opens an archive for file reading.
-            @remarks
+
                 The archives are created using class factories within
                 extension libraries.
             @param filename
@@ -81,12 +81,12 @@ namespace Ogre {
         Archive* load( const String& filename, const String& archiveType, bool readOnly);
 
         /** Unloads an archive.
-        @remarks
+
             You must ensure that this archive is not being used before removing it.
         */
         void unload(Archive* arch);
         /** Unloads an archive by name.
-        @remarks
+
             You must ensure that this archive is not being used before removing it.
         */
         void unload(const String& filename);
@@ -95,7 +95,7 @@ namespace Ogre {
         ArchiveMapIterator getArchiveIterator(void);
 
         /** Adds a new ArchiveFactory to the list of available factories.
-            @remarks
+
                 Plugin developers who add new archive codecs need to call
                 this after defining their ArchiveFactory subclass and
                 Archive subclasses for their archive type.

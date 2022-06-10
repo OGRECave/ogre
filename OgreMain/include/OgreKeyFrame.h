@@ -46,7 +46,7 @@ namespace Ogre
     *  @{
     */
     /** A key frame in an animation sequence defined by an AnimationTrack.
-    @remarks
+
         This class can be used as a basis for all kinds of key frames. 
         The unifying principle is that multiple KeyFrames define an 
         animation sequence, with the exact state of the animation being an 
@@ -86,7 +86,7 @@ namespace Ogre
         /** Get the value at this keyframe. */
         virtual const AnyNumeric& getValue(void) const;
         /** Set the value at this keyframe.
-        @remarks
+
             All keyframe values must have a consistent type. 
         */
         virtual void setValue(const AnyNumeric& val);
@@ -106,7 +106,7 @@ namespace Ogre
         TransformKeyFrame(const AnimationTrack* parent, Real time);
         ~TransformKeyFrame() {}
         /** Sets the translation associated with this keyframe. 
-        @remarks    
+
         The translation factor affects how much the keyframe translates (moves) it's animable
         object at it's time index.
         @param trans The vector to translate by
@@ -157,7 +157,7 @@ namespace Ogre
         VertexMorphKeyFrame(const AnimationTrack* parent, Real time);
         ~VertexMorphKeyFrame() {}
         /** Sets the vertex buffer containing the source positions for this keyframe. 
-        @remarks    
+
             We assume that positions are the first 3 float elements in this buffer,
             although we don't necessarily assume they're the only ones in there.
         @param buf Vertex buffer link; will not be modified so can be shared
@@ -188,13 +188,13 @@ namespace Ogre
         ~VertexPoseKeyFrame() {}
 
         /** Reference to a pose at a given influence level 
-        @remarks
+
             Each keyframe can refer to many poses each at a given influence level.
         **/
         struct PoseRef
         {
             /** The linked pose index.
-            @remarks
+
                 The Mesh contains all poses for all vertex data in one list, both 
                 for the shared vertex data and the dedicated vertex data on submeshes.
                 The 'target' on the parent track must match the 'target' on the 

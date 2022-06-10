@@ -284,7 +284,7 @@ namespace Ogre {
         void reevaluateVertexProcessing(void);
 
         /** Calculates the kind of vertex processing in use.
-        @remarks
+
             This function's return value is calculated according to the current 
             active scheme. This is due to the fact that RTSS schemes may be different
             in their handling of hardware animation.
@@ -347,7 +347,7 @@ namespace Ogre {
         SubEntity* getSubEntity(size_t index) const { return mSubEntityList.at(index); }
 
         /** Gets a pointer to a SubEntity by name
-        @remarks 
+
             Names should be initialized during a Mesh creation.
         */
         SubEntity* getSubEntity( const String& name ) const;
@@ -363,7 +363,7 @@ namespace Ogre {
         }
 
         /** Clones this entity and returns a pointer to the clone.
-        @remarks
+
             Useful method for duplicating an entity. The new entity must be
             given a unique name, and is not attached to the scene in any way
             so must be attached to a SceneNode to be visible (exactly as
@@ -374,7 +374,7 @@ namespace Ogre {
         Entity* clone( const String& newName ) const;
 
         /** Sets the material to use for the whole of this entity.
-        @remarks
+
             This is a shortcut method to set all the materials for all
             subentities of this entity. Only use this method is you want to
             set the same material for all subentities or if you know there
@@ -385,7 +385,7 @@ namespace Ogre {
 
         
         /** Sets the material to use for the whole of this entity.
-        @remarks
+
             This is a shortcut method to set all the materials for all
             subentities of this entity. Only use this method is you want to
             set the same material for all subentities or if you know there
@@ -412,7 +412,7 @@ namespace Ogre {
         const String& getMovableType(void) const override;
 
         /** For entities based on animated meshes, gets the AnimationState object for a single animation.
-        @remarks
+
             You animate an entity by updating the animation state objects. Each of these represents the
             current state of each animation available to the entity. The AnimationState objects are
             initialised from the Mesh object.
@@ -424,7 +424,7 @@ namespace Ogre {
         @return
             In case the entity is animated, this functions returns the pointer to a AnimationStateSet
             containing all animations of the entries. If the entity is not animated, it returns 0.
-        @remarks
+
             You animate an entity by updating the animation state objects. Each of these represents the
             current state of each animation available to the entity. The AnimationState objects are
             initialised from the Mesh object.
@@ -440,7 +440,7 @@ namespace Ogre {
         bool getDisplaySkeleton(void) const;
 
         /** Returns the number of manual levels of detail that this entity supports.
-        @remarks
+
             This number never includes the original entity, it is difference
             with Mesh::getNumLodLevels.
         */
@@ -451,7 +451,7 @@ namespace Ogre {
         ushort getCurrentLodIndex() { return mMeshLodIndex; }
 
         /** Gets a pointer to the entity representing the numbered manual level of detail.
-        @remarks
+
             The zero-based index never includes the original entity, unlike
             Mesh::getLodLevel.
         */
@@ -459,7 +459,7 @@ namespace Ogre {
 
 #if !OGRE_NO_MESHLOD
         /** Sets a level-of-detail bias for the mesh detail of this entity.
-        @remarks
+
             Level of detail reduction is normally applied automatically based on the Mesh
             settings. However, it is possible to influence this behaviour for this entity
             by adjusting the LOD bias. This 'nudges' the mesh level of detail used for this
@@ -490,7 +490,7 @@ namespace Ogre {
         void setMeshLodBias(Real factor, ushort maxDetailIndex = 0, ushort minDetailIndex = 99);
 
         /** Sets a level-of-detail bias for the material detail of this entity.
-        @remarks
+
             Level of detail reduction is normally applied automatically based on the Material
             settings. However, it is possible to influence this behaviour for this entity
             by adjusting the LOD bias. This 'nudges' the material level of detail used for this
@@ -525,7 +525,7 @@ namespace Ogre {
         */
         void setPolygonModeOverrideable(bool PolygonModeOverrideable);
         /** Attaches another object to a certain bone of the skeleton which this entity uses.
-        @remarks
+
             This method can be used to attach another object to an animated part of this entity,
             by attaching it to a bone in the skeleton (with an offset if required). As this entity
             is animated, the attached object will move relative to the bone to which it is attached.
@@ -556,7 +556,7 @@ namespace Ogre {
         MovableObject* detachObjectFromBone(const String &movableName);
 
         /** Detaches an object by pointer.
-        @remarks
+
             Use this method to destroy a MovableObject which is attached to a bone of belonging this entity.
             But sometimes the object may be not in the child object list because it is a LOD entity,
             this method can safely detect and ignore in this case and won't raise an exception.
@@ -590,7 +590,7 @@ namespace Ogre {
         /** Get this Entity's personal skeleton instance. */
         SkeletonInstance* getSkeleton(void) const { return mSkeletonInstance; }
         /** Returns whether or not hardware animation is enabled.
-        @remarks
+
             Because fixed-function indexed vertex blending is rarely supported
             by existing graphics cards, hardware animation can only be done if
             the vertex programs in the materials used to render an entity support
@@ -608,7 +608,7 @@ namespace Ogre {
 
         void _notifyAttached(Node* parent, bool isTagPoint = false) override;
         /** Returns the number of requests that have been made for software animation
-        @remarks
+
             If non-zero then software animation will be performed in updateAnimation
             regardless of the current setting of isHardwareAnimationEnabled or any
             internal optimise for eliminate software animation. Requests for software
@@ -616,7 +616,7 @@ namespace Ogre {
         */
         int getSoftwareAnimationRequests(void) const { return mSoftwareAnimationRequests; }
         /** Returns the number of requests that have been made for software animation of normals
-        @remarks
+
             If non-zero, and getSoftwareAnimationRequests() also returns non-zero,
             then software animation of normals will be performed in updateAnimation
             regardless of the current setting of isHardwareAnimationEnabled or any
@@ -628,7 +628,7 @@ namespace Ogre {
         */
         int getSoftwareAnimationNormalsRequests(void) const { return mSoftwareAnimationNormalsRequests; }
         /** Add a request for software animation
-        @remarks
+
             Tells the entity to perform animation calculations for skeletal/vertex
             animations in software, regardless of the current setting of
             isHardwareAnimationEnabled().  Software animation will be performed
@@ -644,7 +644,7 @@ namespace Ogre {
         */
         void addSoftwareAnimationRequest(bool normalsAlso);
         /** Removes a request for software animation
-        @remarks
+
             Calling this decrements the entity's internal counter of the number
             of requests for software animation.  If the counter is already zero
             then calling this method throws an exception.  The 'normalsAlso'
@@ -680,7 +680,7 @@ namespace Ogre {
 
         /** Updates the internal animation state set to include the latest
             available animations from the attached skeleton.
-        @remarks
+
             Use this method if you manually add animations to a skeleton, or have
             linked the skeleton to another for animation purposes since creating
             this entity.
@@ -691,7 +691,7 @@ namespace Ogre {
         void refreshAvailableAnimationState(void);
 
         /** Advanced method to perform all the updates required for an animated entity.
-        @remarks
+
             You don't normally need to call this, but it's here in case you wish
             to manually update the animation of an Entity at a specific point in
             time. Animation will not be updated more than once a frame no matter
@@ -700,7 +700,7 @@ namespace Ogre {
         void _updateAnimation(void);
 
         /** Tests if any animation applied to this entity.
-        @remarks
+
             An entity is animated if any animation state is enabled, or any manual bone
             applied to the skeleton.
         */
@@ -712,7 +712,7 @@ namespace Ogre {
 
         /** Advanced method to get the temporarily blended skeletal vertex information
             for entities which are software skinned.
-        @remarks
+
             Internal engine will eliminate software animation if possible, this
             information is unreliable unless added request for software animation
             via addSoftwareAnimationRequest.
@@ -721,7 +721,7 @@ namespace Ogre {
         */
         VertexData* _getSkelAnimVertexData(void) const;
         /** Advanced method to get the temporarily blended software vertex animation information
-        @remarks
+
             Internal engine will eliminate software animation if possible, this
             information is unreliable unless added request for software animation
             via addSoftwareAnimationRequest.
@@ -765,7 +765,7 @@ namespace Ogre {
         void _markBuffersUsedForAnimation(void);
 
         /** Has this Entity been initialised yet?
-        @remarks
+
             If this returns false, it means this Entity hasn't been completely
             constructed yet from the underlying resources (Mesh, Skeleton), which 
             probably means they were delay-loaded and aren't available yet. This
@@ -775,7 +775,7 @@ namespace Ogre {
         bool isInitialised(void) const { return mInitialised; }
 
         /** Try to initialise the Entity from the underlying resources.
-        @remarks
+
             This method builds the internal structures of the Entity based on it
             resources (Mesh, Skeleton). This may or may not succeed if the 
             resources it references have been earmarked for background loading,
@@ -832,7 +832,7 @@ namespace Ogre {
         /** If true, the skeleton of the entity will be used to update the bounding box for culling.
             Useful if you have skeletal animations that move the bones away from the root.  Otherwise, the
             bounding box of the mesh in the binding pose will be used.
-        @remarks
+
             When true, the bounding box will be generated to only enclose the bones that are used for skinning.
             Also the resulting bounding box will be expanded by the amount of GetMesh()->getBoneBoundingRadius().
             The expansion amount can be changed on the mesh to achieve a better fitting bounding box.

@@ -84,7 +84,7 @@ class IteratorWrapper
 
         
         /** Constructor.
-        @remarks
+
         Provide a start and end iterator to initialise.
         */
         IteratorWrapper ( IteratorType start, IteratorType last )
@@ -186,7 +186,7 @@ template <typename T>
 class VectorIterator : public VectorIteratorWrapper<T,  typename T::iterator>{
     public:
         /** Constructor.
-        @remarks
+
             Provide a start and end iterator to initialise.
         */  
         VectorIterator( typename T::iterator start, typename T::iterator last )
@@ -195,7 +195,7 @@ class VectorIterator : public VectorIteratorWrapper<T,  typename T::iterator>{
         }
 
         /** Constructor.
-        @remarks
+
             Provide a container to initialise.
         */
         explicit VectorIterator( T& c )
@@ -217,7 +217,7 @@ template <typename T>
 class ConstVectorIterator : public VectorIteratorWrapper<T,  typename T::const_iterator>{
     public:
         /** Constructor.
-        @remarks
+
             Provide a start and end iterator to initialise.
         */  
         ConstVectorIterator( typename T::const_iterator start, typename T::const_iterator last )
@@ -226,7 +226,7 @@ class ConstVectorIterator : public VectorIteratorWrapper<T,  typename T::const_i
         }
 
         /** Constructor.
-        @remarks
+
             Provide a container to initialise.
         */
         explicit ConstVectorIterator ( const T& c )
@@ -265,7 +265,7 @@ class MapIteratorWrapper  : public IteratorWrapper<T, IteratorType, typename T::
         typedef typename T::key_type KeyType;
         
         /** Constructor.
-        @remarks
+
             Provide a start and end iterator to initialise.
         */
         MapIteratorWrapper ( IteratorType start, IteratorType last )
@@ -320,7 +320,7 @@ class MapIterator : public MapIteratorWrapper<T,  typename T::iterator>{
     public:
     
         /** Constructor.
-        @remarks
+
             Provide a start and end iterator to initialise.
         */  
         MapIterator( typename T::iterator start, typename T::iterator last )
@@ -329,7 +329,7 @@ class MapIterator : public MapIteratorWrapper<T,  typename T::iterator>{
         }
         
         /** Constructor.
-        @remarks
+
             Provide a container to initialise.
         */
         explicit MapIterator( T& c )
@@ -353,7 +353,7 @@ class ConstMapIterator : public MapIteratorWrapper<T,  typename T::const_iterato
     public:
     
         /** Constructor.
-        @remarks
+
             Provide a start and end iterator to initialise.
         */  
         ConstMapIterator( typename T::const_iterator start, typename T::const_iterator last )
@@ -362,7 +362,7 @@ class ConstMapIterator : public MapIteratorWrapper<T,  typename T::const_iterato
         }
 
         /** Constructor.
-        @remarks
+
             Provide a container to initialise.
         */
         explicit ConstMapIterator ( const T& c )

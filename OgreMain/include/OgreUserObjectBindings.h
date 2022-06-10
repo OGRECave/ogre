@@ -48,7 +48,7 @@ namespace Ogre {
     {
     public:
         /** Sets any kind of user object on this class instance.
-        @remarks
+
         This method allows you to associate any user object you like with
         this class. This can be a pointer back to one of your own
         classes for instance.
@@ -63,7 +63,7 @@ namespace Ogre {
         const Any& getUserAny(void) const;
 
         /** Sets any kind of user object on this class instance.
-        @remarks
+
         This method allows you to associate multiple object with this class.
         This can be a pointer back to one of your own classes for instance.
         Use a unique key to distinguish between each of these objects.
@@ -74,7 +74,7 @@ namespace Ogre {
 
         /** Retrieves the custom user object associated with this class and key.
         @param key The key that the requested user object is associated with.
-        @remarks
+
         In case no object associated with this key the returned Any object will be empty.
         */
         const Any& getUserAny(const String& key) const;

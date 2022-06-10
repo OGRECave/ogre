@@ -47,7 +47,7 @@ namespace Ogre
     */
 
     /** Interface to a general purpose request / response style background work queue.
-    @remarks
+
         A work queue is a simple structure, where requests for work are placed
         onto the queue, then removed by a worker for processing, then finally
         a response is placed on the result queue for the originator to pick up
@@ -149,7 +149,7 @@ namespace Ogre
         };
 
         /** Interface definition for a handler of requests. 
-        @remarks
+
         User classes are expected to implement this interface in order to
         process requests on the queue. It's important to realise that
         the calls to this class may be in a separate thread to the main
@@ -168,7 +168,7 @@ namespace Ogre
             virtual ~RequestHandler() {}
 
             /** Return whether this handler can process a given request. 
-            @remarks
+
             Defaults to true, but if you wish to add several handlers each of
             which deal with different types of request, you can override
             this method. 
@@ -190,7 +190,7 @@ namespace Ogre
         };
 
         /** Interface definition for a handler of responses. 
-        @remarks
+
         User classes are expected to implement this interface in order to
         process responses from the queue. All calls to this class will be 
         in the main render thread and thus all GPU resources will be
@@ -203,7 +203,7 @@ namespace Ogre
             virtual ~ResponseHandler() {}
 
             /** Return whether this handler can process a given response. 
-            @remarks
+
             Defaults to true, but if you wish to add several handlers each of
             which deal with different types of response, you can override
             this method. 
@@ -230,7 +230,7 @@ namespace Ogre
         */
         virtual void startup(bool forceRestart = true) = 0;
         /** Add a request handler instance to the queue. 
-        @remarks
+
             Every queue must have at least one request handler instance for each 
             channel in which requests are raised. If you 
             add more than one handler per channel, then you must implement canHandleRequest 
@@ -243,7 +243,7 @@ namespace Ogre
         virtual void removeRequestHandler(uint16 channel, RequestHandler* rh) = 0;
 
         /** Add a response handler instance to the queue. 
-        @remarks
+
             Every queue must have at least one response handler instance for each 
             channel in which requests are raised. If you add more than one, then you 
             must implement canHandleResponse differently in each if you wish them 
@@ -331,7 +331,7 @@ namespace Ogre
         virtual bool getRequestsAccepted() const = 0;
 
         /** Process the responses in the queue.
-        @remarks
+
             This method is public, and must be called from the main render
             thread to 'pump' responses through the system. The method will usually
             try to clear all responses before returning = 0; however, you can specify
@@ -357,7 +357,7 @@ namespace Ogre
         virtual void shutdown() = 0;
 
         /** Get a channel ID for a given channel name. 
-        @remarks
+
             Channels are assigned on a first-come, first-served basis and are
             not persistent across application instances. This method allows 
             applications to not worry about channel clashes through manually
@@ -419,7 +419,7 @@ namespace Ogre
         virtual void setWorkersCanAccessRenderSystem(bool access);
 
         /** Process the next request on the queue. 
-        @remarks
+
             This method is public, but only intended for advanced users to call. 
             The only reason you would call this, is if you were using your 
             own thread to drive the worker processing. The thread calling this

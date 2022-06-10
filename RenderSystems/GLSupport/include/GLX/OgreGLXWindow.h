@@ -71,7 +71,7 @@ namespace Ogre
         void swapBuffers();
         
         /**
-           @remarks
+
            * Get custom attribute; the following attributes are valid:
            * WINDOW      The X Window target for rendering.
            * GLCONTEXT    The Ogre GLContext used for rendering.

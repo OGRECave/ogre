@@ -86,7 +86,7 @@ namespace Ogre {
             virtual ~Listener() { }
             /** Called if a technique for a given scheme is not found within a material,
                 allows the application to specify a Technique instance manually.
-            @remarks
+
                 Material schemes allow you to switch wholesale between families of 
                 techniques on a material. However they require you to define those
                 schemes on the materials up-front, which might not be possible or

@@ -42,7 +42,7 @@ namespace Ogre {
     */
     /** Abstract factory class, archive codec plugins can register concrete
         subclasses of this.
-        @remarks
+
             All access to 'archives' (collections of files, compressed or
             just folders, maybe even remote) is managed via the abstract
             Archive class. Plugins are expected to provide the

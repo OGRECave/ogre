@@ -327,13 +327,13 @@ namespace Ogre
             /// Terrain size (along one edge) in vertices; must be 2^n+1
             uint16 terrainSize;
             /** Maximum batch size (along one edge) in vertices; must be 2^n+1 and <= 65
-            @remarks
+
                 The terrain will be divided into hierarchical tiles, and this is the maximum
                 size of one tile in vertices (at any LOD).
             */
             uint16 maxBatchSize;
             /** Minimum batch size (along one edge) in vertices; must be 2^n+1.
-            @remarks
+
             The terrain will be divided into tiles, and this is the minimum
             size of one tile in vertices (at any LOD). Adjacent tiles will be
             collected together into one batch to drop LOD levels once they are individually at this minimum,
@@ -345,7 +345,7 @@ namespace Ogre
             uint16 minBatchSize;
 
             /** Position of the terrain.
-            @remarks
+
                 Represents the position of the centre of the terrain. 
             */
             Vector3 pos;
@@ -354,7 +354,7 @@ namespace Ogre
             Real worldSize;
 
             /** Optional heightmap providing the initial heights for the terrain. 
-            @remarks
+
                 If supplied, should ideally be terrainSize * terrainSize, but if
                 it isn't it will be resized.
             */
@@ -547,7 +547,7 @@ namespace Ogre
             virtual void freeVertexBuffers(const HardwareVertexBufferSharedPtr& posbuf, const HardwareVertexBufferSharedPtr& deltabuf) = 0;
 
             /** Get a shared index buffer for a given number of settings.
-            @remarks
+
                 Since all index structures are the same at the same LOD level and
                 relative position, we can share index buffers. Therefore the 
                 buffer returned from this method does not need to be 'freed' like
@@ -602,7 +602,7 @@ namespace Ogre
         };
 
         /** Tell this instance to use the given GpuBufferAllocator. 
-        @remarks
+
             May only be called when the terrain is not loaded.
         */
         void setGpuBufferAllocator(GpuBufferAllocator* alloc);
@@ -685,7 +685,7 @@ namespace Ogre
         */
         void save(const String& filename);
         /** Save terrain data in native form to a serializing stream.
-        @remarks
+
             If you want complete control over where the terrain data goes, use
             this form.
         */
@@ -699,14 +699,14 @@ namespace Ogre
         */
         bool prepare(const String& filename);
         /** Prepare terrain data from saved data.
-        @remarks
+
             This is safe to do in a background thread as it creates no GPU resources.
             It reads data from a native terrain data chunk. 
         @return true if the preparation was successful
         */
         bool prepare(DataStreamPtr& stream);
         /** Prepare terrain data from saved data.
-        @remarks
+
             This is safe to do in a background thread as it creates no GPU resources.
             It reads data from a native terrain data chunk. 
         @return true if the preparation was successful
@@ -715,7 +715,7 @@ namespace Ogre
 
         /** Prepare the terrain from some import data rather than loading from 
             native data. 
-        @remarks
+
             This method may be called in a background thread.
         */
         bool prepare(const ImportData& importData);
@@ -735,7 +735,7 @@ namespace Ogre
         void load(StreamSerialiser& stream);
 
         /** Load the terrain based on the data already populated via prepare methods. 
-        @remarks
+
             This method must be called in the main render thread. 
         @param lodLevel Load the specified LOD level
         @param synchronous Load type
@@ -743,41 +743,41 @@ namespace Ogre
         void load(int lodLevel = 0, bool synchronous = true);
 
         /** Return whether the terrain is loaded. 
-        @remarks
+
             Should only be called from the render thread really, since this is
             where the loaded state changes.
         */
         bool isLoaded() const { return mIsLoaded; }
 
         /** Returns whether this terrain has been modified since it was first loaded / defined. 
-        @remarks
+
             This flag is reset on save().
         */
         bool isModified() const { return mModified; }
 
 
         /** Returns whether terrain heights have been modified since the terrain was first loaded / defined. 
-        @remarks
+
         This flag is reset on save().
         */
         bool isHeightDataModified() const { return mHeightDataModified; }
 
 
         /** Unload the terrain and free GPU resources. 
-        @remarks
+
             This method must be called in the main render thread.
         */
         void unload();
 
         /** Free CPU resources created during prepare methods.
-        @remarks
+
             This is safe to do in a background thread after calling unload().
         */
         void unprepare();
 
 
         /** Get a pointer to all the height data for this terrain.
-        @remarks
+
             The height data is in world coordinates, relative to the position 
             of the terrain.
         @par
@@ -820,7 +820,7 @@ namespace Ogre
         float getHeightAtWorldPosition(const Vector3& pos) const;
 
         /** Get a pointer to all the delta data for this terrain.
-        @remarks
+
             The delta data is a measure at a given vertex of by how much vertically
             a vertex will have to move to reach the point at which it will be
             removed in the next lower LOD.
@@ -1014,7 +1014,7 @@ namespace Ogre
         void setLayerWorldSize(uint8 index, Real size);
 
         /** Get the layer UV multiplier. 
-        @remarks
+
             This is derived from the texture world size. The base UVs in the 
             terrain vary from 0 to 1 and this multiplier is used (in a fixed-function 
             texture coord scaling or a shader parameter) to translate it to the
@@ -1091,14 +1091,14 @@ namespace Ogre
         void dirtyRect(const Rect& rect);
 
         /** Mark a region of the terrain composite map as dirty. 
-        @remarks
+
             You don't usually need to call this directly, it is inferred from 
             changing the other data on the terrain.
         */
         void _dirtyCompositeMapRect(const Rect& rect);
 
         /** Mark a region of the lightmap as dirty.
-        @remarks
+
             You only need to call this if you need to tell the terrain to update
             the lightmap data for some reason other than the terrain geometry
             has changed. Changing terrain geometry automatically dirties the
@@ -1110,7 +1110,7 @@ namespace Ogre
         void dirtyLightmapRect(const Rect& rect);
 
         /** Mark a the entire lightmap as dirty.
-        @remarks
+
             You only need to call this if you need to tell the terrain to update
             the lightmap data for some reason other than the terrain geometry
             has changed. Changing terrain geometry automatically dirties the
@@ -1122,7 +1122,7 @@ namespace Ogre
         void dirtyLightmap();
 
         /** Trigger the update process for the terrain.
-        @remarks
+
             Updating the terrain will process any dirty sections of the terrain.
             This may affect many things:
             <ol><li>The terrain geometry</li>
@@ -1146,12 +1146,12 @@ namespace Ogre
         void update(bool synchronous = false);
 
         /** Performs an update on the terrain geometry based on the dirty region.
-        @remarks
+
             Terrain geometry will be updated when this method returns.
         */
         void updateGeometry();
         /** Performs an update on the terrain geometry based on the dirty region.
-        @remarks
+
             Terrain geometry will be updated when this method returns, and no
             neighbours will be notified.
         */
@@ -1177,7 +1177,7 @@ namespace Ogre
         void updateDerivedData(bool synchronous = false, uint8 typeMask = 0xFF);
 
         /** Performs an update on the terrain composite map based on its dirty region.
-        @remarks
+
             Rather than calling this directly, call updateDerivedData, which will
             also call it after the other derived data has been updated (there is
             no point updating the composite map until lighting has been updated).
@@ -1188,7 +1188,7 @@ namespace Ogre
 
         /** Performs an update on the terrain composite map based on its dirty region, 
             but only at a maximum frequency. 
-        @remarks
+
         Rather than calling this directly, call updateDerivedData, which will
         also call it after the other derived data has been updated (there is
         no point updating the composite map until lighting has been updated).
@@ -1378,7 +1378,7 @@ namespace Ogre
         OGRE_DEPRECATED const String& getBlendTextureName(uint8 textureIndex) const;
 
         /** Set whether a global colour map is enabled. 
-        @remarks
+
             A global colour map can add variation to your terrain and reduce the 
             perceived tiling effect you might get in areas of continuous lighting
             and the same texture. 
@@ -1415,7 +1415,7 @@ namespace Ogre
             Real minHeight, Real maxHeight, Rect& outRect);
 
         /** Free as many resources as possible for optimal run-time memory use.
-        @remarks
+
             This class keeps some temporary storage around in order to make
             certain actions (such as editing) possible more quickly. Calling this
             method will cause as many of those resources as possible to be
@@ -1515,7 +1515,7 @@ namespace Ogre
         TexturePtr getTerrainNormalMap() const { return mTerrainNormalMap; }
 
         /** Retrieve the terrain's neighbour, or null if not present.
-        @remarks
+
             Terrains only know about their neighbours if they are notified via
             setNeighbour. This information is not saved with the terrain since every
             tile must be able to be independent.
@@ -1524,7 +1524,7 @@ namespace Ogre
         Terrain* getNeighbour(NeighbourIndex index) const;
 
         /** Set a terrain's neighbour, or null to detach one. 
-        @remarks
+
             This information is not saved with the terrain since every
             tile must be able to be independent. However if modifications are
             made to a tile which can affect its neighbours, while connected the
@@ -1554,7 +1554,7 @@ namespace Ogre
 
         /** Tell this instance to notify all neighbours that will be affected
             by a height change that has taken place. 
-        @remarks
+
             This method will determine which neighbours need notification and call
             their neighbourModified method. It is called automatically by 
             updateGeometry().
@@ -1578,7 +1578,7 @@ namespace Ogre
         Terrain* raySelectNeighbour(const Ray& ray, Real distanceLimit = 0);
 
         /** Dump textures to files.
-        @remarks
+
             This is a debugging method.
         */
         void _dumpTextures(const String& prefix, const String& suffix);
@@ -1849,7 +1849,7 @@ namespace Ogre
 
 
     /** Options class which just stores default options for the terrain.
-    @remarks
+
         None of these options are stored with the terrain when saved. They are
         options that you can use to modify the behaviour of the terrain when it
         is loaded or created. 
@@ -1892,7 +1892,7 @@ namespace Ogre
         Real getSkirtSize() const { return mSkirtSize; }
         /** method - the default size of 'skirts' used to hide terrain cracks
         (default 10)
-        @remarks
+
             Changing this value only applies to Terrain instances loaded / reloaded afterwards.
         */
         void setSkirtSize(Real skirtSz) { mSkirtSize = skirtSz; }

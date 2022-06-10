@@ -65,14 +65,14 @@ namespace Ogre {
         void addStrategy(LodStrategy *strategy);
 
         /** Remove a strategy from the manager with a specified name.
-        @remarks
+
             The removed strategy is returned so the user can control
             how it is destroyed.
         */
         LodStrategy *removeStrategy(const String& name);
 
         /** Remove and delete all strategies from the manager.
-        @remarks
+
             All strategies are deleted.  If finer control is required
             over strategy destruction, use removeStrategy.
         */

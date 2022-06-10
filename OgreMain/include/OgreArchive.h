@@ -67,7 +67,7 @@ namespace Ogre {
     typedef SharedPtr<FileInfoList> FileInfoListPtr;
 
     /** Archive-handling class.
-    @remarks
+
         An archive is a generic term for a container of files. This may be a
         filesystem folder, it may be a compressed archive, it may even be 
         a remote location shared on the web. This class is designed to be 
@@ -110,7 +110,7 @@ namespace Ogre {
         virtual bool isCaseSensitive(void) const = 0;
 
         /** Loads the archive.
-        @remarks
+
             This initializes all the internal data of the class.
         @warning
             Do not call this function directly, it is meant to be used

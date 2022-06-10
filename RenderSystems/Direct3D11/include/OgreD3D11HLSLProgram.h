@@ -38,7 +38,7 @@ namespace Ogre {
 
     /** Specialization of HighLevelGpuProgram to provide support for D3D11 
     High-Level Shader Language (HLSL).
-    @remarks
+
     Note that the syntax of D3D11 HLSL is identical to nVidia's Cg language, therefore
     unless you know you will only ever be deploying on Direct3D, or you have some specific
     reason for not wanting to use the Cg plugin, I suggest you use Cg instead since that

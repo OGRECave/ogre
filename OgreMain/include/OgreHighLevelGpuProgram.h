@@ -42,7 +42,7 @@ namespace Ogre {
     */
     /** Abstract base class representing a high-level program (a vertex or
         fragment program).
-    @remarks
+
         High-level programs are vertex and fragment programs written in a high-level
         language such as Cg or HLSL, and as such do not require you to write assembler code
         like GpuProgram does. However, the high-level program does eventually 
@@ -113,7 +113,7 @@ namespace Ogre {
 
 
         /** Creates a new parameters object compatible with this program definition. 
-        @remarks
+
             Unlike low-level assembly programs, parameters objects are specific to the
             program and therefore must be created from it rather than by the 
             HighLevelGpuProgramManager. This method creates a new instance of a parameters

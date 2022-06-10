@@ -31,7 +31,7 @@ THE SOFTWARE
 namespace Ogre
 {
     /** Implementation of a general purpose request / response style background work queue.
-    @remarks
+
         This default implementation of a work queue starts a thread pool and 
         provides queues to process requests. 
     */

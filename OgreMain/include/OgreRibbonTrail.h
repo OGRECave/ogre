@@ -46,7 +46,7 @@ namespace Ogre {
     */
     /** Subclass of BillboardChain which automatically leaves a trail behind
         one or more Node instances.
-    @remarks
+
         An instance of this class will watch one or more Node instances, and
         automatically generate a trail behind them as they move. Because this
         class can monitor multiple modes, it generates its own geometry in 
@@ -98,7 +98,7 @@ namespace Ogre {
         virtual size_t getChainIndexForNode(const Node* n);
 
         /** Set the length of the trail. 
-        @remarks
+
             This sets the length of the trail, in world units. It also sets how
             far apart each segment will be, ie length / max_elements. 
         @param len The length of the trail in world units

@@ -70,7 +70,7 @@ namespace Ogre {
         Quake3Level();
 
         /** Load just the header information from a Quake3 file. 
-        @remarks
+
             This method loads just the header information from the 
             Quake3 file, in order to estimate the loading time.
         */

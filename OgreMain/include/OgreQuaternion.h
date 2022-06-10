@@ -288,7 +288,7 @@ namespace Ogre {
             Slerp ( 0.0f, A, B ) = A
             Slerp ( 1.0f, A, B ) = B
             @return Interpolated quaternion
-            @remarks
+
             Slerp has the proprieties of performing the interpolation at constant
             velocity, and being torque-minimal (unless shortestPath=false).
             However, it's NOT commutative, which means
@@ -320,7 +320,7 @@ namespace Ogre {
         /** Performs Normalised linear interpolation between two quaternions, and returns the result.
             nlerp ( 0.0f, A, B ) = A
             nlerp ( 1.0f, A, B ) = B
-            @remarks
+
             Nlerp is faster than Slerp.
             Nlerp has the proprieties of being commutative (@see Slerp;
             commutativity is desired in certain places, like IK animation), and

@@ -43,7 +43,7 @@ namespace Ogre {
     */
     /** Abstract class defining the interface used by classes which wish 
         to perform script loading to define instances of whatever they manage.
-    @remarks
+
         Typically classes of this type wish to either parse individual script files
         on demand, or be called with a group of files matching a certain pattern
         at the appropriate time. Normally this will coincide with resource loading,

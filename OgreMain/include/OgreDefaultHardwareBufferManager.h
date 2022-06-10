@@ -79,7 +79,7 @@ namespace Ogre {
     };
 
     /** Specialisation of HardwareBufferManagerBase to emulate hardware buffers.
-    @remarks
+
         You might want to instantiate this class if you want to utilise
         classes like MeshSerializer without having initialised the 
         rendering system (which is required to create a 'real' hardware

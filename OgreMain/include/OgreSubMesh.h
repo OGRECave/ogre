@@ -45,7 +45,7 @@ namespace Ogre {
     *  @{
     */
     /** Defines a part of a complete mesh.
-        @remarks
+
             Meshes which make up the definition of a discrete 3D object
             are made up of potentially multiple parts. This is because
             different parts of the mesh may use different materials or
@@ -68,7 +68,7 @@ namespace Ogre {
         ~SubMesh();
 
         /** Dedicated vertex data (only valid if useSharedVertices = false).
-            @remarks
+
                 This data is completely owned by this submesh.
             @par
                 The use of shared or non-shared buffers is determined when
@@ -80,7 +80,7 @@ namespace Ogre {
         IndexData *indexData;
 
         /** Dedicated index map for translate blend index to bone index (only valid if useSharedVertices = false).
-            @remarks
+
                 This data is completely owned by this submesh.
             @par
                 We collect actually used bones of all bone assignments, and build the
@@ -105,7 +105,7 @@ namespace Ogre {
         LODFaceList mLodFaceList;
 
         /** A list of extreme points on the submesh (optional).
-            @remarks
+
                 These points are some arbitrary points on the mesh that are used
                 by engine to better sort submeshes by depth. This doesn't matter
                 much for non-transparent submeshes, as Z-buffer takes care of invisible
@@ -150,7 +150,7 @@ namespace Ogre {
         void _getRenderOperation(RenderOperation& rend, ushort lodIndex = 0);
 
         /** Assigns a vertex to a bone with a given weight, for skeletal animation. 
-        @remarks    
+
             This method is only valid after calling setSkeletonName.
             Since this is a one-off process there exists only 'addBoneAssignment' and
             'clearBoneAssignments' methods, no 'editBoneAssignment'. You should not need

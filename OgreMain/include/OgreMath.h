@@ -51,7 +51,7 @@ namespace Ogre
     typedef std::pair<bool, Real> RayTestResult;
 
     /** Wrapper class which indicates a given angle value is in Radians.
-    @remarks
+
         Radian values are interchangeable with Degree values, and conversions
         will be done automatically between them.
     */
@@ -103,7 +103,7 @@ namespace Ogre
     };
 
     /** Wrapper class which indicates a given angle value is in Degrees.
-    @remarks
+
         Degree values are interchangeable with Radian values, and conversions
         will be done automatically between them.
     */
@@ -156,7 +156,7 @@ namespace Ogre
 
     /** Wrapper class which identifies a value as the currently default angle 
         type, as defined by Math::setAngleUnit.
-    @remarks
+
         Angle values will be automatically converted between radians and degrees,
         as appropriate.
     */
@@ -192,7 +192,7 @@ namespace Ogre
     }
 
     /** Class to provide access to common mathematical functions.
-        @remarks
+
             Most of the maths functions are aliased versions of the C runtime
             library functions. They are aliased here to provide future
             optimisation opportunities, either from faster RTLs or custom
@@ -533,7 +533,7 @@ namespace Ogre
 
        /** Checks whether a given point is inside a triangle, in a
             2-dimensional (Cartesian) space.
-            @remarks
+
                 The vertices of the triangle must be given in either
                 trigonometrical (anticlockwise) or inverse trigonometrical
                 (clockwise) order.
@@ -556,7 +556,7 @@ namespace Ogre
             const Vector2& b, const Vector2& c);
 
        /** Checks whether a given 3D point is inside a triangle.
-       @remarks
+
             The vertices of the triangle must be given in either
             trigonometrical (anticlockwise) or inverse trigonometrical
             (clockwise) order, and the point must be guaranteed to be in the

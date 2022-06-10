@@ -45,7 +45,7 @@ namespace Ogre
     *  @{
     */
     /** The class represents a polygon in 3D space.
-    @remarks
+
         It is made up of 3 or more vertices in a single plane, listed in 
         counter-clockwise order.
     */
@@ -107,7 +107,7 @@ namespace Ogre
         void deleteVertex(size_t vertex);
 
         /** Determines if a point is inside the polygon.
-        @remarks
+
             A point is inside a polygon if it is both on the polygon's plane, 
             and within the polygon's bounds. Polygons are assumed to be convex
             and planar.

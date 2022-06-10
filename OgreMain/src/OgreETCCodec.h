@@ -39,7 +39,7 @@ namespace Ogre {
     */
 
     /** Codec specialized in loading ETC (Ericsson Texture Compression) images.
-    @remarks
+
         We implement our own codec here since we need to be able to keep ETC
         data compressed if the card supports it.
     */

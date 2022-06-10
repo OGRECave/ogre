@@ -42,7 +42,7 @@ namespace Ogre {
     */
     /** This class interpolates orientations (rotations) along a spline using 
         derivatives of quaternions.
-    @remarks
+
         Like the SimpleSpline class, this class is about interpolating values 
         smoothly over a spline. Whilst SimpleSpline deals with positions (the normal
         sense we think about splines), this class interpolates orientations. The
@@ -74,13 +74,13 @@ namespace Ogre {
         void clear(void);
 
         /** Updates a single point in the spline. 
-        @remarks
+
             This point must already exist in the spline.
         */
         void updatePoint(unsigned short index, const Quaternion& value);
 
         /** Returns an interpolated point based on a parametric value over the whole series.
-        @remarks
+
             Given a t value between 0 and 1 representing the parametric distance along the
             whole length of the spline, this method returns an interpolated point.
         @param t Parametric value.
@@ -97,7 +97,7 @@ namespace Ogre {
 
         /** Tells the spline whether it should automatically calculate tangents on demand
             as points are added.
-        @remarks
+
             The spline calculates tangents at each point automatically based on the input points.
             Normally it does this every time a point changes. However, if you have a lot of points
             to add in one go, you probably don't want to incur this overhead and would prefer to 
@@ -110,7 +110,7 @@ namespace Ogre {
         void setAutoCalculate(bool autoCalc);
 
         /** Recalculates the tangents associated with this spline. 
-        @remarks
+
             If you tell the spline not to update on demand by calling setAutoCalculate(false)
             then you must call this after completing your updates to the spline points.
         */

@@ -41,7 +41,7 @@ namespace Ogre {
     */
     /** Abstract interface which classes must implement if they wish to receive
         events from the render queue. 
-    @remarks
+
         The OGRE render queue is divided into several queue groups, as defined by
         uint8. A class may implement this interface, and register itself
         as a listener by calling SceneManager::addRenderQueueListener. After doing so,

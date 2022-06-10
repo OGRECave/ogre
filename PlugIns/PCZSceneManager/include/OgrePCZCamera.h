@@ -66,7 +66,7 @@ namespace Ogre
         ~PCZCamera();
 
         /** Overridden: Retrieves the local axis-aligned bounding box for this object.
-            @remarks
+
                 This bounding box is in local coordinates.
         */
         virtual const AxisAlignedBox& getBoundingBox(void) const;

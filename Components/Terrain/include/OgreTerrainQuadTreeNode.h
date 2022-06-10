@@ -46,7 +46,7 @@ namespace Ogre
 
 
     /** A node in a quad tree used to store a patch of terrain.
-    @remarks
+
         <b>Algorithm overview:</b>
     @par
         Our goal is to perform traditional chunked LOD with geomorphing. But, 
@@ -155,7 +155,7 @@ namespace Ogre
         const LodLevel* getLodLevel(uint16 lod);
 
         /** Notify the node (and children) that deltas are going to be calculated for a given range.
-        @remarks
+
             Based on this call, we can know whether or not to reset the max height.
         */
         void preDeltaCalculation(const Rect& rect);
@@ -307,7 +307,7 @@ namespace Ogre
         VertexDataRecord* mVertexDataRecord;
 
         /** MovableObject implementation to provide the hook to the scene.
-        @remarks
+
             In one sense, it would be most convenient to have a single MovableObject
             to represent the whole Terrain object, and then internally perform
             some quadtree frustum culling to narrow down which specific tiles are rendered.

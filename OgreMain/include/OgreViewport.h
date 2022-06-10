@@ -42,7 +42,7 @@ namespace Ogre {
     */
     /** An abstraction of a viewport, i.e. a rendering region on a render
         target.
-        @remarks
+
             A viewport is the meeting of a camera and a rendering surface -
             the camera renders the scene from a viewpoint, and places its
             results into some subset of a rendering target, which may be the
@@ -94,7 +94,7 @@ namespace Ogre {
         virtual ~Viewport();
 
         /** Notifies the viewport of a possible change in dimensions.
-            @remarks
+
                 Used by the target to update the viewport's dimensions
                 (usually the result of a change in target size).
             @note
@@ -107,7 +107,7 @@ namespace Ogre {
         void update(void);
         
         /** Instructs the viewport to clear itself, without performing an update.
-         @remarks
+
             You would not normally call this method when updating the viewport, 
             since the viewport usually clears itself when updating anyway (@see 
             Viewport::setClearEveryFrame). However, if you wish you have the
@@ -222,7 +222,7 @@ namespace Ogre {
         float getDepthClear(void) const { return mDepthClearValue; }
 
         /** Determines whether to clear the viewport before rendering.
-        @remarks
+
             You can use this method to set which buffers are cleared
             (if any) before rendering every frame.
         @param clear Whether or not to clear any buffers
@@ -241,7 +241,7 @@ namespace Ogre {
 
         /** Sets whether this viewport should be automatically updated 
             if Ogre's rendering loop or RenderTarget::update is being used.
-        @remarks
+
             By default, if you use Ogre's own rendering loop (Root::startRendering)
             or call RenderTarget::update, all viewports are updated automatically.
             This method allows you to control that behaviour, if for example you 
@@ -257,7 +257,7 @@ namespace Ogre {
         bool isAutoUpdated() const { return mIsAutoUpdated; }
 
         /** Set the material scheme which the viewport should use.
-        @remarks
+
             This allows you to tell the system to use a particular
             material scheme when rendering this viewport, which can 
             involve using different techniques to render your materials.
@@ -290,7 +290,7 @@ namespace Ogre {
         unsigned int _getNumRenderedBatches(void) const;
 
         /** Tells this viewport whether it should display Overlay objects.
-        @remarks
+
             Overlay objects are layers which appear on top of the scene. They are created via
             SceneManager::createOverlay and every viewport displays these by default.
             However, you probably don't want this if you're using multiple viewports,
@@ -306,7 +306,7 @@ namespace Ogre {
         bool getOverlaysEnabled(void) const { return mShowOverlays; }
 
         /** Tells this viewport whether it should display skies.
-        @remarks
+
             Skies are layers which appear on background of the scene. They are created via
             SceneManager::setSkyBox, SceneManager::setSkyPlane and SceneManager::setSkyDome and
             every viewport displays these by default. However, you probably don't want this if
@@ -322,7 +322,7 @@ namespace Ogre {
         bool getSkiesEnabled(void) const { return mShowSkies; }
 
         /** Tells this viewport whether it should display shadows.
-        @remarks
+
             This setting enables you to disable shadow rendering for a given viewport. The global
             shadow technique set on SceneManager still controls the type and nature of shadows,
             but this flag can override the setting so that no shadows are rendered for a given
@@ -337,7 +337,7 @@ namespace Ogre {
 
 
         /** Sets a per-viewport visibility mask.
-        @remarks
+
             The visibility mask is a way to exclude objects from rendering for
             a given viewport. For each object in the frustum, a check is made
             between this mask and the objects visibility flags 
@@ -362,7 +362,7 @@ namespace Ogre {
         void removeListener(Listener* l);
 		
 		/** Sets the draw buffer type for the next frame.
-		@remarks
+
 			Specifies the particular buffer that will be
 			targeted by the render target. Should be used if
 			the render target supports quad buffer stereo. If

@@ -55,7 +55,7 @@ namespace Ogre {
     *  @{
     */
     /** Class for serialising skeleton data to/from an OGRE .skeleton file.
-    @remarks
+
         This class allows exporters to write OGRE .skeleton files easily, and allows the
         OGRE engine to import .skeleton files into instantiated OGRE Skeleton objects.
         Note that a .skeleton file includes not only the Skeleton, but also definitions of
@@ -73,7 +73,7 @@ namespace Ogre {
         SkeletonSerializer();
 
         /** Exports a skeleton to the file specified. 
-        @remarks
+
             This method takes an externally created Skeleton object, and exports both it
             and animations it uses to a .skeleton file.
         @param pSkeleton Weak reference to the Skeleton to export
@@ -85,7 +85,7 @@ namespace Ogre {
             SkeletonVersion ver = SKELETON_VERSION_LATEST, Endian endianMode = ENDIAN_NATIVE);
 
         /** Exports a skeleton to the stream specified. 
-        @remarks
+
             This method takes an externally created Skeleton object, and exports both it
             and animations it uses to a .skeleton file.
         @param pSkeleton Weak reference to the Skeleton to export
@@ -96,7 +96,7 @@ namespace Ogre {
         void exportSkeleton(const Skeleton* pSkeleton, DataStreamPtr stream,
             SkeletonVersion ver = SKELETON_VERSION_LATEST, Endian endianMode = ENDIAN_NATIVE);
         /** Imports Skeleton and animation data from a .skeleton file DataStream.
-        @remarks
+
             This method imports data from a DataStream opened from a .skeleton file and places it's
             contents into the Skeleton object which is passed in. 
         @param stream The DataStream holding the .skeleton data. Must be initialised (pos at the start of the buffer).

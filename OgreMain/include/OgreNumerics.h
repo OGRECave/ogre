@@ -41,14 +41,14 @@ namespace Ogre {
     *  @{
     */
     /** Provides numeric solvers for Ogre
-        @remarks
+
             Handles linear algebra numerics.
     */
     class _OgreExport NumericSolver
     {
     public:
         /** Solves a full rank NxN linear system of equations 
-            @remarks
+
                This implements a naive Gaussian elimination algorithm.
                The algorithm is destructive, so there are side effects in coeff and col.
         */

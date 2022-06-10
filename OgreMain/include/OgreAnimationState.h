@@ -51,7 +51,7 @@ namespace Ogre {
     */
 
     /** Represents the state of an animation and the weight of its influence. 
-    @remarks
+
         Other classes can hold instances of this class to store the state of any animations
         they are using.
     */
@@ -97,7 +97,7 @@ namespace Ogre {
         void setWeight(Real weight);
         /** Modifies the time position, adjusting for animation length
         @param offset The amount of time, in seconds, to extend the animation.
-        @remarks
+
             This method loops at the edges if animation looping is enabled.
         */
         void addTime(Real offset);
@@ -279,7 +279,7 @@ namespace Ogre {
     };
 
     /** ControllerValue wrapper class for AnimationState.
-    @remarks
+
         In Azathoth and earlier, AnimationState was a ControllerValue but this
         actually causes memory problems since Controllers delete their values
         automatically when there are no further references to them, but AnimationState

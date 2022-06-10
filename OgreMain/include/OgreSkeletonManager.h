@@ -42,7 +42,7 @@ namespace Ogre {
     *  @{
     */
     /** Handles the management of skeleton resources.
-        @remarks
+
             This class deals with the runtime management of
             skeleton data; like other resource managers it handles
             the creation of resources (in this case skeleton data),

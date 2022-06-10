@@ -64,7 +64,7 @@ namespace Ogre
 
         /** Gets current blit encoder. If none is current, ends all other
             encoders and creates a new blit encoder.
-        @remarks
+
             Use __unsafe_unretained to avoid unnecessary ARC overhead; unless
             you really need to hold on to the returned variable.
             i.e.

@@ -45,7 +45,7 @@ namespace Ogre  {
     */
     /** A tagged point on a skeleton, which can be used to attach entities to on specific
         other entities.
-    @remarks
+
         A Skeleton, like a Mesh, is shared between Entity objects and simply updated as required
         when it comes to rendering. However there are times when you want to attach another object
         to an animated entity, and make sure that attachment follows the parent entity's animation

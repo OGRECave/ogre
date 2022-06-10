@@ -43,11 +43,11 @@ namespace Ogre {
     *  @{
     */
     /** A 2D element which contains other OverlayElement instances.
-    @remarks
+
         This is a specialisation of OverlayElement for 2D elements that contain other
         elements. These are also the smallest elements that can be attached directly
         to an Overlay.
-    @remarks
+
         OverlayContainers should be managed using OverlayManager. This class is responsible for
         instantiating / deleting elements, and also for accepting new types of element
         from plugins etc.
@@ -97,7 +97,7 @@ namespace Ogre {
         OGRE_DEPRECATED virtual ChildIterator getChildIterator(void);
 
         /** Gets an iterator for just the container children of this object.
-        @remarks
+
             Good for cascading updates without having to use RTTI
         */
         virtual ChildContainerIterator getChildContainerIterator(void);

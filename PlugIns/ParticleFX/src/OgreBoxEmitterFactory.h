@@ -36,7 +36,7 @@ THE SOFTWARE.
 namespace Ogre {
 
     /** Factory class for particle emitter of type "Box".
-    @remarks
+
         Creates instances of BoxEmitter to be used in particle systems. 
     */
     class BoxEmitterFactory : public ParticleEmitterFactory

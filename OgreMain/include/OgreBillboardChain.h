@@ -49,7 +49,7 @@ namespace Ogre {
     */
 
     /** Allows the rendering of a chain of connected billboards.
-    @remarks
+
         A billboard chain operates much like a traditional billboard, i.e. its
         segments always face the camera; the difference being that instead of
         a set of disconnected quads, the elements in this class are connected
@@ -194,7 +194,7 @@ namespace Ogre {
         virtual bool getDynamic(void) const { return mDynamic; }
         
         /** Add an element to the 'head' of a chain.
-        @remarks
+
             If this causes the number of elements to exceed the maximum elements
             per chain, the last element in the chain (the 'tail') will be removed
             to allow the additional element to be added.
@@ -232,7 +232,7 @@ namespace Ogre {
 
         /** Sets whether the billboard should always be facing the camera or a custom direction
             set by each point element.
-        @remarks
+
             Billboards facing the camera are useful for smoke trails, light beams, etc by
             simulating a cylinder. However, because of this property, wide trails can cause
             several artefacts unless the head is properly covered.

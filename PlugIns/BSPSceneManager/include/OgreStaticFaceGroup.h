@@ -50,7 +50,7 @@ namespace Ogre {
 
     /** Collects a group of static i.e. immovable faces together which have common
         properties like the material they use, the plane they lie on.
-        @remarks
+
             Whilst for discrete geometry (i.e. movable objects) groups of faces are
             held in the SubMesh class, for immovable objects like scenery there
             needs to ba little more flexibility in the grouping since the group is

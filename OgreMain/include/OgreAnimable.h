@@ -49,7 +49,7 @@ namespace Ogre {
     */
 
     /** Defines an object property which is animable, i.e. may be keyframed.
-    @remarks
+
         Animable properties are those which can be altered over time by a 
         predefined keyframe sequence. They may be set directly, or they may
         be modified from their existing state (common if multiple animations
@@ -242,7 +242,7 @@ namespace Ogre {
         /// Static map of class name to list of animable value names
         static AnimableDictionaryMap msAnimableDictionary;
         /** Get the name of the animable dictionary for this class.
-        @remarks
+
             Subclasses must override this if they want to support animation of
             their values.
         */
@@ -270,7 +270,7 @@ namespace Ogre {
         const StringVector& getAnimableValueNames(void) const;
 
         /** Create a reference-counted AnimableValuePtr for the named value.
-        @remarks
+
             You can use the returned object to animate a value on this object,
             using AnimationTrack. Subclasses must override this if they wish 
             to support animation of their values.

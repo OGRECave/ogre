@@ -42,7 +42,7 @@ namespace Ogre {
     class BorderRenderable;
     
     /** A specialisation of the PanelOverlayElement to provide a panel with a border.
-    @remarks
+
         Whilst the standard panel can use a single tiled material, this class allows
         panels with a tileable backdrop plus a border texture. This is handy for large
         panels that are too big to use a single large texture with a border, or
@@ -78,7 +78,7 @@ namespace Ogre {
          */
         /// @{
         /** Sets the size of the border.
-        @remarks
+
             This method sets a constant size for all borders.
         @param size The size of the border as a factor of the screen dimensions ie 0.2 is one-fifth
             of the screen size.
@@ -86,7 +86,7 @@ namespace Ogre {
         void setBorderSize(Real size);
 
         /** Sets the size of the border, with different sizes for vertical and horizontal borders.
-        @remarks
+
             This method sets a size for the side and top / bottom borders separately.
         @param sides The size of the side borders as a factor of the screen dimensions ie 0.2 is one-fifth
             of the screen size.
@@ -95,7 +95,7 @@ namespace Ogre {
         void setBorderSize(Real sides, Real topAndBottom);
 
         /** Sets the size of the border separately for all borders.
-        @remarks
+
             This method sets a size all borders separately.
         @param left The size of the left border as a factor of the screen dimensions ie 0.2 is one-fifth
             of the screen size.
@@ -221,7 +221,7 @@ namespace Ogre {
     };
 
     /** Class for rendering the border of a BorderPanelOverlayElement.
-    @remarks
+
         We need this because we have to render twice, once with the inner panel's repeating
         material (handled by superclass) and once for the border's separate material. 
     */
