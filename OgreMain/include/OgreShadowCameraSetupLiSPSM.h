@@ -100,7 +100,7 @@ namespace Ogre
         Real mCosCamLightDirThreshold;
 
         /** Calculates the LiSPSM projection matrix P.
-        @remarks
+
         The LiSPSM projection matrix will be built around the axis aligned bounding box 
         of the intersection body B in light space. The distance between the near plane 
         and the projection center is chosen in such a way (distance is set by the para-
@@ -119,7 +119,7 @@ namespace Ogre
             const Camera& cam, const Light& light) const;
 
         /** Calculates the distance between camera position and near clipping plane.
-        @remarks
+
         n_opt determines the distance between light space origin (shadow camera position)
         and the near clipping plane to achieve an optimal perspective foreshortening effect.
         In this way the texel distribution over the shadow map is controlled.
@@ -151,7 +151,7 @@ namespace Ogre
             const Camera& cam) const;
 
         /** Calculates the visible point on the near plane for the n_opt calculation
-        @remarks
+
         z0 lies on the parallel plane to the near plane through e and on the near plane of 
         the frustum C (plane z = bodyB_zMax_ls) and on the line x = e.x.
         @param lightSpace Matrix of the light space transformation
@@ -179,7 +179,7 @@ namespace Ogre
         }
 
         /** Returns a LiSPSM shadow camera.
-        @remarks
+
         Builds and returns a LiSPSM shadow camera. 
         More information can be found on the webpage of the TU Wien: 
         http://www.cg.tuwien.ac.at/research/vr/lispsm/
@@ -188,7 +188,7 @@ namespace Ogre
             const Viewport *vp, const Light *light, Camera *texCam, size_t iteration) const;
 
         /** Adjusts the parameter n to produce optimal shadows.
-        @remarks
+
         The smaller the parameter n, the stronger the perspective warping effect.
         The consequence of a stronger warping is that the near shadows will gain 
         quality while the far ones will lose it. Depending on your scene and light
@@ -216,7 +216,7 @@ namespace Ogre
         /** Sets the threshold between the camera and the light direction below
             which the LiSPSM projection is 'flattened', since coincident light
             and camera projections cause problems with the perspective skew.
-            @remarks
+
             For example, setting this to 20 degrees will mean that as the difference 
             between the light and camera direction reduces from 20 degrees to 0
             degrees, the perspective skew will be proportionately removed.

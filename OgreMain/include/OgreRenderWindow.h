@@ -39,7 +39,7 @@ namespace Ogre
     *  @{
     */
     /** Manages the target rendering window.
-        @remarks
+
             This class handles a window into which the contents
             of a scene are rendered. There is a many-to-1 relationship
             between instances of this class an instance of RenderSystem
@@ -47,7 +47,7 @@ namespace Ogre
             more than one window in the case of level editor tools etc.
             This class is abstract since there may be
             different implementations for different windowing systems.
-        @remarks
+
             Instances are created and communicated with by the render system
             although client programs can get a reference to it from
             the render system if required for resizing or moving.
@@ -151,7 +151,7 @@ namespace Ogre
 
         /** Hide (or show) the window. If called with hidden=true, this
             will make the window completely invisible to the user.
-        @remarks
+
             Setting a window to hidden is useful to create a dummy primary
             RenderWindow hidden from the user so that you can create and
             recreate your actual RenderWindows without having to recreate

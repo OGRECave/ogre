@@ -181,7 +181,7 @@ namespace Ogre {
 
         /** Takes a value with a given src bit mask, and produces another
             value with a desired bit mask.
-            @remarks
+
                 This routine is useful for colour conversion.
         */
         template<typename SrcT, typename DestT>

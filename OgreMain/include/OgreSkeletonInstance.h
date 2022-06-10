@@ -42,7 +42,7 @@ namespace Ogre {
     *  @{
     */
     /** A SkeletonInstance is a single instance of a Skeleton used by a world object.
-    @remarks
+
         The difference between a Skeleton and a SkeletonInstance is that the
         Skeleton is the 'master' version much like Mesh is a 'master' version of
         Entity. Many SkeletonInstance objects can be based on a single Skeleton, 
@@ -69,7 +69,7 @@ namespace Ogre {
             const LinkedSkeletonAnimationSource** linker = 0) const;
 
         /** Creates a new Animation object for animating this skeleton. 
-        @remarks
+
             This method updates the reference skeleton, not just this instance!
         @param name The name of this animation
         @param length The length of the animation in seconds
@@ -81,7 +81,7 @@ namespace Ogre {
             const LinkedSkeletonAnimationSource** linker = 0) const;
 
         /** Removes an Animation from this skeleton. 
-        @remarks
+
             This method updates the reference skeleton, not just this instance!
         */
         void removeAnimation(const String& name);
@@ -125,7 +125,7 @@ namespace Ogre {
         typedef std::list<TagPoint*> TagPointList;
 
         /** Active tag point list.
-        @remarks
+
             This is a linked list of pointers to active tag points
         @par
             This allows very fast insertions and deletions from anywhere in the list to activate / deactivate
@@ -135,7 +135,7 @@ namespace Ogre {
         TagPointList mActiveTagPoints;
 
         /** Free tag point list.
-        @remarks
+
             This contains a list of the tag points free for use as new instances
             as required by the set. When a TagPoint instance is deactivated, there will be a reference on this
             list. As they get used this list reduces, as they get released back to to the set they get added

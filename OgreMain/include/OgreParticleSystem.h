@@ -46,7 +46,7 @@ namespace Ogre {
     *  @{
     */
     /** Class defining particle system based special effects.
-    @remarks
+
         Particle systems are special effects generators which are based on a 
         number of moving points to create the impression of things like like 
         sparkles, smoke, blood spurts, dust etc.
@@ -66,7 +66,7 @@ namespace Ogre {
         /// Default constructor required for STL creation in manager
         ParticleSystem();
         /** Creates a particle system with no emitters or affectors.
-        @remarks
+
             You should use the ParticleSystemManager to create particle systems rather than creating
             them directly.
         */
@@ -75,7 +75,7 @@ namespace Ogre {
         virtual ~ParticleSystem();
 
         /** Sets the ParticleRenderer to be used to render this particle system.
-        @remarks
+
             The main ParticleSystem just manages the creation and movement of 
             particles; they are rendered using functions in ParticleRenderer
             and the ParticleVisual instances they create.
@@ -91,7 +91,7 @@ namespace Ogre {
         const String& getRendererName(void) const;
 
         /** Adds an emitter to this particle system.
-        @remarks
+
             Particles are created in a particle system by emitters - see the ParticleEmitter
             class for more details.
         @param 
@@ -102,7 +102,7 @@ namespace Ogre {
         ParticleEmitter* addEmitter(const String& emitterType);
 
         /** Retrieves an emitter by it's index (zero-based).
-        @remarks
+
             Used to retrieve a pointer to an emitter for a particle system to procedurally change
             emission parameters etc.
             You should check how many emitters are registered against this system before calling
@@ -116,7 +116,7 @@ namespace Ogre {
         unsigned short getNumEmitters(void) const;
 
         /** Removes an emitter from the system.
-        @remarks
+
             Drops the emitter with the index specified from this system.
             You should check how many emitters are registered against this system before calling
             this method with an arbitrary index using getNumEmitters.
@@ -129,7 +129,7 @@ namespace Ogre {
         void removeAllEmitters(void);
 
         /** Removes an emitter from the system.
-        @remarks
+
             Drops the emitter from this system.
         @param
             emitter Pointer to a particle emitter.
@@ -137,7 +137,7 @@ namespace Ogre {
         void removeEmitter(ParticleEmitter *emitter);
         
         /** Adds an affector to this particle system.
-        @remarks
+
             Particles are modified over time in a particle system by affectors - see the ParticleAffector
             class for more details.
         @param 
@@ -148,7 +148,7 @@ namespace Ogre {
         ParticleAffector* addAffector(const String& affectorType);
 
         /** Retrieves an affector by it's index (zero-based).
-        @remarks
+
             Used to retrieve a pointer to an affector for a particle system to procedurally change
             affector parameters etc.
             You should check how many affectors are registered against this system before calling
@@ -162,7 +162,7 @@ namespace Ogre {
         unsigned short getNumAffectors(void) const;
 
         /** Removes an affector from the system.
-        @remarks
+
             Drops the affector with the index specified from this system.
             You should check how many affectors are registered against this system before calling
             this method with an arbitrary index using getNumAffectors.
@@ -179,7 +179,7 @@ namespace Ogre {
         void clear();
 
         /** Gets the number of individual particles in the system right now.
-        @remarks
+
             The number of particles active in a system at a point in time depends on 
             the number of emitters, their emission rates, the time-to-live (TTL) each particle is
             given on emission (and whether any affectors modify that TTL) and the maximum
@@ -188,7 +188,7 @@ namespace Ogre {
         size_t getNumParticles(void) const;
 
         /** Manually add a particle to the system. 
-        @remarks
+
             Instead of using an emitter, you can manually add a particle to the system.
             You must initialise the returned particle instance immediately with the
             'emission' state.
@@ -201,7 +201,7 @@ namespace Ogre {
         Particle* createParticle(void);
 
         /** Manually add an emitter particle to the system. 
-        @remarks
+
             The purpose of a particle emitter is to emit particles. Besides visual particles, also other other
             particle types can be emitted, other emitters for example. The emitted emitters have a double role;
             they behave as particles and can be influenced by affectors, but they are still emitters and capable 
@@ -212,7 +212,7 @@ namespace Ogre {
         Particle* createEmitterParticle(const String& emitterName);
 
         /** Retrieve a particle from the system for manual tweaking.
-        @remarks
+
             Normally you use an affector to alter particles in flight, but
             for small manually controlled particle systems you might want to use
             this method.
@@ -220,13 +220,13 @@ namespace Ogre {
         Particle* getParticle(size_t index);
 
         /** Returns the maximum number of particles this system is allowed to have active at once.
-        @remarks
+
             See ParticleSystem::setParticleQuota for more info.
         */
         size_t getParticleQuota(void) const;
 
         /** Sets the maximum number of particles this system is allowed to have active at once.
-        @remarks
+
             Particle systems all have a particle quota, i.e. a maximum number of particles they are 
             allowed to have active at a time. This allows the application to set a keep particle systems
             under control should they be affected by complex parameters which alter their emission rates
@@ -239,27 +239,27 @@ namespace Ogre {
         void setParticleQuota(size_t quota);
 
         /** Returns the maximum number of emitted emitters this system is allowed to have active at once.
-        @remarks
+
             See ParticleSystem::setEmittedEmitterQuota for more info.
         */
         size_t getEmittedEmitterQuota(void) const;
 
         /** Sets the maximum number of emitted emitters this system is allowed to have active at once.
-        @remarks
+
             Particle systems can have - besides a particle quota - also an emitted emitter quota.
         @param quota The maximum number of emitted emitters this system is allowed to have.
         */
         void setEmittedEmitterQuota(size_t quota);
 
         /** Assignment operator for copying.
-        @remarks
+
             This operator deep copies all particle emitters and effectors, but not particles. The
             system's name is also not copied.
         */
         ParticleSystem& operator=(const ParticleSystem& rhs);
 
         /** Updates the particles in the system based on time elapsed.
-        @remarks
+
             This is called automatically every frame by OGRE.
         @param
             timeElapsed The amount of time, in seconds, since the last frame.
@@ -267,7 +267,7 @@ namespace Ogre {
         void _update(Real timeElapsed);
 
         /** Returns all active particles in this system.
-        @remarks
+
             This method is designed to be used by people providing new ParticleAffector subclasses,
             this is the easiest way to step through all the particles in a system and apply the
             changes the affector wants to make.
@@ -294,7 +294,7 @@ namespace Ogre {
             bool debugRenderables = false);
 
         /** Fast-forwards this system by the required number of seconds.
-        @remarks
+
             This method allows you to fast-forward a system so that it effectively looks like
             it has already been running for the time you specify. This is useful to avoid the
             'startup sequence' of a system, when you want the system to be fully populated right
@@ -310,7 +310,7 @@ namespace Ogre {
         /** Sets a 'speed factor' on this particle system, which means it scales the elapsed
             real time which has passed by this factor before passing it to the emitters, affectors,
             and the particle life calculation.
-        @remarks
+
             An interesting side effect - if you want to create a completely manual particle system
             where you control the emission and life of particles yourself, you can set the speed
             factor to 0.0f, thus disabling normal particle emission, alteration, and death.
@@ -322,7 +322,7 @@ namespace Ogre {
         Real getSpeedFactor(void) const { return mSpeedFactor; }
 
         /** Sets a 'iteration interval' on this particle system.
-        @remarks
+
             The default Particle system update interval, based on elapsed frame time,
             will cause different behavior between low frame-rate and high frame-rate. 
             By using this option, you can make the particle system update at
@@ -352,7 +352,7 @@ namespace Ogre {
 
         /** Sets when the particle system should stop updating after it hasn't been
             visible for a while.
-        @remarks
+
             By default, visible particle systems update all the time, even when 
             not in view. This means that they are guaranteed to be consistent when 
             they do enter view. However, this comes at a cost, updating particle
@@ -382,7 +382,7 @@ namespace Ogre {
         const String& getMovableType(void) const override;
 
         /** Sets the default dimensions of the particles in this set.
-            @remarks
+
                 All particles in a set are created with these default dimensions. The set will render most efficiently if
                 all the particles in the set are the default size. It is possible to alter the size of individual
                 particles at the expense of extra calculation. See the Particle class for more info.
@@ -404,7 +404,7 @@ namespace Ogre {
         /** Returns whether or not particles in this are tested individually for culling. */
         virtual bool getCullIndividually(void) const;
         /** Sets whether culling tests particles in this individually as well as in a group.
-        @remarks
+
             Particle sets are always culled as a whole group, based on a bounding box which 
             encloses all particles in the set. For fairly localised sets, this is enough. However, you
             can optionally tell the set to also cull individual particles in the set, i.e. to test
@@ -427,7 +427,7 @@ namespace Ogre {
         /// Return the resource group to be used to load dependent resources
         virtual const String& getResourceGroupName(void) const { return mResourceGroupName; }
         /** Get the origin of this particle system, e.g. a script file name.
-        @remarks
+
             This property will only contain something if the creator of
             this particle system chose to populate it. Script loaders are advised
             to populate it.
@@ -442,7 +442,7 @@ namespace Ogre {
         void setRenderQueueGroupAndPriority(uint8 queueID, ushort priority);
 
         /** Set whether or not particles are sorted according to the camera.
-        @remarks
+
             Enabling sorting alters the order particles are sent to the renderer.
             When enabled, particles are sent to the renderer in order of 
             furthest distance from the camera.
@@ -452,7 +452,7 @@ namespace Ogre {
         bool getSortingEnabled(void) const { return mSorted; }
 
         /** Set the (initial) bounds of the particle system manually. 
-        @remarks
+
             If you can, set the bounds of a particle system up-front and 
             call setBoundsAutoUpdated(false); this is the most efficient way to
             organise it. Otherwise, set an initial bounds and let the bounds increase
@@ -464,7 +464,7 @@ namespace Ogre {
 
         /** Sets whether the bounds will be automatically updated
             for the life of the particle system
-        @remarks
+
             If you have a stationary particle system, it would be a good idea to
             call this method and set the value to 'false', since the maximum
             bounds of the particle system will eventually be static. If you do
@@ -482,7 +482,7 @@ namespace Ogre {
 
         /** Sets whether particles (and any affector effects) remain relative 
             to the node the particle system is attached to.
-        @remarks
+
             By default particles are in world space once emitted, so they are not
             affected by movement in the parent node of the particle system. This
             makes the most sense when dealing with completely independent particles, 
@@ -497,7 +497,7 @@ namespace Ogre {
         bool getKeepParticlesInLocalSpace(void) const { return mLocalSpace; }
 
         /** Internal method for updating the bounds of the particle system.
-        @remarks
+
             This is called automatically for a period of time after the system's
             creation (10 seconds by default, settable by setBoundsAutoUpdated) 
             to increase (and only increase) the bounds of the system according 
@@ -512,7 +512,7 @@ namespace Ogre {
         void _updateBounds(void);
 
         /** This is used to turn on or off particle emission for this system.
-        @remarks
+
             By default particle system is always emitting particles (if a emitters exists)
             and this can be used to stop the emission for all emitters. To turn it on again, 
             call it passing true.
@@ -523,7 +523,7 @@ namespace Ogre {
         void setEmitting(bool v);
 
         /** Returns true if the particle system emitting flag is turned on.
-        @remarks
+
             This function will not actually return whether the particles are being emitted.
             It only returns the value of emitting flag.
         */
@@ -596,7 +596,7 @@ namespace Ogre {
         };
 
         /** Active particle list.
-            @remarks
+
                 This is a linked list of pointers to particles in the particle pool.
             @par
                 This allows very fast insertions and deletions from anywhere in 
@@ -607,7 +607,7 @@ namespace Ogre {
         ParticlePool mActiveParticles;
 
         /** Free particle queue.
-            @remarks
+
                 This contains a list of the particles free for use as new instances
                 as required by the set. Particle instances are preconstructed up 
                 to the estimated size in the mParticlePool vector and are 
@@ -618,7 +618,7 @@ namespace Ogre {
         ParticlePool mFreeParticles;
 
         /** Pool of particle instances for use and reuse in the active particle list.
-            @remarks
+
                 This vector will be preallocated with the estimated size of the set,and will extend as required.
         */
         ParticlePool mParticlePool;
@@ -630,7 +630,7 @@ namespace Ogre {
         typedef std::map<String, EmittedEmitterList> EmittedEmitterPool;
 
         /** Pool of emitted emitters for use and reuse in the active emitted emitter list.
-        @remarks
+
             The emitters in this pool act as particles and as emitters. The pool is a map containing lists 
             of emitters, identified by their name.
         @par
@@ -640,13 +640,13 @@ namespace Ogre {
         EmittedEmitterPool mEmittedEmitterPool;
 
         /** Free emitted emitter list.
-            @remarks
+
                 This contains a list of the emitters free for use as new instances as required by the set.
         */
         FreeEmittedEmitterMap mFreeEmittedEmitters;
 
         /** Active emitted emitter list.
-            @remarks
+
                 This is a linked list of pointers to emitters in the emitted emitter pool.
                 Emitters that are used are stored (their pointers) in both the list with active particles and in 
                 the list with active emitted emitters.        */
@@ -706,7 +706,7 @@ namespace Ogre {
         void increasePool(size_t size);
 
         /** Resize the internal pool of emitted emitters.
-            @remarks
+
                 The pool consists of multiple vectors containing pointers to particle emitters. Increasing the 
                 pool with size implies that the vectors are equally increased. The quota of emitted emitters is 
                 defined on a particle system level and not on a particle emitter level. This is to prevent that
@@ -721,7 +721,7 @@ namespace Ogre {
         void configureRenderer(void);
 
         /** Create a pool of emitted emitters and assign them to the free emitter list.
-            @remarks
+
                 The emitters in the pool are grouped by name. This name is the name of the base emitter in the
                 main list with particle emitters, which forms the template of the created emitted emitters.
         */
@@ -744,21 +744,21 @@ namespace Ogre {
         FreeEmittedEmitterList* findFreeEmittedEmitter (const String& name);
 
         /** Removes an emitter from the active emitted emitter list.
-            @remarks
+
                 The emitter will not be destroyed!
             @param emitter Pointer to a particle emitter.
         */
         void removeFromActiveEmittedEmitters (ParticleEmitter* emitter);
 
         /** Moves all emitted emitters from the active list to the free list
-            @remarks
+
                 The active emitted emitter list will not be cleared and still keeps references to the emitters!
         */
         void addActiveEmittedEmittersToFreeList (void);
 
         /** This function clears all data structures that are used in combination with emitted emitters and
             sets the flag to indicate that the emitted emitter pool must be initialised again.
-            @remarks
+
                 This function should be called if new emitters are added to a ParticleSystem or deleted from a
                 ParticleSystem. The emitted emitter data structures become out of sync and need to be build up
                 again. The data structures are not reorganised in this function, but by setting a flag, 

@@ -148,7 +148,7 @@ namespace Ogre
         virtual void _alertVisibleObjects( void );
 
         /** Creates a light for use in the scene.
-            @remarks
+
                 Lights can either be in a fixed position and independent of the
                 scene graph, or they can be attached to SceneNodes so they derive
                 their position from the parent node. Either way, they are created
@@ -169,7 +169,7 @@ namespace Ogre
         virtual bool hasLight(const String& name) const;
 
         /** Removes the named light from the scene and destroys it.
-            @remarks
+
                 Any pointers held to this light after calling this method will be invalid.
         */
         virtual void destroyLight(const String& name);
@@ -284,14 +284,14 @@ namespace Ogre
         };
 
         /** Sets the given option for the SceneManager
-                @remarks
+
             Options are:
             "ShowPortals", bool *;
             "ShowBoundingBoxes", bool *;
         */
         virtual bool setOption( const String &, const void * );
         /** Gets the given option for the Scene Manager.
-            @remarks
+
             See setOption
         */
         virtual bool getOption( const String &, void * );
@@ -354,7 +354,7 @@ namespace Ogre
         PCZone* mActiveCameraZone;
 
         /** Internal method for locating a list of lights which could be affecting the frustum. 
-        @remarks
+
             Custom scene managers are encouraged to override this method to make use of their
             scene partitioning scheme to more efficiently locate lights, and to eliminate lights
             which may be occluded by word geometry.

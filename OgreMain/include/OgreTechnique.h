@@ -43,7 +43,7 @@ namespace Ogre {
     *  @{
     */
     /** Class representing an approach to rendering this particular Material. 
-    @remarks
+
         Ogre will attempt to use the best technique supported by the active hardware, 
         unless you specifically request a lower detail technique (say for distant
         rendering).
@@ -152,7 +152,7 @@ namespace Ogre {
         Technique(Material* parent, const Technique& oth);
         ~Technique();
         /** Indicates if this technique is supported by the current graphics card.
-        @remarks
+
             This will only be correct after the Technique has been compiled, which is
             usually done from Material::compile.
         */
@@ -170,7 +170,7 @@ namespace Ogre {
         /// @name Passes
         /// @{
         /** Creates a new Pass for this Technique.
-        @remarks
+
             A Pass is a single rendering pass, i.e. a single draw of the given material.
             Note that if you create a pass without a fragment program, during compilation of the
             material the pass may be split into multiple passes if the graphics card cannot
@@ -224,7 +224,7 @@ namespace Ogre {
         const String& getResourceGroup(void) const;
 
         /** Returns true if this Technique involves transparency. 
-        @remarks
+
             This basically boils down to whether the first pass
             has a scene blending factor. Even if the other passes 
             do not, the base colour, including parts of the original 
@@ -234,14 +234,14 @@ namespace Ogre {
         bool isTransparent(void) const;
 
         /** Returns true if this Technique has transparent sorting enabled. 
-        @remarks
+
             This basically boils down to whether the first pass
             has transparent sorting enabled or not
         */
         bool isTransparentSortingEnabled(void) const;
 
         /** Returns true if this Technique has transparent sorting forced. 
-        @remarks
+
             This basically boils down to whether the first pass
             has transparent sorting forced or not
         */
@@ -269,7 +269,7 @@ namespace Ogre {
         MaterialPtr getShadowCasterMaterial() const;
         /** Sets the details of the material to use when rendering as a
             shadow caster.
-            @remarks
+
             Texture-based shadows require that the caster is rendered to a texture
             in a solid colour (the shadow colour in the case of modulative texture
             shadows). Whilst Ogre can arrange this for the fixed function
@@ -550,7 +550,7 @@ namespace Ogre {
         /// @}
 
         /** Assigns a level-of-detail (LOD) index to this Technique.
-        @remarks
+
             As noted previously, as well as providing fallback support for various
             graphics cards, multiple Technique objects can also be used to implement
             material LOD, where the detail of the material diminishes with distance to 
@@ -570,7 +570,7 @@ namespace Ogre {
         unsigned short getLodIndex(void) const { return mLodIndex; }
 
         /** Set the 'scheme name' for this technique. 
-        @remarks
+
             Material schemes are used to control top-level switching from one
             set of techniques to another. For example, you might use this to 
             define 'high', 'medium' and 'low' complexity levels on materials
@@ -605,7 +605,7 @@ namespace Ogre {
         bool hasColourWriteDisabled(void) const;
 
         /** Set the name of the technique.
-        @remarks
+
         The use of technique name is optional.  Its useful in material scripts where a material could inherit
         from another material and only want to modify a particular technique.
         */
@@ -622,7 +622,7 @@ namespace Ogre {
         bool checkGPURules(StringStream& errors);
         /** Add a rule which manually influences the support for this technique based
             on a GPU vendor.
-        @remarks
+
             You can use this facility to manually control whether a technique is
             considered supported, based on a GPU vendor. You can add inclusive
             or exclusive rules, and you can add as many of each as you like. If
@@ -638,7 +638,7 @@ namespace Ogre {
         void addGPUVendorRule(GPUVendor vendor, IncludeOrExclude includeOrExclude);
         /** Add a rule which manually influences the support for this technique based
             on a GPU vendor.
-        @remarks
+
             You can use this facility to manually control whether a technique is
             considered supported, based on a GPU vendor. You can add inclusive
             or exclusive rules, and you can add as many of each as you like. If
@@ -663,7 +663,7 @@ namespace Ogre {
 
         /** Add a rule which manually influences the support for this technique based
             on a pattern that matches a GPU device name (e.g. '*8800*').
-        @remarks
+
             You can use this facility to manually control whether a technique is
             considered supported, based on a GPU device name pattern. You can add inclusive
             or exclusive rules, and you can add as many of each as you like. If

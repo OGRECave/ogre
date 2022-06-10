@@ -103,7 +103,7 @@ namespace Ogre
 
     /** A 'track' in an animation sequence, i.e. a sequence of keyframes which affect a
         certain type of animable object.
-    @remarks
+
         This class is intended as a base for more complete classes which will actually
         animate specific types of object, e.g. a bone in a skeleton to affect
         skeletal animation. An animation will likely include multiple tracks each of which
@@ -111,11 +111,11 @@ namespace Ogre
         object to have it's own number of keyframes, i.e. you do not have to have the
         maximum number of keyframes for all animable objects just to cope with the most
         animated one.
-    @remarks
+
         Since the most common animable object is a Node, there are options in this class for associating
         the track with a Node which will receive keyframe updates automatically when the 'apply' method
         is called.
-    @remarks
+
         By default rotation is done using shortest-path algorithm.
         It is possible to change this behaviour using
         setUseShortestRotationPath() method.
@@ -153,7 +153,7 @@ namespace Ogre
         KeyFrame* getKeyFrame(size_t index) const { return mKeyFrames.at(index); }
 
         /** Gets the 2 KeyFrame objects which are active at the time given, and the blend value between them.
-        @remarks
+
             At any point in time  in an animation, there are either 1 or 2 keyframes which are 'active',
             1 if the time index is exactly on a keyframe, 2 at all other times i.e. the keyframe before
             and the keyframe after.
@@ -177,7 +177,7 @@ namespace Ogre
             unsigned short* firstKeyIndex = 0) const;
 
         /** Creates a new KeyFrame and adds it to this animation at the given time index.
-        @remarks
+
             It is better to create KeyFrames in time order. Creating them out of order can result 
             in expensive reordering processing. Note that a KeyFrame at time index 0.0 is always created
             for you, so you don't need to create this one, just access it using getKeyFrame(0);
@@ -193,7 +193,7 @@ namespace Ogre
 
 
         /** Gets a KeyFrame object which contains the interpolated transforms at the time index specified.
-        @remarks
+
             The KeyFrame objects held by this class are transformation snapshots at 
             discrete points in time. Normally however, you want to interpolate between these
             keyframes to produce smooth movement, and this method allows you to do this easily.
@@ -270,7 +270,7 @@ namespace Ogre
             AnimableValuePtr& target);
 
         /** Creates a new KeyFrame and adds it to this animation at the given time index.
-        @remarks
+
             It is better to create KeyFrames in time order. Creating them out of order can result 
             in expensive reordering processing. Note that a KeyFrame at time index 0.0 is always created
             for you, so you don't need to create this one, just access it using getKeyFrame(0);
@@ -332,7 +332,7 @@ namespace Ogre
         /// Destructor
         virtual ~NodeAnimationTrack();
         /** Creates a new KeyFrame and adds it to this animation at the given time index.
-        @remarks
+
             It is better to create KeyFrames in time order. Creating them out of order can result 
             in expensive reordering processing. Note that a KeyFrame at time index 0.0 is always created
             for you, so you don't need to create this one, just access it using getKeyFrame(0);
@@ -500,7 +500,7 @@ namespace Ogre
         bool getVertexAnimationIncludesNormals() const;
 
         /** Creates a new morph KeyFrame and adds it to this animation at the given time index.
-        @remarks
+
         It is better to create KeyFrames in time order. Creating them out of order can result 
         in expensive reordering processing. Note that a KeyFrame at time index 0.0 is always created
         for you, so you don't need to create this one, just access it using getKeyFrame(0);

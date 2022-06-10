@@ -192,7 +192,7 @@ namespace Ogre
 
         virtual ~Frustum();
         /** Sets the Y-dimension Field Of View (FOV) of the frustum.
-        @remarks
+
             Field Of View (FOV) is the angle made between the frustum's position, and the edges
             of the 'screen' onto which the scene is projected. High values (90+ degrees) result in a wide-angle,
             fish-eye kind of view, low values (30- degrees) in a stretched, telescopic kind of view. Typical values
@@ -208,7 +208,7 @@ namespace Ogre
         const Radian& getFOVy(void) const;
 
         /** Sets the position of the near clipping plane.
-        @remarks
+
             The position of the near clipping plane is the distance from the frustums position to the screen
             on which the world is projected. The near plane distance, combined with the field-of-view and the
             aspect ratio, determines the size of the viewport through which the world is viewed (in world
@@ -225,7 +225,7 @@ namespace Ogre
         Real getNearClipDistance(void) const;
 
         /** Sets the distance to the far clipping plane.
-        @remarks
+
             The view frustum is a pyramid created from the frustum position and the edges of the viewport.
             This method sets the distance for the far end of that pyramid. 
             Different applications need different values: e.g. a flight sim
@@ -251,7 +251,7 @@ namespace Ogre
         Real getFarClipDistance(void) const;
 
         /** Sets the aspect ratio for the frustum viewport.
-        @remarks
+
             The ratio between the x and y dimensions of the rectangular area visible through the frustum
             is known as aspect ratio: aspect = width / height .
         @par
@@ -265,7 +265,7 @@ namespace Ogre
         Real getAspectRatio(void) const;
 
         /** Sets frustum offsets, used in stereo rendering.
-        @remarks
+
             You can set both horizontal and vertical plane offsets of "eye"; in
             stereo rendering frustum is moved in horizontal plane. To be able to
             render from two "eyes" you'll need two cameras rendering on two
@@ -278,7 +278,7 @@ namespace Ogre
         void setFrustumOffset(const Vector2& offset);
 
         /** Sets frustum offsets, used in stereo rendering.
-        @remarks
+
             You can set both horizontal and vertical plane offsets of "eye"; in
             stereo rendering frustum is moved in horizontal plane. To be able to
             render from two "eyes" you'll need two cameras rendering on two
@@ -348,7 +348,7 @@ namespace Ogre
         void calcViewMatrixRelative(const Vector3& relPos, Matrix4& matToUpdate) const;
 
         /** Set whether to use a custom view matrix on this frustum.
-        @remarks
+
             This is an advanced method which allows you to manually set
             the view matrix on this frustum, rather than having it calculate
             itself based on it's position and orientation. 
@@ -369,7 +369,7 @@ namespace Ogre
         bool isCustomViewMatrixEnabled(void) const { return mCustomViewMatrix; }
 
         /** Set whether to use a custom projection matrix on this frustum.
-        @remarks
+
             This is an advanced method which allows you to manually set
             the projection matrix on this frustum, rather than having it 
             calculate itself based on it's position and orientation. 
@@ -395,13 +395,13 @@ namespace Ogre
         bool isCustomProjectionMatrixEnabled(void) const { return mCustomProjMatrix; }
 
         /** Retrieves the clipping planes of the frustum (world space).
-        @remarks
+
             The clipping planes are ordered as declared in enumerate constants FrustumPlane.
         */
         virtual const Plane* getFrustumPlanes(void) const;
 
         /** Retrieves a specified plane of the frustum (world space).
-        @remarks
+
             Gets a reference to one of the planes which make up the frustum frustum, e.g. for clipping purposes.
         */
         virtual const Plane& getFrustumPlane( unsigned short plane ) const;
@@ -461,7 +461,7 @@ namespace Ogre
         typedef Vector3 Corners[8];
 
         /** Gets the world space corners of the frustum.
-        @remarks
+
             The corners are ordered as follows: top-right near, 
             top-left near, bottom-left near, bottom-right near, 
             top-right far, top-left far, bottom-left far, bottom-right far.
@@ -509,7 +509,7 @@ namespace Ogre
 
         /** Modifies this frustum so it always renders from the reflection of itself through the
             plane specified.
-        @remarks
+
             This is obviously useful for performing planar reflections. 
         */
         void enableReflection(const Plane& p);
@@ -518,7 +518,7 @@ namespace Ogre
             so that changes to it are picked up automatically. It is important that
             this plane continues to exist whilst this object does; do not destroy
             the plane before the frustum.
-        @remarks
+
             This is obviously useful for performing planar reflections. 
         */
         void enableReflection(const MovablePlane* p);
@@ -556,7 +556,7 @@ namespace Ogre
 
         /** Links the frustum to a custom near clip plane, which can be used
             to clip geometry in a custom manner without using user clip planes.
-        @remarks
+
             There are several applications for clipping a scene arbitrarily by
             a single plane; the most common is when rendering a reflection to 
             a texture, and you only want to render geometry that is above the 
@@ -583,7 +583,7 @@ namespace Ogre
         void enableCustomNearClipPlane(const MovablePlane* plane);
         /** Links the frustum to a custom near clip plane, which can be used
             to clip geometry in a custom manner without using user clip planes.
-        @remarks
+
             There are several applications for clipping a scene arbitrarily by
             a single plane; the most common is when rendering a reflection to  
             a texture, and you only want to render geometry that is above the 
@@ -625,14 +625,14 @@ namespace Ogre
         */
         PlaneBoundedVolume getPlaneBoundedVolume();
         /** Set the orientation mode of the frustum. Default is OR_DEGREE_0
-        @remarks
+
             Setting the orientation of a frustum is only supported on
             iOS at this time.  An exception is thrown on other platforms.
         */
         void setOrientationMode(OrientationMode orientationMode);
 
         /** Get the orientation mode of the frustum.
-        @remarks
+
             Getting the orientation of a frustum is only supported on
             iOS at this time.  An exception is thrown on other platforms.
         */

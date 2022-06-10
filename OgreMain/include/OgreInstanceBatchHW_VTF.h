@@ -49,7 +49,7 @@ namespace Ogre
         Basically it has the benefits of both TextureVTF (skeleton animations) and HWInstancingBasic
         (lower memory consumption and basic culling) techniques
 
-        @remarks
+
             Design discussion webpage: http://www.ogre3d.org/forums/viewtopic.php?f=4&t=59902
         @author
             Matias N. Goldberg ("dark_sylinc")

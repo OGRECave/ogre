@@ -68,7 +68,7 @@ namespace Ogre
         virtual void setEnclosureNode(PCZSceneNode *);
 
         /** Adds an SceneNode to this OctreeZone.
-        @remarks
+
         The PCZSceneManager calls this function to add a node
         to the zone.  
         */
@@ -113,7 +113,7 @@ namespace Ogre
         virtual PCZone * updateNodeHomeZone(PCZSceneNode * pczsn, bool allowBackTouces);
 
         /** Find and add visible objects to the render queue.
-        @remarks
+
         Starts with objects in the zone and proceeds through visible portals   
         This is a recursive call (the main call should be to _findVisibleObjects)
         */
@@ -152,7 +152,7 @@ namespace Ogre
                                 PCZSceneNode *exclude );
 
         /** Sets the given option for the Zone
-         @remarks
+
             Options are:
             "Size", AxisAlignedBox *;
             "Depth", int *;
@@ -194,7 +194,7 @@ namespace Ogre
 
     protected:
         /** Walks through the octree, adding any visible objects to the render queue.
-        @remarks
+
         If any octant in the octree if completely within the view frustum,
         all subchildren are automatically added with no visibility tests.
         */

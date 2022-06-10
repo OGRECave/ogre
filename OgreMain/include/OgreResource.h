@@ -74,7 +74,7 @@ namespace Ogre {
             virtual ~Listener() {}
 
             /** Called whenever the resource finishes loading. 
-            @remarks
+
                 If a Resource has been marked as background loaded (@see Resource::setBackgroundLoaded), 
                 the call does not itself occur in the thread which is doing the loading;
                 when loading is complete a response indicator is placed with the
@@ -85,7 +85,7 @@ namespace Ogre {
 
 
             /** Called whenever the resource finishes preparing (paging into memory).
-            @remarks
+
                 If a Resource has been marked as background loaded (@see Resource::setBackgroundLoaded)
                 the call does not itself occur in the thread which is doing the preparing;
                 when preparing is complete a response indicator is placed with the
@@ -257,7 +257,7 @@ namespace Ogre {
         virtual void prepare(bool backgroundThread = false);
 
      /** Loads the resource, if it is not already.
-        @remarks
+
             If the resource is loaded from a file, loading is automatic. If not,
             if for example this resource gained it's data from procedural calls
             rather than loading from a file, then this resource will not reload 
@@ -269,7 +269,7 @@ namespace Ogre {
         virtual void load(bool backgroundThread = false);
 
         /** Reloads the resource, if it is already loaded.
-        @remarks
+
             Calls unload() and then load() again, if the resource is already
             loaded. If it is not loaded already, then nothing happens.
         */
@@ -345,7 +345,7 @@ namespace Ogre {
 
 
         /** Returns whether this Resource has been earmarked for background loading.
-        @remarks
+
             This option only makes sense when you have built Ogre with 
             thread support (OGRE_THREAD_SUPPORT). If a resource has been marked
             for background loading, then it won't load on demand like normal
@@ -367,7 +367,7 @@ namespace Ogre {
         void setBackgroundLoaded(bool bl) { mIsBackgroundLoaded = bl; }
 
         /** Escalates the loading of a background loaded resource. 
-        @remarks
+
             If a resource is set to load in the background, but something needs
             it before it's been loaded, there could be a problem. If the user
             of this resource really can't wait, they can escalate the loading
@@ -391,7 +391,7 @@ namespace Ogre {
         const String& getGroup(void) const { return mGroup; }
 
         /** Change the resource group ownership of a Resource.
-        @remarks
+
             This method is generally reserved for internal use, although
             if you really know what you're doing you can use it to move
             this resource from one group to another.
@@ -402,7 +402,7 @@ namespace Ogre {
         /// Gets the manager which created this resource
         ResourceManager* getCreator(void) { return mCreator; }
         /** Get the origin of this resource, e.g. a script file name.
-        @remarks
+
             This property will only contain something if the creator of
             this resource chose to populate it. Script loaders are advised
             to populate it.
@@ -421,7 +421,7 @@ namespace Ogre {
         virtual size_t getStateCount() const { return mStateCount; }
 
         /** Manually mark the state of this resource as having been changed.
-        @remarks
+
             You only need to call this from outside if you explicitly want derived
             objects to think this object has changed. @see getStateCount.
         */

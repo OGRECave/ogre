@@ -47,7 +47,7 @@ namespace Ogre
         void setEnclosureNode(PCZSceneNode *);
 
         /** Adds an SceneNode to this Zone.
-        @remarks
+
         The PCZSceneManager calls this function to add a node
         to the zone.  
         */
@@ -84,7 +84,7 @@ namespace Ogre
         PCZone * updateNodeHomeZone(PCZSceneNode * pczsn, bool allowBackTouces);
 
         /** Find and add visible objects to the render queue.
-        @remarks
+
         Starts with objects in the zone and proceeds through visible portals   
         This is a recursive call (the main call should be to _findVisibleObjects)
         */

@@ -49,7 +49,7 @@ namespace Ogre
 
     /** Helper class to assist you in managing multiple terrain instances
         that are connected to each other. 
-    @remarks
+
         This class makes it easy to specify the same options for a group of
         terrain instances and have them positioned relative to each other and
         associated via each other's neighbour connections. You can do all this
@@ -82,7 +82,7 @@ namespace Ogre
         TerrainGroup(SceneManager* sm, Terrain::Alignment align, uint16 terrainSize, 
             Real terrainWorldSize);
         /** Alternate constructor.
-        @remarks
+
             You can ONLY use this constructor if you subsequently call loadGroupDefinition
             or loadLegacyTerrain to populate the rest.
         */
@@ -91,7 +91,7 @@ namespace Ogre
 
         /** Retrieve a shared structure which will provide the base settings for
             all terrains created via this group.
-        @remarks
+
             All neighbouring terrains should have the same basic settings (particularly
             the size parameters) - to avoid having to set the terrain import information 
             more than once, you can retrieve the standard settings for this group
@@ -142,7 +142,7 @@ namespace Ogre
         virtual SceneManager* getSceneManager() const { return mSceneManager; }
 
         /** Set the naming convention for file names in this terrain group. 
-        @remarks
+
             You can more easily generate file names for saved / loaded terrain slots
             if you define a naming prefix. When you call saveAllTerrains(), all the
             terrain instances currently loaded will be saved to a file named
@@ -166,7 +166,7 @@ namespace Ogre
         const String& getResourceGroup() const { return mResourceGroup; }
         /** Define a 'slot' in the terrain grid - in this case to be loaded from 
             a generated file name.
-        @remarks
+
             At this stage the terrain instance isn't actually present in the grid, 
             you're merely expressing an intention for it to take its place there
             once it's loaded. The reason we do it like this is to support
@@ -180,7 +180,7 @@ namespace Ogre
         virtual void defineTerrain(long x, long y);
 
         /** Define a 'slot' in the terrain grid - in this case a flat terrain.
-        @remarks
+
             At this stage the terrain instance isn't actually present in the grid, 
             you're merely expressing an intention for it to take its place there
             once it's loaded. The reason we do it like this is to support
@@ -192,7 +192,7 @@ namespace Ogre
         virtual void defineTerrain(long x, long y, float constantHeight);
 
         /** Define the content of a 'slot' in the terrain grid.
-        @remarks
+
             At this stage the terrain instance isn't actually present in the grid, 
             you're merely expressing an intention for it to take its place there
             once it's loaded. The reason we do it like this is to support
@@ -204,7 +204,7 @@ namespace Ogre
         virtual void defineTerrain(long x, long y, const Terrain::ImportData* importData);
 
         /** Define the content of a 'slot' in the terrain grid.
-        @remarks
+
             At this stage the terrain instance isn't actually present in the grid, 
             you're merely expressing an intention for it to take its place there
             once it's loaded. The reason we do it like this is to support
@@ -218,7 +218,7 @@ namespace Ogre
         virtual void defineTerrain(long x, long y, const Image* img, const Terrain::LayerInstanceList* layers = 0);
 
         /** Define the content of a 'slot' in the terrain grid.
-        @remarks
+
             At this stage the terrain instance isn't actually present in the grid, 
             you're merely expressing an intention for it to take its place there
             once it's loaded. The reason we do it like this is to support
@@ -232,7 +232,7 @@ namespace Ogre
         virtual void defineTerrain(long x, long y, const float* pFloat, const Terrain::LayerInstanceList* layers = 0);
 
         /** Define the content of a 'slot' in the terrain grid.
-        @remarks
+
             At this stage the terrain instance isn't actually present in the grid, 
             you're merely expressing an intention for it to take its place there
             once it's loaded. The reason we do it like this is to support
@@ -271,7 +271,7 @@ namespace Ogre
         void loadLegacyTerrain(const ConfigFile& cfg, long x = 0, long y = 0, bool synchronous = true);
 
         /** Unload a specific terrain slot.
-        @remarks
+
             This destroys the Terrain instance but retains the slot definition (so
             it would be reloaded next time you call loadAllTerrains() if you did not
             remove it beforehand).
@@ -285,7 +285,7 @@ namespace Ogre
         virtual void unloadTerrain(long x, long y);
 
         /** Remove a specific terrain slot.
-        @remarks
+
             This destroys any Terrain instance at this position and also removes the 
             definition, so it essentially no longer exists. 
         @param x, y The coordinates of the terrain slot relative to the centre slot (signed).
@@ -348,7 +348,7 @@ namespace Ogre
         };
         
         /** Get the definition of a slot in the terrain.
-        @remarks
+
             Definitions exist before the actual instances to allow background loading.
         @param x, y The coordinates of the terrain slot relative to the centre slot (signed).
         @return The definition, or null if nothing is in this slot. While this return value is
@@ -432,7 +432,7 @@ namespace Ogre
         
         typedef std::vector<Terrain*> TerrainList; 
         /** Test intersection of a box with the terrain. 
-        @remarks
+
             Tests an AABB for overlap with a terrain bounding box. Note that this does not mean that the box
             touches the terrain itself, just the bounding box for the terrain. You can use this to get region
             results for further testing or use (e.g. painting areas). 
@@ -442,7 +442,7 @@ namespace Ogre
         */
         void boxIntersects(const AxisAlignedBox& box, TerrainList* resultList) const;
         /** Test intersection of a sphere with the terrain. 
-        @remarks
+
             Tests a sphere for overlap with a terrain bounding box. Note that this does not mean that the sphere
             touches the terrain itself, just the bounding box for the terrain. You can use this to get region
             results for further testing or use (e.g. painting areas). 

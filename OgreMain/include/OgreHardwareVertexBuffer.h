@@ -166,7 +166,7 @@ namespace Ogre {
 
     /** This class declares the usage of a single vertex buffer as a component
         of a complete VertexDeclaration.
-        @remarks
+
         Several vertex buffers can be used to supply the input geometry for a
         rendering operation, and in each case a vertex buffer can be used in
         different ways for different operations; the buffer itself does not
@@ -337,7 +337,7 @@ namespace Ogre {
         /** Generates a new VertexDeclaration for optimal usage based on the current
             vertex declaration, which can be used with VertexData::reorganiseBuffers later
             if you wish, or simply used as a template.
-        @remarks
+
             Different buffer organisations and buffer usages will be returned
             depending on the parameters passed to this method.
         @param skeletalAnimation Whether this vertex data is going to be
@@ -354,7 +354,7 @@ namespace Ogre {
 
 
         /** Adds a new VertexElement to this declaration.
-        @remarks
+
             This method adds a single element (positions, normals etc) to the end of the
             vertex declaration. <b>Please read the information in VertexDeclaration about
         the importance of ordering and structure for compatibility with older D3D drivers</b>.
@@ -369,7 +369,7 @@ namespace Ogre {
         const VertexElement& addElement(unsigned short source, size_t offset, VertexElementType theType,
             VertexElementSemantic semantic, unsigned short index = 0);
         /** Inserts a new VertexElement at a given position in this declaration.
-        @remarks
+
         This method adds a single element (positions, normals etc) at a given position in this
         vertex declaration. <b>Please read the information in VertexDeclaration about
         the importance of ordering and structure for compatibility with older D3D drivers</b>.
@@ -390,7 +390,7 @@ namespace Ogre {
         void removeElement(unsigned short elem_index);
 
         /** Remove the element with the given semantic and usage index.
-        @remarks
+
             In this case 'index' means the usage index for repeating elements such
             as texture coordinates. For other elements this will always be 0 and does
             not refer to the index in the vector.
@@ -401,7 +401,7 @@ namespace Ogre {
         void removeAllElements(void);
 
         /** Modify an element in-place, params as addElement.
-       @remarks
+
        <b>Please read the information in VertexDeclaration about
         the importance of ordering and structure for compatibility with older D3D drivers</b>.
      */
@@ -418,7 +418,7 @@ namespace Ogre {
         */
 
         /** Gets a list of elements which use a given source.
-        @remarks
+
             Note that the list of elements is returned by value therefore is separate from
             the declaration as soon as this method returns.
         */
@@ -464,7 +464,7 @@ namespace Ogre {
 
     /** Records the state of all the vertex buffer bindings required to provide a vertex declaration
         with the input data it needs for the vertex elements.
-    @remarks
+
         Why do we have this binding list rather than just have VertexElement referring to the
         vertex buffers direct? Well, in the underlying APIs, binding the vertex buffers to an
         index (or 'stream') is the way that vertex data is linked, so this structure better
@@ -488,7 +488,7 @@ namespace Ogre {
         VertexBufferBinding();
         ~VertexBufferBinding();
         /** Set a binding, associating a vertex buffer with a given index.
-        @remarks
+
             If the index is already associated with a vertex buffer,
             the association will be replaced. This may cause the old buffer
             to be destroyed if nothing else is referring to it.
@@ -513,7 +513,7 @@ namespace Ogre {
         size_t getBufferCount(void) const { return mBindingMap.size(); }
 
         /** Gets the highest index which has already been set, plus 1.
-        @remarks
+
             This is to assist in binding the vertex buffers such that there are
             not gaps in the list.
         */
@@ -530,7 +530,7 @@ namespace Ogre {
         bool hasGaps(void) const;
 
         /** Remove any gaps in the bindings.
-        @remarks
+
             This is useful if you've removed vertex buffer from this vertex buffer
             bindings and want to remove any gaps in the bindings. Note, however,
             that if this bindings is already being used with a VertexDeclaration,

@@ -37,7 +37,7 @@ THE SOFTWARE.
 namespace Ogre {
 
     /** Factory class for particle emitter of type "HollowEllipsoid".
-    @remarks
+
         Creates instances of HollowEllipsoidEmitter to be used in particle systems. 
     */
     class HollowEllipsoidEmitterFactory : public ParticleEmitterFactory

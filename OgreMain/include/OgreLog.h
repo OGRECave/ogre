@@ -71,7 +71,7 @@ namespace Ogre {
         virtual ~LogListener() {}
 
         /**
-        @remarks
+
             This is called whenever the log receives a message and is about to write it out
         @param message
             The message to be logged
@@ -114,13 +114,13 @@ namespace Ogre {
 
         OGRE_AUTO_MUTEX; // public to allow external locking
         /**
-        @remarks
+
             Usual constructor - called by LogManager.
         */
         Log( const String& name, bool debugOutput = true, bool suppressFileOutput = false);
 
         /**
-        @remarks
+
         Default destructor.
         */
         ~Log();
@@ -143,7 +143,7 @@ namespace Ogre {
         Stream stream(LogMessageLevel lml = LML_NORMAL, bool maskDebug = false);
 
         /**
-        @remarks
+
             Enable or disable outputting log messages to the debugger.
         */
         void setDebugOutputEnabled(bool debugOutput);
@@ -152,7 +152,7 @@ namespace Ogre {
         /// set the minimal #LogMessageLevel for a message to be logged
         void setMinLogLevel(LogMessageLevel lml);
         /**
-        @remarks
+
             Enable or disable time stamps.
         */
         void setTimeStampEnabled(bool timeStamp);
@@ -160,7 +160,7 @@ namespace Ogre {
         */
         LogMessageLevel getMinLogLevel() const { return mLogLevel; }
         /**
-        @remarks
+
             Register a listener to this log
         @param listener
             A valid listener derived class
@@ -168,7 +168,7 @@ namespace Ogre {
         void addListener(LogListener* listener);
 
         /**
-        @remarks
+
             Unregister a listener from this log
         @param listener
             A valid listener derived class
@@ -176,7 +176,7 @@ namespace Ogre {
         void removeListener(LogListener* listener);
 
         /** Stream object which targets a log.
-        @remarks
+
             A stream logger object makes it simpler to send various things to 
             a log. You can just use the operator<< implementation to stream 
             anything to the log, which is cached until a Stream::Flush is

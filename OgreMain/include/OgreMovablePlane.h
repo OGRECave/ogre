@@ -45,7 +45,7 @@ namespace Ogre {
     */
     /** Definition of a Plane that may be attached to a node, and the derived
         details of it retrieved simply.
-    @remarks
+
         This plane is not here for rendering purposes, it's to allow you to attach
         planes to the scene in order to have them move and follow nodes on their
         own, which is useful if you're using the plane for some kind of calculation,

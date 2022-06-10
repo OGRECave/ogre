@@ -72,7 +72,7 @@ namespace Ogre {
     };
 
     /** A factory class that can create various mesh prefabs. 
-    @remarks
+
         This class is used by OgreMeshManager to offload the loading of various prefab types 
         to a central location.
     */

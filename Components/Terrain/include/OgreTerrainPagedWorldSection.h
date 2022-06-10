@@ -49,7 +49,7 @@ namespace Ogre
     */
 
     /** A world section which includes paged terrain. 
-    @remarks
+
         Rather than implement terrain paging as a PageContent subclass, because terrain
         benefits from direct knowledge of neighbour arrangements and the tight
         coupling between that and the paging strategy, instead we use a PagedWorldSection
@@ -89,7 +89,7 @@ namespace Ogre
         virtual ~TerrainPagedWorldSection();
 
         /** Initialise this section from an existing TerrainGroup instance. 
-        @remarks
+
             This is the route you will take if you're defining this world section
             from scratch in code. The other alternative is that you'll be loading
             this section from a file, in which case all the settings will be

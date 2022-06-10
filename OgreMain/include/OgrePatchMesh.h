@@ -41,7 +41,7 @@ namespace Ogre {
     *  @{
     */
     /** Patch specialisation of Mesh. 
-    @remarks
+
         Instances of this class should be created by calling MeshManager::createBezierPatch.
     */
     class _OgreExport PatchMesh : public Mesh

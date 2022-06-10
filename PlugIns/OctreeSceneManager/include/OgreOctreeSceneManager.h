@@ -113,7 +113,7 @@ public:
     virtual void _alertVisibleObjects( void );
 
     /** Walks through the octree, adding any visible objects to the render queue.
-    @remarks
+
     If any octant in the octree if completely within the view frustum,
     all subchildren are automatically added with no visibility tests.
     */
@@ -161,7 +161,7 @@ public:
     void resize( const AxisAlignedBox &box );
 
     /** Sets the given option for the SceneManager
-               @remarks
+
         Options are:
         "Size", AxisAlignedBox *;
         "Depth", int *;
@@ -170,7 +170,7 @@ public:
 
     virtual bool setOption( const String &, const void * );
     /** Gets the given option for the Scene Manager.
-        @remarks
+
         See setOption
     */
     virtual bool getOption( const String &, void * );

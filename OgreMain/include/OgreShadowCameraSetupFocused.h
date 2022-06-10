@@ -46,7 +46,7 @@ namespace Ogre {
     *  @{
     */
     /** Implements the uniform shadow mapping algorithm in focused mode.
-    @remarks
+
         Differs from the default shadow mapping projection in that it focuses the
         shadow map on the visible areas of the scene. This results in better
         shadow map texel usage, at the expense of some 'swimming' of the shadow
@@ -62,7 +62,7 @@ namespace Ogre {
         bool mUseAggressiveRegion;
     protected:
         /** Transform to or from light space as defined by Wimmer et al.
-        @remarks
+
             Point and spot lights need to be converted to directional lights to enable a 1:1 
             light mapping. Otherwise a directional light may become a point light or a point 
             sink (opposite of a light source) or point/spot lights may become directional lights
@@ -91,13 +91,13 @@ namespace Ogre {
             void merge(const PointListBody& plb);
 
             /** Builds a point list body from a 'real' body.
-            @remarks
+
                 Inserts all vertices from a body into the point list with or without adding duplicate vertices.
             */
             void build(const ConvexBody& body, bool filterDuplicates = true);
 
             /** Builds a PointListBody from a Body and includes all the space in a given direction.
-            @remarks
+
                 Intersects the bounding box with a ray from each available point of the body with the given
                 direction. Base and intersection points are stored in a PointListBody structure.
             @note
@@ -144,7 +144,7 @@ namespace Ogre {
             Matrix4 *out_proj, Frustum *out_cam) const;
 
         /** Calculates the intersection bodyB.
-        @remarks
+
             The intersection bodyB consists of the concatenation the cam frustum clipped 
             by the scene bounding box followed by a convex hullification with the light's 
             position and the clipping with the scene bounding box and the light frustum:
@@ -172,7 +172,7 @@ namespace Ogre {
             const AxisAlignedBox& sceneBB, const AxisAlignedBox& receiverBB, PointListBody *out_bodyB) const;
 
         /** Calculates the bodyLVS.
-        @remarks
+
             Calculates the bodyLVS which consists of the convex intersection operation 
             affecting the light frustum, the view frustum, and the current scene bounding
             box is used to find suitable positions in the viewer's frustum to build the 
@@ -193,7 +193,7 @@ namespace Ogre {
             const AxisAlignedBox& sceneBB, PointListBody *out_LVS) const;
 
         /** Returns the projection view direction.
-        @remarks
+
             After the matrix L_p is applied the orientation of the light space may tilt for
             non-identity projections. To prevent a false shadow cast the real view direction
             is evaluated and applied to the light matrix L.
@@ -208,7 +208,7 @@ namespace Ogre {
             const PointListBody& bodyLVS) const;
 
         /** Returns a valid near-point seen by the camera.
-        @remarks
+
             Returns a point that is situated near the camera by analyzing the bodyLVS that
             contains all the relevant scene space in front of the light and the camera in
             a point list array. The view matrix is relevant because the nearest point in
@@ -223,7 +223,7 @@ namespace Ogre {
 
         /** Transforms a given body to the unit cube (-1,-1,-1) / (+1,+1,+1) with a specific 
             shadow matrix enabled.
-        @remarks
+
             Transforms a given point list body object with the matrix m and then maps its
             extends to a (-1,-1,-1) / (+1,+1,+1) unit cube.
         @param m

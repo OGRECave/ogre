@@ -41,7 +41,7 @@ namespace Ogre {
      */
     /**
        An object which renders geometry to a vertex.
-       @remarks
+
        This is especially useful together with geometry shaders, as you can
        render procedural geometry which will get saved to a vertex buffer for
        reuse later, without regenerating it again. You can also create shaders
@@ -56,7 +56,7 @@ namespace Ogre {
 
         /**
            Get the vertex declaration that the pass will output.
-           @remarks
+
            Use this object to set the elements of the buffer. Object will calculate
            buffers on its own. Only one source allowed!
         */

@@ -42,7 +42,7 @@ namespace Ogre {
     */
 
     /** Class to provide aligned memory allocate functionality.
-    @remarks
+
         All SIMD processing are friendly with aligned memory, and some SIMD routines
         are designed for working with aligned memory only. If the data are intended to
         use SIMD processing, it's need to be aligned for better performance boost.
@@ -76,7 +76,7 @@ namespace Ogre {
         static DECL_MALLOC void* allocate(size_t size, size_t alignment);
 
         /** Allocate memory with default platform dependent alignment.
-            @remarks
+
                 The default alignment depend on target machine, this function
                 guarantee aligned memory according with SIMD processing and
                 cache boundary friendly.

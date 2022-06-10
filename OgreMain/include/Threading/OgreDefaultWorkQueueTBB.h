@@ -32,7 +32,7 @@ THE SOFTWARE
 namespace Ogre
 {
     /** Implementation of a general purpose request / response style background work queue.
-    @remarks
+
         This implementation utilises tbb's task system for the WorkQueue implementation.
     */
     class _OgreExport DefaultWorkQueue : public DefaultWorkQueueBase
@@ -45,7 +45,7 @@ namespace Ogre
         virtual ~DefaultWorkQueue(void);
 #endif
         /** Process the next request on the queue. 
-        @remarks
+
             This method is public, but only intended for advanced users to call. 
             The only reason you would call this, is if you were using your 
             own thread to drive the worker processing. The thread calling this

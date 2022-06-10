@@ -46,7 +46,7 @@ namespace Ogre {
     */
 
     /** Abstract interface representing a 'licensee' of a hardware buffer copy.
-    @remarks
+
         Often it's useful to have temporary buffers which are used for working
         but are not necessarily needed permanently. However, creating and 
         destroying buffers is expensive, so we need a way to share these 
@@ -99,7 +99,7 @@ namespace Ogre {
 
 
     /** Base definition of a hardware buffer manager.
-    @remarks
+
         This class is deliberately not a Singleton, so that multiple types can 
         exist at once (notably DefaultHardwareBufferManagerBase).
         The Singleton is add via the inheritance in HardwareBufferManager below.
@@ -278,7 +278,7 @@ namespace Ogre {
         void destroyVertexBufferBinding(VertexBufferBinding* binding);
 
         /** Registers a vertex buffer as a copy of another.
-        @remarks
+
             This is useful for registering an existing buffer as a temporary buffer
             which can be allocated just like a copy.
         */
@@ -287,7 +287,7 @@ namespace Ogre {
             const HardwareVertexBufferSharedPtr& copy);
 
         /** Allocates a copy of a given vertex buffer.
-        @remarks
+
             This method allocates a temporary copy of an existing vertex buffer.
             This buffer is subsequently stored and can be made available for 
             other purposes later without incurring the cost of construction / 
@@ -313,7 +313,7 @@ namespace Ogre {
             bool copyData = false);
 
         /** Manually release a vertex buffer copy for others to subsequently use.
-        @remarks
+
             Only required if the original call to allocateVertexBufferCopy
             included a licenseType of BLT_MANUAL_RELEASE. 
         @param bufferCopy
@@ -324,7 +324,7 @@ namespace Ogre {
         void releaseVertexBufferCopy(const HardwareVertexBufferSharedPtr& bufferCopy);
 
         /** Tell engine that the vertex buffer copy intent to reuse.
-        @remarks
+
             Ogre internal keep an expired delay counter of BLT_AUTOMATIC_RELEASE
             buffers, when the counter count down to zero, it'll release for other
             purposes later. But you can use this function to reset the counter to
@@ -337,7 +337,7 @@ namespace Ogre {
         void touchVertexBufferCopy(const HardwareVertexBufferSharedPtr& bufferCopy);
 
         /** Free all unused vertex buffer copies.
-        @remarks
+
             This method free all temporary vertex buffers that not in used.
             In normally, temporary vertex buffers are subsequently stored and can
             be made available for other purposes later without incurring the cost
@@ -357,7 +357,7 @@ namespace Ogre {
         void _releaseBufferCopies(bool forceFreeUnused = false);
 
         /** Internal method that forces the release of copies of a given buffer.
-        @remarks
+
             This usually means that the buffer which the copies are based on has
             been changed in some fundamental way, and the owner of the original 
             wishes to make that known so that new copies will reflect the
@@ -369,7 +369,7 @@ namespace Ogre {
         void _forceReleaseBufferCopies(const HardwareVertexBufferSharedPtr& sourceBuffer);
 
         /** Internal method that forces the release of copies of a given buffer.
-        @remarks
+
             This usually means that the buffer which the copies are based on has
             been changed in some fundamental way, and the owner of the original 
             wishes to make that known so that new copies will reflect the

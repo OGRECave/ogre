@@ -42,7 +42,7 @@ namespace Ogre {
     *  @{
     */
     /** Abstract class defining the interface to be implemented by creators of ParticleAffector subclasses.
-    @remarks
+
         Plugins or 3rd party applications can add new types of particle affectors to Ogre by creating
         subclasses of the ParticleAffector class. Because multiple instances of these affectors may be
         required, a factory class to manage the instances is also required. 
@@ -63,7 +63,7 @@ namespace Ogre {
         virtual String getName() const = 0;
 
         /** Creates a new affector instance.
-        @remarks
+
             The subclass MUST add a pointer to the created instance to mAffectors.
         */
         virtual ParticleAffector* createAffector(ParticleSystem* psys) = 0;

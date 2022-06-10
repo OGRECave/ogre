@@ -43,7 +43,7 @@ namespace Ogre
     */
 
     /** A bone in a skeleton.
-    @remarks
+
         See Skeleton for more information about the principles behind skeletal animation.
         This class is a node in the joint hierarchy. Mesh vertices also have assignments
         to bones to define how they move in relation to the skeleton.
@@ -63,7 +63,7 @@ namespace Ogre
         using Node::createChild;
     public:
         /** Creates a new Bone as a child of this bone.
-        @remarks
+
             This method creates a new bone which will inherit the transforms of this
             bone, with the handle specified.
             @param 
@@ -85,7 +85,7 @@ namespace Ogre
         void setBindingPose(void);
 
         /** Resets the position and orientation of this Bone to the original binding position.
-        @remarks
+
             Bones are bound to the mesh in a binding pose. They are then modified from this
             position during animation. This method returns the bone to it's original position and
             orientation.
@@ -93,7 +93,7 @@ namespace Ogre
         void reset(void);
 
         /** Sets whether or not this bone is manually controlled. 
-        @remarks
+
             Manually controlled bones can be altered by the application at runtime, 
             and their positions will not be reset by the animation routines. Note 
             that you should also make sure that there are no AnimationTrack objects
@@ -111,7 +111,7 @@ namespace Ogre
 
         
         /** Gets the transform which takes bone space to current from the binding pose. 
-        @remarks
+
             Internal use only.
         */
         void _getOffsetTransform(Affine3& m) const;

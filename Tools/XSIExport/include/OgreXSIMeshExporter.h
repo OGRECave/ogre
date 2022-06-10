@@ -70,7 +70,7 @@ namespace Ogre {
 
         
         /** Build an OGRe mesh ready for export.
-        @remarks
+
             Every PolygonMesh object is exported as a different SubMesh. Other
             object types are ignored.
         @param mergeSubMeshes Whether to merge submeshes with the same material
@@ -299,7 +299,7 @@ namespace Ogre {
 
         /** Try to look up an existing vertex with the same information, or
             create a new one.
-        @remarks
+
             Note that we build up the list of unique position indexes that are
             actually used by each ProtoSubMesh as we go. When new positions
             are found, they are added and a remap entry created to take account

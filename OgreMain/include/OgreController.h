@@ -43,7 +43,7 @@ namespace Ogre {
     
     
     /** Subclasses of this class are responsible for performing a function on an input value for a Controller.
-        @remarks
+
             This abstract class provides the interface that needs to be supported for a custom function which
             can be 'plugged in' to a Controller instance, which controls some object value based on an input value.
             For example, the WaveControllerFunction class provided by Ogre allows you to use various waveforms to
@@ -106,7 +106,7 @@ namespace Ogre {
     };
 
     /** Instances of this class 'control' the value of another object in the system.
-        @remarks
+
             Controller classes are used to manage the values of object automatically based
             on the value of some input. For example, a Controller could animate a texture
             by controlling the current frame of the texture based on time, or a different Controller
@@ -142,7 +142,7 @@ namespace Ogre {
     public:
 
         /** Usual constructor.
-            @remarks
+
                 Requires source and destination values, and a function object. None of these are destroyed
                 with the Controller when it is deleted (they can be shared) so you must delete these as appropriate.
         */
@@ -208,7 +208,7 @@ namespace Ogre {
 
         /** Tells this controller to map it's input controller value
             to it's output controller value, via the controller function. 
-        @remarks
+
             This method is called automatically every frame by ControllerManager.
         */
         void update(void)

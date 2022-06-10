@@ -54,7 +54,7 @@ namespace Ogre {
 
         /** Removes any whitespace characters, be it standard space or
             TABs and so on.
-            @remarks
+
             The user may specify whether they want to trim only the
             beginning or the end of the String ( the default action is
             to trim both).
@@ -137,7 +137,7 @@ namespace Ogre {
 
         /** Method for splitting a fully qualified filename into the base name
             and path.
-            @remarks
+
             Path is standardised as in standardisePath
         */
         static void splitFilename(const String& qualifiedName,
@@ -145,7 +145,7 @@ namespace Ogre {
 
         /** Method for splitting a fully qualified filename into the base name,
             extension and path.
-            @remarks
+
             Path is standardised as in standardisePath
         */
         static void splitFullFilename(const Ogre::String& qualifiedName,

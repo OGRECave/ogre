@@ -64,7 +64,7 @@ namespace Ogre
     /** Defines the interface to a strategy class which is responsible for deciding
         when Page instances are requested for addition and removal from the 
         paging system.
-    @remarks
+
         The interface is deliberately light, with no specific mention of requesting
         new Page instances. It is entirely up to the PageStrategy to respond
         to the events raised on it and to call methods on other classes (such as
@@ -92,7 +92,7 @@ namespace Ogre
         /// Called when the frame ends
         virtual void frameEnd(Real timeElapsed, PagedWorldSection* section) {}
         /** Called when a camera is used for any kind of rendering.
-        @remarks
+
             This is probably the primary way in which the strategy will request
             new pages. 
         @param cam Camera which is being used for rendering. Class should not
@@ -120,7 +120,7 @@ namespace Ogre
 
         /** Update the contents of the passed in SceneNode to reflect the 
             debug display of a given page. 
-        @remarks
+
             The PageStrategy is to have complete control of the contents of this
             SceneNode, it must not be altered / added to by others.
         */

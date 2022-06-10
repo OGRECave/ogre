@@ -76,7 +76,7 @@ namespace Ogre {
         HBU_CPU_TO_GPU = HBU_CPU_ONLY | HBU_DETAIL_WRITE_ONLY,
     };
     /** Abstract class defining common features of hardware buffers.
-    @remarks
+
         A 'hardware buffer' is any area of memory held outside of core system ram,
         and in our case refers mostly to video ram, although in theory this class
         could be used with other memory areas such as sound card memory, custom
@@ -240,7 +240,7 @@ namespace Ogre {
                 return this->lock(0, mSizeInBytes, options);
             }
             /** Releases the lock on this buffer. 
-            @remarks 
+
                 Locking and unlocking a buffer can, in some rare circumstances such as 
                 switching video modes whilst the buffer is locked, corrupt the 
                 contents of a buffer. This is pretty rare, but if it occurs, 
@@ -308,7 +308,7 @@ namespace Ogre {
             }
 
             /** Copy data from another buffer into this one.
-            @remarks
+
                 Note that the source buffer must not be created with the
                 usage HBU_WRITE_ONLY otherwise this will fail. 
             @param srcBuffer The buffer from which to read the copied data
@@ -332,7 +332,7 @@ namespace Ogre {
             }
 
             /** Copy all data from another buffer into this one. 
-            @remarks
+
                 Normally these buffers should be of identical size, but if they're
                 not, the routine will use the smallest of the two sizes.
             */

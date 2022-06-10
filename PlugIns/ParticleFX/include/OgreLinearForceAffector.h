@@ -41,7 +41,7 @@ namespace Ogre {
     *  @{
     */
     /** This affector applies a force vector to all particles to modify their trajectory. Can be used for gravity, wind, or any other linear force.
-    @remarks
+
         This force can be applied in 2 ways: by taking the average of the particle's current momentum and the 
         force vector, or by adding the force vector to the current particle's momentum. 
     @par
@@ -91,7 +91,7 @@ namespace Ogre {
         Vector3 getForceVector(void) const;
 
         /** Sets how the force vector is applied to a particle. 
-        @remarks
+
           The default is FA_ADD.
         @param fa A member of the ForceApplication enum.
         */

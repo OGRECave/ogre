@@ -50,12 +50,12 @@ namespace Ogre {
     *  @{
     */
     /** Handles the management of mesh resources.
-        @remarks
+
             This class deals with the runtime management of
             mesh data; like other resource managers it handles
             the creation of resources (in this case mesh data),
             working within a fixed memory budget.
-        @remarks
+
             Ogre loads model files from it's own proprietary
             format called .mesh. This is because having a single file
             format is better for runtime performance, and we also have
@@ -370,13 +370,13 @@ namespace Ogre {
         static MeshManager* getSingletonPtr(void);
 
         /** Gets the base element type used for blend weights in vertex buffers.
-        @remarks
+
         See the remarks below for SetBlendWeightsBaseElementType().
         */
         VertexElementType getBlendWeightsBaseElementType() const;
 
         /** sets the base element type used for blend weights in vertex buffers.
-        @remarks
+
         This takes effect when meshes are loaded.  Default is VET_FLOAT1.
         Valid values are:
         VET_UBYTE4_NORM:   8-bit blend weights.  Lowest memory cost but may have precision issues.  Requires SM2.0+ vertex shader.  No software skinning.

@@ -42,7 +42,7 @@ namespace Ogre {
     *  @{
     */
     /** Implements the plane optimal shadow camera algorithm.
-        @remarks
+
             Given a plane of interest, it is possible to set up the shadow camera
             matrix such that the mapping between screen and shadow map is the identity
             (when restricted to pixels that view the plane of interest).  Therefore,

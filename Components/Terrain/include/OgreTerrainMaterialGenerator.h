@@ -140,7 +140,7 @@ namespace Ogre
     };
 
     /** Class that provides functionality to generate materials for use with a terrain.
-    @remarks
+
         Terrains are composed of one or more layers of texture information, and
         require that a material is generated to render them. There are various approaches
         to rendering the terrain, which may vary due to:
@@ -362,7 +362,7 @@ namespace Ogre
         }
 
         /** Set the debug level of the material. 
-        @remarks
+
             Sets the level of debug display for this material.
             What this debug level means is entirely depdendent on the generator, 
             the only constant is that 0 means 'no debug' and non-zero means 

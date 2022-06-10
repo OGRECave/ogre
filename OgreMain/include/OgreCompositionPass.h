@@ -103,13 +103,13 @@ namespace Ogre {
         uint8 getLastRenderQueue() const;
 
         /** Set the material scheme used by this pass.
-        @remarks
+
             Only applicable to passes that render the scene.
             @see Technique::setScheme.
         */
         void setMaterialScheme(const String& schemeName);
         /** Get the material scheme used by this pass.
-        @remarks
+
             Only applicable to passes that render the scene.
             @see Technique::setScheme.
         */

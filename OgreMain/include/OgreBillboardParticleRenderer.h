@@ -44,7 +44,7 @@ namespace Ogre {
 
     /** Specialisation of ParticleSystemRenderer to render particles using 
         a BillboardSet. 
-    @remarks
+
         This renderer has a few more options than the standard particle system,
         which will be passed to it automatically when the particle system itself
         does not understand them.

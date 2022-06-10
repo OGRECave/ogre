@@ -46,7 +46,7 @@ namespace Ogre {
     */
     /** A pose is a linked set of vertex offsets applying to one set of vertex
         data. 
-    @remarks
+
         The target index referred to by the pose has a meaning set by the user
         of this class; but for example when used by Mesh it refers to either the
         Mesh shared geometry (0) or a SubMesh dedicated geometry (1+).

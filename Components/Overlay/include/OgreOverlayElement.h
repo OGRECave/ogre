@@ -79,7 +79,7 @@ namespace Ogre {
     };
 
     /** Abstract definition of a 2D element to be displayed in an Overlay.
-    @remarks
+
     This class abstracts all the details of a 2D element which will appear in
     an overlay. In fact, not all OverlayElement instances can be directly added to an
     Overlay, only those which are OverlayContainer instances (a subclass of this class).
@@ -168,7 +168,7 @@ namespace Ogre {
         virtual void updateTextureGeometry(void) = 0;
 
         /** Internal method for setting up the basic parameter definitions for a subclass. 
-        @remarks
+
         Because StringInterface holds a dictionary of parameters per class, subclasses need to
         call this to ask the base class to add it's parameters to their dictionary as well.
         Can't do this in the constructor because that runs in a non-virtual context.
@@ -261,7 +261,7 @@ namespace Ogre {
         virtual const String& getMaterialName(void) const;
 
         /** Sets the the material this element will use.
-        @remarks
+
         Different elements will use different materials. One constant about them
         all though is that a Material used for a OverlayElement must have it's depth
         checking set to 'off', which means it always gets rendered on top. OGRE
@@ -313,7 +313,7 @@ namespace Ogre {
 
         /** Internal method to notify the element when Z-order of parent overlay
         has changed.
-        @remarks
+
         Overlays have explicit Z-orders. OverlayElements do not, they inherit the 
         Z-order of the overlay, and the Z-order is incremented for every container
         nested within this to ensure that containers are displayed behind contained
@@ -346,7 +346,7 @@ namespace Ogre {
         virtual const String& getTypeName(void) const = 0;
 
         /** Sets the caption on elements that support it. 
-        @remarks
+
         This property doesn't do something on all elements, just those that support it.
         However, being a common requirement it is in the top-level interface to avoid
         having to set it via the StringInterface all the time.
@@ -355,7 +355,7 @@ namespace Ogre {
         /** Gets the caption for this element. */
         const DisplayString& getCaption(void) const { return mCaption; }
         /** Sets the colour on elements that support it. 
-        @remarks
+
         This property doesn't do something on all elements, just those that support it.
         However, being a common requirement it is in the top-level interface to avoid
         having to set it via the StringInterface all the time.
@@ -366,7 +366,7 @@ namespace Ogre {
         virtual const ColourValue& getColour(void) const;
 
         /** Tells this element how to interpret the position and dimension values it is given.
-        @remarks
+
         By default, OverlayElements are positioned and sized according to relative dimensions
         of the screen. This is to ensure portability between different resolutions when you
         want things to be positioned and sized the same way across all resolutions. However, 
@@ -379,7 +379,7 @@ namespace Ogre {
         /** Retrieves the current settings of how the element metrics are interpreted. */
         GuiMetricsMode getMetricsMode(void) const { return mMetricsMode; }
         /** Sets the horizontal origin for this element.
-        @remarks
+
         By default, the horizontal origin for a OverlayElement is the left edge of the parent container
         (or the screen if this is a root element). You can alter this by calling this method, which is
         especially useful when you want to use pixel-based metrics (see setMetricsMode) since in this
@@ -397,7 +397,7 @@ namespace Ogre {
         /** Gets the horizontal alignment for this element. */
         GuiHorizontalAlignment getHorizontalAlignment(void) const { return mHorzAlign; }
         /** Sets the vertical origin for this element. 
-        @remarks
+
         By default, the vertical origin for a OverlayElement is the top edge of the parent container
         (or the screen if this is a root element). You can alter this by calling this method, which is
         especially useful when you want to use pixel-based metrics (see setMetricsMode) since in this

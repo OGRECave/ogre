@@ -128,7 +128,7 @@ namespace Ogre
         void setBlendValue(uint32 x, uint32 y, float val);
 
         /** Get a pointer to the whole blend data. 
-        @remarks
+
             This method allows you to get a raw pointer to all the blend data, to 
             update it as you like. However, you must then call dirtyRect manually 
             if you want those changes to be recognised. 

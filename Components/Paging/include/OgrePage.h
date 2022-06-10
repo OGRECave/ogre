@@ -107,7 +107,7 @@ namespace Ogre
         /// Get the PagedWorldSection this page belongs to
         virtual PagedWorldSection* getParentSection() const { return mParent; }
         /** Get the frame number in which this Page was last loaded or held.
-        @remarks
+
             A Page that has not been requested to be loaded or held in the recent
             past will be a candidate for removal.
         */

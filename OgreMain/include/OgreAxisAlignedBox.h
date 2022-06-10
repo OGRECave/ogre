@@ -44,7 +44,7 @@ namespace Ogre {
     */
 
     /** A 3D box aligned with the x/y/z axes.
-    @remarks
+
     This class represents a simple box which is aligned with the
     axes. Internally it only stores 2 points as the extremeties of
     the box, one which is the minima of all 3 axes, and the other
@@ -246,7 +246,7 @@ namespace Ogre {
 
         /** Returns a pointer to an array of 8 corner points, useful for
         collision vs. non-aligned objects.
-        @remarks
+
         If the order of these corners is important, they are as
         follows: The 4 points of the minimum Z face (note that
         because Ogre uses right-handed coordinates, the minimum Z is
@@ -397,7 +397,7 @@ namespace Ogre {
         }
 
         /** Transforms the box according to the matrix supplied.
-        @remarks
+
         By calling this method you get the axis-aligned box which
         surrounds the transformed version of this box. Therefore each
         corner of the box is transformed by the matrix, then the
@@ -462,7 +462,7 @@ namespace Ogre {
         }
 
         /** Transforms the box according to the affine matrix supplied.
-        @remarks
+
         By calling this method you get the axis-aligned box which
         surrounds the transformed version of this box. Therefore each
         corner of the box is transformed by the matrix, then the

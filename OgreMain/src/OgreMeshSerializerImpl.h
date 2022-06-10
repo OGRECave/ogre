@@ -48,7 +48,7 @@ namespace Ogre {
     */
     /** Internal implementation of Mesh reading / writing for the latest version of the
     .mesh format.
-    @remarks
+
     In order to maintain compatibility with older versions of the .mesh format, there
     will be alternative subclasses of this class to load older versions, whilst this class
     will remain to load the latest version.
@@ -63,7 +63,7 @@ namespace Ogre {
         MeshSerializerImpl();
         virtual ~MeshSerializerImpl();
         /** Exports a mesh to the file specified. 
-        @remarks
+
         This method takes an externally created Mesh object, and exports both it
         and optionally the Materials it uses to a .mesh file.
         @param pMesh Pointer to the Mesh to export
@@ -74,7 +74,7 @@ namespace Ogre {
             Endian endianMode = ENDIAN_NATIVE);
 
         /** Imports Mesh and (optionally) Material data from a .mesh file DataStream.
-        @remarks
+
         This method imports data from a DataStream opened from a .mesh file and places it's
         contents into the Mesh object which is passed in. 
         @param stream The DataStream holding the .mesh data. Must be initialised (pos at the start of the buffer).

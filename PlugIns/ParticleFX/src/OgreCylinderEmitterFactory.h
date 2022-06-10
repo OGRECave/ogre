@@ -37,7 +37,7 @@ THE SOFTWARE.
 namespace Ogre {
 
     /** Factory class for particle emitter of type "Cylinder".
-    @remarks
+
         Creates instances of CylinderEmitter to be used in particle systems. 
     */
     class CylinderEmitterFactory : public ParticleEmitterFactory

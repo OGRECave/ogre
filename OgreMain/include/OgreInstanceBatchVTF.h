@@ -65,7 +65,7 @@ namespace Ogre
         @par
         The material requires at least a texture unit stage named "InstancingVTF"
 
-        @remarks
+
             Design discussion webpage: http://www.ogre3d.org/forums/viewtopic.php?f=4&t=59902
         @author
             Matias N. Goldberg ("dark_sylinc")

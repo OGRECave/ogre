@@ -45,7 +45,7 @@ namespace Ogre {
     *  @{
     */
     /** Represents a layer which is rendered on top of the 'normal' scene contents.
-    @remarks
+
         An overlay is a container for visual components (2D and 3D) which will be 
         rendered after the main scene in order to composite heads-up-displays, menus
         or other layers on top of the contents of the scene.
@@ -117,7 +117,7 @@ namespace Ogre {
         const String& getName(void) const;
         
         /** Alters the Z-order of this overlay. 
-        @remarks
+
             Values between 0 and 650 are valid here.
         */
         void setZOrder(ushort zorder);
@@ -140,7 +140,7 @@ namespace Ogre {
         void setVisible(bool visible);
 
         /** Adds a 2D 'container' to the overlay.
-        @remarks
+
             Containers are created and managed using the OverlayManager. A container
             could be as simple as a square panel, or something more complex like
             a grid or tree view. Containers group collections of other elements,
@@ -153,13 +153,13 @@ namespace Ogre {
 
 
         /** Removes a 2D container from the overlay. 
-        @remarks
+
             NOT FAST. Consider OverlayElement::hide.
         */
         void remove2D(OverlayContainer* cont);
 
         /** Adds a node capable of holding 3D objects to the overlay.
-        @remarks    
+
             Although overlays are traditionally associated with 2D elements, there 
             are reasons why you might want to attach 3D elements to the overlay too.
             For example, if you wanted to have a 3D cockpit, which was overlaid with a
@@ -199,7 +199,7 @@ namespace Ogre {
         void clear();
 
         /** Sets the scrolling factor of this overlay.
-        @remarks
+
             You can use this to set an offset to be used to scroll an 
             overlay around the screen.
         @param x Horizontal scroll value, where 0 = normal, -0.5 = scroll so that only
@@ -216,7 +216,7 @@ namespace Ogre {
         Real getScrollY(void) const;
 
         /** Scrolls the overlay by the offsets provided.
-        @remarks
+
             This method moves the overlay by the amounts provided. As with
             other methods on this object, a full screen width / height is represented
             by the value 1.0.
@@ -233,7 +233,7 @@ namespace Ogre {
         void rotate(const Radian& angle);
 
         /** Sets the scaling factor of this overlay.
-        @remarks
+
             You can use this to set an scale factor to be used to zoom an 
             overlay.
         @param x Horizontal scale value, where 1.0 = normal, 0.5 = half size etc
@@ -263,7 +263,7 @@ namespace Ogre {
         }
 
         /** Get the origin of this overlay, e.g. a script file name.
-        @remarks
+
             This property will only contain something if the creator of
             this overlay chose to populate it. Script loaders are advised
             to populate it.

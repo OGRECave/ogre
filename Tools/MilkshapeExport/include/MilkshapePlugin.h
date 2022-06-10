@@ -35,7 +35,7 @@ THE SOFTWARE.
 
 
 /** A plugin class for Milkshape3D to export to OGRE model formats. 
-@remarks
+
     This class is the implementor of the exporting interface for Milkshape3D, to allow
     you to export your models to OGRE format from that tool.
     Note that this plugin delegates most of the detail of exporting the model to the

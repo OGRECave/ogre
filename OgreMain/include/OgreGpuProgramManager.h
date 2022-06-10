@@ -117,7 +117,7 @@ namespace Ogre {
         }
 
         /** Loads a GPU program from a file
-        @remarks
+
             This method creates a new program of the type specified as the second parameter.
             As with all types of ResourceManager, this class will search for the file in
             all resource locations it has been configured to look in.
@@ -132,7 +132,7 @@ namespace Ogre {
             const String& syntaxCode);
 
         /** Loads a GPU program from a string
-        @remarks
+
             The assembly code must be compatible with this manager - call the 
             getSupportedSyntax method for details of the supported syntaxes 
         @param name The identifying name to give this program, which can be used to
@@ -157,13 +157,13 @@ namespace Ogre {
 
         /** Creates a new GpuProgramParameters instance which can be used to bind
             parameters to your programs.
-        @remarks
+
             Program parameters can be shared between multiple programs if you wish.
         */
         virtual GpuProgramParametersSharedPtr createParameters(void);
         
         /** Create a new, unloaded GpuProgram from a file of assembly. 
-        @remarks    
+
             Use this method in preference to the 'load' methods if you wish to define
             a GpuProgram, but not load it yet; useful for saving memory.
         @par
@@ -181,7 +181,7 @@ namespace Ogre {
             GpuProgramType gptype, const String& syntaxCode);
 
         /** Create a GPU program from a string of assembly code.
-        @remarks    
+
             Use this method in preference to the 'load' methods if you wish to define
             a GpuProgram, but not load it yet; useful for saving memory.
         @par

@@ -39,7 +39,7 @@ namespace Ogre {
     *  @{
     */
     /** Specialisation of SceneNode for the BspSceneManager.
-    @remarks
+
         This specialisation of SceneNode is to enable information about the
         leaf node in which any attached objects are held is stored for
         use in the visibility determination. 
@@ -63,7 +63,7 @@ namespace Ogre {
         /// Overridden from Node
         void _update(bool updateChildren, bool parentHasChanged);
         /** Detaches the indexed object from this scene node.
-        @remarks
+
             Detaches by index, see the alternate version to detach by name. Object indexes
             may change as other objects are added / removed.
         */

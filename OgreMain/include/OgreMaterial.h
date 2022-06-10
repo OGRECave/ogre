@@ -162,7 +162,7 @@ namespace Ogre {
         bool isTransparent(void) const;
 
         /** Sets whether objects using this material will receive shadows.
-        @remarks
+
             This method allows a material to opt out of receiving shadows, if
             it would otherwise do so. Shadows will not be cast on any objects
             unless the scene is set up to support shadows 
@@ -179,7 +179,7 @@ namespace Ogre {
         bool getReceiveShadows(void) const { return mReceiveShadows; }
 
         /** Sets whether objects using this material be classified as opaque to the shadow caster system.
-        @remarks
+
         This method allows a material to cast a shadow, even if it is transparent.
         By default, transparent materials neither cast nor receive shadows. Shadows
         will not be cast on any objects unless the scene is set up to support shadows 
@@ -194,7 +194,7 @@ namespace Ogre {
         /// @name Techniques
         /// @{
         /** Creates a new Technique for this Material.
-        @remarks
+
             A Technique is a single way of rendering geometry in order to achieve the effect
             you are intending in a material. There are many reason why you would want more than
             one - the main one being to handle variable graphics card abilities; you might have
@@ -230,7 +230,7 @@ namespace Ogre {
         }
 
         /** Gets all the Techniques which are supported by the current card.
-        @remarks
+
             The supported technique list is only available after this material has been compiled,
             which typically happens on loading the material. Therefore, if this method returns
             an empty list, try calling Material::load.
@@ -250,7 +250,7 @@ namespace Ogre {
         const String& getUnsupportedTechniquesExplanation() const { return mUnsupportedReasons; }
 
         /** Gets the best supported technique. 
-        @remarks
+
             This method returns the lowest-index supported Technique in this material
             (since lower-indexed Techniques are considered to be better than higher-indexed
             ones).
@@ -293,7 +293,7 @@ namespace Ogre {
         void copyDetailsTo(MaterialPtr& mat) const;
 
         /** 'Compiles' this Material.
-        @remarks
+
             Compiling a material involves determining which Techniques are supported on the
             card on which OGRE is currently running, and for fixed-function Passes within those
             Techniques, splitting the passes down where they contain more TextureUnitState 
@@ -585,18 +585,18 @@ namespace Ogre {
         /// @{
         /** Gets the number of levels-of-detail this material has in the
             given scheme, based on Technique::setLodIndex.
-        @remarks
+
             Note that this will not be up to date until the material has been compiled.
         */
         unsigned short getNumLodLevels(unsigned short schemeIndex) const;
         /** Gets the number of levels-of-detail this material has in the
             given scheme, based on Technique::setLodIndex.
-        @remarks
+
             Note that this will not be up to date until the material has been compiled.
         */
         unsigned short getNumLodLevels(const String& schemeName) const;
         /** Sets the distance at which level-of-detail (LOD) levels come into effect.
-        @remarks
+
             You should only use this if you have assigned LOD indexes to the Technique
             instances attached to this Material. If you have done so, you should call this
             method to determine the distance at which the lowe levels of detail kick in.
@@ -612,7 +612,7 @@ namespace Ogre {
         void setLodLevels(const LodValueList& lodValues);
 
         /** Gets the list of values transformed by the LodStrategy at which each LOD comes into effect.
-        @remarks
+
             Note that the iterator returned from this method is not totally analogous to 
             the one passed in by calling setLodLevels - the list includes a zero
             entry at the start (since the highest LOD starts at value 0). Also, the
@@ -626,7 +626,7 @@ namespace Ogre {
         OGRE_DEPRECATED LodValueIterator getLodValueIterator(void) const;
 
         /** Gets the user-defined list of values which are internally transformed by the LodStrategy.
-        @remarks
+
             Note that the iterator returned from this method is not totally analogous to 
             the one passed in by calling setLodLevels - the list includes a zero
             entry at the start (since the highest LOD starts at value 0). Also, the

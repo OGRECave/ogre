@@ -158,7 +158,7 @@ public:
     bool getSkeletalAnimationIncluded() const { return mSkeletalAnimation; }
 
     /** Tells Ogre whether auto-bound matrices should be sent in column or row-major order.
-    @remarks
+
         This method has the same effect as column_major_matrices option used when declaring manually written hlsl program.
         You want to use this method only when you use float3x4 type in a shader, e.g. for bone matrices.
         In mentioned case you should call this method with false as parameter.

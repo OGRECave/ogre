@@ -40,7 +40,7 @@ namespace Ogre {
     */
     /** Class for performing a radix sort (fast comparison-less sort based on 
         byte value) on various standard STL containers. 
-    @remarks
+
         A radix sort is a very fast sort algorithm. It doesn't use comparisons
         and thus is able to break the theoretical minimum O(N*logN) complexity. 
         Radix sort is complexity O(k*N), where k is a constant. Note that radix

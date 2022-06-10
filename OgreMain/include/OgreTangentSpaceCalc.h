@@ -95,7 +95,7 @@ namespace Ogre
         void addIndexData(IndexData* i_in, RenderOperation::OperationType opType = RenderOperation::OT_TRIANGLE_LIST);
 
         /** Sets whether to store tangent space parity in the W of a 4-component tangent or not.
-        @remarks
+
             The default element format to use is VET_FLOAT3 which is enough to accurately 
             deal with tangents that do not involve any texture coordinate mirroring. 
             If you wish to allow UV mirroring in your model, you must enable 4-component
@@ -113,7 +113,7 @@ namespace Ogre
 
         /** Sets whether or not to split vertices when a mirrored tangent space
             transition is detected (matrix parity differs).
-        @remarks
+
             This defaults to 'off' because it's the safest option; tangents will be
             interpolated in all cases even if they don't agree around a vertex, so
             artefacts will be smoothed out. When you're using art assets of 
@@ -134,7 +134,7 @@ namespace Ogre
 
         /** Sets whether or not to split vertices when tangent space rotates
             more than 90 degrees around a vertex.
-        @remarks
+
             This defaults to 'off' because it's the safest option; tangents will be
             interpolated in all cases even if they don't agree around a vertex, so
             artefacts will be smoothed out. When you're using art assets of 
@@ -153,7 +153,7 @@ namespace Ogre
         bool getSplitRotated() const { return mSplitRotated; }
 
         /** Build a tangent space basis from the provided data.
-        @remarks
+
             Only indexed triangle lists are allowed. Strips and fans cannot be
             supported because it may be necessary to split the geometry up to 
             respect deviances in the tangent space basis better.

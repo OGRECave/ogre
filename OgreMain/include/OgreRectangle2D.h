@@ -78,7 +78,7 @@ namespace Ogre {
                         const Vector3& bottomRight);
 
         /** Sets the UVs of the rectangle
-        @remarks
+
         Doesn't do anything if the rectangle wasn't built with texture coordinates
         */
         void setUVs(const Vector2& topLeft, const Vector2& bottomLeft, const Vector2& topRight,

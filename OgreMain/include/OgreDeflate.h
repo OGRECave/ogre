@@ -152,7 +152,7 @@ namespace Ogre
 
     /** Stream which compresses / uncompresses data using the 'deflate' compression
         algorithm.
-    @remarks
+
         This stream is designed to wrap another stream for the actual source / destination
         of the compressed data, it has no concrete source / data itself. The idea is
         that you pass uncompressed data through this stream, and the underlying
@@ -235,7 +235,7 @@ namespace Ogre
         ~DeflateStream();
         
         /** Returns whether the compressed stream is valid deflated data.
-         @remarks
+
             If you pass this class a READ stream which is not compressed with the 
             deflate algorithm, this method returns false and all read commands
             will actually be executed as passthroughs as a fallback. 

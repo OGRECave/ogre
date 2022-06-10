@@ -63,7 +63,7 @@ namespace Ogre {
 
     /** This class is used to perform Resource operations in a
         background thread. 
-    @remarks
+
         All these requests are now queued via Root::getWorkQueue in order
         to share the thread pool amongst all background tasks. You should therefore
         refer to that class for configuring the behaviour of the threads
@@ -258,7 +258,7 @@ namespace Ogre {
             const NameValuePairList* loadParams = 0, 
             Listener* listener = 0);
         /** Returns whether a previously queued process has completed or not. 
-        @remarks
+
             This method of checking that a background process has completed is
             the 'polling' approach. Each queued method takes an optional listener
             parameter to allow you to register a callback instead, which is

@@ -96,7 +96,7 @@ namespace Ogre {
 
     /** A collection of billboards (faces which are always facing the given direction) with the same (default) dimensions, material
         and which are fairly close proximity to each other.
-    @remarks
+
         Billboards are rectangles made up of 2 tris which are always facing the given direction. They are typically used
         for special effects like particles. This class collects together a set of billboards with the same (default) dimensions,
         material and relative locality in order to process them more efficiently. The entire set of billboards will be
@@ -164,7 +164,7 @@ namespace Ogre {
         size_t mActiveBillboards;
 
         /** Pool of billboard instances for use and reuse.
-        @remarks
+
             This vector will be preallocated with the estimated size of the set,and will extend as required.
         */
         BillboardPool mBillboardPool;
@@ -226,7 +226,7 @@ namespace Ogre {
         //  determine how much calculation has to be done per-billboard. NOT a one-size fits all approach.
         //-----------------------------------------------------------------------
         /** Internal method for generating billboard corners. 
-        @remarks
+
             Optional parameter pBill is only present for type BBT_ORIENTED_SELF and BBT_PERPENDICULAR_SELF
         */
         void genBillboardAxes(Vector3* pX, Vector3 *pY, const Billboard* pBill = 0);
@@ -244,7 +244,7 @@ namespace Ogre {
         void genPointVertices(const Billboard& pBillboard);
 
         /** Internal method generates vertex offsets.
-        @remarks
+
             Takes in parametric offsets as generated from getParametericOffsets, width and height values
             and billboard x and y axes as generated from genBillboardAxes. 
             Fills output array of 4 vectors with vector offsets
@@ -326,7 +326,7 @@ namespace Ogre {
         virtual ~BillboardSet();
 
         /** Creates a new billboard and adds it to this set.
-        @remarks
+
             Behaviour once the billboard pool has been exhausted depends on the
             BillboardSet::setAutoextend option.
         @param position
@@ -357,7 +357,7 @@ namespace Ogre {
         int getNumBillboards(void) const { return static_cast<int>(mActiveBillboards); }
 
         /** Tells the set whether to allow automatic extension of the pool of billboards.
-        @remarks
+
             A BillboardSet stores a pool of pre-constructed billboards which are used as needed when
             a new billboard is requested. This allows applications to create / remove billboards efficiently
             without incurring construction / destruction costs (a must for sets with lots of billboards like
@@ -391,7 +391,7 @@ namespace Ogre {
         bool getSortingEnabled(void) const { return mSortingEnabled; }
 
         /** Adjusts the size of the pool of billboards available in this set.
-        @remarks
+
             See the BillboardSet::setAutoextend method for full details of the billboard pool. This method adjusts
             the preallocated size of the pool. If you try to reduce the size of the pool, the set has the option
             of ignoring you if too many billboards are already in use. Bear in mind that calling this method will
@@ -473,7 +473,7 @@ namespace Ogre {
         BillboardRotationType getBillboardRotationType(void) const { return mRotationType; }
 
         /** Sets the default dimensions of the billboards in this set.
-        @remarks
+
             All billboards in a set are created with these default dimensions. The set will render most efficiently if
             all the billboards in the set are the default size. It is possible to alter the size of individual
             billboards at the expense of extra calculation. See the Billboard class for more info.
@@ -520,7 +520,7 @@ namespace Ogre {
         /** Finish defining billboards. */
         void endBillboards(void);
         /** Set the bounds of the BillboardSet.
-        @remarks
+
             You may need to call this if you're injecting billboards manually, 
             and you're relying on the BillboardSet to determine culling.
         */
@@ -544,7 +544,7 @@ namespace Ogre {
         /** Returns whether or not billboards in this are tested individually for culling. */
         bool getCullIndividually(void) const { return mCullIndividual; }
         /** Sets whether culling tests billboards in this individually as well as in a group.
-        @remarks
+
             Billboard sets are always culled as a whole group, based on a bounding box which 
             encloses all billboards in the set. For fairly localised sets, this is enough. However, you
             can optionally tell the set to also cull individual billboards in the set, i.e. to test
@@ -669,7 +669,7 @@ namespace Ogre {
         virtual SortMode _getSortMode(void) const;
 
         /** Sets whether billboards should be treated as being in world space. 
-        @remarks
+
             This is most useful when you are driving the billboard set from 
             an external data source.
         */
@@ -698,7 +698,7 @@ namespace Ogre {
 
         @param coords is a vector of texture coordinates (in UV space) to choose 
             from for each billboard created in the set.
-        @remarks
+
             Set 'coords' to 0 and/or 'numCoords' to 0 to reset the texture coord 
             rects to the initial set of a single rectangle spanning 0 through 1 in 
             both U and V (i e, the entire texture).
@@ -782,7 +782,7 @@ namespace Ogre {
         uint32 getTypeFlags(void) const;
 
         /** Set the auto update state of this billboard set.
-        @remarks
+
             This methods controls the updating policy of the vertex buffer.
             By default auto update is true so the vertex buffer is being update every time this billboard set
             is about to be rendered. This behavior best fit when the billboards of this set changes frequently.

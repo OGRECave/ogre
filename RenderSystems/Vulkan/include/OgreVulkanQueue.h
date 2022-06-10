@@ -192,7 +192,7 @@ namespace Ogre
         void getGraphicsEncoder( void );
         void getComputeEncoder( void );
         /** Call this function when you need to start copy/transfer operations
-        @remarks
+
             buffer and texture pointers cannot be both nullptr at the same time
 
             You don't have to pair every getCopyEncoder call with an endCopyEncoder call. In

@@ -118,7 +118,7 @@ namespace Ogre {
     };
 
     /** Abstract class representing a Texture resource.
-        @remarks
+
             The actual concrete subclass which will exist for a texture
             is dependent on the rendering system in use (Direct3D, OpenGL etc).
             This class represents the commonalities, and is the one 'used'
@@ -158,7 +158,7 @@ namespace Ogre {
         }
 
         /** Are mipmaps hardware generated?
-        @remarks
+
             Will only be accurate after texture load, or createInternalResources
         */
         bool getMipmapsHardwareGenerated(void) const { return mMipmapsHardwareGenerated; }
@@ -179,7 +179,7 @@ namespace Ogre {
 
         /** Sets whether this texture will be set up so that on sampling it, 
             hardware gamma correction is applied.
-        @remarks
+
             24-bit textures are often saved in gamma colour space; this preserves
             precision in the 'darks'. However, if you're performing blending on 
             the sampled colours, you really want to be doing it in linear space. 
@@ -274,7 +274,7 @@ namespace Ogre {
         void setUsage(int u) { mUsage = u; }
 
         /** Creates the internal texture resources for this texture. 
-        @remarks
+
             This method creates the internal texture resources (pixel buffers, 
             texture surfaces etc) required to begin using this texture. You do
             not need to call this method directly unless you are manually creating

@@ -78,7 +78,7 @@ namespace Ogre
         For more information, @see InstancedEntity
         For information on how Ogre manages multiple Instance batches, @see InstanceManager
 
-    @remarks
+
         Design discussion webpage
     @author
         Matias N. Goldberg ("dark_sylinc")
@@ -187,7 +187,7 @@ namespace Ogre
         const Mesh::IndexMap* _getIndexToBoneMap() const { return mIndexToBoneMap; }
 
         /** Returns true if this technique supports skeletal animation
-        @remarks
+
             A virtual function could have been used, but using a simple variable overridden
             by the derived class is faster than virtual call overhead. And both are clean
             ways of implementing it.
@@ -213,7 +213,7 @@ namespace Ogre
             InstanceEntities. Placed here because in the constructor virtual
             tables may not have been yet filled.
         @param baseSubMesh A sub mesh which the instances will be based upon from
-        @remarks
+
             Call this only ONCE. This is done automatically by Ogre::InstanceManager
             Caller is responsible for freeing buffers in this RenderOperation
             Buffers inside the RenderOp may be null if the built failed.
@@ -233,7 +233,7 @@ namespace Ogre
             last source binding, but shares the other sources.
         @param baseSubMesh A sub mesh which the instances will be based upon from
         @param renderOperation The RenderOp to reference.
-        @remarks
+
             Caller is responsible for freeing buffers passed as input arguments
             This function replaces the need to call build()
         */
@@ -288,7 +288,7 @@ namespace Ogre
             This option makes the batch behave pretty much like Static Geometry, but with the GPU RAM
             memory advantages (less VRAM, less bandwidth) and not LOD support. Very useful for
             billboards of trees, repeating vegetation, etc.
-            @remarks
+
                 This function moves a lot of processing time from the CPU to the GPU. If the GPU
                 is already a bottleneck, you may see a decrease in performance instead!
                 Call this function again (with bStatic=true) if you've made a change to an
@@ -305,14 +305,14 @@ namespace Ogre
         /** Returns a pointer to a new InstancedEntity ready to use
             Note it's actually preallocated, so no memory allocation happens at
             this point.
-            @remarks
+
                 Returns NULL if all instances are being used
         */
         InstancedEntity* createInstancedEntity();
 
         /** Removes an InstancedEntity from the scene retrieved with
             getNewInstancedEntity, putting back into a queue
-            @remarks
+
                 Throws an exception if the instanced entity wasn't created by this batch
                 Removed instanced entities save little CPU time, but _not_ GPU
         */

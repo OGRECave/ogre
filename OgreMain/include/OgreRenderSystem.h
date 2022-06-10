@@ -139,7 +139,7 @@ namespace Ogre
     };
 
     /** Defines the functionality of a 3D API
-    @remarks
+
     The RenderSystem class provides a base interface
     which abstracts the general functionality of the 3D API
     e.g. Direct3D or OpenGL. Whilst a few of the general
@@ -177,7 +177,7 @@ namespace Ogre
         virtual const String& getName(void) const = 0;
 
         /** Returns the details of this API's configuration options
-        @remarks
+
         Each render system must be able to inform the world
         of what options must/can be specified for it's
         operation.
@@ -263,7 +263,7 @@ namespace Ogre
         virtual RenderSystemCapabilities* createRenderSystemCapabilities() const = 0;
  
         /** Get a pointer to the current capabilities being used by the RenderSystem.
-        @remarks
+
         The capabilities may be modified using this pointer, this will only have an effect
         before the RenderSystem has been initialised. It's intended use is to allow a
         listener of the RenderSystemCapabilitiesCreated event to customise the capabilities
@@ -348,7 +348,7 @@ namespace Ogre
         virtual void setLightingEnabled(bool enabled) {}
 
         /** Creates a new rendering window.
-        @remarks
+
         This method creates a new rendering window as specified
         by the paramteters. The rendering system could be
         responible for only a single window (e.g. in the case
@@ -462,7 +462,7 @@ namespace Ogre
 
         /** Retrieves an existing DepthBuffer or creates a new one suited for the given RenderTarget
             and sets it.
-            @remarks
+
                 RenderTarget's pool ID is respected. @see RenderTarget::setDepthBufferPool()
         */
         void setDepthBufferFor( RenderTarget *renderTarget );
@@ -625,7 +625,7 @@ namespace Ogre
         virtual void _setTextureProjectionRelativeTo(bool enabled, const Vector3& pos);
 
         /** Creates a DepthBuffer that can be attached to the specified RenderTarget
-            @remarks
+
                 It doesn't attach anything, it just returns a pointer to a new DepthBuffer
                 Caller is responsible for putting this buffer into the right pool, for
                 attaching, and deleting it. Here's where API-specific magic happens.
@@ -634,7 +634,7 @@ namespace Ogre
         virtual DepthBuffer* _createDepthBufferFor( RenderTarget *renderTarget ) = 0;
 
         /** Removes all depth buffers. Should be called on device lost and shutdown
-            @remarks
+
                 Advanced users can call this directly with bCleanManualBuffers=false to
                 remove all depth buffers created for RTTs; when they think the pool has
                 grown too big or they've used lots of depth buffers they don't need anymore,
@@ -718,7 +718,7 @@ namespace Ogre
             setColourBlendState(mCurrentBlend);
         }
         /** Sets the depth bias, NB you should use the Material version of this. 
-        @remarks
+
         When polygons are coplanar, you can get problems with 'depth fighting' where
         the pixels from the two polys compete for the same screen pixel. This is particularly
         a problem for decals (polys attached to another surface to represent details such as
@@ -766,7 +766,7 @@ namespace Ogre
         OGRE_DEPRECATED static VertexElementType getColourVertexElementType(void) { return VET_UBYTE4_NORM; }
 
         /** Converts a uniform projection matrix to suitable for this render system.
-        @remarks
+
         Because different APIs have different requirements (some incompatible) for the
         projection matrix, this method allows each to implement their own correctly and pass
         back a generic OGRE matrix for storage in the engine.
@@ -800,7 +800,7 @@ namespace Ogre
                                     StencilOperation passOp = SOP_KEEP, bool twoSidedOperation = false);
 
         /** Sets whether or not normals are to be automatically normalised.
-        @remarks
+
         This is useful when, for example, you are scaling SceneNodes such that
         normals may not be unit-length anymore. Note though that this has an
         overhead so should not be turn on unless you really need it.
@@ -862,7 +862,7 @@ namespace Ogre
             const GpuProgramParametersPtr& params, uint16 variabilityMask) = 0;
 
         /** Unbinds GpuPrograms of a given GpuProgramType.
-        @remarks
+
         This returns the pipeline to fixed-function processing for this type.
         */
         virtual void unbindGpuProgram(GpuProgramType gptype);
@@ -906,7 +906,7 @@ namespace Ogre
         bool getInvertVertexWinding(void) const;
 
         /** Sets the 'scissor region' i.e. the region of the target in which rendering can take place.
-        @remarks
+
         This method allows you to 'mask off' rendering in all but a given rectangular area
         as identified by the parameters to this method.
         @param enabled True to enable the scissor test, false to disable it.
@@ -932,7 +932,7 @@ namespace Ogre
                                       float depth = 1.0f, uint16 stencil = 0) = 0;
         /** Returns the horizontal texel offset value required for mapping 
         texel origins to pixel origins in this rendersystem.
-        @remarks
+
         Since rendersystems sometimes disagree on the origin of a texel, 
         mapping from texels to pixels can sometimes be problematic to 
         implement generically. This method allows you to retrieve the offset
@@ -943,7 +943,7 @@ namespace Ogre
         virtual Real getHorizontalTexelOffset(void) { return 0.0f; }
         /** Returns the vertical texel offset value required for mapping 
         texel origins to pixel origins in this rendersystem.
-        @remarks
+
         Since rendersystems sometimes disagree on the origin of a texel, 
         mapping from texels to pixels can sometimes be problematic to 
         implement generically. This method allows you to retrieve the offset
@@ -955,7 +955,7 @@ namespace Ogre
 
         /** Gets the minimum (closest) depth value to be used when rendering
         using identity transforms.
-        @remarks
+
         When using identity transforms you can manually set the depth
         of a vertex; however the input values required differ per
         rendersystem. This method lets you retrieve the correct value.
@@ -964,7 +964,7 @@ namespace Ogre
         virtual Real getMinimumDepthInputValue(void) = 0;
         /** Gets the maximum (farthest) depth value to be used when rendering
         using identity transforms.
-        @remarks
+
         When using identity transforms you can manually set the depth
         of a vertex; however the input values required differ per
         rendersystem. This method lets you retrieve the correct value.
@@ -1021,7 +1021,7 @@ namespace Ogre
         };
 
         /** Sets shared listener.
-        @remarks
+
         Shared listener could be set even if no render system is selected yet.
         This listener will receive "RenderSystemChanged" event on each Root::setRenderSystem call.
         */
@@ -1030,7 +1030,7 @@ namespace Ogre
         static Listener* getSharedListener(void);
 
         /** Adds a listener to the custom events that this render system can raise.
-        @remarks
+
         Some render systems have quite specific, internally generated events 
         that the application may wish to be notified of. Many applications
         don't have to worry about these events, and can just trust OGRE to 
@@ -1055,7 +1055,7 @@ namespace Ogre
 
         /** Tell the rendersystem to perform any prep tasks it needs to directly
         before other threads which might access the rendering API are registered.
-        @remarks
+
         Call this from your main thread before starting your other threads.
         @note
         If you start your own threads, there is a specific startup sequence which
@@ -1081,7 +1081,7 @@ namespace Ogre
 
         /** Register the an additional thread which may make calls to rendersystem-related 
         objects.
-        @remarks
+
         This method should only be called by additional threads during their
         initialisation. If they intend to use hardware rendering system resources 
         they should call this method before doing anything related to the render system.

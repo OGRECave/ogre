@@ -39,7 +39,7 @@ namespace Ogre
     *  @{
     */
     /** Class defining a generic OGRE plugin.
-    @remarks
+
         OGRE is very plugin-oriented and you can customise much of its behaviour
         by registering new plugins, dynamically if you are using dynamic linking.
         This class abstracts the generic interface that all plugins must support.

@@ -44,7 +44,7 @@ namespace Ogre {
     */
 
     /** Abstract class that defines a 'codec'.
-        @remarks
+
             A codec class works like a two-way filter for data - data entered on
             one end (the decode end) gets processed and transformed into easily
             usable data while data passed the other way around codes it back.

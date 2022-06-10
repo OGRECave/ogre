@@ -69,7 +69,7 @@ namespace Ogre
         InstancedEntity. This is obviously a limitation from instancing in general, not this particular
         implementation
 
-        @remarks
+
             Design discussion webpage
         @author
             Matias N. Goldberg ("dark_sylinc")
@@ -171,7 +171,7 @@ namespace Ogre
             Requirements to share trasnformations:
                 * Both InstancedEntities must have use the same skeleton
                 * An InstancedEntity can't be both "master" and "slave" at the same time
-            @remarks
+
             Sharing does nothing if the original mesh doesn't have a skeleton
             When an InstancedEntity is removed (@see InstanceBatch::removeInstancedEntity), it stops
             sharing the transform. If the instanced entity was the master one, all it's slaves stop
@@ -185,7 +185,7 @@ namespace Ogre
             Stops sharing the transform if this is a slave, and notifies the master we're no longer
             a slave.
             If this is a master, tells all it's slave to stop sharing
-            @remarks
+
             This function is automatically called in InstanceBatch::removeInstancedEntity
         */
         void stopSharingTransform();
@@ -281,7 +281,7 @@ namespace Ogre
             Because not all techniques support custom params, and some users may not need it while
             using millions of InstancedEntities, the params have been detached from InstancedEntity
             and stored in it's InstanceBatch instead, to reduce memory overhead.
-        @remarks
+
             If this function is never called, all instances default to Vector4::ZERO. Watch out!
             If you destroy an instanced entity and then create it again (remember! Instanced entities
             are pre-allocated) it's custom param will contain the old value when it was destroyed.

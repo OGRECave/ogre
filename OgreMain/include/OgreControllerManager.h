@@ -48,7 +48,7 @@ namespace Ogre {
     typedef SharedPtr< ControllerFunction<Real> > ControllerFunctionRealPtr;
 
     /** Class for managing Controller instances.
-    @remarks
+
         This class is responsible to keeping tabs on all the Controller instances registered
         and updating them when requested. It also provides a number of convenience methods
         for creating commonly used controllers (such as texture animators).
@@ -222,7 +222,7 @@ namespace Ogre {
         void setTimeFactor(Real tf);
 
         /** Gets the constant that is added to time lapsed between each frame.
-        @remarks
+
             See setFrameDelay for full information on the meaning of this value.
         */
         Real getFrameDelay(void) const;
@@ -242,7 +242,7 @@ namespace Ogre {
         void setFrameDelay(Real fd);
 
         /** Return the elapsed time.
-        @remarks
+
             See setElapsedTime for full information on the meaning of this value.
         */
         Real getElapsedTime(void) const;

@@ -101,7 +101,7 @@ namespace Ogre {
     };
     //-----------------------------------------------------------------------
     /** Predefined controller value for getting / setting a texture coordinate modifications (scales and translates).
-        @remarks
+
             Effects can be applied to the scale or the offset of the u or v coordinates, or both. If separate
             modifications are required to u and v then 2 instances are required to control both independently, or 4
             if you want separate u and v scales as well as separate u and v offsets.
@@ -148,7 +148,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     /** Predefined controller value for setting a single floating-
         point value in a constant parameter of a vertex or fragment program.
-    @remarks
+
         Any value is accepted, it is propagated into the 'x'
         component of the constant register identified by the index. If you
         need to use named parameters, retrieve the index from the param
@@ -264,7 +264,7 @@ namespace Ogre {
 
     //-----------------------------------------------------------------------
     /** Predefined controller function based on a waveform.
-        @remarks
+
             A waveform function translates parametric input to parametric output based on a wave.
         @par
             Note that for simplicity of integration with the rest of the controller insfrastructure, the output of

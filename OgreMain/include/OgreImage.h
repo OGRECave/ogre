@@ -47,7 +47,7 @@ namespace Ogre {
         IF_3D_TEXTURE = 0x00000004
     };
     /** Class representing an image file.
-        @remarks
+
             The Image class usually holds uncompressed image data and is the
             only object that can be loaded in a texture. Image  objects handle 
             image data decoding themselves by the means of locating the correct 
@@ -98,7 +98,7 @@ namespace Ogre {
         void setTo(const ColourValue& col);
 
         /** Flips (mirrors) the image around the Y-axis. 
-            @remarks
+
                 An example of an original and flipped image:
                 <pre>                
                 originalimg
@@ -119,7 +119,7 @@ namespace Ogre {
         Image & flipAroundY();
 
         /** Flips (mirrors) the image around the X-axis.
-            @remarks
+
                 An example of an original and flipped image:
                 <pre>
                         flip axis
@@ -135,7 +135,7 @@ namespace Ogre {
         Image & flipAroundX();
 
         /** Stores a pointer to raw data in memory. The pixel format has to be specified.
-            @remarks
+
                 This method loads an image into memory held in the object. The 
                 pixel format will be either greyscale or RGB with an optional
                 Alpha component.
@@ -177,7 +177,7 @@ namespace Ogre {
             @note
                  The memory associated with this buffer is NOT destroyed with the
                  Image object, unless autoDelete is set to true.
-            @remarks 
+
                 The size of the buffer must be numFaces * PixelUtil::getMemorySize(width, height, depth, format)
          */
         Image& loadDynamicImage(uchar* data, uint32 width, uint32 height, uint32 depth, PixelFormat format,
@@ -190,7 +190,7 @@ namespace Ogre {
         }
         /** Loads raw data from a stream. See the function
             loadDynamicImage for a description of the parameters.
-            @remarks 
+
                 The size of the buffer must be numFaces * PixelUtil::getMemorySize(width, height, depth, format)
             @note
                 Whilst typically your image is likely to be a simple 2D image,
@@ -216,7 +216,7 @@ namespace Ogre {
         }
 
         /** Loads an image file.
-            @remarks
+
                 This method loads an image into memory. Any format for which 
                 an associated ImageCodec is registered can be loaded. 
                 This can include complex formats like DDS with embedded custom 
@@ -233,7 +233,7 @@ namespace Ogre {
         Image & load( const String& filename, const String& groupName );
 
         /** Loads an image file from a stream.
-            @remarks
+
                 This method works in the same way as the filename-based load 
                 method except it loads the image from a DataStream object. 
                 This DataStream is expected to contain the 
@@ -300,7 +300,7 @@ namespace Ogre {
 
         
         /** Save the image as a file. 
-        @remarks
+
             Saving and loading are implemented by back end (sometimes third 
             party) codecs.  Implemented saving functionality is more limited
             than loading in some cases. Particularly DDS file format support 
