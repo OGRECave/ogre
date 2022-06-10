@@ -6,4 +6,7 @@ html {
     html:not(.light-mode) {
 		--primary-color: #628768;
     }
+    img.inline {
+      background-color: #d2dbde;
+    }
 }
