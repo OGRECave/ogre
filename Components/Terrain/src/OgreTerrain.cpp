@@ -1122,15 +1122,10 @@ namespace Ogre
         mMaterialGenerator->requestOptions(this);
 
         mGenerateMaterialInProgress = true;
-        GenerateMaterialRequest req;
-        req.terrain = this;
-        req.stage = GEN_MATERIAL;
-        req.startTime = synchronous ? 0 : Root::getSingletonPtr()->getTimer()->getMilliseconds() + TERRAIN_GENERATE_MATERIAL_INTERVAL_MS;
-        req.synchronous = synchronous;
 
         Root::getSingleton().getWorkQueue()->addRequest(
             mWorkQueueChannel, WORKQUEUE_GENERATE_MATERIAL_REQUEST, 
-            req, 0, synchronous);
+            this, 0, synchronous);
     }
     //---------------------------------------------------------------------
     void Terrain::unload()
@@ -3042,8 +3037,8 @@ namespace Ogre
         }
         else if(req->getType()==WORKQUEUE_GENERATE_MATERIAL_REQUEST)
         {
-            GenerateMaterialRequest gmreq = any_cast<GenerateMaterialRequest>(req->getData());
-            if (gmreq.terrain != this)
+            auto terrain = any_cast<Terrain*>(req->getData());
+            if (terrain != this)
                 return false;
         }
 
@@ -3064,8 +3059,8 @@ namespace Ogre
         }
         else if(req->getType()==WORKQUEUE_GENERATE_MATERIAL_REQUEST)
         {
-            GenerateMaterialRequest gmreq = any_cast<GenerateMaterialRequest>(req->getData());
-            if (gmreq.terrain != this)
+            auto terrain = any_cast<Terrain*>(req->getData());
+            if (terrain != this)
                 return false;
         }
             return true;
@@ -3179,31 +3174,15 @@ namespace Ogre
     //---------------------------------------------------------------------
     void Terrain::handleGenerateMaterialResponse(const WorkQueue::Response* res, const WorkQueue* srcQ)
     {
-        GenerateMaterialRequest gmreq = any_cast<GenerateMaterialRequest>(res->getRequest()->getData());
-        unsigned long currentTime = Root::getSingletonPtr()->getTimer()->getMilliseconds();
+        mMaterial = mMaterialGenerator->generate(this);
+        mMaterial->load();
 
-        // process
-        switch(gmreq.stage)
+        if (mCompositeMapRequired)
         {
-        case GEN_MATERIAL:
-            mMaterial = mMaterialGenerator->generate(this);
-            mMaterial->load();
-            // init next stage
-            if (mCompositeMapRequired)
-            {
-                gmreq.stage = GEN_COMPOSITE_MAP_MATERIAL;
-				gmreq.startTime = currentTime + (gmreq.synchronous ? 0 : TERRAIN_GENERATE_MATERIAL_INTERVAL_MS);
-                Root::getSingleton().getWorkQueue()->addRequest(
-                    mWorkQueueChannel, WORKQUEUE_GENERATE_MATERIAL_REQUEST, 
-                    gmreq, 0, gmreq.synchronous);
-                return;
-            }
-            break;
-        case GEN_COMPOSITE_MAP_MATERIAL:
             mCompositeMapMaterial = mMaterialGenerator->generateForCompositeMap(this);
             mCompositeMapMaterial->load();
-            break;
         }
+
         mMaterialGenerationCount = mMaterialGenerator->getChangeCount();
         mMaterialDirty = false;
 

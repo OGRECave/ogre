@@ -1750,19 +1750,6 @@ namespace Ogre
             PixelBox* lightMapBox;
         };
 
-        enum GenerateMaterialStage{
-            GEN_MATERIAL,
-            GEN_COMPOSITE_MAP_MATERIAL
-        };
-        /// A data holder for communicating with the background GetMaterial
-        struct GenerateMaterialRequest
-        {
-            Terrain* terrain;
-            unsigned long startTime;
-            GenerateMaterialStage stage;
-            bool synchronous;
-        };
-
         String mMaterialName;
         mutable MaterialPtr mMaterial;
         mutable TerrainMaterialGeneratorPtr mMaterialGenerator;
