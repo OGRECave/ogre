@@ -36,6 +36,7 @@ jobs:
         python -m pip install --upgrade pip==22.0.4
         pip install setuptools wheel twine
         pip wheel . --verbose
+        python -m twine upload --repository pypi *.whl
   macos:
     runs-on: macos-10.15
     steps:
