@@ -46,8 +46,7 @@ namespace Ogre
 
     /** Page class
     */
-    class _OgrePagingExport Page : public WorkQueue::RequestHandler, 
-        public WorkQueue::ResponseHandler, public PageAlloc
+    class _OgrePagingExport Page
     {
     public:
         typedef std::vector<PageContentCollection*> ContentCollectionList;
@@ -56,7 +55,6 @@ namespace Ogre
         PagedWorldSection* mParent;
         unsigned long mFrameLastHeld;
         ContentCollectionList mContentCollections;
-        uint16 mWorkQueueChannel;
         bool mDeferredProcessInProgress;
         bool mModified;
 
@@ -87,6 +85,10 @@ namespace Ogre
 
         String generateFilename() const;
 
+        /// WorkQueue::RequestHandler override
+        WorkQueue::Response* handleRequest(const WorkQueue::Request* req, const WorkQueue* srcQ);
+        /// WorkQueue::ResponseHandler override
+        void handleResponse(const WorkQueue::Response* res, const WorkQueue* srcQ);
     public:
         static const uint32 CHUNK_ID;
         static const uint16 CHUNK_VERSION;
@@ -167,22 +169,9 @@ namespace Ogre
         /// Get the list of content collections
         const ContentCollectionList& getContentCollectionList() const;
 
-        /// WorkQueue::RequestHandler override
-        bool canHandleRequest(const WorkQueue::Request* req, const WorkQueue* srcQ) override;
-        /// WorkQueue::RequestHandler override
-        WorkQueue::Response* handleRequest(const WorkQueue::Request* req, const WorkQueue* srcQ) override;
-        /// WorkQueue::ResponseHandler override
-        bool canHandleResponse(const WorkQueue::Response* res, const WorkQueue* srcQ) override;
-        /// WorkQueue::ResponseHandler override
-        void handleResponse(const WorkQueue::Response* res, const WorkQueue* srcQ) override;
-
-
         /// Tell the page that it is modified
         void _notifyModified() { mModified = true; }
         bool isModified() const { return mModified; }
-
-        static const uint16 WORKQUEUE_PREPARE_REQUEST;
-        static const uint16 WORKQUEUE_CHANGECOLLECTION_REQUEST;
 
         /** Function for writing to a stream.
         */
