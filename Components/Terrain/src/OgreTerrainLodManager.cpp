@@ -34,7 +34,6 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-    const uint16 TerrainLodManager::WORKQUEUE_LOAD_LOD_DATA_REQUEST = 1;
     const uint32 TerrainLodManager::TERRAINLODDATA_CHUNK_ID = StreamSerialiser::makeIdentifier("TLDA");
     const uint16 TerrainLodManager::TERRAINLODDATA_CHUNK_VERSION = 1;
 
@@ -77,36 +76,14 @@ namespace Ogre
         mIncreaseLodLevelInProgress = false;
         mLastRequestSynchronous = false;
         mLodInfoTable = 0;
-
-        WorkQueue* wq = Root::getSingleton().getWorkQueue();
-        mWorkQueueChannel = wq->getChannel("Ogre/TerrainLodManager");
-        wq->addRequestHandler(mWorkQueueChannel, this);
-        wq->addResponseHandler(mWorkQueueChannel, this);
     }
 
     TerrainLodManager::~TerrainLodManager()
     {
         waitForDerivedProcesses();
-        WorkQueue* wq = Root::getSingleton().getWorkQueue();
-        wq->removeRequestHandler(mWorkQueueChannel, this);
-        wq->removeResponseHandler(mWorkQueueChannel, this);
 
         if(mLodInfoTable)
             OGRE_FREE(mLodInfoTable,MEMCATEGORY_GENERAL);
-    }
-
-    bool TerrainLodManager::canHandleRequest(const WorkQueue::Request* req, const WorkQueue* srcQ)
-    {
-        LoadLodRequest lreq = any_cast<LoadLodRequest>(req->getData());
-        if (lreq.requestee != this)
-            return false;
-        return RequestHandler::canHandleRequest(req, srcQ);
-    }
-    //---------------------------------------------------------------------
-    bool TerrainLodManager::canHandleResponse(const WorkQueue::Response* res, const WorkQueue* srcQ)
-    {
-        LoadLodRequest lreq = any_cast<LoadLodRequest>(res->getRequest()->getData());
-        return (lreq.requestee == this);
     }
 
     WorkQueue::Response* TerrainLodManager::handleRequest(const WorkQueue::Request* req, const WorkQueue* srcQ)
@@ -281,9 +258,24 @@ namespace Ogre
             {
                 mIncreaseLodLevelInProgress = true;
                 LoadLodRequest req(this,mHighestLodPrepared,mHighestLodLoaded,mTargetLodLevel);
-                Root::getSingleton().getWorkQueue()->addRequest(
-                    mWorkQueueChannel, WORKQUEUE_LOAD_LOD_DATA_REQUEST,
-                    req, 0, synchronous);
+
+                auto r = new WorkQueue::Request(0, 0, req, 0, 0);
+                if(synchronous)
+                {
+                    auto res = handleRequest(r, NULL);
+                    handleResponse(res, NULL);
+                    delete res;
+                }
+                else
+                {
+                    Root::getSingleton().getWorkQueue()->addTask([this, r]() {
+                        auto res = handleRequest(r, NULL);
+                        Root::getSingleton().getWorkQueue()->addMainThreadTask([this, res]() {
+                            handleResponse(res, NULL);
+                            delete res;
+                        });
+                    });
+                }
             }
             else if(synchronous)
                 waitForDerivedProcesses();

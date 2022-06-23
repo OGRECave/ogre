@@ -35,8 +35,6 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-    const uint16 TerrainPagedWorldSection::WORKQUEUE_LOAD_TERRAIN_PAGE_REQUEST = 1;
-
     //---------------------------------------------------------------------
     TerrainPagedWorldSection::TerrainPagedWorldSection(const String& name, PagedWorld* parent, SceneManager* sm)
         : PagedWorldSection(name, parent, sm)
@@ -47,12 +45,6 @@ namespace Ogre
     {
         // we always use a grid strategy
         setStrategy(parent->getManager()->getStrategy("Grid2D"));
-
-        WorkQueue* wq = Root::getSingleton().getWorkQueue();
-        mWorkQueueChannel = wq->getChannel("Ogre/TerrainPagedWorldSection");
-        wq->addRequestHandler(mWorkQueueChannel, this);
-        wq->addResponseHandler(mWorkQueueChannel, this);
-
         mNextLoadingTime = Root::getSingletonPtr()->getTimer()->getMilliseconds();
     }
     //---------------------------------------------------------------------
@@ -67,10 +59,6 @@ namespace Ogre
             OGRE_THREAD_SLEEP(50);
             Root::getSingleton().getWorkQueue()->processMainThreadTasks();
         }
-
-        WorkQueue* wq = Root::getSingleton().getWorkQueue();
-        wq->removeRequestHandler(mWorkQueueChannel, this);
-        wq->removeResponseHandler(mWorkQueueChannel, this);
 
         OGRE_DELETE mTerrainGroup;
         if(mTerrainDefiner)
@@ -243,9 +231,21 @@ namespace Ogre
             // no running tasks, start the new one
             if(mPagesInLoading.size()==1)
             {
-                Root::getSingleton().getWorkQueue()->addRequest(
-                    mWorkQueueChannel, WORKQUEUE_LOAD_TERRAIN_PAGE_REQUEST, 
-                    Any(), 0, forceSynchronous);
+                if(forceSynchronous)
+                {
+                    handleRequest(NULL, NULL);
+                    handleResponse(NULL, NULL);
+                }
+                else
+                {
+                    Root::getSingleton().getWorkQueue()->addTask([this]() {
+                        handleRequest(NULL, NULL);
+                        if(mPagesInLoading.empty())
+                            return;
+                        // continue loading in main thread
+                        Root::getSingleton().getWorkQueue()->addMainThreadTask([this]() { handleResponse(NULL, NULL); });
+                    });
+                }
             }
         }
 
@@ -280,8 +280,7 @@ namespace Ogre
         if(mPagesInLoading.empty())
         {
             mHasRunningTasks = false;
-            req->abortRequest();
-            return OGRE_NEW WorkQueue::Response(req, true, Any());
+            return NULL;
         }
 
         unsigned long currentTime = Root::getSingletonPtr()->getTimer()->getMilliseconds();
@@ -302,8 +301,7 @@ namespace Ogre
             mTerrainDefiner = OGRE_NEW TerrainDefiner();
         mTerrainDefiner->define(mTerrainGroup, x, y);
 
-        // continue loading in main thread
-        return OGRE_NEW WorkQueue::Response(req, true, Any());
+        return NULL;
     }
 
     //---------------------------------------------------------------------
@@ -324,9 +322,13 @@ namespace Ogre
             mNextLoadingTime = currentTime + mLoadingIntervalMs;
 
             // Continue loading other pages
-            Root::getSingleton().getWorkQueue()->addRequest(
-                    mWorkQueueChannel, WORKQUEUE_LOAD_TERRAIN_PAGE_REQUEST, 
-                    Any(), 0, false);
+            Root::getSingleton().getWorkQueue()->addTask([this]() {
+                handleRequest(NULL, NULL);
+                if(mPagesInLoading.empty())
+                    return;
+                // continue loading in main thread
+                Root::getSingleton().getWorkQueue()->addMainThreadTask([this]() { handleResponse(NULL, NULL); });
+            });
         }
         else
             mHasRunningTasks = false;

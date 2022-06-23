@@ -69,8 +69,7 @@ namespace Ogre
         to define, load and remove. Automatic paging is handled separately by the Paging
         component. 
     */
-    class _OgreTerrainExport TerrainGroup : public WorkQueue::RequestHandler, 
-        public WorkQueue::ResponseHandler, public TerrainAlloc
+    class _OgreTerrainExport TerrainGroup
     {
     public:
         /** Constructor.
@@ -482,15 +481,6 @@ namespace Ogre
         /// Get the defined terrains
         const TerrainSlotMap& getTerrainSlots() const { return mTerrainSlots; }
 
-        /// WorkQueue::RequestHandler override
-        bool canHandleRequest(const WorkQueue::Request* req, const WorkQueue* srcQ) override;
-        /// WorkQueue::RequestHandler override
-        WorkQueue::Response* handleRequest(const WorkQueue::Request* req, const WorkQueue* srcQ) override;
-        /// WorkQueue::ResponseHandler override
-        bool canHandleResponse(const WorkQueue::Response* res, const WorkQueue* srcQ) override;
-        /// WorkQueue::ResponseHandler override
-        void handleResponse(const WorkQueue::Response* res, const WorkQueue* srcQ) override;
-
         /// Convert coordinates to a packed integer index
         uint32 packIndex(long x, long y) const;
         
@@ -513,8 +503,6 @@ namespace Ogre
         */
         void loadGroupDefinition(StreamSerialiser& stream);
 
-
-        static const uint16 WORKQUEUE_LOAD_REQUEST;
         static const uint32 CHUNK_ID;
         static const uint16 CHUNK_VERSION;
 
@@ -547,7 +535,6 @@ namespace Ogre
         Vector3 mOrigin;
         TerrainSlotMap mTerrainSlots;
         TerrainPrepareRequestMap mTerrainPrepareRequests;
-        uint16 mWorkQueueChannel;
         String mFilenamePrefix;
         String mFilenameExtension;
         String mResourceGroup;
@@ -564,13 +551,10 @@ namespace Ogre
 
         void loadTerrainImpl(TerrainSlot* slot, bool synchronous);
 
-        /// Structure for holding the load request
-        struct LoadRequest
-        {
-            TerrainSlot* slot;
-            TerrainGroup* origin;
-        };
-        
+        /// WorkQueue::RequestHandler override
+        WorkQueue::Response* handleRequest(const WorkQueue::Request* req, const WorkQueue* srcQ);
+        /// WorkQueue::ResponseHandler override
+        void handleResponse(const WorkQueue::Response* res, const WorkQueue* srcQ);
 
     };
 
