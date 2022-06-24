@@ -65,7 +65,7 @@ namespace Ogre
         while(!mPagesInLoading.empty())
         {
             OGRE_THREAD_SLEEP(50);
-            Root::getSingleton().getWorkQueue()->processResponses();
+            Root::getSingleton().getWorkQueue()->processMainThreadTasks();
         }
 
         WorkQueue* wq = Root::getSingleton().getWorkQueue();

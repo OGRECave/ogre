@@ -80,7 +80,7 @@ namespace Volume {
   
     void ChunkHandler::processWorkQueue(void)
     {
-        mWQ->processResponses();
+        mWQ->processMainThreadTasks();
     }
 
     //-----------------------------------------------------------------------

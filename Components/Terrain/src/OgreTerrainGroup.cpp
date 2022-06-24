@@ -104,7 +104,7 @@ namespace Ogre
         while (getNumTerrainPrepareRequests() > 0)
         {
             OGRE_THREAD_SLEEP(50);
-            Root::getSingleton().getWorkQueue()->processResponses();
+            Root::getSingleton().getWorkQueue()->processMainThreadTasks();
         }
 
         removeAllTerrains();

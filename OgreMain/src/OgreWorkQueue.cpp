@@ -42,6 +42,12 @@ namespace Ogre {
         }
         return i->second;
     }
+    void WorkQueue::processMainThreadTasks()
+    {
+        OGRE_IGNORE_DEPRECATED_BEGIN
+        processResponses();
+        OGRE_IGNORE_DEPRECATED_END
+    }
     //---------------------------------------------------------------------
     WorkQueue::Request::Request(uint16 channel, uint16 rtype, const Any& rData, uint8 retry, RequestID rid)
         : mChannel(channel), mType(rtype), mData(rData), mRetryCount(retry), mID(rid), mAborted(false)
@@ -592,7 +598,7 @@ namespace Ogre {
 
     }
     //---------------------------------------------------------------------
-    void DefaultWorkQueueBase::processResponses() 
+    void DefaultWorkQueueBase::processMainThreadTasks()
     {
         unsigned long msStart = Root::getSingleton().getTimer()->getMilliseconds();
         unsigned long msCurrent = 0;
