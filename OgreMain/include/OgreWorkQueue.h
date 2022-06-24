@@ -330,26 +330,35 @@ namespace Ogre
         /// Returns whether requests are being accepted right now
         virtual bool getRequestsAccepted() const = 0;
 
-        /** Process the responses in the queue.
+        /** Process the tasks in the main-thread queue.
 
-            This method is public, and must be called from the main render
-            thread to 'pump' responses through the system. The method will usually
-            try to clear all responses before returning = 0; however, you can specify
-            a time limit on the response processing to limit the impact of
-            spikes in demand by calling setResponseProcessingTimeLimit.
+            This method must be called from the main render
+            thread to 'pump' tasks through the system. The method will usually
+            try to clear all tasks before returning; however, you can specify
+            a time limit on the tasks processing to limit the impact of
+            spikes in demand by calling @ref setMainThreadProcessingTimeLimit.
         */
-        virtual void processResponses() = 0; 
+        virtual void processMainThreadTasks();
+        
+        /// @deprecated use @ref processMainThreadTasks
+        OGRE_DEPRECATED virtual void processResponses() { }
 
-        /** Get the time limit imposed on the processing of responses in a
+        /** Get the time limit imposed on the processing of tasks in a
             single frame, in milliseconds (0 indicates no limit).
         */
+        uint64 getMainThreadProcessingTimeLimit() const { return getResponseProcessingTimeLimit(); }
+
+        /// @deprecated use @ref getMainThreadProcessingTimeLimit()
         virtual unsigned long getResponseProcessingTimeLimit() const = 0;
 
-        /** Set the time limit imposed on the processing of responses in a
+        /** Set the time limit imposed on the processing of tasks in a
             single frame, in milliseconds (0 indicates no limit).
-            This sets the maximum time that will be spent in processResponses() in 
+            This sets the maximum time that will be spent in @ref processMainThreadTasks() in
             a single frame. The default is 10ms.
         */
+        void setMainThreadProcessingTimeLimit(uint64 ms) { setResponseProcessingTimeLimit(ms); }
+
+        /// @deprecated use @ref setMainThreadProcessingTimeLimit
         virtual void setResponseProcessingTimeLimit(unsigned long ms) = 0;
 
         /** Shut down the queue.
@@ -462,9 +471,8 @@ namespace Ogre
         /// @copydoc WorkQueue::setRequestsAccepted
         void setRequestsAccepted(bool accept) override;
         /// @copydoc WorkQueue::getRequestsAccepted
-        bool getRequestsAccepted() const override;
-        /// @copydoc WorkQueue::processResponses
-        void processResponses() override;
+        virtual bool getRequestsAccepted() const override;
+        void processMainThreadTasks() override;
         /// @copydoc WorkQueue::getResponseProcessingTimeLimit
         unsigned long getResponseProcessingTimeLimit() const override { return mResposeTimeLimitMS; }
         /// @copydoc WorkQueue::setResponseProcessingTimeLimit

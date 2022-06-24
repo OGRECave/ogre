@@ -748,7 +748,7 @@ namespace Ogre {
             HardwareBufferManager::getSingleton()._releaseBufferCopies();
 
         // Tell the queue to process responses
-        mWorkQueue->processResponses();
+        mWorkQueue->processMainThreadTasks();
 
         OgreProfileEndGroup("Frame", OGREPROF_GENERAL);
 
