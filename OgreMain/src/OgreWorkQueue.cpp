@@ -72,7 +72,7 @@ namespace Ogre {
         , mWorkerThreadCount(1)
         , mWorkerRenderSystemAccess(false)
         , mIsRunning(false)
-        , mResposeTimeLimitMS(8)
+        , mResposeTimeLimitMS(10)
         , mWorkerFunc(0)
         , mRequestCount(0)
         , mPaused(false)
