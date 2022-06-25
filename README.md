@@ -62,6 +62,7 @@ For an exhaustive list, see the [features page](http://www.ogre3d.org/about/feat
 ## Who is using it?
 
 **Open Source**
+- [Stunt Rally - 3D Racing Game with Track Editor](https://stuntrally.tuxfamily.org/)
 - [Rigs of Rods - Soft Body Physics Simulator](https://rigsofrods.org/)
 - [Gazebo - Robot simulation](http://gazebosim.org/)
 - [OpenCV OVIS visualization module](https://docs.opencv.org/master/d2/d17/group__ovis.html)
