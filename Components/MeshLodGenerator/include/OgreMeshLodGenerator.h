@@ -30,6 +30,7 @@
 #define __MeshLodGenerator_H_
 
 #include "OgreLodPrerequisites.h"
+#include "OgreLodConfig.h"
 #include "OgreLodData.h"
 #include "OgreLodInputProvider.h"
 #include "OgreLodOutputProvider.h"
@@ -37,6 +38,7 @@
 #include "OgreLodCollapser.h"
 #include "OgreSharedPtr.h"
 #include "OgreSingleton.h"
+#include "OgreWorkQueue.h"
 
 namespace Ogre
 {
@@ -48,6 +50,16 @@ namespace Ogre
 * Generate Low-poly models from High-poly models automatically
 *  @{
 */
+
+struct _OgreLodExport LodWorkQueueRequest {
+    LodConfig config;
+    LodDataPtr data;
+    LodInputProviderPtr input;
+    LodOutputProviderPtr output;
+    LodCollapseCostPtr cost;
+    LodCollapserPtr collapser;
+    bool isCancelled;
+};
 
 class _OgreLodExport MeshLodGenerator :
 public Singleton<MeshLodGenerator>
@@ -83,21 +95,32 @@ public:
      */
     void getAutoconfig(MeshPtr& inMesh, LodConfig& outLodConfig);
 
+    void clearPendingLodRequests();
+
     static void _configureMeshLodUsage(const LodConfig& lodConfig);
     void _resolveComponents(LodConfig& lodConfig, LodCollapseCostPtr& cost, LodDataPtr& data, LodInputProviderPtr& input, LodOutputProviderPtr& output, LodCollapserPtr& collapser);
-    void _process(LodConfig& lodConfig, LodCollapseCost* cost, LodData* data, LodInputProvider* input, LodOutputProvider* output, LodCollapser* collapser);
 
     /// If you only use manual Lod levels, then you don't need to build LodData mesh representation.
     /// This function will generate manual Lod levels without overhead, but every Lod level needs to be a manual Lod level.
     void _generateManualLodLevels(LodConfig& lodConfig);
 
-    void _initWorkQueue();
-protected:
+    void setInjectorListener(LodWorkQueueInjectorListener* injectorListener) {mInjectorListener = injectorListener;}
+    LodWorkQueueInjectorListener* getInjectorListener() {return mInjectorListener;}
+    void removeInjectorListener() {mInjectorListener = 0;}
+private:
+    void _process(LodConfig& lodConfig, LodCollapseCost* cost, LodData* data, LodInputProvider* input, LodOutputProvider* output, LodCollapser* collapser);
+
     void computeLods(LodConfig& lodConfig, LodData* data, LodCollapseCost* cost, LodOutputProvider* output, LodCollapser* collapser);
     void calcLodVertexCount(const LodLevel& lodLevel, size_t uniqueVertexCount, size_t& outVertexCountLimit, Real& outCollapseCostLimit);
 
-    LodWorkQueueWorker* mWQWorker;
-    LodWorkQueueInjector* mWQInjector;
+    OGRE_WQ_MUTEX(mQueueMutex);
+    std::list<LodWorkQueueRequest*> mPendingLodRequests;
+
+    LodWorkQueueInjectorListener* mInjectorListener;
+
+    void addRequestToQueue(LodConfig& lodConfig, LodCollapseCostPtr& cost, LodDataPtr& data, LodInputProviderPtr& input, LodOutputProviderPtr& output, LodCollapserPtr& collapser);
+    WorkQueue::Response* handleRequest(const WorkQueue::Request* req, const WorkQueue* srcQ);
+    void handleResponse(const WorkQueue::Response* res, const WorkQueue* srcQ);
 };
 /** @} */
 /** @} */
