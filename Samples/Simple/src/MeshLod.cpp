@@ -4,8 +4,6 @@ using namespace Ogre;
 using namespace OgreBites;
 
 #include "OgreLodConfigSerializer.h"
-#include "OgreLodWorkQueueInjector.h"
-#include "OgreLodWorkQueueWorker.h"
 #include "OgreMeshLodGenerator.h"
 #include "OgreLodCollapseCostQuadric.h"
 #include "OgreLodInputProviderMesh.h"
@@ -48,8 +46,7 @@ void Sample_MeshLod::setupContent()
     if(!MeshLodGenerator::getSingletonPtr()) {
         new MeshLodGenerator();
     }
-    MeshLodGenerator::getSingleton()._initWorkQueue(); // needed only for LodWorkQueueInjector::setInjectorListener
-    LodWorkQueueInjector::getSingleton().setInjectorListener(this);
+    MeshLodGenerator::getSingleton().setInjectorListener(this);
 
     // setup gui
     setupControls();
@@ -60,7 +57,7 @@ void Sample_MeshLod::setupContent()
 
 void Sample_MeshLod::cleanupContent()
 {
-    Ogre::LodWorkQueueInjector::getSingleton().removeInjectorListener();
+    MeshLodGenerator::getSingleton().removeInjectorListener();
     if(mMeshEntity){
         mSceneMgr->destroyEntity(mMeshEntity);
         mMeshEntity = 0;
@@ -246,7 +243,7 @@ void Sample_MeshLod::saveConfig()
 void Sample_MeshLod::loadAutomaticLod()
 {
     // Remove outdated Lod requests to reduce delay.
-    LodWorkQueueWorker::getSingleton().clearPendingLodRequests();
+    MeshLodGenerator::getSingleton().clearPendingLodRequests();
 
     MeshLodGenerator& gen = MeshLodGenerator::getSingleton();
     //gen.generateAutoconfiguredLodLevels(mLodConfig.mesh);
@@ -270,7 +267,7 @@ void Sample_MeshLod::loadUserLod( bool useWorkLod )
     }
     mTrayMgr->destroyAllWidgetsInTray(TL_TOP);
     // Remove outdated Lod requests to reduce delay.
-    LodWorkQueueWorker::getSingleton().clearPendingLodRequests();
+    MeshLodGenerator::getSingleton().clearPendingLodRequests();
 
     MeshLodGenerator& gen = MeshLodGenerator::getSingleton();
     mLodConfig.advanced.useBackgroundQueue = ENABLE_THREADING;
@@ -597,7 +594,7 @@ void Sample_MeshLod::buttonHit( OgreBites::Button* button )
         //mTrayMgr->showOkDialog("Success", "Showing mesh from: " + filename);
     } else if(button->getName() == "btnSaveMesh") {
         if(!mTrayMgr->getTrayContainer(TL_TOP)->isVisible() && !mLodConfig.levels.empty()){
-            LodWorkQueueWorker::getSingleton().clearPendingLodRequests();
+            MeshLodGenerator::getSingleton().clearPendingLodRequests();
             MeshLodGenerator& gen = MeshLodGenerator::getSingleton();
             mLodConfig.advanced.useBackgroundQueue = false; // Non-threaded
             gen.generateLodLevels(mLodConfig);
