@@ -892,7 +892,6 @@ namespace Ogre {
 
         // Since background thread might be access resources,
         // ensure shutdown before destroying resource manager.
-        mResourceBackgroundQueue->shutdown();
         mWorkQueue->shutdown();
 
         if(mSceneManagerEnum)
@@ -1211,7 +1210,6 @@ namespace Ogre {
         mActiveRenderer->getCapabilities()->log(LogManager::getSingleton().getDefaultLog());
 
         // Background loader
-        mResourceBackgroundQueue->initialise();
         mWorkQueue->startup();
         // Initialise material manager
         mMaterialManager->initialise();
