@@ -145,15 +145,37 @@ namespace Volume {
     */
     class _OgreVolumeExport Chunk : public SimpleRenderable, public FrameListener
     {
-    
-    /// So the actual loading functions can be called.
-    friend class ChunkHandler;
+    /** Data being passed around while loading.
+    */
+    struct ChunkRequest
+    {
+
+        /// The back lower left corner of the world.
+        Vector3 totalFrom;
+
+        /// The front upper rightcorner of the world.
+        Vector3 totalTo;
+
+        /// The current LOD level.
+        size_t level;
+
+        /// The maximum amount of levels.
+        size_t maxLevels;
+
+        /// The MeshBuilder to use.
+        MeshBuilder *meshBuilder;
+
+        /// The DualGridGenerator to use.
+        DualGridGenerator *dualGridGenerator;
+
+        /// The octree node to use.
+        OctreeNode *root;
+
+        /// Whether this is an update of an existing tree
+        bool isUpdate;
+    };
 
     protected:
-
-        /// To handle the WorkQueue.
-        static ChunkHandler mChunkHandler;
-                
         /// To attach this node to.
         SceneNode *mNode;
 
