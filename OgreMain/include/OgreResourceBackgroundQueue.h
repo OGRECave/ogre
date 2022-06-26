@@ -45,7 +45,7 @@ namespace Ogre {
     */
 
     /// Identifier of a background process
-    typedef WorkQueue::RequestID BackgroundProcessTicket;
+    typedef size_t BackgroundProcessTicket;
 
     /** Encapsulates the result of a background queue request */
     struct BackgroundProcessResult
@@ -80,8 +80,7 @@ namespace Ogre {
         You can check the status of tickets by calling isProcessComplete() 
         from your queueing thread. 
     */
-    class _OgreExport ResourceBackgroundQueue : public Singleton<ResourceBackgroundQueue>, public ResourceAlloc, 
-        public WorkQueue::RequestHandler, public WorkQueue::ResponseHandler
+    class _OgreExport ResourceBackgroundQueue : public Singleton<ResourceBackgroundQueue>
     {
     public:
         /** This abstract listener interface lets you get notifications of
@@ -108,27 +107,17 @@ namespace Ogre {
         };
 
     private:
-
-        uint16 mWorkQueueChannel;
+        size_t mRequestCount;
 
         typedef std::set<BackgroundProcessTicket> OutstandingRequestSet;   
         OutstandingRequestSet mOutstandingRequestSet;
 
         BackgroundProcessTicket addRequest(ResourceRequest& req);
-
+        WorkQueue::Response* handleRequest(const WorkQueue::Request* req, const WorkQueue* srcQ);
+        void handleResponse(const WorkQueue::Response* res, const WorkQueue* srcQ);
     public:
         ResourceBackgroundQueue();
         virtual ~ResourceBackgroundQueue();
-
-        /** Initialise the background queue system. 
-        @note Called automatically by Root::initialise.
-        */
-        virtual void initialise(void);
-
-        /** Shut down the background queue system. 
-        @note Called automatically by Root::shutdown.
-        */
-        virtual void shutdown(void);
 
         /** Initialise a resource group in the background.
         @see ResourceGroupManager::initialiseResourceGroup
@@ -270,20 +259,7 @@ namespace Ogre {
             time.
         This is why a non-existent ticket will return 'true'.
         */
-        virtual bool isProcessComplete(BackgroundProcessTicket ticket);
-
-        /** Aborts background process.
-        */
-        void abortRequest( BackgroundProcessTicket ticket );
-
-        /// Implementation for WorkQueue::RequestHandler
-        bool canHandleRequest(const WorkQueue::Request* req, const WorkQueue* srcQ) override;
-        /// Implementation for WorkQueue::RequestHandler
-        WorkQueue::Response* handleRequest(const WorkQueue::Request* req, const WorkQueue* srcQ) override;
-        /// Implementation for WorkQueue::ResponseHandler
-        bool canHandleResponse(const WorkQueue::Response* res, const WorkQueue* srcQ) override;
-        /// Implementation for WorkQueue::ResponseHandler
-        void handleResponse(const WorkQueue::Response* res, const WorkQueue* srcQ) override;
+        bool isProcessComplete(BackgroundProcessTicket ticket);
 
         /// @copydoc Singleton::getSingleton()
         static ResourceBackgroundQueue& getSingleton(void);

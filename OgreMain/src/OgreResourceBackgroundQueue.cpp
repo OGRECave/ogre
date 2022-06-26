@@ -81,30 +81,8 @@ namespace Ogre {
         ResourceRequest request;
     };
     //------------------------------------------------------------------------
-    ResourceBackgroundQueue::ResourceBackgroundQueue() : mWorkQueueChannel(0)
-    {
-    }
-    //------------------------------------------------------------------------
-    ResourceBackgroundQueue::~ResourceBackgroundQueue()
-    {
-        shutdown();
-    }
-    //---------------------------------------------------------------------
-    void ResourceBackgroundQueue::initialise()
-    {
-        WorkQueue* wq = Root::getSingleton().getWorkQueue();
-        mWorkQueueChannel = wq->getChannel("Ogre/ResourceBGQ");
-        wq->addResponseHandler(mWorkQueueChannel, this);
-        wq->addRequestHandler(mWorkQueueChannel, this);
-    }
-    //---------------------------------------------------------------------
-    void ResourceBackgroundQueue::shutdown()
-    {
-        WorkQueue* wq = Root::getSingleton().getWorkQueue();
-        wq->abortRequestsByChannel(mWorkQueueChannel);
-        wq->removeRequestHandler(mWorkQueueChannel, this);
-        wq->removeResponseHandler(mWorkQueueChannel, this);
-    }
+    ResourceBackgroundQueue::ResourceBackgroundQueue() : mRequestCount(0) {}
+    ResourceBackgroundQueue::~ResourceBackgroundQueue() {}
     //------------------------------------------------------------------------
     BackgroundProcessTicket ResourceBackgroundQueue::initialiseResourceGroup(
         const String& name, ResourceBackgroundQueue::Listener* listener)
@@ -298,49 +276,23 @@ namespace Ogre {
         return mOutstandingRequestSet.find(ticket) == mOutstandingRequestSet.end();
     }
     //------------------------------------------------------------------------
-    void ResourceBackgroundQueue::abortRequest( BackgroundProcessTicket ticket )
-    {
-        WorkQueue* queue = Root::getSingleton().getWorkQueue();
-
-        queue->abortRequest( ticket );
-    }
-    //------------------------------------------------------------------------
     BackgroundProcessTicket ResourceBackgroundQueue::addRequest(ResourceRequest& req)
     {
-        WorkQueue* queue = Root::getSingleton().getWorkQueue();
-
-        Any data(req);
-
-        WorkQueue::RequestID requestID = 
-            queue->addRequest(mWorkQueueChannel, (uint16)req.type, data);
-
-
+        auto requestID = mRequestCount++;
         mOutstandingRequestSet.insert(requestID);
 
+        Root::getSingleton().getWorkQueue()->addTask([this, req]() {
+            auto r = new WorkQueue::Request(0, 0, req, 0, 0);
+            handleRequest(r, NULL);
+        });
+
         return requestID;
-    }
-    //-----------------------------------------------------------------------
-    bool ResourceBackgroundQueue::canHandleRequest(const WorkQueue::Request* req, const WorkQueue* srcQ)
-    {
-        return true;
     }
     //-----------------------------------------------------------------------
     WorkQueue::Response* ResourceBackgroundQueue::handleRequest(const WorkQueue::Request* req, const WorkQueue* srcQ)
     {
 
         ResourceRequest resreq = any_cast<ResourceRequest>(req->getData());
-
-        if( req->getAborted() )
-        {
-            if( resreq.type == RT_PREPARE_RESOURCE || resreq.type == RT_LOAD_RESOURCE )
-            {
-                OGRE_DELETE_T(resreq.loadParams, NameValuePairList, MEMCATEGORY_GENERAL);
-                resreq.loadParams = 0;
-            }
-            resreq.result.error = false;
-            ResourceResponse resresp(ResourcePtr(), resreq);
-            return OGRE_NEW WorkQueue::Response(req, true, resresp);
-        }
 
         ResourceManager* rm = 0;
         ResourcePtr resource;
@@ -424,23 +376,19 @@ namespace Ogre {
         }
         resreq.result.error = false;
         ResourceResponse resresp(resource, resreq);
-        return OGRE_NEW WorkQueue::Response(req, true, resresp);
+        delete req;
+        Root::getSingleton().getWorkQueue()->addMainThreadTask(
+            [this, resresp]() {
+                WorkQueue::Response res(NULL, true, resresp);
+                handleResponse(&res, NULL);
+            }
+        );
+        return NULL;
 
-    }
-    //------------------------------------------------------------------------
-    bool ResourceBackgroundQueue::canHandleResponse(const WorkQueue::Response* res, const WorkQueue* srcQ)
-    {
-        return true;
     }
     //------------------------------------------------------------------------
     void ResourceBackgroundQueue::handleResponse(const WorkQueue::Response* res, const WorkQueue* srcQ)
     {
-        if( res->getRequest()->getAborted() )
-        {
-            mOutstandingRequestSet.erase(res->getRequest()->getID());
-            return ;
-        }
-
         ResourceResponse resresp = any_cast<ResourceResponse>(res->getData());
 
         // Complete full loading in main thread if semithreading
