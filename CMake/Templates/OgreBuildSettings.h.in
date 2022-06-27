@@ -72,8 +72,6 @@ OGRE_THREAD_PROVIDER = 1
     Boost libraries provide threading functionality.
 OGRE_THREAD_PROVIDER = 2
     Poco libraries provide threading functionality.
-OGRE_THREAD_PROVIDER = 3
-    TBB library provides threading functionality.
 OGRE_THREAD_PROVIDER = 4
     Standard library provides threading functionality. (requires compiler support)
 */
