@@ -41,11 +41,11 @@ namespace Ogre {
     {
         glBlendEquation(GL_FUNC_ADD);
 
-        if(GLEW_VERSION_2_0)
+        if(GLAD_GL_VERSION_2_0)
         {
             glBlendEquationSeparate(GL_FUNC_ADD, GL_FUNC_ADD);
         }
-        else if(GLEW_EXT_blend_equation_separate)
+        else if(GLAD_GL_EXT_blend_equation_separate)
         {
             glBlendEquationSeparateEXT(GL_FUNC_ADD, GL_FUNC_ADD);
         }
@@ -113,11 +113,6 @@ namespace Ogre {
         mActiveBufferMap.clear();
         mTexUnitsMap.clear();
         mTextureCoordGen.clear();
-
-        mViewport[0] = 0.0f;
-        mViewport[1] = 0.0f;
-        mViewport[2] = 0.0f;
-        mViewport[3] = 0.0f;
 
         mAmbient[0] = 0.2f;
         mAmbient[1] = 0.2f;
@@ -404,20 +399,14 @@ namespace Ogre {
         }
     }
 
-    void GLStateCacheManager::setViewport(GLint x, GLint y, GLsizei width, GLsizei height)
+    void GLStateCacheManager::setViewport(const Rect& r)
     {
 #ifdef OGRE_ENABLE_STATE_CACHE
-        if((mViewport[0] != x) ||
-           (mViewport[1] != y) ||
-           (mViewport[2] != width) ||
-           (mViewport[3] != height))
+        if(mViewport != r)
 #endif
         {
-            mViewport[0] = x;
-            mViewport[1] = y;
-            mViewport[2] = width;
-            mViewport[3] = height;
-            glViewport(x, y, width, height);
+            mViewport = r;
+            glViewport(r.left, r.top, r.width(), r.height());
         }
     }
 
@@ -442,11 +431,11 @@ namespace Ogre {
             mBlendEquationRGB = eqRGB;
             mBlendEquationAlpha = eqAlpha;
 
-            if(GLEW_VERSION_2_0)
+            if(GLAD_GL_VERSION_2_0)
             {
                 glBlendEquationSeparate(eqRGB, eqAlpha);
             }
-            else if(GLEW_EXT_blend_equation_separate)
+            else if(GLAD_GL_EXT_blend_equation_separate)
             {
                 glBlendEquationSeparateEXT(eqRGB, eqAlpha);
             }

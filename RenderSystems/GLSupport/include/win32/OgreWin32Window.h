@@ -68,6 +68,8 @@ namespace Ogre {
 
     protected:
         
+        void switchMode(uint width, uint height, uint frequency);
+
         /** Update the window rect. */ 
         void updateWindowRect();
 
@@ -83,6 +85,7 @@ namespace Ogre {
         bool    mOwnsGLContext;
         bool    mSizing;
         int     mDisplayFrequency;      // fullscreen only, to restore display
+        uint32  mColourDepth;
         DWORD   mWindowedWinStyle;      // Windowed mode window style flags.
         DWORD   mFullscreenWinStyle;    // Fullscreen mode window style flags.
     };

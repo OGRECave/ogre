@@ -1,5 +1,3 @@
-find_package(SWIG 3.0.8)
-
 if(ANDROID)
 	set(JNI_FOUND TRUE)
 	add_library(cpufeatures STATIC ${ANDROID_NDK}/sources/android/cpufeatures/cpu-features.c)
@@ -29,7 +27,7 @@ else()
 	endif()
 endif()
 
-set(CMAKE_SWIG_FLAGS -w401,314 -package org.ogre)
+set(CMAKE_SWIG_FLAGS -w401,314 -package org.ogre -Dfinal)
 
 if (APPLE AND NOT ANDROID)
 	# we are using libc++ on OSX
@@ -53,16 +51,24 @@ if(OGRE_BUILD_COMPONENT_RTSHADERSYSTEM)
 	list(APPEND SWIG_INPUT_MODULES ../RTShaderSystem/include/OgreRTShader.i)
 endif()
 
+if(OGRE_BUILD_COMPONENT_TERRAIN)
+	set_source_files_properties(../Terrain/include/OgreTerrain.i PROPERTIES CPLUSPLUS ON)
+	list(APPEND SWIG_INPUT_MODULES ../Terrain/include/OgreTerrain.i)
+endif()
+
 if(OGRE_BUILD_COMPONENT_OVERLAY)
 	set_source_files_properties(../Overlay/include/OgreOverlay.i PROPERTIES CPLUSPLUS ON)
 	list(APPEND SWIG_INPUT_MODULES ../Overlay/include/OgreOverlay.i)
 endif()
 
-if(OGRE_BUILD_COMPONENT_BITES)
-	if(SDL2_FOUND)
-		include_directories(${SDL2_INCLUDE_DIR})
-	endif()
+if(OGRE_BUILD_COMPONENT_OVERLAY_IMGUI)
+	include_directories("${IMGUI_DIR}")
+	list(APPEND CMAKE_SWIG_FLAGS -DHAVE_IMGUI -DIMGUI_DISABLE_OBSOLETE_FUNCTIONS)
+    set_source_files_properties(../Overlay/include/ImGui.i PROPERTIES CPLUSPLUS ON)
+    list(APPEND SWIG_INPUT_MODULE ../Overlay/include/ImGui.i)
+endif()
 
+if(OGRE_BUILD_COMPONENT_BITES)
 	set_source_files_properties(../Bites/include/OgreBites.i PROPERTIES CPLUSPLUS ON)
 
 	if(ANDROID)
@@ -72,9 +78,15 @@ if(OGRE_BUILD_COMPONENT_BITES)
 	list(APPEND SWIG_INPUT_MODULES ../Bites/include/OgreBites.i)
 endif()
 
+if(OGRE_BUILD_COMPONENT_BULLET)
+    include_directories("${BULLET_INCLUDE_DIRS}")
+    set_source_files_properties(../Bullet/include/OgreBullet.i PROPERTIES CPLUSPLUS ON)
+    list(APPEND SWIG_INPUT_MODULES ../Bullet/include/OgreBullet.i)
+endif()
+
 set(CMAKE_WARN_DEPRECATED OFF)
-swig_add_module(OgreJNI java ${SWIG_INPUT_MODULES})
-swig_link_libraries(OgreJNI OgreBites OgreOverlay OgreRTShaderSystem OgreMain ${JNI_LIBRARIES})
+swig_add_library(OgreJNI LANGUAGE java SOURCES ${SWIG_INPUT_MODULES})
+swig_link_libraries(OgreJNI OgreBites OgreBullet OgreOverlay OgreRTShaderSystem OgreTerrain OgreMain ${JNI_LIBRARIES})
 
 if(${Java_FOUND})
 	set(CLASS_OUTPUT_PATH "${PROJECT_BINARY_DIR}/java/classes")

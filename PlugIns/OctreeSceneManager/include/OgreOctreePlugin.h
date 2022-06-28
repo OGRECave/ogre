@@ -29,13 +29,14 @@ THE SOFTWARE.
 #define __OctreePlugin_H__
 
 #include "OgrePlugin.h"
+#include "OgreOctreePrerequisites.h"
 
 namespace Ogre
 {
     class OctreeSceneManagerFactory;
 
     /** Plugin instance for Octree Manager */
-    class OctreePlugin : public Plugin
+    class _OgreOctreePluginExport OctreePlugin : public Plugin
     {
     public:
         OctreePlugin();

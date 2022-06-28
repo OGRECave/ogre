@@ -202,8 +202,6 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void DefaultSphereSceneQuery::execute(SceneQueryListener* listener)
     {
-        Sphere testSphere;
-
         // Iterate over all movable types
         for(const auto& factIt : Root::getSingleton().getMovableObjectFactories())
         {
@@ -218,9 +216,7 @@ namespace Ogre {
                     continue;
 
                 // Do sphere / sphere test
-                testSphere.setCenter(a->getParentNode()->_getDerivedPosition());
-                testSphere.setRadius(a->getBoundingRadius());
-                if (mSphere.intersects(testSphere))
+                if (mSphere.intersects(a->getWorldBoundingSphere()))
                 {
                     if (!listener->queryResult(a)) return;
                 }

@@ -32,6 +32,41 @@ namespace Ogre {
     //--------------------------------------------------------------------------
     AnimableObject::AnimableDictionaryMap AnimableObject::msAnimableDictionary;
     //--------------------------------------------------------------------------
+    void AnimableObject::createAnimableDictionary(void) const
+    {
+        if (msAnimableDictionary.find(getAnimableDictionaryName()) == msAnimableDictionary.end())
+        {
+            StringVector vec;
+            initialiseAnimableDictionary(vec);
+            msAnimableDictionary[getAnimableDictionaryName()] = vec;
+        }
+    }
+
+    /// Get an updateable reference to animable value list
+    StringVector& AnimableObject::_getAnimableValueNames(void)
+    {
+        AnimableDictionaryMap::iterator i = msAnimableDictionary.find(getAnimableDictionaryName());
+        if (i != msAnimableDictionary.end())
+        {
+            return i->second;
+        }
+
+        OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "Animable value list not found for " + getAnimableDictionaryName());
+    }
+
+    const StringVector& AnimableObject::getAnimableValueNames(void) const
+    {
+        createAnimableDictionary();
+
+        AnimableDictionaryMap::iterator i = msAnimableDictionary.find(getAnimableDictionaryName());
+        if (i != msAnimableDictionary.end())
+        {
+            return i->second;
+        }
+
+        OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "Animable value list not found for " + getAnimableDictionaryName());
+    }
+
     void AnimableValue::resetToBaseValue(void)
     {
         switch(mType)
@@ -52,11 +87,12 @@ namespace Ogre {
             setValue(Vector4(mBaseValueReal));
             break;
         case QUATERNION:
-            setValue(Quaternion(mBaseValueReal));
+            setValue(
+                Quaternion(mBaseValueReal[0], mBaseValueReal[1], mBaseValueReal[2], mBaseValueReal[3]));
             break;
         case COLOUR:
-            setValue(ColourValue(mBaseValueReal[0], mBaseValueReal[1], 
-                mBaseValueReal[2], mBaseValueReal[3]));
+            setValue(
+                ColourValue(mBaseValueReal[0], mBaseValueReal[1], mBaseValueReal[2], mBaseValueReal[3]));
             break;
         case DEGREE:
             setValue(Degree(mBaseValueReal[0]));

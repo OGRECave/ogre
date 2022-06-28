@@ -119,7 +119,7 @@ void GLArbGpuProgram::bindProgramParameters(GpuProgramParametersSharedPtr params
     GLenum type = getProgramType();
     
     // only supports float constants
-    GpuLogicalBufferStructPtr floatStruct = params->getFloatLogicalBufferStruct();
+    GpuLogicalBufferStructPtr floatStruct = params->getLogicalBufferStruct();
 
     for (GpuLogicalIndexUseMap::const_iterator i = floatStruct->map.begin();
         i != floatStruct->map.end(); ++i)

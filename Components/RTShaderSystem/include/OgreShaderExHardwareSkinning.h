@@ -170,8 +170,6 @@ protected:
     SkinningType mSkinningType;
 };
 
-_OgreRTSSExport void operator<<(std::ostream& o, const HardwareSkinning::SkinningData& data);
-
 /** 
 A factory that enables creation of HardwareSkinning instances.
 @remarks Sub class of SubRenderStateFactory
@@ -233,7 +231,7 @@ public:
         internally. Rather this information is stored in the entity's materials as a 
         user binded object.
         
-        @param pEntity A pointer to an entity who's materials need preparing.
+        @par pEntity A pointer to an entity who's materials need preparing.
     */
     void prepareEntityForSkinning(const Entity* pEntity, SkinningType skinningType = ST_LINEAR, bool correctAntidpodalityHandling = false, bool shearScale = false);
 

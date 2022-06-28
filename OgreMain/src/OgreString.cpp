@@ -27,6 +27,13 @@ THE SOFTWARE.
 */
 #include "OgreStableHeaders.h"
 
+// A quick define to overcome different names for the same function
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_WINRT
+#   define strnicmp _strnicmp
+#else
+#   define strnicmp strncasecmp
+#endif
+
 namespace Ogre {
     const String& StringUtil::BLANK = BLANKSTRING;
 
@@ -285,7 +292,7 @@ namespace Ogre {
         //The outer loop loops over directories
         while (indexSrc < pathLen)
         {       
-            if ((bufferSrc[indexSrc] == '\\') || (bufferSrc[indexSrc] == '/'))
+            if (indexSrc && ((bufferSrc[indexSrc] == '\\') || (bufferSrc[indexSrc] == '/')))
             {
                 //check if we have a directory delimiter if so skip it (we should already
                 //have written such a delimiter by this point

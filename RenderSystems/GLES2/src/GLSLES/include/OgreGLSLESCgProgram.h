@@ -33,7 +33,7 @@ THE SOFTWARE.
 
 namespace Ogre {
     /** Specialisation of HighLevelGpuProgram to provide support for CG
-    @remarks
+
         Cg programs will be converted to GLSL        
     */
     class _OgreGLES2Export GLSLESCgProgram : public GLSLESProgram
@@ -41,13 +41,6 @@ namespace Ogre {
     public:
         /// Command object for setting profiles
         class CmdProfiles : public ParamCommand
-        {
-        public:
-            String doGet(const void* target) const;
-            void doSet(void* target, const String& val);
-        };
-        /// Command object for setting entry point
-        class CmdEntryPoint : public ParamCommand
         {
         public:
             String doGet(const void* target) const;
@@ -75,9 +68,7 @@ namespace Ogre {
         /** Gets the Cg profiles which can be supported by the program. */
         const StringVector& getProfiles(void) const { return mProfiles; }
     protected:
-        static CmdEntryPoint msCmdEntryPoint;
         static CmdProfiles msCmdProfiles;
-        String mEntryPoint;
         StringVector mProfiles;
 
         // check if syntax is supported

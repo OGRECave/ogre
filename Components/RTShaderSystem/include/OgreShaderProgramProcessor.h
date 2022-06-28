@@ -58,8 +58,8 @@ public:
     /** Class destructor */
     virtual ~ProgramProcessor();
 
-    /** Return the target language of this processor. */
-    virtual const String& getTargetLanguage() const = 0;
+    /// @deprecated
+    OGRE_DEPRECATED const String& getTargetLanguage() const { return BLANKSTRING; }
     
     /** Called before creation of the GPU programs.
     Do several preparation operation such as validation, register compaction and specific target language optimizations.

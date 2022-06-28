@@ -65,13 +65,6 @@ namespace Ogre {
             const String& paramName,
             const GpuConstantDefinitionMap* (&constantDefs)[6],
             GLUniformReference& refToUpdate);
-        /** Find the data source definition for a given atomic counter
-            uniform name and reference. Return true if found and pair
-            the reference with its data source. */
-        static bool findAtomicCounterDataSource(
-            const String& paramName,
-            const GpuConstantDefinitionMap* (&constantDefs)[6],
-            GLAtomicCounterReference& refToUpdate);
     public:
 
         GLSLProgramManager(GL3PlusRenderSystem* renderSystem);
@@ -96,9 +89,7 @@ namespace Ogre {
         void extractUniformsFromProgram(
             GLuint programObject,
             const GpuConstantDefinitionMap* (&constantDefs)[6],
-            GLUniformReferenceList& uniformList,
-            GLAtomicCounterReferenceList& counterList,
-            GLCounterBufferList& counterBufferList);
+            GLUniformReferenceList& uniformList);
 
         GL3PlusStateCacheManager* getStateCacheManager();
 

@@ -1,24 +1,37 @@
-# RTSS: Run Time Shader System {#rtss}
+# Runtime Shader Generation {#rtss}
 
-The Run Time Shader System or RTSS for short is the %Ogre way of managing Shaders and their variations. Initially it was created as a drop-in-replacement to the Fixed-Function Pipeline (FFP) for RenderSystems that lacked it (e.g D3D11, GLES2).
+With D3D11 and GL3, support for fixed pipeline functionality was removed. Meaning you can only render objects using shaders.
+
+While @ref High-level-Programs offer you maximal control and flexibility over how your objects are rendered, writing and maintaining them is also a very time consuming task.
+
+The Run Time Shader System or RTSS for short is the %Ogre way of managing Shaders and their variations. Initially it was created as a drop-in-replacement to the Fixed-Function Pipeline (FFP) for RenderSystems that lacked it.
 However, since then it grew to a general way to express shader functionality in @ref Material-Scripts without having to manually write shaders.
+
+While the resulting shaders are less optimized, they offer the following advantages:
+
+* Save development time e.g. when your target scene has dynamic lights and the number changes, fog changes and the number of material attributes increases the total count of needed shaders dramatically. It can easily cross 100 and it becomes a time consuming development task.
+* Reusable code - once you've written the shader extension you can use it anywhere due to its independent nature.
+* Custom shaders extension library - enjoy the shared library of effects created by the community. Unlike hand written shader code, which may require many adjustments to be plugged into your own shader code, using the extensions library requires minimum changes.
 
 For fixed function function properties, the RTSS will read the standard `pass` and `texture_unit` definitions, so no changes are required. To enable features that go beyond the possibilities of the FFP, you have to define an additional `rtshader_system` block with the respective properties.
 
 For instance, the FFP only allows per-vertex lighting. To request per-pixel lighting, you would add the following block to a pass:
 
-@snippet Media/RTShaderLib/materials/RTShaderSystem.material rtss_per_pixel
+@snippet Samples/Media/materials/scripts/RTShaderSystem.material rtss_per_pixel
 
 To modify the default lighting stage [see below](@ref rtss_custom_api). For more examples see `Media/RTShaderLib/materials/RTShaderSystem.material`.
 
 @tableofcontents
 
-# RTSS properties in Material Scripts {#rtss_custom_mat}
+# RTSS Pass properties {#rtss_custom_mat}
 
-Here are the attributes you can use in a `rtshader_system` block of a .material script:
+Here are the attributes you can use in a `rtshader_system` block of a `pass {}`:
 
 - [transform_stage](#transform_stage)
 - [lighting_stage](#lighting_stage)
+- [gbuffer](#gbuffer)
+- [normal_map](#normal_map)
+- [metal_roughness](#metal_roughness)
 - [fog_stage](#fog_stage)
 - [light_count](#light_count)
 - [triplanarTexturing](#triplanarTexturing)
@@ -49,20 +62,77 @@ Example: `transform_stage instanced 1`
 Force a specific lighting model.
 
 @par
-Format: `lighting_stage <ffp|per_pixel|normal_map|gbuffer> [normalised]`
+Format: `lighting_stage <ffp|per_pixel> [two_sided] [normalised]`
 @par
-Format2: `lighting_stage normal_map <texturename> [tangent_space|object_space] [coordinateIndex] [samplerName]`
+Example: `lighting_stage ffp two_sided`
+
+@param two_sided compute lighting on both sides of the surface, when culling is disabled.
+@param normalised normalise the blinn-phong reflection model to make it energy conserving - see [this for details](http://www.rorydriscoll.com/2009/01/25/energy-conservation-in-games/)
+
+<a name="gbuffer"></a>
+
+## gbuffer
+
+Redirects intermediate lighting results into gbuffers for e.g. deferred shading.
+
 @par
-Format3: `lighting_stage gbuffer <target_layout> [target_layout]`
+Format: `lighting_stage gbuffer <target_layout> [target_layout]`
+@par
+Example: `lighting_stage gbuffer normal_viewdepth diffuse_specular`
+
+@param target_layout with @c gbuffer, this specifies the data to be written into one or two MRT targets. Possible values are @c depth, @c normal, @c viewpos, @c normal_viewdepth and @c diffuse_specular
+
+<a name="normal_map"></a>
+
+## normal_map
+
+Use a normal map for lighting computations
+
+@par
+Format: `lighting_stage normal_map <texture> [normalmap_space] [texcoord_index] [sampler]`
 @par
 Example: `lighting_stage normal_map Panels_Normal_Tangent.png tangent_space 0 SamplerToUse`
 
-@param normalised with @c ffp or @c per_pixel @copybrief Ogre::RTShader::FFPLighting::setNormaliseEnabled @copydetails Ogre::RTShader::FFPLighting::setNormaliseEnabled
-@param texturename normal map to use with @c normal_map
-@param target_layout with @c gbuffer, this specifies the data to be written into one or two MRT targets. Possible values are @c depth, @c normal, @c viewpos, @c normal_viewdepth and @c diffuse_specular
+@param texture normal map name to use
+@param normalmap_space <dl compact="compact">
+<dt>tangent_space</dt>
+<dd>Normal map contains normal data in tangent space.
+This is the default normal mapping behavior and it requires that the
+target mesh will have valid tangents within its vertex data.</dd>
+<dt>object_space</dt>
+<dd>Normal map contains normal data in object local space.
+This normal mapping technique has the advantages of better visualization results,
+lack of artifacts that comes from texture mirroring usage, it doesn't requires tangent
+and it also saves some instruction in the vertex shader stage.
+The main drawback of using this kind of normal map is that the target object must be static
+in terms of local space rotations and translations.</dd>
+<dt>parallax</dt>
+<dd>Normal map contains normal data in parallax corrected tangent space
+The restrictions of @c tangent_space apply. Additionally the alpha
+channel of the normal texture is expected to contain height displacement data.
+This is used for parallax corrected rendering.</dd>
+</dl>
+@param texcoord_index the start texcoord attribute index to read the uv coordinates from
+@param sampler the [Sampler](@ref Samplers) to use for the normal map
 
-@see Ogre::RTShader::NormalMapLighting::NormalMapSpace
-@see @ref Samplers
+
+<a name="metal_roughness"></a>
+
+## metal_roughness
+
+Use metal roughness parametrisation for lighting computations.
+
+By default, roughness is read from `specular[0]` and metalness from `specular[1]`.
+
+@par
+Format: `lighting_stage metal_roughness [texture <texturename>]`
+@par
+Example: `lighting_stage metal_roughness texture Default_metalRoughness.jpg`
+
+@param texturename texture for spatially varying parametrization.
+[In accordance to the glTF2.0 specification](https://www.khronos.org/registry/glTF/specs/2.0/glTF-2.0.html#_material_pbrmetallicroughness_metallicroughnesstexture), roughness is sampled from the G channel and metalness from the B channel.
+
+@note Using this option switches the lighting equations from Blinn-Phong to the Cook-Torrance PBR model [using the equations described by Filament](https://google.github.io/filament/Filament.html#materialsystem/standardmodelsummary).
 
 <a name="fog_stage"></a>
 
@@ -71,9 +141,11 @@ Example: `lighting_stage normal_map Panels_Normal_Tangent.png tangent_space 0 Sa
 Force a specific fog calculation
 
 @par
-Format: `fog_stage ffp <per_vertex|per_pixel>`
+Format: `fog_stage ffp <calc_mode>`
 @par
 Example: `fog_stage ffp per_pixel`
+
+@param calc_mode either `per_vertex` or `per_pixel`
 
 <a name="light_count"></a>
 
@@ -106,7 +178,9 @@ Valid values are [0; 0.57] not bigger to avoid division by zero
 ## integrated_pssm4
 Integrated PSSM shadow receiver with 2 splits. Custom split points.
 @par
-Format: `integrated_pssm4 <znear> <sp0> <sp1> <zfar>`
+Format: `integrated_pssm4 <znear> <sp0> <sp1> <zfar> [debug] [filter]`
+@param debug visualize the active shadow-splits in the scene
+@param filter one of `pcf4, pcf16` (default: @c pcf4)
 
 <a name="hardware_skinning"></a>
 
@@ -122,6 +196,13 @@ Example: `hardware_skinning 24 2 dual_quaternion true false`
 @param scale_shear add scaling and shearing support to dual quaternion computation
 
 @note You can also use Ogre::RTShader::HardwareSkinningFactory::prepareEntityForSkinning to derive this information automatically.
+
+# RTSS Texture Unit properties {#rtss_tu_props}
+
+Here are the attributes you can use in a `rtshader_system` block of a `texture_unit {}`:
+
+- [layered_blend](#layered_blend)
+- [source_modifier](#source_modifier)
 
 <a name="layered_blend"></a>
 
@@ -153,10 +234,33 @@ Example: `source_modifier src1_inverse_modulate custom 2`
 @param operation one of `src1_modulate, src2_modulate, src1_inverse_modulate, src2_inverse_modulate`
 @param parameterNum number of the custom shader parameter that controls the operation
 
+# Setting properties programmatically {#RTSS-Props-API}
+
+In case you need to set the properties programmatically, see the following example for how the script is mapped to the API.
+
+```cpp
+rtshader_system
+{
+	lighting_stage normal_map Default_normal.jpg
+}
+```
+becomes
+```cpp
+using namespace Ogre::RTShader;
+ShaderGenerator* shaderGen = ShaderGenerator::getSingletonPtr();
+
+shaderGen->createShaderBasedTechnique(mat->getTechnique(0), MSN_SHADERGEN);
+RenderState* rs = shaderGen->getRenderState(MSN_SHADERGEN, *mat, 0);
+SubRenderState* srs = shaderGen->createSubRenderState("NormalMap");
+rs->addTemplateSubRenderState(srs);
+
+srs->setParameter("texture", "Default_normal.jpg");
+```
+
 # System overview {#rtss_overview}
 
 The RTSS manages a set of opaque isolated components (SubRenderStates) where each implements a specific effect.
-These "effects" include Fixed Function transformation and lighting. At the core these components are plain shader files providing a set of functions; e.g. @ref SGX_FUNC_LIGHT_DIRECTIONAL_DIFFUSE, @ref SGX_FUNC_LIGHT_POINT_DIFFUSE.
+These "effects" include Fixed Function transformation and lighting. At the core these components are plain shader files providing a set of functions; e.g. @c SGX_Light_Directional_Diffuse(), @c SGX_Light_Point_Diffuse().
 
 Correctly ordering these functions, providing them with the right input values and interconnecting them is the main purpose of the RTSS.
 
@@ -179,12 +283,12 @@ void main() {
 	$FFP_VS_TEXTURING
 }
 ```
-and `$FFP_VS_TRANSFORM = [FFP_FUNC_TRANSFORM]`, `$FFP_VS_TEXTURING = [FFP_FUNC_TRANSFORM_TEXCOORD]`, it generates
+and `$FFP_VS_TRANSFORM = [FFP_Transform()]`, `$FFP_VS_TEXTURING = [FFP_TransformTexCoord()]`, it generates
 
 ```cpp
-// FORWARD DECLARATIONS
-void FFP_Transform(in mat4, in vec4, out vec4);
-void FFP_TransformTexCoord(in mat4, in vec2, out vec2);
+// PROGRAM DEPENDENCIES
+#include <FFPLib_Transform.glsl>
+#include <FFPLib_Texturing.glsl>
 // GLOBAL PARAMETERS
 uniform	mat4	worldviewproj_matrix;
 uniform	mat4	texture_matrix1;
@@ -213,6 +317,18 @@ The RTSS is flexible enough to "just" move the according calculations from the v
 * Smart program caching: each shader program is created only once and may be used by multiple passes.
 * Automatic vertex shader output register compacting: no more compacting variables by hand. In case the amount of used vertex shader outputs exceeds the maximum allowed (12 to 32, depending on [D3DPSHADERCAPS2_0.NumTemps](http://msdn.microsoft.com/en-us/library/bb172918%28v=VS.85%29.aspx)), a compacting algorithm packs the vertex shader outputs and adds unpack code in the fragment shader side.
 * Material script support, for both export and import.
+
+## Controlling shader re-generation
+
+By default the RTSS synchronizes with the active SceneManager regarding the fog settings and the number of active lights.
+This can result in frame-drops when new lights are added, as all managed Materials are updated for the new light-count.
+On the other hand, the generated shaders might include too many lights for the targeted budget.
+
+To get more fine-grained control, you can use:
+- Ogre::RTShader::RenderState::setLightCountAutoUpdate and
+- Ogre::RTShader::RenderState::setLightCount
+
+to set a fixed number of lights the materials should consider.
 
 # The RTSS in Depth {#rtss_indepth}
 
@@ -266,28 +382,19 @@ These type of components are note worthy for 2 reason. The first and obvious one
 @note If you are using the OgreBites::ApplicationContext, the following steps will be taken automatically for you.
 
 Initializing the system is composed of the following steps:
-* Create the internal managers and structures via the `Ogre::RTShader::ShaderGenerator::initialize()` method.
-* Set the target cache path. This is the place on your disk where the output shaders will be written to or will be read from in case they were generated by previous runs of your application.
-* Verify that the location of the shader libs needed by the system is added to the ResourceGroupManager via the `Ogre::ResourceGroupManager::addResourceLocation()` method.
+* Create the internal managers and structures via the Ogre::RTShader::ShaderGenerator::initialize() method.
 * Assign the target scene manager to the shader generator.
-* Add one or more specialized sub-render states that are to be shared among all materials (per pixel lighting, textured fog, etc...). 
+* Listen for SchemeNotFound events via Ogre::MaterialManager::Listener and use the RTSS to handle them
 
 ```cpp
 if (Ogre::RTShader::ShaderGenerator::initialize())
 {
-	// Grab the shader generator pointer.
-	mShaderGenerator = Ogre::RTShader::ShaderGenerator::getSingletonPtr();
+	// Register the scene manager.
+	Ogre::RTShader::ShaderGenerator::getSingleton().addSceneManager(sceneMgr);
 
-	// Add the shader libs resource location. a sample shader lib can be found in Samples\Media\RTShaderLib
-	Ogre::ResourceGroupManager::getSingleton().addResourceLocation(shaderLibPath, "FileSystem");
-
-	// Set shader cache path.
-	mShaderGenerator->setShaderCachePath(shaderCachePath);		
-
-	// Set the scene manager.
-	mShaderGenerator->addSceneManager(sceneMgr);
-	
-	return true;
+	// forward scheme not found events to the RTSS
+	OgreBites::SGTechniqueResolverListener* schemeNotFoundHandler = ...
+	Ogre::MaterialManager::getSingleton().addListener(schemeNotFoundHandler);
 }
 ```
 
@@ -311,23 +418,25 @@ To use the generated technique set the change material scheme of your viewport(s
 
 ```cpp
 // Create shader based technique from the default technique of the given material.
-mShaderGenerator->createShaderBasedTechnique("Examples/BeachStones", Ogre::MaterialManager::DEFAULT_SCHEME_NAME, Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+mShaderGenerator->createShaderBasedTechnique("Examples/BeachStones", Ogre::MSN_DEFAULT, Ogre::MSN_SHADERGEN);
 
 // Apply the shader generated based techniques.
-mViewport->setMaterialScheme(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+mViewport->setMaterialScheme(Ogre::MSN_SHADERGEN);
 ```
 
 @note you can automate the shader generation process for all materials. First set the viewport scheme to the destination scheme of the RTSS shaders. Second register to the `Ogre::MaterialManager::Listener` implementing `handleSchemeNotFound()` - e.g. OgreBites::SGTechniqueResolverListener
 
-## Runtime shader generation {#rtssGenerate}
-During the application runtime the ShaderGenerator instance receives notifications on per frame basis from its target SceneManager.
+## Shader generation at runtime {#rtssGenerate}
+During the application runtime the @c ShaderGenerator instance receives notifications on per frame basis from its target @c SceneManager.
 At this point it checks the material scheme in use. In case the current scheme has representations in the manager, it executes its validate method.
-The SGScheme validation includes synchronization with scene light and fog settings. In case it is out of date it will rebuild all shader generated techniques.
-1. The first step is to loop over every SGTechnique associated with this SGScheme and build its RenderStates - one for each pass.
-2. The second step is to loop again on every SGTechnique and acquire a program set for each SGPass.
+The @c SGScheme validation includes synchronization with scene light and fog settings. In case it is out of date it will rebuild all shader generated techniques.
+1. The first step is to loop over every @c SGTechnique associated with this @c SGScheme and build its @c RenderStates - one for each pass.
+2. The second step is to loop again on every @c SGTechnique and acquire a program set for each @c SGPass.
 
-The actual acquiring process is done by the TargetRenderState that generates CPU program representation, send them to a matching ProgramWriter that is chosen by the active target language, the writer generates source code that is the basis for the GPU programs.
-The result of this entire process is that each technique associated with the SGScheme has vertex and pixel shaders applied to all its passes. These shaders are synchronized with scene lights and fog settings.
+@note The shaders are only automatically updated for lights and fog changes. If you change the source pass after initial shader creation, you must call Ogre::RTShader::ShaderGenerator::invalidateMaterial manually.
+
+The actual acquiring process is done by the @c TargetRenderState that generates CPU program representation, send them to a matching @c ProgramWriter that is chosen by the active target language, the writer generates source code that is the basis for the GPU programs.
+The result of this entire process is that each technique associated with the @c SGScheme has vertex and pixel shaders applied to all its passes. These shaders are synchronized with scene lights and fog settings.
 
 ![](RuntimeShaderGeneration.svg)
 
@@ -356,7 +465,7 @@ Therefore parameters are not resolved by name (except for local variables), but 
 @par
 You can think of the latter as an extension of the Cg/ HLSL Semantics to the actual content of the parameter.
 @par
-In case of the Ogre::RTShader::FFPTransform wee nned the world view projection matrix and vertex shader input and output position parameters.
+In case of the Ogre::RTShader::FFPTransform we need the world view projection matrix and vertex shader input and output position parameters.
 @par
 @snippet Components/RTShaderSystem/src/OgreShaderFFPTransform.cpp param_resolve
 
@@ -376,7 +485,7 @@ The arguments to the function are the ones you resolved in the first step and th
 You can add call as many functions as you need. The calls will appear in the same order in the generates shader source code.
 @note
 * The ordering of the function invocation is crucial. Use the Ogre::RTShader::FFPVertexShaderStage and Ogre::RTShader::FFPFragmentShaderStage enumarations to place your invocations in the desired global order.
-* Make sure the parameter semantic (in/out) in the SubRenderState code matches to your shader code implementation you supplied in the library file. GLSL will fail to link to libray functions if it won't be able to find a perfect function declaration match. 
+* Make sure the parameter semantic (in/out) in the SubRenderState code matches to your shader code implementation you supplied in the library file. GLSL will fail to link to library functions if it won't be able to find a perfect function declaration match.
 * Ogre::RTShader::SubRenderState::updateGpuProgramsParams - As the name suggest this method should be overridden only in case your SubRenderState should update some parameter it created before.
 * Ogre::RTShader::SubRenderState::preAddToRenderState(): this method called before adding this SubRenderState to a parent RenderState instances. It allows this SubRenderState to exclude itself from the list in case the source pass is not matching. I.E in case of SubRenderState that perform lighting calculations it can return false when the given source pass specifies that lighting calculations disabled for it.
 @snippet Components/RTShaderSystem/src/OgreShaderFFPLighting.cpp disable
@@ -384,15 +493,12 @@ This method also let the SubRenderState to opportunity to modify the destination
 
 Implementing the Ogre::RTShader::SubRenderStateFactory is much simpler and involves implementing the following methods
 * Ogre::RTShader::SubRenderStateFactory::createInstanceImpl(): This method should return instance for the SubRenderState sub class.
-* Ogre::RTShader::SubRenderStateFactory::createInstance(): This method should return instasnce for the SubRenderState sub class using the given script compiler parameters. Implemet this method if you want to be able to creat your custom shader extension from material script.
+* Ogre::RTShader::SubRenderStateFactory::createInstance(): This method should return instance for the SubRenderState sub class using the given script compiler parameters. Implement this method if you want to be able to create your custom shader extension from material script.
 * Ogre::RTShader::SubRenderStateFactory::writeInstance(): This method should write down the parameters of a given SubRenderState instance to material script file. Implement this method if you want to be able to export a material that contains your custom shader extension.
 
 ## Tips for debugging shaders {#debugging}
 A couple of notes on debugging shaders coming from the RTSS:
-* Call OgreBites::ApplicationContext::setRTSSWriteShadersToDisk. This will cache the generated shaders onto the disk under the directory [OGRE_MEDIA_DIR](@ref cmake)`/RTShaderLib/cache`. This is important for 2 reasons:
+* Call OgreBites::ApplicationContext::setRTSSWriteShadersToDisk. This will cache the generated shaders onto the disk under the directory [WRITABLE_PATH](@ref Ogre::FileSystemLayer::getWritablePath)`/RTShaderLib/cache`. This is important for 2 reasons:
   * It will make compilation problems easier to detect.
   * Once a shader is written to the disk, as long as you don't change the code behind it, the same shader will be picked up in the next application run even if its content has changed. If you have compilation or visual problems with the shader you can try to manually tinker with it without compiling the code again and again.
-* Add a breakpoint in OgreShaderProgramManager.cpp at
-@snippetlineno Components/RTShaderSystem/src/OgreShaderProgramManager.cpp debug_break 
-If a shader will fail to compile it will usually fail there. Once that happens you can find the shader name under the `programName` parameter, then look for it in the cache directory you created.
 * Other common problems with creating shaders in RTSS usually occur from defining vertex shader parameters and using them in the pixel shader and vice versa. so watch out for those.

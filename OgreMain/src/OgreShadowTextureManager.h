@@ -46,7 +46,7 @@ namespace Ogre
 
     /** Class to manage the available shadow textures which may be shared between
         many SceneManager instances if formats agree.
-    @remarks
+
         The management of the list of shadow textures has been separated out into
         a dedicated class to enable the clean management of shadow textures
         across many scene manager instances. Where multiple scene managers are
@@ -68,7 +68,7 @@ namespace Ogre
         /** Populate an incoming list with shadow texture references as requested
             in the configuration list.
         */
-        virtual void getShadowTextures(const ShadowTextureConfigList& config, 
+        virtual void getShadowTextures(ShadowTextureConfigList& config,
             ShadowTextureList& listToPopulate);
 
         /** Get an appropriately defined 'null' texture, i.e. one which will always
@@ -77,7 +77,7 @@ namespace Ogre
         virtual TexturePtr getNullShadowTexture(PixelFormat format);
 
         /** Remove any shadow textures that are no longer being referenced.
-        @remarks
+
             This should be called fairly regularly since references may take a 
             little while to disappear in some cases (if referenced by materials)
         */

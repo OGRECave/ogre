@@ -47,18 +47,18 @@ namespace Ogre {
      */
     enum TextureUsage
     {
-        /// same as HardwareBuffer::HBU_STATIC
-        TU_STATIC = HardwareBuffer::HBU_STATIC,
-        /// same as HardwareBuffer::HBU_DYNAMIC
-        TU_DYNAMIC = HardwareBuffer::HBU_DYNAMIC,
-        /// same as HardwareBuffer::HBU_WRITE_ONLY
-        TU_WRITE_ONLY = HardwareBuffer::HBU_WRITE_ONLY,
-        /// same as HardwareBuffer::HBU_STATIC_WRITE_ONLY
-        TU_STATIC_WRITE_ONLY = HardwareBuffer::HBU_STATIC_WRITE_ONLY,
-        /// same as HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY
-        TU_DYNAMIC_WRITE_ONLY = HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY,
-        /// same as HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE
-        TU_DYNAMIC_WRITE_ONLY_DISCARDABLE = HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE,
+        /// same as #HBU_GPU_TO_CPU
+        TU_STATIC = HBU_GPU_TO_CPU,
+        /// same as #HBU_CPU_ONLY
+        TU_DYNAMIC = HBU_CPU_ONLY,
+        /// same as #HBU_DETAIL_WRITE_ONLY
+        TU_WRITE_ONLY = HBU_DETAIL_WRITE_ONLY,
+        /// same as #HBU_GPU_ONLY
+        TU_STATIC_WRITE_ONLY = HBU_GPU_ONLY,
+        /// same as #HBU_CPU_TO_GPU
+        TU_DYNAMIC_WRITE_ONLY = HBU_CPU_TO_GPU,
+        /// @deprecated do not use
+        TU_DYNAMIC_WRITE_ONLY_DISCARDABLE = HBU_CPU_TO_GPU,
         /// Mipmaps will be automatically generated for this texture
         TU_AUTOMIPMAP = 0x10,
         /** This texture will be a render target, i.e. used as a target for render to texture
@@ -73,7 +73,7 @@ namespace Ogre {
         /// Texture can be used as an UAV, but not as a regular texture.
         TU_UAV_NOT_SRV = TU_UAV | TU_NOT_SRV,
         /// Default to automatic mipmap generation static textures
-        TU_DEFAULT = TU_AUTOMIPMAP | TU_STATIC_WRITE_ONLY,
+        TU_DEFAULT = TU_AUTOMIPMAP | HBU_GPU_ONLY,
 
         // deprecated
         TU_NOTSHADERRESOURCE = TU_NOT_SRV
@@ -90,7 +90,7 @@ namespace Ogre {
 
     /** Enum identifying the texture type
     */
-    enum TextureType
+    enum TextureType : uint8
     {
         /// 1D texture, used in combination with 1D texture coordinates
         TEX_TYPE_1D = 1,
@@ -103,10 +103,8 @@ namespace Ogre {
         TEX_TYPE_CUBE_MAP = 4,
         /// 2D texture array
         TEX_TYPE_2D_ARRAY = 5,
-        /// @deprecated do not use. Not support by any of the current rendersystems.
-        TEX_TYPE_2D_RECT = 6,
         /// GLES2 only OES texture type
-        TEX_TYPE_EXTERNAL_OES = 7
+        TEX_TYPE_EXTERNAL_OES = 6
     };
 
     /** Enum identifying special mipmap numbers
@@ -120,7 +118,7 @@ namespace Ogre {
     };
 
     /** Abstract class representing a Texture resource.
-        @remarks
+
             The actual concrete subclass which will exist for a texture
             is dependent on the rendering system in use (Direct3D, OpenGL etc).
             This class represents the commonalities, and is the one 'used'
@@ -160,7 +158,7 @@ namespace Ogre {
         }
 
         /** Are mipmaps hardware generated?
-        @remarks
+
             Will only be accurate after texture load, or createInternalResources
         */
         bool getMipmapsHardwareGenerated(void) const { return mMipmapsHardwareGenerated; }
@@ -181,7 +179,7 @@ namespace Ogre {
 
         /** Sets whether this texture will be set up so that on sampling it, 
             hardware gamma correction is applied.
-        @remarks
+
             24-bit textures are often saved in gamma colour space; this preserves
             precision in the 'darks'. However, if you're performing blending on 
             the sampled colours, you really want to be doing it in linear space. 
@@ -270,13 +268,13 @@ namespace Ogre {
             
             @param u is a combination of TU_STATIC, TU_DYNAMIC, TU_WRITE_ONLY 
                 TU_AUTOMIPMAP and TU_RENDERTARGET (see TextureUsage enum). You are
-                strongly advised to use HBU_STATIC_WRITE_ONLY wherever possible, if you need to 
-                update regularly, consider HBU_DYNAMIC_WRITE_ONLY.
+                strongly advised to use HBU_GPU_ONLY wherever possible, if you need to
+                update regularly, consider HBU_CPU_TO_GPU.
         */
         void setUsage(int u) { mUsage = u; }
 
         /** Creates the internal texture resources for this texture. 
-        @remarks
+
             This method creates the internal texture resources (pixel buffers, 
             texture surfaces etc) required to begin using this texture. You do
             not need to call this method directly unless you are manually creating
@@ -288,8 +286,7 @@ namespace Ogre {
         */
         void createInternalResources(void);
 
-        /** Frees internal texture resources for this texture. 
-        */
+        /// @deprecated use unload() instead
         void freeInternalResources(void);
         
         /** Copies (and maybe scales to fit) the contents of this texture to
@@ -376,21 +373,13 @@ namespace Ogre {
         */
         void setDesiredBitDepths(ushort integerBits, ushort floatBits);
 
-        /** specify that a single channel (luminance) texture should be loaded as alpha
-
-          rather than the default which is to load it into the red channel. This can be helpful if
-          you want to use alpha-only textures in the fixed function pipeline.
-         */
-        void setTreatLuminanceAsAlpha(bool asAlpha);
-
-        /** Gets whether luminace pixel format will treated as alpha format when load this texture.
-        */
-        bool getTreatLuminanceAsAlpha(void) const;
+        /// @deprecated use setFormat(PF_A8)
+        OGRE_DEPRECATED void setTreatLuminanceAsAlpha(bool asAlpha);
 
         /** Return the number of faces this texture has. This will be 6 for a cubemap
             texture and 1 for a 1D, 2D or 3D one.
         */
-        size_t getNumFaces() const;
+        uint32 getNumFaces() const;
 
         /** Return hardware pixel buffer for a surface. This buffer can then
             be used to copy data from and to a particular level of the texture.
@@ -460,13 +449,10 @@ namespace Ogre {
 
         uint32 mNumRequestedMipmaps;
         uint32 mNumMipmaps;
-        bool mMipmapsHardwareGenerated;
-        float mGamma;
-        bool mHwGamma;
-        uint mFSAA;
-        String mFSAAHint;
 
-        TextureType mTextureType;
+        float mGamma;
+        uint mFSAA;
+
         PixelFormat mFormat;
         int mUsage; /// Bit field, so this can't be TextureUsage
 
@@ -476,12 +462,15 @@ namespace Ogre {
         PixelFormat mDesiredFormat;
         unsigned short mDesiredIntegerBitDepth;
         unsigned short mDesiredFloatBitDepth;
-        bool mTreatLuminanceAsAlpha;
 
+        bool mTreatLuminanceAsAlpha;
         bool mInternalResourcesCreated;
+        bool mMipmapsHardwareGenerated;
+        bool mHwGamma;
 
         /// vector of images that should be loaded (cubemap/ texture array)
         std::vector<String> mLayerNames;
+        String mFSAAHint;
 
         /** Vector of images that were pulled from disk by
             prepareLoad but have yet to be pushed into texture memory
@@ -493,6 +482,8 @@ namespace Ogre {
         /// Vector of pointers to subsurfaces
         typedef std::vector<HardwarePixelBufferSharedPtr> SurfaceList;
         SurfaceList mSurfaceList;
+
+        TextureType mTextureType;
 
         void readImage(LoadedImages& imgs, const String& name, const String& ext, bool haveNPOT);
 
@@ -519,6 +510,13 @@ namespace Ogre {
             or from a magic number.
         */
         String getSourceFileType() const;
+
+        /** Returns the maximum number of Mipmaps that can be generated until we reach
+        the mininum possible size. This does not count the base level.
+
+        @return how many times we can divide this texture in 2 until we reach 1x1.
+        */
+        uint32 getMaxMipmaps() const;
 
         static const char* CUBEMAP_SUFFIXES[6];
     };

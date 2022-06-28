@@ -45,7 +45,7 @@ namespace Ogre {
     */
     /** Definition of a Plane that may be attached to a node, and the derived
         details of it retrieved simply.
-    @remarks
+
         This plane is not here for rendering purposes, it's to allow you to attach
         planes to the scene in order to have them move and follow nodes on their
         own, which is useful if you're using the plane for some kind of calculation,
@@ -53,11 +53,10 @@ namespace Ogre {
     */
     class _OgreExport MovablePlane : public Plane, public MovableObject
     {
-    protected:
+    private:
         mutable Plane mDerivedPlane;
         mutable Vector3 mLastTranslate;
         mutable Quaternion mLastRotate;
-        AxisAlignedBox mNullBB;
         mutable bool mDirty;
         static String msMovableType;
     public:
@@ -73,7 +72,7 @@ namespace Ogre {
         /// Overridden from MovableObject
         void _notifyCurrentCamera(Camera*) { /* don't care */ }
         /// Overridden from MovableObject
-        const AxisAlignedBox& getBoundingBox(void) const { return mNullBB; }
+        const AxisAlignedBox& getBoundingBox(void) const { return AxisAlignedBox::BOX_NULL; }
         /// Overridden from MovableObject
         Real getBoundingRadius(void) const { return 0.0f; }
         /// Overridden from MovableObject

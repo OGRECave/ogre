@@ -50,13 +50,13 @@ namespace Ogre
 
     /** Check for GL errors and report them in the Ogre Log.
     */
-    void reportGLSLError(GLenum glErr, const String& ogreMethod, const String& errorTextPrefix, const GLhandleARB obj, const bool forceInfoLog = false, const bool forceException = false);
+    void reportGLSLError(GLenum glErr, const String& ogreMethod, const String& errorTextPrefix, const uint obj, const bool forceInfoLog = false, const bool forceException = false);
 
     /** if there is a message in GL info log then post it in the Ogre Log
     @param msg the info log message string is appended to this string
     @param obj the GL object that is used to retrieve the info log
     */
-    String logObjectInfo(const String& msg, GLhandleARB obj);
+    String logObjectInfo(const String& msg, uint obj);
 
     /// just return the info without logging it
     String getObjectInfo(GLuint obj);

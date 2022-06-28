@@ -31,7 +31,7 @@ THE SOFTWARE.
 namespace Ogre {
     //-----------------------------------------------------------------------
     Light::Light()
-        : mLightType(LT_POINT),
+        :
 #ifdef OGRE_NODELESS_POSITIONING
           mPosition(Vector3::ZERO),
           mDirection(Vector3::NEGATIVE_UNIT_Z),
@@ -48,13 +48,14 @@ namespace Ogre {
           mSpotFalloff(1.0f),
           mSpotNearClip(0.0f),
           mAttenuation(100000.f, 1.f, 0.f, 0.f),
-          mPowerScale(1.0f),
-          mIndexInFrame(0),
           mShadowFarDist(0),
           mShadowFarDistSquared(0),
+          mIndexInFrame(0),
           mShadowNearClipDist(-1),
           mShadowFarClipDist(-1),
           mCameraToBeRelativeTo(0),
+          mPowerScale(1.0f),
+          mLightType(LT_POINT),
           mOwnShadowFarDist(false)
     {
         //mMinPixelSize should always be zero for lights otherwise lights will disapear
@@ -62,7 +63,6 @@ namespace Ogre {
     }
     //-----------------------------------------------------------------------
     Light::Light(const String& name) : MovableObject(name),
-        mLightType(LT_POINT),
 #ifdef OGRE_NODELESS_POSITIONING
         mPosition(Vector3::ZERO),
         mDirection(Vector3::NEGATIVE_UNIT_Z),
@@ -78,13 +78,14 @@ namespace Ogre {
         mSpotFalloff(1.0f),
         mSpotNearClip(0.0f),
         mAttenuation(100000.f, 1.f, 0.f, 0.f),
-        mPowerScale(1.0f),
-        mIndexInFrame(0),
         mShadowFarDist(0),
         mShadowFarDistSquared(0),
+        mIndexInFrame(0),
         mShadowNearClipDist(-1),
         mShadowFarClipDist(-1),
         mCameraToBeRelativeTo(0),
+        mPowerScale(1.0f),
+        mLightType(LT_POINT),
         mOwnShadowFarDist(false)
     {
         //mMinPixelSize should always be zero for lights otherwise lights will disapear
@@ -271,14 +272,9 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     const AxisAlignedBox& Light::getBoundingBox(void) const
     {
-        // Null, lights are not visible
-        static AxisAlignedBox box;
+        // zero extent to still allow SceneQueries to work
+        static AxisAlignedBox box(Vector3(0, 0, 0), Vector3(0, 0, 0));
         return box;
-    }
-    //-----------------------------------------------------------------------
-    void Light::_updateRenderQueue(RenderQueue* queue)
-    {
-        // Do nothing
     }
     //-----------------------------------------------------------------------
     void Light::visitRenderables(Renderable::Visitor* visitor, 
@@ -755,7 +751,7 @@ namespace Ogre {
     void Light::_setCameraRelative(Camera* cam)
     {
         mCameraToBeRelativeTo = cam;
-#ifdef OGRE_NODELESS_POSITONING
+#ifdef OGRE_NODELESS_POSITIONING
         mDerivedCamRelativeDirty = true;
 #endif
     }
@@ -768,7 +764,7 @@ namespace Ogre {
             return maincam->getNearClipDistance();
     }
     //---------------------------------------------------------------------
-    Real Light::_deriveShadowFarClipDistance(const Camera* maincam) const
+    Real Light::_deriveShadowFarClipDistance() const
     {
         if (mShadowFarClipDist >= 0)
             return mShadowFarClipDist;
@@ -968,13 +964,4 @@ namespace Ogre {
 
         return light;
     }
-    //-----------------------------------------------------------------------
-    void LightFactory::destroyInstance( MovableObject* obj)
-    {
-        OGRE_DELETE obj;
-    }
-
-
-
-
 } // Namespace

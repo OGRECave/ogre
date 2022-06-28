@@ -1,8 +1,7 @@
-fragment_program Ogre/Compositor/ASCIIFPCg cg
+fragment_program Ogre/Compositor/ASCIIFPCg hlsl
 {
 	source ASCIIFP.cg
 	entry_point ASCII_ps
-	profiles ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3 ps_2_0 arbfp1
 	
 	default_params
 	{
@@ -34,7 +33,7 @@ fragment_program Ogre/Compositor/ASCIIFPGLSL glsl
 fragment_program Ogre/Compositor/ASCIIFPGLSLES glsles
 {
 	source ASCIIFP.glsles
-	syntax glsles
+	syntax glsl300es
 	
 	default_params
 	{
@@ -62,7 +61,6 @@ material Ogre/Compositor/ASCII
 		pass
 		{
 			cull_hardware none
-			cull_software none
 			depth_func always_pass
             polygon_mode_overrideable false
 

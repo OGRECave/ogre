@@ -71,19 +71,6 @@ void Compositor::removeTechnique(size_t index)
     mCompilationRequired = true;
 }
 //-----------------------------------------------------------------------
-
-CompositionTechnique *Compositor::getTechnique(size_t index)
-{
-    assert (index < mTechniques.size() && "Index out of bounds.");
-    return mTechniques[index];
-}
-//-----------------------------------------------------------------------
-
-size_t Compositor::getNumTechniques()
-{
-    return mTechniques.size();
-}
-//-----------------------------------------------------------------------
 void Compositor::removeAllTechniques()
 {
     Techniques::iterator i, iend;
@@ -100,19 +87,6 @@ void Compositor::removeAllTechniques()
 Compositor::TechniqueIterator Compositor::getTechniqueIterator(void)
 {
     return TechniqueIterator(mTechniques.begin(), mTechniques.end());
-}
-//-----------------------------------------------------------------------
-
-CompositionTechnique *Compositor::getSupportedTechnique(size_t index)
-{
-    assert (index < mSupportedTechniques.size() && "Index out of bounds.");
-    return mSupportedTechniques[index];
-}
-//-----------------------------------------------------------------------
-
-size_t Compositor::getNumSupportedTechniques()
-{
-    return mSupportedTechniques.size();
 }
 //-----------------------------------------------------------------------
 
@@ -145,31 +119,18 @@ void Compositor::compile()
 {
     /// Sift out supported techniques
     mSupportedTechniques.clear();
-    Techniques::iterator i, iend;
-    iend = mTechniques.end();
 
-    // Try looking for exact technique support with no texture fallback
-    for (i = mTechniques.begin(); i != iend; ++i)
+    for (auto t : mTechniques)
     {
-        // Look for exact texture support first
-        if((*i)->isSupported(false))
+        // Allow texture support with degraded pixel format
+        if (t->isSupported(true))
         {
-            mSupportedTechniques.push_back(*i);
+            mSupportedTechniques.push_back(t);
         }
     }
 
     if (mSupportedTechniques.empty())
-    {
-        // Check again, being more lenient with textures
-        for (i = mTechniques.begin(); i != iend; ++i)
-        {
-            // Allow texture support with degraded pixel format
-            if((*i)->isSupported(true))
-            {
-                mSupportedTechniques.push_back(*i);
-            }
-        }
-    }
+        LogManager::getSingleton().logError("Compositor '" + getName() + "' has no supported techniques");
 
     mCompilationRequired = false;
 }
@@ -220,22 +181,11 @@ void Compositor::createGlobalTextures()
         if (def->scope == CompositionTechnique::TS_GLOBAL) 
         {
             //Check that this is a legit global texture
-            if (!def->refCompName.empty()) 
-            {
-                OGRE_EXCEPT(Exception::ERR_INVALID_STATE, 
-                    "Global compositor texture definition can not be a reference",
-                    "Compositor::createGlobalTextures");
-            }
-            if (def->width == 0 || def->height == 0) 
-            {
-                OGRE_EXCEPT(Exception::ERR_INVALID_STATE, 
-                    "Global compositor texture definition must have absolute size",
-                    "Compositor::createGlobalTextures");
-            }
+            OgreAssert(def->refCompName.empty(), "Global compositor texture definition can not be a reference");
+            OgreAssert(def->width && def->height, "Global compositor texture definition must have absolute size");
             if (def->pooled) 
             {
-                LogManager::getSingleton().logMessage(
-                    "Pooling global compositor textures has no effect", LML_CRITICAL);
+                LogManager::getSingleton().logWarning("Pooling global compositor textures has no effect");
             }
             globalTextureNames.insert(def->name);
 
@@ -328,13 +278,7 @@ void Compositor::createGlobalTextures()
         if (numGlobals != globalTextureNames.size())
             isConsistent = false;
 
-        if (!isConsistent) 
-        {
-            OGRE_EXCEPT(Exception::ERR_INVALID_STATE, 
-                "Different composition techniques define different global textures",
-                "Compositor::createGlobalTextures");
-        }
-
+        OgreAssert(isConsistent, "Different composition techniques define different global textures");
     }
     
 }
@@ -365,7 +309,7 @@ const String& Compositor::getTextureInstanceName(const String& name, size_t mrtI
     return getTextureInstance(name, mrtIndex)->getName();
 }
 //-----------------------------------------------------------------------       
-TexturePtr Compositor::getTextureInstance(const String& name, size_t mrtIndex)
+const TexturePtr& Compositor::getTextureInstance(const String& name, size_t mrtIndex)
 {
     //Try simple texture
     GlobalTextureMap::iterator i = mGlobalTextures.find(name);
@@ -386,12 +330,12 @@ TexturePtr Compositor::getTextureInstance(const String& name, size_t mrtIndex)
         
 }
 //---------------------------------------------------------------------
-RenderTarget* Compositor::getRenderTarget(const String& name)
+RenderTarget* Compositor::getRenderTarget(const String& name, int slice)
 {
     // try simple texture
     GlobalTextureMap::iterator i = mGlobalTextures.find(name);
     if(i != mGlobalTextures.end())
-        return i->second->getBuffer()->getRenderTarget();
+        return i->second->getBuffer(slice)->getRenderTarget();
 
     // try MRTs
     GlobalMRTMap::iterator mi = mGlobalMRTs.find(name);

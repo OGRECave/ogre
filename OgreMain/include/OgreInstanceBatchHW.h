@@ -51,7 +51,7 @@ namespace Ogre
         basis. This means we can save vertex shader performance for instances that aren't in scene or
         just not focused by the camera.
 
-        @remarks
+
             Design discussion webpage: http://www.ogre3d.org/forums/viewtopic.php?f=4&t=59902
         @author
             Matias N. Goldberg ("dark_sylinc")
@@ -65,7 +65,6 @@ namespace Ogre
         void setupVertices( const SubMesh* baseSubMesh );
         void setupIndices( const SubMesh* baseSubMesh );
 
-        void removeBlendData();
         virtual bool checkSubMeshCompatibility( const SubMesh* baseSubMesh );
 
         size_t updateVertexBuffer( Camera *currentCamera );

@@ -36,7 +36,13 @@
 #include "OgreWin32Window.h"
 #include "OgreGLUtil.h"
 
+#include <GL/gl.h>
 #include <GL/wglext.h>
+
+static PFNWGLCREATECONTEXTATTRIBSARBPROC _wglCreateContextAttribsARB = 0;
+
+static int glMajorMax = 0;
+static int glMinorMax = 0;
 
 namespace Ogre {
     GLNativeSupport* getGLSupport(int profile)
@@ -88,17 +94,7 @@ namespace Ogre {
         optColourDepth.name = "Colour Depth";
         optColourDepth.immutable = false;
 
-        ConfigOption optVSyncInterval;
-        optVSyncInterval.name = "VSync Interval";
-        optVSyncInterval.immutable = false;
-        optVSyncInterval.possibleValues.push_back( "1" );
-        optVSyncInterval.possibleValues.push_back( "2" );
-        optVSyncInterval.possibleValues.push_back( "3" );
-        optVSyncInterval.possibleValues.push_back( "4" );
-        optVSyncInterval.currentValue = "1";
-
         mOptions[optColourDepth.name] = optColourDepth;
-        mOptions[optVSyncInterval.name] = optVSyncInterval;
 
         return mOptions;
     }
@@ -310,7 +306,15 @@ namespace Ogre {
             HDC oldhdc = wglGetCurrentDC();
             // if wglMakeCurrent fails, wglGetProcAddress will return null
             wglMakeCurrent(hdc, hrc);
-            
+
+            // the default context is created with maximum version
+            // use GL3 query type, as it is the only consumer
+            glGetIntegerv(0x821B, &glMajorMax);
+            glGetIntegerv(0x821C, &glMinorMax);
+
+            _wglCreateContextAttribsARB = (PFNWGLCREATECONTEXTATTRIBSARBPROC)
+                wglGetProcAddress("wglCreateContextAttribsARB");
+
             PFNWGLGETEXTENSIONSSTRINGARBPROC _wglGetExtensionsStringARB =
                 (PFNWGLGETEXTENSIONSSTRINGARBPROC)
                 wglGetProcAddress("wglGetExtensionsStringARB");
@@ -349,8 +353,8 @@ namespace Ogre {
                     WGL_SAMPLES_ARB, 2,
                     0
                 };
-                int formats[256];
-                unsigned int count;
+                int formats[256] = {0};
+                unsigned int count = 0;
                 // cheating here.  wglChoosePixelFormatARB procc address needed later on
                 // when a valid GL context does not exist and glew is not initialized yet.
                 PFNWGLGETPIXELFORMATATTRIBIVARBPROC wglGetPixelFormatAttribiv = (PFNWGLGETPIXELFORMATATTRIBIVARBPROC)wglGetProcAddress("wglGetPixelFormatAttribivARB");
@@ -457,6 +461,55 @@ namespace Ogre {
 
 
         return (format && SetPixelFormat(hdc, format, &pfd));
+    }
+
+    HGLRC Win32GLSupport::createNewContext(HDC hdc, HGLRC shareList)
+    {
+        HGLRC glrc = NULL;
+
+        int profile;
+        int majorVersion;
+        int minorVersion = 0;
+
+        switch(mContextProfile) {
+        case CONTEXT_COMPATIBILITY:
+            profile = WGL_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB;
+            majorVersion = 1;
+            break;
+        case CONTEXT_ES:
+            profile = WGL_CONTEXT_ES2_PROFILE_BIT_EXT;
+            majorVersion = 2;
+            break;
+        default:
+            profile = WGL_CONTEXT_CORE_PROFILE_BIT_ARB;
+            majorVersion = std::max(glMajorMax, 3);
+            minorVersion = std::max(glMinorMax, 3); // 3.1 would be sufficient per spec, but we need 3.3 anyway..
+            break;
+        }
+
+        int context_attribs[] = {
+            WGL_CONTEXT_MAJOR_VERSION_ARB, majorVersion,
+            WGL_CONTEXT_MINOR_VERSION_ARB, minorVersion,
+            WGL_CONTEXT_PROFILE_MASK_ARB, profile,
+            0
+        };
+
+        glrc = _wglCreateContextAttribsARB ? _wglCreateContextAttribsARB(hdc, shareList, context_attribs) : wglCreateContext(hdc);
+
+        if (!glrc)
+            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "wglCreateContext failed: " + translateWGLError());
+
+        if(!_wglCreateContextAttribsARB && shareList && shareList != glrc)
+        {
+            // Share lists with old context
+            if (!wglShareLists(shareList, glrc))
+            {
+                wglDeleteContext(glrc);
+                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "wglShareLists() failed: "+ translateWGLError());
+            }
+        }
+
+        return glrc;
     }
 
     unsigned int Win32GLSupport::getDisplayMonitorCount() const

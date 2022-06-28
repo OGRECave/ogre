@@ -55,7 +55,9 @@ namespace Ogre
     mShowPortals(false),
     mZoneFactoryManager(0),
     mActiveCameraZone(0)
-    { }
+    {
+        addShadowTextureListener(this);
+    }
 
     PCZSceneManager::~PCZSceneManager()
     {
@@ -321,42 +323,18 @@ namespace Ogre
 
     SceneNode* PCZSceneManager::createSceneNodeImpl(void)
     {
-        return OGRE_NEW PCZSceneNode(this);
+        auto ret = new PCZSceneNode(this);
+        // create any zone-specific data necessary
+        createZoneSpecificNodeData(ret);
+        return ret;
     }
 
     SceneNode* PCZSceneManager::createSceneNodeImpl(const String& name)
     {
-        return OGRE_NEW PCZSceneNode(this, name);
-    }
-
-    SceneNode * PCZSceneManager::createSceneNode( void )
-    {
-        SceneNode * on = createSceneNodeImpl();
-        mSceneNodes.push_back(on);
-
+        auto ret = new PCZSceneNode(this, name);
         // create any zone-specific data necessary
-        createZoneSpecificNodeData((PCZSceneNode*)on);
-        // return pointer to the node
-        return on;
-    }
-
-    SceneNode * PCZSceneManager::createSceneNode( const String &name )
-    {
-        // Check name not used
-        if (hasSceneNode(name))
-        {
-            OGRE_EXCEPT(
-                Exception::ERR_DUPLICATE_ITEM,
-                "A scene node with the name " + name + " already exists",
-                "PCZSceneManager::createSceneNode" );
-        }
-        SceneNode * on = createSceneNodeImpl( name );
-        mSceneNodes.push_back(on);
-
-        // create any zone-specific data necessary
-        createZoneSpecificNodeData((PCZSceneNode*)on);
-        // return pointer to the node
-        return on;
+        createZoneSpecificNodeData(ret);
+        return ret;
     }
 
     // Create a camera for the scene
@@ -445,8 +423,6 @@ namespace Ogre
         // Clear animations
         destroyAllAnimations();
 
-        mSkyRenderer.clear();
-
         // Clear render queue, empty completely
         if (mRenderQueue)
             mRenderQueue->clear(true);
@@ -489,17 +465,17 @@ namespace Ogre
     /* enable/disable sky rendering */
     void PCZSceneManager::enableSky(bool onoff)
     {
-        if (mSkyRenderer.mSkyBoxNode)
+        if (mSkyBox.mSceneNode)
         {
-            mSkyRenderer.mSkyBoxEnabled = onoff;
+            mSkyBox.setEnabled(onoff);
         }
-        else if (mSkyRenderer.mSkyDomeNode)
+        else if (mSkyDome.mSceneNode)
         {
-            mSkyRenderer.mSkyDomeEnabled = onoff;
+            mSkyDome.setEnabled(onoff);
         }
-        else if (mSkyRenderer.mSkyPlaneNode)
+        else if (mSkyPlane.mSceneNode)
         {
-            mSkyRenderer.mSkyPlaneEnabled = onoff;
+            mSkyPlane.setEnabled(onoff);
         }
     }
 
@@ -511,22 +487,22 @@ namespace Ogre
             // if no zone specified, use default zone
             zone = mDefaultZone;
         }
-        if (mSkyRenderer.mSkyBoxNode)
+        if (auto node = (PCZSceneNode*)mSkyBox.mSceneNode)
         {
-            ((PCZSceneNode*)mSkyRenderer.mSkyBoxNode)->setHomeZone(zone);
-            ((PCZSceneNode*)mSkyRenderer.mSkyBoxNode)->anchorToHomeZone(zone);
+            node->setHomeZone(zone);
+            node->anchorToHomeZone(zone);
             zone->setHasSky(true);
         }
-        if (mSkyRenderer.mSkyDomeNode)
+        if (auto node = (PCZSceneNode*)mSkyDome.mSceneNode)
         {
-            ((PCZSceneNode*)mSkyRenderer.mSkyDomeNode)->setHomeZone(zone);
-            ((PCZSceneNode*)mSkyRenderer.mSkyDomeNode)->anchorToHomeZone(zone);
+            node->setHomeZone(zone);
+            node->anchorToHomeZone(zone);
             zone->setHasSky(true);
         }
-        if (mSkyRenderer.mSkyPlaneNode)
+        if (auto node = (PCZSceneNode*)mSkyPlane.mSceneNode)
         {
-            ((PCZSceneNode*)mSkyRenderer.mSkyPlaneNode)->setHomeZone(zone);
-            ((PCZSceneNode*)mSkyRenderer.mSkyPlaneNode)->anchorToHomeZone(zone);
+            node->setHomeZone(zone);
+            node->anchorToHomeZone(zone);
             zone->setHasSky(true);
         }
         
@@ -1041,30 +1017,7 @@ namespace Ogre
                 }
             }
 
-            // Sort the lights if using texture shadows, since the first 'n' will be
-            // used to generate shadow textures and we should pick the most appropriate
-            if (isShadowTechniqueTextureBased())
-            {
-                // Allow a ShadowListener to override light sorting
-                // Reverse iterate so last takes precedence
-                bool overridden = false;
-                for (ListenerList::reverse_iterator ri = mListeners.rbegin();
-                    ri != mListeners.rend(); ++ri)
-                {
-                    overridden = (*ri)->sortLightsAffectingFrustum(mLightsAffectingFrustum);
-                    if (overridden)
-                        break;
-                }
-                if (!overridden)
-                {
-                    // default sort (stable to preserve directional light ordering
-                    std::stable_sort(
-                        mLightsAffectingFrustum.begin(), mLightsAffectingFrustum.end(), 
-                        lightsForShadowTextureLess());
-                }
-                
-            }
-
+            mShadowRenderer.sortLightsAffectingFrustum(mLightsAffectingFrustum);
             // Use swap instead of copy operator for efficiently
             mCachedLightInfos.swap(mTestLightInfos);
 
@@ -1089,7 +1042,7 @@ namespace Ogre
         }
     }
     //---------------------------------------------------------------------
-    void PCZSceneManager::fireShadowTexturesPreCaster(Light* light, Camera* camera, size_t iteration)
+    void PCZSceneManager::shadowTextureCasterPreViewProj(Light* light, Camera* camera, size_t iteration)
     {
         PCZSceneNode* camNode = (PCZSceneNode*)camera->getParentSceneNode();
 
@@ -1106,8 +1059,6 @@ namespace Ogre
             if (camNode->getHomeZone() != lightZone)
                 addPCZSceneNode(camNode, lightZone);
         }
-
-        SceneManager::fireShadowTexturesPreCaster(light, camera, iteration);
     }
 
     /* Attempt to automatically connect unconnected portals to proper target zones 
@@ -1467,11 +1418,5 @@ namespace Ogre
     {
         return OGRE_NEW PCZSceneManager(instanceName);
     }
-    //-----------------------------------------------------------------------
-    void PCZSceneManagerFactory::destroyInstance(SceneManager* instance)
-    {
-        OGRE_DELETE instance;
-    }
-
 
 }

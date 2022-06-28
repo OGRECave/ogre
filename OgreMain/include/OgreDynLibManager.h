@@ -40,14 +40,14 @@ namespace Ogre {
     *  @{
     */
     /** Manager for Dynamic-loading Libraries.
-    @remarks
+
         This manager keeps a track of all the open dynamic-loading
         libraries, opens them and returns references to already-open
         libraries.
     */
     class _OgreExport DynLibManager: public Singleton<DynLibManager>, public DynLibAlloc
     {
-    protected:
+    private:
         typedef std::map<String, DynLib*> DynLibList;
         DynLibList mLibList;
     public:

@@ -45,7 +45,7 @@ namespace Ogre
     */
     /** The log manager handles the creation and retrieval of logs for the
         application.
-        @remarks
+
             This class will create new log files and will retrieve instances
             of existing ones. Other classes wishing to log output can either
             create a fresh log or retrieve an existing one to output to.
@@ -63,7 +63,7 @@ namespace Ogre
     */
     class _OgreExport LogManager : public Singleton<LogManager>, public LogAlloc
     {
-    protected:
+    private:
         typedef std::map<String, Log*> LogList;
 
         /// A list of all the logs the manager can access
@@ -134,9 +134,10 @@ namespace Ogre
         Log::Stream stream(LogMessageLevel lml = LML_NORMAL, 
             bool maskDebug = false);
 
-        /** Sets the level of detail of the default log.
-        */
-        void setLogDetail(LoggingLevel ll);
+        /// @deprecated use setMinLogLevel()
+        OGRE_DEPRECATED void setLogDetail(LoggingLevel ll);
+        /// sets the minimal #LogMessageLevel for the default log
+        void setMinLogLevel(LogMessageLevel lml);
         /// @copydoc Singleton::getSingleton()
         static LogManager& getSingleton(void);
         /// @copydoc Singleton::getSingleton()

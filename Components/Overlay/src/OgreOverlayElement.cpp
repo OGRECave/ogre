@@ -35,6 +35,8 @@ THE SOFTWARE.
 #include "OgreOverlayContainer.h"
 #include "OgreResourceGroupManager.h"
 #include "OgreOverlayElementCommands.h"
+#include "OgreTechnique.h"
+#include "OgreLogManager.h"
 
 namespace Ogre {
 
@@ -82,7 +84,6 @@ namespace Ogre {
       , mZOrder(0)
       , mEnabled(true)
       , mInitialised(false)
-      , mSourceTemplate(0)
     {
         // default overlays to preserve their own detail level
         mPolygonModeOverrideable = false;
@@ -99,26 +100,6 @@ namespace Ogre {
             mParent->removeChild(mName);
             mParent = 0;
         }
-    }
-    //---------------------------------------------------------------------
-    const String& OverlayElement::getName(void) const
-    {
-        return mName;
-    }
-    //---------------------------------------------------------------------
-    void OverlayElement::show(void)
-    {
-        mVisible = true;
-    }
-    //---------------------------------------------------------------------
-    void OverlayElement::hide(void)
-    {
-        mVisible = false;
-    }
-    //---------------------------------------------------------------------
-    bool OverlayElement::isVisible(void) const
-    {
-        return mVisible;
     }
     //---------------------------------------------------------------------
     void OverlayElement::setDimensions(Real width, Real height)
@@ -329,8 +310,18 @@ namespace Ogre {
             return;
 
         mMaterial->load();
+
+        auto dstPass = mMaterial->getTechnique(0)->getPass(0); // assume this is representative
+        if (dstPass->getLightingEnabled() || dstPass->getDepthCheckEnabled())
+        {
+            LogManager::getSingleton().logWarning(
+                "force-disabling 'lighting' and 'depth_check' of Material " + mat->getName() +
+                " for use with OverlayElement " + getName());
+        }
+
         // Set some prerequisites to be sure
         mMaterial->setLightingEnabled(false);
+        mMaterial->setReceiveShadows(false);
         mMaterial->setDepthCheckEnabled(false);
     }
 
@@ -697,11 +688,6 @@ namespace Ogre {
         _positionsOutOfDate();
     }
     //-----------------------------------------------------------------------
-    const DisplayString& OverlayElement::getCaption() const
-    {
-        return mCaption;
-    }
-    //-----------------------------------------------------------------------
     void OverlayElement::setColour(const ColourValue& col)
     {
         mColour = col;
@@ -781,31 +767,16 @@ namespace Ogre {
         _positionsOutOfDate();
     }
     //-----------------------------------------------------------------------
-    GuiMetricsMode OverlayElement::getMetricsMode(void) const
-    {
-        return mMetricsMode;
-    }
-    //-----------------------------------------------------------------------
     void OverlayElement::setHorizontalAlignment(GuiHorizontalAlignment gha)
     {
         mHorzAlign = gha;
         _positionsOutOfDate();
     }
     //-----------------------------------------------------------------------
-    GuiHorizontalAlignment OverlayElement::getHorizontalAlignment(void) const
-    {
-        return mHorzAlign;
-    }
-    //-----------------------------------------------------------------------
     void OverlayElement::setVerticalAlignment(GuiVerticalAlignment gva)
     {
         mVertAlign = gva;
         _positionsOutOfDate();
-    }
-    //-----------------------------------------------------------------------
-    GuiVerticalAlignment OverlayElement::getVerticalAlignment(void) const
-    {
-        return mVertAlign;
     }
     //-----------------------------------------------------------------------    
     bool OverlayElement::contains(Real x, Real y) const
@@ -823,18 +794,6 @@ namespace Ogre {
         return ret;
     }
     //-----------------------------------------------------------------------
-    OverlayContainer* OverlayElement::getParent() 
-    { 
-        return mParent;     
-    }
-    //-----------------------------------------------------------------------
-    void OverlayElement::copyFromTemplate(OverlayElement* templateOverlay)
-    {
-        templateOverlay->copyParametersTo(this);
-        mSourceTemplate = templateOverlay ;
-        return;
-    }
-    //-----------------------------------------------------------------------
     OverlayElement* OverlayElement::clone(const String& instanceName)
     {
         OverlayElement* newElement;
@@ -844,16 +803,6 @@ namespace Ogre {
         copyParametersTo(newElement);
 
         return newElement;
-    }
-    //-----------------------------------------------------------------------
-    bool OverlayElement::isEnabled() const
-    { 
-        return mEnabled;
-    }
-    //-----------------------------------------------------------------------
-    void OverlayElement::setEnabled(bool b) 
-    {
-        mEnabled = b;
     }
     //-----------------------------------------------------------------------
 

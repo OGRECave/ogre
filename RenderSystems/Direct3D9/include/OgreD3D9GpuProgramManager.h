@@ -33,16 +33,13 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-    class _OgreD3D9Export D3D9GpuProgramManager : public GpuProgramManager
+    class _OgreD3D9Export D3D9GpuProgramManager : public GpuProgramFactory
     {
-    protected:
-        /// Specialised create method with specific parameters
-        Resource* createImpl(const String& name, ResourceHandle handle, 
-            const String& group, bool isManual, ManualResourceLoader* loader,
-            GpuProgramType gptype, const String& syntaxCode);
     public:
-        D3D9GpuProgramManager();
-        ~D3D9GpuProgramManager();
+        static String currentLanguage;
+        const String& getLanguage(void) const override;
+        GpuProgram* create(ResourceManager* creator, const String& name, ResourceHandle handle,
+                           const String& group, bool isManual, ManualResourceLoader* loader) override;
     };
 
 }

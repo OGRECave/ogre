@@ -39,7 +39,7 @@ String FFPTexturing::Type = "FFP_Texturing";
 const String c_ParamTexelEx("texel_");
 
 //-----------------------------------------------------------------------
-FFPTexturing::FFPTexturing() : mIsPointSprite(false)
+FFPTexturing::FFPTexturing() : mIsPointSprite(false), mLateAddBlend(false)
 {   
 }
 
@@ -81,7 +81,7 @@ bool FFPTexturing::resolveUniformParams(TextureUnitParams* textureUnitParams, Pr
     Program* psProgram = programSet->getCpuProgram(GPT_FRAGMENT_PROGRAM);
     
     // Resolve texture sampler parameter.       
-    textureUnitParams->mTextureSampler = psProgram->resolveParameter(textureUnitParams->mTextureSamplerType, textureUnitParams->mTextureSamplerIndex, (uint16)GPV_GLOBAL, "gTextureSampler");
+    textureUnitParams->mTextureSampler = psProgram->resolveParameter(textureUnitParams->mTextureSamplerType, "gTextureSampler", textureUnitParams->mTextureSamplerIndex);
 
     // Resolve texture matrix parameter.
     if (needsTextureMatrix(textureUnitParams->mTextureUnitState))
@@ -141,6 +141,10 @@ bool FFPTexturing::resolveFunctionsParams(TextureUnitParams* textureUnitParams, 
 
             if (textureUnitParams->mTextureMatrix.get() == NULL)
                 texCoordContent = Parameter::Content(Parameter::SPC_TEXTURE_COORDINATE0 + textureUnitParams->mTextureUnitState->getTextureCoordSet());
+
+            // assume already resolved
+            if(vsMain->getOutputParameter(texCoordContent, textureUnitParams->mVSInTextureCoordinateType))
+                break;
 
             textureUnitParams->mVSInputTexCoord = vsMain->resolveInputParameter(
                 Parameter::Content(Parameter::SPC_TEXTURE_COORDINATE0 +
@@ -254,6 +258,7 @@ bool FFPTexturing::addVSFunctionInvocations(TextureUnitParams* textureUnitParams
     switch (textureUnitParams->mTexCoordCalcMethod)
     {
     case TEXCALC_NONE:
+        if(textureUnitParams->mVSInputTexCoord)
         stage.assign(textureUnitParams->mVSInputTexCoord, textureUnitParams->mVSOutputTexCoord);
         break;
     case TEXCALC_ENVIRONMENT_MAP:
@@ -300,14 +305,16 @@ bool FFPTexturing::addPSFunctionInvocations(TextureUnitParams* textureUnitParams
     
             
     // Add texture sampling code.
-    ParameterPtr texel = psMain->resolveLocalParameter(c_ParamTexelEx + StringConverter::toString(textureUnitParams->mTextureSamplerIndex), GCT_FLOAT4);
-    addPSSampleTexelInvocation(textureUnitParams, psMain, texel, FFP_PS_SAMPLING);
+    ParameterPtr texel = psMain->resolveLocalParameter(GCT_FLOAT4, c_ParamTexelEx + StringConverter::toString(textureUnitParams->mTextureSamplerIndex));
 
     // Build colour argument for source1.
     source1 = getPSArgument(texel, colourBlend.source1, colourBlend.colourArg1, colourBlend.alphaArg1, false);
 
     // Build colour argument for source2.
     source2 = getPSArgument(texel, colourBlend.source2, colourBlend.colourArg2, colourBlend.alphaArg2, false);
+
+    if(source1 == texel || source2 == texel || colourBlend.operation == LBX_BLEND_TEXTURE_ALPHA)
+        addPSSampleTexelInvocation(textureUnitParams, psMain, texel, FFP_PS_SAMPLING);
 
     bool needDifferentAlphaBlend = false;
     if (alphaBlend.operation != colourBlend.operation ||
@@ -318,6 +325,11 @@ bool FFPTexturing::addPSFunctionInvocations(TextureUnitParams* textureUnitParams
         alphaBlend.source1 == LBS_MANUAL ||
         alphaBlend.source2 == LBS_MANUAL)
         needDifferentAlphaBlend = true;
+
+    if(mLateAddBlend && colourBlend.operation == LBX_ADD)
+    {
+        groupOrder = FFP_PS_COLOUR_END + 50 + 1; // after PBR lighting
+    }
 
     // Build colours blend
     addPSBlendInvocations(psMain, source1, source2, texel, 
@@ -333,6 +345,9 @@ bool FFPTexturing::addPSFunctionInvocations(TextureUnitParams* textureUnitParams
 
         // Build alpha argument for source2.
         source2 = getPSArgument(texel, alphaBlend.source2, alphaBlend.colourArg2, alphaBlend.alphaArg2, true);
+
+        if(source1 == texel || source2 == texel || alphaBlend.operation == LBX_BLEND_TEXTURE_ALPHA)
+            addPSSampleTexelInvocation(textureUnitParams, psMain, texel, FFP_PS_SAMPLING);
 
         // Build alpha blend
         addPSBlendInvocations(psMain, source1, source2, texel,
@@ -537,11 +552,22 @@ bool FFPTexturing::needsTextureMatrix(TextureUnitState* textureUnitState)
 }
 
 
+bool FFPTexturing::setParameter(const String& name, const String& value)
+{
+    if(name == "late_add_blend")
+    {
+        StringConverter::parse(value, mLateAddBlend);
+        return true;
+    }
+    return false;
+}
+
 //-----------------------------------------------------------------------
 void FFPTexturing::copyFrom(const SubRenderState& rhs)
 {
     const FFPTexturing& rhsTexture = static_cast<const FFPTexturing&>(rhs);
 
+    mLateAddBlend = rhsTexture.mLateAddBlend;
     setTextureUnitCount(rhsTexture.getTextureUnitCount());
 
     for (unsigned int i=0; i < rhsTexture.getTextureUnitCount(); ++i)
@@ -555,24 +581,19 @@ bool FFPTexturing::preAddToRenderState(const RenderState* renderState, Pass* src
 {
     mIsPointSprite = srcPass->getPointSpritesEnabled();
 
-    //count the number of texture units we need to process
-    size_t validTexUnits = 0;
-    for (const auto tu : srcPass->getTextureUnitStates())
+    if (auto rs = Root::getSingleton().getRenderSystem())
     {
-        validTexUnits += int(isProcessingNeeded(tu));
+        if (mIsPointSprite && !rs->getCapabilities()->hasCapability(RSC_POINT_SPRITES))
+            return false;
     }
 
-    setTextureUnitCount(validTexUnits);
+    setTextureUnitCount(srcPass->getTextureUnitStates().size());
 
     // Build texture stage sub states.
     for (unsigned short i=0; i < srcPass->getNumTextureUnitStates(); ++i)
     {       
         TextureUnitState* texUnitState = srcPass->getTextureUnitState(i);
-
-        if (isProcessingNeeded(texUnitState))
-        {
-            setTextureUnit(i, texUnitState);    
-        }
+        setTextureUnit(i, texUnitState);
     }   
 
     return true;
@@ -599,7 +620,6 @@ void FFPTexturing::setTextureUnitCount(size_t count)
 void FFPTexturing::setTextureUnit(unsigned short index, TextureUnitState* textureUnitState)
 {
     OgreAssert(index < mTextureUnitParamsList.size(), "FFPTexturing unit index out of bounds");
-    OgreAssert(textureUnitState->getBindingType() == TextureUnitState::BT_FRAGMENT, "only fragment shaders supported");
 
     TextureUnitParams& curParams = mTextureUnitParamsList[index];
 
@@ -607,7 +627,7 @@ void FFPTexturing::setTextureUnit(unsigned short index, TextureUnitState* textur
     curParams.mTextureSamplerIndex = index;
     curParams.mTextureUnitState    = textureUnitState;
 
-    bool isGLES2 = Root::getSingletonPtr()->getRenderSystem()->getName().find("OpenGL ES 2") != String::npos;
+    bool isGLES2 = ShaderGenerator::getSingleton().getTargetLanguage() == "glsles";
 
     switch (curParams.mTextureUnitState->getTextureType())
     {
@@ -619,10 +639,6 @@ void FFPTexturing::setTextureUnit(unsigned short index, TextureUnitState* textur
         OGRE_FALLTHROUGH;
     case TEX_TYPE_2D:
         curParams.mTextureSamplerType = GCT_SAMPLER2D;
-        curParams.mVSInTextureCoordinateType = GCT_FLOAT2;
-        break;
-    case TEX_TYPE_2D_RECT:
-        curParams.mTextureSamplerType = GCT_SAMPLERRECT;
         curParams.mVSInTextureCoordinateType = GCT_FLOAT2;
         break;
     case TEX_TYPE_EXTERNAL_OES:
@@ -646,16 +662,17 @@ void FFPTexturing::setTextureUnit(unsigned short index, TextureUnitState* textur
      curParams.mVSOutTextureCoordinateType = curParams.mVSInTextureCoordinateType;
      curParams.mTexCoordCalcMethod = getTexCalcMethod(curParams.mTextureUnitState);
 
+    // let TexCalcMethod override texture type, as it might be wrong for
+    // content_type shadow & content_type compositor
+    if (curParams.mTexCoordCalcMethod == TEXCALC_ENVIRONMENT_MAP_REFLECTION)
+    {
+        curParams.mVSOutTextureCoordinateType = GCT_FLOAT3;
+        curParams.mTextureSamplerType = GCT_SAMPLERCUBE;
+    }
+
      if (curParams.mTexCoordCalcMethod == TEXCALC_PROJECTIVE_TEXTURE)
          curParams.mVSOutTextureCoordinateType = GCT_FLOAT3;    
 }
-
-//-----------------------------------------------------------------------
-bool FFPTexturing::isProcessingNeeded(TextureUnitState* texUnitState)
-{
-    return texUnitState->getBindingType() == TextureUnitState::BT_FRAGMENT;
-}
-
 
 //-----------------------------------------------------------------------
 const String& FFPTexturingFactory::getType() const
@@ -671,18 +688,23 @@ SubRenderState* FFPTexturingFactory::createInstance(ScriptCompiler* compiler,
     {
         if(prop->values.size() == 1)
         {
-            String modelType;
+            String value;
 
-            if(false == SGScriptTranslator::getString(prop->values.front(), &modelType))
+            if(false == SGScriptTranslator::getString(prop->values.front(), &value))
             {
                 compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
                 return NULL;
             }
 
-            if (modelType == "ffp")
-            {
-                return createOrRetrieveInstance(translator);
-            }
+            auto inst = createOrRetrieveInstance(translator);
+
+            if (value == "ffp")
+                return inst;
+
+            if (value == "late_add_blend")
+                inst->setParameter(value, "true");
+
+            return inst;
         }       
     }
 

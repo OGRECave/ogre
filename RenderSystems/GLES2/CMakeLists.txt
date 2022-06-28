@@ -10,12 +10,12 @@
 # Configure OpenGL ES 2.0 RenderSystem build
 
 # GLSL-Optimizer
-find_package(GLSLOptimizer)
-macro_log_feature(GLSL_Optimizer_FOUND "GLSL Optimizer" "GLSL Optimizer" "http://github.com/aras-p/glsl-optimizer/" FALSE "" "")
+find_package(GLSLOptimizer QUIET)
+macro_log_feature(GLSL_Optimizer_FOUND "GLSL Optimizer" "GLSL Optimizer" "http://github.com/aras-p/glsl-optimizer/")
 
 # HLSL2GLSL
-find_package(HLSL2GLSL)
-macro_log_feature(HLSL2GLSL_FOUND "HLSL2GLSL" "HLSL2GLSL" "http://hlsl2glslfork.googlecode.com/" FALSE "" "")
+find_package(HLSL2GLSL QUIET)
+macro_log_feature(HLSL2GLSL_FOUND "HLSL2GLSL" "HLSL2GLSL" "http://hlsl2glslfork.googlecode.com/")
 
 file(GLOB HEADER_FILES "include/*.h")
 list(APPEND HEADER_FILES
@@ -52,14 +52,13 @@ if (APPLE)
   file(GLOB PLATFORM_SOURCES "src/EAGL/*.mm")
 
   include_directories(src/EAGL include/EAGL)
-  link_directories(${OPENGLES2_LIBRARY_PATH})
   set(PLATFORM_HEADER_INSTALL "APPLE")
 endif ()
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/GLSLES/include)
 
 add_library(RenderSystem_GLES2 ${OGRE_LIB_TYPE} ${HEADER_FILES} ${GLESW_HEADERS} ${KHR_HEADERS} ${PLATFORM_HEADERS} ${SOURCE_FILES} ${PLATFORM_SOURCES} ${GLSLES_FILES})
-target_link_libraries(RenderSystem_GLES2 OgreMain OgreGLSupport ${OPENGLES2_LIBRARIES} ${CMAKE_DL_LIBS})
+target_link_libraries(RenderSystem_GLES2 PUBLIC OgreMain ${CMAKE_DL_LIBS} PRIVATE OgreGLSupport)
 target_include_directories(RenderSystem_GLES2 PUBLIC 
     "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
     $<INSTALL_INTERFACE:include/OGRE/RenderSystems/GLES2>)

@@ -232,6 +232,13 @@ namespace Ogre
         mEmitted = emitted;
     }
     //-----------------------------------------------------------------------
+    static float sampleSphereUniform(const float& maxAngle)
+    {
+        float cosMax = -std::cos(maxAngle) + 1; // for maxAngle = pi, cosMax = 2
+        // see https://corysimon.github.io/articles/uniformdistn-on-sphere/
+        return std::acos(1 - cosMax * Math::UnitRandom());
+    }
+
     void ParticleEmitter::genEmissionDirection( const Vector3 &particlePos, Vector3& destVector )
     {
         if( mUseDirPositionRef )
@@ -242,7 +249,7 @@ namespace Ogre
             if (mAngle != Radian(0))
             {
                 // Randomise angle
-                Radian angle = Math::UnitRandom() * mAngle;
+                Radian angle(sampleSphereUniform(mAngle.valueRadians()));
 
                 // Randomise direction
                 destVector = particleDir.randomDeviant( angle );
@@ -258,7 +265,7 @@ namespace Ogre
             if (mAngle != Radian(0))
             {
                 // Randomise angle
-                Radian angle = Math::UnitRandom() * mAngle;
+                Radian angle(sampleSphereUniform(mAngle.valueRadians()));
 
                 // Randomise direction
                 destVector = mDirection.randomDeviant(angle, mUp);
@@ -305,6 +312,12 @@ namespace Ogre
     {
         if (mEnabled)
         {
+            if(mDurationMax < 0)
+            {
+                // single-shot burst
+                setEnabled(false);
+                return mEmissionRate;
+            }
             // Keep fractions, otherwise a high frame rate will result in zero emissions!
             mRemainder += mEmissionRate * timeElapsed;
             unsigned short intRequest = (unsigned short)mRemainder;
@@ -348,20 +361,17 @@ namespace Ogre
 
     }
     //-----------------------------------------------------------------------
-    void ParticleEmitter::genEmissionColour(ColourValue& destColour)
+    void ParticleEmitter::genEmissionColour(RGBA& destColour)
     {
         if (mColourRangeStart != mColourRangeEnd)
         {
             // Randomise
-            //Real t = Math::UnitRandom();
-            destColour.r = mColourRangeStart.r + (Math::UnitRandom() * (mColourRangeEnd.r - mColourRangeStart.r));
-            destColour.g = mColourRangeStart.g + (Math::UnitRandom() * (mColourRangeEnd.g - mColourRangeStart.g));
-            destColour.b = mColourRangeStart.b + (Math::UnitRandom() * (mColourRangeEnd.b - mColourRangeStart.b));
-            destColour.a = mColourRangeStart.a + (Math::UnitRandom() * (mColourRangeEnd.a - mColourRangeStart.a));
+            ColourValue t(Math::UnitRandom(), Math::UnitRandom(), Math::UnitRandom(), Math::UnitRandom());
+            destColour = (mColourRangeStart + t * (mColourRangeEnd - mColourRangeStart)).getAsBYTE();
         }
         else
         {
-            destColour = mColourRangeStart;
+            destColour = mColourRangeStart.getAsBYTE();
         }
     }
     //-----------------------------------------------------------------------

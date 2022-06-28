@@ -44,7 +44,7 @@ namespace Ogre {
     typedef uint32 BGRA;
 
     /** Class representing colour.
-        @remarks
+
             Colour is represented as 4 components, each of which is a
             floating-point value from 0.0 to 1.0.
         @par
@@ -70,41 +70,56 @@ namespace Ogre {
                     float alpha = 1.0f ) : r(red), g(green), b(blue), a(alpha)
         { }
 
-        bool operator==(const ColourValue& rhs) const;
-        bool operator!=(const ColourValue& rhs) const;
+        explicit ColourValue(const uchar* byte) : r(byte[0]), g(byte[1]), b(byte[2]), a(byte[3])
+        {
+            *this /= 255;
+        }
+
+        bool operator==(const ColourValue& rhs) const
+        {
+            return (r == rhs.r && g == rhs.g && b == rhs.b && a == rhs.a);
+        }
+        bool operator!=(const ColourValue& rhs) const { return !(*this == rhs); }
 
         float r,g,b,a;
 
-        /** Retrieves colour as RGBA.
-        */
+        /// @name conversions from/ to native-endian packed formats
+        /// @{
+
+        /// value packed as #PF_R8G8B8A8
         RGBA getAsRGBA(void) const;
 
-        /** Retrieves colour as ARGB.
-        */
+        /// value packed as #PF_A8R8G8B8
         ARGB getAsARGB(void) const;
 
-        /** Retrieves colour as BGRA.
-        */
+        /// value packed as #PF_B8G8R8A8
         BGRA getAsBGRA(void) const;
 
-        /** Retrieves colours as ABGR */
+        /// value packed as #PF_A8B8G8R8
         ABGR getAsABGR(void) const;
 
-        /** Sets colour as RGBA.
-        */
+        /// value packed as #PF_BYTE_RGBA
+        RGBA getAsBYTE() const
+        {
+#if OGRE_ENDIAN == OGRE_ENDIAN_BIG
+            return getAsRGBA();
+#else
+            return getAsABGR();
+#endif
+        }
+
+        /// Set value from #PF_R8G8B8A8
         void setAsRGBA(RGBA val);
 
-        /** Sets colour as ARGB.
-        */
+        /// Set value from #PF_A8R8G8B8
         void setAsARGB(ARGB val);
 
-        /** Sets colour as BGRA.
-        */
+        /// Set value from #PF_B8G8R8A8
         void setAsBGRA(BGRA val);
 
-        /** Sets colour as ABGR.
-        */
+        /// Set value from #PF_A8B8G8R8
         void setAsABGR(ABGR val);
+        /// @}
 
         /** Clamps colour value to the range [0, 1].
         */

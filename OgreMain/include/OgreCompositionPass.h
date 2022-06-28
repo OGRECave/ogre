@@ -103,13 +103,13 @@ namespace Ogre {
         uint8 getLastRenderQueue() const;
 
         /** Set the material scheme used by this pass.
-        @remarks
+
             Only applicable to passes that render the scene.
             @see Technique::setScheme.
         */
         void setMaterialScheme(const String& schemeName);
         /** Get the material scheme used by this pass.
-        @remarks
+
             Only applicable to passes that render the scene.
             @see Technique::setScheme.
         */
@@ -142,26 +142,26 @@ namespace Ogre {
         @note applies when PassType is CLEAR
         */
         void setAutomaticColour(bool val);
-        /** Retrieves if the clear colour is automatically setted to the background colour of the original viewport
+        /** Retrieves if the clear colour is automatically set to the background colour of the original viewport
         @note applies when PassType is CLEAR
         */
         bool getAutomaticColour() const;
         /** Set the viewport clear depth (defaults to 1.0) 
             @note applies when PassType is CLEAR
         */
-        void setClearDepth(Real depth);
+        void setClearDepth(float depth);
         /** Get the viewport clear depth (defaults to 1.0) 
             @note applies when PassType is CLEAR
         */
-        Real getClearDepth() const;
+        float getClearDepth() const;
         /** Set the viewport clear stencil value (defaults to 0) 
             @note applies when PassType is CLEAR
         */
-        void setClearStencil(uint32 value);
+        void setClearStencil(uint16 value);
         /** Get the viewport clear stencil value (defaults to 0) 
             @note applies when PassType is CLEAR
         */
-        uint32 getClearStencil() const;
+        uint16 getClearStencil() const;
 
         /** Set stencil check on or off.
             @note applies when PassType is STENCIL
@@ -228,15 +228,7 @@ namespace Ogre {
         */
         bool getStencilTwoSidedOperation() const;
 
-        /** Set read back stencil-depth buffer as texture operation.
-            @note applies when PassType is STENCIL
-        */
-        void setStencilReadBackAsTextureOperation(bool value);
-        /** Get read back stencil-depth buffer
-            @note applies when PassType is STENCIL
-        */
-        bool getStencilReadBackAsTextureOperation() const;
-
+        const StencilState& getStencilState() const { return mStencilState; }
 
         /// Inputs (for material used for rendering the quad)
         struct InputTex
@@ -286,16 +278,12 @@ namespace Ogre {
         /** Set quad normalised positions [-1;1]x[-1;1]
             @note applies when PassType is RENDERQUAD
          */
-        void setQuadCorners(const FloatRect& quad) { mQuad = quad; mQuadCornerModified = true; }
-        /// @deprecated
-        OGRE_DEPRECATED void setQuadCorners(Real left,Real top,Real right,Real bottom);
+        void setQuadCorners(const FloatRect& quad) { mQuad.rect = quad; mQuad.cornerModified = true; }
 
         /** Get quad normalised positions [-1;1]x[-1;1]
             @note applies when PassType is RENDERQUAD 
          */
-        bool getQuadCorners(FloatRect& quad) const { quad = mQuad; return mQuadCornerModified; }
-        /// @deprecated
-        OGRE_DEPRECATED bool getQuadCorners(Real & left,Real & top,Real & right,Real & bottom) const;
+        bool getQuadCorners(FloatRect& quad) const { quad = mQuad.rect; return mQuad.cornerModified; }
             
         /** Sets the use of camera frustum far corners provided in the quad's normals
             @note applies when PassType is RENDERQUAD 
@@ -324,56 +312,98 @@ namespace Ogre {
         */
         const String& getCustomType() const;
 
-        void setThreadGroups(Vector3i g) { mThreadGroups = g; }
-        Vector3i getThreadGroups() { return mThreadGroups; }
+        void setThreadGroups(const Vector3i& g) { mThreadGroups = g; }
+        const Vector3i& getThreadGroups() const { return mThreadGroups; }
 
+        void setCameraName(const String& name) { mRenderScene.cameraName = name; }
+        const String& getCameraName() const { return mRenderScene.cameraName; }
+
+        void setAlignCameraToFace(bool val) { mRenderScene.alignCameraToFace = val; }
+        bool getAlignCameraToFace() const { return mRenderScene.alignCameraToFace; }
     private:
         /// Parent technique
         CompositionTargetPass *mParent;
         /// Type of composition pass
         PassType mType;
-        /// Identifier for this pass
-        uint32 mIdentifier;
-        /// Material used for rendering
-        MaterialPtr mMaterial;
-        /// [first,last] render queue to render this pass (in case of PT_RENDERSCENE)
-        uint8 mFirstRenderQueue;
-        uint8 mLastRenderQueue;
-        /// Material scheme name
-        String mMaterialScheme;
-        /// Clear buffers (in case of PT_CLEAR)
-        uint32 mClearBuffers;
-        /// Clear colour (in case of PT_CLEAR)
-        ColourValue mClearColour;
-        /// Clear colour with the colour of the original viewport. Overrides mClearColour (in case of PT_CLEAR)
-        bool mAutomaticColour;
-        /// Clear depth (in case of PT_CLEAR)
-        Real mClearDepth;
-        /// Clear stencil value (in case of PT_CLEAR)
-        uint32 mClearStencil;
-        /** Inputs (for material used for rendering the quad).
-            An empty string signifies that no input is used */
-        InputTex mInputs[OGRE_MAX_TEXTURE_LAYERS];
-        /// Stencil operation parameters
-        bool mStencilCheck;
-        CompareFunction mStencilFunc; 
-        uint32 mStencilRefValue;
-        uint32 mStencilMask;
-        StencilOperation mStencilFailOp;
-        StencilOperation mStencilDepthFailOp;
-        StencilOperation mStencilPassOp;
+
+        // in case of PT_RENDERQUAD, PT_COMPUTE, PT_CUSTOM
+        struct MaterialData
+        {
+            /// Identifier for this pass
+            uint32 identifier;
+            /// Material used for rendering
+            MaterialPtr material;
+            /** Inputs (for material used for rendering the quad).
+                An empty string signifies that no input is used */
+            InputTex inputs[OGRE_MAX_TEXTURE_LAYERS];
+
+            MaterialData() : identifier(0) {}
+        } mMaterial;
+
+        // in case of PT_RENDERSCENE
+        struct RenderSceneData
+        {
+            /// [first,last] render queue to render this pass (in case of PT_RENDERSCENE)
+            uint8 firstRenderQueue;
+            uint8 lastRenderQueue;
+
+            /// Material scheme name
+            String materialScheme;
+
+            /// name of camera to use instead of default
+            String cameraName;
+            bool alignCameraToFace;
+
+            RenderSceneData()
+                : firstRenderQueue(RENDER_QUEUE_BACKGROUND), lastRenderQueue(RENDER_QUEUE_SKIES_LATE),
+                  alignCameraToFace(false)
+            {
+            }
+        } mRenderScene;
+
+        // in case of PT_CLEAR
+        struct ClearData
+        {
+            /// Clear buffers
+            uint32 buffers;
+            /// Clear colour
+            ColourValue colour;
+            /// Clear colour with the colour of the original viewport. Overrides mClearColour
+            bool automaticColour;
+            /// Clear depth
+            float depth;
+            /// Clear stencil value
+            uint16 stencil;
+
+            ClearData()
+                : buffers(FBT_COLOUR | FBT_DEPTH), colour(ColourValue::ZERO), automaticColour(false),
+                  depth(1.0f), stencil(0)
+            {
+            }
+        } mClear;
+
+        /// in case of PT_COMPUTE
         Vector3i mThreadGroups;
 
-        bool mStencilTwoSidedOperation;
-        bool mStencilReadBackAsTexture;
+        /// in case of PT_STENCIL
+        StencilState mStencilState;
 
-        /// True if quad should not cover whole screen
-        bool mQuadCornerModified;
-        /// quad positions in normalised coordinates [-1;1]x[-1;1] (in case of PT_RENDERQUAD)
-        FloatRect mQuad;
+        // in case of PT_RENDERQUAD
+        struct QuadData
+        {
+            /// True if quad should not cover whole screen
+            bool cornerModified;
+            /// quad positions in normalised coordinates [-1;1]x[-1;1]
+            FloatRect rect;
+            bool farCorners, farCornersViewSpace;
 
-        bool mQuadFarCorners, mQuadFarCornersViewSpace;
-        /// The type name of the custom composition pass.
+            QuadData()
+                : cornerModified(false), rect(-1, 1, 1, -1), farCorners(false), farCornersViewSpace(false)
+            {
+            }
+        } mQuad;
+
+        /// in case of PT_RENDERCUSTOM
         String mCustomType;
     };
     /** @} */

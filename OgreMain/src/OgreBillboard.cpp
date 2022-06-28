@@ -39,9 +39,8 @@ namespace Ogre {
         mTexcoordIndex(0),
         mPosition(Vector3::ZERO),
         mDirection(Vector3::ZERO),        
-        mColour(ColourValue::White),
-        mRotation(0),
-        mParentSet(0)
+        mColour(0xFFFFFFFF),
+        mRotation(0)
     {
     }
     //-----------------------------------------------------------------------
@@ -55,72 +54,16 @@ namespace Ogre {
         , mTexcoordIndex(0)
         , mPosition(position)
         , mDirection(Vector3::ZERO)
-        , mColour(colour)
+        , mColour(colour.getAsBYTE())
         , mRotation(0)
-        , mParentSet(owner)
     {
     }
     //-----------------------------------------------------------------------
-    void Billboard::setRotation(const Radian& rotation)
-    {
-        mRotation = rotation;
-        if (mRotation != Radian(0))
-            mParentSet->_notifyBillboardRotated();
-    }
-    //-----------------------------------------------------------------------
-    void Billboard::setPosition(const Vector3& position)
-    {
-        mPosition = position;
-    }
-    //-----------------------------------------------------------------------
-    void Billboard::setPosition(Real x, Real y, Real z)
-    {
-        mPosition.x = x;
-        mPosition.y = y;
-        mPosition.z = z;
-    }
-    //-----------------------------------------------------------------------
-    const Vector3& Billboard::getPosition(void) const
-    {
-        return mPosition;
-    }
-    //-----------------------------------------------------------------------
-    void Billboard::setDimensions(Real width, Real height)
+    void Billboard::setDimensions(float width, float height)
     {
         mOwnDimensions = true;
         mWidth = width;
         mHeight = height;
-        mParentSet->_notifyBillboardResized();
-    }
-    //-----------------------------------------------------------------------
-    bool Billboard::hasOwnDimensions(void) const
-    {
-        return mOwnDimensions;
-    }
-    //-----------------------------------------------------------------------
-    void Billboard::_notifyOwner(BillboardSet* owner)
-    {
-        mParentSet = owner;
-    }
-    //-----------------------------------------------------------------------
-    void Billboard::setColour(const ColourValue& colour)
-    {
-        mColour = colour;
-    }
-    //-----------------------------------------------------------------------
-    const ColourValue& Billboard::getColour(void) const
-    {
-        return mColour;
-    }
-    //-----------------------------------------------------------------------
-    Real Billboard::getOwnWidth(void) const
-    {
-        return mWidth;
-    }
-    //-----------------------------------------------------------------------
-    Real Billboard::getOwnHeight(void) const
-    {
-        return mHeight;
     }
     //-----------------------------------------------------------------------
     void Billboard::setTexcoordIndex(uint16 texcoordIndex)
@@ -134,12 +77,5 @@ namespace Ogre {
         mTexcoordRect = texcoordRect;
         mUseTexcoordRect = true;
     }
-    //-----------------------------------------------------------------------
-    void Billboard::setTexcoordRect(Real u0, Real v0, Real u1, Real v1)
-    {
-        setTexcoordRect(FloatRect(u0, v0, u1, v1));
-    }
-
-
 }
 

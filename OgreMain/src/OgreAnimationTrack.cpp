@@ -45,26 +45,13 @@ namespace Ogre {
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
     AnimationTrack::AnimationTrack(Animation* parent, unsigned short handle) :
-        mParent(parent), mHandle(handle), mListener(0)
+        mParent(parent), mListener(0), mHandle(handle)
     {
     }
     //---------------------------------------------------------------------
     AnimationTrack::~AnimationTrack()
     {
         removeAllKeyFrames();
-    }
-    //---------------------------------------------------------------------
-    unsigned short AnimationTrack::getNumKeyFrames(void) const
-    {
-        return (unsigned short)mKeyFrames.size();
-    }
-    //---------------------------------------------------------------------
-    KeyFrame* AnimationTrack::getKeyFrame(unsigned short index) const
-    {
-        // If you hit this assert, then the keyframe index is out of bounds
-        assert( index < (ushort)mKeyFrames.size() );
-
-        return mKeyFrames[index];
     }
     //---------------------------------------------------------------------
     Real AnimationTrack::getKeyFramesAtTime(const TimeIndex& timeIndex, KeyFrame** keyFrame1, KeyFrame** keyFrame2,
@@ -85,12 +72,10 @@ namespace Ogre {
             assert(timeIndex.getKeyIndex() < mKeyFrameIndexMap.size());
             i = mKeyFrames.begin() + mKeyFrameIndexMap[timeIndex.getKeyIndex()];
 #if OGRE_DEBUG_MODE
-            KeyFrame timeKey(0, timePos);
-            if (i != std::lower_bound(mKeyFrames.begin(), mKeyFrames.end(), &timeKey, KeyFrameTimeLess()))
+            KeyFrame timeKey(NULL, timePos);
+            if (i != std::lower_bound(mKeyFrames.begin(), mKeyFrames.end() - 1, &timeKey, KeyFrameTimeLess()))
             {
-                OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
-                    "Optimised key frame search failed",
-                    "AnimationTrack::getKeyFramesAtTime");
+                OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Optimised key frame search failed");
             }
 #endif
         }
@@ -104,29 +89,19 @@ namespace Ogre {
                 timePos = std::fmod( timePos, totalAnimationLength );
 
             // No global keyframe index, need to search with local keyframes.
-            KeyFrame timeKey(0, timePos);
-            i = std::lower_bound(mKeyFrames.begin(), mKeyFrames.end(), &timeKey, KeyFrameTimeLess());
+            KeyFrame timeKey(NULL, timePos);
+            i = std::lower_bound(mKeyFrames.begin(), mKeyFrames.end() - 1, &timeKey, KeyFrameTimeLess());
         }
 
-        if (i == mKeyFrames.end())
-        {
-            // There is no keyframe after this time, wrap back to first
-            *keyFrame2 = mKeyFrames.front();
-            t2 = mParent->getLength() + (*keyFrame2)->getTime();
+        OgreAssertDbg(i != mKeyFrames.end(), "time should have been wrapped before this");
 
-            // Use last keyframe as previous keyframe
+        *keyFrame2 = *i;
+        t2 = (*keyFrame2)->getTime();
+
+        // Find last keyframe before or on current time
+        if (i != mKeyFrames.begin() && timePos < (*i)->getTime())
+        {
             --i;
-        }
-        else
-        {
-            *keyFrame2 = *i;
-            t2 = (*keyFrame2)->getTime();
-
-            // Find last keyframe before or on current time
-            if (i != mKeyFrames.begin() && timePos < (*i)->getTime())
-            {
-                --i;
-            }
         }
 
         // Fill index of the first key
@@ -219,13 +194,13 @@ namespace Ogre {
     void AnimationTrack::_buildKeyFrameIndexMap(const std::vector<Real>& keyFrameTimes)
     {
         // Pre-allocate memory
-        mKeyFrameIndexMap.resize(keyFrameTimes.size() + 1);
+        mKeyFrameIndexMap.resize(keyFrameTimes.size());
 
         size_t i = 0, j = 0;
-        while (j <= keyFrameTimes.size())
+        while (j < keyFrameTimes.size())
         {
             mKeyFrameIndexMap[j] = static_cast<ushort>(i);
-            while (i < mKeyFrames.size() && mKeyFrames[i]->getTime() <= keyFrameTimes[j])
+            while (i < (mKeyFrames.size() - 1) && mKeyFrames[i]->getTime() <= keyFrameTimes[j])
                 ++i;
             ++j;
         }
@@ -352,17 +327,14 @@ namespace Ogre {
     // Node specialisations
     //---------------------------------------------------------------------
     NodeAnimationTrack::NodeAnimationTrack(Animation* parent, unsigned short handle)
-        : AnimationTrack(parent, handle), mTargetNode(0)
-        , mSplines(0), mSplineBuildNeeded(false)
-        , mUseShortestRotationPath(true)
+        : NodeAnimationTrack(parent, handle, 0)
     {
     }
     //---------------------------------------------------------------------
-    NodeAnimationTrack::NodeAnimationTrack(Animation* parent, unsigned short handle,
-        Node* targetNode)
-        : AnimationTrack(parent, handle), mTargetNode(targetNode)
-        , mSplines(0), mSplineBuildNeeded(false)
-        , mUseShortestRotationPath(true)
+    NodeAnimationTrack::NodeAnimationTrack(Animation* parent, unsigned short handle, Node* targetNode)
+        : AnimationTrack(parent, handle), mSplineBuildNeeded(false), mUseShortestRotationPath(true),
+          mTargetNode(targetNode), mSplines(0)
+
     {
     }
     //---------------------------------------------------------------------
@@ -701,30 +673,20 @@ namespace Ogre {
         VertexAnimationType animType, VertexData* targetData, TargetMode target)
         : AnimationTrack(parent, handle)
         , mAnimationType(animType)
-        , mTargetVertexData(targetData)
         , mTargetMode(target)
+        , mTargetVertexData(targetData)
     {
     }
     //--------------------------------------------------------------------------
     VertexMorphKeyFrame* VertexAnimationTrack::createVertexMorphKeyFrame(Real timePos)
     {
-        if (mAnimationType != VAT_MORPH)
-        {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-                "Morph keyframes can only be created on vertex tracks of type morph.",
-                "VertexAnimationTrack::createVertexMorphKeyFrame");
-        }
+        OgreAssert(mAnimationType == VAT_MORPH, "Type mismatch");
         return static_cast<VertexMorphKeyFrame*>(createKeyFrame(timePos));
     }
     //--------------------------------------------------------------------------
     VertexPoseKeyFrame* VertexAnimationTrack::createVertexPoseKeyFrame(Real timePos)
     {
-        if (mAnimationType != VAT_POSE)
-        {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-                "Pose keyframes can only be created on vertex tracks of type pose.",
-                "VertexAnimationTrack::createVertexPoseKeyFrame");
-        }
+        OgreAssert(mAnimationType == VAT_POSE, "Type mismatch");
         return static_cast<VertexPoseKeyFrame*>(createKeyFrame(timePos));
     }
     //--------------------------------------------------------------------------
@@ -980,25 +942,13 @@ namespace Ogre {
     //--------------------------------------------------------------------------
     VertexMorphKeyFrame* VertexAnimationTrack::getVertexMorphKeyFrame(unsigned short index) const
     {
-        if (mAnimationType != VAT_MORPH)
-        {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-                "Morph keyframes can only be created on vertex tracks of type morph.",
-                "VertexAnimationTrack::getVertexMorphKeyFrame");
-        }
-
+        OgreAssert(mAnimationType == VAT_MORPH, "Type mismatch");
         return static_cast<VertexMorphKeyFrame*>(getKeyFrame(index));
     }
     //--------------------------------------------------------------------------
     VertexPoseKeyFrame* VertexAnimationTrack::getVertexPoseKeyFrame(unsigned short index) const
     {
-        if (mAnimationType != VAT_POSE)
-        {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-                "Pose keyframes can only be created on vertex tracks of type pose.",
-                "VertexAnimationTrack::getVertexPoseKeyFrame");
-        }
-
+        OgreAssert(mAnimationType == VAT_POSE, "Type mismatch");
         return static_cast<VertexPoseKeyFrame*>(getKeyFrame(index));
     }
     //--------------------------------------------------------------------------

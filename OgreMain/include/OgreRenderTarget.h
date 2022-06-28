@@ -50,7 +50,7 @@ namespace Ogre {
     */
     /** A 'canvas' which can receive the results of a rendering
         operation.
-        @remarks
+
             This abstract class defines a common root to all targets of rendering operations. A
             render target could be a window on a screen, or another
             offscreen surface like a texture or bump map etc.
@@ -62,17 +62,6 @@ namespace Ogre {
     class _OgreExport RenderTarget : public RenderSysAlloc
     {
     public:
-        enum StatFlags
-        {
-            SF_NONE           = 0,
-            SF_FPS            = 1,
-            SF_AVG_FPS        = 2,
-            SF_BEST_FPS       = 4,
-            SF_WORST_FPS      = 8,
-            SF_TRIANGLE_COUNT = 16,
-            SF_ALL            = 0xFFFF
-        };
-
         struct FrameStats
         {
             /// frames per second (FPS) based on the frames rendered in the last second
@@ -106,16 +95,14 @@ namespace Ogre {
         virtual const String& getName(void) const;
 
         /// Retrieve information about the render target.
-        virtual void getMetrics(unsigned int& width, unsigned int& height, unsigned int& colourDepth);
+        void getMetrics(unsigned int& width, unsigned int& height);
 
         virtual uint32 getWidth(void) const;
         virtual uint32 getHeight(void) const;
-        virtual uint32 getColourDepth(void) const;
 
         /**
          * Sets the pool ID this RenderTarget should query from. Default value is POOL_DEFAULT.
          * Set to POOL_NO_DEPTH to avoid using a DepthBuffer (or manually controlling it) @see DepthBuffer
-         *  @remarks
          *      Changing the pool Id will cause the current depth buffer to be detached unless the old
          *      id and the new one are the same
          */
@@ -138,7 +125,7 @@ namespace Ogre {
         virtual void _detachDepthBuffer();
 
         /** Tells the target to update it's contents.
-            @remarks
+
                 If OGRE is not running in an automatic rendering loop
                 (started using Root::startRendering),
                 the user of the library is responsible for asking each render
@@ -161,7 +148,7 @@ namespace Ogre {
         */
         virtual void update(bool swapBuffers = true);
         /** Swaps the frame buffers to display the next frame.
-            @remarks
+
                 For targets that are double-buffered so that no
                 'in-progress' versions of the scene are displayed
                 during rendering. Once rendering has completed (to
@@ -171,7 +158,7 @@ namespace Ogre {
         virtual void swapBuffers() {}
 
         /** Adds a viewport to the rendering target.
-            @remarks
+
                 A viewport is the rectangle into which rendering output is sent. This method adds
                 a viewport to the render target, rendering from the supplied camera. The
                 rest of the parameters are only required if you wish to add more than one viewport
@@ -218,7 +205,7 @@ namespace Ogre {
         */
         virtual void removeAllViewports(void);
 
-        /** Retieves details of current rendering performance. */
+        /** Retrieves details of current rendering performance. */
         const FrameStats& getStatistics(void) const {
             return mStats;
         }
@@ -265,7 +252,7 @@ namespace Ogre {
         }
 
         /** Add a listener to this RenderTarget which will be called back before & after rendering.
-        @remarks
+
             If you want notifications before and after a target is updated by the system, use
             this method to register your own custom RenderTargetListener class. This is useful
             for potentially adding your own manual rendering commands before and after the
@@ -281,7 +268,7 @@ namespace Ogre {
         virtual void removeAllListeners(void);
 
         /** Sets the priority of this render target in relation to the others. 
-        @remarks
+
             This can be used in order to schedule render target updates. Lower
             priorities will be rendered first. Note that the priority must be set
             at the time the render target is attached to the render system, changes
@@ -301,7 +288,7 @@ namespace Ogre {
 
         /** Sets whether this target should be automatically updated if Ogre's rendering
             loop or Root::_updateAllRenderTargets is being used.
-        @remarks
+
             By default, if you use Ogre's own rendering loop (Root::startRendering)
             or call Root::_updateAllRenderTargets, all render targets are updated 
             automatically. This method allows you to control that behaviour, if 
@@ -347,7 +334,7 @@ namespace Ogre {
         virtual bool requiresTextureFlipping() const = 0;
 
         /** Utility method to notify a render target that a camera has been removed,
-        incase it was referring to it as a viewer.
+        in case it was referring to it as a viewer.
         */
         virtual void _notifyCameraRemoved(const Camera* cam);
 
@@ -375,36 +362,20 @@ namespace Ogre {
         */
         virtual uint getFSAA() const { return mFSAA; }
 
-        /** Gets the FSAA hint (@see Root::createRenderWindow)
-        */
+        /// RenderSystem specific FSAA option. See @ref RenderSystem::_createRenderWindow for details.
         virtual const String& getFSAAHint() const { return mFSAAHint; }
 
         /** Set the level of multisample AA to be used if hardware support it.
             This option will be ignored if the hardware does not support it 
             or setting can not be changed on the fly on per-target level. 
             @param fsaa The number of samples
-            @param fsaaHint Any hinting text (@see Root::createRenderWindow)
+            @param fsaaHint @copybrief getFSAAHint
         */
         virtual void setFSAA(uint fsaa, const String& fsaaHint) { }
 
-        /** RenderSystem specific interface for a RenderTarget;
-            this should be subclassed by RenderSystems.
-        */
-        class Impl
-        {
-        protected:
-            ~Impl() { }
-        };
-        /** Get rendersystem specific interface for this RenderTarget.
-            This is used by the RenderSystem to (un)bind this target, 
-            and to get specific information like surfaces
-            and framebuffer objects.
-        */
-        virtual Impl *_getImpl();
-
         /** Method for manual management of rendering : fires 'preRenderTargetUpdate'
             and initialises statistics etc.
-        @remarks 
+
         <ul>
         <li>_beginUpdate resets statistics and fires 'preRenderTargetUpdate'.</li>
         <li>_updateViewport renders the given viewport (even if it is not autoupdated),
@@ -429,7 +400,7 @@ namespace Ogre {
 
         /** Method for manual management of rendering - renders the given 
         viewport (even if it is not autoupdated)
-        @remarks
+
         This also fires preViewportUpdate and postViewportUpdate, and manages statistics.
         You should call it between _beginUpdate() and _endUpdate().
         @see _beginUpdate for more details.
@@ -439,7 +410,7 @@ namespace Ogre {
         virtual void _updateViewport(int zorder, bool updateStatistics = true);
 
         /** Method for manual management of rendering - renders the given viewport (even if it is not autoupdated)
-        @remarks
+
         This also fires preViewportUpdate and postViewportUpdate, and manages statistics
         if needed. You should call it between _beginUpdate() and _endUpdate().
         @see _beginUpdate for more details.
@@ -449,7 +420,7 @@ namespace Ogre {
         virtual void _updateViewport(Viewport* viewport, bool updateStatistics = true);
 
         /** Method for manual management of rendering - renders only viewports that are auto updated
-        @remarks
+
         This also fires preViewportUpdate and postViewportUpdate, and manages statistics.
         You should call it between _beginUpdate() and _endUpdate().
         See _beginUpdate for more details.
@@ -460,7 +431,7 @@ namespace Ogre {
         
         /** Method for manual management of rendering - finishes statistics calculation 
             and fires 'postRenderTargetUpdate'.
-        @remarks
+
         You should call it after a _beginUpdate
         @see _beginUpdate for more details.
         */
@@ -474,7 +445,6 @@ namespace Ogre {
 
         uint32 mWidth;
         uint32 mHeight;
-        uint32 mColourDepth;
         uint16       mDepthBufferPoolId;
         DepthBuffer *mDepthBuffer;
 

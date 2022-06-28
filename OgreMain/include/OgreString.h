@@ -31,38 +31,6 @@ THE SOFTWARE.
 #include "OgrePrerequisites.h"
 #include "OgreHeaderPrefix.h"
 
-// A quick define to overcome different names for the same function
-#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_WINRT
-#   define locale_t _locale_t
-#   define strtod_l _strtod_l
-#   define strtoul_l _strtoul_l
-#   define strtol_l _strtol_l
-#   define strtoull_l _strtoull_l
-#   define strtoll_l _strtoll_l
-#   define stricmp _stricmp
-#   define strnicmp _strnicmp
-#else
-#   define stricmp strcasecmp
-#   define strnicmp strncasecmp
-#endif
-
-#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
-#   define locale_t int
-#   define strtod_l(ptr, end, l) strtod(ptr, end)
-#   define strtoul_l(ptr, end, base, l) strtoul(ptr, end, base)
-#   define strtol_l(ptr, end, base, l) strtol(ptr, end, base)
-#   define strtoull_l(ptr, end, base, l) strtoull(ptr, end, base)
-#   define strtoll_l(ptr, end, base, l) strtoll(ptr, end, base)
-#endif
-
-// If compiling with make on macOS, these headers need to be included to get
-// definitions of locale_t, strtod_l, etc...
-// See: http://www.unix.com/man-page/osx/3/strtod_l/
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
-#   include <stdlib.h>
-#   include <xlocale.h>
-#endif
-
 #if OGRE_COMPILER == OGRE_COMPILER_GNUC || OGRE_COMPILER == OGRE_COMPILER_CLANG
 #define OGRE_FORMAT_PRINTF(string_idx, first_to_check) __attribute__ ((format (printf, string_idx, first_to_check)))
 #else
@@ -86,7 +54,7 @@ namespace Ogre {
 
         /** Removes any whitespace characters, be it standard space or
             TABs and so on.
-            @remarks
+
             The user may specify whether they want to trim only the
             beginning or the end of the String ( the default action is
             to trim both).
@@ -109,12 +77,12 @@ namespace Ogre {
         /** Returns a StringVector that contains all the substrings delimited
             by the characters in the passed <code>delims</code> argument,
             or in the <code>doubleDelims</code> argument, which is used to include (normal)
-            delimeters in the tokenised string. For example, "strings like this".
+            delimiters in the tokenised string. For example, "strings like this".
             @param str
             @param
             delims A list of delimiter characters to split by
             @param
-            doubleDelims A list of double delimeters characters to tokenise by
+            doubleDelims A list of double delimiters characters to tokenise by
             @param
             maxSplits The maximum number of splits to perform (0 for unlimited splits). If this
             parameters is > 0, the splitting process will stop after this many splits, left to right.
@@ -164,12 +132,12 @@ namespace Ogre {
             @param init The file path to normalize.
             @param makeLowerCase If true, transforms all characters in the string to lowercase.
         */
-        static String normalizeFilePath(const String& init, bool makeLowerCase = true);
+        static String normalizeFilePath(const String& init, bool makeLowerCase = false);
 
 
         /** Method for splitting a fully qualified filename into the base name
             and path.
-            @remarks
+
             Path is standardised as in standardisePath
         */
         static void splitFilename(const String& qualifiedName,
@@ -177,7 +145,7 @@ namespace Ogre {
 
         /** Method for splitting a fully qualified filename into the base name,
             extension and path.
-            @remarks
+
             Path is standardised as in standardisePath
         */
         static void splitFullFilename(const Ogre::String& qualifiedName,
@@ -214,7 +182,7 @@ namespace Ogre {
         static String format(const char* fmt, ...) OGRE_FORMAT_PRINTF(1, 2);
     };
 
-    typedef ::std::hash< _StringBase > _StringHash;
+    typedef ::std::hash< String > _StringHash;
     /** @} */
     /** @} */
 

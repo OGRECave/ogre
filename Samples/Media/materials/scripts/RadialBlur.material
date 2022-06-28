@@ -1,26 +1,17 @@
 //Cg Pixel Shader ps_2_0
-fragment_program Radial_Blur_Cg_ps cg
+fragment_program Radial_Blur_Cg_ps hlsl
 {
 	source Radial_Blur_FP.cg
-	profiles ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3 ps_2_0 arbfp1
-	entry_point main
 }
 
-fragment_program Radial_Blur_GLSLES_ps glsles
-{
-	source Radial_Blur_FP.glsles
-}
-
-fragment_program Radial_Blur_GLSL_ps glsl
+fragment_program Radial_Blur_GLSL_ps glsl glsles
 {
 	source Radial_Blur_FP.glsl
-	syntax glsl150
 }
 
 fragment_program Radial_Blur_ps unified
 {
 	delegate Radial_Blur_GLSL_ps
-	delegate Radial_Blur_GLSLES_ps
 	delegate Radial_Blur_Cg_ps
 }
 
@@ -33,7 +24,6 @@ material Ogre/Compositor/Radial_Blur
 		{
 			//State: D3DRS_CULLMODE, Value : D3DCULL_NONE
 			cull_hardware none
-			cull_software none
 			depth_check off
             polygon_mode_overrideable false
 

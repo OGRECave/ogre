@@ -31,14 +31,12 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-    DepthBuffer::DepthBuffer( uint16 poolId, uint16 bitDepth, uint32 width, uint32 height,
-                              uint32 fsaa, const String &fsaaHint, bool manual ) :
+    DepthBuffer::DepthBuffer( uint16 poolId, uint32 width, uint32 height,
+                              uint32 fsaa, bool manual ) :
                 mPoolId(poolId),
-                mBitDepth(bitDepth),
                 mWidth(width),
                 mHeight(height),
                 mFsaa(fsaa),
-                mFsaaHint(fsaaHint),
                 mManual(manual)
     {
     }
@@ -61,11 +59,6 @@ namespace Ogre
     uint16 DepthBuffer::getPoolId() const
     {
         return mPoolId;
-    }
-    //-----------------------------------------------------------------------
-    uint16 DepthBuffer::getBitDepth() const
-    {
-        return mBitDepth;
     }
     //-----------------------------------------------------------------------
     uint32 DepthBuffer::getWidth() const

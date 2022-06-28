@@ -69,13 +69,10 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void DirectionRandomiserAffector::_affectParticles(ParticleSystem* pSystem, Real timeElapsed)
     {
-        ParticleIterator pi = pSystem->_getIterator();
-        Particle *p;
         Real length = 0;
 
-        while (!pi.end())
+        for (auto p : pSystem->_getActiveParticles())
         {
-            p = pi.getNext();
             if (mScope > Math::UnitRandom())
             {
                 if (!p->mDirection.isZeroLength())

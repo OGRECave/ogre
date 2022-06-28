@@ -54,7 +54,26 @@ void PixelFormatTests::TearDown()
 }
 //--------------------------------------------------------------------------
 TEST_F(PixelFormatTests,IntegerPackUnpack)
-{}
+{
+    ColourValue src(1./1023, 512./1023, 0, 1./3);
+
+    // naive implementation
+    const uint16 ir = static_cast<uint16>( Math::saturate( src.r ) * 1023.0f + 0.5f );
+    const uint16 ig = static_cast<uint16>( Math::saturate( src.g ) * 1023.0f + 0.5f );
+    const uint16 ib = static_cast<uint16>( Math::saturate( src.b ) * 1023.0f + 0.5f );
+    const uint16 ia = static_cast<uint16>( Math::saturate( src.a ) * 3.0f + 0.5f );
+    uint32 ref = (ia << 30u) | (ir << 20u) | (ig << 10u) | (ib);
+
+    uint32 packed;
+    PixelUtil::packColour(src, PF_A2R10G10B10, &packed);
+
+    EXPECT_EQ(packed, ref);
+
+    ColourValue dst;
+    PixelUtil::unpackColour(dst, PF_A2R10G10B10, &packed);
+
+    EXPECT_EQ(src, dst);
+}
 //--------------------------------------------------------------------------
 TEST_F(PixelFormatTests,FloatPackUnpack)
 {

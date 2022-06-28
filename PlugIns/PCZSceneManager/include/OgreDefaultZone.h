@@ -24,15 +24,6 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
-DefaultZone.h  -  Default implementation of PCZone header file.
-
-Default Implementation of PCZone
------------------------------------------------------------------------------
-begin                : Tue Feb 20 2007
-author               : Eric Cha
-email                : ericc@xenopi.com
-Code Style Update    :
------------------------------------------------------------------------------
 */
 
 #ifndef DEFAULTZONE_H
@@ -56,7 +47,7 @@ namespace Ogre
         void setEnclosureNode(PCZSceneNode *);
 
         /** Adds an SceneNode to this Zone.
-        @remarks
+
         The PCZSceneManager calls this function to add a node
         to the zone.  
         */
@@ -93,7 +84,7 @@ namespace Ogre
         PCZone * updateNodeHomeZone(PCZSceneNode * pczsn, bool allowBackTouces);
 
         /** Find and add visible objects to the render queue.
-        @remarks
+
         Starts with objects in the zone and proceeds through visible portals   
         This is a recursive call (the main call should be to _findVisibleObjects)
         */

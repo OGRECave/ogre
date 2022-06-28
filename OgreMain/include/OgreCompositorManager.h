@@ -63,10 +63,6 @@ namespace Ogre {
         CompositorManager();
         virtual ~CompositorManager();
 
-        Resource* createImpl(const String& name, ResourceHandle handle,
-            const String& group, bool isManual, ManualResourceLoader* loader,
-            const NameValuePairList* params) override;
-
         /** Initialises the Compositor manager, which also triggers it to
             parse all available .compositor scripts. */
         void initialise(void);
@@ -81,11 +77,7 @@ namespace Ogre {
 
         /// Get a resource by name
         /// @see ResourceManager::getResourceByName
-        CompositorPtr getByName(const String& name, const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
-
-        /** @see ScriptLoader::parseScript
-        */
-        void parseScript(DataStreamPtr& stream, const String& groupName);
+        CompositorPtr getByName(const String& name, const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME) const;
 
         /** Get the compositor chain for a Viewport. If there is none yet, a new
             compositor chain is registered.
@@ -144,7 +136,7 @@ namespace Ogre {
         TexturePtr getPooledTexture(const String& name, const String& localName, 
             uint32 w, uint32 h,
             PixelFormat f, uint aa, const String& aaHint, bool srgb, UniqueTextureSet& texturesAlreadyAssigned, 
-            CompositorInstance* inst, CompositionTechnique::TextureScope scope);
+            CompositorInstance* inst, CompositionTechnique::TextureScope scope, TextureType type = TEX_TYPE_2D);
 
         /** Free pooled textures from the shared pool (compositor instances still 
             using them will keep them in memory though). 
@@ -196,6 +188,10 @@ namespace Ogre {
         static CompositorManager* getSingletonPtr(void);
     
     private:
+        Resource* createImpl(const String& name, ResourceHandle handle,
+            const String& group, bool isManual, ManualResourceLoader* loader,
+            const NameValuePairList* params) override;
+
         typedef std::map<const Viewport*, CompositorChain*> Chains;
         Chains mChains;
 
@@ -223,57 +219,29 @@ namespace Ogre {
         struct TextureDef
         {
             size_t width, height;
+            TextureType type;
             PixelFormat format;
             uint fsaa;
             String fsaaHint;
             bool sRGBwrite;
 
-            TextureDef(size_t w, size_t h, PixelFormat f, uint aa, const String& aaHint, bool srgb)
-                : width(w), height(h), format(f), fsaa(aa), fsaaHint(aaHint), sRGBwrite(srgb)
+            TextureDef(size_t w, size_t h, TextureType t, PixelFormat f, uint aa, const String& aaHint,
+                       bool srgb)
+                : width(w), height(h), type(t), format(f), fsaa(aa), fsaaHint(aaHint), sRGBwrite(srgb)
             {
+            }
 
+            bool operator<(const TextureDef& y) const
+            {
+                return std::tie(width, height, type, format, fsaa, fsaaHint, sRGBwrite) <
+                       std::tie(y.width, y.height, y.type, y.format, y.fsaa, y.fsaaHint, y.sRGBwrite);
             }
         };
-        struct TextureDefLess
-        {
-            bool operator()(const TextureDef& x, const TextureDef& y) const
-            {
-                if (x.format < y.format)
-                    return true;
-                else if (x.format == y.format)
-                {
-                    if (x.width < y.width)
-                        return true;
-                    else if (x.width == y.width)
-                    {
-                        if (x.height < y.height)
-                            return true;
-                        else if (x.height == y.height)
-                        {
-                            if (x.fsaa < y.fsaa)
-                                return true;
-                            else if (x.fsaa == y.fsaa)
-                            {
-                                if (x.fsaaHint < y.fsaaHint)
-                                    return true;
-                                else if (x.fsaaHint == y.fsaaHint)
-                                {
-                                    if (!x.sRGBwrite && y.sRGBwrite)
-                                        return true;
-                                }
-
-                            }
-                        }
-                    }
-                }
-                return false;
-            }
-        };
-        typedef std::map<TextureDef, TextureList, TextureDefLess> TexturesByDef;
+        typedef std::map<TextureDef, TextureList> TexturesByDef;
         TexturesByDef mTexturesByDef;
 
         typedef std::pair<String, String> StringPair;
-        typedef std::map<TextureDef, TexturePtr, TextureDefLess> TextureDefMap;
+        typedef std::map<TextureDef, TexturePtr> TextureDefMap;
         typedef std::map<StringPair, TextureDefMap> ChainTexturesByDef;
         
         ChainTexturesByDef mChainTexturesByDef;

@@ -36,7 +36,7 @@ THE SOFTWARE.
 namespace Ogre {
 
     /** Class for serializing a Mesh to/from XML.
-    @remarks
+
         This class behaves the same way as MeshSerializer in the main project,
         but is here to allow conversions to / from XML. This class is 
         deliberately not included in the main project because <UL>
@@ -54,10 +54,9 @@ namespace Ogre {
         virtual ~XMLMeshSerializer();
         /** Imports a Mesh from the given XML file.
         @param filename The name of the file to import, expected to be in XML format.
-        @param colourElementType The vertex element to use for packed colours
         @param pMesh The pre-created Mesh object to be populated.
         */
-        void importMesh(const String& filename, VertexElementType colourElementType, Mesh* pMesh);
+        void importMesh(const String& filename, Mesh* pMesh);
 
         /** Exports a mesh to the named XML file. */
         void exportMesh(const Mesh* pMesh, const String& filename);

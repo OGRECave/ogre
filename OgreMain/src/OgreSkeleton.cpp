@@ -39,8 +39,8 @@ namespace Ogre {
     //---------------------------------------------------------------------
     Skeleton::Skeleton()
         : Resource(),
-        mBlendState(ANIMBLEND_AVERAGE),
         mNextAutoHandle(0),
+        mBlendState(ANIMBLEND_AVERAGE),
         mManualBonesDirty(false)
     {
     }
@@ -48,7 +48,7 @@ namespace Ogre {
     Skeleton::Skeleton(ResourceManager* creator, const String& name, ResourceHandle handle,
         const String& group, bool isManual, ManualResourceLoader* loader) 
         : Resource(creator, name, handle, group, isManual, loader), 
-        mBlendState(ANIMBLEND_AVERAGE), mNextAutoHandle(0)
+        mNextAutoHandle(0), mBlendState(ANIMBLEND_AVERAGE)
         // set animation blending to weighted, not cumulative
     {
         if (createParamDictionary("Skeleton"))
@@ -64,15 +64,14 @@ namespace Ogre {
         unload(); 
     }
     //---------------------------------------------------------------------
-    void Skeleton::loadImpl(void)
+    void Skeleton::prepareImpl(void)
     {
         SkeletonSerializer serializer;
-        LogManager::getSingleton().stream()
-            << "Skeleton: Loading " << mName;
 
-        DataStreamPtr stream = 
-            ResourceGroupManager::getSingleton().openResource(
-                mName, mGroup, this);
+        if (getCreator()->getVerbose())
+            LogManager::getSingleton().stream() << "Skeleton: Loading " << mName;
+
+        DataStreamPtr stream = ResourceGroupManager::getSingleton().openResource(mName, mGroup, this);
 
         serializer.importSkeleton(stream, this);
 
@@ -82,13 +81,11 @@ namespace Ogre {
             i != mLinkedSkeletonAnimSourceList.end(); ++i)
         {
             i->pSkeleton = static_pointer_cast<Skeleton>(
-                SkeletonManager::getSingleton().load(i->skeletonName, mGroup));
+                SkeletonManager::getSingleton().prepare(i->skeletonName, mGroup));
         }
-
-
     }
     //---------------------------------------------------------------------
-    void Skeleton::unloadImpl(void)
+    void Skeleton::unprepareImpl(void)
     {
         // destroy bones
         BoneList::iterator i;
@@ -127,11 +124,7 @@ namespace Ogre {
     //---------------------------------------------------------------------
     Bone* Skeleton::createBone(unsigned short handle)
     {
-        if (handle >= OGRE_MAX_NUM_BONES)
-        {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Exceeded the maximum number of bones per skeleton.",
-                "Skeleton::createBone");
-        }
+        OgreAssert(handle < OGRE_MAX_NUM_BONES, "Exceeded the maximum number of bones per skeleton");
         // Check handle not used
         if (handle < mBoneList.size() && mBoneList[handle] != NULL)
         {
@@ -154,11 +147,7 @@ namespace Ogre {
     //---------------------------------------------------------------------
     Bone* Skeleton::createBone(const String& name, unsigned short handle)
     {
-        if (handle >= OGRE_MAX_NUM_BONES)
-        {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Exceeded the maximum number of bones per skeleton.",
-                "Skeleton::createBone");
-        }
+        OgreAssert(handle < OGRE_MAX_NUM_BONES, "Exceeded the maximum number of bones per skeleton");
         // Check handle not used
         if (handle < mBoneList.size() && mBoneList[handle] != NULL)
         {
@@ -523,11 +512,7 @@ namespace Ogre {
     void Skeleton::deriveRootBone(void) const
     {
         // Start at the first bone and work up
-        if (mBoneList.empty())
-        {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Cannot derive root bone as this "
-                "skeleton has no bones!", "Skeleton::deriveRootBone");
-        }
+        OgreAssert(!mBoneList.empty(), "Cannot derive root bone as this skeleton has no bones");
 
         mRootBones.clear();
 
@@ -691,11 +676,11 @@ namespace Ogre {
                 return; // don't bother
         }
 
-        if (isLoaded())
+        if (isPrepared() || isLoaded())
         {
             // Load immediately
             SkeletonPtr skelPtr = static_pointer_cast<Skeleton>(
-                SkeletonManager::getSingleton().load(skelName, mGroup));
+                SkeletonManager::getSingleton().prepare(skelName, mGroup));
             mLinkedSkeletonAnimSourceList.push_back(
                 LinkedSkeletonAnimationSource(skelName, scale, skelPtr));
 
@@ -738,13 +723,9 @@ namespace Ogre {
         ushort numSrcBones = src->getNumBones();
         ushort numDstBones = this->getNumBones();
 
-        if (boneHandleMap.size() != numSrcBones)
-        {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-                "Number of bones in the bone handle map must equal to "
-                "number of bones in the source skeleton.",
-                "Skeleton::_mergeSkeletonAnimations");
-        }
+        OgreAssert(
+            boneHandleMap.size() == numSrcBones,
+            "Number of bones in the bone handle map must equal to number of bones in the source skeleton");
 
         bool existsMissingBone = false;
 

@@ -58,6 +58,7 @@ using namespace Ogre;
 - (void)cancelButtonPressed:(id)sender;
 - (void)okButtonPressed:(id)sender;
 - (void)popUpValueChanged:(id)sender;
+- (void)renderSystemChanged:(id)sender;
 
 // Getters and setters
 - (void)setOptions:(NSDictionary *)dict;
@@ -100,81 +101,7 @@ namespace OgreBites {
 	    mWindowDelegate = [[OgreConfigWindowDelegate alloc] init];
 
         if (!mWindowDelegate)
-            OGRE_EXCEPT (Exception::ERR_INTERNAL_ERROR, "Could not load config dialog",
-                         "ConfigDialog::initialise");
-
-        NSMutableArray *videoModeOptions = [NSMutableArray arrayWithCapacity:1];
-        NSMutableArray *fsaaOptions = [NSMutableArray arrayWithCapacity:1];
-		const RenderSystemList& renderers = Root::getSingleton().getAvailableRenderers();
-
-        // Add renderers and options that are detected per RenderSystem
-        for (RenderSystemList::const_iterator pRend = renderers.begin(); pRend != renderers.end(); ++pRend)
-        {
-            RenderSystem* rs = *pRend;
-
-            // Set defaults per RenderSystem
-			rs->setConfigOption("Video Mode", "800 x 600");
-			rs->setConfigOption("Colour Depth", "32");
-			rs->setConfigOption("FSAA", "0");
-			rs->setConfigOption("Full Screen", "No");
-			rs->setConfigOption("RTT Preferred Mode", "FBO");
-			rs->setConfigOption("sRGB Gamma Conversion", "No");
-			rs->setConfigOption("Content Scaling Factor", "1.0");
-            
-#if OGRE_NO_QUAD_BUFFER_STEREO == 0
-			rs->setConfigOption("Stereo Mode", "None");
-#endif
-
-            // Add to the drop down
-            NSString *renderSystemName = [[NSString alloc] initWithCString:rs->getName().c_str() encoding:NSASCIIStringEncoding];
-            [[mWindowDelegate getRenderSystemsPopUp] addItemWithTitle:renderSystemName];
-            [renderSystemName release];
-            
-            // Get detected option values and add them to our config dictionary
-            const ConfigOptionMap& opts = rs->getConfigOptions();
-            for (ConfigOptionMap::const_iterator pOpt = opts.begin(); pOpt != opts.end(); ++pOpt)
-            {
-                if(pOpt->first == "FSAA")
-                {
-                    for(uint i = 0; i < pOpt->second.possibleValues.size(); i++)
-                    {
-                        NSString *optionString = [NSString stringWithCString:pOpt->second.possibleValues[i].c_str()
-                                                                    encoding:NSASCIIStringEncoding];
-
-                        if(![fsaaOptions containsObject:optionString])
-                             [fsaaOptions addObject:optionString];
-                    }
-                }
-                else if(pOpt->first == "Video Mode")
-                {
-                    for(uint i = 0; i < pOpt->second.possibleValues.size(); i++)
-                    {
-                        NSString *optionString = [NSString stringWithCString:pOpt->second.possibleValues[i].c_str()
-                                                                    encoding:NSASCIIStringEncoding];
-                        
-                        if(![videoModeOptions containsObject:optionString])
-                            [videoModeOptions addObject:optionString];
-                    }
-                }
-            }
-        }
-
-        NSDictionary* options = [NSDictionary dictionaryWithObjectsAndKeys:
-                                 videoModeOptions, @"Video Mode",
-                                 fsaaOptions, @"FSAA",
-                                 [NSArray arrayWithObjects:@"Yes", @"No", nil], @"Full Screen",
-                                 [NSArray arrayWithObjects:@"32", @"16", nil], @"Colour Depth",
-                                 [NSArray arrayWithObjects:@"FBO", @"PBuffer", @"Copy", nil], @"RTT Preferred Mode",
-                                 [NSArray arrayWithObjects:@"Yes", @"No", nil], @"sRGB Gamma Conversion",
-                                 [NSArray arrayWithObjects:@"2.0", @"1.5", @"1.33", @"1.0", nil], @"Content Scaling Factor",
-#if OGRE_NO_QUAD_BUFFER_STEREO == 0
-                                 [NSArray arrayWithObjects:@"None", @"Frame Sequential", nil], @"Stereo Mode",
-#endif
-                                 nil];
-		[mWindowDelegate setOptions:options];
-
-        // Reload table data
-        [[mWindowDelegate getOptionsTable] reloadData];
+            OGRE_EXCEPT (Exception::ERR_INTERNAL_ERROR, "Could not load config dialog");
 	}
 
 	bool ConfigDialog::display()
@@ -251,7 +178,7 @@ namespace OgreBites {
         [[mConfigWindow contentView] addSubview:mCancelButton];
 
         // Then the Ogre logo out of the framework bundle
-        mOgreLogo = [[NSImageView alloc] initWithFrame:NSMakeRect(0, 295, 512, 220)];
+        mOgreLogo = [[NSImageView alloc] initWithFrame:NSMakeRect(0, 395, 512, 120)];
         NSMutableString *logoPath = [[[NSBundle bundleForClass:[self class]] resourcePath] mutableCopy];
         [logoPath appendString:@"/ogrelogo.png"];
 
@@ -264,10 +191,13 @@ namespace OgreBites {
         [[mConfigWindow contentView] addSubview:mOgreLogo];
 
         // Popup menu for rendersystems.  On OS X this is always OpenGL
-        mRenderSystemsPopUp = [[NSPopUpButton alloc] initWithFrame:NSMakeRect(168, 259, 327, 26) pullsDown:NO];
+        mRenderSystemsPopUp = [[NSPopUpButton alloc] initWithFrame:NSMakeRect(168, 359, 327, 26) pullsDown:NO];
         [[mConfigWindow contentView] addSubview:mRenderSystemsPopUp];
 
-        NSTextField *renderSystemLabel = [[NSTextField alloc] initWithFrame:NSMakeRect(18, 265, 148, 17)];
+        [mRenderSystemsPopUp setAction:@selector(renderSystemChanged:)];
+        [mRenderSystemsPopUp setTarget:self];
+
+        NSTextField *renderSystemLabel = [[NSTextField alloc] initWithFrame:NSMakeRect(18, 365, 148, 17)];
         [renderSystemLabel setStringValue:NSLocalizedString(@"Rendering Subsystem", @"renderingSubsystemString")];
         [renderSystemLabel setEditable:NO];
         [renderSystemLabel setSelectable:NO];
@@ -278,7 +208,7 @@ namespace OgreBites {
         [renderSystemLabel release];
 
         // The pretty box to contain the table and options
-        NSBox *tableBox = [[NSBox alloc] initWithFrame:NSMakeRect(19, 54, 477, 203)];
+        NSBox *tableBox = [[NSBox alloc] initWithFrame:NSMakeRect(19, 54, 477, 303)];
         [tableBox setTitle:NSLocalizedString(@"Rendering System Options", @"optionsBoxString")];
         [tableBox setContentViewMargins:NSMakeSize(0, 0)];
         [tableBox setFocusRingType:NSFocusRingTypeNone];
@@ -300,7 +230,7 @@ namespace OgreBites {
         [column release];
 
         // Scroll view to hold the table in case the list grows some day
-        NSScrollView *scrollView = [[NSScrollView alloc] initWithFrame:NSMakeRect(22, 42, 439, 135)];
+        NSScrollView *scrollView = [[NSScrollView alloc] initWithFrame:NSMakeRect(22, 42, 439, 235)];
         [scrollView setBorderType:NSBezelBorder];
         [scrollView setAutoresizesSubviews:YES];
         [scrollView setAutohidesScrollers:YES];
@@ -325,8 +255,43 @@ namespace OgreBites {
 
         [[mConfigWindow contentView] addSubview:tableBox];
         [tableBox release];
+
+        // Add renderers to the drop down
+        const RenderSystemList& renderers = Root::getSingleton().getAvailableRenderers();
+        for (RenderSystemList::const_iterator pRend = renderers.begin(); pRend != renderers.end(); ++pRend)
+        {
+            NSString *renderSystemName = [[NSString alloc] initWithCString:(*pRend)->getName().c_str() encoding:NSASCIIStringEncoding];
+            [mRenderSystemsPopUp addItemWithTitle:renderSystemName];
+        }
+
+        [self refreshConfigOptions];
     }
     return self;
+}
+
+-(void) refreshConfigOptions
+{
+    NSMutableDictionary* dict = [NSMutableDictionary dictionary];
+
+    // Get detected option values and add them to our config dictionary
+    String selectedRenderSystemName = String([[[mRenderSystemsPopUp selectedItem] title] UTF8String]);
+    RenderSystem *rs = Root::getSingleton().getRenderSystemByName(selectedRenderSystemName);
+    const ConfigOptionMap& opts = rs->getConfigOptions();
+    for (ConfigOptionMap::const_iterator pOpt = opts.begin(); pOpt != opts.end(); ++pOpt)
+    {
+        NSString* key = [[NSString alloc] initWithCString:pOpt->first.c_str()];
+        NSMutableArray* values = [[NSMutableArray alloc] initWithCapacity:10];
+        for(uint i = 0; i < pOpt->second.possibleValues.size(); i++)
+        {
+            NSString *value = [[NSString alloc] initWithCString:pOpt->second.possibleValues[i].c_str()
+                                                            encoding:NSASCIIStringEncoding];
+            [values addObject:value];
+        }
+
+        [dict setObject:values forKey:key];
+    }
+
+    [self setOptions:dict];
 }
 
 - (void)dealloc
@@ -345,6 +310,11 @@ namespace OgreBites {
 }
 
 #pragma mark Window and Control delegate methods
+
+- (void)renderSystemChanged:(id)sender
+{
+    [self refreshConfigOptions];
+}
 
 - (void)popUpValueChanged:(id)sender
 {
@@ -393,32 +363,20 @@ namespace OgreBites {
 }
 
 #pragma mark NSTableView delegate and datasource methods
-#if defined(MAC_OS_X_VERSION_10_5) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_5
 - (id)tableView:(NSTableView *)aTableView objectValueForTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex
-#else
-- (id)tableView:(NSTableView *)aTableView objectValueForTableColumn:(NSTableColumn *)aTableColumn row:(int)rowIndex
-#endif
 {
 #pragma unused(aTableView)
     return [[[mOptions keyEnumerator] allObjects] objectAtIndex:rowIndex];
 }
 
-#if defined(MAC_OS_X_VERSION_10_5) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_5
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)aTableView
-#else
-- (int)numberOfRowsInTableView:(NSTableView *)aTableView
-#endif
 {
 #pragma unused(aTableView)
     return [mOptions count];
 }
 
 // Intercept the request to select a new row.  Update the popup's values.
-#if defined(MAC_OS_X_VERSION_10_5) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_5
 - (BOOL)tableView:(NSTableView *)aTableView shouldSelectRow:(NSInteger)rowIndex
-#else
-- (BOOL)tableView:(NSTableView *)aTableView shouldSelectRow:(int)rowIndex
-#endif
 {
 #pragma unused(aTableView)
     // Clear out the options popup menu
@@ -475,6 +433,7 @@ namespace OgreBites {
     [dict retain];
     [mOptions release];
     mOptions = dict;
+    [mOptionsTable reloadData];
 }
 
 - (NSPopUpButton *)getRenderSystemsPopUp

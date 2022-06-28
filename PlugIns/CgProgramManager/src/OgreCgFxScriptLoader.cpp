@@ -33,6 +33,8 @@ THE SOFTWARE.
 #include "OgreHighLevelGpuProgramManager.h"
 #include "OgreCgProgram.h"
 
+#include <sstream>
+
 namespace Ogre {
 
     //---------------------------------------------------------------------
@@ -2725,7 +2727,7 @@ namespace Ogre {
 
         MaterialPtr ogreMaterial = MaterialManager::getSingleton().create(stream->getName(), groupName);
 
-        String sourceToUse = HighLevelGpuProgram::_resolveIncludes(streamAsString, ogreMaterial.get(), stream->getName());
+        String sourceToUse = HighLevelGpuProgram::_resolveIncludes(streamAsString, ogreMaterial.get(), stream->getName(), true);
 
         CGeffect cgEffect = cgCreateEffect(mCgContext, sourceToUse.c_str(), NULL);
         checkForCgError("CgFxScriptLoader::parseScript",
@@ -2915,12 +2917,10 @@ namespace Ogre {
     {
         CGeffect cgEffect = cgGetTechniqueEffect(cgGetPassTechnique(cgPass));
 
-        GpuConstantDefinitionIterator constIt = ogreProgramParameters->getConstantDefinitionIterator();
-        while(constIt.hasMoreElements())
+        for(auto& it : ogreProgramParameters->getConstantDefinitions().map)
         {
             // get the constant definition
-            const String& ogreParamName = constIt.peekNextKey();
-            constIt.getNext();
+            const String& ogreParamName =it.first;
 
             CGparameter cgParameter = cgGetNamedEffectParameter(cgEffect, ogreParamName.c_str());
             // try to find it without case

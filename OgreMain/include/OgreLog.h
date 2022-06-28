@@ -34,6 +34,9 @@ THE SOFTWARE.
 #include "Threading/OgreThreadHeaders.h"
 #include "OgreHeaderPrefix.h"
 
+#include <fstream>
+#include <sstream>
+
 namespace Ogre {
 
     /** \addtogroup Core
@@ -42,11 +45,8 @@ namespace Ogre {
     /** \addtogroup General
     *  @{
     */
-    // LogMessageLevel + LoggingLevel > OGRE_LOG_THRESHOLD = message logged
-    #define OGRE_LOG_THRESHOLD 4
 
-    /** The level of detail to which the log will go into.
-    */
+    /// @deprecated use LogMessageLevel instead
     enum LoggingLevel
     {
         LL_LOW = 1,
@@ -71,7 +71,7 @@ namespace Ogre {
         virtual ~LogListener() {}
 
         /**
-        @remarks
+
             This is called whenever the log receives a message and is about to write it out
         @param message
             The message to be logged
@@ -89,16 +89,17 @@ namespace Ogre {
 
 
     /**
-    @remarks
-         Log class for writing debug/log data to files.
-    @note
-        <br>Should not be used directly, but trough the LogManager class.
+        Log class for writing debug/log data to files.
+
+        You can control the default log level through the `OGRE_MIN_LOGLEVEL` environment variable.
+        Here, the value 1 corresponds to #LML_TRIVIAL etc.
+        @note Should not be used directly, but through the LogManager class.
     */
     class _OgreExport Log : public LogAlloc
     {
-    protected:
+    private:
         std::ofstream   mLog;
-        LoggingLevel    mLogLevel;
+        LogMessageLevel mLogLevel;
         bool            mDebugOut;
         bool            mSuppressFile;
         bool            mTimeStamp;
@@ -113,13 +114,13 @@ namespace Ogre {
 
         OGRE_AUTO_MUTEX; // public to allow external locking
         /**
-        @remarks
+
             Usual constructor - called by LogManager.
         */
         Log( const String& name, bool debugOutput = true, bool suppressFileOutput = false);
 
         /**
-        @remarks
+
         Default destructor.
         */
         ~Log();
@@ -142,25 +143,24 @@ namespace Ogre {
         Stream stream(LogMessageLevel lml = LML_NORMAL, bool maskDebug = false);
 
         /**
-        @remarks
+
             Enable or disable outputting log messages to the debugger.
         */
         void setDebugOutputEnabled(bool debugOutput);
+        /// @deprecated use setMinLogLevel()
+        OGRE_DEPRECATED void setLogDetail(LoggingLevel ll);
+        /// set the minimal #LogMessageLevel for a message to be logged
+        void setMinLogLevel(LogMessageLevel lml);
         /**
-        @remarks
-            Sets the level of the log detail.
-        */
-        void setLogDetail(LoggingLevel ll);
-        /**
-        @remarks
+
             Enable or disable time stamps.
         */
         void setTimeStampEnabled(bool timeStamp);
         /** Gets the level of the log detail.
         */
-        LoggingLevel getLogDetail() const { return mLogLevel; }
+        LogMessageLevel getMinLogLevel() const { return mLogLevel; }
         /**
-        @remarks
+
             Register a listener to this log
         @param listener
             A valid listener derived class
@@ -168,7 +168,7 @@ namespace Ogre {
         void addListener(LogListener* listener);
 
         /**
-        @remarks
+
             Unregister a listener from this log
         @param listener
             A valid listener derived class
@@ -176,7 +176,7 @@ namespace Ogre {
         void removeListener(LogListener* listener);
 
         /** Stream object which targets a log.
-        @remarks
+
             A stream logger object makes it simpler to send various things to 
             a log. You can just use the operator<< implementation to stream 
             anything to the log, which is cached until a Stream::Flush is
@@ -195,7 +195,7 @@ namespace Ogre {
         */
         class _OgrePrivate Stream
         {
-        protected:
+        private:
             Log* mTarget;
             LogMessageLevel mLevel;
             bool mMaskDebug;
@@ -212,13 +212,9 @@ namespace Ogre {
             {
 
             }
-            // copy constructor
-            Stream(const Stream& rhs) 
-                : mTarget(rhs.mTarget), mLevel(rhs.mLevel), mMaskDebug(rhs.mMaskDebug)
-            {
-                // explicit copy of stream required, gcc doesn't like implicit
-                mCache.str(rhs.mCache.str());
-            } 
+            // move constructor
+            Stream(Stream&& rhs) = default;
+
             ~Stream()
             {
                 // flush on destroy

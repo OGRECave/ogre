@@ -41,7 +41,7 @@ namespace Ogre {
     *  @{
     */
     /** OverlayElement representing a flat, single-material (or transparent) panel which can contain other elements.
-    @remarks
+
         This class subclasses OverlayContainer because it can contain other elements. Like other
         containers, if hidden it's contents are also hidden, if moved it's contents also move etc. 
         The panel itself is a 2D rectangle which is either completely transparent, or is rendered 
@@ -99,35 +99,11 @@ namespace Ogre {
         /** Returns whether this panel is transparent. */
         bool isTransparent(void) const;
 
-        /** See OverlayElement. */
-        virtual const String& getTypeName(void) const;
-        /** See Renderable. */
-        void getRenderOperation(RenderOperation& op);
+        const String& getTypeName(void) const override;
+        void getRenderOperation(RenderOperation& op) override;
         /** Overridden from OverlayContainer */
         void _updateRenderQueue(RenderQueue* queue);
 
-
-        /** Command object for specifying tiling (see ParamCommand).*/
-        class _OgrePrivate CmdTiling : public ParamCommand
-        {
-        public:
-            String doGet(const void* target) const;
-            void doSet(void* target, const String& val);
-        };
-        /** Command object for specifying transparency (see ParamCommand).*/
-        class _OgrePrivate CmdTransparent : public ParamCommand
-        {
-        public:
-            String doGet(const void* target) const;
-            void doSet(void* target, const String& val);
-        };
-        /** Command object for specifying UV coordinates (see ParamCommand).*/
-        class _OgrePrivate CmdUVCoords : public ParamCommand
-        {
-        public:
-            String doGet(const void* target) const;
-            void doSet(void* target, const String& val);
-        };
     protected:
         /// Flag indicating if this panel should be visual or just group things
         bool mTransparent;
@@ -149,12 +125,6 @@ namespace Ogre {
         void addBaseParameters(void);
 
         static String msTypeName;
-
-        // Command objects
-        static CmdTiling msCmdTiling;
-        static CmdTransparent msCmdTransparent;
-        static CmdUVCoords msCmdUVCoords;
-
     };
     /** @} */
     /** @} */

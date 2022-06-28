@@ -24,20 +24,6 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
-Portal.h  -  Portals are special constructs which which are used to connect 
-             two Zones in a PCZScene.  Portals are defined by 4 coplanr 
-             corners and a direction.  Portals are contained within Zones and 
-             are essentially "one way" connectors.  Objects and entities can
-             use them to travel to other Zones, but to return, there must be
-             a corresponding Portal which connects back to the original zone
-             from the new zone.
-
------------------------------------------------------------------------------
-begin                : Thu Feb 22 2007
-author               : Eric Cha
-email                : ericc@xenopi.com
-Code Style Update    : Apr 5, 2007
------------------------------------------------------------------------------
 */
 
 #ifndef PORTAL_H
@@ -47,7 +33,16 @@ Code Style Update    : Apr 5, 2007
 
 namespace Ogre
 {
-    /** Portal datastructure for connecting zones. */
+    /** Portal datastructure for connecting zones.
+
+        Portals are special constructs which which are used to connect
+        two Zones in a PCZScene.  Portals are defined by 4 coplanr
+        corners and a direction.  Portals are contained within Zones and
+        are essentially "one way" connectors.  Objects and entities can
+        use them to travel to other Zones, but to return, there must be
+        a corresponding Portal which connects back to the original zone
+        from the new zone.
+     */
     class _OgrePCZPluginExport Portal : public PortalBase
     {
     public:
@@ -89,8 +84,6 @@ namespace Ogre
 
         const String& getType() const
         { return FACTORY_TYPE_NAME; }
-
-        void destroyInstance(MovableObject* obj);
 
         /** Return true here as we want to get a unique type flag. */
         bool requestTypeFlags() const

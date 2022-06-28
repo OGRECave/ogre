@@ -37,18 +37,50 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-        //TODO Add documentation and explain rationale of this class.
-
     /** \addtogroup Core
     *  @{
     */
     /** \addtogroup Resources
     *  @{
     */
+
+    /** Interface definition for factories of GpuProgram. */
+    class _OgreExport GpuProgramFactory : public FactoryAlloc
+    {
+    public:
+        virtual ~GpuProgramFactory() {}
+        /// Get the name of the language this factory creates programs for
+        virtual const String& getLanguage(void) const = 0;
+        virtual GpuProgram* create(ResourceManager* creator, const String& name, ResourceHandle handle,
+                                   const String& group, bool isManual, ManualResourceLoader* loader) = 0;
+        virtual void destroy(GpuProgram* prog) { delete prog; }
+    };
+
+
+    /** This ResourceManager manages GPU shader programs
+
+        This class not only manages the programs themselves, it also manages the factory
+        classes which allow the creation of programs using a variety of
+        syntaxes. Plugins can be created which register themselves as program
+        factories and as such the engine can be extended to accept virtually any kind of
+        program provided a plugin is written.
+    */
     class _OgreExport GpuProgramManager : public ResourceManager, public Singleton<GpuProgramManager>
     {
         // silence warnings
         using ResourceManager::load;
+
+        /// Factories capable of creating GpuProgram instances
+        typedef std::map<String, GpuProgramFactory*> FactoryMap;
+        FactoryMap mFactories;
+
+        /// Factory for dealing with programs for languages we can't create
+        std::unique_ptr<GpuProgramFactory> mNullFactory;
+        /// Factory for unified high-level programs
+        std::unique_ptr<GpuProgramFactory> mUnifiedFactory;
+
+        GpuProgramFactory* getFactory(const String& language);
+
     public:
 
         typedef std::set<String> SyntaxCodes;
@@ -69,22 +101,23 @@ namespace Ogre {
         Resource* createImpl(const String& name, ResourceHandle handle,
             const String& group, bool isManual, ManualResourceLoader* loader,
             const NameValuePairList* createParams);
-
-        /// Specialised create method with specific parameters
-        virtual Resource* createImpl(const String& name, ResourceHandle handle, 
-            const String& group, bool isManual, ManualResourceLoader* loader,
-            GpuProgramType gptype, const String& syntaxCode);
     public:
         GpuProgramManager();
         virtual ~GpuProgramManager();
 
         /// Get a resource by name
         /// @see GpuProgramManager::getResourceByName
-        GpuProgramPtr getByName(const String& name, const String& group OGRE_RESOURCE_GROUP_INIT, bool preferHighLevelPrograms = true);
+        GpuProgramPtr getByName(const String& name, const String& group OGRE_RESOURCE_GROUP_INIT) const;
 
+        /// @deprecated preferHighLevelPrograms has no effect
+        OGRE_DEPRECATED GpuProgramPtr getByName(const String& name, const String& group,
+                                                bool preferHighLevelPrograms) const
+        {
+            return getByName(name, group);
+        }
 
-        /** Loads a GPU program from a file of assembly. 
-        @remarks
+        /** Loads a GPU program from a file
+
             This method creates a new program of the type specified as the second parameter.
             As with all types of ResourceManager, this class will search for the file in
             all resource locations it has been configured to look in.
@@ -98,8 +131,8 @@ namespace Ogre {
             const String& filename, GpuProgramType gptype, 
             const String& syntaxCode);
 
-        /** Loads a GPU program from a string of assembly code.
-        @remarks
+        /** Loads a GPU program from a string
+
             The assembly code must be compatible with this manager - call the 
             getSupportedSyntax method for details of the supported syntaxes 
         @param name The identifying name to give this program, which can be used to
@@ -113,22 +146,24 @@ namespace Ogre {
             const String& code, GpuProgramType gptype,
             const String& syntaxCode);
 
-        /** Returns the syntaxes that this manager supports. */
-        virtual const SyntaxCodes& getSupportedSyntax(void) const;
-         
+        /** Returns the syntaxes that the RenderSystem supports. */
+        static const SyntaxCodes& getSupportedSyntax(void);
 
-        /** Returns whether a given syntax code (e.g. "ps_1_3", "fp20", "arbvp1") is supported. */
-        virtual bool isSyntaxSupported(const String& syntaxCode) const;
-        
+        /** Returns whether a given syntax code (e.g. "glsl330", "vs_4_0", "arbvp1") is supported. */
+        static bool isSyntaxSupported(const String& syntaxCode);
+
+        /** Returns whether a given high-level language (e.g. "glsl", "hlsl") is supported. */
+        bool isLanguageSupported(const String& lang) const;
+
         /** Creates a new GpuProgramParameters instance which can be used to bind
             parameters to your programs.
-        @remarks
+
             Program parameters can be shared between multiple programs if you wish.
         */
         virtual GpuProgramParametersSharedPtr createParameters(void);
         
         /** Create a new, unloaded GpuProgram from a file of assembly. 
-        @remarks    
+
             Use this method in preference to the 'load' methods if you wish to define
             a GpuProgram, but not load it yet; useful for saving memory.
         @par
@@ -146,7 +181,7 @@ namespace Ogre {
             GpuProgramType gptype, const String& syntaxCode);
 
         /** Create a GPU program from a string of assembly code.
-        @remarks    
+
             Use this method in preference to the 'load' methods if you wish to define
             a GpuProgram, but not load it yet; useful for saving memory.
         @par
@@ -166,20 +201,26 @@ namespace Ogre {
         /** General create method, using specific create parameters
             instead of name / value pairs. 
         */
-        virtual ResourcePtr create(const String& name, const String& group, 
-            GpuProgramType gptype, const String& syntaxCode, bool isManual = false, 
+        GpuProgramPtr create(const String& name, const String& group,
+            GpuProgramType gptype, const String& language, bool isManual = false,
             ManualResourceLoader* loader = 0);
 
-        /** Overrides the standard ResourceManager getResourceByName method.
-        @param name The name of the program to retrieve
-        @param group The name of the resource group to attach this new resource to
-        @param preferHighLevelPrograms If set to true (the default), high level programs will be
-            returned in preference to low-level programs.
+        /** Create a new, unloaded GpuProgram.
+        @par
+            This method creates a new program of the type specified as the second and third parameters.
+            You will have to call further methods on the returned program in order to
+            define the program fully before you can load it.
+        @param name The identifying name of the program
+        @param groupName The name of the resource group which this program is
+            to be a member of
+        @param language Code of the language to use (e.g. "cg")
+        @param gptype The type of program to create
         */
-        ResourcePtr getResourceByName(const String& name, const String& group, bool preferHighLevelPrograms);
-
-        /// @overload
-        ResourcePtr getResourceByName(const String& name, const String& group OGRE_RESOURCE_GROUP_INIT);
+        GpuProgramPtr createProgram(const String& name, const String& groupName, const String& language,
+                                    GpuProgramType gptype)
+        {
+            return create(name, groupName, gptype, language);
+        }
 
         /** Create a new set of shared parameters, which can be used across many 
             GpuProgramParameters objects of different structures.
@@ -244,7 +285,10 @@ namespace Ogre {
         */
         void loadMicrocodeCache( DataStreamPtr stream );
         
-
+        /** Add a new factory object for programs of a given language. */
+        void addFactory(GpuProgramFactory* factory);
+        /** Remove a factory object for programs of a given language. */
+        void removeFactory(GpuProgramFactory* factory);
 
         /// @copydoc Singleton::getSingleton()
         static GpuProgramManager& getSingleton(void);

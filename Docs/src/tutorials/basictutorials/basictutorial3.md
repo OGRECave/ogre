@@ -4,48 +4,49 @@
 
 This tutorial will focus on rendering terrain in a scene. We will cover the basic set up that needs to be done, and we will introduce the use of lighting with terrains. We will also give a brief introduction to simulating a sky using Skyboxes, Skydomes, and Skyplanes. Finally, we will explain how to add a fog effect to the scene.
 
-The full source for this tutorial can be found in samples directory **Samples/Terrain/include/Terrain.h**.
+The full source for this tutorial can be found in samples directory **Samples/Simple/include/Terrain.h**.
 
 @note Refer to @ref setup for instructions how set up an Ogre project and compile it successfully.
 
-![](bt3_fog_visual.png)
+@image html bt3_fog_visual.png width=70%
+
 Ignore the FPS stats in the screenshots. They were rendered on an ancient computer.
 
 # An Introduction to Terrain {#tut_terrain}
-With older versions of %Ogre, we had to use the "Terrain Scene Manager" to render terrain in a scene. This is a separate SceneManager that runs alongside your other managers. The new Ogre Terrain Component doesn't require using a separate manager. Since Ogre 1.7 (Cthugha), there are two terrain components: Terrain and Paging. The Paging component is used optimize large terrains. It will be covered in later tutorials. This tutorial will focus largely on the Terrain component.
+With older versions of %Ogre, we had to use the "Terrain Scene Manager" to render terrain in a scene. This is a separate SceneManager that runs alongside your other managers. The new Ogre Terrain Component doesn't require using a separate manager. Since %Ogre 1.7, there are two terrain components: Terrain and Paging. The Paging component is used optimize large terrains. It will be covered in later tutorials. This tutorial will focus largely on the Terrain component.
 
 To set up the terrain we will focus on two main classes:
-- Ogre::Terrain and
-- Ogre::TerrainGroup
+- Ogre::Terrain, representing one piece of terrain and
+- Ogre::TerrainGroup, holding a series of Terrain pieces.
 
-The Terrain class represents one chunk of terrain and the TerrainGroup holds a series of Terrain pieces. It is used for LOD (Level of Detail) rendering. LOD rendering reduces the resolution for terrain that is farther away from the camera. An individual Terrain object consists of tiles with a material mapped on to them. We will use a single TerrainGroup without paging. Paging will be covered in later tutorials.
+This separation is used for LOD (Level of Detail) rendering. LOD rendering reduces the resolution for terrain that is farther away from the camera. An individual Terrain object consists of tiles with a material mapped on to them. We will use a single TerrainGroup without paging. Paging will be covered in later tutorials.
 
 ## Setting Up the Camera
 Let's first set up our Camera. Add the following to the beginning of `setup`:
 
-@snippet Samples/Terrain/include/Terrain.h camera_setup
+@snippet Samples/Simple/include/Terrain.h camera_setup
 
 This should look familiar from the previous tutorial.
 
-@snippet Samples/Terrain/include/Terrain.h camera_inf
+@snippet Samples/Simple/include/Terrain.h camera_inf
 
-The last thing we do is check to see if our current render system has the capability to handle an infinite far clip distance. If it does, then we set the far clip distance to zero (which means ''no'' far clipping).
+The last thing we do is to set the far clip distance to zero (which means ''no'' far clipping).
 ## Setting Up a Light for Our Terrain
 The Terrain component can use a directional light to compute a lightmap. Let's add a Light for this purpose and add some ambient light to the scene while we're at it.
 
-@snippet Samples/Terrain/include/Terrain.h light
+@snippet Samples/Simple/include/Terrain.h light
 
 This was also covered in the previous tutorial if you're confused by any of it. The `normalise` method will make the vector's length equal to one while maintaining its direction. This is something that you will see a lot of when working with vectors. It is done to avoid extra factors showing up in calculations.
 ## Terrain loading overview {#bt3Overview}
 Now we'll get into the actual terrain setup. First, we create TerrainGlobalOptions.
 
-@snippet Samples/Terrain/include/Terrain.h global_opts
+@snippet Samples/Simple/include/Terrain.h global_opts
 
 This is a class that holds information for all of the terrains we might create - that is why they are called ''global'' options. It also provides a few getters and setters. There are also local options for each TerrainGroup that we will see later in this tutorial.
 
 Next we construct our TerrainGroup object. This will manage a grid of Terrains.
 
-@snippet Samples/Terrain/include/Terrain.h terrain_create
+@snippet Samples/Simple/include/Terrain.h terrain_create
 
 The TerrainGroup constructor takes the SceneManager as its first parameter. It then takes an alignment option, terrain size, and terrain world size. You can read the Ogre::TerrainGroup for more information. The `setFilenameConvention` allows us to choose how our terrain will be saved. Finally, we set the origin to be used for our terrain.
 
@@ -55,69 +56,74 @@ configureTerrainDefaults(light);
 ```
 The next thing we do is define our terrains and ask the TerrainGroup to load them all.
 
-@snippet Samples/Terrain/include/Terrain.h define_loop
+@snippet Samples/Simple/include/Terrain.h define_loop
 
 We are only using a single terrain, so the method will only be called once. The for loops are just for demonstration in our case. Again, we will fill in the `defineTerrain` method soon.
 
 We will now initialize the blend maps for our terrain.
 
-@snippet Samples/Terrain/include/Terrain.h init_blend
+@snippet Samples/Simple/include/Terrain.h init_blend
 
 We get a TerrainIterator from our TerrainGroup and then loop through any Terrain elements and initialize their blend maps - `initBlendMaps` will also be written soon. The `mTerrainsImported` variable will be set during the `configureTerrainDefaults` function when we complete it.
 
 The last thing we will do is make sure to cleanup any temporary resources that were created while configuring our terrain.
 
-That completes our `createScene` method. Now we just have to complete all of the methods we jumped over.
+That completes our `setupContent` method. Now we just have to complete all of the methods we jumped over.
 ## Terrain appearance {#bt3Appearance}
-The Ogre Terrain component has a large number of options that can be set to change how the terrain is rendered. To start out, we configure the level of detail as:
+The %Ogre Terrain component has a large number of options that can be set to change how the terrain is rendered. To start out, we configure the level of detail (LOD). There are two LOD approaches in the Terrain component, one controlling the geometry and the other controlling the texture.
 
-@snippet Samples/Terrain/include/Terrain.h configure_lod
+@snippet Samples/Simple/include/Terrain.h configure_lod
 
-We are setting two global options here. The first call sets the largest error in pixels allowed between our ideal terrain and the mesh that is created to render it. A smaller number will mean a more accurate terrain, because it will require more vertices to reduce the error. The second call determines the distance at which Ogre will still apply our lightmap. If you increase this, then you will see Ogre apply lighting effects out to a farther distance.
+The first call sets the largest allowed error for geometry. It controls the distance in pixels allowed between our ideal terrain and the mesh that is created to render it. A smaller number will mean a more accurate terrain, because it will require more vertices to reduce the error.
 
-The next thing we'll do is pass our lighting information to our terrain.
+The second call determines the distance at which %Ogre will reduce the texture resolution. For this, %Ogre automatically creates a composite map, where the terrain textures, the blending textures and lighting information are "baked" together at a lower resolution. This way only a single texture lookup is needed when using the low LOD setting.
+If you increase the distance, then %Ogre will use the high LOD setting out to a farther distance, where it computes all lighting effects per-pixel.
 
-@snippet Samples/Terrain/include/Terrain.h composite_lighting
+In order to generate composite map correctly, we have to pass our lighting information to the terrain.
 
-In the first call, we are sure to call `getDerivedDirection`, because this will apply any transforms that are applied to our Light's direction by any SceneNode it may be attached to. Since our Light is attached to the root Node, this will be the same as calling `getDirection`, but the difference is important to know about. The next two calls should be pretty self-explanatory. We simply set the ambient light and diffuse color for our terrain to match our scene lighting.
+@snippet Samples/Simple/include/Terrain.h composite_lighting
+
+In the first call, `getDerivedDirection` will apply all transforms by the parent SceneNodes to our Light's direction. The next two calls should be pretty self-explanatory. We simply set the ambient light and diffuse color for our terrain to match our scene lighting.
 
 The next thing we do is get a reference to the import settings of our TerrainGroup and set some basic values.
 
-@snippet Samples/Terrain/include/Terrain.h import_settings
+@snippet Samples/Simple/include/Terrain.h import_settings
 
-We are not going to cover the exact meaning of these options in this tutorial, but you may have noticed that `terrainSize` and `worldSize` are set to match the global options we set in `createScene`. The `inputScale` determines how the heightmap image will be scaled up for the scene. We are using a somewhat large scale because our heightmap image has limited precision. You can use floating point raw heightmaps to avoid applying any input scaling, but these images usually require some data compression.
+We are not going to cover the exact meaning of these options in this tutorial. The `inputScale` determines how the heightmap image will be scaled up for the scene. We are using a somewhat large scale because our heightmap image is a 8bit grayscale bitmap, that is  normalised to the `[0; 1]` range on loading. You can use floating point raw heightmaps to avoid applying any input scaling and gain a higher precision, but such images require more storage and are not supported by common image viewers.
 
 The last step is adding the textures our terrain will use. First, we resize the list to hold three textures.
 After that, we set each texture's `worldSize` and add them to the list.
 
-@snippet Samples/Terrain/include/Terrain.h textures
+@snippet Samples/Simple/include/Terrain.h textures
 
 The texture's `worldSize` determines how big each splat of texture is going to be when applied to the terrain. A smaller value will increase the resolution of the rendered texture layer because each piece will be stretched less to fill in the terrain.
 
-The default material generator requires two textures per layer:
-1. a diffuse specular texture and
-2. a heightmap texture.
+The default material generator requires two textures maps per layer:
+1. one containing diffuse + specular data and
+2. another containing normal + displacement data.
 
-The textures used in the tutorial reside in the Samples directory of your SDK or source distribution. As of this writing, they are included in this directory: `Samples/Media/materials/textures/nvidia/`.
-Remember that Ogre will not automatically search subdirectories when loading resources, so you will have to add a line to your `resources.cfg` file telling it to include the nvidia directory, and, of course, you'll have to copy the actual textures into your project's media folder.
+It is recommended that you pre-merge your textures accordingly e.g. using [ImageMagick](https://imagemagick.org/). This way you save storage space and speed up loading.
+However if you want more flexibility, you can also make %Ogre combine the images at loading accordingly as shown below
+
+@snippet Samples/Simple/include/Terrain.h tex_from_src
 
 ## Defining a terrain chunk {#bt3TerrainChunk}
 Now we will tackle our `defineTerrain` method. The first thing we do is ask the TerrainGroup to define a unique filename for this Terrain.
 If it has already been generated, then we can call `TerrainGroup::defineTerrain` method to set up this grid location with the previously generated filename automatically. If it has not been generated, then we generate an image with `getTerrainImage` and then call a different overload of `TerrainGroup::defineTerrain` that takes a reference to our generated image. Finally, we set the `mTerrainsImported` flag to true.
 
-@snippet Samples/Terrain/include/Terrain.h define
+@snippet Samples/Simple/include/Terrain.h define
 
 You might have to look at this method for a little while to fully understand it. Make sure you notice that there are ''three'' different `defineTerrain` methods in use. One of them from TutorialApplication and two of them from TerrainGroup.
 ## Loading a heightmap {#bt3Heightmap}
 We need to write the helper function that was used by `defineTerrain` in the last step. This will load our `terrain.png` heightmap. Make sure it has been added to one of your resource loading paths. It is also included in the Ogre Samples directory.
 
-@snippet Samples/Terrain/include/Terrain.h heightmap
+@snippet Samples/Simple/include/Terrain.h heightmap
 
 Flipping is used to create seamless terrain so that unlimited terrain can be created using a single heightmap. If your terrain's heightmap is already seamless, then you don't need to use this trick. In our case, the flipping code is also useless, because we are using a 1x1 TerrainGroup. Flipping a 1x1 tile doesn't change anything. It is just for demonstration.
 ## Height based blending {#bt3Blendmap}
-Finally, we will finish up our configuration methods by completing the `initBlendMaps` method. This method will blend together the different layers we defined in `configureTerrainDefaults`. For now, you should pretty much view this method as a magic. The details will not be covered in this tutorial. Basically, the method blends the textures based on the height of the terrain at that point. This is not the only way of doing blending. It's a complicated topic and sits right at the verge between Ogre and the things it tries to abstract away.
+Finally, we will finish up our configuration methods by completing the `initBlendMaps` method. This method sets up [texture-splatting](https://en.wikipedia.org/wiki/Texture_splatting) for the different layers we defined in `configureTerrainDefaults`. For now, you should pretty much view this method as a magic. The details will not be covered in this tutorial. Basically, the method blends the textures based on the height of the terrain at that point. This is not the only way of doing blending. It's a complicated topic and sits right at the verge between Ogre and the things it tries to abstract away.
 
-@snippet Samples/Terrain/include/Terrain.h blendmap
+@snippet Samples/Simple/include/Terrain.h blendmap
 
 ## Terrain Loading Label {#bt3LoadingLabel}
 
@@ -125,17 +131,17 @@ There are a number of things we will improve. We will add a label to the overlay
 
 First, we need to add a data member to private section of our Sample_Terrain header.
 
-@snippet Samples/Terrain/include/Terrain.h infolabel
+@snippet Samples/Simple/include/Terrain.h infolabel
 
 Let's construct this label in the `createFrameListener` method.
 
-@snippet Samples/Terrain/include/Terrain.h infolabel_create
+@snippet Samples/Simple/include/Terrain.h infolabel_create
 
 We use the TrayManager pointer that was defined in SdkSample to request the creation of a new label. This method takes a TrayLocation, a name for the label, a caption to display, and a width.
 
 Next we will add logic to `frameRenderingQueued` that tracks whether the terrain is still loading or not. We will also take care of saving our terrain after it has been loaded. Add the following to `frameRenderingQueued` right after the call to the parent method:
 
-@snippet Samples/Terrain/include/Terrain.h loading_label
+@snippet Samples/Simple/include/Terrain.h loading_label
 
 The first thing we do is determine if our terrain is still being built. If it is, then we add our Label to the tray and ask for it to be shown. Then we check to see if any new terrains have been imported. If they have, then we display text saying that the terrain is still being built. Otherwise we assume the textures are being updated.
 
@@ -149,10 +155,10 @@ Compile and run your application again. You should now see a Label at the top of
 ## SkyBoxes
 A SkyBox is basically a huge textured cube that surrounds all of the objects in your scene. It is one of the methods for simulating a sky. We will need six textures to cover all of the interior faces of the SkyBox.
 
-It is very easy to include a SkyBox in your scene. Add the following to the end of `createScene`:
-```cpp
-mSceneMgr->setSkyBox(true, "Examples/SpaceSkyBox");
-```
+It is very easy to include a SkyBox in your scene. Add the following to the end of `setupContent`:
+
+@snippet Samples/Simple/include/Terrain.h skybox
+
 Compile and run your application. That's all there is to it. The SkyBox will look really grainy because we are using a rather low resolution collection of textures.
 
 The first parameter of this method determines whether or not to immediately enable the SkyBox. If you want to later disable the SkyBox you can call `mSceneMgr->setSkyBox(false, "")`. This disables the SkyBox.
@@ -165,7 +171,7 @@ Compile and run your application. Nothing has changed. This is because the fourt
 ```cpp
 mSceneMgr->setSkyBox(true, "Examples/SpaceSkyBox", 300, false);
 ```
-Compile and run your application again. This time you should definitely see something different. Only a small patch of terrain should exist below the camera. Move around and notice what is happening. The SkyBox is being rendered only 300 pixels away from the Camera and it is no longer being rendered before everything else. This means the SkyBox is drawn over terrain that is farther than 300 units away from the Camera.
+Compile and run your application again. This time you should definitely see something different. Only a small patch of terrain should exist below the camera. Move around and notice what is happening. The SkyBox is being rendered only 300 units away from the Camera and it is no longer being rendered before everything else. This means the SkyBox is drawn over terrain that is farther than 300 units away from the Camera.
 
 You can get a modest performance boost by not rendering the SkyBox first, but as you can see, you'll need to make sure not to cause strange problems like this when doing it. For the most part, leaving these additional parameters at their defaults is good enough. Although you may want to purposely use this strange culling behavior in your application. Try not to get to locked into how things are "supposed to work". If something catches your eye, then play around with it.
 ## SkyDomes
@@ -210,7 +216,7 @@ There are two basic types of fog in Ogre: linear and exponential. The difference
 ![](bt3_linear_exp_visual.png)
 
 ## Adding Fog to Our Scene
-We will first add linear fog to our scene. We need to make sure to set our Viewport's background color to our desired fog color. Add the following to `createScene` right ''before'' our code for setting up the terrain:
+We will first add linear fog to our scene. We need to make sure to set our Viewport's background color to our desired fog color. Add the following to `setupContent` right before our code for setting up the terrain:
 ```cpp
 Ogre::ColourValue fadeColour(0.9, 0.9, 0.9);
 mWindow->getViewport(0)->setBackgroundColour(fadeColour);
@@ -218,9 +224,9 @@ mWindow->getViewport(0)->setBackgroundColour(fadeColour);
 Make sure you add this before the terrain code otherwise it won't work. If you were using more than one Viewport, then you may have to iterate through them all by using Ogre::RenderTarget::getNumViewports.
 
 Now we can create the fog.
-```cpp
-mSceneMgr->setFog(Ogre::FOG_LINEAR, fadeColour, 0, 600, 900);
-```
+
+@snippet Samples/Simple/include/Terrain.h linear_fog
+
 The first parameter is the fog type. The second parameter is the color we used to set our Viewport's background color. The third parameter is not used for linear fog. The fourth and fifth parameters specify the beginning and the end of the range for the fog. In our example, the fog will begin at 600 units out from the Camera, and it will end at 900 units. The reason this is called linear fog is because the thickness increases between these two values in a linear fashion. Compile and run your application.
 
 The next type of fog is exponential fog. Like the picture suggests, exponential fog grows slowly at first and then gets dense very quickly. We do not set a range for this fog, instead we simply supply a desired density.

@@ -1,9 +1,7 @@
-/*
- * Input.h
- *
- *  Created on: 05.12.2015
- *      Author: pavel
- */
+// This file is part of the OGRE project.
+// It is subject to the license terms in the LICENSE file found in the top-level directory
+// of this distribution and at https://www.ogre3d.org/licensing.
+// SPDX-License-Identifier: MIT
 
 #ifndef SAMPLES_COMMON_INCLUDE_INPUT_H_
 #define SAMPLES_COMMON_INCLUDE_INPUT_H_
@@ -15,14 +13,18 @@ namespace Ogre {
     struct FrameEvent;
 }
 
+namespace OgreBites {
+
 /** \addtogroup Optional
 *  @{
 */
 /** \addtogroup Bites
 *  @{
 */
-namespace OgreBites {
-
+/** @defgroup Input Input
+ * SDL2 inspired input abstraction layer providing basic events
+ * @{
+ */
 enum ButtonType {
     BUTTON_LEFT = 1,
     BUTTON_MIDDLE,
@@ -40,6 +42,10 @@ enum EventType {
     FINGERUP,
     FINGERMOTION,
     TEXTINPUT,
+    CONTROLLERAXISMOTION,
+    CONTROLLERBUTTONDOWN,
+    CONTROLLERBUTTONUP,
+    JOYAXISMOTION
 };
 
 typedef int Keycode;
@@ -80,6 +86,17 @@ struct TextInputEvent {
     int type;
     const char* chars;
 };
+struct AxisEvent {
+    int type;
+    int which;
+    unsigned char axis;
+    short value;
+};
+struct ButtonEvent {
+    int type;
+    int which;
+    unsigned char button;
+};
 
 union Event
 {
@@ -90,6 +107,8 @@ union Event
     MouseMotionEvent motion;
     TouchFingerEvent tfinger;
     TextInputEvent text;
+    AxisEvent axis;
+    ButtonEvent cbutton;
 };
 
 // SDL compat
@@ -165,6 +184,9 @@ struct _OgreBitesExport InputListener {
     virtual bool mousePressed(const MouseButtonEvent& evt) { return false; }
     virtual bool mouseReleased(const MouseButtonEvent& evt) { return false; }
     virtual bool textInput(const TextInputEvent& evt) { return false; }
+    virtual bool axisMoved(const AxisEvent& evt) { return false; }
+    virtual bool buttonPressed(const ButtonEvent& evt) { return false; }
+    virtual bool buttonReleased(const ButtonEvent& evt) { return false; }
 };
 
 /**
@@ -181,7 +203,7 @@ public:
     InputListenerChain() {}
     InputListenerChain(std::vector<InputListener*> chain) : mListenerChain(chain) {}
 
-    InputListenerChain& operator=(InputListenerChain o)
+    InputListenerChain& operator=(const InputListenerChain& o)
     {
         mListenerChain = o.mListenerChain;
         return *this;
@@ -278,8 +300,9 @@ public:
         return false;
     }
 };
+/** @} */
+/** @} */
+/** @} */
 }
-/** @} */
-/** @} */
 
 #endif /* SAMPLES_COMMON_INCLUDE_INPUT_H_ */

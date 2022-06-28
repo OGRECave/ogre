@@ -29,20 +29,15 @@ THE SOFTWARE.
 #ifndef __VTestPlugin_H__
 #define __VTestPlugin_H__
 
-#include "SdkSample.h"
 #include "SamplePlugin.h"
 
-typedef std::map<std::string, OgreBites::SamplePlugin *> TestPluginMap;
-
 /** Plugin class for visual tests */
-class _OgreSampleClassExport VTestPlugin : public OgreBites::SamplePlugin
+class _OgreSampleExport VTestPlugin : public OgreBites::SamplePlugin
 {
 public:
 
     VTestPlugin();
     ~VTestPlugin();
-protected:
-    TestPluginMap mPluginNameMap;                      // A structure to map plugin names to class types
 };
 
 #endif

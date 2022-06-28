@@ -29,11 +29,12 @@ THE SOFTWARE.
 #define __CompositionTargetPass_H__
 
 #include "OgrePrerequisites.h"
-#include "OgreIteratorWrappers.h"
 #include "OgreHeaderPrefix.h"
 #include "OgreCompositionPass.h"
 
 namespace Ogre {
+    template <typename T> class VectorIterator;
+
     /** \addtogroup Core
     *  @{
     */
@@ -69,7 +70,11 @@ namespace Ogre {
         void setOutputName(const String &out);
         /** Get output local texture name */
         const String &getOutputName() const;
-        
+
+        /// sets the slice of output texture
+        void setOutputSlice(int slice) { mOutputSlice = slice; }
+        int getOutputSlice() const { return mOutputSlice; }
+
         /** Set "only initial" flag. This makes that this target pass is only executed initially 
             after the effect has been enabled.
         */
@@ -86,14 +91,14 @@ namespace Ogre {
         uint32 getVisibilityMask();
 
         /** Set the material scheme used by this target pass.
-        @remarks
+
             Only applicable to targets that render the scene as
             one of their passes.
             @see Technique::setScheme.
         */
         void setMaterialScheme(const String& schemeName);
         /** Get the material scheme used by this target pass.
-        @remarks
+
             Only applicable to targets that render the scene as
             one of their passes.
             @see Technique::setScheme.
@@ -101,13 +106,13 @@ namespace Ogre {
         const String& getMaterialScheme(void) const;
         
         /** Set whether shadows are enabled in this target pass.
-        @remarks
+
             Only applicable to targets that render the scene as
             one of their passes.
         */
         void setShadowsEnabled(bool enabled);
         /** Get whether shadows are enabled in this target pass.
-        @remarks
+
             Only applicable to targets that render the scene as
             one of their passes.
         */
@@ -119,21 +124,18 @@ namespace Ogre {
         /** Get the scene LOD bias used by this pass 
         */
         float getLodBias();
-        
+
         /** Create a new pass, and return a pointer to it.
         */
         CompositionPass *createPass(CompositionPass::PassType type = CompositionPass::PT_RENDERQUAD);
         /** Remove a pass. It will also be destroyed.
         */
         void removePass(size_t idx);
-        /** Get a pass.
-        @deprecated use getPasses()
-        */
-        OGRE_DEPRECATED CompositionPass *getPass(size_t idx);
+        /** Get a pass.*/
+        CompositionPass *getPass(size_t idx) const { return mPasses.at(idx); }
         /** Get the number of passes.
-        @deprecated use getPasses()
         */
-        OGRE_DEPRECATED size_t getNumPasses();
+        size_t getNumPasses() const { return mPasses.size(); }
         
         /// Get the Passes in this TargetPass
         const Passes& getPasses() const {
@@ -175,6 +177,8 @@ namespace Ogre {
         String mMaterialScheme;
         /// Shadows option
         bool mShadowsEnabled;
+        /// Output Slice
+        int mOutputSlice;
     };
 
     /** @} */

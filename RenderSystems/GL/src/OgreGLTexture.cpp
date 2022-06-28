@@ -45,15 +45,6 @@ THE SOFTWARE.
 #include "OgreGLFBORenderTexture.h"
 #include "OgreGLStateCacheManager.h"
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-#  define WIN32_LEAN_AND_MEAN
-#  if !defined(NOMINMAX) && defined(_MSC_VER)
-#   define NOMINMAX // required to stop windows.h messing up std::min
-#  endif
-#  include <windows.h>
-#  include <wingdi.h>
-#endif
-
 namespace Ogre {
 
 
@@ -103,18 +94,8 @@ namespace Ogre {
     //* Creation / loading methods ********************************************
     void GLTexture::createInternalResourcesImpl(void)
     {
-        if (!GLEW_VERSION_2_0 && mTextureType == TEX_TYPE_2D_ARRAY)
-            OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, 
-                "2D texture arrays not supported before OpenGL 2.0", 
-                "GLTexture::createInternalResourcesImpl");
-
-        if (mTextureType == TEX_TYPE_EXTERNAL_OES) {
-            OGRE_EXCEPT(
-                Exception::ERR_RENDERINGAPI_ERROR,
-                "TEX_TYPE_EXTERNAL_OES is not available for openGL",
-                "GLTexture::createInternalResourcesImpl"
-            );
-        }
+        OgreAssert(mTextureType != TEX_TYPE_EXTERNAL_OES,
+                   "TEX_TYPE_EXTERNAL_OES is not available for openGL");
 
         // Convert to nearest power-of-two size if required
         mWidth = GLPixelUtil::optionalPO2(mWidth);      
@@ -124,12 +105,6 @@ namespace Ogre {
 
         // Adjust format if required
         mFormat = TextureManager::getSingleton().getNativeFormat(mTextureType, mFormat, mUsage);
-        
-        // Check requested number of mipmaps
-        uint32 maxMips = getMaxMipmaps();
-        mNumMipmaps = mNumRequestedMipmaps;
-        if(mNumMipmaps>maxMips)
-            mNumMipmaps = maxMips;
 
         // Check if we can do HW mipmap generation
         mMipmapsHardwareGenerated = true;
@@ -144,7 +119,7 @@ namespace Ogre {
         mRenderSystem->_getStateCacheManager()->setTexParameteri(getGLTextureTarget(), GL_TEXTURE_MAX_LEVEL,
                                                                  mNumMipmaps);
 
-        if ((mUsage & TU_AUTOMIPMAP) && mNumRequestedMipmaps)
+        if ((mUsage & TU_AUTOMIPMAP) && mNumMipmaps)
         {
             mRenderSystem->_getStateCacheManager()->setTexParameteri( getGLTextureTarget(), GL_GENERATE_MIPMAP, GL_TRUE );
         }
@@ -196,8 +171,6 @@ namespace Ogre {
                                 size, &tmpdata[0]);
                         }
                         break;
-                    case TEX_TYPE_2D_RECT:
-                        break;
                     case TEX_TYPE_EXTERNAL_OES:
                         OGRE_EXCEPT(
                             Exception::ERR_RENDERINGAPI_ERROR,
@@ -246,8 +219,6 @@ namespace Ogre {
                                 format, datatype, 0);
                         }
                         break;
-                    case TEX_TYPE_2D_RECT:
-                        break;
                     case TEX_TYPE_EXTERNAL_OES:
                         OGRE_EXCEPT(
                             Exception::ERR_RENDERINGAPI_ERROR,
@@ -295,9 +266,8 @@ namespace Ogre {
 
             for(uint32 mip=0; mip<=getNumMipmaps(); mip++)
             {
-                GLHardwarePixelBuffer* buf =
-                    new GLTextureBuffer(mRenderSystem, this, face, mip, width, height, depth);
-                mSurfaceList.push_back(HardwarePixelBufferSharedPtr(buf));
+                auto buf = std::make_shared<GLTextureBuffer>(mRenderSystem, this, face, mip, width, height, depth);
+                mSurfaceList.push_back(buf);
                 
                 if (width > 1)
                     width = width / 2;

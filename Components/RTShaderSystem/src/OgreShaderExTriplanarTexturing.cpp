@@ -27,6 +27,8 @@ THE SOFTWARE.
 #include "OgreShaderPrecompiledHeaders.h"
 #ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
 
+#define SGX_FUNC_TRIPLANAR_TEXTURING "SGX_TriplanarTexturing"
+
 namespace Ogre {
 namespace RTShader {
 
@@ -59,15 +61,15 @@ namespace RTShader {
 		mVSOutPosition = vsMain->resolveOutputParameter(Parameter::SPS_TEXTURE_COORDINATES, -1, Parameter::SPC_POSITION_OBJECT_SPACE, GCT_FLOAT4);
 		mPSInPosition = psMain->resolveInputParameter(mVSOutPosition);
 
-		mSamplerFromX = psProgram->resolveParameter(GCT_SAMPLER2D, mTextureSamplerIndexFromX, (uint16)GPV_GLOBAL, "tp_sampler_from_x");
+		mSamplerFromX = psProgram->resolveParameter(GCT_SAMPLER2D, "tp_sampler_from_x", mTextureSamplerIndexFromX);
 		if (mSamplerFromX.get() == NULL)
 			return false;
 
-		mSamplerFromY = psProgram->resolveParameter(GCT_SAMPLER2D, mTextureSamplerIndexFromY, (uint16)GPV_GLOBAL, "tp_sampler_from_y");
+		mSamplerFromY = psProgram->resolveParameter(GCT_SAMPLER2D, "tp_sampler_from_y", mTextureSamplerIndexFromY);
 		if (mSamplerFromY.get() == NULL)
 			return false;
 
-		mSamplerFromZ = psProgram->resolveParameter(GCT_SAMPLER2D, mTextureSamplerIndexFromZ, (uint16)GPV_GLOBAL, "tp_sampler_from_z");
+		mSamplerFromZ = psProgram->resolveParameter(GCT_SAMPLER2D, "tp_sampler_from_z", mTextureSamplerIndexFromZ);
 		if (mSamplerFromZ.get() == NULL)
 			return false;
 
@@ -75,7 +77,7 @@ namespace RTShader {
         if (mPSOutDiffuse.get() == NULL)    
             return false;
     
-        mPSTPParams = psProgram->resolveParameter(GCT_FLOAT3, -1, (uint16)GPV_GLOBAL, "gTPParams");
+        mPSTPParams = psProgram->resolveParameter(GCT_FLOAT3, "gTPParams");
         if (mPSTPParams.get() == NULL)
             return false;
         return true;
@@ -105,7 +107,7 @@ namespace RTShader {
         vsStage.assign(mVSInPosition, mVSOutPosition);
 
         psMain->getStage(FFP_PS_TEXTURING)
-            .callFunction(SGX_FUNC_TRIPLANAR_TEXTURING,
+            .callFunction("SGX_TriplanarTexturing",
                           {In(mPSInDiffuse), In(mPSInNormal), In(mPSInPosition), In(mSamplerFromX),
                            In(mSamplerFromY), In(mSamplerFromZ), In(mPSTPParams), Out(mPSOutDiffuse)});
 
@@ -151,9 +153,6 @@ namespace RTShader {
     
         mPSOutDiffuse = rhsTP.mPSOutDiffuse;
         mPSInDiffuse = rhsTP.mPSInDiffuse;
-
-        mVSInPosition = rhsTP.mVSInPosition;
-        mVSOutPosition = rhsTP.mVSOutPosition;
 
         mVSOutNormal = rhsTP.mVSOutNormal;
         mVSInNormal = rhsTP.mVSInNormal;

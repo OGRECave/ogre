@@ -24,30 +24,6 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
-OgrePCZFrustum.h  -  PCZ Supplemental Culling Frustum
-
-This isn't really a traditional "frustum", but more a collection of
-extra culling planes used by the PCZ Scene Manager for supplementing
-the camera culling and light zone culling by creating extra culling
-planes from visible portals.  Since portals are 4 sided, the extra 
-culling planes tend to form frustums (pyramids) but nothing in the 
-code really assumes that the culling planes are frustums.  They are
-just treated as planes.  
-
-The "originPlane" is a culling plane which passes through the origin
-point specified.  It is used to cull portals which are close to, but
-behind the camera view.  (the nature of the culling routine doesn't
-give correct results if you just use the "near" plane of the standard
-camera frustum (unless that near plane distance is 0.0, but that is
-highly not recommended for other reasons having to do with having a 
-legal view frustum).
----------------------------------------------------------------------------
-begin                : Mon May 29 2007
-author               : Eric Cha
-email                : ericc@xenopi.com
-Code Style Update    :
-
----------------------------------------------------------------------------
 */
 
 #ifndef PCZ_FRUSTUM_H
@@ -58,14 +34,35 @@ Code Style Update    :
 
 namespace Ogre
 {
+    /** \addtogroup Plugins
+    *  @{
+    */
+    /** \addtogroup PCZSceneManager
+    *  @{
+    */
     class PortalBase;
     class PCPlane;
 
     typedef std::list< PCPlane * > PCPlaneList;
 
     /** Specialized frustum shaped culling volume that has culling planes created from portals 
+
+        This isn't really a traditional "frustum", but more a collection of
+        extra culling planes used by the PCZ Scene Manager for supplementing
+        the camera culling and light zone culling by creating extra culling
+        planes from visible portals.  Since portals are 4 sided, the extra
+        culling planes tend to form frustums (pyramids) but nothing in the
+        code really assumes that the culling planes are frustums.  They are
+        just treated as planes.
+
+        The "originPlane" is a culling plane which passes through the origin
+        point specified.  It is used to cull portals which are close to, but
+        behind the camera view.  (the nature of the culling routine doesn't
+        give correct results if you just use the "near" plane of the standard
+        camera frustum (unless that near plane distance is 0.0, but that is
+        highly not recommended for other reasons having to do with having a
+        legal view frustum).
     */
-    
     class _OgrePCZPluginExport PCZFrustum 
     {
     public:
@@ -129,7 +126,8 @@ namespace Ogre
         ProjectionType mProjType;
 
     };
-
+    /** @} */
+    /** @} */
 }
 
 

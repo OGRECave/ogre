@@ -68,7 +68,7 @@ public:
     @param size number of elements in the parameter.    
     @return parameter instance in case of that resolve operation succeeded.  
     */
-    UniformParameterPtr resolveAutoParameterReal(GpuProgramParameters::AutoConstantType autoType, GpuConstantType type, Real data, size_t size = 0);
+    UniformParameterPtr resolveAutoParameterReal(GpuProgramParameters::AutoConstantType autoType, GpuConstantType type, float data, size_t size = 0);
 
     /** Resolve uniform auto constant parameter with associated int data of this program.
     @param autoType The auto type of the desired parameter.
@@ -77,7 +77,7 @@ public:
     @param size number of elements in the parameter.
     @return parameter instance in case of that resolve operation succeeded.  
     */
-    UniformParameterPtr resolveAutoParameterInt(GpuProgramParameters::AutoConstantType autoType, GpuConstantType type, size_t data, size_t size = 0);
+    UniformParameterPtr resolveAutoParameterInt(GpuProgramParameters::AutoConstantType autoType, GpuConstantType type, uint32 data, size_t size = 0);
 
     /** Resolve uniform parameter of this program.
     @param type The type of the desired parameter.
@@ -90,12 +90,18 @@ public:
     */
     UniformParameterPtr resolveParameter(GpuConstantType type, int index, uint16 variability, const String& suggestedName, size_t size = 0);
     
+    /// @overload
+    UniformParameterPtr resolveParameter(GpuConstantType type, const String& name, int index = -1)
+    {
+        return resolveParameter(type, index, GPV_GLOBAL, name);
+    }
+
     /** Resolve uniform auto constant parameter
     @param autoType The auto type of the desired parameter
     @param data The data to associate with the auto parameter. 
     @return parameter instance in case of that resolve operation succeeded.  
     */
-    UniformParameterPtr resolveParameter(GpuProgramParameters::AutoConstantType autoType, size_t data = 0);
+    UniformParameterPtr resolveParameter(GpuProgramParameters::AutoConstantType autoType, uint32 data = 0);
 
     /** Get parameter by a given name.  
     @param name The name of the parameter to search for.
@@ -119,18 +125,6 @@ public:
     /** Get the list of uniform parameters of this program.
     */
     const UniformParameterList& getParameters() const { return mParameters; };
-
-    /// @deprecated do not use
-    OGRE_DEPRECATED Function* createFunction(const String& name, const String& desc, const Function::FunctionType functionType);
-
-    /// @deprecated do not use
-    Function* getFunctionByName(const String& name);
-
-    /// @deprecated do not use
-    const ShaderFunctionList& getFunctions() const { return mFunctions; };
-
-    /// @deprecated do not use
-    OGRE_DEPRECATED void setEntryPointFunction(Function* function) { mEntryPointFunction = function; }
 
     /// @deprecated use getMain()
     Function* getEntryPointFunction()                    { return mEntryPointFunction; }
@@ -164,7 +158,7 @@ public:
     bool getSkeletalAnimationIncluded() const { return mSkeletalAnimation; }
 
     /** Tells Ogre whether auto-bound matrices should be sent in column or row-major order.
-    @remarks
+
         This method has the same effect as column_major_matrices option used when declaring manually written hlsl program.
         You want to use this method only when you use float3x4 type in a shader, e.g. for bone matrices.
         In mentioned case you should call this method with false as parameter.
@@ -189,7 +183,7 @@ public:
     /** Class destructor */
     ~Program();
 // Protected methods.
-protected:
+private:
 
     /** Class constructor.
     @param type The type of this program.
@@ -199,22 +193,16 @@ protected:
     /** Destroy all parameters of this program. */
     void destroyParameters();
 
-    /** Destroy all functions of this program. */
-    void destroyFunctions();
-
     /** Add parameter to this program. */
     void addParameter(UniformParameterPtr parameter);
         
     /** Remove parameter from this program. */
     void removeParameter(UniformParameterPtr parameter);
-// Attributes.
-protected:
+
     // Program type. (Vertex, Fragment, Geometry).
     GpuProgramType mType;
     // Program uniform parameters.  
     UniformParameterList mParameters;
-    // Function list.
-    ShaderFunctionList mFunctions;
     // Entry point function for this program.   
     Function* mEntryPointFunction;
     // Program dependencies.
@@ -225,7 +213,6 @@ protected:
     bool mSkeletalAnimation;
     // Whether to pass matrices as column-major.
     bool mColumnMajorMatrices;
-private:
     friend class TargetRenderState;
 };
 

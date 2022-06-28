@@ -37,6 +37,7 @@ namespace Ogre {
     /** Utility function, checks Cg for errors, throw exception if detected.
     @param ogreMethod Ogre method name, as Class::method
     @param errorTextPrefix The text to prefix the Cg error text with
+    @param context
     */
     void checkForCgError(const String& ogreMethod, const String& errorTextPrefix, CGcontext context);
 

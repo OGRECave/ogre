@@ -35,7 +35,7 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-    typedef unsigned long long int ResourceHandle;
+    typedef size_t ResourceHandle;
 
 
     // Forward declaration
@@ -74,7 +74,7 @@ namespace Ogre {
             virtual ~Listener() {}
 
             /** Called whenever the resource finishes loading. 
-            @remarks
+
                 If a Resource has been marked as background loaded (@see Resource::setBackgroundLoaded), 
                 the call does not itself occur in the thread which is doing the loading;
                 when loading is complete a response indicator is placed with the
@@ -85,7 +85,7 @@ namespace Ogre {
 
 
             /** Called whenever the resource finishes preparing (paging into memory).
-            @remarks
+
                 If a Resource has been marked as background loaded (@see Resource::setBackgroundLoaded)
                 the call does not itself occur in the thread which is doing the preparing;
                 when preparing is complete a response indicator is placed with the
@@ -122,7 +122,7 @@ namespace Ogre {
             LF_DEFAULT = 0,
             /// Process non-reloadable resources too.
             LF_INCLUDE_NON_RELOADABLE = 1,
-            /// Process only resources which are not referenced by any other object. Usefull to reduce resource consumption.
+            /// Process only resources which are not referenced by any other object. Useful to reduce resource consumption.
             LF_ONLY_UNREFERENCED = 2,
             /// Combination of LF_ONLY_UNREFERENCED and LF_INCLUDE_NON_RELOADABLE
             LF_ONLY_UNREFERENCED_INCLUDE_NON_RELOADABLE = 3,
@@ -151,13 +151,14 @@ namespace Ogre {
         String mOrigin;
         /// Optional manual loader; if provided, data is loaded from here instead of a file
         ManualResourceLoader* mLoader;
+    private:
         /// State count, the number of times this resource has changed state
         size_t mStateCount;
 
         typedef std::set<Listener*> ListenerList;
         ListenerList mListenerList;
         OGRE_MUTEX(mListenerListMutex);
-
+    protected:
         /** Protected unnamed constructor to prevent default construction. 
         */
         Resource() 
@@ -165,6 +166,9 @@ namespace Ogre {
               mIsBackgroundLoaded(0), mIsManual(0), mSize(0), mLoader(0), mStateCount(0)
         { 
         }
+
+        /// protected assignment as this is merely abstract
+        Resource& operator=(const Resource& rhs);
 
         /** Internal hook to perform actions before the load process, but
             after the resource has been marked as 'loading'.
@@ -191,12 +195,12 @@ namespace Ogre {
         */
         virtual void postUnloadImpl(void) {}
 
-        /** Internal implementation of the meat of the 'prepare' action. 
+        /** Internal implementation of the meat of the 'prepare' action, only called if this
+            resource is not being loaded from a ManualResourceLoader.
         */
         virtual void prepareImpl(void) {}
-        /** Internal function for undoing the 'prepare' action.  Called when
-            the load is completed, and when resources are unloaded when they
-            are prepared but not yet loaded.
+        /** Internal function for undoing the 'prepare' action. Only called during
+            unload if this resource is prepared but not yet loaded.
         */
         virtual void unprepareImpl(void) {}
         /** Internal implementation of the meat of the 'load' action, only called if this 
@@ -208,6 +212,8 @@ namespace Ogre {
         */
         virtual void unloadImpl(void) = 0;
 
+        /** Calculate the size of a resource; this will only be called after 'load' */
+        virtual size_t calculateSize(void) const;
     public:
         /** Standard constructor.
         @param creator Pointer to the ResourceManager that is creating this resource
@@ -251,7 +257,7 @@ namespace Ogre {
         virtual void prepare(bool backgroundThread = false);
 
      /** Loads the resource, if it is not already.
-        @remarks
+
             If the resource is loaded from a file, loading is automatic. If not,
             if for example this resource gained it's data from procedural calls
             rather than loading from a file, then this resource will not reload 
@@ -263,7 +269,7 @@ namespace Ogre {
         virtual void load(bool backgroundThread = false);
 
         /** Reloads the resource, if it is already loaded.
-        @remarks
+
             Calls unload() and then load() again, if the resource is already
             loaded. If it is not loaded already, then nothing happens.
         */
@@ -271,14 +277,14 @@ namespace Ogre {
 
         /** Returns true if the Resource is reloadable, false otherwise.
         */
-        virtual bool isReloadable(void) const
+        bool isReloadable(void) const
         {
             return !mIsManual || mLoader;
         }
 
         /** Is this resource manually loaded?
         */
-        virtual bool isManuallyLoaded(void) const
+        bool isManuallyLoaded(void) const
         {
             return mIsManual;
         }
@@ -290,7 +296,7 @@ namespace Ogre {
 
         /** Retrieves info about the size of the resource.
         */
-        virtual size_t getSize(void) const
+        size_t getSize(void) const
         { 
             return mSize; 
         }
@@ -301,19 +307,13 @@ namespace Ogre {
 
         /** Gets resource name.
         */
-        virtual const String& getName(void) const 
-        { 
-            return mName; 
-        }
+        const String& getName(void) const { return mName; }
 
-        virtual ResourceHandle getHandle(void) const
-        {
-            return mHandle;
-        }
+        ResourceHandle getHandle(void) const { return mHandle; }
 
         /** Returns true if the Resource has been prepared, false otherwise.
         */
-        virtual bool isPrepared(void) const 
+        bool isPrepared(void) const
         { 
             // No lock required to read this state since no modify
             return (mLoadingState.load() == LOADSTATE_PREPARED);
@@ -321,7 +321,7 @@ namespace Ogre {
 
         /** Returns true if the Resource has been loaded, false otherwise.
         */
-        virtual bool isLoaded(void) const 
+        bool isLoaded(void) const
         { 
             // No lock required to read this state since no modify
             return (mLoadingState.load() == LOADSTATE_LOADED);
@@ -330,14 +330,14 @@ namespace Ogre {
         /** Returns whether the resource is currently in the process of
             background loading.
         */
-        virtual bool isLoading() const
+        bool isLoading() const
         {
             return (mLoadingState.load() == LOADSTATE_LOADING);
         }
 
         /** Returns the current loading state.
         */
-        virtual LoadingState getLoadingState() const
+        LoadingState getLoadingState() const
         {
             return mLoadingState.load();
         }
@@ -345,7 +345,7 @@ namespace Ogre {
 
 
         /** Returns whether this Resource has been earmarked for background loading.
-        @remarks
+
             This option only makes sense when you have built Ogre with 
             thread support (OGRE_THREAD_SUPPORT). If a resource has been marked
             for background loading, then it won't load on demand like normal
@@ -354,7 +354,7 @@ namespace Ogre {
             other users of this resource should check isLoaded(), and if that
             returns false, don't use the resource and come back later.
         */
-        virtual bool isBackgroundLoaded(void) const { return mIsBackgroundLoaded; }
+        bool isBackgroundLoaded(void) const { return mIsBackgroundLoaded; }
 
         /** Tells the resource whether it is background loaded or not.
 
@@ -364,10 +364,10 @@ namespace Ogre {
             loaded in the background. You should use ResourceBackgroundLoadingQueue
             to manage the actual loading (which will call this method itself).
         */
-        virtual void setBackgroundLoaded(bool bl) { mIsBackgroundLoaded = bl; }
+        void setBackgroundLoaded(bool bl) { mIsBackgroundLoaded = bl; }
 
         /** Escalates the loading of a background loaded resource. 
-        @remarks
+
             If a resource is set to load in the background, but something needs
             it before it's been loaded, there could be a problem. If the user
             of this resource really can't wait, they can escalate the loading
@@ -388,10 +388,10 @@ namespace Ogre {
         virtual void removeListener(Listener* lis);
 
         /// Gets the group which this resource is a member of
-        virtual const String& getGroup(void) const { return mGroup; }
+        const String& getGroup(void) const { return mGroup; }
 
         /** Change the resource group ownership of a Resource.
-        @remarks
+
             This method is generally reserved for internal use, although
             if you really know what you're doing you can use it to move
             this resource from one group to another.
@@ -402,7 +402,7 @@ namespace Ogre {
         /// Gets the manager which created this resource
         ResourceManager* getCreator(void) { return mCreator; }
         /** Get the origin of this resource, e.g. a script file name.
-        @remarks
+
             This property will only contain something if the creator of
             this resource chose to populate it. Script loaders are advised
             to populate it.
@@ -421,7 +421,7 @@ namespace Ogre {
         virtual size_t getStateCount() const { return mStateCount; }
 
         /** Manually mark the state of this resource as having been changed.
-        @remarks
+
             You only need to call this from outside if you explicitly want derived
             objects to think this object has changed. @see getStateCount.
         */
@@ -429,37 +429,25 @@ namespace Ogre {
 
 
         /** Firing of loading complete event
-        @remarks
+
             You should call this from the thread that runs the main frame loop 
             to avoid having to make the receivers of this event thread-safe.
-            If you use Ogre's built in frame loop you don't need to call this
+            If you use %Ogre's built in frame loop you don't need to call this
             yourself.
-            @param wasBackgroundLoaded Whether this was a background loaded event
         */
-        void _fireLoadingComplete(bool wasBackgroundLoaded);
+        void _fireLoadingComplete(bool unused = false);
 
         /** Firing of preparing complete event
-        @remarks
-            You should call this from the thread that runs the main frame loop 
-            to avoid having to make the receivers of this event thread-safe.
-            If you use Ogre's built in frame loop you don't need to call this
-            yourself.
-            @param wasBackgroundLoaded Whether this was a background loaded event
+
+            @copydetails _fireLoadingComplete
         */
-        void _firePreparingComplete(bool wasBackgroundLoaded);
+        void _firePreparingComplete(bool unused = false);
 
         /** Firing of unloading complete event
-        @remarks
-        You should call this from the thread that runs the main frame loop 
-        to avoid having to make the receivers of this event thread-safe.
-        If you use Ogre's built in frame loop you don't need to call this
-        yourself.
+
+            @copydetails _fireLoadingComplete
         */
         void _fireUnloadingComplete(void);
-
-        /** Calculate the size of a resource; this will only be called after 'load' */
-        virtual size_t calculateSize(void) const;
-
     };
 
     /** Interface describing a manual resource loader.

@@ -62,14 +62,14 @@ public:
 
 
     /** Get the type of this sub render state.
-    @remarks
+
     The type string should be unique among all registered sub render states.    
     */
     virtual const String& getType() const = 0;
 
 
     /** Get the execution order of this sub render state.
-    @remarks
+
     The return value should be synchronized with the predefined values
     of the FFPShaderStage enum.
     */
@@ -123,6 +123,9 @@ public:
     @see SubRenderStateAccessor.
     */
     SubRenderStateAccessorPtr getAccessor() const;
+
+    /// generic set method for parameters that connot be derived in @ref preAddToRenderState
+    virtual bool setParameter(const String& name, const String& value) { return false; }
 
 // Protected methods
 protected:
@@ -214,7 +217,7 @@ private:
 
 
 /** Abstract factory interface for creating SubRenderState implementation instances.
-@remarks
+
 Plugins or 3rd party applications can add new types of sub render states to the 
 RTShader System by creating subclasses of the SubRenderState class. 
 Because multiple instances of these sub class may be required, 
@@ -232,7 +235,7 @@ public:
     virtual ~SubRenderStateFactory();
 
     /** Get the type of this sub render state factory.
-    @remarks
+
     The type string should be the same as the type of the SubRenderState sub class it is going to create.   
     @see SubRenderState::getType.
     */

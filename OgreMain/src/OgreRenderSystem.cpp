@@ -34,7 +34,6 @@ THE SOFTWARE.
 
 #include "OgreRenderTarget.h"
 #include "OgreDepthBuffer.h"
-#include "OgreIteratorWrappers.h"
 #include "OgreHardwareOcclusionQuery.h"
 #include "OgreComponents.h"
 
@@ -92,10 +91,9 @@ namespace Ogre {
         if(mFixedFunctionParams)
             return;
 
-        GpuLogicalBufferStructPtr nullPtr;
         GpuLogicalBufferStructPtr logicalBufferStruct(new GpuLogicalBufferStruct());
         mFixedFunctionParams.reset(new GpuProgramParameters);
-        mFixedFunctionParams->_setLogicalIndexes(logicalBufferStruct, nullPtr, nullPtr);
+        mFixedFunctionParams->_setLogicalIndexes(logicalBufferStruct);
         mFixedFunctionParams->setAutoConstant(0, GpuProgramParameters::ACT_WORLD_MATRIX);
         mFixedFunctionParams->setAutoConstant(4, GpuProgramParameters::ACT_VIEW_MATRIX);
         mFixedFunctionParams->setAutoConstant(8, GpuProgramParameters::ACT_PROJECTION_MATRIX);
@@ -122,7 +120,7 @@ namespace Ogre {
         }
     }
 
-    void RenderSystem::setFFPLightParams(size_t index, bool enabled)
+    void RenderSystem::setFFPLightParams(uint32 index, bool enabled)
     {
         if(!mFixedFunctionParams)
             return;
@@ -197,10 +195,12 @@ namespace Ogre {
             miscParams.emplace("FSAA", std::to_string(fsaa));
 
             // D3D specific
-            String hint;
-            fsaaMode >> hint;
             if(!fsaaMode.eof())
+            {
+                String hint;
+                fsaaMode >> hint;
                 miscParams.emplace("FSAAHint", hint);
+            }
         }
 
         if((opt = mOptions.find("VSync")) != end)
@@ -220,6 +220,15 @@ namespace Ogre {
 
         if((opt = mOptions.find("Content Scaling Factor")) != end)
             miscParams["contentScalingFactor"] = opt->second.currentValue;
+
+        if((opt = mOptions.find("Rendering Device")) != end)
+        {
+            // try to parse "Monitor-NN-"
+            auto start = opt->second.currentValue.find('-') + 1;
+            auto len = opt->second.currentValue.find('-', start) - start;
+            if(start != String::npos)
+                miscParams["monitorIndex"] = opt->second.currentValue.substr(start, len);
+        }
 
 #if OGRE_NO_QUAD_BUFFER_STEREO == 0
         if((opt = mOptions.find("Stereo Mode")) != end)
@@ -308,63 +317,37 @@ namespace Ogre {
     }
 
     //---------------------------------------------------------------------------------------------
-    bool RenderSystem::_createRenderWindows(const RenderWindowDescriptionList& renderWindowDescriptions, 
-        RenderWindowList& createdWindows)
+    RenderWindow* RenderSystem::_createRenderWindow(const String& name, unsigned int width,
+                                                    unsigned int height, bool fullScreen,
+                                                    const NameValuePairList* miscParams)
     {
-        unsigned int fullscreenWindowsCount = 0;
-
-        // Grab some information and avoid duplicate render windows.
-        for (unsigned int nWindow=0; nWindow < renderWindowDescriptions.size(); ++nWindow)
+        if (mRenderTargets.find(name) != mRenderTargets.end())
         {
-            const RenderWindowDescription* curDesc = &renderWindowDescriptions[nWindow];
-
-            // Count full screen windows.
-            if (curDesc->useFullScreen)         
-                fullscreenWindowsCount++;   
-
-            bool renderWindowFound = false;
-
-            if (mRenderTargets.find(curDesc->name) != mRenderTargets.end())
-                renderWindowFound = true;
-            else
-            {
-                for (unsigned int nSecWindow = nWindow + 1 ; nSecWindow < renderWindowDescriptions.size(); ++nSecWindow)
-                {
-                    if (curDesc->name == renderWindowDescriptions[nSecWindow].name)
-                    {
-                        renderWindowFound = true;
-                        break;
-                    }                   
-                }
-            }
-
-            // Make sure we don't already have a render target of the 
-            // same name as the one supplied
-            if(renderWindowFound)
-            {
-                String msg;
-
-                msg = "A render target of the same name '" + String(curDesc->name) + "' already "
-                    "exists.  You cannot create a new window with this name.";
-                OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, msg, "RenderSystem::createRenderWindow" );
-            }
-        }
-        
-        // Case we have to create some full screen rendering windows.
-        if (fullscreenWindowsCount > 0)
-        {
-            // Can not mix full screen and windowed rendering windows.
-            if (fullscreenWindowsCount != renderWindowDescriptions.size())
-            {
-                OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
-                    "Can not create mix of full screen and windowed rendering windows",
-                    "RenderSystem::createRenderWindows");
-            }                   
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Window with name '" + name + "' already exists");
         }
 
-        return true;
+        // Log a message
+        StringStream ss;
+        ss << "RenderSystem::_createRenderWindow \"" << name << "\", " <<
+            width << "x" << height << " ";
+        if (fullScreen)
+            ss << "fullscreen ";
+        else
+            ss << "windowed ";
+
+        if (miscParams)
+        {
+            ss << " miscParams: ";
+            NameValuePairList::const_iterator it;
+            for (const auto& p : *miscParams)
+            {
+                ss << p.first << "=" << p.second << " ";
+            }
+        }
+        LogManager::getSingleton().logMessage(ss.str());
+
+        return NULL;
     }
-
     //---------------------------------------------------------------------------------------------
     void RenderSystem::destroyRenderWindow(const String& name)
     {
@@ -447,31 +430,8 @@ namespace Ogre {
         if(!tex || tl.isTextureLoadFailing())
             tex = mTextureManager->_getWarningTexture();
 
-        // Vertex texture binding (D3D9 only)
-        if (mCurrentCapabilities->hasCapability(RSC_VERTEX_TEXTURE_FETCH) &&
-            !mCurrentCapabilities->getVertexTextureUnitsShared())
-        {
-            if (tl.getBindingType() == TextureUnitState::BT_VERTEX)
-            {
-                // Bind vertex texture
-                _setVertexTexture(texUnit, tex);
-                // bind nothing to fragment unit (hardware isn't shared but fragment
-                // unit can't be using the same index
-                _setTexture(texUnit, true, sNullTexPtr);
-            }
-            else
-            {
-                // vice versa
-                _setVertexTexture(texUnit, sNullTexPtr);
-                _setTexture(texUnit, true, tex);
-            }
-        }
-        else
-        {
-            // Shared vertex / fragment textures or no vertex texture support
-            // Bind texture (may be blank)
-            _setTexture(texUnit, true, tex);
-        }
+        // Bind texture (may be blank)
+        _setTexture(texUnit, true, tex);
 
         // Set texture coordinate set
         _setTextureCoordSet(texUnit, tl.getTextureCoordSet());
@@ -567,9 +527,11 @@ namespace Ogre {
     void RenderSystem::_setTextureUnitFiltering(size_t unit, FilterOptions minFilter,
             FilterOptions magFilter, FilterOptions mipFilter)
     {
+        OGRE_IGNORE_DEPRECATED_BEGIN
         _setTextureUnitFiltering(unit, FT_MIN, minFilter);
         _setTextureUnitFiltering(unit, FT_MAG, magFilter);
         _setTextureUnitFiltering(unit, FT_MIP, mipFilter);
+        OGRE_IGNORE_DEPRECATED_END
     }
     //---------------------------------------------------------------------
     void RenderSystem::_cleanupDepthBuffers( bool bCleanManualBuffers )
@@ -595,6 +557,11 @@ namespace Ogre {
         }
 
         mDepthBufferPool.clear();
+    }
+    void RenderSystem::_beginFrame(void)
+    {
+        if (!mActiveViewport)
+            OGRE_EXCEPT(Exception::ERR_INVALID_STATE, "Cannot begin frame - no viewport selected.");
     }
     //-----------------------------------------------------------------------
     CullingMode RenderSystem::_getCullingMode(void) const
@@ -642,6 +609,12 @@ namespace Ogre {
         return mIsReverseDepthBufferEnabled;
     }
     //-----------------------------------------------------------------------
+    void RenderSystem::reinitialise()
+    {
+        shutdown();
+        _initialise();
+    }
+
     void RenderSystem::shutdown(void)
     {
         // Remove occlusion queries
@@ -714,12 +687,6 @@ namespace Ogre {
     unsigned int RenderSystem::_getVertexCount(void) const
     {
         return static_cast< unsigned int >( mVertexCount );
-    }
-    //-----------------------------------------------------------------------
-    void RenderSystem::convertColourValue(const ColourValue& colour, uint32* pDest)
-    {
-        *pDest = VertexElement::convertColourValue(colour, getColourVertexElementType());
-
     }
     //-----------------------------------------------------------------------
     void RenderSystem::_render(const RenderOperation& op)
@@ -806,6 +773,13 @@ namespace Ogre {
     {
         if (mCurrentPassIterationCount <= 1)
             return false;
+
+        // Update derived depth bias
+        if (mDerivedDepthBias)
+        {
+            _setDepthBias(mDerivedDepthBiasBase + mDerivedDepthBiasMultiplier * mCurrentPassIterationNum,
+                          mDerivedDepthBiasSlopeScale);
+        }
 
         --mCurrentPassIterationCount;
         ++mCurrentPassIterationNum;
@@ -989,18 +963,13 @@ namespace Ogre {
     //---------------------------------------------------------------------
     const String& RenderSystem::_getDefaultViewportMaterialScheme( void ) const
     {
-#ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS   
-        if ( !(getCapabilities()->hasCapability(Ogre::RSC_FIXED_FUNCTION)) )
+#ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
+        if (!getCapabilities()->hasCapability(RSC_FIXED_FUNCTION))
         {
-            // I am returning the exact value for now - I don't want to add dependency for the RTSS just for one string  
-            static const String ShaderGeneratorDefaultScheme = "ShaderGeneratorDefaultScheme";
-            return ShaderGeneratorDefaultScheme;
+            return MSN_SHADERGEN;
         }
-        else
 #endif
-        {
-            return MaterialManager::DEFAULT_SCHEME_NAME;
-        }
+        return MSN_DEFAULT;
     }
     //---------------------------------------------------------------------
     Ogre::HardwareVertexBufferSharedPtr RenderSystem::getGlobalInstanceVertexBuffer() const
@@ -1063,6 +1032,16 @@ namespace Ogre {
         optVSync.currentValue = optVSync.possibleValues[1];
         mOptions[optVSync.name] = optVSync;
 
+        ConfigOption optVSyncInterval;
+        optVSyncInterval.name = "VSync Interval";
+        optVSyncInterval.immutable = false;
+        optVSyncInterval.possibleValues.push_back("1");
+        optVSyncInterval.possibleValues.push_back("2");
+        optVSyncInterval.possibleValues.push_back("3");
+        optVSyncInterval.possibleValues.push_back("4");
+        optVSyncInterval.currentValue = optVSyncInterval.possibleValues[0];
+        mOptions[optVSyncInterval.name] = optVSyncInterval;
+
         ConfigOption optSRGB;
         optSRGB.name = "sRGB Gamma Conversion";
         optSRGB.immutable = false;
@@ -1100,5 +1079,32 @@ namespace Ogre {
         }
     }
 
+    bool RenderSystem::flipFrontFace() const
+    {
+        return mInvertVertexWinding != mActiveRenderTarget->requiresTextureFlipping();
+    }
+
+    void RenderSystem::setStencilCheckEnabled(bool enabled)
+    {
+        mStencilState.enabled = enabled;
+        if (!enabled)
+            setStencilState(mStencilState);
+    }
+    void RenderSystem::setStencilBufferParams(CompareFunction func, uint32 refValue, uint32 compareMask,
+                                              uint32 writeMask, StencilOperation stencilFailOp,
+                                              StencilOperation depthFailOp, StencilOperation passOp,
+                                              bool twoSidedOperation)
+    {
+        mStencilState.compareOp = func;
+        mStencilState.referenceValue = refValue;
+        mStencilState.compareMask = compareMask;
+        mStencilState.writeMask = writeMask;
+        mStencilState.stencilFailOp = stencilFailOp;
+        mStencilState.depthFailOp = depthFailOp;
+        mStencilState.depthStencilPassOp = passOp;
+        mStencilState.twoSidedOperation = twoSidedOperation;
+        if(mStencilState.enabled)
+            setStencilState(mStencilState);
+    }
 }
 

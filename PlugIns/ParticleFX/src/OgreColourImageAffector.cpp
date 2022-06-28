@@ -59,15 +59,12 @@ namespace Ogre {
             _loadImage();
         }
 
-        pParticle->mColour = mColourImage.getColourAt(0, 0, 0);
+        pParticle->mColour = mColourImage.getColourAt(0, 0, 0).getAsBYTE();
     
     }
     //-----------------------------------------------------------------------
     void ColourImageAffector::_affectParticles(ParticleSystem* pSystem, Real timeElapsed)
     {
-        Particle*           p;
-        ParticleIterator    pi              = pSystem->_getIterator();
-
         if (!mColourImageLoaded)
         {
             _loadImage();
@@ -75,9 +72,8 @@ namespace Ogre {
 
         int                width            = (int)mColourImage.getWidth()  - 1;
         
-        while (!pi.end())
+        for (auto p : pSystem->_getActiveParticles())
         {
-            p = pi.getNext();
             const Real      life_time       = p->mTotalTimeToLive;
             Real            particle_time   = 1.0f - (p->mTimeToLive / life_time);
 
@@ -91,26 +87,21 @@ namespace Ogre {
 
             if(index < 0)
             {
-                p->mColour = mColourImage.getColourAt(0, 0, 0);
+                p->mColour = mColourImage.getColourAt(0, 0, 0).getAsBYTE();
             }
             else if(index >= width) 
             {
-                p->mColour = mColourImage.getColourAt(width, 0, 0);
+                p->mColour = mColourImage.getColourAt(width, 0, 0).getAsBYTE();
             }
             else
             {
                 // Linear interpolation
                 const Real      fract       = float_index - (Real)index;
-                const Real      to_colour   = fract;
-                const Real      from_colour = 1.0f - to_colour;
              
                 ColourValue from=mColourImage.getColourAt(index, 0, 0),
                             to=mColourImage.getColourAt(index+1, 0, 0);
 
-                p->mColour.r = from.r*from_colour + to.r*to_colour;
-                p->mColour.g = from.g*from_colour + to.g*to_colour;
-                p->mColour.b = from.b*from_colour + to.b*to_colour;
-                p->mColour.a = from.a*from_colour + to.a*to_colour;
+                p->mColour = Math::lerp(from, to, fract).getAsBYTE();
             }
         }
     }

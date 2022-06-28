@@ -45,11 +45,6 @@ namespace Ogre {
     };
     const SPFMDeleteT SPFM_DELETE_T;
 
-    struct SPFMNone {
-        void operator()(void*) {}
-    };
-    const SPFMNone SPFM_NONE;
-
     using std::static_pointer_cast;
     using std::dynamic_pointer_cast;
 

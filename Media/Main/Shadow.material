@@ -1,0 +1,85 @@
+// This file is part of the OGRE project.
+// It is subject to the license terms in the LICENSE file found in the top-level directory
+// of this distribution and at https://www.ogre3d.org/licensing.
+
+material Ogre/TextureShadowCaster
+{
+    receive_shadows false
+    technique
+    {
+        pass
+        {
+            // Lighting has to be on, because we need shadow coloured objects
+            // Note that because we can't predict vertex programs, we'll have to
+            // bind light values to those, and so we bind White to ambient
+            // reflectance, and we'll set the ambient colour to the shadow colour
+            ambient 1 1 1
+            diffuse 0 0 0
+            specular 0 0 0 1
+            emissive 0 0 0
+            fog_override true none
+            // set depth bias in case this is used with PF_DEPTH
+            depth_bias -1 -1
+        }
+    }
+}
+
+material Ogre/StencilShadowModulationPass
+{
+    technique
+    {
+        pass
+        {
+            lighting off
+            scene_blend modulate
+            depth_write off
+            depth_check off
+            cull_hardware none
+
+            vertex_program_ref Ogre/ShadowBlendVP {}
+            fragment_program_ref Ogre/ShadowBlendFP {}
+            texture_unit {}
+        }
+    }
+}
+
+material Ogre/StencilShadowVolumes
+{
+    technique
+    {
+        pass
+        {
+            // program will be set dynamically to match light type
+            vertex_program_ref Ogre/ShadowExtrudeDirLightFinite
+            {
+                // however, the parameters here are shared between all programs
+                param_named_auto worldviewproj_matrix worldviewproj_matrix
+                param_named_auto light_position_object_space light_position_object_space 0
+                param_named_auto shadow_extrusion_distance shadow_extrusion_distance 0
+            }
+            fragment_program_ref Ogre/ShadowBlendFP {}
+        }
+    }
+}
+
+material Ogre/Debug/ShadowVolumes
+{
+    technique
+    {
+        pass
+        {
+            depth_write off
+            scene_blend add
+            cull_hardware none
+
+            // program will be set dynamically to match light type
+            vertex_program_ref Ogre/ShadowExtrudeDirLight
+            {
+                // however, the parameters here are shared between all programs
+                param_named_auto worldviewproj_matrix worldviewproj_matrix
+                param_named_auto light_position_object_space light_position_object_space 0
+            }
+            fragment_program_ref Ogre/ShadowBlendFP {}
+        }
+    }
+}

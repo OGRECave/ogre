@@ -1,26 +1,44 @@
 material glTF2/PBR
 {
+    set $Albedo white.png
+    set $Normal normal_disabled.png
+    set $Emissive black.png
+    set $MetalRoughness white.png
+    set $AmbientOcclusion white.png
+    set $IBL_Diffuse diffuse.jpg
+    set $IBL_Specular specular.jpg
+
     technique
     {
         pass
         {
             texture_unit Albedo
-            {}
+            {
+                texture $Albedo
+            }
             texture_unit Normal
-            {}
+            {
+                texture $Normal
+            }
 			texture_unit Emissive
-			{}
+			{
+                texture $Emissive
+            }
 			texture_unit MetalRoughness
-			{}
+			{
+                texture $MetalRoughness
+            }
 			texture_unit AmbientOcclusion
-			{}
+			{
+                texture $AmbientOcclusion
+            }
             texture_unit IBL_Diffuse
 			{
-				texture diffuse.jpg cubic
+				texture $IBL_Diffuse cubic
 			}
             texture_unit IBL_Specular
 			{
-				texture specular.jpg cubic
+				texture $IBL_Specular cubic
 			}
 			texture_unit IBL_LUT
 			{

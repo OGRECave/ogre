@@ -50,22 +50,23 @@ namespace Ogre {
 
             ::EGLSurface createSurfaceFromWindow(::EGLDisplay display, NativeWindowType win);
 
-            virtual void switchFullScreen(bool fullscreen) = 0;
-            EGLContext * createEGLContext() const {
-                return new EGLContext(mEglDisplay, mGLSupport, mEglConfig, mEglSurface);
+            virtual void switchFullScreen(bool fullscreen) {}
+            EGLContext * createEGLContext(::EGLContext external = NULL) const {
+                return new EGLContext(mEglDisplay, mGLSupport, mEglConfig, mEglSurface, external);
             }
 
-            virtual void getLeftAndTopFromNativeWindow(int & left, int & top, uint width, uint height) = 0;
-            virtual void initNativeCreatedWindow(const NameValuePairList *miscParams) = 0;
-            virtual void createNativeWindow( int &left, int &top, uint &width, uint &height, String &title ) = 0;
-            virtual void windowMovedOrResized() = 0;
+            virtual void windowMovedOrResized() {}
+
+            void finaliseWindow();
     public:
             EGLWindow(EGLSupport* glsupport);
             virtual ~EGLWindow();
 
-//      Moved create to native source because it has native calls in it.
-//            void create(const String& name, unsigned int width, unsigned int height,
-//                        bool fullScreen, const NameValuePairList *miscParams);
+            // default, PBuffer based, implementation
+            void create(const String& name, unsigned int width, unsigned int height, bool fullScreen,
+                        const NameValuePairList* miscParams);
+
+            void resize(unsigned int width, unsigned int height) {}
 
             virtual void setFullscreen (bool fullscreen, uint width, uint height);
             void destroy(void);
@@ -73,7 +74,7 @@ namespace Ogre {
             void setVSyncEnabled(bool vsync);
 
             /**
-               @remarks
+
                * Get custom attribute; the following attributes are valid:
                * WINDOW         The X NativeWindowType target for rendering.
                * GLCONTEXT      The Ogre GLContext used for rendering.

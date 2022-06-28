@@ -1,0 +1,59 @@
+//---------------------------------------------------------------------------
+//These materials/shaders are part of the NEW InstanceManager implementation
+//Written by Matias N. Goldberg ("dark_sylinc")
+//---------------------------------------------------------------------------
+#include "HLSL_SM4Support.hlsl"
+#include "InstancingVertexInterpolators.cg"
+
+float calcDepthShadow(sampler2D shadowMap, float4 uv)
+{
+    uv /= uv.w;
+    return tex2D(shadowMap, uv.xy).x >= uv.z ? 1.0 : 0.0;
+}
+
+//---------------------------------------------
+//Main Pixel Shader
+//---------------------------------------------
+//Textures
+uniform SAMPLER2D(diffuseMap, 0);
+#ifdef DEPTH_SHADOWRECEIVER
+	uniform SAMPLER2D(shadowMap, 1);
+#endif
+
+half4 main_ps( PS_INPUT input ,
+				uniform float4	lightPosition,
+				uniform float3	cameraPosition,
+				uniform half3 	lightAmbient,
+				uniform half3	lightDiffuse,
+				uniform half3	lightSpecular,
+				uniform half4	lightAttenuation,
+				uniform half	lightGloss
+			) : COLOR0
+{
+	float fShadow = 1.0f;
+#ifdef DEPTH_SHADOWRECEIVER
+	fShadow = calcDepthShadow( shadowMap, input.lightSpacePos );
+#endif
+
+	const half4 baseColour = tex2D( diffuseMap, input.uv0 );
+	
+	//Blinn-Phong lighting
+	const half3 normal		= normalize( input.Normal );
+	half3 lightDir			= lightPosition.xyz - input.vPos * lightPosition.w;
+	half3 eyeDir			= normalize( cameraPosition - input.vPos  );
+
+	const half fLength		= length( lightDir );
+	lightDir				= normalize( lightDir );
+
+	const half NdotL = max( 0.0f, dot( normal, lightDir ) );
+	half3 halfVector = normalize(lightDir + eyeDir);
+	const half HdotN = max( 0.0f, dot( halfVector, normal ) );
+	
+	const half3 ambient  = lightAmbient * baseColour.xyz;
+	const half3 diffuse  = lightDiffuse * NdotL * baseColour.xyz;
+	const half3 specular = lightSpecular * pow( HdotN, lightGloss );
+	
+	const half3 directLighting = (diffuse + specular) * fShadow;
+	
+	return half4( directLighting + ambient, baseColour.a );
+}

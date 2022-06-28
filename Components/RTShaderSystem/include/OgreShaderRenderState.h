@@ -67,13 +67,13 @@ public:
     */
     void addTemplateSubRenderState(SubRenderState* subRenderState);
 
-    /** Remove a template sub render state from this render state.
+    /** Remove a sub render state from this render state.
     @param subRenderState The sub render state to remove.
     */
-    void removeTemplateSubRenderState(SubRenderState* subRenderState);
+    void removeSubRenderState(SubRenderState* subRenderState);
 
-    /** Get the list of the template sub render states composing this render state. */
-    const SubRenderStateList& getTemplateSubRenderStateList() const { return mSubRenderStateList; }
+    /** Get the list of the sub render states composing this render state. */
+    const SubRenderStateList& getSubRenderStates() const { return mSubRenderStateList; }
 
     /** 
     Set the light count per light type.
@@ -137,14 +137,19 @@ public:
     
     /** Class default constructor. */
     TargetRenderState();
+    ~TargetRenderState();
 
-    /** Link this target render state with the given render state.
-    Only sub render states with execution order that don't exist in this render state will be added.    
-    @param other The other render state to append to this state.
+    /** Add the SubRenderStates of the given render state as templates to this render state.
+    @note Only sub render states with non FFP execution order will be added.
+    @param templateRS The other render state to use as a template.
     @param srcPass The source pass that this render state is constructed from.
     @param dstPass The destination pass that constructed from this render state.
     */
-    void link(const RenderState& other, Pass* srcPass, Pass* dstPass);
+    void link(const RenderState& templateRS, Pass* srcPass, Pass* dstPass);
+
+    /** Add the SubRenderStates to this render state.
+     */
+    void link(const StringVector& srsTypes, Pass* srcPass, Pass* dstPass);
 
     /** Update the GPU programs constant parameters before a renderable is rendered.
     @param rend The renderable object that is going to be rendered.
@@ -159,11 +164,6 @@ public:
     */
     void addSubRenderStateInstance(SubRenderState* subRenderState);
 
-    /** Remove sub render state from this render state.
-    @param subRenderState The sub render state to remove.
-    */
-    void removeSubRenderStateInstance(SubRenderState* subRenderState);
-    
     /** Acquire CPU/GPU programs set associated with the given render state and bind them to the pass.
     @param pass The pass to bind the programs to.
     */
@@ -176,8 +176,7 @@ public:
 
     /// Key name for associating with a Pass instance.
     static const char* UserKey;
-// Protected methods
-protected:
+private:
     /** Bind the uniform parameters of a given CPU and GPU program set. */
     static void bindUniformParameters(Program* pCpuProgram, const GpuProgramParametersSharedPtr& passParams);
 
@@ -196,19 +195,18 @@ protected:
     */
     ProgramSet* getProgramSet() { return mProgramSet.get(); }
     
-// Attributes.
-protected:
     // Tells if the list of the sub render states is sorted.
     bool mSubRenderStateSortValid;
     // The program set of this RenderState.
     std::unique_ptr<ProgramSet> mProgramSet;
-    
+    Pass* mParent;
 
 private:
     friend class ProgramManager;
     friend class FFPRenderStateBuilder;
 };
 
+typedef std::shared_ptr<TargetRenderState> TargetRenderStatePtr;
 
 /** @} */
 /** @} */

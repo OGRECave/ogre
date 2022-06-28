@@ -33,10 +33,17 @@ namespace RTShader {
 String GLSLProgramWriter::TargetLanguage = "glsl";
 
 //-----------------------------------------------------------------------
-GLSLProgramWriter::GLSLProgramWriter() : mIsGLSLES(false)
+GLSLProgramWriter::GLSLProgramWriter() : mIsGLSLES(false), mIsVulkan(false)
 {
     auto* rs = Root::getSingleton().getRenderSystem();
     mGLSLVersion = rs ? rs->getNativeShadingLanguageVersion() : 120;
+
+    if(rs && rs->getCapabilities()->isShaderProfileSupported("spirv"))
+    {
+        mGLSLVersion = 460;
+        mIsVulkan = true;
+    }
+
     initializeStringMaps();
 }
 
@@ -97,40 +104,37 @@ void GLSLProgramWriter::initializeStringMaps()
     mContentToPerVertexAttributes[Parameter::SPC_TEXTURE_COORDINATE6] = "uv6";
     mContentToPerVertexAttributes[Parameter::SPC_TEXTURE_COORDINATE7] = "uv7";  
 
-    if (mGLSLVersion >= 130 || mIsGLSLES)
-    {
-        mContentToPerVertexAttributes[Parameter::SPC_COLOR_DIFFUSE] = "colour";
-        mContentToPerVertexAttributes[Parameter::SPC_COLOR_SPECULAR] = "secondary_colour";
-    }
+    mContentToPerVertexAttributes[Parameter::SPC_COLOR_DIFFUSE] = "colour";
+    mContentToPerVertexAttributes[Parameter::SPC_COLOR_SPECULAR] = "secondary_colour";
 }
 
 //-----------------------------------------------------------------------
-const char* GLSLProgramWriter::getGL3CompatDefines()
-{
-    // Redefine texture functions to maintain reusability
-    return "#define texture1D texture\n"
-           "#define texture2D texture\n"
-           "#define shadow2DProj textureProj\n"
-           "#define texture3D texture\n"
-           "#define textureCube texture\n"
-           "#define texture2DLod textureLod\n";
-}
-
 void GLSLProgramWriter::writeSourceCode(std::ostream& os, Program* program)
 {
     // Write the current version (this force the driver to more fulfill the glsl standard)
     os << "#version "<< mGLSLVersion << std::endl;
-
-    if(mGLSLVersion > 120)
-    {
-        os << getGL3CompatDefines();
-    }
 
     // Generate dependencies.
     writeProgramDependencies(os, program);
     os << std::endl;
 
     writeMainSourceCode(os, program);
+}
+
+void GLSLProgramWriter::writeUniformBlock(std::ostream& os, const String& name, int binding,
+                                          const UniformParameterList& uniforms)
+{
+    os << "layout(binding = " << binding << ", row_major) uniform " << name << " {";
+
+    for (auto uparam : uniforms)
+    {
+        if(uparam->getType() == GCT_MATRIX_3X4 || uparam->getType() == GCT_MATRIX_2X4)
+            os << "layout(column_major) ";
+        writeParameter(os, uparam);
+        os << ";\n";
+    }
+
+    os << "\n};\n";
 }
 
 void GLSLProgramWriter::writeMainSourceCode(std::ostream& os, Program* program)
@@ -143,112 +147,124 @@ void GLSLProgramWriter::writeMainSourceCode(std::ostream& os, Program* program)
             "GLSLProgramWriter::writeSourceCode" );
     }
 
-    const ShaderFunctionList& functionList = program->getFunctions();
-    ShaderFunctionConstIterator itFunction;
-
     const UniformParameterList& parameterList = program->getParameters();
-    UniformParameterConstIterator itUniformParam = parameterList.begin();
     
     // Generate global variable code.
     writeUniformParametersTitle(os, program);
     os << std::endl;
 
-    // Write the uniforms 
-    for (itUniformParam = parameterList.begin();  itUniformParam != parameterList.end(); ++itUniformParam)
-    {
-        ParameterPtr pUniformParam = *itUniformParam;
+    auto* rs = Root::getSingleton().getRenderSystem();
+    auto hasSSO = rs ? rs->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS) : false;
 
-        os << "uniform\t"; 
-        os << mGpuConstTypeMap[pUniformParam->getType()];
-        os << "\t"; 
-        os << pUniformParam->getName();
-        if (pUniformParam->isArray() == true)
+    // Write the uniforms
+    UniformParameterList uniforms;
+    for (auto param : parameterList)
+    {
+        if(!param->isSampler())
         {
-            os << "[" << pUniformParam->getSize() << "]";   
+            uniforms.push_back(param);
+            continue;
         }
-        os << ";" << std::endl;     
+        writeSamplerParameter(os, param);
+        os << ";" << std::endl;
+    }
+    if (mIsVulkan && !uniforms.empty())
+    {
+        writeUniformBlock(os, "OgreUniforms", gpuType, uniforms);
+        uniforms.clear();
+    }
+
+    int uniformLoc = 0;
+    for (auto uparam : uniforms)
+    {
+        if(mGLSLVersion >= 430 && hasSSO)
+        {
+            os << "layout(location = " << uniformLoc << ") ";
+            auto esize = GpuConstantDefinition::getElementSize(uparam->getType(), true) / 4;
+            uniformLoc += esize * std::max<int>(uparam->getSize(), 1);
+        }
+
+        os << "uniform\t";
+        writeParameter(os, uparam);
+        os << ";\n";
     }
     os << std::endl;            
 
-    // Write program function(s).
-    for (itFunction=functionList.begin(); itFunction != functionList.end(); ++itFunction)
+    Function* curFunction = program->getMain();
+    const ShaderParameterList& inParams = curFunction->getInputParameters();
+
+    writeFunctionTitle(os, curFunction);
+
+    // Write inout params and fill mInputToGLStatesMap
+    writeInputParameters(os, curFunction, gpuType);
+    writeOutParameters(os, curFunction, gpuType);
+
+    // The function name must always main.
+    os << "void main(void) {" << std::endl;
+
+    // Write local parameters.
+    const ShaderParameterList& localParams = curFunction->getLocalParameters();
+    ShaderParameterConstIterator itParam = localParams.begin();
+    ShaderParameterConstIterator itParamEnd = localParams.end();
+
+    for (; itParam != itParamEnd; ++itParam)
     {
-        Function* curFunction = *itFunction;
-        const ShaderParameterList& inParams = curFunction->getInputParameters();
+        os << "\t";
+        writeParameter(os, *itParam);
+        os << ";" << std::endl;
+    }
+    os << std::endl;
 
-        writeFunctionTitle(os, curFunction);
-        
-        // Write inout params and fill mInputToGLStatesMap
-        writeInputParameters(os, curFunction, gpuType);
-        writeOutParameters(os, curFunction, gpuType);
-                    
-        // The function name must always main.
-        os << "void main(void) {" << std::endl;
-
-        // Write local parameters.
-        const ShaderParameterList& localParams = curFunction->getLocalParameters();
-        ShaderParameterConstIterator itParam = localParams.begin();
-        ShaderParameterConstIterator itParamEnd = localParams.end();
-
-        for (; itParam != itParamEnd; ++itParam)
+    for (const auto& pFuncInvoc : curFunction->getAtomInstances())
+    {
+        for (auto& operand : pFuncInvoc->getOperandList())
         {
-            os << "\t";
-            writeLocalParameter(os, *itParam);          
-            os << ";" << std::endl;                     
-        }
-        os << std::endl;            
+            const ParameterPtr& param = operand.getParameter();
+            Operand::OpSemantic opSemantic = operand.getSemantic();
 
-        for (const auto& pFuncInvoc : curFunction->getAtomInstances())
-        {
-            for (auto& operand : pFuncInvoc->getOperandList())
+            bool isInputParam =
+                std::find(inParams.begin(), inParams.end(), param) != inParams.end();
+
+            if (opSemantic == Operand::OPS_OUT || opSemantic == Operand::OPS_INOUT)
             {
-                const ParameterPtr& param = operand.getParameter();
-                Operand::OpSemantic opSemantic = operand.getSemantic();
+                // Check if we write to an input variable because they are only readable
+                // Well, actually "attribute" were writable in GLSL < 120, but we dont care here
+                bool doLocalRename = isInputParam;
 
-                bool isInputParam =
-                    std::find(inParams.begin(), inParams.end(), param) != inParams.end();
-
-                if (opSemantic == Operand::OPS_OUT || opSemantic == Operand::OPS_INOUT)
+                // If its not a varying param check if a uniform is written
+                if (!doLocalRename)
                 {
-                    // Check if we write to an input variable because they are only readable
-                    // Well, actually "attribute" were writable in GLSL < 120, but we dont care here
-                    bool doLocalRename = isInputParam;
-
-                    // If its not a varying param check if a uniform is written
-                    if (!doLocalRename)
-                    {
-                        doLocalRename = std::find(parameterList.begin(), parameterList.end(),
-                                                  param) != parameterList.end();
-                    }
-
-                    // now we check if we already declared a redirector var
-                    if(doLocalRename && mLocalRenames.find(param->getName()) == mLocalRenames.end())
-                    {
-                        // Declare the copy variable and assign the original
-                        String newVar = "local_" + param->getName();
-                        os << "\t" << mGpuConstTypeMap[param->getType()] << " " << newVar << " = " << param->getName() << ";" << std::endl;
-
-                        // From now on we replace it automatic
-                        param->_rename(newVar, true);
-                        mLocalRenames.insert(newVar);
-                    }
+                    doLocalRename = std::find(parameterList.begin(), parameterList.end(),
+                                                param) != parameterList.end();
                 }
 
-                // Now that every texcoord is a vec4 (passed as vertex attributes) we
-                // have to swizzle them according the desired type.
-                if (gpuType == GPT_VERTEX_PROGRAM && isInputParam &&
-                    param->getSemantic() == Parameter::SPS_TEXTURE_COORDINATES)
+                // now we check if we already declared a redirector var
+                if(doLocalRename && mLocalRenames.find(param->getName()) == mLocalRenames.end())
                 {
-                    operand.setMaskToParamType();
+                    // Declare the copy variable and assign the original
+                    String newVar = "local_" + param->getName();
+                    os << "\t" << mGpuConstTypeMap[param->getType()] << " " << newVar << " = " << param->getName() << ";" << std::endl;
+
+                    // From now on we replace it automatic
+                    param->_rename(newVar, true);
+                    mLocalRenames.insert(newVar);
                 }
             }
 
-            os << "\t";
-            pFuncInvoc->writeSourceCode(os, getTargetLanguage());
-            os << std::endl;
+            // Now that every texcoord is a vec4 (passed as vertex attributes) we
+            // have to swizzle them according the desired type.
+            if (gpuType == GPT_VERTEX_PROGRAM && isInputParam &&
+                param->getSemantic() == Parameter::SPS_TEXTURE_COORDINATES)
+            {
+                operand.setMaskToParamType();
+            }
         }
-        os << "}" << std::endl;
+
+        os << "\t";
+        pFuncInvoc->writeSourceCode(os, getTargetLanguage());
+        os << std::endl;
     }
+    os << "}" << std::endl;
     os << std::endl;
 }
 
@@ -258,6 +274,8 @@ void GLSLProgramWriter::writeProgramDependencies(std::ostream& os, Program* prog
     os << "//-----------------------------------------------------------------------------" << std::endl;
     os << "//                         PROGRAM DEPENDENCIES" << std::endl;
     os << "//-----------------------------------------------------------------------------" << std::endl;
+    os << "#define USE_OGRE_FROM_FUTURE" << std::endl;
+    os << "#include <OgreUnifiedShader.h>" << std::endl;
 
     for (unsigned int i=0; i < program->getDependencyCount(); ++i)
     {
@@ -271,6 +289,8 @@ void GLSLProgramWriter::writeInputParameters(std::ostream& os, Function* functio
 
     ShaderParameterConstIterator itParam = inParams.begin();
     ShaderParameterConstIterator itParamEnd = inParams.end();
+
+    int psInLocation = 0;
 
     for ( ; itParam != itParamEnd; ++itParam)
     {       
@@ -290,21 +310,17 @@ void GLSLProgramWriter::writeInputParameters(std::ostream& os, Function* functio
                 pParam->_rename("gl_FragCoord");
                 continue;
             }
-
-            // After GLSL 1.20 varying is deprecated
-            if(mGLSLVersion <= 120 || (mGLSLVersion == 100 && mIsGLSLES))
+            else if(paramContent == Parameter::SPC_FRONT_FACING)
             {
-                os << "varying\t";
-            }
-            else
-            {
-                os << "in\t";
+                pParam->_rename("gl_FrontFacing");
+                continue;
             }
 
+            os << "IN(";
             os << mGpuConstTypeMap[pParam->getType()];
             os << "\t"; 
             os << paramName;
-            os << ";" << std::endl; 
+            os << ", " << psInLocation++ << ")\n";
         }
         else if (gpuType == GPT_VERTEX_PROGRAM && 
                  mContentToPerVertexAttributes.find(paramContent) != mContentToPerVertexAttributes.end())
@@ -313,16 +329,7 @@ void GLSLProgramWriter::writeInputParameters(std::ostream& os, Function* functio
             // according there content.
             pParam->_rename(mContentToPerVertexAttributes[paramContent]);
 
-            // After GLSL 1.20 attribute is deprecated
-            if (mGLSLVersion > 120 || (mGLSLVersion > 100 && mIsGLSLES))
-            {
-                os << "in\t";
-            }
-            else
-            {
-                os << "attribute\t";
-            }
-
+            os << "IN(";
             // all uv texcoords passed by ogre are at least vec4
             if ((paramContent == Parameter::SPC_TEXTURE_COORDINATE0 ||
                  paramContent == Parameter::SPC_TEXTURE_COORDINATE1 ||
@@ -338,19 +345,16 @@ void GLSLProgramWriter::writeInputParameters(std::ostream& os, Function* functio
             }
             else
             {
-                os << mGpuConstTypeMap[pParam->getType()];
+                // the gl rendersystems only pass float attributes
+                GpuConstantType type = pParam->getType();
+                if(!mIsVulkan && !GpuConstantDefinition::isFloat(type))
+                    type = GpuConstantType(type & ~GpuConstantDefinition::getBaseType(type));
+                os << mGpuConstTypeMap[type];
             }
             os << "\t"; 
-            os << mContentToPerVertexAttributes[paramContent];
-            os << ";" << std::endl; 
-        }
-        else if(paramContent == Parameter::SPC_COLOR_DIFFUSE && !mIsGLSLES)
-        {
-            pParam->_rename("gl_Color");
-        }
-        else if(paramContent == Parameter::SPC_COLOR_SPECULAR && !mIsGLSLES)
-        {
-            pParam->_rename("gl_SecondaryColor");
+            os << mContentToPerVertexAttributes[paramContent] << ", ";
+            writeParameterSemantic(os, pParam);  // maps to location
+            os << ")\n";
         }
         else
         {
@@ -371,6 +375,8 @@ void GLSLProgramWriter::writeOutParameters(std::ostream& os, Function* function,
     ShaderParameterConstIterator itParam = outParams.begin();
     ShaderParameterConstIterator itParamEnd = outParams.end();
 
+    int vsOutLocation = 0;
+
     for ( ; itParam != itParamEnd; ++itParam)
     {
         ParameterPtr pParam = *itParam;
@@ -388,15 +394,7 @@ void GLSLProgramWriter::writeOutParameters(std::ostream& os, Function* function,
             }
             else
             {
-                // After GLSL 1.20 varying is deprecated
-                if(mGLSLVersion <= 120 || (mGLSLVersion == 100 && mIsGLSLES))
-                {
-                    os << "varying\t";
-                }
-                else
-                {
-                    os << "out\t";
-                }
+                os << "OUT(";
 
                 // In the vertex and fragment program the variable names must match.
                 // Unfortunately now the input params are prefixed with an 'i' and output params with 'o'.
@@ -405,29 +403,21 @@ void GLSLProgramWriter::writeOutParameters(std::ostream& os, Function* function,
                 paramName[0] = 'i';
                 pParam->_rename(paramName);
 
-                os << mGpuConstTypeMap[pParam->getType()];
-                os << "\t";
-                os << paramName;
-                if (pParam->isArray() == true)
-                {
-                    os << "[" << pParam->getSize() << "]";  
-                }
-                os << ";" << std::endl; 
+                writeParameter(os, pParam);
+                os << ", " << vsOutLocation++ << ")\n";
             }
         }
         else if(gpuType == GPT_FRAGMENT_PROGRAM &&
                 pParam->getSemantic() == Parameter::SPS_COLOR)
         {                   
-            // GLSL fragment program has to write always gl_FragColor (but this is also deprecated after version 120)
-            // Always add gl_FragColor as an output.  The name is for compatibility.
-            if(mGLSLVersion <= 120 || (mIsGLSLES && mGLSLVersion == 100))
+            if(pParam->getIndex() == 0)
             {
+                // handled by UnifiedShader
                 pParam->_rename("gl_FragColor");
+                continue;
             }
-            else
-            {
-                os << "out vec4\t" << pParam->getName() << ";" << std::endl;
-            }
+
+            os << "OUT(vec4\t" << pParam->getName() << ", " << pParam->getIndex() << ")\n";
         }
     }
     
@@ -439,18 +429,6 @@ void GLSLProgramWriter::writeOutParameters(std::ostream& os, Function* function,
         {
             os << "out gl_PerVertex\n{\nvec4 gl_Position;\nfloat gl_PointSize;\nfloat gl_ClipDistance[];\n};\n" << std::endl;
         }
-    }
-}
-
-//-----------------------------------------------------------------------
-void GLSLProgramWriter::writeLocalParameter(std::ostream& os, ParameterPtr parameter)
-{
-    os << mGpuConstTypeMap[parameter->getType()];
-    os << "\t"; 
-    os << parameter->getName();     
-    if (parameter->isArray() == true)
-    {
-        os << "[" << parameter->getSize() << "]";   
     }
 }
 //-----------------------------------------------------------------------

@@ -29,8 +29,8 @@ THE SOFTWARE.
 #define __UnifiedHighLevelGpuProgram_H__
 
 #include "OgrePrerequisites.h"
-#include "OgreHighLevelGpuProgram.h"
-#include "OgreHighLevelGpuProgramManager.h"
+#include "OgreGpuProgram.h"
+#include "OgreGpuProgramManager.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {
@@ -44,7 +44,7 @@ namespace Ogre {
     /** Specialisation of HighLevelGpuProgram which just delegates its implementation
         to one other GpuProgram, allowing a single program definition
         to represent one supported program from a number of options
-    @remarks
+
         Whilst you can use Technique to implement several ways to render an object
         depending on hardware support, if the only reason to need multiple paths is
         because of the shader language supported, this can be
@@ -58,26 +58,8 @@ namespace Ogre {
         at another program name. The first one which has a supported syntax 
         will be used.
     */
-    class _OgreExport UnifiedHighLevelGpuProgram : public HighLevelGpuProgram
+    class _OgreExport UnifiedHighLevelGpuProgram final : public GpuProgram
     {
-    private:
-        static std::map<String,int> mLanguagePriorities;
-
-    public:
-        /// Command object for setting delegate (can set more than once)
-        class CmdDelegate : public ParamCommand
-        {
-        public:
-            String doGet(const void* target) const;
-            void doSet(void* target, const String& val);
-        };
-
-        static void setPriority(String shaderLanguage,int priority);
-        static int  getPriority(String shaderLanguage);
-
-    protected:
-        static CmdDelegate msCmdDelegate;
-
         /// Ordered list of potential delegates
         StringVector mDelegateNames;
         /// The chosen delegate
@@ -88,9 +70,9 @@ namespace Ogre {
 
         void createLowLevelImpl(void);
         void unloadHighLevelImpl(void);
-        void buildConstantDefinitions() const;
         void loadFromSource(void);
 
+        void unloadImpl() { resetCompileError(); }
     public:
         /** Constructor, should be used only by factory classes. */
         UnifiedHighLevelGpuProgram(ResourceManager* creator, const String& name, ResourceHandle handle,
@@ -100,7 +82,7 @@ namespace Ogre {
         virtual size_t calculateSize(void) const;
 
         /** Adds a new delegate program to the list.
-        @remarks
+
             Delegates are tested in order so earlier ones are preferred.
         */
         void addDelegateProgram(const String& name);
@@ -115,7 +97,7 @@ namespace Ogre {
         const String& getLanguage(void) const;
 
         /** Creates a new parameters object compatible with this program definition. 
-        @remarks
+
         Unlike low-level assembly programs, parameters objects are specific to the
         program and therefore must be created from it rather than by the 
         HighLevelGpuProgramManager. This method creates a new instance of a parameters
@@ -129,7 +111,12 @@ namespace Ogre {
 
         /** @copydoc GpuProgram::isSupported */
         bool isSupported(void) const;
-        
+
+        const String& getSource(void) const override
+        {
+            return _getDelegate() ? _getDelegate()->getSource() : BLANKSTRING;
+        }
+
         /** @copydoc GpuProgram::isSkeletalAnimationIncluded */
         bool isSkeletalAnimationIncluded(void) const;
 
@@ -139,7 +126,7 @@ namespace Ogre {
         ushort getNumberOfPosesIncluded(void) const;
 
         bool isVertexTextureFetchRequired(void) const;
-        GpuProgramParametersSharedPtr getDefaultParameters(void);
+        const GpuProgramParametersPtr& getDefaultParameters(void) override;
         bool hasDefaultParameters(void) const;
         bool getPassSurfaceAndLightStates(void) const;
         bool getPassFogStates(void) const;
@@ -165,7 +152,7 @@ namespace Ogre {
     };
 
     /** Factory class for Unified programs. */
-    class _OgreExport UnifiedHighLevelGpuProgramFactory : public HighLevelGpuProgramFactory
+    class _OgreExport UnifiedHighLevelGpuProgramFactory : public GpuProgramFactory
     {
     public:
         UnifiedHighLevelGpuProgramFactory();

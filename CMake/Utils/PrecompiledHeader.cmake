@@ -133,11 +133,11 @@ MACRO(_PCH_GET_COMPILE_COMMAND out_command _input _output)
             STRING(REGEX REPLACE "^ +" "" pchsupport_compiler_cxx_arg1 ${CMAKE_CXX_COMPILER_ARG1})
 
             SET(${out_command}
-              ${CMAKE_CXX_COMPILER} ${pchsupport_compiler_cxx_arg1} ${_compile_FLAGS} -x c++-header -o ${_output} ${_input}
+              ${CMAKE_CXX_COMPILER} ${pchsupport_compiler_cxx_arg1} ${_compile_FLAGS} -x c++-header -c -o ${_output} ${_input}
               )
         ELSE(CMAKE_CXX_COMPILER_ARG1)
             SET(${out_command}
-              ${CMAKE_CXX_COMPILER}  ${_compile_FLAGS} -x c++-header -o ${_output} ${_input}
+              ${CMAKE_CXX_COMPILER}  ${_compile_FLAGS} -x c++-header -c -o ${_output} ${_input}
               )
         ENDIF(CMAKE_CXX_COMPILER_ARG1)
     ELSE(CMAKE_COMPILER_IS_GNUCXX)
@@ -291,7 +291,7 @@ MACRO(ADD_PRECOMPILED_HEADER _targetName _input)
     set_target_properties(${_targetName}_pch_dephelp PROPERTIES INCLUDE_DIRECTORIES "${DIRINC}")
 
     #MESSAGE("_compile_FLAGS: ${_compile_FLAGS}")
-    #message("COMMAND ${CMAKE_CXX_COMPILER}	${_compile_FLAGS} -x c++-header -o ${_output} ${_input}")
+    #message("COMMAND ${CMAKE_CXX_COMPILER}	${_compile_FLAGS} -x c++-header -c -o ${_output} ${_input}")
 
     ADD_CUSTOM_COMMAND(
       OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${_name}"
@@ -323,7 +323,7 @@ ENDMACRO(ADD_PRECOMPILED_HEADER)
 # Not needed by Xcode
 
 MACRO(GET_NATIVE_PRECOMPILED_HEADER _targetName)
-    if(CMAKE_GENERATOR MATCHES "^Visual.*$")
+    if(CMAKE_GENERATOR MATCHES "^Visual.*$" AND CMAKE_VERSION LESS "3.16")
         set(${_targetName}_pch ${CMAKE_CURRENT_BINARY_DIR}/${_targetName}_pch.cpp)
     endif()
 ENDMACRO(GET_NATIVE_PRECOMPILED_HEADER)
@@ -339,6 +339,8 @@ MACRO(ADD_NATIVE_PRECOMPILED_HEADER _targetName _input)
 
     if(NOT OGRE_ENABLE_PRECOMPILED_HEADERS)
         # do nothing
+    elseif(NOT CMAKE_VERSION VERSION_LESS "3.16")
+        target_precompile_headers(${_targetName} PRIVATE ${_input})
     elseif(CMAKE_GENERATOR MATCHES "^Visual.*$")
 
         # Auto include the precompile (useful for moc processing, since the use of
@@ -380,7 +382,7 @@ MACRO(ADD_NATIVE_PRECOMPILED_HEADER _targetName _input)
         # For Xcode, cmake needs my patch to process
         # GCC_PREFIX_HEADER and GCC_PRECOMPILE_PREFIX_HEADER as target properties
 
-        # When buiding out of the tree, precompiled may not be located
+        # When building out of the tree, precompiled may not be located
         # Use full path instead.
         GET_FILENAME_COMPONENT(fullPath ${_input} ABSOLUTE)
 

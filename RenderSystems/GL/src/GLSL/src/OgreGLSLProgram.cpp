@@ -210,20 +210,20 @@ namespace Ogre {
             case GPT_HULL_PROGRAM:
                 break;
             }
-            mGLShaderHandle = glCreateShaderObjectARB(shaderType);
+            mGLShaderHandle = (size_t)glCreateShaderObjectARB(shaderType);
         }
 
         // Add preprocessor extras and main source
         if (!mSource.empty())
         {
             const char *source = mSource.c_str();
-            glShaderSourceARB(mGLShaderHandle, 1, &source, NULL);
+            glShaderSourceARB((GLhandleARB)mGLShaderHandle, 1, &source, NULL);
         }
 
-        glCompileShaderARB(mGLShaderHandle);
+        glCompileShaderARB((GLhandleARB)mGLShaderHandle);
         // check for compile errors
         int compiled = 0;
-        glGetObjectParameterivARB(mGLShaderHandle, GL_OBJECT_COMPILE_STATUS_ARB, &compiled);
+        glGetObjectParameterivARB((GLhandleARB)mGLShaderHandle, GL_OBJECT_COMPILE_STATUS_ARB, &compiled);
 
         String compileInfo = getObjectInfo(mGLShaderHandle);
 
@@ -239,23 +239,15 @@ namespace Ogre {
     {
         if (isSupported())
         {
-            glDeleteObjectARB(mGLShaderHandle);
+            glDeleteObjectARB((GLhandleARB)mGLShaderHandle);
             mGLShaderHandle = 0;
 
             // destroy all programs using this shader
             GLSLLinkProgramManager::getSingletonPtr()->destroyAllByShader(this);
         }
     }
-
     //-----------------------------------------------------------------------
-    void GLSLProgram::populateParameterNames(GpuProgramParametersSharedPtr params)
-    {
-        getConstantDefinitions();
-        params->_setNamedConstants(mConstantDefs);
-        // Don't set logical / physical maps here, as we can't access parameters by logical index in GLHL.
-    }
-    //-----------------------------------------------------------------------
-    void GLSLProgram::buildConstantDefinitions() const
+    void GLSLProgram::buildConstantDefinitions()
     {
         // We need an accurate list of all the uniforms in the shader, but we
         // can't get at them until we link all the shaders into a program object.
@@ -263,11 +255,10 @@ namespace Ogre {
 
         // Therefore instead, parse the source code manually and extract the uniforms
         createParameterMappingStructures(true);
-        mFloatLogicalToPhysical.reset();
-        mIntLogicalToPhysical.reset();
+        mLogicalToPhysical.reset();
 
         GLSLLinkProgramManager::getSingleton().extractUniformsFromGLSL(
-            mSource, *mConstantDefs, mName);
+            mSource, *mConstantDefs, getResourceLogName());
 
         // Also parse any attached sources
         for (GLSLProgramContainer::const_iterator i = mAttachedGLSLPrograms.begin();
@@ -319,19 +310,18 @@ namespace Ogre {
                 "The maximum number of vertices a single run of this geometry program can output",
                 PT_INT),&msMaxOutputVerticesCmd);
         }
-        // Manually assign language now since we use it immediately
-        mSyntaxCode = "glsl";
+        mPassFFPStates = Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_FIXED_FUNCTION);
     }
 
     //-----------------------------------------------------------------------
-    void GLSLProgram::attachToProgramObject( const GLhandleARB programObject )
+    void GLSLProgram::attachToProgramObject( const uint programObject )
     {
         // attach child objects
         for (auto childShader : mAttachedGLSLPrograms)
         {
             childShader->attachToProgramObject(programObject);
         }
-        glAttachObjectARB( programObject, mGLShaderHandle );
+        glAttachObjectARB( (GLhandleARB)programObject, (GLhandleARB)mGLShaderHandle );
         GLenum glErr = glGetError();
         if(glErr != GL_NO_ERROR)
         {
@@ -341,9 +331,9 @@ namespace Ogre {
 
     }
     //-----------------------------------------------------------------------
-    void GLSLProgram::detachFromProgramObject( const GLhandleARB programObject )
+    void GLSLProgram::detachFromProgramObject( const uint programObject )
     {
-        glDetachObjectARB(programObject, mGLShaderHandle);
+        glDetachObjectARB((GLhandleARB)programObject, (GLhandleARB)mGLShaderHandle);
 
         GLenum glErr = glGetError();
         if(glErr != GL_NO_ERROR)

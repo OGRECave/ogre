@@ -68,18 +68,18 @@ if (OGRE_CONFIG_THREADS)
 
 endif()
 
-set(OGRE_ASSERT_MODE 1 CACHE STRING 
-	"Enable Ogre asserts and exceptions. Possible values:
+set(OGRE_ASSERT_MODE 2 CACHE STRING
+	"Enable Ogre asserts. Possible values:
 	0 - Standard asserts in debug builds, nothing in release builds.
 	1 - Standard asserts in debug builds, exceptions in release builds.
-	2 - Exceptions in debug builds, exceptions in release builds."
+	2 - Exceptions in debug & release builds."
 )
 set_property(CACHE OGRE_ASSERT_MODE PROPERTY STRINGS 0 1 2)
 
 # determine config values depending on build options
 set(OGRE_STATIC_LIB ${OGRE_STATIC})
 set(OGRE_DOUBLE_PRECISION ${OGRE_CONFIG_DOUBLE})
-set(OGRE_NODE_INHERIT_TRANSFORM ${OGRE_SET_NODE_INHERIT_TRANSFORM})
+set(OGRE_NODE_INHERIT_TRANSFORM ${OGRE_CONFIG_NODE_INHERIT_TRANSFORM})
 set(OGRE_SET_ASSERT_MODE ${OGRE_ASSERT_MODE})
 set(OGRE_SET_THREADS ${OGRE_CONFIG_THREADS})
 set(OGRE_SET_THREAD_PROVIDER ${OGRE_THREAD_PROVIDER})
@@ -133,6 +133,13 @@ if(SDL2_FOUND OR EMSCRIPTEN)
     set(OGRE_BITES_HAVE_SDL 1)
 endif()
 
+# determine if strtol_l is supported
+include(CheckFunctionExists)
+CHECK_FUNCTION_EXISTS(strtol_l HAVE_STRTOL_L)
+if (NOT HAVE_STRTOL_L)
+  set(OGRE_NO_LOCALE_STRCONVERT 1)
+endif ()
+
 # generate OgreBuildSettings.h
 configure_file(${OGRE_TEMPLATES_DIR}/OgreComponents.h.in ${PROJECT_BINARY_DIR}/include/OgreComponents.h @ONLY)
 configure_file(${OGRE_TEMPLATES_DIR}/OgreBuildSettings.h.in ${PROJECT_BINARY_DIR}/include/OgreBuildSettings.h @ONLY)
@@ -150,16 +157,13 @@ endif ()
 
 # Create the pkg-config package files on Unix systems
 if (UNIX)
-  set(OGRE_PLUGIN_PREFIX "")
   set(OGRE_PLUGIN_EXT ".so")
   set(OGRE_PAGING_ADDITIONAL_PACKAGES "")
   if (OGRE_STATIC)
-    set(OGRE_PLUGIN_PREFIX "lib")
     set(OGRE_PLUGIN_EXT ".a")
   endif ()
 
   set(OGRE_ADDITIONAL_LIBS "")
-  set(OGRE_ADDITIONAL_INCLUDE_DIRS "")
 
   set(OGRE_CFLAGS "")
   set(OGRE_PREFIX_PATH ${CMAKE_INSTALL_PREFIX})
@@ -230,11 +234,6 @@ if (UNIX)
     endif ()
     configure_file(${OGRE_TEMPLATES_DIR}/OGRE-Bites.pc.in ${PROJECT_BINARY_DIR}/pkgconfig/OGRE-Bites.pc @ONLY)
     install(FILES ${PROJECT_BINARY_DIR}/pkgconfig/OGRE-Bites.pc DESTINATION ${OGRE_LIB_DIRECTORY}/pkgconfig)
-  endif ()
-
-  if (OGRE_BUILD_COMPONENT_HLMS)
-    configure_file(${OGRE_TEMPLATES_DIR}/OGRE-HLMS.pc.in ${PROJECT_BINARY_DIR}/pkgconfig/OGRE-HLMS.pc @ONLY)
-    install(FILES ${PROJECT_BINARY_DIR}/pkgconfig/OGRE-HLMS.pc DESTINATION ${OGRE_LIB_DIRECTORY}/pkgconfig)
   endif ()
 endif ()
 

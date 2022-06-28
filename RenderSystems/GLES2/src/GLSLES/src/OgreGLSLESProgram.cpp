@@ -65,9 +65,6 @@ namespace Ogre {
                                             PT_BOOL),&msCmdOptimisation);
 #endif
         }
-        // Manually assign language now since we use it immediately
-        mSyntaxCode = "glsles";
-
         // There is nothing to load
         mLoadFromFile = false;
     }
@@ -161,9 +158,6 @@ namespace Ogre {
             if (caps->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
             {
                 OGRE_CHECK_GL_ERROR(mGLProgramHandle = glCreateProgram());
-                if (caps->hasCapability(RSC_DEBUG))
-                    OGRE_CHECK_GL_ERROR(
-                        glLabelObjectEXT(GL_PROGRAM_OBJECT_EXT, mGLProgramHandle, 0, mName.c_str()));
             }
         }
 
@@ -171,12 +165,10 @@ namespace Ogre {
         if (!mSource.empty())
         {
             size_t versionPos = mSource.find("#version");
-            int shaderVersion = 100;
             size_t belowVersionPos = 0;
 
             if(versionPos != String::npos)
             {
-                shaderVersion = StringConverter::parseInt(mSource.substr(versionPos+9, 3));
                 belowVersionPos = mSource.find('\n', versionPos) + 1;
             }
 
@@ -187,7 +179,7 @@ namespace Ogre {
             // Fix up the source in case someone forgot to redeclare gl_Position
             if (caps->hasCapability(RSC_GLSL_SSO_REDECLARE) && mType == GPT_VERTEX_PROGRAM)
             {
-                if(shaderVersion >= 300) {
+                if(mShaderVersion >= 300) {
                     // Check that it's missing and that this shader has a main function, ie. not a child shader.
                     if(mSource.find("out highp vec4 gl_Position") == String::npos)
                     {
@@ -268,16 +260,15 @@ namespace Ogre {
         }
     }
     //-----------------------------------------------------------------------
-    void GLSLESProgram::buildConstantDefinitions() const
+    void GLSLESProgram::buildConstantDefinitions()
     {
         // We need an accurate list of all the uniforms in the shader, but we
         // can't get at them until we link all the shaders into a program object.
 
         // Therefore instead, parse the source code manually and extract the uniforms
         createParameterMappingStructures(true);
-        mFloatLogicalToPhysical.reset();
-        mIntLogicalToPhysical.reset();
-        GLSLESProgramManager::getSingleton().extractUniformsFromGLSL(mSource, *mConstantDefs, mName);
+        mLogicalToPhysical.reset();
+        GLSLESProgramManager::getSingleton().extractUniformsFromGLSL(mSource, *mConstantDefs, getResourceLogName());
     }
 
     //-----------------------------------------------------------------------
@@ -306,11 +297,10 @@ namespace Ogre {
         OGRE_CHECK_GL_ERROR(glDetachShader(programObject, mGLShaderHandle));
     }
 
+    static const String language = "glsles";
     //-----------------------------------------------------------------------
     const String& GLSLESProgram::getLanguage(void) const
     {
-        static const String language = "glsles";
-
         return language;
     }
     //-----------------------------------------------------------------------
@@ -319,5 +309,18 @@ namespace Ogre {
         GpuProgramParametersSharedPtr params = HighLevelGpuProgram::createParameters();
         params->setTransposeMatrices(true);
         return params;
+    }
+
+    //-----------------------------------------------------------------------
+    const String& GLSLESProgramFactory::getLanguage(void) const
+    {
+        return language;
+    }
+    //-----------------------------------------------------------------------
+    GpuProgram* GLSLESProgramFactory::create(ResourceManager* creator,
+        const String& name, ResourceHandle handle,
+        const String& group, bool isManual, ManualResourceLoader* loader)
+    {
+        return OGRE_NEW GLSLESProgram(creator, name, handle, group, isManual, loader);
     }
 }

@@ -50,7 +50,7 @@ namespace Ogre
     /** This class is the 'core' class for paging terrain, that will integrate
         with the larger paging system and provide the appropriate utility
         classes required. 
-    @remarks
+
         You should construct this class after PageManager and before any PagedWorlds
         that might use it are created / loaded. Once constructed, it will make
         the "Terrain" PagedWorldSection type available, which uses a grid strategy for
@@ -77,7 +77,7 @@ namespace Ogre
         virtual ~TerrainPaging();
 
         /** Create a TerrainPagedWorldSection.
-        @remarks
+
             This is the simplest way to create a world section which is configured
             to contain terrain (among other objects if you want). You can also do this
             by calling PagedWorld::createSection with the type "Terrain" but there
@@ -107,7 +107,7 @@ namespace Ogre
             int32 minX = -10, int32 minY = -10, int32 maxX = 10, int32 maxY = 10, 
             const String& sectionName = BLANKSTRING, uint32 loadingIntervalMs = 900);
 
-    protected:
+    private:
         PageManager* mManager;
 
         class _OgreTerrainExport SectionFactory : public PagedWorldSectionFactory

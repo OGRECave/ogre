@@ -54,7 +54,6 @@ void CGProgramWriter::initializeStringMaps()
     mGpuConstTypeMap[GCT_FLOAT4] = "float4";
     mGpuConstTypeMap[GCT_SAMPLER1D] = "sampler1D";
     mGpuConstTypeMap[GCT_SAMPLER2D] = "sampler2D";
-    mGpuConstTypeMap[GCT_SAMPLER2DSHADOW] = "sampler2D";
     mGpuConstTypeMap[GCT_SAMPLER3D] = "sampler3D";
     mGpuConstTypeMap[GCT_SAMPLERCUBE] = "samplerCUBE";
     mGpuConstTypeMap[GCT_MATRIX_2X2] = "float2x2";
@@ -75,27 +74,12 @@ void CGProgramWriter::initializeStringMaps()
     mGpuConstTypeMap[GCT_UINT3] = "uint3";
     mGpuConstTypeMap[GCT_UINT4] = "uint4";
 
-
-    mParamSemanticMap[Parameter::SPS_POSITION] = "POSITION";
-    mParamSemanticMap[Parameter::SPS_BLEND_WEIGHTS] = "BLENDWEIGHT";
-    mParamSemanticMap[Parameter::SPS_BLEND_INDICES] = "BLENDINDICES";
-    mParamSemanticMap[Parameter::SPS_NORMAL] = "NORMAL";
-    mParamSemanticMap[Parameter::SPS_COLOR] = "COLOR";
-    mParamSemanticMap[Parameter::SPS_TEXTURE_COORDINATES] = "TEXCOORD";
-    mParamSemanticMap[Parameter::SPS_BINORMAL] = "BINORMAL";
-    mParamSemanticMap[Parameter::SPS_TANGENT] = "TANGENT";
-    mParamSemanticMap[Parameter::SPS_UNKNOWN] = "";
+    mParamSemanticMap[Parameter::SPS_FRONT_FACING] = "VFACE";
 }
 
 //-----------------------------------------------------------------------
 void CGProgramWriter::writeSourceCode(std::ostream& os, Program* program)
 {
-    const ShaderFunctionList& functionList = program->getFunctions();
-    ShaderFunctionConstIterator itFunction;
-
-    const UniformParameterList& parameterList = program->getParameters();
-    UniformParameterConstIterator itUniformParam = parameterList.begin();
-
     // Generate source code header.
     writeProgramTitle(os, program);
     os << std::endl;
@@ -108,46 +92,42 @@ void CGProgramWriter::writeSourceCode(std::ostream& os, Program* program)
     writeUniformParametersTitle(os, program);
     os << std::endl;
 
-    for (itUniformParam=parameterList.begin();  itUniformParam != parameterList.end(); ++itUniformParam)
+    for (const auto& param : program->getParameters())
     {
-        writeUniformParameter(os, *itUniformParam);         
+        param->isSampler() ? writeSamplerParameter(os, param) : writeParameter(os, param);
         os << ";" << std::endl;             
     }
     os << std::endl;
 
-    // Write program function(s).
-    for (itFunction=functionList.begin(); itFunction != functionList.end(); ++itFunction)
+
+    Function* curFunction = program->getMain();
+
+    writeFunctionTitle(os, curFunction);
+    writeFunctionDeclaration(os, curFunction);
+
+    os << "{" << std::endl;
+
+    // Write local parameters.
+    const ShaderParameterList& localParams = curFunction->getLocalParameters();
+    ShaderParameterConstIterator itParam;
+
+    for (itParam=localParams.begin();  itParam != localParams.end(); ++itParam)
     {
-        Function* curFunction = *itFunction;
-
-        writeFunctionTitle(os, curFunction);
-        writeFunctionDeclaration(os, curFunction);
-
-        os << "{" << std::endl;
-
-        // Write local parameters.
-        const ShaderParameterList& localParams = curFunction->getLocalParameters();
-        ShaderParameterConstIterator itParam; 
-
-        for (itParam=localParams.begin();  itParam != localParams.end(); ++itParam)
-        {
-            os << "\t";
-            writeLocalParameter(os, *itParam);          
-            os << ";" << std::endl;                     
-        }
-
-        const FunctionAtomInstanceList& atomInstances = curFunction->getAtomInstances();
-        FunctionAtomInstanceConstIterator itAtom;
-
-        for (itAtom=atomInstances.begin(); itAtom != atomInstances.end(); ++itAtom)
-        {           
-            writeAtomInstance(os, *itAtom);
-        }
-
-
-        os << "}" << std::endl;
+        os << "\t";
+        writeParameter(os, *itParam);
+        os << ";" << std::endl;
     }
 
+    const FunctionAtomInstanceList& atomInstances = curFunction->getAtomInstances();
+    FunctionAtomInstanceConstIterator itAtom;
+
+    for (itAtom=atomInstances.begin(); itAtom != atomInstances.end(); ++itAtom)
+    {
+        writeAtomInstance(os, *itAtom);
+    }
+
+
+    os << "}" << std::endl;
     os << std::endl;
 }
 
@@ -159,76 +139,26 @@ void CGProgramWriter::writeProgramDependencies(std::ostream& os, Program* progra
     os << "//                         PROGRAM DEPENDENCIES" << std::endl;
     os << "//-----------------------------------------------------------------------------" << std::endl;
 
+    os << "#include <OgreUnifiedShader.h>" << std::endl;
+
     const auto& rgm = ResourceGroupManager::getSingleton();
 
     for (unsigned int i=0; i < program->getDependencyCount(); ++i)
     {
-        String curDependency = program->getDependency(i) + "." + getTargetLanguage();
-        if (!rgm.resourceExists(ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, curDependency))
-            curDependency = program->getDependency(i) + ".cg"; // fall back to cg extension
+        String curDependency = program->getDependency(i) + ".cg";
+        if (!rgm.resourceExistsInAnyGroup(curDependency))
+            curDependency = program->getDependency(i) + ".glsl"; // fall back to glsl extension
 
         os << "#include \"" << curDependency << '\"' << std::endl;
     }
 }
 
 //-----------------------------------------------------------------------
-void CGProgramWriter::writeUniformParameter(std::ostream& os, const UniformParameterPtr& parameter)
-{
-    os << mGpuConstTypeMap[parameter->getType()];
-    os << "\t"; 
-    os << parameter->getName(); 
-    if (parameter->isArray() == true)
-    {
-        os << "[" << parameter->getSize() << "]";   
-    }
-    
-    if (parameter->isSampler())
-    {
-        os << " : register(s" << parameter->getIndex() << ")";      
-    }
-
-}
-
-//-----------------------------------------------------------------------
 void CGProgramWriter::writeFunctionParameter(std::ostream& os, ParameterPtr parameter)
 {
-    os << mGpuConstTypeMap[parameter->getType()];
-
-    os << "\t"; 
-    os << parameter->getName(); 
-    if (parameter->isArray() == true)
-    {
-        os << "[" << parameter->getSize() << "]";   
-    }
-    
-    if (parameter->getSemantic() != Parameter::SPS_UNKNOWN)
-    {
-        os << " : ";
-        os << mParamSemanticMap[parameter->getSemantic()];
-
-        if (parameter->getSemantic() != Parameter::SPS_POSITION && 
-            parameter->getSemantic() != Parameter::SPS_NORMAL &&
-            parameter->getSemantic() != Parameter::SPS_TANGENT &&
-            parameter->getSemantic() != Parameter::SPS_BLEND_INDICES &&
-            parameter->getSemantic() != Parameter::SPS_BLEND_WEIGHTS &&
-            (!(parameter->getSemantic() == Parameter::SPS_COLOR && parameter->getIndex() == 0)) &&
-            parameter->getIndex() >= 0)
-        {           
-            os << StringConverter::toString(parameter->getIndex()).c_str();
-        }
-    }
-}
-
-//-----------------------------------------------------------------------
-void CGProgramWriter::writeLocalParameter(std::ostream& os, ParameterPtr parameter)
-{
-    os << mGpuConstTypeMap[parameter->getType()];
-    os << "\t"; 
-    os << parameter->getName();     
-    if (parameter->isArray() == true)
-    {
-        os << "[" << parameter->getSize() << "]";   
-    }
+    writeParameter(os, parameter);
+    os << " : ";
+    writeParameterSemantic(os, parameter);
 }
 
 //-----------------------------------------------------------------------
@@ -238,27 +168,16 @@ void CGProgramWriter::writeFunctionDeclaration(std::ostream& os, Function* funct
     const ShaderParameterList& outParams = function->getOutputParameters();
 
 
-    os << "void";
-    os << " ";
-
-    os << function->getName();
-    os << std::endl << "\t(" << std::endl;
+    os << "void main(\n";
 
     ShaderParameterConstIterator it;
-    size_t paramsCount = inParams.size() + outParams.size();
-    size_t curParamIndex = 0;
 
     // Write input parameters.
     for (it=inParams.begin(); it != inParams.end(); ++it)
     {                   
         os << "\t in ";
-
         writeFunctionParameter(os, *it);
-
-        if (curParamIndex + 1 != paramsCount)       
-            os << ", " << std::endl;
-
-        curParamIndex++;
+        os << ",\n";
     }
 
 
@@ -267,14 +186,12 @@ void CGProgramWriter::writeFunctionDeclaration(std::ostream& os, Function* funct
     {
         os << "\t out ";
         writeFunctionParameter(os, *it);
+        os << ",\n";
+    }
 
-        if (curParamIndex + 1 != paramsCount)               
-            os << ", " << std::endl;
+    os.seekp(-2, std::ios_base::end);
 
-        curParamIndex++;
-    }   
-
-    os << std::endl << "\t)" << std::endl;
+    os << "\n)\n";
 }
 
 //-----------------------------------------------------------------------

@@ -45,7 +45,7 @@ namespace Ogre {
     *  @{
     */
     /** Class for loading & managing textures.
-        @remarks
+
             Note that this class is abstract - the particular
             RenderSystem that is in use at the time will create
             a concrete subclass of this. Note that the concrete
@@ -65,27 +65,14 @@ namespace Ogre {
         virtual ~TextureManager();
 
         /// create a new sampler
-        SamplerPtr createSampler(const String& name = BLANKSTRING)
-        {
-            SamplerPtr ret = _createSamplerImpl();
-            if(!name.empty())
-            {
-                OgreAssert(mNamedSamplers.find(name) == mNamedSamplers.end(),
-                           ("Sampler '" + name + "' already exists").c_str());
-                mNamedSamplers[name] = ret;
-            }
-            return ret;
-        }
+        SamplerPtr createSampler(const String& name = BLANKSTRING);
 
         /// retrieve an named sampler
-        const SamplerPtr& getSampler(const String& name) const
-        {
-            static SamplerPtr nullPtr;
-            auto it = mNamedSamplers.find(name);
-            if(it == mNamedSamplers.end())
-                return nullPtr;
-            return it->second;
-        }
+        const SamplerPtr& getSampler(const String& name) const;
+
+        /// clear the list of named samplers
+        /// @copydetails removeAll()
+        void removeAllNamedSamplers() { mNamedSamplers.clear(); }
 
         /// Create a new texture
         /// @copydetails ResourceManager::createResource
@@ -93,7 +80,7 @@ namespace Ogre {
                             bool isManual = false, ManualResourceLoader* loader = 0,
                             const NameValuePairList* createParams = 0);
         /// @copydoc ResourceManager::getResourceByName
-        TexturePtr getByName(const String& name, const String& groupName OGRE_RESOURCE_GROUP_INIT);
+        TexturePtr getByName(const String& name, const String& groupName OGRE_RESOURCE_GROUP_INIT) const;
 
         using ResourceManager::createOrRetrieve;
 
@@ -111,9 +98,7 @@ namespace Ogre {
             @param
                 gamma The gamma adjustment factor to apply to this texture (brightening/darkening)
             @param 
-                isAlpha Only applicable to greyscale images. If true, specifies that
-                the image should be loaded into an alpha texture rather than a
-                single channel colour texture - useful for fixed-function systems.
+                isAlpha deprecated: same as specifying #PF_A8 for @c desiredFormat
             @param 
                 desiredFormat The format you would like to have used instead of
                 the format being based on the contents of the texture
@@ -131,6 +116,16 @@ namespace Ogre {
             PixelFormat desiredFormat = PF_UNKNOWN, bool hwGammaCorrection = false);
 
         /** Prepares to loads a texture from a file.
+            @copydetails TextureManager::load
+            @param isAlpha deprecated: same as specifying #PF_A8 for @c desiredFormat
+        */
+        TexturePtr prepare(
+            const String& name, const String& group,
+            TextureType texType = TEX_TYPE_2D, int numMipmaps = MIP_DEFAULT,
+            Real gamma = 1.0f, bool isAlpha = false,
+            PixelFormat desiredFormat = PF_UNKNOWN, bool hwGammaCorrection = false);
+
+        /** Loads a texture from a file.
             @param
                 name The file to load, or a String identifier in some cases
             @param
@@ -144,10 +139,7 @@ namespace Ogre {
                 level, 1x1x1.
             @param
                 gamma The gamma adjustment factor to apply to this texture (brightening/darkening)
-            @param 
-                isAlpha Only applicable to greyscale images. If true, specifies that
-                the image should be loaded into an alpha texture rather than a
-                single channel colour texture - useful for fixed-function systems.
+
             @param 
                 desiredFormat The format you would like to have used instead of
                 the format being based on the contents of the texture; the manager reserves
@@ -159,21 +151,14 @@ namespace Ogre {
                 8-bits per channel textures, will be ignored for other types. Has the advantage
                 over pre-applied gamma that the texture precision is maintained.
         */
-        TexturePtr prepare(
-            const String& name, const String& group, 
-            TextureType texType = TEX_TYPE_2D, int numMipmaps = MIP_DEFAULT, 
-            Real gamma = 1.0f, bool isAlpha = false,
-            PixelFormat desiredFormat = PF_UNKNOWN, bool hwGammaCorrection = false);
-
-        /** Loads a texture from a file.
-            @copydetails TextureManager::prepare
-        */
-        TexturePtr load(
-            const String& name, const String& group, 
-            TextureType texType = TEX_TYPE_2D, int numMipmaps = MIP_DEFAULT, 
-            Real gamma = 1.0f, bool isAlpha = false,
-            PixelFormat desiredFormat = PF_UNKNOWN, 
-            bool hwGammaCorrection = false);
+        TexturePtr load(const String& name, const String& group, TextureType texType = TEX_TYPE_2D,
+                        int numMipmaps = MIP_DEFAULT, Real gamma = 1.0f,
+                        PixelFormat desiredFormat = PF_UNKNOWN, bool hwGammaCorrection = false);
+        /// @deprecated
+        OGRE_DEPRECATED TexturePtr load(const String& name, const String& group, TextureType texType,
+                                        int numMipmaps, Real gamma, bool isAlpha,
+                                        PixelFormat desiredFormat = PF_UNKNOWN,
+                                        bool hwGammaCorrection = false);
 
         /** Loads a texture from an Image object.
             @note
@@ -252,8 +237,8 @@ namespace Ogre {
                 usage The kind of usage this texture is intended for. It 
                 is a combination of TU_STATIC, TU_DYNAMIC, TU_WRITE_ONLY, 
                 TU_AUTOMIPMAP and TU_RENDERTARGET (see TextureUsage enum). You are
-                strongly advised to use HBU_STATIC_WRITE_ONLY wherever possible, if you need to 
-                update regularly, consider HBU_DYNAMIC_WRITE_ONLY.
+                strongly advised to use HBU_GPU_ONLY wherever possible, if you need to
+                update regularly, consider HBU_CPU_TO_GPU.
             @param
                 loader If you intend the contents of the manual texture to be 
                 regularly updated, to the extent that you don't need to recover 
@@ -271,7 +256,7 @@ namespace Ogre {
             @param fsaa The level of multisampling to use if this is a render target. Ignored
                 if usage does not include TU_RENDERTARGET or if the device does
                 not support it.
-            @param fsaaHint specify "Quality" to enable CSAA on D3D
+            @param fsaaHint @copybrief RenderTarget::getFSAAHint
         */
         virtual TexturePtr createManual(const String & name, const String& group,
             TextureType texType, uint width, uint height, uint depth, 
@@ -329,7 +314,7 @@ namespace Ogre {
 
         /** Returns whether this render system can natively support the precise texture 
             format requested with the given usage options.
-        @remarks
+
             You can still create textures with this format even if this method returns
             false; the texture format will just be altered to one which the device does
             support.
@@ -358,7 +343,7 @@ namespace Ogre {
 
         /** Returns whether this render system has hardware filtering supported for the
             texture format requested with the given usage options.
-        @remarks
+
             Not all texture format are supports filtering by the hardware, i.e. some
             cards support floating point format, but it doesn't supports filtering on
             the floating point texture at all, or only a subset floating point formats
@@ -374,7 +359,7 @@ namespace Ogre {
             doesn't loss visual quality.
         @par
             This method allow you queries hardware texture filtering capability to deciding
-            which verion of the shader to be used. Note it's up to you to write multi-version
+            which version of the shader to be used. Note it's up to you to write multi-version
             shaders for support various hardware, internal engine can't do that for you
             automatically.
         @note
@@ -461,15 +446,16 @@ namespace Ogre {
             void freeInternalResourcesImpl() override {}
             void loadImpl() override {}
         };
-    public:
-        bool isHardwareFilteringSupported(TextureType, PixelFormat, int, bool) override { return false; }
-        PixelFormat getNativeFormat(TextureType, PixelFormat, int) override { return PF_UNKNOWN; }
 
         Resource* createImpl(const String& name, ResourceHandle handle, const String& group, bool,
                              ManualResourceLoader*, const NameValuePairList*) override
         {
             return new NullTexture(this, name, handle, group);
         }
+
+    public:
+        bool isHardwareFilteringSupported(TextureType, PixelFormat, int, bool) override { return false; }
+        PixelFormat getNativeFormat(TextureType, PixelFormat, int) override { return PF_UNKNOWN; }
     };
     /** @} */
     /** @} */

@@ -30,6 +30,7 @@ THE SOFTWARE.
 #include "OgreD3D11Mappings.h"
 #include "OgreD3D11Device.h"
 #include "OgreD3D11RenderSystem.h"
+#include "OgreD3D11DepthBuffer.h"
 #include "OgreRoot.h"
 #include "OgreLogManager.h"
 #include "OgreException.h"
@@ -69,7 +70,7 @@ namespace Ogre
     //---------------------------------------------------------------------
     void D3D11Texture::notifyDeviceRestored(D3D11Device* device)
     {
-        if(mIsManual)
+        if(isManuallyLoaded())
         {
             preLoadImpl();
             createInternalResourcesImpl();
@@ -125,11 +126,6 @@ namespace Ogre
         _setSrcAttributes(mWidth, mHeight, mDepth, mFormat);
     }
     //---------------------------------------------------------------------
-    void D3D11Texture::freeInternalResources(void)
-    {
-        freeInternalResourcesImpl();
-    }
-    //---------------------------------------------------------------------
     void D3D11Texture::freeInternalResourcesImpl()
     {
         mpTex.Reset();
@@ -137,11 +133,6 @@ namespace Ogre
         mp1DTex.Reset();
         mp2DTex.Reset();
         mp3DTex.Reset();
-    }
-    //---------------------------------------------------------------------
-    void D3D11Texture::createInternalResources(void)
-    {
-        createInternalResourcesImpl();
     }
 
     //---------------------------------------------------------------------
@@ -202,7 +193,7 @@ namespace Ogre
         assert(mSrcWidth > 0 || mSrcHeight > 0);
 
         // determine total number of mipmaps including main one (d3d11 convention)
-        UINT numMips = (mNumRequestedMipmaps == MIP_UNLIMITED || (1U << mNumRequestedMipmaps) > mSrcWidth) ? 0 : mNumRequestedMipmaps + 1;
+        UINT numMips = (mNumMipmaps == MIP_UNLIMITED || (1U << mNumMipmaps) > mSrcWidth) ? 0 : mNumMipmaps + 1;
 
         D3D11_TEXTURE1D_DESC desc;
         desc.Width          = static_cast<UINT>(mSrcWidth);
@@ -249,14 +240,11 @@ namespace Ogre
         mSRVDesc.Format = desc.Format;
         mSRVDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE1D;
         mSRVDesc.Texture1D.MipLevels = desc.MipLevels;
-        hr = (desc.BindFlags & D3D11_BIND_SHADER_RESOURCE) ? mDevice->CreateShaderResourceView(mp1DTex.Get(), &mSRVDesc, mpShaderResourceView.ReleaseAndGetAddressOf()) : S_FALSE;
-        if (FAILED(hr) || mDevice.isError())
-        {
-            String errorDescription = mDevice.getErrorDescription(hr);
-			OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
-                "D3D11 device can't create shader resource view.\nError Description:" + errorDescription,
-                "D3D11Texture::_create1DTex");
-        }
+        OGRE_CHECK_DX_ERROR(
+            (desc.BindFlags & D3D11_BIND_SHADER_RESOURCE)
+                ? mDevice->CreateShaderResourceView(mp1DTex.Get(), &mSRVDesc,
+                                                    mpShaderResourceView.ReleaseAndGetAddressOf())
+                : S_FALSE);
 
         this->_setFinalAttributes(desc.Width, 1, 1, D3D11Mappings::_getPF(desc.Format), desc.MiscFlags);
     }
@@ -269,7 +257,7 @@ namespace Ogre
         assert(mSrcWidth > 0 || mSrcHeight > 0);
 
         // determine total number of mipmaps including main one (d3d11 convention)
-        UINT numMips = (mNumRequestedMipmaps == MIP_UNLIMITED || (1U << mNumRequestedMipmaps) > std::max(mSrcWidth, mSrcHeight)) ? 0 : mNumRequestedMipmaps + 1;
+        UINT numMips = (mNumMipmaps == MIP_UNLIMITED || (1U << mNumMipmaps) > std::max(mSrcWidth, mSrcHeight)) ? 0 : mNumMipmaps + 1;
         if(D3D11Mappings::_isBinaryCompressedFormat(mD3DFormat) && numMips > 1)
             numMips = std::max(1U, numMips - 2);
 
@@ -284,6 +272,14 @@ namespace Ogre
         desc.BindFlags      = D3D11Mappings::_getTextureBindFlags(mD3DFormat, _getTextureUsage());
         desc.CPUAccessFlags = D3D11Mappings::_getAccessFlags(_getTextureUsage());
         desc.MiscFlags      = D3D11Mappings::_getTextureMiscFlags(desc.BindFlags, getTextureType(), _getTextureUsage());
+
+        if (PixelUtil::isDepth(mFormat))
+        {
+            desc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_DEPTH_STENCIL;
+            desc.Usage = D3D11_USAGE_DEFAULT;
+            desc.CPUAccessFlags        = 0;
+            desc.MiscFlags             = 0;
+        }
 
         if (this->getTextureType() == TEX_TYPE_CUBE_MAP)
         {
@@ -338,7 +334,7 @@ namespace Ogre
         mNumMipmaps = desc.MipLevels - 1;
         
         ZeroMemory( &mSRVDesc, sizeof(mSRVDesc) );
-        mSRVDesc.Format = desc.Format;
+        mSRVDesc.Format = desc.Format == DXGI_FORMAT_R32_TYPELESS ? DXGI_FORMAT_R32_FLOAT : desc.Format;
         
         switch(this->getTextureType())
         {
@@ -380,14 +376,11 @@ namespace Ogre
             break;
         }
 
-        hr = (desc.BindFlags & D3D11_BIND_SHADER_RESOURCE) ? mDevice->CreateShaderResourceView(mp2DTex.Get(), &mSRVDesc,mpShaderResourceView.ReleaseAndGetAddressOf()) : S_FALSE;
-        if (FAILED(hr) || mDevice.isError())
-        {
-            String errorDescription = mDevice.getErrorDescription(hr);
-			OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
-                "D3D11 device can't create shader resource view.\nError Description:" + errorDescription,
-                "D3D11Texture::_create2DTex");
-        }
+        OGRE_CHECK_DX_ERROR(
+            (desc.BindFlags & D3D11_BIND_SHADER_RESOURCE)
+                ? mDevice->CreateShaderResourceView(mp2DTex.Get(), &mSRVDesc,
+                                                    mpShaderResourceView.ReleaseAndGetAddressOf())
+                : S_FALSE);
 
         this->_setFinalAttributes(desc.Width, desc.Height, desc.ArraySize / getNumFaces(), D3D11Mappings::_getPF(desc.Format), desc.MiscFlags);
     }
@@ -398,7 +391,7 @@ namespace Ogre
         assert(mWidth > 0 && mHeight > 0 && mDepth>0);
 
         // determine total number of mipmaps including main one (d3d11 convention)
-        UINT numMips = (mNumRequestedMipmaps == MIP_UNLIMITED || (1U << mNumRequestedMipmaps) > std::max(std::max(mSrcWidth, mSrcHeight), mDepth)) ? 0 : mNumRequestedMipmaps + 1;
+        UINT numMips = (mNumMipmaps == MIP_UNLIMITED || (1U << mNumMipmaps) > std::max(std::max(mSrcWidth, mSrcHeight), mDepth)) ? 0 : mNumMipmaps + 1;
 
         D3D11_TEXTURE3D_DESC desc;
         desc.Width          = static_cast<UINT>(mSrcWidth);
@@ -449,14 +442,11 @@ namespace Ogre
         mSRVDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE3D;
         mSRVDesc.Texture3D.MostDetailedMip = 0;
         mSRVDesc.Texture3D.MipLevels = desc.MipLevels;
-        hr = (desc.BindFlags & D3D11_BIND_SHADER_RESOURCE) ? mDevice->CreateShaderResourceView(mp3DTex.Get(), &mSRVDesc, mpShaderResourceView.ReleaseAndGetAddressOf()) : S_FALSE;
-        if (FAILED(hr) || mDevice.isError())
-        {
-            String errorDescription = mDevice.getErrorDescription(hr);
-			OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
-                "D3D11 device can't create shader resource view.\nError Description:" + errorDescription,
-                "D3D11Texture::_create3DTex");
-        }
+        OGRE_CHECK_DX_ERROR(
+            (desc.BindFlags & D3D11_BIND_SHADER_RESOURCE)
+                ? mDevice->CreateShaderResourceView(mp3DTex.Get(), &mSRVDesc,
+                                                    mpShaderResourceView.ReleaseAndGetAddressOf())
+                : S_FALSE);
 
         this->_setFinalAttributes(desc.Width, desc.Height, desc.Depth, D3D11Mappings::_getPF(desc.Format), desc.MiscFlags);
     }
@@ -540,7 +530,6 @@ namespace Ogre
         mBuffer = buffer;
         mWidth = (unsigned int) mBuffer->getWidth();
         mHeight = (unsigned int) mBuffer->getHeight();
-        mColourDepth = (unsigned int) PixelUtil::getNumElemBits(mBuffer->getFormat());
         
         ID3D11Resource * pBackBuffer = buffer->getParentTexture()->getTextureResource();
 
@@ -582,22 +571,42 @@ namespace Ogre
             break;
         case D3D11_SRV_DIMENSION_TEXTURE3D:
             RTVDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE3D;
+            RTVDesc.Texture3D.FirstWSlice = mZOffset;
+            RTVDesc.Texture3D.WSize = 1;
             break;
         default:
             assert(false);
         }
-        HRESULT hr = mDevice->CreateRenderTargetView(pBackBuffer, &RTVDesc, mRenderTargetView.ReleaseAndGetAddressOf());
 
-        if (FAILED(hr) || mDevice.isError())
+        if (!PixelUtil::isDepth(mBuffer->getFormat()))
         {
-			String errorDescription = mDevice.getErrorDescription(hr);
-			OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
-				"Error creating Render Target View\nError Description:" + errorDescription,
-                "D3D11RenderTexture::rebind" );
+            OGRE_CHECK_DX_ERROR(mDevice->CreateRenderTargetView(pBackBuffer, &RTVDesc,
+                                                                mRenderTargetView.ReleaseAndGetAddressOf()));
+            return;
         }
+
+        // also create DSV for depth textures
+        D3D11_TEXTURE2D_DESC BBDesc;
+        getSurface()->GetDesc(&BBDesc);
+
+        // Create the depth stencil view
+        D3D11_DEPTH_STENCIL_VIEW_DESC descDSV = {};
+        descDSV.Format = DXGI_FORMAT_D32_FLOAT;
+        descDSV.ViewDimension = (BBDesc.SampleDesc.Count > 1) ? D3D11_DSV_DIMENSION_TEXTURE2DMS : D3D11_DSV_DIMENSION_TEXTURE2D;
+        descDSV.Flags = 0 /* D3D11_DSV_READ_ONLY_DEPTH | D3D11_DSV_READ_ONLY_STENCIL */;    // TODO: Allows bind depth buffer as depth view AND texture simultaneously.
+        descDSV.Texture2D.MipSlice = 0;
+
+        ID3D11DepthStencilView      *depthStencilView;
+        OGRE_CHECK_DX_ERROR(mDevice->CreateDepthStencilView(pBackBuffer, &descDSV, &depthStencilView ));
+
+        D3D11RenderSystem* rs = (D3D11RenderSystem*)Root::getSingleton().getRenderSystem();
+        mDepthBuffer =
+            new D3D11DepthBuffer(DepthBuffer::POOL_NO_DEPTH, rs, depthStencilView, mWidth, mHeight,
+                                 BBDesc.SampleDesc.Count, BBDesc.SampleDesc.Quality, false);
+        mDepthBuffer->_notifyRenderTargetAttached(this);
     }
 
-    uint D3D11RenderTexture::getNumberOfViews() const { return 1; }
+    uint D3D11RenderTexture::getNumberOfViews() const { return PixelUtil::isDepth(mBuffer->getFormat()) ? 0 : 1; }
 
     ID3D11Texture2D* D3D11RenderTexture::getSurface(uint index) const
     {
@@ -620,7 +629,10 @@ namespace Ogre
     //---------------------------------------------------------------------
     D3D11RenderTexture::~D3D11RenderTexture()
     {
+        if (mDepthBuffer && PixelUtil::isDepth (mBuffer->getFormat ()))
+            delete mDepthBuffer;
     }
+
     //---------------------------------------------------------------------
     void D3D11RenderTexture::notifyDeviceLost(D3D11Device* device)
     {

@@ -48,7 +48,6 @@ namespace Ogre {
 
             //virtual GLESPBuffer* createPBuffer(PixelComponentType format,
             //  size_t width, size_t height);
-            virtual void switchMode(uint& width, uint& height, short& frequency);
 
             RenderWindow* newWindow(const String& name,
                                     unsigned int width, unsigned int height,

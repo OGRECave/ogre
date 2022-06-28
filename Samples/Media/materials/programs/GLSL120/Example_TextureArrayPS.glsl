@@ -1,10 +1,15 @@
-#version 120
+#ifdef OGRE_GLSL
 #extension GL_EXT_texture_array : enable
+#endif
 
-uniform sampler2DArray TextureArrayTex;
-varying vec3 oUv;
+#define USE_OGRE_FROM_FUTURE
+#include <OgreUnifiedShader.h>
 
-void main(void)
+SAMPLER2DARRAY(TextureArrayTex, 0);
+
+MAIN_PARAMETERS
+IN(vec3 oUv, TEXCOORD0)
+MAIN_DECLARATION
 {
 	vec3 texcoord;
 	texcoord = oUv;

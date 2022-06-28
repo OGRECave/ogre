@@ -45,7 +45,7 @@ namespace Ogre {
     */
 
     /**  */
-    enum SkeletonAnimationBlendMode {
+    enum SkeletonAnimationBlendMode : uint8 {
         /// Animations are applied by calculating a weighted average of all animations
         ANIMBLEND_AVERAGE = 0,
         /// Animations are applied by calculating a weighted cumulative total
@@ -58,7 +58,7 @@ namespace Ogre {
     struct LinkedSkeletonAnimationSource;
 
     /** A collection of Bone objects used to animate a skinned mesh.
-    @remarks
+
         Skeletal animation works by having a collection of 'bones' which are 
         actually just joints with a position and orientation, arranged in a tree structure.
         For example, the wrist joint is a child of the elbow joint, which in turn is a
@@ -85,13 +85,13 @@ namespace Ogre {
     class _OgreExport Skeleton : public Resource, public AnimationContainer
     {
         friend class SkeletonInstance;
-    protected:
+    private:
         /// Internal constructor for use by SkeletonInstance only
         Skeleton();
 
     public:
         /** Constructor, don't call directly, use SkeletonManager.
-        @remarks
+
             On creation, a Skeleton has a no bones, you should create them and link
             them together appropriately. 
         */
@@ -101,7 +101,7 @@ namespace Ogre {
 
 
         /** Creates a brand new Bone owned by this Skeleton. 
-        @remarks
+
             This method creates an unattached new Bone for this skeleton.
             Unless this is to be a root bone (there may be more than one of 
             these), you must attach it to another Bone in the skeleton using addChild for it to be any use.
@@ -116,7 +116,7 @@ namespace Ogre {
         virtual Bone* createBone(void);
 
         /** Creates a brand new Bone owned by this Skeleton. 
-        @remarks
+
             This method creates an unattached new Bone for this skeleton and assigns it a 
             specific handle. Unless this is to be a root bone (there may be more than one of 
             these), you must attach it to another Bone in the skeleton using addChild for it to be any use. 
@@ -131,7 +131,7 @@ namespace Ogre {
         virtual Bone* createBone(unsigned short handle);
 
         /** Creates a brand new Bone owned by this Skeleton. 
-        @remarks
+
             This method creates an unattached new Bone for this skeleton and assigns it a 
             specific name.Unless this is to be a root bone (there may be more than one of 
             these), you must attach it to another Bone in the skeleton using addChild for it to be any use.
@@ -146,7 +146,7 @@ namespace Ogre {
         virtual Bone* createBone(const String& name);
 
         /** Creates a brand new Bone owned by this Skeleton. 
-        @remarks
+
             This method creates an unattached new Bone for this skeleton and assigns it a 
             specific name and handle. Unless this is to be a root bone (there may be more than one of 
             these), you must attach it to another Bone in the skeleton using addChild for it to be any use.
@@ -202,7 +202,7 @@ namespace Ogre {
         virtual void setBindingPose(void);
 
         /** Resets the position and orientation of all bones in this skeleton to their original binding position.
-        @remarks
+
             A skeleton is bound to a mesh in a binding pose. Bone positions are then modified from this
             position during animation. This method returns all the bones to their original position and
             orientation.
@@ -219,7 +219,7 @@ namespace Ogre {
         virtual Animation* createAnimation(const String& name, Real length);
 
         /** Returns the named Animation object. 
-        @remarks
+
             Will pick up animations in linked skeletons 
             (@see addLinkedSkeletonAnimationSource). 
         @param name The name of the animation
@@ -230,7 +230,7 @@ namespace Ogre {
             const LinkedSkeletonAnimationSource** linker) const;
 
         /** Returns the named Animation object.
-         @remarks
+
              Will pick up animations in linked skeletons 
              (@see addLinkedSkeletonAnimationSource). 
          @param name The name of the animation
@@ -249,7 +249,7 @@ namespace Ogre {
         virtual void removeAnimation(const String& name);
 
         /** Changes the state of the skeleton to reflect the application of the passed in collection of animations.
-        @remarks
+
             Animating a skeleton involves both interpolating between keyframes of a specific animation,
             and blending between the animations themselves. Calling this method sets the state of
             the skeleton so that it reflects the combination of all the passed in animations, at the
@@ -262,19 +262,19 @@ namespace Ogre {
 
 
         /** Initialise an animation set suitable for use with this skeleton. 
-        @remarks
+
             Only recommended for use inside the engine, not by applications.
         */
         virtual void _initAnimationState(AnimationStateSet* animSet);
 
         /** Refresh an animation set suitable for use with this skeleton. 
-        @remarks
+
             Only recommended for use inside the engine, not by applications.
         */
         virtual void _refreshAnimationState(AnimationStateSet* animSet);
 
         /** Populates the passed in array with the bone matrices based on the current position.
-        @remarks
+
             Internal use only. The array pointed to by the passed in pointer must
             be at least as large as the number of bones.
             Assumes animation has already been updated.
@@ -285,7 +285,7 @@ namespace Ogre {
         virtual unsigned short getNumAnimations(void) const;
 
         /** Gets a single animation by index. 
-        @remarks
+
             Will NOT pick up animations in linked skeletons 
             (@see addLinkedSkeletonAnimationSource).
         */
@@ -309,7 +309,7 @@ namespace Ogre {
 
         /** Allows you to use the animations from another Skeleton object to animate
             this skeleton.
-        @remarks
+
             If you have skeletons of identical structure (that means identically
             named bones with identical handles, and with the same hierarchy), but
             slightly different proportions or binding poses, you can re-use animations
@@ -349,8 +349,14 @@ namespace Ogre {
             LinkedSkeletonAnimSourceList;
         typedef ConstVectorIterator<LinkedSkeletonAnimSourceList> 
             LinkedSkeletonAnimSourceIterator;
-        /// Get an iterator over the linked skeletons used as animation sources
-        virtual LinkedSkeletonAnimSourceIterator 
+        /// Get the linked skeletons used as animation sources
+        virtual const LinkedSkeletonAnimSourceList& getLinkedSkeletonAnimationSources() const
+        {
+            return mLinkedSkeletonAnimSourceList;
+        }
+
+        /// @deprecated use getLinkedSkeletonAnimationSources
+        OGRE_DEPRECATED virtual LinkedSkeletonAnimSourceIterator
             getLinkedSkeletonAnimationSourceIterator(void) const;
 
         /// Internal method for marking the manual bones as dirty
@@ -367,7 +373,7 @@ namespace Ogre {
         typedef std::vector<ushort> BoneHandleMap;
 
         /** Merge animations from another Skeleton object into this skeleton.
-        @remarks
+
             This function allow merge two structures compatible skeletons. The
             'compatible' here means identically bones will have same hierarchy,
             but skeletons are not necessary to have same number of bones (if
@@ -404,48 +410,47 @@ namespace Ogre {
             const StringVector& animations = StringVector());
 
         /** Build the bone handle map to use with Skeleton::_mergeSkeletonAnimations.
-        @remarks
+
             Identically bones are determine by handle.
         */
         virtual void _buildMapBoneByHandle(const Skeleton* source,
             BoneHandleMap& boneHandleMap) const;
 
         /** Build the bone handle map to use with Skeleton::_mergeSkeletonAnimations.
-        @remarks
+
             Identically bones are determine by name.
         */
         virtual void _buildMapBoneByName(const Skeleton* source,
             BoneHandleMap& boneHandleMap) const;
 
     protected:
-        SkeletonAnimationBlendMode mBlendState;
-        /// Storage of bones, indexed by bone handle
-        BoneList mBoneList;
+        /// Storage of animations, lookup by name
+        typedef std::map<String, Animation*> AnimationList;
+        AnimationList mAnimationsList;
+    private:
         /// Lookup by bone name
         typedef std::map<String, Bone*> BoneListByName;
         BoneListByName mBoneListByName;
 
-
         /// Pointer to root bones (can now have multiple roots)
         mutable BoneList mRootBones;
-        /// Bone automatic handles
-        unsigned short mNextAutoHandle;
         typedef std::set<Bone*> BoneSet;
         /// Manual bones
         BoneSet mManualBones;
-        /// Manual bones dirty?
-        bool mManualBonesDirty;
-
-
-        /// Storage of animations, lookup by name
-        typedef std::map<String, Animation*> AnimationList;
-        AnimationList mAnimationsList;
 
         /// List of references to other skeletons to use animations from 
         mutable LinkedSkeletonAnimSourceList mLinkedSkeletonAnimSourceList;
 
+        /// Bone automatic handles
+        unsigned short mNextAutoHandle;
+        SkeletonAnimationBlendMode mBlendState;
+        /// Manual bones dirty?
+        bool mManualBonesDirty;
+        /// Storage of bones, indexed by bone handle
+        BoneList mBoneList;
+
         /** Internal method which parses the bones to derive the root bone. 
-        @remarks
+
             Must be const because called in getRootBone but mRootBone is mutable
             since lazy-updated.
         */
@@ -454,13 +459,11 @@ namespace Ogre {
         /// Debugging method
         void _dumpContents(const String& filename);
 
-        /** @copydoc Resource::loadImpl
-        */
-        void loadImpl(void);
+        void loadImpl() {}
+        void unloadImpl() { unprepareImpl(); }
 
-        /** @copydoc Resource::unloadImpl
-        */
-        void unloadImpl(void);
+        void prepareImpl(void);
+        void unprepareImpl(void);
         /// @copydoc Resource::calculateSize
         size_t calculateSize(void) const;
 

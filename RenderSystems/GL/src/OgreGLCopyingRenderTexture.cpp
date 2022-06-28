@@ -45,7 +45,7 @@ namespace Ogre {
         if( name == GLRenderTexture::CustomAttributeString_TARGET )
         {
             GLSurfaceDesc &target = *static_cast<GLSurfaceDesc*>(pData);
-            target.buffer = static_cast<GLHardwarePixelBuffer*>(mBuffer);
+            target.buffer = static_cast<GLHardwarePixelBufferCommon*>(mBuffer);
             target.zoffset = mZOffset;
         }
     }

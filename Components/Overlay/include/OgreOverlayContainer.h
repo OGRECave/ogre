@@ -31,11 +31,10 @@ THE SOFTWARE.
 
 #include "OgreOverlayPrerequisites.h"
 #include "OgreOverlayElement.h"
-#include "OgreIteratorWrappers.h"
 
 
 namespace Ogre {
-
+    template <typename T> class MapIterator;
 
     /** \addtogroup Optional
     *  @{
@@ -44,11 +43,11 @@ namespace Ogre {
     *  @{
     */
     /** A 2D element which contains other OverlayElement instances.
-    @remarks
+
         This is a specialisation of OverlayElement for 2D elements that contain other
         elements. These are also the smallest elements that can be attached directly
         to an Overlay.
-    @remarks
+
         OverlayContainers should be managed using OverlayManager. This class is responsible for
         instantiating / deleting elements, and also for accepting new types of element
         from plugins etc.
@@ -60,7 +59,7 @@ namespace Ogre {
         typedef MapIterator<ChildMap> ChildIterator;
         typedef std::map<String, OverlayContainer*> ChildContainerMap;
         typedef MapIterator<ChildContainerMap> ChildContainerIterator;
-    protected:
+    private:
         /// Map of all children
         ChildMap mChildren;
         /// Map of container children (subset of mChildren)
@@ -91,11 +90,14 @@ namespace Ogre {
         void _removeChild(OverlayElement* elem) { _removeChild(elem->getName()); }
         void _removeChild(const String& name);
 
-        /** Gets an object for iterating over all the children of this object. */
-        virtual ChildIterator getChildIterator(void);
+        /** Gets all the children of this object. */
+        const ChildMap& getChildren() const { return mChildren; }
+
+        /// @deprecated use getChildren(
+        OGRE_DEPRECATED virtual ChildIterator getChildIterator(void);
 
         /** Gets an iterator for just the container children of this object.
-        @remarks
+
             Good for cascading updates without having to use RTTI
         */
         virtual ChildContainerIterator getChildContainerIterator(void);

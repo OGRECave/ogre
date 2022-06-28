@@ -57,7 +57,7 @@ typedef std::set< PCZSceneNode * > PCZSceneNodeList;
 
 
 /** Octree datastructure for managing scene nodes.
-@remarks
+
 This is a loose octree implementation, meaning that each
 octant child of the octree actually overlaps it's siblings by a factor
 of .5.  This guarantees that any thing that is half the size of the parent will
@@ -71,7 +71,7 @@ public:
     ~Octree();
 
     /** Adds an PCZscene node to this octree level.
-    @remarks
+
     This is called by the OctreeZone after
     it has determined the correct Octree to insert the node into.
     */
@@ -89,7 +89,7 @@ public:
     };
 
     /** The bounding box of the octree
-    @remarks
+
     This is used for octant index determination and rendering, but not culling
     */
     AxisAlignedBox mBox;
@@ -104,21 +104,21 @@ public:
     Vector3 mHalfSize;
 
     /** 3D array of children of this octree.
-    @remarks
+
     Children are dynamically created as needed when nodes are inserted in the Octree.
     If, later, all the nodes are removed from the child, it is still kept around.
     */
     Octree * mChildren[ 2 ][ 2 ][ 2 ];
 
     /** Determines if this octree is twice as big as the given box.
-    @remarks
+
     This method is used by the OctreeSceneManager to determine if the given
     box will fit into a child of this octree.
     */
     bool _isTwiceSize( const AxisAlignedBox &box ) const;
 
     /**  Returns the appropriate indexes for the child of this octree into which the box will fit.
-    @remarks
+
     This is used by the OctreeSceneManager to determine which child to traverse next when
     finding the appropriate octree to insert the box.  Since it is a loose octree, only the
     center of the box is checked to determine the octant.
@@ -126,7 +126,7 @@ public:
     void _getChildIndexes( const AxisAlignedBox &, int *x, int *y, int *z ) const;
 
     /** Creates the AxisAlignedBox used for culling this octree.
-    @remarks
+
     Since it's a loose octree, the culling bounds can be different than the actual bounds of the octree.
     */
     void _getCullBounds( AxisAlignedBox * ) const;

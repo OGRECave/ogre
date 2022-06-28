@@ -33,12 +33,14 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #include "SampleContext.h"
 #include "SamplePlugin.h"
 
-#include <iostream> // for Apple
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS && defined(__OBJC__)
+#include <iostream>
+#import <UIKit/UIKit.h>
+#import <QuartzCore/QuartzCore.h>
+#endif
 
 class TestBatch;
 using namespace Ogre;
-
-typedef std::map<String, OgreBites::SamplePlugin *> PluginMap;
 
 /** The common environment that all of the tests run in */
 class TestContext : public OgreBites::SampleContext
@@ -50,6 +52,8 @@ class TestContext : public OgreBites::SampleContext
 
     /** Does basic setup for the context */
     virtual void setup();
+
+    bool frameRenderingQueued(const Ogre::FrameEvent& evt);
 
     /** Frame listener callback, handles updating of the tests at the start of frames
      *        @param evt The frame event (passed in for the framelistener) */
@@ -66,9 +70,8 @@ class TestContext : public OgreBites::SampleContext
     virtual void runSample(OgreBites::Sample* s);
 
     /** Loads test plugins
-     *        @param set The name of the test set to load
      *        @return The initial tets or sample to run */
-    OgreBites::Sample* loadTests(String set);
+    OgreBites::Sample* loadTests();
 
     /** Setup the Root */
     virtual void createRoot();
@@ -94,24 +97,17 @@ class TestContext : public OgreBites::SampleContext
     /** Gets the current timestep value */
     Real getTimestep();
 
-    VisualTest* getCurrentTest() { return mCurrentTest; }
-
     /// Returns whether the entire test was successful or not.
     bool wasSuccessful() const {
         return mSuccess;
     }
 
- protected:
+ private:
+    typedef std::map<String, OgreBites::SamplePlugin *> PluginMap;
     bool mSuccess;
 
     /// The timestep
     Real mTimestep;
-
-    /// Path to the test plugin directory
-    String mPluginDirectory;
-
-    /// List of available test sets
-    std::map<String, StringVector> mTestSets;
 
     /// The tests to be run
     std::deque<OgreBites::Sample*> mTests;
@@ -122,11 +118,8 @@ class TestContext : public OgreBites::SampleContext
     /// Path to the reference set location
     String mReferenceSetPath;
 
-    /// The active test (0 if none is active)
-    VisualTest* mCurrentTest;
-
     /// The current frame of a running test
-    unsigned int mCurrentFrame;
+    int mCurrentFrame;
 
     /// Info about the running batch of tests
     TestBatch* mBatch;
@@ -160,9 +153,6 @@ class TestContext : public OgreBites::SampleContext
 };
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS && defined(__OBJC__)
-#import <UIKit/UIKit.h>
-#import <QuartzCore/QuartzCore.h>
-
 @interface AppDelegate : NSObject <UIApplicationDelegate>
 {
     TestContext *tc;
@@ -282,7 +272,7 @@ class TestContext : public OgreBites::SampleContext
                        Root::getSingleton().renderOneFrame((Real)differenceInSeconds);
                    });
 
-    if(Root::getSingletonPtr() && Root::getSingleton().isInitialised() && !tc->getCurrentTest())
+    if(Root::getSingletonPtr() && Root::getSingleton().isInitialised() && !tc->getCurrentSample())
     {
         tc->finishedTests();
 

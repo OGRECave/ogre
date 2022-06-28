@@ -45,7 +45,7 @@ namespace Ogre {
     public:
         virtual ~RenderObjectListener() {}
         /** Event raised when render single object started.
-        @remarks
+
             This method is called by the SceneManager.
         @param rend
             The renderable that is going to be rendered.

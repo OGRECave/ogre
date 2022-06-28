@@ -81,8 +81,6 @@ namespace Ogre {
         typedef std::map<Material*, std::vector<StaticFaceGroup*>, materialLess > MaterialFaceGroupMap;
         MaterialFaceGroupMap mMatFaceGroupMap;
 
-        RenderOperation mRenderOp;
-
         // Debugging features
         bool mShowNodeAABs;
         RenderOperation mAABGeometry;
@@ -97,12 +95,6 @@ namespace Ogre {
         /** Tags geometry in the leaf specified for later rendering. */
         void processVisibleLeaf(BspNode* leaf, Camera* cam, 
             VisibleObjectsBoundsInfo* visibleBounds, bool onlyShadowCasters);
-
-        /** Caches a face group for imminent rendering. */
-        unsigned int cacheGeometry(unsigned int* pIndexes, const StaticFaceGroup* faceGroup);
-
-        /** Frees up allocated memory for geometry caches. */
-        void freeMemory(void);
 
         /** Adds a bounding box to draw if turned on. */
         void addBoundingBox(const AxisAlignedBox& aab, bool visible);
@@ -168,7 +160,7 @@ namespace Ogre {
         void _notifyObjectDetached(const MovableObject* mov);
 
         /* Creates an AxisAlignedBoxSceneQuery for this scene manager. 
-        @remarks
+
             This method creates a new instance of a query object for this scene manager, 
             for an axis aligned box region. See SceneQuery and AxisAlignedBoxSceneQuery 
             for full details.
@@ -184,7 +176,7 @@ namespace Ogre {
             createAABBQuery(const AxisAlignedBox& box, uint32 mask = 0xFFFFFFFF);
         */
         /* Creates a SphereSceneQuery for this scene manager. 
-        @remarks
+
             This method creates a new instance of a query object for this scene manager, 
             for a spherical region. See SceneQuery and SphereSceneQuery 
             for full details.
@@ -200,7 +192,7 @@ namespace Ogre {
             createSphereQuery(const Sphere& sphere, uint32 mask = 0xFFFFFFFF);
         */
         /** Creates a RaySceneQuery for this scene manager. 
-        @remarks
+
             This method creates a new instance of a query object for this scene manager, 
             looking for objects which fall along a ray. See SceneQuery and RaySceneQuery 
             for full details.
@@ -214,7 +206,7 @@ namespace Ogre {
         virtual RaySceneQuery* 
             createRayQuery(const Ray& ray, uint32 mask = 0xFFFFFFFF);
         /** Creates an IntersectionSceneQuery for this scene manager. 
-        @remarks
+
             This method creates a new instance of a query object for locating
             intersecting objects. See SceneQuery and IntersectionSceneQuery
             for full details.
@@ -280,7 +272,6 @@ namespace Ogre {
         /// Factory type name
         static const String FACTORY_TYPE_NAME;
         SceneManager* createInstance(const String& instanceName);
-        void destroyInstance(SceneManager* instance);
     };
     /** @} */
     /** @} */

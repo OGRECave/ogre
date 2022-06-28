@@ -54,7 +54,7 @@ namespace Ogre
 *  @{
 */
 /** Specialized viewpoint from which an Octree can be rendered.
-@remarks
+
 This class contains several specializations of the Ogre::Camera class. It
 implements the getRenderOperation method in order to return displayable geometry
 for debugging purposes. It also implements a visibility function that is more granular

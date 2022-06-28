@@ -48,6 +48,7 @@ class _OgreLodExport LodOutsideMarker
 public:
     /**
      * @param vertexList List of vertices. vertex.position is the input and vertex.isOuterWallVertex is the output of the algorithm.
+     * @param boundingSphereRadius
      * @param walkAngle Walk angle in dot product values. Allowed range is from -1 to 1. Default = 0. Smaller value is bigger angle.
      *        If you set it to 1 then you can disable walking and it will only mark the vertices on the convex hull.
      */

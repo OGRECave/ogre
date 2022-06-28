@@ -22,7 +22,7 @@
 
 <!ELEMENT nodes (node*, position?, rotation?, scale?)>
 
-<!ELEMENT node (position?, rotation?, scale?, lookTarget?, trackTarget?, userData?, node*, entity*, light*, camera*, particleSystem*, billboardSet*, plane*)>
+<!ELEMENT node (position?, rotation?, scale?, lookTarget?, trackTarget?, userData?, animations?, node*, entity*, light*, camera*, particleSystem*, billboardSet*, plane*)>
 <!ATTLIST node
     name        CDATA    #IMPLIED
     id            ID        #IMPLIED
@@ -43,7 +43,7 @@
     type            (point | directional | spot ) "point"
     visible            (true | false) "true"
     castShadows        (true | false) "true"
-    powerScale		CDATA	"1.0"
+    powerScale      CDATA   "1.0"
 >
 
 <!ELEMENT camera (clipping?, userData?)>
@@ -83,12 +83,14 @@
 
 <!ELEMENT entity (userData?)>
 <!ATTLIST entity
-    name            CDATA    #IMPLIED
-    id                ID        #IMPLIED
-    meshFile        CDATA    #REQUIRED
-    material        CDATA    #IMPLIED
-    static            (true | false) "false"
-    castShadows        (true | false) "true"
+    name		CDATA	#IMPLIED
+    id			ID		#IMPLIED
+    visible		(true | false) "true"
+    meshFile	CDATA	#REQUIRED
+    material	CDATA	#IMPLIED
+	static		CDATA	#IMPLIED
+	instanced	CDATA	#IMPLIED
+    castShadows	(true | false) "true"
 >
 
 <!ELEMENT environment (fog?, skyBox?, skyDome?, skyPlane?, colourAmbient?, colourBackground?)>
@@ -273,4 +275,23 @@
     name CDATA #REQUIRED
     type ( bool | float | int | str ) "str"
     data CDATA #REQUIRED
+>
+
+<!-- https://www.w3schools.com/xml/xml_dtd_elements.asp -->
+
+<!ELEMENT animations (animation+)>
+
+<!ELEMENT animation (keyframe+)>
+<!ATTLIST animation
+    name    CDATA          #REQUIRED
+    length  CDATA          #REQUIRED
+    enable  (true | false)  "false"
+    loop    (true | false)  "false"
+    interpolationMode           (linear | spline)       "linear"
+    rotationInterpolationMode   (linear | spherical)    "linear"
+>
+
+<!ELEMENT keyframe (translation?, rotation?, scale?)>
+<!ATTLIST keyframe
+    time    CDATA  #REQUIRED
 >

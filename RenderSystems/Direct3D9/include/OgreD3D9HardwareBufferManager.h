@@ -36,13 +36,16 @@ namespace Ogre {
     /** Implementation of HardwareBufferManager for D3D9. */
     class _OgreD3D9Export D3D9HardwareBufferManager : public HardwareBufferManager
     {
-    protected:     
-        /// Internal method for creates a new vertex declaration, may be overridden by certain rendering APIs
-        VertexDeclaration* createVertexDeclarationImpl(void);
-        /// Internal method for destroys a vertex declaration, may be overridden by certain rendering APIs
-        void destroyVertexDeclarationImpl(VertexDeclaration* decl);
-
+        bool                        mAutoHardwareBufferManagement;
+        VertexDeclaration* createVertexDeclarationImpl(void) override;
     public:
+        /**
+            Set automatic hardware buffers management.
+            When enabled, an explicit system memory backup is created for buffers with no read caps - so in case of device lost/ device swaps
+            the content of the buffers can be restored from this copy.
+            The default is false in order to reduce system memory consumption.
+        */
+        void setAutoHardwareBufferManagement(bool autoManagement) { mAutoHardwareBufferManagement = autoManagement; }
         D3D9HardwareBufferManager();
         ~D3D9HardwareBufferManager();
         /// Creates a vertex buffer

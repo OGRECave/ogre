@@ -41,12 +41,12 @@ namespace Ogre {
     *  @{
     */
     /** Patch specialisation of Mesh. 
-    @remarks
+
         Instances of this class should be created by calling MeshManager::createBezierPatch.
     */
     class _OgreExport PatchMesh : public Mesh
     {
-    protected:
+    private:
         /// Internal surface definition
         PatchSurface mSurface;
         /// Vertex declaration, cloned from the input
@@ -65,15 +65,15 @@ namespace Ogre {
             size_t uMaxSubdivisionLevel = PatchSurface::AUTO_LEVEL, 
             size_t vMaxSubdivisionLevel = PatchSurface::AUTO_LEVEL,
             PatchSurface::VisibleSide visibleSide = PatchSurface::VS_FRONT,
-            HardwareBuffer::Usage vbUsage = HardwareBuffer::HBU_STATIC_WRITE_ONLY, 
-            HardwareBuffer::Usage ibUsage = HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY,
+            HardwareBuffer::Usage vbUsage = HBU_GPU_ONLY,
+            HardwareBuffer::Usage ibUsage = HBU_CPU_TO_GPU,
             bool vbUseShadow = false, bool ibUseShadow = false);
 
         /* Sets the current subdivision level as a proportion of full detail.
         @param factor Subdivision factor as a value from 0 (control points only) to 1 (maximum
             subdivision). */
         void setSubdivision(Real factor);
-    protected:
+    private:
         void loadImpl(void) override;
         /// Overridden from Resource - do nothing (no disk caching)
         void prepareImpl(void) override {}

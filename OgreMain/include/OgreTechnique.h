@@ -43,7 +43,7 @@ namespace Ogre {
     *  @{
     */
     /** Class representing an approach to rendering this particular Material. 
-    @remarks
+
         Ogre will attempt to use the best technique supported by the active hardware, 
         unless you specifically request a lower detail technique (say for distant
         rendering).
@@ -53,9 +53,9 @@ namespace Ogre {
     public:
         typedef std::vector<Pass*> Passes;
 
-    protected:
+    private:
         /// Illumination pass state type
-        enum IlluminationPassesState
+        enum IlluminationPassesState : int8
         {
             IPS_COMPILE_DISABLED = -1,
             IPS_NOT_COMPILED = 0,
@@ -69,6 +69,8 @@ namespace Ogre {
         // Raw pointer since we don't want child to stop parent's destruction
         Material* mParent;
         IlluminationPassesState mIlluminationPassesCompilationPhase;
+
+        bool mIsSupported;
         /// LOD level
         unsigned short mLodIndex;
         /** Scheme index, derived from scheme name but the names are held on
@@ -106,8 +108,6 @@ namespace Ogre {
 
         // User objects binding.
         UserObjectBindings  mUserObjectBindings;
-
-        bool mIsSupported;
     public:
         /** Directive used to manually control technique support based on the
             inclusion or exclusion of some factor.
@@ -142,7 +142,7 @@ namespace Ogre {
         };
         typedef std::vector<GPUVendorRule> GPUVendorRuleList;
         typedef std::vector<GPUDeviceNameRule> GPUDeviceNameRuleList;
-    protected:
+    private:
         GPUVendorRuleList mGPUVendorRules;
         GPUDeviceNameRuleList mGPUDeviceNameRules;
     public:
@@ -152,7 +152,7 @@ namespace Ogre {
         Technique(Material* parent, const Technique& oth);
         ~Technique();
         /** Indicates if this technique is supported by the current graphics card.
-        @remarks
+
             This will only be correct after the Technique has been compiled, which is
             usually done from Material::compile.
         */
@@ -161,16 +161,16 @@ namespace Ogre {
         @return Any information explaining problems with the compile.
         */
         String _compile(bool autoManageTextureUnits);
-        /// Internal method for checking GPU vendor / device rules
-        bool checkGPURules(StringStream& errors);
         /// Internal method for checking hardware support
         bool checkHardwareSupport(bool autoManageTextureUnits, StringStream& compileErrors);
-        /** Internal method for splitting the passes into illumination passes. */        
-        void _compileIlluminationPasses(void);
         size_t calculateSize(void) const;
 
+        typedef VectorIterator<Passes> PassIterator;
+        typedef VectorIterator<IlluminationPassList> IlluminationPassIterator;
+        /// @name Passes
+        /// @{
         /** Creates a new Pass for this Technique.
-        @remarks
+
             A Pass is a single rendering pass, i.e. a single draw of the given material.
             Note that if you create a pass without a fragment program, during compilation of the
             material the pass may be split into multiple passes if the graphics card cannot
@@ -180,16 +180,14 @@ namespace Ogre {
             enough facilities for what you're asking for.
         */
         Pass* createPass(void);
-        /** Retrieves the Pass with the given index.
-         * @deprecated use getPasses() */
-        Pass* getPass(unsigned short index) const;
+        /** Retrieves the Pass with the given index.*/
+        Pass* getPass(size_t index) const { return mPasses.at(index); }
         /** Retrieves the Pass matching name.
             Returns 0 if name match is not found.
         */
         Pass* getPass(const String& name) const;
-        /** Retrieves the number of passes.
-         * @deprecated use getPasses() */
-        unsigned short getNumPasses(void) const;
+        /** Retrieves the number of passes. */
+        size_t getNumPasses(void) const { return mPasses.size(); }
         /** Removes the Pass with the given index. */
         void removePass(unsigned short index);
         /** Removes all Passes from this Technique. */
@@ -198,7 +196,7 @@ namespace Ogre {
             If successful then returns true.
         */
         bool movePass(const unsigned short sourceIndex, const unsigned short destinationIndex);
-        typedef VectorIterator<Passes> PassIterator;
+
         /** Gets an iterator over the passes in this Technique.
          * @deprecated use getPasses() */
         OGRE_DEPRECATED const PassIterator getPassIterator(void);
@@ -208,18 +206,13 @@ namespace Ogre {
             return mPasses;
         }
 
-        typedef VectorIterator<IlluminationPassList> IlluminationPassIterator;
-        /** Gets an iterator over the illumination-stage categorised passes.
-         * @deprecated use getIlluminationPasses() */
-        OGRE_DEPRECATED const IlluminationPassIterator getIlluminationPassIterator(void) {
-            getIlluminationPasses(); // refresh as needed
-            return IlluminationPassIterator(mIlluminationPasses.begin(),
-                mIlluminationPasses.end());
-        }
-
         /** Gets the illumination-stage categorised passes
          * @note triggers compilation if needed */
         const IlluminationPassList& getIlluminationPasses();
+
+        /** Internal method for splitting the passes into illumination passes. */
+        void _compileIlluminationPasses(void);
+        /// @}
 
         /// Gets the parent Material
         Material* getParent(void) const { return mParent; }
@@ -231,7 +224,7 @@ namespace Ogre {
         const String& getResourceGroup(void) const;
 
         /** Returns true if this Technique involves transparency. 
-        @remarks
+
             This basically boils down to whether the first pass
             has a scene blending factor. Even if the other passes 
             do not, the base colour, including parts of the original 
@@ -241,14 +234,14 @@ namespace Ogre {
         bool isTransparent(void) const;
 
         /** Returns true if this Technique has transparent sorting enabled. 
-        @remarks
+
             This basically boils down to whether the first pass
             has transparent sorting enabled or not
         */
         bool isTransparentSortingEnabled(void) const;
 
         /** Returns true if this Technique has transparent sorting forced. 
-        @remarks
+
             This basically boils down to whether the first pass
             has transparent sorting forced or not
         */
@@ -269,30 +262,52 @@ namespace Ogre {
         /** Tells the technique that it needs recompilation. */
         void _notifyNeedsRecompile(void);
 
+        /// @name Shadow Materials
+        /// @{
         /** return this material specific  shadow casting specific material
         */
-        Ogre::MaterialPtr getShadowCasterMaterial() const;
+        MaterialPtr getShadowCasterMaterial() const;
+        /** Sets the details of the material to use when rendering as a
+            shadow caster.
+
+            Texture-based shadows require that the caster is rendered to a texture
+            in a solid colour (the shadow colour in the case of modulative texture
+            shadows). Whilst Ogre can arrange this for the fixed function
+            pipeline, passes which use vertex programs might need the vertex
+            programs still to run in order to preserve any deformation etc
+            that it does. However, lighting calculations must be a lot simpler,
+            with only the ambient colour being used (which the engine will ensure
+            is bound to the shadow colour).
+            @par
+            Therefore, it is up to implementors of vertex programs to provide an
+            alternative material which can be used to render the object
+            to a shadow texture. Do all the same vertex transforms, but set the
+            colour of the vertex to the ambient colour, as bound using the
+            standard auto parameter binding mechanism.
+        */
+        void setShadowCasterMaterial(MaterialPtr val);
         /** set this material specific  shadow casting specific material
         */
-        void setShadowCasterMaterial(Ogre::MaterialPtr val);
-        /** set this material specific  shadow casting specific material
-        */
-        void setShadowCasterMaterial(const Ogre::String &name);
+        void setShadowCasterMaterial(const String &name);
         /** return this material specific shadow receiving specific material
         */
-        Ogre::MaterialPtr getShadowReceiverMaterial() const;
+        MaterialPtr getShadowReceiverMaterial() const;
         /** set this material specific  shadow receiving specific material
         */
-        void setShadowReceiverMaterial(Ogre::MaterialPtr val);
+        void setShadowReceiverMaterial(MaterialPtr val);
         /** set this material specific  shadow receiving specific material
         */
-        void setShadowReceiverMaterial(const Ogre::String &name);
+        void setShadowReceiverMaterial(const String &name);
+        /// @}
 
-        // -------------------------------------------------------------------------------
-        // The following methods are to make migration from previous versions simpler
-        // and to make code easier to write when dealing with simple materials
-        // They set the properties which have been moved to Pass for all Techniques and all Passes
+        /** @name Forwarded Pass Properties
 
+            The following methods are to make migration from previous versions simpler
+            and to make code easier to write when dealing with simple materials
+            They set the properties which have been moved to Pass for all Techniques and all Passes
+        */
+
+        /// @{
         /** Sets the point size properties for every Pass in this Technique.
         @note
             This property actually exists on the Pass class. For simplicity, this method allows 
@@ -532,9 +547,10 @@ namespace Ogre {
         @see Pass::setSeparateSceneBlending
         */
         void setSeparateSceneBlending( const SceneBlendFactor sourceFactor, const SceneBlendFactor destFactor, const SceneBlendFactor sourceFactorAlpha, const SceneBlendFactor destFactorAlpha);
+        /// @}
 
         /** Assigns a level-of-detail (LOD) index to this Technique.
-        @remarks
+
             As noted previously, as well as providing fallback support for various
             graphics cards, multiple Technique objects can also be used to implement
             material LOD, where the detail of the material diminishes with distance to 
@@ -554,7 +570,7 @@ namespace Ogre {
         unsigned short getLodIndex(void) const { return mLodIndex; }
 
         /** Set the 'scheme name' for this technique. 
-        @remarks
+
             Material schemes are used to control top-level switching from one
             set of techniques to another. For example, you might use this to 
             define 'high', 'medium' and 'low' complexity levels on materials
@@ -589,7 +605,7 @@ namespace Ogre {
         bool hasColourWriteDisabled(void) const;
 
         /** Set the name of the technique.
-        @remarks
+
         The use of technique name is optional.  Its useful in material scripts where a material could inherit
         from another material and only want to modify a particular technique.
         */
@@ -597,13 +613,16 @@ namespace Ogre {
         /// Gets the name of the technique
         const String& getName(void) const { return mName; }
 
-        /// @deprecated do not use
-        bool applyTextureAliases(const AliasTextureNamePairList& aliasList, const bool apply = true) const;
+        typedef ConstVectorIterator<GPUVendorRuleList> GPUVendorRuleIterator;
+        typedef ConstVectorIterator<GPUDeviceNameRuleList> GPUDeviceNameRuleIterator;
+        /// @name GPU Vendor Rules
+        /// @{
 
-
+        /// Internal method for checking GPU vendor / device rules
+        bool checkGPURules(StringStream& errors);
         /** Add a rule which manually influences the support for this technique based
             on a GPU vendor.
-        @remarks
+
             You can use this facility to manually control whether a technique is
             considered supported, based on a GPU vendor. You can add inclusive
             or exclusive rules, and you can add as many of each as you like. If
@@ -619,7 +638,7 @@ namespace Ogre {
         void addGPUVendorRule(GPUVendor vendor, IncludeOrExclude includeOrExclude);
         /** Add a rule which manually influences the support for this technique based
             on a GPU vendor.
-        @remarks
+
             You can use this facility to manually control whether a technique is
             considered supported, based on a GPU vendor. You can add inclusive
             or exclusive rules, and you can add as many of each as you like. If
@@ -635,11 +654,8 @@ namespace Ogre {
         @see addGPUVendorRule
         */
         void removeGPUVendorRule(GPUVendor vendor);
-        typedef ConstVectorIterator<GPUVendorRuleList> GPUVendorRuleIterator;
-        /// Get an iterator over the currently registered vendor rules.
         /// @deprecated use getGPUVendorRules()
         OGRE_DEPRECATED GPUVendorRuleIterator getGPUVendorRuleIterator() const;
-
         /// Get the currently registered vendor rules.
         const GPUVendorRuleList& getGPUVendorRules() const {
             return mGPUVendorRules;
@@ -647,7 +663,7 @@ namespace Ogre {
 
         /** Add a rule which manually influences the support for this technique based
             on a pattern that matches a GPU device name (e.g. '*8800*').
-        @remarks
+
             You can use this facility to manually control whether a technique is
             considered supported, based on a GPU device name pattern. You can add inclusive
             or exclusive rules, and you can add as many of each as you like. If
@@ -669,24 +685,16 @@ namespace Ogre {
         @see addGPUDeviceNameRule
         */
         void removeGPUDeviceNameRule(const String& devicePattern);
-        typedef ConstVectorIterator<GPUDeviceNameRuleList> GPUDeviceNameRuleIterator;
-        /// Get an iterator over the currently registered device name rules.
         /// @deprecated use getGPUDeviceNameRules()
         OGRE_DEPRECATED GPUDeviceNameRuleIterator getGPUDeviceNameRuleIterator() const;
-
         /// Get the currently registered device name rules.
         const GPUDeviceNameRuleList& getGPUDeviceNameRules() const { return mGPUDeviceNameRules; }
+        /// @}
 
-        /** Return an instance of user objects binding associated with this class.
-        You can use it to associate one or more custom objects with this class instance.
-        @see UserObjectBindings::setUserAny.
-        */
+        /// @copydoc UserObjectBindings
         UserObjectBindings& getUserObjectBindings() { return mUserObjectBindings; }
 
-        /** Return an instance of user objects binding associated with this class.
-        You can use it to associate one or more custom objects with this class instance.
-        @see UserObjectBindings::setUserAny.        
-        */
+        /// @overload
         const UserObjectBindings& getUserObjectBindings() const { return mUserObjectBindings; }
 
     };

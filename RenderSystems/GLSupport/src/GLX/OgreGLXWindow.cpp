@@ -37,24 +37,9 @@
 
 #include "OgreGLXContext.h"
 #include "OgreGLXGLSupport.h"
+#include "OgreX11.h"
 
-#include <algorithm>
-#include <sys/time.h>
 #include <climits>
-
-#include <X11/Xlib.h>
-#include <X11/keysym.h>
-
-#include "OgreGLRenderSystemCommon.h"
-
-namespace {
-    int safeXErrorHandler (Display *display, XErrorEvent *event)
-    {
-        // Ignore all XErrorEvents
-        return 0;
-    }
-    int (*oldXErrorHandler)(Display *, XErrorEvent*);
-}
 
 namespace Ogre
 {
@@ -72,20 +57,15 @@ namespace Ogre
 
         destroy();
 
-        // Ignore fatal XErrorEvents from stale handles.
-        oldXErrorHandler = XSetErrorHandler(safeXErrorHandler);
-
         if (mWindow && mIsTopLevel)
         {
-            XDestroyWindow(xDisplay, mWindow);
+            destroyXWindow(xDisplay, mWindow);
         }
 
         if (mContext)
         {
             delete mContext;
         }
-
-        XSetErrorHandler(oldXErrorHandler);
 
         mContext = 0;
         mWindow = 0;
@@ -105,11 +85,9 @@ namespace Ogre
         bool gamma = false;
         ::GLXContext glxContext = 0;
         ::GLXDrawable glxDrawable = 0;
-        Window externalWindow = 0;
         Window parentWindow = DefaultRootWindow(xDisplay);
         int left = DisplayWidth(xDisplay, DefaultScreen(xDisplay))/2 - width/2;
         int top  = DisplayHeight(xDisplay, DefaultScreen(xDisplay))/2 - height/2;
-        String border;
 
         int minBufferSize = 16;
 
@@ -183,13 +161,14 @@ namespace Ogre
 			}
 #endif
 
-            if((opt = miscParams->find("parentWindowHandle")) != end)
+            if ((opt = miscParams->find("parentWindowHandle")) != end ||
+                (opt = miscParams->find("externalWindowHandle")) != end)
             {
                 std::vector<String> tokens = StringUtil::split(opt->second, " :");
 
-                if (tokens.size() == 3)
+                if (tokens.size() >= 3)
                 {
-                    // deprecated display:screen:xid format
+                    // deprecated display:screen:xid:visualinfo format
                     StringConverter::parse(tokens[2], parentWindow);
                 }
                 else
@@ -202,67 +181,11 @@ namespace Ogre
                 // it should be queried from the parentWindow
                 glxDrawable = 0;
             }
-            else if((opt = miscParams->find("externalWindowHandle")) != end)
-            {
-                std::vector<String> tokens = StringUtil::split(opt->second, " :");
-
-                LogManager::getSingleton().logMessage(
-                    "GLXWindow::create: The externalWindowHandle parameter is deprecated.\n"
-                    "Use the parentWindowHandle or currentGLContext parameter instead.");
-
-                if (tokens.size() == 3)
-                {
-                    // Old display:screen:xid format
-                    // The old GLX code always created a "parent" window in this case:
-                    StringConverter::parse(tokens[2], parentWindow);
-                }
-                else if (tokens.size() == 4)
-                {
-                    // Old display:screen:xid:visualinfo format
-                    StringConverter::parse(tokens[2], externalWindow);
-                }
-                else
-                {
-                    // xid format
-                    StringConverter::parse(tokens[0], externalWindow);
-                }
-            }
-
-            if ((opt = miscParams->find("border")) != end)
-                border = opt->second;
         }
 
-        // Ignore fatal XErrorEvents during parameter validation:
-        oldXErrorHandler = XSetErrorHandler(safeXErrorHandler);
-        // Validate parentWindowHandle
-
-        if (parentWindow != DefaultRootWindow(xDisplay))
-        {
-            XWindowAttributes windowAttrib;
-
-            if (! XGetWindowAttributes(xDisplay, parentWindow, &windowAttrib) ||
-                windowAttrib.root != DefaultRootWindow(xDisplay))
-            {
-                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Invalid parentWindowHandle (wrong server or screen)", "GLXWindow::create");
-            }
-        }
-
-        // Validate externalWindowHandle
-
-        if (externalWindow != 0)
-        {
-            XWindowAttributes windowAttrib;
-
-            if (! XGetWindowAttributes(xDisplay, externalWindow, &windowAttrib) ||
-                windowAttrib.root != DefaultRootWindow(xDisplay))
-            {
-                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Invalid externalWindowHandle (wrong server or screen)", "GLXWindow::create");
-            }
-            glxDrawable = externalWindow;
-        }
+        validateParentWindow(xDisplay, parentWindow);
 
         // Derive fbConfig
-
         ::GLXFBConfig fbConfig = 0;
 
         if (glxDrawable)
@@ -276,8 +199,6 @@ namespace Ogre
         }
 
         mIsExternal = (glxDrawable != 0);
-
-        XSetErrorHandler(oldXErrorHandler);
 
         if (! fbConfig)
         {
@@ -364,83 +285,14 @@ namespace Ogre
 
         if (! mIsExternal)
         {
-            XSetWindowAttributes attr;
-            ulong mask;
             XVisualInfo *visualInfo = mGLSupport->getVisualFromFBConfig (fbConfig);
 
-            attr.background_pixel = 0;
-            attr.border_pixel = 0;
-            attr.colormap = XCreateColormap(xDisplay, DefaultRootWindow(xDisplay), visualInfo->visual, AllocNone);
-            attr.event_mask = StructureNotifyMask | VisibilityChangeMask | FocusChangeMask;
-            mask = CWBackPixel | CWBorderPixel | CWColormap | CWEventMask;
-
-            if(mIsFullScreen && mGLSupport->mAtomFullScreen == None)
-            {
-                LogManager::getSingleton().logMessage("GLXWindow::switchFullScreen: Your WM has no fullscreen support");
-
-                // A second best approach for outdated window managers
-                attr.backing_store = NotUseful;
-                attr.save_under = False;
-                attr.override_redirect = True;
-                mask |= CWSaveUnder | CWBackingStore | CWOverrideRedirect;
-                left = top = 0;
-            }
-
             // Create window on server
-            mWindow = XCreateWindow(xDisplay, parentWindow, left, top, width, height, 0, visualInfo->depth, InputOutput, visualInfo->visual, mask, &attr);
-
-            XFree(visualInfo);
-
-            if(!mWindow)
-            {
-                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Unable to create an X Window", "GLXWindow::create");
-            }
+            mWindow = createXWindow(xDisplay, parentWindow, visualInfo, left, top, width, height, mGLSupport->mAtomFullScreen, mIsFullScreen);
 
             if (mIsTopLevel)
             {
-                XWMHints *wmHints;
-                XSizeHints *sizeHints;
-
-                if ((wmHints = XAllocWMHints()) != NULL)
-                {
-                    wmHints->initial_state = NormalState;
-                    wmHints->input = True;
-                    wmHints->flags = StateHint | InputHint;
-                }
-
-                // Is this really necessary ? Which broken WM might need it?
-                if ((sizeHints = XAllocSizeHints()) != NULL)
-                {
-                    // Is this really necessary ? Which broken WM might need it?
-                    sizeHints->flags = USPosition;
-
-                    if(!fullScreen && border == "fixed")
-                    {
-                        sizeHints->min_width = sizeHints->max_width = width;
-                        sizeHints->min_height = sizeHints->max_height = height;
-                        sizeHints->flags |= PMaxSize | PMinSize;
-                    }
-                }
-
-                XTextProperty titleprop;
-                char *lst = &title[0];
-                XStringListToTextProperty(&lst, 1, &titleprop);
-                XSetWMProperties(xDisplay, mWindow, &titleprop, NULL, NULL, 0, sizeHints, wmHints, NULL);
-
-                XFree(titleprop.value);
-                XFree(wmHints);
-                XFree(sizeHints);
-
-                XSetWMProtocols(xDisplay, mWindow, &mGLSupport->mAtomDeleteWindow, 1);
-
-                XWindowAttributes windowAttrib;
-
-                XGetWindowAttributes(xDisplay, mWindow, &windowAttrib);
-
-                left = windowAttrib.x;
-                top = windowAttrib.y;
-                width = windowAttrib.width;
-                height = windowAttrib.height;
+                finaliseTopLevel(xDisplay, mWindow, left, top, width, height, title, mGLSupport->mAtomDeleteWindow);
             }
 
             glxDrawable = mWindow;
@@ -630,41 +482,9 @@ namespace Ogre
             return;
 
         Display* xDisplay = mGLSupport->getXDisplay();
-        XWindowAttributes windowAttrib;
-
-        Window parent, root, *children;
-        uint nChildren;
-
-        XQueryTree(xDisplay, mWindow, &root, &parent, &children, &nChildren);
-
-        if (children)
-            XFree(children);
-
-        XGetWindowAttributes(xDisplay, parent, &windowAttrib);
-
-        if (mIsTopLevel && !mIsFullScreen)
-        {
-            // offset from window decorations
-            mLeft = windowAttrib.x;
-            mTop  = windowAttrib.y;
-            // w/ h of the actual renderwindow
-            XGetWindowAttributes(xDisplay, mWindow, &windowAttrib);
-        }
-
-        if (mWidth == (size_t)windowAttrib.width && mHeight == (size_t)windowAttrib.height)
-            return;
-
-        mWidth = windowAttrib.width;
-        mHeight = windowAttrib.height;
-
-        if(!mIsTopLevel)
-        {
-            XResizeWindow(xDisplay, mWindow, mWidth, mHeight);
-            XFlush(xDisplay);
-        }
-
-        for (ViewportList::iterator it = mViewportList.begin(); it != mViewportList.end(); ++it)
-            (*it).second->_updateDimensions();
+        uint width, height;
+        queryRect(xDisplay, mWindow, mLeft, mTop, width, height, mIsTopLevel && !mIsFullScreen);
+        resize(width, height);
     }
 
     //-------------------------------------------------------------------------------------------------//

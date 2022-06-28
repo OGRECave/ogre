@@ -37,13 +37,27 @@
 
 #import <UIKit/UIKit.h> 
 #import <QuartzCore/QuartzCore.h>
-#import "SampleBrowser.h"
 
 // Defaulting to 2 means that we run at 30 frames per second. For 60 frames, use a value of 1.
 // 30 FPS is usually sufficient and results in lower power consumption.
 #define DISPLAYLINK_FRAME_INTERVAL      2
 
 #ifdef __OBJC__
+
+namespace OgreBites
+{
+    class SampleBrowser;
+}
+
+@interface SampleBrowserGestureView : UIView
+{
+    OgreBites::SampleBrowser *mBrowser;
+}
+@property (assign) OgreBites::SampleBrowser *mBrowser;
+
+@end
+
+#import "SampleBrowser.h"
 
 @interface AppDelegate : NSObject <UIApplicationDelegate>
 {
@@ -156,6 +170,47 @@
     });
 }
 
+@end
+
+@implementation SampleBrowserGestureView
+
+@synthesize mBrowser;
+
+- (BOOL)canBecomeFirstResponder
+{
+    return YES;
+}
+
+- (void)dealloc {
+    [super dealloc];
+}
+
+- (void)motionBegan:(UIEventSubtype)motion withEvent:(UIEvent *)event {
+    if(mBrowser && event.type == UIEventTypeMotion && event.subtype == UIEventSubtypeMotionShake)
+        mBrowser->motionBegan();
+
+    if ([super respondsToSelector:@selector(motionBegan:withEvent:)]) {
+        [super motionBegan:motion withEvent:event];
+    }
+}
+
+- (void)motionEnded:(UIEventSubtype)motion withEvent:(UIEvent *)event {
+    if(mBrowser && event.type == UIEventTypeMotion && event.subtype == UIEventSubtypeMotionShake)
+        mBrowser->motionEnded();
+
+    if ([super respondsToSelector:@selector(motionEnded:withEvent:)]) {
+        [super motionEnded:motion withEvent:event];
+    }
+}
+
+- (void)motionCancelled:(UIEventSubtype)motion withEvent:(UIEvent *)event {
+    if(mBrowser && event.type == UIEventTypeMotion && event.subtype == UIEventSubtypeMotionShake)
+        mBrowser->motionCancelled();
+
+    if ([super respondsToSelector:@selector(motionCancelled:withEvent:)]) {
+        [super motionCancelled:motion withEvent:event];
+    }
+}
 @end
 
 #endif

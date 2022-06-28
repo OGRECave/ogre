@@ -33,7 +33,6 @@ THE SOFTWARE.
 #include "OgreConfig.h"
 #include "OgreHardwareVertexBuffer.h"
 #include "OgreGLSLShaderCommon.h"
-#include "OgreHardwareUniformBuffer.h"
 
 #include <array>
 
@@ -52,10 +51,6 @@ struct GLUniformReference
 typedef std::vector<GLUniformReference> GLUniformReferenceList;
 typedef GLUniformReferenceList::iterator GLUniformReferenceIterator;
 
-typedef std::vector<HardwareUniformBufferSharedPtr> GLUniformBufferList;
-typedef GLUniformBufferList::iterator GLUniformBufferIterator;
-typedef std::map<GpuSharedParametersPtr, HardwareUniformBufferSharedPtr> SharedParamsBufferMap;
-
 typedef  std::array<GLSLShaderCommon*, GPT_COUNT> GLShaderList;
 
 class GLSLProgramCommon
@@ -63,8 +58,6 @@ class GLSLProgramCommon
 public:
     explicit GLSLProgramCommon(const GLShaderList& shaders);
     virtual ~GLSLProgramCommon() {}
-
-    void extractLayoutQualifiers(void);
 
     /// Get the GL Handle for the program object
     uint getGLProgramHandle(void) const { return mGLProgramHandle; }
@@ -103,22 +96,12 @@ protected:
     uint mGLProgramHandle;
     /// Flag indicating that the program or pipeline object has been successfully linked
     int mLinked;
-    /// A value to define the case we didn't look for the attributes since the contractor
-    static const int NULL_CUSTOM_ATTRIBUTES_INDEX = -2;
-    /// A value to define the attribute has not been found (this is also the result when glGetAttribLocation fails)
-    static const int NOT_FOUND_CUSTOM_ATTRIBUTES_INDEX = -1;
-
-    /// An array to hold the attributes indexes
-    int mCustomAttributesIndexes[VES_COUNT][OGRE_MAX_TEXTURE_COORD_SETS];
 
     /// Compiles and links the vertex and fragment programs
     virtual void compileAndLink(void) = 0;
 
     uint32 getCombinedHash();
     String getCombinedName();
-
-    static VertexElementSemantic getAttributeSemanticEnum(const String& type);
-    static const char * getAttributeSemanticString(VertexElementSemantic semantic);
 
     /// Name / attribute list
     struct CustomAttribute

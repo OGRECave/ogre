@@ -15,11 +15,11 @@ classes.
 
 | Build | Status |
 |-------|-----------------|
-| Ubuntu, OSX, Android, iOS | [![Build Status](https://travis-ci.org/OGRECave/ogre.svg?branch=master)](https://travis-ci.org/OGRECave/ogre) |
+| Linux, OSX, Android, iOS | [![CI Build](https://github.com/OGRECave/ogre/workflows/CI%20Build/badge.svg?branch=master)](https://github.com/OGRECave/ogre/actions?query=branch%3Amaster) |
 | MSVC | [![Build status](https://ci.appveyor.com/api/projects/status/kcki7y0n1ahrggdw/branch/master?svg=true)](https://ci.appveyor.com/project/paroj/ogre-bsrh7/branch/master) |
 
 ## Index Of Contents
-* [What's New?](Docs/1.12-Notes.md)  
+* [What's New?](Docs/13-Notes.md)
 A summary of the new and altered features in this release.
 * [Building the core OGRE libraries](https://ogrecave.github.io/ogre/api/latest/building-ogre.html)  
 If you're using the full source release, this will help you build it. If you're using a precompiled SDK then most of the work has already been done for you, and you should use the sample projects to see how to compile your own code against OGRE.
@@ -39,10 +39,13 @@ A gold mine of tutorials, tips and code snippets which will help you get up to s
 
 For an exhaustive list, see the [features page](http://www.ogre3d.org/about/features) and try our Sample Browser. For a quick overview see below
 
-| Integrated Bump Mapping | Integrated shadows |
+| Integrated Bump and Offset Mapping | Integrated shadows |
 |----|----|
-| ![](Other/screenshots/bumpmap.jpg) | ![](Other/screenshots/shadows.jpg) |
+| ![](Other/screenshots/bumpmap.webp) | ![](Other/screenshots/shadows.jpg) |
 
+| Physically Based Shading | Particle Effects |
+|----|----|
+| ![](Other/screenshots/pbr.webp) | ![](Other/screenshots/particle.jpg) |
 
 | HW & SW skeletal animation | Multi-layer Terrain |
 |----|----|
@@ -52,17 +55,19 @@ For an exhaustive list, see the [features page](http://www.ogre3d.org/about/feat
 |----|----|
 | ![](Other/screenshots/compositor.jpg) | ![](Other/screenshots/volume.jpg) |
 
-| [Dear ImGui](https://github.com/ocornut/imgui) | Particle Effects |
+| [Dear ImGui](https://github.com/ocornut/imgui) | [Bullet Physics](https://pybullet.org/) Integration |
 |----|----|
-| ![](Other/screenshots/imgui.jpg) | ![](Other/screenshots/particle.jpg) |
+| ![](Other/screenshots/imgui.jpg) | ![](Other/screenshots/bullet.webp) |
 
 ## Who is using it?
 
 **Open Source**
+- [Stunt Rally - 3D Racing Game with Track Editor](https://stuntrally.tuxfamily.org/)
 - [Rigs of Rods - Soft Body Physics Simulator](https://rigsofrods.org/)
 - [Gazebo - Robot simulation](http://gazebosim.org/)
+- [OpenCV OVIS visualization module](https://docs.opencv.org/master/d2/d17/group__ovis.html)
 - [ROS 3D visualization tool](http://wiki.ros.org/rviz)
-- [legged robotics RAISIM](https://github.com/leggedrobotics/raisimLib#examples)
+- [RAISIM Physics](https://github.com/raisimTech/raisimOgre#news)
 
 **Closed Source**
 - [Hob](http://store.steampowered.com/app/404680/Hob/)

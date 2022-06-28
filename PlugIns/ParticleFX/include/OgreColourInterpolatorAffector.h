@@ -70,8 +70,7 @@ namespace Ogre {
         /** Default constructor. */
         ColourInterpolatorAffector(ParticleSystem* psys);
 
-        /** See ParticleAffector. */
-        void _affectParticles(ParticleSystem* pSystem, Real timeElapsed);
+        void _affectParticles(ParticleSystem* pSystem, Real timeElapsed) override;
 
         void setColourAdjust(size_t index, ColourValue colour);
         ColourValue getColourAdjust(size_t index) const;
@@ -88,9 +87,6 @@ namespace Ogre {
         Real                    mTimeAdj[MAX_STAGES];
 
     };
-
-    /** @} */
-    /** @} */
 }
 
 

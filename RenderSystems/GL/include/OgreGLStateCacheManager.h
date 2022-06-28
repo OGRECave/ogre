@@ -32,7 +32,6 @@ THE SOFTWARE.
 #include "OgreGLPrerequisites.h"
 #include "OgreGLStateCacheManagerCommon.h"
 #include "OgreStdHeaders.h"
-#include "OgreIteratorWrappers.h"
 
 namespace Ogre
 {
@@ -186,7 +185,6 @@ namespace Ogre
         void setStencilMask(GLuint mask);
 
         /** Enables a piece of OpenGL functionality.
-         @param flag The function to enable.
          */
         void setEnabled(GLenum flag, bool enabled);
 
@@ -224,7 +222,7 @@ namespace Ogre
         void setPointSize(GLfloat size);
         void setPointParameters(const GLfloat* attenuation, float minSize = -1, float maxSize = -1);
 
-        void setViewport(GLint x, GLint y, GLsizei width, GLsizei height);
+        void setViewport(const Rect& r);
 
     };
 }

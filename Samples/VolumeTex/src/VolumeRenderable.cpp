@@ -54,17 +54,8 @@ void VolumeRenderable::_notifyCurrentCamera( Camera* cam )
 
     // Fake orientation toward camera
     Vector3 zVec = getParentNode()->_getDerivedPosition() - cam->getDerivedPosition();
-    zVec.normalise();
-    Vector3 fixedAxis = cam->getDerivedOrientation() * Vector3::UNIT_Y ;
-    
-    Vector3 xVec = fixedAxis.crossProduct( zVec );
-    xVec.normalise();
+    mFakeOrientation = Math::lookRotation(zVec.normalisedCopy(), cam->getDerivedOrientation().yAxis());
 
-    Vector3 yVec = zVec.crossProduct( xVec );
-    yVec.normalise();
-
-    mFakeOrientation.FromAxes( xVec, yVec, zVec );
-    
     Matrix3 tempMat;
     getParentNode()->_getDerivedOrientation().UnitInverse().ToRotationMatrix(tempMat);
     

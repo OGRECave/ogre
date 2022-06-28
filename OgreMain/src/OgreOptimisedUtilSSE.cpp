@@ -133,7 +133,7 @@ namespace Ogre {
 
 #if defined(__OGRE_SIMD_ALIGN_STACK)
     /** Stack-align implementation of OptimisedUtil.
-    @remarks
+
         User code compiled by icc and gcc might not align stack
         properly, we need ensure stack align to a 16-bytes boundary
         when execute SSE function.
@@ -1288,7 +1288,9 @@ namespace Ogre {
         size_t pos1VSize, size_t pos2VSize, size_t dstVSize, 
         size_t numVertices,
         bool morphNormals)
-    {   
+    {
+        OgreAssert(pos1VSize == pos2VSize && pos2VSize == dstVSize && dstVSize == (morphNormals ? 24 : 12),
+                   "stride not supported");
         __OGRE_CHECK_STACK_ALIGNED_FOR_SSE();
 
         __m128 src01, src02, src11, src12, src21, src22;

@@ -57,67 +57,45 @@ namespace Ogre {
     {
     }
 
-    void AndroidEGLWindow::getLeftAndTopFromNativeWindow( int & left, int & top, uint width, uint height )
-    {
-        // We don't have a native window.... but I think all android windows are origined
-        left = top = 0;
-    }
-
-    void AndroidEGLWindow::initNativeCreatedWindow(const NameValuePairList *miscParams)
-    {
-    }
-
-    void AndroidEGLWindow::createNativeWindow( int &left, int &top, uint &width, uint &height, String &title )
-    {
-    }
-
-    void AndroidEGLWindow::reposition( int left, int top )
-    {
-    }
-
     void AndroidEGLWindow::resize(uint width, uint height)
     {
-        // cannot do this - query size instead
-        windowMovedOrResized();
+        width *= mScale;
+        height *= mScale;
+
+        if (!mActive || (mWidth == width && mHeight == height))
+            return;
+
+        mWidth = width;
+        mHeight = height;
+
+        // Notify viewports of resize
+        ViewportList::iterator it = mViewportList.begin();
+        while (it != mViewportList.end())
+            (*it++).second->_updateDimensions();
+
+        EGLint format;
+        eglGetConfigAttrib(mEglDisplay, mEglConfig, EGL_NATIVE_VISUAL_ID, &format);
+        EGL_CHECK_ERROR
+
+        if (mScale != 1.0f)
+        {
+            ANativeWindow_setBuffersGeometry(mWindow, mWidth, mHeight, format);
+        }
+        else
+        {
+            ANativeWindow_setBuffersGeometry(mWindow, 0, 0, format);
+        }
     }
 
     void AndroidEGLWindow::windowMovedOrResized()
     {
         if(mActive)
-        {		
-            // When using GPU rendering for Android UI the os creates a context in the main thread
-            // Now we have 2 choices create OGRE in its own thread or set our context current before doing
-            // anything else. I put this code here because this function called before any rendering is done.
-            // Because the events for screen rotation / resizing did not worked on all devices it is the best way
-            // to query the correct dimensions.
-            mContext->setCurrent();
+        {
+            int nwidth = ANativeWindow_getWidth(mWindow);
+            int nheight = ANativeWindow_getHeight(mWindow);
 
-            int nwidth = (int)((float)ANativeWindow_getWidth(mWindow) * mScale);
-            int nheight = (int)((float)ANativeWindow_getHeight(mWindow) * mScale);
-
-            if(mScale != 1.0f && (nwidth != int(mWidth) || nheight != int(mHeight)))
-            {
-                // update buffer geometry
-                EGLint format;
-                eglGetConfigAttrib(mEglDisplay, mEglConfig, EGL_NATIVE_VISUAL_ID, &format);
-                EGL_CHECK_ERROR
-
-                ANativeWindow_setBuffersGeometry(mWindow, nwidth, nheight, format);
-            }
-
-            mWidth = nwidth;
-            mHeight = nheight;
-
-            // Notify viewports of resize
-            ViewportList::iterator it = mViewportList.begin();
-            while( it != mViewportList.end() )
-                (*it++).second->_updateDimensions();
+            resize(nwidth, nheight);
         }
-    }
-    
-    void AndroidEGLWindow::switchFullScreen(bool fullscreen)
-    {
-    
     }
     
     void AndroidEGLWindow::create(const String& name, uint width, uint height,
@@ -211,8 +189,6 @@ namespace Ogre {
             }
         }
 
-        initNativeCreatedWindow(miscParams);
-
         if (mEglSurface)
         {
             mEglConfig = mGLSupport->getGLConfigFromDrawable (mEglSurface, &width, &height);
@@ -239,17 +215,16 @@ namespace Ogre {
             mHwGamma = false;
         }
         
-        mContext = createEGLContext();
+        mContext = createEGLContext(eglContext);
         mContext->setCurrent();
 
         eglQuerySurface(mEglDisplay, mEglSurface, EGL_WIDTH, (EGLint*)&mWidth);
         eglQuerySurface(mEglDisplay, mEglSurface, EGL_HEIGHT, (EGLint*)&mHeight);
         EGL_CHECK_ERROR
 
-        mActive = true;
-        mVisible = true;
-        mClosed = false;
         mPreserveContext = preserveContextOpt;
+
+        finaliseWindow();
     }
 
     void AndroidEGLWindow::_notifySurfaceDestroyed()

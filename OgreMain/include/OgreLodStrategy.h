@@ -40,11 +40,11 @@ namespace Ogre {
     /** \addtogroup Core
     *  @{
     */
-    /** \addtogroup LOD
+    /** \defgroup LOD Level of Detail
     *  @{
     */
     /** Strategy for determining level of detail.
-    @remarks
+
         Generally, to create a new LOD strategy, all of the following will
         need to be implemented: getValueImpl, getBaseValue, transformBias,
         getIndex, sort, and isSorted.
@@ -52,7 +52,7 @@ namespace Ogre {
     */
     class _OgreExport LodStrategy : public LodAlloc
     {
-    protected:
+    private:
         /** Name of this strategy. */
         String mName;
 
@@ -73,9 +73,9 @@ namespace Ogre {
         virtual Real transformBias(Real factor) const = 0;
 
         /** Transform user supplied value to internal value.
-        @remarks
+
             By default, performs no transformation.
-        @remarks
+
             Do not throw exceptions for invalid values here, as the LOD strategy
             may be changed such that the values become valid.
         */

@@ -36,28 +36,66 @@ THE SOFTWARE.
 
 #include "OgreEGLSupport.h"
 #include "OgreEGLWindow.h"
+#if OGRE_PLATFORM != OGRE_PLATFORM_EMSCRIPTEN
 #include "OgreEGLRenderTexture.h"
+#endif
 
+#ifndef EGL_VERSION_1_5
+#define EGL_CONTEXT_MAJOR_VERSION EGL_CONTEXT_CLIENT_VERSION
+#define EGL_CONTEXT_MINOR_VERSION EGL_NONE
+#endif
+
+#include <EGL/eglext.h>
 
 namespace Ogre {
 
 
     EGLSupport::EGLSupport(int profile)
         : GLNativeSupport(profile), mGLDisplay(0),
-          mNativeDisplay(0)
+          mNativeDisplay(EGL_DEFAULT_DISPLAY), hasEGL15(false)
     {
     }
 
     EGLDisplay EGLSupport::getGLDisplay(void)
     {
-        mGLDisplay = eglGetDisplay(mNativeDisplay);
-        EGL_CHECK_ERROR
+#if defined(EGL_VERSION_1_5) && OGRE_PLATFORM != OGRE_PLATFORM_ANDROID && OGRE_PLATFORM != OGRE_PLATFORM_EMSCRIPTEN
+        static auto eglQueryDevicesEXT = (PFNEGLQUERYDEVICESEXTPROC)eglGetProcAddress("eglQueryDevicesEXT");
+        static auto eglQueryDeviceStringEXT =
+            (PFNEGLQUERYDEVICESTRINGEXTPROC)eglGetProcAddress("eglQueryDeviceStringEXT");
+
+        if(eglQueryDevicesEXT && mNativeDisplay == EGL_DEFAULT_DISPLAY)
+        {
+            int numDevices;
+            eglQueryDevicesEXT(0, NULL, &numDevices);
+            EGL_CHECK_ERROR
+            std::vector<EGLDeviceEXT> devices(numDevices);
+            eglQueryDevicesEXT(numDevices, devices.data(), &numDevices);
+
+            EGLAttrib attribs[] = {EGL_NONE};
+            for(auto dev : devices)
+            {
+                EGLDisplay display = eglGetPlatformDisplay(EGL_PLATFORM_DEVICE_EXT, dev, attribs);
+                EGL_CHECK_ERROR
+
+                if(display != EGL_NO_DISPLAY && !mGLDisplay)
+                {
+                    mGLDisplay = display;
+                    const char* exts = eglQueryDeviceStringEXT(dev, EGL_EXTENSIONS);
+                    LogManager::getSingleton().stream() << "EGL: using default display. Device extensions: " << exts;
+                    break;
+                }
+            }
+        }
+        else
+#endif
+        {
+            mGLDisplay = eglGetDisplay(mNativeDisplay);
+            EGL_CHECK_ERROR
+        }
 
         if(mGLDisplay == EGL_NO_DISPLAY)
         {
-            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-                        "Couldn`t open EGLDisplay " + getDisplayName(),
-                        "EGLSupport::getGLDisplay");
+            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Couldn`t get EGLDisplay");
         }
 
         if (eglInitialize(mGLDisplay, &mEGLMajor, &mEGLMinor) == EGL_FALSE)
@@ -69,12 +107,6 @@ namespace Ogre {
         EGL_CHECK_ERROR
 
         return mGLDisplay;
-    }
-
-
-    String EGLSupport::getDisplayName(void)
-    {
-        return "todo";
     }
 
     EGLConfig* EGLSupport::chooseGLConfig(const EGLint *attribList, EGLint *nElements)
@@ -307,37 +339,55 @@ namespace Ogre {
                                               ::EGLContext shareList) const 
     {
         EGLint contextAttrs[] = {
-            EGL_CONTEXT_CLIENT_VERSION, 2,
+            EGL_CONTEXT_MAJOR_VERSION, 3,
+            EGL_CONTEXT_MINOR_VERSION, 2,
+            EGL_NONE, EGL_NONE,
             EGL_NONE
         };
 
+        if (!eglBindAPI(mContextProfile == CONTEXT_ES ? EGL_OPENGL_ES_API : EGL_OPENGL_API))
+        {
+            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "eglBindAPI failed");
+        }
+
         if(mContextProfile != CONTEXT_ES) {
-            if (!eglBindAPI(EGL_OPENGL_API))
+            contextAttrs[1] = 4;
+            contextAttrs[3] = 6;
+
+#ifdef EGL_VERSION_1_5
+            contextAttrs[4] = EGL_CONTEXT_OPENGL_PROFILE_MASK;
+            contextAttrs[5] = EGL_CONTEXT_OPENGL_CORE_PROFILE_BIT;
+            if(mContextProfile == CONTEXT_COMPATIBILITY)
             {
-                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-                        "Couldn`t initialize API ",
-                        "EGLSupport::getGLDisplay");
+                contextAttrs[1] = 3; // MESA 20.2.6 always gives us core if we request 4.x
+                contextAttrs[3] = 0;
+                contextAttrs[5] = EGL_CONTEXT_OPENGL_COMPATIBILITY_PROFILE_BIT;
             }
-            EGL_CHECK_ERROR
-
-            contextAttrs[0] = EGL_NONE;
+#endif
         }
 
-        ::EGLContext context = 0;
-        if (!eglDisplay)
+        if(!hasEGL15)
         {
-            context = eglCreateContext(mGLDisplay, glconfig, shareList, contextAttrs);
-            EGL_CHECK_ERROR
+            contextAttrs[2] = EGL_NONE; // skips following attributes
+            contextAttrs[3] = 0;
         }
-        else
+
+        ::EGLContext context = (::EGLContext)0;
+
+        // find maximal supported context version
+        while(!context && (contextAttrs[1] >= 1))
         {
-            context = eglCreateContext(eglDisplay, glconfig, 0, contextAttrs);
+            context = eglCreateContext(eglDisplay, glconfig, shareList, contextAttrs);
             EGL_CHECK_ERROR
+            contextAttrs[1] -= contextAttrs[3] == 0; // only decrement if minor == 0
+
+            if(hasEGL15)
+                contextAttrs[3] = (contextAttrs[3] - 1 + 7) % 7; // decrement: -1 -> 6
         }
 
         if (!context)
         {
-            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Fail to create New context");
+            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Failed to create EGL context");
             return 0;
         }
 
@@ -362,21 +412,28 @@ namespace Ogre {
     void EGLSupport::initialiseExtensions() {
         assert (mGLDisplay);
 
-        const char* verStr = eglQueryString(mGLDisplay, EGL_VERSION);
-        LogManager::getSingleton().stream() << "EGL_VERSION = " << verStr;
+        const char* propStr = eglQueryString(mGLDisplay, EGL_VENDOR);
+        LogManager::getSingleton().stream() << "EGL_VENDOR = " << propStr;
 
-        const char* extensionsString;
+        propStr = eglQueryString(mGLDisplay, EGL_VERSION);
+        LogManager::getSingleton().stream() << "EGL_VERSION = " << propStr;
 
-        // This is more realistic than using glXGetClientString:
-        extensionsString = eglQueryString(mGLDisplay, EGL_EXTENSIONS);
-
-        LogManager::getSingleton().stream() << "EGL_EXTENSIONS = " << extensionsString;
+        hasEGL15 = String(propStr).find("1.5") != String::npos;
 
         StringStream ext;
+
+        // client extensions
+        propStr = eglQueryString(EGL_NO_DISPLAY, EGL_EXTENSIONS);
+        if(propStr) // NULL = failure case
+            ext << propStr << " ";
+
+        // display extension
+        propStr = eglQueryString(mGLDisplay, EGL_EXTENSIONS);
+        ext << propStr;
+
+        LogManager::getSingleton().stream() << "EGL_EXTENSIONS = " << ext.str();
+
         String instr;
-
-        ext << extensionsString;
-
         while(ext >> instr)
         {
             extensionList.insert(instr);
@@ -386,5 +443,14 @@ namespace Ogre {
     void EGLSupport::setGLDisplay( EGLDisplay val )
     {
         mGLDisplay = val;
+    }
+
+    GLPBuffer* EGLSupport::createPBuffer( PixelComponentType format, size_t width, size_t height )
+    {
+#if OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
+        return nullptr;
+#else
+        return new EGLPBuffer(this, format, width, height);
+#endif
     }
 }

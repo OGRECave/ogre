@@ -1,13 +1,21 @@
 #include <Ogre.h>
+#include <OgreDotSceneLoader.h>
+#include <OgreComponents.h>
+
+#ifdef OGRE_BUILD_COMPONENT_TERRAIN
 #include <OgreTerrain.h>
 #include <OgreTerrainGroup.h>
-#include <OgreDotSceneLoader.h>
-#include <OgreSceneLoaderManager.h>
-#include <OgreComponents.h>
+#endif
 
 #include <pugixml.hpp>
 
 using namespace Ogre;
+
+#ifndef OGRE_BUILD_COMPONENT_TERRAIN
+namespace Ogre {
+    class TerrainGroup {}; // appease unique_ptr destructor
+}
+#endif
 
 namespace
 {
@@ -65,7 +73,7 @@ Quaternion parseQuaternion(const pugi::xml_node& XMLNode)
         axis.z = StringConverter::parseReal(XMLNode.attribute("axisZ").value());
         Real angle = StringConverter::parseReal(XMLNode.attribute("angle").value());
 
-        orientation.FromAngleAxis(Angle(angle), axis);
+        orientation.FromAngleAxis(Radian(angle), axis);
     }
     else if (XMLNode.attribute("angleX"))
     {
@@ -100,17 +108,31 @@ ColourValue parseColour(pugi::xml_node& XMLNode)
                        StringConverter::parseReal(XMLNode.attribute("b").value()),
                        XMLNode.attribute("a") != NULL ? StringConverter::parseReal(XMLNode.attribute("a").value()) : 1);
 }
+
+struct DotSceneCodec : public Codec
+{
+    String magicNumberToFileExt(const char* magicNumberPtr, size_t maxbytes) const { return ""; }
+    String getType() const override { return "scene"; }
+    void decode(const DataStreamPtr& stream, const Any& output) const override
+    {
+        DataStreamPtr _stream(stream);
+        DotSceneLoader loader;
+        loader.load(_stream, ResourceGroupManager::getSingleton().getWorldResourceGroupName(),
+                    any_cast<SceneNode*>(output));
+    }
+
+    void encodeToFile(const Any& input, const String& outFileName) const override
+    {
+        DotSceneLoader loader;
+        loader.exportScene(any_cast<SceneNode*>(input), outFileName);
+    }
+};
+
 } // namespace
 
-DotSceneLoader::DotSceneLoader() : mSceneMgr(0), mBackgroundColour(ColourValue::Black)
-{
-    SceneLoaderManager::getSingleton().registerSceneLoader("DotScene", {".scene"}, this);
-}
+DotSceneLoader::DotSceneLoader() : mSceneMgr(0), mBackgroundColour(ColourValue::Black) {}
 
-DotSceneLoader::~DotSceneLoader()
-{
-    SceneLoaderManager::getSingleton().unregisterSceneLoader("DotScene");
-}
+DotSceneLoader::~DotSceneLoader() {}
 
 void DotSceneLoader::load(DataStreamPtr& stream, const String& groupName, SceneNode* rootNode)
 {
@@ -122,7 +144,7 @@ void DotSceneLoader::load(DataStreamPtr& stream, const String& groupName, SceneN
     auto result = XMLDoc.load_buffer(stream->getAsString().c_str(), stream->size());
     if (!result)
     {
-        LogManager::getSingleton().stream(LML_CRITICAL) << "[DotSceneLoader] " << result.description();
+        LogManager::getSingleton().logError("DotSceneLoader - " + String(result.description()));
         return;
     }
 
@@ -132,7 +154,7 @@ void DotSceneLoader::load(DataStreamPtr& stream, const String& groupName, SceneN
     // Validate the File
     if (!XMLRoot.attribute("formatVersion"))
     {
-        LogManager::getSingleton().logError("[DotSceneLoader] Invalid .scene File. Missing <scene formatVersion='x.y' >");
+        LogManager::getSingleton().logError("DotSceneLoader - Invalid .scene File. Missing <scene formatVersion='x.y' >");
         return;
     }
 
@@ -189,6 +211,8 @@ void DotSceneLoader::processScene(pugi::xml_node& XMLRoot)
 
 void DotSceneLoader::processNodes(pugi::xml_node& XMLNode)
 {
+    LogManager::getSingleton().logMessage("[DotSceneLoader] Processing Nodes...", LML_TRIVIAL);
+
     // Process node (*)
     for (auto pElement : XMLNode.children("node"))
     {
@@ -224,6 +248,8 @@ void DotSceneLoader::processExternals(pugi::xml_node& XMLNode)
 
 void DotSceneLoader::processEnvironment(pugi::xml_node& XMLNode)
 {
+    LogManager::getSingleton().logMessage("[DotSceneLoader] Processing Environment...", LML_TRIVIAL);
+
     // Process camera (?)
     if (auto pElement = XMLNode.child("camera"))
         processCamera(pElement);
@@ -256,6 +282,8 @@ void DotSceneLoader::processEnvironment(pugi::xml_node& XMLNode)
 void DotSceneLoader::processTerrainGroup(pugi::xml_node& XMLNode)
 {
 #ifdef OGRE_BUILD_COMPONENT_TERRAIN
+    LogManager::getSingleton().logMessage("[DotSceneLoader] Processing Terrain Group...", LML_TRIVIAL);
+
     Real worldSize = getAttribReal(XMLNode, "worldSize");
     int mapSize = StringConverter::parseInt(XMLNode.attribute("size").value());
     int compositeMapDistance = StringConverter::parseInt(XMLNode.attribute("tuningCompositeMapDistance").value());
@@ -267,9 +295,9 @@ void DotSceneLoader::processTerrainGroup(pugi::xml_node& XMLNode)
     terrainGlobalOptions->setMaxPixelError((Real)maxPixelError);
     terrainGlobalOptions->setCompositeMapDistance((Real)compositeMapDistance);
 
-    mTerrainGroup.reset(new TerrainGroup(mSceneMgr, Terrain::ALIGN_X_Z, mapSize, worldSize));
-    mTerrainGroup->setOrigin(Vector3::ZERO);
-    mTerrainGroup->setResourceGroup(m_sGroupName);
+    auto terrainGroup = std::make_shared<TerrainGroup>(mSceneMgr, Terrain::ALIGN_X_Z, mapSize, worldSize);
+    terrainGroup->setOrigin(Vector3::ZERO);
+    terrainGroup->setResourceGroup(m_sGroupName);
 
     // Process terrain pages (*)
     for (auto pPageElement : XMLNode.children("terrain"))
@@ -277,11 +305,13 @@ void DotSceneLoader::processTerrainGroup(pugi::xml_node& XMLNode)
         int pageX = StringConverter::parseInt(pPageElement.attribute("x").value());
         int pageY = StringConverter::parseInt(pPageElement.attribute("y").value());
 
-        mTerrainGroup->defineTerrain(pageX, pageY, pPageElement.attribute("dataFile").value());
+        terrainGroup->defineTerrain(pageX, pageY, pPageElement.attribute("dataFile").value());
     }
-    mTerrainGroup->loadAllTerrains(true);
+    terrainGroup->loadAllTerrains(true);
 
-    mTerrainGroup->freeTemporaryResources();
+    terrainGroup->freeTemporaryResources();
+
+    mAttachNode->getUserObjectBindings().setUserAny("TerrainGroup", terrainGroup);
 #else
     OGRE_EXCEPT(Exception::ERR_INVALID_CALL, "recompile with Terrain component");
 #endif
@@ -291,6 +321,8 @@ void DotSceneLoader::processLight(pugi::xml_node& XMLNode, SceneNode* pParent)
 {
     // Process attributes
     String name = getAttrib(XMLNode, "name");
+
+    LogManager::getSingleton().logMessage("[DotSceneLoader] Processing Light: " + name, LML_TRIVIAL);
 
     // Create the light
     Light* pLight = mSceneMgr->createLight(name);
@@ -338,6 +370,9 @@ void DotSceneLoader::processCamera(pugi::xml_node& XMLNode, SceneNode* pParent)
 {
     // Process attributes
     String name = getAttrib(XMLNode, "name");
+
+    LogManager::getSingleton().logMessage("[DotSceneLoader] Processing Camera: " + name, LML_TRIVIAL);
+
     // Real fov = getAttribReal(XMLNode, "fov", 45);
     Real aspectRatio = getAttribReal(XMLNode, "aspectRatio", 1.3333);
     String projectionType = getAttrib(XMLNode, "projectionType", "perspective");
@@ -383,6 +418,8 @@ void DotSceneLoader::processNode(pugi::xml_node& XMLNode, SceneNode* pParent)
 {
     // Construct the node's name
     String name = getAttrib(XMLNode, "name");
+
+    LogManager::getSingleton().logMessage("[DotSceneLoader] Processing Node: " + name, LML_TRIVIAL);
 
     // Create the scene node
     SceneNode* pNode;
@@ -479,6 +516,10 @@ void DotSceneLoader::processNode(pugi::xml_node& XMLNode, SceneNode* pParent)
     // Process userDataReference (?)
     if (auto pElement = XMLNode.child("userData"))
         processUserData(pElement, pNode->getUserObjectBindings());
+
+    // Process node animations (?)
+    if (auto pElement = XMLNode.child("animations"))
+        processNodeAnimations(pElement, pNode);
 }
 
 void DotSceneLoader::processLookTarget(pugi::xml_node& XMLNode, SceneNode* pParent)
@@ -487,6 +528,8 @@ void DotSceneLoader::processLookTarget(pugi::xml_node& XMLNode, SceneNode* pPare
 
     // Process attributes
     String nodeName = getAttrib(XMLNode, "nodeName");
+
+    LogManager::getSingleton().logMessage("[DotSceneLoader] Processing Look Target, nodeName: " + nodeName, LML_TRIVIAL);
 
     Node::TransformSpace relativeTo = Node::TS_PARENT;
     String sValue = getAttrib(XMLNode, "relativeTo");
@@ -518,9 +561,9 @@ void DotSceneLoader::processLookTarget(pugi::xml_node& XMLNode, SceneNode* pPare
 
         pParent->lookAt(position, relativeTo, localDirection);
     }
-    catch (Exception& /*e*/)
+    catch (const Exception& e)
     {
-        LogManager::getSingleton().logMessage("[DotSceneLoader] Error processing a look target!");
+        LogManager::getSingleton().logError("DotSceneLoader - " + e.getDescription());
     }
 }
 
@@ -528,6 +571,8 @@ void DotSceneLoader::processTrackTarget(pugi::xml_node& XMLNode, SceneNode* pPar
 {
     // Process attributes
     String nodeName = getAttrib(XMLNode, "nodeName");
+
+    LogManager::getSingleton().logMessage("[DotSceneLoader] Processing Track Target, nodeName: " + nodeName, LML_TRIVIAL);
 
     // Process localDirection (?)
     Vector3 localDirection = Vector3::NEGATIVE_UNIT_Z;
@@ -545,9 +590,9 @@ void DotSceneLoader::processTrackTarget(pugi::xml_node& XMLNode, SceneNode* pPar
         SceneNode* pTrackNode = mSceneMgr->getSceneNode(nodeName);
         pParent->setAutoTracking(true, pTrackNode, localDirection, offset);
     }
-    catch (Exception& /*e*/)
+    catch (const Exception& e)
     {
-        LogManager::getSingleton().logMessage("[DotSceneLoader] Error processing a track target!");
+        LogManager::getSingleton().logError("DotSceneLoader - " + e.getDescription());
     }
 }
 
@@ -555,23 +600,65 @@ void DotSceneLoader::processEntity(pugi::xml_node& XMLNode, SceneNode* pParent)
 {
     // Process attributes
     String name = getAttrib(XMLNode, "name");
+
+    LogManager::getSingleton().logMessage("[DotSceneLoader] Processing Entity: " + name, LML_TRIVIAL);
+
     String meshFile = getAttrib(XMLNode, "meshFile");
+	String staticGeometry = getAttrib(XMLNode, "static");
+	String instancedManager = getAttrib(XMLNode, "instanced");
+	String material = getAttrib(XMLNode, "material");
     bool castShadows = getAttribBool(XMLNode, "castShadows", true);
+    bool visible = getAttribBool(XMLNode, "visible", true);
 
     // Create the entity
-    Entity* pEntity = 0;
+	MovableObject* pEntity = 0;
+
     try
     {
-        pEntity = mSceneMgr->createEntity(name, meshFile, m_sGroupName);
-        pEntity->setCastShadows(castShadows);
-        pParent->attachObject(pEntity);
+		// If the Entity is instanced then the creation path is different
+		if (!instancedManager.empty())
+		{
+			LogManager::getSingleton().logMessage("[DotSceneLoader] Adding entity: " + name + " to Instance Manager: " + instancedManager, LML_TRIVIAL);
 
-        if (auto material = XMLNode.attribute("material"))
-            pEntity->setMaterialName(material.value());
+			// Load the Mesh to get the material name of the first submesh
+			Ogre::MeshPtr mesh = MeshManager::getSingletonPtr()->load(meshFile, m_sGroupName);
+
+			// Get the material name of the entity
+			if(!material.empty())
+				pEntity = mSceneMgr->createInstancedEntity(material, instancedManager);
+			else
+				pEntity = mSceneMgr->createInstancedEntity(mesh->getSubMesh(0)->getMaterialName(), instancedManager);
+
+			pParent->attachObject(static_cast<InstancedEntity*>(pEntity));
+		}
+		else
+		{
+			pEntity = mSceneMgr->createEntity(name, meshFile, m_sGroupName);
+
+			static_cast<Entity*>(pEntity)->setCastShadows(castShadows);
+			static_cast<Entity*>(pEntity)->setVisible(visible);
+
+			if (!material.empty())
+				static_cast<Entity*>(pEntity)->setMaterialName(material);
+
+			// If the Entity belongs to a Static Geometry group then it doesn't get attached to a node
+			// * TODO * : Clean up nodes without attached entities or children nodes? (should be done afterwards if the hierarchy is being processed)
+			if (!staticGeometry.empty())
+			{
+				LogManager::getSingleton().logMessage("[DotSceneLoader] Adding entity: " + name + " to Static Group: " + staticGeometry, LML_TRIVIAL);
+				mSceneMgr->getStaticGeometry(staticGeometry)->addEntity(static_cast<Entity*>(pEntity), pParent->_getDerivedPosition(), pParent->_getDerivedOrientation(), pParent->_getDerivedScale());
+			}
+			else
+			{
+				LogManager::getSingleton().logMessage("[DotSceneLoader] pParent->attachObject(): " + name, LML_TRIVIAL);
+				pParent->attachObject(static_cast<Entity*>(pEntity));
+			}
+		}
     }
-    catch (Exception& /*e*/)
+    catch (const Exception& e)
     {
-        LogManager::getSingleton().logMessage("[DotSceneLoader] Error loading an entity!", LML_CRITICAL);
+        LogManager::getSingleton().logError("DotSceneLoader - " + e.getDescription());
+        return;
     }
 
     // Process userDataReference (?)
@@ -583,6 +670,9 @@ void DotSceneLoader::processParticleSystem(pugi::xml_node& XMLNode, SceneNode* p
 {
     // Process attributes
     String name = getAttrib(XMLNode, "name");
+
+    LogManager::getSingleton().logMessage("[DotSceneLoader] Processing Particle System: " + name, LML_TRIVIAL);
+
     String templateName = getAttrib(XMLNode, "template");
 
     if (templateName.empty())
@@ -594,9 +684,9 @@ void DotSceneLoader::processParticleSystem(pugi::xml_node& XMLNode, SceneNode* p
         ParticleSystem* pParticles = mSceneMgr->createParticleSystem(name, templateName);
         pParent->attachObject(pParticles);
     }
-    catch (Exception& /*e*/)
+    catch (const Exception& e)
     {
-        LogManager::getSingleton().logMessage("[DotSceneLoader] Error creating a particle system!");
+        LogManager::getSingleton().logError("DotSceneLoader - " + e.getDescription());
     }
 }
 
@@ -608,6 +698,9 @@ void DotSceneLoader::processBillboardSet(pugi::xml_node& XMLNode, SceneNode* pPa
 void DotSceneLoader::processPlane(pugi::xml_node& XMLNode, SceneNode* pParent)
 {
     String name = getAttrib(XMLNode, "name");
+
+    LogManager::getSingleton().logMessage("[DotSceneLoader] Processing Plane: " + name, LML_TRIVIAL);
+
     Real distance = getAttribReal(XMLNode, "distance");
     Real width = getAttribReal(XMLNode, "width");
     Real height = getAttribReal(XMLNode, "height");
@@ -634,6 +727,8 @@ void DotSceneLoader::processPlane(pugi::xml_node& XMLNode, SceneNode* pParent)
 
 void DotSceneLoader::processFog(pugi::xml_node& XMLNode)
 {
+    LogManager::getSingleton().logMessage("[DotSceneLoader] Processing Fog...", LML_TRIVIAL);
+
     // Process attributes
     Real expDensity = getAttribReal(XMLNode, "density", 0.001);
     Real linearStart = getAttribReal(XMLNode, "start", 0.0);
@@ -664,6 +759,8 @@ void DotSceneLoader::processFog(pugi::xml_node& XMLNode)
 
 void DotSceneLoader::processSkyBox(pugi::xml_node& XMLNode)
 {
+    LogManager::getSingleton().logMessage("[DotSceneLoader] Processing SkyBox...", LML_TRIVIAL);
+
     // Process attributes
     String material = getAttrib(XMLNode, "material", "BaseWhite");
     Real distance = getAttribReal(XMLNode, "distance", 5000);
@@ -684,6 +781,8 @@ void DotSceneLoader::processSkyBox(pugi::xml_node& XMLNode)
 
 void DotSceneLoader::processSkyDome(pugi::xml_node& XMLNode)
 {
+    LogManager::getSingleton().logMessage("[DotSceneLoader] Processing SkyDome...", LML_TRIVIAL);
+
     // Process attributes
     String material = XMLNode.attribute("material").value();
     Real curvature = getAttribReal(XMLNode, "curvature", 10);
@@ -705,6 +804,8 @@ void DotSceneLoader::processSkyDome(pugi::xml_node& XMLNode)
 
 void DotSceneLoader::processSkyPlane(pugi::xml_node& XMLNode)
 {
+    LogManager::getSingleton().logMessage("[DotSceneLoader] Processing SkyPlane...", LML_TRIVIAL);
+
     // Process attributes
     String material = getAttrib(XMLNode, "material");
     Real planeX = getAttribReal(XMLNode, "planeX", 0);
@@ -731,7 +832,7 @@ void DotSceneLoader::processLightRange(pugi::xml_node& XMLNode, Light* pLight)
     Real falloff = getAttribReal(XMLNode, "falloff", 1.0);
 
     // Setup the light range
-    pLight->setSpotlightRange(Angle(inner), Angle(outer), falloff);
+    pLight->setSpotlightRange(Radian(inner), Radian(outer), falloff);
 }
 
 void DotSceneLoader::processLightAttenuation(pugi::xml_node& XMLNode, Light* pLight)
@@ -769,17 +870,249 @@ void DotSceneLoader::processUserData(pugi::xml_node& XMLNode, UserObjectBindings
     }
 }
 
+void DotSceneLoader::processNodeAnimations(pugi::xml_node& XMLNode, SceneNode* pParent)
+{
+    LogManager::getSingleton().logMessage("[DotSceneLoader] Processing Node Animations for SceneNode: " + pParent->getName(), LML_TRIVIAL);
+
+    // Process node animations (*)
+    for (auto pElement : XMLNode.children("animation"))
+    {
+        processNodeAnimation(pElement, pParent);
+    }
+}
+
+void DotSceneLoader::processNodeAnimation(pugi::xml_node& XMLNode, SceneNode* pParent)
+{
+    // Process node animation (*)
+
+    // Construct the animation name
+    String name = getAttrib(XMLNode, "name");
+
+    LogManager::getSingleton().logMessage("[DotSceneLoader] Processing Node Animation: " + name, LML_TRIVIAL);
+
+    Real length = getAttribReal(XMLNode, "length");
+
+    Animation* anim = mSceneMgr->createAnimation(name, length);
+
+    bool enable = getAttribBool(XMLNode, "enable", false);
+    bool loop = getAttribBool(XMLNode, "loop", false);
+
+    String interpolationMode = getAttrib(XMLNode, "interpolationMode");
+
+    if (interpolationMode == "linear")
+        anim->setInterpolationMode(Animation::IM_LINEAR);
+    else if (interpolationMode == "spline")
+        anim->setInterpolationMode(Animation::IM_SPLINE);
+    else
+        LogManager::getSingleton().logError("DotSceneLoader - Invalid interpolationMode: " + interpolationMode);
+
+    String rotationInterpolationMode = getAttrib(XMLNode, "rotationInterpolationMode");
+
+    if (rotationInterpolationMode == "linear")
+        anim->setRotationInterpolationMode(Animation::RIM_LINEAR);
+    else if (rotationInterpolationMode == "spherical")
+        anim->setRotationInterpolationMode(Animation::RIM_SPHERICAL);
+    else
+        LogManager::getSingleton().logError("DotSceneLoader - Invalid rotationInterpolationMode: " + rotationInterpolationMode);
+
+    // create a track to animate the camera's node
+    NodeAnimationTrack* track = anim->createNodeTrack(0, pParent);
+
+    // Process keyframes (*)
+    for (auto pElement : XMLNode.children("keyframe"))
+    {
+        processKeyframe(pElement, track);
+    }
+
+    // create a new animation state to track this
+    auto animState = mSceneMgr->createAnimationState(name);
+    animState->setEnabled(enable);
+    animState->setLoop(loop);
+}
+
+void DotSceneLoader::processKeyframe(pugi::xml_node& XMLNode, NodeAnimationTrack* pTrack)
+{
+    // Process node animation keyframe (*)
+    Real time = getAttribReal(XMLNode, "time");
+
+    LogManager::getSingleton().logMessage("[DotSceneLoader] Processing Keyframe: " + StringConverter::toString(time), LML_TRIVIAL);
+
+    auto keyframe = pTrack->createNodeKeyFrame(time);
+
+    // Process translation (?)
+    if (auto pElement = XMLNode.child("position")) {
+        Vector3 translation = parseVector3(pElement);
+        keyframe->setTranslate(translation);
+    }
+
+    // Process rotation (?)
+    //Quaternion rotation = Quaternion::IDENTITY;
+    if (auto pElement = XMLNode.child("rotation")) {
+        Quaternion rotation = parseQuaternion(pElement);
+        keyframe->setRotation(rotation);
+    }
+
+    // Process scale (?)
+    //Vector3 scale = parseVector3(XMLNode.child("scale"));
+    if (auto pElement = XMLNode.child("scale")) {
+        Vector3 scale = parseVector3(pElement);
+        keyframe->setScale(scale);
+    }
+}
+
+void DotSceneLoader::exportScene(SceneNode* rootNode, const String& outFileName)
+{
+    pugi::xml_document XMLDoc; // character type defaults to char
+    auto comment = XMLDoc.append_child(pugi::node_comment);
+    comment.set_value(StringUtil::format(" exporter: Plugin_DotScene %d.%d.%d ", OGRE_VERSION_MAJOR,
+                                         OGRE_VERSION_MINOR, OGRE_VERSION_PATCH)
+                          .c_str());
+    auto scene = XMLDoc.append_child("scene");
+    scene.append_attribute("formatVersion") = "1.1";
+    scene.append_attribute("sceneManager") = rootNode->getCreator()->getTypeName().c_str();
+
+    auto nodes = scene.append_child("nodes");
+
+    for(auto c : rootNode->getChildren())
+        writeNode(nodes, static_cast<SceneNode*>(c));
+
+    //writeNode(nodes, rootNode);
+
+    XMLDoc.save_file(outFileName.c_str());
+}
+
+static void write(pugi::xml_node& node, const Vector3& v)
+{
+    node.append_attribute("x") = StringConverter::toString(v.x).c_str();
+    node.append_attribute("y") = StringConverter::toString(v.y).c_str();
+    node.append_attribute("z") = StringConverter::toString(v.z).c_str();
+}
+
+static void write(pugi::xml_node& node, const ColourValue& c)
+{
+    node.append_attribute("r") = StringConverter::toString(c.r).c_str();
+    node.append_attribute("g") = StringConverter::toString(c.g).c_str();
+    node.append_attribute("b") = StringConverter::toString(c.b).c_str();
+    node.append_attribute("a") = StringConverter::toString(c.a).c_str();
+}
+
+void DotSceneLoader::writeNode(pugi::xml_node& parentXML, const SceneNode* n)
+{
+    auto nodeXML = parentXML.append_child("node");
+    if(!n->getName().empty())
+        nodeXML.append_attribute("name") = n->getName().c_str();
+
+    auto pos = nodeXML.append_child("position");
+    write(pos, n->getPosition());
+
+    auto scale = nodeXML.append_child("scale");
+    write(scale, n->getScale());
+
+    auto rot = nodeXML.append_child("rotation");
+    rot.append_attribute("qw") = StringConverter::toString(n->getOrientation().w).c_str();
+    rot.append_attribute("qx") = StringConverter::toString(n->getOrientation().x).c_str();
+    rot.append_attribute("qy") = StringConverter::toString(n->getOrientation().y).c_str();
+    rot.append_attribute("qz") = StringConverter::toString(n->getOrientation().z).c_str();
+
+    for(auto mo : n->getAttachedObjects())
+    {
+        if(auto c = dynamic_cast<Camera*>(mo))
+        {
+            auto camera = nodeXML.append_child("camera");
+            camera.append_attribute("name") = c->getName().c_str();
+            auto clipping = camera.append_child("clipping");
+            clipping.append_attribute("near") = StringConverter::toString(c->getNearClipDistance()).c_str();
+            clipping.append_attribute("far") = StringConverter::toString(c->getFarClipDistance()).c_str();
+            continue;
+        }
+
+        if (auto l = dynamic_cast<Light*>(mo))
+        {
+            auto light = nodeXML.append_child("light");
+            light.append_attribute("name") = l->getName().c_str();
+            light.append_attribute("castShadows") = StringConverter::toString(l->getCastShadows()).c_str();
+
+            if(!l->isVisible())
+                light.append_attribute("visible") = "false";
+
+            auto diffuse = light.append_child("colourDiffuse");
+            write(diffuse, l->getDiffuseColour());
+            auto specular = light.append_child("colourSpecular");
+            write(specular, l->getSpecularColour());
+            switch (l->getType())
+            {
+            case Light::LT_POINT:
+                light.append_attribute("type") = "point";
+                break;
+            case Light::LT_DIRECTIONAL:
+                light.append_attribute("type") = "directional";
+                break;
+            case Light::LT_SPOTLIGHT:
+                light.append_attribute("type") = "spot";
+                break;
+            }
+
+            if(l->getType() != Light::LT_DIRECTIONAL)
+            {
+                auto range = light.append_child("lightRange");
+                range.append_attribute("inner") =
+                    StringConverter::toString(l->getSpotlightInnerAngle()).c_str();
+                range.append_attribute("outer") =
+                    StringConverter::toString(l->getSpotlightOuterAngle()).c_str();
+                range.append_attribute("falloff") =
+                    StringConverter::toString(l->getSpotlightFalloff()).c_str();
+                auto atten = light.append_child("lightAttenuation");
+                atten.append_attribute("range") =
+                    StringConverter::toString(l->getAttenuationRange()).c_str();
+                atten.append_attribute("constant") =
+                    StringConverter::toString(l->getAttenuationConstant()).c_str();
+                atten.append_attribute("linear") =
+                    StringConverter::toString(l->getAttenuationLinear()).c_str();
+                atten.append_attribute("quadratic") =
+                    StringConverter::toString(l->getAttenuationQuadric()).c_str();
+            }
+
+            continue;
+        }
+
+        if(auto e = dynamic_cast<Entity*>(mo))
+        {
+            auto entity = nodeXML.append_child("entity");
+            entity.append_attribute("name") = e->getName().c_str();
+            entity.append_attribute("meshFile") = e->getMesh()->getName().c_str();
+
+            if(!e->isVisible())
+                entity.append_attribute("visible") = "false";
+
+            // Heuristic: assume first submesh is representative
+            auto sub0mat = e->getSubEntity(0)->getMaterial();
+            if(sub0mat != e->getMesh()->getSubMesh(0)->getMaterial())
+                entity.append_attribute("material") = sub0mat->getName().c_str();
+            continue;
+        }
+
+        LogManager::getSingleton().logWarning("DotSceneLoader - unsupported MovableType " +
+                                            mo->getMovableType());
+    }
+
+    // recurse
+    for(auto c : n->getChildren())
+        writeNode(nodeXML, static_cast<SceneNode*>(c));
+}
+
 const Ogre::String& DotScenePlugin::getName() const {
     static Ogre::String name = "DotScene Loader";
     return name;
 }
 
 void DotScenePlugin::initialise() {
-    mDotSceneLoader = new Ogre::DotSceneLoader();
+    mCodec = new DotSceneCodec();
+    Codec::registerCodec(mCodec);
 }
 
 void DotScenePlugin::shutdown() {
-    delete mDotSceneLoader;
+    Codec::unregisterCodec(mCodec);
+    delete mCodec;
 }
 
 #ifndef OGRE_STATIC_LIB

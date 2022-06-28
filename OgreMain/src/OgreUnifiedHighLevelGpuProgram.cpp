@@ -32,29 +32,22 @@ THE SOFTWARE.
 namespace Ogre
 {
     //-----------------------------------------------------------------------
-    UnifiedHighLevelGpuProgram::CmdDelegate UnifiedHighLevelGpuProgram::msCmdDelegate;
+    /// Command object for setting delegate (can set more than once)
+    class CmdDelegate : public ParamCommand
+    {
+    public:
+        String doGet(const void* target) const;
+        void doSet(void* target, const String& val);
+    };
+    static CmdDelegate msCmdDelegate;
     static const String sLanguage = "unified";
-    std::map<String,int> UnifiedHighLevelGpuProgram::mLanguagePriorities;
 
-    int UnifiedHighLevelGpuProgram::getPriority(String shaderLanguage)
-    {
-        std::map<String,int>::iterator it = mLanguagePriorities.find(shaderLanguage);
-        if (it == mLanguagePriorities.end())
-            return -1;
-        else 
-            return (*it).second;
-    }
-
-    void UnifiedHighLevelGpuProgram::setPriority(String shaderLanguage,int priority)
-    {
-        mLanguagePriorities[shaderLanguage] = priority;
-    }
     //-----------------------------------------------------------------------
     //-----------------------------------------------------------------------
     UnifiedHighLevelGpuProgram::UnifiedHighLevelGpuProgram(
         ResourceManager* creator, const String& name, ResourceHandle handle,
         const String& group, bool isManual, ManualResourceLoader* loader)
-        :HighLevelGpuProgram(creator, name, handle, group, isManual, loader)
+        :GpuProgram(creator, name, handle, group, isManual, loader)
     {
         if (createParamDictionary("UnifiedHighLevelGpuProgram"))
         {
@@ -80,9 +73,6 @@ namespace Ogre
 
         mChosenDelegate.reset();
 
-        GpuProgramPtr tmpDelegate;
-        int tmpPriority = -1;
-
         for (const String& dn : mDelegateNames)
         {
             GpuProgramPtr deleg = GpuProgramManager::getSingleton().getByName(dn, mGroup);
@@ -92,7 +82,7 @@ namespace Ogre
                 deleg = GpuProgramManager::getSingleton().getByName(dn, RGN_AUTODETECT);
 
             // Silently ignore missing links
-            if(!deleg || !deleg->isSupported())
+            if(!deleg || (!deleg->isSupported() && !deleg->hasCompileError()))
                 continue;
 
             if (deleg->getType() != getType())
@@ -102,16 +92,9 @@ namespace Ogre
                 continue;
             }
 
-            int priority = getPriority(deleg->getLanguage());
-            //Find the delegate with the highest prioriry
-            if (priority >= tmpPriority)
-            {
-                tmpDelegate = deleg;
-                tmpPriority = priority;
-            }
+            mChosenDelegate = deleg;
+            break;
         }
-
-        mChosenDelegate = tmpDelegate;
     }
     //-----------------------------------------------------------------------
     const GpuProgramPtr& UnifiedHighLevelGpuProgram::_getDelegate() const
@@ -147,7 +130,7 @@ namespace Ogre
     {
         size_t memSize = 0;
 
-        memSize += HighLevelGpuProgram::calculateSize();
+        memSize += GpuProgram::calculateSize();
 
         // Delegate Names
         for (StringVector::const_iterator i = mDelegateNames.begin(); i != mDelegateNames.end(); ++i)
@@ -188,7 +171,7 @@ namespace Ogre
     bool UnifiedHighLevelGpuProgram::isSupported(void) const
     {
         // Supported if one of the delegates is
-        return _getDelegate().get() != 0;
+        return _getDelegate() && _getDelegate()->isSupported();
     }
     //-----------------------------------------------------------------------
     bool UnifiedHighLevelGpuProgram::isSkeletalAnimationIncluded(void) const
@@ -231,12 +214,13 @@ namespace Ogre
             return false;
     }
     //-----------------------------------------------------------------------
-    GpuProgramParametersSharedPtr UnifiedHighLevelGpuProgram::getDefaultParameters(void)
+    const GpuProgramParametersPtr& UnifiedHighLevelGpuProgram::getDefaultParameters(void)
     {
         if (_getDelegate())
             return _getDelegate()->getDefaultParameters();
-        else
-            return GpuProgramParametersSharedPtr();
+
+        static GpuProgramParametersSharedPtr nullPtr;
+        return nullPtr;
     }
     //-----------------------------------------------------------------------
     bool UnifiedHighLevelGpuProgram::hasDefaultParameters(void) const
@@ -252,7 +236,7 @@ namespace Ogre
         if (_getDelegate())
             return _getDelegate()->getPassSurfaceAndLightStates();
         else
-            return HighLevelGpuProgram::getPassSurfaceAndLightStates();
+            return GpuProgram::getPassSurfaceAndLightStates();
     }
     //---------------------------------------------------------------------
     bool UnifiedHighLevelGpuProgram::getPassFogStates(void) const
@@ -260,7 +244,7 @@ namespace Ogre
         if (_getDelegate())
             return _getDelegate()->getPassFogStates();
         else
-            return HighLevelGpuProgram::getPassFogStates();
+            return GpuProgram::getPassFogStates();
     }
     //---------------------------------------------------------------------
     bool UnifiedHighLevelGpuProgram::getPassTransformStates(void) const
@@ -268,7 +252,7 @@ namespace Ogre
         if (_getDelegate())
             return _getDelegate()->getPassTransformStates();
         else
-            return HighLevelGpuProgram::getPassTransformStates();
+            return GpuProgram::getPassTransformStates();
 
     }
     //-----------------------------------------------------------------------
@@ -400,13 +384,6 @@ namespace Ogre
             "UnifiedHighLevelGpuProgram::unloadHighLevelImpl");
     }
     //-----------------------------------------------------------------------
-    void UnifiedHighLevelGpuProgram::buildConstantDefinitions() const
-    {
-        OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, 
-            "This method should never get called!",
-            "UnifiedHighLevelGpuProgram::buildConstantDefinitions");
-    }
-    //-----------------------------------------------------------------------
     void UnifiedHighLevelGpuProgram::loadFromSource(void)
     {
         OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, 
@@ -415,13 +392,13 @@ namespace Ogre
     }
     //-----------------------------------------------------------------------
     //-----------------------------------------------------------------------
-    String UnifiedHighLevelGpuProgram::CmdDelegate::doGet(const void* target) const
+    String CmdDelegate::doGet(const void* target) const
     {
         // Can't do this (not one delegate), shouldn't matter
         return BLANKSTRING;
     }
     //-----------------------------------------------------------------------
-    void UnifiedHighLevelGpuProgram::CmdDelegate::doSet(void* target, const String& val)
+    void CmdDelegate::doSet(void* target, const String& val)
     {
         static_cast<UnifiedHighLevelGpuProgram*>(target)->addDelegateProgram(val);
     }

@@ -39,17 +39,22 @@ namespace Ogre
 {
     class GLPBuffer;
 
-    /** \addtogroup RenderSystems RenderSystems
-    *  @{
-    */
-    /** \defgroup GLSupport GLSupport
+    struct VideoMode {
+        uint32 width;
+        uint32 height;
+        int16 refreshRate;
+        uint8  bpp;
+
+        String getDescription() const;
+    };
+    typedef std::vector<VideoMode>    VideoModes;
+
+    /**
     * provides OpenGL Context creation using GLX, WGL, EGL, Cocoa
-    *  @{
     */
     class _OgreGLExport GLNativeSupport
     {
         public:
-            typedef GLRenderSystemCommon::VideoModes VideoModes;
             typedef std::set<String> ExtensionList;
 
             enum ContextProfile {
@@ -105,8 +110,6 @@ namespace Ogre
 
             ContextProfile getContextProfile() const { return mContextProfile; }
         protected:
-            typedef GLRenderSystemCommon::VideoMode VideoMode;
-
             // Allowed video modes
             VideoModes mVideoModes;
             std::vector<int> mFSAALevels;
@@ -116,9 +119,6 @@ namespace Ogre
 
             ContextProfile mContextProfile;
     };
-    /** @} */
-    /** @} */
-
 }
 
 #endif

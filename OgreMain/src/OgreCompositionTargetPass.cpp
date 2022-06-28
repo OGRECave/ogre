@@ -38,7 +38,8 @@ CompositionTargetPass::CompositionTargetPass(CompositionTechnique *parent):
     mVisibilityMask(0xFFFFFFFF),
     mLodBias(1.0f),
     mMaterialScheme(MaterialManager::DEFAULT_SCHEME_NAME), 
-    mShadowsEnabled(true)
+    mShadowsEnabled(true),
+    mOutputSlice(0)
 {
     if (Root::getSingleton().getRenderSystem())
     {
@@ -136,19 +137,6 @@ void CompositionTargetPass::removePass(size_t index)
     Passes::iterator i = mPasses.begin() + index;
     OGRE_DELETE (*i);
     mPasses.erase(i);
-}
-//-----------------------------------------------------------------------
-
-CompositionPass *CompositionTargetPass::getPass(size_t index)
-{
-    assert (index < mPasses.size() && "Index out of bounds.");
-    return mPasses[index];
-}
-//-----------------------------------------------------------------------
-
-size_t CompositionTargetPass::getNumPasses()
-{
-    return mPasses.size();
 }
 //-----------------------------------------------------------------------
 void CompositionTargetPass::removeAllPasses()

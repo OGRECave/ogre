@@ -39,8 +39,6 @@ namespace Ogre {
         virtual ~AndroidEGLSupport();
 
         ConfigOptionMap getConfigOptions();
-
-        virtual void switchMode(uint& width, uint& height, short& frequency);
         
         virtual RenderWindow* newWindow(const String& name,
                                         unsigned int width, unsigned int height,

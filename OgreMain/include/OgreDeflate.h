@@ -35,14 +35,124 @@
 #include "OgreHeaderPrefix.h"
 
 /// forward decls
-struct z_stream_s;
-typedef struct z_stream_s z_stream;
+struct mz_stream_s;
+typedef struct mz_stream_s z_stream;
 
 namespace Ogre
 {
+    /** Template version of cache based on static array.
+     'cacheSize' defines size of cache in bytes. */
+    template <size_t cacheSize>
+    class StaticCache
+    {
+    private:
+        /// Static buffer
+        char mBuffer[cacheSize];
+
+        /// Number of bytes valid in cache (written from the beginning of static buffer)
+        size_t mValidBytes;
+        /// Current read position
+        size_t mPos;
+    public:
+        /// Constructor
+        StaticCache()
+        {
+            mValidBytes = 0;
+            mPos = 0;
+            memset(mBuffer, 0, cacheSize);
+        }
+
+        /** Cache data pointed by 'buf'. If 'count' is greater than cache size, we cache only last bytes.
+         Returns number of bytes written to cache. */
+        size_t cacheData(const void* buf, size_t count)
+        {
+            assert(avail() == 0 && "It is assumed that you cache data only after you have read everything.");
+
+            if (count < cacheSize)
+            {
+                // number of bytes written is less than total size of cache
+                if (count + mValidBytes <= cacheSize)
+                {
+                    // just append
+                    memcpy(mBuffer + mValidBytes, buf, count);
+                    mValidBytes += count;
+                }
+                else
+                {
+                    size_t begOff = count - (cacheSize - mValidBytes);
+                    // override old cache content in the beginning
+                    memmove(mBuffer, mBuffer + begOff, mValidBytes - begOff);
+                    // append new data
+                    memcpy(mBuffer + cacheSize - count, buf, count);
+                    mValidBytes = cacheSize;
+                }
+                mPos = mValidBytes;
+                return count;
+            }
+            else
+            {
+                // discard all
+                memcpy(mBuffer, (const char*)buf + count - cacheSize, cacheSize);
+                mValidBytes = mPos = cacheSize;
+                return cacheSize;
+            }
+        }
+        /** Read data from cache to 'buf' (maximum 'count' bytes). Returns number of bytes read from cache. */
+        size_t read(void* buf, size_t count)
+        {
+            size_t rb = avail();
+            rb = (rb < count) ? rb : count;
+            memcpy(buf, mBuffer + mPos, rb);
+            mPos += rb;
+            return rb;
+        }
+
+        /** Step back in cached stream by 'count' bytes. Returns 'true' if cache contains resulting position. */
+        bool rewind(size_t count)
+        {
+            if (mPos < count)
+            {
+                clear();
+                return false;
+            }
+            else
+            {
+                mPos -= count;
+                return true;
+            }
+        }
+        /** Step forward in cached stream by 'count' bytes. Returns 'true' if cache contains resulting position. */
+        bool ff(size_t count)
+        {
+            if (avail() < count)
+            {
+                clear();
+                return false;
+            }
+            else
+            {
+                mPos += count;
+                return true;
+            }
+        }
+
+        /** Returns number of bytes available for reading in cache after rewinding. */
+        size_t avail() const
+        {
+            return mValidBytes - mPos;
+        }
+
+        /** Clear the cache */
+        void clear()
+        {
+            mValidBytes = 0;
+            mPos = 0;
+        }
+    };
+
     /** Stream which compresses / uncompresses data using the 'deflate' compression
         algorithm.
-    @remarks
+
         This stream is designed to wrap another stream for the actual source / destination
         of the compressed data, it has no concrete source / data itself. The idea is
         that you pass uncompressed data through this stream, and the underlying
@@ -67,11 +177,12 @@ namespace Ogre
             ZLib = 1,     /// 2 byte header, 4 byte footer with adler32 checksum, rfc1950
             GZip = 2,     /// 10 byte header, 8 byte footer with crc32 checksum and unpacked size, rfc1952
         };
-    protected:
+    private:
         DataStreamPtr mCompressedStream;
         DataStreamPtr mTmpWriteStream;
         String mTempFileName;
         z_stream* mZStream;
+        int mStatus;
         size_t mCurrentPos;
         size_t mAvailIn;
         
@@ -124,7 +235,7 @@ namespace Ogre
         ~DeflateStream();
         
         /** Returns whether the compressed stream is valid deflated data.
-         @remarks
+
             If you pass this class a READ stream which is not compressed with the 
             deflate algorithm, this method returns false and all read commands
             will actually be executed as passthroughs as a fallback. 

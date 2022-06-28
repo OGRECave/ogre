@@ -41,12 +41,12 @@ THE SOFTWARE.
 #   if OGRE_DEBUG_MODE
 #       define OgreAssert( a, b ) assert( (a) && (b) )
 #   else
-#       define OgreAssert( a, b ) if( !(a) ) OGRE_EXCEPT_2( Ogre::Exception::ERR_RT_ASSERTION_FAILED, (b) )
+#       define OgreAssert( a, b ) if( !(a) ) OGRE_EXCEPT_2( Ogre::Exception::ERR_RT_ASSERTION_FAILED, (#a " failed. " b) )
 #   endif
 
 // EXCEPTIONS mode
 #elif OGRE_ASSERT_MODE == 2
-#   define OgreAssert( a, b ) if( !(a) ) OGRE_EXCEPT_2( Ogre::Exception::ERR_RT_ASSERTION_FAILED, (b) )
+#   define OgreAssert( a, b ) if( !(a) ) OGRE_EXCEPT_2( Ogre::Exception::ERR_RT_ASSERTION_FAILED, (#a " failed. " b) )
 // STANDARD mode
 #else
 /** Checks a condition at runtime and throws exception/ aborts if it fails.
@@ -79,7 +79,7 @@ namespace Ogre {
     *  @{
     */
     /** When thrown, provides information about an error that has occurred inside the engine.
-        @remarks
+
             OGRE never uses return values to indicate errors. Instead, if an
             error occurs, an exception is thrown, and this is the object that
             encapsulates the detail of the problem. The application using
@@ -99,7 +99,7 @@ namespace Ogre {
         String description;
         String source;
         const char* file;
-        mutable String fullDesc; // storage for char* returned by what()
+        String fullDesc; // storage for char* returned by what()
     public:
         /** Static definitions of error codes.
             @todo
@@ -136,7 +136,7 @@ namespace Ogre {
         ~Exception() throw() {}
 
         /** Returns a string with the full description of this error.
-            @remarks
+
                 The description contains the error number, the description
                 supplied by the thrower, what routine threw the exception,
                 and will also supply extra platform-specific information
@@ -145,7 +145,7 @@ namespace Ogre {
                 the place in which OGRE found the problem, and a text
                 description from the 3D rendering library, if available.
         */
-        virtual const String& getFullDescription(void) const;
+        const String& getFullDescription(void) const { return fullDesc; }
 
         /** Gets the source function.
         */
@@ -166,7 +166,7 @@ namespace Ogre {
         const String &getDescription(void) const { return description; }
 
         /// Override std::exception::what
-        const char* what() const throw() { return getFullDescription().c_str(); }
+        const char* what() const throw() { return fullDesc.c_str(); }
         
     };
 
@@ -240,7 +240,7 @@ namespace Ogre {
 
     /** Class implementing dispatch methods in order to construct by-value
         exceptions of a derived type based just on an exception code.
-    @remarks
+
         This nicely handles construction of derived Exceptions by value (needed
         for throwing) without suffering from ambiguity - each code is turned into
         a distinct type so that methods can be overloaded. This allows OGRE_EXCEPT

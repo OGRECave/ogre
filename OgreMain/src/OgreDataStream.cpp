@@ -573,7 +573,7 @@ namespace Ogre {
         if (delim.size() > 1)
         {
             LogManager::getSingleton().logWarning(
-                "FileStreamDataStream::readLine - using only first delimeter");
+                "FileStreamDataStream::readLine - using only first delimiter");
         }
         // Deal with both Unix & Windows LFs
         bool trimCR = false;

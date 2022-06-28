@@ -85,11 +85,10 @@ namespace Ogre {
     }
 
 
-    void RenderTarget::getMetrics(unsigned int& width, unsigned int& height, unsigned int& colourDepth)
+    void RenderTarget::getMetrics(unsigned int& width, unsigned int& height)
     {
         width = mWidth;
         height = mHeight;
-        colourDepth = mColourDepth;
     }
 
     unsigned int RenderTarget::getWidth(void) const
@@ -99,10 +98,6 @@ namespace Ogre {
     unsigned int RenderTarget::getHeight(void) const
     {
         return mHeight;
-    }
-    unsigned int RenderTarget::getColourDepth(void) const
-    {
-        return mColourDepth;
     }
     //-----------------------------------------------------------------------
     void RenderTarget::setDepthBufferPool( uint16 poolId )
@@ -509,16 +504,12 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void RenderTarget::writeContentsToFile(const String& filename)
     {
-        PixelFormat pf = suggestPixelFormat();
+        Image img(suggestPixelFormat(), mWidth, mHeight);
 
-        uchar *data = OGRE_ALLOC_T(uchar, mWidth * mHeight * PixelUtil::getNumElemBytes(pf), MEMCATEGORY_RENDERSYS);
-        PixelBox pb(mWidth, mHeight, 1, pf, data);
-
+        PixelBox pb = img.getPixelBox();
         copyContentsToMemory(pb, pb);
 
-        Image().loadDynamicImage(data, mWidth, mHeight, 1, pf, false, 1, 0).save(filename);
-
-        OGRE_FREE(data, MEMCATEGORY_RENDERSYS);
+        img.save(filename);
     }
     //-----------------------------------------------------------------------
     void RenderTarget::_notifyCameraRemoved(const Camera* cam)
@@ -555,11 +546,6 @@ namespace Ogre {
     bool RenderTarget::isStereoEnabled(void) const
     {
         return mStereoEnabled;
-    }
-    //-----------------------------------------------------------------------
-    RenderTarget::Impl *RenderTarget::_getImpl()
-    {
-        return 0;
     }
     //-----------------------------------------------------------------------
     void RenderTarget::update(bool swap)

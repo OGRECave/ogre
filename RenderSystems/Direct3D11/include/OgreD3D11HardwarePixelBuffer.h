@@ -52,15 +52,6 @@ namespace Ogre {
         const UINT mFace;
         const UINT mMipLevel;
 
-        // if the usage is static - alloc at lock then use device UpdateSubresource when unlock and free memory
-        std::vector<int8> mDataForStaticUsageLock; 
-
-        LockOptions mCurrentLockOptions;
-
-        /// Render targets
-        typedef std::vector<RenderTexture*> SliceTRT;
-        SliceTRT mSliceTRT;
-
         void createStagingBuffer();
         bool mUsingStagingBuffer;
         ComPtr<ID3D11Resource> mStagingBuffer;
@@ -70,7 +61,6 @@ namespace Ogre {
 
         void _unmap(ID3D11Resource *res);
         void _unmapstagingbuffer(bool copyback = true);
-        void _unmapstaticbuffer();
     public:
         D3D11HardwarePixelBuffer(D3D11Texture * parentTexture, D3D11Device & device, UINT mipLevel,
             size_t width, size_t height, size_t depth, UINT face, PixelFormat format, HardwareBuffer::Usage usage);
@@ -89,18 +79,6 @@ namespace Ogre {
 
 
         ~D3D11HardwarePixelBuffer();
-
-        /// Get rendertarget for z slice
-        RenderTexture *getRenderTarget(size_t zoffset);
-
-        /// Notify TextureBuffer of destruction of render target
-        virtual void _clearSliceRTT(size_t zoffset)
-        {
-            if (mSliceTRT.size() > zoffset)
-            {
-                mSliceTRT[zoffset] = 0;
-            }
-        }
 
         D3D11Texture * getParentTexture() const;
 

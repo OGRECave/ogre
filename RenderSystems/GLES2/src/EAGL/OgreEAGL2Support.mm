@@ -29,6 +29,7 @@ THE SOFTWARE.
 #include "OgreRoot.h"
 
 #include "OgreRenderSystem.h"
+#include "OgreLogManager.h"
 #include "OgreEAGLES2Context.h"
 
 #include "OgreEAGL2Support.h"
@@ -56,7 +57,6 @@ namespace Ogre {
     ConfigOptionMap EAGL2Support::getConfigOptions(void)
     {
         ConfigOptionMap mOptions;
-        ConfigOption optDisplayFrequency;
         ConfigOption optContentScalingFactor;
         
         // Get the application frame size.  On all iPhones(including iPhone 4) this will be 320 x 480
@@ -92,12 +92,6 @@ namespace Ogre {
         optOrientation.immutable = false;
         mOptions[optOrientation.name] = optOrientation;
 #endif
-
-        optDisplayFrequency.name = "Display Frequency";
-        optDisplayFrequency.possibleValues.push_back("0 Hz");
-        optDisplayFrequency.currentValue = "0 Hz";
-        optDisplayFrequency.immutable = false;
-        mOptions[optDisplayFrequency.name] = optDisplayFrequency;
 
         return mOptions;
     }

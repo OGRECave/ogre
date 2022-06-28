@@ -25,22 +25,22 @@
 struct VSParticleIn
 {
 	float3 pos   : POSITION;
-	float timer  : TIMER;
-	float type	 : TYPE;
-	float3 vel   : VELOCITY;
+	float timer  : TEXCOORD0;
+	float type	 : TEXCOORD1;
+	float3 vel   : TEXCOORD2;
 };
 
 struct VSParticleDrawOut
 {
-    float3 pos : POSITION;
+    float4 pos : POSITION;
 	float4 color : COLOR0;
-	float radius : RADIUS;
+	float2 radius : TEXCOORD0;
 };
 
 struct PSSceneIn
 {
     float4 pos : SV_Position;
-    float2 tex : TEXTURE0;
+    float2 tex : TEXCOORD0;
     float4 color : COLOR0;
 };
 
@@ -222,14 +222,14 @@ VSParticleIn GenerateParticles_VS(VSParticleIn input)
 
 [maxvertexcount(64)]
 void GenerateParticles_GS(point VSParticleIn input[1], inout PointStream<VSParticleIn> ParticleOutputStream
-	, uniform Texture1D randomTex : TEXUNIT0
-	, uniform float3 frameGravity
+	, uniform Texture1D randomTex
+	, uniform float3 gravity
 	, uniform float globalTime
 	, uniform float elapsedTime
 	, uniform float secondsPerFirework
 	)
 {
-
+    float3 frameGravity = gravity * elapsedTime;
 	if( input[0].type == PT_LAUNCHER )
         GSLauncherHandler( input[0], elapsedTime, globalTime, randomTex, secondsPerFirework, ParticleOutputStream);
 	else if ( input[0].type == PT_SHELL )
@@ -241,14 +241,16 @@ void GenerateParticles_GS(point VSParticleIn input[1], inout PointStream<VSParti
 }
 
 //The vertex shader that prepares the fireworks for display
-VSParticleDrawOut DisplayParticles_VS(VSParticleIn input)
+VSParticleDrawOut DisplayParticles_VS(VSParticleIn input,
+                                        uniform float4x4 worldView,
+                                        uniform float4x4 proj)
 {
 	VSParticleDrawOut output;
     //
     // Pass the point through
     //
-    output.pos = input.pos; //Multiply by world matrix?
-    output.radius = 1.5;
+    output.pos = mul(worldView, float4(input.pos,1));
+    output.radius = float2(1.5, 1.5);
     
     //  
     // calculate the color
@@ -256,12 +258,12 @@ VSParticleDrawOut DisplayParticles_VS(VSParticleIn input)
     if( input.type == PT_LAUNCHER )
     {
         output.color = float4(1,0.1,0.1,1);
-        output.radius = 1.0;
+        output.radius = float2(1.0, 1.0);
     }
     else if( input.type == PT_SHELL )
     {
         output.color = float4(0.1,1,1,1);
-        output.radius = 1.0;
+        output.radius = float2(1.0, 1.0);
     }
     else if( input.type == PT_EMBER1 )
     {
@@ -281,18 +283,20 @@ VSParticleDrawOut DisplayParticles_VS(VSParticleIn input)
     {
         output.color = float4(0,0,0,0);
     }
-       
+
+    float4 tmp = mul(proj, float4(output.radius, output.pos.z, 1));
+    output.radius = tmp.xy; // no w divison here, no viewport normalization in GS
+    output.pos = mul(proj, output.pos);
+
     return output;
 }
 
 //The geometry shader that prepares the fireworks for display
 [maxvertexcount(4)]
 void DisplayParticles_GS( point VSParticleDrawOut input[1]
-						, uniform float4x4 inverseView
-						, uniform float4x4 worldViewProj
 						, inout TriangleStream<PSSceneIn> SpriteStream)
 {
-	float3 g_positions[4] = { float3( -1, 1, 0 ), float3( -1, -1, 0 ), float3( 1, 1, 0 ), float3( 1, -1, 0 ) };
+	float2 g_positions[4] = { float2( -1, 1 ), float2( -1, -1 ), float2( 1, 1 ), float2( 1, -1 ) };
     float2 g_texcoords[4] = { float2(0,1), float2(1,1), float2(0,0), float2(1,0) };
 
 	 PSSceneIn output;
@@ -302,9 +306,7 @@ void DisplayParticles_GS( point VSParticleDrawOut input[1]
     //
     for(int i=0; i<4; i++)
     {
-		float3 position = -g_positions[i]*input[0].radius;
-        position = mul( (float3x3)inverseView, position ) + input[0].pos.xyz;
-        output.pos = mul( worldViewProj, float4(position,1.0) );
+        output.pos = input[0].pos - float4(g_positions[i]*input[0].radius, 0, 0);
 		output.tex = g_texcoords[i];
 		output.color = input[0].color;
 		SpriteStream.Append(output);

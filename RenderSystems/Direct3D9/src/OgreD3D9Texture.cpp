@@ -38,6 +38,9 @@ THE SOFTWARE.
 #include "OgreD3D9Device.h"
 #include "OgreD3D9DeviceManager.h"
 #include "OgreD3D9ResourceManager.h"
+#include "OgreD3D9DepthBuffer.h"
+
+#include <d3dx9.h>
 
 namespace Ogre 
 {
@@ -62,14 +65,7 @@ namespace Ogre
         
         // have to call this here reather than in Resource destructor
         // since calling virtual methods in base destructors causes crash
-        if (isLoaded())
-        {
-            unload(); 
-        }
-        else
-        {
-            freeInternalResources();
-        }               
+        unload();
 
         // Free memory allocated per device.
         DeviceToTextureResourcesIterator it = mMapDeviceToTextureResources.begin();
@@ -209,12 +205,6 @@ namespace Ogre
     }
 
     /****************************************************************************************/
-    void D3D9Texture::freeInternalResources(void)
-    {
-        freeInternalResourcesImpl();
-    }
-
-    /****************************************************************************************/
     void D3D9Texture::freeInternalResourcesImpl()
     {
         D3D9_DEVICE_ACCESS_CRITICAL_SECTION
@@ -264,7 +254,7 @@ namespace Ogre
     {               
         D3D9_DEVICE_ACCESS_CRITICAL_SECTION
         
-        if (mIsManual)
+        if (isManuallyLoaded())
         {
             preLoadImpl();
 
@@ -320,12 +310,6 @@ namespace Ogre
     }
 
     /****************************************************************************************/
-    void D3D9Texture::createInternalResources(void)
-    {
-        createInternalResourcesImpl();
-    }
-
-    /****************************************************************************************/
     void D3D9Texture::determinePool()
     {
         if (useDefaultPool())
@@ -374,6 +358,9 @@ namespace Ogre
             mUsage |= TU_DYNAMIC;
         }
 
+        if(!PixelUtil::isDepth(mFormat))
+            mFormat = TextureManager::getSingleton().getNativeFormat(mTextureType, mFormat, mUsage);
+
         // load based on tex.type
         switch (getTextureType())
         {
@@ -401,15 +388,11 @@ namespace Ogre
 
         // determine which D3D9 pixel format we'll use
         HRESULT hr;
-        D3DFORMAT d3dPF = _chooseD3DFormat(d3d9Device);
-
-        // let's D3DX check the corrected pixel format
-        hr = D3DXCheckTextureRequirements(d3d9Device, NULL, NULL, NULL, 0, &d3dPF, mD3DPool);
+        D3DFORMAT d3dPF = D3D9Mappings::_getPF(mFormat);
 
         // Use D3DX to help us create the texture, this way it can adjust any relevant sizes
         DWORD usage = (mUsage & TU_RENDERTARGET) ? D3DUSAGE_RENDERTARGET : 0;
-        UINT numMips = (mNumRequestedMipmaps == MIP_UNLIMITED) ? 
-                D3DX_DEFAULT : mNumRequestedMipmaps + 1;
+        UINT numMips = (mNumMipmaps == MIP_UNLIMITED) ? 0 : mNumMipmaps + 1;
         // Check dynamic textures
         if (mUsage & TU_DYNAMIC)
         {
@@ -451,7 +434,7 @@ namespace Ogre
         mMipmapsHardwareGenerated = false;
         if (rkCurCaps.TextureCaps & D3DPTEXTURECAPS_MIPMAP)
         {
-            if (mUsage & TU_AUTOMIPMAP && mNumRequestedMipmaps != 0)
+            if (mUsage & TU_AUTOMIPMAP && mNumMipmaps != 0)
             {
                 // use auto.gen. if available, and if desired
                 mMipmapsHardwareGenerated = _canAutoGenMipmaps(d3d9Device, usage, D3DRTYPE_TEXTURE, d3dPF);
@@ -481,17 +464,24 @@ namespace Ogre
         else
             textureResources = allocateTextureResources(d3d9Device);
 
+        if(PixelUtil::isDepth(mFormat))
+        {
+            usage = D3DUSAGE_DEPTHSTENCIL;
+            mD3DPool = D3DPOOL_DEFAULT;
+            // we cannot resolve depth on D3D9
+            mFSAAType = D3DMULTISAMPLE_NONE;
+            mFSAA = 0;
+        }
 
         // create the texture
-        hr = D3DXCreateTexture( 
-                d3d9Device,                             // device
+        hr = d3d9Device->CreateTexture(
                 static_cast<UINT>(mSrcWidth),           // width
                 static_cast<UINT>(mSrcHeight),          // height
                 numMips,                                // number of mip map levels
                 usage,                                  // usage
                 d3dPF,                                  // pixel format
                 mD3DPool,
-                &textureResources->pNormTex);           // data pointer
+                &textureResources->pNormTex, NULL);
         // check result and except if failed
         if (FAILED(hr))
         {
@@ -561,15 +551,11 @@ namespace Ogre
 
         // determine which D3D9 pixel format we'll use
         HRESULT hr;
-        D3DFORMAT d3dPF = _chooseD3DFormat(d3d9Device);
-
-        // let's D3DX check the corrected pixel format
-        hr = D3DXCheckCubeTextureRequirements(d3d9Device, NULL, NULL, 0, &d3dPF, mD3DPool);
+        D3DFORMAT d3dPF = D3D9Mappings::_getPF(mFormat);
 
         // Use D3DX to help us create the texture, this way it can adjust any relevant sizes
         DWORD usage = (mUsage & TU_RENDERTARGET) ? D3DUSAGE_RENDERTARGET : 0;
-        UINT numMips = (mNumRequestedMipmaps == MIP_UNLIMITED) ? 
-            D3DX_DEFAULT : mNumRequestedMipmaps + 1;
+        UINT numMips = (mNumMipmaps == MIP_UNLIMITED) ? 0 : mNumMipmaps + 1;
         // Check dynamic textures
         if (mUsage & TU_DYNAMIC)
         {
@@ -610,7 +596,7 @@ namespace Ogre
         mMipmapsHardwareGenerated = false;
         if (rkCurCaps.TextureCaps & D3DPTEXTURECAPS_MIPCUBEMAP)
         {
-            if (mUsage & TU_AUTOMIPMAP && mNumRequestedMipmaps != 0)
+            if (mUsage & TU_AUTOMIPMAP && mNumMipmaps != 0)
             {
                 // use auto.gen. if available
                 mMipmapsHardwareGenerated = _canAutoGenMipmaps(d3d9Device, usage, D3DRTYPE_CUBETEXTURE, d3dPF);
@@ -640,14 +626,13 @@ namespace Ogre
 
 
         // create the texture
-        hr = D3DXCreateCubeTexture( 
-                d3d9Device,                                 // device
+        hr = d3d9Device->CreateCubeTexture(
                 static_cast<UINT>(mSrcWidth),               // dimension
                 numMips,                                    // number of mip map levels
                 usage,                                      // usage
                 d3dPF,                                      // pixel format
                 mD3DPool,
-                &textureResources->pCubeTex);               // data pointer
+                &textureResources->pCubeTex, NULL);
         // check result and except if failed
         if (FAILED(hr))
         {
@@ -722,14 +707,11 @@ namespace Ogre
 
         // determine which D3D9 pixel format we'll use
         HRESULT hr;
-        D3DFORMAT d3dPF = _chooseD3DFormat(d3d9Device);
-        // let's D3DX check the corrected pixel format
-        hr = D3DXCheckVolumeTextureRequirements(d3d9Device, NULL, NULL, NULL, NULL, 0, &d3dPF, mD3DPool);
+        D3DFORMAT d3dPF = D3D9Mappings::_getPF(mFormat);
 
         // Use D3DX to help us create the texture, this way it can adjust any relevant sizes
         DWORD usage = (mUsage & TU_RENDERTARGET) ? D3DUSAGE_RENDERTARGET : 0;
-        UINT numMips = (mNumRequestedMipmaps == MIP_UNLIMITED) ? 
-            D3DX_DEFAULT : mNumRequestedMipmaps + 1;
+        UINT numMips = (mNumMipmaps == MIP_UNLIMITED) ? 0 : mNumMipmaps + 1;
         // Check dynamic textures
         if (mUsage & TU_DYNAMIC)
         {
@@ -759,7 +741,7 @@ namespace Ogre
         mMipmapsHardwareGenerated = false;
         if (rkCurCaps.TextureCaps & D3DPTEXTURECAPS_MIPVOLUMEMAP)
         {
-            if (mUsage & TU_AUTOMIPMAP && mNumRequestedMipmaps != 0)
+            if (mUsage & TU_AUTOMIPMAP && mNumMipmaps != 0)
             {
                 // use auto.gen. if available
                 mMipmapsHardwareGenerated = _canAutoGenMipmaps(d3d9Device, usage, D3DRTYPE_VOLUMETEXTURE, d3dPF);
@@ -790,8 +772,7 @@ namespace Ogre
 
 
         // create the texture
-        hr = D3DXCreateVolumeTexture(   
-                d3d9Device,                                 // device
+        hr = d3d9Device->CreateVolumeTexture(
                 static_cast<UINT>(mWidth),                  // dimension
                 static_cast<UINT>(mHeight),
                 static_cast<UINT>(mDepth),
@@ -799,7 +780,7 @@ namespace Ogre
                 usage,                                      // usage
                 d3dPF,                                      // pixel format
                 mD3DPool,
-                &textureResources->pVolumeTex);             // data pointer
+                &textureResources->pVolumeTex, NULL);
         // check result and except if failed
         if (FAILED(hr))
         {
@@ -1068,20 +1049,6 @@ namespace Ogre
         return hr == D3D_OK;
     }
     /****************************************************************************************/
-    D3DFORMAT D3D9Texture::_chooseD3DFormat(IDirect3DDevice9* d3d9Device)
-    {       
-        // Choose frame buffer pixel format in case PF_UNKNOWN was requested
-        if(mFormat == PF_UNKNOWN)
-        {   
-            D3D9Device* device = D3D9RenderSystem::getDeviceManager()->getDeviceFromD3D9Device(d3d9Device);
-            
-            return device->getBackBufferFormat();       
-        }
-
-        // Choose closest supported D3D format as a D3D format
-        return D3D9Mappings::_getPF(D3D9Mappings::_getClosestSupportedPF(mFormat));
-    }
-    /****************************************************************************************/
     // Macro to hide ugly cast
     #define GETLEVEL(face,mip) \
         static_cast<D3D9HardwarePixelBuffer*>(mSurfaceList[face*(mNumMipmaps+1)+mip].get())
@@ -1143,7 +1110,7 @@ namespace Ogre
 
                 D3D9HardwarePixelBuffer* currPixelBuffer = GETLEVEL(0, mip);
                                 
-                if (mip == 0 && mNumRequestedMipmaps != 0 && (mUsage & TU_AUTOMIPMAP))
+                if (mip == 0 && mNumMipmaps != 0 && (mUsage & TU_AUTOMIPMAP))
                     currPixelBuffer->_setMipmapping(true, mMipmapsHardwareGenerated);
 
                 currPixelBuffer->bind(d3d9Device, surface, textureResources->pFSAASurface,
@@ -1169,7 +1136,7 @@ namespace Ogre
                     D3D9HardwarePixelBuffer* currPixelBuffer = GETLEVEL(face, mip);
                     
                     
-                    if (mip == 0 && mNumRequestedMipmaps != 0 && (mUsage & TU_AUTOMIPMAP))
+                    if (mip == 0 && mNumMipmaps != 0 && (mUsage & TU_AUTOMIPMAP) && face == 5)
                         currPixelBuffer->_setMipmapping(true, mMipmapsHardwareGenerated);
 
                     currPixelBuffer->bind(d3d9Device, surface, textureResources->pFSAASurface,
@@ -1194,7 +1161,7 @@ namespace Ogre
 
                 currPixelBuffer->bind(d3d9Device, volume, textureResources->pBaseTex);
 
-                if (mip == 0 && mNumRequestedMipmaps != 0 && (mUsage & TU_AUTOMIPMAP))
+                if (mip == 0 && mNumMipmaps != 0 && (mUsage & TU_AUTOMIPMAP))
                     currPixelBuffer->_setMipmapping(true, mMipmapsHardwareGenerated);
 
                 // decrement reference count, the GetSurfaceLevel call increments this
@@ -1210,7 +1177,7 @@ namespace Ogre
     {
         IDirect3DDevice9* d3d9Device = D3D9RenderSystem::getActiveD3D9Device();
         TextureResources* textureResources = getTextureResources(d3d9Device);
-        if (textureResources == NULL || textureResources->pBaseTex == NULL)
+        if ((!textureResources || !textureResources->pBaseTex) && isLoaded())
         {
             // FIXME
             // createTextureResources(d3d9Device);
@@ -1427,14 +1394,23 @@ namespace Ogre
     {
         if(name == "DDBACKBUFFER")
         {
+            auto device = D3D9RenderSystem::getActiveD3D9Device();
+            auto d3dBuffer = static_cast<D3D9HardwarePixelBuffer*>(mBuffer);
+
+            if(PixelUtil::isDepth(mBuffer->getFormat()))
+            {
+                *static_cast<IDirect3DSurface9**>(pData) = d3dBuffer->getNullSurface(device);
+                return;
+            }
+
             if (mFSAA > 0)
             {
                 // rendering to AA surface
-                *(IDirect3DSurface9**)pData = static_cast<D3D9HardwarePixelBuffer*>(mBuffer)->getFSAASurface(D3D9RenderSystem::getActiveD3D9Device());
+                *(IDirect3DSurface9**)pData = d3dBuffer->getFSAASurface(device);
             }
             else
             {
-                *(IDirect3DSurface9**)pData = static_cast<D3D9HardwarePixelBuffer*>(mBuffer)->getSurface(D3D9RenderSystem::getActiveD3D9Device());
+                *(IDirect3DSurface9**)pData = d3dBuffer->getSurface(device);
             }
         }
         else if(name == "HWND")

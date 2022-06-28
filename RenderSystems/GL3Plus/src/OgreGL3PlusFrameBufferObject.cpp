@@ -29,7 +29,7 @@ THE SOFTWARE.
 #include "OgreGL3PlusFrameBufferObject.h"
 #include "OgreGL3PlusHardwarePixelBuffer.h"
 #include "OgreGL3PlusFBORenderTexture.h"
-#include "OgreGL3PlusDepthBuffer.h"
+#include "OgreGLDepthBufferCommon.h"
 #include "OgreGL3PlusStateCacheManager.h"
 #include "OgreGLRenderSystemCommon.h"
 #include "OgreRoot.h"
@@ -167,7 +167,7 @@ namespace Ogre {
             {
                 bool isDepth = PixelUtil::isDepth(mColour[x].buffer->getFormat());
 
-                bufs[x] = isDepth ? GL_DEPTH_ATTACHMENT : (GL_COLOR_ATTACHMENT0 + x);
+                bufs[x] = isDepth ? GL_NONE : (GL_COLOR_ATTACHMENT0 + x);
                 // Keep highest used buffer + 1
                 if(!isDepth)
                     n = x+1;
@@ -279,7 +279,7 @@ namespace Ogre {
     {
         bind(true); // recreate FBO if unusable with current context, bind it
 
-        GL3PlusDepthBuffer *glDepthBuffer = static_cast<GL3PlusDepthBuffer*>(depthBuffer);
+        GLDepthBufferCommon *glDepthBuffer = static_cast<GLDepthBufferCommon*>(depthBuffer);
         if( glDepthBuffer )
         {
             auto *depthBuf   = glDepthBuffer->getDepthBuffer();

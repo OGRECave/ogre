@@ -41,7 +41,7 @@ THE SOFTWARE.
 #define STB_IMAGE_STATIC
 #include "stbi/stb_image.h"
 
-#if OGRE_NO_ZIP_ARCHIVE == 0
+#ifdef HAVE_ZLIB
 #include <zlib.h>
 static Ogre::uchar* custom_zlib_compress(Ogre::uchar* data, int data_len, int* out_len, int /*quality*/)
 {
@@ -73,7 +73,7 @@ namespace Ogre {
         stbi_convert_iphone_png_to_rgb(1);
         stbi_set_unpremultiply_on_load(1);
 
-        LogManager::getSingleton().logMessage("stb_image - v2.23 - public domain image loader");
+        LogManager::getSingleton().logMessage("stb_image - v2.27 - public domain image loader");
         
         // Register codecs
         String exts = "jpeg,jpg,png,bmp,psd,tga,gif,pic,ppm,pgm,hdr";
@@ -105,7 +105,7 @@ namespace Ogre {
     }
     //---------------------------------------------------------------------
     DataStreamPtr STBIImageCodec::encode(const MemoryDataStreamPtr& input,
-                                         const Codec::CodecDataPtr& pData) const
+                                         const CodecDataPtr& pData) const
     {
         if(mType != "png") {
             OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED,
@@ -153,23 +153,22 @@ namespace Ogre {
     }
     //---------------------------------------------------------------------
     void STBIImageCodec::encodeToFile(const MemoryDataStreamPtr& input, const String& outFileName,
-                                      const Codec::CodecDataPtr& pData) const
+                                      const CodecDataPtr& pData) const
     {
 #if OGRE_PLATFORM != OGRE_PLATFORM_EMSCRIPTEN
         MemoryDataStreamPtr data = static_pointer_cast<MemoryDataStream>(encode(input, pData));
         std::ofstream f(outFileName.c_str(), std::ios::out | std::ios::binary);
 
-        if(!f.is_open()) {
-            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
-                        "could not open file",
-                        "STBIImageCodec::encodeToFile" ) ;
+        if (!f.is_open())
+        {
+            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "could not open file " + outFileName);
         }
 
         f.write((char*)data->getPtr(), data->size());
 #endif
     }
     //---------------------------------------------------------------------
-    Codec::DecodeResult STBIImageCodec::decode(const DataStreamPtr& input) const
+    ImageCodec::DecodeResult STBIImageCodec::decode(const DataStreamPtr& input) const
     {
         String contents = input->getAsString();
 

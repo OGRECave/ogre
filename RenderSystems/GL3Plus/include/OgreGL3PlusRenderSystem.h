@@ -47,8 +47,8 @@ namespace Ogre {
     *  @{
     */
     class GLSLShaderManager;
-    class GLSLShaderFactory;
     class GLSLProgram;
+    class GLSLProgramManager;
     class HardwareBufferManager;
 
     /**
@@ -58,9 +58,6 @@ namespace Ogre {
     {
         friend class GL3PlusSampler;
     private:
-        /// Rendering loop control
-        bool mStopRendering;
-
         typedef std::unordered_map<GLenum, GLuint>  BindBufferMap;
 
         /// Last min & mip filtering options, so we can combine them
@@ -72,17 +69,8 @@ namespace Ogre {
 
         GLint mLargestSupportedAnisotropy;
 
-        /// Store last colour write state
-        bool mColourWrite[4];
-
         /// Store last depth write state
         bool mDepthWrite;
-
-        /// Store last scissor enable state
-        bool mScissorsEnabled;
-
-        /// Store scissor box
-        int mScissorBox[4];
 
         /// Store last stencil mask state
         uint32 mStencilWriteMask;
@@ -90,8 +78,8 @@ namespace Ogre {
         // statecaches are per context
         GL3PlusStateCacheManager* mStateCacheManager;
 
-        GpuProgramManager *mShaderManager;
-        GLSLShaderFactory* mGLSLShaderFactory;
+        GLSLProgramManager* mProgramManager;
+        HighLevelGpuProgramFactory* mGLSLShaderFactory;
         HighLevelGpuProgramFactory* mSPIRVShaderFactory;
         HardwareBufferManager* mHardwareBufferManager;
 
@@ -128,8 +116,6 @@ namespace Ogre {
         GL3PlusRenderSystem();
         ~GL3PlusRenderSystem();
 
-        friend class ShaderGeneratorTechniqueResolverListener;
-
         // ----------------------------------
         // Overridden RenderSystem functions
         // ----------------------------------
@@ -149,10 +135,6 @@ namespace Ogre {
         /// @copydoc RenderSystem::_createRenderWindow
         RenderWindow* _createRenderWindow(const String &name, unsigned int width, unsigned int height,
                                           bool fullScreen, const NameValuePairList *miscParams = 0);
-
-        /// @copydoc RenderSystem::_createRenderWindows
-        bool _createRenderWindows(const RenderWindowDescriptionList& renderWindowDescriptions,
-                                  RenderWindowList& createdWindows);
 
         /// @copydoc RenderSystem::_createDepthBufferFor
         DepthBuffer* _createDepthBufferFor( RenderTarget *renderTarget );
@@ -176,11 +158,11 @@ namespace Ogre {
 
         void _setViewport(Viewport *vp);
 
-        void _beginFrame(void);
-
         void _endFrame(void);
 
         void _setCullingMode(CullingMode mode);
+
+        void _setDepthClamp(bool enable);
 
         void _setDepthBufferParams(bool depthTest = true, bool depthWrite = true, CompareFunction depthFunction = CMPF_LESS_EQUAL);
 
@@ -192,21 +174,11 @@ namespace Ogre {
 
         void _setDepthBias(float constantBias, float slopeScaleBias);
 
-        void _setColourBufferWriteEnabled(bool red, bool green, bool blue, bool alpha);
+        void setColourBlendState(const ColourBlendState& state);
 
         void _setPolygonMode(PolygonMode level);
 
-        void setStencilCheckEnabled(bool enabled);
-        /** See
-            RenderSystem.
-        */
-        void setStencilBufferParams(CompareFunction func = CMPF_ALWAYS_PASS,
-                                    uint32 refValue = 0, uint32 compareMask = 0xFFFFFFFF, uint32 writeMask = 0xFFFFFFFF,
-                                    StencilOperation stencilFailOp = SOP_KEEP,
-                                    StencilOperation depthFailOp = SOP_KEEP,
-                                    StencilOperation passOp = SOP_KEEP,
-                    bool twoSidedOperation = false,
-                    bool readBackAsTexture = false);
+        void setStencilState(const StencilState& state) override;
 
         void _setTextureUnitFiltering(size_t unit, FilterType ftype, FilterOptions filter);
 
@@ -218,11 +190,11 @@ namespace Ogre {
                                        uint32* depthFormat,
                                        uint32* stencilFormat);
 
-        void setScissorTest(bool enabled, size_t left = 0, size_t top = 0, size_t right = 800, size_t bottom = 600);
+        void setScissorTest(bool enabled, const Rect& rect = Rect());
 
         void clearFrameBuffer(unsigned int buffers,
                               const ColourValue& colour = ColourValue::Black,
-                              Real depth = 1.0f, unsigned short stencil = 0);
+                              float depth = 1.0f, unsigned short stencil = 0);
         HardwareOcclusionQuery* createHardwareOcclusionQuery(void);
 
         // ----------------------------------
@@ -264,12 +236,8 @@ namespace Ogre {
         void unbindGpuProgram(GpuProgramType gptype);
         void bindGpuProgramParameters(GpuProgramType gptype, const GpuProgramParametersPtr& params, uint16 mask);
 
-        /// @copydoc RenderSystem::_setSeparateSceneBlending
-        void _setSeparateSceneBlending( SceneBlendFactor sourceFactor, SceneBlendFactor destFactor, SceneBlendFactor sourceFactorAlpha, SceneBlendFactor destFactorAlpha, SceneBlendOperation op, SceneBlendOperation alphaOp );
         /// @copydoc RenderSystem::_setAlphaRejectSettings
         void _setAlphaRejectSettings( CompareFunction func, unsigned char value, bool alphaToCoverage );
-        /// @copydoc RenderSystem::getDisplayMonitorCount
-        unsigned int getDisplayMonitorCount() const;
 
         /// @copydoc RenderSystem::beginProfileEvent
         virtual void beginProfileEvent( const String &eventName );

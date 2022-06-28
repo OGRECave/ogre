@@ -155,7 +155,7 @@ namespace Ogre {
         impl->exportMesh(pMesh, stream, endianMode);
     }
     //---------------------------------------------------------------------
-    void MeshSerializer::importMesh(DataStreamPtr& stream, Mesh* pDest)
+    void MeshSerializer::importMesh(const DataStreamPtr& stream, Mesh* pDest)
     {
         determineEndianness(stream);
 
@@ -195,13 +195,20 @@ namespace Ogre {
         // Warn on old version of mesh
         if (ver != mVersionData[0]->versionString)
         {
-            LogManager::getSingleton().logWarning( pDest->getName() +
-                " is an older format (" + ver + "); you should upgrade it as soon as possible" +
-                " using the OgreMeshUpgrade tool.");
+            LogManager::getSingleton().logWarning(pDest->getName() + " uses an old format " + ver +
+                                                  "; upgrade with the OgreMeshUpgrader tool");
         }
 
         if(mListener)
             mListener->processMeshCompleted(pDest);
+
+        auto rs = Root::getSingletonPtr() ? Root::getSingleton().getRenderSystem() : NULL;
+        if (!rs || !rs->getCapabilities()->hasCapability(RSC_VERTEX_FORMAT_INT_10_10_10_2))
+        {
+            // unpacks to floats, if packed
+            pDest->_convertVertexElement(VES_NORMAL, VET_FLOAT3);
+            pDest->_convertVertexElement(VES_TANGENT, VET_FLOAT4);
+        }
     }
     //---------------------------------------------------------------------
     void MeshSerializer::setListener(Ogre::MeshSerializerListener *listener)

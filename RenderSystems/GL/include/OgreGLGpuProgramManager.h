@@ -34,29 +34,34 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-class _OgreGLExport GLGpuProgramManager : public GpuProgramManager
+typedef GpuProgram* (*CreateGpuProgramCallback)(ResourceManager* creator,
+    const String& name, ResourceHandle handle,
+    const String& group, bool isManual, ManualResourceLoader* loader,
+    GpuProgramType gptype, const String& syntaxCode);
+
+struct CreateCallbackWrapper : public GpuProgramFactory
 {
+    String language;
+    CreateGpuProgramCallback callback;
+    const String& getLanguage(void) const override { return language; };
+    GpuProgram* create(ResourceManager* creator, const String& name, ResourceHandle handle,
+                       const String& group, bool isManual, ManualResourceLoader* loader)
+    {
+        // type and syntax code will be corrected by GpuProgramManager
+        return callback(creator, name, handle, group, isManual, loader, GPT_VERTEX_PROGRAM, "");
+    }
+    CreateCallbackWrapper(const String& lang, CreateGpuProgramCallback cb) : language(lang), callback(cb) {}
+};
+
+class GLGpuProgramManager
+{
+    std::list<CreateCallbackWrapper> mFactories;
 public:
-    typedef GpuProgram* (*CreateGpuProgramCallback)(ResourceManager* creator, 
-        const String& name, ResourceHandle handle, 
-        const String& group, bool isManual, ManualResourceLoader* loader,
-        GpuProgramType gptype, const String& syntaxCode);
-
-private:
-    typedef std::map<String, CreateGpuProgramCallback> ProgramMap;
-    ProgramMap mProgramMap;
-
-protected:
-    /// Specialised create method with specific parameters
-    Resource* createImpl(const String& name, ResourceHandle handle, 
-        const String& group, bool isManual, ManualResourceLoader* loader,
-        GpuProgramType gptype, const String& syntaxCode);
-
-public:
-    GLGpuProgramManager();
-    ~GLGpuProgramManager();
-    bool registerProgramFactory(const String& syntaxCode, CreateGpuProgramCallback createFn);
-    bool unregisterProgramFactory(const String& syntaxCode);
+    void registerProgramFactory(const String& syntaxCode, CreateGpuProgramCallback createFn)
+    {
+        mFactories.emplace_back(syntaxCode, createFn);
+        GpuProgramManager::getSingleton().addFactory(&mFactories.back());
+    }
 };
 
 } //namespace Ogre

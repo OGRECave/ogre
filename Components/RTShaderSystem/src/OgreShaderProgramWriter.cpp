@@ -33,22 +33,7 @@ namespace RTShader {
 void ProgramWriter::writeProgramTitle(std::ostream& os, Program* program)
 {
     os << "//-----------------------------------------------------------------------------" << std::endl;
-    os << "// Program Type: ";
-    switch(program->getType())
-    {
-    case GPT_VERTEX_PROGRAM:
-        os << "Vertex shader";
-        break;
-    case GPT_FRAGMENT_PROGRAM:
-        os << "Fragment shader";
-        break;
-    case GPT_GEOMETRY_PROGRAM:
-        os << "Geometry shader";
-        break;  
-    default:
-        break;
-    }
-    os << std::endl;
+    os << "// Program Type: " << to_string(program->getType()) << std::endl;
     os << "// Language: " <<  getTargetLanguage() << std::endl;
     os << "// Created by Ogre RT Shader Generator. All rights reserved." << std::endl;
     os << "//-----------------------------------------------------------------------------" << std::endl;
@@ -65,9 +50,76 @@ void ProgramWriter::writeUniformParametersTitle(std::ostream& os, Program* progr
 void ProgramWriter::writeFunctionTitle(std::ostream& os, Function* function)
 {
     os << "//-----------------------------------------------------------------------------" << std::endl;
-    os << "// Function Name: " <<  function->getName() << std::endl;
-    os << "// Function Desc: " <<  function->getDescription() << std::endl;
+    os << "//                         MAIN" << std::endl;
     os << "//-----------------------------------------------------------------------------" << std::endl;
+}
+
+ProgramWriter::ProgramWriter()
+{
+    mParamSemanticMap[Parameter::SPS_POSITION] = "POSITION";
+    mParamSemanticMap[Parameter::SPS_BLEND_WEIGHTS] = "BLENDWEIGHT";
+    mParamSemanticMap[Parameter::SPS_BLEND_INDICES] = "BLENDINDICES";
+    mParamSemanticMap[Parameter::SPS_NORMAL] = "NORMAL";
+    mParamSemanticMap[Parameter::SPS_COLOR] = "COLOR";
+    mParamSemanticMap[Parameter::SPS_TEXTURE_COORDINATES] = "TEXCOORD";
+    mParamSemanticMap[Parameter::SPS_BINORMAL] = "BINORMAL";
+    mParamSemanticMap[Parameter::SPS_TANGENT] = "TANGENT";
+}
+
+ProgramWriter::~ProgramWriter() {}
+
+void ProgramWriter::writeParameter(std::ostream& os, const ParameterPtr& parameter)
+{
+    os << mGpuConstTypeMap[parameter->getType()] << '\t' << parameter->getName();
+    if (parameter->isArray())
+        os << '[' << parameter->getSize() << ']';
+}
+
+void ProgramWriter::writeSamplerParameter(std::ostream& os, const UniformParameterPtr& parameter)
+{
+    if (parameter->getType() == GCT_SAMPLER_EXTERNAL_OES)
+    {
+        os << "uniform\t";
+        writeParameter(os, parameter);
+        return;
+    }
+
+    switch(parameter->getType())
+    {
+    case GCT_SAMPLER1D:
+        os << "SAMPLER1D(";
+        break;
+    case GCT_SAMPLER2D:
+        os << "SAMPLER2D(";
+        break;
+    case GCT_SAMPLER3D:
+        os << "SAMPLER3D(";
+        break;
+    case GCT_SAMPLERCUBE:
+        os << "SAMPLERCUBE(";
+        break;
+    case GCT_SAMPLER2DSHADOW:
+        os << "SAMPLER2DSHADOW(";
+        break;
+    case GCT_SAMPLER2DARRAY:
+        os << "SAMPLER2DARRAY(";
+        break;
+    default:
+        OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "unsupported sampler type");
+    }
+    os << parameter->getName() << ", " << parameter->getIndex() << ")";
+}
+
+void ProgramWriter::writeParameterSemantic(std::ostream& os, const ParameterPtr& parameter)
+{
+    OgreAssertDbg(parameter->getSemantic() != Parameter::SPS_UNKNOWN, "invalid semantic");
+    os << mParamSemanticMap[parameter->getSemantic()];
+
+    if (parameter->getSemantic() == Parameter::SPS_TEXTURE_COORDINATES ||
+        (parameter->getSemantic() == Parameter::SPS_COLOR && parameter->getIndex() > 0))
+    {
+        os << parameter->getIndex();
+    }
 }
 
 }

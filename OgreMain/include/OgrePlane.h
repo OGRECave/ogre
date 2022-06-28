@@ -50,7 +50,7 @@ namespace Ogre {
     *  @{
     */
     /** Defines a plane in 3D space.
-        @remarks
+
             A plane is defined in 3D space by the equation
             Ax + By + Cz + D = 0
         @par
@@ -205,7 +205,7 @@ namespace Ogre {
         }
 
         /** Normalises the plane.
-            @remarks
+
                 This method normalises the plane's normal and the length scale of d
                 is as well.
             @note

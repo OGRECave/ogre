@@ -31,6 +31,8 @@ THE SOFTWARE.
 #include "OgreBuiltinScriptTranslators.h"
 #include "OgreComponents.h"
 
+#define DEBUG_AST 0
+
 namespace Ogre
 {
     // AbstractNode
@@ -236,7 +238,7 @@ namespace Ogre
         case CE_OBJECTNAMEEXPECTED:
             return "object name expected";
         case CE_OBJECTALLOCATIONERROR:
-            return "object allocation error";
+            return "no object created";
         case CE_OBJECTBASENOTFOUND:
             return "base object not found";
         case CE_INVALIDPARAMETERS:
@@ -266,57 +268,59 @@ namespace Ogre
         return compile(nodes, group);
     }
 
-//  static void logAST(int tabs, const AbstractNodePtr &node)
-//  {
-//      String msg = "";
-//      for(int i = 0; i < tabs; ++i)
-//          msg += "\t";
-//
-//      switch(node->type)
-//      {
-//      case ANT_ATOM:
-//          {
-//              AtomAbstractNode *atom = static_cast<AtomAbstractNode*>(node.get());
-//              msg = msg + atom->value;
-//          }
-//          break;
-//      case ANT_PROPERTY:
-//          {
-//              PropertyAbstractNode *prop = static_cast<PropertyAbstractNode*>(node.get());
-//              msg = msg + prop->name + " =";
-//              for(AbstractNodeList::iterator i = prop->values.begin(); i != prop->values.end(); ++i)
-//              {
-//                  if((*i)->type == ANT_ATOM)
-//                      msg = msg + " " + static_cast<AtomAbstractNode*>((*i).get())->value;
-//              }
-//          }
-//          break;
-//      case ANT_OBJECT:
-//          {
-//              ObjectAbstractNode *obj = static_cast<ObjectAbstractNode*>(node.get());
-//              msg = msg + node->file + " - " + StringConverter::toString(node->line) + " - " + obj->cls + " \"" + obj->name + "\" =";
-//              for(AbstractNodeList::iterator i = obj->values.begin(); i != obj->values.end(); ++i)
-//              {
-//                  if((*i)->type == ANT_ATOM)
-//                      msg = msg + " " + static_cast<AtomAbstractNode*>((*i).get())->value;
-//              }
-//          }
-//          break;
-//      default:
-//          msg = msg + "Unacceptable node type: " + StringConverter::toString(node->type);
-//      }
-//
-//      LogManager::getSingleton().logMessage(msg);
-//
-//      if(node->type == ANT_OBJECT)
-//      {
-//          ObjectAbstractNode *obj = static_cast<ObjectAbstractNode*>(node.get());
-//          for(AbstractNodeList::iterator i = obj->children.begin(); i != obj->children.end(); ++i)
-//          {
-//              logAST(tabs + 1, *i);
-//          }
-//      }
-//  }
+#if DEBUG_AST
+    static void logAST(int tabs, const AbstractNodePtr &node)
+    {
+        String msg = "";
+        for(int i = 0; i < tabs; ++i)
+            msg += "\t";
+
+        switch(node->type)
+        {
+        case ANT_ATOM:
+            {
+                AtomAbstractNode *atom = static_cast<AtomAbstractNode*>(node.get());
+                msg = msg + atom->value;
+            }
+            break;
+        case ANT_PROPERTY:
+            {
+                PropertyAbstractNode *prop = static_cast<PropertyAbstractNode*>(node.get());
+                msg = msg + prop->name + " =";
+                for(AbstractNodeList::iterator i = prop->values.begin(); i != prop->values.end(); ++i)
+                {
+                    if((*i)->type == ANT_ATOM)
+                        msg = msg + " " + static_cast<AtomAbstractNode*>((*i).get())->value;
+                }
+            }
+            break;
+        case ANT_OBJECT:
+            {
+                ObjectAbstractNode *obj = static_cast<ObjectAbstractNode*>(node.get());
+                msg = msg + node->file + " - " + StringConverter::toString(node->line) + " - " + obj->cls + " \"" + obj->name + "\" =";
+                for(AbstractNodeList::iterator i = obj->values.begin(); i != obj->values.end(); ++i)
+                {
+                    if((*i)->type == ANT_ATOM)
+                        msg = msg + " " + static_cast<AtomAbstractNode*>((*i).get())->value;
+                }
+            }
+            break;
+        default:
+            msg = msg + "Unacceptable node type: " + StringConverter::toString(node->type);
+        }
+
+        LogManager::getSingleton().logMessage(msg);
+
+        if(node->type == ANT_OBJECT)
+        {
+            ObjectAbstractNode *obj = static_cast<ObjectAbstractNode*>(node.get());
+            for(AbstractNodeList::iterator i = obj->children.begin(); i != obj->children.end(); ++i)
+            {
+                logAST(tabs + 1, *i);
+            }
+        }
+    }
+#endif
 
     bool ScriptCompiler::compile(const ConcreteNodeListPtr &nodes, const String &group)
     {
@@ -348,7 +352,9 @@ namespace Ogre
         // Translate the nodes
         for(AbstractNodeList::iterator i = ast->begin(); i != ast->end(); ++i)
         {
-            //logAST(0, *i);
+#if DEBUG_AST
+            logAST(0, *i);
+#endif
             if((*i)->type == ANT_OBJECT && static_cast<ObjectAbstractNode*>((*i).get())->abstract)
                 continue;
             //LogManager::getSingleton().logMessage(static_cast<ObjectAbstractNode*>((*i).get())->name);
@@ -360,65 +366,6 @@ namespace Ogre
         mImports.clear();
         mImportRequests.clear();
         mImportTable.clear();
-
-        return mErrors.empty();
-    }
-
-    AbstractNodeListPtr ScriptCompiler::_generateAST(const String &str, const String &source, bool doImports, bool doObjects, bool doVariables)
-    {
-        // Clear the past errors
-        mErrors.clear();
-
-        ConcreteNodeListPtr cst = ScriptParser::parse(ScriptLexer::tokenize(str, source), source);
-
-        // Call the listener to intercept CST
-        if(mListener)
-            mListener->preConversion(this, cst);
-
-        // Convert our nodes to an AST
-        AbstractNodeListPtr ast = convertToAST(*cst);
-
-        if(ast && doImports)
-            processImports(*ast);
-        if(ast && doObjects)
-            processObjects(*ast, *ast);
-        if(ast && doVariables)
-            processVariables(*ast);
-
-        return ast;
-    }
-
-    bool ScriptCompiler::_compile(AbstractNodeListPtr nodes, const String &group, bool doImports, bool doObjects, bool doVariables)
-    {
-        // Set up the compilation context
-        mGroup = group;
-
-        // Clear the past errors
-        mErrors.clear();
-
-        // Clear the environment
-        mEnv.clear();
-
-        // Processes the imports for this script
-        if(doImports)
-            processImports(*nodes);
-        // Process object inheritance
-        if(doObjects)
-            processObjects(*nodes, *nodes);
-        // Process variable expansion
-        if(doVariables)
-            processVariables(*nodes);
-
-        // Translate the nodes
-        for(AbstractNodeList::iterator i = nodes->begin(); i != nodes->end(); ++i)
-        {
-            //logAST(0, *i);
-            if((*i)->type == ANT_OBJECT && static_cast<ObjectAbstractNode*>((*i).get())->abstract)
-                continue;
-            ScriptTranslator *translator = ScriptCompilerManager::getSingleton().getTranslator(*i);
-            if(translator)
-                translator->translate(this, *i);
-        }
 
         return mErrors.empty();
     }
@@ -850,7 +797,7 @@ namespace Ogre
             while(parent && parent->type == ANT_OBJECT)
             {
                 ObjectAbstractNode *obj = static_cast<ObjectAbstractNode*>(parent);
-                if(obj->id == ID_COMPOSITOR)
+                if(obj->id == ID_TARGET || obj->id == ID_TARGET_OUTPUT)
                     return true;
                 parent = obj->parent;
             }
@@ -1247,9 +1194,6 @@ namespace Ogre
         mIds["depth_fail_op"] = ID_DEPTH_FAIL_OP;
         mIds["pass_op"] = ID_PASS_OP;
         mIds["two_sided"] = ID_TWO_SIDED;
-        mIds["read_back_as_texture"] = ID_READ_BACK_AS_TEXTURE;
-
-        mIds["subroutine"] = ID_SUBROUTINE;
 
         mIds["line_width"] = ID_LINE_WIDTH;
         mIds["sampler"] = ID_SAMPLER;
@@ -1257,6 +1201,8 @@ namespace Ogre
         mIds["thread_groups"] = ID_THREAD_GROUPS;
         mIds["render_custom"] = ID_RENDER_CUSTOM;
         mIds["auto"] = ID_AUTO;
+        mIds["camera"] = ID_CAMERA;
+        mIds["align_to_face"] = ID_ALIGN_TO_FACE;
 
 		mLargestRegisteredWordId = ID_END_BUILTIN_IDS;
 	}
@@ -1679,8 +1625,6 @@ namespace Ogre
     String CreateMaterialScriptCompilerEvent::eventType = "createMaterial";
     //----------------------------------------------------------------------------
     String CreateGpuProgramScriptCompilerEvent::eventType = "createGpuProgram";
-    //-------------------------------------------------------------------------
-    String CreateHighLevelGpuProgramScriptCompilerEvent::eventType = "createHighLevelGpuProgram";
     //-------------------------------------------------------------------------
     String CreateGpuSharedParametersScriptCompilerEvent::eventType = "createGpuSharedParameters";
     //-------------------------------------------------------------------------

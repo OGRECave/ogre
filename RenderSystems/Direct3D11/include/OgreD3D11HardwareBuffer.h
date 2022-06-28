@@ -49,8 +49,6 @@ namespace Ogre {
     protected:
         ComPtr<ID3D11Buffer> mlpD3DBuffer;
         bool mUseTempStagingBuffer;
-        D3D11HardwareBuffer* mpTempStagingBuffer;
-        bool mStagingUploadNeeded;
         BufferType mBufferType;
         D3D11Device & mDevice;
         D3D11_BUFFER_DESC mDesc;
@@ -58,29 +56,29 @@ namespace Ogre {
 
 
         /** See HardwareBuffer. */
-        void* lockImpl(size_t offset, size_t length, LockOptions options);
+        void* lockImpl(size_t offset, size_t length, LockOptions options) override;
         /** See HardwareBuffer. */
-        void unlockImpl(void);
+        void unlockImpl(void) override;
 
     public:
         D3D11HardwareBuffer(BufferType btype, size_t sizeBytes, HardwareBuffer::Usage usage, 
-            D3D11Device & device, bool useSystemMem, bool useShadowBuffer, bool streamOut);
+            D3D11Device & device, bool useShadowBuffer, bool streamOut);
         ~D3D11HardwareBuffer();
         /** See HardwareBuffer. */
-        void readData(size_t offset, size_t length, void* pDest);
+        void readData(size_t offset, size_t length, void* pDest) override;
         /** See HardwareBuffer. */
         void writeData(size_t offset, size_t length, const void* pSource,
-            bool discardWholeBuffer = false);
+            bool discardWholeBuffer = false) override;
         /** See HardwareBuffer. We perform a hardware copy here. */
         void copyData(HardwareBuffer& srcBuffer, size_t srcOffset, 
-            size_t dstOffset, size_t length, bool discardWholeBuffer = false);
+            size_t dstOffset, size_t length, bool discardWholeBuffer = false) override;
 		void copyDataImpl(HardwareBuffer& srcBuffer, size_t srcOffset,
 			size_t dstOffset, size_t length, bool discardWholeBuffer = false);
 		/// Updates the real buffer from the shadow buffer, if required
-		virtual void _updateFromShadow(void);
+		void _updateFromShadow(void) override;
 
         /// Get the D3D-specific buffer
-        ID3D11Buffer* getD3DBuffer(void) { return mlpD3DBuffer.Get(); }
+        ID3D11Buffer* getD3DBuffer(void) const { return mlpD3DBuffer.Get(); }
     };
 
 

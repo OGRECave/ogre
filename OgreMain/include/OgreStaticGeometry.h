@@ -44,7 +44,7 @@ namespace Ogre {
     */
     /** Pre-transforms and batches up meshes for efficient use as static
         geometry in a scene.
-    @remarks
+
         Modern graphics cards (GPUs) prefer to receive geometry in large
         batches. It is orders of magnitude faster to render 10 batches
         of 10,000 triangles than it is to render 10,000 batches of 10 
@@ -122,7 +122,7 @@ namespace Ogre {
     public:
         /** Struct holding geometry optimised per SubMesh / LOD level, ready
             for copying to instances. 
-        @remarks
+
             Since we're going to be duplicating geometry lots of times, it's
             far more important that we don't have redundant vertex data. If a 
             SubMesh uses shared geometry, or we're looking at a lower LOD, not
@@ -158,9 +158,9 @@ namespace Ogre {
         struct QueuedSubMesh : public BatchedGeometryAlloc
         {
             SubMesh* submesh;
+            MaterialPtr material;
             /// Link to LOD list of geometry, potentially optimised
             SubMeshLodGeometryLinkList* geometryLodList;
-            String materialName;
             Vector3 position;
             Quaternion orientation;
             Vector3 scale;
@@ -189,42 +189,20 @@ namespace Ogre {
         */
         class _OgreExport GeometryBucket :  public Renderable,  public BatchedGeometryAlloc
         {
-        protected:
             /// Geometry which has been queued up pre-build (not for deallocation)
             QueuedGeometryList mQueuedGeometry;
             /// Pointer to parent bucket
             MaterialBucket* mParent;
-            /// String identifying the vertex / index format
-            String mFormatString;
             /// Vertex information, includes current number of vertices
             /// committed to be a part of this bucket
             VertexData* mVertexData;
             /// Index information, includes index type which limits the max
             /// number of vertices which are allowed in one bucket
             IndexData* mIndexData;
-            /// Size of indexes
-            HardwareIndexBuffer::IndexType mIndexType;
             /// Maximum vertex indexable
             size_t mMaxVertexIndex;
-
-            template<typename T>
-            void copyIndexes(const T* src, T* dst, size_t count, size_t indexOffset)
-            {
-                if (indexOffset == 0)
-                {
-                    memcpy(dst, src, sizeof(T) * count);
-                }
-                else
-                {
-                    while(count--)
-                    {
-                        *dst++ = static_cast<T>(*src++ + indexOffset);
-                    }
-                }
-            }
         public:
-            GeometryBucket(MaterialBucket* parent, const String& formatString, 
-                const VertexData* vData, const IndexData* iData);
+            GeometryBucket(MaterialBucket* parent, const VertexData* vData, const IndexData* iData);
             virtual ~GeometryBucket();
             MaterialBucket* getParent(void) { return mParent; }
             /// Get the vertex data for this geometry 
@@ -256,11 +234,9 @@ namespace Ogre {
         public:
             /// list of Geometry Buckets in this region
             typedef std::vector<GeometryBucket*> GeometryBucketList;
-        protected:
+        private:
             /// Pointer to parent LODBucket
             LODBucket* mParent;
-            /// Material being used
-            String mMaterialName;
             /// Pointer to material being used
             MaterialPtr mMaterial;
             /// Active technique
@@ -269,17 +245,15 @@ namespace Ogre {
             /// list of Geometry Buckets in this region
             GeometryBucketList mGeometryBucketList;
             // index to current Geometry Buckets for a given geometry format
-            typedef std::map<String, GeometryBucket*> CurrentGeometryMap;
+            typedef std::map<uint32, GeometryBucket*> CurrentGeometryMap;
             CurrentGeometryMap mCurrentGeometryMap;
-            /// Get a packed string identifying the geometry format
-            String getGeometryFormatString(SubMeshLodGeometryLink* geom);
             
         public:
-            MaterialBucket(LODBucket* parent, const String& materialName);
+            MaterialBucket(LODBucket* parent, const MaterialPtr& material);
             virtual ~MaterialBucket();
             LODBucket* getParent(void) { return mParent; }
             /// Get the material name
-            const String& getMaterialName(void) const { return mMaterialName; }
+            const String& getMaterialName(void) const { return mMaterial->getName(); }
             /// Assign geometry to this bucket
             void assign(QueuedGeometry* qsm);
             /// Build
@@ -289,10 +263,14 @@ namespace Ogre {
                 Real lodValue);
             /// Get the material for this bucket
             const MaterialPtr& getMaterial(void) const { return mMaterial; }
+            /// Override Material without changing the partitioning. For advanced use only.
+            void _setMaterial(const MaterialPtr& material);
             /// Iterator over geometry
             typedef VectorIterator<GeometryBucketList> GeometryIterator;
-            /// Get an iterator over the contained geometry
-            GeometryIterator getGeometryIterator(void);
+            /// Get a list of the contained geometry
+            const GeometryBucketList& getGeometryList() const { return mGeometryBucketList; }
+            /// @deprecated use getGeometryList()
+            OGRE_DEPRECATED GeometryIterator getGeometryIterator(void);
             /// Get the current Technique
             Technique* getCurrentTechnique(void) const { return mTechnique; }
             /// Dump contents for diagnostics
@@ -300,7 +278,7 @@ namespace Ogre {
             void visitRenderables(Renderable::Visitor* visitor, bool debugRenderables);
         };
         /** A LODBucket is a collection of smaller buckets with the same LOD. 
-        @remarks
+
             LOD refers to Mesh LOD here. Material LOD can change separately
             at the next bucket down from this.
         */
@@ -309,28 +287,7 @@ namespace Ogre {
         public:
             /// Lookup of Material Buckets in this region
             typedef std::map<String, MaterialBucket*> MaterialBucketMap;
-        protected:
-            /** Nested class to allow shadows. */
-            class _OgreExport LODShadowRenderable : public ShadowRenderable
-            {
-            protected:
-                LODBucket* mParent;
-                // Shared link to position buffer
-                HardwareVertexBufferSharedPtr mPositionBuffer;
-                // Shared link to w-coord buffer (optional)
-                HardwareVertexBufferSharedPtr mWBuffer;
-
-            public:
-                LODShadowRenderable(LODBucket* parent, 
-                    HardwareIndexBufferSharedPtr* indexBuffer, const VertexData* vertexData, 
-                    bool createSeparateLightCap, bool isLightCap = false);
-                ~LODShadowRenderable();
-                void getWorldTransforms(Matrix4* xform) const override;
-                HardwareVertexBufferSharedPtr getPositionBuffer(void) { return mPositionBuffer; }
-                HardwareVertexBufferSharedPtr getWBuffer(void) { return mWBuffer; }
-                virtual void rebindIndexBuffer(const HardwareIndexBufferSharedPtr& indexBuffer) override;
-
-            };
+        private:
             /// Pointer to parent region
             Region* mParent;
             /// LOD level (0 == full LOD)
@@ -365,22 +322,21 @@ namespace Ogre {
             /// Iterator over the materials in this LOD
             typedef MapIterator<MaterialBucketMap> MaterialIterator;
             /// Get an iterator over the materials in this LOD
-            MaterialIterator getMaterialIterator(void);
+            const MaterialBucketMap& getMaterialBuckets() const { return mMaterialBucketMap; }
+            /// @deprecated use getMaterialBuckets()
+            OGRE_DEPRECATED MaterialIterator getMaterialIterator(void);
             /// Dump contents for diagnostics
             void dump(std::ofstream& of) const;
             void visitRenderables(Renderable::Visitor* visitor, bool debugRenderables);
             EdgeData* getEdgeList() const { return mEdgeList; }
             ShadowCaster::ShadowRenderableList& getShadowRenderableList() { return mShadowRenderables; }
             bool isVertexProgramInUse() const { return mVertexProgramInUse; }
-            void updateShadowRenderables(
-                ShadowTechnique shadowTechnique, const Vector4& lightPos, 
-                HardwareIndexBufferSharedPtr* indexBuffer, 
-                bool extrudeVertices, Real extrusionDistance, unsigned long flags = 0 );
-            
+            void updateShadowRenderables(const Vector4& lightPos, const HardwareIndexBufferPtr& indexBuffer,
+                                         Real extrusionDistance, int flags = 0);
         };
         /** The details of a topological region which is the highest level of
             partitioning for this class.
-        @remarks
+
             The size & shape of regions entirely depends on the SceneManager
             specific implementation. It is a MovableObject since it will be
             attached to a node based on the local centre - in practice it
@@ -393,13 +349,9 @@ namespace Ogre {
         public:
             /// list of LOD Buckets in this region
             typedef std::vector<LODBucket*> LODBucketList;
-        protected:
+        private:
             /// Parent static geometry
             StaticGeometry* mParent;
-            /// Scene manager link
-            SceneManager* mSceneMgr;
-            /// Scene node
-            SceneNode* mNode;
             /// Local list of queued meshes (not used for deallocation)
             QueuedSubMeshList mQueuedSubMeshes;
             /// Unique identifier for the region
@@ -420,8 +372,6 @@ namespace Ogre {
             LODBucketList mLodBucketList;
             /// List of lights for this region
             mutable LightList mLightList;
-            /// The last frame that this light list was updated in
-            mutable ulong mLightListUpdated;
             /// LOD strategy reference
             const LodStrategy *mLodStrategy;
             /// Current camera
@@ -455,15 +405,15 @@ namespace Ogre {
             uint32 getTypeFlags(void) const;
 
             typedef VectorIterator<LODBucketList> LODIterator;
-            /// Get an iterator over the LODs in this region
-            LODIterator getLODIterator(void);
-            /// @copydoc ShadowCaster::getShadowVolumeRenderableIterator
-            ShadowRenderableListIterator getShadowVolumeRenderableIterator(
-                ShadowTechnique shadowTechnique, const Light* light, 
-                HardwareIndexBufferSharedPtr* indexBuffer, size_t* indexBufferUsedSize,
-                bool extrudeVertices, Real extrusionDistance, unsigned long flags = 0 );
+            /// @deprecated use getLODBuckets()
+            OGRE_DEPRECATED LODIterator getLODIterator(void);
+            /// Get an list of the LODs in this region
+            const LODBucketList& getLODBuckets() const { return mLodBucketList; }
+            const ShadowRenderableList&
+            getShadowVolumeRenderableList(const Light* light, const HardwareIndexBufferPtr& indexBuffer,
+                                          size_t& indexBufferUsedSize, float extrusionDistance,
+                                          int flags = 0) override;
             EdgeData* getEdgeList(void) override;
-            bool hasEdgeList(void) override;
 
             void _releaseManualHardwareResources() override;
             void _restoreManualHardwareResources() override;
@@ -474,17 +424,16 @@ namespace Ogre {
         };
         /** Indexed region map based on packed x/y/z region index, 10 bits for
             each axis.
-        @remarks
+
             Regions are indexed 0-1023 in all axes, where for example region 
             0 in the x axis begins at mOrigin.x + (mRegionDimensions.x * -512), 
             and region 1023 ends at mOrigin + (mRegionDimensions.x * 512).
         */
         typedef std::map<uint32, Region*> RegionMap;
-    protected:
+    private:
         // General state & settings
         SceneManager* mOwner;
         String mName;
-        bool mBuilt;
         Real mUpperDistance;
         Real mSquaredUpperDistance;
         bool mCastShadows;
@@ -591,7 +540,7 @@ namespace Ogre {
         /// Get the name of this object
         const String& getName(void) const { return mName; }
         /** Adds an Entity to the static geometry.
-        @remarks
+
             This method takes an existing Entity and adds its details to the 
             list of elements to include when building. Note that the Entity
             itself is not copied or referenced in this method; an Entity is 
@@ -614,7 +563,7 @@ namespace Ogre {
 
         /** Adds all the Entity objects attached to a SceneNode and all it's
             children to the static geometry.
-        @remarks
+
             This method performs just like addEntity, except it adds all the 
             entities attached to an entire sub-tree to the geometry. 
             The position / orientation / scale parameters are taken from the
@@ -624,7 +573,7 @@ namespace Ogre {
             it's parent, so if you have this node already attached to the scene
             graph, you will need to remove it if you wish to avoid the overhead
             of rendering <i>both</i> the original objects and their new static
-            versions! We don't do this for you incase you are preparing this 
+            versions! We don't do this for you in case you are preparing this
             in advance and so don't want the originals detached yet. 
         @note Must be called before 'build'.
         @param node Pointer to the node to use to provide a set of Entity 
@@ -633,7 +582,7 @@ namespace Ogre {
         virtual void addSceneNode(const SceneNode* node);
 
         /** Build the geometry. 
-        @remarks
+
             Based on all the entities which have been added, and the batching 
             options which have been set, this method constructs the batched 
             geometry structures required. The batches are added to the scene 
@@ -645,7 +594,7 @@ namespace Ogre {
         virtual void build(void);
 
         /** Destroys all the built geometry state (reverse of build). 
-        @remarks
+
             You can call build() again after this and it will pick up all the
             same entities / nodes you queued last time.
         */
@@ -657,7 +606,7 @@ namespace Ogre {
         virtual void reset(void);
 
         /** Sets the distance at which batches are no longer rendered.
-        @remarks
+
             This lets you turn off batches at a given distance. This can be 
             useful for things like detail meshes (grass, foliage etc) and could
             be combined with a shader which fades the geometry out beforehand 
@@ -684,7 +633,7 @@ namespace Ogre {
         virtual bool isVisible(void) const { return mVisible; }
 
         /** Sets whether this geometry should cast shadows.
-        @remarks
+
             No matter what the settings on the original entities,
             the StaticGeometry class defaults to not casting shadows. 
             This is because, being static, unless you have moving lights
@@ -705,7 +654,7 @@ namespace Ogre {
         virtual bool getCastShadows(void) { return mCastShadows; }
 
         /** Sets the size of a single region of geometry.
-        @remarks
+
             This method allows you to configure the physical world size of 
             each region, so you can balance culling against batch size. Entities
             will be fitted within the batch they most closely fit, and the 
@@ -721,7 +670,7 @@ namespace Ogre {
         /** Gets the size of a single batch of geometry. */
         virtual const Vector3& getRegionDimensions(void) const { return mRegionDimensions; }
         /** Sets the origin of the geometry.
-        @remarks
+
             This method allows you to configure the world centre of the geometry,
             thus the place which all regions surround. You probably don't need 
             to mess with this unless you have a seriously large world, since the
@@ -741,7 +690,7 @@ namespace Ogre {
         uint32 getVisibilityFlags() const;
 
         /** Sets the render queue group this object will be rendered through.
-        @remarks
+
             Render queues are grouped to allow you to more tightly control the ordering
             of rendered objects. If you do not call this method, all  objects default
             to the default queue (RenderQueue::getDefaultQueueGroup), which is fine for 
@@ -761,8 +710,10 @@ namespace Ogre {
         
         /// Iterator for iterating over contained regions
         typedef MapIterator<RegionMap> RegionIterator;
-        /// Get an iterator over the regions in this geometry
-        RegionIterator getRegionIterator(void);
+        /// Get an list of the regions in this geometry
+        const RegionMap& getRegions() const { return mRegionMap; }
+        /// @deprecated use getRegions()
+        OGRE_DEPRECATED RegionIterator getRegionIterator(void);
 
         /** Dump the contents of this StaticGeometry to a file for diagnostic
             purposes.
@@ -770,6 +721,19 @@ namespace Ogre {
         virtual void dump(const String& filename) const;
 
 
+    };
+
+    /** Dummy factory to let Regions adhere to MovableObject protocol */
+    class _OgreExport StaticGeometryFactory : public MovableObjectFactory
+    {
+        MovableObject* createInstanceImpl( const String& name, const NameValuePairList* params) { return NULL; }
+    public:
+        StaticGeometryFactory() {}
+        ~StaticGeometryFactory() {}
+
+        static String FACTORY_TYPE_NAME;
+
+        const String& getType(void) const { return FACTORY_TYPE_NAME; }
     };
     /** @} */
     /** @} */

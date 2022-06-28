@@ -24,13 +24,6 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
-PCZCamera.h  -  description
------------------------------------------------------------------------------
-begin                : Wed Feb 21 2007
-author               : Eric Cha
-email                : ericc@xenopi.com
-Code Style Update    :
------------------------------------------------------------------------------
 */
 
 #ifndef PCZCAMERA_H
@@ -42,6 +35,12 @@ Code Style Update    :
 
 namespace Ogre
 {
+    /** \addtogroup Plugins
+    *  @{
+    */
+    /** \addtogroup PCZSceneManager
+    *  @{
+    */
     #define MAX_EXTRA_CULLING_PLANES    40
 
     class PCZone;
@@ -67,7 +66,7 @@ namespace Ogre
         ~PCZCamera();
 
         /** Overridden: Retrieves the local axis-aligned bounding box for this object.
-            @remarks
+
                 This bounding box is in local coordinates.
         */
         virtual const AxisAlignedBox& getBoundingBox(void) const;
@@ -104,7 +103,8 @@ namespace Ogre
         AxisAlignedBox mBox;
         PCZFrustum mExtraCullingFrustum;
     };
-
+    /** @} */
+    /** @} */
 }
 
 #endif

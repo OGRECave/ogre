@@ -39,21 +39,52 @@ namespace Ogre {
     /** \addtogroup Resources
     *  @{
     */
+
+    /** Enum identifying the types of manual mesh built by this manager */
+    enum MeshBuildType
+    {
+        MBT_PLANE,
+        MBT_CURVED_ILLUSION_PLANE,
+        MBT_CURVED_PLANE
+    };
+
+    /** Saved parameters used to (re)build a manual mesh built by this class */
+    struct MeshBuildParams
+    {
+        MeshBuildType type;
+        Plane plane;
+        Real width;
+        Real height;
+        Real curvature;
+        int xsegments;
+        int ysegments;
+        bool normals;
+        unsigned short numTexCoordSets;
+        Real xTile;
+        Real yTile;
+        Vector3 upVector;
+        Quaternion orientation;
+        HardwareBuffer::Usage vertexBufferUsage;
+        HardwareBuffer::Usage indexBufferUsage;
+        bool vertexShadowBuffer;
+        bool indexShadowBuffer;
+        int ySegmentsToKeep;
+    };
+
     /** A factory class that can create various mesh prefabs. 
-    @remarks
+
         This class is used by OgreMeshManager to offload the loading of various prefab types 
         to a central location.
     */
-    class _OgreExport PrefabFactory
+    class PrefabFactory : public ManualResourceLoader
     {
     public:
-        /** If the given mesh has a known prefab resource name (e.g "Prefab_Plane") 
+        /** If the given mesh has a UserObjectBinding for _MeshBuildParams or resource name (e.g "Prefab_Plane")
             then this prefab will be created as a submesh of the given mesh.
 
-            @param mesh The mesh that the potential prefab will be created in.
-            @return true if a prefab has been created, otherwise false.
+            @param res The mesh that the potential prefab will be created in.
         */
-        static bool createPrefab(Mesh* mesh);
+        void loadResource(Resource* res) override;
 
     private:
         /// Creates a plane as a submesh of the given mesh
@@ -65,8 +96,12 @@ namespace Ogre {
         /// Creates a sphere with a diameter of 100 units as a submesh of the given mesh
         static void createSphere(Mesh* mesh);
 
-        /// unit length coordinate axes
-        static void createAxes(Mesh* mesh);
+        /** Utility method for manual loading a plane */
+        static void loadManualPlane(Mesh* pMesh, MeshBuildParams& params);
+        /** Utility method for manual loading a curved plane */
+        static void loadManualCurvedPlane(Mesh* pMesh, MeshBuildParams& params);
+        /** Utility method for manual loading a curved illusion plane */
+        static void loadManualCurvedIllusionPlane(Mesh* pMesh, MeshBuildParams& params);
     };
     /** @} */
     /** @} */

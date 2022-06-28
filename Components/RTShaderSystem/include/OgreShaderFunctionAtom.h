@@ -135,18 +135,11 @@ public:
     */
     ushort getIndirectionLevel()    const { return mIndirectionLevel; }
 
-    /** Returns the parameter name and the usage mask like this 'color.xyz' */
-    String toString()   const;
-
-    /** Returns the given mask as string representation. */
-    static String getMaskAsString(int mask);
+    /** write the parameter name and the usage mask like this 'color.xyz' */
+    void write(std::ostream& os) const;
 
     /** Return the float count of the given mask. */
     static int getFloatCount(int mask);
-
-    /** Return the gpu constant type of the given mask. */
-    static GpuConstantType getGpuConstantType(int mask);
-
 protected:
     /// The parameter being carried by the operand
     ParameterPtr mParameter;
@@ -286,7 +279,7 @@ public:
         bool operator()(FunctionInvocation const& lhs, FunctionInvocation const& rhs) const;
     };
 
-protected:
+private:
     FunctionInvocation() {}
 
     String mReturnType;

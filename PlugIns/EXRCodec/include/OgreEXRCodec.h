@@ -35,7 +35,7 @@ namespace Ogre {
     *  @{
     */
     /** \defgroup EXRCodec EXRCodec
-    * %Codec specialized in loading OpenEXR high dynamic range images.
+    * %Codec specialized in loading high dynamic range .exr images using [OpenEXR](https://www.openexr.com/).
     *  @{
     */
     class EXRCodec : public ImageCodec
@@ -44,16 +44,10 @@ namespace Ogre {
         EXRCodec();
         virtual ~EXRCodec();
 
-        /// @copydoc Codec::encode
-        DataStreamPtr encode(const MemoryDataStreamPtr& input, const CodecDataPtr& pData) const;
-        /// @copydoc Codec::encodeToFile
-        void encodeToFile(const MemoryDataStreamPtr& input, const String& outFileName, const CodecDataPtr& pData) const;
-        /// @copydoc Codec::decode
-        DecodeResult decode(const DataStreamPtr& input) const;
-        /// @copydoc Codec::magicNumberToFileExt
-        String magicNumberToFileExt(const char* magicNumberPtr, size_t maxbytes) const;
-
-        String getType() const;
+        using ImageCodec::decode;
+        DecodeResult decode(const DataStreamPtr& input) const override;
+        String magicNumberToFileExt(const char* magicNumberPtr, size_t maxbytes) const override;
+        String getType() const override;
     };
     /** @} */
     /** @} */

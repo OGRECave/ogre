@@ -1,87 +1,65 @@
 import Ogre
+import Ogre.Bites
 import Ogre.RTShader
 
-class SGResolver(Ogre.MaterialManager_Listener):
-    def __init__(self, shadergen):
-        Ogre.MaterialManager_Listener.__init__(self)
-        self.shadergen = shadergen
+class KeyListener(Ogre.Bites.InputListener):
+    def __init__(self):
+        Ogre.Bites.InputListener.__init__(self)
 
-    def handleSchemeNotFound(self, idx, name, mat, lod_idx, rend):
-        if name != Ogre.RTShader.cvar.ShaderGenerator_DEFAULT_SCHEME_NAME:
-            return None
+    def keyPressed(self, evt):
+        if evt.keysym.sym == Ogre.Bites.SDLK_ESCAPE:
+            Ogre.Root.getSingleton().queueEndRendering()
 
-        def_name = Ogre.cvar.MaterialManager_DEFAULT_SCHEME_NAME
-        succ = self.shadergen.createShaderBasedTechnique(mat, def_name, name)
-
-        if not succ:
-            return None
-
-        self.shadergen.validateMaterial(name, mat.getName(), mat.getGroup())
-
-        return mat.getTechnique(1)
+        return True
 
 def main():
-    root = Ogre.Root("plugins.cfg", "ogre.cfg", "")
+    ctx = Ogre.Bites.ApplicationContext("PySample")
 
-    cfg = Ogre.ConfigFile()
-    cfg.loadDirect("resources.cfg")
+    ctx.initApp()
 
-    rgm = Ogre.ResourceGroupManager.getSingleton()
+    # register for input events
+    klistener = KeyListener() # must keep a reference around
+    ctx.addInputListener(klistener)
 
-    for sec, settings in cfg.getSettingsBySection().items():
-        for kind, loc in settings.items():
-            rgm.addResourceLocation(loc, kind, sec)
-
-    arch = cfg.getSettings("General").values()[0]
-    rgm.addResourceLocation(arch + "/materials/programs/GLSL120", "FileSystem", "General")
-    arch += "/RTShaderLib"
-    rgm.addResourceLocation(arch + "/materials", "FileSystem", "General")
-    rgm.addResourceLocation(arch + "/GLSL", "FileSystem", "General")
-
-    if not root.restoreConfig():
-        root.showConfigDialog(None)
-        root.saveConfig()
-
-    win = root.initialise(True)
-
-    Ogre.RTShader.ShaderGenerator.initialize()
-    shadergen = Ogre.RTShader.ShaderGenerator.getSingleton()
-
-    sgres = SGResolver(shadergen)
-    Ogre.MaterialManager.getSingleton().addListener(sgres)
-
-    rgm.initialiseAllResourceGroups()
-
-    rs = shadergen.getRenderState(Ogre.RTShader.cvar.ShaderGenerator_DEFAULT_SCHEME_NAME)
-    rs.addTemplateSubRenderState(shadergen.createSubRenderState(Ogre.RTShader.cvar.PerPixelLighting_Type));
-
+    root = ctx.getRoot()
     scn_mgr = root.createSceneManager()
-    shadergen.addSceneManager(scn_mgr)
 
-    scn_mgr.setAmbientLight(Ogre.ColourValue(.1, .1, .1))
+    shadergen = Ogre.RTShader.ShaderGenerator.getSingleton()
+    shadergen.addSceneManager(scn_mgr)  # must be done before we do anything with the scene
+
+    # without light we would just get a black screen
+    scn_mgr.setAmbientLight((.1, .1, .1))
 
     light = scn_mgr.createLight("MainLight")
     lightnode = scn_mgr.getRootSceneNode().createChildSceneNode()
     lightnode.setPosition(0, 10, 15)
     lightnode.attachObject(light)
 
+    # create the camera
     cam = scn_mgr.createCamera("myCam")
     cam.setNearClipDistance(5)
-
+    cam.setAutoAspectRatio(True)
     camnode = scn_mgr.getRootSceneNode().createChildSceneNode()
     camnode.attachObject(cam)
-    camnode.lookAt(Ogre.Vector3(0, 0, -1), Ogre.Node.TS_WORLD)
-    camnode.setPosition(0, 0, 15)
-    
-    vp = win.addViewport(cam)
-    vp.setBackgroundColour(Ogre.ColourValue(.3, .3, .3))
 
+    # map input events to camera controls
+    camman = Ogre.Bites.CameraMan(camnode)
+    camman.setStyle(Ogre.Bites.CS_ORBIT)
+    camman.setYawPitchDist(0, 0.3, 15)
+    ctx.addInputListener(camman)
+
+    # and tell it to render into the main window
+    vp = ctx.getRenderWindow().addViewport(cam)
+    vp.setBackgroundColour((.3, .3, .3))
+
+    # finally something to render
     ent = scn_mgr.createEntity("Sinbad.mesh")
     node = scn_mgr.getRootSceneNode().createChildSceneNode()
     node.attachObject(ent)
-    
-    while not root.endRenderingQueued():
-        root.renderOneFrame()
+
+    root.startRendering() # blocks until queueEndRendering is called
+
+    ctx.closeApp()
 
 if __name__ == "__main__":
     main()

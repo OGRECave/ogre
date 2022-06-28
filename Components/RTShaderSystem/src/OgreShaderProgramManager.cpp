@@ -52,16 +52,13 @@ ProgramManager& ProgramManager::getSingleton()
 ProgramManager::ProgramManager()
 {
     createDefaultProgramProcessors();
-    createDefaultProgramWriterFactories();
 }
 
 //-----------------------------------------------------------------------------
 ProgramManager::~ProgramManager()
 {
     flushGpuProgramsCache();
-    destroyDefaultProgramWriterFactories();
     destroyDefaultProgramProcessors();  
-    destroyProgramWriters();
 }
 
 //-----------------------------------------------------------------------------
@@ -121,78 +118,30 @@ void ProgramManager::flushGpuProgramsCache(GpuProgramsMap& gpuProgramsMap)
         gpuProgramsMap.erase(it);
     }
 }
-
-//-----------------------------------------------------------------------------
-void ProgramManager::createDefaultProgramWriterFactories()
-{
-    // Add standard shader writer factories 
-#if OGRE_PLATFORM != OGRE_PLATFORM_ANDROID
-    mProgramWriterFactories.push_back(OGRE_NEW ShaderProgramWriterCGFactory());
-    mProgramWriterFactories.push_back(OGRE_NEW ShaderProgramWriterGLSLFactory());
-    mProgramWriterFactories.push_back(OGRE_NEW ShaderProgramWriterHLSLFactory());
-#endif
-    mProgramWriterFactories.push_back(OGRE_NEW ShaderProgramWriterGLSLESFactory());
-    
-    for (unsigned int i=0; i < mProgramWriterFactories.size(); ++i)
-    {
-        ProgramWriterManager::getSingletonPtr()->addFactory(mProgramWriterFactories[i]);
-    }
-}
-
-//-----------------------------------------------------------------------------
-void ProgramManager::destroyDefaultProgramWriterFactories()
-{ 
-    for (unsigned int i=0; i<mProgramWriterFactories.size(); i++)
-    {
-        ProgramWriterManager::getSingletonPtr()->removeFactory(mProgramWriterFactories[i]);
-        OGRE_DELETE mProgramWriterFactories[i];
-    }
-    mProgramWriterFactories.clear();
-}
-
 //-----------------------------------------------------------------------------
 void ProgramManager::createDefaultProgramProcessors()
 {
     // Add standard shader processors
-#if OGRE_PLATFORM != OGRE_PLATFORM_ANDROID
-    mDefaultProgramProcessors.push_back(OGRE_NEW CGProgramProcessor);
     mDefaultProgramProcessors.push_back(OGRE_NEW GLSLProgramProcessor);
+    addProgramProcessor("glsles", mDefaultProgramProcessors.back());
+    addProgramProcessor("glslang", mDefaultProgramProcessors.back());
+#if OGRE_PLATFORM != OGRE_PLATFORM_ANDROID
+    addProgramProcessor("glsl", mDefaultProgramProcessors.back());
     mDefaultProgramProcessors.push_back(OGRE_NEW HLSLProgramProcessor);
+    addProgramProcessor("hlsl", mDefaultProgramProcessors.back());
 #endif
-    mDefaultProgramProcessors.push_back(OGRE_NEW GLSLESProgramProcessor);
-
-    for (unsigned int i=0; i < mDefaultProgramProcessors.size(); ++i)
-    {
-        addProgramProcessor(mDefaultProgramProcessors[i]);
-    }
 }
 
 //-----------------------------------------------------------------------------
 void ProgramManager::destroyDefaultProgramProcessors()
 {
-    for (unsigned int i=0; i < mDefaultProgramProcessors.size(); ++i)
-    {
-        removeProgramProcessor(mDefaultProgramProcessors[i]);
-        OGRE_DELETE mDefaultProgramProcessors[i];
+    // removing unknown is not an error
+    for(auto lang : {"glsl", "glsles", "glslang", "hlsl"})
+        removeProgramProcessor(lang);
+    for (auto processor : mDefaultProgramProcessors) {
+        OGRE_DELETE processor;
     }
     mDefaultProgramProcessors.clear();
-}
-
-//-----------------------------------------------------------------------------
-void ProgramManager::destroyProgramWriters()
-{
-    ProgramWriterIterator it    = mProgramWritersMap.begin();
-    ProgramWriterIterator itEnd = mProgramWritersMap.end();
-
-    for (; it != itEnd; ++it)
-    {
-        if (it->second != NULL)
-        {
-            OGRE_DELETE it->second;
-            it->second = NULL;
-        }                   
-    }
-    mProgramWritersMap.clear();
 }
 
 //-----------------------------------------------------------------------------
@@ -211,19 +160,8 @@ void ProgramManager::createGpuPrograms(ProgramSet* programSet)
 
     // Grab the matching writer.
     const String& language = ShaderGenerator::getSingleton().getTargetLanguage();
-    ProgramWriterIterator itWriter = mProgramWritersMap.find(language);
-    ProgramWriter* programWriter = NULL;
 
-    // No writer found -> create new one.
-    if (itWriter == mProgramWritersMap.end())
-    {
-        programWriter = ProgramWriterManager::getSingletonPtr()->createProgramWriter(language);
-        mProgramWritersMap[language] = programWriter;
-    }
-    else
-    {
-        programWriter = itWriter->second;
-    }
+    auto programWriter = ProgramWriterManager::getSingleton().getProgramWriter(language);
 
     ProgramProcessorIterator itProcessor = mProgramProcessorsMap.find(language);
     ProgramProcessor* programProcessor = NULL;
@@ -246,10 +184,7 @@ void ProgramManager::createGpuPrograms(ProgramSet* programSet)
     {
         auto gpuProgram = createGpuProgram(programSet->getCpuProgram(type), programWriter, language,
                                            ShaderGenerator::getSingleton().getShaderProfiles(type),
-                                           ShaderGenerator::getSingleton().getShaderProfilesList(type),
                                            ShaderGenerator::getSingleton().getShaderCachePath());
-
-        OgreAssert(gpuProgram, "gpu program could not be created");
         programSet->setGpuProgram(gpuProgram);
     }
 
@@ -267,10 +202,9 @@ GpuProgramPtr ProgramManager::createGpuProgram(Program* shaderProgram,
                                                ProgramWriter* programWriter,
                                                const String& language,
                                                const String& profiles,
-                                               const StringVector& profilesList,
                                                const String& cachePath)
 {
-    stringstream sourceCodeStringStream;
+    std::stringstream sourceCodeStringStream;
 
     // Generate source code.
     programWriter->writeSourceCode(sourceCodeStringStream, shaderProgram);
@@ -305,7 +239,7 @@ GpuProgramPtr ProgramManager::createGpuProgram(Program* shaderProgram,
     // Case cache directory specified -> create program from file.
     if (!cachePath.empty())
     {
-        const String  programFullName = programName + "." + language;
+        const String  programFullName = programName + "." + programWriter->getTargetLanguage();
         const String  programFileName = cachePath + programFullName;
         std::ifstream programFile;
 
@@ -333,39 +267,23 @@ GpuProgramPtr ProgramManager::createGpuProgram(Program* shaderProgram,
     }
 
     pGpuProgram->setSource(source);
-    pGpuProgram->setPreprocessorDefines(shaderProgram->getPreprocessorDefines());
-    pGpuProgram->setParameter("entry_point", shaderProgram->getEntryPointFunction()->getName());
+    pGpuProgram->setParameter("preprocessor_defines", shaderProgram->getPreprocessorDefines());
+    pGpuProgram->setParameter("entry_point", "main");
 
     if (language == "hlsl")
     {
-        // HLSL program requires specific target profile settings - we have to split the profile string.
-        StringVector::const_iterator it = profilesList.begin();
-        StringVector::const_iterator itEnd = profilesList.end();
-        
-        for (; it != itEnd; ++it)
-        {
-            if (GpuProgramManager::getSingleton().isSyntaxSupported(*it))
-            {
-                pGpuProgram->setParameter("target", *it);
-                break;
-            }
-        }
-
+        pGpuProgram->setParameter("target", profiles);
         pGpuProgram->setParameter("enable_backwards_compatibility", "true");
         pGpuProgram->setParameter("column_major_matrices", StringConverter::toString(shaderProgram->getUseColumnMajorMatrices()));
     }
-    
-    pGpuProgram->setParameter("profiles", profiles);
-    pGpuProgram->load();
-
-    // Case an error occurred.
-    if (pGpuProgram->hasCompileError())
+    else if (language == "glsl")
     {
-        //! [debug_break]
-        pGpuProgram.reset();
-        //! [debug_break]
-        return GpuProgramPtr(pGpuProgram);
+        auto* rs = Root::getSingleton().getRenderSystem();
+        if( rs && rs->getNativeShadingLanguageVersion() >= 420)
+            pGpuProgram->setParameter("has_sampler_binding", "true");
     }
+
+    pGpuProgram->load();
 
     // Add the created GPU program to local cache.
     if (pGpuProgram->getType() == GPT_VERTEX_PROGRAM)
@@ -395,25 +313,23 @@ String ProgramManager::generateHash(const String& programString, const String& d
 
 
 //-----------------------------------------------------------------------------
-void ProgramManager::addProgramProcessor(ProgramProcessor* processor)
+void ProgramManager::addProgramProcessor(const String& lang, ProgramProcessor* processor)
 {
     
-    ProgramProcessorIterator itFind = mProgramProcessorsMap.find(processor->getTargetLanguage());
+    ProgramProcessorIterator itFind = mProgramProcessorsMap.find(lang);
 
     if (itFind != mProgramProcessorsMap.end())
     {
-        OGRE_EXCEPT(Exception::ERR_DUPLICATE_ITEM,
-            "A processor for language '" + processor->getTargetLanguage() + "' already exists.",
-            "ProgramManager::addProgramProcessor");
-    }       
+        OGRE_EXCEPT(Exception::ERR_DUPLICATE_ITEM, "A processor for language '" + lang + "' already exists.");
+    }
 
-    mProgramProcessorsMap[processor->getTargetLanguage()] = processor;
+    mProgramProcessorsMap[lang] = processor;
 }
 
 //-----------------------------------------------------------------------------
-void ProgramManager::removeProgramProcessor(ProgramProcessor* processor)
+void ProgramManager::removeProgramProcessor(const String& lang)
 {
-    ProgramProcessorIterator itFind = mProgramProcessorsMap.find(processor->getTargetLanguage());
+    ProgramProcessorIterator itFind = mProgramProcessorsMap.find(lang);
 
     if (itFind != mProgramProcessorsMap.end())
         mProgramProcessorsMap.erase(itFind);
@@ -423,61 +339,49 @@ void ProgramManager::removeProgramProcessor(ProgramProcessor* processor)
 //-----------------------------------------------------------------------------
 void ProgramManager::destroyGpuProgram(GpuProgramPtr& gpuProgram)
 {       
-    HighLevelGpuProgramPtr res           = dynamic_pointer_cast<HighLevelGpuProgram>(gpuProgram);
-
-    if (res)
-    {
-        HighLevelGpuProgramManager::getSingleton().remove(res);
-    }
+    GpuProgramManager::getSingleton().remove(gpuProgram);
 }
 
 //-----------------------------------------------------------------------
 void ProgramManager::synchronizePixelnToBeVertexOut( ProgramSet* programSet )
 {
-    Program* vsProgram = programSet->getCpuProgram(GPT_VERTEX_PROGRAM);
-    Program* psProgram = programSet->getCpuProgram(GPT_FRAGMENT_PROGRAM);
+    Function* vertexMain = programSet->getCpuProgram(GPT_VERTEX_PROGRAM)->getMain();
+    Function* pixelMain = programSet->getCpuProgram(GPT_FRAGMENT_PROGRAM)->getMain();
 
-    // first find the vertex shader
-    ShaderFunctionConstIterator itFunction ;
-    Function* vertexMain = vsProgram->getEntryPointFunction();
-    Function* pixelMain = psProgram->getEntryPointFunction();;
+    // save the pixel program original input parameters
+    auto pixelOriginalInParams = pixelMain->getInputParameters();
 
-    if(pixelMain)
+    // set the pixel Input to be the same as the vertex prog output
+    pixelMain->deleteAllInputParameters();
+
+    // Loop the vertex shader output parameters and make sure that
+    //   all of them exist in the pixel shader input.
+    // If the parameter type exist in the original output - use it
+    // If the parameter doesn't exist - use the parameter from the
+    //   vertex shader input.
+    // The order will be based on the vertex shader parameters order
+    // Write output parameters.
+    for (const auto& curOutParemter : vertexMain->getOutputParameters())
     {
-        // save the pixel program original input parameters
-        const ShaderParameterList pixelOriginalInParams = pixelMain->getInputParameters();
+        ParameterPtr paramToAdd = Function::_getParameterBySemantic(
+            pixelOriginalInParams, curOutParemter->getSemantic(), curOutParemter->getIndex());
 
-        // set the pixel Input to be the same as the vertex prog output
-        pixelMain->deleteAllInputParameters();
+        pixelOriginalInParams.erase(
+            std::remove(pixelOriginalInParams.begin(), pixelOriginalInParams.end(), paramToAdd),
+            pixelOriginalInParams.end());
 
-        // Loop the vertex shader output parameters and make sure that
-        //   all of them exist in the pixel shader input.
-        // If the parameter type exist in the original output - use it
-        // If the parameter doesn't exist - use the parameter from the 
-        //   vertex shader input.
-        // The order will be based on the vertex shader parameters order 
-        // Write output parameters.
-        ShaderParameterConstIterator it;
-        if(vertexMain)
+        if (!paramToAdd)
         {
-            const ShaderParameterList& outParams = vertexMain->getOutputParameters();
-            for (it=outParams.begin(); it != outParams.end(); ++it)
-            {
-                ParameterPtr curOutParemter = *it;
-                ParameterPtr paramToAdd = Function::_getParameterBySemantic(
-                    pixelOriginalInParams, 
-                    curOutParemter->getSemantic(), 
-                    curOutParemter->getIndex());
-
-                if (!paramToAdd)
-                {
-                    // param not found - we will add the one from the vertex shader
-                    paramToAdd = curOutParemter; 
-                }
-
-                pixelMain->addInputParameter(paramToAdd);
-            }
+            // param not found - we will add the one from the vertex shader
+            paramToAdd = curOutParemter;
         }
+
+        pixelMain->addInputParameter(paramToAdd);
+    }
+
+    for(const auto& paramToAdd : pixelOriginalInParams)
+    {
+        pixelMain->addInputParameter(paramToAdd);
     }
 }
 

@@ -42,7 +42,7 @@ namespace Ogre
     /** \addtogroup Core
     *  @{
     */
-    /** \addtogroup General
+    /** \addtogroup Script
     *  @{
     */
     /** These enums hold the types of the concrete parsed nodes */
@@ -219,10 +219,6 @@ namespace Ogre
         bool compile(const String &str, const String &source, const String &group);
         /// Compiles resources from the given concrete node list
         bool compile(const ConcreteNodeListPtr &nodes, const String &group);
-        /// @deprecated
-        OGRE_DEPRECATED AbstractNodeListPtr _generateAST(const String &str, const String &source, bool doImports = false, bool doObjects = false, bool doVariables = false);
-        /// @deprecated
-        OGRE_DEPRECATED bool _compile(AbstractNodeListPtr nodes, const String &group, bool doImports = true, bool doObjects = true, bool doVariables = true);
         /// Adds the given error to the compiler's list of errors
         void addError(uint32 code, const String &file, int line, const String &msg = "");
         /// Sets the listener used by the compiler
@@ -459,7 +455,7 @@ namespace Ogre
     };
 
     /// @deprecated do not use
-    class _OgreExport PreApplyTextureAliasesScriptCompilerEvent : public ScriptCompilerEvent
+    class OGRE_DEPRECATED _OgreExport PreApplyTextureAliasesScriptCompilerEvent : public ScriptCompilerEvent
     {
     public:
         Material *mMaterial;
@@ -524,21 +520,7 @@ namespace Ogre
     };
 
     /// @deprecated use CreateGpuProgramScriptCompilerEvent
-    class _OgreExport CreateHighLevelGpuProgramScriptCompilerEvent : public CreateGpuProgramScriptCompilerEvent
-    {
-    public:
-        String mLanguage;
-        static String eventType;
-
-        CreateHighLevelGpuProgramScriptCompilerEvent(const String& file, const String& name,
-                                                     const String& resourceGroup, const String& source,
-                                                     const String& language, GpuProgramType programType)
-            : CreateGpuProgramScriptCompilerEvent(file, name, resourceGroup, source, language, programType),
-              mLanguage(language)
-        {
-            mType = eventType; // override
-        }
-    };
+    typedef OGRE_DEPRECATED CreateGpuProgramScriptCompilerEvent CreateHighLevelGpuProgramScriptCompilerEvent;
 
     class _OgreExport CreateGpuSharedParametersScriptCompilerEvent : public ScriptCompilerEvent
     {
@@ -845,8 +827,7 @@ namespace Ogre
             ID_DEPTH_FAIL_OP,
             ID_PASS_OP,
             ID_TWO_SIDED,
-            ID_READ_BACK_AS_TEXTURE,
-        // Suport for shader model 5.0
+        // Support for shader model 5.0
         // More program IDs
         ID_TESSELLATION_HULL_PROGRAM,
         ID_TESSELLATION_DOMAIN_PROGRAM,
@@ -860,9 +841,6 @@ namespace Ogre
         ID_TESSELLATION_DOMAIN,
         ID_COMPUTE,
 
-        // Support for subroutine
-        ID_SUBROUTINE,
-
         // added during 1.11. re-sort for 1.12
         ID_LINE_WIDTH,
         ID_SAMPLER,
@@ -870,6 +848,8 @@ namespace Ogre
         ID_THREAD_GROUPS,
         ID_RENDER_CUSTOM,
         ID_AUTO,
+        ID_CAMERA,
+        ID_ALIGN_TO_FACE,
 
         ID_END_BUILTIN_IDS
     };

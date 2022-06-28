@@ -31,7 +31,6 @@ THE SOFTWARE.
 #include "OgreInstanceBatchHW_VTF.h"
 #include "OgreInstanceBatchShader.h"
 #include "OgreInstanceBatchVTF.h"
-#include "OgreIteratorWrappers.h"
 
 namespace Ogre
 {
@@ -78,36 +77,21 @@ namespace Ogre
     //----------------------------------------------------------------------
     void InstanceManager::setInstancesPerBatch( size_t instancesPerBatch )
     {
-        if( !mInstanceBatches.empty() )
-        {
-            OGRE_EXCEPT(Exception::ERR_INVALID_STATE, "Instances per batch can only be changed before"
-                        " building the batch.", "InstanceManager::setInstancesPerBatch");
-        }
-
+        OgreAssert(mInstanceBatches.empty(), "can only be changed before building the batch");
         mInstancesPerBatch = instancesPerBatch;
     }
 
     //----------------------------------------------------------------------
     void InstanceManager::setMaxLookupTableInstances( size_t maxLookupTableInstances )
     {
-        if( !mInstanceBatches.empty() )
-        {
-            OGRE_EXCEPT(Exception::ERR_INVALID_STATE, "Instances per batch can only be changed before"
-                " building the batch.", "InstanceManager::setMaxLookupTableInstances");
-        }
-
+        OgreAssert(mInstanceBatches.empty(), "can only be changed before building the batch");
         mMaxLookupTableInstances = maxLookupTableInstances;
     }
     
     //----------------------------------------------------------------------
     void InstanceManager::setNumCustomParams( unsigned char numCustomParams )
     {
-        if( !mInstanceBatches.empty() )
-        {
-            OGRE_EXCEPT(Exception::ERR_INVALID_STATE, "setNumCustomParams can only be changed before"
-                " building the batch.", "InstanceManager::setNumCustomParams");
-        }
-
+        OgreAssert(mInstanceBatches.empty(), "can only be changed before building the batch");
         mNumCustomParams = numCustomParams;
     }
     //----------------------------------------------------------------------
@@ -262,6 +246,7 @@ namespace Ogre
             mInstancesPerBatch = std::min( maxInstPerBatch, mInstancesPerBatch );
             batch->_setInstancesPerBatch( mInstancesPerBatch );
 
+            OgreAssert(mInstancesPerBatch, "unsupported instancing technique");
             //TODO: Create a "merge" function that merges all submeshes into one big submesh
             //instead of just sending submesh #0
 
@@ -439,6 +424,10 @@ namespace Ogre
         //Return default
         return BatchSettings().setting[id];
     }
+    bool InstanceManager::hasSettings(const String& materialName) const
+    {
+        return mBatchSettings.find(materialName) != mBatchSettings.end();
+    }
     //-----------------------------------------------------------------------
     void InstanceManager::applySettingToBatches( BatchSettingId id, bool value,
                                                  const InstanceBatchVec &container )
@@ -510,7 +499,7 @@ namespace Ogre
     typedef std::map<uint32, uint32> IndicesMap;
 
     template< typename TIndexType >
-    IndicesMap getUsedIndices(IndexData* idxData)
+    void collectUsedIndices(IndicesMap& indicesMap, IndexData* idxData)
     {
         HardwareBufferLockGuard indexLock(idxData->indexBuffer,
                                           idxData->indexStart * sizeof(TIndexType),
@@ -518,33 +507,40 @@ namespace Ogre
                                           HardwareBuffer::HBL_READ_ONLY);
         TIndexType *data = (TIndexType*)indexLock.pData;
 
-        IndicesMap indicesMap;
-        for (size_t i = 0; i < idxData->indexCount; i++) 
+        for (size_t i = 0; i < idxData->indexCount; i++)
         {
             TIndexType index = data[i];
-            if (indicesMap.find(index) == indicesMap.end()) 
+            if (indicesMap.find(index) == indicesMap.end())
             {
                 //We need to guarantee that the size is read before an entry is added, hence these are on separate lines.
                 uint32 size = (uint32)(indicesMap.size());
                 indicesMap[index] = size;
             }
         }
-
-        return indicesMap;
     }
     //-----------------------------------------------------------------------
     template< typename TIndexType >
-    void copyIndexBuffer(IndexData* idxData, IndicesMap& indicesMap)
+    void copyIndexBuffer(IndexData* idxData, const IndicesMap& indicesMap, size_t indexStart)
     {
+        size_t start = std::max(indexStart, idxData->indexStart);
+        size_t count = idxData->indexCount - (start - idxData->indexStart);
+
+        //We get errors if we try to lock a zero size buffer.
+        if (count == 0) {
+            return;
+        }
         HardwareBufferLockGuard indexLock(idxData->indexBuffer,
-                                          idxData->indexStart * sizeof(TIndexType),
-                                          idxData->indexCount * sizeof(TIndexType),
+                                          start * sizeof(TIndexType),
+                                          count * sizeof(TIndexType),
                                           HardwareBuffer::HBL_NORMAL);
         TIndexType *data = (TIndexType*)indexLock.pData;
 
-        for (uint32 i = 0; i < idxData->indexCount; i++) 
+        for (size_t i = 0; i < count; i++)
         {
-            data[i] = (TIndexType)indicesMap[data[i]];
+            //Access data and write on two separate lines, to avoid compiler confusion.
+            auto originalPos = data[i];
+            auto indexEntry = indicesMap.find(originalPos);
+            data[i] = (TIndexType)(indexEntry->second);
         }
     }
     //-----------------------------------------------------------------------
@@ -565,8 +561,22 @@ namespace Ogre
 
             IndexData *indexData = subMesh->indexData;
             HardwareIndexBuffer::IndexType idxType = indexData->indexBuffer->getType();
-            IndicesMap indicesMap = (idxType == HardwareIndexBuffer::IT_16BIT) ? getUsedIndices<uint16>(indexData) :
-                                                                                 getUsedIndices<uint32>(indexData);
+            IndicesMap indicesMap;
+            if (idxType == HardwareIndexBuffer::IT_16BIT) {
+                collectUsedIndices<uint16>(indicesMap, indexData);
+            } else {
+                collectUsedIndices<uint32>(indicesMap, indexData);
+            }
+
+            //Also collect indices for all LOD faces.
+            for (auto& lodIndex : subMesh->mLodFaceList) {
+                //Typically the LOD indices would use the same buffer type as the main index. But we'll check to make extra sure.
+                if (lodIndex->indexBuffer->getType() == HardwareIndexBuffer::IT_16BIT) {
+                    collectUsedIndices<uint16>(indicesMap, lodIndex);
+                } else {
+                    collectUsedIndices<uint32>(indicesMap, lodIndex);
+                }
+            }
 
 
             VertexData *newVertexData = new VertexData();
@@ -597,12 +607,35 @@ namespace Ogre
 
             if (idxType == HardwareIndexBuffer::IT_16BIT)
             {
-                copyIndexBuffer<uint16>(indexData, indicesMap);
+                copyIndexBuffer<uint16>(indexData, indicesMap, 0);
             }
             else
             {
-                copyIndexBuffer<uint32>(indexData, indicesMap);
+                copyIndexBuffer<uint32>(indexData, indicesMap, 0);
             }
+
+            //Need to adjust all of the LOD faces too.
+            size_t lastIndexEnd = 0;
+            for (size_t i = 0; i < subMesh->mLodFaceList.size(); ++i) {
+				auto lodIndex = subMesh->mLodFaceList[i];
+				//When using "generated" mesh lods, the indices are shared, so that index[n] would overlap with
+				//index[n]. We need to take this into account to make sure we don't process data twice (with incorrect
+				//data as a result). We check if the index either is the first one, or if it has a different buffer
+				//than the previous one we processed. Since the overlap seems to be progressing we only need to keep
+				// track of the last used index.
+                if (i == 0 || lodIndex->indexBuffer != subMesh->mLodFaceList[i - 1]->indexBuffer) {
+                    lastIndexEnd = 0;
+                }
+
+                //Typically the LOD indices would use the same buffer type as the main index. But we'll check to make extra sure.
+                if (lodIndex->indexBuffer->getType() == HardwareIndexBuffer::IT_16BIT) {
+                    copyIndexBuffer<uint16>(lodIndex, indicesMap, lastIndexEnd);
+                } else {
+                    copyIndexBuffer<uint32>(lodIndex, indicesMap, lastIndexEnd);
+                }
+                lastIndexEnd = lodIndex->indexStart + lodIndex->indexCount;
+
+			}
 
             // Store new attributes
             subMesh->useSharedVertices = false;
@@ -627,6 +660,21 @@ namespace Ogre
         delete mesh->sharedVertexData;
         mesh->sharedVertexData = NULL;
         mesh->clearBoneAssignments();
+
+        if( mesh->isEdgeListBuilt() )
+        {
+            mesh->freeEdgeList();
+            mesh->buildEdgeList();
+        }
     }
     //-----------------------------------------------------------------------
+    InstanceManager::InstanceBatchIterator InstanceManager::getInstanceBatchIterator( const String &materialName ) const
+    {
+        InstanceBatchMap::const_iterator it = mInstanceBatches.find( materialName );
+        if(it != mInstanceBatches.end())
+            return InstanceBatchIterator( it->second.begin(), it->second.end() );
+
+        OGRE_EXCEPT(Exception::ERR_INVALID_STATE, "Cannot create instance batch iterator. "
+                    "Material " + materialName + " cannot be found");
+    }
 }

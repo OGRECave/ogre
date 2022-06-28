@@ -59,9 +59,8 @@ SubRenderState* SGScriptTranslator::getGeneratedSubRenderState(const String& typ
     if (mGeneratedRenderState)
     {
         /** Get the list of the template sub render states composing this render state. */
-        const SubRenderStateList& rsList =
-            mGeneratedRenderState->getTemplateSubRenderStateList();
-        
+        const SubRenderStateList& rsList = mGeneratedRenderState->getSubRenderStates();
+
         SubRenderStateList::const_iterator it = rsList.begin();
         SubRenderStateList::const_iterator itEnd = rsList.end();
         for(; it != itEnd; ++it)
@@ -90,12 +89,11 @@ void SGScriptTranslator::translateTextureUnit(ScriptCompiler* compiler, const Ab
 
     // Make sure the scheme name is valid - use default if none exists.
     if (dstTechniqueSchemeName.empty()) 
-        dstTechniqueSchemeName = ShaderGenerator::DEFAULT_SCHEME_NAME;  
+        dstTechniqueSchemeName = MSN_SHADERGEN;
 
 
     //check if technique already created
-    techniqueCreated = shaderGenerator->hasShaderBasedTechnique(material->getName(), 
-        material->getGroup(),
+    techniqueCreated = shaderGenerator->hasShaderBasedTechnique(*material,
         technique->getSchemeName(), 
         dstTechniqueSchemeName);
     
@@ -113,9 +111,9 @@ void SGScriptTranslator::translateTextureUnit(ScriptCompiler* compiler, const Ab
     if (techniqueCreated)
     {
         //Attempt to get the render state which might have been created by the pass parsing
-        mGeneratedRenderState = shaderGenerator->getRenderState(dstTechniqueSchemeName, 
-                    material->getName(), material->getGroup(), pass->getIndex());
-    
+        mGeneratedRenderState =
+            shaderGenerator->getRenderState(dstTechniqueSchemeName, *material, pass->getIndex());
+
         // Go over all the render state properties.
         for(AbstractNodeList::iterator i = obj->children.begin(); i != obj->children.end(); ++i)
         {
@@ -158,7 +156,7 @@ void SGScriptTranslator::translatePass(ScriptCompiler* compiler, const AbstractN
 
     // Make sure the scheme name is valid - use default if none exists.
     if (dstTechniqueSchemeName.empty()) 
-        dstTechniqueSchemeName = ShaderGenerator::DEFAULT_SCHEME_NAME;  
+        dstTechniqueSchemeName = MSN_SHADERGEN;
 
 
     // Create the shader based technique.
@@ -190,8 +188,8 @@ void SGScriptTranslator::translatePass(ScriptCompiler* compiler, const AbstractN
                         if (getVector(prop->values.begin(), prop->values.end(), lightCount, 3))
                         {
                             shaderGenerator->createScheme(dstTechniqueSchemeName);
-                            RenderState* renderState = shaderGenerator->getRenderState(dstTechniqueSchemeName, 
-                                material->getName(), material->getGroup(), pass->getIndex());
+                            RenderState* renderState = shaderGenerator->getRenderState(
+                                dstTechniqueSchemeName, *material, pass->getIndex());
 
                             renderState->setLightCount(Vector3i(lightCount.data()));
                             renderState->setLightCountAutoUpdate(false);

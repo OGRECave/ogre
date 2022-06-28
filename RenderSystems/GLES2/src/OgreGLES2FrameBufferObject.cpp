@@ -29,7 +29,7 @@ THE SOFTWARE.
 #include "OgreGLES2FrameBufferObject.h"
 #include "OgreGLES2HardwarePixelBuffer.h"
 #include "OgreGLES2FBORenderTexture.h"
-#include "OgreGLES2DepthBuffer.h"
+#include "OgreGLDepthBufferCommon.h"
 #include "OgreGLUtil.h"
 #include "OgreRoot.h"
 #include "OgreGLES2RenderSystem.h"
@@ -51,27 +51,12 @@ namespace Ogre {
         // Generate framebuffer object
         OGRE_CHECK_GL_ERROR(glGenFramebuffers(1, &mFB));
 
-	   if(rs->getCapabilities()->hasCapability(RSC_DEBUG))
-       {
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
-           OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, mFB)); // to avoid GL_INVALID_OPERATION in glLabelObjectEXT(GL_FRAMEBUFFER,...) on iOS 
-#endif
-           OGRE_CHECK_GL_ERROR(glLabelObjectEXT(GL_FRAMEBUFFER, mFB, 0, ("FBO #" + StringConverter::toString(mFB)).c_str()));
-       }
-
         mNumSamples = std::min(mNumSamples, manager->getMaxFSAASamples());
 
         // Will we need a second FBO to do multisampling?
         if (mNumSamples)
         {
             OGRE_CHECK_GL_ERROR(glGenFramebuffers(1, &mMultisampleFB));
-            if(rs->getCapabilities()->hasCapability(RSC_DEBUG))
-            {
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
-                OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, mMultisampleFB)); // to avoid GL_INVALID_OPERATION in glLabelObjectEXT(GL_FRAMEBUFFER,...) on iOS 
-#endif
-                OGRE_CHECK_GL_ERROR(glLabelObjectEXT(GL_FRAMEBUFFER, mMultisampleFB, 0, ("MSAA FBO #" + StringConverter::toString(mMultisampleFB)).c_str()));
-            }
         }
         else
         {
@@ -154,13 +139,12 @@ namespace Ogre {
         // Bind simple buffer to add colour attachments
         OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, mFB));
 
-        bool isDepth = PixelUtil::isDepth(getFormat());
-
         // Bind all attachment points to frame buffer
         for(unsigned int x = 0; x < maxSupportedMRTs; ++x)
         {
             if(mColour[x].buffer)
             {
+                bool isDepth = PixelUtil::isDepth(mColour[x].buffer->getFormat());
                 if(mColour[x].buffer->getWidth() != width || mColour[x].buffer->getHeight() != height)
                 {
                     StringStream ss;
@@ -183,7 +167,7 @@ namespace Ogre {
         }
 
         // Now deal with depth / stencil
-        if (mMultisampleFB)
+        if (mMultisampleFB && !PixelUtil::isDepth(getFormat()))
         {
             // Bind multisample buffer
             OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, mMultisampleFB));
@@ -213,9 +197,11 @@ namespace Ogre {
                 // Fill attached colour buffers
                 if(mColour[x].buffer)
                 {
-                    bufs[x] = isDepth ? GL_DEPTH_ATTACHMENT : (GL_COLOR_ATTACHMENT0 + x);
+                    bool isDepth = PixelUtil::isDepth(mColour[x].buffer->getFormat());
+                    bufs[x] = isDepth ? GL_NONE : (GL_COLOR_ATTACHMENT0 + x);
                     // Keep highest used buffer + 1
-                    n = x+1;
+                    if(!isDepth)
+                        n = x+1;
                 }
                 else
                 {
@@ -224,8 +210,7 @@ namespace Ogre {
             }
 
             // Drawbuffer extension supported, use it
-            if(!isDepth)
-                OGRE_CHECK_GL_ERROR(glDrawBuffers(n, bufs));
+            OGRE_CHECK_GL_ERROR(glDrawBuffers(n, bufs));
         }
         // Check status
         GLuint status;
@@ -278,29 +263,11 @@ namespace Ogre {
             
             // Generate framebuffer object
             OGRE_CHECK_GL_ERROR(glGenFramebuffers(1, &mFB));
-#ifdef DEBUG
-            if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_DEBUG))
-            {
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
-                OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, mFB)); // to avoid GL_INVALID_OPERATION in glLabelObjectEXT(GL_FRAMEBUFFER,...) on iOS
-#endif
-                OGRE_CHECK_GL_ERROR(glLabelObjectEXT(GL_FRAMEBUFFER, mFB, 0, ("FBO ##" + StringConverter::toString(mFB)).c_str()));
-            }
-#endif
             
             // Will we need a second FBO to do multisampling?
             if (mNumSamples)
             {
                 OGRE_CHECK_GL_ERROR(glGenFramebuffers(1, &mMultisampleFB));
-#ifdef DEBUG
-                if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_DEBUG))
-                {
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
-                    OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, mMultisampleFB)); // to avoid GL_INVALID_OPERATION in glLabelObjectEXT(GL_FRAMEBUFFER,...) on iOS
-#endif
-                    OGRE_CHECK_GL_ERROR(glLabelObjectEXT(GL_FRAMEBUFFER, mMultisampleFB, 0, ("MSAA FBO ##" + StringConverter::toString(mMultisampleFB)).c_str()));
-                }
-#endif
             }
             else
             {
@@ -340,7 +307,7 @@ namespace Ogre {
     {
         bind(true); // recreate FBO if unusable with current context, bind it
 
-        GLES2DepthBuffer *glDepthBuffer = static_cast<GLES2DepthBuffer*>(depthBuffer);
+        auto glDepthBuffer = static_cast<GLDepthBufferCommon*>(depthBuffer);
 
         if( glDepthBuffer )
         {

@@ -33,7 +33,6 @@ THE SOFTWARE.
 
 namespace Ogre {
     //-----------------------------------------------------------------------
-    D3D9HLSLProgram::CmdEntryPoint D3D9HLSLProgram::msCmdEntryPoint;
     D3D9HLSLProgram::CmdTarget D3D9HLSLProgram::msCmdTarget;
     D3D9HLSLProgram::CmdColumnMajorMatrices D3D9HLSLProgram::msCmdColumnMajorMatrices;
     D3D9HLSLProgram::CmdOptimisation D3D9HLSLProgram::msCmdOptimisation;
@@ -41,54 +40,14 @@ namespace Ogre {
     D3D9HLSLProgram::CmdAssemblerCode D3D9HLSLProgram::msCmdAssemblerCode;
     D3D9HLSLProgram::CmdBackwardsCompatibility D3D9HLSLProgram::msCmdBackwardsCompatibility;
 
-    class _OgreD3D9Export HLSLIncludeHandler : public ID3DXInclude
-    {
-    public:
-        HLSLIncludeHandler(Resource* sourceProgram) 
-            : mProgram(sourceProgram) {}
-        ~HLSLIncludeHandler() {}
-        
-        STDMETHOD(Open)(D3DXINCLUDE_TYPE IncludeType,
-            LPCSTR pFileName,
-            LPCVOID pParentData,
-            LPCVOID *ppData,
-            UINT *pByteLen
-            )
-        {
-            // find & load source code
-            DataStreamPtr stream = 
-                ResourceGroupManager::getSingleton().openResource(
-                String(pFileName), mProgram->getGroup(), true, mProgram);
-
-            String source = stream->getAsString();
-            // copy into separate c-string
-            // Note - must NOT copy the null terminator, otherwise this will terminate
-            // the entire program string!
-            *pByteLen = static_cast<UINT>(source.length());
-            char* pChar = OGRE_ALLOC_T(char, *pByteLen, MEMCATEGORY_RESOURCE);
-            memcpy(pChar, source.c_str(), *pByteLen);
-            *ppData = pChar;
-
-            return S_OK;
-        }
-
-        STDMETHOD(Close)(LPCVOID pData)
-        {           
-            OGRE_FREE(pData, MEMCATEGORY_RESOURCE);
-            return S_OK;
-        }
-    protected:
-        Resource* mProgram;
-
-
-    };
-
     //-----------------------------------------------------------------------
     void D3D9HLSLProgram::prepareImpl()
     {
         HighLevelGpuProgram::prepareImpl();
 
-        uint32 hash = _getHash();
+        mSyntaxCode = getTarget();
+        uint32 seed = FastHash(mSyntaxCode.c_str(), mSyntaxCode.length());
+        uint32 hash = _getHash(seed);
         if ( GpuProgramManager::getSingleton().isMicrocodeAvailableInCache(hash) )
         {
             getMicrocodeFromCache(hash);
@@ -142,29 +101,39 @@ namespace Ogre {
             cacheMicrocode->read( &def,  sizeof(GpuConstantDefinition));
 
             mParametersMap.emplace(paramName, def);
+
+            mLogicalToPhysical->bufferSize += def.elementSize * def.arraySize;
         }
     }
     //-----------------------------------------------------------------------
+    const String& D3D9HLSLProgram::getTarget() const
+    {
+        if(mSyntaxCode == "hlsl")
+        {
+            static String vs_2_0 = "vs_2_0", ps_2_0 = "ps_2_0";
+            return mType == GPT_VERTEX_PROGRAM ? vs_2_0 : ps_2_0;
+        }
+
+        return mSyntaxCode;
+    }
+
     void D3D9HLSLProgram::compileMicrocode(void)
     {
         // Populate preprocessor defines
         String stringBuffer;
         std::vector<D3DXMACRO> defines;
         const D3DXMACRO* pDefines = 0;
-        if (!mPreprocessorDefines.empty())
+        stringBuffer = appendBuiltinDefines(mPreprocessorDefines);
+
+        for(const auto& def : parseDefines(stringBuffer))
         {
-            stringBuffer = mPreprocessorDefines;
-
-            for(const auto& def : parseDefines(stringBuffer))
-            {
-                defines.push_back({def.first, def.second});
-            }
-
-            // Add NULL terminator
-            defines.push_back({0, 0});
-
-            pDefines = &defines[0];
+            defines.push_back({def.first, def.second});
         }
+
+        // Add NULL terminator
+        defines.push_back({0, 0});
+
+        pDefines = &defines[0];
 
         // Populate compile flags
         DWORD compileFlags = 0;
@@ -203,8 +172,8 @@ namespace Ogre {
 
         LPD3DXBUFFER errors = 0;
 
-        // include handler
-        HLSLIncludeHandler includeHandler(this);
+        // handle includes
+        mSource = _resolveIncludes(mSource, this, mFilename, true);
 
         LPD3DXCONSTANTTABLE pConstTable;
 
@@ -213,9 +182,9 @@ namespace Ogre {
             mSource.c_str(),
             static_cast<UINT>(mSource.length()),
             pDefines,
-            &includeHandler, 
+            NULL,
             mEntryPoint.c_str(),
-            mTarget.c_str(),
+            mSyntaxCode.c_str(),
             compileFlags,
             &mMicroCode,
             &errors,
@@ -308,14 +277,14 @@ namespace Ogre {
     {
         if (!mCompileError)
         {
-            // Create a low-level program, give it the same name as us
+            // Create a low-level program
             mAssemblerProgram = 
-                GpuProgramManager::getSingleton().createProgramFromString(
-                    mName, 
+                GpuProgramManager::getSingleton().createProgram(
+                    mName+"/Delegate",
                     mGroup,
-                    "",// dummy source, since we'll be using microcode
-                    mType, 
-                    mTarget);
+                    getTarget(),
+                    mType);
+            mAssemblerProgram->setSource("");
             static_cast<D3D9GpuProgram*>(mAssemblerProgram.get())->setExternalMicrocode(mMicroCode);
         }
 
@@ -328,10 +297,9 @@ namespace Ogre {
         SAFE_RELEASE(mMicroCode);
     }
     //-----------------------------------------------------------------------
-    void D3D9HLSLProgram::buildConstantDefinitions() const
+    void D3D9HLSLProgram::buildConstantDefinitions()
     {
-        mConstantDefs->floatBufferSize = mFloatLogicalToPhysical->bufferSize;
-        mConstantDefs->intBufferSize = mIntLogicalToPhysical->bufferSize;
+        mConstantDefs->bufferSize = mLogicalToPhysical->bufferSize;
 
         GpuConstantDefinitionMap::const_iterator iter = mParametersMap.begin();
         GpuConstantDefinitionMap::const_iterator iterE = mParametersMap.end();
@@ -342,20 +310,9 @@ namespace Ogre {
             mConstantDefs->map.emplace(iter->first, iter->second);
 
             // Record logical / physical mapping
-            if (def.isFloat())
-            {
-                            OGRE_LOCK_MUTEX(mFloatLogicalToPhysical->mutex);
-                mFloatLogicalToPhysical->map.emplace(def.logicalIndex,
-                        GpuLogicalIndexUse(def.physicalIndex, def.arraySize * def.elementSize, GPV_GLOBAL));
-                mFloatLogicalToPhysical->bufferSize += def.arraySize * def.elementSize;
-            }
-            else
-            {
-                            OGRE_LOCK_MUTEX(mIntLogicalToPhysical->mutex);
-                mIntLogicalToPhysical->map.emplace(def.logicalIndex,
-                        GpuLogicalIndexUse(def.physicalIndex, def.arraySize * def.elementSize, GPV_GLOBAL));
-                mIntLogicalToPhysical->bufferSize += def.arraySize * def.elementSize;
-            }
+            OGRE_LOCK_MUTEX(mLogicalToPhysical->mutex);
+            mLogicalToPhysical->map.emplace(def.logicalIndex,
+                    GpuLogicalIndexUse(def.physicalIndex, def.arraySize * def.elementSize, GPV_GLOBAL, def.isFloat() ? BCT_FLOAT : BCT_INT));
         }
         
     }
@@ -412,22 +369,11 @@ namespace Ogre {
                 def.logicalIndex = paramIndex;
                 // populate type, array size & element size
                 populateDef(desc, def);
-                if (def.isFloat())
-                {
-                    def.physicalIndex = mFloatLogicalToPhysical->bufferSize;
-                    OGRE_LOCK_MUTEX(mFloatLogicalToPhysical->mutex);
-                    mFloatLogicalToPhysical->map.emplace(paramIndex,
-                        GpuLogicalIndexUse(def.physicalIndex, def.arraySize * def.elementSize, GPV_GLOBAL));
-                    mFloatLogicalToPhysical->bufferSize += def.arraySize * def.elementSize;
-                }
-                else
-                {
-                    def.physicalIndex = mIntLogicalToPhysical->bufferSize;
-                    OGRE_LOCK_MUTEX(mIntLogicalToPhysical->mutex);
-                    mIntLogicalToPhysical->map.emplace(paramIndex,
-                        GpuLogicalIndexUse(def.physicalIndex, def.arraySize * def.elementSize, GPV_GLOBAL));
-                    mIntLogicalToPhysical->bufferSize += def.arraySize * def.elementSize;
-                }
+                def.physicalIndex = mLogicalToPhysical->bufferSize*4;
+                OGRE_LOCK_MUTEX(mLogicalToPhysical->mutex);
+                mLogicalToPhysical->map.emplace(paramIndex,
+                    GpuLogicalIndexUse(def.physicalIndex, def.arraySize * def.elementSize, GPV_GLOBAL, def.isFloat() ? BCT_FLOAT : BCT_INT));
+                mLogicalToPhysical->bufferSize += def.arraySize * def.elementSize;
 
                 if( mParametersMap.find(name) == mParametersMap.end())
                 {
@@ -588,9 +534,6 @@ namespace Ogre {
             setupBaseParamDictionary();
             ParamDictionary* dict = getParamDictionary();
 
-            dict->addParameter(ParameterDef("entry_point", 
-                "The entry point for the HLSL program.",
-                PT_STRING),&msCmdEntryPoint);
             dict->addParameter(ParameterDef("target", 
                 "Name of the assembler target to compile down to.",
                 PT_STRING),&msCmdTarget);
@@ -627,14 +570,6 @@ namespace Ogre {
         }
     }
     //-----------------------------------------------------------------------
-    bool D3D9HLSLProgram::isSupported(void) const
-    {
-        if (mCompileError || !isRequiredCapabilitiesSupported())
-            return false;
-
-        return GpuProgramManager::getSingleton().isSyntaxSupported(mTarget);
-    }
-    //-----------------------------------------------------------------------
     GpuProgramParametersSharedPtr D3D9HLSLProgram::createParameters(void)
     {
         // Call superclass
@@ -648,24 +583,20 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void D3D9HLSLProgram::setTarget(const String& target)
     {
-        mTarget = "";
         std::vector<String> profiles = StringUtil::split(target, " ");
 
+        // find first supported format
         for(unsigned int i = 0 ; i < profiles.size() ; i++)
         {
             String & currentProfile = profiles[i];
             if(GpuProgramManager::getSingleton().isSyntaxSupported(currentProfile))
             {
-                mTarget = currentProfile;
-                break;
+                mSyntaxCode = currentProfile;
+                return;
             }
         }
 
-        if(mTarget == "")
-        {
-            LogManager::getSingleton().logMessage(
-                "Invalid target for D3D9 shader '" + mName + "' - '" + target + "'");
-        }
+        mSyntaxCode = profiles.front();
     }
 
     //-----------------------------------------------------------------------
@@ -676,15 +607,6 @@ namespace Ogre {
         return language;
     }
     //-----------------------------------------------------------------------
-    //-----------------------------------------------------------------------
-    String D3D9HLSLProgram::CmdEntryPoint::doGet(const void *target) const
-    {
-        return static_cast<const D3D9HLSLProgram*>(target)->getEntryPoint();
-    }
-    void D3D9HLSLProgram::CmdEntryPoint::doSet(void *target, const String& val)
-    {
-        static_cast<D3D9HLSLProgram*>(target)->setEntryPoint(val);
-    }
     //-----------------------------------------------------------------------
     String D3D9HLSLProgram::CmdTarget::doGet(const void *target) const
     {

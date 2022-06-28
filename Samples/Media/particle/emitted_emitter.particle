@@ -27,11 +27,11 @@ particle_system Examples/Fireworks
     {
         name                    explosion
         angle                   180
-        emission_rate           1000
+        emission_rate           100
         time_to_live            2
         direction               0 1 0
         velocity                80
-        duration                0.1
+        duration                -1
         repeat_delay_min        2
         repeat_delay_max        3
     }

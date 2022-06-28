@@ -4,8 +4,8 @@ import android.content.pm.ActivityInfo;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import android.graphics.SurfaceTexture;
 import android.app.Activity;
@@ -111,6 +111,7 @@ public class AndroidTextureOES extends Activity {
                 TextureType.TEX_TYPE_EXTERNAL_OES,
                 1080,
                 1920,
+                1,
                 0,
                 PixelFormat.PF_UNKNOWN
         );
@@ -122,8 +123,7 @@ public class AndroidTextureOES extends Activity {
         final AxisAlignedBox bb = new AxisAlignedBox();
         bb.setInfinite();
 
-        rect = new Rectangle2D(true);
-        rect.setCorners(-1.0f, 1.0f, 1.0f, -1.0f);
+        rect = scnMgr.createScreenSpaceRect(true);
         // 90 deg rotate:
         rect.setUVs(new Vector2(0, 1), new Vector2(1, 1), new Vector2(0, 0), new Vector2(1, 0));
         rect.setMaterial(material);

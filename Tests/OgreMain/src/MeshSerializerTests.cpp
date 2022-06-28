@@ -47,6 +47,7 @@ THE SOFTWARE.
 #include "OgreSkeleton.h"
 #include "OgreKeyFrame.h"
 
+#include <fstream>
 
 //#define I_HAVE_LOT_OF_FREE_TIME
 
@@ -430,7 +431,7 @@ void MeshSerializerTests::assertMeshClone(Mesh* a, Mesh* b, MeshVersion version 
             EXPECT_EQ(bList.at(it->first)->getAnimationType(), it->second->getAnimationType());
             ASSERT_EQ(bList.at(it->first)->getNumKeyFrames(), it->second->getNumKeyFrames());
 
-            for (int j = 0; j < it->second->getNumKeyFrames(); j++)
+            for (size_t j = 0; j < it->second->getNumKeyFrames(); j++)
             {
                 VertexPoseKeyFrame* aKeyFrame = it->second->getVertexPoseKeyFrame(j);
                 VertexPoseKeyFrame* bKeyFrame = bList.at(it->first)->getVertexPoseKeyFrame(j);
@@ -619,7 +620,7 @@ void MeshSerializerTests::getResourceFullPath(const ResourcePtr& resource, Strin
     it = locPtr->begin();
     itEnd = locPtr->end();
     for (; it != itEnd; it++) {
-        if (stricmp(name.c_str(), it->filename.c_str()) == 0) {
+        if (StringUtil::startsWith(name, it->filename)) {
             info = &*it;
             break;
         }

@@ -105,7 +105,7 @@ protected:
         const String& groupName, unsigned short passIndex);
 
             
-protected:
+private:
 
     //Render state created as a result of the current node being parsed
     RenderState* mGeneratedRenderState;

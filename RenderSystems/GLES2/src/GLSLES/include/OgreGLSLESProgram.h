@@ -29,6 +29,7 @@ THE SOFTWARE.
 #define __GLSLESProgram_H__
 
 #include "OgreGLES2Prerequisites.h"
+#include "OgreHighLevelGpuProgramManager.h"
 #include "OgreGLSLShaderCommon.h"
 #include "OgreGLES2ManagedResource.h"
 
@@ -87,7 +88,7 @@ namespace Ogre {
         void unloadHighLevelImpl(void);
 
         /// Populate the passed parameters with name->index map, must be overridden
-        void buildConstantDefinitions() const;
+        void buildConstantDefinitions() override;
         /** check the compile result for an error with default precision - and recompile if needed.
             some glsl compilers return an error default precision is set to types other then
             int or float, this function test a failed compile result for the error,
@@ -108,6 +109,18 @@ namespace Ogre {
         /// The optmised source of the program (may be blank until the shader is optmisied)
         String mOptimisedSource;
 #endif
+    };
+
+    /** Factory class for GLSL ES programs. */
+    class GLSLESProgramFactory : public HighLevelGpuProgramFactory
+    {
+    public:
+        /// Get the name of the language this factory creates programs for
+        const String& getLanguage(void) const;
+        /// Create an instance of GLSLESProgram
+        GpuProgram* create(ResourceManager* creator,
+            const String& name, ResourceHandle handle,
+            const String& group, bool isManual, ManualResourceLoader* loader);
     };
 }
 

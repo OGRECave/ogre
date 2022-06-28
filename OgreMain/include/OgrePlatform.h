@@ -31,7 +31,6 @@ THE SOFTWARE.
 #include "OgreConfig.h"
 #include "OgreExports.h"
 
-namespace Ogre {
 /* Initial platform/compiler-related stuff to set.
 */
 #define OGRE_PLATFORM_WIN32 1
@@ -44,10 +43,7 @@ namespace Ogre {
     
 #define OGRE_COMPILER_MSVC 1
 #define OGRE_COMPILER_GNUC 2
-#define OGRE_COMPILER_BORL 3
-#define OGRE_COMPILER_WINSCW 4
-#define OGRE_COMPILER_GCCE 5
-#define OGRE_COMPILER_CLANG 6
+#define OGRE_COMPILER_CLANG 3
 
 #define OGRE_ENDIAN_LITTLE 1
 #define OGRE_ENDIAN_BIG 2
@@ -55,18 +51,40 @@ namespace Ogre {
 #define OGRE_ARCHITECTURE_32 1
 #define OGRE_ARCHITECTURE_64 2
 
+#define OGRE_CPU_UNKNOWN    0
+#define OGRE_CPU_X86        1
+#define OGRE_CPU_PPC        2
+#define OGRE_CPU_ARM        3
+#define OGRE_CPU_MIPS       4
+
+/* Find CPU type */
+#if defined(__i386__) || defined(__x86_64__) || defined(_M_IX86) || defined(_M_X64) || defined(_M_AMD64)
+#   define OGRE_CPU OGRE_CPU_X86
+#elif defined(__ppc__) || defined(__ppc64__) || defined(_M_PPC)
+#   define OGRE_CPU OGRE_CPU_PPC
+#elif defined(__arm__) || defined(__arm64__) || defined(__aarch64__) || defined(_M_ARM) || defined(_M_ARM64)
+#   define OGRE_CPU OGRE_CPU_ARM
+#elif defined(__mips__) || defined(__mips64) || defined(__mips64_) || defined(_M_MIPS)
+#   define OGRE_CPU OGRE_CPU_MIPS
+#else
+#   define OGRE_CPU OGRE_CPU_UNKNOWN
+#endif
+
+/* Determine CPU endian.
+   We were once in situation when XCode could produce mixed endian fat binary with x86 and ppc archs inside, so it's safer to sniff compiler macros too
+ */
+#if defined(OGRE_CONFIG_BIG_ENDIAN) || (defined(__BYTE_ORDER__) && __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__)
+#    define OGRE_ENDIAN OGRE_ENDIAN_BIG
+#else
+#    define OGRE_ENDIAN OGRE_ENDIAN_LITTLE
+#endif
+
+
 /* Finds the compiler type and version.
 */
 #if (defined( __WIN32__ ) || defined( _WIN32 )) && defined(__ANDROID__) // We are using NVTegra
 #   define OGRE_COMPILER OGRE_COMPILER_GNUC
 #   define OGRE_COMP_VER 470
-#elif defined( __GCCE__ )
-#   define OGRE_COMPILER OGRE_COMPILER_GCCE
-#   define OGRE_COMP_VER _MSC_VER
-//# include <staticlibinit_gcce.h> // This is a GCCE toolchain workaround needed when compiling with GCCE 
-#elif defined( __WINSCW__ )
-#   define OGRE_COMPILER OGRE_COMPILER_WINSCW
-#   define OGRE_COMP_VER _MSC_VER
 #elif defined( _MSC_VER )
 #   define OGRE_COMPILER OGRE_COMPILER_MSVC
 #   define OGRE_COMP_VER _MSC_VER
@@ -80,10 +98,6 @@ namespace Ogre {
 #   define OGRE_COMP_VER (((__GNUC__)*100) + \
         (__GNUC_MINOR__*10) + \
         __GNUC_PATCHLEVEL__)
-#elif defined( __BORLANDC__ )
-#   define OGRE_COMPILER OGRE_COMPILER_BORL
-#   define OGRE_COMP_VER __BCPLUSPLUS__
-#   define __FUNCTION__ __FUNC__ 
 #else
 #   pragma error "No known compiler. Abort! Abort!"
 
@@ -159,8 +173,8 @@ namespace Ogre {
 #   define OGRE_PLATFORM OGRE_PLATFORM_LINUX
 #endif
 
-    /* Find the arch type */
-#if defined(__x86_64__) || defined(_M_X64) || defined(_M_AMD64) || defined(_M_ARM64) || defined(__powerpc64__) || defined(__alpha__) || defined(__ia64__) || defined(__s390__) || defined(__s390x__) || defined(__arm64__) || defined(__aarch64__) || defined(__mips64) || defined(__mips64_)
+/* Find the arch type */
+#if defined(__LP64__) || defined(_WIN64)
 #   define OGRE_ARCH_TYPE OGRE_ARCHITECTURE_64
 #else
 #   define OGRE_ARCH_TYPE OGRE_ARCHITECTURE_32
@@ -250,21 +264,17 @@ namespace Ogre {
 #define DECL_MALLOC __attribute__ ((malloc))
 #endif
 
-// Integer formats of fixed bit width
-typedef unsigned int uint32;
-typedef unsigned short uint16;
-typedef unsigned char uint8;
-typedef int int32;
-typedef short int16;
-typedef signed char int8;
-// define uint64 type
-#if OGRE_COMPILER == OGRE_COMPILER_MSVC
-    typedef unsigned __int64 uint64;
-    typedef __int64 int64;
-#else
-    typedef unsigned long long uint64;
-    typedef long long int64;
-#endif
+#include <stdint.h>
+
+namespace Ogre {
+typedef uint32_t uint32;
+typedef uint16_t uint16;
+typedef uint8_t uint8;
+typedef uint64_t uint64;
+typedef int32_t int32;
+typedef int16_t int16;
+typedef int8_t int8;
+typedef int64_t int64;
 }
 
 #endif

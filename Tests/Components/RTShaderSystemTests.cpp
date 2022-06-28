@@ -29,22 +29,15 @@ THE SOFTWARE.
 #include "RootWithoutRenderSystemFixture.h"
 #include "OgreShaderGenerator.h"
 #include "OgreShaderProgramManager.h"
-
-#include "OgreShaderFFPTransform.h"
-#include "OgreShaderFFPColour.h"
-
 #include "OgreShaderFunctionAtom.h"
 
 using namespace Ogre;
 
 struct RTShaderSystem : public RootWithoutRenderSystemFixture
 {
-    std::unique_ptr<GpuProgramManager> gpuProgMgr;
-
     void SetUp()
     {
         RootWithoutRenderSystemFixture::SetUp();
-        gpuProgMgr.reset(new GpuProgramManager());
 
         RTShader::ShaderGenerator::initialize();
         RTShader::ShaderGenerator::getSingleton().setTargetLanguage("glsl");
@@ -52,7 +45,6 @@ struct RTShaderSystem : public RootWithoutRenderSystemFixture
     void TearDown()
     {
         RTShader::ShaderGenerator::destroy();
-        gpuProgMgr.reset();
         RootWithoutRenderSystemFixture::TearDown();
     }
 };
@@ -63,9 +55,10 @@ TEST_F(RTShaderSystem, createShaderBasedTechnique)
     auto mat = MaterialManager::getSingleton().create("TestMat", RGN_DEFAULT);
 
     EXPECT_TRUE(shaderGen.createShaderBasedTechnique(mat->getTechniques()[0], "MyScheme"));
+    shaderGen.getRenderState("MyScheme")->setLightCountAutoUpdate(false);
 
     EXPECT_EQ(mat->getTechniques().size(), size_t(1));
-    shaderGen.validateMaterial("MyScheme", mat->getName(), mat->getGroup());
+    shaderGen.validateMaterial("MyScheme", *mat);
     EXPECT_EQ(mat->getTechniques().size(), size_t(2));
 
     auto newTech = mat->getTechniques()[1];
@@ -83,11 +76,12 @@ TEST_F(RTShaderSystem, MaterialSerializer)
     auto mat = MaterialManager::getSingleton().create("TestMat", RGN_DEFAULT);
 
     shaderGen.createShaderBasedTechnique(mat->getTechniques()[0], "MyScheme");
+    shaderGen.getRenderState("MyScheme")->setLightCountAutoUpdate(false);
 
-    auto rstate = shaderGen.getRenderState("MyScheme", "TestMat", RGN_DEFAULT, 0);
-    rstate->addTemplateSubRenderState(shaderGen.createSubRenderState<RTShader::FFPColour>());
+    auto rstate = shaderGen.getRenderState("MyScheme", *mat);
+    rstate->addTemplateSubRenderState(shaderGen.createSubRenderState("FFP_Colour"));
 
-    shaderGen.validateMaterial("MyScheme", mat->getName(), mat->getGroup());
+    shaderGen.validateMaterial("MyScheme", *mat);
 
     MaterialSerializer ser;
     ser.addListener(shaderGen.getMaterialSerializerListener());
@@ -101,12 +95,8 @@ TEST_F(RTShaderSystem, TargetRenderState)
     auto pass = mat->getTechniques()[0]->getPasses()[0];
 
     using namespace RTShader;
-    auto& shaderGen = ShaderGenerator::getSingleton();
-
     TargetRenderState targetRenderState;
-    targetRenderState.addSubRenderStateInstance(shaderGen.createSubRenderState<FFPTransform>());
-    targetRenderState.addSubRenderStateInstance(shaderGen.createSubRenderState<FFPColour>());
-
+    targetRenderState.link({"FFP_Transform", "FFP_Colour"}, pass, pass);
     targetRenderState.acquirePrograms(pass);
 
     EXPECT_TRUE(pass->hasGpuProgram(GPT_VERTEX_PROGRAM));

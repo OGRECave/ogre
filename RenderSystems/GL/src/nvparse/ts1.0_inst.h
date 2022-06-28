@@ -3,7 +3,10 @@
 
 #define TSP_MAX_ARGS 7
 #define TSP_NUM_TEXTURE_UNITS 4
-#include "OgreGLPrerequisites.h"
+#ifdef _WIN32
+#include <windows.h>
+#endif
+#include <glad/glad.h>
 #ifdef _WIN32
 # define BYTE_ORDER !BIG_ENDIAN
 #endif

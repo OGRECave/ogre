@@ -129,7 +129,7 @@ void LodOutputProviderBuffer::inject()
                 if(n > 0 && buffers[n-1].indexBuffer == buff.indexBuffer){
                     lods.back()->indexBuffer = (*(++lods.rbegin()))->indexBuffer;
                 } else {
-                    lods.back()->indexBuffer = HardwareBufferManager::getSingleton().createIndexBuffer(
+                    lods.back()->indexBuffer = mMesh->getHardwareBufferManager()->createIndexBuffer(
                         buff.indexSize == 2 ?
                         HardwareIndexBuffer::IT_16BIT : HardwareIndexBuffer::IT_32BIT,
                         indexCount, mMesh->getIndexBufferUsage(), mMesh->isIndexBufferShadowed());

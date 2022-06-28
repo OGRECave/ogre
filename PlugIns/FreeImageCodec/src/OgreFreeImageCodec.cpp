@@ -352,7 +352,7 @@ namespace Ogre {
     }
     //---------------------------------------------------------------------
     DataStreamPtr FreeImageCodec::encode(const MemoryDataStreamPtr& input,
-                                         const Codec::CodecDataPtr& pData) const
+                                         const CodecDataPtr& pData) const
     {
         FIBITMAP* fiBitmap = encodeBitmap(input, pData);
 
@@ -381,7 +381,7 @@ namespace Ogre {
     }
     //---------------------------------------------------------------------
     void FreeImageCodec::encodeToFile(const MemoryDataStreamPtr& input, const String& outFileName,
-                                      const Codec::CodecDataPtr& pData) const
+                                      const CodecDataPtr& pData) const
     {
         FIBITMAP* fiBitmap = encodeBitmap(input, pData);
 
@@ -389,7 +389,7 @@ namespace Ogre {
         FreeImage_Unload(fiBitmap);
     }
     //---------------------------------------------------------------------
-    Codec::DecodeResult FreeImageCodec::decode(const DataStreamPtr& input) const
+    ImageCodec::DecodeResult FreeImageCodec::decode(const DataStreamPtr& input) const
     {
         // Buffer stream into memory (TODO: override IO functions instead?)
         MemoryDataStream memStream(input, true);

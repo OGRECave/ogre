@@ -44,14 +44,14 @@ namespace Ogre {
     *  @{
     */
     /** A sphere primitive, mostly used for bounds checking. 
-    @remarks
+
         A sphere in math texts is normally represented by the function
         x^2 + y^2 + z^2 = r^2 (for sphere's centered on the origin). Ogre stores spheres
         simply as a center point and a radius.
     */
     class _OgreExport Sphere
     {
-    protected:
+    private:
         Real mRadius;
         Vector3 mCenter;
     public:

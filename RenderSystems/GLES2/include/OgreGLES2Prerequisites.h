@@ -30,8 +30,6 @@ THE SOFTWARE.
 #define __GLES2Prerequisites_H__
 
 #include "OgrePrerequisites.h"
-#include "OgreLogManager.h"
-#include "OgreMath.h"
 
 #include "OgreGLES2Exports.h"
 #include "OgreGLES2Config.h"
@@ -47,17 +45,12 @@ namespace Ogre {
 #   ifdef __OBJC__
 #       include <OpenGLES/EAGL.h>
 #   endif
-#else
-#   if (OGRE_PLATFORM == OGRE_PLATFORM_WIN32)
-#       if !defined( __MINGW32__ )
-#           define __PRETTY_FUNCTION__ __FUNCTION__
-#           ifndef WIN32_LEAN_AND_MEAN
-#               define WIN32_LEAN_AND_MEAN 1
-#           endif
-#           ifndef NOMINMAX
-#               define NOMINMAX // required to stop windows.h messing up std::min
-#           endif
-#       endif
+#elif (OGRE_PLATFORM == OGRE_PLATFORM_WIN32)
+#   ifndef WIN32_LEAN_AND_MEAN
+#       define WIN32_LEAN_AND_MEAN 1
+#   endif
+#   ifndef NOMINMAX
+#       define NOMINMAX // required to stop windows.h messing up std::min
 #   endif
 #endif
 
@@ -99,27 +92,29 @@ namespace Ogre {
 #define ENABLE_GL_CHECK 0
 
 #if ENABLE_GL_CHECK
+#include "OgreLogManager.h"
 #define OGRE_CHECK_GL_ERROR(glFunc) \
 { \
-        glFunc; \
-        int e = glGetError(); \
-        if (e != 0) \
+    glFunc; \
+    int e = glGetError(); \
+    if (e != 0) \
+    { \
+        const char * errorString = ""; \
+        switch(e) \
         { \
-            const char * errorString = ""; \
-            switch(e) \
-            { \
-            case GL_INVALID_ENUM:       errorString = "GL_INVALID_ENUM";        break; \
-            case GL_INVALID_VALUE:      errorString = "GL_INVALID_VALUE";       break; \
-            case GL_INVALID_OPERATION:  errorString = "GL_INVALID_OPERATION";   break; \
-            case GL_OUT_OF_MEMORY:      errorString = "GL_OUT_OF_MEMORY";       break; \
-            default:                                                            break; \
-            } \
-            char msgBuf[4096]; \
-            StringVector tokens = StringUtil::split(#glFunc, "("); \
-            sprintf(msgBuf, "OpenGL error 0x%04X %s in %s at line %i for %s\n", e, errorString, __PRETTY_FUNCTION__, __LINE__, tokens[0].c_str()); \
-            LogManager::getSingleton().logMessage(msgBuf); \
+        case GL_INVALID_ENUM:       errorString = "GL_INVALID_ENUM";        break; \
+        case GL_INVALID_VALUE:      errorString = "GL_INVALID_VALUE";       break; \
+        case GL_INVALID_OPERATION:  errorString = "GL_INVALID_OPERATION";   break; \
+        case GL_OUT_OF_MEMORY:      errorString = "GL_OUT_OF_MEMORY";       break; \
+        default:                                                            break; \
         } \
-    }
+        String funcname = #glFunc; \
+        funcname = funcname.substr(0, funcname.find('(')); \
+        LogManager::getSingleton().logError(StringUtil::format("%s failed with %s in %s at %s(%d)",          \
+                                                                funcname.c_str(), errorString, __FUNCTION__, \
+                                                                __FILE__, __LINE__));                        \
+    } \
+}
 #else
 #   define OGRE_CHECK_GL_ERROR(glFunc) { glFunc; }
 #endif

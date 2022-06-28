@@ -220,7 +220,7 @@ namespace Ogre {
     };
 
     /** The profiler allows you to measure the performance of your code
-        @remarks
+
             Do not create profiles directly from this unless you want a profile to last
             outside of its scope (i.e. the main game loop). For most cases, use the macro
             OgreProfile(name) and braces to limit the scope. You must enable the Profile
@@ -245,10 +245,10 @@ namespace Ogre {
             Timer* getTimer();
 
             /** Begins a profile
-            @remarks 
+
                 Use the macro OgreProfileBegin(name) instead of calling this directly 
                 so that profiling can be ignored in the release version of your app. 
-            @remarks 
+
                 You only use the macro (or this) if you want a profile to last outside
                 of its scope (i.e. the main game loop). If you use this function, make sure you 
                 use a corresponding OgreProfileEnd(name). Usually you would use the macro 
@@ -260,10 +260,10 @@ namespace Ogre {
             void beginProfile(const String& profileName, uint32 groupID = (uint32)OGREPROF_USER_DEFAULT);
 
             /** Ends a profile
-            @remarks 
+
                 Use the macro OgreProfileEnd(name) instead of calling this directly so that
                 profiling can be ignored in the release version of your app.
-            @remarks
+
                 This function is usually not called directly unless you want a profile to
                 last outside of its scope. In most cases, using the macro OgreProfile(name) 
                 which will call this function automatically when it goes out of scope. Make 
@@ -336,6 +336,7 @@ namespace Ogre {
             @remarks If this is called during a frame, it will be reading the results
             from the previous frame. Therefore, it is best to use this after the frame
             has ended.
+            @param profileName Must be unique and must not be an empty string
             @param limit A number between 0 and 1 representing the percentage of frame time
             @param greaterThan If true, this will return whether the limit is exceeded. Otherwise,
             it will return if the frame time has gone under this limit.
@@ -355,7 +356,7 @@ namespace Ogre {
             uint getUpdateDisplayFrequency() const;
 
             /**
-            @remarks
+
                 Register a ProfileSessionListener from the Profiler
             @param listener
                 A valid listener derived class
@@ -363,7 +364,7 @@ namespace Ogre {
             void addListener(ProfileSessionListener* listener);
 
             /**
-            @remarks
+
                 Unregister a ProfileSessionListener from the Profiler
             @param listener
                 A valid listener derived class
@@ -375,7 +376,7 @@ namespace Ogre {
             /// @copydoc Singleton::getSingleton()
             static Profiler* getSingletonPtr(void);
 
-        protected:
+        private:
             friend class ProfileInstance;
 
             typedef std::vector<ProfileSessionListener*> TProfileSessionListener;
@@ -442,9 +443,9 @@ namespace Ogre {
     }; // end class
 
     /** An individual profile that will be processed by the Profiler
-        @remarks
+
             Use the macro OgreProfile(name) instead of instantiating this profile directly
-        @remarks
+
             We use this Profile to allow scoping rules to signify the beginning and end of
             the profile. Use the Profiler singleton (through the macro OgreProfileBegin(name)
             and OgreProfileEnd(name)) directly if you want a profile to last
@@ -462,7 +463,7 @@ namespace Ogre {
         }
         ~Profile() { Profiler::getSingleton().endProfile(mName, mGroupID); }
 
-    protected:
+    private:
         /// The name of this profile
         String mName;
         /// The group ID

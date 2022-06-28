@@ -56,7 +56,6 @@ public:
 		, mTerrainPagedWorldSection(0)
 		, mPerlinNoiseTerrainGenerator(0)
         , mLodStatus(false)
-		, mAutoLod(true)
 		, mFly(true)
 		, mFallVelocity(0)
         , mTerrainPos(0,0,0)
@@ -71,25 +70,6 @@ public:
 		mInfo["Help"] = "Left click and drag anywhere in the scene to look around. Let go again to show "
 			"cursor and access widgets. Use WASD keys to move. You can increase/decrease terrains' LOD level using Page Up/Page Down."
 			"Use C to generate another random terrain";
-	}
-
-    void testCapabilities(const RenderSystemCapabilities* caps)
-	{
-        if (!caps->hasCapability(RSC_VERTEX_PROGRAM) || !caps->hasCapability(RSC_FRAGMENT_PROGRAM))
-        {
-			OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Your graphics card does not support vertex or fragment shaders, "
-                        "so you cannot run this sample. Sorry!", "Sample_EndlessWorld::testCapabilities");
-        }
-	}
-    
-	StringVector getRequiredPlugins()
-	{
-		StringVector names;
-		if(!GpuProgramManager::getSingleton().isSyntaxSupported("glsles")
-		&& !GpuProgramManager::getSingleton().isSyntaxSupported("glsl")
-		&& !GpuProgramManager::getSingleton().isSyntaxSupported("hlsl"))
-            names.push_back("Cg Program Manager");
-		return names;
 	}
 
     bool frameRenderingQueued(const FrameEvent& evt)
@@ -129,10 +109,9 @@ public:
 			}
 			mLodStatusLabelList.clear();
 
-			TerrainGroup::TerrainIterator ti = mTerrainGroup->getTerrainIterator();
-			while(ti.hasMoreElements())
+			for (const auto& ti : mTerrainGroup->getTerrainSlots())
 			{
-				Terrain* t = ti.getNext()->instance;
+				Terrain* t = ti.second->instance;
 				if (!t)
 					continue;
 
@@ -158,7 +137,7 @@ public:
 			}
 		}
 
-		mTerrainGroup->autoUpdateLodAll(false, Any( Real(HOLD_LOD_DISTANCE) ));
+		mTerrainGroup->autoUpdateLodAll(false, Real(HOLD_LOD_DISTANCE));
 		return SdkSample::frameRenderingQueued(evt);  // don't forget the parent updates!
     }
 
@@ -170,11 +149,9 @@ public:
 		case SDLK_PAGEUP:
 			{
 				mAutoBox->setChecked(false);
-				TerrainGroup::TerrainIterator ti = mTerrainGroup->getTerrainIterator();
-				while(ti.hasMoreElements())
+				for (const auto& ti : mTerrainGroup->getTerrainSlots())
 				{
-					Terrain* t = ti.getNext()->instance;
-					if (t)
+					if(Terrain* t = ti.second->instance)
 						t->increaseLodLevel();
 				}
 			}
@@ -182,11 +159,9 @@ public:
 		case SDLK_PAGEDOWN:
 			{
 				mAutoBox->setChecked(false);
-				TerrainGroup::TerrainIterator ti = mTerrainGroup->getTerrainIterator();
-				while(ti.hasMoreElements())
+				for (const auto& ti : mTerrainGroup->getTerrainSlots())
 				{
-					Terrain* t = ti.getNext()->instance;
-					if (t)
+					if(Terrain* t = ti.second->instance)
 						t->decreaseLodLevel();
 				}
 			}
@@ -199,13 +174,10 @@ public:
 				mPerlinNoiseTerrainGenerator->randomize();
 
 				// reload all terrains
-				TerrainGroup::TerrainIterator ti = mTerrainGroup->getTerrainIterator();
-				while(ti.hasMoreElements())
+				for (const auto& ti : mTerrainGroup->getTerrainSlots())
 				{
-					TerrainGroup::TerrainSlot* slot = ti.getNext();
-					PageID pageID = mTerrainGroup->packIndex( slot->x, slot->y );
-					mTerrainPagedWorldSection->unloadPage(pageID);
-					mTerrainPagedWorldSection->loadPage(pageID);
+					mTerrainPagedWorldSection->unloadPage(ti.first);
+					mTerrainPagedWorldSection->loadPage(ti.first);
 				}
 			}
 			break;
@@ -240,16 +212,8 @@ public:
 		{
 			if(mTerrainGroup)
 			{
-				if(!mAutoLod && mAutoBox->isChecked())
-				{
-					mTerrainGroup->setAutoUpdateLod( TerrainAutoUpdateLodFactory::getAutoUpdateLod(BY_DISTANCE) );
-					mAutoLod = true;
-				}
-				else if(mAutoLod && !mAutoBox->isChecked())
-				{
-					mTerrainGroup->setAutoUpdateLod( TerrainAutoUpdateLodFactory::getAutoUpdateLod(BY_DISTANCE) );
-					mAutoLod = false;
-				}
+				auto strategy = mAutoBox->isChecked() ? BY_DISTANCE : NONE;
+				mTerrainGroup->setAutoUpdateLod(TerrainAutoUpdateLodFactory::getAutoUpdateLod(strategy));
 			}
 		}
 	}
@@ -264,7 +228,6 @@ protected:
 	TerrainPagedWorldSection* mTerrainPagedWorldSection;
 	PerlinNoiseTerrainGenerator* mPerlinNoiseTerrainGenerator;
 	bool mLodStatus;
-	bool mAutoLod;
 
 	/// This class just pretends to provide procedural page content to avoid page loading
 	class DummyPageProvider : public PageProvider
@@ -313,16 +276,10 @@ protected:
 		defaultimp.minBatchSize = 33;
 		defaultimp.maxBatchSize = 65;
 		// textures
-		defaultimp.layerList.resize(3);
-		defaultimp.layerList[0].worldSize = 100;
-		defaultimp.layerList[0].textureNames.push_back("dirt_grayrocky_diffusespecular.dds");
-		defaultimp.layerList[0].textureNames.push_back("dirt_grayrocky_normalheight.dds");
-		defaultimp.layerList[1].worldSize = 30;
-		defaultimp.layerList[1].textureNames.push_back("grass_green-01_diffusespecular.dds");
-		defaultimp.layerList[1].textureNames.push_back("grass_green-01_normalheight.dds");
-		defaultimp.layerList[2].worldSize = 200;
-		defaultimp.layerList[2].textureNames.push_back("growth_weirdfungus-03_diffusespecular.dds");
-		defaultimp.layerList[2].textureNames.push_back("growth_weirdfungus-03_normalheight.dds");
+		defaultimp.layerList.resize(1);
+		defaultimp.layerList[0].worldSize = 200;
+		defaultimp.layerList[0].textureNames.push_back("Ground37_diffspec.dds");
+		defaultimp.layerList[0].textureNames.push_back("Ground37_normheight.dds");
 	}
 
 	/*-----------------------------------------------------------------------------
@@ -342,10 +299,7 @@ protected:
 		mCamera->setNearClipDistance(0.1);
 		mCamera->setFarClipDistance(50000);
 
-		if (mRoot->getRenderSystem()->getCapabilities()->hasCapability(RSC_INFINITE_FAR_PLANE))
-        {
-            mCamera->setFarClipDistance(0);   // enable infinite far clip distance if we can
-        }
+		mCamera->setFarClipDistance(0);   // enable infinite far clip distance
 	}
 
 	void setupControls()
@@ -393,7 +347,6 @@ protected:
 	{
 		mTerrainGlobals = OGRE_NEW TerrainGlobalOptions();
 
-		setupControls();
 		mCameraMan->setTopSpeed(100);
 
 		setDragLook(true);
@@ -403,7 +356,7 @@ protected:
 
 		mSceneMgr->setFog(FOG_LINEAR, ColourValue(0.7, 0.7, 0.8), 0, 4000, 10000);
 
-		LogManager::getSingleton().setLogDetail(LL_BOREME);
+		LogManager::getSingleton().setMinLogLevel(LML_TRIVIAL);
 
 		Light* l = mSceneMgr->createLight("tstLight");
 		l->setType(Light::LT_DIRECTIONAL);
@@ -457,6 +410,8 @@ protected:
 
 		mLodInfoOverlay->add2D(mLodInfoOverlayContainer);
 		mLodInfoOverlay->show();
+
+		setupControls();
 	}
 
 	void _shutdown()

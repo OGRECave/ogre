@@ -28,6 +28,7 @@ THE SOFTWARE.
 #include "OgreStableHeaders.h"
 #include "OgreHardwarePixelBuffer.h"
 #include "OgreImage.h"
+#include "OgreRenderTexture.h"
 
 namespace Ogre 
 {
@@ -37,25 +38,35 @@ namespace Ogre
             PixelFormat format,
             HardwareBuffer::Usage usage, bool useSystemMemory, bool useShadowBuffer):
         HardwareBuffer(usage, useSystemMemory, useShadowBuffer),
-        mWidth(width), mHeight(height), mDepth(depth),
+        mCurrentLockOptions(), mWidth(width), mHeight(height), mDepth(depth),
         mFormat(format)
     {
         // Default
         mRowPitch = mWidth;
         mSlicePitch = mHeight*mWidth;
-        mSizeInBytes = mHeight*mWidth*PixelUtil::getNumElemBytes(mFormat);
+        mSizeInBytes = PixelUtil::getMemorySize(mWidth, mHeight, mDepth, mFormat);
     }
     
     //-----------------------------------------------------------------------------    
     HardwarePixelBuffer::~HardwarePixelBuffer()
     {
+        if (mUsage & TU_RENDERTARGET)
+        {
+            // Delete all render targets that are not yet deleted via _clearSliceRTT because the rendertarget
+            // was deleted by the user.
+            for (auto rt : mSliceTRT)
+            {
+                if (rt)
+                    Root::getSingleton().getRenderSystem()->destroyRenderTarget(rt->getName());
+            }
+        }
     }
     
     //-----------------------------------------------------------------------------    
     void* HardwarePixelBuffer::lock(size_t offset, size_t length, LockOptions options)
     {
-        assert(!isLocked() && "Cannot lock this buffer, it is already locked!");
-        assert(offset == 0 && length == mSizeInBytes && "Cannot lock memory region, most lock box or entire buffer");
+        OgreAssert(!isLocked(), "already locked");
+        OgreAssert(offset == 0 && length == mSizeInBytes, "must lock box or entire buffer");
         
         Box myBox(0, 0, 0, mWidth, mHeight, mDepth);
         const PixelBox &rv = lock(myBox, options);
@@ -65,7 +76,7 @@ namespace Ogre
     //-----------------------------------------------------------------------------    
     const PixelBox& HardwarePixelBuffer::lock(const Box& lockBox, LockOptions options)
     {
-        if (mUseShadowBuffer)
+        if (mShadowBuffer)
         {
             if (options != HBL_READ_ONLY)
             {
@@ -78,6 +89,8 @@ namespace Ogre
         }
         else
         {
+            mCurrentLockOptions = options;
+            mLockedBox = lockBox;
             // Lock the real buffer if there is no shadow buffer 
             mCurrentLock = lockImpl(lockBox, options);
             mIsLocked = true;
@@ -89,8 +102,7 @@ namespace Ogre
     //-----------------------------------------------------------------------------    
     const PixelBox& HardwarePixelBuffer::getCurrentLock() 
     { 
-        assert(isLocked() && "Cannot get current lock: buffer not locked");
-        
+        OgreAssert(isLocked(), "buffer not locked");
         return mCurrentLock; 
     }
     
@@ -108,49 +120,26 @@ namespace Ogre
     {
         if(isLocked() || src->isLocked())
         {
-            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
-                "Source and destination buffer may not be locked!",
-                "HardwarePixelBuffer::blit");
+            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Source and destination buffer may not be locked!");
         }
         if(src.get() == this)
         {
-            OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
-                "Source must not be the same object",
-                "HardwarePixelBuffer::blit" ) ;
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Source must not be the same object");
         }
-        const PixelBox &srclock = src->lock(srcBox, HBL_READ_ONLY);
 
-        LockOptions method = HBL_NORMAL;
-        if(dstBox.left == 0 && dstBox.top == 0 && dstBox.front == 0 &&
-           dstBox.right == mWidth && dstBox.bottom == mHeight &&
-           dstBox.back == mDepth)
+        LockOptions method = HBL_WRITE_ONLY;
+        if (dstBox.left == 0 && dstBox.top == 0 && dstBox.front == 0 && dstBox.right == mWidth &&
+            dstBox.bottom == mHeight && dstBox.back == mDepth)
             // Entire buffer -- we can discard the previous contents
             method = HBL_DISCARD;
-            
-        const PixelBox &dstlock = lock(dstBox, method);
-        if(dstlock.getWidth() != srclock.getWidth() ||
-            dstlock.getHeight() != srclock.getHeight() ||
-            dstlock.getDepth() != srclock.getDepth())
-        {
-            // Scaling desired
-            Image::scale(srclock, dstlock);
-        }
-        else
-        {
-            // No scaling needed
-            PixelUtil::bulkPixelConversion(srclock, dstlock);
-        }
 
+        src->blitToMemory(srcBox, lock(dstBox, method));
         unlock();
-        src->unlock();
     }
     //-----------------------------------------------------------------------------       
     void HardwarePixelBuffer::blit(const HardwarePixelBufferSharedPtr &src)
     {
-        blit(src, 
-            Box(0,0,0,src->getWidth(),src->getHeight(),src->getDepth()), 
-            Box(0,0,0,mWidth,mHeight,mDepth)
-        );
+        blit(src, Box(src->getSize()), Box(getSize()));
     }
     //-----------------------------------------------------------------------------    
     void HardwarePixelBuffer::readData(size_t offset, size_t length, void* pDest)
@@ -189,16 +178,17 @@ namespace Ogre
     }
     //-----------------------------------------------------------------------------    
     
-    RenderTexture *HardwarePixelBuffer::getRenderTarget(size_t)
+    RenderTexture *HardwarePixelBuffer::getRenderTarget(size_t zoffset)
     {
-        OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED,
-                "Not yet implemented for this rendersystem.",
-                "HardwarePixelBuffer::getRenderTarget");
+        assert(mUsage & TU_RENDERTARGET);
+        return mSliceTRT.at(zoffset);
     }
     //-----------------------------------------------------------------------------    
 
     void HardwarePixelBuffer::_clearSliceRTT(size_t zoffset)
     {
+        if(zoffset < mSliceTRT.size())
+            mSliceTRT[zoffset] = NULL;
     }
 
 }

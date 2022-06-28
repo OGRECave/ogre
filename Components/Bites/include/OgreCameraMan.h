@@ -35,14 +35,14 @@
 
 #include "OgreInput.h"
 
-/** \addtogroup Optional
-*  @{
-*/
-/** \addtogroup Bites
-*  @{
-*/
 namespace OgreBites
 {
+    /** \addtogroup Optional
+    *  @{
+    */
+    /** \addtogroup Bites
+    *  @{
+    */
     enum CameraStyle   /// enumerator values for different styles of camera movement
     {
         CS_FREELOOK,
@@ -81,7 +81,7 @@ namespace OgreBites
         /**
         Sets the spatial offset from the target. Only applies for orbit style.
         */
-        void setYawPitchDist(Ogre::Radian yaw, Ogre::Radian pitch, Ogre::Real dist);
+        void setYawPitchDist(const Ogre::Radian& yaw, const Ogre::Radian& pitch, Ogre::Real dist);
 
         /**
         Sets the camera's top speed. Only applies for free-look style.
@@ -172,7 +172,7 @@ namespace OgreBites
         bool mFastMove;
         Ogre::Vector3 mOffset;
     };
+    /** @} */
+    /** @} */
 }
-/** @} */
-/** @} */
 #endif

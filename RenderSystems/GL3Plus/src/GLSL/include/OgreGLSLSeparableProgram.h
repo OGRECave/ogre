@@ -47,7 +47,7 @@ namespace Ogre
         change only a few of the shaders in the pipeline while leaving
         the rest the same.
 
-        @remarks
+
         GLSL has no target assembler or entry point specification like
         DirectX 9 HLSL.  Vertex and Fragment shaders only have one
         entry point called "main".  When a shader is compiled,
@@ -84,13 +84,6 @@ namespace Ogre
         */
         void updateUniforms(GpuProgramParametersSharedPtr params,
                             uint16 mask, GpuProgramType fromProgType);
-        /** Updates program object atomic counter buffers using data
-            from GpuProgramParameters.  Normally called by
-            GLSLShader::bindProgramAtomicCounterParameters() just
-            before rendering occurs.
-        */
-        void updateAtomicCounters(GpuProgramParametersSharedPtr params,
-                                  uint16 mask, GpuProgramType fromProgType);
 
         /** Makes a program pipeline object active by making sure it
             is linked and then putting it in use.

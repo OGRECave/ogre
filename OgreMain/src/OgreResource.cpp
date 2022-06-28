@@ -42,13 +42,28 @@ namespace Ogre
     Resource::~Resource() 
     { 
     }
+    Resource& Resource::operator=(const Resource& rhs)
+    {
+        mName = rhs.mName;
+        mGroup = rhs.mGroup;
+        mCreator = rhs.mCreator;
+        mIsManual = rhs.mIsManual;
+        mLoader = rhs.mLoader;
+        mHandle = rhs.mHandle;
+        mSize = rhs.mSize;
+
+        mLoadingState.store(rhs.mLoadingState.load());
+        mIsBackgroundLoaded = rhs.mIsBackgroundLoaded;
+
+        return *this;
+    }
     //-----------------------------------------------------------------------
     void Resource::escalateLoading()
     {
         // Just call load as if this is the background thread, locking on
         // load status will prevent race conditions
         load(true);
-        _fireLoadingComplete(true);
+        _fireLoadingComplete();
     }
     //-----------------------------------------------------------------------
     void Resource::prepare(bool background)
@@ -129,7 +144,7 @@ namespace Ogre
 
         // Fire events (if not background)
         if (!background)
-            _firePreparingComplete(false);
+            _firePreparingComplete();
 
 
     }
@@ -266,7 +281,7 @@ namespace Ogre
 
         // Fire events, if not background
         if (!background)
-            _fireLoadingComplete(false);
+            _fireLoadingComplete();
 
 
     }
@@ -366,7 +381,7 @@ namespace Ogre
         mListenerList.erase(lis);
     }
     //-----------------------------------------------------------------------
-    void Resource::_fireLoadingComplete(bool wasBackgroundLoaded)
+    void Resource::_fireLoadingComplete(bool unused)
     {
         // Lock the listener list
             OGRE_LOCK_MUTEX(mListenerListMutex);
@@ -377,7 +392,7 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------
-    void Resource::_firePreparingComplete(bool wasBackgroundLoaded)
+    void Resource::_firePreparingComplete(bool unused)
     {
         // Lock the listener list
             OGRE_LOCK_MUTEX(mListenerListMutex);

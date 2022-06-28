@@ -51,7 +51,6 @@ namespace Ogre {
     class _OgrePrivate EAGL2Window : public RenderWindow, public GLRenderTarget
     {
         protected:
-            bool mClosed;
             bool mVisible;
             bool mHidden;
             /// Is this using an external window handle?
@@ -78,7 +77,6 @@ namespace Ogre {
 #endif
 
             void createNativeWindow(uint widthPt, uint heightPt, const NameValuePairList *miscParams);
-            void reposition(int leftPt, int topPt);
             void resize(unsigned int widthPt, unsigned int heightPt);
             void windowMovedOrResized();
             int _getPixelFromPoint(float viewPt) { return mIsContentScalingSupported ? (int)viewPt * mContentScalingFactor : (int)viewPt; }
@@ -91,9 +89,7 @@ namespace Ogre {
             void create(const String& name, unsigned int widthPt, unsigned int heightPt,
                         bool fullScreen, const NameValuePairList *miscParams);
 
-            virtual void setFullscreen(bool fullscreen, uint widthPt, uint heightPt);
             void destroy(void);
-            bool isClosed(void) const { return mClosed; }
             bool isVisible(void) const { return mVisible; }
             void setVisible(bool visible) { mVisible = visible; }
             bool isHidden(void) const { return mHidden; }
@@ -104,7 +100,7 @@ namespace Ogre {
             PixelFormat suggestPixelFormat() const { return PF_BYTE_RGBA; }
 
             /**
-               @remarks
+
                * Get custom attribute; the following attributes are valid:
                * WINDOW         The NativeWindowType target for rendering.
                * VIEW           The EAGLView object that is drawn into.

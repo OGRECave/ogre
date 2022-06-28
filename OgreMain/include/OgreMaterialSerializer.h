@@ -140,7 +140,7 @@ namespace Ogre {
                         }           
         };
 
-    protected:
+    private:
         /** Internal method for saving a program definition which has been
             built up.
         */
@@ -159,10 +159,6 @@ namespace Ogre {
         void writeVertexProgramRef(const Pass* pPass);
         void writeTesselationHullProgramRef(const Pass* pPass);
         void writeTesselationDomainProgramRef(const Pass* pPass);
-        void writeShadowCasterVertexProgramRef(const Pass* pPass);
-        void writeShadowCasterFragmentProgramRef(const Pass* pPass);
-        void writeShadowReceiverVertexProgramRef(const Pass* pPass);
-        void writeShadowReceiverFragmentProgramRef(const Pass* pPass);
         void writeGeometryProgramRef(const Pass* pPass);
         void writeFragmentProgramRef(const Pass* pPass);
         void writeGpuProgramRef(const String& attrib, const GpuProgramPtr& program, const GpuProgramParametersSharedPtr& params);
@@ -177,7 +173,7 @@ namespace Ogre {
             const String& commandName, const String& identifier, 
             const GpuProgramParameters::AutoConstantEntry* autoEntry, 
             const GpuProgramParameters::AutoConstantEntry* defaultAutoEntry, 
-            bool isFloat, bool isDouble, bool isInt, bool isUnsignedInt, 
+            bool isFloat, bool isDouble, bool isInt, bool isUnsignedInt, bool isRegister,
             size_t physicalIndex, size_t physicalSize,
             const GpuProgramParametersSharedPtr& params, GpuProgramParameters* defaultParams,
             const unsigned short level, const bool useMainBuffer);
@@ -258,6 +254,8 @@ namespace Ogre {
         */
         void exportQueued(const String& filename, const bool includeProgDef = false, const String& programFilename = "");
         /** Exports a single in-memory Material to the named material script file.
+        @param pMat Material pointer
+        @param filename the file name of the material script to be exported
         @param exportDefaults if true then exports all values including defaults
         @param includeProgDef if true includes Gpu shader program definitions in the
             export material script otherwise if false then program definitions will
@@ -335,7 +333,7 @@ namespace Ogre {
 
         String quoteWord(const String& val)
         {
-            if (val.find_first_of(" \t") != String::npos)
+            if (val.find_first_of("{}$: \t") != String::npos)
                 return ("\"" + val + "\"");
             else return val;
         }

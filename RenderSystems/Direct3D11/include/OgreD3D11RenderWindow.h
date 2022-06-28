@@ -57,12 +57,10 @@ namespace Ogre
         virtual void create(const String& name, unsigned widthPt, unsigned heightPt, bool fullScreen, const NameValuePairList *miscParams);
         virtual void destroy(void);
 
-        void reposition(int left, int top)                      {}
         void resize(unsigned int width, unsigned int height)    {}
         /// @copydoc RenderTarget::setFSAA
         virtual void setFSAA(uint fsaa, const String& fsaaHint) { mFSAA = fsaa; mFSAAHint = fsaaHint; resize(mWidth, mHeight); }
 
-        bool isClosed() const                                   { return mClosed; }
         bool isHidden() const                                   { return mHidden; }
 
         virtual uint getNumberOfViews() const;
@@ -98,7 +96,6 @@ namespace Ogre
         D3D11Device & mDevice;          // D3D11 driver
         bool    mIsExternal;            // window not created by Ogre
         bool    mSizing;
-        bool    mClosed;
         bool    mHidden;
 
         DXGI_SAMPLE_DESC mFSAAType;     // Effective FSAA mode, limited by hardware capabilities
@@ -130,7 +127,6 @@ namespace Ogre
         void setVSyncEnabled(bool vsync)                        { mVSync = vsync; }
         bool isVSyncEnabled() const                             { return mVSync || mUseFlipMode; }
         void setVSyncInterval(unsigned interval)                { mVSyncInterval = interval; }
-        unsigned getVSyncInterval() const                       { return mVSyncInterval; }
 
         void swapBuffers();
         void updateStats(void);
@@ -156,7 +152,6 @@ namespace Ogre
 
         bool                    mUseFlipMode;                   // Flag to determine if the swapchain flip model is enabled. Not supported before Win8.0, required for WinRT.
         bool                    mVSync;                         // mVSync assumed to be true if mUseFlipMode
-        unsigned                mVSyncInterval;                 // Used at least 1 if mUseFlipMode
 
         DXGI_FRAME_STATISTICS   mPreviousPresentStats;          // We save the previous present stats - so we can detect a "vblank miss"
         bool                    mPreviousPresentStatsIsValid;   // Does mLastPresentStats data is valid (it isn't if when you start or resize the window)

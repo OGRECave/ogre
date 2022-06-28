@@ -91,9 +91,9 @@ public:
     void binaryOp(char op, const std::vector<Operand>& params) const;
 
 private:
-    size_t mStage;
+    uint32 mStage;
     Function* mParent;
-    FunctionStageRef(size_t stage, Function* parent) : mStage(stage), mParent(parent) {}
+    FunctionStageRef(uint32 stage, Function* parent) : mStage(stage), mParent(parent) {}
 };
 
 /** A class that represents a shader based program function.
@@ -103,20 +103,6 @@ class _OgreRTSSExport Function : public RTShaderSystemAlloc
     friend ProgramManager;
 // Interface.
 public:
-    /// @deprecated do not use
-    enum FunctionType
-    {
-        FFT_INTERNAL,
-        FFT_VS_MAIN,
-        FFT_PS_MAIN
-    };
-
-    /** Get the name of this function */
-    const String& getName() const { return mName; }
-
-    /** Get the description of this function */
-    const String& getDescription() const { return mDescription; }
-
     /// @deprecated
     ParameterPtr resolveInputParameter(Parameter::Semantic semantic, int index,  const Parameter::Content content, GpuConstantType type);
 
@@ -172,31 +158,23 @@ public:
         return _getParameterByContent(mOutputParameters, content, type);
     }
 
-    /// @deprecated local parameters do not have index or sematic. use resolveLocalParameter(const String&, GpuConstantType)
-    ParameterPtr resolveLocalParameter(Parameter::Semantic semantic, int index, const String& name, GpuConstantType type);
+    /** Resolve local parameter of this function
 
-    /** Resolve local parameter of this function    
+    local parameters do not have index or semantic.
     @param name The name of the parameter.
     @param type The type of the desired parameter.  
-    Return parameter instance in case of that resolve operation succeeded.
+    @return parameter instance in case of that resolve operation succeeded.
     */
-    ParameterPtr resolveLocalParameter(const String& name, GpuConstantType type)
-    {
-        return resolveLocalParameter(Parameter::SPS_UNKNOWN, 0, name, type);
-    }
-
-    /// @deprecated local parameters do not have index or sematic. use resolveLocalParameter(const String&, GpuConstantType)
-    ParameterPtr resolveLocalParameter(Parameter::Semantic semantic, int index, const Parameter::Content content, GpuConstantType type);
+    ParameterPtr resolveLocalParameter(GpuConstantType type, const String& name);
 
     /** Resolve local parameter of this function
+
+    local parameters do not have index or semantic.
     @param content The content of the parameter.
     @param type The type of the desired parameter.
-    Return parameter instance in case of that resolve operation succeeded.
+    @return parameter instance in case of that resolve operation succeeded.
     */
-    ParameterPtr resolveLocalParameter(Parameter::Content content, GpuConstantType type = GCT_UNKNOWN)
-    {
-        return resolveLocalParameter(Parameter::SPS_UNKNOWN, 0,content, type);
-    }
+    ParameterPtr resolveLocalParameter(Parameter::Content content, GpuConstantType type = GCT_UNKNOWN);
 
     /**
      * get local parameter by content
@@ -228,7 +206,7 @@ public:
     void addAtomInstance(FunctionAtom* atomInstance);
 
     /// get a @ref FFPShaderStage of this function
-    FunctionStageRef getStage(size_t s)
+    FunctionStageRef getStage(uint32 s)
     {
         return FunctionStageRef(s, this);
     }
@@ -259,23 +237,11 @@ public:
     /** Delete all output parameters from this function. */
     void deleteAllOutputParameters();
 
-    /// @deprecated do not use
-    OGRE_DEPRECATED FunctionType getFunctionType() const;
-
-
-protected:
+private:
 
     static ParameterPtr _getParameterByName(const ShaderParameterList& parameterList, const String& name);
     static ParameterPtr _getParameterBySemantic(const ShaderParameterList& parameterList, const Parameter::Semantic semantic, int index);
     static ParameterPtr _getParameterByContent(const ShaderParameterList& parameterList, const Parameter::Content content, GpuConstantType type);
-
-
-    /** Class constructor.
-    @param name The name of this function.
-    @param desc The description of this function.
-    @remarks This class is allocated via an instance of Program class. 
-    */
-    Function(const String& name, const String& desc, const FunctionType functionType);
 
     /** Class destructor */
     ~Function();
@@ -286,11 +252,6 @@ protected:
     /** Delete parameter from a given list */
     void deleteParameter(ShaderParameterList& parameterList, ParameterPtr parameter);
 
-protected:
-    // Function name.
-    String mName;
-    // Function description.
-    String mDescription;
     // Input parameters.
     ShaderParameterList mInputParameters;
     // Output parameters.
@@ -300,9 +261,6 @@ protected:
     // Atom instances composing this function.
     std::map<size_t, FunctionAtomInstanceList> mAtomInstances;
     FunctionAtomInstanceList mSortedAtomInstances;
-    // Function type
-    FunctionType mFunctionType;
-    
 private:
     friend class Program;
 };

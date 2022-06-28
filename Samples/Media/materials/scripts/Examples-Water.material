@@ -84,7 +84,6 @@ material Examples/Water4
 		pass
 		{
 			cull_hardware none
-			cull_software none
 
 			texture_unit
 			{
@@ -102,7 +101,6 @@ material Examples/Water5
 		pass
 		{
 			cull_hardware none
-			cull_software none
 
 			texture_unit
 			{
@@ -143,7 +141,6 @@ material Examples/Water7
 		pass
 		{
 			cull_hardware none
-			cull_software none
 
 			texture_unit
 			{
@@ -170,7 +167,6 @@ material Examples/Water8
 			scene_blend add
 			depth_write off
 			cull_hardware none
-			cull_software none
 
 			texture_unit
 			{

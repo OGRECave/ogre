@@ -88,18 +88,13 @@ CompositorPtr CompositorManager::create (const String& name, const String& group
     return static_pointer_cast<Compositor>(createResource(name,group,isManual,loader,createParams));
 }
 //-----------------------------------------------------------------------
-CompositorPtr CompositorManager::getByName(const String& name, const String& groupName)
+CompositorPtr CompositorManager::getByName(const String& name, const String& groupName) const
 {
     return static_pointer_cast<Compositor>(getResourceByName(name, groupName));
 }
 //-----------------------------------------------------------------------
 void CompositorManager::initialise(void)
 {
-}
-//-----------------------------------------------------------------------
-void CompositorManager::parseScript(DataStreamPtr& stream, const String& groupName)
-{
-    ScriptCompilerManager::getSingleton().parseScript(stream, groupName);
 }
 //-----------------------------------------------------------------------
 CompositorChain *CompositorManager::getCompositorChain(Viewport *vp)
@@ -167,7 +162,7 @@ CompositorInstance *CompositorManager::addCompositor(Viewport *vp, const String 
 {
     CompositorPtr comp = getByName(compositor);
     if(!comp)
-        return 0;
+        OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Compositor '"+compositor+"' not found");
     CompositorChain *chain = getCompositorChain(vp);
     return chain->addCompositor(comp, addPosition==-1 ? CompositorChain::LAST : (size_t)addPosition);
 }
@@ -177,8 +172,10 @@ void CompositorManager::removeCompositor(Viewport *vp, const String &compositor)
     CompositorChain *chain = getCompositorChain(vp);
     size_t pos = chain->getCompositorPosition(compositor);
 
-    if(pos != CompositorChain::NPOS)
-        chain->removeCompositor(pos);
+    if(pos == CompositorChain::NPOS)
+        OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Compositor '"+compositor+"' not in chain");
+
+    chain->removeCompositor(pos);
 }
 //-----------------------------------------------------------------------
 void CompositorManager::setCompositorEnabled(Viewport *vp, const String &compositor, bool value)
@@ -186,8 +183,10 @@ void CompositorManager::setCompositorEnabled(Viewport *vp, const String &composi
     CompositorChain *chain = getCompositorChain(vp);
     size_t pos = chain->getCompositorPosition(compositor);
 
-    if(pos != CompositorChain::NPOS)
-        chain->setCompositorEnabled(pos, value);
+    if(pos == CompositorChain::NPOS)
+        OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Compositor '"+compositor+"' not in chain");
+
+    chain->setCompositorEnabled(pos, value);
 }
 //---------------------------------------------------------------------
 void CompositorManager::_reconstructAllCompositorResources()
@@ -224,16 +223,11 @@ TexturePtr CompositorManager::getPooledTexture(const String& name,
     const String& localName,
     uint32 w, uint32 h, PixelFormat f, uint aa, const String& aaHint, bool srgb,
     CompositorManager::UniqueTextureSet& texturesAssigned, 
-    CompositorInstance* inst, CompositionTechnique::TextureScope scope)
+    CompositorInstance* inst, CompositionTechnique::TextureScope scope, TextureType type)
 {
-    if (scope == CompositionTechnique::TS_GLOBAL) 
-    {
-        OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-            "Global scope texture can not be pooled.",
-            "CompositorManager::getPooledTexture");
-    }
+    OgreAssert(scope != CompositionTechnique::TS_GLOBAL, "Global scope texture can not be pooled");
 
-    TextureDef def(w, h, f, aa, aaHint, srgb);
+    TextureDef def(w, h, type, f, aa, aaHint, srgb);
 
     if (scope == CompositionTechnique::TS_CHAIN)
     {
@@ -447,12 +441,7 @@ void CompositorManager::freePooledTextures(bool onlyIfUnreferenced)
 //---------------------------------------------------------------------
 void CompositorManager::registerCompositorLogic(const String& name, CompositorLogic* logic)
 {   
-    if (name.empty()) 
-    {
-        OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-            "Compositor logic name must not be empty.",
-            "CompositorManager::registerCompositorLogic");
-    }
+    OgreAssert(!name.empty(), "Compositor logic name must not be empty");
     if (mCompositorLogics.find(name) != mCompositorLogics.end())
     {
         OGRE_EXCEPT(Exception::ERR_DUPLICATE_ITEM,
@@ -494,12 +483,7 @@ bool CompositorManager::hasCompositorLogic(const String& name)
 //---------------------------------------------------------------------
 void CompositorManager::registerCustomCompositionPass(const String& name, CustomCompositionPass* logic)
 {   
-    if (name.empty()) 
-    {
-        OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-            "Custom composition pass name must not be empty.",
-            "CompositorManager::registerCustomCompositionPass");
-    }
+    OgreAssert(!name.empty(), "Compositor pass name must not be empty");
     if (mCustomCompositionPasses.find(name) != mCustomCompositionPasses.end())
     {
         OGRE_EXCEPT(Exception::ERR_DUPLICATE_ITEM,

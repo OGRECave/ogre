@@ -46,7 +46,7 @@ namespace Ogre {
     */
     /** Subclass of BillboardChain which automatically leaves a trail behind
         one or more Node instances.
-    @remarks
+
         An instance of this class will watch one or more Node instances, and
         automatically generate a trail behind them as they move. Because this
         class can monitor multiple modes, it generates its own geometry in 
@@ -98,7 +98,7 @@ namespace Ogre {
         virtual size_t getChainIndexForNode(const Node* n);
 
         /** Set the length of the trail. 
-        @remarks
+
             This sets the length of the trail, in world units. It also sets how
             far apart each segment will be, ie length / max_elements. 
         @param len The length of the trail in world units
@@ -129,7 +129,7 @@ namespace Ogre {
         */
         virtual void setInitialColour(size_t chainIndex, float r, float g, float b, float a = 1.0);
         /** Get the starting ribbon colour. */
-        virtual const ColourValue& getInitialColour(size_t chainIndex) const;
+        const ColourValue& getInitialColour(size_t chainIndex) const { return mInitialColour.at(chainIndex); }
 
         /** Enables / disables fading the trail using colour. 
         @param chainIndex The index of the chain
@@ -143,7 +143,7 @@ namespace Ogre {
         */
         virtual void setInitialWidth(size_t chainIndex, Real width);
         /** Get the starting ribbon width in world units. */
-        virtual Real getInitialWidth(size_t chainIndex) const;
+        Real getInitialWidth(size_t chainIndex) const { return mInitialWidth.at(chainIndex); }
         
         /** Set the change in ribbon width per second. 
         @param chainIndex The index of the chain
@@ -151,7 +151,7 @@ namespace Ogre {
         */
         virtual void setWidthChange(size_t chainIndex, Real widthDeltaPerSecond);
         /** Get the change in ribbon width per second. */
-        virtual Real getWidthChange(size_t chainIndex) const;
+        Real getWidthChange(size_t chainIndex) const { return mDeltaWidth.at(chainIndex); }
 
         /** Enables / disables fading the trail using colour. 
         @param chainIndex The index of the chain
@@ -160,7 +160,7 @@ namespace Ogre {
         virtual void setColourChange(size_t chainIndex, float r, float g, float b, float a);
 
         /** Get the per-second fading amount */
-        virtual const ColourValue& getColourChange(size_t chainIndex) const;
+        const ColourValue& getColourChange(size_t chainIndex) const { return mDeltaColour.at(chainIndex); }
 
         /// @see Node::Listener::nodeUpdated
         void nodeUpdated(const Node* node);
@@ -172,7 +172,7 @@ namespace Ogre {
 
         const String& getMovableType(void) const override;
 
-    protected:
+    private:
         /// List of nodes being trailed
         NodeList mNodeList;
         /// Mapping of nodes to chain segments
@@ -204,7 +204,7 @@ namespace Ogre {
         /// Delta width of the ribbon
         RealList mDeltaWidth;
         /// controller used to hook up frame time to fader
-        Controller<Real>* mFadeController;
+        ControllerReal* mFadeController;
         /// controller value for hooking up frame time to fader
         ControllerValueRealPtr mTimeControllerValue;
 
@@ -232,8 +232,6 @@ namespace Ogre {
         static String FACTORY_TYPE_NAME;
 
         const String& getType(void) const;
-        void destroyInstance( MovableObject* obj);  
-
     };
     /** @} */
     /** @} */

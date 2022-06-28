@@ -41,7 +41,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     Real DistanceLodStrategyBase::getValueImpl(const MovableObject *movableObject, const Ogre::Camera *camera) const
     {
-        Real squaredDepth = getSquaredDepth(movableObject, camera);
+        Real squaredDist = getSquaredDepth(movableObject, camera);
 
         // Check if reference view needs to be taken into account
         if (mReferenceViewEnabled)
@@ -61,15 +61,15 @@ namespace Ogre {
             // Compute bias value (note that this is similar to the method used for PixelCountLodStrategy)
             Real biasValue = viewportArea * projectionMatrix[0][0] * projectionMatrix[1][1];
 
-            // Scale squared depth appropriately
-            squaredDepth *= (mReferenceViewValue / biasValue);
+            // Scale squared distance appropriately
+            squaredDist *= (mReferenceViewValue / biasValue);
         }
 
-        // Squared depth should never be below 0, so clamp
-        squaredDepth = std::max(squaredDepth, Real(0));
+        // Squared distance should never be below 0, so clamp
+        squaredDist = std::max(squaredDist, Real(0));
 
         // Now adjust it by the camera bias and return the computed value
-        return squaredDepth * camera->_getLodBiasInverse();
+        return squaredDist * camera->_getLodBiasInverse();
     }
     //-----------------------------------------------------------------------
     Real DistanceLodStrategyBase::getBaseValue() const
@@ -163,15 +163,13 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     Real DistanceLodSphereStrategy::getSquaredDepth(const MovableObject *movableObject, const Ogre::Camera *camera) const
     {
-        // Get squared depth taking into account bounding radius
+        // Get squared distance taking into account bounding radius
         // (d - r) ^ 2 = d^2 - 2dr + r^2, but this requires a lot 
         // more computation (including a sqrt) so we approximate 
         // it with d^2 - r^2, which is good enough for determining 
         // LOD.
 
-        const Vector3& scl = movableObject->getParentNode()->_getDerivedScale();
-        Real factor = std::max(std::max(scl.x, scl.y), scl.z);
-        return movableObject->getParentNode()->getSquaredViewDepth(camera) - Math::Sqr(movableObject->getBoundingRadius() * factor);
+        return movableObject->getParentNode()->getSquaredViewDepth(camera) - Math::Sqr(movableObject->getBoundingRadiusScaled());
     }
     //-----------------------------------------------------------------------
 

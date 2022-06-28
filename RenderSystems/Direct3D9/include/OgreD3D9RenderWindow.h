@@ -49,7 +49,6 @@ namespace Ogre
         void                destroy             (void);
         bool                isActive            () const;
         bool                isVisible           () const;
-        bool                isClosed            () const { return mClosed; }
         bool                isVSync             () const { return mVSync; }
         bool                isAA                () const { return mFSAA != 0; }
         bool                isHidden            () const { return mHidden; }
@@ -57,7 +56,6 @@ namespace Ogre
         void                setVSyncEnabled     (bool vsync);
         bool                isVSyncEnabled      () const;
         void                setVSyncInterval    (unsigned int interval);
-        unsigned int        getVSyncInterval    () const;
         void                reposition          (int left, int top);
         void                resize              (unsigned int width, unsigned int height);
         void                swapBuffers         ();
@@ -70,6 +68,7 @@ namespace Ogre
         
         /** Overridden - see RenderTarget.
         */
+        PixelFormat         suggestPixelFormat() const override;
         void                copyContentsToMemory    (const Box& src, const PixelBox &dst, FrameBuffer buffer);
         bool                requiresTextureFlipping () const { return false; }
 
@@ -131,19 +130,18 @@ namespace Ogre
         bool                        mDeviceValid;           // Device was validation succeeded.
         HWND                        mHWnd;                  // Win32 Window handle      
         bool                        mIsExternal;            // window not created by Ogre
-        bool                        mClosed;                // Is this window destroyed.        
         bool                        mHidden;                // True if this is hidden render window. 
         bool                        mSwitchingFullscreen;   // Are we switching from fullscreen to windowed or vice versa       
         D3DMULTISAMPLE_TYPE         mFSAAType;              // AA type.
         DWORD                       mFSAAQuality;           // AA quality.
         UINT                        mDisplayFrequency;      // Display frequency.
         bool                        mVSync;                 // Use vertical sync or not.
-        unsigned int                mVSyncInterval;         // The vsync interval.
         bool                        mUseNVPerfHUD;          // Use NV Perf HUD.
         DWORD                       mWindowedWinStyle;      // Windowed mode window style flags.
         DWORD                       mFullscreenWinStyle;    // Fullscreen mode window style flags.       
         unsigned int                mDesiredWidth;          // Desired width after resizing
         unsigned int                mDesiredHeight;         // Desired height after resizing
+        uint32                      mColourDepth;
     };
 }
 #endif

@@ -10,20 +10,20 @@
 # Configure Tests build
 if (OGRE_BUILD_TESTS)
 
-  if(NOT EXISTS ${PROJECT_BINARY_DIR}/googletest-1.8.x)
+  if(NOT EXISTS ${PROJECT_BINARY_DIR}/googletest-1.11.0)
     message(STATUS "Building gtest")
     file(DOWNLOAD
-        https://github.com/google/googletest/archive/v1.8.x.tar.gz
-        ${PROJECT_BINARY_DIR}/v1.8.x.tar.gz)
+        https://github.com/google/googletest/archive/refs/tags/release-1.11.0.tar.gz
+        ${PROJECT_BINARY_DIR}/release-1.11.0.tar.gz)
     execute_process(COMMAND ${CMAKE_COMMAND}
-        -E tar xf v1.8.x.tar.gz WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
+        -E tar xf release-1.11.0.tar.gz WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
     execute_process(COMMAND ${BUILD_COMMAND_COMMON}
-        ${PROJECT_BINARY_DIR}/googletest-1.8.x
+        ${PROJECT_BINARY_DIR}/googletest-release-1.11.0
         -Dgtest_force_shared_crt=TRUE
         -DBUILD_GMOCK=FALSE
-        WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/googletest-1.8.x)
+        WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/googletest-release-1.11.0)
     execute_process(COMMAND ${CMAKE_COMMAND}
-        --build ${PROJECT_BINARY_DIR}/googletest-1.8.x ${BUILD_COMMAND_OPTS})
+        --build ${PROJECT_BINARY_DIR}/googletest-release-1.11.0 ${BUILD_COMMAND_OPTS})
   endif()
   find_package(GTest REQUIRED CONFIG)
   include_directories(${CMAKE_CURRENT_SOURCE_DIR}/Common/include)
@@ -90,8 +90,6 @@ if (OGRE_BUILD_TESTS)
       set_property(TARGET Test_Ogre PROPERTY MACOSX_BUNDLE TRUE)
       set(OGRE_BUILT_FRAMEWORK "$(PLATFORM_NAME)/$(CONFIGURATION)")
       set(OGRE_TEST_CONTENTS_PATH ${PROJECT_BINARY_DIR}/bin/$(CONFIGURATION)/Test_Ogre.app/Contents)
-      set_target_properties(Test_Ogre PROPERTIES
-        LINK_FLAGS "-framework Carbon -framework Cocoa")
       add_custom_command(TARGET Test_Ogre POST_BUILD
         COMMAND mkdir ARGS -p ${OGRE_TEST_CONTENTS_PATH}/Resources/Media/CustomCapabilities
         COMMAND ditto
@@ -105,8 +103,6 @@ if (OGRE_BUILD_TESTS)
         COMMAND ln ARGS -s -f ${PROJECT_BINARY_DIR}/bin/resources.cfg
         ${OGRE_TEST_CONTENTS_PATH}/Resources/
         COMMAND ln ARGS -s -f ${PROJECT_BINARY_DIR}/bin/samples.cfg
-        ${OGRE_TEST_CONTENTS_PATH}/Resources/
-        COMMAND ln ARGS -s -f ${PROJECT_BINARY_DIR}/bin/quakemap.cfg
         ${OGRE_TEST_CONTENTS_PATH}/Resources/
         COMMAND ditto
         ${PROJECT_SOURCE_DIR}/Samples/Media/ ${OGRE_TEST_CONTENTS_PATH}/Resources/Media/
@@ -145,6 +141,7 @@ if (OGRE_BUILD_TESTS)
         Codec_FreeImage
         RenderSystem_GL
         RenderSystem_GL3Plus
+        RenderSystem_Metal
       )
   
       foreach(FWK ${FRAMEWORKS})

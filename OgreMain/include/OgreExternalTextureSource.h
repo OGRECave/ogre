@@ -79,34 +79,6 @@ namespace Ogre
         /** Virtual destructor */
         virtual ~ExternalTextureSource() {}
 
-        //------------------------------------------------------------------------------//
-        /* Command objects for specifying some base features                            */
-        /* Any Plugins wishing to add more specific params to "ExternalTextureSourcePlugins"*/
-        /* dictionary, feel free to do so, that's why this is here                      */
-        class _OgrePrivate CmdInputFileName : public ParamCommand
-        {
-        public:
-            String doGet(const void* target) const;
-            void doSet(void* target, const String& val);
-        };
-        class _OgrePrivate CmdFPS : public ParamCommand
-        {
-        public:
-            String doGet(const void* target) const;
-            void doSet(void* target, const String& val);
-        };
-        class _OgrePrivate CmdPlayMode : public ParamCommand
-        {
-        public:
-            String doGet(const void* target) const;
-            void doSet(void* target, const String& val);
-        };
-        class _OgrePrivate CmdTecPassState : public ParamCommand
-        {
-        public:
-            String doGet(const void* target) const;
-            void doSet(void* target, const String& val);
-        };
         //--------------------------------------------------------//
         //Base Functions that work with Command String Interface... Or can be called
         //manually to create video through code 
@@ -158,12 +130,6 @@ namespace Ogre
             const String& groupName = ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME) = 0;
 
     protected:
-        static CmdInputFileName msCmdInputFile;     /// Command for setting input file name
-        static CmdFPS msCmdFramesPerSecond;         /// Command for setting frames per second
-        static CmdPlayMode msCmdPlayMode;           /// Command for setting play mode
-        static CmdTecPassState msCmdTecPassState;   /// Command for setting the technique, pass, & state level
-
-
         /// String Name of this Plugin
         String mPluginName;
     

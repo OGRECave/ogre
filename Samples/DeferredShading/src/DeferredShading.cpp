@@ -37,31 +37,7 @@ same license as the rest of the engine.
 #include "GBufferSchemeHandler.h"
 #include "NullSchemeHandler.h"
 
-#include "SharedData.h"
-
 #include "OgreShaderExGBuffer.h"
-
-namespace Ogre
-{
-    template<> SharedData* Singleton<SharedData>::msSingleton = 0;
-}
-
-SharedData::SharedData()
-    : iRoot(0), iCamera(0), iWindow(0), iSystem(0), iActivate(false),
-      iGlobalActivate(false), iMainLight(0)
-{
-}
-
-SharedData::~SharedData() {}
-
-SharedData* SharedData::getSingletonPtr(void)
-{
-    return msSingleton;
-}
-SharedData& SharedData::getSingleton(void)
-{
-    assert( msSingleton );  return ( *msSingleton );
-}
 
 using namespace Ogre;
 
@@ -164,6 +140,10 @@ void DeferredShadingSystem::setActive(bool active)
         mActive = active;
         mGBufferInstance->setEnabled(active);
 
+        RTShader::ShaderGenerator& rtShaderGen = RTShader::ShaderGenerator::getSingleton();
+        // we do lights ourselves if active
+        rtShaderGen.getRenderState(MSN_SHADERGEN)->setLightCountAutoUpdate(!mActive);
+
         // mCurrentMode could have changed with a prior call to setMode, so iterate all
         setMode(mCurrentMode);
     }
@@ -197,6 +177,7 @@ void DeferredShadingSystem::createResources(void)
 
 
     RTShader::RenderState* schemRenderState = rtShaderGen.getRenderState("GBuffer");
+    schemRenderState->setLightCountAutoUpdate(false); // does not use lights
     RTShader::GBuffer* subRenderState = rtShaderGen.createSubRenderState<RTShader::GBuffer>();
     subRenderState->setOutBuffers({RTShader::GBuffer::TL_DIFFUSE_SPECULAR, RTShader::GBuffer::TL_NORMAL_VIEWDEPTH});
     schemRenderState->addTemplateSubRenderState(subRenderState);

@@ -36,8 +36,6 @@ THE SOFTWARE.
 namespace Ogre {
 namespace RTShader {
 
-#define SGX_LIB_LAYEREDBLENDING     "SGXLib_LayeredBlending"
-
 /** Texturing sub render state implementation of layered blending.
 Derives from FFPTexturing class which derives from SubRenderState class.
 */

@@ -204,6 +204,8 @@ namespace Ogre {
         int Line;
         /// True if we are at beginning of line
         bool BOL;
+        /// Are we expanding a macro?
+        bool SupplimentaryExpand;
         /// A stack of 32 booleans packed into one value :)
         unsigned EnableOutput;
         unsigned EnableElif;
@@ -439,7 +441,7 @@ namespace Ogre {
 
     public:
         /// Create an empty preprocessor object
-        CPreprocessor() {}
+        CPreprocessor();
 
         /// Destroy the preprocessor object
         virtual ~CPreprocessor ();
@@ -459,15 +461,13 @@ namespace Ogre {
                      const char *iMacroValue, size_t iMacroValueLen);
 
         /**
-         * Define a numerical macro.
+         * Define a symbolical macro.
          * @param iMacroName
          *     The name of the defined macro
          * @param iMacroNameLen
          *     The length of the name of the defined macro
-         * @param iMacroValue
-         *     The value of the defined macro
          */
-        void Define (const char *iMacroName, size_t iMacroNameLen, long iMacroValue);
+        void Define (const char *iMacroName, size_t iMacroNameLen);
 
         /**
          * Undefine a macro.

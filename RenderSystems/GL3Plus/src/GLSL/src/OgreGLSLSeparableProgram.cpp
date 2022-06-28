@@ -98,8 +98,6 @@ namespace Ogre
         if (!mLinked)
         {
             compileAndLink();
-
-            extractLayoutQualifiers();
         }
 
         if (mLinked)
@@ -118,8 +116,17 @@ namespace Ogre
         GLuint progID = mShaders[fromProgType]->getGLProgramHandle();
         GLUniformCache* uniformCache = mShaders[fromProgType]->getUniformCache();
 
+        bool usesUBO = false;
+        if(const auto& ubo = static_cast<GLSLShader*>(mShaders[fromProgType])->getDefaultBuffer())
+        {
+            // we ignore ma
+            ubo->writeData(0, ubo->getSizeInBytes(), params->getConstantList().data(), true);
+            static_cast<GL3PlusHardwareBuffer*>(ubo.get())->bind();
+            usesUBO = true;
+        }
+
         // Iterate through uniform reference list and update uniform values
-        for (const auto it : params->getConstantDefinitions().map)
+        for (const auto& it : params->getConstantDefinitions().map)
         {
             const GpuConstantDefinition* def = &it.second;
             if ((def->variability & mask) == 0) // masked
@@ -127,35 +134,15 @@ namespace Ogre
 
             GLsizei glArraySize = (GLsizei)def->arraySize;
 
-            bool shouldUpdate = true;
+            if(usesUBO && !def->isSampler())
+                continue; // already handled above
 
-            switch (def->constType)
-            {
-            case GCT_INT1:
-            case GCT_INT2:
-            case GCT_INT3:
-            case GCT_INT4:
-            case GCT_SAMPLER1D:
-            case GCT_SAMPLER1DSHADOW:
-            case GCT_SAMPLER2D:
-            case GCT_SAMPLER2DSHADOW:
-            case GCT_SAMPLER2DARRAY:
-            case GCT_SAMPLER3D:
-            case GCT_SAMPLERCUBE:
-                shouldUpdate =
-                    uniformCache->updateUniform(def->logicalIndex, params->getIntPointer(def->physicalIndex),
-                                                static_cast<GLsizei>(def->elementSize * def->arraySize * sizeof(int)));
-                break;
-            default:
-                shouldUpdate = uniformCache->updateUniform(
-                    def->logicalIndex, params->getFloatPointer(def->physicalIndex),
-                    static_cast<GLsizei>(def->elementSize * def->arraySize * sizeof(float)));
-                break;
-            }
+            void* val = def->isSampler() ? (void*)params->getRegPointer(def->physicalIndex)
+                                         : (void*)params->getFloatPointer(def->physicalIndex);
+            bool shouldUpdate =
+                uniformCache->updateUniform(def->logicalIndex, val, def->elementSize * def->arraySize * 4);
             if (!shouldUpdate)
-            {
                 continue;
-            }
 
             // Get the index in the parameter real list
             switch (def->constType)
@@ -195,11 +182,10 @@ namespace Ogre
             case GCT_SAMPLER2DARRAY:
             case GCT_SAMPLER3D:
             case GCT_SAMPLERCUBE:
-            case GCT_SAMPLERRECT:
                 // Samplers handled like 1-element ints
             case GCT_INT1:
                 OGRE_CHECK_GL_ERROR(glProgramUniform1iv(progID, def->logicalIndex, glArraySize,
-                                                        params->getIntPointer(def->physicalIndex)));
+                                                        (int*)val));
                 break;
             case GCT_INT2:
                 OGRE_CHECK_GL_ERROR(glProgramUniform2iv(progID, def->logicalIndex, glArraySize,
@@ -315,37 +301,5 @@ namespace Ogre
 
             } // End switch
         }     // End for
-    }
-
-    void GLSLSeparableProgram::updateAtomicCounters(GpuProgramParametersSharedPtr params,
-                                                    uint16 mask, GpuProgramType fromProgType)
-    {
-        // Iterate through the list of atomic counter buffers and update them as needed
-        // GLAtomicBufferIterator currentBuffer = mGLAtomicBufferReferences.begin();
-        // GLAtomicBufferIterator endBuffer = mGLAtomicBufferReferences.end();
-
-        GLAtomicCounterReferenceIterator currentAtomicCounter = mGLAtomicCounterReferences.begin();
-        GLAtomicCounterReferenceIterator endAtomicCounter = mGLAtomicCounterReferences.end();
-
-        for (; currentAtomicCounter != endAtomicCounter; ++currentAtomicCounter)
-        {
-            if (fromProgType == currentAtomicCounter->mSourceProgType)
-            {
-                const GpuConstantDefinition* def = currentAtomicCounter->mConstantDef;
-                if (def->variability & mask)
-                {
-                    GLsizei glArraySize = (GLsizei)def->arraySize;
-                    GLuint glBinding = currentAtomicCounter->mBinding;
-                    GLuint glOffset = currentAtomicCounter->mOffset;
-
-                    // Get the buffer this atomic counter belongs to.
-                    //TODO exception handling
-                    HardwareCounterBufferSharedPtr atomic_buffer = mGLCounterBufferReferences[glBinding];
-
-                    // Update the value.
-                    atomic_buffer->writeData(glOffset, sizeof(GLuint) * glArraySize, params->getUnsignedIntPointer(def->physicalIndex));
-                }
-            }
-        }
     }
 }

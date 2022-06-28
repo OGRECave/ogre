@@ -43,9 +43,11 @@ namespace Ogre {
     EGLContext::EGLContext(EGLDisplay eglDisplay,
                             const EGLSupport* glsupport,
                            ::EGLConfig glconfig,
-                           ::EGLSurface drawable)
+                           ::EGLSurface drawable,
+                           ::EGLContext external)
         : mGLSupport(glsupport),
-          mContext(0)
+          mContext(0),
+          mExternalContext(false)
     {
         assert(drawable);
         GLRenderSystemCommon* renderSystem = static_cast<GLRenderSystemCommon*>(Root::getSingleton().getRenderSystem());
@@ -55,6 +57,12 @@ namespace Ogre {
         if (mainContext)
         {
             shareContext = mainContext->mContext;
+        }
+
+        if (external)
+        {
+            mContext = external;
+            mExternalContext = true;
         }
 
         _createInternalResources(eglDisplay, glconfig, drawable, shareContext);
@@ -80,13 +88,12 @@ namespace Ogre {
         mConfig = glconfig;
         mEglDisplay = eglDisplay;
         
-        mContext = mGLSupport->createNewContext(mEglDisplay, mConfig, shareContext);
+        if(!mExternalContext)
+            mContext = mGLSupport->createNewContext(mEglDisplay, mConfig, shareContext);
         
         if (!mContext)
         {
-            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-                        "Unable to create a suitable EGLContext",
-                        "EGLContext::EGLContext");
+            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Unable to obtain an EGLContext");
         }
 
         setCurrent();
@@ -110,10 +117,13 @@ namespace Ogre {
     void EGLContext::_destroyInternalResources()
     {
         endCurrent();
-        
-        eglDestroyContext(mEglDisplay, mContext);
-        EGL_CHECK_ERROR
-        
+
+        if (!mExternalContext)
+        {
+            eglDestroyContext(mEglDisplay, mContext);
+            EGL_CHECK_ERROR
+        }
+
         mContext = NULL;
     }
 

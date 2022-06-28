@@ -72,7 +72,7 @@ namespace Ogre {
         , mWorkerThreadCount(1)
         , mWorkerRenderSystemAccess(false)
         , mIsRunning(false)
-        , mResposeTimeLimitMS(8)
+        , mResposeTimeLimitMS(10)
         , mWorkerFunc(0)
         , mRequestCount(0)
         , mPaused(false)
@@ -645,8 +645,7 @@ namespace Ogre {
         Response* response = 0;
 
         StringStream dbgMsg;
-        dbgMsg <<
-            "main"
+        dbgMsg << "thread:" << OGRE_THREAD_CURRENT_ID
             << "): ID=" << r->getID() << " channel=" << r->getChannel() 
             << " requestType=" << r->getType();
 
@@ -677,15 +676,10 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void DefaultWorkQueueBase::processResponse(Response* r)
     {
-        StringStream dbgMsg;
-        dbgMsg << "thread:" <<
-            OGRE_THREAD_CURRENT_ID
-            << "): ID=" << r->getRequest()->getID()
-            << " success=" << r->succeeded() << " messages=[" << r->getMessages() << "] channel=" 
-            << r->getRequest()->getChannel() << " requestType=" << r->getRequest()->getType();
-
-        LogManager::getSingleton().stream(LML_TRIVIAL) << 
-            "DefaultWorkQueueBase('" << mName << "') - PROCESS_RESPONSE_START(" << dbgMsg.str();
+        LogManager::getSingleton().stream(LML_TRIVIAL)
+            << "DefaultWorkQueueBase('" << mName << "') - PROCESS_RESPONSE: "
+            << "ID=" << r->getRequest()->getID() << " success=" << r->succeeded() << " messages=[" << r->getMessages()
+            << "] channel=" << r->getRequest()->getChannel() << " requestType=" << r->getRequest()->getType();
 
         ResponseHandlerListByChannel::iterator i = mResponseHandlers.find(r->getRequest()->getChannel());
         if (i != mResponseHandlers.end())
@@ -699,9 +693,6 @@ namespace Ogre {
                 }
             }
         }
-        LogManager::getSingleton().stream(LML_TRIVIAL) << 
-            "DefaultWorkQueueBase('" << mName << "') - PROCESS_RESPONSE_END(" << dbgMsg.str();
-
     }
 
     bool DefaultWorkQueueBase::processIdleRequests()
@@ -749,23 +740,5 @@ namespace Ogre {
 
             return true;
         }
-    }
-
-
-    //---------------------------------------------------------------------
-
-    void DefaultWorkQueueBase::WorkerFunc::operator()()
-    {
-        mQueue->_threadMain();
-    }
-    
-    void DefaultWorkQueueBase::WorkerFunc::operator()() const
-    {
-        mQueue->_threadMain();
-    }
-
-    void DefaultWorkQueueBase::WorkerFunc::run()
-    {
-        mQueue->_threadMain();
     }
 }

@@ -60,7 +60,7 @@ namespace Ogre {
  * This implementation @cite bilas2000automatic slightly derives from the textbook pattern, by requiring
  * manual instantiation, instead of implicitly doing it in #getSingleton. This is useful for classes that
  * want to do some involved initialization, which should be done at a well defined time-point or need some
- * additional parmeters in their constructor.
+ * additional parameters in their constructor.
  *
  * It also allows you to manage the singleton lifetime through RAII.
  *
@@ -80,6 +80,14 @@ protected:
     static T* msSingleton;
 
 public:
+#if defined(__has_attribute)
+#  if __has_attribute(no_sanitize)
+    // The `static_cast` happens so early in the construction of the inheriting
+    // classes that the `this` pointer is still detected as the super class
+    // pointer. Therefore, disabling vptr checks.
+    __attribute__((no_sanitize("vptr")))
+#  endif
+#endif
     Singleton(void)
     {
         OgreAssert(!msSingleton, "There can be only one singleton");

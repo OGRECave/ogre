@@ -63,9 +63,13 @@ macro(create_android_proj ANDROID_PROJECT_TARGET)
     file(MAKE_DIRECTORY "${NDKOUT}/app/src/main/res")
 
     foreach(ACTIVITY_NAME ${MAIN_ACTIVITY} ${EXTRA_ACTIVITIES})
-        string(FIND ${ACTIVITY_NAME} "." DOT REVERSE)
-        math(EXPR DOT "${DOT} + 1")
-        string(SUBSTRING ${ACTIVITY_NAME} ${DOT} -1 LABEL)
+        if(EXTRA_ACTIVITIES)
+            string(FIND ${ACTIVITY_NAME} "." DOT REVERSE)
+            math(EXPR DOT "${DOT} + 1")
+            string(SUBSTRING ${ACTIVITY_NAME} ${DOT} -1 LABEL)
+        else()
+            set(LABEL ${ANDROID_MOD_NAME})
+        endif()
         set(ANDROID_ACTIVITIES "${ANDROID_ACTIVITIES}
         <activity android:name=\"${ACTIVITY_NAME}\"
         android:label=\"${LABEL}\"
@@ -81,5 +85,6 @@ macro(create_android_proj ANDROID_PROJECT_TARGET)
     configure_file("${OGRE_TEMPLATES_DIR}/AndroidManifest.xml.in" "${NDKOUT}/app/src/main/AndroidManifest.xml" @ONLY)
     configure_file("${OGRE_TEMPLATES_DIR}/app.gradle.in" "${NDKOUT}/app/build.gradle" @ONLY)
     configure_file("${OGRE_TEMPLATES_DIR}/project.gradle" "${NDKOUT}/build.gradle" @ONLY)
+    configure_file("${OGRE_TEMPLATES_DIR}/gradle.properties" "${NDKOUT}/gradle.properties" @ONLY)
     file(WRITE "${NDKOUT}/settings.gradle" "include ':app'")
 endmacro(create_android_proj)

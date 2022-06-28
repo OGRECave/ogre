@@ -42,12 +42,8 @@ namespace Ogre
     /** \addtogroup Scene
     *  @{
     */
-    /** Implements the Light Space Perspective Shadow Mapping Algorithm.
-    @remarks
-    Implements the LiSPSM algorithm for an advanced shadow map generation. LiSPSM was
-    developed by Michael Wimmer, Daniel Scherzer and Werner Purgathofer of the TU Wien.
-    The algorithm was presented on the Eurographics Symposium on Rendering 2004.
-    @note
+    /** Implements the %Light Space Perspective Shadow Mapping Algorithm @cite WSP04
+
     Shadow mapping was introduced by Williams in 1978. First a depth image is rendered
     from the light's view and compared in a second pass with depth values of the normal 
     camera view. In case the depth camera's depth value is greater than the depth seen
@@ -57,8 +53,7 @@ namespace Ogre
     viewer however the perspective projection affects near objects to be displayed 
     bigger than further away objects. The same thing happens with the shadow map texels:
     Near shadows appear very coarse and far away shadows are perfectly sampled.
-    In 2002 Stamminger et al. presented an algorithm called Perspective Shadow Maps 
-    (PSM). PSM battles the perspective aliasing by distributing 50% of the shadow map 
+    PSM @cite stamminger2002perspective battles the perspective aliasing by distributing 50% of the shadow map
     texels for objects in the range of < near clipping plane > to < near clipping plane * 2 >
     which inverts the problem: The shadows near the viewer are perfectly sampled, 
     however far away shadow may contain aliasing artefacts. A near clipping plane may be
@@ -85,19 +80,16 @@ namespace Ogre
     However there are still problems. PSM as well as LiSPSM only devote to minimize
     perspective aliasing. Projection aliasing is still a problem, also 'swimming 
     artefacts' still occur. The LiSPSM quality distribution is very good but not the 
-    best available: Some sources say logarithmic shadow mapping is the non plus ultra, 
-    however others reject this thought. There is a research project on logarithmic shadow 
-    maps. The web page url is http://gamma.cs.unc.edu/logsm/. However there is no techical 
-    report available yet (Oct 23rd, 2006).
-    @note
+    best available: Some sources say logarithmic shadow mapping @cite lloyd2007practical
+    is the non plus ultra, however others reject this thought.
+
     More information can be found on the webpage of the TU Wien: 
     http://www.cg.tuwien.ac.at/research/vr/lispsm/
-    @note
+
     Original implementation by Matthias Fink <matthias.fink@web.de>, 2006.
     */
     class _OgreExport LiSPSMShadowCameraSetup : public FocusedShadowCameraSetup
     {
-    protected:
         /// Warp factor adjustment
         Real mOptAdjustFactor;
         /// Use simple nopt derivation?
@@ -108,7 +100,7 @@ namespace Ogre
         Real mCosCamLightDirThreshold;
 
         /** Calculates the LiSPSM projection matrix P.
-        @remarks
+
         The LiSPSM projection matrix will be built around the axis aligned bounding box 
         of the intersection body B in light space. The distance between the near plane 
         and the projection center is chosen in such a way (distance is set by the para-
@@ -127,7 +119,7 @@ namespace Ogre
             const Camera& cam, const Light& light) const;
 
         /** Calculates the distance between camera position and near clipping plane.
-        @remarks
+
         n_opt determines the distance between light space origin (shadow camera position)
         and the near clipping plane to achieve an optimal perspective foreshortening effect.
         In this way the texel distribution over the shadow map is controlled.
@@ -159,7 +151,7 @@ namespace Ogre
             const Camera& cam) const;
 
         /** Calculates the visible point on the near plane for the n_opt calculation
-        @remarks
+
         z0 lies on the parallel plane to the near plane through e and on the near plane of 
         the frustum C (plane z = bodyB_zMax_ls) and on the line x = e.x.
         @param lightSpace Matrix of the light space transformation
@@ -187,7 +179,7 @@ namespace Ogre
         }
 
         /** Returns a LiSPSM shadow camera.
-        @remarks
+
         Builds and returns a LiSPSM shadow camera. 
         More information can be found on the webpage of the TU Wien: 
         http://www.cg.tuwien.ac.at/research/vr/lispsm/
@@ -196,7 +188,7 @@ namespace Ogre
             const Viewport *vp, const Light *light, Camera *texCam, size_t iteration) const;
 
         /** Adjusts the parameter n to produce optimal shadows.
-        @remarks
+
         The smaller the parameter n, the stronger the perspective warping effect.
         The consequence of a stronger warping is that the near shadows will gain 
         quality while the far ones will lose it. Depending on your scene and light
@@ -224,7 +216,7 @@ namespace Ogre
         /** Sets the threshold between the camera and the light direction below
             which the LiSPSM projection is 'flattened', since coincident light
             and camera projections cause problems with the perspective skew.
-            @remarks
+
             For example, setting this to 20 degrees will mean that as the difference 
             between the light and camera direction reduces from 20 degrees to 0
             degrees, the perspective skew will be proportionately removed.

@@ -14,10 +14,14 @@ uniform vec4	lightAttenuation;
 uniform float	lightGloss;
 
 #if DEPTH_SHADOWRECEIVER
-uniform float invShadowMapSize;
 uniform sampler2D shadowMap;
 
-#include "TerrainHelpers.glsl"
+float calcDepthShadow(sampler2D shadowMap, vec4 uv)
+{
+    uv /= uv.w;
+    uv.z = uv.z * 0.5 + 0.5; // convert -1..1 to 0..1
+    return texture2D(shadowMap, uv.xy).x >= uv.z ? 1.0 : 0.0;
+}
 #endif
 
 varying vec2 _uv0;
@@ -36,7 +40,7 @@ void main(void)
 
 	float fShadow = 1.0;
 #if DEPTH_SHADOWRECEIVER
-	fShadow = calcDepthShadow( shadowMap, oLightSpacePos, invShadowMapSize );
+	fShadow = calcDepthShadow( shadowMap, oLightSpacePos );
 #endif
 
 	vec4 baseColour = texture2D( diffuseMap, _uv0 );

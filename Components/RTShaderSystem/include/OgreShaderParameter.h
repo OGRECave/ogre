@@ -67,7 +67,9 @@ public:
         /// Binormal (Y axis if normal is Z)
         SPS_BINORMAL = 8,
         /// Tangent (X axis if normal is Z)
-        SPS_TANGENT = 9
+        SPS_TANGENT = 9,
+        /// VFACE
+        SPS_FRONT_FACING
     };
 
     /** Shader parameter content
@@ -303,6 +305,9 @@ public:
         /// point sprite size
         SPC_POINTSPRITE_SIZE,
 
+        /// gl_FrontFacing
+        SPC_FRONT_FACING,
+
         /// Reserved custom content range to be used by user custom shader extensions.
         SPC_CUSTOM_CONTENT_BEGIN    = 1000,
         SPC_CUSTOM_CONTENT_END      = 2000
@@ -420,7 +425,7 @@ public:
     @param fAutoConstantData The real data for this auto constant parameter.    
     @param size number of elements in the parameter.    
     */
-    UniformParameter(GpuProgramParameters::AutoConstantType autoType, Real fAutoConstantData, size_t size);
+    UniformParameter(GpuProgramParameters::AutoConstantType autoType, float fAutoConstantData, size_t size);
     
     /** Class constructor.
     @param autoType The auto type of this parameter.
@@ -428,14 +433,14 @@ public:
     @param size number of elements in the parameter.
     @param type The desired data type of this auto constant parameter.
     */
-    UniformParameter(GpuProgramParameters::AutoConstantType autoType, Real fAutoConstantData, size_t size, GpuConstantType type);
+    UniformParameter(GpuProgramParameters::AutoConstantType autoType, float fAutoConstantData, size_t size, GpuConstantType type);
 
     /** Class constructor.
     @param autoType The auto type of this parameter.
     @param nAutoConstantData The int data for this auto constant parameter. 
     @param size number of elements in the parameter.    
     */
-    UniformParameter(GpuProgramParameters::AutoConstantType autoType, size_t nAutoConstantData, size_t size);
+    UniformParameter(GpuProgramParameters::AutoConstantType autoType, uint32 nAutoConstantData, size_t size);
     
     /** Class constructor.
     @param autoType The auto type of this parameter.
@@ -443,20 +448,20 @@ public:
     @param size number of elements in the parameter.
     @param type The desired data type of this auto constant parameter.
     */
-    UniformParameter(GpuProgramParameters::AutoConstantType autoType, size_t nAutoConstantData, size_t size, GpuConstantType type);
+    UniformParameter(GpuProgramParameters::AutoConstantType autoType, uint32 nAutoConstantData, size_t size, GpuConstantType type);
 
     
     /** Get auto constant int data of this parameter, in case it is auto constant parameter. */
-    size_t getAutoConstantIntData() const { return mAutoConstantIntData; }  
+    uint32 getAutoConstantIntData() const { return isArray() ? getSize() : mAutoConstantIntData; }
 
     /** Get auto constant real data of this parameter, in case it is auto constant parameter. */
-    Real getAutoConstantRealData() const { return mAutoConstantRealData; }  
+    float getAutoConstantRealData() const { return mAutoConstantRealData; }
 
     /** Return true if this parameter is a floating point type, false otherwise. */
-    bool isFloat() const;
+    bool isFloat() const { return GpuConstantDefinition::isFloat(mType); }
 
     /** Return true if this parameter is a texture sampler type, false otherwise. */
-    bool isSampler() const;
+    bool isSampler() const { return GpuConstantDefinition::isSampler(mType); }
 
     /** Return true if this parameter is an auto constant parameter, false otherwise. */
     bool isAutoConstantParameter() const { return mIsAutoConstantReal || mIsAutoConstantInt; }
@@ -583,7 +588,7 @@ public:
     }
 
     /// light index or array size
-    void updateExtraInfo(size_t data)
+    void updateExtraInfo(uint32 data)
     {
         if (!mParamsPtr)
             return;
@@ -592,7 +597,7 @@ public:
                                         mElementSize);
     }
 
-protected:
+private:
     // Is it auto constant real based parameter.
     bool mIsAutoConstantReal;
     // Is it auto constant int based parameter.
@@ -601,9 +606,9 @@ protected:
     union
     {
         // Auto constant int data.
-        size_t mAutoConstantIntData;
+        uint32 mAutoConstantIntData;
         // Auto constant real data.
-        Real mAutoConstantRealData;
+        float mAutoConstantRealData;
     };      
     // How this parameter varies (bitwise combination of GpuProgramVariability).
     uint16 mVariability;
@@ -612,7 +617,7 @@ protected:
     // The physical index of this parameter in the GPU program.
     size_t mPhysicalIndex;
     // The size of this parameter in the GPU program
-    size_t mElementSize;
+    uint8 mElementSize;
 };
 
 typedef std::vector<UniformParameterPtr>       UniformParameterList;
@@ -678,16 +683,6 @@ public:
 
     static ParameterPtr createInTexcoord(GpuConstantType type, int index, Parameter::Content content);
     static ParameterPtr createOutTexcoord(GpuConstantType type, int index, Parameter::Content content);
-    /// @deprecated use createInTexcoord
-    static ParameterPtr createInTexcoord1(int index, Parameter::Content content);
-    /// @deprecated use createOutTexcoord
-    static ParameterPtr createOutTexcoord1(int index, Parameter::Content content);
-    static ParameterPtr createInTexcoord2(int index, Parameter::Content content);
-    static ParameterPtr createOutTexcoord2(int index, Parameter::Content content);
-    static ParameterPtr createInTexcoord3(int index, Parameter::Content content);
-    static ParameterPtr createOutTexcoord3(int index, Parameter::Content content);
-    static ParameterPtr createInTexcoord4(int index, Parameter::Content content);           
-    static ParameterPtr createOutTexcoord4(int index, Parameter::Content content);
 
     static ParameterPtr createConstParam(const Vector2& val);
     static ParameterPtr createConstParam(const Vector3& val);

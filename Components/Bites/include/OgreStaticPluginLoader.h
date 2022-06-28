@@ -1,6 +1,7 @@
 // This file is part of the OGRE project.
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at https://www.ogre3d.org/licensing.
+// SPDX-License-Identifier: MIT
 
 #ifndef __StaticPluginLoader_H__
 #define __StaticPluginLoader_H__
@@ -10,6 +11,12 @@
 
 namespace OgreBites
 {
+    /** \addtogroup Optional
+    *  @{
+    */
+    /** \addtogroup Bites
+    *  @{
+    */
     /** Utility class for loading the plugins statically.
 
         When loading plugins statically, you are limited to loading plugins
@@ -25,6 +32,8 @@ namespace OgreBites
 
         void unload();
     };
+    /** @} */
+    /** @} */
 }
 
 #endif

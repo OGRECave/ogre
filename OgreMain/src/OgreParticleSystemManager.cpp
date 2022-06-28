@@ -239,11 +239,6 @@ namespace Ogre {
         
     }
     //-----------------------------------------------------------------------
-    void ParticleSystemManager::destroySystemImpl(ParticleSystem* sys)
-    {
-        OGRE_DELETE sys;
-    }
-    //-----------------------------------------------------------------------
     ParticleEmitter* ParticleSystemManager::_createEmitter(
         const String& emitterType, ParticleSystem* psys)
     {
@@ -253,8 +248,7 @@ namespace Ogre {
 
         if (pFact == mEmitterFactories.end())
         {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Cannot find requested emitter type.", 
-                "ParticleSystemManager::_createEmitter");
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Cannot find emitter type '" + emitterType + "'");
         }
 
         return pFact->second->createEmitter(psys);
@@ -287,8 +281,7 @@ namespace Ogre {
 
         if (pFact == mAffectorFactories.end())
         {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Cannot find requested affector type.", 
-                "ParticleSystemManager::_createAffector");
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Cannot find affector type '" + affectorType + "'");
         }
 
         return pFact->second->createAffector(psys);
@@ -420,14 +413,6 @@ namespace Ogre {
     const String& ParticleSystemFactory::getType(void) const
     {
         return FACTORY_TYPE_NAME;
-    }
-    //-----------------------------------------------------------------------
-    void ParticleSystemFactory::destroyInstance( MovableObject* obj) 
-    {
-        // use manager
-        ParticleSystemManager::getSingleton().destroySystemImpl(
-            static_cast<ParticleSystem*>(obj));
-
     }
     //-----------------------------------------------------------------------
 }

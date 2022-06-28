@@ -30,6 +30,7 @@ THE SOFTWARE.
 #include "OgreRoot.h"
 #include "OgreRenderSystem.h"
 #include "OgreBitwise.h"
+#include "OgreLogManager.h"
 
 namespace Ogre {
     struct GLPixelFormatDescription {
@@ -266,6 +267,7 @@ namespace Ogre {
             {GL_NONE, GL_NONE, GL_COMPRESSED_RGBA_ASTC_12x12_KHR},// PF_ASTC_RGBA_12X12_LDR
             {GL_NONE, GL_NONE, GL_NONE}, // PF_DEPTH32
             {GL_NONE, GL_NONE, GL_NONE}, // PF_DEPTH32F
+            {GL_NONE, GL_NONE, GL_NONE}, // PF_DEPTH24_STENCIL8
     };
 
     void GLES2PixelUtil::useSizedFormats()

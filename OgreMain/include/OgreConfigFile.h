@@ -32,10 +32,10 @@ THE SOFTWARE.
 
 #include "OgreCommon.h"
 #include "OgreStringVector.h"
-#include "OgreIteratorWrappers.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {
+    template <typename T> class MapIterator;
 
     /** \addtogroup Core
     *  @{
@@ -44,7 +44,7 @@ namespace Ogre {
     *  @{
     */
     /** Class for quickly loading settings from a text file.
-        @remarks
+
             This class is designed to quickly parse a simple file containing
             key/value pairs, mainly for use in configuration settings.
         @par

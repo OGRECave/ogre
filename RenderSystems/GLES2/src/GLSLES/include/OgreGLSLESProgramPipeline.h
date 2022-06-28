@@ -35,7 +35,7 @@ namespace Ogre
 {
     /** Specialisation of HighLevelGpuProgram to provide support for OpenGL 
      Shader Language (GLSL ES) for OpenGL ES 2.0.
-     @remarks
+
      GLSL ES has no target assembler or entry point specification like DirectX 9 HLSL.
      Vertex and Fragment shaders only have one entry point called "main".  
      When a shader is compiled, microcode is generated but can not be accessed by

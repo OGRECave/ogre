@@ -30,6 +30,7 @@ THE SOFTWARE.
 
 #include "OgreCodec.h"
 #include "OgrePixelFormat.h"
+#include "OgreBitwise.h"
 
 namespace Ogre {
 
@@ -40,17 +41,39 @@ namespace Ogre {
     *  @{
     */
     /** Codec specialized in images.
-        @remarks
+
             The users implementing subclasses of ImageCodec are required to return
             a valid pointer to a ImageData class from the decode(...) function.
     */
     class _OgreExport ImageCodec : public Codec
     {
+    protected:
+        static void flipEndian(void* pData, size_t size, size_t count)
+        {
+#if OGRE_ENDIAN == OGRE_ENDIAN_BIG
+            Bitwise::bswapChunks(pData, size, count);
+#endif
+        }
+        static void flipEndian(void* pData, size_t size)
+        {
+#if OGRE_ENDIAN == OGRE_ENDIAN_BIG
+            Bitwise::bswapBuffer(pData, size);
+#endif
+        }
+
     public:
+        using Codec::decode;
+        using Codec::encode;
+        using Codec::encodeToFile;
+
+        void decode(const DataStreamPtr& input, const Any& output) const override;
+        DataStreamPtr encode(const Any& input) const override;
+        void encodeToFile(const Any& input, const String& outFileName) const override;
+
         virtual ~ImageCodec();
         /** Codec return class for images. Has information about the size and the
             pixel format of the image. */
-        class _OgrePrivate ImageData : public Codec::CodecData
+        class _OgrePrivate ImageData
         {
         public:
             ImageData():
@@ -67,19 +90,20 @@ namespace Ogre {
             uint flags;
 
             PixelFormat format;
-
-            /// @deprecated do not use
-            OGRE_DEPRECATED String dataType() const
-            {
-                return "ImageData";
-            }
         };
+        typedef SharedPtr<ImageData> CodecDataPtr;
 
-
-        /// @deprecated do not use
-        OGRE_DEPRECATED String getDataType() const
+        /// @deprecated
+        OGRE_DEPRECATED virtual DataStreamPtr encode(const MemoryDataStreamPtr& input, const CodecDataPtr& pData) const { return encode(Any()); }
+        /// @deprecated
+        OGRE_DEPRECATED virtual void encodeToFile(const MemoryDataStreamPtr& input, const String& outFileName, const CodecDataPtr& pData) const
+        { encodeToFile(Any(), ""); }
+        /// Result of a decoding; both a decoded data stream and CodecData metadata
+        typedef std::pair<MemoryDataStreamPtr, CodecDataPtr> DecodeResult;
+        /// @deprecated
+        OGRE_DEPRECATED virtual DecodeResult decode(const DataStreamPtr& input) const
         {
-            return "ImageData";
+            return DecodeResult();
         }
     };
 

@@ -42,15 +42,13 @@ namespace Ogre {
     */
 
     /** Class that provides convenient interface to establish a linkage between
-    custom user application objects and Ogre core classes.
-    Any instance of Ogre class that will derive from this class could be associated with custom
-    application object using this class interface.
+    custom user application objects and %Ogre core classes.
     */
     class _OgreExport UserObjectBindings : public GeneralAllocatedObject
     {
     public:
         /** Sets any kind of user object on this class instance.
-        @remarks
+
         This method allows you to associate any user object you like with
         this class. This can be a pointer back to one of your own
         classes for instance.
@@ -65,7 +63,7 @@ namespace Ogre {
         const Any& getUserAny(void) const;
 
         /** Sets any kind of user object on this class instance.
-        @remarks
+
         This method allows you to associate multiple object with this class.
         This can be a pointer back to one of your own classes for instance.
         Use a unique key to distinguish between each of these objects.
@@ -76,7 +74,7 @@ namespace Ogre {
 
         /** Retrieves the custom user object associated with this class and key.
         @param key The key that the requested user object is associated with.
-        @remarks
+
         In case no object associated with this key the returned Any object will be empty.
         */
         const Any& getUserAny(const String& key) const;
@@ -94,20 +92,12 @@ namespace Ogre {
         /** Copy constructor. Performs a copy of all stored UserAny. */
         UserObjectBindings(const UserObjectBindings& other);
 
-        UserObjectBindings& swap(UserObjectBindings& rhs)
-        {
-            std::swap(mAttributes, rhs.mAttributes);
-            return *this;
-        }
+        UserObjectBindings& swap(UserObjectBindings& rhs);
 
-        UserObjectBindings& operator=(const UserObjectBindings& rhs)
-        {
-            UserObjectBindings(rhs).swap(*this);
-            return *this;
-        }
+        UserObjectBindings& operator=(const UserObjectBindings& rhs);
 
     // Types.
-    protected:
+    private:
         typedef std::map<String, Any>          UserObjectsMap;
         typedef UserObjectsMap::iterator        UserObjectsMapIterator;
         typedef UserObjectsMap::const_iterator  UserObjectsMapConstIterator;

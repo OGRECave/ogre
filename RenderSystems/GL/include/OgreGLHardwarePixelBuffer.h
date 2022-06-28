@@ -32,24 +32,9 @@ THE SOFTWARE.
 #include "OgreGLHardwarePixelBufferCommon.h"
 
 namespace Ogre {
-    class _OgreGLExport GLHardwarePixelBuffer: public GLHardwarePixelBufferCommon
-    {
-    public:
-        /// Should be called by HardwareBufferManager
-        GLHardwarePixelBuffer(uint32 mWidth, uint32 mHeight, uint32 mDepth,
-                PixelFormat mFormat,
-                HardwareBuffer::Usage usage);
-        
-        /// @copydoc HardwarePixelBuffer::blitFromMemory
-        void blitFromMemory(const PixelBox &src, const Box &dstBox);
-        
-        /// @copydoc HardwarePixelBuffer::blitToMemory
-        void blitToMemory(const Box &srcBox, const PixelBox &dst);
-    };
-
     /** Texture surface.
     */
-    class _OgreGLExport GLTextureBuffer: public GLHardwarePixelBuffer
+    class GLTextureBuffer: public GLHardwarePixelBufferCommon
     {
     public:
         /** Texture constructor */
@@ -57,8 +42,7 @@ namespace Ogre {
                         uint32 mWidth, uint32 mHeight, uint32 mDepth);
         ~GLTextureBuffer();
         
-        /// @copydoc GLHardwarePixelBuffer::bindToFramebuffer
-        virtual void bindToFramebuffer(uint32 attachment, uint32 zoffset);
+        void bindToFramebuffer(uint32 attachment, uint32 zoffset) override;
         /// @copydoc HardwarePixelBuffer::getRenderTarget
         RenderTexture* getRenderTarget(size_t slice);
         /// Upload a box of pixels to this buffer on the card
@@ -68,42 +52,37 @@ namespace Ogre {
   
         /// Hardware implementation of blitFromMemory
         virtual void blitFromMemory(const PixelBox &src_orig, const Box &dstBox);
-        
-        /// Notify TextureBuffer of destruction of render target
-        void _clearSliceRTT(size_t zoffset)
-        {
-            mSliceTRT[zoffset] = 0;
-        }
+
         /// Copy from framebuffer
         void copyFromFramebuffer(uint32 zoffset);
         /// @copydoc HardwarePixelBuffer::blit
         void blit(const HardwarePixelBufferSharedPtr &src, const Box &srcBox, const Box &dstBox);
+        void blitToMemory(const Box &srcBox, const PixelBox &dst) override;
+    protected:
         /// Blitting implementation
         void blitFromTexture(GLTextureBuffer *src, const Box &srcBox, const Box &dstBox);
-    protected:
+        void _blitFromMemory(const PixelBox &src, const Box &dst);
+
         // In case this is a texture level
         GLenum mTarget;
         GLenum mFaceTarget; // same as mTarget in case of GL_TEXTURE_xD, but cubemap face for cubemaps
         GLuint mTextureID;
-        GLint mFace;
         GLint mLevel;
         bool mHwGamma;
-
-        typedef std::vector<RenderTexture*> SliceTRT;
-        SliceTRT mSliceTRT;
 
         GLRenderSystem* mRenderSystem;
     };
      /** Renderbuffer surface.  Needs FBO extension.
      */
-    class _OgreGLExport GLRenderBuffer: public GLHardwarePixelBuffer
+    class GLRenderBuffer: public GLHardwarePixelBufferCommon
     {
+        void blitFromMemory(const PixelBox& src, const Box& dstBox) override { OgreAssertDbg(false, "Not supported"); }
+        void blitToMemory(const Box& srcBox, const PixelBox& dst) override { OgreAssertDbg(false, "Not supported"); }
     public:
         GLRenderBuffer(GLenum format, uint32 width, uint32 height, GLsizei numSamples);
         ~GLRenderBuffer();
         
-        /// @copydoc GLHardwarePixelBuffer::bindToFramebuffer
-        virtual void bindToFramebuffer(uint32 attachment, uint32 zoffset);
+        void bindToFramebuffer(uint32 attachment, uint32 zoffset) override;
     protected:
         /// In case this is a render buffer
         GLuint mRenderbufferID;

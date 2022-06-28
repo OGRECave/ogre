@@ -1,0 +1,41 @@
+// This file is part of the OGRE project.
+// It is subject to the license terms in the LICENSE file found in the top-level directory
+// of this distribution and at https://www.ogre3d.org/licensing.
+
+vertex_program Ogre/ShadowBlendVP glsl glsles hlsl glslang
+{
+    source ShadowBlend.vert
+    default_params
+    {
+        param_named_auto worldViewProj worldviewproj_matrix
+    }
+}
+
+fragment_program Ogre/ShadowBlendFP glsl glsles hlsl glslang
+{
+    source ShadowBlend.frag
+    default_params
+    {
+        param_named_auto shadowColor shadow_colour
+    }
+}
+
+vertex_program Ogre/ShadowExtrudePointLight glsl glsles hlsl
+{
+    source ShadowExtrudePointLight.vert
+}
+
+vertex_program Ogre/ShadowExtrudeDirLight glsl glsles hlsl
+{
+    source ShadowExtrudeDirLight.vert
+}
+
+vertex_program Ogre/ShadowExtrudePointLightFinite glsl glsles hlsl
+{
+    source ShadowExtrudePointLightFinite.vert
+}
+
+vertex_program Ogre/ShadowExtrudeDirLightFinite glsl glsles hlsl
+{
+    source ShadowExtrudeDirLightFinite.vert
+}

@@ -33,7 +33,7 @@ THE SOFTWARE.
 #include "OgreRoot.h"
 #include "OgreGLHardwarePixelBuffer.h"
 #include "OgreGLFBORenderTexture.h"
-#include "OgreGLDepthBuffer.h"
+#include "OgreGLDepthBufferCommon.h"
 #include "OgreGLRenderSystemCommon.h"
 
 namespace Ogre {
@@ -45,7 +45,7 @@ namespace Ogre {
         // Generate framebuffer object
         glGenFramebuffersEXT(1, &mFB);
         // check multisampling
-        if (GLEW_EXT_framebuffer_blit && GLEW_EXT_framebuffer_multisample)
+        if (GLAD_GL_EXT_framebuffer_blit && GLAD_GL_EXT_framebuffer_multisample)
         {
             // check samples supported
             GLint maxSamples;
@@ -107,8 +107,6 @@ namespace Ogre {
         // Bind simple buffer to add colour attachments
         glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, mFB);
 
-        bool isDepth = PixelUtil::isDepth(getFormat());
-
         // Bind all attachment points to frame buffer
         for(unsigned int x=0; x<maxSupportedMRTs; ++x)
         {
@@ -131,6 +129,7 @@ namespace Ogre {
                     OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, ss.str(), "GLFrameBufferObject::initialise");
                 }
 
+                bool isDepth = PixelUtil::isDepth(mColour[x].buffer->getFormat());
                 mColour[x].buffer->bindToFramebuffer(
                     isDepth ? GL_DEPTH_ATTACHMENT_EXT : (GL_COLOR_ATTACHMENT0_EXT + x), mColour[x].zoffset);
             }
@@ -143,7 +142,7 @@ namespace Ogre {
         }
 
         // Now deal with depth / stencil
-        if (mMultisampleFB)
+        if (mMultisampleFB && !PixelUtil::isDepth(getFormat()))
         {
             // Bind multisample buffer
             glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, mMultisampleFB);
@@ -173,9 +172,11 @@ namespace Ogre {
             // Fill attached colour buffers
             if(mColour[x].buffer)
             {
-                bufs[x] = isDepth ? GL_DEPTH_ATTACHMENT_EXT : (GL_COLOR_ATTACHMENT0_EXT + x);
+                bool isDepth = PixelUtil::isDepth(mColour[x].buffer->getFormat());
+                bufs[x] = isDepth ? GL_NONE : (GL_COLOR_ATTACHMENT0_EXT + x);
                 // Keep highest used buffer + 1
-                n = x+1;
+                if(!isDepth)
+                    n = x+1;
             }
             else
             {
@@ -183,15 +184,12 @@ namespace Ogre {
             }
         }
 
-        if(!isDepth)
-        {
-            if(glDrawBuffers)
-                // Drawbuffer extension supported, use it
-                glDrawBuffers(n, bufs);
-            else
-                // In this case, the capabilities will not show more than 1 simultaneaous render target.
-                glDrawBuffer(bufs[0]);
-        }
+        if(glDrawBuffers)
+            // Drawbuffer extension supported, use it
+            glDrawBuffers(n, bufs);
+        else
+            // In this case, the capabilities will not show more than 1 simultaneaous render target.
+            glDrawBuffer(bufs[0]);
         
         // Check status
         GLuint status;
@@ -245,7 +243,7 @@ namespace Ogre {
 
     void GLFrameBufferObject::attachDepthBuffer( DepthBuffer *depthBuffer )
     {
-        GLDepthBuffer *glDepthBuffer = static_cast<GLDepthBuffer*>(depthBuffer);
+        auto glDepthBuffer = static_cast<GLDepthBufferCommon*>(depthBuffer);
 
         glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, mMultisampleFB ? mMultisampleFB : mFB );
 

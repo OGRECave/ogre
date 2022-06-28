@@ -41,8 +41,6 @@ namespace Ogre {
 
         /// Internal method for creates a new vertex declaration, may be overridden by certain rendering APIs
         VertexDeclaration* createVertexDeclarationImpl(void);
-        /// Internal method for destroys a vertex declaration, may be overridden by certain rendering APIs
-        void destroyVertexDeclarationImpl(VertexDeclaration* decl);
 
     public:
         D3D11HardwareBufferManager(D3D11Device & device);
@@ -59,9 +57,8 @@ namespace Ogre {
         /// @copydoc HardwareBufferManager::createRenderToVertexBuffer
         RenderToVertexBufferSharedPtr createRenderToVertexBuffer();
         /// @copydoc HardwareBufferManager::createUniformBuffer
-        HardwareUniformBufferSharedPtr createUniformBuffer(size_t sizeBytes, 
-                                    HardwareBuffer::Usage usage = HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE, 
-                                    bool useShadowBuffer = false, const String& name = "");
+        HardwareBufferPtr createUniformBuffer(size_t sizeBytes, HardwareBufferUsage usage = HBU_CPU_TO_GPU,
+                                              bool useShadowBuffer = false) override;
     };
 
     typedef D3D11HardwareBufferManager D3D11HardwareBufferManagerBase;

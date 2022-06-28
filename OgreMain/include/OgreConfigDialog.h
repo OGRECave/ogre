@@ -47,7 +47,7 @@ namespace Ogre
         virtual ~ConfigDialog() {}
 
         /** Displays the dialog.
-        @remarks
+
             This method displays the dialog and from then on the dialog
             interacts with the user independently. The dialog will be
             calling the relevant OGRE rendering systems to query them for

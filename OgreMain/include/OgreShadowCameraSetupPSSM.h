@@ -43,7 +43,7 @@ namespace Ogre
     *  @{
     */
     /** Parallel Split Shadow Map (PSSM) shadow camera setup. 
-    @remarks
+
         A PSSM shadow system uses multiple shadow maps per light and maps each
         texture into a region of space, progressing away from the camera. As such
         it is most appropriate for directional light setups. This particular version
@@ -60,7 +60,7 @@ namespace Ogre
         typedef std::vector<Real> SplitPointList;
         typedef std::vector<Real> OptimalAdjustFactorList;
 
-    protected:
+    private:
         uint mSplitCount;
         SplitPointList mSplitPoints;
         OptimalAdjustFactorList mOptimalAdjustFactors;

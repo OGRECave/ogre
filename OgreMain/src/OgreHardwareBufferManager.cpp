@@ -61,13 +61,6 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     HardwareBufferManagerBase::~HardwareBufferManagerBase()
     {
-        // Clear vertex/index buffer list first, avoid destroyed notify do
-        // unnecessary work, and we'll destroy everything here.
-        mVertexBuffers.clear();
-        mIndexBuffers.clear();
-        mUniformBuffers.clear();
-        mCounterBuffers.clear();
-
         // Destroy everything
         destroyAllDeclarations();
         destroyAllBindings();
@@ -87,6 +80,7 @@ namespace Ogre {
     void HardwareBufferManagerBase::destroyVertexDeclaration(VertexDeclaration* decl)
     {
         OGRE_LOCK_MUTEX(mVertexDeclarationsMutex);
+        OgreAssertDbg(mVertexDeclarations.find(decl) != mVertexDeclarations.end(), "unknown decl");
         mVertexDeclarations.erase(decl);
         destroyVertexDeclarationImpl(decl);
     }
@@ -101,7 +95,9 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void HardwareBufferManagerBase::destroyVertexBufferBinding(VertexBufferBinding* binding)
     {
-            OGRE_LOCK_MUTEX(mVertexBufferBindingsMutex);
+        OGRE_LOCK_MUTEX(mVertexBufferBindingsMutex);
+        OgreAssertDbg(mVertexBufferBindings.find(binding) != mVertexBufferBindings.end(),
+                      "unknown binding");
         mVertexBufferBindings.erase(binding);
         destroyVertexBufferBindingImpl(binding);
     }
@@ -393,38 +389,13 @@ namespace Ogre {
             _forceReleaseBufferCopies(buf);
         }
     }
-    //-----------------------------------------------------------------------
-    void HardwareBufferManagerBase::_notifyIndexBufferDestroyed(HardwareIndexBuffer* buf)
-    {
-            OGRE_LOCK_MUTEX(mIndexBuffersMutex);
-
-        IndexBufferList::iterator i = mIndexBuffers.find(buf);
-        if (i != mIndexBuffers.end())
-        {
-            mIndexBuffers.erase(i);
-        }
-    }
-    //-----------------------------------------------------------------------
-    void HardwareBufferManagerBase::_notifyUniformBufferDestroyed(HardwareUniformBuffer* buf)
-    {
-    }
-    //-----------------------------------------------------------------------
-    void HardwareBufferManagerBase::_notifyCounterBufferDestroyed(HardwareCounterBuffer* buf)
-    {
-    }
     RenderToVertexBufferSharedPtr HardwareBufferManagerBase::createRenderToVertexBuffer()
     {
         OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "not supported by RenderSystem");
     }
-    HardwareUniformBufferSharedPtr
-    HardwareBufferManagerBase::createUniformBuffer(size_t sizeBytes, HardwareBuffer::Usage usage,
-                                                   bool useShadowBuffer, const String& name)
-    {
-        OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "not supported by RenderSystem");
-    }
-    HardwareUniformBufferSharedPtr
-    HardwareBufferManagerBase::createCounterBuffer(size_t sizeBytes, HardwareBuffer::Usage usage,
-                                                   bool useShadowBuffer, const String& name)
+    HardwareBufferPtr HardwareBufferManagerBase::createUniformBuffer(size_t sizeBytes,
+                                                                     HardwareBufferUsage usage,
+                                                                     bool useShadowBuffer)
     {
         OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "not supported by RenderSystem");
     }
@@ -475,11 +446,12 @@ namespace Ogre {
 
         posBindIndex = posElem->getSource();
         srcPositionBuffer = bind->getBuffer(posBindIndex);
+        srcNormalBuffer.reset();
 
         if (!normElem)
         {
             posNormalShareBuffer = false;
-            srcNormalBuffer.reset();
+            posNormalExtraData = posElem->getSize() != srcPositionBuffer->getVertexSize();
         }
         else
         {
@@ -487,10 +459,11 @@ namespace Ogre {
             if (normBindIndex == posBindIndex)
             {
                 posNormalShareBuffer = true;
-                srcNormalBuffer.reset();
+                posNormalExtraData = (posElem->getSize() + normElem->getSize()) != srcPositionBuffer->getVertexSize();
             }
             else
             {
+                posNormalExtraData = false;
                 posNormalShareBuffer = false;
                 srcNormalBuffer = bind->getBuffer(normBindIndex);
             }
@@ -505,7 +478,7 @@ namespace Ogre {
         if (positions && !destPositionBuffer)
         {
             destPositionBuffer = srcPositionBuffer->getManager()->allocateVertexBufferCopy(srcPositionBuffer, 
-                HardwareBufferManagerBase::BLT_AUTOMATIC_RELEASE, this);
+                HardwareBufferManagerBase::BLT_AUTOMATIC_RELEASE, this, posNormalExtraData);
         }
         if (normals && !posNormalShareBuffer && srcNormalBuffer && !destNormalBuffer)
         {

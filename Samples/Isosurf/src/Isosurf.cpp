@@ -34,26 +34,9 @@ namespace OgreBites {
         mInfo["Category"] = "Geometry";
     }
 
-    StringVector Sample_Isosurf::getRequiredPlugins()
-    {
-        StringVector names;
-		if(!GpuProgramManager::getSingleton().isSyntaxSupported("glsl150")
-		&& !GpuProgramManager::getSingleton().isSyntaxSupported("hlsl"))
-            names.push_back("Cg Program Manager");
-        return names;
-    }
-
     void Sample_Isosurf::testCapabilities(const RenderSystemCapabilities* caps)
     {
-        if (!caps->hasCapability(RSC_GEOMETRY_PROGRAM))
-        {
-            OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Your render system / hardware does not support geometry programs, "
-                        "so you cannot run this sample. Sorry!", 
-                        "Sample_Isosurf::testCapabilities");
-        }
-
-        Ogre::LogManager::getSingleton().getDefaultLog()->stream() << 
-            "Num output vertices per geometry shader run : " << caps->getGeometryProgramNumOutputVertices();
+        requireMaterial("Ogre/Isosurf/TessellateTetrahedra");
     }
 
     // Just override the mandatory create scene method

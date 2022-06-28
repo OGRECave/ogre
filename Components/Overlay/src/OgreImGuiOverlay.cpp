@@ -19,6 +19,7 @@
 #include <OgreRenderQueue.h>
 #include <OgreFrameListener.h>
 #include <OgreRoot.h>
+#include <OgreTimer.h>
 
 namespace Ogre
 {
@@ -73,6 +74,7 @@ void ImGuiOverlay::ImGUIRenderable::createMaterial()
     mMaterial->load();
     mMaterial->setLightingEnabled(false);
     mMaterial->setDepthCheckEnabled(false);
+    mMaterial->setReceiveShadows(false);
 }
 
 ImFont* ImGuiOverlay::addFont(const String& name, const String& group)
@@ -102,9 +104,11 @@ ImFont* ImGuiOverlay::addFont(const String& name, const String& group)
         cprangePtr = mCodePointRanges.back().data();
     }
 
+    float vpScale = OverlayManager::getSingleton().getPixelRatio();
+
     ImFontConfig cfg;
-    strncpy(cfg.Name, name.c_str(), 40);
-    return io.Fonts->AddFontFromMemoryTTF(ttfchunk.getPtr(), ttfchunk.size(), font->getTrueTypeSize(), &cfg,
+    strncpy(cfg.Name, name.c_str(), IM_ARRAYSIZE(cfg.Name) - 1);
+    return io.Fonts->AddFontFromMemoryTTF(ttfchunk.getPtr(), ttfchunk.size(), font->getTrueTypeSize() * vpScale, &cfg,
                                           cprangePtr);
 }
 
@@ -114,8 +118,6 @@ void ImGuiOverlay::ImGUIRenderable::createFontTexture()
     ImGuiIO& io = ImGui::GetIO();
     if (io.Fonts->Fonts.empty())
         io.Fonts->AddFontDefault();
-    ImGuiFreeType::BuildFontAtlas(io.Fonts, 0);
-
     unsigned char* pixels;
     int width, height;
     io.Fonts->GetTexDataAsRGBA32(&pixels, &width, &height);
@@ -125,12 +127,17 @@ void ImGuiOverlay::ImGUIRenderable::createFontTexture()
 
     mFontTex->getBuffer()->blitFromMemory(PixelBox(Box(0, 0, width, height), PF_BYTE_RGBA, pixels));
 }
-void ImGuiOverlay::NewFrame(const FrameEvent& evt)
+void ImGuiOverlay::NewFrame()
 {
+    static auto lastTime = Root::getSingleton().getTimer()->getMilliseconds();
+    auto now = Root::getSingleton().getTimer()->getMilliseconds();
+
     ImGuiIO& io = ImGui::GetIO();
     io.DeltaTime = std::max<float>(
-        evt.timeSinceLastFrame,
+        float(now - lastTime)/1000,
         1e-4f); // see https://github.com/ocornut/imgui/commit/3c07ec6a6126fb6b98523a9685d1f0f78ca3c40c
+
+    lastTime = now;
 
     // Read keyboard modifiers inputs
     io.KeyAlt = false;
@@ -139,7 +146,8 @@ void ImGuiOverlay::NewFrame(const FrameEvent& evt)
     OverlayManager& oMgr = OverlayManager::getSingleton();
 
     // Setup display size (every frame to accommodate for window resizing)
-    io.DisplaySize = ImVec2(oMgr.getViewportWidth(), oMgr.getViewportHeight());
+    auto vpScale = oMgr.getPixelRatio();
+    io.DisplaySize = ImVec2(oMgr.getViewportWidth() * vpScale, oMgr.getViewportHeight() * vpScale);
 
     // Start the frame
     ImGui::NewFrame();
@@ -153,19 +161,19 @@ void ImGuiOverlay::ImGUIRenderable::_update()
     }
 
     RenderSystem* rSys = Root::getSingleton().getRenderSystem();
-    OverlayManager& oMgr = OverlayManager::getSingleton();
 
     // Construct projection matrix, taking texel offset corrections in account (important for DirectX9)
     // See also:
     //     - OGRE-API specific hint: http://www.ogre3d.org/forums/viewtopic.php?f=5&p=536881#p536881
     //     - IMGUI Dx9 demo solution:
-    //     https://github.com/ocornut/imgui/blob/master/examples/directx9_example/imgui_impl_dx9.cpp#L127-L138
+    //     https://github.com/ocornut/imgui/blob/v1.50/examples/directx9_example/imgui_impl_dx9.cpp#L127-L138
+    ImGuiIO& io = ImGui::GetIO();
     float texelOffsetX = rSys->getHorizontalTexelOffset();
     float texelOffsetY = rSys->getVerticalTexelOffset();
     float L = texelOffsetX;
-    float R = oMgr.getViewportWidth() + texelOffsetX;
+    float R = io.DisplaySize.x + texelOffsetX;
     float T = texelOffsetY;
-    float B = oMgr.getViewportHeight() + texelOffsetY;
+    float B = io.DisplaySize.y + texelOffsetY;
 
     mXform = Matrix4(2.0f / (R - L), 0.0f, 0.0f, (L + R) / (L - R), 0.0f, -2.0f / (B - T), 0.0f,
                      (T + B) / (B - T), 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f);
@@ -185,12 +193,15 @@ bool ImGuiOverlay::ImGUIRenderable::preRender(SceneManager* sm, RenderSystem* rs
 
     TextureUnitState* tu = mMaterial->getBestTechnique()->getPass(0)->getTextureUnitState(0);
 
+    updateVertexData(draw_data);
+
+    mRenderOp.indexData->indexStart = 0;
+    mRenderOp.vertexData->vertexStart = 0;
+
     for (int i = 0; i < draw_data->CmdListsCount; ++i)
     {
         const ImDrawList* draw_list = draw_data->CmdLists[i];
-        updateVertexData(draw_list->VtxBuffer, draw_list->IdxBuffer);
-
-        unsigned int startIdx = 0;
+        mRenderOp.vertexData->vertexCount = draw_list->VtxBuffer.size();
 
         for (int j = 0; j < draw_list->CmdBuffer.Size; ++j)
         {
@@ -198,16 +209,11 @@ bool ImGuiOverlay::ImGUIRenderable::preRender(SceneManager* sm, RenderSystem* rs
             const ImDrawCmd* drawCmd = &draw_list->CmdBuffer[j];
 
             // Set scissoring
-            int scLeft = static_cast<int>(drawCmd->ClipRect.x); // Obtain bounds
-            int scTop = static_cast<int>(drawCmd->ClipRect.y);
-            int scRight = static_cast<int>(drawCmd->ClipRect.z);
-            int scBottom = static_cast<int>(drawCmd->ClipRect.w);
+            Rect scissor(drawCmd->ClipRect.x, drawCmd->ClipRect.y, drawCmd->ClipRect.z,
+                          drawCmd->ClipRect.w);
 
             // Clamp bounds to viewport dimensions
-            scLeft = Math::Clamp(scLeft, 0, vpWidth);
-            scRight = Math::Clamp(scRight, 0, vpWidth);
-            scTop = Math::Clamp(scTop, 0, vpHeight);
-            scBottom = Math::Clamp(scBottom, 0, vpHeight);
+            scissor = scissor.intersect(Rect(0, 0, vpWidth, vpHeight));
 
             if (drawCmd->TextureId)
             {
@@ -220,10 +226,9 @@ bool ImGuiOverlay::ImGUIRenderable::preRender(SceneManager* sm, RenderSystem* rs
                 }
             }
 
-            rsys->setScissorTest(true, scLeft, scTop, scRight, scBottom);
+            rsys->setScissorTest(true, scissor);
 
             // Render!
-            mRenderOp.indexData->indexStart = startIdx;
             mRenderOp.indexData->indexCount = drawCmd->ElemCount;
 
             rsys->_render(mRenderOp);
@@ -236,8 +241,9 @@ bool ImGuiOverlay::ImGUIRenderable::preRender(SceneManager* sm, RenderSystem* rs
             }
 
             // Update counts
-            startIdx += drawCmd->ElemCount;
+            mRenderOp.indexData->indexStart += drawCmd->ElemCount;
         }
+        mRenderOp.vertexData->vertexStart += draw_list->VtxBuffer.size();
     }
     rsys->setScissorTest(false);
     return false;
@@ -258,8 +264,6 @@ ImGuiOverlay::ImGUIRenderable::ImGUIRenderable()
     // use identity projection and view matrices
     mUseIdentityProjection = true;
     mUseIdentityView = true;
-
-    mConvertToBGR = false;
 }
 //-----------------------------------------------------------------------------------
 void ImGuiOverlay::ImGUIRenderable::initialise(void)
@@ -287,10 +291,7 @@ void ImGuiOverlay::ImGUIRenderable::initialise(void)
     offset += VertexElement::getTypeSize(VET_FLOAT2);
     decl->addElement(0, offset, VET_FLOAT2, VES_TEXTURE_COORDINATES, 0);
     offset += VertexElement::getTypeSize(VET_FLOAT2);
-    decl->addElement(0, offset, VET_COLOUR, VES_DIFFUSE);
-
-    if (Root::getSingleton().getRenderSystem()->getName().find("Direct3D9") != String::npos)
-        mConvertToBGR = true;
+    decl->addElement(0, offset, VET_UBYTE4_NORM, VES_DIFFUSE);
 }
 //-----------------------------------------------------------------------------------
 ImGuiOverlay::ImGUIRenderable::~ImGUIRenderable()
@@ -299,38 +300,37 @@ ImGuiOverlay::ImGUIRenderable::~ImGUIRenderable()
     OGRE_DELETE mRenderOp.indexData;
 }
 //-----------------------------------------------------------------------------------
-void ImGuiOverlay::ImGUIRenderable::updateVertexData(const ImVector<ImDrawVert>& vtxBuf,
-                                                     const ImVector<ImDrawIdx>& idxBuf)
+void ImGuiOverlay::ImGUIRenderable::updateVertexData(ImDrawData* draw_data)
 {
+    if(!draw_data->TotalVtxCount)
+        return;
+
     VertexBufferBinding* bind = mRenderOp.vertexData->vertexBufferBinding;
 
-    if (bind->getBindings().empty() || bind->getBuffer(0)->getNumVertices() != size_t(vtxBuf.size()))
+    if (bind->getBindings().empty() || bind->getBuffer(0)->getNumVertices() < size_t(draw_data->TotalVtxCount))
     {
         bind->setBinding(0, HardwareBufferManager::getSingleton().createVertexBuffer(
-                                sizeof(ImDrawVert), vtxBuf.size(), HardwareBuffer::HBU_WRITE_ONLY));
+                                sizeof(ImDrawVert), draw_data->TotalVtxCount, HBU_CPU_TO_GPU));
     }
     if (!mRenderOp.indexData->indexBuffer ||
-        mRenderOp.indexData->indexBuffer->getNumIndexes() != size_t(idxBuf.size()))
+        mRenderOp.indexData->indexBuffer->getNumIndexes() < size_t(draw_data->TotalIdxCount))
     {
         mRenderOp.indexData->indexBuffer = HardwareBufferManager::getSingleton().createIndexBuffer(
-            HardwareIndexBuffer::IT_16BIT, idxBuf.size(), HardwareBuffer::HBU_WRITE_ONLY);
-    }
-
-    if (mConvertToBGR)
-    {
-        // convert RGBA > BGRA
-        PixelBox src(1, vtxBuf.size(), 1, PF_A8B8G8R8, (char*)vtxBuf.Data + offsetof(ImDrawVert, col));
-        src.rowPitch = sizeof(ImDrawVert) / sizeof(ImU32);
-        PixelBox dst = src;
-        dst.format = PF_A8R8G8B8;
-        PixelUtil::bulkPixelConversion(src, dst);
+            HardwareIndexBuffer::IT_16BIT, draw_data->TotalIdxCount, HBU_CPU_TO_GPU);
     }
 
     // Copy all vertices
-    bind->getBuffer(0)->writeData(0, vtxBuf.size_in_bytes(), vtxBuf.Data, true);
-    mRenderOp.indexData->indexBuffer->writeData(0, idxBuf.size_in_bytes(), idxBuf.Data, true);
-
-    mRenderOp.vertexData->vertexStart = 0;
-    mRenderOp.vertexData->vertexCount = vtxBuf.size();
+    size_t vtx_offset = 0;
+    size_t idx_offset = 0;
+    for (int i = 0; i < draw_data->CmdListsCount; ++i)
+    {
+        const ImDrawList* draw_list = draw_data->CmdLists[i];
+        bind->getBuffer(0)->writeData(vtx_offset, draw_list->VtxBuffer.size_in_bytes(), draw_list->VtxBuffer.Data,
+                                      i == 0); // discard on first write
+        mRenderOp.indexData->indexBuffer->writeData(idx_offset, draw_list->IdxBuffer.size_in_bytes(),
+                                                    draw_list->IdxBuffer.Data, i == 0);
+        vtx_offset += draw_list->VtxBuffer.size_in_bytes();
+        idx_offset += draw_list->IdxBuffer.size_in_bytes();
+    }
 }
 } // namespace Ogre

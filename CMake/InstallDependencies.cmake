@@ -10,14 +10,15 @@
 #####################################################
 # Install dependencies 
 #####################################################
-if (NOT APPLE AND NOT WIN32 AND NOT EMSCRIPTEN)
-  return()
-endif()
 
 set(OGRE_DEP_DIR ${OGREDEPS_PATH})
 
-option(OGRE_INSTALL_DEPENDENCIES "Install dependency libs needed for samples" TRUE)
-option(OGRE_COPY_DEPENDENCIES "Copy dependency libs to the build directory" TRUE)
+set(INITVAL FALSE)
+if(WIN32 OR APPLE OR EMSCRIPTEN)
+  set(INITVAL TRUE)
+endif()
+option(OGRE_INSTALL_DEPENDENCIES "Install dependency libs needed for samples" ${INITVAL})
+cmake_dependent_option(OGRE_COPY_DEPENDENCIES "Copy dependency libs to the build directory" TRUE "WIN32" FALSE)
 
 macro(install_debug INPUT)
   if (EXISTS ${OGRE_DEP_DIR}/bin/debug/${INPUT})
@@ -87,28 +88,36 @@ if (OGRE_INSTALL_DEPENDENCIES)
     endif ()
     
     if (EXISTS ${OGRE_DEP_DIR}/lib/)
-        install(DIRECTORY ${OGRE_DEP_DIR}/lib/ DESTINATION lib)
+        install(DIRECTORY ${OGRE_DEP_DIR}/lib/ DESTINATION ${OGRE_LIB_DIRECTORY})
     endif ()
-  else ()  
-	if(WIN32 AND MINGW)    
-		install(FILES DESTINATION lib/debug CONFIGURATIONS Debug)
-		install(FILES DESTINATION lib/relwithdebinfo CONFIGURATIONS RelWithDebInfo)
-		install(FILES DESTINATION lib/release CONFIGURATIONS Release)
-		install(FILES DESTINATION lib/minsizerel CONFIGURATIONS MinSizeRel)
-	endif () # WIN32
+  else ()
+    if(WIN32 AND MINGW)
+      install(FILES DESTINATION lib/debug CONFIGURATIONS Debug)
+      install(FILES DESTINATION lib/relwithdebinfo CONFIGURATIONS RelWithDebInfo)
+      install(FILES DESTINATION lib/release CONFIGURATIONS Release)
+      install(FILES DESTINATION lib/minsizerel CONFIGURATIONS MinSizeRel)
+    elseif(UNIX)
+      if (EXISTS ${OGRE_DEP_DIR}/lib/)
+        install(DIRECTORY ${OGRE_DEP_DIR}/lib/ DESTINATION ${OGRE_LIB_DIRECTORY})
+      endif()
+    endif()
 
     if (EXISTS ${OGRE_DEP_DIR}/bin/)
-        install(DIRECTORY ${OGRE_DEP_DIR}/bin/ DESTINATION bin)
+      install(DIRECTORY ${OGRE_DEP_DIR}/bin/ DESTINATION ${OGRE_BIN_DIRECTORY})
     endif ()
-endif () # OGRE_INSTALL_DEPENDENCIES
-    
+  endif ()
+
+  if(OGRE_BUILD_DEPENDENCIES AND OGRE_BUILD_COMPONENT_BULLET)
+    install(DIRECTORY ${OGRE_DEP_DIR}/include/bullet DESTINATION include)
+  endif()
+
   if(WIN32)
     if(OGRE_BUILD_SAMPLES OR OGRE_BUILD_TESTS)
       if(EXISTS "${SDL2_BINARY}")
-	  file(COPY ${SDL2_BINARY} DESTINATION ${PROJECT_BINARY_DIR}/bin/debug)
-	  file(COPY ${SDL2_BINARY} DESTINATION ${PROJECT_BINARY_DIR}/bin/release)
-	  file(COPY ${SDL2_BINARY} DESTINATION ${PROJECT_BINARY_DIR}/bin/relwithdebinfo)
-	  file(COPY ${SDL2_BINARY} DESTINATION ${PROJECT_BINARY_DIR}/bin/minsizerel)
+        file(COPY ${SDL2_BINARY} DESTINATION ${PROJECT_BINARY_DIR}/bin/debug)
+        file(COPY ${SDL2_BINARY} DESTINATION ${PROJECT_BINARY_DIR}/bin/release)
+        file(COPY ${SDL2_BINARY} DESTINATION ${PROJECT_BINARY_DIR}/bin/relwithdebinfo)
+        file(COPY ${SDL2_BINARY} DESTINATION ${PROJECT_BINARY_DIR}/bin/minsizerel)
       endif()
     endif()
 
@@ -132,125 +141,33 @@ endif () # OGRE_INSTALL_DEPENDENCIES
       install_release(libEGL.dll)
     endif ()
   endif () # WIN32
-  
-  # If we're installing the sample source for an SDK, also install Boost headers & libraries
-  if (OGRE_INSTALL_SAMPLES_SOURCE AND Boost_FOUND)
-    # headers (try to exclude things we don't need)
-    install(DIRECTORY "${Boost_INCLUDE_DIR}/boost" DESTINATION "boost"
-      PATTERN "accumulators" EXCLUDE
-      PATTERN "archive" EXCLUDE
-      PATTERN "asio" EXCLUDE
-      PATTERN "assign" EXCLUDE
-      PATTERN "bimap" EXCLUDE
-      PATTERN "circular_buffer" EXCLUDE
-      PATTERN "compatibility" EXCLUDE
-      PATTERN "concept_check" EXCLUDE
-      PATTERN "container" EXCLUDE
-      PATTERN "dynamic_bitset" EXCLUDE
-      PATTERN "filesystem" EXCLUDE
-      PATTERN "flyweight" EXCLUDE
-      PATTERN "format" EXCLUDE
-      PATTERN "fusion" EXCLUDE
-      PATTERN "geometry" EXCLUDE
-      PATTERN "gil" EXCLUDE
-      PATTERN "graph" EXCLUDE
-      PATTERN "interprocess" EXCLUDE
-      PATTERN "intrusive" EXCLUDE
-      PATTERN "iostreams" EXCLUDE
-      PATTERN "lambda" EXCLUDE
-      PATTERN "logic" EXCLUDE
-      PATTERN "mpi" EXCLUDE
-      PATTERN "multi_array" EXCLUDE
-      PATTERN "multi_index" EXCLUDE
-      PATTERN "numeric" EXCLUDE
-      PATTERN "parameter" EXCLUDE
-      PATTERN "pending" EXCLUDE
-      PATTERN "phoenix" EXCLUDE
-      PATTERN "pool" EXCLUDE
-      PATTERN "program_options" EXCLUDE
-      PATTERN "property_map" EXCLUDE
-      PATTERN "property_tree" EXCLUDE
-      PATTERN "proto" EXCLUDE
-      PATTERN "ptr_container" EXCLUDE
-      PATTERN "python" EXCLUDE
-      PATTERN "random" EXCLUDE
-      PATTERN "regex" EXCLUDE
-      PATTERN "serialization" EXCLUDE
-      PATTERN "signals" EXCLUDE
-      PATTERN "signals2" EXCLUDE
-      PATTERN "spirit" EXCLUDE
-      PATTERN "statechart" EXCLUDE
-      PATTERN "test" EXCLUDE
-      PATTERN "timer" EXCLUDE
-      PATTERN "tr1" EXCLUDE
-      PATTERN "units" EXCLUDE
-      PATTERN "uuid" EXCLUDE
-      PATTERN "variant" EXCLUDE
-      PATTERN "wave" EXCLUDE
-      PATTERN "xpressive" EXCLUDE
-    )
-    # License
-    if (EXISTS "${Boost_INCLUDE_DIR}/boost/LICENSE_1_0.txt")
-        install(FILES "${Boost_INCLUDE_DIR}/boost/LICENSE_1_0.txt" DESTINATION "boost")
-    elseif (EXISTS "${Boost_INCLUDE_DIR}/LICENSE_1_0.txt")
-        install(FILES "${Boost_INCLUDE_DIR}/LICENSE_1_0.txt" DESTINATION "boost")
-    endif ()
-    # libraries
-    if (Boost_THREAD_FOUND)
-      install(FILES ${Boost_THREAD_LIBRARY_DEBUG} DESTINATION "boost/lib" CONFIGURATIONS Debug)
-      install(FILES ${Boost_THREAD_LIBRARY_RELEASE} DESTINATION "boost/lib" CONFIGURATIONS Release)
-    endif()
-    if (Boost_DATE_TIME_FOUND)
-      install(FILES ${Boost_DATE_TIME_LIBRARY_DEBUG} DESTINATION "boost/lib" CONFIGURATIONS Debug)
-      install(FILES ${Boost_DATE_TIME_LIBRARY_RELEASE} DESTINATION "boost/lib" CONFIGURATIONS Release)
-    endif()
-    if (Boost_SYSTEM_FOUND)
-      install(FILES ${Boost_SYSTEM_LIBRARY_DEBUG} DESTINATION "boost/lib" CONFIGURATIONS Debug)
-      install(FILES ${Boost_SYSTEM_LIBRARY_RELEASE} DESTINATION "boost/lib" CONFIGURATIONS Release)
-    endif()
-    if (Boost_CHRONO_FOUND)
-      install(FILES ${Boost_CHRONO_LIBRARY_DEBUG} DESTINATION "boost/lib" CONFIGURATIONS Debug)
-      install(FILES ${Boost_CHRONO_LIBRARY_RELEASE} DESTINATION "boost/lib" CONFIGURATIONS Release)
-    endif()
-  endif()
 endif ()
 
 if (OGRE_COPY_DEPENDENCIES)
+  # copy the required DLLs to the build directory
+  file(GLOB DLLS ${OGRE_DEP_DIR}/bin/*.dll)
+  file(COPY ${DLLS} DESTINATION ${PROJECT_BINARY_DIR}/bin/debug)
+  file(COPY ${DLLS} DESTINATION ${PROJECT_BINARY_DIR}/bin/release)
+  file(COPY ${DLLS} DESTINATION ${PROJECT_BINARY_DIR}/bin/relwithdebinfo)
+  file(COPY ${DLLS} DESTINATION ${PROJECT_BINARY_DIR}/bin/minsizerel)
 
-  if (WIN32)
-    # copy the required DLLs to the build directory
-    file(GLOB DLLS ${OGRE_DEP_DIR}/bin/*.dll)
-    file(COPY ${DLLS} DESTINATION ${PROJECT_BINARY_DIR}/bin/debug)
-    file(COPY ${DLLS} DESTINATION ${PROJECT_BINARY_DIR}/bin/release)
-    file(COPY ${DLLS} DESTINATION ${PROJECT_BINARY_DIR}/bin/relwithdebinfo)
-    file(COPY ${DLLS} DESTINATION ${PROJECT_BINARY_DIR}/bin/minsizerel)
-
-    if (OGRE_BUILD_PLUGIN_CG)
-      if (EXISTS ${Cg_BINARY_DBG} AND EXISTS ${Cg_BINARY_REL})
-        # if MinGW or NMake, the release/debug cg.dll's would conflict, so just pick one
-        if (MINGW OR (CMAKE_GENERATOR STREQUAL "NMake Makefiles"))
-          if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-            file(COPY ${Cg_BINARY_DBG} DESTINATION ${PROJECT_BINARY_DIR}/bin/debug)
-          else ()
-            file(COPY ${Cg_BINARY_REL} DESTINATION ${PROJECT_BINARY_DIR}/bin/release)
-      			file(COPY ${Cg_BINARY_REL} DESTINATION ${PROJECT_BINARY_DIR}/bin/relwithdebinfo)
-      			file(COPY ${Cg_BINARY_REL} DESTINATION ${PROJECT_BINARY_DIR}/bin/minsizerel)
-          endif ()
+  if (OGRE_BUILD_PLUGIN_CG)
+    if (EXISTS ${Cg_BINARY_DBG} AND EXISTS ${Cg_BINARY_REL})
+      # if MinGW or NMake, the release/debug cg.dll's would conflict, so just pick one
+      if (MINGW OR (CMAKE_GENERATOR STREQUAL "NMake Makefiles"))
+        if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+          file(COPY ${Cg_BINARY_DBG} DESTINATION ${PROJECT_BINARY_DIR}/bin/debug)
         else ()
-            file(COPY ${Cg_BINARY_DBG} DESTINATION ${PROJECT_BINARY_DIR}/bin/debug)
-      		file(COPY ${Cg_BINARY_REL} DESTINATION ${PROJECT_BINARY_DIR}/bin/release)
-      		file(COPY ${Cg_BINARY_REL} DESTINATION ${PROJECT_BINARY_DIR}/bin/relwithdebinfo)
-      		file(COPY ${Cg_BINARY_REL} DESTINATION ${PROJECT_BINARY_DIR}/bin/minsizerel)
+          file(COPY ${Cg_BINARY_REL} DESTINATION ${PROJECT_BINARY_DIR}/bin/release)
+          file(COPY ${Cg_BINARY_REL} DESTINATION ${PROJECT_BINARY_DIR}/bin/relwithdebinfo)
+          file(COPY ${Cg_BINARY_REL} DESTINATION ${PROJECT_BINARY_DIR}/bin/minsizerel)
         endif ()
-      endif()
+      else ()
+          file(COPY ${Cg_BINARY_DBG} DESTINATION ${PROJECT_BINARY_DIR}/bin/debug)
+        file(COPY ${Cg_BINARY_REL} DESTINATION ${PROJECT_BINARY_DIR}/bin/release)
+        file(COPY ${Cg_BINARY_REL} DESTINATION ${PROJECT_BINARY_DIR}/bin/relwithdebinfo)
+        file(COPY ${Cg_BINARY_REL} DESTINATION ${PROJECT_BINARY_DIR}/bin/minsizerel)
+      endif ()
     endif()
-    
-    if (OGRE_BUILD_RENDERSYSTEM_GLES2)	
-      copy_debug(libEGL.dll)
-      copy_debug(libGLESv2.dll)
-      copy_release(libEGL.dll)
-      copy_release(libGLESv2.dll)
-    endif ()
-  endif ()
-
+  endif()
 endif ()

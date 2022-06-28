@@ -10,6 +10,10 @@
 
 namespace OgreBites
 {
+    /** \addtogroup Optional
+    *   \addtogroup Bites
+    *   \addtogroup Input
+    */
     struct _OgreBitesExport ImGuiInputListener : public InputListener
     {
         ImGuiInputListener();
@@ -20,8 +24,8 @@ namespace OgreBites
         bool mousePressed(const MouseButtonEvent& evt);
         bool mouseReleased(const MouseButtonEvent& evt);
         bool textInput (const TextInputEvent& evt);
-    private:
-        bool keyEvent (const KeyboardEvent& arg);
+        bool buttonPressed(const ButtonEvent& evt);
+        bool buttonReleased(const ButtonEvent& evt);
     };
 }
 

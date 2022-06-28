@@ -33,6 +33,7 @@ THE SOFTWARE.
 
 #import "OgreGLRenderSystemCommon.h"
 #import "OgreGLNativeSupport.h"
+#import <AppKit/AppKit.h>
 #import <AppKit/NSScreen.h>
 #import <AppKit/NSOpenGLView.h>
 #import <QuartzCore/CVDisplayLink.h>
@@ -322,11 +323,11 @@ namespace Ogre {
         // Make active
         setHidden(hidden);
 		mActive = true;
+        mVisible = true;
         mClosed = false;
         mName = [windowTitle cStringUsingEncoding:NSUTF8StringEncoding];
         mWidth = _getPixelFromPoint(widthPt);
         mHeight = _getPixelFromPoint(heightPt);
-        mColourDepth = colourDepth;
         mFSAA = fsaa_samples;
 
         if(!externalWindowHandle)
@@ -559,7 +560,10 @@ namespace Ogre {
         }
         //make sure the context is current
         NSOpenGLContextGuard ctx_guard(mGLContext);
-
+        for (ViewportList::iterator it = mViewportList.begin(); it != mViewportList.end(); ++it)
+        {
+            (*it).second->_updateDimensions();
+        }
 		[mGLContext update];
     }
 

@@ -35,29 +35,13 @@ namespace Ogre
                                       IDirect3DDevice9 *creator, IDirect3DSurface9 *depthBufferSurf,
                                       D3DFORMAT fmt, uint32 width, uint32 height,
                                       uint32 fsaa, uint32 multiSampleQuality, bool isManual ) :
-                DepthBuffer( poolId, 0, width, height, fsaa, "", isManual ),
+                DepthBuffer( poolId, width, height, fsaa, isManual ),
                 mDepthBuffer( depthBufferSurf ),
                 mCreator( creator ),
                 mMultiSampleQuality( multiSampleQuality ),
                 mD3DFormat( fmt ),
                 mRenderSystem( renderSystem )
     {
-        switch( fmt )
-        {
-        case D3DFMT_D16_LOCKABLE:
-        case D3DFMT_D15S1:
-        case D3DFMT_D16:
-            mBitDepth = 16;
-            break;
-        case D3DFMT_D32:
-        case D3DFMT_D24S8:
-        case D3DFMT_D24X8:
-        case D3DFMT_D24X4S4:
-        case D3DFMT_D32F_LOCKABLE:
-        case D3DFMT_D24FS8:
-            mBitDepth = 32;
-            break;
-        }
     }
 
     D3D9DepthBuffer::~D3D9DepthBuffer()

@@ -23,7 +23,7 @@ public:
     /// must be called before first show()
     ImFont* addFont(const String& name, const String& group OGRE_RESOURCE_GROUP_INIT);
 
-    static void NewFrame(const FrameEvent& evt);
+    static void NewFrame();
 
     void _findVisibleObjects(Camera* cam, RenderQueue* queue, Viewport* vp);
 
@@ -41,7 +41,7 @@ private:
 
         void initialise();
 
-        void updateVertexData(const ImVector<ImDrawVert>& vtxBuf, const ImVector<ImDrawIdx>& idxBuf);
+        void updateVertexData(ImDrawData* draw_data);
 
         bool preRender(SceneManager* sm, RenderSystem* rsys);
 
@@ -58,8 +58,6 @@ private:
         Real getSquaredViewDepth(const Camera*) const { return 0; }
 
         void _update();
-
-        bool mConvertToBGR;
 
         Matrix4 mXform;
         RenderOperation mRenderOp;

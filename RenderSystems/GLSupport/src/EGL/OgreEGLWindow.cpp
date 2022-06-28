@@ -42,7 +42,7 @@ namespace Ogre {
     EGLWindow::EGLWindow(EGLSupport *glsupport)
         : GLWindow(), mGLSupport(glsupport),
           mWindow(0),
-          mNativeDisplay(0),
+          mNativeDisplay(EGL_DEFAULT_DISPLAY),
           mEglDisplay(EGL_NO_DISPLAY),
           mEglConfig(0),
           mEglSurface(0)
@@ -129,12 +129,7 @@ namespace Ogre {
 
     void EGLWindow::getCustomAttribute( const String& name, void* pData )
     {
-        if (name == "DISPLAYNAME")
-        {
-            *static_cast<String*>(pData) = mGLSupport->getDisplayName();
-            return;
-        }
-        else if (name == "DISPLAY")
+        if (name == "DISPLAY")
         {
             *static_cast<EGLDisplay*>(pData) = mEglDisplay;
             return;
@@ -154,6 +149,62 @@ namespace Ogre {
     PixelFormat EGLWindow::suggestPixelFormat() const
     {
         return mGLSupport->getContextProfile() == GLNativeSupport::CONTEXT_ES ? PF_BYTE_RGBA : PF_BYTE_RGB;
+    }
+
+    void EGLWindow::create(const String& name, unsigned int width, unsigned int height, bool fullScreen,
+                           const NameValuePairList* miscParams)
+    {
+#if OGRE_PLATFORM != OGRE_PLATFORM_EMSCRIPTEN
+        int samples = 0;
+
+        if (miscParams)
+        {
+            NameValuePairList::const_iterator opt;
+            if ((opt = miscParams->find("FSAA")) != miscParams->end())
+            {
+                samples = StringConverter::parseUnsignedInt(opt->second);
+            }
+        }
+
+        int minAttribs[] = {
+            EGL_SURFACE_TYPE, EGL_PBUFFER_BIT,
+            EGL_BLUE_SIZE, 5,
+            EGL_GREEN_SIZE, 6,
+            EGL_RED_SIZE, 5,
+            EGL_DEPTH_SIZE, 16,
+            EGL_NONE
+        };
+
+        int maxAttribs[] = {
+            EGL_RED_SIZE,       8,
+            EGL_GREEN_SIZE,     8,
+            EGL_BLUE_SIZE,      8,
+            EGL_DEPTH_SIZE,     24,
+            EGL_ALPHA_SIZE,     8,
+            EGL_STENCIL_SIZE,   8,
+            EGL_SAMPLE_BUFFERS, 1,
+            EGL_SAMPLES, samples,
+            EGL_NONE
+        };
+
+        mEglConfig = mGLSupport->selectGLConfig(minAttribs, maxAttribs);
+        mEglDisplay = mGLSupport->getGLDisplay();
+
+        int pbufferAttribs[] = {
+                EGL_WIDTH, int(width),
+                EGL_HEIGHT, int(height),
+                EGL_NONE,
+        };
+
+        mEglSurface = eglCreatePbufferSurface(mEglDisplay, mEglConfig, pbufferAttribs);
+        mContext = createEGLContext(NULL);
+        mIsExternalGLControl = true; // dont want swapBuffers
+        mName = name;
+        mWidth = width;
+        mHeight = height;
+
+        finaliseWindow();
+#endif
     }
 
     ::EGLSurface EGLWindow::createSurfaceFromWindow(::EGLDisplay display,
@@ -203,5 +254,25 @@ namespace Ogre {
 
         eglMakeCurrent (dpy, oldDraw, oldRead, oldContext);
         EGL_CHECK_ERROR
+    }
+
+    void EGLWindow::finaliseWindow()
+    {
+        // query selected config
+        int Rsz, Gsz, Bsz, Asz, fsaa;
+        mGLSupport->getGLConfigAttrib(mEglConfig, EGL_RED_SIZE, &Rsz);
+        mGLSupport->getGLConfigAttrib(mEglConfig, EGL_BLUE_SIZE, &Gsz);
+        mGLSupport->getGLConfigAttrib(mEglConfig, EGL_GREEN_SIZE, &Bsz);
+        mGLSupport->getGLConfigAttrib(mEglConfig, EGL_ALPHA_SIZE, &Asz);
+        mGLSupport->getGLConfigAttrib(mEglConfig, EGL_SAMPLES, &fsaa);
+
+        LogManager::getSingleton().logMessage(
+            StringUtil::format("EGLWindow: colourBufferSize=%d/%d/%d/%d gamma=%d FSAA=%d", Rsz, Bsz, Gsz,
+                               Asz, mHwGamma, fsaa));
+
+        mActive = true;
+        mVisible = true;
+        mFSAA = fsaa;
+        mClosed = false;
     }
 }

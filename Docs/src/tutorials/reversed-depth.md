@@ -16,7 +16,7 @@ This is a little bit tricky, as e.g. OpenGL is very restrictive on the main dept
 
 Therefore, we will use an off-screen texture for rendering, where we can easily use a floating-point depth buffer and only copy the results to the screen.
 
-For this you can use the following [Compositor script](@ref compositor-scripts):
+For this you can use the following [Compositor script](@ref Compositor-Scripts):
 
 ```cpp
 // a simple material that only applies the texture

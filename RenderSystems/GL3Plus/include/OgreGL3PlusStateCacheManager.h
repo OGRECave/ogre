@@ -32,7 +32,6 @@ THE SOFTWARE.
 #include "OgreGL3PlusPrerequisites.h"
 #include "OgreGLStateCacheManagerCommon.h"
 #include "OgreStdHeaders.h"
-#include "OgreIteratorWrappers.h"
 
 namespace Ogre
 {
@@ -53,13 +52,6 @@ namespace Ogre
 
         /// Stores textures currently bound to each texture stage
         std::unordered_map <GLenum, GLuint> mBoundTextures;
-
-        struct TexGenParams
-        {
-            std::set<GLenum> mEnabled;
-        };
-        /// Stores the currently enabled texcoord generation types per texture unit
-        std::unordered_map <GLenum, TexGenParams> mTextureCoordGen;
 
         /// Stores the currently bound draw frame buffer value
         GLuint mActiveDrawFrameBuffer;
@@ -128,6 +120,8 @@ namespace Ogre
          @param vao The vertex array object ID.
          */
         void bindGLVertexArray(GLuint vao);
+
+        void deleteGLVertexArray(GLuint vao);
         
         /** Bind an OpenGL texture of any type.
          @param target The texture target.
@@ -206,24 +200,13 @@ namespace Ogre
         void setStencilMask(GLuint mask);
 
         /** Enables a piece of OpenGL functionality.
-         @param flag The function to enable.
          */
         void setEnabled(GLenum flag, bool enabled);
-
-        /** Gets the current polygon rendering mode, fill, wireframe, points, etc.
-         @return The current polygon rendering mode.
-         */
-        GLenum getPolygonMode(void) const { return mPolygonMode; }
 
         /** Sets the current polygon rendering mode.
          @param mode The polygon mode to use.
          */
         void setPolygonMode(GLenum mode);
-
-        /** Sets the face culling mode.
-         @return The current face culling mode
-         */
-        GLenum getCullFace(void) const { return mCullFace; }
 
         /** Sets the face culling setting.
          @param face The face culling mode to use.
@@ -235,14 +218,9 @@ namespace Ogre
          */
         void bindGLProgramPipeline(GLuint handle);
 
-        /// Enable the specified texture coordinate generation option for the currently active texture unit
-        void enableTextureCoordGen(GLenum type);
-        /// Disable the specified texture coordinate generation option for the currently active texture unit
-        void disableTextureCoordGen(GLenum type);
-
         void setPointSize(GLfloat size);
 
-        void setViewport(GLint x, GLint y, GLsizei width, GLsizei height);
+        void setViewport(const Rect& r);
     };
 }
 

@@ -370,6 +370,8 @@ namespace Ogre
             //TODO: Check PF_FLOAT32_RGBA is supported (should be, since it was the 1st one)
             const size_t numBones = std::max<size_t>( 1, baseSubMesh->blendIndexToBoneIndexMap.size() );
 
+            // mRowLength can only be 2 or 3
+            static_assert(3 * OGRE_MAX_NUM_BONES < c_maxTexWidthHW, "Too many bones for VTF");
             const size_t maxUsableWidth = c_maxTexWidthHW - (c_maxTexWidthHW % (numBones * mRowLength));
 
             //See InstanceBatchHW::calculateMaxNumInstances for the 65535
@@ -529,12 +531,9 @@ namespace Ogre
         }
         else
         {
-            if( mManager->getCameraRelativeRendering() )
-            {
-                OGRE_EXCEPT(Exception::ERR_INVALID_STATE, "Camera-relative rendering is incompatible"
-                    " with Instancing's static batches. Disable at least one of them",
-                    "InstanceBatch::_updateRenderQueue");
-            }
+            OgreAssert(!mManager->getCameraRelativeRendering(),
+                       "Camera-relative rendering is incompatible with Instancing's static batches. "
+                       "Disable at least one of them");
 
             //Don't update when we're static
             if( mRenderOperation.numberOfInstances )

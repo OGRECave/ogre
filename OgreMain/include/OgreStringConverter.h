@@ -36,6 +36,20 @@ THE SOFTWARE.
 #include "OgreMatrix4.h"
 #include "OgreVector.h"
 
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_WINRT
+#   define locale_t _locale_t
+#elif OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
+#   define locale_t int
+#endif
+
+// If compiling with make on macOS, these headers need to be included to get
+// definitions of locale_t, strtod_l, etc...
+// See: http://www.unix.com/man-page/osx/3/strtod_l/
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
+#   include <stdlib.h>
+#   include <xlocale.h>
+#endif
+
 namespace Ogre {
 
     /** \addtogroup Core
@@ -45,7 +59,7 @@ namespace Ogre {
     *  @{
     */
     /** Class for converting the core Ogre data types to/from Strings.
-    @remarks
+
         The code for converting values to and from strings is here as a separate
         class to avoid coupling String to other datatypes (and vice-versa) which reduces
         compilation dependency: important given how often the core types are used.
@@ -115,48 +129,49 @@ namespace Ogre {
             unsigned short width, char fill = ' ',
             std::ios::fmtflags flags = std::ios::fmtflags(0));
 
-        /** Converts a boolean to a String. 
+        /** Converts a boolean to a String.
+        @param val
         @param yesNo If set to true, result is 'yes' or 'no' instead of 'true' or 'false'
         */
         static String toString(bool val, bool yesNo = false);
         /** Converts a Vector2 to a String. 
-        @remarks
+
             Format is "x y" (i.e. 2x Real values, space delimited)
         */
         static String toString(const Vector2& val);
         /** Converts a Vector3 to a String. 
-        @remarks
+
             Format is "x y z" (i.e. 3x Real values, space delimited)
         */
         static String toString(const Vector3& val);
         /** Converts a Vector4 to a String. 
-        @remarks
+
             Format is "x y z w" (i.e. 4x Real values, space delimited)
         */
         static String toString(const Vector4& val);
         /** Converts a Matrix3 to a String. 
-        @remarks
+
             Format is "00 01 02 10 11 12 20 21 22" where '01' means row 0 column 1 etc.
         */
         static String toString(const Matrix3& val);
         /** Converts a Matrix4 to a String. 
-        @remarks
+
             Format is "00 01 02 03 10 11 12 13 20 21 22 23 30 31 32 33" where 
             '01' means row 0 column 1 etc.
         */
         static String toString(const Matrix4& val);
         /** Converts a Quaternion to a String. 
-        @remarks
+
             Format is "w x y z" (i.e. 4x Real values, space delimited)
         */
         static String toString(const Quaternion& val);
         /** Converts a ColourValue to a String. 
-        @remarks
+
             Format is "r g b a" (i.e. 4x Real values, space delimited). 
         */
         static String toString(const ColourValue& val);
         /** Converts a StringVector to a string.
-        @remarks
+
             Strings must not contain spaces since space is used as a delimiter in
             the output.
         */
@@ -238,7 +253,7 @@ namespace Ogre {
             return parse(val, ret) ? ret : defaultValue;
         }
         /** Converts a String to a boolean. 
-        @remarks
+
             Returns true if case-insensitive match of the start of the string
             matches "true", "yes", "1", or "on", false if "false", "no", "0" 
             or "off".
@@ -249,7 +264,7 @@ namespace Ogre {
             return parse(val, ret) ? ret : defaultValue;
         }
         /** Parses a Vector2 out of a String.
-        @remarks
+
             Format is "x y" ie. 2 Real components, space delimited. Failure to parse returns
             Vector2::ZERO.
         */
@@ -259,7 +274,7 @@ namespace Ogre {
             return parse(val, ret) ? ret : defaultValue;
         }
         /** Parses a Vector3 out of a String.
-        @remarks
+
             Format is "x y z" ie. 3 Real components, space delimited. Failure to parse returns
             Vector3::ZERO.
         */
@@ -269,7 +284,7 @@ namespace Ogre {
             return parse(val, ret) ? ret : defaultValue;
         }
         /** Parses a Vector4 out of a String.
-        @remarks
+
             Format is "x y z w" ie. 4 Real components, space delimited. Failure to parse returns
             Vector4::ZERO.
         */
@@ -279,7 +294,7 @@ namespace Ogre {
             return parse(val, ret) ? ret : defaultValue;
         }
         /** Parses a Matrix3 out of a String.
-        @remarks
+
             Format is "00 01 02 10 11 12 20 21 22" where '01' means row 0 column 1 etc.
             Failure to parse returns Matrix3::IDENTITY.
         */
@@ -289,7 +304,7 @@ namespace Ogre {
             return parse(val, ret) ? ret : defaultValue;
         }
         /** Parses a Matrix4 out of a String.
-        @remarks
+
             Format is "00 01 02 03 10 11 12 13 20 21 22 23 30 31 32 33" where 
             '01' means row 0 column 1 etc. Failure to parse returns Matrix4::IDENTITY.
         */
@@ -299,7 +314,7 @@ namespace Ogre {
             return parse(val, ret) ? ret : defaultValue;
         }
         /** Parses a Quaternion out of a String. 
-        @remarks
+
             Format is "w x y z" (i.e. 4x Real values, space delimited). 
             Failure to parse returns Quaternion::IDENTITY.
         */
@@ -309,7 +324,7 @@ namespace Ogre {
             return parse(val, ret) ? ret : defaultValue;
         }
         /** Parses a ColourValue out of a String. 
-        @remarks
+
             Format is "r g b a" (i.e. 4x Real values, space delimited), or "r g b" which implies
             an alpha value of 1.0 (opaque). Failure to parse returns ColourValue::Black.
         */
@@ -324,39 +339,33 @@ namespace Ogre {
         /** Checks the String is a valid number value. */
         static bool isNumber(const String& val);
 
-
-		/** Converts a ColourBufferType to a String.
-		@remarks
-			String output format is "Back", "Back Left", "Back Right", etc.
-		*/
-		static String toString(ColourBufferType val);
-
-		/** Converts a String to a ColourBufferType.
-		@remarks
-			String input format should be "Back", "Back Left", "Back Right", etc.
-		*/
-		static ColourBufferType parseColourBuffer(const String& val, ColourBufferType defaultValue = CBT_BACK);
-
 		/** Converts a StereoModeType to a String
-		@remarks
+
 			String output format is "None", "Frame Sequential", etc.
 		*/
 		static String toString(StereoModeType val);
 
 		/** Converts a String to a StereoModeType
-		@remarks
+
 			String input format should be "None", "Frame Sequential", etc.
 		*/
 		static StereoModeType parseStereoMode(const String& val, StereoModeType defaultValue = SMT_NONE);
 
 		static locale_t _numLocale;
-    protected:
+    private:
         template<typename T>
         static String _toString(T val, uint16 width, char fill, std::ios::fmtflags flags);
     };
-    /** @} */
-    /** @} */
 
+    inline String to_string(const Quaternion& v) { return StringConverter::toString(v); }
+    inline String to_string(const ColourValue& v) { return StringConverter::toString(v); }
+    inline String to_string(const Vector2& v) { return StringConverter::toString(v); }
+    inline String to_string(const Vector3& v) { return StringConverter::toString(v); }
+    inline String to_string(const Vector4& v) { return StringConverter::toString(v); }
+    inline String to_string(const Matrix3& v) { return StringConverter::toString(v); }
+    inline String to_string(const Matrix4& v) { return StringConverter::toString(v); }
+    /** @} */
+    /** @} */
 }
 
 

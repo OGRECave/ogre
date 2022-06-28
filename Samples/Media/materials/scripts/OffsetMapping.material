@@ -1,70 +1,27 @@
-// Bump map with Parallax offset vertex program, support for this is required 
-vertex_program Examples/OffsetMappingVP/HLSL hlsl
-{ 
-   source OffsetMapping.cg 
-   entry_point main_vp 
-   target vs_2_0
-} 
-
-// Bump map with parallax fragment program 
-fragment_program Examples/OffsetMappingFP/HLSL hlsl
-{ 
-   source OffsetMapping.cg
-   entry_point main_fp
-   target ps_2_0
-} 
-
-// Bump map with Parallax offset vertex program, support for this is required 
-vertex_program Examples/OffsetMappingVP/GLSLES glsles
-{ 
-    source OffsetMappingVp.glsl
-} 
-
-// Bump map with parallax fragment program 
-fragment_program Examples/OffsetMappingFP/GLSLES glsles
-{ 
-    source OffsetMappingFp.glsl
-	default_params
-	{
-		// assign samplers as required by GLSL
-		param_named normalHeightMap int 0
-		param_named diffuseMap int 1
-	}
-}
-
-// Bump map with Parallax offset vertex program, support for this is required 
-vertex_program Examples/OffsetMappingVP/GLSL glsl
-{ 
-    source OffsetMappingVp.glsl
-}
-
-// Bump map with parallax fragment program 
-fragment_program Examples/OffsetMappingFP/GLSL glsl
-{ 
-    source OffsetMappingFp.glsl
-    default_params
-    {
-        // assign samplers as required by GLSL
-        param_named normalHeightMap int 0
-        param_named diffuseMap int 1
-    }
-}
-
-vertex_program Examples/OffsetMappingVP unified
+// Bump map with Parallax offset
+material RTSS/OffsetMapping
 {
-	delegate Examples/OffsetMappingVP/GLSL
-	delegate Examples/OffsetMappingVP/GLSLES
-	delegate Examples/OffsetMappingVP/HLSL
+   technique
+   {
+       pass 
+       {
+           specular 1 1 1 32
+
+           // Base diffuse texture map 
+           texture_unit 
+           { 
+              texture rockwall.tga
+           }
+
+           rtshader_system
+           {
+               lighting_stage normal_map rockwall_NH.tga parallax
+           }
+       }
+   }
 }
 
-fragment_program Examples/OffsetMappingFP unified
-{
-	delegate Examples/OffsetMappingFP/GLSL
-	delegate Examples/OffsetMappingFP/GLSLES
-	delegate Examples/OffsetMappingFP/HLSL
-}
-
-material Examples/OffsetMapping/Specular 
+material Examples/OffsetMapping/Specular
 {
    technique
    {
@@ -73,47 +30,27 @@ material Examples/OffsetMapping/Specular
        {
            illumination_stage ambient
            diffuse 0 0 0
-           // might be needed for D3D) & GL: depth_bias -1 -1
        }
-       // do the lighting and bump mapping with parallax pass 
-       pass 
+       // do the lighting and bump mapping with parallax pass
+       pass
        {
            illumination_stage per_light
-           iteration once_per_light
+           iteration once_per_light point
            scene_blend add
+           specular 0.5 0.5 0.5 32
 
-           // Vertex program reference 
-           vertex_program_ref Examples/OffsetMappingVP 
-           { 
-              param_named_auto lightPosition light_position_object_space 0 
-              param_named_auto eyePosition camera_position_object_space 
-              param_named_auto worldViewProj worldviewproj_matrix 
-           } 
-
-           // Fragment program 
-           fragment_program_ref Examples/OffsetMappingFP
-           { 
-              param_named_auto lightDiffuse light_diffuse_colour 0 
-              param_named_auto lightSpecular light_specular_colour 0 
-              // Parallax Height scale and bias 
-              param_named scaleBias float4 0.04 -0.02 1 0 
-           } 
-
-           // Normal + height(alpha) map 
-           texture_unit 
-           { 
-              texture rockwall_NH.tga
-           } 
-
-           // Base diffuse texture map 
-           texture_unit 
-           { 
+           // Base diffuse texture map
+           texture_unit
+           {
               texture rockwall.tga
-           } 
+           }
+           rtshader_system
+           {
+               lighting_stage normal_map rockwall_NH.tga parallax
+           }
        }
    }
 }
-
 
 
 // Single-pass offset mapping with shadows
@@ -123,16 +60,7 @@ vertex_program Examples/OffsetMappingIntegratedShadowsVPhlsl hlsl
    entry_point integratedshadows_vp 
    target vs_2_0
 } 
-vertex_program Examples/OffsetMappingIntegratedShadowsVPglsl glsl 
-{ 
-   source OffsetMappingShadowsVp.glsl
-   default_params
-   {
-        param_named_auto worldViewProj worldviewproj_matrix 
-   }
-} 
-
-vertex_program Examples/OffsetMappingIntegratedShadowsVPglsles glsles
+vertex_program Examples/OffsetMappingIntegratedShadowsVPglsl glsl glsles
 { 
    source OffsetMappingShadowsVp.glsl
 } 
@@ -144,7 +72,7 @@ fragment_program Examples/OffsetMappingIntegratedShadowsFPhlsl hlsl
    entry_point integratedshadows_fp
    target ps_2_0
 } 
-fragment_program Examples/OffsetMappingIntegratedShadowsFPglsl glsl
+fragment_program Examples/OffsetMappingIntegratedShadowsFPglsl glsl glsles
 {
 	source OffsetMappingShadowsFp.glsl
 	default_params
@@ -156,31 +84,17 @@ fragment_program Examples/OffsetMappingIntegratedShadowsFPglsl glsl
 		param_named shadowMap2 int 3
 	}
 }
-fragment_program Examples/OffsetMappingIntegratedShadowsFPglsles glsles
-{
-	source OffsetMappingShadowsFp.glsl
-	default_params
-	{
-		// assign samplers as required by GLSL ES
-		param_named normalHeightMap int 0
-		param_named diffuseMap int 1
-		param_named shadowMap1 int 2
-		param_named shadowMap2 int 3
-	}
-}
 // Single-pass offset mapping with shadows
 vertex_program Examples/OffsetMappingIntegratedShadowsVP unified
 {
 	delegate Examples/OffsetMappingIntegratedShadowsVPhlsl
 	delegate Examples/OffsetMappingIntegratedShadowsVPglsl
-	delegate Examples/OffsetMappingIntegratedShadowsVPglsles
 }
 // Single-pass offset mapping with shadows
 fragment_program Examples/OffsetMappingIntegratedShadowsFP unified
 {
 	delegate Examples/OffsetMappingIntegratedShadowsFPhlsl
 	delegate Examples/OffsetMappingIntegratedShadowsFPglsl
-	delegate Examples/OffsetMappingIntegratedShadowsFPglsles
 }
 
 

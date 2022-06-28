@@ -46,7 +46,6 @@ material DeferredShading/Post/ShowNormal
     	pass
 		{
 			cull_hardware none
-			cull_software none
 			depth_func always_pass
 			fragment_program_ref DeferredShading/post/ShowNormal_ps
 			{
@@ -75,7 +74,6 @@ material DeferredShading/Post/ShowDS
     	pass
 		{
 			cull_hardware none
-			cull_software none
 			depth_func always_pass
 			fragment_program_ref DeferredShading/post/ShowDS_ps
 			{
@@ -105,7 +103,6 @@ material DeferredShading/Post/ShowColour
     	pass
 		{
 			cull_hardware none
-			cull_software none
 			depth_func always_pass
 			fragment_program_ref DeferredShading/post/ShowColour_ps
 			{

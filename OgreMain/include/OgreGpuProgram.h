@@ -45,7 +45,7 @@ namespace Ogre {
      *  @{
      */
     /** Enumerates the types of programs which can run on the GPU. */
-    enum GpuProgramType
+    enum GpuProgramType : uint8
     {
         GPT_VERTEX_PROGRAM = 0,
         GPT_FRAGMENT_PROGRAM,
@@ -59,7 +59,7 @@ namespace Ogre {
     };
 
     /** Defines a program which runs on the GPU such as a vertex or fragment program.
-        @remarks
+
         This class defines the low-level program in assembler code, the sort used to
         directly assemble into machine instructions for the GPU to execute. By nature,
         this means that the assembler source is rendersystem specific, which is why this
@@ -70,71 +70,6 @@ namespace Ogre {
     class _OgreExport GpuProgram : public Resource
     {
     protected:
-        /// Command object - see ParamCommand
-        class _OgreExport CmdType : public ParamCommand
-    {
-    public:
-        String doGet(const void* target) const;
-        void doSet(void* target, const String& val);
-    };
-    class _OgreExport CmdSyntax : public ParamCommand
-    {
-    public:
-        String doGet(const void* target) const;
-        void doSet(void* target, const String& val);
-    };
-    class _OgreExport CmdSkeletal : public ParamCommand
-    {
-    public:
-        String doGet(const void* target) const;
-        void doSet(void* target, const String& val);
-    };
-    class _OgreExport CmdMorph : public ParamCommand
-    {
-    public:
-        String doGet(const void* target) const;
-        void doSet(void* target, const String& val);
-    };
-    class _OgreExport CmdPose : public ParamCommand
-    {
-    public:
-        String doGet(const void* target) const;
-        void doSet(void* target, const String& val);
-    };
-    class _OgreExport CmdVTF : public ParamCommand
-    {
-    public:
-        String doGet(const void* target) const;
-        void doSet(void* target, const String& val);
-    };
-    class _OgreExport CmdManualNamedConstsFile : public ParamCommand
-    {
-    public:
-        String doGet(const void* target) const;
-        void doSet(void* target, const String& val);
-    };
-    class _OgreExport CmdAdjacency : public ParamCommand
-    {
-    public:
-        String doGet(const void* target) const;
-        void doSet(void* target, const String& val);
-    };
-    class _OgreExport CmdComputeGroupDims : public ParamCommand
-    {
-    public:
-        String doGet(const void* target) const;
-        void doSet(void* target, const String& val);
-    };
-    // Command object for setting / getting parameters
-    static CmdType msTypeCmd;
-    static CmdSyntax msSyntaxCmd;
-    static CmdSkeletal msSkeletalCmd;
-    static CmdMorph msMorphCmd;
-    static CmdPose msPoseCmd;
-    static CmdVTF msVTFCmd;
-    static CmdManualNamedConstsFile msManNamedConstsFileCmd;
-    static CmdAdjacency msAdjacencyCmd;
-    static CmdComputeGroupDims msComputeGroupDimsCmd;
     /// The name of the file to load source from (may be blank)
     String mFilename;
     /// The assembler source of the program (may be blank until file loaded)
@@ -155,35 +90,26 @@ namespace Ogre {
     bool mNeedsAdjacencyInfo;
     /// Did we encounter a compilation error?
     bool mCompileError;
-    /// Does this (vertex) program include pose animation (count of number of poses supported)
-    ushort mPoseAnimation;
-    /// The number of process groups dispatched by this (compute) program.
-    Vector3 mComputeGroupDimensions;
+    bool mLoadedManualNamedConstants;
     /// The default parameters for use with this object
     GpuProgramParametersSharedPtr mDefaultParams;
     /** Record of logical to physical buffer maps. Mandatory for low-level
         programs or high-level programs which set their params the same way.
         This is a shared pointer because if the program is recompiled and the parameters
         change, this definition will alter, but previous params may reference the old def. */
-    mutable GpuLogicalBufferStructPtr mFloatLogicalToPhysical;
-    /// @copydoc mFloatLogicalToPhysical
-    mutable GpuLogicalBufferStructPtr mDoubleLogicalToPhysical;
-    /// @copydoc mFloatLogicalToPhysical
-    mutable GpuLogicalBufferStructPtr mIntLogicalToPhysical;
-    /// static nullPtr
-    static GpuLogicalBufferStructPtr mBoolLogicalToPhysical;
+    GpuLogicalBufferStructPtr mLogicalToPhysical;
     /** Parameter name -> ConstantDefinition map, shared instance used by all parameter objects.
         This is a shared pointer because if the program is recompiled and the parameters
         change, this definition will alter, but previous params may reference the old def.
     */
-    mutable GpuNamedConstantsPtr mConstantDefs;
+    GpuNamedConstantsPtr mConstantDefs;
     /// File from which to load named constants manually
     String mManualNamedConstantsFile;
-    bool mLoadedManualNamedConstants;
-
+    /// Does this (vertex) program include pose animation (count of number of poses supported)
+    ushort mPoseAnimation;
 
     /** Internal method for setting up the basic parameter definitions for a subclass.
-        @remarks
+
         Because StringInterface holds a dictionary of parameters per class, subclasses need to
         call this to ask the base class to add it's parameters to their dictionary as well.
         Can't do this in the constructor because that runs in a non-virtual context.
@@ -206,11 +132,11 @@ namespace Ogre {
     void postLoadImpl();
 
     /// Create the internal params logical & named mapping structures
-    void createParameterMappingStructures(bool recreateIfExists = true) const;
+    void createParameterMappingStructures(bool recreateIfExists = true);
     /// Create the internal params logical mapping structures
-    void createLogicalParameterMappingStructures(bool recreateIfExists = true) const;
+    void createLogicalParameterMappingStructures(bool recreateIfExists = true);
     /// Create the internal params named mapping structures
-    void createNamedParameterMappingStructures(bool recreateIfExists = true) const;
+    void createNamedParameterMappingStructures(bool recreateIfExists = true);
 
     public:
 
@@ -222,13 +148,13 @@ namespace Ogre {
     virtual ~GpuProgram() {}
 
     /** Sets the filename of the source assembly for this program.
-        @remarks
+
         Setting this will have no effect until you (re)load the program.
     */
     void setSourceFile(const String& filename);
 
     /** Sets the source assembly for this program from an in-memory string.
-        @remarks
+
         Setting this will have no effect until you (re)load the program.
     */
     void setSource(const String& source);
@@ -242,14 +168,14 @@ namespace Ogre {
     /** Gets the name of the file used as source for this program. */
     const String& getSourceFile(void) const { return mFilename; }
     /** Gets the assembler source for this program. */
-    const String& getSource(void) const { return mSource; }
+    virtual const String& getSource(void) const { return mSource; }
     /// Set the program type (only valid before load)
     void setType(GpuProgramType t);
     /// Get the program type
     GpuProgramType getType(void) const { return mType; }
 
     /** Returns the GpuProgram which should be bound to the pipeline.
-        @remarks
+
         This method is simply to allow some subclasses of GpuProgram to delegate
         the program which is bound to the pipeline to a delegate, if required. */
     virtual GpuProgram* _getBindingDelegate(void) { return this; }
@@ -258,7 +184,7 @@ namespace Ogre {
     virtual bool isSupported(void) const;
 
     /** Creates a new parameters object compatible with this program definition.
-        @remarks
+
         It is recommended that you use this method of creating parameters objects
         rather than going direct to GpuProgramManager, because this method will
         populate any implementation-specific extras (like named parameters) where
@@ -268,7 +194,7 @@ namespace Ogre {
 
     /** Sets whether a vertex program includes the required instructions
         to perform skeletal animation.
-        @remarks
+
         If this is set to true, OGRE will not blend the geometry according to
         skeletal animation, it will expect the vertex program to do it.
     */
@@ -277,7 +203,7 @@ namespace Ogre {
 
     /** Returns whether a vertex program includes the required instructions
         to perform skeletal animation.
-        @remarks
+
         If this returns true, OGRE will not blend the geometry according to
         skeletal animation, it will expect the vertex program to do it.
     */
@@ -285,7 +211,7 @@ namespace Ogre {
 
     /** Sets whether a vertex program includes the required instructions
         to perform morph animation.
-        @remarks
+
         If this is set to true, OGRE will not blend the geometry according to
         morph animation, it will expect the vertex program to do it.
     */
@@ -294,7 +220,7 @@ namespace Ogre {
 
     /** Sets whether a vertex program includes the required instructions
         to perform pose animation.
-        @remarks
+
         If this is set to true, OGRE will not blend the geometry according to
         pose animation, it will expect the vertex program to do it.
         @param poseCount The number of simultaneous poses the program can blend
@@ -304,7 +230,7 @@ namespace Ogre {
 
     /** Returns whether a vertex program includes the required instructions
         to perform morph animation.
-        @remarks
+
         If this returns true, OGRE will not blend the geometry according to
         morph animation, it will expect the vertex program to do it.
     */
@@ -312,7 +238,7 @@ namespace Ogre {
 
     /** Returns whether a vertex program includes the required instructions
         to perform pose animation.
-        @remarks
+
         If this returns true, OGRE will not blend the geometry according to
         pose animation, it will expect the vertex program to do it.
     */
@@ -330,22 +256,14 @@ namespace Ogre {
     */
     virtual bool isVertexTextureFetchRequired(void) const { return mVertexTextureFetch; }
 
-    /// @deprecated
-    virtual void setAdjacencyInfoRequired(bool r) { mNeedsAdjacencyInfo = r; }
-    /// @deprecated
+    /// @deprecated use OT_DETAIL_ADJACENCY_BIT
+    OGRE_DEPRECATED virtual void setAdjacencyInfoRequired(bool r) { mNeedsAdjacencyInfo = r; }
+    /// @deprecated use OT_DETAIL_ADJACENCY_BIT
     virtual bool isAdjacencyInfoRequired(void) const { return mNeedsAdjacencyInfo; }
-    /** Sets the number of process groups dispatched by this compute
-        program.
-     */
-    virtual void setComputeGroupDimensions(Vector3 dimensions) { mComputeGroupDimensions = dimensions; }
-    /** Returns the number of process groups dispatched by this compute 
-        program.
-     */
-    virtual Vector3 getComputeGroupDimensions(void) const { return mComputeGroupDimensions; }
 
     /** Get a reference to the default parameters which are to be used for all
         uses of this program.
-        @remarks
+
         A program can be set up with a list of default parameters, which can save time when
         using a program many times in a material with roughly the same settings. By
         retrieving the default parameters and populating it with the most used options,
@@ -353,7 +271,7 @@ namespace Ogre {
         the default parameters; thus users of the program need only change the parameters
         which are unique to their own usage of the program.
     */
-    virtual GpuProgramParametersSharedPtr getDefaultParameters(void);
+    virtual const GpuProgramParametersPtr& getDefaultParameters(void);
 
     /** Returns true if default parameters have been set up.
      */
@@ -361,7 +279,7 @@ namespace Ogre {
 
     /** Returns whether a vertex program wants light and material states to be passed
         through fixed pipeline low level API rendering calls (default false, subclasses can override)
-        @remarks
+
         Most vertex programs do not need this material information, however GLSL
         shaders can refer to this material and lighting state so enable this option
     */
@@ -369,7 +287,7 @@ namespace Ogre {
 
     /** Returns whether a fragment program wants fog state to be passed
         through fixed pipeline low level API rendering calls (default true, subclasses can override)
-        @remarks
+
         On DirectX, shader model 2 and earlier continues to have fixed-function fog
         applied to it, so fog state is still passed (you should disable fog on the
         pass if you want to perform fog in the shader). In OpenGL it is also
@@ -379,7 +297,7 @@ namespace Ogre {
 
     /** Returns whether a vertex program wants transform state to be passed
         through fixed pipeline low level API rendering calls
-        @remarks
+
         Most vertex programs do not need fixed-function transform information, however GLSL
         shaders can refer to this state so enable this option
     */
@@ -400,7 +318,7 @@ namespace Ogre {
 
     /** Allows you to manually provide a set of named parameter mappings
         to a program which would not be able to derive named parameters itself.
-        @remarks
+
         You may wish to use this if you have assembler programs that were compiled
         from a high-level source, and want the convenience of still being able
         to use the named parameters from the original high-level source.
@@ -410,7 +328,7 @@ namespace Ogre {
 
     /** Specifies the name of a file from which to load named parameters mapping
         for a program which would not be able to derive named parameters itself.
-        @remarks
+
         You may wish to use this if you have assembler programs that were compiled
         from a high-level source, and want the convenience of still being able
         to use the named parameters from the original high-level source. This
@@ -430,10 +348,9 @@ namespace Ogre {
         a high-level program which loads them, or a low-level program which has them
         specified manually.
     */
-    virtual const GpuNamedConstants& getConstantDefinitions() const { return *mConstantDefs.get(); }
+    virtual const GpuNamedConstants& getConstantDefinitions() { return *mConstantDefs.get(); }
 
-    /// @copydoc Resource::calculateSize
-    virtual size_t calculateSize(void) const;
+    size_t calculateSize(void) const override;
 
     /// internal method to get the microcode cache id
     uint32 _getHash(uint32 seed = 0) const;
@@ -443,6 +360,8 @@ namespace Ogre {
     virtual void loadFromSource(void) = 0;
 
     };
+
+    inline String to_string(const GpuProgramType& v) { return GpuProgram::getProgramTypeName(v); }
     /** @} */
     /** @} */
 }

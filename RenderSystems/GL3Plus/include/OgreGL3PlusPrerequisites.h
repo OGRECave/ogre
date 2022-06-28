@@ -30,8 +30,6 @@ THE SOFTWARE.
 
 #include "OgrePrerequisites.h"
 
-#include "OgreLogManager.h"
-
 namespace Ogre {
     // Forward declarations
     class GLContext;
@@ -46,7 +44,6 @@ namespace Ogre {
     class GL3PlusFBOManager;
     class GL3PlusHardwarePixelBuffer;
     class GL3PlusRenderBuffer;
-    class GL3PlusDepthBuffer;
     
     class GLSLShader;
 
@@ -54,42 +51,16 @@ namespace Ogre {
     typedef shared_ptr<GL3PlusTexture> GL3PlusTexturePtr;
 }
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-#if !defined( __MINGW32__ )
-#   define WIN32_LEAN_AND_MEAN
-#  ifndef NOMINMAX
-#   define NOMINMAX // required to stop windows.h messing up std::min
-#  endif
-#endif
-#   include <windows.h>
-#   include <wingdi.h>
-#   include <GL/gl3w.h>
-#elif OGRE_PLATFORM == OGRE_PLATFORM_LINUX
-#   include <GL/gl3w.h>
-#elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE
-#   include <GL/gl3w.h>
-#endif
-
-// Lots of generated code in here which triggers the new VC CRT security warnings
-#if !defined( _CRT_SECURE_NO_DEPRECATE )
-#define _CRT_SECURE_NO_DEPRECATE
-#endif
-
-#if (OGRE_PLATFORM == OGRE_PLATFORM_WIN32) && !defined(__MINGW32__) && !defined(OGRE_STATIC_LIB)
-#   ifdef RenderSystem_GL3Plus_EXPORTS
-#       define _OgreGL3PlusExport __declspec(dllexport)
-#   else
-#       if defined( __MINGW32__ )
-#           define _OgreGL3PlusExport
-#       else
-#           define _OgreGL3PlusExport __declspec(dllimport)
-#       endif
+#if (OGRE_PLATFORM == OGRE_PLATFORM_WIN32)
+#   ifndef WIN32_LEAN_AND_MEAN
+#       define WIN32_LEAN_AND_MEAN 1
 #   endif
-#elif defined ( OGRE_GCC_VISIBILITY )
-#    define _OgreGL3PlusExport  __attribute__ ((visibility("default")))
-#else
-#    define _OgreGL3PlusExport
+#   ifndef NOMINMAX
+#       define NOMINMAX // required to stop windows.h messing up std::min
+#   endif
 #endif
+
+#include <GL/gl3w.h>
 
 // Convenience macro from ARB_vertex_buffer_object spec
 #define GL_BUFFER_OFFSET(i) ((char *)(i))
@@ -99,10 +70,9 @@ namespace Ogre {
 #endif
 
 #define ENABLE_GL_CHECK 0
-#define ENABLE_GL_DEBUG_OUTPUT 0
 
 #if ENABLE_GL_CHECK
-#include "OgreStringVector.h"
+#include "OgreLogManager.h"
 #define OGRE_CHECK_GL_ERROR(glFunc) \
 { \
     glFunc; \
@@ -119,14 +89,17 @@ namespace Ogre {
             case GL_OUT_OF_MEMORY:      errorString = "GL_OUT_OF_MEMORY";       break; \
             default:                                                            break; \
         } \
-        char msgBuf[4096]; \
-        StringVector tokens = StringUtil::split(#glFunc, "("); \
-        sprintf(msgBuf, "OpenGL error 0x%04X %s in %s at line %i for %s\n", e, errorString, __PRETTY_FUNCTION__, __LINE__, tokens[0].c_str()); \
-        LogManager::getSingleton().logMessage(msgBuf, LML_CRITICAL); \
+        String funcname = #glFunc; \
+        funcname = funcname.substr(0, funcname.find('(')); \
+        LogManager::getSingleton().logError(StringUtil::format("%s failed with %s in %s at %s(%d)",          \
+                                                                funcname.c_str(), errorString, __FUNCTION__, \
+                                                                __FILE__, __LINE__));                        \
     } \
 }
 #else
 #   define OGRE_CHECK_GL_ERROR(glFunc) { glFunc; }
 #endif
+
+#include "OgreGL3PlusExports.h"
 
 #endif //#ifndef __GL3PlusPrerequisites_H__

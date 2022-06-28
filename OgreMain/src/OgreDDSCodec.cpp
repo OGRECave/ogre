@@ -33,8 +33,6 @@ THE SOFTWARE.
 
 namespace Ogre {
     // Internal DDS structure definitions
-#define FOURCC(c0, c1, c2, c3) (c0 | (c1 << 8) | (c2 << 16) | (c3 << 24))
-    
 #if OGRE_COMPILER == OGRE_COMPILER_MSVC
 #pragma pack (push, 1)
 #else
@@ -121,6 +119,7 @@ namespace Ogre {
 #pragma pack ()
 #endif
 
+namespace {
     const uint32 DDS_MAGIC = FOURCC('D', 'D', 'S', ' ');
     const uint32 DDS_PIXELFORMAT_SIZE = 8 * sizeof(uint32);
     const uint32 DDS_CAPS_SIZE = 4 * sizeof(uint32);
@@ -158,7 +157,7 @@ namespace Ogre {
     const uint32 D3DFMT_R32F            = 114;
     const uint32 D3DFMT_G32R32F         = 115;
     const uint32 D3DFMT_A32B32G32R32F   = 116;
-
+}
 
     //---------------------------------------------------------------------
     DDSCodec* DDSCodec::msInstance = 0;
@@ -194,15 +193,8 @@ namespace Ogre {
     { 
     }
     //---------------------------------------------------------------------
-    DataStreamPtr DDSCodec::encode(const MemoryDataStreamPtr& input, const Codec::CodecDataPtr& pData) const
-    {        
-        OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED,
-            "DDS encoding not supported",
-            "DDSCodec::encode" ) ;
-    }
-    //---------------------------------------------------------------------
     void DDSCodec::encodeToFile(const MemoryDataStreamPtr& input, const String& outFileName,
-                                const Codec::CodecDataPtr& pData) const
+                                const CodecDataPtr& pData) const
     {
         // Unwrap codecDataPtr - data is cleaned by calling function
         ImageData* imgData = static_cast<ImageData* >(pData.get());  
@@ -217,6 +209,7 @@ namespace Ogre {
         bool isVolume = (imgData->depth > 1);       
         bool isFloat32r = (imgData->format == PF_FLOAT32_R);
         bool isFloat16 = (imgData->format == PF_FLOAT16_RGBA);
+        bool isFloat16r = (imgData->format == PF_FLOAT16_R);
         bool isFloat32 = (imgData->format == PF_FLOAT32_RGBA);
         bool notImplemented = false;
         String notImplementedString = "";
@@ -226,7 +219,7 @@ namespace Ogre {
         {
             // Square textures only
             notImplemented = true;
-            notImplementedString += " non square textures";
+            notImplementedString += "non square textures";
         }
 
         uint32 size = 1;
@@ -238,7 +231,7 @@ namespace Ogre {
         {
             // Power two textures only
             notImplemented = true;
-            notImplementedString += " non power two textures";
+            notImplementedString += "non power two textures";
         }
 
         switch(imgData->format)
@@ -250,13 +243,14 @@ namespace Ogre {
         case PF_X8B8G8R8:
         case PF_B8G8R8:
         case PF_FLOAT32_R:
+        case PF_FLOAT16_R:
         case PF_FLOAT16_RGBA:
         case PF_FLOAT32_RGBA:
             break;
         default:
             // No crazy FOURCC or 565 et al. file formats at this stage
             notImplemented = true;
-            notImplementedString = " unsupported pixel format";
+            notImplementedString = PixelUtil::getFormatName(imgData->format);
             break;
         }       
 
@@ -266,8 +260,7 @@ namespace Ogre {
         if (notImplemented)
         {
             OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED,
-                "DDS encoding for" + notImplementedString + " not supported",
-                "DDSCodec::encodeToFile" ) ;
+                        "DDS encoding for " + notImplementedString + " not supported");
         }
         else
         {
@@ -310,6 +303,9 @@ namespace Ogre {
                 break;
             case PF_FLOAT32_R:
                 ddsHeaderRgbBits = 32;
+                break;
+            case PF_FLOAT16_R:
+                ddsHeaderRgbBits = 16;
                 break;
             case PF_FLOAT16_RGBA:
                 ddsHeaderRgbBits = 16 * 4;
@@ -362,9 +358,12 @@ namespace Ogre {
 
             ddsHeader.pixelFormat.size = DDS_PIXELFORMAT_SIZE;
             ddsHeader.pixelFormat.flags = (hasAlpha) ? DDPF_RGB|DDPF_ALPHAPIXELS : DDPF_RGB;
-            ddsHeader.pixelFormat.flags = (isFloat32r || isFloat16 || isFloat32) ? DDPF_FOURCC : ddsHeader.pixelFormat.flags;
+            ddsHeader.pixelFormat.flags = (isFloat32r || isFloat16r || isFloat16 || isFloat32) ? DDPF_FOURCC : ddsHeader.pixelFormat.flags;
             if (isFloat32r) {
                 ddsHeader.pixelFormat.fourCC = D3DFMT_R32F;
+            }
+            else if (isFloat16r) {
+                ddsHeader.pixelFormat.fourCC = D3DFMT_R16F;
             }
             else if (isFloat16) {
                 ddsHeader.pixelFormat.fourCC = D3DFMT_A16B16G16R16F;
@@ -378,10 +377,10 @@ namespace Ogre {
             ddsHeader.pixelFormat.rgbBits = ddsHeaderRgbBits;
 
             ddsHeader.pixelFormat.alphaMask = (hasAlpha)   ? 0xFF000000 : 0x00000000;
-            ddsHeader.pixelFormat.alphaMask = (isFloat32r) ? 0x00000000 : ddsHeader.pixelFormat.alphaMask;
-            ddsHeader.pixelFormat.redMask   = (isFloat32r) ? 0xFFFFFFFF :0x00FF0000;
-            ddsHeader.pixelFormat.greenMask = (isFloat32r) ? 0x00000000 :0x0000FF00;
-            ddsHeader.pixelFormat.blueMask  = (isFloat32r) ? 0x00000000 :0x000000FF;
+            ddsHeader.pixelFormat.alphaMask = (isFloat32r || isFloat16r) ? 0x00000000 : ddsHeader.pixelFormat.alphaMask;
+            ddsHeader.pixelFormat.redMask   = (isFloat32r || isFloat16r) ? 0xFFFFFFFF :0x00FF0000;
+            ddsHeader.pixelFormat.greenMask = (isFloat32r || isFloat16r) ? 0x00000000 :0x0000FF00;
+            ddsHeader.pixelFormat.blueMask  = (isFloat32r || isFloat16r) ? 0x00000000 :0x000000FF;
 
             if( flipRgbMasks )
                 std::swap( ddsHeader.pixelFormat.redMask, ddsHeader.pixelFormat.blueMask );
@@ -742,7 +741,7 @@ namespace Ogre {
             pCol[i].a = derivedAlphas[dw & 0x7];
     }
     //---------------------------------------------------------------------
-    Codec::DecodeResult DDSCodec::decode(const DataStreamPtr& stream) const
+    ImageCodec::DecodeResult DDSCodec::decode(const DataStreamPtr& stream) const
     {
         // Read 4 character code
         uint32 fileType;
@@ -780,7 +779,7 @@ namespace Ogre {
         imgData->depth = 1; // (deal with volume later)
         imgData->width = header.width;
         imgData->height = header.height;
-        size_t numFaces = 1; // assume one face until we know otherwise
+        uint32 numFaces = 1; // assume one face until we know otherwise
 
         if (header.caps.caps1 & DDSCAPS_MIPMAP)
         {
@@ -836,9 +835,7 @@ namespace Ogre {
         if (PixelUtil::isCompressed(sourceFormat))
         {
             if (Root::getSingleton().getRenderSystem() == NULL ||
-                !Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_TEXTURE_COMPRESSION_DXT)
-                || (!Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_AUTOMIPMAP_COMPRESSED)
-                && !imgData->num_mipmaps))
+                !Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_TEXTURE_COMPRESSION_DXT))
             {
                 // We'll need to decompress
                 decompressDXT = true;
@@ -1053,20 +1050,6 @@ namespace Ogre {
     String DDSCodec::getType() const 
     {
         return mType;
-    }
-    //---------------------------------------------------------------------    
-    void DDSCodec::flipEndian(void * pData, size_t size, size_t count)
-    {
-#if OGRE_ENDIAN == OGRE_ENDIAN_BIG
-		Bitwise::bswapChunks(pData, size, count);
-#endif
-    }
-    //---------------------------------------------------------------------    
-    void DDSCodec::flipEndian(void * pData, size_t size)
-    {
-#if OGRE_ENDIAN == OGRE_ENDIAN_BIG
-        Bitwise::bswapBuffer(pData, size);
-#endif
     }
     //---------------------------------------------------------------------
     String DDSCodec::magicNumberToFileExt(const char *magicNumberPtr, size_t maxbytes) const

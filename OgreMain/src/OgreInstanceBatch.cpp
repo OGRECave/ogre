@@ -100,22 +100,15 @@ namespace Ogre
 
     void InstanceBatch::_setInstancesPerBatch( size_t instancesPerBatch )
     {
-        if( !mInstancedEntities.empty() )
-        {
-            OGRE_EXCEPT(Exception::ERR_INVALID_STATE, "Instances per batch can only be changed before"
-                        " building the batch.", "InstanceBatch::_setInstancesPerBatch");
-        }
-
+        OgreAssert(mInstancedEntities.empty(),
+                   "Instances per batch can only be changed before building the batch");
         mInstancesPerBatch = instancesPerBatch;
     }
     //-----------------------------------------------------------------------
     bool InstanceBatch::checkSubMeshCompatibility( const SubMesh* baseSubMesh )
     {
-        if( baseSubMesh->operationType != RenderOperation::OT_TRIANGLE_LIST )
-        {
-            OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Only meshes with OT_TRIANGLE_LIST are supported",
-                        "InstanceBatch::checkSubMeshCompatibility");
-        }
+        OgreAssert(baseSubMesh->operationType == RenderOperation::OT_TRIANGLE_LIST,
+                   "Only meshes with OT_TRIANGLE_LIST are supported");
 
         if( !mCustomParams.empty() && mCreator->getInstancingTechnique() != InstanceManager::HWInstancingBasic )
         {
@@ -276,19 +269,9 @@ namespace Ogre
     //-----------------------------------------------------------------------
     void InstanceBatch::removeInstancedEntity( InstancedEntity *instancedEntity )
     {
-        if( instancedEntity->mBatchOwner != this )
-        {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-                        "Trying to remove an InstancedEntity from scene created"
-                        " with a different InstanceBatch",
-                        "InstanceBatch::removeInstancedEntity()");
-        }
-        if( !instancedEntity->isInUse() )
-        {
-            OGRE_EXCEPT(Exception::ERR_INVALID_STATE,
-                        "Trying to remove an InstancedEntity that is already removed!",
-                        "InstanceBatch::removeInstancedEntity()");
-        }
+        OgreAssert(instancedEntity->mBatchOwner == this,
+                   "Trying to remove an InstancedEntity from scene created with a different InstanceBatch");
+        OgreAssert(instancedEntity->isInUse(), "Trying to remove an InstancedEntity that is already removed");
 
         if( instancedEntity->getParentSceneNode() )
             instancedEntity->getParentSceneNode()->detachObject( instancedEntity );

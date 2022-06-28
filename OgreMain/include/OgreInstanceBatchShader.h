@@ -56,7 +56,7 @@ namespace Ogre
         Another improvement is that vertex buffers are shared between batches, which significantly
         reduces GPU VRAM usage.
 
-        @remarks
+
             Design discussion webpage: http://www.ogre3d.org/forums/viewtopic.php?f=4&t=59902
         @author
             Matias N. Goldberg ("dark_sylinc")

@@ -30,6 +30,8 @@ THE SOFTWARE.
 
 
 namespace Ogre {
+    const String MSN_DEFAULT = "Default";
+    const String MSN_SHADERGEN = "ShaderGeneratorDefaultScheme";
 
     //-----------------------------------------------------------------------
     template<> MaterialManager* Singleton<MaterialManager>::msSingleton = 0;
@@ -41,7 +43,7 @@ namespace Ogre {
     {
         assert( msSingleton );  return ( *msSingleton );
     }
-    String MaterialManager::DEFAULT_SCHEME_NAME = "Default";
+    String MaterialManager::DEFAULT_SCHEME_NAME = MSN_DEFAULT;
     //-----------------------------------------------------------------------
     MaterialManager::MaterialManager()
     {
@@ -57,7 +59,7 @@ namespace Ogre {
 
         // Default scheme
         mActiveSchemeIndex = 0;
-        mActiveSchemeName = DEFAULT_SCHEME_NAME;
+        mActiveSchemeName = MSN_DEFAULT;
         mSchemes[mActiveSchemeName] = 0;
 
     }
@@ -88,7 +90,7 @@ namespace Ogre {
         return static_pointer_cast<Material>(createResource(name,group,isManual,loader,createParams));
     }
     //-----------------------------------------------------------------------
-    MaterialPtr MaterialManager::getByName(const String& name, const String& groupName)
+    MaterialPtr MaterialManager::getByName(const String& name, const String& groupName) const
     {
         return static_pointer_cast<Material>(getResourceByName(name, groupName));
     }
@@ -97,12 +99,8 @@ namespace Ogre {
         MaterialPtr ret = getByName(useLighting ? "BaseWhite" : "BaseWhiteNoLighting",
                                     ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME);
 
-        if (!ret)
-        {
-            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Can't find default material "
-                " Did you forget to call MaterialManager::initialise()?",
-                "MaterialManager::getDefaultMaterial");
-        }
+        OgreAssert(ret,
+                   "Can't find default material Did you forget to call MaterialManager::initialise()?");
 
         return ret;
     }
@@ -125,11 +123,6 @@ namespace Ogre {
         ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME);
         baseWhiteNoLighting->setLightingEnabled(false);
 
-    }
-    //-----------------------------------------------------------------------
-    void MaterialManager::parseScript(DataStreamPtr& stream, const String& groupName)
-    {
-        ScriptCompilerManager::getSingleton().parseScript(stream, groupName);
     }
     //-----------------------------------------------------------------------
     void MaterialManager::setDefaultTextureFiltering(TextureFilterOptions fo)
@@ -188,17 +181,7 @@ namespace Ogre {
             if (i->second == index)
                 return i->first;
         }
-        return DEFAULT_SCHEME_NAME;
-    }
-    //-----------------------------------------------------------------------
-    unsigned short MaterialManager::_getActiveSchemeIndex(void) const
-    {
-        return mActiveSchemeIndex;
-    }
-    //-----------------------------------------------------------------------
-    const String& MaterialManager::getActiveScheme(void) const
-    {
-        return mActiveSchemeName;
+        return MSN_DEFAULT;
     }
     //-----------------------------------------------------------------------
     void MaterialManager::setActiveScheme(const String& schemeName)

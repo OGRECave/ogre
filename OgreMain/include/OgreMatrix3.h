@@ -231,27 +231,32 @@ namespace Ogre
         }
         void FromAngleAxis (const Vector3& rkAxis, const Radian& fRadians);
 
-        /** The matrix must be orthonormal.  The decomposition is yaw*pitch*roll
-            where yaw is rotation about the Up vector, pitch is rotation about the
-            Right axis, and roll is rotation about the Direction axis. */
-        bool ToEulerAnglesXYZ (Radian& rfYAngle, Radian& rfPAngle,
-            Radian& rfRAngle) const;
-        bool ToEulerAnglesXZY (Radian& rfYAngle, Radian& rfPAngle,
-            Radian& rfRAngle) const;
-        bool ToEulerAnglesYXZ (Radian& rfYAngle, Radian& rfPAngle,
-            Radian& rfRAngle) const;
-        bool ToEulerAnglesYZX (Radian& rfYAngle, Radian& rfPAngle,
-            Radian& rfRAngle) const;
-        bool ToEulerAnglesZXY (Radian& rfYAngle, Radian& rfPAngle,
-            Radian& rfRAngle) const;
-        bool ToEulerAnglesZYX (Radian& rfYAngle, Radian& rfPAngle,
-            Radian& rfRAngle) const;
+        /**
+            @name Euler angle conversions
+            (De-)composes the matrix in/ from yaw, pitch and roll angles,
+            where yaw is rotation about the Y vector, pitch is rotation about the
+            X axis, and roll is rotation about the Z axis.
+
+            The function suffix indicates the (de-)composition order;
+            e.g. with the YXZ variants the matrix will be (de-)composed as yaw*pitch*roll
+
+            For ToEulerAngles*, the return value denotes whether the solution is unique.
+            @note The matrix to be decomposed must be orthonormal.
+            @{
+        */
+        bool ToEulerAnglesXYZ(Radian& rfYAngle, Radian& rfPAngle, Radian& rfRAngle) const;
+        bool ToEulerAnglesXZY(Radian& rfYAngle, Radian& rfPAngle, Radian& rfRAngle) const;
+        bool ToEulerAnglesYXZ(Radian& rfYAngle, Radian& rfPAngle, Radian& rfRAngle) const;
+        bool ToEulerAnglesYZX(Radian& rfYAngle, Radian& rfPAngle, Radian& rfRAngle) const;
+        bool ToEulerAnglesZXY(Radian& rfYAngle, Radian& rfPAngle, Radian& rfRAngle) const;
+        bool ToEulerAnglesZYX(Radian& rfYAngle, Radian& rfPAngle, Radian& rfRAngle) const;
         void FromEulerAnglesXYZ (const Radian& fYAngle, const Radian& fPAngle, const Radian& fRAngle);
         void FromEulerAnglesXZY (const Radian& fYAngle, const Radian& fPAngle, const Radian& fRAngle);
         void FromEulerAnglesYXZ (const Radian& fYAngle, const Radian& fPAngle, const Radian& fRAngle);
         void FromEulerAnglesYZX (const Radian& fYAngle, const Radian& fPAngle, const Radian& fRAngle);
         void FromEulerAnglesZXY (const Radian& fYAngle, const Radian& fPAngle, const Radian& fRAngle);
         void FromEulerAnglesZYX (const Radian& fYAngle, const Radian& fPAngle, const Radian& fRAngle);
+        /// @}
         /// Eigensolver, matrix must be symmetric
         void EigenSolveSymmetric (Real afEigenvalue[3],
             Vector3 akEigenvector[3]) const;
@@ -291,7 +296,7 @@ namespace Ogre
         static const Matrix3 ZERO;
         static const Matrix3 IDENTITY;
 
-    protected:
+    private:
         // support for eigensolver
         void Tridiagonal (Real afDiag[3], Real afSubDiag[3]);
         bool QLAlgorithm (Real afDiag[3], Real afSubDiag[3]);
@@ -321,6 +326,15 @@ namespace Ogre
                 m[2][0] * v.x + m[2][1] * v.y + m[2][2] * v.z);
     }
 
+    inline Matrix3 Math::lookRotation(const Vector3& direction, const Vector3& yaw)
+    {
+        Matrix3 ret;
+        // cross twice to rederive, only direction is unaltered
+        const Vector3& xAxis = yaw.crossProduct(direction).normalisedCopy();
+        const Vector3& yAxis = direction.crossProduct(xAxis);
+        ret.FromAxes(xAxis, yAxis, direction);
+        return ret;
+    }
     /** @} */
     /** @} */
 }

@@ -34,24 +34,16 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 namespace Ogre {
 
-
-    // Default threshold at which glMapBuffer becomes more efficient than glBufferSubData (32k?)
-    //TODO Double check that this still holds.
-#       define OGRE_GL_DEFAULT_MAP_BUFFER_THRESHOLD (1024 * 32)
-
     /** Implementation of HardwareBufferManager for OpenGL. */
     class _OgreGL3PlusExport GL3PlusHardwareBufferManager : public HardwareBufferManager
     {
     protected:
         GL3PlusRenderSystem* mRenderSystem;
-        char* mScratchBufferPool;
-        OGRE_MUTEX(mScratchMutex);
-        size_t mMapBufferThreshold;
 
-        UniformBufferList mShaderStorageBuffers;
+        size_t mUniformBufferCount;
+        size_t mShaderStorageBufferCount;
 
         VertexDeclaration* createVertexDeclarationImpl(void);
-        void destroyVertexDeclarationImpl(VertexDeclaration* decl);
     public:
         GL3PlusHardwareBufferManager();
         ~GL3PlusHardwareBufferManager();
@@ -63,43 +55,25 @@ namespace Ogre {
             HardwareIndexBuffer::IndexType itype, size_t numIndexes,
             HardwareBuffer::Usage usage, bool useShadowBuffer = false);
         /// Create a uniform buffer
-        HardwareUniformBufferSharedPtr createUniformBuffer(size_t sizeBytes, HardwareBuffer::Usage usage = HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE,
-                                                           bool useShadowBuffer = false, const String& name = "");
+        HardwareBufferPtr createUniformBuffer(size_t sizeBytes, HardwareBufferUsage usage = HBU_CPU_TO_GPU,
+                                              bool useShadowBuffer = false) override;
 
         /// Create a shader storage buffer.
-        HardwareUniformBufferSharedPtr createShaderStorageBuffer(size_t sizeBytes, HardwareBuffer::Usage usage = HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE,
-                                                                 bool useShadowBuffer = false, const String& name = "");
-        /// Create a counter buffer
-        HardwareCounterBufferSharedPtr createCounterBuffer(size_t sizeBytes, HardwareBuffer::Usage usage,
-                                                           bool useShadowBuffer, const String& name = "");
+        HardwareBufferPtr createShaderStorageBuffer(size_t sizeBytes,
+                                                    HardwareBufferUsage usage = HBU_CPU_TO_GPU,
+                                                    bool useShadowBuffer = false);
+
         /// Create a render to vertex buffer
         RenderToVertexBufferSharedPtr createRenderToVertexBuffer();
 
-        size_t getUniformBufferCount() { return mUniformBuffers.size(); }
-        size_t getShaderStorageBufferCount() { return mShaderStorageBuffers.size(); }
+        size_t getUniformBufferCount() { return mUniformBufferCount; }
+        size_t getShaderStorageBufferCount() { return mShaderStorageBufferCount; }
 
         /// Utility function to get the correct GL type based on VET's
         static GLenum getGLType(VertexElementType type);
 
         GL3PlusStateCacheManager * getStateCacheManager();
         void notifyContextDestroyed(GLContext* context);
-
-        /** Allocator method to allow us to use a pool of memory as a scratch
-            area for hardware buffers. This is because glMapBuffer is incredibly
-            inefficient, seemingly no matter what options we give it. So for the
-            period of lock/unlock, we will instead allocate a section of a local
-            memory pool, and use glBufferSubDataARB / glGetBufferSubDataARB
-            instead.
-        */
-        void* allocateScratch(uint32 size);
-
-        /// @see allocateScratch
-        void deallocateScratch(void* ptr);
-
-        /** Threshold after which glMapBuffer is used and not glBufferSubData
-         */
-        size_t getGLMapBufferThreshold() const;
-        void setGLMapBufferThreshold( const size_t value );
     };
 }
 

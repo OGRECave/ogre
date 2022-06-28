@@ -63,3 +63,14 @@ if (OGRE_BUILD_RENDERSYSTEM_GLES2)
   endif()
 endif()
 
+if (OGRE_BUILD_RENDERSYSTEM_METAL)
+    add_subdirectory(Metal)
+endif()
+
+if (OGRE_BUILD_RENDERSYSTEM_TINY)
+    add_subdirectory(Tiny)
+endif()
+
+if (OGRE_BUILD_RENDERSYSTEM_VULKAN)
+    add_subdirectory(Vulkan)
+endif()

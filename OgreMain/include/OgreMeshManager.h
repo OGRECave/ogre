@@ -50,12 +50,12 @@ namespace Ogre {
     *  @{
     */
     /** Handles the management of mesh resources.
-        @remarks
+
             This class deals with the runtime management of
             mesh data; like other resource managers it handles
             the creation of resources (in this case mesh data),
             working within a fixed memory budget.
-        @remarks
+
             Ogre loads model files from it's own proprietary
             format called .mesh. This is because having a single file
             format is better for runtime performance, and we also have
@@ -72,7 +72,7 @@ namespace Ogre {
         void _initialise(void);
 
         /// @copydoc ResourceManager::getResourceByName
-        MeshPtr getByName(const String& name, const String& groupName OGRE_RESOURCE_GROUP_INIT);
+        MeshPtr getByName(const String& name, const String& groupName OGRE_RESOURCE_GROUP_INIT) const;
 
         /// Create a new mesh
         /// @copydetails ResourceManager::createResource
@@ -100,7 +100,7 @@ namespace Ogre {
             bool isManual, ManualResourceLoader* loader,
             const NameValuePairList* createParams,
             HardwareBuffer::Usage vertexBufferUsage,
-            HardwareBuffer::Usage indexBufferUsage = HardwareBuffer::HBU_STATIC_WRITE_ONLY, 
+            HardwareBuffer::Usage indexBufferUsage = HBU_GPU_ONLY,
             bool vertexBufferShadowed = false, bool indexBufferShadowed = false);
 
         /** Prepares a mesh for loading from a file.  This does the IO in advance of the call to load().
@@ -119,16 +119,16 @@ namespace Ogre {
                 copies for faster read access
         */
         MeshPtr prepare( const String& filename, const String& groupName,
-            HardwareBuffer::Usage vertexBufferUsage = HardwareBuffer::HBU_STATIC_WRITE_ONLY, 
-            HardwareBuffer::Usage indexBufferUsage = HardwareBuffer::HBU_STATIC_WRITE_ONLY, 
+            HardwareBuffer::Usage vertexBufferUsage = HBU_GPU_ONLY,
+            HardwareBuffer::Usage indexBufferUsage = HBU_GPU_ONLY,
             bool vertexBufferShadowed = false, bool indexBufferShadowed = false);
 
         /** Loads a mesh from a file, making it immediately available for use.
             @copydetails MeshManager::prepare
         */
         MeshPtr load( const String& filename, const String& groupName,
-            HardwareBuffer::Usage vertexBufferUsage = HardwareBuffer::HBU_STATIC_WRITE_ONLY, 
-            HardwareBuffer::Usage indexBufferUsage = HardwareBuffer::HBU_STATIC_WRITE_ONLY, 
+            HardwareBuffer::Usage vertexBufferUsage = HBU_GPU_ONLY,
+            HardwareBuffer::Usage indexBufferUsage = HBU_GPU_ONLY,
             bool vertexBufferShadowed = false, bool indexBufferShadowed = false);
 
 
@@ -193,8 +193,8 @@ namespace Ogre {
             int xsegments = 1, int ysegments = 1,
             bool normals = true, unsigned short numTexCoordSets = 1,
             Real uTile = 1.0f, Real vTile = 1.0f, const Vector3& upVector = Vector3::UNIT_Y,
-            HardwareBuffer::Usage vertexBufferUsage = HardwareBuffer::HBU_STATIC_WRITE_ONLY, 
-            HardwareBuffer::Usage indexBufferUsage = HardwareBuffer::HBU_STATIC_WRITE_ONLY,
+            HardwareBuffer::Usage vertexBufferUsage = HBU_GPU_ONLY,
+            HardwareBuffer::Usage indexBufferUsage = HBU_GPU_ONLY,
             bool vertexShadowBuffer = false, bool indexShadowBuffer = false);
 
         
@@ -255,8 +255,8 @@ namespace Ogre {
             bool normals = true, unsigned short numTexCoordSets = 1,
             Real uTile = 1.0f, Real vTile = 1.0f, const Vector3& upVector = Vector3::UNIT_Y,
             const Quaternion& orientation = Quaternion::IDENTITY,
-            HardwareBuffer::Usage vertexBufferUsage = HardwareBuffer::HBU_STATIC_WRITE_ONLY, 
-            HardwareBuffer::Usage indexBufferUsage = HardwareBuffer::HBU_STATIC_WRITE_ONLY,
+            HardwareBuffer::Usage vertexBufferUsage = HBU_GPU_ONLY,
+            HardwareBuffer::Usage indexBufferUsage = HBU_GPU_ONLY,
             bool vertexShadowBuffer = false, bool indexShadowBuffer = false, 
             int ySegmentsToKeep = -1);
 
@@ -307,8 +307,8 @@ namespace Ogre {
             int xsegments = 1, int ysegments = 1,
             bool normals = false, unsigned short numTexCoordSets = 1, 
             Real uTile = 1.0f, Real vTile = 1.0f, const Vector3& upVector = Vector3::UNIT_Y,
-            HardwareBuffer::Usage vertexBufferUsage = HardwareBuffer::HBU_STATIC_WRITE_ONLY, 
-            HardwareBuffer::Usage indexBufferUsage = HardwareBuffer::HBU_STATIC_WRITE_ONLY,
+            HardwareBuffer::Usage vertexBufferUsage = HBU_GPU_ONLY,
+            HardwareBuffer::Usage indexBufferUsage = HBU_GPU_ONLY,
             bool vertexShadowBuffer = false, bool indexShadowBuffer = false);
 
         /** Creates a Bezier patch based on an array of control vertices.
@@ -353,8 +353,8 @@ namespace Ogre {
             size_t uMaxSubdivisionLevel = PatchSurface::AUTO_LEVEL, 
             size_t vMaxSubdivisionLevel = PatchSurface::AUTO_LEVEL,
             PatchSurface::VisibleSide visibleSide = PatchSurface::VS_FRONT,
-            HardwareBuffer::Usage vbUsage = HardwareBuffer::HBU_STATIC_WRITE_ONLY, 
-            HardwareBuffer::Usage ibUsage = HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY,
+            HardwareBuffer::Usage vbUsage = HBU_GPU_ONLY,
+            HardwareBuffer::Usage ibUsage = HBU_CPU_TO_GPU,
             bool vbUseShadow = true, bool ibUseShadow = true);
         
         /** Tells the mesh manager that all future meshes should prepare themselves for
@@ -370,13 +370,13 @@ namespace Ogre {
         static MeshManager* getSingletonPtr(void);
 
         /** Gets the base element type used for blend weights in vertex buffers.
-        @remarks
+
         See the remarks below for SetBlendWeightsBaseElementType().
         */
         VertexElementType getBlendWeightsBaseElementType() const;
 
         /** sets the base element type used for blend weights in vertex buffers.
-        @remarks
+
         This takes effect when meshes are loaded.  Default is VET_FLOAT1.
         Valid values are:
         VET_UBYTE4_NORM:   8-bit blend weights.  Lowest memory cost but may have precision issues.  Requires SM2.0+ vertex shader.  No software skinning.
@@ -402,64 +402,14 @@ namespace Ogre {
         */
         MeshSerializerListener *getListener();
 
-    protected:
+    private:
 
         /// @copydoc ResourceManager::createImpl
         Resource* createImpl(const String& name, ResourceHandle handle, 
             const String& group, bool isManual, ManualResourceLoader* loader, 
             const NameValuePairList* createParams);
     
-        /** Enum identifying the types of manual mesh built by this manager */
-        enum MeshBuildType
-        {
-            MBT_PLANE,
-            MBT_CURVED_ILLUSION_PLANE,
-            MBT_CURVED_PLANE
-        };
-        /** Saved parameters used to (re)build a manual mesh built by this class */
-        struct MeshBuildParams
-        {
-            MeshBuildType type;
-            Plane plane;
-            Real width;
-            Real height;
-            Real curvature;
-            int xsegments;
-            int ysegments;
-            bool normals;
-            unsigned short numTexCoordSets;
-            Real xTile;
-            Real yTile;
-            Vector3 upVector;
-            Quaternion orientation;
-            HardwareBuffer::Usage vertexBufferUsage;
-            HardwareBuffer::Usage indexBufferUsage;
-            bool vertexShadowBuffer;
-            bool indexShadowBuffer;
-            int ySegmentsToKeep;
-        };
-
-        struct PrefabLoader : public ManualResourceLoader
-        {
-            /** Map from resource pointer to parameter set */
-            typedef std::map<Resource*, MeshBuildParams> MeshBuildParamsMap;
-            MeshBuildParamsMap mMeshBuildParams;
-
-            /** Utility method for tessellating 2D meshes.
-            */
-            static void tesselate2DMesh(SubMesh* pSub, unsigned short meshWidth, unsigned short meshHeight,
-                bool doubleSided = false,
-                HardwareBuffer::Usage indexBufferUsage = HardwareBuffer::HBU_STATIC_WRITE_ONLY,
-                bool indexSysMem = false);
-            /** Utility method for manual loading a plane */
-            static void loadManualPlane(Mesh* pMesh, MeshBuildParams& params);
-            /** Utility method for manual loading a curved plane */
-            static void loadManualCurvedPlane(Mesh* pMesh, MeshBuildParams& params);
-            /** Utility method for manual loading a curved illusion plane */
-            static void loadManualCurvedIllusionPlane(Mesh* pMesh, MeshBuildParams& params);
-
-            void loadResource(Resource* res);
-        } mPrefabLoader;
+        std::unique_ptr<ManualResourceLoader> mPrefabLoader;
 
         // element type for blend weights in vertex buffer (VET_UBYTE4, VET_USHORT1, or VET_FLOAT1)
         VertexElementType mBlendWeightsBaseElementType;
@@ -471,6 +421,9 @@ namespace Ogre {
 
         // The listener to pass to serializers
         MeshSerializerListener *mListener;
+
+    private:
+        std::unique_ptr<Codec> mMeshCodec;
     };
 
     /** @} */

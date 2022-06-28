@@ -52,16 +52,7 @@ ConfigOptionMap OSXGLSupport::getConfigOptions()
 {
 	ConfigOptionMap mOptions;
 	ConfigOption optBitDepth;
-	ConfigOption optHiddenWindow;
     ConfigOption optContentScalingFactor;
-
-    // Hidden window setting possibilities
-	optHiddenWindow.name = "hidden";
-	optHiddenWindow.possibleValues.push_back( "Yes" );
-	optHiddenWindow.possibleValues.push_back( "No" );
-	optHiddenWindow.currentValue = "No";
-	optHiddenWindow.immutable = false;
-	mOptions[optHiddenWindow.name] = optHiddenWindow;
 
 	optBitDepth.name = "Colour Depth";
 	optBitDepth.currentValue = "32";
@@ -69,8 +60,6 @@ ConfigOptionMap OSXGLSupport::getConfigOptions()
 
     optContentScalingFactor.name = "Content Scaling Factor";
     optContentScalingFactor.possibleValues.push_back( "1.0" );
-    optContentScalingFactor.possibleValues.push_back( "1.33" );
-    optContentScalingFactor.possibleValues.push_back( "1.5" );
     optContentScalingFactor.possibleValues.push_back( "2.0" );
     optContentScalingFactor.currentValue = StringConverter::toString((float)[NSScreen mainScreen].backingScaleFactor);
     optContentScalingFactor.immutable = false;

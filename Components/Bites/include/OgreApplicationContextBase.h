@@ -54,13 +54,6 @@ namespace Ogre {
 
 #include "OgreInput.h"
 
-/** \addtogroup Optional Optional Components
-*  @{
-*/
-/** \defgroup Bites Bites
-* reusable utilities for rapid prototyping
-*  @{
-*/
 namespace OgreBites
 {
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
@@ -68,6 +61,14 @@ namespace OgreBites
 #else
     typedef SDL_Window NativeWindowType;
 #endif
+
+    /** \addtogroup Optional Optional Components
+    *  @{
+    */
+    /** \defgroup Bites Bites
+    * reusable utilities for rapid prototyping
+    *  @{
+    */
 
     /**
      * link between a renderwindow and a platform specific window
@@ -147,7 +148,7 @@ namespace OgreBites
          *
          * by default all shaders are generated to system memory.
          * Must be called before loadResources
-         * @param write
+         * @param write Whether to write out the generated shaders
          */
         void setRTSSWriteShadersToDisk(bool write);
 
@@ -177,6 +178,9 @@ namespace OgreBites
         When input is grabbed the mouse is confined to the window.
         */
         virtual void setWindowGrab(NativeWindowType* win, bool grab = true) {}
+
+        /// get the vertical DPI of the display
+        virtual float getDisplayDPI() const { return 96.0f; }
 
         /// @overload
         void setWindowGrab(bool grab = true) {
@@ -305,7 +309,8 @@ namespace OgreBites
         SGTechniqueResolverListener*       mMaterialMgrListener; // Shader generator material manager listener.
 #endif // INCLUDE_RTSHADER_SYSTEM
     };
+
+    /** @} */
+    /** @} */
 }
-/** @} */
-/** @} */
 #endif

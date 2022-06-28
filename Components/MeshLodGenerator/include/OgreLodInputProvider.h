@@ -43,7 +43,7 @@ public:
     virtual void initData(LodData* data) = 0;
 protected:
     // Helper functions
-    void printTriangle(LodData::Triangle* triangle, stringstream& str);
+    void printTriangle(LodData::Triangle* triangle, std::ostream& str);
     void addTriangleToEdges(LodData* data, LodData::Triangle* triangle);
     bool isDuplicateTriangle(LodData::Triangle* triangle, LodData::Triangle* triangle2);
     LodData::Triangle* isDuplicateTriangle(LodData::Triangle* triangle);

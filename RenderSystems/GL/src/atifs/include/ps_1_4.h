@@ -76,7 +76,7 @@ THE SOFTWARE.
 
 /** Subclasses Compiler2Pass to provide a ps_1_x compiler that takes DirectX pixel shader assembly
     and converts it to a form that can be used by ATI_fragment_shader OpenGL API
-@remarks
+
     all ps_1_1, ps_1_2, ps_1_3, ps_1_4 assembly instructions are recognized but not all are passed
     on to ATI_fragment_shader.  ATI_fragment_shader does not have an equivalent directive for
     texkill or texdepth instructions.

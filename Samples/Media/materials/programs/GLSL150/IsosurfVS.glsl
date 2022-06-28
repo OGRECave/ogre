@@ -19,10 +19,10 @@ out VertexData {
     // vec4 Color;
 } VertexOut;
 
-uniform float IsoValue = 1.0;
+uniform float IsoValue;
 uniform mat4 WorldViewProj;
 uniform mat4 origWorldViewIT;
-uniform vec4 Metaballs[2] = vec4[](vec4( -0.5, 0, 0, 0.2 ), vec4( 0.6, 0, 0, 0.1 ));
+uniform vec4 Metaballs[2];
 
 // Size of the sampling grid
 const ivec3 SizeMask = ivec3( 63, 63, 63 );

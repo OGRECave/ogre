@@ -88,15 +88,15 @@ namespace Ogre {
         */
         void removeAllCompositors();
         
-        /// @deprecated use getCompositorInstances
-        OGRE_DEPRECATED CompositorInstance *getCompositor(size_t index);
-
         /** Get compositor instance by name. Returns null if not found.
         */
-        CompositorInstance* getCompositor(const String& name);
+        CompositorInstance* getCompositor(const String& name) const;
+
+        /// @overload
+        CompositorInstance *getCompositor(size_t index) const { return mInstances.at(index); }
 
         /// Get compositor position by name. Returns #NPOS if not found.
-        size_t getCompositorPosition(const String& name);
+        size_t getCompositorPosition(const String& name) const;
 
         /** Get the original scene compositor instance for this chain (internal use). 
         */
@@ -156,7 +156,7 @@ namespace Ogre {
         */
         CompositorInstance* getNextInstance(CompositorInstance* curr, bool activeOnly = true);
 
-    protected:
+    private:
         /// Viewport affected by this CompositorChain
         Viewport *mViewport;
         

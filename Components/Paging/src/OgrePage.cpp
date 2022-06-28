@@ -110,7 +110,7 @@ namespace Ogre
         if (nextFrame < mFrameLastHeld)
         {
             // we must have wrapped around
-            dist = mFrameLastHeld + (std::numeric_limits<unsigned long>::max() - mFrameLastHeld);
+            dist = nextFrame + (std::numeric_limits<unsigned long>::max() - mFrameLastHeld);
         }
         else
             dist = nextFrame - mFrameLastHeld;
@@ -185,7 +185,7 @@ namespace Ogre
             PageRequest req(this);
             mDeferredProcessInProgress = true;
             Root::getSingleton().getWorkQueue()->addRequest(mWorkQueueChannel, WORKQUEUE_PREPARE_REQUEST, 
-                Any(req), 0, synchronous);
+                req, 0, synchronous);
         }
 
     }
@@ -234,12 +234,12 @@ namespace Ogre
         try
         {
             prepareImpl(res.pageData);
-            response = OGRE_NEW WorkQueue::Response(req, true, Any(res));
+            response = OGRE_NEW WorkQueue::Response(req, true, res);
         }
         catch (Exception& e)
         {
             // oops
-            response = OGRE_NEW WorkQueue::Response(req, false, Any(res), 
+            response = OGRE_NEW WorkQueue::Response(req, false, res,
                 e.getFullDescription());
         }
 

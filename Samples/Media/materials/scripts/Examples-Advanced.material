@@ -169,12 +169,7 @@ vertex_program Examples/BumpMapVPHLSL hlsl
 	target vs_2_0
 }
 
-vertex_program Examples/BumpMapVPGLSLES glsles
-{
-	source Example_BumpMappingVp.glsl
-}
-
-vertex_program Examples/BumpMapVPGLSL glsl
+vertex_program Examples/BumpMapVPGLSL glsl glsles
 {
 	source Example_BumpMappingVp.glsl
 }
@@ -182,7 +177,6 @@ vertex_program Examples/BumpMapVPGLSL glsl
 vertex_program Examples/BumpMapVP unified
 {
 	delegate Examples/BumpMapVPGLSL
-	delegate Examples/BumpMapVPGLSLES
 	delegate Examples/BumpMapVPHLSL
 }
 
@@ -196,21 +190,14 @@ vertex_program Examples/BumpMapVPTangentParityCg cg
 }
 
 // Bump map vertex program, with tangent parity support for this is required
-vertex_program Examples/BumpMapVPTangentParityGLSLES glsles
+vertex_program Examples/BumpMapVPTangentParityGLSL glsl glsles
 {
 	source BumpMapVPTangentParity.glsl
-}
-
-vertex_program Examples/BumpMapVPTangentParityGLSL glsl
-{
-	source BumpMapVPTangentParity.glsl
-	syntax glsl
 }
 
 vertex_program Examples/BumpMapVPTangentParity unified
 {
 	delegate Examples/BumpMapVPTangentParityGLSL
-	delegate Examples/BumpMapVPTangentParityGLSLES
 	delegate Examples/BumpMapVPTangentParityCg
 }
 
@@ -222,17 +209,7 @@ fragment_program Examples/BumpMapFPHLSL hlsl
 	target ps_2_0
 }
 
-fragment_program Examples/BumpMapFPGLSLES glsles
-{
-	source Example_BumpMappingFp.glsl
-	default_params
-	{
-		// assign samplers as required by GLSL
-		param_named normalMap int 0
-	}
-}
-
-fragment_program Examples/BumpMapFPGLSL glsl
+fragment_program Examples/BumpMapFPGLSL glsl glsles
 {
 	source Example_BumpMappingFp.glsl
 	default_params
@@ -245,7 +222,6 @@ fragment_program Examples/BumpMapFPGLSL glsl
 fragment_program Examples/BumpMapFP unified
 {
 	delegate Examples/BumpMapFPGLSL
-	delegate Examples/BumpMapFPGLSLES
 	delegate Examples/BumpMapFPHLSL
 }
 
@@ -258,12 +234,7 @@ vertex_program Examples/BumpMapVPShadowRcvCg cg
 }
 
 // Bump map vertex program shadow receiver
-vertex_program Examples/BumpMapVPShadowRcvGLSLES glsles
-{
-	source Example_BumpMappingShadowRcvVp.glsl
-}
-
-vertex_program Examples/BumpMapVPShadowRcvGLSL glsl
+vertex_program Examples/BumpMapVPShadowRcvGLSL glsl glsles
 {
 	source Example_BumpMappingShadowRcvVp.glsl
 }
@@ -271,7 +242,6 @@ vertex_program Examples/BumpMapVPShadowRcvGLSL glsl
 vertex_program Examples/BumpMapVPShadowRcv unified
 {
 	delegate Examples/BumpMapVPShadowRcvGLSL
-	delegate Examples/BumpMapVPShadowRcvGLSLES
 	delegate Examples/BumpMapVPShadowRcvCg
 }
 
@@ -284,18 +254,7 @@ fragment_program Examples/BumpMapFPShadowRcvCg cg
 }
 
 // Bump map fragment program shadow receiver, support for this is optional
-fragment_program Examples/BumpMapFPShadowRcvGLSLES glsl
-{
-	source Example_BumpMappingShadowRcvFp.glsl
-	default_params
-	{
-		// assign samplers as required by GLSL
-		param_named shadowMap int 0
-		param_named normalMap int 1
-	}
-}
-
-fragment_program Examples/BumpMapFPShadowRcvGLSL glsl
+fragment_program Examples/BumpMapFPShadowRcvGLSL glsl glsles
 {
 	source Example_BumpMappingShadowRcvFp.glsl
 	default_params
@@ -309,7 +268,6 @@ fragment_program Examples/BumpMapFPShadowRcvGLSL glsl
 fragment_program Examples/BumpMapFPShadowRcv unified
 {
 	delegate Examples/BumpMapFPShadowRcvGLSL
-	delegate Examples/BumpMapFPShadowRcvGLSLES
 	delegate Examples/BumpMapFPShadowRcvCg
 }
 
@@ -322,12 +280,7 @@ vertex_program Examples/BumpMapVPSpecularHLSL hlsl
 }
 
 // Bump map with specular vertex program, support for this is required
-vertex_program Examples/BumpMapVPSpecularGLSLES glsles
-{
-	source Example_BumpMappingSpecularVp.glsl
-}
-
-vertex_program Examples/BumpMapVPSpecularGLSL glsl
+vertex_program Examples/BumpMapVPSpecularGLSL glsl glsles
 {
 	source Example_BumpMappingSpecularVp.glsl
 }
@@ -335,7 +288,6 @@ vertex_program Examples/BumpMapVPSpecularGLSL glsl
 vertex_program Examples/BumpMapVPSpecular unified
 {
 	delegate Examples/BumpMapVPSpecularGLSL
-	delegate Examples/BumpMapVPSpecularGLSLES
 	delegate Examples/BumpMapVPSpecularHLSL
 }
 
@@ -348,17 +300,7 @@ fragment_program Examples/BumpMapFPSpecularHLSL hlsl
 }
 
 // Bump map fragment program, support for this is optional
-fragment_program Examples/BumpMapFPSpecularGLSLES glsles
-{
-	source Example_BumpMappingSpecularFp.glsl
-	default_params
-	{
-		// assign samplers as required by GLSL
-		param_named normalMap int 0
-	}
-}
-
-fragment_program Examples/BumpMapFPSpecularGLSL glsl
+fragment_program Examples/BumpMapFPSpecularGLSL glsl glsles
 {
 	source Example_BumpMappingSpecularFp.glsl
 	default_params
@@ -371,7 +313,6 @@ fragment_program Examples/BumpMapFPSpecularGLSL glsl
 fragment_program Examples/BumpMapFPSpecular unified
 {
 	delegate Examples/BumpMapFPSpecularGLSL
-	delegate Examples/BumpMapFPSpecularGLSLES
 	delegate Examples/BumpMapFPSpecularHLSL
 }
 
@@ -381,6 +322,8 @@ material Examples/BumpMapping/MultiLight
 {
 	technique
 	{
+		shadow_receiver_material Examples/BumpMapping/MultiLight/Rcv
+
 		// Base ambient pass
 		pass ambient
 		{
@@ -412,26 +355,11 @@ material Examples/BumpMapping/MultiLight
 			{
 				param_named_auto lightDiffuse light_diffuse_colour 0 
 			}
-
-			// texture shadow receiver program
-			shadow_receiver_vertex_program_ref Examples/BumpMapVPShadowRcv
-			{
-				param_named_auto lightPosition light_position_object_space 0
-				param_named_auto worldViewProj worldviewproj_matrix
-				param_named_auto worldMatrix world_matrix
-				param_named_auto texViewProj texture_viewproj_matrix
-			}
-			// Additive texture shadow receiver program
-			shadow_receiver_fragment_program_ref Examples/BumpMapFPShadowRcv
-			{
-				param_named_auto lightDiffuse light_diffuse_colour 0 
-			}
 			
 			// Base bump map
 			texture_unit normalmap
 			{
 				texture NMBumpsOut.png
-				colour_op replace
 			}
 		}
 		
@@ -444,6 +372,40 @@ material Examples/BumpMapping/MultiLight
 			texture_unit decalmap
 			{
 				texture RustedMetal.jpg 
+			}
+		}
+	}
+}
+
+material Examples/BumpMapping/MultiLight/Rcv
+{
+	technique
+	{
+		pass
+		{
+			scene_blend add
+
+			// texture shadow receiver program
+			vertex_program_ref Examples/BumpMapVPShadowRcv
+			{
+				param_named_auto lightPosition light_position_object_space 0
+				param_named_auto worldViewProj worldviewproj_matrix
+				param_named_auto worldMatrix world_matrix
+				param_named_auto texViewProj texture_viewproj_matrix
+			}
+			// Additive texture shadow receiver program
+			fragment_program_ref Examples/BumpMapFPShadowRcv
+			{
+				param_named_auto lightDiffuse light_diffuse_colour 0
+			}
+
+			texture_unit shadowmap
+			{
+				content_type shadow
+			}
+			texture_unit normalmap
+			{
+				texture NMBumpsOut.png
 			}
 		}
 	}
@@ -564,38 +526,11 @@ material Examples/GeneralTexProjection
 //----------------------------
 // Distortion effects
 //----------------------------
-
-vertex_program Examples/FresnelRefractReflectVPCg hlsl
-{
-	source Example_Fresnel.cg
-	entry_point main_vp
-	target vs_2_0
-}
-vertex_program Examples/FresnelRefractReflectVPGLSLES glsles
+vertex_program Examples/FresnelRefractReflectVP glsl glsles glslang hlsl
 {
 	source Example_FresnelVp.glsl
 }
-vertex_program Examples/FresnelRefractReflectVPGLSL glsl
-{
-	source Example_FresnelVp.glsl
-}
-
-vertex_program Examples/FresnelRefractReflectVP unified
-{
-	delegate Examples/FresnelRefractReflectVPGLSL
-	delegate Examples/FresnelRefractReflectVPGLSLES
-	delegate Examples/FresnelRefractReflectVPCg
-}
-
-fragment_program Examples/FresnelRefractReflectFPCg hlsl
-{
-	source Example_Fresnel.cg
-	entry_point main_fp
-	// sorry, ps_1_1 and fp20 can't do this
-	target ps_2_0
-}
-
-fragment_program Examples/FresnelRefractReflectFPGLSLES glsles
+fragment_program Examples/FresnelRefractReflectFP glsl glsles glslang hlsl
 {
 	source Example_FresnelFp.glsl
 	default_params
@@ -605,25 +540,6 @@ fragment_program Examples/FresnelRefractReflectFPGLSLES glsles
 		param_named reflectMap int 1
 		param_named refractMap int 2
 	}
-}
-
-fragment_program Examples/FresnelRefractReflectFPGLSL glsl
-{
-	source Example_FresnelFp.glsl
-	default_params
-	{
-		// assign samplers as required by GLSL
-		param_named noiseMap int 0
-		param_named reflectMap int 1
-		param_named refractMap int 2
-	}
-}
-
-fragment_program Examples/FresnelRefractReflectFP unified
-{
-	delegate Examples/FresnelRefractReflectFPGLSL
-	delegate Examples/FresnelRefractReflectFPGLSLES
-	delegate Examples/FresnelRefractReflectFPCg
 }
 
 material Examples/FresnelReflectionRefraction
@@ -637,6 +553,7 @@ material Examples/FresnelReflectionRefraction
 			vertex_program_ref Examples/FresnelRefractReflectVP
 			{
 				param_named_auto worldViewProjMatrix worldviewproj_matrix
+				param_named_auto textureProjMatrix texture_worldviewproj_matrix 0
 				param_named_auto eyePosition camera_position_object_space
 				param_named_auto timeVal time 0.05
 				param_named scroll float 1  
@@ -661,13 +578,15 @@ material Examples/FresnelReflectionRefraction
 				filtering linear linear none
 			}
 			// Reflection
-			texture_unit reflection
+			texture_unit
 			{
+				content_type compositor Fresnel reflection
 				tex_address_mode clamp
 			}
 			// Refraction
-			texture_unit refraction
+			texture_unit
 			{
+				content_type compositor Fresnel refraction
 				tex_address_mode clamp
 			}
 		}
@@ -764,20 +683,7 @@ material Examples/Athene/NormalMappedSpecular : Examples/BumpMapping/MultiLightS
 	}
 }
 
-
-vertex_program Examples/TextureArrayVScg cg
-{
-	source Example_TextureArrayVS.cg
-	entry_point textureArray_v
-	profiles vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3
-
-	default_params
-	{
-		param_named_auto worldViewProj worldviewproj_matrix
-	}
-}
-
-vertex_program Examples/TextureArrayVSglsl glsl
+vertex_program Examples/TextureArrayVS glsl glsles hlsl glslang
 {
 	source Example_TextureArrayVS.glsl
 
@@ -787,103 +693,47 @@ vertex_program Examples/TextureArrayVSglsl glsl
 	}
 }
 
-fragment_program Examples/TextureArrayPSglsl glsl
+fragment_program Examples/TextureArrayPSglsl glsl glslang
 {
 	source Example_TextureArrayPS.glsl
-
-	default_params
-	{
-		param_named TextureArrayTex int 0
-	}
-}
-
-vertex_program Examples/TextureArrayVSglsles glsles
-{
-	source Example_TextureArrayVS.glsles
-
-	default_params
-	{
-		param_named_auto worldViewProj worldviewproj_matrix
-	}
 }
 
 fragment_program Examples/TextureArrayPSglsles glsles
 {
 	source Example_TextureArrayPS.glsles
+	syntax glsl300es
+}
 
+fragment_program Examples/TextureArrayPShlsl4 hlsl
+{
+	source Example_TextureArrayPS.glsl
+	target ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
+}
+
+fragment_program Examples/TextureArrayPS unified
+{
+	delegate Examples/TextureArrayPSglsl
+	delegate Examples/TextureArrayPSglsles
+	delegate Examples/TextureArrayPShlsl4
 	default_params
 	{
 		param_named TextureArrayTex int 0
 	}
 }
 
-fragment_program Examples/TextureArrayPShlsl4 hlsl
-{
-	entry_point textureArray_p
-	source Example_TextureArrayPS.hlsl4
-	target ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
-}
-
-fragment_program Examples/TextureArrayPSasm asm
-{
-	source Example_TextureArrayPS.asm
-	syntax gp4fp
-}
-
 material Examples/TextureArray
 {
-	technique asm
+	technique
 	{
 		pass
 		{
-			fragment_program_ref Examples/TextureArrayPSasm
+			vertex_program_ref Examples/TextureArrayVS
 			{
 			}
 
-		}
-	}
-
-
-	technique HLSL4
-	{
-		pass
-		{
-			vertex_program_ref Examples/TextureArrayVScg
-			{
-			}
-
-			fragment_program_ref Examples/TextureArrayPShlsl4
+			fragment_program_ref Examples/TextureArrayPS
 			{
 			}
 		}
 	}
-
-	technique GLSL
-	{
-		pass
-		{
-			vertex_program_ref Examples/TextureArrayVSglsl
-			{
-			}
-
-			fragment_program_ref Examples/TextureArrayPSglsl
-			{
-			}
-		}
-	}
-
-	technique GLSLES
-	{
-		pass
-		{
-			vertex_program_ref Examples/TextureArrayVSglsles
-			{
-			}
-
-			fragment_program_ref Examples/TextureArrayPSglsles
-			{
-			}
-		}
-	}
-
 }

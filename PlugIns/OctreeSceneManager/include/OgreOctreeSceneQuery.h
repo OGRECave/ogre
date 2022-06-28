@@ -56,8 +56,7 @@ public:
     OctreeIntersectionSceneQuery(SceneManager* creator);
     ~OctreeIntersectionSceneQuery();
 
-    /** See IntersectionSceneQuery. */
-    void execute(IntersectionSceneQueryListener* listener);
+    void execute(IntersectionSceneQueryListener* listener) override;
 };
 
 /** Octree implementation of RaySceneQuery. */
@@ -67,8 +66,7 @@ public:
     OctreeRaySceneQuery(SceneManager* creator);
     ~OctreeRaySceneQuery();
 
-    /** See RayScenQuery. */
-    void execute(RaySceneQueryListener* listener);
+    void execute(RaySceneQueryListener* listener) override;
 };
 /** Octree implementation of SphereSceneQuery. */
 class _OgreOctreePluginExport OctreeSphereSceneQuery : public DefaultSphereSceneQuery
@@ -77,8 +75,7 @@ public:
     OctreeSphereSceneQuery(SceneManager* creator);
     ~OctreeSphereSceneQuery();
 
-    /** See SceneQuery. */
-    void execute(SceneQueryListener* listener);
+    void execute(SceneQueryListener* listener) override;
 };
 /** Octree implementation of PlaneBoundedVolumeListSceneQuery. */
 class _OgreOctreePluginExport OctreePlaneBoundedVolumeListSceneQuery : public DefaultPlaneBoundedVolumeListSceneQuery
@@ -87,8 +84,7 @@ public:
     OctreePlaneBoundedVolumeListSceneQuery(SceneManager* creator);
     ~OctreePlaneBoundedVolumeListSceneQuery();
 
-    /** See SceneQuery. */
-    void execute(SceneQueryListener* listener);
+    void execute(SceneQueryListener* listener) override;
 };
 /** Octree implementation of AxisAlignedBoxSceneQuery. */
 class _OgreOctreePluginExport OctreeAxisAlignedBoxSceneQuery : public DefaultAxisAlignedBoxSceneQuery
@@ -97,8 +93,7 @@ public:
     OctreeAxisAlignedBoxSceneQuery(SceneManager* creator);
     ~OctreeAxisAlignedBoxSceneQuery();
 
-    /** See RaySceneQuery. */
-    void execute(SceneQueryListener* listener);
+    void execute(SceneQueryListener* listener) override;
 };
 
 /** @} */

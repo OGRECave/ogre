@@ -327,6 +327,7 @@ material Examples/DynamicCubeMap
 		{
 			texture_unit
 			{
+				content_type compositor CubeMap tex
 				tex_address_mode clamp
 				env_map cubic_reflection
 			}
@@ -407,7 +408,6 @@ material Examples/OgreDance
 			lighting off
 			scene_blend alpha_blend
 			cull_hardware none
-			cull_software none
 
 			texture_unit
 			{
@@ -492,7 +492,6 @@ material Examples/WaterStream
 			ambient 0.1 0.1 0.1
 			scene_blend add
 			depth_write off
-			cull_software none
 			cull_hardware none
 
 			texture_unit
@@ -505,6 +504,21 @@ material Examples/WaterStream
 			{
 				texture Water01.jpg
 				wave_xform scroll_y sine 0 0.1 0 0.25
+			}
+		}
+	}
+}
+
+material Examples/WaterStream/OIT : Examples/WaterStream
+{
+	technique
+	{
+		pass
+		{
+			diffuse 1 1 1 0.9
+			rtshader_system
+			{
+				weighted_blended_oit on
 			}
 		}
 	}
@@ -777,851 +791,69 @@ material Examples/GrassFloor
 	}
 }
 
-vertex_program Examples/GrassWaverVpCg cg
+vertex_program Examples/GrassWaverVpCg hlsl
 {
 	source Grass.cg
 	entry_point grass_vp
-	profiles vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3 vs_1_1 arbvp1
-
-    default_params
-    {
-        param_named_auto worldViewProj worldviewproj_matrix
-
-       // param_named_auto camObjPos camera_position_object_space
-
-        param_named_auto ambient ambient_light_colour
-        param_named_auto objSpaceLight light_position_object_space 0
-        param_named_auto lightColour light_diffuse_colour 0
-
-        param_named_auto offset custom 999
-    }
 }
-
-vertex_program Examples/GrassWaverTexVpCg cg
-  {
-	source Grass.cg
-	entry_point grassTex_vp
-	profiles vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3 vs_1_1 arbvp1
-
-    default_params
-      {
-        param_named_auto worldViewProj worldviewproj_matrix
-        param_named_auto offset custom 999
-    }
-}
-vertex_program Examples/GrassWaverAmbientVpCg cg
-{
-	source Grass.cg
-	entry_point grassAmbient_vp
-	profiles vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3 vs_1_1 arbvp1
-
-    default_params
-  	{
-  				param_named_auto worldViewProj worldviewproj_matrix
-  				param_named_auto ambient ambient_light_colour
-        param_named_auto offset custom 999
-    }
-}
-fragment_program Examples/GrassWaverAmbientFpCg cg
-{
-	source Grass.cg
-	entry_point grassAmbient_fp
-	profiles ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3 ps_2_0 arbfp1
-    default_params
-    {
-    }
-}
-fragment_program Examples/GrassWaverFpCg cg
+fragment_program Examples/GrassWaverFpCg hlsl
 {
 	source Grass.cg
 	entry_point grass_fp
-	profiles ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3 ps_2_0 arbfp1
-    default_params
-    {
-    }
 }
-
-vertex_program Examples/GrassWaverCasterVpCg cg
-{
-	source Grass.cg
-	entry_point grasscaster_vp
-	profiles vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3 vs_1_1 arbvp1
-
-    default_params
-    {
-        param_named_auto worldViewProj worldviewproj_matrix
-        param_named_auto offset custom 999
-		param_named_auto texelOffsets texel_offsets
-    }
-}
-fragment_program Examples/GrassWaverCasterFpCg cg
-{
-	source Grass.cg
-	entry_point grasscaster_fp
-	profiles ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3 ps_2_0 arbfp1
-    default_params
-    {
-    }
-}
-
-vertex_program Examples/GrassWaverReceiverVpCg cg
-{
-	source Grass.cg
-	entry_point grassreceiver_vp
-	profiles vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3 vs_1_1 arbvp1
-
-    default_params
-    {
-        param_named_auto world world_matrix
-		    param_named_auto worldViewProj worldviewproj_matrix
-		    param_named_auto texViewProj texture_viewproj_matrix
-
-        param_named_auto camObjPos camera_position_object_space
-
-  			param_named_auto objSpaceLight light_position_object_space 0
-  			param_named_auto lightColour light_diffuse_colour 0
-
-  			param_named_auto offset custom 999
-  	}
-}
-
-
-fragment_program Examples/GrassWaverReceiverFpCg cg
-{
-	source Grass.cg
-	entry_point grassreceiver_fp
-	profiles ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3 ps_2_0 arbfp1
-
-	default_params
-    {
-        //param_named inverseShadowmapSize float 0.0009765625
-		param_named fixedDepthBias float 0.0005
-		param_named gradientClamp float 0.0098
-		param_named gradientScaleBias float 0
-    }
-}
-
-vertex_program Examples/GrassWaverVpGLSLES glsles
-{
-	source GrassVp.glsles
-	profiles glsles
-
-    default_params
-    {
-        param_named_auto worldViewProj worldviewproj_matrix
-        param_named_auto camObjPos camera_position_object_space
-        param_named_auto ambient ambient_light_colour
-        param_named_auto objSpaceLight light_position_object_space 0
-        param_named_auto lightColour light_diffuse_colour 0
-
-        param_named_auto offset custom 999
-    }
-  }
-
-vertex_program Examples/GrassWaverTexVpGLSLES glsles
-{
-	source GrassTexVp.glsles
-	profiles glsles
-
-    default_params
-      {
-        param_named_auto worldViewProj worldviewproj_matrix
-        param_named_auto offset custom 999
-    }
-}
-vertex_program Examples/GrassWaverAmbientVpGLSLES glsles
-{
-    source GrassAmbientVp.glsles
-    profiles glsles
-
-    default_params
-    {
-        param_named_auto worldViewProj worldviewproj_matrix
-        param_named_auto ambient ambient_light_colour
-        param_named_auto offset custom 999
-    }
-}
-fragment_program Examples/GrassWaverAmbientFpGLSLES glsles
-{
-	source GrassAmbientFp.glsles
-	profiles glsles
-    default_params
-    {
-        param_named diffuseMap int 0
-    }
-}
-
-vertex_program Examples/GrassWaverCasterVpGLSLES glsles
-{
-	source GrassCasterVp.glsles
-	profiles glsles
-
-    default_params
-    {
-        param_named_auto worldViewProj worldviewproj_matrix
-        param_named_auto offset custom 999
-		param_named_auto texelOffsets texel_offsets
-    }
-}
-fragment_program Examples/GrassWaverCasterFpGLSLES glsles
-{
-	source GrassCasterFp.glsles
-	profiles glsles
-    default_params
-    {
-        param_named diffuseMap int 0
-    }
-}
-
-vertex_program Examples/GrassWaverReceiverVpGLSLES glsles
-{
-	source GrassReceiverVp.glsles
-	profiles glsles
-
-    default_params
-    {
-        param_named_auto world world_matrix
-        param_named_auto worldViewProj worldviewproj_matrix
-        param_named_auto texViewProj texture_viewproj_matrix
-
-        param_named_auto camObjPos camera_position_object_space
-
-        param_named_auto objSpaceLight light_position_object_space 0
-        param_named_auto lightColour light_diffuse_colour 0
-
-        param_named_auto offset custom 999
-	}
-}
-
-
-fragment_program Examples/GrassWaverReceiverFpGLSLES glsles
-{
-	source GrassReceiverFp.glsles
-	profiles glsles
-
-	default_params
-    {
-        param_named shadowMap int 0
-        param_named diffuseMap int 1
-        param_named fixedDepthBias float 0.0005
-        param_named gradientClamp float 0.0098
-        param_named gradientScaleBias float 0
-    }
-}
-
-fragment_program Examples/GrassWaverFpGLSLES glsles
-{
-	source GrassFp.glsles
-	profiles glsles
-    default_params
-    {
-        param_named diffuseMap int 0
-    }
-}
-
-vertex_program Examples/GrassWaverVpGLSL glsl
+vertex_program Examples/GrassWaverVpGLSL glsl glsles
 {
 	source GrassVp.glsl
-	syntax glsl150
-
-    default_params
-    {
-        param_named_auto worldViewProj worldviewproj_matrix
-        param_named_auto ambient ambient_light_colour
-        param_named_auto objSpaceLight light_position_object_space 0
-        param_named_auto lightColour light_diffuse_colour 0
-
-        param_named_auto offset custom 999
-    }
-  }
-
-vertex_program Examples/GrassWaverTexVpGLSL glsl
-{
-	source GrassTexVp.glsl
-	syntax glsl150
-
-    default_params
-      {
-        param_named_auto worldViewProj worldviewproj_matrix
-        param_named_auto offset custom 999
-    }
-}
-vertex_program Examples/GrassWaverAmbientVpGLSL glsl
-{
-    source GrassAmbientVp.glsl
-    syntax glsl150
-
-    default_params
-    {
-        param_named_auto worldViewProj worldviewproj_matrix
-        param_named_auto ambient ambient_light_colour
-        param_named_auto offset custom 999
-    }
-}
-fragment_program Examples/GrassWaverAmbientFpGLSL glsl
-{
-	source GrassAmbientFp.glsl
-	syntax glsl150
-    default_params
-    {
-        param_named diffuseMap int 0
-    }
 }
 
-vertex_program Examples/GrassWaverCasterVpGLSL glsl
-{
-	source GrassCasterVp.glsl
-	syntax glsl150
-
-    default_params
-    {
-        param_named_auto worldViewProj worldviewproj_matrix
-        param_named_auto offset custom 999
-		param_named_auto texelOffsets texel_offsets
-    }
-}
-fragment_program Examples/GrassWaverCasterFpGLSL glsl
-{
-	source GrassCasterFp.glsl
-	syntax glsl150
-    default_params
-    {
-        param_named diffuseMap int 0
-    }
-}
-
-vertex_program Examples/GrassWaverReceiverVpGLSL glsl
-{
-	source GrassReceiverVp.glsl
-	syntax glsl150
-
-    default_params
-    {
-        param_named_auto world world_matrix
-        param_named_auto worldViewProj worldviewproj_matrix
-        param_named_auto texViewProj texture_viewproj_matrix
-
-        param_named_auto camObjPos camera_position_object_space
-
-        param_named_auto objSpaceLight light_position_object_space 0
-        param_named_auto lightColour light_diffuse_colour 0
-
-        param_named_auto offset custom 999
-	}
-}
-
-
-fragment_program Examples/GrassWaverReceiverFpGLSL glsl
-{
-	source GrassReceiverFp.glsl
-	syntax glsl150
-
-	default_params
-    {
-        param_named shadowMap int 0
-        param_named diffuseMap int 1
-        param_named fixedDepthBias float 0.0005
-        param_named gradientClamp float 0.0098
-        param_named gradientScaleBias float 0
-    }
-}
-
-fragment_program Examples/GrassWaverFpGLSL glsl
+fragment_program Examples/GrassWaverFpGLSL glsl glsles
 {
 	source GrassFp.glsl
-	syntax glsl150
     default_params
     {
         param_named diffuseMap int 0
     }
-}
-
-vertex_program Examples/GrassWaverReceiverVp unified
-{
-	delegate Examples/GrassWaverReceiverVpGLSL
-	delegate Examples/GrassWaverReceiverVpGLSLES
-	delegate Examples/GrassWaverReceiverVpCg
-}
-
-fragment_program Examples/GrassWaverReceiverFp unified
-{
-	delegate Examples/GrassWaverReceiverFpGLSL
-	delegate Examples/GrassWaverReceiverFpGLSLES
-	delegate Examples/GrassWaverReceiverFpCg
-}
-
-vertex_program Examples/GrassWaverCasterVp unified
-{
-	delegate Examples/GrassWaverCasterVpGLSL
-	delegate Examples/GrassWaverCasterVpGLSLES
-	delegate Examples/GrassWaverCasterVpCg
-}
-
-fragment_program Examples/GrassWaverCasterFp unified
-{
-	delegate Examples/GrassWaverCasterFpGLSL
-	delegate Examples/GrassWaverCasterFpGLSLES
-	delegate Examples/GrassWaverCasterFpCg
-}
-
-vertex_program Examples/GrassWaverAmbientVp unified
-{
-	delegate Examples/GrassWaverAmbientVpGLSL
-	delegate Examples/GrassWaverAmbientVpGLSLES
-	delegate Examples/GrassWaverAmbientVpCg
-}
-
-fragment_program Examples/GrassWaverAmbientFp unified
-{
-	delegate Examples/GrassWaverAmbientFpGLSL
-	delegate Examples/GrassWaverAmbientFpGLSLES
-	delegate Examples/GrassWaverAmbientFpCg
-}
-
-vertex_program Examples/GrassWaverTexVp unified
-{
-	delegate Examples/GrassWaverTexVpGLSL
-	delegate Examples/GrassWaverTexVpGLSLES
-	delegate Examples/GrassWaverTexVpCg
 }
 
 fragment_program Examples/GrassWaverFp unified
 {
 	delegate Examples/GrassWaverFpGLSL
-	delegate Examples/GrassWaverFpGLSLES
 	delegate Examples/GrassWaverFpCg
+    default_params
+    {
+		param_named_auto alphaThresh surface_alpha_rejection_value
+    }
 }
 
 vertex_program Examples/GrassWaverVp unified
 {
 	delegate Examples/GrassWaverVpGLSL
-	delegate Examples/GrassWaverVpGLSLES
 	delegate Examples/GrassWaverVpCg
+
+    default_params
+    {
+        param_named_auto worldViewProj worldviewproj_matrix
+        param_named_auto ambient ambient_light_colour
+        param_named_auto objSpaceLight light_position_object_space 0
+        param_named_auto lightColour light_diffuse_colour 0
+
+        param_named_auto offset custom 999
+    }
 }
 
-material Examples/GrassBladesShadowCaster
+material Examples/GrassBlades/Caster
 {
-	// Vertex program waving grass
     technique
     {
         pass
         {
-			vertex_program_ref Examples/GrassWaverCasterVp
-			{
-			}
-			fragment_program_ref Examples/GrassWaverCasterFp
-			{
-			}
-
-  			alpha_rejection greater 150
-
-  			scene_blend alpha_blend
-
-  		    cull_hardware none
-              cull_software none
-
-              texture_unit
-              {
-				tex_address_mode clamp
-                  texture gras_02.png
-              }
-          }
-
-      }
-}
-
-material Examples/GrassBladesShadowReceiver
-{
-	// Vertex program waving grass
-    technique
-    {
-        pass
-		{
-			scene_blend add
-
-			alpha_rejection greater 150
-
-		    cull_hardware none
-            cull_software none
-
-			vertex_program_ref Examples/GrassWaverReceiverVp
-			{
-			}
-			fragment_program_ref Examples/GrassWaverReceiverFp
-			{
-			}
-
-            texture_unit ShadowMap
-            {
-                 tex_address_mode border
-                 tex_border_colour 1.0 1.0 1.0 0.0
-                 content_type shadow
-                 filtering linear linear none
-                 tex_coord_set 0
-            }
-
-           texture_unit
-           {
-				tex_address_mode clamp
-                tex_coord_set 1
-                texture gras_02.png
-           }
-        }
-
-    }
-}
-
-material Examples/GrassBladesAdditiveFloatTransparentBest
-{
-
-    transparency_casts_shadows on
-    receive_shadows on
-
-	// This is the preferred technique which uses both vertex and
-	// fragment programs, supports coloured lights
-    technique
-    {
-        shadow_caster_material Examples/GrassBladesShadowCaster
-        shadow_receiver_material Examples/GrassBladesShadowReceiver
-
-		// Base ambient pass
-		pass
-		{
-			// base colours, not needed for rendering, but as information
-			// to lighting pass categorisation routine
-			ambient 1 1 1
-			diffuse 0 0 0
-			specular 0 0 0 0
-
-			alpha_rejection greater 150
-
-			scene_blend alpha_blend
-
-		    cull_hardware none
-            cull_software none
-
-			// Really basic vertex program
-			vertex_program_ref Examples/GrassWaverAmbientVp
-			{
-			}
-
-			fragment_program_ref Examples/GrassWaverAmbientFp
-			{
-			}
+            cull_hardware none
+            alpha_rejection greater 150
+            diffuse 0 0 0
 
             texture_unit
             {
-				tex_address_mode clamp
-                texture gras_02.png
-            }
-
-		}
-        pass lighting
-		{
-			// base colours, not needed for rendering, but as information
-			// to lighting pass categorisation routine
-			ambient 0 0 0
-
-			// do this for each light
-			iteration once_per_light
-
-
-			scene_blend add
-
-
-			vertex_program_ref Examples/GrassWaverAmbientVp
-			{
-			}
-
-			fragment_program_ref Examples/GrassWaverAmbientFp
-			{
-			}
-
-
-			alpha_rejection greater 150
-
-		    cull_hardware none
-            cull_software none
-
-            texture_unit ShadowMap
-            {
-                 tex_address_mode border
-                 tex_border_colour 1.0 1.0 1.0 0.0
-                 content_type shadow
-                 filtering linear linear none
-                 tex_coord_set 0
-            }
-
-
-            texture_unit
-            {
-				tex_address_mode clamp
-                texture gras_02.png
-            }
-        }
-		// Decal pass
-		pass
-		{
-			// base colours, not needed for rendering, but as information
-			// to lighting pass categorisation routine
-			lighting off
-
-			alpha_rejection greater 150
-
-			//scene_blend alpha_blend
-			scene_blend dest_colour zero
-
-		    cull_hardware none
-            cull_software none
-
-            texture_unit
-            {
-				tex_address_mode clamp
-                texture gras_02.png
-            }
-
-			vertex_program_ref Examples/GrassWaverVp
-			{
-			}
-
-
-        }
-    }
-}
-
-material Examples/GrassBladesAdditiveFloatTransparent
-{
-
-    transparency_casts_shadows on
-    receive_shadows on
-
-	// This is the preferred technique which uses both vertex and
-	// fragment programs, supports coloured lights
-  	technique
-      {
-        shadow_caster_material Examples/GrassBladesShadowCaster
-        shadow_receiver_material Examples/GrassBladesShadowReceiver
-
-		// Base ambient pass
-          pass
-          {
-			// base colours, not needed for rendering, but as information
-			// to lighting pass categorisation routine
-			ambient 1 1 1
-			diffuse 0 0 0
-			specular 0 0 0 0
-
-  			alpha_rejection greater 150
-
-  			scene_blend alpha_blend
-
-		    cull_hardware none
-            cull_software none
-
-			// Really basic vertex program
-			vertex_program_ref Examples/GrassWaverAmbientVp
-			{
-			}
-
-			fragment_program_ref Examples/GrassWaverAmbientFp
-			{
-			}
-
-            texture_unit
-            {
-				tex_address_mode clamp
-                texture gras_02.png
-            }
-
-		}
-        pass lighting
-		{
-			// base colours, not needed for rendering, but as information
-			// to lighting pass categorisation routine
-			ambient 0 0 0
-
-			// do this for each light
-			iteration once_per_light
-
-
-			scene_blend add
-
-
-			vertex_program_ref Examples/GrassWaverAmbientVp
-			{
-			}
-
-			fragment_program_ref Examples/GrassWaverAmbientFp
-			{
-			}
-
-
-			alpha_rejection greater 150
-
-  		    cull_hardware none
-              cull_software none
-
-            texture_unit ShadowMap
-            {
-                 tex_address_mode border
-                 tex_border_colour 1.0 1.0 1.0 0.0
-                 content_type shadow
-                 filtering linear linear none
-                 tex_coord_set 0
-            }
-
-
-              texture_unit
-              {
-				tex_address_mode clamp
-                  texture gras_02.png
-              }
-          }
-		// Decal pass
-		pass
-		{
-			// base colours, not needed for rendering, but as information
-			// to lighting pass categorisation routine
-			lighting off
-
-			alpha_rejection greater 150
-
-			//scene_blend alpha_blend
-			scene_blend dest_colour zero
-
-		    cull_hardware none
-            cull_software none
-
-            texture_unit
-            {
-				tex_address_mode clamp
-                texture gras_02.png
-            }
-
-			vertex_program_ref Examples/GrassWaverTexVp
-			{
-			}
-        }
-    }
-}
-
-material Examples/GrassBladesAdditiveFloat
-{
-    transparency_casts_shadows on
-    receive_shadows on
-
-	// This is the preferred technique which uses both vertex and
-	// fragment programs, supports coloured lights
-    technique
-    {
-        shadow_caster_material Ogre/DepthShadowmap/Caster/Float
-        shadow_receiver_material Ogre/DepthShadowmap/Receiver/Float
-
-		// Base ambient pass
-		pass
-		{
-			// base colours, not needed for rendering, but as information
-			// to lighting pass categorisation routine
-			ambient 1 1 1
-			diffuse 0 0 0
-			specular 0 0 0 0
-			// Really basic vertex program
-			vertex_program_ref Ogre/BasicVertexPrograms/AmbientOneTextureUnified
-			{
-  			}
-			fragment_program_ref Ogre/BasicFragmentPrograms/PassthroughFP
-			{
-			}
-
-		}
-        pass lighting
-		{
-			// base colours, not needed for rendering, but as information
-			// to lighting pass categorisation routine
-			ambient 0 0 0
-
-			// do this for each light
-			iteration once_per_light
-
-
-			scene_blend add
-
-
-			vertex_program_ref Examples/GrassWaverAmbientVp
-			{
-			}
-
-			fragment_program_ref Examples/GrassWaverAmbientFp
-			{
-			}
-
-
-			alpha_rejection greater 150
-			scene_blend alpha_blend
-
-		    cull_hardware none
-            cull_software none
-
-            texture_unit
-            {
-				tex_address_mode clamp
-                texture gras_02.png
-            }
-        }
-		// Decal pass
-		pass
-		{
-			// base colours, not needed for rendering, but as information
-			// to lighting pass categorisation routine
-			lighting off
-
-			alpha_rejection greater 150
-			scene_blend alpha_blend
-
-		    cull_hardware none
-            cull_software none
-
-            texture_unit
-            {
-				tex_address_mode clamp
-                texture gras_02.png
-            }
-
-			vertex_program_ref Examples/GrassWaverAmbientVp
-			{
-			}
-
-			fragment_program_ref Examples/GrassWaverAmbientFp
-			{
-			}
-
-        }
-    }
-
-}
-
-material Examples/GrassBladesAdditive
-{
-    transparency_casts_shadows on
-    receive_shadows on
-	// Vertex program waving grass
-    technique
-    {
-        pass
-        {
-			vertex_program_ref Examples/GrassWaverAmbientVp
-			{
-			}
-
-			alpha_rejection greater 150
-			scene_blend alpha_blend
-
-		    cull_hardware none
-            cull_software none
-
-            texture_unit
-            {
-				tex_address_mode clamp
+                tex_address_mode clamp
                 texture gras_02.png
             }
         }
@@ -1632,23 +864,13 @@ material Examples/GrassBlades
 {
     transparency_casts_shadows on
     receive_shadows on
-	// Vertex program waving grass
     technique
     {
+        shadow_caster_material Examples/GrassBlades/Caster
         pass
         {
-			vertex_program_ref Examples/GrassWaverVp
-			{
-			}
-			fragment_program_ref Examples/GrassWaverFp
-			{
-			}
-
 			alpha_rejection greater 150
-			scene_blend alpha_blend
-
 		    cull_hardware none
-            cull_software none
 
             texture_unit
             {
@@ -1657,22 +879,21 @@ material Examples/GrassBlades
             }
         }
     }
-    // fallback
+}
+
+material Examples/GrassBladesWaver : Examples/GrassBlades
+{
     technique
     {
         pass
         {
-			alpha_rejection greater 150
-			scene_blend alpha_blend
-
-		    cull_hardware none
-            cull_software none
-
-            texture_unit
-            {
-				tex_address_mode clamp
-                texture gras_02.png
-            }
+			// Vertex program waving grass
+			vertex_program_ref Examples/GrassWaverVp
+			{
+			}
+			fragment_program_ref Examples/GrassWaverFp
+			{
+			}
         }
     }
 }
@@ -1945,14 +1166,6 @@ material Examples/Plane/IntegratedShadows
 
 }
 
-
-fragment_program Examples/ShowUV_pCg cg
-{
-	source Example_Basic.cg
-	entry_point showuv_p
-	profiles ps_2_0 arbfp1
-}
-
 fragment_program Examples/ShowUV_pHLSL hlsl
 {
 	source Example_Basic.cg
@@ -1960,12 +1173,7 @@ fragment_program Examples/ShowUV_pHLSL hlsl
 	target ps_2_0
 }
 
-fragment_program Examples/ShowUV_pGLSLES glsles
-{
-	source ShowUV.glsl
-}
-
-fragment_program Examples/ShowUV_pGLSL glsl
+fragment_program Examples/ShowUV_pGLSL glsl glsles
 {
 	source ShowUV.glsl
 }
@@ -1973,17 +1181,9 @@ fragment_program Examples/ShowUV_pGLSL glsl
 fragment_program Examples/ShowUV_p unified
 {
 	delegate Examples/ShowUV_pGLSL
-	delegate Examples/ShowUV_pGLSLES
 	delegate Examples/ShowUV_pHLSL
-	delegate Examples/ShowUV_pCg
 }
 
-fragment_program Examples/ShowUVdir3D_pCg cg
-{
-	source Example_Basic.cg
-	entry_point showuvdir3d_p
-	profiles ps_2_0 arbfp1
-}
 fragment_program Examples/ShowUVdir3D_pHLSL hlsl
 {
 	source Example_Basic.cg
@@ -1991,12 +1191,7 @@ fragment_program Examples/ShowUVdir3D_pHLSL hlsl
 	target ps_2_0
 }
 
-fragment_program Examples/ShowUVdir3D_pGLSLES glsles
-{
-	source ShowUVdir3D.glsl
-}
-
-fragment_program Examples/ShowUVdir3D_pGLSL glsl
+fragment_program Examples/ShowUVdir3D_pGLSL glsl glsles
 {
 	source ShowUVdir3D.glsl
 }
@@ -2004,20 +1199,7 @@ fragment_program Examples/ShowUVdir3D_pGLSL glsl
 fragment_program Examples/ShowUVdir3D_p unified
 {
 	delegate Examples/ShowUVdir3D_pGLSL
-	delegate Examples/ShowUVdir3D_pGLSLES
 	delegate Examples/ShowUVdir3D_pHLSL
-	delegate Examples/ShowUVdir3D_pCg
-}
-
-vertex_program Examples/ShowTangents_vCg cg
-{
-	source Example_Basic.cg
-	entry_point basicPassthroughTangent_v
-	profiles vs_2_0 arbvp1
-	default_params
-	{
-		param_named_auto worldViewProj worldviewproj_matrix
-	}
 }
 
 vertex_program Examples/ShowTangents_vHLSL hlsl
@@ -2031,16 +1213,7 @@ vertex_program Examples/ShowTangents_vHLSL hlsl
 	}
 }
 
-vertex_program Examples/ShowTangents_vGLSLES glsles
-{
-	source ShowTangents.glsl
-	default_params
-	{
-		param_named_auto worldViewProj worldviewproj_matrix
-	}
-}
-
-vertex_program Examples/ShowTangents_vGLSL glsl
+vertex_program Examples/ShowTangents_vGLSL glsl glsles
 {
 	source ShowTangents.glsl
 	default_params
@@ -2052,20 +1225,7 @@ vertex_program Examples/ShowTangents_vGLSL glsl
 vertex_program Examples/ShowTangents_v unified
 {
 	delegate Examples/ShowTangents_vGLSL
-	delegate Examples/ShowTangents_vGLSLES
 	delegate Examples/ShowTangents_vHLSL
-	delegate Examples/ShowTangents_vCg
-}
-
-vertex_program Examples/ShowNormals_vCg cg
-{
-	source Example_Basic.cg
-	entry_point basicPassthroughNormal_v
-	profiles vs_2_0 arbvp1
-	default_params
-	{
-		param_named_auto worldViewProj worldviewproj_matrix
-	}
 }
 
 vertex_program Examples/ShowNormals_vHLSL hlsl
@@ -2079,16 +1239,7 @@ vertex_program Examples/ShowNormals_vHLSL hlsl
 	}
 }
 
-vertex_program Examples/ShowNormals_vGLSLES glsles
-{
-	source ShowNormals.glsl
-	default_params
-	{
-		param_named_auto worldViewProj worldviewproj_matrix
-	}
-}
-
-vertex_program Examples/ShowNormals_vGLSL glsl
+vertex_program Examples/ShowNormals_vGLSL glsl glsles
 {
 	source ShowNormals.glsl
 	default_params
@@ -2100,9 +1251,7 @@ vertex_program Examples/ShowNormals_vGLSL glsl
 vertex_program Examples/ShowNormals_v unified
 {
 	delegate Examples/ShowNormals_vGLSL
-	delegate Examples/ShowNormals_vGLSLES
 	delegate Examples/ShowNormals_vHLSL
-	delegate Examples/ShowNormals_vCg
 }
 
 material Examples/ShowUV
@@ -2199,7 +1348,6 @@ material Examples/TextureEffect1
 		{
 			ambient 0.75 0.75 0.75
 			cull_hardware none
-			cull_software none
 
 			texture_unit
 			{
@@ -2234,7 +1382,6 @@ material Examples/TextureEffect3
 		{
 			ambient 0.7 0.7 0.7
 			cull_hardware none
-			cull_software none
 
 			texture_unit
 			{
@@ -2261,7 +1408,6 @@ material Examples/TextureEffect4
 			ambient 0.3 0.3 0.3
 			scene_blend colour_blend
 			cull_hardware none
-			cull_software none
 
 			texture_unit
 			{
@@ -2331,5 +1477,71 @@ material DebugSphere1000
 {
 	technique
 	{			
+	}
+}
+
+material Examples/WoodenFloor
+{
+	technique
+	{
+		pass
+		{
+			texture_unit
+			{
+				texture WoodFloor043_1K_Color.jpg
+			}
+			rtshader_system
+			{
+                lighting_stage metal_roughness texture WoodFloor043_1K_MetalRoughness.jpg
+                lighting_stage normal_map WoodFloor043_1K_NormalGL.jpg
+			}
+		}
+	}
+}
+
+material Examples/PBR_Sphere
+{
+	technique
+	{
+		pass
+		{
+			rtshader_system
+			{
+                lighting_stage metal_roughness
+			}
+		}
+	}
+}
+
+material TestLevel_b0_m0/TEXFACE/Grass.jpg
+{
+	receive_shadows on
+	technique
+	{
+		pass
+		{
+			ambient 0.500000 0.500000 0.500000 1.000000
+			diffuse 0.800000 0.800000 0.800000 1.000000
+			texture_unit
+			{
+				texture grass_1024.jpg
+			}
+		}
+	}
+}
+material TestLevel_b0_m0/TEXFACE/Soil.jpg
+{
+	receive_shadows on
+	technique
+	{
+		pass
+		{
+			ambient 0.500000 0.500000 0.500000 1.000000
+			diffuse 0.800000 0.800000 0.800000 1.000000
+			texture_unit
+			{
+				texture egyptrockyfull.jpg
+			}
+		}
 	}
 }

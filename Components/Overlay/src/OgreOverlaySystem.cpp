@@ -36,6 +36,61 @@ THE SOFTWARE.
 
 namespace Ogre {
     //---------------------------------------------------------------------
+    /** Factory for creating PanelOverlayElement instances. */
+    class PanelOverlayElementFactory: public OverlayElementFactory
+    {
+    public:
+        OverlayElement* createOverlayElement(const String& instanceName) override
+        {
+            return OGRE_NEW PanelOverlayElement(instanceName);
+        }
+        const String& getTypeName(void) const override
+        {
+            static String name = "Panel";
+            return name;
+        }
+    };
+
+    /** Factory for creating BorderPanelOverlayElement instances. */
+    class BorderPanelOverlayElementFactory: public OverlayElementFactory
+    {
+    public:
+        OverlayElement* createOverlayElement(const String& instanceName) override
+        {
+            return OGRE_NEW BorderPanelOverlayElement(instanceName);
+        }
+        const String& getTypeName(void) const override
+        {
+            static String name = "BorderPanel";
+            return name;
+        }
+    };
+
+    /** Factory for creating TextAreaOverlayElement instances. */
+    class TextAreaOverlayElementFactory: public OverlayElementFactory
+    {
+    public:
+        OverlayElement* createOverlayElement(const String& instanceName) override
+        {
+            return OGRE_NEW TextAreaOverlayElement(instanceName);
+        }
+        const String& getTypeName(void) const override
+        {
+            static String name = "TextArea";
+            return name;
+        }
+    };
+
+    template<> OverlaySystem *Singleton<OverlaySystem>::msSingleton = 0;
+    OverlaySystem* OverlaySystem::getSingletonPtr()
+    {
+        return msSingleton;
+    }
+    OverlaySystem& OverlaySystem::getSingleton()
+    {
+        assert( msSingleton );  return ( *msSingleton );
+    }
+    //---------------------------------------------------------------------
     OverlaySystem::OverlaySystem()
     {
         RenderSystem::setSharedListener(this);

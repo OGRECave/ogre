@@ -37,6 +37,18 @@ namespace Ogre {
             mAttributes.reset(new Attributes(*other.mAttributes));
     }
 
+    UserObjectBindings& UserObjectBindings::swap(UserObjectBindings& rhs)
+    {
+        std::swap(mAttributes, rhs.mAttributes);
+        return *this;
+    }
+
+    UserObjectBindings& UserObjectBindings::operator=(const UserObjectBindings& rhs)
+    {
+        UserObjectBindings(rhs).swap(*this);
+        return *this;
+    }
+
     //-----------------------------------------------------------------------
     void UserObjectBindings::setUserAny( const Any& anything )
     {

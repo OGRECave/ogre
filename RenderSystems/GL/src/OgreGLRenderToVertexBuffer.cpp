@@ -28,7 +28,7 @@ THE SOFTWARE.
 
 #include "OgreGLRenderToVertexBuffer.h"
 #include "OgreHardwareBufferManager.h"
-#include "OgreGLHardwareVertexBuffer.h"
+#include "OgreGLHardwareBuffer.h"
 #include "OgreRenderable.h"
 #include "OgreSceneManager.h"
 #include "OgreRoot.h"
@@ -145,6 +145,8 @@ namespace Ogre {
 
         bindVerticesOutput(r2vbPass);
 
+        r2vbPass->_updateAutoParams(sceneMgr->_getAutoParamDataSource(), GPV_GLOBAL);
+
         RenderOperation renderOp;
         size_t targetBufferIndex;
         if (mResetRequested || mResetsEveryUpdate)
@@ -166,7 +168,7 @@ namespace Ogre {
             reallocateBuffer(targetBufferIndex);
         }
 
-        GLHardwareVertexBuffer* vertexBuffer = static_cast<GLHardwareVertexBuffer*>(mVertexBuffers[targetBufferIndex].get());
+        GLHardwareBuffer* vertexBuffer = mVertexBuffers[targetBufferIndex]->_getImpl<GLHardwareBuffer>();
         GLuint bufferId = vertexBuffer->getGLBufferId();
 
         //Bind the target buffer
@@ -255,7 +257,7 @@ namespace Ogre {
         //TODO : Implement more?
         default:
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-                "Unsupported vertex element sematic in render to vertex buffer", 
+                "Unsupported vertex element semantic in render to vertex buffer",
                 "OgreGLRenderToVertexBuffer::getSemanticVaryingName");
         }
     }
@@ -275,7 +277,7 @@ namespace Ogre {
         //TODO : Implement more?
         default:
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-                "Unsupported vertex element sematic in render to vertex buffer", 
+                "Unsupported vertex element semantic in render to vertex buffer",
                 "OgreGLRenderToVertexBuffer::getGLSemanticType");
             
         }
@@ -306,7 +308,7 @@ namespace Ogre {
         {
             //Have GLSL shaders, using varying attributes
             GLSL::GLSLLinkProgram* linkProgram = GLSL::GLSLLinkProgramManager::getSingleton().getActiveLinkProgram();
-            GLhandleARB linkProgramId = linkProgram->getGLHandle();
+            uint linkProgramId = linkProgram->getGLHandle();
             
             std::vector<GLint> locations;
             for (unsigned short e=0; e < declaration->getElementCount(); e++)

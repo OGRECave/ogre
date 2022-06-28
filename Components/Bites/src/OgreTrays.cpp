@@ -32,11 +32,9 @@ void Widget::nukeOverlayElement(Ogre::OverlayElement *element)
     if (container)
     {
         std::vector<Ogre::OverlayElement*> toDelete;
-
-        Ogre::OverlayContainer::ChildIterator children = container->getChildIterator();
-        while (children.hasMoreElements())
+        for (const auto& p : container->getChildren())
         {
-            toDelete.push_back(children.getNext());
+            toDelete.push_back(p.second);
         }
 
         for (unsigned int i = 0; i < toDelete.size(); i++)
@@ -74,20 +72,20 @@ Ogre::Vector2 Widget::cursorOffset(Ogre::OverlayElement *element, const Ogre::Ve
 Ogre::Real Widget::getCaptionWidth(const Ogre::DisplayString &caption, Ogre::TextAreaOverlayElement *area)
 {
     Ogre::FontPtr font = area->getFont();
-    Ogre::String current = caption.asUTF8();
+    font->load(); // ensure glyph info is there
     Ogre::Real lineWidth = 0;
 
-    for (unsigned int i = 0; i < current.length(); i++)
+    for (unsigned int i = 0; i < caption.length(); i++)
     {
         // be sure to provide a line width in the text area
-        if (current[i] == ' ')
+        if (caption[i] == ' ')
         {
             if (area->getSpaceWidth() != 0) lineWidth += area->getSpaceWidth();
-            else lineWidth += font->getGlyphAspectRatio(' ') * area->getCharHeight();
+            else lineWidth += font->getGlyphInfo(' ').advance * area->getCharHeight();
         }
-        else if (current[i] == '\n') break;
+        else if (caption[i] == '\n') break;
         // use glyph information to calculate line width
-        else lineWidth += font->getGlyphAspectRatio(current[i]) * area->getCharHeight();
+        else lineWidth += font->getGlyphInfo(caption[i]).advance * area->getCharHeight();
     }
 
     return (unsigned int)lineWidth;
@@ -96,7 +94,8 @@ Ogre::Real Widget::getCaptionWidth(const Ogre::DisplayString &caption, Ogre::Tex
 void Widget::fitCaptionToArea(const Ogre::DisplayString &caption, Ogre::TextAreaOverlayElement *area, Ogre::Real maxWidth)
 {
     Ogre::FontPtr f = area->getFont();
-    Ogre::String s = caption.asUTF8();
+    f->load();
+    Ogre::String s = caption;
 
     size_t nl = s.find('\n');
     if (nl != Ogre::String::npos) s = s.substr(0, nl);
@@ -106,7 +105,7 @@ void Widget::fitCaptionToArea(const Ogre::DisplayString &caption, Ogre::TextArea
     for (unsigned int i = 0; i < s.length(); i++)
     {
         if (s[i] == ' ' && area->getSpaceWidth() != 0) width += area->getSpaceWidth();
-        else width += f->getGlyphAspectRatio(s[i]) * area->getCharHeight();
+        else width += f->getGlyphInfo(s[i]).advance * area->getCharHeight();
         if (width > maxWidth)
         {
             s = s.substr(0, i);
@@ -234,8 +233,9 @@ void TextBox::setText(const Ogre::DisplayString &text)
     mLines.clear();
 
     Ogre::FontPtr font = mTextArea->getFont();
+    font->load(); // ensure glyph info is there
 
-    Ogre::String current = text.asUTF8();
+    Ogre::String current = text;
     bool firstWord = true;
     unsigned int lastSpace = 0;
     unsigned int lineBegin = 0;
@@ -247,7 +247,7 @@ void TextBox::setText(const Ogre::DisplayString &text)
         if (current[i] == ' ')
         {
             if (mTextArea->getSpaceWidth() != 0) lineWidth += mTextArea->getSpaceWidth();
-            else lineWidth += font->getGlyphAspectRatio(' ') * mTextArea->getCharHeight();
+            else lineWidth += font->getGlyphInfo(' ').advance * mTextArea->getCharHeight();
             firstWord = false;
             lastSpace = i;
         }
@@ -261,7 +261,7 @@ void TextBox::setText(const Ogre::DisplayString &text)
         else
         {
             // use glyph information to calculate line width
-            lineWidth += font->getGlyphAspectRatio(current[i]) * mTextArea->getCharHeight();
+            lineWidth += font->getGlyphInfo(current[i]).advance * mTextArea->getCharHeight();
             if (lineWidth > rightBoundary)
             {
                 if (firstWord)
@@ -679,7 +679,7 @@ void SelectMenu::_cursorMoved(const Ogre::Vector2 &cursorPos, float wheelDelta)
             if (newIndex != mDisplayIndex) setDisplayIndex(newIndex);
             return;
         }
-        else if(fabsf(wheelDelta) > 0.5f * 120.0f) // seems that OIS uses click == WHEEL_DELTA == 120 for all platforms
+        else if(fabsf(wheelDelta) > 0.5f)
         {
             int newIndex = Ogre::Math::Clamp<int>(mDisplayIndex + (wheelDelta > 0 ? -1 : 1), 0, (int)(mItems.size() - mItemElements.size()));
             Ogre::Real lowerBoundary = mScrollTrack->getHeight() - mScrollHandle->getHeight();
@@ -962,15 +962,15 @@ void ParamsPanel::setParamValue(const Ogre::DisplayString &paramName, const Ogre
 {
     for (unsigned int i = 0; i < mNames.size(); i++)
     {
-        if (mNames[i] == paramName.asUTF8())
+        if (mNames[i] == paramName)
         {
-            mValues[i] = paramValue.asUTF8();
+            mValues[i] = paramValue;
             updateText();
             return;
         }
     }
 
-    Ogre::String desc = "ParamsPanel \"" + getName() + "\" has no parameter \"" + paramName.asUTF8() + "\".";
+    Ogre::String desc = "ParamsPanel \"" + getName() + "\" has no parameter \"" + paramName + "\".";
     OGRE_EXCEPT(Ogre::Exception::ERR_ITEM_NOT_FOUND, desc, "ParamsPanel::setParamValue");
 }
 
@@ -983,7 +983,7 @@ void ParamsPanel::setParamValue(unsigned int index, const Ogre::DisplayString &p
         OGRE_EXCEPT(Ogre::Exception::ERR_ITEM_NOT_FOUND, desc, "ParamsPanel::setParamValue");
     }
 
-    mValues[index] = paramValue.asUTF8();
+    mValues[index] = paramValue;
     updateText();
 }
 
@@ -991,10 +991,10 @@ Ogre::DisplayString ParamsPanel::getParamValue(const Ogre::DisplayString &paramN
 {
     for (unsigned int i = 0; i < mNames.size(); i++)
     {
-        if (mNames[i] == paramName.asUTF8()) return mValues[i];
+        if (mNames[i] == paramName) return mValues[i];
     }
 
-    Ogre::String desc = "ParamsPanel \"" + getName() + "\" has no parameter \"" + paramName.asUTF8() + "\".";
+    Ogre::String desc = "ParamsPanel \"" + getName() + "\" has no parameter \"" + paramName + "\".";
     OGRE_EXCEPT(Ogre::Exception::ERR_ITEM_NOT_FOUND, desc, "ParamsPanel::getParamValue");
     return "";
 }
@@ -2132,10 +2132,13 @@ bool TrayManager::mouseReleased(const MouseButtonEvent &evt)
 
 bool TrayManager::mouseMoved(const MouseMotionEvent &evt)
 {
-    // always keep track of the mouse pos for refreshCursor()
-    mCursorPos = Ogre::Vector2(evt.x, evt.y);
+    // thats a separate event. Ignore for now.
+    static float wheelDelta = 0;
 
-    float wheelDelta = 0;//evt.state.Z.rel;
+    auto vpScale = Ogre::OverlayManager::getSingleton().getPixelRatio();
+
+    // always keep track of the mouse pos for refreshCursor()
+    mCursorPos = Ogre::Vector2(evt.x, evt.y) / vpScale;
     mCursor->setPosition(mCursorPos.x, mCursorPos.y);
 
     if (mExpandedMenu)   // only check top priority widget until it passes on
@@ -2171,6 +2174,16 @@ bool TrayManager::mouseMoved(const MouseMotionEvent &evt)
     }
 
     if (mTrayDrag) return true;  // don't pass this event on if we're in the middle of a drag
+    return false;
+}
+
+bool TrayManager::mouseWheelRolled(const MouseWheelEvent& evt)
+{
+    if (mExpandedMenu)
+    {
+        mExpandedMenu->_cursorMoved(mCursorPos, evt.y);
+        return true;
+    }
     return false;
 }
 

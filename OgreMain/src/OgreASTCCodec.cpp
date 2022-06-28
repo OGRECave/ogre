@@ -102,7 +102,7 @@ namespace Ogre {
             for (j = i; j < 6; j++)
             {
                 //              NxN       MxN         8x5               10x5              10x6
-                int is_legal = (j==i) || (j==i+1) || (j==3 && j==1) || (j==4 && j==1) || (j==4 && j==2);
+                int is_legal = (j==i) || (j==i+1) || (j==3 && i==1) || (j==4 && i==1) || (j==4 && i==2);
 
                 if(is_legal)
                 {
@@ -158,22 +158,6 @@ namespace Ogre {
             }
         }
     }
-
-    size_t ASTCCodec::getMemorySize( uint32 width, uint32 height, uint32 depth,
-                                     int32 xdim, int32 ydim, PixelFormat fmt )
-    {
-        float bitrate = getBitrateForPixelFormat(fmt);
-        int32 zdim = 1;
-        if(depth > 1)
-        {
-            getClosestBlockDim3d(bitrate, &xdim, &ydim, &zdim);
-        }
-        int xblocks = (width + xdim - 1) / xdim;
-        int yblocks = (height + ydim - 1) / ydim;
-        int zblocks = (depth + zdim - 1) / zdim;
-        return xblocks * yblocks * zblocks * 16;
-    }
-
 	//---------------------------------------------------------------------
 	ASTCCodec* ASTCCodec::msInstance = 0;
 	//---------------------------------------------------------------------
@@ -204,23 +188,7 @@ namespace Ogre {
     { 
     }
     //---------------------------------------------------------------------
-    DataStreamPtr ASTCCodec::encode(const MemoryDataStreamPtr& input, const Codec::CodecDataPtr& pData) const
-    {        
-		OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED,
-                    "ASTC encoding not supported",
-                    "ASTCCodec::encode" ) ;
-    }
-    //---------------------------------------------------------------------
-    void ASTCCodec::encodeToFile(const MemoryDataStreamPtr& input, const String& outFileName,
-                                 const Codec::CodecDataPtr& pData) const
-    {
-		OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED,
-                    "ASTC encoding not supported",
-                    "ASTCCodec::encodeToFile" ) ;
-	}
-
-    //---------------------------------------------------------------------
-    Codec::DecodeResult ASTCCodec::decode(const DataStreamPtr& stream) const
+    ImageCodec::DecodeResult ASTCCodec::decode(const DataStreamPtr& stream) const
     {
         DecodeResult ret;
         ASTCHeader header;
@@ -301,7 +269,7 @@ namespace Ogre {
 
         imgData->flags = IF_COMPRESSED;
 
-		size_t numFaces = 1; // Always one face, cubemaps are not currently supported
+		uint32 numFaces = 1; // Always one face, cubemaps are not currently supported
                              // Calculate total size from number of mipmaps, faces and size
 		imgData->size = Image::calculateSize(imgData->num_mipmaps, numFaces,
                                              imgData->width, imgData->height, imgData->depth, imgData->format);
@@ -322,29 +290,6 @@ namespace Ogre {
     String ASTCCodec::getType() const 
     {
         return mType;
-    }
-    //---------------------------------------------------------------------    
-    void ASTCCodec::flipEndian(void * pData, size_t size, size_t count) const
-    {
-#if OGRE_ENDIAN == OGRE_ENDIAN_BIG
-		for(unsigned int index = 0; index < count; index++)
-        {
-            flipEndian((void *)((long)pData + (index * size)), size);
-        }
-#endif
-    }
-    //---------------------------------------------------------------------    
-    void ASTCCodec::flipEndian(void * pData, size_t size) const
-    {
-#if OGRE_ENDIAN == OGRE_ENDIAN_BIG
-        char swapByte;
-        for(unsigned int byteIndex = 0; byteIndex < size/2; byteIndex++)
-        {
-            swapByte = *(char *)((long)pData + byteIndex);
-            *(char *)((long)pData + byteIndex) = *(char *)((long)pData + size - byteIndex - 1);
-            *(char *)((long)pData + size - byteIndex - 1) = swapByte;
-        }
-#endif
     }
     //---------------------------------------------------------------------    
 	String ASTCCodec::magicNumberToFileExt(const char *magicNumberPtr, size_t maxbytes) const

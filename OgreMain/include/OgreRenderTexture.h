@@ -107,12 +107,7 @@ namespace Ogre
         const BoundSufaceList& getBoundSurfaceList() const { return mBoundSurfaces; }
 
         /** Get a pointer to a bound surface */
-        RenderTexture* getBoundSurface(size_t index)
-        {
-            assert (index < mBoundSurfaces.size());
-            return mBoundSurfaces[index];
-        }
-
+        RenderTexture* getBoundSurface(size_t index) { return mBoundSurfaces.at(index); }
 
     protected:
         BoundSufaceList mBoundSurfaces;

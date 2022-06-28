@@ -31,7 +31,6 @@ THE SOFTWARE.
 #include "OgreETCCodec.h"
 #include "OgreImage.h"
 
-#define FOURCC(c0, c1, c2, c3) (c0 | (c1 << 8) | (c2 << 16) | (c3 << 24))
 #define KTX_ENDIAN_REF      (0x04030201)
 #define KTX_ENDIAN_REF_REV  (0x01020304)
 
@@ -130,23 +129,7 @@ namespace Ogre {
     {
     }
     //---------------------------------------------------------------------
-    DataStreamPtr ETCCodec::encode(const MemoryDataStreamPtr& input,
-                                   const Codec::CodecDataPtr& pData) const
-    {
-        OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED,
-                    "ETC encoding not supported",
-                    "ETCCodec::encode" ) ;
-    }
-    //---------------------------------------------------------------------
-    void ETCCodec::encodeToFile(const MemoryDataStreamPtr& input, const String& outFileName,
-                                const Codec::CodecDataPtr& pData) const
-    {
-        OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED,
-                    "ETC encoding not supported",
-                    "ETCCodec::encodeToFile" ) ;
-    }
-    //---------------------------------------------------------------------
-    Codec::DecodeResult ETCCodec::decode(const DataStreamPtr& stream) const
+    ImageCodec::DecodeResult ETCCodec::decode(const DataStreamPtr& stream) const
     {
         DecodeResult ret;
         if (decodeKTX(stream, ret))
@@ -163,20 +146,6 @@ namespace Ogre {
     String ETCCodec::getType() const
     {
         return mType;
-    }
-    //---------------------------------------------------------------------
-    void ETCCodec::flipEndian(void * pData, size_t size, size_t count)
-    {
-#if OGRE_ENDIAN == OGRE_ENDIAN_BIG
-        Bitwise::bswapChunks(pData, size, count);
-#endif
-    }
-    //---------------------------------------------------------------------
-    void ETCCodec::flipEndian(void * pData, size_t size)
-    {
-#if OGRE_ENDIAN == OGRE_ENDIAN_BIG
-        Bitwise::bswapBuffer(pData, size);
-#endif
     }
     //---------------------------------------------------------------------
     String ETCCodec::magicNumberToFileExt(const char *magicNumberPtr, size_t maxbytes) const
@@ -266,7 +235,6 @@ namespace Ogre {
         // Now deal with the data
         void *destPtr = output->getPtr();
         stream->read(destPtr, imgData->size);
-        destPtr = static_cast<void*>(static_cast<uchar*>(destPtr));
 
         DecodeResult ret;
         ret.first = output;
@@ -386,7 +354,7 @@ namespace Ogre {
         if (header.glType == 0 || header.glFormat == 0)
             imgData->flags |= IF_COMPRESSED;
 
-        size_t numFaces = header.numberOfFaces;
+        uint32 numFaces = header.numberOfFaces;
         if (numFaces > 1)
             imgData->flags |= IF_CUBEMAP;
         // Calculate total size from number of mipmaps, faces and size

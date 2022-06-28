@@ -69,12 +69,8 @@ namespace Ogre
                 same resolution. When it's set, it can be shared with RTTs as long as they have a
                 resolution less or equal than the depth buffer's.
 
-        @remarks
+
             Design discussion http://www.ogre3d.org/forums/viewtopic.php?f=4&t=53534&p=365582
-        @author
-            Matias N. Goldberg
-        @version
-            1.0
      */
     class _OgreExport DepthBuffer : public RenderSysAlloc
     {
@@ -86,8 +82,7 @@ namespace Ogre
             POOL_DEFAULT        = 1
         };
 
-        DepthBuffer( uint16 poolId, uint16 bitDepth, uint32 width, uint32 height,
-                     uint32 fsaa, const String &fsaaHint, bool manual );
+        DepthBuffer(uint16 poolId, uint32 width, uint32 height, uint32 fsaa, bool manual);
         virtual ~DepthBuffer();
 
         /** Sets the pool id in which this DepthBuffer lives.
@@ -96,13 +91,9 @@ namespace Ogre
 
         /// Gets the pool id in which this DepthBuffer lives
         virtual uint16 getPoolId() const;
-        virtual uint16 getBitDepth() const;
         virtual uint32 getWidth() const;
         virtual uint32 getHeight() const;
         uint32 getFSAA() const { return mFsaa; }
-        const String& getFSAAHint() const { return mFsaaHint; }
-        OGRE_DEPRECATED uint32 getFsaa() const { return getFSAA(); }
-        OGRE_DEPRECATED const String& getFsaaHint() const { return getFSAAHint(); }
 
         /** Manual DepthBuffers are cleared in RenderSystem's destructor. Non-manual ones are released
             with it's render target (aka, a backbuffer or similar) */
@@ -110,7 +101,7 @@ namespace Ogre
 
         /** Returns whether the specified RenderTarget is compatible with this DepthBuffer
             That is, this DepthBuffer can be attached to that RenderTarget
-            @remarks
+
                 Most APIs impose the following restrictions:
                 Width & height must be equal or higher than the render target's
                 They must be of the same bit depth.
@@ -120,7 +111,7 @@ namespace Ogre
         virtual bool isCompatible( RenderTarget *renderTarget ) const;
 
         /** Called when a RenderTarget is attaches this DepthBuffer
-            @remarks
+
                 This function doesn't actually attach. It merely informs the DepthBuffer
                 which RenderTarget did attach. The real attachment happens in
                 RenderTarget::attachDepthBuffer()
@@ -129,7 +120,7 @@ namespace Ogre
         virtual void _notifyRenderTargetAttached( RenderTarget *renderTarget );
 
         /** Called when a RenderTarget is detaches from this DepthBuffer
-            @remarks
+
                 Same as DepthBuffer::_notifyRenderTargetAttached()
             @param renderTarget The RenderTarget that has just been detached
         */
@@ -139,11 +130,9 @@ namespace Ogre
         typedef std::set<RenderTarget*> RenderTargetSet;
 
         uint16                      mPoolId;
-        uint16                      mBitDepth;
         uint32                      mWidth;
         uint32                      mHeight;
         uint32                      mFsaa;
-        String                      mFsaaHint;
 
         bool                        mManual; //We don't Release manual surfaces on destruction
         RenderTargetSet             mAttachedRenderTargets;

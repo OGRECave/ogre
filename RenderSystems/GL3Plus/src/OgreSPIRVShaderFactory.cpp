@@ -41,8 +41,6 @@ SPIRVShader::SPIRVShader(ResourceManager* creator, const String& name, ResourceH
     {
         setupBaseParamDictionary();
     }
-
-    mSyntaxCode = "spirv";
 }
 
 SPIRVShader::~SPIRVShader()
@@ -54,14 +52,14 @@ SPIRVShader::~SPIRVShader()
 
 const String& SPIRVShader::getLanguage(void) const
 {
-    static String language = "spirv";
+    static String language = "gl_spirv";
     return language;
 }
 
 void SPIRVShader::compileSource(void)
 {
     OGRE_CHECK_GL_ERROR(glShaderBinary(1, &mGLShaderHandle, GL_SHADER_BINARY_FORMAT_SPIR_V, mSource.data(), mSource.size()));
-    OGRE_CHECK_GL_ERROR(glSpecializeShader(mGLShaderHandle, "main", 0, NULL, NULL));
+    OGRE_CHECK_GL_ERROR(glSpecializeShader(mGLShaderHandle, mEntryPoint.c_str(), 0, NULL, NULL));
 }
 
 SPIRVShaderFactory::SPIRVShaderFactory()
@@ -76,7 +74,7 @@ SPIRVShaderFactory::~SPIRVShaderFactory()
 
 const String& SPIRVShaderFactory::getLanguage(void) const
 {
-    static String language = "spirv";
+    static String language = "gl_spirv";
     return language;
 }
 

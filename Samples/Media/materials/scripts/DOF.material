@@ -1,65 +1,41 @@
-fragment_program DOF_Blur_ps cg
+fragment_program DOF_Blur_ps glsl glsles hlsl
 {
-	source DOF_ps.cg
-	entry_point blur
-	profiles ps_2_0 arbfp1
+    source DoF_Gaussian3x3.frag
+    default_params
+    {
+        param_named_auto vpSize viewport_size
+    }
 }
 
-fragment_program DOF_Blend_ps cg
+fragment_program DOF_Blend_ps glsl glsles hlsl
 {
-	source DOF_ps.cg
-	entry_point blend
-	profiles ps_2_0 arbfp1
+    source DoF_Blend.frag
+    target ps_2_a
+    default_params
+    {
+        param_named_auto pixelSizeScene viewport_size
+        param_named scene int 0
+        param_named depth int 1
+        param_named blur int 2
+    }
 }
 
 //Effect: Depth of Field
-material Ogre/Compositor/DOF_Blur0
+material Ogre/Compositor/DOF_Blur
 {
-	technique
-	{
-		//Rendering Pass: Blur0 (pass index: #1 )
-		pass
-		{
-			//State: D3DRS_CULLMODE, Value : D3DCULL_NONE
-			cull_hardware none
-			cull_software none
-			depth_check off
-            polygon_mode_overrideable false
+    technique
+    {
+        pass
+        {
+            vertex_program_ref Ogre/Compositor/StdQuad_Tex2_vp { }
+            fragment_program_ref DOF_Blur_ps { }
 
-			fragment_program_ref DOF_Blur_ps
-			{
-			    param_named sampleDistance float 0.1
-			}
-			vertex_program_ref Ogre/Compositor/StdQuad_Tex2a_vp
-			{
-			}
-			texture_unit
-			{
-			    // texture will get added at runtime
-                tex_coord_set 0
-				tex_address_mode wrap
-				filtering trilinear
-			}
-		}
-	}
-}
-
-// cheat here by copying from DOF_Blur0
-material Ogre/Compositor/DOF_Blur1 : Ogre/Compositor/DOF_Blur0
-{
-	technique
-	{
-		//Rendering Pass: Blur0 (pass index: #1 )
-		pass
-		{
-		    // use the same pixel shader as DOF_Blur0
-			//fragment_program_ref
-			//{
-			    // override value from copied DOF_Blur0 material
-			//    param_named sampleDistance float 0.1
-			//}
-		}
-	}
+            texture_unit source
+            {
+                tex_address_mode mirror
+            }
+        }
+    }
 }
 
 material Ogre/Compositor/DOF_Blend
@@ -68,28 +44,23 @@ material Ogre/Compositor/DOF_Blend
     {
         pass
         {
-            polygon_mode_overrideable false
-			fragment_program_ref DOF_Blend_ps
-			{
-			    param_named focus float 0.66
-			    param_named range float 1.0
-			}
-			vertex_program_ref Ogre/Compositor/StdQuad_Tex2a_vp
-			{
-			}
-            texture_unit Blur0
+            vertex_program_ref Ogre/Compositor/StdQuad_Tex2_vp { }
+
+            fragment_program_ref DOF_Blend_ps { }
+
+            texture_unit
             {
-			    // texture will get added at runtime
-                tex_coord_set 0
-				tex_address_mode clamp
-				filtering trilinear
+                tex_address_mode clamp
             }
-            texture_unit Blur1
+
+            texture_unit
             {
-			    // texture will get added at runtime
-                tex_coord_set 0
-				tex_address_mode clamp
-				filtering trilinear
+                tex_address_mode border
+            }
+
+            texture_unit
+            {
+                tex_address_mode mirror
             }
         }
     }

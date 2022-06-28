@@ -51,8 +51,7 @@ namespace Ogre
         mIsFullScreen = false;      
         mIsExternal = false;
         mHWnd = 0;
-        mActive = false;        
-        mClosed = false;
+        mActive = false;
         mHidden = false;
         mSwitchingFullscreen = false;
         mDisplayFrequency = 0;
@@ -74,7 +73,6 @@ namespace Ogre
     {
         HINSTANCE hInst = mInstance;
     
-        HWND parentHWnd = 0;
         WNDPROC windowProc = DefWindowProc;
         HWND externalHandle = 0;
         mFSAAType = D3DMULTISAMPLE_NONE;
@@ -113,15 +111,13 @@ namespace Ogre
             opt = miscParams->find("title");
             if(opt != miscParams->end())
                 title = opt->second;
-            // parentWindowHandle       -> parentHWnd
-            opt = miscParams->find("parentWindowHandle");
-            if(opt != miscParams->end())
-                parentHWnd = (HWND)StringConverter::parseSizeT(opt->second);
             opt = miscParams->find("windowProc");
             if (opt != miscParams->end())
                 windowProc = reinterpret_cast<WNDPROC>(StringConverter::parseSizeT(opt->second));
             // externalWindowHandle     -> externalHandle
             opt = miscParams->find("externalWindowHandle");
+            if (opt == miscParams->end())
+                opt = miscParams->find("parentWindowHandle");
             if(opt != miscParams->end())
                 externalHandle = (HWND)StringConverter::parseSizeT(opt->second);
             // vsync    [parseBool]
@@ -246,20 +242,13 @@ namespace Ogre
                 mWindowedWinStyle |= WS_VISIBLE;
             }
 
-            if (parentHWnd)
-            {
-                mWindowedWinStyle |= WS_CHILD;
-            }
+            if (border == "none")
+                mWindowedWinStyle |= WS_POPUP;
+            else if (border == "fixed")
+                mWindowedWinStyle |= WS_OVERLAPPED | WS_BORDER | WS_CAPTION |
+                WS_SYSMENU | WS_MINIMIZEBOX;
             else
-            {
-                if (border == "none")
-                    mWindowedWinStyle |= WS_POPUP;
-                else if (border == "fixed")
-                    mWindowedWinStyle |= WS_OVERLAPPED | WS_BORDER | WS_CAPTION |
-                    WS_SYSMENU | WS_MINIMIZEBOX;
-                else
-                    mWindowedWinStyle |= WS_OVERLAPPEDWINDOW;
-            }
+                mWindowedWinStyle |= WS_OVERLAPPEDWINDOW;
                     
             unsigned int winWidth, winHeight;
             winWidth = width;
@@ -347,7 +336,7 @@ namespace Ogre
             // Pass pointer to self
             mIsExternal = false;
             mHWnd = CreateWindowEx(dwStyleEx, "OgreD3D9Wnd", title.c_str(), getWindowStyle(fullScreen),
-                mLeft, mTop, winWidth, winHeight, parentHWnd, 0, hInst, this);
+                mLeft, mTop, winWidth, winHeight, 0, 0, hInst, this);
         }
         else
         {
@@ -730,11 +719,6 @@ namespace Ogre
             setVSyncEnabled(true);
     }
 
-    unsigned int D3D9RenderWindow::getVSyncInterval() const
-    {
-        return mVSyncInterval;
-    }
-
     void D3D9RenderWindow::reposition(int top, int left)
     {
         if (mHWnd && !mIsFullScreen)
@@ -804,6 +788,11 @@ namespace Ogre
         {
             *(IDirect3DSurface9**)pData = mDevice->getBackBuffer(this);
         }
+    }
+
+    PixelFormat D3D9RenderWindow::suggestPixelFormat() const
+    {
+        return mColourDepth == 16 ? PF_R5G6B5 : PF_X8R8G8B8;
     }
 
     void D3D9RenderWindow::copyContentsToMemory(const Box& src, const PixelBox &dst, FrameBuffer buffer)

@@ -41,10 +41,7 @@ namespace Ogre {
     *  @{
     */
 
-    /** This plugin subclass of ParticleAffector allows you to alter the rotation of particles.
-    @remarks
-        This class supplies the ParticleAffector implementation required to make the particle expand
-        or contract in mid-flight.
+    /** This affector rotates particles in flight.
     */
     class _OgreParticleFXExport RotationAffector : public ParticleAffector
     {
@@ -84,11 +81,9 @@ namespace Ogre {
         /** Default constructor. */
         RotationAffector(ParticleSystem* psys);
 
-        /** See ParticleAffector. */
-        void _initParticle(Particle* pParticle);
+        void _initParticle(Particle* pParticle) override;
 
-        /** See ParticleAffector. */
-        void _affectParticles(ParticleSystem* pSystem, Real timeElapsed);
+        void _affectParticles(ParticleSystem* pSystem, Real timeElapsed) override;
 
 
 

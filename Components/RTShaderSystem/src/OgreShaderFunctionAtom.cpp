@@ -79,34 +79,31 @@ void Operand::setMaskToParamType()
 }
 
 //-----------------------------------------------------------------------------
-String Operand::getMaskAsString(int mask)
+static void writeMask(std::ostream& os, int mask)
 {
-    String retVal = "";
-
-    if (mask != OPM_ALL)
+    if (mask != Operand::OPM_ALL)
     {
-        if (mask & OPM_X)
+        os << '.';
+        if (mask & Operand::OPM_X)
         {
-            retVal += "x";
+            os << 'x';
         }
 
-        if (mask & OPM_Y)
+        if (mask & Operand::OPM_Y)
         {
-            retVal += "y";
+            os << 'y';
         }
 
-        if (mask & OPM_Z)
+        if (mask & Operand::OPM_Z)
         {
-            retVal += "z";
+            os << 'z';
         }
 
-        if (mask & OPM_W)
+        if (mask & Operand::OPM_W)
         {
-            retVal += "w";
+            os << 'w';
         }
     }
-
-    return retVal;
 }
 
 //-----------------------------------------------------------------------------
@@ -128,50 +125,10 @@ int Operand::getFloatCount(int mask)
 }
 
 //-----------------------------------------------------------------------------
-GpuConstantType Operand::getGpuConstantType(int mask)
+void Operand::write(std::ostream& os) const
 {
-    int floatCount = getFloatCount(mask);
-    GpuConstantType type;
-
-    switch (floatCount)
-    {
-
-    case 1:
-        type = GCT_FLOAT1;
-        break;
-
-    case 2:
-        type = GCT_FLOAT2;
-        break;
-
-    case 3:
-        type = GCT_FLOAT3;
-        break;
-
-    case 4:
-        type = GCT_FLOAT4;
-        break;
-
-    default:
-        type = GCT_UNKNOWN;
-        break;
-    }
-
-    return type;
-}
-
-//-----------------------------------------------------------------------------
-String Operand::toString() const
-{
-    String retVal = mParameter->toString();
-    if (mMask == OPM_ALL)
-    {
-        return retVal;
-    }
-
-    retVal += "." + getMaskAsString(mMask);
-
-    return retVal;
+    os << mParameter->toString();
+    writeMask(os, mMask);
 }
 
 //-----------------------------------------------------------------------------
@@ -224,14 +181,16 @@ static String parameterNullMsg(const String& name, size_t pos)
 
 void FunctionAtom::pushOperand(ParameterPtr parameter, Operand::OpSemantic opSemantic, Operand::OpMask opMask, int indirectionLevel)
 {
-    OgreAssert(parameter, parameterNullMsg(mFunctionName, mOperands.size()).c_str());
+    if (!parameter)
+        OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, parameterNullMsg(mFunctionName, mOperands.size()));
     mOperands.push_back(Operand(parameter, opSemantic, opMask, indirectionLevel));
 }
 
 void FunctionAtom::setOperands(const OperandVector& ops)
 {
     for (size_t i = 0; i < ops.size(); i++)
-        OgreAssert(ops[i].getParameter(), parameterNullMsg(mFunctionName, i).c_str());
+        if(!ops[i].getParameter())
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, parameterNullMsg(mFunctionName, i));
 
     mOperands = ops;
 }
@@ -243,7 +202,7 @@ void FunctionAtom::writeOperands(std::ostream& os, OperandVector::const_iterator
     ushort curIndLevel = 0;
     for (OperandVector::const_iterator it = begin; it != end; )
     {
-        os << it->toString();
+        it->write(os);
         ++it;
 
         ushort opIndLevel = 0;
@@ -445,9 +404,7 @@ void SampleTextureAtom::writeSourceCode(std::ostream& os, const String& targetLa
     writeOperands(os, outOp, mOperands.end());
     os << "\t=\t";
 
-    bool is_glsl = targetLanguage[0] == 'g';
-
-    os << (is_glsl ? "texture" : "tex");
+    os << "texture";
     const auto& sampler = mOperands.front().getParameter();
     switch(sampler->getType())
     {
@@ -462,7 +419,7 @@ void SampleTextureAtom::writeSourceCode(std::ostream& os, const String& targetLa
         os << "3D";
         break;
     case GCT_SAMPLERCUBE:
-        os << (is_glsl ? "Cube" : "CUBE");
+        os << "Cube";
         break;
     default:
         OGRE_EXCEPT(Exception::ERR_INVALID_STATE, "unknown sampler");

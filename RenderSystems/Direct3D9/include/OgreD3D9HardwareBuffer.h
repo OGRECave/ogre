@@ -1,0 +1,112 @@
+/*
+-----------------------------------------------------------------------------
+This source file is part of OGRE
+    (Object-oriented Graphics Rendering Engine)
+For the latest info, see http://www.ogre3d.org/
+
+Copyright (c) 2000-2014 Torus Knot Software Ltd
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+-----------------------------------------------------------------------------
+*/
+#ifndef __D3D9HardwareBuffer_H__
+#define __D3D9HardwareBuffer_H__
+
+#include "OgreD3D9Prerequisites.h"
+#include "OgreHardwareBuffer.h"
+#include "OgreD3D9Resource.h"
+
+namespace Ogre {
+
+    /// Specialisation of HardwareVertexBuffer for D3D9
+    class _OgreD3D9Export D3D9HardwareBuffer : public HardwareBuffer, public D3D9Resource
+    {   
+
+    public:
+        D3D9HardwareBuffer(D3DFORMAT type, size_t sizeInBytes, Usage usage,
+                                 bool useShadowBuffer);
+        ~D3D9HardwareBuffer();
+        /** See HardwareBuffer. */
+        void readData(size_t offset, size_t length, void* pDest);
+        /** See HardwareBuffer. */
+        void writeData(size_t offset, size_t length, const void* pSource,
+                bool discardWholeBuffer = false);
+    
+        // Called immediately after the Direct3D device has been created.
+        virtual void notifyOnDeviceCreate(IDirect3DDevice9* d3d9Device);
+
+        // Called before the Direct3D device is going to be destroyed.
+        virtual void notifyOnDeviceDestroy(IDirect3DDevice9* d3d9Device);
+
+        // Called immediately after the Direct3D device has entered a lost state.
+        virtual void notifyOnDeviceLost(IDirect3DDevice9* d3d9Device);
+
+        // Called immediately after the Direct3D device has been reset
+        virtual void notifyOnDeviceReset(IDirect3DDevice9* d3d9Device);
+
+        // Create the actual vertex buffer.
+        void createBuffer(IDirect3DDevice9* d3d9Device, D3DPOOL ePool, bool updateNewBuffer);
+        
+        /// Get D3D9-specific resource
+        IDirect3DResource9* getD3D9Resource(void);
+    protected:  
+        struct BufferResources
+        {
+            IDirect3DResource9*         mBuffer;
+            bool                        mOutOfDate;
+            size_t                      mLockOffset;
+            size_t                      mLockLength;
+            LockOptions                 mLockOptions;
+            uint                        mLastUsedFrame;
+        };
+
+    protected:      
+        /** See HardwareBuffer. */
+        void* lockImpl(size_t offset, size_t length, LockOptions options);      
+        
+        /** See HardwareBuffer. */
+        void unlockImpl(void);          
+        
+        /** Update the given buffer content.*/
+        void updateBufferContent(BufferResources* bufferResources);
+
+        // updates buffer resources from system memory buffer.
+        bool updateBufferResources(const char* systemMemoryBuffer, BufferResources* bufferResources);       
+
+        /** Internal buffer lock method. */
+        char* _lockBuffer(BufferResources* bufferResources, size_t offset, size_t length);
+
+        /** Internal buffer unlock method. */
+        void _unlockBuffer(BufferResources* bufferResources);
+
+
+    protected:
+        typedef std::map<IDirect3DDevice9*, BufferResources*>  DeviceToBufferResourcesMap;
+        typedef DeviceToBufferResourcesMap::iterator            DeviceToBufferResourcesIterator;
+
+        DeviceToBufferResourcesMap  mMapDeviceToBufferResources;    // Map between device to buffer resources.
+        D3DVERTEXBUFFER_DESC        mBufferDesc;                    // Buffer description.      
+        BufferResources*            mSourceBuffer;                  // Source buffer resources when working with multiple devices.
+        char*                       mSourceLockedBytes;             // Source buffer locked bytes.
+        D3DFORMAT                   mType;
+    };
+
+}
+#endif
+

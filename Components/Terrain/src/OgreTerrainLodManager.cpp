@@ -55,7 +55,7 @@ namespace Ogre
 
     void TerrainLodManager::open(const String& filename)
     {
-        if(!filename.empty() && filename.length() > 0)
+        if(!filename.empty())
             mDataStream = Root::getSingleton().openFileStream(filename, mTerrain->_getDerivedResourceGroup());
     }
 
@@ -283,7 +283,7 @@ namespace Ogre
                 LoadLodRequest req(this,mHighestLodPrepared,mHighestLodLoaded,mTargetLodLevel);
                 Root::getSingleton().getWorkQueue()->addRequest(
                     mWorkQueueChannel, WORKQUEUE_LOAD_LOD_DATA_REQUEST,
-                    Any(req), 0, synchronous);
+                    req, 0, synchronous);
             }
             else if(synchronous)
                 waitForDerivedProcesses();

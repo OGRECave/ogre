@@ -34,11 +34,14 @@ THE SOFTWARE.
 #include "OgreCommon.h"
 #include "OgreController.h"
 #include "OgreControllerManager.h"
-#include "OgreIteratorWrappers.h"
 #include "Threading/OgreThreadHeaders.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {
+
+    template <typename T> class MapIterator;
+    template <typename T> class ConstMapIterator;
+    template <typename T> class ConstVectorIterator;
 
     /** \addtogroup Core
     *  @{
@@ -48,7 +51,7 @@ namespace Ogre {
     */
 
     /** Represents the state of an animation and the weight of its influence. 
-    @remarks
+
         Other classes can hold instances of this class to store the state of any animations
         they are using.
     */
@@ -94,7 +97,7 @@ namespace Ogre {
         void setWeight(Real weight);
         /** Modifies the time position, adjusting for animation length
         @param offset The amount of time, in seconds, to extend the animation.
-        @remarks
+
             This method loops at the edges if animation looping is enabled.
         */
         void addTime(Real offset);
@@ -169,7 +172,7 @@ namespace Ogre {
           assert(mBlendMask && mBlendMask->size() > boneHandle);
           return (*mBlendMask)[boneHandle];
       }
-    protected:
+    private:
         /// The blend mask (containing per bone weights)
         BoneBlendMask* mBlendMask;
 
@@ -268,7 +271,7 @@ namespace Ogre {
             return mEnabledAnimationStates;
         }
 
-    protected:
+    private:
         unsigned long mDirtyFrameNumber;
         AnimationStateMap mAnimationStates;
         EnabledAnimationStateList mEnabledAnimationStates;
@@ -276,7 +279,7 @@ namespace Ogre {
     };
 
     /** ControllerValue wrapper class for AnimationState.
-    @remarks
+
         In Azathoth and earlier, AnimationState was a ControllerValue but this
         actually causes memory problems since Controllers delete their values
         automatically when there are no further references to them, but AnimationState
@@ -285,7 +288,7 @@ namespace Ogre {
     */
     class _OgreExport AnimationStateControllerValue : public ControllerValue<Real>
     {
-    protected:
+    private:
         AnimationState* mTargetAnimationState;
         bool mAddTime;
     public:
@@ -298,10 +301,7 @@ namespace Ogre {
          * @param targetAnimationState
          * @param addTime if true, increment time instead of setting to an absolute position
          */
-        static ControllerValueRealPtr create(AnimationState* targetAnimationState, bool addTime = false)
-        {
-            return std::make_shared<AnimationStateControllerValue>(targetAnimationState, addTime);
-        }
+        static ControllerValueRealPtr create(AnimationState* targetAnimationState, bool addTime = false);
 
         /** ControllerValue implementation. */
         Real getValue(void) const

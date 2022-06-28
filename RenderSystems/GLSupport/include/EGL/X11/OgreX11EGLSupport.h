@@ -30,6 +30,8 @@ THE SOFTWARE.
 #ifndef __X11EGLSupport_H__
 #define __X11EGLSupport_H__
 
+// Tell EGL that we are using X11 (to select the appropriate definitions)
+#define USE_X11
 
 #include "OgreEGLSupport.h"
 
@@ -55,10 +57,6 @@ namespace Ogre {
             X11EGLSupport(int profile);
             virtual ~X11EGLSupport();
 
-//          virtual GLPBuffer* createPBuffer(PixelComponentType format,
-//              size_t width, size_t height);
-
-            virtual void switchMode(uint& width, uint& height, short& frequency);
             String getDisplayName(void);
 
             NativeDisplayType getNativeDisplay(void);

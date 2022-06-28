@@ -98,10 +98,10 @@ namespace Ogre {
         mTypeEnumMap.emplace("usampler2DArray", GCT_SAMPLER2DARRAY);
 
         // GL 3.1
-        mTypeEnumMap.emplace("sampler2DRect", GCT_SAMPLERRECT);
-        mTypeEnumMap.emplace("sampler2DRectShadow", GCT_SAMPLERRECT);
-        mTypeEnumMap.emplace("isampler2DRect", GCT_SAMPLERRECT);
-        mTypeEnumMap.emplace("usampler2DRect", GCT_SAMPLERRECT);
+        mTypeEnumMap.emplace("sampler2DRect", GCT_SAMPLER2D);
+        mTypeEnumMap.emplace("sampler2DRectShadow", GCT_SAMPLER2D);
+        mTypeEnumMap.emplace("isampler2DRect", GCT_SAMPLER2D);
+        mTypeEnumMap.emplace("usampler2DRect", GCT_SAMPLER2D);
         mTypeEnumMap.emplace("samplerBuffer", GCT_SAMPLER1D);
         mTypeEnumMap.emplace("isamplerBuffer", GCT_SAMPLER1D);
         mTypeEnumMap.emplace("usamplerBuffer", GCT_SAMPLER1D);
@@ -146,9 +146,9 @@ namespace Ogre {
         mTypeEnumMap.emplace("image3D", GCT_SAMPLER3D);
         mTypeEnumMap.emplace("iimage3D", GCT_SAMPLER3D);
         mTypeEnumMap.emplace("uimage3D", GCT_SAMPLER3D);
-        mTypeEnumMap.emplace("image2DRect", GCT_SAMPLERRECT);
-        mTypeEnumMap.emplace("iimage2DRect", GCT_SAMPLERRECT);
-        mTypeEnumMap.emplace("uimage2DRect", GCT_SAMPLERRECT);
+        mTypeEnumMap.emplace("image2DRect", GCT_SAMPLER2D);
+        mTypeEnumMap.emplace("iimage2DRect", GCT_SAMPLER2D);
+        mTypeEnumMap.emplace("uimage2DRect", GCT_SAMPLER2D);
         mTypeEnumMap.emplace("imageCube", GCT_SAMPLERCUBE);
         mTypeEnumMap.emplace("iimageCube", GCT_SAMPLERCUBE);
         mTypeEnumMap.emplace("uimageCube", GCT_SAMPLERCUBE);
@@ -288,20 +288,15 @@ namespace Ogre {
                 // Complete def and add
                 // increment physical buffer location
                 def.logicalIndex = 0; // not valid in GLSL
-                if (def.isFloat())
+                if (def.isFloat() || def.isDouble() || def.isInt() || def.isUnsignedInt() || def.isBool())
                 {
-                    def.physicalIndex = defs.floatBufferSize;
-                    defs.floatBufferSize += def.arraySize * def.elementSize;
+                    def.physicalIndex = defs.bufferSize * 4;
+                    defs.bufferSize += def.arraySize * def.elementSize;
                 }
-                else if (def.isDouble())
+                else if(def.isSampler())
                 {
-                    def.physicalIndex = defs.doubleBufferSize;
-                    defs.doubleBufferSize += def.arraySize * def.elementSize;
-                }
-                else if (def.isInt() || def.isSampler() || def.isUnsignedInt() || def.isBool())
-                {
-                    def.physicalIndex = defs.intBufferSize;
-                    defs.intBufferSize += def.arraySize * def.elementSize;
+                    def.physicalIndex = defs.registerCount;
+                    defs.registerCount += def.arraySize * def.elementSize;
                 }
                 else
                 {
@@ -309,6 +304,14 @@ namespace Ogre {
                                                           + line + "' in file " + filename);
                 }
                 defs.map.emplace(paramName, def);
+
+                // warn if there is a default value, that we would overwrite
+                if (line.find('=') != String::npos)
+                {
+                    LogManager::getSingleton().logWarning("Default value of uniform '" + paramName +
+                                                          "' is ignored in " + filename);
+                    break;
+                }
             }
         }
     }

@@ -26,15 +26,11 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-
 #include "Ogre.h"
-#include "OgreMeshSerializer.h"
-#include "OgreSkeletonSerializer.h"
 #include "OgreDefaultHardwareBufferManager.h"
 #include "OgreMeshLodGenerator.h"
 #include "OgreDistanceLodStrategy.h"
 #include "OgreLodStrategyManager.h"
-#include "OgreHardwareVertexBuffer.h"
 #include "OgrePixelCountLodStrategy.h"
 #include "OgreLodConfig.h"
 
@@ -48,37 +44,35 @@ namespace {
 
 void help(void)
 {
-    // Print help message
-    cout << endl << "OgreMeshUpgrader: Upgrades or downgrades .mesh file versions." << endl;
-    cout << "Provided for OGRE by Steve Streeting 2004-2014" << endl << endl;
-    cout << "Usage: OgreMeshUpgrader [opts] sourcefile [destfile] " << endl;
-    cout << "-i             = Interactive mode, prompt for options" << endl;
-    cout << "-autogen       = Generate autoconfigured LOD. No more LOD options needed!" << endl;
-    cout << "-l lodlevels   = number of LOD levels" << endl;
-    cout << "-d loddist     = distance increment to reduce LOD" << endl;
-    cout << "-p lodpercent  = Percentage triangle reduction amount per LOD" << endl;
-    cout << "-f lodnumtris  = Fixed vertex reduction per LOD" << endl;
-    cout << "-e         = DON'T generate edge lists (for stencil shadows)" << endl;
-    cout << "-t         = Generate tangents (for normal mapping)" << endl;
-    cout << "-td [uvw|tangent]" << endl;
-    cout << "           = Tangent vertex semantic destination (default tangent)" << endl;
-    cout << "-ts [3|4]      = Tangent size (3 or 4 components, 4 includes parity, default 3)" << endl;
-    cout << "-tm            = Split tangent vertices at UV mirror points" << endl;
-    cout << "-tr            = Split tangent vertices where basis is rotated > 90 degrees" << endl;
-    cout << "-r         = DON'T reorganise buffers to recommended format" << endl;
-    cout << "-d3d       = Convert to D3D colour formats" << endl;
-    cout << "-gl        = Convert to GL colour formats" << endl;
-    cout << "-srcd3d    = Interpret ambiguous colours as D3D style" << endl;
-    cout << "-srcgl     = Interpret ambiguous colours as GL style" << endl;
-    cout << "-E endian  = Set endian mode 'big' 'little' or 'native' (default)" << endl;
-    cout << "-b         = Recalculate bounding box (static meshes only)" << endl;
-    cout << "-V version = Specify OGRE version format to write instead of latest" << endl;
-    cout << "             Options are: 1.10, 1.8, 1.7, 1.4, 1.0" << endl;
-    cout << "sourcefile = name of file to convert" << endl;
-    cout << "destfile   = optional name of file to write to. If you don't" << endl;
-    cout << "             specify this OGRE overwrites the existing file." << endl;
+    cout <<
+R"HELP(Usage: OgreMeshUpgrader [opts] sourcefile [destfile]
 
-    cout << endl;
+  Upgrades or downgrades .mesh file versions.
+
+-i             = Interactive mode, prompt for options
+-pack          = Pack normals and tangents as int_10_10_10_2
+-autogen       = Generate autoconfigured LOD. No LOD options needed
+-l lodlevels   = number of LOD levels
+-d loddist     = distance increment to reduce LOD
+-p lodpercent  = Percentage triangle reduction amount per LOD
+-f lodnumtris  = Fixed vertex reduction per LOD
+-e             = DON'T generate edge lists (for stencil shadows)
+-t             = Generate tangents (for normal mapping)
+-td [uvw|tangent]
+               = Tangent vertex semantic destination (default: tangent)
+-ts [3|4]      = Tangent size (4 includes parity, default: 3)
+-tm            = Split tangent vertices at UV mirror points
+-tr            = Split tangent vertices where basis is rotated > 90 degrees
+-r             = DON'T reorganise buffers to recommended format
+-E endian      = Set endian mode 'big' 'little' or 'native' (default)
+-b             = Recalculate bounding box (static meshes only)
+-V version     = Specify OGRE version format to write instead of latest
+                 Options are: 1.10, 1.8, 1.7, 1.4, 1.0
+-log filename  = name of the log file (default: 'OgreMeshUpgrader.log')
+sourcefile     = name of file to convert
+destfile       = optional name of file to write to. If you don't
+                 specify this OGRE overwrites the existing file.
+)HELP";
 }
 
 struct UpgradeOptions {
@@ -90,11 +84,8 @@ struct UpgradeOptions {
     bool tangentSplitMirrored;
     bool tangentSplitRotated;
     bool dontReorganise;
-    bool destColourFormatSet;
-    VertexElementType destColourFormat;
-    bool srcColourFormatSet;
-    VertexElementType srcColourFormat;
     bool lodAutoconfigure;
+    bool packNormalsTangents;
     unsigned short numLods;
     Real lodDist;
     Real lodPercent;
@@ -103,27 +94,14 @@ struct UpgradeOptions {
     Serializer::Endian endian;
     bool recalcBounds;
     MeshVersion targetVersion;
-
+    String logFile;
 };
 
-
-// Crappy globals
-// NB some of these are not directly used, but are required to
-//   instantiate the singletons used in the dlls
-LogManager* logMgr = 0;
-Math* mth = 0;
-LodStrategyManager* lodMgr = 0;
-MaterialManager* matMgr = 0;
-SkeletonManager* skelMgr = 0;
-MeshSerializer* meshSerializer = 0;
-SkeletonSerializer* skeletonSerializer = 0;
-DefaultHardwareBufferManager *bufferManager = 0;
-ResourceGroupManager* rgm = 0;
-MeshManager* meshMgr = 0;
-UpgradeOptions opts;
-
-void parseOpts(UnaryOptionList& unOpts, BinaryOptionList& binOpts)
+UpgradeOptions parseOpts(UnaryOptionList& unOpts, BinaryOptionList& binOpts)
 {
+    UpgradeOptions opts;
+
+    // Defaults
     opts.interactive = false;
     opts.suppressEdgeLists = false;
     opts.generateTangents = false;
@@ -133,8 +111,8 @@ void parseOpts(UnaryOptionList& unOpts, BinaryOptionList& binOpts)
     opts.tangentSplitRotated = false;
     opts.dontReorganise = false;
     opts.endian = Serializer::ENDIAN_NATIVE;
-    opts.destColourFormatSet = false;
-    opts.srcColourFormatSet = false;
+
+    opts.packNormalsTangents = false;
 
     opts.lodAutoconfigure = false;
     opts.lodDist = 500;
@@ -145,52 +123,29 @@ void parseOpts(UnaryOptionList& unOpts, BinaryOptionList& binOpts)
     opts.recalcBounds = false;
     opts.targetVersion = MESH_VERSION_LATEST;
 
+    opts.suppressEdgeLists = unOpts["-e"];
+    opts.generateTangents = unOpts["-t"];
+    opts.tangentSplitMirrored = unOpts["-tm"];
+    opts.tangentSplitRotated = unOpts["-tr"];
+    opts.lodAutoconfigure = unOpts["-autogen"];
+    opts.interactive = unOpts["-i"];
+    opts.dontReorganise = unOpts["-r"];
+    opts.packNormalsTangents = unOpts["-pack"];
 
-    UnaryOptionList::iterator ui = unOpts.find("-e");
-    opts.suppressEdgeLists = ui->second;
-    ui = unOpts.find("-t");
-    opts.generateTangents = ui->second;
-    ui = unOpts.find("-tm");
-    opts.tangentSplitMirrored = ui->second;
-    ui = unOpts.find("-tr");
-    opts.tangentSplitRotated = ui->second;
-
-    ui = unOpts.find("-autogen");
-    opts.lodAutoconfigure = ui->second;
-
-    ui = unOpts.find("-i");
-    opts.interactive = ui->second;
-    ui = unOpts.find("-r");
-    opts.dontReorganise = ui->second;
-    ui = unOpts.find("-d3d");
-    if (ui->second) {
-        opts.destColourFormatSet = true;
-        opts.destColourFormat = VET_COLOUR_ARGB;
-    }
-    ui = unOpts.find("-gl");
-    if (ui->second) {
-        opts.destColourFormatSet = true;
-        opts.destColourFormat = VET_COLOUR_ABGR;
-    }
-    ui = unOpts.find("-srcd3d");
-    if (ui->second) {
-        opts.srcColourFormatSet = true;
-        opts.srcColourFormat = VET_COLOUR_ARGB;
-    }
-    ui = unOpts.find("-srcgl");
-    if (ui->second) {
-        opts.srcColourFormatSet = true;
-        opts.srcColourFormat = VET_COLOUR_ABGR;
-    }
-    ui = unOpts.find("-b");
-    if (ui->second) {
+    // Unary options (true/false options that don't take a parameter)
+    if (unOpts["-b"]) {
         opts.recalcBounds = true;
     }
 
-
+    // Binary options (options that take a parameter)
     BinaryOptionList::iterator bi = binOpts.find("-l");
     if (!bi->second.empty()) {
         opts.numLods = StringConverter::parseInt(bi->second);
+    }
+
+    bi = binOpts.find("-log");
+    if (!bi->second.empty()) {
+        opts.logFile = binOpts["-log"];
     }
 
     bi = binOpts.find("-d");
@@ -203,7 +158,6 @@ void parseOpts(UnaryOptionList& unOpts, BinaryOptionList& binOpts)
         opts.lodPercent = StringConverter::parseReal(bi->second);
         opts.usePercent = true;
     }
-
 
     bi = binOpts.find("-f");
     if (!bi->second.empty()) {
@@ -219,23 +173,25 @@ void parseOpts(UnaryOptionList& unOpts, BinaryOptionList& binOpts)
             opts.endian = Serializer::ENDIAN_LITTLE;
         } else {
             opts.endian = Serializer::ENDIAN_NATIVE;
+		}
     }
-    }
+
     bi = binOpts.find("-td");
     if (!bi->second.empty()) {
         if (bi->second == "uvw") {
             opts.tangentSemantic = VES_TEXTURE_COORDINATES;
         } else { // if (bi->second == "tangent"), or anything else
             opts.tangentSemantic = VES_TANGENT;
+		}
     }
-    }
+
     bi = binOpts.find("-ts");
     if (!bi->second.empty()) {
         if (bi->second == "4") {
             opts.tangentUseParity = true;
+		}
     }
-    }
-    
+
     bi = binOpts.find("-V");
     if (!bi->second.empty()) {
         if (bi->second == "1.10") {
@@ -249,10 +205,11 @@ void parseOpts(UnaryOptionList& unOpts, BinaryOptionList& binOpts)
         } else if (bi->second == "1.0") {
             opts.targetVersion = MESH_VERSION_1_0;
         } else {
-            logMgr->stream() << "Unrecognised target mesh version '" << bi->second << "'";          
+            LogManager::getSingleton().logError("Unrecognised target mesh version '" + bi->second + "'");
+        }
     }
-    }
-    
+
+    return opts;
 }
 
 String describeSemantic(VertexElementSemantic sem)
@@ -287,6 +244,7 @@ String describeSemantic(VertexElementSemantic sem)
     }
     return "";
 }
+
 void displayVertexBuffers(VertexDeclaration::VertexElementList& elemList)
 {
     // Iterate per buffer
@@ -301,12 +259,12 @@ void displayVertexBuffers(VertexDeclaration::VertexElementList& elemList)
         }
         cout << "   - Element " << elemNum++ << ": " << describeSemantic(i->getSemantic());
         if (i->getSemantic() == VES_TEXTURE_COORDINATES) {
-            cout << " (index " << i->getIndex() << ")"; 
+            cout << " (index " << i->getIndex() << ")";
         }
         cout << endl;
-
     }
 }
+
 // Sort routine for VertexElement
 bool vertexElementLess(const VertexElement& e1, const VertexElement& e2)
 {
@@ -326,9 +284,10 @@ bool vertexElementLess(const VertexElement& e1, const VertexElement& e2)
     }
     return false;
 }
+
 void copyElems(VertexDeclaration* decl, VertexDeclaration::VertexElementList* elemList)
 {
-    
+
     elemList->clear();
     const VertexDeclaration::VertexElementList& origElems = decl->getElements();
     VertexDeclaration::VertexElementList::const_iterator i, iend;
@@ -338,6 +297,7 @@ void copyElems(VertexDeclaration* decl, VertexDeclaration::VertexElementList* el
     }
     elemList->sort(VertexDeclaration::vertexElementLess);
 }
+
 // Utility function to allow the user to modify the layout of vertex buffers.
 void reorganiseVertexBuffers(const String& desc, Mesh& mesh, SubMesh* sm, VertexData* vertexData)
 {
@@ -370,8 +330,7 @@ void reorganiseVertexBuffers(const String& desc, Mesh& mesh, SubMesh* sm, Vertex
                     int eindex = StringConverter::parseInt(moveResp);
                     VertexDeclaration::VertexElementList::iterator movei = elemList.begin();
                     std::advance(movei, eindex);
-                    cout << endl << "Move element " << eindex << "(" + describeSemantic(movei->getSemantic()) <<
-                    ") to which buffer: ";
+                    cout << endl << "Move element " << eindex << "(" + describeSemantic(movei->getSemantic()) << ") to which buffer: ";
                     cin >> moveResp;
                     if (!moveResp.empty()) {
                         int bindex = StringConverter::parseInt(moveResp);
@@ -380,19 +339,18 @@ void reorganiseVertexBuffers(const String& desc, Mesh& mesh, SubMesh* sm, Vertex
                             movei->getSemantic(), movei->getIndex());
                         elemList.sort(vertexElementLess);
                         anyChanges = true;
-                                
+
                     }
                 }
             } else if (response == "a") {
                 // Automatic
-                VertexDeclaration* newDcl = 
+                VertexDeclaration* newDcl =
                     vertexData->vertexDeclaration->getAutoOrganisedDeclaration(
-                        mesh.hasSkeleton(), mesh.hasVertexAnimation(), 
+                        mesh.hasSkeleton(), mesh.hasVertexAnimation(),
                         sm ? sm->getVertexAnimationIncludesNormals() : mesh.getSharedVertexDataAnimationIncludesNormals());
                 copyElems(newDcl, &elemList);
                 HardwareBufferManager::getSingleton().destroyVertexDeclaration(newDcl);
                 anyChanges = true;
-
             } else if (response == "d") {
                 String moveResp;
                 cout << "Which element do you want to delete (type number): ";
@@ -401,7 +359,7 @@ void reorganiseVertexBuffers(const String& desc, Mesh& mesh, SubMesh* sm, Vertex
                     int eindex = StringConverter::parseInt(moveResp);
                     VertexDeclaration::VertexElementList::iterator movei = elemList.begin();
                     std::advance(movei, eindex);
-                    cout << std::endl << "Delete element " << eindex << "(" + describeSemantic(movei->getSemantic()) << ")?: ";
+                    cout << endl << "Delete element " << eindex << "(" + describeSemantic(movei->getSemantic()) << ")?: ";
                     cin >> moveResp;
                     StringUtil::toLowerCase(moveResp);
                     if (moveResp == "y") {
@@ -417,10 +375,9 @@ void reorganiseVertexBuffers(const String& desc, Mesh& mesh, SubMesh* sm, Vertex
                 // finish
                 finish = true;
             } else {
-                std::cout << "Wrong answer!\n";
+                cout << "Wrong answer!\n";
                 response = "";
             }
-            
         }
     }
 
@@ -428,7 +385,7 @@ void reorganiseVertexBuffers(const String& desc, Mesh& mesh, SubMesh* sm, Vertex
         String response;
         while (response.empty()) {
             displayVertexBuffers(elemList);
-            cout << "Really reorganise the vertex buffers this way? ";
+            cout << "Really reorganise the vertex buffers this way? (y/n) ";
             cin >> response;
             StringUtil::toLowerCase(response);
             if (response == "y") {
@@ -457,17 +414,15 @@ void reorganiseVertexBuffers(const String& desc, Mesh& mesh, SubMesh* sm, Vertex
             } else if (response == "n") {
                 // do nothing
             } else {
-                std::cout << "Wrong answer!\n";
+                cout << "Wrong answer!\n";
                 response = "";
             }
         }
-        
     }
-        
-
 }
+
 // Utility function to allow the user to modify the layout of vertex buffers.
-void reorganiseVertexBuffers(Mesh& mesh)
+void reorganiseVertexBuffers(const UpgradeOptions& opts, Mesh& mesh)
 {
     // Make sure animation types up to date
     mesh._determineAnimationTypes();
@@ -477,7 +432,7 @@ void reorganiseVertexBuffers(Mesh& mesh)
             reorganiseVertexBuffers("Shared Geometry", mesh, 0, mesh.sharedVertexData);
         } else {
             // Automatic
-            VertexDeclaration* newDcl = 
+            VertexDeclaration* newDcl =
                 mesh.sharedVertexData->vertexDeclaration->getAutoOrganisedDeclaration(
                 mesh.hasSkeleton(), mesh.hasVertexAnimation(), mesh.getSharedVertexDataAnimationIncludesNormals());
             if (*newDcl != *(mesh.sharedVertexData->vertexDeclaration)) {
@@ -488,7 +443,6 @@ void reorganiseVertexBuffers(Mesh& mesh)
                 }
                 mesh.sharedVertexData->reorganiseBuffers(newDcl, bufferUsages);
             }
-
         }
     }
 
@@ -504,7 +458,7 @@ void reorganiseVertexBuffers(Mesh& mesh)
                 const bool hasVertexAnim = sm->getVertexAnimationType() != Ogre::VAT_NONE;
 
                 // Automatic
-                VertexDeclaration* newDcl = 
+                VertexDeclaration* newDcl =
                     sm->vertexData->vertexDeclaration->getAutoOrganisedDeclaration(
                     mesh.hasSkeleton(), hasVertexAnim, sm->getVertexAnimationIncludesNormals() );
                 if (*newDcl != *(sm->vertexData->vertexDeclaration)) {
@@ -515,44 +469,41 @@ void reorganiseVertexBuffers(Mesh& mesh)
                     }
                     sm->vertexData->reorganiseBuffers(newDcl, bufferUsages);
                 }
-                
             }
         }
     }
 }
 
-
-void vertexBufferReorg(Mesh& mesh)
+void vertexBufferReorg(const UpgradeOptions& opts, Mesh& mesh)
 {
     String response;
 
     if (opts.interactive) {
 
         // Check to see whether we would like to reorganise vertex buffers
-        std::cout << "\nWould you like to reorganise the vertex buffers for this mesh? ";
+        cout << "\nWould you like to reorganise the vertex buffers for this mesh? (y/n) ";
         while (response.empty()) {
             cin >> response;
             StringUtil::toLowerCase(response);
             if (response == "y") {
-                reorganiseVertexBuffers(mesh);
+                reorganiseVertexBuffers(opts, mesh);
             } else if (response == "n") {
                 // Do nothing
             } else {
-                std::cout << "Wrong answer!\n";
+                cout << "Wrong answer!\n";
                 response = "";
             }
         }
     } else if (!opts.dontReorganise) {
-                reorganiseVertexBuffers(mesh);
+                reorganiseVertexBuffers(opts, mesh);
             }
-
 }
 
 void recalcBounds(const VertexData* vdata, AxisAlignedBox& aabb, Real& radius)
 {
-    const VertexElement* posElem = 
+    const VertexElement* posElem =
         vdata->vertexDeclaration->findElementBySemantic(VES_POSITION);
-    
+
     const HardwareVertexBufferSharedPtr buf = vdata->vertexBufferBinding->getBuffer(
         posElem->getSource());
     void* pBase = buf->lock(HardwareBuffer::HBL_READ_ONLY);
@@ -560,17 +511,15 @@ void recalcBounds(const VertexData* vdata, AxisAlignedBox& aabb, Real& radius)
     for (size_t v = 0; v < vdata->vertexCount; ++v) {
         float* pFloat;
         posElem->baseVertexPointerToElement(pBase, &pFloat);
-        
+
         Vector3 pos(pFloat[0], pFloat[1], pFloat[2]);
         aabb.merge(pos);
         radius = std::max(radius, pos.length());
 
         pBase = static_cast<void*>(static_cast<char*>(pBase) + buf->getVertexSize());
-
     }
 
     buf->unlock();
-
 }
 
 void recalcBounds(Mesh* mesh)
@@ -594,8 +543,9 @@ void recalcBounds(Mesh* mesh)
 
 void printLodConfig(const LodConfig& lodConfig)
 {
-    cout << "\n\nLOD config summary:";
-    cout << "\n  lodConfig.strategy=" << lodConfig.strategy->getName();
+    auto logMgr = LogManager::getSingletonPtr();
+    logMgr->logMessage("LOD config summary:");
+    logMgr->logMessage(" - lodConfig.strategy=" + lodConfig.strategy->getName());
     String reductionMethod("Unknown");
     if (lodConfig.levels[0].reductionMethod == LodLevel::VRM_PROPORTIONAL) {
         reductionMethod = "VRM_PROPORTIONAL";
@@ -610,15 +560,17 @@ void printLodConfig(const LodConfig& lodConfig)
     }
     for (unsigned short i = 0; i < lodConfig.levels.size(); i++) {
         const LodLevel& lodLevel = lodConfig.levels[i];
-        cout << "\n  lodConfig.levels[" << i << "].distance=" << lodLevel.distance << distQuantity;
-        cout << "\n  lodConfig.levels[" << i << "].reductionMethod=" <<
-        (lodLevel.manualMeshName.empty() ? reductionMethod : "N/A");
-        cout << "\n  lodConfig.levels[" << i << "].reductionValue=" <<
-        (lodLevel.manualMeshName.empty() ? StringConverter::toString(lodLevel.reductionValue) : "N/A");
-        cout << "\n  lodConfig.levels[" << i << "].manualMeshName=" <<
-        (lodLevel.manualMeshName.empty() ? "N/A" : lodLevel.manualMeshName);
+        logMgr->logMessage(" - lodConfig.levels[" + StringConverter::toString(i) + "].distance=" +
+                           StringConverter::toString(lodLevel.distance) + distQuantity);
+        logMgr->logMessage(" - lodConfig.levels[" + StringConverter::toString(i) + "].reductionMethod=" +
+                           (lodLevel.manualMeshName.empty() ? reductionMethod : "N/A"));
+        logMgr->logMessage(" - lodConfig.levels[" + StringConverter::toString(i) + "].reductionValue=" +
+                           (lodLevel.manualMeshName.empty() ? StringConverter::toString(lodLevel.reductionValue) : "N/A"));
+        logMgr->logMessage(" - lodConfig.levels[" + StringConverter::toString(i) + "].manualMeshName=" +
+                           (lodLevel.manualMeshName.empty() ? "N/A" : lodLevel.manualMeshName));
     }
 }
+
 size_t getUniqueVertexCount(MeshPtr mesh)
 {
 
@@ -631,7 +583,8 @@ size_t getUniqueVertexCount(MeshPtr mesh)
     MeshLodGenerator().generateLodLevels(lodConfig);
     return lodConfig.levels[0].outUniqueVertexCount;
 }
-void buildLod(MeshPtr& mesh)
+
+void buildLod(UpgradeOptions& opts, MeshPtr& mesh)
 {
     String response;
 
@@ -641,8 +594,8 @@ void buildLod(MeshPtr& mesh)
     if (genLod) { // otherwise only ask if not specified on command line
         if (mesh->getNumLodLevels() > 1) {
             do {
-                std::cout << "\nMesh already contains level-of-detail information.\n"
-                             "Do you want to: (u)se it, (r)eplace it, or (d)rop it? ";
+                cout << "\nMesh already contains level-of-detail information.\n"
+                     << "Do you want to: (u)se it, (r)eplace it, or (d)rop it? ";
                 cin >> response;
                 StringUtil::toLowerCase(response);
                 if (response == "u") {
@@ -655,13 +608,13 @@ void buildLod(MeshPtr& mesh)
                 } else if (response == "r") {
                     genLod = true;
                 } else {
-                    std::cout << "Wrong answer!\n";
+                    cout << "Wrong answer!\n";
                     response = "";
                 }
             } while (response == "");
         } else if (askLodDtls) {
             do {
-                std::cout << "\nWould you like to generate level-of-detail information? (y/n) ";
+                cout << "\nWould you like to generate level-of-detail information? (y/n) ";
                 cin >> response;
                 StringUtil::toLowerCase(response);
                 if (response == "n") {
@@ -669,7 +622,7 @@ void buildLod(MeshPtr& mesh)
                 } else if (response == "y") {
                     genLod = true;
                 } else {
-                    std::cout << "Wrong answer!\n";
+                    cout << "Wrong answer!\n";
                     response = "";
                 }
             } while (response == "");
@@ -686,8 +639,7 @@ void buildLod(MeshPtr& mesh)
     lodConfig.strategy = DistanceLodBoxStrategy::getSingletonPtr();
     if (askLodDtls) {
         do {
-            std::cout <<
-            "\nDo you want to (m)anually configure or (a)utoconfigure it?\nautoconfigure=no more questions asked!(m/a) ";
+            cout << "\nDo you want to (m)anually configure or (a)utoconfigure it?\nautoconfigure=no more questions asked! (m/a) ";
             cin >> response;
             StringUtil::toLowerCase(response);
             if (response == "a") {
@@ -695,13 +647,13 @@ void buildLod(MeshPtr& mesh)
             } else if (response == "m") {
                 opts.lodAutoconfigure = false;
             } else {
-                std::cout << "Wrong answer!\n";
+                cout << "Wrong answer!\n";
                 response = "";
             }
         } while (response == "");
         if (!opts.lodAutoconfigure) {
             do {
-                std::cout << "\nDo you want to use (p)ixels or (d)istance to determine where the LOD activates? (p/d) ";
+                cout << "\nDo you want to use (p)ixels or (d)istance to determine where the LOD activates? (p/d) ";
                 cin >> response;
                 StringUtil::toLowerCase(response);
                 if (response == "p") {
@@ -709,16 +661,15 @@ void buildLod(MeshPtr& mesh)
                 } else if (response == "d") {
                     lodConfig.strategy = DistanceLodBoxStrategy::getSingletonPtr();
                 } else {
-                    std::cout << "Wrong answer!\n";
+                    cout << "Wrong answer!\n";
                     response = "";
                 }
             } while (response == "");
             LodLevel lodLevel;
             size_t vertexCount = 0;
             do {
-                cout <<
-                "\nWhat unit of reduction would you like to use(fixed=constant vertex number; proportional=percentage):" <<
-                "\n(f)ixed or (p)roportional? ";
+                cout << "\nWhat unit of reduction would you like to use(fixed=constant vertex number; proportional=percentage): "
+                     << "\n(f)ixed or (p)roportional? ";
                 cin >> response;
                 StringUtil::toLowerCase(response);
                 if (response == "f") {
@@ -727,14 +678,14 @@ void buildLod(MeshPtr& mesh)
                 } else if (response == "p") {
                     lodLevel.reductionMethod = LodLevel::VRM_PROPORTIONAL;
                 } else {
-                    std::cout << "Wrong answer!\n";
+                    cout << "Wrong answer!\n";
                     response = "";
                 }
             } while (response == "");
 
             numLod = 0;
             while (numLod < 1 || numLod > 99) {
-                cout << "\nHow many extra LOD levels would you like to generate? (1-99)";
+                cout << "\nHow many extra LOD levels would you like to generate? (1-99) ";
                 cin >> response;
                 numLod = StringConverter::parseInt(response);
             }
@@ -742,7 +693,7 @@ void buildLod(MeshPtr& mesh)
             Real minDistance = lodConfig.strategy->getBaseValue();
             for (int iLod = 0; iLod < numLod; ++iLod) {
                 do {
-                    cout << "\nShould LOD" << (iLod + 1) << " be a (m)anual or (g)enerated LOD level? (m/g)";
+                    cout << "\nShould LOD" << (iLod + 1) << " be a (m)anual or (g)enerated LOD level? (m/g) ";
                     cin >> response;
                     StringUtil::toLowerCase(response);
                     if (response == "m") {
@@ -787,7 +738,7 @@ void buildLod(MeshPtr& mesh)
                         }
 
                     } else {
-                        std::cout << "Wrong answer!\n";
+                        cout << "Wrong answer!\n";
                         response = "";
                     }
                 } while (response == "");
@@ -820,20 +771,20 @@ void buildLod(MeshPtr& mesh)
                 }
                 minDistance = lodLevel.distance;
                 cout << "\nLOD" << (iLod + 1) << " level summary:";
-                cout << "\n    lodLevel.distance=" << lodLevel.distance;
+                cout << "\n - lodLevel.distance=" << lodLevel.distance;
                 String reductionMethod =
                     ((lodLevel.reductionMethod == LodLevel::VRM_PROPORTIONAL) ? "VRM_PROPORTIONAL" : "VRM_CONSTANT");
-                cout << "\n    lodLevel.reductionMethod=" << (lodLevel.manualMeshName.empty() ? reductionMethod : "N/A");
-                cout << "\n    lodLevel.reductionValue=" <<
+                cout << "\n - lodLevel.reductionMethod=" << (lodLevel.manualMeshName.empty() ? reductionMethod : "N/A");
+                cout << "\n - lodLevel.reductionValue=" <<
                 (lodLevel.manualMeshName.empty() ? StringConverter::toString(lodLevel.reductionValue) : "N/A");
-                cout << "\n    lodLevel.manualMeshName=" << (lodLevel.manualMeshName.empty() ? "N/A" : lodLevel.manualMeshName);
+                cout << "\n - lodLevel.manualMeshName=" << (lodLevel.manualMeshName.empty() ? "N/A" : lodLevel.manualMeshName);
                 lodConfig.levels.push_back(lodLevel);
             }
         }
     } else {
         // not interactive: read parameters from console
         numLod = opts.numLods;
-        LodLevel lodLevel;
+        LodLevel lodLevel = {};
         lodLevel.distance = 0.0;
         for (unsigned short iLod = 0; iLod < numLod; ++iLod) {
 
@@ -860,10 +811,9 @@ void buildLod(MeshPtr& mesh)
     }
     printLodConfig(lodConfig);
 
-
-    cout << "\n\nGenerating LOD levels...";
+    LogManager::getSingleton().logMessage("Generating LOD levels...");
     gen.generateLodLevels(lodConfig);
-    cout << "success\n";
+    LogManager::getSingleton().logMessage("Generating LOD levels... success");
 }
 
 void checkColour(VertexData* vdata, bool& hasColour, bool& hasAmbiguousColour,
@@ -874,11 +824,7 @@ void checkColour(VertexData* vdata, bool& hasColour, bool& hasAmbiguousColour,
          i != elemList.end(); ++i) {
         const VertexElement& elem = *i;
         switch (elem.getType()) {
-        case VET_COLOUR:
-            hasAmbiguousColour = true;
-            OGRE_FALLTHROUGH;
-        case VET_COLOUR_ABGR:
-        case VET_COLOUR_ARGB:
+        case _DETAIL_SWAP_RB:
             hasColour = true;
             originalType = elem.getType();
 
@@ -887,7 +833,6 @@ void checkColour(VertexData* vdata, bool& hasColour, bool& hasAmbiguousColour,
             ;
         }
     }
-
 }
 
 void resolveColourAmbiguities(Mesh* mesh)
@@ -906,84 +851,45 @@ void resolveColourAmbiguities(Mesh* mesh)
         }
     }
 
-    String response;
-    if (hasAmbiguousColour) {
-        if (opts.srcColourFormatSet) {
-            originalType = opts.srcColourFormat;
-        } else {
-            // unknown input colour, have to ask
-            std::cout   << "\nYour mesh has vertex colours but I don't know whether they were generated\n"
-                        << "using GL or D3D ordering. Please indicate which was used when the mesh was\n"
-                        << "created (type 'gl' or 'd3d').\n";
-            while (response.empty()) {
-                cin >> response;
-                StringUtil::toLowerCase(response);
-                if (response == "d3d") {
-                    originalType = VET_COLOUR_ARGB;
-                } else if (response == "gl") {
-                    originalType = VET_COLOUR_ABGR;
-                } else {
-                    std::cout << "Wrong answer!\n";
-                    response = "";
-                }
-            }
-        }
-    }
+    if(!hasColour)
+        return;
 
-    // Ask what format we want to save in
-    VertexElementType desiredType = VET_FLOAT1;
-    if (hasColour) {
-        if (opts.destColourFormatSet) {
-            desiredType = opts.destColourFormat;
-        } else {
-            if (opts.interactive) {
-
-                response = "";
-                std::cout   << "\nYour mesh has vertex colours, which can be stored in one of two layouts,\n"
-                            << "each of which will be slightly faster to load in a different render system.\n"
-                            << "Do you want to prefer Direct3D (d3d) or OpenGL (gl)?\n";
-                while (response.empty()) {
-                    cin >> response;
-                    StringUtil::toLowerCase(response);
-                    if (response == "d3d") {
-                        desiredType = VET_COLOUR_ARGB;
-                    } else if (response == "gl") {
-                        desiredType = VET_COLOUR_ABGR;
-                    } else {
-                        std::cout << "Wrong answer!\n";
-                        response = "";
-                    }
-                }
-            } else {
-                // 'do no harm'
-                return;
-            }
-        }
-
-    }
-
-    if (mesh->sharedVertexData && hasColour) {
+    VertexElementType desiredType = VET_UBYTE4_NORM;
+    if (mesh->sharedVertexData) {
         mesh->sharedVertexData->convertPackedColour(originalType, desiredType);
     }
     for (unsigned short i = 0; i < mesh->getNumSubMeshes(); ++i) {
         SubMesh* sm = mesh->getSubMesh(i);
-        if (sm->useSharedVertices == false && hasColour) {
+        if (!sm->useSharedVertices) {
             sm->vertexData->convertPackedColour(originalType, desiredType);
         }
     }
-
-
 }
 
-struct MaterialCreator : public MeshSerializerListener
+struct MeshResourceCreator : public MeshSerializerListener
 {
     void processMaterialName(Mesh *mesh, String *name)
     {
-        // create material because we do not load any .material files
-        MaterialManager::getSingleton().createOrRetrieve(*name, mesh->getGroup());
+		if(name->empty()) {
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+                "The provided mesh file has an empty material name. See https://ogrecave.github.io/ogre/api/latest/_mesh-_tools.html#autotoc_md32");
+		}
+        else {
+            // create material because we do not load any .material files
+            MaterialManager::getSingleton().createOrRetrieve(*name, mesh->getGroup());
+        }
     }
 
-    void processSkeletonName(Mesh *mesh, String *name) {}
+    void processSkeletonName(Mesh *mesh, String *name)
+    {
+        if (name->empty())
+        {
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "The provided mesh file uses an empty skeleton name");
+        }
+
+        // create skeleton because we do not load any .skeleton files
+        SkeletonManager::getSingleton().createOrRetrieve(*name, mesh->getGroup(), true);
+    }
     void processMeshCompleted(Mesh *mesh) {}
 };
 }
@@ -996,26 +902,13 @@ int main(int numargs, char** args)
     }
 
     int retCode = 0;
-    try 
-    {
-        logMgr = new LogManager();
-        logMgr->createLog("OgreMeshUpgrade.log", true);
-        rgm = new ResourceGroupManager();
-        mth = new Math();
-        lodMgr = new LodStrategyManager();
-        matMgr = new MaterialManager();
-        matMgr->initialise();
-        skelMgr = new SkeletonManager();
-        meshSerializer = new MeshSerializer();
-        MaterialCreator matCreator;
-        meshSerializer->setListener(&matCreator);
-        skeletonSerializer = new SkeletonSerializer();
-        bufferManager = new DefaultHardwareBufferManager(); // needed because we don't have a rendersystem
-        meshMgr = new MeshManager();
-        // don't pad during upgrade
-        meshMgr->setBoundsPaddingFactor(0.0f);
 
-        
+    LogManager logMgr;
+    // this log catches output from the parseArgs call and routes it to stdout only
+    logMgr.createLog("Temporary log", true, true, true);
+
+    try
+    {
         UnaryOptionList unOptList;
         BinaryOptionList binOptList;
 
@@ -1025,11 +918,9 @@ int main(int numargs, char** args)
         unOptList["-tm"] = false;
         unOptList["-tr"] = false;
         unOptList["-r"] = false;
-        unOptList["-gl"] = false;
-        unOptList["-d3d"] = false;
-        unOptList["-srcgl"] = false;
-        unOptList["-srcd3d"] = false;
+        unOptList["-byte"] = true; // this is the only option now, dont error if specified
         unOptList["-autogen"] = false;
+        unOptList["-pack"] = false;
         unOptList["-b"] = false;
         binOptList["-l"] = "";
         binOptList["-d"] = "";
@@ -1039,35 +930,51 @@ int main(int numargs, char** args)
         binOptList["-td"] = "";
         binOptList["-ts"] = "";
         binOptList["-V"] = "";
+        binOptList["-log"] = "OgreMeshUpgrader.log";
 
         int startIdx = findCommandLineOpts(numargs, args, unOptList, binOptList);
-        parseOpts(unOptList, binOptList);
+        auto opts = parseOpts(unOptList, binOptList);
+
+        logMgr.setDefaultLog(NULL); // swallow startup messages
+        Root root("", "", "");
+        // get rid of the temporary log as we use the new log now
+        logMgr.destroyLog("Temporary log");
+
+        // use the log specified by the cmdline params
+        logMgr.setDefaultLog(logMgr.createLog(opts.logFile, true, true));
 
         String source(args[startIdx]);
 
+        MaterialManager::getSingleton().initialise();
+        MeshSerializer meshSerializer;
+        MeshResourceCreator resCreator;
+        meshSerializer.setListener(&resCreator);
+        SkeletonSerializer skeletonSerializer;
+        DefaultHardwareBufferManager bufferManager; // needed because we don't have a rendersystem
+        // don't pad during upgrade
+        MeshManager::getSingleton().setBoundsPaddingFactor(0.0f);
 
         // Load the mesh
         struct stat tagStat;
 
         FILE* pFile = fopen( source.c_str(), "rb" );
         if (!pFile) {
-            OGRE_EXCEPT(Exception::ERR_FILE_NOT_FOUND, 
-                "File " + source + " not found.", "OgreMeshUpgrade");
+            OGRE_EXCEPT(Exception::ERR_FILE_NOT_FOUND,
+                "File " + source + " not found.", "OgreMeshUpgrader");
         }
         stat( source.c_str(), &tagStat );
         MemoryDataStream* memstream = new MemoryDataStream(source, tagStat.st_size, true);
         size_t result = fread( (void*)memstream->getPtr(), 1, tagStat.st_size, pFile );
         if (result != size_t(tagStat.st_size))
             OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
-                "Unexpected error while reading file " + source, "OgreMeshUpgrade");
+                "Unexpected error while reading file " + source, "OgreMeshUpgrader");
         fclose( pFile );
 
-        MeshPtr meshPtr = MeshManager::getSingleton().createManual("conversion",
-                                                                   ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+        MeshPtr meshPtr = MeshManager::getSingleton().createManual("conversion", RGN_DEFAULT);
         Mesh* mesh = meshPtr.get();
 
         DataStreamPtr stream(memstream);
-        meshSerializer->importMesh(stream, mesh);
+        meshSerializer.importMesh(stream, mesh);
 
         // Write out the converted mesh
         String dest;
@@ -1079,44 +986,44 @@ int main(int numargs, char** args)
 
         String response;
 
-        vertexBufferReorg(*mesh);
+        vertexBufferReorg(opts, *mesh);
 
         // Deal with VET_COLOUR ambiguities
         resolveColourAmbiguities(mesh);
-        
-        buildLod(meshPtr);
+
+        buildLod(opts, meshPtr);
 
         if (opts.interactive) {
             do {
-                std::cout << "\nWould you like to (b)uild/(r)emove/(k)eep Edge lists? (b/r/k) ";
+                cout << "\nWould you like to (b)uild/(r)emove/(k)eep Edge lists? (b/r/k) ";
                 cin >> response;
                 StringUtil::toLowerCase(response);
                 if (response == "k") {
                     // Do nothing
                 } else if (response == "b") {
-                    cout << "\nGenerating edge lists...";
+                    cout << "\nGenerating edge lists..." << endl;
                     mesh->buildEdgeList();
-                    cout << "success\n";
+                    cout << "\nGenerating edge lists... success" << endl;
                 } else if (response == "r") {
                     mesh->freeEdgeList();
                 } else {
-                    std::cout << "Wrong answer!\n";
+                    cout << "Wrong answer!\n";
                     response = "";
                 }
             } while (response == "");
         } else {
         // Make sure we generate edge lists, provided they are not deliberately disabled
             if (!opts.suppressEdgeLists) {
-                cout << "\nGenerating edge lists...";
+                logMgr.logMessage("Generating edge lists...");
                 mesh->buildEdgeList();
-                cout << "success\n";
+                logMgr.logMessage("Generating edge lists... success");
             } else {
                 mesh->freeEdgeList();
-        }
+			}
         }
         if (opts.interactive) {
             do {
-                std::cout << "\nWould you like to (g)enerate/(k)eep tangent buffer? (g/k) ";
+                cout << "\nWould you like to (g)enerate/(k)eep tangent buffer? (g/k) ";
                 cin >> response;
                 StringUtil::toLowerCase(response);
                 if (response == "k") {
@@ -1124,7 +1031,7 @@ int main(int numargs, char** args)
                 } else if (response == "g") {
                     opts.generateTangents = true;
                 } else {
-                    std::cout << "Wrong answer!\n";
+                    cout << "Wrong answer!\n";
                     response = "";
                 }
             } while (response == "");
@@ -1136,9 +1043,9 @@ int main(int numargs, char** args)
             if (existing) {
                 if (opts.interactive) {
                     do {
-                    std::cout << "\nThis mesh appears to already have a set of tangents, " <<
-                        "which would suggest tangent vectors have already been calculated. Do you really " <<
-                        "want to generate new tangent vectors (may duplicate)? (y/n) ";
+                        cout << "\nThis mesh appears to already have a set of tangents, "
+                             << "which would suggest tangent vectors have already been calculated. Do you really "
+                             << "want to generate new tangent vectors (may duplicate)? (y/n) ";
                         cin >> response;
                         StringUtil::toLowerCase(response);
                         if (response == "y") {
@@ -1146,7 +1053,7 @@ int main(int numargs, char** args)
                         } else if (response == "n") {
                             opts.generateTangents = false;
                         } else {
-                            std::cout << "Wrong answer!\n";
+                            cout << "Wrong answer!\n";
                             response = "";
                         }
 
@@ -1158,39 +1065,33 @@ int main(int numargs, char** args)
 
             }
             if (opts.generateTangents) {
-                cout << "\nGenerating tangent vectors....";
+                logMgr.logMessage("Generating tangent vectors...");
                 mesh->buildTangentVectors(opts.tangentSemantic, srcTex, destTex,
-                    opts.tangentSplitMirrored, opts.tangentSplitRotated, 
+                    opts.tangentSplitMirrored, opts.tangentSplitRotated,
                     opts.tangentUseParity);
-                cout << "success" << std::endl;
+                logMgr.logMessage("Generating tangent vectors... success");
             }
         }
 
+        if(opts.packNormalsTangents)
+        {
+            mesh->_convertVertexElement(VES_NORMAL, VET_INT_10_10_10_2_NORM);
+            mesh->_convertVertexElement(VES_TANGENT, VET_INT_10_10_10_2_NORM);
+        }
 
         if (opts.recalcBounds) {
             recalcBounds(mesh);
         }
 
-        meshSerializer->exportMesh(mesh, dest, opts.targetVersion, opts.endian);
-    
+        meshSerializer.exportMesh(mesh, dest, opts.targetVersion, opts.endian);
+
+        logMgr.setDefaultLog(NULL); // swallow shutdown messages
     }
     catch (Exception& e)
     {
-        cout << "Exception caught: " << e.getDescription();
+        LogManager::getSingleton().logError(e.getDescription());
         retCode = 1;
     }
 
-
-    delete meshMgr;
-    delete skeletonSerializer;
-    delete meshSerializer;
-    delete skelMgr;
-    delete matMgr;
-    delete lodMgr;
-    delete mth;
-    delete rgm;
-    delete logMgr;
-
     return retCode;
-
 }

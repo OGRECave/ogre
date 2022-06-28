@@ -62,35 +62,20 @@ namespace Ogre {
             NativeDisplayType mNativeDisplay;
 
             bool mIsExternalDisplay;
-            struct EGLVideoMode {
-                typedef std::pair<uint, uint> ScreenSize;
-                typedef short Rate;
-                ScreenSize first;
-                Rate second;
-                EGLVideoMode() {}
-                EGLVideoMode(const VideoMode& m) : first(m.width, m.height), second(m.refreshRate) {}
-
-                bool operator!=(const EGLVideoMode& o) const
-                {
-                    return first != o.first || second != o.second;
-                }
-            };
-            typedef std::vector<EGLVideoMode> EGLVideoModes;
 
             VideoMode mOriginalMode;
             VideoMode mCurrentMode;
 
             EGLint mEGLMajor, mEGLMinor;
 
-            //virtual EGLWindow* createEGLWindow( EGLSupport * support) = 0;
-
+            bool hasEGL15;
             void initialiseExtensions();
         public:
             EGLSupport(int profile);
 
             void start(void);
             void stop(void);
-            virtual String getDisplayName (void);
+
             EGLDisplay getGLDisplay(void);
             void setGLDisplay(EGLDisplay val);
             EGLConfig* chooseGLConfig(const EGLint *attribList, EGLint *nElements);
@@ -106,12 +91,14 @@ namespace Ogre {
                 return NULL;
             }
 
+            GLPBuffer* createPBuffer(PixelComponentType format, size_t width, size_t height) override;
+
             ::EGLConfig getGLConfigFromContext(::EGLContext context);
             ::EGLConfig getGLConfigFromDrawable(::EGLSurface drawable,
                                                 unsigned int *w, unsigned int *h);
             ::EGLConfig selectGLConfig (const EGLint* minAttribs, const EGLint *maxAttribs);
             void switchMode(void);
-            virtual void switchMode(uint& width, uint& height, short& frequency) = 0;
+            virtual void switchMode(uint& width, uint& height, short& frequency) {}
            // virtual GLPBuffer* createPBuffer(PixelComponentType format,
             //                           size_t width, size_t height) = 0;
 //          NativeDisplayType getNativeDisplay();

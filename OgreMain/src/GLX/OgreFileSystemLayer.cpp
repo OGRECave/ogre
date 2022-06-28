@@ -31,6 +31,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <pwd.h>
+#include <dlfcn.h>
 
 namespace Ogre
 {
@@ -80,7 +81,8 @@ namespace Ogre
     {
         // With Ubuntu snaps absolute paths are relative to the snap package.
         char* env_SNAP = getenv("SNAP");
-        if(env_SNAP && !path.empty() && path[0] == '/') // only adjust absolute dirs
+        if (env_SNAP && !path.empty() && path[0] == '/' && // only adjust absolute dirs
+            !StringUtil::startsWith(path, "/snap")) // not a snap path already
             path = env_SNAP + path;
 
         return path;
@@ -107,17 +109,26 @@ namespace Ogre
             Ogre::String::size_type pos = appPath.rfind('/');
             if (pos != Ogre::String::npos)
                 appPath.erase(pos);
-        }
-        else
-        {
-            // couldn't find actual executable path, assume current working dir
-            appPath = ".";
+
+            // use application path as first config search path
+            mConfigPaths.push_back(appPath + '/');
         }
 
-        // use application path as first config search path
-        mConfigPaths.push_back(appPath + '/');
-        // then search inside ../share/OGRE
-        mConfigPaths.push_back(appPath + "/../share/OGRE/");
+        Dl_info info;
+        if (dladdr((const void*)resolveSymlink, &info))
+        {
+            String base(info.dli_fname);
+            // need to strip the module filename from the path
+            String::size_type pos = base.rfind('/');
+            if (pos != String::npos)
+                base.erase(pos);
+
+            // search inside ../share/OGRE
+            mConfigPaths.push_back(StringUtil::normalizeFilePath(base + "/../share/OGRE/", false));
+            // then look relative to PIP structure
+            mConfigPaths.push_back(StringUtil::normalizeFilePath(base+"/../../../../share/OGRE/"));
+        }
+
         // then try system wide /etc
         mConfigPaths.push_back("/etc/OGRE/");
     }

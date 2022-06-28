@@ -1,15 +1,52 @@
-# High-level Programs {#High-level-Programs}
+# GPU Program Scripts {#High-level-Programs}
 
-Support for high level vertex and fragment programs is provided through plugins; this is to make sure that an application using OGRE can use as little or as much of the high-level program functionality as they like. OGRE currently supports 3 high-level program types, Cg ([Cg](#Cg)) (an API- and card-independent, high-level language which lets you write programs for both OpenGL and DirectX for lots of cards), DirectX 9 High-Level Shader Language ([HLSL](#HLSL)), and OpenGL Shader Language ([GLSL](#GLSL)). HLSL can only be used with the DirectX rendersystem, and GLSL can only be used with the GL rendersystem. Cg can be used with both, although experience has shown that more advanced programs, particularly fragment programs which perform a lot of texture fetches, can produce better code in the rendersystem-specific shader language. 
-
-One way to support both HLSL and GLSL is to include separate techniques in the material script, each one referencing separate programs. However, if the programs are basically the same, with the same parameters, and the techniques are complex this can bloat your material scripts with duplication fairly quickly. Instead, if the only difference is the language of the vertex & fragment program you can use OGRE’s [Unified High-level Programs](#Unified-High_002dlevel-Programs) to automatically pick a program suitable for your rendersystem whilst using a single technique.
+@anchor Declaring-Vertex_002fGeometry_002fFragment-Programs
 
 @tableofcontents
 
+In order [to use a vertex, geometry or fragment program in your materials](@ref Using-Vertex_002fGeometry_002fFragment-Programs-in-a-Pass), you first have to define them. A single program definition can be used by any number of materials, the only prerequisite is that a program must be defined before being referenced in the pass section of a material.
 
-# Preprocessor definitions {#Preprocessor-definitions}
+The definition of a program can either be embedded in the .material script itself (in which case it must precede any references to it in the script), or if you wish to use the same program across multiple .material files, you can define it in an external .program script. You define the program in exactly the same way whether you use a .program script or a .material script, the only difference is that all .program scripts are guaranteed to have been parsed before **all** .material scripts, so you can guarantee that your program has been defined before any .material script that might use it. Just like .material scripts, .program scripts will be read from any location which is on your resource path, and you can define many programs in a single script.
 
-Both GLSL and HLSL support using preprocessor definitions in your code - some are defined by the implementation, but you can also define your own, say in order to use the same source code for a few different variants of the same technique. In order to use this feature, include preprocessor conditions in your code, of the kind \#ifdef SYMBOL, \#if SYMBOL==2 etc. Then in your program definition, use the ’preprocessor\_defines’ option, following it with a string of definitions. Definitions are separated by ’;’ or ’,’ and may optionally have a ’=’ operator within them to specify a definition value. Those without an ’=’ will implicitly have a definition of 1. For example:
+Vertex, geometry and fragment programs can be low-level (i.e. assembler code written to the specification of a given low level syntax such as vs\_1\_1 or arbfp1) or high-level such as DirectX HLSL and OpenGL GLSL. High level languages give you a number of advantages, such as being able to write more intuitive code, and possibly being able to target multiple architectures in a single program (for example, the same Cg program might be able to be used in both D3D and GL, whilst the equivalent low-level programs would require separate techniques, each targeting a different API). High-level programs also allow you to use named parameters instead of simply indexed ones, although parameters are not defined here, they are used in the Pass.
+
+Here is an example of a definition of a low-level vertex program:
+
+```cpp
+vertex_program myVertexProgram asm
+{
+    source myVertexProgram.asm
+    syntax vs_1_1
+}
+```
+
+As you can see, that’s very simple, and defining a fragment or geometry program is exactly the same, just with @c vertex_program replaced with @c fragment_program or @c geometry_program, respectively. You give the program a name in the header, followed by the word ’asm’ to indicate that this is a low-level program. Inside the braces, you specify where the source is going to come from (and this is loaded from any of the resource locations as with other media), and also indicate the syntax being used. You might wonder why the syntax specification is required when many of the assembler syntaxes have a header identifying them anyway - well the reason is that the engine needs to know what syntax the program is in before reading it, because during compilation of the material, we want to skip programs which use an unsupportable syntax quickly, without loading the program first.
+
+# Default Program Parameters {#Default-Program-Parameters}
+
+While defining a vertex, geometry or fragment program, you can also specify the default parameters to be used for materials which use it, unless they specifically override them. You do this by including a nested ’default\_params’ section, like so:
+
+@snippet Samples/Media/materials/scripts/Examples-Advanced.material celshading_vp
+
+The syntax of the parameter definition is exactly the same as when you define parameters when using programs, See @ref Program-Parameter-Specification. Defining default parameters allows you to avoid rebinding common parameters repeatedly (clearly in the above example, all but ’shininess’ are unlikely to change between uses of the program) which makes your material declarations shorter.
+
+# High Level Programs
+
+Support for high level vertex and fragment programs is provided through plugins; this is to make sure that an application using OGRE can use as little or as much of the high-level program functionality as they like. OGRE supports multiple high-level program types. Notably DirectX [HLSL](#HLSL), and OpenGL [GLSL](#GLSL). HLSL can only be used with the DirectX rendersystem, and GLSL can only be used with the GL rendersystem.
+
+One way to support both HLSL and GLSL is to include separate techniques in the material script, each one referencing separate programs. However, if the programs are basically the same, with the same parameters, and the techniques are complex this can bloat your material scripts with duplication fairly quickly. Instead, if the only difference is the language of the vertex & fragment program you can use OGRE’s [Unified High-level Programs](#Unified-High_002dlevel-Programs) to automatically pick a program suitable for your rendersystem whilst using a single technique.
+
+There is also [Cg](#Cg) which is deprecated, but allows to use the same Shader code across different APIs - although experience has shown that more advanced programs, particularly fragment programs which perform a lot of texture fetches, can produce better code in the rendersystem-specific shader language.
+The better alternative to Cg is to use @ref multi-language-programs with `OgreUnifiedShader.h`. This achieves the same goal as Cg, but uses only a few straightforward preprocessor macros.
+
+## Preprocessor definitions {#Preprocessor-definitions}
+
+Both GLSL and HLSL support using preprocessor definitions in your code - some are defined by the implementation, but you can also define your own, say in order to use the same source code for a few different variants of the same technique. In order to use this feature, include preprocessor conditions in your code, of the kind <tt>\#ifdef SYMBOL</tt>, <tt>\#if SYMBOL==2</tt> etc. Then in your program definition, use the `preprocessor_defines` option, following it with a string of definitions. Definitions are separated by `;` or `,` and may optionally have a `=` operator within them to specify a definition value. Those without an `=` will implicitly have a definition of 1.
+
+@par
+Format: preprocessor_defines &lt;defines&gt;
+@par
+Example: preprocessor_defines CLEVERTECHNIQUE,NUMTHINGS=2
 
 ```cpp
 // in your shader
@@ -25,14 +62,23 @@ Both GLSL and HLSL support using preprocessor definitions in your code - some ar
 #else
     // something else
 #endif
-
-// in  your program definition
-preprocessor_defines CLEVERTECHNIQUE,NUMTHINGS=2
 ```
 
-This way you can use the same source code but still include small variations, each one defined as a different Ogre program name but based on the same source code.
+This way you can use the same source code but still include small variations, each one defined as a different %Ogre program name but based on the same source code.
 
-@note on GLSL %Ogre pre-processes the source itself instead on relying on the driver implementation which is often buggy. This relaxes using \#ifdef directives compared to the standard - e.g. you can \#ifdef \#version. However this means that defines specified in GLSL extensions are not present.
+@note on GLSL %Ogre pre-processes the source itself instead on relying on the driver implementation which is often buggy. This relaxes using @c \#ifdef directives compared to the standard - e.g. you can <tt>\#ifdef \#version</tt>. However this means that defines specified in GLSL extensions are not present.
+
+## Entry Point
+
+The parameter @c entry_point, specifies the name of a function which will be the first one called as part of the program. Unlike assembler programs, which just run top-to-bottom, high-level programs can include multiple functions and as such you must specify the one which start the ball rolling.
+If you omit this line, %Ogre will default to looking for a function called `main`.
+
+@par
+Format: entry_point &lt;name&gt;
+@par
+Example: entry_point main_vp
+
+@note on GLSL the @c entry_point is required to be `main`
 
 # Cg programs {#Cg}
 
@@ -42,14 +88,16 @@ In order to define Cg programs, you have to have to load Plugin\_CgProgramManage
 fragment_program myCgFragmentProgram cg
 {
     source myCgFragmentProgram.cg
-    entry_point main
+    entry_point main_fp
     profiles ps_2_0 arbfp1
 }
 ```
 
-There are a few differences between this and the assembler program - to begin with, we declare that the fragment program is of type `cg` rather than `asm`, which indicates that it’s a high-level program using Cg. The `source` parameter is the same, except this time it’s referencing a Cg source file instead of a file of assembler.  Here is where things start to change. Firstly, we need to define an `entry_point`, which is the name of a function in the Cg program which will be the first one called as part of the fragment program. Unlike assembler programs, which just run top-to-bottom, Cg programs can include multiple functions and as such you must specify the one which start the ball rolling. Next, instead of a fixed `syntax` parameter, you specify one or more `profiles`; profiles are how Cg compiles a program down to the low-level assembler. The profiles have the same names as the assembler syntax codes mentioned above; the main difference is that you can list more than one, thus allowing the program to be compiled down to more low-level syntaxes so you can write a single high-level program which runs on both D3D and GL. You are advised to just enter the simplest profiles under which your programs can be compiled in order to give it the maximum compatibility. The ordering also matters; if a card supports more than one syntax then the one listed first will be used.
+There are a few differences between this and the assembler program - to begin with, we declare that the fragment program is of type `cg` rather than `asm`, which indicates that it’s a high-level program using Cg. The `source` parameter is the same, except this time it’s referencing a Cg source file instead of a file of assembler.
 
-Lastly, there is a final option called `compile_arguments`, where you can specify arguments exactly as you would to the cgc command-line compiler, should you wish to.
+Here is where things start to change. Instead of a fixed `syntax` parameter, you specify one or more `profiles`; profiles are how Cg compiles a program down to the low-level assembler. The profiles have the same names as the assembler syntax codes mentioned above; the main difference is that you can list more than one, thus allowing the program to be compiled down to more low-level syntaxes so you can write a single high-level program which runs on both D3D and GL. You are advised to just enter the simplest profiles under which your programs can be compiled in order to give it the maximum compatibility. The ordering also matters; if a card supports more than one syntax then the one listed first will be used.
+
+@note Instead of `preprocessor_defines` Cg uses the `compile_arguments` option where you can specify arguments exactly as you would to the [cgc command-line compiler](http://developer.download.nvidia.com/cg/cgc.html). While this gives you more flexibility, it means that you must specify the defines as `-DSYMBOL` separated by spaces. Keep this in mind when copying program definitions across the supported languages.
 
 # DirectX HLSL {#HLSL}
 
@@ -59,7 +107,7 @@ DirectX HLSL has an almost identical language syntax to Cg but is tied to the Di
 vertex_program myHLSLVertexProgram hlsl
 {
     source myHLSLVertexProgram.hlsl
-    entry_point main
+    entry_point main_vp
     target vs_2_0
 }
 ```
@@ -97,9 +145,9 @@ vertex_program myGLSLVertexProgram glsl
 
 In GLSL, no entry point needs to be defined since it is always `main()` and there is no target definition since GLSL source is compiled into native GPU code and not intermediate assembly. 
 
-For modularity %Ogre supports the non-standard `#include <something.glsl>` directive in GLSL. It also works with OpenGL ES and resembles what is available with HLSL and Cg.
+For modularity %Ogre supports the non-standard <tt>\#include <something.glsl></tt> directive in GLSL. It also works with OpenGL ES and resembles what is available with HLSL and Cg.
 
-@deprecated The @c attach keyword for multi-module shaders is not supported on OpenGL ES and therefore deprecated in favor of the `#include` directive
+@deprecated The @c attach keyword for multi-module shaders is not supported on OpenGL ES and therefore deprecated in favor of the @c \#include directive
 
 ```cpp
 vertex_program myExternalGLSLFunction glsl
@@ -217,8 +265,8 @@ refer to the following table for the location indices and names to use:
 | Ogre::VES_POSITION | vertex | 0 | gl_Vertex |
 | Ogre::VES_BLEND_WEIGHTS | blendWeights | 1 | n/a |
 | Ogre::VES_NORMAL | normal | 2 | gl_Normal |
-| Ogre::VES_DIFFUSE | colour | 3 | gl_Color |
-| Ogre::VES_SPECULAR | secondary_colour | 4 | gl_SecondaryColor |
+| Ogre::VES_COLOUR | colour | 3 | gl_Color |
+| Ogre::VES_COLOUR2 | secondary_colour | 4 | gl_SecondaryColor |
 | Ogre::VES_BLEND_INDICES | blendIndices | 7 | n/a |
 | Ogre::VES_TEXTURE_COORDINATES | uv0 - uv7 | 8-15 | gl_MultiTexCoord0 - gl_MultiTexCoord7 |
 | Ogre::VES_TANGENT | tangent | 14 | n/a |
@@ -262,6 +310,80 @@ geometry_program Ogre/GPTest/Swizzle_GP_GLSL glsl
 ```
 
 With GL3+ these values are specified using the `layout` modifier.
+
+# Assembler Shaders
+
+The current supported syntaxes are:
+
+<dl compact="compact">
+<dt>vs_*</dt> <dd>
+
+These is are the DirectX vertex shader assembler syntaxes.
+
+</dd> <dt>arbvp1</dt> <dd>
+
+This is the OpenGL standard assembler format for vertex programs. It’s roughly equivalent to DirectX vs\_1\_1.
+
+</dd> <dt>vp*</dt> <dd>
+
+These are nVidia-specific OpenGL vertex shader syntax which is a superset of vs_1_1_, that have otherwise no equivalent in OpenGL.
+
+</dd>
+<dt>ps_*</dt> <dd>
+
+DirectX pixel shader (i.e. fragment program) assembler syntax.
+@note for ATI 8500, 9000, 9100, 9200 hardware, these profiles can also be used in OpenGL. The ATI 8500 to 9200 do not support arbfp1 but do support atifs extension in OpenGL which is very similar in function to ps\_1\_4 in DirectX. Ogre has a built in ps\_1\_x to atifs compiler that is automatically invoked when ps\_1\_x is used in OpenGL on ATI hardware.
+
+</dd>
+<dt>arbfp1</dt> <dd>
+
+This is the OpenGL standard assembler format for fragment programs. It’s roughly equivalent to ps\_2\_0, which means that not all cards that support basic pixel shaders under DirectX support arbfp1 (for example neither the GeForce3 or GeForce4 support arbfp1, but they do support ps\_1\_1).
+
+</dd> <dt>fp20</dt> <dd>
+
+This is an nVidia-specific OpenGL fragment syntax which is a superset of ps 1.3. It allows you to use the [nvparse format](https://www.nvidia.com/attach/6400) for basic fragment programs. It actually uses NV\_texture\_shader and NV\_register\_combiners to provide functionality equivalent to DirectX’s ps\_1\_1 under GL, but only for nVidia cards. However, since ATI cards adopted arbfp1 a little earlier than nVidia, it is mainly nVidia cards like the GeForce3 and GeForce4 that this will be useful for.
+
+</dd> <dt>fp*</dt> <dd>
+
+Another nVidia-specific OpenGL fragment shader syntax.
+
+</dd>
+<dt>gpu\_gp, gp4\_gp</dt> <dd>
+
+An nVidia-specific OpenGL geometry shader syntax. <br> Supported cards: nVidia GeForce FX8 series<br>
+
+</dd> </dl>
+
+You can get a definitive list of the syntaxes supported by the current card by calling `Ogre::GpuProgramManager::getSupportedSyntax()`.
+
+## Specifying Named Constants {#Specifying-Named-Constants-for-Assembler-Shaders}
+
+Assembler shaders don’t have named constants (also called uniform parameters) because the language does not support them - however if you for example decided to precompile your shaders from a high-level language down to assembler for performance or obscurity, you might still want to use the named parameters. Well, you actually can - GpuNamedConstants which contains the named parameter mappings has a ’save’ method which you can use to write this data to disk, where you can reference it later using the manual\_named\_constants directive inside your assembler program declaration, e.g.
+
+```cpp
+vertex_program myVertexProgram asm
+{
+    source myVertexProgram.asm
+    syntax vs_1_1
+    manual_named_constants myVertexProgram.constants
+}
+```
+
+In this case myVertexProgram.constants has been created by calling `Ogre::GpuNamedConstants::save("myVertexProgram.constants");` sometime earlier as preparation, from the original high-level program. Once you’ve used this directive, you can use named parameters here even though the assembler program itself has no knowledge of them.
+
+# Multi-language Programs {#multi-language-programs}
+
+Basic programs, like the `example.frag` stated above, are compatible with GLSL and GLSLES. To avoid duplicating the whole
+program declaration, you can simply specify all the language types the program is compatible with as:
+
+```cpp
+fragment_program myFragmentShader glsl glsles
+{
+    source example.frag
+}
+```
+
+If you use the built-in defines like @c OGRE_HLSL, you can even write programs compatible with both HLSL and GLSL. In fact, you can use `#include <OgreUnifiedShader.h>` in the shader which provides cross-language macros to help with this.
 
 # Unified High-level Programs {#Unified-High_002dlevel-Programs}
 
@@ -402,31 +524,9 @@ material SupportHLSLandGLSLwithUnified
 }
 ```
 
-At runtime, when myVertexProgram or myFragmentProgram are used, OGRE automatically picks a real program to delegate to based on what’s supported on the current hardware / rendersystem. If none of the delegates are supported, the entire technique referencing the unified program is marked as unsupported and the next technique in the material is checked fro fallback, just like normal. As your materials get larger, and you find you need to support HLSL and GLSL specifically (or need to write multiple interface-compatible versions of a program for whatever other reason), unified programs can really help reduce duplication.
+At runtime, when myVertexProgram or myFragmentProgram are used, OGRE automatically picks a real program to delegate to based on what’s supported on the current hardware / rendersystem. If none of the delegates are supported, the entire technique referencing the unified program is marked as unsupported and the next technique in the material is checked for fallback, just like normal. As your materials get larger, and you find you need to support HLSL and GLSL specifically (or need to write multiple interface-compatible versions of a program for whatever other reason), unified programs can really help reduce duplication.
 
-# Using GPU Programs in a Pass {#Using-Vertex_002fGeometry_002fFragment-Programs-in-a-Pass}
-
-Within a pass section of a material script, you can reference a vertex, geometry and / or a fragment program which is been defined in a .program script (See @ref Declaring-Vertex_002fGeometry_002fFragment-Programs). The programs are defined separately from the usage of them in the pass, since the programs are very likely to be reused between many separate materials, probably across many different .material scripts, so this approach lets you define the program only once and use it many times.
-
-As well as naming the program in question, you can also provide parameters to it. Here’s a simple example:
-
-```cpp
-vertex_program_ref myVertexProgram
-{
-    param_indexed_auto 0 worldviewproj_matrix
-    param_indexed      4 float4  10.0 0 0 0
-}
-```
-
-In this example, we bind a vertex program called ’myVertexProgram’ (which will be defined elsewhere) to the pass, and give it 2 parameters, one is an ’auto’ parameter, meaning we do not have to supply a value as such, just a recognised code (in this case it’s the world/view/projection matrix which is kept up to date automatically by Ogre). The second parameter is a manually specified parameter, a 4-element float. The indexes are described later.
-
-The syntax of the link to a vertex program and a fragment or geometry program are identical, the only difference is that ’fragment\_program\_ref’ and ’geometry\_program\_ref’ are used respectively instead of ’vertex\_program\_ref’.
-
-For many situations vertex, geometry and fragment programs are associated with each other in a pass but this is not cast in stone. You could have a vertex program that can be used by several different fragment programs. Another situation that arises is that you can mix fixed pipeline and programmable pipeline (shaders) together. You could use the non-programmable vertex fixed function pipeline and then provide a fragment\_program\_ref in a pass i.e. there would be no vertex\_program\_ref section in the pass. The fragment program referenced in the pass must meet the requirements as defined in the related API in order to read from the outputs of the vertex fixed pipeline. You could also just have a vertex program that outputs to the fragment fixed function pipeline.
-
-The requirements to read from or write to the fixed function pipeline are similar between rendering API’s (DirectX and OpenGL) but how its actually done in each type of shader (vertex, geometry or fragment) depends on the shader language. For HLSL (DirectX API) and associated asm consult MSDN at <http://msdn.microsoft.com/library/>. For GLSL (OpenGL), consult section 7.6 of the GLSL spec 1.1 available at <http://www.opengl.org/registry/>. The built in varying variables provided in GLSL allow your program to read/write to the fixed function pipeline varyings. For Cg consult the Language Profiles section in CgUsersManual.pdf that comes with the Cg Toolkit available at <https://developer.nvidia.com/cg-toolkit>. For HLSL and Cg its the varying bindings that allow your shader programs to read/write to the fixed function pipeline varyings.
-
-## Parameter specification {#Program-Parameter-Specification}
+# Parameter specification {#Program-Parameter-Specification}
 
 Parameters can be specified using one of 4 commands as shown below. The same syntax is used whether you are defining a parameter just for this particular use of the program, or when specifying the @ref Default-Program-Parameters. Parameters set in the specific use of the program override the defaults.
 
@@ -463,14 +563,14 @@ a space or tab-delimited list of values which can be converted into the type you
 This command tells Ogre to automatically update a given parameter with a derived value. This frees you from writing code to update program parameters every frame when they are always changing.
 
 @par
-Format: param\_indexed\_auto &lt;index&gt; &lt;value\_code&gt; &lt;extra\_params&gt;
+Format: param\_indexed\_auto &lt;index&gt; &lt;autoConstType&gt; &lt;extraInfo&gt;
 @par
 Example: param\_indexed\_auto 0 worldviewproj\_matrix
 
 @param index
 has the same meaning as [param\_indexed](#param_005findexed); note this time you do not have to specify the size of the parameter because the engine knows this already. In the example, the world/view/projection matrix is being used so this is implicitly a matrix4x4.
 
-@param value_code
+@param autoConstType, extraInfo
 is one of Ogre::GpuProgramParameters::AutoConstantType without the `ACT_` prefix. E.g. `ACT_WORLD_MATRIX` becomes `world_matrix`.
 
  <a name="param_005fnamed"></a><a name="param_005fnamed-1"></a>
@@ -492,11 +592,11 @@ The type is required because the program is not compiled and loaded when the mat
 This is the named equivalent of param\_indexed\_auto, for use with high-level programs.
 
 @par
-Format: param\_named\_auto &lt;name&gt; &lt;value\_code&gt; &lt;extra\_params&gt;
+Format: param\_named\_auto &lt;name&gt; &lt;autoConstType&gt; &lt;extraInfo&gt;
 @par
 Example: param\_named\_auto worldViewProj worldviewproj\_matrix
 
-The allowed value codes and the meaning of extra\_params are detailed in [param\_indexed\_auto](#param_005findexed_005fauto).
+The allowed @c autoConstType and the meaning of @c extraInfo are detailed in [param\_indexed\_auto](#param_005findexed_005fauto).
 
 <a name="shared_005fparams_005fref"></a><a name="shared_005fparams_005fref-1"></a>
 
@@ -508,7 +608,50 @@ Format: shared\_params\_ref &lt;shared\_set\_name&gt;
 @par
 Example: shared\_params\_ref mySharedParams
 
-The only required parameter is a name, which must be the name of an already defined shared parameter set. All named parameters which are present in the program that are also present in the shared parameter set will be linked, and the shared parameters used as if you had defined them locally. This is dependent on the definitions (type and array size) matching between the shared set and the program.
+The only required parameter is a name, which must be the name of an already defined shared parameter set. All named parameters which are present in both the program and the shared parameter set will be linked, and the shared parameters values will be used.
+
+# Declaring Shared Parameters {#Declaring-Shared-Parameters}
+
+Often, not every parameter you want to pass to a shader is unique to that program, and perhaps you want to give the same value to a number of different programs, and a number of different materials using that program. Shared parameter sets allow you to define a ’holding area’ for shared parameters that can then be referenced when you need them in particular shaders, while keeping the definition of that value in one place. To define a set of shared parameters, you do this:
+
+```cpp
+shared_params YourSharedParamsName
+{
+    shared_param_named mySharedParam1 float4 0.1 0.2 0.3 0.4
+    ...
+}
+```
+
+As you can see, you need to use the keyword ’shared\_params’ and follow it with the name that you will use to identify these shared parameters. Inside the curly braces, you can define one parameter per line, in a way which is very similar to the [param\_named](#param_005fnamed) syntax. The definition of these lines is:
+@par
+Format: shared\_param\_named &lt;param\_name&gt; &lt;param\_type&gt; \[&lt;\[array\_size\]&gt;\] \[&lt;initial\_values&gt;\]
+
+@param param_name must be unique within the set
+@param param_type can be any one of float, float2, float3, float4, int, int2, int3, int4, matrix2x2, matrix2x3, matrix2x4, matrix3x2, matrix3x3, matrix3x4, matrix4x2, matrix4x3 and matrix4x4.
+@param array_size allows you to define arrays of param\_type should you wish, and if present must be a number enclosed in square brackets (and note, must be separated from the param\_type with whitespace).
+@param initial_values If you wish, you can also initialise the parameters by providing a list of values.
+
+Once you have defined the shared parameters, you can reference them inside default\_params and params blocks using [shared\_params\_ref](#shared_005fparams_005fref). You can also obtain a reference to them in your code via Ogre::GpuProgramManager::getSharedParameters, and update the values for all instances using them.
+
+## Hardware Support
+
+Furthermore, shared_params can be mapped to hardware buffers, if supported by the RenderSystem. To enable this, you have to provide a matching declaration in your shader.
+
+For HLSL, that would be a constant buffer defined as
+```cpp
+cbuffer YourSharedParamsName
+{
+    float4 mySharedParam1;
+}
+```
+
+and for GLSL a uniform block defined as
+```cpp
+layout(std140, row_major) uniform YourSharedParamsName
+{
+    vec4 mySharedParam1;
+};
+```
 
 # Shadows and Vertex Programs {#Shadows-and-Vertex-Programs}
 
@@ -517,40 +660,65 @@ When using @ref Shadows, the use of vertex programs can add some additional comp
 - If you use **stencil shadows**, then any vertex programs which do vertex deformation can be a problem, because stencil shadows are calculated on the CPU, which does not have access to the modified vertices. If the vertex program is doing standard skeletal animation, this is ok (see section above) because %Ogre knows how to replicate the effect in software, but any other vertex deformation cannot be replicated, and you will either have to accept that the shadow will not reflect this deformation, or you should turn off shadows for that object.
 - If you use **texture shadows**, then vertex deformation is acceptable; however, when rendering the object into the shadow texture (the shadow caster pass), the shadow has to be rendered in a solid colour (linked to the ambient colour). You must therefore provide an alternative vertex program, so %Ogre provides you with a way of specifying one to use when rendering the caster.
 
-Basically you link an alternative vertex program, using exactly the same syntax as the original vertex program link:
+Basically you specify an alternate material to use when rendering the object into the shadow texture:
 
 ```cpp
-shadow_caster_vertex_program_ref myShadowCasterVertexProgram
+technique myShaderBasedTechnique
 {
-    param_indexed_auto 0 worldviewproj_matrix
-    param_indexed_auto 4 ambient_light_colour
+    shadow_caster_material myShadowCasterMaterial
+    pass
+    {
+        ...
+    }
 }
 ```
 
-When rendering a shadow caster, Ogre will automatically use the alternate program. You can bind the same or different parameters to the program - the most important thing is that you bind **ambient\_light\_colour**, since this determines the colour of the shadow in modulative texture shadows. If you don’t supply an alternate program, Ogre will fall back on a fixed-function material which will not reflect any vertex deformation you do in your vertex program. 
+When rendering a shadow caster, Ogre will automatically use the alternate material. You can bind the same or different parameters to the program - the most important thing is that you bind @c *ambient_light_colour*, since this determines the colour of the shadow in modulative texture shadows. If you don’t supply an alternate material, Ogre will fall back on a fixed-function material which will not reflect any vertex deformation you do in your vertex or geometry programs.
 
-In addition, when rendering the shadow receivers with shadow textures, Ogre needs to project the shadow texture. It does this automatically in fixed function mode, but if the receivers use vertex programs, they need to have a shadow receiver program which does the usual vertex deformation, but also generates projective texture coordinates. The additional program linked into the pass like this:
+In addition, when rendering the shadow receivers with shadow textures, Ogre needs to project the shadow texture. It does this automatically in fixed function mode, but if the receivers use vertex programs, they need to have a shadow receiver material which does the usual vertex deformation, but also generates projective texture coordinates.
+
+@note At this point you can as well just extend your original program for @ref Integrated-Texture-Shadows. The only advantage of the technique below is that you can use the same material with and without shadow mapping.
+
+The alternative material is linked into the technique - similarly to the caster material - like:
 
 ```cpp
-shadow_receiver_vertex_program_ref myShadowReceiverVertexProgram
+technique myShaderBasedTechnique
 {
-    param_indexed_auto 0 worldviewproj_matrix
-    param_indexed_auto 4 texture_viewproj_matrix
+    shadow_receiver_material myShadowReceiverMaterial
+    ...
+}
+
+material myShadowReceiverMaterial
+{
+    ...
+    vertex_program_ref myShadowReceiverVertexProgram
+    {
+        param_indexed_auto 0 worldviewproj_matrix
+        param_indexed_auto 4 texture_worldviewproj_matrix
+    }
+    ...
 }
 ```
 
-For the purposes of writing this alternate program, there is an automatic parameter binding of ’texture\_viewproj\_matrix’ which provides the program with texture projection parameters. The vertex program should do it’s normal vertex processing, and generate texture coordinates using this matrix and place them in texture coord sets 0 and 1, since some shadow techniques use 2 texture units. The colour of the vertices output by this vertex program must always be white, so as not to affect the final colour of the rendered shadow. 
+For the purposes of writing the alternate program, there is an automatic parameter binding of @c texture_worldviewproj_matrix which provides the program with texture projection parameters. The vertex program should do it’s normal vertex processing, and generate texture coordinates using this matrix and place them in texture coord sets 0 and 1, since some shadow techniques use 2 texture units. The colour of the vertices output by this vertex program must always be white, so as not to affect the final colour of the rendered shadow.
 
-When using additive texture shadows, the shadow pass render is actually the lighting render, so if you perform any fragment program lighting you also need to pull in a custom fragment program. You use the shadow\_receiver\_fragment\_program\_ref for this:
+When using additive texture shadows, the @c shadow_receiver_material replaces the lighting render, so if you perform any fragment program lighting you also need to pull in a custom fragment program:
 
 ```cpp
-shadow_receiver_fragment_program_ref myShadowReceiverFragmentProgram
+pass
 {
-    param_named_auto lightDiffuse light_diffuse_colour 0 
+    fragment_program_ref myShadowReceiverFragmentProgram
+    {
+        param_named_auto lightDiffuse light_diffuse_colour 0
+    }
+    texture_unit
+    {
+        content_type shadow
+    }
 }
 ```
 
-You should pass the projected shadow coordinates from the custom vertex program. As for textures, texture unit 0 will always be the shadow texture. Any other textures which you bind in your pass will be carried across too, but will be moved up by 1 unit to make room for the shadow texture. Therefore your shadow receiver fragment program is likely to be the same as the bare lighting pass of your normal material, except that you insert an extra texture sampler at index 0, which you will use to adjust the result by (modulating diffuse and specular components).
+You should pass the projected shadow coordinates from the custom vertex program. As for textures, define a @c texture_unit with @c content_type @c shadow to pull the shadow texture. Your shadow receiver fragment program is likely to be the same as the bare lighting pass of your normal material, except that you insert an extra texture sampler for the shadow texture, which you will use to adjust the result by (modulating diffuse and specular components).
 
 # Skeletal Animation in Vertex Programs {#Skeletal-Animation-in-Vertex-Programs}
 
@@ -603,11 +771,7 @@ Since hardware support for vertex texture fetching is not ubiquitous, you should
 
 ## DirectX9 binding limitations
 
-Unfortunately the method for binding textures so that they are available to a vertex program is not well standardised. As at the time of writing, Shader Model 3.0 (SM3.0) hardware under DirectX9 include 4 separate sampler bindings for the purposes of vertex textures. OpenGL, on the other hand, is able to access vertex textures in GLSL (and in assembler through NV\_vertex\_program\_3, although this is less popular), but the textures are shared with the fragment pipeline. I expect DirectX to move to the GL model with the advent of DirectX10, since a unified shader architecture implies sharing of texture resources between the two stages. As it is right now though, we’re stuck with an inconsistent situation.
-
-To reflect this, you should use the `binding_type` attribute in a texture unit to indicate which unit you are targeting with your texture - ’fragment’ (the default) or ’vertex’. For render systems that don’t have separate bindings, this actually does nothing. But for those that do, it will ensure your texture gets bound to the right processing unit.
-
-Note that whilst DirectX9 has separate bindings for the vertex and fragment pipelines, binding a texture to the vertex processing unit still uses up a ’slot’ which is then not available for use in the fragment pipeline. I didn’t manage to find this documented anywhere, but the nVidia samples certainly avoid binding a texture to the same index on both vertex and fragment units, and when I tried to do it, the texture did not appear correctly in the fragment unit, whilst it did as soon as I moved it into the next unit.
+Shader Model 3.0 (SM3.0) hardware under DirectX9 includes 4 sampler bindings for the purposes of vertex textures. Ogre assigns the first 4 texture units to these bindings - therefore you should put fragment-only textures last.
 
 <a name="Texture-format-limitations"></a>
 
@@ -621,39 +785,137 @@ Again as at the time of writing, the types of texture you can use in a vertex pr
 
 As at the time of writing (early Q3 2006), ATI do not support texture fetch in their current crop of cards (Radeon X1n00). nVidia do support it in both their 6n00 and 7n00 range. ATI support an alternative called ’Render to Vertex Buffer’, but this is not standardised at this time and is very much different in its implementation, so cannot be considered to be a drop-in replacement. This is the case even though the Radeon X1n00 cards claim to support vs\_3\_0 (which requires vertex texture fetch).
 
-@page Runtime-Shader-Generation Runtime Shader Generation 
+# Programmatic creation {#GpuProgram-API}
 
-Writing shading programs is a common task when developing 3D based application. Most of the visual effects used by 3D based applications involve shader programs.
-Additionally with D3D11, support for fixed pipeline functionality was removed. Meaning you can only render objects using shaders.
+In case you need to create GPU Programs programmatically, see the following example for how the script is mapped to the API.
 
-While @ref High-level-Programs offer you maximal control and flexibility over how your objects are rendered, writing and maintaining them is also a very time consuming task.
+```cpp
+vertex_program glTF2/PBR_vs glsl
+{
+	source pbr-vert.glsl
+    preprocessor_defines HAS_NORMALS,HAS_TANGENTS
+    default_params
+    {
+        param_named_auto u_MVPMatrix worldviewproj_matrix
+    }
+}
+```
+becomes
+```cpp
+using namespace Ogre;
+GpuProgramManager& mgr = GpuProgramManager::getSingleton();
 
-Instead %Ogre can also automatically generate shaders on the fly, based on object material properties, scene setup and other user definitions. While the resulting shaders are less optimized, they offer the following advantages:
+GpuProgramPtr vertex_program = mgr.createProgram("glTF2/PBR_vs", RGN_DEFAULT, "glsl", GPT_VERTEX_PROGRAM);
+vertex_program->setSource("pbr-vert.glsl");
+vertex_program->setParameter("preprocessor_defines", "HAS_NORMALS,HAS_TANGENTS");
 
-* Save development time e.g. when your target scene has dynamic lights and the number changes, fog changes and the number of material attributes increases the total count of needed shaders dramatically. It can easily cross 100 and it becomes a time consuming development task.
-* Reusable code - once you've written the shader extension you can use it anywhere due to its independent nature.
-* Custom shaders extension library - enjoy the shared library of effects created by the community. Unlike hand written shader code, which may require many adjustments to be plugged into your own shader code, using the extensions library requires minimum changes.
+GpuProgramParametersPtr params = vertex_program->getDefaultParameters();
+params->setNamedAutoConstant("u_MVPMatrix", GpuProgramParameters::ACT_WORLDVIEWPROJ_MATRIX);
+```
 
-You have the choice between two different systems, which are implemented as components. You can select the one you need (or disable both) at compile time.
+@page Cross-platform-Shaders Cross-platform Shaders
 
-* @subpage rtss <br />
-The RTSS is not another Uber shader with an exploding amount of @c \#ifdefs that make it increasingly difficult to add new functionality. 
-Instead, it manages a set of opaque isolated components (SubRenderStates) where each implements a specific effect.
-These "effects" notable include full Fixed Function emulation. At the core these components are plain shader files providing a set of functions. The shaders are based on properties defined in @ref Material-Scripts.
-* @subpage hlms <br />
-This component allows you to manage shader variations of a specific shader template.
-This is a different take to the Uber shader management, but instead of using plain
-@c \#ifdefs it uses a custom, more powerful preprocessor language.
-Currently the HLMS can be only configured via a custom API and does not respect classical @ref Ogre::Material properties.
+When targeting multiple graphics APIs, one typically needs to provide separate shaders for each API. This results in lots of duplicated code gets out of hand quickly.
 
-# Historical background
+@tableofcontents
 
-When the early graphic cards came into the market they contained a fixed but large set of functions with which you could influence how 3D object were rendered. These included influencing object positions using matrices, calculating the effect of textures on a pixel, calculating the effect of lights on vertices and so on. These set of functions and their implementation in hardware became later known as the graphic card fixed pipeline (or Fixed Function Pipeline).
+To support using the same shader code for multiple APIs, %Ogre provides the following mechanisms.
+- @c \#include directives are universally supported - even with GLSL, so you can rely on them to organised your shaders.
+- There are several built-in defines that can be used to conditionally compile different versions of the same shader.
 
-As graphic cards became more powerful and graphic application became more complex, a need for new ways to manipulate the rendering of 3D models became apparent. This need saw the introduction of shaders. 
+# Built-in defines
+The following defines are available:
+- The current shading language and native version: e.g. @c OGRE_GLSL=120, @c OGRE_HLSL=3
+- The current shader type: e.g. @c OGRE_VERTEX_SHADER, @c OGRE_FRAGMENT_SHADER
+- Whether @ref reversed-depth is enabled: @c OGRE_REVERSED_Z
 
-Shaders are small custom made programs that run directly on the graphics card. Using these programs, one could replace the calculations that were made by the fixed pipeline and add new functionality. However there was a catch: If shaders are used on an object, the object can no longer use any of the functionality of the fixed pipeline. Any calculation that was used in the fixed pipeline needed to be recreated in the shaders. With early graphics applications this was not problematic. Shaders were simple and their numbers were kept low. However as applications grew in complexity this meant that the need for shaders grew as well. As a programmer you were left with 2 choices, both bad. Either create an exuberant amount of small shaders that soon became too many to effectively maintain. Or create an uber shader, a huge complex shader, that soon became too complex to effectively maintain as well.
+# Cross-platform macros
 
-The RTSS seeks to fix those problems by automatically generating shaders based on the operations previously required from the fixed pipeline and new capabilities required by the user.
+Additionally, the `OgreUnifiedShader.h` provides macros to map GLSL to HLSL and (to some extent) Metal.
 
-With the introduction of the version 11 of Direct3D, a new reason for having an RTSS like system became apparent. With D3D11 support for fixed pipeline functionality was removed. Meaning, you can only render objects using shaders. The RTSS is an excellent tool for this purpose.
+As everything is handled by standard macros, the conversion can be performed by simply running the standard c preprocessor (`cpp`) on them - even without running %Ogre.
+
+In general, you have to do the following changes compared to regular GLSL:
+- Add the `#include <OgreUnifiedShader.h>` directive at the top of the file
+- Use the `MAIN_PARAMETERS` and `MAIN_DECLARATION` directives instead of `void main()`
+- Use the `IN`/ `OUT` macros to specify non-uniform parameters that are passed to the main function.
+- Declare Samplers with `SAMPLER2D/3D/CUBE/..` macros instead of `sampler2D/3D/Cube/..`
+- Use `mtxFromRows` / `mtxFromCols` to construct matrices from vectors
+- Use the HLSL style `mul` instead of `*` to multiply matrices
+- Use `vec2_splat(1.0)` instead of the `vec2(1.0)` single component constructor.
+
+Lets take a look on how to use the `OgreUnifiedShader.h` macros by starting with a simple GLSL shader:
+
+```cpp
+uniform mat4 worldMatrix;
+
+attribute vec4 vertex;
+void main()
+{
+    gl_Position = worldMatrix * vertex;
+}
+```
+
+to make it cross-platform, we need to modify it as:
+
+```cpp
+#include <OgreUnifiedShader.h>
+uniform mat4 worldMatrix;
+
+MAIN_PARAMETERS
+IN(vec4 vertex, POSITION)
+MAIN_DECLARATION
+{
+    gl_Position = mul(worldMatrix, vertex);
+}
+```
+
+@note If you only target different versions of the same API, there are reduced headers:
+- `HLSL_SM4Support.hlsl` providing the `SAMPLER*` macros for mapping HLSL9/ Cg and HLSL SM4 (D3D11)
+- `GLSL_GL3Support.glsl` providing the `IN`/ `OUT` macros and `texture` aliases for mapping GLSL <= 120 and GLSL >= 130
+
+# Uber shader tips
+
+To toggle features on and off use a shader skeleton like this:
+
+```cpp
+#ifdef USE_UV
+#include "parameters_uv.glsl"
+#endif
+#ifdef USE_SKINNING
+#include <parameters_skinning.glsl>
+#endif
+...
+
+void main()
+{
+#ifdef USE_UV
+    #include <transform_uv.glsl>
+#endif
+#ifdef USE_SKINNING
+    #include <transform_skinning.glsl>
+#endif
+#ifdef USE_TANGENT
+    #include <construct_tbn.glsl>
+#endif
+    ...
+    gl_Position = ...;
+}
+```
+
+then in the material file, you can instantiate it as:
+
+```cpp
+vertex_program TextureAndSkinning glsl
+{
+    source UberShader_vp.glsl
+    preprocessor_defines USE_UV,USE_SKINNING
+    default_params
+    {
+        ...
+    }
+}
+```
+and reference it with your materials.
+
+Incidentally, this is very similar to what the [RTSS](@ref rtss) is doing internally. Except, you do not need the @c preprocessor_defines part, as it can derive automatically from the material what needs to be done.

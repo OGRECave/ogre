@@ -29,7 +29,7 @@ THE SOFTWARE.
 #include "OgreGLES2RenderToVertexBuffer.h"
 
 #include "OgreHardwareBufferManager.h"
-#include "OgreGLES2HardwareVertexBuffer.h"
+#include "OgreGLES2HardwareBuffer.h"
 #include "OgreRenderable.h"
 #include "OgreSceneManager.h"
 #include "OgreRoot.h"
@@ -110,6 +110,8 @@ namespace Ogre {
         
         bindVerticesOutput(r2vbPass);
 
+        r2vbPass->_updateAutoParams(sceneMgr->_getAutoParamDataSource(), GPV_GLOBAL);
+
         RenderOperation renderOp;
         size_t targetBufferIndex;
         if (mResetRequested || mResetsEveryUpdate)
@@ -131,7 +133,7 @@ namespace Ogre {
             reallocateBuffer(targetBufferIndex);
         }
 
-        GLES2HardwareVertexBuffer* vertexBuffer = static_cast<GLES2HardwareVertexBuffer*>(mVertexBuffers[targetBufferIndex].get());
+        auto vertexBuffer = mVertexBuffers[targetBufferIndex]->_getImpl<GLES2HardwareBuffer>();
 /*        if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
         {
             GLSLESProgramPipeline* programPipeline =
@@ -234,7 +236,7 @@ namespace Ogre {
         //TODO : Implement more?
         default:
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-                "Unsupported vertex element sematic in render to vertex buffer", 
+                "Unsupported vertex element semantic in render to vertex buffer",
                 "OgreGLES2RenderToVertexBuffer::getSemanticVaryingName");
         }
     }

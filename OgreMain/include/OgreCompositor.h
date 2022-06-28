@@ -29,10 +29,10 @@ THE SOFTWARE.
 #define __Compositor_H__
 
 #include "OgrePrerequisites.h"
-#include "OgreIteratorWrappers.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {
+    template <typename T> class VectorIterator;
 
     /** \addtogroup Core
     *  @{
@@ -67,11 +67,11 @@ namespace Ogre {
         
         /** Get a technique.
         */
-        CompositionTechnique *getTechnique(size_t idx);
+        CompositionTechnique *getTechnique(size_t idx) const { return mTechniques.at(idx); }
         
         /** Get the number of techniques.
         */
-        size_t getNumTechniques();
+        size_t getNumTechniques() const { return mTechniques.size(); }
         
         /** Remove all techniques
         */
@@ -81,23 +81,23 @@ namespace Ogre {
         TechniqueIterator getTechniqueIterator(void);
         
         /** Get a supported technique.
-        @remarks
+
             The supported technique list is only available after this compositor has been compiled,
             which typically happens on loading it. Therefore, if this method returns
             an empty list, try calling Compositor::load.
         */
-        CompositionTechnique *getSupportedTechnique(size_t idx);
+        CompositionTechnique *getSupportedTechnique(size_t idx) const { return mSupportedTechniques.at(idx); }
         
         /** Get the number of supported techniques.
-        @remarks
+
             The supported technique list is only available after this compositor has been compiled,
             which typically happens on loading it. Therefore, if this method returns
             an empty list, try calling Compositor::load.
         */
-        size_t getNumSupportedTechniques();
+        size_t getNumSupportedTechniques() const { return mSupportedTechniques.size(); }
         
         /** Gets an iterator over all the Techniques which are supported by the current card. 
-        @remarks
+
             The supported technique list is only available after this compositor has been compiled,
             which typically happens on loading it. Therefore, if this method returns
             an empty list, try calling Compositor::load.
@@ -105,7 +105,7 @@ namespace Ogre {
         TechniqueIterator getSupportedTechniqueIterator(void);
 
         /** Get a pointer to a supported technique for a given scheme. 
-        @remarks
+
             If there is no specific supported technique with this scheme name, 
             then the first supported technique with no specific scheme will be returned.
         @param schemeName The scheme name you are looking for. Blank means to 
@@ -125,15 +125,15 @@ namespace Ogre {
         @param mrtIndex If name identifies a MRT, which texture attachment to retrieve
         @return The texture pointer, corresponds to a real texture
         */
-        TexturePtr getTextureInstance(const String& name, size_t mrtIndex);
+        const TexturePtr& getTextureInstance(const String& name, size_t mrtIndex);
 
         /** Get the render target for a given render texture name. 
-        @remarks
+
             You can use this to add listeners etc, but do not use it to update the
             targets manually or any other modifications, the compositor instance 
             is in charge of this.
         */
-        RenderTarget* getRenderTarget(const String& name);
+        RenderTarget* getRenderTarget(const String& name, int slice = 0);
 
     protected:
         /// @copydoc Resource::loadImpl

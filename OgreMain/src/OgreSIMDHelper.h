@@ -290,7 +290,7 @@ namespace Ogre {
 #if OGRE_DEBUG_MODE
 #define __OGRE_CHECK_STACK_ALIGNED_FOR_SSE()        \
     {                                               \
-        __m128 test;                                \
+        __m128 test = {};                           \
         assert(_isAlignedForSSE(&test));            \
     }
 

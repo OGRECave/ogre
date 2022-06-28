@@ -16,6 +16,10 @@ if (OGRE_BUILD_COMPONENT_BITES)
     add_subdirectory(Bites)
 endif()
 
+if (OGRE_BUILD_COMPONENT_BULLET)
+    add_subdirectory(Bullet)
+endif()
+
 if (OGRE_BUILD_COMPONENT_PAGING)
   add_subdirectory(Paging)
 endif ()
@@ -42,10 +46,6 @@ endif ()
 
 if (OGRE_BUILD_COMPONENT_OVERLAY)
 	add_subdirectory(Overlay)
-endif ()
-
-if (OGRE_BUILD_COMPONENT_HLMS)
-	add_subdirectory(HLMS)
 endif ()
 
 if (OGRE_BUILD_COMPONENT_PYTHON)

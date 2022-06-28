@@ -34,19 +34,19 @@ namespace Ogre {
 
     enum D3D9ResourceCreationPolicy
     {
-        // Creates the rendering resource on the current active device that needs it.
-        // This policy should be used when video memory consumption should be minimized but
-        // it might cause some performance issues when using loader resource thread since
-        // a resource that was not created on specified device will be created on demand during
-        // the rendering process and might cause the FPS to drop down. 
+        /// Creates the rendering resource on the current active device that needs it.
+        /// This policy should be used when video memory consumption should be minimized but
+        /// it might cause some performance issues when using loader resource thread since
+        /// a resource that was not created on specified device will be created on demand during
+        /// the rendering process and might cause the FPS to drop down.
         RCP_CREATE_ON_ACTIVE_DEVICE,
 
-        // Create the rendering resource on every existing device.      
-        // This policy should be used when working intensively with a background loader thread.
-        // In that case when multiple devices exist, the resource will be created on each device
-        // and will be ready to use in the rendering thread. 
-        // The draw back can be some video memory waste in case that each device render different
-        // scene and doesn't really need all the resources.
+        /// Create the rendering resource on every existing device.
+        /// This policy should be used when working intensively with a background loader thread.
+        /// In that case when multiple devices exist, the resource will be created on each device
+        /// and will be ready to use in the rendering thread.
+        /// The draw back can be some video memory waste in case that each device render different
+        /// scene and doesn't really need all the resources.
         RCP_CREATE_ON_ALL_DEVICES
     };
     
@@ -82,16 +82,6 @@ namespace Ogre {
         void                        setCreationPolicy   (D3D9ResourceCreationPolicy creationPolicy);
         D3D9ResourceCreationPolicy  getCreationPolicy   () const;
 
-        /** 
-            Set/Get automatic hardware buffers management.
-            This has affect only when multiple devices involved during the runtime.
-            When enabled, an explicit system memory backup is created for buffers with no read caps - so in case of device swaps
-            the content of the buffers can be restored from this copy.
-            The default is false in order to reduce system memory consumption.
-        */
-        void                        setAutoHardwareBufferManagement(bool autoManagement) { mAutoHardwareBufferManagement = autoManagement; }
-        bool                        getAutoHardwareBufferManagement() const { return mAutoHardwareBufferManagement; }
-
     // Friends.
     protected:
         friend class D3D9Resource;
@@ -117,7 +107,6 @@ namespace Ogre {
         ResourceContainer           mResources;
         D3D9ResourceCreationPolicy  mResourceCreationPolicy;
         long                        mDeviceAccessLockCount;     
-        bool                        mAutoHardwareBufferManagement;
     };
 }
 

@@ -5,13 +5,6 @@ fragment_program SSAO/ShowNormals_fp_hlsl hlsl
     target ps_2_0
 }
 
-fragment_program SSAO/ShowNormals_fp_cg cg
-{
-    source ShowNormals.cg
-    entry_point ShowNormals_fp
-    profiles ps_2_0 arbfp1
-}
-
 fragment_program SSAO/ShowNormals_fp_glsl glsl
 {
 	source ShowNormalsFP.glsl
@@ -25,8 +18,7 @@ fragment_program SSAO/ShowNormals_fp_glsl glsl
 fragment_program SSAO/ShowNormals_fp unified
 {
 	delegate SSAO/ShowNormals_fp_glsl 
-	delegate SSAO/ShowNormals_fp_hlsl 
-	delegate SSAO/ShowNormals_fp_cg
+	delegate SSAO/ShowNormals_fp_hlsl
 }
 
 material SSAO/ShowNormals

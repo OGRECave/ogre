@@ -52,7 +52,7 @@ namespace Ogre {
 
         // This contains the complete list of supported extensions
         std::set<String> mExtensionList;
-        String mVendor;
+        GPUVendor mVendor;
 
         /** Manager object for creating render textures.
             Direct render to texture via FBO is preferable
@@ -74,16 +74,15 @@ namespace Ogre {
         */
         virtual void _oneTimeContextInitialization() = 0;
     public:
-        struct VideoMode {
-            uint32 width;
-            uint32 height;
-            int16 refreshRate;
-            uint8  bpp;
+        /**
+         Specific options:
 
-            String getDescription() const;
-        };
-        typedef std::vector<VideoMode>    VideoModes;
-
+        | Key |  Default | Description |
+        |-----|---------------|---------|
+        | Reversed Z-Buffer | false | Use reverse depth buffer to improve depth precision (GL3+ only) |
+        | Separate Shader Objects | false | Compile shaders individually instad of using monolithic programs. Better introspection. Allows mixing GLSL and SPIRV shaders (GL3+ only)  |
+        | Fixed Pipeline Enabled | true | Use fixed function units where possible. Disable to test migration to shader-only pipeline (GL only) |
+        */
         void setConfigOption(const String &name, const String &value);
 
         virtual ~GLRenderSystemCommon() {}
@@ -108,8 +107,6 @@ namespace Ogre {
         */
         bool checkExtension(const String& ext) const;
 
-        String validateConfigOptions() { return BLANKSTRING; }
-
         /** Unregister a render target->context mapping. If the context of target
             is the current context, change the context to the main context so it
             can be destroyed safely.
@@ -123,20 +120,8 @@ namespace Ogre {
                                             const HardwareVertexBufferSharedPtr& vertexBuffer,
                                             const size_t vertexStart) = 0;
 
-        Real getHorizontalTexelOffset(void) { return 0.0; }               // No offset in GL
-        Real getVerticalTexelOffset(void) { return 0.0; }                 // No offset in GL
         Real getMinimumDepthInputValue(void) { return -1.0f; }            // Range [-1.0f, 1.0f]
         Real getMaximumDepthInputValue(void) { return 1.0f; }             // Range [-1.0f, 1.0f]
-
-        VertexElementType getColourVertexElementType(void) const {
-            return VET_COLOUR_ABGR;
-        }
-
-        void reinitialise(void)
-        {
-            this->shutdown();
-            this->_initialise();
-        }
 
         void _convertProjectionMatrix(const Matrix4& matrix, Matrix4& dest, bool);
 
@@ -155,6 +140,8 @@ namespace Ogre {
         virtual void _destroyFbo(GLContext* context, uint32 fbo) {}
         /** Complete destruction of VAOs and FBOs deferred while creator context was not current */
         void _completeDeferredVaoFboDestruction();
+
+        unsigned int getDisplayMonitorCount() const;
 
         void registerThread();
         void unregisterThread();

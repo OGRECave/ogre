@@ -43,6 +43,10 @@ namespace Ogre {
         destroyAllResourcePools();
         removeAll();
     }
+    void ResourceManager::parseScript(DataStreamPtr& stream, const String& groupName)
+    {
+        ScriptCompilerManager::getSingleton().parseScript(stream, groupName);
+    }
     //-----------------------------------------------------------------------
     ResourcePtr ResourceManager::createResource(const String& name, const String& group,
         bool isManual, ManualResourceLoader* loader, const NameValuePairList* params)
@@ -138,8 +142,8 @@ namespace Ogre {
             }
             else
             {
-                ResourceWithGroupMap::iterator itGroup = mResourcesWithGroup.find(res->getGroup());
-                result = itGroup->second.emplace(res->getName(), res);
+                auto resgroup = mResourcesWithGroup.emplace(res->getGroup(), ResourceMap()).first;
+                result = resgroup->second.emplace(res->getName(), res);
             }
         }
 
@@ -217,7 +221,9 @@ namespace Ogre {
         ResourcePtr res = getResourceByName(name, group);
 
 #if OGRE_RESOURCEMANAGER_STRICT
-        OgreAssert(res, ("attempting to unload unknown resource: "+name+" in group "+group).c_str());
+        if (!res)
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+                        "attempting to unload unknown resource: " + name + " in group " + group);
 #endif
 
         if (res)
@@ -298,7 +304,9 @@ namespace Ogre {
         ResourcePtr res = getResourceByName(name, group);
 
 #if OGRE_RESOURCEMANAGER_STRICT
-        OgreAssert(res, ("attempting to remove unknown resource: "+name+" in group "+group).c_str());
+        if (!res)
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+                        "attempting to remove unknown resource: " + name + " in group " + group);
 #endif
 
         if (res)
@@ -357,7 +365,7 @@ namespace Ogre {
         }
     }
     //-----------------------------------------------------------------------
-    ResourcePtr ResourceManager::getResourceByName(const String& name, const String& groupName /* = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME */)
+    ResourcePtr ResourceManager::getResourceByName(const String& name, const String& groupName) const
     {
         OGRE_LOCK_AUTO_MUTEX;
 
@@ -366,7 +374,7 @@ namespace Ogre {
 
         if(isGlobal)
         {
-            ResourceMap::iterator it = mResources.find(name);
+            auto it = mResources.find(name);
             if( it != mResources.end())
             {
                 return it->second;
@@ -376,11 +384,11 @@ namespace Ogre {
         // look in all grouped pools
         if (groupName == ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME)
         {
-            ResourceWithGroupMap::iterator iter = mResourcesWithGroup.begin();
-            ResourceWithGroupMap::iterator iterE = mResourcesWithGroup.end();
+            auto iter = mResourcesWithGroup.begin();
+            auto iterE = mResourcesWithGroup.end();
             for ( ; iter != iterE ; ++iter )
             {
-                ResourceMap::iterator resMapIt = iter->second.find(name);
+                auto resMapIt = iter->second.find(name);
 
                 if( resMapIt != iter->second.end())
                 {
@@ -391,10 +399,10 @@ namespace Ogre {
         else if (!isGlobal)
         {
             // look in the grouped pool
-            ResourceWithGroupMap::iterator itGroup = mResourcesWithGroup.find(groupName);
+            auto itGroup = mResourcesWithGroup.find(groupName);
             if( itGroup != mResourcesWithGroup.end())
             {
-                ResourceMap::iterator it = itGroup->second.find(name);
+                auto it = itGroup->second.find(name);
 
                 if( it != itGroup->second.end())
                 {
@@ -404,7 +412,7 @@ namespace Ogre {
 
 #if !OGRE_RESOURCEMANAGER_STRICT
             // fall back to global
-            ResourceMap::iterator it = mResources.find(name);
+            auto it = mResources.find(name);
             if( it != mResources.end())
             {
                 return it->second;
@@ -415,10 +423,10 @@ namespace Ogre {
         return ResourcePtr();
     }
     //-----------------------------------------------------------------------
-    ResourcePtr ResourceManager::getByHandle(ResourceHandle handle)
+    ResourcePtr ResourceManager::getByHandle(ResourceHandle handle) const
     {
         OGRE_LOCK_AUTO_MUTEX;
-        ResourceHandleMap::iterator it = mResourcesByHandle.find(handle);
+        auto it = mResourcesByHandle.find(handle);
         return it == mResourcesByHandle.end() ? ResourcePtr() : it->second;
     }
     //-----------------------------------------------------------------------
@@ -484,8 +492,7 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void ResourceManager::destroyResourcePool(ResourcePool* pool)
     {
-        if(!pool)
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Cannot destroy a null ResourcePool.", "ResourceManager::destroyResourcePool");
+        OgreAssert(pool, "Cannot destroy a null ResourcePool");
 
         OGRE_LOCK_AUTO_MUTEX;
 

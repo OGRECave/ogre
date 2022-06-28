@@ -32,7 +32,7 @@ THE SOFTWARE.
 #include "OgreSingleton.h"
 #include "OgreDataStream.h"
 #include "OgreArchive.h"
-#include "OgreIteratorWrappers.h"
+#include "OgreIteratorWrapper.h"
 #include "OgreCommon.h"
 #include "Threading/OgreThreadHeaders.h"
 #include <ctime>
@@ -87,8 +87,8 @@ namespace Ogre {
         <li>resourceGroupLoadStarted</li>
         <li>resourceLoadStarted (*)</li>
         <li>resourceLoadEnded (*)</li>
-        <li>worldGeometryStageStarted (*)</li>
-        <li>worldGeometryStageEnded (*)</li>
+        <li>customStageStarted (*)</li>
+        <li>customStageEnded (*)</li>
         <li>resourceGroupLoadEnded</li>
         <li>resourceGroupPrepareStarted</li>
         <li>resourcePrepareStarted (*)</li>
@@ -146,19 +146,6 @@ namespace Ogre {
         /** This event is fired when the resource has been prepared. 
         */
         virtual void resourcePrepareEnded(void) {}
-        /** This event is fired when a stage of preparing linked world geometry 
-            is about to start. The number of stages required will have been 
-            included in the resourceCount passed in resourceGroupLoadStarted.
-        @param description Text description of what was just prepared
-        */
-        virtual void worldGeometryPrepareStageStarted(const String& description)
-        { (void)description; }
-
-        /** This event is fired when a stage of preparing linked world geometry 
-            has been completed. The number of stages required will have been 
-            included in the resourceCount passed in resourceGroupLoadStarted.
-        */
-        virtual void worldGeometryPrepareStageEnded(void) {}
         /** This event is fired when a resource group finished preparing. */
         virtual void resourceGroupPrepareEnded(const String& groupName)
         { (void)groupName; }
@@ -166,7 +153,7 @@ namespace Ogre {
         /** This event is fired  when a resource group begins loading.
         @param groupName The name of the group being loaded
         @param resourceCount The number of resources which will be loaded, including
-            a number of stages required to load any linked world geometry
+            a number of custom stages required to load anything else
         */
         virtual void resourceGroupLoadStarted(const String& groupName, size_t resourceCount) {}
         /** This event is fired when a declared resource is about to be loaded. 
@@ -176,17 +163,17 @@ namespace Ogre {
         /** This event is fired when the resource has been loaded. 
         */
         virtual void resourceLoadEnded(void) {}
-        /** This event is fired when a stage of loading linked world geometry 
+        /** This event is fired when a custom loading stage
             is about to start. The number of stages required will have been 
             included in the resourceCount passed in resourceGroupLoadStarted.
-        @param description Text description of what was just loaded
+        @param description Text description of what is about to be done
         */
-        virtual void worldGeometryStageStarted(const String& description){}
-        /** This event is fired when a stage of loading linked world geometry 
+        virtual void customStageStarted(const String& description){}
+        /** This event is fired when a custom loading stage
             has been completed. The number of stages required will have been 
             included in the resourceCount passed in resourceGroupLoadStarted.
         */
-        virtual void worldGeometryStageEnded(void) {}
+        virtual void customStageEnded(void) {}
         /** This event is fired when a resource group finished loading. */
         virtual void resourceGroupLoadEnded(const String& groupName) {}
         /** This event is fired when a resource was just created.
@@ -213,14 +200,14 @@ namespace Ogre {
         virtual ~ResourceLoadingListener() {}
 
         /** This event is called when a resource beings loading. */
-        virtual DataStreamPtr resourceLoading(const String &name, const String &group, Resource *resource) = 0;
+        virtual DataStreamPtr resourceLoading(const String &name, const String &group, Resource *resource) { return NULL; }
 
         /** This event is called when a resource stream has been opened, but not processed yet. 
 
             You may alter the stream if you wish or alter the incoming pointer to point at
             another stream if you wish.
         */
-        virtual void resourceStreamOpened(const String &name, const String &group, Resource *resource, DataStreamPtr& dataStream) = 0;
+        virtual void resourceStreamOpened(const String &name, const String &group, Resource *resource, DataStreamPtr& dataStream) {}
 
         /** This event is called when a resource collides with another existing one in a resource manager
 
@@ -228,7 +215,7 @@ namespace Ogre {
             @param resourceManager the according resource manager 
             @return false to skip registration of the conflicting resource and continue using the previous instance.
           */
-        virtual bool resourceCollision(Resource *resource, ResourceManager *resourceManager) = 0;
+        virtual bool resourceCollision(Resource *resource, ResourceManager *resourceManager) { return true; }
     };
 
     /** This singleton class manages the list of resource groups, and notifying
@@ -280,7 +267,7 @@ namespace Ogre {
         /// List of possible file locations
         typedef std::vector<ResourceLocation> LocationList;
 
-    protected:
+    private:
         /// Map of resource types (strings) to ResourceManagers, used to notify them to load / unload group contents
         ResourceManagerMap mResourceManagerMap;
 
@@ -332,10 +319,7 @@ namespace Ogre {
             // (e.g. skeletons and materials before meshes)
             typedef std::map<Real, LoadUnloadResourceList> LoadResourceOrderMap;
             LoadResourceOrderMap loadResourceOrderMap;
-            /// Linked world geometry, as passed to setWorldGeometry
-            String worldGeometry;
-            /// Scene manager to use with linked world geometry
-            SceneManager* worldGeometrySceneManager;
+            uint32 customStageCount;
             // in global pool flag - if true the resource will be loaded even a different   group was requested in the load method as a parameter.
             bool inGlobalPool;
 
@@ -353,19 +337,19 @@ namespace Ogre {
 
         /** Parses all the available scripts found in the resource locations
         for the given group, for all ResourceManagers.
-        @remarks
+
             Called as part of initialiseResourceGroup
         */
         void parseResourceGroupScripts(ResourceGroup* grp) const;
         /** Create all the pre-declared resources.
-        @remarks
+
             Called as part of initialiseResourceGroup
         */
         void createDeclaredResources(ResourceGroup* grp);
         /** Adds a created resource to a group. */
         void addCreatedResource(ResourcePtr& res, ResourceGroup& group) const;
         /** Get resource group */
-        ResourceGroup* getResourceGroup(const String& name) const;
+        ResourceGroup* getResourceGroup(const String& name, bool throwOnFailure = false) const;
         /** Drops contents of a group, leave group there, notify ResourceManagers. */
         void dropGroupContents(ResourceGroup* grp);
         /** Delete a group for shutdown - don't notify ResourceManagers. */
@@ -454,52 +438,40 @@ namespace Ogre {
         void initialiseAllResourceGroups(void);
 
         /** Prepares a resource group.
-        @remarks
+
             Prepares any created resources which are part of the named group.
             Note that resources must have already been created by calling
-            ResourceManager::createResource, or declared using #declareResource or
+            ResourceManager::createResource, or declared using declareResource() or
             in a script (such as .material and .overlay). The latter requires
-            that initialiseResourceGroup has been called. 
+            that initialiseResourceGroup() has been called.
         
             When this method is called, this class will callback any ResourceGroupListener
             which have been registered to update them on progress. 
         @param name The name of the resource group to prepare.
-        @param prepareMainResources If true, prepares normal resources associated 
-            with the group (you might want to set this to false if you wanted
-            to just prepare world geometry in bulk)
-        @param prepareWorldGeom If true, prepares any linked world geometry
-            @see #linkWorldGeometryToResourceGroup
         */
-        void prepareResourceGroup(const String& name, bool prepareMainResources = true, 
-            bool prepareWorldGeom = true);
+        void prepareResourceGroup(const String& name);
 
         /** Loads a resource group.
-        @remarks
+
             Loads any created resources which are part of the named group.
             Note that resources must have already been created by calling
-            ResourceManager::create, or declared using declareResource() or
+            ResourceManager::createResource, or declared using declareResource() or
             in a script (such as .material and .overlay). The latter requires
-            that initialiseResourceGroup has been called. 
+            that initialiseResourceGroup() has been called.
         
             When this method is called, this class will callback any ResourceGroupListeners
             which have been registered to update them on progress. 
         @param name The name of the resource group to load.
-        @param loadMainResources If true, loads normal resources associated 
-            with the group (you might want to set this to false if you wanted
-            to just load world geometry in bulk)
-        @param loadWorldGeom If true, loads any linked world geometry
-            @see #linkWorldGeometryToResourceGroup
         */
-        void loadResourceGroup(const String& name, bool loadMainResources = true, 
-            bool loadWorldGeom = true);
+        void loadResourceGroup(const String& name);
 
         /** Unloads a resource group.
-        @remarks
+
             This method unloads all the resources that have been declared as
             being part of the named resource group. Note that these resources
             will still exist in their respective ResourceManager classes, but
             will be in an unloaded state. If you want to remove them entirely,
-            you should use clearResourceGroup or destroyResourceGroup.
+            you should use clearResourceGroup() or destroyResourceGroup().
         @param name The name to of the resource group to unload.
         @param reloadableOnly If set to true, only unload the resource that is
             reloadable. Because some resources isn't reloadable, they will be
@@ -511,8 +483,8 @@ namespace Ogre {
         void unloadResourceGroup(const String& name, bool reloadableOnly = true);
 
         /** Unload all resources which are not referenced by any other object.
-        @remarks
-            This method behaves like unloadResourceGroup, except that it only
+
+            This method behaves like unloadResourceGroup(), except that it only
             unloads resources in the group which are not in use, ie not referenced
             by other objects. This allows you to free up some memory selectively
             whilst still keeping the group around (and the resources present,
@@ -525,7 +497,7 @@ namespace Ogre {
             bool reloadableOnly = true);
 
         /** Clears a resource group. 
-        @remarks
+
             This method unloads all resources in the group, but in addition it
             removes all those resources from their ResourceManagers, and then 
             clears all the members from the list. That means after calling this
@@ -543,7 +515,7 @@ namespace Ogre {
         void destroyResourceGroup(const String& name);
 
         /** Checks the status of a resource group.
-        @remarks
+
             Looks at the state of a resource group.
             If initialiseResourceGroup has been called for the resource
             group return true, otherwise return false.
@@ -552,7 +524,7 @@ namespace Ogre {
         bool isResourceGroupInitialised(const String& name) const;
 
         /** Checks the status of a resource group.
-        @remarks
+
             Looks at the state of a resource group.
             If loadResourceGroup has been called for the resource
             group return true, otherwise return false.
@@ -634,7 +606,7 @@ namespace Ogre {
             const String& groupName, ManualResourceLoader* loader,
             const NameValuePairList& loadParameters = NameValuePairList());
         /** Undeclare a resource.
-        @remarks
+
             Note that this will not cause it to be unloaded
             if it is already loaded, nor will it destroy a resource which has 
             already been created if initialiseResourceGroup has been called already.
@@ -649,12 +621,15 @@ namespace Ogre {
             pointing at the source of the data.
         @param resourceName The name of the resource to locate.
             Even if resource locations are added recursively, you
-            must provide a fully qualified name to this method. You 
+            must provide a fully qualified name to this method. You
             can find out the matching fully qualified names by using the
             find() method if you need to.
-        @param groupName The name of the resource group; this determines which 
-            locations are searched. 
-        @param resourceBeingLoaded Optional pointer to the resource being 
+        @param groupName The name of the resource group; this determines which
+            locations are searched.
+            If you're loading a @ref Resource using #RGN_AUTODETECT, you **must**
+            also provide the resourceBeingLoaded parameter to enable the
+            group membership to be changed
+        @param resourceBeingLoaded Optional pointer to the resource being
             loaded, which you should supply if you want
         @param throwOnFailure throw an exception. Returns nullptr otherwise
         @return Shared pointer to data stream containing the data, will be
@@ -670,12 +645,8 @@ namespace Ogre {
         }
 
         /** 
-            @param searchGroupsIfNotFound If true, if the resource is not found in 
-            the group specified, other groups will be searched. If you're
-            loading a real Resource using this option, you <strong>must</strong>
-            also provide the resourceBeingLoaded parameter to enable the 
-            group membership to be changed
-            @copydetails openResource
+            @overload
+            if the resource is not found in the group specified, other groups will be searched.
             @deprecated use AUTODETECT_RESOURCE_GROUP_NAME instead of searchGroupsIfNotFound
         */
         OGRE_DEPRECATED DataStreamPtr openResource(const String& resourceName,
@@ -780,7 +751,7 @@ namespace Ogre {
         StringVectorPtr findResourceLocation(const String& groupName, const String& pattern) const;
 
         /** Create a new resource file in a given group.
-        @remarks
+
             This method creates a new file in a resource group and passes you back a 
             writeable stream. 
         @param filename The name of the file to create
@@ -828,7 +799,7 @@ namespace Ogre {
         void removeResourceGroupListener(ResourceGroupListener* l);
 
         /** Sets the resource group that 'world' resources will use.
-        @remarks
+
             This is the group which should be used by SceneManagers implementing
             world geometry when looking for their resources. Defaults to the 
             DEFAULT_RESOURCE_GROUP_NAME but this can be altered.
@@ -838,30 +809,21 @@ namespace Ogre {
         /// Gets the resource group that 'world' resources will use.
         const String& getWorldResourceGroupName(void) const { return mWorldGroupName; }
 
-        /** Associates some world geometry with a resource group, causing it to 
-            be loaded / unloaded with the resource group.
-        @remarks
-            You would use this method to essentially defer a call to 
-            SceneManager::setWorldGeometry to the time when the resource group
-            is loaded. The advantage of this is that compatible scene managers 
-            will include the estimate of the number of loading stages for that
-            world geometry when the resource group begins loading, allowing you
-            to include that in a loading progress report. 
-        @param group The name of the resource group
-        @param worldGeometry The parameter which should be passed to setWorldGeometry
-        @param sceneManager The SceneManager which should be called
-        */
-        void linkWorldGeometryToResourceGroup(const String& group, 
-            const String& worldGeometry, SceneManager* sceneManager);
+        /** Declare the number custom loading stages for a resource group
 
-        /** Clear any link to world geometry from a resource group.
-        @remarks
-            Basically undoes a previous call to #linkWorldGeometryToResourceGroup.
+        This allows you to include them in a loading progress report.
+        @param group The name of the resource group
+        @param stageCount The number of extra stages
+        @see #addResourceGroupListener
+        @see #_notifyCustomStageStarted
+        @see #_notifyCustomStageEnded
         */
-        void unlinkWorldGeometryFromResourceGroup(const String& group);
+        void setCustomStagesForResourceGroup(const String& group, uint32 stageCount);
+
+        uint32 getCustomStagesForResourceGroup(const String& group);
 
             /** Checks the status of a resource group.
-        @remarks
+
             Looks at the state of a resource group.
             If loadResourceGroup has been called for the resource
             group return true, otherwise return false.
@@ -876,7 +838,7 @@ namespace Ogre {
         /** Internal method for registering a ResourceManager (which should be
             a singleton). Creators of plugins can register new ResourceManagers
             this way if they wish.
-        @remarks
+
             ResourceManagers that wish to parse scripts must also call 
             _registerScriptLoader.
         @param resourceType String identifying the resource type, must be unique.
@@ -885,16 +847,19 @@ namespace Ogre {
         void _registerResourceManager(const String& resourceType, ResourceManager* rm);
 
         /** Internal method for unregistering a ResourceManager.
-        @remarks
+
             ResourceManagers that wish to parse scripts must also call 
             _unregisterScriptLoader.
         @param resourceType String identifying the resource type.
         */
         void _unregisterResourceManager(const String& resourceType);
 
-        /** Get an iterator over the registered resource managers.
+        /** Get the registered resource managers.
         */
-        ResourceManagerIterator getResourceManagerIterator()
+        const ResourceManagerMap& getResourceManagers() const { return mResourceManagerMap; }
+
+        /// @deprecated use getResourceManagers()
+        OGRE_DEPRECATED ResourceManagerIterator getResourceManagerIterator()
         { return ResourceManagerIterator(
             mResourceManagerMap.begin(), mResourceManagerMap.end()); }
 
@@ -939,22 +904,18 @@ namespace Ogre {
         */
         void _notifyAllResourcesRemoved(ResourceManager* manager) const;
 
-        /** Notify this manager that one stage of world geometry loading has been 
-            started.
-        @remarks
-            Custom SceneManagers which load custom world geometry should call this 
-            method the number of times equal to the value they return from 
-            SceneManager::estimateWorldGeometry while loading their geometry.
+        /** Notify this manager that one custom loading stage has been started
+
+        User code should call this method the number of times equal to the value declared
+        in #setCustomStagesForResourceGroup.
         */
-        void _notifyWorldGeometryStageStarted(const String& description) const;
-        /** Notify this manager that one stage of world geometry loading has been 
-            completed.
-        @remarks
-            Custom SceneManagers which load custom world geometry should call this 
-            method the number of times equal to the value they return from 
-            SceneManager::estimateWorldGeometry while loading their geometry.
+        void _notifyCustomStageStarted(const String& description) const;
+        /** Notify this manager that one custom loading stage has been completed
+
+        User code should call this method the number of times equal to the value declared
+        #setCustomStagesForResourceGroup.
         */
-        void _notifyWorldGeometryStageEnded(void) const;
+        void _notifyCustomStageEnded(void) const;
 
         /** Get a list of the currently defined resource groups. 
         @note This method intentionally returns a copy rather than a reference in

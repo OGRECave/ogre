@@ -28,7 +28,6 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 #include "OgreGL3PlusRenderToVertexBuffer.h"
 #include "OgreHardwareBufferManager.h"
-#include "OgreGL3PlusHardwareVertexBuffer.h"
 #include "OgreRenderable.h"
 #include "OgreSceneManager.h"
 #include "OgreRoot.h"
@@ -185,6 +184,8 @@ namespace Ogre {
             mFirstUpdate = false;
         }
 
+        r2vbPass->_updateAutoParams(sceneMgr->_getAutoParamDataSource(), GPV_GLOBAL);
+
         // size_t targetBufferIndex = mSourceBufferIndex == 0 ? 0 : 1;
 
         // Disable rasterization.
@@ -210,7 +211,7 @@ namespace Ogre {
         //TODO add tessellation stages
 
         // Bind source vertex array + target tranform feedback buffer.
-        GL3PlusHardwareVertexBuffer* targetVertexBuffer = static_cast<GL3PlusHardwareVertexBuffer*>(mVertexBuffers[mTargetBufferIndex].get());
+        const GL3PlusHardwareBuffer* targetVertexBuffer = mVertexBuffers[mTargetBufferIndex]->_getImpl<GL3PlusHardwareBuffer>();
         // OGRE_CHECK_GL_ERROR(glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, VertexBuffer[mTargetBufferIndex]));
         OGRE_CHECK_GL_ERROR(glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, targetVertexBuffer->getGLBufferId()));
         // OGRE_CHECK_GL_ERROR(glBindVertexArray(VertexArray[mSourceBufferIndex]));
@@ -303,7 +304,7 @@ namespace Ogre {
             //TODO : Implement more?
         default:
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-                        "Unsupported vertex element sematic in render to vertex buffer",
+                        "Unsupported vertex element semantic in render to vertex buffer",
                         "OgreGL3PlusRenderToVertexBuffer::getSemanticVaryingName");
         }
     }

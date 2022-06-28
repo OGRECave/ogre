@@ -47,7 +47,7 @@ namespace Ogre {
         IF_3D_TEXTURE = 0x00000004
     };
     /** Class representing an image file.
-        @remarks
+
             The Image class usually holds uncompressed image data and is the
             only object that can be loaded in a texture. Image  objects handle 
             image data decoding themselves by the means of locating the correct 
@@ -59,13 +59,28 @@ namespace Ogre {
     */
     class _OgreExport Image : public ImageAlloc
     {
+    friend class ImageCodec;
     public:
         /** Standard constructor.
-        */
-        Image();
+         *
+         * allocates a buffer of given size if buffer pointer is NULL.
+         */
+        Image(PixelFormat format = PF_UNKNOWN, uint32 width = 0, uint32 height = 0, uint32 depth = 1,
+              uchar* buffer = NULL, bool autoDelete = true);
         /** Copy-constructor - copies all the data from the target image.
-        */
+         */
         Image( const Image &img );
+
+        /**
+         * allocates a buffer of given size if needed
+         *
+         * - If the current allocation is equal to the requested size, this does nothing
+         * - Otherwise any current allocation is freed, and memory of specified size is allocated
+         *
+         * @see loadDynamicImage
+         */
+        void create(PixelFormat format, uint32 width, uint32 height, uint32 depth = 1, uint32 numFaces = 1,
+                    uint32 numMipMaps = 0);
 
         /** Standard destructor.
         */
@@ -75,8 +90,15 @@ namespace Ogre {
         */
         Image & operator = ( const Image & img );
 
+        /**
+         * sets all pixels to the specified colour
+         *
+         * format conversion is performed as needed
+         */
+        void setTo(const ColourValue& col);
+
         /** Flips (mirrors) the image around the Y-axis. 
-            @remarks
+
                 An example of an original and flipped image:
                 <pre>                
                 originalimg
@@ -97,7 +119,7 @@ namespace Ogre {
         Image & flipAroundY();
 
         /** Flips (mirrors) the image around the X-axis.
-            @remarks
+
                 An example of an original and flipped image:
                 <pre>
                         flip axis
@@ -113,7 +135,7 @@ namespace Ogre {
         Image & flipAroundX();
 
         /** Stores a pointer to raw data in memory. The pixel format has to be specified.
-            @remarks
+
                 This method loads an image into memory held in the object. The 
                 pixel format will be either greyscale or RGB with an optional
                 Alpha component.
@@ -155,14 +177,12 @@ namespace Ogre {
             @note
                  The memory associated with this buffer is NOT destroyed with the
                  Image object, unless autoDelete is set to true.
-            @remarks 
+
                 The size of the buffer must be numFaces * PixelUtil::getMemorySize(width, height, depth, format)
          */
-        Image& loadDynamicImage( uchar* data, uint32 width, uint32 height,
-                            uint32 depth,
-                             PixelFormat format, bool autoDelete = false, 
-                             size_t numFaces = 1, uint32 numMipMaps = 0);
-        
+        Image& loadDynamicImage(uchar* data, uint32 width, uint32 height, uint32 depth, PixelFormat format,
+                                bool autoDelete = false, uint32 numFaces = 1, uint32 numMipMaps = 0);
+
         /// @overload
         Image& loadDynamicImage(uchar* data, uint32 width, uint32 height, PixelFormat format)
         {
@@ -170,7 +190,7 @@ namespace Ogre {
         }
         /** Loads raw data from a stream. See the function
             loadDynamicImage for a description of the parameters.
-            @remarks 
+
                 The size of the buffer must be numFaces * PixelUtil::getMemorySize(width, height, depth, format)
             @note
                 Whilst typically your image is likely to be a simple 2D image,
@@ -187,20 +207,16 @@ namespace Ogre {
                 Of course, you will never have multiple faces (cube map) and
                 depth too.
         */
-        Image & loadRawData( 
-            const DataStreamPtr& stream,
-            uint32 width, uint32 height, uint32 depth,
-            PixelFormat format,
-            size_t numFaces = 1, uint32 numMipMaps = 0);
+        Image& loadRawData(const DataStreamPtr& stream, uint32 width, uint32 height, uint32 depth,
+                           PixelFormat format, uint32 numFaces = 1, uint32 numMipMaps = 0);
         /// @overload
-        Image& loadRawData(const DataStreamPtr& stream, uint32 width, uint32 height,
-                           PixelFormat format)
+        Image& loadRawData(const DataStreamPtr& stream, uint32 width, uint32 height, PixelFormat format)
         {
             return loadRawData(stream, width, height, 1, format);
         }
 
         /** Loads an image file.
-            @remarks
+
                 This method loads an image into memory. Any format for which 
                 an associated ImageCodec is registered can be loaded. 
                 This can include complex formats like DDS with embedded custom 
@@ -217,7 +233,7 @@ namespace Ogre {
         Image & load( const String& filename, const String& groupName );
 
         /** Loads an image file from a stream.
-            @remarks
+
                 This method works in the same way as the filename-based load 
                 method except it loads the image from a DataStream object. 
                 This DataStream is expected to contain the 
@@ -284,7 +300,7 @@ namespace Ogre {
 
         
         /** Save the image as a file. 
-        @remarks
+
             Saving and loading are implemented by back end (sometimes third 
             party) codecs.  Implemented saving functionality is more limited
             than loading in some cases. Particularly DDS file format support 
@@ -300,23 +316,39 @@ namespace Ogre {
         */
         DataStreamPtr encode(const String& formatextension);
 
-        /** Returns a pointer to the internal image buffer.
-        @remarks
+        /** Returns a pointer to the internal image buffer at the specified pixel location.
+
             Be careful with this method. You will almost certainly
             prefer to use getPixelBox, especially with complex images
             which include many faces or custom mipmaps.
         */
-        uchar* getData(void);
+        uchar* getData(uint32 x = 0, uint32 y = 0, uint32 z = 0)
+        {
+            assert((!mBuffer && (x + y + z) == 0) || (x < mWidth && y < mHeight && z < mDepth));
+            return mBuffer + mPixelSize * (z * mWidth * mHeight + mWidth * y + x);
+        }
 
-        /** Returns a const pointer to the internal image buffer.
-        @remarks
-            Be careful with this method. You will almost certainly
-            prefer to use getPixelBox, especially with complex images
-            which include many faces or custom mipmaps.
-        */
-        const uchar * getData() const;       
+        /// @overload
+        const uchar* getData(uint32 x = 0, uint32 y = 0, uint32 z = 0) const
+        {
+            assert(mBuffer);
+            assert(x < mWidth && y < mHeight && z < mDepth);
+            return mBuffer + mPixelSize * (z * mWidth * mHeight + mWidth * y + x);
+        }
 
-        /** Returns the size of the data buffer.
+        /// @overload
+        template <typename T> T* getData(uint32 x = 0, uint32 y = 0, uint32 z = 0)
+        {
+            return reinterpret_cast<T*>(getData(x, y, z));
+        }
+
+        /// @overload
+        template <typename T> const T* getData(uint32 x = 0, uint32 y = 0, uint32 z = 0) const
+        {
+            return reinterpret_cast<const T*>(getData(x, y, z));
+        }
+
+        /** Returns the size of the data buffer in bytes
         */
         size_t getSize() const;
 
@@ -343,7 +375,7 @@ namespace Ogre {
         /** Get the number of faces of the image. This is usually 6 for a cubemap, and
             1 for a normal image.
         */
-        size_t getNumFaces(void) const;
+        uint32 getNumFaces(void) const;
 
         /** Gets the physical width in bytes of each row of pixels.
         */
@@ -373,19 +405,19 @@ namespace Ogre {
          * is only valid for cubemaps and volume textures. This uses the first (largest)
          * mipmap.
          */
-        ColourValue getColourAt(size_t x, size_t y, size_t z) const;
+        ColourValue getColourAt(uint32 x, uint32 y, uint32 z) const;
         
         /**
          * Set colour value at a certain location in the image. The z coordinate
          * is only valid for cubemaps and volume textures. This uses the first (largest)
          * mipmap.
          */
-        void setColourAt(ColourValue const &cv, size_t x, size_t y, size_t z);
+        void setColourAt(ColourValue const &cv, uint32 x, uint32 y, uint32 z);
 
         /**
          * Get a PixelBox encapsulating the image data of a mipmap
          */
-        PixelBox getPixelBox(size_t face = 0, size_t mipmap = 0) const;
+        PixelBox getPixelBox(uint32 face = 0, uint32 mipmap = 0) const;
 
         /// Delete all the memory held by this image, if owned by this image (not dynamic)
         void freeMemory();
@@ -394,10 +426,7 @@ namespace Ogre {
         {
             FILTER_NEAREST,
             FILTER_LINEAR,
-            FILTER_BILINEAR,
-            FILTER_BOX,
-            FILTER_TRIANGLE,
-            FILTER_BICUBIC
+            FILTER_BILINEAR = FILTER_LINEAR
         };
         /** Scale a 1D, 2D or 3D image volume. 
             @param  src         PixelBox containing the source pointer, dimensions and format
@@ -412,32 +441,31 @@ namespace Ogre {
         void resize(ushort width, ushort height, Filter filter = FILTER_BILINEAR);
         
         /// Static function to calculate size in bytes from the number of mipmaps, faces and the dimensions
-        static size_t calculateSize(size_t mipmaps, size_t faces, uint32 width, uint32 height, uint32 depth, PixelFormat format);
+        static size_t calculateSize(uint32 mipmaps, uint32 faces, uint32 width, uint32 height, uint32 depth, PixelFormat format);
 
         /// Static function to get an image type string from a stream via magic numbers
         static String getFileExtFromMagic(DataStreamPtr stream);
 
-    protected:
+    private:
         /// The width of the image in pixels
         uint32 mWidth;
         /// The height of the image in pixels
         uint32 mHeight;
         /// The depth of the image
         uint32 mDepth;
-        /// The size of the image buffer
-        size_t mBufSize;
         /// The number of mipmaps the image contains
         uint32 mNumMipmaps;
+        /// The size of the image buffer
+        size_t mBufSize;
         /// Image specific flags.
         int mFlags;
 
         /// The pixel format of the image
         PixelFormat mFormat;
 
+        uchar* mBuffer;
         /// The number of bytes per pixel
         uchar mPixelSize;
-        uchar* mBuffer;
-
         /// A bool to determine if we delete the buffer or the calling app does
         bool mAutoDelete;
     };

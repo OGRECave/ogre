@@ -31,7 +31,6 @@ THE SOFTWARE.
 
 
 #include "OgrePrerequisites.h"
-#include "OgreMinGWSupport.h" // extra defines for MinGW to deal with DX SDK
 #include "OgreComPtr.h"       // too much resource leaks were caused without it by throwing constructors
 
 #include "OgreException.h"
@@ -42,13 +41,23 @@ THE SOFTWARE.
 
 #define OGRE_EXCEPT_EX(code, num, desc, src) throw Ogre::D3D11RenderingAPIException(num, desc, src, __FILE__, __LINE__)
 
+#define OGRE_CHECK_DX_ERROR(dxcall) \
+{ \
+    HRESULT hr = dxcall; \
+    if (FAILED(hr) || mDevice.isError()) \
+    { \
+        String desc = mDevice.getErrorDescription(hr); \
+        throw Ogre::D3D11RenderingAPIException(hr, desc, __FUNCTION__, __FILE__, __LINE__); \
+    } \
+}
+
 // some D3D commonly used macros
 #define SAFE_DELETE(p)       { if(p) { delete (p);     (p)=NULL; } }
 #define SAFE_DELETE_ARRAY(p) { if(p) { delete[] (p);   (p)=NULL; } }
 #define SAFE_RELEASE(p)      { if(p) { (p)->Release(); (p)=NULL; } }
 
 #if defined(_WIN32_WINNT_WIN8) // Win8 SDK required to compile, will work on Windows 8 and Platform Update for Windows 7
-#define OGRE_D3D11_PROFILING OGRE_PROFILING
+#define OGRE_D3D11_PROFILING 1
 #endif
 
 #undef NOMINMAX
@@ -66,6 +75,7 @@ THE SOFTWARE.
 #   include <d3dcompiler.h>
 #endif
  
+ #include <sstream>
 
 namespace Ogre
 {
@@ -136,16 +146,13 @@ namespace Ogre
         int hresult;
     public:
         D3D11RenderingAPIException(int hr, const String& inDescription, const String& inSource, const char* inFile, long inLine)
-            : RenderingAPIException(hr, inDescription, inSource, inFile, inLine), hresult(hr) {}
+            : RenderingAPIException(hr, inDescription, inSource, inFile, inLine), hresult(hr) {
+            StringStream ss;
+            ss << fullDesc << " HRESULT=0x" << std::hex << hresult;
+            fullDesc = ss.str();
+        }
 
         int getHResult() const { return hresult; }
-
-        const String& getFullDescription(void) const {
-            StringStream ss(RenderingAPIException::getFullDescription());
-            ss << " HRESULT=" << hresult;
-            fullDesc = ss.str();
-            return fullDesc;
-        }
     };
 }
 #endif

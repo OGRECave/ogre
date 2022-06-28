@@ -1,0 +1,104 @@
+name: CI Build
+on: 
+  push:
+    branches: [master]
+    tags: ["v*"]
+  pull_request:
+    branches: [master]
+jobs:
+  linux:
+    runs-on: ubuntu-20.04
+    steps:
+    - name: Install Dependencies
+      run: |
+        sudo apt update
+        sudo apt install -y libxrandr-dev \
+          libgles2-mesa-dev mesa-common-dev libgl1-mesa-dev mesa-vulkan-drivers \
+          libfreetype6-dev libpugixml-dev libassimp-dev libbullet-dev qtbase5-dev \
+          nvidia-cg-dev glslang-dev spirv-tools spirv-headers \
+          swig4.0 mono-mcs python3-dev \
+          python3-lxml texlive-binaries texlive-base graphviz doxygen g++-7
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 2
+    - name: Build
+      run: |
+        cmake -P ci-build.cmake
+        cmake --build build -- -j 2
+        cmake --build build --target OgreDoc > /dev/null
+      env:  # need to fix warnings on newer compilers first
+        CC: gcc-7
+        CXX: g++-7
+    - name: Test
+      run: |
+        # doxygen warnings check
+        cat build/doxygen_warnings.log
+        test ! -s build/doxygen_warnings.log
+        # run unit tests
+        build/bin/Test_Ogre
+        # run visual tests
+        cd build/bin && ./TestContext -rs "OpenGL 3+ Rendering Subsystem"
+        # verify that the python modules are loadable
+        cd ../lib && python -c "import _Ogre; import _RTShader"
+        cd ../../
+        # validate XMLConverter output
+        build/bin/OgreXMLConverter Samples/Media/models/jaiqua.mesh && build/bin/OgreXMLConverter Samples/Media/models/jaiqua.skeleton
+        python3 Tools/XMLConverter/docs/validate.py Samples/Media/models/jaiqua.mesh.xml
+        # validate DotScene DTD
+        python3 PlugIns/DotScene/misc/validate.py PlugIns/DotScene/misc/example.scene
+        # check whitespace
+        git diff --check HEAD^
+  android:
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/cache@v2
+      with:
+        path: android-ndk-r21e
+        key: ${{ runner.os }}-android-ndk
+    - name: Install Dependencies
+      run: sudo apt-get install -y swig4.0
+    - name: Build
+      run: |
+        cmake -P ci-build.cmake
+        cmake --build build -- -j 2
+      env:
+        ANDROID: true
+    - name: zip SDK
+      id: package
+      run: |
+        [[ $GITHUB_REF = refs/tags/* ]] && VERNAME=${GITHUB_REF##*/} || VERNAME="master"
+        echo "::set-output name=ver::${VERNAME}"
+        cd build/OgreJNI && zip -qr ogre-sdk-android-${VERNAME}-arm64-v8a.zip *
+    - name: upload artifact
+      run: |
+        test ! -n "$CLOUDSMITH_API_KEY" && exit 0
+        pip3 install --upgrade cloudsmith-cli
+        ~/.local/bin/cloudsmith push raw ogrecave/ogre build/OgreJNI/ogre-sdk-android-*-arm64-v8a.zip --republish --version ${{ steps.package.outputs.ver }} -k $CLOUDSMITH_API_KEY
+      env:
+        CLOUDSMITH_API_KEY: ${{ secrets.CLOUDSMITH_API_KEY }}
+  macos:
+    runs-on: macos-10.15
+    steps:
+    - name: Install Dependencies
+      run: brew update && brew install sdl2 pugixml
+    - uses: actions/checkout@v2
+    - name: Build
+      run: |
+        cmake -P ci-build.cmake
+        set -o pipefail && cmake --build build | xcpretty
+      env:
+        TRAVIS_OS_NAME: osx
+    - name: Test
+      run: build/bin/Debug/Test_Ogre.app/Contents/MacOS/Test_Ogre --gtest_filter=-UseCustomCapabilitiesTests*
+  ios:
+    runs-on: macos-10.15
+    steps:
+    - uses: actions/checkout@v2
+    - name: Build
+      run: |
+        cmake -P ci-build.cmake
+        set -o pipefail && cmake --build build | xcpretty
+      env:
+        IOS: true
+      

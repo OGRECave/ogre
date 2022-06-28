@@ -39,12 +39,10 @@ GLWindow::GLWindow() : mContext(0)
     mIsFullScreen = false;
     mIsExternal = false;
     mIsExternalGLControl = false;
-    mClosed = false;
     mActive = false;
     mHidden = false;
     mVisible = false;
     mVSync = false;
-    mVSyncInterval = 1;
 }
 
 //-------------------------------------------------------------------------------------------------//

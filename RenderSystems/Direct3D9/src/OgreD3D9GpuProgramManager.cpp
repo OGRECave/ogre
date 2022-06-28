@@ -31,36 +31,14 @@ THE SOFTWARE.
 
 namespace Ogre {
     //-----------------------------------------------------------------------------
-    D3D9GpuProgramManager::D3D9GpuProgramManager()
-        :GpuProgramManager()
+    String D3D9GpuProgramManager::currentLanguage = "vs_2_0";
+    GpuProgram* D3D9GpuProgramManager::create(ResourceManager* creator, const String& name, ResourceHandle handle,
+        const String& group, bool isManual, ManualResourceLoader* loader)
     {
-        // Superclass sets up members 
-
-        // Register with resource group manager
-        ResourceGroupManager::getSingleton()._registerResourceManager(mResourceType, this);
-
+        return OGRE_NEW D3D9GpuProgram(creator, name, handle, group, isManual, loader);
     }
-    //-----------------------------------------------------------------------------
-    D3D9GpuProgramManager::~D3D9GpuProgramManager()
-    {
-        // Unregister with resource group manager
-        ResourceGroupManager::getSingleton()._unregisterResourceManager(mResourceType);
 
-    }
-    //-----------------------------------------------------------------------------
-    Resource* D3D9GpuProgramManager::createImpl(const String& name, ResourceHandle handle, 
-        const String& group, bool isManual, ManualResourceLoader* loader,
-        GpuProgramType gptype, const String& syntaxCode)
-    {
-        if (gptype == GPT_VERTEX_PROGRAM)
-        {
-            return OGRE_NEW D3D9GpuVertexProgram(this, name, handle, group, 
-                isManual, loader);
-        }
-        else
-        {
-            return OGRE_NEW D3D9GpuFragmentProgram(this, name, handle, group, 
-                isManual, loader);
-        }
+    const String& D3D9GpuProgramManager::getLanguage(void) const {
+        return currentLanguage;
     }
 }

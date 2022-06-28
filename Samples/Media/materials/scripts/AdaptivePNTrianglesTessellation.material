@@ -345,7 +345,6 @@ material Ogre/AdaptivePNTrianglesTessellation
 			texture_unit 
 			{
 				texture floor_bump.PNG
-				binding_type vertex
 			}
 		}
 	}

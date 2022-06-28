@@ -42,8 +42,7 @@ namespace Ogre {
     }
     PixelBox PixelBox::getSubVolume(const Box &def, bool resetOrigin /* = true */) const
     {
-        if(!contains(def))
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Bounds out of range", "PixelBox::getSubVolume");
+        OgreAssert(contains(def), "");
 
         if(PixelUtil::isCompressed(format) && (def.left != left || def.top != top || def.right != right || def.bottom != bottom))
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Cannot return subvolume of compressed PixelBuffer with less than slice granularity", "PixelBox::getSubVolume");
@@ -425,11 +424,6 @@ namespace Ogre {
     /*************************************************************************
     * Pixel packing/unpacking utilities
     */
-    void PixelUtil::packColour(const ColourValue &colour, const PixelFormat pf,  void* dest)
-    {
-        packColour(colour.r, colour.g, colour.b, colour.a, pf, dest);
-    }
-    //-----------------------------------------------------------------------
     void PixelUtil::packColour(const uint8 r, const uint8 g, const uint8 b, const uint8 a, const PixelFormat pf,  void* dest)
     {
         const PixelFormatDescription &des = getDescriptionFor(pf);
@@ -515,16 +509,9 @@ namespace Ogre {
                 ((uint8*)dest)[0] = (uint8)Bitwise::floatToFixed(r, 8);
                 ((uint8*)dest)[1] = (uint8)Bitwise::floatToFixed(a, 8);
                 break;
-            case PF_A2B10G10R10:
-            {
-                const uint16 ir = static_cast<uint16>( Math::saturate( r ) * 1023.0f + 0.5f );
-                const uint16 ig = static_cast<uint16>( Math::saturate( g ) * 1023.0f + 0.5f );
-                const uint16 ib = static_cast<uint16>( Math::saturate( b ) * 1023.0f + 0.5f );
-                const uint16 ia = static_cast<uint16>( Math::saturate( a ) * 3.0f + 0.5f );
-
-                ((uint32*)dest)[0] = (ia << 30u) | (ir << 20u) | (ig << 10u) | (ib);
+            case PF_A8:
+                ((uint8*)dest)[0] = (uint8)Bitwise::floatToFixed(r, 8);
                 break;
-            }
             default:
                 // Not yet supported
                 OGRE_EXCEPT(
@@ -534,11 +521,6 @@ namespace Ogre {
                 break;
             }
         }
-    }
-    //-----------------------------------------------------------------------
-    void PixelUtil::unpackColour(ColourValue *colour, PixelFormat pf,  const void* src)
-    {
-        unpackColour(&colour->r, &colour->g, &colour->b, &colour->a, pf, src);
     }
     //-----------------------------------------------------------------------
     void PixelUtil::unpackColour(uint8 *r, uint8 *g, uint8 *b, uint8 *a, PixelFormat pf,  const void* src)
@@ -677,20 +659,9 @@ namespace Ogre {
     }
     //-----------------------------------------------------------------------
     /* Convert pixels from one format to another */
-    void PixelUtil::bulkPixelConversion(void *srcp, PixelFormat srcFormat,
-        void *destp, PixelFormat dstFormat, unsigned int count)
-    {
-        PixelBox src(count, 1, 1, srcFormat, srcp),
-                 dst(count, 1, 1, dstFormat, destp);
-
-        bulkPixelConversion(src, dst);
-    }
-    //-----------------------------------------------------------------------
     void PixelUtil::bulkPixelConversion(const PixelBox &src, const PixelBox &dst)
     {
-        assert(src.getWidth() == dst.getWidth() &&
-               src.getHeight() == dst.getHeight() &&
-               src.getDepth() == dst.getDepth());
+        OgreAssert(src.getSize() == dst.getSize(), "");
 
         // Check for compressed formats, we don't support decompression, compression or recoding
         if(PixelUtil::isCompressed(src.format) || PixelUtil::isCompressed(dst.format))

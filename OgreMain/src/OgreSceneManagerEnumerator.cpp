@@ -85,8 +85,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void SceneManagerEnumerator::removeFactory(SceneManagerFactory* fact)
     {
-        if(!fact)
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Cannot remove a null SceneManagerFactory.", "SceneManagerEnumerator::removeFactory");
+        OgreAssert(fact, "Cannot remove a null SceneManagerFactory");
 
         // destroy all instances for this factory
         for (Instances::iterator i = mInstances.begin(); i != mInstances.end(); )
@@ -190,8 +189,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void SceneManagerEnumerator::destroySceneManager(SceneManager* sm)
     {
-        if(!sm)
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Cannot destroy a null SceneManager.", "SceneManagerEnumerator::destroySceneManager");
+        OgreAssert(sm, "Cannot destroy a null SceneManager");
 
         // Erase instance from map
         mInstances.erase(sm->getName());
@@ -274,11 +272,6 @@ namespace Ogre {
         const String& instanceName)
     {
         return OGRE_NEW DefaultSceneManager(instanceName);
-    }
-    //-----------------------------------------------------------------------
-    void DefaultSceneManagerFactory::destroyInstance(SceneManager* instance)
-    {
-        OGRE_DELETE instance;
     }
     //-----------------------------------------------------------------------
     //-----------------------------------------------------------------------

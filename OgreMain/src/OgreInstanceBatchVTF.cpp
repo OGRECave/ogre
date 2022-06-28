@@ -216,7 +216,6 @@ namespace Ogre
                     {
                         texUnit->setTextureName( mMatrixTexture->getName(), textureType );
                         texUnit->setTextureFiltering( TFO_NONE );
-                        texUnit->setBindingType( TextureUnitState::BT_VERTEX );
                     }
                 }
             }
@@ -280,7 +279,6 @@ namespace Ogre
             texHeight += 1;
 
         //Don't use 1D textures, as OGL goes crazy because the shader should be calling texture1D()...
-        //TextureType texType = texHeight == 1 ? TEX_TYPE_1D : TEX_TYPE_2D;
         TextureType texType = TEX_TYPE_2D;
 
         mMatrixTexture = TextureManager::getSingleton().createManual(
@@ -288,6 +286,7 @@ namespace Ogre
                                         (uint)texWidth, (uint)texHeight,
                                         0, PF_FLOAT32_RGBA, TU_DYNAMIC_WRITE_ONLY_DISCARDABLE );
 
+        OgreAssert(mMatrixTexture->getFormat() == PF_FLOAT32_RGBA, "float texture support required");
         //Set our cloned material to use this custom texture!
         setupMaterialToUseVTF( texType, mMaterial );
     }

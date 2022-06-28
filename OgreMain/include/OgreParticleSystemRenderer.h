@@ -36,7 +36,7 @@ THE SOFTWARE.
 #include "OgreRenderable.h"
 
 namespace Ogre {
-
+    class ParticleVisualData;
     /** \addtogroup Core
     *  @{
     */
@@ -58,12 +58,12 @@ namespace Ogre {
         virtual const String& getType(void) const = 0;
 
         /** Delegated to by ParticleSystem::_updateRenderQueue
-        @remarks
+
             The subclass must update the render queue using whichever Renderable
             instance(s) it wishes.
         */
         virtual void _updateRenderQueue(RenderQueue* queue, 
-            std::list<Particle*>& currentParticles, bool cullIndividually) = 0;
+            std::vector<Particle*>& currentParticles, bool cullIndividually) = 0;
 
         /** Sets the material this renderer must use; called by ParticleSystem. */
         virtual void _setMaterial(MaterialPtr& mat) = 0;
@@ -71,10 +71,6 @@ namespace Ogre {
         virtual void _notifyCurrentCamera(Camera* cam) = 0;
         /** Delegated to by ParticleSystem::_notifyAttached */
         virtual void _notifyAttached(Node* parent, bool isTagPoint = false) = 0;
-        /** Optional callback notified when particles are rotated */
-        virtual void _notifyParticleRotated(void) {}
-        /** Optional callback notified when particles are resized individually */
-        virtual void _notifyParticleResized(void) {}
         /** Tells the renderer that the particle quota has changed */
         virtual void _notifyParticleQuota(size_t quota) = 0;
         /** Tells the renderer that the particle default size has changed */
@@ -84,25 +80,13 @@ namespace Ogre {
         /** Optional callback notified when particle expired */
         virtual void _notifyParticleExpired(Particle* particle) {}
         /** Optional callback notified when particles moved */
-        virtual void _notifyParticleMoved(std::list<Particle*>& currentParticles) {}
+        virtual void _notifyParticleMoved(std::vector<Particle*>& currentParticles) {}
         /** Optional callback notified when particles cleared */
-        virtual void _notifyParticleCleared(std::list<Particle*>& currentParticles) {}
-        /** Create a new ParticleVisualData instance for attachment to a particle.
-        @remarks
-            If this renderer needs additional data in each particle, then this should
-            be held in an instance of a subclass of ParticleVisualData, and this method
-            should be overridden to return a new instance of it. The default
-            behaviour is to return null.
-        */
-        virtual ParticleVisualData* _createVisualData(void) { return 0; }
-        /** Destroy a ParticleVisualData instance.
-        @remarks
-            If this renderer needs additional data in each particle, then this should
-            be held in an instance of a subclass of ParticleVisualData, and this method
-            should be overridden to destroy an instance of it. The default
-            behaviour is to do nothing.
-        */
-        virtual void _destroyVisualData(ParticleVisualData* vis) { assert (vis == 0); }
+        virtual void _notifyParticleCleared(std::vector<Particle*>& currentParticles) {}
+        /// @deprecated do not use
+        OGRE_DEPRECATED ParticleVisualData* _createVisualData(void) { return 0; }
+        /// @deprecated do not use
+        OGRE_DEPRECATED void _destroyVisualData(ParticleVisualData*) {}
 
         /** Sets which render queue group this renderer should target with it's
             output.
@@ -127,14 +111,13 @@ namespace Ogre {
         virtual void visitRenderables(Renderable::Visitor* visitor, 
             bool debugRenderables = false) = 0;
 
+        /// Tells the Renderer about the ParticleSystem bounds
+        virtual void _notifyBoundingBox(const AxisAlignedBox& aabb) {}
+
+        /// Tells the Renderer whether to cast shadows
+        virtual void _notifyCastShadows(bool enabled) {}
     };
 
-    /** Abstract class definition of a factory object for ParticleSystemRenderer. */
-    class _OgreExport ParticleSystemRendererFactory : public FactoryObj<ParticleSystemRenderer>, public FXAlloc
-    {
-    public:
-        // No methods, must just override all methods inherited from FactoryObj
-    };
     /** @} */
     /** @} */
 

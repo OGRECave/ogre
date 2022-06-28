@@ -42,14 +42,14 @@
 
 #include "OgreInput.h"
 
-/** \addtogroup Optional
-*  @{
-*/
-/** \addtogroup Bites
-*  @{
-*/
 namespace OgreBites
 {
+    /** \addtogroup Optional
+    *  @{
+    */
+    /** \addtogroup Bites
+    *  @{
+    */
 
 #if OGRE_BITES_HAVE_SDL
     class _OgreBitesExport ApplicationContextSDL : public ApplicationContextBase
@@ -60,6 +60,7 @@ namespace OgreBites
         explicit ApplicationContextSDL(const Ogre::String& appName = "Ogre3D");
 
         void setWindowGrab(NativeWindowType* win, bool grab);
+        float getDisplayDPI() const override;
         void shutdown();
         void pollEvents();
         void addInputListener(NativeWindowType* win, InputListener* lis);
@@ -100,7 +101,7 @@ namespace OgreBites
 #else
     typedef ApplicationContextBase ApplicationContext;
 #endif
+    /** @} */
+    /** @} */
 }
-/** @} */
-/** @} */
 #endif

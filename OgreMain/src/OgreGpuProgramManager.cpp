@@ -28,66 +28,82 @@ THE SOFTWARE.
 #include "OgreStableHeaders.h"
 #include "OgreGpuProgramManager.h"
 #include "OgreHighLevelGpuProgramManager.h"
+#include "OgreUnifiedHighLevelGpuProgram.h"
 #include "OgreStreamSerialiser.h"
 
 namespace Ogre {
-    static uint32 CACHE_CHUNK_ID = StreamSerialiser::makeIdentifier("OGPC"); // Ogre Gpu Program cache
+namespace {
+    uint32 CACHE_CHUNK_ID = StreamSerialiser::makeIdentifier("OGPC"); // Ogre Gpu Program cache
 
-    /// default implementation for RenderSystems without assembly shader support
-    class UnsupportedGpuProgram : public GpuProgram
+    String sNullLang = "null";
+    class NullProgram : public GpuProgram
     {
-    public:
-        UnsupportedGpuProgram(ResourceManager* creator, const String& name, ResourceHandle handle,
-            const String& group, bool isManual, ManualResourceLoader* loader)
-            : GpuProgram(creator, name, handle, group, isManual, loader) { }
+    protected:
+        /** Internal load implementation, must be implemented by subclasses.
+        */
+        void loadFromSource(void) {}
+        void unloadImpl() {}
 
-        bool isSupported() const { return false; }
-        void throwException()
+    public:
+        NullProgram(ResourceManager* creator,
+            const String& name, ResourceHandle handle, const String& group,
+            bool isManual, ManualResourceLoader* loader)
+            : GpuProgram(creator, name, handle, group, isManual, loader){}
+        ~NullProgram() {}
+        /// Overridden from GpuProgram - never supported
+        bool isSupported(void) const { return false; }
+        /// Overridden from GpuProgram
+        const String& getLanguage(void) const { return sNullLang; }
+        size_t calculateSize(void) const { return 0; }
+
+        /// Overridden from StringInterface
+        bool setParameter(const String& name, const String& value)
         {
-            String message = "assembly shaders are unsupported. Shader name:" + mName + "\n";
-            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, message);
+            // always silently ignore all parameters so as not to report errors on
+            // unsupported platforms
+            return true;
         }
 
-    protected:
-        void loadImpl(void)         { throwException(); }
-        void loadFromSource(void)   { throwException(); }
-        void unloadImpl(void)       { }
     };
+    class NullProgramFactory : public HighLevelGpuProgramFactory
+    {
+    public:
+        NullProgramFactory() {}
+        ~NullProgramFactory() {}
+        /// Get the name of the language this factory creates programs for
+        const String& getLanguage(void) const
+        {
+            return sNullLang;
+        }
+        GpuProgram* create(ResourceManager* creator,
+            const String& name, ResourceHandle handle,
+            const String& group, bool isManual, ManualResourceLoader* loader)
+        {
+            return OGRE_NEW NullProgram(creator, name, handle, group, isManual, loader);
+        }
+    };
+}
 
     Resource* GpuProgramManager::createImpl(const String& name, ResourceHandle handle, const String& group,
                                             bool isManual, ManualResourceLoader* loader,
                                             const NameValuePairList* params)
     {
-        NameValuePairList::const_iterator paramSyntax, paramType;
+        OgreAssert(params, "params cannot be null");
 
-        if (!params || (paramSyntax = params->find("syntax")) == params->end() ||
-            (paramType = params->find("type")) == params->end())
+        auto langIt = params->find("language");
+        auto typeIt = params->find("type");
+
+        if(langIt == params->end())
+            langIt = params->find("syntax");
+
+        if (langIt == params->end() || typeIt == params->end())
         {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "You must supply 'syntax' and 'type' parameters");
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+                        "You must supply 'language' or 'syntax' and 'type' parameters");
         }
 
-        GpuProgramType gpt;
-        if (paramType->second == "vertex_program")
-        {
-            gpt = GPT_VERTEX_PROGRAM;
-        }
-        else if (paramType->second == "geometry_program")
-        {
-            gpt = GPT_GEOMETRY_PROGRAM;
-        }
-        else
-        {
-            gpt = GPT_FRAGMENT_PROGRAM;
-        }
-
-        return createImpl(name, handle, group, isManual, loader, gpt, paramSyntax->second);
-    }
-
-    Resource* GpuProgramManager::createImpl(const String& name, ResourceHandle handle, const String& group,
-                                            bool isManual, ManualResourceLoader* loader,
-                                            GpuProgramType gptype, const String& syntaxCode)
-    {
-        return new UnsupportedGpuProgram(this, name, handle, group, isManual, loader);
+        // "syntax" and "type" will be applied by ResourceManager::createResource
+        return getFactory(langIt->second)->create(this, name, handle, group, isManual, loader);
     }
 
     //-----------------------------------------------------------------------
@@ -101,9 +117,9 @@ namespace Ogre {
         assert( msSingleton );  return ( *msSingleton );  
     }
     //-----------------------------------------------------------------------
-    GpuProgramPtr GpuProgramManager::getByName(const String& name, const String& group, bool preferHighLevelPrograms)
+    GpuProgramPtr GpuProgramManager::getByName(const String& name, const String& group) const
     {
-        return static_pointer_cast<GpuProgram>(getResourceByName(name, group, preferHighLevelPrograms));
+        return static_pointer_cast<GpuProgram>(getResourceByName(name, group));
     }
     //---------------------------------------------------------------------------
     GpuProgramManager::GpuProgramManager()
@@ -115,12 +131,17 @@ namespace Ogre {
         mSaveMicrocodesToCache = false;
         mCacheDirty = false;
 
-        // subclasses should register with resource group manager
+        mNullFactory.reset(new NullProgramFactory());
+        addFactory(mNullFactory.get());
+        mUnifiedFactory.reset(new UnifiedHighLevelGpuProgramFactory());
+        addFactory(mUnifiedFactory.get());
+
+        ResourceGroupManager::getSingleton()._registerResourceManager(mResourceType, this);
     }
     //---------------------------------------------------------------------------
     GpuProgramManager::~GpuProgramManager()
     {
-        // subclasses should unregister with resource group manager
+        ResourceGroupManager::getSingleton()._unregisterResourceManager(mResourceType);
     }
     //---------------------------------------------------------------------------
     GpuProgramPtr GpuProgramManager::load(const String& name,
@@ -159,29 +180,27 @@ namespace Ogre {
         return prg;
     }
     //---------------------------------------------------------------------------
-    ResourcePtr GpuProgramManager::create(const String& name, const String& group, 
-        GpuProgramType gptype, const String& syntaxCode, bool isManual, 
-        ManualResourceLoader* loader)
+    GpuProgramPtr GpuProgramManager::create(const String& name, const String& group, GpuProgramType gptype,
+                                            const String& syntaxCode, bool isManual,
+                                            ManualResourceLoader* loader)
     {
-        // Call creation implementation
-        ResourcePtr ret = ResourcePtr(
-            createImpl(name, getNextHandle(), group, isManual, loader, gptype, syntaxCode));
+        auto prg = getFactory(syntaxCode)->create(this, name, getNextHandle(), group, isManual, loader);
+        prg->setType(gptype);
+        prg->setSyntaxCode(syntaxCode);
 
+        ResourcePtr ret(prg);
         addImpl(ret);
         // Tell resource group manager
         if(ret)
             ResourceGroupManager::getSingleton()._notifyResourceCreated(ret);
-        return ret;
+        return static_pointer_cast<GpuProgram>(ret);
     }
     //---------------------------------------------------------------------------
-    GpuProgramPtr GpuProgramManager::createProgram(const String& name, 
-        const String& groupName, const String& filename, 
-        GpuProgramType gptype, const String& syntaxCode)
+    GpuProgramPtr GpuProgramManager::createProgram(const String& name, const String& groupName,
+                                                   const String& filename, GpuProgramType gptype,
+                                                   const String& syntaxCode)
     {
-        GpuProgramPtr prg = static_pointer_cast<GpuProgram>(create(name, groupName, gptype, syntaxCode));
-        // Set all prarmeters (create does not set, just determines factory)
-        prg->setType(gptype);
-        prg->setSyntaxCode(syntaxCode);
+        GpuProgramPtr prg = createProgram(name, groupName, syntaxCode, gptype);
         prg->setSourceFile(filename);
         return prg;
     }
@@ -190,15 +209,12 @@ namespace Ogre {
         const String& groupName, const String& code, GpuProgramType gptype, 
         const String& syntaxCode)
     {
-        GpuProgramPtr prg = static_pointer_cast<GpuProgram>(create(name, groupName, gptype, syntaxCode));
-        // Set all prarmeters (create does not set, just determines factory)
-        prg->setType(gptype);
-        prg->setSyntaxCode(syntaxCode);
+        GpuProgramPtr prg = createProgram(name, groupName, syntaxCode, gptype);
         prg->setSource(code);
         return prg;
     }
     //---------------------------------------------------------------------------
-    const GpuProgramManager::SyntaxCodes& GpuProgramManager::getSupportedSyntax(void) const
+    const GpuProgramManager::SyntaxCodes& GpuProgramManager::getSupportedSyntax(void)
     {
         // Use the current render system
         RenderSystem* rs = Root::getSingleton().getRenderSystem();
@@ -208,26 +224,13 @@ namespace Ogre {
     }
 
     //---------------------------------------------------------------------------
-    bool GpuProgramManager::isSyntaxSupported(const String& syntaxCode) const
+    bool GpuProgramManager::isSyntaxSupported(const String& syntaxCode)
     {
         // Use the current render system
         RenderSystem* rs = Root::getSingleton().getRenderSystem();
 
         // Get the supported syntax from RenderSystemCapabilities 
         return rs && rs->getCapabilities()->isShaderProfileSupported(syntaxCode);
-    }
-    //---------------------------------------------------------------------------
-    ResourcePtr GpuProgramManager::getResourceByName(const String& name, const String& group, bool preferHighLevelPrograms)
-    {
-        if (!preferHighLevelPrograms)
-            return ResourceManager::getResourceByName(name, group);
-        return getResourceByName(name, group);
-    }
-    ResourcePtr GpuProgramManager::getResourceByName(const String& name, const String& group)
-    {
-        // prefer HighLevel Programs
-        ResourcePtr ret = HighLevelGpuProgramManager::getSingleton().getResourceByName(name, group);
-        return ret ? ret : ResourceManager::getResourceByName(name, group);
     }
     //-----------------------------------------------------------------------------
     GpuProgramParametersSharedPtr GpuProgramManager::createParameters(void)
@@ -430,5 +433,38 @@ namespace Ogre {
         
     }
     //---------------------------------------------------------------------
+    //---------------------------------------------------------------------------
+    void GpuProgramManager::addFactory(GpuProgramFactory* factory)
+    {
+        // deliberately allow later plugins to override earlier ones
+        mFactories[factory->getLanguage()] = factory;
+    }
+    //---------------------------------------------------------------------------
+    void GpuProgramManager::removeFactory(GpuProgramFactory* factory)
+    {
+        // Remove only if equal to registered one, since it might overridden
+        // by other plugins
+        FactoryMap::iterator it = mFactories.find(factory->getLanguage());
+        if (it != mFactories.end() && it->second == factory)
+        {
+            mFactories.erase(it);
+        }
+    }
+    //---------------------------------------------------------------------------
+    GpuProgramFactory* GpuProgramManager::getFactory(const String& language)
+    {
+        FactoryMap::iterator i = mFactories.find(language);
 
+        if (i == mFactories.end())
+        {
+            // use the null factory to create programs that will never be supported
+            i = mFactories.find(sNullLang);
+        }
+        return i->second;
+    }
+    //---------------------------------------------------------------------
+    bool GpuProgramManager::isLanguageSupported(const String& lang) const
+    {
+        return mFactories.find(lang) != mFactories.end();
+    }
 }

@@ -6,9 +6,9 @@
 #include <OgreColourValue.h>
 #include <OgreQuaternion.h>
 #include <OgreResourceGroupManager.h>
-#include <OgreSceneLoader.h>
 #include <OgreString.h>
 #include <OgrePlugin.h>
+#include <OgreCodec.h>
 
 namespace pugi
 {
@@ -20,9 +20,16 @@ namespace Ogre
 {
 class SceneManager;
 class SceneNode;
-class TerrainGroup;
 
-class _OgreDotScenePluginExport DotSceneLoader : public Ogre::SceneLoader
+/** \addtogroup Plugins Plugins
+*  @{
+*/
+/** \defgroup DotSceneCodec DotSceneCodec
+ *
+ * %Codec for loading and saving the SceneNode hierarchy in .scene files.
+ * @{
+ */
+class _OgreDotScenePluginExport DotSceneLoader
 {
 public:
     DotSceneLoader();
@@ -30,11 +37,12 @@ public:
 
     void load(Ogre::DataStreamPtr& stream, const Ogre::String& groupName, Ogre::SceneNode* rootNode);
 
-    Ogre::TerrainGroup* getTerrainGroup() { return mTerrainGroup.get(); }
+    void exportScene(SceneNode* rootNode, const String& outFileName);
 
     const Ogre::ColourValue& getBackgroundColour() { return mBackgroundColour; }
 
 protected:
+    void writeNode(pugi::xml_node& parentXML, const SceneNode* node);
     void processScene(pugi::xml_node& XMLRoot);
 
     void processNodes(pugi::xml_node& XMLNode);
@@ -53,6 +61,9 @@ protected:
     void processParticleSystem(pugi::xml_node& XMLNode, Ogre::SceneNode* pParent);
     void processBillboardSet(pugi::xml_node& XMLNode, Ogre::SceneNode* pParent);
     void processPlane(pugi::xml_node& XMLNode, Ogre::SceneNode* pParent);
+    void processNodeAnimations(pugi::xml_node& XMLNode, Ogre::SceneNode* pParent);
+    void processNodeAnimation(pugi::xml_node& XMLNode, Ogre::SceneNode* pParent);
+    void processKeyframe(pugi::xml_node& XMLNode, Ogre::NodeAnimationTrack* pTrack);
 
     void processFog(pugi::xml_node& XMLNode);
     void processSkyBox(pugi::xml_node& XMLNode);
@@ -65,11 +76,10 @@ protected:
     Ogre::SceneManager* mSceneMgr;
     Ogre::SceneNode* mAttachNode;
     Ogre::String m_sGroupName;
-    std::unique_ptr<TerrainGroup> mTerrainGroup;
     Ogre::ColourValue mBackgroundColour;
 };
 
-class DotScenePlugin : public Plugin
+class _OgreDotScenePluginExport DotScenePlugin : public Plugin
 {
     const String& getName() const;
 
@@ -77,8 +87,10 @@ class DotScenePlugin : public Plugin
     void initialise();
     void shutdown();
     void uninstall() {}
-protected:
-    SceneLoader* mDotSceneLoader;
+private:
+    Codec* mCodec;
 };
+/** @} */
+/** @} */
 } // namespace Ogre
 #endif // DOT_SCENELOADER_H

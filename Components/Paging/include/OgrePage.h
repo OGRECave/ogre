@@ -51,7 +51,7 @@ namespace Ogre
     {
     public:
         typedef std::vector<PageContentCollection*> ContentCollectionList;
-    protected:
+    private:
         PageID mID;
         PagedWorldSection* mParent;
         unsigned long mFrameLastHeld;
@@ -71,18 +71,11 @@ namespace Ogre
         struct PageRequest
         {
             Page* srcPage;
-            _OgrePagingExport friend std::ostream& operator<<(std::ostream& o, const PageRequest& r)
-            { return o; }       
-
             PageRequest(Page* p): srcPage(p) {}
         };
         struct PageResponse
         {
             PageData* pageData;
-
-            _OgrePagingExport friend std::ostream& operator<<(std::ostream& o, const PageResponse& r)
-            { return o; }       
-
             PageResponse() : pageData(0) {}
         };
 
@@ -114,7 +107,7 @@ namespace Ogre
         /// Get the PagedWorldSection this page belongs to
         virtual PagedWorldSection* getParentSection() const { return mParent; }
         /** Get the frame number in which this Page was last loaded or held.
-        @remarks
+
             A Page that has not been requested to be loaded or held in the recent
             past will be a candidate for removal.
         */

@@ -81,22 +81,14 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void OverlayManager::_releaseManualHardwareResources()
     {
-        for(int iTemplate = 0; iTemplate <= 1; ++iTemplate)
-        {
-            ElementMap& elementMap = getElementMap(iTemplate != 0);
-            for(ElementMap::iterator i = elementMap.begin(), i_end = elementMap.end(); i != i_end; ++i)
-                i->second->_releaseManualHardwareResources();
-        }
+        for(ElementMap::iterator i = mElements.begin(), i_end = mElements.end(); i != i_end; ++i)
+            i->second->_releaseManualHardwareResources();
     }
     //---------------------------------------------------------------------
     void OverlayManager::_restoreManualHardwareResources()
     {
-        for(int iTemplate = 0; iTemplate <= 1; ++iTemplate)
-        {
-            ElementMap& elementMap = getElementMap(iTemplate != 0);
-            for(ElementMap::iterator i = elementMap.begin(), i_end = elementMap.end(); i != i_end; ++i)
-                i->second->_restoreManualHardwareResources();
-        }
+        for(ElementMap::iterator i = mElements.begin(), i_end = mElements.end(); i != i_end; ++i)
+            i->second->_restoreManualHardwareResources();
     }
     //---------------------------------------------------------------------
     const StringVector& OverlayManager::getScriptPatterns(void) const
@@ -283,20 +275,14 @@ namespace Ogre {
         mPixelRatio = ratio;
     }
     //---------------------------------------------------------------------
-    OverlayManager::ElementMap& OverlayManager::getElementMap(bool isATemplate)
-    {
-        return (isATemplate)?mTemplates:mInstances;
-    }
-
-    //---------------------------------------------------------------------
-    OverlayElement* OverlayManager::createOverlayElementFromTemplate(const String& templateName, const String& typeName, const String& instanceName, bool isATemplate)
+    OverlayElement* OverlayManager::createOverlayElementFromTemplate(const String& templateName, const String& typeName, const String& instanceName, bool)
     {
 
         OverlayElement* newObj  = NULL;
 
         if (templateName.empty())
         {
-            newObj = createOverlayElement(typeName, instanceName, isATemplate);
+            newObj = createOverlayElement(typeName, instanceName);
         }
         else
         {
@@ -313,7 +299,7 @@ namespace Ogre {
                 typeNameToCreate = typeName;
             }
 
-            newObj = createOverlayElement(typeNameToCreate, instanceName, isATemplate);
+            newObj = createOverlayElement(typeNameToCreate, instanceName);
 
             ((OverlayContainer*)newObj)->copyFromTemplate(templateGui);
         }
@@ -330,17 +316,11 @@ namespace Ogre {
     }
 
     //---------------------------------------------------------------------
-    OverlayElement* OverlayManager::createOverlayElement(const String& typeName, const String& instanceName, bool isATemplate)
-    {
-        return createOverlayElementImpl(typeName, instanceName, getElementMap(isATemplate));
-    }
-
-    //---------------------------------------------------------------------
-    OverlayElement* OverlayManager::createOverlayElementImpl(const String& typeName, const String& instanceName, ElementMap& elementMap)
+    OverlayElement* OverlayManager::createOverlayElement(const String& typeName, const String& instanceName, bool)
     {
         // Check not duplicated
-        ElementMap::iterator ii = elementMap.find(instanceName);
-        if (ii != elementMap.end())
+        ElementMap::iterator ii = mElements.find(instanceName);
+        if (ii != mElements.end())
         {
             OGRE_EXCEPT(Exception::ERR_DUPLICATE_ITEM, "OverlayElement with name " + instanceName +
                 " already exists.", "OverlayManager::createOverlayElement" );
@@ -348,7 +328,7 @@ namespace Ogre {
         OverlayElement* newElem = createOverlayElementFromFactory(typeName, instanceName);
 
         // Register
-        elementMap.emplace(instanceName, newElem);
+        mElements.emplace(instanceName, newElem);
 
         return newElem;
 
@@ -369,54 +349,36 @@ namespace Ogre {
         // create
         return fi->second->createOverlayElement(instanceName);
     }
-
     //---------------------------------------------------------------------
-    OverlayElement* OverlayManager::getOverlayElement(const String& name, bool isATemplate)
-    {
-        return getOverlayElementImpl(name, getElementMap(isATemplate));
-    }
-    //---------------------------------------------------------------------
-    bool OverlayManager::hasOverlayElement(const String& name, bool isATemplate)
-    {
-        return hasOverlayElementImpl(name, getElementMap(isATemplate));
-    }
-    //---------------------------------------------------------------------
-    OverlayElement* OverlayManager::getOverlayElementImpl(const String& name, ElementMap& elementMap)
+    OverlayElement* OverlayManager::getOverlayElement(const String& name,bool)
     {
         // Locate instance
-        ElementMap::iterator ii = elementMap.find(name);
-        if (ii == elementMap.end())
+        ElementMap::iterator ii = mElements.find(name);
+        if (ii == mElements.end())
         {
-            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "OverlayElement with name " + name +
-                " not found.", "OverlayManager::getOverlayElementImpl" );
+            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "OverlayElement with name " + name + " not found.");
         }
 
         return ii->second;
     }
     //---------------------------------------------------------------------
-    bool OverlayManager::hasOverlayElementImpl(const String& name, ElementMap& elementMap)
+    bool OverlayManager::hasOverlayElement(const String& name,bool)
     {
-        ElementMap::iterator ii = elementMap.find(name);
-        return ii != elementMap.end();
-    }
-    //---------------------------------------------------------------------
-    void OverlayManager::destroyOverlayElement(const String& instanceName, bool isATemplate)
-    {
-        destroyOverlayElementImpl(instanceName, getElementMap(isATemplate));
+        ElementMap::iterator ii = mElements.find(name);
+        return ii != mElements.end();
     }
 
     //---------------------------------------------------------------------
-    void OverlayManager::destroyOverlayElement(OverlayElement* pInstance, bool isATemplate)
+    void OverlayManager::destroyOverlayElement(OverlayElement* pInstance,bool)
     {
-        destroyOverlayElementImpl(pInstance->getName(), getElementMap(isATemplate));
+        destroyOverlayElement(pInstance->getName());
     }
-
     //---------------------------------------------------------------------
-    void OverlayManager::destroyOverlayElementImpl(const String& instanceName, ElementMap& elementMap)
+    void OverlayManager::destroyOverlayElement(const String& instanceName,bool)
     {
         // Locate instance
-        ElementMap::iterator ii = elementMap.find(instanceName);
-        if (ii == elementMap.end())
+        ElementMap::iterator ii = mElements.find(instanceName);
+        if (ii == mElements.end())
         {
             OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "OverlayElement with name " + instanceName +
                 " not found.", "OverlayManager::destroyOverlayElement" );
@@ -431,19 +393,14 @@ namespace Ogre {
         }
 
         fi->second->destroyOverlayElement(ii->second);
-        elementMap.erase(ii);
+        mElements.erase(ii);
     }
     //---------------------------------------------------------------------
-    void OverlayManager::destroyAllOverlayElements(bool isATemplate)
-    {
-        destroyAllOverlayElementsImpl(getElementMap(isATemplate));
-    }
-    //---------------------------------------------------------------------
-    void OverlayManager::destroyAllOverlayElementsImpl(ElementMap& elementMap)
+    void OverlayManager::destroyAllOverlayElements(bool)
     {
         ElementMap::iterator i;
 
-        while ((i = elementMap.begin()) != elementMap.end())
+        while ((i = mElements.begin()) != mElements.end())
         {
             OverlayElement* element = i->second;
 
@@ -466,7 +423,7 @@ namespace Ogre {
             // children of containers will be auto-removed when container is destroyed.
             // destroy the element and remove it from the list
             fi->second->destroyOverlayElement(element);
-            elementMap.erase(i);
+            mElements.erase(i);
         }
     }
     //---------------------------------------------------------------------

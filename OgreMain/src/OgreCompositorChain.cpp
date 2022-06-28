@@ -96,7 +96,7 @@ void CompositorChain::createOriginalScene()
                 }
                 pass render_scene
                 {
-                    visibility_mask FFFFFFFF
+                    visibility_mask 0xFFFFFFFF
                     render_queues SKIES_EARLY SKIES_LATE
                 }
             }
@@ -113,18 +113,17 @@ void CompositorChain::createOriginalScene()
     CompositorPtr scene = CompositorManager::getSingleton().getByName(compName, ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME);
     if (!scene)
     {
+        /// Create base "original scene" compositor
         scene = CompositorManager::getSingleton().create(compName, ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME);
         CompositionTargetPass *tp = scene->createTechnique()->getOutputTargetPass();
-        tp->createPass(CompositionPass::PT_CLEAR);
+        auto pass = tp->createPass(CompositionPass::PT_CLEAR);
+        pass->setAutomaticColour(true);
 
         /// Render everything, including skies
-        CompositionPass *pass = tp->createPass(CompositionPass::PT_RENDERSCENE);
+        pass = tp->createPass(CompositionPass::PT_RENDERSCENE);
         pass->setFirstRenderQueue(RENDER_QUEUE_BACKGROUND);
         pass->setLastRenderQueue(RENDER_QUEUE_SKIES_LATE);
-
-        /// Create base "original scene" compositor
-        scene = static_pointer_cast<Compositor>(CompositorManager::getSingleton().load(compName,
-            ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME));
+        scene->load();
     }
     mOriginalScene = OGRE_NEW CompositorInstance(scene->getSupportedTechnique(), this);
 }
@@ -148,10 +147,6 @@ CompositorInstance* CompositorChain::addCompositor(CompositorPtr filter, size_t 
     CompositionTechnique *tech = filter->getSupportedTechnique(scheme);
     if(!tech)
     {
-        /// Warn user
-        LogManager::getSingleton().logMessage(
-            "CompositorChain: Compositor " + filter->getName() + " has no supported techniques.", LML_CRITICAL
-            );
         return 0;
     }
     CompositorInstance *t = OGRE_NEW CompositorInstance(tech, this);
@@ -215,15 +210,9 @@ void CompositorChain::_queuedOperation(CompositorInstance::RenderSystemOperation
 
 }
 //-----------------------------------------------------------------------
-CompositorInstance *CompositorChain::getCompositor(size_t index)
+size_t CompositorChain::getCompositorPosition(const String& name) const
 {
-    assert (index < mInstances.size() && "Index out of bounds.");
-    return mInstances[index];
-}
-//-----------------------------------------------------------------------
-size_t CompositorChain::getCompositorPosition(const String& name)
-{
-    for (Instances::iterator it = mInstances.begin(); it != mInstances.end(); ++it) 
+    for (auto it = mInstances.begin(); it != mInstances.end(); ++it)
     {
         if ((*it)->getCompositor()->getName() == name) 
         {
@@ -232,7 +221,7 @@ size_t CompositorChain::getCompositorPosition(const String& name)
     }
     return NPOS;
 }
-CompositorInstance *CompositorChain::getCompositor(const String& name)
+CompositorInstance *CompositorChain::getCompositor(const String& name) const
 {
     size_t idx = getCompositorPosition(name);
     return idx == NPOS ? NULL : mInstances[idx];
@@ -277,6 +266,19 @@ void CompositorChain::setCompositorEnabled(size_t position, bool state)
     inst->setEnabled(state);
 }
 //-----------------------------------------------------------------------
+static const Quaternion& getCubemapRotation(int i)
+{
+    static const Quaternion CubemapRotations[6] = {
+        Quaternion(Degree(-90), Vector3::UNIT_Y), //+X
+        Quaternion(Degree(90), Vector3::UNIT_Y),  //-X
+        Quaternion(Degree(90), Vector3::UNIT_X),  //+Y
+        Quaternion(Degree(-90), Vector3::UNIT_X), //-Y
+        Quaternion::IDENTITY,                     //+Z
+        Quaternion(Degree(180), Vector3::UNIT_Y)  //-Z
+    };
+
+    return CubemapRotations[i];
+}
 void CompositorChain::preRenderTargetUpdate(const RenderTargetEvent& evt)
 {
     /// Compile if state is dirty
@@ -302,17 +304,30 @@ void CompositorChain::preRenderTargetUpdate(const RenderTargetEvent& evt)
     }
 
     /// Iterate over compiled state
-    CompositorInstance::CompiledState::iterator i;
-    for(i=mCompiledState.begin(); i!=mCompiledState.end(); ++i)
+    for(auto& op : mCompiledState)
     {
         /// Skip if this is a target that should only be initialised initially
-        if(i->onlyInitial && i->hasBeenRendered)
+        if(op.onlyInitial && op.hasBeenRendered)
             continue;
-        i->hasBeenRendered = true;
+        op.hasBeenRendered = true;
+
+        auto vp = op.target->getViewport(0);
+        if (!op.cameraOverride.empty())
+        {
+            SceneManager *sm = cam->getSceneManager();
+            cam = sm->getCamera(op.cameraOverride);
+            vp->setCamera(cam);
+        }
+
+        if (op.alignCameraToFace > -1)
+        {
+            cam->getParentSceneNode()->setOrientation(getCubemapRotation(op.alignCameraToFace));
+        }
+
         /// Setup and render
-        preTargetOperation(*i, i->target->getViewport(0), cam);
-        i->target->update();
-        postTargetOperation(*i, i->target->getViewport(0), cam);
+        preTargetOperation(op, vp, cam);
+        op.target->update();
+        postTargetOperation(op, vp, cam);
     }
 }
 //-----------------------------------------------------------------------
@@ -334,16 +349,14 @@ void CompositorChain::preViewportUpdate(const RenderTargetViewportEvent& evt)
     // set original scene details from viewport
     CompositionPass* pass = mOriginalScene->getTechnique()->getOutputTargetPass()->getPasses()[0];
     CompositionTargetPass* passParent = pass->getParent();
-    if (pass->getClearBuffers() != mViewport->getClearBuffers() ||
-        pass->getClearColour() != mViewport->getBackgroundColour() ||
+    if (pass->getClearBuffers() != mOldClearEveryFrameBuffers ||
         pass->getClearDepth() != mViewport->getDepthClear() ||
         passParent->getVisibilityMask() != mViewport->getVisibilityMask() ||
         passParent->getMaterialScheme() != mViewport->getMaterialScheme() ||
         passParent->getShadowsEnabled() != mViewport->getShadowsEnabled())
     {
         // recompile if viewport settings are different
-        pass->setClearBuffers(mViewport->getClearBuffers());
-        pass->setClearColour(mViewport->getBackgroundColour());
+        pass->setClearBuffers(mOldClearEveryFrameBuffers);
         pass->setClearDepth(mViewport->getDepthClear());
         passParent->setVisibilityMask(mViewport->getVisibilityMask());
         passParent->setMaterialScheme(mViewport->getMaterialScheme());
@@ -480,10 +493,6 @@ void CompositorChain::_compile()
     /// Set previous CompositorInstance for each compositor in the list
     CompositorInstance *lastComposition = mOriginalScene;
     mOriginalScene->mPreviousInstance = 0;
-    CompositionPass* pass = mOriginalScene->getTechnique()->getOutputTargetPass()->getPasses()[0];
-    pass->setClearBuffers(mViewport->getClearBuffers());
-    pass->setClearColour(mViewport->getBackgroundColour());
-    pass->setClearDepth(mViewport->getDepthClear());
     for(Instances::iterator i=mInstances.begin(); i!=mInstances.end(); ++i)
     {
         if((*i)->getEnabled())

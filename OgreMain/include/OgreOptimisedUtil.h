@@ -109,7 +109,7 @@ namespace Ogre {
 
         /** Performs a software vertex morph, of the kind used for
             morph animation although it can be used for other purposes. 
-        @remarks
+
             This function will linearly interpolate positions between two
             source buffers, into a third buffer.
         @param t Parametric distance between the start and end positions
@@ -120,6 +120,7 @@ namespace Ogre {
         @param numVertices Number of vertices to morph, which agree with
             the number in start, end and destination buffer. Bear in mind
             three floating-point values per vertex
+        @param morphNormals
         */
         virtual void softwareVertexMorph(
             Real t,
@@ -162,7 +163,7 @@ namespace Ogre {
             size_t numTriangles) = 0;
 
         /** Calculate the light facing state of the triangle's face normals
-        @remarks
+
             This is normally the first stage of calculating a silhouette, i.e.
             establishing which tris are facing the light and which are facing
             away.
@@ -205,7 +206,7 @@ namespace Ogre {
             size_t numVertices) = 0;
     };
 
-    /** Returns raw offseted of the given pointer.
+    /** Returns raw offsetted of the given pointer.
     @note
         The offset are in bytes, no matter what type of the pointer.
     */

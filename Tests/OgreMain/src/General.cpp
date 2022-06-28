@@ -44,8 +44,13 @@ THE SOFTWARE.
 #include "OgreMeshManager.h"
 #include "OgreMesh.h"
 #include "OgreSkeletonManager.h"
+#include "OgreSkeletonInstance.h"
 #include "OgreCompositorManager.h"
 #include "OgreTextureManager.h"
+#include "OgreFileSystem.h"
+#include "OgreArchiveManager.h"
+
+#include "OgreHighLevelGpuProgram.h"
 
 #include <random>
 using std::minstd_rand;
@@ -208,10 +213,10 @@ TEST(MaterialSerializer, Basic)
     ASSERT_TRUE(mat2);
     EXPECT_EQ(mat2->getTechniques().size(), mat->getTechniques().size());
     EXPECT_EQ(mat2->getTechniques()[0]->getPasses()[0]->getAmbient(), ColourValue::Green);
+    EXPECT_EQ(mat2->getTechniques()[0]->getPasses()[0]->getTextureUnitState(0)->getName(),
+              "Test TUS");
     EXPECT_EQ(mat2->getTechniques()[0]->getPasses()[0]->getTextureUnitState("Test TUS")->getContentType(),
               TextureUnitState::CONTENT_SHADOW);
-    EXPECT_EQ(mat2->getTechniques()[0]->getPasses()[0]->getTextureUnitState("Test TUS")->getTextureNameAlias(),
-              "Test TUS");
     EXPECT_EQ(mat2->getTechniques()[0]->getPasses()[0]->getTextureUnitState(1)->getTextureName(),
               "TextureName");
 }
@@ -233,22 +238,66 @@ TEST(Image, FlipV)
 
     // img.save(testPath+"/decal1vflip.png");
 
-    ASSERT_TRUE(!memcmp(img.getData(), ref.getData(), ref.getSize()));
-
     STBIImageCodec::shutdown();
+    ASSERT_TRUE(!memcmp(img.getData(), ref.getData(), ref.getSize()));
 }
 
-struct TestResourceLoadingListener : public ResourceLoadingListener
+TEST(Image, Resize)
 {
-    DataStreamPtr resourceLoading(const String &name, const String &group, Resource *resource) { return DataStreamPtr(); }
-    void resourceStreamOpened(const String &name, const String &group, Resource *resource, DataStreamPtr& dataStream) {}
+    ResourceGroupManager mgr;
+    STBIImageCodec::startup();
+    ConfigFile cf;
+    cf.load(FileSystemLayer(OGRE_VERSION_NAME).getConfigFilePath("resources.cfg"));
+    auto testPath = cf.getSettings("Tests").begin()->second;
+
+    Image ref;
+    ref.load(Root::openFileStream(testPath+"/decal1small.png"), "png");
+
+    Image img;
+    img.load(Root::openFileStream(testPath+"/decal1.png"), "png");
+    img.resize(128, 128);
+
+    //img.save(testPath+"/decal1small.png");
+
+    STBIImageCodec::shutdown();
+    ASSERT_TRUE(!memcmp(img.getData(), ref.getData(), ref.getSize()));
+}
+
+
+TEST(Image, Combine)
+{
+    ResourceGroupManager mgr;
+    FileSystemArchiveFactory fs;
+    ArchiveManager amgr;
+    amgr.addArchiveFactory(&fs);
+    STBIImageCodec::startup();
+    ConfigFile cf;
+    cf.load(FileSystemLayer(OGRE_VERSION_NAME).getConfigFilePath("resources.cfg"));
+    mgr.addResourceLocation(cf.getSettings("General").begin()->second+"/../materials/textures", fs.getType());
+    mgr.initialiseAllResourceGroups();
+
+    auto testPath = cf.getSettings("Tests").begin()->second;
+    Image ref;
+    ref.load(Root::openFileStream(testPath+"/rockwall_flare.png"), "png");
+
+    Image combined;
+    // pick 2 files that are the same size, alpha texture will be made greyscale
+    combined.loadTwoImagesAsRGBA("rockwall.tga", "flare.png", RGN_DEFAULT, PF_BYTE_RGBA);
+
+    // combined.save(testPath+"/rockwall_flare.png");
+    STBIImageCodec::shutdown();
+    ASSERT_TRUE(!memcmp(combined.getData(), ref.getData(), ref.getSize()));
+}
+
+struct UsePreviousResourceLoadingListener : public ResourceLoadingListener
+{
     bool resourceCollision(Resource *resource, ResourceManager *resourceManager) { return false; }
 };
 
 typedef RootWithoutRenderSystemFixture ResourceLoading;
 TEST_F(ResourceLoading, CollsionUseExisting)
 {
-    TestResourceLoadingListener listener;
+    UsePreviousResourceLoadingListener listener;
     ResourceGroupManager::getSingleton().setLoadingListener(&listener);
 
     MaterialPtr mat = MaterialManager::getSingleton().create("Collision", "Tests");
@@ -273,6 +322,27 @@ TEST_F(ResourceLoading, CollsionUseExisting)
         "Collision", "Tests", "null", GPT_VERTEX_PROGRAM));
 }
 
+struct DeletePreviousResourceLoadingListener : public ResourceLoadingListener
+{
+    bool resourceCollision(Resource* resource, ResourceManager* resourceManager)
+    {
+        resourceManager->remove(resource->getName(), resource->getGroup());
+        return true;
+    }
+};
+
+TEST_F(ResourceLoading, CollsionDeleteExisting)
+{
+    DeletePreviousResourceLoadingListener listener;
+    ResourceGroupManager::getSingleton().setLoadingListener(&listener);
+    ResourceGroupManager::getSingleton().createResourceGroup("EmptyGroup", false);
+
+    MaterialPtr mat = MaterialManager::getSingleton().create("Collision", "EmptyGroup");
+    EXPECT_TRUE(mat);
+    EXPECT_TRUE(MaterialManager::getSingleton().create("Collision", "EmptyGroup"));
+    EXPECT_TRUE(mat->clone("Collision"));
+}
+
 typedef RootWithoutRenderSystemFixture TextureTests;
 TEST_F(TextureTests, Blank)
 {
@@ -285,7 +355,99 @@ TEST_F(TextureTests, Blank)
     EXPECT_EQ(tus->getNumMipmaps(), MIP_DEFAULT);
     EXPECT_EQ(tus->getDesiredFormat(), PF_UNKNOWN);
     EXPECT_EQ(tus->getFrameTextureName(0), "");
-    EXPECT_EQ(tus->getIsAlpha(), false);
     EXPECT_EQ(tus->getGamma(), 1.0f);
     EXPECT_EQ(tus->isHardwareGammaEnabled(), false);
+}
+
+TEST(GpuSharedParameters, align)
+{
+    Root root("");
+    GpuSharedParameters params("dummy");
+
+    // trivial case
+    params.addConstantDefinition("a", GCT_FLOAT1);
+    EXPECT_EQ(params.getConstantDefinition("a").logicalIndex, 0);
+
+    // 16 byte alignment
+    params.addConstantDefinition("b", GCT_FLOAT4);
+    EXPECT_EQ(params.getConstantDefinition("b").logicalIndex, 16);
+
+    // break alignment again
+    params.addConstantDefinition("c", GCT_FLOAT1);
+    EXPECT_EQ(params.getConstantDefinition("c").logicalIndex, 32);
+
+    // 16 byte alignment
+    params.addConstantDefinition("d", GCT_MATRIX_4X4);
+    EXPECT_EQ(params.getConstantDefinition("d").logicalIndex, 48);
+}
+
+typedef RootWithoutRenderSystemFixture HighLevelGpuProgramTest;
+TEST_F(HighLevelGpuProgramTest, resolveIncludes)
+{
+    auto mat = MaterialManager::getSingleton().create("Dummy", RGN_DEFAULT);
+
+    auto& rgm = ResourceGroupManager::getSingleton();
+    rgm.addResourceLocation(".", "FileSystem", RGN_DEFAULT, false, false);
+
+    // recursive inclusion
+    String bar = "World";
+    rgm.createResource("bar.cg", RGN_DEFAULT)->write(bar.c_str(), bar.size());
+    String foo = "Hello\n#include <bar.cg>\n";
+    rgm.createResource("foo.cg", RGN_DEFAULT)->write(foo.c_str(), foo.size());
+    const char* src = "#include <foo.cg>";
+
+    String res = HighLevelGpuProgram::_resolveIncludes(src, mat.get(), "main.cg", true);
+    rgm.deleteResource("foo.cg", RGN_DEFAULT);
+    rgm.deleteResource("bar.cg", RGN_DEFAULT);
+
+    String ref = "#line 1  \"foo.cg\"\n"
+                 "Hello\n"
+                 "#line 1  \"bar.cg\"\n"
+                 "World\n"
+                 "#line 3 \"foo.cg\"";
+
+    ASSERT_EQ(res.substr(0, ref.size()), ref);
+}
+
+TEST(Math, TriangleRayIntersection)
+{
+    Vector3 tri[3] = {{-1, 0, 0}, {1, 0, 0}, {0, 1, 0}};
+    auto ray = Ray({0, 0.5, 1}, {0, 0, -1});
+
+    EXPECT_TRUE(Math::intersects(ray, tri[0], tri[1], tri[2], true, true).first);
+    EXPECT_TRUE(Math::intersects(ray, tri[0], tri[1], tri[2], true, false).first);
+    EXPECT_FALSE(Math::intersects(ray, tri[0], tri[1], tri[2], false, true).first);
+    EXPECT_FALSE(Math::intersects(ray, tri[0], tri[1], tri[2], false, false).first);
+
+    ray = Ray({0, 0.5, -1}, {0, 0, 1});
+
+    EXPECT_TRUE(Math::intersects(ray, tri[0], tri[1], tri[2], true, true).first);
+    EXPECT_FALSE(Math::intersects(ray, tri[0], tri[1], tri[2], true, false).first);
+    EXPECT_TRUE(Math::intersects(ray, tri[0], tri[1], tri[2], false, true).first);
+    EXPECT_FALSE(Math::intersects(ray, tri[0], tri[1], tri[2], false, false).first);
+}
+
+typedef RootWithoutRenderSystemFixture SkeletonTests;
+TEST_F(SkeletonTests, linkedSkeletonAnimationSource)
+{
+    auto sceneMgr = mRoot->createSceneManager();
+    auto entity = sceneMgr->createEntity("jaiqua.mesh");
+    entity->getSkeleton()->addLinkedSkeletonAnimationSource("ninja.skeleton");
+    entity->refreshAvailableAnimationState();
+    EXPECT_TRUE(entity->getAnimationState("Stealth")); // animation from ninja.sekeleton
+}
+
+TEST(MaterialLoading, LateShadowCaster)
+{
+    Root root("");
+    auto tech = MaterialManager::getSingleton().create("Material", RGN_DEFAULT)->createTechnique();
+    tech->setShadowCasterMaterial("Caster");
+    EXPECT_FALSE(tech->getShadowCasterMaterial());
+
+    MaterialManager::getSingleton().create("Caster", RGN_DEFAULT);
+
+    // force call _load() due to missing rendersystem
+    tech->_load();
+
+    EXPECT_TRUE(tech->getShadowCasterMaterial());
 }

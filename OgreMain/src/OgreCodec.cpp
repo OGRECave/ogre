@@ -35,6 +35,17 @@ namespace Ogre {
     Codec::~Codec() {
     }
 
+    DataStreamPtr Codec::encode(const Any& input) const
+    {
+        OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, getType() + " - encoding to memory not supported");
+        return DataStreamPtr();
+    }
+
+    void Codec::encodeToFile(const Any& input, const String& outFileName) const
+    {
+        OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, getType() + " - encoding to file not supported");
+    }
+
     StringVector Codec::getExtensions(void)
     {
         StringVector result;
@@ -45,6 +56,13 @@ namespace Ogre {
             result.push_back(i->first);
         }
         return result;
+    }
+
+    void Codec::registerCodec(Codec* pCodec)
+    {
+        auto ret = msMapCodecs.emplace(pCodec->getType(), pCodec);
+        if (!ret.second)
+            OGRE_EXCEPT(Exception::ERR_DUPLICATE_ITEM, pCodec->getType() + " already has a registered codec");
     }
 
     Codec* Codec::getCodec(const String& extension)
@@ -60,10 +78,8 @@ namespace Ogre {
             else
                 formats_str = "Supported formats are: " + StringConverter::toString(getExtensions()) + ".";
 
-            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
-                "Can not find codec for '" + extension + "' image format.\n" + 
-                formats_str,
-                "Codec::getCodec");
+            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND,
+                        "Can not find codec for '" + extension + "' format.\n" + formats_str);
         }
 
         return i->second;

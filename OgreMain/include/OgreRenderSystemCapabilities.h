@@ -80,26 +80,25 @@ namespace Ogre
         RSC_AUTOMIPMAP_COMPRESSED = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 1),
         /// Supports anisotropic texture filtering
         RSC_ANISOTROPY              = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 2),
-        /// Supports fixed-function DOT3 texture blend
-        /// @deprecated All targetted APIs by Ogre support this feature
-        RSC_DOT3                    = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 3),
+        /// Supports depth clamping
+        RSC_DEPTH_CLAMP             = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 3),
         /// Supports linewidth != 1.0
         RSC_WIDE_LINES              = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 4),
         /// Supports hardware stencil buffer
         RSC_HWSTENCIL               = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 5),
-        /// Supports atomic counter buffers
-        RSC_ATOMIC_COUNTERS         = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 6),
+        /// Supports read/write buffers with atomic counters (e.g. RWStructuredBuffer or SSBO)
+        RSC_READ_WRITE_BUFFERS      = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 6),
         /// Supports compressed textures in the ASTC format
         RSC_TEXTURE_COMPRESSION_ASTC = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 7),
         /// Supports 32bit hardware index buffers
         RSC_32BIT_INDEX             = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 8),
         /// Supports vertex programs (vertex shaders)
+        /// @deprecated All targeted APIs by Ogre support this feature
         RSC_VERTEX_PROGRAM          = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 9),
-        /// Supports fragment programs (pixel shaders)
-        RSC_FRAGMENT_PROGRAM        = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 10),
-        /// Supports performing a scissor test to exclude areas of the screen
-		/// @deprecated All targetted APIs by Ogre support this feature
-        RSC_SCISSOR_TEST            = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 11),
+        /// Supports hardware tessellation domain programs
+        RSC_TESSELLATION_DOMAIN_PROGRAM = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 10),
+        /// Supports 2D Texture Arrays
+        RSC_TEXTURE_2D_ARRAY        = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 11),
         /// Supports separate stencil updates for both front and back faces
         RSC_TWO_SIDED_STENCIL       = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 12),
         /// Supports wrapping the stencil value at the range extremeties
@@ -108,10 +107,10 @@ namespace Ogre
         RSC_HWOCCLUSION             = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 14),
         /// Supports user clipping planes
         RSC_USER_CLIP_PLANES        = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 15),
-        /// Supports the VET_UBYTE4 vertex element type
-        RSC_VERTEX_FORMAT_UBYTE4    = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 16),
-        /// Supports infinite far plane projection
-        RSC_INFINITE_FAR_PLANE      = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 17),
+        /// Supports hardware compute programs
+        RSC_COMPUTE_PROGRAM         = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 16),
+        /// Supports 1d textures
+        RSC_TEXTURE_1D              = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 17),
         /// Supports hardware render-to-texture (bigger than framebuffer)
         RSC_HWRENDER_TO_TEXTURE     = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 18),
         /// Supports float textures and render targets
@@ -157,9 +156,8 @@ namespace Ogre
         RSC_MRT_DIFFERENT_BIT_DEPTHS = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 10),
         /// Supports Alpha to Coverage (A2C)
         RSC_ALPHA_TO_COVERAGE = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 11),
-        /// Supports Blending operations other than +
-		/// @deprecated All targetted APIs by Ogre support this feature.
-        RSC_ADVANCED_BLEND_OPERATIONS = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 12),
+        /// Supports reading back compiled shaders
+        RSC_CAN_GET_COMPILED_SHADER_BUFFER = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 12),
         /// Supports HW gamma, both in the framebuffer and as texture.
         RSC_HW_GAMMA = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 13),
         /// Supports using the MAIN depth buffer for RTTs. D3D 9&10, OGL w/FBO support unknown
@@ -170,22 +168,10 @@ namespace Ogre
         RSC_RTT_DEPTHBUFFER_RESOLUTION_LESSEQUAL = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 15),
         /// Supports using vertex buffers for instance data
         RSC_VERTEX_BUFFER_INSTANCE_DATA = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 16),
-        /// Supports using vertex buffers for instance data
-        RSC_CAN_GET_COMPILED_SHADER_BUFFER = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 17),
-        /// Supports dynamic linkage/shader subroutine
-        RSC_SHADER_SUBROUTINE = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 18),
-
-        RSC_HWRENDER_TO_TEXTURE_3D = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 19),
-        /// Supports 1d textures
-        RSC_TEXTURE_1D              = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 20),
         /// Supports hardware tessellation hull programs
-        RSC_TESSELLATION_HULL_PROGRAM = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 21),
-        /// Supports hardware tessellation domain programs
-        RSC_TESSELLATION_DOMAIN_PROGRAM = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 22),
-        /// Supports hardware compute programs
-        RSC_COMPUTE_PROGRAM = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 23),
-        /// Supports asynchronous hardware occlusion queries
-        RSC_HWOCCLUSION_ASYNCHRONOUS = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 24),
+        RSC_TESSELLATION_HULL_PROGRAM = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 17),
+        /// Supports #VET_INT_10_10_10_2_NORM
+        RSC_VERTEX_FORMAT_INT_10_10_10_2 = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 18),
 
         // ***** DirectX specific caps *****
         /// Is DirectX feature "per stage constants" supported
@@ -196,6 +182,9 @@ namespace Ogre
         /// W-buffers are enabled by default for 16bit depth buffers and disabled for all other
         /// depths.
         RSC_WBUFFER              = OGRE_CAPS_VALUE(CAPS_CATEGORY_D3D9, 2),
+        /// D3D11: Supports asynchronous hardware occlusion queries
+        RSC_HWOCCLUSION_ASYNCHRONOUS = OGRE_CAPS_VALUE(CAPS_CATEGORY_D3D9, 3),
+        RSC_HWRENDER_TO_TEXTURE_3D = OGRE_CAPS_VALUE(CAPS_CATEGORY_D3D9, 4),
 
         // ***** GL Specific Caps *****
         /// Support for PBuffer
@@ -211,6 +200,12 @@ namespace Ogre
         RSC_DEBUG = OGRE_CAPS_VALUE(CAPS_CATEGORY_GL, 4),
         /// RS can map driver buffer storage directly instead of using a shadow buffer
         RSC_MAPBUFFER = OGRE_CAPS_VALUE(CAPS_CATEGORY_GL, 5),
+
+        // deprecated caps, all aliasing to RSC_VERTEX_PROGRAM
+        /// @deprecated assume present
+        RSC_INFINITE_FAR_PLANE = RSC_VERTEX_PROGRAM,
+        /// @deprecated assume present
+        RSC_FRAGMENT_PROGRAM = RSC_VERTEX_PROGRAM
     };
 
     /// DriverVersion is used by RenderSystemCapabilities and both GL and D3D9
@@ -227,28 +222,8 @@ namespace Ogre
             major = minor = release = build = 0;
         }
 
-        String toString() const 
-        {
-            StringStream str;
-            str << major << "." << minor << "." << release << "." << build;
-            return str.str();
-        }
-
-        void fromString(const String& versionString)
-        {
-            StringVector tokens = StringUtil::split(versionString, ".");
-            if(!tokens.empty())
-            {
-                major = StringConverter::parseInt(tokens[0]);
-                if (tokens.size() > 1)
-                    minor = StringConverter::parseInt(tokens[1]);
-                if (tokens.size() > 2)
-                    release = StringConverter::parseInt(tokens[2]);
-                if (tokens.size() > 3)
-                    build = StringConverter::parseInt(tokens[3]);
-            }
-
-        }
+        String toString() const;
+        void fromString(const String& versionString);
     };
 
     /** Enumeration of GPU vendors. */
@@ -272,7 +247,7 @@ namespace Ogre
     };
 
     /** This class stores the capabilities of the graphics card.
-    @remarks
+
     This information is set by the individual render systems.
     */
     class _OgreExport RenderSystemCapabilities : public RenderSysAlloc
@@ -296,8 +271,6 @@ namespace Ogre
         ushort mNumTextureUnits;
         /// The stencil buffer bit depth
         ushort mStencilBufferBitDepth;
-        /// The number of matrices available for hardware blending
-        ushort mNumVertexBlendMatrices;
         /// Stores the capabilities flags.
         int mCapabilities[CAPS_CATEGORY_COUNT];
         /// Which categories are relevant
@@ -307,24 +280,12 @@ namespace Ogre
         /// The identifier associated with the render system for which these capabilities are valid
         String mRenderSystemName;
 
-        /// The number of floating-point constants vertex programs support
-        ushort mVertexProgramConstantFloatCount;           
-        /// The number of integer constants vertex programs support
-        ushort mVertexProgramConstantIntCount;           
-        /// The number of boolean constants vertex programs support
-        ushort mVertexProgramConstantBoolCount;           
-        /// The number of floating-point constants geometry programs support
-        ushort mGeometryProgramConstantFloatCount;           
-        /// The number of integer constants vertex geometry support
-        ushort mGeometryProgramConstantIntCount;           
-        /// The number of boolean constants vertex geometry support
-        ushort mGeometryProgramConstantBoolCount;           
-        /// The number of floating-point constants fragment programs support
-        ushort mFragmentProgramConstantFloatCount;           
-        /// The number of integer constants fragment programs support
-        ushort mFragmentProgramConstantIntCount;           
-        /// The number of boolean constants fragment programs support
-        ushort mFragmentProgramConstantBoolCount;
+        /// The number of floating-point 4-vector constants vertex programs support
+        ushort mVertexProgramConstantFloatCount;
+        /// The number of floating-point 4-vector constants geometry programs support
+        ushort mGeometryProgramConstantFloatCount;
+        /// The number of floating-point 4-vector constants fragment programs support
+        ushort mFragmentProgramConstantFloatCount;
         /// The number of simultaneous render targets supported
         ushort mNumMultiRenderTargets;
         /// The maximum point size
@@ -344,25 +305,12 @@ namespace Ogre
         /// The list of supported shader profiles
         ShaderProfiles mSupportedShaderProfiles;
 
-        // Support for new shader stages in shader model 5.0
-        /// The number of floating-point constants tessellation Hull programs support
-        ushort mTessellationHullProgramConstantFloatCount;           
-        /// The number of integer constants tessellation Hull programs support
-        ushort mTessellationHullProgramConstantIntCount;           
-        /// The number of boolean constants tessellation Hull programs support
-        ushort mTessellationHullProgramConstantBoolCount;
-        /// The number of floating-point constants tessellation Domain programs support
-        ushort mTessellationDomainProgramConstantFloatCount;           
-        /// The number of integer constants tessellation Domain programs support
-        ushort mTessellationDomainProgramConstantIntCount;           
-        /// The number of boolean constants tessellation Domain programs support
-        ushort mTessellationDomainProgramConstantBoolCount;
-        /// The number of floating-point constants compute programs support
-        ushort mComputeProgramConstantFloatCount;           
-        /// The number of integer constants compute programs support
-        ushort mComputeProgramConstantIntCount;           
-        /// The number of boolean constants compute programs support
-        ushort mComputeProgramConstantBoolCount;
+        /// The number of floating-point 4-vector constants tessellation Hull programs support
+        ushort mTessellationHullProgramConstantFloatCount;
+        /// The number of floating-point 4-vector constants tessellation Domain programs support
+        ushort mTessellationDomainProgramConstantFloatCount;
+        /// The number of floating-point 4-vector constants compute programs support
+        ushort mComputeProgramConstantFloatCount;
 
         /// The number of vertex attributes available
         ushort mNumVertexAttributes;
@@ -433,14 +381,10 @@ namespace Ogre
             mNumTextureUnits = num;
         }
 
+        /// @deprecated do not use
         void setStencilBufferBitDepth(ushort num)
         {
             mStencilBufferBitDepth = num;
-        }
-
-        void setNumVertexBlendMatrices(ushort num)
-        {
-            mNumVertexBlendMatrices = num;
         }
 
         /// The number of simultaneous render targets supported
@@ -476,22 +420,10 @@ namespace Ogre
             return mNumTextureUnits;
         }
 
-        /** Determines the bit depth of the hardware accelerated stencil 
-        buffer, if supported.
-        @remarks
-        If hardware stencilling is not supported, the software will
-        provide an 8-bit software stencil.
-        */
+        /// @deprecated assume 8-bit stencil buffer
         ushort getStencilBufferBitDepth(void) const
         {
             return mStencilBufferBitDepth;
-        }
-
-        /** Returns the number of matrices available to hardware vertex 
-        blending for this rendering system. */
-        ushort getNumVertexBlendMatrices(void) const
-        {
-            return mNumVertexBlendMatrices;
         }
 
         /// The number of simultaneous render targets supported
@@ -546,26 +478,15 @@ namespace Ogre
 
         /** Adds the profile to the list of supported profiles
         */
-        void addShaderProfile(const String& profile)
-        {
-            mSupportedShaderProfiles.insert(profile);
-
-        }
+        void addShaderProfile(const String& profile);
 
         /** Remove a given shader profile, if present.
         */
-        void removeShaderProfile(const String& profile)
-        {
-            mSupportedShaderProfiles.erase(profile);
-        }
+        void removeShaderProfile(const String& profile);
 
         /** Returns true if profile is in the list of supported profiles
         */
-        bool isShaderProfileSupported(const String& profile) const
-        {
-            return (mSupportedShaderProfiles.end() != mSupportedShaderProfiles.find(profile));
-        }
-
+        bool isShaderProfileSupported(const String& profile) const;
 
         /** Returns a set of all supported shader profiles
         * */
@@ -575,50 +496,20 @@ namespace Ogre
         }
 
 
-        /// The number of floating-point constants vertex programs support
+        /// The number of floating-point 4-vector constants vertex programs support
         ushort getVertexProgramConstantFloatCount(void) const
         {
-            return mVertexProgramConstantFloatCount;           
+            return mVertexProgramConstantFloatCount;
         }
-        /// The number of integer constants vertex programs support
-        ushort getVertexProgramConstantIntCount(void) const
-        {
-            return mVertexProgramConstantIntCount;           
-        }
-        /// The number of boolean constants vertex programs support
-        ushort getVertexProgramConstantBoolCount(void) const
-        {
-            return mVertexProgramConstantBoolCount;           
-        }
-        /// The number of floating-point constants geometry programs support
+        /// The number of floating-point 4-vector constants geometry programs support
         ushort getGeometryProgramConstantFloatCount(void) const
         {
-            return mGeometryProgramConstantFloatCount;           
+            return mGeometryProgramConstantFloatCount;
         }
-        /// The number of integer constants geometry programs support
-        ushort getGeometryProgramConstantIntCount(void) const
-        {
-            return mGeometryProgramConstantIntCount;           
-        }
-        /// The number of boolean constants geometry programs support
-        ushort getGeometryProgramConstantBoolCount(void) const
-        {
-            return mGeometryProgramConstantBoolCount;           
-        }
-        /// The number of floating-point constants fragment programs support
+        /// The number of floating-point 4-vector constants fragment programs support
         ushort getFragmentProgramConstantFloatCount(void) const
         {
-            return mFragmentProgramConstantFloatCount;           
-        }
-        /// The number of integer constants fragment programs support
-        ushort getFragmentProgramConstantIntCount(void) const
-        {
-            return mFragmentProgramConstantIntCount;           
-        }
-        /// The number of boolean constants fragment programs support
-        ushort getFragmentProgramConstantBoolCount(void) const
-        {
-            return mFragmentProgramConstantBoolCount;           
+            return mFragmentProgramConstantFloatCount;
         }
 
         /// sets the device name for Render system
@@ -633,51 +524,22 @@ namespace Ogre
             return mDeviceName;
         }
 
-        /// The number of floating-point constants vertex programs support
+        /// The number of floating-point 4-vector constants vertex programs support
         void setVertexProgramConstantFloatCount(ushort c)
         {
-            mVertexProgramConstantFloatCount = c;           
+            mVertexProgramConstantFloatCount = c;
         }
-        /// The number of integer constants vertex programs support
-        void setVertexProgramConstantIntCount(ushort c)
-        {
-            mVertexProgramConstantIntCount = c;           
-        }
-        /// The number of boolean constants vertex programs support
-        void setVertexProgramConstantBoolCount(ushort c)
-        {
-            mVertexProgramConstantBoolCount = c;           
-        }
-        /// The number of floating-point constants geometry programs support
+        /// The number of floating-point 4-vector constants geometry programs support
         void setGeometryProgramConstantFloatCount(ushort c)
         {
-            mGeometryProgramConstantFloatCount = c;           
+            mGeometryProgramConstantFloatCount = c;
         }
-        /// The number of integer constants geometry programs support
-        void setGeometryProgramConstantIntCount(ushort c)
-        {
-            mGeometryProgramConstantIntCount = c;           
-        }
-        /// The number of boolean constants geometry programs support
-        void setGeometryProgramConstantBoolCount(ushort c)
-        {
-            mGeometryProgramConstantBoolCount = c;           
-        }
-        /// The number of floating-point constants fragment programs support
+        /// The number of floating-point 4-vector constants fragment programs support
         void setFragmentProgramConstantFloatCount(ushort c)
         {
-            mFragmentProgramConstantFloatCount = c;           
+            mFragmentProgramConstantFloatCount = c;
         }
-        /// The number of integer constants fragment programs support
-        void setFragmentProgramConstantIntCount(ushort c)
-        {
-            mFragmentProgramConstantIntCount = c;           
-        }
-        /// The number of boolean constants fragment programs support
-        void setFragmentProgramConstantBoolCount(ushort c)
-        {
-            mFragmentProgramConstantBoolCount = c;           
-        }
+
         /// Maximum point screen size in pixels
         void setMaxPointSize(Real s)
         {
@@ -694,7 +556,7 @@ namespace Ogre
             mNonPOW2TexturesLimited = l;
         }
         /** Are non-power of two textures limited in features?
-        @remarks
+
         If the RSC_NON_POWER_OF_2_TEXTURES capability is set, but this
         method returns true, you can use non power of 2 textures only if:
         <ul><li>You load them explicitly with no mip maps</li>
@@ -726,14 +588,13 @@ namespace Ogre
         {
             return mNumVertexTextureUnits;
         }
-        /// Set whether the vertex texture units are shared with the fragment processor
-        void setVertexTextureUnitsShared(bool shared)
+        /// @deprecated obsolete
+        OGRE_DEPRECATED void setVertexTextureUnitsShared(bool shared)
         {
             mVertexTextureUnitsShared = shared;
         }
-        /// Get whether the vertex texture units are shared with the fragment processor
-        /// @deprecated only needed for D3D9
-        bool getVertexTextureUnitsShared(void) const
+        /// @deprecated obsolete
+        OGRE_DEPRECATED bool getVertexTextureUnitsShared(void) const
         {
             return mVertexTextureUnitsShared;
         }
@@ -777,101 +638,163 @@ namespace Ogre
         /** Write the capabilities to the pass in Log */
         void log(Log* pLog) const;
 
-        // Support for new shader stages in shader model 5.0
-        /// The number of floating-point constants tessellation Hull programs support
-        void setTessellationHullProgramConstantFloatCount(ushort c)
-        {
-            mTessellationHullProgramConstantFloatCount = c;           
-        }
-        /// The number of integer constants tessellation Domain programs support
-        void setTessellationHullProgramConstantIntCount(ushort c)
-        {
-            mTessellationHullProgramConstantIntCount = c;           
-        }
-        /// The number of boolean constants tessellation Domain programs support
-        void setTessellationHullProgramConstantBoolCount(ushort c)
-        {
-            mTessellationHullProgramConstantBoolCount = c;           
-        }
-        /// The number of floating-point constants fragment programs support
-        ushort getTessellationHullProgramConstantFloatCount(void) const
-        {
-            return mTessellationHullProgramConstantFloatCount;           
-        }
-        /// The number of integer constants fragment programs support
-        ushort getTessellationHullProgramConstantIntCount(void) const
-        {
-            return mTessellationHullProgramConstantIntCount;           
-        }
-        /// The number of boolean constants fragment programs support
-        ushort getTessellationHullProgramConstantBoolCount(void) const
-        {
-            return mTessellationHullProgramConstantBoolCount;           
-        }
-
-        /// The number of floating-point constants tessellation Domain programs support
-        void setTessellationDomainProgramConstantFloatCount(ushort c)
-        {
-            mTessellationDomainProgramConstantFloatCount = c;           
-        }
-        /// The number of integer constants tessellation Domain programs support
-        void setTessellationDomainProgramConstantIntCount(ushort c)
-        {
-            mTessellationDomainProgramConstantIntCount = c;           
-        }
-        /// The number of boolean constants tessellation Domain programs support
-        void setTessellationDomainProgramConstantBoolCount(ushort c)
-        {
-            mTessellationDomainProgramConstantBoolCount = c;           
-        }
-        /// The number of floating-point constants fragment programs support
-        ushort getTessellationDomainProgramConstantFloatCount(void) const
-        {
-            return mTessellationDomainProgramConstantFloatCount;           
-        }
-        /// The number of integer constants fragment programs support
-        ushort getTessellationDomainProgramConstantIntCount(void) const
-        {
-            return mTessellationDomainProgramConstantIntCount;           
-        }
-        /// The number of boolean constants fragment programs support
-        ushort getTessellationDomainProgramConstantBoolCount(void) const
-        {
-            return mTessellationDomainProgramConstantBoolCount;           
-        }
-
-        /// The number of floating-point constants compute programs support
+        /// The number of floating-point 4-vector constants compute programs support
         void setComputeProgramConstantFloatCount(ushort c)
         {
-            mComputeProgramConstantFloatCount = c;           
+            mComputeProgramConstantFloatCount = c;
         }
-        /// The number of integer constants compute programs support
-        void setComputeProgramConstantIntCount(ushort c)
-        {
-            mComputeProgramConstantIntCount = c;           
-        }
-        /// The number of boolean constants compute programs support
-        void setComputeProgramConstantBoolCount(ushort c)
-        {
-            mComputeProgramConstantBoolCount = c;           
-        }
-        /// The number of floating-point constants fragment programs support
+        /// The number of floating-point 4-vector constants fragment programs support
         ushort getComputeProgramConstantFloatCount(void) const
         {
-            return mComputeProgramConstantFloatCount;           
+            return mComputeProgramConstantFloatCount;
         }
-        /// The number of integer constants fragment programs support
-        ushort getComputeProgramConstantIntCount(void) const
+        /// The number of floating-point 4-vector constants fragment programs support
+        ushort getTessellationDomainProgramConstantFloatCount(void) const
         {
-            return mComputeProgramConstantIntCount;           
+            return mTessellationDomainProgramConstantFloatCount;
         }
-        /// The number of boolean constants fragment programs support
-        ushort getComputeProgramConstantBoolCount(void) const
+        /// The number of floating-point 4-vector constants tessellation Domain programs support
+        void setTessellationDomainProgramConstantFloatCount(ushort c)
         {
-            return mComputeProgramConstantBoolCount;           
+            mTessellationDomainProgramConstantFloatCount = c;
+        }
+        /// The number of floating-point 4-vector constants fragment programs support
+        ushort getTessellationHullProgramConstantFloatCount(void) const
+        {
+            return mTessellationHullProgramConstantFloatCount;
+        }
+        /// The number of floating-point 4-vector constants tessellation Hull programs support
+        void setTessellationHullProgramConstantFloatCount(ushort c)
+        {
+            mTessellationHullProgramConstantFloatCount = c;
+        }
+
+
+        /// @deprecated use getVertexProgramConstantFloatCount instead
+        OGRE_DEPRECATED ushort getVertexProgramConstantIntCount(void) const
+        {
+            return mVertexProgramConstantFloatCount;
+        }
+        /// @deprecated use getVertexProgramConstantFloatCount instead
+        OGRE_DEPRECATED ushort getVertexProgramConstantBoolCount(void) const
+        {
+            return mVertexProgramConstantFloatCount;
+        }
+        /// @deprecated use getGeometryProgramConstantFloatCount instead
+        OGRE_DEPRECATED ushort getGeometryProgramConstantIntCount(void) const
+        {
+            return mGeometryProgramConstantFloatCount;
+        }
+        /// @deprecated use getGeometryProgramConstantFloatCount instead
+        OGRE_DEPRECATED ushort getGeometryProgramConstantBoolCount(void) const
+        {
+            return mGeometryProgramConstantFloatCount;
+        }
+        /// @deprecated use getFragmentProgramConstantFloatCount instead
+        OGRE_DEPRECATED ushort getFragmentProgramConstantIntCount(void) const
+        {
+            return mFragmentProgramConstantFloatCount;
+        }
+        /// @deprecated use getFragmentProgramConstantFloatCount instead
+        OGRE_DEPRECATED ushort getFragmentProgramConstantBoolCount(void) const
+        {
+            return mFragmentProgramConstantFloatCount;
+        }
+        /// @deprecated use setVertexProgramConstantFloatCount instead
+        OGRE_DEPRECATED void setVertexProgramConstantIntCount(ushort c)
+        {
+            mVertexProgramConstantFloatCount = c;
+        }
+        /// @deprecated use setVertexProgramConstantFloatCount instead
+        OGRE_DEPRECATED void setVertexProgramConstantBoolCount(ushort c)
+        {
+            mVertexProgramConstantFloatCount = c;
+        }
+        /// @deprecated use setGeometryProgramConstantFloatCount instead
+        OGRE_DEPRECATED void setGeometryProgramConstantIntCount(ushort c)
+        {
+            mGeometryProgramConstantFloatCount = c;
+        }
+        /// @deprecated use setGeometryProgramConstantFloatCount instead
+        OGRE_DEPRECATED void setGeometryProgramConstantBoolCount(ushort c)
+        {
+            mGeometryProgramConstantFloatCount = c;
+        }
+        /// @deprecated use setFragmentProgramConstantFloatCount instead
+        OGRE_DEPRECATED void setFragmentProgramConstantIntCount(ushort c)
+        {
+            mFragmentProgramConstantFloatCount = c;
+        }
+        /// @deprecated use setFragmentProgramConstantFloatCount instead
+        OGRE_DEPRECATED void setFragmentProgramConstantBoolCount(ushort c)
+        {
+            mFragmentProgramConstantFloatCount = c;
+        }
+        /// @deprecated use setTessellationHullProgramConstantFloatCount instead
+        OGRE_DEPRECATED void setTessellationHullProgramConstantIntCount(ushort c)
+        {
+            mTessellationHullProgramConstantFloatCount = c;
+        }
+        /// @deprecated use setTessellationHullProgramConstantFloatCount instead
+        OGRE_DEPRECATED void setTessellationHullProgramConstantBoolCount(ushort c)
+        {
+            mTessellationHullProgramConstantFloatCount = c;
+        }
+        /// @deprecated use getTessellationHullProgramConstantFloatCount instead
+        OGRE_DEPRECATED ushort getTessellationHullProgramConstantIntCount(void) const
+        {
+            return mTessellationHullProgramConstantFloatCount;
+        }
+        /// @deprecated use getTessellationHullProgramConstantFloatCount instead
+        OGRE_DEPRECATED ushort getTessellationHullProgramConstantBoolCount(void) const
+        {
+            return mTessellationHullProgramConstantFloatCount;
+        }
+        /// @deprecated use setTessellationDomainProgramConstantFloatCount instead
+        OGRE_DEPRECATED void setTessellationDomainProgramConstantIntCount(ushort c)
+        {
+            mTessellationDomainProgramConstantFloatCount = c;
+        }
+        /// @deprecated use setTessellationDomainProgramConstantFloatCount instead
+        OGRE_DEPRECATED void setTessellationDomainProgramConstantBoolCount(ushort c)
+        {
+            mTessellationDomainProgramConstantFloatCount = c;
+        }
+        /// @deprecated use getTessellationDomainProgramConstantFloatCount instead
+        OGRE_DEPRECATED ushort getTessellationDomainProgramConstantIntCount(void) const
+        {
+            return mTessellationDomainProgramConstantFloatCount;
+        }
+        /// @deprecated use getTessellationDomainProgramConstantFloatCount instead
+        OGRE_DEPRECATED ushort getTessellationDomainProgramConstantBoolCount(void) const
+        {
+            return mTessellationDomainProgramConstantFloatCount;
+        }
+        /// @deprecated use setComputeProgramConstantFloatCount instead
+        OGRE_DEPRECATED void setComputeProgramConstantIntCount(ushort c)
+        {
+            mComputeProgramConstantFloatCount = c;
+        }
+        /// @deprecated use setComputeProgramConstantFloatCount instead
+        OGRE_DEPRECATED void setComputeProgramConstantBoolCount(ushort c)
+        {
+            mComputeProgramConstantFloatCount = c;
+        }
+        /// @deprecated use getComputeProgramConstantFloatCount instead
+        OGRE_DEPRECATED ushort getComputeProgramConstantIntCount(void) const
+        {
+            return mComputeProgramConstantFloatCount;
+        }
+        /// @deprecated use getComputeProgramConstantFloatCount instead
+        OGRE_DEPRECATED ushort getComputeProgramConstantBoolCount(void) const
+        {
+            return mComputeProgramConstantFloatCount;
         }
 
     };
+
+    inline String to_string(GPUVendor v) { return RenderSystemCapabilities::vendorToString(v); }
+    inline String to_string(const DriverVersion& v) { return v.toString(); }
 
     /** @} */
     /** @} */

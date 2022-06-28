@@ -34,28 +34,26 @@ THE SOFTWARE.
 /** \addtogroup Optional
 *  @{
 */
-/** \addtogroup Paging
-*  Some details on paging component
-*  @{
-*/
+/** \defgroup Paging Paging
+*  Render large modular structures
 
-
-/** @file
+    # File Format
     The paging file format is a composite one - a single file / stream can contain
     data which is not necessarily all read by a single class. Instead, data
     chunks can be read by different classes, allowing the format to be extended to
     different types smoothly.
-    @par
+
     Paging world files have by default an extension ".world", but that is not
     a requirement. Internally, the only thing that matters is the data chunks
     and their identifiers, which are 4-character codes embedded in a uint32 as
     calculated by StreamSerialiser::makeIdentifier. All data will be read and 
     written using DataStream and the StreamSerialiser class. 
-    @par
+
     Data types are expressed at the lowest level exposed by the StreamSerialiser class, 
     which is used to read / write this file. 
-    @par
-    <b>Chunk Definitions</b>
+
+    ## Chunk Definitions
+
     @par
     <b>PagedWorld (Identifier 'PWLD')</b>\n
     [Version 1]
@@ -215,9 +213,7 @@ THE SOFTWARE.
     </tr>
     </table>
 */
-
-/*@}*/
-/*@}*/
+/**@}*/
 
 
 #endif 

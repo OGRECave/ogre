@@ -153,17 +153,22 @@ void GBuffer::addNormalInvocations(ProgramSet* programSet, const ParameterPtr& o
     Function* vsMain = vsProgram->getMain();
     Function* psMain = programSet->getCpuProgram(GPT_FRAGMENT_PROGRAM)->getMain();
 
-    // compute vertex shader normal
-    auto vstage = vsMain->getStage(FFP_VS_LIGHTING);
-    auto vsInNormal = vsMain->resolveInputParameter(Parameter::SPC_NORMAL_OBJECT_SPACE);
-    auto vsOutNormal = vsMain->resolveOutputParameter(Parameter::SPC_NORMAL_VIEW_SPACE);
-    auto worldViewITMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_NORMAL_MATRIX);
-    vstage.callFunction(FFP_FUNC_TRANSFORM, worldViewITMatrix, vsInNormal, vsOutNormal);
-    vstage.callFunction(FFP_FUNC_NORMALIZE, vsOutNormal);
-
-    // pass through
     auto fstage = psMain->getStage(FFP_PS_COLOUR_END);
-    fstage.assign(psMain->resolveInputParameter(vsOutNormal), Out(out).xyz());
+    auto viewNormal = psMain->getLocalParameter(Parameter::SPC_NORMAL_VIEW_SPACE);
+    if(!viewNormal)
+    {
+        // compute vertex shader normal
+        auto vstage = vsMain->getStage(FFP_VS_LIGHTING);
+        auto vsInNormal = vsMain->resolveInputParameter(Parameter::SPC_NORMAL_OBJECT_SPACE);
+        auto vsOutNormal = vsMain->resolveOutputParameter(Parameter::SPC_NORMAL_VIEW_SPACE);
+        auto worldViewITMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_NORMAL_MATRIX);
+        vstage.callFunction(FFP_FUNC_TRANSFORM, worldViewITMatrix, vsInNormal, vsOutNormal);
+        vstage.callFunction(FFP_FUNC_NORMALIZE, vsOutNormal);
+
+        // pass through
+        viewNormal = psMain->resolveInputParameter(vsOutNormal);
+    }
+    fstage.assign(viewNormal, Out(out).xyz());
 }
 
 void GBuffer::addDiffuseSpecularInvocations(ProgramSet* programSet, const ParameterPtr& out)

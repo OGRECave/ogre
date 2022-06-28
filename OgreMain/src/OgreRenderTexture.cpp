@@ -41,8 +41,6 @@ namespace Ogre
         mPriority = OGRE_REND_TO_TEX_RT_GROUP;
         mWidth = mBuffer->getWidth();
         mHeight = mBuffer->getHeight();
-        mColourDepth = static_cast<unsigned int>(
-            Ogre::PixelUtil::getNumElemBits(mBuffer->getFormat()));
 
         if(PixelUtil::isDepth(mBuffer->getFormat()))
             mDepthBufferPoolId = DepthBuffer::POOL_NO_DEPTH;
@@ -55,12 +53,7 @@ namespace Ogre
     void RenderTexture::copyContentsToMemory(const Box& src, const PixelBox &dst, FrameBuffer buffer)
     {
         if (buffer == FB_AUTO) buffer = FB_FRONT;
-        if (buffer != FB_FRONT)
-        {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-                        "Invalid buffer.",
-                        "RenderTexture::copyContentsToMemory" );
-        }
+        OgreAssert(buffer == FB_FRONT, "Invalid buffer");
 
         mBuffer->blitToMemory(src, dst);
     }

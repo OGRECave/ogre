@@ -41,30 +41,14 @@ void SGX_InstancedViewportsTransform(
     in vec4 i_monitorIndex,
     out vec4 o_position)
 {
-    o_position = i_worldViewMatrix * i_position;
-    mat4 viewportOffset;
-    viewportOffset[0][0] = i_viewportOffsetMatrixR0.x;
-    viewportOffset[1][0] = i_viewportOffsetMatrixR0.y;
-    viewportOffset[2][0] = i_viewportOffsetMatrixR0.z;
-    viewportOffset[3][0] = i_viewportOffsetMatrixR0.w;
+    o_position = mul(i_worldViewMatrix, i_position);
+    mat4 viewportOffset = mtxFromRows(i_viewportOffsetMatrixR0,
+                                      i_viewportOffsetMatrixR1,
+                                      i_viewportOffsetMatrixR2,
+                                      i_viewportOffsetMatrixR3);
 
-    viewportOffset[0][1] = i_viewportOffsetMatrixR1.x;
-    viewportOffset[1][1] = i_viewportOffsetMatrixR1.y;
-    viewportOffset[2][1] = i_viewportOffsetMatrixR1.z;
-    viewportOffset[3][1] = i_viewportOffsetMatrixR1.w;
-
-    viewportOffset[0][2] = i_viewportOffsetMatrixR2.x;
-    viewportOffset[1][2] = i_viewportOffsetMatrixR2.y;
-    viewportOffset[2][2] = i_viewportOffsetMatrixR2.z;
-    viewportOffset[3][2] = i_viewportOffsetMatrixR2.w;
-
-    viewportOffset[0][3] = i_viewportOffsetMatrixR3.x;
-    viewportOffset[1][3] = i_viewportOffsetMatrixR3.y;
-    viewportOffset[2][3] = i_viewportOffsetMatrixR3.z;
-    viewportOffset[3][3] = i_viewportOffsetMatrixR3.w;
-
-    o_position = viewportOffset * o_position;
-    o_position = i_projectionMatrix * o_position;
+    o_position = mul(viewportOffset, o_position);
+    o_position = mul(i_projectionMatrix, o_position);
 
     vec2 monitorIndexNorm = i_monitorIndex.xy - ((i_monitorsCount - 1.0)/2.0);
     o_position.xy =
@@ -88,7 +72,7 @@ void SGX_InstancedViewportsDiscardOutOfBounds(
     float maxM = max(boxedXY.x,boxedXY.y);
     if (maxM >= 0.5)
     {
-#ifdef FRAGMENT_PROG
+#ifdef OGRE_FRAGMENT_SHADER
         discard;
 #endif
     }

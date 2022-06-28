@@ -127,7 +127,7 @@ namespace Ogre {
         typedef std::pair<ResourcePtr, bool> ResourceCreateOrRetrieveResult;
         /** Create a new resource, or retrieve an existing one with the same
             name if it already exists.
-        @remarks
+
             This method performs the same task as calling getByName() followed
             by create() if that returns null. The advantage is that it does it
             in one call so there are no race conditions if using multiple
@@ -143,7 +143,7 @@ namespace Ogre {
             const NameValuePairList* createParams = 0);
         
         /** Set a limit on the amount of memory this resource handler may use.
-            @remarks
+
                 If, when asked to load a new resource, the manager believes it will exceed this memory
                 budget, it will temporarily unload a resource to make room for the new one. This unloading
                 is not permanent and the Resource is not destroyed; it simply needs to be reloaded when
@@ -159,7 +159,7 @@ namespace Ogre {
         size_t getMemoryUsage(void) const { return mMemoryUsage.load(); }
 
         /** Unloads a single resource by name.
-        @remarks
+
             Unloaded resources are not removed, they simply free up their memory
             as much as they can and wait to be reloaded.
             @see ResourceGroupManager for unloading of resource groups.
@@ -167,7 +167,7 @@ namespace Ogre {
         void  unload(const String& name, const String& group OGRE_RESOURCE_GROUP_INIT);
         
         /** Unloads a single resource by handle.
-        @remarks
+
             Unloaded resources are not removed, they simply free up their memory
             as much as they can and wait to be reloaded.
             @see ResourceGroupManager for unloading of resource groups.
@@ -175,7 +175,7 @@ namespace Ogre {
         void unload(ResourceHandle handle);
 
         /** Unloads all resources.
-        @remarks
+
             Unloaded resources are not removed, they simply free up their memory
             as much as they can and wait to be reloaded.
             @see ResourceGroupManager for unloading of resource groups.
@@ -190,7 +190,7 @@ namespace Ogre {
             { unloadAll(reloadableOnly ? Resource::LF_DEFAULT : Resource::LF_INCLUDE_NON_RELOADABLE); }
 
         /** Caused all currently loaded resources to be reloaded.
-        @remarks
+
             All resources currently being held in this manager which are also
             marked as currently loaded will be unloaded, then loaded again.
         @param reloadableOnly If true (the default), only reload the resource that
@@ -204,7 +204,7 @@ namespace Ogre {
             { reloadAll(reloadableOnly ? Resource::LF_DEFAULT : Resource::LF_INCLUDE_NON_RELOADABLE); }
 
         /** Unload all resources which are not referenced by any other object.
-        @remarks
+
             This method behaves like unloadAll, except that it only unloads resources
             which are not in use, ie not referenced by other objects. This allows you
             to free up some memory selectively whilst still keeping the group around
@@ -222,7 +222,7 @@ namespace Ogre {
 
         /** Caused all currently loaded but not referenced by any other object
             resources to be reloaded.
-        @remarks
+
             This method behaves like reloadAll, except that it only reloads resources
             which are not in use, i.e. not referenced by other objects.
         @par
@@ -237,7 +237,7 @@ namespace Ogre {
             { reloadAll(reloadableOnly ? Resource::LF_ONLY_UNREFERENCED : Resource::LF_ONLY_UNREFERENCED_INCLUDE_NON_RELOADABLE); }
 
         /** Unloads all resources.
-        @remarks
+
             Unloaded resources are not removed, they simply free up their memory
             as much as they can and wait to be reloaded.
             @see ResourceGroupManager for unloading of resource groups.
@@ -248,7 +248,7 @@ namespace Ogre {
         virtual void unloadAll(Resource::LoadingFlags flags);
 
         /** Caused all currently loaded resources to be reloaded.
-        @remarks
+
             All resources currently being held in this manager which are also
             marked as currently loaded will be unloaded, then loaded again.
         @param flags Allow to restrict processing to only reloadable and/or
@@ -259,7 +259,7 @@ namespace Ogre {
         virtual void reloadAll(Resource::LoadingFlags flags);
 
         /** Remove a single resource.
-        @remarks
+
             Removes a single resource, meaning it will be removed from the list
             of valid resources in this manager, also causing it to be unloaded. 
         @note
@@ -299,7 +299,7 @@ namespace Ogre {
         virtual void removeAll(void);
 
         /** Remove all resources which are not referenced by any other object.
-        @remarks
+
             This method behaves like removeAll, except that it only removes resources
             which are not in use, ie not referenced by other objects. This allows you
             to free up some memory selectively whilst still keeping the group around
@@ -316,19 +316,19 @@ namespace Ogre {
 
         /** Retrieves a pointer to a resource by name, or null if the resource does not exist.
         */
-        virtual ResourcePtr getResourceByName(const String& name, const String& groupName OGRE_RESOURCE_GROUP_INIT);
+        virtual ResourcePtr getResourceByName(const String& name, const String& groupName OGRE_RESOURCE_GROUP_INIT) const;
 
         /** Retrieves a pointer to a resource by handle, or null if the resource does not exist.
         */
-        virtual ResourcePtr getByHandle(ResourceHandle handle);
+        virtual ResourcePtr getByHandle(ResourceHandle handle) const;
         
         /// Returns whether the named resource exists in this manager
-        bool resourceExists(const String& name, const String& group OGRE_RESOURCE_GROUP_INIT)
+        bool resourceExists(const String& name, const String& group OGRE_RESOURCE_GROUP_INIT) const
         {
             return getResourceByName(name, group).get() != 0;
         }
         /// Returns whether a resource with the given handle exists in this manager
-        bool resourceExists(ResourceHandle handle)
+        bool resourceExists(ResourceHandle handle) const
         {
             return getByHandle(handle).get() != 0;
         }
@@ -378,46 +378,9 @@ namespace Ogre {
             ManualResourceLoader* loader = 0, const NameValuePairList* loadParams = 0,
             bool backgroundThread = false);
 
-        /** Gets the file patterns which should be used to find scripts for this
-            ResourceManager.
-        @remarks
-            Some resource managers can read script files in order to define
-            resources ahead of time. These resources are added to the available
-            list inside the manager, but none are loaded initially. This allows
-            you to load the items that are used on demand, or to load them all 
-            as a group if you wish (through ResourceGroupManager).
-        @par
-            This method lets you determine the file pattern which will be used
-            to identify scripts intended for this manager.
-        @return
-            A list of file patterns, in the order they should be searched in.
-        @see parseScript
-        */
-        const StringVector& getScriptPatterns(void) const { return mScriptPatterns; }
-
-        /** Parse the definition of a set of resources from a script file.
-        @remarks
-            Some resource managers can read script files in order to define
-            resources ahead of time. These resources are added to the available
-            list inside the manager, but none are loaded initially. This allows
-            you to load the items that are used on demand, or to load them all 
-            as a group if you wish (through ResourceGroupManager).
-        @param stream Weak reference to a data stream which is the source of the script
-        @param groupName The name of the resource group that resources which are
-            parsed are to become a member of. If this group is loaded or unloaded, 
-            then the resources discovered in this script will be loaded / unloaded
-            with it.
-        */
-        void parseScript(DataStreamPtr& stream, const String& groupName)
-                { (void)stream; (void)groupName; }
-
-        /** Gets the relative loading order of resources of this type.
-        @remarks
-            There are dependencies between some kinds of resource in terms of loading
-            order, and this value enumerates that. Higher values load later during
-            bulk loading tasks.
-        */
-        Real getLoadingOrder(void) const { return mLoadOrder; }
+        const StringVector& getScriptPatterns(void) const override { return mScriptPatterns; }
+        void parseScript(DataStreamPtr& stream, const String& groupName) override;
+        Real getLoadingOrder(void) const override { return mLoadOrder; }
 
         /** Gets a string identifying the type of resource this manager handles. */
         const String& getResourceType(void) const { return mResourceType; }
@@ -430,13 +393,12 @@ namespace Ogre {
 
         /** Definition of a pool of resources, which users can use to reuse similar
             resources many times without destroying and recreating them.
-        @remarks
+
             This is a simple utility class which allows the reuse of resources
             between code which has a changing need for them. For example, 
         */
         class _OgreExport ResourcePool : public Pool<ResourcePtr>, public ResourceAlloc
         {
-        protected:
             String mName;
         public:
             ResourcePool(const String& name);
@@ -465,9 +427,10 @@ namespace Ogre {
 
         /** Create a new resource instance compatible with this manager (no custom 
             parameters are populated at this point). 
-        @remarks
+
             Subclasses must override this method and create a subclass of Resource.
         @param name The unique name of the resource
+        @param handle The unique handle of the resource
         @param group The name of the resource group to attach this new resource to
         @param isManual Is this resource manually loaded? If so, you should really
             populate the loader parameter in order that the load process

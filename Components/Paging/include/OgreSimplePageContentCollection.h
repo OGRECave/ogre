@@ -69,7 +69,7 @@ namespace Ogre
         typedef std::vector<PageContent*> ContentList;
         static const uint32 SUBCLASS_CHUNK_ID;
         static const uint16 SUBCLASS_CHUNK_VERSION;
-    protected:
+    private:
         ContentList mContentList;
     public:
         SimplePageContentCollection(PageContentCollectionFactory* creator);

@@ -34,12 +34,10 @@ namespace RTShader {
 Program::Program(GpuProgramType type)
 {
     mType               = type;
-    // all programs must have an entry point, nobody cares about FFT
-    mEntryPointFunction = new Function("main", "", Function::FFT_VS_MAIN);
+    // all programs must have an entry point
+    mEntryPointFunction = new Function();
     mSkeletalAnimation  = false;
     mColumnMajorMatrices = true;
-
-    mFunctions.push_back(mEntryPointFunction);
 }
 
 //-----------------------------------------------------------------------------
@@ -47,25 +45,13 @@ Program::~Program()
 {
     destroyParameters();
 
-    destroyFunctions();
+    delete mEntryPointFunction;
 }
 
 //-----------------------------------------------------------------------------
 void Program::destroyParameters()
 {
     mParameters.clear();
-}
-
-//-----------------------------------------------------------------------------
-void Program::destroyFunctions()
-{
-    ShaderFunctionIterator it;
-
-    for (it = mFunctions.begin(); it != mFunctions.end(); ++it)
-    {
-        OGRE_DELETE *it;
-    }
-    mFunctions.clear();
 }
 
 //-----------------------------------------------------------------------------
@@ -141,20 +127,20 @@ static bool isArray(GpuProgramParameters::AutoConstantType autoType)
     }
 }
 
-UniformParameterPtr Program::resolveParameter(GpuProgramParameters::AutoConstantType autoType, size_t data)
+UniformParameterPtr Program::resolveParameter(GpuProgramParameters::AutoConstantType autoType, uint32 data)
 {
     UniformParameterPtr param;
 
     // Check if parameter already exists.
     param = getParameterByAutoType(autoType);
 
-    size_t size = 0;
-    if(isArray(autoType)) std::swap(size, data); // for array autotypes the extra parameter is the size
-
     if (param && param->getAutoConstantIntData() == data)
     {
         return param;
     }
+
+    uint32 size = 0;
+    if(isArray(autoType)) std::swap(size, data); // for array autotypes the extra parameter is the size
     
     // Create new parameter
     param = UniformParameterPtr(OGRE_NEW UniformParameter(autoType, data, size));
@@ -181,7 +167,7 @@ UniformParameterPtr Program::resolveAutoParameterReal(GpuProgramParameters::Auto
     }
     
     // Create new parameter.
-    param = UniformParameterPtr(OGRE_NEW UniformParameter(autoType, data, size));
+    param = UniformParameterPtr(OGRE_NEW UniformParameter(autoType, float(data), size));
     addParameter(param);
 
     return param;
@@ -189,7 +175,7 @@ UniformParameterPtr Program::resolveAutoParameterReal(GpuProgramParameters::Auto
 
 //-----------------------------------------------------------------------------
 UniformParameterPtr Program::resolveAutoParameterReal(GpuProgramParameters::AutoConstantType autoType, GpuConstantType type,
-                                                Real data, size_t size)
+                                                float data, size_t size)
 {
     UniformParameterPtr param;
 
@@ -214,7 +200,7 @@ UniformParameterPtr Program::resolveAutoParameterReal(GpuProgramParameters::Auto
 
 //-----------------------------------------------------------------------------
 UniformParameterPtr Program::resolveAutoParameterInt(GpuProgramParameters::AutoConstantType autoType, GpuConstantType type, 
-                                           size_t data, size_t size)
+                                           uint32 data, size_t size)
 {
     UniformParameterPtr param;
 
@@ -327,41 +313,6 @@ UniformParameterPtr Program::getParameterByAutoType(GpuProgramParameters::AutoCo
     }
 
     return UniformParameterPtr();
-}
-
-//-----------------------------------------------------------------------------
-Function* Program::createFunction(const String& name, const String& desc, const Function::FunctionType functionType)
-{
-    Function* shaderFunction;
-
-    shaderFunction = getFunctionByName(name);
-    if (shaderFunction != NULL)
-    {
-        OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, 
-            "Function " + name + " already declared in program.", 
-            "Program::createFunction" );
-    }
-
-    shaderFunction = OGRE_NEW Function(name, desc, functionType);
-    mFunctions.push_back(shaderFunction);
-
-    return shaderFunction;
-}
-
-//-----------------------------------------------------------------------------
-Function* Program::getFunctionByName(const String& name)
-{
-    ShaderFunctionIterator it;
-
-    for (it = mFunctions.begin(); it != mFunctions.end(); ++it)
-    {
-        if ((*it)->getName() == name)
-        {
-            return *it;
-        }
-    }
-
-    return NULL;
 }
 
 //-----------------------------------------------------------------------------

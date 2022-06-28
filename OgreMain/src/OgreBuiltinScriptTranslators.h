@@ -63,10 +63,8 @@ namespace Ogre{
         void translate(ScriptCompiler *compiler, const AbstractNodePtr &node);
     protected:
         void translateProgramRef(GpuProgramType type, ScriptCompiler *compiler, ObjectAbstractNode *node);
-        void translateShadowCasterVertexProgramRef(ScriptCompiler *compiler, ObjectAbstractNode *node);
-        void translateShadowCasterFragmentProgramRef(ScriptCompiler *compiler, ObjectAbstractNode *node);
-        void translateShadowReceiverVertexProgramRef(ScriptCompiler *compiler, ObjectAbstractNode *node);
-        void translateShadowReceiverFragmentProgramRef(ScriptCompiler *compiler, ObjectAbstractNode *node);
+        void translateShadowCasterProgramRef(GpuProgramType type, ScriptCompiler *compiler, ObjectAbstractNode *node);
+        void translateShadowReceiverProgramRef(GpuProgramType type, ScriptCompiler *compiler, ObjectAbstractNode *node);
     };
 
     class TextureUnitTranslator : public ScriptTranslator
@@ -97,7 +95,7 @@ namespace Ogre{
         GpuProgramTranslator();
         void translate(ScriptCompiler *compiler, const AbstractNodePtr &node);
     protected:
-        void translateGpuProgram(ScriptCompiler *compiler, ObjectAbstractNode *obj, const String& language);
+        void translateGpuProgram(ScriptCompiler *compiler, ObjectAbstractNode *obj, String language);
     public:
         static void translateProgramParameters(ScriptCompiler *compiler, GpuProgramParametersSharedPtr params, ObjectAbstractNode *obj);
     };

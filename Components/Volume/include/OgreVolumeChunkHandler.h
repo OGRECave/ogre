@@ -78,15 +78,6 @@ namespace Volume {
 
         /// Whether this is an update of an existing tree
         bool isUpdate;
-        
-        /** Stream operator <<.
-        @param o
-            The used stream.
-        @param r
-            The streamed ChunkRequest.
-        */
-        _OgreVolumeExport friend std::ostream& operator<<(std::ostream& o, const ChunkRequest& r)
-        { return o; }
     } ChunkRequest;
     
     /** Handles the WorkQueue management of the chunks.

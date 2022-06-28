@@ -34,12 +34,7 @@ The wiki article explaining this demo can be found here :
 
 #include "SdkSample.h"
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-#define WIN32_LEAN_AND_MEAN
-#include "windows.h"
-#endif
-
-#include "SharedData.h"
+#include "DeferredShading.h"
 #include "OgreCompositorInstance.h"
 #include "OgreSceneManager.h"
 #include "OgreSceneNode.h"
@@ -58,6 +53,7 @@ const ColourValue SAMPLE_COLORS[] =
 class _OgreSampleClassExport Sample_DeferredShading : public SdkSample, public RenderTargetListener
 {
 protected:
+    Light* mMainLight;
     DeferredShadingSystem *mSystem;
     SelectMenu* mDisplayModeMenu;
     
@@ -75,8 +71,6 @@ protected:
     
     void cleanupContent(void)
     {
-        delete ( SharedData::getSingletonPtr() );
-        
         delete mSystem;
     }
     
@@ -101,20 +95,18 @@ protected:
     void itemSelected(SelectMenu* menu)
     {
         //Options are aligned with the mode enum
-        SharedData::getSingleton().iSystem->setMode(
-                                                    (DeferredShadingSystem::DSMode)menu->getSelectionIndex());
+        mSystem->setMode((DeferredShadingSystem::DSMode)menu->getSelectionIndex());
     }
     
     void checkBoxToggled(CheckBox* box)
     {
         if (box->getName() == "SSAO")
         {
-            SharedData::getSingleton().iSystem->setSSAO(box->isChecked());
+            mSystem->setSSAO(box->isChecked());
         }
         else if (box->getName() == "GlobalLight")
         {
-            SharedData::getSingleton().iGlobalActivate = box->isChecked();
-            SharedData::getSingleton().iMainLight->setVisible(box->isChecked());
+            mMainLight->setVisible(box->isChecked());
         }
         else if (box->getName() == "Shadows")
         {
@@ -124,7 +116,7 @@ protected:
         }
         else if (box->getName() == "DeferredShading")
         {
-            SharedData::getSingleton().iSystem->setActive(box->isChecked());
+            mSystem->setActive(box->isChecked());
         }
     }
     
@@ -235,12 +227,6 @@ protected:
 
     void testCapabilities(const RenderSystemCapabilities* caps)
     {
-        if (!caps->hasCapability(RSC_VERTEX_PROGRAM) || !(caps->hasCapability(RSC_FRAGMENT_PROGRAM)))
-        {
-            OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Your card does not support vertex and fragment programs, so cannot "
-                        "run this demo. Sorry!", 
-                        "DeferredShading::testCapabilities");
-        }
         if (caps->getNumMultiRenderTargets()<2)
         {
             OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Your card does not support at least two simultaneous render targets, so cannot "
@@ -248,20 +234,13 @@ protected:
                         "DeferredShading::testCapabilities");
         }
 
-        if (!GpuProgramManager::getSingleton().isSyntaxSupported("hlsl") &&
-            !GpuProgramManager::getSingleton().isSyntaxSupported("glsl300es") &&
-            !GpuProgramManager::getSingleton().isSyntaxSupported("glsl150"))
-        {
-            OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Your graphics card does not support advanced vertex"
-                        " programs, so you cannot run this sample. Sorry!", "DeferredShading::testCapabilities");
-        }
+        requireMaterial("DeferredShading/AmbientLight");
     }
 
     // Just override the mandatory create scene method
     void setupContent(void)
     {
         mCameraMan->setTopSpeed(20.0);
-        new SharedData();
         mSystem = 0;
 
         // Set ambient light
@@ -288,16 +267,9 @@ protected:
         setDragLook(true);
         
         mSystem = new DeferredShadingSystem(mWindow->getViewport(0), mSceneMgr, mCamera);
-        SharedData::getSingleton().iSystem = mSystem;
         mSystem->initialize();
         
-        // safely setup application's (not postfilter!) shared data
-        SharedData::getSingleton().iCamera = mCamera;
-        SharedData::getSingleton().iRoot = mRoot;
-        SharedData::getSingleton().iWindow = mWindow;
-        SharedData::getSingleton().iActivate = true;
-        SharedData::getSingleton().iGlobalActivate = true;
-        SharedData::getSingleton().iMainLight = l1;
+        mMainLight = l1;
         
         //Create the scene
         // Create "root" node
@@ -409,9 +381,6 @@ protected:
             static_cast<SceneNode*>(light->getParentNode())->attachObject(ent);
             ent->setVisible(true);
         }       
-        
-        // Store nodes for hiding/showing
-        SharedData::getSingleton().mLightNodes = nodes;
         
         // Do some animation for node a-f
         // Generate helix structure

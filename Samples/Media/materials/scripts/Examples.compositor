@@ -69,6 +69,7 @@ compositor Bloom
     }
 }
 
+//! [glass_script]
 compositor Glass
 {
     technique
@@ -90,6 +91,7 @@ compositor Glass
         }
     }
 }
+//! [glass_script]
 
 compositor "Old TV"
 {
@@ -147,61 +149,46 @@ compositor B&W
 }
 //! [manual_sample]
 
-//compositor DOF // based on Blur but final pass does depth of field
-//{
-//    technique
-//    {
-//        // Temporary textures
-//        texture rt0 target_width target_height PF_BYTE_RGBA
-//        texture rt1 target_width target_height PF_BYTE_RGBA
-//
-//        target rt1
-//        {
-//            // Render output from previous compositor (or original scene)
-//            input previous
-//        }
-//
-//        target rt0
-//        {
-//            // Start with clear texture
-//            input none
-//            // Vertical blur pass
-//            pass render_quad
-//            {
-//                // Renders a fullscreen quad with a material
-//                material Ogre/Compositor/DOF_Blur0
-//                input 0 rt1
-//            }
-//        }
-//
-//        target rt1
-//        {
-//            // Start with clear texture
-//            input none
-//            // Horizontal blur pass
-//            pass render_quad
-//            {
-//                // Renders a fullscreen quad with a material
-//                material Ogre/Compositor/DOF_Blur1
-//                input 0 rt0
-//            }
-//        }
-//
-//        target_output
-//        {
-//            // Start with clear output
-//            input none
-//            // Draw a fullscreen quad
-//            pass render_quad
-//            {
-//                // Renders a fullscreen quad with a material
-//                material Ogre/Compositor/DOF_Blend
-//                input 0 rt0
-//                input 1 rt1
-//            }
-//        }
-//    }
-//}
+compositor DoF
+{
+   technique
+   {
+       // Temporary textures
+       texture scene target_width target_height PF_BYTE_RGBA PF_DEPTH16
+       texture blur target_width_scaled 0.25 target_height_scaled 0.25 PF_BYTE_RGBA
+
+       target scene
+       {
+           // Render original scene
+           input previous
+       }
+
+       target blur
+       {
+           input none
+           // blur pass
+           pass render_quad
+           {
+               material Ogre/Compositor/DOF_Blur
+               input 0 scene 0
+           }
+       }
+
+       target_output
+       {
+           // Start with clear output
+           input none
+           // Draw a fullscreen quad
+           pass render_quad
+           {
+                material Ogre/Compositor/DOF_Blend
+                input 0 scene 0
+                input 1 scene 1
+                input 2 blur
+           }
+       }
+   }
+}
 
 // Embossed (fake bump) effect
 compositor Embossed
@@ -802,6 +789,106 @@ compositor Compute
                 // the texture size is 256x256x1 and we have 16x16x1 threads per group
                 // so we have to launch 16x16x1 groups
                 thread_groups 16 16 1
+            }
+        }
+    }
+}
+
+// abstract node to avoid copy & paste
+abstract target CubeFace
+{
+    visibility_mask 0xF0 // avoid ogrehead in the reflection
+    pass clear {}
+    pass render_scene
+    {
+        camera CubeMapCamera align_to_face
+    }
+}
+
+compositor CubeMap
+{
+    technique
+    {
+        texture tex 128 128 PF_BYTE_RGB cubic
+        target tex 0 : CubeFace {}
+        target tex 1 : CubeFace {}
+        target tex 2 : CubeFace {}
+        target tex 3 : CubeFace {}
+        target tex 4 : CubeFace {}
+        target tex 5 : CubeFace {}
+
+        target_output
+        {
+            input previous
+        }
+    }
+}
+
+compositor Fresnel
+{
+    technique
+    {
+        texture reflection 512 512 PF_BYTE_RGB
+        texture refraction 512 512 PF_BYTE_RGB
+        target reflection
+        {
+            visibility_mask 0x00F // SURFACE objects
+            input previous
+        }
+        target refraction
+        {
+            visibility_mask 0x0F0 // SUBMERGED objects
+            input previous
+        }
+        target_output
+        {
+            input previous
+        }
+    }
+}
+
+compositor WBOIT
+{
+    technique
+    {
+        texture opaque target_width target_height PF_BYTE_RGBA no_fsaa depth_pool 1
+        texture accum target_width target_height PF_FLOAT16_RGBA PF_FLOAT16_R no_fsaa depth_pool 1
+
+        target opaque
+        {
+            input previous
+        }
+
+        target accum
+        {
+            pass clear
+            {
+                buffers colour
+                colour_value 0 0 0 1
+            }
+            pass render_scene
+            {
+                // RTSS must use be used for transparents
+                material_scheme ShaderGeneratorDefaultScheme
+                first_render_queue 96
+                last_render_queue 97
+            }
+        }
+
+        target_output
+        {
+            input none
+            pass clear {}
+            pass render_quad
+            {
+                material Compositor/Copy
+                input 0 opaque
+            }
+            pass render_quad
+            {
+                material Compositor/WBOIT
+                input 0 accum 0
+                input 1 accum 1
             }
         }
     }

@@ -26,9 +26,9 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 #include "RadixSortTests.h"
-#include "OgreRadixSort.h"
 #include "OgreMath.h"
 #include <climits>
+#include "../../../OgreMain/src/OgreRadixSort.h"
 
 using namespace Ogre;
 

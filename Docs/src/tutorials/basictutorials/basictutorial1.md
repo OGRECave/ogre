@@ -2,11 +2,11 @@
 
 @tableofcontents
 
-This first tutorial will cover the basic elements of building a scene in Ogre. The primary focus will be the Ogre::SceneManager, Ogre::SceneNode, and Entity(external link). An Ogre::Entity is anything represented by a mesh. A Ogre::SceneNode is what attaches an object to your scene. Finally, the SceneManager is the object that organizes everything. It keeps track of the entities and nodes in your scene and determines how to display them.
+This first tutorial will cover the basic elements of building a scene in Ogre. The primary focus will be the Ogre::SceneManager, Ogre::SceneNode, and Ogre::Entity. An Entity is anything represented by a mesh. A Ogre::SceneNode is what attaches an object to your scene. Finally, the SceneManager is the object that organizes everything. It keeps track of the entities and nodes in your scene and determines how to display them.
 
 We'll start with an explanation of some of the basic concepts in Ogre. Don't worry, this first tutorial has a little more explanation than the rest, but that changes very quickly once you get to the later tutorials. We will be building plenty of things. We just have to lay a little groundwork first, so you have somewhere to stand.
 
-The full source for this tutorial (BasicTutorial1.cpp) can be found in samples directory **Samples/Tutorials**.
+The full source for this tutorial can be found in samples directory **Samples/Tutorials/BasicTutorial1.cpp**.
 
 @note Refer to @ref setup for instructions how set up an Ogre project and compile it successfully.
 
@@ -15,7 +15,7 @@ We are going to provide a quick introduction to the basic elements of an Ogre sc
 
 ## SceneManager {#scenemanager}
 
-Everything that appears on the screen is managed by the SceneManager. The SceneManager keeps track of the locations and other attributes of the objects in your scene. The SceneManager also manages any cameras that you add to your scene. There are multiples types of SceneManagers. There are managers focused on rendering terrain and other managers focused on rendering BSP maps. The different types of SceneManager are listed [here](http://www.ogre3d.org/tikiwiki/tiki-index.php?page=SceneManagersFAQ).
+Everything that appears on the screen is managed by the Ogre::SceneManager. The SceneManager keeps track of the locations and other attributes of the objects in your scene. The SceneManager also manages any cameras that you add to your scene. There are multiples types of SceneManagers. They differ in how they partition the scene for culling and searching nodes. There are managers implementing the [Octtree](https://en.wikipedia.org/wiki/Octree) scheme and others using portals. For now, you can use the default SceneManager, which is best suited for scenes where most of the objects are visible most of the time.
 
 [//]: <> (TODO: Move content of the link into manual pages as well)
 
@@ -41,13 +41,11 @@ The first thing we want to do is turn on the lights.
 
 The setAmbientLight method takes an Ogre::ColourValue. The three values represent the red, green, and blue values of the colour, and they range between 0 and 1.
 
-scnMgr is a variable that is defined in OgreBites::ApplicationContext. There are a number of features avariables, like setting up resources and initialization of required routines for rendering. They will be introduced as we need them.
+scnMgr is a variable that is defined in OgreBites::ApplicationContext. There are a number of features available, like setting up resources and initialization of required routines for rendering. They will be introduced as we need them.
 
 Lights will be covered in detail in the next tutorial, but we will still add a simple one to this scene as a teaser. New Light objects can also be requested from the Ogre::SceneManager. We give the Light a unique name when it is created.
 
 @snippet Samples/Tutorials/BasicTutorial1.cpp newlight
-
-Starting from Ogre 1.10 camera and lights require to create separate scene node for them so that they need to be attached to them.
 
 Once the Light is created and attached to its SceneNode, we set its position. The three parameters are the x, y, and z coordinates of the location we want to place the Light.
 
@@ -79,7 +77,7 @@ We now have a basic scene set up. Compile and run your application. You should s
 
 # Coordinates Systems {#CoordinatesSystems}
 
-Before we go on, let's cover some basics of Ogre's coordinate system. Ogre, like many other graphics engines, uses the x-z plane as the "floor" in a scene. This means that the y-axis is the vertical axis to ensure Ogre is using a [right-handed coordinate system](http://mathworld.wolfram.com/Right-HandedCoordinateSystem.html)
+Before we go on, let's cover some basics of Ogre's coordinate system. Ogre, like many other graphics engines, uses the x-z plane as the "floor" in a scene. This means that the y-axis is the vertical axis to ensure Ogre is using a [right-handed coordinate system](https://en.wikipedia.org/wiki/Right-hand_rule)
 
 ![](bt1_display1921.png)
 
@@ -88,7 +86,7 @@ The x-axis starts with negative values to the left and increases to the right (p
 When you run your application, notice how your Ogre head is facing towards the camera down the positive z-axis. This is a property of the mesh itself and the orientation of the camera. Cameras are covered in a later tutorial. The Ogre head is sitting at the origin of our world, (0, 0, 0). The direction the head is facing by default is a result of which way it was facing when it was originally modeled. You can effectively change this from within Ogre as well, but it will require some knowledge of quaternions, which aren't really covered until the [Intermediate Tutorials](#).
 [//]: <> (TODO: Replace link with manual page when time has come)
 
-Ogre uses a vector class to represent positions and directions. There are vectors defined for 2-4 dimensions. They are called Ogre::Vector2, Ogre::Vector3, and Ogre::Vector4 - Vector3 being the most commonly used by far. If you are not familiar with the concept of vectors it is highly recommended to learn a little before attempting these tutorials. Even though Ogre is an abstraction over many of the complications involved with OpenGL and DirectX, there is still no escaping some mathematical concepts. Vectors and basic linear algebra will be some of the most useful things you can learn if you intend to proceed with 3D rendering. This [site](http://www.wildbunny.co.uk/blog/vector-maths-a-primer-for-games-programmers/) has produced a nice primer on vectors focused on game programmers.
+Ogre uses a vector class to represent positions and directions. There are vectors defined for 2-4 dimensions. They are called Ogre::Vector2, Ogre::Vector3, and Ogre::Vector4 - Vector3 being the most commonly used by far. If you are not familiar with the concept of vectors it is highly recommended to learn a little before attempting these tutorials. Even though Ogre is an abstraction over many of the complications involved with OpenGL and DirectX, there is still no escaping some mathematical concepts. Vectors and basic linear algebra will be some of the most useful things you can learn if you intend to proceed with 3D rendering. This [site](https://paroj.github.io/gltut/Positioning/Tutorial%2006.html) has produced a nice primer on vectors focused on game programmers.
 
 # Adding Another Entity {#AddingAnotherEntity}
 
@@ -190,80 +188,15 @@ Compile and run your application. We should now have a rotated Ogre head in our 
 
 ![](bt1_rotated_entity.png)
 
-# The Ogre Environment {#TheOgreEnvironment}
+# Plugins {#TheOgreEnvironment}
 
-The library and configuration files for Ogre can be found in the 'bin' folder of your OgreSDK. You should use the debug files when building your application in debug mod
+Third-party plugins make it easy to integrate external libraries to add things like physics, input, and GUI systems. These libraries are used together to form a full game development environment. You might find this piecemeal approach a little strange, but it is a very common design pattern in large software projects. It is harder to comprehend at first, but it is a much more flexible approach when you want to start building more complicated scenes.
 
-## Libraries and Plugins {#LibrariesandPlugins}
+The SDK includes some of these third-party libraries. The [Simple DirectMedia Layer](https://www.libsdl.org/) is used to manage input events and distribute them to Ogre. You can also make use of [Assimp](https://www.assimp.org/) through the @ref AssimpCodec. This library allows you to load many popular geometry formats like .obj. There are other libraries (not included with the SDK) that offer functionality such as sound and physics.
 
-Ogre is divided into three shared library groups: main library, plugins, and third-party libraries.
-
-### Main library
-
-The main library group contains the Ogre library itself and the shared libraries it relies on. The Ogre library is contained within @c OgreMain.dll or @c libOgreMain.so depending on your platform. This library must be included in all of your Ogre applications. OgreMain only depends on @c libz and @c libzzip.
-
-### Plugins
-
-The second group of shared libraries are the plugins. Ogre pushes a good portion of its functionality into shared libraries so that they may be turned on or off easily. The core plugins that are included with Ogre have names that start with "Plugin_" and "Codec_". You can also write your own plugins.
-
-Ogre also uses plugins for the different render systems (such as OpenGL, DirectX, etc). These plugins start with "RenderSystem_". This is also so that you can add only the systems you will need. This can be useful if you write shaders that rely on a particular system, because you can simply remove the incompatible system so that the program won't try to run incorrect code. This also means you can write your own plugins if you want to extend Ogre into another render system.
-
-### Third-party Plugins
-
-The last major group contains third-party libraries and other general support libraries. Ogre is focused sharply on being a graphics rendering library. This group makes it easy to integrate external libraries to add things like physics, input, and GUI systems. These libraries are used together to form a full game development environment. You might find this piecemeal approach a little strange, but it is a very common design pattern in large software projects. It is harder to comprehend at first, but it is a much more flexible approach when you want to start building more complicated scenes.
-
-The Ogre demos and SDK include some of these third-party libraries. The [Simple DirectMedia](https://www.libsdl.org/) can be used to manage input events and distribute them to Ogre. You can also make use of Cg, which is used by CgProgramManager. This library allows you to produce materials with custom shaders. There are other libraries (not included with Ogre) that offer functionality such as sound and physics.
-
-### Testing vs Release
+## Testing vs Release
 
 When you're building your application you can just leave every plugin activated. This will allow you to experiment with using them or not. But when you get ready to distribute a release build of your work, then you will want to deactivate any of the plugins you are not using.
-
-## Configuration Files {#ConfigurationFiles}
-
-Ogre uses several configuration files (\*.cfg). They control things like which plugins are loaded and where your application will search for resource files. We will briefly introduce you to each of these files. You'll slowly read more about them as you progress through the tutorials as well.
-
-You can place these files the same directory as your executable or in any of [the default lookup paths described here](@ref Ogre::FileSystemLayer::getConfigFilePath).
-
-### plugins.cfg
-
-This file tells Ogre which plugins to load. You modify this file when you want to load a different set of plugins. It is often most useful to simply "comment out" lines instead of removing them, because you never know when a stroke of inspiration will mean you want to reload some unused plugins. Here is some sample content:
-
-```
-# Plugin=RenderSystem_Direct3D9
-# Plugin=RenderSystem_Direct3D10
-# Plugin=RenderSystem_Direct3D11
-Plugin=RenderSystem_GL
-```
-
-We have the three DirectX systems commented out, and an active line for OpenGL. On a windows system, you may have this reversed. You can see why it might be helpful not to delete unused lines, because then you have to try and remember whether it was RenderSystem_OpenGL or RenderSystem_GL.
-
-You can also decide where Ogre looks for plugins by changing the 'PluginFolder' variable. You can use both absolute and relative paths, but you cannot use environment variables like $(OGRE_HOME). For example, if you have built Ogre from source on a linux machine, then you will need a line like this at the beginning of your file:
-
-```
-PluginFolder=/usr/local/lib/OGRE
-```
-
-By default, Ogre would have been looking in '/usr/lib/OGRE'. This is where it would be placed if you installed Ogre from a package manager. You may have to do something similar on Mac.
-
-### resources.cfg
-
-This file contains a list of the directories Ogre will use to search for resources. Resources include scripts, meshes, textures, GUI layouts, and others. You can also use both absolute and relative paths in this file, but you still cannot use environment variables. Ogre will **not** search subdirectories, so you have to manually enter them. Here is an example:
-
-```
-[General]
-FileSystem=../media
-FileSystem=../media/materials/scripts
-FileSystem=../media/materials/textures
-FileSystem=../media/models
-```
-
-Here is an example of a relative path being used and the need to list subdirectories. Including the '../media' directory did not automatically include the '../media/models' directory. This is so that Ogre doesn't get greedy and waste time loading up unneeded resources.
-
-### ogre.cfg
-
-This file is generated by the Render Settings dialog that appears when you run your application. **Do not** distribute this file with your application. This file will be specific to your own setup. This file will contain your choices for things like screen resolution. Do not modify this file directly. Change the settings with the dialog and it will be automatically updated.
-
-That covers all of the configuration files that Ogre manipulates directly. Ogre must find 'plugins.cfg' and 'resources.cfg' to function properly. Later tutorials will cover more of their use.
 
 # Conclusion {#Conclusion1}
 

@@ -46,7 +46,7 @@ namespace Ogre
     class Affine3;
     Matrix4 operator*(const Matrix4 &m, const Matrix4 &m2);
     /** Class encapsulating a standard 4x4 homogeneous matrix.
-        @remarks
+
             OGRE uses column vectors when applying matrix multiplications,
             This means a vector is represented as a single column, 4-row
             matrix. This has the effect that the transformations implemented
@@ -201,7 +201,7 @@ namespace Ogre
         Matrix4 transpose() const;
 
         /** Building a Affine3 from orientation / scale / position.
-        @remarks
+
             Transform is performed in the order scale, rotate, translation, i.e. translation is independent
             of orientation axes, scale does not affect size of translation, rotation and scaling are always
             centered on the origin.
@@ -209,7 +209,7 @@ namespace Ogre
         void makeTransform(const Vector3& position, const Vector3& scale, const Quaternion& orientation);
 
         /** Building an inverse Affine3 from orientation / scale / position.
-        @remarks
+
             As makeTransform except it build the inverse given the same data as makeTransform, so
             performing -translation, -rotate, 1/scale in that order.
         */
@@ -539,7 +539,7 @@ namespace Ogre
     }
 
     /** Vector transformation using '*'.
-        @remarks
+
             Transforms the given 3-D vector by the matrix, projecting the
             result back into <i>w</i> = 1.
         @note

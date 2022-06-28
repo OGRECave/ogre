@@ -47,7 +47,7 @@ public:
     virtual void initCollapseCosts(LodData* data);
     virtual void computeVertexCollapseCost(LodData* data, LodData::Vertex* vertex, Real& collapseCost, LodData::Vertex*& collapseTo);
     virtual Real computeEdgeCollapseCost(LodData* data, LodData::Vertex* src, LodData::Edge* dstEdge);
-protected:
+private:
 
     struct ProfiledEdge {
         LodData::Vertex* dst;

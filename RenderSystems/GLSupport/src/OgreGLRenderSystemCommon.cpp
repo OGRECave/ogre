@@ -43,7 +43,7 @@ namespace Ogre {
         c.erase(p, c.end());
     }
 
-    String GLRenderSystemCommon::VideoMode::getDescription() const
+    String VideoMode::getDescription() const
     {
         return StringUtil::format("%4d x %4d", width, height);
     }
@@ -84,14 +84,6 @@ namespace Ogre {
         }
         mOptions[optFSAA.name] = optFSAA;
 
-        // TODO remove this on next release
-        ConfigOption optRTTMode;
-        optRTTMode.name = "RTT Preferred Mode";
-        optRTTMode.possibleValues.push_back("FBO");
-        optRTTMode.currentValue = optRTTMode.possibleValues[0];
-        optRTTMode.immutable = true;
-        mOptions[optRTTMode.name] = optRTTMode;
-
         refreshConfig();
     }
 
@@ -127,11 +119,7 @@ namespace Ogre {
             return;
 
         optDisplayFrequency->second.possibleValues.clear();
-        if( !isFullscreen )
-        {
-            optDisplayFrequency->second.possibleValues.push_back( "N/A" );
-        }
-        else
+        if (isFullscreen)
         {
             for (const auto& mode : mGLSupport->getVideoModes())
             {
@@ -149,15 +137,13 @@ namespace Ogre {
             removeDuplicates(optDisplayFrequency->second.possibleValues);
         }
 
-        if (!optDisplayFrequency->second.possibleValues.empty())
+        if (optDisplayFrequency->second.possibleValues.empty())
         {
-            optDisplayFrequency->second.currentValue = optDisplayFrequency->second.possibleValues[0];
+            optDisplayFrequency->second.possibleValues.push_back("N/A");
+            optDisplayFrequency->second.immutable = true;
         }
-        else
-        {
-            optVideoMode->second.currentValue = mGLSupport->getVideoModes()[0].getDescription();
-            optDisplayFrequency->second.currentValue = StringConverter::toString(mGLSupport->getVideoModes()[0].refreshRate) + " Hz";
-        }
+
+        optDisplayFrequency->second.currentValue = optDisplayFrequency->second.possibleValues.front();
     }
 
     //-------------------------------------------------------------------------------------------------//
@@ -165,9 +151,7 @@ namespace Ogre {
     {
         ConfigOptionMap::iterator option = mOptions.find(name);
         if (option == mOptions.end()) {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-                        "Option named " + name + " does not exist.",
-                        "GLNativeSupport::setConfigOption");
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Option named '" + name + "' does not exist.");
         }
         option->second.currentValue = value;
 
@@ -228,6 +212,11 @@ namespace Ogre {
                                                          uint32* depthFormat, uint32* stencilFormat)
     {
         mRTTManager->getBestDepthStencil( internalColourFormat, depthFormat, stencilFormat );
+    }
+
+    unsigned int GLRenderSystemCommon::getDisplayMonitorCount() const
+    {
+        return mGLSupport->getDisplayMonitorCount();
     }
 
     void GLRenderSystemCommon::registerThread()

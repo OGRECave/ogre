@@ -24,8 +24,6 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
-PortalBase.h  -  PortalBase is the base class for Portal and AntiPortal.
-
 */
 
 #ifndef ANTIPORTAL_H
@@ -61,8 +59,6 @@ namespace Ogre
 
         const String& getType() const
         { return FACTORY_TYPE_NAME; }
-
-        void destroyInstance(MovableObject* obj);
 
         /** Return true here as we want to get a unique type flag. */
         bool requestTypeFlags() const

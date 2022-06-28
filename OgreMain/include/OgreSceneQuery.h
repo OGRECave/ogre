@@ -41,29 +41,29 @@ namespace Ogre {
     *  @{
     */
     /** A class for performing queries on a scene.
-    @remarks
+
         This is an abstract class for performing a query on a scene, i.e. to retrieve
         a list of objects and/or world geometry sections which are potentially intersecting a
         given region. Note the use of the word 'potentially': the results of a scene query
         are generated based on bounding volumes, and as such are not correct at a triangle
         level; the user of the SceneQuery is expected to filter the results further if
         greater accuracy is required.
-    @par
+
         Different SceneManagers will implement these queries in different ways to
         exploit their particular scene organisation, and thus will provide their own
         concrete subclasses. In fact, these subclasses will be derived from subclasses
         of this class rather than directly because there will be region-type classes
         in between.
-    @par
+
         These queries could have just been implemented as methods on the SceneManager,
         however, they are wrapped up as objects to allow 'compilation' of queries
         if deemed appropriate by the implementation; i.e. each concrete subclass may
         precalculate information (such as fixed scene partitions involved in the query)
         to speed up the repeated use of the query.
-    @par
+
         You should never try to create a SceneQuery object yourself, they should be created
         using the SceneManager interfaces for the type of query required, e.g.
-        SceneManager::createSphereSceneQuery.
+        @ref SceneManager::createSphereQuery.
     */
     class _OgreExport SceneQuery : public SceneMgtAlloc
     {
@@ -73,6 +73,8 @@ namespace Ogre {
             these types will be supported by all SceneManagers; once the application
             has decided which SceneManager specialisation to use, it is expected that 
             it will know which type of world geometry abstraction is available to it.
+
+            @note only supported by the BspSceneManager
         */
         enum WorldFragmentType {
             /// Return no world geometry hits at all
@@ -88,7 +90,7 @@ namespace Ogre {
         };
 
         /** Represents part of the world geometry that is a result of a SceneQuery. 
-        @remarks
+
             Since world geometry is normally vast and sprawling, we need a way of
             retrieving parts of it based on a query. That is what this struct is for;
             note there are potentially as many data structures for world geometry as there
@@ -126,7 +128,7 @@ namespace Ogre {
         virtual ~SceneQuery();
 
         /** Sets the mask for results of this query.
-        @remarks
+
             This method allows you to set a 'mask' to limit the results of this
             query to certain types of result. The actual meaning of this value is
             up to the application; basically MovableObject instances will only be returned
@@ -139,7 +141,7 @@ namespace Ogre {
         virtual uint32 getQueryMask(void) const;
 
         /** Sets the type mask for results of this query.
-        @remarks
+
             This method allows you to set a 'type mask' to limit the results of this
             query to certain types of objects. Whilst setQueryMask deals with flags
             set per instance of object, this method deals with setting a mask on 
@@ -152,7 +154,7 @@ namespace Ogre {
 
         /** Tells the query what kind of world geometry to return from queries;
             often the full renderable geometry is not what is needed. 
-        @remarks
+
             The application receiving the world geometry is expected to know 
             what to do with it; inevitably this means that the application must 
             have knowledge of at least some of the structures
@@ -174,7 +176,7 @@ namespace Ogre {
 
     /** This optional class allows you to receive per-result callbacks from
         SceneQuery executions instead of a single set of consolidated results.
-    @remarks
+
         You should override this with your own subclass. Note that certain query
         classes may refine this listener interface.
     */
@@ -183,13 +185,13 @@ namespace Ogre {
     public:
         virtual ~SceneQueryListener() { }
         /** Called when a MovableObject is returned by a query.
-        @remarks
+
             The implementor should return 'true' to continue returning objects,
             or 'false' to abandon any further results from this query.
         */
         virtual bool queryResult(MovableObject* object) = 0;
         /** Called when a WorldFragment is returned by a query.
-        @remarks
+
             The implementor should return 'true' to continue returning objects,
             or 'false' to abandon any further results from this query.
         */
@@ -209,7 +211,7 @@ namespace Ogre {
     };
 
     /** Abstract class defining a query which returns single results from a region. 
-    @remarks
+
         This class is simply a generalisation of the subtypes of query that return 
         a set of individual results in a region. See the SceneQuery class for abstract
         information, and subclasses for the detail of each query type.
@@ -217,14 +219,13 @@ namespace Ogre {
     class _OgreExport RegionSceneQuery
         : public SceneQuery, public SceneQueryListener
     {
-    protected:
         SceneQueryResult* mLastResult;
     public:
         /** Standard constructor, should be called by SceneManager. */
         RegionSceneQuery(SceneManager* mgr);
         virtual ~RegionSceneQuery();
         /** Executes the query, returning the results back in one list.
-        @remarks
+
             This method executes the scene query as configured, gathers the results
             into one structure and returns a reference to that structure. These
             results will also persist in this query object until the next query is
@@ -234,7 +235,7 @@ namespace Ogre {
         virtual SceneQueryResult& execute(void);
 
         /** Executes the query and returns each match through a listener interface. 
-        @remarks
+
             Note that this method does not store the results of the query internally 
             so does not update the 'last result' value. This means that this version of
             execute is more lightweight and therefore more efficient than the version 
@@ -247,7 +248,7 @@ namespace Ogre {
         */
         virtual SceneQueryResult& getLastResults(void) const;
         /** Clears the results of the last query execution.
-        @remarks
+
             You only need to call this if you specifically want to free up the memory
             used by this object to hold the last query results. This object clears the
             results itself when executing and when destroying itself.
@@ -310,19 +311,8 @@ namespace Ogre {
 
     };
 
-
-    /*
-    /// Specialises the SceneQuery class for querying within a pyramid. 
-    class _OgreExport PyramidSceneQuery : public RegionSceneQuery
-    {
-    public:
-        PyramidSceneQuery(SceneManager* mgr);
-        virtual ~PyramidSceneQuery();
-    };
-    */
-
     /** Alternative listener class for dealing with RaySceneQuery.
-    @remarks
+
         Because the RaySceneQuery returns results in an extra bit of information, namely
         distance, the listener interface must be customised from the standard SceneQueryListener.
     */
@@ -331,7 +321,7 @@ namespace Ogre {
     public:
         virtual ~RaySceneQueryListener() { }
         /** Called when a movable objects intersects the ray.
-        @remarks
+
             As with SceneQueryListener, the implementor of this method should return 'true'
             if further results are required, or 'false' to abandon any further results from
             the current query.
@@ -339,7 +329,7 @@ namespace Ogre {
         virtual bool queryResult(MovableObject* obj, Real distance) = 0;
 
         /** Called when a world fragment is intersected by the ray. 
-        @remarks
+
             As with SceneQueryListener, the implementor of this method should return 'true'
             if further results are required, or 'false' to abandon any further results from
             the current query.
@@ -371,6 +361,7 @@ namespace Ogre {
     {
     protected:
         Ray mRay;
+    private:
         bool mSortByDistance;
         ushort mMaxResults;
         RaySceneQueryResult mResult;
@@ -383,7 +374,7 @@ namespace Ogre {
         /** Gets the ray which is to be used for this query. */
         virtual const Ray& getRay(void) const;
         /** Sets whether the results of this query will be sorted by distance along the ray.
-        @remarks
+
             Often you want to know what was the first object a ray intersected with, and this 
             method allows you to ask the query to sort the results so that the nearest results
             are listed first.
@@ -407,7 +398,7 @@ namespace Ogre {
         results are being sorted) */
         virtual ushort getMaxResults(void) const;
         /** Executes the query, returning the results back in one list.
-        @remarks
+
             This method executes the scene query as configured, gathers the results
             into one structure and returns a reference to that structure. These
             results will also persist in this query object until the next query is
@@ -417,7 +408,7 @@ namespace Ogre {
         virtual RaySceneQueryResult& execute(void);
 
         /** Executes the query and returns each match through a listener interface. 
-        @remarks
+
             Note that this method does not store the results of the query internally 
             so does not update the 'last result' value. This means that this version of
             execute is more lightweight and therefore more efficient than the version 
@@ -430,7 +421,7 @@ namespace Ogre {
         */
         virtual RaySceneQueryResult& getLastResults(void);
         /** Clears the results of the last query execution.
-        @remarks
+
             You only need to call this if you specifically want to free up the memory
             used by this object to hold the last query results. This object clears the
             results itself when executing and when destroying itself.
@@ -448,7 +439,7 @@ namespace Ogre {
     };
 
     /** Alternative listener class for dealing with IntersectionSceneQuery.
-    @remarks
+
         Because the IntersectionSceneQuery returns results in pairs, rather than singularly,
         the listener interface must be customised from the standard SceneQueryListener.
     */
@@ -457,7 +448,7 @@ namespace Ogre {
     public:
         virtual ~IntersectionSceneQueryListener() { }
         /** Called when 2 movable objects intersect one another.
-        @remarks
+
             As with SceneQueryListener, the implementor of this method should return 'true'
             if further results are required, or 'false' to abandon any further results from
             the current query.
@@ -465,7 +456,7 @@ namespace Ogre {
         virtual bool queryResult(MovableObject* first, MovableObject* second) = 0;
 
         /** Called when a movable intersects a world fragment. 
-        @remarks
+
             As with SceneQueryListener, the implementor of this method should return 'true'
             if further results are required, or 'false' to abandon any further results from
             the current query.
@@ -497,7 +488,7 @@ namespace Ogre {
 
     /** Separate SceneQuery class to query for pairs of objects which are
         possibly intersecting one another.
-    @remarks
+
         This SceneQuery subclass considers the whole world and returns pairs of objects
         which are close enough to each other that they may be intersecting. Because of
         this slightly different focus, the return types and listener interface are
@@ -506,14 +497,13 @@ namespace Ogre {
     class _OgreExport IntersectionSceneQuery
         : public SceneQuery, public IntersectionSceneQueryListener 
     {
-    protected:
         IntersectionSceneQueryResult* mLastResult;
     public:
         IntersectionSceneQuery(SceneManager* mgr);
         virtual ~IntersectionSceneQuery();
 
         /** Executes the query, returning the results back in one list.
-        @remarks
+
             This method executes the scene query as configured, gathers the results
             into one structure and returns a reference to that structure. These
             results will also persist in this query object until the next query is
@@ -523,7 +513,7 @@ namespace Ogre {
         virtual IntersectionSceneQueryResult& execute(void);
 
         /** Executes the query and returns each match through a listener interface. 
-        @remarks
+
             Note that this method does not store the results of the query internally 
             so does not update the 'last result' value. This means that this version of
             execute is more lightweight and therefore more efficient than the version 
@@ -536,7 +526,7 @@ namespace Ogre {
         */
         virtual IntersectionSceneQueryResult& getLastResults(void) const;
         /** Clears the results of the last query execution.
-        @remarks
+
             You only need to call this if you specifically want to free up the memory
             used by this object to hold the last query results. This object clears the
             results itself when executing and when destroying itself.

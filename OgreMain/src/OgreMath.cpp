@@ -30,21 +30,21 @@ THE SOFTWARE.
 namespace Ogre
 {
 
-    const Real Math::POS_INFINITY = std::numeric_limits<Real>::infinity();
-    const Real Math::NEG_INFINITY = -std::numeric_limits<Real>::infinity();
-    const Real Math::PI = Real( 4.0 * atan( 1.0 ) );
-    const Real Math::TWO_PI = Real( 2.0 * PI );
-    const Real Math::HALF_PI = Real( 0.5 * PI );
-    const Real Math::fDeg2Rad = PI / Real(180.0);
-    const Real Math::fRad2Deg = Real(180.0) / PI;
-    const Real Math::LOG2 = std::log(Real(2.0));
+    constexpr Real Math::POS_INFINITY;
+    constexpr Real Math::NEG_INFINITY;
+    constexpr Real Math::PI;
+    constexpr Real Math::TWO_PI;
+    constexpr Real Math::HALF_PI;
+    constexpr float Math::fDeg2Rad;
+    constexpr float Math::fRad2Deg;
+    constexpr Real Math::LOG2;
 
     int Math::mTrigTableSize;
    Math::AngleUnit Math::msAngleUnit;
 
-    Real  Math::mTrigTableFactor;
-    Real *Math::mSinTable = NULL;
-    Real *Math::mTanTable = NULL;
+    float  Math::mTrigTableFactor;
+    float *Math::mSinTable = NULL;
+    float *Math::mTanTable = NULL;
 
     Math::RandomValueProvider* Math::mRandProvider = NULL;
 
@@ -55,8 +55,8 @@ namespace Ogre
         mTrigTableSize = trigTableSize;
         mTrigTableFactor = mTrigTableSize / Math::TWO_PI;
 
-        mSinTable = OGRE_ALLOC_T(Real, mTrigTableSize, MEMCATEGORY_GENERAL);
-        mTanTable = OGRE_ALLOC_T(Real, mTrigTableSize, MEMCATEGORY_GENERAL);
+        mSinTable = OGRE_ALLOC_T(float, mTrigTableSize, MEMCATEGORY_GENERAL);
+        mTanTable = OGRE_ALLOC_T(float, mTrigTableSize, MEMCATEGORY_GENERAL);
 
         buildTrigTables();
     }
@@ -75,7 +75,7 @@ namespace Ogre
         // Could get away with building only PI sized Sin table but simpler this 
         // way. Who cares, it'll ony use an extra 8k of memory anyway and I like 
         // simplicity.
-        Real angle;
+        float angle;
         for (int i = 0; i < mTrigTableSize; ++i)
         {
             angle = Math::TWO_PI * i / Real(mTrigTableSize);
@@ -84,7 +84,7 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------   
-    Real Math::SinTable (Real fValue)
+    float Math::SinTable (float fValue)
     {
         // Convert range to index values, wrap if required
         int idx;
@@ -100,10 +100,10 @@ namespace Ogre
         return mSinTable[idx];
     }
     //-----------------------------------------------------------------------
-    Real Math::TanTable (Real fValue)
+    float Math::TanTable (float fValue)
     {
         // Convert range to index values, wrap if required
-        int idx = int(fValue *= mTrigTableFactor) % mTrigTableSize;
+        int idx = int(fValue * mTrigTableFactor) % mTrigTableSize;
         return mTanTable[idx];
     }
     //-----------------------------------------------------------------------
@@ -141,7 +141,7 @@ namespace Ogre
     {
         if (mRandProvider)
             return mRandProvider->getRandomUnit();
-        else return Real(rand()) / RAND_MAX;
+        else return Real(rand()) / float(RAND_MAX);
     }
     
     //-----------------------------------------------------------------------
@@ -161,7 +161,7 @@ namespace Ogre
        return msAngleUnit;
    }
     //-----------------------------------------------------------------------
-    Real Math::AngleUnitsToRadians(Real angleunits)
+    float Math::AngleUnitsToRadians(float angleunits)
     {
        if (msAngleUnit == AU_DEGREE)
            return angleunits * fDeg2Rad;
@@ -170,7 +170,7 @@ namespace Ogre
     }
 
     //-----------------------------------------------------------------------
-    Real Math::RadiansToAngleUnits(Real radians)
+    float Math::RadiansToAngleUnits(float radians)
     {
        if (msAngleUnit == AU_DEGREE)
            return radians * fRad2Deg;
@@ -179,7 +179,7 @@ namespace Ogre
     }
 
     //-----------------------------------------------------------------------
-    Real Math::AngleUnitsToDegrees(Real angleunits)
+    float Math::AngleUnitsToDegrees(float angleunits)
     {
        if (msAngleUnit == AU_RADIAN)
            return angleunits * fRad2Deg;
@@ -188,7 +188,7 @@ namespace Ogre
     }
 
     //-----------------------------------------------------------------------
-    Real Math::DegreesToAngleUnits(Real degrees)
+    float Math::DegreesToAngleUnits(float degrees)
     {
        if (msAngleUnit == AU_RADIAN)
            return degrees * fDeg2Rad;
@@ -592,105 +592,38 @@ namespace Ogre
         return true;
     }
     //-----------------------------------------------------------------------
-    std::pair<bool, Real> Math::intersects(const Ray& ray, const Vector3& a,
-        const Vector3& b, const Vector3& c, const Vector3& normal,
-        bool positiveSide, bool negativeSide)
+    std::pair<bool, Real> Math::intersects(const Ray& ray, const Vector3& a, const Vector3& b,
+                                           const Vector3& c, bool positiveSide, bool negativeSide)
     {
-        //
-        // Calculate intersection with plane.
-        //
-        Real t;
-        {
-            Real denom = normal.dotProduct(ray.getDirection());
+        const Real EPSILON = 1e-6f;
+        Vector3 E1 = b - a;
+        Vector3 E2 = c - a;
+        Vector3 P = ray.getDirection().crossProduct(E2);
+        Real det = E1.dotProduct(P);
 
-            // Check intersect side
-            if (denom > + std::numeric_limits<Real>::epsilon())
-            {
-                if (!negativeSide)
-                    return std::pair<bool, Real>(false, (Real)0);
-            }
-            else if (denom < - std::numeric_limits<Real>::epsilon())
-            {
-                if (!positiveSide)
-                    return std::pair<bool, Real>(false, (Real)0);
-            }
-            else
-            {
-                // Parallel or triangle area is close to zero when
-                // the plane normal not normalised.
-                return std::pair<bool, Real>(false, (Real)0);
-            }
+        // if determinant is near zero, ray lies in plane of triangle
+        if((!positiveSide || det <= EPSILON) && (!negativeSide || det >= -EPSILON))
+            return {false, (Real)0};
+        Real inv_det = 1.0f / det;
 
-            t = normal.dotProduct(a - ray.getOrigin()) / denom;
+        // calculate u parameter and test bounds
+        Vector3 T = ray.getOrigin() - a;
+        Real u = T.dotProduct(P) * inv_det;
+        if(u < 0.0f || u > 1.0f)
+            return {false, (Real)0};
 
-            if (t < 0)
-            {
-                // Intersection is behind origin
-                return std::pair<bool, Real>(false, (Real)0);
-            }
-        }
+        // calculate v parameter and test bounds
+        Vector3 Q = T.crossProduct(E1);
+        Real v = ray.getDirection().dotProduct(Q) * inv_det;
+        if (v < 0.0f || u + v > 1.0f)
+            return {false, (Real)0};
 
-        //
-        // Calculate the largest area projection plane in X, Y or Z.
-        //
-        size_t i0, i1;
-        {
-            Real n0 = Math::Abs(normal[0]);
-            Real n1 = Math::Abs(normal[1]);
-            Real n2 = Math::Abs(normal[2]);
+        // calculate t, ray intersects triangle
+        Real t = E2.dotProduct(Q) * inv_det;
+        if (t < 0.0f)
+            return {false, (Real)0};
 
-            i0 = 1; i1 = 2;
-            if (n1 > n2)
-            {
-                if (n1 > n0) i0 = 0;
-            }
-            else
-            {
-                if (n2 > n0) i1 = 0;
-            }
-        }
-
-        //
-        // Check the intersection point is inside the triangle.
-        //
-        {
-            Real u1 = b[i0] - a[i0];
-            Real v1 = b[i1] - a[i1];
-            Real u2 = c[i0] - a[i0];
-            Real v2 = c[i1] - a[i1];
-            Real u0 = t * ray.getDirection()[i0] + ray.getOrigin()[i0] - a[i0];
-            Real v0 = t * ray.getDirection()[i1] + ray.getOrigin()[i1] - a[i1];
-
-            Real alpha = u0 * v2 - u2 * v0;
-            Real beta  = u1 * v0 - u0 * v1;
-            Real area  = u1 * v2 - u2 * v1;
-
-            // epsilon to avoid float precision error
-            const Real EPSILON = 1e-6f;
-
-            Real tolerance = - EPSILON * area;
-
-            if (area > 0)
-            {
-                if (alpha < tolerance || beta < tolerance || alpha+beta > area-tolerance)
-                    return std::pair<bool, Real>(false, (Real)0);
-            }
-            else
-            {
-                if (alpha > tolerance || beta > tolerance || alpha+beta < area-tolerance)
-                    return std::pair<bool, Real>(false, (Real)0);
-            }
-        }
-
-        return std::pair<bool, Real>(true, (Real)t);
-    }
-    //-----------------------------------------------------------------------
-    std::pair<bool, Real> Math::intersects(const Ray& ray, const Vector3& a,
-        const Vector3& b, const Vector3& c,
-        bool positiveSide, bool negativeSide)
-    {
-        Vector3 normal = calculateBasicFaceNormalWithoutNormalize(a, b, c);
-        return intersects(ray, a, b, c, normal, positiveSide, negativeSide);
+        return {true, t};
     }
     //-----------------------------------------------------------------------
     bool Math::intersects(const Sphere& sphere, const AxisAlignedBox& box)

@@ -46,21 +46,22 @@ namespace Ogre {
     class _OgreExport HardwareIndexBuffer : public HardwareBuffer
     {
         public:
-            enum IndexType {
+            enum IndexType : uint8 {
                 IT_16BIT,
                 IT_32BIT
             };
 
-        protected:
+        private:
             IndexType mIndexType;
+            uint8 mIndexSize;
             HardwareBufferManagerBase* mMgr;
             size_t mNumIndexes;
-            size_t mIndexSize;
-
         public:
             /// Should be called by HardwareBufferManager
-            HardwareIndexBuffer(HardwareBufferManagerBase* mgr, IndexType idxType, size_t numIndexes, HardwareBuffer::Usage usage,
-                bool useSystemMemory, bool useShadowBuffer);
+            HardwareIndexBuffer(HardwareBufferManagerBase* mgr, IndexType idxType, size_t numIndexes,
+                                Usage usage, bool useSystemMemory, bool useShadowBuffer);
+            HardwareIndexBuffer(HardwareBufferManagerBase* mgr, IndexType idxType, size_t numIndexes,
+                                HardwareBuffer* delegate);
             ~HardwareIndexBuffer();
             /// Return the manager of this buffer, if any
             HardwareBufferManagerBase* getManager() const { return mMgr; }
@@ -69,7 +70,9 @@ namespace Ogre {
             /// Get the number of indexes in this buffer
             size_t getNumIndexes(void) const { return mNumIndexes; }
             /// Get the size in bytes of each index
-            size_t getIndexSize(void) const { return mIndexSize; }
+            uint8 getIndexSize(void) const { return mIndexSize; }
+
+            static size_t indexSize(IndexType type) { return type == IT_16BIT ? sizeof(uint16) : sizeof(uint32); }
 
             // NB subclasses should override lock, unlock, readData, writeData
     };

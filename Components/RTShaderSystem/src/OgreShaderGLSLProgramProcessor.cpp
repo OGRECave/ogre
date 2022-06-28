@@ -30,26 +30,14 @@ THE SOFTWARE.
 namespace Ogre {
 namespace RTShader {
 
-String GLSLProgramProcessor::TargetLanguage = "glsl";
-
 //-----------------------------------------------------------------------------
 GLSLProgramProcessor::GLSLProgramProcessor()
 {
-
 }
 
 //-----------------------------------------------------------------------------
 GLSLProgramProcessor::~GLSLProgramProcessor()
 {
-    StringVector::iterator it = mLibraryPrograms.begin();
-    StringVector::iterator itEnd = mLibraryPrograms.end();
-    
-    for (; it != itEnd; ++it)
-    {
-        HighLevelGpuProgramManager::getSingleton().remove(
-            *it, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
-    }
-    mLibraryPrograms.clear();
 }
 
 //-----------------------------------------------------------------------------
@@ -86,17 +74,18 @@ bool GLSLProgramProcessor::postCreateGpuPrograms(ProgramSet* programSet)
 //-----------------------------------------------------------------------------
 void GLSLProgramProcessor::bindTextureSamplers(Program* pCpuProgram, GpuProgramPtr pGpuProgram)
 {
+    if (StringConverter::parseBool(pGpuProgram->getParameter("has_sampler_binding")))
+        return;
+
     GpuProgramParametersSharedPtr pGpuParams = pGpuProgram->getDefaultParameters();
-    const UniformParameterList& progParams = pCpuProgram->getParameters();
-    UniformParameterConstIterator itParams;
 
     // Bind the samplers.
-    for (itParams=progParams.begin(); itParams != progParams.end(); ++itParams)
+    for (const auto& pCurParam : pCpuProgram->getParameters())
     {
-        const UniformParameterPtr pCurParam = *itParams;
-        
-        if (pCurParam->isSampler())
-        {       
+        if (pCurParam->isSampler() && pCurParam->isUsed())
+        {
+            // The optimizer may remove some unnecessary parameters, so we should ignore them
+            pGpuParams->setIgnoreMissingParams(true);
             pGpuParams->setNamedConstant(pCurParam->getName(), pCurParam->getIndex());                      
         }       
     }

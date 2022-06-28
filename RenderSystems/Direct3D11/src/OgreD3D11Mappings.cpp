@@ -227,7 +227,7 @@ namespace Ogre
             // D3D debug runtime doesn't like you locking managed buffers readonly
             // when they were created with write-only (even though you CAN read
             // from the software backed version)
-            if (!(usage & HardwareBuffer::HBU_WRITE_ONLY))
+            if (!(usage & HBU_DETAIL_WRITE_ONLY))
                 ret = D3D11_MAP_READ;
 
         }
@@ -280,11 +280,6 @@ namespace Ogre
     {
         switch (vType)
         {
-        case VET_COLOUR:
-        case VET_COLOUR_ABGR:
-        case VET_COLOUR_ARGB:
-            return DXGI_FORMAT_R8G8B8A8_UNORM;
-
         // Float32
         case VET_FLOAT1:
             return DXGI_FORMAT_R32_FLOAT;
@@ -407,14 +402,6 @@ namespace Ogre
         return "";
     }
     //---------------------------------------------------------------------
-    void D3D11Mappings::get(const ColourValue& inColour, float * outColour )
-    {
-        outColour[0] = inColour.r;
-        outColour[1] = inColour.g;
-        outColour[2] = inColour.b;
-        outColour[3] = inColour.a;  
-    }
-    //---------------------------------------------------------------------
     PixelFormat D3D11Mappings::_getPF(DXGI_FORMAT d3dPF)
     {
         switch(d3dPF)
@@ -458,13 +445,13 @@ namespace Ogre
         case DXGI_FORMAT_R16G16_UINT:               return PF_UNKNOWN;
         case DXGI_FORMAT_R16G16_SNORM:              return PF_UNKNOWN;
         case DXGI_FORMAT_R16G16_SINT:               return PF_R16G16_SINT;
-        case DXGI_FORMAT_R32_TYPELESS:              return PF_UNKNOWN;
+        case DXGI_FORMAT_R32_TYPELESS:              return PF_DEPTH32;
         case DXGI_FORMAT_D32_FLOAT:                 return PF_DEPTH32F;
         case DXGI_FORMAT_R32_FLOAT:                 return PF_FLOAT32_R;
         case DXGI_FORMAT_R32_UINT:                  return PF_UNKNOWN;
         case DXGI_FORMAT_R32_SINT:                  return PF_UNKNOWN;
         case DXGI_FORMAT_R24G8_TYPELESS:            return PF_UNKNOWN;
-        case DXGI_FORMAT_D24_UNORM_S8_UINT:         return PF_UNKNOWN;
+        case DXGI_FORMAT_D24_UNORM_S8_UINT:         return PF_DEPTH24_STENCIL8;
         case DXGI_FORMAT_R24_UNORM_X8_TYPELESS:     return PF_UNKNOWN;
         case DXGI_FORMAT_X24_TYPELESS_G8_UINT:      return PF_UNKNOWN;
         case DXGI_FORMAT_R8G8_TYPELESS:             return PF_UNKNOWN;
@@ -584,7 +571,11 @@ namespace Ogre
         case PF_BC6H_SF16:      return DXGI_FORMAT_BC6H_SF16;
         case PF_BC7_UNORM:      return DXGI_FORMAT_BC7_UNORM;
         case PF_R16G16_SINT:    return DXGI_FORMAT_R16G16_SINT;
-        case PF_FLOAT32_GR:     return DXGI_FORMAT_R32G32_FLOAT;         
+        case PF_FLOAT32_GR:     return DXGI_FORMAT_R32G32_FLOAT;
+        case PF_DEPTH16:        return DXGI_FORMAT_R32_TYPELESS;
+        case PF_DEPTH32:        return DXGI_FORMAT_R32_TYPELESS;
+        case PF_DEPTH32F:       return DXGI_FORMAT_R32_TYPELESS;
+        case PF_DEPTH24_STENCIL8:     return DXGI_FORMAT_R24G8_TYPELESS;
         default:                return DXGI_FORMAT_UNKNOWN;
         }
     }
@@ -636,6 +627,12 @@ namespace Ogre
             return PF_FLOAT16_RGBA;
         case PF_FLOAT32_RGB:
             return PF_FLOAT32_RGBA;
+        case PF_DEPTH16:
+            return PF_L16;
+        case PF_DEPTH24_STENCIL8:
+        case PF_DEPTH32:
+        case PF_DEPTH32F:
+            return PF_FLOAT32_R;
         case PF_UNKNOWN:
         default:
             return PF_A8B8G8R8;

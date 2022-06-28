@@ -46,12 +46,18 @@ namespace Ogre {
         mSizeInBytes = mVertexSize * numVertices;
 
         // Create a shadow buffer if required
-        if (mUseShadowBuffer)
+        if (useShadowBuffer)
         {
-            mShadowBuffer.reset(new DefaultHardwareVertexBuffer(mMgr, mVertexSize,
-                    mNumVertices, HardwareBuffer::HBU_DYNAMIC));
+            mShadowBuffer.reset(new DefaultHardwareBuffer(mSizeInBytes));
         }
 
+    }
+    HardwareVertexBuffer::HardwareVertexBuffer(HardwareBufferManagerBase* mgr, size_t vertexSize,
+                                               size_t numVertices, HardwareBuffer* delegate)
+        : HardwareVertexBuffer(mgr, vertexSize, numVertices, delegate->getUsage(), delegate->isSystemMemory(),
+                               false)
+    {
+        mDelegate.reset(delegate);
     }
     //-----------------------------------------------------------------------------
     HardwareVertexBuffer::~HardwareVertexBuffer()
@@ -108,7 +114,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------------
     VertexElement::VertexElement(unsigned short source, size_t offset, VertexElementType theType,
                                  VertexElementSemantic semantic, unsigned short index)
-        : mSource(source), mIndex(index), mOffset(offset), mType(theType), mSemantic(semantic)
+        : mOffset(offset), mSource(source), mIndex(index), mType(theType), mSemantic(semantic)
     {
     }
     //-----------------------------------------------------------------------------
@@ -121,10 +127,6 @@ namespace Ogre {
     {
         switch(etype)
         {
-        case VET_COLOUR:
-        case VET_COLOUR_ABGR:
-        case VET_COLOUR_ARGB:
-            return sizeof(RGBA);
         case VET_FLOAT1:
             return sizeof(float);
         case VET_FLOAT2:
@@ -173,7 +175,10 @@ namespace Ogre {
         case VET_BYTE4_NORM:
         case VET_UBYTE4:
         case VET_UBYTE4_NORM:
+        case _DETAIL_SWAP_RB:
             return sizeof(char)*4;
+        case VET_INT_10_10_10_2_NORM:
+            return 4;
         }
         return 0;
     }
@@ -182,9 +187,6 @@ namespace Ogre {
     {
         switch (etype)
         {
-        case VET_COLOUR:
-        case VET_COLOUR_ABGR:
-        case VET_COLOUR_ARGB:
         case VET_FLOAT1:
         case VET_SHORT1:
         case VET_USHORT1:
@@ -220,6 +222,8 @@ namespace Ogre {
         case VET_UBYTE4:
         case VET_BYTE4_NORM:
         case VET_UBYTE4_NORM:
+        case _DETAIL_SWAP_RB:
+        case VET_INT_10_10_10_2_NORM:
             return 4;
         }
         OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Invalid type", 
@@ -283,54 +287,13 @@ namespace Ogre {
             "VertexElement::multiplyTypeCount");
     }
     //--------------------------------------------------------------------------
-    VertexElementType VertexElement::getBestColourVertexElementType(void)
-    {
-        // Use the current render system to determine if possible
-        if (Root::getSingletonPtr() && Root::getSingletonPtr()->getRenderSystem())
-        {
-            return Root::getSingleton().getRenderSystem()->getColourVertexElementType();
-        }
-        else
-        {
-            // We can't know the specific type right now, so pick a type
-            // based on platform
-#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_WINRT
-            return VET_COLOUR_ARGB; // prefer D3D format on windows
-#else
-            return VET_COLOUR_ABGR; // prefer GL format on everything else
-#endif
-
-        }
-    }
-    //--------------------------------------------------------------------------
-    void VertexElement::convertColourValue(VertexElementType srcType, 
-        VertexElementType dstType, uint32* ptr)
+    void VertexElement::convertColourValue(VertexElementType srcType, VertexElementType dstType, uint32* ptr)
     {
         if (srcType == dstType)
             return;
 
         // Conversion between ARGB and ABGR is always a case of flipping R/B
-        *ptr = 
-           ((*ptr&0x00FF0000)>>16)|((*ptr&0x000000FF)<<16)|(*ptr&0xFF00FF00);               
-    }
-    //--------------------------------------------------------------------------
-    uint32 VertexElement::convertColourValue(const ColourValue& src, 
-        VertexElementType dst)
-    {
-        switch(dst)
-        {
-#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_WINRT
-        default:
-#endif
-        case VET_COLOUR_ARGB:
-            return src.getAsARGB();
-#if OGRE_PLATFORM != OGRE_PLATFORM_WIN32 && OGRE_PLATFORM != OGRE_PLATFORM_WINRT
-        default:
-#endif
-        case VET_COLOUR_ABGR: 
-            return src.getAsABGR();
-        };
-
+        *ptr = ((*ptr & 0x00FF0000) >> 16) | ((*ptr & 0x000000FF) << 16) | (*ptr & 0xFF00FF00);
     }
     //-----------------------------------------------------------------------------
     VertexElementType VertexElement::getBaseType(VertexElementType multiType)
@@ -357,12 +320,6 @@ namespace Ogre {
             case VET_UINT3:
             case VET_UINT4:
                 return VET_UINT1;
-            case VET_COLOUR:
-                return VET_COLOUR;
-            case VET_COLOUR_ABGR:
-                return VET_COLOUR_ABGR;
-            case VET_COLOUR_ARGB:
-                return VET_COLOUR_ARGB;
             case VET_SHORT1:
             case VET_SHORT2:
             case VET_SHORT3:
@@ -386,7 +343,10 @@ namespace Ogre {
             case VET_UBYTE4:
                 return VET_UBYTE4;
             case VET_UBYTE4_NORM:
+            case _DETAIL_SWAP_RB:
                 return VET_UBYTE4_NORM;
+            case VET_INT_10_10_10_2_NORM:
+                return VET_INT_10_10_10_2_NORM;
         };
         // To keep compiler happy
         return VET_FLOAT1;
@@ -409,14 +369,7 @@ namespace Ogre {
         size_t offset, VertexElementType theType,
         VertexElementSemantic semantic, unsigned short index)
     {
-        // Refine colour type to a specific type
-        if (theType == VET_COLOUR)
-        {
-            theType = VertexElement::getBestColourVertexElementType();
-        }
-        mElementList.push_back(
-            VertexElement(source, offset, theType, semantic, index));
-
+        mElementList.push_back(VertexElement(source, offset, theType, semantic, index));
         notifyChanged();
         return mElementList.back();
     }
@@ -829,22 +782,4 @@ namespace Ogre {
         mBindingMap.swap(newBindingMap);
         mHighIndex = targetIndex;
     }
-    //-----------------------------------------------------------------------------
-    bool VertexBufferBinding::hasInstanceData() const
-    {
-        VertexBufferBinding::VertexBufferBindingMap::const_iterator i, iend;
-        iend = mBindingMap.end();
-        for (i = mBindingMap.begin(); i != iend; ++i)
-        {
-            if ( i->second->isInstanceData() )
-            {
-                return true;
-            }
-        }
-        return false;
-    }
-
-
-
-
 }

@@ -42,7 +42,7 @@ namespace Ogre {
     */
 
     /** Level of detail strategy based on distance from camera. This is an abstract base class for DistanceLodBoxStrategy and DistanceLodSphereStrategy.
-        @remarks
+
             The purpose of the reference view is to ensure a consistent experience for all users. Monitors of different resolutions and aspect ratios will each have different results for the distance queries.
         @par
             It depends on gameplay testing. If all testers had 16:9 monitors and 110° FOV, then that's the value you should enter (to ensure as much as possible the experience stays consistent for all other users who don't have a 16:9 monitor and/or use a different FOV).
@@ -82,7 +82,7 @@ namespace Ogre {
         /// @copydoc LodStrategy::isSorted
         virtual bool isSorted(const Mesh::LodValueList& values) const;
 
-        /** Get the squared depth from camera to the LOD object */
+        /** Get the squared distance between the camera and the LOD object */
         virtual Real getSquaredDepth(const MovableObject *movableObject, const Ogre::Camera *camera) const = 0;
 
         /** Sets the reference view upon which the distances were based.
@@ -118,7 +118,7 @@ namespace Ogre {
     */
 
     /** Level of detail strategy based on distance from camera to an object's bounding sphere.
-        @remarks
+
             The purpose of the reference view is to ensure a consistent experience for all users. Monitors of different resolutions and aspect ratios will each have different results for the distance queries.
         @par
             It depends on gameplay testing. If all testers had 16:9 monitors and 110° FOV, then that's the value you should enter (to ensure as much as possible the experience stays consistent for all other users who don't have a 16:9 monitor and/or use a different FOV).
@@ -151,7 +151,7 @@ namespace Ogre {
     */
 
     /** Level of detail strategy based on distance from camera to an object's bounding box.
-        @remarks
+
             The purpose of the reference view is to ensure a consistent experience for all users. Monitors of different resolutions and aspect ratios will each have different results for the distance queries.
         @par
             It depends on gameplay testing. If all testers had 16:9 monitors and 110° FOV, then that's the value you should enter (to ensure as much as possible the experience stays consistent for all other users who don't have a 16:9 monitor and/or use a different FOV).

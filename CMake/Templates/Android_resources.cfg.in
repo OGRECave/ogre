@@ -1,7 +1,6 @@
 # Ogre Core Resources
 [OgreInternal]
-APKFileSystem=/ShadowVolume
-APKFileSystem=/RTShaderLib/materials
+APKFileSystem=/Main
 APKFileSystem=/RTShaderLib/GLSL
 APKFileSystem=/Terrain
 
@@ -14,14 +13,12 @@ APKFileSystem=/thumbnails
 # Rarely used resources should be separately loaded by the
 # samples which require them.
 [General]
-# Bites uses the next entry to discover the platform shaders
-APKFileSystem=/
-APKFileSystem=/fonts
-APKFileSystem=/materials/programs
+APKFileSystem=/materials/programs/GLSL
+APKFileSystem=/materials/programs/GLSLES
 APKFileSystem=/materials/scripts
 APKFileSystem=/materials/textures
 APKFileSystem=/materials/textures/glTF2_IBL
-APKFileSystem=/materials/textures/nvidia
+APKFileSystem=/materials/textures/terrain
 APKFileSystem=/models
 APKFileSystem=/particle
 APKFileSystem=/materials/scripts/SSAO
@@ -37,6 +34,8 @@ APKZip=/packs/skybox.zip
 APKZip=/packs/DamagedHelmet.zip
 
 APKFileSystem=/PBR
-APKFileSystem=/HLMS
 APKFileSystem=/DeferredShadingMedia
 APKFileSystem=/DeferredShadingMedia/DeferredShading/post
+
+[BSPWorld]
+APKZip=/packs/oa_rpg3dm2.pk3

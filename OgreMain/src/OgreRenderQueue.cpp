@@ -42,13 +42,12 @@ namespace Ogre {
         , mRenderableListener(0)
     {
         // Create the 'main' queue up-front since we'll always need that
-        mGroups[RENDER_QUEUE_MAIN].reset(new RenderQueueGroup(this, mSplitPassesByLightingType,
-                                                              mSplitNoShadowPasses,
-                                                              mShadowCastersCannotBeReceivers));
+        mGroups[RENDER_QUEUE_MAIN].reset(new RenderQueueGroup(
+            mSplitPassesByLightingType, mSplitNoShadowPasses, mShadowCastersCannotBeReceivers));
 
         // set default queue
         mDefaultQueueGroup = RENDER_QUEUE_MAIN;
-        mDefaultRenderablePriority = OGRE_RENDERABLE_DEFAULT_PRIORITY;
+        mDefaultRenderablePriority = Renderable::DEFAULT_PRIORITY;
 
     }
     //---------------------------------------------------------------------
@@ -102,19 +101,14 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void RenderQueue::clear(bool destroyPassMaps)
     {
-        // Clear the queues
-        SceneManagerEnumerator::SceneManagerIterator scnIt =
-            SceneManagerEnumerator::getSingleton().getSceneManagerIterator();
-
         // Note: We clear dirty passes from all RenderQueues in all 
         // SceneManagers, because the following recalculation of pass hashes
         // also considers all RenderQueues and could become inconsistent, otherwise.
-        while (scnIt.hasMoreElements())
+        for (auto p : SceneManagerEnumerator::getSingleton().getSceneManagers())
         {
-            SceneManager* sceneMgr = scnIt.getNext();
-            RenderQueue* queue = sceneMgr->getRenderQueue();
+            RenderQueue* queue = p.second->getRenderQueue();
 
-            for (size_t i = 0; i < RENDER_QUEUE_MAX; ++i)
+            for (size_t i = 0; i < RENDER_QUEUE_COUNT; ++i)
             {
                 if(queue->mGroups[i])
                     queue->mGroups[i]->clear(destroyPassMaps);
@@ -167,8 +161,7 @@ namespace Ogre {
         if (!mGroups[groupID])
         {
             // Insert new
-            mGroups[groupID].reset(new RenderQueueGroup(this, mSplitPassesByLightingType,
-                                                        mSplitNoShadowPasses,
+            mGroups[groupID].reset(new RenderQueueGroup(mSplitPassesByLightingType, mSplitNoShadowPasses,
                                                         mShadowCastersCannotBeReceivers));
         }
 
@@ -180,7 +173,7 @@ namespace Ogre {
     {
         mSplitPassesByLightingType = split;
 
-        for (size_t i = 0; i < RENDER_QUEUE_MAX; ++i)
+        for (size_t i = 0; i < RENDER_QUEUE_COUNT; ++i)
         {
             if(mGroups[i])
                 mGroups[i]->setSplitPassesByLightingType(split);
@@ -196,7 +189,7 @@ namespace Ogre {
     {
         mSplitNoShadowPasses = split;
 
-        for (size_t i = 0; i < RENDER_QUEUE_MAX; ++i)
+        for (size_t i = 0; i < RENDER_QUEUE_COUNT; ++i)
         {
             if(mGroups[i])
                 mGroups[i]->setSplitNoShadowPasses(split);
@@ -212,7 +205,7 @@ namespace Ogre {
     {
         mShadowCastersCannotBeReceivers = ind;
 
-        for (size_t i = 0; i < RENDER_QUEUE_MAX; ++i)
+        for (size_t i = 0; i < RENDER_QUEUE_COUNT; ++i)
         {
             if(mGroups[i])
                 mGroups[i]->setShadowCastersCannotBeReceivers(ind);
@@ -226,7 +219,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void RenderQueue::merge( const RenderQueue* rhs )
     {
-        for (size_t i = 0; i < RENDER_QUEUE_MAX; ++i)
+        for (size_t i = 0; i < RENDER_QUEUE_COUNT; ++i)
         {
             if(!rhs->mGroups[i])
                 continue;
@@ -242,31 +235,32 @@ namespace Ogre {
         bool onlyShadowCasters, 
         VisibleObjectsBoundsInfo* visibleBounds)
     {
-        mo->_notifyCurrentCamera(cam);
-        if (mo->isVisible())
-        {
-            bool receiveShadows = getQueueGroup(mo->getRenderQueueGroup())->getShadowsEnabled()
-                && mo->getReceivesShadows();
+        // receiveShadows is a material property, so we can query it before LOD
+        bool receiveShadows = getQueueGroup(mo->getRenderQueueGroup())->getShadowsEnabled() && mo->getReceivesShadows();
 
-            if (!onlyShadowCasters || mo->getCastShadows())
+        if(onlyShadowCasters && !mo->getCastShadows() && !receiveShadows)
+            return;
+
+        mo->_notifyCurrentCamera(cam);
+        if (!mo->isVisible())
+            return;
+
+        const auto& bbox = mo->getWorldBoundingBox(true);
+        const auto& bsphere = mo->getWorldBoundingSphere(true);
+
+        if (!onlyShadowCasters || mo->getCastShadows())
+        {
+            mo->_updateRenderQueue(this);
+            if (visibleBounds)
             {
-                mo -> _updateRenderQueue( this );
-                if (visibleBounds)
-                {
-                    visibleBounds->merge(mo->getWorldBoundingBox(true), 
-                        mo->getWorldBoundingSphere(true), cam, 
-                        receiveShadows);
-                }
-            }
-            // not shadow caster, receiver only?
-            else if (onlyShadowCasters && !mo->getCastShadows() && 
-                receiveShadows)
-            {
-                visibleBounds->mergeNonRenderedButInFrustum(mo->getWorldBoundingBox(true), 
-                    mo->getWorldBoundingSphere(true), cam);
+                visibleBounds->merge(bbox, bsphere, cam, receiveShadows);
             }
         }
-
+        // not shadow caster, receiver only?
+        else if (receiveShadows)
+        {
+            visibleBounds->mergeNonRenderedButInFrustum(bbox, bsphere, cam);
+        }
     }
 
 }

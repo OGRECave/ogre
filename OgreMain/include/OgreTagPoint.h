@@ -45,7 +45,7 @@ namespace Ogre  {
     */
     /** A tagged point on a skeleton, which can be used to attach entities to on specific
         other entities.
-    @remarks
+
         A Skeleton, like a Mesh, is shared between Entity objects and simply updated as required
         when it comes to rendering. However there are times when you want to attach another object
         to an animated entity, and make sure that attachment follows the parent entity's animation
@@ -99,17 +99,13 @@ namespace Ogre  {
         void needUpdate(bool forceParentUpdate = false) override;
         /** Overridden from Node in order to include parent Entity transform. */
         void updateFromParentImpl(void) const override;
-        /// @deprecated do not use
-        OGRE_DEPRECATED const LightList& getLights(void) const;
-
-
 
     private:
+        bool mInheritParentEntityOrientation;
+        bool mInheritParentEntityScale;
         Entity *mParentEntity;
         MovableObject *mChildObject;
         mutable Affine3 mFullLocalTransform;
-        bool mInheritParentEntityOrientation;
-        bool mInheritParentEntityScale;
     };
 
     /** @} */

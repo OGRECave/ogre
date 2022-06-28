@@ -2173,7 +2173,7 @@ bool ParseBuiltInMacroParms(MACROENTRY *parsedMacro, char *parmStr)
 	foundParm = strdup(parmStr);
 	if (foundParm == NULL)
 	{
-		LexError("Out of memory parsing bultin macro parameters.\n");
+		LexError("Out of memory parsing builtin macro parameters.\n");
 		return false;
 	}
 
@@ -2194,7 +2194,7 @@ bool ParseBuiltInMacroParms(MACROENTRY *parsedMacro, char *parmStr)
 		if (curMT == NULL)
 		{
 			free(parmStr);
-			LexError("Out of memory parsing bultin macro parameters.\n");
+			LexError("Out of memory parsing builtin macro parameters.\n");
 			return false;
 		} 
 		curMT->next = NULL;

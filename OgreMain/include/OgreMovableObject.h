@@ -49,7 +49,7 @@ namespace Ogre {
     *  @{
     */
     /** Abstract class defining a movable object in a scene.
-        @remarks
+
             Instances of this class are discrete, relatively small, movable objects
             which are attached to SceneNode objects to define their position.
     */
@@ -77,7 +77,7 @@ namespace Ogre {
             */
             virtual bool objectRendering(const MovableObject*, const Camera*) { return true; }
             /** Called when the movable object needs to query a light list.
-            @remarks
+
                 If you want to customize light finding for this object, you should override 
                 this method and hook into MovableObject via MovableObject::setListener.
                 Be aware that the default method caches results within a frame to 
@@ -183,7 +183,7 @@ namespace Ogre {
         SceneManager* _getManager(void) const { return mManager; }
 
         /** Notifies the movable object that hardware resources were lost
-            @remarks
+
                 Called automatically by RenderSystem if hardware resources
                 were lost and can not be restored using some internal mechanism.
                 Among affected resources are nested shadow renderables, ManualObjects, etc.
@@ -191,7 +191,7 @@ namespace Ogre {
         virtual void _releaseManualHardwareResources() {}
 
         /** Notifies the movable object that hardware resources should be restored
-            @remarks
+
                 Called automatically by RenderSystem if hardware resources
                 were lost and can not be restored using some internal mechanism.
                 Among affected resources are nested shadow renderables, ManualObjects, etc.
@@ -205,7 +205,7 @@ namespace Ogre {
         virtual const String& getMovableType(void) const = 0;
 
         /** Returns the node to which this object is attached.
-        @remarks
+
             A MovableObject may be attached to either a SceneNode or to a TagPoint, 
             the latter case if it's attached to a bone on an animated entity. 
             Both are Node subclasses so this method will return either.
@@ -213,7 +213,7 @@ namespace Ogre {
         Node* getParentNode(void) const { return mParentNode; }
 
         /** Returns the scene node to which this object is attached.
-        @remarks
+
             A MovableObject may be attached to either a SceneNode or to a TagPoint, 
             the latter case if it's attached to a bone on an animated entity. 
             This method will return the scene node of the parent entity 
@@ -244,14 +244,14 @@ namespace Ogre {
         virtual void _notifyMoved(void);
 
         /** Internal method to notify the object of the camera to be used for the next rendering operation.
-            @remarks
+
                 Certain objects may want to do specific processing based on the camera position. This method notifies
                 them in case they wish to do this.
         */
         virtual void _notifyCurrentCamera(Camera* cam);
 
         /** Retrieves the local axis-aligned bounding box for this object.
-            @remarks
+
                 This bounding box is in local coordinates.
         */
         virtual const AxisAlignedBox& getBoundingBox(void) const = 0;
@@ -261,12 +261,15 @@ namespace Ogre {
         */
         virtual Real getBoundingRadius(void) const = 0;
 
+        /// as getBoundingRadius, but with scaling applied
+        Real getBoundingRadiusScaled() const;
+
         /** Retrieves the axis-aligned bounding box for this object in world coordinates. */
         virtual const AxisAlignedBox& getWorldBoundingBox(bool derive = false) const;
         /** Retrieves the worldspace bounding sphere for this object. */
         virtual const Sphere& getWorldBoundingSphere(bool derive = false) const;
         /** Internal method by which the movable object must add Renderable subclass instances to the rendering queue.
-            @remarks
+
                 The engine will call this method when this object is to be rendered. The object must then create one or more
                 Renderable subclass instances which it places on the passed in Queue for rendering.
         */
@@ -289,13 +292,13 @@ namespace Ogre {
         void setVisible(bool visible) { mVisible = visible; }
 
         /** Gets this object whether to be visible or not, if it has a renderable component. 
-        @remarks
+
             Returns the value set by MovableObject::setVisible only.
         */
         bool getVisible(void) const { return mVisible; }
 
         /** Returns whether or not this object is supposed to be visible or not. 
-        @remarks
+
             Takes into account both upper rendering distance and visible flag.
         */
         virtual bool isVisible(void) const;
@@ -329,33 +332,21 @@ namespace Ogre {
         }
 
         /** @deprecated use UserObjectBindings::setUserAny via getUserObjectBindings() instead.
-            Sets any kind of user value on this object.
-        @remarks
-            This method allows you to associate any user value you like with 
-            this MovableObject. This can be a pointer back to one of your own
-            classes for instance.       
         */
         OGRE_DEPRECATED void setUserAny(const Any& anything) { getUserObjectBindings().setUserAny(anything); }
 
         /** @deprecated use UserObjectBindings::getUserAny via getUserObjectBindings() instead.
-            Retrieves the custom user value associated with this object.
         */
         OGRE_DEPRECATED const Any& getUserAny(void) const { return getUserObjectBindings().getUserAny(); }
 
-        /** Return an instance of user objects binding associated with this class.
-        You can use it to associate one or more custom objects with this class instance.
-        @see UserObjectBindings::setUserAny.        
-        */
+        /// @copydoc UserObjectBindings
         UserObjectBindings& getUserObjectBindings() { return mUserObjectBindings; }
 
-        /** Return an instance of user objects binding associated with this class.
-        You can use it to associate one or more custom objects with this class instance.
-        @see UserObjectBindings::setUserAny.        
-        */
+        /// @overload
         const UserObjectBindings& getUserObjectBindings() const { return mUserObjectBindings; }
 
         /** Sets the render queue group this entity will be rendered through.
-        @remarks
+
             Render queues are grouped to allow you to more tightly control the ordering
             of rendered objects. If you do not call this method, all Entity objects default
             to the default queue (RenderQueue::getDefaultQueueGroup), which is fine for most objects. You may want to alter this
@@ -369,7 +360,7 @@ namespace Ogre {
         virtual void setRenderQueueGroup(uint8 queueID);
 
         /** Sets the render queue group and group priority this entity will be rendered through.
-        @remarks
+
             Render queues are grouped to allow you to more tightly control the ordering
             of rendered objects. Within a single render group there another type of grouping
             called priority which allows further control.  If you do not call this method, 
@@ -394,7 +385,7 @@ namespace Ogre {
         virtual const Affine3& _getParentNodeFullTransform(void) const;
 
         /** Sets the query flags for this object.
-        @remarks
+
             When performing a scene query, this object will be included or excluded according
             to flags on the object and flags on the query. This is a bitwise value, so only when
             a bit on these flags is set, will it be included in a query asking for that flag. The
@@ -411,7 +402,7 @@ namespace Ogre {
         void removeQueryFlags(uint32 flags) { mQueryFlags &= ~flags; }
         
         /// Returns the query flags relevant for this object
-        uint32 getQueryFlags(void) const { return mQueryFlags; }
+        virtual uint32 getQueryFlags(void) const { return mQueryFlags; }
 
         /** Set the default query flags for all future MovableObject instances.
         */
@@ -423,7 +414,7 @@ namespace Ogre {
 
         
         /** Sets the visibility flags for this object.
-        @remarks
+
             As well as a simple true/false value for visibility (as seen in setVisible), 
             you can also set visibility flags which when 'and'ed with the SceneManager's
             visibility mask can also make an object invisible.
@@ -439,7 +430,7 @@ namespace Ogre {
         void removeVisibilityFlags(uint32 flags) { mVisibilityFlags &= ~flags; }
         
         /// Returns the visibility flags relevant for this object
-        uint32 getVisibilityFlags(void) const { return mVisibilityFlags; }
+        virtual uint32 getVisibilityFlags(void) const { return mVisibilityFlags; }
 
         /** Set the default visibility flags for all future MovableObject instances.
         */
@@ -450,7 +441,7 @@ namespace Ogre {
         static uint32 getDefaultVisibilityFlags() { return msDefaultVisibilityFlags; }
 
         /** Sets a listener for this object.
-        @remarks
+
             Note for size and performance reasons only one listener per object
             is allowed.
         */
@@ -461,7 +452,7 @@ namespace Ogre {
         Listener* getListener(void) const { return mListener; }
 
         /** Gets a list of lights, ordered relative to how close they are to this movable object.
-        @remarks
+
             By default, this method gives the listener a chance to populate light list first,
             if there is no listener or Listener::objectQueryLights returns NULL, it'll
             query the light list from parent entity if it is present, or returns
@@ -481,12 +472,12 @@ namespace Ogre {
         const LightList& queryLights(void) const;
 
         /** Get a bitwise mask which will filter the lights affecting this object
-        @remarks
+
         By default, this mask is fully set meaning all lights will affect this object
         */
         uint32 getLightMask()const { return mLightMask; }
         /** Set a bitwise mask which will filter the lights affecting this object
-        @remarks
+
         This mask will be compared against the mask held against Light to determine
         if a light should affect a given object. 
         By default, this mask is fully set meaning all lights will affect this object
@@ -494,7 +485,7 @@ namespace Ogre {
         void setLightMask(uint32 lightMask);
 
         /** Returns a pointer to the current list of lights for this object.
-        @remarks
+
             You should not modify this list outside of MovableObject::Listener::objectQueryLights
             (say if you want to use it to implement this method, and use the pointer
             as a return value) and for reading it's only accurate as at the last frame.
@@ -503,18 +494,15 @@ namespace Ogre {
 
         /// Returns details of the edges which might be used to determine a silhouette
         EdgeData* getEdgeList(void) { return NULL; }
-        /// Returns whether the object has a valid edge list.
-        bool hasEdgeList(void) { return false; }
         /// Define a default implementation of method from ShadowCaster which implements no shadows
-        ShadowRenderableListIterator getShadowVolumeRenderableIterator(
-            ShadowTechnique shadowTechnique, const Light* light, 
-            HardwareIndexBufferSharedPtr* indexBuffer, size_t* indexBufferUsedSize,
-            bool extrudeVertices, Real extrusionDist, unsigned long flags = 0);
-        
+        const ShadowRenderableList& getShadowVolumeRenderableList(
+            const Light* light, const HardwareIndexBufferPtr& indexBuffer,
+            size_t& indexBufferUsedSize, float extrusionDist, int flags = 0) override;
+
         const AxisAlignedBox& getLightCapBounds(void) const override;
         const AxisAlignedBox& getDarkCapBounds(const Light& light, Real dirLightExtrusionDist) const override;
         /** Sets whether or not this object will cast shadows.
-        @remarks
+
         This setting simply allows you to turn on/off shadows for a given object.
         An object will not cast shadows unless the scene supports it in any case
         (see SceneManager::setShadowTechnique), and also the material which is
@@ -536,7 +524,7 @@ namespace Ogre {
         /** Get the distance to extrude for a point/spot light */
         Real getPointExtrusionDistance(const Light* l) const;
         /** Get the 'type flags' for this MovableObject.
-        @remarks
+
             A type flag identifies the type of the MovableObject as a bitpattern. 
             This is used for categorical inclusion / exclusion in SceneQuery
             objects. By default, this method returns all ones for objects not 
@@ -562,7 +550,7 @@ namespace Ogre {
             bool debugRenderables = false) = 0;
 
         /** Sets whether or not the debug display of this object is enabled.
-        @remarks
+
             Some objects aren't visible themselves but it can be useful to display
             a debug representation of them. Or, objects may have an additional 
             debug display on top of their regular display. This option enables / 
@@ -586,7 +574,7 @@ namespace Ogre {
     */
     class _OgreExport MovableObjectFactory : public MovableAlloc
     {
-    protected:
+    private:
         /// Type flag, allocated if requested
         uint32 mTypeFlag;
 
@@ -610,11 +598,11 @@ namespace Ogre {
             const String& name, SceneManager* manager, 
             const NameValuePairList* params = 0);
         /** Destroy an instance of the object */
-        virtual void destroyInstance(MovableObject* obj) = 0;
+        virtual void destroyInstance(MovableObject* obj) { delete obj; }
 
         /** Does this factory require the allocation of a 'type flag', used to 
             selectively include / exclude this type from scene queries?
-        @remarks
+
             The default implementation here is to return 'false', ie not to 
             request a unique type mask from Root. For objects that
             never need to be excluded in SceneQuery results, that's fine, since
@@ -627,7 +615,7 @@ namespace Ogre {
         */
         virtual bool requestTypeFlags(void) const { return false; }
         /** Notify this factory of the type mask to apply. 
-        @remarks
+
             This should normally only be called by Root in response to
             a 'true' result from requestTypeMask. However, you can actually use
             it yourself if you're careful; for example to assign the same mask
@@ -637,7 +625,7 @@ namespace Ogre {
         void _notifyTypeFlags(uint32 flag) { mTypeFlag = flag; }
 
         /** Gets the type flag for this factory.
-        @remarks
+
             A type flag is like a query flag, except that it applies to all instances
             of a certain type of object.
         */

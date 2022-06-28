@@ -49,7 +49,7 @@ namespace Ogre {
     */
 
     /** Defines an object property which is animable, i.e. may be keyframed.
-    @remarks
+
         Animable properties are those which can be altered over time by a 
         predefined keyframe sequence. They may be set directly, or they may
         be modified from their existing state (common if multiple animations
@@ -109,8 +109,13 @@ namespace Ogre {
         virtual void setAsBaseValue(const Vector4& val) 
         { memcpy(mBaseValueReal, val.ptr(), sizeof(Real)*4); }
         /// Internal method to set a value as base
-        virtual void setAsBaseValue(const Quaternion& val) 
-        { memcpy(mBaseValueReal, val.ptr(), sizeof(Real)*4); }
+        virtual void setAsBaseValue(const Quaternion& val)
+        {
+            mBaseValueReal[0] = val.w;
+            mBaseValueReal[1] = val.x;
+            mBaseValueReal[2] = val.y;
+            mBaseValueReal[3] = val.z;
+        }
         /// Internal method to set a value as base
         virtual void setAsBaseValue(const Any& val);
         /// Internal method to set a value as base
@@ -237,7 +242,7 @@ namespace Ogre {
         /// Static map of class name to list of animable value names
         static AnimableDictionaryMap msAnimableDictionary;
         /** Get the name of the animable dictionary for this class.
-        @remarks
+
             Subclasses must override this if they want to support animation of
             their values.
         */
@@ -246,35 +251,10 @@ namespace Ogre {
         /** Internal method for creating a dictionary of animable value names 
             for the class, if it does not already exist.
         */
-        void createAnimableDictionary(void) const
-        {
-            if (msAnimableDictionary.find(getAnimableDictionaryName()) 
-                == msAnimableDictionary.end())
-            {
-                StringVector vec;
-                initialiseAnimableDictionary(vec);
-                msAnimableDictionary[getAnimableDictionaryName()] = vec;
-            }
-
-        }
+        void createAnimableDictionary(void) const;
     
         /// Get an updateable reference to animable value list
-        StringVector& _getAnimableValueNames(void)
-        {
-            AnimableDictionaryMap::iterator i = 
-                msAnimableDictionary.find(getAnimableDictionaryName());
-            if (i != msAnimableDictionary.end())
-            {
-                return i->second;
-            }
-            else
-            {
-                OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
-                    "Animable value list not found for " + getAnimableDictionaryName(), 
-                    "AnimableObject::getAnimableValueNames");
-            }
-
-        }
+        StringVector& _getAnimableValueNames(void);
 
         /** Internal method for initialising dictionary; should be implemented by 
             subclasses wanting to expose animable parameters.
@@ -287,27 +267,10 @@ namespace Ogre {
         virtual ~AnimableObject() {}
 
         /** Gets a list of animable value names for this object. */
-        const StringVector& getAnimableValueNames(void) const
-        {
-            createAnimableDictionary();
-
-            AnimableDictionaryMap::iterator i = 
-                msAnimableDictionary.find(getAnimableDictionaryName());
-            if (i != msAnimableDictionary.end())
-            {
-                return i->second;
-            }
-            else
-            {
-                OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
-                    "Animable value list not found for " + getAnimableDictionaryName(), 
-                    "AnimableObject::getAnimableValueNames");
-            }
-
-        }
+        const StringVector& getAnimableValueNames(void) const;
 
         /** Create a reference-counted AnimableValuePtr for the named value.
-        @remarks
+
             You can use the returned object to animate a value on this object,
             using AnimationTrack. Subclasses must override this if they wish 
             to support animation of their values.

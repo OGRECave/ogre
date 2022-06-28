@@ -40,6 +40,7 @@ THE SOFTWARE.
 #include "OgreLodStrategyManager.h"
 #include "OgreLodStrategy.h"
 #include "OgreMaterialManager.h"
+#include "OgreSkeletonManager.h"
 #include <cstddef>
 
 namespace Ogre {
@@ -53,12 +54,11 @@ namespace Ogre {
     {
     }
     //---------------------------------------------------------------------
-    void XMLMeshSerializer::importMesh(const String& filename, 
-        VertexElementType colourElementType, Mesh* pMesh)
+    void XMLMeshSerializer::importMesh(const String& filename, Mesh* pMesh)
     {
         LogManager::getSingleton().logMessage("XMLMeshSerializer reading mesh data from " + filename + "...");
         mMesh = pMesh;
-        mColourElementType = colourElementType;
+        mColourElementType = VET_UBYTE4_NORM;
         pugi::xml_document mXMLDoc;
         mXMLDoc.load_file(filename.c_str());
 
@@ -176,16 +176,15 @@ namespace Ogre {
             LogManager::getSingleton().logMessage("Skeleton link exported.");
 
             // Write bone assignments
-            Mesh::BoneAssignmentIterator bi = const_cast<Mesh*>(pMesh)->getBoneAssignmentIterator();
-            if (bi.hasMoreElements())
+            const auto& boneAssigns = pMesh->getBoneAssignments();
+            if (!boneAssigns.empty())
             {
                 LogManager::getSingleton().logMessage("Exporting shared geometry bone assignments...");
                 pugi::xml_node boneAssignNode = rootNode.append_child("boneassignments");
 
-                while (bi.hasMoreElements())
+                for (const auto& e : boneAssigns)
                 {
-                    const VertexBoneAssignment& assign = bi.getNext();
-                    writeBoneAssignment(boneAssignNode, &assign);
+                    writeBoneAssignment(boneAssignNode, &e.second);
                 }
 
                 LogManager::getSingleton().logMessage("Shared geometry bone assignments exported.");
@@ -351,14 +350,12 @@ namespace Ogre {
         // Bone assignments
         if (mMesh->hasSkeleton())
         {
-            SubMesh::BoneAssignmentIterator bi = const_cast<SubMesh*>(s)->getBoneAssignmentIterator();
             LogManager::getSingleton().logMessage("Exporting dedicated geometry bone assignments...");
 
             pugi::xml_node boneAssignNode = subMeshNode.append_child("boneassignments");
-            while (bi.hasMoreElements())
+            for (const auto& e : s->getBoneAssignments())
             {
-                const VertexBoneAssignment& assign = bi.getNext();
-                writeBoneAssignment(boneAssignNode, &assign);
+                writeBoneAssignment(boneAssignNode, &e.second);
             }
         }
         LogManager::getSingleton().logMessage("Dedicated geometry bone assignments exported.");
@@ -395,7 +392,7 @@ namespace Ogre {
             float* pFloat;
             uint16* pShort;
             uint8* pChar;
-            ARGB* pColour;
+            ABGR* pColour;
 
             pVert = static_cast<unsigned char*>(
                 vbuf->lock(HardwareBuffer::HBL_READ_ONLY));
@@ -446,9 +443,7 @@ namespace Ogre {
                         case VET_FLOAT4: 
                             type = "float4"; 
                             break;
-                        case VET_COLOUR: 
-                        case VET_COLOUR_ARGB: 
-                        case VET_COLOUR_ABGR: 
+                        case VET_UBYTE4_NORM:
                             type = "colour"; 
                             break;
                         case VET_SHORT1: 
@@ -532,12 +527,8 @@ namespace Ogre {
                         elem.baseVertexPointerToElement(pVert, &pColour);
                         dataNode = vertexNode.append_child("colour_diffuse");
                         {
-                            ARGB rc = *pColour++;
                             ColourValue cv;
-                            cv.b = (rc & 0xFF) / 255.0f;        rc >>= 8;
-                            cv.g = (rc & 0xFF) / 255.0f;        rc >>= 8;
-                            cv.r = (rc & 0xFF) / 255.0f;        rc >>= 8;
-                            cv.a = (rc & 0xFF) / 255.0f;
+                            elem.getType() == VET_COLOUR_ABGR ? cv.setAsABGR(*pColour) : cv.setAsARGB(*pColour);
                             dataNode.append_attribute("value") = StringConverter::toString(cv).c_str();
                         }
                         break;
@@ -545,12 +536,8 @@ namespace Ogre {
                         elem.baseVertexPointerToElement(pVert, &pColour);
                         dataNode = vertexNode.append_child("colour_specular");
                         {
-                            ARGB rc = *pColour++;
                             ColourValue cv;
-                            cv.b = (rc & 0xFF) / 255.0f;        rc >>= 8;
-                            cv.g = (rc & 0xFF) / 255.0f;        rc >>= 8;
-                            cv.r = (rc & 0xFF) / 255.0f;        rc >>= 8;
-                            cv.a = (rc & 0xFF) / 255.0f;
+                            elem.getType() == VET_COLOUR_ABGR ? cv.setAsABGR(*pColour) : cv.setAsARGB(*pColour);
                             dataNode.append_attribute("value") = StringConverter::toString(cv).c_str();
                         }
                         break;
@@ -603,15 +590,11 @@ namespace Ogre {
                             dataNode.append_attribute("w") =  StringConverter::toString(*pShort++ / 65535.0f).c_str();
                             dataNode.append_attribute("x") =  StringConverter::toString(*pShort++ / 65535.0f).c_str();
                             break;
-                        case VET_COLOUR: case VET_COLOUR_ARGB: case VET_COLOUR_ABGR:
+                        case VET_UBYTE4_NORM:
                             elem.baseVertexPointerToElement(pVert, &pColour);
                             {
-                                ARGB rc = *pColour++;
                                 ColourValue cv;
-                                cv.b = (rc & 0xFF) / 255.0f;        rc >>= 8;
-                                cv.g = (rc & 0xFF) / 255.0f;        rc >>= 8;
-                                cv.r = (rc & 0xFF) / 255.0f;        rc >>= 8;
-                                cv.a = (rc & 0xFF) / 255.0f;
+                                elem.getType() == VET_COLOUR_ARGB ? cv.setAsARGB(*pColour) : cv.setAsABGR(*pColour);
                                 dataNode.append_attribute("u") = StringConverter::toString(cv).c_str();
                             }
                             break;
@@ -695,6 +678,11 @@ namespace Ogre {
             {
                 // we do not load any materials - so create a dummy here to just store the name
                 sm->setMaterial(MaterialManager::getSingleton().create(mat, RGN_DEFAULT));
+            }
+            else
+            {
+                LogManager::getSingleton().logError(
+                    "empty material name encountered. This violates the specs and can lead to crashes.");
             }
 
             // Read operation type
@@ -974,11 +962,11 @@ namespace Ogre {
                         else if (!::strcmp(attrib,"ubyte4"))
                             vtype = VET_UBYTE4;
                         else if (!::strcmp(attrib,"colour"))
-                            vtype = VET_COLOUR;
+                            vtype = VET_UBYTE4_NORM;
                         else if (!::strcmp(attrib,"colour_argb"))
-                            vtype = VET_COLOUR_ARGB;
+                            vtype = _DETAIL_SWAP_RB;
                         else if (!::strcmp(attrib,"colour_abgr"))
-                            vtype = VET_COLOUR_ABGR;
+                            vtype = VET_UBYTE4_NORM;
                         else 
                         {
                             auto err = LogManager::getSingleton().stream(LML_CRITICAL);
@@ -1109,9 +1097,8 @@ namespace Ogre {
                         }
                         elem.baseVertexPointerToElement(pVert, &pCol);
                         {
-                            ColourValue cv;
-                            cv = StringConverter::parseColourValue(xmlElem.attribute("value").value());
-                            *pCol++ = VertexElement::convertColourValue(cv, mColourElementType);
+                            auto cv = StringConverter::parseColourValue(xmlElem.attribute("value").value());
+                            *pCol++ = cv.getAsABGR();
                         }
                         break;
                     case VES_SPECULAR:
@@ -1123,9 +1110,8 @@ namespace Ogre {
                         }
                         elem.baseVertexPointerToElement(pVert, &pCol);
                         {
-                            ColourValue cv;
-                            cv = StringConverter::parseColourValue(xmlElem.attribute("value").value());
-                            *pCol++ = VertexElement::convertColourValue(cv, mColourElementType);
+                            auto cv = StringConverter::parseColourValue(xmlElem.attribute("value").value());
+                            *pCol++ = cv.getAsABGR();
                         }
                         break;
                     case VES_TEXTURE_COORDINATES:
@@ -1244,20 +1230,11 @@ namespace Ogre {
                             *pChar++ = static_cast<uint8>(0.5f + 255.0f * StringConverter::parseReal(xmlElem.attribute("x").value()));
                             break;
 
-                        case VET_COLOUR: 
+                        case VET_UBYTE4_NORM:
                             {
                                 elem.baseVertexPointerToElement(pVert, &pCol);
                                 ColourValue cv = StringConverter::parseColourValue(xmlElem.attribute("u").value());
-                                *pCol++ = VertexElement::convertColourValue(cv, mColourElementType);
-                            }
-                            break;
-
-                        case VET_COLOUR_ARGB:
-                        case VET_COLOUR_ABGR: 
-                            {
-                                elem.baseVertexPointerToElement(pVert, &pCol);
-                                ColourValue cv = StringConverter::parseColourValue(xmlElem.attribute("u").value());
-                                *pCol++ = VertexElement::convertColourValue(cv, elem.getType());
+                                *pCol++ = cv.getAsABGR();
                             }
                             break;
                         default:
@@ -1300,7 +1277,10 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void XMLMeshSerializer::readSkeletonLink(pugi::xml_node& mSkelNode)
     {
-        mMesh->setSkeletonName(mSkelNode.attribute("name").value());
+        String name = mSkelNode.attribute("name").value();
+        // create dummy, because we do not load external resources
+        auto skel = SkeletonManager::getSingleton().create(name, mMesh->getGroup());
+        mMesh->_notifySkeleton(skel);
     }
     //---------------------------------------------------------------------
     void XMLMeshSerializer::readBoneAssignments(pugi::xml_node& mBoneAssignmentsNode)
@@ -2030,27 +2010,26 @@ namespace Ogre {
             poseNode.append_attribute("name") = pose->getName().c_str();
             
             bool includesNormals = !pose->getNormals().empty();
-
-            Pose::ConstVertexOffsetIterator vit = pose->getVertexOffsetIterator();
-            Pose::ConstNormalsIterator nit = pose->getNormalsIterator();
-            while (vit.hasMoreElements())
+            auto nit = pose->getNormals().begin();
+            for (const auto& vit : pose->getVertexOffsets())
             {
                 pugi::xml_node poseOffsetElement = poseNode.append_child("poseoffset");
 
                 poseOffsetElement.append_attribute("index") =
-                    StringConverter::toString(vit.peekNextKey()).c_str();
+                    StringConverter::toString(vit.first).c_str();
 
-                Vector3 offset = vit.getNext();
+                const Vector3& offset = vit.second;
                 poseOffsetElement.append_attribute("x") = StringConverter::toString(offset.x).c_str();
                 poseOffsetElement.append_attribute("y") = StringConverter::toString(offset.y).c_str();
                 poseOffsetElement.append_attribute("z") = StringConverter::toString(offset.z).c_str();
                 
                 if (includesNormals)
                 {
-                    Vector3 normal = nit.getNext();
+                    const Vector3& normal = nit->second;
                     poseOffsetElement.append_attribute("nx") = StringConverter::toString(normal.x).c_str();
                     poseOffsetElement.append_attribute("ny") = StringConverter::toString(normal.y).c_str();
                     poseOffsetElement.append_attribute("nz") = StringConverter::toString(normal.z).c_str();
+                    nit++;
                 }
                 
                 
@@ -2090,13 +2069,12 @@ namespace Ogre {
             }
             
             pugi::xml_node tracksNode = animNode.append_child("tracks");
-            Animation::VertexTrackIterator iter = anim->getVertexTrackIterator();
-            while(iter.hasMoreElements())
+            for (const auto& trackIt : anim->_getVertexTrackList())
             {
-                const VertexAnimationTrack* track = iter.getNext();
+                const VertexAnimationTrack* track = trackIt.second;
                 pugi::xml_node trackNode = tracksNode.append_child("track");
 
-                unsigned short targetID = track->getHandle();
+                unsigned short targetID = trackIt.first;
                 if (targetID == 0)
                 {
                     trackNode.append_attribute("target") = "mesh";

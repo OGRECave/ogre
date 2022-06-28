@@ -34,6 +34,7 @@ THE SOFTWARE.
 #include "OgreGLES2RenderSystem.h"
 #include "OgreGLES2PixelFormat.h"
 #include "OgreViewport.h"
+#include "OgreLogManager.h"
 #include <iomanip>
 
 #import <UIKit/UIWindow.h>
@@ -53,8 +54,7 @@ namespace Ogre {
 
 
     EAGL2Window::EAGL2Window(EAGL2Support *glsupport)
-        :   mClosed(false),
-            mVisible(false),
+        :   mVisible(false),
             mHidden(false),
             mIsExternal(false),
             mUsingExternalView(false),
@@ -113,14 +113,6 @@ namespace Ogre {
             [mWindow setHidden:hidden];
         }
     }
-
-    void EAGL2Window::setFullscreen(bool fullscreen, uint widthPt, uint heightPt)
-    {
-    }
-
-    void EAGL2Window::reposition(int leftPt, int topPt)
-	{
-	}
     
 	void EAGL2Window::resize(unsigned int widthPt, unsigned int heightPt)
 	{

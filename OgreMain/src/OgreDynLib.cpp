@@ -29,6 +29,24 @@ THE SOFTWARE.
 
 #include "OgreDynLib.h"
 
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+#    define DYNLIB_LOAD( a ) LoadLibraryEx( a, NULL, 0 ) // we can not use LOAD_WITH_ALTERED_SEARCH_PATH with relative paths
+#    define DYNLIB_GETSYM( a, b ) GetProcAddress( a, b )
+#    define DYNLIB_UNLOAD( a ) !FreeLibrary( a )
+#elif OGRE_PLATFORM == OGRE_PLATFORM_WINRT
+#    define DYNLIB_LOAD( a ) LoadPackagedLibrary( stringToWstring(a).c_str(), 0 )
+#    define DYNLIB_GETSYM( a, b ) GetProcAddress( a, b )
+#    define DYNLIB_UNLOAD( a ) !FreeLibrary( a )
+#elif OGRE_PLATFORM == OGRE_PLATFORM_LINUX || OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
+#    define DYNLIB_LOAD( a ) dlopen( a, RTLD_LAZY | RTLD_GLOBAL)
+#    define DYNLIB_GETSYM( a, b ) dlsym( a, b )
+#    define DYNLIB_UNLOAD( a ) dlclose( a )
+#elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
+#    define DYNLIB_LOAD( a ) mac_loadDylib( a )
+#    define FRAMEWORK_LOAD( a ) mac_loadFramework( a )
+#    define DYNLIB_GETSYM( a, b ) dlsym( a, b )
+#    define DYNLIB_UNLOAD( a ) dlclose( a )
+#endif
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_WINRT
 #  define WIN32_LEAN_AND_MEAN
@@ -36,6 +54,10 @@ THE SOFTWARE.
 #   define NOMINMAX // required to stop windows.h messing up std::min
 #  endif
 #  include <windows.h>
+#else
+extern "C" {
+#   include <dlfcn.h>
+}
 #endif
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_WINRT
@@ -51,11 +73,12 @@ static std::wstring stringToWstring(const std::string& s)
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
 #   include "macUtils.h"
+extern "C" {
+#   include <unistd.h>
+#   include <sys/param.h>
+#   include <CoreFoundation/CoreFoundation.h>
+}
 #endif
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
-#   include <dlfcn.h>
-#endif
-
 
 namespace Ogre {
 
@@ -82,7 +105,7 @@ namespace Ogre {
         // dlopen() does not add .so to the filename, like windows does for .dll
         if (name.find(".so") == String::npos)
         {
-            name += StringUtil::format(".so.%d.%d.%d", OGRE_VERSION_MAJOR, OGRE_VERSION_MINOR, OGRE_VERSION_PATCH);
+            name += StringUtil::format(".so.%d.%d", OGRE_VERSION_MAJOR, OGRE_VERSION_MINOR);
         }
 #elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE
         // dlopen() does not add .dylib to the filename, like windows does for .dll

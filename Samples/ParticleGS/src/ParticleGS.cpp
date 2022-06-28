@@ -27,7 +27,6 @@ using namespace Ogre;
 using namespace OgreBites;
 
 namespace OgreBites {
-const Vector3 GRAVITY_VECTOR = Vector3(0, -9.8, 0);
 
 #ifdef LOG_GENERATED_BUFFER
 struct FireworkParticle
@@ -49,8 +48,8 @@ struct FireworkParticle
 
     void Sample_ParticleGS::createProceduralParticleSystem()
     {
-        mParticleSystem = static_cast<ProceduralManualObject*>
-            (mSceneMgr->createMovableObject("ParticleGSEntity", ProceduralManualObjectFactory::FACTORY_TYPE_NAME));
+        mParticleSystem = new ProceduralManualObject();
+        mParticleSystem->_notifyManager(mSceneMgr);
         MaterialPtr mat = MaterialManager::getSingleton().getByName("Ogre/ParticleGS/Display", "General");
         mParticleSystem->setMaterial(mat);
 
@@ -65,9 +64,16 @@ struct FireworkParticle
         particleSystemSeed->end();
 
         // Generate the RenderToBufferObject.
-        RenderToVertexBufferSharedPtr r2vb =
-            HardwareBufferManager::getSingleton().createRenderToVertexBuffer();
+        auto r2vb = HardwareBufferManager::getSingleton().createRenderToVertexBuffer();
         r2vb->setRenderToBufferMaterialName("Ogre/ParticleGS/Generate");
+
+        // Apply the random texture.
+        TexturePtr randomTexture = RandomTools::generateRandomVelocityTexture();
+        r2vb->getRenderToBufferMaterial()
+            ->getTechnique(0)
+            ->getPass(0)
+            ->getTextureUnitState("RandomTexture")
+            ->setTexture(randomTexture);
 
         r2vb->setOperationType(RenderOperation::OT_POINT_LIST);
         r2vb->setMaxVertexCount(16000);
@@ -84,23 +90,9 @@ struct FireworkParticle
         // Velocity
         vertexDecl->addElement(0, offset, VET_FLOAT3, VES_TEXTURE_COORDINATES, 2).getSize();
 
-        // Apply the random texture.
-        TexturePtr randomTexture = RandomTools::generateRandomVelocityTexture();
-        r2vb->getRenderToBufferMaterial()->getBestTechnique()->getPass(0)->
-            getTextureUnitState("RandomTexture")->setTextureName(
-                randomTexture->getName(), randomTexture->getTextureType());
-
         // Bind the two together.
+        r2vb->setSourceRenderable(particleSystemSeed->getSections()[0]);
         mParticleSystem->setRenderToVertexBuffer(r2vb);
-        mParticleSystem->setManualObject(particleSystemSeed);
-
-        // GpuProgramParametersSharedPtr geomParams = mParticleSystem->
-        //     getRenderToVertexBuffer()->getRenderToBufferMaterial()->
-        //     getBestTechnique()->getPass(0)->getGeometryProgramParameters();
-        // if (geomParams->_findNamedConstantDefinition("randomTexture"))
-        // {
-        //     geomParams->setNamedConstant("randomTexture", 0);
-        // }
 
         // Set bounds.
         AxisAlignedBox aabb;
@@ -111,31 +103,15 @@ struct FireworkParticle
 
     void Sample_ParticleGS::testCapabilities(const RenderSystemCapabilities* caps)
     {
-        if (!caps->hasCapability(RSC_GEOMETRY_PROGRAM))
-        {
-            OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Your render system / hardware does not support geometry programs, "
-                        "so you cannot run this sample. Sorry!",
-                        "Sample_ParticleGS::createScene");
-        }
-        if (!caps->hasCapability(RSC_HWRENDER_TO_VERTEX_BUFFER))
-        {
-            OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Your render system / hardware does not support render to vertex buffers, "
-                        "so you cannot run this sample. Sorry!",
-                        "Sample_ParticleGS::createScene");
-        }
+        requireMaterial("Ogre/ParticleGS/Generate");
     }
 
     void Sample_ParticleGS::setupContent(void)
     {
-        demoTime = 0;
-
         mCameraNode->setPosition(0,35,-100);
         mCameraNode->lookAt(Vector3(0,35,0), Node::TS_PARENT);
 
         mSceneMgr->setAmbientLight(ColourValue(0.7, 0.7, 0.7));
-
-        mProceduralManualObjectFactory = OGRE_NEW ProceduralManualObjectFactory();
-        Root::getSingleton().addMovableObjectFactory(mProceduralManualObjectFactory);
 
         createProceduralParticleSystem();
         mSceneMgr->getRootSceneNode()->createChildSceneNode()->attachObject(mParticleSystem);
@@ -163,33 +139,10 @@ struct FireworkParticle
 
     void Sample_ParticleGS::cleanupContent()
     {
-        Root::getSingleton().removeMovableObjectFactory(mProceduralManualObjectFactory);
-        OGRE_DELETE mProceduralManualObjectFactory;
-        mProceduralManualObjectFactory = 0;
+        delete mParticleSystem;
+        mParticleSystem = 0;
 
         MeshManager::getSingleton().remove("Myplane", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
-    }
-
-    bool Sample_ParticleGS::frameStarted(const FrameEvent& evt)
-    {
-        // Set shader parameters.
-        GpuProgramParametersSharedPtr geomParams = mParticleSystem->
-            getRenderToVertexBuffer()->getRenderToBufferMaterial()->
-            getBestTechnique()->getPass(0)->getGeometryProgramParameters();
-        if (geomParams->_findNamedConstantDefinition("elapsedTime"))
-        {
-            geomParams->setNamedConstant("elapsedTime", evt.timeSinceLastFrame);
-        }
-        demoTime += evt.timeSinceLastFrame;
-        if (geomParams->_findNamedConstantDefinition("globalTime"))
-        {
-            geomParams->setNamedConstant("globalTime", demoTime);
-        }
-        if (geomParams->_findNamedConstantDefinition("frameGravity"))
-        {
-            geomParams->setNamedConstant("frameGravity", GRAVITY_VECTOR * evt.timeSinceLastFrame);
-        }
-        return SdkSample::frameStarted(evt);
     }
 
 #ifdef LOG_GENERATED_BUFFER
