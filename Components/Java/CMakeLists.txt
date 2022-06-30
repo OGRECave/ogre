@@ -45,20 +45,24 @@ endif()
 
 set_source_files_properties(../../OgreMain/include/Ogre.i PROPERTIES CPLUSPLUS ON)
 set(SWIG_INPUT_MODULES ../../OgreMain/include/Ogre.i)
+set(SWIG_COMPONENT_LIBRARIES OgreMain)
 
 if(OGRE_BUILD_COMPONENT_RTSHADERSYSTEM)
 	set_source_files_properties(../RTShaderSystem/include/OgreRTShader.i PROPERTIES CPLUSPLUS ON)
 	list(APPEND SWIG_INPUT_MODULES ../RTShaderSystem/include/OgreRTShader.i)
+    list(APPEND SWIG_COMPONENT_LIBRARIES "OgreRTShaderSystem")
 endif()
 
 if(OGRE_BUILD_COMPONENT_TERRAIN)
 	set_source_files_properties(../Terrain/include/OgreTerrain.i PROPERTIES CPLUSPLUS ON)
 	list(APPEND SWIG_INPUT_MODULES ../Terrain/include/OgreTerrain.i)
+    list(APPEND SWIG_COMPONENT_LIBRARIES "OgreTerrain")
 endif()
 
 if(OGRE_BUILD_COMPONENT_OVERLAY)
 	set_source_files_properties(../Overlay/include/OgreOverlay.i PROPERTIES CPLUSPLUS ON)
 	list(APPEND SWIG_INPUT_MODULES ../Overlay/include/OgreOverlay.i)
+    list(APPEND SWIG_COMPONENT_LIBRARIES "OgreOverlay")
 endif()
 
 if(OGRE_BUILD_COMPONENT_OVERLAY_IMGUI)
@@ -76,17 +80,19 @@ if(OGRE_BUILD_COMPONENT_BITES)
 	endif()
 
 	list(APPEND SWIG_INPUT_MODULES ../Bites/include/OgreBites.i)
+    list(APPEND SWIG_COMPONENT_LIBRARIES "OgreBites")
 endif()
 
 if(OGRE_BUILD_COMPONENT_BULLET)
     include_directories("${BULLET_INCLUDE_DIRS}")
     set_source_files_properties(../Bullet/include/OgreBullet.i PROPERTIES CPLUSPLUS ON)
     list(APPEND SWIG_INPUT_MODULES ../Bullet/include/OgreBullet.i)
+    list(APPEND SWIG_COMPONENT_LIBRARIES "OgreBullet")
 endif()
 
 set(CMAKE_WARN_DEPRECATED OFF)
 swig_add_library(OgreJNI LANGUAGE java SOURCES ${SWIG_INPUT_MODULES})
-swig_link_libraries(OgreJNI OgreBites OgreBullet OgreOverlay OgreRTShaderSystem OgreTerrain OgreMain ${JNI_LIBRARIES})
+swig_link_libraries(OgreJNI ${SWIG_COMPONENT_LIBRARIES} ${JNI_LIBRARIES})
 
 if(${Java_FOUND})
 	set(CLASS_OUTPUT_PATH "${PROJECT_BINARY_DIR}/java/classes")
