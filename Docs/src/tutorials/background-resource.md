@@ -12,26 +12,11 @@ To prepare a Texture in the background you can do:
 ```cpp
 Ogre::TexturePtr tex = ...;
 Ogre::ResourceBackgroundQueue& rbq = Ogre::ResourceBackgroundQueue::getSingleton();
-Ogre::WorkQueue::RequestID ticket = rbq.prepare(tex->getCreator()->getType(), tex->getName(), tex->getGroup());
+std::future<void> fut = rbq.prepare(tex);
 ```
 
-the returned ticket can be used to identify the request via Ogre::WorkQueue::abortRequest, or to poll whether it is finished via Ogre::ResourceBackgroundQueue::isProcessComplete.
-However, the preferred way to get notified about the operation being completed is to pass a Ogre::ResourceBackgroundQueue::Listener as the final argument.
-
-The following code shows an sample implementation that loads a previously prepared resource on the main thread.
-```cpp
-class LoadWhenPreparedListener : public Ogre::ResourceBackgroundQueue::Listener
-{
-    std::map<Ogre::WorkQueue::RequestID, Ogre::ResourcePtr> mResources;
-
-    ...
-
-    void operationCompleted (Ogre::WorkQueue::RequestID id, const Ogre::BackgroundProcessResult& result)
-    {
-        if (!result.error) mResources[id]->load();
-    }
-}
-```
+the returned std::future can be used to poll whether it is finished via std::future::wait_for.
+However, the preferred way to get notified about the operation being completed is to register a Ogre::Resource::Listener.
 
 In the default build config, background workers cannot access the Ogre::RenderSystem to avoid the overhead incurred by the underlying APIs.
 Therefore, only Ogre::Resource::prepare can be called by a worker, while Ogre::Resource::load must be done on the main thread.
