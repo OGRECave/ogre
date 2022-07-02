@@ -588,7 +588,6 @@ SHARED_PTR(Compositor);
 %ignore Ogre::CompositionTargetPass::getNumPasses;
 %ignore Ogre::CompositionTargetPass::getPassIterator;
 %include "OgreCompositionTargetPass.h"
-%include "OgreResourceBackgroundQueue.h"
 SHARED_PTR(HardwareBuffer);
 SHARED_PTR(HardwareVertexBuffer);
 #ifdef SWIGPYTHON
