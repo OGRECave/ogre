@@ -44,7 +44,7 @@ For manually building the dependencies, please refer to the list below and get a
 On linux you additionally need the following system headers to build the GL, GL3+, GLES2 & Vulkan RenderSystems:
 * Ubuntu
 
-    sudo apt-get install libgles2-mesa-dev libvulkan-dev glslang-dev
+    sudo apt-get install libgles2-mesa-dev libvulkan-dev glslang-dev libxrandr-dev
 
 * Fedora
 
@@ -90,7 +90,7 @@ contains this file). In the field *Where to build the binaries* enter
 the path to the build directory you created.
 Hit *Configure*. A dialogue will appear asking you to select a generator.
 
-Check the [CMake documentation](https://cmake.org/cmake/help/latest/manual/cmake-generators.7.html) for details on which one is appropriate for your platform and compiler.  
+Check the [CMake documentation](https://cmake.org/cmake/help/latest/manual/cmake-generators.7.html) for details on which one is appropriate for your platform and compiler.
 @note on OSX, you must to use the Xcode generator to get a proper SampleBrowser .app bundle.
 
 Click *Finish*. CMake will now gather some information about your
@@ -118,7 +118,7 @@ Go to your chosen build directory. CMake has generated a build system for
 you which you will now use to build Ogre. If you are using Visual Studio,
 you should find the file OGRE.sln. Open it and compile the target
 *BUILD_ALL*. Similarly you will find an Xcode project to build Ogre
-on MacOS. 
+on MacOS.
 
 If you rather want to trigger the build form a console, then cd to your build directory and call the appropriate make program as
 
