@@ -106,8 +106,9 @@ namespace Ogre
 
         /** Get the type of portal */
         PORTAL_TYPE getType() const {return mType;}
-        /** Retrieve the radius of the portal (calculates if necessary for quad portals) */
-        Real getRadius() const;
+        /** Retrieve the radius of the portal in world coordinates */
+        Real getDerivedRadius() const
+        { return mDerivedRadius; }
 
         /** Get the Zone the Portal is currently "in" */
         PCZone* getCurrentHomeZone()
@@ -190,8 +191,7 @@ namespace Ogre
         const AxisAlignedBox& getBoundingBox() const;
 
         /** @copydoc MovableObject::getBoundingRadius */
-        Real getBoundingRadius() const
-        { return getRadius(); }
+        Real getBoundingRadius() const;
 
         /** @copydoc MovableObject::_updateRenderQueue */
         void _updateRenderQueue(RenderQueue* queue)
@@ -255,6 +255,8 @@ namespace Ogre
         /// Derived (world coordinates) direction of the portal
         // NOTE: Only applicable for a Quad portal
         mutable Vector3 mDerivedDirection;
+        /// Derived (world coordinates) radius of the sphere enclosing the portal
+        mutable Real mDerivedRadius;
         /// Derived (world coordinates) of portal (center point)
         mutable Vector3 mDerivedCP;
         /// Sphere of the portal centered on the derived CP
