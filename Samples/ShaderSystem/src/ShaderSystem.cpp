@@ -74,6 +74,7 @@ Sample_ShaderSystem::~Sample_ShaderSystem()
 
 void Sample_ShaderSystem::_shutdown()
 {
+    mShaderGenerator->getRenderState(MSN_SHADERGEN)->reset();
     destroyInstancedViewports();
     SdkSample::_shutdown();
 }
