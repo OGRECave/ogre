@@ -162,16 +162,6 @@ private:
     @param processor The instance to remove.
     */
     void removeProgramProcessor(const String& lang);
-
-    /** Destroy a GPU program by name.
-    @param gpuProgram The program to destroy.
-    */
-    void destroyGpuProgram(GpuProgramPtr& gpuProgram);
-
-    /** Flush the local GPU programs cache.
-    @param gpuProgramsMap The GPU programs cache.
-    */
-    void flushGpuProgramsCache(GpuProgramsMap& gpuProgramsMap);
     
     /** Return the number of created shaders. */
     size_t getShaderCount(GpuProgramType type) const;
@@ -183,10 +173,8 @@ private:
     ProgramProcessorMap mProgramProcessorsMap;
     // Holds standard shader writer factories
     ProgramWriterFactoryList mProgramWriterFactories;
-    // The generated vertex shaders.
-    GpuProgramsMap mVertexShaderMap;
-    // The generated fragment shaders.
-    GpuProgramsMap mFragmentShaderMap;
+    // The generated shaders.
+    std::vector<GpuProgramPtr> mShaderList;
     // The default program processors.
     ProgramProcessorList mDefaultProgramProcessors;
 
