@@ -54,7 +54,7 @@ set(BUILD_COMMAND_COMMON ${CMAKE_COMMAND}
   -G ${CMAKE_GENERATOR}
   -DCMAKE_GENERATOR_PLATFORM=${CMAKE_GENERATOR_PLATFORM}
   -DCMAKE_MAKE_PROGRAM=${CMAKE_MAKE_PROGRAM}
-  -DCMAKE_POSITION_INDEPENDENT_CODE=TRUE # allow linking into a shared lib
+  -DCMAKE_POSITION_INDEPENDENT_CODE=TRUE # allow linking into a  shared lib
   ${CROSS})
 
 # Set hardcoded path guesses for various platforms
