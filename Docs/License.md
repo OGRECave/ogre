@@ -194,7 +194,7 @@ Licensed Under:</td>
 
 <tr>
 <td>Needed By:</td>
-<td>OgreXMLConverter, Bites Component</td>
+<td>OgreXMLConverter, Plugin_DotScene</td>
 </tr>
 
 </tbody>
