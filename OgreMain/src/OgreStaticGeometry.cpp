@@ -491,6 +491,12 @@ namespace Ogre {
     //--------------------------------------------------------------------------
     void StaticGeometry::addSceneNode(const SceneNode* node)
     {
+        if(node->getCreator()->getRootSceneNode()->_getFullTransform() != Affine3::IDENTITY)
+        {
+            // otherwise it is applied twice
+            LogManager::getSingleton().logError("StaticGeometry - Root SceneNode transform must be IDENTITY");
+        }
+
         for (auto mobj : node->getAttachedObjects())
         {
             if (mobj->getMovableType() == "Entity")
