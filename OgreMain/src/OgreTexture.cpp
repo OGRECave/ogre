@@ -415,7 +415,7 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void Texture::convertToImage(Image& destImage, bool includeMipMaps)
     {
-        uint32 numMips = includeMipMaps? getNumMipmaps() + 1 : 1;
+        uint32 numMips = includeMipMaps? getNumMipmaps() : 0;
         destImage.create(getFormat(), getWidth(), getHeight(), getDepth(), getNumFaces(), numMips);
 
         for (uint32 face = 0; face < getNumFaces(); ++face)
