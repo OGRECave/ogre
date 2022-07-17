@@ -666,38 +666,29 @@ namespace Ogre {
         // Check for compressed formats, we don't support decompression, compression or recoding
         if(PixelUtil::isCompressed(src.format) || PixelUtil::isCompressed(dst.format))
         {
-            if(src.format == dst.format && src.isConsecutive() && dst.isConsecutive())
-            {
-                // we can copy with slice granularity, useful for Tex2DArray handling
-                size_t bytesPerSlice = getMemorySize(src.getWidth(), src.getHeight(), 1, src.format);
-                memcpy(dst.data + bytesPerSlice * dst.front,
-                    src.data + bytesPerSlice * src.front,
-                    bytesPerSlice * src.getDepth());
-                return;
-            }
-            else
-            {
-                OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED,
-                    "This method can not be used to compress or decompress images",
-                    "PixelUtil::bulkPixelConversion");
-            }
+            OgreAssert(src.format == dst.format && src.isConsecutive() && dst.isConsecutive(),
+                       "This method can not be used to compress or decompress images");
+            // we can copy with slice granularity, useful for Tex2DArray handling
+            size_t bytesPerSlice = getMemorySize(src.getWidth(), src.getHeight(), 1, src.format);
+            memcpy(dst.data + bytesPerSlice * dst.front, src.data + bytesPerSlice * src.front,
+                   bytesPerSlice * src.getDepth());
+            return;
         }
 
         // The easy case
         if(src.format == dst.format) {
+            uint8 *srcptr = src.getTopLeftFrontPixelPtr();
+            uint8 *dstptr = dst.getTopLeftFrontPixelPtr();
+
             // Everything consecutive?
             if(src.isConsecutive() && dst.isConsecutive())
             {
-                memcpy(dst.getTopLeftFrontPixelPtr(), src.getTopLeftFrontPixelPtr(), src.getConsecutiveSize());
+                memcpy(dstptr, srcptr, src.getConsecutiveSize());
                 return;
             }
 
             const size_t srcPixelSize = PixelUtil::getNumElemBytes(src.format);
             const size_t dstPixelSize = PixelUtil::getNumElemBytes(dst.format);
-            uint8 *srcptr = src.data
-                + (src.left + src.top * src.rowPitch + src.front * src.slicePitch) * srcPixelSize;
-            uint8 *dstptr = dst.data
-                + (dst.left + dst.top * dst.rowPitch + dst.front * dst.slicePitch) * dstPixelSize;
 
             // Calculate pitches+skips in bytes
             const size_t srcRowPitchBytes = src.rowPitch*srcPixelSize;
@@ -758,11 +749,9 @@ namespace Ogre {
 
         const size_t srcPixelSize = PixelUtil::getNumElemBytes(src.format);
         const size_t dstPixelSize = PixelUtil::getNumElemBytes(dst.format);
-        uint8 *srcptr = src.data
-            + (src.left + src.top * src.rowPitch + src.front * src.slicePitch) * srcPixelSize;
-        uint8 *dstptr = dst.data
-            + (dst.left + dst.top * dst.rowPitch + dst.front * dst.slicePitch) * dstPixelSize;
-        
+        uint8* srcptr = src.getTopLeftFrontPixelPtr();
+        uint8* dstptr = dst.getTopLeftFrontPixelPtr();
+
         // Old way, not taking into account box dimensions
         //uint8 *srcptr = static_cast<uint8*>(src.data), *dstptr = static_cast<uint8*>(dst.data);
 
@@ -796,22 +785,16 @@ namespace Ogre {
     void PixelUtil::bulkPixelVerticalFlip(const PixelBox &box)
     {
         // Check for compressed formats, we don't support decompression, compression or recoding
-        if(PixelUtil::isCompressed(box.format))
-        {
-            OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED,
-                        "This method can not be used for compressed formats",
-                        "PixelUtil::bulkPixelVerticalFlip");
-        }
+        OgreAssert(!PixelUtil::isCompressed(box.format), "This method can not be used for compressed formats");
         
         const size_t pixelSize = PixelUtil::getNumElemBytes(box.format);
-        const size_t copySize = (box.right - box.left) * pixelSize;
+        const size_t copySize = box.getWidth() * pixelSize;
 
         // Calculate pitches in bytes
         const size_t rowPitchBytes = box.rowPitch * pixelSize;
         const size_t slicePitchBytes = box.slicePitch * pixelSize;
 
-        uint8 *basesrcptr = box.data
-            + (box.left + box.top * box.rowPitch + box.front * box.slicePitch) * pixelSize;
+        uint8 *basesrcptr = box.getTopLeftFrontPixelPtr();
         uint8 *basedstptr = basesrcptr + (box.bottom - box.top - 1) * rowPitchBytes;
         uint8* tmpptr = (uint8*)OGRE_MALLOC_SIMD(copySize, MEMCATEGORY_GENERAL);
         
