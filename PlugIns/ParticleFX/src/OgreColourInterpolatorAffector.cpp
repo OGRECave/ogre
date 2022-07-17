@@ -109,6 +109,11 @@ namespace Ogre {
         return mColourAdj[index];
     }
 
+	//-----------------------------------------------------------------------
+	void ColourInterpolatorAffector::_initParticle(Particle* pParticle)
+	{
+		pParticle->mColour = mColourAdj[0].getAsBYTE();
+	}
 
     //-----------------------------------------------------------------------
     void ColourInterpolatorAffector::setTimeAdjust(size_t index, Real time)
