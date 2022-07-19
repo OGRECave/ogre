@@ -28,7 +28,6 @@ THE SOFTWARE.
 #ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
 
 #define SGX_LIB_NORMALMAP                           "SGXLib_NormalMap"
-#define SGX_FUNC_CONSTRUCT_TBNMATRIX                "SGX_ConstructTBNMatrix"
 #define SGX_FUNC_FETCHNORMAL                        "SGX_FetchNormal"
 
 namespace Ogre {
@@ -103,11 +102,8 @@ bool NormalMapLighting::createCpuSubPrograms(ProgramSet* programSet)
         vstage.callFunction(FFP_FUNC_TRANSFORM, normalMatrix, vsInNormal, vsOutNormal);
         vstage.callFunction(FFP_FUNC_TRANSFORM, normalMatrix, vsInTangent, vsOutTangent);
 
-        // Construct TBN matrix.
-        auto TBNMatrix = psMain->resolveLocalParameter(GCT_MATRIX_3X3, "lMatTBN");
-        fstage.callFunction(SGX_FUNC_CONSTRUCT_TBNMATRIX, viewNormal, psInTangent, TBNMatrix);
         // transform normal
-        fstage.callFunction(FFP_FUNC_TRANSFORM, TBNMatrix, newViewNormal, newViewNormal);
+        fstage.callFunction("SGX_TransformNormal", {In(viewNormal), In(psInTangent), InOut(newViewNormal)});
     }
     else if (mNormalMapSpace & NMS_OBJECT)
     {
