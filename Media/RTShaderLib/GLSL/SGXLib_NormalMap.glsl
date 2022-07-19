@@ -45,8 +45,8 @@ void SGX_ConstructTBNMatrix(in vec3 vNormal,
 				   in vec3 vTangent,
 				   out mat3 vOut)
 {
-	vNormal = normalize(vNormal);
-	vTangent = normalize(vTangent);
+	// use non-normalised post-interpolation values as in mikktspace
+	// resulting normal will be normalised by lighting
 	vec3 vBinormal = cross(vNormal, vTangent);
 	// direction: from tangent space to world
 	vOut = mtxFromCols(vTangent, vBinormal, vNormal);
