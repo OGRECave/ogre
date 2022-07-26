@@ -630,22 +630,15 @@ namespace Ogre {
         // Remove all the render targets. Destroy primary target last since others may depend on it.
         // Keep mRenderTargets valid all the time, so that render targets could receive
         // appropriate notifications, for example FBO based about GL context destruction.
-        RenderTarget* primary = 0;
-        for (RenderTargetMap::iterator it = mRenderTargets.begin(); it != mRenderTargets.end(); /* note - no increment */)
-        {
-            RenderTarget* current = it->second;
-            if (!primary && current->isPrimary())
-            {
-                ++it;
-                primary = current;
-            }
-            else
-            {
-                it = mRenderTargets.erase(it);
-                OGRE_DELETE current;
-            }
+        RenderTarget* current {nullptr};
+        for (auto &&a : mRenderTargets) {
+            current = a.second;
+            if (a.second->isPrimary())
+                continue;
+            OGRE_DELETE current;
+            mRenderTargets.erase(a.first);
         }
-        OGRE_DELETE primary;
+        OGRE_DELETE current;
         mRenderTargets.clear();
 
         mPrioritisedRenderTargets.clear();
