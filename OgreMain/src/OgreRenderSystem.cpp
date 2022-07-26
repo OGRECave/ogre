@@ -618,10 +618,9 @@ namespace Ogre {
     void RenderSystem::shutdown(void)
     {
         // Remove occlusion queries
-        for (HardwareOcclusionQueryList::iterator i = mHwOcclusionQueries.begin();
-            i != mHwOcclusionQueries.end(); ++i)
+        for (auto &a : mHwOcclusionQueries)
         {
-            OGRE_DELETE *i;
+            OGRE_DELETE a;
         }
         mHwOcclusionQueries.clear();
 
