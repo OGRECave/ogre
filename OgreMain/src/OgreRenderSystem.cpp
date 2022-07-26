@@ -608,7 +608,7 @@ namespace Ogre {
     void RenderSystem::shutdown(void)
     {
         // Remove occlusion queries
-        for (auto &a : mHwOcclusionQueries)
+        for (auto q : mHwOcclusionQueries)
         {
             OGRE_DELETE a;
         }
