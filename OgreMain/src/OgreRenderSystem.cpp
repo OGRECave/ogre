@@ -631,9 +631,7 @@ namespace Ogre {
         // Keep mRenderTargets valid all the time, so that render targets could receive
         // appropriate notifications, for example FBO based about GL context destruction.
         RenderTarget* primary {nullptr};
-        RenderTarget* current {nullptr};
         for (auto &&a : mRenderTargets) {
-            current = a.second;
             if (!primary && a.second->isPrimary()) {
                 primary = a.second;
                 continue;
