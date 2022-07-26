@@ -638,7 +638,7 @@ namespace Ogre {
                 primary = a.second;
                 continue;
             }
-            OGRE_DELETE current;
+            OGRE_DELETE a.second;
             mRenderTargets.erase(a.first);
         }
         OGRE_DELETE primary;
