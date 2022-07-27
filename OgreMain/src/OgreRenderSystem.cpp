@@ -823,12 +823,6 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void RenderSystem::fireEvent(const String& name, const NameValuePairList* params)
     {
-        // for(ListenerList::iterator i = mEventListeners.begin(); 
-        //     i != mEventListeners.end(); ++i)
-        // {
-        //     (*i)->eventOccurred(name, params);
-        // }
-
         for(auto &a : mEventListeners)
         {
             a->eventOccurred(name, params);
@@ -840,14 +834,6 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void RenderSystem::destroyHardwareOcclusionQuery( HardwareOcclusionQuery *hq)
     {
-        // HardwareOcclusionQueryList::iterator i =
-        //     std::find(mHwOcclusionQueries.begin(), mHwOcclusionQueries.end(), hq);
-        // if (i != mHwOcclusionQueries.end())
-        // {
-        //     mHwOcclusionQueries.erase(i);
-        //     OGRE_DELETE hq;
-        // }
-
         auto end { mHwOcclusionQueries.end() };
         auto i { std::find(mHwOcclusionQueries.begin(), end, hq) };
         if (i != end)
