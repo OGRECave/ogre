@@ -435,8 +435,6 @@ namespace Ogre {
         _setTextureBlendMode(texUnit, tl.getColourBlendMode());
         _setTextureBlendMode(texUnit, tl.getAlphaBlendMode());
 
-        // Set texture effects
-        // TextureUnitState::EffectMap::iterator effi;
         // Iterate over new effects
         bool anyCalcs = false;
         for (auto &effi : tl.mEffects)
