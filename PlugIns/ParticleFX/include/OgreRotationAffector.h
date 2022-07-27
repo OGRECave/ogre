@@ -43,7 +43,7 @@ namespace Ogre {
 
     /** This affector rotates particles in flight.
     */
-    class _OgreParticleFXExport RotationAffector : public ParticleAffector
+    class RotationAffector : public ParticleAffector
     {
     public:
         /// Command object for particle emitter  - see ParamCommand 

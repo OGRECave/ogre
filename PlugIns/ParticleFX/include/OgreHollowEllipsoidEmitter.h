@@ -41,7 +41,7 @@ namespace Ogre {
     */
     /** Particle emitter which emits particles randomly from points inside a hollow ellipsoid.
     */
-    class _OgreParticleFXExport HollowEllipsoidEmitter : public EllipsoidEmitter
+    class HollowEllipsoidEmitter : public EllipsoidEmitter
     {
     public:
         /** Command object for inner size (see ParamCommand).*/
