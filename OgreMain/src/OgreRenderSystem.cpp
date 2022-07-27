@@ -610,7 +610,7 @@ namespace Ogre {
         // Remove occlusion queries
         for (auto q : mHwOcclusionQueries)
         {
-            OGRE_DELETE a;
+            OGRE_DELETE q;
         }
         mHwOcclusionQueries.clear();
 
