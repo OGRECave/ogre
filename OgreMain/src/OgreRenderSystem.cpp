@@ -838,12 +838,12 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void RenderSystem::destroyHardwareOcclusionQuery( HardwareOcclusionQuery *hq)
     {
-        HardwareOcclusionQueryList::iterator i =
-            std::find(mHwOcclusionQueries.begin(), mHwOcclusionQueries.end(), hq);
-        if (i != mHwOcclusionQueries.end())
+        auto end { std::end(mHwOcclusionQueries) };
+        auto i { std::find(std::begin(mHwOcclusionQueries), end, hq) };                                                
+        if (i != end)
         {
-            mHwOcclusionQueries.erase(i);
-            OGRE_DELETE hq;
+             mHwOcclusionQueries.erase(i);
+             OGRE_DELETE hq;
         }
     }
     //-----------------------------------------------------------------------
