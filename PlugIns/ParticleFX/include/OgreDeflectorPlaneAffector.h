@@ -42,7 +42,7 @@ namespace Ogre {
     */
     /** This affector defines a plane which deflects particles which collide with it.
     */
-    class _OgreParticleFXExport DeflectorPlaneAffector : public ParticleAffector
+    class DeflectorPlaneAffector : public ParticleAffector
     {
     public:
         /** Command object for plane point (see ParamCommand).*/

@@ -42,7 +42,7 @@ namespace Ogre {
 
     /** This affector scales particles in flight.
     */
-    class _OgreParticleFXExport ScaleAffector : public ParticleAffector
+    class ScaleAffector : public ParticleAffector
     {
     public:
 

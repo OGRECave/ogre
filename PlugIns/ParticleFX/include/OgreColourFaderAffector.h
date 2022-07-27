@@ -42,7 +42,7 @@ namespace Ogre {
 
     /** This affector modifies the colour of particles in flight.
     */
-    class _OgreParticleFXExport ColourFaderAffector : public ParticleAffector
+    class ColourFaderAffector : public ParticleAffector
     {
     public:
 

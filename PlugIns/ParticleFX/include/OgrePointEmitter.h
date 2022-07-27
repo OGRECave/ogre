@@ -45,7 +45,7 @@ namespace Ogre {
         depending the 'angle' parameter, which is the angle across which to scatter the 
         particles either side of the base direction of the emitter. 
     */
-    class _OgreParticleFXExport PointEmitter : public ParticleEmitter
+    class PointEmitter : public ParticleEmitter
     {
     public:
         PointEmitter(ParticleSystem* psys);

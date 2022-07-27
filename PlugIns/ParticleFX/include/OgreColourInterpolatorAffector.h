@@ -36,7 +36,7 @@ THE SOFTWARE.
 namespace Ogre {
 
 
-    class _OgreParticleFXExport ColourInterpolatorAffector : public ParticleAffector
+    class ColourInterpolatorAffector : public ParticleAffector
     {
     public:
         // this is something of a hack.. 

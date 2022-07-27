@@ -40,7 +40,7 @@ namespace Ogre {
     *  @{
     */
 
-    class _OgreParticleFXExport ColourFaderAffector2 : public ParticleAffector
+    class ColourFaderAffector2 : public ParticleAffector
     {
     public:
 

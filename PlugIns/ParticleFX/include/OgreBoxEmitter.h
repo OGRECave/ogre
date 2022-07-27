@@ -41,7 +41,7 @@ namespace Ogre {
 
     /** This emitter emits particles from a random location within a 3-dimensional box.
     */
-    class _OgreParticleFXExport BoxEmitter : public AreaEmitter
+    class BoxEmitter : public AreaEmitter
     {
     public:
 
