@@ -78,7 +78,7 @@ jobs:
       env:
         CLOUDSMITH_API_KEY: ${{ secrets.CLOUDSMITH_API_KEY }}
   macos:
-    runs-on: macos-10.15
+    runs-on: macos-11
     steps:
     - name: Install Dependencies
       run: brew update && brew install sdl2 pugixml
@@ -92,7 +92,7 @@ jobs:
     - name: Test
       run: build/bin/Debug/Test_Ogre.app/Contents/MacOS/Test_Ogre --gtest_filter=-UseCustomCapabilitiesTests*
   ios:
-    runs-on: macos-10.15
+    runs-on: macos-11
     steps:
     - uses: actions/checkout@v2
     - name: Build
