@@ -38,7 +38,7 @@ jobs:
         pip wheel . --verbose
         python -m twine upload --repository pypi *.whl
   macos:
-    runs-on: macos-10.15
+    runs-on: macos-11
     steps:
     - name: Install Dependencies
       run: brew update && brew install swig
