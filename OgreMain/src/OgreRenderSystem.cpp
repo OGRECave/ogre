@@ -242,9 +242,9 @@ namespace Ogre {
     {
 
         // Init stats
-        for (auto &a : mRenderTargets)
+        for (auto& rt : mRenderTargets)
         {
-            a.second->resetStatistics();
+            rt.second->resetStatistics();
         }
     }
     //-----------------------------------------------------------------------
@@ -252,10 +252,10 @@ namespace Ogre {
     {
         // Update all in order of priority
         // This ensures render-to-texture targets get updated before render windows
-        for (auto &a : mPrioritisedRenderTargets)
+        for (auto& prt : mPrioritisedRenderTargets)
         {
-            if (a.second->isActive() && a.second->isAutoUpdated())
-                a.second->update(swapBuffers);
+            if (prt.second->isActive() && prt.second->isAutoUpdated())
+                prt.second->update(swapBuffers);
         }
     }
     //-----------------------------------------------------------------------
@@ -605,9 +605,9 @@ namespace Ogre {
 
     void RenderSystem::shutdown(void)
     {
-        for (auto &a : mHwOcclusionQueries)
+        for (auto& q : mHwOcclusionQueries)
         {
-            OGRE_DELETE a;
+            OGRE_DELETE q;
         }
         mHwOcclusionQueries.clear();
 
@@ -821,9 +821,9 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void RenderSystem::fireEvent(const String& name, const NameValuePairList* params)
     {
-        for(auto &a : mEventListeners)
+        for(auto& el : mEventListeners)
         {
-            a->eventOccurred(name, params);
+            el->eventOccurred(name, params);
         }
 
         if(msSharedEventListener)
