@@ -252,10 +252,10 @@ namespace Ogre {
     {
         // Update all in order of priority
         // This ensures render-to-texture targets get updated before render windows
-        for (auto& prt : mPrioritisedRenderTargets)
+        for (auto& rt : mPrioritisedRenderTargets)
         {
-            if (prt.second->isActive() && prt.second->isAutoUpdated())
-                prt.second->update(swapBuffers);
+            if (rt.second->isActive() && rt.second->isAutoUpdated())
+                rt.second->update(swapBuffers);
         }
     }
     //-----------------------------------------------------------------------
@@ -264,10 +264,10 @@ namespace Ogre {
         OgreProfile("_swapAllRenderTargetBuffers");
         // Update all in order of priority
         // This ensures render-to-texture targets get updated before render windows
-        for (auto &a : mPrioritisedRenderTargets)
+        for (auto& rt : mPrioritisedRenderTargets)
         {
-            if (a.second->isActive() && a.second->isAutoUpdated())
-                a.second->swapBuffers();
+            if (rt.second->isActive() && rt.second->isAutoUpdated())
+                rt.second->swapBuffers();
         }
     }
     //-----------------------------------------------------------------------
@@ -739,9 +739,9 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void RenderSystem::_notifyCameraRemoved(const Camera* cam)
     {
-        for (auto &a : mRenderTargets)
+        for (auto& rt : mRenderTargets)
         {
-            auto target = a.second;
+            auto target = rt.second;
             target->_notifyCameraRemoved(cam);
         }
     }
