@@ -487,9 +487,9 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     String RenderTarget::writeContentsToTimestampedFile(const String& filenamePrefix, const String& filenameSuffix)
     {
-        struct tm *pTime;
-        time_t ctTime; time(&ctTime);
-        pTime = localtime( &ctTime );
+        std::time_t t { std::time(nullptr) };
+        auto pTime { std::localtime(&t) };
+
         // use ISO 8601 order
         StringStream oss;
         oss << filenamePrefix
