@@ -260,10 +260,10 @@ namespace Ogre {
         // make a copy of the list to avoid crashes, the viewport destructor change the list
         ViewportList vlist = mViewportList;
 
-        for (ViewportList::iterator it = vlist.begin(); it != vlist.end(); ++it)
+        for (auto& vl : vlistt)
         {
-            fireViewportRemoved(it->second);
-            OGRE_DELETE (*it).second;
+            fireViewportRemoved(vl.second);
+            OGRE_DELETE vl.second;
         }
 
         mViewportList.clear();
@@ -357,12 +357,9 @@ namespace Ogre {
         RenderTargetEvent evt;
         evt.source = this;
 
-        RenderTargetListenerList::iterator i, iend;
-        i = mListeners.begin();
-        iend = mListeners.end();
-        for(; i != iend; ++i)
+        for(auto& l : mListeners)
         {
-            (*i)->preRenderTargetUpdate(evt);
+            l->preRenderTargetUpdate(evt);
         }
 
 
@@ -373,12 +370,9 @@ namespace Ogre {
         RenderTargetEvent evt;
         evt.source = this;
 
-        RenderTargetListenerList::iterator i, iend;
-        i = mListeners.begin();
-        iend = mListeners.end();
-        for(; i != iend; ++i)
+        for(auto& l : mListeners)
         {
-            (*i)->postRenderTargetUpdate(evt);
+            l->postRenderTargetUpdate(evt);
         }
     }
     //-----------------------------------------------------------------------
@@ -430,12 +424,9 @@ namespace Ogre {
         RenderTargetViewportEvent evt;
         evt.source = vp;
 
-        RenderTargetListenerList::iterator i, iend;
-        i = mListeners.begin();
-        iend = mListeners.end();
-        for(; i != iend; ++i)
+        for(auto& l : mListeners)
         {
-            (*i)->preViewportUpdate(evt);
+            l->preViewportUpdate(evt);
         }
     }
     //-----------------------------------------------------------------------
@@ -444,12 +435,9 @@ namespace Ogre {
         RenderTargetViewportEvent evt;
         evt.source = vp;
 
-        RenderTargetListenerList::iterator i, iend;
-        i = mListeners.begin();
-        iend = mListeners.end();
-        for(; i != iend; ++i)
+        for(auto& l : mListeners)
         {
-            (*i)->postViewportUpdate(evt);
+            l->postViewportUpdate(evt);
         }
     }
     //-----------------------------------------------------------------------
@@ -458,12 +446,9 @@ namespace Ogre {
         RenderTargetViewportEvent evt;
         evt.source = vp;
 
-        RenderTargetListenerList::iterator i, iend;
-        i = mListeners.begin();
-        iend = mListeners.end();
-        for(; i != iend; ++i)
+        for(auto& l : mListeners)
         {
-            (*i)->viewportAdded(evt);
+            l->viewportAdded(evt);
         }
     }
     //-----------------------------------------------------------------------
@@ -476,12 +461,9 @@ namespace Ogre {
         // some will want to remove themselves as listeners when they get this
         RenderTargetListenerList tempList = mListeners;
 
-        RenderTargetListenerList::iterator i, iend;
-        i = tempList.begin();
-        iend = tempList.end();
-        for(; i != iend; ++i)
+        for(auto& l : tempList)
         {
-            (*i)->viewportRemoved(evt);
+            l->viewportRemoved(evt);
         }
     }
     //-----------------------------------------------------------------------
@@ -516,9 +498,9 @@ namespace Ogre {
     {
         ViewportList::iterator i, iend;
         iend = mViewportList.end();
-        for (i = mViewportList.begin(); i != iend; ++i)
+        for (auto& l : mViewportList)
         {
-            Viewport* v = i->second;
+            Viewport* v = l.second;
             if (v->getCamera() == cam)
             {
                 // disable camera link
@@ -562,6 +544,5 @@ namespace Ogre {
         }
         OgreProfileEndGPUEvent(getName());
     }
-    
-
 }        
+
