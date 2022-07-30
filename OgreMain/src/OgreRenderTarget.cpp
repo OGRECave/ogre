@@ -260,7 +260,7 @@ namespace Ogre {
         // make a copy of the list to avoid crashes, the viewport destructor change the list
         ViewportList vlist = mViewportList;
 
-        for (auto& vl : vlistt)
+        for (auto& vl : vlist)
         {
             fireViewportRemoved(vl.second);
             OGRE_DELETE vl.second;
