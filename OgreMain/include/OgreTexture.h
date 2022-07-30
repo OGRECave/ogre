@@ -506,11 +506,6 @@ namespace Ogre {
         /** Default implementation of unload which calls freeInternalResources */
         void unloadImpl(void);
 
-        /** Identify the source file type as a string, either from the extension
-            or from a magic number.
-        */
-        String getSourceFileType() const;
-
         /** Returns the maximum number of Mipmaps that can be generated until we reach
         the mininum possible size. This does not count the base level.
 
