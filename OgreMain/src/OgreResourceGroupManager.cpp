@@ -72,9 +72,9 @@ namespace Ogre {
         // delete all resource groups
         ResourceGroupMap::iterator i, iend;
         iend = mResourceGroupMap.end();
-        for (i = mResourceGroupMap.begin(); i != iend; ++i)
+        for (auto& g : mResourceGroupMap)
         {
-            deleteGroup(i->second);
+            deleteGroup(g.second);
         }
         mResourceGroupMap.clear();
     }
@@ -125,11 +125,9 @@ namespace Ogre {
             OGRE_LOCK_AUTO_MUTEX;
 
         // Intialise all declared resource groups
-        ResourceGroupMap::iterator i, iend;
-        iend = mResourceGroupMap.end();
-        for (i = mResourceGroupMap.begin(); i != iend; ++i)
+        for (auto& g : mResourceGroupMap)
         {
-            ResourceGroup* grp = i->second;
+            ResourceGroup* grp = g.second;
             OGRE_LOCK_MUTEX(grp->OGRE_AUTO_MUTEX_NAME); // lock group mutex
             if (grp->groupStatus == ResourceGroup::UNINITIALSED)
             {
@@ -138,7 +136,7 @@ namespace Ogre {
                 // Set current group
                 mCurrentGroup = grp;
                 parseResourceGroupScripts(grp);
-                LogManager::getSingleton().logMessage("Creating resources for group " + i->first);
+                LogManager::getSingleton().logMessage("Creating resources for group " + g.first);
                 createDeclaredResources(grp);
                 grp->groupStatus = ResourceGroup::INITIALISED;
                 LogManager::getSingleton().logMessage("All done");
@@ -159,21 +157,20 @@ namespace Ogre {
         mCurrentGroup = grp;
 
         // Count up resources for starting event
-        ResourceGroup::LoadResourceOrderMap::iterator oi;
         size_t resourceCount = 0;
-        for (oi = grp->loadResourceOrderMap.begin(); oi != grp->loadResourceOrderMap.end(); ++oi)
+        for (auto& oi : grp->loadResourceOrderMap)
         {
-            resourceCount += oi->second.size();
+            resourceCount += oi.second.size();
         }
 
         fireResourceGroupPrepareStarted(name, resourceCount);
 
         // Now load for real
-        for (oi = grp->loadResourceOrderMap.begin(); oi != grp->loadResourceOrderMap.end(); ++oi)
+        for (auto& oi : grp->loadResourceOrderMap)
         {
             size_t n = 0;
-            LoadUnloadResourceList::iterator l = oi->second.begin();
-            while (l != oi->second.end())
+            LoadUnloadResourceList::iterator l = oi.second.begin();
+            while (l != oi.second.end())
             {
                 ResourcePtr res = *l;
 
@@ -196,7 +193,7 @@ namespace Ogre {
                 // been invalidated
                 if (res->getGroup() != name)
                 {
-                    l = oi->second.begin();
+                    l = oi.second.begin();
                     std::advance(l, n);
                 }
                 else
@@ -224,21 +221,20 @@ namespace Ogre {
         mCurrentGroup = grp;
 
         // Count up resources for starting event
-        ResourceGroup::LoadResourceOrderMap::iterator oi;
         size_t resourceCount = grp->customStageCount;
-        for (oi = grp->loadResourceOrderMap.begin(); oi != grp->loadResourceOrderMap.end(); ++oi)
+        for (auto& oi : grp->loadResourceOrderMap)
         {
-            resourceCount += oi->second.size();
+            resourceCount += oi.second.size();
         }
 
         fireResourceGroupLoadStarted(name, resourceCount);
 
         // Now load for real
-        for (oi = grp->loadResourceOrderMap.begin(); oi != grp->loadResourceOrderMap.end(); ++oi)
+        for (auto& oi : grp->loadResourceOrderMap)
         {
             size_t n = 0;
-            LoadUnloadResourceList::iterator l = oi->second.begin();
-            while (l != oi->second.end())
+            auto l = oi.second.begin();
+            while (l != oi.second.end())
             {
                 ResourcePtr res = *l;
 
@@ -261,7 +257,7 @@ namespace Ogre {
                 // been invalidated
                 if (res->getGroup() != name)
                 {
-                    l = oi->second.begin();
+                    l = oi.second.begin();
                     std::advance(l, n);
                 }
                 else
@@ -290,15 +286,12 @@ namespace Ogre {
         mCurrentGroup = grp;
         OGRE_LOCK_MUTEX(grp->OGRE_AUTO_MUTEX_NAME); // lock group mutex 
 
-        // Count up resources for starting event
-        ResourceGroup::LoadResourceOrderMap::reverse_iterator oi;
         // unload in reverse order
-        for (oi = grp->loadResourceOrderMap.rbegin(); oi != grp->loadResourceOrderMap.rend(); ++oi)
+        for (auto& oi : grp->loadResourceOrderMap)
         {
-            for (LoadUnloadResourceList::iterator l = oi->second.begin();
-                l != oi->second.end(); ++l)
+            for (auto& l : oi.second)
             {
-                Resource* resource = l->get();
+                Resource* resource = l.get();
                 if (!reloadableOnly || resource->isReloadable())
                 {
                     resource->unload();
@@ -327,14 +320,13 @@ namespace Ogre {
         // unload in reverse order
         for (oi = grp->loadResourceOrderMap.rbegin(); oi != grp->loadResourceOrderMap.rend(); ++oi)
         {
-            for (LoadUnloadResourceList::iterator l = oi->second.begin();
-                l != oi->second.end(); ++l)
+            for (auto& l : oi->second)
             {
                 // A use count of 3 means that only RGM and RM have references
                 // RGM has one (this one) and RM has 2 (by name and by handle)
-                if (l->use_count() == RESOURCE_SYSTEM_NUM_REFERENCE_COUNTS)
+                if (l.use_count() == RESOURCE_SYSTEM_NUM_REFERENCE_COUNTS)
                 {
-                    Resource* resource = l->get();
+                    Resource* resource = l.get();
                     if (!reloadableOnly || resource->isReloadable())
                     {
                         resource->unload();
@@ -407,11 +399,9 @@ namespace Ogre {
 
         OGRE_LOCK_MUTEX(grp->OGRE_AUTO_MUTEX_NAME); // lock group mutex
 
-        LocationList::iterator li, liend;
-        liend = grp->locationList.end();
-        for (li = grp->locationList.begin(); li != liend; ++li)
+        for (auto& li : grp->locationList)
         {
-            Archive* pArch = li->archive;
+            Archive* pArch = li.archive;
             if (pArch->getName() == name)
                 // Delete indexes
                 return true;
@@ -440,8 +430,8 @@ namespace Ogre {
         grp->locationList.push_back(loc);
 
         // Index resources
-        for( StringVector::iterator it = vec->begin(); it != vec->end(); ++it )
-            grp->addToIndex(*it, pArch);
+        for (auto& s : *vec)
+            grp->addToIndex(s, pArch);
         
         StringStream msg;
         msg << "Added resource location '" << name << "' of type '" << locType
@@ -459,9 +449,8 @@ namespace Ogre {
         OGRE_LOCK_MUTEX(grp->OGRE_AUTO_MUTEX_NAME); // lock group mutex
 
         // Remove from location list
-        LocationList::iterator li, liend;
-        liend = grp->locationList.end();
-        for (li = grp->locationList.begin(); li != liend; ++li)
+        auto liend = grp->locationList.end();
+        for (auto li = grp->locationList.begin(); li != liend; ++li)
         {
             Archive* pArch = li->archive;
             if (pArch->getName() == name)
@@ -471,7 +460,6 @@ namespace Ogre {
                 ArchiveManager::getSingleton().unload(pArch);
                 break;
             }
-
         }
 
         LogManager::getSingleton().logMessage("Removed resource location " + name);
@@ -508,7 +496,7 @@ namespace Ogre {
         ResourceGroup* grp = getResourceGroup(groupName, true);
         OGRE_LOCK_MUTEX(grp->OGRE_AUTO_MUTEX_NAME); // lock group mutex
 
-        for (ResourceDeclarationList::iterator i = grp->resourceDeclarations.begin();
+        for (auto i = grp->resourceDeclarations.begin();
             i != grp->resourceDeclarations.end(); ++i)
         {
             if (i->resourceName == name)
