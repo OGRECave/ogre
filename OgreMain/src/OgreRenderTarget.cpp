@@ -544,5 +544,4 @@ namespace Ogre {
         }
         OgreProfileEndGPUEvent(getName());
     }
-}        
-
+}
