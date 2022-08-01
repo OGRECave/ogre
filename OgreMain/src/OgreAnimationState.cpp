@@ -237,18 +237,16 @@ namespace Ogre
         // lock rhs
             OGRE_LOCK_MUTEX(rhs.OGRE_AUTO_MUTEX_NAME);
 
-        for (AnimationStateMap::const_iterator i = rhs.mAnimationStates.begin();
-            i != rhs.mAnimationStates.end(); ++i)
+        for (auto& s : rhs.mAnimationStates)
         {
-            AnimationState* src = i->second;
+            AnimationState* src = s.second;
             mAnimationStates[src->getAnimationName()] = OGRE_NEW AnimationState(this, *src);
         }
 
         // Clone enabled animation state list
-        for (EnabledAnimationStateList::const_iterator it = rhs.mEnabledAnimationStates.begin();
-            it != rhs.mEnabledAnimationStates.end(); ++it)
+        for (auto& s : rhs.mEnabledAnimationStates)
         {
-            const AnimationState* src = *it;
+            const AnimationState* src = s;
             mEnabledAnimationStates.push_back(getAnimationState(src->getAnimationName()));
         }
     }
@@ -277,10 +275,9 @@ namespace Ogre
     {
             OGRE_LOCK_AUTO_MUTEX;
 
-        for (AnimationStateMap::iterator i = mAnimationStates.begin();
-            i != mAnimationStates.end(); ++i)
+        for (auto& s : mAnimationStates)
         {
-            OGRE_DELETE i->second;
+            OGRE_DELETE s.second;
         }
         mAnimationStates.clear();
         mEnabledAnimationStates.clear();
@@ -350,26 +347,22 @@ namespace Ogre
         // lock source
             OGRE_LOCK_AUTO_MUTEX;
 
-        AnimationStateMap::iterator i, iend;
-        iend = target->mAnimationStates.end();
-        for (i = target->mAnimationStates.begin(); i != iend; ++i) {
-            AnimationStateMap::const_iterator iother = mAnimationStates.find(i->first);
+        for (auto& s : target->mAnimationStates) {
+            AnimationStateMap::const_iterator iother = mAnimationStates.find(s.first);
             if (iother == mAnimationStates.end()) {
-                OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "No animation entry found named " + i->first, 
+                OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "No animation entry found named " + s.first, 
                     "AnimationStateSet::copyMatchingState");
             } else {
-                i->second->copyStateFrom(*(iother->second));
+                s.second->copyStateFrom(*(iother->second));
             }
         }
 
         // Copy matching enabled animation state list
         target->mEnabledAnimationStates.clear();
 
-        EnabledAnimationStateList::const_iterator it, itend;
-        itend = mEnabledAnimationStates.end();
-        for (it = mEnabledAnimationStates.begin(); it != itend; ++it)
+        for (auto& s : mEnabledAnimationStates)
         {
-            const AnimationState* src = *it;
+            const AnimationState* src = s;
             AnimationStateMap::const_iterator itarget = target->mAnimationStates.find(src->getAnimationName());
             if (itarget != target->mAnimationStates.end())
             {
