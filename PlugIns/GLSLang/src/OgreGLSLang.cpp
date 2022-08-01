@@ -270,6 +270,11 @@ GLSLangProgram::GLSLangProgram(ResourceManager* creator, const String& name, Res
     }
 }
 
+GLSLangProgram::~GLSLangProgram()
+{
+    unload();
+}
+
 const String& GLSLangProgram::getLanguage(void) const
 {
     return sLanguageName;
