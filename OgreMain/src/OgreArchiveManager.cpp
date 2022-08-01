@@ -108,9 +108,9 @@ namespace Ogre {
         // We now raise an assert.
 
         // Unload & delete resources in turn
-        for( ArchiveMap::iterator it = mArchives.begin(); it != mArchives.end(); ++it )
+        for (auto& a : mArchives)
         {
-            Archive* arch = it->second;
+            Archive* arch = a.second;
             // Unload
             arch->unload();
             // Find factory to destroy. An archive factory created this file, it should still be there!
