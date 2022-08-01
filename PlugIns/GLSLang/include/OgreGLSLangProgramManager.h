@@ -38,6 +38,7 @@ class GLSLangProgram : public HighLevelGpuProgram
 public:
     GLSLangProgram(ResourceManager* creator, const String& name, ResourceHandle handle, const String& group,
                    bool isManual, ManualResourceLoader* loader);
+    ~GLSLangProgram();
     const String& getLanguage(void) const override;
 
     bool isSupported() const override;
