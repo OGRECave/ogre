@@ -202,7 +202,7 @@ void Compositor::createGlobalTextures()
 
                 // create and bind individual surfaces
                 size_t atch = 0;
-                for (auto&  p : def->formatList) 
+                for (auto&  p : def->formatList)
                 {
 
                     String texname = MRTbaseName + "/" + StringConverter::toString(atch);
@@ -212,7 +212,7 @@ void Compositor::createGlobalTextures()
                             texname, 
                             ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME, TEX_TYPE_2D, \
                             (uint)def->width, (uint)def->height, 0, p, TU_RENDERTARGET, 0,  \
-                            def->hwGammaWrite && !PixelUtil::isFloatingPoint(p), def->fsaa); 
+                            def->hwGammaWrite && !PixelUtil::isFloatingPoint(p), def->fsaa);
                     
                     RenderTexture* rt = tex->getBuffer()->getRenderTarget();
                     rt->setAutoUpdated(false);
