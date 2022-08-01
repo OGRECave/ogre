@@ -66,11 +66,10 @@ void CompositionTechnique::removeTextureDefinition(size_t index)
 //---------------------------------------------------------------------
 CompositionTechnique::TextureDefinition *CompositionTechnique::getTextureDefinition(const String& name) const
 {
-    auto iend = mTextureDefinitions.end();
-    for (auto i = mTextureDefinitions.begin(); i != iend; ++i)
+    for (auto& i : mTextureDefinitions)
     {
-        if ((*i)->name == name)
-            return *i;
+        if (i->name == name)
+            return i;
     }
 
     return 0;
@@ -79,11 +78,9 @@ CompositionTechnique::TextureDefinition *CompositionTechnique::getTextureDefinit
 //-----------------------------------------------------------------------
 void CompositionTechnique::removeAllTextureDefinitions()
 {
-    TextureDefinitions::iterator i, iend;
-    iend = mTextureDefinitions.end();
-    for (i = mTextureDefinitions.begin(); i != iend; ++i)
+    for (auto& i : mTextureDefinitions)
     {
-        OGRE_DELETE (*i);
+        OGRE_DELETE (i);
     }
     mTextureDefinitions.clear();
 }
@@ -112,11 +109,9 @@ void CompositionTechnique::removeTargetPass(size_t index)
 //-----------------------------------------------------------------------
 void CompositionTechnique::removeAllTargetPasses()
 {
-    TargetPasses::iterator i, iend;
-    iend = mTargetPasses.end();
-    for (i = mTargetPasses.begin(); i != iend; ++i)
+    for (auto& p : mTargetPasses)
     {
-        OGRE_DELETE (*i);
+        OGRE_DELETE (p);
     }
     mTargetPasses.clear();
 }
@@ -142,23 +137,19 @@ bool CompositionTechnique::isSupported(bool acceptTextureDegradation)
     }
 
     // Check all target passes is supported
-    TargetPasses::iterator pi, piend;
-    piend = mTargetPasses.end();
-    for (pi = mTargetPasses.begin(); pi != piend; ++pi)
+    for (auto& pi : mTargetPasses)
     {
-        CompositionTargetPass* targetPass = *pi;
+        CompositionTargetPass* targetPass = pi;
         if (!targetPass->_isSupported())
         {
             return false;
         }
     }
 
-    TextureDefinitions::iterator i, iend;
-    iend = mTextureDefinitions.end();
     TextureManager& texMgr = TextureManager::getSingleton();
-    for (i = mTextureDefinitions.begin(); i != iend; ++i)
+    for (auto& i : mTextureDefinitions)
     {
-        TextureDefinition* td = *i;
+        TextureDefinition* td = i;
 
         // Firstly check MRTs
         if (td->formatList.size() > 
@@ -167,19 +158,18 @@ bool CompositionTechnique::isSupported(bool acceptTextureDegradation)
             return false;
         }
 
-
-        for (PixelFormatList::iterator pfi = td->formatList.begin(); pfi != td->formatList.end(); ++pfi)
+        for (auto& pfi : td->formatList)
         {
             // Check whether equivalent supported
             // Need a format which is the same number of bits to pass
-            bool accepted = texMgr.isEquivalentFormatSupported(td->type, *pfi, TU_RENDERTARGET);
-            if(!accepted && acceptTextureDegradation)
+            bool accepted = texMgr.isEquivalentFormatSupported(td->type, pfi, TU_RENDERTARGET);
+            if (!accepted && acceptTextureDegradation)
             {
                 // Don't care about exact format so long as something is supported
-                accepted = texMgr.getNativeFormat(td->type, *pfi, TU_RENDERTARGET) != PF_UNKNOWN;
+                accepted = texMgr.getNativeFormat(td->type, pfi, TU_RENDERTARGET) != PF_UNKNOWN;
             }
 
-            if(!accepted)
+            if (!accepted)
                 return false;
         }
 
@@ -190,10 +180,10 @@ bool CompositionTechnique::isSupported(bool acceptTextureDegradation)
             PixelFormat nativeFormat = texMgr.getNativeFormat( td->type, td->formatList.front(),
                                                                 TU_RENDERTARGET );
             size_t nativeBits = PixelUtil::getNumElemBits( nativeFormat );
-            for( PixelFormatList::iterator pfi = td->formatList.begin()+1;
+            for (PixelFormatList::iterator pfi = td->formatList.begin() + 1;
                     pfi != td->formatList.end(); ++pfi )
             {
-                PixelFormat nativeTmp = texMgr.getNativeFormat( td->type, *pfi, TU_RENDERTARGET );
+                PixelFormat nativeTmp = texMgr.getNativeFormat (td->type, *pfi, TU_RENDERTARGET );
                 if( PixelUtil::getNumElemBits( nativeTmp ) != nativeBits )
                 {
                     return false;

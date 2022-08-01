@@ -137,20 +137,20 @@ void Compositor::compile()
 //---------------------------------------------------------------------
 CompositionTechnique* Compositor::getSupportedTechnique(const String& schemeName)
 {
-    for(Techniques::iterator i = mSupportedTechniques.begin(); i != mSupportedTechniques.end(); ++i)
+    for(auto& i : mSupportedTechniques)
     {
-        if ((*i)->getSchemeName() == schemeName)
+        if (i->getSchemeName() == schemeName)
         {
-            return *i;
+            return i;
         }
     }
 
     // didn't find a matching one
-    for(Techniques::iterator i = mSupportedTechniques.begin(); i != mSupportedTechniques.end(); ++i)
+    for(auto& i : mSupportedTechniques)
     {
-        if ((*i)->getSchemeName().empty())
+        if (i->getSchemeName().empty())
         {
-            return *i;
+            return i;
         }
     }
 
@@ -174,10 +174,9 @@ void Compositor::createGlobalTextures()
     CompositionTechnique* firstTechnique = mSupportedTechniques[0];
 
     const CompositionTechnique::TextureDefinitions& tdefs = firstTechnique->getTextureDefinitions();
-    CompositionTechnique::TextureDefinitions::const_iterator texDefIt = tdefs.begin();
-    for (; texDefIt != tdefs.end(); ++texDefIt)
+    for (const auto& texDefIt : tdefs)
     {
-        CompositionTechnique::TextureDefinition* def = *texDefIt;
+        CompositionTechnique::TextureDefinition* def = texDefIt;
         if (def->scope == CompositionTechnique::TS_GLOBAL) 
         {
             //Check that this is a legit global texture
@@ -203,8 +202,7 @@ void Compositor::createGlobalTextures()
 
                 // create and bind individual surfaces
                 size_t atch = 0;
-                for (PixelFormatList::iterator p = def->formatList.begin(); 
-                    p != def->formatList.end(); ++p, ++atch)
+                for (auto&  p : def->formatList) 
                 {
 
                     String texname = MRTbaseName + "/" + StringConverter::toString(atch);
@@ -213,8 +211,8 @@ void Compositor::createGlobalTextures()
                     tex = TextureManager::getSingleton().createManual(
                             texname, 
                             ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME, TEX_TYPE_2D, 
-                            (uint)def->width, (uint)def->height, 0, *p, TU_RENDERTARGET, 0, 
-                            def->hwGammaWrite && !PixelUtil::isFloatingPoint(*p), def->fsaa); 
+                            (uint)def->width, (uint)def->height, 0, p, TU_RENDERTARGET, 0, 
+                            def->hwGammaWrite && !PixelUtil::isFloatingPoint(p), def->fsaa); 
                     
                     RenderTexture* rt = tex->getBuffer()->getRenderTarget();
                     rt->setAutoUpdated(false);
@@ -260,11 +258,10 @@ void Compositor::createGlobalTextures()
         CompositionTechnique* technique = mSupportedTechniques[i];
         bool isConsistent = true;
         size_t numGlobals = 0;
-        const CompositionTechnique::TextureDefinitions& tdefs2 = technique->getTextureDefinitions();
-        texDefIt = tdefs2.begin();
-        for (; texDefIt != tdefs2.end(); ++texDefIt)
+        const auto& tdefs2 = technique->getTextureDefinitions();
+        for (auto& texDefIt : tdefs2)
         {
-            CompositionTechnique::TextureDefinition* texDef = *texDefIt;
+            CompositionTechnique::TextureDefinition* texDef = texDefIt;
             if (texDef->scope == CompositionTechnique::TS_GLOBAL) 
             {
                 if (globalTextureNames.find(texDef->name) == globalTextureNames.end()) 
@@ -285,20 +282,16 @@ void Compositor::createGlobalTextures()
 //-----------------------------------------------------------------------
 void Compositor::freeGlobalTextures()
 {
-    GlobalTextureMap::iterator i = mGlobalTextures.begin();
-    while (i != mGlobalTextures.end())
+    for (auto& i : mGlobalTextures)
     {
-        TextureManager::getSingleton().remove(i->second);
-        ++i;
+        TextureManager::getSingleton().remove(i.second);
     }
     mGlobalTextures.clear();
 
-    GlobalMRTMap::iterator mrti = mGlobalMRTs.begin();
-    while (mrti != mGlobalMRTs.end())
+    for (auto& mrti : mGlobalMRTs)
     {
         // remove MRT
-        Root::getSingleton().getRenderSystem()->destroyRenderTarget(mrti->second->getName());
-        ++mrti;
+        Root::getSingleton().getRenderSystem()->destroyRenderTarget(mrti.second->getName());
     }
     mGlobalMRTs.clear();
 
