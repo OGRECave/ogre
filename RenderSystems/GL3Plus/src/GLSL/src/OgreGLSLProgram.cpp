@@ -92,9 +92,9 @@ namespace Ogre {
 
         // Convert to const char * for GL
         std::vector<const char*> names;
-        for (uint e = 0; e < nameStrings.size(); e++)
+        for (const auto & nameString : nameStrings)
         {
-            names.push_back(nameStrings[e].c_str());
+            names.push_back(nameString.c_str());
         }
 
         // TODO replace glTransformFeedbackVaryings with in-shader specification (GL 4.4)

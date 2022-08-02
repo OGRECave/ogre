@@ -194,11 +194,10 @@ namespace Ogre {
             mMin.x = mMin.y = mMin.z = Math::POS_INFINITY;
             mMax.x = mMax.y = mMax.z = Math::NEG_INFINITY;
 
-            for (std::set<uint32>::const_iterator i = mIndices.begin ();
-                 i != mIndices.end (); ++i)
+            for (unsigned int idx : mIndices)
             {
                 float *v;
-                poselem->baseVertexPointerToElement (vdata + *i * vsz, &v);
+                poselem->baseVertexPointerToElement (vdata + idx * vsz, &v);
                 extend (v);
             }
         }
@@ -298,16 +297,15 @@ namespace Ogre {
             // Find the largest box with more than one vertex :)
             Cluster *split_box = NULL;
             Real split_volume = -1;
-            for (std::vector<Cluster>::iterator b = boxes.begin ();
-                 b != boxes.end (); ++b)
+            for (auto & boxe : boxes)
             {
-                if (b->empty ())
+                if (boxe.empty ())
                     continue;
-                Real v = b->volume ();
+                Real v = boxe.volume ();
                 if (v > split_volume)
                 {
                     split_volume = v;
-                    split_box = &*b;
+                    split_box = &boxe;
                 }
             }
 
@@ -334,24 +332,21 @@ namespace Ogre {
 
         // Fine, now from every cluster choose the vertex that is most
         // distant from the geometrical center and from other extremes.
-        for (std::vector<Cluster>::const_iterator b = boxes.begin ();
-             b != boxes.end (); ++b)
+        for (const auto & boxe : boxes)
         {
             Real rating = 0;
             Vector3 best_vertex;
 
-            for (std::set<uint32>::const_iterator i = b->mIndices.begin ();
-                 i != b->mIndices.end (); ++i)
+            for (unsigned int i : boxe.mIndices)
             {
                 float *v;
-                poselem->baseVertexPointerToElement (vdata + *i * vsz, &v);
+                poselem->baseVertexPointerToElement (vdata + i * vsz, &v);
 
                 Vector3 vv (v [0], v [1], v [2]);
                 Real r = (vv - center).squaredLength ();
 
-                for (std::vector<Vector3>::const_iterator e = extremityPoints.begin ();
-                     e != extremityPoints.end (); ++e)
-                    r += (*e - vv).squaredLength ();
+                for (auto extremityPoint : extremityPoints)
+                    r += (extremityPoint - vv).squaredLength ();
                 if (r > rating)
                 {
                     rating = r;

@@ -540,9 +540,9 @@ namespace Ogre {
         // will determine load status etc again
         ConstImagePtrList imagePtrs;
 
-        for (size_t i = 0; i < loadedImages.size(); ++i)
+        for (auto& img : loadedImages)
         {
-            imagePtrs.push_back(&loadedImages[i]);
+            imagePtrs.push_back(&img);
         }
 
         _loadImages(imagePtrs);

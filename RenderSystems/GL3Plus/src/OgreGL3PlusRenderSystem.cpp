@@ -1434,9 +1434,9 @@ namespace Ogre {
     {
         static_cast<GL3PlusHardwareBufferManager*>(HardwareBufferManager::getSingletonPtr())->notifyContextDestroyed(context);
 
-        for(RenderTargetMap::iterator it = mRenderTargets.begin(); it!=mRenderTargets.end(); ++it)
+        for(auto & rt : mRenderTargets)
         {
-            if(auto target = dynamic_cast<GLRenderTarget*>(it->second))
+            if(auto target = dynamic_cast<GLRenderTarget*>(rt.second))
             {
                 if(auto fbo = target->getFBO())
                     fbo->notifyContextDestroyed(context);

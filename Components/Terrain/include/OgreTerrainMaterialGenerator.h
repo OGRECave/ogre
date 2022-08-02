@@ -217,11 +217,11 @@ namespace Ogre
         {
             if (!mActiveProfile || mActiveProfile->getName() != name)
             {
-                for (ProfileList::iterator i = mProfiles.begin(); i != mProfiles.end(); ++i)
+                for (auto & p : mProfiles)
                 {
-                    if ((*i)->getName() == name)
+                    if (p->getName() == name)
                     {
-                        setActiveProfile(*i);
+                        setActiveProfile(p);
                         break;
                     }
                 }

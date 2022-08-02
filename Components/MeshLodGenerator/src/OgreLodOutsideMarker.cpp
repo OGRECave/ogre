@@ -50,9 +50,9 @@ void LodOutsideMarker::generateHull()
 {
     initHull();
     {
-        for (size_t i = 0; i < mHull.size(); i++) {
-            if (!mHull[i].removed) {
-                CHVertex* furthestVertex = getFurthestVertex(&mHull[i]);
+        for (auto & t : mHull) {
+            if (!t.removed) {
+                CHVertex* furthestVertex = getFurthestVertex(&t);
                 if (!furthestVertex) {
                     continue;
                 }
@@ -456,14 +456,14 @@ Ogre::MeshPtr LodOutsideMarker::createConvexHullMesh(const String& meshName, con
     // min & max position
     AxisAlignedBox bounds;
 
-    for (size_t i = 0; i < mHull.size(); i++) {
-        assert(!mHull[i].removed);
+    for (auto & t : mHull) {
+        assert(!t.removed);
         for(size_t n = 0; n < 3; n++){
             indexBuffer.push_back(id++);
-            vertexBuffer.push_back(mHull[i].vertex[n]->position.x);
-            vertexBuffer.push_back(mHull[i].vertex[n]->position.y);
-            vertexBuffer.push_back(mHull[i].vertex[n]->position.z);
-            bounds.merge(mHull[i].vertex[n]->position);
+            vertexBuffer.push_back(t.vertex[n]->position.x);
+            vertexBuffer.push_back(t.vertex[n]->position.y);
+            vertexBuffer.push_back(t.vertex[n]->position.z);
+            bounds.merge(t.vertex[n]->position);
         }
     }
 

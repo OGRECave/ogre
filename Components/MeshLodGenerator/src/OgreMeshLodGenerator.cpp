@@ -200,8 +200,8 @@ void MeshLodGenerator::generateLodLevels(LodConfig& lodConfig,
 {
     // If we don't have generated Lod levels, we can use _generateManualLodLevels.
     bool hasGeneratedLevels = false;
-    for(size_t i = 0; i < lodConfig.levels.size(); i++) {
-        if(lodConfig.levels[i].manualMeshName.empty()) {
+    for(auto & level : lodConfig.levels) {
+        if(level.manualMeshName.empty()) {
             hasGeneratedLevels = true;
             break;
         }

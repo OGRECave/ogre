@@ -558,9 +558,9 @@ VertexIndexToShape::~VertexIndexToShape()
 
     if (mBoneIndex)
     {
-        for (BoneIndex::iterator i = mBoneIndex->begin(); i != mBoneIndex->end(); ++i)
+        for (auto & i : *mBoneIndex)
         {
-            delete i->second;
+            delete i.second;
         }
         delete mBoneIndex;
     }

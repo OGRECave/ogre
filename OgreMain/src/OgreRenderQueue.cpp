@@ -108,10 +108,10 @@ namespace Ogre {
         {
             RenderQueue* queue = p.second->getRenderQueue();
 
-            for (size_t i = 0; i < RENDER_QUEUE_COUNT; ++i)
+            for (auto & g : queue->mGroups)
             {
-                if(queue->mGroups[i])
-                    queue->mGroups[i]->clear(destroyPassMaps);
+                if(g)
+                    g->clear(destroyPassMaps);
             }
         }
 
@@ -173,10 +173,10 @@ namespace Ogre {
     {
         mSplitPassesByLightingType = split;
 
-        for (size_t i = 0; i < RENDER_QUEUE_COUNT; ++i)
+        for (auto & g : mGroups)
         {
-            if(mGroups[i])
-                mGroups[i]->setSplitPassesByLightingType(split);
+            if(g)
+                g->setSplitPassesByLightingType(split);
         }
     }
     //-----------------------------------------------------------------------
@@ -189,10 +189,10 @@ namespace Ogre {
     {
         mSplitNoShadowPasses = split;
 
-        for (size_t i = 0; i < RENDER_QUEUE_COUNT; ++i)
+        for (auto & g : mGroups)
         {
-            if(mGroups[i])
-                mGroups[i]->setSplitNoShadowPasses(split);
+            if(g)
+                g->setSplitNoShadowPasses(split);
         }
     }
     //-----------------------------------------------------------------------
@@ -205,10 +205,10 @@ namespace Ogre {
     {
         mShadowCastersCannotBeReceivers = ind;
 
-        for (size_t i = 0; i < RENDER_QUEUE_COUNT; ++i)
+        for (auto & g : mGroups)
         {
-            if(mGroups[i])
-                mGroups[i]->setShadowCastersCannotBeReceivers(ind);
+            if(g)
+                g->setShadowCastersCannotBeReceivers(ind);
         }
     }
     //-----------------------------------------------------------------------

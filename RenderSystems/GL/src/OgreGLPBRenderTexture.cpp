@@ -81,9 +81,9 @@ namespace Ogre {
     GLPBRTTManager::~GLPBRTTManager()
     {
         // Delete remaining PBuffers
-        for(size_t x=0; x<PCT_COUNT; ++x)
+        for(auto & mPBuffer : mPBuffers)
         {
-            delete mPBuffers[x].pb;
+            delete mPBuffer.pb;
         }
     }
 

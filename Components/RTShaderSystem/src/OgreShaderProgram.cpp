@@ -320,9 +320,9 @@ UniformParameterPtr Program::getParameterByAutoType(GpuProgramParameters::AutoCo
 //-----------------------------------------------------------------------------
 void Program::addDependency(const String& libFileName)
 {
-    for (unsigned int i=0; i < mDependencies.size(); ++i)
+    for (auto & dep : mDependencies)
     {
-        if (mDependencies[i] == libFileName)
+        if (dep == libFileName)
         {
             return;
         }

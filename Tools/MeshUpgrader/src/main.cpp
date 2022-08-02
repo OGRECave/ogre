@@ -820,9 +820,7 @@ void checkColour(VertexData* vdata, bool& hasColour, bool& hasAmbiguousColour,
                  VertexElementType& originalType)
 {
     const VertexDeclaration::VertexElementList& elemList = vdata->vertexDeclaration->getElements();
-    for (VertexDeclaration::VertexElementList::const_iterator i = elemList.begin();
-         i != elemList.end(); ++i) {
-        const VertexElement& elem = *i;
+    for (const auto & elem : elemList) {
         switch (elem.getType()) {
         case _DETAIL_SWAP_RB:
             hasColour = true;

@@ -59,11 +59,10 @@ namespace Ogre {
         ViewportList vlist = mViewportList;
         
         // Delete viewports
-        for (ViewportList::iterator i = vlist.begin();
-            i != vlist.end(); ++i)
+        for (auto & i : vlist)
         {
-            fireViewportRemoved(i->second);
-            OGRE_DELETE (*i).second;
+            fireViewportRemoved(i.second);
+            OGRE_DELETE i.second;
         }
 
         //DepthBuffer keeps track of us, avoid a dangling pointer

@@ -491,10 +491,8 @@ namespace Ogre
         //  samplers
         uint8 numSamplers = (uint8)decl.samplers.size();
         stream.write(&numSamplers);
-        for (TerrainLayerSamplerList::const_iterator i = decl.samplers.begin(); 
-            i != decl.samplers.end(); ++i)
+        for (const auto & sampler : decl.samplers)
         {
-            const TerrainLayerSampler& sampler = *i;
             stream.writeChunkBegin(TERRAINLAYERSAMPLER_CHUNK_ID, TERRAINLAYERSAMPLER_CHUNK_VERSION);
             stream.write(&sampler.alias);
             uint8 pixFmt = (uint8)sampler.format;
@@ -504,10 +502,8 @@ namespace Ogre
         //  elements
         uint8 numElems = (uint8)decl.elements.size();
         stream.write(&numElems);
-        for (TerrainLayerSamplerElementList::const_iterator i = decl.elements.begin(); 
-            i != decl.elements.end(); ++i)
+        for (auto elem : decl.elements)
         {
-            const TerrainLayerSamplerElement& elem= *i;
             stream.writeChunkBegin(TERRAINLAYERSAMPLERELEMENT_CHUNK_ID, TERRAINLAYERSAMPLERELEMENT_CHUNK_VERSION);
             stream.write(&elem.source);
             uint8 sem = (uint8)elem.semantic;
@@ -564,15 +560,13 @@ namespace Ogre
     {
         uint8 numLayers = (uint8)layers.size();
         stream.write(&numLayers);
-        for (LayerInstanceList::const_iterator i = layers.begin(); i != layers.end(); ++i)
+        for (const auto & inst : layers)
         {
-            const LayerInstance& inst = *i;
             stream.writeChunkBegin(TERRAINLAYERINSTANCE_CHUNK_ID, TERRAINLAYERINSTANCE_CHUNK_VERSION);
             stream.write(&inst.worldSize);
-            for (StringVector::const_iterator t = inst.textureNames.begin(); 
-                t != inst.textureNames.end(); ++t)
+            for (const auto & textureName : inst.textureNames)
             {
-                stream.write(&(*t));
+                stream.write(&textureName);
             }
             stream.writeChunkEnd(TERRAINLAYERINSTANCE_CHUNK_ID);
         }
@@ -1974,9 +1968,9 @@ namespace Ogre
         TextureManager* tmgr = TextureManager::getSingletonPtr();
         if (tmgr)
         {
-            for (TexturePtrList::iterator i = mBlendTextureList.begin(); i != mBlendTextureList.end(); ++i)
+            for (auto & i : mBlendTextureList)
             {   
-                tmgr->remove((*i)->getHandle());
+                tmgr->remove(i->getHandle());
             }
             mBlendTextureList.clear();
 
@@ -2505,9 +2499,8 @@ namespace Ogre
     //---------------------------------------------------------------------
     void Terrain::checkLayers(bool includeGPUResources)
     {
-        for (LayerInstanceList::iterator it = mLayers.begin(); it != mLayers.end(); ++it)
+        for (auto & layer : mLayers)
         {
-            LayerInstance& layer = *it;
             // If we're missing sampler entries compared to the declaration, initialise them
             for (size_t i = layer.textureNames.size(); i < mLayerDecl.samplers.size(); ++i)
             {
@@ -3354,9 +3347,9 @@ namespace Ogre
         getPoint(inRect.left, inRect.bottom-1, startHeight, &corners[2]);
         getPoint(inRect.right-1, inRect.bottom-1, startHeight, &corners[3]);
 
-        for (int i = 0; i < 4; ++i)
+        for (auto & corner : corners)
         {
-            Ray ray(corners[i] + mPos, vec);
+            Ray ray(corner + mPos, vec);
             std::pair<bool, Real> rayHit = ray.intersects(p);
             if(rayHit.first)
             {

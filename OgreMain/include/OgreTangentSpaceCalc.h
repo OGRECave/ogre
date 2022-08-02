@@ -226,11 +226,8 @@ namespace Ogre
         template <typename T>
         void remapIndexes(T* ibuf, size_t indexSet, Result& res)
         {
-            for (IndexRemapList::iterator i = res.indexesRemapped.begin();
-                i != res.indexesRemapped.end(); ++i)
+            for (auto & remap : res.indexesRemapped)
             {
-                IndexRemap& remap = *i;
-
                 // Note that because this is a vertex split situation, and vertex
                 // split is only for some faces, it's not a case of replacing all
                 // instances of vertex index A with vertex index B

@@ -131,8 +131,8 @@ try
         log.logMessage("Finished parsing VRML file");
 
         // populate name map
-        for (vrmllib::file::defs_t::iterator i=vfile.defs.begin(), e=vfile.defs.end(); i!=e; ++i)
-            gNameMap[i->second] = i->first;
+        for (auto & def : vfile.defs)
+            gNameMap[def.second] = def.first;
 
         // search from SubMeshes
         parseFile(mesh.get(), vfile);
@@ -178,8 +178,8 @@ catch (const char *e) {
 
 void parseFile(Mesh *mesh, const vrmllib::file &file)
 {
-    for (vrmllib::file::roots_t::const_iterator i=file.roots.begin(), e=file.roots.end(); i!=e; ++i)
-        parseNode(mesh, *i);
+    for (auto root : file.roots)
+        parseNode(mesh, root);
 }
 
 void parseNode(Mesh *mesh, const vrmllib::node *n, Matrix4 m)
@@ -206,9 +206,8 @@ void parseNode(Mesh *mesh, const vrmllib::node *n, Matrix4 m)
     }
 
     if (const grouping_node *gn = dynamic_cast<const grouping_node *>(n)) {
-        for (std::vector<vrmllib::node *>::const_iterator
-            i=gn->children.begin(), e=gn->children.end(); i!=e; ++i)
-                parseNode(mesh, *i, m);
+        for (auto i : gn->children)
+                parseNode(mesh, i, m);
 
     } else if (const Shape *sh = dynamic_cast<const Shape *>(n))
         parseShape(mesh, sh, m);
@@ -304,8 +303,8 @@ try
     TriVec triangles;
 
     AxisAlignedBox bbox = mesh->getBounds();
-    for(size_t i = 0; i < coord->point.size(); i++) {
-        bbox.merge(vec(coord->point[i]));
+    for(auto & i : coord->point) {
+        bbox.merge(vec(i));
     }
     mesh->_setBounds(bbox);
     log.logMessage("Processing geometry...");

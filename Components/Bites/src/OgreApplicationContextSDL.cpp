@@ -146,12 +146,12 @@ void ApplicationContextSDL::pollEvents()
             if(event.window.event != SDL_WINDOWEVENT_RESIZED)
                 continue;
 
-            for(WindowList::iterator it = mWindows.begin(); it != mWindows.end(); ++it)
+            for(auto & window : mWindows)
             {
-                if(event.window.windowID != SDL_GetWindowID(it->native))
+                if(event.window.windowID != SDL_GetWindowID(window.native))
                     continue;
 
-                Ogre::RenderWindow* win = it->render;
+                Ogre::RenderWindow* win = window.render;
                 win->resize(event.window.data1, event.window.data2);
                 windowResized(win);
             }

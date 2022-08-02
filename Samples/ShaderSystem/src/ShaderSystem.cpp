@@ -269,10 +269,8 @@ void Sample_ShaderSystem::setupContent()
     mCamera->setNearClipDistance(30);
 
     // Load sample meshes and generate tangent vectors.
-    for (int i=0; i < MESH_ARRAY_SIZE; ++i)
+    for (const auto & curMeshName : MESH_ARRAY)
     {
-        const String& curMeshName = MESH_ARRAY[i];
-
         MeshPtr pMesh = MeshManager::getSingleton().load(curMeshName,
             ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,    
             HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY, 
@@ -491,9 +489,8 @@ void Sample_ShaderSystem::setupUI()
 void Sample_ShaderSystem::cleanupContent()
 {   
     // UnLoad sample meshes and generate tangent vectors.
-    for (int i=0; i < MESH_ARRAY_SIZE; ++i)
+    for (const auto & curMeshName : MESH_ARRAY)
     {
-        const String& curMeshName = MESH_ARRAY[i];
         MeshManager::getSingleton().unload(curMeshName, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
     }
     
@@ -848,9 +845,9 @@ void Sample_ShaderSystem::updateAddLotsOfModels(bool addThem)
             addModelToScene("tudorhouse.mesh");
             addModelToScene("WoodPallet.mesh");
         }
-        for (size_t i = 0 ; i < mLotsOfModelsNodes.size() ; i++)
+        for (auto & n : mLotsOfModelsNodes)
         {
-            mLotsOfModelsNodes[i]->setVisible(mAddedLotsOfModels);
+            n->setVisible(mAddedLotsOfModels);
         }
         
     }

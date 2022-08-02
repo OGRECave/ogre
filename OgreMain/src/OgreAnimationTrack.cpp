@@ -178,9 +178,9 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void AnimationTrack::_collectKeyFrameTimes(std::vector<Real>& keyFrameTimes)
     {
-        for (KeyFrameList::const_iterator i = mKeyFrames.begin(); i != mKeyFrames.end(); ++i)
+        for (auto k : mKeyFrames)
         {
-            Real timePos = (*i)->getTime();
+            Real timePos = k->getTime();
 
             std::vector<Real>::iterator it =
                 std::lower_bound(keyFrameTimes.begin(), keyFrameTimes.end(), timePos);
@@ -211,10 +211,9 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void AnimationTrack::populateClone(AnimationTrack* clone) const
     {
-        for (KeyFrameList::const_iterator i = mKeyFrames.begin();
-            i != mKeyFrames.end(); ++i)
+        for (auto k : mKeyFrames)
         {
-            KeyFrame* clonekf = (*i)->_clone(clone);
+            KeyFrame* clonekf = k->_clone(clone);
             clone->mKeyFrames.push_back(clonekf);
         }
     }
@@ -652,9 +651,9 @@ namespace Ogre {
     {
         const TransformKeyFrame* base = static_cast<const TransformKeyFrame*>(b);
         
-        for (KeyFrameList::iterator i = mKeyFrames.begin(); i != mKeyFrames.end(); ++i)
+        for (auto & k : mKeyFrames)
         {
-            TransformKeyFrame* kf = static_cast<TransformKeyFrame*>(*i);
+            TransformKeyFrame* kf = static_cast<TransformKeyFrame*>(k);
             kf->setTranslate(kf->getTranslate() - base->getTranslate());
             kf->setRotation(base->getRotation().Inverse() * kf->getRotation());
             kf->setScale(kf->getScale() * (Vector3::UNIT_SCALE / base->getScale()));
@@ -707,37 +706,33 @@ namespace Ogre {
             // key 2 and interpolate the influence
             const VertexPoseKeyFrame::PoseRefList& poseList1 = vkf1->getPoseReferences();
             const VertexPoseKeyFrame::PoseRefList& poseList2 = vkf2->getPoseReferences();
-            for (VertexPoseKeyFrame::PoseRefList::const_iterator p1 = poseList1.begin();
-                 p1 != poseList1.end(); ++p1)
+            for (auto p1 : poseList1)
             {
-                Real startInfluence = p1->influence;
+                Real startInfluence = p1.influence;
                 Real endInfluence = 0;
                 // Search for entry in keyframe 2 list (if not there, will be 0)
-                for (VertexPoseKeyFrame::PoseRefList::const_iterator p2 = poseList2.begin();
-                     p2 != poseList2.end(); ++p2)
+                for (auto p2 : poseList2)
                 {
-                    if (p1->poseIndex == p2->poseIndex)
+                    if (p1.poseIndex == p2.poseIndex)
                     {
-                        endInfluence = p2->influence;
+                        endInfluence = p2.influence;
                         break;
                     }
                 }
                 // Interpolate influence
                 Real influence = startInfluence + t*(endInfluence - startInfluence);
                 
-                vkfOut->addPoseReference(p1->poseIndex, influence);
+                vkfOut->addPoseReference(p1.poseIndex, influence);
                 
                 
             }
             // Now deal with any poses in key 2 which are not in key 1
-            for (VertexPoseKeyFrame::PoseRefList::const_iterator p2 = poseList2.begin();
-                 p2 != poseList2.end(); ++p2)
+            for (auto p2 : poseList2)
             {
                 bool found = false;
-                for (VertexPoseKeyFrame::PoseRefList::const_iterator p1 = poseList1.begin();
-                     p1 != poseList1.end(); ++p1)
+                for (auto p1 : poseList1)
                 {
-                    if (p1->poseIndex == p2->poseIndex)
+                    if (p1.poseIndex == p2.poseIndex)
                     {
                         found = true;
                         break;
@@ -746,9 +741,9 @@ namespace Ogre {
                 if (!found)
                 {
                     // Need to apply this pose too, scaled from 0 start
-                    Real influence = t * p2->influence;
+                    Real influence = t * p2.influence;
                     
-                    vkfOut->addPoseReference(p2->poseIndex, influence);
+                    vkfOut->addPoseReference(p2.poseIndex, influence);
 
                 }
             } // key 2 iteration
@@ -851,18 +846,16 @@ namespace Ogre {
             // key 2 and interpolate the influence
             const VertexPoseKeyFrame::PoseRefList& poseList1 = vkf1->getPoseReferences();
             const VertexPoseKeyFrame::PoseRefList& poseList2 = vkf2->getPoseReferences();
-            for (VertexPoseKeyFrame::PoseRefList::const_iterator p1 = poseList1.begin();
-                p1 != poseList1.end(); ++p1)
+            for (auto p1 : poseList1)
             {
-                Real startInfluence = p1->influence;
+                Real startInfluence = p1.influence;
                 Real endInfluence = 0;
                 // Search for entry in keyframe 2 list (if not there, will be 0)
-                for (VertexPoseKeyFrame::PoseRefList::const_iterator p2 = poseList2.begin();
-                    p2 != poseList2.end(); ++p2)
+                for (auto p2 : poseList2)
                 {
-                    if (p1->poseIndex == p2->poseIndex)
+                    if (p1.poseIndex == p2.poseIndex)
                     {
-                        endInfluence = p2->influence;
+                        endInfluence = p2.influence;
                         break;
                     }
                 }
@@ -871,20 +864,18 @@ namespace Ogre {
                 // Scale by animation weight
                 influence = weight * influence;
                 // Get pose
-                assert (poseList && p1->poseIndex < poseList->size());
-                Pose* pose = (*poseList)[p1->poseIndex];
+                assert (poseList && p1.poseIndex < poseList->size());
+                Pose* pose = (*poseList)[p1.poseIndex];
                 // apply
                 applyPoseToVertexData(pose, data, influence);
             }
             // Now deal with any poses in key 2 which are not in key 1
-            for (VertexPoseKeyFrame::PoseRefList::const_iterator p2 = poseList2.begin();
-                p2 != poseList2.end(); ++p2)
+            for (auto p2 : poseList2)
             {
                 bool found = false;
-                for (VertexPoseKeyFrame::PoseRefList::const_iterator p1 = poseList1.begin();
-                    p1 != poseList1.end(); ++p1)
+                for (auto p1 : poseList1)
                 {
-                    if (p1->poseIndex == p2->poseIndex)
+                    if (p1.poseIndex == p2.poseIndex)
                     {
                         found = true;
                         break;
@@ -893,12 +884,12 @@ namespace Ogre {
                 if (!found)
                 {
                     // Need to apply this pose too, scaled from 0 start
-                    Real influence = t * p2->influence;
+                    Real influence = t * p2.influence;
                     // Scale by animation weight
                     influence = weight * influence;
                     // Get pose
-                    assert (poseList && p2->poseIndex <= poseList->size());
-                    const Pose* pose = (*poseList)[p2->poseIndex];
+                    assert (poseList && p2.poseIndex <= poseList->size());
+                    const Pose* pose = (*poseList)[p2.poseIndex];
                     // apply
                     applyPoseToVertexData(pose, data, influence);
                 }
@@ -1014,9 +1005,9 @@ namespace Ogre {
     {
         const VertexPoseKeyFrame* base = static_cast<const VertexPoseKeyFrame*>(b);
         
-        for (KeyFrameList::iterator i = mKeyFrames.begin(); i != mKeyFrames.end(); ++i)
+        for (auto & k : mKeyFrames)
         {
-            VertexPoseKeyFrame* kf = static_cast<VertexPoseKeyFrame*>(*i);
+            VertexPoseKeyFrame* kf = static_cast<VertexPoseKeyFrame*>(k);
             
             kf->_applyBaseKeyFrame(base);
         }

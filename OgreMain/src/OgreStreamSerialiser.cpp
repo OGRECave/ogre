@@ -136,8 +136,8 @@ namespace Ogre
                 "Warning: stream " << mStream->getName() << " was not fully read / written; " <<
                 mChunkStack.size() << " chunks remain unterminated.";
         }
-        for (ChunkStack::iterator i = mChunkStack.begin(); i != mChunkStack.end(); ++i)
-            delete *i;
+        for (auto & i : mChunkStack)
+            delete i;
         mChunkStack.clear();
 
     }

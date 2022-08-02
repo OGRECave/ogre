@@ -207,9 +207,8 @@ namespace {
         // Divide the passes into the 3 categories
         const IlluminationPassList& passes = pTech->getIlluminationPasses();
 
-        for(size_t i = 0; i < passes.size(); i++)
+        for(auto p : passes)
         {
-            IlluminationPass* p = passes[i];
             // Insert into solid list
             QueuedRenderableCollection* collection = NULL;
             switch(p->stage)

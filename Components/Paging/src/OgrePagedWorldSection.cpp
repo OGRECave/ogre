@@ -173,9 +173,9 @@ namespace Ogre
         ser.writeChunkEnd(CHUNK_ID);
 
         // save all pages (in separate files)
-        for (PageMap::iterator i = mPages.begin(); i != mPages.end(); ++i)
+        for (auto & p : mPages)
         {
-            i->second->save();
+            p.second->save();
         }
 
 
@@ -311,9 +311,9 @@ namespace Ogre
         if (!mParent->getManager()->getPagingOperationsEnabled())
             return;
 
-        for (PageMap::iterator i= mPages.begin(); i != mPages.end(); ++i)
+        for (auto & p : mPages)
         {
-            OGRE_DELETE i->second;
+            OGRE_DELETE p.second;
         }
         mPages.clear();
 
@@ -323,8 +323,8 @@ namespace Ogre
     {
         mStrategy->frameStart(timeSinceLastFrame, this);
 
-        for (PageMap::iterator i = mPages.begin(); i != mPages.end(); ++i)
-            i->second->frameStart(timeSinceLastFrame);
+        for (auto & p : mPages)
+            p.second->frameStart(timeSinceLastFrame);
     }
     //---------------------------------------------------------------------
     void PagedWorldSection::frameEnd(Real timeElapsed)
@@ -349,8 +349,8 @@ namespace Ogre
     {
         mStrategy->notifyCamera(cam, this);
 
-        for (PageMap::iterator i = mPages.begin(); i != mPages.end(); ++i)
-            i->second->notifyCamera(cam);
+        for (auto & p : mPages)
+            p.second->notifyCamera(cam);
     }
     //---------------------------------------------------------------------
     StreamSerialiser* PagedWorldSection::_readPageStream(PageID pageID)
