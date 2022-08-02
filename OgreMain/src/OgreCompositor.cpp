@@ -210,7 +210,7 @@ void Compositor::createGlobalTextures()
                     
                     tex = TextureManager::getSingleton().createManual(
                             texname, 
-                            ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME, TEX_TYPE_2D, \
+                            RGN_INTERNAL, TEX_TYPE_2D,
                             (uint)def->width, (uint)def->height, 0, p, TU_RENDERTARGET, 0,  \
                             def->hwGammaWrite && !PixelUtil::isFloatingPoint(p), def->fsaa);
                     
