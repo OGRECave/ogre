@@ -570,19 +570,20 @@ namespace Ogre {
         Vector3 lasttrans = Vector3::ZERO;
         Vector3 lastscale = Vector3::ZERO;
         Quaternion lastorientation;
+        KeyFrameList::iterator i = mKeyFrames.begin();
         Radian quatTolerance(1e-3f);
         std::list<unsigned short> removeList;
         unsigned short k = 0;
         ushort dupKfCount = 0;
-        for (auto& i : mKeyFrames)
+        for (; i != mKeyFrames.end(); ++i, ++k)
         {
-            TransformKeyFrame* kf = static_cast<TransformKeyFrame*>(i);
+            TransformKeyFrame* kf = static_cast<TransformKeyFrame*>(*i);
             Vector3 newtrans = kf->getTranslate();
             Vector3 newscale = kf->getScale();
             Quaternion neworientation = kf->getRotation();
             // Ignore first keyframe; now include the last keyframe as we eliminate
             // only k-2 in a group of 5 to ensure we only eliminate middle keys
-            if (i != *mKeyFrames.begin() &&
+            if (i != mKeyFrames.begin() &&
                 newtrans.positionEquals(lasttrans) &&
                 newscale.positionEquals(lastscale) &&
                 neworientation.equals(lastorientation, quatTolerance))
@@ -750,11 +751,11 @@ namespace Ogre {
         if (mAnimationType == VAT_MORPH)
         {
             bool normals = false;
-            for (const auto& k : mKeyFrames)
+            for (KeyFrameList::const_iterator i = mKeyFrames.begin(); i != mKeyFrames.end(); ++i)
             {
-                VertexMorphKeyFrame* kf = static_cast<VertexMorphKeyFrame*>(k);
+                VertexMorphKeyFrame* kf = static_cast<VertexMorphKeyFrame*>(*i);
                 bool thisnorm = kf->getVertexBuffer()->getVertexSize() > 12;
-                if (k == *mKeyFrames.begin())
+                if (i == mKeyFrames.begin())
                     normals = thisnorm;
                 else
                     // Only support normals if ALL keyframes include them

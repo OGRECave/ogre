@@ -174,9 +174,8 @@ void Compositor::createGlobalTextures()
     CompositionTechnique* firstTechnique = mSupportedTechniques[0];
 
     const CompositionTechnique::TextureDefinitions& tdefs = firstTechnique->getTextureDefinitions();
-    for (const auto& texDefIt : tdefs)
+    for (auto def : tdefs)
     {
-        CompositionTechnique::TextureDefinition* def = texDefIt;
         if (def->scope == CompositionTechnique::TS_GLOBAL) 
         {
             //Check that this is a legit global texture

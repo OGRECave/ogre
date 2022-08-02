@@ -237,16 +237,14 @@ namespace Ogre
         // lock rhs
             OGRE_LOCK_MUTEX(rhs.OGRE_AUTO_MUTEX_NAME);
 
-        for (auto& s : rhs.mAnimationStates)
+        for (auto st : rhs.mAnimationStates)
         {
-            AnimationState* src = s.second;
-            mAnimationStates[src->getAnimationName()] = OGRE_NEW AnimationState(this, *src);
+            mAnimationStates[(st.second)->getAnimationName()] = OGRE_NEW AnimationState(this, *(st.second));
         }
 
         // Clone enabled animation state list
-        for (auto& s : rhs.mEnabledAnimationStates)
+        for (auto src : rhs.mEnabledAnimationStates)
         {
-            const AnimationState* src = s;
             mEnabledAnimationStates.push_back(getAnimationState(src->getAnimationName()));
         }
     }
@@ -360,9 +358,8 @@ namespace Ogre
         // Copy matching enabled animation state list
         target->mEnabledAnimationStates.clear();
 
-        for (auto& s : mEnabledAnimationStates)
+        for (auto src : mEnabledAnimationStates)
         {
-            const AnimationState* src = s;
             AnimationStateMap::const_iterator itarget = target->mAnimationStates.find(src->getAnimationName());
             if (itarget != target->mAnimationStates.end())
             {

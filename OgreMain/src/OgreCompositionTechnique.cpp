@@ -147,10 +147,8 @@ bool CompositionTechnique::isSupported(bool acceptTextureDegradation)
     }
 
     TextureManager& texMgr = TextureManager::getSingleton();
-    for (auto& i : mTextureDefinitions)
+    for (auto td : mTextureDefinitions)
     {
-        TextureDefinition* td = i;
-
         // Firstly check MRTs
         if (td->formatList.size() > 
             Root::getSingleton().getRenderSystem()->getCapabilities()->getNumMultiRenderTargets())
