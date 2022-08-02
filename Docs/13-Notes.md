@@ -161,5 +161,9 @@ The RenderSystem does not yet support all of Ogre features, but many common use-
 This new Plugin enables Ogre to automatically compile GLSL shaders to SPIRV that in turn will be loaded by GL3+.
 This means you can now easily use the Khronos reference compiler instead of what your driver would do - similar to how things work on D3D11.
 
+## Bullet Component (since 13.4)
+
+btOgre was moved into Ogre as the Bullet Component. This allows you to just build it as part of Ogre on one hand and on the other hand this ensures that it is integration tested by our CI.
+
 ## HLMS
 The component was removed. The RTSS or just plain shaders in Ogre materials are a better way forward.
