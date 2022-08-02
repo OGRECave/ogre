@@ -75,10 +75,9 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void Quake3ShaderManager::clear(void)
     {
-        for (Quake3ShaderMap::iterator i = mShaderMap.begin();
-            i != mShaderMap.end(); ++i)
+        for (auto & i : mShaderMap)
         {
-            OGRE_DELETE i->second;
+            OGRE_DELETE i.second;
         }
         mShaderMap.clear();
     }

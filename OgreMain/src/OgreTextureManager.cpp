@@ -223,9 +223,9 @@ namespace Ogre {
         if (reloadTextures)
         {
             // Iterate through all textures
-            for (ResourceMap::iterator it = mResources.begin(); it != mResources.end(); ++it)
+            for (auto & r : mResources)
             {
-                Texture* texture = static_cast<Texture*>(it->second.get());
+                Texture* texture = static_cast<Texture*>(r.second.get());
                 // Reload loaded and reloadable texture only
                 if (texture->isLoaded() && texture->isReloadable())
                 {
@@ -253,9 +253,9 @@ namespace Ogre {
         if (reloadTextures)
         {
             // Iterate through all textures
-            for (ResourceMap::iterator it = mResources.begin(); it != mResources.end(); ++it)
+            for (auto & r : mResources)
             {
-                Texture* texture = static_cast<Texture*>(it->second.get());
+                Texture* texture = static_cast<Texture*>(r.second.get());
                 // Reload loaded and reloadable texture only
                 if (texture->isLoaded() && texture->isReloadable())
                 {
@@ -284,9 +284,9 @@ namespace Ogre {
         if (reloadTextures)
         {
             // Iterate through all textures
-            for (ResourceMap::iterator it = mResources.begin(); it != mResources.end(); ++it)
+            for (auto & r : mResources)
             {
-                Texture* texture = static_cast<Texture*>(it->second.get());
+                Texture* texture = static_cast<Texture*>(r.second.get());
                 // Reload loaded and reloadable texture only
                 if (texture->isLoaded() && texture->isReloadable())
                 {

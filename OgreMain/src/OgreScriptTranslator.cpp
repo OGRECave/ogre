@@ -1110,11 +1110,11 @@ namespace Ogre{
 
         bool bval;
 
-        for(AbstractNodeList::iterator i = obj->children.begin(); i != obj->children.end(); ++i)
+        for(auto & i : obj->children)
         {
-            if((*i)->type == ANT_PROPERTY)
+            if(i->type == ANT_PROPERTY)
             {
-                PropertyAbstractNode *prop = static_cast<PropertyAbstractNode*>((*i).get());
+                PropertyAbstractNode *prop = static_cast<PropertyAbstractNode*>(i.get());
                 switch(prop->id)
                 {
                 case ID_LOD_VALUES:
@@ -1220,9 +1220,9 @@ namespace Ogre{
                                        "token \"" + prop->name + "\" is not recognized");
                 }
             }
-            else if((*i)->type == ANT_OBJECT)
+            else if(i->type == ANT_OBJECT)
             {
-                processNode(compiler, *i);
+                processNode(compiler, i);
             }
         }
 
@@ -1263,11 +1263,11 @@ namespace Ogre{
         String sval;
 
         // Set the properties for the material
-        for(AbstractNodeList::iterator i = obj->children.begin(); i != obj->children.end(); ++i)
+        for(auto & i : obj->children)
         {
-            if((*i)->type == ANT_PROPERTY)
+            if(i->type == ANT_PROPERTY)
             {
-                PropertyAbstractNode *prop = static_cast<PropertyAbstractNode*>((*i).get());
+                PropertyAbstractNode *prop = static_cast<PropertyAbstractNode*>(i.get());
                 switch(prop->id)
                 {
                 case ID_SCHEME:
@@ -1409,9 +1409,9 @@ namespace Ogre{
                                        "token \"" + prop->name + "\" is not recognized");
                 }
             }
-            else if((*i)->type == ANT_OBJECT)
+            else if(i->type == ANT_OBJECT)
             {
-                processNode(compiler, *i);
+                processNode(compiler, i);
             }
         }
     }
@@ -1441,11 +1441,11 @@ namespace Ogre{
         uint32 uival;
 
         // Set the properties for the material
-        for(AbstractNodeList::iterator i = obj->children.begin(); i != obj->children.end(); ++i)
+        for(auto & i : obj->children)
         {
-            if((*i)->type == ANT_PROPERTY)
+            if(i->type == ANT_PROPERTY)
             {
-                PropertyAbstractNode *prop = static_cast<PropertyAbstractNode*>((*i).get());
+                PropertyAbstractNode *prop = static_cast<PropertyAbstractNode*>(i.get());
                 switch(prop->id)
                 {
                 case ID_AMBIENT:
@@ -2281,9 +2281,9 @@ namespace Ogre{
                                        "token \"" + prop->name + "\" is not recognized");
                 }
             }
-            else if((*i)->type == ANT_OBJECT)
+            else if(i->type == ANT_OBJECT)
             {
-                ObjectAbstractNode *child = static_cast<ObjectAbstractNode*>((*i).get());
+                ObjectAbstractNode *child = static_cast<ObjectAbstractNode*>(i.get());
                 switch(child->id)
                 {
                 case ID_FRAGMENT_PROGRAM_REF:
@@ -2307,7 +2307,7 @@ namespace Ogre{
                     translateShadowReceiverProgramRef(GPT_FRAGMENT_PROGRAM, compiler, child);
                     break;
                 default:
-                    processNode(compiler, *i);
+                    processNode(compiler, i);
                     break;
                 case ID_FRAGMENT_PROGRAM:
                 case ID_VERTEX_PROGRAM:
@@ -2317,7 +2317,7 @@ namespace Ogre{
                 case ID_COMPUTE_PROGRAM:
                 {
                     // auto assign inline defined programs
-                    processNode(compiler, *i);
+                    processNode(compiler, i);
                     GpuProgramType type = getProgramType(child->id);
                     mPass->setGpuProgram(type, GpuProgramUsage::_getProgramByName(child->name, mPass->getResourceGroup(), type));
                 }
@@ -2587,11 +2587,11 @@ namespace Ogre{
         SamplerPtr sampler = TextureManager::getSingleton().createSampler(obj->name);
 
         // Set the properties for the material
-        for(AbstractNodeList::iterator i = obj->children.begin(); i != obj->children.end(); ++i)
+        for(auto & i : obj->children)
         {
-            if((*i)->type == ANT_PROPERTY)
+            if(i->type == ANT_PROPERTY)
             {
-                PropertyAbstractNode *prop = static_cast<PropertyAbstractNode*>((*i).get());
+                PropertyAbstractNode *prop = static_cast<PropertyAbstractNode*>(i.get());
                 switch(prop->id)
                 {
                 case ID_TEX_ADDRESS_MODE:
@@ -2608,9 +2608,9 @@ namespace Ogre{
                                        "token \"" + prop->name + "\" is not recognized");
                 }
             }
-            else if((*i)->type == ANT_OBJECT)
+            else if(i->type == ANT_OBJECT)
             {
-                processNode(compiler, *i);
+                processNode(compiler, i);
             }
         }
     }
@@ -2632,11 +2632,11 @@ namespace Ogre{
         String sval;
 
         // Set the properties for the material
-        for(AbstractNodeList::iterator i = obj->children.begin(); i != obj->children.end(); ++i)
+        for(auto & i : obj->children)
         {
-            if((*i)->type == ANT_PROPERTY)
+            if(i->type == ANT_PROPERTY)
             {
-                PropertyAbstractNode *prop = static_cast<PropertyAbstractNode*>((*i).get());
+                PropertyAbstractNode *prop = static_cast<PropertyAbstractNode*>(i.get());
                 switch(prop->id)
                 {
                 case ID_TEX_ADDRESS_MODE:
@@ -3423,9 +3423,9 @@ namespace Ogre{
                                        "token \"" + prop->name + "\" is not recognized");
                 }
             }
-            else if((*i)->type == ANT_OBJECT)
+            else if(i->type == ANT_OBJECT)
             {
-                processNode(compiler, *i);
+                processNode(compiler, i);
             }
         }
     }
@@ -3498,11 +3498,11 @@ namespace Ogre{
 
         ExternalTextureSourceManager::getSingleton().getCurrentPlugIn()->setParameter( "set_T_P_S", tps );
 
-        for(AbstractNodeList::iterator i = obj->children.begin(); i != obj->children.end(); ++i)
+        for(auto & i : obj->children)
         {
-            if((*i)->type == ANT_PROPERTY)
+            if(i->type == ANT_PROPERTY)
             {
-                PropertyAbstractNode *prop = (PropertyAbstractNode*)(*i).get();
+                PropertyAbstractNode *prop = (PropertyAbstractNode*)i.get();
                 // Glob the property values all together
                 String str = "";
                 for(AbstractNodeList::iterator j = prop->values.begin(); j != prop->values.end(); ++j)
@@ -3513,9 +3513,9 @@ namespace Ogre{
                 }
                 ExternalTextureSourceManager::getSingleton().getCurrentPlugIn()->setParameter(prop->name, str);
             }
-            else if((*i)->type == ANT_OBJECT)
+            else if(i->type == ANT_OBJECT)
             {
-                processNode(compiler, *i);
+                processNode(compiler, i);
             }
         }
 
@@ -3578,11 +3578,11 @@ namespace Ogre{
         std::vector<std::pair<PropertyAbstractNode*, String> > customParameters;
         String source, profiles, target;
         AbstractNodePtr params;
-        for(AbstractNodeList::iterator i = obj->children.begin(); i != obj->children.end(); ++i)
+        for(auto & i : obj->children)
         {
-            if((*i)->type == ANT_PROPERTY)
+            if(i->type == ANT_PROPERTY)
             {
-                PropertyAbstractNode *prop = (PropertyAbstractNode*)(*i).get();
+                PropertyAbstractNode *prop = (PropertyAbstractNode*)i.get();
                 if(prop->id == ID_SOURCE)
                 {
                     if(!getValue(prop, compiler, source))
@@ -3638,12 +3638,12 @@ namespace Ogre{
                         customParameters.push_back(std::make_pair(prop, value));
                 }
             }
-            else if((*i)->type == ANT_OBJECT)
+            else if(i->type == ANT_OBJECT)
             {
-                if(((ObjectAbstractNode*)(*i).get())->id == ID_DEFAULT_PARAMS)
-                    params = *i;
+                if(((ObjectAbstractNode*)i.get())->id == ID_DEFAULT_PARAMS)
+                    params = i;
                 else
-                    processNode(compiler, *i);
+                    processNode(compiler, i);
             }
         }
 
@@ -3799,11 +3799,11 @@ namespace Ogre{
         uint32 animParametricsCount = 0;
 
         String value;
-        for(AbstractNodeList::iterator i = obj->children.begin(); i != obj->children.end(); ++i)
+        for(auto & i : obj->children)
         {
-            if((*i)->type == ANT_PROPERTY)
+            if(i->type == ANT_PROPERTY)
             {
-                PropertyAbstractNode *prop = static_cast<PropertyAbstractNode*>((*i).get());
+                PropertyAbstractNode *prop = static_cast<PropertyAbstractNode*>(i.get());
                 switch(prop->id)
                 {
                 case ID_SHARED_PARAMS_REF:
@@ -4243,12 +4243,12 @@ namespace Ogre{
             return;
         }
 
-        for (AbstractNodeList::iterator i = obj->children.begin(); i != obj->children.end(); ++i)
+        for (auto & i : obj->children)
         {
-            if ((*i)->type != ANT_PROPERTY)
+            if (i->type != ANT_PROPERTY)
                 continue;
 
-            PropertyAbstractNode *prop = static_cast<PropertyAbstractNode*>((*i).get());
+            PropertyAbstractNode *prop = static_cast<PropertyAbstractNode*>(i.get());
             if (prop->id != ID_SHARED_PARAM_NAMED)
             {
                 compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
@@ -4413,11 +4413,11 @@ namespace Ogre{
 
         obj->context = mSystem;
 
-        for(AbstractNodeList::iterator i = obj->children.begin(); i != obj->children.end(); ++i)
+        for(auto & i : obj->children)
         {
-            if((*i)->type == ANT_PROPERTY)
+            if(i->type == ANT_PROPERTY)
             {
-                PropertyAbstractNode *prop = static_cast<PropertyAbstractNode*>((*i).get());
+                PropertyAbstractNode *prop = static_cast<PropertyAbstractNode*>(i.get());
                 switch(prop->id)
                 {
                 case ID_MATERIAL:
@@ -4487,7 +4487,7 @@ namespace Ogre{
             }
             else
             {
-                processNode(compiler, *i);
+                processNode(compiler, i);
             }
         }
     }
@@ -4530,11 +4530,11 @@ namespace Ogre{
             return;
         }
 
-        for(AbstractNodeList::iterator i = obj->children.begin(); i != obj->children.end(); ++i)
+        for(auto & i : obj->children)
         {
-            if((*i)->type == ANT_PROPERTY)
+            if(i->type == ANT_PROPERTY)
             {
-                PropertyAbstractNode *prop = static_cast<PropertyAbstractNode*>((*i).get());
+                PropertyAbstractNode *prop = static_cast<PropertyAbstractNode*>(i.get());
                 String value;
 
                 // Glob the values together
@@ -4561,7 +4561,7 @@ namespace Ogre{
             }
             else
             {
-                processNode(compiler, *i);
+                processNode(compiler, i);
             }
         }
     }
@@ -4603,11 +4603,11 @@ namespace Ogre{
             return;
         }
 
-        for(AbstractNodeList::iterator i = obj->children.begin(); i != obj->children.end(); ++i)
+        for(auto & i : obj->children)
         {
-            if((*i)->type == ANT_PROPERTY)
+            if(i->type == ANT_PROPERTY)
             {
-                PropertyAbstractNode *prop = static_cast<PropertyAbstractNode*>((*i).get());
+                PropertyAbstractNode *prop = static_cast<PropertyAbstractNode*>(i.get());
                 String value;
 
                 // Glob the values together
@@ -4634,7 +4634,7 @@ namespace Ogre{
             }
             else
             {
-                processNode(compiler, *i);
+                processNode(compiler, i);
             }
         }
     }
@@ -4676,15 +4676,15 @@ namespace Ogre{
         mCompositor->_notifyOrigin(obj->file);
         obj->context = mCompositor;
 
-        for(AbstractNodeList::iterator i = obj->children.begin(); i != obj->children.end(); ++i)
+        for(auto & i : obj->children)
         {
-            if((*i)->type == ANT_OBJECT)
+            if(i->type == ANT_OBJECT)
             {
-                processNode(compiler, *i);
+                processNode(compiler, i);
             }
             else
             {
-                compiler->addError(ScriptCompiler::CE_UNEXPECTEDTOKEN, (*i)->file, (*i)->line,
+                compiler->addError(ScriptCompiler::CE_UNEXPECTEDTOKEN, i->file, i->line,
                                    "token not recognized");
             }
         }
@@ -4708,15 +4708,15 @@ namespace Ogre{
 
         String sval;
 
-        for(AbstractNodeList::iterator i = obj->children.begin(); i != obj->children.end(); ++i)
+        for(auto & i : obj->children)
         {
-            if((*i)->type == ANT_OBJECT)
+            if(i->type == ANT_OBJECT)
             {
-                processNode(compiler, *i);
+                processNode(compiler, i);
             }
-            else if((*i)->type == ANT_PROPERTY)
+            else if(i->type == ANT_PROPERTY)
             {
-                PropertyAbstractNode *prop = static_cast<PropertyAbstractNode*>((*i).get());
+                PropertyAbstractNode *prop = static_cast<PropertyAbstractNode*>(i.get());
                 switch(prop->id)
                 {
                 case ID_TEXTURE:
@@ -4996,15 +4996,15 @@ namespace Ogre{
         uint32 uival;
         String sval;
 
-        for(AbstractNodeList::iterator i = obj->children.begin(); i != obj->children.end(); ++i)
+        for(auto & i : obj->children)
         {
-            if((*i)->type == ANT_OBJECT)
+            if(i->type == ANT_OBJECT)
             {
-                processNode(compiler, *i);
+                processNode(compiler, i);
             }
-            else if((*i)->type == ANT_PROPERTY)
+            else if(i->type == ANT_PROPERTY)
             {
-                PropertyAbstractNode *prop = static_cast<PropertyAbstractNode*>((*i).get());
+                PropertyAbstractNode *prop = static_cast<PropertyAbstractNode*>(i.get());
                 switch(prop->id)
                 {
                 case ID_INPUT:
@@ -5109,15 +5109,15 @@ namespace Ogre{
         String sval;
         StencilOperation sop;
 
-        for(AbstractNodeList::iterator i = obj->children.begin(); i != obj->children.end(); ++i)
+        for(auto & i : obj->children)
         {
-            if((*i)->type == ANT_OBJECT)
+            if(i->type == ANT_OBJECT)
             {
-                processNode(compiler, *i);
+                processNode(compiler, i);
             }
-            else if((*i)->type == ANT_PROPERTY)
+            else if(i->type == ANT_PROPERTY)
             {
-                PropertyAbstractNode *prop = static_cast<PropertyAbstractNode*>((*i).get());
+                PropertyAbstractNode *prop = static_cast<PropertyAbstractNode*>(i.get());
                 switch(prop->id)
                 {
                 case ID_CHECK:

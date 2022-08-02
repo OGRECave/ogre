@@ -100,14 +100,14 @@ namespace Ogre {
             
             // Pull off individual formats (separated by comma by FI)
             StringVector extsVector = StringUtil::split(exts, ",");
-            for (StringVector::iterator v = extsVector.begin(); v != extsVector.end(); ++v)
+            for (auto & v : extsVector)
             {
                 // FreeImage 3.13 lists many formats twice: once under their own codec and
                 // once under the "RAW" codec, which is listed last. Avoid letting the RAW override
                 // the dedicated codec!
-                if (!Codec::isCodecRegistered(*v))
+                if (!Codec::isCodecRegistered(v))
                 {
-                    ImageCodec* codec = OGRE_NEW FreeImageCodec(*v, i);
+                    ImageCodec* codec = OGRE_NEW FreeImageCodec(v, i);
                     msCodecList.push_back(codec);
                     Codec::registerCodec(codec);
                 }
@@ -129,11 +129,10 @@ namespace Ogre {
     {
         FreeImage_DeInitialise();
 
-        for (RegisteredCodecList::iterator i = msCodecList.begin();
-            i != msCodecList.end(); ++i)
+        for (auto & i : msCodecList)
         {
-            Codec::unregisterCodec(*i);
-            OGRE_DELETE *i;
+            Codec::unregisterCodec(i);
+            OGRE_DELETE i;
         }
         msCodecList.clear();
 

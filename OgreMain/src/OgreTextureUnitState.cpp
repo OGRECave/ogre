@@ -219,9 +219,9 @@ namespace Ogre {
         mCompositorRefName = oth.mCompositorRefName;
         mCompositorRefTexName = oth.mCompositorRefTexName;
         // Can't sharing controllers with other TUS, reset to null to avoid potential bug.
-        for (EffectMap::iterator j = mEffects.begin(); j != mEffects.end(); ++j)
+        for (auto & e : mEffects)
         {
-            j->second.controller = 0;
+            e.second.controller = 0;
         }
 
         // Load immediately if Material loaded
@@ -972,9 +972,9 @@ namespace Ogre {
             createAnimController();
         }
         // Effect controllers
-        for (EffectMap::iterator it = mEffects.begin(); it != mEffects.end(); ++it)
+        for (auto & e : mEffects)
         {
-            createEffectController(it->second);
+            createEffectController(e.second);
         }
 
     }
@@ -1158,12 +1158,12 @@ namespace Ogre {
         }
 
         // Destroy effect controllers
-        for (EffectMap::iterator i = mEffects.begin(); i != mEffects.end(); ++i)
+        for (auto & e : mEffects)
         {
-            if (i->second.controller)
+            if (e.second.controller)
             {
-                ControllerManager::getSingleton().destroyController(i->second.controller);
-                i->second.controller = 0;
+                ControllerManager::getSingleton().destroyController(e.second.controller);
+                e.second.controller = 0;
             }
         }
 

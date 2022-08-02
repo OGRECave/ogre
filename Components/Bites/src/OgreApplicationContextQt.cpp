@@ -217,20 +217,20 @@ namespace OgreBites
             mRoot->queueEndRendering();
             break;
         case QEvent::UpdateRequest:
-            for(WindowList::iterator it = mWindows.begin(); it != mWindows.end(); ++it)
+            for(auto & window : mWindows)
             {
-                if(w->winId() != ((QWindow*)it->native)->winId())
+                if(w->winId() != ((QWindow*)window.native)->winId())
                     continue;
-                it->render->update();
+                window.render->update();
             }
             break;
         case QEvent::Resize:
-            for(WindowList::iterator it = mWindows.begin(); it != mWindows.end(); ++it)
+            for(auto & window : mWindows)
             {
-                if(w->winId() != ((QWindow*)it->native)->winId())
+                if(w->winId() != ((QWindow*)window.native)->winId())
                     continue;
 
-                Ogre::RenderWindow* win = it->render;
+                Ogre::RenderWindow* win = window.render;
                 win->resize(w->width(), w->height());
                 windowResized(win);
             }

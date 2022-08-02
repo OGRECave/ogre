@@ -137,20 +137,20 @@ void Compositor::compile()
 //---------------------------------------------------------------------
 CompositionTechnique* Compositor::getSupportedTechnique(const String& schemeName)
 {
-    for(Techniques::iterator i = mSupportedTechniques.begin(); i != mSupportedTechniques.end(); ++i)
+    for(auto & t : mSupportedTechniques)
     {
-        if ((*i)->getSchemeName() == schemeName)
+        if (t->getSchemeName() == schemeName)
         {
-            return *i;
+            return t;
         }
     }
 
     // didn't find a matching one
-    for(Techniques::iterator i = mSupportedTechniques.begin(); i != mSupportedTechniques.end(); ++i)
+    for(auto & t : mSupportedTechniques)
     {
-        if ((*i)->getSchemeName().empty())
+        if (t->getSchemeName().empty())
         {
-            return *i;
+            return t;
         }
     }
 

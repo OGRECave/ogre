@@ -52,9 +52,9 @@ VTestPlugin::VTestPlugin()
 
 VTestPlugin::~VTestPlugin()
 {
-    for (OgreBites::SampleSet::iterator i = mSamples.begin(); i != mSamples.end(); ++i)
+    for (auto s : mSamples)
     {
-        delete *i;
+        delete s;
     }
     mSamples.clear();
 }

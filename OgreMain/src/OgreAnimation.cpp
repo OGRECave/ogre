@@ -565,10 +565,9 @@ namespace Ogre {
         }
 
         // Now destroy the tracks we marked for death
-        for(std::list<unsigned short>::iterator h = tracksToDestroy.begin();
-            h != tracksToDestroy.end(); ++h)
+        for(unsigned short & h : tracksToDestroy)
         {
-            destroyNodeTrack(*h);
+            destroyNodeTrack(h);
         }
     }
     //-----------------------------------------------------------------------
@@ -593,10 +592,9 @@ namespace Ogre {
         }
 
         // Now destroy the tracks we marked for death
-        for(std::list<unsigned short>::iterator h = tracksToDestroy.begin();
-            h != tracksToDestroy.end(); ++h)
+        for(unsigned short & h : tracksToDestroy)
         {
-            destroyVertexTrack(*h);
+            destroyVertexTrack(h);
         }
 
     }
@@ -608,20 +606,17 @@ namespace Ogre {
         newAnim->mRotationInterpolationMode = mRotationInterpolationMode;
         
         // Clone all tracks
-        for (NodeTrackList::const_iterator i = mNodeTrackList.begin();
-            i != mNodeTrackList.end(); ++i)
+        for (auto i : mNodeTrackList)
         {
-            i->second->_clone(newAnim);
+            i.second->_clone(newAnim);
         }
-        for (NumericTrackList::const_iterator i = mNumericTrackList.begin();
-            i != mNumericTrackList.end(); ++i)
+        for (auto i : mNumericTrackList)
         {
-            i->second->_clone(newAnim);
+            i.second->_clone(newAnim);
         }
-        for (VertexTrackList::const_iterator i = mVertexTrackList.begin();
-            i != mVertexTrackList.end(); ++i)
+        for (auto i : mVertexTrackList)
         {
-            i->second->_clone(newAnim);
+            i.second->_clone(newAnim);
         }
 
         newAnim->_keyFrameListChanged();
@@ -729,9 +724,9 @@ namespace Ogre {
             
             if (baseAnim)
             {
-                for (NodeTrackList::iterator i = mNodeTrackList.begin(); i != mNodeTrackList.end(); ++i)
+                for (auto & i : mNodeTrackList)
                 {
-                    NodeAnimationTrack* track = i->second;
+                    NodeAnimationTrack* track = i.second;
                     
                     NodeAnimationTrack* baseTrack;
                     if (baseAnim == this)
@@ -744,9 +739,9 @@ namespace Ogre {
                     track->_applyBaseKeyFrame(&kf);
                 }
                 
-                for (VertexTrackList::iterator i = mVertexTrackList.begin(); i != mVertexTrackList.end(); ++i)
+                for (auto & i : mVertexTrackList)
                 {
-                    VertexAnimationTrack* track = i->second;
+                    VertexAnimationTrack* track = i.second;
                     
                     if (track->getAnimationType() == VAT_POSE)
                     {

@@ -281,9 +281,8 @@ void ApplicationContextBase::removeInputListener(NativeWindowType* win, InputLis
 
 bool ApplicationContextBase::frameRenderingQueued(const Ogre::FrameEvent& evt)
 {
-    for(InputListenerList::iterator it = mInputListeners.begin();
-            it != mInputListeners.end(); ++it) {
-        it->second->frameRendered(evt);
+    for(const auto & li : mInputListeners) {
+        li.second->frameRendered(evt);
     }
 
     return true;
@@ -361,13 +360,12 @@ void ApplicationContextBase::_fireInputEvent(const Event& event, uint32_t window
     }
 #endif
 
-    for(InputListenerList::iterator it = mInputListeners.begin();
-            it != mInputListeners.end(); ++it)
+    for(const auto & li : mInputListeners)
     {
         // gamepad events are not window specific
-        if(it->first != windowID && event.type <= TEXTINPUT) continue;
+        if(li.first != windowID && event.type <= TEXTINPUT) continue;
 
-        InputListener& l = *it->second;
+        InputListener& l = *li.second;
 
         switch (event.type)
         {
@@ -508,21 +506,21 @@ void ApplicationContextBase::reconfigure(const Ogre::String &renderer, Ogre::Nam
     Ogre::RenderSystem* rs = mRoot->getRenderSystemByName(renderer);
 
     // set all given render system options
-    for (Ogre::NameValuePairList::iterator it = options.begin(); it != options.end(); it++)
+    for (auto & option : options)
     {
-        rs->setConfigOption(it->first, it->second);
+        rs->setConfigOption(option.first, option.second);
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
         // Change the viewport orientation on the fly if requested
-        if(it->first == "Orientation")
+        if(option.first == "Orientation")
         {
             Ogre::RenderWindow* win = getRenderWindow();
 
-            if (it->second == "Landscape Left")
+            if (option.second == "Landscape Left")
                 win->getViewport(0)->setOrientationMode(Ogre::OR_LANDSCAPELEFT, true);
-            else if (it->second == "Landscape Right")
+            else if (option.second == "Landscape Right")
                 win->getViewport(0)->setOrientationMode(Ogre::OR_LANDSCAPERIGHT, true);
-            else if (it->second == "Portrait")
+            else if (option.second == "Portrait")
                 win->getViewport(0)->setOrientationMode(Ogre::OR_PORTRAIT, true);
         }
 #endif

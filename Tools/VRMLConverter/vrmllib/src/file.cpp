@@ -12,11 +12,11 @@ namespace {
 
 void set_parent(std::vector<node *> &c, grouping_node *p)
 {
-    for (std::vector<node *>::iterator i=c.begin(); i!=c.end(); ++i) {
-        if (!*i)
+    for (auto & i : c) {
+        if (!i)
             continue;
-        (*i)->parent = p;
-        if (grouping_node *n = dynamic_cast<grouping_node *>(*i))
+        i->parent = p;
+        if (grouping_node *n = dynamic_cast<grouping_node *>(i))
             set_parent(n->children, n);
     }
 }

@@ -195,9 +195,9 @@ void CompositorManager::_reconstructAllCompositorResources()
     // first, that way shared resources will get freed
     typedef std::vector<CompositorInstance*> InstVec;
     InstVec instancesToReenable;
-    for (Chains::iterator i = mChains.begin(); i != mChains.end(); ++i)
+    for (auto & it : mChains)
     {
-        CompositorChain* chain = i->second;
+        CompositorChain* chain = it.second;
         for (CompositorInstance* inst : chain->getCompositorInstances())
         {
             if (inst->getEnabled())
@@ -212,9 +212,8 @@ void CompositorManager::_reconstructAllCompositorResources()
     if( mRectangle )
         mRectangle->setDefaultUVs();
 
-    for (InstVec::iterator i = instancesToReenable.begin(); i != instancesToReenable.end(); ++i)
+    for (auto inst : instancesToReenable)
     {
-        CompositorInstance* inst = *i;
         inst->setEnabled(true);
     }
 }
@@ -256,9 +255,8 @@ TexturePtr CompositorManager::getPooledTexture(const String& name,
     TexturePtr ret;
     TextureList& texList = i->second;
     // iterate over the existing textures and check if we can re-use
-    for (TextureList::iterator t = texList.begin(); t != texList.end(); ++t)
+    for (auto & tex : texList)
     {
-        TexturePtr& tex = *t;
         // check not already used
         if (texturesAssigned.find(tex.get()) == texturesAssigned.end())
         {
@@ -397,9 +395,9 @@ void CompositorManager::freePooledTextures(bool onlyIfUnreferenced)
 {
     if (onlyIfUnreferenced)
     {
-        for (TexturesByDef::iterator i = mTexturesByDef.begin(); i != mTexturesByDef.end(); ++i)
+        for (auto & i : mTexturesByDef)
         {
-            TextureList& texList = i->second;
+            TextureList& texList = i.second;
             for (TextureList::iterator j = texList.begin(); j != texList.end();)
             {
                 // if the resource system, plus this class, are the only ones to have a reference..
@@ -414,9 +412,9 @@ void CompositorManager::freePooledTextures(bool onlyIfUnreferenced)
                     ++j;
             }
         }
-        for (ChainTexturesByDef::iterator i = mChainTexturesByDef.begin(); i != mChainTexturesByDef.end(); ++i)
+        for (auto & i : mChainTexturesByDef)
         {
-            TextureDefMap& texMap = i->second;
+            TextureDefMap& texMap = i.second;
             for (TextureDefMap::iterator j = texMap.begin(); j != texMap.end();) 
             {
                 const TexturePtr& tex = j->second;

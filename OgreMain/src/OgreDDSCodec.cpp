@@ -350,9 +350,9 @@ namespace {
             ddsHeader.depth = (uint32)(isCubeMap ? 6 : ddsHeader.depth);
             ddsHeader.mipMapCount = imgData->num_mipmaps + 1;
             ddsHeader.sizeOrPitch = ddsHeaderSizeOrPitch;
-            for (uint32 reserved1=0; reserved1<11; reserved1++) // XXX nasty constant 11
+            for (unsigned int & reserved1 : ddsHeader.reserved1) // XXX nasty constant 11
             {
-                ddsHeader.reserved1[reserved1] = 0;
+                reserved1 = 0;
             }
             ddsHeader.reserved2 = 0;
 
@@ -681,12 +681,12 @@ namespace {
         // Note - we assume all values have already been endian swapped
         
         // This is an explicit alpha block, 4 bits per pixel, LSB first
-        for (size_t row = 0; row < 4; ++row)
+        for (unsigned short row : block.alphaRow)
         {
             for (size_t x = 0; x < 4; ++x)
             {
                 // Shift and mask off to 4 bits
-                uint8 val = static_cast<uint8>(block.alphaRow[row] >> (x * 4) & 0xF);
+                uint8 val = static_cast<uint8>(row >> (x * 4) & 0xF);
                 // Convert to [0,1]
                 pCol->a = (Real)val / (Real)0xF;
                 pCol++;

@@ -126,9 +126,8 @@ namespace Ogre
         }
 
         PCZone * connectedZone;
-        for ( PortalList::iterator it = mPortals.begin(); it != mPortals.end(); ++it )
+        for (auto p : mPortals)
         {
-            Portal * p = *it;
             //Check if the portal intersects the node
             if (p != ignorePortal &&
                 p->intersects(pczsn) != Portal::NO_INTERSECT)
@@ -158,9 +157,8 @@ namespace Ogre
                                                 PCZFrustum *portalFrustum,
                                                 Portal * ignorePortal)
     {
-        for ( PortalList::iterator it = mPortals.begin(); it != mPortals.end(); ++it )
+        for (auto p : mPortals)
         {
-            Portal * p = *it;
             if (p != ignorePortal)
             {
                 // calculate the direction vector from light to portal
@@ -327,10 +325,8 @@ namespace Ogre
             }
 
             // Secondly we check againts the antiportals of this zone.
-            for (AntiPortalList::iterator ait = mAntiPortals.begin(); ait != mAntiPortals.end(); ++ait)
+            for (auto ap : mAntiPortals)
             {
-                AntiPortal* ap = (*ait);
-
                 // Skip portal if it doesn't need updating.
                 // If both portals are not moving, then there's no need to check between them.
                 if (!portalNeedUpdate && !ap->needUpdate()) continue;
@@ -356,9 +352,8 @@ namespace Ogre
             PCZone * tzone = p->getTargetZone();
             if (tzone != this)
             {
-                for ( PortalList::iterator it3 = tzone->mPortals.begin(); it3 != tzone->mPortals.end(); ++it3 )
+                for (auto p3 : tzone->mPortals)
                 {
-                    Portal * p3 = (*it3);
                     // only check against bigger regular portals
                     if (pRadius < p3->getDerivedRadius())
                     {
@@ -374,9 +369,8 @@ namespace Ogre
             }
         }
         // transfer any portals to new zones that have been flagged
-        for ( PortalList::iterator it = transferPortalList.begin(); it != transferPortalList.end(); ++it )
+        for (auto p : transferPortalList)
         {
-            Portal * p = *it;
             if (p->getNewHomeZone() != 0)
             {
                 _removePortal(p);
@@ -385,9 +379,8 @@ namespace Ogre
             }
         }
         // transfer any anti portals to new zones that have been flagged
-        for (AntiPortalList::iterator it = transferAntiPortalList.begin(); it != transferAntiPortalList.end(); ++it)
+        for (auto p : transferAntiPortalList)
         {
-            AntiPortal* p = *it;
             if (p->getNewHomeZone() != 0)
             {
                 _removeAntiPortal(p);
@@ -404,9 +397,9 @@ namespace Ogre
         // So it's impracticle to do any AABB to find node of interest by portals.
         // Hence for this case, we just mark all nodes as dirty as long as there's
         // any moving portal within the zone.
-        for ( PortalList::iterator it = mPortals.begin(); it != mPortals.end(); ++it )
+        for (auto & mPortal : mPortals)
         {
-            if ((*it)->needUpdate())
+            if (mPortal->needUpdate())
             {
                 // Mark all home nodes.
                 PCZSceneNodeList::iterator it2 = mHomeNodeList.begin();
@@ -581,17 +574,15 @@ namespace Ogre
         // Here we merge both portal and antiportal visible to the camera into one list.
         // Then we sort them in the order from nearest to furthest from camera.
         PortalBaseList sortedPortalList;
-        for (AntiPortalList::iterator iter = mAntiPortals.begin(); iter != mAntiPortals.end(); ++iter)
+        for (auto portal : mAntiPortals)
         {
-            AntiPortal* portal = *iter;
             if (camera->isVisible(portal))
             {
                 sortedPortalList.push_back(portal);
             }
         }
-        for (PortalList::iterator iter = mPortals.begin(); iter != mPortals.end(); ++iter)
+        for (auto portal : mPortals)
         {
-            Portal* portal = *iter;
             if (camera->isVisible(portal))
             {
                 sortedPortalList.push_back(portal);

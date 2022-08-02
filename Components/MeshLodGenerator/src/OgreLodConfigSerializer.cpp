@@ -275,8 +275,8 @@ namespace Ogre
 
         size += levelSize * mLodConfig->levels.size();
 
-        for(size_t i = 0; i < mLodConfig->levels.size(); i++) {
-            size += calcStringSize(mLodConfig->levels[i].manualMeshName);
+        for(auto & level : mLodConfig->levels) {
+            size += calcStringSize(level.manualMeshName);
         }
 
         return size;

@@ -298,9 +298,9 @@ namespace Ogre
     {
         std::vector<Plane> planesVec;
         planesVec.reserve(planes.size());
-        for (std::list<Plane>::const_iterator i = planes.begin(); i != planes.end(); ++i)
+        for (auto plane : planes)
         {
-            planesVec.push_back(*i);
+            planesVec.push_back(plane);
         }
         return intersects(ray, planesVec, normalIsOutside);
     }

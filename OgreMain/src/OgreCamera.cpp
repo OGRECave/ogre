@@ -88,9 +88,9 @@ namespace Ogre {
     Camera::~Camera()
     {
         ListenerList listenersCopy = mListeners;
-        for (ListenerList::iterator i = listenersCopy.begin(); i != listenersCopy.end(); ++i)
+        for (auto & i : listenersCopy)
         {
-            (*i)->cameraDestroyed(this);
+            i->cameraDestroyed(this);
         }
     }
     //-----------------------------------------------------------------------
@@ -487,9 +487,9 @@ namespace Ogre {
 
         //notify prerender scene
         ListenerList listenersCopy = mListeners;
-        for (ListenerList::iterator i = listenersCopy.begin(); i != listenersCopy.end(); ++i)
+        for (auto & i : listenersCopy)
         {
-            (*i)->cameraPreRenderScene(this);
+            i->cameraPreRenderScene(this);
         }
 
         //render scene
@@ -499,9 +499,9 @@ namespace Ogre {
         listenersCopy = mListeners;
 
         //notify postrender scene
-        for (ListenerList::iterator i = listenersCopy.begin(); i != listenersCopy.end(); ++i)
+        for (auto & i : listenersCopy)
         {
-            (*i)->cameraPostRenderScene(this);
+            i->cameraPostRenderScene(this);
         }
         OgreProfileEndGPUEvent(getName());
     }
@@ -1143,10 +1143,10 @@ namespace Ogre {
         {
             Quaternion planeRot = invPlaneRot.Inverse();
             (*intersect3d).clear();
-            for(unsigned int i=0; i<iPnt.size(); i++)
+            for(auto & i : iPnt)
             {
-                Vector3 intersection = planeRot * Vector3(iPnt[i].x, iPnt[i].y, iPnt[i].z);
-                (*intersect3d).push_back(Vector4(intersection.x, intersection.y, intersection.z, iPnt[i].w));
+                Vector3 intersection = planeRot * Vector3(i.x, i.y, i.z);
+                (*intersect3d).push_back(Vector4(intersection.x, intersection.y, intersection.z, i.w));
             }
         }
     }
