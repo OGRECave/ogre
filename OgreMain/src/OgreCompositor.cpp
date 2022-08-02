@@ -221,7 +221,7 @@ void Compositor::createGlobalTextures()
                     // Also add to local textures so we can look up
                     String mrtLocalName = CompositorInstance::getMRTTexLocalName(def->name, atch);
                     mGlobalTextures[mrtLocalName] = tex;
-                    
+                    atch++;
                 }
 
                 rendTarget = mrt;
