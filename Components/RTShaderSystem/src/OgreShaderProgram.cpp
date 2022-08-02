@@ -25,6 +25,8 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
+#include <memory>
+
 #include "OgreShaderPrecompiledHeaders.h"
 
 namespace Ogre {
@@ -143,7 +145,7 @@ UniformParameterPtr Program::resolveParameter(GpuProgramParameters::AutoConstant
     if(isArray(autoType)) std::swap(size, data); // for array autotypes the extra parameter is the size
     
     // Create new parameter
-    param = UniformParameterPtr(OGRE_NEW UniformParameter(autoType, data, size));
+    param = std::make_shared<UniformParameter>(autoType, data, size);
     addParameter(param);
 
     return param;
@@ -167,7 +169,7 @@ UniformParameterPtr Program::resolveAutoParameterReal(GpuProgramParameters::Auto
     }
     
     // Create new parameter.
-    param = UniformParameterPtr(OGRE_NEW UniformParameter(autoType, float(data), size));
+    param = std::make_shared<UniformParameter>(autoType, float(data), size);
     addParameter(param);
 
     return param;
@@ -192,7 +194,7 @@ UniformParameterPtr Program::resolveAutoParameterReal(GpuProgramParameters::Auto
     }
     
     // Create new parameter.
-    param = UniformParameterPtr(OGRE_NEW UniformParameter(autoType, data, size, type));
+    param = std::make_shared<UniformParameter>(autoType, data, size, type);
     addParameter(param);
 
     return param;
@@ -217,7 +219,7 @@ UniformParameterPtr Program::resolveAutoParameterInt(GpuProgramParameters::AutoC
     }
 
     // Create new parameter.
-    param = UniformParameterPtr(OGRE_NEW UniformParameter(autoType, data, size, type));
+    param = std::make_shared<UniformParameter>(autoType, data, size, type);
     addParameter(param);
 
     return param;

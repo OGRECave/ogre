@@ -25,6 +25,8 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
+#include <memory>
+
 #include "OgreShaderPrecompiledHeaders.h"
 
 namespace Ogre {
@@ -337,93 +339,93 @@ ParameterPtr ParameterFactory::createInPosition(int index, Parameter::Content co
 //-----------------------------------------------------------------------
 ParameterPtr ParameterFactory::createOutPosition(int index)
 {
-    return ParameterPtr(OGRE_NEW Parameter(GCT_FLOAT4, "oPos_" + StringConverter::toString(index), 
+    return std::make_shared<Parameter>(GCT_FLOAT4, "oPos_" + StringConverter::toString(index),
         Parameter::SPS_POSITION, index, 
-        Parameter::SPC_POSITION_PROJECTIVE_SPACE));
+        Parameter::SPC_POSITION_PROJECTIVE_SPACE);
 }
 
 //-----------------------------------------------------------------------
 ParameterPtr ParameterFactory::createInNormal(int index)
 {
-    return ParameterPtr(OGRE_NEW Parameter(GCT_FLOAT3, "iNormal_" + StringConverter::toString(index), 
+    return std::make_shared<Parameter>(GCT_FLOAT3, "iNormal_" + StringConverter::toString(index),
         Parameter::SPS_NORMAL, index, 
-        Parameter::SPC_NORMAL_OBJECT_SPACE));
+        Parameter::SPC_NORMAL_OBJECT_SPACE);
 }
 
 
 //-----------------------------------------------------------------------
 ParameterPtr ParameterFactory::createInWeights(int index)
 {
-    return ParameterPtr(OGRE_NEW Parameter(GCT_FLOAT4, "iBlendWeights_" + StringConverter::toString(index), 
+    return std::make_shared<Parameter>(GCT_FLOAT4, "iBlendWeights_" + StringConverter::toString(index),
         Parameter::SPS_BLEND_WEIGHTS, index, 
-        Parameter::SPC_BLEND_WEIGHTS));
+        Parameter::SPC_BLEND_WEIGHTS);
 }
 
 
 //-----------------------------------------------------------------------
 ParameterPtr ParameterFactory::createInIndices(int index)
 {
-	return ParameterPtr(OGRE_NEW Parameter(
+	return std::make_shared<Parameter>(
 		GCT_UINT4
-	, "iBlendIndices_" + StringConverter::toString(index), 
+	, "iBlendIndices_" + StringConverter::toString(index),
         Parameter::SPS_BLEND_INDICES, index, 
-        Parameter::SPC_BLEND_INDICES));
+        Parameter::SPC_BLEND_INDICES);
 }
 
 //-----------------------------------------------------------------------
 ParameterPtr ParameterFactory::createInBiNormal(int index)
 {
-    return ParameterPtr(OGRE_NEW Parameter(GCT_FLOAT3, "iBiNormal_" + StringConverter::toString(index), 
+    return std::make_shared<Parameter>(GCT_FLOAT3, "iBiNormal_" + StringConverter::toString(index),
         Parameter::SPS_BINORMAL, index, 
-        Parameter::SPC_BINORMAL_OBJECT_SPACE));
+        Parameter::SPC_BINORMAL_OBJECT_SPACE);
 }
 
 //-----------------------------------------------------------------------
 ParameterPtr ParameterFactory::createInTangent(int index)
 {
-    return ParameterPtr(OGRE_NEW Parameter(GCT_FLOAT3, "iTangent_" + StringConverter::toString(index), 
+    return std::make_shared<Parameter>(GCT_FLOAT3, "iTangent_" + StringConverter::toString(index),
         Parameter::SPS_TANGENT, index, 
-        Parameter::SPC_TANGENT_OBJECT_SPACE));
+        Parameter::SPC_TANGENT_OBJECT_SPACE);
 }
 
 //-----------------------------------------------------------------------
 ParameterPtr ParameterFactory::createOutNormal(int index)
 {
-    return ParameterPtr(OGRE_NEW Parameter(GCT_FLOAT3, "oNormal_" + StringConverter::toString(index), 
+    return std::make_shared<Parameter>(GCT_FLOAT3, "oNormal_" + StringConverter::toString(index),
         Parameter::SPS_NORMAL, index, 
-        Parameter::SPC_NORMAL_OBJECT_SPACE));
+        Parameter::SPC_NORMAL_OBJECT_SPACE);
 }
 
 //-----------------------------------------------------------------------
 ParameterPtr ParameterFactory::createOutBiNormal(int index)
 {
-    return ParameterPtr(OGRE_NEW Parameter(GCT_FLOAT3, "oBiNormal_" + StringConverter::toString(index), 
+    return std::make_shared<Parameter>(GCT_FLOAT3, "oBiNormal_" + StringConverter::toString(index),
         Parameter::SPS_BINORMAL, index, 
-        Parameter::SPC_BINORMAL_OBJECT_SPACE));
+        Parameter::SPC_BINORMAL_OBJECT_SPACE);
 }
 
 //-----------------------------------------------------------------------
 ParameterPtr ParameterFactory::createOutTangent(int index)
 {
-    return ParameterPtr(OGRE_NEW Parameter(GCT_FLOAT3, "oTangent_" + StringConverter::toString(index), 
+    return std::make_shared<Parameter>(GCT_FLOAT3, "oTangent_" + StringConverter::toString(index),
         Parameter::SPS_TANGENT, index, 
-        Parameter::SPC_TANGENT_OBJECT_SPACE));
+        Parameter::SPC_TANGENT_OBJECT_SPACE);
 }
 
 //-----------------------------------------------------------------------
 ParameterPtr ParameterFactory::createInColor(int index)
 {
-    return ParameterPtr(OGRE_NEW Parameter(GCT_FLOAT4, "iColor_" + StringConverter::toString(index), 
+    return std::make_shared<Parameter>(GCT_FLOAT4, "iColor_" + StringConverter::toString(index),
         Parameter::SPS_COLOR, index, 
-        index == 0 ? Parameter::SPC_COLOR_DIFFUSE : Parameter::SPC_COLOR_SPECULAR));
+        index == 0 ? Parameter::SPC_COLOR_DIFFUSE : Parameter::SPC_COLOR_SPECULAR);
 }
 
 //-----------------------------------------------------------------------
 ParameterPtr ParameterFactory::createOutColor(int index)
 {
-    return ParameterPtr(OGRE_NEW Parameter(GCT_FLOAT4, "oColor_" + StringConverter::toString(index), 
+    return std::make_shared<Parameter>(GCT_FLOAT4, "oColor_" + StringConverter::toString(index),
         Parameter::SPS_COLOR, index, 
-        index == 0 ? Parameter::SPC_COLOR_DIFFUSE : Parameter::SPC_COLOR_SPECULAR));
+        index == 0 ? Parameter::SPC_COLOR_DIFFUSE : Parameter::SPC_COLOR_SPECULAR);
 }
 
 //-----------------------------------------------------------------------
@@ -563,46 +565,46 @@ UniformParameterPtr ParameterFactory::createSampler(GpuConstantType type, int in
 //-----------------------------------------------------------------------
 UniformParameterPtr ParameterFactory::createSampler1D(int index)
 {
-    return UniformParameterPtr(OGRE_NEW UniformParameter(GCT_SAMPLER1D, "gSampler1D_" + StringConverter::toString(index), 
+    return std::make_shared<UniformParameter>(GCT_SAMPLER1D, "gSampler1D_" + StringConverter::toString(index),
         Parameter::SPS_UNKNOWN, index, 
         Parameter::SPC_UNKNOWN,
-        (uint16)GPV_GLOBAL, 1));
+        (uint16)GPV_GLOBAL, 1);
 }
 
 //-----------------------------------------------------------------------
 UniformParameterPtr ParameterFactory::createSampler2D(int index)
 {
-    return UniformParameterPtr(OGRE_NEW UniformParameter(GCT_SAMPLER2D, "gSampler2D_" + StringConverter::toString(index), 
+    return std::make_shared<UniformParameter>(GCT_SAMPLER2D, "gSampler2D_" + StringConverter::toString(index),
         Parameter::SPS_UNKNOWN, index, 
         Parameter::SPC_UNKNOWN,
-        (uint16)GPV_GLOBAL, 1));
+        (uint16)GPV_GLOBAL, 1);
 }
 
 //-----------------------------------------------------------------------
 UniformParameterPtr ParameterFactory::createSampler2DArray(int index)
 {
-    return UniformParameterPtr(OGRE_NEW UniformParameter(GCT_SAMPLER2DARRAY, "gSampler2DArray_" + StringConverter::toString(index), 
+    return std::make_shared<UniformParameter>(GCT_SAMPLER2DARRAY, "gSampler2DArray_" + StringConverter::toString(index),
                                                          Parameter::SPS_UNKNOWN, index, 
                                                          Parameter::SPC_UNKNOWN,
-                                                         (uint16)GPV_GLOBAL, 1));
+                                                         (uint16)GPV_GLOBAL, 1);
 }
 
 //-----------------------------------------------------------------------
 UniformParameterPtr ParameterFactory::createSampler3D(int index)
 {
-    return UniformParameterPtr(OGRE_NEW UniformParameter(GCT_SAMPLER3D, "gSampler3D_" + StringConverter::toString(index), 
+    return std::make_shared<UniformParameter>(GCT_SAMPLER3D, "gSampler3D_" + StringConverter::toString(index),
         Parameter::SPS_UNKNOWN, index, 
         Parameter::SPC_UNKNOWN,
-        (uint16)GPV_GLOBAL, 1));
+        (uint16)GPV_GLOBAL, 1);
 }
 
 //-----------------------------------------------------------------------
 UniformParameterPtr ParameterFactory::createSamplerCUBE(int index)
 {
-    return UniformParameterPtr(OGRE_NEW UniformParameter(GCT_SAMPLERCUBE, "gSamplerCUBE_" + StringConverter::toString(index), 
+    return std::make_shared<UniformParameter>(GCT_SAMPLERCUBE, "gSamplerCUBE_" + StringConverter::toString(index),
         Parameter::SPS_UNKNOWN, index, 
         Parameter::SPC_UNKNOWN,
-        (uint16)GPV_GLOBAL, 1));
+        (uint16)GPV_GLOBAL, 1);
 }
 //-----------------------------------------------------------------------
 ParameterPtr ParameterFactory::createConstParam(const Vector2& val)
@@ -640,9 +642,9 @@ UniformParameterPtr ParameterFactory::createUniform(GpuConstantType type,
 {
     UniformParameterPtr param;
     
-    param = UniformParameterPtr(OGRE_NEW UniformParameter(type, suggestedName + StringConverter::toString(index), 
+    param = std::make_shared<UniformParameter>(type, suggestedName + StringConverter::toString(index),
         Parameter::SPS_UNKNOWN, index, 
-        Parameter::SPC_UNKNOWN, variability, size));
+        Parameter::SPC_UNKNOWN, variability, size);
         
     return param;
 }

@@ -26,6 +26,8 @@
  * -----------------------------------------------------------------------------
  */
 
+#include <memory>
+
 #include "OgreMeshLodPrecompiledHeaders.h"
 
 namespace Ogre
@@ -140,10 +142,10 @@ void MeshLodGenerator::_resolveComponents(LodConfig& lodConfig,
 
     }
     if(!data) {
-        data = LodDataPtr(new LodData());
+        data = std::make_shared<LodData>();
     }
     if(!collapser) {
-        collapser = LodCollapserPtr(new LodCollapser());
+        collapser = std::make_shared<LodCollapser>();
     }
     if(lodConfig.advanced.useBackgroundQueue) {
         if(!input) {
