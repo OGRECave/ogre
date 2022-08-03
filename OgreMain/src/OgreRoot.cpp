@@ -399,7 +399,7 @@ namespace Ogre {
                 continue;
             }
 
-            for (auto p : settings)
+            for (const auto& p : settings)
             {
                 try
                 {

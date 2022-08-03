@@ -453,7 +453,7 @@ bool HardwareSkinningFactory::extractSkeletonData(const Entity* pEntity, size_t 
     if (!hasVertexAnim && pEntity->hasSkeleton())
     {
         //get weights count
-        MeshPtr pMesh = pEntity->getMesh();
+        const MeshPtr& pMesh = pEntity->getMesh();
 
         RenderOperation ro;
         SubMesh* pSubMesh = pMesh->getSubMesh(subEntityIndex);

@@ -53,7 +53,7 @@ void ProgramProcessor::bindAutoParameters(Program* pCpuProgram, GpuProgramPtr pG
 
     for (itParams=progParams.begin(); itParams != progParams.end(); ++itParams)
     {
-        const UniformParameterPtr pCurParam = *itParams;
+        const UniformParameterPtr& pCurParam = *itParams;
         const GpuConstantDefinition* gpuConstDef = pGpuParams->_findNamedConstantDefinition(pCurParam->getName());
     
         if (gpuConstDef != NULL)
@@ -194,7 +194,7 @@ void ProgramProcessor::countVsTexcoordOutputs(Function* vsMain,
     // Grab vertex shader output information.
     for (; it != itEnd; ++it)
     {
-        const ParameterPtr curParam = *it;
+        const ParameterPtr& curParam = *it;
 
         if (curParam->getSemantic() == Parameter::SPS_TEXTURE_COORDINATES)
         {
@@ -212,7 +212,7 @@ void ProgramProcessor::buildTexcoordTable(const ShaderParameterList& paramList, 
 
     for (; it != itEnd; ++it)
     {
-        const ParameterPtr curParam = *it;
+        const ParameterPtr& curParam = *it;
 
         if (curParam->getSemantic() == Parameter::SPS_TEXTURE_COORDINATES)
         {
@@ -613,7 +613,7 @@ void ProgramProcessor::generateLocalSplitParameters(Function* func, GpuProgramTy
         return; 
 
     // Create the local parameters + map from source to local.
-    for (auto srcParameter : splitParams)
+    for (const auto& srcParameter : splitParams)
     {
         ParameterPtr localParameter = func->resolveLocalParameter(srcParameter->getType(), "lsplit_" + srcParameter->getName());
 
