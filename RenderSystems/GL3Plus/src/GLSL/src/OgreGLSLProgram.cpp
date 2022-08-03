@@ -92,7 +92,8 @@ namespace Ogre {
 
         // Convert to const char * for GL
         std::vector<const char*> names;
-        for (const auto & nameString : nameStrings)
+        names.reserve(nameStrings.size());
+for (const auto & nameString : nameStrings)
         {
             names.push_back(nameString.c_str());
         }

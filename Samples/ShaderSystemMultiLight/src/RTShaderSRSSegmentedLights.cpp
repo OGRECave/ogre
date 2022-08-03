@@ -795,7 +795,7 @@ void RTShaderSRSSegmentedLights::getLightCount(int lightCount[3]) const
     lightCount[1] = 0;
     lightCount[2] = 0;
 
-    for (auto curParams : mLightParamsList)
+    for (const auto& curParams : mLightParamsList)
     {
         if (curParams.mType == Light::LT_POINT)
             lightCount[0]++;

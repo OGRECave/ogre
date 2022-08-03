@@ -522,7 +522,7 @@ Vector3i FFPLighting::getLightCount() const
 {
 	Vector3i lightCount(0, 0, 0);
 
-	for (auto curParams : mLightParamsList)
+	for (const auto& curParams : mLightParamsList)
 	{
 			if (curParams.mType == Light::LT_POINT)
 			lightCount[0]++;

@@ -100,7 +100,7 @@ namespace Ogre
         {
             //find and remove factory from mPCZoneFactories
             // Note that this does not free the factory from memory, just removes from the factory manager
-            String name = factory->getFactoryTypeName();
+            const String& name = factory->getFactoryTypeName();
             PCZoneFactoryMap::iterator zi = mPCZoneFactories.find(name);
             if (zi != mPCZoneFactories.end())
             {

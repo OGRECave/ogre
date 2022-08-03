@@ -2008,7 +2008,7 @@ namespace Ogre{
                         bool colourMask[] = {false ,false ,false, false};
 
                         uint8 channelIndex = 0;
-                        for(AbstractNodePtr abstractNode : prop->values)
+                        for(const AbstractNodePtr& abstractNode : prop->values)
                         {
                             if(!getBoolean(abstractNode, &colourMask[channelIndex++]))
                             {
