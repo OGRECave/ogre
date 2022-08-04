@@ -177,12 +177,12 @@ namespace Ogre {
         /** @copydoc OverlayElement::_update */
         void _update(void);
     private:
-        Real mLeftBorderSize;
-        Real mRightBorderSize;
-        Real mTopBorderSize;
-        Real mBottomBorderSize;
+        float mLeftBorderSize;
+        float mRightBorderSize;
+        float mTopBorderSize;
+        float mBottomBorderSize;
         struct CellUV {
-            Real u1, v1, u2, v2;
+            float u1, v1, u2, v2;
         };
         CellUV mBorderUV[8];
 
