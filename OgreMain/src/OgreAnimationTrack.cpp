@@ -964,21 +964,15 @@ namespace Ogre {
         }
         else
         {
-
-            KeyFrameList::const_iterator i = mKeyFrames.begin();
-            for (; i != mKeyFrames.end(); ++i)
+            for (auto kf : mKeyFrames)
             {
                 // look for keyframes which have a pose influence which is non-zero
-                const VertexPoseKeyFrame* kf = static_cast<const VertexPoseKeyFrame*>(*i);
-                VertexPoseKeyFrame::PoseRefList::const_iterator poseIt
-                    = kf->getPoseReferences().begin();
-                for (;poseIt != kf->getPoseReferences().end(); ++poseIt)
+                auto& poses = static_cast<const VertexPoseKeyFrame *>(kf)->getPoseReferences();
+                for (auto& poseIt : poses)
                 {
-                    const VertexPoseKeyFrame::PoseRef& poseRef = *poseIt;
-                    if (poseRef.influence > 0.0f)
+                    if (poseIt.influence > 0.0f)
                         return true;
                 }
-
             }
 
             return false;
