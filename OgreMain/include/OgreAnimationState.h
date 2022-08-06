@@ -160,21 +160,21 @@ namespace Ogre {
        * @par Stick to the setBlendMaskEntry method if you don't know exactly what you're doing.
        */
       void _setBlendMask(const BoneBlendMask* blendMask);
-      /// Get the current blend mask (const version, may be 0) 
-      const BoneBlendMask* getBlendMask() const {return mBlendMask;}
+      /// Get the current blend mask
+      const BoneBlendMask* getBlendMask() const {return &mBlendMask;}
       /// Return whether there is currently a valid blend mask set
-      bool hasBlendMask() const {return mBlendMask != 0;}
+      bool hasBlendMask() const {return !mBlendMask.empty();}
       /// Set the weight for the bone identified by the given handle
       void setBlendMaskEntry(size_t boneHandle, float weight);
       /// Get the weight for the bone identified by the given handle
       inline float getBlendMaskEntry(size_t boneHandle) const
       {
-          assert(mBlendMask && mBlendMask->size() > boneHandle);
-          return (*mBlendMask)[boneHandle];
+          assert(mBlendMask.size() > boneHandle);
+          return mBlendMask[boneHandle];
       }
     private:
         /// The blend mask (containing per bone weights)
-        BoneBlendMask* mBlendMask;
+        BoneBlendMask mBlendMask;
 
         String mAnimationName;
         AnimationStateSet* mParent;
