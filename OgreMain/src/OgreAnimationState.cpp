@@ -34,8 +34,7 @@ namespace Ogre
 
     //---------------------------------------------------------------------
     AnimationState::AnimationState(AnimationStateSet* parent, const AnimationState &rhs)
-        : mBlendMask(0)
-        , mAnimationName(rhs.mAnimationName)
+        : mAnimationName(rhs.mAnimationName)
         , mParent(parent)
         , mTimePos(rhs.mTimePos)
         , mLength(rhs.mLength)
@@ -49,8 +48,7 @@ namespace Ogre
     AnimationState::AnimationState(const String& animName, 
         AnimationStateSet *parent, Real timePos, Real length, Real weight, 
         bool enabled)
-        : mBlendMask(0)
-        , mAnimationName(animName)
+        : mAnimationName(animName)
         , mParent(parent)
         , mTimePos(timePos)
         , mLength(length)
@@ -173,15 +171,15 @@ namespace Ogre
     //---------------------------------------------------------------------
     void AnimationState::setBlendMaskEntry(size_t boneHandle, float weight)
     {
-        assert(mBlendMask && mBlendMask->size() > boneHandle);
-        (*mBlendMask)[boneHandle] = weight;
+        assert(mBlendMask.size() > boneHandle);
+        mBlendMask[boneHandle] = weight;
         if (mEnabled)
             mParent->_notifyDirty();
     }
     //---------------------------------------------------------------------
     void AnimationState::_setBlendMaskData(const float* blendMaskData) 
     {
-        assert(mBlendMask && "No BlendMask set!");
+        assert(!mBlendMask.empty() && "No BlendMask set!");
         // input 0?
         if(!blendMaskData)
         {
@@ -189,39 +187,39 @@ namespace Ogre
             return;
         }
         // dangerous memcpy
-        memcpy(&((*mBlendMask)[0]), blendMaskData, sizeof(float) * mBlendMask->size());
+        memcpy(mBlendMask.data(), blendMaskData, sizeof(float) * mBlendMask.size());
         if (mEnabled)
             mParent->_notifyDirty();
     }
     //---------------------------------------------------------------------
     void AnimationState::_setBlendMask(const BoneBlendMask* blendMask) 
     {
-        if(!mBlendMask)
+        if(mBlendMask.empty())
         {
             createBlendMask(blendMask->size(), false);
         }
-        _setBlendMaskData(&(*blendMask)[0]);
+        _setBlendMaskData(blendMask->data());
     }
     //---------------------------------------------------------------------
     void AnimationState::createBlendMask(size_t blendMaskSizeHint, float initialWeight)
     {
-        if(!mBlendMask)
+        if(mBlendMask.empty())
         {
             if(initialWeight >= 0)
             {
-                mBlendMask = OGRE_NEW_T(BoneBlendMask, MEMCATEGORY_ANIMATION)(blendMaskSizeHint, initialWeight);
+                mBlendMask.resize(blendMaskSizeHint, initialWeight);
             }
             else
             {
-                mBlendMask = OGRE_NEW_T(BoneBlendMask, MEMCATEGORY_ANIMATION)(blendMaskSizeHint);
+                mBlendMask.resize(blendMaskSizeHint);
             }
         }
     }
     //---------------------------------------------------------------------
     void AnimationState::destroyBlendMask()
     {
-        OGRE_DELETE_T(mBlendMask, BoneBlendMask, MEMCATEGORY_ANIMATION);
-        mBlendMask = 0;
+        mBlendMask.clear();
+        mBlendMask.shrink_to_fit();
     }
     //---------------------------------------------------------------------
 
