@@ -1013,7 +1013,4 @@ namespace Ogre {
         }
         
     }
-    
-
 }
-
