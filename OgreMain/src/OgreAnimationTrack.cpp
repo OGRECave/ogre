@@ -1007,7 +1007,4 @@ namespace Ogre {
         }
         
     }
-    
-
 }
-

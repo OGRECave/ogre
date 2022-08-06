@@ -173,34 +173,34 @@ namespace Ogre
     //---------------------------------------------------------------------
     void AnimationState::setBlendMaskEntry(size_t boneHandle, float weight)
     {
-      assert(mBlendMask && mBlendMask->size() > boneHandle);
-      (*mBlendMask)[boneHandle] = weight;
-      if (mEnabled)
-        mParent->_notifyDirty();
+        assert(mBlendMask && mBlendMask->size() > boneHandle);
+        (*mBlendMask)[boneHandle] = weight;
+        if (mEnabled)
+            mParent->_notifyDirty();
     }
     //---------------------------------------------------------------------
     void AnimationState::_setBlendMaskData(const float* blendMaskData) 
     {
-      assert(mBlendMask && "No BlendMask set!");
-      // input 0?
-      if(!blendMaskData)
-      {
-        destroyBlendMask();
-        return;
-      }
-      // dangerous memcpy
-      memcpy(&((*mBlendMask)[0]), blendMaskData, sizeof(float) * mBlendMask->size());
-      if (mEnabled)
-        mParent->_notifyDirty();
+        assert(mBlendMask && "No BlendMask set!");
+        // input 0?
+        if(!blendMaskData)
+        {
+            destroyBlendMask();
+            return;
+        }
+        // dangerous memcpy
+        memcpy(&((*mBlendMask)[0]), blendMaskData, sizeof(float) * mBlendMask->size());
+        if (mEnabled)
+            mParent->_notifyDirty();
     }
     //---------------------------------------------------------------------
     void AnimationState::_setBlendMask(const BoneBlendMask* blendMask) 
     {
-      if(!mBlendMask)
-      {
-        createBlendMask(blendMask->size(), false);
-      }
-      _setBlendMaskData(&(*blendMask)[0]);
+        if(!mBlendMask)
+        {
+            createBlendMask(blendMask->size(), false);
+        }
+        _setBlendMaskData(&(*blendMask)[0]);
     }
     //---------------------------------------------------------------------
     void AnimationState::createBlendMask(size_t blendMaskSizeHint, float initialWeight)
