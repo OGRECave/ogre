@@ -412,28 +412,10 @@ namespace Ogre
         // clang-format on
     }
     //-----------------------------------------------------------------------------------
-    VkImageAspectFlags VulkanMappings::getImageAspect( PixelFormat pf,
-                                                       const bool bPreferDepthOverStencil )
+    VkImageAspectFlags VulkanMappings::getImageAspect(PixelFormat pf, const bool bPreferDepthOverStencil)
     {
-        const uint32 pfFlags = PixelUtil::getFlags( pf );
-
-        VkImageAspectFlags retVal = 0;
-        if( pfFlags & ( PFF_DEPTH /*| PFF_STENCIL*/ ) )
-        {
-            if( pfFlags & PFF_DEPTH )
-                retVal = VK_IMAGE_ASPECT_DEPTH_BIT;
-            /*if( pfFlags & PFF_STENCIL )
-            {
-                if( !bPreferDepthOverStencil || !( pfFlags & PFF_DEPTH ) )
-                    retVal |= VK_IMAGE_ASPECT_STENCIL_BIT;
-            }*/
-        }
-        else
-        {
-            retVal = VK_IMAGE_ASPECT_COLOR_BIT;
-        }
-
-        return retVal;
+        // we dont have a format corresponding to VK_IMAGE_ASPECT_STENCIL_BIT yet
+        return PixelUtil::isDepth(pf) ? VK_IMAGE_ASPECT_DEPTH_BIT : VK_IMAGE_ASPECT_COLOR_BIT;
     }
     //-----------------------------------------------------------------------------------
     VkAccessFlags VulkanMappings::get( const Texture *texture )
