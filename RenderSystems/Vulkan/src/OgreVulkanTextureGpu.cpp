@@ -89,7 +89,7 @@ namespace Ogre
         region.bufferRowLength = 0;
         region.bufferImageHeight = 0;
 
-        region.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+        region.imageSubresource.aspectMask = VulkanMappings::getImageAspect(mFormat);
         region.imageSubresource.mipLevel = mLevel;
         region.imageSubresource.baseArrayLayer = mFace;
         region.imageSubresource.layerCount = 1;
@@ -154,7 +154,7 @@ namespace Ogre
         region.bufferRowLength = 0;
         region.bufferImageHeight = 0;
 
-        region.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+        region.imageSubresource.aspectMask = VulkanMappings::getImageAspect(mFormat);;
         region.imageSubresource.mipLevel = 0;
         region.imageSubresource.baseArrayLayer = 0;
         region.imageSubresource.layerCount = 1;
