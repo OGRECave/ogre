@@ -1255,8 +1255,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     StringVectorPtr ResourceGroupManager::listResourceNames(const String& groupName, bool dirs) const
     {
-        // MEMCATEGORY_GENERAL is the only category supported for SharedPtr
-        StringVectorPtr vec(OGRE_NEW_T(StringVector, MEMCATEGORY_GENERAL)(), SPFM_DELETE_T);
+        auto vec = std::make_shared<StringVector>();
 
         // Try to find in resource index first
         ResourceGroup* grp = getResourceGroup(groupName, true);
@@ -1278,8 +1277,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     FileInfoListPtr ResourceGroupManager::listResourceFileInfo(const String& groupName, bool dirs) const
     {
-        // MEMCATEGORY_GENERAL is the only category supported for SharedPtr
-        FileInfoListPtr vec(OGRE_NEW_T(FileInfoList, MEMCATEGORY_GENERAL)(), SPFM_DELETE_T);
+        auto vec = std::make_shared<FileInfoList>();
 
         // Try to find in resource index first
         ResourceGroup* grp = getResourceGroup(groupName, true);
@@ -1301,8 +1299,7 @@ namespace Ogre {
     StringVectorPtr ResourceGroupManager::findResourceNames(const String& groupName, 
         const String& pattern, bool dirs) const
     {
-        // MEMCATEGORY_GENERAL is the only category supported for SharedPtr
-        StringVectorPtr vec(OGRE_NEW_T(StringVector, MEMCATEGORY_GENERAL)(), SPFM_DELETE_T);
+        auto vec = std::make_shared<StringVector>();
 
         // Try to find in resource index first
         ResourceGroup* grp = getResourceGroup(groupName, true);
@@ -1323,8 +1320,7 @@ namespace Ogre {
     FileInfoListPtr ResourceGroupManager::findResourceFileInfo(const String& groupName, 
         const String& pattern, bool dirs) const
     {
-        // MEMCATEGORY_GENERAL is the only category supported for SharedPtr
-        FileInfoListPtr vec(OGRE_NEW_T(FileInfoList, MEMCATEGORY_GENERAL)(), SPFM_DELETE_T);
+        auto vec = std::make_shared<FileInfoList>();
 
         // Try to find in resource index first
         ResourceGroup* grp = getResourceGroup(groupName, true);
@@ -1446,7 +1442,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     StringVectorPtr ResourceGroupManager::listResourceLocations(const String& groupName) const
     {
-        StringVectorPtr vec(OGRE_NEW_T(StringVector, MEMCATEGORY_GENERAL)(), SPFM_DELETE_T);
+        auto vec = std::make_shared<StringVector>();
 
         // Try to find in resource index first
         ResourceGroup* grp = getResourceGroup(groupName, true);
@@ -1465,7 +1461,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     StringVectorPtr ResourceGroupManager::findResourceLocation(const String& groupName, const String& pattern) const
     {
-        StringVectorPtr vec(OGRE_NEW_T(StringVector, MEMCATEGORY_GENERAL)(), SPFM_DELETE_T);
+        auto vec = std::make_shared<StringVector>();
 
         // Try to find in resource index first
         ResourceGroup* grp = getResourceGroup(groupName, true);

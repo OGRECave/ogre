@@ -455,8 +455,7 @@ namespace {
     StringVectorPtr FileSystemArchive::list(bool recursive, bool dirs) const
     {
         // directory change requires locking due to saved returns
-        // Note that we have to tell the SharedPtr to use OGRE_DELETE_T not OGRE_DELETE by passing category
-        StringVectorPtr ret(OGRE_NEW_T(StringVector, MEMCATEGORY_GENERAL)(), SPFM_DELETE_T);
+        auto ret = std::make_shared<StringVector>();
 
         findFiles("*", recursive, dirs, ret.get(), 0);
 
@@ -465,8 +464,7 @@ namespace {
     //-----------------------------------------------------------------------
     FileInfoListPtr FileSystemArchive::listFileInfo(bool recursive, bool dirs) const
     {
-        // Note that we have to tell the SharedPtr to use OGRE_DELETE_T not OGRE_DELETE by passing category
-        FileInfoListPtr ret(OGRE_NEW_T(FileInfoList, MEMCATEGORY_GENERAL)(), SPFM_DELETE_T);
+        auto ret = std::make_shared<FileInfoList>();
 
         findFiles("*", recursive, dirs, 0, ret.get());
 
@@ -476,8 +474,7 @@ namespace {
     StringVectorPtr FileSystemArchive::find(const String& pattern,
                                             bool recursive, bool dirs) const
     {
-        // Note that we have to tell the SharedPtr to use OGRE_DELETE_T not OGRE_DELETE by passing category
-        StringVectorPtr ret(OGRE_NEW_T(StringVector, MEMCATEGORY_GENERAL)(), SPFM_DELETE_T);
+        auto ret = std::make_shared<StringVector>();
 
         findFiles(pattern, recursive, dirs, ret.get(), 0);
 
@@ -488,8 +485,7 @@ namespace {
     FileInfoListPtr FileSystemArchive::findFileInfo(const String& pattern, 
         bool recursive, bool dirs) const
     {
-        // Note that we have to tell the SharedPtr to use OGRE_DELETE_T not OGRE_DELETE by passing category
-        FileInfoListPtr ret(OGRE_NEW_T(FileInfoList, MEMCATEGORY_GENERAL)(), SPFM_DELETE_T);
+        auto ret = std::make_shared<FileInfoList>();
 
         findFiles(pattern, recursive, dirs, 0, ret.get());
 
