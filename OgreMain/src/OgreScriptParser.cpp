@@ -38,8 +38,7 @@ namespace Ogre
 
     ConcreteNodeListPtr ScriptParser::parse(const ScriptTokenList &tokens, const String& file)
     {
-        // MEMCATEGORY_GENERAL because SharedPtr can only free using that category
-        ConcreteNodeListPtr nodes(OGRE_NEW_T(ConcreteNodeList, MEMCATEGORY_GENERAL)(), SPFM_DELETE_T);
+        auto nodes = std::make_shared<ConcreteNodeList>();
 
         enum{READY, OBJECT};
         uint32 state = READY;
@@ -433,8 +432,7 @@ namespace Ogre
 
     ConcreteNodeListPtr ScriptParser::parseChunk(const ScriptTokenList &tokens, const String& file)
     {
-        // MEMCATEGORY_GENERAL because SharedPtr can only free using that category
-        ConcreteNodeListPtr nodes(OGRE_NEW_T(ConcreteNodeList, MEMCATEGORY_GENERAL)(), SPFM_DELETE_T);
+        auto nodes = std::make_shared<ConcreteNodeList>();
 
         ConcreteNodePtr node;
         const ScriptToken *token = 0;
