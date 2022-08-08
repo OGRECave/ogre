@@ -27,6 +27,8 @@ THE SOFTWARE.
 */
 #include "OgreStableHeaders.h"
 #include "OgreGpuProgram.h"
+
+#include <memory>
 #include "OgreGpuProgramManager.h"
 #include "OgreRenderSystemCapabilities.h"
 
@@ -267,13 +269,13 @@ namespace Ogre
     void GpuProgram::createLogicalParameterMappingStructures(bool recreateIfExists)
     {
         if (recreateIfExists || !mLogicalToPhysical)
-            mLogicalToPhysical = GpuLogicalBufferStructPtr(OGRE_NEW GpuLogicalBufferStruct());
+            mLogicalToPhysical = std::make_shared<GpuLogicalBufferStruct>();
     }
     //---------------------------------------------------------------------
     void GpuProgram::createNamedParameterMappingStructures(bool recreateIfExists)
     {
         if (recreateIfExists || !mConstantDefs)
-            mConstantDefs = GpuNamedConstantsPtr(OGRE_NEW GpuNamedConstants());
+            mConstantDefs = std::make_shared<GpuNamedConstants>();
     }
     //---------------------------------------------------------------------
     void GpuProgram::setManualNamedConstantsFile(const String& paramDefFile)

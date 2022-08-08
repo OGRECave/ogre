@@ -26,6 +26,8 @@ THE SOFTWARE.
 */
 #include "OgreShaderExTextureAtlasSampler.h"
 
+#include <memory>
+
 #ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
 #include "OgreShaderFFPRenderState.h"
 #include "OgreShaderProgram.h"
@@ -411,7 +413,7 @@ bool TextureAtlasSamplerFactory::addTexutreAtlasDefinition( DataStreamPtr stream
                     TextureAtlasMap::iterator it = tmpMap.find(textureName);
                     if (it == tmpMap.end())
                     {
-                        it = tmpMap.emplace(textureName, TextureAtlasTablePtr(new TextureAtlasTable)).first;
+                        it = tmpMap.emplace(textureName, std::make_shared<TextureAtlasTable>()).first;
                     }
                     
                     // file line format:  <original texture filename>/t/t<atlas filename>, <atlas idx>, <atlas type>, <woffset>, <hoffset>, <depth offset>, <width>, <height>

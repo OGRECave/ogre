@@ -26,6 +26,8 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 #include "OgreQuake3Level.h"
+
+#include <memory>
 #include "OgreLogManager.h"
 #include "OgreTextureManager.h"
 
@@ -40,7 +42,7 @@ namespace Ogre {
     void Quake3Level::loadHeaderFromStream(DataStreamPtr& inStream)
     {
         // Load just the header
-        mChunk = MemoryDataStreamPtr(OGRE_NEW MemoryDataStream(sizeof(bsp_header_t)));
+        mChunk = std::make_shared<MemoryDataStream>(sizeof(bsp_header_t));
         inStream->read(mChunk->getPtr(), sizeof(bsp_header_t));
         // Grab all the counts, header only
         initialise(true);
@@ -48,7 +50,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void Quake3Level::loadFromStream(const DataStreamPtr& stream)
     {
-        mChunk = MemoryDataStreamPtr(OGRE_NEW MemoryDataStream(stream));
+        mChunk = std::make_shared<MemoryDataStream>(stream);
         initialise();
 
 #if OGRE_DEBUG_MODE
