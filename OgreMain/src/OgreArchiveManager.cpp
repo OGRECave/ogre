@@ -108,17 +108,15 @@ namespace Ogre {
         // We now raise an assert.
 
         // Unload & delete resources in turn
-        for( ArchiveMap::iterator it = mArchives.begin(); it != mArchives.end(); ++it )
+        for (auto& a : mArchives)
         {
-            Archive* arch = it->second;
             // Unload
-            arch->unload();
+            a.second->unload();
             // Find factory to destroy. An archive factory created this file, it should still be there!
-            ArchiveFactoryMap::iterator fit = mArchFactories.find(arch->getType());
+            ArchiveFactoryMap::iterator fit = mArchFactories.find(a.second->getType());
             assert( fit != mArchFactories.end() && "Cannot find an ArchiveFactory "
                     "to deal with archive this type" );
-            fit->second->destroyInstance(arch);
-            
+            fit->second->destroyInstance(a.second);
         }
         // Empty the list
         mArchives.clear();
