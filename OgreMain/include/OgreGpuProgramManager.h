@@ -160,8 +160,8 @@ namespace Ogre {
 
             Program parameters can be shared between multiple programs if you wish.
         */
-        virtual GpuProgramParametersSharedPtr createParameters(void);
-        
+        static GpuProgramParametersPtr createParameters(void) { return std::make_shared<GpuProgramParameters>(); }
+
         /** Create a new, unloaded GpuProgram from a file of assembly. 
 
             Use this method in preference to the 'load' methods if you wish to define
@@ -263,7 +263,7 @@ namespace Ogre {
         /** Creates a microcode to be later added to the cache.
         @param size The size of the microcode in bytes
         */
-        Microcode createMicrocode( size_t size ) const;
+        static Microcode createMicrocode(size_t size) { return std::make_shared<MemoryDataStream>(size); }
 
         /** Adds a microcode for a program to the microcode cache.
         @param id The id of the program
