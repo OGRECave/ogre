@@ -299,7 +299,7 @@ namespace Ogre {
     {
         if (mRealCapabilities != 0)
         {
-          OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, 
+          OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
               "Custom render capabilities must be set before the RenderSystem is initialised.",
               "RenderSystem::useCustomRenderSystemCapabilities");
         }
