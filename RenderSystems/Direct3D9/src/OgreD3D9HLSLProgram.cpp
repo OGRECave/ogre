@@ -234,8 +234,7 @@ namespace Ogre {
         size_t sizeOfBuffer = sizeof(size_t) + mMicroCode->GetBufferSize() + sizeof(size_t) + mParametersMapSizeAsBuffer;
         
         // create microcode
-        GpuProgramManager::Microcode newMicrocode = 
-            GpuProgramManager::getSingleton().createMicrocode(sizeOfBuffer);
+        auto newMicrocode = GpuProgramManager::createMicrocode(sizeOfBuffer);
 
         // save size of microcode
         size_t microcodeSize = mMicroCode->GetBufferSize();

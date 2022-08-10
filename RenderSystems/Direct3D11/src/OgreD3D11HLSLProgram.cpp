@@ -695,8 +695,7 @@ namespace Ogre {
 
 
                 // create microcode
-                GpuProgramManager::Microcode newMicrocode = 
-                    GpuProgramManager::getSingleton().createMicrocode(sizeOfData);
+                auto newMicrocode = GpuProgramManager::createMicrocode(sizeOfData);
 
 
 #define WRITE_START(curlist, memberType) {                          \

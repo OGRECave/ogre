@@ -167,8 +167,7 @@ for (const auto & nameString : nameStrings)
         OGRE_CHECK_GL_ERROR(glGetProgramiv(programHandle, GL_PROGRAM_BINARY_LENGTH, &binaryLength));
 
         // create microcode
-        GpuProgramManager::Microcode newMicrocode =
-            GpuProgramManager::getSingleton().createMicrocode(binaryLength + sizeof(GLenum));
+        auto newMicrocode = GpuProgramManager::createMicrocode(binaryLength + sizeof(GLenum));
 
         // get binary
         OGRE_CHECK_GL_ERROR(glGetProgramBinary(programHandle, binaryLength, NULL,

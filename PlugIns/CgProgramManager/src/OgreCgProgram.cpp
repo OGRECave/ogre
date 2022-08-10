@@ -378,8 +378,7 @@ namespace Ogre {
 													 mParametersMapSizeAsBuffer);
 
 		// create microcode
-		GpuProgramManager::Microcode newMicrocode =
-			GpuProgramManager::getSingleton().createMicrocode(sizeOfMicrocode);
+		auto newMicrocode = GpuProgramManager::createMicrocode(sizeOfMicrocode);
 
 		newMicrocode->seek(0);
 
