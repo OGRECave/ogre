@@ -73,6 +73,8 @@ namespace Ogre {
             only need to be set once, like the LightingModel can be defined here.
         */
         virtual void _oneTimeContextInitialization() = 0;
+
+        size_t applyGlobalInstancingDeclaration(const RenderOperation& op);
     public:
         /**
          Specific options:
