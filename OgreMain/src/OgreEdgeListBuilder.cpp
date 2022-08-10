@@ -174,11 +174,9 @@ namespace Ogre {
         }
 
         // Build triangles and edge list
-        GeometryList::const_iterator i, iend;
-        iend = mGeometryList.end();
-        for (i = mGeometryList.begin(); i != iend; ++i)
+        for (auto& g : mGeometryList)
         {
-            buildTrianglesEdges(*i);
+            buildTrianglesEdges(g);
         }
 
         // Allocate memory for light facing calculate
