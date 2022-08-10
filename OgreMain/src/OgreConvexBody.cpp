@@ -60,7 +60,7 @@ namespace Ogre
     {
         OGRE_LOCK_MUTEX(msFreePolygonsMutex);
         
-        for (auto *p : msFreePolygons) 
+        for (auto *p : msFreePolygons)
         {
             OGRE_DELETE_T(p, Polygon, MEMCATEGORY_SCENE_CONTROL);
         }
@@ -454,7 +454,7 @@ namespace Ogre
     //-----------------------------------------------------------------------
     void ConvexBody::reset( void )
     {
-        for (auto *p : mPolygons) 
+        for (auto *p : mPolygons)
         {
             freePolygon(p);
         }
