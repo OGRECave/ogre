@@ -114,8 +114,7 @@ namespace Ogre {
         OGRE_CHECK_GL_ERROR(glGetProgramiv(programHandle, GL_PROGRAM_BINARY_LENGTH_OES, &binaryLength));
 
         // Create microcode
-        GpuProgramManager::Microcode newMicrocode =
-            GpuProgramManager::getSingleton().createMicrocode(static_cast<uint32>(binaryLength + sizeof(GLenum)));
+        auto newMicrocode = GpuProgramManager::createMicrocode(static_cast<uint32>(binaryLength + sizeof(GLenum)));
 
         // Get binary
         OGRE_CHECK_GL_ERROR(glGetProgramBinaryOES(programHandle, binaryLength, NULL, (GLenum *)newMicrocode->getPtr(),

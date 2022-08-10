@@ -223,8 +223,7 @@ namespace Ogre {
         else if ( GpuProgramManager::getSingleton().getSaveMicrocodesToCache() )
         {
             // create microcode
-            GpuProgramManager::Microcode newMicrocode = 
-                GpuProgramManager::getSingleton().createMicrocode(microcode->GetBufferSize());
+            auto newMicrocode = GpuProgramManager::createMicrocode(microcode->GetBufferSize());
 
             // save microcode
             memcpy(newMicrocode->getPtr(), microcode->GetBufferPointer(), microcode->GetBufferSize());
