@@ -391,11 +391,11 @@ void CompositorInstance::collectPasses(TargetOperation &finalState, const Compos
             /// Create local material
             MaterialPtr localMat = createLocalMaterial(srcmat->getName());
             /// Copy and adapt passes from source material
-            for(auto *scrpass : srctech->getPasses())
+            for(auto *srcpass : srctech->getPasses())
             {
                 /// Create new target pass
                 targetpass = localMat->getTechnique(0)->createPass();
-                (*targetpass) = (*scrpass);
+                (*targetpass) = (*srcpass);
 
                 if (isCompute && !targetpass->hasGpuProgram(GPT_COMPUTE_PROGRAM))
                 {
@@ -899,8 +899,6 @@ void CompositorInstance::freeResources(bool forResizeOnly, bool clearReserveText
     // required (saves some time & memory thrashing / fragmentation on resize)
 
     const CompositionTechnique::TextureDefinitions& tdefs = mTechnique->getTextureDefinitions();
-    // CompositionTechnique::TextureDefinitions::const_iterator it = tdefs.begin();
-    // for (; it != tdefs.end(); ++it)
     for (auto *def : tdefs)
     {
         if (!def->refCompName.empty()) 
@@ -1183,28 +1181,24 @@ void CompositorInstance::removeListener(Listener *l)
 //-----------------------------------------------------------------------
 void CompositorInstance::_fireNotifyMaterialSetup(uint32 pass_id, MaterialPtr &mat)
 {
-    // Listeners::iterator i, iend=mListeners.end();
     for(auto *l : mListeners)
         l->notifyMaterialSetup(pass_id, mat);
 }
 //-----------------------------------------------------------------------
 void CompositorInstance::_fireNotifyMaterialRender(uint32 pass_id, MaterialPtr &mat)
 {
-    // Listeners::iterator i, iend=mListeners.end();
     for(auto *l : mListeners)
         l->notifyMaterialRender(pass_id, mat);
 }
 //-----------------------------------------------------------------------
 void CompositorInstance::_fireNotifyResourcesCreated(bool forResizeOnly)
 {
-    // Listeners::iterator i, iend=mListeners.end();
     for(auto *l : mListeners)
         l->notifyResourcesCreated(forResizeOnly);
 }
 //-----------------------------------------------------------------------
 void CompositorInstance::_fireNotifyResourcesReleased(bool forResizeOnly)
 {
-    // Listeners::iterator i, iend=mListeners.end();
     for(auto *l : mListeners)
         l->notifyResourcesReleased(forResizeOnly);
 }
