@@ -215,11 +215,10 @@ public:
         }
 
         // Queue passes from mat
-        Technique::Passes::const_iterator i;
-        for(i = technique->getPasses().begin(); i != technique->getPasses().end(); ++i)
+        for(auto *p : technique->getPasses())
         {
             sm->_injectRenderWithPass(
-                *i,
+                p,
                 rect,
                 false // don't allow replacement of shadow passes
                 );
@@ -392,10 +391,8 @@ void CompositorInstance::collectPasses(TargetOperation &finalState, const Compos
             /// Create local material
             MaterialPtr localMat = createLocalMaterial(srcmat->getName());
             /// Copy and adapt passes from source material
-            Technique::Passes::const_iterator i;
-            for(i = srctech->getPasses().begin(); i != srctech->getPasses().end(); ++i)
+            for(auto *srcpass : srctech->getPasses())
             {
-                Pass *srcpass = *i;
                 /// Create new target pass
                 targetpass = localMat->getTechnique(0)->createPass();
                 (*targetpass) = (*srcpass);
@@ -522,10 +519,8 @@ void CompositorInstance::setTechnique(CompositionTechnique* tech, bool reuseText
             // this will ensure they don't get destroyed as unreferenced
             // so they're ready to use again later
             const CompositionTechnique::TextureDefinitions& tdefs = mTechnique->getTextureDefinitions();
-            CompositionTechnique::TextureDefinitions::const_iterator it = tdefs.begin();
-            for (; it != tdefs.end(); ++it)
+            for (auto *def : tdefs)
             {
-                CompositionTechnique::TextureDefinition *def = *it;
                 if (def->pooled)
                 {
                     LocalTextureMap::iterator i = mLocalTextures.find(def->name);
@@ -826,10 +821,8 @@ void CompositorInstance::deriveTextureRenderTargetOptions(
     bool renderingScene = false;
 
     const CompositionTechnique::TargetPasses& passes = mTechnique->getTargetPasses();
-    CompositionTechnique::TargetPasses::const_iterator it;
-    for (it = passes.begin(); it != passes.end(); ++it)
+    for (auto *tp : passes)
     {
-        CompositionTargetPass* tp = *it;
         if (tp->getOutputName() == texname)
         {
             if (tp->getInputMode() == CompositionTargetPass::IM_PREVIOUS)
@@ -906,11 +899,8 @@ void CompositorInstance::freeResources(bool forResizeOnly, bool clearReserveText
     // required (saves some time & memory thrashing / fragmentation on resize)
 
     const CompositionTechnique::TextureDefinitions& tdefs = mTechnique->getTextureDefinitions();
-    CompositionTechnique::TextureDefinitions::const_iterator it = tdefs.begin();
-    for (; it != tdefs.end(); ++it)
+    for (auto *def : tdefs)
     {
-        CompositionTechnique::TextureDefinition *def = *it;
-
         if (!def->refCompName.empty()) 
         {
             //This is a reference, isn't created here
@@ -969,15 +959,12 @@ void CompositorInstance::freeResources(bool forResizeOnly, bool clearReserveText
         if (forResizeOnly)
         {
             // just remove the ones which would be affected by a resize
-            for (ReserveTextureMap::iterator i = mReserveTextures.begin();
-                i != mReserveTextures.end(); )
+            for (auto& t : mReserveTextures)
             {
-                if (i->first->width == 0 || i->first->height == 0)
+                if (t.first->width == 0 || t.first->height == 0)
                 {
-                    mReserveTextures.erase(i++);
+                    mReserveTextures.erase(t.first);
                 }
-                else
-                    ++i;
             }
         }
         else
@@ -1194,30 +1181,26 @@ void CompositorInstance::removeListener(Listener *l)
 //-----------------------------------------------------------------------
 void CompositorInstance::_fireNotifyMaterialSetup(uint32 pass_id, MaterialPtr &mat)
 {
-    Listeners::iterator i, iend=mListeners.end();
-    for(i=mListeners.begin(); i!=iend; ++i)
-        (*i)->notifyMaterialSetup(pass_id, mat);
+    for(auto *l : mListeners)
+        l->notifyMaterialSetup(pass_id, mat);
 }
 //-----------------------------------------------------------------------
 void CompositorInstance::_fireNotifyMaterialRender(uint32 pass_id, MaterialPtr &mat)
 {
-    Listeners::iterator i, iend=mListeners.end();
-    for(i=mListeners.begin(); i!=iend; ++i)
-        (*i)->notifyMaterialRender(pass_id, mat);
+    for(auto *l : mListeners)
+        l->notifyMaterialRender(pass_id, mat);
 }
 //-----------------------------------------------------------------------
 void CompositorInstance::_fireNotifyResourcesCreated(bool forResizeOnly)
 {
-    Listeners::iterator i, iend=mListeners.end();
-    for(i=mListeners.begin(); i!=iend; ++i)
-        (*i)->notifyResourcesCreated(forResizeOnly);
+    for(auto *l : mListeners)
+        l->notifyResourcesCreated(forResizeOnly);
 }
 //-----------------------------------------------------------------------
 void CompositorInstance::_fireNotifyResourcesReleased(bool forResizeOnly)
 {
-    Listeners::iterator i, iend=mListeners.end();
-    for(i=mListeners.begin(); i!=iend; ++i)
-        (*i)->notifyResourcesReleased(forResizeOnly);
+    for(auto *l : mListeners)
+        l->notifyResourcesReleased(forResizeOnly);
 }
 //-----------------------------------------------------------------------
 void CompositorInstance::notifyCameraChanged(Camera* camera)

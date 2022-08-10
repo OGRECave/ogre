@@ -135,10 +135,9 @@ void CompositorManager::removeAll(void)
 //-----------------------------------------------------------------------
 void CompositorManager::freeChains()
 {
-    Chains::iterator i, iend=mChains.end();
-    for(i=mChains.begin(); i!=iend;++i)
+    for(auto& c : mChains)
     {
-        OGRE_DELETE  i->second;
+        OGRE_DELETE  c.second;
     }
     mChains.clear();
 }
@@ -315,10 +314,8 @@ TexturePtr CompositorManager::getPooledTexture(const String& name,
 bool CompositorManager::isInputPreviousTarget(CompositorInstance* inst, const Ogre::String& localName)
 {
     const CompositionTechnique::TargetPasses& passes = inst->getTechnique()->getTargetPasses();
-    CompositionTechnique::TargetPasses::const_iterator it;
-    for (it = passes.begin(); it != passes.end(); ++it)
+    for (auto *tp :  passes)
     {
-        CompositionTargetPass* tp = *it;
         if (tp->getInputMode() == CompositionTargetPass::IM_PREVIOUS &&
             tp->getOutputName() == localName)
         {
@@ -334,10 +331,8 @@ bool CompositorManager::isInputPreviousTarget(CompositorInstance* inst, const Og
 bool CompositorManager::isInputPreviousTarget(CompositorInstance* inst, TexturePtr tex)
 {
     const CompositionTechnique::TargetPasses& passes = inst->getTechnique()->getTargetPasses();
-    CompositionTechnique::TargetPasses::const_iterator it;
-    for (it = passes.begin(); it != passes.end(); ++it)
+    for (auto *tp : passes)
     {
-        CompositionTargetPass* tp = *it;
         if (tp->getInputMode() == CompositionTargetPass::IM_PREVIOUS)
         {
             // Don't have to worry about an MRT, because no MRT can be input previous
@@ -355,11 +350,8 @@ bool CompositorManager::isInputPreviousTarget(CompositorInstance* inst, TextureP
 bool CompositorManager::isInputToOutputTarget(CompositorInstance* inst, const Ogre::String& localName)
 {
     CompositionTargetPass* tp = inst->getTechnique()->getOutputTargetPass();
-    CompositionTargetPass::Passes::const_iterator pit = tp->getPasses().begin();
-
-    for (;pit != tp->getPasses().end(); ++pit)
+    for (auto *p : tp->getPasses())
     {
-        CompositionPass* p = *pit;
         for (size_t i = 0; i < p->getNumInputs(); ++i)
         {
             if (p->getInput(i).name == localName)
@@ -374,11 +366,8 @@ bool CompositorManager::isInputToOutputTarget(CompositorInstance* inst, const Og
 bool CompositorManager::isInputToOutputTarget(CompositorInstance* inst, TexturePtr tex)
 {
     CompositionTargetPass* tp = inst->getTechnique()->getOutputTargetPass();
-    CompositionTargetPass::Passes::const_iterator pit = tp->getPasses().begin();
-
-    for (;pit != tp->getPasses().end(); ++pit)
+    for (auto *p : tp->getPasses())
     {
-        CompositionPass* p = *pit;
         for (size_t i = 0; i < p->getNumInputs(); ++i)
         {
             TexturePtr t = inst->getTextureInstance(p->getInput(i).name, 0);
@@ -398,7 +387,7 @@ void CompositorManager::freePooledTextures(bool onlyIfUnreferenced)
         for (auto & i : mTexturesByDef)
         {
             TextureList& texList = i.second;
-            for (TextureList::iterator j = texList.begin(); j != texList.end();)
+            for (auto j = texList.begin(); j != texList.end();)
             {
                 // if the resource system, plus this class, are the only ones to have a reference..
                 // NOTE: any material references will stop this texture getting freed (e.g. compositor demo)
