@@ -58,12 +58,11 @@ namespace Ogre
     //-----------------------------------------------------------------------
     void ConvexBody::_destroyPool()
     {
-            OGRE_LOCK_MUTEX(msFreePolygonsMutex);
+        OGRE_LOCK_MUTEX(msFreePolygonsMutex);
         
-        for (PolygonList::iterator i = msFreePolygons.begin(); 
-            i != msFreePolygons.end(); ++i)
+        for (auto *p : msFreePolygons)
         {
-            OGRE_DELETE_T(*i, Polygon, MEMCATEGORY_SCENE_CONTROL);
+            OGRE_DELETE_T(p, Polygon, MEMCATEGORY_SCENE_CONTROL);
         }
         msFreePolygons.clear();
     }
@@ -92,7 +91,7 @@ namespace Ogre
     //-----------------------------------------------------------------------
     void ConvexBody::freePolygon(Polygon* poly)
     {
-            OGRE_LOCK_MUTEX(msFreePolygonsMutex);
+        OGRE_LOCK_MUTEX(msFreePolygonsMutex);
         msFreePolygons.push_back(poly);
     }
     //-----------------------------------------------------------------------
@@ -455,10 +454,9 @@ namespace Ogre
     //-----------------------------------------------------------------------
     void ConvexBody::reset( void )
     {
-        for (PolygonList::iterator it = mPolygons.begin(); 
-            it != mPolygons.end(); ++it)
+        for (auto *p : mPolygons)
         {
-            freePolygon(*it);
+            freePolygon(p);
         }
         mPolygons.clear();
     }
