@@ -2304,15 +2304,6 @@ namespace Ogre {
 
         mMaxBuiltInTextureAttribIndex = 0;
 
-        HardwareVertexBufferSharedPtr globalInstanceVertexBuffer = getGlobalInstanceVertexBuffer();
-        VertexDeclaration* globalVertexDeclaration = getGlobalInstanceVertexBufferVertexDeclaration();
-        size_t numberOfInstances = op.numberOfInstances;
-
-        if (op.useGlobalInstancingVertexBufferIsAvailable)
-        {
-            numberOfInstances *= getGlobalNumberOfInstances();
-        }
-
         const VertexDeclaration::VertexElementList& decl =
             op.vertexData->vertexDeclaration->getElements();
         VertexDeclaration::VertexElementList::const_iterator elemIter, elemEnd;
@@ -2332,16 +2323,7 @@ namespace Ogre {
             bindVertexElementToGpu(elem, vertexBuffer, op.vertexData->vertexStart);
         }
 
-        if( globalInstanceVertexBuffer && globalVertexDeclaration != NULL )
-        {
-            elemEnd = globalVertexDeclaration->getElements().end();
-            for (elemIter = globalVertexDeclaration->getElements().begin(); elemIter != elemEnd; ++elemIter)
-            {
-                const VertexElement & elem = *elemIter;
-                bindVertexElementToGpu(elem, globalInstanceVertexBuffer, 0);
-
-            }
-        }
+        size_t numberOfInstances = applyGlobalInstancingDeclaration(op);
 
         bool multitexturing = (getCapabilities()->getNumTextureUnits() > 1);
         if (multitexturing)

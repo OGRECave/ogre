@@ -1084,16 +1084,6 @@ namespace Ogre {
         // Call super class.
         RenderSystem::_render(op);
 
-        // Create variables related to instancing.
-        HardwareVertexBufferSharedPtr globalInstanceVertexBuffer = getGlobalInstanceVertexBuffer();
-        VertexDeclaration* globalVertexDeclaration = getGlobalInstanceVertexBufferVertexDeclaration();
-        size_t numberOfInstances = op.numberOfInstances;
-
-        if (op.useGlobalInstancingVertexBufferIsAvailable)
-        {
-            numberOfInstances *= getGlobalNumberOfInstances();
-        }
-
         if (!mProgramManager->getActiveProgram())
         {
             LogManager::getSingleton().logError("Failed to create shader program.");
@@ -1114,17 +1104,7 @@ namespace Ogre {
             mStateCacheManager->bindGLBuffer(GL_ELEMENT_ARRAY_BUFFER,
                 op.indexData->indexBuffer->_getImpl<GL3PlusHardwareBuffer>()->getGLBufferId());
 
-        // unconditionally modify VAO for global instance data (FIXME bad API)
-        VertexDeclaration::VertexElementList::const_iterator elemIter, elemEnd;
-        if ( globalInstanceVertexBuffer && globalVertexDeclaration )
-        {
-            elemEnd = globalVertexDeclaration->getElements().end();
-            for (elemIter = globalVertexDeclaration->getElements().begin(); elemIter != elemEnd; ++elemIter)
-            {
-                const VertexElement & elem = *elemIter;
-                bindVertexElementToGpu(elem, globalInstanceVertexBuffer, 0);
-            }
-        }
+        size_t numberOfInstances = applyGlobalInstancingDeclaration(op);
 
         int operationType = op.operationType;
         // Use adjacency if there is a geometry program and it requested adjacency info
