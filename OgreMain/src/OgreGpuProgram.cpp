@@ -292,10 +292,11 @@ namespace Ogre
         mLogicalToPhysical->bufferSize = mConstantDefs->bufferSize;
         mLogicalToPhysical->map.clear();
         // need to set up logical mappings too for some rendersystems
-        for (auto& i : mConstantDefs->map)
+        for (GpuConstantDefinitionMap::const_iterator i = mConstantDefs->map.begin();
+            i != mConstantDefs->map.end(); ++i)
         {
-            const String& name = i.first;
-            const GpuConstantDefinition& def = i.second;
+            const String& name = i->first;
+            const GpuConstantDefinition& def = i->second;
             // only consider non-array entries
             if (name.find('[') == String::npos)
             {
@@ -305,8 +306,6 @@ namespace Ogre
                 mLogicalToPhysical->map.emplace(val);
             }
         }
-
-
     }
     //-----------------------------------------------------------------------------
     GpuProgramParametersSharedPtr GpuProgram::createParameters(void)
