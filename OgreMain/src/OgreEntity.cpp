@@ -304,11 +304,11 @@ namespace Ogre {
         if (mInitialised)
         {
             // Copy material settings
-            SubEntityList::const_iterator i;
             unsigned int n = 0;
-            for (i = mSubEntityList.begin(); i != mSubEntityList.end(); ++i, ++n)
+            for (auto *e : mSubEntityList)
             {
-                newEnt->getSubEntity(n)->setMaterialName((*i)->getMaterialName());
+                newEnt->getSubEntity(n)->setMaterialName(e->getMaterialName());
+                ++n;
             }
             if (mAnimationState)
             {
@@ -1829,16 +1829,14 @@ namespace Ogre {
         bool init = mShadowRenderables.empty();
 
         EdgeData::EdgeGroupList::iterator egi;
-        ShadowRenderableList::iterator si, siend;
         if (init)
             mShadowRenderables.resize(edgeList->edgeGroups.size());
 
         bool isAnimated = hasAnimation;
         bool updatedSharedGeomNormals = false;
         bool extrude = flags & SRF_EXTRUDE_IN_SOFTWARE;
-        siend = mShadowRenderables.end();
         egi = edgeList->edgeGroups.begin();
-        for (si = mShadowRenderables.begin(); si != siend; ++si, ++egi)
+        for (auto *si : mShadowRenderables)
         {
             const VertexData *pVertData;
             if (isAnimated)
@@ -1860,8 +1858,8 @@ namespace Ogre {
                 // for extruding the shadow volume) since otherwise we can
                 // get depth-fighting on the light cap
 
-                *si = OGRE_NEW EntityShadowRenderable(this, indexBuffer, pVertData,
-                                                      mVertexProgramInUse || !extrude, subent);
+                si = OGRE_NEW EntityShadowRenderable(this, indexBuffer, pVertData,
+mVertexProgramInUse || !extrude, subent);
             }
             else
             {
@@ -1870,11 +1868,11 @@ namespace Ogre {
                 // since a temporary buffer is requested each frame
                 // therefore, we need to update the EntityShadowRenderable
                 // with the current position buffer
-                static_cast<EntityShadowRenderable*>(*si)->rebindPositionBuffer(pVertData, hasAnimation);
+                static_cast<EntityShadowRenderable*>(si)->rebindPositionBuffer(pVertData, hasAnimation);
 
             }
             // Get shadow renderable
-            HardwareVertexBufferSharedPtr esrPositionBuffer = (*si)->getPositionBuffer();
+            HardwareVertexBufferSharedPtr esrPositionBuffer = si->getPositionBuffer();
             // For animated entities we need to recalculate the face normals
             if (hasAnimation)
             {
@@ -1905,11 +1903,11 @@ namespace Ogre {
                 extrudeVertices(esrPositionBuffer,
                     egi->vertexData->vertexCount,
                     lightPos, extrusionDistance);
-
             }
             // Stop suppressing hardware update now, if we were
             esrPositionBuffer->suppressHardwareUpdate(false);
 
+            ++egi;
         }
         // Calc triangle light facing
         updateEdgeListLightFacing(edgeList, lightPos);
@@ -2225,7 +2223,7 @@ namespace Ogre {
         bool debugRenderables)
     {
         // Visit each SubEntity
-        for (auto & i : mSubEntityList)
+        for (auto& i : mSubEntityList)
         {
             visitor->visit(i, 0, false);
         }

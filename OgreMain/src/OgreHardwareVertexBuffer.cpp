@@ -554,14 +554,11 @@ namespace Ogre {
         // Sort first
         sort();
 
-        VertexElementList::iterator i, iend;
-        iend = mElementList.end();
         unsigned short targetIdx = 0;
         unsigned short lastIdx = getElement(0)->getSource();
         unsigned short c = 0;
-        for (i = mElementList.begin(); i != iend; ++i, ++c)
+        for (auto& elem : mElementList)
         {
-            VertexElement& elem = *i;
             if (lastIdx != elem.getSource())
             {
                 targetIdx++;
@@ -573,6 +570,7 @@ namespace Ogre {
                     elem.getSemantic(), elem.getIndex());
             }
 
+            ++c;
         }
 
     }
@@ -583,13 +581,12 @@ namespace Ogre {
         VertexDeclaration* newDecl = this->clone();
         // Set all sources to the same buffer (for now)
         const VertexDeclaration::VertexElementList& elems = newDecl->getElements();
-        VertexDeclaration::VertexElementList::const_iterator i;
         unsigned short c = 0;
-        for (i = elems.begin(); i != elems.end(); ++i, ++c)
+        for (auto& e : elems)
         {
-            const VertexElement& elem = *i;
             // Set source & offset to 0 for now, before sort
-            newDecl->modifyElement(c, 0, 0, elem.getType(), elem.getSemantic(), elem.getIndex());
+            newDecl->modifyElement(c, 0, 0, e.getType(), e.getSemantic(), e.getIndex());
+            ++c;
         }
         newDecl->sort();
         // Now sort out proper buffer assignments and offsets
@@ -597,13 +594,11 @@ namespace Ogre {
         c = 0;
         unsigned short buffer = 0;
         VertexElementSemantic prevSemantic = VES_POSITION;
-        for (i = elems.begin(); i != elems.end(); ++i, ++c)
+        for (auto& e : elems)
         {
-            const VertexElement& elem = *i;
-
             bool splitWithPrev = false;
             bool splitWithNext = false;
-            switch (elem.getSemantic())
+            switch (e.getSemantic())
             {
             case VES_POSITION:
                 // Split positions if vertex animated with only positions
@@ -643,9 +638,9 @@ namespace Ogre {
                 offset = 0;
             }
 
-            prevSemantic = elem.getSemantic();
+            prevSemantic = e.getSemantic();
             newDecl->modifyElement(c, buffer, offset,
-                elem.getType(), elem.getSemantic(), elem.getIndex());
+                e.getType(), e.getSemantic(), e.getIndex());
 
             if (splitWithNext)
             {
@@ -654,8 +649,10 @@ namespace Ogre {
             }
             else
             {
-                offset += elem.getSize();
+                offset += e.getSize();
             }
+
+            ++c;
         }
 
         return newDecl;
