@@ -148,6 +148,7 @@ namespace Ogre
     //-----------------------------------------------------------------------
     void RibbonTrail::setTrailLength(Real len)
     {
+        OgreAssert(len > 0, "invalid value");
         mTrailLength = len;
         mElemLength = mTrailLength / mMaxElementsPerChain;
         mSquaredElemLength = mElemLength * mElemLength;
