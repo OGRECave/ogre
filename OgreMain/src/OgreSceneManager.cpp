@@ -176,16 +176,6 @@ bool SceneManager::isRenderQueueToBeProcessed(uint8 qid)
         || (!inList && mSpecialCaseQueueMode == SCRQM_EXCLUDE);
 }
 //-----------------------------------------------------------------------
-void SceneManager::setWorldGeometryRenderQueue(uint8 qid)
-{
-    mWorldGeometryRenderQueue = qid;
-}
-//-----------------------------------------------------------------------
-uint8 SceneManager::getWorldGeometryRenderQueue(void)
-{
-    return mWorldGeometryRenderQueue;
-}
-//-----------------------------------------------------------------------
 Camera* SceneManager::createCamera(const String& name)
 {
     // Check name not used
