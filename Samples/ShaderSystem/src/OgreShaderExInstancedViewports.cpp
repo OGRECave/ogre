@@ -85,7 +85,8 @@ void ShaderExInstancedViewports::copyFrom(const SubRenderState& rhs)
 //-----------------------------------------------------------------------
 bool ShaderExInstancedViewports::preAddToRenderState( const RenderState* renderState, Pass* srcPass, Pass* dstPass )
 {
-    return srcPass->getParent()->getParent()->getName().find("SdkTrays") == Ogre::String::npos;
+    auto matname = srcPass->getParent()->getParent()->getName();
+    return matname.find("SdkTrays") == String::npos && matname.find("Instancing") == String::npos;
 }
 //-----------------------------------------------------------------------
 bool ShaderExInstancedViewports::resolveParameters(ProgramSet* programSet)
@@ -122,14 +123,14 @@ bool ShaderExInstancedViewports::resolveParameters(ProgramSet* programSet)
     mProjectionMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_PROJECTION_MATRIX);
     
     
-#define SPC_MONITOR_INDEX Parameter::SPC_TEXTURE_COORDINATE3
+#define SPC_MONITOR_INDEX Parameter::SPC_TEXTURE_COORDINATE1
     // Resolve vertex shader  monitor index
     mVSInMonitorIndex = vsMain->resolveInputParameter(SPC_MONITOR_INDEX, GCT_FLOAT4);
 
-#define SPC_MATRIX_R0 Parameter::SPC_TEXTURE_COORDINATE4
-#define SPC_MATRIX_R1 Parameter::SPC_TEXTURE_COORDINATE5
-#define SPC_MATRIX_R2 Parameter::SPC_TEXTURE_COORDINATE6
-#define SPC_MATRIX_R3 Parameter::SPC_TEXTURE_COORDINATE7
+#define SPC_MATRIX_R0 Parameter::SPC_TEXTURE_COORDINATE2
+#define SPC_MATRIX_R1 Parameter::SPC_TEXTURE_COORDINATE3
+#define SPC_MATRIX_R2 Parameter::SPC_TEXTURE_COORDINATE4
+#define SPC_MATRIX_R3 Parameter::SPC_TEXTURE_COORDINATE5
 
     // Resolve vertex shader viewport offset matrix
     mVSInViewportOffsetMatrixR0 = vsMain->resolveInputParameter(SPC_MATRIX_R0, GCT_FLOAT4);
@@ -252,15 +253,15 @@ void ShaderExInstancedViewports::setMonitorsCount( const Vector2 monitorCount )
     Ogre::VertexDeclaration* vertexDeclaration = Ogre::HardwareBufferManager::getSingleton().createVertexDeclaration();
     size_t offset = 0;
     offset = vertexDeclaration->getVertexSize(0);
+    vertexDeclaration->addElement(0, offset, Ogre::VET_FLOAT4, Ogre::VES_TEXTURE_COORDINATES, 1);
+    offset = vertexDeclaration->getVertexSize(0);
+    vertexDeclaration->addElement(0, offset, Ogre::VET_FLOAT4, Ogre::VES_TEXTURE_COORDINATES, 2);
+    offset = vertexDeclaration->getVertexSize(0);
     vertexDeclaration->addElement(0, offset, Ogre::VET_FLOAT4, Ogre::VES_TEXTURE_COORDINATES, 3);
     offset = vertexDeclaration->getVertexSize(0);
     vertexDeclaration->addElement(0, offset, Ogre::VET_FLOAT4, Ogre::VES_TEXTURE_COORDINATES, 4);
     offset = vertexDeclaration->getVertexSize(0);
     vertexDeclaration->addElement(0, offset, Ogre::VET_FLOAT4, Ogre::VES_TEXTURE_COORDINATES, 5);
-    offset = vertexDeclaration->getVertexSize(0);
-    vertexDeclaration->addElement(0, offset, Ogre::VET_FLOAT4, Ogre::VES_TEXTURE_COORDINATES, 6);
-    offset = vertexDeclaration->getVertexSize(0);
-    vertexDeclaration->addElement(0, offset, Ogre::VET_FLOAT4, Ogre::VES_TEXTURE_COORDINATES, 7);
 
     Ogre::HardwareVertexBufferSharedPtr vbuf =
         Ogre::HardwareBufferManager::getSingleton().createVertexBuffer(
