@@ -2481,7 +2481,7 @@ namespace Ogre {
             by the SceneManager. If the SceneManager feeds world geometry into
             the queues, however, the ordering will be affected. 
         */
-        void setWorldGeometryRenderQueue(uint8 qid);
+        void setWorldGeometryRenderQueue(uint8 qid) { mWorldGeometryRenderQueue = qid; }
         /** Gets the render queue that the world geometry (if any) this SceneManager
             renders will be associated with.
 
@@ -2492,7 +2492,7 @@ namespace Ogre {
             world geometry, it should still pick a queue to represent it's manual
             rendering, and check isRenderQueueToBeProcessed before rendering.
         */
-        uint8 getWorldGeometryRenderQueue(void);
+        uint8 getWorldGeometryRenderQueue() { return mWorldGeometryRenderQueue; }
 
         /** Internal method for notifying the manager that a SceneNode is autotracking. */
         void _notifyAutotrackingSceneNode(SceneNode* node, bool autoTrack);
