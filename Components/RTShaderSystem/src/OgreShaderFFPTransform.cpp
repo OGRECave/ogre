@@ -85,6 +85,7 @@ bool FFPTransform::createCpuSubPrograms(ProgramSet* programSet)
     auto stage = vsEntry->getStage(FFP_VS_TRANSFORM);
     if(mInstanced)
     {
+        vsProgram->setInstancingIncluded(true);
         if (isHLSL)
         {
             // set hlsl shader to use row-major matrices instead of column-major.

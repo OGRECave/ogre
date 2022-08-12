@@ -40,6 +40,7 @@ Program::Program(GpuProgramType type)
     mEntryPointFunction = new Function();
     mSkeletalAnimation  = false;
     mColumnMajorMatrices = true;
+    mInstancing         = false;
 }
 
 //-----------------------------------------------------------------------------

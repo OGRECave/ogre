@@ -164,9 +164,11 @@ void ProgramManager::createGpuPrograms(ProgramSet* programSet)
         programSet->setGpuProgram(gpuProgram);
     }
 
-    //update flags
-    programSet->getGpuProgram(GPT_VERTEX_PROGRAM)->setSkeletalAnimationIncluded(
-        programSet->getCpuProgram(GPT_VERTEX_PROGRAM)->getSkeletalAnimationIncluded());
+    // update VS flags
+    auto gpuVs = programSet->getGpuProgram(GPT_VERTEX_PROGRAM);
+    auto cpuVs = programSet->getCpuProgram(GPT_VERTEX_PROGRAM);
+    gpuVs->setSkeletalAnimationIncluded(cpuVs->getSkeletalAnimationIncluded());
+    gpuVs->setInstancingIncluded(cpuVs->getInstancingIncluded());
 
     // Call the post creation of GPU programs method.
     if(!programProcessor->postCreateGpuPrograms(programSet))
