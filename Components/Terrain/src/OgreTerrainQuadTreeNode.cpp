@@ -1319,8 +1319,7 @@ namespace Ogre
                             // vertices which would drop out at this LOD, even 
                             // while using the single shared vertex data
                             setCustomParameter(Terrain::LOD_MORPH_CUSTOM_PARAM,
-                                Vector4(mLodTransition, mCurrentLod + mBaseLod + 1, 0, 0));
-
+                                               Vector4f(mLodTransition, mCurrentLod + mBaseLod + 1, 0, 0));
                         }
                         // since LODs are ordered from highest to lowest detail, 
                         // we can stop looking now
@@ -1362,14 +1361,13 @@ namespace Ogre
     {
          mCurrentLod = lod;
          setCustomParameter(Terrain::LOD_MORPH_CUSTOM_PARAM,
-             Vector4(mLodTransition, mCurrentLod + mBaseLod + 1, 0, 0));
+                            Vector4f(mLodTransition, mCurrentLod + mBaseLod + 1, 0, 0));
     }
     //---------------------------------------------------------------------
     void TerrainQuadTreeNode::setLodTransition(float t)
     {
-        mLodTransition = t;                         
-        setCustomParameter(Terrain::LOD_MORPH_CUSTOM_PARAM,
-            Vector4(mLodTransition, mCurrentLod + mBaseLod + 1, 0, 0));
+        mLodTransition = t;
+        setCustomParameter(Terrain::LOD_MORPH_CUSTOM_PARAM, Vector4f(mLodTransition, mCurrentLod + mBaseLod + 1, 0, 0));
     }
     //---------------------------------------------------------------------
     bool TerrainQuadTreeNode::isRenderedAtCurrentLod() const

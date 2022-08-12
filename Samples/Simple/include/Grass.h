@@ -261,11 +261,11 @@ class _OgreSampleClassExport Sample_Grass : public SdkSample
 
  void waveGrass(Real timeElapsed)
  {
-     static Real xinc = Math::PI * 0.3;
-     static Real zinc = Math::PI * 0.44;
-     static Real xpos = Math::RangeRandom(-Math::PI, Math::PI);
-     static Real zpos = Math::RangeRandom(-Math::PI, Math::PI);
-     static Vector4 offset(0, 0, 0, 0);
+     static float xinc = Math::PI * 0.3;
+     static float zinc = Math::PI * 0.44;
+     static float xpos = Math::RangeRandom(-Math::PI, Math::PI);
+     static float zpos = Math::RangeRandom(-Math::PI, Math::PI);
+     static Vector4f offset(0);
 
      xpos += xinc * timeElapsed;
      zpos += zinc * timeElapsed;
@@ -276,8 +276,8 @@ class _OgreSampleClassExport Sample_Grass : public SdkSample
          // a little randomness
          xpos += reg.second->getCentre().x * 0.001;
          zpos += reg.second->getCentre().z * 0.001;
-         offset.x = std::sin(xpos) * 4;
-         offset.z = std::sin(zpos) * 4;
+         offset[0] = std::sin(xpos) * 4;
+         offset[2] = std::sin(zpos) * 4;
 
          for (auto lod : reg.second->getLODBuckets())
          {

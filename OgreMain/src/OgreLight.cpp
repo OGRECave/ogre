@@ -777,12 +777,12 @@ namespace Ogre {
         }
     }
     //-----------------------------------------------------------------------
-    void Light::setCustomParameter(uint16 index, const Ogre::Vector4 &value)
+    void Light::setCustomParameter(uint16 index, const Ogre::Vector4f &value)
     {
         mCustomParameters[index] = value;
     }
     //-----------------------------------------------------------------------
-    const Vector4 &Light::getCustomParameter(uint16 index) const
+    const Vector4f &Light::getCustomParameter(uint16 index) const
     {
         CustomParameterMap::const_iterator i = mCustomParameters.find(index);
         if (i != mCustomParameters.end())

@@ -379,7 +379,7 @@ namespace Ogre
 
                     Element& elem = mChainElementList[seg.start + e];
                     elem.width = elem.width - (time * mDeltaWidth[s]);
-                    elem.width = std::max(Real(0.0f), elem.width);
+                    elem.width = std::max(0.0f, elem.width);
                     elem.colour = elem.colour - (mDeltaColour[s] * time);
                     elem.colour.saturate();
 

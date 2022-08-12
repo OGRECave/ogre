@@ -213,7 +213,7 @@ void Sample_ShaderSystem::sliderMoved(Slider* slider)
         if (mLayeredBlendingEntity != NULL)
         {
             Ogre::Real val = mModifierValueSlider->getValue();
-            mLayeredBlendingEntity->getSubEntity(0)->setCustomParameter(2, Vector4(val,val,val,0));
+            mLayeredBlendingEntity->getSubEntity(0)->setCustomParameter(2, Vector4f(val,val,val,0));
         }
     }
 }
@@ -312,7 +312,7 @@ void Sample_ShaderSystem::setupContent()
     // Create texture layer blending demonstration entity.
     mLayeredBlendingEntity = mSceneMgr->createEntity("LayeredBlendingMaterialEntity", MAIN_ENTITY_MESH);
     mLayeredBlendingEntity->setMaterialName("RTSS/LayeredBlending");
-    mLayeredBlendingEntity->getSubEntity(0)->setCustomParameter(2, Vector4::ZERO);
+    mLayeredBlendingEntity->getSubEntity(0)->setCustomParameter(2, Vector4f(0));
     childNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
     childNode->setPosition(300.0, 200.0, -200.0);
     childNode->attachObject(mLayeredBlendingEntity);
