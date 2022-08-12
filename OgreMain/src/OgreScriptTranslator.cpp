@@ -1862,8 +1862,12 @@ namespace Ogre{
                                        prop->name + ". Only used by the BSP scene manager.");
                     break;
                 case ID_NORMALISE_NORMALS:
+                    OGRE_IGNORE_DEPRECATED_BEGIN
                     if(getValue(prop, compiler, bval))
                         mPass->setNormaliseNormals(bval);
+                    OGRE_IGNORE_DEPRECATED_END
+                    compiler->addError(ScriptCompiler::CE_DEPRECATEDSYMBOL, prop->file, prop->line,
+                                       prop->name + ". Only used by fixed function APIs.");
                     break;
                 case ID_LIGHTING:
                     if(getValue(prop, compiler, bval))
