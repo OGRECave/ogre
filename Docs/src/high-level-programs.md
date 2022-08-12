@@ -725,7 +725,7 @@ You do this by adding the following attribute to your `vertex_program` definitio
 
 When you do this, all SubEntities with the same material will be batched together. %Ogre will create and populate an instance buffer with the world matrices of the instances. This buffer is provided in the `TEXCOORD1` attribute (also consuming `TEXCOORD2` and `TEXCOORD3`) to the vertex shader.
 
-When batching, all instances are rendered in a single draw-call. All per-renderable operations
+When batching, all instances are rendered in a single draw-call. All per-renderable operations are only performed with the first SubMesh of the batch.
 
 Therefore the following features are not supported:
 - `start_light` and `iteration` (all instances share the same lights)
