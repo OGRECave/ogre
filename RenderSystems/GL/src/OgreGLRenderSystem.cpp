@@ -2323,7 +2323,7 @@ namespace Ogre {
             bindVertexElementToGpu(elem, vertexBuffer, op.vertexData->vertexStart);
         }
 
-        size_t numberOfInstances = applyGlobalInstancingDeclaration(op);
+        auto numberOfInstances = op.numberOfInstances;
 
         bool multitexturing = (getCapabilities()->getNumTextureUnits() > 1);
         if (multitexturing)

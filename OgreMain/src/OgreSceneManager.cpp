@@ -1791,6 +1791,33 @@ void SceneManager::issueRenderWithLights(Renderable* rend, const Pass* pass,
          resetLightClip();
 }
 //-----------------------------------------------------------------------
+static void injectGlobalInstancingDeclaration(RenderOperation& ro, const RenderSystem* rs)
+{
+    if (!ro.useGlobalInstancingVertexBufferIsAvailable)
+        return;
+
+    // Create variables related to instancing.
+    VertexDeclaration* instanceDecl = rs->getGlobalInstanceVertexBufferVertexDeclaration();
+
+    if(!instanceDecl || instanceDecl->getElements().empty())
+        return;
+
+    auto instancingSrc = ro.vertexData->vertexDeclaration->getMaxSource();
+
+    auto testElement = instanceDecl->getElements().front();
+    if(!ro.vertexData->vertexDeclaration->findElementBySemantic(testElement.getSemantic(), testElement.getIndex()))
+    {
+        instancingSrc += 1;
+        for (auto el : instanceDecl->getElements())
+        {
+            ro.vertexData->vertexDeclaration->addElement(instancingSrc, el.getOffset(), el.getType(), el.getSemantic(),
+                                                         el.getIndex());
+        }
+    }
+    ro.vertexData->vertexBufferBinding->setBinding(instancingSrc, rs->getGlobalInstanceVertexBuffer());
+
+    ro.numberOfInstances *= rs->getGlobalNumberOfInstances();
+}
 
 static PolygonMode derivePolygonMode(const Pass* pass, const Renderable* rend, const Camera* cam)
 {
@@ -1912,6 +1939,8 @@ void SceneManager::renderInstancedObject(const RenderableList& rends, const Pass
 
     // set again -> might have been recreated
     ro.vertexData->vertexBufferBinding->setBinding(instancingSrc, mInstanceBuffer);
+
+    injectGlobalInstancingDeclaration(ro, mDestRenderSystem);
 
     mDestRenderSystem->_render(ro);
 
@@ -3950,6 +3979,8 @@ void SceneManager::_issueRenderOp(Renderable* rend, const Pass* pass)
         ro.srcRenderable = rend;
 
         rend->getRenderOperation(ro);
+
+        injectGlobalInstancingDeclaration(ro, mDestRenderSystem);
 
         mDestRenderSystem->_render(ro);
     }

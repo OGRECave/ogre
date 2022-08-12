@@ -146,30 +146,6 @@ namespace Ogre {
         optDisplayFrequency->second.currentValue = optDisplayFrequency->second.possibleValues.front();
     }
 
-    size_t GLRenderSystemCommon::applyGlobalInstancingDeclaration(const RenderOperation& op)
-    {
-        // Create variables related to instancing.
-        HardwareVertexBufferSharedPtr globalInstanceVertexBuffer = getGlobalInstanceVertexBuffer();
-        VertexDeclaration* globalVertexDeclaration = getGlobalInstanceVertexBufferVertexDeclaration();
-        size_t numberOfInstances = op.numberOfInstances;
-
-        if (op.useGlobalInstancingVertexBufferIsAvailable)
-        {
-            numberOfInstances *= getGlobalNumberOfInstances();
-        }
-
-        // unconditionally modify VAO for global instance data (FIXME bad API)
-        if ( globalInstanceVertexBuffer && globalVertexDeclaration )
-        {
-            for (const auto& elem : globalVertexDeclaration->getElements())
-            {
-                bindVertexElementToGpu(elem, globalInstanceVertexBuffer, 0);
-            }
-        }
-
-        return numberOfInstances;
-    }
-
     //-------------------------------------------------------------------------------------------------//
     void GLRenderSystemCommon::setConfigOption(const String &name, const String &value)
     {

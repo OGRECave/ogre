@@ -302,9 +302,7 @@ namespace Ogre
         void _setPolygonMode(PolygonMode level);
         void _setTextureUnitFiltering(size_t unit, FilterType ftype, FilterOptions filter);
         void setVertexDeclaration(VertexDeclaration* decl);
-        void setVertexDeclaration(VertexDeclaration* decl, bool useGlobalInstancingVertexBufferIsAvailable);
-        void setVertexBufferBinding(VertexBufferBinding* binding);
-        void setVertexBufferBinding(VertexBufferBinding* binding, size_t numberOfInstances, bool useGlobalInstancingVertexBufferIsAvailable, bool indexesUsed);
+        void setVertexBufferBinding(VertexBufferBinding* binding, int numberOfInstances, bool indexesUsed);
         void _render(const RenderOperation& op);
 
         void bindGpuProgram(GpuProgram* prg);

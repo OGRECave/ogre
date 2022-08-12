@@ -1217,7 +1217,7 @@ namespace Ogre {
         size_t numberOfInstances = 0;
         if (getCapabilities()->hasCapability(RSC_VERTEX_BUFFER_INSTANCE_DATA))
         {
-            numberOfInstances = applyGlobalInstancingDeclaration(op);
+            numberOfInstances = op.numberOfInstances;
         }
 
         // Find the correct type to render
