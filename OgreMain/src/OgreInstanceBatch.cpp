@@ -74,7 +74,7 @@ namespace Ogre
         mName = batchName;
 		if (mCreator != NULL)
 		{
-		    mCustomParams.resize( mCreator->getNumCustomParams() * mInstancesPerBatch, Ogre::Vector4::ZERO );
+		    mCustomParams.resize( mCreator->getNumCustomParams() * mInstancesPerBatch, Vector4f(0) );
 	    }
 		
 	}
@@ -430,7 +430,7 @@ namespace Ogre
             InstancedEntity *instance = generateInstancedEntity(i);
             mInstancedEntities.push_back( instance );
             mUnusedEntities.push_back( instance );
-            mCustomParams.push_back( Ogre::Vector4::ZERO );
+            mCustomParams.push_back( Vector4f(0) );
         }
 
         //We've potentially changed our bounds
@@ -614,12 +614,12 @@ namespace Ogre
     }
     //-----------------------------------------------------------------------
     void InstanceBatch::_setCustomParam( InstancedEntity *instancedEntity, unsigned char idx,
-                                         const Vector4 &newParam )
+                                         const Vector4f &newParam )
     {
         mCustomParams[instancedEntity->mInstanceId * mCreator->getNumCustomParams() + idx] = newParam;
     }
     //-----------------------------------------------------------------------
-    const Vector4& InstanceBatch::_getCustomParam( InstancedEntity *instancedEntity, unsigned char idx )
+    const Vector4f& InstanceBatch::_getCustomParam( InstancedEntity *instancedEntity, unsigned char idx )
     {
         return mCustomParams[instancedEntity->mInstanceId * mCreator->getNumCustomParams() + idx];
     }

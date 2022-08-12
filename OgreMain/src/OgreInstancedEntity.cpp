@@ -509,12 +509,12 @@ namespace Ogre
         mUseLocalTransform &= used;
     }
     //---------------------------------------------------------------------------
-    void InstancedEntity::setCustomParam( unsigned char idx, const Vector4 &newParam )
+    void InstancedEntity::setCustomParam( unsigned char idx, const Vector4f &newParam )
     {
         mBatchOwner->_setCustomParam( this, idx, newParam );
     }
     //---------------------------------------------------------------------------
-    const Vector4& InstancedEntity::getCustomParam( unsigned char idx )
+    const Vector4f& InstancedEntity::getCustomParam( unsigned char idx )
     {
         return mBatchOwner->_getCustomParam( this, idx );
     }
