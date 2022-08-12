@@ -395,21 +395,7 @@ namespace Ogre
     //-----------------------------------------------------------------------
     void PCZSceneManager::clearScene(void)
     {
-        destroyAllStaticGeometry();
-        destroyAllMovableObjects();
-
-        // Clear root node of all children
-        getRootSceneNode()->removeAllChildren();
-        getRootSceneNode()->detachAllObjects();
-
-        // Delete all SceneNodes, except root that is
-        for (SceneNodeList::iterator i = mSceneNodes.begin();
-            i != mSceneNodes.end(); ++i)
-        {
-            OGRE_DELETE *i;
-        }
-        mSceneNodes.clear();
-        mAutoTrackingSceneNodes.clear();
+        SceneManager::clearScene();
 
         // delete all the zones
         for (ZoneMap::iterator j = mZones.begin();
@@ -419,13 +405,6 @@ namespace Ogre
         }
         mZones.clear();
         mDefaultZone = 0;
-
-        // Clear animations
-        destroyAllAnimations();
-
-        // Clear render queue, empty completely
-        if (mRenderQueue)
-            mRenderQueue->clear(true);
 
         // re-initialize
         init(mDefaultZoneTypeName, mDefaultZoneFileName);
