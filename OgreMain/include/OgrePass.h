@@ -1349,8 +1349,10 @@ namespace Ogre {
             this has an overhead so you might want to turn that off through
             Ogre::SceneManager::setNormaliseNormalsOnScale(false) and only do it per-Pass
             when you need to.
+
+            @deprecated Only used by fixed function APIs. Use shaders if you rely on this.
         */
-        void setNormaliseNormals(bool normalise) { mNormaliseNormals = normalise; }
+        OGRE_DEPRECATED void setNormaliseNormals(bool normalise) { mNormaliseNormals = normalise; }
 
         /** Returns true if this pass has auto-normalisation of normals set. */
         bool getNormaliseNormals(void) const {return mNormaliseNormals; }

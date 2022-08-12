@@ -3282,20 +3282,11 @@ namespace Ogre {
         */
         bool getFindVisibleObjects(void) { return mFindVisibleObjects; }
 
-        /** Set whether to automatically normalise normals on objects whenever they
-            are scaled.
+        /// @deprecated do not use
+        OGRE_DEPRECATED void setNormaliseNormalsOnScale(bool n) { mNormaliseNormalsOnScale = n; }
 
-            Scaling can distort normals so the default behaviour is to compensate
-            for this, but it has a cost. If you would prefer to manually manage 
-            this, set this option to 'false' and use Pass::setNormaliseNormals
-            only when needed.
-        */
-        void setNormaliseNormalsOnScale(bool n) { mNormaliseNormalsOnScale = n; }
-
-        /** Get whether to automatically normalise normals on objects whenever they
-            are scaled.
-        */
-        bool getNormaliseNormalsOnScale() const { return mNormaliseNormalsOnScale; }
+        /// @deprecated do not use
+        OGRE_DEPRECATED bool getNormaliseNormalsOnScale() const { return mNormaliseNormalsOnScale; }
 
         /** Set whether to automatically flip the culling mode on objects whenever they
             are negatively scaled.
