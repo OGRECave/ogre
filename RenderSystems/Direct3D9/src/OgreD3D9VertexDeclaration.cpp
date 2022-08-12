@@ -34,7 +34,7 @@ THE SOFTWARE.
 namespace Ogre {
 
     //-----------------------------------------------------------------------
-    D3D9VertexDeclaration::D3D9VertexDeclaration() : mLastUsedGlobalDeclaration(0), mUsedGlobalDeclaration(false)
+    D3D9VertexDeclaration::D3D9VertexDeclaration()
     {
 
     }
@@ -70,17 +70,8 @@ namespace Ogre {
     }
 
     //-----------------------------------------------------------------------
-    IDirect3DVertexDeclaration9* D3D9VertexDeclaration::getD3DVertexDeclaration(
-            VertexDeclaration * globalDeclaration, bool useGlobalInstancingVertexBufferIsAvailable)
+    IDirect3DVertexDeclaration9* D3D9VertexDeclaration::getD3DVertexDeclaration()
     {
-        if (mLastUsedGlobalDeclaration != globalDeclaration ||
-            useGlobalInstancingVertexBufferIsAvailable != mUsedGlobalDeclaration )
-        {
-            releaseDeclaration();
-            mLastUsedGlobalDeclaration = globalDeclaration;
-            mUsedGlobalDeclaration = useGlobalInstancingVertexBufferIsAvailable;
-        }
-
         IDirect3DDevice9* pCurDevice   = D3D9RenderSystem::getActiveD3D9Device();
         DeviceToDeclarationIterator it = mMapDeviceToDeclaration.find(pCurDevice);
         IDirect3DVertexDeclaration9* lpVertDecl = NULL;
@@ -89,10 +80,6 @@ namespace Ogre {
         if (it == mMapDeviceToDeclaration.end() || it->second == NULL)
         {
             size_t d3delemsSize = mElementList.size() + 1;
-            if(mLastUsedGlobalDeclaration != NULL && mUsedGlobalDeclaration )
-            {
-                d3delemsSize += globalDeclaration->getElementCount(); 
-            }
             D3DVERTEXELEMENT9* d3delems = OGRE_ALLOC_T(D3DVERTEXELEMENT9, d3delemsSize, MEMCATEGORY_RENDERSYS);
 
             VertexElementList::const_iterator i, iend;
@@ -109,19 +96,6 @@ namespace Ogre {
                     maxSource = element.getSource();
                 }
             }
-
-            if(mLastUsedGlobalDeclaration != NULL && mUsedGlobalDeclaration )
-            {
-                iend = globalDeclaration->getElements().end();
-                for (i = globalDeclaration->getElements().begin(); i != iend; ++i, ++idx)
-                {
-                    const VertexElement & element = *i;
-                    D3DVERTEXELEMENT9 & dxElement = d3delems[idx];
-                    convertElement(element, dxElement);
-                    dxElement.Stream = maxSource + 1;
-                }                
-            }
-
 
             // Add terminator
             d3delems[idx].Stream = 0xff;

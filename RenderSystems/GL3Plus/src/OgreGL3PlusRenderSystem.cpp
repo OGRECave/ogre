@@ -1104,7 +1104,7 @@ namespace Ogre {
             mStateCacheManager->bindGLBuffer(GL_ELEMENT_ARRAY_BUFFER,
                 op.indexData->indexBuffer->_getImpl<GL3PlusHardwareBuffer>()->getGLBufferId());
 
-        size_t numberOfInstances = applyGlobalInstancingDeclaration(op);
+        auto numberOfInstances = op.numberOfInstances;
 
         int operationType = op.operationType;
         // Use adjacency if there is a geometry program and it requested adjacency info
