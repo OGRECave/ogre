@@ -121,7 +121,7 @@ namespace Ogre
         virtual void entriesModified( bool createFbo );
 
         virtual void setClearColour( uint8 idx, const ColourValue &clearColour );
-        virtual void setClearDepth( Real clearDepth );
+        virtual void setClearDepth( float clearDepth );
         virtual void setClearStencil( uint32 clearStencil );
 
         /// Sets the clear colour to all entries. In some APIs may be faster

@@ -1397,7 +1397,7 @@ namespace Ogre
             mCurrentRenderPassDescriptor = rtt->getRenderPassDescriptor();
         }
     }
-    void VulkanRenderSystem::clearFrameBuffer(unsigned int buffers, const ColourValue& colour, Real depth,
+    void VulkanRenderSystem::clearFrameBuffer(unsigned int buffers, const ColourValue& colour, float depth,
                                               unsigned short stencil)
     {
         mCurrentRenderPassDescriptor->setClearColour(colour);
