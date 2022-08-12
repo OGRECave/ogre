@@ -13,6 +13,7 @@ static const char *c_instancingTechniques[] =
     "Hardware Instancing Basic",
     "Hardware Instancing + VTF",
     "Limited Animation - Hardware Instancing + VTF",
+    "Automatic HW Instancing",
     "No Instancing"
 };
 
@@ -23,6 +24,7 @@ static const char *c_materialsTechniques[] =
     "Examples/Instancing/HWBasic/Robot",
     "Examples/Instancing/VTF/HW/Robot",
     "Examples/Instancing/VTF/HW/LUT/Robot",
+    "Examples/Instancing/HWBasic/Robot",
     "Examples/Instancing/RTSS/Robot"
 };
 
@@ -33,6 +35,7 @@ static const char *c_materialsTechniques_dq[] =
     "Examples/Instancing/HWBasic/Robot",
     "Examples/Instancing/VTF/HW/Robot_dq",
     "Examples/Instancing/VTF/HW/LUT/Robot_dq",
+    "Examples/Instancing/HWBasic/Robot",
     "Examples/Instancing/RTSS/Robot_dq"
 };
 
@@ -43,6 +46,7 @@ static const char *c_materialsTechniques_dq_two_weights[] =
     "Examples/Instancing/HWBasic/spine",
     "Examples/Instancing/VTF/HW/spine_dq_two_weights",
     "Examples/Instancing/VTF/HW/LUT/spine_dq_two_weights",
+    "Examples/Instancing/HWBasic/spine",
     "Examples/Instancing/RTSS/spine_dq_two_weights"
 };
 
@@ -324,6 +328,9 @@ void Sample_NewInstancing::createEntities(int technique)
         Entity *ent = mSceneMgr->createEntity( c_meshNames[mCurrentMesh] );
         ent->setMaterialName( mCurrentMaterialSet[technique] );
         mEntities.push_back( ent );
+
+        if(technique == NUM_IM_TECHNIQUES)
+            continue;
 
         //Get the animation
         AnimationState *anim = ent->getAnimationState( "Walk" );
