@@ -39,29 +39,22 @@ namespace Ogre
     *  @{
     */
 
-    /** This is the same technique the old "InstancedGeometry" implementation used (with improvements).
+    /** This is the same technique the old InstancedGeometry implementation used (with improvements).
         Basically it creates a large vertex buffer with many repeating entities, and sends per instance
         data through shader constants. Because SM 2.0 & 3.0 have up to 256 shader constant registers,
         this means there can be approx up to 84 instances per batch, assuming they're not skinned
         But using shader constants for other stuff (i.e. lighting) also affects negatively this number
         A mesh with skeletally animated 2 bones reduces the number 84 to 42 instances per batch.
-        @par
+
         The main advantage of this technique is that it's supported on a high variety of hardware
         (SM 2.0 cards are required) and the same shader can be used for both skeletally animated
         normal entities and instanced entities without a single change required.
-        @par
-        Unlike the old InstancedGeometry implementation, the developer doesn't need to worry about
+
+        Unlike the old @c InstancedGeometry implementation, the developer doesn't need to worry about
         reaching the 84 instances limit, the InstanceManager automatically takes care of splitting
         and creating new batches. But beware internally, this means less performance improvement.
         Another improvement is that vertex buffers are shared between batches, which significantly
         reduces GPU VRAM usage.
-
-
-            Design discussion webpage: http://www.ogre3d.org/forums/viewtopic.php?f=4&t=59902
-        @author
-            Matias N. Goldberg ("dark_sylinc")
-        @version
-            1.0
      */
     class _OgreExport InstanceBatchShader : public InstanceBatch
     {

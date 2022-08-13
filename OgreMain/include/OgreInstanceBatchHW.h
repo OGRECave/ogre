@@ -40,23 +40,17 @@ namespace Ogre
     */
 
     /** This is technique requires true instancing hardware support.
+
         Basically it creates a cloned vertex buffer from the original, with an extra buffer containing
-        3 additional TEXCOORDS (12 bytes) repeated as much as the instance count.
+        3 additional @c TEXCOORDS (12 bytes) repeated as much as the instance count.
         That will be used for each instance data.
-        @par
+
         The main advantage of this technique is that it's <em>VERY</em> fast; but it doesn't support
         skeletal animation at all. Very reduced memory consumption and bandwidth. Great for particles,
         debris, bricks, trees, sprites.
         This batch is one of the few (if not the only) techniques that allows culling on an individual
         basis. This means we can save vertex shader performance for instances that aren't in scene or
         just not focused by the camera.
-
-
-            Design discussion webpage: http://www.ogre3d.org/forums/viewtopic.php?f=4&t=59902
-        @author
-            Matias N. Goldberg ("dark_sylinc")
-        @version
-            1.1
      */
     class _OgreExport InstanceBatchHW : public InstanceBatch
     {
