@@ -48,20 +48,10 @@ Also their compatibility and performance varies.
 
 ## ShaderBased {#InstancingTechniquesShaderBased}
 
-This is the most compatible technique.
-It is a Software Instancing technique.
-World matrices are passed through constant registers, and thus the maximum number of instances per batch is 80; which quickly goes down if the object is skeletally animated.
-This technique does not play very well with skeletal animation because of that, unless the number of bones is very low (3 or less).
+@copybrief Ogre::InstanceBatchShader
+@copydetails Ogre::InstanceBatchShader
 
-See `material Examples/Instancing/ShaderBased` for an example on how to write the vertex shader. (You can find these files in OGRE sources from before v1.12)
-Files:
- - ShaderInstancing.material
- - ShaderInstancing.vert (GLSL)
- - ShaderInstancing.cg (Cg, works with HLSL)
-
-See `Examples/Instancing/RTSS/Robot` for an example on how to use instancing with the [RTSS: Run Time Shader System](@ref rtss)
-
-Add to the Vertex Shader input example:
+Vertex Shader input example:
 ```cpp
 	...
 	float4 blendIdx : BLENDINDICES,
@@ -77,23 +67,18 @@ Vertex position calculation example:
 	...
 ```
 
+See `Examples/Instancing/RTSS/Robot` for an example on how to use instancing with the [RTSS: Run Time Shader System](@ref rtss)
+
+See `material Examples/Instancing/ShaderBased` for an example on how to write the vertex shader. (You can find these files in OGRE sources from before v1.12)
+Files:
+ - ShaderInstancing.material
+ - ShaderInstancing.vert (GLSL)
+ - ShaderInstancing.cg (Cg, works with HLSL)
+
 ## VTF (Software) {#InstancingTechniquesVTFSoftware}
 
-VTF stands for "Vertex Texture Fetch".
-It is a Software Instancing technique.
-Unlike ShaderBased, world matrices are passed to the vertex shader through a texture.
-Such feature has only been supported since Vertex Shader 3.0 and is not supported on Radeon X1xxx cards and is quite slow on GeForce 6 & 7.
-However it's very fast on any modern GPU (GeForce 8, 9, 200, 300, 400, 500, 600, 700; all Radeon HD series, Intel HD 3000 and above)
-
-The advantage of VTF over ShaderBased is that it supports a very high max number of instances per batch; even if it's skeletally animated.
-
-Take note that you will need to set a `texture_unit` (preferably the first one, for compatibility) including the shadow caster besides the texture (eg. diffuse, specular, normal maps) so that Ogre gets where to put the vertex texture.
-
-See `material Examples/Instancing/VTF` for an example on how to write the vertex shader and setup the material.
-Files:
- - VTFInstancing.material
- - VTFInstancing.vert (GLSL)
- - VTFInstancing.cg (Cg, also works with HLSL)
+@copybrief Ogre::BaseInstanceBatchVTF
+@copydetails Ogre::BaseInstanceBatchVTF
 
 Texture unit example:
 ```
@@ -116,18 +101,18 @@ Vertex position calculation example:
 
 @snippet Samples/Media/materials/programs/HLSL_Cg/VTFInstancing.cg world_pos
 
+See `material Examples/Instancing/VTF` for an example on how to write the vertex shader and setup the material.
+Files:
+ - VTFInstancing.material
+ - VTFInstancing.vert (GLSL)
+ - VTFInstancing.cg (Cg, also works with HLSL)
+
 ## HW VTF {#InstancingTechniquesHWVTF}
 
 This is the same technique as VTF; but implemented through hardware instancing.
 It is probably one of the best and most flexible techniques.
 
 The vertex shader has to be slightly different from SW VTF version.
-See `material Examples/Instancing/HW_VTF` for an example on how to write the vertex shader and setup the material.
-Files:
- - HW\_VTFInstancing.material
- - HW\_VTFInstancing.vert (GLSL)
- - HW\_VTFInstancing.cg (Cg, works with HLSL)
-
 
 Texture unit example:
 ```
@@ -148,16 +133,18 @@ Vertex position calculation example:
 
 @snippet Samples/Media/materials/programs/HLSL_Cg/HW_VTFInstancing.cg world_pos
 
+See `material Examples/Instancing/HW_VTF` for an example on how to write the vertex shader and setup the material.
+Files:
+ - HW\_VTFInstancing.material
+ - HW\_VTFInstancing.vert (GLSL)
+ - HW\_VTFInstancing.cg (Cg, works with HLSL)
+
 ### HW VTF LUT {#InstancingTechniquesHW}
 
 LUT is a special feature of HW VTF; which stands for <b>L</b>ook <b>U</b>p <b>T</b>able.
 It has been particularly designed for drawing large animated crowds.
 
 The technique is a trick that works by animating a limited number of instances (i.e. 16 animations) storing them in a look up table in the VTF, and then repeating these animations to all instances uniformly, giving the appearance that all instances are independently animated when seen in large crowds.
-
-See `material Examples/Instancing/HW_VTF_LUT`.
-Files:
- - Same as HW VTF (different macros defined)
 
 To enable the use of LUT, `SceneManager::createInstanceManager`'s flags must include the flag `IM_VTFBONEMATRIXLOOKUP` and specify HW VTF as technique.
 
@@ -168,20 +155,14 @@ mSceneMgr->createInstanceManager("InstanceMgr","MyMesh.mesh",
 			numInstancesPerBatch,IM_USEALL|IM_VTFBONEMATRIXLOOKUP );
 ```
 
+See `material Examples/Instancing/HW_VTF_LUT`.
+Files:
+ - Same as HW VTF (different macros defined)
+
 ## HW Basic {#InstancingTechniquesHWBasic}
 
-HW Basic is probably the fastest instancing technique[^7], but is surely more compatible than HW VTF.
-
-The world matrix data is passed to the vertex shader using a `float3x4` `TEXCOORD` (*attribute* in GLSL jargon) instead of a vertex texture.
-The other big difference with HW VTF, besides how data is being passed, is that HW Basic doesn't support skeletal animations at all, making it the preferred choice for rendering inanimate objects like trees, falling leaves, buildings, etc.
-
-See `material Examples/Instancing/HWBasic` for an example. (You can find these files in OGRE sources from before v1.12)
-Files:
- - HWInstancing.material
- - HWBasicInstancing.vert (GLSL)
- - HWBasicInstancing.cg (Cg, works with HLSL)
-
-See `Examples/Instancing/RTSS/Robot` for an example on how to use instancing with the [RTSS: Run Time Shader System](@ref rtss)
+@copybrief Ogre::InstanceBatchHW
+@copydetails Ogre::InstanceBatchHW
 
 Vertex Shader input example:
 ```cpp
@@ -197,6 +178,13 @@ Vertex position calculation example:
 	oClipPos = mul( viewProjMatrix, worldPos );
 	...
 ```
+See `Examples/Instancing/RTSS/Robot` for an example on how to use instancing with the [RTSS: Run Time Shader System](@ref rtss)
+
+See `material Examples/Instancing/HWBasic` for an example. (You can find these files in OGRE sources from before v1.12)
+Files:
+ - HWInstancing.material
+ - HWBasicInstancing.vert (GLSL)
+ - HWBasicInstancing.cg (Cg, works with HLSL)
 
 # Custom parameters {#InstancingCustomParameters}
 
@@ -394,8 +382,6 @@ Either create the instance manager with the flag Ogre::IM_FORCEONEWEIGHT, or mod
 @par Q: How do I find how many weights per vertices is using my model?
 
 A: The quickest way is by looking at the type of Ogre::VES_BLEND_WEIGHTS, where `VET_FLOAT<N>` means N weights.
-
-[^7]: Whether it is actually faster than HW VTF depends on the GPU architecture
 
 [^8]: In theory all other techniques could implement custom parameters but for performance reasons only HW VTF is well suited to implement it.
       Though it yet remains to be seen whether it should be passed to the shader through the VTF, or through additional TEXCOORDs.
