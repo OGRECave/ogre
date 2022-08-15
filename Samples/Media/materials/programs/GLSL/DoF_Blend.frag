@@ -7,10 +7,6 @@
 #define USE_OGRE_FROM_FUTURE
 #include <OgreUnifiedShader.h>
 
-#ifdef GL_ES
-precision highp float; // for accumulation
-#endif
-
 #define NUM_TAPS 12						// number of taps the shader will use
 
 uniform vec4 pixelSizeScene;			// pixel size of full resolution image
@@ -22,7 +18,7 @@ SAMPLER2D(blur,  2);				// downsampled and blurred image
 // dofParams coefficients:
 // x = near blur depth; y = focal plane depth; z = far blur depth
 // w = blurriness cutoff constant
-STATIC vec4 dofParams = vec4(0.9991, 0.9985, 0.9975, 1);
+STATIC f32vec4 dofParams = vec4(0.9991, 0.9985, 0.9975, 1);
 
 float getBlurAmount(float depth)
 {
