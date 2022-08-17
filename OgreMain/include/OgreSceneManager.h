@@ -87,7 +87,6 @@ namespace Ogre {
 
     // Forward declarations
     class CompositorChain;
-    class InstancedGeometry;
     class Rectangle2D;
     class LodListener;
     struct MovableObjectLodChangedEvent;
@@ -438,8 +437,6 @@ namespace Ogre {
 
         typedef std::map<String, StaticGeometry* > StaticGeometryList;
         StaticGeometryList mStaticGeometryList;
-        typedef std::map<String, InstancedGeometry* > InstancedGeometryList;
-        InstancedGeometryList mInstancedGeometryList;
 
         typedef std::map<String, InstanceManager*> InstanceManagerMap;
         InstanceManagerMap  mInstanceManagerMap;
