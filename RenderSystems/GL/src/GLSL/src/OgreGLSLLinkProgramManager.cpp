@@ -179,10 +179,10 @@ namespace Ogre {
         // only do this for user defined uniforms, ignore built in gl state uniforms
         for (int index = 0; index < uniformCount; index++)
         {
-            GLint arraySize = 0;
+            GLint numActiveArrayElements = 0;
             GLenum glType;
             glGetActiveUniformARB((GLhandleARB)programObject, index, BUFFERSIZE, NULL,
-                &arraySize, &glType, uniformName);
+                &numActiveArrayElements, &glType, uniformName);
             // don't add built in uniforms
             newGLUniformReference.mLocation = glGetUniformLocationARB((GLhandleARB)programObject, uniformName);
             if (newGLUniformReference.mLocation >= 0)
@@ -210,8 +210,17 @@ namespace Ogre {
                 // only add this parameter if we found the source
                 if (foundSource)
                 {
-                    assert(size_t (arraySize) == newGLUniformReference.mConstantDef->arraySize
-                            && "GL doesn't agree with our array size!");
+                    // Note that numActiveArrayElements comes from glGetActiveUniformARB()
+                    // which returns the index of the highest active array element (that is
+                    // an element actually used by the shader) plus one. That is, if some array
+                    // elements are not used by the shader (possibly optimized away), then
+                    // numActiveArrayElements can well be less than
+                    // newGLUniformReference.mConstantDef->arraySize.
+                    // Keep in mind that glUniform*v() faimily of functions does allow specifying
+                    // a number of elements to update greater than the number of active
+                    // elements in the shader.
+                    assert(size_t (numActiveArrayElements) <= newGLUniformReference.mConstantDef->arraySize
+                            && "We provide less array elements than what shader actually uses!");
                     list.push_back(newGLUniformReference);
                 }
 
