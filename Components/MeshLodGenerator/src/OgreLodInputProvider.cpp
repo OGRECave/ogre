@@ -44,10 +44,10 @@ namespace Ogre
 
 bool LodInputProvider::isDuplicateTriangle(LodData::Triangle* triangle, LodData::Triangle* triangle2)
 {
-    for (int i = 0; i < 3; i++) {
-        if (triangle->vertex[i] != triangle2->vertex[0] ||
-            triangle->vertex[i] != triangle2->vertex[1] ||
-            triangle->vertex[i] != triangle2->vertex[2]) {
+    for (auto & i : triangle->vertex) {
+        if (i != triangle2->vertex[0] ||
+            i != triangle2->vertex[1] ||
+            i != triangle2->vertex[2]) {
                 return false;
         }
     }
@@ -87,8 +87,8 @@ void LodInputProvider::addTriangleToEdges(LodData* data, LodData::Triangle* tria
             return;
         }
     }
-    for (int i = 0; i < 3; i++) {
-        triangle->vertex[i]->triangles.addNotExists(triangle);
+    for (auto & i : triangle->vertex) {
+        i->triangles.addNotExists(triangle);
     }
     for (int i = 0; i < 3; i++) {
         for (int n = 0; n < 3; n++) {

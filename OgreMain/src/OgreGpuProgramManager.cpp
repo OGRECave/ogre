@@ -232,11 +232,6 @@ namespace {
         // Get the supported syntax from RenderSystemCapabilities 
         return rs && rs->getCapabilities()->isShaderProfileSupported(syntaxCode);
     }
-    //-----------------------------------------------------------------------------
-    GpuProgramParametersSharedPtr GpuProgramManager::createParameters(void)
-    {
-        return GpuProgramParametersSharedPtr(OGRE_NEW GpuProgramParameters());
-    }
     //---------------------------------------------------------------------
     GpuSharedParametersPtr GpuProgramManager::createSharedParameters(const String& name)
     {
@@ -313,11 +308,6 @@ namespace {
     const GpuProgramManager::Microcode & GpuProgramManager::getMicrocodeFromCache( uint32 id ) const
     {
         return mMicrocodeCache.find(id)->second;
-    }
-    //---------------------------------------------------------------------
-    GpuProgramManager::Microcode GpuProgramManager::createMicrocode( size_t size ) const
-    {   
-        return Microcode(OGRE_NEW MemoryDataStream(size));  
     }
     //---------------------------------------------------------------------
     void GpuProgramManager::addMicrocodeToCache( uint32 id, const GpuProgramManager::Microcode & microcode )

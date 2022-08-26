@@ -50,7 +50,7 @@ namespace Ogre {
         is the angle across which to scatter the particles either side of the
         base direction of the emitter. 
     */
-    class _OgreParticleFXExport RingEmitter : public AreaEmitter
+    class RingEmitter : public AreaEmitter
     {
     public:
         /// @see AreaEmitter

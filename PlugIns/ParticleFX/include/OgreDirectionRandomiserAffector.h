@@ -42,7 +42,7 @@ namespace Ogre {
     */
     /** This affector applies randomness to the movement of the particles.
     */
-    class _OgreParticleFXExport DirectionRandomiserAffector : public ParticleAffector
+    class DirectionRandomiserAffector : public ParticleAffector
     {
     public:
         /** Command object for randomness (see ParamCommand).*/

@@ -81,9 +81,8 @@ namespace Ogre
         for (ShadowTextureConfig& config : configList)
         {
             bool found = false;
-            for (ShadowTextureList::iterator t = mTextureList.begin(); t != mTextureList.end(); ++t)
+            for (auto & tex : mTextureList)
             {
-                const TexturePtr& tex = *t;
                 // Skip if already used this one
                 if (usedTextures.find(tex.get()) != usedTextures.end())
                     continue;
@@ -123,10 +122,8 @@ namespace Ogre
     //---------------------------------------------------------------------
     TexturePtr ShadowTextureManager::getNullShadowTexture(PixelFormat format)
     {
-        for (ShadowTextureList::iterator t = mNullTextureList.begin(); t != mNullTextureList.end(); ++t)
+        for (auto & tex : mNullTextureList)
         {
-            const TexturePtr& tex = *t;
-
             if (format == tex->getFormat())
             {
                 // Ok, a match
@@ -195,9 +192,9 @@ namespace Ogre
     //---------------------------------------------------------------------
     void ShadowTextureManager::clear()
     {
-        for (ShadowTextureList::iterator i = mTextureList.begin(); i != mTextureList.end(); ++i)
+        for (auto & i : mTextureList)
         {
-            TextureManager::getSingleton().remove((*i)->getHandle());
+            TextureManager::getSingleton().remove(i->getHandle());
         }
         mTextureList.clear();
 

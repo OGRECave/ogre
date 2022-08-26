@@ -36,8 +36,7 @@ THE SOFTWARE.
 namespace Ogre {
 
 //-----------------------------------------------------------------------
-Compositor::Compositor(ResourceManager* creator, const String& name, ResourceHandle handle,
-            const String& group, bool isManual, ManualResourceLoader* loader):
+Compositor::Compositor(ResourceManager* creator, const String& name, ResourceHandle handle, const String& group, bool isManual, ManualResourceLoader* loader):
     Resource(creator, name, handle, group, isManual, loader),
     mCompilationRequired(true)
 {
@@ -75,9 +74,9 @@ void Compositor::removeAllTechniques()
 {
     Techniques::iterator i, iend;
     iend = mTechniques.end();
-    for (i = mTechniques.begin(); i != iend; ++i)
+    for (auto *t : mTechniques)
     {
-        OGRE_DELETE (*i);
+        OGRE_DELETE t;
     }
     mTechniques.clear();
     mSupportedTechniques.clear();
@@ -137,20 +136,20 @@ void Compositor::compile()
 //---------------------------------------------------------------------
 CompositionTechnique* Compositor::getSupportedTechnique(const String& schemeName)
 {
-    for(Techniques::iterator i = mSupportedTechniques.begin(); i != mSupportedTechniques.end(); ++i)
+    for(auto & t : mSupportedTechniques)
     {
-        if ((*i)->getSchemeName() == schemeName)
+        if (t->getSchemeName() == schemeName)
         {
-            return *i;
+            return t;
         }
     }
 
     // didn't find a matching one
-    for(Techniques::iterator i = mSupportedTechniques.begin(); i != mSupportedTechniques.end(); ++i)
+    for(auto & t : mSupportedTechniques)
     {
-        if ((*i)->getSchemeName().empty())
+        if (t->getSchemeName().empty())
         {
-            return *i;
+            return t;
         }
     }
 

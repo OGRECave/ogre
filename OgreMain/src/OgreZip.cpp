@@ -204,7 +204,7 @@ namespace {
     StringVectorPtr ZipArchive::list(bool recursive, bool dirs) const
     {
         OGRE_LOCK_AUTO_MUTEX;
-        StringVectorPtr ret = StringVectorPtr(OGRE_NEW_T(StringVector, MEMCATEGORY_GENERAL)(), SPFM_DELETE_T);
+        auto ret = std::make_shared<StringVector>();
 
         FileInfoList::const_iterator i, iend;
         iend = mFileList.end();
@@ -219,21 +219,21 @@ namespace {
     FileInfoListPtr ZipArchive::listFileInfo(bool recursive, bool dirs) const
     {
         OGRE_LOCK_AUTO_MUTEX;
-        FileInfoList* fil = OGRE_NEW_T(FileInfoList, MEMCATEGORY_GENERAL)();
+        auto ret = std::make_shared<FileInfoList>();
         FileInfoList::const_iterator i, iend;
         iend = mFileList.end();
         for (i = mFileList.begin(); i != iend; ++i)
             if ((dirs == (i->compressedSize == size_t (-1))) &&
                 (recursive || i->path.empty()))
-                fil->push_back(*i);
+                ret->push_back(*i);
 
-        return FileInfoListPtr(fil, SPFM_DELETE_T);
+        return ret;
     }
     //-----------------------------------------------------------------------
     StringVectorPtr ZipArchive::find(const String& pattern, bool recursive, bool dirs) const
     {
         OGRE_LOCK_AUTO_MUTEX;
-        StringVectorPtr ret = StringVectorPtr(OGRE_NEW_T(StringVector, MEMCATEGORY_GENERAL)(), SPFM_DELETE_T);
+        auto ret = std::make_shared<StringVector>();
         // If pattern contains a directory name, do a full match
         bool full_match = (pattern.find ('/') != String::npos) ||
                           (pattern.find ('\\') != String::npos);
@@ -255,7 +255,7 @@ namespace {
         bool recursive, bool dirs) const
     {
         OGRE_LOCK_AUTO_MUTEX;
-        FileInfoListPtr ret = FileInfoListPtr(OGRE_NEW_T(FileInfoList, MEMCATEGORY_GENERAL)(), SPFM_DELETE_T);
+        auto ret = std::make_shared<FileInfoList>();
         // If pattern contains a directory name, do a full match
         bool full_match = (pattern.find ('/') != String::npos) ||
                           (pattern.find ('\\') != String::npos);

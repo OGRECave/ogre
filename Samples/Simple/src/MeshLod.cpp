@@ -220,13 +220,13 @@ bool Sample_MeshLod::loadConfig()
     lcs.importLodConfig(&mLodConfig, filename);
 
     mLodLevelList->clearItems();
-    for(size_t i = 0; i < mLodConfig.levels.size(); i++){
-        mLodLevelList->addItem(StringConverter::toString(mLodConfig.levels[i].distance) + "px");
+    for(auto & level : mLodConfig.levels){
+        mLodLevelList->addItem(StringConverter::toString(level.distance) + "px");
     }
 
     mProfileList->clearItems();
-    for(size_t i = 0; i < mLodConfig.advanced.profile.size(); i++){
-        mProfileList->addItem(StringConverter::toString(mLodConfig.advanced.profile[i].src));
+    for(auto & i : mLodConfig.advanced.profile){
+        mProfileList->addItem(StringConverter::toString(i.src));
     }
 
     mUseVertexNormals->setChecked(mLodConfig.advanced.useVertexNormals, false);

@@ -160,10 +160,8 @@ TEST_F(SceneQueryTest,Intersection)
     EXPECT_EQ(results.movables2movables.size(), sizeof(expected)/sizeof(expected[0]));
 
     int i = 0;
-    for (SceneQueryMovableIntersectionList::iterator mov = results.movables2movables.begin();
-         mov != results.movables2movables.end(); ++mov)
+    for (auto & thepair : results.movables2movables)
     {
-        SceneQueryMovableObjectPair& thepair = *mov;
         // printf("{%d, %d},", StringConverter::parseInt(thepair.first->getName()), StringConverter::parseInt(thepair.second->getName()));
         ASSERT_EQ(expected[i][0], StringConverter::parseInt(thepair.first->getName()));
         ASSERT_EQ(expected[i][1], StringConverter::parseInt(thepair.second->getName()));

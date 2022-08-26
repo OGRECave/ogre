@@ -7,7 +7,8 @@
 using namespace Ogre;
 using namespace OgreBites;
 
-#define NUM_TECHNIQUES (((int)InstanceManager::InstancingTechniquesCount) + 1)
+#define NUM_IM_TECHNIQUES (((int)InstanceManager::InstancingTechniquesCount) + 1)
+#define NUM_TECHNIQUES (NUM_IM_TECHNIQUES + 2)
 
 class _OgreSampleClassExport Sample_NewInstancing : public SdkSample
 {
@@ -29,7 +30,7 @@ protected:
 
     void switchSkinningTechnique(int index);
 
-    void createEntities();
+    void createEntities(int technique);
 
     void createInstancedEntities();
 
@@ -81,7 +82,7 @@ protected:
     std::vector<SceneNode*>         mSceneNodes;
     std::set<AnimationState*>       mAnimations;
     InstanceManager                 *mCurrentManager;
-    bool                            mSupportedTechniques[NUM_TECHNIQUES+1];
+    std::array<bool, NUM_TECHNIQUES> mSupportedTechniques;
     const char**                        mCurrentMaterialSet;
     uint16                          mCurrentFlags;
 

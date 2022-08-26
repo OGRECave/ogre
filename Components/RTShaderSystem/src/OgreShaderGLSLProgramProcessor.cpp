@@ -64,7 +64,7 @@ bool GLSLProgramProcessor::postCreateGpuPrograms(ProgramSet* programSet)
     for(auto type : {GPT_VERTEX_PROGRAM, GPT_FRAGMENT_PROGRAM})
     {
         Program* cpuProgram = programSet->getCpuProgram(type);
-        GpuProgramPtr gpuProgram = programSet->getGpuProgram(type);
+        const GpuProgramPtr& gpuProgram = programSet->getGpuProgram(type);
         bindAutoParameters(cpuProgram, gpuProgram);
         bindTextureSamplers(cpuProgram, gpuProgram);
     }

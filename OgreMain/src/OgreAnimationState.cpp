@@ -34,8 +34,7 @@ namespace Ogre
 
     //---------------------------------------------------------------------
     AnimationState::AnimationState(AnimationStateSet* parent, const AnimationState &rhs)
-        : mBlendMask(0)
-        , mAnimationName(rhs.mAnimationName)
+        : mAnimationName(rhs.mAnimationName)
         , mParent(parent)
         , mTimePos(rhs.mTimePos)
         , mLength(rhs.mLength)
@@ -49,8 +48,7 @@ namespace Ogre
     AnimationState::AnimationState(const String& animName, 
         AnimationStateSet *parent, Real timePos, Real length, Real weight, 
         bool enabled)
-        : mBlendMask(0)
-        , mAnimationName(animName)
+        : mAnimationName(animName)
         , mParent(parent)
         , mTimePos(timePos)
         , mLength(length)
@@ -173,55 +171,55 @@ namespace Ogre
     //---------------------------------------------------------------------
     void AnimationState::setBlendMaskEntry(size_t boneHandle, float weight)
     {
-      assert(mBlendMask && mBlendMask->size() > boneHandle);
-      (*mBlendMask)[boneHandle] = weight;
-      if (mEnabled)
-        mParent->_notifyDirty();
+        assert(mBlendMask.size() > boneHandle);
+        mBlendMask[boneHandle] = weight;
+        if (mEnabled)
+            mParent->_notifyDirty();
     }
     //---------------------------------------------------------------------
     void AnimationState::_setBlendMaskData(const float* blendMaskData) 
     {
-      assert(mBlendMask && "No BlendMask set!");
-      // input 0?
-      if(!blendMaskData)
-      {
-        destroyBlendMask();
-        return;
-      }
-      // dangerous memcpy
-      memcpy(&((*mBlendMask)[0]), blendMaskData, sizeof(float) * mBlendMask->size());
-      if (mEnabled)
-        mParent->_notifyDirty();
+        assert(!mBlendMask.empty() && "No BlendMask set!");
+        // input 0?
+        if(!blendMaskData)
+        {
+            destroyBlendMask();
+            return;
+        }
+        // dangerous memcpy
+        memcpy(mBlendMask.data(), blendMaskData, sizeof(float) * mBlendMask.size());
+        if (mEnabled)
+            mParent->_notifyDirty();
     }
     //---------------------------------------------------------------------
     void AnimationState::_setBlendMask(const BoneBlendMask* blendMask) 
     {
-      if(!mBlendMask)
-      {
-        createBlendMask(blendMask->size(), false);
-      }
-      _setBlendMaskData(&(*blendMask)[0]);
+        if(mBlendMask.empty())
+        {
+            createBlendMask(blendMask->size(), false);
+        }
+        _setBlendMaskData(blendMask->data());
     }
     //---------------------------------------------------------------------
     void AnimationState::createBlendMask(size_t blendMaskSizeHint, float initialWeight)
     {
-        if(!mBlendMask)
+        if(mBlendMask.empty())
         {
             if(initialWeight >= 0)
             {
-                mBlendMask = OGRE_NEW_T(BoneBlendMask, MEMCATEGORY_ANIMATION)(blendMaskSizeHint, initialWeight);
+                mBlendMask.resize(blendMaskSizeHint, initialWeight);
             }
             else
             {
-                mBlendMask = OGRE_NEW_T(BoneBlendMask, MEMCATEGORY_ANIMATION)(blendMaskSizeHint);
+                mBlendMask.resize(blendMaskSizeHint);
             }
         }
     }
     //---------------------------------------------------------------------
     void AnimationState::destroyBlendMask()
     {
-        OGRE_DELETE_T(mBlendMask, BoneBlendMask, MEMCATEGORY_ANIMATION);
-        mBlendMask = 0;
+        mBlendMask.clear();
+        mBlendMask.shrink_to_fit();
     }
     //---------------------------------------------------------------------
 
@@ -237,18 +235,15 @@ namespace Ogre
         // lock rhs
             OGRE_LOCK_MUTEX(rhs.OGRE_AUTO_MUTEX_NAME);
 
-        for (AnimationStateMap::const_iterator i = rhs.mAnimationStates.begin();
-            i != rhs.mAnimationStates.end(); ++i)
+        for (const auto & mAnimationState : rhs.mAnimationStates)
         {
-            AnimationState* src = i->second;
+            AnimationState* src = mAnimationState.second;
             mAnimationStates[src->getAnimationName()] = OGRE_NEW AnimationState(this, *src);
         }
 
         // Clone enabled animation state list
-        for (EnabledAnimationStateList::const_iterator it = rhs.mEnabledAnimationStates.begin();
-            it != rhs.mEnabledAnimationStates.end(); ++it)
+        for (auto src : rhs.mEnabledAnimationStates)
         {
-            const AnimationState* src = *it;
             mEnabledAnimationStates.push_back(getAnimationState(src->getAnimationName()));
         }
     }
@@ -277,10 +272,9 @@ namespace Ogre
     {
             OGRE_LOCK_AUTO_MUTEX;
 
-        for (AnimationStateMap::iterator i = mAnimationStates.begin();
-            i != mAnimationStates.end(); ++i)
+        for (auto & mAnimationState : mAnimationStates)
         {
-            OGRE_DELETE i->second;
+            OGRE_DELETE mAnimationState.second;
         }
         mAnimationStates.clear();
         mEnabledAnimationStates.clear();

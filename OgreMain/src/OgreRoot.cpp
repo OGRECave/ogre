@@ -255,6 +255,7 @@ namespace Ogre {
 #endif
 		mCompositorManager.reset(); // needs rendersystem
         mParticleManager.reset(); // may use plugins
+        mMaterialManager.reset(); // may use GPU program manager
         mGpuProgramManager.reset(); // may use plugins
         unloadPlugins();
 
@@ -398,7 +399,7 @@ namespace Ogre {
                 continue;
             }
 
-            for (auto p : settings)
+            for (const auto& p : settings)
             {
                 try
                 {

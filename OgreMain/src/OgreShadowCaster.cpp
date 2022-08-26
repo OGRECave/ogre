@@ -102,10 +102,10 @@ namespace Ogre {
     // ------------------------------------------------------------------------
     void ShadowCaster::clearShadowRenderableList(ShadowRenderableList& shadowRenderables)
     {
-        for(ShadowRenderableList::iterator si = shadowRenderables.begin(), siend = shadowRenderables.end(); si != siend; ++si)
+        for(auto & shadowRenderable : shadowRenderables)
         {
-            OGRE_DELETE *si;
-            *si = 0;
+            OGRE_DELETE shadowRenderable;
+            shadowRenderable = 0;
         }
         shadowRenderables.clear();
     }

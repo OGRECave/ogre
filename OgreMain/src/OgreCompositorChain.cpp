@@ -435,19 +435,17 @@ void CompositorChain::postViewportUpdate(const RenderTargetViewportEvent& evt)
 void CompositorChain::viewportCameraChanged(Viewport* viewport)
 {
     Camera* camera = viewport->getCamera();
-    size_t count = mInstances.size();
-    for (size_t i = 0; i < count; ++i)
+    for (auto *i : mInstances)
     {
-        mInstances[i]->notifyCameraChanged(camera);
+        i->notifyCameraChanged(camera);
     }
 }
 //-----------------------------------------------------------------------
 void CompositorChain::viewportDimensionsChanged(Viewport* viewport)
 {
-    size_t count = mInstances.size();
-    for (size_t i = 0; i < count; ++i)
+    for (auto *i : mInstances)
     {
-        mInstances[i]->notifyResized();
+        i->notifyResized();
     }
 }
 //-----------------------------------------------------------------------
@@ -459,10 +457,9 @@ void CompositorChain::viewportDestroyed(Viewport* viewport)
 //-----------------------------------------------------------------------
 void CompositorChain::clearCompiledState()
 {
-    for (RenderSystemOperations::iterator i = mRenderSystemOperations.begin();
-        i != mRenderSystemOperations.end(); ++i)
+    for (auto *r : mRenderSystemOperations)
     {
-        OGRE_DELETE *i;
+        OGRE_DELETE r;
     }
     mRenderSystemOperations.clear();
 
@@ -493,13 +490,13 @@ void CompositorChain::_compile()
     /// Set previous CompositorInstance for each compositor in the list
     CompositorInstance *lastComposition = mOriginalScene;
     mOriginalScene->mPreviousInstance = 0;
-    for(Instances::iterator i=mInstances.begin(); i!=mInstances.end(); ++i)
+    for(auto *i : mInstances)
     {
-        if((*i)->getEnabled())
+        if(i->getEnabled())
         {
             compositorsEnabled = true;
-            (*i)->mPreviousInstance = lastComposition;
-            lastComposition = (*i);
+            i->mPreviousInstance = lastComposition;
+            lastComposition = i;
         }
     }
     
@@ -635,14 +632,14 @@ CompositorInstance* CompositorChain::getPreviousInstance(CompositorInstance* cur
 CompositorInstance* CompositorChain::getNextInstance(CompositorInstance* curr, bool activeOnly)
 {
     bool found = false;
-    for(Instances::iterator i=mInstances.begin(); i!=mInstances.end(); ++i)
+    for(auto *i : mInstances)
     {
         if (found)
         {
-            if ((*i)->getEnabled() || !activeOnly)
-                return *i;
+            if (i->getEnabled() || !activeOnly)
+                return i;
         }
-        else if(*i == curr)
+        else if(i == curr)
         {
             found = true;
         }

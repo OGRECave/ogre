@@ -1011,7 +1011,7 @@ namespace Ogre
 
         std::vector<VkBuffer> vertexBuffers;
         std::vector<VkVertexInputBindingDescription> bufferBindings;
-        for(auto it : op.vertexData->vertexBufferBinding->getBindings())
+        for(const auto& it : op.vertexData->vertexBufferBinding->getBindings())
         {
             auto inputRate = it.second->isInstanceData() ? VK_VERTEX_INPUT_RATE_INSTANCE : VK_VERTEX_INPUT_RATE_VERTEX;
             bufferBindings.push_back({it.first, uint32(it.second->getVertexSize()), inputRate});
@@ -1397,7 +1397,7 @@ namespace Ogre
             mCurrentRenderPassDescriptor = rtt->getRenderPassDescriptor();
         }
     }
-    void VulkanRenderSystem::clearFrameBuffer(unsigned int buffers, const ColourValue& colour, Real depth,
+    void VulkanRenderSystem::clearFrameBuffer(unsigned int buffers, const ColourValue& colour, float depth,
                                               unsigned short stencil)
     {
         mCurrentRenderPassDescriptor->setClearColour(colour);

@@ -87,7 +87,6 @@ namespace Ogre {
 
     // Forward declarations
     class CompositorChain;
-    class InstancedGeometry;
     class Rectangle2D;
     class LodListener;
     struct MovableObjectLodChangedEvent;
@@ -414,6 +413,11 @@ namespace Ogre {
         typedef std::map<String, Camera* > CameraList;
         typedef std::map<String, Animation*> AnimationList;
         typedef std::map<String, MovableObject*> MovableObjectMap;
+    private:
+        HardwareVertexBufferPtr mInstanceBuffer;
+
+        void renderInstancedObject(const RenderableList& rend, const Pass* pass,
+            bool lightScissoringClipping, bool doLightIteration, const LightList* manualLightList = 0);
     protected:
 
         /// Subclasses can override this to ensure their specialised SceneNode is used.
@@ -436,8 +440,6 @@ namespace Ogre {
 
         typedef std::map<String, StaticGeometry* > StaticGeometryList;
         StaticGeometryList mStaticGeometryList;
-        typedef std::map<String, InstancedGeometry* > InstancedGeometryList;
-        InstancedGeometryList mInstancedGeometryList;
 
         typedef std::map<String, InstanceManager*> InstanceManagerMap;
         InstanceManagerMap  mInstanceManagerMap;
@@ -2481,7 +2483,7 @@ namespace Ogre {
             by the SceneManager. If the SceneManager feeds world geometry into
             the queues, however, the ordering will be affected. 
         */
-        void setWorldGeometryRenderQueue(uint8 qid);
+        void setWorldGeometryRenderQueue(uint8 qid) { mWorldGeometryRenderQueue = qid; }
         /** Gets the render queue that the world geometry (if any) this SceneManager
             renders will be associated with.
 
@@ -2492,7 +2494,7 @@ namespace Ogre {
             world geometry, it should still pick a queue to represent it's manual
             rendering, and check isRenderQueueToBeProcessed before rendering.
         */
-        uint8 getWorldGeometryRenderQueue(void);
+        uint8 getWorldGeometryRenderQueue() { return mWorldGeometryRenderQueue; }
 
         /** Internal method for notifying the manager that a SceneNode is autotracking. */
         void _notifyAutotrackingSceneNode(SceneNode* node, bool autoTrack);
@@ -3282,20 +3284,11 @@ namespace Ogre {
         */
         bool getFindVisibleObjects(void) { return mFindVisibleObjects; }
 
-        /** Set whether to automatically normalise normals on objects whenever they
-            are scaled.
+        /// @deprecated do not use
+        OGRE_DEPRECATED void setNormaliseNormalsOnScale(bool n) { mNormaliseNormalsOnScale = n; }
 
-            Scaling can distort normals so the default behaviour is to compensate
-            for this, but it has a cost. If you would prefer to manually manage 
-            this, set this option to 'false' and use Pass::setNormaliseNormals
-            only when needed.
-        */
-        void setNormaliseNormalsOnScale(bool n) { mNormaliseNormalsOnScale = n; }
-
-        /** Get whether to automatically normalise normals on objects whenever they
-            are scaled.
-        */
-        bool getNormaliseNormalsOnScale() const { return mNormaliseNormalsOnScale; }
+        /// @deprecated do not use
+        OGRE_DEPRECATED bool getNormaliseNormalsOnScale() const { return mNormaliseNormalsOnScale; }
 
         /** Set whether to automatically flip the culling mode on objects whenever they
             are negatively scaled.

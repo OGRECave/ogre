@@ -374,11 +374,8 @@ namespace Ogre
                 {
                     bool bPresent = false;
 
-                    for(Polygon::VertexList::iterator vit = mBodyPoints.begin();
-                        vit != mBodyPoints.end(); ++vit)
+                    for(auto & v : mBodyPoints)
                     {
-                        const Vector3& v = *vit;
-
                         if (vInsert.positionEquals(v))
                         {
                             bPresent = true;

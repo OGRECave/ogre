@@ -147,7 +147,7 @@ namespace Ogre {
     void BspSceneManager::renderStaticGeometry(void)
     {
         // Check we should be rendering
-        if (!isRenderQueueToBeProcessed(mWorldGeometryRenderQueue))
+        if (!isRenderQueueToBeProcessed(getWorldGeometryRenderQueue()))
             return;
 
         // For each material in turn, cache rendering data & render

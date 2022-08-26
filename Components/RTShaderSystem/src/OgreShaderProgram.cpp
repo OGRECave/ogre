@@ -25,6 +25,8 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
+#include <memory>
+
 #include "OgreShaderPrecompiledHeaders.h"
 
 namespace Ogre {
@@ -38,6 +40,7 @@ Program::Program(GpuProgramType type)
     mEntryPointFunction = new Function();
     mSkeletalAnimation  = false;
     mColumnMajorMatrices = true;
+    mInstancing         = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -143,7 +146,7 @@ UniformParameterPtr Program::resolveParameter(GpuProgramParameters::AutoConstant
     if(isArray(autoType)) std::swap(size, data); // for array autotypes the extra parameter is the size
     
     // Create new parameter
-    param = UniformParameterPtr(OGRE_NEW UniformParameter(autoType, data, size));
+    param = std::make_shared<UniformParameter>(autoType, data, size);
     addParameter(param);
 
     return param;
@@ -167,7 +170,7 @@ UniformParameterPtr Program::resolveAutoParameterReal(GpuProgramParameters::Auto
     }
     
     // Create new parameter.
-    param = UniformParameterPtr(OGRE_NEW UniformParameter(autoType, float(data), size));
+    param = std::make_shared<UniformParameter>(autoType, float(data), size);
     addParameter(param);
 
     return param;
@@ -192,7 +195,7 @@ UniformParameterPtr Program::resolveAutoParameterReal(GpuProgramParameters::Auto
     }
     
     // Create new parameter.
-    param = UniformParameterPtr(OGRE_NEW UniformParameter(autoType, data, size, type));
+    param = std::make_shared<UniformParameter>(autoType, data, size, type);
     addParameter(param);
 
     return param;
@@ -217,7 +220,7 @@ UniformParameterPtr Program::resolveAutoParameterInt(GpuProgramParameters::AutoC
     }
 
     // Create new parameter.
-    param = UniformParameterPtr(OGRE_NEW UniformParameter(autoType, data, size, type));
+    param = std::make_shared<UniformParameter>(autoType, data, size, type);
     addParameter(param);
 
     return param;
@@ -318,9 +321,9 @@ UniformParameterPtr Program::getParameterByAutoType(GpuProgramParameters::AutoCo
 //-----------------------------------------------------------------------------
 void Program::addDependency(const String& libFileName)
 {
-    for (unsigned int i=0; i < mDependencies.size(); ++i)
+    for (auto & dep : mDependencies)
     {
-        if (mDependencies[i] == libFileName)
+        if (dep == libFileName)
         {
             return;
         }

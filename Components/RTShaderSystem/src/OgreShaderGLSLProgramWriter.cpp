@@ -126,7 +126,7 @@ void GLSLProgramWriter::writeUniformBlock(std::ostream& os, const String& name, 
 {
     os << "layout(binding = " << binding << ", row_major) uniform " << name << " {";
 
-    for (auto uparam : uniforms)
+    for (const auto& uparam : uniforms)
     {
         if(uparam->getType() == GCT_MATRIX_3X4 || uparam->getType() == GCT_MATRIX_2X4)
             os << "layout(column_major) ";
@@ -158,7 +158,7 @@ void GLSLProgramWriter::writeMainSourceCode(std::ostream& os, Program* program)
 
     // Write the uniforms
     UniformParameterList uniforms;
-    for (auto param : parameterList)
+    for (const auto& param : parameterList)
     {
         if(!param->isSampler())
         {
@@ -175,7 +175,7 @@ void GLSLProgramWriter::writeMainSourceCode(std::ostream& os, Program* program)
     }
 
     int uniformLoc = 0;
-    for (auto uparam : uniforms)
+    for (const auto& uparam : uniforms)
     {
         if(mGLSLVersion >= 430 && hasSSO)
         {
@@ -294,7 +294,7 @@ void GLSLProgramWriter::writeInputParameters(std::ostream& os, Function* functio
 
     for ( ; itParam != itParamEnd; ++itParam)
     {       
-        ParameterPtr pParam = *itParam;
+        const ParameterPtr& pParam = *itParam;
         Parameter::Content paramContent = pParam->getContent();
         const String& paramName = pParam->getName();
 
@@ -379,7 +379,7 @@ void GLSLProgramWriter::writeOutParameters(std::ostream& os, Function* function,
 
     for ( ; itParam != itParamEnd; ++itParam)
     {
-        ParameterPtr pParam = *itParam;
+        const ParameterPtr& pParam = *itParam;
 
         if(gpuType == GPT_VERTEX_PROGRAM)
         {

@@ -85,10 +85,9 @@ namespace Ogre
     //---------------------------------------------------------------------
     void Page::destroyAllContentCollections()
     {
-        for (ContentCollectionList::iterator i = mContentCollections.begin(); 
-            i != mContentCollections.end(); ++i)
+        for (auto & cc : mContentCollections)
         {
-            delete *i;
+            delete cc;
         }
         mContentCollections.clear();
     }
@@ -294,10 +293,9 @@ namespace Ogre
     {
         mParent->_loadProceduralPage(this);
 
-        for (ContentCollectionList::iterator i = mContentCollections.begin();
-            i != mContentCollections.end(); ++i)
+        for (auto & cc : mContentCollections)
         {
-            (*i)->load();
+            cc->load();
         }
     }
     //---------------------------------------------------------------------
@@ -323,15 +321,14 @@ namespace Ogre
         stream.write(&mID);
 
         // content collections
-        for (ContentCollectionList::iterator i = mContentCollections.begin();
-            i != mContentCollections.end(); ++i)
+        for (auto & cc : mContentCollections)
         {
             // declaration
             stream.writeChunkBegin(CHUNK_CONTENTCOLLECTION_DECLARATION_ID);
-            stream.write(&(*i)->getType());
+            stream.write(&cc->getType());
             stream.writeChunkEnd(CHUNK_CONTENTCOLLECTION_DECLARATION_ID);
             // data
-            (*i)->save(stream);
+            cc->save(stream);
         }
 
         stream.writeChunkEnd(CHUNK_ID);
@@ -344,10 +341,9 @@ namespace Ogre
         updateDebugDisplay();
 
         // content collections
-        for (ContentCollectionList::iterator i = mContentCollections.begin();
-            i != mContentCollections.end(); ++i)
+        for (auto & cc : mContentCollections)
         {
-            (*i)->frameStart(timeSinceLastFrame);
+            cc->frameStart(timeSinceLastFrame);
         }
 
 
@@ -356,10 +352,9 @@ namespace Ogre
     void Page::frameEnd(Real timeElapsed)
     {
         // content collections
-        for (ContentCollectionList::iterator i = mContentCollections.begin();
-            i != mContentCollections.end(); ++i)
+        for (auto & cc : mContentCollections)
         {
-            (*i)->frameEnd(timeElapsed);
+            cc->frameEnd(timeElapsed);
         }
 
     }
@@ -367,10 +362,9 @@ namespace Ogre
     void Page::notifyCamera(Camera* cam)
     {
         // content collections
-        for (ContentCollectionList::iterator i = mContentCollections.begin();
-            i != mContentCollections.end(); ++i)
+        for (auto & cc : mContentCollections)
         {
-            (*i)->notifyCamera(cam);
+            cc->notifyCamera(cam);
         }
 
     }

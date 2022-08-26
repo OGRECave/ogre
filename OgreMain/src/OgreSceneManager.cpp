@@ -176,16 +176,6 @@ bool SceneManager::isRenderQueueToBeProcessed(uint8 qid)
         || (!inList && mSpecialCaseQueueMode == SCRQM_EXCLUDE);
 }
 //-----------------------------------------------------------------------
-void SceneManager::setWorldGeometryRenderQueue(uint8 qid)
-{
-    mWorldGeometryRenderQueue = qid;
-}
-//-----------------------------------------------------------------------
-uint8 SceneManager::getWorldGeometryRenderQueue(void)
-{
-    return mWorldGeometryRenderQueue;
-}
-//-----------------------------------------------------------------------
 Camera* SceneManager::createCamera(const String& name)
 {
     // Check name not used
@@ -1552,15 +1542,53 @@ void SceneManager::SceneMgrQueuedRenderableVisitor::visit(const Pass* p, Rendera
     // Set pass, store the actual one used
     mUsedPass = targetSceneMgr->_setPass(p);
 
+    SubMesh* lastsm = 0;
+    RenderableList instances;
+
+    bool useInstancing = mUsedPass->hasVertexProgram() && mUsedPass->getVertexProgram()->isInstancingIncluded();
+
     for (Renderable* r : rs)
     {
         // Give SM a chance to eliminate
         if (!targetSceneMgr->validateRenderableForRendering(mUsedPass, r))
             continue;
 
+        if(useInstancing)
+        {
+            if(auto se = dynamic_cast<SubEntity*>(r))
+            {
+                if(lastsm == se->getSubMesh())
+                {
+                    instances.push_back(r);
+                    continue;
+                }
+
+                // different SubMesh -> flush and restart instances
+                if(!instances.empty())
+                {
+                    targetSceneMgr->renderInstancedObject(instances, mUsedPass, scissoring, autoLights, manualLightList);
+                    instances.clear();
+                }
+
+                lastsm = se->getSubMesh();
+                instances.push_back(r);
+                continue;
+            }
+
+            // not a SubEntity -> flush instances and render this one
+            if(!instances.empty())
+            {
+                targetSceneMgr->renderInstancedObject(instances, mUsedPass, scissoring, autoLights, manualLightList);
+                instances.clear();
+            }
+        }
+
         // Render a single object, this will set up auto params if required
         targetSceneMgr->renderSingleObject(r, mUsedPass, scissoring, autoLights, manualLightList);
     }
+
+    if (!instances.empty())
+        targetSceneMgr->renderInstancedObject(instances, mUsedPass, scissoring, autoLights, manualLightList);
 
     OgreProfileEndGPUEvent(p->getParent()->getParent()->getName());
 }
@@ -1763,6 +1791,162 @@ void SceneManager::issueRenderWithLights(Renderable* rend, const Pass* pass,
          resetLightClip();
 }
 //-----------------------------------------------------------------------
+static void injectGlobalInstancingDeclaration(RenderOperation& ro, const RenderSystem* rs)
+{
+    if (!ro.useGlobalInstancingVertexBufferIsAvailable)
+        return;
+
+    // Create variables related to instancing.
+    VertexDeclaration* instanceDecl = rs->getGlobalInstanceVertexBufferVertexDeclaration();
+
+    if(!instanceDecl || instanceDecl->getElements().empty())
+        return;
+
+    auto instancingSrc = ro.vertexData->vertexDeclaration->getMaxSource();
+
+    auto testElement = instanceDecl->getElements().front();
+    if(!ro.vertexData->vertexDeclaration->findElementBySemantic(testElement.getSemantic(), testElement.getIndex()))
+    {
+        instancingSrc += 1;
+        for (auto el : instanceDecl->getElements())
+        {
+            ro.vertexData->vertexDeclaration->addElement(instancingSrc, el.getOffset(), el.getType(), el.getSemantic(),
+                                                         el.getIndex());
+        }
+    }
+    ro.vertexData->vertexBufferBinding->setBinding(instancingSrc, rs->getGlobalInstanceVertexBuffer());
+
+    ro.numberOfInstances *= rs->getGlobalNumberOfInstances();
+}
+
+static PolygonMode derivePolygonMode(const Pass* pass, const Renderable* rend, const Camera* cam)
+{
+    // Set up the solid / wireframe override
+    // Precedence is Camera, Object, Material
+    // Camera might not override object if not overrideable
+    PolygonMode reqMode = pass->getPolygonMode();
+    if (pass->getPolygonModeOverrideable() && rend->getPolygonModeOverrideable())
+    {
+        PolygonMode camPolyMode = cam->getPolygonMode();
+        // check camera detial only when render detail is overridable
+        if (reqMode > camPolyMode)
+        {
+            // only downgrade detail; if cam says wireframe we don't go up to solid
+            reqMode = camPolyMode;
+        }
+    }
+    return reqMode;
+}
+
+void SceneManager::renderInstancedObject(const RenderableList& rends, const Pass* pass, bool lightScissoringClipping,
+                                         bool doLightIteration, const LightList* manualLightList)
+{
+    mAutoParamDataSource->setCurrentRenderable(rends.front());
+    // override: this is passed through the instance buffer
+    mAutoParamDataSource->setWorldMatrices(&Affine3::IDENTITY, 1);
+
+    // Shader only path -> no normalise normals
+
+    // We batch world matrices, so we skip setWorldTransform for each individual renderable
+
+    // this copes with returning from negative scale in previous render op
+    // for same pass
+    if (mFlipCullingOnNegativeScale && mPassCullingMode != mDestRenderSystem->_getCullingMode())
+        mDestRenderSystem->_setCullingMode(mPassCullingMode);
+
+    mDestRenderSystem->_setPolygonMode(derivePolygonMode(pass, rends.front(), mCameraInProgress));
+
+    // TODO: manually driving lights
+
+    // collect lights of all renderables, thus cannot handle start-light without re-sorting
+    std::set<Light*> batchLights;
+    for (auto r : rends)
+    {
+        const LightList& rendLightList = r->getLights();
+        batchLights.insert(rendLightList.begin(), rendLightList.end());
+    }
+    LightList lightListToUse;
+
+    if(pass->getLightMask() == 0xFFFFFFFF)
+    {
+        lightListToUse = LightList(batchLights.begin(), batchLights.end());
+    }
+    else
+    {
+        for (auto l : batchLights)
+            if (pass->getLightMask() & l->getLightMask())
+                lightListToUse.push_back(l);
+    }
+
+    // TODO IterationDepthBias
+
+    // TODO light scissoring & clipping
+
+    useLights(&lightListToUse, pass->getMaxSimultaneousLights());
+    fireRenderSingleObject(rends.front(), pass, mAutoParamDataSource.get(), &lightListToUse, false);
+
+    updateGpuProgramParameters(pass);
+
+    if(!rends.front()->preRender(this, mDestRenderSystem))
+    {
+        rends.front()->postRender(this, mDestRenderSystem);
+        return;
+    }
+
+    using Matrix3x4f = TransformBase<3, float>;
+
+    // update instance buffer
+    if (!mInstanceBuffer || mInstanceBuffer->getNumVertices() < rends.size())
+    {
+        mInstanceBuffer = HardwareBufferManager::getSingleton().createVertexBuffer(sizeof(Matrix3x4f), rends.size(), HBU_CPU_TO_GPU);
+        mInstanceBuffer->setIsInstanceData(true);
+        mInstanceBuffer->setInstanceDataStepRate(1);
+    }
+
+    // fill instance data
+    {
+        HardwareBufferLockGuard lock(mInstanceBuffer, HardwareBuffer::HBL_DISCARD);
+        auto instanceData = static_cast<Matrix3x4f*>(lock.pData);
+
+        auto camPos = mAutoParamDataSource->getCurrentCamera()->getDerivedPosition();
+
+        for (auto r : rends)
+        {
+            auto worldT = static_cast<SubEntity*>(r)->getParent()->_getParentNodeFullTransform();
+            if(mCameraRelativeRendering)
+                worldT.setTrans(worldT.getTrans() - camPos);
+            *instanceData++ = Matrix3x4f(worldT[0]);
+        }
+    }
+
+    RenderOperation ro;
+    rends.front()->getRenderOperation(ro);
+    ro.srcRenderable = rends.front();
+    ro.numberOfInstances = rends.size();
+
+    auto ielem = ro.vertexData->vertexDeclaration->findElementBySemantic(VES_TEXTURE_COORDINATES, 1);
+
+    auto instancingSrc = ro.vertexData->vertexDeclaration->getMaxSource();
+    if(!ielem)
+    {
+        instancingSrc += 1;
+        auto vec4sz = VertexElement::getTypeSize(VET_FLOAT4);
+        ro.vertexData->vertexDeclaration->addElement(instancingSrc, 0 * vec4sz, VET_FLOAT4, VES_TEXTURE_COORDINATES, 1);
+        ro.vertexData->vertexDeclaration->addElement(instancingSrc, 1 * vec4sz, VET_FLOAT4, VES_TEXTURE_COORDINATES, 2);
+        ro.vertexData->vertexDeclaration->addElement(instancingSrc, 2 * vec4sz, VET_FLOAT4, VES_TEXTURE_COORDINATES, 3);
+        // TODO ACT_CUSTOM
+    }
+
+    // set again -> might have been recreated
+    ro.vertexData->vertexBufferBinding->setBinding(instancingSrc, mInstanceBuffer);
+
+    injectGlobalInstancingDeclaration(ro, mDestRenderSystem);
+
+    mDestRenderSystem->_render(ro);
+
+    rends.front()->postRender(this, mDestRenderSystem);
+}
+
 void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
                                       bool lightScissoringClipping, bool doLightIteration,
                                       const LightList* manualLightList)
@@ -1808,21 +1992,7 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
             mDestRenderSystem->_setCullingMode(cullMode);
     }
 
-    // Set up the solid / wireframe override
-    // Precedence is Camera, Object, Material
-    // Camera might not override object if not overrideable
-    PolygonMode reqMode = pass->getPolygonMode();
-    if (pass->getPolygonModeOverrideable() && rend->getPolygonModeOverrideable())
-    {
-        PolygonMode camPolyMode = mCameraInProgress->getPolygonMode();
-        // check camera detial only when render detail is overridable
-        if (reqMode > camPolyMode)
-        {
-            // only downgrade detail; if cam says wireframe we don't go up to solid
-            reqMode = camPolyMode;
-        }
-    }
-    mDestRenderSystem->_setPolygonMode(reqMode);
+    mDestRenderSystem->_setPolygonMode(derivePolygonMode(pass, rend, mCameraInProgress));
 
     if (!doLightIteration)
     {
@@ -3809,6 +3979,8 @@ void SceneManager::_issueRenderOp(Renderable* rend, const Pass* pass)
         ro.srcRenderable = rend;
 
         rend->getRenderOperation(ro);
+
+        injectGlobalInstancingDeclaration(ro, mDestRenderSystem);
 
         mDestRenderSystem->_render(ro);
     }

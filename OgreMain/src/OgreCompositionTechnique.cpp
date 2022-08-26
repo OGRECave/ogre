@@ -66,24 +66,20 @@ void CompositionTechnique::removeTextureDefinition(size_t index)
 //---------------------------------------------------------------------
 CompositionTechnique::TextureDefinition *CompositionTechnique::getTextureDefinition(const String& name) const
 {
-    auto iend = mTextureDefinitions.end();
-    for (auto i = mTextureDefinitions.begin(); i != iend; ++i)
+    for (auto *t : mTextureDefinitions)
     {
-        if ((*i)->name == name)
-            return *i;
+        if (t->name == name)
+            return t;
     }
-
     return 0;
 
 }
 //-----------------------------------------------------------------------
 void CompositionTechnique::removeAllTextureDefinitions()
 {
-    TextureDefinitions::iterator i, iend;
-    iend = mTextureDefinitions.end();
-    for (i = mTextureDefinitions.begin(); i != iend; ++i)
+    for (auto *t : mTextureDefinitions)
     {
-        OGRE_DELETE (*i);
+        OGRE_DELETE t;
     }
     mTextureDefinitions.clear();
 }
@@ -112,11 +108,9 @@ void CompositionTechnique::removeTargetPass(size_t index)
 //-----------------------------------------------------------------------
 void CompositionTechnique::removeAllTargetPasses()
 {
-    TargetPasses::iterator i, iend;
-    iend = mTargetPasses.end();
-    for (i = mTargetPasses.begin(); i != iend; ++i)
+    for (auto *t : mTargetPasses)
     {
-        OGRE_DELETE (*i);
+        OGRE_DELETE t;
     }
     mTargetPasses.clear();
 }
@@ -142,24 +136,17 @@ bool CompositionTechnique::isSupported(bool acceptTextureDegradation)
     }
 
     // Check all target passes is supported
-    TargetPasses::iterator pi, piend;
-    piend = mTargetPasses.end();
-    for (pi = mTargetPasses.begin(); pi != piend; ++pi)
+    for (auto *p : mTargetPasses)
     {
-        CompositionTargetPass* targetPass = *pi;
-        if (!targetPass->_isSupported())
+        if (!p->_isSupported())
         {
             return false;
         }
     }
 
-    TextureDefinitions::iterator i, iend;
-    iend = mTextureDefinitions.end();
     TextureManager& texMgr = TextureManager::getSingleton();
-    for (i = mTextureDefinitions.begin(); i != iend; ++i)
+    for (auto *td : mTextureDefinitions)
     {
-        TextureDefinition* td = *i;
-
         // Firstly check MRTs
         if (td->formatList.size() > 
             Root::getSingleton().getRenderSystem()->getCapabilities()->getNumMultiRenderTargets())
@@ -168,15 +155,15 @@ bool CompositionTechnique::isSupported(bool acceptTextureDegradation)
         }
 
 
-        for (PixelFormatList::iterator pfi = td->formatList.begin(); pfi != td->formatList.end(); ++pfi)
+        for (auto& pfi : td->formatList)
         {
             // Check whether equivalent supported
             // Need a format which is the same number of bits to pass
-            bool accepted = texMgr.isEquivalentFormatSupported(td->type, *pfi, TU_RENDERTARGET);
+            bool accepted = texMgr.isEquivalentFormatSupported(td->type, pfi, TU_RENDERTARGET);
             if(!accepted && acceptTextureDegradation)
             {
                 // Don't care about exact format so long as something is supported
-                accepted = texMgr.getNativeFormat(td->type, *pfi, TU_RENDERTARGET) != PF_UNKNOWN;
+                accepted = texMgr.getNativeFormat(td->type, pfi, TU_RENDERTARGET) != PF_UNKNOWN;
             }
 
             if(!accepted)

@@ -51,9 +51,11 @@ Format: `transform_stage <type> [attrIndex]`
 Example: `transform_stage instanced 1`
 
 @param type either `ffp` or `instanced`
-@param coordinateIndex the start texcoord attribute index to read the instanced world matrix from
+@param attrIndex the start texcoord attribute index to read the instanced world matrix from
 
-@note `instanced` is supposed to be used with Ogre::InstanceManager::HWInstancingBasic
+@see @ref Instancing-in-Vertex-Programs
+@see Ogre::InstanceBatchHW
+
 
 <a name="lighting_stage"></a>
 

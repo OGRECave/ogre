@@ -533,7 +533,7 @@ namespace Ogre {
                 }
 
                 // And remove from mActiveParticles
-                *i = std::move(*(--iend));
+                *i = *(--iend);
             }
             else
             {

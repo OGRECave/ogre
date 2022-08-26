@@ -375,33 +375,6 @@ namespace Ogre {
             }
         }
     }
-    //---------------------------------------------------------------------
-    String Texture::getSourceFileType() const
-    {
-        if (mName.empty())
-            return BLANKSTRING;
-
-        String::size_type pos = mName.find_last_of('.');
-        if (pos != String::npos && pos < (mName.length() - 1))
-        {
-            String ext = mName.substr(pos + 1);
-            StringUtil::toLowerCase(ext);
-            return ext;
-        }
-
-        // No extension
-        auto dstream = ResourceGroupManager::getSingleton().openResource(
-            mName, mGroup, NULL, false);
-
-        if (!dstream && getTextureType() == TEX_TYPE_CUBE_MAP)
-        {
-            // try again with one of the faces (non-dds)
-            dstream = ResourceGroupManager::getSingleton().openResource(mName + "_rt", mGroup, NULL, false);
-        }
-
-        return dstream ? Image::getFileExtFromMagic(dstream) : BLANKSTRING;
-
-    }
     const HardwarePixelBufferSharedPtr& Texture::getBuffer(size_t face, size_t mipmap)
     {
         OgreAssert(face < getNumFaces(), "out of range");
@@ -415,7 +388,7 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void Texture::convertToImage(Image& destImage, bool includeMipMaps)
     {
-        uint32 numMips = includeMipMaps? getNumMipmaps() + 1 : 1;
+        uint32 numMips = includeMipMaps? getNumMipmaps() : 0;
         destImage.create(getFormat(), getWidth(), getHeight(), getDepth(), getNumFaces(), numMips);
 
         for (uint32 face = 0; face < getNumFaces(); ++face)
@@ -540,9 +513,9 @@ namespace Ogre {
         // will determine load status etc again
         ConstImagePtrList imagePtrs;
 
-        for (size_t i = 0; i < loadedImages.size(); ++i)
+        for (auto& img : loadedImages)
         {
-            imagePtrs.push_back(&loadedImages[i]);
+            imagePtrs.push_back(&img);
         }
 
         _loadImages(imagePtrs);

@@ -654,11 +654,8 @@ namespace Ogre {
 
 
         // Also parse any attached sources.
-        for (GLSLProgramContainer::const_iterator i = mAttachedGLSLPrograms.begin();
-             i != mAttachedGLSLPrograms.end(); ++i)
+        for (auto childShader : mAttachedGLSLPrograms)
         {
-            GLSLShaderCommon* childShader = *i;
-
             GLSLProgramManager::getSingleton().extractUniformsFromGLSL(
                 childShader->getSource(), *mConstantDefs, childShader->getName());
         }

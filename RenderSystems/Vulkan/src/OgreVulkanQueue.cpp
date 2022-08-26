@@ -528,7 +528,6 @@ namespace Ogre
 
                 if( texture->getUsage() & TU_RENDERTARGET )
                 {
-                    texAccessFlags |= VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
                     if( !PixelUtil::isDepth( texture->getFormat() ) )
                     {
                         texAccessFlags |= VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;

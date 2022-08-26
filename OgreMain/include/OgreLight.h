@@ -512,13 +512,13 @@ namespace Ogre {
         @param value
             The value to associate.
         */
-        void setCustomParameter(uint16 index, const Vector4& value);
+        void setCustomParameter(uint16 index, const Vector4f& value);
 
         /** Returns the custom value associated with this Light at the given index.
         @param index Index of the parameter to retrieve
         @see setCustomParameter for full details.
         */
-        const Vector4& getCustomParameter(uint16 index) const;
+        const Vector4f& getCustomParameter(uint16 index) const;
 
         /** Update a custom GpuProgramParameters constant which is derived from 
             information only this Light knows.
@@ -605,7 +605,7 @@ namespace Ogre {
         /// Pointer to a custom shadow camera setup.
         mutable ShadowCameraSetupPtr mCustomShadowCameraSetup;
 
-        typedef std::map<uint16, Vector4> CustomParameterMap;
+        typedef std::map<uint16, Vector4f> CustomParameterMap;
         /// Stores the custom parameters for the light.
         CustomParameterMap mCustomParameters;
         Real mPowerScale;

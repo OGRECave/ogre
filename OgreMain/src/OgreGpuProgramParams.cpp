@@ -259,11 +259,10 @@ namespace Ogre
 
         // simple export of all the named constants, no chunks
         // name, physical index
-        for (GpuConstantDefinitionMap::const_iterator i = pConsts->map.begin();
-             i != pConsts->map.end(); ++i)
+        for (const auto & i : pConsts->map)
         {
-            const String& name = i->first;
-            const GpuConstantDefinition& def = i->second;
+            const String& name = i.first;
+            const GpuConstantDefinition& def = i.second;
 
             writeString(name);
             writeInts(((const uint32*)&def.physicalIndex), 1);
@@ -407,10 +406,9 @@ namespace Ogre
             GpuConstantDefinition& def = i->second;
             size_t numElems = def.elementSize * def.arraySize;
 
-            for (GpuConstantDefinitionMap::iterator j = mNamedConstants.map.begin();
-                 j != mNamedConstants.map.end(); ++j)
+            for (auto & j : mNamedConstants.map)
             {
-                GpuConstantDefinition& otherDef = j->second;
+                GpuConstantDefinition& otherDef = j.second;
                 // comes after in the buffer
                 if (otherDef.physicalIndex > def.physicalIndex)
                 {
@@ -558,10 +556,10 @@ namespace Ogre
         mCopyDataList.clear();
 
         const GpuConstantDefinitionMap& sharedmap = mSharedParams->getConstantDefinitions().map;
-        for (GpuConstantDefinitionMap::const_iterator i = sharedmap.begin(); i != sharedmap.end(); ++i)
+        for (const auto & i : sharedmap)
         {
-            const String& pName = i->first;
-            const GpuConstantDefinition& shareddef = i->second;
+            const String& pName = i.first;
+            const GpuConstantDefinition& shareddef = i.second;
 
             const GpuConstantDefinition* instdef = mParams->_findNamedConstantDefinition(pName, false);
             if (instdef)
@@ -783,9 +781,9 @@ namespace Ogre
     void GpuProgramParameters::copySharedParamSetUsage(const GpuSharedParamUsageList& srcList)
     {
         mSharedParamSets.clear();
-        for (GpuSharedParamUsageList::const_iterator i = srcList.begin(); i != srcList.end(); ++i)
+        for (const auto & i : srcList)
         {
-            mSharedParamSets.push_back(GpuSharedParametersUsage(i->getSharedParams(), this));
+            mSharedParamSets.push_back(GpuSharedParametersUsage(i.getSharedParams(), this));
         }
 
     }
@@ -797,10 +795,9 @@ namespace Ogre
         memSize += mConstants.size();
         memSize += mRegisters.size()*4;
 
-        for (AutoConstantList::const_iterator i = mAutoConstants.begin();
-             i != mAutoConstants.end(); ++i)
+        for (const auto & ac : mAutoConstants)
         {
-            memSize += sizeof((*i));
+            memSize += sizeof(ac);
         }
 
         return memSize;
@@ -1419,15 +1416,14 @@ namespace Ogre
     {
         // update existing index if it exists
         bool found = false;
-        for (AutoConstantList::iterator i = mAutoConstants.begin();
-             i != mAutoConstants.end(); ++i)
+        for (auto & ac : mAutoConstants)
         {
-            if (i->physicalIndex == physicalIndex)
+            if (ac.physicalIndex == physicalIndex)
             {
-                i->paramType = acType;
-                i->data = extraInfo;
-                i->elementCount = elementSize;
-                i->variability = variability;
+                ac.paramType = acType;
+                ac.data = extraInfo;
+                ac.elementCount = elementSize;
+                ac.variability = variability;
                 found = true;
                 break;
             }
@@ -1445,15 +1441,14 @@ namespace Ogre
     {
         // update existing index if it exists
         bool found = false;
-        for (AutoConstantList::iterator i = mAutoConstants.begin();
-             i != mAutoConstants.end(); ++i)
+        for (auto & ac : mAutoConstants)
         {
-            if (i->physicalIndex == physicalIndex)
+            if (ac.physicalIndex == physicalIndex)
             {
-                i->paramType = acType;
-                i->fData = rData;
-                i->elementCount = elementSize;
-                i->variability = variability;
+                ac.paramType = acType;
+                ac.fData = rData;
+                ac.elementCount = elementSize;
+                ac.variability = variability;
                 found = true;
                 break;
             }
@@ -1558,326 +1553,326 @@ namespace Ogre
         mActivePassIterationIndex = std::numeric_limits<size_t>::max();
 
         // Autoconstant index is not a physical index
-        for (AutoConstantList::const_iterator i = mAutoConstants.begin(); i != mAutoConstants.end(); ++i)
+        for (const auto & ac : mAutoConstants)
         {
             // Only update needed slots
-            if (i->variability & mask)
+            if (ac.variability & mask)
             {
 
-                switch(i->paramType)
+                switch(ac.paramType)
                 {
                 case ACT_VIEW_MATRIX:
-                    _writeRawConstant(i->physicalIndex, source->getViewMatrix(),i->elementCount);
+                    _writeRawConstant(ac.physicalIndex, source->getViewMatrix(),ac.elementCount);
                     break;
                 case ACT_INVERSE_VIEW_MATRIX:
-                    _writeRawConstant(i->physicalIndex, source->getInverseViewMatrix(),i->elementCount);
+                    _writeRawConstant(ac.physicalIndex, source->getInverseViewMatrix(),ac.elementCount);
                     break;
                 case ACT_TRANSPOSE_VIEW_MATRIX:
-                    _writeRawConstant(i->physicalIndex, source->getTransposeViewMatrix(),i->elementCount);
+                    _writeRawConstant(ac.physicalIndex, source->getTransposeViewMatrix(),ac.elementCount);
                     break;
                 case ACT_INVERSE_TRANSPOSE_VIEW_MATRIX:
-                    _writeRawConstant(i->physicalIndex, source->getInverseTransposeViewMatrix(),i->elementCount);
+                    _writeRawConstant(ac.physicalIndex, source->getInverseTransposeViewMatrix(),ac.elementCount);
                     break;
 
                 case ACT_PROJECTION_MATRIX:
-                    _writeRawConstant(i->physicalIndex, source->getProjectionMatrix(),i->elementCount);
+                    _writeRawConstant(ac.physicalIndex, source->getProjectionMatrix(),ac.elementCount);
                     break;
                 case ACT_INVERSE_PROJECTION_MATRIX:
-                    _writeRawConstant(i->physicalIndex, source->getInverseProjectionMatrix(),i->elementCount);
+                    _writeRawConstant(ac.physicalIndex, source->getInverseProjectionMatrix(),ac.elementCount);
                     break;
                 case ACT_TRANSPOSE_PROJECTION_MATRIX:
-                    _writeRawConstant(i->physicalIndex, source->getTransposeProjectionMatrix(),i->elementCount);
+                    _writeRawConstant(ac.physicalIndex, source->getTransposeProjectionMatrix(),ac.elementCount);
                     break;
                 case ACT_INVERSE_TRANSPOSE_PROJECTION_MATRIX:
-                    _writeRawConstant(i->physicalIndex, source->getInverseTransposeProjectionMatrix(),i->elementCount);
+                    _writeRawConstant(ac.physicalIndex, source->getInverseTransposeProjectionMatrix(),ac.elementCount);
                     break;
 
                 case ACT_VIEWPROJ_MATRIX:
-                    _writeRawConstant(i->physicalIndex, source->getViewProjectionMatrix(),i->elementCount);
+                    _writeRawConstant(ac.physicalIndex, source->getViewProjectionMatrix(),ac.elementCount);
                     break;
                 case ACT_INVERSE_VIEWPROJ_MATRIX:
-                    _writeRawConstant(i->physicalIndex, source->getInverseViewProjMatrix(),i->elementCount);
+                    _writeRawConstant(ac.physicalIndex, source->getInverseViewProjMatrix(),ac.elementCount);
                     break;
                 case ACT_TRANSPOSE_VIEWPROJ_MATRIX:
-                    _writeRawConstant(i->physicalIndex, source->getTransposeViewProjMatrix(),i->elementCount);
+                    _writeRawConstant(ac.physicalIndex, source->getTransposeViewProjMatrix(),ac.elementCount);
                     break;
                 case ACT_INVERSE_TRANSPOSE_VIEWPROJ_MATRIX:
-                    _writeRawConstant(i->physicalIndex, source->getInverseTransposeViewProjMatrix(),i->elementCount);
+                    _writeRawConstant(ac.physicalIndex, source->getInverseTransposeViewProjMatrix(),ac.elementCount);
                     break;
                 case ACT_RENDER_TARGET_FLIPPING:
-                    _writeRawConstant(i->physicalIndex, source->getCurrentRenderTarget()->requiresTextureFlipping() ? -1.f : +1.f);
+                    _writeRawConstant(ac.physicalIndex, source->getCurrentRenderTarget()->requiresTextureFlipping() ? -1.f : +1.f);
                     break;
                 case ACT_VERTEX_WINDING:
                     {
                         RenderSystem* rsys = Root::getSingleton().getRenderSystem();
-                        _writeRawConstant(i->physicalIndex, rsys->getInvertVertexWinding() ? -1.f : +1.f);
+                        _writeRawConstant(ac.physicalIndex, rsys->getInvertVertexWinding() ? -1.f : +1.f);
                     }
                     break;
 
                     // NB ambient light still here because it's not related to a specific light
                 case ACT_AMBIENT_LIGHT_COLOUR:
-                    _writeRawConstant(i->physicalIndex, source->getAmbientLightColour(),
-                                      i->elementCount);
+                    _writeRawConstant(ac.physicalIndex, source->getAmbientLightColour(),
+                                      ac.elementCount);
                     break;
                 case ACT_DERIVED_AMBIENT_LIGHT_COLOUR:
-                    _writeRawConstant(i->physicalIndex, source->getDerivedAmbientLightColour(),
-                                      i->elementCount);
+                    _writeRawConstant(ac.physicalIndex, source->getDerivedAmbientLightColour(),
+                                      ac.elementCount);
                     break;
                 case ACT_DERIVED_SCENE_COLOUR:
-                    _writeRawConstant(i->physicalIndex, source->getDerivedSceneColour(),
-                                      i->elementCount);
+                    _writeRawConstant(ac.physicalIndex, source->getDerivedSceneColour(),
+                                      ac.elementCount);
                     break;
 
                 case ACT_FOG_COLOUR:
-                    _writeRawConstant(i->physicalIndex, source->getFogColour(), i->elementCount);
+                    _writeRawConstant(ac.physicalIndex, source->getFogColour(), ac.elementCount);
                     break;
                 case ACT_FOG_PARAMS:
-                    _writeRawConstant(i->physicalIndex, source->getFogParams(), i->elementCount);
+                    _writeRawConstant(ac.physicalIndex, source->getFogParams(), ac.elementCount);
                     break;
                 case ACT_POINT_PARAMS:
-                    _writeRawConstant(i->physicalIndex, source->getPointParams(), i->elementCount);
+                    _writeRawConstant(ac.physicalIndex, source->getPointParams(), ac.elementCount);
                     break;
                 case ACT_SURFACE_AMBIENT_COLOUR:
-                    _writeRawConstant(i->physicalIndex, source->getSurfaceAmbientColour(),
-                                      i->elementCount);
+                    _writeRawConstant(ac.physicalIndex, source->getSurfaceAmbientColour(),
+                                      ac.elementCount);
                     break;
                 case ACT_SURFACE_DIFFUSE_COLOUR:
-                    _writeRawConstant(i->physicalIndex, source->getSurfaceDiffuseColour(),
-                                      i->elementCount);
+                    _writeRawConstant(ac.physicalIndex, source->getSurfaceDiffuseColour(),
+                                      ac.elementCount);
                     break;
                 case ACT_SURFACE_SPECULAR_COLOUR:
-                    _writeRawConstant(i->physicalIndex, source->getSurfaceSpecularColour(),
-                                      i->elementCount);
+                    _writeRawConstant(ac.physicalIndex, source->getSurfaceSpecularColour(),
+                                      ac.elementCount);
                     break;
                 case ACT_SURFACE_EMISSIVE_COLOUR:
-                    _writeRawConstant(i->physicalIndex, source->getSurfaceEmissiveColour(),
-                                      i->elementCount);
+                    _writeRawConstant(ac.physicalIndex, source->getSurfaceEmissiveColour(),
+                                      ac.elementCount);
                     break;
                 case ACT_SURFACE_SHININESS:
-                    _writeRawConstant(i->physicalIndex, source->getSurfaceShininess());
+                    _writeRawConstant(ac.physicalIndex, source->getSurfaceShininess());
                     break;
                 case ACT_SURFACE_ALPHA_REJECTION_VALUE:
-                    _writeRawConstant(i->physicalIndex, source->getSurfaceAlphaRejectionValue());
+                    _writeRawConstant(ac.physicalIndex, source->getSurfaceAlphaRejectionValue());
                     break;
 
                 case ACT_CAMERA_POSITION:
-                    _writeRawConstant(i->physicalIndex, source->getCameraPosition(), i->elementCount);
+                    _writeRawConstant(ac.physicalIndex, source->getCameraPosition(), ac.elementCount);
                     break;
                 case ACT_CAMERA_RELATIVE_POSITION:
-                    _writeRawConstant (i->physicalIndex, source->getCameraRelativePosition(), i->elementCount);
+                    _writeRawConstant (ac.physicalIndex, source->getCameraRelativePosition(), ac.elementCount);
                     break;
                 case ACT_TIME:
-                    _writeRawConstant(i->physicalIndex, source->getTime() * i->fData);
+                    _writeRawConstant(ac.physicalIndex, source->getTime() * ac.fData);
                     break;
                 case ACT_TIME_0_X:
-                    _writeRawConstant(i->physicalIndex, source->getTime_0_X(i->fData));
+                    _writeRawConstant(ac.physicalIndex, source->getTime_0_X(ac.fData));
                     break;
                 case ACT_COSTIME_0_X:
-                    _writeRawConstant(i->physicalIndex, source->getCosTime_0_X(i->fData));
+                    _writeRawConstant(ac.physicalIndex, source->getCosTime_0_X(ac.fData));
                     break;
                 case ACT_SINTIME_0_X:
-                    _writeRawConstant(i->physicalIndex, source->getSinTime_0_X(i->fData));
+                    _writeRawConstant(ac.physicalIndex, source->getSinTime_0_X(ac.fData));
                     break;
                 case ACT_TANTIME_0_X:
-                    _writeRawConstant(i->physicalIndex, source->getTanTime_0_X(i->fData));
+                    _writeRawConstant(ac.physicalIndex, source->getTanTime_0_X(ac.fData));
                     break;
                 case ACT_TIME_0_X_PACKED:
-                    _writeRawConstant(i->physicalIndex, source->getTime_0_X_packed(i->fData), i->elementCount);
+                    _writeRawConstant(ac.physicalIndex, source->getTime_0_X_packed(ac.fData), ac.elementCount);
                     break;
                 case ACT_TIME_0_1:
-                    _writeRawConstant(i->physicalIndex, source->getTime_0_1(i->fData));
+                    _writeRawConstant(ac.physicalIndex, source->getTime_0_1(ac.fData));
                     break;
                 case ACT_COSTIME_0_1:
-                    _writeRawConstant(i->physicalIndex, source->getCosTime_0_1(i->fData));
+                    _writeRawConstant(ac.physicalIndex, source->getCosTime_0_1(ac.fData));
                     break;
                 case ACT_SINTIME_0_1:
-                    _writeRawConstant(i->physicalIndex, source->getSinTime_0_1(i->fData));
+                    _writeRawConstant(ac.physicalIndex, source->getSinTime_0_1(ac.fData));
                     break;
                 case ACT_TANTIME_0_1:
-                    _writeRawConstant(i->physicalIndex, source->getTanTime_0_1(i->fData));
+                    _writeRawConstant(ac.physicalIndex, source->getTanTime_0_1(ac.fData));
                     break;
                 case ACT_TIME_0_1_PACKED:
-                    _writeRawConstant(i->physicalIndex, source->getTime_0_1_packed(i->fData), i->elementCount);
+                    _writeRawConstant(ac.physicalIndex, source->getTime_0_1_packed(ac.fData), ac.elementCount);
                     break;
                 case ACT_TIME_0_2PI:
-                    _writeRawConstant(i->physicalIndex, source->getTime_0_2Pi(i->fData));
+                    _writeRawConstant(ac.physicalIndex, source->getTime_0_2Pi(ac.fData));
                     break;
                 case ACT_COSTIME_0_2PI:
-                    _writeRawConstant(i->physicalIndex, source->getCosTime_0_2Pi(i->fData));
+                    _writeRawConstant(ac.physicalIndex, source->getCosTime_0_2Pi(ac.fData));
                     break;
                 case ACT_SINTIME_0_2PI:
-                    _writeRawConstant(i->physicalIndex, source->getSinTime_0_2Pi(i->fData));
+                    _writeRawConstant(ac.physicalIndex, source->getSinTime_0_2Pi(ac.fData));
                     break;
                 case ACT_TANTIME_0_2PI:
-                    _writeRawConstant(i->physicalIndex, source->getTanTime_0_2Pi(i->fData));
+                    _writeRawConstant(ac.physicalIndex, source->getTanTime_0_2Pi(ac.fData));
                     break;
                 case ACT_TIME_0_2PI_PACKED:
-                    _writeRawConstant(i->physicalIndex, source->getTime_0_2Pi_packed(i->fData), i->elementCount);
+                    _writeRawConstant(ac.physicalIndex, source->getTime_0_2Pi_packed(ac.fData), ac.elementCount);
                     break;
                 case ACT_FRAME_TIME:
-                    _writeRawConstant(i->physicalIndex, source->getFrameTime() * i->fData);
+                    _writeRawConstant(ac.physicalIndex, source->getFrameTime() * ac.fData);
                     break;
                 case ACT_FPS:
-                    _writeRawConstant(i->physicalIndex, source->getFPS());
+                    _writeRawConstant(ac.physicalIndex, source->getFPS());
                     break;
                 case ACT_VIEWPORT_WIDTH:
-                    _writeRawConstant(i->physicalIndex, source->getViewportWidth());
+                    _writeRawConstant(ac.physicalIndex, source->getViewportWidth());
                     break;
                 case ACT_VIEWPORT_HEIGHT:
-                    _writeRawConstant(i->physicalIndex, source->getViewportHeight());
+                    _writeRawConstant(ac.physicalIndex, source->getViewportHeight());
                     break;
                 case ACT_INVERSE_VIEWPORT_WIDTH:
-                    _writeRawConstant(i->physicalIndex, source->getInverseViewportWidth());
+                    _writeRawConstant(ac.physicalIndex, source->getInverseViewportWidth());
                     break;
                 case ACT_INVERSE_VIEWPORT_HEIGHT:
-                    _writeRawConstant(i->physicalIndex, source->getInverseViewportHeight());
+                    _writeRawConstant(ac.physicalIndex, source->getInverseViewportHeight());
                     break;
                 case ACT_VIEWPORT_SIZE:
-                    _writeRawConstant(i->physicalIndex, Vector4f(
+                    _writeRawConstant(ac.physicalIndex, Vector4f(
                         source->getViewportWidth(),
                         source->getViewportHeight(),
                         source->getInverseViewportWidth(),
-                        source->getInverseViewportHeight()), i->elementCount);
+                        source->getInverseViewportHeight()), ac.elementCount);
                     break;
                 case ACT_TEXEL_OFFSETS:
                     {
                         RenderSystem* rsys = Root::getSingleton().getRenderSystem();
-                        _writeRawConstant(i->physicalIndex, Vector4f(
+                        _writeRawConstant(ac.physicalIndex, Vector4f(
                             rsys->getHorizontalTexelOffset(),
                             rsys->getVerticalTexelOffset(),
                             rsys->getHorizontalTexelOffset() * source->getInverseViewportWidth(),
                             rsys->getVerticalTexelOffset() * source->getInverseViewportHeight()),
-                                          i->elementCount);
+                                          ac.elementCount);
                     }
                     break;
                 case ACT_TEXTURE_SIZE:
-                    _writeRawConstant(i->physicalIndex, source->getTextureSize(i->data), i->elementCount);
+                    _writeRawConstant(ac.physicalIndex, source->getTextureSize(ac.data), ac.elementCount);
                     break;
                 case ACT_INVERSE_TEXTURE_SIZE:
-                    _writeRawConstant(i->physicalIndex, source->getInverseTextureSize(i->data), i->elementCount);
+                    _writeRawConstant(ac.physicalIndex, source->getInverseTextureSize(ac.data), ac.elementCount);
                     break;
                 case ACT_PACKED_TEXTURE_SIZE:
-                    _writeRawConstant(i->physicalIndex, source->getPackedTextureSize(i->data), i->elementCount);
+                    _writeRawConstant(ac.physicalIndex, source->getPackedTextureSize(ac.data), ac.elementCount);
                     break;
                 case ACT_SCENE_DEPTH_RANGE:
-                    _writeRawConstant(i->physicalIndex, source->getSceneDepthRange(), i->elementCount);
+                    _writeRawConstant(ac.physicalIndex, source->getSceneDepthRange(), ac.elementCount);
                     break;
                 case ACT_VIEW_DIRECTION:
-                    _writeRawConstant(i->physicalIndex, source->getViewDirection());
+                    _writeRawConstant(ac.physicalIndex, source->getViewDirection());
                     break;
                 case ACT_VIEW_SIDE_VECTOR:
-                    _writeRawConstant(i->physicalIndex, source->getViewSideVector());
+                    _writeRawConstant(ac.physicalIndex, source->getViewSideVector());
                     break;
                 case ACT_VIEW_UP_VECTOR:
-                    _writeRawConstant(i->physicalIndex, source->getViewUpVector());
+                    _writeRawConstant(ac.physicalIndex, source->getViewUpVector());
                     break;
                 case ACT_FOV:
-                    _writeRawConstant(i->physicalIndex, source->getFOV());
+                    _writeRawConstant(ac.physicalIndex, source->getFOV());
                     break;
                 case ACT_NEAR_CLIP_DISTANCE:
-                    _writeRawConstant(i->physicalIndex, source->getNearClipDistance());
+                    _writeRawConstant(ac.physicalIndex, source->getNearClipDistance());
                     break;
                 case ACT_FAR_CLIP_DISTANCE:
-                    _writeRawConstant(i->physicalIndex, source->getFarClipDistance());
+                    _writeRawConstant(ac.physicalIndex, source->getFarClipDistance());
                     break;
                 case ACT_PASS_NUMBER:
-                    _writeRawConstant(i->physicalIndex, (float)source->getPassNumber());
+                    _writeRawConstant(ac.physicalIndex, (float)source->getPassNumber());
                     break;
                 case ACT_PASS_ITERATION_NUMBER:
                     // this is actually just an initial set-up, it's bound separately, so still global
-                    _writeRawConstant(i->physicalIndex, 0.0f);
-                    mActivePassIterationIndex = i->physicalIndex;
+                    _writeRawConstant(ac.physicalIndex, 0.0f);
+                    mActivePassIterationIndex = ac.physicalIndex;
                     break;
                 case ACT_TEXTURE_MATRIX:
-                    _writeRawConstant(i->physicalIndex, source->getTextureTransformMatrix(i->data),i->elementCount);
+                    _writeRawConstant(ac.physicalIndex, source->getTextureTransformMatrix(ac.data),ac.elementCount);
                     break;
                 case ACT_LOD_CAMERA_POSITION:
-                    _writeRawConstant(i->physicalIndex, source->getLodCameraPosition(), i->elementCount);
+                    _writeRawConstant(ac.physicalIndex, source->getLodCameraPosition(), ac.elementCount);
                     break;
 
                 case ACT_TEXTURE_WORLDVIEWPROJ_MATRIX:
                     // can also be updated in lights
-                    _writeRawConstant(i->physicalIndex, source->getTextureWorldViewProjMatrix(i->data),i->elementCount);
+                    _writeRawConstant(ac.physicalIndex, source->getTextureWorldViewProjMatrix(ac.data),ac.elementCount);
                     break;
                 case ACT_TEXTURE_WORLDVIEWPROJ_MATRIX_ARRAY:
-                    for (size_t l = 0; l < i->data; ++l)
+                    for (size_t l = 0; l < ac.data; ++l)
                     {
                         // can also be updated in lights
-                        _writeRawConstant(i->physicalIndex + l*sizeof(Matrix4),
-                                          source->getTextureWorldViewProjMatrix(l),i->elementCount);
+                        _writeRawConstant(ac.physicalIndex + l*sizeof(Matrix4),
+                                          source->getTextureWorldViewProjMatrix(l),ac.elementCount);
                     }
                     break;
                 case ACT_SPOTLIGHT_WORLDVIEWPROJ_MATRIX:
-                    _writeRawConstant(i->physicalIndex, source->getSpotlightWorldViewProjMatrix(i->data),i->elementCount);
+                    _writeRawConstant(ac.physicalIndex, source->getSpotlightWorldViewProjMatrix(ac.data),ac.elementCount);
                     break;
                 case ACT_SPOTLIGHT_WORLDVIEWPROJ_MATRIX_ARRAY:
-                    for (size_t l = 0; l < i->data; ++l)
-                        _writeRawConstant(i->physicalIndex + l*sizeof(Matrix4), source->getSpotlightWorldViewProjMatrix(l), i->elementCount);
+                    for (size_t l = 0; l < ac.data; ++l)
+                        _writeRawConstant(ac.physicalIndex + l*sizeof(Matrix4), source->getSpotlightWorldViewProjMatrix(l), ac.elementCount);
                     break;
                 case ACT_LIGHT_POSITION_OBJECT_SPACE:
-                    _writeRawConstant(i->physicalIndex,
+                    _writeRawConstant(ac.physicalIndex,
                                       source->getInverseWorldMatrix() *
-                                          source->getLightAs4DVector(i->data),
-                                      i->elementCount);
+                                          source->getLightAs4DVector(ac.data),
+                                      ac.elementCount);
                     break;
                 case ACT_LIGHT_DIRECTION_OBJECT_SPACE:
                     // We need the inverse of the inverse transpose
                     m3 = source->getTransposeWorldMatrix().linear();
-                    vec3 = m3 * source->getLightDirection(i->data);
+                    vec3 = m3 * source->getLightDirection(ac.data);
                     vec3.normalise();
                     // Set as 4D vector for compatibility
-                    _writeRawConstant(i->physicalIndex, Vector4f(vec3.x, vec3.y, vec3.z, 0.0f), i->elementCount);
+                    _writeRawConstant(ac.physicalIndex, Vector4f(vec3.x, vec3.y, vec3.z, 0.0f), ac.elementCount);
                     break;
                 case ACT_LIGHT_DISTANCE_OBJECT_SPACE:
-                    vec3 = source->getInverseWorldMatrix() * source->getLightPosition(i->data);
-                    _writeRawConstant(i->physicalIndex, vec3.length());
+                    vec3 = source->getInverseWorldMatrix() * source->getLightPosition(ac.data);
+                    _writeRawConstant(ac.physicalIndex, vec3.length());
                     break;
                 case ACT_LIGHT_POSITION_OBJECT_SPACE_ARRAY:
-                    for (size_t l = 0; l < i->data; ++l)
-                        _writeRawConstant(i->physicalIndex + l*sizeof(Vector4),
+                    for (size_t l = 0; l < ac.data; ++l)
+                        _writeRawConstant(ac.physicalIndex + l*sizeof(Vector4),
                                           source->getInverseWorldMatrix() *
                                               source->getLightAs4DVector(l),
-                                          i->elementCount);
+                                          ac.elementCount);
                     break;
 
                 case ACT_LIGHT_DIRECTION_OBJECT_SPACE_ARRAY:
                     // We need the inverse of the inverse transpose
                     m3 = source->getTransposeWorldMatrix().linear();
-                    for (size_t l = 0; l < i->data; ++l)
+                    for (size_t l = 0; l < ac.data; ++l)
                     {
                         vec3 = m3 * source->getLightDirection(l);
                         vec3.normalise();
-                        _writeRawConstant(i->physicalIndex + l*sizeof(Vector4f),
-                                          Vector4f(vec3.x, vec3.y, vec3.z, 0.0f), i->elementCount);
+                        _writeRawConstant(ac.physicalIndex + l*sizeof(Vector4f),
+                                          Vector4f(vec3.x, vec3.y, vec3.z, 0.0f), ac.elementCount);
                     }
                     break;
 
                 case ACT_LIGHT_DISTANCE_OBJECT_SPACE_ARRAY:
-                    for (size_t l = 0; l < i->data; ++l)
+                    for (size_t l = 0; l < ac.data; ++l)
                     {
                         vec3 = source->getInverseWorldMatrix() * source->getLightPosition(l);
-                        _writeRawConstant(i->physicalIndex + l*sizeof(Real), vec3.length());
+                        _writeRawConstant(ac.physicalIndex + l*sizeof(Real), vec3.length());
                     }
                     break;
 
                 case ACT_WORLD_MATRIX:
-                    _writeRawConstant(i->physicalIndex, source->getWorldMatrix(),i->elementCount);
+                    _writeRawConstant(ac.physicalIndex, source->getWorldMatrix(),ac.elementCount);
                     break;
                 case ACT_INVERSE_WORLD_MATRIX:
-                    _writeRawConstant(i->physicalIndex, source->getInverseWorldMatrix(),i->elementCount);
+                    _writeRawConstant(ac.physicalIndex, source->getInverseWorldMatrix(),ac.elementCount);
                     break;
                 case ACT_TRANSPOSE_WORLD_MATRIX:
-                    _writeRawConstant(i->physicalIndex, source->getTransposeWorldMatrix(),i->elementCount);
+                    _writeRawConstant(ac.physicalIndex, source->getTransposeWorldMatrix(),ac.elementCount);
                     break;
                 case ACT_INVERSE_TRANSPOSE_WORLD_MATRIX:
-                    _writeRawConstant(i->physicalIndex, source->getInverseTransposeWorldMatrix(),i->elementCount);
+                    _writeRawConstant(ac.physicalIndex, source->getInverseTransposeWorldMatrix(),ac.elementCount);
                     break;
 
                 case ACT_WORLD_MATRIX_ARRAY_3x4:
                     // Loop over matrices
                     pMatrix = source->getWorldMatrixArray();
                     numMatrices = source->getWorldMatrixCount();
-                    index = i->physicalIndex;
+                    index = ac.physicalIndex;
                     for (m = 0; m < numMatrices; ++m)
                     {
                         _writeRawConstants(index, (*pMatrix)[0], 12);
@@ -1886,14 +1881,14 @@ namespace Ogre
                     }
                     break;
                 case ACT_WORLD_MATRIX_ARRAY:
-                    _writeRawConstant(i->physicalIndex, source->getWorldMatrixArray(),
+                    _writeRawConstant(ac.physicalIndex, source->getWorldMatrixArray(),
                                       source->getWorldMatrixCount());
                     break;
                 case ACT_WORLD_DUALQUATERNION_ARRAY_2x4:
                     // Loop over matrices
                     pMatrix = source->getWorldMatrixArray();
                     numMatrices = source->getWorldMatrixCount();
-                    index = i->physicalIndex;
+                    index = ac.physicalIndex;
                     for (m = 0; m < numMatrices; ++m)
                     {
                         dQuat.fromTransformationMatrix(*pMatrix);
@@ -1906,7 +1901,7 @@ namespace Ogre
                     // Loop over matrices
                     pMatrix = source->getWorldMatrixArray();
                     numMatrices = source->getWorldMatrixCount();
-                    index = i->physicalIndex;
+                    index = ac.physicalIndex;
 
                     scaleM = Matrix4::IDENTITY;
 
@@ -1940,253 +1935,253 @@ namespace Ogre
                     }
                     break;
                 case ACT_WORLDVIEW_MATRIX:
-                    _writeRawConstant(i->physicalIndex, source->getWorldViewMatrix(),i->elementCount);
+                    _writeRawConstant(ac.physicalIndex, source->getWorldViewMatrix(),ac.elementCount);
                     break;
                 case ACT_INVERSE_WORLDVIEW_MATRIX:
-                    _writeRawConstant(i->physicalIndex, source->getInverseWorldViewMatrix(),i->elementCount);
+                    _writeRawConstant(ac.physicalIndex, source->getInverseWorldViewMatrix(),ac.elementCount);
                     break;
                 case ACT_TRANSPOSE_WORLDVIEW_MATRIX:
-                    _writeRawConstant(i->physicalIndex, source->getTransposeWorldViewMatrix(),i->elementCount);
+                    _writeRawConstant(ac.physicalIndex, source->getTransposeWorldViewMatrix(),ac.elementCount);
                     break;
                 case ACT_NORMAL_MATRIX:
-                    if(i->elementCount == 9) // check if shader supports packed data
+                    if(ac.elementCount == 9) // check if shader supports packed data
                     {
-                        _writeRawConstant(i->physicalIndex, source->getInverseTransposeWorldViewMatrix().linear(),i->elementCount);
+                        _writeRawConstant(ac.physicalIndex, source->getInverseTransposeWorldViewMatrix().linear(),ac.elementCount);
                         break;
                     }
                     OGRE_FALLTHROUGH; // fallthrough to padded 4x4 matrix
                 case ACT_INVERSE_TRANSPOSE_WORLDVIEW_MATRIX:
-                    _writeRawConstant(i->physicalIndex, source->getInverseTransposeWorldViewMatrix(),i->elementCount);
+                    _writeRawConstant(ac.physicalIndex, source->getInverseTransposeWorldViewMatrix(),ac.elementCount);
                     break;
 
                 case ACT_WORLDVIEWPROJ_MATRIX:
-                    _writeRawConstant(i->physicalIndex, source->getWorldViewProjMatrix(),i->elementCount);
+                    _writeRawConstant(ac.physicalIndex, source->getWorldViewProjMatrix(),ac.elementCount);
                     break;
                 case ACT_INVERSE_WORLDVIEWPROJ_MATRIX:
-                    _writeRawConstant(i->physicalIndex, source->getInverseWorldViewProjMatrix(),i->elementCount);
+                    _writeRawConstant(ac.physicalIndex, source->getInverseWorldViewProjMatrix(),ac.elementCount);
                     break;
                 case ACT_TRANSPOSE_WORLDVIEWPROJ_MATRIX:
-                    _writeRawConstant(i->physicalIndex, source->getTransposeWorldViewProjMatrix(),i->elementCount);
+                    _writeRawConstant(ac.physicalIndex, source->getTransposeWorldViewProjMatrix(),ac.elementCount);
                     break;
                 case ACT_INVERSE_TRANSPOSE_WORLDVIEWPROJ_MATRIX:
-                    _writeRawConstant(i->physicalIndex, source->getInverseTransposeWorldViewProjMatrix(),i->elementCount);
+                    _writeRawConstant(ac.physicalIndex, source->getInverseTransposeWorldViewProjMatrix(),ac.elementCount);
                     break;
                 case ACT_CAMERA_POSITION_OBJECT_SPACE:
-                    _writeRawConstant(i->physicalIndex, source->getCameraPositionObjectSpace(), i->elementCount);
+                    _writeRawConstant(ac.physicalIndex, source->getCameraPositionObjectSpace(), ac.elementCount);
                     break;
                 case ACT_LOD_CAMERA_POSITION_OBJECT_SPACE:
-                    _writeRawConstant(i->physicalIndex, source->getLodCameraPositionObjectSpace(), i->elementCount);
+                    _writeRawConstant(ac.physicalIndex, source->getLodCameraPositionObjectSpace(), ac.elementCount);
                     break;
 
                 case ACT_CUSTOM:
                 case ACT_ANIMATION_PARAMETRIC:
-                    source->getCurrentRenderable()->_updateCustomGpuParameter(*i, this);
+                    source->getCurrentRenderable()->_updateCustomGpuParameter(ac, this);
                     break;
                 case ACT_LIGHT_CUSTOM:
-                    source->updateLightCustomGpuParameter(*i, this);
+                    source->updateLightCustomGpuParameter(ac, this);
                     break;
                 case ACT_LIGHT_COUNT:
-                    _writeRawConstant(i->physicalIndex, source->getLightCount());
+                    _writeRawConstant(ac.physicalIndex, source->getLightCount());
                     break;
                 case ACT_LIGHT_DIFFUSE_COLOUR:
-                    _writeRawConstant(i->physicalIndex, source->getLightDiffuseColour(i->data), i->elementCount);
+                    _writeRawConstant(ac.physicalIndex, source->getLightDiffuseColour(ac.data), ac.elementCount);
                     break;
                 case ACT_LIGHT_SPECULAR_COLOUR:
-                    _writeRawConstant(i->physicalIndex, source->getLightSpecularColour(i->data), i->elementCount);
+                    _writeRawConstant(ac.physicalIndex, source->getLightSpecularColour(ac.data), ac.elementCount);
                     break;
                 case ACT_LIGHT_POSITION:
                     // Get as 4D vector, works for directional lights too
                     // Use element count in case uniform slot is smaller
-                    _writeRawConstant(i->physicalIndex,
-                                      source->getLightAs4DVector(i->data), i->elementCount);
+                    _writeRawConstant(ac.physicalIndex,
+                                      source->getLightAs4DVector(ac.data), ac.elementCount);
                     break;
                 case ACT_LIGHT_DIRECTION:
-                    vec3 = source->getLightDirection(i->data);
+                    vec3 = source->getLightDirection(ac.data);
                     // Set as 4D vector for compatibility
                     // Use element count in case uniform slot is smaller
-                    _writeRawConstant(i->physicalIndex, Vector4f(vec3.x, vec3.y, vec3.z, 1.0f), i->elementCount);
+                    _writeRawConstant(ac.physicalIndex, Vector4f(vec3.x, vec3.y, vec3.z, 1.0f), ac.elementCount);
                     break;
                 case ACT_LIGHT_POSITION_VIEW_SPACE:
-                    _writeRawConstant(i->physicalIndex,
-                                      source->getViewMatrix() * source->getLightAs4DVector(i->data), i->elementCount);
+                    _writeRawConstant(ac.physicalIndex,
+                                      source->getViewMatrix() * source->getLightAs4DVector(ac.data), ac.elementCount);
                     break;
                 case ACT_LIGHT_DIRECTION_VIEW_SPACE:
                     m3 = source->getInverseTransposeViewMatrix().linear();
                     // inverse transpose in case of scaling
-                    vec3 = m3 * source->getLightDirection(i->data);
+                    vec3 = m3 * source->getLightDirection(ac.data);
                     vec3.normalise();
                     // Set as 4D vector for compatibility
-                    _writeRawConstant(i->physicalIndex, Vector4f(vec3.x, vec3.y, vec3.z, 0.0f),i->elementCount);
+                    _writeRawConstant(ac.physicalIndex, Vector4f(vec3.x, vec3.y, vec3.z, 0.0f),ac.elementCount);
                     break;
                 case ACT_SHADOW_EXTRUSION_DISTANCE:
                     // extrusion is in object-space, so we have to rescale by the inverse
                     // of the world scaling to deal with scaled objects
                     m3 = source->getWorldMatrix().linear();
-                    _writeRawConstant(i->physicalIndex, source->getShadowExtrusionDistance() /
+                    _writeRawConstant(ac.physicalIndex, source->getShadowExtrusionDistance() /
                                       Math::Sqrt(std::max(std::max(m3.GetColumn(0).squaredLength(), m3.GetColumn(1).squaredLength()), m3.GetColumn(2).squaredLength())));
                     break;
                 case ACT_SHADOW_SCENE_DEPTH_RANGE:
-                    _writeRawConstant(i->physicalIndex, source->getShadowSceneDepthRange(i->data));
+                    _writeRawConstant(ac.physicalIndex, source->getShadowSceneDepthRange(ac.data));
                     break;
                 case ACT_SHADOW_SCENE_DEPTH_RANGE_ARRAY:
-                    for (size_t l = 0; l < i->data; ++l)
-                        _writeRawConstant(i->physicalIndex + l*i->elementCount, source->getShadowSceneDepthRange(l), i->elementCount);
+                    for (size_t l = 0; l < ac.data; ++l)
+                        _writeRawConstant(ac.physicalIndex + l*ac.elementCount, source->getShadowSceneDepthRange(l), ac.elementCount);
                     break;
                 case ACT_SHADOW_COLOUR:
-                    _writeRawConstant(i->physicalIndex, source->getShadowColour(), i->elementCount);
+                    _writeRawConstant(ac.physicalIndex, source->getShadowColour(), ac.elementCount);
                     break;
                 case ACT_LIGHT_POWER_SCALE:
-                    _writeRawConstant(i->physicalIndex, source->getLightPowerScale(i->data));
+                    _writeRawConstant(ac.physicalIndex, source->getLightPowerScale(ac.data));
                     break;
                 case ACT_LIGHT_DIFFUSE_COLOUR_POWER_SCALED:
-                    _writeRawConstant(i->physicalIndex, source->getLightDiffuseColourWithPower(i->data), i->elementCount);
+                    _writeRawConstant(ac.physicalIndex, source->getLightDiffuseColourWithPower(ac.data), ac.elementCount);
                     break;
                 case ACT_LIGHT_SPECULAR_COLOUR_POWER_SCALED:
-                    _writeRawConstant(i->physicalIndex, source->getLightSpecularColourWithPower(i->data), i->elementCount);
+                    _writeRawConstant(ac.physicalIndex, source->getLightSpecularColourWithPower(ac.data), ac.elementCount);
                     break;
                 case ACT_LIGHT_NUMBER:
-                    _writeRawConstant(i->physicalIndex, source->getLightNumber(i->data));
+                    _writeRawConstant(ac.physicalIndex, source->getLightNumber(ac.data));
                     break;
                 case ACT_LIGHT_CASTS_SHADOWS:
-                    _writeRawConstant(i->physicalIndex, source->getLightCastsShadows(i->data));
+                    _writeRawConstant(ac.physicalIndex, source->getLightCastsShadows(ac.data));
                     break;
                 case ACT_LIGHT_CASTS_SHADOWS_ARRAY:
-                    for (size_t l = 0; l < i->data; ++l)
-                        _writeRawConstant(i->physicalIndex + l*sizeof(float), source->getLightCastsShadows(l));
+                    for (size_t l = 0; l < ac.data; ++l)
+                        _writeRawConstant(ac.physicalIndex + l*sizeof(float), source->getLightCastsShadows(l));
                     break;
                 case ACT_LIGHT_ATTENUATION:
-                    _writeRawConstant(i->physicalIndex, source->getLightAttenuation(i->data), i->elementCount);
+                    _writeRawConstant(ac.physicalIndex, source->getLightAttenuation(ac.data), ac.elementCount);
                     break;
                 case ACT_SPOTLIGHT_PARAMS:
-                    _writeRawConstant(i->physicalIndex, source->getSpotlightParams(i->data), i->elementCount);
+                    _writeRawConstant(ac.physicalIndex, source->getSpotlightParams(ac.data), ac.elementCount);
                     break;
                 case ACT_LIGHT_DIFFUSE_COLOUR_ARRAY:
-                    for (size_t l = 0; l < i->data; ++l)
-                        _writeRawConstant(i->physicalIndex + l*sizeof(ColourValue),
-                                          source->getLightDiffuseColour(l), i->elementCount);
+                    for (size_t l = 0; l < ac.data; ++l)
+                        _writeRawConstant(ac.physicalIndex + l*sizeof(ColourValue),
+                                          source->getLightDiffuseColour(l), ac.elementCount);
                     break;
 
                 case ACT_LIGHT_SPECULAR_COLOUR_ARRAY:
-                    for (size_t l = 0; l < i->data; ++l)
-                        _writeRawConstant(i->physicalIndex + l*sizeof(ColourValue),
-                                          source->getLightSpecularColour(l), i->elementCount);
+                    for (size_t l = 0; l < ac.data; ++l)
+                        _writeRawConstant(ac.physicalIndex + l*sizeof(ColourValue),
+                                          source->getLightSpecularColour(l), ac.elementCount);
                     break;
                 case ACT_LIGHT_DIFFUSE_COLOUR_POWER_SCALED_ARRAY:
-                    for (size_t l = 0; l < i->data; ++l)
-                        _writeRawConstant(i->physicalIndex + l*sizeof(ColourValue),
-                                          source->getLightDiffuseColourWithPower(l), i->elementCount);
+                    for (size_t l = 0; l < ac.data; ++l)
+                        _writeRawConstant(ac.physicalIndex + l*sizeof(ColourValue),
+                                          source->getLightDiffuseColourWithPower(l), ac.elementCount);
                     break;
 
                 case ACT_LIGHT_SPECULAR_COLOUR_POWER_SCALED_ARRAY:
-                    for (size_t l = 0; l < i->data; ++l)
-                        _writeRawConstant(i->physicalIndex + l*sizeof(ColourValue),
-                                          source->getLightSpecularColourWithPower(l), i->elementCount);
+                    for (size_t l = 0; l < ac.data; ++l)
+                        _writeRawConstant(ac.physicalIndex + l*sizeof(ColourValue),
+                                          source->getLightSpecularColourWithPower(l), ac.elementCount);
                     break;
 
                 case ACT_LIGHT_POSITION_ARRAY:
                     // Get as 4D vector, works for directional lights too
-                    for (size_t l = 0; l < i->data; ++l)
-                        _writeRawConstant(i->physicalIndex + l*sizeof(Vector4),
-                                          source->getLightAs4DVector(l), i->elementCount);
+                    for (size_t l = 0; l < ac.data; ++l)
+                        _writeRawConstant(ac.physicalIndex + l*sizeof(Vector4),
+                                          source->getLightAs4DVector(l), ac.elementCount);
                     break;
 
                 case ACT_LIGHT_DIRECTION_ARRAY:
-                    for (size_t l = 0; l < i->data; ++l)
+                    for (size_t l = 0; l < ac.data; ++l)
                     {
                         vec3 = source->getLightDirection(l);
                         // Set as 4D vector for compatibility
-                        _writeRawConstant(i->physicalIndex + l*sizeof(Vector4f),
-                                          Vector4f(vec3.x, vec3.y, vec3.z, 0.0f), i->elementCount);
+                        _writeRawConstant(ac.physicalIndex + l*sizeof(Vector4f),
+                                          Vector4f(vec3.x, vec3.y, vec3.z, 0.0f), ac.elementCount);
                     }
                     break;
 
                 case ACT_LIGHT_POSITION_VIEW_SPACE_ARRAY:
-                    for (size_t l = 0; l < i->data; ++l)
-                        _writeRawConstant(i->physicalIndex + l*sizeof(Vector4),
+                    for (size_t l = 0; l < ac.data; ++l)
+                        _writeRawConstant(ac.physicalIndex + l*sizeof(Vector4),
                                           source->getViewMatrix() *
                                               source->getLightAs4DVector(l),
-                                          i->elementCount);
+                                          ac.elementCount);
                     break;
 
                 case ACT_LIGHT_DIRECTION_VIEW_SPACE_ARRAY:
                     m3 = source->getInverseTransposeViewMatrix().linear();
-                    for (size_t l = 0; l < i->data; ++l)
+                    for (size_t l = 0; l < ac.data; ++l)
                     {
                         vec3 = m3 * source->getLightDirection(l);
                         vec3.normalise();
                         // Set as 4D vector for compatibility
-                        _writeRawConstant(i->physicalIndex + l*sizeof(Vector4f),
-                                          Vector4f(vec3.x, vec3.y, vec3.z, 0.0f), i->elementCount);
+                        _writeRawConstant(ac.physicalIndex + l*sizeof(Vector4f),
+                                          Vector4f(vec3.x, vec3.y, vec3.z, 0.0f), ac.elementCount);
                     }
                     break;
 
                 case ACT_LIGHT_POWER_SCALE_ARRAY:
-                    for (size_t l = 0; l < i->data; ++l)
-                        _writeRawConstant(i->physicalIndex + l*sizeof(Real),
+                    for (size_t l = 0; l < ac.data; ++l)
+                        _writeRawConstant(ac.physicalIndex + l*sizeof(Real),
                                           source->getLightPowerScale(l));
                     break;
 
                 case ACT_LIGHT_ATTENUATION_ARRAY:
-                    for (size_t l = 0; l < i->data; ++l)
+                    for (size_t l = 0; l < ac.data; ++l)
                     {
-                        _writeRawConstant(i->physicalIndex + l*sizeof(Vector4f),
-                                          source->getLightAttenuation(l), i->elementCount);
+                        _writeRawConstant(ac.physicalIndex + l*sizeof(Vector4f),
+                                          source->getLightAttenuation(l), ac.elementCount);
                     }
                     break;
                 case ACT_SPOTLIGHT_PARAMS_ARRAY:
-                    for (size_t l = 0 ; l < i->data; ++l)
+                    for (size_t l = 0 ; l < ac.data; ++l)
                     {
-                        _writeRawConstant(i->physicalIndex + l*sizeof(Vector4f), source->getSpotlightParams(l),
-                                          i->elementCount);
+                        _writeRawConstant(ac.physicalIndex + l*sizeof(Vector4f), source->getSpotlightParams(l),
+                                          ac.elementCount);
                     }
                     break;
                 case ACT_DERIVED_LIGHT_DIFFUSE_COLOUR:
-                    _writeRawConstant(i->physicalIndex,
-                                      source->getLightDiffuseColourWithPower(i->data) * source->getSurfaceDiffuseColour(),
-                                      i->elementCount);
+                    _writeRawConstant(ac.physicalIndex,
+                                      source->getLightDiffuseColourWithPower(ac.data) * source->getSurfaceDiffuseColour(),
+                                      ac.elementCount);
                     break;
                 case ACT_DERIVED_LIGHT_SPECULAR_COLOUR:
-                    _writeRawConstant(i->physicalIndex,
-                                      source->getLightSpecularColourWithPower(i->data) * source->getSurfaceSpecularColour(),
-                                      i->elementCount);
+                    _writeRawConstant(ac.physicalIndex,
+                                      source->getLightSpecularColourWithPower(ac.data) * source->getSurfaceSpecularColour(),
+                                      ac.elementCount);
                     break;
                 case ACT_DERIVED_LIGHT_DIFFUSE_COLOUR_ARRAY:
-                    for (size_t l = 0; l < i->data; ++l)
+                    for (size_t l = 0; l < ac.data; ++l)
                     {
-                        _writeRawConstant(i->physicalIndex + l*sizeof(ColourValue),
+                        _writeRawConstant(ac.physicalIndex + l*sizeof(ColourValue),
                                           source->getLightDiffuseColourWithPower(l) * source->getSurfaceDiffuseColour(),
-                                          i->elementCount);
+                                          ac.elementCount);
                     }
                     break;
                 case ACT_DERIVED_LIGHT_SPECULAR_COLOUR_ARRAY:
-                    for (size_t l = 0; l < i->data; ++l)
+                    for (size_t l = 0; l < ac.data; ++l)
                     {
-                        _writeRawConstant(i->physicalIndex + l*sizeof(ColourValue),
+                        _writeRawConstant(ac.physicalIndex + l*sizeof(ColourValue),
                                           source->getLightSpecularColourWithPower(l) * source->getSurfaceSpecularColour(),
-                                          i->elementCount);
+                                          ac.elementCount);
                     }
                     break;
                 case ACT_TEXTURE_VIEWPROJ_MATRIX:
                     // can also be updated in lights
-                    _writeRawConstant(i->physicalIndex, source->getTextureViewProjMatrix(i->data),i->elementCount);
+                    _writeRawConstant(ac.physicalIndex, source->getTextureViewProjMatrix(ac.data),ac.elementCount);
                     break;
                 case ACT_TEXTURE_VIEWPROJ_MATRIX_ARRAY:
-                    for (size_t l = 0; l < i->data; ++l)
+                    for (size_t l = 0; l < ac.data; ++l)
                     {
                         // can also be updated in lights
-                        _writeRawConstant(i->physicalIndex + l*sizeof(Matrix4),
-                                          source->getTextureViewProjMatrix(l),i->elementCount);
+                        _writeRawConstant(ac.physicalIndex + l*sizeof(Matrix4),
+                                          source->getTextureViewProjMatrix(l),ac.elementCount);
                     }
                     break;
                 case ACT_SPOTLIGHT_VIEWPROJ_MATRIX:
-                    _writeRawConstant(i->physicalIndex, source->getSpotlightViewProjMatrix(i->data),i->elementCount);
+                    _writeRawConstant(ac.physicalIndex, source->getSpotlightViewProjMatrix(ac.data),ac.elementCount);
                     break;
                 case ACT_SPOTLIGHT_VIEWPROJ_MATRIX_ARRAY:
-                    for (size_t l = 0; l < i->data; ++l)
+                    for (size_t l = 0; l < ac.data; ++l)
                     {
                         // can also be updated in lights
-                        _writeRawConstant(i->physicalIndex + l*sizeof(Matrix4),
-                                          source->getSpotlightViewProjMatrix(l),i->elementCount);
+                        _writeRawConstant(ac.physicalIndex + l*sizeof(Matrix4),
+                                          source->getSpotlightViewProjMatrix(l),ac.elementCount);
                     }
                     break;
 
@@ -2423,10 +2418,8 @@ namespace Ogre
     const GpuProgramParameters::AutoConstantEntry*
     GpuProgramParameters::_findRawAutoConstantEntryFloat(size_t physicalIndex) const
     {
-        for(AutoConstantList::const_iterator i = mAutoConstants.begin();
-            i != mAutoConstants.end(); ++i)
+        for(const auto & ac : mAutoConstants)
         {
-            const AutoConstantEntry& ac = *i;
             // should check that auto is float and not int so that physicalIndex
             // doesn't have any ambiguity
             // However, all autos are float I think so no need
@@ -2494,10 +2487,8 @@ namespace Ogre
                 }
             }
 
-            for (AutoConstantList::const_iterator i = source.mAutoConstants.begin();
-                 i != source.mAutoConstants.end(); ++i)
+            for (const auto & autoEntry : source.mAutoConstants)
             {
-                const GpuProgramParameters::AutoConstantEntry& autoEntry = *i;
                 // find dest physical index
                 std::map<size_t, String>::iterator mi = srcToDestNamedMap.find(autoEntry.physicalIndex);
                 if (mi != srcToDestNamedMap.end())
@@ -2515,10 +2506,8 @@ namespace Ogre
             }
 
             // Copy shared param sets
-            for (GpuSharedParamUsageList::const_iterator i = source.mSharedParamSets.begin();
-                 i != source.mSharedParamSets.end(); ++i)
+            for (const auto & usage : source.mSharedParamSets)
             {
-                const GpuSharedParametersUsage& usage = *i;
                 if (!isUsingSharedParameters(usage.getName()))
                 {
                     addSharedParameters(usage.getSharedParams());
@@ -2595,10 +2584,9 @@ namespace Ogre
     //---------------------------------------------------------------------
     bool GpuProgramParameters::isUsingSharedParameters(const String& sharedParamsName) const
     {
-        for (GpuSharedParamUsageList::const_iterator i = mSharedParamSets.begin();
-             i != mSharedParamSets.end(); ++i)
+        for (const auto & mSharedParamSet : mSharedParamSets)
         {
-            if (i->getName() == sharedParamsName)
+            if (mSharedParamSet.getName() == sharedParamsName)
                 return true;
         }
         return false;

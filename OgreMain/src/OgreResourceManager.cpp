@@ -521,9 +521,8 @@ namespace Ogre {
     {
         OGRE_LOCK_AUTO_MUTEX;
 
-        for (ResourcePoolMap::iterator i = mResourcePoolMap.begin(); 
-            i != mResourcePoolMap.end(); ++i)
-            OGRE_DELETE i->second;
+        for (auto & i : mResourcePoolMap)
+            OGRE_DELETE i.second;
 
         mResourcePoolMap.clear();
     }
@@ -548,9 +547,9 @@ namespace Ogre {
     void ResourceManager::ResourcePool::clear()
     {
             OGRE_LOCK_AUTO_MUTEX;
-        for (ItemList::iterator i = mItems.begin(); i != mItems.end(); ++i)
+        for (auto & i : mItems)
         {
-            (*i)->getCreator()->remove((*i)->getHandle());
+            i->getCreator()->remove(i->getHandle());
         }
         mItems.clear();
     }

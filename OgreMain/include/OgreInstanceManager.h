@@ -135,7 +135,7 @@ namespace Ogre
         /** @see defragmentBatches overload, this takes care of an array of batches
             for a specific material */
         void defragmentBatches( bool optimizeCull, std::vector<InstancedEntity*> &entities,
-                                std::vector<Ogre::Vector4> &usedParams,
+                                std::vector<Ogre::Vector4f> &usedParams,
                                 InstanceBatchVec &fragmentedBatches );
 
         /** @see setSetting. This function helps it by setting the given parameter to all batches

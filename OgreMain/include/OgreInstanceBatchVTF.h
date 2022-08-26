@@ -43,17 +43,17 @@ namespace Ogre
 
     /** Instancing implementation using vertex texture through Vertex Texture Fetch (VTF)
         This implementation has the following advantages:
-          * Supports huge amount of instances per batch
-          * Supports skinning even with huge ammounts of instances per batch
-          * Doesn't need shader constants registers.
-          * Best suited for skinned entities
+          - Supports huge amount of instances per batch
+          - Supports skinning even with huge ammounts of instances per batch
+          - Doesn't need shader constants registers.
+          - Best suited for skinned entities
 
         But beware the disadvantages:
-          * VTF is only fast on modern GPUs (ATI Radeon HD 2000+, GeForce 8+ series onwards)
-          * On GeForce 6/7 series VTF is too slow
-          * VTF isn't (controversely) supported on old ATI X1800 hardware
-          * Only one bone weight per vertex is supported
-          * GPUs with low memory bandwidth (i.e. laptops and integrated GPUs)
+          - VTF is only fast on modern GPUs (ATI Radeon HD 2000+, GeForce 8+ series onwards)
+          - On GeForce 6/7 series VTF is too slow
+          - VTF isn't (controversely) supported on old ATI X1800 hardware
+          - Only one bone weight per vertex is supported
+          - GPUs with low memory bandwidth (i.e. laptops and integrated GPUs)
           may perform even worse than no instancing
 
         Whether this performs great or bad depends on the hardware. It improved up to 4x performance on
@@ -62,15 +62,9 @@ namespace Ogre
         Each BaseInstanceBatchVTF has it's own texture, which occupies memory in VRAM.
         Approx VRAM usage can be computed by doing 12 bytes * 3 * numInstances * numBones
         Use flag IM_VTFBESTFIT to avoid wasting VRAM (but may reduce amount of instances per batch).
-        @par
-        The material requires at least a texture unit stage named "InstancingVTF"
 
+        The material requires at least a texture unit stage named @c InstancingVTF
 
-            Design discussion webpage: http://www.ogre3d.org/forums/viewtopic.php?f=4&t=59902
-        @author
-            Matias N. Goldberg ("dark_sylinc")
-        @version
-            1.0
      */
     class _OgreExport BaseInstanceBatchVTF : public InstanceBatch
     {

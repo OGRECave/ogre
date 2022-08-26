@@ -145,17 +145,18 @@ public:
     @param index The index of the dependecy.
     */
     const String& getDependency(unsigned int index) const;
-    
 
-    /** Sets whether a vertex program includes the required instructions
-        to perform skeletal animation. 
-    */
+    /// @copydoc GpuProgram::setSkeletalAnimationIncluded
     void setSkeletalAnimationIncluded(bool value) { mSkeletalAnimation = value; }
  
-    /** Returns whether a vertex program includes the required instructions
-        to perform skeletal animation. 
-    */
+    /// @copydoc GpuProgram::isSkeletalAnimationIncluded
     bool getSkeletalAnimationIncluded() const { return mSkeletalAnimation; }
+
+    /// @copydoc GpuProgram::setInstancingIncluded
+    void setInstancingIncluded(bool included) { mInstancing = included; }
+
+    /// @copydoc GpuProgram::isInstancingIncluded
+    bool getInstancingIncluded(void) const { return mInstancing; }
 
     /** Tells Ogre whether auto-bound matrices should be sent in column or row-major order.
 
@@ -213,6 +214,7 @@ private:
     bool mSkeletalAnimation;
     // Whether to pass matrices as column-major.
     bool mColumnMajorMatrices;
+    bool mInstancing;
     friend class TargetRenderState;
 };
 

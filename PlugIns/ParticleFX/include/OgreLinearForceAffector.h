@@ -52,7 +52,7 @@ namespace Ogre {
         it is not self-stabilising and can lead to perpetually increasing particle velocities. 
         You choose the approach by calling the setForceApplication method.
     */
-    class _OgreParticleFXExport LinearForceAffector : public ParticleAffector
+    class LinearForceAffector : public ParticleAffector
     {
     public:
         /** Command object for force vector (see ParamCommand).*/

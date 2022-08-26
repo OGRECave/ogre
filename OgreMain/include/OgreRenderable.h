@@ -229,7 +229,7 @@ namespace Ogre {
             two is performed by the ACT_CUSTOM entry, if that is used.
         @param value The value to associate.
         */
-        void setCustomParameter(size_t index, const Vector4& value);
+        void setCustomParameter(size_t index, const Vector4f& value);
 
         /** Removes a custom value which is associated with this Renderable at the given index.
         @param index Index of the parameter to remove.
@@ -247,7 +247,7 @@ namespace Ogre {
         @param index Index of the parameter to retrieve.
             @see setCustomParameter for full details.
         */
-        const Vector4& getCustomParameter(size_t index) const;
+        const Vector4f& getCustomParameter(size_t index) const;
 
         /** Update a custom GpuProgramParameters constant which is derived from 
             information only this Renderable knows.
@@ -341,7 +341,7 @@ namespace Ogre {
         };
 
     protected:
-        typedef std::map<size_t, Vector4> CustomParameterMap;
+        typedef std::map<size_t, Vector4f> CustomParameterMap;
         CustomParameterMap mCustomParameters;
         UserObjectBindings mUserObjectBindings;      /// User objects binding.
         bool mPolygonModeOverrideable;

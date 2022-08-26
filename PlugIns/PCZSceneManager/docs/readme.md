@@ -1,30 +1,24 @@
 # Using the PCZ Scene Manager {#pczscenemanager}
 
-The Portal-Connected-Zone Scene Manager (PCZSM) is a plugin for Ogre3D (see
-www.ogre3d.org for more information about Ogre3d) which allows traversal of
+The Portal-Connected-Zone Scene Manager (PCZSM) is a plugin for Ogre3D which allows traversal of
 a scene which is non-homogeneous in structure.  Specifically, the PCZSM uses
 "Zones" which have their own hierarchy.  Zones are connected to other zones
 by "Portals" which can be envisioned as 4-point convex planar polygons (or
 Spheres or AAB's).  
 
+@tableofcontents
+
 This document gives basic information on the usage of the PCZSceneManager.
 It is not complete, and will change & expand as needed.  Note that as of
 this writing, the PCZSM has not undergone very extensive testing, nor is
 it optimized very much.  Assistance in these two areas would be greatly
-appreciated.  For support or to report bugs, please see the Developer Forum 
-at Ogre3D.org
+appreciated.
 
-Cheers,
-
-Eric "Chaster" Cha
-
-## USING THE PCZ_SCENEMANAGER
-
-NOTE: For an example of PCZSM usage, see the PCZTestApp Application.  It
+@note For an example of PCZSM usage, see the PCZTestApp Sample.  It
 is probably a lot easier to understand than trying to figure it all out
 from this. 
 
-## LOADING & INITIALIZATION:
+## LOADING & INITIALIZATION
 
 The PCZSM is loaded just like any other Scene Manager plugin.  Included in
 the standard PCZSM plugin is the "default" zone.  If the user wishes to
@@ -37,7 +31,7 @@ ZoneType_OCtree, ZoneType_Terrain) the PCZSM should use for the default zone.
 The default zone is the zone where entities are placed if they are not 
 specified to be in other zones.  
 
-## CREATING ZONES:
+## CREATING ZONES
 
 Once the PCZSM has been initialized, the user can proceed with creating
 zones (PCZSceneManager::createZone(zoneType, zoneName)).  Zones can be 
@@ -53,12 +47,10 @@ the sky when the 'outdoor' zone is visible).  Usually, the Sky should be
 associated with the default zone (which is usually used as the "all
 encompassing exterior zone").
 
-## CREATING PORTALS:
+## CREATING PORTALS
 
 Once the user has created a zone (in addition to the default zone), 
 they can create portals to attach two zones together.  
-
-*** NEW AS OF 9/25/07: 
 
 To create a portal, the user just calls PCZSceneManager::createPortal(). 
 NOTE: The user should NOT just instantiate a portal manually (i.e. portal = new Portal)
@@ -77,14 +69,14 @@ NOTE: Portals currently only connect different zones.  The user can't
 connect portals to the same zone yet (i.e. no teleporters).  This functionality
 could be added later.
 
-UPDATE as of 3/17/09: Portals can be "closed" (and opened) by calling Portal::setEnable(false)
+Portals can be "closed" (and opened) by calling Portal::setEnable(false)
 (and Portal::setEnable(false)).  Disabling a portal prevents the scene manager from traversing
 through the portal and also prevents scenenodes & ray queries from crossing the portal.
 Basically, it turns a portal "off".  Disabling an antiportal (see note below about 
 Creating antiportals) prevents the antiportal from blocking scene traversal through
 regular portals.
 
-NEW IN VERSION 1.2: Portals can take 3 different forms: quad portals, AAB portals, 
+Portals can take 3 different forms: quad portals, AAB portals,
 and Sphere portals.  AAB and Sphere portals do not add any culling planes to the
 frustum, and just serve to serve as enclosures for zones which aren't naturally
 surrounded by geometry.  They function a little different than traditional quad
@@ -123,16 +115,13 @@ scene node, it will move with the scene node (including rotations or translation
 Because of this, it is also highly recommended (although not required) that
 the node a portal is associated with be located at the center of the portal.
 
-NOTE: Scaling of a portal is not yet *tested*.  Scaling a node should scale 
-the portal (but don't cry to me if it doesn't work right yet...)   
-
 Once all portals in the scene have been created, the user can either manually 
 assign their zone targets (i.e. the zone which they connect to) or they can
 call PCZSceneManager::connectPortalsToTargetZonesByLocation() to do it 
 automatically.  Note that this function requires all portals to have a matching
 portal in the target zone.  
 
-## ANTIPORTALS  ** NEW As of 3/17/09 **
+## ANTIPORTALS
 
 Antiportals are a new feature (thanks to Lf3thn4d). Antiportals prevent traversal of 
 portals located behind them (as viewed from the camera).  They are created and manipulated
@@ -144,7 +133,7 @@ To Create an antiportal, it's very similar to regular portals.  All you need to 
 PCZSceneManager::createAntiPortal("name of the antiportal"), set the corner values,
 attach it to a node, and add it to the proper zone.  
 
-## CREATING OBJECTS/ENTITIES:
+## CREATING OBJECTS/ENTITIES
 
 Once the zones and portals have been created, the user can create objects/entities. 
 The user should use SceneManager::createSceneNode() to create all scene nodes.
@@ -174,14 +163,14 @@ So for example, the enclosure node/object for a room would be the model of the
 walls, ceiling, and floor (assuming they are all modeled as one object or at least
 all attached to the same node).  See the PCZTestApp for an example.
 
-## SCENE QUERIES:
+## SCENE QUERIES
 
 I have implemented Scene Query functions for Default & Octree Zones.  In general,
 they are used the same way as Scene Queries for any other Scene Manager, with
 one difference.  The user must specify the "start zone" for any scene query
 using XXXSceneQuery::setStartZone(zone) where "XXX" is Ray, Sphere, AxisAlignedBox, etc.
 
-## KNOWN BUGS:
+## KNOWN BUGS
 
 * Light traversal is not quite correct.  In order to avoid infinite recursion, I had to
   put in a hack which can potentially result in lighting not traversing into some zones properly.

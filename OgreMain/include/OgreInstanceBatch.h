@@ -89,7 +89,7 @@ namespace Ogre
     {
     public:
         typedef std::vector<InstancedEntity*>  InstancedEntityVec;
-        typedef std::vector<Vector4>           CustomParamsVec;
+        typedef std::vector<Vector4f>           CustomParamsVec;
     protected:
         typedef TransformBase<3, float>        Matrix3x4f;
         RenderOperation     mRenderOperation;
@@ -327,10 +327,10 @@ namespace Ogre
         void _markTransformSharingDirty() { mTransformSharingDirty = true; }
 
         /** @see InstancedEntity::setCustomParam */
-        void _setCustomParam( InstancedEntity *instancedEntity, unsigned char idx, const Vector4 &newParam );
+        void _setCustomParam( InstancedEntity *instancedEntity, unsigned char idx, const Vector4f &newParam );
 
         /** @see InstancedEntity::getCustomParam */
-        const Vector4& _getCustomParam( InstancedEntity *instancedEntity, unsigned char idx );
+        const Vector4f& _getCustomParam( InstancedEntity *instancedEntity, unsigned char idx );
 
         //Renderable overloads
         /** @copydoc Renderable::getMaterial */

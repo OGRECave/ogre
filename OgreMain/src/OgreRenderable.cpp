@@ -6,7 +6,7 @@
 
 namespace Ogre
 {
-void Renderable::setCustomParameter(size_t index, const Vector4& value) { mCustomParameters[index] = value; }
+void Renderable::setCustomParameter(size_t index, const Vector4f& value) { mCustomParameters[index] = value; }
 
 void Renderable::removeCustomParameter(size_t index) { mCustomParameters.erase(index); }
 
@@ -15,7 +15,7 @@ bool Renderable::hasCustomParameter(size_t index) const
     return mCustomParameters.find(index) != mCustomParameters.end();
 }
 
-const Vector4& Renderable::getCustomParameter(size_t index) const
+const Vector4f& Renderable::getCustomParameter(size_t index) const
 {
     CustomParameterMap::const_iterator i = mCustomParameters.find(index);
     if (i != mCustomParameters.end())

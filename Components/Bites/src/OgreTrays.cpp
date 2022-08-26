@@ -71,7 +71,7 @@ Ogre::Vector2 Widget::cursorOffset(Ogre::OverlayElement *element, const Ogre::Ve
 
 Ogre::Real Widget::getCaptionWidth(const Ogre::DisplayString &caption, Ogre::TextAreaOverlayElement *area)
 {
-    Ogre::FontPtr font = area->getFont();
+    const Ogre::FontPtr& font = area->getFont();
     font->load(); // ensure glyph info is there
     Ogre::Real lineWidth = 0;
 

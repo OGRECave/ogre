@@ -61,9 +61,6 @@ namespace Ogre {
         // immediately test WGL_ARB_pixel_format and FSAA support
         // so we can set configuration options appropriately
         initialiseWGL();
-#if OGRE_NO_QUAD_BUFFER_STEREO == 0
-		mStereoMode = SMT_NONE;
-#endif
     } 
 
     ConfigOptionMap Win32GLSupport::getConfigOptions()
@@ -391,7 +388,7 @@ namespace Ogre {
         return DefWindowProc(hwnd, umsg, wp, lp);
     }
 
-    bool Win32GLSupport::selectPixelFormat(HDC hdc, int colourDepth, int multisample, bool hwGamma)
+    bool Win32GLSupport::selectPixelFormat(HDC hdc, int colourDepth, int multisample, bool hwGamma, bool stereo)
     {
         PIXELFORMATDESCRIPTOR pfd;
         memset(&pfd, 0, sizeof(pfd));
@@ -405,7 +402,7 @@ namespace Ogre {
         pfd.cStencilBits = 8;
 
 #if OGRE_NO_QUAD_BUFFER_STEREO == 0
-		if (SMT_FRAME_SEQUENTIAL == mStereoMode)
+		if (stereo)
 			pfd.dwFlags |= PFD_STEREO;
 #endif
 
@@ -436,7 +433,7 @@ namespace Ogre {
             attribList.push_back(WGL_SAMPLES_ARB); attribList.push_back(multisample);
 			
 #if OGRE_NO_QUAD_BUFFER_STEREO == 0
-			if (SMT_FRAME_SEQUENTIAL == mStereoMode)
+			if (stereo)
 				attribList.push_back(WGL_STEREO_ARB); attribList.push_back(true);
 #endif
 

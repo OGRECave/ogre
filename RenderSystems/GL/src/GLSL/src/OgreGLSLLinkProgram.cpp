@@ -479,8 +479,7 @@ namespace Ogre {
                 GLenum binaryFormat = 0; 
 
                 // create microcode
-                GpuProgramManager::Microcode newMicrocode = 
-                    GpuProgramManager::getSingleton().createMicrocode(binaryLength + sizeof(GLenum));
+                auto newMicrocode = GpuProgramManager::createMicrocode(binaryLength + sizeof(GLenum));
 
                 // get binary
                 uint8 * programBuffer = newMicrocode->getPtr() + sizeof(GLenum);

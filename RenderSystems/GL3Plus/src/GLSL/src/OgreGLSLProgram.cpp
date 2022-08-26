@@ -92,9 +92,10 @@ namespace Ogre {
 
         // Convert to const char * for GL
         std::vector<const char*> names;
-        for (uint e = 0; e < nameStrings.size(); e++)
+        names.reserve(nameStrings.size());
+for (const auto & nameString : nameStrings)
         {
-            names.push_back(nameStrings[e].c_str());
+            names.push_back(nameString.c_str());
         }
 
         // TODO replace glTransformFeedbackVaryings with in-shader specification (GL 4.4)
@@ -166,8 +167,7 @@ namespace Ogre {
         OGRE_CHECK_GL_ERROR(glGetProgramiv(programHandle, GL_PROGRAM_BINARY_LENGTH, &binaryLength));
 
         // create microcode
-        GpuProgramManager::Microcode newMicrocode =
-            GpuProgramManager::getSingleton().createMicrocode(binaryLength + sizeof(GLenum));
+        auto newMicrocode = GpuProgramManager::createMicrocode(binaryLength + sizeof(GLenum));
 
         // get binary
         OGRE_CHECK_GL_ERROR(glGetProgramBinary(programHandle, binaryLength, NULL,

@@ -66,9 +66,9 @@ namespace Ogre
     RibbonTrail::~RibbonTrail()
     {
         // Detach listeners
-        for (NodeList::iterator i = mNodeList.begin(); i != mNodeList.end(); ++i)
+        for (auto & i : mNodeList)
         {
-            (*i)->setListener(0);
+            i->setListener(0);
         }
 
         if (mFadeController)
@@ -148,6 +148,7 @@ namespace Ogre
     //-----------------------------------------------------------------------
     void RibbonTrail::setTrailLength(Real len)
     {
+        OgreAssert(len > 0, "invalid value");
         mTrailLength = len;
         mElemLength = mTrailLength / mMaxElementsPerChain;
         mSquaredElemLength = mElemLength * mElemLength;
@@ -378,7 +379,7 @@ namespace Ogre
 
                     Element& elem = mChainElementList[seg.start + e];
                     elem.width = elem.width - (time * mDeltaWidth[s]);
-                    elem.width = std::max(Real(0.0f), elem.width);
+                    elem.width = std::max(0.0f, elem.width);
                     elem.colour = elem.colour - (mDeltaColour[s] * time);
                     elem.colour.saturate();
 

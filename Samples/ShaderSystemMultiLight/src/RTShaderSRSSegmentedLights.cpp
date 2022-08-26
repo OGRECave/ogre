@@ -68,10 +68,8 @@ void RTShaderSRSSegmentedLights::updateGpuProgramsParams(Renderable* rend, const
     float spotIntensity = 1;
     
     // Update per light parameters.
-    for (unsigned int i=0; i < mLightParamsList.size(); ++i)
+    for (auto & curParams : mLightParamsList)
     {
-        const LightParams& curParams = mLightParamsList[i];
-
         if (curLightType != curParams.mType)
         {
             curLightType = curParams.mType;
@@ -317,42 +315,42 @@ bool RTShaderSRSSegmentedLights::resolvePerLightParameters(ProgramSet* programSe
     Program* psProgram = programSet->getCpuProgram(GPT_FRAGMENT_PROGRAM);
 
     // Resolve per light parameters.
-    for (unsigned int i=0; i < mLightParamsList.size(); ++i)
+    for (auto & i : mLightParamsList)
     {       
-        switch (mLightParamsList[i].mType)
+        switch (i.mType)
         {
         case Light::LT_DIRECTIONAL:
-            mLightParamsList[i].mDirection = psProgram->resolveParameter(GCT_FLOAT3, -1, (uint16)GPV_LIGHTS, "light_direction_space");
+            i.mDirection = psProgram->resolveParameter(GCT_FLOAT3, -1, (uint16)GPV_LIGHTS, "light_direction_space");
             break;
 
         case Light::LT_POINT:
         case Light::LT_SPOTLIGHT:
-            mLightParamsList[i].mPosition = psProgram->resolveParameter(GCT_FLOAT3, -1, (uint16)GPV_LIGHTS, "light_position_space");
-            mLightParamsList[i].mDirection = psProgram->resolveParameter(GCT_FLOAT3, -1, (uint16)GPV_LIGHTS, "light_direction_space");
-            mLightParamsList[i].mSpotParams = psProgram->resolveParameter(GCT_FLOAT3, -1, (uint16)GPV_LIGHTS, "spotlight_params");
+            i.mPosition = psProgram->resolveParameter(GCT_FLOAT3, -1, (uint16)GPV_LIGHTS, "light_position_space");
+            i.mDirection = psProgram->resolveParameter(GCT_FLOAT3, -1, (uint16)GPV_LIGHTS, "light_direction_space");
+            i.mSpotParams = psProgram->resolveParameter(GCT_FLOAT3, -1, (uint16)GPV_LIGHTS, "spotlight_params");
             break;
         }
 
         // Resolve diffuse colour.
         if ((mTrackVertexColourType & TVC_DIFFUSE) == 0)
         {
-            mLightParamsList[i].mDiffuseColour = psProgram->resolveParameter(GCT_FLOAT3, -1, (uint16)GPV_LIGHTS | (uint16)GPV_GLOBAL, "derived_light_diffuse");
+            i.mDiffuseColour = psProgram->resolveParameter(GCT_FLOAT3, -1, (uint16)GPV_LIGHTS | (uint16)GPV_GLOBAL, "derived_light_diffuse");
         }
         else
         {
-            mLightParamsList[i].mDiffuseColour = psProgram->resolveParameter(GCT_FLOAT3, -1, (uint16)GPV_LIGHTS, "light_diffuse");
+            i.mDiffuseColour = psProgram->resolveParameter(GCT_FLOAT3, -1, (uint16)GPV_LIGHTS, "light_diffuse");
         }   
 
-        if ((mSpecularEnable) && (mLightParamsList[i].mType == Light::LT_DIRECTIONAL))
+        if ((mSpecularEnable) && (i.mType == Light::LT_DIRECTIONAL))
         {
             // Resolve specular colour.
             if ((mTrackVertexColourType & TVC_SPECULAR) == 0)
             {
-                mLightParamsList[i].mSpecularColour = psProgram->resolveParameter(GCT_FLOAT3, -1, (uint16)GPV_LIGHTS | (uint16)GPV_GLOBAL, "derived_light_specular");
+                i.mSpecularColour = psProgram->resolveParameter(GCT_FLOAT3, -1, (uint16)GPV_LIGHTS | (uint16)GPV_GLOBAL, "derived_light_specular");
             }
             else
             {
-                mLightParamsList[i].mSpecularColour = psProgram->resolveParameter(GCT_FLOAT3, -1, (uint16)GPV_LIGHTS, "light_specular");
+                i.mSpecularColour = psProgram->resolveParameter(GCT_FLOAT3, -1, (uint16)GPV_LIGHTS, "light_specular");
             }                       
         }       
 
@@ -394,9 +392,9 @@ bool RTShaderSRSSegmentedLights::addFunctionInvocations(ProgramSet* programSet)
 
 
     // Add per light functions.
-    for (unsigned int i=0; i < mLightParamsList.size(); ++i)
+    for (auto & i : mLightParamsList)
     {       
-        if (false == addPSIlluminationInvocation(&mLightParamsList[i], psMain, FFP_PS_COLOUR_BEGIN + 1))
+        if (false == addPSIlluminationInvocation(&i, psMain, FFP_PS_COLOUR_BEGIN + 1))
             return false;
     }
 
@@ -797,10 +795,8 @@ void RTShaderSRSSegmentedLights::getLightCount(int lightCount[3]) const
     lightCount[1] = 0;
     lightCount[2] = 0;
 
-    for (unsigned int i=0; i < mLightParamsList.size(); ++i)
+    for (const auto& curParams : mLightParamsList)
     {
-        const LightParams curParams = mLightParamsList[i];
-
         if (curParams.mType == Light::LT_POINT)
             lightCount[0]++;
         else if (curParams.mType == Light::LT_DIRECTIONAL)

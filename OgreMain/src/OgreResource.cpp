@@ -384,36 +384,31 @@ namespace Ogre
     void Resource::_fireLoadingComplete(bool unused)
     {
         // Lock the listener list
-            OGRE_LOCK_MUTEX(mListenerListMutex);
-        for (ListenerList::iterator i = mListenerList.begin();
-            i != mListenerList.end(); ++i)
+        OGRE_LOCK_MUTEX(mListenerListMutex);
+        for (auto& l : mListenerList)
         {
-            (*i)->loadingComplete(this);
+            l->loadingComplete(this);
         }
     }
     //-----------------------------------------------------------------------
     void Resource::_firePreparingComplete(bool unused)
     {
         // Lock the listener list
-            OGRE_LOCK_MUTEX(mListenerListMutex);
-        for (ListenerList::iterator i = mListenerList.begin();
-            i != mListenerList.end(); ++i)
+        OGRE_LOCK_MUTEX(mListenerListMutex);
+        for (auto& l : mListenerList)
         {
-            (*i)->preparingComplete(this);
+            l->preparingComplete(this);
         }
     }
     //-----------------------------------------------------------------------
     void Resource::_fireUnloadingComplete(void)
     {
         // Lock the listener list
-            OGRE_LOCK_MUTEX(mListenerListMutex);
-            for (ListenerList::iterator i = mListenerList.begin();
-                i != mListenerList.end(); ++i)
-            {
-
-                (*i)->unloadingComplete(this);
-
-            }
+        OGRE_LOCK_MUTEX(mListenerListMutex);
+        for (auto& l : mListenerList)
+        {
+            l->unloadingComplete(this);
+        }
     }
 
 }

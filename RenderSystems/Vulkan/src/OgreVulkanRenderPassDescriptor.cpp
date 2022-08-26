@@ -459,17 +459,17 @@ namespace Ogre
             getClearColour( clearColour, mColour[idx]->getFormat() );
     }
     //-----------------------------------------------------------------------------------
-    void VulkanRenderPassDescriptor::setClearDepth( Real clearDepth )
+    void VulkanRenderPassDescriptor::setClearDepth( float clearDepth )
     {
         //RenderPassDescriptor::setClearDepth( clearDepth );
         if( mDepth && mSharedFboItor != mRenderSystem->_getFrameBufferDescMap().end() )
         {
             size_t attachmentIdx = mSharedFboItor->second.mNumImageViews - 1u;
             if( !mRenderSystem->isReverseDepthBufferEnabled() )
-                mClearValues[attachmentIdx].depthStencil.depth = static_cast<float>(clearDepth);
+                mClearValues[attachmentIdx].depthStencil.depth = clearDepth;
             else
             {
-                mClearValues[attachmentIdx].depthStencil.depth = static_cast<float>(Real(1.0) - clearDepth);
+                mClearValues[attachmentIdx].depthStencil.depth = 1.0f - clearDepth;
             }
         }
     }

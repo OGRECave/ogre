@@ -172,10 +172,8 @@ namespace Ogre
                 //Write custom parameters, if any
                 for( unsigned char i=0; i<numCustomParams; ++i )
                 {
-                    *pDest++ = mCustomParams[customParamIdx+i].x;
-                    *pDest++ = mCustomParams[customParamIdx+i].y;
-                    *pDest++ = mCustomParams[customParamIdx+i].z;
-                    *pDest++ = mCustomParams[customParamIdx+i].w;
+                    memcpy(pDest, mCustomParams[customParamIdx+i].ptr(), sizeof(Vector4f));
+                    pDest += 4;
                 }
 
                 ++retVal;

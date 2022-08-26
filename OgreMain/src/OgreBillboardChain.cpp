@@ -214,6 +214,13 @@ namespace Ogre {
         mDynamic = dyn;
         mBuffersNeedRecreating = mIndexContentDirty = mVertexContentDirty = true;
     }
+    void BillboardChain::setAutoUpdate(bool autoUpdate)
+    {
+        mAutoUpdate = autoUpdate;
+        OGRE_IGNORE_DEPRECATED_BEGIN
+        setDynamic(autoUpdate);
+        OGRE_IGNORE_DEPRECATED_END
+    }
     //-----------------------------------------------------------------------
     void BillboardChain::addChainElement(size_t chainIndex,
         const BillboardChain::Element& dtls)
@@ -383,11 +390,8 @@ namespace Ogre {
         {
             mAABB.setNull();
             Vector3 widthVector;
-            for (ChainSegmentList::const_iterator segi = mChainSegmentList.begin();
-                segi != mChainSegmentList.end(); ++segi)
+            for (const auto & seg : mChainSegmentList)
             {
-                const ChainSegment& seg = *segi;
-
                 if (seg.head != SEGMENT_EMPTY)
                 {
 
@@ -431,7 +435,7 @@ namespace Ogre {
     {
         setupBuffers();
 
-        if (!mVertexContentDirty && false) // TODO: mAutoUpdate flag like BillboardSet
+        if (!mVertexContentDirty && !mAutoUpdate)
             return;
 
         HardwareVertexBufferSharedPtr pBuffer =
@@ -442,11 +446,8 @@ namespace Ogre {
         Vector3 eyePos = mParentNode->convertWorldToLocalPosition(camPos);
 
         Vector3 chainTangent;
-        for (ChainSegmentList::iterator segi = mChainSegmentList.begin();
-            segi != mChainSegmentList.end(); ++segi)
+        for (auto & seg : mChainSegmentList)
         {
-            ChainSegment& seg = *segi;
-
             // Skip 0 or 1 element segment counts
             if (seg.head != SEGMENT_EMPTY && seg.head != seg.tail)
             {
@@ -576,11 +577,8 @@ namespace Ogre {
             uint16* pShort = static_cast<uint16*>(indexLock.pData);
             mIndexData->indexCount = 0;
             // indexes
-            for (ChainSegmentList::iterator segi = mChainSegmentList.begin();
-                segi != mChainSegmentList.end(); ++segi)
+            for (auto & seg : mChainSegmentList)
             {
-                ChainSegment& seg = *segi;
-
                 // Skip 0 or 1 element segment counts
                 if (seg.head != SEGMENT_EMPTY && seg.head != seg.tail)
                 {

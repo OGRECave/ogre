@@ -59,24 +59,24 @@ protected:
         SubEntity* sub;
         
         sub = ent->getSubEntity(0);    // eyes
-        sub->setCustomParameter(SP_SHININESS, Vector4(35, 0, 0, 0));
-        sub->setCustomParameter(SP_DIFFUSE, Vector4(1, 0.3, 0.3, 1));
-        sub->setCustomParameter(SP_SPECULAR, Vector4(1, 0.6, 0.6, 1));
+        sub->setCustomParameter(SP_SHININESS, Vector4f(35, 0, 0, 0));
+        sub->setCustomParameter(SP_DIFFUSE, Vector4f(1, 0.3, 0.3, 1));
+        sub->setCustomParameter(SP_SPECULAR, Vector4f(1, 0.6, 0.6, 1));
 
         sub = ent->getSubEntity(1);    // skin
-        sub->setCustomParameter(SP_SHININESS, Vector4(10, 0, 0, 0));
-        sub->setCustomParameter(SP_DIFFUSE, Vector4(0, 0.5, 0, 1));
-        sub->setCustomParameter(SP_SPECULAR, Vector4(0.3, 0.5, 0.3, 1));
+        sub->setCustomParameter(SP_SHININESS, Vector4f(10, 0, 0, 0));
+        sub->setCustomParameter(SP_DIFFUSE, Vector4f(0, 0.5, 0, 1));
+        sub->setCustomParameter(SP_SPECULAR, Vector4f(0.3, 0.5, 0.3, 1));
 
         sub = ent->getSubEntity(2);    // earring
-        sub->setCustomParameter(SP_SHININESS, Vector4(25, 0, 0, 0));
-        sub->setCustomParameter(SP_DIFFUSE, Vector4(1, 1, 0, 1));
-        sub->setCustomParameter(SP_SPECULAR, Vector4(1, 1, 0.7, 1));
+        sub->setCustomParameter(SP_SHININESS, Vector4f(25, 0, 0, 0));
+        sub->setCustomParameter(SP_DIFFUSE, Vector4f(1, 1, 0, 1));
+        sub->setCustomParameter(SP_SPECULAR, Vector4f(1, 1, 0.7, 1));
 
         sub = ent->getSubEntity(3);    // teeth
-        sub->setCustomParameter(SP_SHININESS, Vector4(20, 0, 0, 0));
-        sub->setCustomParameter(SP_DIFFUSE, Vector4(1, 1, 0.7, 1));
-        sub->setCustomParameter(SP_SPECULAR, Vector4(1, 1, 1, 1));
+        sub->setCustomParameter(SP_SHININESS, Vector4f(20, 0, 0, 0));
+        sub->setCustomParameter(SP_DIFFUSE, Vector4f(1, 1, 0.7, 1));
+        sub->setCustomParameter(SP_SPECULAR, Vector4f(1, 1, 1, 1));
 
         // create a check box to toggle light movement
         mMoveLight = mTrayMgr->createCheckBox(TL_TOPLEFT, "MoveLight", "Move Light");

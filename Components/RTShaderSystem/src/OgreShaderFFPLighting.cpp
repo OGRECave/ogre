@@ -67,11 +67,9 @@ void FFPLighting::updateGpuProgramsParams(Renderable* rend, const Pass* pass, co
 	unsigned int curSearchLightIndex = 0;
 
 	// Update per light parameters.
-	for (unsigned int i=0; i < mLightParamsList.size(); ++i)
+	for (auto & curParams : mLightParamsList)
 	{
-		const LightParams& curParams = mLightParamsList[i];
-
-		if (curLightType != curParams.mType)
+			if (curLightType != curParams.mType)
 		{
 			curLightType = curParams.mType;
 			curSearchLightIndex = 0;
@@ -524,11 +522,9 @@ Vector3i FFPLighting::getLightCount() const
 {
 	Vector3i lightCount(0, 0, 0);
 
-	for (unsigned int i=0; i < mLightParamsList.size(); ++i)
+	for (const auto& curParams : mLightParamsList)
 	{
-		const LightParams curParams = mLightParamsList[i];
-
-		if (curParams.mType == Light::LT_POINT)
+			if (curParams.mType == Light::LT_POINT)
 			lightCount[0]++;
 		else if (curParams.mType == Light::LT_DIRECTIONAL)
 			lightCount[1]++;

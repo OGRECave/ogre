@@ -32,7 +32,7 @@ The syntax of the parameter definition is exactly the same as when you define pa
 
 # High Level Programs
 
-Support for high level vertex and fragment programs is provided through plugins; this is to make sure that an application using OGRE can use as little or as much of the high-level program functionality as they like. OGRE supports multiple high-level program types. Notably DirectX [HLSL](#HLSL), and OpenGL [GLSL](#GLSL). HLSL can only be used with the DirectX rendersystem, and GLSL can only be used with the GL rendersystem.
+Support for high level vertex and fragment programs is provided through plugins; this is to make sure that an application using OGRE can use as little or as much of the high-level program functionality as they like. OGRE supports multiple high-level program types. Notably DirectX [HLSL](#HLSL), and OpenGL [GLSL](#GLSL). HLSL can only be used with the DirectX rendersystem, and GLSL can only be used with the GL and Vulkan rendersystems.
 
 One way to support both HLSL and GLSL is to include separate techniques in the material script, each one referencing separate programs. However, if the programs are basically the same, with the same parameters, and the techniques are complex this can bloat your material scripts with duplication fairly quickly. Instead, if the only difference is the language of the vertex & fragment program you can use OGRE’s [Unified High-level Programs](#Unified-High_002dlevel-Programs) to automatically pick a program suitable for your rendersystem whilst using a single technique.
 
@@ -80,9 +80,153 @@ Example: entry_point main_vp
 
 @note on GLSL the @c entry_point is required to be `main`
 
+# GLSL programs {#GLSL}
+
+GLSL is the native shading language of the OpenGL API and requires no plugins there. Additionally, you can use it with Vulkan by loading the @c Plugin_GLSLangProgramManager.
+Declaring a OpenGL GLSL program is similar to Cg but simpler. Here’s an example:
+
+```cpp
+vertex_program myGLSLVertexProgram glsl
+{
+    source myGLSLVertexProgram.vert
+}
+```
+
+The type `glsl` works with the GL and GL3+ RenderSystems, while with the GLES2 RenderSystem you must specify `glsles` instead.
+For Vulkan, you must specify `glslang` so the GLSLang Plugin is used. This also works with GL3+, in case you prefer not to use the GLSL compiler of your driver.
+If your shader is designed for this, you can also specify all of those at once. See @ref multi-language-programs.
+
+In GLSL, no entry point needs to be defined since it is always `main()` and there is no target definition since GLSL source is compiled into native GPU code and not intermediate assembly. 
+
+For modularity %Ogre supports the non-standard <tt>\#include <something.glsl></tt> directive in GLSL. It also works with OpenGL ES and resembles what is available with HLSL and Cg.
+
+## Binding vertex attributes {#Binding-vertex-attributes}
+
+Vertex attributes must be declared in the shader, for the vertex data bound to it by Ogre.
+
+```cpp
+// legacy GLSL syntax
+attribute vec4 vertex;
+
+// modern GLSL syntax with explicit layout qualifier
+layout(location = 0) in vec4 vertex;
+```
+
+refer to the following table for the location indices and names to use:
+
+| Semantic | Custom name | Binding location | Legacy OpenGL built-in |
+|----------|------|------------------|-----------------------|
+| Ogre::VES_POSITION | vertex | 0 | gl_Vertex |
+| Ogre::VES_BLEND_WEIGHTS | blendWeights | 1 | n/a |
+| Ogre::VES_NORMAL | normal | 2 | gl_Normal |
+| Ogre::VES_COLOUR | colour | 3 | gl_Color |
+| Ogre::VES_COLOUR2 | secondary_colour | 4 | gl_SecondaryColor |
+| Ogre::VES_BLEND_INDICES | blendIndices | 7 | n/a |
+| Ogre::VES_TEXTURE_COORDINATES | uv0 - uv7 | 8-15 | gl_MultiTexCoord0 - gl_MultiTexCoord7 |
+| Ogre::VES_TANGENT | tangent | 14 | n/a |
+| Ogre::VES_BINORMAL | binormal | 15 | n/a |
+
+@note uv6 and uv7 share attributes with tangent and binormal respectively so cannot both be present.
+
+## Binding Texture Samplers {#GLSL-Texture-Samplers}
+
+To bind samplers to texture unit indices from the material scripts, you can either use the explicit binding with GL4.2+ or
+set the sampler via a `int` type named parameter.
+
+```cpp
+// modern (GL4.2+) syntax with explicit binding
+layout(binding = 0) uniform sampler2D diffuseMap;
+
+// legacy syntax
+uniform sampler2D diffuseMap;
+```
+
+Binding the sampler in material script:
+
+```cpp
+material exampleGLSLTexturing
+{
+  technique
+  {
+    pass
+    {
+      fragment_program_ref myFragmentShader
+      {
+        param_named diffuseMap int 0
+      }
+
+      texture_unit 
+      {
+        texture myTexture.jpg 2d
+      }
+    }
+  }
+}
+```
+
+An index value of 0 refers to the first texture unit in the pass, an index value of 1 refers to the second unit in the pass and so on.
+
+## Matrix parameters {#Matrix-parameters}
+
+Here are some examples of passing matrices to GLSL mat2, mat3, mat4 uniforms:
+
+```cpp
+// mat4 uniform
+param_named OcclusionMatrix matrix4x4 1 0 0 0  0 1 0 0  0 0 1 0  0 0 0 0
+// or
+param_named ViewMatrix float16 0 1 0 0  0 0 1 0  0 0 0 1  0 0 0 0
+
+// mat3
+param_named TextRotMatrix float9 1 0 0  0 1 0  0 0 1
+
+// mat2 uniform
+param_named skewMatrix float4 0.5 0 -0.5 1.0
+```
+
+@note GLSL uses column-major storage by default, while %Ogre is using row-major storage. Furthermore, GLSL is using column-major addressing, while %Ogre and HLSL use row-major addressing.
+This means that `mat[0]` is the first column in GLSL, but the first row in HLSL and %Ogre. %Ogre takes care of transposing square matrices before uploading them with GLSL, so matrix-vector multiplication `M*v` just works and `mat[0]` will return the same data.
+However, with non-square matrices transposing would change their GLSL type from e.g. `mat2x4` (two columns, four rows) to `mat4x2` (two rows, four columns) and consequently what `mat[0]` would return. Therefore %Ogre just passes such matrices unchanged and you have to handle this case (notably in skinning) yourself by either transposing the matrix in the shader or column-wise access.
+
+## Compatibility profile GLSL features {#Legacy-GLSL-features}
+
+The following features are only available when using the legacy OpenGL profile. Notably they are not available with GL3+ or GLES2.
+
+### Accessing OpenGL state
+GLSL can access most of the GL states directly so you do not need to pass these states through [param\_named\_auto](#param_005fnamed_005fauto) in the material script. This includes lights, material state, and all the matrices used in the openGL state i.e. model view matrix, worldview projection matrix etc.
+
+### Access to built-in attributes
+GLSL natively supports automatic binding of the most common incoming per-vertex attributes (e.g. `gl_Vertex`, `gl_Normal`, `gl_MultiTexCoord0` etc)
+as described in section 7.3 of the GLSL manual.
+There are some drivers that do not behave correctly when mixing built-in vertex attributes like `gl_Normal` and custom vertex attributes, so for maximum compatibility you should use all custom attributes
+
+### Geometry shader specification
+GLSL allows the same shader to run on different types of geometry primitives. In order to properly link the shaders together, you have to specify which primitives it will receive as input, which primitives it will emit and how many vertices a single run of the shader can generate. The GLSL geometry\_program definition requires three additional parameters
+
+@param input\_operation\_type
+The operation type of the geometry that the shader will receive. Can be ’point\_list’, ’line\_list’, ’line\_strip’, ’triangle\_list’, ’triangle\_strip’ or ’triangle\_fan’.
+
+@param output\_operation\_type
+The operation type of the geometry that the shader will emit. Can be ’point\_list’, ’line\_strip’ or ’triangle\_strip’.
+
+@param max\_output\_vertices
+The maximum number of vertices that the shader can emit. There is an upper limit for this value, it is exposed in the render system capabilities.
+
+@par Example
+```cpp
+geometry_program Ogre/GPTest/Swizzle_GP_GLSL glsl
+{
+    source SwizzleGP.glsl
+    input_operation_type triangle_list
+    output_operation_type line_strip
+    max_output_vertices 6
+}
+```
+
+With GL3+ these values are specified using the `layout` modifier.
+
 # Cg programs {#Cg}
 
-In order to define Cg programs, you have to have to load Plugin\_CgProgramManager.so/.dll at startup, either through plugins.cfg or through your own plugin loading code. They are very easy to define:
+In order to define Cg programs, you have to have to load @c Plugin_CgProgramManager at startup, either through plugins.cfg or through your own plugin loading code. They are very easy to define:
 
 ```cpp
 fragment_program myCgFragmentProgram cg
@@ -131,21 +275,9 @@ Set the optimisation level, which can be one of ’default’, ’none’, ’0�
 
 </dd> </dl>
 
+### Multi module shaders
 
-# OpenGL GLSL {#GLSL}
-
-OpenGL GLSL has a similar language syntax to HLSL but is tied to the OpenGL API. The are a few benefits over Cg in that it only requires the OpenGL render system plugin, not any additional plugins. Declaring a OpenGL GLSL program is similar to Cg but simpler. Here’s an example:
-
-```cpp
-vertex_program myGLSLVertexProgram glsl
-{
-    source myGLSLVertexProgram.vert
-}
-```
-
-In GLSL, no entry point needs to be defined since it is always `main()` and there is no target definition since GLSL source is compiled into native GPU code and not intermediate assembly. 
-
-For modularity %Ogre supports the non-standard <tt>\#include <something.glsl></tt> directive in GLSL. It also works with OpenGL ES and resembles what is available with HLSL and Cg.
+The `attach` keyword allows creating GLSL shaders from multiple shader modules of the same type. The referencing shader has to forward-declare the functions it intends to use
 
 @deprecated The @c attach keyword for multi-module shaders is not supported on OpenGL ES and therefore deprecated in favor of the @c \#include directive
 
@@ -162,160 +294,21 @@ vertex_program myGLSLVertexProgram glsl
 }
 ```
 
-The `attach` keyword allows creating GLSL shaders from multiple shader modules of the same type. The referencing shader has to forward-declare the functions it intends to use
-
-## GLSL Texture Samplers {#GLSL-Texture-Samplers}
-
-To pass texture unit index values from the material script to texture samplers in glsl use `int` type named parameters. See the example below:<br>
-
-excerpt from GLSL example.frag source:
-
-```cpp
-varying vec2 UV;
-uniform sampler2D diffuseMap;
-
-void main(void)
-{
-    gl_FragColor = texture2D(diffuseMap, UV);
-}
-```
-
-In material script:
-
-```cpp
-fragment_program myFragmentShader glsl
-{
-  source example.frag
-}
-
-material exampleGLSLTexturing
-{
-  technique
-  {
-    pass
-    {
-      fragment_program_ref myFragmentShader
-      {
-        param_named diffuseMap int 0
-      }
-
-      texture_unit 
-      {
-        texture myTexture.jpg 2d
-      }
-    }
-  }
-}
-```
-
-An index value of 0 refers to the first texture unit in the pass, an index value of 1 refers to the second unit in the pass and so on.
-
-## Matrix parameters {#Matrix-parameters}
-
-Here are some examples of passing matrices to GLSL mat2, mat3, mat4 uniforms:
-
-```cpp
-material exampleGLSLmatrixUniforms
-{
-  technique matrix_passing
-  {
-    pass examples
-    {
-      vertex_program_ref myVertexShader
-      {
-        // mat4 uniform
-        param_named OcclusionMatrix matrix4x4 1 0 0 0  0 1 0 0  0 0 1 0  0 0 0 0 
-        // or
-        param_named ViewMatrix float16 0 1 0 0  0 0 1 0  0 0 0 1  0 0 0 0 
-        
-        // mat3
-        param_named TextRotMatrix float9 1 0 0  0 1 0  0 0 1  
-      }
-      
-      fragment_program_ref myFragmentShader
-      { 
-        // mat2 uniform
-        param_named skewMatrix float4 0.5 0 -0.5 1.0
-      }
-    }
-  }
-}
-```
-
-@note GLSL uses column-major storage by default, while %Ogre is using row-major storage. Furthermore, GLSL is using column-major addressing, while %Ogre and HLSL use row-major addressing.
-This means that `mat[0]` is the first column in GLSL, but the first row in HLSL and %Ogre. %Ogre takes care of transposing square matrices before uploading them with GLSL, so matrix-vector multiplication `M*v` just works and `mat[0]` will return the same data.
-However, with non-square matrices transposing would change their GLSL type from e.g. `mat2x4` (two columns, four rows) to `mat4x2` (two rows, four columns) and consequently what `mat[0]` would return. Therefore %Ogre just passes such matrices unchanged and you have to handle this case (notably in skinning) yourself by either transposing the matrix in the shader or column-wise access.
-
-## Binding vertex attributes {#Binding-vertex-attributes}
-
-Vertex attributes must be declared in the shader, for the vertex data bound to it by Ogre.
-
-```cpp
-// legacy GLSL syntax
-attribute vec4 vertex;
-
-// modern GLSL syntax with explicit layout qualifier
-layout(location = 0) in vec4 vertex;
-```
-
-refer to the following table for the location indices and names to use:
-
-| Semantic | Custom name | Binding location | Legacy OpenGL built-in |
-|----------|------|------------------|-----------------------|
-| Ogre::VES_POSITION | vertex | 0 | gl_Vertex |
-| Ogre::VES_BLEND_WEIGHTS | blendWeights | 1 | n/a |
-| Ogre::VES_NORMAL | normal | 2 | gl_Normal |
-| Ogre::VES_COLOUR | colour | 3 | gl_Color |
-| Ogre::VES_COLOUR2 | secondary_colour | 4 | gl_SecondaryColor |
-| Ogre::VES_BLEND_INDICES | blendIndices | 7 | n/a |
-| Ogre::VES_TEXTURE_COORDINATES | uv0 - uv7 | 8-15 | gl_MultiTexCoord0 - gl_MultiTexCoord7 |
-| Ogre::VES_TANGENT | tangent | 14 | n/a |
-| Ogre::VES_BINORMAL | binormal | 15 | n/a |
-
-@note uv6 and uv7 share attributes with tangent and binormal respectively so cannot both be present.
-
-## Compatibility profile GLSL features {#Legacy-GLSL-features}
-
-The following features are only available when using the legacy OpenGL profile. Notably they are not available with GL3+ or GLES2.
-
-### Accessing OpenGL state
-GLSL can access most of the GL states directly so you do not need to pass these states through [param\_named\_auto](#param_005fnamed_005fauto) in the material script. This includes lights, material state, and all the matrices used in the openGL state i.e. model view matrix, worldview projection matrix etc.
-
-### Access to built-in attributes
-GLSL natively supports automatic binding of the most common incoming per-vertex attributes (e.g. `gl_Vertex`, `gl_Normal`, `gl_MultiTexCoord0` etc)
-as described in section 7.3 of the GLSL manual.
-There are some drivers that do not behave correctly when mixing built-in vertex attributes like `gl_Normal` and custom vertex attributes, so for maximum compatibility you should use all custom attributes
-
-### Geometry shader specification
-GLSL allows the same shader to run on different types of geometry primitives. In order to properly link the shaders together, you have to specify which primitives it will receive as input, which primitives it will emit and how many vertices a single run of the shader can generate. The GLSL geometry\_program definition requires three additional parameters
-
-@param input\_operation\_type
-The operation type of the geometry that the shader will receive. Can be ’point\_list’, ’line\_list’, ’line\_strip’, ’triangle\_list’, ’triangle\_strip’ or ’triangle\_fan’.
-
-@param output\_operation\_type
-The operation type of the geometry that the shader will emit. Can be ’point\_list’, ’line\_strip’ or ’triangle\_strip’.
-
-@param max\_output\_vertices
-The maximum number of vertices that the shader can emit. There is an upper limit for this value, it is exposed in the render system capabilities.
-
-@par Example
-```cpp
-geometry_program Ogre/GPTest/Swizzle_GP_GLSL glsl
-{
-    source SwizzleGP.glsl
-    input_operation_type triangle_list
-    output_operation_type line_strip
-    max_output_vertices 6
-}
-```
-
-With GL3+ these values are specified using the `layout` modifier.
-
 # Assembler Shaders
 
 The current supported syntaxes are:
 
 <dl compact="compact">
+<dt>spirv</dt> <dd>
+
+The assembly language used by Vulkan
+
+</dd>
+<dt>gl_spirv</dt> <dd>
+
+SPIRV variant exposed by ARB_gl_spirv
+
+</dd>
 <dt>vs_*</dt> <dd>
 
 These is are the DirectX vertex shader assembler syntaxes.
@@ -720,9 +713,32 @@ pass
 
 You should pass the projected shadow coordinates from the custom vertex program. As for textures, define a @c texture_unit with @c content_type @c shadow to pull the shadow texture. Your shadow receiver fragment program is likely to be the same as the bare lighting pass of your normal material, except that you insert an extra texture sampler for the shadow texture, which you will use to adjust the result by (modulating diffuse and specular components).
 
+# Instancing in Vertex Programs {#Instancing-in-Vertex-Programs}
+
+You can implement hardware instancing by writing a vertex program which reads the world matrix of each instance from a `float3x4` vertex attribute.
+However, you need to communicate this support to %Ogre so it batches the instances instead of rendering them individually.
+You do this by adding the following attribute to your `vertex_program` definition:
+
+```cpp
+   includes_instancing true
+```
+
+When you do this, all SubEntities with the same material will be batched together. %Ogre will create and populate an instance buffer with the world matrices of the instances. This buffer is provided in the `TEXCOORD1` attribute (also consuming `TEXCOORD2` and `TEXCOORD3`) to the vertex shader.
+
+When batching, all instances are rendered in a single draw-call. All per-renderable operations are only performed with the first SubMesh of the batch.
+
+Therefore the following features are not supported:
+- `start_light` and `iteration` (all instances share the same lights)
+- flip culling on negative scale (all instances use the same face order)
+- custom renderable parameters (not implemented)
+- light scissoring & clipping (not implemented)
+- manualLightList (not implemented)
+
+@note Instancing cannot be used together with skeletal animation (neither Hardware nor Software).
+
 # Skeletal Animation in Vertex Programs {#Skeletal-Animation-in-Vertex-Programs}
 
-You can implement skeletal animation in hardware by writing a vertex program which uses the per-vertex blending indices and blending weights, together with an array of world matrices (which will be provided for you by Ogre if you bind the automatic parameter ’world\_matrix\_array\_3x4’). However, you need to communicate this support to Ogre so it does not perform skeletal animation in software for you. You do this by adding the following attribute to your vertex\_program definition:
+You can implement skeletal animation in hardware by writing a vertex program which uses the per-vertex blending indices and blending weights, together with an array of world matrices (which will be provided for you by Ogre if you bind the automatic parameter ’world\_matrix\_array\_3x4’). However, you need to communicate this support to Ogre so it does not perform skeletal animation in software for you. You do this by adding the following attribute to your `vertex_program` definition:
 
 ```cpp
    includes_skeletal_animation true
@@ -733,7 +749,7 @@ When you do this, any skeletally animated entity which uses this material will f
 
 # Morph Animation in Vertex Programs {#Morph-Animation-in-Vertex-Programs}
 
-You can implement morph animation in hardware by writing a vertex program which linearly blends between the first and second position keyframes passed as positions and the first free texture coordinate set, and by binding the animation\_parametric value to a parameter (which tells you how far to interpolate between the two). However, you need to communicate this support to Ogre so it does not perform morph animation in software for you. You do this by adding the following attribute to your vertex\_program definition:
+You can implement morph animation in hardware by writing a vertex program which linearly blends between the first and second position keyframes passed as positions and the first free texture coordinate set, and by binding the animation\_parametric value to a parameter (which tells you how far to interpolate between the two). However, you need to communicate this support to Ogre so it does not perform morph animation in software for you. You do this by adding the following attribute to your `vertex_program` definition:
 
 ```cpp
    includes_morph_animation true

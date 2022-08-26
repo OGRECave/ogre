@@ -659,10 +659,10 @@ namespace Ogre {
         mFrustumPlanes[FRUSTUM_PLANE_FAR].d = combo[3][3] - combo[2][3];
 
         // Renormalise any normals which were not unit length
-        for(int i=0; i<6; i++ ) 
+        for(auto & p : mFrustumPlanes)
         {
-            Real length = mFrustumPlanes[i].normal.normalise();
-            mFrustumPlanes[i].d /= length;
+            Real length = p.normal.normalise();
+            p.d /= length;
         }
 
         mRecalcFrustumPlanes = false;

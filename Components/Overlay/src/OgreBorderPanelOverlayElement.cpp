@@ -609,7 +609,7 @@ namespace Ogre {
         */
         // Convert positions into -1, 1 coordinate space (homogenous clip space)
         // Top / bottom also need inverting since y is upside down
-        Real left[8], right[8], top[8], bottom[8];
+        float left[8], right[8], top[8], bottom[8];
         // Horizontal
         left[0] = left[3] = left[5] = _getDerivedLeft() * 2 - 1;
         left[1] = left[6] = right[0] = right[3] = right[5] = left[0] + (mLeftBorderSize * 2);
@@ -628,7 +628,7 @@ namespace Ogre {
         float* pPos = static_cast<float*>(vbufLock.pData);
         // Use the furthest away depth value, since materials should have depth-check off
         // This initialised the depth buffer for any 3D objects in front
-        Real zValue = Root::getSingleton().getRenderSystem()->getMaximumDepthInputValue();
+        float zValue = Root::getSingleton().getRenderSystem()->getMaximumDepthInputValue();
         for (ushort cell = 0; cell < 8; ++cell)
         {
             /*

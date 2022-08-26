@@ -39,6 +39,7 @@ public:
         mSceneMgr->setAmbientLight(ColourValue(0.7, 0.7, 0.7));
 
         mCamera->setNearClipDistance(0.05);
+        mTrayMgr->showCursor();
 
         // Player object
         auto player = mSceneMgr->createEntity("ogrehead.mesh");

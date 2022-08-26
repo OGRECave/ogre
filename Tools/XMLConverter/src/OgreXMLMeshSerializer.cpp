@@ -1495,13 +1495,12 @@ namespace Ogre {
 
             submeshNode.append_attribute("index") =   StringConverter::toString(idx).c_str();
 
-            for (std::vector<Vector3>::const_iterator v = sm->extremityPoints.begin ();
-                 v != sm->extremityPoints.end (); ++v)
+            for (auto extremityPoint : sm->extremityPoints)
             {
                 pugi::xml_node vert = submeshNode.append_child("position");
-                vert.append_attribute("x") = StringConverter::toString(v->x).c_str();
-                vert.append_attribute("y") = StringConverter::toString(v->y).c_str();
-                vert.append_attribute("z") = StringConverter::toString(v->z).c_str();
+                vert.append_attribute("x") = StringConverter::toString(extremityPoint.x).c_str();
+                vert.append_attribute("y") = StringConverter::toString(extremityPoint.y).c_str();
+                vert.append_attribute("z") = StringConverter::toString(extremityPoint.z).c_str();
             }
         }
     }

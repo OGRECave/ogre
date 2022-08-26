@@ -1192,22 +1192,6 @@ namespace Ogre {
         // Call super class
         RenderSystem::_render(op);
 
-        HardwareVertexBufferSharedPtr globalInstanceVertexBuffer;
-        VertexDeclaration* globalVertexDeclaration = 0;
-
-        size_t numberOfInstances = 0;
-        if(getCapabilities()->hasCapability(RSC_VERTEX_BUFFER_INSTANCE_DATA))
-        {
-            globalInstanceVertexBuffer = getGlobalInstanceVertexBuffer();
-            globalVertexDeclaration = getGlobalInstanceVertexBufferVertexDeclaration();
-            numberOfInstances = op.numberOfInstances;
-
-            if (op.useGlobalInstancingVertexBufferIsAvailable)
-            {
-                numberOfInstances *= getGlobalNumberOfInstances();
-            }
-        }
-
         void* pBufferData = 0;
 
         GLVertexArrayObject* vao = static_cast<GLVertexArrayObject*>(op.vertexData->vertexDeclaration);
@@ -1230,17 +1214,10 @@ namespace Ogre {
                 op.indexData->indexBuffer->_getImpl<GLES2HardwareBuffer>()->getGLBufferId());
 
 
-        if (getCapabilities()->hasCapability(RSC_VERTEX_BUFFER_INSTANCE_DATA)
-            && globalInstanceVertexBuffer && globalVertexDeclaration)
+        size_t numberOfInstances = 0;
+        if (getCapabilities()->hasCapability(RSC_VERTEX_BUFFER_INSTANCE_DATA))
         {
-            VertexDeclaration::VertexElementList::const_iterator elemIter, elemEnd;
-            elemEnd = globalVertexDeclaration->getElements().end();
-            for (elemIter = globalVertexDeclaration->getElements().begin(); elemIter != elemEnd;
-                 ++elemIter)
-            {
-                const VertexElement& elem = *elemIter;
-                bindVertexElementToGpu(elem, globalInstanceVertexBuffer, 0);
-            }
+            numberOfInstances = op.numberOfInstances;
         }
 
         // Find the correct type to render

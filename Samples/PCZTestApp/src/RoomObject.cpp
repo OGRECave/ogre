@@ -243,9 +243,9 @@ Ogre::ManualObject* RoomObject::createRoom(Ogre::SceneManager *scene,
     Ogre::ColourValue color = ColourValue(0, 0, solid, solid);
 
     // copy to room
-    for (int i=0;i<32;i++)
+    for (auto & point : points)
     {
-        room->position(points[i]);
+        room->position(point);
         room->colour(color);
     }
 

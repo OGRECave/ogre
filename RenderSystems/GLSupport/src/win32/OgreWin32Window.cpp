@@ -401,14 +401,14 @@ namespace Ogre {
         {
             int testFsaa = mFSAA;
             bool testHwGamma = hwGamma;
-            bool formatOk = mGLSupport.selectPixelFormat(mHDC, mColourDepth, testFsaa, testHwGamma);
+            bool formatOk = mGLSupport.selectPixelFormat(mHDC, mColourDepth, testFsaa, testHwGamma, mStereoEnabled);
             if (!formatOk)
             {
                 if (mFSAA > 0)
                 {
                     // try without FSAA
                     testFsaa = 0;
-                    formatOk = mGLSupport.selectPixelFormat(mHDC, mColourDepth, testFsaa, testHwGamma);
+                    formatOk = mGLSupport.selectPixelFormat(mHDC, mColourDepth, testFsaa, testHwGamma, mStereoEnabled);
                 }
 
                 if (!formatOk && hwGamma)
@@ -416,7 +416,7 @@ namespace Ogre {
                     // try without sRGB
                     testHwGamma = false;
                     testFsaa = mFSAA;
-                    formatOk = mGLSupport.selectPixelFormat(mHDC, mColourDepth, testFsaa, testHwGamma);
+                    formatOk = mGLSupport.selectPixelFormat(mHDC, mColourDepth, testFsaa, testHwGamma, mStereoEnabled);
                 }
 
                 if (!formatOk && hwGamma && (mFSAA > 0))
@@ -424,7 +424,7 @@ namespace Ogre {
                     // try without both
                     testHwGamma = false;
                     testFsaa = 0;
-                    formatOk = mGLSupport.selectPixelFormat(mHDC, mColourDepth, testFsaa, testHwGamma);
+                    formatOk = mGLSupport.selectPixelFormat(mHDC, mColourDepth, testFsaa, testHwGamma, mStereoEnabled);
                 }
 
                 if (!formatOk)

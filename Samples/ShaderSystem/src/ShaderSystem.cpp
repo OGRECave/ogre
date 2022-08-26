@@ -74,6 +74,7 @@ Sample_ShaderSystem::~Sample_ShaderSystem()
 
 void Sample_ShaderSystem::_shutdown()
 {
+    mShaderGenerator->getRenderState(MSN_SHADERGEN)->reset();
     destroyInstancedViewports();
     SdkSample::_shutdown();
 }
@@ -212,7 +213,7 @@ void Sample_ShaderSystem::sliderMoved(Slider* slider)
         if (mLayeredBlendingEntity != NULL)
         {
             Ogre::Real val = mModifierValueSlider->getValue();
-            mLayeredBlendingEntity->getSubEntity(0)->setCustomParameter(2, Vector4(val,val,val,0));
+            mLayeredBlendingEntity->getSubEntity(0)->setCustomParameter(2, Vector4f(val,val,val,0));
         }
     }
 }
@@ -268,10 +269,8 @@ void Sample_ShaderSystem::setupContent()
     mCamera->setNearClipDistance(30);
 
     // Load sample meshes and generate tangent vectors.
-    for (int i=0; i < MESH_ARRAY_SIZE; ++i)
+    for (const auto & curMeshName : MESH_ARRAY)
     {
-        const String& curMeshName = MESH_ARRAY[i];
-
         MeshPtr pMesh = MeshManager::getSingleton().load(curMeshName,
             ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,    
             HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY, 
@@ -313,7 +312,7 @@ void Sample_ShaderSystem::setupContent()
     // Create texture layer blending demonstration entity.
     mLayeredBlendingEntity = mSceneMgr->createEntity("LayeredBlendingMaterialEntity", MAIN_ENTITY_MESH);
     mLayeredBlendingEntity->setMaterialName("RTSS/LayeredBlending");
-    mLayeredBlendingEntity->getSubEntity(0)->setCustomParameter(2, Vector4::ZERO);
+    mLayeredBlendingEntity->getSubEntity(0)->setCustomParameter(2, Vector4f(0));
     childNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
     childNode->setPosition(300.0, 200.0, -200.0);
     childNode->attachObject(mLayeredBlendingEntity);
@@ -490,9 +489,8 @@ void Sample_ShaderSystem::setupUI()
 void Sample_ShaderSystem::cleanupContent()
 {   
     // UnLoad sample meshes and generate tangent vectors.
-    for (int i=0; i < MESH_ARRAY_SIZE; ++i)
+    for (const auto & curMeshName : MESH_ARRAY)
     {
-        const String& curMeshName = MESH_ARRAY[i];
         MeshManager::getSingleton().unload(curMeshName, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
     }
     
@@ -847,9 +845,9 @@ void Sample_ShaderSystem::updateAddLotsOfModels(bool addThem)
             addModelToScene("tudorhouse.mesh");
             addModelToScene("WoodPallet.mesh");
         }
-        for (size_t i = 0 ; i < mLotsOfModelsNodes.size() ; i++)
+        for (auto & n : mLotsOfModelsNodes)
         {
-            mLotsOfModelsNodes[i]->setVisible(mAddedLotsOfModels);
+            n->setVisible(mAddedLotsOfModels);
         }
         
     }

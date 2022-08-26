@@ -42,7 +42,7 @@ namespace Ogre {
     */
     /** This emitter emits particles in a random direction from within a cylinder area, where the cylinder is oriented along the Z-axis.
     */
-    class _OgreParticleFXExport CylinderEmitter : public AreaEmitter
+    class CylinderEmitter : public AreaEmitter
     {
     public:
         /** See AreaEmitter. */

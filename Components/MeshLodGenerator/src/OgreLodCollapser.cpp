@@ -102,8 +102,8 @@ namespace Ogre
     bool LodCollapser::hasSrcID(unsigned int srcID, size_t submeshID)
     {
         // This will only return exact matches.
-        for (size_t i = 0; i < tmpCollapsedEdges.size(); i++) {
-            if (tmpCollapsedEdges[i].srcID == srcID && tmpCollapsedEdges[i].submeshID == submeshID) {
+        for (auto & tmpCollapsedEdge : tmpCollapsedEdges) {
+            if (tmpCollapsedEdge.srcID == srcID && tmpCollapsedEdge.submeshID == submeshID) {
                 return true;
             }
         }
@@ -113,9 +113,9 @@ namespace Ogre
     {
         triangle->isRemoved = true;
         // skip is needed if we are iterating on the vertex's edges or triangles.
-        for (int i = 0; i < 3; i++) {
-            if (triangle->vertex[i] != skip) {
-                triangle->vertex[i]->triangles.removeExists(triangle);
+        for (auto & i : triangle->vertex) {
+            if (i != skip) {
+                i->triangles.removeExists(triangle);
             }
         }
         for (int i = 0; i < 3; i++) {

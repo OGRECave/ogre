@@ -639,9 +639,8 @@ namespace Ogre
         Font* f = static_cast<Font*>(target);
 
         StringVector vec = StringUtil::split(val, " \t");
-        for (StringVector::iterator i = vec.begin(); i != vec.end(); ++i)
+        for (auto & item : vec)
         {
-            String& item = *i;
             StringVector itemVec = StringUtil::split(item, "-");
             if (itemVec.size() == 2)
             {

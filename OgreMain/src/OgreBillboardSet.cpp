@@ -96,10 +96,9 @@ namespace Ogre {
     BillboardSet::~BillboardSet()
     {
         // Free pool items
-        BillboardPool::iterator i;
-        for (i = mBillboardPool.begin(); i != mBillboardPool.end(); ++i)
+        for (auto *b : mBillboardPool)
         {
-            OGRE_DELETE *i;
+            OGRE_DELETE b;
         }
 
         // Delete shared buffers

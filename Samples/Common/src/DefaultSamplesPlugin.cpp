@@ -170,9 +170,9 @@ DefaultSamplesPlugin::DefaultSamplesPlugin() : SamplePlugin("DefaultSamplesPlugi
 
 DefaultSamplesPlugin::~DefaultSamplesPlugin()
 {
-    for (SampleSet::iterator i = mSamples.begin(); i != mSamples.end(); ++i)
+    for (auto s : mSamples)
     {
-        delete *i;
+        delete s;
     }
 }
 

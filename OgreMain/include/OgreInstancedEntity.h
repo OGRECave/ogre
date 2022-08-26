@@ -288,8 +288,8 @@ namespace Ogre
         @param idx of the param. In the range [0; InstanceManager::getNumCustomParams())
         @param newParam New parameter
         */
-        void setCustomParam( unsigned char idx, const Vector4 &newParam );
-        const Vector4& getCustomParam( unsigned char idx );
+        void setCustomParam( unsigned char idx, const Vector4f &newParam );
+        const Vector4f& getCustomParam( unsigned char idx );
     };
 }
 

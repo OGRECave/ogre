@@ -187,19 +187,19 @@ OgreBites::Sample* TestContext::loadTests()
     for(auto it : mPluginNameMap)
     {
         OgreBites::SampleSet newSamples = it.second->getSamples();
-        for (OgreBites::SampleSet::iterator j = newSamples.begin(); j != newSamples.end(); j++)
+        for (auto newSample : newSamples)
         {
             // capability check
             try
             {
-                (*j)->testCapabilities(mRoot->getRenderSystem()->getCapabilities());
+                newSample->testCapabilities(mRoot->getRenderSystem()->getCapabilities());
             }
             catch(Ogre::Exception&)
             {
                 continue;
             }
 
-            mTests.push_back(*j);
+            mTests.push_back(newSample);
         }
     }
 
@@ -432,9 +432,9 @@ void TestContext::setupDirectories(Ogre::String batchName)
         // add a directory for the render system
         Ogre::String rsysName = Ogre::Root::getSingleton().getRenderSystem()->getName();
         // strip spaces from render system name
-        for (unsigned int i = 0;i < rsysName.size(); ++i)
-            if (rsysName[i] != ' ')
-                mOutputDir += rsysName[i];
+        for (char i : rsysName)
+            if (i != ' ')
+                mOutputDir += i;
         mOutputDir += "/";
         static_cast<Ogre::FileSystemLayer*>(mFSLayer)->createDirectory(mOutputDir);
     }
@@ -508,16 +508,16 @@ void TestContext::finishedTests()
             if(mSummaryOutputDir != "NONE")
             {
                 Ogre::String rs;
-                for(size_t j = 0; j < mRenderSystemName.size(); ++j)
-                    if(mRenderSystemName[j]!=' ')
-                        rs += mRenderSystemName[j];
+                for(char j : mRenderSystemName)
+                    if(j!=' ')
+                        rs += j;
 
                 CppUnitResultWriter cppunitWriter(*compareTo, *mBatch, results);
                 cppunitWriter.writeToFile(mSummaryOutputDir + "/TestResults_" + rs + ".xml");
             }
 
-            for(size_t i = 0; i < results.size(); i++) {
-                mSuccess = mSuccess && results[i].passed;
+            for(auto & result : results) {
+                mSuccess = mSuccess && result.passed;
             }
         }
 
