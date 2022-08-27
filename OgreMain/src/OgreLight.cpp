@@ -592,11 +592,11 @@ namespace Ogre {
         }
         void applyDeltaValue(const Vector4& val)
         {
-            setValue(mLight->getAs4DVector() + val);
+            setValue(mLight->getAttenuation() + val);
         }
         void setCurrentStateAsBaseValue(void)
         {
-            setAsBaseValue(mLight->getAs4DVector());
+            setAsBaseValue(mLight->getAttenuation());
         }
 
     };
