@@ -449,3 +449,38 @@ TEST(MaterialLoading, LateShadowCaster)
 
     EXPECT_TRUE(tech->getShadowCasterMaterial());
 }
+
+TEST(Light, AnimableValue)
+{
+    Light l;
+
+    l.setDiffuseColour(0, 0, 0);
+    auto diffuseColour = l.createAnimableValue("diffuseColour");
+    diffuseColour->applyDeltaValue(ColourValue(1, 2, 3, 0));
+    EXPECT_EQ(l.getDiffuseColour(), ColourValue(1, 2, 3));
+
+    l.setSpecularColour(0, 0, 0);
+    auto specularColour = l.createAnimableValue("specularColour");
+    specularColour->applyDeltaValue(ColourValue(1, 2, 3, 0));
+    EXPECT_EQ(l.getSpecularColour(), ColourValue(1, 2, 3));
+
+    l.setAttenuation(0, 0, 0, 0);
+    auto attenuation = l.createAnimableValue("attenuation");
+    attenuation->applyDeltaValue(Vector4(1, 2, 3, 4));
+    EXPECT_EQ(l.getAttenuation(), Vector4f(1, 2, 3, 4));
+
+    l.setSpotlightInnerAngle(Radian(0));
+    auto spotlightInner = l.createAnimableValue("spotlightInner");
+    spotlightInner->applyDeltaValue(Real(1));
+    EXPECT_EQ(l.getSpotlightInnerAngle(), Radian(1));
+
+    l.setSpotlightOuterAngle(Radian(0));
+    auto spotlightOuter = l.createAnimableValue("spotlightOuter");
+    spotlightOuter->applyDeltaValue(Real(1));
+    EXPECT_EQ(l.getSpotlightOuterAngle(), Radian(1));
+
+    l.setSpotlightFalloff(0);
+    auto spotlightFalloff = l.createAnimableValue("spotlightFalloff");
+    spotlightFalloff->applyDeltaValue(Real(1));
+    EXPECT_EQ(l.getSpotlightFalloff(), 1);
+}
