@@ -96,11 +96,11 @@ TestContext::~TestContext()
 
 void TestContext::setup()
 {
-    NameValuePairList miscParams;
-    mRoot->initialise(false, "OGRE Sample Browser");
+    mRoot->initialise(false);
 
     // Standard setup.
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
+    NameValuePairList miscParams;
     CGSize modeSize = [[UIScreen mainScreen] currentMode].size;
     uint w = modeSize.width / [UIScreen mainScreen].scale;
     uint h = modeSize.height / [UIScreen mainScreen].scale;
@@ -114,20 +114,9 @@ void TestContext::setup()
     miscParams["retainedBacking"] = StringConverter::toString(true);
     mWindow = mRoot->createRenderWindow("OGRE Sample Browser", w, h, true, &miscParams);
 #else
-    Ogre::ConfigOptionMap ropts = mRoot->getRenderSystem()->getConfigOptions();
-
-    size_t w, h;
-
-    std::istringstream mode(ropts["Video Mode"].currentValue);
-    Ogre::String token;
-    mode >> w; // width
-    mode >> token; // 'x' as seperator between width and height
-    mode >> h; // height
-
-    miscParams["FSAA"] = ropts["FSAA"].currentValue;
-    miscParams["vsync"] = ropts["VSync"].currentValue;
-
-    mWindow = mRoot->createRenderWindow("OGRE Sample Browser", w, h, false, &miscParams);
+    auto desc = mRoot->getRenderSystem()->getRenderWindowDescription();
+    desc.name = "OGRE VTest Context";
+    mWindow = mRoot->createRenderWindow(desc);
 #endif
 
     mWindow->setDeactivateOnFocusChange(false);
