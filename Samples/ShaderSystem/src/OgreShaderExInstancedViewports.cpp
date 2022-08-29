@@ -270,8 +270,8 @@ void ShaderExInstancedViewports::setMonitorsCount( const Vector2 monitorCount )
     vbuf->setIsInstanceData(true);
 
     float * buf = (float *)vbuf->lock(Ogre::HardwareBuffer::HBL_DISCARD);
-    for (float x = 0 ; x < monitorCount.x ; x++)
-        for (float y = 0 ; y < monitorCount.y ; y++)
+    for (int x = 0 ; x < monitorCount.x ; x++)
+        for (int y = 0 ; y < monitorCount.y ; y++)
         {
             *buf = x; buf++;
             *buf = y; buf++;
