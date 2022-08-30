@@ -87,7 +87,6 @@ namespace Ogre
     void ExternalTextureSourceManager::destroyAdvancedTexture( const String& sTextureName,
         const String& groupName )
     {
-        // TextureSystemList::iterator i;
         for(auto& t : mTextureSystems)
         {
             //Broadcast to every registered System... Only the true one will destroy texture
