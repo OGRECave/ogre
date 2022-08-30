@@ -304,11 +304,10 @@ namespace Ogre {
         if (mInitialised)
         {
             // Copy material settings
-            SubEntityList::const_iterator i;
             unsigned int n = 0;
-            for (i = mSubEntityList.begin(); i != mSubEntityList.end(); ++i, ++n)
+            for (const auto *e : mSubEntityList)
             {
-                newEnt->getSubEntity(n)->setMaterialName((*i)->getMaterialName());
+                newEnt->getSubEntity(n)->setMaterialName(e->getMaterialName());
             }
             if (mAnimationState)
             {
@@ -2225,7 +2224,7 @@ namespace Ogre {
         bool debugRenderables)
     {
         // Visit each SubEntity
-        for (auto & i : mSubEntityList)
+        for (auto& i : mSubEntityList)
         {
             visitor->visit(i, 0, false);
         }
