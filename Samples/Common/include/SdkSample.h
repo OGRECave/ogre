@@ -50,7 +50,7 @@ namespace OgreBites
         /*-----------------------------------------------------------------------------
         | Manually update the cursor position after being unpaused.
         -----------------------------------------------------------------------------*/
-        virtual void unpaused()
+        void unpaused() override
         {
             mTrayMgr->refreshCursor();
         }
@@ -58,7 +58,7 @@ namespace OgreBites
         /*-----------------------------------------------------------------------------
         | Automatically saves position and orientation for free-look cameras.
         -----------------------------------------------------------------------------*/
-        virtual void saveState(Ogre::NameValuePairList& state)
+        void saveState(Ogre::NameValuePairList& state) override
         {
             if (mCameraMan->getStyle() == CS_FREELOOK)
             {
@@ -70,7 +70,7 @@ namespace OgreBites
         /*-----------------------------------------------------------------------------
         | Automatically restores position and orientation for free-look cameras.
         -----------------------------------------------------------------------------*/
-        virtual void restoreState(Ogre::NameValuePairList& state)
+        void restoreState(Ogre::NameValuePairList& state) override
         {
             if (state.find("CameraPosition") != state.end() && state.find("CameraOrientation") != state.end())
             {
@@ -80,7 +80,7 @@ namespace OgreBites
             }
         }
 
-        virtual bool frameRenderingQueued(const Ogre::FrameEvent& evt)
+        bool frameRenderingQueued(const Ogre::FrameEvent& evt) override
         {
             if(!mTrayMgr) return true;
 
@@ -95,7 +95,7 @@ namespace OgreBites
             return true;
         }
 
-        virtual bool keyPressed(const KeyboardEvent& evt)
+        bool keyPressed(const KeyboardEvent& evt) override
         {
         	int key = evt.keysym.sym;
         	
@@ -112,7 +112,7 @@ namespace OgreBites
             return true;
         }
 
-        virtual bool keyReleased(const KeyboardEvent& evt)
+        bool keyReleased(const KeyboardEvent& evt) override
         {
             mCameraMan->keyReleased(evt);
 
@@ -122,7 +122,7 @@ namespace OgreBites
         /* IMPORTANT: When overriding these following handlers, remember to allow the tray manager
         to filter out any interface-related mouse events before processing them in your scene.
         If the tray manager handler returns true, the event was meant for the trays, not you. */
-        virtual bool mouseMoved(const MouseMotionEvent& evt)
+        bool mouseMoved(const MouseMotionEvent& evt) override
         {
             if (mTrayMgr->mouseMoved(evt)) return true;
 
@@ -131,14 +131,14 @@ namespace OgreBites
         }
 
         // convert and redirect
-        virtual bool touchMoved(const TouchFingerEvent& evt) {
+        bool touchMoved(const TouchFingerEvent& evt) override {
             MouseMotionEvent e;
             e.xrel = evt.dx * mWindow->getWidth();
             e.yrel = evt.dy * mWindow->getHeight();
             return mouseMoved(e);
         }
 
-        virtual bool mousePressed(const MouseButtonEvent& evt)
+        bool mousePressed(const MouseButtonEvent& evt) override
         {
             if (mTrayMgr->mousePressed(evt)) return true;
 
@@ -153,13 +153,13 @@ namespace OgreBites
         }
 
         // convert and redirect
-        virtual bool touchPressed(const TouchFingerEvent& evt) {
+        bool touchPressed(const TouchFingerEvent& evt) override {
             MouseButtonEvent e;
             e.button = BUTTON_LEFT;
             return mousePressed(e);
         }
 
-        virtual bool mouseReleased(const MouseButtonEvent& evt)
+        bool mouseReleased(const MouseButtonEvent& evt) override
         {
             if (mTrayMgr->mouseReleased(evt)) return true;
 
@@ -174,13 +174,13 @@ namespace OgreBites
         }
 
         // convert and redirect
-        virtual bool touchReleased(const TouchFingerEvent& evt) {
+        bool touchReleased(const TouchFingerEvent& evt) override {
             MouseButtonEvent e;
             e.button = BUTTON_LEFT;
             return mouseReleased(e);
         }
 
-        virtual bool mouseWheelRolled(const MouseWheelEvent& evt) {
+        bool mouseWheelRolled(const MouseWheelEvent& evt) override {
             if(mTrayMgr->mouseWheelRolled(evt))
                 return true;
             mCameraMan->mouseWheelRolled(evt);
@@ -190,7 +190,7 @@ namespace OgreBites
         /*-----------------------------------------------------------------------------
         | Extended to setup a default tray interface and camera controller.
         -----------------------------------------------------------------------------*/
-        virtual void _setup(Ogre::RenderWindow* window, Ogre::FileSystemLayer* fsLayer, Ogre::OverlaySystem* overlaySys)
+        void _setup(Ogre::RenderWindow* window, Ogre::FileSystemLayer* fsLayer, Ogre::OverlaySystem* overlaySys) override
         {
             Sample::_setup(window, fsLayer, overlaySys);
 
@@ -198,7 +198,7 @@ namespace OgreBites
                 mControls.reset(new AdvancedRenderControls(mTrayMgr.get(), mCamera));
         }
 
-        virtual void _shutdown()
+        void _shutdown() override
         {
             Sample::_shutdown();
 
@@ -213,7 +213,7 @@ namespace OgreBites
 
     protected:
 
-        virtual void setupView()
+        void setupView() override
         {
             // setup default viewport layout and camera
             mCamera = mSceneMgr->createCamera("MainCamera");

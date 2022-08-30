@@ -21,12 +21,12 @@ public:
         mInfo["Category"] = "Unsorted";
     }
 
-    void testCapabilities(const RenderSystemCapabilities* caps)
+    void testCapabilities(const RenderSystemCapabilities* caps) override
     {
         requireMaterial("Examples/FresnelReflectionRefraction");
     }
 
-    bool frameRenderingQueued(const FrameEvent &evt)
+    bool frameRenderingQueued(const FrameEvent &evt) override
     {
         // update the fish spline path animations and loop as needed
         mFishAnimTime += evt.timeSinceLastFrame;
@@ -46,19 +46,19 @@ public:
         return SdkSample::frameRenderingQueued(evt);
     }
 
-    void preRenderTargetUpdate(const RenderTargetEvent& evt)
+    void preRenderTargetUpdate(const RenderTargetEvent& evt) override
     {
         mCamera->enableReflection(mWaterPlane);
     }
 
-    void postRenderTargetUpdate(const RenderTargetEvent& evt)
+    void postRenderTargetUpdate(const RenderTargetEvent& evt) override
     {
         mCamera->disableReflection();
     }
 
 protected:
 
-    void setupContent()
+    void setupContent() override
     {
         mCameraNode->setPosition(-50, 125, 760);
         mCameraMan->setTopSpeed(280);
@@ -204,7 +204,7 @@ protected:
         mFishAnimTime = 0;
     }
 
-    void cleanupContent()
+    void cleanupContent() override
     {
         mSurfaceEnts.clear();
         mSubmergedEnts.clear();

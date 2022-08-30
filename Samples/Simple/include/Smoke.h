@@ -19,7 +19,7 @@ public:
         mInfo["Category"] = "Effects";
     }
 
-    bool frameRenderingQueued(const FrameEvent& evt)
+    bool frameRenderingQueued(const FrameEvent& evt) override
     {
         // spin the head around and make it float up and down
         mPivot->setPosition(0, Math::Sin(mRoot->getTimer()->getMilliseconds() / 150.0) * 10, 0);
@@ -29,7 +29,7 @@ public:
 
 protected:
 
-    void setupContent()
+    void setupContent() override
     {     
 
         mSceneMgr->setSkyBox(true, "Examples/EveningSkyBox");

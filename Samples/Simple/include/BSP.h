@@ -20,7 +20,7 @@ class _OgreSampleClassExport Sample_BSP : public SdkSample
         mInfo["Category"] = "Geometry";
     }
 
-    StringVector getRequiredPlugins()
+    StringVector getRequiredPlugins() override
     {
         StringVector names;
         names.push_back("BSP Scene Manager");
@@ -29,13 +29,13 @@ class _OgreSampleClassExport Sample_BSP : public SdkSample
 
  protected:
 
-    void locateResources()
+    void locateResources() override
     {
     	// Pick a new resource group so Q3Shader parser is correctly registered
     	ResourceGroupManager::getSingleton().setWorldResourceGroupName("BSPWorld");
     }
 
-    void createSceneManager()
+    void createSceneManager() override
     {
         mSceneMgr = mRoot->createSceneManager("BspSceneManager");   // the BSP scene manager is required for this sample
 #ifdef INCLUDE_RTSHADER_SYSTEM
@@ -45,7 +45,7 @@ class _OgreSampleClassExport Sample_BSP : public SdkSample
             mSceneMgr->addRenderQueueListener(mOverlaySystem);
     }
 
-    void loadResources()
+    void loadResources() override
     {
         /* NOTE: The browser initialises everything at the beginning already, so we use a 0 init proportion.
            If you're not compiling this sample for use with the browser, then leave the init proportion at 0.7. */
@@ -62,7 +62,7 @@ class _OgreSampleClassExport Sample_BSP : public SdkSample
         mTrayMgr->hideLoadingBar();
     }
 
-    void unloadResources()
+    void unloadResources() override
     {
         // unload the map so we don't interfere with subsequent samples
         ResourceGroupManager& rgm = ResourceGroupManager::getSingleton();
@@ -70,7 +70,7 @@ class _OgreSampleClassExport Sample_BSP : public SdkSample
         rgm.setWorldResourceGroupName(ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
     }
 
-    void setupContent()
+    void setupContent() override
     {
         // modify camera for close work
         mCamera->setNearClipDistance(4);

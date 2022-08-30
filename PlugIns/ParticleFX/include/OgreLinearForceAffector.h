@@ -59,16 +59,16 @@ namespace Ogre {
         class CmdForceVector : public ParamCommand
         {
         public:
-            String doGet(const void* target) const;
-            void doSet(void* target, const String& val);
+            String doGet(const void* target) const override;
+            void doSet(void* target, const String& val) override;
         };
 
         /** Command object for force application (see ParamCommand).*/
         class CmdForceApp : public ParamCommand
         {
         public:
-            String doGet(const void* target) const;
-            void doSet(void* target, const String& val);
+            String doGet(const void* target) const override;
+            void doSet(void* target, const String& val) override;
         };
         /// Choice of how to apply the force vector to particles
         enum ForceApplication

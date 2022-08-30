@@ -62,12 +62,12 @@ public:
         
     }
 
-    virtual Real  getValue (void) const
+    Real  getValue (void) const override
     {
         return intensity;
     }
 
-    virtual void  setValue (Real value)
+    void  setValue (Real value) override
     {
         intensity = value;
 
@@ -144,7 +144,7 @@ public:
 protected:
     
     // Just override the mandatory create scene method
-    void setupContent(void)
+    void setupContent(void) override
     {
         mCameraMan->setStyle(CS_ORBIT);
         mCameraMan->setYawPitchDist(Degree(0), Degree(45), 400);
@@ -299,7 +299,7 @@ protected:
         setupGUI();
     }
 
-    virtual void setupView()
+    void setupView() override
     {
         SdkSample::setupView();
 
@@ -307,7 +307,7 @@ protected:
         mCamera->setFarClipDistance(100000);
     }
     
-    virtual void cleanupContent()
+    void cleanupContent() override
     {
         ControllerManager::getSingleton().destroyController(mController);
 
@@ -434,7 +434,7 @@ protected:
         }
     }
 
-    void itemSelected(SelectMenu* menu)
+    void itemSelected(SelectMenu* menu) override
     {
         if (menu == mTechniqueMenu) handleShadowTypeChanged();
         else if (menu == mLightingMenu) handleShadowTypeChanged();
@@ -512,7 +512,7 @@ protected:
         pass->setDepthBias(-mFixedBiasSlider->getValue(), -mSlopedBiasSlider->getValue());
     }
 
-    void sliderMoved(Slider* slider)
+    void sliderMoved(Slider* slider) override
     {
         updateDepthShadowParams();
     }

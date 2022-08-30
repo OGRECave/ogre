@@ -182,7 +182,7 @@ namespace Ogre
 
         /** Overridden from RenderTarget, flags invisible windows as inactive
         */
-        virtual bool isActive(void) const { return mActive && isVisible(); }
+        bool isActive(void) const override { return mActive && isVisible(); }
 
         /** Indicates whether the window has been closed by the user.
         */
@@ -194,7 +194,7 @@ namespace Ogre
             This is the case because it holds the context for vertex,
             index buffers and textures.
         */
-        virtual bool isPrimary(void) const;
+        bool isPrimary(void) const override;
 
         /** Returns true if window is running in fullscreen mode.
         */
@@ -206,7 +206,7 @@ namespace Ogre
         void getMetrics(unsigned int& width, unsigned int& height, int& left, int& top) const;
 
         /// Override since windows don't usually have alpha
-        PixelFormat suggestPixelFormat() const { return PF_BYTE_RGB; }
+        PixelFormat suggestPixelFormat() const override { return PF_BYTE_RGB; }
 
         /** Returns true if the window will automatically de-activate itself when it loses focus.
         */

@@ -74,7 +74,7 @@ namespace Ogre {
         /// @copydoc ResourceManager::createImpl
         Resource* createImpl(const String& name, ResourceHandle handle, 
             const String& group, bool isManual, ManualResourceLoader* loader, 
-            const NameValuePairList* createParams);
+            const NameValuePairList* createParams) override;
 
     };
 

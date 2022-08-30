@@ -51,8 +51,8 @@ namespace Ogre {
             const String& group, bool isManual, ManualResourceLoader* loader);
         ~GLSLESProgram();
 
-        void attachToProgramObject( const GLuint programObject );
-        void detachFromProgramObject( const GLuint programObject );
+        void attachToProgramObject( const GLuint programObject ) override;
+        void detachFromProgramObject( const GLuint programObject ) override;
 
 #if !OGRE_NO_GLES2_GLSL_OPTIMISER
         /// Sets if the GLSL optimiser is enabled.
@@ -72,20 +72,20 @@ namespace Ogre {
 #endif
 
         /// Overridden from GpuProgram
-        const String& getLanguage(void) const;
+        const String& getLanguage(void) const override;
         /// Overridden from GpuProgram
-        GpuProgramParametersSharedPtr createParameters(void);
+        GpuProgramParametersSharedPtr createParameters(void) override;
 
-        bool linkSeparable();
+        bool linkSeparable() override;
 
     protected:
 #if !OGRE_NO_GLES2_GLSL_OPTIMISER
         static CmdOptimisation msCmdOptimisation;
 #endif
 
-        void loadFromSource();
+        void loadFromSource() override;
         /// Internal unload implementation, must be implemented by subclasses
-        void unloadHighLevelImpl(void);
+        void unloadHighLevelImpl(void) override;
 
         /// Populate the passed parameters with name->index map, must be overridden
         void buildConstantDefinitions() override;
@@ -97,8 +97,8 @@ namespace Ogre {
         void checkAndFixInvalidDefaultPrecisionError( String &message );
         
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
-        virtual void notifyOnContextLost();
-        virtual void notifyOnContextReset();
+        void notifyOnContextLost() override;
+        void notifyOnContextReset() override;
 #endif
         
     private:
@@ -116,11 +116,11 @@ namespace Ogre {
     {
     public:
         /// Get the name of the language this factory creates programs for
-        const String& getLanguage(void) const;
+        const String& getLanguage(void) const override;
         /// Create an instance of GLSLESProgram
         GpuProgram* create(ResourceManager* creator,
             const String& name, ResourceHandle handle,
-            const String& group, bool isManual, ManualResourceLoader* loader);
+            const String& group, bool isManual, ManualResourceLoader* loader) override;
     };
 }
 

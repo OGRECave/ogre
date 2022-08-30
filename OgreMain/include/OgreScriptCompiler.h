@@ -113,8 +113,8 @@ namespace Ogre
         uint32 id;
     public:
         AtomAbstractNode(AbstractNode *ptr);
-        AbstractNode *clone() const;
-        const String& getValue() const { return value; }
+        AbstractNode *clone() const override;
+        const String& getValue() const override { return value; }
     };
 
     /** This specific abstract node represents a script object */
@@ -132,8 +132,8 @@ namespace Ogre
         AbstractNodeList overrides; // For use when processing object inheritance and overriding
     public:
         ObjectAbstractNode(AbstractNode *ptr);
-        AbstractNode *clone() const;
-        const String& getValue() const { return cls; }
+        AbstractNode *clone() const override;
+        const String& getValue() const override { return cls; }
 
         void addVariable(const String &name);
         void setVariable(const String &name, const String &value);
@@ -150,8 +150,8 @@ namespace Ogre
         AbstractNodeList values;
     public:
         PropertyAbstractNode(AbstractNode *ptr);
-        AbstractNode *clone() const;
-        const String& getValue() const { return name; }
+        AbstractNode *clone() const override;
+        const String& getValue() const override { return name; }
     };
 
     /** This abstract node represents an import statement */
@@ -161,8 +161,8 @@ namespace Ogre
         String target, source;
     public:
         ImportAbstractNode();
-        AbstractNode *clone() const;
-        const String& getValue() const { return target; }
+        AbstractNode *clone() const override;
+        const String& getValue() const override { return target; }
     };
 
     /** This abstract node represents a variable assignment */
@@ -172,8 +172,8 @@ namespace Ogre
         String name;
     public:
         VariableAccessAbstractNode(AbstractNode *ptr);
-        AbstractNode *clone() const;
-        const String& getValue() const { return name; }
+        AbstractNode *clone() const override;
+        const String& getValue() const override { return name; }
     };
 
     class ScriptCompilerEvent;
@@ -442,11 +442,11 @@ namespace Ogre
         /// Adds a script extension that can be handled (e.g. *.material, *.pu, etc.)
         void addScriptPattern(const String &pattern);
         /// @copydoc ScriptLoader::getScriptPatterns
-        const StringVector& getScriptPatterns(void) const;
+        const StringVector& getScriptPatterns(void) const override;
         /// @copydoc ScriptLoader::parseScript
-        void parseScript(DataStreamPtr& stream, const String& groupName);
+        void parseScript(DataStreamPtr& stream, const String& groupName) override;
         /// @copydoc ScriptLoader::getLoadingOrder
-        Real getLoadingOrder(void) const;
+        Real getLoadingOrder(void) const override;
 
         /// @copydoc Singleton::getSingleton()
         static ScriptCompilerManager& getSingleton(void);

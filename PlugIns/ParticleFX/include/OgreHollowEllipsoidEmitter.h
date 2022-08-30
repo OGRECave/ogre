@@ -48,22 +48,22 @@ namespace Ogre {
         class CmdInnerX : public ParamCommand
         {
         public:
-            String doGet(const void* target) const;
-            void doSet(void* target, const String& val);
+            String doGet(const void* target) const override;
+            void doSet(void* target, const String& val) override;
         };
         /** Command object for inner size (see ParamCommand).*/
         class CmdInnerY : public ParamCommand
         {
         public:
-            String doGet(const void* target) const;
-            void doSet(void* target, const String& val);
+            String doGet(const void* target) const override;
+            void doSet(void* target, const String& val) override;
         };
         /** Command object for inner size (see ParamCommand).*/
         class CmdInnerZ : public ParamCommand
         {
         public:
-            String doGet(const void* target) const;
-            void doSet(void* target, const String& val);
+            String doGet(const void* target) const override;
+            void doSet(void* target, const String& val) override;
         };
         // See AreaEmitter
 

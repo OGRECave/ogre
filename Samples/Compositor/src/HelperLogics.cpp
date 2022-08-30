@@ -25,8 +25,8 @@ class HeatVisionListener: public Ogre::CompositorInstance::Listener
 public:
     HeatVisionListener();
     virtual ~HeatVisionListener();
-    virtual void notifyMaterialSetup(Ogre::uint32 pass_id, Ogre::MaterialPtr &mat);
-    virtual void notifyMaterialRender(Ogre::uint32 pass_id, Ogre::MaterialPtr &mat);
+    void notifyMaterialSetup(Ogre::uint32 pass_id, Ogre::MaterialPtr &mat) override;
+    void notifyMaterialRender(Ogre::uint32 pass_id, Ogre::MaterialPtr &mat) override;
 protected:
     Ogre::GpuProgramParametersSharedPtr fpParams;
     float start, end, curr;
@@ -48,8 +48,8 @@ public:
     virtual ~HDRListener();
     void notifyViewportSize(int width, int height);
     void notifyCompositor(Ogre::CompositorInstance* instance);
-    virtual void notifyMaterialSetup(Ogre::uint32 pass_id, Ogre::MaterialPtr &mat);
-    virtual void notifyMaterialRender(Ogre::uint32 pass_id, Ogre::MaterialPtr &mat);
+    void notifyMaterialSetup(Ogre::uint32 pass_id, Ogre::MaterialPtr &mat) override;
+    void notifyMaterialRender(Ogre::uint32 pass_id, Ogre::MaterialPtr &mat) override;
 };
 //---------------------------------------------------------------------------
 class GaussianListener : public Ogre::CompositorInstance::Listener
@@ -65,8 +65,8 @@ public:
     GaussianListener();
     virtual ~GaussianListener();
     void notifyViewportSize(int width, int height);
-    virtual void notifyMaterialSetup(Ogre::uint32 pass_id, Ogre::MaterialPtr &mat);
-    virtual void notifyMaterialRender(Ogre::uint32 pass_id, Ogre::MaterialPtr &mat);
+    void notifyMaterialSetup(Ogre::uint32 pass_id, Ogre::MaterialPtr &mat) override;
+    void notifyMaterialRender(Ogre::uint32 pass_id, Ogre::MaterialPtr &mat) override;
 };
 //---------------------------------------------------------------------------
 Ogre::CompositorInstance::Listener* HDRLogic::createListener(Ogre::CompositorInstance* instance)

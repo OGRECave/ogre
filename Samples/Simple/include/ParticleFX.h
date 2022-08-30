@@ -20,14 +20,14 @@ public:
         mInfo["Help"] = "Use the checkboxes to toggle visibility of the individual particle systems.";
     }
 
-    bool frameRenderingQueued(const FrameEvent& evt)
+    bool frameRenderingQueued(const FrameEvent& evt) override
     {
         mFountainPivot->yaw(Degree(evt.timeSinceLastFrame * 30));   // spin the fountains around
 
         return SdkSample::frameRenderingQueued(evt);   // don't forget the parent class updates!
     }
 
-    void checkBoxToggled(CheckBox* box)
+    void checkBoxToggled(CheckBox* box) override
     {
         // show or hide the particle system with the same name as the check box
         mSceneMgr->getParticleSystem(box->getName())->setVisible(box->isChecked());
@@ -35,7 +35,7 @@ public:
 
 protected:
 
-    void setupContent()
+    void setupContent() override
     {
         // setup some basic lighting for our scene
         mSceneMgr->setAmbientLight(ColourValue(0.3, 0.3, 0.3));

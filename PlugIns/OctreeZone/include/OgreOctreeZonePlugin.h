@@ -50,19 +50,19 @@ namespace Ogre
         OctreeZonePlugin();
 
         /// @copydoc Plugin::getName
-        const String& getName() const;
+        const String& getName() const override;
 
         /// @copydoc Plugin::install
-        void install();
+        void install() override;
 
         /// @copydoc Plugin::initialise
-        void initialise();
+        void initialise() override;
 
         /// @copydoc Plugin::shutdown
-        void shutdown();
+        void shutdown() override;
 
         /// @copydoc Plugin::uninstall
-        void uninstall();
+        void uninstall() override;
     protected:
         OctreeZoneFactory* mOctreeZoneFactory;
 

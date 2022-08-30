@@ -217,7 +217,7 @@ namespace Ogre {
         @param name The name of this animation
         @param length The length of the animation in seconds
         */
-        virtual Animation* createAnimation(const String& name, Real length);
+        Animation* createAnimation(const String& name, Real length) override;
 
         /** Returns the named Animation object. 
 
@@ -236,7 +236,7 @@ namespace Ogre {
              (@see addLinkedSkeletonAnimationSource). 
          @param name The name of the animation
          */
-        virtual Animation* getAnimation(const String& name) const;
+        Animation* getAnimation(const String& name) const override;
 
         /// Internal accessor for animations (returns null if animation does not exist)
         virtual Animation* _getAnimationImpl(const String& name, 
@@ -244,10 +244,10 @@ namespace Ogre {
 
 
         /** Returns whether this skeleton contains the named animation. */
-        virtual bool hasAnimation(const String& name) const;
+        bool hasAnimation(const String& name) const override;
 
         /** Removes an Animation from this skeleton. */
-        virtual void removeAnimation(const String& name);
+        void removeAnimation(const String& name) override;
 
         /** Changes the state of the skeleton to reflect the application of the passed in collection of animations.
 
@@ -283,14 +283,14 @@ namespace Ogre {
         virtual void _getBoneMatrices(Affine3* pMatrices);
 
         /** Gets the number of animations on this skeleton. */
-        virtual unsigned short getNumAnimations(void) const;
+        unsigned short getNumAnimations(void) const override;
 
         /** Gets a single animation by index. 
 
             Will NOT pick up animations in linked skeletons 
             (@see addLinkedSkeletonAnimationSource).
         */
-        virtual Animation* getAnimation(unsigned short index) const;
+        Animation* getAnimation(unsigned short index) const override;
 
 
         /** Gets the animation blending mode which this skeleton will use. */
@@ -460,13 +460,13 @@ namespace Ogre {
         /// Debugging method
         void _dumpContents(const String& filename);
 
-        void loadImpl() {}
-        void unloadImpl() { unprepareImpl(); }
+        void loadImpl() override {}
+        void unloadImpl() override { unprepareImpl(); }
 
-        void prepareImpl(void);
-        void unprepareImpl(void);
+        void prepareImpl(void) override;
+        void unprepareImpl(void) override;
         /// @copydoc Resource::calculateSize
-        size_t calculateSize(void) const;
+        size_t calculateSize(void) const override;
 
     };
 

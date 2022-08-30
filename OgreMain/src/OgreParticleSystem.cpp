@@ -40,78 +40,78 @@ namespace Ogre {
     class _OgrePrivate CmdQuota : public ParamCommand
     {
     public:
-        String doGet(const void* target) const;
-        void doSet(void* target, const String& val);
+        String doGet(const void* target) const override;
+        void doSet(void* target, const String& val) override;
     };
     /** Command object for emittedEmitterQuota (see ParamCommand).*/
     class _OgrePrivate CmdEmittedEmitterQuota : public ParamCommand
     {
     public:
-        String doGet(const void* target) const;
-        void doSet(void* target, const String& val);
+        String doGet(const void* target) const override;
+        void doSet(void* target, const String& val) override;
     };
     /** Command object for material (see ParamCommand).*/
     class _OgrePrivate CmdMaterial : public ParamCommand
     {
     public:
-        String doGet(const void* target) const;
-        void doSet(void* target, const String& val);
+        String doGet(const void* target) const override;
+        void doSet(void* target, const String& val) override;
     };
     /** Command object for cull_each (see ParamCommand).*/
     class _OgrePrivate CmdCull : public ParamCommand
     {
     public:
-        String doGet(const void* target) const;
-        void doSet(void* target, const String& val);
+        String doGet(const void* target) const override;
+        void doSet(void* target, const String& val) override;
     };
     /** Command object for particle_width (see ParamCommand).*/
     class _OgrePrivate CmdWidth : public ParamCommand
     {
     public:
-        String doGet(const void* target) const;
-        void doSet(void* target, const String& val);
+        String doGet(const void* target) const override;
+        void doSet(void* target, const String& val) override;
     };
     /** Command object for particle_height (see ParamCommand).*/
     class _OgrePrivate CmdHeight : public ParamCommand
     {
     public:
-        String doGet(const void* target) const;
-        void doSet(void* target, const String& val);
+        String doGet(const void* target) const override;
+        void doSet(void* target, const String& val) override;
     };
     /** Command object for renderer (see ParamCommand).*/
     class _OgrePrivate CmdRenderer : public ParamCommand
     {
     public:
-        String doGet(const void* target) const;
-        void doSet(void* target, const String& val);
+        String doGet(const void* target) const override;
+        void doSet(void* target, const String& val) override;
     };
     /** Command object for sorting (see ParamCommand).*/
     class CmdSorted : public ParamCommand
     {
     public:
-        String doGet(const void* target) const;
-        void doSet(void* target, const String& val);
+        String doGet(const void* target) const override;
+        void doSet(void* target, const String& val) override;
     };
     /** Command object for local space (see ParamCommand).*/
     class CmdLocalSpace : public ParamCommand
     {
     public:
-        String doGet(const void* target) const;
-        void doSet(void* target, const String& val);
+        String doGet(const void* target) const override;
+        void doSet(void* target, const String& val) override;
     };
     /** Command object for iteration interval(see ParamCommand).*/
     class CmdIterationInterval : public ParamCommand
     {
     public:
-        String doGet(const void* target) const;
-        void doSet(void* target, const String& val);
+        String doGet(const void* target) const override;
+        void doSet(void* target, const String& val) override;
     };
     /** Command object for nonvisible timeout (see ParamCommand).*/
     class CmdNonvisibleTimeout : public ParamCommand
     {
     public:
-        String doGet(const void* target) const;
-        void doSet(void* target, const String& val);
+        String doGet(const void* target) const override;
+        void doSet(void* target, const String& val) override;
     };
     /// Command objects
     static CmdCull msCullCmd;
@@ -138,9 +138,9 @@ namespace Ogre {
     public:
         ParticleSystemUpdateValue(ParticleSystem* target) : mTarget(target) {}
 
-        Real getValue(void) const { return 0; } // N/A
+        Real getValue(void) const override { return 0; } // N/A
 
-        void setValue(Real value) { mTarget->_update(value); }
+        void setValue(Real value) override { mTarget->_update(value); }
 
     };
     //-----------------------------------------------------------------------

@@ -86,87 +86,87 @@ namespace Ogre {
         TinyRenderSystem();
         ~TinyRenderSystem();
 
-        void initConfigOptions();
+        void initConfigOptions() override;
 
-        Real getMinimumDepthInputValue(void) { return -1.0f; }            // Range [-1.0f, 1.0f]
-        Real getMaximumDepthInputValue(void) { return 1.0f; }             // Range [-1.0f, 1.0f]
-        void _convertProjectionMatrix(const Matrix4& matrix, Matrix4& dest, bool) { dest = matrix; }
+        Real getMinimumDepthInputValue(void) override { return -1.0f; }            // Range [-1.0f, 1.0f]
+        Real getMaximumDepthInputValue(void) override { return 1.0f; }             // Range [-1.0f, 1.0f]
+        void _convertProjectionMatrix(const Matrix4& matrix, Matrix4& dest, bool) override { dest = matrix; }
 
-        void setConfigOption(const String &name, const String &value) {}
+        void setConfigOption(const String &name, const String &value) override {}
 
         // ----------------------------------
         // Overridden RenderSystem functions
         // ----------------------------------
 
-        const String& getName(void) const;
+        const String& getName(void) const override;
 
-        virtual RenderSystemCapabilities* createRenderSystemCapabilities() const;
+        RenderSystemCapabilities* createRenderSystemCapabilities() const override;
 
-        void initialiseFromRenderSystemCapabilities(RenderSystemCapabilities* caps, RenderTarget* primary);
+        void initialiseFromRenderSystemCapabilities(RenderSystemCapabilities* caps, RenderTarget* primary) override;
 
-        void shutdown(void);
+        void shutdown(void) override;
 
         /// @copydoc RenderSystem::_createRenderWindow
         RenderWindow* _createRenderWindow(const String &name, unsigned int width, unsigned int height,
-                                          bool fullScreen, const NameValuePairList *miscParams = 0);
+                                          bool fullScreen, const NameValuePairList *miscParams = 0) override;
 
         /// @copydoc RenderSystem::_createDepthBufferFor
-        DepthBuffer* _createDepthBufferFor( RenderTarget *renderTarget );
+        DepthBuffer* _createDepthBufferFor( RenderTarget *renderTarget ) override;
 
         /// @copydoc RenderSystem::createMultiRenderTarget
-        virtual MultiRenderTarget * createMultiRenderTarget(const String & name);
+        MultiRenderTarget * createMultiRenderTarget(const String & name) override;
 
         // -----------------------------
         // Low-level overridden members
         // -----------------------------
-        void _setTexture(size_t unit, bool enabled, const TexturePtr &tex);
+        void _setTexture(size_t unit, bool enabled, const TexturePtr &tex) override;
 
-        void _setSampler(size_t unit, Sampler& sampler);
+        void _setSampler(size_t unit, Sampler& sampler) override;
 
 
-        void setLightingEnabled(bool enabled) { mDefaultShader.uniform_doLighting = enabled; }
+        void setLightingEnabled(bool enabled) override { mDefaultShader.uniform_doLighting = enabled; }
 
-        void _setViewport(Viewport *vp);
+        void _setViewport(Viewport *vp) override;
 
-        void _endFrame(void);
+        void _endFrame(void) override;
 
-        void _setCullingMode(CullingMode mode);
+        void _setCullingMode(CullingMode mode) override;
 
-        void _setDepthBufferParams(bool depthTest = true, bool depthWrite = true, CompareFunction depthFunction = CMPF_LESS_EQUAL);
+        void _setDepthBufferParams(bool depthTest = true, bool depthWrite = true, CompareFunction depthFunction = CMPF_LESS_EQUAL) override;
 
-        void _setDepthBias(float constantBias, float slopeScaleBias);
+        void _setDepthBias(float constantBias, float slopeScaleBias) override;
 
-        void setColourBlendState(const ColourBlendState& state);
+        void setColourBlendState(const ColourBlendState& state) override;
 
-        void _setPolygonMode(PolygonMode level);
+        void _setPolygonMode(PolygonMode level) override;
 
         void setStencilState(const StencilState& state) override {}
 
-        void applyFixedFunctionParams(const GpuProgramParametersPtr& params, uint16 variabilityMask);
+        void applyFixedFunctionParams(const GpuProgramParametersPtr& params, uint16 variabilityMask) override;
 
-        void _render(const RenderOperation& op);
+        void _render(const RenderOperation& op) override;
 
-        void setScissorTest(bool enabled, const Rect& rect = Rect());
+        void setScissorTest(bool enabled, const Rect& rect = Rect()) override;
 
         void clearFrameBuffer(unsigned int buffers,
                               const ColourValue& colour = ColourValue::Black,
-                              float depth = 1.0f, unsigned short stencil = 0);
-        HardwareOcclusionQuery* createHardwareOcclusionQuery(void);
+                              float depth = 1.0f, unsigned short stencil = 0) override;
+        HardwareOcclusionQuery* createHardwareOcclusionQuery(void) override;
 
         /**
          * Set current render target to target, enabling its GL context if needed
          */
-        void _setRenderTarget(RenderTarget *target);
+        void _setRenderTarget(RenderTarget *target) override;
 
         void bindGpuProgramParameters(GpuProgramType gptype,
-            const GpuProgramParametersPtr& params, uint16 variabilityMask) {}
+            const GpuProgramParametersPtr& params, uint16 variabilityMask) override {}
 
         /// @copydoc RenderSystem::_setAlphaRejectSettings
-        void _setAlphaRejectSettings( CompareFunction func, unsigned char value, bool alphaToCoverage );
+        void _setAlphaRejectSettings( CompareFunction func, unsigned char value, bool alphaToCoverage ) override;
 
-        virtual void beginProfileEvent( const String &eventName ) {}
-        virtual void endProfileEvent( void ) {}
-        virtual void markProfileEvent( const String &eventName ) {}
+        void beginProfileEvent( const String &eventName ) override {}
+        void endProfileEvent( void ) override {}
+        void markProfileEvent( const String &eventName ) override {}
     };
     /** @} */
     /** @} */

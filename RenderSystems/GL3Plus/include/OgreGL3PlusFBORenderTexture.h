@@ -44,18 +44,18 @@ namespace Ogre {
     public:
         GL3PlusFBORenderTexture(GL3PlusFBOManager *manager, const String &name, const GLSurfaceDesc &target, bool writeGamma, uint fsaa);
 
-        virtual void getCustomAttribute(const String& name, void* pData);
+        void getCustomAttribute(const String& name, void* pData) override;
 
         /// Override needed to deal with multisample buffers
-        virtual void swapBuffers();
+        void swapBuffers() override;
 
         /// Override so we can attach the depth buffer to the FBO
-        virtual bool attachDepthBuffer( DepthBuffer *depthBuffer );
-        virtual void detachDepthBuffer();
-        virtual void _detachDepthBuffer();
+        bool attachDepthBuffer( DepthBuffer *depthBuffer ) override;
+        void detachDepthBuffer() override;
+        void _detachDepthBuffer() override;
 
-        GLContext* getContext() const { return mFB.getContext(); }
-        GLFrameBufferObjectCommon* getFBO() { return &mFB; }
+        GLContext* getContext() const override { return mFB.getContext(); }
+        GLFrameBufferObjectCommon* getFBO() override { return &mFB; }
     protected:
         GL3PlusFrameBufferObject mFB;
     };
@@ -70,12 +70,12 @@ namespace Ogre {
 
         /** Get best depth and stencil supported for given internalFormat
          */
-        void getBestDepthStencil(PixelFormat internalFormat, GLenum *depthFormat, GLenum *stencilFormat);
+        void getBestDepthStencil(PixelFormat internalFormat, GLenum *depthFormat, GLenum *stencilFormat) override;
 
         /** Create a texture rendertarget object
          */
-        virtual GL3PlusFBORenderTexture *createRenderTexture(const String &name,
-                                                             const GLSurfaceDesc &target, bool writeGamma, uint fsaa);
+        GL3PlusFBORenderTexture *createRenderTexture(const String &name,
+                                                             const GLSurfaceDesc &target, bool writeGamma, uint fsaa) override;
 
         /** Request a render buffer. If format is GL_NONE, return a zero buffer.
          */

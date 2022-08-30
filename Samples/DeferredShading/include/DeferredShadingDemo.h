@@ -69,7 +69,7 @@ public:
 
 protected:
     
-    void cleanupContent(void)
+    void cleanupContent(void) override
     {
         delete mSystem;
     }
@@ -92,13 +92,13 @@ protected:
         mDisplayModeMenu->addItem("Debug depth / specular");
     }
     
-    void itemSelected(SelectMenu* menu)
+    void itemSelected(SelectMenu* menu) override
     {
         //Options are aligned with the mode enum
         mSystem->setMode((DeferredShadingSystem::DSMode)menu->getSelectionIndex());
     }
     
-    void checkBoxToggled(CheckBox* box)
+    void checkBoxToggled(CheckBox* box) override
     {
         if (box->getName() == "SSAO")
         {
@@ -225,7 +225,7 @@ protected:
         
     }
 
-    void testCapabilities(const RenderSystemCapabilities* caps)
+    void testCapabilities(const RenderSystemCapabilities* caps) override
     {
         if (caps->getNumMultiRenderTargets()<2)
         {
@@ -238,7 +238,7 @@ protected:
     }
 
     // Just override the mandatory create scene method
-    void setupContent(void)
+    void setupContent(void) override
     {
         mCameraMan->setTopSpeed(20.0);
         mSystem = 0;

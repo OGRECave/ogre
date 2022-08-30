@@ -56,7 +56,7 @@ namespace Ogre {
         AttributeSet mValidAttributes;
 
         /// Compiles and links the the vertex and fragment programs
-        void compileAndLink();
+        void compileAndLink() override;
         /// Get the the binary data of a program from the microcode cache
         void getMicrocodeFromCache(uint32 id);
     public:
@@ -67,14 +67,14 @@ namespace Ogre {
         /** Makes a program object active by making sure it is linked and then putting it in use.
 
         */
-        void activate(void);
+        void activate(void) override;
 
         bool isAttributeValid(VertexElementSemantic semantic, uint index);
         
         /** Updates program object uniforms using data from GpuProgramParameters.
         normally called by GLSLGpuProgram::bindParameters() just before rendering occurs.
         */
-        void updateUniforms(GpuProgramParametersSharedPtr params, uint16 mask, GpuProgramType fromProgType);
+        void updateUniforms(GpuProgramParametersSharedPtr params, uint16 mask, GpuProgramType fromProgType) override;
 
         /// Get the GL Handle for the program object
         uint getGLHandle(void) const { return mGLProgramHandle; }

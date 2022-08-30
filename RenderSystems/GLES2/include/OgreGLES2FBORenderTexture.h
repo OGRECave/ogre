@@ -44,27 +44,27 @@ namespace Ogre {
     public:
         GLES2FBORenderTexture(GLES2FBOManager *manager, const String &name, const GLSurfaceDesc &target, bool writeGamma, uint fsaa);
         
-        virtual void getCustomAttribute(const String& name, void* pData);
+        void getCustomAttribute(const String& name, void* pData) override;
 
         /// Override needed to deal with multisample buffers
-        virtual void swapBuffers();
+        void swapBuffers() override;
 
         /// Override so we can attach the depth buffer to the FBO
-        virtual bool attachDepthBuffer( DepthBuffer *depthBuffer );
-        virtual void detachDepthBuffer();
-        virtual void _detachDepthBuffer();
+        bool attachDepthBuffer( DepthBuffer *depthBuffer ) override;
+        void detachDepthBuffer() override;
+        void _detachDepthBuffer() override;
 
-        GLContext* getContext() const { return mFB.getContext(); }
-        GLFrameBufferObjectCommon* getFBO() { return &mFB; }
+        GLContext* getContext() const override { return mFB.getContext(); }
+        GLFrameBufferObjectCommon* getFBO() override { return &mFB; }
     protected:
         GLES2FrameBufferObject mFB;
         
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
         /** See AndroidResource. */
-        virtual void notifyOnContextLost();
+        void notifyOnContextLost() override;
         
         /** See AndroidResource. */
-        virtual void notifyOnContextReset();
+        void notifyOnContextReset() override;
 #endif
     };
     
@@ -79,16 +79,14 @@ namespace Ogre {
         /** Bind a certain render target if it is a FBO. If it is not a FBO, bind the
             main frame buffer.
         */
-        void bind(RenderTarget *target);
+        void bind(RenderTarget *target) override;
 
         /** Get best depth and stencil supported for given internalFormat
         */
-        void getBestDepthStencil(PixelFormat internalFormat, uint32 *depthFormat, uint32 *stencilFormat);
-        
-        /** Create a texture rendertarget object
-        */
-        virtual GLES2FBORenderTexture *createRenderTexture(const String &name, 
-            const GLSurfaceDesc &target, bool writeGamma, uint fsaa);
+        void getBestDepthStencil(PixelFormat internalFormat, uint32 *depthFormat, uint32 *stencilFormat) override;
+
+        GLES2FBORenderTexture *createRenderTexture(const String &name,
+            const GLSurfaceDesc &target, bool writeGamma, uint fsaa) override;
         
         /** Request a render buffer. If format is GL_NONE, return a zero buffer.
         */

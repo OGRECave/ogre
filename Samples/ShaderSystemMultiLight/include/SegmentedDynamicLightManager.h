@@ -72,9 +72,8 @@ public:
     //Get whether to display the lights in debug mode
     bool isDebugMode() const { return mIsDebugMode; }
 
-    //Implementation of SceneManager::Listener
-    virtual void postFindVisibleObjects(SceneManager* source, 
-        SceneManager::IlluminationRenderStage irs, Viewport* v);
+    void postFindVisibleObjects(SceneManager* source,
+        SceneManager::IlluminationRenderStage irs, Viewport* v) override;
     
     /// @copydoc Singleton::getSingleton()
     static SegmentedDynamicLightManager& getSingleton(void);

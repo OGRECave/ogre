@@ -334,28 +334,28 @@ namespace Ogre
 
         //Renderable overloads
         /** @copydoc Renderable::getMaterial */
-        const MaterialPtr& getMaterial(void) const      { return mMaterial; }
+        const MaterialPtr& getMaterial(void) const override      { return mMaterial; }
         /** @copydoc Renderable::getRenderOperation */
-        void getRenderOperation( RenderOperation& op )  { op = mRenderOperation; }
+        void getRenderOperation( RenderOperation& op ) override  { op = mRenderOperation; }
 
         /** @copydoc Renderable::getSquaredViewDepth */
-        Real getSquaredViewDepth( const Camera* cam ) const;
+        Real getSquaredViewDepth( const Camera* cam ) const override;
         /** @copydoc Renderable::getLights */
-        const LightList& getLights( void ) const;
+        const LightList& getLights( void ) const override;
         /** @copydoc Renderable::getTechnique */
-        Technique* getTechnique(void) const;
+        Technique* getTechnique(void) const override;
 
         /** @copydoc MovableObject::getMovableType */
-        const String& getMovableType(void) const;
+        const String& getMovableType(void) const override;
         /** @copydoc MovableObject::_notifyCurrentCamera */
-        void _notifyCurrentCamera( Camera* cam );
+        void _notifyCurrentCamera( Camera* cam ) override;
         /** @copydoc MovableObject::getBoundingBox */
-        const AxisAlignedBox& getBoundingBox(void) const;
+        const AxisAlignedBox& getBoundingBox(void) const override;
         /** @copydoc MovableObject::getBoundingRadius */
-        Real getBoundingRadius(void) const;
+        Real getBoundingRadius(void) const override;
 
-        virtual void _updateRenderQueue(RenderQueue* queue);
-        void visitRenderables( Renderable::Visitor* visitor, bool debugRenderables = false );
+        void _updateRenderQueue(RenderQueue* queue) override;
+        void visitRenderables( Renderable::Visitor* visitor, bool debugRenderables = false ) override;
 
         // resolve ambiguity of get/setUserAny due to inheriting from Renderable and MovableObject
         using Renderable::getUserAny;

@@ -42,8 +42,8 @@ class RenderSystemCapabilitiesTests : public ::testing::Test
 {
 
 public:
-    void SetUp();
-    void TearDown();
+    void SetUp() override;
+    void TearDown() override;
 
     // For serializing .rendercaps we need RSCManager
     RenderSystemCapabilitiesManager* mRenderSystemCapabilitiesManager;

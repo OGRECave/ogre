@@ -25,7 +25,7 @@ public:
 
 protected:
 
-    void setupContent()
+    void setupContent() override
     {     
         mViewport->setBackgroundColour(ColourValue::White);
 

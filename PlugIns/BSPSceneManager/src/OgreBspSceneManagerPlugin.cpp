@@ -36,7 +36,7 @@ namespace Ogre
 namespace {
     struct BspSceneCodec : public Codec
     {
-        String magicNumberToFileExt(const char* magicNumberPtr, size_t maxbytes) const { return ""; }
+        String magicNumberToFileExt(const char* magicNumberPtr, size_t maxbytes) const override { return ""; }
         String getType() const override { return "bsp"; }
         void decode(const DataStreamPtr& stream, const Any& output) const override
         {

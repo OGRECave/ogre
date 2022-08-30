@@ -58,11 +58,11 @@ namespace Ogre {
     public:
         virtual ~ZipArchiveFactory() {}
         /// @copydoc FactoryObj::getType
-        const String& getType(void) const;
+        const String& getType(void) const override;
 
         using ArchiveFactory::createInstance;
 
-        Archive *createInstance( const String& name, bool readOnly );
+        Archive *createInstance( const String& name, bool readOnly ) override;
     };
 
     /** Specialisation of ZipArchiveFactory for embedded Zip files. */

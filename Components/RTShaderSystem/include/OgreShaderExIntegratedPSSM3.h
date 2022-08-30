@@ -59,28 +59,28 @@ public:
     /** 
     @see SubRenderState::getType.
     */
-    virtual const String& getType() const;
+    const String& getType() const override;
 
     /** 
     @see SubRenderState::getType.
     */
-    virtual int getExecutionOrder() const;
+    int getExecutionOrder() const override;
 
     /** 
     @see SubRenderState::updateGpuProgramsParams.
     */
-    virtual void updateGpuProgramsParams(Renderable* rend, const Pass* pass, const AutoParamDataSource* source, const LightList* pLightList);
+    void updateGpuProgramsParams(Renderable* rend, const Pass* pass, const AutoParamDataSource* source, const LightList* pLightList) override;
 
     /** 
     @see SubRenderState::copyFrom.
     */
-    virtual void copyFrom(const SubRenderState& rhs);
+    void copyFrom(const SubRenderState& rhs) override;
 
 
     /** 
     @see SubRenderState::preAddToRenderState.
     */
-    virtual bool preAddToRenderState(const RenderState* renderState, Pass* srcPass, Pass* dstPass);
+    bool preAddToRenderState(const RenderState* renderState, Pass* srcPass, Pass* dstPass) override;
 
 
     
@@ -133,17 +133,17 @@ protected:
     /** 
     @see SubRenderState::resolveParameters.
     */
-    virtual bool resolveParameters(ProgramSet* programSet);
+    bool resolveParameters(ProgramSet* programSet) override;
 
     /** 
     @see SubRenderState::resolveDependencies.
     */
-    virtual bool resolveDependencies(ProgramSet* programSet);
+    bool resolveDependencies(ProgramSet* programSet) override;
 
     /** 
     @see SubRenderState::addFunctionInvocations.
     */
-    virtual bool addFunctionInvocations(ProgramSet* programSet);
+    bool addFunctionInvocations(ProgramSet* programSet) override;
 
     /** 
     Internal method that adds related vertex shader functions invocations.
@@ -195,12 +195,12 @@ public:
     /** 
     @see SubRenderStateFactory::getType.
     */
-    virtual const String& getType() const;
+    const String& getType() const override;
 
     /** 
     @see SubRenderStateFactory::createInstance.
     */
-    virtual SubRenderState* createInstance(ScriptCompiler* compiler, PropertyAbstractNode* prop, Pass* pass, SGScriptTranslator* translator);
+    SubRenderState* createInstance(ScriptCompiler* compiler, PropertyAbstractNode* prop, Pass* pass, SGScriptTranslator* translator) override;
 
 
 protected:
@@ -208,7 +208,7 @@ protected:
     /** 
     @see SubRenderStateFactory::createInstanceImpl.
     */
-    virtual SubRenderState* createInstanceImpl();
+    SubRenderState* createInstanceImpl() override;
 
 
 };

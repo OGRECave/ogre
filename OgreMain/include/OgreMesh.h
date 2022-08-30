@@ -198,18 +198,18 @@ namespace Ogre {
             It also does not set up submeshes, etc.  You have to call load()
             to do that.
          */
-        void prepareImpl(void);
+        void prepareImpl(void) override;
         /** Destroys data cached by prepareImpl.
          */
-        void unprepareImpl(void);
+        void unprepareImpl(void) override;
         /// @copydoc Resource::loadImpl
-        void loadImpl(void);
+        void loadImpl(void) override;
         /// @copydoc Resource::postLoadImpl
-        void postLoadImpl(void);
+        void postLoadImpl(void) override;
         /// @copydoc Resource::unloadImpl
-        void unloadImpl(void);
+        void unloadImpl(void) override;
         /// @copydoc Resource::calculateSize
-        size_t calculateSize(void) const;
+        size_t calculateSize(void) const override;
 
         void mergeAdjacentTexcoords( unsigned short finalTexCoordSet,
                                      unsigned short texCoordSetToDestroy, VertexData *vertexData );
@@ -345,7 +345,7 @@ namespace Ogre {
         MeshPtr clone(const String& newName, const String& newGroup = BLANKSTRING);
 
         /** @copydoc Resource::reload */
-        void reload(LoadingFlags flags = LF_DEFAULT);
+        void reload(LoadingFlags flags = LF_DEFAULT) override;
 
         /** Get the axis-aligned bounding box for this mesh.
         */
@@ -849,13 +849,13 @@ namespace Ogre {
         @param length
             The length of the animation in seconds.
         */
-        virtual Animation* createAnimation(const String& name, Real length);
+        Animation* createAnimation(const String& name, Real length) override;
 
         /** Returns the named vertex Animation object. 
         @param name
             The name of the animation.
         */
-        virtual Animation* getAnimation(const String& name) const;
+        Animation* getAnimation(const String& name) const override;
 
         /** Internal access to the named vertex Animation object - returns null 
             if it does not exist. 
@@ -865,17 +865,17 @@ namespace Ogre {
         virtual Animation* _getAnimationImpl(const String& name) const;
 
         /** Returns whether this mesh contains the named vertex animation. */
-        virtual bool hasAnimation(const String& name) const;
+        bool hasAnimation(const String& name) const override;
 
         /** Removes vertex Animation from this mesh. */
-        virtual void removeAnimation(const String& name);
+        void removeAnimation(const String& name) override;
 
         /** Gets the number of morph animations in this mesh. */
-        virtual unsigned short getNumAnimations(void) const;
+        unsigned short getNumAnimations(void) const override;
 
         /** Gets a single morph animation by index. 
         */
-        virtual Animation* getAnimation(unsigned short index) const;
+        Animation* getAnimation(unsigned short index) const override;
 
         /** Removes all morph Animations from this mesh. */
         virtual void removeAllAnimations(void);

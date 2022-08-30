@@ -84,10 +84,10 @@ namespace Ogre {
         /// World-Axis aligned bounding box, updated only through _update
         AxisAlignedBox mWorldAABB;
 
-        void updateFromParentImpl(void) const;
+        void updateFromParentImpl(void) const override;
 
         /** See Node */
-        void setParent(Node* parent);
+        void setParent(Node* parent) override;
 
         /// Tracking offset for fine tuning
         Vector3 mAutoTrackOffset;
@@ -109,10 +109,10 @@ namespace Ogre {
         */
         virtual void setInSceneGraph(bool inGraph);
         /** See Node. */
-        Node* createChildImpl(void);
+        Node* createChildImpl(void) override;
 
         /** See Node. */
-        Node* createChildImpl(const String& name);
+        Node* createChildImpl(const String& name) override;
     public:
         /** Constructor, only to be called by the creator SceneManager.
 
@@ -186,7 +186,7 @@ namespace Ogre {
                     so the child should retrieve the parent's transform and combine it with its own
                     even if it hasn't changed itself.
         */
-        void _update(bool updateChildren, bool parentHasChanged);
+        void _update(bool updateChildren, bool parentHasChanged) override;
 
         /** Tells the SceneNode to update the world bound info it stores.
         */
@@ -359,7 +359,7 @@ namespace Ogre {
 
         /** Rotate the node around the Y-axis.
         */
-        void yaw(const Radian& angle, TransformSpace relativeTo = TS_LOCAL);
+        void yaw(const Radian& angle, TransformSpace relativeTo = TS_LOCAL) override;
         /** Sets the node's direction vector ie it's local -z.
 
         Note that the 'up' vector for the orientation will automatically be 

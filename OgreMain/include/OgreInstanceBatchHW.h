@@ -56,10 +56,10 @@ namespace Ogre
     {
         bool    mKeepStatic;
 
-        void setupVertices( const SubMesh* baseSubMesh );
-        void setupIndices( const SubMesh* baseSubMesh );
+        void setupVertices( const SubMesh* baseSubMesh ) override;
+        void setupIndices( const SubMesh* baseSubMesh ) override;
 
-        virtual bool checkSubMeshCompatibility( const SubMesh* baseSubMesh );
+        bool checkSubMeshCompatibility( const SubMesh* baseSubMesh ) override;
 
         size_t updateVertexBuffer( Camera *currentCamera );
 
@@ -70,33 +70,33 @@ namespace Ogre
         virtual ~InstanceBatchHW();
 
         /** @see InstanceBatch::calculateMaxNumInstances */
-        size_t calculateMaxNumInstances( const SubMesh *baseSubMesh, uint16 flags ) const;
+        size_t calculateMaxNumInstances( const SubMesh *baseSubMesh, uint16 flags ) const override;
 
         /** @see InstanceBatch::buildFrom */
-        void buildFrom( const SubMesh *baseSubMesh, const RenderOperation &renderOperation );
+        void buildFrom( const SubMesh *baseSubMesh, const RenderOperation &renderOperation ) override;
 
         /** Overloaded so that we don't perform needless updates when in static mode. Also doing that
             could cause glitches with shadow mapping (since Ogre thinks we're small/bigger than we
             really are when displaying, or that we're somewhere else)
         */
-        void _boundsDirty(void);
+        void _boundsDirty(void) override;
 
         /** @see InstanceBatch::setStaticAndUpdate. While this flag is true, no individual per-entity
             cull check is made. This means if the camera is looking at only one instance, all instances
             are sent to the vertex shader (unlike when this flag is false). This saves a lot of CPU
             power and a bit of bus bandwidth.
         */
-        void setStaticAndUpdate( bool bStatic );
+        void setStaticAndUpdate( bool bStatic ) override;
 
-        bool isStatic() const                       { return mKeepStatic; }
+        bool isStatic() const override                       { return mKeepStatic; }
 
         //Renderable overloads
-        void getWorldTransforms( Matrix4* xform ) const;
-        unsigned short getNumWorldTransforms(void) const;
+        void getWorldTransforms( Matrix4* xform ) const override;
+        unsigned short getNumWorldTransforms(void) const override;
 
         /** Overloaded to avoid updating skeletons (which we don't support), check visibility on a
             per unit basis and finally updated the vertex buffer */
-        virtual void _updateRenderQueue( RenderQueue* queue );
+        void _updateRenderQueue( RenderQueue* queue ) override;
     };
 }
 

@@ -47,11 +47,11 @@ namespace Ogre {
     class CmdHasSamplersBinding : public ParamCommand
     {
     public:
-        String doGet(const void* target) const
+        String doGet(const void* target) const override
         {
             return StringConverter::toString(static_cast<const GLSLShader*>(target)->getSamplerBinding());
         }
-        void doSet(void* target, const String& val)
+        void doSet(void* target, const String& val) override
         {
             static_cast<GLSLShader*>(target)->setSamplerBinding(StringConverter::parseBool(val));
         }

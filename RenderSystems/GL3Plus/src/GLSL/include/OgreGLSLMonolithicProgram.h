@@ -50,7 +50,7 @@ namespace Ogre {
     {
     protected:
         /// Compiles and links the vertex and fragment programs
-        void compileAndLink(void);
+        void compileAndLink(void) override;
 
         void buildGLUniformReferences(void);
 
@@ -62,14 +62,14 @@ namespace Ogre {
         /** Makes a program object active by making sure it is linked
             and then putting it in use.
         */
-        void activate(void);
+        void activate(void) override;
 
         /** Updates program object uniforms using data from
             GpuProgramParameters.  normally called by
             GLSLShader::bindParameters() just before rendering
             occurs.
         */
-        void updateUniforms(GpuProgramParametersSharedPtr params, uint16 mask, GpuProgramType fromProgType);
+        void updateUniforms(GpuProgramParametersSharedPtr params, uint16 mask, GpuProgramType fromProgType) override;
 
         void updateAtomicCounters(GpuProgramParametersSharedPtr params, uint16 mask,
                                   GpuProgramType fromProgType) {}

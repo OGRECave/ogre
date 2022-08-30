@@ -169,17 +169,17 @@ namespace Ogre
 
         public: // queries
 
-            virtual const std::type_info & getType() const
+            const std::type_info & getType() const override
             {
                 return typeid(ValueType);
             }
 
-            virtual placeholder * clone() const
+            placeholder * clone() const override
             {
                 return OGRE_NEW_T(holder, MEMCATEGORY_GENERAL)(held);
             }
 
-            virtual void writeToStream(std::ostream& o)
+            void writeToStream(std::ostream& o) override
             {
                 o << "Any::ValueType";
             }
@@ -269,37 +269,37 @@ namespace Ogre
 
         public: // queries
 
-            virtual const std::type_info & getType() const
+            const std::type_info & getType() const override
             {
                 return typeid(ValueType);
             }
 
-            virtual placeholder * clone() const
+            placeholder * clone() const override
             {
                 return OGRE_NEW_T(numholder, MEMCATEGORY_GENERAL)(held);
             }
 
-            virtual placeholder* add(placeholder* rhs)
+            placeholder* add(placeholder* rhs) override
             {
                 return OGRE_NEW_T(numholder, MEMCATEGORY_GENERAL)(held + static_cast<numholder*>(rhs)->held);
             }
-            virtual placeholder* subtract(placeholder* rhs)
+            placeholder* subtract(placeholder* rhs) override
             {
                 return OGRE_NEW_T(numholder, MEMCATEGORY_GENERAL)(held - static_cast<numholder*>(rhs)->held);
             }
-            virtual placeholder* multiply(placeholder* rhs)
+            placeholder* multiply(placeholder* rhs) override
             {
                 return OGRE_NEW_T(numholder, MEMCATEGORY_GENERAL)(held * static_cast<numholder*>(rhs)->held);
             }
-            virtual placeholder* multiply(Real factor)
+            placeholder* multiply(Real factor) override
             {
                 return OGRE_NEW_T(numholder, MEMCATEGORY_GENERAL)(held * factor);
             }
-            virtual placeholder* divide(placeholder* rhs)
+            placeholder* divide(placeholder* rhs) override
             {
                 return OGRE_NEW_T(numholder, MEMCATEGORY_GENERAL)(held / static_cast<numholder*>(rhs)->held);
             }
-            virtual void writeToStream(std::ostream& o)
+            void writeToStream(std::ostream& o) override
             {
                 o << held;
             }

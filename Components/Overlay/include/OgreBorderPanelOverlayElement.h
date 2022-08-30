@@ -62,14 +62,14 @@ namespace Ogre {
         BorderPanelOverlayElement(const String& name);
         virtual ~BorderPanelOverlayElement();
 
-        virtual void initialise(void);
+        void initialise(void) override;
 
         /** @copydoc OverlayElement::_releaseManualHardwareResources */
-        virtual void _releaseManualHardwareResources();
+        void _releaseManualHardwareResources() override;
         /** @copydoc OverlayElement::_restoreManualHardwareResources */
-        virtual void _restoreManualHardwareResources();
+        void _restoreManualHardwareResources() override;
 
-        const String& getTypeName(void) const;
+        const String& getTypeName(void) const override;
         /** @name Border Size
             Remember that the dimensions specified here are in relation to the size of
             the screen, so 0.1 is 1/10th of the screen width or height. Also note that because
@@ -166,16 +166,16 @@ namespace Ogre {
         const String& getBorderMaterialName(void) const;
 
         /** @copydoc OverlayContainer::_updateRenderQueue */
-        void _updateRenderQueue(RenderQueue* queue);
+        void _updateRenderQueue(RenderQueue* queue) override;
         /// @copydoc OverlayElement::visitRenderables
         void visitRenderables(Renderable::Visitor* visitor, 
             bool debugRenderables = false);
 
         /** @copydoc OverlayElement::setMetricsMode */
-        void setMetricsMode(GuiMetricsMode gmm);
+        void setMetricsMode(GuiMetricsMode gmm) override;
 
         /** @copydoc OverlayElement::_update */
-        void _update(void);
+        void _update(void) override;
     private:
         float mLeftBorderSize;
         float mRightBorderSize;
@@ -199,11 +199,11 @@ namespace Ogre {
         static String msTypeName;
 
         /// Internal method for setting up geometry, called by OverlayElement::update
-        void updatePositionGeometry(void);
+        void updatePositionGeometry(void) override;
         /// Internal method for setting up geometry, called by OverlayElement::update
-        void updateTextureGeometry(void);
+        void updateTextureGeometry(void) override;
         /// Internal method for setting up parameters
-        void addBaseParameters(void);
+        void addBaseParameters(void) override;
 
         enum BorderCellIndex {
             BCELL_TOP_LEFT = 0,
@@ -237,12 +237,12 @@ namespace Ogre {
             mUseIdentityView = true;
             mPolygonModeOverrideable = parent->getPolygonModeOverrideable();
         }
-        const MaterialPtr& getMaterial(void) const { return mParent->mBorderMaterial; }
-        void getRenderOperation(RenderOperation& op) { op = mParent->mRenderOp2; }
-        void getWorldTransforms(Matrix4* xform) const { mParent->getWorldTransforms(xform); }
-        unsigned short getNumWorldTransforms(void) const { return 1; }
-        Real getSquaredViewDepth(const Camera* cam) const { return mParent->getSquaredViewDepth(cam); }
-        const LightList& getLights(void) const
+        const MaterialPtr& getMaterial(void) const override { return mParent->mBorderMaterial; }
+        void getRenderOperation(RenderOperation& op) override { op = mParent->mRenderOp2; }
+        void getWorldTransforms(Matrix4* xform) const override { mParent->getWorldTransforms(xform); }
+        unsigned short getNumWorldTransforms(void) const override { return 1; }
+        Real getSquaredViewDepth(const Camera* cam) const override { return mParent->getSquaredViewDepth(cam); }
+        const LightList& getLights(void) const override
         {
             // N/A, panels are not lit
             static LightList ll;

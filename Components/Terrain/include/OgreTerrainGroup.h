@@ -483,13 +483,13 @@ namespace Ogre
         const TerrainSlotMap& getTerrainSlots() const { return mTerrainSlots; }
 
         /// WorkQueue::RequestHandler override
-        bool canHandleRequest(const WorkQueue::Request* req, const WorkQueue* srcQ);
+        bool canHandleRequest(const WorkQueue::Request* req, const WorkQueue* srcQ) override;
         /// WorkQueue::RequestHandler override
-        WorkQueue::Response* handleRequest(const WorkQueue::Request* req, const WorkQueue* srcQ);
+        WorkQueue::Response* handleRequest(const WorkQueue::Request* req, const WorkQueue* srcQ) override;
         /// WorkQueue::ResponseHandler override
-        bool canHandleResponse(const WorkQueue::Response* res, const WorkQueue* srcQ);
+        bool canHandleResponse(const WorkQueue::Response* res, const WorkQueue* srcQ) override;
         /// WorkQueue::ResponseHandler override
-        void handleResponse(const WorkQueue::Response* res, const WorkQueue* srcQ);
+        void handleResponse(const WorkQueue::Response* res, const WorkQueue* srcQ) override;
 
         /// Convert coordinates to a packed integer index
         uint32 packIndex(long x, long y) const;

@@ -76,11 +76,11 @@ namespace Ogre {
     class _OgreSTBICodecExport STBIPlugin : public Plugin
     {
     public:
-        const String& getName() const;
-        void install() { STBIImageCodec::startup(); }
-        void uninstall() { STBIImageCodec::shutdown(); }
-        void initialise() {}
-        void shutdown() {}
+        const String& getName() const override;
+        void install() override { STBIImageCodec::startup(); }
+        void uninstall() override { STBIImageCodec::shutdown(); }
+        void initialise() override {}
+        void shutdown() override {}
     };
     /** @} */
     /** @} */

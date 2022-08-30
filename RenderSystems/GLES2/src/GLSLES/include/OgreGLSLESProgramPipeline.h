@@ -63,19 +63,19 @@ namespace Ogre
         /** Updates program pipeline object uniforms using data from GpuProgramParameters.
          normally called by GLSLESGpuProgram::bindParameters() just before rendering occurs.
          */
-        virtual void updateUniforms(GpuProgramParametersSharedPtr params, uint16 mask, GpuProgramType fromProgType);
+        void updateUniforms(GpuProgramParametersSharedPtr params, uint16 mask, GpuProgramType fromProgType) override;
 
         /** Makes a program pipeline object active by making sure it is linked and then putting it in use.
          */
-        void activate(void);
+        void activate(void) override;
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
-        virtual void notifyOnContextLost();
+        void notifyOnContextLost() override;
 #endif
 
     protected:
         /// Compiles and links the separate vertex and fragment programs
-        virtual void compileAndLink(void);
+        void compileAndLink(void) override;
 
         /// Build uniform references from active named uniforms
         virtual void buildGLUniformReferences(void);

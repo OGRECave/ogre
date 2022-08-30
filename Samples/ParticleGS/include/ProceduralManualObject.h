@@ -36,8 +36,8 @@ namespace Ogre
         void getRenderOperation(RenderOperation& op) override { mR2vbObject->getRenderOperation(op); }
 
         // Delegate to the manual object.
-        Real getBoundingRadius(void) const { return 0; }
-        Real getSquaredViewDepth(const Camera* cam) const { return 0; }
+        Real getBoundingRadius(void) const override { return 0; }
+        Real getSquaredViewDepth(const Camera* cam) const override { return 0; }
 
     protected:
         RenderToVertexBufferSharedPtr mR2vbObject;

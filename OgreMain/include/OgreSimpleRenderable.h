@@ -75,25 +75,25 @@ namespace Ogre {
         SimpleRenderable(const String& name);
 
         virtual void setMaterial(const MaterialPtr& mat);
-        virtual const MaterialPtr& getMaterial(void) const;
+        const MaterialPtr& getMaterial(void) const override;
 
         virtual void setRenderOperation( const RenderOperation& rend );
-        virtual void getRenderOperation(RenderOperation& op);
+        void getRenderOperation(RenderOperation& op) override;
 
         void setTransform( const Affine3& xform );
-        virtual void getWorldTransforms( Matrix4* xform ) const;
+        void getWorldTransforms( Matrix4* xform ) const override;
 
 
-        virtual void _notifyCurrentCamera(Camera* cam);
+        void _notifyCurrentCamera(Camera* cam) override;
 
         void setBoundingBox( const AxisAlignedBox& box );
-        virtual const AxisAlignedBox& getBoundingBox(void) const;
+        const AxisAlignedBox& getBoundingBox(void) const override;
 
-        virtual void _updateRenderQueue(RenderQueue* queue);
+        void _updateRenderQueue(RenderQueue* queue) override;
 
         void visitRenderables(Renderable::Visitor* visitor,
             bool debugRenderables = false) override;
-        virtual const String& getMovableType(void) const override;
+        const String& getMovableType(void) const override;
         const LightList& getLights(void) const override;
 
     };

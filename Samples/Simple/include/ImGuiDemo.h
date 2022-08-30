@@ -21,7 +21,7 @@ public:
         mInfo["Thumbnail"] = "thumb_imgui.png";
     }
 
-    void preViewportUpdate(const RenderTargetViewportEvent& evt)
+    void preViewportUpdate(const RenderTargetViewportEvent& evt) override
     {
         if(!evt.source->getOverlaysEnabled()) return;
         if(!mTrayMgr->getTraysLayer()->isVisible()) return;
@@ -31,15 +31,15 @@ public:
         ImGui::ShowDemoWindow();
     }
 
-    bool keyPressed(const KeyboardEvent& evt) { return mListenerChain.keyPressed(evt); }
-    bool keyReleased(const KeyboardEvent& evt) { return mListenerChain.keyReleased(evt); }
-    bool mouseMoved(const MouseMotionEvent& evt) { return mListenerChain.mouseMoved(evt); }
-    bool mouseWheelRolled(const MouseWheelEvent& evt) { return mListenerChain.mouseWheelRolled(evt); }
-    bool mousePressed(const MouseButtonEvent& evt) { return mListenerChain.mousePressed(evt); }
-    bool mouseReleased(const MouseButtonEvent& evt) { return mListenerChain.mouseReleased(evt); }
-    bool textInput (const TextInputEvent& evt) { return mListenerChain.textInput (evt); }
+    bool keyPressed(const KeyboardEvent& evt) override { return mListenerChain.keyPressed(evt); }
+    bool keyReleased(const KeyboardEvent& evt) override { return mListenerChain.keyReleased(evt); }
+    bool mouseMoved(const MouseMotionEvent& evt) override { return mListenerChain.mouseMoved(evt); }
+    bool mouseWheelRolled(const MouseWheelEvent& evt) override { return mListenerChain.mouseWheelRolled(evt); }
+    bool mousePressed(const MouseButtonEvent& evt) override { return mListenerChain.mousePressed(evt); }
+    bool mouseReleased(const MouseButtonEvent& evt) override { return mListenerChain.mouseReleased(evt); }
+    bool textInput (const TextInputEvent& evt) override { return mListenerChain.textInput (evt); }
 
-    void setupContent(void)
+    void setupContent(void) override
     {
         auto imguiOverlay = new ImGuiOverlay();
 
@@ -77,7 +77,7 @@ public:
         node->attachObject(ent);
     }
 
-    void cleanupContent()
+    void cleanupContent() override
     {
         OverlayManager::getSingleton().destroy("ImGuiOverlay");
         mWindow->removeListener(this);

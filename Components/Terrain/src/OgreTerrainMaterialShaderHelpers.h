@@ -70,12 +70,12 @@ namespace Ogre
     {
         ShaderHelperGLSL();
     protected:
-        HighLevelGpuProgramPtr createVertexProgram(const SM2Profile* prof, const Terrain* terrain, TechniqueType tt);
-        HighLevelGpuProgramPtr createFragmentProgram(const SM2Profile* prof, const Terrain* terrain, TechniqueType tt);
-        void generateVertexProgramSource(const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, StringStream& outStream);
-        void generateFpHeader(const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, StringStream& outStream);
-        void generateFpLayer(const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, uint layer, StringStream& outStream);
-        void generateFpFooter(const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, StringStream& outStream);
+        HighLevelGpuProgramPtr createVertexProgram(const SM2Profile* prof, const Terrain* terrain, TechniqueType tt) override;
+        HighLevelGpuProgramPtr createFragmentProgram(const SM2Profile* prof, const Terrain* terrain, TechniqueType tt) override;
+        void generateVertexProgramSource(const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, StringStream& outStream) override;
+        void generateFpHeader(const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, StringStream& outStream) override;
+        void generateFpLayer(const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, uint layer, StringStream& outStream) override;
+        void generateFpFooter(const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, StringStream& outStream) override;
         void generateVpDynamicShadows(const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, StringStream& outStream);
         void generateFpDynamicShadows(const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, StringStream& outStream);
     };

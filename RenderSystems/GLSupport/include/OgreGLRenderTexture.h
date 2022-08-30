@@ -110,7 +110,7 @@ namespace Ogre {
     {
     public:
         GLRenderTexture(const String &name, const GLSurfaceDesc &target, bool writeGamma, uint fsaa);
-        bool requiresTextureFlipping() const { return true; }
+        bool requiresTextureFlipping() const override { return true; }
 
         static const String CustomAttributeString_FBO;
         static const String CustomAttributeString_TARGET;

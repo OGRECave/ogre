@@ -73,21 +73,21 @@ namespace Ogre {
         public:
             EGLSupport(int profile);
 
-            void start(void);
-            void stop(void);
+            void start(void) override;
+            void stop(void) override;
 
             EGLDisplay getGLDisplay(void);
             void setGLDisplay(EGLDisplay val);
             EGLConfig* chooseGLConfig(const EGLint *attribList, EGLint *nElements);
             EGLConfig* getConfigs(EGLint *nElements);
             EGLBoolean getGLConfigAttrib(EGLConfig fbConfig, EGLint attribute, EGLint *value);
-            void* getProcAddress(const char* name) const;
+            void* getProcAddress(const char* name) const override;
             ::EGLContext createNewContext(EGLDisplay eglDisplay, ::EGLConfig glconfig, ::EGLContext shareList) const;
 
             RenderWindow* newWindow(const String& name,
                                     unsigned int width, unsigned int height,
                                     bool fullScreen,
-                                    const NameValuePairList *miscParams = 0) {
+                                    const NameValuePairList *miscParams = 0) override {
                 return NULL;
             }
 

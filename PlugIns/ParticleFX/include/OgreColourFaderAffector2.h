@@ -48,72 +48,72 @@ namespace Ogre {
         class CmdRedAdjust1 : public ParamCommand
         {
         public:
-            String doGet(const void* target) const;
-            void doSet(void* target, const String& val);
+            String doGet(const void* target) const override;
+            void doSet(void* target, const String& val) override;
         };
 
         /** Command object for green adjust (see ParamCommand).*/
         class CmdGreenAdjust1 : public ParamCommand
         {
         public:
-            String doGet(const void* target) const;
-            void doSet(void* target, const String& val);
+            String doGet(const void* target) const override;
+            void doSet(void* target, const String& val) override;
         };
 
         /** Command object for blue adjust (see ParamCommand).*/
         class CmdBlueAdjust1 : public ParamCommand
         {
         public:
-            String doGet(const void* target) const;
-            void doSet(void* target, const String& val);
+            String doGet(const void* target) const override;
+            void doSet(void* target, const String& val) override;
         };
 
         /** Command object for alpha adjust (see ParamCommand).*/
         class CmdAlphaAdjust1 : public ParamCommand
         {
         public:
-            String doGet(const void* target) const;
-            void doSet(void* target, const String& val);
+            String doGet(const void* target) const override;
+            void doSet(void* target, const String& val) override;
         };
 
         /** Command object for red adjust (see ParamCommand).*/
         class CmdRedAdjust2 : public ParamCommand
         {
         public:
-            String doGet(const void* target) const;
-            void doSet(void* target, const String& val);
+            String doGet(const void* target) const override;
+            void doSet(void* target, const String& val) override;
         };
 
         /** Command object for green adjust (see ParamCommand).*/
         class CmdGreenAdjust2 : public ParamCommand
         {
         public:
-            String doGet(const void* target) const;
-            void doSet(void* target, const String& val);
+            String doGet(const void* target) const override;
+            void doSet(void* target, const String& val) override;
         };
 
         /** Command object for blue adjust (see ParamCommand).*/
         class CmdBlueAdjust2 : public ParamCommand
         {
         public:
-            String doGet(const void* target) const;
-            void doSet(void* target, const String& val);
+            String doGet(const void* target) const override;
+            void doSet(void* target, const String& val) override;
         };
 
         /** Command object for alpha adjust (see ParamCommand).*/
         class CmdAlphaAdjust2 : public ParamCommand
         {
         public:
-            String doGet(const void* target) const;
-            void doSet(void* target, const String& val);
+            String doGet(const void* target) const override;
+            void doSet(void* target, const String& val) override;
         };
 
         /** Command object for alpha adjust (see ParamCommand).*/
         class CmdStateChange : public ParamCommand
         {
         public:
-            String doGet(const void* target) const;
-            void doSet(void* target, const String& val);
+            String doGet(const void* target) const override;
+            void doSet(void* target, const String& val) override;
         };
 
 

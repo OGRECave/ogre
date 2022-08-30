@@ -17,15 +17,15 @@ namespace OgreBites
     struct _OgreBitesExport ImGuiInputListener : public InputListener
     {
         ImGuiInputListener();
-        bool keyPressed(const KeyboardEvent& evt);
-        bool keyReleased(const KeyboardEvent& evt);
-        bool mouseMoved(const MouseMotionEvent& evt);
-        bool mouseWheelRolled(const MouseWheelEvent& evt);
-        bool mousePressed(const MouseButtonEvent& evt);
-        bool mouseReleased(const MouseButtonEvent& evt);
-        bool textInput (const TextInputEvent& evt);
-        bool buttonPressed(const ButtonEvent& evt);
-        bool buttonReleased(const ButtonEvent& evt);
+        bool keyPressed(const KeyboardEvent& evt) override;
+        bool keyReleased(const KeyboardEvent& evt) override;
+        bool mouseMoved(const MouseMotionEvent& evt) override;
+        bool mouseWheelRolled(const MouseWheelEvent& evt) override;
+        bool mousePressed(const MouseButtonEvent& evt) override;
+        bool mouseReleased(const MouseButtonEvent& evt) override;
+        bool textInput (const TextInputEvent& evt) override;
+        bool buttonPressed(const ButtonEvent& evt) override;
+        bool buttonReleased(const ButtonEvent& evt) override;
     };
 }
 

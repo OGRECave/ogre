@@ -16,12 +16,12 @@ class _OgreTinyExport TinyPlugin : public Plugin
 public:
     TinyPlugin();
 
-    const String& getName() const;
+    const String& getName() const override;
 
-    void install();
-    void initialise();
-    void shutdown();
-    void uninstall();
+    void install() override;
+    void initialise() override;
+    void shutdown() override;
+    void uninstall() override;
 
 protected:
     RenderSystem* mRenderSystem;

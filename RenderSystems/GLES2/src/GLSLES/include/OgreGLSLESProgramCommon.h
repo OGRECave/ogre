@@ -44,9 +44,9 @@ namespace Ogre {
     {
     protected:
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
-        virtual void notifyOnContextLost();
+        void notifyOnContextLost() override;
 
-        virtual void notifyOnContextReset();
+        void notifyOnContextReset() override;
 #endif
         /// Constructor should only be used by GLSLESLinkProgramManager and GLSLESProgramPipelineManager
         GLSLESProgramCommon(const GLShaderList& shaders);

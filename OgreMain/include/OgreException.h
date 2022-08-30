@@ -165,8 +165,7 @@ namespace Ogre {
         */
         const String &getDescription(void) const { return description; }
 
-        /// Override std::exception::what
-        const char* what() const throw() { return fullDesc.c_str(); }
+        const char* what() const throw() override { return fullDesc.c_str(); }
         
     };
 

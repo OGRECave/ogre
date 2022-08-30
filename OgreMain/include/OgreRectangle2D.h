@@ -51,7 +51,7 @@ namespace Ogre {
     protected:
         /** Override this method to prevent parent transforms (rotation,translation,scale)
         */
-        void getWorldTransforms( Matrix4* xform ) const;
+        void getWorldTransforms( Matrix4* xform ) const override;
 
         void _initRectangle2D(bool includeTextureCoords, HardwareBuffer::Usage vBufUsage);
 
@@ -86,10 +86,10 @@ namespace Ogre {
 
         void setDefaultUVs();
 
-        Real getSquaredViewDepth(const Camera* cam) const
+        Real getSquaredViewDepth(const Camera* cam) const override
         { (void)cam; return 0; }
 
-        Real getBoundingRadius(void) const { return 0; }
+        Real getBoundingRadius(void) const override { return 0; }
 
         const String& getMovableType() const override;
     };

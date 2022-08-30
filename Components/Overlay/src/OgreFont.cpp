@@ -58,38 +58,38 @@ namespace Ogre
     class CmdType : public ParamCommand
     {
     public:
-        String doGet(const void* target) const;
-        void doSet(void* target, const String& val);
+        String doGet(const void* target) const override;
+        void doSet(void* target, const String& val) override;
     };
     class CmdSource : public ParamCommand
     {
     public:
-        String doGet(const void* target) const;
-        void doSet(void* target, const String& val);
+        String doGet(const void* target) const override;
+        void doSet(void* target, const String& val) override;
     };
     class CmdCharSpacer : public ParamCommand
     {
     public:
-        String doGet(const void* target) const;
-        void doSet(void* target, const String& val);
+        String doGet(const void* target) const override;
+        void doSet(void* target, const String& val) override;
     };
     class CmdSize : public ParamCommand
     {
     public:
-        String doGet(const void* target) const;
-        void doSet(void* target, const String& val);
+        String doGet(const void* target) const override;
+        void doSet(void* target, const String& val) override;
     };
     class CmdResolution : public ParamCommand
     {
     public:
-        String doGet(const void* target) const;
-        void doSet(void* target, const String& val);
+        String doGet(const void* target) const override;
+        void doSet(void* target, const String& val) override;
     };
     class CmdCodePoints : public ParamCommand
     {
     public:
-        String doGet(const void* target) const;
-        void doSet(void* target, const String& val);
+        String doGet(const void* target) const override;
+        void doSet(void* target, const String& val) override;
     };
 
     // Command object for setting / getting parameters

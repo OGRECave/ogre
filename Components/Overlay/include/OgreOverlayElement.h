@@ -443,15 +443,14 @@ namespace Ogre {
         */
         ushort getZOrder() const { return mZOrder; }
 
-        /** Overridden from Renderable */
-        Real getSquaredViewDepth(const Camera* cam) const 
+        Real getSquaredViewDepth(const Camera* cam) const override
         { 
             (void)cam;
             return 10000.0f - (Real)getZOrder(); 
         }
 
         /** @copydoc Renderable::getLights */
-        const LightList& getLights(void) const
+        const LightList& getLights(void) const override
         {
             // Overlayelements should not be lit by the scene, this will not get called
             static LightList ll;

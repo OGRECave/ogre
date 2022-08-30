@@ -279,10 +279,10 @@ namespace Ogre
         virtual NumericKeyFrame* createNumericKeyFrame(Real timePos);
 
         /// @copydoc AnimationTrack::getInterpolatedKeyFrame
-        virtual void getInterpolatedKeyFrame(const TimeIndex& timeIndex, KeyFrame* kf) const;
+        void getInterpolatedKeyFrame(const TimeIndex& timeIndex, KeyFrame* kf) const override;
 
         /// @copydoc AnimationTrack::apply
-        virtual void apply(const TimeIndex& timeIndex, Real weight = 1.0, Real scale = 1.0f);
+        void apply(const TimeIndex& timeIndex, Real weight = 1.0, Real scale = 1.0f) override;
 
         /** Applies an animation track to a given animable value.
         @param anim The AnimableValue to which to apply the animation
@@ -314,7 +314,7 @@ namespace Ogre
         AnimableValuePtr mTargetAnim;
 
         /// @copydoc AnimationTrack::createKeyFrameImpl
-        KeyFrame* createKeyFrameImpl(Real time);
+        KeyFrame* createKeyFrameImpl(Real time) override;
 
 
     };
@@ -356,13 +356,13 @@ namespace Ogre
         virtual bool getUseShortestRotationPath() const;
 
         /// @copydoc AnimationTrack::getInterpolatedKeyFrame
-        virtual void getInterpolatedKeyFrame(const TimeIndex& timeIndex, KeyFrame* kf) const;
+        void getInterpolatedKeyFrame(const TimeIndex& timeIndex, KeyFrame* kf) const override;
 
         /// @copydoc AnimationTrack::apply
-        virtual void apply(const TimeIndex& timeIndex, Real weight = 1.0, Real scale = 1.0f);
+        void apply(const TimeIndex& timeIndex, Real weight = 1.0, Real scale = 1.0f) override;
 
         /// @copydoc AnimationTrack::_keyFrameDataChanged
-        void _keyFrameDataChanged(void) const;
+        void _keyFrameDataChanged(void) const override;
 
         /** Returns the KeyFrame at the specified index. */
         virtual TransformKeyFrame* getNodeKeyFrame(unsigned short index) const;
@@ -372,19 +372,19 @@ namespace Ogre
             doing anything useful - can be used to determine if this track
             can be optimised out.
         */
-        virtual bool hasNonZeroKeyFrames(void) const;
+        bool hasNonZeroKeyFrames(void) const override;
 
         /** Optimise the current track by removing any duplicate keyframes. */
-        virtual void optimise(void);
+        void optimise(void) override;
 
         /** Clone this track (internal use only) */
         NodeAnimationTrack* _clone(Animation* newParent) const;
         
-        void _applyBaseKeyFrame(const KeyFrame* base);
+        void _applyBaseKeyFrame(const KeyFrame* base) override;
         
     private:
         /// Specialised keyframe creation
-        KeyFrame* createKeyFrameImpl(Real time);
+        KeyFrame* createKeyFrameImpl(Real time) override;
         // Flag indicating we need to rebuild the splines next time
         virtual void buildInterpolationSplines(void) const;
 
@@ -514,10 +514,10 @@ namespace Ogre
 
         /** @copydoc AnimationTrack::getInterpolatedKeyFrame
         */
-        virtual void getInterpolatedKeyFrame(const TimeIndex& timeIndex, KeyFrame* kf) const;
+        void getInterpolatedKeyFrame(const TimeIndex& timeIndex, KeyFrame* kf) const override;
 
         /// @copydoc AnimationTrack::apply
-        virtual void apply(const TimeIndex& timeIndex, Real weight = 1.0, Real scale = 1.0f);
+        void apply(const TimeIndex& timeIndex, Real weight = 1.0, Real scale = 1.0f) override;
 
         /** As the 'apply' method but applies to specified VertexData instead of 
             associated data. */
@@ -546,15 +546,15 @@ namespace Ogre
         doing anything useful - can be used to determine if this track
         can be optimised out.
         */
-        virtual bool hasNonZeroKeyFrames(void) const;
+        bool hasNonZeroKeyFrames(void) const override;
 
         /** Optimise the current track by removing any duplicate keyframes. */
-        virtual void optimise(void);
+        void optimise(void) override;
 
         /** Clone this track (internal use only) */
         VertexAnimationTrack* _clone(Animation* newParent) const;
         
-        void _applyBaseKeyFrame(const KeyFrame* base);
+        void _applyBaseKeyFrame(const KeyFrame* base) override;
 
     private:
         /// Animation type
@@ -565,7 +565,7 @@ namespace Ogre
         VertexData* mTargetVertexData;
 
         /// @copydoc AnimationTrack::createKeyFrameImpl
-        KeyFrame* createKeyFrameImpl(Real time);
+        KeyFrame* createKeyFrameImpl(Real time) override;
 
         /// Utility method for applying pose animation
         void applyPoseToVertexData(const Pose* pose, VertexData* data, Real influence);

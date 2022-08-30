@@ -89,11 +89,11 @@ namespace Ogre {
         void _restoreManualHardwareResources();
 
         /// @copydoc ScriptLoader::getScriptPatterns
-        const StringVector& getScriptPatterns(void) const;
+        const StringVector& getScriptPatterns(void) const override;
         /// @copydoc ScriptLoader::parseScript
-        void parseScript(DataStreamPtr& stream, const String& groupName);
+        void parseScript(DataStreamPtr& stream, const String& groupName) override;
         /// @copydoc ScriptLoader::getLoadingOrder
-        Real getLoadingOrder(void) const;
+        Real getLoadingOrder(void) const override;
 
         void addOverlay(Overlay* overlay);
 

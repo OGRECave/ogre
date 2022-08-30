@@ -46,8 +46,8 @@ public:
     PageManager* mPageManager;
     SceneManager* mSceneMgr;
 
-    void SetUp();
-    void TearDown();
+    void SetUp() override;
+    void TearDown() override;
 };
 // Register the test suite
 

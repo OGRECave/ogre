@@ -17,12 +17,12 @@ namespace Ogre {
 class TerrainTransform : public RTShader::SubRenderState
 {
 public:
-    const String& getType() const { return Type; }
-    int getExecutionOrder() const { return RTShader::FFP_TRANSFORM; }
-    void copyFrom(const SubRenderState& rhs) {}
-    bool createCpuSubPrograms(RTShader::ProgramSet* programSet);
-    bool preAddToRenderState(const RTShader::RenderState* renderState, Pass* srcPass, Pass* dstPass);
-    void updateGpuProgramsParams(Renderable* rend, const Pass* pass, const AutoParamDataSource* source, const LightList* pLightList);
+    const String& getType() const override { return Type; }
+    int getExecutionOrder() const override { return RTShader::FFP_TRANSFORM; }
+    void copyFrom(const SubRenderState& rhs) override {}
+    bool createCpuSubPrograms(RTShader::ProgramSet* programSet) override;
+    bool preAddToRenderState(const RTShader::RenderState* renderState, Pass* srcPass, Pass* dstPass) override;
+    void updateGpuProgramsParams(Renderable* rend, const Pass* pass, const AutoParamDataSource* source, const LightList* pLightList) override;
 
     static String Type;
 private:
@@ -37,10 +37,10 @@ private:
 class TerrainTransformFactory : public RTShader::SubRenderStateFactory
 {
 public:
-    const String& getType() const;
+    const String& getType() const override;
 
 protected:
-    RTShader::SubRenderState* createInstanceImpl();
+    RTShader::SubRenderState* createInstanceImpl() override;
 };
 }
 #endif

@@ -97,7 +97,7 @@ namespace Ogre {
             GLenum getBlendMode(SceneBlendFactor ogreBlend) const;
             void bindVertexElementToGpu(const VertexElement& elem,
                                         const HardwareVertexBufferSharedPtr& vertexBuffer,
-                                        const size_t vertexStart);
+                                        const size_t vertexStart) override;
 
             /** Initialises GL extensions, must be done AFTER the GL context has been
                 established.
@@ -116,75 +116,75 @@ namespace Ogre {
             // Overridden RenderSystem functions
             // ----------------------------------
 
-            const String& getName(void) const;
+            const String& getName(void) const override;
 
             void _initialise() override;
 
-            virtual RenderSystemCapabilities* createRenderSystemCapabilities() const;
+            RenderSystemCapabilities* createRenderSystemCapabilities() const override;
 
-            void initialiseFromRenderSystemCapabilities(RenderSystemCapabilities* caps, RenderTarget* primary);
+            void initialiseFromRenderSystemCapabilities(RenderSystemCapabilities* caps, RenderTarget* primary) override;
 
-            void shutdown(void);
+            void shutdown(void) override;
 
             /// @copydoc RenderSystem::_createRenderWindow
             RenderWindow* _createRenderWindow(const String &name, unsigned int width, unsigned int height, 
-                bool fullScreen, const NameValuePairList *miscParams = 0);
+                bool fullScreen, const NameValuePairList *miscParams = 0) override;
 
             /// @copydoc RenderSystem::_createDepthBufferFor
-            DepthBuffer* _createDepthBufferFor( RenderTarget *renderTarget );
+            DepthBuffer* _createDepthBufferFor( RenderTarget *renderTarget ) override;
 
             /// @copydoc RenderSystem::createMultiRenderTarget
-            virtual MultiRenderTarget * createMultiRenderTarget(const String & name);
+            MultiRenderTarget * createMultiRenderTarget(const String & name) override;
 
 
-            void destroyRenderWindow(const String& name);
+            void destroyRenderWindow(const String& name) override;
 
             // -----------------------------
             // Low-level overridden members
             // -----------------------------
-            void _setTexture(size_t unit, bool enabled, const TexturePtr &tex);
+            void _setTexture(size_t unit, bool enabled, const TexturePtr &tex) override;
 
-            void _setSampler(size_t unit, Sampler& sampler);
+            void _setSampler(size_t unit, Sampler& sampler) override;
 
-            void _setTextureAddressingMode(size_t stage, const Sampler::UVWAddressingMode& uvw);
+            void _setTextureAddressingMode(size_t stage, const Sampler::UVWAddressingMode& uvw) override;
 
-            void _setLineWidth(float width);
+            void _setLineWidth(float width) override;
 
-            void _setViewport(Viewport *vp);
+            void _setViewport(Viewport *vp) override;
 
-            void _endFrame(void);
+            void _endFrame(void) override;
 
-            void _setCullingMode(CullingMode mode);
+            void _setCullingMode(CullingMode mode) override;
 
-            void _setDepthBufferParams(bool depthTest = true, bool depthWrite = true, CompareFunction depthFunction = CMPF_LESS_EQUAL);
+            void _setDepthBufferParams(bool depthTest = true, bool depthWrite = true, CompareFunction depthFunction = CMPF_LESS_EQUAL) override;
 
-            void _setDepthBufferCheckEnabled(bool enabled = true);
+            void _setDepthBufferCheckEnabled(bool enabled = true) override;
 
-            void _setDepthBufferWriteEnabled(bool enabled = true);
+            void _setDepthBufferWriteEnabled(bool enabled = true) override;
 
-            void _setDepthBufferFunction(CompareFunction func = CMPF_LESS_EQUAL);
+            void _setDepthBufferFunction(CompareFunction func = CMPF_LESS_EQUAL) override;
 
-            void _setDepthBias(float constantBias, float slopeScaleBias);
+            void _setDepthBias(float constantBias, float slopeScaleBias) override;
 
-            void setColourBlendState(const ColourBlendState& state);
+            void setColourBlendState(const ColourBlendState& state) override;
 
-            void _setPolygonMode(PolygonMode level);
+            void _setPolygonMode(PolygonMode level) override;
 
             void setStencilState(const StencilState& state) override;
 
-            virtual void _setTextureUnitFiltering(size_t unit, FilterOptions minFilter,
-                FilterOptions magFilter, FilterOptions mipFilter);              
+            void _setTextureUnitFiltering(size_t unit, FilterOptions minFilter,
+                FilterOptions magFilter, FilterOptions mipFilter) override;
 
-            void _setTextureUnitFiltering(size_t unit, FilterType ftype, FilterOptions filter);
+            void _setTextureUnitFiltering(size_t unit, FilterType ftype, FilterOptions filter) override;
 
-            void _render(const RenderOperation& op);
+            void _render(const RenderOperation& op) override;
 
-            void setScissorTest(bool enabled, const Rect& rect = Rect());
+            void setScissorTest(bool enabled, const Rect& rect = Rect()) override;
 
             void clearFrameBuffer(unsigned int buffers,
                 const ColourValue& colour = ColourValue::Black,
-                float depth = 1.0f, unsigned short stencil = 0);
-            HardwareOcclusionQuery* createHardwareOcclusionQuery(void);
+                float depth = 1.0f, unsigned short stencil = 0) override;
+            HardwareOcclusionQuery* createHardwareOcclusionQuery(void) override;
 
             // ----------------------------------
             // GLES2RenderSystem specific members
@@ -192,13 +192,13 @@ namespace Ogre {
             GLES2StateCacheManager * _getStateCacheManager() { return mStateCacheManager; }
         
             /** Create VAO on current context */
-            uint32 _createVao();
+            uint32 _createVao() override;
             /** Bind VAO, context should be equal to current context, as VAOs are not shared  */
-            void _bindVao(GLContext* context, uint32 vao);
+            void _bindVao(GLContext* context, uint32 vao) override;
             /** Destroy VAO immediately or defer if it was created on other context */
-            void _destroyVao(GLContext* context, uint32 vao);
+            void _destroyVao(GLContext* context, uint32 vao) override;
             /** Destroy FBO immediately or defer if it was created on other context */
-            void _destroyFbo(GLContext* context, uint32 fbo);
+            void _destroyFbo(GLContext* context, uint32 fbo) override;
 
             /** Unregister a render target->context mapping. If the context of target 
              is the current context, change the context to the main context so it
@@ -207,48 +207,48 @@ namespace Ogre {
              @note This is automatically called by the destructor of 
              GLContext.
              */
-            void _unregisterContext(GLContext *context);
+            void _unregisterContext(GLContext *context) override;
             /** Switch GL context, dealing with involved internal cached states too
              */
             void _switchContext(GLContext *context);
-            void _oneTimeContextInitialization();
+            void _oneTimeContextInitialization() override;
             void initialiseContext(RenderWindow* primary);
             /**
              * Set current render target to target, enabling its GL context if needed
              */
-            void _setRenderTarget(RenderTarget *target);
+            void _setRenderTarget(RenderTarget *target) override;
 
             GLint convertCompareFunction(CompareFunction func) const;
             GLint convertStencilOp(StencilOperation op, bool invert = false) const;
 
-            void bindGpuProgram(GpuProgram* prg);
-            void unbindGpuProgram(GpuProgramType gptype);
-            void bindGpuProgramParameters(GpuProgramType gptype, const GpuProgramParametersPtr& params, uint16 mask);
+            void bindGpuProgram(GpuProgram* prg) override;
+            void unbindGpuProgram(GpuProgramType gptype) override;
+            void bindGpuProgramParameters(GpuProgramType gptype, const GpuProgramParametersPtr& params, uint16 mask) override;
 
             /// @copydoc RenderSystem::_setAlphaRejectSettings
-            void _setAlphaRejectSettings( CompareFunction func, unsigned char value, bool alphaToCoverage );
+            void _setAlphaRejectSettings( CompareFunction func, unsigned char value, bool alphaToCoverage ) override;
 
             void _destroyDepthBuffer(RenderTarget* pRenderWnd);
         
             /// @copydoc RenderSystem::beginProfileEvent
-            virtual void beginProfileEvent( const String &eventName );
+            void beginProfileEvent( const String &eventName ) override;
             
             /// @copydoc RenderSystem::endProfileEvent
-            virtual void endProfileEvent( void );
+            void endProfileEvent( void ) override;
             
             /// @copydoc RenderSystem::markProfileEvent
-            virtual void markProfileEvent( const String &eventName );
+            void markProfileEvent( const String &eventName ) override;
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
-            void resetRenderer(RenderWindow* pRenderWnd);
+            void resetRenderer(RenderWindow* pRenderWnd) override;
         
-            void notifyOnContextLost();
+            void notifyOnContextLost() override;
 
             static GLES2ManagedResourceManager* getResourceManager();
     private:
             static GLES2ManagedResourceManager* mResourceManager;
 #endif
-            void _copyContentsToMemory(Viewport* vp, const Box& src, const PixelBox& dst, RenderWindow::FrameBuffer buffer);
+            void _copyContentsToMemory(Viewport* vp, const Box& src, const PixelBox& dst, RenderWindow::FrameBuffer buffer) override;
     };
 }
 

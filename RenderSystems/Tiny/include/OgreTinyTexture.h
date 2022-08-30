@@ -21,8 +21,8 @@ namespace Ogre {
 
     protected:
         Image mBuffer;
-        void createInternalResourcesImpl(void);
-        void freeInternalResourcesImpl(void) {}
+        void createInternalResourcesImpl(void) override;
+        void freeInternalResourcesImpl(void) override {}
     };
 }
 

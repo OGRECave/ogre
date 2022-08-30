@@ -76,8 +76,8 @@ namespace Ogre
     class _OgreTerrainExport TerrainAutoUpdateLodByDistance : public TerrainAutoUpdateLod
     {
     public:
-        virtual void autoUpdateLod(Terrain *terrain, bool synchronous, const Any &data);
-        virtual uint32 getStrategyId() { return BY_DISTANCE; }
+        void autoUpdateLod(Terrain *terrain, bool synchronous, const Any &data) override;
+        uint32 getStrategyId() override { return BY_DISTANCE; }
 
     private:
         /** Modifies Terrain's LOD level according to it's distance from camera.

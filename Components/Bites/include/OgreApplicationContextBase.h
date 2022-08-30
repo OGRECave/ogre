@@ -119,12 +119,12 @@ namespace OgreBites
         void closeApp();
 
         // callback interface copied from various listeners to be used by ApplicationContext
-        virtual bool frameStarted(const Ogre::FrameEvent& evt) {
+        bool frameStarted(const Ogre::FrameEvent& evt) override {
             pollEvents();
             return true;
         }
-        virtual bool frameRenderingQueued(const Ogre::FrameEvent& evt);
-        virtual bool frameEnded(const Ogre::FrameEvent& evt) { return true; }
+        bool frameRenderingQueued(const Ogre::FrameEvent& evt) override;
+        bool frameEnded(const Ogre::FrameEvent& evt) override { return true; }
         virtual void windowMoved(Ogre::RenderWindow* rw) {}
         virtual void windowResized(Ogre::RenderWindow* rw) {}
         virtual bool windowClosing(Ogre::RenderWindow* rw) { return true; }

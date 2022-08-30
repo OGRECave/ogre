@@ -66,8 +66,8 @@ namespace Ogre
         PCZSceneNode( SceneManager* creator, const String& name );
         /** Standard destructor */
         ~PCZSceneNode();
-        void _update(bool updateChildren, bool parentHasChanged);
-        void updateFromParentImpl() const;
+        void _update(bool updateChildren, bool parentHasChanged) override;
+        void updateFromParentImpl() const override;
 
         SceneNode* createChildSceneNode(const Vector3& translate = Vector3::ZERO,
                                         const Quaternion& rotate = Quaternion::IDENTITY) override;

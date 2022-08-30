@@ -312,7 +312,7 @@ private:
 
     // supply virtual functions for Compiler2Pass
     /// Pass 1 is completed so now take tokens generated and build machine instructions
-    bool doPass2();
+    bool doPass2() override;
 
     /** Build a machine instruction from token and ready it for expansion
         will expand CISC tokens using macro database

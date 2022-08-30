@@ -42,19 +42,19 @@ namespace Ogre {
         protected:
             GLES2RenderSystem* mRenderSystem;
             /// Internal method for creates a new vertex declaration, may be overridden by certain rendering APIs
-            VertexDeclaration* createVertexDeclarationImpl(void);
+            VertexDeclaration* createVertexDeclarationImpl(void) override;
         public:
             GLES2HardwareBufferManager();
             virtual ~GLES2HardwareBufferManager();
             /// Creates a vertex buffer
             HardwareVertexBufferSharedPtr createVertexBuffer(size_t vertexSize,
-                size_t numVerts, HardwareBuffer::Usage usage, bool useShadowBuffer = false);
+                size_t numVerts, HardwareBuffer::Usage usage, bool useShadowBuffer = false) override;
             /// Create a hardware vertex buffer
             HardwareIndexBufferSharedPtr createIndexBuffer(
                 HardwareIndexBuffer::IndexType itype, size_t numIndexes,
-                HardwareBuffer::Usage usage, bool useShadowBuffer = false);
+                HardwareBuffer::Usage usage, bool useShadowBuffer = false) override;
             /// Create a render to vertex buffer
-            RenderToVertexBufferSharedPtr createRenderToVertexBuffer();
+            RenderToVertexBufferSharedPtr createRenderToVertexBuffer() override;
             /// Create a uniform buffer
             HardwareBufferPtr createUniformBuffer(size_t sizeBytes, HardwareBufferUsage usage,
                                                   bool useShadowBuffer) override;

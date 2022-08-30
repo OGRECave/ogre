@@ -36,8 +36,8 @@ namespace Ogre
     class CmdDelegate : public ParamCommand
     {
     public:
-        String doGet(const void* target) const;
-        void doSet(void* target, const String& val);
+        String doGet(const void* target) const override;
+        void doSet(void* target, const String& val) override;
     };
     static CmdDelegate msCmdDelegate;
     static const String sLanguage = "unified";

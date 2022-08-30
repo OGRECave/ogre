@@ -63,15 +63,15 @@ protected:
     
     void setupGUI();
     void setupScene();
-    virtual void setupContent();
-    virtual void cleanupContent();
+    void setupContent() override;
+    void cleanupContent() override;
     
-    void sliderMoved(Slider* slider);
-    void buttonHit(OgreBites::Button* button);
-    void checkBoxToggled(CheckBox* box);
-    void itemSelected(SelectMenu* menu);
+    void sliderMoved(Slider* slider) override;
+    void buttonHit(OgreBites::Button* button) override;
+    void checkBoxToggled(CheckBox* box) override;
+    void itemSelected(SelectMenu* menu) override;
     void changePage(int nextPage = -1);
-    virtual bool frameRenderingQueued(const FrameEvent& evt);
+    bool frameRenderingQueued(const FrameEvent& evt) override;
 };
 
 /**********************************************************************

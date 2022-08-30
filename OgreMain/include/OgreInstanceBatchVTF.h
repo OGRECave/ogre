@@ -135,7 +135,7 @@ namespace Ogre
         virtual void updateSharedLookupIndexes();
 
         /** @see InstanceBatch::generateInstancedEntity() */
-        virtual InstancedEntity* generateInstancedEntity(size_t num);
+        InstancedEntity* generateInstancedEntity(size_t num) override;
 
     public:
         BaseInstanceBatchVTF( InstanceManager *creator, MeshPtr &meshReference, const MaterialPtr &material,
@@ -144,14 +144,14 @@ namespace Ogre
         virtual ~BaseInstanceBatchVTF();
 
         /** @see InstanceBatch::buildFrom */
-        void buildFrom( const SubMesh *baseSubMesh, const RenderOperation &renderOperation );
+        void buildFrom( const SubMesh *baseSubMesh, const RenderOperation &renderOperation ) override;
 
         //Renderable overloads
-        void getWorldTransforms( Matrix4* xform ) const;
-        unsigned short getNumWorldTransforms(void) const;
+        void getWorldTransforms( Matrix4* xform ) const override;
+        unsigned short getNumWorldTransforms(void) const override;
 
         /** Overloaded to be able to updated the vertex texture */
-        void _updateRenderQueue(RenderQueue* queue);
+        void _updateRenderQueue(RenderQueue* queue) override;
 
         /** Sets the state of the usage of bone matrix lookup
         
@@ -189,7 +189,7 @@ namespace Ogre
         bool useOneWeight() const { return mUseOneWeight; }
 
         /** @see InstanceBatch::useBoneWorldMatrices()  */
-        virtual bool useBoneWorldMatrices() const { return !mUseBoneMatrixLookup; }
+        bool useBoneWorldMatrices() const override { return !mUseBoneMatrixLookup; }
 
         /** @return the maximum amount of shared transform entities when using lookup table*/
         virtual size_t getMaxLookupTableInstances() const { return mMaxLookupTableInstances; }
@@ -199,14 +199,14 @@ namespace Ogre
     class _OgreExport InstanceBatchVTF : public BaseInstanceBatchVTF
     {
         
-        void setupVertices( const SubMesh* baseSubMesh );
-        void setupIndices( const SubMesh* baseSubMesh );
+        void setupVertices( const SubMesh* baseSubMesh ) override;
+        void setupIndices( const SubMesh* baseSubMesh ) override;
 
         /** Creates 2 TEXCOORD semantics that will be used to sample the vertex texture */
         void createVertexSemantics( VertexData *thisVertexData, VertexData *baseVertexData,
-            const HWBoneIdxVec &hwBoneIdx, const HWBoneWgtVec &hwBoneWgt );
+            const HWBoneIdxVec &hwBoneIdx, const HWBoneWgtVec &hwBoneWgt ) override;
 
-        virtual bool matricesTogetherPerRow() const { return false; }
+        bool matricesTogetherPerRow() const override { return false; }
     public:
         InstanceBatchVTF( InstanceManager *creator, MeshPtr &meshReference, const MaterialPtr &material,
                             size_t instancesPerBatch, const Mesh::IndexMap *indexToBoneMap,
@@ -214,7 +214,7 @@ namespace Ogre
         virtual ~InstanceBatchVTF();
 
         /** @see InstanceBatch::calculateMaxNumInstances */
-        size_t calculateMaxNumInstances( const SubMesh *baseSubMesh, uint16 flags ) const;
+        size_t calculateMaxNumInstances( const SubMesh *baseSubMesh, uint16 flags ) const override;
     };
 }
 

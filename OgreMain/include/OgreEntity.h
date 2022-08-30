@@ -743,7 +743,7 @@ namespace Ogre {
         */
         TempBlendedBufferInfo* _getVertexAnimTempBufferInfo(void);
         /// Override to return specific type flag.
-        uint32 getTypeFlags(void) const;
+        uint32 getTypeFlags(void) const override;
         /// Retrieve the VertexData which should be used for GPU binding.
         VertexData* getVertexDataForBinding(void);
 
@@ -792,7 +792,7 @@ namespace Ogre {
         /** Resource::Listener hook to notify Entity that a delay-loaded Mesh is
             complete.
         */
-        void loadingComplete(Resource* res);
+        void loadingComplete(Resource* res) override;
 
         void visitRenderables(Renderable::Visitor* visitor, bool debugRenderables = false) override;
 
@@ -854,14 +854,14 @@ namespace Ogre {
     class _OgreExport EntityFactory : public MovableObjectFactory
     {
     private:
-        MovableObject* createInstanceImpl( const String& name, const NameValuePairList* params);
+        MovableObject* createInstanceImpl( const String& name, const NameValuePairList* params) override;
     public:
         EntityFactory() {}
         ~EntityFactory() {}
 
         static String FACTORY_TYPE_NAME;
 
-        const String& getType(void) const;
+        const String& getType(void) const override;
     };
     /** @} */
     /** @} */

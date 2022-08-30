@@ -52,8 +52,8 @@ namespace Ogre {
             size_t      mIndex;
 
         public:
-            String doGet(const void* target) const;
-            void doSet(void* target, const String& val);
+            String doGet(const void* target) const override;
+            void doSet(void* target, const String& val) override;
         };
 
         /** Command object for red adjust (see ParamCommand).*/
@@ -63,8 +63,8 @@ namespace Ogre {
             size_t      mIndex;
 
         public:
-            String doGet(const void* target) const;
-            void doSet(void* target, const String& val);
+            String doGet(const void* target) const override;
+            void doSet(void* target, const String& val) override;
         };
 
         /** Default constructor. */

@@ -90,14 +90,14 @@ namespace Ogre
         virtual const ContentList& getContentList() const { return mContentList; }
 
         // Overridden from PageContentCollection
-        virtual void save(StreamSerialiser& stream);
-        virtual void frameStart(Real timeSinceLastFrame);
-        virtual void frameEnd(Real timeElapsed);
-        virtual void notifyCamera(Camera* cam);
-        bool prepare(StreamSerialiser& stream);
-        void load();
-        void unload();
-        void unprepare();
+        void save(StreamSerialiser& stream) override;
+        void frameStart(Real timeSinceLastFrame) override;
+        void frameEnd(Real timeElapsed) override;
+        void notifyCamera(Camera* cam) override;
+        bool prepare(StreamSerialiser& stream) override;
+        void load() override;
+        void unload() override;
+        void unprepare() override;
 
     protected:
 
@@ -116,13 +116,13 @@ namespace Ogre
         SimplePageContentCollectionFactory() {}
         ~SimplePageContentCollectionFactory() {}
 
-        const String& getName() const { return FACTORY_NAME; }
+        const String& getName() const override { return FACTORY_NAME; }
 
-        PageContentCollection* createInstance() OGRE_NODISCARD
+        PageContentCollection* createInstance() override OGRE_NODISCARD
         {
             return OGRE_NEW SimplePageContentCollection(this); 
         }
-        void destroyInstance(PageContentCollection* c)
+        void destroyInstance(PageContentCollection* c) override
         {
             OGRE_DELETE c;
         }

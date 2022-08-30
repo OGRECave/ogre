@@ -120,10 +120,10 @@ namespace Volume {
         void processWorkQueue(void);
 
         /// Implementation for WorkQueue::RequestHandler
-        WorkQueue::Response* handleRequest(const WorkQueue::Request* req, const WorkQueue* srcQ);
+        WorkQueue::Response* handleRequest(const WorkQueue::Request* req, const WorkQueue* srcQ) override;
         
         /// Implementation for WorkQueue::ResponseHandler
-        void handleResponse(const WorkQueue::Response* res, const WorkQueue* srcQ);
+        void handleResponse(const WorkQueue::Response* res, const WorkQueue* srcQ) override;
         
     };
     /** @} */

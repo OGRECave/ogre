@@ -29,18 +29,18 @@ class _OgreSampleClassExport Sample_AtomicCounters : public SdkSample
         mInfo["Category"] = "Unsorted";
     }
 
-    void testCapabilities(const RenderSystemCapabilities* caps)
+    void testCapabilities(const RenderSystemCapabilities* caps) override
     {
         requireMaterial("Example/RasterizationOrder");
     }
 
-    bool frameEnded(const FrameEvent& evt)
+    bool frameEnded(const FrameEvent& evt) override
     {
         GpuProgramManager::getSingleton().getSharedParameters("CounterBuffer")->setNamedConstant("ac", 0);
         return true;
     }
 
-    void setupContent()
+    void setupContent() override
     {
         mViewport->setBackgroundColour(ColourValue(0.3, 0.3, 0.3));
 

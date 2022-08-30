@@ -47,7 +47,7 @@ public:
 
     uint getGLID() const { return mTextureID; }
 
-    void getCustomAttribute(const String& name, void* pData);
+    void getCustomAttribute(const String& name, void* pData) override;
 
 protected:
     uint mTextureID;

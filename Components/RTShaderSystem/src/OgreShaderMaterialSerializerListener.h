@@ -50,29 +50,17 @@ class SGMaterialSerializerListener : public MaterialSerializer::Listener, public
 // Interface.
 public:
 
-    /** 
-    @see MaterialSerializer::Listener::materialEventRaised
-    */
-    virtual void materialEventRaised(MaterialSerializer* ser, 
-        MaterialSerializer::SerializeEvent event, bool& skip, const Material* mat);
+    void materialEventRaised(MaterialSerializer* ser,
+        MaterialSerializer::SerializeEvent event, bool& skip, const Material* mat) override;
 
-    /** 
-    @see MaterialSerializer::Listener::techniqueEventRaised
-    */
-    virtual void techniqueEventRaised(MaterialSerializer* ser, 
-        MaterialSerializer::SerializeEvent event, bool& skip, const Technique* tech);
+    void techniqueEventRaised(MaterialSerializer* ser,
+        MaterialSerializer::SerializeEvent event, bool& skip, const Technique* tech) override;
 
-    /** 
-    @see MaterialSerializer::Listener::passEventRaised
-    */
-    virtual void passEventRaised(MaterialSerializer* ser, 
-        MaterialSerializer::SerializeEvent event, bool& skip, const Pass* tech);
+    void passEventRaised(MaterialSerializer* ser,
+        MaterialSerializer::SerializeEvent event, bool& skip, const Pass* tech) override;
 
-    /** 
-    @see MaterialSerializer::Listener::textureUnitStateEventRaised
-    */
-    virtual void textureUnitStateEventRaised(MaterialSerializer* ser, 
-        MaterialSerializer::SerializeEvent event, bool& skip, const TextureUnitState* textureUnit);
+    void textureUnitStateEventRaised(MaterialSerializer* ser,
+        MaterialSerializer::SerializeEvent event, bool& skip, const TextureUnitState* textureUnit) override;
   
 // Types.
 protected:

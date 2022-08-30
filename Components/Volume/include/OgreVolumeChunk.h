@@ -328,15 +328,15 @@ namespace Volume {
 
         /** Overridden from MovableObject.
         */
-        virtual const String& getMovableType(void) const;
+        const String& getMovableType(void) const override;
         
         /** Overridden from Renderable.
         */
-        virtual Real getSquaredViewDepth(const Camera* camera) const;
+        Real getSquaredViewDepth(const Camera* camera) const override;
 
         /** Overridden from  MovableObject.
         */
-        virtual Real getBoundingRadius() const;
+        Real getBoundingRadius() const override;
 
         /** Loads the volume mesh with all LODs.
         @param parent
@@ -410,7 +410,7 @@ namespace Volume {
         
         /** Overridden from FrameListener.
         */
-        virtual bool frameStarted(const FrameEvent& evt);
+        bool frameStarted(const FrameEvent& evt) override;
         
         /** Overridable factory method.
         @return
@@ -421,7 +421,7 @@ namespace Volume {
         /** Overridden from SimpleRenderable.
             Sets the material of this chunk and all of his children.
         */
-        void setMaterial(const MaterialPtr& mat);
+        void setMaterial(const MaterialPtr& mat) override;
 
         /// @overload
         using Ogre::SimpleRenderable::setMaterial;

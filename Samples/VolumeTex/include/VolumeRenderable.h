@@ -27,14 +27,14 @@ public:
     ~VolumeRenderable();
     
     // Copydoc Ogre::SimpleRenderable::notifyCurrentCamera
-    void _notifyCurrentCamera( Ogre::Camera* cam );
-    void getWorldTransforms( Ogre::Matrix4* xform ) const;
+    void _notifyCurrentCamera( Ogre::Camera* cam ) override;
+    void getWorldTransforms( Ogre::Matrix4* xform ) const override;
     
     /**
      * Retrieves ratios of the origin-centered bounding sphere for this
      * object.
      */
-    Ogre::Real getBoundingRadius() const;
+    Ogre::Real getBoundingRadius() const override;
     
     Ogre::Real getSquaredViewDepth(const Ogre::Camera*) const override;
 protected:

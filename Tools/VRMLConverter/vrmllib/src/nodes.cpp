@@ -47,7 +47,7 @@ template<class Type>
 class node_creator : public node_creator_base {
 public:
     node_creator(const char *type) { g_node_creators[type] = this; }
-    node *create() { return new Type; }
+    node *create() override { return new Type; }
 };
 
 } // namespace bits

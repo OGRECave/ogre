@@ -29,8 +29,8 @@ class _OgreSampleClassExport Sample_Compute : public SdkSample
 
  public:
     Sample_Compute();
-    void testCapabilities(const RenderSystemCapabilities* caps);
-    void setupContent(void);
+    void testCapabilities(const RenderSystemCapabilities* caps) override;
+    void setupContent(void) override;
 };
 }
 #endif  // end _CompositorDemo_H_

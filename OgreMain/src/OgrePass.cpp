@@ -38,7 +38,7 @@ namespace Ogre {
     */
     struct MinTextureStateChangeHashFunc : public Pass::HashFunc
     {
-        uint32 operator()(const Pass* p) const
+        uint32 operator()(const Pass* p) const override
         {
             OGRE_LOCK_MUTEX(p->mTexUnitChangeMutex);
             uint32 hash = 0;
@@ -61,7 +61,7 @@ namespace Ogre {
     */
     struct MinGpuProgramChangeHashFunc : public Pass::HashFunc
     {
-        uint32 operator()(const Pass* p) const
+        uint32 operator()(const Pass* p) const override
         {
             OGRE_LOCK_MUTEX(p->mGpuProgramChangeMutex);
             uint32 hash = 0;

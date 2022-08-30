@@ -243,7 +243,7 @@ namespace Ogre
             return mGetter();
         }
 
-        Ogre::Any getValue() const
+        Ogre::Any getValue() const override
         {
             return Ogre::Any(get());
         }

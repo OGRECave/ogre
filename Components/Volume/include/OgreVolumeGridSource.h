@@ -81,11 +81,11 @@ namespace Volume {
         
         /** Overridden from VolumeSource.
         */
-        virtual Vector3 getIntersectionStart(const Ray &ray, Real maxDistance) const;
+        Vector3 getIntersectionStart(const Ray &ray, Real maxDistance) const override;
         
         /** Overridden from VolumeSource.
         */
-        virtual Vector3 getIntersectionEnd(const Ray &ray, Real maxDistance) const;
+        Vector3 getIntersectionEnd(const Ray &ray, Real maxDistance) const override;
 
         /** Gets the volume value of a position.
         @param x
@@ -152,11 +152,11 @@ namespace Volume {
 
         /** Overridden from VolumeSource.
         */
-        virtual Vector4 getValueAndGradient(const Vector3 &position) const;
+        Vector4 getValueAndGradient(const Vector3 &position) const override;
         
         /** Overridden from VolumeSource.
         */
-        virtual Real getValue(const Vector3 &position) const;
+        Real getValue(const Vector3 &position) const override;
 
         /** Gets the width of the texture.
         @return

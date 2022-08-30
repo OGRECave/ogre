@@ -49,8 +49,8 @@ protected:
     FileSystemLayer* mFSLayer;
 
 public:
-    void SetUp();
-    void TearDown();
+    void SetUp() override;
+    void TearDown() override;
     void testMesh(MeshVersion version);
     void assertMeshClone(Mesh* a, Mesh* b, MeshVersion version = MESH_VERSION_LATEST);
     void assertVertexDataClone(VertexData* a, VertexData* b, MeshVersion version = MESH_VERSION_LATEST);

@@ -93,8 +93,8 @@ namespace Ogre {
         }
 
         /// Default shadow camera setup
-        virtual void getShadowCamera (const SceneManager *sm, const Camera *cam, 
-                                      const Viewport *vp, const Light *light, Camera *texCam, size_t iteration) const;
+        void getShadowCamera (const SceneManager *sm, const Camera *cam,
+                                      const Viewport *vp, const Light *light, Camera *texCam, size_t iteration) const override;
     };
 
     /** @} */

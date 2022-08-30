@@ -85,11 +85,11 @@ namespace Ogre {
     class _OgreFreeImageCodecExport FreeImagePlugin : public Plugin
     {
     public:
-        const String& getName() const;
-        void install() { FreeImageCodec::startup(); }
-        void uninstall() { FreeImageCodec::shutdown(); }
-        void initialise() {}
-        void shutdown() {}
+        const String& getName() const override;
+        void install() override { FreeImageCodec::startup(); }
+        void uninstall() override { FreeImageCodec::shutdown(); }
+        void initialise() override {}
+        void shutdown() override {}
     };
     /** @} */
     /** @} */

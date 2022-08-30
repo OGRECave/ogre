@@ -283,15 +283,15 @@ namespace Ogre {
         */
         virtual const String& getMaterialName(void) const;
 
-        virtual void _notifyCurrentCamera(Camera* cam) override;
+        void _notifyCurrentCamera(Camera* cam) override;
         void _notifyAttached(Node* parent, bool isTagPoint = false) override;
-        virtual const AxisAlignedBox& getBoundingBox(void) const override { return mAABB; }
-        virtual Real getBoundingRadius(void) const override { return mBoundingRadius; }
-        virtual void _updateRenderQueue(RenderQueue* queue) override;
+        const AxisAlignedBox& getBoundingBox(void) const override { return mAABB; }
+        Real getBoundingRadius(void) const override { return mBoundingRadius; }
+        void _updateRenderQueue(RenderQueue* queue) override;
 
         /// @copydoc MovableObject::visitRenderables
         void visitRenderables(Renderable::Visitor* visitor, 
-            bool debugRenderables = false);
+            bool debugRenderables = false) override;
 
         /** Fast-forwards this system by the required number of seconds.
 
@@ -437,9 +437,9 @@ namespace Ogre {
         void _notifyOrigin(const String& origin) { mOrigin = origin; }
 
         /** @copydoc MovableObject::setRenderQueueGroup */
-        void setRenderQueueGroup(uint8 queueID);
+        void setRenderQueueGroup(uint8 queueID) override;
         /** @copydoc MovableObject::setRenderQueueGroupAndPriority */
-        void setRenderQueueGroupAndPriority(uint8 queueID, ushort priority);
+        void setRenderQueueGroupAndPriority(uint8 queueID, ushort priority) override;
 
         /** Set whether or not particles are sorted according to the camera.
 
@@ -530,7 +530,7 @@ namespace Ogre {
         bool getEmitting() const;
 
         /// Override to return specific type flag
-        uint32 getTypeFlags(void) const;
+        uint32 getTypeFlags(void) const override;
     private:
         AxisAlignedBox mAABB;
         Real mBoundingRadius;

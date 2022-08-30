@@ -52,7 +52,7 @@ namespace Ogre
             EGLPBuffer(EGLSupport* glsupport, PixelComponentType format, uint32 width, uint32 height);
             virtual ~EGLPBuffer();
 
-            GLContext *getContext() const { return mContext; }
+            GLContext *getContext() const override { return mContext; }
     };
 }
 

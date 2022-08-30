@@ -63,12 +63,12 @@ namespace Ogre {
         virtual ~PanelOverlayElement();
 
         /** Initialise */
-        virtual void initialise(void);
+        void initialise(void) override;
 
         /** @copydoc OverlayElement::_releaseManualHardwareResources */
-        virtual void _releaseManualHardwareResources();
+        void _releaseManualHardwareResources() override;
         /** @copydoc OverlayElement::_restoreManualHardwareResources */
-        virtual void _restoreManualHardwareResources();
+        void _restoreManualHardwareResources() override;
 
         /** Sets the number of times textures should repeat. 
         @param x The number of times the texture should repeat horizontally
@@ -102,7 +102,7 @@ namespace Ogre {
         const String& getTypeName(void) const override;
         void getRenderOperation(RenderOperation& op) override;
         /** Overridden from OverlayContainer */
-        void _updateRenderQueue(RenderQueue* queue);
+        void _updateRenderQueue(RenderQueue* queue) override;
 
     protected:
         /// Flag indicating if this panel should be visual or just group things
@@ -116,13 +116,13 @@ namespace Ogre {
         RenderOperation mRenderOp;
 
         /// Internal method for setting up geometry, called by OverlayElement::update
-        virtual void updatePositionGeometry(void);
+        void updatePositionGeometry(void) override;
 
         /// Called to update the texture coords when layers change
-        virtual void updateTextureGeometry(void);
+        void updateTextureGeometry(void) override;
 
         /// Method for setting up base parameters for this class
-        void addBaseParameters(void);
+        void addBaseParameters(void) override;
 
         static String msTypeName;
     };

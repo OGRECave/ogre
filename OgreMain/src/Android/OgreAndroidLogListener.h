@@ -37,7 +37,7 @@ namespace Ogre
     class AndroidLogListener : public LogListener, public LogAlloc
     {
     public:
-        void messageLogged(const String& message, LogMessageLevel lml, bool maskDebug, const String &logName, bool& skipThisMessage );
+        void messageLogged(const String& message, LogMessageLevel lml, bool maskDebug, const String &logName, bool& skipThisMessage ) override;
     };
 }
 

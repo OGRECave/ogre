@@ -49,7 +49,7 @@ class _OgreLodExport LodInputProviderMesh :
 public:
     LodInputProviderMesh(MeshPtr mesh);
     /// Called when the data should be filled with the input.
-    virtual void initData(LodData* data);
+    void initData(LodData* data) override;
     
 protected:
     typedef std::vector<LodData::Vertex*> VertexLookupList;

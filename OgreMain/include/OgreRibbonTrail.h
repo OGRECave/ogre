@@ -108,11 +108,11 @@ namespace Ogre {
         virtual Real getTrailLength(void) const { return mTrailLength; }
 
         /** @copydoc BillboardChain::setMaxChainElements */
-        void setMaxChainElements(size_t maxElements);
+        void setMaxChainElements(size_t maxElements) override;
         /** @copydoc BillboardChain::setNumberOfChains */
-        void setNumberOfChains(size_t numChains);
+        void setNumberOfChains(size_t numChains) override;
         /** @copydoc BillboardChain::clearChain */
-        void clearChain(size_t chainIndex);
+        void clearChain(size_t chainIndex) override;
 
         /** Set the starting ribbon colour for a given segment. 
         @param chainIndex The index of the chain
@@ -163,9 +163,9 @@ namespace Ogre {
         const ColourValue& getColourChange(size_t chainIndex) const { return mDeltaColour.at(chainIndex); }
 
         /// @see Node::Listener::nodeUpdated
-        void nodeUpdated(const Node* node);
+        void nodeUpdated(const Node* node) override;
         /// @see Node::Listener::nodeDestroyed
-        void nodeDestroyed(const Node* node);
+        void nodeDestroyed(const Node* node) override;
 
         /// Perform any fading / width delta required; internal method
         virtual void _timeUpdate(Real time);
@@ -224,14 +224,14 @@ namespace Ogre {
     class _OgreExport RibbonTrailFactory : public MovableObjectFactory
     {
     protected:
-        MovableObject* createInstanceImpl( const String& name, const NameValuePairList* params);
+        MovableObject* createInstanceImpl( const String& name, const NameValuePairList* params) override;
     public:
         RibbonTrailFactory() {}
         ~RibbonTrailFactory() {}
 
         static String FACTORY_TYPE_NAME;
 
-        const String& getType(void) const;
+        const String& getType(void) const override;
     };
     /** @} */
     /** @} */

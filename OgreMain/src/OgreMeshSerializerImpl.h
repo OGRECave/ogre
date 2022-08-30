@@ -203,22 +203,22 @@ namespace Ogre {
         // but now we can mix them. If it is mixed, we can't export it to older mesh formats.
         String compatibleLodStrategyName(String lodStrategyName);
         virtual bool isLodMixed(const Mesh* pMesh);
-        virtual size_t calcLodLevelSize(const Mesh* pMesh);
-        virtual size_t calcLodUsageManualSize(const MeshLodUsage& usage);
-        virtual size_t calcLodUsageGeneratedSize(const Mesh* pMesh, const MeshLodUsage& usage, unsigned short lodNum);
-        virtual size_t calcLodUsageGeneratedSubmeshSize(const SubMesh* submesh, unsigned short lodNum);
+        size_t calcLodLevelSize(const Mesh* pMesh) override;
+        size_t calcLodUsageManualSize(const MeshLodUsage& usage) override;
+        size_t calcLodUsageGeneratedSize(const Mesh* pMesh, const MeshLodUsage& usage, unsigned short lodNum) override;
+        size_t calcLodUsageGeneratedSubmeshSize(const SubMesh* submesh, unsigned short lodNum) override;
 #if !OGRE_NO_MESHLOD
-        virtual void writeLodLevel(const Mesh* pMesh);
-        virtual void writeLodUsageGenerated(const Mesh* pMesh, const MeshLodUsage& usage, unsigned short lodNum);
-        virtual void writeLodUsageGeneratedSubmesh(const SubMesh* submesh, unsigned short lodNum);
-        virtual void writeLodUsageManual(const MeshLodUsage& usage);
+        void writeLodLevel(const Mesh* pMesh) override;
+        void writeLodUsageGenerated(const Mesh* pMesh, const MeshLodUsage& usage, unsigned short lodNum) override;
+        void writeLodUsageGeneratedSubmesh(const SubMesh* submesh, unsigned short lodNum) override;
+        void writeLodUsageManual(const MeshLodUsage& usage) override;
 
-        virtual void readMeshLodUsageGenerated(const DataStreamPtr& stream, Mesh* pMesh,
-            unsigned short lodNum, MeshLodUsage& usage);
-        virtual void readMeshLodUsageManual(const DataStreamPtr& stream, Mesh* pMesh, unsigned short lodNum, MeshLodUsage& usage);
+        void readMeshLodUsageGenerated(const DataStreamPtr& stream, Mesh* pMesh,
+            unsigned short lodNum, MeshLodUsage& usage) override;
+        void readMeshLodUsageManual(const DataStreamPtr& stream, Mesh* pMesh, unsigned short lodNum, MeshLodUsage& usage) override;
 #endif
-        virtual void readMeshLodLevel(const DataStreamPtr& stream, Mesh* pMesh);
-        virtual void enableValidation();
+        void readMeshLodLevel(const DataStreamPtr& stream, Mesh* pMesh) override;
+        void enableValidation() override;
     };
 
     /** Class for providing backwards-compatibility for loading version 1.41 of the .mesh format. 
@@ -230,12 +230,12 @@ namespace Ogre {
         MeshSerializerImpl_v1_41();
         ~MeshSerializerImpl_v1_41();
     protected:
-        void writeMorphKeyframe(const VertexMorphKeyFrame* kf, size_t vertexCount);
-        void readMorphKeyFrame(const DataStreamPtr& stream, Mesh* pMesh, VertexAnimationTrack* track);
-        void writePose(const Pose* pose);
-        void readPose(const DataStreamPtr& stream, Mesh* pMesh);
-        size_t calcMorphKeyframeSize(const VertexMorphKeyFrame* kf, size_t vertexCount);
-        size_t calcPoseSize(const Pose* pose);
+        void writeMorphKeyframe(const VertexMorphKeyFrame* kf, size_t vertexCount) override;
+        void readMorphKeyFrame(const DataStreamPtr& stream, Mesh* pMesh, VertexAnimationTrack* track) override;
+        void writePose(const Pose* pose) override;
+        void readPose(const DataStreamPtr& stream, Mesh* pMesh) override;
+        size_t calcMorphKeyframeSize(const VertexMorphKeyFrame* kf, size_t vertexCount) override;
+        size_t calcPoseSize(const Pose* pose) override;
         size_t calcPoseVertexSize(void);
         using MeshSerializerImpl::calcPoseVertexSize;
     };
@@ -249,11 +249,11 @@ namespace Ogre {
         MeshSerializerImpl_v1_4();
         ~MeshSerializerImpl_v1_4();
     protected:
-        virtual size_t calcLodLevelSize(const Mesh* pMesh);
-        virtual void readMeshLodLevel(const DataStreamPtr& stream, Mesh* pMesh);
+        size_t calcLodLevelSize(const Mesh* pMesh) override;
+        void readMeshLodLevel(const DataStreamPtr& stream, Mesh* pMesh) override;
 #if !OGRE_NO_MESHLOD
-        virtual void writeLodLevel(const Mesh* pMesh);
-        virtual void writeLodUsageGenerated(const Mesh* pMesh, const MeshLodUsage& usage, unsigned short lodNum);
+        void writeLodLevel(const Mesh* pMesh) override;
+        void writeLodUsageGenerated(const Mesh* pMesh, const MeshLodUsage& usage, unsigned short lodNum) override;
 #endif
     };
 
@@ -266,14 +266,14 @@ namespace Ogre {
         MeshSerializerImpl_v1_3();
         ~MeshSerializerImpl_v1_3();
     protected:
-        virtual void readEdgeListLodInfo(const DataStreamPtr& stream, EdgeData* edgeData);
+        void readEdgeListLodInfo(const DataStreamPtr& stream, EdgeData* edgeData) override;
 
         /// Reorganise triangles of the edge list to group by vertex set
         virtual void reorganiseTriangles(EdgeData* edgeData);
         
-        virtual void writeEdgeList(const Mesh* pMesh);
-        virtual size_t calcEdgeListLodSize(const EdgeData* edgeData, bool isManual);
-        virtual size_t calcEdgeGroupSize(const EdgeData::EdgeGroup& group);
+        void writeEdgeList(const Mesh* pMesh) override;
+        size_t calcEdgeListLodSize(const EdgeData* edgeData, bool isManual) override;
+        size_t calcEdgeGroupSize(const EdgeData::EdgeGroup& group) override;
     };
 
     /** Class for providing backwards-compatibility for loading version 1.2 of the .mesh format. 
@@ -285,8 +285,8 @@ namespace Ogre {
         MeshSerializerImpl_v1_2();
         ~MeshSerializerImpl_v1_2();
     protected:
-        virtual void readMesh(const DataStreamPtr& stream, Mesh* pMesh, MeshSerializerListener *listener);
-        virtual void readGeometry(const DataStreamPtr& stream, Mesh* pMesh, VertexData* dest);
+        void readMesh(const DataStreamPtr& stream, Mesh* pMesh, MeshSerializerListener *listener) override;
+        void readGeometry(const DataStreamPtr& stream, Mesh* pMesh, VertexData* dest) override;
         virtual void readGeometryPositions(unsigned short bindIdx, const DataStreamPtr& stream,
             Mesh* pMesh, VertexData* dest);
         virtual void readGeometryNormals(unsigned short bindIdx, const DataStreamPtr& stream,
@@ -307,7 +307,7 @@ namespace Ogre {
         ~MeshSerializerImpl_v1_1();
     protected:
         void readGeometryTexCoords(unsigned short bindIdx, const DataStreamPtr& stream,
-            Mesh* pMesh, VertexData* dest, unsigned short set);
+            Mesh* pMesh, VertexData* dest, unsigned short set) override;
     };
 
     /** @} */

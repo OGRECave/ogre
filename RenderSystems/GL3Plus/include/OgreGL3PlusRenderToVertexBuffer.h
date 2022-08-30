@@ -48,11 +48,11 @@ namespace Ogre {
 
         /** Get the render operation for this buffer
          */
-        virtual void getRenderOperation(RenderOperation& op);
+        void getRenderOperation(RenderOperation& op) override;
 
         /** Update the contents of this vertex buffer by rendering
          */
-        virtual void update(SceneManager* sceneMgr);
+        void update(SceneManager* sceneMgr) override;
     protected:
         HardwareVertexBufferSharedPtr mVertexBuffers[2];
         /* size_t mSourceBufferIndex; */

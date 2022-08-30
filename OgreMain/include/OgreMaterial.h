@@ -141,9 +141,9 @@ namespace Ogre {
         @see
         Resource
         */
-        void unloadImpl(void);
+        void unloadImpl(void) override;
         /// @copydoc Resource::calculateSize
-        size_t calculateSize(void) const;
+        size_t calculateSize(void) const override;
     public:
 
         /** Constructor - use resource manager's create method rather than this.
@@ -652,9 +652,7 @@ namespace Ogre {
         void setLodStrategy(LodStrategy *lodStrategy);
         /// @}
 
-        /** @copydoc Resource::touch
-        */
-        void touch(void) 
+        void touch(void) override
         { 
             if (mCompilationRequired) 
                 compile();

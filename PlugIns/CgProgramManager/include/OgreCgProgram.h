@@ -55,15 +55,15 @@ namespace Ogre {
         class CmdProfiles : public ParamCommand
         {
         public:
-            String doGet(const void* target) const;
-            void doSet(void* target, const String& val);
+            String doGet(const void* target) const override;
+            void doSet(void* target, const String& val) override;
         };
         /// Command object for setting compilation arguments
         class CmdArgs : public ParamCommand
         {
         public:
-            String doGet(const void* target) const;
-            void doSet(void* target, const String& val);
+            String doGet(const void* target) const override;
+            void doSet(void* target, const String& val) override;
         };
 
     protected:
@@ -75,12 +75,12 @@ namespace Ogre {
         CGcontext mCgContext;
         /** Internal load implementation, must be implemented by subclasses.
         */
-        void loadFromSource(void);
+        void loadFromSource(void) override;
         /** Internal method for creating an appropriate low-level program from this
         high-level program, must be implemented by subclasses. */
-        void createLowLevelImpl(void);
+        void createLowLevelImpl(void) override;
         /// Internal unload implementation, must be implemented by subclasses
-        void unloadHighLevelImpl(void);
+        void unloadHighLevelImpl(void) override;
         /// Populate the passed parameters with name->index map, must be overridden
         void buildConstantDefinitions() override;
 
@@ -138,26 +138,26 @@ namespace Ogre {
         /** Gets the Cg profiles which can be supported by the program. */
         const StringVector& getProfiles(void) const { return mProfiles; }
         /// Overridden from GpuProgram
-        bool isSupported(void) const;
+        bool isSupported(void) const override;
         /// Overridden from GpuProgram
-        const String& getLanguage(void) const;
+        const String& getLanguage(void) const override;
 
-        GpuProgramParametersSharedPtr createParameters();
-        GpuProgram* _getBindingDelegate();
+        GpuProgramParametersSharedPtr createParameters() override;
+        GpuProgram* _getBindingDelegate() override;
 
-        bool isSkeletalAnimationIncluded(void) const;
-        bool isMorphAnimationIncluded(void) const;
-        bool isPoseAnimationIncluded(void) const;
-        bool isVertexTextureFetchRequired(void) const;
+        bool isSkeletalAnimationIncluded(void) const override;
+        bool isMorphAnimationIncluded(void) const override;
+        bool isPoseAnimationIncluded(void) const override;
+        bool isVertexTextureFetchRequired(void) const override;
         const GpuProgramParametersPtr& getDefaultParameters(void) override;
-        bool hasDefaultParameters(void) const;
-        bool getPassSurfaceAndLightStates(void) const;
-        bool getPassFogStates(void) const;
-        bool getPassTransformStates(void) const;
-        bool hasCompileError(void) const;
-        void resetCompileError(void);
+        bool hasDefaultParameters(void) const override;
+        bool getPassSurfaceAndLightStates(void) const override;
+        bool getPassFogStates(void) const override;
+        bool getPassTransformStates(void) const override;
+        bool hasCompileError(void) const override;
+        void resetCompileError(void) override;
         size_t getSize(void) const;
-        void touch(void);
+        void touch(void) override;
     };
     /** @} */
     /** @} */

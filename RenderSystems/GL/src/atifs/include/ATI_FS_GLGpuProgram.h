@@ -45,16 +45,16 @@ namespace Ogre {
 
 
         /// Execute the binding functions for this program
-        void bindProgram(void);
+        void bindProgram(void) override;
         /// Execute the unbinding functions for this program
-        void unbindProgram(void);
+        void unbindProgram(void) override;
         /// Execute the param binding functions for this program
-        void bindProgramParameters(GpuProgramParametersSharedPtr params, uint16 mask);
+        void bindProgramParameters(GpuProgramParametersSharedPtr params, uint16 mask) override;
 
     protected:
         /// @copydoc Resource::unload
-        void unloadImpl(void);
-        void loadFromSource(void);
+        void unloadImpl(void) override;
+        void loadFromSource(void) override;
         GLenum mProgramType;
 
     }; // class ATI_FS_GLGpuProgram

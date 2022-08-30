@@ -76,7 +76,7 @@ protected:
 
     /** Sets up the sample.
     */
-    virtual void setupContent(void);
+    void setupContent(void) override;
         
     /** Sets up the UI.
     */
@@ -84,7 +84,7 @@ protected:
         
     /** Is called when the sample is stopped.
     */
-    virtual void cleanupContent(void);
+    void cleanupContent(void) override;
 
     /** Intersects a ray with the volume and adds a sphere at the intersection.
     @param ray
@@ -101,27 +101,27 @@ public:
     
     /** Overridden from SdkSample.
     */
-    virtual bool keyPressed(const KeyboardEvent& evt);
+    bool keyPressed(const KeyboardEvent& evt) override;
 
     /** Overridden from SdkSample.
     */
-    virtual bool touchPressed(const TouchFingerEvent& evt);
+    bool touchPressed(const TouchFingerEvent& evt) override;
 
     /** Overridden from SdkSample.
     */
-    virtual bool mousePressed(const MouseButtonEvent& evt);
+    bool mousePressed(const MouseButtonEvent& evt) override;
 
     /** Overridden from SdkSample.
     */
-    virtual bool mouseReleased(const MouseButtonEvent& evt);
+    bool mouseReleased(const MouseButtonEvent& evt) override;
 
     /** Overridden from SdkSample.
     */
-    virtual bool mouseMoved(const MouseMotionEvent& evt);
+    bool mouseMoved(const MouseMotionEvent& evt) override;
     
     /** Overridden from SdkSample.
      */
-    virtual bool frameRenderingQueued(const Ogre::FrameEvent& evt);
+    bool frameRenderingQueued(const Ogre::FrameEvent& evt) override;
 };
 
 #endif

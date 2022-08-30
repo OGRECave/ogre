@@ -63,7 +63,7 @@ namespace Ogre
         ~PCZLight();
 
         /** Overridden from MovableObject */
-        const String& getMovableType(void) const;
+        const String& getMovableType(void) const override;
 
         /** Clear the affectedZonesList 
         */
@@ -93,7 +93,7 @@ namespace Ogre
         void removeZoneFromAffectedZonesList(PCZone * zone);
 
         /// MovableObject notified when SceneNode changes
-        virtual void _notifyMoved(void);   
+        void _notifyMoved(void) override;
 
         /// Clear update flag
         void clearNeedsUpdate(void)   { mNeedsUpdate = false; } 
@@ -119,14 +119,14 @@ namespace Ogre
     class _OgrePCZPluginExport PCZLightFactory : public MovableObjectFactory
     {
     protected:
-        MovableObject* createInstanceImpl( const String& name, const NameValuePairList* params);
+        MovableObject* createInstanceImpl( const String& name, const NameValuePairList* params) override;
     public:
         PCZLightFactory() {}
         ~PCZLightFactory() {}
 
         static String FACTORY_TYPE_NAME;
 
-        const String& getType(void) const;
+        const String& getType(void) const override;
     };
     /** @} */
     /** @} */

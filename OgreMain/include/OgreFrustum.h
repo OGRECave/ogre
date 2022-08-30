@@ -611,7 +611,7 @@ namespace Ogre
 
         /// @copydoc MovableObject::visitRenderables
         void visitRenderables(Renderable::Visitor* visitor, 
-            bool debugRenderables = false);
+            bool debugRenderables = false) override;
 
         /// Small constant used to reduce far plane projection to avoid inaccuracies
         static const Real INFINITE_FAR_PLANE_ADJUST;

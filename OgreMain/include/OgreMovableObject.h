@@ -265,7 +265,7 @@ namespace Ogre {
         Real getBoundingRadiusScaled() const;
 
         /** Retrieves the axis-aligned bounding box for this object in world coordinates. */
-        virtual const AxisAlignedBox& getWorldBoundingBox(bool derive = false) const;
+        const AxisAlignedBox& getWorldBoundingBox(bool derive = false) const override;
         /** Retrieves the worldspace bounding sphere for this object. */
         virtual const Sphere& getWorldBoundingSphere(bool derive = false) const;
         /** Internal method by which the movable object must add Renderable subclass instances to the rendering queue.
@@ -493,7 +493,7 @@ namespace Ogre {
         LightList* _getLightList() { return &mLightList; }
 
         /// Returns details of the edges which might be used to determine a silhouette
-        EdgeData* getEdgeList(void) { return NULL; }
+        EdgeData* getEdgeList(void) override { return NULL; }
         /// Define a default implementation of method from ShadowCaster which implements no shadows
         const ShadowRenderableList& getShadowVolumeRenderableList(
             const Light* light, const HardwareIndexBufferPtr& indexBuffer,
@@ -515,14 +515,14 @@ namespace Ogre {
         */
         void setCastShadows(bool enabled) { mCastShadows = enabled; }
         /** Returns whether shadow casting is enabled for this object. */
-        bool getCastShadows(void) const { return mCastShadows; }
+        bool getCastShadows(void) const override { return mCastShadows; }
         /** Returns whether the Material of any Renderable that this MovableObject will add to 
             the render queue will receive shadows. 
         */
         bool getReceivesShadows();
             
         /** Get the distance to extrude for a point/spot light */
-        Real getPointExtrusionDistance(const Light* l) const;
+        Real getPointExtrusionDistance(const Light* l) const override;
         /** Get the 'type flags' for this MovableObject.
 
             A type flag identifies the type of the MovableObject as a bitpattern. 

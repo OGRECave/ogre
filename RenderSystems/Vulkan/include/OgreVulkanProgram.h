@@ -74,7 +74,7 @@ namespace Ogre
         VulkanProgramFactory( VulkanDevice *device);
         virtual ~VulkanProgramFactory( void );
         /// Get the name of the language this factory creates programs for
-        const String &getLanguage( void ) const;
+        const String &getLanguage( void ) const override;
         /// Create an instance of VulkanProgram
         GpuProgram *create( ResourceManager *creator, const String &name, ResourceHandle handle,
                                      const String &group, bool isManual, ManualResourceLoader *loader ) override;

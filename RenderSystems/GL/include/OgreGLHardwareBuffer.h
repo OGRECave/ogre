@@ -49,19 +49,19 @@ namespace Ogre {
 
     protected:
         /** See HardwareBuffer. */
-        void* lockImpl(size_t offset, size_t length, LockOptions options);
+        void* lockImpl(size_t offset, size_t length, LockOptions options) override;
         /** See HardwareBuffer. */
-        void unlockImpl(void);
+        void unlockImpl(void) override;
     public:
         GLHardwareVertexBuffer(GLenum target, size_t sizeInBytes, Usage usage, bool useShadowBuffer);
         ~GLHardwareVertexBuffer();
         /** See HardwareBuffer. */
-        void readData(size_t offset, size_t length, void* pDest);
+        void readData(size_t offset, size_t length, void* pDest) override;
         /** See HardwareBuffer. */
         void writeData(size_t offset, size_t length, 
-            const void* pSource, bool discardWholeBuffer = false);
+            const void* pSource, bool discardWholeBuffer = false) override;
         /** See HardwareBuffer. */
-        void _updateFromShadow(void);
+        void _updateFromShadow(void) override;
 
         GLuint getGLBufferId(void) const { return mBufferId; }
     };

@@ -32,7 +32,7 @@ public:
         
     }
 
-    virtual void _shutdown()
+    void _shutdown() override
     {
         RTShader::RenderState* pMainRenderState = 
             RTShader::ShaderGenerator::getSingleton().createOrRetrieveRenderState(MSN_SHADERGEN).first;
@@ -49,14 +49,14 @@ public:
         SdkSample::_shutdown();
     }
 
-    bool frameRenderingQueued(const FrameEvent& evt)
+    bool frameRenderingQueued(const FrameEvent& evt) override
     {
         return SdkSample::frameRenderingQueued(evt);   // don't forget the parent class updates!
     }
 
 protected:
 
-   void setupContent()
+   void setupContent() override
     {
         mTrayMgr->createCheckBox(TL_BOTTOM, ACTIVATE_FOG_BUTTON, "Fog Active")->setChecked(true,false);
         mTrayMgr->createCheckBox(TL_BOTTOM, ACTIVATE_SKY_BUTTON, "Sky Box Active")->setChecked(true,false);
@@ -131,7 +131,7 @@ protected:
     
 
     //--------------------------------------------------------------------------
-    void sliderMoved(Slider* slider)
+    void sliderMoved(Slider* slider) override
     {
         if (slider->getName() == FOG_DISTANCE_SLIDER)
         {
@@ -155,7 +155,7 @@ protected:
         }
     }
         
-    void checkBoxToggled(CheckBox* box)
+    void checkBoxToggled(CheckBox* box) override
     {
         const String& cbName = box->getName();
         if (cbName == ACTIVATE_FOG_BUTTON)
@@ -171,7 +171,7 @@ protected:
         }
     }
 
-    bool mousePressed(const MouseButtonEvent& evt)
+    bool mousePressed(const MouseButtonEvent& evt) override
     {
         if (mTrayMgr->mousePressed(evt))
             return true;
@@ -184,7 +184,7 @@ protected:
     }
 
     
-    bool mouseReleased(const MouseButtonEvent& evt)
+    bool mouseReleased(const MouseButtonEvent& evt) override
     {
         if (mTrayMgr->mouseReleased(evt))
             return true;
@@ -197,7 +197,7 @@ protected:
     }
 
 
-    bool mouseMoved(const MouseMotionEvent& evt)
+    bool mouseMoved(const MouseMotionEvent& evt) override
     {
         if(mTrayMgr->mouseMoved(evt))
             return true;
@@ -209,7 +209,7 @@ protected:
         return true;
     }
 
-    void cleanupContent()
+    void cleanupContent() override
     {
         MeshManager::getSingleton().remove("floor", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
     }

@@ -108,11 +108,11 @@ namespace Volume {
         
         /** Overridden from IsoSurface.
         */
-        virtual void addMarchingCubesTriangles(const Vector3 *corners, const Vector4 *volumeValues, MeshBuilder *mb) const;
+        void addMarchingCubesTriangles(const Vector3 *corners, const Vector4 *volumeValues, MeshBuilder *mb) const override;
         
         /** Overridden from IsoSurface.
         */
-        virtual void addMarchingSquaresTriangles(const Vector3 *corners, const Vector4 *volumeValues, const size_t *indices, const Real maxDistance, MeshBuilder *mb) const;
+        void addMarchingSquaresTriangles(const Vector3 *corners, const Vector4 *volumeValues, const size_t *indices, const Real maxDistance, MeshBuilder *mb) const override;
     };
     /** @} */
     /** @} */

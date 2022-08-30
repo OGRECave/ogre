@@ -103,44 +103,44 @@ namespace Ogre {
         bool isPointRenderingEnabled(void) const { return mBillboardSet->isPointRenderingEnabled(); }
 
         /// @copydoc ParticleSystemRenderer::getType
-        const String& getType(void) const;
+        const String& getType(void) const override;
         /// @copydoc ParticleSystemRenderer::_updateRenderQueue
         void _updateRenderQueue(RenderQueue* queue, 
-            std::vector<Particle*>& currentParticles, bool cullIndividually);
+            std::vector<Particle*>& currentParticles, bool cullIndividually) override;
         /// @copydoc ParticleSystemRenderer::visitRenderables
-        void visitRenderables(Renderable::Visitor* visitor, bool debugRenderables = false)
+        void visitRenderables(Renderable::Visitor* visitor, bool debugRenderables = false) override
         {
             mBillboardSet->visitRenderables(visitor, debugRenderables);
         }
-        void _setMaterial(MaterialPtr& mat) { mBillboardSet->setMaterial(mat); }
+        void _setMaterial(MaterialPtr& mat) override { mBillboardSet->setMaterial(mat); }
         /// @copydoc ParticleSystemRenderer::_notifyCurrentCamera
-        void _notifyCurrentCamera(Camera* cam) { mBillboardSet->_notifyCurrentCamera(cam); }
+        void _notifyCurrentCamera(Camera* cam) override { mBillboardSet->_notifyCurrentCamera(cam); }
         /// @copydoc ParticleSystemRenderer::_notifyParticleQuota
-        void _notifyParticleQuota(size_t quota) { mBillboardSet->setPoolSize(quota); }
+        void _notifyParticleQuota(size_t quota) override { mBillboardSet->setPoolSize(quota); }
         /// @copydoc ParticleSystemRenderer::_notifyAttached
-        void _notifyAttached(Node* parent, bool isTagPoint = false)
+        void _notifyAttached(Node* parent, bool isTagPoint = false) override
         {
             mBillboardSet->_notifyAttached(parent, isTagPoint);
         }
         /// @copydoc ParticleSystemRenderer::_notifyDefaultDimensions
-        void _notifyDefaultDimensions(Real width, Real height)
+        void _notifyDefaultDimensions(Real width, Real height) override
         {
             mBillboardSet->setDefaultDimensions(width, height);
         }
         /// @copydoc ParticleSystemRenderer::setRenderQueueGroup
-        void setRenderQueueGroup(uint8 queueID) { mBillboardSet->setRenderQueueGroup(queueID); }
+        void setRenderQueueGroup(uint8 queueID) override { mBillboardSet->setRenderQueueGroup(queueID); }
         /// @copydoc MovableObject::setRenderQueueGroupAndPriority
-        void setRenderQueueGroupAndPriority(uint8 queueID, ushort priority)
+        void setRenderQueueGroupAndPriority(uint8 queueID, ushort priority) override
         {
             mBillboardSet->setRenderQueueGroupAndPriority(queueID, priority);
         }
         /// @copydoc ParticleSystemRenderer::setKeepParticlesInLocalSpace
-        void setKeepParticlesInLocalSpace(bool keepLocal)
+        void setKeepParticlesInLocalSpace(bool keepLocal) override
         {
             mBillboardSet->setBillboardsInWorldSpace(!keepLocal);
         }
         /// @copydoc ParticleSystemRenderer::_getSortMode
-        SortMode _getSortMode(void) const { return mBillboardSet->_getSortMode(); }
+        SortMode _getSortMode(void) const override { return mBillboardSet->_getSortMode(); }
 
         /// Access BillboardSet in use
         BillboardSet* getBillboardSet(void) const { return mBillboardSet; }
@@ -155,9 +155,9 @@ namespace Ogre {
     {
     public:
         /// @copydoc FactoryObj::getType
-        const String& getType() const;
+        const String& getType() const override;
         /// @copydoc FactoryObj::createInstance
-        ParticleSystemRenderer* createInstance( const String& name );
+        ParticleSystemRenderer* createInstance( const String& name ) override;
     };
     /** @} */
     /** @} */

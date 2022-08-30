@@ -40,7 +40,7 @@ namespace OgreBites
         ConfigDialog();
         virtual ~ConfigDialog();
 
-        virtual bool display();
+        bool display() override;
 
     protected:
         // platform specific implementation

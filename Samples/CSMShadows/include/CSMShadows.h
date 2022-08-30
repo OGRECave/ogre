@@ -23,7 +23,7 @@ public:
         mInfo["Category"] = "Lighting";
     }
 
-    void cleanupContent()
+    void cleanupContent() override
     {
         mSceneMgr->removeShadowTextureListener(mGpuConstants);
         delete mGpuConstants;
@@ -33,12 +33,12 @@ public:
         NUM_CASCADES = 4
     };
 
-    void testCapabilities(const Ogre::RenderSystemCapabilities* caps)
+    void testCapabilities(const Ogre::RenderSystemCapabilities* caps) override
     {
         requireMaterial("CSMShadows/Rockwall");
     }
 
-    void setupContent()
+    void setupContent() override
     {
         mCameraMan->setStyle(CS_ORBIT);
 

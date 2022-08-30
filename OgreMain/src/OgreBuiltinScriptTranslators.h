@@ -42,7 +42,7 @@ namespace Ogre{
         Ogre::AliasTextureNamePairList mTextureAliases;
     public:
         MaterialTranslator();
-        void translate(ScriptCompiler *compiler, const AbstractNodePtr &node);
+        void translate(ScriptCompiler *compiler, const AbstractNodePtr &node) override;
     };
         
     class TechniqueTranslator : public ScriptTranslator
@@ -51,7 +51,7 @@ namespace Ogre{
         Technique *mTechnique;
     public:
         TechniqueTranslator();
-        void translate(ScriptCompiler *compiler, const AbstractNodePtr &node);
+        void translate(ScriptCompiler *compiler, const AbstractNodePtr &node) override;
     };
     
     class PassTranslator : public ScriptTranslator
@@ -60,7 +60,7 @@ namespace Ogre{
         Pass *mPass;
     public:
         PassTranslator();
-        void translate(ScriptCompiler *compiler, const AbstractNodePtr &node);
+        void translate(ScriptCompiler *compiler, const AbstractNodePtr &node) override;
     protected:
         void translateProgramRef(GpuProgramType type, ScriptCompiler *compiler, ObjectAbstractNode *node);
         void translateShadowCasterProgramRef(GpuProgramType type, ScriptCompiler *compiler, ObjectAbstractNode *node);
@@ -73,27 +73,27 @@ namespace Ogre{
         TextureUnitState *mUnit;
     public:
         TextureUnitTranslator();
-        void translate(ScriptCompiler *compiler, const AbstractNodePtr &node);
+        void translate(ScriptCompiler *compiler, const AbstractNodePtr &node) override;
     };
 
     struct SamplerTranslator : public ScriptTranslator
     {
         static void translateSamplerParam(ScriptCompiler *compiler, const SamplerPtr& sampler, PropertyAbstractNode* node);
-        void translate(ScriptCompiler *compiler, const AbstractNodePtr &node);
+        void translate(ScriptCompiler *compiler, const AbstractNodePtr &node) override;
     };
 
     class TextureSourceTranslator : public ScriptTranslator
     {
     public:
         TextureSourceTranslator();
-        void translate(ScriptCompiler *compiler, const AbstractNodePtr &node);
+        void translate(ScriptCompiler *compiler, const AbstractNodePtr &node) override;
     };
 
     class GpuProgramTranslator : public ScriptTranslator
     {   
     public:
         GpuProgramTranslator();
-        void translate(ScriptCompiler *compiler, const AbstractNodePtr &node);
+        void translate(ScriptCompiler *compiler, const AbstractNodePtr &node) override;
     protected:
         void translateGpuProgram(ScriptCompiler *compiler, ObjectAbstractNode *obj, String language);
     public:
@@ -104,7 +104,7 @@ namespace Ogre{
     {   
     public:
         SharedParamsTranslator();
-        void translate(ScriptCompiler *compiler, const AbstractNodePtr &node);
+        void translate(ScriptCompiler *compiler, const AbstractNodePtr &node) override;
     protected:
     };
 
@@ -117,7 +117,7 @@ namespace Ogre{
         Ogre::ParticleSystem *mSystem;
     public:
         ParticleSystemTranslator();
-        void translate(ScriptCompiler *compiler, const AbstractNodePtr &node);
+        void translate(ScriptCompiler *compiler, const AbstractNodePtr &node) override;
     };
     class ParticleEmitterTranslator : public ScriptTranslator
     {
@@ -125,7 +125,7 @@ namespace Ogre{
         Ogre::ParticleEmitter *mEmitter;
     public:
         ParticleEmitterTranslator();
-        void translate(ScriptCompiler *compiler, const AbstractNodePtr &node);
+        void translate(ScriptCompiler *compiler, const AbstractNodePtr &node) override;
     };
     class ParticleAffectorTranslator : public ScriptTranslator
     {
@@ -133,7 +133,7 @@ namespace Ogre{
         Ogre::ParticleAffector *mAffector;
     public:
         ParticleAffectorTranslator();
-        void translate(ScriptCompiler *compiler, const AbstractNodePtr &node);
+        void translate(ScriptCompiler *compiler, const AbstractNodePtr &node) override;
     };
 
     /**************************************************************************
@@ -145,7 +145,7 @@ namespace Ogre{
         Compositor *mCompositor;
     public:
         CompositorTranslator();
-        void translate(ScriptCompiler *compiler, const AbstractNodePtr &node);
+        void translate(ScriptCompiler *compiler, const AbstractNodePtr &node) override;
     };
     class CompositionTechniqueTranslator : public ScriptTranslator
     {
@@ -153,7 +153,7 @@ namespace Ogre{
         CompositionTechnique *mTechnique;
     public:
         CompositionTechniqueTranslator();
-        void translate(ScriptCompiler *compiler, const AbstractNodePtr &node);
+        void translate(ScriptCompiler *compiler, const AbstractNodePtr &node) override;
     };
     class CompositionTargetPassTranslator : public ScriptTranslator
     {
@@ -161,7 +161,7 @@ namespace Ogre{
         CompositionTargetPass *mTarget;
     public:
         CompositionTargetPassTranslator();
-        void translate(ScriptCompiler *compiler, const AbstractNodePtr &node);
+        void translate(ScriptCompiler *compiler, const AbstractNodePtr &node) override;
     };
     class CompositionPassTranslator : public ScriptTranslator
     {
@@ -169,7 +169,7 @@ namespace Ogre{
         CompositionPass *mPass;
     public:
         CompositionPassTranslator();
-        void translate(ScriptCompiler *compiler, const AbstractNodePtr &node);
+        void translate(ScriptCompiler *compiler, const AbstractNodePtr &node) override;
     };
     /**************************************************************************
      * BuiltinScriptTranslatorManager
@@ -196,7 +196,7 @@ namespace Ogre{
     public:
         BuiltinScriptTranslatorManager();
         /// Returns a manager for the given object abstract node, or null if it is not supported
-        virtual ScriptTranslator *getTranslator(const AbstractNodePtr &node);
+        ScriptTranslator *getTranslator(const AbstractNodePtr &node) override;
     };
 }
 

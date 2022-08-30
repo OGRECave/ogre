@@ -37,7 +37,7 @@ protected:
         mTrayMgr->createCheckBox(TL_TOPLEFT, "ibl", "Image Based Lighting", gui_width)->setChecked(true, false);
     }
 
-    void setupContent()
+    void setupContent() override
     {
         setupControls();
 
@@ -72,7 +72,7 @@ protected:
         mParams = mat->getTechnique(0)->getPass(0)->getFragmentProgramParameters();
     }
 
-    void itemSelected(SelectMenu* menu)
+    void itemSelected(SelectMenu* menu) override
     {
         static const char* materials[] = {"DamagedHelmet", "DamagedHelmet_RTSS", "DamagedHelmet_Filament"};
         int n = menu->getSelectionIndex();
@@ -80,7 +80,7 @@ protected:
         mEntity->setMaterialName(materials[n]);
     }
         
-    void checkBoxToggled(CheckBox* box)
+    void checkBoxToggled(CheckBox* box) override
     {
         mParams->setNamedConstant("u_ScaleIBLAmbient", Vector4(Real(box->isChecked())));
     }

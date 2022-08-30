@@ -83,19 +83,19 @@ namespace Ogre
             just before rendering occurs.
         */
         void updateUniforms(GpuProgramParametersSharedPtr params,
-                            uint16 mask, GpuProgramType fromProgType);
+                            uint16 mask, GpuProgramType fromProgType) override;
 
         /** Makes a program pipeline object active by making sure it
             is linked and then putting it in use.
         */
-        void activate(void);
+        void activate(void) override;
 
     protected:
         /// GL handle for pipeline object.
         GLuint mGLProgramPipelineHandle;
 
         /// Compiles and links the separate programs.
-        void compileAndLink(void);
+        void compileAndLink(void) override;
 
         void getMicrocodeFromCache(void);
         void getIndividualProgramMicrocodeFromCache(GLSLShader* program);

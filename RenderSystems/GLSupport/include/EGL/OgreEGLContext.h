@@ -57,10 +57,10 @@ namespace Ogre {
             void _updateInternalResources(EGLDisplay eglDisplay, ::EGLConfig glconfig, ::EGLSurface drawable);
 #endif
 
-            void setCurrent();
-            void endCurrent();
+            void setCurrent() override;
+            void endCurrent() override;
 
-            GLContext* clone() const {
+            GLContext* clone() const override {
                 return new EGLContext(mEglDisplay, mGLSupport, mConfig, mDrawable, NULL);
             }
 

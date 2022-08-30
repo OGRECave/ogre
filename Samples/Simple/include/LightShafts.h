@@ -41,7 +41,7 @@ public:
                         "N - Change light cookie";
     }
 
-    bool frameStarted(const FrameEvent& e)
+    bool frameStarted(const FrameEvent& e) override
     {
         // Update light position
         updatePosition(e);
@@ -49,7 +49,7 @@ public:
         return SdkSample::frameStarted(e);
     }
 
-    bool keyPressed(const OgreBites::KeyboardEvent& evt)
+    bool keyPressed(const OgreBites::KeyboardEvent& evt) override
     {
         switch (evt.keysym.sym)
         {
@@ -98,7 +98,7 @@ public:
         }
     }
 
-    void setupContent(void)
+    void setupContent(void) override
     {
 #ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
         // Make this viewport work with shader generator scheme.
@@ -225,7 +225,7 @@ public:
         mLightCamera->setDebugDisplayEnabled(true);
     }
 
-    void cleanupContent()
+    void cleanupContent() override
     {
         MeshManager::getSingleton().remove("FloorPlaneMesh", RGN_DEFAULT);
     }

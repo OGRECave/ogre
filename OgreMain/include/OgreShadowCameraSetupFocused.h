@@ -259,8 +259,8 @@ namespace Ogre {
 
         /** Returns a uniform shadow camera with a focused view.
         */
-        virtual void getShadowCamera(const SceneManager *sm, const Camera *cam,
-            const Viewport *vp, const Light *light, Camera *texCam, size_t iteration) const;
+        void getShadowCamera(const SceneManager *sm, const Camera *cam,
+            const Viewport *vp, const Light *light, Camera *texCam, size_t iteration) const override;
 
         /** Sets whether or not to use the more aggressive approach to deciding on
             the focus region or not.

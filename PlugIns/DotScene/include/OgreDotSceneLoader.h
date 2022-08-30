@@ -81,12 +81,12 @@ protected:
 
 class _OgreDotScenePluginExport DotScenePlugin : public Plugin
 {
-    const String& getName() const;
+    const String& getName() const override;
 
-    void install() {}
-    void initialise();
-    void shutdown();
-    void uninstall() {}
+    void install() override {}
+    void initialise() override;
+    void shutdown() override;
+    void uninstall() override {}
 private:
     Codec* mCodec;
 };

@@ -22,10 +22,9 @@ same license as the rest of the engine.
 class NullSchemeHandler : public Ogre::MaterialManager::Listener
 {
 public:
-    /** @copydoc MaterialManager::Listener::handleSchemeNotFound */
-    virtual Ogre::Technique* handleSchemeNotFound(unsigned short schemeIndex, 
+    Ogre::Technique* handleSchemeNotFound(unsigned short schemeIndex,
         const Ogre::String& schemeName, Ogre::Material* originalMaterial, unsigned short lodIndex, 
-        const Ogre::Renderable* rend)
+        const Ogre::Renderable* rend) override
     {
         //Creating a technique so the handler only gets called once per material
         Ogre::Technique* emptyTech = originalMaterial->createTechnique();

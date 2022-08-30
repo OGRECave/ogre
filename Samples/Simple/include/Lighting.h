@@ -39,7 +39,7 @@ public:
         mInfo["Category"] = "Lighting";
     }
 
-    bool frameRenderingQueued(const FrameEvent& evt)
+    bool frameRenderingQueued(const FrameEvent& evt) override
     {
         // Modulate the light flare according to performed occlusion queries
         if (mUseOcclusionQuery)
@@ -80,7 +80,7 @@ public:
 
 protected:
 
-    void setupContent()
+    void setupContent() override
     {
         // Set our camera to orbit around the origin at a suitable distance
         mCameraMan->setStyle(CS_ORBIT);
@@ -282,8 +282,8 @@ protected:
     }
 
     // Event raised when render single object started.
-    virtual void notifyRenderSingleObject(Renderable* rend, const Pass* pass, const AutoParamDataSource* source, 
-            const LightList* pLightList, bool suppressRenderStateChanges)
+    void notifyRenderSingleObject(Renderable* rend, const Pass* pass, const AutoParamDataSource* source,
+            const LightList* pLightList, bool suppressRenderStateChanges) override
     {
         //
         // The following code activates and deactivates the occlusion queries
@@ -319,7 +319,7 @@ protected:
         }
     }
 
-    void cleanupContent()
+    void cleanupContent() override
     {
         RenderSystem* renderSystem = Ogre::Root::getSingleton().getRenderSystem();
         if (mLight1QueryArea != NULL)

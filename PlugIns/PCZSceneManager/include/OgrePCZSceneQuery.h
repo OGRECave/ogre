@@ -44,7 +44,7 @@ namespace Ogre
         ~PCZIntersectionSceneQuery();
 
         /** See IntersectionSceneQuery. */
-        void execute(IntersectionSceneQueryListener* listener);
+        void execute(IntersectionSceneQueryListener* listener) override;
     };
     /** PCZ implementation of AxisAlignedBoxSceneQuery. */
     class _OgrePCZPluginExport PCZAxisAlignedBoxSceneQuery : public DefaultAxisAlignedBoxSceneQuery
@@ -54,7 +54,7 @@ namespace Ogre
         ~PCZAxisAlignedBoxSceneQuery();
 
         /** See RaySceneQuery. */
-        void execute(SceneQueryListener* listener);
+        void execute(SceneQueryListener* listener) override;
 
         /** set the zone to start the scene query */
         void setStartZone(PCZone * startZone) {mStartZone = startZone;}
@@ -72,7 +72,7 @@ namespace Ogre
         ~PCZRaySceneQuery();
 
         /** See RayScenQuery. */
-        void execute(RaySceneQueryListener* listener);
+        void execute(RaySceneQueryListener* listener) override;
 
         /** set the zone to start the scene query */
         void setStartZone(PCZone * startZone) {mStartZone = startZone;}
@@ -90,7 +90,7 @@ namespace Ogre
         ~PCZSphereSceneQuery();
 
         /** See SceneQuery. */
-        void execute(SceneQueryListener* listener);
+        void execute(SceneQueryListener* listener) override;
 
         /** set the zone to start the scene query */
         void setStartZone(PCZone * startZone) {mStartZone = startZone;}
@@ -108,7 +108,7 @@ namespace Ogre
         ~PCZPlaneBoundedVolumeListSceneQuery();
 
         /** See SceneQuery. */
-        void execute(SceneQueryListener* listener);
+        void execute(SceneQueryListener* listener) override;
 
         /** set the zone to start the scene query */
         void setStartZone(PCZone * startZone) {mStartZone = startZone;}

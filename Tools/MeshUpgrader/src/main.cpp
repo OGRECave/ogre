@@ -866,7 +866,7 @@ void resolveColourAmbiguities(Mesh* mesh)
 
 struct MeshResourceCreator : public MeshSerializerListener
 {
-    void processMaterialName(Mesh *mesh, String *name)
+    void processMaterialName(Mesh *mesh, String *name) override
     {
 		if(name->empty()) {
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
@@ -878,7 +878,7 @@ struct MeshResourceCreator : public MeshSerializerListener
         }
     }
 
-    void processSkeletonName(Mesh *mesh, String *name)
+    void processSkeletonName(Mesh *mesh, String *name) override
     {
         if (name->empty())
         {
@@ -888,7 +888,7 @@ struct MeshResourceCreator : public MeshSerializerListener
         // create skeleton because we do not load any .skeleton files
         SkeletonManager::getSingleton().createOrRetrieve(*name, mesh->getGroup(), true);
     }
-    void processMeshCompleted(Mesh *mesh) {}
+    void processMeshCompleted(Mesh *mesh) override {}
 };
 }
 

@@ -43,19 +43,19 @@ namespace Ogre {
         GLES2FBOMultiRenderTarget(GLES2FBOManager *manager, const String &name);
         ~GLES2FBOMultiRenderTarget();
 
-        virtual void getCustomAttribute( const String& name, void *pData );
-        GLContext* getContext() const { return fbo.getContext(); }
-        GLFrameBufferObjectCommon* getFBO() { return &fbo; }
+        void getCustomAttribute( const String& name, void *pData ) override;
+        GLContext* getContext() const override { return fbo.getContext(); }
+        GLFrameBufferObjectCommon* getFBO() override { return &fbo; }
 
-        bool requiresTextureFlipping() const { return true; }
+        bool requiresTextureFlipping() const override { return true; }
 
         /// Override so we can attach the depth buffer to the FBO
-        virtual bool attachDepthBuffer( DepthBuffer *depthBuffer );
-        virtual void detachDepthBuffer();
-        virtual void _detachDepthBuffer();
+        bool attachDepthBuffer( DepthBuffer *depthBuffer ) override;
+        void detachDepthBuffer() override;
+        void _detachDepthBuffer() override;
     private:
-        virtual void bindSurfaceImpl(size_t attachment, RenderTexture *target);
-        virtual void unbindSurfaceImpl(size_t attachment); 
+        void bindSurfaceImpl(size_t attachment, RenderTexture *target) override;
+        void unbindSurfaceImpl(size_t attachment) override;
         GLES2FrameBufferObject fbo;
     };
 

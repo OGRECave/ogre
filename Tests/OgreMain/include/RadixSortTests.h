@@ -34,8 +34,8 @@ THE SOFTWARE.
 class RadixSortTests : public ::testing::Test
 {
 public:
-    void SetUp();
-    void TearDown();
+    void SetUp() override;
+    void TearDown() override;
 };
 
 #endif

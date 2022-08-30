@@ -20,7 +20,7 @@ public:
         mInfo["Thumbnail"] = "thumb_bullet.png";
     }
 
-    bool frameStarted(const FrameEvent& evt)
+    bool frameStarted(const FrameEvent& evt) override
     {
         mDynWorld->getBtWorld()->stepSimulation(evt.timeSinceLastFrame, 10);
         mDbgDraw->update();
@@ -28,7 +28,7 @@ public:
         return true;
     }
 
-    void setupContent(void)
+    void setupContent(void) override
     {
         mCameraMan->setStyle(OgreBites::CS_ORBIT);
         mCameraMan->setYawPitchDist(Degree(45), Degree(45), 20);

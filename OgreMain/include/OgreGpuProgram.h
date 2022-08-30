@@ -127,11 +127,11 @@ namespace Ogre {
     // catches errors during prepare
     void safePrepare();
 
-    void prepareImpl();
+    void prepareImpl() override;
 
-    void loadImpl(void);
+    void loadImpl(void) override;
 
-    void postLoadImpl();
+    void postLoadImpl() override;
 
     /// Create the internal params logical & named mapping structures
     void createParameterMappingStructures(bool recreateIfExists = true);

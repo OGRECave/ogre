@@ -61,7 +61,7 @@ namespace Ogre {
         */
         GLRTTManager *mRTTManager;
 
-        void initConfigOptions();
+        void initConfigOptions() override;
         void refreshConfig();
 
         typedef std::list<GLContext*> GLContextList;
@@ -83,7 +83,7 @@ namespace Ogre {
         | Separate Shader Objects | false | Compile shaders individually instad of using monolithic programs. Better introspection. Allows mixing GLSL and SPIRV shaders (GL3+ only)  |
         | Fixed Pipeline Enabled | true | Use fixed function units where possible. Disable to test migration to shader-only pipeline (GL only) |
         */
-        void setConfigOption(const String &name, const String &value);
+        void setConfigOption(const String &name, const String &value) override;
 
         virtual ~GLRenderSystemCommon() {}
 
@@ -120,10 +120,10 @@ namespace Ogre {
                                             const HardwareVertexBufferSharedPtr& vertexBuffer,
                                             const size_t vertexStart) = 0;
 
-        Real getMinimumDepthInputValue(void) { return -1.0f; }            // Range [-1.0f, 1.0f]
-        Real getMaximumDepthInputValue(void) { return 1.0f; }             // Range [-1.0f, 1.0f]
+        Real getMinimumDepthInputValue(void) override { return -1.0f; }            // Range [-1.0f, 1.0f]
+        Real getMaximumDepthInputValue(void) override { return 1.0f; }             // Range [-1.0f, 1.0f]
 
-        void _convertProjectionMatrix(const Matrix4& matrix, Matrix4& dest, bool);
+        void _convertProjectionMatrix(const Matrix4& matrix, Matrix4& dest, bool) override;
 
         /// Mimics D3D9RenderSystem::_getDepthStencilFormatFor, if no FBO RTT manager, outputs GL_NONE
         virtual void _getDepthStencilFormatFor(PixelFormat internalColourFormat,
@@ -141,12 +141,12 @@ namespace Ogre {
         /** Complete destruction of VAOs and FBOs deferred while creator context was not current */
         void _completeDeferredVaoFboDestruction();
 
-        unsigned int getDisplayMonitorCount() const;
+        unsigned int getDisplayMonitorCount() const override;
 
-        void registerThread();
-        void unregisterThread();
-        void preExtraThreadsStarted();
-        void postExtraThreadsStarted();
+        void registerThread() override;
+        void unregisterThread() override;
+        void preExtraThreadsStarted() override;
+        void postExtraThreadsStarted() override;
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
         virtual void resetRenderer(RenderWindow* pRenderWnd) = 0;

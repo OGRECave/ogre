@@ -60,15 +60,15 @@ namespace OgreBites
         {
         }
 
-        const Ogre::String& getName() const
+        const Ogre::String& getName() const override
         {
             return mName;
         }
         
-        void install() {}
-        void uninstall() {}
-        void initialise() {}
-        void shutdown() {}
+        void install() override {}
+        void uninstall() override {}
+        void initialise() override {}
+        void shutdown() override {}
 
         /*-----------------------------------------------------------------------------
         | Adds a sample to the queue.

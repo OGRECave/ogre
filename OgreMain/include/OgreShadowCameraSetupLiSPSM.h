@@ -184,8 +184,8 @@ namespace Ogre
         More information can be found on the webpage of the TU Wien: 
         http://www.cg.tuwien.ac.at/research/vr/lispsm/
         */
-        virtual void getShadowCamera(const SceneManager *sm, const Camera *cam, 
-            const Viewport *vp, const Light *light, Camera *texCam, size_t iteration) const;
+        void getShadowCamera(const SceneManager *sm, const Camera *cam,
+            const Viewport *vp, const Light *light, Camera *texCam, size_t iteration) const override;
 
         /** Adjusts the parameter n to produce optimal shadows.
 

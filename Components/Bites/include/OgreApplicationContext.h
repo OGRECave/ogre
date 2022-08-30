@@ -55,19 +55,19 @@ namespace OgreBites
     class _OgreBitesExport ApplicationContextSDL : public ApplicationContextBase
     {
     protected:
-        void _destroyWindow(const NativeWindowPair& win);
+        void _destroyWindow(const NativeWindowPair& win) override;
     public:
         explicit ApplicationContextSDL(const Ogre::String& appName = "Ogre3D");
 
-        void setWindowGrab(NativeWindowType* win, bool grab);
+        void setWindowGrab(NativeWindowType* win, bool grab) override;
         float getDisplayDPI() const override;
-        void shutdown();
-        void pollEvents();
-        void addInputListener(NativeWindowType* win, InputListener* lis);
-        void removeInputListener(NativeWindowType* win, InputListener* lis);
-        virtual NativeWindowPair
+        void shutdown() override;
+        void pollEvents() override;
+        void addInputListener(NativeWindowType* win, InputListener* lis) override;
+        void removeInputListener(NativeWindowType* win, InputListener* lis) override;
+        NativeWindowPair
         createWindow(const Ogre::String& name, uint32_t w = 0, uint32_t h = 0,
-                     Ogre::NameValuePairList miscParams = Ogre::NameValuePairList());
+                     Ogre::NameValuePairList miscParams = Ogre::NameValuePairList()) override;
 
         using ApplicationContextBase::setWindowGrab;
         using ApplicationContextBase::addInputListener;
@@ -84,13 +84,13 @@ namespace OgreBites
         void initAppForAndroid(AAssetManager* assetMgr, ANativeWindow* window);
         void _fireInputEventAndroid(AInputEvent* event, int wheel = 0);
 
-        virtual void locateResources();
-        virtual void shutdown();
-        void pollEvents();
+        void locateResources() override;
+        void shutdown() override;
+        void pollEvents() override;
 
-        virtual NativeWindowPair
+        NativeWindowPair
         createWindow(const Ogre::String& name, uint32_t w = 0, uint32_t h = 0,
-                     Ogre::NameValuePairList miscParams = Ogre::NameValuePairList());
+                     Ogre::NameValuePairList miscParams = Ogre::NameValuePairList()) override;
 
     protected:
         AAssetManager* mAAssetMgr;

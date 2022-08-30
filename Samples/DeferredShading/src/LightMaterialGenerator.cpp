@@ -51,7 +51,7 @@ public:
 
     }
 
-    virtual GpuProgramPtr generateVertexShader(Perm permutation)
+    GpuProgramPtr generateVertexShader(Perm permutation) override
     {
         String programName = "DeferredShading/post/";
 
@@ -70,7 +70,7 @@ public:
         return ptr;
     }
 
-    virtual GpuProgramPtr generateFragmentShader(Perm permutation)
+    GpuProgramPtr generateFragmentShader(Perm permutation) override
     {
         /// Create shader
         if (mMasterSource.empty())
@@ -103,7 +103,7 @@ public:
         return GpuProgramPtr(ptrProgram);
     }
 
-    virtual MaterialPtr generateTemplateMaterial(Perm permutation)
+    MaterialPtr generateTemplateMaterial(Perm permutation) override
     {
         String materialName = mBaseName;
     
@@ -217,7 +217,7 @@ public:
 
     }
 
-    virtual GpuProgramPtr generateVertexShader(Perm permutation)
+    GpuProgramPtr generateVertexShader(Perm permutation) override
     {
         String programName = "DeferredShading/post/";
 
@@ -236,7 +236,7 @@ public:
         return ptr;
     }
 
-    virtual GpuProgramPtr generateFragmentShader(Perm permutation)
+    GpuProgramPtr generateFragmentShader(Perm permutation) override
     {
         /// Create shader
         if (mMasterSource.empty())
@@ -284,7 +284,7 @@ public:
         return GpuProgramPtr(ptrProgram);
     }
 
-    virtual MaterialPtr generateTemplateMaterial(Perm permutation)
+    MaterialPtr generateTemplateMaterial(Perm permutation) override
     {
         String materialName = mBaseName;
 

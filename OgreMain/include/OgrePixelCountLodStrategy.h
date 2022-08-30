@@ -57,22 +57,22 @@ namespace Ogre {
         PixelCountLodStrategyBase(const String& name);
 
         /// @copydoc LodStrategy::getBaseValue
-        virtual Real getBaseValue() const;
+        Real getBaseValue() const override;
 
         /// @copydoc LodStrategy::transformBias
-        virtual Real transformBias(Real factor) const;
+        Real transformBias(Real factor) const override;
 
         /// @copydoc LodStrategy::getIndex
-        virtual ushort getIndex(Real value, const Mesh::MeshLodUsageList& meshLodUsageList) const;
+        ushort getIndex(Real value, const Mesh::MeshLodUsageList& meshLodUsageList) const override;
 
         /// @copydoc LodStrategy::getIndex
-        virtual ushort getIndex(Real value, const Material::LodValueList& materialLodValueList) const;
+        ushort getIndex(Real value, const Material::LodValueList& materialLodValueList) const override;
 
         /// @copydoc LodStrategy::sort
-        virtual void sort(Mesh::MeshLodUsageList& meshLodUsageList) const;
+        void sort(Mesh::MeshLodUsageList& meshLodUsageList) const override;
 
         /// @copydoc LodStrategy::isSorted
-        virtual bool isSorted(const Mesh::LodValueList& values) const;
+        bool isSorted(const Mesh::LodValueList& values) const override;
     };
 
     class _OgreExport AbsolutePixelCountLodStrategy : public PixelCountLodStrategyBase, public Singleton<AbsolutePixelCountLodStrategy>

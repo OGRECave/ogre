@@ -16,13 +16,13 @@ namespace Ogre {
         virtual ~TinyTextureManager();
 
         /// @copydoc TextureManager::getNativeFormat
-        PixelFormat getNativeFormat(TextureType ttype, PixelFormat format, int usage);
+        PixelFormat getNativeFormat(TextureType ttype, PixelFormat format, int usage) override;
 
     protected:
         /// @copydoc ResourceManager::createImpl
         Resource* createImpl(const String& name, ResourceHandle handle,
                              const String& group, bool isManual, ManualResourceLoader* loader,
-                             const NameValuePairList* createParams);
+                             const NameValuePairList* createParams) override;
     };
 }
 

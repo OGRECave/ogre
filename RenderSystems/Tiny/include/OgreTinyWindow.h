@@ -19,18 +19,18 @@ namespace Ogre
         TinyWindow();
 
         void create(const String& name, unsigned int width, unsigned int height,
-                    bool fullScreen, const NameValuePairList *miscParams);
+                    bool fullScreen, const NameValuePairList *miscParams) override;
 
-        void destroy(void) {}
+        void destroy(void) override {}
 
-        void resize(unsigned int width, unsigned int height);
+        void resize(unsigned int width, unsigned int height) override;
 
-        void copyContentsToMemory(const Box& src, const PixelBox &dst, FrameBuffer buffer);
-        bool requiresTextureFlipping() const { return true; }
+        void copyContentsToMemory(const Box& src, const PixelBox &dst, FrameBuffer buffer) override;
+        bool requiresTextureFlipping() const override { return true; }
 
         Image* getImage() { return &mBuffer; }
 
-        void swapBuffers();
+        void swapBuffers() override;
 
     protected:
         Image mBuffer;

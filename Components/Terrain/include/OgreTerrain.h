@@ -574,12 +574,12 @@ namespace Ogre
         public:
             DefaultGpuBufferAllocator();
             virtual ~DefaultGpuBufferAllocator();
-            void allocateVertexBuffers(Terrain* forTerrain, size_t numVertices, HardwareVertexBufferSharedPtr& destPos, HardwareVertexBufferSharedPtr& destDelta);
-            void freeVertexBuffers(const HardwareVertexBufferSharedPtr& posbuf, const HardwareVertexBufferSharedPtr& deltabuf);
+            void allocateVertexBuffers(Terrain* forTerrain, size_t numVertices, HardwareVertexBufferSharedPtr& destPos, HardwareVertexBufferSharedPtr& destDelta) override;
+            void freeVertexBuffers(const HardwareVertexBufferSharedPtr& posbuf, const HardwareVertexBufferSharedPtr& deltabuf) override;
             HardwareIndexBufferSharedPtr getSharedIndexBuffer(uint16 batchSize, 
                 uint16 vdatasize, size_t vertexIncrement, uint16 xoffset, uint16 yoffset, uint16 numSkirtRowsCols, 
-                uint16 skirtRowColSkip);
-            void freeAllBuffers();
+                uint16 skirtRowColSkip) override;
+            void freeAllBuffers() override;
 
             /** 'Warm start' the allocator based on needing x instances of 
                 terrain with the given configuration.
@@ -1309,9 +1309,9 @@ namespace Ogre
 
         /// Overridden from SceneManager::Listener
         void preFindVisibleObjects(SceneManager* source, 
-            SceneManager::IlluminationRenderStage irs, Viewport* v);
+            SceneManager::IlluminationRenderStage irs, Viewport* v) override;
         /// Overridden from SceneManager::Listener
-        void sceneManagerDestroyed(SceneManager* source);
+        void sceneManagerDestroyed(SceneManager* source) override;
 
         /// Get the render queue group that this terrain will be rendered into
         uint8 getRenderQueueGroup(void) const { return mRenderQueueGroup; }
@@ -1489,13 +1489,13 @@ namespace Ogre
         bool _getUseVertexCompression() const; 
         
         /// WorkQueue::RequestHandler override
-        bool canHandleRequest(const WorkQueue::Request* req, const WorkQueue* srcQ);
+        bool canHandleRequest(const WorkQueue::Request* req, const WorkQueue* srcQ) override;
         /// WorkQueue::RequestHandler override
-        WorkQueue::Response* handleRequest(const WorkQueue::Request* req, const WorkQueue* srcQ);
+        WorkQueue::Response* handleRequest(const WorkQueue::Request* req, const WorkQueue* srcQ) override;
         /// WorkQueue::ResponseHandler override
-        bool canHandleResponse(const WorkQueue::Response* res, const WorkQueue* srcQ);
+        bool canHandleResponse(const WorkQueue::Response* res, const WorkQueue* srcQ) override;
         /// WorkQueue::ResponseHandler override
-        void handleResponse(const WorkQueue::Response* res, const WorkQueue* srcQ);
+        void handleResponse(const WorkQueue::Response* res, const WorkQueue* srcQ) override;
         /// Handler for GenerateMaterial
         void handleGenerateMaterialResponse(const WorkQueue::Response* res, const WorkQueue* srcQ);
 

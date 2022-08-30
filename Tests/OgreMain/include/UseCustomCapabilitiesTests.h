@@ -53,8 +53,8 @@ public:
 #ifdef OGRE_STATIC_LIB
     OgreBites::StaticPluginLoader mStaticPluginLoader;
 #endif
-    void SetUp();
-    void TearDown();
+    void SetUp() override;
+    void TearDown() override;
 };
 
 #endif

@@ -40,10 +40,10 @@ class _OgreGLExport GLHardwarePixelBufferCommon : public HardwarePixelBuffer
 {
 protected:
     /// Lock a box
-    PixelBox lockImpl(const Box &lockBox,  LockOptions options);
+    PixelBox lockImpl(const Box &lockBox,  LockOptions options) override;
 
     /// Unlock a box
-    void unlockImpl(void);
+    void unlockImpl(void) override;
 
     // Internal buffer; either on-card or in system memory, freed/allocated on demand
     // depending on buffer usage

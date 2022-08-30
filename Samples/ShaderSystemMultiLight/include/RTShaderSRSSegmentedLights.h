@@ -48,28 +48,28 @@ public:
     /** 
     @see SubRenderState::getType.
     */
-    virtual const Ogre::String& getType() const;
+    const Ogre::String& getType() const override;
 
     /** 
     @see SubRenderState::getType.
     */
-    virtual int getExecutionOrder() const;
+    int getExecutionOrder() const override;
 
     /** 
     @see SubRenderState::updateGpuProgramsParams.
     */
-    virtual void updateGpuProgramsParams(Ogre::Renderable* rend, const Ogre::Pass* pass, const Ogre::AutoParamDataSource* source, const Ogre::LightList* pLightList);
+    void updateGpuProgramsParams(Ogre::Renderable* rend, const Ogre::Pass* pass, const Ogre::AutoParamDataSource* source, const Ogre::LightList* pLightList) override;
 
     /** 
     @see SubRenderState::copyFrom.
     */
-    virtual void copyFrom(const Ogre::RTShader::SubRenderState& rhs);
+    void copyFrom(const Ogre::RTShader::SubRenderState& rhs) override;
 
 
     /** 
     @see SubRenderState::preAddToRenderState.
     */
-    virtual bool preAddToRenderState(const Ogre::RTShader::RenderState* renderState, Ogre::Pass* srcPass, Ogre::Pass* dstPass);
+    bool preAddToRenderState(const Ogre::RTShader::RenderState* renderState, Ogre::Pass* srcPass, Ogre::Pass* dstPass) override;
 
 
 
@@ -137,7 +137,7 @@ protected:
     /** 
     @see SubRenderState::resolveParameters.
     */
-    virtual bool resolveParameters(Ogre::RTShader::ProgramSet* programSet);
+    bool resolveParameters(Ogre::RTShader::ProgramSet* programSet) override;
 
     /** Resolve global lighting parameters */
     bool resolveGlobalParameters(Ogre::RTShader::ProgramSet* programSet);
@@ -148,12 +148,12 @@ protected:
     /** 
     @see SubRenderState::resolveDependencies.
     */
-    virtual bool resolveDependencies(Ogre::RTShader::ProgramSet* programSet);
+    bool resolveDependencies(Ogre::RTShader::ProgramSet* programSet) override;
 
     /** 
     @see SubRenderState::addFunctionInvocations.
     */
-    virtual bool addFunctionInvocations(Ogre::RTShader::ProgramSet* programSet);
+    bool addFunctionInvocations(Ogre::RTShader::ProgramSet* programSet) override;
 
 
     /** 
@@ -238,17 +238,17 @@ public:
     /** 
     @see SubRenderStateFactory::getType.
     */
-    virtual const Ogre::String& getType() const;
+    const Ogre::String& getType() const override;
 
     /** 
     @see SubRenderStateFactory::createInstance.
     */
-    virtual Ogre::RTShader::SubRenderState* createInstance(Ogre::ScriptCompiler* compiler, Ogre::PropertyAbstractNode* prop, Ogre::Pass* pass, Ogre::RTShader::SGScriptTranslator* translator);
+    Ogre::RTShader::SubRenderState* createInstance(Ogre::ScriptCompiler* compiler, Ogre::PropertyAbstractNode* prop, Ogre::Pass* pass, Ogre::RTShader::SGScriptTranslator* translator) override;
 
     /** 
     @see SubRenderStateFactory::writeInstance.
     */
-    virtual void writeInstance(Ogre::MaterialSerializer* ser, Ogre::RTShader::SubRenderState* subRenderState, Ogre::Pass* srcPass, Ogre::Pass* dstPass);
+    void writeInstance(Ogre::MaterialSerializer* ser, Ogre::RTShader::SubRenderState* subRenderState, Ogre::Pass* srcPass, Ogre::Pass* dstPass) override;
 
 
 protected:
@@ -256,7 +256,7 @@ protected:
     /** 
     @see SubRenderStateFactory::createInstanceImpl.
     */
-    virtual Ogre::RTShader::SubRenderState* createInstanceImpl();
+    Ogre::RTShader::SubRenderState* createInstanceImpl() override;
 
 
 };

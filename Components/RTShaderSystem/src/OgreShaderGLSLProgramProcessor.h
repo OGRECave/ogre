@@ -59,12 +59,12 @@ public:
     /** 
     @see ProgramProcessor::preCreateGpuPrograms
     */
-    virtual bool preCreateGpuPrograms(ProgramSet* programSet);
+    bool preCreateGpuPrograms(ProgramSet* programSet) override;
 
     /** 
     @see ProgramProcessor::postCreateGpuPrograms
     */
-    virtual bool postCreateGpuPrograms(ProgramSet* programSet);
+    bool postCreateGpuPrograms(ProgramSet* programSet) override;
 
 
 private:

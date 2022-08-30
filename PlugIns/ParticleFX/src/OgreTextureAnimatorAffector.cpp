@@ -13,12 +13,12 @@ namespace Ogre {
 class CmdStart : public ParamCommand
 {
 public:
-    String doGet(const void* target) const
+    String doGet(const void* target) const override
     {
         return StringConverter::toString(
             static_cast<const TextureAnimatorAffector*>(target)->getTexcoordStart());
     }
-    void doSet(void* target, const String& val)
+    void doSet(void* target, const String& val) override
     {
         static_cast<TextureAnimatorAffector*>(target)->setTexcoordStart(StringConverter::parseInt(val));
     }
@@ -26,12 +26,12 @@ public:
 class CmdCount : public ParamCommand
 {
 public:
-    String doGet(const void* target) const
+    String doGet(const void* target) const override
     {
         return StringConverter::toString(
             static_cast<const TextureAnimatorAffector*>(target)->getTexcoordCount());
     }
-    void doSet(void* target, const String& val)
+    void doSet(void* target, const String& val) override
     {
         static_cast<TextureAnimatorAffector*>(target)->setTexcoordCount(StringConverter::parseInt(val));
     }
@@ -39,12 +39,12 @@ public:
 class CmdDuration : public ParamCommand
 {
 public:
-    String doGet(const void* target) const
+    String doGet(const void* target) const override
     {
         return StringConverter::toString(
             static_cast<const TextureAnimatorAffector*>(target)->getDuration());
     }
-    void doSet(void* target, const String& val)
+    void doSet(void* target, const String& val) override
     {
         static_cast<TextureAnimatorAffector*>(target)->setDuration(StringConverter::parseReal(val));
     }
@@ -52,12 +52,12 @@ public:
 class CmdOffset : public ParamCommand
 {
 public:
-    String doGet(const void* target) const
+    String doGet(const void* target) const override
     {
         return StringConverter::toString(
             static_cast<const TextureAnimatorAffector*>(target)->isRandomStartOffset());
     }
-    void doSet(void* target, const String& val)
+    void doSet(void* target, const String& val) override
     {
         static_cast<TextureAnimatorAffector*>(target)->useRandomStartOffset(StringConverter::parseBool(val));
     }

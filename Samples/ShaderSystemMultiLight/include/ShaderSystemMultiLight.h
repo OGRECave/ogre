@@ -67,7 +67,7 @@ public:
         
     }
 
-    virtual void _shutdown()
+    void _shutdown() override
     {
         delete SegmentedDynamicLightManager::getSingletonPtr();
 
@@ -91,7 +91,7 @@ public:
         SdkSample::_shutdown();
     }
 
-    bool frameRenderingQueued(const FrameEvent& evt)
+    bool frameRenderingQueued(const FrameEvent& evt) override
     {
         // Move the lights along their paths
         for(size_t i = 0 ; i < mLights.size() ; ++i)
@@ -115,7 +115,7 @@ public:
 
 protected:
 
-    void setupContent()
+    void setupContent() override
     {
         mTrayMgr->createThickSlider(TL_BOTTOM, NUM_OF_LIGHTS_SLIDER, "Num of lights", 240, 80, 0, 64, 65)->setValue(cInitialLightCount, false);
         mTrayMgr->createCheckBox(TL_BOTTOM, TWIRL_LIGHTS_CHECKBOX, "Twirl Lights", 240)->setChecked(false, false);
@@ -146,7 +146,7 @@ protected:
         setupLights();
     }
         
-    void cleanupContent()
+    void cleanupContent() override
     {
         MeshManager::getSingleton().remove("floor", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
     }
@@ -277,7 +277,7 @@ protected:
     }
 
     //--------------------------------------------------------------------------
-    void sliderMoved(Slider* slider)
+    void sliderMoved(Slider* slider) override
     {
         if (slider->getName() == NUM_OF_LIGHTS_SLIDER)
         {
@@ -314,7 +314,7 @@ protected:
     }
 
     
-    void checkBoxToggled(CheckBox* box)
+    void checkBoxToggled(CheckBox* box) override
     {
         const String& cbName = box->getName();
 

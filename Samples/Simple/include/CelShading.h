@@ -18,12 +18,12 @@ public:
         mInfo["Category"] = "Lighting";
     }
 
-    void testCapabilities(const RenderSystemCapabilities* caps)
+    void testCapabilities(const RenderSystemCapabilities* caps) override
     {
         requireMaterial("Examples/CelShading");
     }
 
-    bool frameRenderingQueued(const FrameEvent& evt)
+    bool frameRenderingQueued(const FrameEvent& evt) override
     {
         // make the light revolve around our model if and only if the check box is checked
         if (mMoveLight->isChecked()) mLightPivot->yaw(Degree(evt.timeSinceLastFrame * 30));
@@ -33,7 +33,7 @@ public:
 
 protected:
 
-    void setupContent()
+    void setupContent() override
     {     
         mViewport->setBackgroundColour(ColourValue::White);
 

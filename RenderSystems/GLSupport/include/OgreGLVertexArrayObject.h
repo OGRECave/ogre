@@ -49,7 +49,7 @@ namespace Ogre {
         std::vector<uint32> mInstanceAttribsBound;
         size_t mVertexStart;
 
-        void notifyChanged() { mNeedsUpdate = true; }
+        void notifyChanged() override { mNeedsUpdate = true; }
     public:
         GLVertexArrayObject();
         ~GLVertexArrayObject();

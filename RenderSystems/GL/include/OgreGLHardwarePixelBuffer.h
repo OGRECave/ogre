@@ -46,17 +46,17 @@ namespace Ogre {
         /// @copydoc HardwarePixelBuffer::getRenderTarget
         RenderTexture* getRenderTarget(size_t slice);
         /// Upload a box of pixels to this buffer on the card
-        virtual void upload(const PixelBox &data, const Box &dest);
+        void upload(const PixelBox &data, const Box &dest) override;
         /// Download a box of pixels from the card
-        virtual void download(const PixelBox &data);
+        void download(const PixelBox &data) override;
   
         /// Hardware implementation of blitFromMemory
-        virtual void blitFromMemory(const PixelBox &src_orig, const Box &dstBox);
+        void blitFromMemory(const PixelBox &src_orig, const Box &dstBox) override;
 
         /// Copy from framebuffer
         void copyFromFramebuffer(uint32 zoffset);
         /// @copydoc HardwarePixelBuffer::blit
-        void blit(const HardwarePixelBufferSharedPtr &src, const Box &srcBox, const Box &dstBox);
+        void blit(const HardwarePixelBufferSharedPtr &src, const Box &srcBox, const Box &dstBox) override;
         void blitToMemory(const Box &srcBox, const PixelBox &dst) override;
     protected:
         /// Blitting implementation
