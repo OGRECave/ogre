@@ -105,8 +105,8 @@ namespace Ogre
         {
             if( t.first == sTexturePlugInType )
             {
-                LogManager::getSingleton().logMessage( "Shutting Down Texture Controller: " 
-                        + t.second->getPluginStringName() 
+                LogManager::getSingleton().logMessage( "Shutting Down Texture Controller: "
+                        + t.second->getPluginStringName()
                         + " To be replaced by: "
                         + pTextureSystem->getPluginStringName());
 
