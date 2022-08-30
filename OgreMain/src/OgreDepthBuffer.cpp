@@ -106,7 +106,7 @@ namespace Ogre
     void DepthBuffer::detachFromAllRenderTargets()
     {
         //If we call, detachDepthBuffer
-        for (auto *r : mAttachedRenderTargets) 
+        for (auto *r : mAttachedRenderTargets)
             r->_detachDepthBuffer();
 
         mAttachedRenderTargets.clear();
