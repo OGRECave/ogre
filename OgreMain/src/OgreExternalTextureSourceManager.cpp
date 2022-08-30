@@ -87,11 +87,10 @@ namespace Ogre
     void ExternalTextureSourceManager::destroyAdvancedTexture( const String& sTextureName,
         const String& groupName )
     {
-        TextureSystemList::iterator i;
-        for( i = mTextureSystems.begin(); i != mTextureSystems.end(); ++i )
+        for(auto& t : mTextureSystems)
         {
             //Broadcast to every registered System... Only the true one will destroy texture
-            i->second->destroyAdvancedTexture( sTextureName, groupName );
+            t.second->destroyAdvancedTexture( sTextureName, groupName );
         }
     }
 
@@ -101,20 +100,18 @@ namespace Ogre
         LogManager::getSingleton().logMessage( "Registering Texture Controller: Type = "
                         + sTexturePlugInType + " Name = " + pTextureSystem->getPluginStringName());
 
-        TextureSystemList::iterator i;
-            
-        for( i = mTextureSystems.begin(); i != mTextureSystems.end(); ++i )
+        for(auto& t : mTextureSystems)
         {
-            if( i->first == sTexturePlugInType )
+            if( t.first == sTexturePlugInType )
             {
-                LogManager::getSingleton().logMessage( "Shutting Down Texture Controller: " 
-                        + i->second->getPluginStringName() 
+                LogManager::getSingleton().logMessage( "Shutting Down Texture Controller: "
+                        + t.second->getPluginStringName()
                         + " To be replaced by: "
                         + pTextureSystem->getPluginStringName());
 
-                i->second->shutDown();              //Only one plugIn of Sent Type can be registered at a time
+                t.second->shutDown();              //Only one plugIn of Sent Type can be registered at a time
                                                     //so shut down old plugin before starting new plugin
-                i->second = pTextureSystem;
+                t.second = pTextureSystem;
                 // **Moved this line b/c Rendersystem needs to be selected before things
                 // such as framelistners can be added
                 // pTextureSystem->Initialise();
@@ -127,11 +124,10 @@ namespace Ogre
     //****************************************************************************************
     ExternalTextureSource* ExternalTextureSourceManager::getExternalTextureSource( const String& sTexturePlugInType )
     {
-        TextureSystemList::iterator i;
-        for( i = mTextureSystems.begin(); i != mTextureSystems.end(); ++i )
+        for(auto& t : mTextureSystems)
         {
-            if( i->first == sTexturePlugInType )
-                return i->second;
+            if(t.first == sTexturePlugInType)
+                return t.second;
         }
         return 0;
     }
