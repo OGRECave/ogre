@@ -47,26 +47,26 @@ namespace Ogre
     class _OgrePrivate CmdInputFileName : public ParamCommand
     {
     public:
-        String doGet(const void* target) const;
-        void doSet(void* target, const String& val);
+        String doGet(const void* target) const override;
+        void doSet(void* target, const String& val) override;
     };
     class _OgrePrivate CmdFPS : public ParamCommand
     {
     public:
-        String doGet(const void* target) const;
-        void doSet(void* target, const String& val);
+        String doGet(const void* target) const override;
+        void doSet(void* target, const String& val) override;
     };
     class _OgrePrivate CmdPlayMode : public ParamCommand
     {
     public:
-        String doGet(const void* target) const;
-        void doSet(void* target, const String& val);
+        String doGet(const void* target) const override;
+        void doSet(void* target, const String& val) override;
     };
     class _OgrePrivate CmdTecPassState : public ParamCommand
     {
     public:
-        String doGet(const void* target) const;
-        void doSet(void* target, const String& val);
+        String doGet(const void* target) const override;
+        void doSet(void* target, const String& val) override;
     };
     static CmdInputFileName msCmdInputFile;     /// Command for setting input file name
     static CmdFPS msCmdFramesPerSecond;         /// Command for setting frames per second

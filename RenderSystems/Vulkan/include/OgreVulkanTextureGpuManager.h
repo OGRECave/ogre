@@ -73,9 +73,9 @@ namespace Ogre
         SamplerPtr _createSamplerImpl() override;
 
         Resource* createImpl(const String& name, ResourceHandle handle, const String& group, bool isManual,
-                             ManualResourceLoader* loader, const NameValuePairList* createParams);
+                             ManualResourceLoader* loader, const NameValuePairList* createParams) override;
 
-        PixelFormat getNativeFormat(TextureType ttype, PixelFormat format, int usage);
+        PixelFormat getNativeFormat(TextureType ttype, PixelFormat format, int usage) override;
     public:
         VulkanTextureGpuManager(RenderSystem* renderSystem, VulkanDevice* device, bool bCanRestrictImageViewUsage);
         virtual ~VulkanTextureGpuManager();

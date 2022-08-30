@@ -304,13 +304,13 @@ namespace Ogre {
         static ControllerValueRealPtr create(AnimationState* targetAnimationState, bool addTime = false);
 
         /** ControllerValue implementation. */
-        Real getValue(void) const
+        Real getValue(void) const override
         {
             return mTargetAnimationState->getTimePosition() / mTargetAnimationState->getLength();
         }
 
         /** ControllerValue implementation. */
-        void setValue(Real value)
+        void setValue(Real value) override
         {
             if(mAddTime)
                 mTargetAnimationState->addTime(value);

@@ -46,12 +46,12 @@ namespace Ogre {
     {
     protected:
         /// Compiles and links the vertex and fragment programs
-        virtual void compileAndLink(void);
+        void compileAndLink(void) override;
 
         void buildGLUniformReferences(void);
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
-        virtual void notifyOnContextLost();
+        void notifyOnContextLost() override;
 #endif
         
     public:
@@ -61,12 +61,12 @@ namespace Ogre {
 
         /** Makes a program object active by making sure it is linked and then putting it in use.
         */
-        void activate(void);
+        void activate(void) override;
 
         /** Updates program object uniforms using data from GpuProgramParameters.
         normally called by GLSLESGpuProgram::bindParameters() just before rendering occurs.
         */
-        virtual void updateUniforms(GpuProgramParametersSharedPtr params, uint16 mask, GpuProgramType fromProgType);
+        void updateUniforms(GpuProgramParametersSharedPtr params, uint16 mask, GpuProgramType fromProgType) override;
     };
 
 }

@@ -24,7 +24,7 @@ public:
     ssaoListener(Ogre::CompositorInstance* instance) : mInstance(instance) {}
    
     // this callback we will use to modify SSAO parameters
-    void notifyMaterialRender(Ogre::uint32 pass_id, Ogre::MaterialPtr &mat)
+    void notifyMaterialRender(Ogre::uint32 pass_id, Ogre::MaterialPtr &mat) override
     {
         if (pass_id != 42) // not SSAO, return
             return;

@@ -69,10 +69,9 @@ public:
         mGBufRefMat->load();
     }
 
-    /** @copydoc MaterialManager::Listener::handleSchemeNotFound */
-    virtual Ogre::Technique* handleSchemeNotFound(unsigned short schemeIndex, 
+    Ogre::Technique* handleSchemeNotFound(unsigned short schemeIndex,
         const Ogre::String& schemeName, Ogre::Material* originalMaterial, unsigned short lodIndex, 
-        const Ogre::Renderable* rend)
+        const Ogre::Renderable* rend) override
     {
             Technique* gBufferTech = originalMaterial->createTechnique();
             gBufferTech->setSchemeName(schemeName);
@@ -134,7 +133,7 @@ public:
         mLight = NULL;
     }
     
-    void cleanupContent()
+    void cleanupContent() override
     {
         MaterialManager::getSingleton().removeListener(mGBufSchemeHandler, "GBuffer");
         delete mGBufSchemeHandler;
@@ -161,7 +160,7 @@ public:
         mMeshes.clear();
     }
     
-    void testCapabilities(const RenderSystemCapabilities* caps)
+    void testCapabilities(const RenderSystemCapabilities* caps) override
     {
 		if (StringUtil::startsWith(caps->getRenderSystemName(), "OpenGL ES"))
         {
@@ -405,7 +404,7 @@ protected:
     /**
      * Create the scene and load the content.
      */
-    void setupContent()
+    void setupContent() override
     {
         mViewport->setBackgroundColour(ColourValue(0.5, 0.5, 0.5, 1));
         
@@ -589,7 +588,7 @@ protected:
     }
     
     // sdkTray listener callbacks
-    void itemSelected(SelectMenu* menu)
+    void itemSelected(SelectMenu* menu) override
     {
         if (menu->getName() == SSAO_OBJECT_MENU_NAME)
             changeMesh(menu->getSelectionIndex());
@@ -615,7 +614,7 @@ protected:
         }
     }
     
-    void sliderMoved(Slider* slider)
+    void sliderMoved(Slider* slider) override
     {
         if (slider->getName() == SSAO_CREASE_MINIMUM_NAME)
             setUniform("SSAO/CreaseShading", "cMinimumCrease", slider->getValue());
@@ -678,7 +677,7 @@ protected:
             setUniform("SSAO/HemisphereMC", "cSampleLengthExponent", slider->getValue());
     }
     
-    void checkBoxToggled(OgreBites::CheckBox *box) 
+    void checkBoxToggled(OgreBites::CheckBox *box) override
     {
         if(box->getName() == SSAO_MODUALTE)
         {
@@ -724,7 +723,7 @@ protected:
     
     // The following three methods are for mouse input
     /** @see Sample::pointerPressed. */
-    bool mousePressed(const MouseButtonEvent& evt)
+    bool mousePressed(const MouseButtonEvent& evt) override
     {
         if (mTrayMgr->mousePressed(evt)) 
             return true;
@@ -735,7 +734,7 @@ protected:
     }
     
     /** @see Sample::mouseReleased. */
-    bool mouseReleased(const MouseButtonEvent& evt)
+    bool mouseReleased(const MouseButtonEvent& evt) override
     {
         if (mTrayMgr->mouseReleased(evt)) 
             return true;
@@ -746,7 +745,7 @@ protected:
     }
     
     /** @see Sample::mouseMoved. */
-    bool mouseMoved(const MouseMotionEvent& evt)
+    bool mouseMoved(const MouseMotionEvent& evt) override
     {
         // only rotate the camera if cursor is hidden
         if (mTrayMgr->isCursorVisible())

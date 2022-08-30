@@ -94,7 +94,7 @@ public:
     virtual ~TapDetector()
     {
     }
-    virtual GESTURE_STATE Detect( const AInputEvent* motion_event );
+    GESTURE_STATE Detect( const AInputEvent* motion_event ) override;
 };
 
 /******************************************************************
@@ -117,8 +117,8 @@ public:
     virtual ~DoubletapDetector()
     {
     }
-    virtual GESTURE_STATE Detect( const AInputEvent* motion_event );
-    virtual void SetConfiguration( AConfiguration* config );
+    GESTURE_STATE Detect( const AInputEvent* motion_event ) override;
+    void SetConfiguration( AConfiguration* config ) override;
 };
 
 /******************************************************************
@@ -142,7 +142,7 @@ public:
     virtual ~PinchDetector()
     {
     }
-    virtual GESTURE_STATE Detect( const AInputEvent* event );
+    GESTURE_STATE Detect( const AInputEvent* event ) override;
     bool GetPointers( Vec2& v1, Vec2& v2 );
 };
 
@@ -164,7 +164,7 @@ public:
     virtual ~DragDetector()
     {
     }
-    virtual GESTURE_STATE Detect( const AInputEvent* event );
+    GESTURE_STATE Detect( const AInputEvent* event ) override;
     bool GetPointer( Vec2& v );
 };
 

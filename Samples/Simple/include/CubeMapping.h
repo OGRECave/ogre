@@ -19,7 +19,7 @@ public:
         mInfo["Category"] = "Unsorted";
     }
 
-    bool frameRenderingQueued(const FrameEvent& evt)
+    bool frameRenderingQueued(const FrameEvent& evt) override
     {
         mPivot->yaw(Radian(evt.timeSinceLastFrame));      // spin the fishy around the cube mapped one
         mFishSwim->addTime(evt.timeSinceLastFrame * 3);   // make the fishy swim
@@ -28,7 +28,7 @@ public:
 
 protected:
 
-    void setupContent()
+    void setupContent() override
     {
         mSceneMgr->setSkyDome(true, "Examples/CloudySky");
 
@@ -87,7 +87,7 @@ protected:
         mSceneMgr->getRootSceneNode()->createChildSceneNode()->attachObject(cubeCamera);
     }
 
-    void cleanupContent()
+    void cleanupContent() override
     {
         MeshManager::getSingleton().remove("floor", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
     }

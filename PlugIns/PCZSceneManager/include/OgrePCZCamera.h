@@ -69,10 +69,10 @@ namespace Ogre
 
                 This bounding box is in local coordinates.
         */
-        virtual const AxisAlignedBox& getBoundingBox(void) const;
+        const AxisAlignedBox& getBoundingBox(void) const override;
 
         /* Overridden isVisible function for aabb */
-        virtual bool isVisible( const AxisAlignedBox &bound, FrustumPlane *culledBy=0) const;
+        bool isVisible( const AxisAlignedBox &bound, FrustumPlane *culledBy=0) const override;
 
         /* isVisible() function for portals */
         bool isVisible(PortalBase* portal, FrustumPlane* culledBy = 0) const;
@@ -86,7 +86,7 @@ namespace Ogre
         PCZCamera::Visibility getVisibility( const AxisAlignedBox &bound );
 
         /// Sets the type of projection to use (orthographic or perspective).
-        void setProjectionType(ProjectionType pt);
+        void setProjectionType(ProjectionType pt) override;
 
         /* Update function (currently used for making sure the origin stuff for the
            extra culling frustum is up to date */

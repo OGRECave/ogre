@@ -51,36 +51,36 @@ class TestContext : public OgreBites::SampleContext
     virtual ~TestContext();
 
     /** Does basic setup for the context */
-    virtual void setup();
+    void setup() override;
 
-    bool frameRenderingQueued(const Ogre::FrameEvent& evt);
+    bool frameRenderingQueued(const Ogre::FrameEvent& evt) override;
 
     /** Frame listener callback, handles updating of the tests at the start of frames
      *        @param evt The frame event (passed in for the framelistener) */
-    virtual bool frameStarted(const FrameEvent& evt);
+    bool frameStarted(const FrameEvent& evt) override;
 
     /** Frame listener callback, handles updating of the tests at the end of frames
      *        @param evt The frame event (passed in for the framelistener) */
-    virtual bool frameEnded(const FrameEvent& evt);
+    bool frameEnded(const FrameEvent& evt) override;
 
     /** Runs a given test or sample
      *        @param s The OgreBites::Sample to run
      *        @remarks If s is a VisualTest, then timing and rand will be setup for
      *            determinism. */
-    virtual void runSample(OgreBites::Sample* s);
+    void runSample(OgreBites::Sample* s) override;
 
     /** Loads test plugins
      *        @return The initial tets or sample to run */
     OgreBites::Sample* loadTests();
 
     /** Setup the Root */
-    virtual void createRoot();
+    void createRoot() override;
 
     /** Start it up */
-    virtual void go(OgreBites::Sample* initialSample = 0);
+    void go(OgreBites::Sample* initialSample = 0) override;
 
     /** Handles the config dialog */
-    virtual bool oneTimeConfig();
+    bool oneTimeConfig() override;
 
     /** Set up directories for the tests to output to */
     virtual void setupDirectories(String batchName);

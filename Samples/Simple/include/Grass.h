@@ -35,14 +35,14 @@ class _OgreSampleClassExport Sample_Grass : public SdkSample
         mInfo["Help"] = "Press B to toggle bounding boxes.";
     }
 
-    bool frameRenderingQueued(const FrameEvent& evt)
+    bool frameRenderingQueued(const FrameEvent& evt) override
     {
         mLightAnimState->addTime(evt.timeSinceLastFrame);   // move the light around
         waveGrass(evt.timeSinceLastFrame);                  // wave the grass around slowly to simulate wind
         return SdkSample::frameRenderingQueued(evt);        // don't forget the parent class updates!
     }
 
-    bool keyPressed(const KeyboardEvent& evt)
+    bool keyPressed(const KeyboardEvent& evt) override
     {
         Keycode key = evt.keysym.sym;
         // toggle bounding boxes with B key unless the help dialog is visible
@@ -68,12 +68,12 @@ class _OgreSampleClassExport Sample_Grass : public SdkSample
          mMaxSize = maxSize;
      }
 
-     Real getValue () const
+     Real getValue () const override
      {
          return mIntensity;
      }
 
-     void setValue (Real value)
+     void setValue (Real value) override
      {
          mIntensity = value;
 
@@ -96,7 +96,7 @@ class _OgreSampleClassExport Sample_Grass : public SdkSample
      Real mIntensity;
  };
 
- void setupContent()
+ void setupContent() override
  {
      // Make this viewport work with shader generator
      mViewport->setMaterialScheme(MSN_SHADERGEN);
@@ -290,7 +290,7 @@ class _OgreSampleClassExport Sample_Grass : public SdkSample
      }
  }
 
- void checkBoxToggled(CheckBox* box)
+ void checkBoxToggled(CheckBox* box) override
  {
      auto mat = MaterialManager::getSingleton().getByName(box->isChecked() ? "Examples/GrassBladesWaver"
                                                                            : "Examples/GrassBlades");
@@ -306,7 +306,7 @@ class _OgreSampleClassExport Sample_Grass : public SdkSample
      }
  }
 
- void cleanupContent()
+ void cleanupContent() override
  {
      ControllerManager::getSingleton().destroyController(mLightController);
      MeshManager::getSingleton().remove("ground", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);

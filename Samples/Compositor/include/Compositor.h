@@ -32,18 +32,18 @@ class _OgreSampleClassExport Sample_Compositor : public SdkSample
  public:
     Sample_Compositor();
 
-    void setupContent(void);
-    void cleanupContent(void);
+    void setupContent(void) override;
+    void cleanupContent(void) override;
 
-    bool frameRenderingQueued(const FrameEvent& evt);
+    bool frameRenderingQueued(const FrameEvent& evt) override;
 
-    void checkBoxToggled(OgreBites::CheckBox * box);
-    void buttonHit(OgreBites::Button* button);
-    void itemSelected(OgreBites::SelectMenu* menu);
+    void checkBoxToggled(OgreBites::CheckBox * box) override;
+    void buttonHit(OgreBites::Button* button) override;
+    void itemSelected(OgreBites::SelectMenu* menu) override;
 
  protected:
 
-    void setupView(void);
+    void setupView(void) override;
     void setupControls(void);
     void setupScene(void);
     void createEffects(void);

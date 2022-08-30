@@ -51,24 +51,24 @@ public:
     GLSLangProgramFactory();
     ~GLSLangProgramFactory();
     /// Get the name of the language this factory creates programs for
-    const String& getLanguage(void) const;
+    const String& getLanguage(void) const override;
     GpuProgram* create(ResourceManager* creator, const String& name, ResourceHandle handle,
-                       const String& group, bool isManual, ManualResourceLoader* loader);
+                       const String& group, bool isManual, ManualResourceLoader* loader) override;
 };
 
 /** Plugin instance for Cg Program Manager */
 class _OgreGLSLangProgramManagerExport GLSLangPlugin : public Plugin
 {
 public:
-    const String& getName() const;
+    const String& getName() const override;
 
-    void install();
+    void install() override;
 
-    void initialise();
+    void initialise() override;
 
-    void shutdown();
+    void shutdown() override;
 
-    void uninstall();
+    void uninstall() override;
 
 protected:
     std::unique_ptr<GLSLangProgramFactory> mProgramFactory;

@@ -144,11 +144,11 @@ private:
 class _OgreAssimpExport AssimpPlugin : public Plugin
 {
 public:
-    const String& getName() const;
-    void install();
-    void uninstall();
-    void initialise() {}
-    void shutdown() {}
+    const String& getName() const override;
+    void install() override;
+    void uninstall() override;
+    void initialise() override {}
+    void shutdown() override {}
 };
 /** @} */
 /** @} */

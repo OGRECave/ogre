@@ -15,39 +15,39 @@ namespace {
         ~APKFileSystemArchive();
 
         /// @copydoc Archive::isCaseSensitive
-        bool isCaseSensitive(void) const;
+        bool isCaseSensitive(void) const override;
 
         /// @copydoc Archive::load
-        void load();
+        void load() override;
         /// @copydoc Archive::unload
-        void unload();
+        void unload() override;
 
         /// @copydoc Archive::open
-        DataStreamPtr open(const String& filename, bool readOnly = true) const;
+        DataStreamPtr open(const String& filename, bool readOnly = true) const override;
 
         /// @copydoc Archive::create
-        DataStreamPtr create(const String& filename);
+        DataStreamPtr create(const String& filename) override;
 
         /// @copydoc Archive::remove
-        void remove(const String& filename);
+        void remove(const String& filename) override;
 
         /// @copydoc Archive::list
-        StringVectorPtr list(bool recursive = true, bool dirs = false) const;
+        StringVectorPtr list(bool recursive = true, bool dirs = false) const override;
 
         /// @copydoc Archive::listFileInfo
-        FileInfoListPtr listFileInfo(bool recursive = true, bool dirs = false) const;
+        FileInfoListPtr listFileInfo(bool recursive = true, bool dirs = false) const override;
 
         /// @copydoc Archive::find
-        StringVectorPtr find(const String& pattern, bool recursive = true, bool dirs = false) const;
+        StringVectorPtr find(const String& pattern, bool recursive = true, bool dirs = false) const override;
 
         /// @copydoc Archive::findFileInfo
-        FileInfoListPtr findFileInfo(const String& pattern, bool recursive = true, bool dirs = false) const;
+        FileInfoListPtr findFileInfo(const String& pattern, bool recursive = true, bool dirs = false) const override;
 
         /// @copydoc Archive::exists
-        bool exists(const String& filename) const;
+        bool exists(const String& filename) const override;
 
         /// @copydoc Archive::getModifiedTime
-        time_t getModifiedTime(const String& filename) const;
+        time_t getModifiedTime(const String& filename) const override;
     };
 
 	std::map<String, std::vector< String > > mFiles;

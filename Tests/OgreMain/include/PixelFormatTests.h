@@ -38,8 +38,8 @@ class PixelFormatTests : public ::testing::Test
 {
 
 public:
-    void SetUp();
-    void TearDown();
+    void SetUp() override;
+    void TearDown() override;
 
     // Utils
     void setupBoxes(PixelFormat srcFormat, PixelFormat dstFormat);

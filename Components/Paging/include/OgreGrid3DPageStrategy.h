@@ -172,9 +172,9 @@ namespace Ogre
         virtual int32 getCellRangeMaxZ() const { return mMaxCellZ; }
 
         /// Load this data from a stream (returns true if successful)
-        bool load(StreamSerialiser& stream);
+        bool load(StreamSerialiser& stream) override;
         /// Save this data to a stream
-        void save(StreamSerialiser& stream);
+        void save(StreamSerialiser& stream) override;
 
         virtual void getMidPointGridSpace(int32 x, int32 y, int32 z, Vector3& mid);
         /// Get the (grid space) bottom-left of a cell
@@ -207,11 +207,11 @@ namespace Ogre
         ~Grid3DPageStrategy();
 
         // Overridden members
-        void notifyCamera(Camera* cam, PagedWorldSection* section);
-        PageStrategyData* createData();
-        void destroyData(PageStrategyData* d);
-        void updateDebugDisplay(Page* p, SceneNode* sn);
-        PageID getPageID(const Vector3& worldPos, PagedWorldSection* section);
+        void notifyCamera(Camera* cam, PagedWorldSection* section) override;
+        PageStrategyData* createData() override;
+        void destroyData(PageStrategyData* d) override;
+        void updateDebugDisplay(Page* p, SceneNode* sn) override;
+        PageID getPageID(const Vector3& worldPos, PagedWorldSection* section) override;
     };
 
     /*@}*/

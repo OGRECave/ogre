@@ -103,10 +103,10 @@ namespace Ogre {
         void renderStaticGeometry(void);
 
         /** @copydoc SceneManager::clearScene */
-        void clearScene(void);
+        void clearScene(void) override;
 
         // Overridden so we can manually render world geometry
-        bool fireRenderQueueEnded(uint8 id, const String& invocation);
+        bool fireRenderQueueEnded(uint8 id, const String& invocation) override;
 
         typedef std::set<const MovableObject*> MovablesForRendering;
         MovablesForRendering mMovablesForRendering;
@@ -117,21 +117,21 @@ namespace Ogre {
 
 
         /// @copydoc SceneManager::getTypeName
-        const String& getTypeName(void) const;
+        const String& getTypeName(void) const override;
 
         /** Specialised from SceneManager to support Quake3 bsp files. */
-        void setWorldGeometry(const String& filename);
+        void setWorldGeometry(const String& filename) override;
 
         /** Specialised from SceneManager to support Quake3 bsp files. */
-        size_t estimateWorldGeometry(const String& filename);
+        size_t estimateWorldGeometry(const String& filename) override;
         
         /** Specialised from SceneManager to support Quake3 bsp files. */
         void setWorldGeometry(DataStreamPtr& stream, 
-            const String& typeName = BLANKSTRING);
+            const String& typeName = BLANKSTRING) override;
 
         /** Specialised from SceneManager to support Quake3 bsp files. */
         size_t estimateWorldGeometry(DataStreamPtr& stream, 
-            const String& typeName = BLANKSTRING);
+            const String& typeName = BLANKSTRING) override;
 
         /** Tells the manager whether to draw the axis-aligned boxes that surround
             nodes in the Bsp tree. For debugging purposes.
@@ -139,7 +139,7 @@ namespace Ogre {
         void showNodeBoxes(bool show);
 
         /** Specialised to suggest viewpoints. */
-        ViewPoint getSuggestedViewpoint(bool random = false);
+        ViewPoint getSuggestedViewpoint(bool random = false) override;
 
         const BspLevelPtr& getLevel(void) {return mLevel; }
 
@@ -147,12 +147,12 @@ namespace Ogre {
 
         /** Overridden from SceneManager. */
         void _findVisibleObjects(Camera* cam, VisibleObjectsBoundsInfo* visibleBounds, 
-            bool onlyShadowCasters);
+            bool onlyShadowCasters) override;
 
         /** Creates a specialized BspSceneNode */
-        SceneNode * createSceneNodeImpl ( void );
+        SceneNode * createSceneNodeImpl ( void ) override;
         /** Creates a specialized BspSceneNode */
-        SceneNode * createSceneNodeImpl ( const String &name );
+        SceneNode * createSceneNodeImpl ( const String &name ) override;
 
         /** Internal method for tagging BspNodes with objects which intersect them. */
         void _notifyObjectMoved(const MovableObject* mov, const Vector3& pos);
@@ -203,8 +203,8 @@ namespace Ogre {
         @param mask The query mask to apply to this query; can be used to filter out
             certain objects; see SceneQuery for details.
         */
-        virtual RaySceneQuery* 
-            createRayQuery(const Ray& ray, uint32 mask = 0xFFFFFFFF);
+        RaySceneQuery*
+            createRayQuery(const Ray& ray, uint32 mask = 0xFFFFFFFF) override;
         /** Creates an IntersectionSceneQuery for this scene manager. 
 
             This method creates a new instance of a query object for locating
@@ -216,8 +216,8 @@ namespace Ogre {
         @param mask The query mask to apply to this query; can be used to filter out
             certain objects; see SceneQuery for details.
         */
-        virtual IntersectionSceneQuery* 
-            createIntersectionQuery(uint32 mask = 0xFFFFFFFF);
+        IntersectionSceneQuery*
+            createIntersectionQuery(uint32 mask = 0xFFFFFFFF) override;
 
     };
 
@@ -228,7 +228,7 @@ namespace Ogre {
         BspIntersectionSceneQuery(SceneManager* creator);
 
         /** See IntersectionSceneQuery. */
-        void execute(IntersectionSceneQueryListener* listener);
+        void execute(IntersectionSceneQueryListener* listener) override;
 
     };
 
@@ -240,7 +240,7 @@ namespace Ogre {
         ~BspRaySceneQuery();
 
         /** See RaySceneQuery. */
-        void execute(RaySceneQueryListener* listener);
+        void execute(RaySceneQueryListener* listener) override;
     protected:
         /// Set for eliminating duplicates since objects can be in > 1 node
         std::set<MovableObject*> mObjsThisQuery;
@@ -265,13 +265,13 @@ namespace Ogre {
     class BspSceneManagerFactory : public SceneManagerFactory
     {
     protected:
-        void initMetaData(void) const;
+        void initMetaData(void) const override;
     public:
         BspSceneManagerFactory() {}
         ~BspSceneManagerFactory() {}
         /// Factory type name
         static const String FACTORY_TYPE_NAME;
-        SceneManager* createInstance(const String& instanceName);
+        SceneManager* createInstance(const String& instanceName) override;
     };
     /** @} */
     /** @} */

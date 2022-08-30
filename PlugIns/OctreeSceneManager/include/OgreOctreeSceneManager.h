@@ -82,29 +82,29 @@ public:
     ~OctreeSceneManager();
 
     /// @copydoc SceneManager::getTypeName
-    const String& getTypeName(void) const;
+    const String& getTypeName(void) const override;
 
     /** Initializes the manager to the given box and depth.
     */
     void init( AxisAlignedBox &box, int d );
 
     /** Creates a specialized OctreeNode */
-    virtual SceneNode * createSceneNodeImpl ( void );
+    SceneNode * createSceneNodeImpl ( void ) override;
     /** Creates a specialized OctreeNode */
-    virtual SceneNode * createSceneNodeImpl ( const String &name );
+    SceneNode * createSceneNodeImpl ( const String &name ) override;
     /** Creates a specialized OctreeCamera */
-    virtual Camera * createCamera( const String &name );
+    Camera * createCamera( const String &name ) override;
 
     /** Deletes a scene node */
-    virtual void destroySceneNode( const String &name );
+    void destroySceneNode( const String &name ) override;
 
 
 
     /** Does nothing more */
-    virtual void _updateSceneGraph( Camera * cam );
+    void _updateSceneGraph( Camera * cam ) override;
     /** Recurses through the octree determining which nodes are visible. */
-    virtual void _findVisibleObjects ( Camera * cam, 
-        VisibleObjectsBoundsInfo* visibleBounds, bool onlyShadowCasters );
+    void _findVisibleObjects ( Camera * cam,
+        VisibleObjectsBoundsInfo* visibleBounds, bool onlyShadowCasters ) override;
 
     /** Alerts each unculled object, notifying it that it will be drawn.
      * Useful for doing calculations only on nodes that will be drawn, prior
@@ -168,23 +168,23 @@ public:
         "ShowOctree", bool *;
     */
 
-    virtual bool setOption( const String &, const void * );
+    bool setOption( const String &, const void * ) override;
     /** Gets the given option for the Scene Manager.
 
         See setOption
     */
-    virtual bool getOption( const String &, void * );
+    bool getOption( const String &, void * ) override;
 
-    bool getOptionValues( const String & key, StringVector &refValueList );
-    bool getOptionKeys( StringVector &refKeys );
+    bool getOptionValues( const String & key, StringVector &refValueList ) override;
+    bool getOptionKeys( StringVector &refKeys ) override;
     /** Overridden from SceneManager */
-    void clearScene(void);
+    void clearScene(void) override;
 
-    AxisAlignedBoxSceneQuery* createAABBQuery(const AxisAlignedBox& box, uint32 mask);
-    SphereSceneQuery* createSphereQuery(const Sphere& sphere, uint32 mask);
-    PlaneBoundedVolumeListSceneQuery* createPlaneBoundedVolumeQuery(const PlaneBoundedVolumeList& volumes, uint32 mask);
-    RaySceneQuery* createRayQuery(const Ray& ray, uint32 mask);
-    IntersectionSceneQuery* createIntersectionQuery(uint32 mask);
+    AxisAlignedBoxSceneQuery* createAABBQuery(const AxisAlignedBox& box, uint32 mask) override;
+    SphereSceneQuery* createSphereQuery(const Sphere& sphere, uint32 mask) override;
+    PlaneBoundedVolumeListSceneQuery* createPlaneBoundedVolumeQuery(const PlaneBoundedVolumeList& volumes, uint32 mask) override;
+    RaySceneQuery* createRayQuery(const Ray& ray, uint32 mask) override;
+    IntersectionSceneQuery* createIntersectionQuery(uint32 mask) override;
 
 protected:
 
@@ -220,13 +220,13 @@ protected:
 class OctreeSceneManagerFactory : public SceneManagerFactory
 {
 protected:
-    void initMetaData(void) const;
+    void initMetaData(void) const override;
 public:
     OctreeSceneManagerFactory() {}
     ~OctreeSceneManagerFactory() {}
     /// Factory type name
     static const String FACTORY_TYPE_NAME;
-    SceneManager* createInstance(const String& instanceName);
+    SceneManager* createInstance(const String& instanceName) override;
 };
 
 

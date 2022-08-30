@@ -73,7 +73,7 @@ namespace Ogre {
                     RenderWindow* newWindow(const String& name,
                                         unsigned int width, unsigned int height,
                                         bool fullScreen,
-                                        const NameValuePairList *miscParams = 0);
+                                        const NameValuePairList *miscParams = 0) override;
 
     };
 }

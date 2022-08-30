@@ -24,7 +24,7 @@ public:
         addScreenshotFrame(25);
     }
 
-    bool frameRenderingQueued(const FrameEvent& evt)
+    bool frameRenderingQueued(const FrameEvent& evt) override
     {
         Real theta = ControllerManager::getSingleton().getElapsedTime();
 
@@ -47,7 +47,7 @@ public:
 
 protected:
 
-    void checkBoxToggled(CheckBox* box)
+    void checkBoxToggled(CheckBox* box) override
     {
         auto& cm = CompositorManager::getSingleton();
         cm.setCompositorEnabled(mViewport, "WBOIT", box->isChecked());
@@ -64,7 +64,7 @@ protected:
         }
     }
 
-    void setupContent()
+    void setupContent() override
     {
 #ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
         // Need RTSS for WBOIT

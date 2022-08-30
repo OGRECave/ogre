@@ -92,7 +92,7 @@ protected:
     SceneManager *sceneMgr ;
 
     // Just override the mandatory create scene method
-    void setupContent(void)
+    void setupContent(void) override
     {
         sceneMgr = mSceneMgr ;
         // Set ambient light
@@ -209,7 +209,7 @@ protected:
         mTrayMgr->showCursor();
     }
     
-    void cleanupContent()
+    void cleanupContent() override
     {
         delete waterMesh;
         waterMesh = 0;
@@ -269,7 +269,7 @@ protected:
         }
     }
     
-    void sliderMoved(Slider* slider)
+    void sliderMoved(Slider* slider) override
     {
         if (slider->getName() == "HeadDepthSlider")
         {
@@ -293,7 +293,7 @@ protected:
         }
     }
     
-    void checkBoxToggled(CheckBox* checkBox)
+    void checkBoxToggled(CheckBox* checkBox) override
     {
         if (checkBox->getName() == "FakeNormalsCB")
         {
@@ -305,7 +305,7 @@ protected:
         }
     }
     
-    void itemSelected(SelectMenu* menu)
+    void itemSelected(SelectMenu* menu) override
     {
         //Only one menu in this demo
         const String& materialName = menu->getSelectedItem();
@@ -346,7 +346,7 @@ protected:
     
 public:
     
-    bool keyPressed(const KeyboardEvent& evt)
+    bool keyPressed(const KeyboardEvent& evt) override
     {
         static bool rain = false;
 
@@ -358,7 +358,7 @@ public:
         return SdkSample::keyPressed(evt);
     }
     
-    bool frameRenderingQueued(const FrameEvent& evt)
+    bool frameRenderingQueued(const FrameEvent& evt) override
     {
         if( SdkSample::frameRenderingQueued(evt) == false )
             return false;

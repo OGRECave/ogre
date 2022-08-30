@@ -72,7 +72,7 @@ namespace Ogre {
 
         /** Internal implementation of lock(), do not OVERRIDE or CALL this
             for HardwarePixelBuffer implementations, but override the previous method */
-        virtual void* lockImpl(size_t offset, size_t length, LockOptions options);
+        void* lockImpl(size_t offset, size_t length, LockOptions options) override;
 
         /** Notify TextureBuffer of destruction of render target.
             Called by RenderTexture when destroyed.
@@ -114,10 +114,10 @@ namespace Ogre {
         const PixelBox& getCurrentLock();
         
         /// @copydoc HardwareBuffer::readData
-        virtual void readData(size_t offset, size_t length, void* pDest);
+        void readData(size_t offset, size_t length, void* pDest) override;
         /// @copydoc HardwareBuffer::writeData
-        virtual void writeData(size_t offset, size_t length, const void* pSource,
-                bool discardWholeBuffer = false);
+        void writeData(size_t offset, size_t length, const void* pSource,
+                bool discardWholeBuffer = false) override;
         
         /** Copies a box from another PixelBuffer to a region of the 
             this PixelBuffer. 

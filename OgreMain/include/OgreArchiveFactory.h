@@ -69,7 +69,7 @@ namespace Ogre {
         */
         virtual Archive* createInstance(const String& name, bool readOnly) OGRE_NODISCARD = 0;
 
-        virtual Archive* createInstance(const String& name) OGRE_NODISCARD { return createInstance(name, true); }
+        Archive* createInstance(const String& name) override OGRE_NODISCARD { return createInstance(name, true); }
     };
     /** @} */
     /** @} */

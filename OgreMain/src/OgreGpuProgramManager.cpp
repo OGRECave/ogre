@@ -41,8 +41,8 @@ namespace {
     protected:
         /** Internal load implementation, must be implemented by subclasses.
         */
-        void loadFromSource(void) {}
-        void unloadImpl() {}
+        void loadFromSource(void) override {}
+        void unloadImpl() override {}
 
     public:
         NullProgram(ResourceManager* creator,
@@ -51,10 +51,10 @@ namespace {
             : GpuProgram(creator, name, handle, group, isManual, loader){}
         ~NullProgram() {}
         /// Overridden from GpuProgram - never supported
-        bool isSupported(void) const { return false; }
+        bool isSupported(void) const override { return false; }
         /// Overridden from GpuProgram
-        const String& getLanguage(void) const { return sNullLang; }
-        size_t calculateSize(void) const { return 0; }
+        const String& getLanguage(void) const override { return sNullLang; }
+        size_t calculateSize(void) const override { return 0; }
 
         /// Overridden from StringInterface
         bool setParameter(const String& name, const String& value)
@@ -71,13 +71,13 @@ namespace {
         NullProgramFactory() {}
         ~NullProgramFactory() {}
         /// Get the name of the language this factory creates programs for
-        const String& getLanguage(void) const
+        const String& getLanguage(void) const override
         {
             return sNullLang;
         }
         GpuProgram* create(ResourceManager* creator,
             const String& name, ResourceHandle handle,
-            const String& group, bool isManual, ManualResourceLoader* loader)
+            const String& group, bool isManual, ManualResourceLoader* loader) override
         {
             return OGRE_NEW NullProgram(creator, name, handle, group, isManual, loader);
         }

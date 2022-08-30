@@ -28,8 +28,8 @@ class MeshLodTests : public RootWithoutRenderSystemFixture
 public:
     MeshPtr mMesh;
 
-    void SetUp();
-    void TearDown();
+    void SetUp() override;
+    void TearDown() override;
     void runMeshLodConfigTests(LodConfig::Advanced& advanced);
     void blockedWaitForLodGeneration(const MeshPtr& mesh);
     void addProfile(LodConfig& config);

@@ -55,18 +55,18 @@ namespace Ogre {
         float mScale;
         
     protected:
-        virtual void resize(unsigned int width, unsigned int height);
-        virtual void windowMovedOrResized();
+        void resize(unsigned int width, unsigned int height) override;
+        void windowMovedOrResized() override;
         
     public:
         AndroidEGLWindow(AndroidEGLSupport* glsupport);
         void create(const String& name, unsigned int width, unsigned int height,
-                    bool fullScreen, const NameValuePairList *miscParams);
+                    bool fullScreen, const NameValuePairList *miscParams) override;
         
-        float getViewPointToPixelScale() { return mScale; }
+        float getViewPointToPixelScale() override { return mScale; }
 
-        void _notifySurfaceDestroyed();
-        void _notifySurfaceCreated(void* window, void* config);
+        void _notifySurfaceDestroyed() override;
+        void _notifySurfaceCreated(void* window, void* config) override;
     };
 }
 

@@ -37,7 +37,7 @@ class _OgreSampleClassExport Sample_FacialAnimation : public SdkSample
 
  protected:
 
-    void setupContent(void)
+    void setupContent(void) override
     {
         // setup some basic lighting for our scene
         mSceneMgr->setAmbientLight(ColourValue(0.5, 0.5, 0.5));
@@ -104,7 +104,7 @@ class _OgreSampleClassExport Sample_FacialAnimation : public SdkSample
         mTrayMgr->createCheckBox(TL_TOP, "Manual", "Manual Animation")->setChecked(!mPlayAnimation);
     }
 
-    void cleanupContent()
+    void cleanupContent() override
     {
         mExpressions.clear();
         mMouthShapes.clear();
@@ -114,7 +114,7 @@ class _OgreSampleClassExport Sample_FacialAnimation : public SdkSample
         mHeadMesh->unload();
     }
 
-    void checkBoxToggled(OgreBites::CheckBox * box)
+    void checkBoxToggled(OgreBites::CheckBox * box) override
     {
         bool play = !box->isChecked();
         mPlayAnimation->setEnabled(play);
@@ -140,7 +140,7 @@ class _OgreSampleClassExport Sample_FacialAnimation : public SdkSample
         }
     }
 
-    void sliderMoved(OgreBites::Slider * slider)
+    void sliderMoved(OgreBites::Slider * slider) override
     {
         // update the pose reference controlled by this slider
         mManualKeyFrame->updatePoseReference(StringConverter::parseInt(slider->getName().substr(4)), slider->getValue());

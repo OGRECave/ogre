@@ -25,10 +25,10 @@ public:
 
     static void NewFrame();
 
-    void _findVisibleObjects(Camera* cam, RenderQueue* queue, Viewport* vp);
+    void _findVisibleObjects(Camera* cam, RenderQueue* queue, Viewport* vp) override;
 
 private:
-    void initialise();
+    void initialise() override;
 
     typedef std::vector<ImWchar> CodePointRange;
     std::vector<CodePointRange> mCodePointRanges;
@@ -43,19 +43,19 @@ private:
 
         void updateVertexData(ImDrawData* draw_data);
 
-        bool preRender(SceneManager* sm, RenderSystem* rsys);
+        bool preRender(SceneManager* sm, RenderSystem* rsys) override;
 
-        virtual void getWorldTransforms(Matrix4* xform) const { *xform = mXform; }
-        virtual void getRenderOperation(RenderOperation& op) { op = mRenderOp; }
+        void getWorldTransforms(Matrix4* xform) const override { *xform = mXform; }
+        void getRenderOperation(RenderOperation& op) override { op = mRenderOp; }
 
-        const LightList& getLights(void) const;
+        const LightList& getLights(void) const override;
 
         void createMaterial();
         void createFontTexture();
 
-        const MaterialPtr& getMaterial() const { return mMaterial; }
+        const MaterialPtr& getMaterial() const override { return mMaterial; }
 
-        Real getSquaredViewDepth(const Camera*) const { return 0; }
+        Real getSquaredViewDepth(const Camera*) const override { return 0; }
 
         void _update();
 

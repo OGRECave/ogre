@@ -90,10 +90,10 @@ namespace Ogre
         bool isOpen() const;
 
         static const uint16 WORKQUEUE_LOAD_LOD_DATA_REQUEST;
-        virtual bool canHandleRequest(const WorkQueue::Request* req, const WorkQueue* srcQ);
-        virtual bool canHandleResponse(const WorkQueue::Response* res, const WorkQueue* srcQ);
-        virtual WorkQueue::Response* handleRequest(const WorkQueue::Request* req, const WorkQueue* srcQ);
-        virtual void handleResponse(const WorkQueue::Response* res, const WorkQueue* srcQ);
+        bool canHandleRequest(const WorkQueue::Request* req, const WorkQueue* srcQ) override;
+        bool canHandleResponse(const WorkQueue::Response* res, const WorkQueue* srcQ) override;
+        WorkQueue::Response* handleRequest(const WorkQueue::Request* req, const WorkQueue* srcQ) override;
+        void handleResponse(const WorkQueue::Response* res, const WorkQueue* srcQ) override;
 
         void updateToLodLevel(int lodLevel, bool synchronous = false);
         /// Save each LOD level separately compressed so seek is possible

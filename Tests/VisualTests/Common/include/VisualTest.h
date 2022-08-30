@@ -53,7 +53,7 @@ class VisualTest : public OgreBites::Sample
     }
 
     /** set up the camera and viewport */
-    virtual void setupView()
+    void setupView() override
     {
         mCamera = mSceneMgr->createCamera("MainCamera");
         mCameraNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
@@ -66,7 +66,7 @@ class VisualTest : public OgreBites::Sample
     }
 
     /** Unload all resources used by this sample */
-    virtual void unloadResources()
+    void unloadResources() override
     {
 #ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
         auto& rtShaderGen = Ogre::RTShader::ShaderGenerator::getSingleton();
@@ -79,7 +79,7 @@ class VisualTest : public OgreBites::Sample
     }
 
     /** Default frame started callback, advances animations */
-    virtual bool frameStarted(const Ogre::FrameEvent& evt)
+    bool frameStarted(const Ogre::FrameEvent& evt) override
     {
         for(unsigned int i = 0; i < mAnimStateList.size(); ++i)
             mAnimStateList[i]->addTime(evt.timeSinceLastFrame);

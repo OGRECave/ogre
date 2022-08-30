@@ -16,8 +16,8 @@ class _OgreExport DefaultDebugDrawer : public DebugDrawer
     ManualObject mAxes;
     int mDrawType;
     bool mStatic;
-    void preFindVisibleObjects(SceneManager* source, SceneManager::IlluminationRenderStage irs, Viewport* v);
-    void postFindVisibleObjects(SceneManager* source, SceneManager::IlluminationRenderStage irs, Viewport* v);
+    void preFindVisibleObjects(SceneManager* source, SceneManager::IlluminationRenderStage irs, Viewport* v) override;
+    void postFindVisibleObjects(SceneManager* source, SceneManager::IlluminationRenderStage irs, Viewport* v) override;
     void beginLines();
 public:
     enum DrawType
@@ -31,9 +31,9 @@ public:
     /// if static, the drawer contents are preserved across frames. They are cleared otherwise.
     void setStatic(bool enable) { mStatic = enable; }
 
-    void drawBone(const Node* node);
-    void drawSceneNode(const SceneNode* node);
-    void drawFrustum(const Frustum* frust);
+    void drawBone(const Node* node) override;
+    void drawSceneNode(const SceneNode* node) override;
+    void drawFrustum(const Frustum* frust) override;
     /// Allows the rendering of a wireframe bounding box.
     void drawWireBox(const AxisAlignedBox& aabb, const ColourValue& colour = ColourValue::White);
     /// draw coordinate axes

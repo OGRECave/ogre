@@ -66,11 +66,11 @@ namespace Volume {
         
         /** Overridden from Source.
         */
-        virtual Vector4 getValueAndGradient(const Vector3 &position) const;
+        Vector4 getValueAndGradient(const Vector3 &position) const override;
 
         /** Overridden from Source.
         */
-        virtual Real getValue(const Vector3 &position) const;
+        Real getValue(const Vector3 &position) const override;
     };
 
     /** A plane.
@@ -97,11 +97,11 @@ namespace Volume {
         
         /** Overridden from Source.
         */
-        virtual Vector4 getValueAndGradient(const Vector3 &position) const;
+        Vector4 getValueAndGradient(const Vector3 &position) const override;
 
         /** Overridden from Source.
         */
-        virtual Real getValue(const Vector3 &position) const;
+        Real getValue(const Vector3 &position) const override;
     };
 
     /** A not rotated cube.
@@ -161,11 +161,11 @@ namespace Volume {
         
         /** Overridden from Source.
         */
-        virtual Vector4 getValueAndGradient(const Vector3 &position) const;
+        Vector4 getValueAndGradient(const Vector3 &position) const override;
 
         /** Overridden from Source.
         */
-        virtual Real getValue(const Vector3 &position) const;
+        Real getValue(const Vector3 &position) const override;
     };
 
     /** Abstract operation volume source holding two sources as operants.
@@ -239,11 +239,11 @@ namespace Volume {
         
         /** Overridden from Source.
         */
-        virtual Vector4 getValueAndGradient(const Vector3 &position) const;
+        Vector4 getValueAndGradient(const Vector3 &position) const override;
 
         /** Overridden from Source.
         */
-        virtual Real getValue(const Vector3 &position) const;
+        Real getValue(const Vector3 &position) const override;
     };
 
     /** Builds the union between two sources.
@@ -266,11 +266,11 @@ namespace Volume {
         
         /** Overridden from Source.
         */
-        virtual Vector4 getValueAndGradient(const Vector3 &position) const;
+        Vector4 getValueAndGradient(const Vector3 &position) const override;
 
         /** Overridden from Source.
         */
-        virtual Real getValue(const Vector3 &position) const;
+        Real getValue(const Vector3 &position) const override;
     };
 
     /** Builds the difference between two sources.
@@ -294,11 +294,11 @@ namespace Volume {
         
         /** Overridden from Source.
         */
-        virtual Vector4 getValueAndGradient(const Vector3 &position) const;
+        Vector4 getValueAndGradient(const Vector3 &position) const override;
 
         /** Overridden from Source.
         */
-        virtual Real getValue(const Vector3 &position) const;
+        Real getValue(const Vector3 &position) const override;
     };
 
     /** Source which does a unary operation to another one.
@@ -354,11 +354,11 @@ namespace Volume {
         
         /** Overridden from Source.
         */
-        virtual Vector4 getValueAndGradient(const Vector3 &position) const;
+        Vector4 getValueAndGradient(const Vector3 &position) const override;
 
         /** Overridden from Source.
         */
-        virtual Real getValue(const Vector3 &position) const;
+        Real getValue(const Vector3 &position) const override;
     };
 
     /** Scales the given volume source.
@@ -381,11 +381,11 @@ namespace Volume {
         
         /** Overridden from Source.
         */
-        virtual Vector4 getValueAndGradient(const Vector3 &position) const;
+        Vector4 getValueAndGradient(const Vector3 &position) const override;
 
         /** Overridden from Source.
         */
-        virtual Real getValue(const Vector3 &position) const;
+        Real getValue(const Vector3 &position) const override;
     };
 
     class _OgreVolumeExport CSGNoiseSource: public CSGUnarySource
@@ -459,11 +459,11 @@ namespace Volume {
                 
         /** Overridden from Source.
         */
-        virtual Vector4 getValueAndGradient(const Vector3 &position) const;
+        Vector4 getValueAndGradient(const Vector3 &position) const override;
 
         /** Overridden from Source.
         */
-        virtual Real getValue(const Vector3 &position) const;
+        Real getValue(const Vector3 &position) const override;
         
         /** Gets the initial seed.
         @return

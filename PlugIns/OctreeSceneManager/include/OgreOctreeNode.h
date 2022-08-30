@@ -67,16 +67,16 @@ public:
     ~OctreeNode();
 
     /** Overridden from Node to remove any reference to octants */
-    Node * removeChild( unsigned short index );
+    Node * removeChild( unsigned short index ) override;
     
     /** Overridden from Node to remove any reference to octants */
-    Node * removeChild( const String & name );
+    Node * removeChild( const String & name ) override;
 
     /** Overridden from Node to remove any reference to octants */
-    Node * removeChild( Node* child);
+    Node * removeChild( Node* child) override;
 
     /** Overridden from Node to remove any reference to octants */
-    void removeAllChildren(void);
+    void removeAllChildren(void) override;
 
     /** Returns the Octree in which this OctreeNode resides
     */
@@ -127,7 +127,7 @@ protected:
     any children. If the node has changed its bounds, it is removed from its
     current octree, and reinserted into the tree.
     */
-    void _updateBounds( void );
+    void _updateBounds( void ) override;
 
     void _removeNodeAndChildren( );
 

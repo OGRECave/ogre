@@ -46,10 +46,10 @@ namespace Ogre {
         void getLeftAndTopFromNativeWindow(int & left, int & top, uint width, uint height);
         void initNativeCreatedWindow(const NameValuePairList *miscParams);
         void createNativeWindow( int &left, int &top, uint &width, uint &height, String &title );
-        virtual void reposition(int left, int top);
-        virtual void resize(unsigned int width, unsigned int height);
-        virtual void windowMovedOrResized();
-        virtual void switchFullScreen(bool fullscreen);
+        void reposition(int left, int top) override;
+        void resize(unsigned int width, unsigned int height) override;
+        void windowMovedOrResized() override;
+        void switchFullScreen(bool fullscreen) override;
 
 
     public:
@@ -63,13 +63,13 @@ namespace Ogre {
             * XWINDOW        The X NativeWindowType connection behind that context.
             * ATOM           The X Atom used in client delete events.
             */
-            virtual void getCustomAttribute(const String& name, void* pData);
+            void getCustomAttribute(const String& name, void* pData) override;
 
-            virtual void setFullscreen (bool fullscreen, uint width, uint height);
+            void setFullscreen (bool fullscreen, uint width, uint height) override;
 
         //Moved this from EGLWindow because it has some native calls.
             void create(const String& name, unsigned int width, unsigned int height,
-                        bool fullScreen, const NameValuePairList *miscParams);
+                        bool fullScreen, const NameValuePairList *miscParams) override;
     };
 }
 

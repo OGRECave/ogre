@@ -44,8 +44,8 @@ namespace Ogre {
         class CmdImageAdjust : public ParamCommand
         {
         public:
-            String doGet(const void* target) const;
-            void doSet(void* target, const String& val);
+            String doGet(const void* target) const override;
+            void doSet(void* target, const String& val) override;
         };
 
         /** Default constructor. */

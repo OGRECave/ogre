@@ -96,11 +96,11 @@ namespace Volume {
         
         /** Overridden from Source.
         */
-        virtual Vector4 getValueAndGradient(const Vector3 &position) const;
+        Vector4 getValueAndGradient(const Vector3 &position) const override;
         
         /** Overridden from Source.
         */
-        virtual Real getValue(const Vector3 &position) const;
+        Real getValue(const Vector3 &position) const override;
 
     };
     /** @} */

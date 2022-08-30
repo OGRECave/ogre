@@ -65,91 +65,91 @@ namespace Ogre
 
         /** Set the enclosure node for this OctreeZone
         */
-        virtual void setEnclosureNode(PCZSceneNode *);
+        void setEnclosureNode(PCZSceneNode *) override;
 
         /** Adds an SceneNode to this OctreeZone.
 
         The PCZSceneManager calls this function to add a node
         to the zone.  
         */
-        virtual void _addNode( PCZSceneNode * );
+        void _addNode( PCZSceneNode * ) override;
 
         /** Removes all references to a SceneNode from this Zone.
         */
-        virtual void removeNode( PCZSceneNode * );
+        void removeNode( PCZSceneNode * ) override;
 
         /** Remove all nodes from the node reference list and clear it
         */
-        virtual void _clearNodeLists(short nodeListTypes);
+        void _clearNodeLists(short nodeListTypes) override;
 
         /** Indicates whether or not this zone requires zone-specific data for 
          *  each scene node
          */
-        virtual bool requiresZoneSpecificNodeData(void);
+        bool requiresZoneSpecificNodeData(void) override;
 
         /** Create zone specific data for a node
         */
-        virtual void createNodeZoneData(PCZSceneNode *);
+        void createNodeZoneData(PCZSceneNode *) override;
 
         /** (recursive) Check the given node against all portals in the zone
         */
-        virtual void _checkNodeAgainstPortals(PCZSceneNode *, Portal * );
+        void _checkNodeAgainstPortals(PCZSceneNode *, Portal * ) override;
 
         /** (recursive) Check the given light against all portals in the zone
         */
-        virtual void _checkLightAgainstPortals(PCZLight *, 
+        void _checkLightAgainstPortals(PCZLight *,
                                                unsigned long, 
                                                PCZFrustum *,
-                                               Portal*);
+                                               Portal*) override;
 
         /** Update the zone data for each portal
         */
-        void updatePortalsZoneData(void);
+        void updatePortalsZoneData(void) override;
 
         /** Mark nodes dirty base on moving portals. */
-        void dirtyNodeByMovingPortals(void);
+        void dirtyNodeByMovingPortals(void) override;
 
         /** Update a node's home zone */
-        virtual PCZone * updateNodeHomeZone(PCZSceneNode * pczsn, bool allowBackTouces);
+        PCZone * updateNodeHomeZone(PCZSceneNode * pczsn, bool allowBackTouces) override;
 
         /** Find and add visible objects to the render queue.
 
         Starts with objects in the zone and proceeds through visible portals   
         This is a recursive call (the main call should be to _findVisibleObjects)
         */
-        virtual void findVisibleNodes(PCZCamera *, 
+        void findVisibleNodes(PCZCamera *,
                                       NodeList & visibleNodeList,
                                       RenderQueue * queue,
                                       VisibleObjectsBoundsInfo* visibleBounds, 
                                       bool onlyShadowCasters,
                                       bool displayNodes,
-                                      bool showBoundingBoxes);
+                                      bool showBoundingBoxes) override;
 
         /** Functions for finding Nodes that intersect various shapes */
-        virtual void _findNodes(const AxisAlignedBox &t, 
+        void _findNodes(const AxisAlignedBox &t,
                                 PCZSceneNodeList &list,
                                 PortalList &visitedPortals,
                                 bool includeVisitors,
                                 bool recurseThruPortals,
-                                PCZSceneNode *exclude);
-        virtual void _findNodes(const Sphere &t, 
+                                PCZSceneNode *exclude) override;
+        void _findNodes(const Sphere &t,
                                 PCZSceneNodeList &list, 
                                 PortalList &visitedPortals,
                                 bool includeVisitors,
                                 bool recurseThruPortals,
-                                PCZSceneNode *exclude );
-        virtual void _findNodes(const PlaneBoundedVolume &t, 
+                                PCZSceneNode *exclude ) override;
+        void _findNodes(const PlaneBoundedVolume &t,
                                 PCZSceneNodeList &list, 
                                 PortalList &visitedPortals,
                                 bool includeVisitors,
                                 bool recurseThruPortals,
-                                PCZSceneNode *exclude );
-        virtual void _findNodes(const Ray &t, 
+                                PCZSceneNode *exclude ) override;
+        void _findNodes(const Ray &t,
                                 PCZSceneNodeList &list, 
                                 PortalList &visitedPortals,
                                 bool includeVisitors,
                                 bool recurseThruPortals,
-                                PCZSceneNode *exclude );
+                                PCZSceneNode *exclude ) override;
 
         /** Sets the given option for the Zone
 
@@ -158,24 +158,24 @@ namespace Ogre
             "Depth", int *;
             "ShowOctree", bool *;
         */
-        virtual bool setOption( const String &, const void * );
+        bool setOption( const String &, const void * ) override;
 
         /** Called when the scene manager creates a camera because
             some zone managers (like TerrainZone) need the camera info.
         */
-        virtual void notifyCameraCreated( Camera* c );
+        void notifyCameraCreated( Camera* c ) override;
 
         /** Called by PCZSM during setWorldGeometryRenderQueue() */
-        virtual void notifyWorldGeometryRenderQueue(uint8 qid);
+        void notifyWorldGeometryRenderQueue(uint8 qid) override;
 
         /** Called when a _renderScene is called in the SceneManager */
-        virtual void notifyBeginRenderScene(void);
+        void notifyBeginRenderScene(void) override;
 
         /** Called by PCZSM during setZoneGeometry() */
-        virtual void setZoneGeometry(const String &filename, PCZSceneNode * parentNode);
+        void setZoneGeometry(const String &filename, PCZSceneNode * parentNode) override;
 
         /** Get the world coordinate aabb of the zone */
-        virtual void getAABB(AxisAlignedBox &);
+        void getAABB(AxisAlignedBox &) override;
 
         /// Init function carried over from OctreeSceneManager
         void init(AxisAlignedBox &box, int depth);
@@ -225,7 +225,7 @@ namespace Ogre
         /** Standard destructor */
         ~OctreeZoneData();
         /** Update data */
-        void update(void);
+        void update(void) override;
 
         /** Returns the Octree in which this OctreeNode resides
         */
@@ -255,8 +255,8 @@ namespace Ogre
         OctreeZoneFactory();
         virtual ~OctreeZoneFactory();
 
-        bool supportsPCZoneType(const String& zoneType);
-        PCZone* createPCZone(PCZSceneManager * pczsm, const String& zoneName);
+        bool supportsPCZoneType(const String& zoneType) override;
+        PCZone* createPCZone(PCZSceneManager * pczsm, const String& zoneName) override;
     };
     /** @} */
     /** @} */

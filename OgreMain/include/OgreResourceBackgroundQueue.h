@@ -277,13 +277,13 @@ namespace Ogre {
         void abortRequest( BackgroundProcessTicket ticket );
 
         /// Implementation for WorkQueue::RequestHandler
-        bool canHandleRequest(const WorkQueue::Request* req, const WorkQueue* srcQ);
+        bool canHandleRequest(const WorkQueue::Request* req, const WorkQueue* srcQ) override;
         /// Implementation for WorkQueue::RequestHandler
-        WorkQueue::Response* handleRequest(const WorkQueue::Request* req, const WorkQueue* srcQ);
+        WorkQueue::Response* handleRequest(const WorkQueue::Request* req, const WorkQueue* srcQ) override;
         /// Implementation for WorkQueue::ResponseHandler
-        bool canHandleResponse(const WorkQueue::Response* res, const WorkQueue* srcQ);
+        bool canHandleResponse(const WorkQueue::Response* res, const WorkQueue* srcQ) override;
         /// Implementation for WorkQueue::ResponseHandler
-        void handleResponse(const WorkQueue::Response* res, const WorkQueue* srcQ);
+        void handleResponse(const WorkQueue::Response* res, const WorkQueue* srcQ) override;
 
         /// @copydoc Singleton::getSingleton()
         static ResourceBackgroundQueue& getSingleton(void);

@@ -142,8 +142,8 @@ namespace Ogre
         size_t calculateSize(void) const;
 
         // Resource Listener
-        void unloadingComplete(Resource* prog);
-        void loadingComplete(Resource* prog);
+        void unloadingComplete(Resource* prog) override;
+        void loadingComplete(Resource* prog) override;
 
         static GpuProgramPtr _getProgramByName(const String& name, const String& group,
                                                GpuProgramType type);

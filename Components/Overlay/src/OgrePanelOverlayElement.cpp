@@ -40,22 +40,22 @@ namespace Ogre {
     class _OgrePrivate CmdTiling : public ParamCommand
     {
     public:
-        String doGet(const void* target) const;
-        void doSet(void* target, const String& val);
+        String doGet(const void* target) const override;
+        void doSet(void* target, const String& val) override;
     };
     /** Command object for specifying transparency (see ParamCommand).*/
     class _OgrePrivate CmdTransparent : public ParamCommand
     {
     public:
-        String doGet(const void* target) const;
-        void doSet(void* target, const String& val);
+        String doGet(const void* target) const override;
+        void doSet(void* target, const String& val) override;
     };
     /** Command object for specifying UV coordinates (see ParamCommand).*/
     class _OgrePrivate CmdUVCoords : public ParamCommand
     {
     public:
-        String doGet(const void* target) const;
-        void doSet(void* target, const String& val);
+        String doGet(const void* target) const override;
+        void doSet(void* target, const String& val) override;
     };
     // Command objects
     static CmdTiling msCmdTiling;

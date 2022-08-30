@@ -40,8 +40,8 @@ namespace Ogre
         VulkanWindow *mWindow;
         uint32 mCurrentImageIdx;
 
-        virtual void createInternalResourcesImpl( void ) override;
-        virtual void freeInternalResourcesImpl( void ) override;
+        void createInternalResourcesImpl( void ) override;
+        void freeInternalResourcesImpl( void ) override;
 
     public:
         VulkanTextureGpuWindow(String name, TextureType initialType, TextureManager* textureManager,
@@ -58,7 +58,7 @@ namespace Ogre
 
         VulkanWindow* getWindow() const { return mWindow; }
 
-        virtual void getCustomAttribute( const String& name, void *pData );
+        void getCustomAttribute( const String& name, void *pData ) override;
     };
 }  // namespace Ogre
 

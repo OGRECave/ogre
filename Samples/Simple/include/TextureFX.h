@@ -23,7 +23,7 @@ public:
 
 protected:
 
-    void setupContent()
+    void setupContent() override
     {
         mSceneMgr->setSkyBox(true, "Examples/TrippySkyBox");
 

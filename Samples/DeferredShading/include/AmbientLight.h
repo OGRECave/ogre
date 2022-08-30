@@ -36,13 +36,13 @@ public:
     ~AmbientLight();
 
     /** @copydoc MovableObject::getBoundingRadius */
-    virtual Ogre::Real getBoundingRadius(void) const;
+    Ogre::Real getBoundingRadius(void) const override;
     /** @copydoc Renderable::getSquaredViewDepth */
-    virtual Ogre::Real getSquaredViewDepth(const Ogre::Camera*) const;
+    Ogre::Real getSquaredViewDepth(const Ogre::Camera*) const override;
     /** @copydoc Renderable::getMaterial */
-    virtual const Ogre::MaterialPtr& getMaterial(void) const;
+    const Ogre::MaterialPtr& getMaterial(void) const override;
 
-    virtual void getWorldTransforms(Ogre::Matrix4* xform) const;
+    void getWorldTransforms(Ogre::Matrix4* xform) const override;
 
     void updateFromCamera(Ogre::Camera* camera);
 protected:

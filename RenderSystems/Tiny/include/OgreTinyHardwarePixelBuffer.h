@@ -16,16 +16,16 @@ namespace Ogre {
         TinyHardwarePixelBuffer(const PixelBox& data, Usage usage);
 
         /// Lock a box
-        PixelBox lockImpl(const Box &lockBox,  LockOptions options) {  return mBuffer.getSubVolume(lockBox); }
+        PixelBox lockImpl(const Box &lockBox,  LockOptions options) override {  return mBuffer.getSubVolume(lockBox); }
 
         /// Unlock a box
-        void unlockImpl(void) {}
+        void unlockImpl(void) override {}
 
         /// @copydoc HardwarePixelBuffer::blitFromMemory
-        void blitFromMemory(const PixelBox &src, const Box &dstBox);
+        void blitFromMemory(const PixelBox &src, const Box &dstBox) override;
 
         /// @copydoc HardwarePixelBuffer::blitToMemory
-        void blitToMemory(const Box &srcBox, const PixelBox &dst);
+        void blitToMemory(const Box &srcBox, const PixelBox &dst) override;
     };
 }
 

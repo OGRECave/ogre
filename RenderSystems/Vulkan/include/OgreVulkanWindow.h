@@ -112,20 +112,20 @@ namespace Ogre
 
         VkSurfaceTransformFlagBitsKHR getSurfaceTransform() const { return mSurfaceTransform; }
 
-        virtual void destroy( void );
+        void destroy( void ) override;
 
-        virtual void reposition( int32 leftPt, int32 topPt ) {}
+        void reposition( int32 leftPt, int32 topPt ) override {}
 
         void setVisible( bool visible ) override { mVisible = visible; }
         bool isVisible( void ) const override { return mVisible; }
-        void setHidden( bool hidden ) { mHidden = hidden; }
-        bool isHidden( void ) const { return mHidden; }
+        void setHidden( bool hidden ) override { mHidden = hidden; }
+        bool isHidden( void ) const override { return mHidden; }
 
-        PixelFormat suggestPixelFormat() const { return mTexture->getFormat(); }
-        void copyContentsToMemory(const Box& src, const PixelBox &dst, FrameBuffer buffer = FB_AUTO);
+        PixelFormat suggestPixelFormat() const override { return mTexture->getFormat(); }
+        void copyContentsToMemory(const Box& src, const PixelBox &dst, FrameBuffer buffer = FB_AUTO) override;
 
         /// Vulkan clip space has inverted Y axis compared to OpenGL
-        bool requiresTextureFlipping() const { return true; }
+        bool requiresTextureFlipping() const override { return true; }
 
         void resize(unsigned int widthPt, unsigned int heightPt) override;
 
@@ -134,7 +134,7 @@ namespace Ogre
         void _setDevice( VulkanDevice *device );
 
         void create(const String& name, unsigned int widthPt, unsigned int heightPt, bool fullScreen,
-                    const NameValuePairList* miscParams);
+                    const NameValuePairList* miscParams) override;
 
         /// Returns null if getImageAcquiredSemaphore has already been called during this frame
         VkSemaphore getImageAcquiredSemaphore( void );
@@ -160,8 +160,8 @@ namespace Ogre
         void _swapBuffers();
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-        void _notifySurfaceDestroyed() {}
-        void _notifySurfaceCreated(void* window, void* config) {}
+        void _notifySurfaceDestroyed() override {}
+        void _notifySurfaceCreated(void* window, void* config) override {}
 #endif
     };
 }  // namespace Ogre

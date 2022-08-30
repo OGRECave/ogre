@@ -22,12 +22,12 @@ public:
 
 protected:
 
-    void testCapabilities( const RenderSystemCapabilities* caps )
+    void testCapabilities( const RenderSystemCapabilities* caps ) override
     {
         requireMaterial("Examples/TextureArray");
     }
 
-    void setupContent()
+    void setupContent() override
     {
         mSceneMgr->setSkyBox(true, "Examples/TrippySkyBox");
 

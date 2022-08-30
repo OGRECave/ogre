@@ -260,19 +260,19 @@ namespace Ogre {
 
 
         // Overridden members follow
-        Real getSquaredViewDepth(const Camera* cam) const;
-        Real getBoundingRadius(void) const;
-        const AxisAlignedBox& getBoundingBox(void) const;
-        const MaterialPtr& getMaterial(void) const;
-        const String& getMovableType(void) const;
-        void _updateRenderQueue(RenderQueue *);
-        void getRenderOperation(RenderOperation &);
-        virtual bool preRender(SceneManager* sm, RenderSystem* rsys);
-        void getWorldTransforms(Matrix4 *) const;
-        const LightList& getLights(void) const;
+        Real getSquaredViewDepth(const Camera* cam) const override;
+        Real getBoundingRadius(void) const override;
+        const AxisAlignedBox& getBoundingBox(void) const override;
+        const MaterialPtr& getMaterial(void) const override;
+        const String& getMovableType(void) const override;
+        void _updateRenderQueue(RenderQueue *) override;
+        void getRenderOperation(RenderOperation &) override;
+        bool preRender(SceneManager* sm, RenderSystem* rsys) override;
+        void getWorldTransforms(Matrix4 *) const override;
+        const LightList& getLights(void) const override;
         /// @copydoc MovableObject::visitRenderables
         void visitRenderables(Renderable::Visitor* visitor, 
-            bool debugRenderables = false);
+            bool debugRenderables = false) override;
 
 
 
@@ -367,14 +367,14 @@ namespace Ogre {
     class _OgreExport BillboardChainFactory : public MovableObjectFactory
     {
     private:
-        MovableObject* createInstanceImpl( const String& name, const NameValuePairList* params);
+        MovableObject* createInstanceImpl( const String& name, const NameValuePairList* params) override;
     public:
         BillboardChainFactory() {}
         ~BillboardChainFactory() {}
 
         static String FACTORY_TYPE_NAME;
 
-        const String& getType(void) const;
+        const String& getType(void) const override;
     };
 
     /** @} */

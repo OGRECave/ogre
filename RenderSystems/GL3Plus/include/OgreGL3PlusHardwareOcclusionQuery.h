@@ -81,10 +81,10 @@ public:
     //------------------------------------------------------------------
     // Occlusion query functions (see base class documentation for this)
     //--
-    void beginOcclusionQuery();
-    void endOcclusionQuery();
-    bool pullOcclusionQuery(unsigned int* NumOfFragments);
-    bool isStillOutstanding(void);
+    void beginOcclusionQuery() override;
+    void endOcclusionQuery() override;
+    bool pullOcclusionQuery(unsigned int* NumOfFragments) override;
+    bool isStillOutstanding(void) override;
 
     private:
         GLuint mQueryID;

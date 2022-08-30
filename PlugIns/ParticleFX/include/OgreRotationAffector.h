@@ -50,32 +50,32 @@ namespace Ogre {
         class CmdRotationSpeedRangeStart : public ParamCommand
         {
         public:
-            String doGet(const void* target) const;
-            void doSet(void* target, const String& val);
+            String doGet(const void* target) const override;
+            void doSet(void* target, const String& val) override;
         };
 
         /// Command object for particle emitter  - see ParamCommand 
         class CmdRotationSpeedRangeEnd : public ParamCommand
         {
         public:
-            String doGet(const void* target) const;
-            void doSet(void* target, const String& val);
+            String doGet(const void* target) const override;
+            void doSet(void* target, const String& val) override;
         };
 
         /// Command object for particle emitter  - see ParamCommand 
         class CmdRotationRangeStart : public ParamCommand
         {
         public:
-            String doGet(const void* target) const;
-            void doSet(void* target, const String& val);
+            String doGet(const void* target) const override;
+            void doSet(void* target, const String& val) override;
         };
 
         /// Command object for particle emitter  - see ParamCommand 
         class CmdRotationRangeEnd : public ParamCommand
         {
         public:
-            String doGet(const void* target) const;
-            void doSet(void* target, const String& val);
+            String doGet(const void* target) const override;
+            void doSet(void* target, const String& val) override;
         };
 
         /** Default constructor. */

@@ -24,7 +24,7 @@ public:
             "cursor and access widgets. Use WASD keys to move.";
     }
 
-    bool frameRenderingQueued(const FrameEvent& evt)
+    bool frameRenderingQueued(const FrameEvent& evt) override
     {
         if (mMoveLights)
         {
@@ -36,7 +36,7 @@ public:
         return SdkSample::frameRenderingQueued(evt);  // don't forget the parent class updates!
     }
 
-    void itemSelected(SelectMenu* menu)
+    void itemSelected(SelectMenu* menu) override
     {
         if (menu == mMeshMenu)
         {
@@ -59,7 +59,7 @@ public:
         }
     }
 
-    void checkBoxToggled(CheckBox* box)
+    void checkBoxToggled(CheckBox* box) override
     {
         if (StringUtil::startsWith(box->getName(), "Light", false))
         {
@@ -77,7 +77,7 @@ public:
 
 protected:
 
-    void setupContent()
+    void setupContent() override
     {
         // Make this viewport work with shader generator scheme.
         mViewport->setMaterialScheme(MSN_SHADERGEN);

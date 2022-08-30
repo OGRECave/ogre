@@ -70,16 +70,16 @@ namespace Ogre {
 
         void createLowLevelImpl(void);
         void unloadHighLevelImpl(void);
-        void loadFromSource(void);
+        void loadFromSource(void) override;
 
-        void unloadImpl() { resetCompileError(); }
+        void unloadImpl() override { resetCompileError(); }
     public:
         /** Constructor, should be used only by factory classes. */
         UnifiedHighLevelGpuProgram(ResourceManager* creator, const String& name, ResourceHandle handle,
             const String& group, bool isManual = false, ManualResourceLoader* loader = 0);
         ~UnifiedHighLevelGpuProgram();
 
-        virtual size_t calculateSize(void) const;
+        size_t calculateSize(void) const override;
 
         /** Adds a new delegate program to the list.
 
@@ -94,7 +94,7 @@ namespace Ogre {
         const GpuProgramPtr& _getDelegate() const;
 
         /** @copydoc GpuProgram::getLanguage */
-        const String& getLanguage(void) const;
+        const String& getLanguage(void) const override;
 
         /** Creates a new parameters object compatible with this program definition. 
 
@@ -103,14 +103,14 @@ namespace Ogre {
         HighLevelGpuProgramManager. This method creates a new instance of a parameters
         object containing the definition of the parameters this program understands.
         */
-        GpuProgramParametersSharedPtr createParameters(void);
+        GpuProgramParametersSharedPtr createParameters(void) override;
         /** @copydoc GpuProgram::_getBindingDelegate */
-        GpuProgram* _getBindingDelegate(void);
+        GpuProgram* _getBindingDelegate(void) override;
 
         // All the following methods must delegate to the implementation
 
         /** @copydoc GpuProgram::isSupported */
-        bool isSupported(void) const;
+        bool isSupported(void) const override;
 
         const String& getSource(void) const override
         {
@@ -118,36 +118,36 @@ namespace Ogre {
         }
 
         /** @copydoc GpuProgram::isSkeletalAnimationIncluded */
-        bool isSkeletalAnimationIncluded(void) const;
+        bool isSkeletalAnimationIncluded(void) const override;
 
-        bool isMorphAnimationIncluded(void) const;
+        bool isMorphAnimationIncluded(void) const override;
 
-        bool isPoseAnimationIncluded(void) const;
-        ushort getNumberOfPosesIncluded(void) const;
+        bool isPoseAnimationIncluded(void) const override;
+        ushort getNumberOfPosesIncluded(void) const override;
 
-        bool isVertexTextureFetchRequired(void) const;
+        bool isVertexTextureFetchRequired(void) const override;
         const GpuProgramParametersPtr& getDefaultParameters(void) override;
-        bool hasDefaultParameters(void) const;
-        bool getPassSurfaceAndLightStates(void) const;
-        bool getPassFogStates(void) const;
-        bool getPassTransformStates(void) const;
-        bool hasCompileError(void) const;
-        void resetCompileError(void);
+        bool hasDefaultParameters(void) const override;
+        bool getPassSurfaceAndLightStates(void) const override;
+        bool getPassFogStates(void) const override;
+        bool getPassTransformStates(void) const override;
+        bool hasCompileError(void) const override;
+        void resetCompileError(void) override;
 
-        void load(bool backgroundThread = false);
-        void reload(LoadingFlags flags = LF_DEFAULT);
+        void load(bool backgroundThread = false) override;
+        void reload(LoadingFlags flags = LF_DEFAULT) override;
         bool isReloadable(void) const;
         bool isLoaded(void) const;
         bool isLoading() const;
         LoadingState getLoadingState() const;
-        void unload(void);
+        void unload(void) override;
         size_t getSize(void) const;
-        void touch(void);
+        void touch(void) override;
         bool isBackgroundLoaded(void) const;
         void setBackgroundLoaded(bool bl);
-        void escalateLoading();
-        void addListener(Listener* lis);
-        void removeListener(Listener* lis);
+        void escalateLoading() override;
+        void addListener(Listener* lis) override;
+        void removeListener(Listener* lis) override;
 
     };
 
@@ -158,10 +158,10 @@ namespace Ogre {
         UnifiedHighLevelGpuProgramFactory();
         ~UnifiedHighLevelGpuProgramFactory();
         /// Get the name of the language this factory creates programs for
-        const String& getLanguage(void) const;
+        const String& getLanguage(void) const override;
         GpuProgram* create(ResourceManager* creator,
             const String& name, ResourceHandle handle,
-            const String& group, bool isManual, ManualResourceLoader* loader);
+            const String& group, bool isManual, ManualResourceLoader* loader) override;
     };
 
     /** @} */

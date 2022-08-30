@@ -383,8 +383,8 @@ namespace Ogre {
             SceneMgrQueuedRenderableVisitor() 
                 :transparentShadowCastersMode(false) {}
             ~SceneMgrQueuedRenderableVisitor() {}
-            void visit(const Pass* p, RenderableList& rs);
-            void visit(RenderablePass* rp);
+            void visit(const Pass* p, RenderableList& rs) override;
+            void visit(RenderablePass* rp) override;
 
             /// Target SM to send renderables to
             SceneManager* targetSceneMgr;
@@ -475,7 +475,7 @@ namespace Ogre {
         protected:
             SceneManager* mSceneManager;
             virtual void _updateRenderQueue(RenderQueue* queue) = 0;
-            void nodeDestroyed(const Node*);
+            void nodeDestroyed(const Node*) override;
         public:
             enum BoxPlane
             {
@@ -493,14 +493,14 @@ namespace Ogre {
             bool mEnabled;
 
             void setEnabled(bool enable);
-            void postFindVisibleObjects(SceneManager* source, IlluminationRenderStage irs, Viewport* vp);
+            void postFindVisibleObjects(SceneManager* source, IlluminationRenderStage irs, Viewport* vp) override;
         };
 
         class _OgreExport SkyPlaneRenderer : public SkyRenderer
         {
             Entity* mSkyPlaneEntity;
             Plane mSkyPlane;
-            void _updateRenderQueue(RenderQueue* queue);
+            void _updateRenderQueue(RenderQueue* queue) override;
         public:
             SkyPlaneRenderer(SceneManager* owner) : SkyRenderer(owner), mSkyPlaneEntity(0) {}
             SkyPlaneGenParameters mSkyPlaneGenParameters;
@@ -514,7 +514,7 @@ namespace Ogre {
             std::unique_ptr<ManualObject> mSkyBoxObj;
 
             Quaternion mSkyBoxOrientation;
-            void _updateRenderQueue(RenderQueue* queue);
+            void _updateRenderQueue(RenderQueue* queue) override;
         public:
             SkyBoxRenderer(SceneManager* owner) : SkyRenderer(owner) {}
             SkyBoxGenParameters mSkyBoxGenParameters;
@@ -534,7 +534,7 @@ namespace Ogre {
                 const Quaternion& orientation,
                 int xsegments, int ysegments, int ySegmentsToKeep,
                 const String& groupName);
-            void _updateRenderQueue(RenderQueue* queue);
+            void _updateRenderQueue(RenderQueue* queue) override;
         public:
             SkyDomeRenderer(SceneManager* owner)  : SkyRenderer(owner) {}
             SkyDomeGenParameters mSkyDomeGenParameters;
@@ -833,8 +833,8 @@ namespace Ogre {
                     mLight = light;
                     mFarDistSquared = farDistSquared;
                 }
-                bool queryResult(MovableObject* object);
-                bool queryResult(SceneQuery::WorldFragment* fragment);
+                bool queryResult(MovableObject* object) override;
+                bool queryResult(SceneQuery::WorldFragment* fragment) override;
             };
 
             std::unique_ptr<ShadowCasterSceneQueryListener> mShadowCasterQueryListener;

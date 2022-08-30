@@ -165,7 +165,7 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
 #endif
 
     }
-    bool frameRenderingQueued(const FrameEvent& evt)
+    bool frameRenderingQueued(const FrameEvent& evt) override
     {
         if (mMode != MODE_NORMAL)
         {
@@ -270,13 +270,13 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
         mTerrainGroup->saveAllTerrains(onlyIfModified);
     }
 
-    bool keyReleased(const KeyboardEvent& evt)
+    bool keyReleased(const KeyboardEvent& evt) override
     {
         mKeyPressed = 0;
         return SdkSample::keyReleased(evt);
     }
 
-    bool keyPressed (const KeyboardEvent &e)
+    bool keyPressed (const KeyboardEvent &e) override
     {
 #if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
         mKeyPressed = e.keysym.sym;
@@ -329,7 +329,7 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
         return true;
     }
 
-    void itemSelected(SelectMenu* menu)
+    void itemSelected(SelectMenu* menu) override
     {
         if (menu == mEditMenu)
         {
@@ -342,7 +342,7 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
         }
     }
 
-    void checkBoxToggled(CheckBox* box)
+    void checkBoxToggled(CheckBox* box) override
     {
         if (box == mFlyBox)
         {
@@ -645,7 +645,7 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
     /*-----------------------------------------------------------------------------
       | Extends setupView to change some initial camera settings for this sample.
       -----------------------------------------------------------------------------*/
-    void setupView()
+    void setupView() override
     {
         SdkSample::setupView();
         // Make this viewport work with shader generator scheme.
@@ -697,7 +697,7 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
         mTrayMgr->createParamsPanel(TL_TOPLEFT, "Help", 100, names)->setParamValue(0, "H/F1");
     }
 
-    void setupContent()
+    void setupContent() override
     {
         //! [global_opts]
         mTerrainGlobals = new Ogre::TerrainGlobalOptions();
@@ -812,7 +812,7 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
 
     }
 
-    void _shutdown()
+    void _shutdown() override
     {
         if (mTerrainPaging)
         {

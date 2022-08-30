@@ -119,7 +119,7 @@ namespace Ogre {
         Renderable *_getTexturedRectangle2D();
 
         /** Overridden from ResourceManager since we have to clean up chains too. */
-        void removeAll(void);
+        void removeAll(void) override;
 
         /** Internal method for forcing all active compositors to recreate their resources. */
         void _reconstructAllCompositorResources();

@@ -41,7 +41,7 @@ namespace Ogre
         virtual ~AntiPortal();
 
         /** @copydoc MovableObject::getMovableType */
-        const String& getMovableType() const;
+        const String& getMovableType() const override;
 
     };
 
@@ -49,7 +49,7 @@ namespace Ogre
     class _OgrePCZPluginExport AntiPortalFactory : public PortalBaseFactory
     {
     protected:
-        MovableObject* createInstanceImpl(const String& name, const NameValuePairList* params);
+        MovableObject* createInstanceImpl(const String& name, const NameValuePairList* params) override;
     public:
         AntiPortalFactory() {}
         ~AntiPortalFactory() {}
@@ -57,11 +57,11 @@ namespace Ogre
         static String FACTORY_TYPE_NAME;
         static unsigned long FACTORY_TYPE_FLAG;
 
-        const String& getType() const
+        const String& getType() const override
         { return FACTORY_TYPE_NAME; }
 
         /** Return true here as we want to get a unique type flag. */
-        bool requestTypeFlags() const
+        bool requestTypeFlags() const override
         { return true; }
 
     };

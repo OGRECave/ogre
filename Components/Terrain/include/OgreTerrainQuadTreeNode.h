@@ -222,10 +222,10 @@ namespace Ogre
         bool pointIntersectsNode(long x, long y);
 
         /// Get the AABB (local coords) of this node
-        const AxisAlignedBox& getBoundingBox(void) const { return mAABB; }
+        const AxisAlignedBox& getBoundingBox(void) const override { return mAABB; }
 
         /// Get the bounding radius of this node
-        Real getBoundingRadius() const;
+        Real getBoundingRadius() const override;
         /// Get the local centre of this node, relative to parent terrain centre
         const Vector3& getLocalCentre() const { return mLocalCentre; }
         /// Get the minimum height of the node
@@ -330,8 +330,8 @@ namespace Ogre
         // actual implementation of MovableObject methods
         bool isVisible(void) const override;
         const String& getMovableType(void) const override;
-        void _updateRenderQueue(RenderQueue* queue);
-        void visitRenderables(Renderable::Visitor* visitor,  bool debugRenderables = false);
+        void _updateRenderQueue(RenderQueue* queue) override;
+        void visitRenderables(Renderable::Visitor* visitor,  bool debugRenderables = false) override;
         // actual implementations of Renderable methods
         const MaterialPtr& getMaterial(void) const override;
         Technique* getTechnique(void) const override;

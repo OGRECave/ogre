@@ -25,7 +25,7 @@ class _OgreSampleClassExport Sample_DualQuaternion : public SdkSample
         mInfo["Category"] = "Animation";
     }
 
-    bool frameRenderingQueued(const FrameEvent& evt)
+    bool frameRenderingQueued(const FrameEvent& evt) override
     {
         const Real start = 30;
         const Real range = 145;
@@ -40,7 +40,7 @@ class _OgreSampleClassExport Sample_DualQuaternion : public SdkSample
     }
 
  protected:
-    void setupContent()
+    void setupContent() override
     {
 #if defined(INCLUDE_RTSHADER_SYSTEM) && defined(RTSHADER_SYSTEM_BUILD_EXT_SHADERS)
         // Make this viewport work with shader generator scheme.
@@ -169,7 +169,7 @@ class _OgreSampleClassExport Sample_DualQuaternion : public SdkSample
         mTrayMgr->createParamsPanel(TL_TOPLEFT, "Skinning", 170, names)->setParamValue(0, value);
     }
 
-    void cleanupContent()
+    void cleanupContent() override
     {
         MeshManager::getSingleton().remove("floor", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
 

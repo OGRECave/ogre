@@ -50,7 +50,7 @@ public:
     static LodWorkQueueInjector* getSingletonPtr();
     static LodWorkQueueInjector& getSingleton();
 
-    void handleResponse(const WorkQueue::Response* res, const WorkQueue* srcQ);
+    void handleResponse(const WorkQueue::Response* res, const WorkQueue* srcQ) override;
 
     void setInjectorListener(LodWorkQueueInjectorListener* injectorListener) {mInjectorListener = injectorListener;}
     LodWorkQueueInjectorListener* getInjectorListener() {return mInjectorListener;}

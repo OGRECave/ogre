@@ -210,13 +210,13 @@ namespace Ogre {
             /// Get the index data for this geometry 
             const IndexData* getIndexData(void) const { return mIndexData; }
             /// @copydoc Renderable::getMaterial
-            const MaterialPtr& getMaterial(void) const;
-            Technique* getTechnique(void) const;
-            void getRenderOperation(RenderOperation& op);
-            void getWorldTransforms(Matrix4* xform) const;
-            Real getSquaredViewDepth(const Camera* cam) const;
-            const LightList& getLights(void) const;
-            bool getCastsShadows(void) const;
+            const MaterialPtr& getMaterial(void) const override;
+            Technique* getTechnique(void) const override;
+            void getRenderOperation(RenderOperation& op) override;
+            void getWorldTransforms(Matrix4* xform) const override;
+            Real getSquaredViewDepth(const Camera* cam) const override;
+            const LightList& getLights(void) const override;
+            bool getCastsShadows(void) const override;
             
             /** Try to assign geometry to this bucket.
             @return false if there is no room left in this bucket
@@ -393,16 +393,16 @@ namespace Ogre {
             uint32 getID(void) const { return mRegionID; }
             /// Get the centre point of the region
             const Vector3& getCentre(void) const { return mCentre; }
-            const String& getMovableType(void) const;
-            void _notifyCurrentCamera(Camera* cam);
-            const AxisAlignedBox& getBoundingBox(void) const;
-            Real getBoundingRadius(void) const;
-            void _updateRenderQueue(RenderQueue* queue);
+            const String& getMovableType(void) const override;
+            void _notifyCurrentCamera(Camera* cam) override;
+            const AxisAlignedBox& getBoundingBox(void) const override;
+            Real getBoundingRadius(void) const override;
+            void _updateRenderQueue(RenderQueue* queue) override;
             /// @copydoc MovableObject::visitRenderables
             void visitRenderables(Renderable::Visitor* visitor, 
-                bool debugRenderables = false);
-            bool isVisible(void) const;
-            uint32 getTypeFlags(void) const;
+                bool debugRenderables = false) override;
+            bool isVisible(void) const override;
+            uint32 getTypeFlags(void) const override;
 
             typedef VectorIterator<LODBucketList> LODIterator;
             /// @deprecated use getLODBuckets()
@@ -726,14 +726,14 @@ namespace Ogre {
     /** Dummy factory to let Regions adhere to MovableObject protocol */
     class _OgreExport StaticGeometryFactory : public MovableObjectFactory
     {
-        MovableObject* createInstanceImpl( const String& name, const NameValuePairList* params) { return NULL; }
+        MovableObject* createInstanceImpl( const String& name, const NameValuePairList* params) override { return NULL; }
     public:
         StaticGeometryFactory() {}
         ~StaticGeometryFactory() {}
 
         static String FACTORY_TYPE_NAME;
 
-        const String& getType(void) const { return FACTORY_TYPE_NAME; }
+        const String& getType(void) const override { return FACTORY_TYPE_NAME; }
     };
     /** @} */
     /** @} */

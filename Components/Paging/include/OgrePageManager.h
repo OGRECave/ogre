@@ -445,10 +445,10 @@ namespace Ogre
             EventRouter() : pManager(0), pWorldMap(0), pCameraList(0) {}
             ~EventRouter() {}
 
-            void cameraPreRenderScene(Camera* cam);
-            void cameraDestroyed(Camera* cam);
-            bool frameStarted(const FrameEvent& evt);
-            bool frameEnded(const FrameEvent& evt);
+            void cameraPreRenderScene(Camera* cam) override;
+            void cameraDestroyed(Camera* cam) override;
+            bool frameStarted(const FrameEvent& evt) override;
+            bool frameEnded(const FrameEvent& evt) override;
         };
 
         void createStandardStrategies();

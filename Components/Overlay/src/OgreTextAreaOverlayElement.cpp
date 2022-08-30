@@ -45,50 +45,50 @@ namespace Ogre {
     class _OgrePrivate CmdCaption : public ParamCommand
     {
     public:
-        String doGet( const void* target ) const;
-        void doSet( void* target, const String& val );
+        String doGet( const void* target ) const override;
+        void doSet( void* target, const String& val ) override;
     };
     class _OgrePrivate CmdCharHeight : public ParamCommand
     {
     public:
-        String doGet( const void* target ) const;
-        void doSet( void* target, const String& val );
+        String doGet( const void* target ) const override;
+        void doSet( void* target, const String& val ) override;
     };
     class _OgrePrivate CmdSpaceWidth : public ParamCommand
     {
     public:
-        String doGet( const void* target ) const;
-        void doSet( void* target, const String& val );
+        String doGet( const void* target ) const override;
+        void doSet( void* target, const String& val ) override;
     };
     class _OgrePrivate CmdFontName : public ParamCommand
     {
     public:
-        String doGet( const void* target ) const;
-        void doSet( void* target, const String& val );
+        String doGet( const void* target ) const override;
+        void doSet( void* target, const String& val ) override;
     };
     class _OgrePrivate CmdColourTop : public ParamCommand
     {
     public:
-        String doGet( const void* target ) const;
-        void doSet( void* target, const String& val );
+        String doGet( const void* target ) const override;
+        void doSet( void* target, const String& val ) override;
     };
     class _OgrePrivate CmdColourBottom : public ParamCommand
     {
     public:
-        String doGet( const void* target ) const;
-        void doSet( void* target, const String& val );
+        String doGet( const void* target ) const override;
+        void doSet( void* target, const String& val ) override;
     };
     class _OgrePrivate CmdColour : public ParamCommand
     {
     public:
-        String doGet( const void* target ) const;
-        void doSet( void* target, const String& val );
+        String doGet( const void* target ) const override;
+        void doSet( void* target, const String& val ) override;
     };
     class _OgrePrivate CmdAlignment : public ParamCommand
     {
     public:
-        String doGet( const void* target ) const;
-        void doSet( void* target, const String& val );
+        String doGet( const void* target ) const override;
+        void doSet( void* target, const String& val ) override;
     };
     // Command objects
     static CmdCharHeight msCmdCharHeight;

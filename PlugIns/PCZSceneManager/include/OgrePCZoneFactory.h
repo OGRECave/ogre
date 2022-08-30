@@ -57,8 +57,8 @@ namespace Ogre
     public:
         DefaultZoneFactory();
         virtual ~DefaultZoneFactory();
-        bool supportsPCZoneType(const String& zoneType);
-        PCZone* createPCZone(PCZSceneManager * pczsm, const String& zoneName);
+        bool supportsPCZoneType(const String& zoneType) override;
+        PCZone* createPCZone(PCZSceneManager * pczsm, const String& zoneName) override;
     };
 
     // PCZoneFactory manager class

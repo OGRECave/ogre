@@ -36,14 +36,14 @@ public:
         mFrustumPlanes[FRUSTUM_PLANE_FAR].normal = Vector3::UNIT_Z;
         mFrustumPlanes[FRUSTUM_PLANE_FAR].d = 9999999999999999999.0f;
     }
-    virtual bool isVisible(const AxisAlignedBox& bound, FrustumPlane* culledBy = 0) const {return true;};
-    virtual bool isVisible(const Sphere& bound, FrustumPlane* culledBy = 0) const {return true;};
-    virtual bool isVisible(const Vector3& vert, FrustumPlane* culledBy = 0) const {return true;};
+    bool isVisible(const AxisAlignedBox& bound, FrustumPlane* culledBy = 0) const override {return true;};
+    bool isVisible(const Sphere& bound, FrustumPlane* culledBy = 0) const override {return true;};
+    bool isVisible(const Vector3& vert, FrustumPlane* culledBy = 0) const override {return true;};
     bool projectSphere(const Sphere& sphere, 
-        Real* left, Real* top, Real* right, Real* bottom) const {*left = *bottom = -1.0f; *right = *top = 1.0f; return true;};
+        Real* left, Real* top, Real* right, Real* bottom) const override {*left = *bottom = -1.0f; *right = *top = 1.0f; return true;};
     Real getNearClipDistance(void) const {return 1.0;};
     Real getFarClipDistance(void) const {return 9999999999999.0f;};
-    const Plane& getFrustumPlane( unsigned short plane ) const
+    const Plane& getFrustumPlane( unsigned short plane ) const override
     {
         return mFrustumPlanes[plane];
     }
@@ -58,36 +58,36 @@ public:
     Sample_ShaderSystem();
     ~Sample_ShaderSystem();
         
-    virtual void _shutdown();
+    void _shutdown() override;
 
     /** @see Sample::checkBoxToggled. */
-    void checkBoxToggled(CheckBox* box);
+    void checkBoxToggled(CheckBox* box) override;
 
     /** @see Sample::itemSelected. */
-    void itemSelected(SelectMenu* menu);
+    void itemSelected(SelectMenu* menu) override;
 
     /** @see Sample::buttonHit. */
-    virtual void buttonHit(OgreBites::Button* b);
+    void buttonHit(OgreBites::Button* b) override;
 
     /** @see Sample::sliderMoved. */
-    virtual void sliderMoved(Slider* slider);
+    void sliderMoved(Slider* slider) override;
 
     /** @see Sample::testCapabilities. */
-    void testCapabilities(const RenderSystemCapabilities* caps);
+    void testCapabilities(const RenderSystemCapabilities* caps) override;
     
     /** @see Sample::frameRenderingQueued. */
-    bool frameRenderingQueued(const FrameEvent& evt);
+    bool frameRenderingQueued(const FrameEvent& evt) override;
 
     void updateTargetObjInfo();
 
     /** @see Sample::mousePressed. */
-    bool mousePressed(const MouseButtonEvent& evt);
+    bool mousePressed(const MouseButtonEvent& evt) override;
 
     /** @see Sample::mouseReleased. */
-    bool mouseReleased(const MouseButtonEvent& evt);
+    bool mouseReleased(const MouseButtonEvent& evt) override;
 
     /** @see Sample::mouseMoved. */
-    bool mouseMoved(const MouseMotionEvent& evt);
+    bool mouseMoved(const MouseMotionEvent& evt) override;
 
 protected:
 
@@ -150,22 +150,22 @@ protected:
 //  virtual void setupView();
 
     /** @see Sample::setupContent. */
-    virtual void setupContent();
+    void setupContent() override;
 
     /** Setup the UI for the sample. */
     void setupUI();
     
     /** @see Sample::setupContent. */
-    virtual void cleanupContent();
+    void cleanupContent() override;
 
     /** @see Sample::loadResources. */
-    void loadResources();
+    void loadResources() override;
 
     /** Create private resource group. */
     void createPrivateResourceGroup();
     
     /** @see Sample::unloadResources. */
-    void unloadResources();
+    void unloadResources() override;
 
     void createInstancedViewports();
     void destroyInstancedViewports();

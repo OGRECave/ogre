@@ -35,14 +35,14 @@ using namespace Ogre;
 
 struct RTShaderSystem : public RootWithoutRenderSystemFixture
 {
-    void SetUp()
+    void SetUp() override
     {
         RootWithoutRenderSystemFixture::SetUp();
 
         RTShader::ShaderGenerator::initialize();
         RTShader::ShaderGenerator::getSingleton().setTargetLanguage("glsl");
     }
-    void TearDown()
+    void TearDown() override
     {
         RTShader::ShaderGenerator::destroy();
         RootWithoutRenderSystemFixture::TearDown();

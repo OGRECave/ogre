@@ -18,7 +18,7 @@ public:
         mInfo["Category"] = "Environment";
     }
 
-    void sliderMoved(Slider* slider)
+    void sliderMoved(Slider* slider) override
     {
         // use the values from the sliders to update the skydome properties
         mSceneMgr->setSkyDome(true, "Examples/CloudySky", mCurvatureSlider->getValue(), mTilingSlider->getValue());
@@ -26,7 +26,7 @@ public:
 
 protected:
 
-    void setupContent()
+    void setupContent() override
     {
         // setup some basic lighting for our scene
         mSceneMgr->setAmbientLight(ColourValue(0.3, 0.3, 0.3));
@@ -62,7 +62,7 @@ protected:
         mTilingSlider->setValue(8);
     }
 
-    void cleanupContent()
+    void cleanupContent() override
     {
         MeshManager::getSingleton().remove("floor", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
     }

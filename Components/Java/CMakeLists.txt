@@ -23,7 +23,7 @@ if(MSVC)
 else()
 	add_definitions(-Wno-strict-aliasing -Wno-cast-qual -Wno-shadow -Wno-missing-declarations)
 	if(CMAKE_COMPILER_IS_GNUCXX)
-		add_definitions(-Wno-unused-but-set-variable)
+		add_definitions(-Wno-unused-but-set-variable -Wno-suggest-override)
 	endif()
 endif()
 

@@ -92,7 +92,7 @@ namespace Ogre
         virtual void setValue(const AnyNumeric& val);
 
         /** Clone a keyframe (internal use only) */
-        KeyFrame* _clone(AnimationTrack* newParent) const;
+        KeyFrame* _clone(AnimationTrack* newParent) const override;
     private:
         AnyNumeric mValue;
     };
@@ -136,7 +136,7 @@ namespace Ogre
         virtual const Quaternion& getRotation(void) const;
 
         /** Clone a keyframe (internal use only) */
-        KeyFrame* _clone(AnimationTrack* newParent) const;
+        KeyFrame* _clone(AnimationTrack* newParent) const override;
     private:
         Vector3 mTranslate;
         Vector3 mScale;
@@ -168,8 +168,7 @@ namespace Ogre
         /** Gets the vertex buffer containing positions for this keyframe. */
         const HardwareVertexBufferSharedPtr& getVertexBuffer(void) const;
 
-        /** Clone a keyframe (internal use only) */
-        KeyFrame* _clone(AnimationTrack* newParent) const;      
+        KeyFrame* _clone(AnimationTrack* newParent) const override;
 
     private:
         HardwareVertexBufferSharedPtr mBuffer;
@@ -241,7 +240,7 @@ namespace Ogre
         OGRE_DEPRECATED ConstPoseRefIterator getPoseReferenceIterator(void) const;
 
         /** Clone a keyframe (internal use only) */
-        KeyFrame* _clone(AnimationTrack* newParent) const;
+        KeyFrame* _clone(AnimationTrack* newParent) const override;
         
         void _applyBaseKeyFrame(const VertexPoseKeyFrame* base);
         

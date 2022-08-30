@@ -191,9 +191,9 @@ namespace Ogre
         virtual int32 getCellRangeMaxY() const { return mMaxCellY; }
 
         /// Load this data from a stream (returns true if successful)
-        bool load(StreamSerialiser& stream);
+        bool load(StreamSerialiser& stream) override;
         /// Save this data to a stream
-        void save(StreamSerialiser& stream);
+        void save(StreamSerialiser& stream) override;
 
         /// Convert a world point to grid space (not relative to origin)
         virtual void convertWorldToGridSpace(const Vector3& world, Vector2& grid);
@@ -232,11 +232,11 @@ namespace Ogre
         ~Grid2DPageStrategy();
 
         // Overridden members
-        void notifyCamera(Camera* cam, PagedWorldSection* section);
-        PageStrategyData* createData();
-        void destroyData(PageStrategyData* d);
-        void updateDebugDisplay(Page* p, SceneNode* sn);
-        PageID getPageID(const Vector3& worldPos, PagedWorldSection* section);
+        void notifyCamera(Camera* cam, PagedWorldSection* section) override;
+        PageStrategyData* createData() override;
+        void destroyData(PageStrategyData* d) override;
+        void updateDebugDisplay(Page* p, SceneNode* sn) override;
+        PageID getPageID(const Vector3& worldPos, PagedWorldSection* section) override;
     };
 
     /** @} */

@@ -36,11 +36,11 @@ namespace Ogre
     {
     public:
         //-----------------------------------------------------------------------
-        String doGet(const void* target) const
+        String doGet(const void* target) const override
         {
             return static_cast<const HighLevelGpuProgram*>(target)->getPreprocessorDefines();
         }
-        void doSet(void* target, const String& val)
+        void doSet(void* target, const String& val) override
         {
             static_cast<HighLevelGpuProgram*>(target)->setPreprocessorDefines(val);
         }
@@ -51,11 +51,11 @@ namespace Ogre
     class CmdEntryPoint : public ParamCommand
     {
     public:
-        String doGet(const void* target) const
+        String doGet(const void* target) const override
         {
             return static_cast<const HighLevelGpuProgram*>(target)->getEntryPoint();
         }
-        void doSet(void* target, const String& val) { static_cast<HighLevelGpuProgram*>(target)->setEntryPoint(val); }
+        void doSet(void* target, const String& val) override { static_cast<HighLevelGpuProgram*>(target)->setEntryPoint(val); }
     };
     static CmdEntryPoint msCmdEntryPoint;
 

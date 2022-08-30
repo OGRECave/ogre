@@ -111,7 +111,7 @@ ColourValue parseColour(pugi::xml_node& XMLNode)
 
 struct DotSceneCodec : public Codec
 {
-    String magicNumberToFileExt(const char* magicNumberPtr, size_t maxbytes) const { return ""; }
+    String magicNumberToFileExt(const char* magicNumberPtr, size_t maxbytes) const override { return ""; }
     String getType() const override { return "scene"; }
     void decode(const DataStreamPtr& stream, const Any& output) const override
     {

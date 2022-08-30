@@ -72,8 +72,8 @@ namespace Ogre {
         void create(const String& name, unsigned int width, unsigned int height,
                     bool fullScreen, const NameValuePairList *miscParams);
 
-        void _notifySurfaceDestroyed();
-        void _notifySurfaceCreated(void* window, void* config = NULL);
+        void _notifySurfaceDestroyed() override;
+        void _notifySurfaceCreated(void* window, void* config = NULL) override;
         virtual void swapBuffers();
     };
 }

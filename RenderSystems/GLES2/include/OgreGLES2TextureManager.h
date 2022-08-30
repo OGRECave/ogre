@@ -43,18 +43,18 @@ namespace Ogre {
             virtual ~GLES2TextureManager();
 
             /// @copydoc TextureManager::getNativeFormat
-            PixelFormat getNativeFormat(TextureType ttype, PixelFormat format, int usage);
+            PixelFormat getNativeFormat(TextureType ttype, PixelFormat format, int usage) override;
 
             /// @copydoc TextureManager::isHardwareFilteringSupported
             bool isHardwareFilteringSupported(TextureType ttype, PixelFormat format, int usage,
-                                              bool preciseFormatOnly = false);
+                                              bool preciseFormatOnly = false) override;
     protected:
         friend class GLES2RenderSystem;
         
         /// @copydoc ResourceManager::createImpl
         Resource* createImpl(const String& name, ResourceHandle handle,
                              const String& group, bool isManual, ManualResourceLoader* loader, 
-                             const NameValuePairList* createParams);
+                             const NameValuePairList* createParams) override;
         
         GLES2RenderSystem* mRenderSystem;
     };

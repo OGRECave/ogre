@@ -42,8 +42,8 @@ protected:
     HardwareBufferManager* mBufMgr;
 
 public:
-    void SetUp();
-    void TearDown();
+    void SetUp() override;
+    void TearDown() override;
 };
 
 #endif

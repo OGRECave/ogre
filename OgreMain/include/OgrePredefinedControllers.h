@@ -93,10 +93,10 @@ namespace Ogre {
 
         /** Gets the frame number as a parametric value in the range [0,1]
         */
-        Real getValue(void) const;
+        Real getValue(void) const override;
         /** Sets the frame number as a parametric value in the range [0,1]; the actual frame number is (value * numFrames) % numFrames).
         */
-        void setValue(Real value);
+        void setValue(Real value) override;
 
     };
     //-----------------------------------------------------------------------
@@ -140,8 +140,8 @@ namespace Ogre {
             return std::make_shared<TexCoordModifierControllerValue>(t, translateU, translateV, scaleU, scaleV, rotate);
         }
 
-        Real getValue(void) const;
-        void setValue(Real value);
+        Real getValue(void) const override;
+        void setValue(Real value) override;
 
     };
 
@@ -180,8 +180,8 @@ namespace Ogre {
             return std::make_shared<FloatGpuParameterControllerValue>(params, index);
         }
 
-        Real getValue(void) const;
-        void setValue(Real value);
+        Real getValue(void) const override;
+        void setValue(Real value) override;
 
     };
     //-----------------------------------------------------------------------
@@ -203,7 +203,7 @@ namespace Ogre {
             return std::make_shared<PassthroughControllerFunction>(deltaInput);
         }
 
-        Real calculate(Real source);
+        Real calculate(Real source) override;
     };
 
     /** Predefined controller function for dealing with animation.
@@ -228,7 +228,7 @@ namespace Ogre {
             return std::make_shared<AnimationControllerFunction>(sequenceTime, timeOffset);
         }
 
-        Real calculate(Real source);
+        Real calculate(Real source) override;
 
         /** Set the time value manually. */
         void setTime(Real timeVal);
@@ -259,7 +259,7 @@ namespace Ogre {
             return std::make_shared<ScaleControllerFunction>(scalefactor, deltaInput);
         }
 
-        Real calculate(Real source);
+        Real calculate(Real source) override;
     };
 
     //-----------------------------------------------------------------------
@@ -309,7 +309,7 @@ namespace Ogre {
             return std::make_shared<WaveformControllerFunction>(wType, base, frequency, phase, amplitude, deltaInput, dutyCycle);
         }
 
-        Real calculate(Real source);
+        Real calculate(Real source) override;
     };
 
     //-----------------------------------------------------------------------
@@ -343,7 +343,7 @@ namespace Ogre {
             return std::make_shared<LinearControllerFunction>(keys, values, frequency, deltaInput);
         }
 
-        Real calculate(Real source);
+        Real calculate(Real source) override;
     };
     //-----------------------------------------------------------------------
     /** @} */

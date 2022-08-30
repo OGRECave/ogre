@@ -68,22 +68,22 @@ public:
     /** 
     @see SubRenderState::getType.
     */
-    virtual const String& getType() const;
+    const String& getType() const override;
 
     /** 
     @see SubRenderState::getType.
     */
-    virtual int getExecutionOrder() const;
+    int getExecutionOrder() const override;
 
     /** 
     @see SubRenderState::copyFrom.
     */
-    virtual void copyFrom(const SubRenderState& rhs);
+    void copyFrom(const SubRenderState& rhs) override;
 
     /** 
     @see SubRenderState::preAddToRenderState.
     */
-    virtual bool preAddToRenderState(const RenderState* renderState, Pass* srcPass, Pass* dstPass);
+    bool preAddToRenderState(const RenderState* renderState, Pass* srcPass, Pass* dstPass) override;
 
     /**
     Set the resolve stage flags that this sub render state will produce.
@@ -114,9 +114,9 @@ public:
 
 // Protected methods
 protected:  
-    virtual bool resolveParameters(ProgramSet* programSet); 
-    virtual bool resolveDependencies(ProgramSet* programSet);
-    virtual bool addFunctionInvocations(ProgramSet* programSet);
+    bool resolveParameters(ProgramSet* programSet) override;
+    bool resolveDependencies(ProgramSet* programSet) override;
+    bool addFunctionInvocations(ProgramSet* programSet) override;
 
 // Attributes.
 protected:
@@ -148,17 +148,17 @@ public:
     /** 
     @see SubRenderStateFactory::getType.
     */
-    virtual const String& getType() const;
+    const String& getType() const override;
 
     /** 
     @see SubRenderStateFactory::createInstance.
     */
-    virtual SubRenderState* createInstance(ScriptCompiler* compiler, PropertyAbstractNode* prop, Pass* pass, SGScriptTranslator* translator);
+    SubRenderState* createInstance(ScriptCompiler* compiler, PropertyAbstractNode* prop, Pass* pass, SGScriptTranslator* translator) override;
 
     /** 
     @see SubRenderStateFactory::writeInstance.
     */
-    virtual void writeInstance(MaterialSerializer* ser, SubRenderState* subRenderState, Pass* srcPass, Pass* dstPass);
+    void writeInstance(MaterialSerializer* ser, SubRenderState* subRenderState, Pass* srcPass, Pass* dstPass) override;
 
     
 protected:
@@ -166,7 +166,7 @@ protected:
     /** 
     @see SubRenderStateFactory::createInstanceImpl.
     */
-    virtual SubRenderState* createInstanceImpl();
+    SubRenderState* createInstanceImpl() override;
 
 
 };

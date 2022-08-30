@@ -59,29 +59,29 @@ namespace Ogre {
         class CmdWidth : public ParamCommand
         {
         public:
-            String doGet(const void* target) const;
-            void doSet(void* target, const String& val);
+            String doGet(const void* target) const override;
+            void doSet(void* target, const String& val) override;
         };
         /** Command object for area emitter size (see ParamCommand).*/
         class CmdHeight : public ParamCommand
         {
         public:
-            String doGet(const void* target) const;
-            void doSet(void* target, const String& val);
+            String doGet(const void* target) const override;
+            void doSet(void* target, const String& val) override;
         };
         /** Command object for area emitter size (see ParamCommand).*/
         class CmdDepth : public ParamCommand
         {
         public:
-            String doGet(const void* target) const;
-            void doSet(void* target, const String& val);
+            String doGet(const void* target) const override;
+            void doSet(void* target, const String& val) override;
         };
 
 
         AreaEmitter(ParticleSystem* psys) : ParticleEmitter(psys) {}
 
         /** Overloaded to update the trans. matrix */
-        void setDirection( const Vector3& direction );
+        void setDirection( const Vector3& direction ) override;
 
         /** Sets the size of the area from which particles are emitted.
         @param

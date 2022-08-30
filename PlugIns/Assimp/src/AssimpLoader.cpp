@@ -60,7 +60,7 @@ struct OgreLogStream : public Assimp::LogStream
     LogMessageLevel _lml;
     OgreLogStream(LogMessageLevel lml) : _lml(lml) {}
 
-    void write(const char* message)
+    void write(const char* message) override
     {
         String msg(message);
         StringUtil::trim(msg);
@@ -74,16 +74,16 @@ struct OgreIOStream : public Assimp::IOStream
 
     OgreIOStream(DataStreamPtr _stream) : stream(_stream) {}
 
-    size_t Read(void* pvBuffer, size_t pSize, size_t pCount)
+    size_t Read(void* pvBuffer, size_t pSize, size_t pCount) override
     {
         size_t bytes = stream->read(pvBuffer, pSize * pCount);
         return bytes / pSize;
     }
-    size_t Tell() const { return stream->tell(); }
-    size_t FileSize() const { return stream->size(); }
+    size_t Tell() const override { return stream->tell(); }
+    size_t FileSize() const override { return stream->size(); }
 
-    size_t Write(const void* pvBuffer, size_t pSize, size_t pCount) { return 0; }
-    aiReturn Seek(size_t pOffset, aiOrigin pOrigin)
+    size_t Write(const void* pvBuffer, size_t pSize, size_t pCount) override { return 0; }
+    aiReturn Seek(size_t pOffset, aiOrigin pOrigin) override
     {
         if (pOrigin != aiOrigin_SET)
             return AI_FAILURE;
@@ -91,7 +91,7 @@ struct OgreIOStream : public Assimp::IOStream
         stream->seek(pOffset);
         return AI_SUCCESS;
     }
-    void Flush() {}
+    void Flush() override {}
 };
 
 struct OgreIOSystem : public Assimp::IOSystem
@@ -102,7 +102,7 @@ struct OgreIOSystem : public Assimp::IOSystem
 
     OgreIOSystem(const DataStreamPtr& _source, const String& group) : source(_source), _group(group) {}
 
-    bool Exists(const char* pFile) const
+    bool Exists(const char* pFile) const override
     {
         String file = StringUtil::normalizeFilePath(pFile, false);
         if (file == source->getName())
@@ -1313,8 +1313,8 @@ struct AssimpCodec : public Codec
 
     AssimpCodec(const String& type) : mType(type) {}
 
-    String magicNumberToFileExt(const char* magicNumberPtr, size_t maxbytes) const { return ""; }
-    String getType() const { return mType; }
+    String magicNumberToFileExt(const char* magicNumberPtr, size_t maxbytes) const override { return ""; }
+    String getType() const override { return mType; }
     void decode(const DataStreamPtr& input, const Any& output) const override
     {
         Mesh* dst = any_cast<Mesh*>(output);

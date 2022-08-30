@@ -144,14 +144,14 @@ namespace Ogre
         virtual uint32 getLoadingIntervalMs() const;
 
         /// Overridden from PagedWorldSection
-        void loadPage(PageID pageID, bool forceSynchronous = false);
+        void loadPage(PageID pageID, bool forceSynchronous = false) override;
         /// Overridden from PagedWorldSection
-        void unloadPage(PageID pageID, bool forceSynchronous = false);
+        void unloadPage(PageID pageID, bool forceSynchronous = false) override;
 
         /// WorkQueue::RequestHandler override
-        WorkQueue::Response* handleRequest(const WorkQueue::Request* req, const WorkQueue* srcQ);
+        WorkQueue::Response* handleRequest(const WorkQueue::Request* req, const WorkQueue* srcQ) override;
         /// WorkQueue::ResponseHandler override
-        void handleResponse(const WorkQueue::Response* res, const WorkQueue* srcQ);
+        void handleResponse(const WorkQueue::Response* res, const WorkQueue* srcQ) override;
 
         static const uint16 WORKQUEUE_LOAD_TERRAIN_PAGE_REQUEST;
 
@@ -182,8 +182,8 @@ namespace Ogre
         uint32 mLoadingIntervalMs;
 
         /// Overridden from PagedWorldSection
-        void loadSubtypeData(StreamSerialiser& ser);
-        void saveSubtypeData(StreamSerialiser& ser);
+        void loadSubtypeData(StreamSerialiser& ser) override;
+        void saveSubtypeData(StreamSerialiser& ser) override;
 
         virtual void syncSettings();
 

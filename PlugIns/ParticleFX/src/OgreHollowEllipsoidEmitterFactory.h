@@ -47,7 +47,7 @@ namespace Ogre {
     public:
         String getName() const override { return "HollowEllipsoid"; }
 
-        ParticleEmitter* createEmitter(ParticleSystem* psys) 
+        ParticleEmitter* createEmitter(ParticleSystem* psys) override
         {
             ParticleEmitter* emit = OGRE_NEW HollowEllipsoidEmitter(psys);
             mEmitters.push_back(emit);

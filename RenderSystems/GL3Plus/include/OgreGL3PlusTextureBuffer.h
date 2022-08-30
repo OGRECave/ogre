@@ -44,13 +44,13 @@ namespace Ogre {
                              uint32 height, uint32 depth);
         ~GL3PlusTextureBuffer();
 
-        virtual void bindToFramebuffer(uint32 attachment, uint32 zoffset);
+        void bindToFramebuffer(uint32 attachment, uint32 zoffset) override;
 
         /// Upload a box of pixels to this buffer on the card.
-        virtual void upload(const PixelBox &data, const Box &dest);
+        void upload(const PixelBox &data, const Box &dest) override;
 
         /// Download a box of pixels from the card.
-        virtual void download(const PixelBox &data);
+        void download(const PixelBox &data) override;
 
         /// Hardware implementation of blitFromMemory.
         void blitFromMemory(const PixelBox &src_orig, const Box &dstBox) override;
@@ -60,7 +60,7 @@ namespace Ogre {
 
         /// @copydoc HardwarePixelBuffer::blit
         void blit(const HardwarePixelBufferSharedPtr &src,
-                  const Box &srcBox, const Box &dstBox);
+                  const Box &srcBox, const Box &dstBox) override;
 
         void blitToMemory(const Box &srcBox, const PixelBox &dst) override;
     protected:

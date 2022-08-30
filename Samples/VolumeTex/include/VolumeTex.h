@@ -41,7 +41,7 @@ public:
         mInfo["Category"] = "Unsorted";
     }
 
-    void testCapabilities(const RenderSystemCapabilities* caps)
+    void testCapabilities(const RenderSystemCapabilities* caps) override
     {
         if (!caps->hasCapability(RSC_TEXTURE_3D))
         {
@@ -55,7 +55,7 @@ protected:
     TexturePtr ptex;
     float global_real, global_imag, global_theta;
 
-    void setupView(void)
+    void setupView(void) override
     {
         SdkSample::setupView();
 
@@ -65,11 +65,11 @@ protected:
         mCamera->setNearClipDistance(5);
     }
 
-    void setupContent(void);
+    void setupContent(void) override;
 
-    bool frameRenderingQueued( const FrameEvent& evt );
+    bool frameRenderingQueued( const FrameEvent& evt ) override;
 
-    void cleanupContent(void);
+    void cleanupContent(void) override;
 
     void createControls()
     {
@@ -80,7 +80,7 @@ protected:
         mTrayMgr->showCursor();
     }
 
-    void sliderMoved(Slider* slider)
+    void sliderMoved(Slider* slider) override
     {
         if (slider->getName() == "RealSlider")
         {

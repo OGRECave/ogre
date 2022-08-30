@@ -89,11 +89,11 @@ namespace Ogre {
     template <typename _Class, typename Param, Param (_Class::*getter)() const, void (_Class::*setter)(Param)>
     class SimpleParamCommand : public ParamCommand {
     public:
-        String doGet(const void* target) const {
+        String doGet(const void* target) const override {
             return StringConverter::toString((static_cast<const _Class*>(target)->*getter)());
         }
 
-        void doSet(void* target, const String& val) {
+        void doSet(void* target, const String& val) override {
             typename std::decay<Param>::type tmp;
             StringConverter::parse(val, tmp);
             (static_cast<_Class*>(target)->*setter)(tmp);
@@ -104,11 +104,11 @@ namespace Ogre {
     template <typename _Class, const String& (_Class::*getter)() const, void (_Class::*setter)(const String&)>
     class SimpleParamCommand<_Class, const String&, getter, setter> : public ParamCommand {
     public:
-        String doGet(const void* target) const {
+        String doGet(const void* target) const override {
             return (static_cast<const _Class*>(target)->*getter)();
         }
 
-        void doSet(void* target, const String& val) {
+        void doSet(void* target, const String& val) override {
             (static_cast<_Class*>(target)->*setter)(val);
         }
     };

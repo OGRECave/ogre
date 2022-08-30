@@ -124,14 +124,14 @@ namespace Ogre
         const Quaternion& _getBindingPoseInverseOrientation(void) const { return mBindDerivedInverseOrientation; }
 
         /// @see Node::needUpdate
-        void needUpdate(bool forceParentUpdate = false);
+        void needUpdate(bool forceParentUpdate = false) override;
 
 
     private:
         /** See Node. */
-        Node* createChildImpl(void);
+        Node* createChildImpl(void) override;
         /** See Node. */
-        Node* createChildImpl(const String& name);
+        Node* createChildImpl(const String& name) override;
 
         /// Pointer back to creator, for child creation (not smart ptr so child does not preserve parent)
         Skeleton* mCreator;

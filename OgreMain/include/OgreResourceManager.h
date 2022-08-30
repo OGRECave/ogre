@@ -405,7 +405,7 @@ namespace Ogre {
             ~ResourcePool();
             /// Get the name of the pool
             const String& getName() const;
-            void clear();
+            void clear() override;
         };
         
         /// Create a resource pool, or reuse one that already exists

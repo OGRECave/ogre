@@ -507,7 +507,7 @@ namespace Ogre {
         */
         const String& getMaterialName(void) const { return mMaterial->getName(); }
 
-        virtual void _notifyCurrentCamera(Camera* cam) override;
+        void _notifyCurrentCamera(Camera* cam) override;
 
         /** Begin injection of billboard data; applicable when 
             constructing the BillboardSet for external data use.
@@ -528,7 +528,7 @@ namespace Ogre {
 
         const AxisAlignedBox& getBoundingBox(void) const override { return mAABB; }
         Real getBoundingRadius(void) const override { return mBoundingRadius; }
-        virtual void _updateRenderQueue(RenderQueue* queue) override;
+        void _updateRenderQueue(RenderQueue* queue) override;
         const MaterialPtr& getMaterial(void) const override { return mMaterial; }
 
         /** Sets the name of the material to be used for this billboard set.
@@ -538,8 +538,8 @@ namespace Ogre {
         virtual void setMaterial( const MaterialPtr& material );
 
 
-        virtual void getRenderOperation(RenderOperation& op) override;
-        virtual void getWorldTransforms(Matrix4* xform) const override;
+        void getRenderOperation(RenderOperation& op) override;
+        void getWorldTransforms(Matrix4* xform) const override;
 
         /** Returns whether or not billboards in this are tested individually for culling. */
         bool getCullIndividually(void) const { return mCullIndividual; }
@@ -650,17 +650,17 @@ namespace Ogre {
         bool getUseAccurateFacing(void) const { return mAccurateFacing; }
         /// @}
 
-        virtual const String& getMovableType(void) const override;
+        const String& getMovableType(void) const override;
         Real getSquaredViewDepth(const Camera* cam) const override;
 
         /** Update the bounds of the billboardset */
         virtual void _updateBounds(void);
         /** @copydoc Renderable::getLights */
-        const LightList& getLights(void) const;
+        const LightList& getLights(void) const override;
 
         /// @copydoc MovableObject::visitRenderables
         void visitRenderables(Renderable::Visitor* visitor, 
-            bool debugRenderables = false);
+            bool debugRenderables = false) override;
 
         /** Sort the billboard set. Only called when enabled via setSortingEnabled */
         virtual void _sortBillboards( Camera* cam);
@@ -779,7 +779,7 @@ namespace Ogre {
         bool isPointRenderingEnabled(void) const { return mPointRendering; }
 
         /// Override to return specific type flag
-        uint32 getTypeFlags(void) const;
+        uint32 getTypeFlags(void) const override;
 
         /** Set the auto update state of this billboard set.
 
@@ -802,7 +802,7 @@ namespace Ogre {
         void notifyBillboardDataChanged(void) { mBillboardDataChanged = true; }
 
         /** @copydoc MovableObject::_releaseManualHardwareResources */
-        void _releaseManualHardwareResources() { _destroyBuffers(); }
+        void _releaseManualHardwareResources() override { _destroyBuffers(); }
 
     };
 
@@ -810,14 +810,14 @@ namespace Ogre {
     class _OgreExport BillboardSetFactory : public MovableObjectFactory
     {
     protected:
-        MovableObject* createInstanceImpl( const String& name, const NameValuePairList* params);
+        MovableObject* createInstanceImpl( const String& name, const NameValuePairList* params) override;
     public:
         BillboardSetFactory() {}
         ~BillboardSetFactory() {}
 
         static String FACTORY_TYPE_NAME;
 
-        const String& getType(void) const;
+        const String& getType(void) const override;
     };
     /** @} */
     /** @} */

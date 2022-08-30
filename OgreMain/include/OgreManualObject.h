@@ -110,7 +110,7 @@ namespace Ogre
         virtual ~ManualObject();
 
         /** @copydoc MovableObject::_releaseManualHardwareResources */
-        void _releaseManualHardwareResources() { clear(); }
+        void _releaseManualHardwareResources() override { clear(); }
 
         //pre-declare ManualObjectSection
         class ManualObjectSection;
@@ -545,13 +545,13 @@ namespace Ogre
         // MovableObject overrides
 
         /** @copydoc MovableObject::getMovableType */
-        const String& getMovableType(void) const;
+        const String& getMovableType(void) const override;
         /** @copydoc MovableObject::getBoundingBox */
         const AxisAlignedBox& getBoundingBox(void) const override { return mAABB; }
         /** @copydoc MovableObject::getBoundingRadius */
         Real getBoundingRadius(void) const override { return mRadius; }
         /** @copydoc MovableObject::_updateRenderQueue */
-        void _updateRenderQueue(RenderQueue* queue);
+        void _updateRenderQueue(RenderQueue* queue) override;
         /** Implement this method to enable stencil shadows */
         EdgeData* getEdgeList(void) override;
         /** Implement this method to enable stencil shadows. */
@@ -600,15 +600,15 @@ namespace Ogre
             
             // Renderable overrides
             /** @copydoc Renderable::getMaterial */
-            const MaterialPtr& getMaterial(void) const;
+            const MaterialPtr& getMaterial(void) const override;
             /** @copydoc Renderable::getRenderOperation */
-            void getRenderOperation(RenderOperation& op);
+            void getRenderOperation(RenderOperation& op) override;
             /** @copydoc Renderable::getWorldTransforms */
-            void getWorldTransforms(Matrix4* xform) const;
+            void getWorldTransforms(Matrix4* xform) const override;
             /** @copydoc Renderable::getSquaredViewDepth */
-            Real getSquaredViewDepth(const Ogre::Camera *) const;
+            Real getSquaredViewDepth(const Ogre::Camera *) const override;
             /** @copydoc Renderable::getLights */
-            const LightList &getLights(void) const;
+            const LightList &getLights(void) const override;
 
             /// convert this section to a SubMesh
             void convertToSubMesh(SubMesh* sm) const;
@@ -619,7 +619,7 @@ namespace Ogre
 
         /// @copydoc MovableObject::visitRenderables
         void visitRenderables(Renderable::Visitor* visitor, 
-            bool debugRenderables = false);
+            bool debugRenderables = false) override;
         
         
     private:
@@ -700,14 +700,14 @@ namespace Ogre
     class _OgreExport ManualObjectFactory : public MovableObjectFactory
     {
     protected:
-        MovableObject* createInstanceImpl( const String& name, const NameValuePairList* params);
+        MovableObject* createInstanceImpl( const String& name, const NameValuePairList* params) override;
     public:
         ManualObjectFactory() {}
         ~ManualObjectFactory() {}
 
         static String FACTORY_TYPE_NAME;
 
-        const String& getType(void) const;
+        const String& getType(void) const override;
     };
     /** @} */
     /** @} */

@@ -18,7 +18,7 @@ public:
         mInfo["Category"] = "Geometry";
     }
 
-    void checkBoxToggled(CheckBox* box)
+    void checkBoxToggled(CheckBox* box) override
     {
         mPatchPass->setPolygonMode(box->isChecked() ? PM_WIREFRAME : PM_SOLID);
 
@@ -29,7 +29,7 @@ public:
 #endif
     }
 
-    void sliderMoved(Slider* slider)
+    void sliderMoved(Slider* slider) override
     {
         mPatch->setSubdivision(slider->getValue());
     }
@@ -49,7 +49,7 @@ protected:
 #   pragma pack(pop)
 #endif
 
-    void setupContent()
+    void setupContent() override
     {
         // setup some basic lighting for our scene
         mSceneMgr->setAmbientLight(ColourValue(0.5, 0.5, 0.5));
@@ -102,7 +102,7 @@ protected:
         mTrayMgr->createCheckBox(TL_TOPLEFT, "Wireframe", "Wireframe", 120);
     }
 
-    void cleanupContent()
+    void cleanupContent() override
     {
         HardwareBufferManager::getSingleton().destroyVertexDeclaration(mDecl);
         mPatchPass->setPolygonMode(PM_SOLID);

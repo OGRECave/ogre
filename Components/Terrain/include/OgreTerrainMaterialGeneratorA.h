@@ -68,13 +68,13 @@ namespace Ogre
         public:
             SM2Profile(TerrainMaterialGenerator* parent, const String& name, const String& desc);
             virtual ~SM2Profile();
-            MaterialPtr generate(const Terrain* terrain);
-            MaterialPtr generateForCompositeMap(const Terrain* terrain);
-            uint8 getMaxLayers(const Terrain* terrain) const;
-            void updateParams(const MaterialPtr& mat, const Terrain* terrain);
-            void updateParamsForCompositeMap(const MaterialPtr& mat, const Terrain* terrain);
-            void requestOptions(Terrain* terrain);
-            bool isVertexCompressionSupported() const;
+            MaterialPtr generate(const Terrain* terrain) override;
+            MaterialPtr generateForCompositeMap(const Terrain* terrain) override;
+            uint8 getMaxLayers(const Terrain* terrain) const override;
+            void updateParams(const MaterialPtr& mat, const Terrain* terrain) override;
+            void updateParamsForCompositeMap(const MaterialPtr& mat, const Terrain* terrain) override;
+            void requestOptions(Terrain* terrain) override;
+            bool isVertexCompressionSupported() const override;
 
             /** Whether to support normal mapping per layer in the shader (default true). 
             */
@@ -109,7 +109,7 @@ namespace Ogre
             /** Whether to support a light map over the terrain in the shader,
             if it's present (default true). 
             */
-            void setLightmapEnabled(bool enabled);
+            void setLightmapEnabled(bool enabled) override;
             /** Whether to use the composite map to provide a lower LOD technique
                 in the distance (default true). 
             */

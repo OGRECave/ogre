@@ -15,10 +15,10 @@ class _OgreSampleClassExport Sample_Isosurf : public SdkSample
 
  public:
     Sample_Isosurf();
-    void testCapabilities(const RenderSystemCapabilities* caps);
-    void setupContent(void);
-    void cleanupContent();
-    bool frameRenderingQueued(const FrameEvent& evt);
+    void testCapabilities(const RenderSystemCapabilities* caps) override;
+    void setupContent(void) override;
+    void cleanupContent() override;
+    bool frameRenderingQueued(const FrameEvent& evt) override;
 };
 }
 

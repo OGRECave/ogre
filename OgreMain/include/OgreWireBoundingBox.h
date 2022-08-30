@@ -50,7 +50,7 @@ namespace Ogre {
     private:
         /** Override this method to prevent parent transforms (rotation,translation,scale)
         */
-        void getWorldTransforms( Matrix4* xform ) const;
+        void getWorldTransforms( Matrix4* xform ) const override;
         
         /** Builds the wireframe line list.
         */
@@ -72,9 +72,9 @@ namespace Ogre {
         */
         void setupBoundingBox(const AxisAlignedBox& aabb);
 
-        Real getSquaredViewDepth(const Camera* cam) const;
+        Real getSquaredViewDepth(const Camera* cam) const override;
 
-        Real getBoundingRadius(void) const { return mRadius; }
+        Real getBoundingRadius(void) const override { return mRadius; }
 
     };
     /** @} */

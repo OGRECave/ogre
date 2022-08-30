@@ -12,7 +12,7 @@ class commentstreambuf : public std::streambuf {
 public:
     commentstreambuf(std::streambuf *, char start_sb, char end_sb);
 
-    int underflow();
+    int underflow() override;
 };
 
 commentstreambuf::commentstreambuf(std::streambuf *sb, char start_sb, char end_sb)

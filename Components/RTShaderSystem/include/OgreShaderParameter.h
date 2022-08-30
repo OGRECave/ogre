@@ -648,12 +648,12 @@ public:
     /** 
     @see Parameter::isConstParameter.
     */
-    virtual bool isConstParameter() const { return true; }
+    bool isConstParameter() const override { return true; }
 
     /** 
     @see Parameter::toString.
     */
-    virtual String toString() const = 0;
+    String toString() const override = 0;
 
 protected:
     valueType mValue;

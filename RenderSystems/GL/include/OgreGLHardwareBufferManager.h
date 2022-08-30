@@ -52,13 +52,13 @@ namespace Ogre {
         ~GLHardwareBufferManager();
         /// Creates a vertex buffer
         HardwareVertexBufferSharedPtr createVertexBuffer(size_t vertexSize, 
-            size_t numVerts, HardwareBuffer::Usage usage, bool useShadowBuffer = false);
+            size_t numVerts, HardwareBuffer::Usage usage, bool useShadowBuffer = false) override;
         /// Create a hardware vertex buffer
         HardwareIndexBufferSharedPtr createIndexBuffer(
             HardwareIndexBuffer::IndexType itype, size_t numIndexes, 
-            HardwareBuffer::Usage usage, bool useShadowBuffer = false);
+            HardwareBuffer::Usage usage, bool useShadowBuffer = false) override;
         /// Create a render to vertex buffer
-        RenderToVertexBufferSharedPtr createRenderToVertexBuffer();
+        RenderToVertexBufferSharedPtr createRenderToVertexBuffer() override;
         /// Utility function to get the correct GL usage based on HBU's
         static GLenum getGLUsage(unsigned int usage);
 

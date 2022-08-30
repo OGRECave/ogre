@@ -487,12 +487,12 @@ namespace Ogre {
 
         void readImage(LoadedImages& imgs, const String& name, const String& ext, bool haveNPOT);
 
-        void prepareImpl();
-        void unprepareImpl();
-        void loadImpl();
+        void prepareImpl() override;
+        void unprepareImpl() override;
+        void loadImpl() override;
 
         /// @copydoc Resource::calculateSize
-        size_t calculateSize(void) const;
+        size_t calculateSize(void) const override;
         
 
         /** Implementation of creating internal texture resources 
@@ -504,7 +504,7 @@ namespace Ogre {
         virtual void freeInternalResourcesImpl(void) = 0;
 
         /** Default implementation of unload which calls freeInternalResources */
-        void unloadImpl(void);
+        void unloadImpl(void) override;
 
         /** Returns the maximum number of Mipmaps that can be generated until we reach
         the mininum possible size. This does not count the base level.

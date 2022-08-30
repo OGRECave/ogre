@@ -92,7 +92,7 @@ namespace Ogre {
         /// Utility method, binds dest copies into a given VertexData struct.
         void bindTempCopies(VertexData* targetData, bool suppressHardwareUpload);
         /** Overridden member from HardwareBufferLicensee. */
-        void licenseExpired(HardwareBuffer* buffer);
+        void licenseExpired(HardwareBuffer* buffer) override;
         /** Detect currently have buffer copies checked out and touch it. */
         bool buffersCheckedOut(bool positions = true, bool normals = true) const;
     };

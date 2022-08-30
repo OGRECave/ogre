@@ -55,11 +55,11 @@ namespace Ogre {
     {
     public:
         /// @copydoc FactoryObj::getType
-        const String& getType(void) const;
+        const String& getType(void) const override;
 
         using ArchiveFactory::createInstance;
 
-        Archive *createInstance( const String& name, bool readOnly );
+        Archive *createInstance( const String& name, bool readOnly ) override;
 
         /// Set whether filesystem enumeration will include hidden files or not.
         /// This should be called prior to declaring and/or initializing filesystem
@@ -76,9 +76,9 @@ namespace Ogre {
         APKFileSystemArchiveFactory(AAssetManager* assetMgr) : mAssetMgr(assetMgr) {}
         virtual ~APKFileSystemArchiveFactory() {}
         /// @copydoc FactoryObj::getType
-        const String& getType(void) const;
+        const String& getType(void) const override;
         /// @copydoc ArchiveFactory::createInstance
-        Archive *createInstance( const String& name, bool readOnly );
+        Archive *createInstance( const String& name, bool readOnly ) override;
     private:
         AAssetManager* mAssetMgr;
     };

@@ -127,12 +127,9 @@ namespace Ogre
         /// Internal method for loading from ttf
         void createTextureFromFont(void);
 
-        /// @copydoc Resource::loadImpl
-        virtual void loadImpl();
-        /// @copydoc Resource::unloadImpl
-        virtual void unloadImpl();
-        /// @copydoc Resource::calculateSize
-        size_t calculateSize(void) const { return 0; } // permanent resource is in the texture 
+        void loadImpl() override;
+        void unloadImpl() override;
+        size_t calculateSize(void) const override { return 0; } // permanent resource is in the texture
     public:
 
         /** Constructor.
@@ -331,7 +328,7 @@ namespace Ogre
         /** Implementation of ManualResourceLoader::loadResource, called
             when the Texture that this font creates needs to (re)load.
         */
-        void loadResource(Resource* resource);
+        void loadResource(Resource* resource) override;
 
         /** Manually set the material used for this font.
 

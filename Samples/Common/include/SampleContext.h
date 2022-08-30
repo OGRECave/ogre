@@ -190,7 +190,7 @@ namespace OgreBites
         /*-----------------------------------------------------------------------------
         | Processes frame started events.
         -----------------------------------------------------------------------------*/
-        virtual bool frameStarted(const Ogre::FrameEvent& evt)
+        bool frameStarted(const Ogre::FrameEvent& evt) override
         {
             pollEvents();
 
@@ -201,7 +201,7 @@ namespace OgreBites
         /*-----------------------------------------------------------------------------
         | Processes rendering queued events.
         -----------------------------------------------------------------------------*/
-        virtual bool frameRenderingQueued(const Ogre::FrameEvent& evt)
+        bool frameRenderingQueued(const Ogre::FrameEvent& evt) override
         {
             // manually call sample callback to ensure correct order
             return !isCurrentSamplePaused() ? mCurrentSample->frameRenderingQueued(evt) : true;
@@ -210,7 +210,7 @@ namespace OgreBites
         /*-----------------------------------------------------------------------------
         | Processes frame ended events.
         -----------------------------------------------------------------------------*/
-        virtual bool frameEnded(const Ogre::FrameEvent& evt)
+        bool frameEnded(const Ogre::FrameEvent& evt) override
         {
             // manually call sample callback to ensure correct order
             if (mCurrentSample && !mSamplePaused && !mCurrentSample->frameEnded(evt)) return false;
@@ -226,7 +226,7 @@ namespace OgreBites
         | Processes window size change event. Adjusts mouse's region to match that
         | of the window. You could also override this method to prevent resizing.
         -----------------------------------------------------------------------------*/
-        virtual void windowResized(Ogre::RenderWindow* rw)
+        void windowResized(Ogre::RenderWindow* rw) override
         {
             // manually call sample callback to ensure correct order
             if (!isCurrentSamplePaused()) mCurrentSample->windowResized(rw);
@@ -234,30 +234,30 @@ namespace OgreBites
 
         // window event callbacks which manually call their respective sample callbacks to ensure correct order
 
-        virtual void windowMoved(Ogre::RenderWindow* rw)
+        void windowMoved(Ogre::RenderWindow* rw) override
         {
             if (!isCurrentSamplePaused()) mCurrentSample->windowMoved(rw);
         }
 
-        virtual bool windowClosing(Ogre::RenderWindow* rw)
+        bool windowClosing(Ogre::RenderWindow* rw) override
         {
             if (!isCurrentSamplePaused()) return mCurrentSample->windowClosing(rw);
             return true;
         }
 
-        virtual void windowClosed(Ogre::RenderWindow* rw)
+        void windowClosed(Ogre::RenderWindow* rw) override
         {
             if (!isCurrentSamplePaused()) mCurrentSample->windowClosed(rw);
         }
 
-        virtual void windowFocusChange(Ogre::RenderWindow* rw)
+        void windowFocusChange(Ogre::RenderWindow* rw) override
         {
             if (!isCurrentSamplePaused()) mCurrentSample->windowFocusChange(rw);
         }
 
         // keyboard and mouse callbacks which manually call their respective sample callbacks to ensure correct order
 
-        virtual bool keyPressed(const KeyboardEvent& evt)
+        bool keyPressed(const KeyboardEvent& evt) override
         {
             // Ignore repeated signals from key being held down.
             if (evt.repeat) return true;
@@ -266,62 +266,62 @@ namespace OgreBites
             return true;
         }
 
-        virtual bool keyReleased(const KeyboardEvent& evt)
+        bool keyReleased(const KeyboardEvent& evt) override
         {
             if (!isCurrentSamplePaused()) return mCurrentSample->keyReleased(evt);
             return true;
         }
 
-        virtual bool touchMoved(const TouchFingerEvent& evt)
+        bool touchMoved(const TouchFingerEvent& evt) override
         {
             if (!isCurrentSamplePaused())
                 return mCurrentSample->touchMoved(evt);
             return true;
         }
 
-        virtual bool mouseMoved(const MouseMotionEvent& evt)
+        bool mouseMoved(const MouseMotionEvent& evt) override
         {
             if (!isCurrentSamplePaused())
                 return mCurrentSample->mouseMoved(evt);
             return true;
         }
 
-        virtual bool touchPressed(const TouchFingerEvent& evt)
+        bool touchPressed(const TouchFingerEvent& evt) override
         {
             if (!isCurrentSamplePaused())
                 return mCurrentSample->touchPressed(evt);
             return true;
         }
 
-        virtual bool mousePressed(const MouseButtonEvent& evt)
+        bool mousePressed(const MouseButtonEvent& evt) override
         {
             if (!isCurrentSamplePaused())
                 return mCurrentSample->mousePressed(evt);
             return true;
         }
 
-        virtual bool touchReleased(const TouchFingerEvent& evt)
+        bool touchReleased(const TouchFingerEvent& evt) override
         {
             if (!isCurrentSamplePaused())
                 return mCurrentSample->touchReleased(evt);
             return true;
         }
 
-        virtual bool mouseReleased(const MouseButtonEvent& evt)
+        bool mouseReleased(const MouseButtonEvent& evt) override
         {
             if (!isCurrentSamplePaused())
                 return mCurrentSample->mouseReleased(evt);
             return true;
         }
 
-        virtual bool mouseWheelRolled(const MouseWheelEvent& evt)
+        bool mouseWheelRolled(const MouseWheelEvent& evt) override
         {
             if (!isCurrentSamplePaused())
                 return mCurrentSample->mouseWheelRolled(evt);
             return true;
         }
 
-        virtual bool textInput (const TextInputEvent& evt)
+        bool textInput (const TextInputEvent& evt) override
         {
             if (!isCurrentSamplePaused ())
                 return mCurrentSample->textInput (evt);
@@ -336,7 +336,7 @@ namespace OgreBites
         /*-----------------------------------------------------------------------------
         | Reconfigures the context. Attempts to preserve the current sample state.
         -----------------------------------------------------------------------------*/
-        virtual void reconfigure(const Ogre::String& renderer, Ogre::NameValuePairList& options)
+        void reconfigure(const Ogre::String& renderer, Ogre::NameValuePairList& options) override
         {
             // save current sample state
             mLastSample = mCurrentSample;
@@ -362,7 +362,7 @@ namespace OgreBites
         /*-----------------------------------------------------------------------------
         | Cleans up and shuts down the context.
         -----------------------------------------------------------------------------*/
-        virtual void shutdown()
+        void shutdown() override
         {
             if (mCurrentSample)
             {

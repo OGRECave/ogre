@@ -42,12 +42,12 @@ public:
                         "opposed to going through the walls).";
     }
 
-    void cleanupContent()
+    void cleanupContent() override
     {
         delete raySceneQuery;
     }
 
-    void createSceneManager(void)
+    void createSceneManager(void) override
     {
         // Create the SceneManager, in this case a generic one
         mSceneMgr = mRoot->createSceneManager("PCZSceneManager");
@@ -140,7 +140,7 @@ public:
         return antiPortalNode;
     }
 
-    void setupContent(void)
+    void setupContent(void) override
     {
         mCameraMan->setTopSpeed(15);
         mCamera->setNearClipDistance(2);
@@ -272,7 +272,7 @@ public:
         camera is in is usually what gets highlighted).  It's just a simple test of
         ray scene queries. Scene Queries will (at least, should) traverse portals.
      */
-    bool frameRenderingQueued( const FrameEvent& evt )
+    bool frameRenderingQueued( const FrameEvent& evt ) override
     {
         SdkSample::frameRenderingQueued(evt);
 #if 0

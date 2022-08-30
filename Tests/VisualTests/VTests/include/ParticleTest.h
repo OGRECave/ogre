@@ -43,7 +43,7 @@ public:
 
 protected:
 
-    void setupContent();
+    void setupContent() override;
 
 };
 

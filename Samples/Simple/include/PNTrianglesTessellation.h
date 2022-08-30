@@ -27,7 +27,7 @@ public:
         mInfo["Help"] = "Top Left: Multi-frame\nTop Right: Scrolling\nBottom Left: Rotation\nBottom Right: Scaling";
     }
 
-    void testCapabilities(const RenderSystemCapabilities* caps)
+    void testCapabilities(const RenderSystemCapabilities* caps) override
     {
         if (!caps->hasCapability(RSC_TESSELLATION_HULL_PROGRAM) || !caps->hasCapability(RSC_TESSELLATION_DOMAIN_PROGRAM))
         {
@@ -45,7 +45,7 @@ public:
         }
     }
 
-    bool frameRenderingQueued(const FrameEvent& evt)
+    bool frameRenderingQueued(const FrameEvent& evt) override
     {
         if (mMoveLights)
         {
@@ -57,7 +57,7 @@ public:
         return SdkSample::frameRenderingQueued(evt);  // don't forget the parent class updates!
     }
 
-    void itemSelected(SelectMenu* menu)
+    void itemSelected(SelectMenu* menu) override
     {
         if (menu == mMeshMenu)
         {
@@ -85,7 +85,7 @@ public:
         }
     }
 
-    void checkBoxToggled(CheckBox* box)
+    void checkBoxToggled(CheckBox* box) override
     {
         if (box->getName() == "Wire")
         {
@@ -107,7 +107,7 @@ public:
         }
     }
 
-    void sliderMoved(Slider* slider)
+    void sliderMoved(Slider* slider) override
     {
         if( slider->getName() == "tessellationAmount" )
         {
@@ -118,7 +118,7 @@ public:
 
 protected:
 
-    void setupContent()
+    void setupContent() override
     {
         // create our main node to attach our entities to
         mObjectNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
@@ -142,7 +142,7 @@ protected:
         mTrayMgr->showCursor();
     }
 
-    void unloadResources()
+    void unloadResources() override
     {
 
     }
@@ -259,7 +259,7 @@ protected:
         mMeshMenu->selectItem(0);  // select first mesh
     }
 
-    void cleanupContent()
+    void cleanupContent() override
     {
         // clean up properly to avoid interfering with subsequent samples
         for (std::map<String, StringVector>::iterator it = mPossibilities.begin(); it != mPossibilities.end(); it++)

@@ -46,8 +46,8 @@ protected:
     size_t mFileSizeRoot2;
 
 public:
-    void SetUp();
-    void TearDown();
+    void SetUp() override;
+    void TearDown() override;
 };
 
 #endif

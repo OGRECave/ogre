@@ -49,8 +49,8 @@ public:
     SceneManager* mSceneMgr;
     TerrainGlobalOptions* mTerrainOpts;
 
-    void SetUp();
-    void TearDown();
+    void SetUp() override;
+    void TearDown() override;
 };
 
 //--------------------------------------------------------------------------

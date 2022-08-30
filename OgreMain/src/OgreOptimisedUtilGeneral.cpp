@@ -43,7 +43,7 @@ namespace Ogre {
     {
     public:
         /// @copydoc OptimisedUtil::softwareVertexSkinning
-        virtual void softwareVertexSkinning(
+        void softwareVertexSkinning(
             const float *srcPosPtr, float *destPosPtr,
             const float *srcNormPtr, float *destNormPtr,
             const float *blendWeightPtr, const unsigned char* blendIndexPtr,
@@ -52,45 +52,45 @@ namespace Ogre {
             size_t srcNormStride, size_t destNormStride,
             size_t blendWeightStride, size_t blendIndexStride,
             size_t numWeightsPerVertex,
-            size_t numVertices);
+            size_t numVertices) override;
 
         /// @copydoc OptimisedUtil::softwareVertexMorph
-        virtual void softwareVertexMorph(
+        void softwareVertexMorph(
             Real t,
             const float *srcPos1, const float *srcPos2,
             float *dstPos,
             size_t pos1VSize, size_t pos2VSize, size_t dstVSize, 
             size_t numVertices,
-            bool morphNormals);
+            bool morphNormals) override;
 
         /// @copydoc OptimisedUtil::concatenateAffineMatrices
-        virtual void concatenateAffineMatrices(
+        void concatenateAffineMatrices(
             const Affine3& baseMatrix,
             const Affine3* srcMatrices,
             Affine3* dstMatrices,
-            size_t numMatrices);
+            size_t numMatrices) override;
 
         /// @copydoc OptimisedUtil::calculateFaceNormals
-        virtual void calculateFaceNormals(
+        void calculateFaceNormals(
             const float *positions,
             const EdgeData::Triangle *triangles,
             Vector4 *faceNormals,
-            size_t numTriangles);
+            size_t numTriangles) override;
 
         /// @copydoc OptimisedUtil::calculateLightFacing
-        virtual void calculateLightFacing(
+        void calculateLightFacing(
             const Vector4& lightPos,
             const Vector4* faceNormals,
             char* lightFacings,
-            size_t numFaces);
+            size_t numFaces) override;
 
         /// @copydoc OptimisedUtil::extrudeVertices
-        virtual void extrudeVertices(
+        void extrudeVertices(
             const Vector4& lightPos,
             Real extrudeDist,
             const float* srcPositions,
             float* destPositions,
-            size_t numVertices);
+            size_t numVertices) override;
     };
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------

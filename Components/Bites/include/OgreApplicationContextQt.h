@@ -72,7 +72,7 @@ public:
 
     using ApplicationContextBase::setWindowGrab;
 
-    void setWindowGrab(NativeWindowType* win, bool grab);
+    void setWindowGrab(NativeWindowType* win, bool grab) override;
 
     using ApplicationContextBase::addInputListener;
     using ApplicationContextBase::removeInputListener;

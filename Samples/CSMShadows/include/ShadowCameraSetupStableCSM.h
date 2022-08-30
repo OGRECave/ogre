@@ -47,9 +47,9 @@ public:
     size_t getCascadeCount() const { return mCascadeCount; }
 
     /// Returns a stable CSM shadow camera for the given iteration
-    virtual void getShadowCamera(const Ogre::SceneManager* sm, const Ogre::Camera* cam,
+    void getShadowCamera(const Ogre::SceneManager* sm, const Ogre::Camera* cam,
                                  const Ogre::Viewport* vp, const Ogre::Light* light, Ogre::Camera* texCam,
-                                 size_t iteration) const;
+                                 size_t iteration) const override;
 
     /// Returns the calculated split points.
     const SplitPointList& getSplitPoints() const { return mSplitPoints; }

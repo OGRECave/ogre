@@ -57,7 +57,7 @@ public:
 
 protected:
     ushort mChannelID;
-    WorkQueue::Response* handleRequest(const WorkQueue::Request* req, const WorkQueue* srcQ);
+    WorkQueue::Response* handleRequest(const WorkQueue::Request* req, const WorkQueue* srcQ) override;
 };
 }
 #endif

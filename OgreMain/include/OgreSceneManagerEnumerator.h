@@ -46,13 +46,13 @@ namespace Ogre {
     class _OgreExport DefaultSceneManagerFactory : public SceneManagerFactory
     {
     protected:
-        void initMetaData(void) const;
+        void initMetaData(void) const override;
     public:
         DefaultSceneManagerFactory() {}
         ~DefaultSceneManagerFactory() {}
         /// Factory type name
         static const String FACTORY_TYPE_NAME;
-        SceneManager* createInstance(const String& instanceName);
+        SceneManager* createInstance(const String& instanceName) override;
     };
 
     /// Default scene manager
@@ -61,7 +61,7 @@ namespace Ogre {
     public:
         DefaultSceneManager(const String& name);
         ~DefaultSceneManager();
-        const String& getTypeName(void) const;
+        const String& getTypeName(void) const override;
     };
 
     /** Enumerates the SceneManager classes available to applications.

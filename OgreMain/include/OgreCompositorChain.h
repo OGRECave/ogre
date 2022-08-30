@@ -118,13 +118,13 @@ namespace Ogre {
         */
         void setCompositorEnabled(size_t position, bool state);
 
-        void preRenderTargetUpdate(const RenderTargetEvent& evt);
-        void postRenderTargetUpdate(const RenderTargetEvent& evt);
-        void preViewportUpdate(const RenderTargetViewportEvent& evt);
-        void postViewportUpdate(const RenderTargetViewportEvent& evt);
-        void viewportCameraChanged(Viewport* viewport);
-        void viewportDimensionsChanged(Viewport* viewport);
-        void viewportDestroyed(Viewport* viewport);
+        void preRenderTargetUpdate(const RenderTargetEvent& evt) override;
+        void postRenderTargetUpdate(const RenderTargetEvent& evt) override;
+        void preViewportUpdate(const RenderTargetViewportEvent& evt) override;
+        void postViewportUpdate(const RenderTargetViewportEvent& evt) override;
+        void viewportCameraChanged(Viewport* viewport) override;
+        void viewportDimensionsChanged(Viewport* viewport) override;
+        void viewportDestroyed(Viewport* viewport) override;
 
         /** Mark state as dirty, and to be recompiled next frame.
         */
@@ -210,8 +210,8 @@ namespace Ogre {
         public:
             RQListener() : mOperation(0), mSceneManager(0), mRenderSystem(0), mViewport(0) {}
 
-            void renderQueueStarted(uint8 queueGroupId, const String& invocation, bool& skipThisInvocation);
-            void renderQueueEnded(uint8 queueGroupId, const String& invocation, bool& repeatThisInvocation);
+            void renderQueueStarted(uint8 queueGroupId, const String& invocation, bool& skipThisInvocation) override;
+            void renderQueueEnded(uint8 queueGroupId, const String& invocation, bool& repeatThisInvocation) override;
 
             /** Set current operation and target. */
             void setOperation(CompositorInstance::TargetOperation *op,SceneManager *sm,RenderSystem *rs);

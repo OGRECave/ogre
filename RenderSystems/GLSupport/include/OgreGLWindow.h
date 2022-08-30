@@ -39,16 +39,16 @@ namespace Ogre
     public:
         GLWindow();
 
-        bool isVisible(void) const { return mVisible; }
-        void setVisible(bool visible) { mVisible = visible; }
-        bool isHidden(void) const { return mHidden; }
+        bool isVisible(void) const override { return mVisible; }
+        void setVisible(bool visible) override { mVisible = visible; }
+        bool isHidden(void) const override { return mHidden; }
 
-        bool isVSyncEnabled() const { return mVSync; }
-        void setVSyncInterval(unsigned int interval);
+        bool isVSyncEnabled() const override { return mVSync; }
+        void setVSyncInterval(unsigned int interval) override;
 
-        void copyContentsToMemory(const Box& src, const PixelBox &dst, FrameBuffer buffer);
-        bool requiresTextureFlipping() const { return false; }
-        GLContext* getContext() const { return mContext; }
+        void copyContentsToMemory(const Box& src, const PixelBox &dst, FrameBuffer buffer) override;
+        bool requiresTextureFlipping() const override { return false; }
+        GLContext* getContext() const override { return mContext; }
 
     protected:
         bool mVisible;

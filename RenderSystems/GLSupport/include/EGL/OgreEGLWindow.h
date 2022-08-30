@@ -55,7 +55,7 @@ namespace Ogre {
                 return new EGLContext(mEglDisplay, mGLSupport, mEglConfig, mEglSurface, external);
             }
 
-            virtual void windowMovedOrResized() {}
+            void windowMovedOrResized() override {}
 
             void finaliseWindow();
     public:
@@ -64,14 +64,14 @@ namespace Ogre {
 
             // default, PBuffer based, implementation
             void create(const String& name, unsigned int width, unsigned int height, bool fullScreen,
-                        const NameValuePairList* miscParams);
+                        const NameValuePairList* miscParams) override;
 
-            void resize(unsigned int width, unsigned int height) {}
+            void resize(unsigned int width, unsigned int height) override {}
 
-            virtual void setFullscreen (bool fullscreen, uint width, uint height);
-            void destroy(void);
-            void swapBuffers();
-            void setVSyncEnabled(bool vsync);
+            void setFullscreen (bool fullscreen, uint width, uint height) override;
+            void destroy(void) override;
+            void swapBuffers() override;
+            void setVSyncEnabled(bool vsync) override;
 
             /**
 
@@ -81,9 +81,9 @@ namespace Ogre {
                * DISPLAY        EGLDisplay connection behind that context.
                * DISPLAYNAME    The name for the connected display.
                */
-            virtual void getCustomAttribute(const String& name, void* pData);
+            void getCustomAttribute(const String& name, void* pData) override;
 
-            PixelFormat suggestPixelFormat() const;
+            PixelFormat suggestPixelFormat() const override;
     };
 }
 
