@@ -72,8 +72,6 @@ void Compositor::removeTechnique(size_t index)
 //-----------------------------------------------------------------------
 void Compositor::removeAllTechniques()
 {
-    Techniques::iterator i, iend;
-    iend = mTechniques.end();
     for (auto *t : mTechniques)
     {
         OGRE_DELETE t;

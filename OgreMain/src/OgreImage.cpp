@@ -203,7 +203,7 @@ namespace Ogre {
         OgreAssert(mBuffer, "No image data loaded");
         mNumMipmaps = 0; // Image operations lose precomputed mipmaps
 
-        ushort y;
+        uint32 y;
         switch (mPixelSize)
         {
         case 1:
