@@ -162,6 +162,9 @@ namespace Ogre {
     //-----------------------------------------------------------------------------
     Image& Image::operator=(const Image& img)
     {
+        if (this == &img)
+            return *this;
+
         // Only create & copy when other data was owning
         if (img.mBuffer && img.mAutoDelete)
         {

@@ -387,6 +387,9 @@ namespace Ogre {
     //-----------------------------------------------------------------------------
     Technique& Technique::operator=(const Technique& rhs)
     {
+        if (this == &rhs)
+            return *this;
+
         mName = rhs.mName;
         this->mIsSupported = rhs.mIsSupported;
         this->mLodIndex = rhs.mLodIndex;
