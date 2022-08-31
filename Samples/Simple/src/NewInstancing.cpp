@@ -337,7 +337,7 @@ void Sample_NewInstancing::createEntities(int technique)
         if (mAnimations.insert( anim ).second)
         {
             anim->setEnabled( true );
-            anim->addTime( float(rng())/float(rng.max()) * 10 ); //Random start offset
+            anim->addTime( double(rng())/rng.max() * 10 ); //Random start offset
         }
     }
 }
@@ -360,7 +360,7 @@ void Sample_NewInstancing::createInstancedEntities()
                 //Get the animation
                 AnimationState *anim = ent->getAnimationState( "Walk" );
                 anim->setEnabled( true );
-                anim->addTime( float(rng())/float(rng.max()) * 10); //Random start offset
+                anim->addTime( double(rng())/rng.max() * 10); //Random start offset
                 mAnimations.insert( anim );
             }
 
@@ -391,7 +391,7 @@ void Sample_NewInstancing::createSceneNodes()
             {
                 SceneNode *sceneNode = rootNode->createChildSceneNode();
                 sceneNode->attachObject( mEntities[idx] );
-                sceneNode->yaw( Radian( float(rng())/float(rng.max()) * 10 * Math::PI )); //Random orientation
+                sceneNode->yaw( Radian( double(rng())/rng.max() * 10 * Math::PI )); //Random orientation
                 sceneNode->setPosition( mEntities[idx]->getBoundingRadius() * (i - NUM_INST_ROW * 0.5f), 0,
                     mEntities[idx]->getBoundingRadius() * (j - NUM_INST_COLUMN * 0.5f) );
                 mSceneNodes.push_back( sceneNode );

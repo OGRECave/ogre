@@ -103,9 +103,9 @@ static void createRandomEntityClones(Entity* ent, size_t cloneCount, const Vecto
         SceneNode* node = mgr->createSceneNode();
         // Random translate.
         Vector3 nodePos = max - min;
-        nodePos.x *= float(rng())/rng.max();
-        nodePos.y *= float(rng())/rng.max();
-        nodePos.z *= float(rng())/rng.max();
+        nodePos.x *= double(rng())/rng.max();
+        nodePos.y *= double(rng())/rng.max();
+        nodePos.z *= double(rng())/rng.max();
         nodePos += min;
         node->setPosition(nodePos);
         mgr->getRootSceneNode()->addChild(node);
