@@ -70,8 +70,8 @@ if(DEFINED ENV{ANDROID})
     set(CMAKE_BUILD_TYPE RelWithDebInfo)
     set(CROSS
         -DANDROID_PLATFORM=android-16
-        -DANDROID_NDK=${CMAKE_CURRENT_SOURCE_DIR}/android-ndk-r21e
-        -DCMAKE_TOOLCHAIN_FILE=${CMAKE_CURRENT_SOURCE_DIR}/android-ndk-r21e/build/cmake/android.toolchain.cmake
+        -DANDROID_NDK=${CMAKE_CURRENT_SOURCE_DIR}/android-ndk-r25b
+        -DCMAKE_TOOLCHAIN_FILE=${CMAKE_CURRENT_SOURCE_DIR}/android-ndk-r25b/build/cmake/android.toolchain.cmake
         -DANDROID_ARM_NEON=TRUE
         -DANDROID_ABI=arm64-v8a)
 
@@ -86,17 +86,17 @@ if(DEFINED ENV{ANDROID})
         -DOGRE_DEPENDENCIES_DIR=${CMAKE_CURRENT_SOURCE_DIR}/ogredeps)
     set(BUILD_DEPS TRUE)
 
-    if(NOT EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/android-ndk-r21e)
+    if(NOT EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/android-ndk-r25b)
         message(STATUS "Downloading Android NDK")
         file(DOWNLOAD
-            https://dl.google.com/android/repository/android-ndk-r21e-linux-x86_64.zip
-            ./android-ndk-r21e-linux-x86_64.zip)
+            https://dl.google.com/android/repository/android-ndk-r25b-linux.zip
+            ./android-ndk-r25b-linux.zip)
         message(STATUS "Extracting Android NDK")
-        execute_process(COMMAND unzip android-ndk-r21e-linux-x86_64.zip OUTPUT_QUIET)
+        execute_process(COMMAND unzip android-ndk-r25b-linux.zip OUTPUT_QUIET)
         message(STATUS "Building Shaderc")
         execute_process(COMMAND
             ../../../ndk-build -j2 NDK_PROJECT_PATH=. APP_BUILD_SCRIPT=Android.mk APP_STL=c++_static APP_ABI=arm64-v8a libshaderc_combined
-            WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/android-ndk-r21e/sources/third_party/shaderc/)
+            WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/android-ndk-r25b/sources/third_party/shaderc/)
     endif()
 endif()
 
