@@ -78,7 +78,11 @@ elseif (UNIX)
     set(NATIVE_INCLUDES
         ${CMAKE_CURRENT_SOURCE_DIR}/include/GLX
         ${OPENGL_INCLUDE_DIR})
-    
+
+    if(NOT OPENGL_glx_LIBRARY)
+      set(OPENGL_glx_LIBRARY ${OPENGL_gl_LIBRARY})
+    endif()
+
     set(PLATFORM_LIBS ${X11_LIBRARIES} ${X11_Xrandr_LIB} ${OPENGL_glx_LIBRARY})
   endif()
   list(APPEND NATIVE_INCLUDES "${CMAKE_CURRENT_SOURCE_DIR}/src/X11/")
