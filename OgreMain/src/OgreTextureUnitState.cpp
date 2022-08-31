@@ -205,6 +205,9 @@ namespace Ogre {
     TextureUnitState & TextureUnitState::operator = ( 
         const TextureUnitState &oth )
     {
+        if (this == &oth)
+            return *this;
+
         assert(mAnimController == 0);
         removeAllEffects();
 

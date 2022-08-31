@@ -74,6 +74,9 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     Material& Material::operator=(const Material& rhs)
     {
+        if (this == &rhs)
+            return *this;
+
         Resource::operator=(rhs);
         mReceiveShadows = rhs.mReceiveShadows;
         mTransparencyCastsShadows = rhs.mTransparencyCastsShadows;
