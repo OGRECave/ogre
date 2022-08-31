@@ -7,14 +7,14 @@ target_include_directories(Plugin_GLSLangProgramManager PUBLIC
     $<INSTALL_INTERFACE:include/OGRE/Plugins/GLSLang>)
 
 if(ANDROID)
-    target_include_directories(Plugin_GLSLangProgramManager PRIVATE
+    target_include_directories(Plugin_GLSLangProgramManager SYSTEM PRIVATE
         ${ANDROID_NDK}/sources/third_party/shaderc/third_party/glslang
         ${ANDROID_NDK}/sources/third_party/shaderc/third_party/)
     target_link_libraries(Plugin_GLSLangProgramManager PUBLIC OgreMain
         ${ANDROID_NDK}/sources/third_party/shaderc/libs/c++_static/${ANDROID_ABI}/libshaderc.a)
 elseif(DEFINED ENV{VULKAN_SDK})
     message(STATUS "Using VULKAN_SDK: $ENV{VULKAN_SDK}")
-    target_include_directories(Plugin_GLSLangProgramManager PRIVATE $ENV{VULKAN_SDK}/include)
+    target_include_directories(Plugin_GLSLangProgramManager SYSTEM PRIVATE $ENV{VULKAN_SDK}/include)
     target_link_directories(Plugin_GLSLangProgramManager PRIVATE $ENV{VULKAN_SDK}/lib)
     target_link_libraries(Plugin_GLSLangProgramManager PUBLIC OgreMain shaderc_combined)
 else()
