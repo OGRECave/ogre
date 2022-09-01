@@ -340,30 +340,25 @@ namespace Ogre
     void AnimationStateSet::copyMatchingState(AnimationStateSet* target) const
     {
         // lock target
-            OGRE_LOCK_MUTEX(target->OGRE_AUTO_MUTEX_NAME);
+        OGRE_LOCK_MUTEX(target->OGRE_AUTO_MUTEX_NAME);
         // lock source
-            OGRE_LOCK_AUTO_MUTEX;
+        OGRE_LOCK_AUTO_MUTEX;
 
-        AnimationStateMap::iterator i, iend;
-        iend = target->mAnimationStates.end();
-        for (i = target->mAnimationStates.begin(); i != iend; ++i) {
-            AnimationStateMap::const_iterator iother = mAnimationStates.find(i->first);
+        for (auto& t : target->mAnimationStates) {
+            AnimationStateMap::const_iterator iother = mAnimationStates.find(t.first);
             if (iother == mAnimationStates.end()) {
-                OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "No animation entry found named " + i->first, 
+                OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "No animation entry found named " + t.first,
                     "AnimationStateSet::copyMatchingState");
             } else {
-                i->second->copyStateFrom(*(iother->second));
+                t.second->copyStateFrom(*(iother->second));
             }
         }
 
         // Copy matching enabled animation state list
         target->mEnabledAnimationStates.clear();
 
-        EnabledAnimationStateList::const_iterator it, itend;
-        itend = mEnabledAnimationStates.end();
-        for (it = mEnabledAnimationStates.begin(); it != itend; ++it)
+        for (auto *src : mEnabledAnimationStates)
         {
-            const AnimationState* src = *it;
             AnimationStateMap::const_iterator itarget = target->mAnimationStates.find(src->getAnimationName());
             if (itarget != target->mAnimationStates.end())
             {
