@@ -137,11 +137,11 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------
-    Real Math::UnitRandom ()
+    float Math::UnitRandom ()
     {
         if (mRandProvider)
             return mRandProvider->getRandomUnit();
-        else return Real(rand()) / float(RAND_MAX);
+        else return rand() / float(RAND_MAX);
     }
     
     //-----------------------------------------------------------------------
