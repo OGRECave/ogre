@@ -342,16 +342,6 @@ namespace Ogre
     {
         RenderSystem::initConfigOptions();
 
-        // Video mode possibilities
-        ConfigOption optVideoMode;
-        optVideoMode.name = "Video Mode";
-        optVideoMode.immutable = false;
-
-        optVideoMode.possibleValues.push_back("1920 x 1080");
-        optVideoMode.possibleValues.push_back("1280 x 720");
-        optVideoMode.possibleValues.push_back("800 x 600");
-        optVideoMode.currentValue = optVideoMode.possibleValues.front();
-
         ConfigOption optFSAA;
         optFSAA.name = "FSAA";
         optFSAA.immutable = false;
@@ -373,7 +363,6 @@ namespace Ogre
 
         mOptions[optDevices.name] = optDevices;
         mOptions[optFSAA.name] = optFSAA;
-        mOptions[optVideoMode.name] = optVideoMode;
 
         ConfigOption opt;
         opt.name = "Reversed Z-Buffer";

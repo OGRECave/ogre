@@ -86,8 +86,6 @@ namespace Ogre {
         TinyRenderSystem();
         ~TinyRenderSystem();
 
-        void initConfigOptions() override;
-
         Real getMinimumDepthInputValue(void) override { return -1.0f; }            // Range [-1.0f, 1.0f]
         Real getMaximumDepthInputValue(void) override { return 1.0f; }             // Range [-1.0f, 1.0f]
         void _convertProjectionMatrix(const Matrix4& matrix, Matrix4& dest, bool) override { dest = matrix; }
