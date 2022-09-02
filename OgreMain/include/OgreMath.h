@@ -464,7 +464,7 @@ namespace Ogre
             @return
                 A random number in the range from [0,1].
         */
-        static Real UnitRandom ();
+        static float UnitRandom();
 
         /** Generate a random number within the range provided.
             @param fLow
@@ -474,17 +474,13 @@ namespace Ogre
             @return
                 A random number in the range from [fLow,fHigh].
          */
-        static Real RangeRandom (Real fLow, Real fHigh) {
-            return (fHigh-fLow)*UnitRandom() + fLow;
-        }
+        static float RangeRandom(float fLow, float fHigh) { return (fHigh - fLow) * UnitRandom() + fLow; }
 
         /** Generate a random number in the range [-1,1].
             @return
                 A random number in the range from [-1,1].
          */
-        static Real SymmetricRandom () {
-            return 2.0f * UnitRandom() - 1.0f;
-        }
+        static float SymmetricRandom() { return 2.0f * UnitRandom() - 1.0f; }
 
         static void SetRandomValueProvider(RandomValueProvider* provider);
        
