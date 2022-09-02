@@ -46,12 +46,6 @@ namespace Ogre {
     {        
         mNativeDisplay = EGL_DEFAULT_DISPLAY;
         mGLDisplay = getGLDisplay();
-        
-        mCurrentMode.width = 1280;
-        mCurrentMode.height = 800;
-        mCurrentMode.refreshRate = 0;
-        mOriginalMode = mCurrentMode;
-        mVideoModes.push_back(mCurrentMode);
     }
 
     ConfigOptionMap AndroidEGLSupport::getConfigOptions()

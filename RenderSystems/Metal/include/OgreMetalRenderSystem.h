@@ -96,7 +96,6 @@ namespace Ogre
         MetalRenderSystem();
         virtual ~MetalRenderSystem();
 
-        void initConfigOptions();
         virtual void shutdown(void);
 
         virtual const String& getName(void) const;

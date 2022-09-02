@@ -76,18 +76,6 @@ namespace Ogre
         // set config options defaults
         initConfigOptions();
     }
-    void MetalRenderSystem::initConfigOptions()
-    {
-        RenderSystem::initConfigOptions();
-
-        ConfigOption opt;
-        opt.name = "Video Mode";
-        opt.immutable = false;
-        opt.possibleValues.push_back("800 x 600");
-        opt.currentValue = opt.possibleValues[0];
-
-        mOptions[opt.name] = opt;
-    }
     //-------------------------------------------------------------------------
     MetalRenderSystem::~MetalRenderSystem()
     {

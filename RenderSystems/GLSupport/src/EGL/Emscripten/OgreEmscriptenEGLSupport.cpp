@@ -46,12 +46,6 @@ namespace Ogre {
     {        
         mNativeDisplay = EGL_DEFAULT_DISPLAY;
         mGLDisplay = getGLDisplay();
-        
-        mCurrentMode.width = 800;
-        mCurrentMode.height = 600;
-        mCurrentMode.refreshRate = 0;
-        mOriginalMode = mCurrentMode;
-        mVideoModes.push_back(mCurrentMode);
     }
 
     EmscriptenEGLSupport::~EmscriptenEGLSupport()

@@ -1001,6 +1001,16 @@ namespace Ogre {
         optFullScreen.immutable = false;
         mOptions[optFullScreen.name] = optFullScreen;
 
+        // Video mode possibilities, can be overwritten by actual values
+        ConfigOption optVideoMode;
+        optVideoMode.name = "Video Mode";
+        optVideoMode.possibleValues.push_back("1920 x 1080");
+        optVideoMode.possibleValues.push_back("1280 x 720");
+        optVideoMode.possibleValues.push_back("800 x 600");
+        optVideoMode.currentValue = optVideoMode.possibleValues.back();
+        optVideoMode.immutable = false;
+        mOptions[optVideoMode.name] = optVideoMode;
+
         ConfigOption optVSync;
         optVSync.name = "VSync";
         optVSync.immutable = false;
