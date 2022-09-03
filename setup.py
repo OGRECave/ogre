@@ -58,10 +58,14 @@ def main():
         cmake_args += ["-DSWIG_EXECUTABLE=C:/ProgramData/chocolatey/bin/swig.exe",
                        "-DOGRE_BIN_DIRECTORY=Ogre", # direct dlls into python package
                        "-DOGRE_CFG_INSTALL_PATH=bin", # but keep config files in bin, relative to Media
-                       "-DOGRE_BUILD_RENDERSYSTEM_D3D9=OFF" # do not require old runtime
+                       "-DOGRE_BUILD_RENDERSYSTEM_D3D9=OFF", # do not require old runtime
+                       "-DOGRE_BUILD_RENDERSYSTEM_VULKAN=ON",
+                       "-DOGRE_BUILD_PLUGIN_GLSLANG=ON"
                        ]
     elif sys.platform == "linux":
         cmake_args += ["-DOGRE_GLSUPPORT_USE_EGL=ON",
+                       "-DOGRE_BUILD_RENDERSYSTEM_VULKAN=ON",
+                       "-DOGRE_BUILD_PLUGIN_GLSLANG=ON",
                        "-DCMAKE_CXX_FLAGS=-s", # strip assimp
                        "-DCMAKE_INSTALL_RPATH=$ORIGIN;$ORIGIN/OGRE"]
     elif sys.platform == "darwin":
