@@ -33,6 +33,7 @@ THE SOFTWARE.
 #include "OgreLogManager.h"
 #include "OgrePixelFormat.h"
 
+#include "OgreVulkanExports.h"
 #if OGRE_PLATFORM == OGRE_PLATFORM_LINUX
 #define VK_USE_PLATFORM_XLIB_KHR
 #elif OGRE_PLATFORM == OGRE_PLATFORM_WIN32
@@ -122,21 +123,5 @@ namespace Ogre
         OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, vkfunc + " failed with " + vkResultToString(result)); \
     } \
 }
-
-#if( OGRE_PLATFORM == OGRE_PLATFORM_WIN32 ) && !defined( __MINGW32__ ) && !defined( OGRE_STATIC_LIB )
-#    ifdef RenderSystem_Vulkan_EXPORTS
-#        define _OgreVulkanExport __declspec( dllexport )
-#    else
-#        if defined( __MINGW32__ )
-#            define _OgreVulkanExport
-#        else
-#            define _OgreVulkanExport __declspec( dllimport )
-#        endif
-#    endif
-#elif defined( RenderSystem_Vulkan_EXPORTS )
-#    define _OgreVulkanExport __attribute__( ( visibility( "default" ) ) )
-#else
-#    define _OgreVulkanExport
-#endif
 
 #endif  //#ifndef _OgreVulkanPrerequisites_H_

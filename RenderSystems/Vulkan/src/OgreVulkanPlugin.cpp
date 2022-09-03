@@ -28,6 +28,7 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 #include "OgreVulkanPlugin.h"
 #include "OgreRoot.h"
+#include "OgreVulkanRenderSystem.h"
 
 namespace Ogre
 {

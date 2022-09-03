@@ -29,10 +29,12 @@ THE SOFTWARE.
 #define __VulkanPlugin_H__
 
 #include "OgrePlugin.h"
-#include "OgreVulkanRenderSystem.h"
+#include "OgreVulkanExports.h"
 
 namespace Ogre
 {
+    class VulkanRenderSystem;
+
     /** Plugin instance for Vulkan Manager */
     class _OgreVulkanExport VulkanPlugin : public Plugin
     {
