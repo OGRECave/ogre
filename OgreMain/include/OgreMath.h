@@ -663,8 +663,8 @@ namespace Ogre
             return std::abs(b-a) <= tolerance;
         }
 
-        /** Calculates the tangent space vector for a given set of positions / texture coords. */
-        static Vector3 calculateTangentSpaceVector(
+        /// @deprecated use @ref TangentSpaceCalc
+        OGRE_DEPRECATED static Vector3 calculateTangentSpaceVector(
             const Vector3& position1, const Vector3& position2, const Vector3& position3,
             Real u1, Real v1, Real u2, Real v2, Real u3, Real v3);
 
