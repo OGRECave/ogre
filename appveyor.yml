@@ -4,7 +4,7 @@ environment:
   CS_APIKEY:
     secure: XiSyqXBlbnIqawfinZqXimatuEdpYsI38+HK2TgvuUGHQEoeFHA62700/EhFJ4M1
 image:
- - Visual Studio 2017
+ - Visual Studio 2019
 install:
  - cmd: choco install swig -y --version 4.0.2.04082020 & exit 0
  - cmd: curl -LO https://sdk.lunarg.com/sdk/download/1.2.189.2/windows/VulkanSDK-1.2.189.2-Installer.exe
@@ -12,7 +12,7 @@ install:
  - cmd: cd %APPVEYOR_BUILD_FOLDER%
  - cmd: git submodule update --init --recursive
 build_script:
- - set PATH=C:\Qt\5.12\msvc2017_64\bin;%PATH%
+ - set PATH=C:\Qt\5.15\msvc2019_64\bin;%PATH%
  - set VULKAN_SDK=C:\VulkanSDK\1.2.189.2
  - cmake -P ci-build.cmake
  - cmake --build build --config RelWithDebInfo --target INSTALL
@@ -29,7 +29,7 @@ branches:
 after_build:
   - IF NOT "%APPVEYOR_REPO_TAG%" == "true" set APPVEYOR_REPO_TAG_NAME=master
   - 7z a ogre-sdk-%APPVEYOR_REPO_TAG_NAME%-msvc141-x64.zip ./build/sdk/*
-  - SET PATH=C:\Python37-x64;C:\Python37-x64\Scripts;%PATH%
+  - SET PATH=C:\Python310-x64;C:\Python310-x64\Scripts;%PATH%
   - pip install --upgrade cloudsmith-cli
   - IF "%APPVEYOR_PULL_REQUEST_NUMBER%" == "" cloudsmith push raw ogrecave/ogre ogre-sdk-%APPVEYOR_REPO_TAG_NAME%-msvc141-x64.zip --republish --version %APPVEYOR_REPO_TAG_NAME% -k %CS_APIKEY%
 artifacts:
