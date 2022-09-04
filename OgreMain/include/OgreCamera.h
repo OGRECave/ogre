@@ -383,10 +383,8 @@ namespace Ogre {
         OGRE_DEPRECATED void setAutoTracking(bool enabled, SceneNode* const target = 0,
             const Vector3& offset = Vector3::ZERO);
 
-        /** Get the derived position of this frustum. */
-        const Vector3& getPositionForViewUpdate(void) const;
-        /** Get the derived orientation of this frustum. */
-        const Quaternion& getOrientationForViewUpdate(void) const;
+        const Vector3& getPositionForViewUpdate(void) const override;
+        const Quaternion& getOrientationForViewUpdate(void) const override;
 #endif
         /** Tells the Camera to contact the SceneManager to render from it's viewpoint.
         @param vp The viewport to render to

@@ -242,11 +242,8 @@ namespace Ogre {
         */
         OGRE_DEPRECATED const Vector3& getDirection(void) const;
 
-        /** @copydoc MovableObject::_notifyAttached */
-        void _notifyAttached(Node* parent, bool isTagPoint = false);
-
-        /** @copydoc MovableObject::_notifyMoved */
-        void _notifyMoved(void);
+        void _notifyAttached(Node* parent, bool isTagPoint = false) override;
+        void _notifyMoved(void) override;
 #endif
         /** Sets the range of a spotlight, i.e. the angle of the inner and outer cones
             and the rate of falloff between them.
