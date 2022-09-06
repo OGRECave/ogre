@@ -575,8 +575,8 @@ namespace Ogre {
         unsigned short k = 0;
         ushort dupKfCount = 0;
         for (auto *f : mKeyFrames)
-        {   
-            auto kf = static_cast<TransformKeyFrame*>(f); 
+        {
+            auto kf = static_cast<TransformKeyFrame*>(f);
             Vector3 newtrans = kf->getTranslate();
             Vector3 newscale = kf->getScale();
             Quaternion neworientation = kf->getRotation();
