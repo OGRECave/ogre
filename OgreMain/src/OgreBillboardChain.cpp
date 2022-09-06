@@ -390,7 +390,7 @@ namespace Ogre {
         {
             mAABB.setNull();
             Vector3 widthVector;
-            for (const auto & seg : mChainSegmentList)
+            for (const auto& seg : mChainSegmentList)
             {
                 if (seg.head != SEGMENT_EMPTY)
                 {
@@ -446,7 +446,7 @@ namespace Ogre {
         Vector3 eyePos = mParentNode->convertWorldToLocalPosition(camPos);
 
         Vector3 chainTangent;
-        for (auto & seg : mChainSegmentList)
+        for (auto& seg : mChainSegmentList)
         {
             // Skip 0 or 1 element segment counts
             if (seg.head != SEGMENT_EMPTY && seg.head != seg.tail)
@@ -577,7 +577,7 @@ namespace Ogre {
             uint16* pShort = static_cast<uint16*>(indexLock.pData);
             mIndexData->indexCount = 0;
             // indexes
-            for (auto & seg : mChainSegmentList)
+            for (auto& seg : mChainSegmentList)
             {
                 // Skip 0 or 1 element segment counts
                 if (seg.head != SEGMENT_EMPTY && seg.head != seg.tail)
@@ -675,7 +675,6 @@ namespace Ogre {
             else
                 queue->addRenderable(this);
         }
-
     }
     //-----------------------------------------------------------------------
     void BillboardChain::getRenderOperation(RenderOperation& op)
@@ -760,12 +759,9 @@ namespace Ogre {
             {
                 dynamic = StringConverter::parseBool(ni->second);
             }
-
         }
 
         return OGRE_NEW BillboardChain(name, maxElements, numberOfChains, useTex, useCol, dynamic);
 
     }
 }
-
-
