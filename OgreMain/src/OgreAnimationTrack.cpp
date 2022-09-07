@@ -195,7 +195,9 @@ namespace Ogre {
     {
         // Pre-allocate memory
         mKeyFrameIndexMap.resize(keyFrameTimes.size());
+
         size_t i = 0, j = 0;
+
         while (j < keyFrameTimes.size())
         {
             mKeyFrameIndexMap[j] = static_cast<ushort>(i);
@@ -208,7 +210,9 @@ namespace Ogre {
     }
     //--------------------------------------------------------------------------
     void AnimationTrack::_applyBaseKeyFrame(const KeyFrame*)
-    {}
+    {
+
+    }
     //---------------------------------------------------------------------
     void AnimationTrack::populateClone(AnimationTrack* clone) const
     {
