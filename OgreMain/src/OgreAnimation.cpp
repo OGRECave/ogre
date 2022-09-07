@@ -522,10 +522,9 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void Animation::_destroyNodeTracks(const TrackHandleList& tracks)
     {
-        TrackHandleList::const_iterator t;
-        for (t = tracks.begin(); t != tracks.end(); ++t)
+        for (auto t : tracks)
         {
-            destroyNodeTrack(*t);
+            destroyNodeTrack(t);
         }
     }
     //-----------------------------------------------------------------------
@@ -573,7 +572,7 @@ namespace Ogre {
         }
 
         // Now destroy the tracks we marked for death
-        for(unsigned short & h : tracksToDestroy)
+        for(unsigned short& h : tracksToDestroy)
         {
             destroyVertexTrack(h);
         }
