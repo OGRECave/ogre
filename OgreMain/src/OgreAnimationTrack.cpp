@@ -195,11 +195,15 @@ namespace Ogre {
     {
         // Pre-allocate memory
         mKeyFrameIndexMap.resize(keyFrameTimes.size());
-
-        for (size_t i = 0, j = 0; j < keyFrameTimes.size(); ++j)
+        size_t i = 0, j = 0;
+        while (j < keyFrameTimes.size())
         {
             mKeyFrameIndexMap[j] = static_cast<ushort>(i);
-            for (; i < (mKeyFrames.size() - 1) && mKeyFrames[i]->getTime() <= keyFrameTimes[j]; ++i);
+            while (i < (mKeyFrames.size() - 1) && mKeyFrames[i]->getTime() <= keyFrameTimes[j])
+            {
+                ++i;
+            }
+            ++j;
         }
     }
     //--------------------------------------------------------------------------
