@@ -190,8 +190,9 @@ if (APPLE)
 	# also, symlink frameworks so .app is standalone
 	# NOTE: $(CONFIGURATION) is not resolvable at CMake run time, it's only 
 	# valid at build time (hence parenthesis rather than braces)
+  # PLATFORM_NAME is set by us in ConfigTargets
 	
-    set(OGRE_OSX_BUILD_CONFIGURATION "${CMAKE_OSX_SYSROOT}/$(CONFIGURATION)")
+    set(OGRE_OSX_BUILD_CONFIGURATION "${PLATFORM_NAME}/$(CONFIGURATION)")
 	set (OGRE_SAMPLE_CONTENTS_PATH 
 		${PROJECT_BINARY_DIR}/bin/$(CONFIGURATION)/SampleBrowser.app/Contents)
 	add_custom_command(TARGET SampleBrowser POST_BUILD
@@ -215,7 +216,8 @@ if (APPLE)
 		COMMAND mkdir ARGS -p ${OGRE_SAMPLE_CONTENTS_PATH}/Plugins)
 
     set(FRAMEWORKS OgreOverlay
-		OgreBites
+		    OgreBites
+        OgreBullet
         OgrePaging
         OgreProperty
         OgreRTShaderSystem
