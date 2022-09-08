@@ -850,8 +850,8 @@ namespace Ogre {
         RGBA colour = bb.mColour;
 
         // Texcoords
-        assert( bb.mUseTexcoordRect || bb.mTexcoordIndex < mTextureCoords.size() );
-        const Ogre::FloatRect & r =
+        assert(bb.mUseTexcoordRect || bb.mTexcoordIndex < mTextureCoords.size());
+        const Ogre::FloatRect& r =
             bb.mUseTexcoordRect ? bb.mTexcoordRect : mTextureCoords[bb.mTexcoordIndex];
 
         if (bb.mRotation == Radian(0))
@@ -1069,46 +1069,45 @@ namespace Ogre {
 
     void BillboardSet::setTextureCoords(const std::vector<FloatRect>& coords)
     {
-      if( coords.empty() ) {
-        setTextureStacksAndSlices( 1, 1 );
-        return;
-      }
-
-      mTextureCoords = coords;
+        if(coords.empty()) {
+            setTextureStacksAndSlices(1, 1);
+            return;
+        }
+        mTextureCoords = coords;
     }
 
     void BillboardSet::setTextureStacksAndSlices( uchar stacks, uchar slices )
-    {
-      if( stacks == 0 ) stacks = 1;
-      if( slices == 0 ) slices = 1;
-      //  clear out any previous allocation (as vectors may not shrink)
-      TextureCoordSets().swap( mTextureCoords );
-      //  make room
-      mTextureCoords.resize( (size_t)stacks * slices );
-      unsigned int coordIndex = 0;
-      //  spread the U and V coordinates across the rects
-      for( uint v = 0; v < stacks; ++v ) {
-        //  (float)X / X is guaranteed to be == 1.0f for X up to 8 million, so
-        //  our range of 1..256 is quite enough to guarantee perfect coverage.
-        float top = (float)v / (float)stacks;
-        float bottom = ((float)v + 1) / (float)stacks;
-        for( uint u = 0; u < slices; ++u ) {
-          Ogre::FloatRect & r = mTextureCoords[coordIndex];
-          r.left = (float)u / (float)slices;
-          r.bottom = bottom;
-          r.right = ((float)u + 1) / (float)slices;
-          r.top = top;
-          ++coordIndex;
+{
+        if(stacks == 0) stacks = 1;
+        if(slices == 0) slices = 1;
+        //  clear out any previous allocation (as vectors may not shrink)
+        TextureCoordSets().swap(mTextureCoords);
+        //  make room
+        mTextureCoords.resize((size_t)stacks * slices);
+        unsigned int coordIndex = 0;
+        //  spread the U and V coordinates across the rects
+        for(uint v = 0; v < stacks; ++v) {
+            //  (float)X / X is guaranteed to be == 1.0f for X up to 8 million, so
+            //  our range of 1..256 is quite enough to guarantee perfect coverage.
+            float top = (float)v / (float)stacks;
+            float bottom = ((float)v + 1) / (float)stacks;
+            for(uint u = 0; u < slices; ++u) {
+                Ogre::FloatRect & r = mTextureCoords[coordIndex];
+                r.left = (float)u / (float)slices;
+                r.bottom = bottom;
+                r.right = ((float)u + 1) / (float)slices;
+                r.top = top;
+                ++coordIndex;
+            }
         }
-      }
-      assert( coordIndex == (size_t)stacks * slices );
+        assert( coordIndex == (size_t)stacks * slices );
     }
     //-----------------------------------------------------------------------
     Ogre::FloatRect const * BillboardSet::getTextureCoords( uint16 * oNumCoords )
     {
-      *oNumCoords = (uint16)mTextureCoords.size();
-      //  std::vector<> is guaranteed to be contiguous
-      return &mTextureCoords.front();
+        *oNumCoords = (uint16)mTextureCoords.size();
+        //  std::vector<> is guaranteed to be contiguous
+        return &mTextureCoords.front();
     }
     //-----------------------------------------------------------------------
     void BillboardSet::setPointRenderingEnabled(bool enabled)
@@ -1167,7 +1166,6 @@ namespace Ogre {
             {
                 externalData = StringConverter::parseBool(ni->second);
             }
-
         }
 
         if (poolSize > 0)
@@ -1178,6 +1176,5 @@ namespace Ogre {
         {
             return OGRE_NEW BillboardSet(name);
         }
-
     }
 }
