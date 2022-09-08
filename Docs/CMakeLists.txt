@@ -41,6 +41,7 @@ if(DOXYGEN_FOUND)
         ${COMPONENTS}
         ${PLUGINS}
         ${PROJECT_SOURCE_DIR}/PlugIns/PCZSceneManager/docs/readme.md
+        ${PROJECT_SOURCE_DIR}/PlugIns/DotScene/README.md
         ${PROJECT_SOURCE_DIR}/RenderSystems
         ${BASIC_TUTORIALS}
         ${PROJECT_SOURCE_DIR}/Docs/src/apimainpage.md
