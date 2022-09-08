@@ -11,6 +11,7 @@
     - @subpage trays
     - @subpage volume
     - @subpage meshlod-generator
+    - @subpage dotscene_overview
 - In Depth
     - @subpage manual-mesh-creation
     - @subpage tut_StaticGeom

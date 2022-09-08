@@ -682,6 +682,7 @@ INPUT                  = OgreMain/include \
                             Components/Volume/include \
                             PlugIns \
                             PlugIns/PCZSceneManager/docs/readme.md \
+                            PlugIns/DotScene/README.md \
                             RenderSystems \
                             Docs/src/apimainpage.md \
                             Docs/src/manual.md \
