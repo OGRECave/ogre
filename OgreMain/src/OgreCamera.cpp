@@ -34,7 +34,7 @@ namespace Ogre {
 
     String Camera::msMovableType = "Camera";
     //-----------------------------------------------------------------------
-    Camera::Camera( const String& name, SceneManager* sm)
+    Camera::Camera(const String& name, SceneManager* sm)
         : Frustum(name),
         mWindowSet(false),
         mAutoAspectRatio(false),
@@ -55,7 +55,6 @@ namespace Ogre {
         mSortMode(SM_DISTANCE),
         mSceneDetail(PM_SOLID)
     {
-
         // Reasonable defaults to camera params
         mFOVy = Radian(Math::PI/4.0f);
         mNearDist = 100.0f;
@@ -74,12 +73,10 @@ namespace Ogre {
         // Init matrices
         mViewMatrix = Affine3::ZERO;
         mProjMatrixRS = Matrix4::ZERO;
-
         mParentNode = 0;
 
         // no reflection
         mReflect = false;
-
         mVisible = false;
         mManager = sm;
     }
@@ -88,7 +85,7 @@ namespace Ogre {
     Camera::~Camera()
     {
         ListenerList listenersCopy = mListeners;
-        for (auto & i : listenersCopy)
+        for (auto& i : listenersCopy)
         {
             i->cameraDestroyed(this);
         }
@@ -174,7 +171,7 @@ namespace Ogre {
 
         Quaternion targetWorldOrientation;
 
-        if( mYawFixed )
+        if (mYawFixed)
         {
             targetWorldOrientation = Math::lookRotation(zAdjustVec, mYawFixedAxis);
         }
@@ -186,7 +183,7 @@ namespace Ogre {
             updateView();
             mRealOrientation.ToAxes(axes);
             Quaternion rotQuat;
-            if ( (axes[2]+zAdjustVec).squaredLength() <  0.00005f) 
+            if ((axes[2]+zAdjustVec).squaredLength() <  0.00005f) 
             {
                 // Oops, a 180 degree turn (infinite possible rotation axes)
                 // Default to yaw i.e. use current UP
@@ -487,7 +484,7 @@ namespace Ogre {
 
         //notify prerender scene
         ListenerList listenersCopy = mListeners;
-        for (auto & i : listenersCopy)
+        for (auto& i : listenersCopy)
         {
             i->cameraPreRenderScene(this);
         }
@@ -499,7 +496,7 @@ namespace Ogre {
         listenersCopy = mListeners;
 
         //notify postrender scene
-        for (auto & i : listenersCopy)
+        for (auto& i : listenersCopy)
         {
             i->cameraPostRenderScene(this);
         }
@@ -727,7 +724,6 @@ namespace Ogre {
         getCameraToViewportBoxVolume(screenLeft, screenTop, screenRight, screenBottom, 
             &vol, includeFarPlane);
         return vol;
-
     }
     //---------------------------------------------------------------------()
     void Camera::getCameraToViewportBoxVolume(Real screenLeft, 
@@ -788,7 +784,6 @@ namespace Ogre {
                 Plane(mFrustumPlanes[FRUSTUM_PLANE_BOTTOM].normal, br.getOrigin()));
             outVolume->planes.push_back(
                 Plane(mFrustumPlanes[FRUSTUM_PLANE_LEFT].normal, ul.getOrigin()));
-            
 
         }
 
@@ -1041,7 +1036,7 @@ namespace Ogre {
         // now set the intersection point and note whether it is a 
         // point at infinity or straddles infinity
         unsigned int i;
-        for (i=0; i<4; i++)
+        for (i = 0; i < 4; i++)
         {
             Real test = dir[i].z * delta;
             if (test == 0.0) {
@@ -1056,7 +1051,7 @@ namespace Ogre {
             }
         }
 
-        for (i=0; i<4; i++)
+        for (i = 0; i < 4; i++)
         {
             // store the finite intersection points
             if (infpt[i] == 0)
@@ -1137,13 +1132,12 @@ namespace Ogre {
         // compute intersection points on plane
         std::vector<Vector4> iPnt = getRayForwardIntersect(lPos, vec, -pval.d);
 
-
         // return wanted data
         if(intersect3d) 
         {
             Quaternion planeRot = invPlaneRot.Inverse();
             (*intersect3d).clear();
-            for(auto & i : iPnt)
+            for(auto& i : iPnt)
             {
                 Vector3 intersection = planeRot * Vector3(i.x, i.y, i.z);
                 (*intersect3d).push_back(Vector4(intersection.x, intersection.y, intersection.z, i.w));
@@ -1169,8 +1163,5 @@ namespace Ogre {
         // Don't do these, they're not base settings and can cause referencing issues
         //this->setLodCamera(cam->getLodCamera());
         //this->setCullingFrustum(cam->getCullingFrustum());
-
     }
-
-
 } // namespace Ogre

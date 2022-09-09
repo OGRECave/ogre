@@ -182,11 +182,9 @@ size_t CompositorChain::getNumCompositors()
 //-----------------------------------------------------------------------
 void CompositorChain::removeAllCompositors()
 {
-    Instances::iterator i, iend;
-    iend = mInstances.end();
-    for (i = mInstances.begin(); i != iend; ++i)
+    for (auto *i : mInstances)
     {
-        OGRE_DELETE *i;
+        OGRE_DELETE i;
     }
     mInstances.clear();
     
