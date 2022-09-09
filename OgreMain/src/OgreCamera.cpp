@@ -183,7 +183,7 @@ namespace Ogre {
             updateView();
             mRealOrientation.ToAxes(axes);
             Quaternion rotQuat;
-            if ((axes[2]+zAdjustVec).squaredLength() <  0.00005f) 
+            if ((axes[2]+zAdjustVec).squaredLength() <  0.00005f)
             {
                 // Oops, a 180 degree turn (infinite possible rotation axes)
                 // Default to yaw i.e. use current UP
