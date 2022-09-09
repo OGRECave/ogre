@@ -87,7 +87,7 @@ namespace Ogre {
 
     Codec* Codec::getCodec(char *magicNumberPtr, size_t maxbytes)
     {
-        for (auto& c : msMapCodecs) 
+        for (auto& c : msMapCodecs)
         {
             String ext = c.second->magicNumberToFileExt(magicNumberPtr, maxbytes);
             if (!ext.empty())
