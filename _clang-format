@@ -1,0 +1,2 @@
+{UseTab: Never, ColumnLimit: 120, IndentWidth: 4, AccessModifierOffset: -4, PointerAlignment: Left,
+  Standard: Cpp11, Cpp11BracedListStyle: true, BasedOnStyle: LLVM, BreakBeforeBraces: Allman}
