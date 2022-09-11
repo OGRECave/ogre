@@ -141,11 +141,9 @@ void CompositionTargetPass::removePass(size_t index)
 //-----------------------------------------------------------------------
 void CompositionTargetPass::removeAllPasses()
 {
-    Passes::iterator i, iend;
-    iend = mPasses.end();
-    for (i = mPasses.begin(); i != iend; ++i)
+    for (auto p : mPasses)
     {
-        OGRE_DELETE (*i);
+        OGRE_DELETE (p);
     }
     mPasses.clear();
 }

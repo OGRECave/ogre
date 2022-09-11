@@ -108,20 +108,20 @@ bool CompositionPass::getAutomaticColour() const
 //-----------------------------------------------------------------------
 void CompositionPass::setInput(size_t id, const String &input, size_t mrtIndex)
 {
-    assert(id<OGRE_MAX_TEXTURE_LAYERS);
+    assert(id < OGRE_MAX_TEXTURE_LAYERS);
     mMaterial.inputs[id] = InputTex(input, mrtIndex);
 }
 //-----------------------------------------------------------------------
 const CompositionPass::InputTex &CompositionPass::getInput(size_t id) const
 {
-    assert(id<OGRE_MAX_TEXTURE_LAYERS);
+    assert(id < OGRE_MAX_TEXTURE_LAYERS);
     return mMaterial.inputs[id];
 }
 //-----------------------------------------------------------------------
 size_t CompositionPass::getNumInputs() const
 {
     size_t count = 0;
-    for(size_t x=0; x<OGRE_MAX_TEXTURE_LAYERS; ++x)
+    for(size_t x = 0; x < OGRE_MAX_TEXTURE_LAYERS; ++x)
     {
         if(!mMaterial.inputs[x].name.empty())
             count = x+1;
@@ -131,7 +131,7 @@ size_t CompositionPass::getNumInputs() const
 //-----------------------------------------------------------------------
 void CompositionPass::clearAllInputs()
 {
-    for(auto & input : mMaterial.inputs)
+    for(auto& input : mMaterial.inputs)
     {
         input.name.clear();
     }
