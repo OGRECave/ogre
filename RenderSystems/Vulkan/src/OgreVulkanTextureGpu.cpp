@@ -179,9 +179,9 @@ namespace Ogre
         mDefaultDisplaySrv( 0 ),
         mDisplayTextureName( 0 ),
         mFinalTextureName( 0 ),
-        mMemory(VK_NULL_HANDLE),
+        mAllocation(VK_NULL_HANDLE),
         mMsaaTextureName( 0 ),
-        mMsaaMemory(VK_NULL_HANDLE),
+        mMsaaAllocation(VK_NULL_HANDLE),
         mCurrLayout( VK_IMAGE_LAYOUT_UNDEFINED ),
         mNextLayout( VK_IMAGE_LAYOUT_UNDEFINED )
     {
@@ -235,35 +235,15 @@ namespace Ogre
         if( isUav() )
             imageInfo.usage |= VK_IMAGE_USAGE_STORAGE_BIT;
 
+        VulkanDevice* device = static_cast<VulkanTextureGpuManager*>(mCreator)->getDevice();
+
+        VmaAllocationCreateInfo allocInfo = {};
+        allocInfo.usage = VMA_MEMORY_USAGE_GPU_ONLY;
+        OGRE_VK_CHECK(vmaCreateImage(device->getAllocator(), &imageInfo, &allocInfo, &mFinalTextureName, &mAllocation, 0));
+
         String textureName = getName();
-
-        auto textureManager = static_cast<VulkanTextureGpuManager*>(mCreator);
-        VulkanDevice* device = textureManager->getDevice();
-
-        OGRE_VK_CHECK(vkCreateImage(device->mDevice, &imageInfo, 0, &mFinalTextureName));
-
         setObjectName( device->mDevice, (uint64_t)mFinalTextureName,
                        VK_DEBUG_REPORT_OBJECT_TYPE_IMAGE_EXT, textureName.c_str() );
-
-        VkMemoryRequirements memRequirements;
-        vkGetImageMemoryRequirements( device->mDevice, mFinalTextureName, &memRequirements );
-
-        VkMemoryAllocateInfo memAllocInfo = {VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO};
-        memAllocInfo.allocationSize = memRequirements.size;
-        memAllocInfo.memoryTypeIndex = 0;
-
-        const auto& memProperties = device->mDeviceMemoryProperties;
-        for(; memAllocInfo.memoryTypeIndex < memProperties.memoryTypeCount; memAllocInfo.memoryTypeIndex++)
-        {
-            if ((memProperties.memoryTypes[memAllocInfo.memoryTypeIndex].propertyFlags &
-                 VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT))
-            {
-                break;
-            }
-        }
-
-        OGRE_VK_CHECK(vkAllocateMemory(device->mDevice, &memAllocInfo, NULL, &mMemory));
-        OGRE_VK_CHECK(vkBindImageMemory(device->mDevice, mFinalTextureName, mMemory, 0));
 
         OgreAssert(device->mGraphicsQueue.getEncoderState() != VulkanQueue::EncoderGraphicsOpen,
                    "interrupting RenderPass not supported");
@@ -341,8 +321,7 @@ namespace Ogre
         vkDestroyImageView(device->mDevice, mDefaultDisplaySrv, 0);
         mDefaultDisplaySrv = 0;
 
-        vkDestroyImage(device->mDevice, mFinalTextureName, 0);
-        vkFreeMemory(device->mDevice, mMemory, 0);
+        vmaDestroyImage(device->getAllocator(), mFinalTextureName, mAllocation);
 
         destroyMsaaSurface();
 
@@ -706,36 +685,16 @@ namespace Ogre
                                ? VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT
                                : VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
 
+        VulkanDevice* device = static_cast<VulkanTextureGpuManager*>(mCreator)->getDevice();
+
+        VmaAllocationCreateInfo allocInfo = {};
+        allocInfo.usage = VMA_MEMORY_USAGE_GPU_ONLY;
+        OGRE_VK_CHECK(
+            vmaCreateImage(device->getAllocator(), &imageInfo, &allocInfo, &mMsaaTextureName, &mMsaaAllocation, 0));
+
         String textureName = getName() + "/MsaaImplicit";
-
-        auto textureManager = static_cast<VulkanTextureGpuManager*>(mCreator);
-        VulkanDevice* device = textureManager->getDevice();
-
-        OGRE_VK_CHECK(vkCreateImage( device->mDevice, &imageInfo, 0, &mMsaaTextureName ));
-
         setObjectName(device->mDevice, (uint64_t)mMsaaTextureName, VK_DEBUG_REPORT_OBJECT_TYPE_IMAGE_EXT,
                       textureName.c_str());
-
-        VkMemoryRequirements memRequirements;
-        vkGetImageMemoryRequirements( device->mDevice, mMsaaTextureName, &memRequirements );
-
-        VkMemoryAllocateInfo memAllocInfo = {VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO};
-        memAllocInfo.allocationSize = memRequirements.size;
-        memAllocInfo.memoryTypeIndex = 0;
-
-        const auto& memProperties = device->mDeviceMemoryProperties;
-        for(; memAllocInfo.memoryTypeIndex < memProperties.memoryTypeCount; memAllocInfo.memoryTypeIndex++)
-        {
-            if ((memProperties.memoryTypes[memAllocInfo.memoryTypeIndex].propertyFlags &
-                 VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT))
-            {
-                break;
-            }
-        }
-
-        OGRE_VK_CHECK(vkAllocateMemory(device->mDevice, &memAllocInfo, NULL, &mMsaaMemory));
-
-        OGRE_VK_CHECK(vkBindImageMemory(device->mDevice, mMsaaTextureName, mMsaaMemory, 0));
 
         // Immediately transition to its only state
         VkImageMemoryBarrier imageBarrier = this->getImageMemoryBarrier();
@@ -755,11 +714,9 @@ namespace Ogre
     {
         if(!mMsaaTextureName)
             return;
-        auto textureManager = static_cast<VulkanTextureGpuManager*>(mCreator);
-        VulkanDevice *device = textureManager->getDevice();
 
-        vkDestroyImage(device->mDevice, mMsaaTextureName, 0);
-        vkFreeMemory(device->mDevice, mMsaaMemory, 0);
+        VulkanDevice *device = static_cast<VulkanTextureGpuManager*>(mCreator)->getDevice();
+        vmaDestroyImage(device->getAllocator(), mMsaaTextureName, mMsaaAllocation);
     }
 
     VulkanRenderTexture::VulkanRenderTexture(const String& name, HardwarePixelBuffer* buffer, uint32 zoffset,

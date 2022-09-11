@@ -779,7 +779,6 @@ namespace Ogre
                 deviceExtensions.push_back( VK_EXT_DEBUG_MARKER_EXTENSION_NAME );
 
             mDevice->createDevice( deviceExtensions, 0u, 0u );
-            volkLoadDevice(mDevice->mDevice);
 
             mHardwareBufferManager = OGRE_NEW VulkanHardwareBufferManager( mDevice );
 

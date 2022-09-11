@@ -51,10 +51,30 @@ namespace Ogre
         }
     }
 
+    static VmaMemoryUsage getVmaUsage(HardwareBuffer::Usage usage)
+    {
+        switch(usage)
+        {
+        case HBU_CPU_TO_GPU:
+            return VMA_MEMORY_USAGE_CPU_TO_GPU;
+        case HBU_GPU_TO_CPU:
+            return VMA_MEMORY_USAGE_GPU_TO_CPU;
+        case HBU_CPU_ONLY:
+            return VMA_MEMORY_USAGE_CPU_ONLY;
+        default:
+        case HBU_GPU_ONLY:
+            return VMA_MEMORY_USAGE_GPU_ONLY;
+        }
+    }
+
     void VulkanHardwareBuffer::discard()
     {
         if(mBuffer)
-            mDevice->mGraphicsQueue.queueForDeletion(mBuffer, mMemory);
+        {
+            if(mMappedPtr)
+                vmaUnmapMemory( mDevice->getAllocator(), mAllocation );
+            mDevice->mGraphicsQueue.queueForDeletion(mBuffer, mAllocation);
+        }
 
         VkBufferCreateInfo bufferCi = {VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO};
         bufferCi.size = mSizeInBytes;
@@ -63,44 +83,22 @@ namespace Ogre
         if((mUsage & HBU_CPU_ONLY) == 0)
             bufferCi.usage |= VK_BUFFER_USAGE_TRANSFER_DST_BIT;
 
-        OGRE_VK_CHECK(vkCreateBuffer(mDevice->mDevice, &bufferCi, 0, &mBuffer));
-
-        VkMemoryRequirements buffMemRequirements;
-        vkGetBufferMemoryRequirements( mDevice->mDevice, mBuffer, &buffMemRequirements );
-
-        VkMemoryAllocateInfo memAllocInfo = {VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO};
-        memAllocInfo.allocationSize = buffMemRequirements.size;
-
-        uint32 reqFlags = 0;
-        if(mUsage != HBU_GPU_ONLY)
-            reqFlags = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
-        else
-            reqFlags = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
-
-        const auto& memProperties = mDevice->mDeviceMemoryProperties;
-        for(; memAllocInfo.memoryTypeIndex < memProperties.memoryTypeCount; memAllocInfo.memoryTypeIndex++)
-        {
-            if ((memProperties.memoryTypes[memAllocInfo.memoryTypeIndex].propertyFlags & reqFlags) == reqFlags)
-            {
-                break;
-            }
-        }
-
-        OGRE_VK_CHECK(vkAllocateMemory(mDevice->mDevice, &memAllocInfo, NULL, &mMemory));
-        OGRE_VK_CHECK(vkBindBufferMemory(mDevice->mDevice, mBuffer, mMemory, 0));
+        VmaAllocationCreateInfo allocInfo = {};
+        allocInfo.usage = getVmaUsage(mUsage);
+        OGRE_VK_CHECK(vmaCreateBuffer(mDevice->getAllocator(), &bufferCi, &allocInfo, &mBuffer, &mAllocation, 0));
 
         if (mUsage == HBU_CPU_TO_GPU)
         {
-            OGRE_VK_CHECK(vkMapMemory(mDevice->mDevice, mMemory, 0, mSizeInBytes, 0, &mMappedPtr));
+            OGRE_VK_CHECK(vmaMapMemory(mDevice->getAllocator(), mAllocation, &mMappedPtr));
         }
     }
 
     VulkanHardwareBuffer::~VulkanHardwareBuffer()
     {
         if(mMappedPtr)
-            vkUnmapMemory( mDevice->mDevice, mMemory );
+            vmaUnmapMemory( mDevice->getAllocator(), mAllocation );
         // delay until we are sure this buffer is no longer in use
-        mDevice->mGraphicsQueue.queueForDeletion(mBuffer, mMemory);
+        mDevice->mGraphicsQueue.queueForDeletion(mBuffer, mAllocation);
     }
 
     void* VulkanHardwareBuffer::lockImpl(size_t offset, size_t length, LockOptions options)
@@ -120,7 +118,7 @@ namespace Ogre
             return static_cast<uint8*>(mMappedPtr) + offset;
 
         void *retPtr = 0;
-        OGRE_VK_CHECK(vkMapMemory(mDevice->mDevice, mMemory, 0, mSizeInBytes, 0, &retPtr));
+        OGRE_VK_CHECK(vmaMapMemory(mDevice->getAllocator(), mAllocation, &retPtr));
         return static_cast<uint8*>(retPtr) + offset;
     }
 
@@ -129,7 +127,7 @@ namespace Ogre
         OgreAssert(!mShadowBuffer, "should be handled by _updateFromShadow");
         if(mMappedPtr) // persistent mapping
             return;
-        vkUnmapMemory( mDevice->mDevice, mMemory );
+        vmaUnmapMemory( mDevice->getAllocator(), mAllocation );
     }
 
     void VulkanHardwareBuffer::readData( size_t offset, size_t length, void *pDest )

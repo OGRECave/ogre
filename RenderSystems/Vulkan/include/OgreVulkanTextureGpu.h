@@ -37,6 +37,8 @@ THE SOFTWARE.
 #include "OgreVulkanHardwareBuffer.h"
 #include "OgreRenderTexture.h"
 
+#include "vk_mem_alloc.h"
+
 namespace Ogre
 {
     /** \addtogroup Core
@@ -105,11 +107,11 @@ namespace Ogre
         ///     4. The msaa resolved texture (hasMsaaExplicitResolves==false)
         /// This value may be a renderbuffer instead of a texture if isRenderbuffer() returns true.
         VkImage mFinalTextureName;
-        VkDeviceMemory mMemory;
+        VmaAllocation mAllocation;
 
         /// Only used when hasMsaaExplicitResolves() == false
         VkImage mMsaaTextureName;
-        VkDeviceMemory mMsaaMemory;
+        VmaAllocation mMsaaAllocation;
     public:
         /// The current layout we're in. Including any internal stuff.
         VkImageLayout mCurrLayout;
