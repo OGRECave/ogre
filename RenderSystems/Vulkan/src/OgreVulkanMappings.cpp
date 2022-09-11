@@ -414,8 +414,10 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     VkImageAspectFlags VulkanMappings::getImageAspect(PixelFormat pf, const bool bPreferDepthOverStencil)
     {
-        // we dont have a format corresponding to VK_IMAGE_ASPECT_STENCIL_BIT yet
-        return PixelUtil::isDepth(pf) ? VK_IMAGE_ASPECT_DEPTH_BIT : VK_IMAGE_ASPECT_COLOR_BIT;
+        int ret = PixelUtil::isDepth(pf) ? VK_IMAGE_ASPECT_DEPTH_BIT : VK_IMAGE_ASPECT_COLOR_BIT;
+        if (pf == PF_DEPTH24_STENCIL8)
+            ret |= VK_IMAGE_ASPECT_STENCIL_BIT;
+        return ret;
     }
     //-----------------------------------------------------------------------------------
     VkAccessFlags VulkanMappings::get( const Texture *texture )
