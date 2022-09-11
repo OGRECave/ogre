@@ -326,7 +326,7 @@ namespace Ogre
         case PF_R32_UINT:              return VK_FORMAT_R32_UINT;
         case PF_R32_SINT:              return VK_FORMAT_R32_SINT;
         //case PF_D24_UNORM:             return VK_FORMAT_X8_D24_UNORM_PACK32;
-        case PF_DEPTH24_STENCIL8:            return VK_FORMAT_D24_UNORM_S8_UINT;
+        case PF_DEPTH24_STENCIL8:            return VK_FORMAT_D32_SFLOAT_S8_UINT; // VK_FORMAT_D24_UNORM_S8_UINT not supported on AMD
         case PF_BYTE_LA:
         case PF_RG8:                   return VK_FORMAT_R8G8_UNORM;
         case PF_R8G8_UINT:              return VK_FORMAT_R8G8_UINT;
