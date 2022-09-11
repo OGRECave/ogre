@@ -33,13 +33,15 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 #include "OgreHardwareBuffer.h"
 
+#include "vk_mem_alloc.h"
+
 namespace Ogre
 {
     class VulkanHardwareBuffer : public HardwareBuffer
     {
     private:
         VkBuffer mBuffer;
-        VkDeviceMemory  mMemory;
+        VmaAllocation mAllocation;
         VulkanDevice *mDevice;
         uint32 mTarget;
         void *mMappedPtr;

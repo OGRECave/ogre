@@ -44,6 +44,9 @@ THE SOFTWARE.
 
 #include <volk.h>
 
+#define VMA_NULLABLE
+#define VMA_NOT_NULL
+#define VMA_STATIC_VULKAN_FUNCTIONS 0
 
 namespace Ogre
 {

@@ -820,9 +820,9 @@ namespace Ogre
         mGpuWaitSemaphForCurrCmdBuff.push_back( imageAcquisitionSemaph );
     }
     //-------------------------------------------------------------------------
-    void VulkanQueue::queueForDeletion(VkBuffer buffer, VkDeviceMemory memory)
+    void VulkanQueue::queueForDeletion(VkBuffer buffer, VmaAllocation allocation)
     {
-       mPerFrameData[mCurrentFrameIdx].mBufferGraveyard.push_back({buffer, memory});
+       mPerFrameData[mCurrentFrameIdx].mBufferGraveyard.push_back({buffer, allocation});
     }
     void VulkanQueue::queueForDeletion(const std::shared_ptr<VulkanDescriptorPool>& descriptorPool)
     {
@@ -836,8 +836,7 @@ namespace Ogre
         // it is safe to free staging buffers now
         for(auto bm : mPerFrameData[frameIdx].mBufferGraveyard)
         {
-            vkDestroyBuffer(mDevice, bm.first, nullptr);
-            vkFreeMemory(mDevice, bm.second, nullptr);
+            vmaDestroyBuffer(mOwnerDevice->getAllocator(), bm.first, bm.second);
         }
         mPerFrameData[frameIdx].mBufferGraveyard.clear();
         mPerFrameData[frameIdx].mDescriptorPoolGraveyard.clear();
