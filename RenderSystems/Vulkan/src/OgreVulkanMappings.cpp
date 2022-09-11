@@ -361,6 +361,7 @@ namespace Ogre
         case PF_BC4_SNORM:             return VK_FORMAT_BC4_SNORM_BLOCK;
         case PF_BC5_UNORM:             return VK_FORMAT_BC5_UNORM_BLOCK;
         case PF_BC5_SNORM:             return VK_FORMAT_BC5_SNORM_BLOCK;
+        case PF_R5G6B5:                return VK_FORMAT_R5G6B5_UNORM_PACK16;
         case PF_B5G6R5:                return VK_FORMAT_B5G6R5_UNORM_PACK16;
         case PF_A1R5G5B5:              return VK_FORMAT_B5G5R5A1_UNORM_PACK16;
         case PF_A8R8G8B8:              return VK_FORMAT_B8G8R8A8_UNORM;
