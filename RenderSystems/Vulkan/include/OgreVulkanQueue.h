@@ -33,6 +33,8 @@ THE SOFTWARE.
 
 #include "OgreHeaderPrefix.h"
 
+#include "vk_mem_alloc.h"
+
 namespace Ogre
 {
     typedef std::vector<VkSemaphore> VkSemaphoreArray;
@@ -56,7 +58,7 @@ namespace Ogre
             VkCommandBuffer mCommandBuffer;
             VkFence mProtectingFence;
 
-            std::vector<std::pair<VkBuffer, VkDeviceMemory>> mBufferGraveyard;
+            std::vector<std::pair<VkBuffer, VmaAllocation>> mBufferGraveyard;
             std::vector<std::shared_ptr<VulkanDescriptorPool>> mDescriptorPoolGraveyard;
         };
 
@@ -180,7 +182,7 @@ namespace Ogre
         void init( VkDevice device, VkQueue queue, VulkanRenderSystem *renderSystem );
         void destroy( void );
 
-        void queueForDeletion(VkBuffer buffer, VkDeviceMemory memory);
+        void queueForDeletion(VkBuffer buffer, VmaAllocation allocation);
         void queueForDeletion(const std::shared_ptr<VulkanDescriptorPool>& descriptorPool);
     protected:
         void newCommandBuffer( void );

@@ -33,6 +33,11 @@ else()
     target_link_libraries(RenderSystem_Vulkan PRIVATE ${X11_LIBRARIES})
 endif()
 
+if(UNIX)
+    set_source_files_properties(src/vma.cpp
+        PROPERTIES COMPILE_FLAGS "-Wno-implicit-fallthrough -Wno-unused-variable")
+endif()
+
 target_link_libraries(RenderSystem_Vulkan PUBLIC OgreMain PRIVATE ${CMAKE_DL_LIBS})
 
 target_include_directories(RenderSystem_Vulkan PUBLIC

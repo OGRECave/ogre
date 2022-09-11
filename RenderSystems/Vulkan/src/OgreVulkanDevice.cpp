@@ -63,7 +63,8 @@ namespace Ogre
             destroyQueues( mComputeQueues );
             destroyQueues( mTransferQueues );
 
-            // Must be done externally (this' destructor has yet to free more Vulkan stuff)
+            vmaDestroyAllocator(mVmaAllocator);
+
             vkDestroyDevice( mDevice, 0 );
             mDevice = 0;
             mPhysicalDevice = 0;
@@ -265,6 +266,36 @@ namespace Ogre
         createInfo.pEnabledFeatures = &mDeviceFeatures;
 
         OGRE_VK_CHECK(vkCreateDevice(mPhysicalDevice, &createInfo, NULL, &mDevice));
+
+        volkLoadDevice(mDevice);
+
+        VmaVulkanFunctions fns;
+        fns.vkGetInstanceProcAddr = vkGetInstanceProcAddr;
+        fns.vkGetDeviceProcAddr = vkGetDeviceProcAddr;
+        fns.vkGetPhysicalDeviceProperties = vkGetPhysicalDeviceProperties;
+        fns.vkGetPhysicalDeviceMemoryProperties = vkGetPhysicalDeviceMemoryProperties;
+        fns.vkAllocateMemory = vkAllocateMemory;
+        fns.vkFreeMemory = vkFreeMemory;
+        fns.vkMapMemory = vkMapMemory;
+        fns.vkUnmapMemory = vkUnmapMemory;
+        fns.vkFlushMappedMemoryRanges = vkFlushMappedMemoryRanges;
+        fns.vkInvalidateMappedMemoryRanges = vkInvalidateMappedMemoryRanges;
+        fns.vkBindBufferMemory = vkBindBufferMemory;
+        fns.vkBindImageMemory = vkBindImageMemory;
+        fns.vkGetBufferMemoryRequirements = vkGetBufferMemoryRequirements;
+        fns.vkGetImageMemoryRequirements = vkGetImageMemoryRequirements;
+        fns.vkCreateBuffer = vkCreateBuffer;
+        fns.vkDestroyBuffer = vkDestroyBuffer;
+        fns.vkCreateImage = vkCreateImage;
+        fns.vkDestroyImage = vkDestroyImage;
+        fns.vkCmdCopyBuffer = vkCmdCopyBuffer;
+
+        VmaAllocatorCreateInfo allocatorCreateInfo = {};
+        allocatorCreateInfo.instance = mInstance;
+        allocatorCreateInfo.device = mDevice;
+        allocatorCreateInfo.physicalDevice = mPhysicalDevice;
+        allocatorCreateInfo.pVulkanFunctions = &fns;
+        vmaCreateAllocator(&allocatorCreateInfo, &mVmaAllocator);
     }
     //-------------------------------------------------------------------------
     void VulkanDevice::initQueues( void )
