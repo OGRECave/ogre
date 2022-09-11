@@ -450,7 +450,7 @@ namespace Ogre
         mTexture->setFSAA(mFSAA, "");
 
         mDepthTexture = new VulkanTextureGpu(texMgr, "RenderWindow DepthBuffer", 0, "", true, 0);
-        mDepthTexture->setFormat(PF_DEPTH24_STENCIL8);
+        mDepthTexture->setFormat(PF_DEPTH32);
         mDepthTexture->setFSAA(mFSAA, "");
 #if 0
         mStencilBuffer = 0;
