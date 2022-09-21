@@ -136,7 +136,7 @@ namespace Ogre {
         option on this texture to Ogre::FO_ANISOTROPIC.
         @param maxAniso
             The maximal anisotropy level, should be between 2 and the maximum
-            supported by hardware (1 is the default, ie. no anisotrophy).
+            supported by hardware (1 is the default, ie. no anisotropy).
         */
         void setAnisotropy(unsigned int maxAniso)
         {
