@@ -748,7 +748,7 @@ namespace Ogre
     GpuProgramParameters::GpuProgramParameters() :
         mCombinedVariability(GPV_GLOBAL)
         , mTransposeMatrices(false)
-        , mIgnoreMissingParams(false)
+        , mIgnoreMissingParams(true)
         , mActivePassIterationIndex(std::numeric_limits<size_t>::max())
     {
     }
