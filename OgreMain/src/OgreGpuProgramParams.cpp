@@ -2307,9 +2307,13 @@ namespace Ogre
             return;
 
         if (count > def->arraySize * def->elementSize)
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-                        StringUtil::format("Too many values for parameter %s: %zu > %d", name.c_str(), count,
-                                           def->arraySize * def->elementSize));
+        {
+            // The shader compiler may trim the array if the trailing elements
+            // are unused or their usage can be optimized away. Therefore,
+            // a count exceeding the array size not not an error.
+            count = def->arraySize * def->elementSize;
+        }
+
         _writeRawConstants(withArrayOffset(def, name), val, count);
     }
     void GpuProgramParameters::setNamedConstant(const String& name, const float* val, size_t count, size_t multiple)
