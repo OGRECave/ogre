@@ -6,42 +6,30 @@
 #include "Ogre.h"
 #include "OgreApplicationContext.h"
 
-class MyTestApp : public OgreBites::ApplicationContext, public OgreBites::InputListener
-{
-public:
-    MyTestApp();
-    void setup();
-    bool keyPressed(const OgreBites::KeyboardEvent& evt);
-};
-
-//! [constructor]
-MyTestApp::MyTestApp() : OgreBites::ApplicationContext("OgreTutorialApp")
-{
-}
-//! [constructor]
-
 //! [key_handler]
-bool MyTestApp::keyPressed(const OgreBites::KeyboardEvent& evt)
+class KeyHandler : public OgreBites::InputListener
 {
-    if (evt.keysym.sym == OgreBites::SDLK_ESCAPE)
+    bool keyPressed(const OgreBites::KeyboardEvent& evt) override
     {
-        getRoot()->queueEndRendering();
+        if (evt.keysym.sym == OgreBites::SDLK_ESCAPE)
+        {
+            Ogre::Root::getSingleton().queueEndRendering();
+        }
+        return true;
     }
-    return true;
-}
+};
 //! [key_handler]
+
+int main(int argc, char *argv[])
+{
+//! [constructor]
+    OgreBites::ApplicationContext ctx("OgreTutorialApp");
+    ctx.initApp();
+//! [constructor]
 
 //! [setup]
-void MyTestApp::setup(void)
-{
-    // do not forget to call the base first
-    OgreBites::ApplicationContext::setup();
-    
-    // register for input events
-    addInputListener(this);
-
     // get a pointer to the already created root
-    Ogre::Root* root = getRoot();
+    Ogre::Root* root = ctx.getRoot();
     Ogre::SceneManager* scnMgr = root->createSceneManager();
 
     // register our scene with the RTSS
@@ -66,22 +54,21 @@ void MyTestApp::setup(void)
     camNode->attachObject(cam);
 
     // and tell it to render into the main window
-    getRenderWindow()->addViewport(cam);
+    ctx.getRenderWindow()->addViewport(cam);
 
     // finally something to render
     Ogre::Entity* ent = scnMgr->createEntity("Sinbad.mesh");
     Ogre::SceneNode* node = scnMgr->getRootSceneNode()->createChildSceneNode();
     node->attachObject(ent);
-}
 //! [setup]
 
 //! [main]
-int main(int argc, char *argv[])
-{
-    MyTestApp app;
-    app.initApp();
-    app.getRoot()->startRendering();
-    app.closeApp();
+    // register for input events
+    KeyHandler keyHandler;
+    ctx.addInputListener(&keyHandler);
+
+    ctx.getRoot()->startRendering();
+    ctx.closeApp();
+//! [main]
     return 0;
 }
-//! [main]
