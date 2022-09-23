@@ -27,35 +27,29 @@ The easiest way to get started is the OgreBites Component. It handles Ogre start
 This is useful if all you want is to get a Scene with a FPS counter up and running (rapid prototyping).
 If available it also uses SDL2 for input - you now just have to implement the callbacks.
 
-To use it, simply derive from OgreBites::ApplicationContext and if you want to get input events from OgreBites::InputListener
-
-```cpp
-class MyTestApp : public OgreBites::ApplicationContext, public OgreBites::InputListener
-{
-    ...
-}
-```
-in the constructor we set our application name. The ogre configuration files will be stored in a system dependent location specific to our app.
+The main class is OgreBites::ApplicationContext which manages the lifetime of everything else.
+In the constructor we set our application name. The ogre configuration files will be stored in a system dependent location specific to our app. Then @c initApp will initialise all components and create a window for us.
 @snippet Samples/Tutorials/Bootstrap.cpp constructor
 
-to handle input events, we then override the according method
-@snippet Samples/Tutorials/Bootstrap.cpp key_handler
-
-the interesting part however is the setup method
+the interesting part however is creation of the actual scene
 @note The code is explained in detail in the Tutorial @ref tut_FirstScene
 
 @snippet Samples/Tutorials/Bootstrap.cpp setup
 
+to handle input events, we then override the according method
+@snippet Samples/Tutorials/Bootstrap.cpp key_handler
+
 finally we start everything as
 @snippet Samples/Tutorials/Bootstrap.cpp main
+
+OgreBites itself is also a good starting point if you need more control over the Camera or the Window creation.
+For instance to render into an externally created Window. Fore Qt interop, there is OgreBites::ApplicationContextQt.
+
 @note You can find the full code of the above example at 
 * `Samples/Tutorials/Bootstrap.cpp` for C++
 * `Samples/Python/sample.py` for Python
 * `Samples/AndroidJNI/MainActivity.java` for Java (Android)
 * `Samples/Csharp/example.cs` for C\#
-
-OgreBites itself is also a good starting point if you need more control over the Camera or the Window creation.
-For instance to render into an existing Qt Window.
 
 @see Ogre::FileSystemLayer::getConfigFilePath
 @see Ogre::Root::renderOneFrame
