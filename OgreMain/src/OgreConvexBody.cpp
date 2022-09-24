@@ -1174,23 +1174,24 @@ namespace Ogre
     bool ConvexBody::findAndEraseEdgePair(const Vector3& vec, 
         Polygon::EdgeMap& intersectionEdges, Vector3& vNext ) const
     {
-        for (auto& i : intersectionEdges)
+        for (Polygon::EdgeMap::iterator it = intersectionEdges.begin(); 
+            it != intersectionEdges.end(); ++it)
         {
-            if (i.first.positionEquals(vec))
+            if (it->first.positionEquals(vec))
             {
-                vNext = i.second;
+                vNext = it->second;
 
                 // erase found edge
-                intersectionEdges.erase(i.first);
+                intersectionEdges.erase( it );
 
                 return true; // found!
             }
-            else if (i.second.positionEquals(vec))
+            else if (it->second.positionEquals(vec))
             {
-                vNext = i.first;
+                vNext = it->first;
 
                 // erase found edge
-                intersectionEdges.erase(i.first);
+                intersectionEdges.erase( it );
 
                 return true; // found!
             }
