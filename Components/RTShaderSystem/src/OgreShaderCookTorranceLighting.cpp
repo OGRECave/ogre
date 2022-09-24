@@ -103,15 +103,10 @@ bool CookTorranceLighting::createCpuSubPrograms(ProgramSet* programSet)
 
     auto sceneCol = psProgram->resolveParameter(GpuProgramParameters::ACT_DERIVED_SCENE_COLOUR);
     auto litResult = psMain->resolveLocalParameter(GCT_FLOAT4, "litResult");
-    auto ambient = psMain->resolveLocalParameter(GCT_FLOAT4, "ambient");
     auto diffuse = psProgram->resolveParameter(GpuProgramParameters::ACT_SURFACE_DIFFUSE_COLOUR);
 
     fstage.mul(diffuse, outDiffuse, outDiffuse);
-
     fstage.assign(Vector4(0), litResult);
-    fstage.assign(sceneCol, ambient);
-
-    fstage.mul(ambient, outDiffuse, ambient);
 
     if(mLightCount > 0)
     {
@@ -121,16 +116,17 @@ bool CookTorranceLighting::createCpuSubPrograms(ProgramSet* programSet)
         auto spotParams = psProgram->resolveParameter(GpuProgramParameters::ACT_SPOTLIGHT_PARAMS_ARRAY, mLightCount);
         auto lightDirView = psProgram->resolveParameter(GpuProgramParameters::ACT_LIGHT_DIRECTION_VIEW_SPACE_ARRAY, mLightCount);
 
-        fstage.callFunction("PBR_Lights", {In(viewNormal), In(viewPos), In(lightPos), In(lightDiffuse),
-                                            In(pointParams), In(lightDirView), In(spotParams), In(outDiffuse).xyz(),
-                                            mrparams, InOut(litResult).xyz()});
+        std::vector<Operand> params = {In(viewNormal),       In(viewPos),     In(sceneCol),          In(lightPos),
+                                       In(lightDiffuse),     In(pointParams), In(lightDirView),      In(spotParams),
+                                       In(outDiffuse).xyz(), mrparams,        InOut(litResult).xyz()};
+
+        if (auto shadowFactor = psMain->getLocalParameter("lShadowFactor"))
+            params.insert(params.begin(), In(shadowFactor));
+
+        fstage.callFunction("PBR_Lights", params);
     }
 
-    fstage.add(ambient, litResult, outDiffuse);
-
-    if (auto shadowFactor = psMain->getLocalParameter("lShadowFactor"))
-        fstage.callFunction("SGX_ApplyShadowFactor_Diffuse",
-                            {In(ambient), In(shadowFactor), InOut(outDiffuse)});
+    fstage.assign(In(litResult).xyz(), Out(outDiffuse).xyz());
 
     return true;
 }
