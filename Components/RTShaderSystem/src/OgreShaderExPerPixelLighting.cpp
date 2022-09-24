@@ -268,7 +268,7 @@ bool PerPixelLighting::addFunctionInvocations(ProgramSet* programSet)
         if (auto shadowFactor = psMain->getLocalParameter("lShadowFactor"))
         {
             stage.callFunction("SGX_ApplyShadowFactor_Diffuse",
-                               {In(mDerivedSceneColour), In(mOutDiffuse), In(shadowFactor), Out(mOutDiffuse)});
+                               {In(mDerivedSceneColour), In(shadowFactor), InOut(mOutDiffuse)});
             if(mSpecularEnable)
                 stage.mul(mOutSpecular, shadowFactor, mOutSpecular);
         }

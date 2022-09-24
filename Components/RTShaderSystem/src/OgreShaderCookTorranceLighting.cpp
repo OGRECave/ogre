@@ -130,7 +130,7 @@ bool CookTorranceLighting::createCpuSubPrograms(ProgramSet* programSet)
 
     if (auto shadowFactor = psMain->getLocalParameter("lShadowFactor"))
         fstage.callFunction("SGX_ApplyShadowFactor_Diffuse",
-                            {In(ambient), In(outDiffuse), In(shadowFactor), Out(outDiffuse)});
+                            {In(ambient), In(shadowFactor), InOut(outDiffuse)});
 
     return true;
 }
