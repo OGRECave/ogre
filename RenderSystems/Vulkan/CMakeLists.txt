@@ -35,9 +35,10 @@ endif()
 
 if(UNIX)
     set_source_files_properties(src/vma.cpp
-        PROPERTIES COMPILE_FLAGS "-Wno-implicit-fallthrough -Wno-unused-variable -Wno-parentheses")
+        PROPERTIES COMPILE_FLAGS "-Wno-implicit-fallthrough -Wno-unused-variable -Wno-parentheses -Wno-unused-function")
 endif()
 
+#target_compile_features(RenderSystem_Vulkan PRIVATE cxx_std_17)
 target_link_libraries(RenderSystem_Vulkan PUBLIC OgreMain PRIVATE ${CMAKE_DL_LIBS})
 
 target_include_directories(RenderSystem_Vulkan PUBLIC

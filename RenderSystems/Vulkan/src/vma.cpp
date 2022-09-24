@@ -7,5 +7,8 @@
 #define _MSVC_LANG 0
 #endif
 
+#define VMA_SYSTEM_ALIGNED_MALLOC Ogre::AlignedMemory::allocate
+#define VMA_SYSTEM_ALIGNED_FREE Ogre::AlignedMemory::deallocate
+
 // #define VMA_ASSERT(expr) OgreAssert(expr, "")
 #include "vk_mem_alloc.h"
