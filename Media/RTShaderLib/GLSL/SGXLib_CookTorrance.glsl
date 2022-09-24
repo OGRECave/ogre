@@ -162,8 +162,12 @@ void evaluateLight(
 
 #if LIGHT_COUNT > 0
 void PBR_Lights(
+#ifdef PSSM_NUM_SPLITS
+                in float shadowFactor,
+#endif
                 in vec3 vNormal,
                 in vec3 viewPos,
+                in vec4 ambient,
                 in vec4 lightPos[LIGHT_COUNT],
                 in vec4 lightColor[LIGHT_COUNT],
                 in vec4 pointParams[LIGHT_COUNT],
@@ -191,7 +195,14 @@ void PBR_Lights(
     {
         evaluateLight(vNormal, viewPos, lightPos[i], lightColor[i].xyz, pointParams[i], vLightDirView[i], spotParams[i],
                       diffuseColor, f0, roughness, vOutColour);
+
+#ifdef PSSM_NUM_SPLITS
+        if(i == 0) // directional lights always come first
+            vOutColour *= shadowFactor;
+#endif
     }
+
+    vOutColour += baseColor * ambient.rgb;
 
     vOutColour = saturate(vOutColour);
 }
