@@ -1007,11 +1007,7 @@ void Sample_ShaderSystem::applyShadowType(int menuIndex)
         mSpotLightCheckBox->setChecked(false);
 
         mTrayMgr->removeWidgetFromTray(mDirLightCheckBox);
-        mTrayMgr->removeWidgetFromTray(mPointLightCheckBox);
-        mTrayMgr->removeWidgetFromTray(mSpotLightCheckBox);
         mDirLightCheckBox->hide();
-        mPointLightCheckBox->hide();
-        mSpotLightCheckBox->hide();
 
         // Disable fog on the caster pass.
         MaterialPtr passCaterMaterial = MaterialManager::getSingleton().getByName("PSSM/shadow_caster");

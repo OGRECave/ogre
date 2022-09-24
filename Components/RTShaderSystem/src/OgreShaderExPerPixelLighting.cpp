@@ -256,17 +256,22 @@ bool PerPixelLighting::addFunctionInvocations(ProgramSet* programSet)
         stage.callFunction("SGX_Flip_Backface_Normal", mFrontFacing, mTargetFlipped, mViewNormal);
 
     // Add per light functions.
+    int i = 0;
     for (const auto& lp : mLightParamsList)
     {
         addIlluminationInvocation(&lp, stage);
-    }
 
-    if (auto shadowFactor = psMain->getLocalParameter("lShadowFactor"))
-    {
-        stage.callFunction("SGX_ApplyShadowFactor_Diffuse",
-                            {In(mDerivedSceneColour), In(mOutDiffuse), In(shadowFactor), Out(mOutDiffuse)});
-        if(mSpecularEnable)
-            stage.mul(mOutSpecular, shadowFactor, mOutSpecular);
+        if(i > 0) // directional lights are in front
+            continue;
+        i++;
+
+        if (auto shadowFactor = psMain->getLocalParameter("lShadowFactor"))
+        {
+            stage.callFunction("SGX_ApplyShadowFactor_Diffuse",
+                               {In(mDerivedSceneColour), In(mOutDiffuse), In(shadowFactor), Out(mOutDiffuse)});
+            if(mSpecularEnable)
+                stage.mul(mOutSpecular, shadowFactor, mOutSpecular);
+        }
     }
 
     // Assign back temporary variables
