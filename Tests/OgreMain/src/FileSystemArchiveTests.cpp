@@ -69,6 +69,7 @@ TEST_F(FileSystemArchiveTests,ListNonRecursive)
     EXPECT_EQ(String("rootfile.txt"), vec->at(0));
     EXPECT_EQ(String("rootfile2.txt"), vec->at(1));
 
+    EXPECT_EQ("rootfile.txt", mArch->open("rootfile.txt")->getName());
 }
 
 TEST_F(FileSystemArchiveTests,Exists)
