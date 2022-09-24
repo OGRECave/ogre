@@ -67,7 +67,7 @@ TEST_F(ZipArchiveTests,ListNonRecursive)
     EXPECT_EQ(String("rootfile.txt"), vec->at(0));
     EXPECT_EQ(String("rootfile2.txt"), vec->at(1));
 
-
+    EXPECT_EQ("rootfile.txt", arch->open("rootfile.txt")->getName());
 }
 //--------------------------------------------------------------------------
 TEST_F(ZipArchiveTests,ListRecursive)
