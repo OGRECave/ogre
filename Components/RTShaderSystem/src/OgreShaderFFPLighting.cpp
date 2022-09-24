@@ -499,7 +499,7 @@ bool FFPLighting::setParameter(const String& name, const String& value)
 //-----------------------------------------------------------------------
 void FFPLighting::setLightCount(const Vector3i& lightCount)
 {
-	for (int type=0; type < 3; ++type)
+	for (int type : {1, 0, 2}) // directional first
 	{
 		for (int i=0; i < lightCount[type]; ++i)
 		{
