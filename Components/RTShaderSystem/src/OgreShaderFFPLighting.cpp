@@ -275,8 +275,7 @@ bool FFPLighting::addFunctionInvocations(ProgramSet* programSet)
         auto psOutDiffuse = psMain->resolveOutputParameter(Parameter::SPC_COLOR_DIFFUSE);
 
         auto fstage = psMain->getStage(FFP_PS_COLOUR_BEGIN);
-        fstage.callFunction("SGX_ApplyShadowFactor_Diffuse",
-                            {In(ambient), In(psOutDiffuse), In(shadowFactor), Out(psOutDiffuse)});
+        fstage.callFunction("SGX_ApplyShadowFactor_Diffuse", {In(ambient), In(shadowFactor), InOut(psOutDiffuse)});
         if (mSpecularEnable)
         {
             auto psSpecular = psMain->getInputParameter(Parameter::SPC_COLOR_SPECULAR);

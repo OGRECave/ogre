@@ -48,12 +48,10 @@ STATIC vec3 pssm_lod_info = vec3(0.0, 0.0, 0.0);
 
 //-----------------------------------------------------------------------------
 void SGX_ApplyShadowFactor_Diffuse(in vec4 ambient, 
-					  in vec4 lightSum, 
-					  in float fShadowFactor, 
-					  out vec4 oLight)
+					  in float fShadowFactor,
+					  inout vec4 oLight)
 {
-	oLight.rgb = ambient.rgb + (lightSum.rgb - ambient.rgb) * fShadowFactor;
-	oLight.a   = lightSum.a;
+	oLight.rgb = mix(ambient.rgb, oLight.rgb, fShadowFactor);
 
 #ifdef DEBUG_PSSM
 	oLight.rgb += pssm_lod_info;
