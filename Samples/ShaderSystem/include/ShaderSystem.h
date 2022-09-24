@@ -10,8 +10,8 @@ using namespace OgreBites;
 // Lighting models.
 enum ShaderSystemLightingModel
 {
-    SSLM_PerVertexLighting,
     SSLM_PerPixelLighting,
+    SSLM_CookTorranceLighting,
     SSLM_NormalMapLightingTangentSpace,
     SSLM_NormalMapLightingObjectSpace
 };

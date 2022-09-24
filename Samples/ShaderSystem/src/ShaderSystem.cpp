@@ -130,7 +130,7 @@ void Sample_ShaderSystem::itemSelected(SelectMenu* menu)
     {
         int curModelIndex = menu->getSelectionIndex();
 
-        if (curModelIndex >= SSLM_PerVertexLighting && curModelIndex <= SSLM_NormalMapLightingObjectSpace)
+        if (curModelIndex >= SSLM_PerPixelLighting&& curModelIndex <= SSLM_NormalMapLightingObjectSpace)
         {
             setCurrentLightingModel((ShaderSystemLightingModel)curModelIndex);
         }
@@ -240,7 +240,7 @@ void Sample_ShaderSystem::setupContent()
 {
     
     // Setup default effects values.
-    mCurLightingModel       = SSLM_PerVertexLighting;
+    mCurLightingModel       = SSLM_PerPixelLighting;
     mPerPixelFogEnable      = false;
     mSpecularEnable         = false;
     mReflectionMapEnable    = false;
@@ -461,13 +461,10 @@ void Sample_ShaderSystem::setupUI()
     }
 
     mLightingModelMenu = mTrayMgr->createLongSelectMenu(TL_BOTTOM, "TargetModelLighting", "", 240, 230, 10);    
-    mLightingModelMenu ->addItem("Per Vertex");
-
-#ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
     mLightingModelMenu ->addItem("Per Pixel");
+    mLightingModelMenu ->addItem("Cook Torrance");
     mLightingModelMenu ->addItem("Normal Map - Tangent Space");
     mLightingModelMenu ->addItem("Normal Map - Object Space");
-#endif
 
     mTrayMgr->createButton(TL_BOTTOM, EXPORT_BUTTON_NAME, "Export Material", 240);
     
@@ -645,15 +642,11 @@ void Sample_ShaderSystem::generateShaders(Entity* entity)
 
 
 #ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
-            if (mCurLightingModel == SSLM_PerVertexLighting)
+            if (mCurLightingModel == SSLM_CookTorranceLighting)
             {
-                RTShader::SubRenderState* perPerVertexLightModel = mShaderGenerator->createSubRenderState("FFP_Lighting");
-
-                renderState->addTemplateSubRenderState(perPerVertexLightModel); 
+                auto lightModel = mShaderGenerator->createSubRenderState("CookTorranceLighting");
+                renderState->addTemplateSubRenderState(lightModel);
             }
-#endif
-
-#ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
             else if (mCurLightingModel == SSLM_PerPixelLighting)
             {
                 RTShader::SubRenderState* perPixelLightModel = mShaderGenerator->createSubRenderState("SGX_PerPixelLighting");
