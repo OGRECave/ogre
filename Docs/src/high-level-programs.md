@@ -442,14 +442,14 @@ material SupportHLSLandGLSLwithoutUnified
     {
         pass
         {
-            vertex_program_ref myVertexProgramHLSL
+            vertex_program_ref myVertexProgramGLSL
             {
                 param_named_auto worldViewProj worldviewproj_matrix
                 param_named_auto lightColour light_diffuse_colour 0
                 param_named_auto lightSpecular light_specular_colour 0
                 param_named_auto lightAtten light_attenuation 0
             }
-            fragment_program_ref myFragmentProgramHLSL
+            fragment_program_ref myFragmentProgramGLSL
             {
             }
         }

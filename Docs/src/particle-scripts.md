@@ -215,7 +215,7 @@ This sets whether or not the BillboardSet will use point rendering rather than m
 
 ### accurate\_facing
 
-This sets whether or not the BillboardSet will use a slower but more accurate calculation for facing the billboard to the camera. Bt default it uses the camera direction, which is faster but means the billboards don’t stay in the same orientation as you rotate the camera. The ’accurate\_facing true’ option makes the calculation based on a vector from each billboard to the camera, which means the orientation is constant even whilst the camera rotates.
+This sets whether or not the BillboardSet will use a slower but more accurate calculation for facing the billboard to the camera. By default it uses the camera direction, which is faster but means the billboards don’t stay in the same orientation as you rotate the camera. The ’accurate\_facing on’ option makes the calculation based on a vector from each billboard to the camera, which means the orientation is constant even whilst the camera rotates.
 
 format: accurate\_facing on|off<br> default: accurate\_facing off<br>
 
