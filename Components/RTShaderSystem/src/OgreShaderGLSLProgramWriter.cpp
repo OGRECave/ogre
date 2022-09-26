@@ -184,6 +184,9 @@ void GLSLProgramWriter::writeMainSourceCode(std::ostream& os, Program* program)
             uniformLoc += esize * std::max<int>(uparam->getSize(), 1);
         }
 
+        if(mIsGLSLES)
+            os << "highp "; // force highp to avoid precision mismatch between VP/ FP
+
         os << "uniform\t";
         writeParameter(os, uparam);
         os << ";\n";
