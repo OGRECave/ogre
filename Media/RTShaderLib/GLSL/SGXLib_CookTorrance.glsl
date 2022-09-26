@@ -155,8 +155,6 @@ void evaluateLight(
         color *= getAngleAttenuation(spotParams.xyz, vLightDirView.xyz, vLightView);
     }
 
-    // linear to gamma
-    color = pow(color, vec3_splat(1.0/2.2));
     vOutColour += color;
 }
 
@@ -177,6 +175,10 @@ void PBR_Lights(
                 in vec2 mrParam,
                 inout vec3 vOutColour)
 {
+#ifdef DEBUG_PSSM
+	baseColor += pssm_lod_info;
+#endif
+
     // gamma to linear
     baseColor = pow(baseColor, vec3_splat(2.2));
 
@@ -202,7 +204,10 @@ void PBR_Lights(
 #endif
     }
 
-    vOutColour += baseColor * ambient.rgb;
+    vOutColour += baseColor * pow(ambient.rgb, vec3_splat(2.2));
+
+    // linear to gamma
+    vOutColour = pow(vOutColour, vec3_splat(1.0/2.2));
 
     vOutColour = saturate(vOutColour);
 }
