@@ -622,12 +622,12 @@ void Sample_ShaderSystem::generateShaders(Entity* entity)
 
             if (mSpecularEnable)
             {
-                curPass->setSpecular(ColourValue::White);
+                curPass->setSpecular(mCurLightingModel != SSLM_CookTorranceLighting ? ColourValue::White : ColourValue(0.3, 0.0));
                 curPass->setShininess(32.0);
             }
             else
             {
-                curPass->setSpecular(ColourValue::Black);
+                curPass->setSpecular(mCurLightingModel != SSLM_CookTorranceLighting ? ColourValue::Black : ColourValue(1.0, 0.0));
                 curPass->setShininess(0.0);
             }
             
@@ -762,7 +762,7 @@ void Sample_ShaderSystem::createPointLight()
     light->setCastShadows(false);
     light->setDiffuseColour(0.15, 0.65, 0.15);
     light->setSpecularColour(0.5, 0.5, 0.5);    
-    light->setAttenuation(200.0, 1.0, 0.0005, 0.0);
+    light->setAttenuation(250.0, 0.5, 0, 0.00003);
 
     // create pivot node
     mPointLightNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
