@@ -196,7 +196,7 @@ static void fixupFFPLighting(TargetRenderState* renderState)
 #ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
     const SubRenderStateList& subRenderStateList = renderState->getSubRenderStates();
     auto it = std::find_if(subRenderStateList.begin(), subRenderStateList.end(),
-                           [](const SubRenderState* e) { return e->getType() == FFPLighting::Type; });
+                           [](const SubRenderState* e) { return e->getType() == SRS_PER_VERTEX_LIGHTING; });
 
     if (it == subRenderStateList.end())
         return;
@@ -204,9 +204,9 @@ static void fixupFFPLighting(TargetRenderState* renderState)
     auto ffpLighting = static_cast<FFPLighting*>(*it);
 
     it = std::find_if(subRenderStateList.begin(), subRenderStateList.end(),
-                      [](const SubRenderState* e) { return e->getType() == FFPColour::Type; });
+                      [](const SubRenderState* e) { return e->getType() == SRS_VERTEX_COLOUR; });
 
-    OgreAssert(it != subRenderStateList.end(), "FFPColour required");
+    OgreAssert(it != subRenderStateList.end(), "SRS_VERTEX_COLOUR required");
 
     auto ffpColour = static_cast<FFPColour*>(*it);
     ffpColour->addResolveStageMask(FFPColour::SF_VS_OUTPUT_DIFFUSE);

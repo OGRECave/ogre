@@ -44,9 +44,6 @@ namespace RTShader {
 *  @{
 */
 
-/** Normal Map Lighting extension sub render state implementation.
-Derives from SubRenderState class.
-*/
 class NormalMapLighting : public SubRenderState
 {
 
@@ -82,9 +79,6 @@ public:
     Return the index of the input vertex shader texture coordinate set.
     */
     unsigned int getTexCoordIndex() const { return mVSTexCoordSetIndex; }
-
-    // Type of this render state.
-    static String Type;
 
     enum NormalMapSpace
     {

@@ -96,8 +96,6 @@ public:
     */
     CalcMode getCalcMode() const { return mCalcMode; }
 
-    static String Type;
-
 // Protected methods
 protected:
 

@@ -34,6 +34,8 @@ namespace RTShader {
 /*                                                                      */
 /************************************************************************/
 String FFPTexturing::Type = "FFP_Texturing";
+const String SRS_TEXTURING = "FFP_Texturing";
+
 #define _INT_VALUE(f) (*(int*)(&(f)))
 
 const String c_ParamTexelEx("texel_");
@@ -46,7 +48,7 @@ FFPTexturing::FFPTexturing() : mIsPointSprite(false), mLateAddBlend(false)
 //-----------------------------------------------------------------------
 const String& FFPTexturing::getType() const
 {
-    return Type;
+    return SRS_TEXTURING;
 }
 
 //-----------------------------------------------------------------------
@@ -677,7 +679,7 @@ void FFPTexturing::setTextureUnit(unsigned short index, TextureUnitState* textur
 //-----------------------------------------------------------------------
 const String& FFPTexturingFactory::getType() const
 {
-    return FFPTexturing::Type;
+    return SRS_TEXTURING;
 }
 
 //-----------------------------------------------------------------------

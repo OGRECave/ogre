@@ -90,8 +90,6 @@ public:
 
     bool setParameter(const String& name, const String& value) override;
 
-    static String Type;
-
     /**
     Get the specular component state.
     */

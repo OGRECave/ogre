@@ -46,6 +46,7 @@ HardwareSkinningFactory& HardwareSkinningFactory::getSingleton(void)
 }
 
 String HardwareSkinning::Type = "SGX_HardwareSkinning";
+const String SRS_HARDWARE_SKINNING = "SGX_HardwareSkinning";
 
 /************************************************************************/
 /*                                                                      */
@@ -59,7 +60,7 @@ HardwareSkinning::HardwareSkinning() :
 //-----------------------------------------------------------------------
 const String& HardwareSkinning::getType() const
 {
-    return Type;
+    return SRS_HARDWARE_SKINNING;
 }
 
 //-----------------------------------------------------------------------
@@ -238,7 +239,7 @@ HardwareSkinningFactory::~HardwareSkinningFactory() {}
 //-----------------------------------------------------------------------
 const String& HardwareSkinningFactory::getType() const
 {
-    return HardwareSkinning::Type;
+    return SRS_HARDWARE_SKINNING;
 }
 
 //-----------------------------------------------------------------------

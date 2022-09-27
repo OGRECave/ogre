@@ -32,7 +32,7 @@ namespace RTShader {
 /************************************************************************/
 /*                                                                      */
 /************************************************************************/
-String FFPLighting::Type = "FFP_Lighting";
+const String SRS_PER_VERTEX_LIGHTING = "FFP_Lighting";
 
 //-----------------------------------------------------------------------
 FFPLighting::FFPLighting()
@@ -46,7 +46,7 @@ FFPLighting::FFPLighting()
 //-----------------------------------------------------------------------
 const String& FFPLighting::getType() const
 {
-	return Type;
+	return SRS_PER_VERTEX_LIGHTING;
 }
 
 
@@ -537,7 +537,7 @@ Vector3i FFPLighting::getLightCount() const
 //-----------------------------------------------------------------------
 const String& FFPLightingFactory::getType() const
 {
-	return FFPLighting::Type;
+	return SRS_PER_VERTEX_LIGHTING;
 }
 
 //-----------------------------------------------------------------------

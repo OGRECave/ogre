@@ -34,11 +34,12 @@ namespace RTShader {
 /*                                                                      */
 /************************************************************************/
 String FFPTransform::Type = "FFP_Transform";
+const String SRS_TRANSFORM = "FFP_Transform";
 
 //-----------------------------------------------------------------------
 const String& FFPTransform::getType() const
 {
-    return Type;
+    return SRS_TRANSFORM;
 }
 
 
@@ -132,7 +133,7 @@ void FFPTransform::copyFrom(const SubRenderState& rhs)
 //-----------------------------------------------------------------------
 const String& FFPTransformFactory::getType() const
 {
-    return FFPTransform::Type;
+    return SRS_TRANSFORM;
 }
 
 //-----------------------------------------------------------------------
