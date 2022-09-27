@@ -41,9 +41,6 @@ namespace RTShader {
 *  @{
 */
 
-/** Triplanar Texturing.
-Derives from SubRenderState class.
-*/
 class _OgreRTSSExport TriplanarTexturing : public SubRenderState
 {
 

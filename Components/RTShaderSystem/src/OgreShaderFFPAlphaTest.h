@@ -36,10 +36,6 @@ THE SOFTWARE.
 namespace Ogre {
 namespace RTShader {
 
-/**
-A factory that enables creation of LayeredBlending instances.
-@remarks Sub class of SubRenderStateFactory
-*/
 	class FFPAlphaTest : public SubRenderState
 	{
 
@@ -68,9 +64,6 @@ A factory that enables creation of LayeredBlending instances.
     bool addFunctionInvocations(ProgramSet* programSet) override;
 
 public:
-
-	/// The type.
-	static String Type;
     /**
     @see SubRenderState::getType.
     */

@@ -36,9 +36,6 @@ THE SOFTWARE.
 namespace Ogre {
 namespace RTShader {
 
-/** Texturing sub render state implementation of layered blending.
-Derives from FFPTexturing class which derives from SubRenderState class.
-*/
 class _OgreRTSSExport LayeredBlending : public FFPTexturing
 {
 public:

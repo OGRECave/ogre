@@ -36,7 +36,7 @@ namespace RTShader {
 /************************************************************************/
 /*                                                                      */
 /************************************************************************/
-String NormalMapLighting::Type                      = "NormalMap";
+const String SRS_NORMALMAP                      = "NormalMap";
 
 //-----------------------------------------------------------------------
 NormalMapLighting::NormalMapLighting()
@@ -51,7 +51,7 @@ NormalMapLighting::NormalMapLighting()
 //-----------------------------------------------------------------------
 const String& NormalMapLighting::getType() const
 {
-    return Type;
+    return SRS_NORMALMAP;
 }
 //-----------------------------------------------------------------------
 bool NormalMapLighting::createCpuSubPrograms(ProgramSet* programSet)
@@ -204,7 +204,7 @@ bool NormalMapLighting::setParameter(const String& name, const String& value)
 //-----------------------------------------------------------------------
 const String& NormalMapLightingFactory::getType() const
 {
-    return NormalMapLighting::Type;
+    return SRS_NORMALMAP;
 }
 
 //-----------------------------------------------------------------------

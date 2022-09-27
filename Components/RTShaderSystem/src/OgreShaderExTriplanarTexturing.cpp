@@ -33,6 +33,7 @@ namespace Ogre {
 namespace RTShader {
 
     String TriplanarTexturing::type = "SGX_TriplanarTexturing";
+    const String SRS_TRIPLANAR_TEXTURING = "SGX_TriplanarTexturing";
 
     //-----------------------------------------------------------------------
 
@@ -117,7 +118,7 @@ namespace RTShader {
     //-----------------------------------------------------------------------
     const String& TriplanarTexturing::getType() const
     {
-        return type;
+        return SRS_TRIPLANAR_TEXTURING;
     }
 
     //-----------------------------------------------------------------------
@@ -197,7 +198,7 @@ namespace RTShader {
     //-----------------------------------------------------------------------
     const String& TriplanarTexturingFactory::getType() const
     {
-        return TriplanarTexturing::type;
+        return SRS_TRIPLANAR_TEXTURING;
     }
 
     //-----------------------------------------------------------------------

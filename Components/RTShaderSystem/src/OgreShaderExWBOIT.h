@@ -32,8 +32,6 @@ public:
     bool preAddToRenderState(const RenderState* renderState, Pass* srcPass, Pass* dstPass) override;
     bool createCpuSubPrograms(ProgramSet* programSet) override;
     void copyFrom(const SubRenderState& rhs) override {}
-
-    static String Type;
 };
 
 /**

@@ -43,9 +43,7 @@ namespace RTShader {
 *  @{
 */
 
-/** Integrated PSSM shadow receiver with 3 splits sub render state implementation.
-Derives from SubRenderState class.
-*/
+/// @copydoc SRS_INTEGRATED_PSSM3
 class _OgreRTSSExport IntegratedPSSM3 : public SubRenderState
 {
 
@@ -56,10 +54,7 @@ public:
     /** Class default constructor */    
     IntegratedPSSM3();
 
-    /** 
-    @see SubRenderState::getType.
-    */
-    const String& getType() const override;
+    const String& getType() const override { return SRS_INTEGRATED_PSSM3; }
 
     /** 
     @see SubRenderState::getType.
@@ -191,11 +186,7 @@ A factory that enables creation of IntegratedPSSM3 instances.
 class _OgreRTSSExport IntegratedPSSM3Factory : public SubRenderStateFactory
 {
 public:
-
-    /** 
-    @see SubRenderStateFactory::getType.
-    */
-    const String& getType() const override;
+    const String& getType() const override { return SRS_INTEGRATED_PSSM3; }
 
     /** 
     @see SubRenderStateFactory::createInstance.

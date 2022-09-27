@@ -38,6 +38,7 @@ namespace RTShader {
 /*                                                                      */
 /************************************************************************/
 String IntegratedPSSM3::Type = "SGX_IntegratedPSSM3";
+const String SRS_INTEGRATED_PSSM3 = "SGX_IntegratedPSSM3";
 
 //-----------------------------------------------------------------------
 IntegratedPSSM3::IntegratedPSSM3()
@@ -49,13 +50,6 @@ IntegratedPSSM3::IntegratedPSSM3()
     mIsD3D9 = false;
     mShadowTextureParamsList.resize(1); // normal single texture depth shadowmapping
 }
-
-//-----------------------------------------------------------------------
-const String& IntegratedPSSM3::getType() const
-{
-    return Type;
-}
-
 
 //-----------------------------------------------------------------------
 int IntegratedPSSM3::getExecutionOrder() const
@@ -339,14 +333,6 @@ bool IntegratedPSSM3::addPSInvocation(Program* psProgram, const int groupOrder)
 
     // shadow factor is applied by lighting stages
     return true;
-}
-
-
-
-//-----------------------------------------------------------------------
-const String& IntegratedPSSM3Factory::getType() const
-{
-    return IntegratedPSSM3::Type;
 }
 
 //-----------------------------------------------------------------------

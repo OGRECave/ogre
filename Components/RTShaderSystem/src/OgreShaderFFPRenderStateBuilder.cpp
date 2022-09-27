@@ -37,16 +37,16 @@ void FFPRenderStateBuilder::buildRenderState(ShaderGenerator::SGPass* sgPass, Ta
 {
     auto& sg = ShaderGenerator::getSingleton();
     RenderState ffpTemplate;
-    ffpTemplate.addTemplateSubRenderState(sg.createSubRenderState(FFPTransform::Type));
-    ffpTemplate.addTemplateSubRenderState(sg.createSubRenderState(FFPColour::Type));
+    ffpTemplate.addTemplateSubRenderState(sg.createSubRenderState(SRS_TRANSFORM));
+    ffpTemplate.addTemplateSubRenderState(sg.createSubRenderState(SRS_VERTEX_COLOUR));
 #ifndef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
-    ffpTemplate.addTemplateSubRenderState(sg.createSubRenderState(FFPLighting::Type));
+    ffpTemplate.addTemplateSubRenderState(sg.createSubRenderState(SRS_PER_VERTEX_LIGHTING));
 #else
-    ffpTemplate.addTemplateSubRenderState(sg.createSubRenderState(PerPixelLighting::Type));
+    ffpTemplate.addTemplateSubRenderState(sg.createSubRenderState(SRS_PER_PIXEL_LIGHTING));
 #endif
-    ffpTemplate.addTemplateSubRenderState(sg.createSubRenderState(FFPTexturing::Type));
-    ffpTemplate.addTemplateSubRenderState(sg.createSubRenderState(FFPFog::Type));
-    ffpTemplate.addTemplateSubRenderState(sg.createSubRenderState(FFPAlphaTest::Type));
+    ffpTemplate.addTemplateSubRenderState(sg.createSubRenderState(SRS_TEXTURING));
+    ffpTemplate.addTemplateSubRenderState(sg.createSubRenderState(SRS_FOG));
+    ffpTemplate.addTemplateSubRenderState(sg.createSubRenderState(SRS_ALPHA_TEST));
 
     renderState->link(ffpTemplate, sgPass->getSrcPass(), sgPass->getDstPass());
 }

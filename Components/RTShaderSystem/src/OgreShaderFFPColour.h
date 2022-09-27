@@ -41,9 +41,6 @@ namespace RTShader {
 *  @{
 */
 
-/** Colour sub render state implementation of the Fixed Function Pipeline.
-Derives from SubRenderState class.
-*/
 class FFPColour : public SubRenderState
 {
 public:
@@ -109,8 +106,6 @@ public:
     @param mask The mask to remove from current flag set.
     */
     void removeResolveStageMask(unsigned int mask)  { mResolveStageFlags &= ~mask; }
-
-    static String Type;
 
 // Protected methods
 protected:  

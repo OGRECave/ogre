@@ -33,6 +33,7 @@ namespace RTShader {
 
 
 String LayeredBlending::Type = "LayeredBlendRTSSEx";
+const String SRS_LAYERED_BLENDING = "LayeredBlendRTSSEx";
 
  struct BlendModeDescription {
         /* Type of the blend mode */
@@ -101,7 +102,7 @@ LayeredBlending::LayeredBlending()
 //-----------------------------------------------------------------------
 const Ogre::String& LayeredBlending::getType() const
 {
-    return Type;
+    return SRS_LAYERED_BLENDING;
 }
 
 
@@ -305,7 +306,7 @@ bool LayeredBlending::getSourceModifier(unsigned short index, SourceModifier& mo
 //-----------------------------------------------------------------------
 const String& LayeredBlendingFactory::getType() const
 {
-    return LayeredBlending::Type;
+    return SRS_LAYERED_BLENDING;
 }
 
 //-----------------------------------------------------------------------

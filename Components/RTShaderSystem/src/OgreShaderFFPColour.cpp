@@ -33,7 +33,7 @@ namespace RTShader {
 /************************************************************************/
 /*                                                                      */
 /************************************************************************/
-String FFPColour::Type = "FFP_Colour";
+const String SRS_VERTEX_COLOUR = "FFP_Colour";
 
 //-----------------------------------------------------------------------
 FFPColour::FFPColour()
@@ -44,7 +44,7 @@ FFPColour::FFPColour()
 //-----------------------------------------------------------------------
 const String& FFPColour::getType() const
 {
-    return Type;
+    return SRS_VERTEX_COLOUR;
 }
 
 
@@ -191,7 +191,7 @@ bool FFPColour::preAddToRenderState(const RenderState* renderState, Pass* srcPas
 //-----------------------------------------------------------------------
 const String& FFPColourFactory::getType() const
 {
-    return FFPColour::Type;
+    return SRS_VERTEX_COLOUR;
 }
 
 //-----------------------------------------------------------------------

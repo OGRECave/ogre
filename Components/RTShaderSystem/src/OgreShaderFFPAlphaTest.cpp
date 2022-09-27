@@ -31,13 +31,13 @@ THE SOFTWARE.
 namespace Ogre {
 	namespace RTShader {
 
-		String FFPAlphaTest::Type = "FFP_Alpha_Test";
+		const String SRS_ALPHA_TEST = "FFP_Alpha_Test";
 
 
 		//-----------------------------------------------------------------------
 		const Ogre::String& FFPAlphaTest::getType() const
 		{
-			return Type;
+			return SRS_ALPHA_TEST;
 		}
 
 
@@ -102,7 +102,7 @@ namespace Ogre {
 		//-----------------------------------------------------------------------
 		const String& FFPAlphaTestFactory ::getType() const
 		{
-			return FFPAlphaTest::Type;
+			return SRS_ALPHA_TEST;
 		}
 
 		//-----------------------------------------------------------------------

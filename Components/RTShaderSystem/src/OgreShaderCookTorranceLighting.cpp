@@ -13,13 +13,13 @@ namespace RTShader
 /************************************************************************/
 /*                                                                      */
 /************************************************************************/
-String CookTorranceLighting::Type = "CookTorranceLighting";
+const String SRS_COOK_TORRANCE_LIGHTING = "CookTorranceLighting";
 
 //-----------------------------------------------------------------------
 CookTorranceLighting::CookTorranceLighting() : mLightCount(0), mMRMapSamplerIndex(0) {}
 
 //-----------------------------------------------------------------------
-const String& CookTorranceLighting::getType() const { return Type; }
+const String& CookTorranceLighting::getType() const { return SRS_COOK_TORRANCE_LIGHTING; }
 //-----------------------------------------------------------------------
 bool CookTorranceLighting::createCpuSubPrograms(ProgramSet* programSet)
 {
@@ -169,7 +169,7 @@ bool CookTorranceLighting::setParameter(const String& name, const String& value)
 }
 
 //-----------------------------------------------------------------------
-const String& CookTorranceLightingFactory::getType() const { return CookTorranceLighting::Type; }
+const String& CookTorranceLightingFactory::getType() const { return SRS_COOK_TORRANCE_LIGHTING; }
 
 //-----------------------------------------------------------------------
 SubRenderState* CookTorranceLightingFactory::createInstance(ScriptCompiler* compiler, PropertyAbstractNode* prop,
