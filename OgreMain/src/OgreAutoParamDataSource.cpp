@@ -38,6 +38,7 @@ namespace Ogre {
     AutoParamDataSource::AutoParamDataSource()
         : mWorldMatrixCount(0),
          mWorldMatrixArray(0),
+         mLocalMatrixDirty (true),
          mWorldMatrixDirty(true),
          mViewMatrixDirty(true),
          mProjMatrixDirty(true),
@@ -104,6 +105,7 @@ namespace Ogre {
     void AutoParamDataSource::setCurrentRenderable(const Renderable* rend)
     {
         mCurrentRenderable = rend;
+        mLocalMatrixDirty = true;
         mWorldMatrixDirty = true;
         mViewMatrixDirty = true;
         mProjMatrixDirty = true;
@@ -262,6 +264,18 @@ namespace Ogre {
         mWorldMatrixDirty = false;
     }
     //-----------------------------------------------------------------------------
+    const Affine3& AutoParamDataSource::getLocalMatrix (void) const
+    {
+        if (mLocalMatrixDirty)
+        {
+            mLocalMatrixArray = mLocalMatrix;
+            mCurrentRenderable->getLocalTransforms (reinterpret_cast<Matrix4*>(mLocalMatrix));
+            mLocalMatrixCount = mCurrentRenderable->getNumLocalTransforms ();
+            mLocalMatrixDirty = false;
+        }
+        return mLocalMatrixArray[0];
+    }
+    //-----------------------------------------------------------------------------
     const Affine3& AutoParamDataSource::getWorldMatrix(void) const
     {
         if (mWorldMatrixDirty)
@@ -281,11 +295,25 @@ namespace Ogre {
         return mWorldMatrixArray[0];
     }
     //-----------------------------------------------------------------------------
+    size_t AutoParamDataSource::getLocalMatrixCount (void) const
+    {
+        // trigger derivation
+        getLocalMatrix ();
+        return mLocalMatrixCount;
+    }
+    //-----------------------------------------------------------------------------
     size_t AutoParamDataSource::getWorldMatrixCount(void) const
     {
         // trigger derivation
         getWorldMatrix();
         return mWorldMatrixCount;
+    }
+    //-----------------------------------------------------------------------------
+    const Affine3* AutoParamDataSource::getLocalMatrixArray (void) const
+    {
+        // trigger derivation
+        getLocalMatrix ();
+        return mLocalMatrixArray;
     }
     //-----------------------------------------------------------------------------
     const Affine3* AutoParamDataSource::getWorldMatrixArray(void) const

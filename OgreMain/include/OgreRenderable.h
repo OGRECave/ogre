@@ -132,6 +132,7 @@ namespace Ogre {
             the behavior is undefined if returns non-affine matrix here.
         */
         virtual void getWorldTransforms(Matrix4* xform) const = 0;
+        virtual void getLocalTransforms (Matrix4* xform) const {};
 
         /** Returns the number of world transform matrices this renderable requires.
 
@@ -141,6 +142,7 @@ namespace Ogre {
             If a renderable does not use vertex blending this method returns 1, which is the default for 
             simplicity.
         */
+        virtual unsigned short getNumLocalTransforms (void) const { return 1; }
         virtual unsigned short getNumWorldTransforms(void) const { return 1; }
 
         /** Sets whether or not to use an 'identity' projection.

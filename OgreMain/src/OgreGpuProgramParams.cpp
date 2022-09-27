@@ -40,6 +40,7 @@ namespace Ogre
         AutoConstantDefinition(ACT_TRANSPOSE_WORLD_MATRIX,             "transpose_world_matrix",            16, ET_REAL, ACDT_NONE),
         AutoConstantDefinition(ACT_INVERSE_TRANSPOSE_WORLD_MATRIX, "inverse_transpose_world_matrix", 16, ET_REAL, ACDT_NONE),
 
+        AutoConstantDefinition(ACT_LOCAL_MATRIX_ARRAY_3x4,        "local_matrix_array_3x4",      12, ET_REAL, ACDT_NONE),
         AutoConstantDefinition(ACT_WORLD_MATRIX_ARRAY_3x4,        "world_matrix_array_3x4",      12, ET_REAL, ACDT_NONE),
         AutoConstantDefinition(ACT_WORLD_MATRIX_ARRAY,            "world_matrix_array",          16, ET_REAL, ACDT_NONE),
         AutoConstantDefinition(ACT_WORLD_DUALQUATERNION_ARRAY_2x4, "world_dualquaternion_array_2x4",      8, ET_REAL, ACDT_NONE),
@@ -1101,6 +1102,7 @@ namespace Ogre
         case ACT_INVERSE_WORLD_MATRIX:
         case ACT_TRANSPOSE_WORLD_MATRIX:
         case ACT_INVERSE_TRANSPOSE_WORLD_MATRIX:
+        case ACT_LOCAL_MATRIX_ARRAY_3x4:
         case ACT_WORLD_MATRIX_ARRAY_3x4:
         case ACT_WORLD_MATRIX_ARRAY:
         case ACT_WORLD_DUALQUATERNION_ARRAY_2x4:
@@ -1862,6 +1864,19 @@ namespace Ogre
                     break;
                 case ACT_INVERSE_TRANSPOSE_WORLD_MATRIX:
                     _writeRawConstant(ac.physicalIndex, source->getInverseTransposeWorldMatrix(),ac.elementCount);
+                    break;
+
+                case ACT_LOCAL_MATRIX_ARRAY_3x4:
+                    // Loop over matrices
+                    pMatrix = source->getLocalMatrixArray ();
+                    numMatrices = source->getLocalMatrixCount ();
+                    index = i->physicalIndex;
+                    for (m = 0; m < numMatrices; ++m)
+                    {
+                        _writeRawConstants (index, (*pMatrix)[0], 12);
+                        index += 12 * sizeof (Real);
+                        ++pMatrix;
+                    }
                     break;
 
                 case ACT_WORLD_MATRIX_ARRAY_3x4:

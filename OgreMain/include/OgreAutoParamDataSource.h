@@ -61,8 +61,11 @@ namespace Ogre {
     private:
         const Light& getLight(size_t index) const;
         mutable Affine3 mWorldMatrix[256];
+        mutable Affine3 mLocalMatrix[256];
         mutable size_t mWorldMatrixCount;
         mutable const Affine3* mWorldMatrixArray;
+        mutable size_t mLocalMatrixCount;
+        mutable const Affine3* mLocalMatrixArray;
         mutable Affine3 mWorldViewMatrix;
         mutable Matrix4 mViewProjMatrix;
         mutable Matrix4 mWorldViewProjMatrix;
@@ -85,6 +88,7 @@ namespace Ogre {
         mutable Vector4 mLodCameraPosition;
         mutable Vector4 mLodCameraPositionObjectSpace;
 
+        mutable bool mLocalMatrixDirty;
         mutable bool mWorldMatrixDirty;
         mutable bool mViewMatrixDirty;
         mutable bool mProjMatrixDirty;
@@ -157,8 +161,11 @@ namespace Ogre {
 		/** Returns the current bounded camera */
 		const Camera* getCurrentCamera() const;
 
+        const Affine3& getLocalMatrix (void) const;
         const Affine3& getWorldMatrix(void) const;
+        const Affine3* getLocalMatrixArray (void) const;
         const Affine3* getWorldMatrixArray(void) const;
+        size_t getLocalMatrixCount (void) const;
         size_t getWorldMatrixCount(void) const;
         const Affine3& getViewMatrix(void) const;
         const Matrix4& getViewProjectionMatrix(void) const;

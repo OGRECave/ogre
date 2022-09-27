@@ -640,6 +640,7 @@ namespace Ogre {
             /// 4columns) usually for doing hardware skinning.
             /// You should make enough entries available in your vertex program for the number of
             /// bones in use, i.e. an array of numBones*3 float4’s.
+            ACT_LOCAL_MATRIX_ARRAY_3x4,
             ACT_WORLD_MATRIX_ARRAY_3x4,
             /// The current array of world matrices, used for blending
             ACT_WORLD_MATRIX_ARRAY,
