@@ -148,7 +148,6 @@ namespace Ogre
 
         //Renderable overloads
         void getWorldTransforms( Matrix4* xform ) const override;
-        unsigned short getNumWorldTransforms(void) const override;
 
         /** Overloaded to be able to updated the vertex texture */
         void _updateRenderQueue(RenderQueue* queue) override;
