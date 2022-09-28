@@ -257,7 +257,7 @@ ShaderGenerator* shaderGen = ShaderGenerator::getSingletonPtr();
 
 shaderGen->createShaderBasedTechnique(mat->getTechnique(0), MSN_SHADERGEN);
 RenderState* rs = shaderGen->getRenderState(MSN_SHADERGEN, *mat, 0);
-SubRenderState* srs = shaderGen->createSubRenderState("NormalMap");
+SubRenderState* srs = shaderGen->createSubRenderState(SRS_NORMALMAP);
 rs->addTemplateSubRenderState(srs);
 
 srs->setParameter("texture", "Default_normal.jpg");
