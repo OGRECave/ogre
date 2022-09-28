@@ -426,11 +426,6 @@ namespace Ogre
         *xform = Matrix4::IDENTITY;
     }
     //-----------------------------------------------------------------------
-    unsigned short BaseInstanceBatchVTF::getNumWorldTransforms(void) const
-    {
-        return 1;
-    }
-    //-----------------------------------------------------------------------
     void BaseInstanceBatchVTF::_updateRenderQueue(RenderQueue* queue)
     {
         InstanceBatch::_updateRenderQueue( queue );

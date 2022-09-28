@@ -92,7 +92,6 @@ namespace Ogre
 
         //Renderable overloads
         void getWorldTransforms( Matrix4* xform ) const override;
-        unsigned short getNumWorldTransforms(void) const override;
 
         /** Overloaded to avoid updating skeletons (which we don't support), check visibility on a
             per unit basis and finally updated the vertex buffer */
