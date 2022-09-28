@@ -157,7 +157,7 @@ protected:
         mViewport->setMaterialScheme(MSN_SHADERGEN);
 
         //Add the hardware skinning to the shader generator default render state
-        mSrsHardwareSkinning = mShaderGenerator->createSubRenderState<RTShader::HardwareSkinning>();
+        mSrsHardwareSkinning = mShaderGenerator->createSubRenderState(RTShader::SRS_HARDWARE_SKINNING);
         Ogre::RTShader::RenderState* renderState = mShaderGenerator->getRenderState(MSN_SHADERGEN);
         renderState->addTemplateSubRenderState(mSrsHardwareSkinning);
 

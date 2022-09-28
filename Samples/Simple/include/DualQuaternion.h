@@ -48,7 +48,7 @@ class _OgreSampleClassExport Sample_DualQuaternion : public SdkSample
 
         // Add the hardware skinning to the shader generator default
         // render state.
-        mSrsHardwareSkinning = mShaderGenerator->createSubRenderState(Ogre::RTShader::HardwareSkinning::Type);
+        mSrsHardwareSkinning = mShaderGenerator->createSubRenderState(RTShader::SRS_HARDWARE_SKINNING);
         Ogre::RTShader::RenderState* renderState = mShaderGenerator->getRenderState(MSN_SHADERGEN);
         renderState->addTemplateSubRenderState(mSrsHardwareSkinning);
 
