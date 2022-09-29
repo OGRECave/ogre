@@ -94,7 +94,6 @@ bool LinearSkinning::resolveParameters(ProgramSet* programSet)
         mParamInWeights = vsMain->resolveInputParameter(Parameter::SPC_BLEND_WEIGHTS);
         mParamInWorldMatrices = vsProgram->resolveParameter(GpuProgramParameters::ACT_WORLD_MATRIX_ARRAY_3x4, mBoneCount);
         mParamInInvWorldMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_INVERSE_WORLD_MATRIX);
-        mParamInViewProjMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_VIEWPROJ_MATRIX);
 
         mParamTempFloat4 = vsMain->resolveLocalParameter(GCT_FLOAT4, "TempVal4");
         mParamTempFloat3 = vsMain->resolveLocalParameter(GCT_FLOAT3, "TempVal3");
@@ -102,8 +101,9 @@ bool LinearSkinning::resolveParameters(ProgramSet* programSet)
     else
     {
         mParamInWorldMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_WORLD_MATRIX);
-        mParamInWorldViewProjMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_WORLDVIEWPROJ_MATRIX);
     }
+
+    mParamInWorldViewProjMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_WORLDVIEWPROJ_MATRIX);
     return true;
 }
 
@@ -151,17 +151,10 @@ void LinearSkinning::addPositionCalculations(Function* vsMain)
         //update back the original position relative to the object
         stage.callFunction(FFP_FUNC_TRANSFORM, mParamInInvWorldMatrix, mParamLocalPositionWorld,
                            mParamInPosition);
+    }
 
-        //update the projective position thereby filling the transform stage role
-        stage.callFunction(FFP_FUNC_TRANSFORM, mParamInViewProjMatrix, mParamLocalPositionWorld,
-                           mParamOutPositionProj);
-    }
-    else
-    {
-        //update from object to projective space
-        stage.callFunction(FFP_FUNC_TRANSFORM, mParamInWorldViewProjMatrix, mParamInPosition,
-                           mParamOutPositionProj);
-    }
+    // update from object to projective space
+    stage.callFunction(FFP_FUNC_TRANSFORM, mParamInWorldViewProjMatrix, mParamInPosition, mParamOutPositionProj);
 }
 
 //-----------------------------------------------------------------------
