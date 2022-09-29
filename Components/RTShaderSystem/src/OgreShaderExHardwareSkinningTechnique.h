@@ -133,7 +133,6 @@ protected:
     ParameterPtr mParamInWeights;
     UniformParameterPtr mParamInWorldMatrices;
     UniformParameterPtr mParamInInvWorldMatrix;
-    UniformParameterPtr mParamInViewProjMatrix;
     UniformParameterPtr mParamInWorldMatrix;
     UniformParameterPtr mParamInWorldViewProjMatrix;
 

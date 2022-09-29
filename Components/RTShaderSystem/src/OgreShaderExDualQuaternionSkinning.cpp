@@ -91,7 +91,6 @@ bool DualQuaternionSkinning::resolveParameters(ProgramSet* programSet)
         mParamInWeights = vsMain->resolveInputParameter(Parameter::SPC_BLEND_WEIGHTS);
         mParamInWorldMatrices = vsProgram->resolveParameter(GpuProgramParameters::ACT_WORLD_DUALQUATERNION_ARRAY_2x4, mBoneCount);
         mParamInInvWorldMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_INVERSE_WORLD_MATRIX);
-        mParamInViewProjMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_VIEWPROJ_MATRIX);
         
         mParamTempWorldMatrix = vsMain->resolveLocalParameter(GCT_MATRIX_2X4, "worldMatrix");
         mParamBlendDQ = vsMain->resolveLocalParameter(GCT_MATRIX_2X4, "blendDQ");
@@ -113,14 +112,13 @@ bool DualQuaternionSkinning::resolveParameters(ProgramSet* programSet)
         }
         
         mParamTempFloat2x4 = vsMain->resolveLocalParameter(GCT_MATRIX_2X4, "TempVal2x4");
-        mParamTempFloat4 = vsMain->resolveLocalParameter(GCT_FLOAT4, "TempVal4");
         mParamTempFloat3 = vsMain->resolveLocalParameter(GCT_FLOAT3, "TempVal3");
     }
     else
     {
         mParamInWorldMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_WORLD_MATRIX);
-        mParamInWorldViewProjMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_WORLDVIEWPROJ_MATRIX);
     }
+    mParamInWorldViewProjMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_WORLDVIEWPROJ_MATRIX);
     return true;
 }
 
@@ -204,20 +202,14 @@ void DualQuaternionSkinning::addPositionCalculations(Function* vsMain)
         stage.callFunction(SGX_FUNC_NORMALIZE_DUAL_QUATERNION, mParamBlendDQ);
 
         //Calculate the blend position
-        stage.callFunction(SGX_FUNC_CALCULATE_BLEND_POSITION, mParamLocalBlendPosition, mParamBlendDQ, mParamTempFloat4);
-
-        //Update from object to projective space
-        stage.callFunction(FFP_FUNC_TRANSFORM, mParamInViewProjMatrix, mParamTempFloat4, mParamOutPositionProj);
+        stage.callFunction(SGX_FUNC_CALCULATE_BLEND_POSITION, mParamLocalBlendPosition, mParamBlendDQ, mParamInPosition);
 
         //update back the original position relative to the object
-        stage.callFunction(FFP_FUNC_TRANSFORM, mParamInInvWorldMatrix, mParamTempFloat4,
-                           mParamInPosition);
+        stage.callFunction(FFP_FUNC_TRANSFORM, mParamInInvWorldMatrix, mParamInPosition, mParamInPosition);
     }
-    else
-    {
-        //update from object to projective space
-        stage.callFunction(FFP_FUNC_TRANSFORM, mParamInWorldViewProjMatrix, mParamInPosition, mParamOutPositionProj);
-    }
+
+    //update from object to projective space
+    stage.callFunction(FFP_FUNC_TRANSFORM, mParamInWorldViewProjMatrix, mParamInPosition, mParamOutPositionProj);
 }
 
 //-----------------------------------------------------------------------
