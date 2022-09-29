@@ -1859,7 +1859,7 @@ namespace Ogre {
     void Mesh::prepareMatricesForVertexBlend(const Affine3** blendMatrices,
         const Affine3* boneMatrices, const IndexMap& indexMap)
     {
-        assert(indexMap.size() <= 256);
+        assert(indexMap.size() <= OGRE_MAX_NUM_BONES);
         IndexMap::const_iterator it, itend;
         itend = indexMap.end();
         for (it = indexMap.begin(); it != itend; ++it)

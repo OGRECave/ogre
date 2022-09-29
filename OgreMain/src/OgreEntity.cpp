@@ -825,7 +825,7 @@ namespace Ogre {
                 // Software blend?
                 if (softwareAnimation)
                 {
-                    const Affine3* blendMatrices[256];
+                    const Affine3* blendMatrices[OGRE_MAX_NUM_BONES];
 
                     // Ok, we need to do a software blend
                     // Firstly, check out working vertex buffers

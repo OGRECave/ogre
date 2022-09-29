@@ -51,10 +51,6 @@ namespace Ogre {
         /// Animations are applied by calculating a weighted cumulative total
         ANIMBLEND_CUMULATIVE = 1
     };
-
-/// blend indices are stored as ubyte, so we can't address more than 256 bones
-#define OGRE_MAX_NUM_BONES 256
-
     
     struct LinkedSkeletonAnimationSource;
 
