@@ -60,7 +60,7 @@ namespace Ogre {
     {
     private:
         const Light& getLight(size_t index) const;
-        mutable Affine3 mWorldMatrix[256];
+        mutable Affine3 mWorldMatrix[OGRE_MAX_NUM_BONES];
         mutable size_t mWorldMatrixCount;
         mutable const Affine3* mWorldMatrixArray;
         mutable Affine3 mWorldViewMatrix;
