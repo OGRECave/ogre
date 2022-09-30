@@ -271,7 +271,8 @@ namespace Ogre {
             mWorldMatrixCount = mCurrentRenderable->getNumWorldTransforms();
             if (mCameraRelativeRendering && !mCurrentRenderable->getUseIdentityView())
             {
-                for (size_t i = 0; i < mWorldMatrixCount; ++i)
+                size_t worldMatrixCount = MeshManager::getBonesUseObjectSpace() ? 1 : mWorldMatrixCount;
+                for (size_t i = 0; i < worldMatrixCount; ++i)
                 {
                     mWorldMatrix[i].setTrans(mWorldMatrix[i].getTrans() - mCameraRelativePosition);
                 }
@@ -281,18 +282,18 @@ namespace Ogre {
         return mWorldMatrixArray[0];
     }
     //-----------------------------------------------------------------------------
-    size_t AutoParamDataSource::getWorldMatrixCount(void) const
+    size_t AutoParamDataSource::getBoneMatrixCount(void) const
     {
         // trigger derivation
         getWorldMatrix();
-        return mWorldMatrixCount;
+        return mWorldMatrixCount == 1 ? 1 : mWorldMatrixCount - int(MeshManager::getBonesUseObjectSpace());
     }
     //-----------------------------------------------------------------------------
-    const Affine3* AutoParamDataSource::getWorldMatrixArray(void) const
+    const Affine3* AutoParamDataSource::getBoneMatrixArray(void) const
     {
         // trigger derivation
         getWorldMatrix();
-        return mWorldMatrixArray;
+        return mWorldMatrixArray + int(MeshManager::getBonesUseObjectSpace());
     }
     //-----------------------------------------------------------------------------
     const Affine3& AutoParamDataSource::getViewMatrix(void) const
