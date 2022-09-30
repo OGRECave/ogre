@@ -133,15 +133,8 @@ protected:
     ParameterPtr mParamInWeights;
     UniformParameterPtr mParamInWorldMatrices;
     UniformParameterPtr mParamInInvWorldMatrix;
-    UniformParameterPtr mParamInWorldMatrix;
     UniformParameterPtr mParamInWorldViewProjMatrix;
 
-    ParameterPtr mParamTempFloat4;
-    ParameterPtr mParamTempFloat3;
-    ParameterPtr mParamLocalPositionWorld;
-    ParameterPtr mParamLocalNormalWorld;
-    //ParameterPtr mParamLocalTangentWorld;
-    //ParameterPtr mParamLocalBinormalWorld;
     ParameterPtr mParamOutPositionProj;
 };
 
