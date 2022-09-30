@@ -31,10 +31,8 @@ THE SOFTWARE.
 #define HS_DATA_BIND_NAME "HS_SRS_DATA"
 
 #define SGX_LIB_DUAL_QUATERNION                 "SGXLib_DualQuaternion"
-#define SGX_FUNC_ANTIPODALITY_ADJUSTMENT        "SGX_AntipodalityAdjustment"
 #define SGX_FUNC_CALCULATE_BLEND_POSITION       "SGX_CalculateBlendPosition"
 #define SGX_FUNC_CALCULATE_BLEND_NORMAL         "SGX_CalculateBlendNormal"
-#define SGX_FUNC_NORMALIZE_DUAL_QUATERNION      "SGX_NormalizeDualQuaternion"
 #define SGX_FUNC_ADJOINT_TRANSPOSE_MATRIX       "SGX_AdjointTransposeMatrix"
 
 namespace Ogre {
@@ -75,12 +73,6 @@ bool DualQuaternionSkinning::resolveParameters(ProgramSet* programSet)
     //mParamInBiNormal = vsMain->resolveInputParameter(Parameter::SPS_BINORMAL, 0, Parameter::SPC_BINORMAL_OBJECT_SPACE, GCT_FLOAT3);
     //mParamInTangent = vsMain->resolveInputParameter(Parameter::SPS_TANGENT, 0, Parameter::SPC_TANGENT_OBJECT_SPACE, GCT_FLOAT3);
 
-    //local param
-    mParamLocalBlendPosition = vsMain->resolveLocalParameter(GCT_FLOAT3, "BlendedPosition");
-    mParamLocalNormalWorld = vsMain->resolveLocalParameter(Parameter::SPC_NORMAL_WORLD_SPACE);
-    //mParamLocalTangentWorld = vsMain->resolveLocalParameter(Parameter::SPS_TANGENT, 0, Parameter::SPC_TANGENT_WORLD_SPACE, GCT_FLOAT3);
-    //mParamLocalBinormalWorld = vsMain->resolveLocalParameter(Parameter::SPS_BINORMAL, 0, Parameter::SPC_BINORMAL_WORLD_SPACE, GCT_FLOAT3);
-
     //output param
     mParamOutPositionProj = vsMain->resolveOutputParameter(Parameter::SPC_POSITION_PROJECTIVE_SPACE);
 
@@ -92,9 +84,7 @@ bool DualQuaternionSkinning::resolveParameters(ProgramSet* programSet)
         mParamInWorldMatrices = vsProgram->resolveParameter(GpuProgramParameters::ACT_WORLD_DUALQUATERNION_ARRAY_2x4, mBoneCount);
         mParamInInvWorldMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_INVERSE_WORLD_MATRIX);
         
-        mParamTempWorldMatrix = vsMain->resolveLocalParameter(GCT_MATRIX_2X4, "worldMatrix");
         mParamBlendDQ = vsMain->resolveLocalParameter(GCT_MATRIX_2X4, "blendDQ");
-        mParamInitialDQ = vsMain->resolveLocalParameter(GCT_MATRIX_2X4, "initialDQ");
 
         if (ShaderGenerator::getSingleton().getTargetLanguage() == "hlsl")
         {
@@ -108,15 +98,7 @@ bool DualQuaternionSkinning::resolveParameters(ProgramSet* programSet)
             mParamInScaleShearMatrices = vsProgram->resolveParameter(GpuProgramParameters::ACT_WORLD_SCALE_SHEAR_MATRIX_ARRAY_3x4, mBoneCount);
             mParamBlendS = vsMain->resolveLocalParameter(GCT_MATRIX_3X4, "blendS");
             mParamTempFloat3x3 = vsMain->resolveLocalParameter(GCT_MATRIX_3X3, "TempVal3x3");
-            mParamTempFloat3x4 = vsMain->resolveLocalParameter(GCT_MATRIX_3X4, "TempVal3x4");
         }
-        
-        mParamTempFloat2x4 = vsMain->resolveLocalParameter(GCT_MATRIX_2X4, "TempVal2x4");
-        mParamTempFloat3 = vsMain->resolveLocalParameter(GCT_FLOAT3, "TempVal3");
-    }
-    else
-    {
-        mParamInWorldMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_WORLD_MATRIX);
     }
     mParamInWorldViewProjMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_WORLDVIEWPROJ_MATRIX);
     return true;
@@ -129,7 +111,13 @@ bool DualQuaternionSkinning::resolveDependencies(ProgramSet* programSet)
     vsProgram->addDependency(FFP_LIB_COMMON);
     vsProgram->addDependency(FFP_LIB_TRANSFORM);
     if(mDoBoneCalculations)
+    {
         vsProgram->addDependency(SGX_LIB_DUAL_QUATERNION);
+        vsProgram->addPreprocessorDefines(StringUtil::format("BONE_COUNT=%d", mBoneCount));
+        vsProgram->addPreprocessorDefines(StringUtil::format("WEIGHT_COUNT=%d", mWeightCount));
+        if(mCorrectAntipodalityHandling)
+            vsProgram->addPreprocessorDefines("CORRECT_ANTIPODALITY");
+    }
 
     return true;
 }
@@ -145,7 +133,7 @@ bool DualQuaternionSkinning::addFunctionInvocations(ProgramSet* programSet)
 
     //add functions to calculate normal and normal related data in world and object space
     if(mDoLightCalculations)
-        addNormalRelatedCalculations(vsMain, mParamInNormal, mParamLocalNormalWorld);
+        addNormalRelatedCalculations(vsMain, mParamInNormal, mParamInNormal);
     //addNormalRelatedCalculations(vsMain, mParamInTangent, mParamLocalTangentWorld, internalCounter);
     //addNormalRelatedCalculations(vsMain, mParamInBiNormal, mParamLocalBinormalWorld, internalCounter);
 
@@ -159,50 +147,21 @@ void DualQuaternionSkinning::addPositionCalculations(Function* vsMain)
 
     if (mDoBoneCalculations == true)
     {
-        if(mScalingShearingSupport)
+        if (mScalingShearingSupport)
         {
-            //Construct a scaling and shearing matrix based on the blend weights
-            for(int i = 0 ; i < getWeightCount() ; ++i)
-            {
-                //Assign the local param based on the current index of the scaling and shearing matrices
-                stage.assign({In(mParamInScaleShearMatrices), At(mParamInIndices).mask(indexToMask(i)),
-                              Out(mParamTempFloat3x4)});
-
-                //Calculate the resultant scaling and shearing matrix based on the weights given
-                addIndexedPositionWeight(vsMain, i, mParamTempFloat3x4, mParamTempFloat3x4, mParamBlendS);
-            }
-
-            //Transform the position based by the scaling and shearing matrix
-            stage.callFunction(FFP_FUNC_TRANSFORM, mParamBlendS, mParamInPosition, mParamLocalBlendPosition);
-        }
-        else
-        {
-            //Assign the input position to the local blended position
-            stage.assign(In(mParamInPosition).xyz(), mParamLocalBlendPosition);
-        }
-        
-        //Set functions to calculate world position
-        for(int i = 0 ; i < getWeightCount() ; ++i)
-        {
-            // Build the dual quaternion matrix
-            stage.assign(
-                {In(mParamInWorldMatrices), At(mParamInIndices).mask(indexToMask(i)), Out(mParamTempFloat2x4)});
-
-            //Adjust the podalities of the dual quaternions
-            if(mCorrectAntipodalityHandling)
-            {   
-                adjustForCorrectAntipodality(vsMain, i, mParamTempFloat2x4);
-            }
-
-            //Calculate the resultant dual quaternion based on the weights given
-            addIndexedPositionWeight(vsMain, i, mParamTempFloat2x4, mParamTempFloat2x4, mParamBlendDQ);
+            // Construct a scaling and shearing matrix based on the blend weights
+            stage.callFunction("blendBonesMat3x4", {In(mParamInScaleShearMatrices), In(mParamInIndices),
+                                                    In(mParamInWeights), Out(mParamBlendS)});
+            // Transform the position based by the scaling and shearing matrix
+            stage.callFunction(FFP_FUNC_TRANSFORM, mParamBlendS, mParamInPosition, Out(mParamInPosition).xyz());
         }
 
-        //Normalize the dual quaternion
-        stage.callFunction(SGX_FUNC_NORMALIZE_DUAL_QUATERNION, mParamBlendDQ);
+        // Calculate the resultant dual quaternion based on the weights given
+        stage.callFunction("blendBonesDQ",
+                           {In(mParamInWorldMatrices), In(mParamInIndices), In(mParamInWeights), Out(mParamBlendDQ)});
 
         //Calculate the blend position
-        stage.callFunction(SGX_FUNC_CALCULATE_BLEND_POSITION, mParamLocalBlendPosition, mParamBlendDQ, mParamInPosition);
+        stage.callFunction(SGX_FUNC_CALCULATE_BLEND_POSITION, In(mParamInPosition).xyz(), mParamBlendDQ, mParamInPosition);
 
         //update back the original position relative to the object
         stage.callFunction(FFP_FUNC_TRANSFORM, mParamInInvWorldMatrix, mParamInPosition, mParamInPosition);
@@ -231,59 +190,11 @@ void DualQuaternionSkinning::addNormalRelatedCalculations(Function* vsMain,
             stage.callFunction(FFP_FUNC_NORMALIZE, pNormalRelatedParam);
         }
         //Transform the normal according to the dual quaternion
-        stage.callFunction(SGX_FUNC_CALCULATE_BLEND_NORMAL, pNormalRelatedParam, mParamBlendDQ, pNormalWorldRelatedParam);
+        stage.callFunction(SGX_FUNC_CALCULATE_BLEND_NORMAL, pNormalRelatedParam, mParamBlendDQ, pNormalRelatedParam);
         //update back the original position relative to the object
-        stage.callFunction(FFP_FUNC_TRANSFORM, mParamInInvWorldMatrix, pNormalWorldRelatedParam, pNormalRelatedParam);
-    }
-    else
-    {
-        //update from object to world space
-        stage.callFunction(FFP_FUNC_TRANSFORM, mParamInWorldMatrix, pNormalRelatedParam, pNormalWorldRelatedParam);
+        stage.callFunction(FFP_FUNC_TRANSFORM, mParamInInvWorldMatrix, pNormalRelatedParam, pNormalRelatedParam);
     }
 }
-
-//-----------------------------------------------------------------------
-void DualQuaternionSkinning::adjustForCorrectAntipodality(Function* vsMain,
-                                int index, const ParameterPtr& pTempWorldMatrix)
-{
-    auto stage = vsMain->getStage(FFP_VS_TRANSFORM);
-    
-    //Antipodality doesn't need to be adjusted for dq0 on itself (used as the basis of antipodality calculations)
-    if(index > 0)
-    {
-        //This is the base dual quaternion dq0, which the antipodality calculations are based on
-        stage.callFunction(SGX_FUNC_ANTIPODALITY_ADJUSTMENT, mParamInitialDQ, mParamTempFloat2x4, pTempWorldMatrix);
-    }
-    else if(index == 0)
-    {   
-        //Set the first dual quaternion as the initial dq
-        stage.assign(mParamTempFloat2x4, mParamInitialDQ);
-    }
-}
-
-//-----------------------------------------------------------------------
-void DualQuaternionSkinning::addIndexedPositionWeight(Function* vsMain, int index,
-                                ParameterPtr& pWorldMatrix, ParameterPtr& pPositionTempParameter,
-                                ParameterPtr& pPositionRelatedOutputParam)
-{
-    auto stage = vsMain->getStage(FFP_VS_TRANSFORM);
-
-    //multiply position with world matrix and put into temporary param
-    stage.mul(In(mParamInWeights).mask(indexToMask(index)), pWorldMatrix, pPositionTempParameter);
-
-    //check if on first iteration
-    if (index == 0)
-    {
-        //set the local param as the value of the world param
-        stage.assign(pPositionTempParameter, pPositionRelatedOutputParam);
-    }
-    else
-    {
-        //add the local param as the value of the world param
-        stage.add(pPositionTempParameter, pPositionRelatedOutputParam, pPositionRelatedOutputParam);
-    }
-}
-
 }
 }
 
