@@ -313,6 +313,11 @@ namespace Ogre
         InstancedEntityVec::const_iterator itor = mInstancedEntities.begin();
         InstancedEntityVec::const_iterator end  = mInstancedEntities.end();
 
+        if (MeshManager::getBonesUseObjectSpace())
+        {
+            *xform = Affine3::IDENTITY;
+            xform++;
+        }
         while( itor != end )
         {
             xform += (*itor)->getTransforms( xform );
@@ -322,6 +327,6 @@ namespace Ogre
     //-----------------------------------------------------------------------
     unsigned short InstanceBatchShader::getNumWorldTransforms(void) const
     {
-        return uint16(mNumWorldMatrices);
+        return uint16(mNumWorldMatrices) + uint16(MeshManager::getBonesUseObjectSpace());
     }
 }

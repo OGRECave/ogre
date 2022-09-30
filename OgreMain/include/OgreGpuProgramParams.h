@@ -636,18 +636,22 @@ namespace Ogre {
             /// The current world matrix, inverted & transposed
             ACT_INVERSE_TRANSPOSE_WORLD_MATRIX,
 
-            /// An array of world matrices, each represented as only a 3x4 matrix (3 rows of
+            /// An array of bone matrices, each represented as only a 3x4 matrix (3 rows of
             /// 4columns) usually for doing hardware skinning.
             /// You should make enough entries available in your vertex program for the number of
             /// bones in use, i.e. an array of numBones*3 float4’s.
-            ACT_WORLD_MATRIX_ARRAY_3x4,
-            /// The current array of world matrices, used for blending
-            ACT_WORLD_MATRIX_ARRAY,
-            /// The current array of world matrices transformed to an array of dual quaternions,
+            ACT_BONE_MATRIX_ARRAY_3x4,
+            ACT_WORLD_MATRIX_ARRAY_3x4 = ACT_BONE_MATRIX_ARRAY_3x4,
+            /// The current array of bone matrices, used for blending
+            ACT_BONE_MATRIX_ARRAY,
+            ACT_WORLD_MATRIX_ARRAY = ACT_BONE_MATRIX_ARRAY,
+            /// The current array of bone matrices transformed to an array of dual quaternions,
             /// represented as a 2x4 matrix
-            ACT_WORLD_DUALQUATERNION_ARRAY_2x4,
-            /// The scale and shear components of the current array of world matrices
-            ACT_WORLD_SCALE_SHEAR_MATRIX_ARRAY_3x4,
+            ACT_BONE_DUALQUATERNION_ARRAY_2x4,
+            ACT_WORLD_DUALQUATERNION_ARRAY_2x4 = ACT_BONE_DUALQUATERNION_ARRAY_2x4,
+            /// The scale and shear components of the current array of bone matrices
+            ACT_BONE_SCALE_SHEAR_MATRIX_ARRAY_3x4,
+            ACT_WORLD_SCALE_SHEAR_MATRIX_ARRAY_3x4 = ACT_BONE_SCALE_SHEAR_MATRIX_ARRAY_3x4,
 
             /// The current view matrix
             ACT_VIEW_MATRIX,

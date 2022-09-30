@@ -189,13 +189,18 @@ namespace Ogre {
             if (mParentEntity->_isSkeletonAnimated())
             {
                 // Bones, use cached matrices built when Entity::_updateRenderQueue was called
-                assert(mParentEntity->mBoneWorldMatrices);
+                auto boneMatrices = MeshManager::getBonesUseObjectSpace() ? mParentEntity->mBoneMatrices
+                                                                          : mParentEntity->mBoneWorldMatrices;
+                assert(boneMatrices);
 
-                Mesh::IndexMap::const_iterator it, itend;
-                itend = indexMap.end();
-                for (it = indexMap.begin(); it != itend; ++it, ++xform)
+                if (MeshManager::getBonesUseObjectSpace())
                 {
-                    *xform = mParentEntity->mBoneWorldMatrices[*it];
+                    *xform++ = mParentEntity->_getParentNodeFullTransform();
+                }
+
+                for (auto idx : indexMap)
+                {
+                    *xform++ = boneMatrices[idx];
                 }
             }
             else
@@ -221,7 +226,7 @@ namespace Ogre {
                 mSubMesh->parent->sharedBlendIndexToBoneIndexMap : mSubMesh->blendIndexToBoneIndexMap;
             assert(indexMap.size() <= mParentEntity->mNumBoneMatrices);
 
-            return static_cast<unsigned short>(indexMap.size());
+            return uint16(indexMap.size()) + uint16(MeshManager::getBonesUseObjectSpace());
         }
     }
     //-----------------------------------------------------------------------

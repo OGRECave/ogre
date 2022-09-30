@@ -40,10 +40,10 @@ namespace Ogre
         AutoConstantDefinition(ACT_TRANSPOSE_WORLD_MATRIX,             "transpose_world_matrix",            16, ET_REAL, ACDT_NONE),
         AutoConstantDefinition(ACT_INVERSE_TRANSPOSE_WORLD_MATRIX, "inverse_transpose_world_matrix", 16, ET_REAL, ACDT_NONE),
 
-        AutoConstantDefinition(ACT_WORLD_MATRIX_ARRAY_3x4,        "world_matrix_array_3x4",      12, ET_REAL, ACDT_NONE),
-        AutoConstantDefinition(ACT_WORLD_MATRIX_ARRAY,            "world_matrix_array",          16, ET_REAL, ACDT_NONE),
-        AutoConstantDefinition(ACT_WORLD_DUALQUATERNION_ARRAY_2x4, "world_dualquaternion_array_2x4",      8, ET_REAL, ACDT_NONE),
-        AutoConstantDefinition(ACT_WORLD_SCALE_SHEAR_MATRIX_ARRAY_3x4, "world_scale_shear_matrix_array_3x4", 12, ET_REAL, ACDT_NONE),
+        AutoConstantDefinition(ACT_BONE_MATRIX_ARRAY_3x4,        "bone_matrix_array_3x4",      12, ET_REAL, ACDT_NONE),
+        AutoConstantDefinition(ACT_BONE_MATRIX_ARRAY,            "bone_matrix_array",          16, ET_REAL, ACDT_NONE),
+        AutoConstantDefinition(ACT_BONE_DUALQUATERNION_ARRAY_2x4, "bone_dualquaternion_array_2x4",      8, ET_REAL, ACDT_NONE),
+        AutoConstantDefinition(ACT_BONE_SCALE_SHEAR_MATRIX_ARRAY_3x4, "bone_scale_shear_matrix_array_3x4", 12, ET_REAL, ACDT_NONE),
         AutoConstantDefinition(ACT_VIEW_MATRIX,                   "view_matrix",                 16, ET_REAL, ACDT_NONE),
         AutoConstantDefinition(ACT_INVERSE_VIEW_MATRIX,           "inverse_view_matrix",         16, ET_REAL, ACDT_NONE),
         AutoConstantDefinition(ACT_TRANSPOSE_VIEW_MATRIX,              "transpose_view_matrix",             16, ET_REAL, ACDT_NONE),
@@ -184,6 +184,13 @@ namespace Ogre
         AutoConstantDefinition(ACT_LOD_CAMERA_POSITION_OBJECT_SPACE,  "lod_camera_position_object_space", 3, ET_REAL, ACDT_NONE),
         AutoConstantDefinition(ACT_LIGHT_CUSTOM,        "light_custom", 4, ET_REAL, ACDT_INT),
         AutoConstantDefinition(ACT_POINT_PARAMS,                    "point_params",                   4, ET_REAL, ACDT_NONE),
+
+        // NOTE: new auto constants must be added before this line, as the following are merely aliases
+        // to allow legacy world_ names in scripts
+        AutoConstantDefinition(ACT_BONE_MATRIX_ARRAY_3x4,        "world_matrix_array_3x4",      12, ET_REAL, ACDT_NONE),
+        AutoConstantDefinition(ACT_BONE_MATRIX_ARRAY,            "world_matrix_array",          16, ET_REAL, ACDT_NONE),
+        AutoConstantDefinition(ACT_BONE_DUALQUATERNION_ARRAY_2x4, "world_dualquaternion_array_2x4",      8, ET_REAL, ACDT_NONE),
+        AutoConstantDefinition(ACT_BONE_SCALE_SHEAR_MATRIX_ARRAY_3x4, "world_scale_shear_matrix_array_3x4", 12, ET_REAL, ACDT_NONE),
     };
 
     GpuNamedConstants::GpuNamedConstants() : bufferSize(0), registerCount(0) {}
@@ -1864,10 +1871,10 @@ namespace Ogre
                     _writeRawConstant(ac.physicalIndex, source->getInverseTransposeWorldMatrix(),ac.elementCount);
                     break;
 
-                case ACT_WORLD_MATRIX_ARRAY_3x4:
+                case ACT_BONE_MATRIX_ARRAY_3x4:
                     // Loop over matrices
-                    pMatrix = source->getWorldMatrixArray();
-                    numMatrices = source->getWorldMatrixCount();
+                    pMatrix = source->getBoneMatrixArray();
+                    numMatrices = source->getBoneMatrixCount();
                     index = ac.physicalIndex;
                     for (m = 0; m < numMatrices; ++m)
                     {
@@ -1876,14 +1883,14 @@ namespace Ogre
                         ++pMatrix;
                     }
                     break;
-                case ACT_WORLD_MATRIX_ARRAY:
-                    _writeRawConstant(ac.physicalIndex, source->getWorldMatrixArray(),
-                                      source->getWorldMatrixCount());
+                case ACT_BONE_MATRIX_ARRAY:
+                    _writeRawConstant(ac.physicalIndex, source->getBoneMatrixArray(),
+                                      source->getBoneMatrixCount());
                     break;
-                case ACT_WORLD_DUALQUATERNION_ARRAY_2x4:
+                case ACT_BONE_DUALQUATERNION_ARRAY_2x4:
                     // Loop over matrices
-                    pMatrix = source->getWorldMatrixArray();
-                    numMatrices = source->getWorldMatrixCount();
+                    pMatrix = source->getBoneMatrixArray();
+                    numMatrices = source->getBoneMatrixCount();
                     index = ac.physicalIndex;
                     for (m = 0; m < numMatrices; ++m)
                     {
@@ -1893,10 +1900,10 @@ namespace Ogre
                         ++pMatrix;
                     }
                     break;
-                case ACT_WORLD_SCALE_SHEAR_MATRIX_ARRAY_3x4:
+                case ACT_BONE_SCALE_SHEAR_MATRIX_ARRAY_3x4:
                     // Loop over matrices
-                    pMatrix = source->getWorldMatrixArray();
-                    numMatrices = source->getWorldMatrixCount();
+                    pMatrix = source->getBoneMatrixArray();
+                    numMatrices = source->getBoneMatrixCount();
                     index = ac.physicalIndex;
 
                     scaleM = Matrix4::IDENTITY;
@@ -2537,7 +2544,6 @@ namespace Ogre
     const GpuProgramParameters::AutoConstantDefinition*
     GpuProgramParameters::getAutoConstantDefinition(const size_t idx)
     {
-
         if (idx < getNumAutoConstantDefinitions())
         {
             // verify index is equal to acType

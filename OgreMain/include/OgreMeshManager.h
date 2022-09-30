@@ -385,6 +385,15 @@ namespace Ogre {
         */
         void setBlendWeightsBaseElementType( VertexElementType vet );
 
+        /** Set whether to keep the bone matrices in object space or transform them to world space.
+         *
+         * Transforming to world space happens on the CPU and is the legacy behavior. Using object space bones
+         * is more efficient as it allows to do the transformation in the vertex shader.
+         */
+        static void setBonesUseObjectSpace(bool enable) { mBonesUseObjectSpace = true; }
+        /// whether the bone matrices are in object space or world space
+        static bool getBonesUseObjectSpace() { return mBonesUseObjectSpace; }
+
         /** Gets the factor by which the bounding box of an entity is padded.
             Default is 0.01
         */
@@ -415,6 +424,7 @@ namespace Ogre {
         VertexElementType mBlendWeightsBaseElementType;
 
         bool mPrepAllMeshesForShadowVolumes;
+        static bool mBonesUseObjectSpace;
     
         //the factor by which the bounding box of an entity is padded   
         Real mBoundsPaddingFactor;
