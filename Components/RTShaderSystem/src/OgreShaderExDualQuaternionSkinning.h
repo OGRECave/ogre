@@ -72,16 +72,6 @@ public:
 protected:
     /** Adds functions to calculate position data in world, object and projective space */
     void addPositionCalculations(Function* vsMain);
-
-    /** Adjusts the sign of a dual quaternion depending on its orientation to the root dual quaternion */
-    void adjustForCorrectAntipodality(Function* vsMain, int index, const ParameterPtr& pTempWorldMatrix);
-
-    /** Adds the weight of a given position for a given index
-    @param pPositionTempParameter
-        Requires a temp parameter with a matrix the same size of pPositionRelatedParam
-    */
-    void addIndexedPositionWeight(Function* vsMain, int index, ParameterPtr& pWorldMatrix,
-                                  ParameterPtr& pPositionTempParameter, ParameterPtr& pPositionRelatedOutputParam);
     
     /** Adds the calculations for calculating a normal related element */
     void addNormalRelatedCalculations(Function* vsMain,
@@ -90,19 +80,11 @@ protected:
 
 protected:
     UniformParameterPtr mParamInScaleShearMatrices;
-    ParameterPtr mParamLocalBlendPosition;
     ParameterPtr mParamBlendS;
     ParameterPtr mParamBlendDQ;
-    ParameterPtr mParamInitialDQ;
-    ParameterPtr mParamTempWorldMatrix;
 
-    ParameterPtr mParamTempFloat2x4;
     ParameterPtr mParamTempFloat3x3;
     ParameterPtr mParamTempFloat3x4;
-    
-    ParameterPtr mParamIndex1;
-    ParameterPtr mParamIndex2;
-
 };
 
 } // namespace RTShader

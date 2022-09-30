@@ -81,6 +81,7 @@ void SGX_BlendWeight(in float blendWgt, in mat3x4 scaleShearMatrix, out mat3x4 v
 }
 
 //-----------------------------------------------------------------------------
+// Adjusts the sign of a dual quaternion depending on its orientation to the root dual quaternion
 void SGX_AntipodalityAdjustment(in mat2x4 dq0, in mat2x4 dq1,out mat2x4 dq2)
 {
 	//Accurate antipodality handling. For speed increase, remove the following line, 
@@ -105,12 +106,6 @@ void SGX_CalculateBlendNormal(in vec3 normal, in mat2x4 blendDQ, out vec3 vOut)
 }
 
 //-----------------------------------------------------------------------------
-void SGX_NormalizeDualQuaternion(inout mat2x4 dq)
-{
-	dq /= length(dq[0]);
-}
-
-//-----------------------------------------------------------------------------
 void SGX_AdjointTransposeMatrix(in mat3x4 M, out mat3 vOut)
 {
 	mat3 atM;
@@ -130,7 +125,48 @@ void SGX_AdjointTransposeMatrix(in mat3x4 M, out mat3 vOut)
 }
 
 //-----------------------------------------------------------------------------
-void SGX_BuildDualQuaternionMatrix(in vec4 r1, in vec4 r2, out mat2x4 vOut)
+void blendBonesDQ(mat2x4 bones_dq[BONE_COUNT], vec4 indices, vec4 weights, out mat2x4 blendDQ)
 {
-	vOut = mat2x4(r1, r2);
+	blendDQ = bones_dq[int(indices.x)] * weights.x;
+	mat2x4 dqi;
+#ifdef CORRECT_ANTIPODALITY
+	mat2x4 dq0 = blendDQ;
+#endif
+#if WEIGHT_COUNT > 1
+	dqi = bones_dq[int(indices.y)] * weights.y;
+#	ifdef CORRECT_ANTIPODALITY
+	SGX_AntipodalityAdjustment(dq0, dqi, dqi);
+#	endif
+	blendDQ += dqi;
+#endif
+#if WEIGHT_COUNT > 2
+	dqi = bones_dq[int(indices.z)] * weights.z;
+#	ifdef CORRECT_ANTIPODALITY
+	SGX_AntipodalityAdjustment(dq0, dqi, dqi);
+#	endif
+	blendDQ += dqi;
+#endif
+#if WEIGHT_COUNT > 3
+	dqi = bones_dq[int(indices.w)] * weights.w;
+#	ifdef CORRECT_ANTIPODALITY
+	SGX_AntipodalityAdjustment(dq0, dqi, dqi);
+#	endif
+	blendDQ += dqi;
+#endif
+
+	blendDQ /= length(blendDQ[0]); // normalise dual quaternion
+}
+
+void blendBonesMat3x4(mat3x4 bones_mat[BONE_COUNT], vec4 indices, vec4 weights, out mat3x4 blendMat)
+{
+	blendMat = bones_mat[int(indices.x)] * weights.x;
+#if WEIGHT_COUNT > 1
+	blendMat += bones_mat[int(indices.y)] * weights.y;
+#endif
+#if WEIGHT_COUNT > 2
+	blendMat += bones_mat[int(indices.z)] * weights.z;
+#endif
+#if WEIGHT_COUNT > 3
+	blendMat += bones_mat[int(indices.w)] * weights.w;
+#endif
 }
