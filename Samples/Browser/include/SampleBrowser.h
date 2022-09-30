@@ -771,6 +771,7 @@ namespace OgreBites
           -----------------------------------------------------------------------------*/
         void setup() override
         {
+            Ogre::MeshManager::setBonesUseObjectSpace(true);
             ApplicationContext::setup();
             mWindow = getRenderWindow();
             addInputListener(this);
