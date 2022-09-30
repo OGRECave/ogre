@@ -82,7 +82,8 @@ bool DualQuaternionSkinning::resolveParameters(ProgramSet* programSet)
         mParamInIndices = vsMain->resolveInputParameter(Parameter::SPC_BLEND_INDICES);
         mParamInWeights = vsMain->resolveInputParameter(Parameter::SPC_BLEND_WEIGHTS);
         mParamInWorldMatrices = vsProgram->resolveParameter(GpuProgramParameters::ACT_WORLD_DUALQUATERNION_ARRAY_2x4, mBoneCount);
-        mParamInInvWorldMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_INVERSE_WORLD_MATRIX);
+        if(!mObjSpaceBones)
+            mParamInInvWorldMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_INVERSE_WORLD_MATRIX);
         
         mParamBlendDQ = vsMain->resolveLocalParameter(GCT_MATRIX_2X4, "blendDQ");
 
@@ -164,7 +165,8 @@ void DualQuaternionSkinning::addPositionCalculations(Function* vsMain)
         stage.callFunction(SGX_FUNC_CALCULATE_BLEND_POSITION, In(mParamInPosition).xyz(), mParamBlendDQ, mParamInPosition);
 
         //update back the original position relative to the object
-        stage.callFunction(FFP_FUNC_TRANSFORM, mParamInInvWorldMatrix, mParamInPosition, mParamInPosition);
+        if (!mObjSpaceBones)
+            stage.callFunction(FFP_FUNC_TRANSFORM, mParamInInvWorldMatrix, mParamInPosition, mParamInPosition);
     }
 
     //update from object to projective space
@@ -192,7 +194,8 @@ void DualQuaternionSkinning::addNormalRelatedCalculations(Function* vsMain,
         //Transform the normal according to the dual quaternion
         stage.callFunction(SGX_FUNC_CALCULATE_BLEND_NORMAL, pNormalRelatedParam, mParamBlendDQ, pNormalRelatedParam);
         //update back the original position relative to the object
-        stage.callFunction(FFP_FUNC_TRANSFORM, mParamInInvWorldMatrix, pNormalRelatedParam, pNormalRelatedParam);
+        if(!mObjSpaceBones)
+            stage.callFunction(FFP_FUNC_TRANSFORM, mParamInInvWorldMatrix, pNormalRelatedParam, pNormalRelatedParam);
     }
 }
 }

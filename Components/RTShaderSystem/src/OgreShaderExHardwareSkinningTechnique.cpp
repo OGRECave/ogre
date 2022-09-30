@@ -26,6 +26,7 @@ THE SOFTWARE.
 */
 
 #include "OgreShaderPrecompiledHeaders.h"
+#include "OgreMeshManager.h"
 
 #ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
 
@@ -43,7 +44,8 @@ HardwareSkinningTechnique::HardwareSkinningTechnique() :
     mWeightCount(0),
     mCorrectAntipodalityHandling(false),
     mScalingShearingSupport(false),
-    mDoBoneCalculations(false)
+    mDoBoneCalculations(false),
+    mObjSpaceBones(false)
 {
 }
 
@@ -59,6 +61,7 @@ void HardwareSkinningTechnique::setHardwareSkinningParam(ushort boneCount, ushor
     mWeightCount = std::min<ushort>(weightCount, 4);
     mCorrectAntipodalityHandling = correctAntipodalityHandling;
     mScalingShearingSupport = scalingShearingSupport;
+    mObjSpaceBones = MeshManager::getBonesUseObjectSpace();
 }
 
 //-----------------------------------------------------------------------

@@ -125,6 +125,8 @@ protected:
     bool mDoBoneCalculations;
     bool mDoLightCalculations;
     
+    bool mObjSpaceBones;
+
     ParameterPtr mParamInPosition;
     ParameterPtr mParamInNormal;
     //ParameterPtr mParamInBiNormal;

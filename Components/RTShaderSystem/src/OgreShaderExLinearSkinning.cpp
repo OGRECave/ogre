@@ -87,7 +87,8 @@ bool LinearSkinning::resolveParameters(ProgramSet* programSet)
         mParamInIndices = vsMain->resolveInputParameter(Parameter::SPC_BLEND_INDICES);
         mParamInWeights = vsMain->resolveInputParameter(Parameter::SPC_BLEND_WEIGHTS);
         mParamInWorldMatrices = vsProgram->resolveParameter(GpuProgramParameters::ACT_WORLD_MATRIX_ARRAY_3x4, mBoneCount);
-        mParamInInvWorldMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_INVERSE_WORLD_MATRIX);
+        if(!mObjSpaceBones)
+            mParamInInvWorldMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_INVERSE_WORLD_MATRIX);
 
         mParamBlendMat = vsMain->resolveLocalParameter(GCT_MATRIX_3X4, "blendMat");
     }
@@ -148,7 +149,8 @@ void LinearSkinning::addPositionCalculations(Function* vsMain)
         stage.assign(1, Out(mParamInPosition).w());
 
         //update back the original position relative to the object
-        stage.callFunction(FFP_FUNC_TRANSFORM, mParamInInvWorldMatrix, mParamInPosition, mParamInPosition);
+        if (!mObjSpaceBones)
+            stage.callFunction(FFP_FUNC_TRANSFORM, mParamInInvWorldMatrix, mParamInPosition, mParamInPosition);
     }
 
     // update from object to projective space
@@ -168,8 +170,9 @@ void LinearSkinning::addNormalRelatedCalculations(Function* vsMain,
         stage.callFunction(FFP_FUNC_TRANSFORM, mParamBlendMat, pNormalRelatedParam, pNormalWorldRelatedParam);
 
         //update back the original position relative to the object
-        stage.callFunction(FFP_FUNC_TRANSFORM, mParamInInvWorldMatrix, pNormalWorldRelatedParam,
-                           pNormalRelatedParam);
+        if (!mObjSpaceBones)
+            stage.callFunction(FFP_FUNC_TRANSFORM, mParamInInvWorldMatrix, pNormalWorldRelatedParam,
+                               pNormalRelatedParam);
     }
 }
 }
