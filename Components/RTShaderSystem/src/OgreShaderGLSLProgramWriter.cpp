@@ -124,7 +124,7 @@ void GLSLProgramWriter::writeSourceCode(std::ostream& os, Program* program)
 void GLSLProgramWriter::writeUniformBlock(std::ostream& os, const String& name, int binding,
                                           const UniformParameterList& uniforms)
 {
-    os << "layout(binding = " << binding << ", row_major) uniform " << name << " {";
+    os << "layout(binding = " << binding << ", row_major) uniform " << name << " {\n";
 
     for (const auto& uparam : uniforms)
     {
@@ -134,7 +134,7 @@ void GLSLProgramWriter::writeUniformBlock(std::ostream& os, const String& name, 
         os << ";\n";
     }
 
-    os << "\n};\n";
+    os << "};\n";
 }
 
 void GLSLProgramWriter::writeMainSourceCode(std::ostream& os, Program* program)
