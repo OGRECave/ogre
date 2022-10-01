@@ -126,22 +126,16 @@ namespace Ogre
     void InstanceBatch::_updateBounds(void)
     {
         mFullBoundingBox.setNull();
-
-        InstancedEntityVec::const_iterator itor = mInstancedEntities.begin();
-        InstancedEntityVec::const_iterator end  = mInstancedEntities.end();
-
         Real maxScale = 0;
-        while( itor != end )
-        {
-            InstancedEntity* ent = (*itor);
-            //Only increase the bounding box for those objects we know are in the scene
-            if( ent->isInScene() )
-            {
-                maxScale = std::max(maxScale, ent->getMaxScaleCoef());
-                mFullBoundingBox.merge( ent->_getDerivedPosition() );
-            }
 
-            ++itor;
+        for(auto *e : mInstancedEntities)
+        {
+            //Only increase the bounding box for those objects we know are in the scene
+            if(e->isInScene())
+            {
+                maxScale = std::max(maxScale, e->getMaxScaleCoef());
+                mFullBoundingBox.merge( e->_getDerivedPosition() );
+            }
         }
 
         Real addToBound = maxScale * _getMeshReference()->getBoundingSphereRadius();
@@ -153,8 +147,8 @@ namespace Ogre
         if (mParentNode) {
             mParentNode->needUpdate();
         }
-	mBoundsUpdated  = true;
-        mBoundsDirty    = false;
+	    mBoundsUpdated  = true;
+        mBoundsDirty = false;
     }
 
     //-----------------------------------------------------------------------
@@ -196,25 +190,18 @@ namespace Ogre
     //-----------------------------------------------------------------------
     void InstanceBatch::deleteAllInstancedEntities()
     {
-        InstancedEntityVec::const_iterator itor = mInstancedEntities.begin();
-        InstancedEntityVec::const_iterator end  = mInstancedEntities.end();
-
-        while( itor != end )
+        for (auto *e : mInstancedEntities)
         {
-            if( (*itor)->getParentSceneNode() )
-                (*itor)->getParentSceneNode()->detachObject( (*itor) );
-
-            OGRE_DELETE *itor++;
+            if(e->getParentSceneNode() )
+                e->getParentSceneNode()->detachObject(e);
+            OGRE_DELETE e;
         }
     }
     //-----------------------------------------------------------------------
     void InstanceBatch::deleteUnusedInstancedEntities()
     {
-        InstancedEntityVec::const_iterator itor = mUnusedEntities.begin();
-        InstancedEntityVec::const_iterator end  = mUnusedEntities.end();
-
-        while( itor != end )
-            OGRE_DELETE *itor++;
+        for (auto *e : mUnusedEntities)
+            OGRE_DELETE e;
 
         mUnusedEntities.clear();
     }
@@ -286,20 +273,12 @@ namespace Ogre
     void InstanceBatch::getInstancedEntitiesInUse( InstancedEntityVec &outEntities,
                                                     CustomParamsVec &outParams )
     {
-        InstancedEntityVec::const_iterator itor = mInstancedEntities.begin();
-        InstancedEntityVec::const_iterator end  = mInstancedEntities.end();
-
-        while( itor != end )
-        {
-            if( (*itor)->isInUse() )
-            {
-                outEntities.push_back( *itor );
-
+        for (auto *e : mInstancedEntities) {
+            if (e->isInUse()) {
+                outEntities.push_back(e);
                 for( unsigned char i=0; i<mCreator->getNumCustomParams(); ++i )
-                    outParams.push_back( _getCustomParam( *itor, i ) );
+                    outParams.push_back(_getCustomParam(e, i));
             }
-
-            ++itor;
         }
     }
     //-----------------------------------------------------------------------
@@ -410,14 +389,9 @@ namespace Ogre
 
         //Reassign instance IDs and tell we're the new parent
         uint32 instanceId = 0;
-        InstancedEntityVec::const_iterator itor = mInstancedEntities.begin();
-        InstancedEntityVec::const_iterator end  = mInstancedEntities.end();
-
-        while( itor != end )
-        {
-            (*itor)->mInstanceId = instanceId++;
-            (*itor)->mBatchOwner = this;
-            ++itor;
+        for (auto *e : mInstancedEntities) {
+            e->mInstanceId = instanceId++;
+            e->mBatchOwner = this;
         }
 
         //Recreate unused entities, if there's left space in our container
@@ -588,15 +562,9 @@ namespace Ogre
 
         if( mVisible )
         {
-            if( mMeshReference->hasSkeleton() )
-            {
-                InstancedEntityVec::const_iterator itor = mInstancedEntities.begin();
-                InstancedEntityVec::const_iterator end  = mInstancedEntities.end();
-
-                while( itor != end )    
-                {
-                    mDirtyAnimation |= (*itor)->_updateAnimation();
-                    ++itor;
+            if( mMeshReference->hasSkeleton() ) {
+                for (auto *e : mInstancedEntities) {
+                    mDirtyAnimation |= e->_updateAnimation();
                 }
             }
 
