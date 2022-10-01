@@ -861,7 +861,7 @@ namespace Ogre {
 
             /** The derived ambient light colour, with 'r', 'g', 'b' components filled with
                 product of surface ambient colour and ambient light colour, respectively,
-                and 'a' component filled with surface ambient alpha component.
+                and 'a' component filled with surface diffuse alpha component.
             */
             ACT_DERIVED_AMBIENT_LIGHT_COLOUR,
             /** The derived scene colour, with 'r', 'g' and 'b' components filled with sum

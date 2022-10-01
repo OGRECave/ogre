@@ -601,7 +601,9 @@ namespace Ogre {
     //-----------------------------------------------------------------------------
     ColourValue AutoParamDataSource::getDerivedAmbientLightColour(void) const
     {
-        return getAmbientLightColour() * getSurfaceAmbientColour();
+        auto result = getAmbientLightColour() * getSurfaceAmbientColour();
+        result.a = getSurfaceDiffuseColour().a;
+        return result;
     }
     //-----------------------------------------------------------------------------
     ColourValue AutoParamDataSource::getDerivedSceneColour(void) const
