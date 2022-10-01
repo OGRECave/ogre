@@ -311,12 +311,12 @@ void PerPixelLighting::addPSGlobalIlluminationInvocation(const FunctionStageRef&
         }
         else
         {
-            stage.assign(In(mDerivedAmbientLightColour).xyz(), Out(mOutDiffuse).xyz());
+            stage.assign(mDerivedAmbientLightColour, mOutDiffuse);
         }
 
         if (mTrackVertexColourType & TVC_EMISSIVE)
         {
-            stage.add(mInDiffuse, mOutDiffuse, mOutDiffuse);
+            stage.add(In(mInDiffuse).xyz(), In(mOutDiffuse).xyz(), Out(mOutDiffuse).xyz());
         }
         else
         {
