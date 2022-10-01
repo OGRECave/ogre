@@ -28,7 +28,6 @@ THE SOFTWARE.
 #include "OgreShaderPrecompiledHeaders.h"
 
 #ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
-#define HS_DATA_BIND_NAME "HS_SRS_DATA"
 
 #define SGX_LIB_DUAL_QUATERNION                 "SGXLib_DualQuaternion"
 #define SGX_FUNC_CALCULATE_BLEND_POSITION       "SGX_CalculateBlendPosition"
@@ -42,161 +41,55 @@ namespace RTShader {
 /************************************************************************/
 /*                                                                      */
 /************************************************************************/
-DualQuaternionSkinning::DualQuaternionSkinning() : HardwareSkinningTechnique()
+bool DualQuaternionSkinning::resolveParameters(Program* vsProgram)
 {
-}
-
-//-----------------------------------------------------------------------
-bool DualQuaternionSkinning::resolveParameters(ProgramSet* programSet)
-{
-    Program* vsProgram = programSet->getCpuProgram(GPT_VERTEX_PROGRAM);
     Function* vsMain = vsProgram->getEntryPointFunction();
 
-    //if needed mark this vertex program as hardware skinned
-    if (mDoBoneCalculations == true)
+    mParamInWorldMatrices = vsProgram->resolveParameter(GpuProgramParameters::ACT_WORLD_DUALQUATERNION_ARRAY_2x4, mBoneCount);
+    mParamBlendDQ = vsMain->resolveLocalParameter(GCT_MATRIX_2X4, "blendDQ");
+
+    if(mScalingShearingSupport)
     {
-        vsProgram->setSkeletalAnimationIncluded(true);
+        mParamInScaleShearMatrices = vsProgram->resolveParameter(GpuProgramParameters::ACT_WORLD_SCALE_SHEAR_MATRIX_ARRAY_3x4, mBoneCount);
+        mParamBlendS = vsMain->resolveLocalParameter(GCT_MATRIX_3X4, "blendS");
+        mParamTempFloat3x3 = vsMain->resolveLocalParameter(GCT_MATRIX_3X3, "TempVal3x3");
     }
-
-    //
-    // get the parameters we need whether we are doing bone calculations or not
-    //
-    // Note: in order to be consistent we will always output position, normal,
-    // tangent and binormal in both object and world space. And output position
-    // in projective space to cover the responsibility of the transform stage
-
-    //input param
-    mParamInPosition = vsMain->resolveInputParameter(Parameter::SPC_POSITION_OBJECT_SPACE);
-
-    if(mDoLightCalculations)
-        mParamInNormal = vsMain->resolveInputParameter(Parameter::SPC_NORMAL_OBJECT_SPACE);
-    //mParamInBiNormal = vsMain->resolveInputParameter(Parameter::SPS_BINORMAL, 0, Parameter::SPC_BINORMAL_OBJECT_SPACE, GCT_FLOAT3);
-    //mParamInTangent = vsMain->resolveInputParameter(Parameter::SPS_TANGENT, 0, Parameter::SPC_TANGENT_OBJECT_SPACE, GCT_FLOAT3);
-
-    //output param
-    mParamOutPositionProj = vsMain->resolveOutputParameter(Parameter::SPC_POSITION_PROJECTIVE_SPACE);
-
-    if (mDoBoneCalculations == true)
-    {
-        //input parameters
-        mParamInIndices = vsMain->resolveInputParameter(Parameter::SPC_BLEND_INDICES);
-        mParamInWeights = vsMain->resolveInputParameter(Parameter::SPC_BLEND_WEIGHTS);
-        mParamInWorldMatrices = vsProgram->resolveParameter(GpuProgramParameters::ACT_WORLD_DUALQUATERNION_ARRAY_2x4, mBoneCount);
-        if(!mObjSpaceBones)
-            mParamInInvWorldMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_INVERSE_WORLD_MATRIX);
-        
-        mParamBlendDQ = vsMain->resolveLocalParameter(GCT_MATRIX_2X4, "blendDQ");
-
-        if (ShaderGenerator::getSingleton().getTargetLanguage() == "hlsl")
-        {
-            //set hlsl shader to use row-major matrices instead of column-major.
-            //it enables the use of auto-bound 3x4 matrices in generated hlsl shader.
-            vsProgram->setUseColumnMajorMatrices(false);
-        }
-
-        if(mScalingShearingSupport)
-        {
-            mParamInScaleShearMatrices = vsProgram->resolveParameter(GpuProgramParameters::ACT_WORLD_SCALE_SHEAR_MATRIX_ARRAY_3x4, mBoneCount);
-            mParamBlendS = vsMain->resolveLocalParameter(GCT_MATRIX_3X4, "blendS");
-            mParamTempFloat3x3 = vsMain->resolveLocalParameter(GCT_MATRIX_3X3, "TempVal3x3");
-        }
-    }
-    mParamInWorldViewProjMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_WORLDVIEWPROJ_MATRIX);
     return true;
 }
-
 //-----------------------------------------------------------------------
-bool DualQuaternionSkinning::resolveDependencies(ProgramSet* programSet)
+void DualQuaternionSkinning::addPositionCalculations(const FunctionStageRef& stage)
 {
-    Program* vsProgram = programSet->getCpuProgram(GPT_VERTEX_PROGRAM);
-    vsProgram->addDependency(FFP_LIB_COMMON);
-    vsProgram->addDependency(FFP_LIB_TRANSFORM);
-    if(mDoBoneCalculations)
+    if (mScalingShearingSupport)
     {
-        vsProgram->addDependency(SGX_LIB_DUAL_QUATERNION);
-        vsProgram->addPreprocessorDefines(StringUtil::format("BONE_COUNT=%d", mBoneCount));
-        vsProgram->addPreprocessorDefines(StringUtil::format("WEIGHT_COUNT=%d", mWeightCount));
-        if(mCorrectAntipodalityHandling)
-            vsProgram->addPreprocessorDefines("CORRECT_ANTIPODALITY");
+        // Construct a scaling and shearing matrix based on the blend weights
+        stage.callFunction("blendBonesMat3x4", {In(mParamInScaleShearMatrices), In(mParamInIndices),
+                                                In(mParamInWeights), Out(mParamBlendS)});
+        // Transform the position based by the scaling and shearing matrix
+        stage.callFunction(FFP_FUNC_TRANSFORM, mParamBlendS, mParamInPosition, Out(mParamInPosition).xyz());
     }
 
-    return true;
+    // Calculate the resultant dual quaternion based on the weights given
+    stage.callFunction("blendBonesDQ",
+                       {In(mParamInWorldMatrices), In(mParamInIndices), In(mParamInWeights), Out(mParamBlendDQ)});
+
+    // Calculate the blend position
+    stage.callFunction(SGX_FUNC_CALCULATE_BLEND_POSITION, In(mParamInPosition).xyz(), mParamBlendDQ, mParamInPosition);
 }
 
 //-----------------------------------------------------------------------
-bool DualQuaternionSkinning::addFunctionInvocations(ProgramSet* programSet)
+void DualQuaternionSkinning::addNormalRelatedCalculations(const FunctionStageRef& stage)
 {
-    Program* vsProgram = programSet->getCpuProgram(GPT_VERTEX_PROGRAM);
-    Function* vsMain = vsProgram->getEntryPointFunction();
-
-    //add functions to calculate position data in world, object and projective space
-    addPositionCalculations(vsMain);
-
-    //add functions to calculate normal and normal related data in world and object space
-    if(mDoLightCalculations)
-        addNormalRelatedCalculations(vsMain, mParamInNormal, mParamInNormal);
-    //addNormalRelatedCalculations(vsMain, mParamInTangent, mParamLocalTangentWorld, internalCounter);
-    //addNormalRelatedCalculations(vsMain, mParamInBiNormal, mParamLocalBinormalWorld, internalCounter);
-
-    return true;
-}
-
-//-----------------------------------------------------------------------
-void DualQuaternionSkinning::addPositionCalculations(Function* vsMain)
-{
-    auto stage = vsMain->getStage(FFP_VS_TRANSFORM);
-
-    if (mDoBoneCalculations == true)
+    if (mScalingShearingSupport)
     {
-        if (mScalingShearingSupport)
-        {
-            // Construct a scaling and shearing matrix based on the blend weights
-            stage.callFunction("blendBonesMat3x4", {In(mParamInScaleShearMatrices), In(mParamInIndices),
-                                                    In(mParamInWeights), Out(mParamBlendS)});
-            // Transform the position based by the scaling and shearing matrix
-            stage.callFunction(FFP_FUNC_TRANSFORM, mParamBlendS, mParamInPosition, Out(mParamInPosition).xyz());
-        }
-
-        // Calculate the resultant dual quaternion based on the weights given
-        stage.callFunction("blendBonesDQ",
-                           {In(mParamInWorldMatrices), In(mParamInIndices), In(mParamInWeights), Out(mParamBlendDQ)});
-
-        //Calculate the blend position
-        stage.callFunction(SGX_FUNC_CALCULATE_BLEND_POSITION, In(mParamInPosition).xyz(), mParamBlendDQ, mParamInPosition);
-
-        //update back the original position relative to the object
-        if (!mObjSpaceBones)
-            stage.callFunction(FFP_FUNC_TRANSFORM, mParamInInvWorldMatrix, mParamInPosition, mParamInPosition);
+        // Calculate the adjoint transpose of the blended scaling and shearing matrix
+        stage.callFunction(SGX_FUNC_ADJOINT_TRANSPOSE_MATRIX, mParamBlendS, mParamTempFloat3x3);
+        // Transform the normal by the adjoint transpose of the blended scaling and shearing matrix
+        stage.callFunction(FFP_FUNC_TRANSFORM, mParamTempFloat3x3, mParamInNormal, mParamInNormal);
+        // Need to normalize again after transforming the normal
+        stage.callFunction(FFP_FUNC_NORMALIZE, mParamInNormal);
     }
-
-    //update from object to projective space
-    stage.callFunction(FFP_FUNC_TRANSFORM, mParamInWorldViewProjMatrix, mParamInPosition, mParamOutPositionProj);
-}
-
-//-----------------------------------------------------------------------
-void DualQuaternionSkinning::addNormalRelatedCalculations(Function* vsMain,
-                                ParameterPtr& pNormalRelatedParam,
-                                ParameterPtr& pNormalWorldRelatedParam)
-{
-    auto stage = vsMain->getStage(FFP_VS_TRANSFORM);
-
-    if (mDoBoneCalculations == true)
-    {
-        if(mScalingShearingSupport)
-        {
-            //Calculate the adjoint transpose of the blended scaling and shearing matrix
-            stage.callFunction(SGX_FUNC_ADJOINT_TRANSPOSE_MATRIX, mParamBlendS, mParamTempFloat3x3);
-            //Transform the normal by the adjoint transpose of the blended scaling and shearing matrix
-            stage.callFunction(FFP_FUNC_TRANSFORM, mParamTempFloat3x3, pNormalRelatedParam, pNormalRelatedParam);
-            //Need to normalize again after transforming the normal
-            stage.callFunction(FFP_FUNC_NORMALIZE, pNormalRelatedParam);
-        }
-        //Transform the normal according to the dual quaternion
-        stage.callFunction(SGX_FUNC_CALCULATE_BLEND_NORMAL, pNormalRelatedParam, mParamBlendDQ, pNormalRelatedParam);
-        //update back the original position relative to the object
-        if(!mObjSpaceBones)
-            stage.callFunction(FFP_FUNC_TRANSFORM, mParamInInvWorldMatrix, pNormalRelatedParam, pNormalRelatedParam);
-    }
+    // Transform the normal according to the dual quaternion
+    stage.callFunction(SGX_FUNC_CALCULATE_BLEND_NORMAL, mParamInNormal, mParamBlendDQ, mParamInNormal);
 }
 }
 }
