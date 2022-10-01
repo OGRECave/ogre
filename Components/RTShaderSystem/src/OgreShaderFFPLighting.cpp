@@ -319,7 +319,7 @@ void FFPLighting::addGlobalIlluminationInvocation(const FunctionStageRef& stage)
 
 		if (mTrackVertexColourType & TVC_EMISSIVE)
 		{
-            stage.add(mInDiffuse, mOutDiffuse, mOutDiffuse);
+			stage.add(In(mInDiffuse).xyz(), In(mOutDiffuse).xyz(), Out(mOutDiffuse).xyz());
 		}
 		else
 		{
