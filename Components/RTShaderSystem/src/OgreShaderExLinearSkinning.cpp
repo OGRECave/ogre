@@ -28,9 +28,6 @@ THE SOFTWARE.
 #include "OgreShaderPrecompiledHeaders.h"
 #ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
 
-#define HS_DATA_BIND_NAME "HS_SRS_DATA"
-
-
 namespace Ogre {
 
 namespace RTShader {
@@ -39,141 +36,32 @@ namespace RTShader {
 /************************************************************************/
 /*                                                                      */
 /************************************************************************/
-LinearSkinning::LinearSkinning() : HardwareSkinningTechnique()
+bool LinearSkinning::resolveParameters(Program* vsProgram)
 {
-}
-
-//-----------------------------------------------------------------------
-bool LinearSkinning::resolveParameters(ProgramSet* programSet)
-{
-
-    Program* vsProgram = programSet->getCpuProgram(GPT_VERTEX_PROGRAM);
     Function* vsMain = vsProgram->getEntryPointFunction();
-
-    //if needed mark this vertex program as hardware skinned
-    if (mDoBoneCalculations == true)
-    {
-        vsProgram->setSkeletalAnimationIncluded(true);
-    }
-
-    //
-    // get the parameters we need whether we are doing bone calculations or not
-    //
-    // Note: in order to be consistent we will always output position, normal,
-    // tangent and binormal in both object and world space. And output position
-    // in projective space to cover the responsibility of the transform stage
-
-    //input param
-    mParamInPosition = vsMain->resolveInputParameter(Parameter::SPC_POSITION_OBJECT_SPACE);
-
-    if(mDoLightCalculations)
-        mParamInNormal = vsMain->resolveInputParameter(Parameter::SPC_NORMAL_OBJECT_SPACE);
-    //mParamInBiNormal = vsMain->resolveInputParameter(Parameter::SPS_BINORMAL, 0, Parameter::SPC_BINORMAL_OBJECT_SPACE, GCT_FLOAT3);
-    //mParamInTangent = vsMain->resolveInputParameter(Parameter::SPS_TANGENT, 0, Parameter::SPC_TANGENT_OBJECT_SPACE, GCT_FLOAT3);
-
-    //output param
-    mParamOutPositionProj = vsMain->resolveOutputParameter(Parameter::SPC_POSITION_PROJECTIVE_SPACE);
-
-    if (mDoBoneCalculations == true)
-    {
-        if (ShaderGenerator::getSingleton().getTargetLanguage() == "hlsl")
-        {
-            //set hlsl shader to use row-major matrices instead of column-major.
-            //it enables the use of 3x4 matrices in hlsl shader instead of full 4x4 matrix.
-            vsProgram->setUseColumnMajorMatrices(false);
-        }
-
-        //input parameters
-        mParamInIndices = vsMain->resolveInputParameter(Parameter::SPC_BLEND_INDICES);
-        mParamInWeights = vsMain->resolveInputParameter(Parameter::SPC_BLEND_WEIGHTS);
-        mParamInWorldMatrices = vsProgram->resolveParameter(GpuProgramParameters::ACT_WORLD_MATRIX_ARRAY_3x4, mBoneCount);
-        if(!mObjSpaceBones)
-            mParamInInvWorldMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_INVERSE_WORLD_MATRIX);
-
-        mParamBlendMat = vsMain->resolveLocalParameter(GCT_MATRIX_3X4, "blendMat");
-    }
-
-    mParamInWorldViewProjMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_WORLDVIEWPROJ_MATRIX);
+    mParamInWorldMatrices = vsProgram->resolveParameter(GpuProgramParameters::ACT_WORLD_MATRIX_ARRAY_3x4, mBoneCount);
+    mParamBlendMat = vsMain->resolveLocalParameter(GCT_MATRIX_3X4, "blendMat");
     return true;
 }
 
 //-----------------------------------------------------------------------
-bool LinearSkinning::resolveDependencies(ProgramSet* programSet)
+void LinearSkinning::addPositionCalculations(const FunctionStageRef& stage)
 {
-    Program* vsProgram = programSet->getCpuProgram(GPT_VERTEX_PROGRAM);
-    vsProgram->addDependency(FFP_LIB_COMMON);
-    vsProgram->addDependency(FFP_LIB_TRANSFORM);
+    // Construct a scaling and shearing matrix based on the blend weights
+    stage.callFunction("blendBonesMat3x4",
+                       {In(mParamInWorldMatrices), In(mParamInIndices), In(mParamInWeights), Out(mParamBlendMat)});
 
-    if (mDoBoneCalculations)
-    {
-        vsProgram->addDependency("SGXLib_DualQuaternion");
-        vsProgram->addPreprocessorDefines(StringUtil::format("BONE_COUNT=%d", mBoneCount));
-        vsProgram->addPreprocessorDefines(StringUtil::format("WEIGHT_COUNT=%d", mWeightCount));
-    }
-
-    return true;
+    // multiply position with world matrix
+    stage.callFunction(FFP_FUNC_TRANSFORM, mParamBlendMat, mParamInPosition, Out(mParamInPosition).xyz());
+    // set w value to 1
+    stage.assign(1, Out(mParamInPosition).w());
 }
 
 //-----------------------------------------------------------------------
-bool LinearSkinning::addFunctionInvocations(ProgramSet* programSet)
+void LinearSkinning::addNormalRelatedCalculations(const FunctionStageRef& stage)
 {
-
-    Program* vsProgram = programSet->getCpuProgram(GPT_VERTEX_PROGRAM);
-    Function* vsMain = vsProgram->getEntryPointFunction();
-
-    //add functions to calculate position data in world, object and projective space
-    addPositionCalculations(vsMain);
-
-    //add functions to calculate normal and normal related data in world and object space
-    if(mDoLightCalculations)
-        addNormalRelatedCalculations(vsMain, mParamInNormal, mParamInNormal);
-    //addNormalRelatedCalculations(vsMain, mParamInTangent, mParamLocalTangentWorld, internalCounter);
-    //addNormalRelatedCalculations(vsMain, mParamInBiNormal, mParamLocalBinormalWorld, internalCounter);
-    return true;
-}
-
-//-----------------------------------------------------------------------
-void LinearSkinning::addPositionCalculations(Function* vsMain)
-{
-    auto stage = vsMain->getStage(FFP_VS_TRANSFORM);
-
-    if (mDoBoneCalculations == true)
-    {
-        // Construct a scaling and shearing matrix based on the blend weights
-        stage.callFunction("blendBonesMat3x4",
-                           {In(mParamInWorldMatrices), In(mParamInIndices), In(mParamInWeights), Out(mParamBlendMat)});
-
-        //multiply position with world matrix
-        stage.callFunction(FFP_FUNC_TRANSFORM, mParamBlendMat, mParamInPosition, Out(mParamInPosition).xyz());
-        //set w value to 1
-        stage.assign(1, Out(mParamInPosition).w());
-
-        //update back the original position relative to the object
-        if (!mObjSpaceBones)
-            stage.callFunction(FFP_FUNC_TRANSFORM, mParamInInvWorldMatrix, mParamInPosition, mParamInPosition);
-    }
-
-    // update from object to projective space
-    stage.callFunction(FFP_FUNC_TRANSFORM, mParamInWorldViewProjMatrix, mParamInPosition, mParamOutPositionProj);
-}
-
-//-----------------------------------------------------------------------
-void LinearSkinning::addNormalRelatedCalculations(Function* vsMain,
-                                ParameterPtr& pNormalRelatedParam,
-                                ParameterPtr& pNormalWorldRelatedParam)
-{
-    auto stage = vsMain->getStage(FFP_VS_TRANSFORM);
-
-    if (mDoBoneCalculations == true)
-    {
-        //multiply normal with world matrix and put into temporary param
-        stage.callFunction(FFP_FUNC_TRANSFORM, mParamBlendMat, pNormalRelatedParam, pNormalWorldRelatedParam);
-
-        //update back the original position relative to the object
-        if (!mObjSpaceBones)
-            stage.callFunction(FFP_FUNC_TRANSFORM, mParamInInvWorldMatrix, pNormalWorldRelatedParam,
-                               pNormalRelatedParam);
-    }
+    // multiply normal with world matrix and put into temporary param
+    stage.callFunction(FFP_FUNC_TRANSFORM, mParamBlendMat, mParamInNormal, mParamInNormal);
 }
 }
 }

@@ -48,34 +48,9 @@ the points and normals by their assigned bone matricies.
 */
 class LinearSkinning : public HardwareSkinningTechnique
 {
-// Interface.
-public:
-    /** Class default constructor */
-    LinearSkinning();
-
-    /**
-    @see SubRenderState::resolveParameters.
-    */
-    bool resolveParameters(ProgramSet* programSet) override;
-
-    /**
-    @see SubRenderState::resolveDependencies.
-    */
-    bool resolveDependencies(ProgramSet* programSet) override;
-
-    /**
-    @see SubRenderState::addFunctionInvocations.
-    */
-    bool addFunctionInvocations(ProgramSet* programSet) override;
-
-protected:
-    /** Adds functions to calculate position data in world, object and projective space */
-    void addPositionCalculations(Function* vsMain);
-
-    /** Adds the calculations for calculating a normal related element */
-    void addNormalRelatedCalculations(Function* vsMain,
-                        ParameterPtr& pNormalRelatedParam,
-                        ParameterPtr& pNormalWorldRelatedParam);
+    bool resolveParameters(Program* vsProgram) override;
+    void addPositionCalculations(const FunctionStageRef& stage) override;
+    void addNormalRelatedCalculations(const FunctionStageRef& stage) override;
 
     ParameterPtr mParamBlendMat;
 };

@@ -89,31 +89,23 @@ public:
     */
     bool hasScalingShearingSupport();
 
-    /**
-    */
-    void setDoBoneCalculations(bool doBoneCalculations);
 
+    void setDoBoneCalculations(bool doBoneCalculations);
     void setDoLightCalculations(bool val) { mDoLightCalculations = val; }
 
-    /**
-    @see SubRenderState::resolveParameters.
-    */
-    virtual bool resolveParameters(ProgramSet* programSet) = 0;
+    bool resolveParameters(ProgramSet* programSet);
+    bool resolveDependencies(ProgramSet* programSet);
 
-    /**
-    @see SubRenderState::resolveDependencies.
-    */
-    virtual bool resolveDependencies(ProgramSet* programSet) = 0;
+    bool addFunctionInvocations(ProgramSet* programSet);
 
-    /**
-    @see SubRenderState::addFunctionInvocations.
-    */
-    virtual bool addFunctionInvocations(ProgramSet* programSet) = 0;
+private:
+    /** Adds functions to calculate position data in world, object and projective space */
+    virtual void addPositionCalculations(const FunctionStageRef& stage) = 0;
 
-protected:
-    /** Translates an index number to a mask value */
-    Operand::OpMask indexToMask (int index);
+    /** Adds the calculations for calculating a normal related element */
+    virtual void addNormalRelatedCalculations(const FunctionStageRef& stage) = 0;
 
+    virtual bool resolveParameters(Program* vsProgram) = 0;
 // Attributes.
 protected:
     ushort mBoneCount;
