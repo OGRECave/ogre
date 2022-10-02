@@ -103,10 +103,8 @@ namespace Ogre
                 }
             }
 
-            //Reaching here means material is supported, but malformed
-            OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, 
-            "Material '" + mMaterial->getName() + "' is malformed for this instancing technique",
-            "InstanceBatchShader::calculateMaxNumInstances");
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+                        "Material '" + mMaterial->getName() + "' does not support hardware skinning");
         }
 
         //Reaching here the material is just unsupported.
