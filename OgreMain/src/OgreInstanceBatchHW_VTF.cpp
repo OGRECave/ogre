@@ -77,7 +77,7 @@ namespace Ogre
         HWBoneWgtVec hwBoneWgt;
 
         //Blend weights may not be present because HW_VTF does not require to be skeletally animated
-        const VertexElement *veWeights = baseVertexData->vertexDeclaration->findElementBySemantic( VES_BLEND_WEIGHTS ); 
+        const VertexElement *veWeights = baseVertexData->vertexDeclaration->findElementBySemantic( VES_BLEND_WEIGHTS );
         if( veWeights )
             mWeightCount = forceOneWeight() ? 1 : veWeights->getSize() / sizeof(float);
         else
