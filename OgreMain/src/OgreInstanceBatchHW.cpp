@@ -93,7 +93,7 @@ namespace Ogre
         size_t offset               = 0;
         unsigned short nextTexCoord = thisVertexData->vertexDeclaration->getNextFreeTextureCoordinate();
         const unsigned short newSource = thisVertexData->vertexDeclaration->getMaxSource() + 1;
-        for( unsigned char i=0; i<3 + mCreator->getNumCustomParams(); ++i )
+        for (unsigned char i = 0; i < 3 + mCreator->getNumCustomParams(); ++i)
         {
             thisVertexData->vertexDeclaration->addElement( newSource, offset, VET_FLOAT4,
                                                             VES_TEXTURE_COORDINATES, nextTexCoord++ );
@@ -149,37 +149,30 @@ namespace Ogre
         const ushort bufferIdx = ushort(binding->getBufferCount()-1);
         HardwareBufferLockGuard vertexLock(binding->getBuffer(bufferIdx), HardwareBuffer::HBL_DISCARD);
         float *pDest = static_cast<float*>(vertexLock.pData);
-
-        InstancedEntityVec::const_iterator itor = mInstancedEntities.begin();
-        InstancedEntityVec::const_iterator end  = mInstancedEntities.end();
-
         unsigned char numCustomParams           = mCreator->getNumCustomParams();
         size_t customParamIdx                   = 0;
 
-        while( itor != end )
+        for (auto *e : mInstancedEntities)
         {
             //Cull on an individual basis, the less entities are visible, the less instances we draw.
             //No need to use null matrices at all!
-            if( (*itor)->findVisible( currentCamera ) )
+            if (e->findVisible(currentCamera ))
             {
-                const size_t floatsWritten = (*itor)->getTransforms3x4( (Matrix3x4f*)pDest );
+                const size_t floatsWritten = e->getTransforms3x4( (Matrix3x4f*)pDest);
 
                 if( mManager->getCameraRelativeRendering() )
-                    makeMatrixCameraRelative3x4( (Matrix3x4f*)pDest, floatsWritten / 12 );
+                    makeMatrixCameraRelative3x4((Matrix3x4f*)pDest, floatsWritten / 12);
 
                 pDest += floatsWritten;
 
                 //Write custom parameters, if any
-                for( unsigned char i=0; i<numCustomParams; ++i )
+                for (unsigned char i = 0; i < numCustomParams; ++i)
                 {
                     memcpy(pDest, mCustomParams[customParamIdx+i].ptr(), sizeof(Vector4f));
                     pDest += 4;
                 }
-
                 ++retVal;
             }
-            ++itor;
-
             customParamIdx += numCustomParams;
         }
 

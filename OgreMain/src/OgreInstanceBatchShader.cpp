@@ -275,31 +275,27 @@ namespace Ogre
             char *startBuf = baseBuf;
 
             //Copy and repeat
-            for( uint8 j=0; j<uint8(mInstancesPerBatch); ++j )
+            for (uint8 j = 0; j < uint8(mInstancesPerBatch); ++j)
             {
                 //Repeat source
                 baseBuf = startBuf;
 
-                for( size_t k=0; k<baseVertexData->vertexCount; ++k )
+                for (size_t k = 0; k < baseVertexData->vertexCount; ++k)
                 {
-                    VertexDeclaration::VertexElementList::const_iterator it = veList.begin();
-                    VertexDeclaration::VertexElementList::const_iterator en = veList.end();
-
-                    while( it != en )
+                    for (auto& vl : veList)
                     {
-                        switch( it->getSemantic() )
+                        switch (vl.getSemantic())
                         {
                         case VES_BLEND_INDICES:
-                        *(thisBuf + it->getOffset() + 0) = *(baseBuf + it->getOffset() + 0) + j * numBones;
-                        *(thisBuf + it->getOffset() + 1) = *(baseBuf + it->getOffset() + 1) + j * numBones;
-                        *(thisBuf + it->getOffset() + 2) = *(baseBuf + it->getOffset() + 2) + j * numBones;
-                        *(thisBuf + it->getOffset() + 3) = *(baseBuf + it->getOffset() + 3) + j * numBones;
+                        *(thisBuf + vl.getOffset() + 0) = *(baseBuf + vl.getOffset() + 0) + j * numBones;
+                        *(thisBuf + vl.getOffset() + 1) = *(baseBuf + vl.getOffset() + 1) + j * numBones;
+                        *(thisBuf + vl.getOffset() + 2) = *(baseBuf + vl.getOffset() + 2) + j * numBones;
+                        *(thisBuf + vl.getOffset() + 3) = *(baseBuf + vl.getOffset() + 3) + j * numBones;
                             break;
                         default:
-                            memcpy( thisBuf + it->getOffset(), baseBuf + it->getOffset(), it->getSize() );
+                            memcpy( thisBuf + vl.getOffset(), baseBuf + vl.getOffset(), vl.getSize() );
                             break;
                         }
-                        ++it;
                     }
                     thisBuf += baseVertexData->vertexDeclaration->getVertexSize(i);
                     baseBuf += baseVertexData->vertexDeclaration->getVertexSize(i);
@@ -310,18 +306,15 @@ namespace Ogre
     //-----------------------------------------------------------------------
     void InstanceBatchShader::getWorldTransforms( Matrix4* xform ) const
     {
-        InstancedEntityVec::const_iterator itor = mInstancedEntities.begin();
-        InstancedEntityVec::const_iterator end  = mInstancedEntities.end();
-
         if (MeshManager::getBonesUseObjectSpace())
         {
             *xform = Affine3::IDENTITY;
             xform++;
         }
-        while( itor != end )
+
+        for (auto *e : mInstancedEntities)
         {
-            xform += (*itor)->getTransforms( xform );
-            ++itor;
+            xform += e->getTransforms(xform);
         }
     }
     //-----------------------------------------------------------------------
