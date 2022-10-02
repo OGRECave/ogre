@@ -895,8 +895,7 @@ namespace Ogre {
         const auto& programUsage = getProgramUsage(type);
         if (!programUsage)
         {
-            OGRE_EXCEPT (Exception::ERR_INVALIDPARAMS,
-                "This pass does not have this program type assigned!");
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "This pass has no " + to_string(type) + " program");
         }
         return programUsage->getParameters();
     }
