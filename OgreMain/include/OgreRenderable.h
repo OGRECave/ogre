@@ -123,25 +123,31 @@ namespace Ogre {
 
             If the object has any derived transforms, these are expected to be up to date as long as
             all the SceneNode structures have been updated before this is called.
-        @par
-            This method will populate transform with 1 matrix if it does not use vertex blending. If it
-            does use vertex blending it will fill the passed in pointer with an array of matrices,
-            the length being the value returned from getNumWorldTransforms.
+
         @note
             Internal Ogre never supports non-affine matrix for world transform matrix/matrices,
             the behavior is undefined if returns non-affine matrix here.
+
+            This method will populate transform with 1 matrix if it does not use GPU vertex blending. If it
+            does use GPU vertex blending it will fill the passed in pointer with an array of matrices,
+            the length being the value returned from @ref getNumWorldTransforms.
+
+        @note If @ref MeshManager::getBonesUseObjectSpace() is true, the first matrix must contain the world
+            transform of the object, and the rest of the matrices must contain the bone transforms in object space.
         */
         virtual void getWorldTransforms(Matrix4* xform) const = 0;
 
         /** Returns the number of world transform matrices this renderable requires.
 
-            When a renderable uses vertex blending, it uses multiple world matrices instead of a single
+            When a renderable uses GPU vertex blending, it uses multiple world matrices instead of a single
             one. Each vertex sent to the pipeline can reference one or more matrices in this list
             with given weights.
             If a renderable does not use vertex blending this method returns 1, which is the default for 
             simplicity.
+            @note If @ref MeshManager::getBonesUseObjectSpace() is true, this method must return
+            numBones + 1
         */
-        virtual unsigned short getNumWorldTransforms(void) const { return 1; }
+        virtual uint16 getNumWorldTransforms(void) const { return 1; }
 
         /** Sets whether or not to use an 'identity' projection.
 
