@@ -317,12 +317,7 @@ namespace Ogre
                 The value to round up to the nearest integer.
          */
         static inline Real Ceil (Real fValue) { return std::ceil(fValue); }
-        static inline bool isNaN(Real f)
-        {
-            // std::isnan() is C99, not supported by all compilers
-            // However NaN always fails this next test, no other number does.
-            return f != f;
-        }
+        static inline bool isNaN(Real f) { return std::isnan(f); }
 
         /** Cosine function.
             @param fValue
