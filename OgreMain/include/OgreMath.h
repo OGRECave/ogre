@@ -319,7 +319,10 @@ namespace Ogre
         static inline Real Ceil (Real fValue) { return std::ceil(fValue); }
         static inline bool isNaN(Real f)
         {
-            // std::isnan() is C99, not supported by all compilers
+#if defined(__FAST_MATH__) || defined(_M_FP_FAST)
+            assert(false && "not available with fast math");
+#endif
+            // std::isnan() has non-portable behaviour on MSVC
             // However NaN always fails this next test, no other number does.
             return f != f;
         }
