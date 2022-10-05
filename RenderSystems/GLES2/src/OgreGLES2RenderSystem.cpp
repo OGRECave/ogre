@@ -902,10 +902,12 @@ namespace Ogre {
             }
             
 #if OGRE_NO_VIEWPORT_ORIENTATIONMODE == 0
+            // This works fine whether getConfigOptions() returns by value or by reference.
+            const ConfigOptionMap& configOptions = mGLSupport->getConfigOptions();
             ConfigOptionMap::const_iterator opt;
-            ConfigOptionMap::const_iterator end = mGLSupport->getConfigOptions().end();
+            ConfigOptionMap::const_iterator end = configOptions.end();
             
-            if ((opt = mGLSupport->getConfigOptions().find("Orientation")) != end)
+            if ((opt = configOptions.find("Orientation")) != end)
             {
                 String val = opt->second.currentValue;
                 if (val.find("Landscape") != String::npos)
