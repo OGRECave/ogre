@@ -93,16 +93,26 @@ namespace Ogre
             ret->unload();
         }
 
+        String defines = "TERRAIN,";
         if (prof->getReceiveDynamicShadowsPSSM())
         {
             uint numShadowTextures = prof->getReceiveDynamicShadowsPSSM()->getSplitCount();
 
-            auto defines = StringUtil::format("PSSM_NUM_SPLITS=%d", numShadowTextures);
+            defines += StringUtil::format(",PSSM_NUM_SPLITS=%d", numShadowTextures);
             if (!prof->getReceiveDynamicShadowsDepth())
                 defines += ",PSSM_SAMPLE_COLOUR";
-
-            ret->setParameter("preprocessor_defines", defines);
         }
+
+        if(terrain->getAlignment() == Terrain::ALIGN_Y_Z)
+            defines += ",TERRAIN_ALIGN_Y_Z";
+        if (prof->isLayerNormalMappingEnabled())
+        {
+            defines += ",TERRAIN_NORMAL_MAPPING";
+            if (prof->isLayerParallaxMappingEnabled() && tt != RENDER_COMPOSITE_MAP)
+                defines += ",TERRAIN_PARALLAX_MAPPING";
+        }
+
+        ret->setParameter("preprocessor_defines", defines);
 
         if(mLang == "hlsl")
         {
@@ -251,6 +261,7 @@ namespace Ogre
         outStream << "#include <SGXLib_NormalMap.glsl>\n";
         outStream << "#include <SGXLib_PerPixelLighting.glsl>\n";
         outStream << "#include <SGXLib_IntegratedPSSM.glsl>\n";
+        outStream << "#include <TerrainSurface.glsl>\n";
 
         // UV's premultiplied, packed as xy/zw
         uint maxLayers = prof->getMaxLayers(terrain);
@@ -360,8 +371,7 @@ namespace Ogre
             "    vec3 eyeDir = eyePosObjSpace - oPosObj.xyz;\n"
 
             // set up accumulation areas
-            "    vec3 diffuse = vec3(0,0,0);\n"
-            "    float specular = 0.0;\n";
+            "    vec4 diffuseSpec = vec4_splat(0.0);\n";
 
         // set up the blend values
         for (uint i = 0; i < numBlendTextures; ++i)
@@ -371,34 +381,10 @@ namespace Ogre
 
         if (prof->isLayerNormalMappingEnabled())
         {
-            // derive the tangent space basis
-            // we do this in the pixel shader because we don't have per-vertex normals
-            // because of the LOD, we use a normal map
-            // tangent is always +x or -z in object space depending on alignment
-            switch(terrain->getAlignment())
-            {
-                case Terrain::ALIGN_X_Y:
-                case Terrain::ALIGN_X_Z:
-                    outStream << "    vec3 tangent = vec3(1, 0, 0);\n";
-                    break;
-                case Terrain::ALIGN_Y_Z:
-                    outStream << "    vec3 tangent = vec3(0, 0, -1);\n";
-                    break;
-            };
-
-            outStream << "    vec3 binormal = normalize(cross(tangent, normal));\n";
-            // note, now we need to re-cross to derive tangent again because it wasn't orthonormal
-            outStream << "    tangent = normalize(cross(normal, binormal));\n";
-            // derive final matrix
-            outStream << "    mat3 TBN = mtxFromRows(tangent, binormal, normal);\n";
-
+            outStream << "    transformToTS(normal, lightDir, eyeDir);\n";
             // set up lighting result placeholders for interpolation
             outStream << "    vec3 TSnormal;\n";
-            if (prof->isLayerParallaxMappingEnabled())
-                outStream << "    float displacement;\n";
-            // move
-            outStream << "    lightDir = normalize(mul(TBN, lightDir));\n";
-            outStream << "    eyeDir = normalize(mul(TBN, eyeDir));\n";
+            outStream << "    normal = vec3_splat(0.0);\n";
         }
         else
         {
@@ -406,7 +392,6 @@ namespace Ogre
             outStream << "    lightDir = normalize(lightDir);\n";
             outStream << "    eyeDir = normalize(eyeDir);\n";
         }
-        outStream << "    vec3 halfAngle = normalize(lightDir + eyeDir);\n";
     }
     //---------------------------------------------------------------------
     void ShaderHelperGLSL::generateFpLayer(const SM2Profile* prof, const Terrain* terrain,
@@ -414,51 +399,17 @@ namespace Ogre
     {
         uint uvMulIdx = layer / 4;
         uint blendIdx = (layer-1) / 4;
-        String blendWeightStr = StringUtil::format("blendTexVal%d.%s", blendIdx, getChannel(layer-1));
+        String blendWeightStr = !layer ? "1.0" : StringUtil::format("blendTexVal%d.%s", blendIdx, getChannel(layer-1));
+        String uvMulStr = StringUtil::format("uvMul_%d.%s", uvMulIdx, getChannel(layer));
 
-        // generate UV
-        outStream << "    vec2 uv" << layer << " = mod(uv * uvMul_" << uvMulIdx << "." << getChannel(layer) << ", 1.0);\n";
-
-        // calculate lighting here if normal mapping
+        outStream << "    blendTerrainLayer(" << blendWeightStr << ", uv, " << uvMulStr << ", ";
         if (prof->isLayerNormalMappingEnabled())
         {
             if (prof->isLayerParallaxMappingEnabled() && tt != RENDER_COMPOSITE_MAP)
-            {
-                // modify UV - note we have to sample an extra time
-                outStream << "    displacement = texture2D(normtex" << layer << ", uv" << layer << ").a\n"
-                             "        * scaleBiasSpecular.x + scaleBiasSpecular.y;\n";
-                outStream << "    uv" << layer << " += eyeDir.xy * displacement;\n";
-            }
-
-            // access TS normal map
-            outStream << StringUtil::format("    SGX_FetchNormal(normtex%d, uv%d, TSnormal);\n", layer, layer);
-
-            if (!layer)
-                outStream << "    normal = TSnormal;\n";
-            else
-                outStream << "    normal += TSnormal * " << blendWeightStr << ";\n";
-
+                outStream << "eyeDir, scaleBiasSpecular.xy, ";
+            outStream << "normtex" << layer << ", normal, ";
         }
-
-        // sample diffuse texture
-        outStream << "    vec4 diffuseSpecTex" << layer
-            << " = texture2D(difftex" << layer << ", uv" << layer << ");\n";
-
-        // apply to common
-        if (!layer)
-        {
-            outStream << "    diffuse = diffuseSpecTex0.rgb;\n";
-            if (prof->isLayerSpecularMappingEnabled())
-                outStream << "    specular = diffuseSpecTex0.a;\n";
-        }
-        else
-        {
-            outStream << "    diffuse = mix(diffuse, diffuseSpecTex" << layer
-                << ".rgb, " << blendWeightStr << ");\n";
-            if (prof->isLayerSpecularMappingEnabled())
-                outStream << "    specular = mix(specular, diffuseSpecTex" << layer
-                    << ".a, " << blendWeightStr << ");\n";
-        }
+        outStream << "difftex" << layer << ", diffuseSpec);\n";
     }
     //---------------------------------------------------------------------
     void ShaderHelperGLSL::generateFpFooter(const SM2Profile* prof, const Terrain* terrain,
@@ -467,7 +418,7 @@ namespace Ogre
         if (terrain->getGlobalColourMapEnabled() && prof->isGlobalColourMapEnabled())
         {
             // sample colour map and apply to diffuse
-            outStream << "    diffuse *= texture2D(globalColourMap, uv).rgb;\n";
+            outStream << "    diffuseSpec.rgb *= texture2D(globalColourMap, uv).rgb;\n";
         }
         if (prof->isLightmapEnabled())
         {
@@ -482,24 +433,24 @@ namespace Ogre
 
         // specular default
         if (!prof->isLayerSpecularMappingEnabled())
-            outStream << "    specular = 1.0;\n";
+            outStream << "    diffuseSpec.a = 1.0;\n";
 
         if (tt == RENDER_COMPOSITE_MAP)
         {
-            outStream << "    SGX_Light_Directional_Diffuse(normal, lightDir, diffuse, gl_FragColor.rgb);\n";
+            outStream << "    SGX_Light_Directional_Diffuse(normal, lightDir, diffuseSpec.rgb, gl_FragColor.rgb);\n";
             // Lighting embedded in alpha
             outStream << "    gl_FragColor.a = shadow;\n";
         }
         else
         {
             outStream << "    vec3 specularCol = vec3(0,0,0);\n";
-            outStream << "    SGX_Light_Directional_DiffuseSpecular(normal, eyeDir, lightDir, lightDiffuseColour * diffuse, "
-                            "lightSpecularColour * specular, scaleBiasSpecular.z, gl_FragColor.rgb, specularCol);\n";
+            outStream << "    SGX_Light_Directional_DiffuseSpecular(normal, eyeDir, lightDir, lightDiffuseColour * diffuseSpec.rgb, "
+                            "lightSpecularColour * diffuseSpec.a, scaleBiasSpecular.z, gl_FragColor.rgb, specularCol);\n";
 
             // Apply specular
             outStream << "    gl_FragColor.rgb += specularCol;\n";
         }
-        outStream << "    gl_FragColor.rgb = gl_FragColor.rgb * shadow + ambient.rgb * diffuse;\n";
+        outStream << "    gl_FragColor.rgb = gl_FragColor.rgb * shadow + ambient.rgb * diffuseSpec.rgb;\n";
 
         if (prof->getParent()->getDebugLevel())
         {
