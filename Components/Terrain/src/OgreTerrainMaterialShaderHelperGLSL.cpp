@@ -368,7 +368,7 @@ namespace Ogre
         outStream <<
             "    vec3 lightDir = \n"
             "        -(lightPosObjSpace.xyz - (oPosObj.xyz * lightPosObjSpace.w));\n"
-            "    vec3 eyeDir = eyePosObjSpace - oPosObj.xyz;\n"
+            "    vec3 eyeDir = oPosObj.xyz - eyePosObjSpace;\n"
 
             // set up accumulation areas
             "    vec4 diffuseSpec = vec4_splat(0.0);\n";
@@ -390,7 +390,6 @@ namespace Ogre
         {
             // simple per-pixel lighting with no normal mapping
             outStream << "    lightDir = normalize(lightDir);\n";
-            outStream << "    eyeDir = normalize(eyeDir);\n";
         }
     }
     //---------------------------------------------------------------------
