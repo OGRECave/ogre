@@ -60,18 +60,10 @@ namespace Ogre
     InstanceManager::~InstanceManager()
     {
         //Remove all batches from all materials we created
-        InstanceBatchMap::const_iterator itor = mInstanceBatches.begin();
-        InstanceBatchMap::const_iterator end  = mInstanceBatches.end();
-
-        while( itor != end )
+        for (auto& i : mInstanceBatches)
         {
-            InstanceBatchVec::const_iterator it = itor->second.begin();
-            InstanceBatchVec::const_iterator en = itor->second.end();
-
-            while( it != en )
-                OGRE_DELETE *it++;
-
-            ++itor;
+            for (auto *it : i.second)
+                OGRE_DELETE it;
         }
     }
     //----------------------------------------------------------------------
@@ -163,15 +155,10 @@ namespace Ogre
     inline InstanceBatch* InstanceManager::getFreeBatch( const String &materialName )
     {
         InstanceBatchVec &batchVec = mInstanceBatches[materialName];
-
-        InstanceBatchVec::const_reverse_iterator itor = batchVec.rbegin();
-        InstanceBatchVec::const_reverse_iterator end  = batchVec.rend();
-
-        while( itor != end )
+        for (auto *b : batchVec)
         {
-            if( !(*itor)->isBatchFull() )
-                return *itor;
-            ++itor;
+            if(!b->isBatchFull())
+                return b;
         }
 
         //None found, or they're all full
@@ -355,31 +342,22 @@ namespace Ogre
         _updateDirtyBatches();
 
         //Do this for every material
-        InstanceBatchMap::iterator itor = mInstanceBatches.begin();
-        InstanceBatchMap::iterator end  = mInstanceBatches.end();
-
-        while( itor != end )
+        for (auto& b : mInstanceBatches)
         {
             InstanceBatch::InstancedEntityVec   usedEntities;
             InstanceBatch::CustomParamsVec      usedParams;
-            usedEntities.reserve( itor->second.size() * mInstancesPerBatch );
+            usedEntities.reserve(b.second.size() * mInstancesPerBatch );
 
             //Collect all Instanced Entities being used by _all_ batches from this material
-            InstanceBatchVec::iterator it = itor->second.begin();
-            InstanceBatchVec::iterator en = itor->second.end();
-
-            while( it != en )
+            for (auto *it : b.second)
             {
                 //Don't collect instances from static batches, we assume they're correctly set
                 //Plus, we don't want to put InstancedEntities from non-static into static batches
-                if( !(*it)->isStatic() )
-                    (*it)->getInstancedEntitiesInUse( usedEntities, usedParams );
-                ++it;
+                if (!it->isStatic())
+                    it->getInstancedEntitiesInUse(usedEntities, usedParams);
             }
 
-            defragmentBatches( optimizeCulling, usedEntities, usedParams, itor->second );
-
-            ++itor;
+            defragmentBatches(optimizeCulling, usedEntities, usedParams, b.second );
         }
     }
     //-----------------------------------------------------------------------
@@ -390,15 +368,10 @@ namespace Ogre
         if( materialName == BLANKSTRING )
         {
             //Setup all existing materials
-            InstanceBatchMap::iterator itor = mInstanceBatches.begin();
-            InstanceBatchMap::iterator end  = mInstanceBatches.end();
-
-            while( itor != end )
+            for (auto& i : mInstanceBatches)
             {
-                mBatchSettings[itor->first].setting[id] = value;
-                applySettingToBatches( id, value, itor->second );
-
-                ++itor;
+                mBatchSettings[i.first].setting[id] = value;
+                applySettingToBatches( id, value, i.second );
             }
         }
         else
@@ -432,43 +405,30 @@ namespace Ogre
     void InstanceManager::applySettingToBatches( BatchSettingId id, bool value,
                                                  const InstanceBatchVec &container )
     {
-        InstanceBatchVec::const_iterator itor = container.begin();
-        InstanceBatchVec::const_iterator end  = container.end();
-
-        while( itor != end )
+        for (auto *s : container)
         {
-            switch( id )
+            switch(id)
             {
             case CAST_SHADOWS:
-                (*itor)->setCastShadows( value );
+                s->setCastShadows(value);
                 break;
             case SHOW_BOUNDINGBOX:
-                (*itor)->getParentSceneNode()->showBoundingBox( value );
+                s->getParentSceneNode()->showBoundingBox(value);
                 break;
             default:
                 break;
             }
-            ++itor;
         }
     }
     //-----------------------------------------------------------------------
     void InstanceManager::setBatchesAsStaticAndUpdate( bool bStatic )
     {
-        InstanceBatchMap::iterator itor = mInstanceBatches.begin();
-        InstanceBatchMap::iterator end  = mInstanceBatches.end();
-
-        while( itor != end )
+        for (auto& b : mInstanceBatches)
         {
-            InstanceBatchVec::iterator it = itor->second.begin();
-            InstanceBatchVec::iterator en = itor->second.end();
-
-            while( it != en )
+            for (auto *it : b.second)
             {
-                (*it)->setStaticAndUpdate( bStatic );
-                ++it;
+                it->setStaticAndUpdate(bStatic);
             }
-
-            ++itor;
         }
     }
     //-----------------------------------------------------------------------
@@ -482,15 +442,10 @@ namespace Ogre
     //-----------------------------------------------------------------------
     void InstanceManager::_updateDirtyBatches(void)
     {
-        InstanceBatchVec::const_iterator itor = mDirtyBatches.begin();
-        InstanceBatchVec::const_iterator end  = mDirtyBatches.end();
-
-        while( itor != end )
+        for (auto *d : mDirtyBatches)
         {
-            (*itor)->_updateBounds();
-            ++itor;
+            d->_updateBounds();
         }
-
         mDirtyBatches.clear();
     }
     //-----------------------------------------------------------------------
@@ -548,8 +503,6 @@ namespace Ogre
     {
         // Retrieve data to copy bone assignments
         const Mesh::VertexBoneAssignmentList& boneAssignments = mesh->getBoneAssignments();
-        Mesh::VertexBoneAssignmentList::const_iterator it = boneAssignments.begin();
-        Mesh::VertexBoneAssignmentList::const_iterator end = boneAssignments.end();
         size_t curVertexOffset = 0;
 
         // Access shared vertices
@@ -578,7 +531,6 @@ namespace Ogre
                 }
             }
 
-
             VertexData *newVertexData = new VertexData();
             newVertexData->vertexCount = indicesMap.size();
             newVertexData->vertexDeclaration = sharedVertexData->vertexDeclaration->clone();
@@ -594,12 +546,10 @@ namespace Ogre
                 HardwareBufferLockGuard oldLock(sharedVertexBuffer, 0, sharedVertexData->vertexCount * vertexSize, HardwareBuffer::HBL_READ_ONLY);
                 HardwareBufferLockGuard newLock(newVertexBuffer, 0, newVertexData->vertexCount * vertexSize, HardwareBuffer::HBL_NORMAL);
 
-                IndicesMap::iterator indIt = indicesMap.begin();
-                IndicesMap::iterator endIndIt = indicesMap.end();
-                for (; indIt != endIndIt; ++indIt)
+                for (auto& id : indicesMap)
                 {
-                    memcpy((uint8*)newLock.pData + vertexSize * indIt->second,
-                           (uint8*)oldLock.pData + vertexSize * indIt->first, vertexSize);
+                    memcpy((uint8*)newLock.pData + vertexSize * id.second,
+                           (uint8*)oldLock.pData + vertexSize * id.first, vertexSize);
                 }
 
                 newVertexData->vertexBufferBinding->setBinding(bufIdx, newVertexBuffer);
@@ -634,7 +584,6 @@ namespace Ogre
                     copyIndexBuffer<uint32>(lodIndex, indicesMap, lastIndexEnd);
                 }
                 lastIndexEnd = lodIndex->indexStart + lodIndex->indexCount;
-
 			}
 
             // Store new attributes
@@ -643,13 +592,13 @@ namespace Ogre
 
             // Transfer bone assignments to the submesh
             size_t offset = curVertexOffset + newVertexData->vertexCount;
-            for (; it != end; ++it)
+            for (auto& b : boneAssignments)
             {
-                size_t vertexIdx = (*it).first;
+                size_t vertexIdx = b.first;
                 if (vertexIdx > offset)
                     break;
 
-                VertexBoneAssignment boneAssignment = (*it).second;
+                VertexBoneAssignment boneAssignment = b.second;
                 boneAssignment.vertexIndex = static_cast<unsigned int>(boneAssignment.vertexIndex - curVertexOffset);
                 subMesh->addBoneAssignment(boneAssignment);
             }
