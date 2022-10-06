@@ -32,10 +32,7 @@ void blendTerrainLayer(in float blendWeight, in vec2 uv0, in float uvMul,
     vec2 uv = mod(uv0 * uvMul, 1.0);
 
 #ifdef TERRAIN_PARALLAX_MAPPING
-    // modify UV - note we have to sample an extra time
-	float height = texture2D(normtex, uv).a;
-	float displacement = (height * scaleBias.x) + scaleBias.y;
-	uv += eyeDir.xy * displacement;
+    SGX_Generate_Parallax_Texcoord(normtex, uv, eyeDir, scaleBias, uv);
 #endif
 
     // sample diffuse texture
