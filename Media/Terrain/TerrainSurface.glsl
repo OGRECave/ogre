@@ -19,7 +19,7 @@ void transformToTS(in vec3 normal, inout vec3 lightDir, inout vec3 eyeDir)
     eyeDir = normalize(mul(TBN, eyeDir));
 }
 
-void blendTerrainLayer(in float blendWeight, in vec2 uv0, in float uvMul,
+void blendTerrainLayer(in float blendWeight, in f32vec2 uv0, in float uvMul,
 #ifdef TERRAIN_PARALLAX_MAPPING
                     in vec3 eyeDir, in vec2 scaleBias,
 #endif
