@@ -1,4 +1,4 @@
-void transformToTS(in vec3 normal, inout vec3 lightDir, inout vec3 eyeDir)
+void transformToTS(in vec3 TSnormal, in mat3 normalMatrix, inout vec3 normal)
 {
     // derive the tangent space basis
     // we do this in the pixel shader because we don't have per-vertex normals
@@ -10,19 +10,19 @@ void transformToTS(in vec3 normal, inout vec3 lightDir, inout vec3 eyeDir)
     vec3 tangent = vec3(1, 0, 0);
 #endif
     normal = normalize(normal);
+    tangent = normalize(mul(normalMatrix, tangent));
     vec3 binormal = cross(tangent, normal);
     // note, now we need to re-cross to derive tangent again because it wasn't orthonormal
     tangent = cross(normal, binormal);
     // derive final matrix
-    mat3 TBN = mtxFromRows(tangent, binormal, normal);
+    mat3 TBN = mtxFromCols(tangent, binormal, normal);
 
-    lightDir = normalize(mul(TBN, lightDir));
-    eyeDir = normalize(mul(TBN, eyeDir));
+    normal = mul(TBN, TSnormal);
 }
 
 void blendTerrainLayer(in float blendWeight, in f32vec2 uv0, in float uvMul,
 #ifdef TERRAIN_PARALLAX_MAPPING
-                    in vec3 eyeDir, in vec2 scaleBias,
+                    in vec3 viewPos, in vec2 scaleBias,
 #endif
 #ifdef TERRAIN_NORMAL_MAPPING
                     in sampler2D normtex, inout vec3 normal,
@@ -33,7 +33,7 @@ void blendTerrainLayer(in float blendWeight, in f32vec2 uv0, in float uvMul,
     vec2 uv = mod(uv0 * uvMul, 1.0);
 
 #ifdef TERRAIN_PARALLAX_MAPPING
-    SGX_Generate_Parallax_Texcoord(normtex, uv, eyeDir, scaleBias, uv);
+    SGX_Generate_Parallax_Texcoord(normtex, uv, viewPos, scaleBias, uv);
 #endif
 
     // sample diffuse texture

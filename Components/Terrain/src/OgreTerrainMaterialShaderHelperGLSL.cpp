@@ -134,7 +134,8 @@ namespace Ogre
         outStream <<
             "OGRE_UNIFORMS_BEGIN\n"
             "uniform mat4 worldMatrix;\n"
-            "uniform mat4 viewProjMatrix;\n"
+            "uniform mat4 viewMatrix;\n"
+            "uniform mat4 projMatrix;\n"
             "uniform vec2 lodMorph;\n"; // morph amount, morph LOD target
 
         bool compression = terrain->_getUseVertexCompression() && tt != RENDER_COMPOSITE_MAP;
@@ -215,8 +216,7 @@ namespace Ogre
                 "#define uv0 _uv0\n"; // alias uv0 to _uv0
         }
         outStream <<
-            "    vec4 worldPos = mul(worldMatrix, position);\n"
-            "    oPosObj = position;\n";
+            "    vec4 worldPos = mul(worldMatrix, position);\n";
 
         // morph
         if (tt != RENDER_COMPOSITE_MAP)
@@ -230,8 +230,9 @@ namespace Ogre
             outStream << ");\n";
         }
 
+        outStream << "    oPosObj = mul(viewMatrix, worldPos);\n";
         outStream <<
-            "    gl_Position = mul(viewProjMatrix, worldPos);\n"
+            "    gl_Position = mul(projMatrix, oPosObj);\n"
             "    oUVMisc.xy = uv0.xy;\n";
 
         if (fog)
@@ -320,11 +321,11 @@ namespace Ogre
         outStream <<
             // Only 1 light supported in this version
             // deferred shading profile / generator later, ok? :)
-            "uniform vec4 lightPosObjSpace;\n"
+            "uniform vec4 lightPos;\n"
             "uniform vec3 lightDiffuseColour;\n"
             "uniform vec3 lightSpecularColour;\n"
-            "uniform vec3 eyePosObjSpace;\n"
             "uniform vec4 ambient;\n"
+            "uniform mat3 normalMatrix;\n"
             // pack scale, bias and specular
             "uniform vec4 scaleBiasSpecular;\n";
 
@@ -365,10 +366,11 @@ namespace Ogre
         "    vec3 normal;\n"
         "    SGX_FetchNormal(globalNormal, uv, normal);\n";
 
+        outStream << "    normal = mul(normalMatrix, normal);\n";
+
         outStream <<
-            "    vec3 lightDir = \n"
-            "        -(lightPosObjSpace.xyz - (oPosObj.xyz * lightPosObjSpace.w));\n"
-            "    vec3 eyeDir = oPosObj.xyz - eyePosObjSpace;\n"
+            "    vec3 lightDir = -lightPos.xyz;\n"
+            "    vec3 viewPos = oPosObj.xyz;\n"
 
             // set up accumulation areas
             "    vec4 diffuseSpec = vec4_splat(0.0);\n";
@@ -381,10 +383,8 @@ namespace Ogre
 
         if (prof->isLayerNormalMappingEnabled())
         {
-            outStream << "    transformToTS(normal, lightDir, eyeDir);\n";
             // set up lighting result placeholders for interpolation
-            outStream << "    vec3 TSnormal;\n";
-            outStream << "    normal = vec3_splat(0.0);\n";
+            outStream << "    vec3 TSnormal = vec3_splat(0.0);\n";
         }
         else
         {
@@ -405,8 +405,8 @@ namespace Ogre
         if (prof->isLayerNormalMappingEnabled())
         {
             if (prof->isLayerParallaxMappingEnabled() && tt != RENDER_COMPOSITE_MAP)
-                outStream << "eyeDir, scaleBiasSpecular.xy, ";
-            outStream << "normtex" << layer << ", normal, ";
+                outStream << "viewPos, scaleBiasSpecular.xy, ";
+            outStream << "normtex" << layer << ", TSnormal, ";
         }
         outStream << "difftex" << layer << ", diffuseSpec);\n";
     }
@@ -430,6 +430,9 @@ namespace Ogre
             generateFpDynamicShadows(prof, terrain, tt, outStream);
         }
 
+        if (prof->isLayerNormalMappingEnabled())
+            outStream << "    transformToTS(TSnormal, normalMatrix, normal);\n\n";
+
         // specular default
         if (!prof->isLayerSpecularMappingEnabled())
             outStream << "    diffuseSpec.a = 1.0;\n";
@@ -443,7 +446,7 @@ namespace Ogre
         else
         {
             outStream << "    vec3 specularCol = vec3(0,0,0);\n";
-            outStream << "    SGX_Light_Directional_DiffuseSpecular(normal, eyeDir, lightDir, lightDiffuseColour * diffuseSpec.rgb, "
+            outStream << "    SGX_Light_Directional_DiffuseSpecular(normal, viewPos, lightDir, lightDiffuseColour * diffuseSpec.rgb, "
                             "lightSpecularColour * diffuseSpec.a, scaleBiasSpecular.z, gl_FragColor.rgb, specularCol);\n";
 
             // Apply specular
