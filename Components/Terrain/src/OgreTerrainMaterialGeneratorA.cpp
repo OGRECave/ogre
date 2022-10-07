@@ -512,7 +512,8 @@ namespace Ogre
         GpuProgramParametersSharedPtr params = prog->getDefaultParameters();
         params->setIgnoreMissingParams(true);
         params->setNamedAutoConstant("worldMatrix", GpuProgramParameters::ACT_WORLD_MATRIX);
-        params->setNamedAutoConstant("viewProjMatrix", GpuProgramParameters::ACT_VIEWPROJ_MATRIX);
+        params->setNamedAutoConstant("viewMatrix", GpuProgramParameters::ACT_VIEW_MATRIX);
+        params->setNamedAutoConstant("projMatrix", GpuProgramParameters::ACT_PROJECTION_MATRIX);
         params->setNamedAutoConstant("lodMorph", GpuProgramParameters::ACT_CUSTOM, 
             Terrain::LOD_MORPH_CUSTOM_PARAM);
         params->setNamedAutoConstant("fogParams", GpuProgramParameters::ACT_FOG_PARAMS);
@@ -547,11 +548,11 @@ namespace Ogre
         params->setIgnoreMissingParams(true);
 
         params->setNamedAutoConstant("ambient", GpuProgramParameters::ACT_AMBIENT_LIGHT_COLOUR);
-        params->setNamedAutoConstant("lightPosObjSpace", GpuProgramParameters::ACT_LIGHT_POSITION_OBJECT_SPACE, 0);
+        params->setNamedAutoConstant("lightPos", GpuProgramParameters::ACT_LIGHT_POSITION_VIEW_SPACE, 0);
         params->setNamedAutoConstant("lightDiffuseColour", GpuProgramParameters::ACT_LIGHT_DIFFUSE_COLOUR, 0);
         params->setNamedAutoConstant("lightSpecularColour", GpuProgramParameters::ACT_LIGHT_SPECULAR_COLOUR, 0);
-        params->setNamedAutoConstant("eyePosObjSpace", GpuProgramParameters::ACT_CAMERA_POSITION_OBJECT_SPACE);
         params->setNamedAutoConstant("fogColour", GpuProgramParameters::ACT_FOG_COLOUR);
+        params->setNamedAutoConstant("normalMatrix", GpuProgramParameters::ACT_NORMAL_MATRIX);
 
         if (prof->isShadowingEnabled(tt, terrain))
         {
