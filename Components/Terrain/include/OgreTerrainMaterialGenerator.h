@@ -46,13 +46,7 @@ namespace Ogre
     *  @{
     */
 
-
-    /** Enumeration of types of data that can be read from textures that are
-    specific to a given layer. Notice that global texture information 
-    such as shadows and terrain normals are not represented
-    here because they are not a per-layer attribute, and blending
-    is stored in packed texture structures which are stored separately.
-    */
+    /// @deprecated do not use
     enum TerrainLayerSamplerSemantic
     {
         /// Albedo colour (diffuse reflectance colour)
@@ -131,11 +125,17 @@ namespace Ogre
     struct _OgreTerrainExport TerrainLayerDeclaration
     {
         TerrainLayerSamplerList samplers;
-        TerrainLayerSamplerElementList elements;
+        OGRE_DEPRECATED TerrainLayerSamplerElementList elements;
 
         bool operator==(const TerrainLayerDeclaration& dcl) const
         {
-            return samplers == dcl.samplers && elements == dcl.elements;
+            return samplers == dcl.samplers;
+        }
+
+        TerrainLayerDeclaration& operator=(const TerrainLayerDeclaration& dcl)
+        {
+            samplers = dcl.samplers;
+            return *this;
         }
     };
 
@@ -210,10 +210,10 @@ namespace Ogre
     
         /** Get the list of profiles that this generator supports.
         */
-        virtual const ProfileList& getProfiles() const { return mProfiles; }
+        OGRE_DEPRECATED virtual const ProfileList& getProfiles() const { return mProfiles; }
 
         /** Set the active profile by name. */
-        virtual void setActiveProfile(const String& name)
+        OGRE_DEPRECATED virtual void setActiveProfile(const String& name)
         {
             if (!mActiveProfile || mActiveProfile->getName() != name)
             {
@@ -265,7 +265,7 @@ namespace Ogre
             to be flexible to generate materials for other declarations too, it 
             can specify here. 
         */
-        virtual bool canGenerateUsingDeclaration(const TerrainLayerDeclaration& decl)
+        OGRE_DEPRECATED virtual bool canGenerateUsingDeclaration(const TerrainLayerDeclaration& decl)
         {
             return decl == mLayerDecl;
         }

@@ -59,16 +59,6 @@ namespace Ogre
         mLayerDecl.samplers.push_back(TerrainLayerSampler("albedo_specular", PF_BYTE_RGBA));
         mLayerDecl.samplers.push_back(TerrainLayerSampler("normal_height", PF_BYTE_RGBA));
         
-        mLayerDecl.elements.push_back(
-            TerrainLayerSamplerElement(0, TLSS_ALBEDO, 0, 3));
-        mLayerDecl.elements.push_back(
-            TerrainLayerSamplerElement(0, TLSS_SPECULAR, 3, 1));
-        mLayerDecl.elements.push_back(
-            TerrainLayerSamplerElement(1, TLSS_NORMAL, 0, 3));
-        mLayerDecl.elements.push_back(
-            TerrainLayerSamplerElement(1, TLSS_HEIGHT, 3, 1));
-
-
         mProfiles.push_back(OGRE_NEW SM2Profile(this, "SM2", "Profile for rendering on Shader Model 2 capable cards"));
 
         // TODO - check hardware capabilities & use fallbacks if required (more profiles needed)
