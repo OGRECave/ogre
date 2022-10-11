@@ -500,18 +500,8 @@ namespace Ogre
             stream.writeChunkEnd(TERRAINLAYERSAMPLER_CHUNK_ID);
         }
         //  elements
-        uint8 numElems = (uint8)decl.elements.size();
+        uint8 numElems = 0;
         stream.write(&numElems);
-        for (auto elem : decl.elements)
-        {
-            stream.writeChunkBegin(TERRAINLAYERSAMPLERELEMENT_CHUNK_ID, TERRAINLAYERSAMPLERELEMENT_CHUNK_VERSION);
-            stream.write(&elem.source);
-            uint8 sem = (uint8)elem.semantic;
-            stream.write(&sem);
-            stream.write(&elem.elementStart);
-            stream.write(&elem.elementCount);
-            stream.writeChunkEnd(TERRAINLAYERSAMPLERELEMENT_CHUNK_ID);
-        }
         stream.writeChunkEnd(TERRAINLAYERDECLARATION_CHUNK_ID);
     }
     //---------------------------------------------------------------------
@@ -534,21 +524,19 @@ namespace Ogre
             targetdecl.samplers[s].format = (PixelFormat)pixFmt;
             stream.readChunkEnd(TERRAINLAYERSAMPLER_CHUNK_ID);
         }
-        //  elements
+        //  elements are gone, keeping for backward compatibility
         uint8 numElems;
         stream.read(&numElems);
-        targetdecl.elements.resize(numElems);
         for (uint8 e = 0; e < numElems; ++e)
         {
             if (!stream.readChunkBegin(TERRAINLAYERSAMPLERELEMENT_CHUNK_ID, TERRAINLAYERSAMPLERELEMENT_CHUNK_VERSION))
                 return false;
 
-            stream.read(&(targetdecl.elements[e].source));
-            uint8 sem;
-            stream.read(&sem);
-            targetdecl.elements[e].semantic = (TerrainLayerSamplerSemantic)sem;
-            stream.read(&(targetdecl.elements[e].elementStart));
-            stream.read(&(targetdecl.elements[e].elementCount));
+            uint8 unused;
+            stream.read(&unused); // source
+            stream.read(&unused); // semantic
+            stream.read(&unused); // start
+            stream.read(&unused); // count
             stream.readChunkEnd(TERRAINLAYERSAMPLERELEMENT_CHUNK_ID);
         }
         stream.readChunkEnd(TERRAINLAYERDECLARATION_CHUNK_ID);
@@ -2501,17 +2489,8 @@ namespace Ogre
     {
         for (auto & layer : mLayers)
         {
-            // If we're missing sampler entries compared to the declaration, initialise them
-            for (size_t i = layer.textureNames.size(); i < mLayerDecl.samplers.size(); ++i)
-            {
-                layer.textureNames.push_back(BLANKSTRING);
-            }
-
-            // if we have too many layers for the declaration, trim them
-            if (layer.textureNames.size() > mLayerDecl.samplers.size())
-            {
-                layer.textureNames.resize(mLayerDecl.samplers.size());
-            }
+            // adjust number of textureNames to number declared samplers
+            layer.textureNames.resize(mLayerDecl.samplers.size());
         }
 
         if (includeGPUResources)
@@ -2529,7 +2508,7 @@ namespace Ogre
             mMaterialGenerator = TerrainGlobalOptions::getSingleton().getDefaultMaterialGenerator();
         }
 
-        if (mLayerDecl.elements.empty())
+        if (mLayerDecl.samplers.empty())
         {
             // default the declaration
             mLayerDecl = mMaterialGenerator->getLayerDeclaration();
