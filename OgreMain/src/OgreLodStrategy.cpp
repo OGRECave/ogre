@@ -101,15 +101,14 @@ namespace Ogre {
     //---------------------------------------------------------------------
     ushort LodStrategy::getIndexAscending(Real value, const Mesh::MeshLodUsageList& meshLodUsageList)
     {
-        Mesh::MeshLodUsageList::const_iterator i, iend;
-        iend = meshLodUsageList.end();
         ushort index = 0;
-        for (i = meshLodUsageList.begin(); i != iend; ++i, ++index)
+        for (auto& m : meshLodUsageList)
         {
-            if (i->value > value)
+            if (m.value > value)
             {
                 return index ? index - 1 : 0;
             }
+            ++index;
         }
 
         // If we fall all the way through, use the highest value
@@ -118,15 +117,14 @@ namespace Ogre {
     //---------------------------------------------------------------------
     ushort LodStrategy::getIndexDescending(Real value, const Mesh::MeshLodUsageList& meshLodUsageList)
     {
-        Mesh::MeshLodUsageList::const_iterator i, iend;
-        iend = meshLodUsageList.end();
         ushort index = 0;
-        for (i = meshLodUsageList.begin(); i != iend; ++i, ++index)
+        for (auto& m : meshLodUsageList)
         {
-            if (i->value < value)
+            if (m.value < value)
             {
                 return index ? index - 1 : 0;
             }
+            ++index;
         }
 
         // If we fall all the way through, use the highest value
@@ -135,15 +133,14 @@ namespace Ogre {
     //---------------------------------------------------------------------
     ushort LodStrategy::getIndexAscending(Real value, const Material::LodValueList& materialLodValueList)
     {
-        Material::LodValueList::const_iterator i, iend;
-        iend = materialLodValueList.end();
         unsigned short index = 0;
-        for (i = materialLodValueList.begin(); i != iend; ++i, ++index)
+        for (auto& m : materialLodValueList)
         {
-            if (*i > value)
+            if (m > value)
             {
                 return index ? index - 1 : 0;
             }
+            ++index;
         }
 
         // If we fall all the way through, use the highest value
@@ -152,19 +149,17 @@ namespace Ogre {
     //---------------------------------------------------------------------
     ushort LodStrategy::getIndexDescending(Real value, const Material::LodValueList& materialLodValueList)
     {
-        Material::LodValueList::const_iterator i, iend;
-        iend = materialLodValueList.end();
         unsigned short index = 0;
-        for (i = materialLodValueList.begin(); i != iend; ++i, ++index)
+        for (auto& m : materialLodValueList)
         {
-            if (*i < value)
+            if (m < value)
             {
                 return index ? index - 1 : 0;
             }
+            ++index;
         }
 
         // If we fall all the way through, use the highest value
         return static_cast<ushort>(materialLodValueList.size() - 1);
     }
-
 } // namespace
