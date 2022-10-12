@@ -1862,7 +1862,7 @@ namespace Ogre
     {
         for (auto *l : mListeners)
         {
-            l->materialEventRaised(this, event, skip, mat);        
+            l->materialEventRaised(this, event, skip, mat);
             if (skip)
                 break;
         }       
