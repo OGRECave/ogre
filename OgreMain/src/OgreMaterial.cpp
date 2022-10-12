@@ -239,7 +239,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     Technique* Material::getTechnique(const String& name) const
     {
-        Technique* foundTechnique = 0; 
+        Technique* foundTechnique = 0;
         // iterate through techniques to find a match
         for (auto *t : mTechniques)
         {
