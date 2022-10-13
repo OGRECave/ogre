@@ -288,6 +288,13 @@ namespace Ogre
                     lod1RenderState->addSubRenderStateInstance(pssm);
                 }
                 lod1RenderState->acquirePrograms(pass);
+                for (auto srs : lod1RenderState->getSubRenderStates())
+                {
+                    if (srs->getType() == "TerrainTransform")
+                    {
+                        srs->updateGpuProgramsParams(NULL, NULL, NULL, NULL);
+                    }
+                }
             }
             catch(const Exception& e)
             {
