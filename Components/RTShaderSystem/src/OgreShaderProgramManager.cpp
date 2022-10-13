@@ -126,13 +126,7 @@ void ProgramManager::createGpuPrograms(ProgramSet* programSet)
     // Before we start we need to make sure that the pixel shader input
     //  parameters are the same as the vertex output, this required by 
     //  shader models 4 and 5.
-    // This change may incrase the number of register used in older shader
-    //  models - this is why the check is present here.
-    bool isVs4 = GpuProgramManager::getSingleton().isSyntaxSupported("vs_4_0_level_9_1");
-    if (isVs4)
-    {
-        synchronizePixelnToBeVertexOut(programSet);
-    }
+    matchVStoPSInterface(programSet);
 
     // Grab the matching writer.
     const String& language = ShaderGenerator::getSingleton().getTargetLanguage();
@@ -306,7 +300,7 @@ void ProgramManager::removeProgramProcessor(const String& lang)
 }
 
 //-----------------------------------------------------------------------
-void ProgramManager::synchronizePixelnToBeVertexOut( ProgramSet* programSet )
+void ProgramManager::matchVStoPSInterface( ProgramSet* programSet )
 {
     Function* vertexMain = programSet->getCpuProgram(GPT_VERTEX_PROGRAM)->getMain();
     Function* pixelMain = programSet->getCpuProgram(GPT_FRAGMENT_PROGRAM)->getMain();
