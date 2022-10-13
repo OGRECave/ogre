@@ -167,7 +167,7 @@ private:
     size_t getShaderCount(GpuProgramType type) const;
 
     /** Fix the input of the pixel shader to be the same as the output of the vertex shader */
-    void synchronizePixelnToBeVertexOut(ProgramSet* programSet);
+    void matchVStoPSInterface(ProgramSet* programSet);
 
     // Map between target language and shader program processor.    
     ProgramProcessorMap mProgramProcessorsMap;
