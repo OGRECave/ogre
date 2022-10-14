@@ -277,10 +277,9 @@ namespace Ogre
                 writeValue(StringConverter::toString(rule.caseSensitive));
             }
             // Iterate over passes
-            Technique::Passes::const_iterator i;
-            for(i = pTech->getPasses().begin(); i != pTech->getPasses().end(); ++i)
+            for(auto& p : pTech->getPasses())
             {
-                writePass(*i);
+                writePass(p);
                 mBuffer += "\n";
             }
 
@@ -775,10 +774,9 @@ namespace Ogre
             }
 
             // Nested texture layers
-            Pass::TextureUnitStates::const_iterator it;
-            for(it = pPass->getTextureUnitStates().begin(); it != pPass->getTextureUnitStates().end(); ++it)
+            for(auto& s : pPass->getTextureUnitStates())
             {
-                writeTextureUnit(*it);
+                writeTextureUnit(s);
             }
 
             // Fire write end event.
@@ -1862,45 +1860,33 @@ namespace Ogre
     //---------------------------------------------------------------------
     void MaterialSerializer::fireMaterialEvent(SerializeEvent event, bool& skip, const Material* mat)
     {
-        ListenerListIterator it    = mListeners.begin();
-        ListenerListIterator itEnd = mListeners.end();
-
-        while (it != itEnd)
+        for (auto *l : mListeners)
         {
-            (*it)->materialEventRaised(this, event, skip, mat);         
+            l->materialEventRaised(this, event, skip, mat);
             if (skip)
                 break;
-            ++it;
         }       
     }
 
     //---------------------------------------------------------------------
     void MaterialSerializer::fireTechniqueEvent(SerializeEvent event, bool& skip, const Technique* tech)
     {
-        ListenerListIterator it    = mListeners.begin();
-        ListenerListIterator itEnd = mListeners.end();
-
-        while (it != itEnd)
+        for (auto *l : mListeners)
         {
-            (*it)->techniqueEventRaised(this, event, skip, tech);
+            l->techniqueEventRaised(this, event, skip, tech);
             if (skip)
                 break;
-            ++it;
         }
     }
 
     //---------------------------------------------------------------------
     void MaterialSerializer::firePassEvent(SerializeEvent event, bool& skip, const Pass* pass)
     {
-        ListenerListIterator it    = mListeners.begin();
-        ListenerListIterator itEnd = mListeners.end();
-
-        while (it != itEnd)
+        for (auto *l : mListeners)
         {
-            (*it)->passEventRaised(this, event, skip, pass);
+            l->passEventRaised(this, event, skip, pass);
             if (skip)
                 break;
-            ++it;
         }
     }
 
@@ -1911,15 +1897,11 @@ namespace Ogre
         const GpuProgramParametersSharedPtr& params,
         GpuProgramParameters* defaultParams)
     {
-        ListenerListIterator it    = mListeners.begin();
-        ListenerListIterator itEnd = mListeners.end();
-
-        while (it != itEnd)
+        for (auto *l : mListeners)
         {
-            (*it)->gpuProgramRefEventRaised(this, event, skip, attrib, program, params, defaultParams);
+            l->gpuProgramRefEventRaised(this, event, skip, attrib, program, params, defaultParams);
             if (skip)
                 break;
-            ++it;
         }
     }   
 
@@ -1927,15 +1909,11 @@ namespace Ogre
     void MaterialSerializer::fireTextureUnitStateEvent(SerializeEvent event, bool& skip,
         const TextureUnitState* textureUnit)
     {
-        ListenerListIterator it    = mListeners.begin();
-        ListenerListIterator itEnd = mListeners.end();
-
-        while (it != itEnd)
+        for (auto *l : mListeners)
         {
-            (*it)->textureUnitStateEventRaised(this, event, skip, textureUnit);
+            l->textureUnitStateEventRaised(this, event, skip, textureUnit);
             if (skip)
                 break;
-            ++it;
         }
     }   
 }

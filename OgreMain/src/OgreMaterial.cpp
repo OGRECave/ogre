@@ -83,15 +83,13 @@ namespace Ogre {
 
         // Copy Techniques
         this->removeAllTechniques();
-        Techniques::const_iterator i, iend;
-        iend = rhs.mTechniques.end();
-        for(i = rhs.mTechniques.begin(); i != iend; ++i)
+        for(auto *t : rhs.mTechniques)
         {
-            Technique* t = this->createTechnique();
-            *t = *(*i);
-            if ((*i)->isSupported())
+            Technique* tech = this->createTechnique();
+            *tech = *t;
+            if (t->isSupported())
             {
-                insertSupportedTechnique(t);
+                insertSupportedTechnique(tech);
             }
         }
 
@@ -114,36 +112,28 @@ namespace Ogre {
         // compile if required
         if (mCompilationRequired)
             compile();
-
         // Load all supported techniques
-        Techniques::iterator i, iend;
-        iend = mSupportedTechniques.end();
-        for (i = mSupportedTechniques.begin(); i != iend; ++i)
+        for (auto *t : mSupportedTechniques)
         {
-            (*i)->_prepare();
+            t->_prepare();
         }
     }
     //-----------------------------------------------------------------------
     void Material::unprepareImpl(void)
     {
         // Load all supported techniques
-        Techniques::iterator i, iend;
-        iend = mSupportedTechniques.end();
-        for (i = mSupportedTechniques.begin(); i != iend; ++i)
+        for (auto *t : mSupportedTechniques)
         {
-            (*i)->_unprepare();
+            t->_unprepare();
         }
     }
     //-----------------------------------------------------------------------
     void Material::loadImpl(void)
     {
-
         // Load all supported techniques
-        Techniques::iterator i, iend;
-        iend = mSupportedTechniques.end();
-        for (i = mSupportedTechniques.begin(); i != iend; ++i)
+        for (auto *t : mSupportedTechniques)
         {
-            (*i)->_load();
+            t->_load();
         }
 
     }
@@ -151,11 +141,9 @@ namespace Ogre {
     void Material::unloadImpl(void)
     {
         // Unload all supported techniques
-        Techniques::iterator i, iend;
-        iend = mSupportedTechniques.end();
-        for (i = mSupportedTechniques.begin(); i != iend; ++i)
+        for (auto *t : mSupportedTechniques)
         {
-            (*i)->_unload();
+            t->_unload();
         }
     }
     //-----------------------------------------------------------------------
@@ -251,19 +239,15 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     Technique* Material::getTechnique(const String& name) const
     {
-        Techniques::const_iterator i    = mTechniques.begin();
-        Techniques::const_iterator iend = mTechniques.end();
         Technique* foundTechnique = 0;
-
         // iterate through techniques to find a match
-        while (i != iend)
+        for (auto *t : mTechniques)
         {
-            if ( (*i)->getName() == name )
+            if (t->getName() == name)
             {
-                foundTechnique = (*i);
+                foundTechnique = t;
                 break;
             }
-            ++i;
         }
 
         return foundTechnique;
@@ -377,11 +361,9 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void Material::removeAllTechniques(void)
     {
-        Techniques::iterator i, iend;
-        iend = mTechniques.end();
-        for (i = mTechniques.begin(); i != iend; ++i)
+        for (auto *t : mTechniques)
         {
-            OGRE_DELETE(*i);
+            OGRE_DELETE t;
         }
         mTechniques.clear();
         clearBestTechniqueList();
@@ -400,11 +382,9 @@ namespace Ogre {
     bool Material::isTransparent(void) const
     {
         // Check each technique
-        Techniques::const_iterator i, iend;
-        iend = mTechniques.end();
-        for (i = mTechniques.begin(); i != iend; ++i)
+        for (auto *t : mTechniques)
         {
-            if ( (*i)->isTransparent() )
+            if (t->isTransparent())
                 return true;
         }
         return false;
@@ -416,28 +396,26 @@ namespace Ogre {
         clearBestTechniqueList();
         mUnsupportedReasons.clear();
 
-
-        Techniques::iterator i, iend;
-        iend = mTechniques.end();
         size_t techNo = 0;
-        for (i = mTechniques.begin(); i != iend; ++i, ++techNo)
+        for (auto *t : mTechniques)
         {
-            String compileMessages = (*i)->_compile(autoManageTextureUnits);
-            if ( (*i)->isSupported() )
+            String compileMessages = t->_compile(autoManageTextureUnits);
+            if (t->isSupported())
             {
-                insertSupportedTechnique(*i);
+                insertSupportedTechnique(t);
             }
             else
             {
                 // Log informational
                 StringStream str;
                 str << "Material " << mName << " Technique " << techNo;
-                if (!(*i)->getName().empty())
-                    str << "(" << (*i)->getName() << ")";
+                if (!t->getName().empty())
+                    str << "(" << t->getName() << ")";
                 str << " is not supported. " << compileMessages;
                 LogManager::getSingleton().logMessage(str.str(), LML_TRIVIAL);
                 mUnsupportedReasons += compileMessages;
             }
+            ++techNo;
         }
 
         mCompilationRequired = false;
@@ -559,21 +537,18 @@ namespace Ogre {
     void Material::setLodLevels(const LodValueList& lodValues)
     {
         // Square the distances for the internal list
-        LodValueList::const_iterator i, iend;
-        iend = lodValues.end();
         // First, clear and add single zero entry
         mLodValues.clear();
         mUserLodValues.clear();
         mUserLodValues.push_back(0);
         if (mLodStrategy)
             mLodValues.push_back(mLodStrategy->getBaseValue());
-        for (i = lodValues.begin(); i != iend; ++i)
+        for (auto& v : lodValues)
         {
-            mUserLodValues.push_back(*i);
+            mUserLodValues.push_back(v);
             if (mLodStrategy)
-                mLodValues.push_back(mLodStrategy->transformUserValue(*i));
+                mLodValues.push_back(mLodStrategy->transformUserValue(v));
         }
-        
     }
     // --------------------------------------------------------------------
     ushort Material::getLodIndex(Real value) const
