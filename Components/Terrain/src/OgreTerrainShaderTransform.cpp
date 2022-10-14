@@ -30,18 +30,12 @@ bool TerrainTransform::preAddToRenderState(const RenderState* renderState, Pass*
     return true;
 }
 
-void TerrainTransform::updateGpuProgramsParams(Renderable* rend, const Pass* pass,
-                                               const AutoParamDataSource* source,
-                                               const LightList* pLightList)
+void TerrainTransform::updateParams()
 {
-    if(!mPointTrans || mConstParamsSet)
-        return;
-
     mPointTrans->setGpuParameter(mTerrain->getPointTransform());
 
     float baseUVScale = 1.0f / (mTerrain->getSize() - 1);
     mBaseUVScale->setGpuParameter(baseUVScale);
-    mConstParamsSet = true;
 }
 
 //-----------------------------------------------------------------------

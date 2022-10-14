@@ -251,7 +251,6 @@ namespace Ogre
         }
 
         addTechnique(mat, terrain, HIGH_LOD);
-        updateParams(mat, terrain);
 
         // LOD
         if(mCompositeMapEnabled)
@@ -288,13 +287,6 @@ namespace Ogre
                     lod1RenderState->addSubRenderStateInstance(pssm);
                 }
                 lod1RenderState->acquirePrograms(pass);
-                for (auto srs : lod1RenderState->getSubRenderStates())
-                {
-                    if (srs->getType() == "TerrainTransform")
-                    {
-                        srs->updateGpuProgramsParams(NULL, NULL, NULL, NULL);
-                    }
-                }
             }
             catch(const Exception& e)
             {
@@ -306,6 +298,8 @@ namespace Ogre
 
             mat->setLodLevels({TerrainGlobalOptions::getSingleton().getCompositeMapDistance()});
         }
+
+        updateParams(mat, terrain);
 
         return mat;
     }
@@ -434,6 +428,20 @@ namespace Ogre
         Pass* p = mat->getTechnique(0)->getPass(0);
         mShaderGen->updateVpParams(this, terrain, HIGH_LOD, p->getVertexProgramParameters());
         mShaderGen->updateFpParams(this, terrain, HIGH_LOD, p->getFragmentProgramParameters());
+
+        if(!isCompositeMapEnabled())
+            return;
+
+        using namespace RTShader;
+        auto lod1RenderState = any_cast<TargetRenderStatePtr>(
+            mat->getTechnique(1)->getPass(0)->getUserObjectBindings().getUserAny(TargetRenderState::UserKey));
+        for (auto srs : lod1RenderState->getSubRenderStates())
+        {
+            if (auto transform = dynamic_cast<TerrainTransform*>(srs))
+            {
+                transform->updateParams();
+            }
+        }
     }
     //---------------------------------------------------------------------
     void TerrainMaterialGeneratorA::SM2Profile::updateParamsForCompositeMap(const MaterialPtr& mat, const Terrain* terrain)
