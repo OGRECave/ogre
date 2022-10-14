@@ -480,7 +480,7 @@ namespace Ogre {
         mContentTypeLookupBuilt = false;
     }
     //-----------------------------------------------------------------------
-    void Pass::_getBlendFlags(SceneBlendType type, SceneBlendFactor& source, SceneBlendFactor& dest)
+    static void _getBlendFlags(SceneBlendType type, SceneBlendFactor& source, SceneBlendFactor& dest)
     {
         switch ( type )
         {
@@ -500,16 +500,12 @@ namespace Ogre {
             source = SBF_ONE;
             dest = SBF_ONE;
             return;
+        default:
         case SBT_REPLACE:
             source = SBF_ONE;
             dest = SBF_ZERO;
             return;
         }
-
-        // Default to SBT_REPLACE
-
-        source = SBF_ONE;
-        dest = SBF_ZERO;
     }
     //-----------------------------------------------------------------------
     void Pass::setSceneBlending(SceneBlendType sbt)

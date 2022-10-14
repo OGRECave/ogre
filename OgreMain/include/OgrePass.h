@@ -245,9 +245,6 @@ namespace Ogre {
         Light::LightTypes mOnlyLightType;
         FogMode mFogMode;
 
-        /// Used to get scene blending flags from a blending type
-        void _getBlendFlags(SceneBlendType type, SceneBlendFactor& source, SceneBlendFactor& dest);
-
     public:
         typedef std::set<Pass*> PassSet;
     private:
