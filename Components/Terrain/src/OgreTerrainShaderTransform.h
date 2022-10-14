@@ -22,13 +22,12 @@ public:
     void copyFrom(const SubRenderState& rhs) override {}
     bool createCpuSubPrograms(RTShader::ProgramSet* programSet) override;
     bool preAddToRenderState(const RTShader::RenderState* renderState, Pass* srcPass, Pass* dstPass) override;
-    void updateGpuProgramsParams(Renderable* rend, const Pass* pass, const AutoParamDataSource* source, const LightList* pLightList) override;
+    void updateParams();
 
     static String Type;
 private:
     const Terrain* mTerrain;
     bool mCompressed = false;
-    bool mConstParamsSet = false;
     Terrain::Alignment mAlign = Terrain::ALIGN_X_Z;
     RTShader::UniformParameterPtr mPointTrans;
     RTShader::UniformParameterPtr mBaseUVScale;
