@@ -307,7 +307,7 @@ namespace Ogre {
             unsigned int n = 0;
             for (const auto *e : mSubEntityList)
             {
-                newEnt->getSubEntity(n)->setMaterialName(e->getMaterialName());
+                newEnt->getSubEntities()[n++]->setMaterialName(e->getMaterialName());
             }
             if (mAnimationState)
             {
