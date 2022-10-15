@@ -308,8 +308,6 @@ namespace Ogre
     std::pair<bool, Real> Math::intersects(const Ray& ray, 
         const std::vector<Plane>& planes, bool normalIsOutside)
     {
-        std::vector<Plane>::const_iterator planeit, planeitend;
-        planeitend = planes.end();
         bool allInside = true;
         std::pair<bool, Real> ret;
         std::pair<bool, Real> end;
@@ -318,15 +316,12 @@ namespace Ogre
         end.first = false;
         end.second = 0;
 
-
         // derive side
         // NB we don't pass directly since that would require Plane::Side in 
         // interface, which results in recursive includes since Math is so fundamental
         Plane::Side outside = normalIsOutside ? Plane::POSITIVE_SIDE : Plane::NEGATIVE_SIDE;
-
-        for (planeit = planes.begin(); planeit != planeitend; ++planeit)
+        for (auto& plane : planes)
         {
-            const Plane& plane = *planeit;
             // is origin outside?
             if (plane.getSide(ray.getOrigin()) == outside)
             {
