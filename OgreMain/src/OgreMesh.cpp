@@ -306,10 +306,9 @@ namespace Ogre {
         newMesh->mIndexBufferShadowBuffer = mIndexBufferShadowBuffer;
 
         // Copy submeshes first
-        std::vector<SubMesh*>::iterator subi;
-        for (subi = mSubMeshList.begin(); subi != mSubMeshList.end(); ++subi)
+        for (auto *subi : mSubMeshList)
         {
-            (*subi)->clone("", newMesh.get());
+            subi->clone("", newMesh.get());
         }
 
         // Copy shared geometry and index map, if any
@@ -338,17 +337,17 @@ namespace Ogre {
         newMesh->mMeshLodUsageList = mMeshLodUsageList;
 #endif
         // Unreference edge lists, otherwise we'll delete the same lot twice, build on demand
-        MeshLodUsageList::iterator lodi, lodOldi;
+        MeshLodUsageList::iterator lodOldi;
         lodOldi = mMeshLodUsageList.begin();
-        for (lodi = newMesh->mMeshLodUsageList.begin(); lodi != newMesh->mMeshLodUsageList.end(); ++lodi, ++lodOldi) {
-            MeshLodUsage& newLod = *lodi;
+        for (auto& lodi : newMesh->mMeshLodUsageList) {
             MeshLodUsage& lod = *lodOldi;
-            newLod.manualName = lod.manualName;
-            newLod.userValue = lod.userValue;
-            newLod.value = lod.value;
+            lodi.manualName = lod.manualName;
+            lodi.userValue = lod.userValue;
+            lodi.value = lod.value;
             if (lod.edgeData) {
-                newLod.edgeData = lod.edgeData->clone();
+                lodi.edgeData = lod.edgeData->clone();
             }
+            ++lodOldi;
         }
 
         newMesh->mSkeleton = mSkeleton;
@@ -558,11 +557,10 @@ namespace Ogre {
         }
 
         // Merge in any new vertex animations
-        AnimationList::iterator i;
-        for (i = mAnimationsList.begin(); i != mAnimationsList.end(); ++i)
+        for (auto& i : mAnimationsList)
         {
-            Animation* anim = i->second;
             // Create animation at time index 0, default params mean this has weight 1 and is disabled
+            auto anim = i.second;
             const String& animName = anim->getName();
             if (!animSet->hasAnimationState(animName))
             {
@@ -576,7 +574,6 @@ namespace Ogre {
                 animState->setTimePosition(std::min(anim->getLength(), animState->getTimePosition()));
             }
         }
-
     }
     //-----------------------------------------------------------------------
     void Mesh::_updateCompiledBoneAssignments(void)
@@ -584,12 +581,11 @@ namespace Ogre {
         if (mBoneAssignmentsOutOfDate)
             _compileBoneAssignments();
 
-        SubMeshList::iterator i;
-        for (i = mSubMeshList.begin(); i != mSubMeshList.end(); ++i)
+        for (auto *m : mSubMeshList)
         {
-            if ((*i)->mBoneAssignmentsOutOfDate)
+            if (m->mBoneAssignmentsOutOfDate)
             {
-                (*i)->_compileBoneAssignments();
+                m->_compileBoneAssignments();
             }
         }
     }
@@ -720,11 +716,9 @@ namespace Ogre {
         BoneIndexSet usedBoneIndices;
 
         // Collect actually used bones
-        VertexBoneAssignmentList::const_iterator itVBA, itendVBA;
-        itendVBA = boneAssignments.end();
-        for (itVBA = boneAssignments.begin(); itVBA != itendVBA; ++itVBA)
+        for (auto& itVBA : boneAssignments)
         {
-            usedBoneIndices.insert(itVBA->second.boneIndex);
+            usedBoneIndices.insert(itVBA.second.boneIndex);
         }
 
         // Allocate space for index map
@@ -732,13 +726,12 @@ namespace Ogre {
         boneIndexToBlendIndexMap.resize(*usedBoneIndices.rbegin() + 1);
 
         // Make index map between bone index and blend index
-        BoneIndexSet::const_iterator itBoneIndex, itendBoneIndex;
         unsigned short blendIndex = 0;
-        itendBoneIndex = usedBoneIndices.end();
-        for (itBoneIndex = usedBoneIndices.begin(); itBoneIndex != itendBoneIndex; ++itBoneIndex, ++blendIndex)
+        for (auto& itBoneIndex : usedBoneIndices)
         {
-            boneIndexToBlendIndexMap[*itBoneIndex] = blendIndex;
-            blendIndexToBoneIndexMap[blendIndex] = *itBoneIndex;
+            boneIndexToBlendIndexMap[itBoneIndex] = blendIndex;
+            blendIndexToBoneIndexMap[blendIndex] = itBoneIndex;
+            ++blendIndex;
         }
     }
     //---------------------------------------------------------------------
@@ -1046,18 +1039,13 @@ namespace Ogre {
             }
 
             // check submesh vertices
-            SubMeshList::const_iterator itor = mSubMeshList.begin();
-            SubMeshList::const_iterator end  = mSubMeshList.end();
-
-            while( itor != end )
+            for(auto *submesh : mSubMeshList)
             {
-                SubMesh* submesh = *itor;
                 if (!submesh->useSharedVertices && submesh->vertexData)
                 {
                     Real r = _computeBoneBoundingRadiusHelper(submesh->vertexData, submesh->mBoneAssignments, bonePositions, boneChildren);
                     radius = std::max( radius, r );
                 }
-                ++itor;
             }
             if (radius > Real(0))
             {
@@ -1218,11 +1206,9 @@ namespace Ogre {
     {
 #if !OGRE_NO_MESHLOD
         // Remove data from SubMeshes
-        SubMeshList::iterator isub, isubend;
-        isubend = mSubMeshList.end();
-        for (isub = mSubMeshList.begin(); isub != isubend; ++isub)
+        for (auto *isub : mSubMeshList)
         {
-            (*isub)->removeLodLevels();
+            isub->removeLodLevels();
         }
 
         bool edgeListWasBuilt = isEdgeListBuilt();
@@ -1267,14 +1253,10 @@ namespace Ogre {
         if( sharedVertexData )
             mergeAdjacentTexcoords( finalTexCoordSet, texCoordSetToDestroy, sharedVertexData );
 
-        SubMeshList::const_iterator itor = mSubMeshList.begin();
-        SubMeshList::const_iterator end  = mSubMeshList.end();
-
-        while( itor != end )
+        for (auto *s : mSubMeshList)
         {
-            if( !(*itor)->useSharedVertices )
-                mergeAdjacentTexcoords( finalTexCoordSet, texCoordSetToDestroy, (*itor)->vertexData );
-            ++itor;
+            if(!s->useSharedVertices)
+                mergeAdjacentTexcoords (finalTexCoordSet, texCoordSetToDestroy, s->vertexData );
         }
     }
     //---------------------------------------------------------------------
@@ -1454,20 +1436,17 @@ namespace Ogre {
                 // Update poses (some vertices might have been duplicated)
                 // we will just check which vertices have been split and copy
                 // the offset for the original vertex to the corresponding new vertex
-                PoseList::iterator pose_it;
-                for( pose_it = mPoseList.begin(); pose_it != mPoseList.end(); ++pose_it)
+                for (auto *current_pose : mPoseList)
                 {
-                    Pose* current_pose = *pose_it;
                     const Pose::VertexOffsetMap& offset_map = current_pose->getVertexOffsets();
-
-                    for(auto & split : res.vertexSplits)
+                    for(auto& split : res.vertexSplits)
                     {
-                        Pose::VertexOffsetMap::const_iterator found_offset = offset_map.find( split.first );
+                        Pose::VertexOffsetMap::const_iterator found_offset = offset_map.find(split.first);
 
                         // copy the offset
                         if( found_offset != offset_map.end() )
                         {
-                            current_pose->addVertex( split.second, found_offset->second );
+                            current_pose->addVertex (split.second, found_offset->second );
                         }
                     }
                 }
@@ -1518,13 +1497,9 @@ namespace Ogre {
         bool sharedGeometryDone = false;
         bool foundExisting = false;
         bool firstOne = true;
-        SubMeshList::iterator i, iend;
-        iend = mSubMeshList.end();
-        for (i = mSubMeshList.begin(); i != iend; ++i)
+        for (auto *sm : mSubMeshList)
         {
-            SubMesh* sm = *i;
             VertexData* vertexData;
-
             if (sm->useSharedVertices)
             {
                 if (sharedGeometryDone)
@@ -1661,11 +1636,8 @@ namespace Ogre {
                 }
 
                 // Prepare the builder using the submesh information
-                SubMeshList::iterator i, iend;
-                iend = mSubMeshList.end();
-                for (i = mSubMeshList.begin(); i != iend; ++i)
+                for (auto *s : mSubMeshList)
                 {
-                    SubMesh* s = *i;
                     if (s->operationType != RenderOperation::OT_TRIANGLE_FAN && 
                         s->operationType != RenderOperation::OT_TRIANGLE_LIST && 
                         s->operationType != RenderOperation::OT_TRIANGLE_STRIP)
@@ -1738,11 +1710,8 @@ namespace Ogre {
         }
 
         // Prepare the builder using the submesh information
-        SubMeshList::iterator i, iend;
-        iend = mSubMeshList.end();
-        for (i = mSubMeshList.begin(); i != iend; ++i)
+        for (auto *s : mSubMeshList)
         {
-            SubMesh* s = *i;
             if (s->operationType != RenderOperation::OT_TRIANGLE_FAN && 
                 s->operationType != RenderOperation::OT_TRIANGLE_LIST && 
                 s->operationType != RenderOperation::OT_TRIANGLE_STRIP)
@@ -1763,16 +1732,16 @@ namespace Ogre {
             }
         }
 
-            mMeshLodUsageList[0].edgeData = eb.build();
+        mMeshLodUsageList[0].edgeData = eb.build();
 
-#if OGRE_DEBUG_MODE
-            // Override default log
-            Log* log = LogManager::getSingleton().createLog(
-                mName + "_lod0"+
-                "_prepshadow.log", false, false);
-            mMeshLodUsageList[0].edgeData->log(log);
-            // clean up log & close file handle
-            LogManager::getSingleton().destroyLog(log);
+#if OGREUG_MODE
+        // Override default log
+        Log* log = LogManager::getSingleton().createLog(
+            mName + "_lod0"+
+            "_prepshadow.log", false, false);
+        mMeshLodUsageList[0].edgeData->log(log);
+        // clean up log & close file handle
+        LogManager::getSingleton().destroyLog(log);
 #endif
 #endif
         mEdgeListsBuilt = true;
@@ -1784,13 +1753,9 @@ namespace Ogre {
             return;
 #if !OGRE_NO_MESHLOD
         // Loop over LODs
-        MeshLodUsageList::iterator i, iend;
-        iend = mMeshLodUsageList.end();
         unsigned short index = 0;
-        for (i = mMeshLodUsageList.begin(); i != iend; ++i, ++index)
+        for (auto& usage : mMeshLodUsageList)
         {
-            MeshLodUsage& usage = *i;
-
             if (usage.manualName.empty() || index == 0)
             {
                 // Only delete if we own this data
@@ -1798,6 +1763,7 @@ namespace Ogre {
                 OGRE_DELETE usage.edgeData;
             }
             usage.edgeData = NULL;
+            ++index;
         }
 #else
         OGRE_DELETE mMeshLodUsageList[0].edgeData;
@@ -1815,11 +1781,8 @@ namespace Ogre {
         {
             sharedVertexData->prepareForShadowVolume();
         }
-        SubMeshList::iterator i, iend;
-        iend = mSubMeshList.end();
-        for (i = mSubMeshList.begin(); i != iend; ++i)
+        for (auto *s : mSubMeshList)
         {
-            SubMesh* s = *i;
             if (!s->useSharedVertices && 
                 (s->operationType == RenderOperation::OT_TRIANGLE_FAN || 
                 s->operationType == RenderOperation::OT_TRIANGLE_LIST ||
@@ -1860,11 +1823,9 @@ namespace Ogre {
         const Affine3* boneMatrices, const IndexMap& indexMap)
     {
         assert(indexMap.size() <= OGRE_MAX_NUM_BONES);
-        IndexMap::const_iterator it, itend;
-        itend = indexMap.end();
-        for (it = indexMap.begin(); it != itend; ++it)
+        for (auto& i : indexMap)
         {
-            *blendMatrices++ = boneMatrices + *it;
+            *blendMatrices++ = boneMatrices + i;
         }
     }
     //---------------------------------------------------------------------
@@ -2102,24 +2063,23 @@ namespace Ogre {
             }
         }
 
-        SubMeshList::const_iterator si;
-        for (si = mSubMeshList.begin(); si != mSubMeshList.end(); ++si)
+        for (auto *s : mSubMeshList)
         {
             // Dedicated vertices
-            if (!(*si)->useSharedVertices)
+            if (!s->useSharedVertices)
             {
                 for (i = 0;
-                    i < (*si)->vertexData->vertexBufferBinding->getBufferCount();
+                    i < s->vertexData->vertexBufferBinding->getBufferCount();
                     ++i)
                 {
-                    ret += (*si)->vertexData->vertexBufferBinding
+                    ret += s->vertexData->vertexBufferBinding
                         ->getBuffer(i)->getSizeInBytes();
                 }
             }
-            if ((*si)->indexData->indexBuffer)
+            if (s->indexData->indexBuffer)
             {
                 // Index data
-                ret += (*si)->indexData->indexBuffer->getSizeInBytes();
+                ret += s->indexData->indexBuffer->getSizeInBytes();
             }
 
         }
@@ -2314,10 +2274,9 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void Mesh::removeAllAnimations(void)
     {
-        AnimationList::iterator i = mAnimationsList.begin();
-        for (; i != mAnimationsList.end(); ++i)
+        for (auto& a : mAnimationsList)
         {
-            OGRE_DELETE i->second;
+            OGRE_DELETE a.second;
         }
         mAnimationsList.clear();
         mAnimationTypesDirty = true;
