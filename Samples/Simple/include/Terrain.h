@@ -714,8 +714,10 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
 
         setDragLook(true);
 
+#if OGRE_PLATFORM != OGRE_PLATFORM_ANDROID
         MaterialManager::getSingleton().setDefaultTextureFiltering(TFO_ANISOTROPIC);
-        MaterialManager::getSingleton().setDefaultAnisotropy(7);
+        MaterialManager::getSingleton().setDefaultAnisotropy(8);
+#endif
 
         ColourValue fadeColour(0.7, 0.7, 0.8);
         //! [linear_fog]
