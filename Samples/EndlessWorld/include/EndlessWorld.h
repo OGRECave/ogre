@@ -296,9 +296,7 @@ protected:
 			);
 		mCameraNode->setPosition(mTerrainPos+worldCenter);
 		mCameraNode->lookAt(mTerrainPos, Node::TS_PARENT);
-		mCamera->setNearClipDistance(0.1);
-		mCamera->setFarClipDistance(50000);
-
+		mCamera->setNearClipDistance(5);
 		mCamera->setFarClipDistance(0);   // enable infinite far clip distance
 	}
 
