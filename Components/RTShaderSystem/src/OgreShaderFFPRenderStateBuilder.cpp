@@ -35,19 +35,9 @@ namespace RTShader {
 //-----------------------------------------------------------------------------
 void FFPRenderStateBuilder::buildRenderState(ShaderGenerator::SGPass* sgPass, TargetRenderState* renderState)
 {
-    auto& sg = ShaderGenerator::getSingleton();
     RenderState ffpTemplate;
-    ffpTemplate.addTemplateSubRenderState(sg.createSubRenderState(SRS_TRANSFORM));
-    ffpTemplate.addTemplateSubRenderState(sg.createSubRenderState(SRS_VERTEX_COLOUR));
-#ifndef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
-    ffpTemplate.addTemplateSubRenderState(sg.createSubRenderState(SRS_PER_VERTEX_LIGHTING));
-#else
-    ffpTemplate.addTemplateSubRenderState(sg.createSubRenderState(SRS_PER_PIXEL_LIGHTING));
-#endif
-    ffpTemplate.addTemplateSubRenderState(sg.createSubRenderState(SRS_TEXTURING));
-    ffpTemplate.addTemplateSubRenderState(sg.createSubRenderState(SRS_FOG));
-    ffpTemplate.addTemplateSubRenderState(sg.createSubRenderState(SRS_ALPHA_TEST));
-
+    ffpTemplate.addTemplateSubRenderStates(
+        {SRS_TRANSFORM, SRS_VERTEX_COLOUR, SRS_PER_PIXEL_LIGHTING, SRS_TEXTURING, SRS_FOG, SRS_ALPHA_TEST});
     renderState->link(ffpTemplate, sgPass->getSrcPass(), sgPass->getDstPass());
 }
 }

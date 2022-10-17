@@ -68,6 +68,14 @@ const Vector3i& RenderState::getLightCount() const
     return mLightCount;
 }
 
+void RenderState::addTemplateSubRenderStates(const StringVector& srsTypes)
+{
+    for (auto& srsType : srsTypes)
+    {
+        addTemplateSubRenderState(ShaderGenerator::getSingleton().createSubRenderState(srsType));
+    }
+}
+
 //-----------------------------------------------------------------------
 void RenderState::addTemplateSubRenderState(SubRenderState* subRenderState)
 {

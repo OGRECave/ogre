@@ -67,6 +67,9 @@ public:
     */
     void addTemplateSubRenderState(SubRenderState* subRenderState);
 
+    /// Add multiple template sub render states by SRS type
+    void addTemplateSubRenderStates(const StringVector& srsTypes);
+
     /** Remove a sub render state from this render state.
     @param subRenderState The sub render state to remove.
     */
