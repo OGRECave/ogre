@@ -36,8 +36,13 @@ bool CookTorranceLighting::createCpuSubPrograms(ProgramSet* programSet)
     psProgram->addPreprocessorDefines(StringUtil::format("LIGHT_COUNT=%d", mLightCount));
 
     // Resolve texture coordinates.
-    auto vsInTexcoord = vsMain->resolveInputParameter(Parameter::SPC_TEXTURE_COORDINATE0, GCT_FLOAT2);
-    auto vsOutTexcoord = vsMain->resolveOutputParameter(Parameter::SPC_TEXTURE_COORDINATE0, GCT_FLOAT2);
+    auto vsOutTexcoord = vsMain->getOutputParameter(Parameter::SPC_TEXTURE_COORDINATE0, GCT_FLOAT2); // allow override by others
+    ParameterPtr vsInTexcoord;
+    if(!vsOutTexcoord)
+    {
+        vsInTexcoord = vsMain->getInputParameter(Parameter::SPC_TEXTURE_COORDINATE0, GCT_FLOAT2);
+        vsOutTexcoord = vsMain->resolveOutputParameter(Parameter::SPC_TEXTURE_COORDINATE0, GCT_FLOAT2);
+    }
     auto psInTexcoord = psMain->resolveInputParameter(vsOutTexcoord);
 
     // resolve view position
@@ -73,7 +78,8 @@ bool CookTorranceLighting::createCpuSubPrograms(ProgramSet* programSet)
     auto fstage = psMain->getStage(FFP_PS_COLOUR_END + 50);
 
     // Forward texture coordinates
-    vstage.assign(vsInTexcoord, vsOutTexcoord);
+    if(vsInTexcoord)
+        vstage.assign(vsInTexcoord, vsOutTexcoord);
     vstage.callFunction(FFP_FUNC_TRANSFORM, worldViewMatrix, vsInPosition, vsOutViewPos);
 
     // transform normal in VS
