@@ -230,7 +230,7 @@ private:
         mCameraNode->setFixedYawAxis(true);
 
         // our model is quite small, so reduce the clipping planes
-        cam->setNearClipDistance(0.1);
+        cam->setNearClipDistance(1);
         cam->setFarClipDistance(100);
 
         mPivotPitch = 0;
