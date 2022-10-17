@@ -125,7 +125,6 @@ protected:
 
 private:
     friend class ProgramManager;
-    friend class FFPRenderStateBuilder;
 };
 
 /** This is the target render state. This class will hold the actual generated CPU/GPU programs.
@@ -206,7 +205,6 @@ private:
 
 private:
     friend class ProgramManager;
-    friend class FFPRenderStateBuilder;
 };
 
 typedef std::shared_ptr<TargetRenderState> TargetRenderStatePtr;

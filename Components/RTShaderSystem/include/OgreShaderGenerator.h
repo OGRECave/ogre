@@ -854,8 +854,6 @@ private:
     std::unique_ptr<ProgramWriterManager> mProgramWriterManager;
     // File system layer manager.
     FileSystemLayer* mFSLayer;
-    // Fixed Function Render state builder.
-    std::unique_ptr<FFPRenderStateBuilder> mFFPRenderStateBuilder;
     // Material entries map.
     SGMaterialMap mMaterialEntriesMap;
     // Scheme entries map.
@@ -880,7 +878,6 @@ private:
     uint32 ID_RT_SHADER_SYSTEM;
 
     friend class SGPass;
-    friend class FFPRenderStateBuilder;
     friend class SGScriptTranslatorManager;
     friend class SGScriptTranslator;
     friend class SGMaterialSerializerListener;

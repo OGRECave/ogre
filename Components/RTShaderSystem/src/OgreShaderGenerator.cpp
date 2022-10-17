@@ -197,11 +197,6 @@ bool ShaderGenerator::_initialize()
     // Allocate program manager.
     mProgramManager.reset(new ProgramManager);
 
-    // Allocate and initialize FFP render state builder.
-#ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
-    mFFPRenderStateBuilder.reset(new FFPRenderStateBuilder);
-#endif
-
     // Create extensions factories.
     createBuiltinSRSFactories();
 
@@ -339,10 +334,6 @@ void ShaderGenerator::_destroy()
 
     // Destroy extensions factories.
     destroyBuiltinSRSFactories();
-
-#ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
-    mFFPRenderStateBuilder.reset();
-#endif
 
     mProgramManager.reset();
     mProgramWriterManager.reset();
@@ -1445,6 +1436,16 @@ ShaderGenerator::SGPass::~SGPass()
 }
 
 //-----------------------------------------------------------------------------
+#ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
+static void addDefaultSubRenderStates(const TargetRenderStatePtr& renderState, Pass* srcPass, Pass* dstPass)
+{
+    RenderState ffpTemplate;
+    ffpTemplate.addTemplateSubRenderStates(
+        {SRS_TRANSFORM, SRS_VERTEX_COLOUR, SRS_PER_PIXEL_LIGHTING, SRS_TEXTURING, SRS_FOG, SRS_ALPHA_TEST});
+    renderState->link(ffpTemplate, srcPass, dstPass);
+}
+#endif
+
 void ShaderGenerator::SGPass::buildTargetRenderState()
 {   
     if(mSrcPass->isProgrammable() && !mParent->overProgrammablePass() && !isIlluminationPass()) return;
@@ -1485,8 +1486,7 @@ void ShaderGenerator::SGPass::buildTargetRenderState()
     }
 
 #ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
-    // Build the FFP state.
-    FFPRenderStateBuilder::buildRenderState(this, targetRenderState.get());
+    addDefaultSubRenderStates(targetRenderState, mSrcPass, mDstPass);
 #endif
 
     targetRenderState->acquirePrograms(mDstPass);
