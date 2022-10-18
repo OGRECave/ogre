@@ -160,7 +160,7 @@ void evaluateLight(
 
 #if LIGHT_COUNT > 0
 void PBR_Lights(
-#ifdef PSSM_NUM_SPLITS
+#ifdef HAVE_SHADOW_FACTOR
                 in float shadowFactor,
 #endif
                 in vec3 vNormal,
@@ -198,7 +198,7 @@ void PBR_Lights(
         evaluateLight(vNormal, viewPos, lightPos[i], lightColor[i].xyz, pointParams[i], vLightDirView[i], spotParams[i],
                       diffuseColor, f0, roughness, vOutColour);
 
-#ifdef PSSM_NUM_SPLITS
+#ifdef HAVE_SHADOW_FACTOR
         if(i == 0) // directional lights always come first
             vOutColour *= shadowFactor;
 #endif
