@@ -459,5 +459,18 @@ void BinaryOpAtom::writeSourceCode(std::ostream& os, const String& targetLanguag
     os << ";";
 }
 
+void BuiltinFunctionAtom::writeSourceCode(std::ostream& os, const String& targetLanguage) const
+{
+    // find the output operand
+    OperandVector::const_iterator outOp = mOperands.begin();
+    while(outOp->getSemantic() != Operand::OPS_OUT)
+        outOp++;
+
+    writeOperands(os, outOp, mOperands.end());
+    os << "\t=\t" << mFunctionName << "(";
+    writeOperands(os, mOperands.begin(), outOp);
+    os << ");";
+}
+
 }
 }

@@ -309,8 +309,20 @@ class _OgreRTSSExport BinaryOpAtom : public FunctionAtom
 {
     char mOp;
 public:
-    explicit BinaryOpAtom(char op, int groupOrder) : mOp(op) { mGroupExecutionOrder = groupOrder; }
+    BinaryOpAtom(char op, int groupOrder) : mOp(op) { mGroupExecutionOrder = groupOrder; }
     BinaryOpAtom(char op, const In& a, const In& b, const Out& dst, int groupOrder);
+    void writeSourceCode(std::ostream& os, const String& targetLanguage) const override;
+};
+
+/// shorthand for "dst = BUILTIN(args);"
+class _OgreRTSSExport BuiltinFunctionAtom : public FunctionAtom
+{
+public:
+    BuiltinFunctionAtom(const char* builtin, int groupOrder)
+    {
+        mFunctionName = builtin;
+        mGroupExecutionOrder = groupOrder;
+    }
     void writeSourceCode(std::ostream& os, const String& targetLanguage) const override;
 };
 

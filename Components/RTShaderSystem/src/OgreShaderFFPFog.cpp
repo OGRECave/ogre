@@ -112,7 +112,6 @@ bool FFPFog::resolveDependencies(ProgramSet* programSet)
     Program* psProgram = programSet->getCpuProgram(GPT_FRAGMENT_PROGRAM);
 
     vsProgram->addDependency(FFP_LIB_FOG);
-    psProgram->addDependency(FFP_LIB_COMMON);
 
     // Per pixel fog.
     if (mCalcMode == CM_PER_PIXEL)
@@ -180,11 +179,8 @@ bool FFPFog::addFunctionInvocations(ProgramSet* programSet)
         auto vsFogStage = vsMain->getStage(FFP_VS_FOG);
         vsFogStage.callFunction(fogfunc, mVSOutPos, mFogParams, mVSOutFogFactor);
         //! [func_invoc]
-        psMain->getStage(FFP_VS_FOG)
-            .callFunction(FFP_FUNC_LERP, {In(mFogColour), In(mPSOutDiffuse), In(mPSInFogFactor), Out(mPSOutDiffuse)});
+        psMain->getStage(FFP_VS_FOG).callBuiltin("mix", mFogColour, mPSOutDiffuse, mPSInFogFactor, mPSOutDiffuse);
     }
-
-
 
     return true;
 }
