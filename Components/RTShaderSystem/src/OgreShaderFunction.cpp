@@ -186,6 +186,13 @@ void FunctionStageRef::binaryOp(char op, const std::vector<Operand>& params) con
     mParent->addAtomInstance(function);
 }
 
+void FunctionStageRef::callBuiltin(const char* name, const std::vector<Operand>& params) const
+{
+    auto function = new BuiltinFunctionAtom(name, mStage);
+    function->setOperands(params);
+    mParent->addAtomInstance(function);
+}
+
 //-----------------------------------------------------------------------------
 Function::~Function()
 {

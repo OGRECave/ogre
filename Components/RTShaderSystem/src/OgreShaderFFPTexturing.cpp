@@ -219,9 +219,7 @@ bool FFPTexturing::resolveDependencies(ProgramSet* programSet)
     Program* vsProgram = programSet->getCpuProgram(GPT_VERTEX_PROGRAM);
     Program* psProgram = programSet->getCpuProgram(GPT_FRAGMENT_PROGRAM);
 
-    vsProgram->addDependency(FFP_LIB_COMMON);
     vsProgram->addDependency(FFP_LIB_TEXTURING);    
-    psProgram->addDependency(FFP_LIB_COMMON);
     psProgram->addDependency(FFP_LIB_TEXTURING);
     //! [deps_resolve]
     return true;
@@ -450,30 +448,28 @@ void FFPTexturing::addPSBlendInvocations(Function* psMain,
         stage.sub(In(arg1).mask(mask), In(arg2).mask(mask), Out(mPSOutDiffuse).mask(mask));
         break;
     case LBX_BLEND_DIFFUSE_ALPHA:
-        stage.callFunction(FFP_FUNC_LERP, {In(arg2).mask(mask), In(arg1).mask(mask), In(mPSDiffuse).w(),
-                                           Out(mPSOutDiffuse).mask(mask)});
+        stage.callBuiltin(
+            "mix", {In(arg2).mask(mask), In(arg1).mask(mask), In(mPSDiffuse).w(), Out(mPSOutDiffuse).mask(mask)});
         break;
     case LBX_BLEND_TEXTURE_ALPHA:
-        stage.callFunction(FFP_FUNC_LERP, {In(arg2).mask(mask), In(arg1).mask(mask), In(texel).w(),
-                                           Out(mPSOutDiffuse).mask(mask)});
+        stage.callBuiltin("mix",
+                          {In(arg2).mask(mask), In(arg1).mask(mask), In(texel).w(), Out(mPSOutDiffuse).mask(mask)});
         break;
     case LBX_BLEND_CURRENT_ALPHA:
-        stage.callFunction(FFP_FUNC_LERP, {In(arg2).mask(mask), In(arg1).mask(mask),
-                                           In(mPSOutDiffuse).w(),
-                                           Out(mPSOutDiffuse).mask(mask)});
+        stage.callBuiltin(
+            "mix", {In(arg2).mask(mask), In(arg1).mask(mask), In(mPSOutDiffuse).w(), Out(mPSOutDiffuse).mask(mask)});
         break;
     case LBX_BLEND_MANUAL:
-        stage.callFunction(FFP_FUNC_LERP, {In(arg2).mask(mask), In(arg1).mask(mask),
-                                           In(ParameterFactory::createConstParam(blendMode.factor)),
-                                           Out(mPSOutDiffuse).mask(mask)});
+        stage.callBuiltin(
+            "mix", {In(arg2).mask(mask), In(arg1).mask(mask), In(blendMode.factor), Out(mPSOutDiffuse).mask(mask)});
         break;
     case LBX_DOTPRODUCT:
         stage.callFunction(FFP_FUNC_DOTPRODUCT, In(arg2).mask(mask), In(arg1).mask(mask),
                            Out(mPSOutDiffuse).mask(mask));
         break;
     case LBX_BLEND_DIFFUSE_COLOUR:
-        stage.callFunction(FFP_FUNC_LERP, {In(arg2).mask(mask), In(arg1).mask(mask),
-                                           In(mPSDiffuse).mask(mask), Out(mPSOutDiffuse).mask(mask)});
+        stage.callBuiltin("mix", {In(arg2).mask(mask), In(arg1).mask(mask), In(mPSDiffuse).mask(mask),
+                                  Out(mPSOutDiffuse).mask(mask)});
         break;
     }
 }

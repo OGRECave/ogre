@@ -95,7 +95,6 @@ bool HardwareSkinningTechnique::hasScalingShearingSupport()
 bool HardwareSkinningTechnique::resolveDependencies(ProgramSet* programSet)
 {
     Program* vsProgram = programSet->getCpuProgram(GPT_VERTEX_PROGRAM);
-    vsProgram->addDependency(FFP_LIB_COMMON);
     vsProgram->addDependency(FFP_LIB_TRANSFORM);
     if(mDoBoneCalculations)
     {

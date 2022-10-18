@@ -90,6 +90,16 @@ public:
     /// dst = arg0 OP arg1;
     void binaryOp(char op, const std::vector<Operand>& params) const;
 
+    /// shorthand for "dst = BUILTIN(args);"
+    void callBuiltin(const char* name, const std::vector<Operand>& params) const;
+
+    void callBuiltin(const char* name, const In& arg, const Out& ret) const { callBuiltin(name, {arg, ret}); }
+
+    void callBuiltin(const char* name, const In& arg0, const In& arg1, const In& arg2, const Out& ret) const
+    {
+        callBuiltin(name, {arg0, arg1, arg2, ret});
+    }
+
 private:
     uint32 mStage;
     Function* mParent;

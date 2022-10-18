@@ -106,7 +106,7 @@ void GBuffer::addViewPosInvocations(ProgramSet* programSet, const ParameterPtr& 
     if(depthOnly)
     {
         auto far = psProgram->resolveParameter(GpuProgramParameters::ACT_FAR_CLIP_DISTANCE);
-        fstage.callFunction("FFP_Length", viewPos, Out(out).w());
+        fstage.callBuiltin("length", viewPos, Out(out).w());
         fstage.div(In(out).w(), far, Out(out).w());
         return;
     }
@@ -164,7 +164,7 @@ void GBuffer::addNormalInvocations(ProgramSet* programSet, const ParameterPtr& o
         auto vsOutNormal = vsMain->resolveOutputParameter(Parameter::SPC_NORMAL_VIEW_SPACE);
         auto worldViewITMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_NORMAL_MATRIX);
         vstage.callFunction(FFP_FUNC_TRANSFORM, worldViewITMatrix, vsInNormal, vsOutNormal);
-        vstage.callFunction(FFP_FUNC_NORMALIZE, vsOutNormal);
+        vstage.callBuiltin("normalize", vsOutNormal, vsOutNormal);
 
         // pass through
         viewNormal = psMain->resolveInputParameter(vsOutNormal);

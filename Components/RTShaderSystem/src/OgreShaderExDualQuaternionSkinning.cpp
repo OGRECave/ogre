@@ -86,7 +86,7 @@ void DualQuaternionSkinning::addNormalRelatedCalculations(const FunctionStageRef
         // Transform the normal by the adjoint transpose of the blended scaling and shearing matrix
         stage.callFunction(FFP_FUNC_TRANSFORM, mParamTempFloat3x3, mParamInNormal, mParamInNormal);
         // Need to normalize again after transforming the normal
-        stage.callFunction(FFP_FUNC_NORMALIZE, mParamInNormal);
+        stage.callBuiltin("normalize", mParamInNormal, mParamInNormal);
     }
     // Transform the normal according to the dual quaternion
     stage.callFunction(SGX_FUNC_CALCULATE_BLEND_NORMAL, mParamInNormal, mParamBlendDQ, mParamInNormal);

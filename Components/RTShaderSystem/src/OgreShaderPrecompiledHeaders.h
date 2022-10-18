@@ -91,11 +91,6 @@ THE SOFTWARE.
 #include "OgreShaderGLSLProgramWriter.h"
 #include "OgreShaderGLSLESProgramWriter.h"
 
-// Fixed Function Library: Common functions
-#define FFP_FUNC_LERP                               "FFP_Lerp"
-#define FFP_FUNC_DOTPRODUCT                         "FFP_DotProduct"
-#define FFP_FUNC_NORMALIZE                          "FFP_Normalize"
-
 // Fixed Function Library: Transform functions
 #define FFP_LIB_TRANSFORM                           "FFPLib_Transform"
 #define FFP_FUNC_TRANSFORM                          "FFP_Transform"
@@ -112,6 +107,7 @@ THE SOFTWARE.
 #define FFP_FUNC_MODULATEX4                         "FFP_ModulateX4"
 #define FFP_FUNC_ADDSIGNED                          "FFP_AddSigned"
 #define FFP_FUNC_ADDSMOOTH                          "FFP_AddSmooth"
+#define FFP_FUNC_DOTPRODUCT                         "FFP_DotProduct"
 
 // Fixed Function Library: Fog functions
 #define FFP_LIB_FOG                                 "FFPLib_Fog"
