@@ -9,9 +9,10 @@ void transformToTS(in vec3 normal, inout vec3 lightDir, inout vec3 eyeDir)
 #else
     vec3 tangent = vec3(1, 0, 0);
 #endif
-    vec3 binormal = normalize(cross(tangent, normal));
+    normal = normalize(normal);
+    vec3 binormal = cross(tangent, normal);
     // note, now we need to re-cross to derive tangent again because it wasn't orthonormal
-    tangent = normalize(cross(normal, binormal));
+    tangent = cross(normal, binormal);
     // derive final matrix
     mat3 TBN = mtxFromRows(tangent, binormal, normal);
 
