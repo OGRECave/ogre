@@ -188,12 +188,9 @@ bool AdvancedRenderControls::keyPressed(const KeyboardEvent& evt) {
 
         // Search the per pixel sub render state and remove it.
         else {
-            for (auto srs : schemRenderState->getSubRenderStates()) {
-                // This is the per pixel sub render state -> remove it.
-                if (srs->getType() == Ogre::RTShader::SRS_PER_VERTEX_LIGHTING) {
-                    schemRenderState->removeSubRenderState(srs);
-                    break;
-                }
+            if (auto srs = schemRenderState->getSubRenderState(Ogre::RTShader::SRS_PER_VERTEX_LIGHTING))
+            {
+                schemRenderState->removeSubRenderState(srs);
             }
         }
 

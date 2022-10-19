@@ -569,15 +569,9 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
         matProfile->setReceiveDynamicShadowsLowLod(SHADOWS_IN_LOW_LOD_MATERIAL);
 
         RTShader::RenderState* schemRenderState = mShaderGenerator->getRenderState(MSN_SHADERGEN);
-
-        for (auto srs : schemRenderState->getSubRenderStates())
+        if (auto srs = schemRenderState->getSubRenderState(RTShader::SRS_INTEGRATED_PSSM3))
         {
-            // This is the pssm3 sub render state -> remove it.
-            if (dynamic_cast<RTShader::IntegratedPSSM3*>(srs))
-            {
-                schemRenderState->removeSubRenderState(srs);
-                break;
-            }
+            schemRenderState->removeSubRenderState(srs);
         }
 
         if (enabled)

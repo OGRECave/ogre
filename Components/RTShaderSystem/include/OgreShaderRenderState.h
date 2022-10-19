@@ -78,6 +78,9 @@ public:
     /** Get the list of the sub render states composing this render state. */
     const SubRenderStateList& getSubRenderStates() const { return mSubRenderStateList; }
 
+    /// get sub render state by type (uniquely identified) or NULL if not found
+    SubRenderState* getSubRenderState(const String& type) const;
+
     /** 
     Set the light count per light type.
     @param 
