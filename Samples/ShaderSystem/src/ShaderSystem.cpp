@@ -33,6 +33,13 @@ const String MESH_ARRAY[MESH_ARRAY_SIZE] =
     "knot.mesh"
 };
 
+const char* blendModes[] = {"default",     "normal",       "lighten",     "darken",      "multiply",   "average",
+                            "add",         "subtract",     "difference",  "negation",    "exclusion",  "screen",
+                            "overlay",     "hard_light",   "soft_light",  "color_dodge", "color_burn", "linear_dodge",
+                            "linear_burn", "linear_light", "vivid_light", "pin_light",   "hard_mix",   "reflect",
+                            "glow",        "phoenix",      "saturation",  "color",       "luminosity"};
+#define NUM_BLEND_MODES (sizeof(blendModes) / sizeof(blendModes[0]))
+
 //-----------------------------------------------------------------------
 Sample_ShaderSystem::Sample_ShaderSystem() :
     mLayeredBlendingEntity(NULL)
@@ -65,6 +72,7 @@ Sample_ShaderSystem::Sample_ShaderSystem() :
     mBbsFlare = NULL;
     mAddedLotsOfModels = false;
     mNumberOfModelsAdded = 0;
+    mCurrentBlendMode = NUM_BLEND_MODES - 1;
 }
 //-----------------------------------------------------------------------
 Sample_ShaderSystem::~Sample_ShaderSystem()
@@ -474,9 +482,7 @@ void Sample_ShaderSystem::setupUI()
     mModifierValueSlider = mTrayMgr->createThickSlider(TL_RIGHT, MODIFIER_VALUE_SLIDER, "Modifier", 240, 80, 0, 1, 100);
     mModifierValueSlider->setValue(0.0,false);  
     // Update the caption.
-    if(mLayerBlendSubRS)
-        updateLayerBlendingCaption(mLayerBlendSubRS->getBlendMode(1));
-
+    mLayerBlendLabel->setCaption(blendModes[mCurrentBlendMode]);
 #endif
 
     mTrayMgr->showCursor();
@@ -1216,152 +1222,13 @@ void Sample_ShaderSystem::updateTargetObjInfo()
 //-----------------------------------------------------------------------
 void Sample_ShaderSystem::changeTextureLayerBlendMode()
 {
-    LayeredBlending::BlendMode curBlendMode = mLayerBlendSubRS->getBlendMode(1);
-    LayeredBlending::BlendMode nextBlendMode;
-
     // Update the next blend layer mode.
-    if (curBlendMode == LayeredBlending::LB_BlendLuminosity)
-    {
-        nextBlendMode = LayeredBlending::LB_FFPBlend;
-    }
-    else
-    {
-        nextBlendMode = (LayeredBlending::BlendMode)(curBlendMode + 1);
-    }
+    mCurrentBlendMode = (mCurrentBlendMode + 1) % NUM_BLEND_MODES;
 
-    
-    mLayerBlendSubRS->setBlendMode(1, nextBlendMode);
-    mShaderGenerator->invalidateMaterial(MSN_SHADERGEN,
-                                         "RTSS/LayeredBlending", RGN_DEFAULT);
+    mLayerBlendSubRS->setBlendMode(1, blendModes[mCurrentBlendMode]);
+    mShaderGenerator->invalidateMaterial(MSN_SHADERGEN, "RTSS/LayeredBlending", RGN_DEFAULT);
 
-    // Update the caption.
-    updateLayerBlendingCaption(nextBlendMode);
-
-}
-
-//-----------------------------------------------------------------------
-void Sample_ShaderSystem::updateLayerBlendingCaption( LayeredBlending::BlendMode nextBlendMode )
-{
-    switch (nextBlendMode)
-    {
-    case LayeredBlending::LB_FFPBlend:
-        mLayerBlendLabel->setCaption("FFP Blend");
-        break;
-
-    case LayeredBlending::LB_BlendNormal:
-        mLayerBlendLabel->setCaption("Normal");
-        break;
-
-    case LayeredBlending::LB_BlendLighten:  
-        mLayerBlendLabel->setCaption("Lighten");
-        break;
-
-    case LayeredBlending::LB_BlendDarken:
-        mLayerBlendLabel->setCaption("Darken");
-        break;
-
-    case LayeredBlending::LB_BlendMultiply:
-        mLayerBlendLabel->setCaption("Multiply");
-        break;
-
-    case LayeredBlending::LB_BlendAverage:
-        mLayerBlendLabel->setCaption("Average");
-        break;
-
-    case LayeredBlending::LB_BlendAdd:
-        mLayerBlendLabel->setCaption("Add");
-        break;
-
-    case LayeredBlending::LB_BlendSubtract:
-        mLayerBlendLabel->setCaption("Subtract");
-        break;
-
-    case LayeredBlending::LB_BlendDifference:
-        mLayerBlendLabel->setCaption("Difference");
-        break;
-
-    case LayeredBlending::LB_BlendNegation:
-        mLayerBlendLabel->setCaption("Negation");
-        break;
-
-    case LayeredBlending::LB_BlendExclusion:
-        mLayerBlendLabel->setCaption("Exclusion");
-        break;
-
-    case LayeredBlending::LB_BlendScreen:
-        mLayerBlendLabel->setCaption("Screen");
-        break;
-
-    case LayeredBlending::LB_BlendOverlay:
-        mLayerBlendLabel->setCaption("Overlay");
-        break;
-
-    case LayeredBlending::LB_BlendSoftLight:
-        mLayerBlendLabel->setCaption("SoftLight");
-        break;
-
-    case LayeredBlending::LB_BlendHardLight:
-        mLayerBlendLabel->setCaption("HardLight");
-        break;
-
-    case LayeredBlending::LB_BlendColorDodge:
-        mLayerBlendLabel->setCaption("ColorDodge");
-        break;
-
-    case LayeredBlending::LB_BlendColorBurn: 
-        mLayerBlendLabel->setCaption("ColorBurn");
-        break;
-
-    case LayeredBlending::LB_BlendLinearDodge:
-        mLayerBlendLabel->setCaption("LinearDodge");
-        break;
-
-    case LayeredBlending::LB_BlendLinearBurn:
-        mLayerBlendLabel->setCaption("LinearBurn");
-        break;
-
-    case LayeredBlending::LB_BlendLinearLight:
-        mLayerBlendLabel->setCaption("LinearLight");
-        break;
-
-    case LayeredBlending::LB_BlendVividLight:
-        mLayerBlendLabel->setCaption("VividLight");
-        break;
-
-    case LayeredBlending::LB_BlendPinLight:
-        mLayerBlendLabel->setCaption("PinLight");
-        break;
-
-    case LayeredBlending::LB_BlendHardMix:
-        mLayerBlendLabel->setCaption("HardMix");
-        break;
-
-    case LayeredBlending::LB_BlendReflect:
-        mLayerBlendLabel->setCaption("Reflect");
-        break;
-
-    case LayeredBlending::LB_BlendGlow:
-        mLayerBlendLabel->setCaption("Glow");
-        break;
-
-    case LayeredBlending::LB_BlendPhoenix:
-        mLayerBlendLabel->setCaption("Phoenix");
-        break;
-
-    case LayeredBlending::LB_BlendSaturation:
-        mLayerBlendLabel->setCaption("Saturation");
-        break;
-
-    case LayeredBlending::LB_BlendColor:
-        mLayerBlendLabel->setCaption("Color");
-        break;
-
-    case LayeredBlending::LB_BlendLuminosity:
-        mLayerBlendLabel->setCaption("Luminosity");
-        break;
-    default:
-        break;
-    }
+    mLayerBlendLabel->setCaption(blendModes[mCurrentBlendMode]);
 }
 
 //-----------------------------------------------------------------------

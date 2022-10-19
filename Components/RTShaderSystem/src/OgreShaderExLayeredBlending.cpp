@@ -35,6 +35,8 @@ namespace RTShader {
 String LayeredBlending::Type = "LayeredBlendRTSSEx";
 const String SRS_LAYERED_BLENDING = "LayeredBlendRTSSEx";
 
+namespace {
+
  struct BlendModeDescription {
         /* Type of the blend mode */
         LayeredBlending::BlendMode type;
@@ -93,6 +95,59 @@ const SourceModifierDescription _sourceModifiers[(int)LayeredBlending::SM_MaxSou
     { LayeredBlending::SM_Source1InvModulate ,"src1_inverse_modulate"},
     { LayeredBlending::SM_Source2InvModulate ,"src2_inverse_modulate"}
     };
+
+//-----------------------------------------------------------------------
+LayeredBlending::BlendMode stringToBlendMode(const String &strValue)
+{
+    for(const auto & _blendMode : _blendModes)
+    {
+        if (_blendMode.name == strValue)
+        {
+            return _blendMode.type;
+        }
+    }
+    return LayeredBlending::LB_Invalid;
+}
+
+//-----------------------------------------------------------------------
+String blendModeToString(LayeredBlending::BlendMode blendMode)
+{
+    for(const auto & _blendMode : _blendModes)
+    {
+        if (_blendMode.type == blendMode)
+        {
+            return _blendMode.name;
+        }
+    }
+    return "";
+}
+
+//-----------------------------------------------------------------------
+LayeredBlending::SourceModifier stringToSourceModifier(const String &strValue)
+{
+    for(const auto & _sourceModifier : _sourceModifiers)
+    {
+        if (_sourceModifier.name == strValue)
+        {
+            return _sourceModifier.type;
+        }
+    }
+    return LayeredBlending::SM_Invalid;
+}
+
+//-----------------------------------------------------------------------
+String sourceModifierToString(LayeredBlending::SourceModifier modifier)
+{
+    for(const auto & _sourceModifier : _sourceModifiers)
+    {
+        if (_sourceModifier.type == modifier)
+        {
+            return _sourceModifier.name;
+        }
+    }
+    return "";
+}
+}
 //-----------------------------------------------------------------------
 LayeredBlending::LayeredBlending()
 {
@@ -266,6 +321,16 @@ void LayeredBlending::setBlendMode(unsigned short index, BlendMode mode)
     mTextureBlends[index].blendMode = mode;
 }
 
+bool LayeredBlending::setBlendMode(uint16 index, const String& mode)
+{
+    auto blendMode = stringToBlendMode(mode);
+    if (blendMode == LB_Invalid)
+        return false;
+
+    setBlendMode(index, blendMode);
+    return true;
+}
+
 //-----------------------------------------------------------------------
 LayeredBlending::BlendMode LayeredBlending::getBlendMode(unsigned short index) const
 {
@@ -325,14 +390,12 @@ SubRenderState* LayeredBlendingFactory::createInstance(ScriptCompiler* compiler,
         LayeredBlending::BlendMode blendMode = stringToBlendMode(blendType);
         if (blendMode == LayeredBlending::LB_Invalid)
         {
+            StringVector vec;
+            for (const auto& m : _blendModes)
+                vec.push_back(m.name);
+
             compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                "Expected one of the following blend modes: default, normal, " \
-                "lighten, darken, multiply, average, add, " \
-                "subtract, difference, negation, exclusion, " \
-                "screen, overlay, hard_light, soft_light, " \
-                "color_dodge, color_burn, linear_dodge, linear_burn, " \
-                "linear_light, vivid_light, pin_light, hard_mix, " \
-                "reflect, glow, phoenix, saturation, color and luminosity");
+                "Expected one of the following blend modes: " + StringConverter::toString(vec));
             return NULL;
         }
 
@@ -443,58 +506,6 @@ void LayeredBlendingFactory::writeInstance(MaterialSerializer* ser, SubRenderSta
 SubRenderState* LayeredBlendingFactory::createInstanceImpl()
 {
     return OGRE_NEW LayeredBlending;
-}
-
-//-----------------------------------------------------------------------
-LayeredBlending::BlendMode LayeredBlendingFactory::stringToBlendMode(const String &strValue)
-{
-    for(const auto & _blendMode : _blendModes)
-    {
-        if (_blendMode.name == strValue)
-        {
-            return _blendMode.type;
-        }
-    }
-    return LayeredBlending::LB_Invalid;
-}
-
-//-----------------------------------------------------------------------
-String LayeredBlendingFactory::blendModeToString(LayeredBlending::BlendMode blendMode)
-{
-    for(const auto & _blendMode : _blendModes)
-    {
-        if (_blendMode.type == blendMode)
-        {
-            return _blendMode.name;
-        }
-    }
-    return "";
-}
-
-//-----------------------------------------------------------------------
-LayeredBlending::SourceModifier LayeredBlendingFactory::stringToSourceModifier(const String &strValue)
-{
-    for(const auto & _sourceModifier : _sourceModifiers)
-    {
-        if (_sourceModifier.name == strValue)
-        {
-            return _sourceModifier.type;
-        }
-    }
-    return LayeredBlending::SM_Invalid;
-}
-
-//-----------------------------------------------------------------------
-String LayeredBlendingFactory::sourceModifierToString(LayeredBlending::SourceModifier modifier)
-{
-    for(const auto & _sourceModifier : _sourceModifiers)
-    {
-        if (_sourceModifier.type == modifier)
-        {
-            return _sourceModifier.name;
-        }
-    }
-    return "";
 }
 
 //-----------------------------------------------------------------------

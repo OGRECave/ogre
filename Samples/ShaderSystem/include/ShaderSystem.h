@@ -183,9 +183,6 @@ protected:
     /** Change the current texture layer blend mode. */
     void changeTextureLayerBlendMode();
 
-    /** Update layer blend caption. */
-    void updateLayerBlendingCaption( RTShader::LayeredBlending::BlendMode nextBlendMode );
-
     ManualObject* createTextureAtlasObject();
     void createMaterialForTexture( const String & texName, bool isTextureAtlasTexture );
     // Types.
@@ -236,7 +233,8 @@ protected:
     CheckBox*                           mSpotLightCheckBox;     // The spot light check box.
     String                              mExportMaterialPath;    // The path of the export material.
     CheckBox*                           mInstancedViewportsCheckBox; // The instanced viewports check box.
-    CheckBox*                           mAddLotsOfModels; // The "add lots of models" check box.                
+    CheckBox*                           mAddLotsOfModels; // The "add lots of models" check box.
+    int                                 mCurrentBlendMode;
 };
 
 #endif
