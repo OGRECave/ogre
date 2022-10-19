@@ -158,7 +158,8 @@ void DefaultDebugDrawer::drawSceneNode(const SceneNode* node)
     }
     if (mDrawType & DT_AXES)
     {
-        Vector3f hs(aabb.getHalfSize());
+        // remove scale here as it will be in full transform below too
+        Vector3f hs(aabb.getHalfSize() / node->_getDerivedScale());
         float sz = std::min(hs[0], hs[1]);
         sz = std::min(sz, hs[2]);
         sz = std::max(sz, 1.0f);
