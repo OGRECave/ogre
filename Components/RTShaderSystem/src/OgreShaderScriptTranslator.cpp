@@ -57,18 +57,7 @@ SubRenderState* SGScriptTranslator::getGeneratedSubRenderState(const String& typ
 {
     //check if we are in the middle of parsing
     if (mGeneratedRenderState)
-    {
-        /** Get the list of the template sub render states composing this render state. */
-        const SubRenderStateList& rsList = mGeneratedRenderState->getSubRenderStates();
-
-        SubRenderStateList::const_iterator it = rsList.begin();
-        SubRenderStateList::const_iterator itEnd = rsList.end();
-        for(; it != itEnd; ++it)
-        {
-            if ((*it)->getType() == typeName)
-                return *it;
-        }
-    }
+        return mGeneratedRenderState->getSubRenderState(typeName);
     return NULL;
 }
     

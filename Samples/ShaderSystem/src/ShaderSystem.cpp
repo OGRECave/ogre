@@ -331,13 +331,9 @@ void Sample_ShaderSystem::setupContent()
     if (renderState)
     {           
         // Search for the texture layer blend sub state.
-        for (auto curSubRenderState : renderState->getSubRenderStates())
+        if (auto srs = renderState->getSubRenderState(SRS_LAYERED_BLENDING))
         {
-            if (curSubRenderState->getType() == LayeredBlending::Type)
-            {
-                mLayerBlendSubRS = static_cast<LayeredBlending*>(curSubRenderState);
-                break;
-            }
+            mLayerBlendSubRS = static_cast<LayeredBlending*>(srs);
         }
     }
 
@@ -552,30 +548,8 @@ void Sample_ShaderSystem::setPerPixelFogEnable( bool enable )
 
         // Grab the scheme render state.
         RenderState* schemRenderState = mShaderGenerator->getRenderState(MSN_SHADERGEN);
-        const SubRenderStateList& subRenderStateList = schemRenderState->getSubRenderStates();
-        SubRenderStateListConstIterator it = subRenderStateList.begin();
-        SubRenderStateListConstIterator itEnd = subRenderStateList.end();
-        SubRenderState* fogSubRenderState = NULL;
-        
         // Search for the fog sub state.
-        for (; it != itEnd; ++it)
-        {
-            SubRenderState* curSubRenderState = *it;
-
-            if (curSubRenderState->getType() == "FFP_Fog")
-            {
-                fogSubRenderState = curSubRenderState;
-                break;
-            }
-        }
-
-        // Create the fog sub render state if need to.
-        if (fogSubRenderState == NULL)
-        {           
-            fogSubRenderState = mShaderGenerator->createSubRenderState("FFP_Fog");
-            schemRenderState->addTemplateSubRenderState(fogSubRenderState);
-        }
-            
+        auto fogSubRenderState = schemRenderState->getSubRenderState(SRS_FOG);
         
         // Select the desired fog calculation mode.
         fogSubRenderState->setParameter("calc_mode", mPerPixelFogEnable ? "per_pixel" : "per_vertex");
@@ -967,14 +941,9 @@ void Sample_ShaderSystem::applyShadowType(int menuIndex)
         mSceneMgr->setShadowTechnique(SHADOWTYPE_NONE);
 
 #ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
-        for (auto srs : schemRenderState->getSubRenderStates())
+        if (auto srs = schemRenderState->getSubRenderState(SRS_INTEGRATED_PSSM3))
         {
-            // This is the pssm3 sub render state -> remove it.
-            if (dynamic_cast<RTShader::IntegratedPSSM3*>(srs))
-            {
-                schemRenderState->removeSubRenderState(srs);
-                break;
-            }
+            schemRenderState->removeSubRenderState(srs);
         }
 #endif
 

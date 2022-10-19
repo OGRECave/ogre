@@ -435,12 +435,9 @@ namespace Ogre
         using namespace RTShader;
         auto lod1RenderState = any_cast<TargetRenderStatePtr>(
             mat->getTechnique(1)->getPass(0)->getUserObjectBindings().getUserAny(TargetRenderState::UserKey));
-        for (auto srs : lod1RenderState->getSubRenderStates())
+        if (auto transform = lod1RenderState->getSubRenderState("TerrainTransform"))
         {
-            if (auto transform = dynamic_cast<TerrainTransform*>(srs))
-            {
-                transform->updateParams();
-            }
+            static_cast<TerrainTransform*>(transform)->updateParams();
         }
     }
     //---------------------------------------------------------------------
