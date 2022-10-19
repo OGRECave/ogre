@@ -147,6 +147,10 @@ void DefaultDebugDrawer::drawBone(const Node* node)
 }
 void DefaultDebugDrawer::drawSceneNode(const SceneNode* node)
 {
+    // skip drawing root scene node as it contains the camera frustum
+    if(!node->getParent())
+        return;
+
     const auto& aabb = node->_getWorldAABB();
     //Skip all bounding boxes that are infinite.
     if (aabb.isInfinite()) {
