@@ -318,7 +318,7 @@ void Sample_ShaderSystem::setupContent()
     childNode->attachObject(mLayeredBlendingEntity);
 
     // Grab the render state of the material.
-    auto renderState = mShaderGenerator->getRenderState(MSN_SHADERGEN, "RTSS/LayeredBlending", RGN_INTERNAL, 0);
+    auto renderState = mShaderGenerator->getRenderState(MSN_SHADERGEN, "RTSS/LayeredBlending", RGN_DEFAULT, 0);
 
     if (renderState)
     {           
@@ -1232,7 +1232,7 @@ void Sample_ShaderSystem::changeTextureLayerBlendMode()
     
     mLayerBlendSubRS->setBlendMode(1, nextBlendMode);
     mShaderGenerator->invalidateMaterial(MSN_SHADERGEN,
-                                         "RTSS/LayeredBlending", RGN_INTERNAL);
+                                         "RTSS/LayeredBlending", RGN_DEFAULT);
 
     // Update the caption.
     updateLayerBlendingCaption(nextBlendMode);
