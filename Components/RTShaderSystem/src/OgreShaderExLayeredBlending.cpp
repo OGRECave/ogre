@@ -343,6 +343,16 @@ LayeredBlending::BlendMode LayeredBlending::getBlendMode(unsigned short index) c
 
 
 //-----------------------------------------------------------------------
+bool LayeredBlending::setSourceModifier(unsigned short index, const String& modType, int customNum)
+{
+    SourceModifier mod = stringToSourceModifier(modType);
+    if (mod == SM_Invalid)
+        return false;
+
+    setSourceModifier(index, mod, customNum);
+    return true;
+}
+
 void LayeredBlending::setSourceModifier(unsigned short index, SourceModifier modType, int customNum)
 {
     if(mTextureBlends.size() < (size_t)index + 1)
@@ -387,8 +397,7 @@ SubRenderState* LayeredBlendingFactory::createInstance(ScriptCompiler* compiler,
             return NULL;
         }
 
-        LayeredBlending::BlendMode blendMode = stringToBlendMode(blendType);
-        if (blendMode == LayeredBlending::LB_Invalid)
+        if (stringToBlendMode(blendType) == LayeredBlending::LB_Invalid)
         {
             StringVector vec;
             for (const auto& m : _blendModes)
@@ -406,7 +415,7 @@ SubRenderState* LayeredBlendingFactory::createInstance(ScriptCompiler* compiler,
         
         //update the layer sub render state
         unsigned short texIndex = texState->getParent()->getTextureUnitStateIndex(texState);
-        layeredBlendState->setBlendMode(texIndex, blendMode);
+        layeredBlendState->setBlendMode(texIndex, blendType);
 
         return layeredBlendState;
     }
@@ -426,10 +435,9 @@ SubRenderState* LayeredBlendingFactory::createInstance(ScriptCompiler* compiler,
         int customNum;
         
         AbstractNodeList::const_iterator itValue = prop->values.begin();
-        isParseSuccess = SGScriptTranslator::getString(*itValue, &modifierString); 
-        LayeredBlending::SourceModifier modType = stringToSourceModifier(modifierString);
-        isParseSuccess &= modType != LayeredBlending::SM_Invalid;
-        if(isParseSuccess == false)
+        isParseSuccess = SGScriptTranslator::getString(*itValue, &modifierString) &&
+                         stringToSourceModifier(modifierString) != LayeredBlending::SM_Invalid;
+        if (isParseSuccess == false)
         {
             compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line, 
                 "Expected one of the following modifier type as first parameter: " \
@@ -447,8 +455,7 @@ SubRenderState* LayeredBlendingFactory::createInstance(ScriptCompiler* compiler,
             return NULL;
         }
         ++itValue;
-        isParseSuccess = SGScriptTranslator::getInt(*itValue, &customNum); 
-        if(isParseSuccess == false)
+        if(!SGScriptTranslator::getInt(*itValue, &customNum))
         {
             compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line, 
                 "Expected number of custom parameter as third parameter.");
@@ -456,12 +463,11 @@ SubRenderState* LayeredBlendingFactory::createInstance(ScriptCompiler* compiler,
         }
 
         //get the layer blend sub-render state to work on
-        LayeredBlending* layeredBlendState =
-            createOrRetrieveSubRenderState(translator);
-        
+        LayeredBlending* layeredBlendState = createOrRetrieveSubRenderState(translator);
+
         //update the layer sub render state
         unsigned short texIndex = texState->getParent()->getTextureUnitStateIndex(texState);
-        layeredBlendState->setSourceModifier(texIndex, modType, customNum);
+        layeredBlendState->setSourceModifier(texIndex, modifierString, customNum);
 
         return layeredBlendState;
             

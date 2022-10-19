@@ -134,6 +134,9 @@ public:
     */
     void setSourceModifier(unsigned short index, SourceModifier modType, int customNum);
 
+    /// @overload
+    bool setSourceModifier(unsigned short index, const String& modType, int customNum);
+
     /** 
     Returns the source modifier parameters for a given texture unit
     @return True if a valid modifier exist for the given texture unit
