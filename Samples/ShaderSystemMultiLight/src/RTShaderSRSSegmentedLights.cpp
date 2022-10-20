@@ -60,7 +60,6 @@ void RTShaderSRSSegmentedLights::updateGpuProgramsParams(Renderable* rend, const
     if ((mLightParamsList.empty()) && (!mUseSegmentedLightTexture))
         return;
 
-    const Affine3& matWorld = source->getWorldMatrix();
     Light::LightTypes curLightType = Light::LT_DIRECTIONAL; 
     unsigned int curSearchLightIndex = 0;
 
@@ -103,14 +102,14 @@ void RTShaderSRSSegmentedLights::updateGpuProgramsParams(Renderable* rend, const
         case Light::LT_DIRECTIONAL:
 
             // Update light direction.
-            vParameter = matWorld * srcLight->getAs4DVector(true);
+            vParameter = srcLight->getAs4DVector(true);
             curParams.mDirection->setGpuParameter(vParameter.ptr(),3,1);
             break;
 
         case Light::LT_POINT:
 
             // Update light position.
-            vParameter = matWorld * srcLight->getAs4DVector(true);
+            vParameter = srcLight->getAs4DVector(true);
             curParams.mPosition->setGpuParameter(vParameter.ptr(),3,1);
 
             // Update light attenuation parameters.
@@ -122,7 +121,7 @@ void RTShaderSRSSegmentedLights::updateGpuProgramsParams(Renderable* rend, const
                 Ogre::Vector3 vec3;
 
                 // Update light position.
-                vParameter = matWorld * srcLight->getAs4DVector(true);
+                vParameter = srcLight->getAs4DVector(true);
                 curParams.mPosition->setGpuParameter(vParameter.ptr(),3,1);
 
 
