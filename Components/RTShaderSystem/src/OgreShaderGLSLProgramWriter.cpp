@@ -320,6 +320,8 @@ void GLSLProgramWriter::writeInputParameters(std::ostream& os, Function* functio
             }
 
             os << "IN(";
+            if(pParam->isHighP())
+                os << "f32"; // rely on unified shader vor f32vec4 etc.
             os << mGpuConstTypeMap[pParam->getType()];
             os << "\t"; 
             os << paramName;
