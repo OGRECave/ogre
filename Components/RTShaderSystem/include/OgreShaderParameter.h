@@ -375,6 +375,10 @@ public:
     void setUsed(bool used) { mUsed = used; }
     bool isUsed() { return mUsed; }
 
+    /// Is highp needed when using GLSL ES
+    bool isHighP() const { return mIsHighP; }
+    void setHighP(bool highP) { mIsHighP = highP; }
+
 // Attributes.
 protected:
     // Name of this parameter.
@@ -395,6 +399,7 @@ protected:
     size_t mSize;
     
     bool mUsed;
+    bool mIsHighP;
 };
 
 typedef ShaderParameterList::iterator           ShaderParameterIterator;

@@ -160,7 +160,7 @@ namespace RTShader {
     };
 
 //-----------------------------------------------------------------------
-Parameter::Parameter() : mName(""), mType(GCT_UNKNOWN), mSemantic(SPS_UNKNOWN), mIndex(0), mContent(SPC_UNKNOWN), mSize(0), mUsed(false)
+Parameter::Parameter() : mName(""), mType(GCT_UNKNOWN), mSemantic(SPS_UNKNOWN), mIndex(0), mContent(SPC_UNKNOWN), mSize(0), mUsed(false), mIsHighP(false)
 {
 }
 
@@ -168,7 +168,7 @@ Parameter::Parameter() : mName(""), mType(GCT_UNKNOWN), mSemantic(SPS_UNKNOWN), 
 Parameter::Parameter(GpuConstantType type, const String& name, 
             const Semantic& semantic, int index, 
             const Content& content, size_t size) :
-    mName(name), mType(type), mSemantic(semantic), mIndex(index), mContent(content), mSize(size), mUsed(false)
+    mName(name), mType(type), mSemantic(semantic), mIndex(index), mContent(content), mSize(size), mUsed(false), mIsHighP(false)
 {
 }
 
@@ -180,6 +180,7 @@ UniformParameter::UniformParameter(GpuConstantType type, const String& name,
 {
     mIsAutoConstantReal     = false;    
     mIsAutoConstantInt      = false;
+    mIsHighP                = false;
     mAutoConstantIntData    = 0;
     mVariability            = variability;
     mParamsPtr              = NULL;
