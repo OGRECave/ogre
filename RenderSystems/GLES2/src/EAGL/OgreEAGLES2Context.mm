@@ -48,20 +48,20 @@ namespace Ogre {
 
         mDrawable = SAFE_ARC_RETAIN(drawable);
 
-#if OGRE_NO_GLES3_SUPPORT == 0
-        EAGLRenderingAPI renderingAPI = kEAGLRenderingAPIOpenGLES3;
-#else
-        EAGLRenderingAPI renderingAPI = kEAGLRenderingAPIOpenGLES2;
-#endif
-        // If the group argument is not NULL, then we assume that an externally created EAGLSharegroup
-        // is to be used and a context is created using that group.
-        if(group)
+        for(EAGLRenderingAPI renderingAPI : {kEAGLRenderingAPIOpenGLES3, kEAGLRenderingAPIOpenGLES2})
         {
-            mContext = [[EAGLContext alloc] initWithAPI:renderingAPI sharegroup:group];
-        }
-        else
-        {
-            mContext = [[EAGLContext alloc] initWithAPI:renderingAPI];
+            // If the group argument is not NULL, then we assume that an externally created EAGLSharegroup
+            // is to be used and a context is created using that group.
+            if(group)
+            {
+                mContext = [[EAGLContext alloc] initWithAPI:renderingAPI sharegroup:group];
+            }
+            else
+            {
+                mContext = [[EAGLContext alloc] initWithAPI:renderingAPI];
+            }
+            if(mContext)
+                break;
         }
 
         if (!mContext || ![EAGLContext setCurrentContext:mContext])
@@ -122,7 +122,6 @@ namespace Ogre {
         OGRE_CHECK_GL_ERROR(glGetRenderbufferParameteriv(GL_RENDERBUFFER, GL_RENDERBUFFER_HEIGHT, &mBackingHeight));
         OGRE_CHECK_GL_ERROR(glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, mViewRenderbuffer));
 
-#if GL_APPLE_framebuffer_multisample || OGRE_NO_GLES3_SUPPORT == 0
         if(mIsMultiSampleSupported && mNumSamples > 0)
         {
             // Determine how many MSAA samples to use
@@ -162,7 +161,6 @@ namespace Ogre {
             }
         }
         else
-#endif
         {
             OGRE_CHECK_GL_ERROR(glGenRenderbuffers(1, &mDepthRenderbuffer));
             OGRE_CHECK_GL_ERROR(glBindRenderbuffer(GL_RENDERBUFFER, mDepthRenderbuffer));
