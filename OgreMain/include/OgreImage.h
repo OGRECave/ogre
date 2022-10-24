@@ -350,44 +350,44 @@ namespace Ogre {
 
         /** Returns the size of the data buffer in bytes
         */
-        size_t getSize() const;
+        size_t getSize() const { return mBufSize; }
 
         /** Returns the number of mipmaps contained in the image.
         */
-        uint32 getNumMipmaps() const;
+        uint32 getNumMipmaps() const { return mNumMipmaps; }
 
         /** Returns true if the image has the appropriate flag set.
         */
-        bool hasFlag(const ImageFlags imgFlag) const;
+        bool hasFlag(const ImageFlags imgFlag) const { return (mFlags & imgFlag) != 0; }
 
         /** Gets the width of the image in pixels.
         */
-        uint32 getWidth(void) const;
+        uint32 getWidth(void) const { return mWidth; }
 
         /** Gets the height of the image in pixels.
         */
-        uint32 getHeight(void) const;
+        uint32 getHeight(void) const { return mHeight; }
 
         /** Gets the depth of the image.
         */
-        uint32 getDepth(void) const;
+        uint32 getDepth(void) const { return mDepth; }
         
         /** Get the number of faces of the image. This is usually 6 for a cubemap, and
             1 for a normal image.
         */
-        uint32 getNumFaces(void) const;
+        uint32 getNumFaces(void) const { return hasFlag(IF_CUBEMAP) ? 6 : 1; }
 
         /** Gets the physical width in bytes of each row of pixels.
         */
-        size_t getRowSpan(void) const;
+        size_t getRowSpan(void) const { return mWidth * mPixelSize; }
 
         /** Returns the image format.
         */
-        PixelFormat getFormat() const;
+        PixelFormat getFormat() const { return mFormat; }
 
         /** Returns the number of bits per pixel.
         */
-        uchar getBPP() const;
+        uchar getBPP() const { return mPixelSize * 8;}
 
         /** Returns true if the image has an alpha component.
         */
