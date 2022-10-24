@@ -287,6 +287,30 @@ TEST(Image, Combine)
     ASSERT_TRUE(!memcmp(combined.getData(), ref.getData(), ref.getSize()));
 }
 
+TEST(Image, Compressed)
+{
+    Root root;
+    ConfigFile cf;
+    cf.load(FileSystemLayer(OGRE_VERSION_NAME).getConfigFilePath("resources.cfg"));
+    auto testPath = cf.getSettings("Tests").begin()->second;
+
+    Image img;
+#if OGRE_NO_PVRTC_CODEC == 0
+    // 2bpp
+    img.load(Root::openFileStream(testPath+"/ogreborderUp_pvr2.pvr"), "pvr");
+    EXPECT_EQ(img.getFormat(), PF_PVRTC_RGB2);
+    // 2bpp alpha
+    img.load(Root::openFileStream(testPath+"/ogreborderUp_pvr2a.pvr"), "pvr");
+    EXPECT_EQ(img.getFormat(), PF_PVRTC_RGBA2);
+    // 4bpp
+    img.load(Root::openFileStream(testPath+"/ogreborderUp_pvr4.pvr"), "pvr");
+    EXPECT_EQ(img.getFormat(), PF_PVRTC_RGB4);
+    // 4 bpp alpha
+    img.load(Root::openFileStream(testPath+"/ogreborderUp_pvr4a.pvr"), "pvr");
+    EXPECT_EQ(img.getFormat(), PF_PVRTC_RGBA4);
+#endif
+}
+
 struct UsePreviousResourceLoadingListener : public ResourceLoadingListener
 {
     bool resourceCollision(Resource *resource, ResourceManager *resourceManager) override { return false; }
