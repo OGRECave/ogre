@@ -104,11 +104,6 @@ namespace OgreBites
 
     try {
         sb.go();
-
-        Ogre::Root::getSingleton().getRenderSystem()->_initRenderTargets();
-
-        // Clear event times
-        Ogre::Root::getSingleton().clearEventTimes();
     } catch( Ogre::Exception& e ) {
         std::cerr << "An exception has occurred: " <<
         e.getFullDescription().c_str() << std::endl;

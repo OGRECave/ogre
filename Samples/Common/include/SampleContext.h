@@ -121,20 +121,10 @@ namespace OgreBites
         virtual void go(Sample* initialSample = 0)
         {
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
-            createRoot();
-
-            if (!oneTimeConfig()) return;
-
-            if (!mFirstRun) mRoot->setRenderSystem(mRoot->getRenderSystemByName(mNextRenderer));
-
             mLastRun = true;  // assume this is our last run
 
-            setup();
-
-            if (!mFirstRun) recoverLastSample();
-            else if (initialSample) runSample(initialSample);
-
-            mRoot->saveConfig();
+            initApp();
+            loadStartUpSample();
 #else
             while (!mLastRun)
             {

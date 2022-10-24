@@ -207,11 +207,6 @@ class TestContext : public OgreBites::SampleContext
     try {
         tc = new TestContext([arguments count], &argv[0]);
         tc->go();
-
-        Root::getSingleton().getRenderSystem()->_initRenderTargets();
-
-        // Clear event times
-        Root::getSingleton().clearEventTimes();
     } catch( Exception& e ) {
         std::cerr << "An exception has occurred: " <<
             e.getFullDescription().c_str() << std::endl;
