@@ -236,9 +236,8 @@ namespace Ogre {
         void *destPtr = output->getPtr();
         stream->read(destPtr, imgData->size);
 
-        DecodeResult ret;
-        ret.first = output;
-        ret.second = CodecDataPtr(imgData);
+        result.first = output;
+        result.second = CodecDataPtr(imgData);
 
         return true;
     }
