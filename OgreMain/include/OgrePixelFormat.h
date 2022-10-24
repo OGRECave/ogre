@@ -469,7 +469,7 @@ namespace Ogre {
 
                Passing PF_UNKNOWN will result in returning a size of 0 bytes.
         */
-        static size_t getNumElemBytes( PixelFormat format );
+        static uint8 getNumElemBytes( PixelFormat format );
 
         /** Returns the size in bits of an element of the given pixel format.
           @return
@@ -477,7 +477,7 @@ namespace Ogre {
 
                Passing PF_UNKNOWN will result in returning a size of 0 bits.
         */
-        static size_t getNumElemBits( PixelFormat format );
+        static uint8 getNumElemBits( PixelFormat format );
 
         /** Returns the size in memory of a region with the given extents and pixel
             format with consecutive memory layout.
@@ -557,7 +557,7 @@ namespace Ogre {
         /** Returns the component count for a certain pixel format. Returns 3(no alpha) or 
             4 (has alpha) in case there is no clear component type like with compressed formats.
          */
-        static size_t getComponentCount(PixelFormat fmt);
+        static uint8 getComponentCount(PixelFormat fmt);
 
         /** Gets the format from given name.
             @param  name            The string of format name
