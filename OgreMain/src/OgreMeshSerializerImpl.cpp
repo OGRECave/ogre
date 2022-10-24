@@ -2910,18 +2910,14 @@ namespace Ogre {
                         "MeshSerializerImpl::readMeshLodUsageGenerated");
                 }
 
-                // SubMesh* sm = pMesh->getSubMesh(i);
                 IndexData* indexData = OGRE_NEW IndexData();
                 sm->mLodFaceList[lodNum - 1] = indexData;
-                // unsigned int numIndexes
                 unsigned int numIndexes;
                 readInts(stream, &numIndexes, 1);
                 indexData->indexCount = static_cast<size_t>(numIndexes);
-
-                // bool indexes32Bit
                 bool idx32Bit;
                 readBools(stream, &idx32Bit, 1);
-                // unsigned short*/int* faceIndexes;  ((v1, v2, v3) * numFaces)
+
                 if (idx32Bit)
                 {
                     indexData->indexBuffer = pMesh->getHardwareBufferManager()->createIndexBuffer(
