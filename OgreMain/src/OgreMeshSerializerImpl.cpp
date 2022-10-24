@@ -2900,8 +2900,6 @@ namespace Ogre {
         pushInnerChunk(stream);
         {
             // Get one set of detail per SubMesh
-            // numSubs = pMesh->getNumSubMeshes();
-            //for (i = 0; i < numSubs; ++i)
             for (auto *sm : pMesh->getSubMeshes())
             {
                 unsigned long streamID = readChunk(stream);
