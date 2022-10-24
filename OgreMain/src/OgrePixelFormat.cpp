@@ -92,7 +92,7 @@ namespace Ogre {
         return _pixelFormats[ord];
     }
     //-----------------------------------------------------------------------
-    size_t PixelUtil::getNumElemBytes( PixelFormat format )
+    uint8 PixelUtil::getNumElemBytes( PixelFormat format )
     {
         return getDescriptionFor(format).elemBytes;
     }
@@ -192,7 +192,7 @@ namespace Ogre {
         }
     }
     //-----------------------------------------------------------------------
-    size_t PixelUtil::getNumElemBits( PixelFormat format )
+    uint8 PixelUtil::getNumElemBits( PixelFormat format )
     {
         return getDescriptionFor(format).elemBytes * 8;
     }
@@ -280,7 +280,7 @@ namespace Ogre {
         return des.componentType;
     }
     //-----------------------------------------------------------------------
-    size_t PixelUtil::getComponentCount(PixelFormat fmt)
+    uint8 PixelUtil::getComponentCount(PixelFormat fmt)
     {
         const PixelFormatDescription &des = getDescriptionFor(fmt);
         return des.componentCount;
