@@ -268,4 +268,7 @@ Licensed Under:</td>
     <li>
         <p>Smoke15Frames.png by Beast, published under CC-0 https://opengameart.org/content/smoke-aura</p>
     </li>
+    <li>
+        <p>Earth-Color10x6.astc and Texture.pkm by ARM Limited, published under MIT https://github.com/ARM-software/opengl-es-sdk-for-android</p>
+    </li>
 </ul>
