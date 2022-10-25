@@ -55,8 +55,7 @@ namespace Ogre {
         PVRTCCodec();
         virtual ~PVRTCCodec() { }
 
-        using ImageCodec::decode;
-        DecodeResult decode(const DataStreamPtr& input) const override;
+        void decode(const DataStreamPtr& input, const Any& output) const override;
 		String magicNumberToFileExt(const char *magicNumberPtr, size_t maxbytes) const override;
         String getType() const override;
 
@@ -67,10 +66,10 @@ namespace Ogre {
 
 	private:
 		/// Decode PVRTCV2 image format
-		DecodeResult decodeV2(const DataStreamPtr& stream) const;
+		static void decodeV2(const DataStreamPtr& stream, Image* image);
 
 		/// Decode PVRTCV3 image format
-		DecodeResult decodeV3(const DataStreamPtr& stream) const;
+		static void decodeV3(const DataStreamPtr& stream, Image* image);
     };
 	/** @} */
 	/** @} */
