@@ -32,6 +32,7 @@ THE SOFTWARE.
 
 #include "OgreLogManager.h"
 #include "OgreDataStream.h"
+#include "OgreImage.h"
 
 // freeimage 3.9.1~3.11.0 interoperability fix
 #ifndef FREEIMAGE_COLORORDER
@@ -144,21 +145,19 @@ namespace Ogre {
     { 
     }
     //---------------------------------------------------------------------
-    FIBITMAP* FreeImageCodec::encodeBitmap(const MemoryDataStreamPtr& input,
-                                           const CodecDataPtr& pData) const
+    FIBITMAP* FreeImageCodec::encodeBitmap(Image* image) const
     {
         FIBITMAP* ret = 0;
 
-        ImageData* pImgData = static_cast< ImageData * >( pData.get() );
-        PixelBox src(pImgData->width, pImgData->height, pImgData->depth, pImgData->format, input->getPtr());
+        PixelBox src = image->getPixelBox();
 
         // The required format, which will adjust to the format
         // actually supported by FreeImage.
-        PixelFormat requiredFormat = pImgData->format;
+        PixelFormat requiredFormat = image->getFormat();
 
         // determine the settings
         FREE_IMAGE_TYPE imageType;
-        PixelFormat determiningFormat = pImgData->format;
+        PixelFormat determiningFormat = image->getFormat();
 
         switch(determiningFormat)
         {
@@ -267,13 +266,13 @@ namespace Ogre {
 
         bool conversionRequired = false;
 
-        unsigned char* srcData = input->getPtr();
+        unsigned char* srcData = image->getData();
 
         // Check BPP
         unsigned bpp = static_cast<unsigned>(PixelUtil::getNumElemBits(requiredFormat));
         if (!FreeImage_FIFSupportsExportBPP((FREE_IMAGE_FORMAT)mFreeImageType, (int)bpp))
         {
-            if (bpp == 32 && PixelUtil::hasAlpha(pImgData->format) && FreeImage_FIFSupportsExportBPP((FREE_IMAGE_FORMAT)mFreeImageType, 24))
+            if (bpp == 32 && image->getHasAlpha() && FreeImage_FIFSupportsExportBPP((FREE_IMAGE_FORMAT)mFreeImageType, 24))
             {
                 // drop to 24 bit (lose alpha)
 #if FREEIMAGE_COLORORDER == FREEIMAGE_COLORORDER_RGB
@@ -283,21 +282,21 @@ namespace Ogre {
 #endif
                 bpp = 24;
             }
-            else if (bpp == 128 && PixelUtil::hasAlpha(pImgData->format) && FreeImage_FIFSupportsExportBPP((FREE_IMAGE_FORMAT)mFreeImageType, 96))
+            else if (bpp == 128 && image->getHasAlpha() && FreeImage_FIFSupportsExportBPP((FREE_IMAGE_FORMAT)mFreeImageType, 96))
             {
                 // drop to 96-bit floating point
                 requiredFormat = PF_FLOAT32_RGB;
             }
         }
 
-        PixelBox convBox(pImgData->width, pImgData->height, 1, requiredFormat);
-        if (requiredFormat != pImgData->format)
+        PixelBox convBox(image->getPixelBox(), requiredFormat);
+        if (requiredFormat != image->getFormat())
         {
             conversionRequired = true;
             // Allocate memory
             convBox.data = OGRE_ALLOC_T(uchar, convBox.getConsecutiveSize(), MEMCATEGORY_GENERAL);
             // perform conversion and reassign source
-            PixelBox newSrc(pImgData->width, pImgData->height, 1, pImgData->format, input->getPtr());
+            PixelBox newSrc = image->getPixelBox();
             PixelUtil::bulkPixelConversion(newSrc, convBox);
             srcData = convBox.data;
         }
@@ -305,8 +304,8 @@ namespace Ogre {
 
         ret = FreeImage_AllocateT(
             imageType, 
-            static_cast<int>(pImgData->width), 
-            static_cast<int>(pImgData->height), 
+            static_cast<int>(image->getWidth()),
+            static_cast<int>(image->getHeight()),
             bpp);
 
         if (!ret)
@@ -329,14 +328,14 @@ namespace Ogre {
         }
         
         size_t dstPitch = FreeImage_GetPitch(ret);
-        size_t srcPitch = pImgData->width * PixelUtil::getNumElemBytes(requiredFormat);
+        size_t srcPitch = image->getWidth() * PixelUtil::getNumElemBytes(requiredFormat);
 
 
         // Copy data, invert scanlines and respect FreeImage pitch
         uchar* pDst = FreeImage_GetBits(ret);
-        for (size_t y = 0; y < pImgData->height; ++y)
+        for (size_t y = 0; y < image->getHeight(); ++y)
         {
-            uchar* pSrc = srcData + (pImgData->height - y - 1) * srcPitch;
+            uchar* pSrc = srcData + (image->getHeight() - y - 1) * srcPitch;
             memcpy(pDst, pSrc, srcPitch);
             pDst += dstPitch;
         }
@@ -350,10 +349,9 @@ namespace Ogre {
         return ret;
     }
     //---------------------------------------------------------------------
-    DataStreamPtr FreeImageCodec::encode(const MemoryDataStreamPtr& input,
-                                         const CodecDataPtr& pData) const
+    DataStreamPtr FreeImageCodec::encode(const Any& input) const
     {
-        FIBITMAP* fiBitmap = encodeBitmap(input, pData);
+        FIBITMAP* fiBitmap = encodeBitmap(any_cast<Image*>(input));
 
         // open memory chunk allocated by FreeImage
         FIMEMORY* mem = FreeImage_OpenMemory();
@@ -379,17 +377,18 @@ namespace Ogre {
 
     }
     //---------------------------------------------------------------------
-    void FreeImageCodec::encodeToFile(const MemoryDataStreamPtr& input, const String& outFileName,
-                                      const CodecDataPtr& pData) const
+    void FreeImageCodec::encodeToFile(const Any& input, const String& outFileName) const
     {
-        FIBITMAP* fiBitmap = encodeBitmap(input, pData);
+        FIBITMAP* fiBitmap = encodeBitmap(any_cast<Image*>(input));
 
         FreeImage_Save((FREE_IMAGE_FORMAT)mFreeImageType, fiBitmap, outFileName.c_str());
         FreeImage_Unload(fiBitmap);
     }
     //---------------------------------------------------------------------
-    ImageCodec::DecodeResult FreeImageCodec::decode(const DataStreamPtr& input) const
+    void FreeImageCodec::decode(const DataStreamPtr& input, const Any& output) const
     {
+        Image* image = any_cast<Image*>(output);
+
         // Buffer stream into memory (TODO: override IO functions instead?)
         MemoryDataStream memStream(input, true);
 
@@ -406,18 +405,9 @@ namespace Ogre {
                 "FreeImageCodec::decode");
         }
 
-
-        ImageData* imgData = OGRE_NEW ImageData();
-        MemoryDataStreamPtr output;
-
-        imgData->depth = 1; // only 2D formats handled by this codec
-        imgData->width = FreeImage_GetWidth(fiBitmap);
-        imgData->height = FreeImage_GetHeight(fiBitmap);
-        imgData->num_mipmaps = 0; // no mipmaps in non-DDS 
-        imgData->flags = 0;
-
         // Must derive format first, this may perform conversions
-        
+        PixelFormat format = PF_UNKNOWN;
+
         FREE_IMAGE_TYPE imageType = FreeImage_GetImageType(fiBitmap);
         FREE_IMAGE_COLOR_TYPE colourType = FreeImage_GetColorType(fiBitmap);
         unsigned bpp = FreeImage_GetBPP(fiBitmap);
@@ -430,7 +420,6 @@ namespace Ogre {
         case FIT_INT32:
         case FIT_DOUBLE:
         default:
-            OGRE_DELETE imgData;
             FreeImage_CloseMemory(fiMem);
             OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
                 "Unknown or unsupported image format", 
@@ -476,19 +465,19 @@ namespace Ogre {
             switch(bpp)
             {
             case 8:
-                imgData->format = PF_L8;
+                format = PF_L8;
                 break;
             case 16:
                 // Determine 555 or 565 from green mask
                 // cannot be 16-bit greyscale since that's FIT_UINT16
                 if(FreeImage_GetGreenMask(fiBitmap) == FI16_565_GREEN_MASK)
                 {
-                    imgData->format = PF_R5G6B5;
+                    format = PF_R5G6B5;
                 }
                 else
                 {
                     // FreeImage doesn't support 4444 format so must be 1555
-                    imgData->format = PF_A1R5G5B5;
+                    format = PF_A1R5G5B5;
                 }
                 break;
             case 24:
@@ -496,16 +485,16 @@ namespace Ogre {
                 //     PF_BYTE_BGR[A] for little endian (== PF_ARGB native)
                 //     PF_BYTE_RGB[A] for big endian (== PF_RGBA native)
 #if FREEIMAGE_COLORORDER == FREEIMAGE_COLORORDER_RGB
-                imgData->format = PF_BYTE_RGB;
+                format = PF_BYTE_RGB;
 #else
-                imgData->format = PF_BYTE_BGR;
+                format = PF_BYTE_BGR;
 #endif
                 break;
             case 32:
 #if FREEIMAGE_COLORORDER == FREEIMAGE_COLORORDER_RGB
-                imgData->format = PF_BYTE_RGBA;
+                format = PF_BYTE_RGBA;
 #else
-                imgData->format = PF_BYTE_BGRA;
+                format = PF_BYTE_BGRA;
 #endif
                 break;
                 
@@ -515,23 +504,23 @@ namespace Ogre {
         case FIT_UINT16:
         case FIT_INT16:
             // 16-bit greyscale
-            imgData->format = PF_L16;
+            format = PF_L16;
             break;
         case FIT_FLOAT:
             // Single-component floating point data
-            imgData->format = PF_FLOAT32_R;
+            format = PF_FLOAT32_R;
             break;
         case FIT_RGB16:
-            imgData->format = PF_SHORT_RGB;
+            format = PF_SHORT_RGB;
             break;
         case FIT_RGBA16:
-            imgData->format = PF_SHORT_RGBA;
+            format = PF_SHORT_RGBA;
             break;
         case FIT_RGBF:
-            imgData->format = PF_FLOAT32_RGB;
+            format = PF_FLOAT32_RGB;
             break;
         case FIT_RGBAF:
-            imgData->format = PF_FLOAT32_RGBA;
+            format = PF_FLOAT32_RGBA;
             break;
             
             
@@ -540,16 +529,17 @@ namespace Ogre {
         unsigned char* srcData = FreeImage_GetBits(fiBitmap);
         unsigned srcPitch = FreeImage_GetPitch(fiBitmap);
 
-        // Final data - invert image and trim pitch at the same time
-        size_t dstPitch = imgData->width * PixelUtil::getNumElemBytes(imgData->format);
-        imgData->size = dstPitch * imgData->height;
-        // Bind output buffer
-        output.reset(OGRE_NEW MemoryDataStream(imgData->size));
+        // only 2D formats handled by this codec
+        // no mipmaps in non-DDS
+        image->create(format, FreeImage_GetWidth(fiBitmap), FreeImage_GetHeight(fiBitmap));
 
-        uchar* pDst = output->getPtr();
-        for (size_t y = 0; y < imgData->height; ++y)
+        // Final data - invert image and trim pitch at the same time
+        size_t dstPitch =  image->getRowSpan();
+
+        uchar* pDst = image->getData();
+        for (size_t y = 0; y < image->getHeight(); ++y)
         {
-            uchar* pSrc = srcData + (imgData->height - y - 1) * srcPitch;
+            uchar* pSrc = srcData + (image->getHeight() - y - 1) * srcPitch;
             memcpy(pDst, pSrc, dstPitch);
             pDst += dstPitch;
         }
@@ -557,13 +547,6 @@ namespace Ogre {
         
         FreeImage_Unload(fiBitmap);
         FreeImage_CloseMemory(fiMem);
-
-
-        DecodeResult ret;
-        ret.first = output;
-        ret.second = CodecDataPtr(imgData);
-        return ret;
-
     }
     //---------------------------------------------------------------------    
     String FreeImageCodec::getType() const 
