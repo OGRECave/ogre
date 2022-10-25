@@ -57,10 +57,9 @@ EXRCodec::~EXRCodec()
     LogManager::getSingleton().logMessage("EXRCodec deinitialised");
 }
 
-ImageCodec::DecodeResult EXRCodec::decode(const DataStreamPtr& input) const
+void EXRCodec::decode(const DataStreamPtr& input, const Any& output) const
 {
-    ImageData * imgData = new ImageData;
-    MemoryDataStreamPtr output;
+    Image* image = any_cast<Image*>(output);
 
     try {
         // Make a mutable clone of input to be able to change file pointer
@@ -80,11 +79,13 @@ ImageCodec::DecodeResult EXRCodec::decode(const DataStreamPtr& input) const
         if(channels.findChannel("A"))
             components = 4;
         
+        auto format = components==3 ? PF_FLOAT32_RGB : PF_FLOAT32_RGBA;
+
         // Allocate memory
-        output.reset(new MemoryDataStream(width*height*components*4));
+        image->create(format, width, height);
     
         // Construct frame buffer
-        uchar *pixels = output->getPtr();
+        uchar *pixels = image->getData();
         FrameBuffer frameBuffer;
         frameBuffer.insert("R",             // name
                     Slice (PixelType::FLOAT,       // type
@@ -111,25 +112,11 @@ ImageCodec::DecodeResult EXRCodec::decode(const DataStreamPtr& input) const
       
         file.setFrameBuffer (frameBuffer);
         file.readPixels (dw.min.y, dw.max.y);
-    
-        imgData->format = components==3 ? PF_FLOAT32_RGB : PF_FLOAT32_RGBA;
-        imgData->width = width;
-        imgData->height = height;
-        imgData->depth = 1;
-        imgData->size = width*height*components*4;
-        imgData->num_mipmaps = 0;
-        imgData->flags = 0;
     } catch (const std::exception &exc) {
-        delete imgData;
         throw(Exception(Exception::ERR_INTERNAL_ERROR,
             "OpenEXR Error",
             exc.what()));
     }
-    
-    DecodeResult ret;
-    ret.first = output; 
-    ret.second = CodecDataPtr(imgData);
-    return ret;
 }
 
 String EXRCodec::getType() const 
