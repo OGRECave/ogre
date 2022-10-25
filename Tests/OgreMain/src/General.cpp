@@ -313,6 +313,8 @@ TEST(Image, Compressed)
 #if OGRE_NO_ETC_CODEC == 0
     img.load(Root::openFileStream(testPath+"/Texture.pkm"), "pkm");
     EXPECT_EQ(img.getFormat(), PF_ETC2_RGB8);
+    img.load(Root::openFileStream(testPath+"/etc2-rgba8.ktx"), "ktx");
+    EXPECT_EQ(img.getFormat(), PF_ETC2_RGBA8);
 #endif
 
 #if OGRE_NO_ASTC_CODEC == 0
