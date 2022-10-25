@@ -309,6 +309,16 @@ TEST(Image, Compressed)
     img.load(Root::openFileStream(testPath+"/ogreborderUp_pvr4a.pvr"), "pvr");
     EXPECT_EQ(img.getFormat(), PF_PVRTC_RGBA4);
 #endif
+
+#if OGRE_NO_ETC_CODEC == 0
+    img.load(Root::openFileStream(testPath+"/Texture.pkm"), "pkm");
+    EXPECT_EQ(img.getFormat(), PF_ETC2_RGB8);
+#endif
+
+#if OGRE_NO_ASTC_CODEC == 0
+    img.load(Root::openFileStream(testPath+"/Earth-Color10x6.astc"), "astc");
+    EXPECT_EQ(img.getFormat(), PF_ASTC_RGBA_10X6_LDR);
+#endif
 }
 
 struct UsePreviousResourceLoadingListener : public ResourceLoadingListener
