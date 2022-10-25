@@ -321,6 +321,11 @@ TEST(Image, Compressed)
     img.load(Root::openFileStream(testPath+"/Earth-Color10x6.astc"), "astc");
     EXPECT_EQ(img.getFormat(), PF_ASTC_RGBA_10X6_LDR);
 #endif
+
+#if OGRE_NO_DDS_CODEC == 0
+    img.load(Root::openFileStream(testPath+"/ogreborderUp_dxt3.dds"), "dds");
+    EXPECT_EQ(img.getFormat(), PF_BYTE_RGBA); // no RenderSystem available, will decompress
+#endif
 }
 
 struct UsePreviousResourceLoadingListener : public ResourceLoadingListener
