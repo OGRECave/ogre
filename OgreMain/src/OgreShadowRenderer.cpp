@@ -642,8 +642,6 @@ void SceneManager::ShadowRenderer::ensureShadowTexturesCreated()
 
             // Camera names are local to SM
             String camName = shadowTex->getName() + "Cam";
-            // Material names are global to SM, make specific
-            String matName = shadowTex->getName() + "Mat" + mSceneManager->getName();
 
             RenderTexture *shadowRTT = shadowTex->getBuffer()->getRenderTarget();
 
@@ -671,29 +669,6 @@ void SceneManager::ShadowRenderer::ensureShadowTexturesCreated()
             // Don't update automatically - we'll do it when required
             shadowRTT->setAutoUpdated(false);
 
-            // Also create corresponding Material used for rendering this shadow
-            MaterialPtr mat = MaterialManager::getSingleton().getByName(matName);
-            if (!mat)
-            {
-                mat = MaterialManager::getSingleton().create(
-                    matName, ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME);
-            }
-            Pass* p = mat->getTechnique(0)->getPass(0);
-            if (p->getNumTextureUnitStates() != 1 ||
-                p->getTextureUnitState(0)->_getTexturePtr(0) != shadowTex)
-            {
-                mat->getTechnique(0)->getPass(0)->removeAllTextureUnitStates();
-                // create texture unit referring to render target texture
-                TextureUnitState* texUnit =
-                    p->createTextureUnitState(shadowTex->getName());
-                // set projective based on camera
-                texUnit->setProjectiveTexturing(!p->hasVertexProgram(), cam);
-                // clamp to border colour
-                texUnit->setSampler(mBorderSampler);
-                mat->touch();
-
-            }
-
             // insert dummy camera-light combination
             mShadowCamLightMapping[cam] = 0;
 
@@ -717,25 +692,6 @@ void SceneManager::ShadowRenderer::ensureShadowTexturesCreated()
 //---------------------------------------------------------------------
 void SceneManager::ShadowRenderer::destroyShadowTextures(void)
 {
-
-    ShadowTextureList::iterator i, iend;
-    iend = mShadowTextures.end();
-    for (i = mShadowTextures.begin(); i != iend; ++i)
-    {
-        TexturePtr &shadowTex = *i;
-
-        // Cleanup material that references this texture
-        String matName = shadowTex->getName() + "Mat" + mSceneManager->getName();
-        MaterialPtr mat = MaterialManager::getSingleton().getByName(matName);
-        if (mat)
-        {
-            // manually clear TUS to ensure texture ref released
-            mat->getTechnique(0)->getPass(0)->removeAllTextureUnitStates();
-            MaterialManager::getSingleton().remove(mat->getHandle());
-        }
-
-    }
-
     for (auto cam : mShadowTextureCameras)
     {
         mSceneManager->getRootSceneNode()->removeAndDestroyChild(cam->getParentSceneNode());
