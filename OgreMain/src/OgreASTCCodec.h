@@ -55,8 +55,7 @@ namespace Ogre {
         ASTCCodec();
         virtual ~ASTCCodec() { }
 
-		using ImageCodec::decode;
-        DecodeResult decode(const DataStreamPtr& input) const override;
+        void decode(const DataStreamPtr& input, const Any& output) const override;
 		String magicNumberToFileExt(const char *magicNumberPtr, size_t maxbytes) const override;
         String getType() const override;
 

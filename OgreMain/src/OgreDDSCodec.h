@@ -72,12 +72,8 @@ namespace Ogre {
         DDSCodec();
         virtual ~DDSCodec() { }
 
-        using ImageCodec::decode;
-        using ImageCodec::encode;
-        using ImageCodec::encodeToFile;
-
-        void encodeToFile(const MemoryDataStreamPtr& input, const String& outFileName, const CodecDataPtr& pData) const override;
-        DecodeResult decode(const DataStreamPtr& input) const override;
+        void encodeToFile(const Any& input, const String& outFileName) const override;
+        void decode(const DataStreamPtr& input, const Any& output) const override;
         String magicNumberToFileExt(const char *magicNumberPtr, size_t maxbytes) const override;
         String getType() const override;
 

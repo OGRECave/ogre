@@ -188,9 +188,9 @@ namespace Ogre {
     { 
     }
     //---------------------------------------------------------------------
-    ImageCodec::DecodeResult ASTCCodec::decode(const DataStreamPtr& stream) const
+    void ASTCCodec::decode(const DataStreamPtr& stream, const Any& output) const
     {
-        DecodeResult ret;
+        Image* image = any_cast<Image*>(output);
         ASTCHeader header;
 
         // Read the ASTC header
@@ -208,11 +208,7 @@ namespace Ogre {
         int ysize = header.ysize[0] + 256 * header.ysize[1] + 65536 * header.ysize[2];
         int zsize = header.zsize[0] + 256 * header.zsize[1] + 65536 * header.zsize[2];
 
-        ImageData *imgData = OGRE_NEW ImageData();
-        imgData->width = xsize;
-        imgData->height = ysize;
-        imgData->depth = zsize;
-		imgData->num_mipmaps = 0; // Always 1 mip level per file
+        PixelFormat format = PF_UNKNOWN;
 
         // For 3D we calculate the bitrate then find the nearest 2D block size.
         if(zdim > 1)
@@ -223,68 +219,54 @@ namespace Ogre {
 
         if(xdim == 4)
         {
-            imgData->format = PF_ASTC_RGBA_4X4_LDR;
+            format = PF_ASTC_RGBA_4X4_LDR;
         }
         else if(xdim == 5)
         {
             if(ydim == 4)
-                imgData->format = PF_ASTC_RGBA_5X4_LDR;
+                format = PF_ASTC_RGBA_5X4_LDR;
             else if(ydim == 5)
-                imgData->format = PF_ASTC_RGBA_5X5_LDR;
+                format = PF_ASTC_RGBA_5X5_LDR;
         }
         else if(xdim == 6)
         {
             if(ydim == 5)
-                imgData->format = PF_ASTC_RGBA_6X5_LDR;
+                format = PF_ASTC_RGBA_6X5_LDR;
             else if(ydim == 6)
-                imgData->format = PF_ASTC_RGBA_6X6_LDR;
+                format = PF_ASTC_RGBA_6X6_LDR;
         }
         else if(xdim == 8)
         {
             if(ydim == 5)
-                imgData->format = PF_ASTC_RGBA_8X5_LDR;
+                format = PF_ASTC_RGBA_8X5_LDR;
             else if(ydim == 6)
-                imgData->format = PF_ASTC_RGBA_8X6_LDR;
+                format = PF_ASTC_RGBA_8X6_LDR;
             else if(ydim == 8)
-                imgData->format = PF_ASTC_RGBA_8X8_LDR;
+                format = PF_ASTC_RGBA_8X8_LDR;
         }
         else if(xdim == 10)
         {
             if(ydim == 5)
-                imgData->format = PF_ASTC_RGBA_10X5_LDR;
+                format = PF_ASTC_RGBA_10X5_LDR;
             else if(ydim == 6)
-                imgData->format = PF_ASTC_RGBA_10X6_LDR;
+                format = PF_ASTC_RGBA_10X6_LDR;
             else if(ydim == 8)
-                imgData->format = PF_ASTC_RGBA_10X8_LDR;
+                format = PF_ASTC_RGBA_10X8_LDR;
             else if(ydim == 10)
-                imgData->format = PF_ASTC_RGBA_10X10_LDR;
+                format = PF_ASTC_RGBA_10X10_LDR;
         }
         else if(xdim == 12)
         {
             if(ydim == 10)
-                imgData->format = PF_ASTC_RGBA_12X10_LDR;
+                format = PF_ASTC_RGBA_12X10_LDR;
             else if(ydim == 12)
-                imgData->format = PF_ASTC_RGBA_12X12_LDR;
+                format = PF_ASTC_RGBA_12X12_LDR;
         }
 
-        imgData->flags = IF_COMPRESSED;
-
-		uint32 numFaces = 1; // Always one face, cubemaps are not currently supported
-                             // Calculate total size from number of mipmaps, faces and size
-		imgData->size = Image::calculateSize(imgData->num_mipmaps, numFaces,
-                                             imgData->width, imgData->height, imgData->depth, imgData->format);
-
-		// Bind output buffer
-		MemoryDataStreamPtr output(OGRE_NEW MemoryDataStream(imgData->size));
-
-		// Now deal with the data
-		uchar* destPtr = output->getPtr();
-        stream->read(destPtr, imgData->size);
-
-		ret.first = output;
-		ret.second = CodecDataPtr(imgData);
-        
-		return ret;
+		// Always one face, cubemaps are not currently supported
+        // Always 1 mip level per file
+        image->create(format, xsize, ysize, zsize, 1, 0);
+        stream->read(image->getData(), image->getSize());
     }
     //---------------------------------------------------------------------    
     String ASTCCodec::getType() const 
