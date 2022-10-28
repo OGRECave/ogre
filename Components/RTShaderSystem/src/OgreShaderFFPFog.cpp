@@ -241,7 +241,6 @@ SubRenderState* FFPFogFactory::createInstance(ScriptCompiler* compiler,
 
             if(false == SGScriptTranslator::getString(prop->values.front(), &strValue))
             {
-                compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
                 return NULL;
             }
 
@@ -256,7 +255,6 @@ SubRenderState* FFPFogFactory::createInstance(ScriptCompiler* compiler,
                     ++it;
                     if (false == SGScriptTranslator::getString(*it, &strValue))
                     {
-                        compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
                         return NULL;
                     }
 

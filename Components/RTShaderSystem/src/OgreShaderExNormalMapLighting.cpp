@@ -223,7 +223,6 @@ SubRenderState* NormalMapLightingFactory::createInstance(ScriptCompiler* compile
             // Read light model type.
             if(false == SGScriptTranslator::getString(*it, &strValue))
             {
-                compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
                 return NULL;
             }
 
@@ -233,7 +232,6 @@ SubRenderState* NormalMapLightingFactory::createInstance(ScriptCompiler* compile
                 ++it;
                 if (false == SGScriptTranslator::getString(*it, &strValue))
                 {
-                    compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
                     return NULL;
                 }
 
@@ -250,14 +248,12 @@ SubRenderState* NormalMapLightingFactory::createInstance(ScriptCompiler* compile
                     ++it;
                     if (false == SGScriptTranslator::getString(*it, &strValue))
                     {
-                        compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
                         return NULL;
                     }
 
                     if(!normalMapSubRenderState->setParameter("normalmap_space", strValue))
                     {
                         compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
-                        return NULL;
                     }
                 }
 
@@ -280,14 +276,12 @@ SubRenderState* NormalMapLightingFactory::createInstance(ScriptCompiler* compile
                     if (false == SGScriptTranslator::getString(*it, &strValue))
                     {
                         compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
-                        return NULL;
                     }
 
                     // sampler reference
                     if(!normalMapSubRenderState->setParameter("sampler", strValue))
                     {
                         compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
-                        return NULL;
                     }
                 }
                                 

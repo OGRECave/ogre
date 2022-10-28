@@ -144,7 +144,6 @@ SubRenderState* FFPTransformFactory::createInstance(ScriptCompiler* compiler,
     {
         if(prop->values.size() > 0)
         {
-            bool hasError = false;
             String modelType;
             int texCoordSlot = 1;
 
@@ -152,17 +151,11 @@ SubRenderState* FFPTransformFactory::createInstance(ScriptCompiler* compiler,
 
             if(!SGScriptTranslator::getString(*it, &modelType))
             {
-                hasError = true;
+                return NULL;
             }
 
             if(++it != prop->values.end() && !SGScriptTranslator::getInt(*++it, &texCoordSlot))
-                hasError = true;
-
-            if(hasError)
-            {
-                compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
                 return NULL;
-            }
 
             auto ret = static_cast<FFPTransform*>(createOrRetrieveInstance(translator));
             ret->setInstancingParams(modelType == "instanced", texCoordSlot);

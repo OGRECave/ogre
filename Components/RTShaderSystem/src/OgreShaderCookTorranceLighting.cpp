@@ -190,13 +190,7 @@ SubRenderState* CookTorranceLightingFactory::createInstance(ScriptCompiler* comp
         AbstractNodeList::const_iterator it = prop->values.begin();
 
         // Read light model type.
-        if (!SGScriptTranslator::getString(*it++, &strValue))
-        {
-            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
-            return NULL;
-        }
-
-        if(strValue != "metal_roughness")
+        if (!SGScriptTranslator::getString(*it++, &strValue) || strValue != "metal_roughness")
             return NULL;
 
         auto subRenderState = createOrRetrieveInstance(translator);

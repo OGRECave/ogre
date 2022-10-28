@@ -552,7 +552,6 @@ SubRenderState*	FFPLightingFactory::createInstance(ScriptCompiler* compiler,
 
     if(!SGScriptTranslator::getString(*it, &val))
     {
-        compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
         return NULL;
     }
 
@@ -566,7 +565,6 @@ SubRenderState*	FFPLightingFactory::createInstance(ScriptCompiler* compiler,
     {
         if(!SGScriptTranslator::getString(*it, &val))
         {
-            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
             return NULL;
         }
 

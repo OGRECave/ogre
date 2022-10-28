@@ -81,7 +81,6 @@ SubRenderState* WBOITFactory::createInstance(ScriptCompiler* compiler, PropertyA
     bool val;
     if(!SGScriptTranslator::getBoolean(*it++, &val))
     {
-        compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
         return NULL;
     }
 

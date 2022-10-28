@@ -206,7 +206,6 @@ SubRenderState* FFPColourFactory::createInstance(ScriptCompiler* compiler,
 
             if(false == SGScriptTranslator::getString(prop->values.front(), &modelType))
             {
-                compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
                 return NULL;
             }
 
