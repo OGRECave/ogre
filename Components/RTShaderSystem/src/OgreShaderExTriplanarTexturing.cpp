@@ -216,19 +216,16 @@ namespace RTShader {
                 float parameters[3];
                 if (false == SGScriptTranslator::getFloat(*it, parameters))
                 {
-                    compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
                     return NULL;
                 }
                 ++it;
                 if (false == SGScriptTranslator::getFloat(*it, parameters + 1))
                 {
-                    compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
                     return NULL;
                 }
                 ++it;
                 if (false == SGScriptTranslator::getFloat(*it, parameters + 2))
                 {
-                    compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
                     return NULL;
                 }
                 Vector3 vParameters(parameters[0], parameters[1], parameters[2]);
@@ -238,28 +235,21 @@ namespace RTShader {
                 ++it;
                 if (false == SGScriptTranslator::getString(*it, &textureNameFromX))
                 {
-                    compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
                     return NULL;
                 }
                 ++it;
                 if (false == SGScriptTranslator::getString(*it, &textureNameFromY))
                 {
-                    compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
                     return NULL;
                 }
                 ++it;
                 if (false == SGScriptTranslator::getString(*it, &textureNameFromZ))
                 {
-                    compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
                     return NULL;
                 }
                 tpSubRenderState->setTextureNames(textureNameFromX, textureNameFromY, textureNameFromZ);
 
                 return subRenderState;
-            }
-            else
-            {
-                compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
             }
         }
         return NULL;

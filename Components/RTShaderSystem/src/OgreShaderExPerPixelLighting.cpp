@@ -341,13 +341,7 @@ SubRenderState* PerPixelLightingFactory::createInstance(ScriptCompiler* compiler
     auto it = prop->values.begin();
     String val;
 
-    if(!SGScriptTranslator::getString(*it++, &val))
-    {
-        compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
-        return NULL;
-    }
-
-    if (val != "per_pixel")
+    if(!SGScriptTranslator::getString(*it++, &val) || val != "per_pixel")
         return NULL;
 
     auto ret = createOrRetrieveInstance(translator);

@@ -690,7 +690,6 @@ SubRenderState* FFPTexturingFactory::createInstance(ScriptCompiler* compiler,
 
             if(false == SGScriptTranslator::getString(prop->values.front(), &value))
             {
-                compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
                 return NULL;
             }
 

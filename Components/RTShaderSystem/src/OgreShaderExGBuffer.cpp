@@ -219,20 +219,13 @@ SubRenderState* GBufferFactory::createInstance(ScriptCompiler* compiler, Propert
     auto it = prop->values.begin();
     String val;
 
-    if(!SGScriptTranslator::getString(*it++, &val))
-    {
-        compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
-        return NULL;
-    }
-
-    if (val != "gbuffer")
+    if(!SGScriptTranslator::getString(*it++, &val) || val != "gbuffer")
         return NULL;
 
     GBuffer::TargetBuffers targets;
 
     if(!SGScriptTranslator::getString(*it++, &val))
     {
-        compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
         return NULL;
     }
     targets.push_back(translate(val));
@@ -241,7 +234,6 @@ SubRenderState* GBufferFactory::createInstance(ScriptCompiler* compiler, Propert
     {
         if(!SGScriptTranslator::getString(*it++, &val))
         {
-            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
             return NULL;
         }
 

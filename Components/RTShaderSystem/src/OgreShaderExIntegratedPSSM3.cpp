@@ -341,11 +341,7 @@ SubRenderState* IntegratedPSSM3Factory::createInstance(ScriptCompiler* compiler,
 {
     if (prop->name == "integrated_pssm4")
     {       
-        if (prop->values.size() != 4)
-        {
-            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
-        }
-        else
+        if (prop->values.size() == 4)
         {
             IntegratedPSSM3::SplitPointList splitPointList; 
 
@@ -358,8 +354,7 @@ SubRenderState* IntegratedPSSM3Factory::createInstance(ScriptCompiler* compiler,
                 
                 if (false == SGScriptTranslator::getReal(*it, &curSplitValue))
                 {
-                    compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
-                    break;
+                    return NULL;
                 }
 
                 splitPointList.push_back(curSplitValue);

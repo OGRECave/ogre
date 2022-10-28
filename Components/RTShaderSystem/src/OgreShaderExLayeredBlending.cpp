@@ -393,7 +393,6 @@ SubRenderState* LayeredBlendingFactory::createInstance(ScriptCompiler* compiler,
         String blendType;
         if(false == SGScriptTranslator::getString(prop->values.front(), &blendType))
         {
-            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
             return NULL;
         }
 
@@ -422,11 +421,7 @@ SubRenderState* LayeredBlendingFactory::createInstance(ScriptCompiler* compiler,
     if (prop->name == "source_modifier")
     {
         if(prop->values.size() < 3)
-        {
-            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line, 
-                "Expected three or more parameters.");
             return NULL;
-        }
 
         // Read light model type.
         bool isParseSuccess;
