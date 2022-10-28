@@ -193,13 +193,13 @@ Format: `integrated_pssm4 <znear> <sp0> <sp1> <zfar> [debug] [filter]`
 @copydoc Ogre::RTShader::SRS_HARDWARE_SKINNING
 
 @par
-Format: `hardware_skinning <max_bone_count> <max_weight_count> [type antipodality_check scale_shear]`
+Format: `hardware_skinning <max_bone_count> <max_weight_count> [type] [correct_antipodality scale_shearing]`
 @par
 Example: `hardware_skinning 24 2 dual_quaternion true false`
 
-@param type either `dual_quaternion` or `linear`
-@param antipodality_check Accurate antipodality handling for rotations > 180°
-@param scale_shear add scaling and shearing support to dual quaternion computation
+@param type either `dual_quaternion` or `linear` (default: @c linear)
+@param correct_antipodality Correctly handle rotations > 180° in dual quaternion computation
+@param scale_shearing add scaling and shearing support to dual quaternion computation
 
 @note You can also use Ogre::RTShader::HardwareSkinningFactory::prepareEntityForSkinning to derive this information automatically.
 

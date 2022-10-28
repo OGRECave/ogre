@@ -49,6 +49,12 @@ namespace RTShader {
 *  @{
 */
 
+enum SkinningType
+{
+    ST_LINEAR,
+    ST_DUAL_QUATERNION
+};
+
 /** Implement a sub render state which performs hardware skinning.
 Meaning, this sub render states adds calculations which multiply
 the points and normals by their assigned bone matricies.
