@@ -247,64 +247,58 @@ SubRenderState* HardwareSkinningFactory::createInstance(ScriptCompiler* compiler
 {
     if (prop->name == "hardware_skinning")
     {
-        bool hasError = false;
         uint32 boneCount = 0;
         uint32 weightCount = 0;
-        String skinningType = "";
+        String skinningType = "linear";
         SkinningType skinType = ST_LINEAR;
         bool correctAntipodalityHandling = false;
         bool scalingShearingSupport = false;
         
-        if(prop->values.size() >= 2)
+        if(prop->values.size() < 2)
+            return NULL;
+
+        AbstractNodeList::iterator it = prop->values.begin();
+        if(false == SGScriptTranslator::getUInt(*it, &boneCount))
+            return NULL;
+
+        ++it;
+        if(false == SGScriptTranslator::getUInt(*it, &weightCount))
+            return NULL;
+
+        if(prop->values.size() >= 3)
         {
-            AbstractNodeList::iterator it = prop->values.begin();
-            if(false == SGScriptTranslator::getUInt(*it, &boneCount))
-                hasError = true;
+            ++it;
+            SGScriptTranslator::getString(*it, &skinningType);
+        }
+
+        if(prop->values.size() >= 5)
+        {
+            ++it;
+            SGScriptTranslator::getBoolean(*it, &correctAntipodalityHandling);
 
             ++it;
-            if(false == SGScriptTranslator::getUInt(*it, &weightCount))
-                hasError = true;
+            SGScriptTranslator::getBoolean(*it, &scalingShearingSupport);
+        }
 
-            if(prop->values.size() >= 5)
-            {
-                ++it;
-                SGScriptTranslator::getString(*it, &skinningType);
-
-                ++it;
-                SGScriptTranslator::getBoolean(*it, &correctAntipodalityHandling);
-
-                ++it;
-                SGScriptTranslator::getBoolean(*it, &scalingShearingSupport);
-            }
-
-            //If the skinningType is not specified or is specified incorrectly, default to linear skinning.
-            if(skinningType == "dual_quaternion")
-            {
-                skinType = ST_DUAL_QUATERNION;
-            }
-            else
-            {
-                skinType = ST_LINEAR;
-            }
+        if(skinningType == "dual_quaternion")
+        {
+            skinType = ST_DUAL_QUATERNION;
+        }
+        else if(skinningType == "linear")
+        {
+            skinType = ST_LINEAR;
         }
         else
-            hasError = true;
-
-        if (hasError == true)
         {
-            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
             return NULL;
         }
-        else
-        {
-            //create and update the hardware skinning sub render state
-            SubRenderState* subRenderState = createOrRetrieveInstance(translator);
-            HardwareSkinning* hardSkinSrs = static_cast<HardwareSkinning*>(subRenderState);
-            hardSkinSrs->setHardwareSkinningParam(boneCount, weightCount, skinType, correctAntipodalityHandling, scalingShearingSupport);
-            
-            return subRenderState;
-        }
 
+        //create and update the hardware skinning sub render state
+        SubRenderState* subRenderState = createOrRetrieveInstance(translator);
+        HardwareSkinning* hardSkinSrs = static_cast<HardwareSkinning*>(subRenderState);
+        hardSkinSrs->setHardwareSkinningParam(boneCount, weightCount, skinType, correctAntipodalityHandling, scalingShearingSupport);
+
+        return subRenderState;
     }
 
     return NULL;

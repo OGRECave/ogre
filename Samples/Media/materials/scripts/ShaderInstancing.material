@@ -12,7 +12,7 @@ material Examples/Instancing/ShaderBased/shadow_caster
 			rtshader_system
 			{
 				lighting_stage gbuffer depth
-				hardware_skinning 70 1 linear false false
+				hardware_skinning 70 1 linear
 			}
 		}
 	}
@@ -65,7 +65,7 @@ material Examples/Instancing/RTSS/Robot
 
 			rtshader_system
 			{
-				hardware_skinning 70 1 linear false false
+				hardware_skinning 70 1 linear
 			}
 		}
 	}
