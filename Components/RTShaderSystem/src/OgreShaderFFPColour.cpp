@@ -202,14 +202,7 @@ SubRenderState* FFPColourFactory::createInstance(ScriptCompiler* compiler,
     {
         if(prop->values.size() == 1)
         {
-            String modelType;
-
-            if(false == SGScriptTranslator::getString(prop->values.front(), &modelType))
-            {
-                return NULL;
-            }
-
-            if (modelType == "ffp")
+            if (prop->values.front()->getString() == "ffp")
             {
                 return createOrRetrieveInstance(translator);
             }

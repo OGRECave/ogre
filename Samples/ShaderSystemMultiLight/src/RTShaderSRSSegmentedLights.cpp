@@ -820,14 +820,7 @@ SubRenderState* RTShaderSRSSegmentedLightsFactory::createInstance(ScriptCompiler
     {
         if(prop->values.size() == 1)
         {
-            String modelType;
-
-            if(false == SGScriptTranslator::getString(prop->values.front(), &modelType))
-            {
-                return NULL;
-            }
-
-            if (modelType == "per_pixel")
+            if (prop->values.front()->getString() == "per_pixel")
             {
                 return createOrRetrieveInstance(translator);
             }

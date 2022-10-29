@@ -168,7 +168,7 @@ bool CookTorranceLighting::preAddToRenderState(const RenderState* renderState, P
 
 bool CookTorranceLighting::setParameter(const String& name, const String& value)
 {
-    if (name == "texture")
+    if (name == "texture" && !value.empty())
     {
         mMetalRoughnessMapName = value;
         return true;
@@ -190,27 +190,23 @@ SubRenderState* CookTorranceLightingFactory::createInstance(ScriptCompiler* comp
         AbstractNodeList::const_iterator it = prop->values.begin();
 
         // Read light model type.
-        if (!SGScriptTranslator::getString(*it++, &strValue) || strValue != "metal_roughness")
+        if ((*it++)->getString()!= "metal_roughness")
             return NULL;
 
         auto subRenderState = createOrRetrieveInstance(translator);
 
-        if(prop->values.size() == 1)
+        if(prop->values.size() < 3)
             return subRenderState;
 
-        if (!SGScriptTranslator::getString(*it++, &strValue) || strValue != "texture")
+        if ((*it++)->getString() != "texture")
         {
             compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
             return subRenderState;
         }
 
-        if (false == SGScriptTranslator::getString(*it, &strValue))
-        {
-            compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
-            return subRenderState;
-        }
+        if(!subRenderState->setParameter("texture", (*it++)->getString()))
+            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
 
-        subRenderState->setParameter("texture", strValue);
         return subRenderState;
     }
 

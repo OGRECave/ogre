@@ -213,7 +213,7 @@ bool FFPFog::preAddToRenderState(const RenderState* renderState, Pass* srcPass, 
 //-----------------------------------------------------------------------
 bool FFPFog::setParameter(const String& name, const String& value)
 {
-	if(name == "calc_mode")
+	if(name == "calc_mode" && !value.empty())
 	{
         CalcMode cm = value == "per_vertex" ? CM_PER_VERTEX : CM_PER_PIXEL;
 		setCalcMode(cm);
@@ -237,28 +237,16 @@ SubRenderState* FFPFogFactory::createInstance(ScriptCompiler* compiler,
     {
         if(prop->values.size() >= 1)
         {
-            String strValue;
-
-            if(false == SGScriptTranslator::getString(prop->values.front(), &strValue))
-            {
-                return NULL;
-            }
-
-            if (strValue == "ffp")
+            if (prop->values.front()->getString() == "ffp")
             {
                 SubRenderState* subRenderState = createOrRetrieveInstance(translator);
-                FFPFog* fogSubRenderState = static_cast<FFPFog*>(subRenderState);
                 AbstractNodeList::const_iterator it = prop->values.begin();
 
                 if(prop->values.size() >= 2)
                 {
                     ++it;
-                    if (false == SGScriptTranslator::getString(*it, &strValue))
-                    {
-                        return NULL;
-                    }
-
-                    fogSubRenderState->setParameter("calc_mode", strValue);
+                    if(!subRenderState->setParameter("calc_mode", (*it)->getString()))
+                        compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
                 }
                 
                 return subRenderState;

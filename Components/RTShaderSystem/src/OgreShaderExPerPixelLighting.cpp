@@ -339,9 +339,7 @@ SubRenderState* PerPixelLightingFactory::createInstance(ScriptCompiler* compiler
         return NULL;
 
     auto it = prop->values.begin();
-    String val;
-
-    if(!SGScriptTranslator::getString(*it++, &val) || val != "per_pixel")
+    if((*it++)->getString() != "per_pixel")
         return NULL;
 
     auto ret = createOrRetrieveInstance(translator);
@@ -349,10 +347,9 @@ SubRenderState* PerPixelLightingFactory::createInstance(ScriptCompiler* compiler
     // process the flags
     while(it != prop->values.end())
     {
-        if (!SGScriptTranslator::getString(*it++, &val) || !ret->setParameter(val, "true"))
-        {
+        const String& val = (*it++)->getString();
+        if (!ret->setParameter(val, "true"))
             compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line, val);
-        }
     }
 
     return ret;

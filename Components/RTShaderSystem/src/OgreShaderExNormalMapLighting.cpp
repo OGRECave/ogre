@@ -179,13 +179,13 @@ bool NormalMapLighting::setParameter(const String& name, const String& value)
 		return false;
 	}
 
-	if(name == "texture")
+	if(name == "texture" && !value.empty())
 	{
 		mNormalMapTextureName = value;
 		return true;
 	}
 
-	if(name == "texcoord_index")
+	if(name == "texcoord_index" && !value.empty())
 	{
 		setTexCoordIndex(StringConverter::parseInt(value));
 		return true;
@@ -217,41 +217,22 @@ SubRenderState* NormalMapLightingFactory::createInstance(ScriptCompiler* compile
     {
         if(prop->values.size() >= 2)
         {
-            String strValue;
             AbstractNodeList::const_iterator it = prop->values.begin();
             
-            // Read light model type.
-            if(false == SGScriptTranslator::getString(*it, &strValue))
-            {
-                return NULL;
-            }
-
             // Case light model type is normal map
-            if (strValue == "normal_map")
+            if ((*it)->getString() == "normal_map")
             {
                 ++it;
-                if (false == SGScriptTranslator::getString(*it, &strValue))
-                {
-                    return NULL;
-                }
-
-                
                 SubRenderState* subRenderState = createOrRetrieveInstance(translator);
                 NormalMapLighting* normalMapSubRenderState = static_cast<NormalMapLighting*>(subRenderState);
                 
-                normalMapSubRenderState->setParameter("texture", strValue);
+                subRenderState->setParameter("texture", (*it)->getString());
 
-                
                 // Read normal map space type.
                 if (prop->values.size() >= 3)
                 {                   
                     ++it;
-                    if (false == SGScriptTranslator::getString(*it, &strValue))
-                    {
-                        return NULL;
-                    }
-
-                    if(!normalMapSubRenderState->setParameter("normalmap_space", strValue))
+                    if(!subRenderState->setParameter("normalmap_space", (*it)->getString()))
                     {
                         compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
                     }
@@ -273,13 +254,8 @@ SubRenderState* NormalMapLightingFactory::createInstance(ScriptCompiler* compile
                 if (prop->values.size() >= 5)
                 {
                     ++it;
-                    if (false == SGScriptTranslator::getString(*it, &strValue))
-                    {
-                        compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
-                    }
-
                     // sampler reference
-                    if(!normalMapSubRenderState->setParameter("sampler", strValue))
+                    if(!normalMapSubRenderState->setParameter("sampler", (*it)->getString()))
                     {
                         compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
                     }

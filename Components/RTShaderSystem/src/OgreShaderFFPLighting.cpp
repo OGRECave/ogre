@@ -548,27 +548,16 @@ SubRenderState*	FFPLightingFactory::createInstance(ScriptCompiler* compiler,
         return NULL;
 
     auto it = prop->values.begin();
-    String val;
-
-    if(!SGScriptTranslator::getString(*it, &val))
-    {
-        return NULL;
-    }
 
     SubRenderState* ret = NULL;
-    if (val == "ffp")
+    if ((*it++)->getString() == "ffp")
     {
         ret = createOrRetrieveInstance(translator);
     }
 
     if(ret && prop->values.size() >= 2)
     {
-        if(!SGScriptTranslator::getString(*it, &val))
-        {
-            return NULL;
-        }
-
-        static_cast<FFPLighting*>(ret)->setNormaliseEnabled(val == "normalised");
+        ret->setParameter((*it)->getString(), "true"); // normalise
     }
 
     return ret;

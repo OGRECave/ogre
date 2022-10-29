@@ -686,12 +686,7 @@ SubRenderState* FFPTexturingFactory::createInstance(ScriptCompiler* compiler,
     {
         if(prop->values.size() == 1)
         {
-            String value;
-
-            if(false == SGScriptTranslator::getString(prop->values.front(), &value))
-            {
-                return NULL;
-            }
+            const String& value = prop->values.front()->getString();
 
             auto inst = createOrRetrieveInstance(translator);
 

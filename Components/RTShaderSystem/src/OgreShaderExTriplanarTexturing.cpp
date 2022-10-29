@@ -231,22 +231,13 @@ namespace RTShader {
                 Vector3 vParameters(parameters[0], parameters[1], parameters[2]);
                 tpSubRenderState->setParameters(vParameters);
 
-                String textureNameFromX, textureNameFromY, textureNameFromZ;
-                ++it;
-                if (false == SGScriptTranslator::getString(*it, &textureNameFromX))
-                {
+                String textureNameFromX = (*it++)->getString();
+                String textureNameFromY = (*it++)->getString();
+                String textureNameFromZ = (*it++)->getString();
+
+                if(textureNameFromX.empty() || textureNameFromY.empty() || textureNameFromZ.empty())
                     return NULL;
-                }
-                ++it;
-                if (false == SGScriptTranslator::getString(*it, &textureNameFromY))
-                {
-                    return NULL;
-                }
-                ++it;
-                if (false == SGScriptTranslator::getString(*it, &textureNameFromZ))
-                {
-                    return NULL;
-                }
+
                 tpSubRenderState->setTextureNames(textureNameFromX, textureNameFromY, textureNameFromZ);
 
                 return subRenderState;

@@ -56,12 +56,16 @@ public:
     void translate(ScriptCompiler *compiler, const AbstractNodePtr &node) override;
 
     using ScriptTranslator::getBoolean;
-    using ScriptTranslator::getString;
-    using ScriptTranslator::getReal;
+    // @deprecated use AbstractNode::getString() instead
+    OGRE_DEPRECATED static bool getString(const AbstractNodePtr& node, String* result)
+    {
+        return ScriptTranslator::getString(node, result);
+    }
+    using ScriptTranslator::getColour;
     using ScriptTranslator::getFloat;
     using ScriptTranslator::getInt;
+    using ScriptTranslator::getReal;
     using ScriptTranslator::getUInt;
-    using ScriptTranslator::getColour;
 
     /**
     * Returns a sub render state of a given name which has already 

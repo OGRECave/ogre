@@ -390,13 +390,7 @@ SubRenderState* LayeredBlendingFactory::createInstance(ScriptCompiler* compiler,
 {
     if (prop->name == "layered_blend")
     {
-        String blendType;
-        if(false == SGScriptTranslator::getString(prop->values.front(), &blendType))
-        {
-            return NULL;
-        }
-
-        if (stringToBlendMode(blendType) == LayeredBlending::LB_Invalid)
+        if (stringToBlendMode(prop->values.front()->getString()) == LayeredBlending::LB_Invalid)
         {
             StringVector vec;
             for (const auto& m : _blendModes)
@@ -414,7 +408,7 @@ SubRenderState* LayeredBlendingFactory::createInstance(ScriptCompiler* compiler,
         
         //update the layer sub render state
         unsigned short texIndex = texState->getParent()->getTextureUnitStateIndex(texState);
-        layeredBlendState->setBlendMode(texIndex, blendType);
+        layeredBlendState->setBlendMode(texIndex, prop->values.front()->getString());
 
         return layeredBlendState;
     }
@@ -430,8 +424,8 @@ SubRenderState* LayeredBlendingFactory::createInstance(ScriptCompiler* compiler,
         int customNum;
         
         AbstractNodeList::const_iterator itValue = prop->values.begin();
-        isParseSuccess = SGScriptTranslator::getString(*itValue, &modifierString) &&
-                         stringToSourceModifier(modifierString) != LayeredBlending::SM_Invalid;
+        modifierString = (*itValue)->getString();
+        isParseSuccess = stringToSourceModifier(modifierString) != LayeredBlending::SM_Invalid;
         if (isParseSuccess == false)
         {
             compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line, 
@@ -441,8 +435,7 @@ SubRenderState* LayeredBlendingFactory::createInstance(ScriptCompiler* compiler,
         }
 
         ++itValue;
-        isParseSuccess = SGScriptTranslator::getString(*itValue, &paramType); 
-        isParseSuccess &= (paramType == "custom");
+        isParseSuccess &= ((*itValue)->getString() == "custom");
         if(isParseSuccess == false)
         {
             compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line, 

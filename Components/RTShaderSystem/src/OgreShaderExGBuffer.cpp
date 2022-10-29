@@ -217,28 +217,14 @@ SubRenderState* GBufferFactory::createInstance(ScriptCompiler* compiler, Propert
         return NULL;
 
     auto it = prop->values.begin();
-    String val;
-
-    if(!SGScriptTranslator::getString(*it++, &val) || val != "gbuffer")
+    if((*it++)->getString() != "gbuffer")
         return NULL;
 
     GBuffer::TargetBuffers targets;
-
-    if(!SGScriptTranslator::getString(*it++, &val))
-    {
-        return NULL;
-    }
-    targets.push_back(translate(val));
+    targets.push_back(translate((*it++)->getString()));
 
     if(it != prop->values.end())
-    {
-        if(!SGScriptTranslator::getString(*it++, &val))
-        {
-            return NULL;
-        }
-
-        targets.push_back(translate(val));
-    }
+        targets.push_back(translate((*it++)->getString()));
 
     auto ret = static_cast<GBuffer*>(createOrRetrieveInstance(translator));
     ret->setOutBuffers(targets);
