@@ -102,11 +102,11 @@ namespace Ogre{
     bool getValue(const AbstractNodePtr &node, T& result);
     template<> bool getValue(const AbstractNodePtr &node, float& result)
     {
-        return ScriptTranslator::getFloat(node, &result);
+        return StringConverter::parse(node->getString(), result);
     }
     template<> bool getValue(const AbstractNodePtr &node, double& result)
     {
-        return ScriptTranslator::getDouble(node, &result);
+        return StringConverter::parse(node->getString(), result);
     }
     template<> bool getValue(const AbstractNodePtr &node, bool& result)
     {
@@ -114,11 +114,11 @@ namespace Ogre{
     }
     template<> bool getValue(const AbstractNodePtr &node, uint32& result)
     {
-        return ScriptTranslator::getUInt(node, &result);
+        return StringConverter::parse(node->getString(), result);
     }
     template<> bool getValue(const AbstractNodePtr &node, int32& result)
     {
-        return ScriptTranslator::getInt(node, &result);
+        return StringConverter::parse(node->getString(), result);
     }
     template<> bool getValue(const AbstractNodePtr &node, String& result)
     {
@@ -626,38 +626,22 @@ namespace Ogre{
     //-------------------------------------------------------------------------
     bool ScriptTranslator::getFloat(const Ogre::AbstractNodePtr &node, float *result)
     {
-        if(node->type != ANT_ATOM)
-            return false;
-
-        AtomAbstractNode *atom = (AtomAbstractNode*)node.get();
-        return StringConverter::parse(atom->value, *result);
+        return StringConverter::parse(node->getString(), *result);
     }
     //-------------------------------------------------------------------------
     bool ScriptTranslator::getDouble(const Ogre::AbstractNodePtr &node, double *result)
     {
-        if(node->type != ANT_ATOM)
-            return false;
-
-        AtomAbstractNode *atom = (AtomAbstractNode*)node.get();
-        return StringConverter::parse(atom->value, *result);
+        return StringConverter::parse(node->getString(), *result);
     }
     //-------------------------------------------------------------------------
     bool ScriptTranslator::getInt(const Ogre::AbstractNodePtr &node, int *result)
     {
-        if (node->type != ANT_ATOM)
-            return false;
-
-        AtomAbstractNode *atom = (AtomAbstractNode*)node.get();
-        return StringConverter::parse(atom->value, *result);
+        return StringConverter::parse(node->getString(), *result);
     }
     //-------------------------------------------------------------------------
     bool ScriptTranslator::getUInt(const Ogre::AbstractNodePtr &node, uint *result)
     {
-        if (node->type != ANT_ATOM)
-            return false;
-
-        AtomAbstractNode *atom = (AtomAbstractNode*)node.get();
-        return StringConverter::parse(atom->value, *result);
+        return StringConverter::parse(node->getString(), *result);
     }
     //-------------------------------------------------------------------------
     bool ScriptTranslator::getColour(AbstractNodeList::const_iterator i, AbstractNodeList::const_iterator end, ColourValue *result, int maxEntries)
@@ -968,9 +952,8 @@ namespace Ogre{
     //---------------------------------------------------------------------
     bool ScriptTranslator::getConstantType(AbstractNodeList::const_iterator i, GpuConstantType *op)
     {
-
-        String val;
-        if(!getString(*i, &val))
+        const String& val = (*i)->getString();
+        if(val.empty())
             return false;
 
         if (val.find("float") != String::npos)
@@ -1170,20 +1153,11 @@ namespace Ogre{
                     }
                     else
                     {
-                        String strategyName;
-                        bool result = getString(prop->values.front(), &strategyName);
-                        if (result)
-                        {
+                        LodStrategy *strategy = LodStrategyManager::getSingleton().getStrategy(prop->values.front()->getString());
+                        if (strategy)
+                            mMaterial->setLodStrategy(strategy);
 
-                            LodStrategy *strategy = LodStrategyManager::getSingleton().getStrategy(strategyName);
-
-                            result = (strategy != 0);
-
-                            if (result)
-                                mMaterial->setLodStrategy(strategy);
-                        }
-
-                        if (!result)
+                        if (!strategy)
                         {
                             compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
                                                "lod_strategy argument must be a valid LOD strategy");
@@ -1831,7 +1805,7 @@ namespace Ogre{
                         else
                         {
                             String val2;
-                            if (getString(prop->values.front(), &val2) && val2=="force")
+                            if (prop->values.front()->getString()=="force")
                             {
                                 mPass->setTransparentSortingEnabled(true);
                                 mPass->setTransparentSortingForced(true);
@@ -4515,18 +4489,11 @@ namespace Ogre{
             return;
         }
 
-        String type;
-        if(!getString(obj->values.front(), &type))
-        {
-            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, obj->file, obj->line);
-            return;
-        }
-
         ParticleSystem *system = any_cast<ParticleSystem*>(obj->parent->context);
 
         try
         {
-            mEmitter = system->addEmitter(type);
+            mEmitter = system->addEmitter(obj->values.front()->getString());
         }
         catch(Exception &e)
         {
@@ -4589,17 +4556,10 @@ namespace Ogre{
             return;
         }
 
-        String type;
-        if(!getString(obj->values.front(), &type))
-        {
-            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, obj->file, obj->line);
-            return;
-        }
-
         ParticleSystem *system = any_cast<ParticleSystem*>(obj->parent->context);
         try
         {
-            mAffector = system->addAffector(type);
+            mAffector = system->addAffector(obj->values.front()->getString());
         }
         catch(Exception &e)
         {
