@@ -172,7 +172,6 @@ configure_file(${OGRE_TEMPLATES_DIR}/samples.cfg.in ${PROJECT_BINARY_DIR}/inst/b
 install(FILES 
   ${PROJECT_BINARY_DIR}/inst/bin/resources.cfg
   ${PROJECT_BINARY_DIR}/inst/bin/plugins.cfg
-  ${PROJECT_BINARY_DIR}/inst/bin/samples.cfg
   DESTINATION "${OGRE_CFG_INSTALL_PATH}"
 )
 
