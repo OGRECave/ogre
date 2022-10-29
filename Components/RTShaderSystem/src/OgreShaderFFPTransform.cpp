@@ -144,15 +144,10 @@ SubRenderState* FFPTransformFactory::createInstance(ScriptCompiler* compiler,
     {
         if(prop->values.size() > 0)
         {
-            String modelType;
             int texCoordSlot = 1;
 
             auto it = prop->values.begin();
-
-            if(!SGScriptTranslator::getString(*it, &modelType))
-            {
-                return NULL;
-            }
+            const String& modelType = (*it)->getString();
 
             if(++it != prop->values.end() && !SGScriptTranslator::getInt(*++it, &texCoordSlot))
                 return NULL;

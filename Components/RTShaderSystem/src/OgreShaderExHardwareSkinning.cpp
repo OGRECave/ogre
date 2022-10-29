@@ -268,7 +268,7 @@ SubRenderState* HardwareSkinningFactory::createInstance(ScriptCompiler* compiler
         if(prop->values.size() >= 3)
         {
             ++it;
-            SGScriptTranslator::getString(*it, &skinningType);
+            skinningType = (*it)->getString();
         }
 
         if(prop->values.size() >= 5)

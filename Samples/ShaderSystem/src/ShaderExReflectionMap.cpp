@@ -267,45 +267,32 @@ SubRenderState* ShaderExReflectionMapFactory::createInstance(ScriptCompiler* com
             AbstractNodeList::const_iterator it = prop->values.begin();
 
             // Read reflection map type.
-            if(false == SGScriptTranslator::getString(*it, &strValue))
-            {
-                return NULL;
-            }
+            strValue = (*it)->getString();
             ++it;
 
             SubRenderState* subRenderState = SubRenderStateFactory::createInstance();
             ShaderExReflectionMap* reflectionMapSubRenderState = static_cast<ShaderExReflectionMap*>(subRenderState);
-            
 
-            // Reflection map is cubic texture.
             if (strValue == "cube_map")
             {
                 reflectionMapSubRenderState->setReflectionMapType(TEX_TYPE_CUBE_MAP);
             }
-
-            // Reflection map is 2d texture.
             else if (strValue == "2d_map")
             {
                 reflectionMapSubRenderState->setReflectionMapType(TEX_TYPE_2D);
             }
-    
-            // Read mask texture.
-            if (false == SGScriptTranslator::getString(*it, &strValue))
+            else
             {
-                compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
                 return NULL;
             }
-            reflectionMapSubRenderState->setMaskMapTextureName(strValue);
+
+            // Read mask texture.
+            reflectionMapSubRenderState->setMaskMapTextureName((*it)->getString());
             ++it;
             
         
             // Read reflection texture.
-            if (false == SGScriptTranslator::getString(*it, &strValue))
-            {
-                compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
-                return NULL;
-            }           
-            reflectionMapSubRenderState->setReflectionMapTextureName(strValue);
+            reflectionMapSubRenderState->setReflectionMapTextureName((*it)->getString());
             ++it;
 
             // Read reflection power value.
