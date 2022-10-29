@@ -131,9 +131,9 @@ if(OGRE_BUILD_DEPENDENCIES AND NOT EXISTS ${OGREDEPS_PATH})
     if(MSVC OR MINGW OR SKBUILD) # other platforms dont need this
       message(STATUS "Building zlib") # only needed for Assimp
       file(DOWNLOAD
-          http://zlib.net/zlib-1.2.12.tar.gz
-          ${PROJECT_BINARY_DIR}/zlib-1.2.12.tar.gz
-          EXPECTED_HASH SHA256=91844808532e5ce316b3c010929493c0244f3d37593afd6de04f71821d5136d9)
+          http://zlib.net/zlib-1.2.13.tar.gz
+          ${PROJECT_BINARY_DIR}/zlib-1.2.13.tar.gz
+          EXPECTED_HASH SHA256=b3a24de97a8fdbc835b9833169501030b8977031bcb54b3b3ac13740f846ab30)
       execute_process(COMMAND ${CMAKE_COMMAND}
           -E tar xf zlib-1.2.12.tar.gz WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
       execute_process(COMMAND ${BUILD_COMMAND_COMMON}
