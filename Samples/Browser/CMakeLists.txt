@@ -286,6 +286,8 @@ endif(ANDROID)
 
 if (OGRE_INSTALL_SAMPLES)
 	ogre_install_target(SampleBrowser "" FALSE)
+  install(FILES ${PROJECT_BINARY_DIR}/inst/bin/samples.cfg DESTINATION "${OGRE_CFG_INSTALL_PATH}")
+
 	if (OGRE_INSTALL_PDB)
 		# install debug pdb files
 		install(FILES $<TARGET_PDB_FILE:SampleBrowser>
