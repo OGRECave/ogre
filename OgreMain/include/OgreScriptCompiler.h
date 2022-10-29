@@ -103,6 +103,8 @@ namespace Ogre
         virtual AbstractNode *clone() const = 0;
         /// Returns a string value depending on the type of the AbstractNode.
         virtual const String& getValue() const = 0;
+        /// Returns the string content of the node for ANT_ATOM. Empty string otherwise.
+        const String& getString() const;
     };
 
     /** This is an abstract node which cannot be broken down further */
@@ -116,6 +118,11 @@ namespace Ogre
         AbstractNode *clone() const override;
         const String& getValue() const override { return value; }
     };
+
+    inline const String& AbstractNode::getString() const
+    {
+        return type == ANT_ATOM ? static_cast<const AtomAbstractNode*>(this)->value : BLANKSTRING;
+    }
 
     /** This specific abstract node represents a script object */
     class _OgreExport ObjectAbstractNode : public AbstractNode
