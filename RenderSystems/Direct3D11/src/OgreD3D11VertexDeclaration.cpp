@@ -87,10 +87,11 @@ namespace Ogre {
 
                 if (elem.Format == DXGI_FORMAT_UNKNOWN)
                 {
-                    OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-                                StringUtil::format("No VertexElement for semantic %s%d in shader %s found",
-                                                   inputDesc.SemanticName, inputDesc.SemanticIndex,
-                                                   boundVertexProgram->getName().c_str()));
+                    OGRE_EXCEPT(
+                        Exception::ERR_RENDERINGAPI_ERROR,
+                        StringUtil::format("Vertex Shader %s consumes semantic %s%d but no such VertexElement provided",
+                                           boundVertexProgram->getName().c_str(), inputDesc.SemanticName,
+                                           inputDesc.SemanticIndex));
                 }
 
                 elem.SemanticName          = inputDesc.SemanticName;
