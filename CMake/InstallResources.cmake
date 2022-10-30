@@ -145,25 +145,22 @@ if (NOT OGRE_BUILD_PLUGIN_EXRCODEC OR NOT OGRE_COMMENT_PLUGIN_FREEIMAGE)
   # overlaps with freeimage
   set(OGRE_COMMENT_PLUGIN_EXRCODEC "#")
 endif ()
-if (NOT OGRE_BUILD_COMPONENT_TERRAIN)
-  set(OGRE_COMMENT_COMPONENT_TERRAIN "#")
-endif ()
-if (NOT OGRE_BUILD_COMPONENT_RTSHADERSYSTEM)
-  set(OGRE_COMMENT_COMPONENT_RTSHADERSYSTEM "#")
-endif ()
-if (NOT OGRE_BUILD_COMPONENT_VOLUME)
-  set(OGRE_COMMENT_COMPONENT_VOLUME "#")
-endif ()
-if (NOT OGRE_BUILD_COMPONENT_TERRAIN OR NOT OGRE_BUILD_COMPONENT_PAGING)
-  set(OGRE_COMMENT_SAMPLE_ENDLESSWORLD "#")
-endif ()
 if(NOT OGRE_BUILD_TESTS)
   set(OGRE_COMMENT_PLAYPENTESTS "#")
 endif()
 
+set(OGRE_SAMPLE_RESOURCES "")
 
 set(OGRE_CORE_MEDIA_DIR "${OGRE_MEDIA_DIR_REL}")
+
 # CREATE CONFIG FILES - INSTALL VERSIONS
+
+if(OGRE_INSTALL_SAMPLES)
+  # deal with sample resources
+  configure_file(${OGRE_TEMPLATES_DIR}/sample_resources.cfg.in ${PROJECT_BINARY_DIR}/sample_resources.cfg)
+  file(READ ${PROJECT_BINARY_DIR}/sample_resources.cfg OGRE_SAMPLE_RESOURCES)
+endif()
+
 configure_file(${OGRE_TEMPLATES_DIR}/resources.cfg.in ${PROJECT_BINARY_DIR}/inst/bin/resources.cfg)
 configure_file(${OGRE_TEMPLATES_DIR}/plugins.cfg.in ${PROJECT_BINARY_DIR}/inst/bin/plugins.cfg)
 configure_file(${OGRE_TEMPLATES_DIR}/samples.cfg.in ${PROJECT_BINARY_DIR}/inst/bin/samples.cfg)
@@ -197,6 +194,12 @@ elseif (UNIX)
   set(OGRE_PLUGIN_DIR_REL "${PROJECT_BINARY_DIR}/lib")
   set(OGRE_SAMPLES_DIR_REL "${PROJECT_BINARY_DIR}/lib")
 endif ()
+
+if(OGRE_BUILD_SAMPLES)
+  # deal with sample resources
+  configure_file(${OGRE_TEMPLATES_DIR}/sample_resources.cfg.in ${PROJECT_BINARY_DIR}/sample_resources.cfg)
+  file(READ ${PROJECT_BINARY_DIR}/sample_resources.cfg OGRE_SAMPLE_RESOURCES)
+endif()
 
 if (WINDOWS_STORE OR WINDOWS_PHONE OR EMSCRIPTEN)
   # These platfroms requires all resources to be packaged inside the application bundle,
