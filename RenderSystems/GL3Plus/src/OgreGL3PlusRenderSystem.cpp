@@ -1098,6 +1098,8 @@ namespace Ogre {
         if (updateVAO)
             vao->bindToGpu(this, op.vertexData->vertexBufferBinding, 0);
 
+        mCurrentShader[GPT_VERTEX_PROGRAM]->validateDeclaration(op.vertexData->vertexDeclaration);
+
         // We treat index buffer binding inside VAO as volatile, always updating and never relying onto it,
         // as one shared vertex buffer could be rendered with several index buffers, from submeshes and/or LODs
         if (op.useIndexes)

@@ -70,6 +70,8 @@ namespace Ogre {
         void extractUniforms(int block = -1) const;
         void extractBufferBlocks(GLenum type) const;
 
+        void extractAttributes();
+
         mutable HardwareBufferPtr mDefaultBuffer;
         bool mHasSamplerBinding;
     };
