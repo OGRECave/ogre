@@ -4,58 +4,9 @@ FileSystem=@OGRE_CORE_MEDIA_DIR@/Main
 FileSystem=@OGRE_CORE_MEDIA_DIR@/RTShaderLib/GLSL
 FileSystem=@OGRE_CORE_MEDIA_DIR@/Terrain/
 
-# Resources required by the sample browser and most samples.
+# Resources required by OgreBites::Trays
 [Essential]
 Zip=@OGRE_CORE_MEDIA_DIR@/packs/SdkTrays.zip
 Zip=@OGRE_CORE_MEDIA_DIR@/packs/profiler.zip
-FileSystem=@OGRE_MEDIA_DIR_REL@/thumbnails
 
-# Common sample resources needed by many of the samples.
-# Rarely used resources should be separately loaded by the
-# samples which require them.
-[General]
-# PBR media must come before the scripts that reference it
-FileSystem=@OGRE_MEDIA_DIR_REL@/PBR
-FileSystem=@OGRE_MEDIA_DIR_REL@/PBR/filament
-FileSystem=@OGRE_MEDIA_DIR_REL@/materials/textures/PBR
-
-FileSystem=@OGRE_MEDIA_DIR_REL@/materials/programs/GLSL
-FileSystem=@OGRE_MEDIA_DIR_REL@/materials/programs/GLSL120
-FileSystem=@OGRE_MEDIA_DIR_REL@/materials/programs/GLSL150
-FileSystem=@OGRE_MEDIA_DIR_REL@/materials/programs/GLSL400
-FileSystem=@OGRE_MEDIA_DIR_REL@/materials/programs/GLSLES
-FileSystem=@OGRE_MEDIA_DIR_REL@/materials/programs/SPIRV
-FileSystem=@OGRE_MEDIA_DIR_REL@/materials/programs/Cg
-FileSystem=@OGRE_MEDIA_DIR_REL@/materials/programs/HLSL
-FileSystem=@OGRE_MEDIA_DIR_REL@/materials/programs/HLSL_Cg
-FileSystem=@OGRE_MEDIA_DIR_REL@/materials/scripts
-FileSystem=@OGRE_MEDIA_DIR_REL@/materials/textures
-FileSystem=@OGRE_MEDIA_DIR_REL@/materials/textures/terrain
-FileSystem=@OGRE_MEDIA_DIR_REL@/models
-FileSystem=@OGRE_MEDIA_DIR_REL@/particle
-FileSystem=@OGRE_MEDIA_DIR_REL@/DeferredShadingMedia
-FileSystem=@OGRE_MEDIA_DIR_REL@/DeferredShadingMedia/DeferredShading/post
-FileSystem=@OGRE_MEDIA_DIR_REL@/PCZAppMedia
-FileSystem=@OGRE_MEDIA_DIR_REL@/materials/scripts/SSAO
-FileSystem=@OGRE_MEDIA_DIR_REL@/materials/textures/SSAO
-FileSystem=@OGRE_MEDIA_DIR_REL@/volumeTerrain
-FileSystem=@OGRE_MEDIA_DIR_REL@/CSMShadows
-Zip=@OGRE_MEDIA_DIR_REL@/packs/cubemap.zip
-Zip=@OGRE_MEDIA_DIR_REL@/packs/cubemapsJS.zip
-Zip=@OGRE_MEDIA_DIR_REL@/packs/dragon.zip
-Zip=@OGRE_MEDIA_DIR_REL@/packs/fresneldemo.zip
-Zip=@OGRE_MEDIA_DIR_REL@/packs/ogredance.zip
-Zip=@OGRE_MEDIA_DIR_REL@/packs/Sinbad.zip
-Zip=@OGRE_MEDIA_DIR_REL@/packs/skybox.zip
-Zip=@OGRE_MEDIA_DIR_REL@/volumeTerrain/volumeTerrainBig.zip
-
-Zip=@OGRE_MEDIA_DIR_REL@/packs/DamagedHelmet.zip
-Zip=@OGRE_MEDIA_DIR_REL@/packs/filament_shaders.zip
-
-[BSPWorld]
-Zip=@OGRE_MEDIA_DIR_REL@/packs/oa_rpg3dm2.pk3
-Zip=@OGRE_MEDIA_DIR_REL@/packs/ogretestmap.zip
-
-# Materials for visual tests
-[Tests]
-FileSystem=@OGRE_TEST_MEDIA_DIR_REL@
+@OGRE_SAMPLE_RESOURCES@
