@@ -1059,21 +1059,16 @@ The base\_name in this format is something like ’skybox.jpg’, and the system
 @par
 Format2 (long): cubic\_texture &lt;front&gt; &lt;back&gt; &lt;left&gt; &lt;right&gt; &lt;up&gt; &lt;down&gt; &lt;combinedUVW|separateUV&gt;
 
-In this case each face is specified explicitly, in case you don’t want to conform to the image naming standards above. You can only use this for the separateUV version since the combinedUVW version requires a single texture name to be assigned to the combined 3D texture (see below).
+In this case each face is specified explicitly, in case you don’t want to conform to the image naming standards above.
 
 In both cases the final parameter means the following:
 
 <dl compact="compact">
-<dt>separateUV</dt> <dd>
-
-@deprecated Use real cubic textures due to hardware support
-
-The 6 textures are kept separate but are all referenced by this single texture layer. One texture at a time is active (they are actually stored as 6 frames), and they are addressed using standard 2D UV coordinates.
-</dd>
 <dt>combinedUVW</dt> <dd>
-
 The 6 textures are combined into a single ’cubic’ texture map which is then addressed using 3D texture coordinates.
-
+</dd>
+<dt>separateUV</dt> <dd>
+This is no longer supported and behaves like combinedUVW.
 </dd>
 </dl> <br>
 
@@ -1203,11 +1198,11 @@ Similar to the spherical environment map, but the effect is based on the positio
 
 </dd> <dt>cubic\_reflection</dt> <dd>
 
-A more advanced form of reflection mapping which uses a group of 6 textures making up the inside of a cube, each of which is a view if the scene down each axis. Works extremely well in all cases but has a higher technical requirement from the card than spherical mapping. Requires that you bind a [cubic\_texture](#cubic_005ftexture) to this texture unit and use the ’combinedUVW’ option.
+A more advanced form of reflection mapping which uses a group of 6 textures making up the inside of a cube, each of which is a view if the scene down each axis. Works extremely well in all cases but has a higher technical requirement from the card than spherical mapping. Requires that you bind a [cubic texture](#texture) to this unit.
 
 </dd> <dt>cubic\_normal</dt> <dd>
 
-Generates 3D texture coordinates containing the camera space normal vector from the normal information held in the vertex data. Again, full use of this feature requires a [cubic\_texture](#cubic_005ftexture) with the ’combinedUVW’ option.
+Generates 3D texture coordinates containing the camera space normal vector from the normal information held in the vertex data. Again, use of this feature requires a [cubic texture](#texture).
 
 </dd> </dl> <br>
 @par
