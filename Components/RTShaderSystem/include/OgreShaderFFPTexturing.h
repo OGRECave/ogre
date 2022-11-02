@@ -188,14 +188,12 @@ protected:
                 const int groupOrder, Operand::OpMask targetChannels);
     
     /** 
-    Determines the texture coordinates calculation method of the given texture unit state.
-    */
-    TexCoordCalcMethod getTexCalcMethod(TextureUnitState* textureUnitState);
-
-    /** 
     Determines if the given texture unit state need to use texture transformation matrix.
     */
     bool needsTextureMatrix(TextureUnitState* textureUnitState);
+
+    /// @deprecated do not use
+    OGRE_DEPRECATED TexCoordCalcMethod getTexCalcMethod(TextureUnitState* textureUnitState);
 
     /// @deprecated do not use
     OGRE_DEPRECATED bool isProcessingNeeded(TextureUnitState* texUnitState) { return true; }

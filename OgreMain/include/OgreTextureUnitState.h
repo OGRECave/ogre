@@ -36,6 +36,8 @@ THE SOFTWARE.
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {
+    enum TexCoordCalcMethod : uint8;
+
     /** \addtogroup Core
     *  @{
     */
@@ -1068,6 +1070,8 @@ namespace Ogre {
 
         /// return a sampler local to this TUS instead of the shared global one
         const SamplerPtr& _getLocalSampler();
+
+        TexCoordCalcMethod _deriveTexCoordCalcMethod() const;
 private:
         // State
         /// The current animation frame.
@@ -1140,6 +1144,8 @@ private:
         void ensureLoaded(size_t frame) const;
 
         TexturePtr retrieveTexture(const String& name);
+
+        bool checkTexCalcSettings(const TexturePtr& tex) const;
     };
 
     /** @} */
