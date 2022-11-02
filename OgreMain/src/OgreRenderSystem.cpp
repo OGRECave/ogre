@@ -438,51 +438,15 @@ namespace Ogre {
         _setTextureBlendMode(texUnit, tl.getColourBlendMode());
         _setTextureBlendMode(texUnit, tl.getAlphaBlendMode());
 
-        // Iterate over new effects
-        bool anyCalcs = false;
-        for (auto &effi : tl.mEffects)
+        auto calcMode = tl._deriveTexCoordCalcMethod();
+        if(calcMode == TEXCALC_PROJECTIVE_TEXTURE)
         {
-            switch (effi.second.type)
-            {
-            case TextureUnitState::ET_ENVIRONMENT_MAP:
-                if (effi.second.subtype == TextureUnitState::ENV_CURVED)
-                {
-                    _setTextureCoordCalculation(texUnit, TEXCALC_ENVIRONMENT_MAP);
-                    anyCalcs = true;
-                }
-                else if (effi.second.subtype == TextureUnitState::ENV_PLANAR)
-                {
-                    _setTextureCoordCalculation(texUnit, TEXCALC_ENVIRONMENT_MAP_PLANAR);
-                    anyCalcs = true;
-                }
-                else if (effi.second.subtype == TextureUnitState::ENV_REFLECTION)
-                {
-                    _setTextureCoordCalculation(texUnit, TEXCALC_ENVIRONMENT_MAP_REFLECTION);
-                    anyCalcs = true;
-                }
-                else if (effi.second.subtype == TextureUnitState::ENV_NORMAL)
-                {
-                    _setTextureCoordCalculation(texUnit, TEXCALC_ENVIRONMENT_MAP_NORMAL);
-                    anyCalcs = true;
-                }
-                break;
-            case TextureUnitState::ET_UVSCROLL:
-            case TextureUnitState::ET_USCROLL:
-            case TextureUnitState::ET_VSCROLL:
-            case TextureUnitState::ET_ROTATE:
-            case TextureUnitState::ET_TRANSFORM:
-                break;
-            case TextureUnitState::ET_PROJECTIVE_TEXTURE:
-                _setTextureCoordCalculation(texUnit, TEXCALC_PROJECTIVE_TEXTURE, 
-                    effi.second.frustum);
-                anyCalcs = true;
-                break;
-            }
+            auto frustum = tl.getEffects().find(TextureUnitState::ET_PROJECTIVE_TEXTURE)->second.frustum;
+            _setTextureCoordCalculation(texUnit, calcMode, frustum);
         }
-        // Ensure any previous texcoord calc settings are reset if there are now none
-        if (!anyCalcs)
+        else
         {
-            _setTextureCoordCalculation(texUnit, TEXCALC_NONE);
+            _setTextureCoordCalculation(texUnit, calcMode);
         }
 
         // Change tetxure matrix 

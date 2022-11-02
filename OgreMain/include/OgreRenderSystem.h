@@ -57,7 +57,7 @@ namespace Ogre
 
     class TextureManager;
     /// Enum describing the ways to generate texture coordinates
-    enum TexCoordCalcMethod
+    enum TexCoordCalcMethod : uint8
     {
         /// No calculated texture coordinates
         TEXCALC_NONE,

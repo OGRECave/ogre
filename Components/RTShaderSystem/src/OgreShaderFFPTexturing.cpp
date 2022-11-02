@@ -477,45 +477,7 @@ void FFPTexturing::addPSBlendInvocations(Function* psMain,
 //-----------------------------------------------------------------------
 TexCoordCalcMethod FFPTexturing::getTexCalcMethod(TextureUnitState* textureUnitState)
 {
-    TexCoordCalcMethod                      texCoordCalcMethod = TEXCALC_NONE;  
-    const TextureUnitState::EffectMap&      effectMap = textureUnitState->getEffects(); 
-    TextureUnitState::EffectMap::const_iterator effi;
-    
-    for (effi = effectMap.begin(); effi != effectMap.end(); ++effi)
-    {
-        switch (effi->second.type)
-        {
-        case TextureUnitState::ET_ENVIRONMENT_MAP:
-            if (effi->second.subtype == TextureUnitState::ENV_CURVED)
-            {
-                texCoordCalcMethod = TEXCALC_ENVIRONMENT_MAP;               
-            }
-            else if (effi->second.subtype == TextureUnitState::ENV_PLANAR)
-            {
-                texCoordCalcMethod = TEXCALC_ENVIRONMENT_MAP_PLANAR;                
-            }
-            else if (effi->second.subtype == TextureUnitState::ENV_REFLECTION)
-            {
-                texCoordCalcMethod = TEXCALC_ENVIRONMENT_MAP_REFLECTION;                
-            }
-            else if (effi->second.subtype == TextureUnitState::ENV_NORMAL)
-            {
-                texCoordCalcMethod = TEXCALC_ENVIRONMENT_MAP_NORMAL;                
-            }
-            break;
-        case TextureUnitState::ET_UVSCROLL:
-        case TextureUnitState::ET_USCROLL:
-        case TextureUnitState::ET_VSCROLL:
-        case TextureUnitState::ET_ROTATE:
-        case TextureUnitState::ET_TRANSFORM:
-            break;
-        case TextureUnitState::ET_PROJECTIVE_TEXTURE:
-            texCoordCalcMethod = TEXCALC_PROJECTIVE_TEXTURE;
-            break;
-        }
-    }
-
-    return texCoordCalcMethod;
+    return textureUnitState->_deriveTexCoordCalcMethod();
 }
 
 //-----------------------------------------------------------------------
@@ -658,8 +620,11 @@ void FFPTexturing::setTextureUnit(unsigned short index, TextureUnitState* textur
         break;
     }   
 
+    if(textureUnitState->isTextureLoadFailing())
+        return;
+
      curParams.mVSOutTextureCoordinateType = curParams.mVSInTextureCoordinateType;
-     curParams.mTexCoordCalcMethod = getTexCalcMethod(curParams.mTextureUnitState);
+     curParams.mTexCoordCalcMethod = textureUnitState->_deriveTexCoordCalcMethod();
 
     if (curParams.mTexCoordCalcMethod == TEXCALC_PROJECTIVE_TEXTURE)
         curParams.mVSOutTextureCoordinateType = GCT_FLOAT3;
@@ -669,12 +634,6 @@ void FFPTexturing::setTextureUnit(unsigned short index, TextureUnitState* textur
     if (curParams.mTexCoordCalcMethod == TEXCALC_ENVIRONMENT_MAP_REFLECTION ||
         curParams.mTexCoordCalcMethod == TEXCALC_ENVIRONMENT_MAP_NORMAL)
     {
-        if (textureUnitState->getContentType() == TextureUnitState::CONTENT_NAMED &&
-            curParams.mTextureSamplerType != GCT_SAMPLERCUBE)
-        {
-            const auto& matname = textureUnitState->getParent()->getParent()->getParent()->getName();
-            LogManager::getSingleton().logError(matname + " - env_map setting requires a cubic texture");
-        }
         curParams.mVSOutTextureCoordinateType = GCT_FLOAT3;
         curParams.mTextureSamplerType = GCT_SAMPLERCUBE;
     }
@@ -682,12 +641,6 @@ void FFPTexturing::setTextureUnit(unsigned short index, TextureUnitState* textur
     if (curParams.mTexCoordCalcMethod == TEXCALC_ENVIRONMENT_MAP_PLANAR ||
         curParams.mTexCoordCalcMethod == TEXCALC_ENVIRONMENT_MAP)
     {
-        if (textureUnitState->getContentType() == TextureUnitState::CONTENT_NAMED &&
-            curParams.mTextureSamplerType != GCT_SAMPLER2D)
-        {
-            const auto& matname = textureUnitState->getParent()->getParent()->getParent()->getName();
-            LogManager::getSingleton().logError(matname + " - env_map setting requires a 2d texture");
-        }
         curParams.mVSOutTextureCoordinateType = GCT_FLOAT2;
         curParams.mTextureSamplerType = GCT_SAMPLER2D;
     }
