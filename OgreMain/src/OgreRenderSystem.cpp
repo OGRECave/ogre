@@ -425,10 +425,13 @@ namespace Ogre {
         // Bind texture (may be blank)
         _setTexture(texUnit, true, tex);
 
+        _setSampler(texUnit, *tl.getSampler());
+
+        if(!getCapabilities()->hasCapability(RSC_FIXED_FUNCTION))
+            return;
+
         // Set texture coordinate set
         _setTextureCoordSet(texUnit, tl.getTextureCoordSet());
-
-        _setSampler(texUnit, *tl.getSampler());
 
         // Set blend modes
         // Note, colour before alpha is important
