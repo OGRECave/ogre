@@ -660,16 +660,36 @@ void FFPTexturing::setTextureUnit(unsigned short index, TextureUnitState* textur
      curParams.mVSOutTextureCoordinateType = curParams.mVSInTextureCoordinateType;
      curParams.mTexCoordCalcMethod = getTexCalcMethod(curParams.mTextureUnitState);
 
+    if (curParams.mTexCoordCalcMethod == TEXCALC_PROJECTIVE_TEXTURE)
+        curParams.mVSOutTextureCoordinateType = GCT_FLOAT3;
+
     // let TexCalcMethod override texture type, as it might be wrong for
     // content_type shadow & content_type compositor
-    if (curParams.mTexCoordCalcMethod == TEXCALC_ENVIRONMENT_MAP_REFLECTION)
+    if (curParams.mTexCoordCalcMethod == TEXCALC_ENVIRONMENT_MAP_REFLECTION ||
+        curParams.mTexCoordCalcMethod == TEXCALC_ENVIRONMENT_MAP_NORMAL)
     {
+        if (textureUnitState->getContentType() == TextureUnitState::CONTENT_NAMED &&
+            curParams.mTextureSamplerType != GCT_SAMPLERCUBE)
+        {
+            const auto& matname = textureUnitState->getParent()->getParent()->getParent()->getName();
+            LogManager::getSingleton().logError(matname + " - env_map setting requires a cubic texture");
+        }
         curParams.mVSOutTextureCoordinateType = GCT_FLOAT3;
         curParams.mTextureSamplerType = GCT_SAMPLERCUBE;
     }
 
-     if (curParams.mTexCoordCalcMethod == TEXCALC_PROJECTIVE_TEXTURE)
-         curParams.mVSOutTextureCoordinateType = GCT_FLOAT3;    
+    if (curParams.mTexCoordCalcMethod == TEXCALC_ENVIRONMENT_MAP_PLANAR ||
+        curParams.mTexCoordCalcMethod == TEXCALC_ENVIRONMENT_MAP)
+    {
+        if (textureUnitState->getContentType() == TextureUnitState::CONTENT_NAMED &&
+            curParams.mTextureSamplerType != GCT_SAMPLER2D)
+        {
+            const auto& matname = textureUnitState->getParent()->getParent()->getParent()->getName();
+            LogManager::getSingleton().logError(matname + " - env_map setting requires a 2d texture");
+        }
+        curParams.mVSOutTextureCoordinateType = GCT_FLOAT2;
+        curParams.mTextureSamplerType = GCT_SAMPLER2D;
+    }
 }
 
 //-----------------------------------------------------------------------
