@@ -33,7 +33,7 @@ using namespace Ogre;
 
 TEST(QuaternionTests,Norm)
 {
-    EXPECT_EQ(Quaternion(0, 2, 2, 2).Norm(), Vector3(2, 2, 2).length());
+    EXPECT_NEAR(Quaternion(0, 2, 2, 2).Norm(), Vector3(2, 2, 2).length(), 1e-6);
 }
 
 TEST(QuaternionTests,FromVectors)
