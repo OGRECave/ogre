@@ -99,11 +99,11 @@ bool FFPTexturing::resolveUniformParams(TextureUnitParams* textureUnitParams, Pr
     // Resolve World + View matrices.
     case TEXCALC_ENVIRONMENT_MAP:
     case TEXCALC_ENVIRONMENT_MAP_PLANAR:    
+        mWorldMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_WORLDVIEW_MATRIX);
+        OGRE_FALLTHROUGH;
     case TEXCALC_ENVIRONMENT_MAP_NORMAL:
         //TODO: change the following 'mWorldITMatrix' member to 'mWorldViewITMatrix'
-        mWorldITMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_INVERSE_TRANSPOSE_WORLDVIEW_MATRIX);
-        mViewMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_VIEW_MATRIX);
-        mWorldMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_WORLD_MATRIX);
+        mWorldITMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_NORMAL_MATRIX);
         break;
 
     case TEXCALC_ENVIRONMENT_MAP_REFLECTION:
@@ -154,20 +154,14 @@ bool FFPTexturing::resolveFunctionsParams(TextureUnitParams* textureUnitParams, 
             break;
 
         case TEXCALC_ENVIRONMENT_MAP:
-        case TEXCALC_ENVIRONMENT_MAP_PLANAR:        
-        case TEXCALC_ENVIRONMENT_MAP_NORMAL:
+        case TEXCALC_ENVIRONMENT_MAP_PLANAR:
+        case TEXCALC_ENVIRONMENT_MAP_REFLECTION:
             // Resolve vertex normal.
             mVSInputPos = vsMain->resolveInputParameter(Parameter::SPC_POSITION_OBJECT_SPACE);
+            OGRE_FALLTHROUGH;
+        case TEXCALC_ENVIRONMENT_MAP_NORMAL:
             mVSInputNormal = vsMain->resolveInputParameter(Parameter::SPC_NORMAL_OBJECT_SPACE);
             break;  
-
-        case TEXCALC_ENVIRONMENT_MAP_REFLECTION:
-
-            // Resolve vertex normal.
-            mVSInputNormal = vsMain->resolveInputParameter(Parameter::SPC_NORMAL_OBJECT_SPACE);
-            // Resolve vertex position.
-            mVSInputPos = vsMain->resolveInputParameter(Parameter::SPC_POSITION_OBJECT_SPACE);
-            break;
 
         case TEXCALC_PROJECTIVE_TEXTURE:
             // Resolve vertex position.
@@ -263,7 +257,7 @@ bool FFPTexturing::addVSFunctionInvocations(TextureUnitParams* textureUnitParams
     case TEXCALC_ENVIRONMENT_MAP:
     case TEXCALC_ENVIRONMENT_MAP_PLANAR:
         stage.callFunction(FFP_FUNC_GENERATE_TEXCOORD_ENV_SPHERE,
-                           {In(mWorldMatrix), In(mViewMatrix), In(mWorldITMatrix), In(mVSInputPos), In(mVSInputNormal),
+                           {In(mWorldMatrix), In(mWorldITMatrix), In(mVSInputPos), In(mVSInputNormal),
                             Out(textureUnitParams->mVSOutputTexCoord)});
         break;
     case TEXCALC_ENVIRONMENT_MAP_REFLECTION:
@@ -272,9 +266,8 @@ bool FFPTexturing::addVSFunctionInvocations(TextureUnitParams* textureUnitParams
                             Out(textureUnitParams->mVSOutputTexCoord)});
         break;
     case TEXCALC_ENVIRONMENT_MAP_NORMAL:
-        stage.callFunction(
-            FFP_FUNC_GENERATE_TEXCOORD_ENV_NORMAL,
-            {In(mWorldITMatrix), In(mViewMatrix), In(mVSInputNormal), Out(textureUnitParams->mVSOutputTexCoord)});
+        stage.callFunction(FFP_FUNC_GENERATE_TEXCOORD_ENV_NORMAL,
+                           {In(mWorldITMatrix), In(mVSInputNormal), Out(textureUnitParams->mVSOutputTexCoord)});
         break;
     case TEXCALC_PROJECTIVE_TEXTURE:
         stage.callBuiltin("mul", {In(textureUnitParams->mTextureViewProjImageMatrix), In(mVSInputPos),
