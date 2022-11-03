@@ -534,9 +534,10 @@ bool FFPTexturing::needsTextureMatrix(TextureUnitState* textureUnitState)
         case TextureUnitState::ET_VSCROLL:
         case TextureUnitState::ET_ROTATE:
         case TextureUnitState::ET_TRANSFORM:
+            return true;
         case TextureUnitState::ET_ENVIRONMENT_MAP:
         case TextureUnitState::ET_PROJECTIVE_TEXTURE:
-            return true;        
+            break;
         }
     }
 
