@@ -133,26 +133,6 @@ void FFP_GenerateTexCoord_EnvMap_Reflect(in mat4 mWorld,
 }
 
 //-----------------------------------------------------------------------------
-void FFP_GenerateTexCoord_Projection(in mat4 mWorld, 							
-						   in mat4 mTexViewProjImage,					  			
-						   in vec4 vPos,						  				  
-						   out vec3 vOut)
-{
-	vec4 vWorldPos    = mul(mWorld, vPos);
-	vec4 vTexturePos  = mul(mTexViewProjImage, vWorldPos);
-
-	vOut = vec3(vTexturePos.xy, vTexturePos.w);
-}
-
-//-----------------------------------------------------------------------------
-void FFP_SampleTextureProj(in sampler2D s, 
-				   in vec3 f,
-				   out vec4 t)
-{
-	t = texture2D(s, f.xy/f.z);
-}
-
-//-----------------------------------------------------------------------------
 void FFP_ModulateX2(in float vIn0, in float vIn1, out float vOut)
 {
 	vOut = vIn0 * vIn1 * 2.0;

@@ -113,9 +113,8 @@ bool FFPTexturing::resolveUniformParams(TextureUnitParams* textureUnitParams, Pr
         break;
 
     case TEXCALC_PROJECTIVE_TEXTURE:
-        mWorldMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_WORLD_MATRIX);
         textureUnitParams->mTextureViewProjImageMatrix = vsProgram->resolveParameter(
-            GpuProgramParameters::ACT_TEXTURE_VIEWPROJ_MATRIX, textureUnitParams->mTextureSamplerIndex);
+            GpuProgramParameters::ACT_TEXTURE_WORLDVIEWPROJ_MATRIX, textureUnitParams->mTextureSamplerIndex);
         break;
     }
 
@@ -278,9 +277,8 @@ bool FFPTexturing::addVSFunctionInvocations(TextureUnitParams* textureUnitParams
             {In(mWorldITMatrix), In(mViewMatrix), In(mVSInputNormal), Out(textureUnitParams->mVSOutputTexCoord)});
         break;
     case TEXCALC_PROJECTIVE_TEXTURE:
-        stage.callFunction(FFP_FUNC_GENERATE_TEXCOORD_PROJECTION,
-                           {In(mWorldMatrix), In(textureUnitParams->mTextureViewProjImageMatrix), In(mVSInputPos),
-                            Out(textureUnitParams->mVSOutputTexCoord)});
+        stage.callBuiltin("mul", {In(textureUnitParams->mTextureViewProjImageMatrix), In(mVSInputPos),
+                                  Out(textureUnitParams->mVSOutputTexCoord)});
         break;
     default:
         return false;
@@ -372,8 +370,8 @@ void FFPTexturing::addPSSampleTexelInvocation(TextureUnitParams* textureUnitPara
         return;
     }
 
-    stage.callFunction(FFP_FUNC_SAMPLE_TEXTURE_PROJ, textureUnitParams->mTextureSampler,
-                       textureUnitParams->mPSInputTexCoord, texel);
+    stage.callBuiltin("texture2DProj",
+                      {In(textureUnitParams->mTextureSampler), In(textureUnitParams->mPSInputTexCoord), Out(texel)});
 }
 
 //-----------------------------------------------------------------------
@@ -627,7 +625,7 @@ void FFPTexturing::setTextureUnit(unsigned short index, TextureUnitState* textur
      curParams.mTexCoordCalcMethod = textureUnitState->_deriveTexCoordCalcMethod();
 
     if (curParams.mTexCoordCalcMethod == TEXCALC_PROJECTIVE_TEXTURE)
-        curParams.mVSOutTextureCoordinateType = GCT_FLOAT3;
+        curParams.mVSOutTextureCoordinateType = GCT_FLOAT4;
 
     // let TexCalcMethod override texture type, as it might be wrong for
     // content_type shadow & content_type compositor
