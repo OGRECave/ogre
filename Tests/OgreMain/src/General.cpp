@@ -64,10 +64,27 @@ TEST_F(CameraTests,customProjectionMatrix)
     std::vector<Vector3> corners(cam.getWorldSpaceCorners(), cam.getWorldSpaceCorners() + 8);
     RealRect extents = cam.getFrustumExtents();
     cam.setCustomProjectionMatrix(true, cam.getProjectionMatrix());
-    for(int j = 0; j < 8; j++)
-        EXPECT_EQ(corners[j], cam.getWorldSpaceCorners()[j]);
+    for(int j = 0; j < 8; j++) {
+        for(int k = 0; k < 3; k++) {
+            if(typeid(corners[j]) == typeid(float))
+                EXPECT_FLOAT_EQ(corners[j][k], cam.getWorldSpaceCorners()[j][k]);
+            else
+                EXPECT_DOUBLE_EQ(corners[j][k], cam.getWorldSpaceCorners()[j][k]);
+        }
+    }
 
-    EXPECT_EQ(extents, cam.getFrustumExtents());
+    if(typeid(Ogre::Real) == typeid(float)) {
+        EXPECT_FLOAT_EQ(extents.bottom, cam.getFrustumExtents().bottom);
+        EXPECT_FLOAT_EQ(extents.top, cam.getFrustumExtents().top);
+        EXPECT_FLOAT_EQ(extents.left, cam.getFrustumExtents().left);
+        EXPECT_FLOAT_EQ(extents.right, cam.getFrustumExtents().right);
+    } else {
+        EXPECT_DOUBLE_EQ(extents.bottom, cam.getFrustumExtents().bottom);
+        EXPECT_DOUBLE_EQ(extents.top, cam.getFrustumExtents().top);
+        EXPECT_DOUBLE_EQ(extents.left, cam.getFrustumExtents().left);
+        EXPECT_DOUBLE_EQ(extents.right, cam.getFrustumExtents().right);
+    }
+
 }
 
 TEST(Root,shutdown)
