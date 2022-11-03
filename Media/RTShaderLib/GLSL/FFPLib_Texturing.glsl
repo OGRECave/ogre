@@ -62,30 +62,25 @@ void FFP_TransformTexCoord(in mat4 m, in vec3 v, out vec3 vOut)
 }
 
 //-----------------------------------------------------------------------------
-void FFP_GenerateTexCoord_EnvMap_Normal(in mat4 mWorldIT, 
-						   in mat4 mView,
+void FFP_GenerateTexCoord_EnvMap_Normal(in mat3 mWorldIT,
 						   in vec3 vNormal,
 						   out vec3 vOut)
 {
-	vec3 vWorldNormal = mul(to_mat3(mWorldIT), vNormal);
-	vec3 vViewNormal  = mul(to_mat3(mView), vWorldNormal);
-
-	vOut = vViewNormal;
+	vOut = normalize(mul(mWorldIT, vNormal));
 }
 
 //-----------------------------------------------------------------------------
-void FFP_GenerateTexCoord_EnvMap_Sphere(in 	mat4 mWorld,
-										in 	mat4 mView,
-										in 	mat4 mWorldIT,
+void FFP_GenerateTexCoord_EnvMap_Sphere(in 	mat4 mWorldView,
+										in 	mat3 mWorldIT,
 										in 	vec4 vPos,
 										in 	vec3 vNormal,
 										out vec2 vOut)
 {
-	mat4 worldview = mul(mView, mWorld);
-	vec3 normal = normalize( mul(mWorldIT, vec4(vNormal,0.0)).xyz);
-	vec3 eyedir =  normalize(mul(worldview, vPos)).xyz;
+	vec3 normal = normalize( mul(mWorldIT, vNormal));
+	vec3 eyedir =  normalize(mul(mWorldView, vPos)).xyz;
 	vec3 r = reflect(eyedir, normal);
-	float two_p = 2.0 * sqrt( r.x * r.x + r.y * r.y + (r.z + 1.0) *  (r.z + 1.0));
+	r.z += 1.0;
+	float two_p = 2.0 * length(r);
 	vOut = vec2(0.5 + r.x / two_p, 0.5 - r.y / two_p);
 }
 
