@@ -414,22 +414,19 @@ void FFPTexturing::addPSBlendInvocations(Function* psMain,
         stage.assign(In(arg2).mask(mask), Out(mPSOutDiffuse).mask(mask));
         break;
     case LBX_MODULATE:
-        stage.mul(In(arg1).mask(mask), In(arg2).mask(mask), Out(mPSOutDiffuse).mask(mask));
-        break;
     case LBX_MODULATE_X2:
-        stage.callFunction(FFP_FUNC_MODULATEX2, In(arg1).mask(mask), In(arg2).mask(mask),
-                           Out(mPSOutDiffuse).mask(mask));
-        break;
     case LBX_MODULATE_X4:
-        stage.callFunction(FFP_FUNC_MODULATEX4, In(arg1).mask(mask), In(arg2).mask(mask),
-                           Out(mPSOutDiffuse).mask(mask));
+        stage.mul(In(arg1).mask(mask), In(arg2).mask(mask), Out(mPSOutDiffuse).mask(mask));
+        if (blendMode.operation == LBX_MODULATE_X2)
+            stage.mul(In(mPSOutDiffuse).mask(mask), 2.0, Out(mPSOutDiffuse).mask(mask));
+        if (blendMode.operation == LBX_MODULATE_X4)
+            stage.mul(In(mPSOutDiffuse).mask(mask), 4.0, Out(mPSOutDiffuse).mask(mask));
         break;
     case LBX_ADD:
-        stage.add(In(arg1).mask(mask), In(arg2).mask(mask), Out(mPSOutDiffuse).mask(mask));
-        break;
     case LBX_ADD_SIGNED:
-        stage.callFunction(FFP_FUNC_ADDSIGNED, In(arg1).mask(mask), In(arg2).mask(mask),
-                           Out(mPSOutDiffuse).mask(mask));
+        stage.add(In(arg1).mask(mask), In(arg2).mask(mask), Out(mPSOutDiffuse).mask(mask));
+        if(blendMode.operation == LBX_ADD_SIGNED)
+            stage.sub(In(mPSOutDiffuse).mask(mask), 0.5, Out(mPSOutDiffuse).mask(mask));
         break;
     case LBX_ADD_SMOOTH:
         stage.callFunction(FFP_FUNC_ADDSMOOTH, In(arg1).mask(mask), In(arg2).mask(mask),
