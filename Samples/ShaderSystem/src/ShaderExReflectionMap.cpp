@@ -130,7 +130,7 @@ bool ShaderExReflectionMap::resolveParameters(ProgramSet* programSet)
     // Resolve world inverse transpose matrix.  
     mWorldITMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_INVERSE_TRANSPOSE_WORLD_MATRIX);
     // Resolve view matrix.
-    mViewMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_VIEW_MATRIX);
+    mViewMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_CAMERA_POSITION);
     // Resolve vertex position.
     mVSInputPos = vsMain->resolveInputParameter(Parameter::SPC_POSITION_OBJECT_SPACE);
     // Resolve vertex normal.

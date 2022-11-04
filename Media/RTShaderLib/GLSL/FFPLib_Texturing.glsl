@@ -38,12 +38,6 @@ THE SOFTWARE.
 // see http://msdn.microsoft.com/en-us/library/bb206241.aspx
 //-----------------------------------------------------------------------------
 
-#ifdef OGRE_HLSL
-mat3 to_mat3(mat4 m) { return (mat3)m; }
-#else
-#define to_mat3 mat3
-#endif
-
 //-----------------------------------------------------------------------------
 void FFP_TransformTexCoord(in mat4 m, in vec2 v, out vec2 vOut)
 {
@@ -87,42 +81,17 @@ void FFP_GenerateTexCoord_EnvMap_Sphere(in 	mat4 mWorldView,
 //-----------------------------------------------------------------------------
 void FFP_GenerateTexCoord_EnvMap_Reflect(in mat4 mWorld, 
 							in mat4 mWorldIT, 
-						   in mat4 mView,						  
+						   in vec3 vCamPos,
 						   in vec3 vNormal,
 						   in vec4 vPos,						  
 						   out vec3 vOut)
 {
-#ifdef OGRE_HLSL
-	mView[2][0] = -mView[2][0];
-	mView[2][1] = -mView[2][1];
-	mView[2][2] = -mView[2][2];
-	mView[2][3] = -mView[2][3];
-#else
-	mView[0][2] = -mView[0][2];
-	mView[1][2] = -mView[1][2];
-	mView[2][2] = -mView[2][2];
-	mView[3][2] = -mView[3][2];
-#endif
-
-	mat4 matViewT = transpose(mView);
-
-	vec3 vWorldNormal = mul(to_mat3(mWorldIT), vNormal);
-	vec3 vViewNormal  = mul(to_mat3(mView), vWorldNormal);
-	vec4 vWorldPos    = mul(mWorld, vPos);
-	vec3 vNormViewPos  = normalize(mul(mView, vWorldPos).xyz);
+	vec3 vWorldNormal = normalize(mul(mWorldIT, vec4(vNormal, 0.0)).xyz);
+	vec3 vWorldPos    = mul(mWorld, vPos).xyz;
+	vec3 vEyeDir  = normalize(vWorldPos - vCamPos);
 	
-	vec3 vReflect = reflect(vNormViewPos, vViewNormal);
-
-#ifdef OGRE_HLSL
-	matViewT[2][0] = -matViewT[2][0];
-	matViewT[2][1] = -matViewT[2][1];
-	matViewT[2][2] = -matViewT[2][2];
-#else
-	matViewT[0][2] = -matViewT[0][2];
-	matViewT[1][2] = -matViewT[1][2];
-	matViewT[2][2] = -matViewT[2][2];
-#endif
-	vReflect = mul(to_mat3(matViewT), vReflect);
+	vec3 vReflect = reflect(vEyeDir, vWorldNormal);
+	vReflect.z *= -1;
 
 	vOut = vReflect;
 }
