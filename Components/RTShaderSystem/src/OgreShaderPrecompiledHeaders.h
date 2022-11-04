@@ -101,9 +101,6 @@ THE SOFTWARE.
 #define FFP_FUNC_GENERATE_TEXCOORD_ENV_SPHERE       "FFP_GenerateTexCoord_EnvMap_Sphere"
 #define FFP_FUNC_GENERATE_TEXCOORD_ENV_REFLECT      "FFP_GenerateTexCoord_EnvMap_Reflect"
 
-#define FFP_FUNC_MODULATEX2                         "FFP_ModulateX2"
-#define FFP_FUNC_MODULATEX4                         "FFP_ModulateX4"
-#define FFP_FUNC_ADDSIGNED                          "FFP_AddSigned"
 #define FFP_FUNC_ADDSMOOTH                          "FFP_AddSmooth"
 #define FFP_FUNC_DOTPRODUCT                         "FFP_DotProduct"
 
