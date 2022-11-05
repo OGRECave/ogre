@@ -1181,7 +1181,10 @@ Format: alpha\_op\_ex &lt;op&gt; &lt;source1&gt; &lt;source2&gt; \[&lt;manualBle
 
 ## env\_map
 
-Turns on/off texture coordinate effect that makes this layer an environment map. @ffp_rtss_only
+@ffp_rtss_only
+
+@copybrief Ogre::TextureUnitState::setEnvironmentMap
+
 @par
 Format: env\_map &lt;off|spherical|planar|cubic\_reflection|cubic\_normal&gt;
 
@@ -1190,18 +1193,22 @@ Environment maps make an object look reflective by using automatic texture coord
 <dl compact="compact">
 <dt>spherical</dt> <dd>
 
-A spherical environment map. Requires a single texture which is either a fish-eye lens view of the reflected scene, or some other texture which looks good as a spherical map (a texture of glossy highlights is popular especially in car sims). This effect is based on the relationship between the eye direction and the vertex normals of the object, so works best when there are a lot of gradually changing normals, i.e. curved objects.
+@copydoc Ogre::TextureUnitState::ENV_CURVED
+Requires a single texture which is either a fish-eye lens view of the reflected scene, or some other texture which looks good as a spherical map (a texture of glossy highlights is popular especially in car sims). This effect is based on the relationship between the eye direction and the vertex normals of the object, so works best when there are a lot of gradually changing normals, i.e. curved objects.
 
 </dd> <dt>planar</dt> <dd>
 
-Similar to the spherical environment map, but the effect is based on the position of the vertices in the viewport rather than vertex normals. This effect is therefore useful for planar geometry (where a spherical env\_map would not look good because the normals are all the same) or objects without normals.
+The effect is based on the position of the vertices in the viewport rather than vertex normals. This is useful for planar geometry (where a spherical env\_map would not look good because the normals are all the same) or objects without normals.
+
+@remarks This was never actually implemented. Same as @c spherical on all backends.
 
 </dd> <dt>cubic\_reflection</dt> <dd>
 
-A more advanced form of reflection mapping which uses a group of 6 textures making up the inside of a cube, each of which is a view if the scene down each axis. Works extremely well in all cases but has a higher technical requirement from the card than spherical mapping. Requires that you bind a [cubic texture](#texture) to this unit.
+@copydoc Ogre::TextureUnitState::ENV_REFLECTION
+Uses a group of 6 textures making up the inside of a cube, each of which is a view if the scene down each axis. Works extremely well in all cases but has a higher technical requirement from the card than spherical mapping. Requires that you bind a [cubic texture](#texture) to this unit.
 
 </dd> <dt>cubic\_normal</dt> <dd>
-
+@copydoc Ogre::TextureUnitState::ENV_NORMAL
 Generates 3D texture coordinates containing the camera space normal vector from the normal information held in the vertex data. Again, use of this feature requires a [cubic texture](#texture).
 
 </dd> </dl> <br>

@@ -262,17 +262,16 @@ namespace Ogre {
 
         };
 
-        /** Enumeration to specify type of envmap.
-        */
+        /// %Texture coordinate generation method for environment mapping.
         enum EnvMapType
         {
-            /// Envmap based on vector from camera to vertex position, good for planar geometry.
+            /// 2D texture coordinates using view space position. Same as ENV_CURVED on all backends.
             ENV_PLANAR,
-            /// Envmap based on dot of vector from camera to vertex and vertex normal, good for curves.
+            /// 2D texture coordinates using spherical reflection mapping
             ENV_CURVED,
-            /// Envmap intended to supply reflection vectors for cube mapping.
+            /// Cubic texture coordinates using the reflection vector
             ENV_REFLECTION,
-            /// Envmap intended to supply normal vectors for cube mapping.
+            /// Cubic texture coordinates using the normal vector
             ENV_NORMAL
         };
 
@@ -864,12 +863,12 @@ namespace Ogre {
 
         /** Generic method for setting up texture effects.
 
-            Allows you to specify effects directly by using the TextureEffectType enumeration. The
+            Allows you to specify effects directly by using the #TextureEffectType enumeration. The
             arguments that go with it depend on the effect type. Only one effect of
             each type can be applied to a texture layer.
         @par
             This method is used internally by Ogre but it is better generally for applications to use the
-            more intuitive specialised methods such as setEnvironmentMap and setScroll.
+            more intuitive specialised methods such as #setEnvironmentMap and #setTextureScroll.
         */
         void addEffect(TextureEffect& effect);
 
@@ -880,9 +879,7 @@ namespace Ogre {
 
             The vectors generated can either be used to address a single 2D texture which
             is a 'fish-eye' lens view of a scene, or a 3D cubic environment map which requires 6 textures
-            for each side of the inside of a cube. The type depends on what texture you set up - if you use the
-            setTextureName method then a 2D fisheye lens texture is required, whereas if you used setCubicTextureName
-            then a cubic environment map will be used.
+            for each side of the inside of a cube.
 
             This effect works best if the object has lots of gradually changing normals. The texture also
             has to be designed for this effect - see the example spheremap.png included with the sample
@@ -894,10 +891,9 @@ namespace Ogre {
             generated coordinates rather than static model texture coordinates.
         @param enable
             True to enable, false to disable
-        @param envMapType
-            The type of environment mapping to perform. Planar, curved, reflection or normal. @see EnvMapType
+        @param texGenType texture coordinate generation type
         */
-        void setEnvironmentMap(bool enable, EnvMapType envMapType = ENV_CURVED);
+        void setEnvironmentMap(bool enable, EnvMapType texGenType = ENV_CURVED);
 
         /** Sets up an animated scroll for the texture layer.
 
