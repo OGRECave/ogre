@@ -178,7 +178,7 @@ namespace Ogre {
             }
             else if (pass[p].texGen == TEXGEN_ENVIRONMENT)
             {
-                t->setEnvironmentMap(true, TextureUnitState::ENV_PLANAR);
+                t->setEnvironmentMap(true, TextureUnitState::ENV_CURVED);
             }
             // Tex mod
             // Scale
