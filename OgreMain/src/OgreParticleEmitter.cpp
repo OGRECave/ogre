@@ -694,7 +694,7 @@ namespace Ogre
     //-----------------------------------------------------------------------
     void ParticleEmitterFactory::destroyEmitter(ParticleEmitter* e)        
     {
-        auto i = find(begin(mEmitters), end(mEmitters), e);
+        auto i = std::find(std::begin(mEmitters), std::end(mEmitters), e);
         if (i != end(mEmitters)) {
             mEmitters.erase(i);
             OGRE_DELETE e;
