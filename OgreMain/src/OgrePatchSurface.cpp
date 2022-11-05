@@ -111,7 +111,7 @@ namespace Ogre {
         Vector3 min = Vector3::ZERO, max = Vector3::UNIT_SCALE;
         Real maxSqRadius = 0;
         bool first = true;
-        for (auto& ctli : mVecCtlPoints)
+        for (const auto& ctli : mVecCtlPoints)
         {
             if (first)
             {
