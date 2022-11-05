@@ -1026,8 +1026,8 @@ namespace Ogre {
         void _load(void);
         /** Internal method for unloading this object as part of Material::unload. */
         void _unload(void);
-        /// Returns whether this unit has texture coordinate generation that depends on the camera.
-        bool hasViewRelativeTextureCoordinateGeneration(void) const;
+        /// @deprecated do not use
+        OGRE_DEPRECATED bool hasViewRelativeTextureCoordinateGeneration(void) const;
 
         /// Is this loaded?
         bool isLoaded(void) const;
