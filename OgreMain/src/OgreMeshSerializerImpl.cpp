@@ -587,7 +587,9 @@ namespace Ogre {
         size += calcSubMeshOperationSize(pSub);
 
         // Bone assignments
-	for (const auto& b : pSub->mBoneAssignments)
+	SubMesh::VertexBoneAssignmentList::const_iterator vi;
+	for (vi = pSub->mBoneAssignments.begin();
+	     vi != pSub->mBoneAssignments.end(); ++vi)
         {
             size += calcBoneAssignmentSize();
         }
