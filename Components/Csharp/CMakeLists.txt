@@ -27,7 +27,11 @@ else()
 	add_definitions(-Wno-strict-aliasing -Wno-cast-qual -Wno-shadow -Wno-missing-declarations -Wno-unused-but-set-variable)
 endif()
 
-set(CMAKE_SWIG_FLAGS -w401,314 -namespace org.ogre -Dfinal)
+set(CMAKE_SWIG_FLAGS -w401,314 -namespace org.ogre)
+
+if(SWIG_VERSION VERSION_LESS "4.1")
+    list(APPEND CMAKE_SWIG_FLAGS -Dfinal)
+endif()
 
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/csharp/")
 set(CMAKE_SWIG_OUTDIR "${PROJECT_BINARY_DIR}/csharp/")
