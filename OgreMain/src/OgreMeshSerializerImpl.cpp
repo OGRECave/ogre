@@ -315,39 +315,24 @@ namespace Ogre {
     size_t MeshSerializerImpl::calcExtremesSize(const Mesh* pMesh)
     {
         size_t size = 0;
-        unsigned short i = 0;
         for (auto *s : pMesh->getSubMeshes())
         {
             if (!s->extremityPoints.empty()){
-                size += calcSubMeshExtremesSize(i, s);
+                size += calcSubMeshExtremesSize(s);
             }
-            ++i;
         }
         return size;
     }
     //---------------------------------------------------------------------
     void MeshSerializerImpl::writeSubMeshExtremes(unsigned short idx, const SubMesh* s)
     {
-        
-        writeChunkHeader(M_TABLE_EXTREMES, calcSubMeshExtremesSize(idx, s));
+        writeChunkHeader(M_TABLE_EXTREMES, calcSubMeshExtremesSize(s));
 
         writeShorts(&idx, 1);
-
-        float *vertices = OGRE_ALLOC_T(float, s->extremityPoints.size() * 3, MEMCATEGORY_GEOMETRY);
-        float *pVert = vertices;
-
-        for (auto extremityPoint : s->extremityPoints)
-        {
-            *pVert++ = extremityPoint.x;
-            *pVert++ = extremityPoint.y;
-            *pVert++ = extremityPoint.z;
-        }
-
-        writeFloats(vertices, s->extremityPoints.size () * 3);
-        OGRE_FREE(vertices, MEMCATEGORY_GEOMETRY);
+        writeFloats(s->extremityPoints.front().ptr(), s->extremityPoints.size () * 3);
     }
 
-    size_t MeshSerializerImpl::calcSubMeshExtremesSize(unsigned short idx, const SubMesh* s)
+    size_t MeshSerializerImpl::calcSubMeshExtremesSize(const SubMesh* s)
     {
         return MSTREAM_OVERHEAD_SIZE + sizeof (unsigned short) +
             s->extremityPoints.size() * sizeof (float)* 3;
@@ -363,7 +348,6 @@ namespace Ogre {
         // iterate through texture aliases and write them out as a chunk
         for (auto& t : s->mTextureAliases)
         {
-            // calculate chunk size based on string length + 1.  Add 1 for the line feed.
             chunkSize = MSTREAM_OVERHEAD_SIZE + calcStringSize(t.first) + calcStringSize(t.second);
             writeChunkHeader(M_SUBMESH_TEXTURE_ALIAS, chunkSize);
             // write out alias name
@@ -379,7 +363,7 @@ namespace Ogre {
     void MeshSerializerImpl::writeSubMeshOperation(const SubMesh* sm)
     {
         // Header
-        writeChunkHeader(M_SUBMESH_OPERATION, calcSubMeshOperationSize(sm));
+        writeChunkHeader(M_SUBMESH_OPERATION, calcSubMeshOperationSize());
 
         // unsigned short operationType
         unsigned short opType = static_cast<unsigned short>(sm->operationType);
@@ -530,7 +514,7 @@ namespace Ogre {
         }
 #endif
         
-        size += calcBoundsInfoSize(pMesh);
+        size += calcBoundsInfoSize();
 
         // Submesh name table
         size += calcSubMeshNameTableSize(pMesh);
@@ -584,20 +568,15 @@ namespace Ogre {
         }
 
         size += calcSubMeshTextureAliasesSize(pSub);
-        size += calcSubMeshOperationSize(pSub);
+        size += calcSubMeshOperationSize();
 
         // Bone assignments
-	SubMesh::VertexBoneAssignmentList::const_iterator vi;
-	for (vi = pSub->mBoneAssignments.begin();
-	     vi != pSub->mBoneAssignments.end(); ++vi)
-        {
-            size += calcBoneAssignmentSize();
-        }
+        size += pSub->mBoneAssignments.size() * calcBoneAssignmentSize();
 
         return size;
     }
     //---------------------------------------------------------------------
-    size_t MeshSerializerImpl::calcSubMeshOperationSize(const SubMesh* pSub)
+    size_t MeshSerializerImpl::calcSubMeshOperationSize()
     {
         return MSTREAM_OVERHEAD_SIZE + sizeof(uint16);
     }
@@ -608,7 +587,6 @@ namespace Ogre {
         // iterate through texture alias map and calc size of strings
         for (auto& t : pSub->mTextureAliases)
         {
-            // calculate chunk size based on string length + 1.  Add 1 for the line feed.
             chunkSize += MSTREAM_OVERHEAD_SIZE + calcStringSize(t.first) + calcStringSize(t.second);
         }
 
@@ -1343,19 +1321,13 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void MeshSerializerImpl::writeBoundsInfo(const Mesh* pMesh)
     {
-        writeChunkHeader(M_MESH_BOUNDS, calcBoundsInfoSize(pMesh));
+        writeChunkHeader(M_MESH_BOUNDS, calcBoundsInfoSize());
 
         // float minx, miny, minz
         const Vector3& min = pMesh->mAABB.getMinimum();
         const Vector3& max = pMesh->mAABB.getMaximum();
-        writeFloats(&min.x, 1);
-        writeFloats(&min.y, 1);
-        writeFloats(&min.z, 1);
-        // float maxx, maxy, maxz
-        writeFloats(&max.x, 1);
-        writeFloats(&max.y, 1);
-        writeFloats(&max.z, 1);
-        // float radius
+        writeFloats(min.ptr(), 3);
+        writeFloats(max.ptr(), 3);
         writeFloats(&pMesh->mBoundRadius, 1);
 
     }
@@ -1363,22 +1335,16 @@ namespace Ogre {
     void MeshSerializerImpl::readBoundsInfo(const DataStreamPtr& stream, Mesh* pMesh)
     {
         Vector3 min, max;
-        // float minx, miny, minz
-        readFloats(stream, &min.x, 1);
-        readFloats(stream, &min.y, 1);
-        readFloats(stream, &min.z, 1);
-        // float maxx, maxy, maxz
-        readFloats(stream, &max.x, 1);
-        readFloats(stream, &max.y, 1);
-        readFloats(stream, &max.z, 1);
+        readFloats(stream, min.ptr(), 3);
+        readFloats(stream, max.ptr(), 3);
         AxisAlignedBox box(min, max);
         pMesh->_setBounds(box, false);
-        // float radius
+
         float radius;
         readFloats(stream, &radius, 1);
         pMesh->_setBoundingSphereRadius(radius);
     }
-    size_t MeshSerializerImpl::calcBoundsInfoSize(const Mesh* pMesh)
+    size_t MeshSerializerImpl::calcBoundsInfoSize()
     {
         unsigned long size = MSTREAM_OVERHEAD_SIZE;
         size += sizeof(float) * 7;
@@ -2027,8 +1993,7 @@ namespace Ogre {
     size_t MeshSerializerImpl::calcAnimationSize(const Animation* anim)
     {
         size_t size = MSTREAM_OVERHEAD_SIZE;
-        // char* name
-        size += anim->getName().length() + 1;
+        size += calcStringSize(anim->getName());
 
         // float length
         size += sizeof(float);
@@ -2125,8 +2090,7 @@ namespace Ogre {
     {
         size_t size = MSTREAM_OVERHEAD_SIZE;
 
-        // char* name (may be blank)
-        size += pose->getName().length() + 1;
+        size += calcStringSize(pose->getName());
         // unsigned short target
         size += sizeof(uint16);
         // bool includesNormals
@@ -2231,8 +2195,7 @@ namespace Ogre {
         if (anim->getUseBaseKeyFrame())
         {
             size_t size = MSTREAM_OVERHEAD_SIZE;
-            // char* baseAnimationName (including terminator)
-            size += anim->getBaseKeyFrameAnimationName().length() + 1;
+            size += calcStringSize(anim->getBaseKeyFrameAnimationName());
             // float baseKeyFrameTime
             size += sizeof(float);
             
@@ -2643,13 +2606,9 @@ namespace Ogre {
         
         assert ((n_floats % 3) == 0);
         
-        float *vert = OGRE_ALLOC_T(float, n_floats, MEMCATEGORY_GEOMETRY);
-        readFloats(stream, vert, n_floats);
-        
-        for (int i = 0; i < n_floats; i += 3)
-            sm->extremityPoints.push_back(Vector3(vert [i], vert [i + 1], vert [i + 2]));
-        
-        OGRE_FREE(vert, MEMCATEGORY_GEOMETRY);
+        sm->extremityPoints.resize(n_floats / 3);
+
+        readFloats(stream, sm->extremityPoints.front().ptr(), n_floats);
     }
 
     void MeshSerializerImpl::enableValidation()
@@ -3219,8 +3178,7 @@ namespace Ogre {
     {
         size_t size = MSTREAM_OVERHEAD_SIZE;
 
-        // char* name (may be blank)
-        size += pose->getName().length() + 1;
+        size += calcStringSize(pose->getName());
         // unsigned short target
         size += sizeof(uint16);
 

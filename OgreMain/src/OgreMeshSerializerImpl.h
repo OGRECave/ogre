@@ -118,7 +118,7 @@ namespace Ogre {
         virtual size_t calcGeometrySize(const VertexData* pGeom);
         virtual size_t calcSkeletonLinkSize(const String& skelName);
         virtual size_t calcBoneAssignmentSize(void);
-        virtual size_t calcSubMeshOperationSize(const SubMesh* pSub);
+        virtual size_t calcSubMeshOperationSize();
         virtual size_t calcSubMeshNameTableSize(const Mesh* pMesh);
         virtual size_t calcLodLevelSize(const Mesh* pMesh);
         virtual size_t calcLodUsageManualSize(const MeshLodUsage& usage);
@@ -137,9 +137,9 @@ namespace Ogre {
         virtual size_t calcPoseKeyframePoseRefSize(void);
         virtual size_t calcPoseVertexSize(const Pose* pose);
         virtual size_t calcSubMeshTextureAliasesSize(const SubMesh* pSub);
-        virtual size_t calcBoundsInfoSize(const Mesh* pMesh);
+        virtual size_t calcBoundsInfoSize();
         virtual size_t calcExtremesSize(const Mesh* pMesh);
-        virtual size_t calcSubMeshExtremesSize(unsigned short idx, const SubMesh* s);
+        virtual size_t calcSubMeshExtremesSize(const SubMesh* s);
 
         virtual void readTextureLayer(const DataStreamPtr& stream, Mesh* pMesh, MaterialPtr& pMat);
         virtual void readSubMeshNameTable(const DataStreamPtr& stream, Mesh* pMesh);
