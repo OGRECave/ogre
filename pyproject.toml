@@ -1,2 +1,2 @@
 [build-system]
-requires = ["setuptools", "wheel", "scikit-build", "cmake", "pip", "swig==4.0.2"]
+requires = ["setuptools", "wheel", "scikit-build", "cmake", "pip", "swig"]
