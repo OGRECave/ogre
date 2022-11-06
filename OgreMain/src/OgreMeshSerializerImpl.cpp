@@ -589,11 +589,9 @@ namespace Ogre {
         // Bone assignments
         if (!pSub->mBoneAssignments.empty())
         {
-            auto bass = pSub->mBoneAssignments.size();
-            while (bass)
+	    for (const auto& b : mBoneAssignments)
             {
                 size += calcBoneAssignmentSize();
-                --bass;
             }
         }
 
