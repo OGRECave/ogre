@@ -587,12 +587,9 @@ namespace Ogre {
         size += calcSubMeshOperationSize(pSub);
 
         // Bone assignments
-        if (!pSub->mBoneAssignments.empty())
+	for (const auto& b : pSub->mBoneAssignments)
         {
-	    for (const auto& b : mBoneAssignments)
-            {
-                size += calcBoneAssignmentSize();
-            }
+            size += calcBoneAssignmentSize();
         }
 
         return size;
