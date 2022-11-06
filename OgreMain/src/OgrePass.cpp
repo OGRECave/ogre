@@ -1044,27 +1044,22 @@ namespace Ogre {
     void Pass::processPendingPassUpdates(void)
     {
         {
-                    OGRE_LOCK_MUTEX(msPassGraveyardMutex);
+            OGRE_LOCK_MUTEX(msPassGraveyardMutex);
             // Delete items in the graveyard
-            PassSet::iterator i, iend;
-            iend = msPassGraveyard.end();
-            for (i = msPassGraveyard.begin(); i != iend; ++i)
+            for (auto& i : msPassGraveyard)
             {
-                OGRE_DELETE *i;
+                OGRE_DELETE i;
             }
             msPassGraveyard.clear();
         }
         PassSet tempDirtyHashList;
         {
-                    OGRE_LOCK_MUTEX(msDirtyHashListMutex);
+            OGRE_LOCK_MUTEX(msDirtyHashListMutex);
             // The dirty ones will have been removed from the groups above using the old hash now
             tempDirtyHashList.swap(msDirtyHashList);
         }
-        PassSet::iterator i, iend;
-        iend = tempDirtyHashList.end();
-        for (i = tempDirtyHashList.begin(); i != iend; ++i)
+        for (auto *p : tempDirtyHashList)
         {
-            Pass* p = *i;
             p->_recalculateHash();
         }
     }

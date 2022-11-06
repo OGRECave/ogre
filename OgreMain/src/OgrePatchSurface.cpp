@@ -108,24 +108,22 @@ namespace Ogre {
         mRequiredIndexCount = (mMeshWidth-1) * (mMeshHeight-1) * 2 * iterations * 3;
 
         // Calculate bounds based on control points
-        std::vector<Vector3>::const_iterator ctli;
         Vector3 min = Vector3::ZERO, max = Vector3::UNIT_SCALE;
         Real maxSqRadius = 0;
         bool first = true;
-        for (ctli = mVecCtlPoints.begin(); ctli != mVecCtlPoints.end(); ++ctli)
+        for (const auto& ctli : mVecCtlPoints)
         {
             if (first)
             {
-                min = max = *ctli;
-                maxSqRadius = ctli->squaredLength();
+                min = max = ctli;
+                maxSqRadius = ctli.squaredLength();
                 first = false;
             }
             else
             {
-                min.makeFloor(*ctli);
-                max.makeCeil(*ctli);
-                maxSqRadius = std::max(ctli->squaredLength(), maxSqRadius);
-
+                min.makeFloor(ctli);
+                max.makeCeil(ctli);
+                maxSqRadius = std::max(ctli.squaredLength(), maxSqRadius);
             }
         }
         mAABB.setExtents(min, max);
