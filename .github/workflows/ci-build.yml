@@ -18,7 +18,7 @@ jobs:
           nvidia-cg-dev glslang-dev spirv-tools spirv-headers \
           swig4.0 mono-mcs python3-dev \
           python3-lxml texlive-binaries texlive-base graphviz doxygen g++-7
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
         fetch-depth: 2
     - name: Build
@@ -51,8 +51,8 @@ jobs:
   android:
     runs-on: ubuntu-20.04
     steps:
-    - uses: actions/checkout@v2
-    - uses: actions/cache@v2
+    - uses: actions/checkout@v3
+    - uses: actions/cache@v3
       with:
         path: android-ndk-r21e
         key: ${{ runner.os }}-android-ndk
@@ -68,7 +68,7 @@ jobs:
       id: package
       run: |
         [[ $GITHUB_REF = refs/tags/* ]] && VERNAME=${GITHUB_REF##*/} || VERNAME="master"
-        echo "::set-output name=ver::${VERNAME}"
+        echo "ver=${VERNAME}" >> $GITHUB_OUTPUT
         cd build/OgreJNI && zip -qr ogre-sdk-android-${VERNAME}-arm64-v8a.zip *
     - name: upload artifact
       run: |
@@ -82,7 +82,7 @@ jobs:
     steps:
     - name: Install Dependencies
       run: brew update && brew install sdl2 pugixml
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Build
       run: |
         cmake -P ci-build.cmake
@@ -94,7 +94,7 @@ jobs:
   ios:
     runs-on: macos-11
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Build
       run: |
         cmake -P ci-build.cmake
