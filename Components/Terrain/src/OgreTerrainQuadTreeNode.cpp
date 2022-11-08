@@ -258,6 +258,9 @@ namespace Ogre
 
         if (!isAttached())
             mLocalNode->attachObject(this);
+
+        mQueryFlags = mTerrain->getQueryFlags();
+        mVisibilityFlags = mTerrain->getVisibilityFlags();
     }
     //---------------------------------------------------------------------
     void TerrainQuadTreeNode::unload()
