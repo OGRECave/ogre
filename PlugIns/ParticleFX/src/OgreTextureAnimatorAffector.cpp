@@ -90,6 +90,8 @@ public:
     //-----------------------------------------------------------------------
     void TextureAnimatorAffector::_initParticle(Particle* pParticle)
     {
+        pParticle->mTexcoordIndex = 0;
+
         if (!mRandomStartOffset)
             return;
 
