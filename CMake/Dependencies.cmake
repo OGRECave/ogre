@@ -113,16 +113,16 @@ if(OGRE_BUILD_DEPENDENCIES AND NOT EXISTS ${OGREDEPS_PATH})
     if(MSVC OR MINGW OR SKBUILD) # other platforms dont need this
         message(STATUS "Building SDL2")
         file(DOWNLOAD
-            https://libsdl.org/release/SDL2-2.0.22.tar.gz
-            ${PROJECT_BINARY_DIR}/SDL2-2.0.22.tar.gz)
+            https://libsdl.org/release/SDL2-2.24.1.tar.gz
+            ${PROJECT_BINARY_DIR}/SDL2-2.24.1.tar.gz)
         execute_process(COMMAND ${CMAKE_COMMAND} 
-            -E tar xf SDL2-2.0.22.tar.gz WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
+            -E tar xf SDL2-2.24.1.tar.gz WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
         execute_process(COMMAND ${CMAKE_COMMAND}
             -E make_directory ${PROJECT_BINARY_DIR}/SDL2-build)
         execute_process(COMMAND ${BUILD_COMMAND_COMMON}
             -DSDL_STATIC=FALSE
             -DCMAKE_INSTALL_LIBDIR=lib
-            ${PROJECT_BINARY_DIR}/SDL2-2.0.22
+            ${PROJECT_BINARY_DIR}/SDL2-2.24.1
             WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/SDL2-build)
         execute_process(COMMAND ${CMAKE_COMMAND}
             --build ${PROJECT_BINARY_DIR}/SDL2-build ${BUILD_COMMAND_OPTS})
@@ -145,10 +145,10 @@ if(OGRE_BUILD_DEPENDENCIES AND NOT EXISTS ${OGREDEPS_PATH})
 
       message(STATUS "Building Assimp")
       file(DOWNLOAD
-          https://github.com/assimp/assimp/archive/v5.2.4.tar.gz
-          ${PROJECT_BINARY_DIR}/v5.2.4.tar.gz)
+              https://github.com/assimp/assimp/archive/refs/tags/v5.2.5.zip
+          ${PROJECT_BINARY_DIR}/v5.2.5.tar.gz)
       execute_process(COMMAND ${CMAKE_COMMAND}
-          -E tar xf v5.2.4.tar.gz WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
+          -E tar xf v5.2.5.tar.gz WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
       execute_process(COMMAND ${BUILD_COMMAND_COMMON}
           -DZLIB_ROOT=${OGREDEPS_PATH}
           -DBUILD_SHARED_LIBS=OFF
@@ -156,10 +156,10 @@ if(OGRE_BUILD_DEPENDENCIES AND NOT EXISTS ${OGREDEPS_PATH})
           -DASSIMP_NO_EXPORT=TRUE
           -DASSIMP_BUILD_OGRE_IMPORTER=OFF
           -DASSIMP_BUILD_ASSIMP_TOOLS=OFF
-          ${PROJECT_BINARY_DIR}/assimp-5.2.4
-          WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/assimp-5.2.4)
+          ${PROJECT_BINARY_DIR}/assimp-5.2.5
+          WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/assimp-5.2.5)
       execute_process(COMMAND ${CMAKE_COMMAND}
-        --build ${PROJECT_BINARY_DIR}/assimp-5.2.4 ${BUILD_COMMAND_OPTS})
+        --build ${PROJECT_BINARY_DIR}/assimp-5.2.5 ${BUILD_COMMAND_OPTS})
     endif()
 
     message(STATUS "Building Bullet")
