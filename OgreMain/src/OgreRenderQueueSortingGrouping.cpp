@@ -230,7 +230,7 @@ namespace {
     //-----------------------------------------------------------------------
     void RenderPriorityGroup::addUnsortedTransparentRenderable(Technique* pTech, Renderable* rend)
     {
-        for(const auto& p : pTech->getPasses())
+        for(auto* p : pTech->getPasses())
         {
             // Insert into transparent list
             mTransparentsUnsorted.addRenderable(p, rend);
@@ -239,7 +239,7 @@ namespace {
     //-----------------------------------------------------------------------
     void RenderPriorityGroup::addTransparentRenderable(Technique* pTech, Renderable* rend)
     {
-        for(const auto& p : pTech->getPasses())
+        for(auto *p : pTech->getPasses())
         {
             // Insert into transparent list
             mTransparents.addRenderable(p, rend);
