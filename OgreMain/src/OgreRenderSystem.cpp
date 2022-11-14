@@ -528,27 +528,19 @@ namespace Ogre {
     void RenderSystem::_cleanupDepthBuffers( bool bCleanManualBuffers )
     {
         DepthBufferMap::iterator itMap = mDepthBufferPool.begin();
-        DepthBufferMap::iterator enMap = mDepthBufferPool.end();
 
-        while( itMap != enMap )
+        for (const auto& m : mDepthBufferPool)
         {
-            DepthBufferVec::const_iterator itor = itMap->second.begin();
-            DepthBufferVec::const_iterator end  = itMap->second.end();
-
-            while( itor != end )
+            for (auto *b : m.second)
             {
-                if( bCleanManualBuffers || !(*itor)->isManual() )
-                    delete *itor;
-                ++itor;
+                if (bCleanManualBuffers || !b->isManual())
+                    delete b;
             }
-
             itMap->second.clear();
-
-            ++itMap;
         }
-
         mDepthBufferPool.clear();
     }
+    //-----------------------------------------------------------------------
     void RenderSystem::_beginFrame(void)
     {
         if (!mActiveViewport)
@@ -567,12 +559,11 @@ namespace Ogre {
             return; //RenderTarget explicitly requested no depth buffer
 
         //Find a depth buffer in the pool
-        DepthBufferVec::const_iterator itor = mDepthBufferPool[poolId].begin();
-        DepthBufferVec::const_iterator end  = mDepthBufferPool[poolId].end();
-
-        bool bAttached = false;
-        while( itor != end && !bAttached )
-            bAttached = renderTarget->attachDepthBuffer( *itor++ );
+        bool bAttached;
+        for (auto& d : mDepthBufferPool[poolId]) {
+            bAttached = renderTarget->attachDepthBuffer(d);
+            if (bAttached) break;
+        }
 
         //Not found yet? Create a new one!
         if( !bAttached )
@@ -835,8 +826,8 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void RenderSystem::destroyHardwareOcclusionQuery( HardwareOcclusionQuery *hq)
     {
-        auto end { mHwOcclusionQueries.end() };
-        auto i { std::find(mHwOcclusionQueries.begin(), end, hq) };
+        auto end = mHwOcclusionQueries.end();
+        auto i = std::find(mHwOcclusionQueries.begin(), end, hq);
         if (i != end)
         {
             mHwOcclusionQueries.erase(i);
