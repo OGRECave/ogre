@@ -192,7 +192,7 @@ namespace {
             collection = &mSolidsBasic;
         }
 
-        for(const auto& p : pTech->getPasses())
+        for(auto* p : pTech->getPasses())
         {
             // Insert into solid list
             collection->addRenderable(p, rend);
