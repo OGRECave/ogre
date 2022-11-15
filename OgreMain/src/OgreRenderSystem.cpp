@@ -536,7 +536,7 @@ namespace Ogre {
                 if (bCleanManualBuffers || !b->isManual())
                     delete b;
             }
-            itMap->second.clear();
+            m.second.clear();
             ++itMap;
         }
         mDepthBufferPool.clear();
