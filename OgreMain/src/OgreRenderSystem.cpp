@@ -529,7 +529,7 @@ namespace Ogre {
     {
         DepthBufferMap::iterator itMap = mDepthBufferPool.begin();
 
-        for (const auto& m : mDepthBufferPool)
+        for (auto& m : mDepthBufferPool)
         {
             for (auto *b : m.second)
             {
