@@ -265,7 +265,7 @@ namespace {
             // Hmm, a bit hacky but least obtrusive for now
                     OGRE_LOCK_MUTEX(Pass::msPassGraveyardMutex);
             const Pass::PassSet& graveyardList = Pass::getPassGraveyard();
-            for (const auto& gi : graveyardList)
+            for (auto* p : graveyardList)
             {
                 removePassEntry(gi);
             }
