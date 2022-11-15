@@ -192,12 +192,10 @@ namespace {
             collection = &mSolidsBasic;
         }
 
-
-        Technique::Passes::const_iterator i;
-        for(i = pTech->getPasses().begin(); i != pTech->getPasses().end(); ++i)
+        for(auto* p : pTech->getPasses())
         {
             // Insert into solid list
-            collection->addRenderable(*i, rend);
+            collection->addRenderable(p, rend);
         }
     }
     //-----------------------------------------------------------------------
@@ -232,21 +230,19 @@ namespace {
     //-----------------------------------------------------------------------
     void RenderPriorityGroup::addUnsortedTransparentRenderable(Technique* pTech, Renderable* rend)
     {
-        Technique::Passes::const_iterator i;
-        for(i = pTech->getPasses().begin(); i != pTech->getPasses().end(); ++i)
+        for(auto* p : pTech->getPasses())
         {
             // Insert into transparent list
-            mTransparentsUnsorted.addRenderable(*i, rend);
+            mTransparentsUnsorted.addRenderable(p, rend);
         }
     }
     //-----------------------------------------------------------------------
     void RenderPriorityGroup::addTransparentRenderable(Technique* pTech, Renderable* rend)
     {
-        Technique::Passes::const_iterator i;
-        for(i = pTech->getPasses().begin(); i != pTech->getPasses().end(); ++i)
+        for(auto *p : pTech->getPasses())
         {
             // Insert into transparent list
-            mTransparents.addRenderable(*i, rend);
+            mTransparents.addRenderable(p, rend);
         }
     }
     //-----------------------------------------------------------------------
@@ -269,11 +265,9 @@ namespace {
             // Hmm, a bit hacky but least obtrusive for now
                     OGRE_LOCK_MUTEX(Pass::msPassGraveyardMutex);
             const Pass::PassSet& graveyardList = Pass::getPassGraveyard();
-            Pass::PassSet::const_iterator gi, giend;
-            giend = graveyardList.end();
-            for (gi = graveyardList.begin(); gi != giend; ++gi)
+            for (auto* p : graveyardList)
             {
-                removePassEntry(*gi);
+                removePassEntry(p);
             }
         }
 
@@ -284,11 +278,9 @@ namespace {
             // Hmm, a bit hacky but least obtrusive for now
                     OGRE_LOCK_MUTEX(Pass::msDirtyHashListMutex);
             const Pass::PassSet& dirtyList = Pass::getDirtyHashList();
-            Pass::PassSet::const_iterator di, diend;
-            diend = dirtyList.end();
-            for (di = dirtyList.begin(); di != diend; ++di)
+            for (auto* p : dirtyList)
             {
-                removePassEntry(*di);
+                removePassEntry(p);
             }
         }
         // NB we do NOT clear the graveyard or the dirty list here, because 
@@ -336,12 +328,10 @@ namespace {
     //-----------------------------------------------------------------------
     void QueuedRenderableCollection::clear(void)
     {
-        PassGroupRenderableMap::iterator i, iend;
-        iend = mGrouped.end();
-        for (i = mGrouped.begin(); i != iend; ++i)
+        for (auto& i : mGrouped)
         {
             // Clear the list associated with this pass, but leave the pass entry
-            i->second.clear();
+            i.second.clear();
         }
 
         // Clear sorted list
@@ -463,14 +453,12 @@ namespace {
     void QueuedRenderableCollection::acceptVisitorGrouped(
         QueuedRenderableVisitor* visitor) const
     {
-        PassGroupRenderableMap::const_iterator ipass, ipassend;
-        ipassend = mGrouped.end();
-        for (ipass = mGrouped.begin(); ipass != ipassend; ++ipass)
+        for (auto& ipass : mGrouped)
         {
             // Fast bypass if this group is now empty
-            if (ipass->second.empty()) continue;
+            if (ipass.second.empty()) continue;
 
-            visitor->visit(ipass->first, const_cast<RenderableList&>(ipass->second));
+            visitor->visit(ipass.first, const_cast<RenderableList&>(ipass.second));
         } 
 
     }
@@ -479,12 +467,9 @@ namespace {
         QueuedRenderableVisitor* visitor) const
     {
         // List is already in descending order, so iterate forward
-        RenderablePassList::const_iterator i, iend;
-
-        iend = mSortedDescending.end();
-        for (i = mSortedDescending.begin(); i != iend; ++i)
+        for (const auto& i : mSortedDescending)
         {
-            visitor->visit(const_cast<RenderablePass*>(&(*i)));
+            visitor->visit(const_cast<RenderablePass*>(&i));
         }
     }
     //-----------------------------------------------------------------------
@@ -506,20 +491,17 @@ namespace {
     {
         mSortedDescending.insert( mSortedDescending.end(), rhs.mSortedDescending.begin(), rhs.mSortedDescending.end() );
 
-        PassGroupRenderableMap::const_iterator srcGroup;
-        for( srcGroup = rhs.mGrouped.begin(); srcGroup != rhs.mGrouped.end(); ++srcGroup )
+        for (const auto& srcGroup : rhs.mGrouped)
         {
             // Optionally create new pass entry, build a new list
             // Note that this pass and list are never destroyed until the
             // engine shuts down, or a pass is destroyed or has it's hash
             // recalculated, although the lists will be cleared
-            PassGroupRenderableMap::iterator dstGroup = mGrouped.emplace(srcGroup->first, RenderableList()).first;
+            PassGroupRenderableMap::iterator dstGroup = mGrouped.emplace(srcGroup.first, RenderableList()).first;
 
             // Insert renderable
-            dstGroup->second.insert( dstGroup->second.end(), srcGroup->second.begin(), srcGroup->second.end() );
+            dstGroup->second.insert(dstGroup->second.end(), srcGroup.second.begin(), srcGroup.second.end() );
         }
     }
-
-
 }
 

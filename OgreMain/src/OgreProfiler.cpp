@@ -425,13 +425,12 @@ namespace Ogre {
             instance->history.maxTimeMillisecs = frameTimeMillisecs;
         }
 
-        if(instance->frame.frameTime > maxFrameTime)
+        if (instance->frame.frameTime > maxFrameTime)
             maxFrameTime = (Real)instance->frame.frameTime;
 
-        ProfileChildren::iterator it = instance->children.begin(), endit = instance->children.end();
-        for(;it != endit; ++it)
+        for (auto& i : instance->children)
         {
-            ProfileInstance* child = it->second;
+            ProfileInstance* child = i.second;
 
             // we set the number of times each profile was called per frame to 0
             // because not all profiles are called every frame
@@ -448,10 +447,9 @@ namespace Ogre {
     {
         Real maxFrameTime = 0;
 
-        ProfileChildren::iterator it = mRoot.children.begin(), endit = mRoot.children.end();
-        for(;it != endit; ++it)
+        for (auto& i : mRoot.children)
         {
-            ProfileInstance* child = it->second;
+            ProfileInstance* child = i.second;
 
             // we set the number of times each profile was called per frame to 0
             // because not all profiles are called every frame
@@ -486,7 +484,7 @@ namespace Ogre {
             // ensure the root won't be culled
             mRoot.frame.calls = 1;
 
-            for(auto & l : mListeners)
+            for(auto& l : mListeners)
                 l->displayResults(mRoot, mMaxTotalFrameTime);
         }
         ++mCurrentFrame;
@@ -501,10 +499,9 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     bool ProfileInstance::watchForMax(const String& profileName) 
     {
-        ProfileChildren::iterator it = children.begin(), endit = children.end();
-        for(;it != endit; ++it)
+        for(auto& i : children)
         {
-            ProfileInstance* child = it->second;
+            ProfileInstance* child = i.second;
             if( (child->name == profileName && child->watchForMax()) || child->watchForMax(profileName))
                 return true;
         }
@@ -519,10 +516,9 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     bool ProfileInstance::watchForMin(const String& profileName) 
     {
-        ProfileChildren::iterator it = children.begin(), endit = children.end();
-        for(;it != endit; ++it)
+        for(auto& i : children)
         {
-            ProfileInstance* child = it->second;
+            ProfileInstance* child = i.second;
             if( (child->name == profileName && child->watchForMin()) || child->watchForMin(profileName))
                 return true;
         }
@@ -537,10 +533,9 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     bool ProfileInstance::watchForLimit(const String& profileName, Real limit, bool greaterThan) 
     {
-        ProfileChildren::iterator it = children.begin(), endit = children.end();
-        for(;it != endit; ++it)
+        for(auto& i : children)
         {
-            ProfileInstance* child = it->second;
+            ProfileInstance* child = i.second;
             if( (child->name == profileName && child->watchForLimit(limit, greaterThan)) || child->watchForLimit(profileName, limit, greaterThan))
                 return true;
         }
@@ -551,7 +546,7 @@ namespace Ogre {
     {
         LogManager::getSingleton().logMessage("----------------------Profiler Results----------------------");
 
-        for(auto & it : mRoot.children)
+        for(auto& it : mRoot.children)
         {
             it.second->logResults();
         }
@@ -573,7 +568,7 @@ namespace Ogre {
                         " | Max " + StringConverter::toString(history.maxTimePercent) + 
                         " | Avg "+ StringConverter::toString(history.totalTimePercent / history.totalCalls));   
 
-        for(auto & it : children)
+        for(auto& it : children)
         {
             it.second->logResults();
         }
@@ -593,7 +588,7 @@ namespace Ogre {
 
         history.minTimePercent = 1;
         history.minTimeMillisecs = 100000;
-        for(auto & it : children)
+        for(auto& it : children)
         {
             it.second->reset();
         }
