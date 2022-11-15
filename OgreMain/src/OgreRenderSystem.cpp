@@ -527,8 +527,6 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void RenderSystem::_cleanupDepthBuffers( bool bCleanManualBuffers )
     {
-        DepthBufferMap::iterator itMap = mDepthBufferPool.begin();
-
         for (auto& m : mDepthBufferPool)
         {
             for (auto *b : m.second)
@@ -560,7 +558,7 @@ namespace Ogre {
             return; //RenderTarget explicitly requested no depth buffer
 
         //Find a depth buffer in the pool
-        bool bAttached;
+        bool bAttached = false;
         for (auto& d : mDepthBufferPool[poolId]) {
             bAttached = renderTarget->attachDepthBuffer(d);
             if (bAttached) break;
