@@ -314,6 +314,75 @@ namespace Ogre {
         }
     }
 
+    //---------------------------------------------------------------------
+    static bool findUniformDataSource(const String& paramName, const GpuConstantDefinitionMap* (&constantDefs)[6],
+                               GLUniformReference& refToUpdate)
+    {
+        for (int i = 0; i < 6; i++)
+        {
+            if (constantDefs[i])
+            {
+                auto parami = constantDefs[i]->find(paramName);
+                if (parami != constantDefs[i]->end())
+                {
+                    refToUpdate.mSourceProgType = static_cast<GpuProgramType>(i);
+                    refToUpdate.mConstantDef = &(parami->second);
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    bool GLSLProgramManagerCommon::validateParam(String paramName, uint32 numActiveArrayElements,
+                                                 const GpuConstantDefinitionMap* (&constantDefs)[6],
+                                                 GLUniformReference& refToUpdate)
+    {
+        // Don't add built in uniforms, atomic counters, or uniform block parameters.
+        if (refToUpdate.mLocation < 0)
+            return false;
+
+        // ATI drivers (Catalyst 7.2 and earlier) and
+        // older NVidia drivers will include all array
+        // elements as uniforms but we only want the root
+        // array name and location. Also note that ATI Catalyst
+        // 6.8 to 7.2 there is a bug with glUniform that does
+        // not allow you to update a uniform array past the
+        // first uniform array element ie you can't start
+        // updating an array starting at element 1, must
+        // always be element 0.
+
+        // If the uniform name ends with "]" then its an array element uniform
+        if (paramName.back() == ']')
+        {
+            // if not the first array element then skip it and continue to the next uniform
+            if (paramName.compare(paramName.size() - 3, 3, "[0]") != 0)
+                return false;
+            paramName.resize(paramName.size() - 3);
+        }
+
+        // Find out which params object this comes from
+        bool foundSource = findUniformDataSource(paramName, constantDefs, refToUpdate);
+
+        if(!foundSource)
+            return false;
+
+        // Note that numActiveArrayElements comes from glGetActiveUniformARB()
+        // which returns the index of the highest active array element (that is
+        // an element actually used by the shader) plus one. That is, if some array
+        // elements are not used by the shader (possibly optimized away), then
+        // numActiveArrayElements can well be less than
+        // newGLUniformReference.mConstantDef->arraySize.
+        // Keep in mind that glUniform*v() faimily of functions does allow specifying
+        // a number of elements to update greater than the number of active
+        // elements in the shader.
+        OgreAssertDbg(numActiveArrayElements <= refToUpdate.mConstantDef->arraySize,
+                      "We provide less array elements than what shader actually uses");
+
+        // Only add this parameter if we found the source
+        return true;
+    }
+
     void GLSLProgramManagerCommon::extractUniformsFromGLSL(const String& src,
         GpuNamedConstants& defs, const String& filename)
     {

@@ -159,39 +159,6 @@ namespace Ogre {
         return false;
     }
 
-    //---------------------------------------------------------------------
-    bool GLSLESProgramManager::completeParamSource(
-        const String& paramName,
-        const GpuConstantDefinitionMap* vertexConstantDefs, 
-        const GpuConstantDefinitionMap* fragmentConstantDefs,
-        GLUniformReference& refToUpdate)
-    {
-        if (vertexConstantDefs)
-        {
-            GpuConstantDefinitionMap::const_iterator parami = 
-                vertexConstantDefs->find(paramName);
-            if (parami != vertexConstantDefs->end())
-            {
-                refToUpdate.mSourceProgType = GPT_VERTEX_PROGRAM;
-                refToUpdate.mConstantDef = &(parami->second);
-                return true;
-            }
-        }
-
-        if (fragmentConstantDefs)
-        {
-            GpuConstantDefinitionMap::const_iterator parami = 
-                fragmentConstantDefs->find(paramName);
-            if (parami != fragmentConstantDefs->end())
-            {
-                refToUpdate.mSourceProgType = GPT_FRAGMENT_PROGRAM;
-                refToUpdate.mConstantDef = &(parami->second);
-                return true;
-            }
-        }
-        return false;
-    }
-
 #if !OGRE_NO_GLES2_GLSL_OPTIMISER
     void GLSLESProgramManager::optimiseShaderSource(GLSLESGpuProgram* gpuProgram)
     {
@@ -232,22 +199,15 @@ namespace Ogre {
     {
         // Scan through the active uniforms and add them to the reference list
         GLint uniformCount = 0;
-        GLint maxLength = 0;
-        char* uniformName = NULL;
         #define uniformLength 200
+        char uniformName[uniformLength] = {0};
 
-        OGRE_CHECK_GL_ERROR(glGetProgramiv(programObject, GL_ACTIVE_UNIFORM_MAX_LENGTH, &maxLength));
-
-        // If the max length of active uniforms is 0, then there are 0 active.
-        // There won't be any to extract so we can return.
-        if(maxLength == 0)
-            return;
-
-        uniformName = new char[maxLength + 1];
         GLUniformReference newGLUniformReference;
 
         // Get the number of active uniforms
         OGRE_CHECK_GL_ERROR(glGetProgramiv(programObject, GL_ACTIVE_UNIFORMS, &uniformCount));
+
+        const GpuConstantDefinitionMap* params[6] = { vertexConstantDefs, fragmentConstantDefs };
 
         // Loop over each of the active uniforms, and add them to the reference container
         // only do this for user defined uniforms, ignore built in gl state uniforms
@@ -255,47 +215,15 @@ namespace Ogre {
         {
             GLint arraySize = 0;
             GLenum glType = GL_NONE;
-            OGRE_CHECK_GL_ERROR(glGetActiveUniform(programObject, index, maxLength, NULL,
+            OGRE_CHECK_GL_ERROR(glGetActiveUniform(programObject, index, uniformLength, NULL,
                 &arraySize, &glType, uniformName));
 
             // Don't add built in uniforms
             newGLUniformReference.mLocation = glGetUniformLocation(programObject, uniformName);
-            if (newGLUniformReference.mLocation >= 0)
-            {
-                // User defined uniform found, add it to the reference list
-                String paramName = String( uniformName );
 
-                // If the uniform name has a "[" in it then its an array element uniform.
-                String::size_type arrayStart = paramName.find('[');
-                if (arrayStart != String::npos)
-                {
-                    // If not the first array element then skip it and continue to the next uniform
-                    if (paramName.compare(arrayStart, paramName.size() - 1, "[0]") != 0) continue;
-                    paramName = paramName.substr(0, arrayStart);
-                }
-
-                // Find out which params object this comes from
-                bool foundSource = completeParamSource(paramName,
-                        vertexConstantDefs, fragmentConstantDefs, newGLUniformReference);
-
-                // Only add this parameter if we found the source
-                if (foundSource)
-                {
-                    assert(size_t (arraySize) == newGLUniformReference.mConstantDef->arraySize
-                            && "GL doesn't agree with our array size!");
-                    list.push_back(newGLUniformReference);
-                }
-
-                // Don't bother adding individual array params, they will be
-                // picked up in the 'parent' parameter can copied all at once
-                // anyway, individual indexes are only needed for lookup from
-                // user params
-            } // end if
-        } // end for
-        
-        if( uniformName != NULL ) 
-        {
-            delete[] uniformName;
+            if(!validateParam(uniformName, arraySize, params, newGLUniformReference))
+                continue;
+            list.push_back(newGLUniformReference);
         }
 
 #if 0 // needs updating to GL3Plus code
