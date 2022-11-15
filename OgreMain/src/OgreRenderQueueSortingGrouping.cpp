@@ -267,7 +267,7 @@ namespace {
             const Pass::PassSet& graveyardList = Pass::getPassGraveyard();
             for (auto* p : graveyardList)
             {
-                removePassEntry(gi);
+                removePassEntry(p);
             }
         }
 
@@ -278,9 +278,9 @@ namespace {
             // Hmm, a bit hacky but least obtrusive for now
                     OGRE_LOCK_MUTEX(Pass::msDirtyHashListMutex);
             const Pass::PassSet& dirtyList = Pass::getDirtyHashList();
-            for (const auto& di : dirtyList)
+            for (auto* p : dirtyList)
             {
-                removePassEntry(di);
+                removePassEntry(p);
             }
         }
         // NB we do NOT clear the graveyard or the dirty list here, because 
