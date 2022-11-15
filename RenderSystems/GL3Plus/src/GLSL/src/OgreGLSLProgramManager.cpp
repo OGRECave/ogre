@@ -130,27 +130,6 @@ namespace Ogre {
         }
     }
 
-    bool GLSLProgramManager::findUniformDataSource(
-        const String& paramName,
-        const GpuConstantDefinitionMap* (&constantDefs)[6],
-        GLUniformReference& refToUpdate)
-    {
-        for(int i = 0; i < 6; i++) {
-            if (constantDefs[i])
-            {
-                GpuConstantDefinitionMap::const_iterator parami =
-                        constantDefs[i]->find(paramName);
-                if (parami != constantDefs[i]->end())
-                {
-                    refToUpdate.mSourceProgType = static_cast<GpuProgramType>(i);
-                    refToUpdate.mConstantDef = &(parami->second);
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
     void GLSLProgramManager::extractUniformsFromProgram(GLuint programObject,
                                                         const GpuConstantDefinitionMap* (&constantDefs)[6],
                                                         GLUniformReferenceList& uniformList)
@@ -175,50 +154,12 @@ namespace Ogre {
             GLenum glType;
             OGRE_CHECK_GL_ERROR(glGetActiveUniform(programObject, index, uniformLength, NULL,
                                                    &arraySize, &glType, uniformName));
-
-            // Don't add built in uniforms, atomic counters, or uniform block parameters.
             OGRE_CHECK_GL_ERROR(newGLUniformReference.mLocation = glGetUniformLocation(programObject, uniformName));
 
-            // User defined uniform found, add it to the reference list.
-            String paramName = String(uniformName);
-
-            // ATI drivers (Catalyst 7.2 and earlier) and
-            // older NVidia drivers will include all array
-            // elements as uniforms but we only want the root
-            // array name and location. Also note that ATI Catalyst
-            // 6.8 to 7.2 there is a bug with glUniform that does
-            // not allow you to update a uniform array past the
-            // first uniform array element ie you can't start
-            // updating an array starting at element 1, must
-            // always be element 0.
-
-            // If the uniform name ends with "]" then its an array element uniform
-            if (paramName.back() == ']')
-            {
-                // if not the first array element then skip it and continue to the next uniform
-                if (paramName.compare(paramName.size() - 3, 3, "[0]") != 0) continue;
-                paramName.resize(paramName.size() - 3);
-            }
-
-            if (newGLUniformReference.mLocation >= 0)
-            {
-                // Find out which params object this comes from
-                bool foundSource = findUniformDataSource(paramName, constantDefs, newGLUniformReference);
-
-                // Only add this parameter if we found the source
-                if (foundSource)
-                {
-                    assert(size_t (arraySize) == newGLUniformReference.mConstantDef->arraySize
-                           && "GL doesn't agree with our array size!");
-                    uniformList.push_back(newGLUniformReference);
-                }
-
-                // Don't bother adding individual array params, they will be
-                // picked up in the 'parent' parameter can copied all at once
-                // anyway, individual indexes are only needed for lookup from
-                // user params
-            }
-        } // end for
+            if(!validateParam(uniformName, arraySize, constantDefs, newGLUniformReference))
+                continue;
+            uniformList.push_back(newGLUniformReference);
+        }
 
         // FIXME Ogre materials need a new shared param that is associated with an entity.
         // This could be impemented as a switch-like statement inside shared_params:

@@ -58,6 +58,10 @@ namespace Ogre {
             store it in a GpuNamedConstant. */
         void parseGLSLUniform(String line, GpuNamedConstants& defs, const String& filename);
 
+        /// checks whether the param with the given name should be added to the uniforms list
+        static bool validateParam(String paramName, uint32 numActiveArrayElements,
+                                  const GpuConstantDefinitionMap* (&constantDefs)[6], GLUniformReference& refToUpdate);
+
         typedef std::map<uint32, GLSLProgramCommon*> ProgramMap;
         typedef ProgramMap::iterator ProgramIterator;
 

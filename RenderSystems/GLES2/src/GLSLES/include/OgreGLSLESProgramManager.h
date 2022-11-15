@@ -58,11 +58,6 @@ namespace Ogre {
 #if !OGRE_NO_GLES2_GLSL_OPTIMISER
         struct glslopt_ctx *mGLSLOptimiserContext;
 #endif
-        /// Find where the data for a specific uniform should come from, populate
-        static bool completeParamSource(const String& paramName,
-            const GpuConstantDefinitionMap* vertexConstantDefs, 
-            const GpuConstantDefinitionMap* fragmentConstantDefs,
-            GLUniformReference& refToUpdate);
     public:
 
         GLSLESProgramManager(void);

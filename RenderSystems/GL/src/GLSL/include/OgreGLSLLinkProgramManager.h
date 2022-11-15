@@ -44,13 +44,6 @@ namespace Ogre {
     private:
         GLSLLinkProgram* mActiveLinkProgram;
 
-        /// Find where the data for a specific uniform should come from, populate
-        static bool completeParamSource(const String& paramName,
-            const GpuConstantDefinitionMap* vertexConstantDefs, 
-            const GpuConstantDefinitionMap* geometryConstantDefs,
-            const GpuConstantDefinitionMap* fragmentConstantDefs,
-            GLUniformReference& refToUpdate);
-
     public:
 
         GLSLLinkProgramManager(void);
