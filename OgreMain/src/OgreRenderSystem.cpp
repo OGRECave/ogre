@@ -535,7 +535,6 @@ namespace Ogre {
                     delete b;
             }
             m.second.clear();
-            ++itMap;
         }
         mDepthBufferPool.clear();
     }
