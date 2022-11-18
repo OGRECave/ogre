@@ -278,8 +278,8 @@ namespace Ogre {
         // Copy the indexes into a software area for staging
         size_t numIndexes = q3lvl.mNumElements + mPatchIndexCount;
         // Create an index buffer manually in system memory, allow space for patches
-        mIndexes.reset(OGRE_NEW DefaultHardwareIndexBuffer(HardwareIndexBuffer::IT_32BIT, numIndexes,
-                                                           HardwareBuffer::HBU_DYNAMIC));
+        mIndexes = std::make_shared<HardwareIndexBuffer>(nullptr, HardwareIndexBuffer::IT_32BIT, numIndexes,
+                                                         new DefaultHardwareBuffer(numIndexes * sizeof(int)));
         // Write main indexes
         mIndexes->writeData(0, sizeof(unsigned int) * q3lvl.mNumElements, q3lvl.mElements, true);
         // create actual hardware index buffer
