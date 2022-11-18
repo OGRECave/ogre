@@ -84,7 +84,7 @@ namespace Ogre
     both a resource in it's own right, but it also provides the manual load
     implementation for the Texture it creates.
     */
-    class _OgreOverlayExport Font : public Resource, public ManualResourceLoader
+    class _OgreOverlayExport Font final : public Resource, public ManualResourceLoader
     {
     protected:
         /// The type of font
