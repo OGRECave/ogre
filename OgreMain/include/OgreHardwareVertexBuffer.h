@@ -45,15 +45,13 @@ namespace Ogre {
     *  @{
     */
     /** Specialisation of HardwareBuffer for a vertex buffer. */
-    class _OgreExport HardwareVertexBuffer : public HardwareBuffer
+    class _OgreExport HardwareVertexBuffer final : public HardwareBuffer
     {
             bool mIsInstanceData;
             HardwareBufferManagerBase* mMgr;
             size_t mNumVertices;
             size_t mVertexSize;
             size_t mInstanceDataStepRate;           
-            /// Checks if vertex instance data is supported by the render system
-            virtual bool checkIfVertexInstanceDataIsSupported();
 
         public:
             /// Should be called by HardwareBufferManager
