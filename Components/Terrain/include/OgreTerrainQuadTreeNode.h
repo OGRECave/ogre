@@ -349,7 +349,7 @@ namespace Ogre
         /* Update the vertex buffers - the rect in question is relative to the whole terrain, 
             not the local vertex data (which may use a subset)
         */
-        void updateVertexBuffer(HardwareVertexBufferSharedPtr& posbuf, HardwareVertexBufferSharedPtr& deltabuf, const Rect& rect);
+        void updateVertexBuffer(const HardwareVertexBufferPtr& posbuf, const HardwareVertexBufferPtr& deltabuf, const Rect& rect);
         void destroyCpuVertexData();
 
         void createGpuVertexData();
