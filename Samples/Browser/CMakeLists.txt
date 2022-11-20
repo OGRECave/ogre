@@ -41,9 +41,8 @@ if (WINDOWS_STORE OR WINDOWS_PHONE)
     set(SHORT_NAME ${EXE_NAME})
     set(PACKAGE_GUID "ef31484f-4f23-4b9f-8748-af5482696ae5")
     set(APP_MANIFEST_NAME Package.appxmanifest)
-    string(SUBSTRING ${MSVC_VERSION} 0 2 MSVC_SHORT)
     configure_file(
-        ${OGRE_TEMPLATES_DIR}/Package_vc${MSVC_SHORT}00.WindowsStore.appxmanifest.in
+        ${OGRE_TEMPLATES_DIR}/Package_vc1900.WindowsStore.appxmanifest.in
         ${CMAKE_CURRENT_BINARY_DIR}/${APP_MANIFEST_NAME}
         @ONLY)
 
