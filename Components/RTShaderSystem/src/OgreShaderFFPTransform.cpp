@@ -87,6 +87,8 @@ bool FFPTransform::createCpuSubPrograms(ProgramSet* programSet)
     if(mInstanced)
     {
         vsProgram->setInstancingIncluded(true);
+        // this at prevents software skinning, which is not supported with instancing
+        vsProgram->setSkeletalAnimationIncluded(true);
         if (isHLSL)
         {
             // set hlsl shader to use row-major matrices instead of column-major.
