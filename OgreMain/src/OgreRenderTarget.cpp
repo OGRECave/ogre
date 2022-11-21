@@ -166,15 +166,13 @@ namespace Ogre {
     {
         // Go through viewports in Z-order
         // Tell each to refresh
-        ViewportList::iterator it = mViewportList.begin();
-        while (it != mViewportList.end())
+        for (const auto& v : mViewportList)
         {
-            Viewport* viewport = (*it).second;
+            Viewport* viewport = v.second;
             if(viewport->isAutoUpdated())
             {
                 _updateViewport(viewport,updateStatistics);
             }
-            ++it;
         }
     }
 
