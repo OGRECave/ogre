@@ -142,19 +142,10 @@ namespace Ogre {
         mVertexBufferBindings.clear();
     }
     //-----------------------------------------------------------------------
-    void HardwareBufferManagerBase::registerVertexBufferSourceAndCopy(
-            const HardwareVertexBufferSharedPtr& sourceBuffer,
-            const HardwareVertexBufferSharedPtr& copy)
-    {
-            OGRE_LOCK_MUTEX(mTempBuffersMutex);
-        // Add copy to free temporary vertex buffers
-        mFreeTempVertexBufferMap.emplace(sourceBuffer.get(), copy);
-    }
-    //-----------------------------------------------------------------------
     HardwareVertexBufferSharedPtr 
     HardwareBufferManagerBase::allocateVertexBufferCopy(
         const HardwareVertexBufferSharedPtr& sourceBuffer, 
-        BufferLicenseType licenseType, HardwareBufferLicensee* licensee,
+        HardwareBufferLicensee* licensee,
         bool copyData)
     {
         // pre-lock the mVertexBuffers mutex, which would usually get locked in
@@ -191,7 +182,7 @@ namespace Ogre {
             // Insert copy into licensee list
             mTempVertexBufferLicenses.emplace(
                     vbuf.get(),
-                    VertexBufferLicense(sourceBuffer.get(), licenseType, EXPIRED_DELAY_FRAME_THRESHOLD, vbuf, licensee));
+                    VertexBufferLicense(sourceBuffer.get(), EXPIRED_DELAY_FRAME_THRESHOLD, vbuf, licensee));
             return vbuf;
         }
 
@@ -221,7 +212,6 @@ namespace Ogre {
         if (i != mTempVertexBufferLicenses.end())
         {
             VertexBufferLicense& vbl = i->second;
-            assert(vbl.licenseType == BLT_AUTOMATIC_RELEASE);
             vbl.expiredDelay = EXPIRED_DELAY_FRAME_THRESHOLD;
         }
     }
@@ -272,8 +262,7 @@ namespace Ogre {
         {
             TemporaryVertexBufferLicenseMap::iterator icur = i++;
             VertexBufferLicense& vbl = icur->second;
-            if (vbl.licenseType == BLT_AUTOMATIC_RELEASE &&
-                (forceFreeUnused || --vbl.expiredDelay <= 0))
+            if (forceFreeUnused || --vbl.expiredDelay <= 0)
             {
                 vbl.licensee->licenseExpired(vbl.buffer.get());
 
@@ -456,13 +445,12 @@ namespace Ogre {
 
         if (positions && !destPositionBuffer)
         {
-            destPositionBuffer = srcPositionBuffer->getManager()->allocateVertexBufferCopy(srcPositionBuffer, 
-                HardwareBufferManagerBase::BLT_AUTOMATIC_RELEASE, this, posNormalExtraData);
+            destPositionBuffer =
+                srcPositionBuffer->getManager()->allocateVertexBufferCopy(srcPositionBuffer, this, posNormalExtraData);
         }
         if (normals && !posNormalShareBuffer && srcNormalBuffer && !destNormalBuffer)
         {
-            destNormalBuffer = srcNormalBuffer->getManager()->allocateVertexBufferCopy(srcNormalBuffer, 
-                HardwareBufferManagerBase::BLT_AUTOMATIC_RELEASE, this);
+            destNormalBuffer = srcNormalBuffer->getManager()->allocateVertexBufferCopy(srcNormalBuffer, this);
         }
     }
     //-----------------------------------------------------------------------------

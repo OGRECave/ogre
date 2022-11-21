@@ -142,34 +142,21 @@ namespace Ogre {
         /// Internal method for destroys a VertexBufferBinding, may be overridden by certain rendering APIs.
         virtual void destroyVertexBufferBindingImpl(VertexBufferBinding* binding);
 
-    public:
-
-        enum BufferLicenseType
-        {
-            /// Licensee will only release buffer when it says so.
-            BLT_MANUAL_RELEASE,
-            /// Licensee can have license revoked.
-            BLT_AUTOMATIC_RELEASE
-        };
-
     private:
         /** Struct holding details of a license to use a temporary shared buffer. */
         class _OgrePrivate VertexBufferLicense
         {
         public:
             HardwareVertexBuffer* originalBufferPtr;
-            BufferLicenseType licenseType;
             size_t expiredDelay;
             HardwareVertexBufferSharedPtr buffer;
             HardwareBufferLicensee* licensee;
             VertexBufferLicense(
                 HardwareVertexBuffer* orig,
-                BufferLicenseType ltype, 
                 size_t delay,
                 HardwareVertexBufferSharedPtr buf, 
                 HardwareBufferLicensee* lic) 
                 : originalBufferPtr(orig)
-                , licenseType(ltype)
                 , expiredDelay(delay)
                 , buffer(buf)
                 , licensee(lic)
@@ -189,11 +176,12 @@ namespace Ogre {
         size_t mUnderUsedFrameCount;
         /// Number of frames to wait before free unused temporary buffers.
         static const size_t UNDER_USED_FRAME_THRESHOLD;
-        /// Frame delay for BLT_AUTOMATIC_RELEASE temporary buffers.
+        /// Frame delay for temporary buffers.
         static const size_t EXPIRED_DELAY_FRAME_THRESHOLD;
         // Mutexes
         OGRE_MUTEX(mTempBuffersMutex);
 
+        void _forceReleaseBufferCopies(HardwareVertexBuffer* sourceBuffer);
     public:
         HardwareBufferManagerBase();
         virtual ~HardwareBufferManagerBase();
@@ -271,15 +259,6 @@ namespace Ogre {
         /** Destroys a VertexBufferBinding. */
         void destroyVertexBufferBinding(VertexBufferBinding* binding);
 
-        /** Registers a vertex buffer as a copy of another.
-
-            This is useful for registering an existing buffer as a temporary buffer
-            which can be allocated just like a copy.
-        */
-        virtual void registerVertexBufferSourceAndCopy(
-            const HardwareVertexBufferSharedPtr& sourceBuffer,
-            const HardwareVertexBufferSharedPtr& copy);
-
         /** Allocates a copy of a given vertex buffer.
 
             This method allocates a temporary copy of an existing vertex buffer.
@@ -288,10 +267,6 @@ namespace Ogre {
             destruction.
         @param sourceBuffer
             The source buffer to use as a copy.
-        @param licenseType
-            The type of license required on this buffer - automatic
-            release causes this class to release licenses every frame so that 
-            they can be reallocated anew.
         @param licensee
             Pointer back to the class requesting the copy, which must
             implement HardwareBufferLicense in order to be notified when the license
@@ -302,14 +277,11 @@ namespace Ogre {
         */
         HardwareVertexBufferSharedPtr allocateVertexBufferCopy(
             const HardwareVertexBufferSharedPtr& sourceBuffer, 
-            BufferLicenseType licenseType,
             HardwareBufferLicensee* licensee,
             bool copyData = false);
 
         /** Manually release a vertex buffer copy for others to subsequently use.
 
-            Only required if the original call to allocateVertexBufferCopy
-            included a licenseType of BLT_MANUAL_RELEASE. 
         @param bufferCopy
             The buffer copy. The caller is expected to delete
             or at least no longer use this reference, since another user may
@@ -319,8 +291,8 @@ namespace Ogre {
 
         /** Tell engine that the vertex buffer copy intent to reuse.
 
-            Ogre internal keep an expired delay counter of BLT_AUTOMATIC_RELEASE
-            buffers, when the counter count down to zero, it'll release for other
+            Ogre internal keep an expired delay counter.
+            When the counter count down to zero, it'll release for other
             purposes later. But you can use this function to reset the counter to
             the internal configured value, keep the buffer not get released for
             some frames.
@@ -341,8 +313,7 @@ namespace Ogre {
         */
         void _freeUnusedBufferCopies(void);
 
-        /** Internal method for releasing all temporary buffers which have been 
-           allocated using BLT_AUTOMATIC_RELEASE; is called by OGRE.
+        /** Internal method for releasing all temporary buffers; is called by OGRE.
         @param forceFreeUnused
             If @c true, free all unused temporary buffers.
             If @c false, auto detect and free all unused temporary buffers based on
@@ -361,18 +332,6 @@ namespace Ogre {
             from the source buffer are deleted.
         */
         void _forceReleaseBufferCopies(const HardwareVertexBufferSharedPtr& sourceBuffer);
-
-        /** Internal method that forces the release of copies of a given buffer.
-
-            This usually means that the buffer which the copies are based on has
-            been changed in some fundamental way, and the owner of the original 
-            wishes to make that known so that new copies will reflect the
-            changes.
-        @param sourceBuffer
-            The source buffer as a pointer. Any buffer copies created from
-            the source buffer are deleted.
-        */
-        void _forceReleaseBufferCopies(HardwareVertexBuffer* sourceBuffer);
 
         /// Notification that a hardware vertex buffer has been destroyed.
         void _notifyVertexBufferDestroyed(HardwareVertexBuffer* buf);
