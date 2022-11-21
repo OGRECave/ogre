@@ -194,12 +194,6 @@ namespace Ogre {
         // Mutexes
         OGRE_MUTEX(mTempBuffersMutex);
 
-
-        /// Creates a new buffer as a copy of the source, does not copy data.
-        virtual HardwareVertexBufferSharedPtr makeBufferCopy(
-            const HardwareVertexBufferSharedPtr& source, 
-            HardwareBuffer::Usage usage, bool useShadowBuffer);
-
     public:
         HardwareBufferManagerBase();
         virtual ~HardwareBufferManagerBase();
