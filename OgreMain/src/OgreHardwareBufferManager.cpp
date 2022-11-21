@@ -158,7 +158,7 @@ namespace Ogre {
         bool copyData)
     {
         // pre-lock the mVertexBuffers mutex, which would usually get locked in
-        //  makeBufferCopy / createVertexBuffer
+        // createVertexBuffer
         // this prevents a deadlock in _notifyVertexBufferDestroyed
         // which locks the same mutexes (via other methods) but in reverse order
         OGRE_LOCK_MUTEX(mVertexBuffersMutex);
@@ -171,11 +171,9 @@ namespace Ogre {
                 mFreeTempVertexBufferMap.find(sourceBuffer.get());
             if (i == mFreeTempVertexBufferMap.end())
             {
-                // copy buffer, use shadow buffer and make dynamic
-                vbuf = makeBufferCopy(
-                    sourceBuffer, 
-                    HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE, 
-                    true);
+                // create new copy buffer, use shadow buffer and make dynamic
+                vbuf = createVertexBuffer(sourceBuffer->getVertexSize(), sourceBuffer->getNumVertices(), HBU_CPU_TO_GPU,
+                                          true);
             }
             else
             {
@@ -390,17 +388,6 @@ namespace Ogre {
                                                                      bool useShadowBuffer)
     {
         OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "not supported by RenderSystem");
-    }
-    //-----------------------------------------------------------------------
-    HardwareVertexBufferSharedPtr 
-    HardwareBufferManagerBase::makeBufferCopy(
-        const HardwareVertexBufferSharedPtr& source,
-        HardwareBuffer::Usage usage, bool useShadowBuffer)
-    {
-        return this->createVertexBuffer(
-            source->getVertexSize(), 
-            source->getNumVertices(),
-            usage, useShadowBuffer);
     }
     //-----------------------------------------------------------------------------
     //-----------------------------------------------------------------------------
