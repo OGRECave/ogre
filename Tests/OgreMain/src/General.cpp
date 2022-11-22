@@ -66,14 +66,14 @@ TEST_F(CameraTests,customProjectionMatrix)
     cam.setCustomProjectionMatrix(true, cam.getProjectionMatrix());
     for(int j = 0; j < 8; j++) {
         for(int k = 0; k < 3; k++) {
-            if(typeid(corners[j]) == typeid(float))
+            if(OGRE_DOUBLE_PRECISION == 0)
                 EXPECT_FLOAT_EQ(corners[j][k], cam.getWorldSpaceCorners()[j][k]);
             else
                 EXPECT_DOUBLE_EQ(corners[j][k], cam.getWorldSpaceCorners()[j][k]);
         }
     }
 
-    if(typeid(Ogre::Real) == typeid(float)) {
+    if(OGRE_DOUBLE_PRECISION == 0) {
         EXPECT_FLOAT_EQ(extents.bottom, cam.getFrustumExtents().bottom);
         EXPECT_FLOAT_EQ(extents.top, cam.getFrustumExtents().top);
         EXPECT_FLOAT_EQ(extents.left, cam.getFrustumExtents().left);
