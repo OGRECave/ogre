@@ -32,6 +32,9 @@ bool TerrainTransform::preAddToRenderState(const RenderState* renderState, Pass*
 
 void TerrainTransform::updateParams()
 {
+    if(!mCompressed)
+        return;
+
     mPointTrans->setGpuParameter(mTerrain->getPointTransform());
 
     float baseUVScale = 1.0f / (mTerrain->getSize() - 1);
