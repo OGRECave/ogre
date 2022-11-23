@@ -392,7 +392,7 @@ namespace Ogre
 
         // Use D3DX to help us create the texture, this way it can adjust any relevant sizes
         DWORD usage = (mUsage & TU_RENDERTARGET) ? D3DUSAGE_RENDERTARGET : 0;
-        UINT numMips = (mNumMipmaps == MIP_UNLIMITED) ? 0 : mNumMipmaps + 1;
+        UINT numMips = (mNumRequestedMipmaps == MIP_UNLIMITED) ? 0 : mNumMipmaps + 1;
         // Check dynamic textures
         if (mUsage & TU_DYNAMIC)
         {
@@ -555,7 +555,7 @@ namespace Ogre
 
         // Use D3DX to help us create the texture, this way it can adjust any relevant sizes
         DWORD usage = (mUsage & TU_RENDERTARGET) ? D3DUSAGE_RENDERTARGET : 0;
-        UINT numMips = (mNumMipmaps == MIP_UNLIMITED) ? 0 : mNumMipmaps + 1;
+        UINT numMips = (mNumRequestedMipmaps == MIP_UNLIMITED) ? 0 : mNumMipmaps + 1;
         // Check dynamic textures
         if (mUsage & TU_DYNAMIC)
         {
@@ -711,7 +711,7 @@ namespace Ogre
 
         // Use D3DX to help us create the texture, this way it can adjust any relevant sizes
         DWORD usage = (mUsage & TU_RENDERTARGET) ? D3DUSAGE_RENDERTARGET : 0;
-        UINT numMips = (mNumMipmaps == MIP_UNLIMITED) ? 0 : mNumMipmaps + 1;
+        UINT numMips = (mNumRequestedMipmaps == MIP_UNLIMITED) ? 0 : mNumMipmaps + 1;
         // Check dynamic textures
         if (mUsage & TU_DYNAMIC)
         {
