@@ -105,9 +105,9 @@ namespace Ogre {
         /// Blend buffer details for dedicated geometry
         std::unique_ptr<VertexData> mSkelAnimVertexData;
         /// Quick lookup of buffers
-        TempBlendedBufferInfo mTempSkelAnimInfo;
+        Entity::TempBlendedBufferInfo mTempSkelAnimInfo;
         /// Temp buffer details for software Vertex anim geometry
-        TempBlendedBufferInfo mTempVertexAnimInfo;
+        Entity::TempBlendedBufferInfo mTempVertexAnimInfo;
         /// Vertex data details for software Vertex anim of shared geometry
         std::unique_ptr<VertexData> mSoftwareVertexAnimVertexData;
         /// Vertex data details for hardware Vertex anim of shared geometry
@@ -254,14 +254,6 @@ namespace Ogre {
             The positions/normals of the returned vertex data is in object space.
         */
         VertexData* _getHardwareVertexAnimVertexData(void);
-        /** Advanced method to get the temp buffer information for software 
-        skeletal animation.
-        */
-        TempBlendedBufferInfo* _getSkelAnimTempBufferInfo(void);
-        /** Advanced method to get the temp buffer information for software 
-        morph animation.
-        */
-        TempBlendedBufferInfo* _getVertexAnimTempBufferInfo(void);
         /// Retrieve the VertexData which should be used for GPU binding
         VertexData* getVertexDataForBinding(void);
 

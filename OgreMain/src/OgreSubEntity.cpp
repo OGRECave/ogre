@@ -331,16 +331,6 @@ namespace Ogre {
         return mHardwareVertexAnimVertexData.get();
     }
     //-----------------------------------------------------------------------
-    TempBlendedBufferInfo* SubEntity::_getSkelAnimTempBufferInfo(void) 
-    {
-        return &mTempSkelAnimInfo;
-    }
-    //-----------------------------------------------------------------------
-    TempBlendedBufferInfo* SubEntity::_getVertexAnimTempBufferInfo(void) 
-    {
-        return &mTempVertexAnimInfo;
-    }
-    //-----------------------------------------------------------------------
     void SubEntity::_updateCustomGpuParameter(
         const GpuProgramParameters::AutoConstantEntry& constantEntry,
         GpuProgramParameters* params) const
