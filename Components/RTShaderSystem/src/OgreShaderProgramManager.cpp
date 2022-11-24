@@ -71,7 +71,7 @@ void ProgramManager::releasePrograms(const ProgramSet* programSet)
             continue;
 
 	const auto it = std::find(mShaderList.begin(), mShaderList.end(), prg);
-        // TODO: this check should not be necessary, but we observed strange prg.use_count() in the wild 
+        // TODO: this check should not be necessary, but we observed strange prg.use_count() in the wild
         if(it != mShaderList.end())
             mShaderList.erase(it);
         GpuProgramManager::getSingleton().remove(prg);
