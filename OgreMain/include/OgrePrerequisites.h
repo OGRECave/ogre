@@ -231,7 +231,6 @@ namespace Ogre {
     class SubMesh;
     class TagPoint;
     class Technique;
-    class TempBlendedBufferInfo;
     class ExternalTextureSource;
     class TextureUnitState;
     class Texture;

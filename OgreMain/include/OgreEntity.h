@@ -107,6 +107,38 @@ namespace Ogre {
         /// State of animation for animable meshes
         AnimationStateSet* mAnimationState;
 
+        /** Structure for recording the use of temporary blend buffers. */
+        class TempBlendedBufferInfo : public HardwareBufferLicensee
+        {
+        private:
+            // Pre-blended
+            HardwareVertexBufferPtr srcPositionBuffer;
+            HardwareVertexBufferPtr srcNormalBuffer;
+            // Post-blended
+            HardwareVertexBufferPtr destPositionBuffer;
+            HardwareVertexBufferPtr destNormalBuffer;
+            unsigned short posBindIndex;
+            unsigned short normBindIndex;
+            /// Both positions and normals are contained in the same buffer.
+            bool posNormalShareBuffer;
+            bool posNormalExtraData;
+            bool bindPositions;
+            bool bindNormals;
+
+        public:
+            ~TempBlendedBufferInfo(void);
+            /// Utility method, extract info from the given VertexData.
+            void extractFrom(const VertexData* sourceData);
+            /// Utility method, checks out temporary copies of src into dest.
+            void checkoutTempCopies(bool positions = true, bool normals = true);
+            /// Utility method, binds dest copies into a given VertexData struct.
+            void bindTempCopies(VertexData* targetData, bool suppressHardwareUpload);
+            /** Overridden member from HardwareBufferLicensee. */
+            void licenseExpired(HardwareBuffer* buffer) override;
+            /** Detect currently have buffer copies checked out and touch it. */
+            bool buffersCheckedOut(bool positions = true, bool normals = true) const;
+        };
+
 
         /// Temp buffer details for software skeletal anim of shared geometry
         TempBlendedBufferInfo mTempSkelAnimInfo;
@@ -734,14 +766,6 @@ namespace Ogre {
             The positions/normals of the returned vertex data is in object space.
         */
         VertexData* _getHardwareVertexAnimVertexData(void) const;
-        /** Advanced method to get the temp buffer information for software
-            skeletal animation.
-        */
-        TempBlendedBufferInfo* _getSkelAnimTempBufferInfo(void);
-        /** Advanced method to get the temp buffer information for software
-            morph animation.
-        */
-        TempBlendedBufferInfo* _getVertexAnimTempBufferInfo(void);
         /// Override to return specific type flag.
         uint32 getTypeFlags(void) const override;
         /// Retrieve the VertexData which should be used for GPU binding.

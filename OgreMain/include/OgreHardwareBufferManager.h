@@ -65,39 +65,6 @@ namespace Ogre {
         virtual void licenseExpired(HardwareBuffer* buffer) = 0;
     };
 
-    /** Structure for recording the use of temporary blend buffers. */
-    class _OgreExport TempBlendedBufferInfo : public HardwareBufferLicensee, public BufferAlloc
-    {
-    private:
-        // Pre-blended 
-        HardwareVertexBufferSharedPtr srcPositionBuffer;
-        HardwareVertexBufferSharedPtr srcNormalBuffer;
-        // Post-blended 
-        HardwareVertexBufferSharedPtr destPositionBuffer;
-        HardwareVertexBufferSharedPtr destNormalBuffer;
-        unsigned short posBindIndex;
-        unsigned short normBindIndex;
-        /// Both positions and normals are contained in the same buffer.
-        bool posNormalShareBuffer;
-        bool posNormalExtraData;
-        bool bindPositions;
-        bool bindNormals;
-
-    public:
-        ~TempBlendedBufferInfo(void);
-        /// Utility method, extract info from the given VertexData.
-        void extractFrom(const VertexData* sourceData);
-        /// Utility method, checks out temporary copies of src into dest.
-        void checkoutTempCopies(bool positions = true, bool normals = true);
-        /// Utility method, binds dest copies into a given VertexData struct.
-        void bindTempCopies(VertexData* targetData, bool suppressHardwareUpload);
-        /** Overridden member from HardwareBufferLicensee. */
-        void licenseExpired(HardwareBuffer* buffer) override;
-        /** Detect currently have buffer copies checked out and touch it. */
-        bool buffersCheckedOut(bool positions = true, bool normals = true) const;
-    };
-
-
     /** Base definition of a hardware buffer manager.
 
         This class is deliberately not a Singleton, so that multiple types can 
