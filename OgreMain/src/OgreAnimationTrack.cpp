@@ -233,19 +233,9 @@ namespace Ogre {
     }
     //---------------------------------------------------------------------
     NumericAnimationTrack::NumericAnimationTrack(Animation* parent,
-        unsigned short handle, AnimableValuePtr& target)
+        unsigned short handle, const AnimableValuePtr& target)
         :AnimationTrack(parent, handle), mTargetAnim(target)
     {
-    }
-    //---------------------------------------------------------------------
-    const AnimableValuePtr& NumericAnimationTrack::getAssociatedAnimable(void) const
-    {
-        return mTargetAnim;
-    }
-    //---------------------------------------------------------------------
-    void NumericAnimationTrack::setAssociatedAnimable(const AnimableValuePtr& val)
-    {
-        mTargetAnim = val;
     }
     //---------------------------------------------------------------------
     KeyFrame* NumericAnimationTrack::createKeyFrameImpl(Real time)
@@ -320,9 +310,7 @@ namespace Ogre {
     //---------------------------------------------------------------------
     NumericAnimationTrack* NumericAnimationTrack::_clone(Animation* newParent) const
     {
-        NumericAnimationTrack* newTrack = 
-            newParent->createNumericTrack(mHandle);
-        newTrack->mTargetAnim = mTargetAnim;
+        NumericAnimationTrack* newTrack = newParent->createNumericTrack(mHandle, mTargetAnim);
         populateClone(newTrack);
         return newTrack;
     }

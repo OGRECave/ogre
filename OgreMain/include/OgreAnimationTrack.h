@@ -265,7 +265,7 @@ namespace Ogre
         NumericAnimationTrack(Animation* parent, unsigned short handle);
         /// Constructor, associates with an AnimableValue
         NumericAnimationTrack(Animation* parent, unsigned short handle, 
-            AnimableValuePtr& target);
+            const AnimableValuePtr& target);
 
         /// @copydoc AnimationTrack::createKeyFrame
         virtual NumericKeyFrame* createNumericKeyFrame(Real timePos);
@@ -288,11 +288,11 @@ namespace Ogre
             Real weight = 1.0, Real scale = 1.0f);
 
         /** Returns a pointer to the associated animable object (if any). */
-        virtual const AnimableValuePtr& getAssociatedAnimable(void) const;
+        const AnimableValuePtr& getAssociatedAnimable(void) const { return mTargetAnim; }
 
         /** Sets the associated animable object which will be automatically 
             affected by calls to 'apply'. */
-        virtual void setAssociatedAnimable(const AnimableValuePtr& val);
+        void setAssociatedAnimable(const AnimableValuePtr& val) { mTargetAnim = val; }
 
         /** Returns the KeyFrame at the specified index. */
         NumericKeyFrame* getNumericKeyFrame(unsigned short index) const;
