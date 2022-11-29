@@ -137,12 +137,6 @@ namespace Ogre {
         */
         NodeAnimationTrack* createNodeTrack(unsigned short handle);
 
-        /** Creates a NumericAnimationTrack for animating any numeric value.
-        @param handle Handle to give the track, used for accessing the track later. 
-            Must be unique within this Animation.
-        */
-        NumericAnimationTrack* createNumericTrack(unsigned short handle);
-
         /** Creates a VertexAnimationTrack for animating vertex position data.
         @param handle Handle to give the track, used for accessing the track later. 
             Must be unique within this Animation, and is used to identify the target. For example

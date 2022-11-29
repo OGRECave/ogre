@@ -261,8 +261,6 @@ namespace Ogre
     class _OgreExport NumericAnimationTrack : public AnimationTrack
     {
     public:
-        /// Constructor
-        NumericAnimationTrack(Animation* parent, unsigned short handle);
         /// Constructor, associates with an AnimableValue
         NumericAnimationTrack(Animation* parent, unsigned short handle, 
             const AnimableValuePtr& target);

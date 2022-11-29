@@ -227,12 +227,6 @@ namespace Ogre {
     // Numeric specialisations
     //---------------------------------------------------------------------
     NumericAnimationTrack::NumericAnimationTrack(Animation* parent,
-        unsigned short handle)
-        : AnimationTrack(parent, handle)
-    {
-    }
-    //---------------------------------------------------------------------
-    NumericAnimationTrack::NumericAnimationTrack(Animation* parent,
         unsigned short handle, const AnimableValuePtr& target)
         :AnimationTrack(parent, handle), mTargetAnim(target)
     {
@@ -242,6 +236,33 @@ namespace Ogre {
     {
         return OGRE_NEW NumericKeyFrame(this, time);
     }
+
+    static Any lerpAny(const Any& v0, const Any& v1, Real t, AnimableValue::ValueType type)
+    {
+        switch(type)
+        {
+        default:
+        case AnimableValue::INT:
+            return Math::lerp(any_cast<int>(v0), any_cast<int>(v1), t);
+        case AnimableValue::REAL:
+            return Math::lerp(any_cast<Real>(v0), any_cast<Real>(v1), t);
+        case AnimableValue::VECTOR2:
+            return Math::lerp(any_cast<Vector2>(v0), any_cast<Vector2>(v1), t);
+        case AnimableValue::VECTOR3:
+            return Math::lerp(any_cast<Vector3>(v0), any_cast<Vector3>(v1), t);
+        case AnimableValue::VECTOR4:
+            return Math::lerp(any_cast<Vector4>(v0), any_cast<Vector4>(v1), t);
+        case AnimableValue::QUATERNION:
+            return Math::lerp(any_cast<Quaternion>(v0), any_cast<Quaternion>(v1), t);
+        case AnimableValue::COLOUR:
+            return Math::lerp(any_cast<ColourValue>(v0), any_cast<ColourValue>(v1), t);
+        case AnimableValue::DEGREE:
+            return Math::lerp(any_cast<Degree>(v0), any_cast<Degree>(v1), t);
+        case AnimableValue::RADIAN:
+            return Math::lerp(any_cast<Radian>(v0), any_cast<Radian>(v1), t);
+        }
+    }
+
     //---------------------------------------------------------------------
     void NumericAnimationTrack::getInterpolatedKeyFrame(const TimeIndex& timeIndex,
         KeyFrame* kf) const
@@ -271,8 +292,7 @@ namespace Ogre {
         else
         {
             // Interpolate by t
-            AnyNumeric diff = k2->getValue() - k1->getValue();
-            kret->setValue(k1->getValue() + diff * t);
+            kret->setValue(lerpAny(k1->getValue(), k2->getValue(), t, mTargetAnim->getType()));
         }
     }
     //---------------------------------------------------------------------
@@ -281,6 +301,31 @@ namespace Ogre {
         applyToAnimable(mTargetAnim, timeIndex, weight, scale);
     }
     //---------------------------------------------------------------------
+    static Any scaleAny(const Any& v, Real s, AnimableValue::ValueType type)
+    {
+        switch(type)
+        {
+        default:
+        case AnimableValue::INT:
+            return any_cast<int>(v) * s;
+        case AnimableValue::REAL:
+            return any_cast<Real>(v) * s;
+        case AnimableValue::VECTOR2:
+            return any_cast<Vector2>(v) * s;
+        case AnimableValue::VECTOR3:
+            return any_cast<Vector3>(v) * s;
+        case AnimableValue::VECTOR4:
+            return any_cast<Vector4>(v) * s;
+        case AnimableValue::QUATERNION:
+            return any_cast<Quaternion>(v) * s;
+        case AnimableValue::COLOUR:
+            return any_cast<ColourValue>(v) * s;
+        case AnimableValue::DEGREE:
+            return any_cast<Degree>(v) * s;
+        case AnimableValue::RADIAN:
+            return any_cast<Radian>(v) * s;
+        }
+    }
     void NumericAnimationTrack::applyToAnimable(const AnimableValuePtr& anim, const TimeIndex& timeIndex,
         Real weight, Real scale)
     {
@@ -292,9 +337,7 @@ namespace Ogre {
         getInterpolatedKeyFrame(timeIndex, &kf);
         // add to existing. Weights are not relative, but treated as
         // absolute multipliers for the animation
-        AnyNumeric val = kf.getValue() * (weight * scale);
-
-        anim->applyDeltaValue(val);
+        anim->applyDeltaValue(scaleAny(kf.getValue(), weight * scale, mTargetAnim->getType()));
 
     }
     //--------------------------------------------------------------------------
