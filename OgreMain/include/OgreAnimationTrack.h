@@ -178,9 +178,7 @@ namespace Ogre
 
         /** Creates a new KeyFrame and adds it to this animation at the given time index.
 
-            It is better to create KeyFrames in time order. Creating them out of order can result 
-            in expensive reordering processing. Note that a KeyFrame at time index 0.0 is always created
-            for you, so you don't need to create this one, just access it using getKeyFrame(0);
+            It is better to create KeyFrames in time order.
         @param timePos The time from which this KeyFrame will apply.
         */
         virtual KeyFrame* createKeyFrame(Real timePos);
@@ -269,13 +267,7 @@ namespace Ogre
         NumericAnimationTrack(Animation* parent, unsigned short handle, 
             AnimableValuePtr& target);
 
-        /** Creates a new KeyFrame and adds it to this animation at the given time index.
-
-            It is better to create KeyFrames in time order. Creating them out of order can result 
-            in expensive reordering processing. Note that a KeyFrame at time index 0.0 is always created
-            for you, so you don't need to create this one, just access it using getKeyFrame(0);
-        @param timePos The time from which this KeyFrame will apply.
-        */
+        /// @copydoc AnimationTrack::createKeyFrame
         virtual NumericKeyFrame* createNumericKeyFrame(Real timePos);
 
         /// @copydoc AnimationTrack::getInterpolatedKeyFrame
@@ -331,13 +323,7 @@ namespace Ogre
             Node* targetNode);
         /// Destructor
         virtual ~NodeAnimationTrack();
-        /** Creates a new KeyFrame and adds it to this animation at the given time index.
-
-            It is better to create KeyFrames in time order. Creating them out of order can result 
-            in expensive reordering processing. Note that a KeyFrame at time index 0.0 is always created
-            for you, so you don't need to create this one, just access it using getKeyFrame(0);
-        @param timePos The time from which this KeyFrame will apply.
-        */
+        /// @copydoc AnimationTrack::createKeyFrame
         virtual TransformKeyFrame* createNodeKeyFrame(Real timePos);
         /** Returns a pointer to the associated Node object (if any). */
         virtual Node* getAssociatedNode(void) const;
@@ -499,13 +485,7 @@ namespace Ogre
         /** Whether the vertex animation (if present) includes normals */
         bool getVertexAnimationIncludesNormals() const;
 
-        /** Creates a new morph KeyFrame and adds it to this animation at the given time index.
-
-        It is better to create KeyFrames in time order. Creating them out of order can result 
-        in expensive reordering processing. Note that a KeyFrame at time index 0.0 is always created
-        for you, so you don't need to create this one, just access it using getKeyFrame(0);
-        @param timePos The time from which this KeyFrame will apply.
-        */
+        /// @copydoc AnimationTrack::createKeyFrame
         virtual VertexMorphKeyFrame* createVertexMorphKeyFrame(Real timePos);
 
         /** Creates the single pose KeyFrame and adds it to this animation.
