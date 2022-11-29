@@ -84,17 +84,17 @@ namespace Ogre
         ~NumericKeyFrame() {}
 
         /** Get the value at this keyframe. */
-        virtual const AnyNumeric& getValue(void) const;
+        const Any& getValue(void) const { return mValue; }
         /** Set the value at this keyframe.
 
             All keyframe values must have a consistent type. 
         */
-        virtual void setValue(const AnyNumeric& val);
+        void setValue(const Any& val) { mValue = val; }
 
         /** Clone a keyframe (internal use only) */
         KeyFrame* _clone(AnimationTrack* newParent) const override;
     private:
-        AnyNumeric mValue;
+        Any mValue;
     };
 
 
