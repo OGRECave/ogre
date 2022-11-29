@@ -52,6 +52,8 @@ THE SOFTWARE.
 
 #include "OgreHighLevelGpuProgram.h"
 
+#include "OgreKeyFrame.h"
+
 #include <random>
 using std::minstd_rand;
 
@@ -541,4 +543,19 @@ TEST(Light, AnimableValue)
     auto spotlightFalloff = l.createAnimableValue("spotlightFalloff");
     spotlightFalloff->applyDeltaValue(Real(1));
     EXPECT_EQ(l.getSpotlightFalloff(), 1);
+}
+
+TEST(Light, AnimationTrack)
+{
+    Light l;
+    l.setDiffuseColour(0, 0, 0);
+
+    Animation anim("test", 1.0);
+    auto track = anim.createNumericTrack(0, l.createAnimableValue("diffuseColour"));
+    track->createNumericKeyFrame(0)->setValue(ColourValue(1, 2, 3, 0));
+    track->createNumericKeyFrame(1)->setValue(ColourValue(2, 4, 6, 0));
+
+    track->apply(0.5);
+
+    EXPECT_EQ(l.getDiffuseColour(), ColourValue(1.5, 3, 4.5));
 }
