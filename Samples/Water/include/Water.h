@@ -177,10 +177,7 @@ protected:
         waterNode->attachObject(billboardSet);
 
         setupControls();
-
-#if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
         setDragLook(true);
-#endif
         
         timeoutDelay = 0.0f;
     }

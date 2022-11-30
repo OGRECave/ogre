@@ -228,6 +228,9 @@ namespace OgreBites
 
         virtual void setDragLook(bool enabled)
         {
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
+            return;
+#endif
             if (enabled)
             {
                 mCameraMan->setStyle(CS_MANUAL);

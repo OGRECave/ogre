@@ -79,9 +79,7 @@ void Sample_VolumeTerrain::setupControls(void)
 {
     mMouseState = 0;
     mTrayMgr->showCursor();
-#if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
-        setDragLook(true);
-#endif
+    setDragLook(true);
     mCameraMan->setTopSpeed((Real)100.0);
     // make room for the volume
     mTrayMgr->showLogo(TL_TOPRIGHT);
