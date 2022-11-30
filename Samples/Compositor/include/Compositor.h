@@ -130,10 +130,7 @@ void Sample_Compositor::setupContent(void)
     registerCompositors();
 
     setupControls();
-
-#if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
     setDragLook(true);
-#endif
 }
 
 static bool blacklisted(const String& name)

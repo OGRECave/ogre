@@ -173,10 +173,7 @@ void Sample_NewInstancing::setupContent()
     mCameraNode->setPosition( 0, 120, 100 );
 
     setupGUI();
-
-#if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
     setDragLook(true);
-#endif
 
     switchInstancingTechnique();
 }
