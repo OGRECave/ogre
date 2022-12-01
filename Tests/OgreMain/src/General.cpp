@@ -549,13 +549,21 @@ TEST(Light, AnimationTrack)
 {
     Light l;
     l.setDiffuseColour(0, 0, 0);
+    l.setAttenuation(0, 0, 0, 0);
 
     Animation anim("test", 1.0);
-    auto track = anim.createNumericTrack(0, l.createAnimableValue("diffuseColour"));
-    track->createNumericKeyFrame(0)->setValue(ColourValue(1, 2, 3, 0));
-    track->createNumericKeyFrame(1)->setValue(ColourValue(2, 4, 6, 0));
+    auto diffuse = anim.createNumericTrack(0, l.createAnimableValue("diffuseColour"));
+    diffuse->createNumericKeyFrame(0)->setValue(ColourValue(1, 2, 3, 0));
+    diffuse->createNumericKeyFrame(1)->setValue(ColourValue(2, 4, 6, 0));
 
-    track->apply(0.5);
+    diffuse->apply(0.5);
 
     EXPECT_EQ(l.getDiffuseColour(), ColourValue(1.5, 3, 4.5));
+
+    auto attenuation = anim.createNumericTrack(1, l.createAnimableValue("attenuation"));
+    attenuation->createNumericKeyFrame(0)->setValue(Vector4(1, 2, 3, 4));
+    attenuation->createNumericKeyFrame(1)->setValue(Vector4(2, 4, 6, 8));
+
+    attenuation->apply(0.5);
+    EXPECT_EQ(l.getAttenuation(), Vector4f(1.5, 3, 4.5, 6));
 }
