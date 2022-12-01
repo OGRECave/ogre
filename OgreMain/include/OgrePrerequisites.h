@@ -40,6 +40,13 @@ namespace Ogre {
 
     #define OGRE_MIN_VERSION(MAJOR, MINOR, PATCH) OGRE_VERSION >= ((MAJOR << 16) | (MINOR << 8) | PATCH)
 
+// OSX needs this correctly export typeinfo, however on MSVC there is huge fallout with it. Linux is fine either way.
+#if OGRE_COMPILER == OGRE_COMPILER_MSVC
+    #define _OgreMaybeExport
+#else
+    #define _OgreMaybeExport _OgreExport
+#endif
+
     // define the real number values to be used
     // default to use 'float' unless precompiler option set
     #if OGRE_DOUBLE_PRECISION == 1
@@ -239,7 +246,7 @@ namespace Ogre {
     class TransformKeyFrame;
     class Timer;
     class UserObjectBindings;
-    template <int dims, typename T> class Vector;
+    template <int dims, typename T> class _OgreMaybeExport Vector;
     typedef Vector<2, Real> Vector2;
     typedef Vector<2, int> Vector2i;
     typedef Vector<3, Real> Vector3;
