@@ -91,7 +91,7 @@ void FFP_GenerateTexCoord_EnvMap_Reflect(in mat4 mWorld,
 	vec3 vEyeDir  = normalize(vWorldPos - vCamPos);
 	
 	vec3 vReflect = reflect(vEyeDir, vWorldNormal);
-	vReflect.z *= -1;
+	vReflect.z *= -1.0;
 
 	vOut = vReflect;
 }
