@@ -98,7 +98,7 @@ namespace Ogre
     TerrainGlobalOptions::TerrainGlobalOptions()
         : mSkirtSize(30)
         , mLightMapDir(Vector3(1, -1, 0).normalisedCopy())
-        , mCastsShadows(true)
+        , mCastsShadows(false)
         , mMaxPixelError(3.0)
         , mRenderQueueGroup(RENDER_QUEUE_MAIN)
         , mVisibilityFlags(0xFFFFFFFF)
