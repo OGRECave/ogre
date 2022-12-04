@@ -702,6 +702,8 @@ namespace Ogre {
             /// default shadow camera setup
             ShadowCameraSetupPtr mDefaultShadowCameraSetup;
 
+            ShadowCameraSetupPtr mCullCameraSetup;
+
             void setShadowTechnique(ShadowTechnique technique);
 
             /// Internal method for creating shadow textures (texture-based shadows)
