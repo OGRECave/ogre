@@ -190,6 +190,7 @@ void Sample_NewInstancing::setupLighting()
     n->attachObject(light);
     n->setDirection(0, -1, -1);
     light->setSpecularColour( 0.6, 0.82, 1.0 );
+    light->setShadowFarDistance( 10000 );
 }
 
 //------------------------------------------------------------------------------

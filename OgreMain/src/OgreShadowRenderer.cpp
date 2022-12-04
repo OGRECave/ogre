@@ -73,6 +73,8 @@ mShadowCasterRenderBackFaces(true)
     // set up default shadow camera setup
     mDefaultShadowCameraSetup = DefaultShadowCameraSetup::create();
 
+    mCullCameraSetup = DefaultShadowCameraSetup::create();
+
     // init shadow texture count per type.
     mShadowTextureCountPerType[Light::LT_POINT] = 1;
     mShadowTextureCountPerType[Light::LT_DIRECTIONAL] = 1;
@@ -653,8 +655,17 @@ void SceneManager::ShadowRenderer::ensureShadowTexturesCreated()
             // in prepareShadowTextures to coexist with multiple SMs
             Camera* cam = mSceneManager->createCamera(camName);
             cam->setAspectRatio((Real)shadowTex->getWidth() / (Real)shadowTex->getHeight());
-            mSceneManager->getRootSceneNode()->createChildSceneNode()->attachObject(cam);
+            auto camNode = mSceneManager->getRootSceneNode()->createChildSceneNode();
+            camNode->attachObject(cam);
             mShadowTextureCameras.push_back(cam);
+
+            // use separate culling camera, in case a focused shadow setup is used
+            // in which case we want to keep the original light frustum for culling
+            Camera* cullCam = mSceneManager->createCamera(camName+"/Cull");
+            cullCam->setAspectRatio((Real)shadowTex->getWidth() / (Real)shadowTex->getHeight());
+            cam->setCullingFrustum(cullCam);
+            camNode->attachObject(cullCam);
+
 
             // Create a viewport, if not there already
             if (shadowRTT->getNumViewports() == 0)
@@ -697,6 +708,8 @@ void SceneManager::ShadowRenderer::destroyShadowTextures(void)
         mSceneManager->getRootSceneNode()->removeAndDestroyChild(cam->getParentSceneNode());
         // Always destroy camera since they are local to this SM
         mSceneManager->destroyCamera(cam);
+        if(auto cullcam = dynamic_cast<Camera*>(cam->getCullingFrustum()))
+            mSceneManager->destroyCamera(cullcam);
     }
     mShadowTextures.clear();
     mShadowTextureCameras.clear();
@@ -770,6 +783,10 @@ void SceneManager::ShadowRenderer::prepareShadowTextures(Camera* cam, Viewport* 
             Camera *texCam = *ci;
             // rebind camera, incase another SM in use which has switched to its cam
             shadowView->setCamera(texCam);
+            // also update culling camera
+            auto cullCam = dynamic_cast<Camera*>(texCam->getCullingFrustum());
+            cullCam->_notifyViewport(shadowView);
+            mCullCameraSetup->getShadowCamera(mSceneManager, cam, vp, light, cullCam, j);
 
             // Associate main view camera as LOD camera
             texCam->setLodCamera(cam);
