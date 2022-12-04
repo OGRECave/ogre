@@ -763,7 +763,10 @@ namespace Ogre {
         if(getCapabilities()->hasCapability(RSC_TEXTURE_3D))
             mStateCacheManager->setTexParameteri(target, GL_TEXTURE_WRAP_R, getTextureAddressingMode(uvw.w));
 
-        if ((uvw.u == TAM_BORDER || uvw.v == TAM_BORDER || uvw.w == TAM_BORDER) && checkExtension("GL_EXT_texture_border_clamp"))
+        bool hasBorderClamp = hasMinGLVersion(3, 2) || checkExtension("GL_EXT_texture_border_clamp") ||
+                              checkExtension("GL_OES_texture_border_clamp");
+
+        if ((uvw.u == TAM_BORDER || uvw.v == TAM_BORDER || uvw.w == TAM_BORDER) && hasBorderClamp)
             OGRE_CHECK_GL_ERROR(glTexParameterfv( target, GL_TEXTURE_BORDER_COLOR_EXT, sampler.getBorderColour().ptr()));
 
         // only via shader..
@@ -807,8 +810,9 @@ namespace Ogre {
         switch (tam)
         {
             case TextureUnitState::TAM_CLAMP:
-            case TextureUnitState::TAM_BORDER:
                 return GL_CLAMP_TO_EDGE;
+            case TextureUnitState::TAM_BORDER:
+                return GL_CLAMP_TO_BORDER_EXT;
             case TextureUnitState::TAM_MIRROR:
                 return GL_MIRRORED_REPEAT;
             case TextureUnitState::TAM_WRAP:
