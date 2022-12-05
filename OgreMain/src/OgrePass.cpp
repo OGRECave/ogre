@@ -256,23 +256,19 @@ namespace Ogre {
             othUsage ? programUsage.reset(new GpuProgramUsage(*othUsage, this)) : programUsage.reset();
         }
 
-        TextureUnitStates::const_iterator i, iend;
-
         // Clear texture units but doesn't notify need recompilation in the case
         // we are cloning, The parent material will take care of this.
-        iend = mTextureUnitStates.end();
-        for (i = mTextureUnitStates.begin(); i != iend; ++i)
+        for (auto *t : mTextureUnitStates)
         {
-            OGRE_DELETE *i;
+            OGRE_DELETE t;
         }
 
         mTextureUnitStates.clear();
 
         // Copy texture units
-        iend = oth.mTextureUnitStates.end();
-        for (i = oth.mTextureUnitStates.begin(); i != iend; ++i)
+        for (auto *s : oth.mTextureUnitStates)
         {
-            TextureUnitState* t = OGRE_NEW TextureUnitState(this, *(*i));
+            TextureUnitState* t = OGRE_NEW TextureUnitState(this, *s);
             mTextureUnitStates.push_back(t);
         }
 

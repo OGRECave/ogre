@@ -1556,14 +1556,12 @@ namespace Ogre {
     ParticleAffectorFactory::~ParticleAffectorFactory() 
     {
         // Destroy all affectors
-        std::vector<ParticleAffector*>::iterator i;
-        for (i = mAffectors.begin(); i != mAffectors.end(); ++i)
+        for (auto *a : mAffectors)
         {
-            OGRE_DELETE (*i);
+            OGRE_DELETE a;
         }
             
         mAffectors.clear();
-
     }
     //-----------------------------------------------------------------------
     void ParticleAffectorFactory::destroyAffector(ParticleAffector* e)

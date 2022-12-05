@@ -111,7 +111,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void ParticleSystemManager::addRendererFactory(ParticleSystemRendererFactory* factory)
     {
-            OGRE_LOCK_AUTO_MUTEX ;
+        OGRE_LOCK_AUTO_MUTEX ;
         String name = factory->getType();
         mRendererFactories[name] = factory;
         LogManager::getSingleton().logMessage("Particle Renderer Type '" + name + "' registered");
