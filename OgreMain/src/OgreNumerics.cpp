@@ -26,59 +26,56 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#include "OgreNumerics.h"
 #include "OgreStableHeaders.h"
+#include "OgreNumerics.h"
+
 
 namespace Ogre
 {
-bool NumericSolver::solveNxNLinearSysDestr(int n, double** coeff, double* col)
-{
-    // we'll use standard row reduction; since we only care about systems with unique
-    // solutions, our job is slightly easier.  more can probably be done later to improve
-    // precision versus this naive method
-
-    int i, j;
-
-    for (j = 0; j < n; j++)
+    bool NumericSolver::solveNxNLinearSysDestr(int n, double **coeff, double *col)
     {
-        // look for a row with a leading coefficient we can use to cancel the rest
-        int nonzeroIndex = -1;
-        for (i = j; i < n; i++)
+        // we'll use standard row reduction; since we only care about systems with unique
+        // solutions, our job is slightly easier.  more can probably be done later to improve
+        // precision versus this naive method
+
+        int i, j;
+
+        for(j = 0; j < n; j++)
         {
-            if (coeff[i][j] != 0.0)
-            {
-                nonzeroIndex = i;
-                break;
+            // look for a row with a leading coefficient we can use to cancel the rest
+            int nonzeroIndex = -1;
+            for(i = j; i < n; i++) {
+                if (coeff[i][j] != 0.0) {
+                    nonzeroIndex = i;
+                    break;
+                }
+            }
+            if (nonzeroIndex < 0) 
+                return false;
+            double *tptr = coeff[j];
+            coeff[j] = coeff[nonzeroIndex];
+            coeff[nonzeroIndex] = tptr;
+            double tval = col[j];
+            col[j] = col[nonzeroIndex];
+            col[nonzeroIndex] = tval;
+            nonzeroIndex = j;
+
+            // normalize row to have leading coeff of 1 and kill other rows' entries
+            double invelt = 1.0 / coeff[nonzeroIndex][j];
+            int k;
+            for (k = j; k < n; k++)
+                coeff[nonzeroIndex][k] *= invelt;
+            col[nonzeroIndex] *= invelt;
+            for (i = 0; i < n; i++) {
+                if (i==nonzeroIndex || coeff[i][j] == 0.0)
+                    continue;
+                double temp = coeff[i][j];
+                for (k = j; k < n; k++)
+                    coeff[i][k] -= temp * coeff[nonzeroIndex][k];
+                col[i] -= temp * col[nonzeroIndex];
             }
         }
-        if (nonzeroIndex < 0)
-            return false;
-        double* tptr = coeff[j];
-        coeff[j] = coeff[nonzeroIndex];
-        coeff[nonzeroIndex] = tptr;
-        double tval = col[j];
-        col[j] = col[nonzeroIndex];
-        col[nonzeroIndex] = tval;
-        nonzeroIndex = j;
 
-        // normalize row to have leading coeff of 1 and kill other rows' entries
-        double invelt = 1.0 / coeff[nonzeroIndex][j];
-        int k;
-        for (k = j; k < n; k++)
-            coeff[nonzeroIndex][k] *= invelt;
-        col[nonzeroIndex] *= invelt;
-        for (i = 0; i < n; i++)
-        {
-            if (i == nonzeroIndex || coeff[i][j] == 0.0)
-                continue;
-            double temp = coeff[i][j];
-            for (k = j; k < n; k++)
-                coeff[i][k] -= temp * coeff[nonzeroIndex][k];
-            col[i] -= temp * col[nonzeroIndex];
-        }
+        return true;
     }
-
-    return true;
 }
-
-} // namespace Ogre
