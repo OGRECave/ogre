@@ -28,7 +28,6 @@ THE SOFTWARE.
 #include "OgreStableHeaders.h"
 
 #include "OgreTagPoint.h"
-#include "OgreLight.h"
 #include "OgreEntity.h"
 #include "OgreLodListener.h"
 

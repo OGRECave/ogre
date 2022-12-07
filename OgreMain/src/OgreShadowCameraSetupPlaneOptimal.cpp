@@ -27,7 +27,6 @@ THE SOFTWARE.
 */
 
 #include "OgreStableHeaders.h"
-#include "OgreLight.h"
 #include "OgreShadowCameraSetupPlaneOptimal.h"
 #include "OgreNumerics.h"
 #include "OgreMovablePlane.h"
