@@ -26,7 +26,6 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 #include "OgreStableHeaders.h"
-#include "OgreLight.h"
 #include "OgreEdgeListBuilder.h"
 #include "OgreOptimisedUtil.h"
 

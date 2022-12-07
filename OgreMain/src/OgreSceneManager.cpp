@@ -28,7 +28,6 @@ THE SOFTWARE.
 #include "OgreStableHeaders.h"
 
 #include "OgreEntity.h"
-#include "OgreLight.h"
 #include "OgreControllerManager.h"
 #include "OgreAnimation.h"
 #include "OgreRenderObjectListener.h"
