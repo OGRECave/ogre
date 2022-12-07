@@ -765,6 +765,7 @@ void SceneManager::ShadowRenderer::prepareShadowTextures(Camera* cam, Viewport* 
     ci = mShadowTextureCameras.begin();
     mShadowTextureIndexLightList.clear();
     size_t shadowTextureIndex = 0;
+
     for (i = lightList->begin(), si = mShadowTextures.begin(); i != iend && si != siend; ++i)
     {
         Light* light = *i;
@@ -772,6 +773,8 @@ void SceneManager::ShadowRenderer::prepareShadowTextures(Camera* cam, Viewport* 
         // skip light if shadows are disabled
         if (!light->getCastShadows())
             continue;
+
+        mDestRenderSystem->_setDepthClamp(light->getType() == Light::LT_DIRECTIONAL);
 
         // texture iteration per light.
         size_t textureCountPerLight = mShadowTextureCountPerType[light->getType()];
@@ -831,6 +834,8 @@ void SceneManager::ShadowRenderer::prepareShadowTextures(Camera* cam, Viewport* 
             ++si; // next shadow texture
             ++ci; // next camera
         }
+
+        mDestRenderSystem->_setDepthClamp(false);
 
         // set the first shadow texture index for this light.
         mShadowTextureIndexLightList.push_back(shadowTextureIndex);
