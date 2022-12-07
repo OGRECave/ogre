@@ -40,11 +40,11 @@ namespace Ogre
 
         int i, j;
 
-        for(j = 0; j < n; j++)
+        for(j=0; j<n; j++)
         {
             // look for a row with a leading coefficient we can use to cancel the rest
             int nonzeroIndex = -1;
-            for(i = j; i < n; i++) {
+            for(i=j; i<n; i++) {
                 if (coeff[i][j] != 0.0) {
                     nonzeroIndex = i;
                     break;
@@ -63,14 +63,14 @@ namespace Ogre
             // normalize row to have leading coeff of 1 and kill other rows' entries
             double invelt = 1.0 / coeff[nonzeroIndex][j];
             int k;
-            for (k = j; k < n; k++)
+            for (k=j; k<n; k++)
                 coeff[nonzeroIndex][k] *= invelt;
             col[nonzeroIndex] *= invelt;
-            for (i = 0; i < n; i++) {
+            for (i=0; i<n; i++) {
                 if (i==nonzeroIndex || coeff[i][j] == 0.0)
                     continue;
                 double temp = coeff[i][j];
-                for (k = j; k < n; k++)
+                for (k=j; k<n; k++)
                     coeff[i][k] -= temp * coeff[nonzeroIndex][k];
                 col[i] -= temp * col[nonzeroIndex];
             }
@@ -78,4 +78,5 @@ namespace Ogre
 
         return true;
     }
+
 }
