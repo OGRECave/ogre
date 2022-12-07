@@ -131,6 +131,12 @@ namespace Ogre
                 mBodyB.clip(p);
             }
 
+            if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_DEPTH_CLAMP))
+            {
+                out_bodyB->build(mBodyB);
+                return;
+            }
+
             // Extrude the intersection bodyB into the inverted light direction and store 
             // the info in the point list.
             // Maximum extrusion extent is to the shadow far distance
