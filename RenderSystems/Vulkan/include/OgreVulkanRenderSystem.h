@@ -210,6 +210,7 @@ namespace Ogre
         void _convertProjectionMatrix(const Matrix4& matrix, Matrix4& dest, bool) override;
         void _setDepthBias(float constantBias, float slopeScaleBias = 0.0f) override;
         void _setDepthBufferParams(bool depthTest, bool depthWrite, CompareFunction depthFunction) override;
+        void _setDepthClamp(bool enable) override;
         void _setCullingMode(CullingMode mode) override;
         void _setAlphaRejectSettings(CompareFunction func, unsigned char value, bool alphaToCoverage) override;
         void setColourBlendState(const ColourBlendState& state) override;

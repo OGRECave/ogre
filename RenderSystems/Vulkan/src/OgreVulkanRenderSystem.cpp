@@ -1275,6 +1275,11 @@ namespace Ogre
         }
     }
 
+    void VulkanRenderSystem::_setDepthClamp(bool enable)
+    {
+        rasterState.depthClampEnable = enable;
+    }
+
     void VulkanRenderSystem::_setAlphaRejectSettings(CompareFunction func, unsigned char value, bool alphaToCoverage)
     {
         mssCi.alphaToCoverageEnable = (func != CMPF_ALWAYS_PASS) && alphaToCoverage;
