@@ -176,7 +176,7 @@ namespace Ogre {
     
     void GL3PlusStateCacheManager::bindGLBuffer(GLenum target, GLuint buffer, bool force)
     {
-#ifdef OGRE_ENABLE_STATE_CACHE_CRITICAL
+#ifdef OGRE_ENABLE_STATE_CACHE
         auto ret = mActiveBufferMap.emplace(target, buffer);
         if(ret.first->second != buffer || force) // Update the cached value if needed
         {
@@ -243,7 +243,7 @@ namespace Ogre {
         //always delete the buffer, even if not currently bound
         OGRE_CHECK_GL_ERROR(glDeleteBuffers(1, &buffer));
 
-#ifdef OGRE_ENABLE_STATE_CACHE_CRITICAL
+#ifdef OGRE_ENABLE_STATE_CACHE
         BindBufferMap::iterator i = mActiveBufferMap.find(target);
         
         if (i != mActiveBufferMap.end() && ((*i).second == buffer))
@@ -258,7 +258,7 @@ namespace Ogre {
 
     void GL3PlusStateCacheManager::bindGLVertexArray(GLuint vao)
     {
-#ifdef OGRE_ENABLE_STATE_CACHE_CRITICAL
+#ifdef OGRE_ENABLE_STATE_CACHE_CRITICAL // multi-context is handled by GLVertexArrayObject::bind
         if(mActiveVertexArray != vao)
         {
             mActiveVertexArray = vao;
