@@ -38,20 +38,10 @@ namespace Ogre
     class _OgreGL3PlusExport GL3PlusStateCacheManager : public GLStateCacheManagerCommon
     {
     protected:
-        struct TextureUnitParams
-        {
-            TexParameteriMap mTexParameteriMap;
-        };
-
-        typedef std::unordered_map<GLuint, TextureUnitParams> TexUnitsMap;
-
         /* These variables are used for caching OpenGL state.
          They are cached because state changes can be quite expensive,
          which is especially important on mobile or embedded systems.
          */
-
-        /// Stores textures currently bound to each texture stage
-        std::unordered_map <GLenum, GLuint> mBoundTextures;
 
         /// Stores the currently bound draw frame buffer value
         GLuint mActiveDrawFrameBuffer;
@@ -59,16 +49,12 @@ namespace Ogre
         GLuint mActiveReadFrameBuffer;
         /// Stores the currently bound vertex array object
         GLuint mActiveVertexArray;
-        /// A map of texture parameters for each texture unit
-        TexUnitsMap mTexUnitsMap;
         /// Stores the current polygon rendering mode
         GLenum mPolygonMode;
         /// Stores the last bound texture id
         GLuint mLastBoundTexID;
         /// Stores the currently bound separable program pipeline
         GLuint mActiveProgramPipeline;
-
-        GLfloat mPointSize;
     public:
         GL3PlusStateCacheManager(void);
         
@@ -83,22 +69,19 @@ namespace Ogre
         /** Bind an OpenGL frame buffer.
          @param target The buffer target.
          @param buffer The buffer ID.
-         @param force Optional parameter to force an update.
          */
-        void bindGLFrameBuffer(GLenum target,GLuint buffer, bool force = false);
+        void bindGLFrameBuffer(GLenum target,GLuint buffer);
 
         /** Bind an OpenGL frame buffer.
          @param buffer The buffer ID.
-         @param force Optional parameter to force an update.
          */
-        void bindGLRenderBuffer(GLuint buffer, bool force = false);
+        void bindGLRenderBuffer(GLuint buffer);
 
         /** Bind an OpenGL buffer of any type.
          @param target The buffer target.
          @param buffer The buffer ID.
-         @param force Optional parameter to force an update.
          */
-        void bindGLBuffer(GLenum target, GLuint buffer, bool force = false);
+        void bindGLBuffer(GLenum target, GLuint buffer);
 
         /** Delete an OpenGL frame buffer.
          @param target The buffer target.
@@ -217,8 +200,6 @@ namespace Ogre
          @param handle The handle to the program pipeline
          */
         void bindGLProgramPipeline(GLuint handle);
-
-        void setPointSize(GLfloat size);
 
         void setViewport(const Rect& r);
     };
