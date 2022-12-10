@@ -99,17 +99,14 @@ namespace Ogre {
         mEnableVector.clear();
         mActiveBufferMap.clear();
         mTexUnitsMap.clear();
-
-        mEnabledVertexAttribs.reserve(64);
-        mEnabledVertexAttribs.clear();
 #endif
     }
 
-    void GLES2StateCacheManager::bindGLBuffer(GLenum target, GLuint buffer, bool force)
+    void GLES2StateCacheManager::bindGLBuffer(GLenum target, GLuint buffer)
     {
 #ifdef OGRE_ENABLE_STATE_CACHE
         auto ret = mActiveBufferMap.emplace(target, buffer);
-        if(ret.first->second != buffer || force) // Update the cached value if needed
+        if(ret.first->second != buffer) // Update the cached value if needed
         {
             ret.first->second = buffer;
             ret.second = true;
@@ -196,7 +193,7 @@ namespace Ogre {
         TexUnitsMap::iterator it = mTexUnitsMap.find(mLastBoundTexID);
         if (it == mTexUnitsMap.end())
         {
-            TextureUnitParams unit;
+            TexParameteriMap unit;
             mTexUnitsMap[mLastBoundTexID] = unit;
             
             // Update the iterator
@@ -204,7 +201,7 @@ namespace Ogre {
         }
         
         // Get a local copy of the parameter map and search for this parameter
-        TexParameteriMap &myMap = (*it).second.mTexParameteriMap;
+        TexParameteriMap &myMap = (*it).second;
         auto ret = myMap.emplace(pname, param);
         TexParameteriMap::iterator i = ret.first;
 
@@ -218,38 +215,6 @@ namespace Ogre {
         }
 #else
         OGRE_CHECK_GL_ERROR(glTexParameteri(target, pname, param));
-#endif
-    }
-
-    void GLES2StateCacheManager::setTexParameterf(GLenum target, GLenum pname, GLfloat param)
-    {
-#ifdef OGRE_ENABLE_STATE_CACHE
-        // Check if we have a map entry for this texture id. If not, create a blank one and insert it.
-        TexUnitsMap::iterator it = mTexUnitsMap.find(mLastBoundTexID);
-        if (it == mTexUnitsMap.end())
-        {
-            TextureUnitParams unit;
-            mTexUnitsMap[mLastBoundTexID] = unit;
-
-            // Update the iterator
-            it = mTexUnitsMap.find(mLastBoundTexID);
-        }
-
-        // Get a local copy of the parameter map and search for this parameter
-        TexParameterfMap &myMap = (*it).second.mTexParameterfMap;
-        auto ret = myMap.emplace(pname, param);
-        TexParameterfMap::iterator i = ret.first;
-
-        // Update the cached value if needed
-        if((*i).second != param || ret.second)
-        {
-            (*i).second = param;
-
-            // Update GL
-            OGRE_CHECK_GL_ERROR(glTexParameterf(target, pname, param));
-        }
-#else
-        OGRE_CHECK_GL_ERROR(glTexParameterf(target, pname, param));
 #endif
     }
 

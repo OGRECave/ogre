@@ -108,15 +108,13 @@ namespace Ogre {
         mActiveBufferMap.clear();
         mTexUnitsMap.clear();
 
-        mPointSize = 1.0f;
-
         mActiveDrawFrameBuffer=0;
         mActiveReadFrameBuffer=0;
 
         mActiveVertexArray = 0;
     }
 
-    void GL3PlusStateCacheManager::bindGLFrameBuffer(GLenum target,GLuint buffer, bool force)
+    void GL3PlusStateCacheManager::bindGLFrameBuffer(GLenum target,GLuint buffer)
     {
 #ifdef OGRE_ENABLE_STATE_CACHE
         bool update = false;
@@ -156,11 +154,11 @@ namespace Ogre {
             OGRE_CHECK_GL_ERROR(glBindFramebuffer(target, buffer));
         }
     }
-    void GL3PlusStateCacheManager::bindGLRenderBuffer(GLuint buffer, bool force)
+    void GL3PlusStateCacheManager::bindGLRenderBuffer(GLuint buffer)
     {
 #ifdef OGRE_ENABLE_STATE_CACHE
         auto ret = mActiveBufferMap.emplace(GL_RENDERBUFFER, buffer);
-        if(ret.first->second != buffer || force) // Update the cached value if needed
+        if(ret.first->second != buffer) // Update the cached value if needed
         {
             ret.first->second = buffer;
             ret.second = true;
@@ -174,11 +172,11 @@ namespace Ogre {
         }
     }
     
-    void GL3PlusStateCacheManager::bindGLBuffer(GLenum target, GLuint buffer, bool force)
+    void GL3PlusStateCacheManager::bindGLBuffer(GLenum target, GLuint buffer)
     {
 #ifdef OGRE_ENABLE_STATE_CACHE
         auto ret = mActiveBufferMap.emplace(target, buffer);
-        if(ret.first->second != buffer || force) // Update the cached value if needed
+        if(ret.first->second != buffer) // Update the cached value if needed
         {
             ret.first->second = buffer;
             ret.second = true;
@@ -300,7 +298,7 @@ namespace Ogre {
         TexUnitsMap::iterator it = mTexUnitsMap.find(mLastBoundTexID);
         if (it == mTexUnitsMap.end())
         {
-            TextureUnitParams unit;
+            TexParameteriMap unit;
             mTexUnitsMap[mLastBoundTexID] = unit;
             
             // Update the iterator
@@ -308,7 +306,7 @@ namespace Ogre {
         }
         
         // Get a local copy of the parameter map and search for this parameter
-        TexParameteriMap &myMap = (*it).second.mTexParameteriMap;
+        TexParameteriMap &myMap = (*it).second;
         auto ret = myMap.emplace(pname, param);
         TexParameteriMap::iterator i = ret.first;
 
@@ -524,17 +522,6 @@ namespace Ogre {
         }
     }
 
-
-    void GL3PlusStateCacheManager::setPointSize(GLfloat size)
-    {
-#ifdef OGRE_ENABLE_STATE_CACHE
-        if (mPointSize != size)
-#endif
-        {
-            mPointSize = size;
-            OGRE_CHECK_GL_ERROR(glPointSize(mPointSize));
-        }
-    }
     void GL3PlusStateCacheManager::bindGLProgramPipeline(GLuint handle)
     {
 #ifdef OGRE_ENABLE_STATE_CACHE

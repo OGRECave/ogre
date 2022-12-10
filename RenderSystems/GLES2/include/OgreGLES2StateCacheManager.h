@@ -37,20 +37,8 @@ namespace Ogre
     class _OgreGLES2Export GLES2StateCacheManager : public GLStateCacheManagerCommon
     {
     protected:
-        struct TextureUnitParams
-        {
-            TexParameteriMap mTexParameteriMap;
-            TexParameterfMap mTexParameterfMap;
-        };
-
-        typedef std::unordered_map<GLuint, TextureUnitParams> TexUnitsMap;
-
         /// Stores the currently bound vertex array object
         GLuint mActiveVertexArray;
-        /// A map of texture parameters for each texture unit
-        TexUnitsMap mTexUnitsMap;
-        /// Stores the currently enabled vertex attributes
-        std::vector<GLuint> mEnabledVertexAttribs;
         /// Stores the last bound texture id
         GLuint mLastBoundTexID;
     public:
@@ -68,9 +56,8 @@ namespace Ogre
         /** Bind an OpenGL buffer of any type.
          @param target The buffer target.
          @param buffer The buffer ID.
-         @param force Optional parameter to force an update.
          */
-        void bindGLBuffer(GLenum target, GLuint buffer, bool force = false);
+        void bindGLBuffer(GLenum target, GLuint buffer);
 
         /** Delete an OpenGL buffer of any type.
          @param target The buffer target.
@@ -100,13 +87,6 @@ namespace Ogre
          @param param The parameter value.
          */
         void setTexParameteri(GLenum target, GLenum pname, GLint param);
-
-        /** Sets a float parameter value per texture target.
-         @param target The texture target.
-         @param pname The parameter name.
-         @param param The parameter value.
-         */
-        void setTexParameterf(GLenum target, GLenum pname, GLfloat param);
 
         /** Activate an OpenGL texture unit.
          @param unit The texture unit to activate.

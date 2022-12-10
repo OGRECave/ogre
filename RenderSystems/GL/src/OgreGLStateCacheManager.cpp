@@ -147,11 +147,11 @@ namespace Ogre {
         mPointAttenuation[2] = 0.0f;
     }
 
-    void GLStateCacheManager::bindGLBuffer(GLenum target, GLuint buffer, bool force)
+    void GLStateCacheManager::bindGLBuffer(GLenum target, GLuint buffer)
     {
 #ifdef OGRE_ENABLE_STATE_CACHE
         auto ret = mActiveBufferMap.emplace(target, buffer);
-        if(ret.first->second != buffer || force) // Update the cached value if needed
+        if(ret.first->second != buffer) // Update the cached value if needed
         {
             ret.first->second = buffer;
             ret.second = true;
@@ -224,7 +224,7 @@ namespace Ogre {
         TexUnitsMap::iterator it = mTexUnitsMap.find(mLastBoundTexID);
         if (it == mTexUnitsMap.end())
         {
-            TextureUnitParams unit;
+            TexParameteriMap unit;
             mTexUnitsMap[mLastBoundTexID] = unit;
             
             // Update the iterator
@@ -232,7 +232,7 @@ namespace Ogre {
         }
         
         // Get a local copy of the parameter map and search for this parameter
-        TexParameteriMap &myMap = (*it).second.mTexParameteriMap;
+        TexParameteriMap &myMap = (*it).second;
 
         auto ret = myMap.emplace(pname, param);
         TexParameteriMap::iterator i = ret.first;

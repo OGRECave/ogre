@@ -58,7 +58,7 @@ namespace Ogre
     protected:
         typedef std::unordered_map<uint32, uint32> BindBufferMap;
         typedef std::unordered_map<uint32, int> TexParameteriMap;
-        typedef std::unordered_map<uint32, float> TexParameterfMap;
+        typedef std::unordered_map<uint32, TexParameteriMap> TexUnitsMap;
 
         /* These variables are used for caching OpenGL state.
          They are cached because state changes can be quite expensive,
@@ -94,6 +94,8 @@ namespace Ogre
         uint32 mBlendFuncDestAlpha;
         /// Stores the currently active texture unit
         size_t mActiveTextureUnit;
+        /// A map of texture parameters for each texture unit
+        TexUnitsMap mTexUnitsMap;
     public:
         virtual ~GLStateCacheManagerCommon() {}
 
