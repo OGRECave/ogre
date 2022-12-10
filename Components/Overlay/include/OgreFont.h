@@ -249,8 +249,14 @@ namespace Ogre
             CodePointMap::const_iterator i = mCodePointMap.find(id);
             if (i == mCodePointMap.end())
             {
-                OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND,
-                            StringUtil::format("Code point %d not found in font %s", id, mName.c_str()));
+                // Try a fallback first.
+                i = mCodePointMap.find(static_cast<CodePoint>('?'));
+
+                if (i == mCodePointMap.end())
+                {
+                    OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, StringUtil::format(
+                        "Code point %d and fallback 63 not found in font %s", id, mName.c_str()));
+                }
             }
             return i->second;
         }
