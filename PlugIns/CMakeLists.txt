@@ -59,3 +59,7 @@ endif ()
 if (OGRE_BUILD_PLUGIN_GLSLANG)
   add_subdirectory(GLSLang)
 endif()
+
+if (OGRE_BUILD_PLUGIN_RSIMAGE)
+  add_subdirectory(RsImageCodec)
+endif()

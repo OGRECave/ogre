@@ -1,0 +1,13 @@
+[package]
+name = "rsimage"
+version = "13.6.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+image = "0.24.5"
+
+[lib]
+crate-type = ["staticlib"]
+path = "rsimage.rs"
