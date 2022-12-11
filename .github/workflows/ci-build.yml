@@ -14,7 +14,7 @@ jobs:
         sudo apt update
         sudo apt install -y libxrandr-dev \
           libgles2-mesa-dev mesa-common-dev libgl1-mesa-dev mesa-vulkan-drivers \
-          libfreetype6-dev libpugixml-dev libassimp-dev libbullet-dev qtbase5-dev \
+          libfreetype6-dev libpugixml-dev libassimp-dev libbullet-dev qtbase5-dev cargo \
           nvidia-cg-dev glslang-dev spirv-tools spirv-headers \
           swig4.0 mono-mcs python3-dev \
           python3-lxml texlive-binaries texlive-base graphviz doxygen g++-7
