@@ -27,6 +27,10 @@ add_library(Codec_RsImage ${OGRE_LIB_TYPE} ${HEADER_FILES} ${SOURCES})
 add_dependencies(Codec_RsImage rsimage)
 target_link_libraries(Codec_RsImage PUBLIC OgreMain PRIVATE ${RS_LIB_PATH} ${CMAKE_DL_LIBS})
 
+if(MSVC)
+    target_link_libraries(Codec_RsImage PRIVATE wsock32 ws2_32 bcrypt userenv)
+endif()
+
 target_include_directories(Codec_RsImage PUBLIC
   "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
   $<INSTALL_INTERFACE:include/OGRE/Plugins/RsImageCodec>)
