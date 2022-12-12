@@ -7,12 +7,14 @@ image:
  - Visual Studio 2019
 install:
  - cmd: choco install swig -y --version 4.0.2.04082020 & exit 0
+ - cmd: curl -sSf -o rustup-init.exe https://win.rustup.rs/
+ - cmd: rustup-init.exe -y
  - cmd: curl -LO https://sdk.lunarg.com/sdk/download/1.2.189.2/windows/VulkanSDK-1.2.189.2-Installer.exe
  - cmd: VulkanSDK-1.2.189.2-Installer.exe --accept-licenses --default-answer --confirm-command install
  - cmd: cd %APPVEYOR_BUILD_FOLDER%
  - cmd: git submodule update --init --recursive
 build_script:
- - set PATH=C:\Qt\5.15\msvc2019_64\bin;%PATH%
+ - set PATH=C:\Qt\5.15\msvc2019_64\bin;C:\Users\appveyor\.cargo\bin;%PATH%
  - set VULKAN_SDK=C:\VulkanSDK\1.2.189.2
  - cmake -P ci-build.cmake
  - cmake --build build --config RelWithDebInfo --target INSTALL
