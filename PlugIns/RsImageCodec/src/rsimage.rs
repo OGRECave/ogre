@@ -4,6 +4,7 @@
 // SPDX-License-Identifier: MIT
 
 use std::ffi::CStr;
+use std::os::raw::c_char;
 use std::io::Cursor;
 use std::slice;
 
@@ -11,7 +12,7 @@ use std::slice;
 pub extern "C" fn rs_image_decode(
     input: *const u8,
     input_length: usize,
-    ext: *const i8,
+    ext: *const c_char,
     width: *mut u32,
     height: *mut u32,
     colortype: *mut u32,
@@ -46,7 +47,7 @@ pub extern "C" fn rs_image_encode(
     width: u32,
     height: u32,
     t: u32,
-    ext: *const i8,
+    ext: *const c_char,
     data: *mut *mut u8,
     data_len: *mut usize,
 ) {
