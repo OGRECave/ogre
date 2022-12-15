@@ -47,11 +47,6 @@ namespace Ogre {
         destroyAllBindings();
     }
 
-    GLES2StateCacheManager * GLES2HardwareBufferManager::getStateCacheManager()
-    {
-        return mRenderSystem->_getStateCacheManager();
-    }
-
     void GLES2HardwareBufferManager::notifyContextDestroyed(GLContext* context)
     {
         OGRE_LOCK_MUTEX(mVertexDeclarationsMutex);

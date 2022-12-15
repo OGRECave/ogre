@@ -68,11 +68,6 @@ namespace Ogre {
         OGRE_FREE_SIMD(mScratchBufferPool, MEMCATEGORY_GEOMETRY);
     }
     //-----------------------------------------------------------------------
-    GLStateCacheManager * GLHardwareBufferManager::getStateCacheManager()
-    {
-        return mRenderSystem->_getStateCacheManager();
-    }
-    //-----------------------------------------------------------------------
     HardwareVertexBufferSharedPtr GLHardwareBufferManager::createVertexBuffer(
         size_t vertexSize, size_t numVerts, HardwareBuffer::Usage usage, bool useShadowBuffer)
     {
