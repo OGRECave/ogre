@@ -61,7 +61,6 @@ namespace Ogre {
             /// Utility function to get the correct GL type based on VET's
             static GLenum getGLType(VertexElementType type);
 
-            GLES2StateCacheManager * getStateCacheManager();
             void notifyContextDestroyed(GLContext* context);
     };
 }

@@ -45,11 +45,6 @@ namespace Ogre {
         destroyAllBindings();
     }
 
-    GL3PlusStateCacheManager * GL3PlusHardwareBufferManager::getStateCacheManager()
-    {
-        return mRenderSystem->_getStateCacheManager();
-    }
-
     void GL3PlusHardwareBufferManager::notifyContextDestroyed(GLContext* context)
     {
         OGRE_LOCK_MUTEX(mVertexDeclarationsMutex);
