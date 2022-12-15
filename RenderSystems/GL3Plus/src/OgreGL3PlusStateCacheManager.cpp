@@ -513,7 +513,7 @@ namespace Ogre {
 
     void GL3PlusStateCacheManager::setPolygonMode(GLenum mode)
     {
-#ifdef OGRE_ENABLE_STATE_CACHE_CRITICAL
+#ifdef OGRE_ENABLE_STATE_CACHE
         if (mPolygonMode != mode)
 #endif
         {
