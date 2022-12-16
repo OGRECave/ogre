@@ -153,8 +153,7 @@ public:
         mBillboardSet->setCastShadows(false);
         mLightCameraSN->attachObject(mBillboardSet);
 
-        // Creating a RRT for depth/shadow map
-        createLightCameraRTT(mLight0);
+        getLightCamera();
 
         // Create a rush of billboards according to the frustum of the camera(mLightCamera)
         // After it, we can use the lightcamera/billboards scenenode like a light projector
@@ -180,6 +179,8 @@ public:
 
     bool createLightShafts(BillboardSet* billboard, Camera* LightCamera, const int& NumberOfPlanes)
     {
+        mViewport->update(); // make sure LightCamera is synced to scene settings
+
         // Calculate the distance between planes
         float DistanceBetweenPlanes =
             (LightCamera->getFarClipDistance() - LightCamera->getNearClipDistance()) / NumberOfPlanes;
@@ -210,7 +211,7 @@ public:
         return true;
     }
 
-    void createLightCameraRTT(Light* light)
+    void getLightCamera()
     {
         // Create a texture for use as rtt
         TexturePtr LightCameraRTT = mSceneMgr->getShadowTexture(0);
@@ -218,9 +219,6 @@ public:
 
         Viewport* RT_Texture_Viewport = RT_Texture->getViewport(0);
         mLightCamera = RT_Texture_Viewport->getCamera();
-
-        mSceneMgr->getShadowCameraSetup()->getShadowCamera(mSceneMgr, mCamera, RT_Texture_Viewport, light, mLightCamera,
-                                                           0);
 
         mLightCamera->setDebugDisplayEnabled(true);
     }
