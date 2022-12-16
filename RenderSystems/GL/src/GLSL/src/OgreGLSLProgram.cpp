@@ -369,6 +369,8 @@ namespace Ogre {
     {
         // Tell the Link Program Manager what shader is to become inactive
         GLSLLinkProgramManager::getSingleton().setActiveShader( mType, NULL );
+        // change back to fixed pipeline
+        glUseProgramObjectARB(0);
     }
 
     //-----------------------------------------------------------------------------

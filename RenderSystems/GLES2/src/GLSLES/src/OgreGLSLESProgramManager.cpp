@@ -57,7 +57,7 @@ namespace Ogre {
     }
 
     //-----------------------------------------------------------------------
-    GLSLESProgramManager::GLSLESProgramManager(void) : mActiveProgram(NULL)
+    GLSLESProgramManager::GLSLESProgramManager(void)
     {
         
 #if !OGRE_NO_GLES2_GLSL_OPTIMISER
@@ -86,7 +86,7 @@ namespace Ogre {
     {
         // If there is an active link program then return it
         if (mActiveProgram)
-            return mActiveProgram;
+            return static_cast<GLSLESProgramCommon*>(mActiveProgram);;
 
         // No active link program so find one or make a new one
         // Is there an active key?
@@ -127,36 +127,7 @@ namespace Ogre {
         // Make the program object active
         if (mActiveProgram) mActiveProgram->activate();
 
-        return mActiveProgram;
-    }
-
-    //-----------------------------------------------------------------------
-    void GLSLESProgramManager::setActiveShader(GpuProgramType type, GLSLESProgram* gpuProgram)
-    {
-        if (gpuProgram != mActiveShader[type])
-        {
-            mActiveShader[type] = gpuProgram;
-            // ActiveLinkProgram is no longer valid
-            mActiveProgram = NULL;
-        }
-    }
-
-    //-----------------------------------------------------------------------
-    bool GLSLESProgramManager::destroyLinkProgram(GLSLESProgramCommon* linkProgram)
-    {
-        for (ProgramIterator currentProgram = mPrograms.begin();
-            currentProgram != mPrograms.end(); ++currentProgram)
-        {
-            GLSLESProgramCommon* prgm = static_cast<GLSLESProgramCommon*>(currentProgram->second);
-            if(prgm == linkProgram)
-            {
-                mPrograms.erase(currentProgram);
-                OGRE_DELETE prgm;
-                return true;
-            }
-        }
-
-        return false;
+        return static_cast<GLSLESProgramCommon*>(mActiveProgram);
     }
 
 #if !OGRE_NO_GLES2_GLSL_OPTIMISER

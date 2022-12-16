@@ -56,7 +56,7 @@ namespace Ogre {
     }
     
     GLSLProgramManager::GLSLProgramManager(GL3PlusRenderSystem* renderSystem)
-        : mActiveProgram(NULL), mRenderSystem(renderSystem)
+        : mRenderSystem(renderSystem)
     {
     }
 
@@ -71,7 +71,7 @@ namespace Ogre {
     {
         // If there is an active link program then return it.
         if (mActiveProgram)
-            return mActiveProgram;
+            return static_cast<GLSLProgram*>(mActiveProgram);
 
         // No active link program so find one or make a new one.
         // Is there an active key?
@@ -117,17 +117,7 @@ namespace Ogre {
         if (mActiveProgram)
             mActiveProgram->activate();
 
-        return mActiveProgram;
-    }
-
-    void GLSLProgramManager::setActiveShader(GpuProgramType type, GLSLShader* shader)
-    {
-        if (mActiveShader[type] != shader)
-        {
-            mActiveShader[type] = shader;
-            // ActiveMonolithicProgram is no longer valid
-            mActiveProgram = NULL;
-        }
+        return static_cast<GLSLProgram*>(mActiveProgram);
     }
 
     void GLSLProgramManager::extractUniformsFromProgram(GLuint programObject,

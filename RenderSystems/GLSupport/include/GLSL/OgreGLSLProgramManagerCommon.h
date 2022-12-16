@@ -70,6 +70,8 @@ namespace Ogre {
 
         /// Active shader objects defining the active program object.
         GLShaderList mActiveShader;
+        /// active objects defining the active rendering gpu state
+        GLSLProgramCommon* mActiveProgram;
     public:
         GLSLProgramManagerCommon();
         virtual ~GLSLProgramManagerCommon();
@@ -87,6 +89,11 @@ namespace Ogre {
 
         /// Destroy all programs which referencing this shader
         void destroyAllByShader(GLSLShaderCommon* shader);
+
+        /** Set the shader for the next rendering state.
+            The active program object will be cleared.
+        */
+        void setActiveShader(GpuProgramType type, GLSLShaderCommon* shader);
     };
 
 }

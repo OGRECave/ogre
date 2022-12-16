@@ -40,10 +40,6 @@ namespace Ogre {
 
     class _OgreGLExport GLSLLinkProgramManager : public Singleton<GLSLLinkProgramManager>, public GLSLProgramManagerCommon
     {
-
-    private:
-        GLSLLinkProgram* mActiveLinkProgram;
-
     public:
 
         GLSLLinkProgramManager(void);
@@ -54,12 +50,6 @@ namespace Ogre {
             if a program object was not already created and linked a new one is created and linked
         */
         GLSLLinkProgram* getActiveLinkProgram(void);
-
-        /** Set the active fragment shader for the next rendering state.
-            The active program object will be cleared.
-            Normally called from the GLSLGpuProgram::bindProgram and unbindProgram methods
-        */
-        void setActiveShader(GpuProgramType type, GLSLProgram* gpuProgram);
 
         /** Populate a list of uniforms based on a program object.
         @param programObject Handle to the program object to query
