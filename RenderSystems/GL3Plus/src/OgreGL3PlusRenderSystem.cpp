@@ -32,8 +32,6 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #include "OgreRenderSystem.h"
 #include "OgreLogManager.h"
 #include "OgreStringConverter.h"
-#include "OgreLight.h"
-#include "OgreCamera.h"
 #include "OgreGL3PlusTextureManager.h"
 #include "OgreGL3PlusHardwareBuffer.h"
 #include "OgreGLSLShader.h"

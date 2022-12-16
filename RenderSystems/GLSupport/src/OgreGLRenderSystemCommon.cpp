@@ -27,7 +27,6 @@ THE SOFTWARE.
 */
 #include "OgreGLRenderSystemCommon.h"
 #include "OgreGLContext.h"
-#include "OgreFrustum.h"
 #include "OgreGLNativeSupport.h"
 #include "OgreGLRenderTexture.h"
 
