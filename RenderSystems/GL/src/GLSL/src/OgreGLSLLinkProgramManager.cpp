@@ -51,7 +51,7 @@ namespace Ogre {
     }
 
     //-----------------------------------------------------------------------
-    GLSLLinkProgramManager::GLSLLinkProgramManager(void) : mActiveLinkProgram(NULL) {}
+    GLSLLinkProgramManager::GLSLLinkProgramManager(void) {}
 
     //-----------------------------------------------------------------------
     GLSLLinkProgramManager::~GLSLLinkProgramManager(void) {}
@@ -60,8 +60,8 @@ namespace Ogre {
     GLSLLinkProgram* GLSLLinkProgramManager::getActiveLinkProgram(void)
     {
         // if there is an active link program then return it
-        if (mActiveLinkProgram)
-            return mActiveLinkProgram;
+        if (mActiveProgram)
+            return static_cast<GLSLLinkProgram*>(mActiveProgram);;
 
         // no active link program so find one or make a new one
         // is there an active key?
@@ -80,34 +80,21 @@ namespace Ogre {
             // program object not found for key so need to create it
             if (programFound == mPrograms.end())
             {
-                mActiveLinkProgram = new GLSLLinkProgram(mActiveShader);
-                mPrograms[activeKey] = mActiveLinkProgram;
+                mActiveProgram = new GLSLLinkProgram(mActiveShader);
+                mPrograms[activeKey] = mActiveProgram;
             }
             else
             {
                 // found a link program in map container so make it active
-                mActiveLinkProgram = static_cast<GLSLLinkProgram*>(programFound->second);
+                mActiveProgram = static_cast<GLSLLinkProgram*>(programFound->second);
             }
 
         }
         // make the program object active
-        if (mActiveLinkProgram) mActiveLinkProgram->activate();
+        if (mActiveProgram) mActiveProgram->activate();
 
-        return mActiveLinkProgram;
+        return static_cast<GLSLLinkProgram*>(mActiveProgram);;
 
-    }
-
-    //-----------------------------------------------------------------------
-    void GLSLLinkProgramManager::setActiveShader(GpuProgramType type, GLSLProgram* gpuProgram)
-    {
-        if (gpuProgram != mActiveShader[type])
-        {
-            mActiveShader[type] = gpuProgram;
-            // ActiveLinkProgram is no longer valid
-            mActiveLinkProgram = NULL;
-            // change back to fixed pipeline
-            glUseProgramObjectARB(0);
-        }
     }
     //---------------------------------------------------------------------
     void GLSLLinkProgramManager::extractUniforms(uint programObject,

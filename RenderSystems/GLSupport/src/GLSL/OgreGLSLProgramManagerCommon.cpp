@@ -33,7 +33,7 @@
 
 namespace Ogre {
 
-    GLSLProgramManagerCommon::GLSLProgramManagerCommon()
+    GLSLProgramManagerCommon::GLSLProgramManagerCommon() : mActiveProgram(NULL)
     {
         mActiveShader.fill(NULL);
 
@@ -200,6 +200,16 @@ namespace Ogre {
         for(unsigned int & i : keysToErase)
         {
             mPrograms.erase(mPrograms.find(i));
+        }
+    }
+
+    void GLSLProgramManagerCommon::setActiveShader(GpuProgramType type, GLSLShaderCommon* shader)
+    {
+        if (mActiveShader[type] != shader)
+        {
+            mActiveShader[type] = shader;
+            // ActiveMonolithicProgram is no longer valid
+            mActiveProgram = NULL;
         }
     }
 

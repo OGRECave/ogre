@@ -52,9 +52,6 @@ namespace Ogre {
     class _OgreGLES2Export GLSLESProgramManager : public GLSLProgramManagerCommon, public Singleton<GLSLESProgramManager>
     {
     protected:
-        /// Active object defining the active rendering gpu state
-        GLSLESProgramCommon* mActiveProgram;
-
 #if !OGRE_NO_GLES2_GLSL_OPTIMISER
         struct glslopt_ctx *mGLSLOptimiserContext;
 #endif
@@ -63,22 +60,11 @@ namespace Ogre {
         GLSLESProgramManager(void);
         ~GLSLESProgramManager(void);
 
-        /** Set the active shader for the next rendering state.
-            The active program object will be cleared.
-            Normally called from the GLSLESGpuProgram::bindProgram and unbindProgram methods
-        */
-        void setActiveShader(GpuProgramType type, GLSLESProgram* fragmentGpuProgram);
-
         /**
             Get the program object that links the two active shader objects together
             if a program object was not already created and linked a new one is created and linked
         */
         GLSLESProgramCommon* getActiveProgram(void);
-
-        /**
-            Destroy and remove the linker program from the local cache
-        */
-        bool destroyLinkProgram(GLSLESProgramCommon* linkProgram);
 
 #if !OGRE_NO_GLES2_GLSL_OPTIMISER
         /**

@@ -53,9 +53,6 @@ namespace Ogre {
     class _OgreGL3PlusExport GLSLProgramManager : public GLSLProgramManagerCommon, public Singleton<GLSLProgramManager>
     {
     protected:
-        /// active objects defining the active rendering gpu state
-        GLSLProgram* mActiveProgram;
-
         GL3PlusRenderSystem* mRenderSystem;
 
         /** Find the data source definition for a given uniform name
@@ -76,13 +73,6 @@ namespace Ogre {
             @note this method does NOT link seperable programs.
         */
         GLSLProgram* getActiveProgram(void);
-
-        /** Set the shader for the next rendering state.
-            The active program object will be cleared.  Normally
-            called from the GLRenderSystem::bindGpuProgram and
-            unbindProgram methods
-        */
-        void setActiveShader(GpuProgramType type, GLSLShader* shader);
 
         /** Populate a list of uniforms based on an OpenGL program object.
         */
