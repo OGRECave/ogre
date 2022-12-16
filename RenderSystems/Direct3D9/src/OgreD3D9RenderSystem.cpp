@@ -35,7 +35,6 @@ THE SOFTWARE.
 #include "OgreD3D9TextureManager.h"
 #include "OgreD3D9Texture.h"
 #include "OgreLogManager.h"
-#include "OgreLight.h"
 #include "OgreMath.h"
 #include "OgreViewport.h"
 #include "OgreD3D9HardwareBufferManager.h"

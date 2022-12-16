@@ -30,7 +30,6 @@ THE SOFTWARE.
 
 #include "OgreD3D9Prerequisites.h"
 #include "OgreCommon.h"
-#include "OgreLight.h"
 #include "OgreMaterial.h"
 #include "OgreRenderSystem.h"
 #include "OgreHardwareBuffer.h"
@@ -67,8 +66,6 @@ namespace Ogre
 
         /// return a D3D9 equivalent for a Ogre ShadeOptions value
         static DWORD get(ShadeOptions so);
-        /// return a D3D9 equivalent for a Ogre LightTypes value
-        static D3DLIGHTTYPE get(Ogre::Light::LightTypes lightType);
         /// return a D3D9 equivalent for a Ogre TexCoordCalsMethod value
         static DWORD get(TexCoordCalcMethod m, const D3DCAPS9& caps);
         /// return a D3D9 equivalent for a Ogre TextureAddressingMode value
