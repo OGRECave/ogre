@@ -108,8 +108,9 @@ Also, you can now use the `bone_*_array` alias instead of `world_*_array` for cl
 - ShadowTextureListener was factored out of SceneManager::Listener
 - RenderQueueInvocationSequence API was removed as it prevented effective batching. Use the current Viewport name instead of invocationName in your RenderQueueListener for porting.
 - SWIG 4.0 is now fully supported
-- Flollowing SemVer, incrementing PATCH now guarantees ABI compatibility. Therefore SOVERSION on Unix system now only contains two digits e.g. `libOgreMain.so.13.0` instead of `libOgreMain.so.1.12.13`.
+- Following SemVer, incrementing PATCH now guarantees ABI compatibility. Therefore SOVERSION on Unix system now only contains two digits e.g. `libOgreMain.so.13.0` instead of `libOgreMain.so.1.12.13`.
 - since 13.3, `PF_DEPTH24_STENCIL8` is available
+- since 13.6, shadow pancaking is applied for directional shadow lights
 
 
 ### Breaking non-API changes
@@ -164,6 +165,11 @@ rtshader_system
 
 Here, metalness is read from `specular[0]` and roughness from `specular[1]`.
 
+## Terrain
+
+Since 13.6, `TerrainMaterialGeneratorA` internally uses the RTSS to generate shaders. This allows you to use the RTSS SRS to customize the terrain appearance.
+The API to configure this is `TerrainMaterialGeneratorA::getMainRenderState()`. This way you can enable multiple light support for the terrain or switch to PBR lighting equations.
+
 ## DotScene
 The Plugin now supports exporting via a generic `SceneNode::saveChildren` API. This allows you to dump your dynamically generated Scene to file and later inspect it with ogre-meshviewer, which also got improved .scene support.
 
@@ -202,6 +208,11 @@ This means you can now easily use the Khronos reference compiler instead of what
 ## Bullet Component (since 13.4)
 
 btOgre was moved into Ogre as the Bullet Component. This allows you to just build it as part of Ogre on one hand and on the other hand this ensures that it is integration tested by our CI.
+
+## RsImage Codec (since 13.6)
+
+This new Codec internally uses image-rs to load the various formats, which are all implemented in Rust and thus provide memory safety.
+Unfortunately, currently the Rust implementation is slower than the highly optimized C libs that have been around for decades.
 
 ## HLMS
 The component was removed. The RTSS or just plain shaders in Ogre materials are a better way forward.
