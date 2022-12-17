@@ -104,7 +104,6 @@ protected:
         matNames.push_back("RTSS/NormalMapping_MultiPass");
 #endif
         matNames.push_back("Examples/BumpMapping/MultiLight");
-        matNames.push_back("Examples/BumpMapping/MultiLightSpecular");
         matNames.push_back("Examples/ShowUV");
         matNames.push_back("Examples/ShowNormals");
         matNames.push_back("Examples/ShowTangents");
@@ -120,7 +119,6 @@ protected:
         matNames.push_back("RTSS/Athene/NormalMapping_MultiPass");
 #endif
         matNames.push_back("Examples/Athene/NormalMapped");
-        matNames.push_back("Examples/Athene/NormalMappedSpecular");
         matNames.push_back("Examples/ShowUV");
         matNames.push_back("Examples/ShowNormals");
         matNames.push_back("Examples/ShowTangents");
