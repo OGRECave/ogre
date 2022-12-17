@@ -97,33 +97,34 @@ protected:
     {
         StringVector matNames;
 
+
+#ifdef INCLUDE_RTSHADER_SYSTEM
+        matNames.push_back("RTSS/NormalMapping_SinglePass");
+        matNames.push_back("RTSS/OffsetMapping");
+        matNames.push_back("RTSS/NormalMapping_MultiPass");
+#endif
         matNames.push_back("Examples/BumpMapping/MultiLight");
         matNames.push_back("Examples/BumpMapping/MultiLightSpecular");
         matNames.push_back("Examples/ShowUV");
         matNames.push_back("Examples/ShowNormals");
         matNames.push_back("Examples/ShowTangents");
 
-#ifdef INCLUDE_RTSHADER_SYSTEM
-        matNames.push_back("RTSS/OffsetMapping");
-        matNames.push_back("RTSS/NormalMapping_SinglePass");
-        matNames.push_back("RTSS/NormalMapping_MultiPass");
-#endif
 
     
         mPossibilities["ogrehead.mesh"] = matNames;
         mPossibilities["knot.mesh"] = matNames;
 
         matNames.clear();
-        matNames.push_back("Examples/Athene/NormalMapped");
-        matNames.push_back("Examples/Athene/NormalMappedSpecular");
-        matNames.push_back("Examples/Athene/NormalMappedSpecular");
-        matNames.push_back("Examples/ShowUV");
-        matNames.push_back("Examples/ShowNormals");
-        matNames.push_back("Examples/ShowTangents");
 #ifdef INCLUDE_RTSHADER_SYSTEM
         matNames.push_back("RTSS/Athene/NormalMapping_SinglePass");
         matNames.push_back("RTSS/Athene/NormalMapping_MultiPass");
 #endif
+        matNames.push_back("Examples/Athene/NormalMapped");
+        matNames.push_back("Examples/Athene/NormalMappedSpecular");
+        matNames.push_back("Examples/ShowUV");
+        matNames.push_back("Examples/ShowNormals");
+        matNames.push_back("Examples/ShowTangents");
+
 
         mPossibilities["athene.mesh"] = matNames;
 
