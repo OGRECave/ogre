@@ -786,10 +786,6 @@ void SceneManager::ShadowRenderer::prepareShadowTextures(Camera* cam, Viewport* 
             Camera *texCam = *ci;
             // rebind camera, incase another SM in use which has switched to its cam
             shadowView->setCamera(texCam);
-            // also update culling camera
-            auto cullCam = dynamic_cast<Camera*>(texCam->getCullingFrustum());
-            cullCam->_notifyViewport(shadowView);
-            mCullCameraSetup->getShadowCamera(mSceneManager, cam, vp, light, cullCam, j);
 
             // Associate main view camera as LOD camera
             texCam->setLodCamera(cam);
@@ -804,6 +800,11 @@ void SceneManager::ShadowRenderer::prepareShadowTextures(Camera* cam, Viewport* 
             }
             if (light->getType() != Light::LT_DIRECTIONAL)
                 texCam->getParentSceneNode()->setPosition(light->getDerivedPosition());
+
+            // also update culling camera
+            auto cullCam = dynamic_cast<Camera*>(texCam->getCullingFrustum());
+            cullCam->_notifyViewport(shadowView);
+            mCullCameraSetup->getShadowCamera(mSceneManager, cam, vp, light, cullCam, j);
 
             // Use the material scheme of the main viewport
             // This is required to pick up the correct shadow_caster_material and similar properties.
