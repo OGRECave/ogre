@@ -21,7 +21,6 @@ const String SPECULAR_BOX               = "SpecularBox";
 const String REFLECTIONMAP_BOX          = "ReflectionMapBox";
 const String REFLECTIONMAP_POWER_SLIDER = "ReflectionPowerSlider";
 const String MAIN_ENTITY_NAME           = "MainEntity";
-const String EXPORT_BUTTON_NAME         = "ExportMaterial";
 const String FLUSH_BUTTON_NAME          = "FlushShaderCache";
 const String LAYERBLEND_BUTTON_NAME     = "ChangeLayerBlendType";
 const String MODIFIER_VALUE_SLIDER      = "ModifierValueSlider";
@@ -163,15 +162,8 @@ void Sample_ShaderSystem::itemSelected(SelectMenu* menu)
 //-----------------------------------------------------------------------
 void Sample_ShaderSystem::buttonHit( OgreBites::Button* b )
 {
-    // Case the current material of the main entity should be exported.
-    if (b->getName() == EXPORT_BUTTON_NAME)
-    {       
-        const String& materialName = mSceneMgr->getEntity(MAIN_ENTITY_NAME)->getSubEntity(0)->getMaterialName();
-        
-        exportRTShaderSystemMaterial(mExportMaterialPath + "ShaderSystemExport.material", materialName);                        
-    }
     // Case the shader cache should be flushed.
-    else if (b->getName() == FLUSH_BUTTON_NAME)
+    if (b->getName() == FLUSH_BUTTON_NAME)
     {               
         mShaderGenerator->flushShaderCache();
     }
@@ -308,8 +300,7 @@ void Sample_ShaderSystem::setupContent()
     childNode->showBoundingBox(true);
 
     // Create reflection entity that will show the exported material.
-    const String& mainExportedMaterial = mSceneMgr->getEntity(MAIN_ENTITY_NAME)->getSubEntity(0)->getMaterialName() + "_RTSS_Export";
-    MaterialPtr matMainEnt        = MaterialManager::getSingleton().getByName(mainExportedMaterial, SAMPLE_MATERIAL_GROUP);
+    MaterialPtr matMainEnt = mSceneMgr->getEntity(MAIN_ENTITY_NAME)->getSubEntity(0)->getMaterial()->clone("_RTSS_Export");
 
     entity = mSceneMgr->createEntity("ExportedMaterialEntity", MAIN_ENTITY_MESH);
     entity->setMaterial(matMainEnt);
@@ -469,8 +460,6 @@ void Sample_ShaderSystem::setupUI()
     mLightingModelMenu ->addItem("Cook Torrance");
     mLightingModelMenu ->addItem("Normal Map - Tangent Space");
     mLightingModelMenu ->addItem("Normal Map - Object Space");
-
-    mTrayMgr->createButton(TL_BOTTOM, EXPORT_BUTTON_NAME, "Export Material", 240);
     
 #ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
     mLayerBlendLabel = mTrayMgr->createLabel(TL_RIGHT, "Blend Type", "Blend Type", 240);
@@ -1008,35 +997,6 @@ void Sample_ShaderSystem::applyShadowType(int menuIndex)
 }
 
 //-----------------------------------------------------------------------
-void Sample_ShaderSystem::exportRTShaderSystemMaterial(const String& fileName, const String& materialName)
-{
-    // Grab material pointer.
-    MaterialPtr materialPtr = MaterialManager::getSingleton().getByName(materialName);
-
-    // Create shader based technique.
-    bool success = mShaderGenerator->createShaderBasedTechnique(*materialPtr, MSN_DEFAULT, MSN_SHADERGEN);
-
-    // Case creation of shader based technique succeeded.
-    if (success)
-    {
-        // Force shader generation of the given material.
-        RTShader::ShaderGenerator::getSingleton().validateMaterial(MSN_SHADERGEN, *materialPtr);
-
-        // Grab the RTSS material serializer listener.
-        MaterialSerializer::Listener* matRTSSListener = RTShader::ShaderGenerator::getSingleton().getMaterialSerializerListener();
-        MaterialSerializer matSer;
-
-        // Add the custom RTSS listener to the serializer.
-        // It will make sure that every custom parameter needed by the RTSS 
-        // will be added to the exported material script.
-        matSer.addListener(matRTSSListener);
-
-        // Simply export the material.
-        matSer.exportMaterial(materialPtr, fileName, false, false, "", materialPtr->getName() + "_RTSS_Export");
-    }
-}
-
-//-----------------------------------------------------------------------
 void Sample_ShaderSystem::testCapabilities( const RenderSystemCapabilities* caps )
 {
     if(RTShader::ShaderGenerator::getSingleton().getTargetLanguage() != "null")
@@ -1054,29 +1014,11 @@ void Sample_ShaderSystem::loadResources()
 
     mTextureAtlasFactory = OGRE_NEW TextureAtlasSamplerFactory;
     mShaderGenerator->addSubRenderStateFactory(mTextureAtlasFactory);
-
-    createPrivateResourceGroup();
-}
-
-//-----------------------------------------------------------------------
-void Sample_ShaderSystem::createPrivateResourceGroup()
-{
-    // Create the resource group of the RT Shader System Sample.
-    ResourceGroupManager& rgm = ResourceGroupManager::getSingleton();
-
-    mExportMaterialPath = "C:/";
-
-    rgm.createResourceGroup(SAMPLE_MATERIAL_GROUP, false);
-    rgm.addResourceLocation(mExportMaterialPath, "FileSystem", SAMPLE_MATERIAL_GROUP);      
-    rgm.initialiseResourceGroup(SAMPLE_MATERIAL_GROUP);
-    rgm.loadResourceGroup(SAMPLE_MATERIAL_GROUP);
 }
 
 //-----------------------------------------------------------------------
 void Sample_ShaderSystem::unloadResources()
 {
-    destroyPrivateResourceGroup();
-
     mShaderGenerator->removeAllShaderBasedTechniques(
         "Panels", ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
     mShaderGenerator->removeAllShaderBasedTechniques(
@@ -1096,15 +1038,6 @@ void Sample_ShaderSystem::unloadResources()
         OGRE_DELETE mTextureAtlasFactory;
         mTextureAtlasFactory = NULL;
     }
-}
-
-//-----------------------------------------------------------------------
-void Sample_ShaderSystem::destroyPrivateResourceGroup()
-{
-    // Destroy the resource group of the RT Shader System   
-    ResourceGroupManager& rgm = ResourceGroupManager::getSingleton();
-
-    rgm.destroyResourceGroup(SAMPLE_MATERIAL_GROUP);
 }
 
 //-----------------------------------------------------------------------
