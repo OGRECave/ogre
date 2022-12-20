@@ -282,11 +282,9 @@ namespace Ogre {
         size_t memSize = 0;
 
         // Tally up TU states
-        TextureUnitStates::const_iterator i, iend;
-        iend = mTextureUnitStates.end();
-        for (i = mTextureUnitStates.begin(); i != iend; ++i)
+        for (auto *t : mTextureUnitStates)
         {
-            memSize += (*i)->calculateSize();
+            memSize += t->calculateSize();
         }
         for(const auto& u : mProgramUsage)
             memSize += u ? u->calculateSize() : 0;
@@ -374,7 +372,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void Pass::addTextureUnitState(TextureUnitState* state)
     {
-            OGRE_LOCK_MUTEX(mTexUnitChangeMutex);
+        OGRE_LOCK_MUTEX(mTexUnitChangeMutex);
 
         OgreAssert(state , "TextureUnitState is NULL");
 
@@ -402,21 +400,17 @@ namespace Ogre {
     //-----------------------------------------------------------------------------
     TextureUnitState* Pass::getTextureUnitState(const String& name) const
     {
-            OGRE_LOCK_MUTEX(mTexUnitChangeMutex);
-        TextureUnitStates::const_iterator i    = mTextureUnitStates.begin();
-        TextureUnitStates::const_iterator iend = mTextureUnitStates.end();
+        OGRE_LOCK_MUTEX(mTexUnitChangeMutex);
         TextureUnitState* foundTUS = 0;
 
         // iterate through TUS Container to find a match
-        while (i != iend)
+        for (auto *t : mTextureUnitStates)
         {
-            if ( (*i)->getName() == name )
+            if (t->getName() == name)
             {
-                foundTUS = (*i);
+                foundTUS = t;
                 break;
             }
-
-            ++i;
         }
 
         return foundTUS;
@@ -709,13 +703,10 @@ namespace Ogre {
     {
         // We assume the Technique only calls this when the material is being
         // prepared
-
         // prepare each TextureUnitState
-        TextureUnitStates::iterator i, iend;
-        iend = mTextureUnitStates.end();
-        for (i = mTextureUnitStates.begin(); i != iend; ++i)
+        for (auto *t : mTextureUnitStates)
         {
-            (*i)->_prepare();
+            t->_prepare();
         }
 
     }
@@ -723,11 +714,9 @@ namespace Ogre {
     void Pass::_unprepare(void)
     {
         // unprepare each TextureUnitState
-        TextureUnitStates::iterator i, iend;
-        iend = mTextureUnitStates.end();
-        for (i = mTextureUnitStates.begin(); i != iend; ++i)
+        for (auto *t : mTextureUnitStates)
         {
-            (*i)->_unprepare();
+            t->_unprepare();
         }
 
     }
@@ -736,13 +725,10 @@ namespace Ogre {
     {
         // We assume the Technique only calls this when the material is being
         // loaded
-
         // Load each TextureUnitState
-        TextureUnitStates::iterator i, iend;
-        iend = mTextureUnitStates.end();
-        for (i = mTextureUnitStates.begin(); i != iend; ++i)
+        for (auto *t : mTextureUnitStates)
         {
-            (*i)->_load();
+            t->_load();
         }
 
         // Load programs
@@ -759,11 +745,9 @@ namespace Ogre {
     void Pass::_unload(void)
     {
         // Unload each TextureUnitState
-        TextureUnitStates::iterator i, iend;
-        iend = mTextureUnitStates.end();
-        for (i = mTextureUnitStates.begin(); i != iend; ++i)
+        for (auto *t : mTextureUnitStates)
         {
-            (*i)->_unload();
+            t->_unload();
         }
 
         // TODO Unload programs
@@ -978,7 +962,7 @@ namespace Ogre {
         Material* mat = mParent->getParent();
         if (mat->isLoading() || mat->isLoaded())
         {
-                    OGRE_LOCK_MUTEX(msDirtyHashListMutex);
+            OGRE_LOCK_MUTEX(msDirtyHashListMutex);
             // Mark this hash as for follow up
             msDirtyHashList.insert(this);
             mHashDirtyQueued = false;
@@ -1004,23 +988,18 @@ namespace Ogre {
     void Pass::setTextureFiltering(TextureFilterOptions filterType)
     {
         OGRE_LOCK_MUTEX(mTexUnitChangeMutex);
-
-        TextureUnitStates::iterator i, iend;
-        iend = mTextureUnitStates.end();
-        for (i = mTextureUnitStates.begin(); i != iend; ++i)
+        for (auto *t : mTextureUnitStates)
         {
-            (*i)->setTextureFiltering(filterType);
+            t->setTextureFiltering(filterType);
         }
     }
     // --------------------------------------------------------------------
     void Pass::setTextureAnisotropy(unsigned int maxAniso)
     {
         OGRE_LOCK_MUTEX(mTexUnitChangeMutex);
-        TextureUnitStates::iterator i, iend;
-        iend = mTextureUnitStates.end();
-        for (i = mTextureUnitStates.begin(); i != iend; ++i)
+        for (auto *t : mTextureUnitStates)
         {
-            (*i)->setTextureAnisotropy(maxAniso);
+            t->setTextureAnisotropy(maxAniso);
         }
     }
     //-----------------------------------------------------------------------
