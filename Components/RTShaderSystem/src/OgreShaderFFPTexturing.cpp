@@ -670,7 +670,7 @@ void FFPTexturingFactory::writeInstance(MaterialSerializer* ser, SubRenderState*
                                      Pass* srcPass, Pass* dstPass)
 {
     ser->writeAttribute(4, "texturing_stage");
-    ser->writeValue("ffp");
+    ser->writeValue("late_add_blend"); // this is the only case where somebody would add this as a custom SRS
 }
 
 //-----------------------------------------------------------------------
