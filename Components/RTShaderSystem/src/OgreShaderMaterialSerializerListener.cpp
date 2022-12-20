@@ -73,6 +73,67 @@ void SGMaterialSerializerListener::techniqueEventRaised(MaterialSerializer* ser,
     }
 }
 
+//-----------------------------------------------------------------------------
+void SGMaterialSerializerListener::serializePassAttributes(MaterialSerializer* ser, ShaderGenerator::SGPass* passEntry)
+{
+    // Grab the custom render state this pass uses.
+    RenderState* customRenderState = passEntry->getCustomRenderState();
+
+    if (!customRenderState)
+        return;
+
+     // Write section header and begin it.
+    ser->writeAttribute(3, "rtshader_system");
+    ser->beginSection(3);
+
+    // Write each of the sub-render states that composing the final render state.
+    for (SubRenderState* curSubRenderState : customRenderState->getSubRenderStates())
+    {
+        if (SubRenderStateFactory* curFactory =
+                ShaderGenerator::getSingleton().getSubRenderStateFactory(curSubRenderState->getType()))
+        {
+            curFactory->writeInstance(ser, curSubRenderState, passEntry->getSrcPass(), passEntry->getDstPass());
+        }
+    }
+
+    // Write section end.
+    ser->endSection(3);
+}
+
+//-----------------------------------------------------------------------------
+void SGMaterialSerializerListener::serializeTextureUnitStateAttributes(MaterialSerializer* ser,
+                                                                       ShaderGenerator::SGPass* passEntry,
+                                                                       const TextureUnitState* srcTextureUnit)
+{
+    // Grab the custom render state this pass uses.
+    RenderState* customRenderState = passEntry->getCustomRenderState();
+
+    if (!customRenderState)
+        return;
+
+    // Write section header and begin it.
+    ser->writeAttribute(4, "rtshader_system");
+    ser->beginSection(4);
+
+    //retrive the destintion texture unit state
+    TextureUnitState* dstTextureUnit = NULL;
+    unsigned short texIndex = srcTextureUnit->getParent()->getTextureUnitStateIndex(srcTextureUnit);
+    if (texIndex < passEntry->getDstPass()->getNumTextureUnitStates())
+    {
+        dstTextureUnit = passEntry->getDstPass()->getTextureUnitState(texIndex);
+    }
+
+    // Write each of the sub-render states that composing the final render state.
+    for (SubRenderState* curSubRenderState : customRenderState->getSubRenderStates())
+    {
+        if (SubRenderStateFactory* curFactory =
+                ShaderGenerator::getSingleton().getSubRenderStateFactory(curSubRenderState->getType()))
+            curFactory->writeInstance(ser, curSubRenderState, srcTextureUnit, dstTextureUnit);
+    }
+
+    // Write section end.
+    ser->endSection(4);
+}
 
 //-----------------------------------------------------------------------------
 void SGMaterialSerializerListener::passEventRaised(MaterialSerializer* ser, 
@@ -81,14 +142,11 @@ void SGMaterialSerializerListener::passEventRaised(MaterialSerializer* ser,
 {
     // End of pass writing event.
     if (event == MaterialSerializer::MSE_WRITE_END)
-    {       
-        // Grab the shader generator pass instance.
-        ShaderGenerator::SGPass* passEntry = getShaderGeneratedPass(pass);
-        
+    {
         // Case this pass use as source pass for shader generated pass.
-        if (passEntry != NULL)                          
-            ShaderGenerator::getSingleton().serializePassAttributes(ser, passEntry);
-    }   
+        if (auto passEntry = getShaderGeneratedPass(pass))
+            serializePassAttributes(ser, passEntry);
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -98,14 +156,11 @@ void SGMaterialSerializerListener::textureUnitStateEventRaised(MaterialSerialize
 {
     // End of pass writing event.
     if (event == MaterialSerializer::MSE_WRITE_END)
-    {       
-        // Grab the shader generator pass instance.
-        ShaderGenerator::SGPass* passEntry = getShaderGeneratedPass(textureUnit->getParent());
-        
+    {
         // Case this pass use as source pass for shader generated pass.
-        if (passEntry != NULL)                          
-            ShaderGenerator::getSingleton().serializeTextureUnitStateAttributes(ser, passEntry, textureUnit);
-    }   
+        if (auto passEntry = getShaderGeneratedPass(textureUnit->getParent()))
+            serializeTextureUnitStateAttributes(ser, passEntry, textureUnit);
+    }
 }
 
 //-----------------------------------------------------------------------------

@@ -785,22 +785,6 @@ private:
     /** Return a matching script translator. */
     ScriptTranslator* getTranslator(const AbstractNodePtr& node);
 
-
-    /** This method called by instance of SGMaterialSerializerListener and 
-    serialize a given pass entry attributes.
-    @param ser The material serializer.
-    @param passEntry The SGPass instance.
-    */
-    void serializePassAttributes(MaterialSerializer* ser, SGPass* passEntry);
-
-    /** This method called by instance of SGMaterialSerializerListener and 
-    serialize a given textureUnitState entry attributes.
-    @param ser The material serializer.
-    @param passEntry The SGPass instance.
-    @param srcTextureUnit The TextureUnitState being serialized.
-    */
-    void serializeTextureUnitStateAttributes(MaterialSerializer* ser, SGPass* passEntry, const TextureUnitState* srcTextureUnit);
-
     /** Finds an entry iterator in the mMaterialEntriesMap map.
     This function is able to find materials with group specified as 
     AUTODETECT_RESOURCE_GROUP_NAME 
