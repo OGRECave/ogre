@@ -41,6 +41,10 @@ THE SOFTWARE.
 #include "OgreAssimpLoader.h"
 #include <assimp/postprocess.h>
 
+#ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
+#include <OgreShaderGenerator.h>
+#endif
+
 using namespace Ogre;
 
 namespace
@@ -186,6 +190,10 @@ int main(int numargs, char** args)
 
         MaterialManager::getSingleton().initialise();
 
+#ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
+        RTShader::ShaderGenerator::initialize();
+#endif
+
         DefaultHardwareBufferManager bufferManager; // needed because we don't have a rendersystem
         DefaultTextureManager texMgr;
 
@@ -219,6 +227,13 @@ int main(int numargs, char** args)
 
         // queue up the materials for serialise
         MaterialSerializer ms;
+#ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
+        auto& shadergen = RTShader::ShaderGenerator::getSingleton();
+        shadergen.setTargetLanguage("glsl"); // must be valid, but otherwise arbitrary
+        shadergen.getRenderState(MSN_SHADERGEN)->setLightCountAutoUpdate(false);
+        shadergen.validateScheme(MSN_SHADERGEN);
+        ms.addListener(shadergen.getMaterialSerializerListener());
+#endif
         for (const String& name : exportNames)
             ms.queueForExport(MaterialManager::getSingleton().getByName(name));
 
