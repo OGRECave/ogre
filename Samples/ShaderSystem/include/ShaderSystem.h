@@ -140,9 +140,6 @@ protected:
     /** Update runtime generated shaders of the target entities in this demo. */
     void updateSystemShaders();
 
-    /** Export a given material including RTSS extended attributes.*/
-    void exportRTShaderSystemMaterial(const String& fileName, const String& materialName);
-
     /** Create shaders based techniques using the given entity based on its sub entities material set. */
     void generateShaders(Entity* entity);
 
@@ -160,9 +157,6 @@ protected:
 
     /** @see Sample::loadResources. */
     void loadResources() override;
-
-    /** Create private resource group. */
-    void createPrivateResourceGroup();
     
     /** @see Sample::unloadResources. */
     void unloadResources() override;
@@ -170,9 +164,6 @@ protected:
     void createInstancedViewports();
     void destroyInstancedViewports();
     void destroyInstancedViewportsFactory();
-
-    /** Destroy private resource group. */
-    void destroyPrivateResourceGroup();
 
     /** Pick the target object. */
     void pickTargetObject( const MouseButtonEvent &evt );
@@ -231,7 +222,6 @@ protected:
     CheckBox*                           mDirLightCheckBox;      // The directional light check box.
     CheckBox*                           mPointLightCheckBox;    // The point light check box.
     CheckBox*                           mSpotLightCheckBox;     // The spot light check box.
-    String                              mExportMaterialPath;    // The path of the export material.
     CheckBox*                           mInstancedViewportsCheckBox; // The instanced viewports check box.
     CheckBox*                           mAddLotsOfModels; // The "add lots of models" check box.
     int                                 mCurrentBlendMode;
