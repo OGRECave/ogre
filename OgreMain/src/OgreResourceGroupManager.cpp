@@ -984,7 +984,7 @@ namespace Ogre {
         // Iterate over all groups
         for (const auto & grpi : mResourceGroupMap)
         {
-                    OGRE_LOCK_MUTEX(grpi->second->OGRE_AUTO_MUTEX_NAME);
+                    OGRE_LOCK_MUTEX(grpi.second->OGRE_AUTO_MUTEX_NAME);
             // Iterate over all priorities
             for (auto & oi : grpi.second->loadResourceOrderMap)
             {
