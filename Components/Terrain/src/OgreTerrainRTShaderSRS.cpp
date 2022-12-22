@@ -78,6 +78,11 @@ bool TerrainTransform::createCpuSubPrograms(ProgramSet* programSet)
                        {In(mPointTrans), In(mBaseUVScale), In(positionIn), In(height), Out(position), Out(uv)});
         positionIn = position;
     }
+    else
+    {
+        auto uvin = vsEntry->resolveInputParameter(Parameter::SPC_TEXTURE_COORDINATE0, GCT_FLOAT2);
+        stage.assign(In(uvin).xy(), uv);
+    }
 
     stage.callFunction("FFP_Transform", wvpMatrix, positionIn, positionOut);
     stage.callFunction("applyLODMorph", {In(delta), In(lodMorph), InOut(positionOut).mask(heightAxis[mAlign])});
