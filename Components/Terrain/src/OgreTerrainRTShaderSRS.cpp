@@ -117,12 +117,6 @@ bool TerrainSurface::preAddToRenderState(const RenderState* renderState, Pass* s
     SamplerPtr clampSampler = TextureManager::getSingleton().createSampler();
     clampSampler->setAddressingMode(TAM_CLAMP);
 
-    if(mUseSpecularMapping && !mForCompositeMap)
-    {
-        // we use that to inject our specular map
-        srcPass->setVertexColourTracking(TVC_SPECULAR);
-    }
-
     auto tu = dstPass->createTextureUnitState();
     tu->setTexture(mTerrain->getTerrainNormalMap());
     tu->setSampler(clampSampler);
