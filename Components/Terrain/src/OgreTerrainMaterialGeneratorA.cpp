@@ -275,6 +275,12 @@ namespace Ogre
         pass->setSpecular(ColourValue::White);
         pass->setShininess(32); // user param
 
+        if(mLayerSpecularMappingEnabled)
+        {
+            // we use this to inject our specular map
+            pass->setVertexColourTracking(TVC_SPECULAR);
+        }
+
         using namespace RTShader;
         auto mainRenderState = std::make_shared<TargetRenderState>();
         auto tplRS = static_cast<TerrainMaterialGeneratorA*>(mParent)->getMainRenderState();
