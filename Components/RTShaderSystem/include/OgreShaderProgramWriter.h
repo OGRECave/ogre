@@ -36,6 +36,8 @@ THE SOFTWARE.
 namespace Ogre {
 namespace RTShader {
 
+class FunctionAtom;
+
 /** \addtogroup Optional
 *  @{
 */
@@ -86,12 +88,17 @@ protected:
     /** Write a function parameter. */
     void writeParameterSemantic(std::ostream& os, const ParameterPtr& parameter);
 
+    void redirectGlobalWrites(std::ostream& os, FunctionAtom* func, const ShaderParameterList& inputs,
+                              const UniformParameterList& uniform);
+
     typedef std::map<GpuConstantType, const char*> GpuConstTypeToStringMap;
     typedef std::map<Parameter::Semantic, const char*> ParamSemanticToStringMap;
     // Map between GPU constant type to string value.
     GpuConstTypeToStringMap mGpuConstTypeMap;
     // Map between parameter semantic to string value.
     ParamSemanticToStringMap mParamSemanticMap;
+
+    std::set<String> mLocalRenames;
 };
 
 /** @} */

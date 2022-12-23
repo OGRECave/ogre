@@ -75,7 +75,6 @@ public:
 
     // Protected methods.
 protected:
-
     void writeMainSourceCode(std::ostream& os, Program* program);
 
     /** Initialize string maps. */
@@ -97,8 +96,6 @@ protected:
 
     // Attributes.
 protected:
-    std::set<String> mLocalRenames;
-
     // Map parameter content to vertex attributes 
     ParamContentToStringMap mContentToPerVertexAttributes;
     // Holds the current glsl version

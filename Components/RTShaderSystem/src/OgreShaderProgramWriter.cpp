@@ -122,5 +122,41 @@ void ProgramWriter::writeParameterSemantic(std::ostream& os, const ParameterPtr&
     }
 }
 
+void ProgramWriter::redirectGlobalWrites(std::ostream& os, FunctionAtom* func, const ShaderParameterList& inputs,
+                                         const UniformParameterList& uniforms)
+{
+    for (auto& operand : func->getOperandList())
+    {
+        auto opSemantic = operand.getSemantic();
+
+        if (opSemantic != Operand::OPS_OUT && opSemantic != Operand::OPS_INOUT)
+            continue;
+
+        const ParameterPtr& param = operand.getParameter();
+
+        // Check if we write to an input variable because they are only readable
+        // Well, actually "attribute" were writable in GLSL < 120, but we dont care here
+        bool doLocalRename = std::find(inputs.begin(), inputs.end(), param) != inputs.end();
+
+        // If its not a varying param check if a uniform is written
+        if (!doLocalRename)
+        {
+            doLocalRename = std::find(uniforms.begin(), uniforms.end(), param) != uniforms.end();
+        }
+
+        // now we check if we already declared a redirector var
+        if (doLocalRename && mLocalRenames.find(param->getName()) == mLocalRenames.end())
+        {
+            // Declare the copy variable and assign the original
+            String newVar = "local_" + param->getName();
+            os << "\t" << mGpuConstTypeMap[param->getType()] << " " << newVar << " = " << param->getName() << ";"
+                << std::endl;
+
+            // From now on we replace it automatic
+            param->_rename(newVar, true);
+            mLocalRenames.insert(newVar);
+        }
+    }
+}
 }
 }
