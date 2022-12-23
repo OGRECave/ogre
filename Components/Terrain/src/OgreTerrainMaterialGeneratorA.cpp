@@ -103,7 +103,6 @@ namespace Ogre
         , mCompositeMapEnabled(true)
         , mReceiveDynamicShadows(true)
         , mPSSM(0)
-        , mDepthShadows(false)
         , mLowLodShadows(false)
     {
     }
@@ -195,16 +194,6 @@ namespace Ogre
             mPSSM = pssmSettings;
             mParent->_markChanged();
         }
-    }
-    //---------------------------------------------------------------------
-    void TerrainMaterialGeneratorA::SM2Profile::setReceiveDynamicShadowsDepth(bool enabled)
-    {
-        if (enabled != mDepthShadows)
-        {
-            mDepthShadows = enabled;
-            mParent->_markChanged();
-        }
-
     }
     //---------------------------------------------------------------------
     void TerrainMaterialGeneratorA::SM2Profile::setReceiveDynamicShadowsLowLod(bool enabled)

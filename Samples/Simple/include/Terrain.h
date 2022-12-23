@@ -623,7 +623,6 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
                 mSceneMgr->setShadowTextureCasterMaterial(MaterialPtr());
             }
 
-            matProfile->setReceiveDynamicShadowsDepth(depthShadows);
             matProfile->setReceiveDynamicShadowsPSSM(static_cast<PSSMShadowCameraSetup*>(mPSSMSetup.get()));
 
             //addTextureShadowDebugOverlay(TL_RIGHT, 3);
