@@ -219,47 +219,19 @@ void GLSLProgramWriter::writeMainSourceCode(std::ostream& os, Program* program)
 
     for (const auto& pFuncInvoc : curFunction->getAtomInstances())
     {
+        redirectGlobalWrites(os, pFuncInvoc, inParams, parameterList);
         for (auto& operand : pFuncInvoc->getOperandList())
         {
             const ParameterPtr& param = operand.getParameter();
-            Operand::OpSemantic opSemantic = operand.getSemantic();
+            if (gpuType != GPT_VERTEX_PROGRAM || param->getSemantic() != Parameter::SPS_TEXTURE_COORDINATES)
+                continue;
 
-            bool isInputParam =
-                std::find(inParams.begin(), inParams.end(), param) != inParams.end();
-
-            if (opSemantic == Operand::OPS_OUT || opSemantic == Operand::OPS_INOUT)
-            {
-                // Check if we write to an input variable because they are only readable
-                // Well, actually "attribute" were writable in GLSL < 120, but we dont care here
-                bool doLocalRename = isInputParam;
-
-                // If its not a varying param check if a uniform is written
-                if (!doLocalRename)
-                {
-                    doLocalRename = std::find(parameterList.begin(), parameterList.end(),
-                                                param) != parameterList.end();
-                }
-
-                // now we check if we already declared a redirector var
-                if(doLocalRename && mLocalRenames.find(param->getName()) == mLocalRenames.end())
-                {
-                    // Declare the copy variable and assign the original
-                    String newVar = "local_" + param->getName();
-                    os << "\t" << mGpuConstTypeMap[param->getType()] << " " << newVar << " = " << param->getName() << ";" << std::endl;
-
-                    // From now on we replace it automatic
-                    param->_rename(newVar, true);
-                    mLocalRenames.insert(newVar);
-                }
-            }
+            bool isInputParam = std::find(inParams.begin(), inParams.end(), param) != inParams.end();
 
             // Now that every texcoord is a vec4 (passed as vertex attributes) we
             // have to swizzle them according the desired type.
-            if (gpuType == GPT_VERTEX_PROGRAM && isInputParam &&
-                param->getSemantic() == Parameter::SPS_TEXTURE_COORDINATES)
-            {
+            if (isInputParam)
                 operand.setMaskToParamType();
-            }
         }
 
         os << "\t";

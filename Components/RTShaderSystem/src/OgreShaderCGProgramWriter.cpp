@@ -123,6 +123,7 @@ void CGProgramWriter::writeSourceCode(std::ostream& os, Program* program)
 
     for (itAtom=atomInstances.begin(); itAtom != atomInstances.end(); ++itAtom)
     {
+        redirectGlobalWrites(os, *itAtom, curFunction->getInputParameters(), program->getParameters());
         writeAtomInstance(os, *itAtom);
     }
 
