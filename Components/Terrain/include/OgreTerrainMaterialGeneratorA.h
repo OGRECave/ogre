@@ -143,12 +143,10 @@ namespace Ogre
             settings to use (default 0). 
             */
             PSSMShadowCameraSetup* getReceiveDynamicShadowsPSSM() const { return mPSSM; }
-            /** Whether to use depth shadows (default false). 
-            */
-            void setReceiveDynamicShadowsDepth(bool enabled);
-            /** Whether to use depth shadows (default false). 
-            */
-            bool getReceiveDynamicShadowsDepth() const { return mDepthShadows; }
+            /// @deprecated determined by PixelFormat
+            OGRE_DEPRECATED void setReceiveDynamicShadowsDepth(bool enabled) {}
+            /// @deprecated determined by PixelFormat
+            OGRE_DEPRECATED bool getReceiveDynamicShadowsDepth() const { return true; }
             /** Whether to use shadows on low LOD material rendering (when using composite map) (default false). 
             */
             void setReceiveDynamicShadowsLowLod(bool enabled);
@@ -166,7 +164,6 @@ namespace Ogre
             bool mCompositeMapEnabled;
             bool mReceiveDynamicShadows;
             PSSMShadowCameraSetup* mPSSM;
-            bool mDepthShadows;
             bool mLowLodShadows;
         };
     };
