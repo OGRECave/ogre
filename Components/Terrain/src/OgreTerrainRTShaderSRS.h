@@ -38,7 +38,10 @@ class TerrainSurface : public RTShader::SubRenderState
 public:
     const String& getType() const override { return Type; }
     int getExecutionOrder() const override { return RTShader::FFP_LIGHTING - 1; }
-    void copyFrom(const SubRenderState& rhs) override {}
+    void copyFrom(const SubRenderState& rhs) override
+    {
+        mUseNormalMapping = static_cast<const TerrainSurface&>(rhs).mUseNormalMapping;
+    }
     bool createCpuSubPrograms(RTShader::ProgramSet* programSet) override;
     bool preAddToRenderState(const RTShader::RenderState* renderState, Pass* srcPass, Pass* dstPass) override;
     void updateParams();
@@ -48,7 +51,7 @@ public:
 protected:
     const Terrain* mTerrain;
     std::vector<RTShader::UniformParameterPtr> mUVMul;
-    bool mUseNormalMapping = false;
+    bool mUseNormalMapping = true;
     bool mUseSpecularMapping = false;
     bool mUseParallaxMapping = false;
     bool mForCompositeMap = false;

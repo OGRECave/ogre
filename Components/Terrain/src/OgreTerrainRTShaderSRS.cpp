@@ -106,6 +106,10 @@ bool TerrainSurface::setParameter(const String& name, const String& value)
     {
         return StringConverter::parse(value, mUseSpecularMapping);
     }
+    else if (name == "use_normal_mapping")
+    {
+        return StringConverter::parse(value, mUseNormalMapping);
+    }
 
     return false;
 }
@@ -144,7 +148,7 @@ bool TerrainSurface::preAddToRenderState(const RenderState* renderState, Pass* s
 
     mUVMul.resize((mTerrain->getLayerCount() + 3) / 4); // integer ceil
 
-    mUseNormalMapping = !mTerrain->getLayerTextureName(0, 1).empty();
+    mUseNormalMapping = mUseNormalMapping && !mTerrain->getLayerTextureName(0, 1).empty();
     for (int i = 0; i < mTerrain->getLayerCount(); ++i)
     {
         srcPass->createTextureUnitState(mTerrain->getLayerTextureName(i, 0));

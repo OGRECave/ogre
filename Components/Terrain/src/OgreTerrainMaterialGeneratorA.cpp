@@ -232,6 +232,21 @@ namespace Ogre
 
     }
     //---------------------------------------------------------------------
+    static int getRequiredLayers(const Terrain* terrain, bool pssm)
+    {
+        int layers = terrain->getLayerCount(); // layer diffusespec
+        if (!terrain->getLayerTextureName(0, 1).empty())
+            layers *= 2; // per layer normalheight
+        layers += 1; // global normal
+        layers += bool(terrain->getGlobalColourMap());
+        layers += bool(terrain->getLightmap());
+        layers += terrain->getBlendTextures().size();
+
+        if(pssm)
+            layers += 3; // 3 shadow textures
+
+        return layers;
+    }
     MaterialPtr TerrainMaterialGeneratorA::SM2Profile::generate(const Terrain* terrain)
     {
         // re-use old material if exists
@@ -252,10 +267,12 @@ namespace Ogre
         // Automatically disable normal & parallax mapping if card cannot handle it
         // We do this rather than having a specific technique for it since it's simpler
         auto rsc = Root::getSingletonPtr()->getRenderSystem()->getCapabilities();
-        if (rsc->getNumTextureUnits() < 9)
+        if (getRequiredLayers(terrain, mPSSM) > rsc->getNumTextureUnits())
         {
             setLayerNormalMappingEnabled(false);
             setLayerParallaxMappingEnabled(false);
+            LogManager::getSingleton().logWarning(
+                "TerrainMaterialGeneratorA: Normal mapping disabled due to lack of texture units");
         }
 
         Pass* pass;
@@ -274,6 +291,9 @@ namespace Ogre
         auto mainRenderState = std::make_shared<TargetRenderState>();
         auto tplRS = static_cast<TerrainMaterialGeneratorA*>(mParent)->getMainRenderState();
         mainRenderState->setLightCount(tplRS->getLightCount());
+
+        if(auto surface = tplRS->getSubRenderState("TerrainSurface"))
+            surface->setParameter("use_normal_mapping", std::to_string(mLayerNormalMappingEnabled));
 
         try
         {
