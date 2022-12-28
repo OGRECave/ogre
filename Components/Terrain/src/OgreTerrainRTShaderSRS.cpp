@@ -255,7 +255,7 @@ bool TerrainSurface::createCpuSubPrograms(ProgramSet* programSet)
     stage.assign(Vector3::ZERO, TSnormal);
     for (int l = 0; l < mTerrain->getLayerCount(); ++l)
     {
-        auto blendWeight = l == 0 ? In(1.0f) :  In(blendWeights[0]).mask(channel[(l - 1) % 4]);
+        auto blendWeight = l == 0 ? In(1.0f) : In(blendWeights[(l - 1) / 4]).mask(channel[(l - 1) % 4]);
         auto difftex = psProgram->resolveParameter(GCT_SAMPLER2D, "difftex", texUnit++);
         std::vector<Operand> args = {blendWeight, In(uvPS), In(mUVMul[l/4]).mask(channel[l % 4])};
         if (mUseNormalMapping)
