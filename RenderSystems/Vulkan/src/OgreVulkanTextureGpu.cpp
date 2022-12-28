@@ -69,46 +69,81 @@ namespace Ogre
 
         auto textureManager = static_cast<VulkanTextureGpuManager*>(mParent->getCreator());
         VulkanDevice* device = textureManager->getDevice();
-        mStagingBuffer.reset(new VulkanHardwareBuffer(VK_BUFFER_USAGE_TRANSFER_SRC_BIT, ret.getConsecutiveSize(),
-                                                      HBU_CPU_ONLY, false, device));
+
+        uint32 target = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
+        if(options != HBL_DISCARD && options != HBL_WRITE_ONLY)
+            target |= VK_BUFFER_USAGE_TRANSFER_DST_BIT;
+
+        mStagingBuffer.reset(new VulkanHardwareBuffer(target, ret.getConsecutiveSize(), HBU_CPU_ONLY, false, device));
+
+        if (options != HBL_DISCARD && options != HBL_WRITE_ONLY)
+        {
+            device->mGraphicsQueue.getCopyEncoder(0, mParent, true);
+
+            VkBuffer dstBuffer = mStagingBuffer->getVkBuffer();
+
+            VkBufferImageCopy region;
+            region.bufferOffset = 0;
+            region.bufferRowLength = 0;
+            region.bufferImageHeight = 0;
+
+            region.imageSubresource.aspectMask = VulkanMappings::getImageAspect(mFormat);;
+            region.imageSubresource.mipLevel = mLevel;
+            region.imageSubresource.baseArrayLayer = mFace;
+            region.imageSubresource.layerCount = 1;
+
+            region.imageOffset.x = lockBox.left;
+            region.imageOffset.y = lockBox.top;
+            region.imageOffset.z = lockBox.front;
+            region.imageExtent.width = lockBox.getWidth();
+            region.imageExtent.height = lockBox.getHeight();
+            region.imageExtent.depth = lockBox.getDepth();
+
+            vkCmdCopyImageToBuffer(device->mGraphicsQueue.mCurrentCmdBuffer, mParent->getFinalTextureName(),
+                                    VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, dstBuffer, 1u, &region);
+            device->mGraphicsQueue.commitAndNextCommandBuffer();
+        }
+
         return PixelBox(lockBox, mParent->getFormat(), mStagingBuffer->lock(options));
     }
 
     void VulkanHardwarePixelBuffer::unlockImpl()
     {
         mStagingBuffer->unlock();
-
-        auto textureManager = static_cast<VulkanTextureGpuManager*>(mParent->getCreator());
-        VulkanDevice* device = textureManager->getDevice();
-        device->mGraphicsQueue.getCopyEncoder( 0, mParent, false );
-
-        VkBuffer srcBuffer = mStagingBuffer->getVkBuffer();
-
         VkBufferImageCopy region;
-        region.bufferOffset = 0;
-        region.bufferRowLength = 0;
-        region.bufferImageHeight = 0;
-
-        region.imageSubresource.aspectMask = VulkanMappings::getImageAspect(mFormat);
-        region.imageSubresource.mipLevel = mLevel;
-        region.imageSubresource.baseArrayLayer = mFace;
-        region.imageSubresource.layerCount = 1;
-
-        region.imageOffset.x = mCurrentLock.left;
-        region.imageOffset.y = mCurrentLock.top;
-        region.imageOffset.z = mCurrentLock.front;
-        region.imageExtent.width = mCurrentLock.getWidth();
-        region.imageExtent.height = mCurrentLock.getHeight();
-        region.imageExtent.depth = mCurrentLock.getDepth();
-
-        if(mParent->getTextureType() == TEX_TYPE_2D_ARRAY)
+        if (mCurrentLockOptions != HBL_READ_ONLY)
         {
-            region.imageSubresource.baseArrayLayer = mCurrentLock.front;
-            region.imageOffset.z = 0;
-        }
+            auto textureManager = static_cast<VulkanTextureGpuManager*>(mParent->getCreator());
+            VulkanDevice* device = textureManager->getDevice();
+            device->mGraphicsQueue.getCopyEncoder(0, mParent, false);
 
-        vkCmdCopyBufferToImage(device->mGraphicsQueue.mCurrentCmdBuffer, srcBuffer, mParent->getFinalTextureName(),
-                                VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1u, &region);
+            VkBuffer srcBuffer = mStagingBuffer->getVkBuffer();
+
+            region.bufferOffset = 0;
+            region.bufferRowLength = 0;
+            region.bufferImageHeight = 0;
+
+            region.imageSubresource.aspectMask = VulkanMappings::getImageAspect(mFormat);
+            region.imageSubresource.mipLevel = mLevel;
+            region.imageSubresource.baseArrayLayer = mFace;
+            region.imageSubresource.layerCount = 1;
+
+            region.imageOffset.x = mCurrentLock.left;
+            region.imageOffset.y = mCurrentLock.top;
+            region.imageOffset.z = mCurrentLock.front;
+            region.imageExtent.width = mCurrentLock.getWidth();
+            region.imageExtent.height = mCurrentLock.getHeight();
+            region.imageExtent.depth = mCurrentLock.getDepth();
+
+            if (mParent->getTextureType() == TEX_TYPE_2D_ARRAY)
+            {
+                region.imageSubresource.baseArrayLayer = mCurrentLock.front;
+                region.imageOffset.z = 0;
+            }
+
+            vkCmdCopyBufferToImage(device->mGraphicsQueue.mCurrentCmdBuffer, srcBuffer, mParent->getFinalTextureName(),
+                                   VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1u, &region);
+        }
 
         bool finalSlice = region.imageSubresource.baseArrayLayer == mParent->getNumLayers() - 1;
         if((mParent->getUsage() & TU_AUTOMIPMAP) && finalSlice)
@@ -139,38 +174,9 @@ namespace Ogre
     void VulkanHardwarePixelBuffer::blitToMemory(const Box& srcBox, const PixelBox& dst)
     {
         OgreAssert(srcBox.getSize() == dst.getSize(), "scaling currently not supported");
-        auto textureManager = static_cast<VulkanTextureGpuManager*>(mParent->getCreator());
-        VulkanDevice* device = textureManager->getDevice();
-
-        auto stagingBuffer = std::make_shared<VulkanHardwareBuffer>(
-            VK_BUFFER_USAGE_TRANSFER_DST_BIT, dst.getConsecutiveSize(), HBU_CPU_ONLY, false, device);
-
-        device->mGraphicsQueue.getCopyEncoder(0, mParent, true);
-
-        VkBuffer dstBuffer = stagingBuffer->getVkBuffer();
-
-        VkBufferImageCopy region;
-        region.bufferOffset = 0;
-        region.bufferRowLength = 0;
-        region.bufferImageHeight = 0;
-
-        region.imageSubresource.aspectMask = VulkanMappings::getImageAspect(mFormat);;
-        region.imageSubresource.mipLevel = 0;
-        region.imageSubresource.baseArrayLayer = 0;
-        region.imageSubresource.layerCount = 1;
-
-        region.imageOffset.x = 0;
-        region.imageOffset.y = 0;
-        region.imageOffset.z = 0;
-        region.imageExtent.width = srcBox.getWidth();
-        region.imageExtent.height = srcBox.getHeight();
-        region.imageExtent.depth = srcBox.getDepth();
-
-        vkCmdCopyImageToBuffer(device->mGraphicsQueue.mCurrentCmdBuffer, mParent->getFinalTextureName(),
-                                VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, dstBuffer, 1u, &region);
-        device->mGraphicsQueue.commitAndNextCommandBuffer();
-
-        stagingBuffer->readData(0, dst.getConsecutiveSize(), dst.data);
+        auto src = lock(srcBox, HBL_READ_ONLY);
+        PixelUtil::bulkPixelConversion(src, dst);
+        unlock();
     }
 
     VulkanTextureGpu::VulkanTextureGpu(TextureManager* textureManager, const String& name, ResourceHandle handle,

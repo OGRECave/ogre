@@ -68,7 +68,7 @@ namespace Ogre
             createMsaaSurface();
 
         // create surface to handle download
-        auto buf = std::make_shared<VulkanHardwarePixelBuffer>(this, mWidth, mHeight, mDepth, 1, 0);
+        auto buf = std::make_shared<VulkanHardwarePixelBuffer>(this, mWidth, mHeight, mDepth, 0, 0);
         mSurfaceList.push_back(buf);
         mCurrLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
         mNextLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
