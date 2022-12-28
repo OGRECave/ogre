@@ -1021,10 +1021,7 @@ namespace Ogre {
         mMaterial = MaterialManager::getSingleton().getByName(name, groupName);
         if (!mMaterial)
         {
-            LogManager::getSingleton().logError("Can't assign material " + name +
-                " to ParticleSystem " + mName + " because this "
-                "Material does not exist in group "+groupName+". Have you forgotten to define it in a "
-                ".material script?");
+            logMaterialNotFound(name, groupName, "ParticleSystem", mName);
             mMaterial = MaterialManager::getSingleton().getDefaultMaterial(false);
         }
         if (mIsRendererConfigured)
