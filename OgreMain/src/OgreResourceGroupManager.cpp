@@ -598,7 +598,7 @@ namespace Ogre {
         OGRE_LOCK_AUTO_MUTEX;
         OGRE_LOCK_MUTEX(grp->OGRE_AUTO_MUTEX_NAME); // lock group mutex
         
-        for (auto& li : grp->locationList) 
+        for (auto& li : grp->locationList)
         {
             Archive* arch = li.archive;
 
@@ -631,7 +631,7 @@ namespace Ogre {
         OGRE_LOCK_AUTO_MUTEX;
         OGRE_LOCK_MUTEX(grp->OGRE_AUTO_MUTEX_NAME); // lock group mutex
         
-        for (auto& li : grp->locationList) 
+        for (auto& li : grp->locationList)
         {
             Archive* arch = li.archive;
 
@@ -656,7 +656,7 @@ namespace Ogre {
         ResourceGroup* grp = getResourceGroup(groupName, true);
         OGRE_LOCK_MUTEX(grp->OGRE_AUTO_MUTEX_NAME); // lock group mutex
 
-        for (auto& li : grp->locationList) 
+        for (auto& li : grp->locationList)
         {
             Archive* arch = li.archive;
 
