@@ -726,9 +726,7 @@ namespace Ogre {
 
     void GLES2RenderSystem::_setTexture(size_t stage, bool enabled, const TexturePtr &texPtr)
     {
-        if (!mStateCacheManager->activateGLTextureUnit(stage))
-            return;
-
+        mStateCacheManager->activateGLTextureUnit(stage);
         if (enabled)
         {
             GLES2TexturePtr tex = static_pointer_cast<GLES2Texture>(texPtr);
@@ -751,8 +749,7 @@ namespace Ogre {
 
     void GLES2RenderSystem::_setSampler(size_t unit, Sampler& sampler)
     {
-        if (!mStateCacheManager->activateGLTextureUnit(unit))
-            return;
+        mStateCacheManager->activateGLTextureUnit(unit);
 
         GLenum target = mTextureTypes[unit];
 
@@ -822,9 +819,7 @@ namespace Ogre {
 
     void GLES2RenderSystem::_setTextureAddressingMode(size_t stage, const Sampler::UVWAddressingMode& uvw)
     {
-        if (!mStateCacheManager->activateGLTextureUnit(stage))
-            return;
-
+        mStateCacheManager->activateGLTextureUnit(stage);
         mStateCacheManager->setTexParameteri(mTextureTypes[stage], GL_TEXTURE_WRAP_S, getTextureAddressingMode(uvw.u));
         mStateCacheManager->setTexParameteri(mTextureTypes[stage], GL_TEXTURE_WRAP_T, getTextureAddressingMode(uvw.v));
 
@@ -1151,9 +1146,7 @@ namespace Ogre {
                 
     void GLES2RenderSystem::_setTextureUnitFiltering(size_t unit, FilterType ftype, FilterOptions fo)
     {
-        if (!mStateCacheManager->activateGLTextureUnit(unit))
-            return;
-
+        mStateCacheManager->activateGLTextureUnit(unit);
         switch (ftype)
         {
             case FT_MIN:

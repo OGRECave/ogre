@@ -340,9 +340,6 @@ namespace Ogre {
             return true;
 #endif
 
-        if (unit >= Root::getSingleton().getRenderSystem()->getCapabilities()->getNumTextureUnits())
-            return false;
-
         OGRE_CHECK_GL_ERROR(glActiveTexture(GL_TEXTURE0 + unit));
         mActiveTextureUnit = unit;
         return true;

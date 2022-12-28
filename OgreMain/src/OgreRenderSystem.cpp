@@ -416,6 +416,9 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void RenderSystem::_setTextureUnitSettings(size_t texUnit, TextureUnitState& tl)
     {
+        if(texUnit >= getCapabilities()->getNumTextureUnits())
+            return;
+
         // This method is only ever called to set a texture unit to valid details
         // The method _disableTextureUnit is called to turn a unit off
         TexturePtr tex = tl._getTexturePtr();
