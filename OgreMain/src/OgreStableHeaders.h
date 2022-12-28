@@ -128,4 +128,10 @@ extern "C" {
 #define OGRE_IGNORE_DEPRECATED_END _Pragma("GCC diagnostic pop")
 #endif
 
+namespace Ogre
+{
+void logMaterialNotFound(const String& name, const String& groupName, const String& destType, const String& destName,
+                         LogMessageLevel lml = LML_CRITICAL);
+}
+
 #endif 

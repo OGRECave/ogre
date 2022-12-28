@@ -932,10 +932,7 @@ namespace Ogre {
         }
         else
         {
-            LogManager::getSingleton().logWarning("Can't assign material '" + materialName +
-                "' to SubMesh of '" + pMesh->getName() + "' because this "
-                "Material does not exist in group '"+pMesh->getGroup()+"'. Have you forgotten to define it in a "
-                ".material script?");
+            logMaterialNotFound(materialName, pMesh->getGroup(), "SubMesh of", pMesh->getName(), LML_WARNING);
         }
 
         // bool useSharedVertices
