@@ -731,7 +731,6 @@ namespace Ogre {
 
         // Tell all listeners
         bool ret = true;
-        for (std::set<FrameListener*>::iterator i = mFrameListeners.begin(); i != mFrameListeners.end(); ++i)
         for (auto *l : mFrameListeners)
         {
             if(mRemovedFrameListeners.find(l) != mRemovedFrameListeners.end())
