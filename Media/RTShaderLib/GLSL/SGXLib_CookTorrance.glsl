@@ -1,3 +1,7 @@
+// This file is part of the OGRE project.
+// code adapted from Google Filament
+// SPDX-License-Identifier: Apache-2.0
+
 #define PI 3.14159265359
 
 #ifdef OGRE_GLSLES
@@ -9,6 +13,13 @@
 
 #define MEDIUMP_FLT_MAX    65504.0
 #define saturateMediump(x) min(x, MEDIUMP_FLT_MAX)
+
+#define MIN_N_DOT_V 1e-4
+
+float clampNoV(float NoV) {
+    // Neubelt and Pettineo 2013, "Crafting a Next-gen Material Pipeline for The Order: 1886"
+    return max(NoV, MIN_N_DOT_V);
+}
 
 // Computes x^5 using only multiply operations.
 float pow5(float x) {
@@ -134,7 +145,7 @@ void evaluateLight(
     // https://google.github.io/filament/Filament.md.html#materialsystem/standardmodelsummary
     vec3 h    = normalize(vView + vLightView);
     float NoH = saturate(dot(vNormalView, h));
-    float NoV = abs(dot(vNormalView, vView)) + 1e-5;
+    float NoV = clampNoV(abs(dot(vNormalView, vView)));
 
     float V = V_SmithGGXCorrelated(roughness, NoV, NoL);
     vec3 F  = F_Schlick(f0, f90, NoH);
