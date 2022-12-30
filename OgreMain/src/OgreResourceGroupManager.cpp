@@ -571,13 +571,11 @@ namespace Ogre {
         // streams
         DataStreamList ret;
 
-        LocationList::iterator li, liend;
-        liend = grp->locationList.end();
-        for (li = grp->locationList.begin(); li != liend; ++li)
+        for (auto& li : grp->locationList)
         {
-            Archive* arch = li->archive;
+            Archive* arch = li.archive;
             // Find all the names based on whether this archive is recursive
-            StringVectorPtr names = arch->find(pattern, li->recursive);
+            StringVectorPtr names = arch->find(pattern, li.recursive);
 
             // Iterate over the names and load a stream for each
             for (auto & ni : *names)
@@ -600,10 +598,9 @@ namespace Ogre {
         OGRE_LOCK_AUTO_MUTEX;
         OGRE_LOCK_MUTEX(grp->OGRE_AUTO_MUTEX_NAME); // lock group mutex
         
-        for (LocationList::iterator li = grp->locationList.begin(); 
-            li != grp->locationList.end(); ++li)
+        for (auto& li : grp->locationList)
         {
-            Archive* arch = li->archive;
+            Archive* arch = li.archive;
 
             if (!arch->isReadOnly() && 
                 (locationPattern.empty() || StringUtil::match(arch->getName(), locationPattern, false)))
@@ -616,7 +613,6 @@ namespace Ogre {
                 // create it
                 DataStreamPtr ret = arch->create(filename);
                 grp->addToIndex(filename, arch);
-
 
                 return ret;
             }
@@ -635,10 +631,9 @@ namespace Ogre {
         OGRE_LOCK_AUTO_MUTEX;
         OGRE_LOCK_MUTEX(grp->OGRE_AUTO_MUTEX_NAME); // lock group mutex
         
-        for (LocationList::iterator li = grp->locationList.begin(); 
-            li != grp->locationList.end(); ++li)
+        for (auto& li : grp->locationList)
         {
-            Archive* arch = li->archive;
+            Archive* arch = li.archive;
 
             if (!arch->isReadOnly() && 
                 (locationPattern.empty() || StringUtil::match(arch->getName(), locationPattern, false)))
@@ -653,7 +648,6 @@ namespace Ogre {
                 }
             }
         }
-
     }
     //---------------------------------------------------------------------
     void ResourceGroupManager::deleteMatchingResources(const String& filePattern, 
@@ -662,21 +656,18 @@ namespace Ogre {
         ResourceGroup* grp = getResourceGroup(groupName, true);
         OGRE_LOCK_MUTEX(grp->OGRE_AUTO_MUTEX_NAME); // lock group mutex
 
-        
-        for (LocationList::iterator li = grp->locationList.begin(); 
-            li != grp->locationList.end(); ++li)
+        for (auto& li : grp->locationList)
         {
-            Archive* arch = li->archive;
+            Archive* arch = li.archive;
 
             if (!arch->isReadOnly() && 
                 (locationPattern.empty() || StringUtil::match(arch->getName(), locationPattern, false)))
             {
                 StringVectorPtr matchingFiles = arch->find(filePattern);
-                for (auto & f : *matchingFiles)
+                for (auto& f : *matchingFiles)
                 {
                     arch->remove(f);
                     grp->removeFromIndex(f, arch);
-
                 }
             }
         }
@@ -762,16 +753,13 @@ namespace Ogre {
     ScriptLoader *ResourceGroupManager::_findScriptLoader(const String &pattern) const
     {
         OGRE_LOCK_AUTO_MUTEX;
-
-        ScriptLoaderOrderMap::const_iterator oi;
-        for (oi = mScriptLoaderOrderMap.begin();
-            oi != mScriptLoaderOrderMap.end(); ++oi)
+        for (auto& oi : mScriptLoaderOrderMap)
         {
-            ScriptLoader* su = oi->second;
+            ScriptLoader* su = oi.second;
             const StringVector& patterns = su->getScriptPatterns();
 
             // Search for matches in the patterns
-            for (const auto & p : patterns)
+            for (const auto& p : patterns)
             {
                 if(p == pattern)
                     return su;
@@ -793,17 +781,15 @@ namespace Ogre {
         ScriptLoaderFileList scriptLoaderFileList;
         size_t scriptCount = 0;
         // Iterate over script users in loading order and get streams
-        ScriptLoaderOrderMap::const_iterator oi;
-        for (oi = mScriptLoaderOrderMap.begin();
-            oi != mScriptLoaderOrderMap.end(); ++oi)
+        for (auto& oi : mScriptLoaderOrderMap)
         {
-            ScriptLoader* su = oi->second;
+            ScriptLoader* su = oi.second;
 
             scriptLoaderFileList.push_back(LoaderFileListPair(su, FileInfoList()));
 
             // Get all the patterns and search them
             const StringVector& patterns = su->getScriptPatterns();
-            for (const auto & pattern : patterns)
+            for (const auto& pattern : patterns)
             {
                 FileInfoListPtr fileList = findResourceFileInfo(grp->name, pattern);
                 FileInfoList& lst = scriptLoaderFileList.back().second;
@@ -861,10 +847,8 @@ namespace Ogre {
     void ResourceGroupManager::createDeclaredResources(ResourceGroup* grp)
     {
 
-        for (ResourceDeclarationList::iterator i = grp->resourceDeclarations.begin();
-            i != grp->resourceDeclarations.end(); ++i)
+        for (auto& dcl : grp->resourceDeclarations)
         {
-            ResourceDeclaration& dcl = *i;
             // Retrieve the appropriate manager
             ResourceManager* mgr = _getResourceManager(dcl.resourceType);
             // Create the resource
@@ -879,7 +863,6 @@ namespace Ogre {
                 grp->loadResourceOrderMap[mgr->getLoadingOrder()] = LoadUnloadResourceList();
             }
         }
-
     }
     //-----------------------------------------------------------------------
     void ResourceGroupManager::_notifyResourceCreated(ResourcePtr& res) const
@@ -1064,12 +1047,10 @@ namespace Ogre {
             groupSet = true;
         }
         // delete all the load list entries
-        ResourceGroup::LoadResourceOrderMap::iterator j, jend;
-        jend = grp->loadResourceOrderMap.end();
-        for (j = grp->loadResourceOrderMap.begin(); j != jend; ++j)
+        for (auto& j : grp->loadResourceOrderMap)
         {
             // Iterate over resources
-            for (auto & k : j->second)
+            for (auto& k : j.second)
             {
                 k->getCreator()->remove(k);
             }
@@ -1262,11 +1243,9 @@ namespace Ogre {
         OGRE_LOCK_MUTEX(grp->OGRE_AUTO_MUTEX_NAME); // lock group mutex
 
         // Iterate over the archives
-        LocationList::iterator i, iend;
-        iend = grp->locationList.end();
-        for (i = grp->locationList.begin(); i != iend; ++i)
+        for (auto& i : grp->locationList)
         {
-            StringVectorPtr lst = i->archive->list(i->recursive, dirs);
+            StringVectorPtr lst = i.archive->list(i.recursive, dirs);
             vec->insert(vec->end(), lst->begin(), lst->end());
         }
 
@@ -1284,11 +1263,9 @@ namespace Ogre {
         OGRE_LOCK_MUTEX(grp->OGRE_AUTO_MUTEX_NAME); // lock group mutex
 
         // Iterate over the archives
-        LocationList::iterator i, iend;
-        iend = grp->locationList.end();
-        for (i = grp->locationList.begin(); i != iend; ++i)
+        for (auto& i : grp->locationList)
         {
-            FileInfoListPtr lst = i->archive->listFileInfo(i->recursive, dirs);
+            FileInfoListPtr lst = i.archive->listFileInfo(i.recursive, dirs);
             vec->insert(vec->end(), lst->begin(), lst->end());
         }
 
@@ -1306,11 +1283,9 @@ namespace Ogre {
         OGRE_LOCK_MUTEX(grp->OGRE_AUTO_MUTEX_NAME); // lock group mutex
 
             // Iterate over the archives
-            LocationList::iterator i, iend;
-        iend = grp->locationList.end();
-        for (i = grp->locationList.begin(); i != iend; ++i)
+        for (auto& i : grp->locationList)
         {
-            StringVectorPtr lst = i->archive->find(pattern, i->recursive, dirs);
+            StringVectorPtr lst = i.archive->find(pattern, i.recursive, dirs);
             vec->insert(vec->end(), lst->begin(), lst->end());
         }
 
@@ -1326,12 +1301,10 @@ namespace Ogre {
         ResourceGroup* grp = getResourceGroup(groupName, true);
         OGRE_LOCK_MUTEX(grp->OGRE_AUTO_MUTEX_NAME); // lock group mutex
 
-            // Iterate over the archives
-            LocationList::iterator i, iend;
-        iend = grp->locationList.end();
-        for (i = grp->locationList.begin(); i != iend; ++i)
+        // Iterate over the archives
+        for (auto& i : grp->locationList)
         {
-            FileInfoListPtr lst = i->archive->findFileInfo(pattern, i->recursive, dirs);
+            FileInfoListPtr lst = i.archive->findFileInfo(pattern, i.recursive, dirs);
             vec->insert(vec->end(), lst->begin(), lst->end());
         }
 
@@ -1370,12 +1343,9 @@ namespace Ogre {
         }
 
         // Search the hard way
-        LocationList::iterator li, liend;
-        liend = grp->locationList.end();
-        for (li = grp->locationList.begin(); li != liend; ++li)
+        for (auto& li : grp->locationList.begin)
         {
-            Archive* arch = li->archive;
-            if (arch->exists(resourceName))
+            if (li.archive->exists(resourceName))
             {
                 return arch;
             }
@@ -1449,11 +1419,9 @@ namespace Ogre {
         OGRE_LOCK_MUTEX(grp->OGRE_AUTO_MUTEX_NAME); // lock group mutex
 
         // Iterate over the archives
-        LocationList::iterator i, iend;
-        iend = grp->locationList.end();
-        for (i = grp->locationList.begin(); i != iend; ++i)
+        for (auto& i : grp->locationList)
         {
-            vec->push_back(i->archive->getName());
+            vec->push_back(i.archive->getName());
         }
 
         return vec;
@@ -1468,11 +1436,9 @@ namespace Ogre {
         OGRE_LOCK_MUTEX(grp->OGRE_AUTO_MUTEX_NAME); // lock group mutex
 
         // Iterate over the archives
-        LocationList::iterator i, iend;
-        iend = grp->locationList.end();
-        for (i = grp->locationList.begin(); i != iend; ++i)
+        for (auto& i : grp->locationList)
         {
-            String location = i->archive->getName();
+            String location = i.archive->getName();
             // Search for the pattern
             if(StringUtil::match(location, pattern))
             {
@@ -1602,6 +1568,5 @@ namespace Ogre {
                 ++rit;
             }
         }
-
     }
 }
