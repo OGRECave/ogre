@@ -114,7 +114,7 @@ namespace Ogre  {
             {GL_NONE},                                           // PF_PVRTC_RGBA4
             {GL_NONE},                                           // PF_PVRTC2_2BPP
             {GL_NONE},                                           // PF_PVRTC2_4BPP
-            {GL_BGR, GL_UNSIGNED_INT_10F_11F_11F_REV, GL_R11F_G11F_B10F}, // PF_R11G11B10_FLOAT
+            {GL_RGB, GL_UNSIGNED_INT_10F_11F_11F_REV, GL_R11F_G11F_B10F}, // PF_R11G11B10_FLOAT
             {GL_RED_INTEGER, GL_UNSIGNED_BYTE, GL_R8UI},         // PF_R8_UINT
             {GL_RG_INTEGER, GL_UNSIGNED_BYTE, GL_RG8UI},         // PF_R8G8_UINT
             {GL_RGB_INTEGER, GL_UNSIGNED_BYTE, GL_RGB8UI},       // PF_R8G8B8_UINT
