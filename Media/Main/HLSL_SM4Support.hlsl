@@ -38,6 +38,7 @@ float4 tex1D(Sampler1D s, float v) { return s.t.Sample(s.s, v); }
 float4 tex2D(Sampler2D s, float2 v) { return s.t.Sample(s.s, v); }
 float4 tex3D(Sampler3D s, float3 v) { return s.t.Sample(s.s, v); }
 float4 texCUBE(SamplerCube s, float3 v) { return s.t.Sample(s.s, v); }
+float4 texCUBElod(SamplerCube s, float4 v) { return s.t.SampleLevel(s.s, v.xyz, v.w); }
 
 float4 tex2D(Sampler2D s, float2 v, float2 ddx, float2 ddy) { return s.t.SampleGrad(s.s, v, ddx, ddy); }
 float4 tex2Dproj(Sampler2D s, float4 v) { return s.t.Sample(s.s, v.xy/v.w); }

@@ -43,6 +43,8 @@
 vec4 texture2DLod(sampler2D s, vec2 v, float lod) { return tex2Dlod(s, vec4(v.x, v.y, 0, lod)); }
 
 #define samplerCube samplerCUBE
+vec4 textureCubeLod(samplerCube s, vec3 v, float lod) { return texCUBElod(s, vec4(v.x, v.y, v.z, lod)); }
+
 #define sampler2DShadow Sampler2DShadow
 
 #define mix lerp
