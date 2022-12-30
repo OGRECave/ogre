@@ -1032,8 +1032,10 @@ const Pass* SceneManager::_setPass(const Pass* pass, bool evenIfSuppressed,
         if (pTex->getContentType() == TextureUnitState::CONTENT_COMPOSITOR)
         {
             CompositorChain* currentChain = _getActiveCompositorChain();
-            OgreAssert(currentChain, "A pass that wishes to reference a compositor texture "
-                                     "attempted to render in a pipeline without a compositor");
+            if (!currentChain)
+                OGRE_EXCEPT(Exception::ERR_INVALID_STATE,
+                            "TextureUnitState references a compositor, but current viewport of '" +
+                                mCurrentViewport->getTarget()->getName() + "' does not have a CompositorChain");
             auto compName = pTex->getReferencedCompositorName();
             CompositorInstance* refComp = currentChain->getCompositor(compName);
             if (!refComp)
