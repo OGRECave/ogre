@@ -1092,12 +1092,12 @@ namespace Ogre {
             */
             ACT_SHADOW_COLOUR,
             /** Provides texture size of the texture unit (index determined by setAutoConstant
-                call). Packed as `(width, height, depth, 1)`
+                call). Packed as `(width, height, depth, numMipMaps)`
             */
             ACT_TEXTURE_SIZE,
             /** Provides inverse texture size of the texture unit (index determined by
                setAutoConstant
-                call). Packed as `(1 / width, 1 / height, 1 / depth, 1)`
+                call). Packed as `(1 / width, 1 / height, 1 / depth, 1 / numMipMaps)`
             */
             ACT_INVERSE_TEXTURE_SIZE,
             /** Provides packed texture size of the texture unit (index determined by
