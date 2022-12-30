@@ -313,9 +313,14 @@ namespace Ogre {
         case 0x93BD: // COMPRESSED_RGBA_ASTC_12x12_KHR
             format = PF_ASTC_RGBA_12X12_LDR;
             break;
-        default:
+        case 0x8D64: // GL_ETC1_RGB8_OES
             format = PF_ETC1_RGB8;
             break;
+        case 0x8C3A: // GL_R11F_G11F_B10F
+            format = PF_R11G11B10_FLOAT;
+            break;
+        default:
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Unsupported glInternalFormat");
         }
 
         image->create(format, header.pixelWidth, header.pixelHeight, 1, header.numberOfFaces,
