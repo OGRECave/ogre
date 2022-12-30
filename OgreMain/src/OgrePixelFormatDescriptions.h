@@ -639,7 +639,7 @@ namespace Ogre {
             /* Bytes per element */
             4,
             /* Flags */
-            PFF_FLOAT | PFF_NATIVEENDIAN,
+            PFF_FLOAT,
             /* Component type and count */
             PCT_FLOAT32, 1,
             /* rbits, gbits, bbits, abits */
