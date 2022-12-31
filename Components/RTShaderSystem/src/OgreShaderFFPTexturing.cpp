@@ -270,8 +270,8 @@ bool FFPTexturing::addVSFunctionInvocations(TextureUnitParams* textureUnitParams
                            {In(mWorldITMatrix), In(mVSInputNormal), Out(textureUnitParams->mVSOutputTexCoord)});
         break;
     case TEXCALC_PROJECTIVE_TEXTURE:
-        stage.callBuiltin("mul", {In(textureUnitParams->mTextureViewProjImageMatrix), In(mVSInputPos),
-                                  Out(textureUnitParams->mVSOutputTexCoord)});
+        stage.callBuiltin("mul", textureUnitParams->mTextureViewProjImageMatrix, mVSInputPos,
+                          textureUnitParams->mVSOutputTexCoord);
         break;
     default:
         return false;
@@ -363,8 +363,7 @@ void FFPTexturing::addPSSampleTexelInvocation(TextureUnitParams* textureUnitPara
         return;
     }
 
-    stage.callBuiltin("texture2DProj",
-                      {In(textureUnitParams->mTextureSampler), In(textureUnitParams->mPSInputTexCoord), Out(texel)});
+    stage.callBuiltin("texture2DProj", textureUnitParams->mTextureSampler, textureUnitParams->mPSInputTexCoord, texel);
 }
 
 //-----------------------------------------------------------------------
