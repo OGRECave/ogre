@@ -202,6 +202,11 @@ namespace Ogre
         }
 
         Texture::loadImpl();
+
+        // with D3DUSAGE_AUTOGENMIPMAP, GetLevelCount always returns 1 for the number of levels.
+        // currect this after loading
+        if (mUsage & TU_AUTOMIPMAP)
+            mNumMipmaps = getMaxMipmaps();
     }
 
     /****************************************************************************************/
