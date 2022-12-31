@@ -86,6 +86,14 @@ class VisualTest : public OgreBites::Sample
         return true;
     }
 
+    bool keyPressed(const OgreBites::KeyboardEvent& evt) override
+    {
+        if (evt.keysym.sym == OgreBites::SDLK_F6)
+            mCamera->getViewport()->getTarget()->writeContentsToTimestampedFile("screenshot", ".png");
+
+        return true;
+    }
+
  protected:
     // a list of animation states to automatically update
     std::vector<Ogre::AnimationState*> mAnimStateList;
