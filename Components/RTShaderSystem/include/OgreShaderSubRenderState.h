@@ -60,6 +60,8 @@ _OgreRTSSExport extern const String SRS_INTEGRATED_PSSM3;
 _OgreRTSSExport extern const String SRS_PER_PIXEL_LIGHTING;
 /// Use metal roughness parametrisation for lighting calulations
 _OgreRTSSExport extern const String SRS_COOK_TORRANCE_LIGHTING;
+/// Adds calculations for indirect image based lighting (IBL)
+_OgreRTSSExport extern const String SRS_IMAGE_BASED_LIGHTING;
 /// Use a normal map to derive normals
 _OgreRTSSExport extern const String SRS_NORMALMAP;
 /// Redirects rendering results into intermediate buffers for the WBOIT algorithm

@@ -39,6 +39,8 @@ protected:
 
     void setupContent() override
     {
+        // Make this viewport work with shader generator
+        mViewport->setMaterialScheme(MSN_SHADERGEN);
         setupControls();
 
         mCamera->setNearClipDistance(0.1);
@@ -82,7 +84,14 @@ protected:
         
     void checkBoxToggled(CheckBox* box) override
     {
-        mParams->setNamedConstant("u_ScaleIBLAmbient", Vector4(Real(box->isChecked())));
+        bool checked = box->isChecked();
+        mParams->setNamedConstant("u_ScaleIBLAmbient", Vector4f(float(checked)));
+
+        using namespace RTShader;
+        MaterialPtr mat = MaterialManager::getSingleton().getByName("DamagedHelmet_RTSS");
+        const auto& renderstate = any_cast<TargetRenderStatePtr>(
+            mat->getTechnique(1)->getPass(0)->getUserObjectBindings().getUserAny(TargetRenderState::UserKey));
+        renderstate->getSubRenderState(SRS_IMAGE_BASED_LIGHTING)->setParameter("luminance", checked ? "4" : "0");
     }
 };
 

@@ -29,6 +29,7 @@ Here are the attributes you can use in a `rtshader_system` block of a `pass {}`:
 
 - [transform_stage](#transform_stage)
 - [lighting_stage](#lighting_stage)
+- [image_based_lighting](#image_based_lighting)
 - [gbuffer](#gbuffer)
 - [normal_map](#normal_map)
 - [metal_roughness](#metal_roughness)
@@ -71,6 +72,21 @@ Example: `lighting_stage ffp two_sided`
 
 @param two_sided compute lighting on both sides of the surface, when culling is disabled.
 @param normalised normalise the blinn-phong reflection model to make it energy conserving - see [this for details](http://www.rorydriscoll.com/2009/01/25/energy-conservation-in-games/)
+
+<a name="image_based_lighting"></a>
+
+## image_based_lighting
+
+@copydoc Ogre::RTShader::SRS_IMAGE_BASED_LIGHTING
+
+@par
+Format: `image_based_lighting texture <texture> [luminance <luminance>]`
+@par
+Example: `image_based_lighting texture ibl_cubemap.ktx`
+
+@param luminance factor to scale the IBL influence by
+
+For best results, generate the cubemaps using [cmgen](https://github.com/google/filament/tree/main/tools/cmgen) from the filament project.
 
 <a name="gbuffer"></a>
 
