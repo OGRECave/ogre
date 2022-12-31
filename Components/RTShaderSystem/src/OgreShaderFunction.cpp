@@ -49,12 +49,12 @@ static GpuConstantType typeFromContent(Parameter::Content content)
     case Parameter::SPC_POSITION_LIGHT_SPACE5:
     case Parameter::SPC_POSITION_LIGHT_SPACE6:
     case Parameter::SPC_POSITION_LIGHT_SPACE7:
+    case Parameter::SPC_TANGENT_OBJECT_SPACE:
         return GCT_FLOAT4;
     case Parameter::SPC_NORMAL_TANGENT_SPACE:
     case Parameter::SPC_NORMAL_OBJECT_SPACE:
     case Parameter::SPC_NORMAL_WORLD_SPACE:
     case Parameter::SPC_NORMAL_VIEW_SPACE:
-    case Parameter::SPC_TANGENT_OBJECT_SPACE:
     case Parameter::SPC_POSTOCAMERA_TANGENT_SPACE:
     case Parameter::SPC_POSTOCAMERA_OBJECT_SPACE:
     case Parameter::SPC_POSTOCAMERA_VIEW_SPACE:

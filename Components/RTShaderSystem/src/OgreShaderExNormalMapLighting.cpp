@@ -99,10 +99,11 @@ bool NormalMapLighting::createCpuSubPrograms(ProgramSet* programSet)
 
         // transform normal & tangent
         auto normalMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_NORMAL_MATRIX);
-        vstage.callFunction(FFP_FUNC_TRANSFORM, normalMatrix, vsInNormal, vsOutNormal);
+        vstage.callBuiltin("mul", normalMatrix, vsInNormal, vsOutNormal);
         vstage.callBuiltin("normalize", vsOutNormal, vsOutNormal);
-        vstage.callFunction(FFP_FUNC_TRANSFORM, normalMatrix, vsInTangent, vsOutTangent);
-        vstage.callBuiltin("normalize", vsOutTangent, vsOutTangent);
+        vstage.callBuiltin("mul", normalMatrix, In(vsInTangent).xyz(), Out(vsOutTangent).xyz());
+        vstage.callBuiltin("normalize", In(vsOutTangent).xyz(), Out(vsOutTangent).xyz());
+        vstage.assign(In(vsInTangent).w(), Out(vsOutTangent).w());
 
         // transform normal
         fstage.callFunction("SGX_TransformNormal", {In(viewNormal), In(psInTangent), InOut(newViewNormal)});
