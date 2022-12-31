@@ -90,7 +90,7 @@ bool CookTorranceLighting::createCpuSubPrograms(ProgramSet* programSet)
     }
 
     // add the lighting computation
-    In mrparams(ParameterPtr(NULL));
+    auto mrparams = psMain->resolveLocalParameter(GCT_FLOAT2, "metalRoughness");
     if(!mMetalRoughnessMapName.empty())
     {
         auto metalRoughnessSampler =
@@ -99,19 +99,20 @@ bool CookTorranceLighting::createCpuSubPrograms(ProgramSet* programSet)
         // Roughness is stored in the 'g' channel, metallic is stored in the 'b' channel.
         // This layout intentionally reserves the 'r' channel for (optional) occlusion map data
         fstage.sampleTexture(metalRoughnessSampler, psInTexcoord, mrSample);
-        mrparams = In(mrSample).mask(Operand::OPM_YZ);
+        fstage.assign(In(mrSample).mask(Operand::OPM_YZ), mrparams);
     }
     else
     {
         auto specular = psProgram->resolveParameter(GpuProgramParameters::ACT_SURFACE_SPECULAR_COLOUR);
-        mrparams = In(specular).xy();
+        fstage.assign(In(specular).xy(), mrparams);
     }
 
     auto sceneCol = psProgram->resolveParameter(GpuProgramParameters::ACT_DERIVED_SCENE_COLOUR);
     auto litResult = psMain->resolveLocalParameter(GCT_FLOAT4, "litResult");
     auto diffuse = psProgram->resolveParameter(GpuProgramParameters::ACT_SURFACE_DIFFUSE_COLOUR);
+    auto baseColor = psMain->resolveLocalParameter(GCT_FLOAT3, "baseColor");
 
-    fstage.mul(diffuse, outDiffuse, outDiffuse);
+    fstage.mul(In(diffuse).xyz(), In(outDiffuse).xyz(), baseColor);
     fstage.assign(Vector4(0), litResult);
 
     if(mLightCount > 0)
@@ -124,7 +125,7 @@ bool CookTorranceLighting::createCpuSubPrograms(ProgramSet* programSet)
 
         std::vector<Operand> params = {In(viewNormal),       In(viewPos),     In(sceneCol),          In(lightPos),
                                        In(lightDiffuse),     In(pointParams), In(lightDirView),      In(spotParams),
-                                       In(outDiffuse).xyz(), mrparams,        InOut(litResult).xyz()};
+                                       In(baseColor),        In(mrparams),    InOut(litResult).xyz()};
 
         if (auto shadowFactor = psMain->getLocalParameter("lShadowFactor"))
         {
