@@ -189,18 +189,6 @@ vertex_program Examples/BumpMapVPTangentParityCg cg
 	compile_arguments -DTANGENTS_HAVE_PARITY=1
 }
 
-// Bump map vertex program, with tangent parity support for this is required
-vertex_program Examples/BumpMapVPTangentParityGLSL glsl glsles
-{
-	source BumpMapVPTangentParity.glsl
-}
-
-vertex_program Examples/BumpMapVPTangentParity unified
-{
-	delegate Examples/BumpMapVPTangentParityGLSL
-	delegate Examples/BumpMapVPTangentParityCg
-}
-
 // Bump map fragment program, support for this is optional
 fragment_program Examples/BumpMapFPHLSL hlsl
 {
@@ -392,21 +380,22 @@ material Examples/BumpMapping/MultiLightSpecular
 }
 
 // Any number of lights, diffuse only, correct for tangent parity.
-material Examples/BumpMapping/MultiLightTangentParity : Examples/BumpMapping/MultiLight
+material Examples/BumpMapping/MultiLightTangentParity
 {
-
 	technique
 	{
-		pass perlight
+		pass
 		{
-			// Just change the vertex program.
-			vertex_program_ref Examples/BumpMapVPTangentParity
+			texture_unit decalmap
 			{
-				param_named_auto lightPosition light_position_object_space 0
-				param_named_auto worldViewProj worldviewproj_matrix
+				texture RustedMetal.jpg
+			}
+
+			rtshader_system
+			{
+				lighting_stage normal_map NMBumpsOut.png
 			}
 		}
-		
 	}
 
 }
