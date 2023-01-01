@@ -165,6 +165,15 @@ rtshader_system
 
 Here, metalness is read from `specular[0]` and roughness from `specular[1]`.
 
+Since 13.6, additionally indirect, image based lighting (IBL) can be used. It can be enabled by also adding
+
+```nginx
+image_based_lighting texture ibl_cubemap.ktx
+```
+
+Where `ibl_cubemap.ktx`, is a cubemap texture.
+For best results, it should be generated with the [cmgen tool](https://github.com/google/filament/tree/main/tools/cmgen) from the filament project.
+
 ## Terrain
 
 Since 13.6, `TerrainMaterialGeneratorA` internally uses the RTSS to generate shaders. This allows you to use the RTSS SRS to customize the terrain appearance.
