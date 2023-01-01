@@ -289,6 +289,7 @@ MAIN_DECLARATION
     vec3 l = normalize(u_LightDirection);             // Vector from surface point to light
     vec3 h = normalize(l+v);                          // Half vector between both l and v
     vec3 reflection = -normalize(reflect(v, n));
+    reflection.z *= -1.0;
 
     pbrInputs.NdotL = clamp(dot(n, l), 0.001, 1.0);
     pbrInputs.NdotV = abs(dot(n, v)) + 0.001;

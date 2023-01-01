@@ -145,7 +145,7 @@ fragment_program PBR_filament_cloth_fs_glsl glsl
         // param_named      frameUniforms.iblSH        float27 65504.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0
         // x = IBL max mip level
         // y = IBL resolution
-        param_named      frameUniforms.iblMaxMipLevel       float2 7.0 128.0
+        param_named      frameUniforms.iblMaxMipLevel       float2 10.0 1024.0
         param_named      frameUniforms.iblLuminance         float 1.0
         // Only needed when HAS_REFRACTION
         // param_named_auto frameUniforms.clipFromWorldMatrix  viewproj_matrix
