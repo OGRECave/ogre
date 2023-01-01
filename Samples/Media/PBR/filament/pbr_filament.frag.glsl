@@ -184,6 +184,7 @@ void material(inout MaterialInputs material)
 
     // Must be invoked after setting material.normal.
     prepareMaterial(material);
+    shading_reflected.z *= -1.0;
 }
 
 // Mainly from main.fs
