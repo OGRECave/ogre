@@ -32,6 +32,7 @@ THE SOFTWARE.
 
 namespace Ogre {
     const char* Texture::CUBEMAP_SUFFIXES[] = {"_rt", "_lf", "_up", "_dn", "_fr", "_bk"};
+    static const char* CUBEMAP_SUFFIXES_ALT[] = {"_px", "_nx", "_py", "_ny", "_pz", "_nz"};
     //--------------------------------------------------------------------------
     Texture::Texture(ResourceManager* creator, const String& name, 
         ResourceHandle handle, const String& group, bool isManual, 
@@ -461,6 +462,14 @@ namespace Ogre {
                 mLayerNames.resize(6);
                 for (size_t i = 0; i < 6; i++)
                     mLayerNames[i] = StringUtil::format("%s%s.%s", baseName.c_str(), CUBEMAP_SUFFIXES[i], ext.c_str());
+
+                if(!ResourceGroupManager::getSingleton().resourceExistsInAnyGroup(mLayerNames[0]))
+                {
+                    // assume alternative naming convention
+                    for (size_t i = 0; i < 6; i++)
+                        mLayerNames[i] =
+                            StringUtil::format("%s%s.%s", baseName.c_str(), CUBEMAP_SUFFIXES_ALT[i], ext.c_str());
+                }
             }
             else if (mTextureType == TEX_TYPE_2D_ARRAY)
             { // ignore

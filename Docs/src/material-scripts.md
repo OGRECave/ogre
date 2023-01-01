@@ -1008,8 +1008,10 @@ A 3 dimensional texture i.e. volume texture. Your texture has a width, a height,
 
 </dd> <dt>cubic</dt> <dd>
 
-This texture is made up of 6 2D textures which are pasted around the inside of a cube. The base_name in this format is something like ’skybox.jpg’, and the system will expect you to provide skybox_fr.jpg, skybox_bk.jpg, skybox_up.jpg, skybox_dn.jpg, skybox_lf.jpg, and skybox_rt.jpg for the individual faces.
-Alternatively 1 cube texture can be used if supported by the texture format(DDS for example) and rendersystem. Can be addressed with 3D texture coordinates and are useful for cubic reflection maps and normal maps.
+This texture is made up of 6 2D textures which are pasted around the inside of a cube.
+Can be addressed with 3D texture coordinates and are useful for cubic reflection maps.
+If the @c texturename in this format is something like @c skybox.jpg, the system will expect `skybox_px.jpg, skybox_nx.jpg, skybox_py.jpg, skybox_ny.jpg, skybox_pz.jpg, skybox_nz.jpg` for the individual faces. For compatibility, the suffixes `_lf, _rt, _up, _dn, _fr, _bk`  are also supported.
+Alternatively a single file with all faces can be used, if supported by the texture format (e.g. DDS).
 </dd> </dl>
 
 @param numMipMaps
@@ -1020,7 +1022,7 @@ specify the desired pixel format of the texture to create, which may be differen
 Names defined in Ogre::PixelFormat are valid values.
 
 @param gamma
-informs the renderer that you want the graphics hardware to perform gamma correction on the texture values as they are sampled for rendering. This is only applicable for textures which have 8-bit colour channels (e.g.PF\_R8G8B8). Often, 8-bit per channel textures will be stored in gamma space in order to increase the precision of the darker colours (<http://en.wikipedia.org/wiki/Gamma_correction>) but this can throw out blending and filtering calculations since they assume linear space colour values. For the best quality shading, you may want to enable gamma correction so that the hardware converts the texture values to linear space for you automatically when sampling the texture, then the calculations in the pipeline can be done in a reliable linear colour space. When rendering to a final 8-bit per channel display, you’ll also want to convert back to gamma space which can be done in your shader (by raising to the power 1/2.2) or you can enable gamma correction on the texture being rendered to or the render window. Note that the ’gamma’ option on textures is applied on loading the texture so must be specified consistently if you use this texture in multiple places.
+informs the renderer that you want the graphics hardware to perform gamma correction on the texture values as they are sampled for rendering. This is only applicable for textures which have 8-bit colour channels (e.g.PF\_R8G8B8). Often, 8-bit per channel textures will be stored in [gamma space](http://en.wikipedia.org/wiki/Gamma_correction) in order to increase the precision of the darker colours but this can throw out blending and filtering calculations since they assume linear space colour values. For the best quality shading, you may want to enable gamma correction so that the hardware converts the texture values to linear space for you automatically when sampling the texture, then the calculations in the pipeline can be done in a reliable linear colour space. When rendering to a final 8-bit per channel display, you’ll also want to convert back to gamma space which can be done in your shader (by raising to the power 1/2.2) or you can enable gamma correction on the texture being rendered to or the render window. Note that the ’gamma’ option on textures is applied on loading the texture so must be specified consistently if you use this texture in multiple places.
 
 <a name="anim_005ftexture"></a><a name="anim_005ftexture-1"></a>
 
@@ -1054,10 +1056,8 @@ Format1 (short): cubic\_texture &lt;base\_name&gt; &lt;combinedUVW|separateUV&gt
 
 @deprecated use the format '`texture <basename> cubic`' instead
 
-The base\_name in this format is something like ’skybox.jpg’, and the system will expect you to provide skybox\_fr.jpg, skybox\_bk.jpg, skybox\_up.jpg, skybox\_dn.jpg, skybox\_lf.jpg, and skybox\_rt.jpg for the individual faces.
-
 @par
-Format2 (long): cubic\_texture &lt;front&gt; &lt;back&gt; &lt;left&gt; &lt;right&gt; &lt;up&gt; &lt;down&gt; &lt;combinedUVW|separateUV&gt;
+Format2 (long): cubic\_texture &lt;pz&gt; &lt;nz&gt; &lt;nx&gt; &lt;px&gt; &lt;py&gt; &lt;ny&gt; &lt;combinedUVW|separateUV&gt;
 
 In this case each face is specified explicitly, in case you don’t want to conform to the image naming standards above.
 
