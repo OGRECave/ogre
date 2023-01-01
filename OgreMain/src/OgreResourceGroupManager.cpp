@@ -1343,11 +1343,11 @@ namespace Ogre {
         }
 
         // Search the hard way
-        for (auto& li : grp->locationList.begin)
+        for (auto& li : grp->locationList)
         {
             if (li.archive->exists(resourceName))
             {
-                return arch;
+                return li.archive;
             }
         }
 #endif
