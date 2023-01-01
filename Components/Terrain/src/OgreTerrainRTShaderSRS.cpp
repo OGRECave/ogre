@@ -252,7 +252,7 @@ bool TerrainSurface::createCpuSubPrograms(ProgramSet* programSet)
     }
 
     stage.assign(Vector4::ZERO, diffuseSpec);
-    stage.assign(Vector3::ZERO, TSnormal);
+    stage.assign(Vector3(0, 0, 1), TSnormal);
     for (int l = 0; l < mTerrain->getLayerCount(); ++l)
     {
         auto blendWeight = l == 0 ? In(1.0f) : In(blendWeights[(l - 1) / 4]).mask(channel[(l - 1) % 4]);

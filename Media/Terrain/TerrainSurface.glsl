@@ -51,6 +51,7 @@ void blendTerrainLayer(in float blendWeight, in f32vec2 uv0, in float uvMul,
     vec3 TSnormal;
     // access TS normal map
     SGX_FetchNormal(normtex, uv, TSnormal);
-    normal += TSnormal * blendWeight;
+    // Partial Derivative Blending https://blog.selfshadow.com/publications/blending-in-detail/
+    normal = normalize(vec3(mix(normal.xy*TSnormal.z, TSnormal.xy*normal.z, blendWeight), TSnormal.z*normal.z));
 #endif
 }
