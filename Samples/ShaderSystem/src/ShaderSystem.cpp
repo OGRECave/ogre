@@ -1,12 +1,12 @@
 #include "SamplePlugin.h"
 #include "OgreShaderSubRenderState.h"
 #include "ShaderSystem.h"
-#include "ShaderExReflectionMap.h"
 #include "OgreShaderExInstancedViewports.h"
 #include "OgreShaderExTextureAtlasSampler.h"
 #include "OgreBillboard.h"
 using namespace Ogre;
 using namespace OgreBites;
+using namespace Ogre::RTShader;
 
 //-----------------------------------------------------------------------
 const String DIRECTIONAL_LIGHT_NAME     = "DirectionalLight";
@@ -63,7 +63,6 @@ Sample_ShaderSystem::Sample_ShaderSystem() :
                     "Right click on object to see the shaders it currently uses. "
                     ;
     mPointLightNode = NULL;
-    mReflectionMapFactory = NULL;
     mTextureAtlasFactory = NULL;
     mInstancedViewportsEnable = false;
     mInstancedViewportsSubRenderState = NULL;
@@ -95,10 +94,6 @@ void Sample_ShaderSystem::checkBoxToggled(CheckBox* box)
     if (cbName == SPECULAR_BOX)
     {
         setSpecularEnable(box->isChecked());
-    }
-    else if (cbName == REFLECTIONMAP_BOX)
-    {
-        setReflectionMapEnable(box->isChecked());
     }
     else if (cbName == DIRECTIONAL_LIGHT_NAME)
     {
@@ -179,32 +174,19 @@ void Sample_ShaderSystem::buttonHit( OgreBites::Button* b )
 //--------------------------------------------------------------------------
 void Sample_ShaderSystem::sliderMoved(Slider* slider)
 {
-    if (slider->getName() == REFLECTIONMAP_POWER_SLIDER)
+    if (slider->getName() == REFLECTIONMAP_POWER_SLIDER && mReflectionMapSubRS)
     {
-        Real reflectionPower = slider->getValue();
+        String luminance = std::to_string(slider->getValue());
 
-        if (mReflectionMapSubRS != NULL)
+        // Grab the instances set and update them with the new reflection power value.
+        // The instances are the actual sub render states that have been assembled to create the final shaders.
+        // Every time that the shaders have to be re-generated (light changes, fog changes etc..) a new set of sub render states
+        // based on the template sub render states assembled for each pass.
+        // From that set of instances a CPU program is generated and afterward a GPU program finally generated.
+        auto instanceSet = mReflectionMapSubRS->getAccessor()->getSubRenderStateInstanceSet();
+        for (auto inst : instanceSet)
         {
-            ShaderExReflectionMap* reflectionMapSubRS = static_cast<ShaderExReflectionMap*>(mReflectionMapSubRS);
-            
-            // Since RTSS export caps based on the template sub render states we have to update the template reflection sub render state. 
-            reflectionMapSubRS->setReflectionPower(reflectionPower);
-
-            // Grab the instances set and update them with the new reflection power value.
-            // The instances are the actual sub render states that have been assembled to create the final shaders.
-            // Every time that the shaders have to be re-generated (light changes, fog changes etc..) a new set of sub render states 
-            // based on the template sub render states assembled for each pass.
-            // From that set of instances a CPU program is generated and afterward a GPU program finally generated.
-            RTShader::SubRenderStateSet instanceSet = mReflectionMapSubRS->getAccessor()->getSubRenderStateInstanceSet();
-            RTShader::SubRenderStateSetIterator it = instanceSet.begin();
-            RTShader::SubRenderStateSetIterator itEnd = instanceSet.end();
-
-            for (; it != itEnd; ++it)
-            {
-                ShaderExReflectionMap* reflectionMapSubRSInstance = static_cast<ShaderExReflectionMap*>(*it);
-                
-                reflectionMapSubRSInstance->setReflectionPower(reflectionPower);
-            }
+            inst->setParameter("luminance", luminance);
         }
     }   
 
@@ -243,7 +225,6 @@ void Sample_ShaderSystem::setupContent()
     mCurLightingModel       = SSLM_PerPixelLighting;
     mPerPixelFogEnable      = false;
     mSpecularEnable         = false;
-    mReflectionMapEnable    = false;
     mReflectionMapSubRS     = NULL;
     mLayerBlendSubRS        = NULL;
 
@@ -445,22 +426,16 @@ void Sample_ShaderSystem::setupUI()
     mTrayMgr->createLabel(TL_BOTTOM, "MainEntityLabel", "Main Entity Settings", 240);
     mTrayMgr->createCheckBox(TL_BOTTOM, SPECULAR_BOX, "Specular", 240)->setChecked(mSpecularEnable);
 
-    // Allow reflection map only on PS3 and above since with all lights on + specular + bump we 
-    // exceed the instruction count limits of PS2.
-    if (GpuProgramManager::getSingleton().isSyntaxSupported("ps_3_0") ||
-        !GpuProgramManager::getSingleton().isSyntaxSupported("ps_2_0"))
-    {
-        mTrayMgr->createCheckBox(TL_BOTTOM, REFLECTIONMAP_BOX, "Reflection Map", 240)->setChecked(mReflectionMapEnable);
-        mReflectionPowerSlider = mTrayMgr->createThickSlider(TL_BOTTOM, REFLECTIONMAP_POWER_SLIDER, "Reflection Power", 240, 80, 0, 1, 100);
-        mReflectionPowerSlider->setValue(0.5, false);
-    }
-
     mLightingModelMenu = mTrayMgr->createLongSelectMenu(TL_BOTTOM, "TargetModelLighting", "", 240, 230, 10);    
     mLightingModelMenu ->addItem("Per Pixel");
     mLightingModelMenu ->addItem("Cook Torrance");
+    mLightingModelMenu ->addItem("Image Based");
     mLightingModelMenu ->addItem("Normal Map - Tangent Space");
     mLightingModelMenu ->addItem("Normal Map - Object Space");
-    
+
+    mReflectionPowerSlider = mTrayMgr->createThickSlider(TL_BOTTOM, REFLECTIONMAP_POWER_SLIDER, "IBL Luminace", 240, 80, 0, 5, 100);
+    mReflectionPowerSlider->setValue(0.5, false);
+
 #ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
     mLayerBlendLabel = mTrayMgr->createLabel(TL_RIGHT, "Blend Type", "Blend Type", 240);
     mTrayMgr->createButton(TL_RIGHT, LAYERBLEND_BUTTON_NAME, "Change Blend Type", 220);
@@ -497,13 +472,7 @@ void Sample_ShaderSystem::setCurrentLightingModel(ShaderSystemLightingModel ligh
     {
         mCurLightingModel  = lightingModel;
 
-        EntityListIterator it = mTargetEntities.begin();
-        EntityListIterator itEnd = mTargetEntities.end();
-
-        for (; it != itEnd; ++it)
-        {
-            generateShaders(*it);
-        }       
+        updateSystemShaders();
     }
 }
 
@@ -513,16 +482,6 @@ void Sample_ShaderSystem::setSpecularEnable(bool enable)
     if (mSpecularEnable != enable)
     {
         mSpecularEnable = enable;
-        updateSystemShaders();
-    }
-}
-
-//-----------------------------------------------------------------------
-void Sample_ShaderSystem::setReflectionMapEnable(bool enable)
-{
-    if (mReflectionMapEnable != enable)
-    {
-        mReflectionMapEnable = enable;
         updateSystemShaders();
     }
 }
@@ -563,12 +522,9 @@ void Sample_ShaderSystem::setAtlasBorderMode( bool enable )
 //-----------------------------------------------------------------------
 void Sample_ShaderSystem::updateSystemShaders() 
 {
-    EntityListIterator it = mTargetEntities.begin();
-    EntityListIterator itEnd = mTargetEntities.end();
-
-    for (; it != itEnd; ++it)
+    for (auto e : mTargetEntities)
     {
-        generateShaders(*it);
+        generateShaders(e);
     }   
 }
 
@@ -589,14 +545,16 @@ void Sample_ShaderSystem::generateShaders(Entity* entity)
         {                   
             Pass* curPass = curMaterial->getTechnique(0)->getPass(0);
 
+            bool cookTorrance = mCurLightingModel == SSLM_CookTorranceLighting || mCurLightingModel == SSLM_ImageBasedLighting;
+
             if (mSpecularEnable)
             {
-                curPass->setSpecular(mCurLightingModel != SSLM_CookTorranceLighting ? ColourValue::White : ColourValue(0.3, 0.0));
+                curPass->setSpecular(!cookTorrance ? ColourValue::White : ColourValue(0.1, 0.0));
                 curPass->setShininess(32.0);
             }
             else
             {
-                curPass->setSpecular(mCurLightingModel != SSLM_CookTorranceLighting ? ColourValue::Black : ColourValue(1.0, 0.0));
+                curPass->setSpecular(!cookTorrance ? ColourValue::Black : ColourValue(1.0, 0.0));
                 curPass->setShininess(0.0);
             }
             
@@ -611,7 +569,7 @@ void Sample_ShaderSystem::generateShaders(Entity* entity)
 
 
 #ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
-            if (mCurLightingModel == SSLM_CookTorranceLighting)
+            if (mCurLightingModel == SSLM_CookTorranceLighting || mCurLightingModel == SSLM_ImageBasedLighting)
             {
                 auto lightModel = mShaderGenerator->createSubRenderState("CookTorranceLighting");
                 renderState->addTemplateSubRenderState(lightModel);
@@ -622,13 +580,35 @@ void Sample_ShaderSystem::generateShaders(Entity* entity)
                 
                 renderState->addTemplateSubRenderState(perPixelLightModel);             
             }
-            else if (mCurLightingModel == SSLM_NormalMapLightingTangentSpace)
+            else if (mCurLightingModel == SSLM_NormalMapLightingObjectSpace)
             {
                 // Apply normal map only on main entity.
                 if (entity->getName() == MAIN_ENTITY_NAME)
                 {
                     RTShader::SubRenderState* normalMapSubRS = mShaderGenerator->createSubRenderState("NormalMap");
-                    
+
+                    normalMapSubRS->setParameter("normalmap_space", "object_space");
+                    normalMapSubRS->setParameter("texture", "Panels_Normal_Obj.png");
+
+                    renderState->addTemplateSubRenderState(normalMapSubRS);
+                }
+
+                // It is secondary entity -> use simple per pixel lighting.
+                else
+                {
+                    RTShader::SubRenderState* perPixelLightModel = mShaderGenerator->createSubRenderState("SGX_PerPixelLighting");
+                    renderState->addTemplateSubRenderState(perPixelLightModel);
+                }               
+            }
+
+            if (mCurLightingModel == SSLM_NormalMapLightingTangentSpace ||
+                mCurLightingModel == SSLM_CookTorranceLighting || mCurLightingModel == SSLM_ImageBasedLighting)
+            {
+                // Apply normal map only on main entity.
+                if (entity->getName() == MAIN_ENTITY_NAME)
+                {
+                    RTShader::SubRenderState* normalMapSubRS = mShaderGenerator->createSubRenderState("NormalMap");
+
                     normalMapSubRS->setParameter("normalmap_space", "tangent_space");
                     normalMapSubRS->setParameter("texture", "Panels_Normal_Tangent.png");
 
@@ -640,42 +620,14 @@ void Sample_ShaderSystem::generateShaders(Entity* entity)
                 {
                     RTShader::SubRenderState* perPixelLightModel = mShaderGenerator->createSubRenderState("SGX_PerPixelLighting");
                     renderState->addTemplateSubRenderState(perPixelLightModel);
-                }               
-            }
-            else if (mCurLightingModel == SSLM_NormalMapLightingObjectSpace)
-            {
-                // Apply normal map only on main entity.
-                if (entity->getName() == MAIN_ENTITY_NAME)
-                {
-                    RTShader::SubRenderState* normalMapSubRS = mShaderGenerator->createSubRenderState("NormalMap");
-                
-                    normalMapSubRS->setParameter("normalmap_space", "object_space");
-                    normalMapSubRS->setParameter("texture", "Panels_Normal_Obj.png");
-
-                    renderState->addTemplateSubRenderState(normalMapSubRS);
                 }
-                
-                // It is secondary entity -> use simple per pixel lighting.
-                else
-                {
-                    RTShader::SubRenderState* perPixelLightModel = mShaderGenerator->createSubRenderState("SGX_PerPixelLighting");
-                    renderState->addTemplateSubRenderState(perPixelLightModel);
-                }               
             }
-
 #endif
-            if (mReflectionMapEnable)
+            if (mCurLightingModel == SSLM_ImageBasedLighting)
             {               
-                RTShader::SubRenderState* subRenderState = mShaderGenerator->createSubRenderState(ShaderExReflectionMap::Type);
-                ShaderExReflectionMap* reflectionMapSubRS = static_cast<ShaderExReflectionMap*>(subRenderState);
-            
-                reflectionMapSubRS->setReflectionMapType(TEX_TYPE_CUBE_MAP);
-                reflectionMapSubRS->setReflectionPower(mReflectionPowerSlider->getValue());
-
-                // Setup the textures needed by the reflection effect.
-                reflectionMapSubRS->setMaskMapTextureName("Panels_refmask.png");    
-                reflectionMapSubRS->setReflectionMapTextureName("cubescene.jpg");
-                                            
+                RTShader::SubRenderState* subRenderState = mShaderGenerator->createSubRenderState(RTShader::SRS_IMAGE_BASED_LIGHTING);
+                subRenderState->setParameter("texture", "cubescene.jpg");
+                subRenderState->setParameter("luminance", std::to_string(mReflectionPowerSlider->getValue()));
                 renderState->addTemplateSubRenderState(subRenderState);
                 mReflectionMapSubRS = subRenderState;               
             }
@@ -1008,10 +960,6 @@ void Sample_ShaderSystem::testCapabilities( const RenderSystemCapabilities* caps
 //-----------------------------------------------------------------------
 void Sample_ShaderSystem::loadResources()
 {
-    // Create and add the custom reflection map shader extension factory to the shader generator.   
-    mReflectionMapFactory = OGRE_NEW ShaderExReflectionMapFactory;
-    mShaderGenerator->addSubRenderStateFactory(mReflectionMapFactory);
-
     mTextureAtlasFactory = OGRE_NEW TextureAtlasSamplerFactory;
     mShaderGenerator->addSubRenderStateFactory(mTextureAtlasFactory);
 }
@@ -1019,18 +967,6 @@ void Sample_ShaderSystem::loadResources()
 //-----------------------------------------------------------------------
 void Sample_ShaderSystem::unloadResources()
 {
-    mShaderGenerator->removeAllShaderBasedTechniques(
-        "Panels", ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
-    mShaderGenerator->removeAllShaderBasedTechniques(
-        "Panels_RTSS_Export", ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
-
-    if (mReflectionMapFactory != NULL)
-    {   
-        mShaderGenerator->removeSubRenderStateFactory(mReflectionMapFactory);
-        OGRE_DELETE mReflectionMapFactory;
-        mReflectionMapFactory = NULL;
-    }
-
     if (mTextureAtlasFactory != NULL)
     {
         mTextureAtlasFactory->destroyAllInstances();

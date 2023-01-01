@@ -12,6 +12,7 @@ enum ShaderSystemLightingModel
 {
     SSLM_PerPixelLighting,
     SSLM_CookTorranceLighting,
+    SSLM_ImageBasedLighting,
     SSLM_NormalMapLightingTangentSpace,
     SSLM_NormalMapLightingObjectSpace
 };
@@ -103,11 +104,6 @@ protected:
     /** Return current specular state. */
     bool getSpecularEnable() const { return mSpecularEnable; }
 
-    /** Set reflection map enable state. */
-    void setReflectionMapEnable(bool enable);
-
-    /** Return current reflection map state. */
-    bool getReflectionMapEnable() const { return mReflectionMapEnable; }
 
     /** Set fog per pixel enable state. */
     void setPerPixelFogEnable(bool enable);
@@ -193,7 +189,6 @@ protected:
     SelectMenu*                         mShadowMenu;            // The shadow type menu.
     bool                                mPerPixelFogEnable;     // When true the RTSS will do per pixel fog calculations.
     bool                                mSpecularEnable;        // The current specular state.  
-    RTShader::SubRenderStateFactory*    mReflectionMapFactory;  // The custom reflection map shader extension factory.
     RTShader::SubRenderStateFactory*    mTextureAtlasFactory;
     RTShader::SubRenderState*           mInstancedViewportsSubRenderState;// todo - doc
     bool                                mInstancedViewportsEnable;      // todo - doc
@@ -209,7 +204,6 @@ protected:
     RTShader::LayeredBlending*          mLayerBlendSubRS;       // The layer blending sub render state.
     Label*                              mLayerBlendLabel;       // The layer blending label.
     Slider*                             mReflectionPowerSlider; // The reflection power controller slider.
-    bool                                mReflectionMapEnable;   // The current reflection map effect state.
     Slider*                             mModifierValueSlider;   // The value of the modifier for the layered blend controller slider.
     Entity*                             mLayeredBlendingEntity; // Entity used to show layered blending SRS
     SceneNode*                          mPointLightNode;        // Point light scene node.
