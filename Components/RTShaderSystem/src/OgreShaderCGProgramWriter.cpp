@@ -31,12 +31,18 @@ THE SOFTWARE.
 namespace Ogre {
 namespace RTShader {
 
-String CGProgramWriter::TargetLanguage = "cg";
+String CGProgramWriter::TargetLanguage = "hlsl";
 
 //-----------------------------------------------------------------------
 CGProgramWriter::CGProgramWriter()
 {
     initializeStringMaps();
+
+    if(GpuProgramManager::getSingleton().isSyntaxSupported("ps_4_0"))
+    {
+        mGpuConstTypeMap[GCT_SAMPLER2DARRAY] = "Sampler2DArray";
+        mGpuConstTypeMap[GCT_SAMPLER2DSHADOW] = "Sampler2DShadow";
+    }
 }
 
 //-----------------------------------------------------------------------
