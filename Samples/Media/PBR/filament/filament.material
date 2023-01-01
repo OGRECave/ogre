@@ -29,8 +29,8 @@ abstract material Filament
     set $Normal normal_disabled.png
     set $Emissive black.png
     set $MetalRoughness white.png
-    set $BRDFLUT "DFG_Multiscatter_Cloth_LUT.dds 2d 0 PF_FLOAT16_RGB"
-    set $IBL_SPECULAR specular.jpg
+    set $BRDFLUT "dfgLUTmultiscatter.dds 2d 0"
+    set $IBL_SPECULAR black.png
 
     technique
     {

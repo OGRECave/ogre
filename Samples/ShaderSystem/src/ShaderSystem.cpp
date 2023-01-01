@@ -236,7 +236,7 @@ void Sample_ShaderSystem::setupContent()
     mSceneMgr->setAmbientLight(ColourValue(0.2, 0.2, 0.2));
 
     // Setup the sky box,
-    mSceneMgr->setSkyBox(true, "Examples/SceneCubeMap2");
+    mSceneMgr->setSkyBox(true, "Examples/SceneSkyBox2");
 
     MeshManager::getSingleton().createPlane("Myplane",
         ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, Plane(Vector3::UNIT_Y, 0),
@@ -626,7 +626,7 @@ void Sample_ShaderSystem::generateShaders(Entity* entity)
             if (mCurLightingModel == SSLM_ImageBasedLighting)
             {               
                 RTShader::SubRenderState* subRenderState = mShaderGenerator->createSubRenderState(RTShader::SRS_IMAGE_BASED_LIGHTING);
-                subRenderState->setParameter("texture", "cubescene.jpg");
+                subRenderState->setParameter("texture", "studio_garden.jpg");
                 subRenderState->setParameter("luminance", std::to_string(mReflectionPowerSlider->getValue()));
                 renderState->addTemplateSubRenderState(subRenderState);
                 mReflectionMapSubRS = subRenderState;               
