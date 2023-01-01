@@ -2557,7 +2557,7 @@ void SceneManager::removeShadowTextureListener(ShadowTextureListener* delListene
 //---------------------------------------------------------------------
 void SceneManager::firePreRenderQueues()
 {
-    for (auto *l : mRenderQueueListeners) 
+    for (auto *l : mRenderQueueListeners)
     {
         l->preRenderQueues();
     }
@@ -2565,7 +2565,7 @@ void SceneManager::firePreRenderQueues()
 //---------------------------------------------------------------------
 void SceneManager::firePostRenderQueues()
 {
-    for (auto *l : mRenderQueueListeners) 
+    for (auto *l : mRenderQueueListeners)
     {
         l->postRenderQueues();
     }
