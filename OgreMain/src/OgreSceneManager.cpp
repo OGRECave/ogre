@@ -650,10 +650,9 @@ void SceneManager::clearScene(void)
     getRootSceneNode()->detachAllObjects();
 
     // Delete all SceneNodes, except root that is
-    for (SceneNodeList::iterator i = mSceneNodes.begin();
-        i != mSceneNodes.end(); ++i)
+    for (auto *n : mSceneNodes)
     {
-        OGRE_DELETE *i;
+        OGRE_DELETE n;
     }
     mSceneNodes.clear();
     mNamedNodes.clear();
@@ -997,10 +996,8 @@ const Pass* SceneManager::_setPass(const Pass* pass, bool evenIfSuppressed,
     size_t startLightIndex = pass->getStartLight();
     size_t shadowTexUnitIndex = 0;
     size_t shadowTexIndex = mShadowRenderer.getShadowTexIndex(startLightIndex);
-    Pass::TextureUnitStates::const_iterator it;
-    for(it = pass->getTextureUnitStates().begin(); it != pass->getTextureUnitStates().end(); ++it)
+    for(auto *pTex : pass->getTextureUnitStates())
     {
-        TextureUnitState* pTex = *it;
         if (!pass->getIteratePerLight() && isShadowTechniqueTextureBased() &&
             pTex->getContentType() == TextureUnitState::CONTENT_SHADOW)
         {
@@ -1175,11 +1172,9 @@ void SceneManager::_renderScene(Camera* camera, Viewport* vp, bool includeOverla
             _updateSceneGraph(camera);
 
             // Auto-track nodes
-            AutoTrackingSceneNodes::iterator atsni, atsniend;
-            atsniend = mAutoTrackingSceneNodes.end();
-            for (atsni = mAutoTrackingSceneNodes.begin(); atsni != atsniend; ++atsni)
+            for (auto *a : mAutoTrackingSceneNodes)
             {
-                (*atsni)->_autoTrack();
+                a->_autoTrack();
             }
 #ifdef OGRE_NODELESS_POSITIONING
             // Auto-track camera if required
@@ -1313,13 +1308,12 @@ void SceneManager::_releaseManualHardwareResources()
 
     // release hardware resources inside all movable objects
     OGRE_LOCK_MUTEX(mMovableObjectCollectionMapMutex);
-    for(MovableObjectCollectionMap::iterator ci = mMovableObjectCollectionMap.begin(),
-        ci_end = mMovableObjectCollectionMap.end(); ci != ci_end; ++ci)
+    for (const auto& m : mMovableObjectCollectionMap)
     {
-        MovableObjectCollection* coll = ci->second;
+        MovableObjectCollection* coll = m.second;
         OGRE_LOCK_MUTEX(coll->mutex);
-        for(MovableObjectMap::iterator i = coll->map.begin(), i_end = coll->map.end(); i != i_end; ++i)
-            i->second->_releaseManualHardwareResources();
+        for(auto& i : coll->map)
+            i.second->_releaseManualHardwareResources();
     }
 }
 //-----------------------------------------------------------------------
@@ -1337,13 +1331,12 @@ void SceneManager::_restoreManualHardwareResources()
 
     // restore hardware resources inside all movable objects
     OGRE_LOCK_MUTEX(mMovableObjectCollectionMapMutex);
-    for(MovableObjectCollectionMap::iterator ci = mMovableObjectCollectionMap.begin(),
-        ci_end = mMovableObjectCollectionMap.end(); ci != ci_end; ++ci)
+    for(const auto& m : mMovableObjectCollectionMap)
     {
-        MovableObjectCollection* coll = ci->second;
+        MovableObjectCollection* coll = m.second;
         OGRE_LOCK_MUTEX(coll->mutex);
-        for(MovableObjectMap::iterator i = coll->map.begin(), i_end = coll->map.end(); i != i_end; ++i)
-            i->second->_restoreManualHardwareResources();
+        for(auto& i : coll->map)
+            i.second->_restoreManualHardwareResources();
     }
 }
 //-----------------------------------------------------------------------
@@ -2339,11 +2332,10 @@ void SceneManager::destroyAllAnimations(void)
     // Destroy all states too, since they cannot reference destroyed animations
     destroyAllAnimationStates();
 
-    AnimationList::iterator i;
-    for (i = mAnimationsList.begin(); i != mAnimationsList.end(); ++i)
+    for (auto& i : mAnimationsList)
     {
         // destroy
-        OGRE_DELETE i->second;
+        OGRE_DELETE i.second;
     }
     mAnimationsList.clear();
 }
@@ -2385,10 +2377,8 @@ void SceneManager::_applySceneAnimations(void)
     OGRE_LOCK_MUTEX(mAnimationStates.OGRE_AUTO_MUTEX_NAME);
 
     // Iterate twice, once to reset, once to apply, to allow blending
-    EnabledAnimationStateList::const_iterator animIt;
-    for(animIt = mAnimationStates.getEnabledAnimationStates().begin(); animIt != mAnimationStates.getEnabledAnimationStates().end(); ++animIt)
+    for(auto *state : mAnimationStates.getEnabledAnimationStates())
     {
-        const AnimationState* state = *animIt;
         Animation* anim = getAnimation(state->getAnimationName());
 
         // Reset any nodes involved
@@ -2406,9 +2396,8 @@ void SceneManager::_applySceneAnimations(void)
     }
 
     // this should allow blended animations
-    for(animIt = mAnimationStates.getEnabledAnimationStates().begin(); animIt != mAnimationStates.getEnabledAnimationStates().end(); ++animIt)
+    for(auto *state : mAnimationStates.getEnabledAnimationStates())
     {
-        const AnimationState* state = *animIt;
         Animation* anim = getAnimation(state->getAnimationName());
         // Apply the animation
         anim->apply(state->getTimePosition(), state->getWeight());
@@ -2568,44 +2557,36 @@ void SceneManager::removeShadowTextureListener(ShadowTextureListener* delListene
 //---------------------------------------------------------------------
 void SceneManager::firePreRenderQueues()
 {
-    for (RenderQueueListenerList::iterator i = mRenderQueueListeners.begin(); 
-        i != mRenderQueueListeners.end(); ++i)
+    for (auto *l : mRenderQueueListeners)
     {
-        (*i)->preRenderQueues();
+        l->preRenderQueues();
     }
 }
 //---------------------------------------------------------------------
 void SceneManager::firePostRenderQueues()
 {
-    for (RenderQueueListenerList::iterator i = mRenderQueueListeners.begin(); 
-        i != mRenderQueueListeners.end(); ++i)
+    for (auto *l : mRenderQueueListeners)
     {
-        (*i)->postRenderQueues();
+        l->postRenderQueues();
     }
 }
 //---------------------------------------------------------------------
 bool SceneManager::fireRenderQueueStarted(uint8 id, const String& invocation)
 {
-    RenderQueueListenerList::iterator i, iend;
     bool skip = false;
-
-    iend = mRenderQueueListeners.end();
-    for (i = mRenderQueueListeners.begin(); i != iend; ++i)
+    for (auto *l : mRenderQueueListeners)
     {
-        (*i)->renderQueueStarted(id, invocation, skip);
+        l->renderQueueStarted(id, invocation, skip);
     }
     return skip;
 }
 //---------------------------------------------------------------------
 bool SceneManager::fireRenderQueueEnded(uint8 id, const String& invocation)
 {
-    RenderQueueListenerList::iterator i, iend;
     bool repeat = false;
-
-    iend = mRenderQueueListeners.end();
-    for (i = mRenderQueueListeners.begin(); i != iend; ++i)
+    for (auto *l : mRenderQueueListeners)
     {
-        (*i)->renderQueueEnded(id, invocation, repeat);
+        l->renderQueueEnded(id, invocation, repeat);
     }
     return repeat;
 }
@@ -2614,36 +2595,27 @@ void SceneManager::fireRenderSingleObject(Renderable* rend, const Pass* pass,
                                            const AutoParamDataSource* source, 
                                            const LightList* pLightList, bool suppressRenderStateChanges)
 {
-    RenderObjectListenerList::iterator i, iend;
-
-    iend = mRenderObjectListeners.end();
-    for (i = mRenderObjectListeners.begin(); i != iend; ++i)
+    for (auto *l : mRenderObjectListeners)
     {
-        (*i)->notifyRenderSingleObject(rend, pass, source, pLightList, suppressRenderStateChanges);
+        l->notifyRenderSingleObject(rend, pass, source, pLightList, suppressRenderStateChanges);
     }
 }
 //---------------------------------------------------------------------
 void SceneManager::firePreUpdateSceneGraph(Camera* camera)
 {
     ListenerList listenersCopy = mListeners;
-    ListenerList::iterator i, iend;
-
-    iend = listenersCopy.end();
-    for (i = listenersCopy.begin(); i != iend; ++i)
+    for (auto *l : listenersCopy)
     {
-        (*i)->preUpdateSceneGraph(this, camera);
+        l->preUpdateSceneGraph(this, camera);
     }
 }
 //---------------------------------------------------------------------
 void SceneManager::firePostUpdateSceneGraph(Camera* camera)
 {
     ListenerList listenersCopy = mListeners;
-    ListenerList::iterator i, iend;
-
-    iend = listenersCopy.end();
-    for (i = listenersCopy.begin(); i != iend; ++i)
+    for (auto *l : listenersCopy)
     {
-        (*i)->postUpdateSceneGraph(this, camera);
+        l->postUpdateSceneGraph(this, camera);
     }
 }
 
@@ -2651,12 +2623,9 @@ void SceneManager::firePostUpdateSceneGraph(Camera* camera)
 void SceneManager::firePreFindVisibleObjects(Viewport* v)
 {
     ListenerList listenersCopy = mListeners;
-    ListenerList::iterator i, iend;
-
-    iend = listenersCopy.end();
-    for (i = listenersCopy.begin(); i != iend; ++i)
+    for (auto *l : listenersCopy)
     {
-        (*i)->preFindVisibleObjects(this, mIlluminationStage, v);
+        l->preFindVisibleObjects(this, mIlluminationStage, v);
     }
 
 }
@@ -2664,26 +2633,18 @@ void SceneManager::firePreFindVisibleObjects(Viewport* v)
 void SceneManager::firePostFindVisibleObjects(Viewport* v)
 {
     ListenerList listenersCopy = mListeners;
-    ListenerList::iterator i, iend;
-
-    iend = listenersCopy.end();
-    for (i = listenersCopy.begin(); i != iend; ++i)
+    for (auto *l : listenersCopy)
     {
-        (*i)->postFindVisibleObjects(this, mIlluminationStage, v);
+        l->postFindVisibleObjects(this, mIlluminationStage, v);
     }
-
-
 }
 //---------------------------------------------------------------------
 void SceneManager::fireSceneManagerDestroyed()
 {
     ListenerList listenersCopy = mListeners;
-    ListenerList::iterator i, iend;
-
-    iend = listenersCopy.end();
-    for (i = listenersCopy.begin(); i != iend; ++i)
+    for (auto *l : listenersCopy)
     {
-        (*i)->sceneManagerDestroyed(this);
+        l->sceneManagerDestroyed(this);
     }
 }
 //---------------------------------------------------------------------
@@ -2931,9 +2892,8 @@ ClipResult SceneManager::buildAndSetScissor(const LightList& ll, const Camera* c
     finalRect.left = finalRect.bottom = 1.0f;
     finalRect.right = finalRect.top = -1.0f;
 
-    for (LightList::const_iterator i = ll.begin(); i != ll.end(); ++i)
+    for (auto *l : ll)
     {
-        Light* l = *i;
         // a directional light is being used, no scissoring can be done, period.
         if (l->getType() == Light::LT_DIRECTIONAL)
             return CLIPPED_NONE;
@@ -3004,8 +2964,8 @@ void SceneManager::checkCachedLightClippingInfo(bool forceScissorRectsInvalidati
     }
     else if(forceScissorRectsInvalidation)
     {
-        for(LightClippingInfoMap::iterator ci = mLightClippingInfoMap.begin(), ci_end = mLightClippingInfoMap.end(); ci != ci_end; ++ci)
-            ci->second.scissorValid = false;
+        for(auto& c : mLightClippingInfoMap)
+            c.second.scissorValid = false;
     }
 }
 //---------------------------------------------------------------------
@@ -3031,10 +2991,10 @@ ClipResult SceneManager::buildAndSetLightClip(const LightList& ll)
         return CLIPPED_NONE;
 
     Light* clipBase = 0;
-    for (LightList::const_iterator i = ll.begin(); i != ll.end(); ++i)
+    for (auto *l : ll)
     {
         // a directional light is being used, no clipping can be done, period.
-        if ((*i)->getType() == Light::LT_DIRECTIONAL)
+        if (l->getType() == Light::LT_DIRECTIONAL)
             return CLIPPED_NONE;
 
         if (clipBase)
@@ -3043,7 +3003,7 @@ ClipResult SceneManager::buildAndSetLightClip(const LightList& ll)
             // in this list we could clip by, so clip none
             return CLIPPED_NONE;
         }
-        clipBase = *i;
+        clipBase = l;
     }
 
     if (clipBase)
@@ -3310,11 +3270,9 @@ void SceneManager::destroyStaticGeometry(const String& name)
 //---------------------------------------------------------------------
 void SceneManager::destroyAllStaticGeometry(void)
 {
-    StaticGeometryList::iterator i, iend;
-    iend = mStaticGeometryList.end();
-    for (i = mStaticGeometryList.begin(); i != iend; ++i)
+    for (auto& s : mStaticGeometryList)
     {
-        OGRE_DELETE i->second;
+        OGRE_DELETE s.second;
     }
     mStaticGeometryList.clear();
 }
@@ -3380,13 +3338,9 @@ void SceneManager::destroyInstanceManager( InstanceManager *instanceManager )
 //---------------------------------------------------------------------
 void SceneManager::destroyAllInstanceManagers(void)
 {
-    InstanceManagerMap::iterator itor = mInstanceManagerMap.begin();
-    InstanceManagerMap::iterator end  = mInstanceManagerMap.end();
-
-    while( itor != end )
+    for (auto& m : mInstanceManagerMap)
     {
-        OGRE_DELETE itor->second;
-        ++itor;
+        OGRE_DELETE m.second;
     }
 
     mInstanceManagerMap.clear();
@@ -3443,13 +3397,9 @@ void SceneManager::updateDirtyInstanceManagers(void)
 
     while( !mDirtyInstanceMgrsTmp.empty() )
     {
-        InstanceManagerVec::const_iterator itor = mDirtyInstanceMgrsTmp.begin();
-        InstanceManagerVec::const_iterator end  = mDirtyInstanceMgrsTmp.end();
-
-        while( itor != end )
+        for(auto *d : mDirtyInstanceMgrsTmp)
         {
-            (*itor)->_updateDirtyBatches();
-            ++itor;
+            d->_updateDirtyBatches();
         }
 
         //Clear temp buffer
@@ -3629,14 +3579,13 @@ void SceneManager::destroyAllMovableObjectsByType(const String& typeName)
         Root::getSingleton().getMovableObjectFactory(typeName);
     
     {
-            OGRE_LOCK_MUTEX(objectMap->mutex);
-        MovableObjectMap::iterator i = objectMap->map.begin();
-        for (; i != objectMap->map.end(); ++i)
+        OGRE_LOCK_MUTEX(objectMap->mutex);
+        for (auto& m : objectMap->map)
         {
             // Only destroy our own
-            if (i->second->_getManager() == this)
+            if (m.second->_getManager() == this)
             {
-                factory->destroyInstance(i->second);
+                factory->destroyInstance(m.second);
             }
         }
         objectMap->map.clear();
@@ -3647,33 +3596,28 @@ void SceneManager::destroyAllMovableObjects(void)
 {
     // Lock collection mutex
     OGRE_LOCK_MUTEX(mMovableObjectCollectionMapMutex);
-
-    MovableObjectCollectionMap::iterator ci = mMovableObjectCollectionMap.begin();
-
-    for(;ci != mMovableObjectCollectionMap.end(); ++ci)
+    for(auto& c : mMovableObjectCollectionMap)
     {
-        MovableObjectCollection* coll = ci->second;
+        MovableObjectCollection* coll = c.second;
 
         // lock map mutex
         OGRE_LOCK_MUTEX(coll->mutex);
 
-        if (Root::getSingleton().hasMovableObjectFactory(ci->first))
+        if (Root::getSingleton().hasMovableObjectFactory(c.first))
         {
             // Only destroy if we have a factory instance; otherwise must be injected
             MovableObjectFactory* factory = 
-                Root::getSingleton().getMovableObjectFactory(ci->first);
-            MovableObjectMap::iterator i = coll->map.begin();
-            for (; i != coll->map.end(); ++i)
+                Root::getSingleton().getMovableObjectFactory(c.first);
+            for (auto& i : coll->map)
             {
-                if (i->second->_getManager() == this)
+                if (i.second->_getManager() == this)
                 {
-                    factory->destroyInstance(i->second);
+                    factory->destroyInstance(i.second);
                 }
             }
         }
         coll->map.clear();
     }
-
 }
 //---------------------------------------------------------------------
 MovableObject* SceneManager::getMovableObject(const String& name, const String& typeName) const
@@ -3843,9 +3787,9 @@ void SceneManager::_notifyMovableObjectLodChanged(MovableObjectLodChangedEvent& 
 {
     // Notify listeners and determine if event needs to be queued
     bool queueEvent = false;
-    for (LodListenerSet::iterator it = mLodListeners.begin(); it != mLodListeners.end(); ++it)
+    for (auto *l : mLodListeners)
     {
-        if ((*it)->prequeueMovableObjectLodChanged(evt))
+        if (l->prequeueMovableObjectLodChanged(evt))
             queueEvent = true;
     }
 
@@ -3858,9 +3802,9 @@ void SceneManager::_notifyEntityMeshLodChanged(EntityMeshLodChangedEvent& evt)
 {
     // Notify listeners and determine if event needs to be queued
     bool queueEvent = false;
-    for (LodListenerSet::iterator it = mLodListeners.begin(); it != mLodListeners.end(); ++it)
+    for (auto *l : mLodListeners)
     {
-        if ((*it)->prequeueEntityMeshLodChanged(evt))
+        if (l->prequeueEntityMeshLodChanged(evt))
             queueEvent = true;
     }
 
@@ -3873,9 +3817,9 @@ void SceneManager::_notifyEntityMaterialLodChanged(EntityMaterialLodChangedEvent
 {
     // Notify listeners and determine if event needs to be queued
     bool queueEvent = false;
-    for (LodListenerSet::iterator it = mLodListeners.begin(); it != mLodListeners.end(); ++it)
+    for (auto *l : mLodListeners)
     {
-        if ((*it)->prequeueEntityMaterialLodChanged(evt))
+        if (l->prequeueEntityMaterialLodChanged(evt))
             queueEvent = true;
     }
 
@@ -3887,16 +3831,16 @@ void SceneManager::_notifyEntityMaterialLodChanged(EntityMaterialLodChangedEvent
 void SceneManager::_handleLodEvents()
 {
     // Handle events with each listener
-    for (LodListenerSet::iterator it = mLodListeners.begin(); it != mLodListeners.end(); ++it)
+    for (auto *l : mLodListeners)
     {
-        for (MovableObjectLodChangedEventList::const_iterator jt = mMovableObjectLodChangedEvents.begin(); jt != mMovableObjectLodChangedEvents.end(); ++jt)
-            (*it)->postqueueMovableObjectLodChanged(*jt);
+        for (auto& e : mMovableObjectLodChangedEvents)
+            l->postqueueMovableObjectLodChanged(e);
 
-        for (EntityMeshLodChangedEventList::const_iterator jt = mEntityMeshLodChangedEvents.begin(); jt != mEntityMeshLodChangedEvents.end(); ++jt)
-            (*it)->postqueueEntityMeshLodChanged(*jt);
+        for (auto& e : mEntityMeshLodChangedEvents)
+            l->postqueueEntityMeshLodChanged(e);
 
-        for (EntityMaterialLodChangedEventList::const_iterator jt = mEntityMaterialLodChangedEvents.begin(); jt != mEntityMaterialLodChangedEvents.end(); ++jt)
-            (*it)->postqueueEntityMaterialLodChanged(*jt);
+        for (auto& e : mEntityMaterialLodChangedEvents)
+            l->postqueueEntityMaterialLodChanged(e);
     }
 
     // Clear event queues
@@ -4002,8 +3946,7 @@ void VisibleObjectsBoundsInfo::reset()
     maxDistance = maxDistanceInFrustum = 0;
 }
 //---------------------------------------------------------------------
-void VisibleObjectsBoundsInfo::merge(const AxisAlignedBox& boxBounds, const Sphere& sphereBounds, 
-           const Camera* cam, bool receiver)
+void VisibleObjectsBoundsInfo::merge(const AxisAlignedBox& boxBounds, const Sphere& sphereBounds, const Camera* cam, bool receiver)
 {
     aabb.merge(boxBounds);
     if (receiver)
@@ -4017,8 +3960,7 @@ void VisibleObjectsBoundsInfo::merge(const AxisAlignedBox& boxBounds, const Sphe
     maxDistanceInFrustum = std::max(maxDistanceInFrustum, camDistToCenter + sphereBounds.getRadius());
 }
 //---------------------------------------------------------------------
-void VisibleObjectsBoundsInfo::mergeNonRenderedButInFrustum(const AxisAlignedBox& boxBounds, 
-                                  const Sphere& sphereBounds, const Camera* cam)
+void VisibleObjectsBoundsInfo::mergeNonRenderedButInFrustum(const AxisAlignedBox& boxBounds, const Sphere& sphereBounds, const Camera* cam)
 {
     (void)boxBounds;
     // use view matrix to determine distance, works with custom view matrices
@@ -4028,7 +3970,6 @@ void VisibleObjectsBoundsInfo::mergeNonRenderedButInFrustum(const AxisAlignedBox
     maxDistanceInFrustum = std::max(maxDistanceInFrustum, camDistToCenter + sphereBounds.getRadius());
 
 }
-
-
+//---------------------------------------------------------------------
 
 }
