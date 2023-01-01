@@ -88,42 +88,6 @@ material Examples/SpaceSkyBox
 	}
 }
 
-material Examples/SceneSkyBox1
-{
-	technique
-	{
-		pass
-		{
-			lighting off
-			depth_write off
-
-			texture_unit
-			{
-				texture cubemap.jpg cubic
-				tex_address_mode clamp
-			}
-		}
-	}
-}
-
-material Examples/SceneCubeMap1
-{
-	technique
-	{
-		pass
-		{
-			lighting off
-
-			texture_unit
-			{
-				texture cubemap.jpg cubic
-				tex_address_mode clamp
-				env_map cubic_reflection
-			}
-		}
-	}
-}
-
 material Examples/SceneSkyBox2
 {
 	technique
@@ -135,24 +99,7 @@ material Examples/SceneSkyBox2
 
 			texture_unit
 			{
-				texture cubescene.jpg cubic
-				tex_address_mode clamp
-			}
-		}
-	}
-}
-
-material Examples/SceneCubeMap2
-{
-	technique
-	{
-		pass
-		{
-			lighting off
-
-			texture_unit
-			{
-				texture cubescene.jpg cubic
+				texture studio_garden.jpg cubic
 				tex_address_mode clamp
 			}
 		}

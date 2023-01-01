@@ -271,4 +271,7 @@ Licensed Under:</td>
     <li>
         <p>Earth-Color10x6.astc and Texture.pkm by ARM Limited, published under MIT https://github.com/ARM-software/opengl-es-sdk-for-android</p>
     </li>
+    <li>
+        <p>studio_garden.jpg adapted from Sergej Majboroda, published under CC-0 https://polyhaven.com/a/studio_garden</p>
+    </li>
 </ul>

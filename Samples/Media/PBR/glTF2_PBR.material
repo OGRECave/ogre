@@ -5,8 +5,8 @@ material glTF2/PBR
     set $Emissive black.png
     set $MetalRoughness white.png
     set $AmbientOcclusion white.png
-    set $IBL_Diffuse diffuse.jpg
-    set $IBL_Specular specular.jpg
+    set $IBL_Diffuse black.png
+    set $IBL_Specular black.png
 
     technique
     {
