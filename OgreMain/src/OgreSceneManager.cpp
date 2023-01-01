@@ -1312,7 +1312,7 @@ void SceneManager::_releaseManualHardwareResources()
     {
         MovableObjectCollection* coll = m.second;
         OGRE_LOCK_MUTEX(coll->mutex);
-        for(const auto& i : coll->map)
+        for(auto& i : coll->map)
             i.second->_releaseManualHardwareResources();
     }
 }
@@ -1335,7 +1335,7 @@ void SceneManager::_restoreManualHardwareResources()
     {
         MovableObjectCollection* coll = m.second;
         OGRE_LOCK_MUTEX(coll->mutex);
-        for(const auto& i : coll->map)
+        for(auto& i : coll->map)
             i.second->_restoreManualHardwareResources();
     }
 }
