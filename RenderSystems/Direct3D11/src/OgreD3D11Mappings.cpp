@@ -132,7 +132,7 @@ namespace Ogre
         switch(level)
         {
         case PM_POINTS:
-            return D3D11_FILL_SOLID; // this will done in a geometry shader like in the FixedFuncEMU sample  and the shader needs solid
+            return D3D11_FILL_SOLID;
         case PM_WIREFRAME:
             return D3D11_FILL_WIREFRAME;
         case PM_SOLID:

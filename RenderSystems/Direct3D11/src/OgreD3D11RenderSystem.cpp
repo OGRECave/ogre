@@ -2079,6 +2079,9 @@ namespace Ogre
             if(mGeometryProgramBound && mBoundGeometryProgram && mBoundGeometryProgram->isAdjacencyInfoRequired())
                 operationType |= RenderOperation::OT_DETAIL_ADJACENCY_BIT;
 
+            if(mPolygonMode == PM_POINTS)
+                operationType = RenderOperation::OT_POINT_LIST;
+
             switch( operationType )
             {
             case RenderOperation::OT_POINT_LIST:
