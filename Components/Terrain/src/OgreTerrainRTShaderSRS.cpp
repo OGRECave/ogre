@@ -279,7 +279,7 @@ bool TerrainSurface::createCpuSubPrograms(ProgramSet* programSet)
 
     // fake vertexcolour input for TVC_SPECULAR
     if(mUseSpecularMapping)
-        stage.mul(In(diffuseSpec).z(), Vector4(1), diffuse);
+        stage.mul(In(diffuseSpec).w(), Vector4(1), diffuse);
 
     if(lightMap)
     {
