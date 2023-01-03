@@ -751,7 +751,7 @@ namespace Ogre
         if( isRenderTarget )
             retVal |= D3D11_BIND_RENDER_TARGET;
 
-        if( usage & TU_UAV )
+        if( usage & TU_UNORDERED_ACCESS )
             retVal |= D3D11_BIND_UNORDERED_ACCESS;
 
         return retVal;

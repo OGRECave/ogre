@@ -155,7 +155,7 @@ namespace Ogre
         if( !( textureFlags & TU_NOT_SRV ) )
             features |= VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT;
 
-        if( textureFlags & TU_UAV )
+        if( textureFlags & TU_UNORDERED_ACCESS )
             features |= VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT;
 
         if( textureFlags & TU_RENDERTARGET )
