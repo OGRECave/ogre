@@ -1,6 +1,6 @@
 #version 430
 
-layout(binding = 0, rgba8) coherent uniform image2D image_data;
+layout(binding = 0, rgba8) writeonly uniform image2D image_data;
 
 uniform float roll;
 
