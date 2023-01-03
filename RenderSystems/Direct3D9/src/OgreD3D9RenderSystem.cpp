@@ -899,11 +899,6 @@ namespace Ogre
             D3D9Driver* pCurDriver       = mDriverList->item(i);            
             const D3DCAPS9& rkCurCaps    = pCurDriver->getD3D9DeviceCaps();
 
-            if (rkCurCaps.MaxSimultaneousTextures < rsc->getNumTextureUnits())
-            {
-                rsc->setNumTextureUnits(static_cast<ushort>(rkCurCaps.MaxSimultaneousTextures));
-            }
-
             bool has_level_9_1 = true;
 
             // Check for Anisotropy.
