@@ -57,12 +57,12 @@ namespace OgreBites {
 
         mImage = TextureManager::getSingleton().createManual(
             "ImageData", // Name of texture
-            "General",   // Name of resource group in which the texture should be created
+            RGN_DEFAULT, // Name of resource group in which the texture should be created
             TEX_TYPE_2D, // Texture type
             256, 256, 1, // Width, Height, Depth
             0,           // Number of mipmaps
             PF_BYTE_RGBA, // Pixel format
-            TU_DYNAMIC   // usage
+            HBU_GPU_ONLY | TU_UNORDERED_ACCESS // usage
         );
 
         // make it accessible to the compute shader (write)

@@ -13,9 +13,16 @@ compute_program Compute/CS_GLSL glsl
         // post_memory_barrier texture
 }
 
+compute_program Compute/CS_HLSL hlsl
+{
+        source ComputeCS.hlsl
+        target cs_5_0
+}
+
 compute_program Compute/CS unified
 {
         delegate Compute/CS_GLSL
+        delegate Compute/CS_HLSL
 }
 material Compute/Compositor
 {

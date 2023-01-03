@@ -155,11 +155,8 @@ namespace Ogre
         /// structure holding texture unit settings for every stage
         struct sD3DTextureStageDesc
         {
-            /// the type of the texture
-            TextureType type;
-
             /// texture 
-            ID3D11ShaderResourceView  *pTex;
+            D3D11Texture  *pTex;
             ID3D11SamplerState    *pSampler;
             bool used;
         } mTexStageDesc[OGRE_MAX_TEXTURE_LAYERS];

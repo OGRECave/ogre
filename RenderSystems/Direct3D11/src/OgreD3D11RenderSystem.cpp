@@ -1438,16 +1438,12 @@ namespace Ogre
     //---------------------------------------------------------------------
     void D3D11RenderSystem::_setTexture( size_t stage, bool enabled, const TexturePtr& tex )
     {
-        static D3D11TexturePtr dt;
-        dt = static_pointer_cast<D3D11Texture>(tex);
-        if (enabled && dt && dt->getSize() > 0)
+        if (enabled && tex && tex->getSize() > 0)
         {
             // note used
-            dt->touch();
-            ID3D11ShaderResourceView * pTex = dt->getSrvView();
-            mTexStageDesc[stage].pTex = pTex;
+            tex->touch();
+            mTexStageDesc[stage].pTex = static_cast<D3D11Texture*>(tex.get());
             mTexStageDesc[stage].used = true;
-            mTexStageDesc[stage].type = dt->getTextureType();
 
             mLastTextureUnitState = stage+1;
         }
@@ -1789,13 +1785,58 @@ namespace Ogre
     //---------------------------------------------------------------------
     void D3D11RenderSystem::_dispatchCompute(const Vector3i& workgroupDim)
     {
+        mDevice.GetImmediateContext()->CSSetShader(mBoundComputeProgram->getComputeShader(),
+                                                    mClassInstances[GPT_COMPUTE_PROGRAM],
+                                                    mNumClassInstances[GPT_COMPUTE_PROGRAM]);
+        CHECK_DEVICE_ERROR("set compute shader");
+
+        ID3D11ShaderResourceView* nullSrv[] = { 0 };
+
+        ID3D11UnorderedAccessView* uavs[OGRE_MAX_TEXTURE_LAYERS] = {NULL};
+        ID3D11ShaderResourceView * srvs[OGRE_MAX_TEXTURE_LAYERS] = {NULL};
+        ID3D11SamplerState* samplers[OGRE_MAX_TEXTURE_LAYERS] = {NULL};
+
+        // samplers mapping
+        size_t numberOfSamplers = std::min(mLastTextureUnitState,(size_t)(OGRE_MAX_TEXTURE_LAYERS + 1));
+        for (size_t n = 0; n < numberOfSamplers; n++)
+        {
+            if(!mTexStageDesc[n].used)
+                continue;
+
+            if(mTexStageDesc[n].pTex->getUsage() & TU_UNORDERED_ACCESS)
+                uavs[n] = mTexStageDesc[n].pTex->getUavView(0, 0, PF_UNKNOWN);
+            else
+            {
+                srvs[n] = mTexStageDesc[n].pTex->getSrvView();
+                samplers[n] = mTexStageDesc[n].pSampler;
+            }
+        }
+
+        if(mFeatureLevel >= D3D_FEATURE_LEVEL_11_0)
+        {
+            // unbind SRVs from other stages
+            mDevice.GetImmediateContext()->VSSetShaderResources(0, 1, nullSrv);
+            mDevice.GetImmediateContext()->PSSetShaderResources(0, 1, nullSrv);
+            mSamplerStatesChanged = true;
+
+            mDevice.GetImmediateContext()->CSSetUnorderedAccessViews(0, static_cast<UINT>(numberOfSamplers), uavs, NULL);
+            CHECK_DEVICE_ERROR("set compute UAVs");
+        }
+
+        if (mFeatureLevel >= D3D_FEATURE_LEVEL_10_0)
+        {
+            mDevice.GetImmediateContext()->CSSetSamplers(static_cast<UINT>(0), static_cast<UINT>(numberOfSamplers), samplers);
+            CHECK_DEVICE_ERROR("set compute shader samplers");
+            mDevice.GetImmediateContext()->CSSetShaderResources(static_cast<UINT>(0), static_cast<UINT>(numberOfSamplers), srvs);
+            CHECK_DEVICE_ERROR("set compute shader resources");
+        }
+
         // Bound unordered access views
         mDevice.GetImmediateContext()->Dispatch(workgroupDim[0], workgroupDim[1], workgroupDim[2]);
 
         // unbind
         ID3D11UnorderedAccessView* views[] = { 0 };
-        ID3D11ShaderResourceView* srvs[] = { 0 };
-        mDevice.GetImmediateContext()->CSSetShaderResources( 0, 1, srvs );
+        mDevice.GetImmediateContext()->CSSetShaderResources( 0, 1, nullSrv );
         mDevice.GetImmediateContext()->CSSetUnorderedAccessViews( 0, 1, views, NULL );
         mDevice.GetImmediateContext()->CSSetShader( NULL, NULL, 0 );
     }
@@ -1872,7 +1913,7 @@ namespace Ogre
                 ID3D11SamplerState *sampler = NULL;
                 sD3DTextureStageDesc & stage = mTexStageDesc[n];
                 opState->mSamplerStates[n]  = stage.used ? stage.pSampler : NULL;
-                opState->mTextures[n]       = stage.used ? stage.pTex : NULL;
+                opState->mTextures[n]       = stage.used ? stage.pTex->getSrvView() : NULL;
             }
             for (size_t n = opState->mTexturesCount; n < OGRE_MAX_TEXTURE_LAYERS; n++)
 			{
@@ -1929,15 +1970,6 @@ namespace Ogre
                 CHECK_DEVICE_ERROR("set geometry shader samplers");
                 mDevice.GetImmediateContext()->GSSetShaderResources(0, opState->mTexturesCount, &opState->mTextures[0]);
                 CHECK_DEVICE_ERROR("set geometry shader resources");
-            }
-
-            /// Compute Shader binding
-            if (mBoundComputeProgram && mFeatureLevel >= D3D_FEATURE_LEVEL_10_0)
-            {
-                mDevice.GetImmediateContext()->CSSetSamplers(static_cast<UINT>(0), static_cast<UINT>(opState->mSamplerStatesCount), opState->mSamplerStates);
-                CHECK_DEVICE_ERROR("set compute shader samplers");
-                mDevice.GetImmediateContext()->CSSetShaderResources(static_cast<UINT>(0), static_cast<UINT>(opState->mTexturesCount), &opState->mTextures[0]);
-                CHECK_DEVICE_ERROR("set compute shader resources");
             }
 
             /// Hull Shader binding
@@ -2029,14 +2061,6 @@ namespace Ogre
                                                        mNumClassInstances[GPT_DOMAIN_PROGRAM]);
             CHECK_DEVICE_ERROR("set domain shader");
         }
-        if (mBoundComputeProgram)
-        {
-            mDevice.GetImmediateContext()->CSSetShader(mBoundComputeProgram->getComputeShader(),
-                                                       mClassInstances[GPT_COMPUTE_PROGRAM], 
-                                                       mNumClassInstances[GPT_COMPUTE_PROGRAM]);
-            CHECK_DEVICE_ERROR("set compute shader");
-        }
-
 
         setVertexDeclaration(op.vertexData->vertexDeclaration, op.vertexData->vertexBufferBinding);
         setVertexBufferBinding(op.vertexData->vertexBufferBinding);
