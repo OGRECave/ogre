@@ -575,6 +575,9 @@ void FFPTexturing::setTextureUnit(unsigned short index, TextureUnitState* textur
     curParams.mTextureSamplerIndex = index;
     curParams.mTextureUnitState    = textureUnitState;
 
+    if(textureUnitState->isTextureLoadFailing()) // -> will be set to a 2D texture
+        return;
+
     bool isGLES2 = ShaderGenerator::getSingleton().getTargetLanguage() == "glsles";
 
     switch (curParams.mTextureUnitState->getTextureType())
@@ -606,9 +609,6 @@ void FFPTexturing::setTextureUnit(unsigned short index, TextureUnitState* textur
         curParams.mVSInTextureCoordinateType = GCT_FLOAT3;
         break;
     }   
-
-    if(textureUnitState->isTextureLoadFailing())
-        return;
 
      curParams.mVSOutTextureCoordinateType = curParams.mVSInTextureCoordinateType;
      curParams.mTexCoordCalcMethod = textureUnitState->_deriveTexCoordCalcMethod();
