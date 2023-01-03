@@ -69,14 +69,16 @@ namespace Ogre {
         TU_NOT_SRV = 0x40,
         /// Texture can be bound as an Unordered Access View
         /// (imageStore/imageRead/glBindImageTexture in GL jargon)
-        TU_UAV = 0x80,
+        TU_UNORDERED_ACCESS = 0x80,
         /// Texture can be used as an UAV, but not as a regular texture.
-        TU_UAV_NOT_SRV = TU_UAV | TU_NOT_SRV,
+        TU_UAV_NOT_SRV = TU_UNORDERED_ACCESS | TU_NOT_SRV,
         /// Default to automatic mipmap generation static textures
         TU_DEFAULT = TU_AUTOMIPMAP | HBU_GPU_ONLY,
 
-        // deprecated
-        TU_NOTSHADERRESOURCE = TU_NOT_SRV
+        /// @deprecated
+        TU_NOTSHADERRESOURCE = TU_NOT_SRV,
+        /// @deprecated
+        TU_UAV = TU_UNORDERED_ACCESS
     };
 
     /** Enum identifying the texture access privilege

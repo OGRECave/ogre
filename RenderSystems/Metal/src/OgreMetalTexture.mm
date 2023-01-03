@@ -109,10 +109,10 @@ namespace Ogre
         desc.usage = MTLTextureUsageShaderRead;
         if( mUsage & TU_RENDERTARGET )
             desc.usage |= MTLTextureUsageRenderTarget;
-        if( mUsage & TU_UAV )
+        if( mUsage & TU_UNORDERED_ACCESS )
             desc.usage |= MTLTextureUsageShaderWrite;
 
-        if( mUsage & (TU_UAV|TU_NOT_SRV|TU_RENDERTARGET) )
+        if( mUsage & (TU_UNORDERED_ACCESS|TU_NOT_SRV|TU_RENDERTARGET) )
             desc.storageMode = MTLStorageModePrivate;
 
         mTexture = [mDevice->mDevice newTextureWithDescriptor:desc];

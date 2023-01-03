@@ -425,10 +425,10 @@ namespace Ogre
     {
         VkAccessFlags texAccessFlags = 0;
 
-        if( texture->getUsage() & TU_UAV )
+        if( texture->getUsage() & TU_UNORDERED_ACCESS )
         {
             texAccessFlags |= VK_ACCESS_SHADER_READ_BIT;
-            if( texture->getUsage() & TU_UAV )
+            if( texture->getUsage() & TU_UNORDERED_ACCESS )
                 texAccessFlags |= VK_ACCESS_SHADER_WRITE_BIT;
         }
         if( texture->getUsage() & TU_RENDERTARGET )
