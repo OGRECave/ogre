@@ -1804,7 +1804,7 @@ namespace Ogre
                 continue;
 
             if(mTexStageDesc[n].pTex->getUsage() & TU_UNORDERED_ACCESS)
-                uavs[n] = mTexStageDesc[n].pTex->getUavView(0, 0, PF_UNKNOWN);
+                uavs[n] = mTexStageDesc[n].pTex->getUavView();
             else
             {
                 srvs[n] = mTexStageDesc[n].pTex->getSrvView();
