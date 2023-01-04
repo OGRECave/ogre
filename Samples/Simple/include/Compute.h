@@ -24,9 +24,6 @@ class _OgreSampleClassExport Sample_Compute : public SdkSample
 {
     Entity* mOgreEnt;
 
-    TexturePtr mImage;
-    HardwarePixelBufferSharedPtr mPixelBuffer;
-
  public:
     Sample_Compute();
     void testCapabilities(const RenderSystemCapabilities* caps) override;

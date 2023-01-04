@@ -425,6 +425,12 @@ namespace Ogre {
         if(!tex || tl.isTextureLoadFailing())
             tex = mTextureManager->_getWarningTexture();
 
+        if(tl.getUnorderedAccessMipLevel() > -1)
+        {
+            tex->createShaderAccessPoint(texUnit, TA_READ_WRITE, tl.getUnorderedAccessMipLevel());
+            return;
+        }
+
         // Bind texture (may be blank)
         _setTexture(texUnit, true, tex);
 

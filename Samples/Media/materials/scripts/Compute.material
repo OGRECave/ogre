@@ -5,6 +5,7 @@ compute_program Compute/CS_GLSL glsl
 {
         source ComputeCS.glsl
         syntax glsl430
+        has_sampler_binding true
 
         //TODO how to handle glMemoryBarrier?
         // do other programs need to support this?
@@ -34,6 +35,13 @@ material Compute/Compositor
             {
                 param_named_auto roll time
             }
+
+            texture_unit
+            {
+                // resolution must be 256x256. Contents will be overwritten
+                texture 10points.png 0 PF_BYTE_RGBA
+                unordered_access 0
+            }
         }
     }
 }
@@ -47,6 +55,7 @@ material Compute/Show
             lighting off
             texture_unit
             {
+                texture 10points.png 0 PF_BYTE_RGBA
                 filtering none
                 tex_address_mode clamp
             }

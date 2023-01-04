@@ -857,6 +857,7 @@ namespace Ogre
         ID_AUTO,
         ID_CAMERA,
         ID_ALIGN_TO_FACE,
+        ID_UNORDERED_ACCESS,
 
         ID_END_BUILTIN_IDS
     };
