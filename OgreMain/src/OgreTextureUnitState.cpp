@@ -121,6 +121,7 @@ namespace Ogre {
         : mCurrentFrame(0)
         , mAnimDuration(0)
         , mTextureCoordSetIndex(0)
+        , mUnorderedAccessMipLevel(-1)
         , mGamma(1)
         , mUMod(0)
         , mVMod(0)
@@ -164,6 +165,7 @@ namespace Ogre {
         : mCurrentFrame(0)
         , mAnimDuration(0)
         , mTextureCoordSetIndex(0)
+        , mUnorderedAccessMipLevel(-1)
         , mGamma(1)
         , mUMod(0)
         , mVMod(0)
@@ -1073,6 +1075,9 @@ namespace Ogre {
             return;
 
         tex->setGamma(mGamma);
+
+        if(mUnorderedAccessMipLevel > -1)
+            tex->setUsage(HBU_GPU_ONLY | TU_UNORDERED_ACCESS);
 
         try {
             tex->load();

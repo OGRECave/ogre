@@ -563,6 +563,10 @@ namespace Ogre {
         */
         void setTextureCoordSet(unsigned int set);
 
+        /// Enables Unordered Access to the provided mipLevel of the texture
+        void setUnorderedAccessMipLevel(int mipLevel) { mUnorderedAccessMipLevel = mipLevel; }
+        int getUnorderedAccessMipLevel() const { return mUnorderedAccessMipLevel; }
+
         /** Sets a matrix used to transform any texture coordinates on this layer.
 
             Texture coordinates can be modified on a texture layer to create effects like scrolling
@@ -1081,6 +1085,8 @@ private:
         Real mAnimDuration;
 
         unsigned int mTextureCoordSetIndex;
+
+        int mUnorderedAccessMipLevel;
 
         LayerBlendModeEx mColourBlendMode;
         SceneBlendFactor mColourBlendFallbackSrc;

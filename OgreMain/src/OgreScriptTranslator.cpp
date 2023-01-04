@@ -2638,6 +2638,10 @@ namespace Ogre{
                                                prop->file, prop->line, sval);
                     }
                     break;
+                case ID_UNORDERED_ACCESS:
+                    if(getValue(prop, compiler, uival))
+                        mUnit->setUnorderedAccessMipLevel(uival);
+                    break;
                 case ID_TEXTURE_ALIAS:
                     compiler->addError(ScriptCompiler::CE_DEPRECATEDSYMBOL, prop->file, prop->line,
                         "texture_alias. Use 'texture $variable'");

@@ -954,6 +954,7 @@ Here are the attributes you can use in a @c texture_unit section of a .material 
 -   [transform](#transform)
 -   [content\_type](#content_005ftype)
 -   [sampler_ref](#sampler_ref)
+-   [unordered_access](#unordered_access)
 
 @note Furthermore all attributes of @ref Samplers are available. Using any of them will create a new Ogre::Sampler local to the texture unit.
 This means that any changes you made to the Default Sampler e.g. via Ogre::MaterialManager::setDefaultTextureFiltering have no effect anymore.
@@ -1341,6 +1342,17 @@ Format: sampler_ref &lt;name&gt;
 
 @par
 Example: sampler_ref mySampler
+
+<a name="unordered_access"></a>
+## unordered_access
+
+@copydoc Ogre::TextureUnitState::setUnorderedAccessMipLevel
+
+@par
+Format: unordered_access &lt;mipLevel&gt;
+
+@par
+Example: unordered_access 0
 
 # Samplers {#Samplers}
 
