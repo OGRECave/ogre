@@ -291,6 +291,9 @@ public:
         // Queue passes from mat
         for(auto* pass : technique->getPasses())
         {
+            int tuIdx = 0;
+            for(auto* tu : pass->getTextureUnitStates())
+                rs->_setTextureUnitSettings(tuIdx++, *tu);
             auto params = pass->getGpuProgramParameters(GPT_COMPUTE_PROGRAM);
             params->_updateAutoParams(sm->_getAutoParamDataSource(), GPV_GLOBAL);
             rs->bindGpuProgram(pass->getComputeProgram()->_getBindingDelegate());
