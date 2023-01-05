@@ -1203,7 +1203,7 @@ namespace Ogre
         mIds["auto"] = ID_AUTO;
         mIds["camera"] = ID_CAMERA;
         mIds["align_to_face"] = ID_ALIGN_TO_FACE;
-        mIds["unordered_access"] = ID_UNORDERED_ACCESS;
+        mIds["unordered_access_mip"] = ID_UNORDERED_ACCESS_MIP;
 
 		mLargestRegisteredWordId = ID_END_BUILTIN_IDS;
 	}

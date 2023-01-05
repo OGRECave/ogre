@@ -40,7 +40,7 @@ material Compute/Compositor
             {
                 // resolution must be 256x256. Contents will be overwritten
                 texture 10points.png 0 PF_BYTE_RGBA
-                unordered_access 0
+                unordered_access_mip 0
             }
         }
     }
