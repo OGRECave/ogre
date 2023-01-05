@@ -1921,8 +1921,10 @@ void SceneManager::renderInstancedObject(const RenderableList& rends, const Pass
     auto ielem = ro.vertexData->vertexDeclaration->findElementBySemantic(VES_TEXTURE_COORDINATES, 1);
 
     auto instancingSrc = ro.vertexData->vertexDeclaration->getMaxSource();
-    if(!ielem)
+    if(!ielem || instancingSrc == 0)
     {
+        ro.vertexData->vertexDeclaration->removeElement(VES_TEXTURE_COORDINATES, 1);
+
         instancingSrc += 1;
         auto vec4sz = VertexElement::getTypeSize(VET_FLOAT4);
         ro.vertexData->vertexDeclaration->addElement(instancingSrc, 0 * vec4sz, VET_FLOAT4, VES_TEXTURE_COORDINATES, 1);
