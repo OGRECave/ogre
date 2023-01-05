@@ -2638,7 +2638,7 @@ namespace Ogre{
                                                prop->file, prop->line, sval);
                     }
                     break;
-                case ID_UNORDERED_ACCESS:
+                case ID_UNORDERED_ACCESS_MIP:
                     if(getValue(prop, compiler, uival))
                         mUnit->setUnorderedAccessMipLevel(uival);
                     break;
