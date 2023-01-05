@@ -59,6 +59,7 @@ THE SOFTWARE.
 #include "OgreGpuProgram.h"
 #include "OgreGpuProgramManager.h"
 #include "OgreHardwareBufferManager.h"
+#include "OgreDefaultHardwareBufferManager.h"
 #include "OgreHardwareIndexBuffer.h"
 #include "OgreHardwarePixelBuffer.h"
 #include "OgreHardwareOcclusionQuery.h"

@@ -604,6 +604,7 @@ SHARED_PTR(HardwarePixelBuffer);
 %include "OgreHardwarePixelBuffer.h"
 %ignore Ogre::HardwareBufferManagerBase::_forceReleaseBufferCopies(HardwareVertexBuffer* sourceBuffer);
 %include "OgreHardwareBufferManager.h"
+%include "OgreDefaultHardwareBufferManager.h"
 %include "OgreVertexIndexData.h"
 // managers
 %ignore Ogre::ResourceGroupManager::openResource(const String&, const String&, bool, Resource*) const;
