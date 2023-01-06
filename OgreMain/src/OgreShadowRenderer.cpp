@@ -706,10 +706,12 @@ void SceneManager::ShadowRenderer::destroyShadowTextures(void)
     for (auto cam : mShadowTextureCameras)
     {
         mSceneManager->getRootSceneNode()->removeAndDestroyChild(cam->getParentSceneNode());
+
         // Always destroy camera since they are local to this SM
-        mSceneManager->destroyCamera(cam);
         if(auto cullcam = dynamic_cast<Camera*>(cam->getCullingFrustum()))
             mSceneManager->destroyCamera(cullcam);
+
+        mSceneManager->destroyCamera(cam);
     }
     mShadowTextures.clear();
     mShadowTextureCameras.clear();
