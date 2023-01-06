@@ -114,7 +114,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     const SceneManagerMetaData* SceneManagerEnumerator::getMetaData(const String& typeName) const
     {
-        for (auto *d : mMetaDataList) 
+        for (auto *d : mMetaDataList)
         {
             if (typeName == d->typeName)
             {
@@ -248,7 +248,7 @@ namespace Ogre {
         for (auto& i : mInstances)
         {
             // shutdown instances (clear scene)
-            i.second->clearScene();            
+            i.second->clearScene();
         }
     }
     //-----------------------------------------------------------------------
