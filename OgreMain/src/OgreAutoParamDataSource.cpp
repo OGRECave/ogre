@@ -70,7 +70,7 @@ namespace Ogre {
         mBlankLight.setDiffuseColour(ColourValue::Black);
         mBlankLight.setSpecularColour(ColourValue::Black);
         mBlankLight.setAttenuation(0,1,0,0);
-        mBlankLight._notifyAttached(&mDummyNode);
+        mDummyNode.attachObject(&mBlankLight);
         for(size_t i = 0; i < OGRE_MAX_SIMULTANEOUS_LIGHTS; ++i)
         {
             mTextureViewProjMatrixDirty[i] = true;

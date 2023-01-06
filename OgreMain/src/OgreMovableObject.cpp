@@ -75,22 +75,7 @@ namespace Ogre {
             mListener->objectDestroyed(this);
         }
 
-        if (mParentNode)
-        {
-            // detach from parent
-            if (mParentIsTagPoint)
-            {
-                // May be we are a LOD entity which not in the parent entity child object list,
-                // call this method could safely ignore this case.
-                static_cast<TagPoint*>(mParentNode)->getParentEntity()->detachObjectFromBone(this);
-            }
-            else
-            {
-                // May be we are a LOD entity which not in the parent node child object list,
-                // call this method could safely ignore this case.
-                static_cast<SceneNode*>(mParentNode)->detachObject(this);
-            }
-        }
+        detachFromParent(); // this should never throw, if it does terminating is the thing to do
     }
     //-----------------------------------------------------------------------
     void MovableObject::_notifyAttached(Node* parent, bool isTagPoint)
