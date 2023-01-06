@@ -173,17 +173,10 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void SceneNode::detachObject(MovableObject* obj)
     {
-        ObjectMap::iterator i, iend;
-        iend = mObjectsByName.end();
-        for (i = mObjectsByName.begin(); i != iend; ++i)
-        {
-            if (*i == obj)
-            {
-                std::swap(*i, mObjectsByName.back());
-                mObjectsByName.pop_back();
-                break;
-            }
-        }
+        auto it = std::find(mObjectsByName.begin(), mObjectsByName.end(), obj);
+        OgreAssert(it != mObjectsByName.end(), "Object is not attached to this node");
+        std::swap(*it, mObjectsByName.back());
+        mObjectsByName.pop_back();
         obj->_notifyAttached((SceneNode*)0);
 
         // Make sure bounds get updated (must go right to the top)
@@ -310,8 +303,9 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void SceneNode::removeAndDestroyChild(SceneNode* child)
     {
-        removeAndDestroyChild(std::find(getChildren().begin(), getChildren().end(), child) -
-                              getChildren().begin());
+        auto it = std::find(getChildren().begin(), getChildren().end(), child);
+        OgreAssert(it != getChildren().end(), "Not a child of this SceneNode");
+        removeAndDestroyChild(it - getChildren().begin());
     }
     //-----------------------------------------------------------------------
     void SceneNode::removeAndDestroyAllChildren(void)

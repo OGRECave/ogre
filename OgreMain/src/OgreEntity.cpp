@@ -206,9 +206,8 @@ namespace Ogre {
         for (auto *li : mLodEntityList)
         {
             if(li != this) {
-                // Delete
+                li->mParentNode = NULL; // prevent LODs from unregistering themselves
                 OGRE_DELETE li;
-                li = nullptr;
             }
         }
         mLodEntityList.clear();
@@ -1484,20 +1483,15 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void Entity::detachObjectFromBone(MovableObject* obj)
     {
-        for (auto *o : mChildObjectList)
-        {
-            if (o == obj)
-            {
-                detachObjectImpl(obj);
-                std::swap(o, mChildObjectList.back());
-                mChildObjectList.pop_back();
+        auto it = std::find(mChildObjectList.begin(), mChildObjectList.end(), obj);
+        OgreAssert(it != mChildObjectList.end(), "Object not attached to this entity");
+        detachObjectImpl(*it);
+        std::swap(*it, mChildObjectList.back());
+        mChildObjectList.pop_back();
 
-                // Trigger update of bounding box if necessary
-                if (mParentNode)
-                    mParentNode->needUpdate();
-                break;
-            }
-        }
+        // Trigger update of bounding box if necessary
+        if (mParentNode)
+            mParentNode->needUpdate();
     }
     //-----------------------------------------------------------------------
     void Entity::detachAllObjectsFromBone(void)
