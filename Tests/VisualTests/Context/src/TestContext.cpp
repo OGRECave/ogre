@@ -294,6 +294,12 @@ void TestContext::runSample(OgreBites::Sample* sampleToRun)
             sampleToRun = mTests.front();
     }
 
+    if(mCurrentSample)
+    {
+        mCurrentSample->_shutdown();
+        mCurrentSample = NULL;
+    }
+
     // Set things up to be deterministic
     // Seed rand with a predictable value
     srand(5); // 5 is completely arbitrary, the idea is simply to use a constant
