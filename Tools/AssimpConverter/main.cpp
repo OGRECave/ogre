@@ -212,7 +212,7 @@ int main(int numargs, char** args)
         }
 
         MeshSerializer meshSer;
-        meshSer.exportMesh(mesh.get(), path + basename + ".mesh");
+        meshSer.exportMesh(mesh, path + basename + ".mesh");
 
         if (skeleton)
         {

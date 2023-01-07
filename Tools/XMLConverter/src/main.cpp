@@ -319,7 +319,7 @@ void XMLToBinary(XmlOptions opts, MeshSerializer& meshSerializer)
             }
         }
 
-        meshSerializer.exportMesh(newMesh.get(), opts.dest, opts.endian);
+        meshSerializer.exportMesh(newMesh, opts.dest, opts.endian);
 
         // Clean up the conversion mesh
         MeshManager::getSingleton().remove("conversion", RGN_DEFAULT);
