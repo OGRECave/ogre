@@ -55,22 +55,20 @@ namespace Ogre {
         // Destroy all remaining instances
         // Really should have shutdown and unregistered by now, but catch here in case
         Instances instancesCopy = mInstances;
-        for (Instances::iterator i = instancesCopy.begin(); i != instancesCopy.end(); ++i)
+        for (auto& i : instancesCopy)
         {
             // destroy instances
-            for(Factories::iterator f = mFactories.begin(); f != mFactories.end(); ++f)
+            for(auto *f : mFactories)
             {
-                if ((*f)->getMetaData().typeName == i->second->getTypeName())
+                if (f->getMetaData().typeName == i.second->getTypeName())
                 {
-                    (*f)->destroyInstance(i->second);
-                    mInstances.erase(i->first);
+                    f->destroyInstance(i.second);
+                    mInstances.erase(i.first);
                     break;
                 }
             }
-
         }
         mInstances.clear();
-
     }
     //-----------------------------------------------------------------------
     void SceneManagerEnumerator::addFactory(SceneManagerFactory* fact)
@@ -116,26 +114,23 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     const SceneManagerMetaData* SceneManagerEnumerator::getMetaData(const String& typeName) const
     {
-        for (MetaDataList::const_iterator i = mMetaDataList.begin(); 
-            i != mMetaDataList.end(); ++i)
+        for (auto *d : mMetaDataList)
         {
-            if (typeName == (*i)->typeName)
+            if (typeName == d->typeName)
             {
-                return *i;
+                return d;
             }
         }
 
         OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
             "No metadata found for scene manager of type '" + typeName + "'",
             "SceneManagerEnumerator::createSceneManager");
-
     }
     //-----------------------------------------------------------------------
     SceneManagerEnumerator::MetaDataIterator 
     SceneManagerEnumerator::getMetaDataIterator(void) const
     {
         return MetaDataIterator(mMetaDataList.begin(), mMetaDataList.end());
-
     }
     //-----------------------------------------------------------------------
     SceneManager* SceneManagerEnumerator::createSceneManager(
@@ -149,20 +144,20 @@ namespace Ogre {
         }
 
         SceneManager* inst = 0;
-        for(Factories::iterator i = mFactories.begin(); i != mFactories.end(); ++i)
+        for(auto *f : mFactories)
         {
-            if ((*i)->getMetaData().typeName == typeName)
+            if (f->getMetaData().typeName == typeName)
             {
                 if (instanceName.empty())
                 {
                     // generate a name
                     StringStream s;
                     s << "SceneManagerInstance" << ++mInstanceCreateCount;
-                    inst = (*i)->createInstance(s.str());
+                    inst = f->createInstance(s.str());
                 }
                 else
                 {
-                    inst = (*i)->createInstance(instanceName);
+                    inst = f->createInstance(instanceName);
                 }
                 break;
             }
@@ -195,15 +190,14 @@ namespace Ogre {
         mInstances.erase(sm->getName());
 
         // Find factory to destroy
-        for(Factories::iterator i = mFactories.begin(); i != mFactories.end(); ++i)
+        for(auto *f : mFactories)
         {
-            if ((*i)->getMetaData().typeName == sm->getTypeName())
+            if (f->getMetaData().typeName == sm->getTypeName())
             {
-                (*i)->destroyInstance(sm);
+                f->destroyInstance(sm);
                 break;
             }
         }
-
     }
     //-----------------------------------------------------------------------
     SceneManager* SceneManagerEnumerator::getSceneManager(const String& instanceName) const
@@ -243,21 +237,19 @@ namespace Ogre {
     {
         mCurrentRenderSystem = rs;
 
-        for (Instances::iterator i = mInstances.begin(); i != mInstances.end(); ++i)
+        for (auto& i : mInstances)
         {
-            i->second->_setDestinationRenderSystem(rs);
+            i.second->_setDestinationRenderSystem(rs);
         }
-
     }
     //-----------------------------------------------------------------------
     void SceneManagerEnumerator::shutdownAll(void)
     {
-        for (Instances::iterator i = mInstances.begin(); i != mInstances.end(); ++i)
+        for (auto& i : mInstances)
         {
             // shutdown instances (clear scene)
-            i->second->clearScene();            
+            i.second->clearScene();
         }
-
     }
     //-----------------------------------------------------------------------
     const String DefaultSceneManagerFactory::FACTORY_TYPE_NAME = "DefaultSceneManager";
@@ -289,6 +281,4 @@ namespace Ogre {
         return DefaultSceneManagerFactory::FACTORY_TYPE_NAME;
     }
     //-----------------------------------------------------------------------
-
-
 }

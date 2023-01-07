@@ -54,11 +54,10 @@ namespace Ogre {
         ScriptTokenList tokens;
 
         // Iterate over the input
-        String::const_iterator i = str.begin(), end = str.end();
-        while(i != end)
+        for(char i : str)
         {
             lastc = c;
-            c = *i;
+            c = i;
 
             if(c == quote)
                 lastQuote = line;
@@ -236,8 +235,6 @@ namespace Ogre {
             // Separate check for newlines just to track line numbers
             if(c == cr || (c == lf && lastc != cr))
                 line++;
-
-            i++;
         }
 
         // Check for valid exit states
@@ -323,6 +320,4 @@ namespace Ogre {
     {
         return c == '\n' || c == '\r';
     }
-
 }
-

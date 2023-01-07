@@ -181,7 +181,6 @@ namespace Ogre {
 
         // Make sure bounds get updated (must go right to the top)
         needUpdate();
-
     }
     //-----------------------------------------------------------------------
     void SceneNode::detachAllObjects(void)
@@ -201,11 +200,10 @@ namespace Ogre {
         mWorldAABB.setNull();
 
         // Update bounds from own attached objects
-        ObjectMap::iterator i;
-        for (i = mObjectsByName.begin(); i != mObjectsByName.end(); ++i)
+        for (auto *o : mObjectsByName)
         {
             // Merge world bounds of each object
-            mWorldAABB.merge((*i)->getWorldBoundingBox(true));
+            mWorldAABB.merge(o->getWorldBoundingBox(true));
         }
 
         // Merge with children
@@ -226,13 +224,9 @@ namespace Ogre {
             return;
 
         // Add all entities
-        ObjectMap::iterator iobj;
-        ObjectMap::iterator iobjend = mObjectsByName.end();
-        for (iobj = mObjectsByName.begin(); iobj != iobjend; ++iobj)
+        for (auto *o : mObjectsByName)
         {
-            MovableObject* mo = *iobj;
-
-            queue->processVisibleObject(mo, cam, onlyShadowCasters, visibleBounds);
+            queue->processVisibleObject(o, cam, onlyShadowCasters, visibleBounds);
         }
 
         if (includeChildren)
@@ -589,7 +583,4 @@ namespace Ogre {
             }
         }
     }
-
-
-
 }
