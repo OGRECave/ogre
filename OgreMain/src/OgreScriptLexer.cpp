@@ -54,7 +54,7 @@ namespace Ogre {
         ScriptTokenList tokens;
 
         // Iterate over the input
-        for(auto& i : str)
+        for(char i : str)
         {
             lastc = c;
             c = i;
