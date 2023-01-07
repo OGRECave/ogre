@@ -610,7 +610,7 @@ void Sample_MeshLod::buttonHit( OgreBites::Button* button )
             if(!FileSystemLayer::fileExists(filename + ".orig"))
                 FileSystemLayer::renameFile(filename, filename + ".orig");
             MeshSerializer ms;
-            ms.exportMesh(mLodConfig.mesh.get(), filename);
+            ms.exportMesh(mLodConfig.mesh, filename);
             mTrayMgr->showOkDialog("Success", "Mesh saved to: " + filename);
         }
         if(!mTrayMgr->getTrayContainer(TL_TOP)->isVisible()){

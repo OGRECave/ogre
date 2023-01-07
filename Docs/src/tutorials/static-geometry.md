@@ -50,7 +50,7 @@ Here is an example. Do __not__ add this code to our current project.
 ```cpp
 auto mesh = obj.convertToMesh("GrassBladesMesh");
 Ogre::MeshSerializer ser;
-ser.exportMesh(mesh.get(), "my_grass.mesh");
+ser.exportMesh(mesh, "my_grass.mesh");
 
 Ogre::StaticGeometry* mField;
 ```

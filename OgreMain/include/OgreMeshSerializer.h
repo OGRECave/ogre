@@ -94,18 +94,6 @@ namespace Ogre {
         MeshSerializer();
         virtual ~MeshSerializer();
 
-
-        /** Exports a mesh to the file specified, in the latest format
-
-            This method takes an externally created Mesh object, and exports it
-            to a .mesh file in the latest format version available.
-        @param pMesh Pointer to the Mesh to export
-        @param filename The destination filename
-        @param endianMode The endian mode of the written file
-        */
-        void exportMesh(const Mesh* pMesh, const String& filename,
-            Endian endianMode = ENDIAN_NATIVE);
-
         /** Exports a mesh to the file specified, in a specific version format. 
 
          This method takes an externally created Mesh object, and exports it
@@ -117,36 +105,31 @@ namespace Ogre {
          @param version Mesh version to write
          @param endianMode The endian mode of the written file
          */
-        void exportMesh(const Mesh* pMesh, const String& filename,
-                        MeshVersion version,
+        void exportMesh(const Mesh* pMesh, const String& filename, MeshVersion version,
                         Endian endianMode = ENDIAN_NATIVE);
 
-        /** Exports a mesh to the stream specified, in the latest format. 
+        /// @overload
+        void exportMesh(const Mesh* pMesh, const String& filename, Endian endianMode = ENDIAN_NATIVE)
+        {
+            exportMesh(pMesh, filename, MESH_VERSION_LATEST, endianMode);
+        }
 
-         This method takes an externally created Mesh object, and exports it
-         to a .mesh file in the latest format version. 
-        @param pMesh Pointer to the Mesh to export
-        @param stream Writeable stream
-        @param endianMode The endian mode of the written file
-        */
-        void exportMesh(const Mesh* pMesh, DataStreamPtr stream,
-            Endian endianMode = ENDIAN_NATIVE);
+        /// @overload
+        void exportMesh(const MeshPtr& pMesh, const String& filename, Endian endianMode = ENDIAN_NATIVE)
+        {
+            exportMesh(pMesh.get(), filename, MESH_VERSION_LATEST, endianMode);
+        }
 
-        /** Exports a mesh to the stream specified, in a specific version format. 
+        /// @overload
+        void exportMesh(const Mesh* pMesh, DataStreamPtr stream, Endian endianMode = ENDIAN_NATIVE)
+        {
+            exportMesh(pMesh, stream, MESH_VERSION_LATEST, endianMode);
+        }
 
-         This method takes an externally created Mesh object, and exports it
-         to a .mesh file in the specified format version. Note that picking a
-         format version other that the latest will cause some information to be
-         lost.
-         @param pMesh Pointer to the Mesh to export
-         @param stream Writeable stream
-         @param version Mesh version to write
-         @param endianMode The endian mode of the written file
-         */
-        void exportMesh(const Mesh* pMesh, DataStreamPtr stream,
-                        MeshVersion version,
+        /// @overload
+        void exportMesh(const Mesh* pMesh, DataStreamPtr stream, MeshVersion version,
                         Endian endianMode = ENDIAN_NATIVE);
-        
+
         /** Imports Mesh and (optionally) Material data from a .mesh file DataStream.
 
             This method imports data from a DataStream opened from a .mesh file and places it's

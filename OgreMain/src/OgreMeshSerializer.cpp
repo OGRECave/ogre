@@ -97,16 +97,6 @@ namespace Ogre {
     }
     //---------------------------------------------------------------------
     void MeshSerializer::exportMesh(const Mesh* pMesh, const String& filename,
-        Endian endianMode)
-    {
-        DataStreamPtr stream = _openFileStream(filename, std::ios::binary | std::ios::out);
-
-        exportMesh(pMesh, stream, endianMode);
-
-        stream->close();
-    }
-    //---------------------------------------------------------------------
-    void MeshSerializer::exportMesh(const Mesh* pMesh, const String& filename,
                                     MeshVersion version, Endian endianMode)
     {
         DataStreamPtr stream = _openFileStream(filename, std::ios::binary | std::ios::out);
@@ -114,12 +104,6 @@ namespace Ogre {
         exportMesh(pMesh, stream, version, endianMode);
         
         stream->close();
-    }
-    //---------------------------------------------------------------------
-    void MeshSerializer::exportMesh(const Mesh* pMesh, DataStreamPtr stream,
-        Endian endianMode)
-    {
-        exportMesh(pMesh, stream, MESH_VERSION_LATEST, endianMode);
     }
     //---------------------------------------------------------------------
     void MeshSerializer::exportMesh(const Mesh* pMesh, DataStreamPtr stream,
