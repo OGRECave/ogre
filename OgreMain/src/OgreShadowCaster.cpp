@@ -194,18 +194,12 @@ namespace Ogre {
         size_t preCountIndexes = 0;
 
         si = shadowRenderables.begin();
-        egiend = edgeData->edgeGroups.end();
-        for (egi = edgeData->edgeGroups.begin(); egi != egiend; ++egi, ++si)
+        for (auto& eg : edgeData->edgeGroups)
         {
-            const EdgeData::EdgeGroup& eg = *egi;
+            // const EdgeData::EdgeGroup& eg = *egi;
             bool  firstDarkCapTri = true;
-
-            EdgeData::EdgeList::const_iterator i, iend;
-            iend = eg.edges.end();
-            for (i = eg.edges.begin(); i != iend; ++i)
+            for (auto& edge :  eg.edges)
             {
-                const EdgeData::Edge& edge = *i;
-
                 // Silhouette edge, when two tris has opposite light facing, or
                 // degenerate edge where only tri 1 is valid and the tri light facing
                 char lightFacing = edgeData->triangleLightFacings[edge.triIndex[0]];
@@ -287,6 +281,7 @@ namespace Ogre {
                     }
                 }
             }
+            ++si;
         }
         // End pre-count
         
@@ -327,10 +322,8 @@ namespace Ogre {
         // Iterate over the groups and form renderables for each based on their
         // lightFacing
         si = shadowRenderables.begin();
-        egiend = edgeData->edgeGroups.end();
-        for (egi = edgeData->edgeGroups.begin(); egi != egiend; ++egi, ++si)
+        for (auto& eg : edgeData->edgeGroups)
         {
-            const EdgeData::EdgeGroup& eg = *egi;
             // Initialise the index start for this shadow renderable
             IndexData* indexData = (*si)->getRenderOperationForUpdate()->indexData;
 
@@ -346,12 +339,8 @@ namespace Ogre {
             bool  firstDarkCapTri = true;
             unsigned short darkCapStart = 0;
 
-            EdgeData::EdgeList::const_iterator i, iend;
-            iend = eg.edges.end();
-            for (i = eg.edges.begin(); i != iend; ++i)
+            for (auto& edge : eg.edges)
             {
-                const EdgeData::Edge& edge = *i;
-
                 // Silhouette edge, when two tris has opposite light facing, or
                 // degenerate edge where only tri 1 is valid and the tri light facing
                 char lightFacing = edgeData->triangleLightFacings[edge.triIndex[0]];
@@ -499,6 +488,7 @@ namespace Ogre {
             // update index count for current index data (either this shadow renderable or its light cap)
             indexData->indexCount = numIndices - indexData->indexStart;
 
+            ++si;
         }
 
         // In debug mode, check we didn't overrun the index buffer
