@@ -466,8 +466,8 @@ namespace Ogre
                 node->type = CNT_QUOTE;
                 break;
             default:
-                OGRE_EXCEPT(Exception::ERR_INVALID_STATE, 
-                    Ogre::String("unexpected token") + token.lexeme + " at line " + 
+                OGRE_EXCEPT(Exception::ERR_INVALID_STATE,
+                    Ogre::String("unexpected token") + token.lexeme + " at line " +
                         Ogre::StringConverter::toString(token.line),
                     "ScriptParser::parseChunk");
             }
