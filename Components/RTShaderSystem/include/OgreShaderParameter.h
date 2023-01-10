@@ -379,6 +379,9 @@ public:
     bool isHighP() const { return mIsHighP; }
     void setHighP(bool highP) { mIsHighP = highP; }
 
+    const String& getStructType() const { return mStructType; }
+    void setStructType(const String& structType) { mStructType = structType; }
+
 // Attributes.
 protected:
     // Name of this parameter.
@@ -389,6 +392,10 @@ protected:
 
     // Type of this parameter.
     GpuConstantType mType;
+
+    // Type, if this is a struct
+    String mStructType;
+
     // Semantic of this parameter.
     Semantic mSemantic;
     // Index of this parameter.

@@ -423,6 +423,24 @@ ParameterPtr Function::resolveLocalParameter(GpuConstantType type, const String&
     return param;
 }
 
+ParameterPtr Function::resolveLocalStructParameter(const String& type, const String& name)
+{
+    ParameterPtr param;
+
+    param = _getParameterByName(mLocalParameters, name);
+    if (param)
+    {
+        OgreAssert(param->getStructType() == type, "A parameter with the same name but different type already exists");
+        return param;
+    }
+
+    param = std::make_shared<Parameter>(GCT_UNKNOWN, name, Parameter::SPS_UNKNOWN, 0, Parameter::SPC_UNKNOWN);
+    param->setStructType(type);
+    addParameter(mLocalParameters, param);
+
+    return param;
+}
+
 //-----------------------------------------------------------------------------
 ParameterPtr Function::resolveLocalParameter(const Parameter::Content content, GpuConstantType type)
 {
