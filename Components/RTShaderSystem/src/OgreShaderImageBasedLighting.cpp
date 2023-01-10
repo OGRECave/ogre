@@ -71,11 +71,10 @@ bool ImageBasedLighting::createCpuSubPrograms(ProgramSet* programSet)
     auto vsOutViewPos = vsMain->resolveOutputParameter(Parameter::SPC_POSITION_VIEW_SPACE);
     auto viewPos = psMain->resolveInputParameter(vsOutViewPos);
 
-    auto mrparams = psMain->getLocalParameter("metalRoughness");
-    auto baseColor = psMain->getLocalParameter("baseColor");
+    auto pixel = psMain->getLocalParameter("pixel");
     mLuminanceParam = psProgram->resolveParameter(GCT_FLOAT1, "luminance");
 
-    if (!mrparams)
+    if (!pixel)
     {
         LogManager::getSingleton().logError("image_based_lighting must be used with the metal_roughness SRS");
         return true;
@@ -98,10 +97,10 @@ bool ImageBasedLighting::createCpuSubPrograms(ProgramSet* programSet)
     auto iblEnvSize = psProgram->resolveParameter(GpuProgramParameters::ACT_TEXTURE_SIZE, mEnvMapSamplerIndex);
     auto invViewMat = psProgram->resolveParameter(GpuProgramParameters::ACT_INVERSE_VIEW_MATRIX);
 
-    auto fstage = psMain->getStage(FFP_PS_COLOUR_END + 60); // run after CookTorrance
+    auto fstage = psMain->getStage(FFP_PS_COLOUR_END + 55); // run before CookTorrance evaluation
 
     fstage.callFunction("evaluateIBL",
-                        {In(baseColor), In(mrparams), In(viewNormal), In(viewPos), In(invViewMat), In(dfgLUTSampler), In(iblEnvSampler),
+                        {InOut(pixel), In(viewNormal), In(viewPos), In(invViewMat), In(dfgLUTSampler), In(iblEnvSampler),
                          In(iblEnvSize).w(), In(mLuminanceParam), InOut(outDiffuse).xyz()});
 
     return true;
