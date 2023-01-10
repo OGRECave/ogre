@@ -437,41 +437,38 @@ namespace Ogre
         auto nodes = std::make_shared<ConcreteNodeList>();
 
         ConcreteNodePtr node;
-        const ScriptToken *token = 0;
-        for(const auto & i : tokens)
+        for(const auto& token : tokens)
         {
-            token = &i;
-
-            switch(token->type)
+            switch(token.type)
             {
             case TID_VARIABLE:
                 node = std::make_shared<ConcreteNode>();
                 node->file = file;
-                node->line = token->line;
+                node->line = token.line;
                 node->parent = 0;
-                node->token = token->lexeme;
+                node->token = token.lexeme;
                 node->type = CNT_VARIABLE;
                 break;
             case TID_WORD:
                 node = std::make_shared<ConcreteNode>();
                 node->file = file;
-                node->line = token->line;
+                node->line = token.line;
                 node->parent = 0;
-                node->token = token->lexeme;
+                node->token = token.lexeme;
                 node->type = CNT_WORD;
                 break;
             case TID_QUOTE:
                 node = std::make_shared<ConcreteNode>();
                 node->file = file;
-                node->line = token->line;
+                node->line = token.line;
                 node->parent = 0;
-                node->token= unquoted(token->lexeme);
+                node->token= unquoted(token.lexeme);
                 node->type = CNT_QUOTE;
                 break;
             default:
-                OGRE_EXCEPT(Exception::ERR_INVALID_STATE, 
-                    Ogre::String("unexpected token") + token->lexeme + " at line " + 
-                        Ogre::StringConverter::toString(token->line),
+                OGRE_EXCEPT(Exception::ERR_INVALID_STATE,
+                    Ogre::String("unexpected token") + token.lexeme + " at line " +
+                        Ogre::StringConverter::toString(token.line),
                     "ScriptParser::parseChunk");
             }
 
