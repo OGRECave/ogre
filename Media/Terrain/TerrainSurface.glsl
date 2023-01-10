@@ -26,6 +26,8 @@ void getShadowFactor(in sampler2D lightmap, in vec2 uv, inout float shadowFactor
     shadowFactor = min(shadowFactor, lmShadow);
 }
 
+#define MIN_BLEND_WEIGHT 0.0039 // 1/255
+
 void blendTerrainLayer(in float blendWeight, in f32vec2 uv0, in float uvMul,
 #ifdef TERRAIN_PARALLAX_MAPPING
                     in vec3 viewPos, in vec2 scaleBias,
@@ -35,6 +37,9 @@ void blendTerrainLayer(in float blendWeight, in f32vec2 uv0, in float uvMul,
 #endif
                     in sampler2D difftex, inout vec4 diffuseSpec)
 {
+    if(blendWeight < MIN_BLEND_WEIGHT)
+        return;
+
     // generate UV
     vec2 uv = mod(uv0 * uvMul, 1.0);
 
