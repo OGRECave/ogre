@@ -112,9 +112,14 @@ bool CookTorranceLighting::createCpuSubPrograms(ProgramSet* programSet)
     auto diffuse = psProgram->resolveParameter(GpuProgramParameters::ACT_SURFACE_DIFFUSE_COLOUR);
     auto baseColor = psMain->resolveLocalParameter(GCT_FLOAT3, "baseColor");
 
-    fstage.mul(In(diffuse).xyz(), In(outDiffuse).xyz(), baseColor);
-    fstage.assign(Vector4(0), litResult);
+    auto pixelParams = psMain->resolveLocalStructParameter("PixelParams", "pixel");
 
+    fstage.mul(In(diffuse).xyz(), In(outDiffuse).xyz(), baseColor);
+    fstage.assign(Vector3(0), Out(outDiffuse).xyz());
+
+    fstage.callFunction("PBR_MakeParams", {In(baseColor), In(mrparams), InOut(pixelParams)});
+
+    fstage = psMain->getStage(FFP_PS_COLOUR_END + 60); // make gap to inject IBL here
     if(mLightCount > 0)
     {
         auto lightPos = psProgram->resolveParameter(GpuProgramParameters::ACT_LIGHT_POSITION_VIEW_SPACE_ARRAY, mLightCount);
@@ -125,7 +130,7 @@ bool CookTorranceLighting::createCpuSubPrograms(ProgramSet* programSet)
 
         std::vector<Operand> params = {In(viewNormal),       In(viewPos),     In(sceneCol),          In(lightPos),
                                        In(lightDiffuse),     In(pointParams), In(lightDirView),      In(spotParams),
-                                       In(baseColor),        In(mrparams),    InOut(litResult).xyz()};
+                                       In(pixelParams),      InOut(outDiffuse).xyz()};
 
         if (auto shadowFactor = psMain->getLocalParameter("lShadowFactor"))
         {
@@ -135,8 +140,6 @@ bool CookTorranceLighting::createCpuSubPrograms(ProgramSet* programSet)
 
         fstage.callFunction("PBR_Lights", params);
     }
-
-    fstage.assign(In(litResult).xyz(), Out(outDiffuse).xyz());
 
     return true;
 }

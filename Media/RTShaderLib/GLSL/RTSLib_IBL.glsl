@@ -2,8 +2,8 @@
 // code adapted from Google Filament
 // SPDX-License-Identifier: Apache-2.0
 
-vec3 specularDFG(const vec3 dfg, vec3 f0) {
-    return mix(dfg.xxx, dfg.yyy, f0);
+vec3 specularDFG(const PixelParams pixel) {
+    return mix(pixel.dfg.xxx, pixel.dfg.yyy, pixel.f0);
 }
 
 vec3 decodeDataForIBL(const vec4 data) {
@@ -36,8 +36,7 @@ vec3 getSpecularDominantDirection(const vec3 n, const vec3 r, float roughness) {
     return mix(r, n, roughness * roughness);
 }
 
-void evaluateIBL(in vec3 baseColor,
-                 in vec2 mrParam,
+void evaluateIBL(inout PixelParams pixel,
                  in vec3 vNormal,
                  in vec3 viewPos,
                  in mat4 invViewMat,
@@ -47,20 +46,6 @@ void evaluateIBL(in vec3 baseColor,
                  in float iblLuminance,
                  inout vec3 color)
 {
-    // gamma to linear
-    baseColor = pow(baseColor, vec3_splat(2.2));
-
-    float perceptualRoughness = mrParam.x;
-    float metallic = saturate(mrParam.y);
-
-    // Clamp the roughness to a minimum value to avoid divisions by 0 during lighting
-    perceptualRoughness = clamp(perceptualRoughness, MIN_PERCEPTUAL_ROUGHNESS, 1.0);
-    // Remaps the roughness to a perceptually linear roughness (roughness^2)
-    float roughness = perceptualRoughnessToRoughness(perceptualRoughness);
-
-    vec3 f0 = computeF0(baseColor, metallic, 0.04);
-    vec3 diffuseColor = computeDiffuseColor(baseColor, metallic);
-
     vec3 shading_normal = normalize(vNormal);
     vec3 shading_view = -normalize(viewPos);
     float shading_NoV = clampNoV(abs(dot(shading_normal, shading_view)));
@@ -70,10 +55,10 @@ void evaluateIBL(in vec3 baseColor,
     vec3 shading_reflected = reflect(-shading_view, shading_normal);
 
     // Pre-filtered DFG term used for image-based lighting
-    vec3 dfg = PrefilteredDFG_LUT(dfgTex, perceptualRoughness, shading_NoV);
+    pixel.dfg = PrefilteredDFG_LUT(dfgTex, pixel.perceptualRoughness, shading_NoV);
 
-    vec3 E = specularDFG(dfg, f0);
-    vec3 r = getSpecularDominantDirection(shading_normal, shading_reflected, roughness);
+    vec3 E = specularDFG(pixel);
+    vec3 r = getSpecularDominantDirection(shading_normal, shading_reflected, pixel.roughness);
 
     // OGRE specific: convert r and n back to world space for texture sampling
     r = normalize(mul(invViewMat, vec4(r, 0.0)).xyz);
@@ -81,10 +66,10 @@ void evaluateIBL(in vec3 baseColor,
     shading_normal = normalize(mul(invViewMat, vec4(shading_normal, 0.0)).xyz);
 
     // specular layer
-    vec3 Fr = E * prefilteredRadiance(iblEnvTex, r, perceptualRoughness, iblRoughnessOneLevel);
+    vec3 Fr = E * prefilteredRadiance(iblEnvTex, r, pixel.perceptualRoughness, iblRoughnessOneLevel);
 
     vec3 diffuseIrradiance = Irradiance_RoughnessOne(iblEnvTex, shading_normal, iblRoughnessOneLevel);
-    vec3 Fd = diffuseColor * diffuseIrradiance * (1.0 - E);
+    vec3 Fd = pixel.diffuseColor * diffuseIrradiance * (1.0 - E);
 
     Fr *= iblLuminance;
     Fd *= iblLuminance;
@@ -98,5 +83,5 @@ void evaluateIBL(in vec3 baseColor,
 
     // linear to gamma
     color = pow(color, vec3_splat(1.0/2.2));
-    //color = saturate(color);
+    color = saturate(color);
 }
