@@ -103,7 +103,6 @@ private:
                const Options& options);
     bool createSubMesh(const String& name, int index, const aiNode* pNode, const aiMesh* mesh,
                        const aiMaterial* mat, Mesh* mMesh, AxisAlignedBox& mAAB);
-    MaterialPtr createMaterial(const aiMaterial* mat, const Ogre::String &group);
     void grabNodeNamesFromNode(const aiScene* mScene, const aiNode* pNode);
     void grabBoneNamesFromNode(const aiScene* mScene, const aiNode* pNode);
     void computeNodesDerivedTransform(const aiScene* mScene, const aiNode* pNode,

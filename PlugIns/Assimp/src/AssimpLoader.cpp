@@ -853,7 +853,7 @@ void AssimpLoader::grabBoneNamesFromNode(const aiScene* mScene, const aiNode* pN
     }
 }
 
-MaterialPtr AssimpLoader::createMaterial(const aiMaterial* mat, const Ogre::String &group)
+static MaterialPtr createMaterial(const aiMaterial* mat, const Ogre::String &group, const String& meshName, bool verbose)
 {
     static int dummyMatCount = 0;
 
@@ -865,36 +865,33 @@ MaterialPtr AssimpLoader::createMaterial(const aiMaterial* mat, const Ogre::Stri
     aiString szPath;
     if (AI_SUCCESS == aiGetMaterialString(mat, AI_MATKEY_NAME, &szPath))
     {
-        if (!mQuietMode)
+        if (verbose)
         {
             LogManager::getSingleton().logMessage("Using aiGetMaterialString : Name " +
                                                   String(szPath.data));
         }
     }
 
-    MaterialPtr omat;
+    String matName = meshName;
     if(szPath.length)
     {
-        auto status = omatMgr->createOrRetrieve(ReplaceSpaces(szPath.data), group);
-        omat = static_pointer_cast<Material>(status.first);
-
-        if (!status.second)
-            return omat;
-
-        if (!mQuietMode)
-        {
-            LogManager::getSingleton().logMessage("Creating " + String(szPath.data));
-        }
+        matName += String(szPath.data);
+        matName = ReplaceSpaces(matName);
     }
     else
     {
-        if (!mQuietMode)
-        {
-            LogManager::getSingleton().logMessage("Unnamed material encountered...");
-        }
+        matName += StringUtil::format("dummyMat%d", dummyMatCount++);
+    }
 
-        omat = omatMgr->getDefaultMaterial(false)->clone("dummyMat" +
-                                                         StringConverter::toString(dummyMatCount++), group);
+    auto status = omatMgr->createOrRetrieve(matName, group);
+    auto omat = static_pointer_cast<Material>(status.first);
+
+    if (!status.second)
+        return omat;
+
+    if (verbose)
+    {
+        LogManager::getSingleton().logMessage("Creating " + matName);
     }
 
     // ambient
@@ -955,7 +952,7 @@ MaterialPtr AssimpLoader::createMaterial(const aiMaterial* mat, const Ogre::Stri
     String outPath;
     if (mat->GetTexture(type, 0, &path) == AI_SUCCESS)
     {
-        if (!mQuietMode)
+        if (verbose)
         {
             LogManager::getSingleton().logMessage("Found texture " + String(path.data) + " for channel " +
                                                   StringConverter::toString(uvindex));
@@ -969,7 +966,7 @@ MaterialPtr AssimpLoader::createMaterial(const aiMaterial* mat, const Ogre::Stri
 
     if (mat->GetTexture(aiTextureType_EMISSIVE, 0, &path) == AI_SUCCESS)
     {
-        if (!mQuietMode)
+        if (verbose)
         {
             LogManager::getSingleton().logMessage("Found emissive map: " + String(path.data));
         }
@@ -987,7 +984,7 @@ MaterialPtr AssimpLoader::createMaterial(const aiMaterial* mat, const Ogre::Stri
 
     if (mat->GetTexture(aiTextureType_NORMALS, 0, &path) == AI_SUCCESS)
     {
-        if (!mQuietMode)
+        if (verbose)
         {
             LogManager::getSingleton().logMessage("Found normal map: " + String(path.data));
         }
@@ -1003,7 +1000,7 @@ MaterialPtr AssimpLoader::createMaterial(const aiMaterial* mat, const Ogre::Stri
 
     if (mat->GetTexture(aiTextureType_UNKNOWN, 0, &path) == AI_SUCCESS)
     {
-        if (!mQuietMode)
+        if (verbose)
         {
             LogManager::getSingleton().logMessage("Found metal roughness map: " + String(path.data));
         }
@@ -1039,7 +1036,7 @@ bool AssimpLoader::createSubMesh(const String& name, int index, const aiNode* pN
         return false;
     }
 
-    MaterialPtr matptr = createMaterial(mat, mMesh->getGroup());
+    MaterialPtr matptr = createMaterial(mat, mMesh->getGroup(), mMesh->getName(), !mQuietMode);
 
     // now begin the object definition
     // We create a submesh per material
