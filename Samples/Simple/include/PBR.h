@@ -85,7 +85,7 @@ protected:
     void checkBoxToggled(CheckBox* box) override
     {
         bool checked = box->isChecked();
-        mParams->setNamedConstant("u_ScaleIBLAmbient", Vector4f(float(checked)));
+        mParams->setNamedConstant("u_ScaleIBLAmbient", Vector4(float(checked)));
 
         using namespace RTShader;
         MaterialPtr mat = MaterialManager::getSingleton().getByName("DamagedHelmet_RTSS");
