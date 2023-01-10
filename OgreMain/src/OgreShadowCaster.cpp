@@ -196,7 +196,6 @@ namespace Ogre {
         si = shadowRenderables.begin();
         for (auto& eg : edgeData->edgeGroups)
         {
-            // const EdgeData::EdgeGroup& eg = *egi;
             bool  firstDarkCapTri = true;
             for (auto& edge :  eg.edges)
             {
