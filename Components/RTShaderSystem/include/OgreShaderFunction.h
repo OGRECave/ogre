@@ -190,6 +190,9 @@ public:
     */
     ParameterPtr resolveLocalParameter(Parameter::Content content, GpuConstantType type = GCT_UNKNOWN);
 
+
+    ParameterPtr resolveLocalStructParameter(const String& type, const String& name);
+
     /**
      * get local parameter by content
      * @param content

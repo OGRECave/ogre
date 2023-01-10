@@ -70,6 +70,12 @@ ProgramWriter::~ProgramWriter() {}
 
 void ProgramWriter::writeParameter(std::ostream& os, const ParameterPtr& parameter)
 {
+    if (!parameter->getStructType().empty())
+    {
+        os << parameter->getStructType() << '\t' << parameter->getName();
+        return;
+    }
+
     os << mGpuConstTypeMap[parameter->getType()] << '\t' << parameter->getName();
     if (parameter->isArray())
         os << '[' << parameter->getSize() << ']';
