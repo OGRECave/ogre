@@ -71,7 +71,7 @@ abstract material Filament
             }
             texture_unit IBL_SPECULAR
             {
-                texture $IBL_SPECULAR cubic
+                texture $IBL_SPECULAR cubic gamma
                 sampler_ref PBRIBLSampler
             }
             texture_unit SSAO
