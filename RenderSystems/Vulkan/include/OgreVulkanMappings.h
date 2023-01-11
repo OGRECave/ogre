@@ -58,7 +58,7 @@ namespace Ogre
         static VkSamplerAddressMode get( TextureAddressingMode mode );
 
         static VkImageViewType get( TextureType textureType );
-        static VkFormat get( PixelFormatGpu pf );
+        static VkFormat get( PixelFormat pf, bool hwGamma = false);
         static VkImageAspectFlags getImageAspect( PixelFormatGpu pf,
                                                   const bool bPreferDepthOverStencil = false );
 
