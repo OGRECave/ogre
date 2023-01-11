@@ -212,7 +212,7 @@ namespace Ogre
         imageInfo.mipLevels = mNumMipmaps + 1;
         imageInfo.arrayLayers = getNumFaces();
         imageInfo.flags = 0;
-        imageInfo.format = VulkanMappings::get( mFormat );
+        imageInfo.format = VulkanMappings::get( mFormat, mHwGamma );
         imageInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
         imageInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
         imageInfo.usage = VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT;
@@ -583,7 +583,7 @@ namespace Ogre
         VkImageViewCreateInfo imageViewCi = {VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO};
         imageViewCi.image = imageOverride ? imageOverride : mFinalTextureName;
         imageViewCi.viewType = texType;
-        imageViewCi.format = VulkanMappings::get( mFormat );
+        imageViewCi.format = VulkanMappings::get( mFormat, mHwGamma );
 
         if (PixelUtil::isLuminance(mFormat) && !PixelUtil::isDepth(mFormat))
         {

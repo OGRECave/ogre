@@ -286,7 +286,7 @@ namespace Ogre
         return VK_IMAGE_VIEW_TYPE_2D;
     }
     //-----------------------------------------------------------------------------------
-    VkFormat VulkanMappings::get( PixelFormat pf )
+    VkFormat VulkanMappings::get( PixelFormat pf, bool hwGamma )
     {
         // clang-format off
         switch( pf )
@@ -310,8 +310,7 @@ namespace Ogre
         //case PF_R10G10B10A2_UINT:      return VK_FORMAT_A2B10G10R10_UINT_PACK32;
         case PF_R11G11B10_FLOAT:       return VK_FORMAT_B10G11R11_UFLOAT_PACK32;
         case PF_X8B8G8R8:
-        case PF_A8B8G8R8:           return VK_FORMAT_R8G8B8A8_UNORM;
-        //case PF_RGBA8_UNORM_SRGB:      return VK_FORMAT_R8G8B8A8_SRGB;
+        case PF_A8B8G8R8:           return hwGamma ? VK_FORMAT_R8G8B8A8_SRGB : VK_FORMAT_R8G8B8A8_UNORM;
         //case PF_A8B8G8R8_UINT:            return VK_FORMAT_R8G8B8A8_UINT;
         //case PF_A8B8G8R8_SNORM:           return VK_FORMAT_R8G8B8A8_SNORM;
         //case PF_A8B8G8R8_SINT:            return VK_FORMAT_R8G8B8A8_SINT;
@@ -345,17 +344,14 @@ namespace Ogre
         case PF_R8_SNORM:              return VK_FORMAT_R8_SNORM;
         case PF_R8_SINT:               return VK_FORMAT_R8_SINT;
         case PF_R9G9B9E5_SHAREDEXP:    return VK_FORMAT_E5B9G9R9_UFLOAT_PACK32;
-        case PF_DXT1:                  return VK_FORMAT_BC1_RGBA_UNORM_BLOCK;
-        case PF_DXT2:                  return VK_FORMAT_BC1_RGBA_UNORM_BLOCK;
-        case PF_DXT3:                  return VK_FORMAT_BC2_UNORM_BLOCK;
-        case PF_DXT4:                  return VK_FORMAT_BC2_UNORM_BLOCK;
-        case PF_DXT5:                  return VK_FORMAT_BC3_UNORM_BLOCK;
+        case PF_DXT1:                  return hwGamma ? VK_FORMAT_BC1_RGBA_SRGB_BLOCK : VK_FORMAT_BC1_RGBA_UNORM_BLOCK;
+        case PF_DXT2:                  return hwGamma ? VK_FORMAT_BC1_RGBA_SRGB_BLOCK : VK_FORMAT_BC1_RGBA_UNORM_BLOCK;
+        case PF_DXT3:                  return hwGamma ? VK_FORMAT_BC2_SRGB_BLOCK : VK_FORMAT_BC2_UNORM_BLOCK;
+        case PF_DXT4:                  return hwGamma ? VK_FORMAT_BC2_SRGB_BLOCK : VK_FORMAT_BC2_UNORM_BLOCK;
+        case PF_DXT5:                  return hwGamma ? VK_FORMAT_BC3_SRGB_BLOCK : VK_FORMAT_BC3_UNORM_BLOCK;
 #if 0
         case PF_R8G8_B8G8_UNORM:       return VK_FORMAT_B8G8R8G8_422_UNORM;
         case PF_G8R8_G8B8_UNORM:       return VK_FORMAT_G8B8G8R8_422_UNORM;
-        case PF_BC1_UNORM_SRGB:        return VK_FORMAT_BC1_RGBA_SRGB_BLOCK;
-        case PF_BC2_UNORM_SRGB:        return VK_FORMAT_BC2_SRGB_BLOCK;
-        case PF_BC3_UNORM_SRGB:        return VK_FORMAT_BC3_SRGB_BLOCK;
 #endif
         case PF_BC4_UNORM:             return VK_FORMAT_BC4_UNORM_BLOCK;
         case PF_BC4_SNORM:             return VK_FORMAT_BC4_SNORM_BLOCK;
@@ -364,11 +360,9 @@ namespace Ogre
         case PF_R5G6B5:                return VK_FORMAT_R5G6B5_UNORM_PACK16;
         case PF_B5G6R5:                return VK_FORMAT_B5G6R5_UNORM_PACK16;
         case PF_A1R5G5B5:              return VK_FORMAT_B5G5R5A1_UNORM_PACK16;
-        case PF_A8R8G8B8:              return VK_FORMAT_B8G8R8A8_UNORM;
-        case PF_X8R8G8B8:              return VK_FORMAT_B8G8R8A8_UNORM;
+        case PF_A8R8G8B8:              return hwGamma ? VK_FORMAT_B8G8R8A8_SRGB : VK_FORMAT_B8G8R8A8_UNORM;
+        case PF_X8R8G8B8:              return hwGamma ? VK_FORMAT_B8G8R8A8_SRGB : VK_FORMAT_B8G8R8A8_UNORM;
         //case PF_R10G10B10_XR_BIAS_A2_UNORM:return VK_FORMAT_A2R10G10B10_USCALED_PACK32;
-        //case PF_BGRA8_UNORM_SRGB:      return VK_FORMAT_B8G8R8A8_SRGB;
-        //case PF_BGRX8_UNORM_SRGB:      return VK_FORMAT_B8G8R8A8_SRGB;
         case PF_BC6H_UF16:             return VK_FORMAT_BC6H_UFLOAT_BLOCK;
         case PF_BC6H_SF16:             return VK_FORMAT_BC6H_SFLOAT_BLOCK;
         case PF_BC7_UNORM:             return VK_FORMAT_BC7_UNORM_BLOCK;

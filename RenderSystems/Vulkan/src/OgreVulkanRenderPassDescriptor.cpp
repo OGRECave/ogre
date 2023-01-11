@@ -157,7 +157,7 @@ namespace Ogre
         }
 
         VkAttachmentDescription &attachment = attachments[currAttachmIdx];
-        attachment.format = VulkanMappings::get( texture->getFormat() );
+        attachment.format = VulkanMappings::get( texture->getFormat(), texture->isHardwareGammaEnabled() );
         attachment.samples = bResolveTex ? VK_SAMPLE_COUNT_1_BIT : VkSampleCountFlagBits(colour->getFSAA());
         attachment.loadOp = bResolveTex ? VK_ATTACHMENT_LOAD_OP_DONT_CARE : VK_ATTACHMENT_LOAD_OP_CLEAR;// TODO colour.loadAction );
         attachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE; // TODO colour.storeAction
