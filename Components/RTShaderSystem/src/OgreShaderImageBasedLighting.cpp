@@ -56,6 +56,7 @@ bool ImageBasedLighting::preAddToRenderState(const RenderState* renderState, Pas
     mDfgLUTSamplerIndex = dstPass->getNumTextureUnitStates() - 1;
 
     tus = dstPass->createTextureUnitState(mEnvMapName);
+    tus->setHardwareGammaEnabled(true);
     mEnvMapSamplerIndex = dstPass->getNumTextureUnitStates() - 1;
 
     return true;

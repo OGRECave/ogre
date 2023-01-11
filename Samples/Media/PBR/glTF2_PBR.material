@@ -34,11 +34,11 @@ material glTF2/PBR
             }
             texture_unit IBL_Diffuse
 			{
-				texture $IBL_Diffuse cubic
+				texture $IBL_Diffuse cubic gamma
 			}
             texture_unit IBL_Specular
 			{
-				texture $IBL_Specular cubic
+				texture $IBL_Specular cubic gamma
 			}
 			texture_unit IBL_LUT
 			{
