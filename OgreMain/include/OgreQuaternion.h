@@ -67,8 +67,8 @@ namespace Ogre {
         {}
         /// Construct from an explicit list of values
         inline Quaternion (
-            float fW,
-            float fX, float fY, float fZ)
+            Real fW,
+            Real fX, Real fY, Real fZ)
             : w(fW), x(fX), y(fY), z(fZ)
         {
         }
@@ -93,9 +93,9 @@ namespace Ogre {
             this->FromAxes(akAxis);
         }
         /// Construct a quaternion from 4 manual w/x/y/z values
-        inline Quaternion(float* valptr)
+        inline Quaternion(Real* valptr)
         {
-            memcpy(&w, valptr, sizeof(float)*4);
+            memcpy(&w, valptr, sizeof(Real)*4);
         }
 
         /** Exchange the contents of this quaternion with another. 
@@ -109,7 +109,7 @@ namespace Ogre {
         }
 
         /// Array accessor operator
-        inline float operator [] ( const size_t i ) const
+        inline Real operator [] ( const size_t i ) const
         {
             assert( i < 4 );
 
@@ -117,7 +117,7 @@ namespace Ogre {
         }
 
         /// Array accessor operator
-        inline float& operator [] ( const size_t i )
+        inline Real& operator [] ( const size_t i )
         {
             assert( i < 4 );
 
@@ -125,13 +125,13 @@ namespace Ogre {
         }
 
         /// Pointer accessor for direct copying
-        inline float* ptr()
+        inline Real* ptr()
         {
             return &w;
         }
 
         /// Pointer accessor for direct copying
-        inline const float* ptr() const
+        inline const Real* ptr() const
         {
             return &w;
         }
@@ -183,11 +183,11 @@ namespace Ogre {
         Quaternion operator+ (const Quaternion& rkQ) const;
         Quaternion operator- (const Quaternion& rkQ) const;
         Quaternion operator*(const Quaternion& rkQ) const;
-        Quaternion operator*(float s) const
+        Quaternion operator*(Real s) const
         {
             return Quaternion(s * w, s * x, s * y, s * z);
         }
-        friend Quaternion operator*(float s, const Quaternion& q)
+        friend Quaternion operator*(Real s, const Quaternion& q)
         {
             return q * s;
         }
@@ -203,16 +203,16 @@ namespace Ogre {
         }
         // functions of a quaternion
         /// Returns the dot product of the quaternion
-        float Dot(const Quaternion& rkQ) const
+        Real Dot(const Quaternion& rkQ) const
         {
             return w * rkQ.w + x * rkQ.x + y * rkQ.y + z * rkQ.z;
         }
         /// Returns the normal length of this quaternion.
-        float Norm() const { return std::sqrt(w * w + x * x + y * y + z * z); }
+        Real Norm() const { return Math::Sqrt(w * w + x * x + y * y + z * z); }
         /// Normalises this quaternion, and returns the previous length
-        float normalise(void)
+        Real normalise(void)
         {
-            float len = Norm();
+            Real len = Norm();
             *this = 1.0f / len * *this;
             return len;
         }
@@ -264,7 +264,7 @@ namespace Ogre {
         */
         bool equals(const Quaternion& rhs, const Radian& tolerance) const
         {
-            float d = Dot(rhs);
+            Real d = Dot(rhs);
             Radian angle = Math::ACos(2.0f * d*d - 1.0f);
 
             return Math::Abs(angle.valueRadians()) <= tolerance.valueRadians();
@@ -278,9 +278,9 @@ namespace Ogre {
             therefore be careful if your code relies in the order of the operands.
             This is specially important in IK animation.
         */
-        inline bool orientationEquals( const Quaternion& other, float tolerance = 1e-3f ) const
+        inline bool orientationEquals( const Quaternion& other, Real tolerance = 1e-3f ) const
         {
-            float d = this->Dot(other);
+            Real d = this->Dot(other);
             return 1 - d*d < tolerance;
         }
         
@@ -335,13 +335,13 @@ namespace Ogre {
             const Quaternion& rkQ, bool shortestPath = false);
 
         /// Cutoff for sine near zero
-        static const float msEpsilon;
+        static const Real msEpsilon;
 
         // special values
         static const Quaternion ZERO;
         static const Quaternion IDENTITY;
 
-        float w, x, y, z;
+        Real w, x, y, z;
 
         /// Check whether this quaternion contains valid values
         inline bool isNaN() const
