@@ -36,7 +36,7 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-    const float Quaternion::msEpsilon = 1e-03;
+    const Real Quaternion::msEpsilon = 1e-03;
     const Quaternion Quaternion::ZERO(0,0,0,0);
     const Quaternion Quaternion::IDENTITY(1,0,0,0);
 
@@ -72,7 +72,7 @@ namespace Ogre {
             size_t k = s_iNext[j];
 
             fRoot = Math::Sqrt(kRot[i][i]-kRot[j][j]-kRot[k][k] + 1.0f);
-            float* apkQuat[3] = { &x, &y, &z };
+            Real* apkQuat[3] = { &x, &y, &z };
             *apkQuat[i] = 0.5f*fRoot;
             fRoot = 0.5f/fRoot;
             w = (kRot[k][j]-kRot[j][k])*fRoot;
@@ -116,7 +116,7 @@ namespace Ogre {
         //   q = cos(A/2)+sin(A/2)*(x*i+y*j+z*k)
 
         Radian fHalfAngle ( 0.5*rfAngle );
-        float fSin = Math::Sin(fHalfAngle);
+        Real fSin = Math::Sin(fHalfAngle);
         w = Math::Cos(fHalfAngle);
         x = fSin*rkAxis.x;
         y = fSin*rkAxis.y;
@@ -299,15 +299,15 @@ namespace Ogre {
         // use exp(q) = e^w(cos(A)+(x*i+y*j+z*k)) since sin(A)/A has limit 1.
 
         Radian fAngle ( Math::Sqrt(x*x+y*y+z*z) );
-        float fSin = Math::Sin(fAngle);
-		float fExpW = Math::Exp(w);
+        Real fSin = Math::Sin(fAngle);
+		Real fExpW = Math::Exp(w);
 
         Quaternion kResult;
         kResult.w = fExpW*Math::Cos(fAngle);
 
         if ( Math::Abs(fAngle.valueRadians()) >= msEpsilon )
         {
-            float fCoeff = fExpW*(fSin/(fAngle.valueRadians()));
+            Real fCoeff = fExpW*(fSin/(fAngle.valueRadians()));
             kResult.x = fCoeff*x;
             kResult.y = fCoeff*y;
             kResult.z = fCoeff*z;

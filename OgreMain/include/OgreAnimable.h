@@ -110,12 +110,7 @@ namespace Ogre {
         { memcpy(mBaseValueReal, val.ptr(), sizeof(Real)*4); }
         /// Internal method to set a value as base
         virtual void setAsBaseValue(const Quaternion& val)
-        {
-            mBaseValueReal[0] = val.w;
-            mBaseValueReal[1] = val.x;
-            mBaseValueReal[2] = val.y;
-            mBaseValueReal[3] = val.z;
-        }
+        { memcpy(mBaseValueReal, val.ptr(), sizeof(Real)*4); }
         /// Internal method to set a value as base
         virtual void setAsBaseValue(const Any& val);
         /// Internal method to set a value as base

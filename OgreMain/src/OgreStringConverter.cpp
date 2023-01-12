@@ -322,8 +322,7 @@ namespace Ogre {
         return true;
     }
 
-    template<typename T>
-    static bool parseReals(const String& val, T* dst, size_t n)
+    static bool parseReals(const String& val, Real* dst, size_t n)
     {
         // Split on space
         std::vector<String> vec = StringUtil::split(val);
