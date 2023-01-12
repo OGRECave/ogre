@@ -273,7 +273,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     Quaternion Quaternion::Inverse () const
     {
-        Real fNorm = Real(w)*w+Real(x)*x+Real(y)*y+Real(z)*z;
+        Real fNorm = w*w+x*x+y*y+z*z;
         if ( fNorm > 0.0 )
         {
             Real fInvNorm = 1.0f/fNorm;
