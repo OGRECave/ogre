@@ -17,7 +17,8 @@ vec3 Irradiance_RoughnessOne(samplerCube light_iblSpecular, const vec3 n, float 
 
 vec3 PrefilteredDFG_LUT(sampler2D light_iblDFG, float lod, float NoV) {
     // coord = sqrt(linear_roughness), which is the mapping used by cmgen.
-    return texture2DLod(light_iblDFG, vec2(NoV, lod), 0.0).rgb;
+    // OGRE Specific: y is flipped compared to Filament code
+    return texture2DLod(light_iblDFG, vec2(NoV, 1.0 - lod), 0.0).rgb;
 }
 
 float perceptualRoughnessToLod(float iblRoughnessOneLevel, float perceptualRoughness) {
