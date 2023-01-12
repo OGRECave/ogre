@@ -205,7 +205,6 @@ namespace Ogre
         {
             for (auto *pass : technique->getPasses())
             {
-                Pass::TextureUnitStates::const_iterator it;
                 for(auto *texUnit : pass->getTextureUnitStates())
                 {
                     if( texUnit->getName() == "InstancingVTF" )
