@@ -186,7 +186,6 @@ namespace Ogre {
         // or when light position is too close to light cap bound.
         bool useMcGuire = edgeData->edgeGroups.size() <= 1 && 
             (lightType == Light::LT_DIRECTIONAL || isBoundOkForMcGuire(getLightCapBounds(), light->getDerivedPosition()));
-        EdgeData::EdgeGroupList::const_iterator egi, egiend;
         ShadowRenderableList::const_iterator si;
 
         // pre-count the size of index data we need since it makes a big perf difference
