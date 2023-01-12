@@ -122,3 +122,16 @@ TEST(QuaternionTests,Log)
     EXPECT_NEAR(logUnitQuat.y, 0.24555616385496, 1e-6);
     EXPECT_NEAR(logUnitQuat.z, 0.08185205461832, 1e-6);
 }
+
+TEST(QuaternionTests, Precision)
+{
+    if(OGRE_DOUBLE_PRECISION == 0)
+        GTEST_SKIP() << "OGRE_DOUBLE_PRECISION required";
+
+    Quaternion rot(Radian(5), Vector3::UNIT_X);
+    Quaternion rot_inv(Radian(-5), Vector3::UNIT_X);
+    Vector3 v_s(0, 5e6, 0);
+    Vector3 v_e = rot * v_s;
+    v_e = rot_inv * v_e;
+    EXPECT_LE((v_s - v_e).length(), 0.6);
+}
