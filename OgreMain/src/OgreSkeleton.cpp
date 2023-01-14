@@ -67,7 +67,7 @@ namespace Ogre {
     void Skeleton::prepareImpl(void)
     {
         SkeletonSerializer serializer;
-
+        
         if (getCreator()->getVerbose())
             LogManager::getSingleton().stream() << "Skeleton: Loading " << mName;
 
@@ -76,7 +76,7 @@ namespace Ogre {
         serializer.importSkeleton(stream, this);
 
         // Load any linked skeletons
-        for (auto& s : mLinkedSkeletonAnimSourceList) 
+        for (auto& s : mLinkedSkeletonAnimSourceList)
         {
             s.pSkeleton = static_pointer_cast<Skeleton>(
                 SkeletonManager::getSingleton().prepare(s.skeletonName, mGroup));
@@ -367,7 +367,7 @@ namespace Ogre {
         }
 
         // Also iterate over linked animation
-        for (auto& li : mLinkedSkeletonAnimSourceList) 
+        for (auto& li : mLinkedSkeletonAnimSourceList)
         {
             if (li.pSkeleton)
             {
@@ -397,7 +397,7 @@ namespace Ogre {
             }
         }
         // Also iterate over linked animation
-        for (auto& li : mLinkedSkeletonAnimSourceList) 
+        for (auto& li : mLinkedSkeletonAnimSourceList)
         {
             if (li.pSkeleton)
             {
@@ -633,7 +633,7 @@ namespace Ogre {
         Real scale)
     {
         // Check not already linked
-        for (auto& l : mLinkedSkeletonAnimSourceList) 
+        for (auto& l : mLinkedSkeletonAnimSourceList)
         {
             if (skelName == l.skeletonName)
                 return; // don't bother
