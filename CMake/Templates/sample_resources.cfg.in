@@ -8,7 +8,6 @@ FileSystem=@OGRE_MEDIA_DIR_REL@/thumbnails
 # PBR media must come before the scripts that reference it
 FileSystem=@OGRE_MEDIA_DIR_REL@/PBR
 FileSystem=@OGRE_MEDIA_DIR_REL@/PBR/filament
-FileSystem=@OGRE_MEDIA_DIR_REL@/materials/textures/PBR
 
 FileSystem=@OGRE_MEDIA_DIR_REL@/materials/programs/GLSL
 FileSystem=@OGRE_MEDIA_DIR_REL@/materials/programs/GLSL120
