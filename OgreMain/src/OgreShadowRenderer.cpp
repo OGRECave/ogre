@@ -637,11 +637,8 @@ void SceneManager::ShadowRenderer::ensureShadowTexturesCreated()
         size_t __i = 0;
 
         // Recreate shadow textures
-        for (ShadowTextureList::iterator i = mShadowTextures.begin();
-            i != mShadowTextures.end(); ++i, ++__i)
+        for (auto& shadowTex : mShadowTextures)
         {
-            const TexturePtr& shadowTex = *i;
-
             // Camera names are local to SM
             String camName = shadowTex->getName() + "Cam";
 
@@ -693,8 +690,7 @@ void SceneManager::ShadowRenderer::ensureShadowTexturesCreated()
                 mNullShadowTexture = ShadowTextureManager::getSingleton().getNullShadowTexture(
                     mShadowTextureConfigList[0].format);
             }
-
-
+            ++__i;
         }
         mShadowTextureConfigDirty = false;
     }
@@ -950,14 +946,8 @@ void SceneManager::ShadowRenderer::renderShadowVolumesToStencil(const Light* lig
         light->_getNearClipVolume(camera);
 
     // Now iterate over the casters and render
-    ShadowCasterList::const_iterator si, siend;
-    siend = casters.end();
-
-
-    // Now iterate over the casters and render
-    for (si = casters.begin(); si != siend; ++si)
+    for (auto *caster : casters)
     {
-        ShadowCaster* caster = *si;
         bool zfailAlgo = camera->isCustomNearClipPlaneEnabled();
         unsigned long flags = 0;
 
@@ -1533,17 +1523,16 @@ SceneManager::ShadowRenderer::getShadowCasterBoundsInfo( const Light* light, siz
 
     // find light
     unsigned int foundCount = 0;
-    ShadowCamLightMapping::const_iterator it;
-    for ( it = mShadowCamLightMapping.begin() ; it != mShadowCamLightMapping.end(); ++it )
+    for (auto& m : mShadowCamLightMapping)
     {
-        if ( it->second == light )
+        if (m.second == light )
         {
             if (foundCount == iteration)
             {
                 // search the camera-aab list for the texture cam
-                auto camIt = mSceneManager->mCamVisibleObjectsMap.find( it->first );
+                auto camIt = mSceneManager->mCamVisibleObjectsMap.find(m.first);
 
-                if ( camIt == mSceneManager->mCamVisibleObjectsMap.end() )
+                if (camIt == mSceneManager->mCamVisibleObjectsMap.end())
                 {
                     return nullBox;
                 }
@@ -1855,12 +1844,10 @@ SceneManager::ShadowRenderer::findShadowCastersForLight(const Light* light, cons
 void SceneManager::ShadowRenderer::fireShadowTexturesUpdated(size_t numberOfShadowTextures)
 {
     ListenerList listenersCopy = mListeners;
-    ListenerList::iterator i, iend;
 
-    iend = listenersCopy.end();
-    for (i = listenersCopy.begin(); i != iend; ++i)
+    for (auto *l : listenersCopy)
     {
-        (*i)->shadowTexturesUpdated(numberOfShadowTextures);
+        l->shadowTexturesUpdated(numberOfShadowTextures);
     }
 }
 //---------------------------------------------------------------------
@@ -1876,12 +1863,9 @@ void SceneManager::ShadowRenderer::fireShadowTexturesPreCaster(Light* light, Cam
 void SceneManager::ShadowRenderer::fireShadowTexturesPreReceiver(Light* light, Frustum* f)
 {
     ListenerList listenersCopy = mListeners;
-    ListenerList::iterator i, iend;
-
-    iend = listenersCopy.end();
-    for (i = listenersCopy.begin(); i != iend; ++i)
+    for (auto *l : listenersCopy)
     {
-        (*i)->shadowTextureReceiverPreViewProj(light, f);
+        l->shadowTextureReceiverPreViewProj(light, f);
     }
 }
 void SceneManager::ShadowRenderer::sortLightsAffectingFrustum(LightList& lightList) const

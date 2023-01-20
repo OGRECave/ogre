@@ -76,22 +76,19 @@ namespace Ogre {
         serializer.importSkeleton(stream, this);
 
         // Load any linked skeletons
-        LinkedSkeletonAnimSourceList::iterator i;
-        for (i = mLinkedSkeletonAnimSourceList.begin(); 
-            i != mLinkedSkeletonAnimSourceList.end(); ++i)
+        for (auto& s : mLinkedSkeletonAnimSourceList)
         {
-            i->pSkeleton = static_pointer_cast<Skeleton>(
-                SkeletonManager::getSingleton().prepare(i->skeletonName, mGroup));
+            s.pSkeleton = static_pointer_cast<Skeleton>(
+                SkeletonManager::getSingleton().prepare(s.skeletonName, mGroup));
         }
     }
     //---------------------------------------------------------------------
     void Skeleton::unprepareImpl(void)
     {
         // destroy bones
-        BoneList::iterator i;
-        for (i = mBoneList.begin(); i != mBoneList.end(); ++i)
+        for (auto *b : mBoneList)
         {
-            OGRE_DELETE *i;
+            OGRE_DELETE b;
         }
         mBoneList.clear();
         mBoneListByName.clear();
@@ -100,10 +97,9 @@ namespace Ogre {
         mManualBonesDirty = false;
 
         // Destroy animations
-        AnimationList::iterator ai;
-        for (ai = mAnimationsList.begin(); ai != mAnimationsList.end(); ++ai)
+        for (auto& ai : mAnimationsList)
         {
-            OGRE_DELETE ai->second;
+            OGRE_DELETE ai.second;
         }
         mAnimationsList.clear();
 
@@ -220,10 +216,8 @@ namespace Ogre {
         }
 
         // Per enabled animation state
-        EnabledAnimationStateList::const_iterator animIt;
-        for(animIt = animSet.getEnabledAnimationStates().begin(); animIt != animSet.getEnabledAnimationStates().end(); ++animIt)
+        for(auto *animState : animSet.getEnabledAnimationStates())
         {
-            const AnimationState* animState = *animIt;
             const LinkedSkeletonAnimationSource* linked = 0;
             Animation* anim = _getAnimationImpl(animState->getAnimationName(), &linked);
             // tolerate state entries for animations we're not aware of
@@ -250,21 +244,18 @@ namespace Ogre {
         // Update the derived transforms
         _updateTransforms();
 
-
-        BoneList::iterator i;
-        for (i = mBoneList.begin(); i != mBoneList.end(); ++i)
+        for (auto *b : mBoneList)
         {            
-            (*i)->setBindingPose();
+            b->setBindingPose();
         }
     }
     //---------------------------------------------------------------------
     void Skeleton::reset(bool resetManualBones)
     {
-        BoneList::iterator i;
-        for (i = mBoneList.begin(); i != mBoneList.end(); ++i)
+        for (auto *b : mBoneList)
         {
-            if(!(*i)->isManuallyControlled() || resetManualBones)
-                (*i)->reset();
+            if(!b->isManuallyControlled() || resetManualBones)
+                b->reset();
         }
     }
     //---------------------------------------------------------------------
@@ -367,35 +358,30 @@ namespace Ogre {
     {
         animSet->removeAllAnimationStates();
            
-        AnimationList::iterator i;
-        for (i = mAnimationsList.begin(); i != mAnimationsList.end(); ++i)
+        for (auto& a : mAnimationsList)
         {
-            Animation* anim = i->second;
+            Animation* anim = a.second;
             // Create animation at time index 0, default params mean this has weight 1 and is disabled
             const String& animName = anim->getName();
             animSet->createAnimationState(animName, 0.0, anim->getLength());
         }
 
         // Also iterate over linked animation
-        LinkedSkeletonAnimSourceList::iterator li;
-        for (li = mLinkedSkeletonAnimSourceList.begin(); 
-            li != mLinkedSkeletonAnimSourceList.end(); ++li)
+        for (auto& li : mLinkedSkeletonAnimSourceList)
         {
-            if (li->pSkeleton)
+            if (li.pSkeleton)
             {
-                li->pSkeleton->_refreshAnimationState(animSet);
+                li.pSkeleton->_refreshAnimationState(animSet);
             }
         }
-
     }
     //-----------------------------------------------------------------------
     void Skeleton::_refreshAnimationState(AnimationStateSet* animSet)
     {
         // Merge in any new animations
-        AnimationList::iterator i;
-        for (i = mAnimationsList.begin(); i != mAnimationsList.end(); ++i)
+        for (auto& a : mAnimationsList)
         {
-            Animation* anim = i->second;
+            Animation* anim = a.second;
             // Create animation at time index 0, default params mean this has weight 1 and is disabled
             const String& animName = anim->getName();
             if (!animSet->hasAnimationState(animName))
@@ -411,13 +397,11 @@ namespace Ogre {
             }
         }
         // Also iterate over linked animation
-        LinkedSkeletonAnimSourceList::iterator li;
-        for (li = mLinkedSkeletonAnimSourceList.begin(); 
-            li != mLinkedSkeletonAnimSourceList.end(); ++li)
+        for (auto& li : mLinkedSkeletonAnimSourceList)
         {
-            if (li->pSkeleton)
+            if (li.pSkeleton)
             {
-                li->pSkeleton->_refreshAnimationState(animSet);
+                li.pSkeleton->_refreshAnimationState(animSet);
             }
         }
     }
@@ -456,12 +440,9 @@ namespace Ogre {
             Also note we combine scale as equivalent axes, no shearing.
         */
 
-        BoneList::const_iterator i, boneend;
-        boneend = mBoneList.end();
-        for (i = mBoneList.begin();i != boneend; ++i)
+        for (auto *b : mBoneList)
         {
-            Bone* pBone = *i;
-            pBone->_getOffsetTransform(*pMatrices);
+            b->_getOffsetTransform(*pMatrices);
             pMatrices++;
         }
 
@@ -516,15 +497,12 @@ namespace Ogre {
 
         mRootBones.clear();
 
-        BoneList::const_iterator i;
-        BoneList::const_iterator iend = mBoneList.end();
-        for (i = mBoneList.begin(); i != iend; ++i)
+        for (auto *b : mBoneList)
         {
-            Bone* currentBone = *i;
-            if (currentBone->getParent() == 0)
+            if (b->getParent() == 0)
             {
                 // This is a root
-                mRootBones.push_back(currentBone);
+                mRootBones.push_back(b);
             }
         }
     }
@@ -542,14 +520,11 @@ namespace Ogre {
         of << "== Bones ==" << std::endl;
         of << "Number of bones: " << (unsigned int)mBoneList.size() << std::endl;
         
-        BoneList::iterator bi;
-        for (bi = mBoneList.begin(); bi != mBoneList.end(); ++bi)
+        for (auto *b : mBoneList)
         {
-            Bone* bone = *bi;
-
-            of << "-- Bone " << bone->getHandle() << " --" << std::endl;
-            of << "Position: " << bone->getPosition();
-            q = bone->getOrientation();
+            of << "-- Bone " << b->getHandle() << " --" << std::endl;
+            of << "Position: " << b->getPosition();
+            q = b->getOrientation();
             of << "Rotation: " << q;
             q.ToAngleAxis(angle, axis);
             of << " = " << angle.valueRadians() << " radians around axis " << axis << std::endl << std::endl;
@@ -558,10 +533,9 @@ namespace Ogre {
         of << "== Animations ==" << std::endl;
         of << "Number of animations: " << (unsigned int)mAnimationsList.size() << std::endl;
 
-        AnimationList::iterator ai;
-        for (ai = mAnimationsList.begin(); ai != mAnimationsList.end(); ++ai)
+        for (auto& a : mAnimationsList)
         {
-            Animation* anim = ai->second;
+            Animation* anim = a.second;
 
             of << "-- Animation '" << anim->getName() << "' (length " << anim->getLength() << ") --" << std::endl;
             of << "Number of tracks: " << anim->getNumNodeTracks() << std::endl;
@@ -586,11 +560,7 @@ namespace Ogre {
                 }
 
             }
-
-
-
         }
-
     }
     //---------------------------------------------------------------------
     SkeletonAnimationBlendMode Skeleton::getBlendMode() const
@@ -619,20 +589,15 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void Skeleton::_updateTransforms(void)
     {
-        BoneList::iterator i, iend;
-        iend = mRootBones.end();
-        for (i = mRootBones.begin(); i != iend; ++i)
+        for (auto *b : mRootBones)
         {
-            (*i)->_update(true, false);
+            b->_update(true, false);
         }
         mManualBonesDirty = false;
     }
     //---------------------------------------------------------------------
     void Skeleton::optimiseAllAnimations(bool preservingIdentityNodeTracks)
     {
-        AnimationList::iterator ai, aiend;
-        aiend = mAnimationsList.end();
-
         if (!preservingIdentityNodeTracks)
         {
             Animation::TrackHandleList tracksToDestroy;
@@ -645,22 +610,22 @@ namespace Ogre {
             }
 
             // Collect identity node tracks for all animations
-            for (ai = mAnimationsList.begin(); ai != aiend; ++ai)
+            for (auto& a : mAnimationsList)
             {
-                ai->second->_collectIdentityNodeTracks(tracksToDestroy);
+                a.second->_collectIdentityNodeTracks(tracksToDestroy);
             }
 
             // Destroy identity node tracks
-            for (ai = mAnimationsList.begin(); ai != aiend; ++ai)
+            for (auto& a : mAnimationsList)
             {
-                ai->second->_destroyNodeTracks(tracksToDestroy);
+                a.second->_destroyNodeTracks(tracksToDestroy);
             }
         }
 
-        for (ai = mAnimationsList.begin(); ai != aiend; ++ai)
+        for (auto& a : mAnimationsList)
         {
             // Don't discard identity node tracks here
-            ai->second->optimise(false);
+            a.second->optimise(false);
         }
     }
     //---------------------------------------------------------------------
@@ -668,11 +633,9 @@ namespace Ogre {
         Real scale)
     {
         // Check not already linked
-        LinkedSkeletonAnimSourceList::iterator i;
-        for (i = mLinkedSkeletonAnimSourceList.begin(); 
-            i != mLinkedSkeletonAnimSourceList.end(); ++i)
+        for (auto& l : mLinkedSkeletonAnimSourceList)
         {
-            if (skelName == i->skeletonName)
+            if (skelName == l.skeletonName)
                 return; // don't bother
         }
 
