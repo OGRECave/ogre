@@ -839,7 +839,6 @@ void SceneManager::ShadowRenderer::prepareShadowTextures(Camera* cam, Viewport* 
         // set the first shadow texture index for this light.
         mShadowTextureIndexLightList.push_back(shadowTextureIndex);
         shadowTextureIndex += textureCountPerLight;
-        ++i;
     }
 
     fireShadowTexturesUpdated(std::min(lightList->size(), mShadowTextures.size()));
