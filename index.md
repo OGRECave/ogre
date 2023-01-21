@@ -14,7 +14,7 @@ The latest release is [![GitHub release](https://img.shields.io/github/release/o
 * [API/ ABI changes](https://ogrecave.github.io/ogre/abi_tracker/timeline/ogre) (since v1.8)
 
 ## Try it
-* [Online Emscripten Demo](https://ogrecave.github.io/ogre/emscripten/) - [Web Assembly & WebGL2](https://ogrecave.github.io/ogre/wasm/)
+* [Online Emscripten Demo](https://ogrecave.github.io/ogre/emscripten/)
 * Ubuntu Snap package: `sudo snap install ogre`
 * [Android App on F-Droid](https://f-droid.org/packages/org.ogre.browser/)
 
@@ -43,7 +43,6 @@ If you want to dive deeper into the OGRE ecosystem here are your options.
 - [Hob](http://store.steampowered.com/app/404680/Hob/)
 - [Torchlight II](http://store.steampowered.com/app/200710/Torchlight_II/)
 - [Battlezone 98 Redux](http://store.steampowered.com/app/301650/Battlezone_98_Redux/)
-- [Live Home 3D - Home Design Software](https://www.livehome3d.com/)
 
 ## Literature
 There are 3 books written on OGRE
@@ -55,8 +54,7 @@ There are 3 books written on OGRE
 ## Useful Add-Ons
 Beneath the OGRECave umbrella you can also find some useful OGRE Add-Ons like
 
-* [Ogitor SceneBuilder](https://github.com/OGRECave/ogitor)
-* [Assimp importer tool](https://github.com/OGRECave/ogre-assimp)
+* [Ogre Mesh Viewer](https://github.com/OGRECave/ogre-meshviewer)
 * [Blender Exporter](https://github.com/OGRECave/blender2ogre)
-* [Syntax highlighting for Ogre Scripts for Atom](https://github.com/OGRECave/language-ogre-script)
-* [Particle Universe](https://github.com/OGRECave/particleuniverse)
+* [Syntax highlighting for VSCode](https://github.com/OGRECave/language-ogre-script)
+* [OggSound & Theora Video](https://github.com/OGRECave/ogre-audiovideo)
