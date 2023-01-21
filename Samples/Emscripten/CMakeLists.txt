@@ -1,7 +1,7 @@
 set(MEDIA_DIR ${CMAKE_BINARY_DIR}/bin/media/)
 
 set(CMAKE_EXECUTABLE_SUFFIX ".html")
-set(CMAKE_EXE_LINKER_FLAGS "--preload-file ${MEDIA_DIR}/@. -s EXPORTED_FUNCTIONS=\"[ '_passAssetAsArrayBuffer', '_clearScene', '_main']\" -s USE_SDL=2")
+set(CMAKE_EXE_LINKER_FLAGS "--preload-file ${MEDIA_DIR}/@. -s EXPORTED_FUNCTIONS=\"[ '_passAssetAsArrayBuffer', '_clearScene', '_main']\" -s USE_SDL=2 -s MAX_WEBGL_VERSION=2")
 
 add_definitions(-s USE_SDL=2)
 
