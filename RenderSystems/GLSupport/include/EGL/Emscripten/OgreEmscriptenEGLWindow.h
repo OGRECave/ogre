@@ -57,9 +57,9 @@ namespace Ogre {
         String mCanvasSelector;
         
     protected:
-        virtual void resize(unsigned int width, unsigned int height);
-        virtual void windowMovedOrResized();
-        virtual void switchFullScreen(bool fullscreen);
+        void resize(unsigned int width, unsigned int height) override;
+        void windowMovedOrResized() override;
+        void switchFullScreen(bool fullscreen) override;
         
         static EM_BOOL canvasWindowResized(int eventType, const EmscriptenUiEvent *uiEvent, void *userData);
         static EM_BOOL fullscreenCallback(int eventType, const EmscriptenFullscreenChangeEvent* event, void* userData);
@@ -70,11 +70,11 @@ namespace Ogre {
         EmscriptenEGLWindow(EmscriptenEGLSupport* glsupport);
         virtual ~EmscriptenEGLWindow();
         void create(const String& name, unsigned int width, unsigned int height,
-                    bool fullScreen, const NameValuePairList *miscParams);
+                    bool fullScreen, const NameValuePairList *miscParams) override;
 
         void _notifySurfaceDestroyed() override;
         void _notifySurfaceCreated(void* window, void* config = NULL) override;
-        virtual void swapBuffers();
+        void swapBuffers() override;
     };
 }
 
