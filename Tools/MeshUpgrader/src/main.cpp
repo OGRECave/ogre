@@ -56,7 +56,7 @@ R"HELP(Usage: OgreMeshUpgrader [opts] sourcefile [destfile]
 -d loddist     = distance increment to reduce LOD
 -p lodpercent  = Percentage triangle reduction amount per LOD
 -f lodnumtris  = Fixed vertex reduction per LOD
--e             = DON'T generate edge lists (for stencil shadows)
+-el            = generate edge lists (for stencil shadows)
 -t             = Generate tangents (for normal mapping)
 -ts [3|4]      = Tangent size (4 includes parity, default: 3)
 -tm            = Split tangent vertices at UV mirror points
@@ -75,7 +75,7 @@ destfile       = optional name of file to write to. If you don't
 
 struct UpgradeOptions {
     bool interactive;
-    bool suppressEdgeLists;
+    bool generateEdgeLists;
     bool generateTangents;
     bool tangentUseParity;
     bool tangentSplitMirrored;
@@ -100,7 +100,7 @@ UpgradeOptions parseOpts(UnaryOptionList& unOpts, BinaryOptionList& binOpts)
 
     // Defaults
     opts.interactive = false;
-    opts.suppressEdgeLists = false;
+    opts.generateEdgeLists = false;
     opts.generateTangents = false;
     opts.tangentUseParity = false;
     opts.tangentSplitMirrored = false;
@@ -119,7 +119,7 @@ UpgradeOptions parseOpts(UnaryOptionList& unOpts, BinaryOptionList& binOpts)
     opts.recalcBounds = false;
     opts.targetVersion = MESH_VERSION_LATEST;
 
-    opts.suppressEdgeLists = unOpts["-e"];
+    opts.generateEdgeLists = unOpts["-el"];
     opts.generateTangents = unOpts["-t"];
     opts.tangentSplitMirrored = unOpts["-tm"];
     opts.tangentSplitRotated = unOpts["-tr"];
@@ -897,13 +897,15 @@ int main(int numargs, char** args)
         UnaryOptionList unOptList;
         BinaryOptionList binOptList;
 
+        unOptList["-byte"] = true; // this is the only option now, dont error if specified
+        unOptList["-e"] = true; // this is default, dont error if specified
+
         unOptList["-i"] = false;
-        unOptList["-e"] = false;
+        unOptList["-el"] = false;
         unOptList["-t"] = false;
         unOptList["-tm"] = false;
         unOptList["-tr"] = false;
         unOptList["-r"] = false;
-        unOptList["-byte"] = true; // this is the only option now, dont error if specified
         unOptList["-autogen"] = false;
         unOptList["-pack"] = false;
         unOptList["-b"] = false;
@@ -997,7 +999,7 @@ int main(int numargs, char** args)
             } while (response == "");
         } else {
         // Make sure we generate edge lists, provided they are not deliberately disabled
-            if (!opts.suppressEdgeLists) {
+            if (opts.generateEdgeLists) {
                 logMgr.logMessage("Generating edge lists...");
                 mesh->buildEdgeList();
                 logMgr.logMessage("Generating edge lists... success");
