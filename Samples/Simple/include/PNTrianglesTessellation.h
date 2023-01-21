@@ -168,13 +168,7 @@ protected:
                 HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY);
 
             // build tangent vectors for our mesh
-            unsigned short src, dest;
-            if (!mesh->suggestTangentVectorBuildParams(VES_TANGENT, src, dest))
-            {
-                mesh->buildTangentVectors(VES_TANGENT, src, dest);
-                // this version cleans mirrored and rotated UVs but requires quality models
-                // mesh->buildTangentVectors(VES_TANGENT, src, dest, true, true);
-            }
+            mesh->buildTangentVectors();
 
             // create an entity from the mesh and set the first available material
             Entity* ent = mSceneMgr->createEntity(mesh->getName(), mesh->getName());

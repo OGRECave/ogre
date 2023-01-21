@@ -259,12 +259,7 @@ void Sample_ShaderSystem::setupContent()
             true, true); //so we can still read it
 
         // Build tangent vectors, all our meshes use only 1 texture coordset 
-        // Note we can build into VES_TANGENT now (SM2+)
-        unsigned short src, dest;
-        if (!pMesh->suggestTangentVectorBuildParams(VES_TANGENT, src, dest))
-        {
-            pMesh->buildTangentVectors(VES_TANGENT, src, dest);     
-        }
+        pMesh->buildTangentVectors();
     }
     
 

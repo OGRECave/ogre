@@ -157,15 +157,8 @@ namespace Ogre
             Only indexed triangle lists are allowed. Strips and fans cannot be
             supported because it may be necessary to split the geometry up to 
             respect deviances in the tangent space basis better.
-        @param targetSemantic The semantic to store the tangents in. Defaults to 
-            the explicit tangent binding, but note that this is only usable on more
-            modern hardware (Shader Model 2), so if you need portability with older
-            cards you should change this to a texture coordinate binding instead.
         @param sourceTexCoordSet The texture coordinate index which should be used as the source
             of 2D texture coordinates, with which to calculate the tangents.
-        @param index The element index, ie the texture coordinate set which should be used to store the 3D
-            coordinates representing a tangent vector per vertex, if targetSemantic is 
-            VES_TEXTURE_COORDINATES. If this already exists, it will be overwritten.
         @return
             A structure containing the results of the tangent space build. Vertex data
             will always be modified but it's also possible that the index data
@@ -174,9 +167,14 @@ namespace Ogre
             This is discontinuous, therefore the vertices have to be split along
             this edge, resulting in new vertices.
         */
-        Result build(VertexElementSemantic targetSemantic = VES_TANGENT,
-            unsigned short sourceTexCoordSet = 0, unsigned short index = 1);
+        Result build(unsigned short sourceTexCoordSet = 0);
 
+        OGRE_DEPRECATED Result build(VertexElementSemantic targetSemantic, unsigned short sourceTexCoordSet = 0,
+                                     unsigned short index = 0)
+        {
+            OgreAssert(targetSemantic == VES_TANGENT && index == 0, "Invalid Parameters");
+            return build(sourceTexCoordSet);
+        }
 
     private:
 
