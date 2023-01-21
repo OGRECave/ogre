@@ -93,7 +93,6 @@ namespace Ogre {
             GLSLESProgram* mCurrentVertexProgram;
             GLSLESProgram* mCurrentFragmentProgram;
 
-            GLint getTextureAddressingMode(TextureAddressingMode tam) const;
             GLenum getBlendMode(SceneBlendFactor ogreBlend) const;
             void bindVertexElementToGpu(const VertexElement& elem,
                                         const HardwareVertexBufferSharedPtr& vertexBuffer,

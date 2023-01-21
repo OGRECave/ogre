@@ -747,6 +747,24 @@ namespace Ogre {
         }
     }
 
+    static int getTextureAddressingMode(TextureAddressingMode tam, bool hasBorderClamp = true)
+    {
+        switch (tam)
+        {
+        case TAM_BORDER:
+            if (hasBorderClamp)
+                return GL_CLAMP_TO_BORDER_EXT;
+            OGRE_FALLTHROUGH;
+        case TAM_CLAMP:
+            return GL_CLAMP_TO_EDGE;
+        case TAM_MIRROR:
+            return GL_MIRRORED_REPEAT;
+        case TAM_WRAP:
+        default:
+            return GL_REPEAT;
+        }
+    }
+
     void GLES2RenderSystem::_setSampler(size_t unit, Sampler& sampler)
     {
         mStateCacheManager->activateGLTextureUnit(unit);
@@ -754,13 +772,14 @@ namespace Ogre {
         GLenum target = mTextureTypes[unit];
 
         const Sampler::UVWAddressingMode& uvw = sampler.getAddressingMode();
-        mStateCacheManager->setTexParameteri(target, GL_TEXTURE_WRAP_S, getTextureAddressingMode(uvw.u));
-        mStateCacheManager->setTexParameteri(target, GL_TEXTURE_WRAP_T, getTextureAddressingMode(uvw.v));
-        if(getCapabilities()->hasCapability(RSC_TEXTURE_3D))
-            mStateCacheManager->setTexParameteri(target, GL_TEXTURE_WRAP_R, getTextureAddressingMode(uvw.w));
 
         bool hasBorderClamp = hasMinGLVersion(3, 2) || checkExtension("GL_EXT_texture_border_clamp") ||
                               checkExtension("GL_OES_texture_border_clamp");
+
+        mStateCacheManager->setTexParameteri(target, GL_TEXTURE_WRAP_S, getTextureAddressingMode(uvw.u, hasBorderClamp));
+        mStateCacheManager->setTexParameteri(target, GL_TEXTURE_WRAP_T, getTextureAddressingMode(uvw.v, hasBorderClamp));
+        if(getCapabilities()->hasCapability(RSC_TEXTURE_3D))
+            mStateCacheManager->setTexParameteri(target, GL_TEXTURE_WRAP_R, getTextureAddressingMode(uvw.w, hasBorderClamp));
 
         if ((uvw.u == TAM_BORDER || uvw.v == TAM_BORDER || uvw.w == TAM_BORDER) && hasBorderClamp)
             OGRE_CHECK_GL_ERROR(glTexParameterfv( target, GL_TEXTURE_BORDER_COLOR_EXT, sampler.getBorderColour().ptr()));
@@ -798,22 +817,6 @@ namespace Ogre {
         case FO_NONE:
             mStateCacheManager->setTexParameteri(target, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
             break;
-        }
-    }
-
-    GLint GLES2RenderSystem::getTextureAddressingMode(TextureAddressingMode tam) const
-    {
-        switch (tam)
-        {
-            case TextureUnitState::TAM_CLAMP:
-                return GL_CLAMP_TO_EDGE;
-            case TextureUnitState::TAM_BORDER:
-                return GL_CLAMP_TO_BORDER_EXT;
-            case TextureUnitState::TAM_MIRROR:
-                return GL_MIRRORED_REPEAT;
-            case TextureUnitState::TAM_WRAP:
-            default:
-                return GL_REPEAT;
         }
     }
 
