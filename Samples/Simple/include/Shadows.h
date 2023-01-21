@@ -245,13 +245,8 @@ protected:
         mLightNode->setAutoTracking(true, mSceneMgr->getRootSceneNode());
 
         // Prepare athene mesh for normalmapping
-        MeshPtr pAthene = MeshManager::getSingleton().load("athene.mesh", 
-            ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
-        unsigned short src, dest;
-        if (!pAthene->suggestTangentVectorBuildParams(VES_TANGENT, src, dest))
-        {
-            pAthene->buildTangentVectors(VES_TANGENT, src, dest);
-        }
+        MeshPtr pAthene = MeshManager::getSingleton().load("athene.mesh", RGN_DEFAULT);
+        pAthene->buildTangentVectors();
 
         SceneNode* node;
         node = mSceneMgr->getRootSceneNode()->createChildSceneNode();

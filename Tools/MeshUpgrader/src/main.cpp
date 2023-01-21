@@ -58,8 +58,6 @@ R"HELP(Usage: OgreMeshUpgrader [opts] sourcefile [destfile]
 -f lodnumtris  = Fixed vertex reduction per LOD
 -e             = DON'T generate edge lists (for stencil shadows)
 -t             = Generate tangents (for normal mapping)
--td [uvw|tangent]
-               = Tangent vertex semantic destination (default: tangent)
 -ts [3|4]      = Tangent size (4 includes parity, default: 3)
 -tm            = Split tangent vertices at UV mirror points
 -tr            = Split tangent vertices where basis is rotated > 90 degrees
@@ -79,7 +77,6 @@ struct UpgradeOptions {
     bool interactive;
     bool suppressEdgeLists;
     bool generateTangents;
-    VertexElementSemantic tangentSemantic;
     bool tangentUseParity;
     bool tangentSplitMirrored;
     bool tangentSplitRotated;
@@ -105,7 +102,6 @@ UpgradeOptions parseOpts(UnaryOptionList& unOpts, BinaryOptionList& binOpts)
     opts.interactive = false;
     opts.suppressEdgeLists = false;
     opts.generateTangents = false;
-    opts.tangentSemantic = VES_TANGENT;
     opts.tangentUseParity = false;
     opts.tangentSplitMirrored = false;
     opts.tangentSplitRotated = false;
@@ -173,15 +169,6 @@ UpgradeOptions parseOpts(UnaryOptionList& unOpts, BinaryOptionList& binOpts)
             opts.endian = Serializer::ENDIAN_LITTLE;
         } else {
             opts.endian = Serializer::ENDIAN_NATIVE;
-		}
-    }
-
-    bi = binOpts.find("-td");
-    if (!bi->second.empty()) {
-        if (bi->second == "uvw") {
-            opts.tangentSemantic = VES_TEXTURE_COORDINATES;
-        } else { // if (bi->second == "tangent"), or anything else
-            opts.tangentSemantic = VES_TANGENT;
 		}
     }
 
@@ -925,7 +912,6 @@ int main(int numargs, char** args)
         binOptList["-p"] = "";
         binOptList["-f"] = "";
         binOptList["-E"] = "";
-        binOptList["-td"] = "";
         binOptList["-ts"] = "";
         binOptList["-V"] = "";
         binOptList["-log"] = "OgreMeshUpgrader.log";
@@ -1036,8 +1022,8 @@ int main(int numargs, char** args)
         }
         // Generate tangents?
         if (opts.generateTangents) {
-            unsigned short srcTex, destTex;
-            bool existing = mesh->suggestTangentVectorBuildParams(opts.tangentSemantic, srcTex, destTex);
+            unsigned short srcTex;
+            bool existing = mesh->suggestTangentVectorBuildParams(srcTex);
             if (existing) {
                 if (opts.interactive) {
                     do {
@@ -1064,9 +1050,8 @@ int main(int numargs, char** args)
             }
             if (opts.generateTangents) {
                 logMgr.logMessage("Generating tangent vectors...");
-                mesh->buildTangentVectors(opts.tangentSemantic, srcTex, destTex,
-                    opts.tangentSplitMirrored, opts.tangentSplitRotated,
-                    opts.tangentUseParity);
+                mesh->buildTangentVectors(srcTex, opts.tangentSplitMirrored, opts.tangentSplitRotated,
+                                          opts.tangentUseParity);
                 logMgr.logMessage("Generating tangent vectors... success");
             }
         }
