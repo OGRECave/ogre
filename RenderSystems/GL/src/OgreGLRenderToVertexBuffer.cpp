@@ -30,13 +30,10 @@ THE SOFTWARE.
 #include "OgreHardwareBufferManager.h"
 #include "OgreGLHardwareBuffer.h"
 #include "OgreRenderable.h"
-#include "OgreSceneManager.h"
 #include "OgreRoot.h"
 #include "OgreGLRenderSystem.h"
 #include "OgreGLSLLinkProgramManager.h"
-#include "OgreStringConverter.h"
 #include "OgreLogManager.h"
-#include "OgreTechnique.h"
 
 namespace Ogre {
 //-----------------------------------------------------------------------------
@@ -54,22 +51,6 @@ namespace Ogre {
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "GL RenderToVertexBuffer"
                 "can only output point lists, line lists, or triangle lists",
                 "OgreGLRenderToVertexBuffer::getR2VBPrimitiveType");
-        }
-    }
-//-----------------------------------------------------------------------------
-    static GLint getVertexCountPerPrimitive(RenderOperation::OperationType operationType)
-    {
-        //We can only get points, lines or triangles since they are the only
-        //legal R2VB output primitive types
-        switch (operationType)
-        {
-        case RenderOperation::OT_POINT_LIST:
-            return 1;
-        case RenderOperation::OT_LINE_LIST:
-            return 2;
-        default:
-        case RenderOperation::OT_TRIANGLE_LIST:
-            return 3;
         }
     }
 //-----------------------------------------------------------------------------
@@ -103,7 +84,7 @@ namespace Ogre {
         }
     }
 //-----------------------------------------------------------------------------
-    GLRenderToVertexBuffer::GLRenderToVertexBuffer() : mFrontBufferIndex(-1)
+    GLRenderToVertexBuffer::GLRenderToVertexBuffer()
     {
         mVertexBuffers[0].reset();
         mVertexBuffers[1].reset();
@@ -117,13 +98,6 @@ namespace Ogre {
         glDeleteQueries(1, &mPrimitivesDrawnQuery);
     }
 //-----------------------------------------------------------------------------
-    void GLRenderToVertexBuffer::getRenderOperation(RenderOperation& op)
-    {
-        op.operationType = mOperationType;
-        op.useIndexes = false;
-        op.vertexData = mVertexData.get();
-    }
-//-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
     void GLRenderToVertexBuffer::update(SceneManager* sceneMgr)
     {
@@ -135,31 +109,24 @@ namespace Ogre {
             //Buffers don't match. Need to reallocate.
             mResetRequested = true;
         }
-        
-        //Single pass only for now
-        Ogre::Pass* r2vbPass = mMaterial->getBestTechnique()->getPass(0);
-        //Set pass before binding buffers to activate the GPU programs
-        sceneMgr->_setPass(r2vbPass);
+
+        Ogre::Pass* r2vbPass = derivePass(sceneMgr);
         
         checkGLError(true, false);
 
         bindVerticesOutput(r2vbPass);
 
-        r2vbPass->_updateAutoParams(sceneMgr->_getAutoParamDataSource(), GPV_GLOBAL);
-
         RenderOperation renderOp;
-        size_t targetBufferIndex;
+        auto targetBufferIndex = mTargetBufferIndex;
         if (mResetRequested || mResetsEveryUpdate)
         {
             //Use source data to render to first buffer
             mSourceRenderable->getRenderOperation(renderOp);
-            targetBufferIndex = 0;
         }
         else
         {
             //Use current front buffer to render to back buffer
             this->getRenderOperation(renderOp);
-            targetBufferIndex = 1 - mFrontBufferIndex;
         }
 
         if (!mVertexBuffers[targetBufferIndex] || 
@@ -185,16 +152,6 @@ namespace Ogre {
         targetRenderSystem->setWorldMatrix(Matrix4::IDENTITY);
         targetRenderSystem->setViewMatrix(Matrix4::IDENTITY);
         targetRenderSystem->setProjectionMatrix(Matrix4::IDENTITY);
-        if (r2vbPass->hasVertexProgram())
-        {
-            targetRenderSystem->bindGpuProgramParameters(GPT_VERTEX_PROGRAM, 
-                r2vbPass->getVertexProgramParameters(), GPV_ALL);
-        }
-        if (r2vbPass->hasGeometryProgram())
-        {
-            targetRenderSystem->bindGpuProgramParameters(GPT_GEOMETRY_PROGRAM,
-                r2vbPass->getGeometryProgramParameters(), GPV_ALL);
-        }
         targetRenderSystem->_render(renderOp);
         
         //Finish the query
@@ -209,57 +166,15 @@ namespace Ogre {
 
         checkGLError(true, true, "GLRenderToVertexBuffer::update");
 
-        //Switch the vertex binding if necessary
-        if (targetBufferIndex != mFrontBufferIndex)
-        {
-            mVertexData->vertexBufferBinding->unsetAllBindings();
-            mVertexData->vertexBufferBinding->setBinding(0, mVertexBuffers[targetBufferIndex]);
-            mFrontBufferIndex = targetBufferIndex;
-        }
+        //Switch the vertex binding
+        mVertexData->vertexBufferBinding->unsetAllBindings();
+        mVertexData->vertexBufferBinding->setBinding(0, mVertexBuffers[targetBufferIndex]);
+        mTargetBufferIndex = mTargetBufferIndex == 0 ? 1 : 0;
 
         glDisable(GL_RASTERIZER_DISCARD_NV);    // enable rasterization
 
         //Clear the reset flag
         mResetRequested = false;
-    }
-//-----------------------------------------------------------------------------
-    void GLRenderToVertexBuffer::reallocateBuffer(size_t index)
-    {
-        assert(index == 0 || index == 1);
-        if (mVertexBuffers[index])
-        {
-            mVertexBuffers[index].reset();
-        }
-        
-        mVertexBuffers[index] = HardwareBufferManager::getSingleton().createVertexBuffer(
-            mVertexData->vertexDeclaration->getVertexSize(0), mMaxVertexCount, 
-#if OGRE_DEBUG_MODE
-            //Allow to read the contents of the buffer in debug mode
-            HardwareBuffer::HBU_DYNAMIC
-#else
-            HardwareBuffer::HBU_STATIC_WRITE_ONLY
-#endif
-            );
-    }
-//-----------------------------------------------------------------------------
-    String GLRenderToVertexBuffer::getSemanticVaryingName(VertexElementSemantic semantic, unsigned short index)
-    {
-        switch (semantic)
-        {
-        case VES_POSITION:
-            return "gl_Position";
-        case VES_TEXTURE_COORDINATES:
-            return String("gl_TexCoord[") + StringConverter::toString(index) + "]";
-        case VES_DIFFUSE:
-            return "gl_FrontColor";
-        case VES_SPECULAR:
-            return "gl_FrontSecondaryColor";
-        //TODO : Implement more?
-        default:
-            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-                "Unsupported vertex element semantic in render to vertex buffer",
-                "OgreGLRenderToVertexBuffer::getSemanticVaryingName");
-        }
     }
 //-----------------------------------------------------------------------------
     GLint GLRenderToVertexBuffer::getGLSemanticType(VertexElementSemantic semantic)

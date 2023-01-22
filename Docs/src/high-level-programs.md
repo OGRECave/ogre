@@ -187,6 +187,20 @@ param_named skewMatrix float4 0.5 0 -0.5 1.0
 This means that `mat[0]` is the first column in GLSL, but the first row in HLSL and %Ogre. %Ogre takes care of transposing square matrices before uploading them with GLSL, so matrix-vector multiplication `M*v` just works and `mat[0]` will return the same data.
 However, with non-square matrices transposing would change their GLSL type from e.g. `mat2x4` (two columns, four rows) to `mat4x2` (two rows, four columns) and consequently what `mat[0]` would return. Therefore %Ogre just passes such matrices unchanged and you have to handle this case (notably in skinning) yourself by either transposing the matrix in the shader or column-wise access.
 
+## Transform Feedback Varyings {#Transform-Feedback-Varyings}
+
+Similarly to vertex attributes, the transform feedback varyings are bound by name.
+Only interleaved output to a single buffer is supported. The offsets are given by the Ogre::VertexDeclaration.
+The available varyings are:
+
+| Semantic | Varying name |
+|----------|--------------|
+| Ogre::VES_POSITION | xfb_position |
+| Ogre::VES_NORMAL | xfb_normal |
+| Ogre::VES_COLOUR | xfb_colour |
+| Ogre::VES_COLOUR2 | xfb_colour2 |
+| Ogre::VES_TEXTURE_COORDINATES | xfb_uv0 - xfb_uv7 |
+
 ## Compatibility profile GLSL features {#Legacy-GLSL-features}
 
 The following features are only available when using the legacy OpenGL profile. Notably they are not available with GL3+ or GLES2.

@@ -28,20 +28,11 @@ THE SOFTWARE.
 #ifndef __GLES2RenderToVertexBuffer_H__
 #define __GLES2RenderToVertexBuffer_H__
 
-#include "OgreRenderToVertexBuffer.h"
+#include "OgreGLRenderToVertexBufferCommon.h"
 #include "OgreGLES2Prerequisites.h"
 
 namespace Ogre {
-    /**
-        An object which renders geometry to a vertex.
-
-        This is especially useful together with geometry shaders, as you can
-        render procedural geometry which will get saved to a vertex buffer for
-        reuse later, without regenerating it again. You can also create shaders
-        that run on previous results of those shaders, creating stateful 
-        shaders.
-    */
-    class _OgreGLES2Export GLES2RenderToVertexBuffer : public RenderToVertexBuffer
+    class GLES2RenderToVertexBuffer : public GLRenderToVertexBufferCommon
     {    
     public:
         /** C'tor */
@@ -50,20 +41,11 @@ namespace Ogre {
         virtual ~GLES2RenderToVertexBuffer();
 
         /**
-            Get the render operation for this buffer 
-        */
-        void getRenderOperation(RenderOperation& op) override;
-
-        /**
             Update the contents of this vertex buffer by rendering
         */
         void update(SceneManager* sceneMgr) override;
     protected:
-        void reallocateBuffer(size_t index);
         void bindVerticesOutput(Pass* pass);
-        String getSemanticVaryingName(VertexElementSemantic semantic, unsigned short index);
-        HardwareVertexBufferSharedPtr mVertexBuffers[2];
-        size_t mFrontBufferIndex;
         GLuint mPrimitivesDrawnQuery;
         bool mFeedbackActive;
     };

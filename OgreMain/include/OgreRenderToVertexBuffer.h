@@ -95,7 +95,7 @@ namespace Ogre {
         /**
            Get the render operation for this buffer
         */
-        virtual void getRenderOperation(RenderOperation& op) = 0;
+        void getRenderOperation(RenderOperation& op);
 
         /**
            Update the contents of this vertex buffer by rendering
@@ -133,13 +133,18 @@ namespace Ogre {
         void setRenderToBufferMaterialName(const String& materialName);
 
     protected:
+        Pass* derivePass(SceneManager* sceneMgr);
+
         RenderOperation::OperationType mOperationType;
         bool mResetsEveryUpdate;
         bool mResetRequested;
-        MaterialPtr mMaterial;
         Renderable* mSourceRenderable;
         std::unique_ptr<VertexData> mVertexData;
         unsigned int mMaxVertexCount;
+        HardwareVertexBufferPtr mVertexBuffers[2];
+        uint8 mTargetBufferIndex;
+     private:
+        MaterialPtr mMaterial;
     };
 
     /** @} */

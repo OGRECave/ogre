@@ -104,6 +104,7 @@ add_library(OgreGLSupport STATIC
     src/OgreGLTextureCommon.cpp
     src/OgreGLDepthBufferCommon.cpp
     src/OgreGLRenderTexture.cpp
+    src/OgreGLRenderToVertexBufferCommon.cpp
     src/OgreGLHardwarePixelBufferCommon.cpp
     src/OgreGLUniformCache.cpp
     src/OgreGLVertexArrayObject.cpp
