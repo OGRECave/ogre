@@ -265,11 +265,11 @@ ManualObject::ManualObject(const String& name)
             case VET_FLOAT2:
             case VET_FLOAT3:
             case VET_FLOAT4:
-                OgreAssert(elem.getSemantic() != VES_DIFFUSE, "must use VET_COLOUR");
+                OgreAssert(elem.getSemantic() != VES_COLOUR, "must use VET_UBYTE4_NORM");
                 elem.baseVertexPointerToElement(pBase, &pFloat);
                 break;
             case VET_UBYTE4_NORM:
-                OgreAssert(elem.getSemantic() == VES_DIFFUSE, "must use VES_DIFFUSE");
+                OgreAssert(elem.getSemantic() == VES_COLOUR, "must use VES_COLOUR");
                 elem.baseVertexPointerToElement(pBase, &pRGBA);
                 break;
             default:
@@ -281,27 +281,20 @@ ManualObject::ManualObject(const String& name)
             switch(elem.getSemantic())
             {
             case VES_POSITION:
-                *pFloat++ = mTempVertex.position.x;
-                *pFloat++ = mTempVertex.position.y;
-                *pFloat++ = mTempVertex.position.z;
+                memcpy(pFloat, mTempVertex.position.ptr(), sizeof(Vector3f));
                 break;
             case VES_NORMAL:
-                *pFloat++ = mTempVertex.normal.x;
-                *pFloat++ = mTempVertex.normal.y;
-                *pFloat++ = mTempVertex.normal.z;
+                memcpy(pFloat, mTempVertex.normal.ptr(), sizeof(Vector3f));
                 break;
             case VES_TANGENT:
-                *pFloat++ = mTempVertex.tangent.x;
-                *pFloat++ = mTempVertex.tangent.y;
-                *pFloat++ = mTempVertex.tangent.z;
+                memcpy(pFloat, mTempVertex.tangent.ptr(), sizeof(Vector3f));
                 break;
             case VES_TEXTURE_COORDINATES:
                 dims = VertexElement::getTypeCount(elem.getType());
-                for (ushort t = 0; t < dims; ++t)
-                    *pFloat++ = mTempVertex.texCoord[elem.getIndex()][t];
+                memcpy(pFloat, mTempVertex.texCoord[elem.getIndex()].ptr(), sizeof(float)*dims);
                 break;
-            case VES_DIFFUSE:
-                *pRGBA++ = mTempVertex.colour.getAsABGR();
+            case VES_COLOUR:
+                *pRGBA = mTempVertex.colour.getAsBYTE();
                 break;
             default:
                 OgreAssert(false, "invalid semantic");
