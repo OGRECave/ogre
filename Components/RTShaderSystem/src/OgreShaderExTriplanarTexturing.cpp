@@ -228,6 +228,7 @@ namespace RTShader {
                 {
                     return NULL;
                 }
+                ++it;
                 Vector3 vParameters(parameters[0], parameters[1], parameters[2]);
                 tpSubRenderState->setParameters(vParameters);
 
