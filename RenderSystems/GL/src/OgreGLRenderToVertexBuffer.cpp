@@ -299,7 +299,7 @@ namespace Ogre {
         {
             sampleProgram = pass->getGeometryProgram().get();
         }
-        if ((sampleProgram != 0) && (sampleProgram->getLanguage() == "glsl"))
+        if (sampleProgram && (sampleProgram->_getBindingDelegate()->getLanguage() == "glsl"))
         {
             useVaryingAttributes = true;
         }
