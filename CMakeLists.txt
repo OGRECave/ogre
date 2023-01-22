@@ -16,7 +16,7 @@
 
 cmake_minimum_required(VERSION 3.10.0)
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
@@ -67,7 +67,7 @@ if (APPLE AND NOT ANDROID)
   add_definitions(-D__ASSERT_MACROS_DEFINE_VERSIONS_WITHOUT_UNDERSCORES=0)
 endif ()
 
-project(OGRE VERSION 13.6.1)
+project(OGRE VERSION 14.0.0)
 
 # extra version info
 set(OGRE_VERSION_SUFFIX "")
