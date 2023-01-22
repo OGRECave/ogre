@@ -32,26 +32,12 @@ THE SOFTWARE.
 #include "OgreD3D11Prerequisites.h"
 
 namespace Ogre {
-    /**
-    An object which renders geometry to a vertex.
-
-    This is especially useful together with geometry shaders, as you can
-    render procedural geometry which will get saved to a vertex buffer for
-    reuse later, without regenerating it again. You can also create shaders
-    that run on previous results of those shaders, creating stateful 
-    shaders.
-    */
-    class _OgreD3D11Export D3D11RenderToVertexBuffer :
+    class D3D11RenderToVertexBuffer :
         public RenderToVertexBuffer
     {
     public:
         D3D11RenderToVertexBuffer(D3D11Device & device, D3D11HardwareBufferManagerBase * bufManager);
         virtual ~D3D11RenderToVertexBuffer(void);
-
-        /**
-        Get the render operation for this buffer 
-        */
-        virtual void getRenderOperation(RenderOperation& op);
 
         /**
         Update the contents of this vertex buffer by rendering
@@ -63,8 +49,6 @@ namespace Ogre {
 
         ID3D11GeometryShader* mpGeometryShader;
         D3D11Device & mDevice;
-        HardwareVertexBufferSharedPtr mVertexBuffers[2];
-        size_t mFrontBufferIndex;
         D3D11HardwareBufferManagerBase * mBufManager;
     };
 }

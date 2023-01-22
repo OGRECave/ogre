@@ -35,16 +35,10 @@ in block {
     vec3 Vel;
 } FireworkData[];
 
-// out vec3 outputPos;
-// out float outputTimer;
-// out float outputType;
-// out vec3 outputVel;
-
-// out vec3 gl_Position;
-out vec3 oPos;
-out float oUv0; // Timer
-out float oUv1; // Type
-out vec3 oUv2;  // Velocity
+out vec3  xfb_position;
+out float xfb_uv0; // Timer
+out float xfb_uv1; // Type
+out vec3  xfb_uv2; // Velocity
 
 uniform sampler1D randomTexture;
 uniform vec3 gravity;
@@ -64,10 +58,10 @@ void GSGenericHandler( vec3 Pos, vec3 Vel, float Timer, float Type,
 
     if (Pos.y > -100)
     {
-        oPos = Pos + (Vel * elapsedTime);
-        oUv0 = Timer;
-        oUv1 = Type;
-        oUv2 = Vel;
+        xfb_position = Pos + (Vel * elapsedTime);
+        xfb_uv0 = Timer;
+        xfb_uv1 = Type;
+        xfb_uv2 = Vel;
         EmitVertex();
     }
 }
@@ -97,10 +91,10 @@ void GSLauncherHandler( vec3 Pos, vec3 Vel, float Timer, float Type,
         vRandom = normalize(vRandom + vec3(0, 2.5, 0));
 
         // Time to emit a new SHELL.
-        oPos = Pos + Vel * elapsedTime;
-        oUv2 = Vel + vRandom * 35.0;
-        oUv0 = P_SHELLLIFE + vRandom.y * 0.5;
-        oUv1 = PT_SHELL;
+        xfb_position = Pos + Vel * elapsedTime;
+        xfb_uv2 = Vel + vRandom * 35.0;
+        xfb_uv0 = P_SHELLLIFE + vRandom.y * 0.5;
+        xfb_uv1 = PT_SHELL;
         EmitVertex();
 
         // Reset our timer.
@@ -112,10 +106,10 @@ void GSLauncherHandler( vec3 Pos, vec3 Vel, float Timer, float Type,
     }
 
     // Emit ourselves to keep us alive.
-    oPos = Pos;
-    oUv2 = Vel;
-    oUv0 = Timer;
-    oUv1 = Type;
+    xfb_position = Pos;
+    xfb_uv2 = Vel;
+    xfb_uv0 = Timer;
+    xfb_uv1 = Type;
     EmitVertex();
 }
 
@@ -136,10 +130,10 @@ void GSShellHandler( vec3 Pos, vec3 Vel, float Timer, float Type,
         for (int i = 0; i < NUM_EMBER_1S; i++)
         {
             vRandom = normalize(RandomDir(Type + i, globalTime, randomTex));
-            oPos = Pos + Vel * elapsedTime;
-            oUv2 = Vel + vRandom * 15.0;
-            oUv0 = P_EMBER1LIFE;
-            oUv1 = PT_EMBER1;
+            xfb_position = Pos + Vel * elapsedTime;
+            xfb_uv2 = Vel + vRandom * 15.0;
+            xfb_uv0 = P_EMBER1LIFE;
+            xfb_uv1 = PT_EMBER1;
             EmitVertex();
         }
 
@@ -149,10 +143,10 @@ void GSShellHandler( vec3 Pos, vec3 Vel, float Timer, float Type,
         for (int i = 0; i < NUM_EMBER_2S; i++)
         {
             vRandom = normalize(RandomDir(Type, globalTime, randomTex));
-            oPos = Pos + Vel * elapsedTime;
-            oUv2 = Vel + vRandom * 10.0;
-            oUv0 = P_EMBER2LIFE + 0.4 * vRandom.x;
-            oUv1 = PT_EMBER2;
+            xfb_position = Pos + Vel * elapsedTime;
+            xfb_uv2 = Vel + vRandom * 10.0;
+            xfb_uv0 = P_EMBER2LIFE + 0.4 * vRandom.x;
+            xfb_uv1 = PT_EMBER2;
             EmitVertex();
         }
 
@@ -190,10 +184,10 @@ void GSEmber2Handler( vec3 Pos, vec3 Vel, float Timer, float Type,
         // Time to emit a series of new Ember3's.
         for (int i = 0; i < NUM_EMBER_3S; i++)
         {
-            oPos = Pos + Vel * elapsedTime;
-            oUv2 = Vel + normalize(RandomDir(Type + i, globalTime, randomTex)) * 10.0;
-            oUv0 = P_EMBER3LIFE;
-            oUv1 = PT_EMBER3;
+            xfb_position = Pos + Vel * elapsedTime;
+            xfb_uv2 = Vel + normalize(RandomDir(Type + i, globalTime, randomTex)) * 10.0;
+            xfb_uv0 = P_EMBER3LIFE;
+            xfb_uv1 = PT_EMBER3;
             EmitVertex();
         }
     }
@@ -226,21 +220,21 @@ void main()
     // gl_Position = FireworkData[0].Pos + 1;// + FireworkData[0].Vel * elapsedTime;
     // // gl_Position = Pos[0];// + FireworkData[0].Vel * elapsedTime;
     // //gl_Position = vec4(10, 10, 10, 1);
-    // // oUv0 = P_SHELLLIFE + 0.5;
-    // oUv0 = FireworkData[0].Timer;
-    // // oUv0 = Timer[0];
-    // oUv1 = FireworkData[0].Type;
-    // // oUv1 = Type[0];
-    // oUv2 = FireworkData[0].Vel;
-    // // oUv2 = Vel[0];
-    // //oUv2 = vec3(4, 5, 35.0);
+    // // xfb_uv0 = P_SHELLLIFE + 0.5;
+    // xfb_uv0 = FireworkData[0].Timer;
+    // // xfb_uv0 = Timer[0];
+    // xfb_uv1 = FireworkData[0].Type;
+    // // xfb_uv1 = Type[0];
+    // xfb_uv2 = FireworkData[0].Vel;
+    // // xfb_uv2 = Vel[0];
+    // //xfb_uv2 = vec3(4, 5, 35.0);
     // EmitVertex();
     // EndPrimitive();
     // // // gl_Position = vec4(10, 20, 30, 1);
     // gl_Position = vec3(10, 20, 30);
-    // oUv0 = P_EMBER3LIFE;
-    // oUv1 = PT_SHELL;
-    // oUv2 = vec3(40, 50, 60);
+    // xfb_uv0 = P_EMBER3LIFE;
+    // xfb_uv1 = PT_SHELL;
+    // xfb_uv2 = vec3(40, 50, 60);
     // EmitVertex();
     // EndPrimitive();
 }
