@@ -29,11 +29,11 @@ branches:
     - stable
     - /v\d+\.\d+\.\d+/
 after_build:
-  - IF NOT "%APPVEYOR_REPO_TAG%" == "true" set APPVEYOR_REPO_TAG_NAME=master
+  - IF NOT "%APPVEYOR_REPO_TAG%" == "true" set APPVEYOR_REPO_TAG_NAME=stable
   - 7z a ogre-sdk-%APPVEYOR_REPO_TAG_NAME%-msvc141-x64.zip ./build/sdk/*
   - SET PATH=C:\Python310-x64;C:\Python310-x64\Scripts;%PATH%
   - pip install --upgrade cloudsmith-cli
   - IF "%APPVEYOR_PULL_REQUEST_NUMBER%" == "" cloudsmith push raw ogrecave/ogre ogre-sdk-%APPVEYOR_REPO_TAG_NAME%-msvc141-x64.zip --republish --version %APPVEYOR_REPO_TAG_NAME% -k %CS_APIKEY%
 artifacts:
-  - path: ogre-sdk-master-msvc141-x64.zip
-    name: ogre-sdk-master-msvc141-x64
+  - path: ogre-sdk-stable-msvc141-x64.zip
+    name: ogre-sdk-stable-msvc141-x64

@@ -1,10 +1,10 @@
 name: CI Build
 on: 
   push:
-    branches: [master]
+    branches: [stable]
     tags: ["v*"]
   pull_request:
-    branches: [master]
+    branches: [stable]
 jobs:
   linux:
     runs-on: ubuntu-20.04
@@ -67,7 +67,7 @@ jobs:
     - name: zip SDK
       id: package
       run: |
-        [[ $GITHUB_REF = refs/tags/* ]] && VERNAME=${GITHUB_REF##*/} || VERNAME="master"
+        [[ $GITHUB_REF = refs/tags/* ]] && VERNAME=${GITHUB_REF##*/} || VERNAME="stable"
         echo "ver=${VERNAME}" >> $GITHUB_OUTPUT
         cd build/OgreJNI && zip -qr ogre-sdk-android-${VERNAME}-arm64-v8a.zip *
     - name: upload artifact
