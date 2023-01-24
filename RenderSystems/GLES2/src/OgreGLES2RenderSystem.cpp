@@ -901,22 +901,7 @@ namespace Ogre {
                 vpRect.top = target->getHeight() - vpRect.top;
                 vpRect.bottom = target->getHeight() - vpRect.bottom;
             }
-            
-#if OGRE_NO_VIEWPORT_ORIENTATIONMODE == 0
-            // This works fine whether getConfigOptions() returns by value or by reference.
-            const ConfigOptionMap& configOptions = mGLSupport->getConfigOptions();
-            ConfigOptionMap::const_iterator opt;
-            ConfigOptionMap::const_iterator end = configOptions.end();
-            
-            if ((opt = configOptions.find("Orientation")) != end)
-            {
-                String val = opt->second.currentValue;
-                if (val.find("Landscape") != String::npos)
-                {
-                    std::swap(vpRect.right, vpRect.bottom);
-                }
-            }
-#endif
+
             mStateCacheManager->setViewport(vpRect);
 
             vp->_clearUpdatedFlag();

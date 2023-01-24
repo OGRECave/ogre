@@ -1277,11 +1277,6 @@ void TrayManager::hideCursor()
 
 void TrayManager::refreshCursor()
 {
-#if (OGRE_NO_VIEWPORT_ORIENTATIONMODE == 0) || (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS)
-    // TODO:
-    // the position should be based on the orientation, for now simply return
-    return;
-#endif
     mCursor->setPosition(mCursorPos.x, mCursorPos.y);
 }
 

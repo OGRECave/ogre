@@ -30,7 +30,6 @@ THE SOFTWARE.
 #include "OgreRenderTarget.h"
 
 namespace Ogre {
-    OrientationMode Viewport::mDefaultOrientationMode = OR_DEGREE_0;
     //---------------------------------------------------------------------
     Viewport::Viewport(Camera* cam, RenderTarget* target, float left, float top, float width, float height, int ZOrder)
         : mCamera(cam)
@@ -58,9 +57,6 @@ namespace Ogre {
             << ", relative dimensions " << mRelRect
             << " Z-order: " << ZOrder;
 #endif
-
-        // Set the default orientation mode
-        mOrientationMode = mDefaultOrientationMode;
             
         // Set the default material scheme
         RenderSystem* rs = Root::getSingleton().getRenderSystem();
@@ -116,10 +112,6 @@ namespace Ogre {
         {
             if (mCamera->getAutoAspectRatio())
                 mCamera->setAspectRatio((float)mActRect.width() / (float)mActRect.height());
-
-#if OGRE_NO_VIEWPORT_ORIENTATIONMODE == 0
-            mCamera->setOrientationMode(mOrientationMode);
-#endif
         }
 
         LogManager::getSingleton().stream(LML_TRIVIAL)
@@ -150,63 +142,6 @@ namespace Ogre {
             // Tell Camera to render into me
             mCamera->_renderScene(this);
         }
-    }
-    //---------------------------------------------------------------------
-    void Viewport::setOrientationMode(OrientationMode orientationMode, bool setDefault)
-    {
-#if OGRE_NO_VIEWPORT_ORIENTATIONMODE != 0
-        OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED,
-                    "Setting Viewport orientation mode is not supported");
-#endif
-        mOrientationMode = orientationMode;
-
-        if (setDefault)
-        {
-            setDefaultOrientationMode(orientationMode);
-        }
-
-        if (mCamera)
-        {
-            mCamera->setOrientationMode(mOrientationMode);
-        }
-
-    // Update the render system config
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
-        RenderSystem* rs = Root::getSingleton().getRenderSystem();
-        if(mOrientationMode == OR_LANDSCAPELEFT)
-            rs->setConfigOption("Orientation", "Landscape Left");
-        else if(mOrientationMode == OR_LANDSCAPERIGHT)
-            rs->setConfigOption("Orientation", "Landscape Right");
-        else if(mOrientationMode == OR_PORTRAIT)
-            rs->setConfigOption("Orientation", "Portrait");
-#endif
-    }
-    //---------------------------------------------------------------------
-    OrientationMode Viewport::getOrientationMode() const
-    {
-#if OGRE_NO_VIEWPORT_ORIENTATIONMODE != 0
-        OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED,
-                    "Getting Viewport orientation mode is not supported");
-#endif
-        return mOrientationMode;
-    }
-    //---------------------------------------------------------------------
-    void Viewport::setDefaultOrientationMode(OrientationMode orientationMode)
-    {
-#if OGRE_NO_VIEWPORT_ORIENTATIONMODE != 0
-        OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED,
-                    "Setting default Viewport orientation mode is not supported");
-#endif
-        mDefaultOrientationMode = orientationMode;
-    }
-    //---------------------------------------------------------------------
-    OrientationMode Viewport::getDefaultOrientationMode()
-    {
-#if OGRE_NO_VIEWPORT_ORIENTATIONMODE != 0
-        OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED,
-                    "Getting default Viewport orientation mode is not supported");
-#endif
-        return mDefaultOrientationMode;
     }
     //---------------------------------------------------------------------
     void Viewport::setClearEveryFrame(bool inClear, unsigned int inBuffers)
@@ -265,46 +200,12 @@ namespace Ogre {
             {
                 cam->setAspectRatio((float)mActRect.width() / (float)mActRect.height());
             }
-#if OGRE_NO_VIEWPORT_ORIENTATIONMODE == 0
-            cam->setOrientationMode(mOrientationMode);
-#endif
             cam->_notifyViewport(this);
         }
 
         for (ListenerList::iterator i = mListeners.begin(); i != mListeners.end(); ++i)
         {
             (*i)->viewportCameraChanged(this);
-        }
-    }
-    //-----------------------------------------------------------------------
-    void Viewport::pointOrientedToScreen(const Vector2 &v, int orientationMode, Vector2 &outv)
-    {
-        pointOrientedToScreen(v.x, v.y, orientationMode, outv.x, outv.y);
-    }
-    //-----------------------------------------------------------------------
-    void Viewport::pointOrientedToScreen(Real orientedX, Real orientedY, int orientationMode,
-                                         Real &screenX, Real &screenY)
-    {
-        Real orX = orientedX;
-        Real orY = orientedY;
-        switch (orientationMode)
-        {
-        case 1:
-            screenX = orY;
-            screenY = Real(1.0) - orX;
-            break;
-        case 2:
-            screenX = Real(1.0) - orX;
-            screenY = Real(1.0) - orY;
-            break;
-        case 3:
-            screenX = Real(1.0) - orY;
-            screenY = orX;
-            break;
-        default:
-            screenX = orX;
-            screenY = orY;
-            break;
         }
     }
     //-----------------------------------------------------------------------

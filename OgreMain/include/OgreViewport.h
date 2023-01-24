@@ -187,22 +187,6 @@ namespace Ogre {
         */
         void setDimensions(float left, float top, float width, float height);
 
-        /** Set the orientation mode of the viewport.
-        */
-        void setOrientationMode(OrientationMode orientationMode, bool setDefault = true);
-
-        /** Get the orientation mode of the viewport.
-        */
-        OrientationMode getOrientationMode() const;
-
-        /** Set the initial orientation mode of viewports.
-        */
-        static void setDefaultOrientationMode(OrientationMode orientationMode);
-
-        /** Get the initial orientation mode of viewports.
-        */
-        static OrientationMode getDefaultOrientationMode();
-
         /** Sets the initial background colour of the viewport (before
             rendering).
         */
@@ -351,11 +335,6 @@ namespace Ogre {
         */
         uint getVisibilityMask(void) const { return mVisibilityMask; }
 
-        /** Convert oriented input point coordinates to screen coordinates. */
-        void pointOrientedToScreen(const Vector2 &v, int orientationMode, Vector2 &outv);
-        void pointOrientedToScreen(Real orientedX, Real orientedY, int orientationMode,
-                                   Real &screenX, Real &screenY);
-
         /// Add a listener to this viewport
         void addListener(Listener* l);
         /// Remove a listener to this viewport
@@ -398,9 +377,6 @@ namespace Ogre {
         uint32 mVisibilityMask;
         /// Material scheme
         String mMaterialSchemeName;
-        /// Viewport orientation mode
-        OrientationMode mOrientationMode;
-        static OrientationMode mDefaultOrientationMode;
 
         /// Automatic rendering on/off
         bool mIsAutoUpdated;

@@ -95,8 +95,6 @@ WARNING: Disabling this will make the samples unusable.
 */
 #cmakedefine01 OGRE_NO_ZIP_ARCHIVE
 
-#cmakedefine01 OGRE_NO_VIEWPORT_ORIENTATIONMODE
-
 #cmakedefine01 OGRE_NO_TBB_SCHEDULER
 
 /** If set to 1, profiling code will be included in the application. When you
