@@ -81,17 +81,6 @@ namespace Ogre {
         mFSAALevels.push_back(8);
 
         mOptions[optContentScalingFactor.name] = optContentScalingFactor;
-        
-#if OGRE_NO_VIEWPORT_ORIENTATIONMODE == 0
-        ConfigOption optOrientation;
-        optOrientation.name = "Orientation";
-        optOrientation.possibleValues.push_back("Portrait");
-        optOrientation.possibleValues.push_back("Landscape Left");
-        optOrientation.possibleValues.push_back("Landscape Right");
-        optOrientation.currentValue = "Portrait";
-        optOrientation.immutable = false;
-        mOptions[optOrientation.name] = optOrientation;
-#endif
 
         return mOptions;
     }

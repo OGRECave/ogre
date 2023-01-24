@@ -509,21 +509,6 @@ void ApplicationContextBase::reconfigure(const Ogre::String &renderer, Ogre::Nam
     for (auto & option : options)
     {
         rs->setConfigOption(option.first, option.second);
-
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
-        // Change the viewport orientation on the fly if requested
-        if(option.first == "Orientation")
-        {
-            Ogre::RenderWindow* win = getRenderWindow();
-
-            if (option.second == "Landscape Left")
-                win->getViewport(0)->setOrientationMode(Ogre::OR_LANDSCAPELEFT, true);
-            else if (option.second == "Landscape Right")
-                win->getViewport(0)->setOrientationMode(Ogre::OR_LANDSCAPERIGHT, true);
-            else if (option.second == "Portrait")
-                win->getViewport(0)->setOrientationMode(Ogre::OR_PORTRAIT, true);
-        }
-#endif
     }
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS

@@ -324,10 +324,6 @@ namespace Ogre {
 
         Radian orientationRotation = Radian(0);
 
-#if OGRE_NO_VIEWPORT_ORIENTATIONMODE == 0
-        orientationRotation = Radian(OverlayManager::getSingleton().getViewportOrientationMode() * Math::HALF_PI);
-#endif
-
         Matrix3 rot3x3, scale3x3;
         rot3x3.FromEulerAnglesXYZ(Radian(0), Radian(0), mRotate + orientationRotation);
         scale3x3 = Matrix3::ZERO;
