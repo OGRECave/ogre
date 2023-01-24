@@ -35,7 +35,6 @@ THE SOFTWARE.
 namespace Ogre
 {
     class PSSMShadowCameraSetup;
-    class ShaderHelper;
 
     namespace RTShader
     {
@@ -46,23 +45,23 @@ namespace Ogre
     *  @{
     */
     /** \addtogroup Terrain
-    *  Some details on the terrain component
     *  @{
     */
-
-    enum TechniqueType
-    {
-        HIGH_LOD,
-        LOW_LOD,
-        RENDER_COMPOSITE_MAP
-    };
 
     /** A TerrainMaterialGenerator which can cope with normal mapped, specular mapped
         terrain.
     */
     class _OgreTerrainExport TerrainMaterialGeneratorA : public TerrainMaterialGenerator
     {
+    public:
+        class SM2Profile;
+    private:
         std::unique_ptr<RTShader::RenderState> mMainRenderState;
+        std::unique_ptr<SM2Profile> mActiveProfile;
+        bool mLightmapEnabled;
+        bool mCompositeMapEnabled;
+        bool mReceiveDynamicShadows;
+        bool mLowLodShadows;
     public:
         TerrainMaterialGeneratorA();
         virtual ~TerrainMaterialGeneratorA();
@@ -71,19 +70,15 @@ namespace Ogre
 
         /** Shader model 2 profile target. 
         */
-        class _OgreTerrainExport SM2Profile : public TerrainMaterialGenerator::Profile
+        class _OgreTerrainExport SM2Profile : public Profile
         {
         public:
-            SM2Profile(TerrainMaterialGenerator* parent, const String& name, const String& desc);
+            SM2Profile(TerrainMaterialGeneratorA* parent);
             virtual ~SM2Profile();
-            MaterialPtr generate(const Terrain* terrain) override;
-            MaterialPtr generateForCompositeMap(const Terrain* terrain) override;
-            uint8 getMaxLayers(const Terrain* terrain) const override;
-            void updateParams(const MaterialPtr& mat, const Terrain* terrain) override;
-            void updateParamsForCompositeMap(const MaterialPtr& mat, const Terrain* terrain) override;
-            void requestOptions(Terrain* terrain) override;
-            bool isVertexCompressionSupported() const override;
-
+            /// Generate / reuse a material for the terrain
+            MaterialPtr generate(const Terrain* terrain);
+            /// Get the number of layers supported
+            uint8 getMaxLayers(const Terrain* terrain) const;
             /** Whether to support normal mapping per layer in the shader (default true). 
             */
             bool isLayerNormalMappingEnabled() const  { return mLayerNormalMappingEnabled; }
@@ -102,38 +97,7 @@ namespace Ogre
             /** Whether to support specular mapping per layer in the shader (default true). 
             */
             void setLayerSpecularMappingEnabled(bool enabled);
-            /** Whether to support a global colour map over the terrain in the shader,
-                if it's present (default true). 
-            */
-            bool isGlobalColourMapEnabled() const  { return mGlobalColourMapEnabled; }
-            /** Whether to support a global colour map over the terrain in the shader,
-            if it's present (default true). 
-            */
-            void setGlobalColourMapEnabled(bool enabled);
-            /** Whether to support a light map over the terrain in the shader,
-            if it's present (default true). 
-            */
-            bool isLightmapEnabled() const  { return mLightmapEnabled; }
-            /** Whether to support a light map over the terrain in the shader,
-            if it's present (default true). 
-            */
-            void setLightmapEnabled(bool enabled) override;
-            /** Whether to use the composite map to provide a lower LOD technique
-                in the distance (default true). 
-            */
-            bool isCompositeMapEnabled() const  { return mCompositeMapEnabled; }
-            /** Whether to use the composite map to provide a lower LOD technique
-            in the distance (default true). 
-            */
-            void setCompositeMapEnabled(bool enabled);
-            /** Whether to support dynamic texture shadows received from other 
-                objects, on the terrain (default true). 
-            */
-            bool getReceiveDynamicShadowsEnabled() const  { return mReceiveDynamicShadows; }
-            /** Whether to support dynamic texture shadows received from other 
-            objects, on the terrain (default true). 
-            */
-            void setReceiveDynamicShadowsEnabled(bool enabled);
+
 
             /** Whether to use PSSM support dynamic texture shadows, and if so the 
                 settings to use (default 0). 
@@ -143,29 +107,69 @@ namespace Ogre
             settings to use (default 0). 
             */
             PSSMShadowCameraSetup* getReceiveDynamicShadowsPSSM() const { return mPSSM; }
-            /// @deprecated determined by PixelFormat
-            OGRE_DEPRECATED void setReceiveDynamicShadowsDepth(bool enabled) {}
-            /// @deprecated determined by PixelFormat
-            OGRE_DEPRECATED bool getReceiveDynamicShadowsDepth() const { return true; }
-            /** Whether to use shadows on low LOD material rendering (when using composite map) (default false). 
-            */
-            void setReceiveDynamicShadowsLowLod(bool enabled);
-            /** Whether to use shadows on low LOD material rendering (when using composite map) (default false). 
-            */
-            bool getReceiveDynamicShadowsLowLod() const { return mLowLodShadows; }
 
-            bool isShadowingEnabled(TechniqueType tt, const Terrain* terrain) const;
+            void setLightmapEnabled(bool enabled) { mParent->setLightmapEnabled(enabled); }
+            void setCompositeMapEnabled(bool enabled) { mParent->setCompositeMapEnabled(enabled); }
+            void setReceiveDynamicShadowsEnabled(bool enabled) { mParent->setReceiveDynamicShadowsEnabled(enabled); }
+            void setReceiveDynamicShadowsLowLod(bool enabled) { mParent->setReceiveDynamicShadowsLowLod(enabled); }
         private:
+            enum TechniqueType
+            {
+                HIGH_LOD,
+                LOW_LOD,
+                RENDER_COMPOSITE_MAP
+            };
+            bool isShadowingEnabled(TechniqueType tt, const Terrain* terrain) const;
+            TerrainMaterialGeneratorA* mParent;
             bool mLayerNormalMappingEnabled;
             bool mLayerParallaxMappingEnabled;
             bool mLayerSpecularMappingEnabled;
-            bool mGlobalColourMapEnabled;
-            bool mLightmapEnabled;
-            bool mCompositeMapEnabled;
-            bool mReceiveDynamicShadows;
             PSSMShadowCameraSetup* mPSSM;
-            bool mLowLodShadows;
         };
+
+        /** Whether to support normal mapping per layer in the shader (default true).
+        */
+        void setLayerNormalMappingEnabled(bool enabled) { mActiveProfile->setLayerNormalMappingEnabled(enabled); }
+
+        /** Whether to support specular mapping per layer in the shader (default true).
+        */
+        void setLayerSpecularMappingEnabled(bool enabled) { mActiveProfile->setLayerSpecularMappingEnabled(enabled); }
+
+        /** Whether to support dynamic texture shadows received from other
+            objects, on the terrain (default true).
+        */
+        bool getReceiveDynamicShadowsEnabled() const  { return mReceiveDynamicShadows; }
+        /** Whether to support dynamic texture shadows received from other
+        objects, on the terrain (default true).
+        */
+        void setReceiveDynamicShadowsEnabled(bool enabled);
+
+        /** Whether to use shadows on low LOD material rendering (when using composite map) (default false).
+        */
+        void setReceiveDynamicShadowsLowLod(bool enabled);
+
+        /** Whether to use shadows on low LOD material rendering (when using composite map) (default false).
+        */
+        bool getReceiveDynamicShadowsLowLod() const { return mLowLodShadows; }
+
+        bool isLightmapEnabled() const  { return mLightmapEnabled; }
+        /** Whether to use the composite map to provide a lower LOD technique
+        in the distance (default true).
+        */
+        void setCompositeMapEnabled(bool enabled);
+        bool isCompositeMapEnabled() const  { return mCompositeMapEnabled; }
+
+        /// Get the active profile
+        Profile* getActiveProfile() const override { return mActiveProfile.get(); }
+
+        bool isVertexCompressionSupported() const override { return true; }
+        void requestOptions(Terrain* terrain) override;
+        MaterialPtr generate(const Terrain* terrain) override { return mActiveProfile->generate(terrain); }
+        MaterialPtr generateForCompositeMap(const Terrain* terrain) override;
+        void setLightmapEnabled(bool enabled) override;
+        uint8 getMaxLayers(const Terrain* terrain) const override { return mActiveProfile->getMaxLayers(terrain); }
+        void updateParams(const MaterialPtr& mat, const Terrain* terrain) override;
+        void updateParamsForCompositeMap(const MaterialPtr& mat, const Terrain* terrain) override;
     };
     /** @} */
     /** @} */
