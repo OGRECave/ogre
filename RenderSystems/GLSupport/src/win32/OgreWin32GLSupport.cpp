@@ -479,8 +479,16 @@ namespace Ogre {
             break;
         default:
             profile = WGL_CONTEXT_CORE_PROFILE_BIT_ARB;
-            majorVersion = std::max(glMajorMax, 3);
-            minorVersion = std::max(glMinorMax, 3); // 3.1 would be sufficient per spec, but we need 3.3 anyway..
+            if (glMajorMax > 3)
+            {
+                majorVersion = glMajorMax;
+                minorVersion = glMinorMax;
+            }
+            else
+            {
+                majorVersion = 3;
+                minorVersion = 3; // 3.1 would be sufficient per spec, but we need 3.3 anyway..
+            }
             break;
         }
 
