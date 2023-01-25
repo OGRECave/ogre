@@ -373,32 +373,6 @@ void SceneManager::_populateLightList(const Vector3& position, Real radius, Ligh
     }
 }
 //-----------------------------------------------------------------------
-Entity* SceneManager::createEntity(const String& entityName, PrefabType ptype)
-{
-    switch (ptype)
-    {
-    case PT_PLANE:
-        return createEntity(entityName, "Prefab_Plane");
-    case PT_CUBE:
-        return createEntity(entityName, "Prefab_Cube");
-    case PT_SPHERE:
-        return createEntity(entityName, "Prefab_Sphere");
-
-        break;
-    }
-
-    OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND, 
-        "Unknown prefab type for entity " + entityName,
-        "SceneManager::createEntity");
-}
-//---------------------------------------------------------------------
-Entity* SceneManager::createEntity(PrefabType ptype)
-{
-    String name = mMovableNameGenerator.generate();
-    return createEntity(name, ptype);
-}
-
-//-----------------------------------------------------------------------
 Entity* SceneManager::createEntity(
                                    const String& entityName,
                                    const String& meshName,

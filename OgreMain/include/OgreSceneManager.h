@@ -1422,17 +1422,9 @@ namespace Ogre {
         DebugDrawer* getDebugDrawer() const { return mDebugDrawer.get(); }
         /// @}
 
-        /** Prefab shapes available without loading a model.
-            @note
-                Minimal implementation at present.
-            @todo
-                Add more prefabs (teapots, teapots!!!)
-        */
-        enum PrefabType {
-            PT_PLANE,
-            PT_CUBE,
-            PT_SPHERE
-        };
+        static constexpr const char* PT_PLANE = "Prefab_Plane"; //!< XY plane with -100..100 extent, +Z normal and UVs
+        static constexpr const char* PT_CUBE = "Prefab_Cube"; //!< 100x100x100 cube centred at origin with normals and UVs
+        static constexpr const char* PT_SPHERE = "Prefab_Sphere"; //!< %Sphere with radius 50, around origin with normals UVs
         /// @name Entities
         /// @{
         /** Create an Entity (instance of a discrete mesh).
@@ -1466,18 +1458,6 @@ namespace Ogre {
         */
         Entity* createEntity(const MeshPtr& pMesh);
 
-        /** Create an Entity (instance of a discrete mesh) from a range of prefab shapes.
-            @param
-                entityName The name to be given to the entity (must be unique).
-            @param
-                ptype The prefab type.
-        */
-        Entity* createEntity(const String& entityName, PrefabType ptype);
-
-        /** Create an Entity (instance of a discrete mesh) from a range of prefab shapes, generating the name.
-            @param ptype The prefab type.
-        */
-        Entity* createEntity(PrefabType ptype);
         /// @copydoc getMovableObject()
         Entity* getEntity(const String& name) const;
         /// @copydoc hasMovableObject()
