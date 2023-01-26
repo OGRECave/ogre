@@ -162,14 +162,12 @@ namespace Ogre {
                 mFreeTempVertexBufferMap.find(sourceBuffer.get());
             if (i == mFreeTempVertexBufferMap.end())
             {
-                printf("creating temp vertex buffer\n");
                 // create new copy buffer, use shadow buffer and make dynamic
                 vbuf = createVertexBuffer(sourceBuffer->getVertexSize(), sourceBuffer->getNumVertices(), HBU_CPU_TO_GPU,
                                           true);
             }
             else
             {
-                printf("Reusing temp vertex buffer\n");
                 // Allocate existing copy
                 vbuf = i->second;
                 mFreeTempVertexBufferMap.erase(i);
