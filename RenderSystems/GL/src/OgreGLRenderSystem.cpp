@@ -1730,14 +1730,10 @@ namespace Ogre {
     void GLRenderSystem::_setCullingMode(CullingMode mode)
     {
         mCullingMode = mode;
-        // NB: Because two-sided stencil API dependence of the front face, we must
-        // use the same 'winding' for the front face everywhere. As the OGRE default
-        // culling mode is clockwise, we also treat anticlockwise winding as front
-        // face for consistently. On the assumption that, we can't change the front
-        // face by glFrontFace anywhere.
 
         GLenum cullMode;
         bool flip = flipFrontFace();
+        glFrontFace(flip ? GL_CW : GL_CCW);
 
         switch( mode )
         {
@@ -1745,10 +1741,10 @@ namespace Ogre {
             mStateCacheManager->setEnabled( GL_CULL_FACE, false );
             return;
         case CULL_CLOCKWISE:
-            cullMode = flip ? GL_FRONT : GL_BACK;
+            cullMode = GL_BACK;
             break;
         case CULL_ANTICLOCKWISE:
-            cullMode = flip ? GL_BACK : GL_FRONT;
+            cullMode = GL_FRONT;
             break;
         }
 
@@ -1896,7 +1892,7 @@ namespace Ogre {
         if(!state.enabled)
             return;
 
-        bool flip;
+        bool flip = false;
         mStencilWriteMask = state.writeMask;
 
         auto compareOp = convertCompareFunction(state.compareOp);
@@ -1906,9 +1902,6 @@ namespace Ogre {
             if (!mCurrentCapabilities->hasCapability(RSC_TWO_SIDED_STENCIL))
                 OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "2-sided stencils are not supported");
 
-            // NB: We should always treat CCW as front face for consistent with default
-            // culling mode. Therefore, we must take care with two-sided stencil settings.
-            flip = flipFrontFace();
             if(GLAD_GL_VERSION_2_0) // New GL2 commands
             {
                 // Back

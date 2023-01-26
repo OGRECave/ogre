@@ -830,14 +830,10 @@ namespace Ogre {
     void GL3PlusRenderSystem::_setCullingMode(CullingMode mode)
     {
         mCullingMode = mode;
-        // NB: Because two-sided stencil API dependence of the front face, we must
-        // use the same 'winding' for the front face everywhere. As the OGRE default
-        // culling mode is clockwise, we also treat anticlockwise winding as front
-        // face for consistently. On the assumption that, we can't change the front
-        // face by glFrontFace anywhere.
 
         GLenum cullMode;
         bool flip = flipFrontFace();
+        OGRE_CHECK_GL_ERROR(glFrontFace(flip ? GL_CW : GL_CCW));
 
         switch( mode )
         {
@@ -845,10 +841,10 @@ namespace Ogre {
             mStateCacheManager->setEnabled( GL_CULL_FACE, false );
             return;
         case CULL_CLOCKWISE:
-            cullMode = flip ? GL_FRONT : GL_BACK;
+            cullMode = GL_BACK;
             break;
         case CULL_ANTICLOCKWISE:
-            cullMode = flip ? GL_BACK : GL_FRONT;
+            cullMode = GL_FRONT;
             break;
         }
 
@@ -978,16 +974,13 @@ namespace Ogre {
 
         if(!state.enabled)
             return;
-        bool flip;
+        bool flip = false;
         mStencilWriteMask = state.writeMask;
 
         auto compareOp = convertCompareFunction(state.compareOp);
 
         if (state.twoSidedOperation)
         {
-            // NB: We should always treat CCW as front face for consistent with default
-            // culling mode. Therefore, we must take care with two-sided stencil settings.
-            flip = flipFrontFace();
             // Back
             OGRE_CHECK_GL_ERROR(glStencilMaskSeparate(GL_BACK, state.writeMask));
             OGRE_CHECK_GL_ERROR(glStencilFuncSeparate(GL_BACK, compareOp, state.referenceValue, state.compareMask));
@@ -1006,7 +999,6 @@ namespace Ogre {
         }
         else
         {
-            flip = false;
             mStateCacheManager->setStencilMask(state.writeMask);
             OGRE_CHECK_GL_ERROR(glStencilFunc(compareOp, state.referenceValue, state.compareMask));
             OGRE_CHECK_GL_ERROR(glStencilOp(

@@ -1260,7 +1260,12 @@ namespace Ogre
         }
     }
 
-    void VulkanRenderSystem::_setCullingMode(CullingMode mode) { rasterState.cullMode = VulkanMappings::get(mode); }
+    void VulkanRenderSystem::_setCullingMode(CullingMode mode)
+    {
+        rasterState.cullMode = VulkanMappings::get(mode);
+        // flipFrontFace result is inverted due to inverted clip space Y
+        rasterState.frontFace = !flipFrontFace() ? VK_FRONT_FACE_CLOCKWISE : VK_FRONT_FACE_COUNTER_CLOCKWISE;
+    }
 
     void VulkanRenderSystem::_setDepthBias(float constantBias, float slopeScaleBias)
     {

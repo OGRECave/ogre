@@ -938,6 +938,7 @@ namespace Ogre {
 
         GLenum cullMode;
         bool flip = flipFrontFace();
+        OGRE_CHECK_GL_ERROR(glFrontFace(flip ? GL_CW : GL_CCW));
 
         switch (mode)
         {
@@ -945,10 +946,10 @@ namespace Ogre {
             mStateCacheManager->setDisabled(GL_CULL_FACE);
             return;
         case CULL_CLOCKWISE:
-            cullMode = flip ? GL_FRONT : GL_BACK;
+            cullMode = GL_BACK;
             break;
         case CULL_ANTICLOCKWISE:
-            cullMode = flip ? GL_BACK : GL_FRONT;
+            cullMode = GL_FRONT;
             break;
         }
 
@@ -1089,9 +1090,6 @@ namespace Ogre {
 
         if (state.twoSidedOperation)
         {
-            // NB: We should always treat CCW as front face for consistent with default
-            // culling mode. Therefore, we must take care with two-sided stencil settings.
-            flip = flipFrontFace();
             // Back
             OGRE_CHECK_GL_ERROR(glStencilMaskSeparate(GL_BACK, state.writeMask));
             OGRE_CHECK_GL_ERROR(glStencilFuncSeparate(GL_BACK, compareOp, state.referenceValue, state.compareMask));
