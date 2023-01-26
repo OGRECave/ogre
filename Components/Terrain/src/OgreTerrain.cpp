@@ -477,9 +477,9 @@ namespace Ogre
         // Layer declaration
         stream.writeChunkBegin(TERRAINLAYERDECLARATION_CHUNK_ID, TERRAINLAYERDECLARATION_CHUNK_VERSION);
         //  samplers
-        uint8 numSamplers = (uint8)decl.samplers.size();
+        uint8 numSamplers = (uint8)decl.size();
         stream.write(&numSamplers);
-        for (const auto & sampler : decl.samplers)
+        for (const auto & sampler : decl)
         {
             stream.writeChunkBegin(TERRAINLAYERSAMPLER_CHUNK_ID, TERRAINLAYERSAMPLER_CHUNK_VERSION);
             stream.write(&sampler.alias);
@@ -500,16 +500,16 @@ namespace Ogre
         //  samplers
         uint8 numSamplers;
         stream.read(&numSamplers);
-        targetdecl.samplers.resize(numSamplers);
+        targetdecl.resize(numSamplers);
         for (uint8 s = 0; s < numSamplers; ++s)
         {
             if (!stream.readChunkBegin(TERRAINLAYERSAMPLER_CHUNK_ID, TERRAINLAYERSAMPLER_CHUNK_VERSION))
                 return false;
 
-            stream.read(&(targetdecl.samplers[s].alias));
+            stream.read(&(targetdecl[s].alias));
             uint8 pixFmt;
             stream.read(&pixFmt);
-            targetdecl.samplers[s].format = (PixelFormat)pixFmt;
+            targetdecl[s].format = (PixelFormat)pixFmt;
             stream.readChunkEnd(TERRAINLAYERSAMPLER_CHUNK_ID);
         }
         //  elements are gone, keeping for backward compatibility
@@ -660,7 +660,7 @@ namespace Ogre
 
 
         // Layers
-        if (!readLayerInstanceList(stream, mLayerDecl.samplers.size(), mLayers))
+        if (!readLayerInstanceList(stream, mLayerDecl.size(), mLayers))
             return false;
         deriveUVMultipliers();
 
@@ -1750,7 +1750,7 @@ namespace Ogre
     //---------------------------------------------------------------------
     const String& Terrain::getLayerTextureName(uint8 layerIndex, uint8 samplerIndex) const
     {
-        if (layerIndex < mLayers.size() && samplerIndex < mLayerDecl.samplers.size())
+        if (layerIndex < mLayers.size() && samplerIndex < mLayerDecl.size())
         {
             return mLayers[layerIndex].textureNames[samplerIndex];
         }
@@ -1763,7 +1763,7 @@ namespace Ogre
     //---------------------------------------------------------------------
     void Terrain::setLayerTextureName(uint8 layerIndex, uint8 samplerIndex, const String& textureName)
     {
-        if (layerIndex < mLayers.size() && samplerIndex < mLayerDecl.samplers.size())
+        if (layerIndex < mLayers.size() && samplerIndex < mLayerDecl.size())
         {
             if (mLayers[layerIndex].textureNames[samplerIndex] != textureName)
             {
@@ -2489,7 +2489,7 @@ namespace Ogre
         for (auto & layer : mLayers)
         {
             // adjust number of textureNames to number declared samplers
-            layer.textureNames.resize(mLayerDecl.samplers.size());
+            layer.textureNames.resize(mLayerDecl.size());
         }
 
         if (includeGPUResources)
@@ -2507,7 +2507,7 @@ namespace Ogre
             mMaterialGenerator = TerrainGlobalOptions::getSingleton().getDefaultMaterialGenerator();
         }
 
-        if (mLayerDecl.samplers.empty())
+        if (mLayerDecl.empty())
         {
             // default the declaration
             mLayerDecl = mMaterialGenerator->getLayerDeclaration();

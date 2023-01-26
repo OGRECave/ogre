@@ -59,7 +59,7 @@ namespace Ogre
         // We expect terrain textures to have no alpha, so we use the alpha channel
         // in the albedo texture to store specular reflection
         // similarly we double-up the normal and height (for parallax)
-        mLayerDecl.samplers = {{"albedo_specular", PF_BYTE_RGBA}, {"normal_height", PF_BYTE_RGBA}};
+        mLayerDecl = {{"albedo_specular", PF_BYTE_RGBA}, {"normal_height", PF_BYTE_RGBA}};
 
         mActiveProfile.reset(new SM2Profile(this));
 
