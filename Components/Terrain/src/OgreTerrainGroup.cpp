@@ -1016,7 +1016,7 @@ namespace Ogre
         ser.read(&mDefaultImportData.maxBatchSize);
         ser.read(&mDefaultImportData.minBatchSize);
         Terrain::readLayerDeclaration(ser, mDefaultImportData.layerDeclaration);
-        Terrain::readLayerInstanceList(ser, mDefaultImportData.layerDeclaration.samplers.size(), 
+        Terrain::readLayerInstanceList(ser, mDefaultImportData.layerDeclaration.size(),
             mDefaultImportData.layerList);
 
         // copy data that would have normally happened on construction

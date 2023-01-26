@@ -46,52 +46,6 @@ namespace Ogre
     *  @{
     */
 
-    /// @deprecated do not use
-    enum TerrainLayerSamplerSemantic
-    {
-        /// Albedo colour (diffuse reflectance colour)
-        TLSS_ALBEDO = 0,
-        /// Tangent-space normal information from a detail texture
-        TLSS_NORMAL = 1,
-        /// Height information for the detail texture
-        TLSS_HEIGHT = 2,
-        /// Specular reflectance
-        TLSS_SPECULAR = 3
-    };
-
-    /** Information about one element of a sampler / texture within a layer. 
-    */
-    struct _OgreTerrainExport TerrainLayerSamplerElement
-    {
-        /// The source sampler index of this element relative to LayerDeclaration's list
-        uint8 source;
-        /// The semantic this element represents
-        TerrainLayerSamplerSemantic semantic;
-        /// The colour element at which this element starts
-        uint8 elementStart;
-        /// The number of colour elements this semantic uses (usually standard per semantic)
-        uint8 elementCount;
-
-        bool operator==(const TerrainLayerSamplerElement& e) const
-        {
-            return source == e.source &&
-                semantic == e.semantic &&
-                elementStart == e.elementStart &&
-                elementCount == e.elementCount;
-        }
-
-        TerrainLayerSamplerElement() : 
-            source(0), semantic(TLSS_ALBEDO), elementStart(0), elementCount(0)
-        {}
-
-        TerrainLayerSamplerElement(uint8 src, TerrainLayerSamplerSemantic sem,
-            uint8 elemStart, uint8 elemCount)
-            : source(src), semantic(sem), elementStart(elemStart), elementCount(elemCount)
-        {
-        }
-    };
-    typedef std::vector<TerrainLayerSamplerElement> TerrainLayerSamplerElementList;
-
     /** Description of a sampler that will be used with each layer. 
     */
     struct _OgreTerrainExport TerrainLayerSampler
@@ -100,11 +54,6 @@ namespace Ogre
         String alias;
         /// The format required of this texture
         PixelFormat format;
-
-        bool operator==(const TerrainLayerSampler& s) const
-        {
-            return alias == s.alias && format == s.format;
-        }
 
         TerrainLayerSampler()
             : alias(""), format(PF_UNKNOWN)
@@ -116,28 +65,11 @@ namespace Ogre
         {
         }
     };
-    typedef std::vector<TerrainLayerSampler> TerrainLayerSamplerList;
-
     /** The definition of the information each layer will contain in this terrain.
     All layers must contain the same structure of information, although the
     input textures can be different per layer instance. 
     */
-    struct _OgreTerrainExport TerrainLayerDeclaration
-    {
-        TerrainLayerSamplerList samplers;
-        OGRE_DEPRECATED TerrainLayerSamplerElementList elements;
-
-        bool operator==(const TerrainLayerDeclaration& dcl) const
-        {
-            return samplers == dcl.samplers;
-        }
-
-        TerrainLayerDeclaration& operator=(const TerrainLayerDeclaration& dcl)
-        {
-            samplers = dcl.samplers;
-            return *this;
-        }
-    };
+    typedef std::vector<TerrainLayerSampler> TerrainLayerDeclaration;
 
     /** Class that provides functionality to generate materials for use with a terrain.
 
