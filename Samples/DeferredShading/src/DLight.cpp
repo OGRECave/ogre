@@ -336,7 +336,7 @@ void DLight::updateFromCamera(Ogre::Camera* camera)
 
         SceneNode dummyNode(NULL);
         Camera shadowCam("ShadowCameraSetupCam", 0);
-        shadowCam._notifyAttached(&dummyNode);
+        dummyNode.attachObject(&shadowCam);
         shadowCam._notifyViewport(camera->getViewport());
         SceneManager* sm = mParentLight->_getManager();
         sm->getShadowCameraSetup()->getShadowCamera(sm, 
