@@ -606,8 +606,8 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
                 mSceneMgr->setShadowTextureSelfShadow(true);
                 mSceneMgr->setShadowCasterRenderBackFaces(true);
 
-                auto subRenderState = mShaderGenerator->createSubRenderState<RTShader::IntegratedPSSM3>();
-                subRenderState->setSplitPoints(static_cast<PSSMShadowCameraSetup*>(mPSSMSetup.get())->getSplitPoints());
+                auto subRenderState = mShaderGenerator->createSubRenderState(RTShader::SRS_INTEGRATED_PSSM3);
+                subRenderState->setParameter("split_points",  static_cast<PSSMShadowCameraSetup*>(mPSSMSetup.get())->getSplitPoints());
                 schemRenderState->addTemplateSubRenderState(subRenderState);
 
                 mSceneMgr->setShadowTextureCasterMaterial(MaterialManager::getSingleton().getByName("PSSM/shadow_caster"));

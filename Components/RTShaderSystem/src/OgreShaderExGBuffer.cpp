@@ -50,6 +50,33 @@ bool GBuffer::preAddToRenderState(const RenderState* renderState, Pass* srcPass,
     return true;
 }
 
+static GBuffer::TargetLayout translate(const String& val)
+{
+    if(val == "depth")
+        return GBuffer::TL_DEPTH;
+    if(val == "normal")
+        return GBuffer::TL_NORMAL;
+    if(val == "viewpos")
+        return GBuffer::TL_VIEWPOS;
+    if(val == "normal_viewdepth")
+        return GBuffer::TL_NORMAL_VIEWDEPTH;
+    return GBuffer::TL_DIFFUSE_SPECULAR;
+}
+
+void GBuffer::setParameter(const String& name, const Any& value)
+{
+    if(name == "target_buffers")
+    {
+        auto buffers = any_cast<StringVector>(value);
+        mOutBuffers.clear();
+
+        for(const auto& buf : buffers)
+            mOutBuffers.push_back(translate(buf));
+        return;
+    }
+    SubRenderState::setParameter(name, value);
+}
+
 //-----------------------------------------------------------------------
 bool GBuffer::createCpuSubPrograms(ProgramSet* programSet)
 {
@@ -196,19 +223,6 @@ void GBuffer::copyFrom(const SubRenderState& rhs)
 //-----------------------------------------------------------------------
 const String& GBufferFactory::getType() const { return SRS_GBUFFER; }
 
-static GBuffer::TargetLayout translate(const String& val)
-{
-    if(val == "depth")
-        return GBuffer::TL_DEPTH;
-    if(val == "normal")
-        return GBuffer::TL_NORMAL;
-    if(val == "viewpos")
-        return GBuffer::TL_VIEWPOS;
-    if(val == "normal_viewdepth")
-        return GBuffer::TL_NORMAL_VIEWDEPTH;
-    return GBuffer::TL_DIFFUSE_SPECULAR;
-}
-
 //-----------------------------------------------------------------------
 SubRenderState* GBufferFactory::createInstance(ScriptCompiler* compiler, PropertyAbstractNode* prop, Pass* pass,
                                                SGScriptTranslator* translator)
@@ -220,14 +234,14 @@ SubRenderState* GBufferFactory::createInstance(ScriptCompiler* compiler, Propert
     if((*it++)->getString() != "gbuffer")
         return NULL;
 
-    GBuffer::TargetBuffers targets;
-    targets.push_back(translate((*it++)->getString()));
+    StringVector targets;
+    targets.push_back((*it++)->getString());
 
     if(it != prop->values.end())
-        targets.push_back(translate((*it++)->getString()));
+        targets.push_back((*it++)->getString());
 
     auto ret = static_cast<GBuffer*>(createOrRetrieveInstance(translator));
-    ret->setOutBuffers(targets);
+    ret->setParameter("target_buffers", targets);
     return ret;
 }
 

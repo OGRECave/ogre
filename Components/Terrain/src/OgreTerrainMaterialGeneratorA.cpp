@@ -41,7 +41,6 @@ THE SOFTWARE.
 
 #include "OgreShaderGenerator.h"
 #include "OgreTerrainRTShaderSRS.h"
-#include "OgreShaderExIntegratedPSSM3.h"
 
 #include <fstream>
 #include <string>
@@ -285,9 +284,9 @@ namespace Ogre
             surface->setParameter("use_specular_mapping", std::to_string(mLayerSpecularMappingEnabled));
             if(isShadowingEnabled(HIGH_LOD, terrain))
             {
-                auto pssm = ShaderGenerator::getSingleton().createSubRenderState<IntegratedPSSM3>();
+                auto pssm = ShaderGenerator::getSingleton().createSubRenderState(SRS_INTEGRATED_PSSM3);
                 if(mPSSM)
-                    pssm->setSplitPoints(mPSSM->getSplitPoints());
+                    pssm->setParameter("split_points", mPSSM->getSplitPoints());
                 pssm->preAddToRenderState(mainRenderState.get(), pass, pass);
                 mainRenderState->addSubRenderStateInstance(pssm);
             }
@@ -322,9 +321,9 @@ namespace Ogre
                 {
                     // light count needed to enable PSSM3
                     lod1RenderState->setLightCount(Vector3i(0, 1, 0));
-                    auto pssm = ShaderGenerator::getSingleton().createSubRenderState<IntegratedPSSM3>();
+                    auto pssm = ShaderGenerator::getSingleton().createSubRenderState(SRS_INTEGRATED_PSSM3);
                     if(mPSSM)
-                        pssm->setSplitPoints(mPSSM->getSplitPoints());
+                        pssm->setParameter("split_points", mPSSM->getSplitPoints());
                     pssm->preAddToRenderState(lod1RenderState.get(), pass, pass);
                     lod1RenderState->addSubRenderStateInstance(pssm);
                 }

@@ -37,8 +37,6 @@ same license as the rest of the engine.
 #include "GBufferSchemeHandler.h"
 #include "NullSchemeHandler.h"
 
-#include "OgreShaderExGBuffer.h"
-
 using namespace Ogre;
 
 const Ogre::uint8 DeferredShadingSystem::PRE_GBUFFER_RENDER_QUEUE = Ogre::RENDER_QUEUE_1;
@@ -178,8 +176,8 @@ void DeferredShadingSystem::createResources(void)
 
     RTShader::RenderState* schemRenderState = rtShaderGen.getRenderState("GBuffer");
     schemRenderState->setLightCountAutoUpdate(false); // does not use lights
-    RTShader::GBuffer* subRenderState = rtShaderGen.createSubRenderState<RTShader::GBuffer>();
-    subRenderState->setOutBuffers({RTShader::GBuffer::TL_DIFFUSE_SPECULAR, RTShader::GBuffer::TL_NORMAL_VIEWDEPTH});
+    auto subRenderState = rtShaderGen.createSubRenderState(RTShader::SRS_GBUFFER);
+    subRenderState->setParameter("target_buffers", StringVector{"diffuse_specular", "normal_viewdepth"});
     schemRenderState->addTemplateSubRenderState(subRenderState);
 
     mCompositorLogics["SSAOLogic"] = new SSAOLogic;
