@@ -159,6 +159,15 @@ public:
     /// generic set method for parameters that connot be derived in @ref preAddToRenderState
     virtual bool setParameter(const String& name, const String& value) { return false; }
 
+    /// @overload
+    bool setParameter(const String& name, const char* value) { return setParameter(name, String(value)); }
+
+    /// @overload
+    virtual void setParameter(const String& name, const Any& value)
+    {
+        OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, name+": unsupported any type");
+    }
+
 // Protected methods
 protected:
 

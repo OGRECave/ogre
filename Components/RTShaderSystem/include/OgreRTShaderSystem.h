@@ -33,7 +33,6 @@ THE SOFTWARE.
 #include "OgreShaderRenderState.h"
 #include "OgreShaderFunction.h"
 #include "OgreShaderFFPTransform.h"
-#include "OgreShaderExIntegratedPSSM3.h"
 #include "OgreShaderExLayeredBlending.h"
 #include "OgreShaderExHardwareSkinning.h"
 

@@ -932,9 +932,9 @@ void Sample_ShaderSystem::applyShadowType(int menuIndex)
         mSceneMgr->setShadowCameraSetup(ShadowCameraSetupPtr(pssmSetup));
 
     
-        auto subRenderState = mShaderGenerator->createSubRenderState<RTShader::IntegratedPSSM3>();
-        subRenderState->setSplitPoints(pssmSetup->getSplitPoints());
-        subRenderState->setDebug(menuIndex > 1);
+        auto subRenderState = mShaderGenerator->createSubRenderState(SRS_INTEGRATED_PSSM3);
+        subRenderState->setParameter("split_points", pssmSetup->getSplitPoints());
+        subRenderState->setParameter("debug", menuIndex > 1);
         schemRenderState->addTemplateSubRenderState(subRenderState);        
     }
 #endif

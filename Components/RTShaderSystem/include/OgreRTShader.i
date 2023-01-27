@@ -24,6 +24,5 @@
 %include "OgreShaderGenerator.h"
 %include "OgreShaderRenderState.h"
 %include "OgreShaderFFPTransform.h"
-%include "OgreShaderExIntegratedPSSM3.h"
 %include "OgreShaderExLayeredBlending.h"
 %include "OgreShaderExHardwareSkinning.h"
