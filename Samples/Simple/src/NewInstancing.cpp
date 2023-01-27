@@ -120,7 +120,7 @@ void Sample_NewInstancing::setupContent()
     schemRenderState->addTemplateSubRenderState(subRenderState);
 
     // increase max bone count for higher efficiency
-    RTShader::HardwareSkinningFactory::getSingleton().setMaxCalculableBoneCount(80);
+    RTShader::HardwareSkinningFactory::setMaxCalculableBoneCount(80);
 
     // re-generate shaders to include new SRSs
     rtShaderGen.invalidateScheme(MSN_SHADERGEN);

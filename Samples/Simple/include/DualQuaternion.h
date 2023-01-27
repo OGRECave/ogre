@@ -59,14 +59,14 @@ class _OgreSampleClassExport Sample_DualQuaternion : public SdkSample
         Ogre::MaterialPtr pCast3 = Ogre::MaterialManager::getSingleton().getByName("Ogre/RTShader/shadow_caster_dq_skinning_3weight_twophase");
         Ogre::MaterialPtr pCast4 = Ogre::MaterialManager::getSingleton().getByName("Ogre/RTShader/shadow_caster_dq_skinning_4weight_twophase");
 
-        Ogre::RTShader::HardwareSkinningFactory::getSingleton().setCustomShadowCasterMaterials(RTShader::ST_DUAL_QUATERNION, pCast1, pCast2, pCast3, pCast4);
+        Ogre::RTShader::HardwareSkinningFactory::setCustomShadowCasterMaterials(RTShader::ST_DUAL_QUATERNION, pCast1, pCast2, pCast3, pCast4);
 
         Ogre::MaterialPtr pCast1l = Ogre::MaterialManager::getSingleton().getByName("Ogre/RTShader/shadow_caster_skinning_1weight");
         Ogre::MaterialPtr pCast2l = Ogre::MaterialManager::getSingleton().getByName("Ogre/RTShader/shadow_caster_skinning_2weight");
         Ogre::MaterialPtr pCast3l = Ogre::MaterialManager::getSingleton().getByName("Ogre/RTShader/shadow_caster_skinning_3weight");
         Ogre::MaterialPtr pCast4l = Ogre::MaterialManager::getSingleton().getByName("Ogre/RTShader/shadow_caster_skinning_4weight");
 
-        Ogre::RTShader::HardwareSkinningFactory::getSingleton().setCustomShadowCasterMaterials(RTShader::ST_LINEAR, pCast1l, pCast2l, pCast3l, pCast4l);
+        Ogre::RTShader::HardwareSkinningFactory::setCustomShadowCasterMaterials(RTShader::ST_LINEAR, pCast1l, pCast2l, pCast3l, pCast4l);
 #endif
         // Set shadow properties.
         mSceneMgr->setShadowTechnique(SHADOWTYPE_TEXTURE_MODULATIVE);
@@ -138,8 +138,8 @@ class _OgreSampleClassExport Sample_DualQuaternion : public SdkSample
         // In case the system uses the RTSS, the following line will
         // ensure that the entity is using hardware animation in RTSS
         // as well.
-        RTShader::HardwareSkinningFactory::getSingleton().prepareEntityForSkinning(ent);
-        RTShader::HardwareSkinningFactory::getSingleton().prepareEntityForSkinning(entDQ, RTShader::ST_DUAL_QUATERNION, false, true);
+        RTShader::HardwareSkinningFactory::prepareEntityForSkinning(ent);
+        RTShader::HardwareSkinningFactory::prepareEntityForSkinning(entDQ, RTShader::ST_DUAL_QUATERNION, false, true);
 #endif
 
         // make sure we query the correct scheme

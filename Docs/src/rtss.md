@@ -209,7 +209,7 @@ Format: `integrated_pssm4 <znear> <sp0> <sp1> <zfar> [debug] [filter]`
 @copydoc Ogre::RTShader::SRS_HARDWARE_SKINNING
 
 @par
-Format: `hardware_skinning <max_bone_count> <max_weight_count> [type] [correct_antipodality scale_shearing]`
+Format: `hardware_skinning <max_bone_count> <weight_count> [type] [correct_antipodality scale_shearing]`
 @par
 Example: `hardware_skinning 24 2 dual_quaternion true false`
 

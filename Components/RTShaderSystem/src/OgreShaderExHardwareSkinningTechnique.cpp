@@ -43,7 +43,7 @@ HardwareSkinningTechnique::HardwareSkinningTechnique() :
     mCorrectAntipodalityHandling(false),
     mScalingShearingSupport(false),
     mDoBoneCalculations(false),
-    mObjSpaceBones(false)
+    mObjSpaceBones(MeshManager::getBonesUseObjectSpace())
 {
 }
 
@@ -59,7 +59,34 @@ void HardwareSkinningTechnique::setHardwareSkinningParam(ushort boneCount, ushor
     mWeightCount = std::min<ushort>(weightCount, 4);
     mCorrectAntipodalityHandling = correctAntipodalityHandling;
     mScalingShearingSupport = scalingShearingSupport;
-    mObjSpaceBones = MeshManager::getBonesUseObjectSpace();
+}
+
+bool HardwareSkinningTechnique::setParameter(const String& name, const String& value)
+{
+    if(name == "max_bone_count")
+    {
+        uint num = 0;
+        StringConverter::parse(value, num);
+        mBoneCount = std::min<ushort>(num, OGRE_MAX_NUM_BONES);
+        return num && num < OGRE_MAX_NUM_BONES;
+    }
+    else if(name == "weight_count")
+    {
+        uint num = 0;
+        StringConverter::parse(value, num);
+        mWeightCount = std::min<ushort>(num, 4);
+        return num && num < 5;
+    }
+    else if(name == "correct_antipodality")
+    {
+        return StringConverter::parse(value, mCorrectAntipodalityHandling);
+    }
+    else if(name == "scale_shearing")
+    {
+        return StringConverter::parse(value, mScalingShearingSupport);
+    }
+
+    return false;
 }
 
 //-----------------------------------------------------------------------
