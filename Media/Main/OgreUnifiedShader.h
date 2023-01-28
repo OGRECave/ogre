@@ -15,7 +15,7 @@
 // }
 
 /// configuration
-// use macros that will be default with Ogre 14
+// use macros that will be default with Ogre 15
 // #define USE_OGRE_FROM_FUTURE
 
 // @public-api
@@ -101,9 +101,7 @@ mat3 mtxFromCols(vec3 a, vec3 b, vec3 c)
 // GLSL
 #include "GLSL_GL3Support.glsl"
 
-#ifndef USE_OGRE_FROM_FUTURE
-#define _UNIFORM_BINDING(b)
-#elif defined(VULKAN)
+#ifdef VULKAN
 #define _UNIFORM_BINDING(b) layout(binding = b + 2) uniform
 #elif __VERSION__ >= 420
 #define _UNIFORM_BINDING(b) layout(binding = b) uniform

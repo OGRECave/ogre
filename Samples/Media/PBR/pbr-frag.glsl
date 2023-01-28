@@ -11,7 +11,6 @@ precision highp float;
 #endif
 #endif
 
-#define USE_OGRE_FROM_FUTURE
 #include <OgreUnifiedShader.h>
 
 // The MIT License

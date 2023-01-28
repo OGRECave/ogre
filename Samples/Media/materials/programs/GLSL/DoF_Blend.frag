@@ -4,7 +4,6 @@
 // This code is in the public domain. You may do whatever you want with it.
 
 // based on "Advanced Depth of Field" by "Thorsten Scheuermann"
-#define USE_OGRE_FROM_FUTURE
 #include <OgreUnifiedShader.h>
 
 #define NUM_TAPS 12						// number of taps the shader will use

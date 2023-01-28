@@ -248,7 +248,6 @@ void GLSLProgramWriter::writeProgramDependencies(std::ostream& os, Program* prog
     os << "//-----------------------------------------------------------------------------" << std::endl;
     os << "//                         PROGRAM DEPENDENCIES" << std::endl;
     os << "//-----------------------------------------------------------------------------" << std::endl;
-    os << "#define USE_OGRE_FROM_FUTURE" << std::endl;
     os << "#include <OgreUnifiedShader.h>" << std::endl;
 
     for (unsigned int i=0; i < program->getDependencyCount(); ++i)
