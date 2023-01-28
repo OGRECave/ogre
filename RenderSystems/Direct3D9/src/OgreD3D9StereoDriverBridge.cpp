@@ -42,14 +42,14 @@ namespace Ogre
 		mIsNvapiInitialized = false;
 		mStereoMode = stereoMode;
 
-		if (SMT_FRAME_SEQUENTIAL != mStereoMode)
+		if (!mStereoMode)
 			return;
 
 		// Both initialize and set driver mode need to be called to determine whether NVIDIA stereo is available
 		NvAPI_Status nvStatus = NvAPI_Initialize();
 		if (NVAPI_OK == nvStatus)
 			nvStatus = NvAPI_Stereo_SetDriverMode(NVAPI_STEREO_DRIVER_MODE_DIRECT);
-			
+
 		if (NVAPI_OK == nvStatus)
 		{
 			NvAPI_ShortString nvapiStatusMessage;

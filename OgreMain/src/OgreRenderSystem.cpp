@@ -231,7 +231,7 @@ namespace Ogre {
         }
 
 #if OGRE_NO_QUAD_BUFFER_STEREO == 0
-        if((opt = mOptions.find("Stereo Mode")) != end)
+        if((opt = mOptions.find("Frame Sequential Stereo")) != end)
             miscParams["stereoMode"] = opt->second.currentValue;
 #endif
         return ret;
@@ -1004,9 +1004,9 @@ namespace Ogre {
 
 #if OGRE_NO_QUAD_BUFFER_STEREO == 0
         ConfigOption optStereoMode;
-        optStereoMode.name = "Stereo Mode";
-        optStereoMode.possibleValues.push_back(StringConverter::toString(SMT_NONE));
-        optStereoMode.possibleValues.push_back(StringConverter::toString(SMT_FRAME_SEQUENTIAL));
+        optStereoMode.name = "Frame Sequential Stereo";
+        optStereoMode.possibleValues.push_back("Off");
+        optStereoMode.possibleValues.push_back("On");
         optStereoMode.currentValue = optStereoMode.possibleValues[0];
         optStereoMode.immutable = false;
 

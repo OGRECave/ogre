@@ -39,6 +39,7 @@ THE SOFTWARE.
 namespace Ogre {
 
   class D3D11StereoDriverImpl;
+  typedef bool StereoModeType;
 
   /** Bridge interface from the render system to the stereo driver. Loads the
    correct driver and forwards the methods to the stereo driver implementation.*/
