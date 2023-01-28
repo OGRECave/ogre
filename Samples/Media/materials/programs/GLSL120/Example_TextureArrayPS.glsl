@@ -2,7 +2,6 @@
 #extension GL_EXT_texture_array : enable
 #endif
 
-#define USE_OGRE_FROM_FUTURE
 #include <OgreUnifiedShader.h>
 
 SAMPLER2DARRAY(TextureArrayTex, 0);

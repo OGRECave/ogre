@@ -1,4 +1,3 @@
-#define USE_OGRE_FROM_FUTURE
 #include <OgreUnifiedShader.h>
 
 SAMPLER2D(RT, 0);
