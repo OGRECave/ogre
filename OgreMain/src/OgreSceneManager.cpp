@@ -313,11 +313,6 @@ const LightList& SceneManager::_getLightsAffectingFrustum(void) const
     return mLightsAffectingFrustum;
 }
 //-----------------------------------------------------------------------
-bool SceneManager::lightLess::operator()(const Light* a, const Light* b) const
-{
-    return a->tempSquareDist < b->tempSquareDist;
-}
-//-----------------------------------------------------------------------
 void SceneManager::_populateLightList(const Vector3& position, Real radius, LightList& destList, uint32 lightMask)
 {
     // Really basic trawl of the lights, then sort
@@ -361,7 +356,8 @@ void SceneManager::_populateLightList(const Vector3& position, Real radius, Ligh
     // Thus we only allow object-relative sorting on the remainder of the list
     std::advance(start, std::min(numShadowCastingLights, destList.size()));
     // Sort (stable to guarantee ordering on directional lights)
-    std::stable_sort(start, destList.end(), lightLess());
+    std::stable_sort(start, destList.end(),
+                     [](const Light* a, const Light* b) { return a->tempSquareDist < b->tempSquareDist; });
 
     // Now assign indexes in the list so they can be examined if needed
     lightIndex = 0;
@@ -1327,28 +1323,6 @@ void SceneManager::setWorldGeometry(DataStreamPtr& stream,
     OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
         "World geometry is not supported by the generic SceneManager.",
         "SceneManager::setWorldGeometry");
-}
-
-//-----------------------------------------------------------------------
-bool SceneManager::materialLess::operator() (const Material* x, const Material* y) const
-{
-    // If x transparent and y not, x > y (since x has to overlap y)
-    if (x->isTransparent() && !y->isTransparent())
-    {
-        return false;
-    }
-    // If y is transparent and x not, x < y
-    else if (!x->isTransparent() && y->isTransparent())
-    {
-        return true;
-    }
-    else
-    {
-        // Otherwise don't care (both transparent or both solid)
-        // Just arbitrarily use pointer
-        return x < y;
-    }
-
 }
 //-----------------------------------------------------------------------
 void SceneManager::setSkyPlane(
@@ -2735,23 +2709,6 @@ void SceneManager::updateRenderQueueGroupSplitOptions(RenderQueueGroup* group,
 void SceneManager::_notifyLightsDirty(void)
 {
     ++mLightsDirtyCounter;
-}
-//---------------------------------------------------------------------
-bool SceneManager::lightsForShadowTextureLess::operator ()(
-    const Ogre::Light *l1, const Ogre::Light *l2) const
-{
-    if (l1 == l2)
-        return false;
-
-    // sort shadow casting lights ahead of non-shadow casting
-    if (l1->getCastShadows() != l2->getCastShadows())
-    {
-        return l1->getCastShadows();
-    }
-
-    // otherwise sort by distance (directional lights will have 0 here)
-    return l1->tempSquareDist < l2->tempSquareDist;
-
 }
 //---------------------------------------------------------------------
 void SceneManager::findLightsAffectingFrustum(const Camera* camera)
