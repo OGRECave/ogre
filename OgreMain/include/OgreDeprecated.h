@@ -26,6 +26,14 @@ namespace Ogre
     };
     const SPFMNone SPFM_NONE;
 
+    struct SPFMDeleteT {
+        template<class T>
+        void operator()(T* p) {
+            OGRE_DELETE_T(p, T, MEMCATEGORY_GENERAL);
+        }
+    };
+    const SPFMDeleteT SPFM_DELETE_T;
+
     typedef std::map<int, MaterialPtr> QuadMaterialMap;
 
 #define OGRE_HashMap ::std::unordered_map
