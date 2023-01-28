@@ -37,14 +37,6 @@ namespace Ogre {
     /** \addtogroup General
     *  @{
     */
-    struct SPFMDeleteT {
-        template<class T>
-        void operator()(T* p) {
-            OGRE_DELETE_T(p, T, MEMCATEGORY_GENERAL);
-        }
-    };
-    const SPFMDeleteT SPFM_DELETE_T;
-
     using std::static_pointer_cast;
     using std::dynamic_pointer_cast;
 
