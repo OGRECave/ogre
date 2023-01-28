@@ -253,17 +253,6 @@ namespace Ogre {
             /// User type mask limit
             USER_TYPE_MASK_LIMIT = FRUSTUM_TYPE_MASK
         };
-        /** Comparator for material map, for sorting materials into render order (e.g. transparent last).
-        */
-        struct materialLess
-        {
-            _OgreExport bool operator()(const Material* x, const Material* y) const;
-        };
-        /// Comparator for sorting lights relative to a point
-        struct lightLess
-        {
-            _OgreExport bool operator()(const Light* a, const Light* b) const;
-        };
 
         /// Describes the stage of rendering when performing complex illumination
         enum IlluminationRenderStage
@@ -971,20 +960,6 @@ namespace Ogre {
         typedef std::map<Light*, LightClippingInfo> LightClippingInfoMap;
         LightClippingInfoMap mLightClippingInfoMap;
         unsigned long mLightClippingInfoMapFrameNumber;
-
-        /** Default sorting routine which sorts lights which cast shadows
-            to the front of a list, sub-sorting by distance.
-
-            Since shadow textures are generated from lights based on the
-            frustum rather than individual objects, a shadow and camera-wise sort is
-            required to pick the best lights near the start of the list. Up to 
-            the number of shadow textures will be generated from this.
-        */
-        struct lightsForShadowTextureLess
-        {
-            _OgreExport bool operator()(const Light* l1, const Light* l2) const;
-        };
-
 
         /** Internal method for locating a list of lights which could be affecting the frustum.
 

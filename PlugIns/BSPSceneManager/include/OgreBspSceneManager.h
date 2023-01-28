@@ -68,7 +68,30 @@ namespace Ogre {
     */
     class BspSceneManager : public SceneManager
     {
-    protected:
+        /** Comparator for material map, for sorting materials into render order (e.g. transparent last).
+        */
+        struct materialLess
+        {
+            bool operator()(const Material* x, const Material* y) const
+            {
+                // If x transparent and y not, x > y (since x has to overlap y)
+                if (x->isTransparent() && !y->isTransparent())
+                {
+                    return false;
+                }
+                // If y is transparent and x not, x < y
+                else if (!x->isTransparent() && y->isTransparent())
+                {
+                    return true;
+                }
+                else
+                {
+                    // Otherwise don't care (both transparent or both solid)
+                    // Just arbitrarily use pointer
+                    return x < y;
+                }
+            }
+        };
 
         /// World geometry
         BspLevelPtr mLevel;
