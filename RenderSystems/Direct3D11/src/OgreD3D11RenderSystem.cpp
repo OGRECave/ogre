@@ -649,7 +649,7 @@ namespace Ogre
 
 #if OGRE_NO_QUAD_BUFFER_STEREO == 0
         // Stereo driver must be created before device is created
-        StereoModeType stereoMode = StringConverter::parseStereoMode(mOptions["Stereo Mode"].currentValue);
+        auto stereoMode = StringConverter::parseBool(mOptions["Frame Sequential Stereo"].currentValue);
         D3D11StereoDriverBridge* stereoBridge = OGRE_NEW D3D11StereoDriverBridge(stereoMode);
 #endif
 

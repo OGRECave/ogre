@@ -150,9 +150,7 @@ namespace Ogre {
 #if OGRE_NO_QUAD_BUFFER_STEREO == 0
 			if ((opt = miscParams->find("stereoMode")) != end)
 			{
-				StereoModeType stereoMode = StringConverter::parseStereoMode(opt->second);
-				if (SMT_NONE != stereoMode)
-					mStereoEnabled = true;
+				mStereoEnabled = StringConverter::parseBool(opt->second);
 			}
 #endif
 

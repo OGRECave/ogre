@@ -3863,12 +3863,12 @@ namespace Ogre
     void D3D9RenderSystem::createStereoDriver(const NameValuePairList* miscParams)
     {
         // Get the value used to create the render system.  If none, get the parameter value used to create the window.
-        StereoModeType stereoMode = StringConverter::parseStereoMode(mOptions["Stereo Mode"].currentValue);
-        if (stereoMode == SMT_NONE)
+        bool stereoMode = StringConverter::parseBool(mOptions["Frame Sequential Stereo"].currentValue);
+        if (!stereoMode)
         {
             NameValuePairList::const_iterator iter = miscParams->find("stereoMode");
             if (iter != miscParams->end())
-              stereoMode = StringConverter::parseStereoMode((*iter).second);
+              stereoMode = StringConverter::parseBool((*iter).second);
         }
 
         // Always create the stereo bridge regardless of the mode
