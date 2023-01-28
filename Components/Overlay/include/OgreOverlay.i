@@ -6,7 +6,6 @@
 %{
 /* Includes the header in the wrapper code */
 #include "Ogre.h"
-#include "OgreUnifiedHighLevelGpuProgram.h"
 
 #include "OgreOverlayPrerequisites.h"
 #include "OgreFont.h"
