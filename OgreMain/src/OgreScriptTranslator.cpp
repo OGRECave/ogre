@@ -408,26 +408,6 @@ namespace Ogre{
         return true;
     }
 
-    template<> bool getValue(const AbstractNodePtr& node, TextureUnitState::BindingType& result)
-    {
-        if(node->type != ANT_ATOM)
-            return false;
-
-        switch (static_cast<AtomAbstractNode*>(node.get())->id)
-        {
-        case ID_VERTEX:
-            result = TextureUnitState::BT_VERTEX;
-            break;
-        case ID_FRAGMENT:
-            result = TextureUnitState::BT_FRAGMENT;
-            break;
-        default:
-            return false;
-        }
-        return true;
-    }
-
-
     template<> bool getValue(const AbstractNodePtr& node, CompositionTargetPass::InputMode& result)
     {
         if(node->type != ANT_ATOM)
@@ -3324,17 +3304,6 @@ namespace Ogre{
                             mUnit->setTextureTransform(m);
                         else
                             compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
-                    }
-                    break;
-                case ID_BINDING_TYPE:
-                    TextureUnitState::BindingType bt;
-                    if(getValue(prop, compiler, bt))
-                    {
-                        compiler->addError(ScriptCompiler::CE_DEPRECATEDSYMBOL, prop->file, prop->line,
-                                           "binding_type. no longer needed");
-                        OGRE_IGNORE_DEPRECATED_BEGIN
-                        mUnit->setBindingType(bt);
-                        OGRE_IGNORE_DEPRECATED_END
                     }
                     break;
                 case ID_CONTENT_TYPE:
