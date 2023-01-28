@@ -172,15 +172,6 @@ namespace Ogre
         */
         Vector3 perpendicular(void) const;
 
-        Vector3& operator = ( const Real fScaler )
-        {
-            x = fScaler;
-            y = fScaler;
-            z = fScaler;
-
-            return (Vector3&)*this;
-        }
-
         /** Calculates the absolute dot (scalar) product of this vector with another.
 
                 This function work similar dotProduct, except it use absolute value
@@ -270,24 +261,6 @@ namespace Ogre
         Real x, y, z, w;
         Real* ptr() { return &x; }
         const Real* ptr() const { return &x; }
-
-        Vector4& operator = ( const Real fScalar)
-        {
-            x = fScalar;
-            y = fScalar;
-            z = fScalar;
-            w = fScalar;
-            return (Vector4&)*this;
-        }
-
-        Vector4& operator = (const VectorBase<3, Real>& rhs)
-        {
-            x = rhs.x;
-            y = rhs.y;
-            z = rhs.z;
-            w = 1.0f;
-            return (Vector4&)*this;
-        }
 
         // special points
         static const Vector4 ZERO;
