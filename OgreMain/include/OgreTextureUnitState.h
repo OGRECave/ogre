@@ -472,19 +472,6 @@ namespace Ogre {
         */
         unsigned int getNumFrames(void) const;
 
-
-        /** The type of unit to bind the texture settings to.
-            @deprecated only D3D9 has separate sampler bindings. All other RenderSystems use unified pipelines.
-         */
-        enum BindingType : uint8
-        {
-            /** Regular fragment processing unit - the default. */
-            BT_FRAGMENT = 0,
-            /** Vertex processing unit - indicates this unit will be used for 
-                a vertex texture fetch.
-            */
-            BT_VERTEX = 1
-        };
         /** Enum identifying the type of content this texture unit contains.
         */
         enum ContentType : uint8
@@ -498,12 +485,6 @@ namespace Ogre {
             /// when the pass is rendered within a compositor sequence.
             CONTENT_COMPOSITOR = 2
         };
-
-        /// @deprecated obsolete
-        OGRE_DEPRECATED void setBindingType(BindingType bt);
-
-        /// @deprecated obsolete
-        OGRE_DEPRECATED BindingType getBindingType(void) const;
 
         /** Set the type of content this TextureUnitState references.
 
@@ -1030,8 +1011,6 @@ namespace Ogre {
         void _load(void);
         /** Internal method for unloading this object as part of Material::unload. */
         void _unload(void);
-        /// @deprecated do not use
-        OGRE_DEPRECATED bool hasViewRelativeTextureCoordinateGeneration(void) const;
 
         /// Is this loaded?
         bool isLoaded(void) const;
@@ -1099,8 +1078,6 @@ private:
         Radian mRotate;
         mutable Matrix4 mTexModMatrix;
 
-        /// Binding type (fragment, vertex, tessellation hull and domain pipeline).
-        BindingType mBindingType;
         /// Content type of texture (normal loaded texture, auto-texture).
         ContentType mContentType;
 

@@ -1113,9 +1113,6 @@ namespace Ogre
         mIds["square"] = ID_SQUARE;
         mIds["inverse_sawtooth"] = ID_INVERSE_SAWTOOTH;
         mIds["transform"] = ID_TRANSFORM;
-        mIds["binding_type"] = ID_BINDING_TYPE;
-        mIds["vertex"] = ID_VERTEX;
-        mIds["fragment"] = ID_FRAGMENT;
         mIds["geometry"] = ID_GEOMETRY;
         mIds["tessellation_hull"] = ID_TESSELLATION_HULL;
         mIds["tessellation_domain"] = ID_TESSELLATION_DOMAIN;
