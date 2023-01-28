@@ -11,7 +11,6 @@
 #include "OgreParticleSystemRenderer.h"
 #include "OgreParticleEmitterFactory.h"
 #include "OgreParticleAffectorFactory.h"
-#include "OgreUnifiedHighLevelGpuProgram.h"
 #include "OgreScriptCompiler.h"
 #include "OgreConfigDialog.h"
 #include "OgreFileSystemLayer.h"
@@ -625,8 +624,6 @@ SHARED_PTR(HardwarePixelBuffer);
     %include "OgreTextureManager.h"
     %include "OgreGpuProgramManager.h"
     %include "OgreHighLevelGpuProgramManager.h"
-SHARED_PTR(UnifiedHighLevelGpuProgram);
-%include "OgreUnifiedHighLevelGpuProgram.h"
 // animations
 %ignore Ogre::VertexPoseKeyFrame::getPoseReferenceIterator;
 %include "OgreKeyFrame.h"

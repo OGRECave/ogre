@@ -7,7 +7,6 @@
 
 %{
 #include "Ogre.h"
-#include "OgreUnifiedHighLevelGpuProgram.h"
 #include "OgreBullet.h"
 %}
 

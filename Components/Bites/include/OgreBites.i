@@ -10,7 +10,6 @@
 #include "OgreCameraMan.h"
 #include "OgreTrays.h"
 #include "OgreAdvancedRenderControls.h"
-#include "OgreUnifiedHighLevelGpuProgram.h"
 #include "OgrePredefinedControllers.h"
 
 #include "OgreImGuiInputListener.h"

@@ -3,7 +3,6 @@
 /* Includes the header in the wrapper code */
 #include "Ogre.h"
 #include "OgreRTShaderSystem.h"
-#include "OgreUnifiedHighLevelGpuProgram.h"
 %}
 
 %include std_string.i

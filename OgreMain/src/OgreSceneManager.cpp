@@ -43,7 +43,6 @@ THE SOFTWARE.
 #include "OgreInstancedEntity.h"
 #include "OgreRenderTexture.h"
 #include "OgreLodListener.h"
-#include "OgreUnifiedHighLevelGpuProgram.h"
 #include "OgreDefaultDebugDrawer.h"
 
 // This class implements the most basic scene manager
