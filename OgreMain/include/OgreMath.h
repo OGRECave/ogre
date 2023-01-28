@@ -32,6 +32,10 @@ THE SOFTWARE.
 #include "OgrePrerequisites.h"
 #include "OgreHeaderPrefix.h"
 
+#if defined(__FAST_MATH__) || defined(_M_FP_FAST)
+#define OGRE_FAST_MATH
+#endif
+
 namespace Ogre
 {
     /** \addtogroup Core
@@ -317,15 +321,15 @@ namespace Ogre
                 The value to round up to the nearest integer.
          */
         static inline Real Ceil (Real fValue) { return std::ceil(fValue); }
+
+#ifndef OGRE_FAST_MATH
         static inline bool isNaN(Real f)
         {
-#if defined(__FAST_MATH__) || defined(_M_FP_FAST)
-            assert(false && "not available with fast math");
-#endif
             // std::isnan() has non-portable behaviour on MSVC
             // However NaN always fails this next test, no other number does.
             return f != f;
         }
+#endif
 
         /** Cosine function.
             @param fValue
