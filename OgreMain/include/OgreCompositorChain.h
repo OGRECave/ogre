@@ -210,8 +210,7 @@ namespace Ogre {
         public:
             RQListener() : mOperation(0), mSceneManager(0), mRenderSystem(0), mViewport(0) {}
 
-            void renderQueueStarted(uint8 queueGroupId, const String& invocation, bool& skipThisInvocation) override;
-            void renderQueueEnded(uint8 queueGroupId, const String& invocation, bool& repeatThisInvocation) override;
+            void renderQueueStarted(uint8 queueGroupId, const String& cameraName, bool& skipThisInvocation) override;
 
             /** Set current operation and target. */
             void setOperation(CompositorInstance::TargetOperation *op,SceneManager *sm,RenderSystem *rs);

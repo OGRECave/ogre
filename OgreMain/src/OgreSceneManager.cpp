@@ -50,7 +50,6 @@ THE SOFTWARE.
 #include <cstdio>
 
 namespace Ogre {
-static const String INVOCATION_SHADOWS = "SHADOWS";
 //-----------------------------------------------------------------------
 SceneManager::SceneManager(const String& name) :
 mName(name),
@@ -1471,8 +1470,7 @@ void SceneManager::renderVisibleObjectsDefaultSequence(void)
         do // for repeating queues
         {
             // Fire queue started event
-            if (fireRenderQueueStarted(qId, mIlluminationStage == IRS_RENDER_TO_TEXTURE ? INVOCATION_SHADOWS
-                                                                                        : BLANKSTRING))
+            if (fireRenderQueueStarted(qId, mCameraInProgress->getName()))
             {
                 // Someone requested we skip this queue
                 break;
@@ -1481,8 +1479,7 @@ void SceneManager::renderVisibleObjectsDefaultSequence(void)
             _renderQueueGroupObjects(pGroup, QueuedRenderableCollection::OM_PASS_GROUP);
 
             // Fire queue ended event
-            if (fireRenderQueueEnded(qId, mIlluminationStage == IRS_RENDER_TO_TEXTURE ? INVOCATION_SHADOWS
-                                                                                      : BLANKSTRING))
+            if (fireRenderQueueEnded(qId, mCameraInProgress->getName()))
             {
                 // Someone requested we repeat this queue
                 repeatQueue = true;
@@ -2546,22 +2543,22 @@ void SceneManager::firePostRenderQueues()
     }
 }
 //---------------------------------------------------------------------
-bool SceneManager::fireRenderQueueStarted(uint8 id, const String& invocation)
+bool SceneManager::fireRenderQueueStarted(uint8 id, const String& cameraName)
 {
     bool skip = false;
     for (auto *l : mRenderQueueListeners)
     {
-        l->renderQueueStarted(id, invocation, skip);
+        l->renderQueueStarted(id, cameraName, skip);
     }
     return skip;
 }
 //---------------------------------------------------------------------
-bool SceneManager::fireRenderQueueEnded(uint8 id, const String& invocation)
+bool SceneManager::fireRenderQueueEnded(uint8 id, const String& cameraName)
 {
     bool repeat = false;
     for (auto *l : mRenderQueueListeners)
     {
-        l->renderQueueEnded(id, invocation, repeat);
+        l->renderQueueEnded(id, cameraName, repeat);
     }
     return repeat;
 }
