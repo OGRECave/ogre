@@ -345,7 +345,9 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void Node::setOrientation( const Quaternion & q )
     {
+#ifndef OGRE_FAST_MATH
         OgreAssertDbg(!q.isNaN(), "Invalid orientation supplied as parameter");
+#endif
         mOrientation = q;
         mOrientation.normalise();
         needUpdate();
@@ -365,7 +367,9 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void Node::setPosition(const Vector3& pos)
     {
+#ifndef OGRE_FAST_MATH
         assert(!pos.isNaN() && "Invalid vector supplied as parameter");
+#endif
         mPosition = pos;
         needUpdate();
     }
@@ -554,7 +558,9 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void Node::setScale(const Vector3& inScale)
     {
+#ifndef OGRE_FAST_MATH
         assert(!inScale.isNaN() && "Invalid vector supplied as parameter");
+#endif
         mScale = inScale;
         needUpdate();
     }

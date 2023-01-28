@@ -544,6 +544,7 @@ namespace Ogre
             return ret;
         }
 
+#ifndef OGRE_FAST_MATH
         /// Check whether this vector contains valid values
         bool isNaN() const
         {
@@ -552,6 +553,7 @@ namespace Ogre
                     return true;
             return false;
         }
+#endif
 
         /** Gets the angle between 2 vectors.
 

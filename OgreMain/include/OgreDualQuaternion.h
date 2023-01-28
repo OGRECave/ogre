@@ -143,13 +143,15 @@ namespace Ogre {
             std::swap(dy, other.dy);
             std::swap(dz, other.dz);
         }
-        
+
+#ifndef OGRE_FAST_MATH
         /// Check whether this dual quaternion contains valid values
         inline bool isNaN() const
         {
             return Math::isNaN(w) || Math::isNaN(x) || Math::isNaN(y) || Math::isNaN(z) ||  
                 Math::isNaN(dw) || Math::isNaN(dx) || Math::isNaN(dy) || Math::isNaN(dz);
         }
+#endif
 
         /// Construct a dual quaternion from a rotation described by a Quaternion and a translation described by a Vector3
         void fromRotationTranslation (const Quaternion& q, const Vector3& trans);
