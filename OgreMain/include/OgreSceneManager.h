@@ -903,9 +903,9 @@ namespace Ogre {
         /// Internal method for firing the queue end event
         void firePostRenderQueues();
         /// Internal method for firing the queue start event, returns true if queue is to be skipped
-        virtual bool fireRenderQueueStarted(uint8 id, const String& invocation);
+        virtual bool fireRenderQueueStarted(uint8 id, const String& cameraName);
         /// Internal method for firing the queue end event, returns true if queue is to be repeated
-        virtual bool fireRenderQueueEnded(uint8 id, const String& invocation);
+        virtual bool fireRenderQueueEnded(uint8 id, const String& cameraName);
         /// Internal method for firing when rendering a single object.
         void fireRenderSingleObject(Renderable* rend, const Pass* pass, const AutoParamDataSource* source,
             const LightList* pLightList, bool suppressRenderStateChanges);

@@ -62,8 +62,7 @@ namespace Ogre {
         OverlaySystem();
         virtual ~OverlaySystem();
 
-        void renderQueueStarted(uint8 queueGroupId, const String& invocation,
-            bool& skipThisInvocation) override;
+        void renderQueueStarted(uint8 queueGroupId, const String& cameraName, bool& skipThisInvocation) override;
 
         void eventOccurred(const String& eventName, const NameValuePairList* parameters) override;
 
