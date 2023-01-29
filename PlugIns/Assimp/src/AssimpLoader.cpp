@@ -974,6 +974,7 @@ static MaterialPtr createMaterial(const aiMaterial* mat, const Ogre::String &gro
         StringUtil::splitFilename(String(path.data), basename, outPath);
         auto tus = omat->getTechnique(0)->getPass(0)->createTextureUnitState(basename);
         tus->setColourOperation(LBO_ADD);
+        omat->setSelfIllumination(0, 0, 0); // assimp assumes emissive is modulated, whereas Ogre adds up
     }
 
 #ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
