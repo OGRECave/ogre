@@ -414,6 +414,29 @@ bool AssimpLoader::_load(const char* name, Assimp::Importer& importer, Mesh* mes
         }
     }
 
+    // Create embedded textures
+    for (unsigned int i = 0; i < scene->mNumTextures; ++i)
+    {
+        const aiTexture* tex = scene->mTextures[i];
+        auto texname =
+            StringUtil::format("%s%s.%s", mesh->getName().c_str(), tex->mFilename.C_Str(), tex->achFormatHint);
+        if (TextureManager::getSingleton().resourceExists(texname, mesh->getGroup()))
+            continue;
+
+        Image img;
+        if(tex->mHeight == 0)
+        {
+            auto stream = std::make_shared<MemoryDataStream>(tex->pcData, tex->mWidth, false);
+            img.load(stream, tex->achFormatHint);
+        }
+        else
+        {
+            img.loadDynamicImage((uchar*)tex->pcData, tex->mWidth, tex->mHeight, PF_A8R8G8B8);
+        }
+
+        TextureManager::getSingleton().loadImage(texname, mesh->getGroup(), img);
+    }
+
     loadDataFromNode(scene, scene->mRootNode, mesh);
 
     Assimp::DefaultLogger::kill();
@@ -853,7 +876,27 @@ void AssimpLoader::grabBoneNamesFromNode(const aiScene* mScene, const aiNode* pN
     }
 }
 
-static MaterialPtr createMaterial(const aiMaterial* mat, const Ogre::String &group, const String& meshName, bool verbose)
+static bool getTextureName(const aiMaterial* mat, aiTextureType type, const aiScene* scene, const String& meshName,
+                           String& basename)
+{
+    aiString path;
+    String outPath;
+    if (mat->GetTexture(type, 0, &path) == AI_SUCCESS)
+    {
+        const aiTexture* tex = scene->GetEmbeddedTexture(path.C_Str());
+        if(tex)
+        {
+            basename = StringUtil::format("%s%s.%.8s", meshName.c_str(), tex->mFilename.C_Str(), tex->achFormatHint);
+            return true;
+        }
+
+        StringUtil::splitFilename(String(path.data), basename, outPath);
+        return true;
+    }
+    return false;
+}
+
+static MaterialPtr createMaterial(const aiMaterial* mat, const Ogre::String &group, const String& meshName, const aiScene* scene, bool verbose)
 {
     static int dummyMatCount = 0;
 
@@ -949,29 +992,22 @@ static MaterialPtr createMaterial(const aiMaterial* mat, const Ogre::String &gro
     }
 
     String basename;
-    String outPath;
-    if (mat->GetTexture(type, 0, &path) == AI_SUCCESS)
+    if (getTextureName(mat, type, scene, meshName, basename))
     {
         if (verbose)
         {
-            LogManager::getSingleton().logMessage("Found texture " + String(path.data) + " for channel " +
+            LogManager::getSingleton().logMessage("Found texture " + basename + " for channel " +
                                                   StringConverter::toString(uvindex));
         }
-
-        StringUtil::splitFilename(String(path.data), basename, outPath);
         omat->getTechnique(0)->getPass(0)->createTextureUnitState(basename);
-
-        // TODO: save embedded images to file
     }
 
-    if (mat->GetTexture(aiTextureType_EMISSIVE, 0, &path) == AI_SUCCESS)
+    if (getTextureName(mat, aiTextureType_EMISSIVE, scene, meshName, basename))
     {
         if (verbose)
         {
-            LogManager::getSingleton().logMessage("Found emissive map: " + String(path.data));
+            LogManager::getSingleton().logMessage("Found emissive map: " + basename);
         }
-
-        StringUtil::splitFilename(String(path.data), basename, outPath);
         auto tus = omat->getTechnique(0)->getPass(0)->createTextureUnitState(basename);
         tus->setColourOperation(LBO_ADD);
         omat->setSelfIllumination(0, 0, 0); // assimp assumes emissive is modulated, whereas Ogre adds up
@@ -983,34 +1019,32 @@ static MaterialPtr createMaterial(const aiMaterial* mat, const Ogre::String &gro
     if(!shaderGen)
         return omat;
 
-    if (mat->GetTexture(aiTextureType_NORMALS, 0, &path) == AI_SUCCESS)
+    if (getTextureName(mat, aiTextureType_NORMALS, scene, meshName, basename))
     {
         if (verbose)
         {
-            LogManager::getSingleton().logMessage("Found normal map: " + String(path.data));
+            LogManager::getSingleton().logMessage("Found normal map: " + basename);
         }
 
         shaderGen->createShaderBasedTechnique(omat->getTechnique(0), MSN_SHADERGEN);
         auto rs = shaderGen->getRenderState(MSN_SHADERGEN, *omat, 0);
         auto srs = shaderGen->createSubRenderState("NormalMap");
 
-        StringUtil::splitFilename(String(path.data), basename, outPath);
         srs->setParameter("texture", basename);
         rs->addTemplateSubRenderState(srs);
     }
 
-    if (mat->GetTexture(aiTextureType_UNKNOWN, 0, &path) == AI_SUCCESS)
+    if (getTextureName(mat, aiTextureType_UNKNOWN, scene, meshName, basename))
     {
         if (verbose)
         {
-            LogManager::getSingleton().logMessage("Found metal roughness map: " + String(path.data));
+            LogManager::getSingleton().logMessage("Found metal roughness map: " + basename);
         }
 
         shaderGen->createShaderBasedTechnique(omat->getTechnique(0), MSN_SHADERGEN);
         auto rs = shaderGen->getRenderState(MSN_SHADERGEN, *omat, 0);
         auto srs = shaderGen->createSubRenderState("CookTorranceLighting");
 
-        StringUtil::splitFilename(String(path.data), basename, outPath);
         srs->setParameter("texture", basename);
         rs->addTemplateSubRenderState(srs);
 
@@ -1024,7 +1058,7 @@ static MaterialPtr createMaterial(const aiMaterial* mat, const Ogre::String &gro
 }
 
 bool AssimpLoader::createSubMesh(const String& name, int index, const aiNode* pNode, const aiMesh* mesh,
-                                 const aiMaterial* mat, Mesh* mMesh, AxisAlignedBox& mAAB)
+                                 const MaterialPtr& matptr, Mesh* mMesh, AxisAlignedBox& mAAB)
 {
     // if animated all submeshes must have bone weights
     if (mBonesByName.size() && !mesh->HasBones())
@@ -1036,8 +1070,6 @@ bool AssimpLoader::createSubMesh(const String& name, int index, const aiNode* pN
         }
         return false;
     }
-
-    MaterialPtr matptr = createMaterial(mat, mMesh->getGroup(), mMesh->getName(), !mQuietMode);
 
     // now begin the object definition
     // We create a submesh per material
@@ -1288,7 +1320,8 @@ void AssimpLoader::loadDataFromNode(const aiScene* mScene, const aiNode* pNode, 
 
             // Create a material instance for the mesh.
             const aiMaterial* pAIMaterial = mScene->mMaterials[pAIMesh->mMaterialIndex];
-            createSubMesh(pNode->mName.data, idx, pNode, pAIMesh, pAIMaterial, mesh, mAAB);
+            MaterialPtr matptr = createMaterial(pAIMaterial, mesh->getGroup(), mesh->getName(), mScene, !mQuietMode);
+            createSubMesh(pNode->mName.data, idx, pNode, pAIMesh, matptr, mesh, mAAB);
         }
 
         // We must indicate the bounding box
