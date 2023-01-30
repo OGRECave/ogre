@@ -195,8 +195,7 @@ DynamicsWorld::DynamicsWorld(const Vector3& gravity)
     mBtWorld->setInternalTickCallback(onTick);
 }
 
-btRigidBody* DynamicsWorld::addRigidBody(float mass, Entity* ent, ColliderType ct, CollisionListener* listener,
-                                         int group, int mask)
+btRigidBody* DynamicsWorld::addRigidBody(float mass, Entity* ent, ColliderType ct, CollisionListener* listener, int group, int mask)
 {
     auto node = ent->getParentSceneNode();
     OgreAssert(node, "entity must be attached");
@@ -693,5 +692,119 @@ void DebugDrawer::drawLine(const btVector3& from, const btVector3& to, const btV
     mLines.position(convert(to));
     mLines.colour(col);
 }
+
+/** new code */
+
+class CollisionObject
+{
+    btCollisionObject* mBtBody;
+    btCollisionWorld* mBtWorld;
+    Node *mNode;
+
+public:
+    CollisionObject(btCollisionObject* btBody, btCollisionWorld* btWorld) : mBtBody(btBody), mBtWorld(btWorld) {}
+    ~CollisionObject()
+    {
+        mBtWorld->removeCollisionObject(mBtBody);
+        delete (EntityCollisionListener*)mBtBody->getUserPointer();
+        delete mBtBody->getCollisionShape();
+        delete mBtBody;
+    }
+
+    btCollisionObject* getBtBody() const { return mBtBody; }
+
+    void setNode(Node *n) {
+        mNode = n;
+    }
+
+    void getWorldTransform(btTransform& ret) const 
+    {
+        ret = btTransform(convert(mNode->getOrientation()), convert(mNode->getPosition()));
+    }
+
+    void setWorldTransform(const btTransform& in) 
+    {
+        btQuaternion rot = in.getRotation();
+        btVector3 pos = in.getOrigin();
+        mNode->setOrientation(rot.w(), rot.x(), rot.y(), rot.z());
+        mNode->setPosition(pos.x(), pos.y(), pos.z());
+    }
+};
+
+CollisionWorld::CollisionWorld()
+{
+    // Bullet initialisation.
+    mCollisionConfig.reset(new btDefaultCollisionConfiguration());
+    mDispatcher.reset(new btCollisionDispatcher(mCollisionConfig.get()));
+    mBroadphase.reset(new btDbvtBroadphase());
+
+    mBtWorld = new btCollisionWorld(mDispatcher.get(), mBroadphase.get(), mCollisionConfig.get());
+}
+
+CollisionWorld::~CollisionWorld() { delete mBtWorld; }
+
+btCollisionObject* CollisionWorld::addCollisionObject(Entity* ent, ColliderType ct, CollisionListener* listener, int group, int mask) {
+    auto node = ent->getParentSceneNode();
+    OgreAssert(node, "entity must be attached");
+    // RigidBodyState* state = new RigidBodyState(node);
+
+    if (ent->hasSkeleton()) {
+        ent->addSoftwareAnimationRequest(false);
+        ent->_updateAnimation();
+        ent->setUpdateBoundingBoxFromSkeleton(true);
+    }
+
+    btCollisionShape* cs = nullptr;
+
+    switch (ct) {
+    case CT_BOX:
+        cs = createBoxCollider(ent);
+        break;
+    case CT_SPHERE:
+        cs = createSphereCollider(ent);
+        break;
+    case CT_CYLINDER:
+        cs = createCylinderCollider(ent);
+        break;
+    case CT_CAPSULE:
+        cs = createCapsuleCollider(ent);
+        break;
+    case CT_TRIMESH:
+        cs = VertexIndexToShape(ent).createTrimesh();
+        break;
+    case CT_HULL:
+        cs = VertexIndexToShape(ent).createConvex();
+        break;
+    }
+
+    if (ent->hasSkeleton())
+        ent->removeSoftwareAnimationRequest(false);
+
+    auto co = new btCollisionObject();
+    co->setCollisionShape(cs);
+    mBtWorld->addCollisionObject(co, group, mask);
+    co->setUserPointer(new EntityCollisionListener{ent, listener});
+
+
+    // transfer ownership to node
+    auto bodyWrapper = std::make_shared<CollisionObject>(co, mBtWorld);
+    bodyWrapper->setNode(node);
+    node->getUserObjectBindings().setUserAny("BtColiisionObject", bodyWrapper);
+
+    auto ret = btTransform(convert(node->getOrientation()), convert(node->getPosition()));
+    btQuaternion rot = ret.getRotation();
+    btVector3 pos = ret.getOrigin();
+    btTransform t(rot, pos);
+    co->setWorldTransform(t);
+    return co;
+}
+
+void CollisionWorld::rayTest(const Ray& ray, RayResultCallback* callback, float maxDist) {
+    RayResultCallbackWrapper wrapper(callback, maxDist);
+    btVector3 from = convert(ray.getOrigin());
+    btVector3 to = convert(ray.getPoint(maxDist));
+    mBtWorld->rayTest(from, to, wrapper);
+}
+
 } // namespace Bullet
 } // namespace Ogre

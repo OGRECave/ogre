@@ -86,12 +86,31 @@ struct _OgreBulletExport RayResultCallback
 };
 
 /// simplified wrapper with automatic memory management
-class _OgreBulletExport DynamicsWorld
+class _OgreBulletExport CollisionWorld
 {
+protected:
     std::unique_ptr<btCollisionConfiguration> mCollisionConfig;
     std::unique_ptr<btCollisionDispatcher> mDispatcher;
-    std::unique_ptr<btConstraintSolver> mSolver;
     std::unique_ptr<btBroadphaseInterface> mBroadphase;
+    btCollisionWorld* mBtWorld;
+
+public:
+    explicit CollisionWorld();
+    ~CollisionWorld();
+    CollisionWorld(btCollisionWorld* btWorld) : mBtWorld(btWorld) {}
+
+    btCollisionObject* addCollisionObject(Entity* ent, ColliderType ct, CollisionListener* listener = nullptr, int group = 1, int mask = -1);
+
+    btCollisionWorld* getBtWorld() const { return mBtWorld; }
+
+    void rayTest(const Ray& ray, RayResultCallback* callback, float maxDist = 1000);
+};
+
+
+/// simplified wrapper with automatic memory management
+class _OgreBulletExport DynamicsWorld : public CollisionWorld
+{
+    std::unique_ptr<btConstraintSolver> mSolver;
     btDynamicsWorld* mBtWorld;
 
 public:
@@ -99,8 +118,7 @@ public:
     ~DynamicsWorld();
     DynamicsWorld(btDynamicsWorld* btWorld) : mBtWorld(btWorld) {}
 
-    btRigidBody* addRigidBody(float mass, Entity* ent, ColliderType ct, CollisionListener* listener = nullptr,
-                              int group = 1, int mask = -1);
+    btRigidBody* addRigidBody(float mass, Entity* ent, ColliderType ct, CollisionListener* listener = nullptr, int group = 1, int mask = -1);
 
     btDynamicsWorld* getBtWorld() const { return mBtWorld; }
 
@@ -110,13 +128,12 @@ public:
 class _OgreBulletExport DebugDrawer : public btIDebugDraw
 {
     SceneNode* mNode;
-    btDynamicsWorld* mWorld;
-
+    btCollisionWorld *mWorld;
     ManualObject mLines;
     int mDebugMode;
 
 public:
-    DebugDrawer(SceneNode* node, btDynamicsWorld* world)
+    DebugDrawer(SceneNode* node, btCollisionWorld* world)
         : mNode(node), mWorld(world), mLines(""), mDebugMode(DBG_DrawWireframe)
     {
         mLines.setCastShadows(false);
