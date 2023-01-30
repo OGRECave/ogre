@@ -96,7 +96,7 @@ protected:
 
 public:
     explicit CollisionWorld();
-    ~CollisionWorld();
+    virtual ~CollisionWorld();
     CollisionWorld(btCollisionWorld* btWorld) : mBtWorld(btWorld) {}
 
     btCollisionObject* addCollisionObject(Entity* ent, ColliderType ct, CollisionListener* listener = nullptr, int group = 1, int mask = -1);
