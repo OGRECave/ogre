@@ -101,7 +101,7 @@ public:
 
     btCollisionObject* addCollisionObject(Entity* ent, ColliderType ct, CollisionListener* listener = nullptr, int group = 1, int mask = -1);
 
-    btCollisionWorld* getBtWorld() const { return mBtWorld; }
+    virtual btCollisionWorld* getBtWorld() const { return mBtWorld; }
 
     void rayTest(const Ray& ray, RayResultCallback* callback, float maxDist = 1000);
 };
@@ -120,7 +120,7 @@ public:
 
     btRigidBody* addRigidBody(float mass, Entity* ent, ColliderType ct, CollisionListener* listener = nullptr, int group = 1, int mask = -1);
 
-    btDynamicsWorld* getBtWorld() const { return mBtWorld; }
+    btDynamicsWorld* getBtWorld() const override { return mBtWorld; }
 
     void rayTest(const Ray& ray, RayResultCallback* callback, float maxDist = 1000);
 };
