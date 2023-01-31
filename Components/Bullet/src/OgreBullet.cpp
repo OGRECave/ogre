@@ -163,26 +163,34 @@ private:
 };
 
 /// wrapper with automatic memory management
-class RigidBody
+class CollisionObject
 {
-    btRigidBody* mBtBody;
-    btDynamicsWorld* mBtWorld;
+protected:
+    btCollisionObject* mBtBody;
+    btCollisionWorld* mBtWorld;
 
 public:
-    RigidBody(btRigidBody* btBody, btDynamicsWorld* btWorld) : mBtBody(btBody), mBtWorld(btWorld) {}
-    ~RigidBody()
+    CollisionObject(btCollisionObject* btBody, btCollisionWorld* btWorld) : mBtBody(btBody), mBtWorld(btWorld) {}
+    virtual ~CollisionObject()
     {
-        mBtWorld->removeRigidBody(mBtBody);
-        delete (EntityCollisionListener*)mBtBody->getUserPointer();
-        delete mBtBody->getMotionState();
+        mBtWorld->removeCollisionObject(mBtBody);
         delete mBtBody->getCollisionShape();
         delete mBtBody;
     }
+};
+class RigidBody : public CollisionObject
+{
+public:
+    using CollisionObject::CollisionObject;
 
-    btRigidBody* getBtBody() const { return mBtBody; }
+    ~RigidBody()
+    {
+        delete (EntityCollisionListener*)(mBtBody)->getUserPointer();
+        delete ((btRigidBody*)mBtBody)->getMotionState();
+    }
 };
 
-DynamicsWorld::DynamicsWorld(const Vector3& gravity)
+DynamicsWorld::DynamicsWorld(const Vector3& gravity) : CollisionWorld(NULL) // prevent CollisionWorld from creating a world
 {
     // Bullet initialisation.
     mCollisionConfig.reset(new btDefaultCollisionConfiguration());
@@ -190,18 +198,14 @@ DynamicsWorld::DynamicsWorld(const Vector3& gravity)
     mSolver.reset(new btSequentialImpulseConstraintSolver());
     mBroadphase.reset(new btDbvtBroadphase());
 
-    mBtWorld = new btDiscreteDynamicsWorld(mDispatcher.get(), mBroadphase.get(), mSolver.get(), mCollisionConfig.get());
-    mBtWorld->setGravity(convert(gravity));
-    mBtWorld->setInternalTickCallback(onTick);
+    auto btworld = new btDiscreteDynamicsWorld(mDispatcher.get(), mBroadphase.get(), mSolver.get(), mCollisionConfig.get());
+    btworld->setGravity(convert(gravity));
+    btworld->setInternalTickCallback(onTick);
+    mBtWorld = btworld;
 }
 
-btRigidBody* DynamicsWorld::addRigidBody(float mass, Entity* ent, ColliderType ct, CollisionListener* listener,
-                                         int group, int mask)
+static btCollisionShape* getCollisionShape(Entity* ent, ColliderType ct)
 {
-    auto node = ent->getParentSceneNode();
-    OgreAssert(node, "entity must be attached");
-    RigidBodyState* state = new RigidBodyState(node);
-
     if (ent->hasSkeleton())
     {
         ent->addSoftwareAnimationRequest(false);
@@ -235,19 +239,49 @@ btRigidBody* DynamicsWorld::addRigidBody(float mass, Entity* ent, ColliderType c
     if (ent->hasSkeleton())
         ent->removeSoftwareAnimationRequest(false);
 
+    return cs;
+}
+
+btRigidBody* DynamicsWorld::addRigidBody(float mass, Entity* ent, ColliderType ct, CollisionListener* listener,
+                                         int group, int mask)
+{
+    auto node = ent->getParentSceneNode();
+    OgreAssert(node, "entity must be attached");
+    RigidBodyState* state = new RigidBodyState(node);
+
+    btCollisionShape* cs = getCollisionShape(ent, ct);
+
     btVector3 inertia(0, 0, 0);
     if (mass != 0) // mass = 0 -> static
         cs->calculateLocalInertia(mass, inertia);
 
     auto rb = new btRigidBody(mass, state, cs, inertia);
-    mBtWorld->addRigidBody(rb, group, mask);
+    getBtWorld()->addRigidBody(rb, group, mask);
     rb->setUserPointer(new EntityCollisionListener{ent, listener});
 
     // transfer ownership to node
-    auto bodyWrapper = std::make_shared<RigidBody>(rb, mBtWorld);
-    node->getUserObjectBindings().setUserAny("BtRigidBody", bodyWrapper);
+    auto objWrapper = std::make_shared<RigidBody>(rb, mBtWorld);
+    node->getUserObjectBindings().setUserAny("BtCollisionObject", objWrapper);
 
     return rb;
+}
+
+btCollisionObject* CollisionWorld::addCollisionObject(Entity* ent, ColliderType ct, int group, int mask)
+{
+    auto node = ent->getParentSceneNode();
+    OgreAssert(node, "entity must be attached");
+
+    btCollisionShape* cs = getCollisionShape(ent, ct);
+
+    auto co = new btCollisionObject();
+    co->setCollisionShape(cs);
+    mBtWorld->addCollisionObject(co, group, mask);
+
+    // transfer ownership to node
+    auto objWrapper = std::make_shared<CollisionObject>(co, mBtWorld);
+    node->getUserObjectBindings().setUserAny("BtCollisionObject", objWrapper);
+
+    return co;
 }
 
 struct RayResultCallbackWrapper : public btCollisionWorld::RayResultCallback
@@ -266,7 +300,7 @@ struct RayResultCallbackWrapper : public btCollisionWorld::RayResultCallback
     }
 };
 
-void DynamicsWorld::rayTest(const Ray& ray, RayResultCallback* callback, float maxDist)
+void CollisionWorld::rayTest(const Ray& ray, RayResultCallback* callback, float maxDist)
 {
     RayResultCallbackWrapper wrapper(callback, maxDist);
     btVector3 from = convert(ray.getOrigin());
@@ -274,7 +308,7 @@ void DynamicsWorld::rayTest(const Ray& ray, RayResultCallback* callback, float m
     mBtWorld->rayTest(from, to, wrapper);
 }
 
-DynamicsWorld::~DynamicsWorld() { delete mBtWorld; }
+CollisionWorld::~CollisionWorld() { delete mBtWorld; }
 
 /*
  * =============================================================================================
