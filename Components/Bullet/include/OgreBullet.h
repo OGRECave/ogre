@@ -92,16 +92,16 @@ protected:
     std::unique_ptr<btCollisionConfiguration> mCollisionConfig;
     std::unique_ptr<btCollisionDispatcher> mDispatcher;
     std::unique_ptr<btBroadphaseInterface> mBroadphase;
-    btCollisionWorld* mBtWorld;
+    btCollisionWorld* mCollisionWorld;
 
 public:
     explicit CollisionWorld();
     virtual ~CollisionWorld();
-    CollisionWorld(btCollisionWorld* btWorld) : mBtWorld(btWorld) {}
+    CollisionWorld(btCollisionWorld* btWorld) : mCollisionWorld(btWorld) {}
 
     btCollisionObject* addCollisionObject(Entity* ent, ColliderType ct, CollisionListener* listener = nullptr, int group = 1, int mask = -1);
 
-    virtual btCollisionWorld* getBtWorld() const { return mBtWorld; }
+    btCollisionWorld* getBtCollisionWorld() const { return mCollisionWorld; }
 
     void rayTest(const Ray& ray, RayResultCallback* callback, float maxDist = 1000);
 };
@@ -120,7 +120,7 @@ public:
 
     btRigidBody* addRigidBody(float mass, Entity* ent, ColliderType ct, CollisionListener* listener = nullptr, int group = 1, int mask = -1);
 
-    btDynamicsWorld* getBtWorld() const override { return mBtWorld; }
+    BtDynamicsWorld* getBtWorld() const { return mBtWorld; }
 
     void rayTest(const Ray& ray, RayResultCallback* callback, float maxDist = 1000);
 };

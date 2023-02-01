@@ -787,6 +787,7 @@ btCollisionObject* CollisionWorld::addCollisionObject(Entity* ent, ColliderType 
 
 
     // transfer ownership to node
+    /****
     auto bodyWrapper = std::make_shared<CollisionObject>(co, mBtWorld);
     bodyWrapper->setNode(node);
     node->getUserObjectBindings().setUserAny("BtColiisionObject", bodyWrapper);
@@ -796,6 +797,7 @@ btCollisionObject* CollisionWorld::addCollisionObject(Entity* ent, ColliderType 
     btVector3 pos = ret.getOrigin();
     btTransform t(rot, pos);
     co->setWorldTransform(t);
+    ****/
     return co;
 }
 
