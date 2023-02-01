@@ -514,11 +514,6 @@ ADD_REPR(ColourValue)
 
 %include "OgreNameGenerator.h"
 %include "OgreController.h"
-%ignore Ogre::RenderSystemCapabilities::setVertexTextureUnitsShared;
-%ignore Ogre::RenderSystemCapabilities::getVertexTextureUnitsShared;
-%rename("$ignore", regextarget=1) ".*ProgramConstantIntCount.*";
-%rename("$ignore", regextarget=1) ".*ProgramConstantBoolCount.*";
-%include "OgreRenderSystemCapabilities.h"
 %ignore Ogre::GpuProgramParameters::hasPassIterationNumber; // deprecated
 %ignore Ogre::GpuProgramParameters::getPassIterationNumberIndex; // deprecated
 %ignore Ogre::GpuProgramParameters::setConstantFromTime;
@@ -556,6 +551,7 @@ SHARED_PTR(StringInterface);
         %include "OgreGpuProgram.h"
             SHARED_PTR(HighLevelGpuProgram);
             %include "OgreHighLevelGpuProgram.h"
+%include "OgreRenderSystemCapabilities.h"
 %ignore Ogre::PreApplyTextureAliasesScriptCompilerEvent;
 %include "OgreScriptCompiler.h"
 %ignore Ogre::TextureUnitState::setCubicTexture;

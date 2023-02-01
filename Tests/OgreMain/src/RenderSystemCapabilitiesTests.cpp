@@ -531,8 +531,8 @@ TEST_F(RenderSystemCapabilitiesTests,WriteAndReadComplexCapabilities)
     EXPECT_EQ(caps.getNumTextureUnits(), caps2.getNumTextureUnits());
     EXPECT_EQ(caps.getNumMultiRenderTargets(), caps2.getNumMultiRenderTargets());
 
-    EXPECT_EQ(caps.getVertexProgramConstantFloatCount(), caps2.getVertexProgramConstantFloatCount());
-    EXPECT_EQ(caps.getFragmentProgramConstantFloatCount(), caps2.getFragmentProgramConstantFloatCount());
+    EXPECT_EQ(caps.getConstantFloatCount(GPT_VERTEX_PROGRAM), caps2.getConstantFloatCount(GPT_VERTEX_PROGRAM));
+    EXPECT_EQ(caps.getConstantFloatCount(GPT_FRAGMENT_PROGRAM), caps2.getConstantFloatCount(GPT_FRAGMENT_PROGRAM));
 
     EXPECT_EQ(caps.getMaxPointSize(), caps2.getMaxPointSize());
     EXPECT_EQ(caps.getNonPOW2TexturesLimited(), caps2.getNonPOW2TexturesLimited());
