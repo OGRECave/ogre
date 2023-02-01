@@ -66,4 +66,6 @@ TEST_F(DotSceneTests, exportImport)
     EXPECT_EQ(sceneMgr->getEntity("EntityUnlit")->getSubEntity(0)->getMaterialName(), "BaseWhiteNoLighting");
 
     FileSystemLayer::removeFile("DotSceneTest.scene");
+
+    mRoot->getInstalledPlugins().front()->shutdown();
 }
