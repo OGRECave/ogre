@@ -738,10 +738,10 @@ CollisionWorld::CollisionWorld()
     mDispatcher.reset(new btCollisionDispatcher(mCollisionConfig.get()));
     mBroadphase.reset(new btDbvtBroadphase());
 
-    mBtWorld = new btCollisionWorld(mDispatcher.get(), mBroadphase.get(), mCollisionConfig.get());
+    mCollisionWorld = new btCollisionWorld(mDispatcher.get(), mBroadphase.get(), mCollisionConfig.get());
 }
 
-CollisionWorld::~CollisionWorld() { delete mBtWorld; }
+CollisionWorld::~CollisionWorld() { delete mCollisionWorld; }
 
 btCollisionObject* CollisionWorld::addCollisionObject(Entity* ent, ColliderType ct, CollisionListener* listener, int group, int mask) {
     auto node = ent->getParentSceneNode();
@@ -782,22 +782,9 @@ btCollisionObject* CollisionWorld::addCollisionObject(Entity* ent, ColliderType 
 
     auto co = new btCollisionObject();
     co->setCollisionShape(cs);
-    mBtWorld->addCollisionObject(co, group, mask);
+    mCollisionWorld->addCollisionObject(co, group, mask);
     co->setUserPointer(new EntityCollisionListener{ent, listener});
 
-
-    // transfer ownership to node
-    /****
-    auto bodyWrapper = std::make_shared<CollisionObject>(co, mBtWorld);
-    bodyWrapper->setNode(node);
-    node->getUserObjectBindings().setUserAny("BtColiisionObject", bodyWrapper);
-
-    auto ret = btTransform(convert(node->getOrientation()), convert(node->getPosition()));
-    btQuaternion rot = ret.getRotation();
-    btVector3 pos = ret.getOrigin();
-    btTransform t(rot, pos);
-    co->setWorldTransform(t);
-    ****/
     return co;
 }
 
@@ -805,7 +792,7 @@ void CollisionWorld::rayTest(const Ray& ray, RayResultCallback* callback, float 
     RayResultCallbackWrapper wrapper(callback, maxDist);
     btVector3 from = convert(ray.getOrigin());
     btVector3 to = convert(ray.getPoint(maxDist));
-    mBtWorld->rayTest(from, to, wrapper);
+    mCollisionWorld->rayTest(from, to, wrapper);
 }
 
 } // namespace Bullet
