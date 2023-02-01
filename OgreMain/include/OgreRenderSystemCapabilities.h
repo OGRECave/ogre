@@ -33,6 +33,7 @@ THE SOFTWARE.
 #include "OgreStringVector.h"
 #include "OgreStringConverter.h"
 #include "OgreHeaderPrefix.h"
+#include "OgreGpuProgram.h"
 
 // Because there are more than 32 possible Capabilities, more than 1 int is needed to store them all.
 // In fact, an array of integers is used to store capabilities. However all the capabilities are defined in the single
@@ -280,12 +281,8 @@ namespace Ogre
         /// The identifier associated with the render system for which these capabilities are valid
         String mRenderSystemName;
 
-        /// The number of floating-point 4-vector constants vertex programs support
-        ushort mVertexProgramConstantFloatCount;
-        /// The number of floating-point 4-vector constants geometry programs support
-        ushort mGeometryProgramConstantFloatCount;
-        /// The number of floating-point 4-vector constants fragment programs support
-        ushort mFragmentProgramConstantFloatCount;
+        /// The number of floating-point 4-vector constants
+        ushort mConstantFloatCount[GPT_COUNT];
         /// The number of simultaneous render targets supported
         ushort mNumMultiRenderTargets;
         /// The maximum point size
@@ -296,21 +293,11 @@ namespace Ogre
         Real mMaxSupportedAnisotropy;
         /// The number of vertex texture units supported
         ushort mNumVertexTextureUnits;
-        /// Are vertex texture units shared with fragment processor?
-        bool mVertexTextureUnitsShared;
         /// The number of vertices a geometry program can emit in a single run
         int mGeometryProgramNumOutputVertices;
 
-
         /// The list of supported shader profiles
         ShaderProfiles mSupportedShaderProfiles;
-
-        /// The number of floating-point 4-vector constants tessellation Hull programs support
-        ushort mTessellationHullProgramConstantFloatCount;
-        /// The number of floating-point 4-vector constants tessellation Domain programs support
-        ushort mTessellationDomainProgramConstantFloatCount;
-        /// The number of floating-point 4-vector constants compute programs support
-        ushort mComputeProgramConstantFloatCount;
 
         /// The number of vertex attributes available
         ushort mNumVertexAttributes;
@@ -497,19 +484,9 @@ namespace Ogre
 
 
         /// The number of floating-point 4-vector constants vertex programs support
-        ushort getVertexProgramConstantFloatCount(void) const
+        ushort getConstantFloatCount(GpuProgramType programType) const
         {
-            return mVertexProgramConstantFloatCount;
-        }
-        /// The number of floating-point 4-vector constants geometry programs support
-        ushort getGeometryProgramConstantFloatCount(void) const
-        {
-            return mGeometryProgramConstantFloatCount;
-        }
-        /// The number of floating-point 4-vector constants fragment programs support
-        ushort getFragmentProgramConstantFloatCount(void) const
-        {
-            return mFragmentProgramConstantFloatCount;
+            return mConstantFloatCount[programType];
         }
 
         /// sets the device name for Render system
@@ -527,17 +504,17 @@ namespace Ogre
         /// The number of floating-point 4-vector constants vertex programs support
         void setVertexProgramConstantFloatCount(ushort c)
         {
-            mVertexProgramConstantFloatCount = c;
+            mConstantFloatCount[GPT_VERTEX_PROGRAM] = c;
         }
         /// The number of floating-point 4-vector constants geometry programs support
         void setGeometryProgramConstantFloatCount(ushort c)
         {
-            mGeometryProgramConstantFloatCount = c;
+            mConstantFloatCount[GPT_GEOMETRY_PROGRAM] = c;
         }
         /// The number of floating-point 4-vector constants fragment programs support
         void setFragmentProgramConstantFloatCount(ushort c)
         {
-            mFragmentProgramConstantFloatCount = c;
+            mConstantFloatCount[GPT_FRAGMENT_PROGRAM] = c;
         }
 
         /// Maximum point screen size in pixels
@@ -588,16 +565,6 @@ namespace Ogre
         {
             return mNumVertexTextureUnits;
         }
-        /// @deprecated obsolete
-        OGRE_DEPRECATED void setVertexTextureUnitsShared(bool shared)
-        {
-            mVertexTextureUnitsShared = shared;
-        }
-        /// @deprecated obsolete
-        OGRE_DEPRECATED bool getVertexTextureUnitsShared(void) const
-        {
-            return mVertexTextureUnitsShared;
-        }
 
         /// Set the number of vertices a single geometry program run can emit
         void setGeometryProgramNumOutputVertices(int numOutputVertices)
@@ -641,154 +608,17 @@ namespace Ogre
         /// The number of floating-point 4-vector constants compute programs support
         void setComputeProgramConstantFloatCount(ushort c)
         {
-            mComputeProgramConstantFloatCount = c;
-        }
-        /// The number of floating-point 4-vector constants fragment programs support
-        ushort getComputeProgramConstantFloatCount(void) const
-        {
-            return mComputeProgramConstantFloatCount;
-        }
-        /// The number of floating-point 4-vector constants fragment programs support
-        ushort getTessellationDomainProgramConstantFloatCount(void) const
-        {
-            return mTessellationDomainProgramConstantFloatCount;
+            mConstantFloatCount[GPT_COMPUTE_PROGRAM] = c;
         }
         /// The number of floating-point 4-vector constants tessellation Domain programs support
         void setTessellationDomainProgramConstantFloatCount(ushort c)
         {
-            mTessellationDomainProgramConstantFloatCount = c;
-        }
-        /// The number of floating-point 4-vector constants fragment programs support
-        ushort getTessellationHullProgramConstantFloatCount(void) const
-        {
-            return mTessellationHullProgramConstantFloatCount;
+            mConstantFloatCount[GPT_DOMAIN_PROGRAM] = c;
         }
         /// The number of floating-point 4-vector constants tessellation Hull programs support
         void setTessellationHullProgramConstantFloatCount(ushort c)
         {
-            mTessellationHullProgramConstantFloatCount = c;
-        }
-
-
-        /// @deprecated use getVertexProgramConstantFloatCount instead
-        OGRE_DEPRECATED ushort getVertexProgramConstantIntCount(void) const
-        {
-            return mVertexProgramConstantFloatCount;
-        }
-        /// @deprecated use getVertexProgramConstantFloatCount instead
-        OGRE_DEPRECATED ushort getVertexProgramConstantBoolCount(void) const
-        {
-            return mVertexProgramConstantFloatCount;
-        }
-        /// @deprecated use getGeometryProgramConstantFloatCount instead
-        OGRE_DEPRECATED ushort getGeometryProgramConstantIntCount(void) const
-        {
-            return mGeometryProgramConstantFloatCount;
-        }
-        /// @deprecated use getGeometryProgramConstantFloatCount instead
-        OGRE_DEPRECATED ushort getGeometryProgramConstantBoolCount(void) const
-        {
-            return mGeometryProgramConstantFloatCount;
-        }
-        /// @deprecated use getFragmentProgramConstantFloatCount instead
-        OGRE_DEPRECATED ushort getFragmentProgramConstantIntCount(void) const
-        {
-            return mFragmentProgramConstantFloatCount;
-        }
-        /// @deprecated use getFragmentProgramConstantFloatCount instead
-        OGRE_DEPRECATED ushort getFragmentProgramConstantBoolCount(void) const
-        {
-            return mFragmentProgramConstantFloatCount;
-        }
-        /// @deprecated use setVertexProgramConstantFloatCount instead
-        OGRE_DEPRECATED void setVertexProgramConstantIntCount(ushort c)
-        {
-            mVertexProgramConstantFloatCount = c;
-        }
-        /// @deprecated use setVertexProgramConstantFloatCount instead
-        OGRE_DEPRECATED void setVertexProgramConstantBoolCount(ushort c)
-        {
-            mVertexProgramConstantFloatCount = c;
-        }
-        /// @deprecated use setGeometryProgramConstantFloatCount instead
-        OGRE_DEPRECATED void setGeometryProgramConstantIntCount(ushort c)
-        {
-            mGeometryProgramConstantFloatCount = c;
-        }
-        /// @deprecated use setGeometryProgramConstantFloatCount instead
-        OGRE_DEPRECATED void setGeometryProgramConstantBoolCount(ushort c)
-        {
-            mGeometryProgramConstantFloatCount = c;
-        }
-        /// @deprecated use setFragmentProgramConstantFloatCount instead
-        OGRE_DEPRECATED void setFragmentProgramConstantIntCount(ushort c)
-        {
-            mFragmentProgramConstantFloatCount = c;
-        }
-        /// @deprecated use setFragmentProgramConstantFloatCount instead
-        OGRE_DEPRECATED void setFragmentProgramConstantBoolCount(ushort c)
-        {
-            mFragmentProgramConstantFloatCount = c;
-        }
-        /// @deprecated use setTessellationHullProgramConstantFloatCount instead
-        OGRE_DEPRECATED void setTessellationHullProgramConstantIntCount(ushort c)
-        {
-            mTessellationHullProgramConstantFloatCount = c;
-        }
-        /// @deprecated use setTessellationHullProgramConstantFloatCount instead
-        OGRE_DEPRECATED void setTessellationHullProgramConstantBoolCount(ushort c)
-        {
-            mTessellationHullProgramConstantFloatCount = c;
-        }
-        /// @deprecated use getTessellationHullProgramConstantFloatCount instead
-        OGRE_DEPRECATED ushort getTessellationHullProgramConstantIntCount(void) const
-        {
-            return mTessellationHullProgramConstantFloatCount;
-        }
-        /// @deprecated use getTessellationHullProgramConstantFloatCount instead
-        OGRE_DEPRECATED ushort getTessellationHullProgramConstantBoolCount(void) const
-        {
-            return mTessellationHullProgramConstantFloatCount;
-        }
-        /// @deprecated use setTessellationDomainProgramConstantFloatCount instead
-        OGRE_DEPRECATED void setTessellationDomainProgramConstantIntCount(ushort c)
-        {
-            mTessellationDomainProgramConstantFloatCount = c;
-        }
-        /// @deprecated use setTessellationDomainProgramConstantFloatCount instead
-        OGRE_DEPRECATED void setTessellationDomainProgramConstantBoolCount(ushort c)
-        {
-            mTessellationDomainProgramConstantFloatCount = c;
-        }
-        /// @deprecated use getTessellationDomainProgramConstantFloatCount instead
-        OGRE_DEPRECATED ushort getTessellationDomainProgramConstantIntCount(void) const
-        {
-            return mTessellationDomainProgramConstantFloatCount;
-        }
-        /// @deprecated use getTessellationDomainProgramConstantFloatCount instead
-        OGRE_DEPRECATED ushort getTessellationDomainProgramConstantBoolCount(void) const
-        {
-            return mTessellationDomainProgramConstantFloatCount;
-        }
-        /// @deprecated use setComputeProgramConstantFloatCount instead
-        OGRE_DEPRECATED void setComputeProgramConstantIntCount(ushort c)
-        {
-            mComputeProgramConstantFloatCount = c;
-        }
-        /// @deprecated use setComputeProgramConstantFloatCount instead
-        OGRE_DEPRECATED void setComputeProgramConstantBoolCount(ushort c)
-        {
-            mComputeProgramConstantFloatCount = c;
-        }
-        /// @deprecated use getComputeProgramConstantFloatCount instead
-        OGRE_DEPRECATED ushort getComputeProgramConstantIntCount(void) const
-        {
-            return mComputeProgramConstantFloatCount;
-        }
-        /// @deprecated use getComputeProgramConstantFloatCount instead
-        OGRE_DEPRECATED ushort getComputeProgramConstantBoolCount(void) const
-        {
-            return mComputeProgramConstantFloatCount;
+            mConstantFloatCount[GPT_HULL_PROGRAM] = c;
         }
 
     };
