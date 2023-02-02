@@ -132,12 +132,6 @@ namespace Ogre {
 
     void TinyRenderSystem::initialiseFromRenderSystemCapabilities(RenderSystemCapabilities* caps, RenderTarget* primary)
     {
-        if (caps->getRenderSystemName() != getName())
-        {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-                        "Trying to initialize TinyRenderSystem from RenderSystemCapabilities that do not support Tiny");
-        }
-
         // Use VBO's by default
         mHardwareBufferManager = new DefaultHardwareBufferManager();
 
