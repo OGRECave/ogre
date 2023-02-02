@@ -9,9 +9,8 @@ I'm also used to be around #Ogre3D on irc.freenode.net.
 ## FEATURES
 
 It's basically a couple of Python modules to load and process the
-structured Erlang binary file produced by Wings and save it in 
-Ogre XML. It does the following:
-
+structured Erlang binary file produced by Wings and save it in Ogre XML.
+It does the following:
  - Loads the polygon data
  - Handles UV coordinates, material diffuse/ambient/specular/shininess values
  - Handle copying vertices at hard edges (like smoothing groups in Max)
@@ -35,8 +34,7 @@ This will result in a .mesh.xml file. It has to be converted to a .mesh via the 
 	% OgreXMLConverter test.mesh.xml
 ```
 
-The w2o.py program will also export internal Wings textures, 
-using the name of the material (not the name of the image) as filename.
+The w2o.py program will also export internal Wings textures, using the name of the material (not the name of the image) as filename.
 
 ## REQUIREMENTS
 (These should be available on a recent Linux system)

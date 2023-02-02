@@ -16,11 +16,8 @@ Converts VRML97 files to .mesh files containing static meshes and materials.
 That's all.
 
 ## Notes
- - Make sure your objects are tesselated. 
-   They don't have to be triangulated - the converter takes care of that, 
-   but primitive shapes (like spheres, boxes, etc) are not recognised.
+ - Make sure your objects are tesselated.
+   They don't have to be triangulated - the converter takes care of that, but primitive shapes (like spheres, boxes, etc) are not recognised.
 
- - If you want the mesh to contain normals (which is usually the case), 
-   then make sure that normals are exported. 
-   There is usually an option for this in the modeler, 
-   but the default is 'off' in most programs.
+ - If you want the mesh to contain normals (which is usually the case), then make sure that normals are exported.
+   There is usually an option for this in the modeler, but the default is 'off' in most programs.

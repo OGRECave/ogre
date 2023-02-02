@@ -106,4 +106,3 @@ clipOptions:
 # Troubleshooting
 - Some users reported that they need to add an additional "-v" parameter after "-q" into the file "ogreExporter.mel",
   in the lines 1924 to 1926 (details: [Maya Ogre Exporter Save Settings problem - Download the fix](http://www.ogre3d.org/forums/viewtopic.php?f=8&t=46563))
-

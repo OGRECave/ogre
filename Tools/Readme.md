@@ -131,14 +131,10 @@ destfile   = optional name of file to write to. If you don't
 Again you can drag files onto this tool, so long as you don't mind it overwriting the file in place.
 If you'd prefer to keep a backup, make a copy or use the command line to upgrade to a different file.
 
-Reorganising vertex buffers: 
+Reorganising vertex buffers:
 This tool now allows you to restructure the vertex buffers in your mesh.
-If you are upgrading from a version prior to 0.15.0, 
-then you should answer 'y' when asked if you want to reorganise the buffers, 
-since 0.15.0 and later allows more efficient structures in the binary mesh.
-You will then be shown the buffer structures for each of the geometry sections; 
-you can either reorganise the buffers yourself, or use 'automatic' mode, 
-which is recommended unless you know what you're doing.
+If you are upgrading from a version prior to 0.15.0, then you should answer 'y' when asked if you want to reorganise the buffers, since 0.15.0 and later allows more efficient structures in the binary mesh.
+You will then be shown the buffer structures for each of the geometry sections; you can either reorganise the buffers yourself, or use 'automatic' mode, which is recommended unless you know what you're doing.
 
 ## MilkshapeExport
 Allows you to export OGRE .mesh files from the shareware modelling tool Milkshape3d.
