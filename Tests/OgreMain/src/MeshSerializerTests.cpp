@@ -275,16 +275,16 @@ TEST_F(MeshSerializerTests,Mesh_Version_1_2)
 }
 #endif /* ifdef I_HAVE_LOT_OF_FREE_TIME */
 //--------------------------------------------------------------------------
+#ifdef OGRE_TEST_XMLSERIALIZER
 TEST_F(MeshSerializerTests,Mesh_XML)
 {
-#ifdef OGRE_TEST_XMLSERIALIZER
     XMLMeshSerializer serializerXML;
     serializerXML.exportMesh(mOrigMesh.get(), mMeshFullPath + ".xml");
     mMesh = MeshManager::getSingleton().create(mMesh->getName() + ".test.mesh", mMesh->getGroup());
     serializerXML.importMesh(mMeshFullPath + ".xml", VET_COLOUR_ABGR, mMesh.get());
     assertMeshClone(mOrigMesh.get(), mMesh.get());
-#endif
 }
+#endif
 
 namespace Ogre
 {
