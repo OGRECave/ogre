@@ -321,13 +321,11 @@ namespace Ogre
                 created based on the options currently set on the render
                 system.
             @param windowTitle
-            @param customCapabilitiesConfig see #useCustomRenderSystemCapabilities
             @return
                 A pointer to the automatically created window, if
                 requested, otherwise <b>NULL</b>.
         */
-        RenderWindow* initialise(bool autoCreateWindow, const String& windowTitle = "OGRE Render Window",
-                                    const String& customCapabilitiesConfig = BLANKSTRING);
+        RenderWindow* initialise(bool autoCreateWindow, const String& windowTitle = "OGRE Render Window");
 
         /** Returns whether the system is initialised or not. */
         bool isInitialised(void) const { return mIsInitialised; }
