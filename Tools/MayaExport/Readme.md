@@ -1,3 +1,6 @@
+
+# Ogre exporter for Maya
+```
 /*******************************************************************************
  *                        Ogre exporter for Maya                               *
  *                                                                             *
@@ -6,18 +9,16 @@
  * Sponsored by: Anygma N.V. ( http://www.nazooka.com )                        *
  *                                                                             *
  *******************************************************************************
+```
 
---------------------------------------------------------------------------------
-Installation:
---------------------------------------------------------------------------------
-
-1) Copy "ogreExporter.mll" to your Maya plug-ins directory (e.g.: C:\Program Files\Alias\Maya7.0\bin\plug-ins)
+## Installation
+1) Copy "ogreExporter.mll" to your Maya plug-ins directory (e.g.: `C:\Program Files\Alias\Maya7.0\bin\plug-ins`)
 
 2) Copy Ogre DLLs (you can find them in the "dlls" directory of this zip) to your Maya bin directory
-   (e.g.: C:\Program Files\Alias\Maya7.0\bin)
+   (e.g.: `C:\Program Files\Alias\Maya7.0\bin`)
 
 3) Copy "ogreExporter.mel" (from the "mel" directory of this zip) to your Maya scripts directory 
-   (e.g.: C:\Documents and Settings\user\My Documents\maya\6.5\scripts)
+   (e.g.: `C:\Documents and Settings\user\My Documents\maya\6.5\scripts`)
 
 4) If you already have a userSetup.mel in your scripts folder, then append the line 
       source ogreExporter.mel;
@@ -25,16 +26,14 @@ Installation:
    If you don't have a "userSetup.mel" file in your scripts directory, then copy there the one you find in
    the "scripts" directory of this zip.
 
-5) Launch vcredist_x86.exe to install the latest Visual Studio DLLs
+5) Launch `vcredist_x86.exe` to install the latest Visual Studio DLLs
 
---------------------------------------------------------------------------------
-Usage:
---------------------------------------------------------------------------------
+## Usage
 
 1) Via GUI from the menu Ogre->Export
 
 2) Via script:
-
+```
 ogreExport 	generalOptions 
 
 		["-mesh" meshFilename meshOptions]
@@ -65,7 +64,6 @@ ogreExport 	generalOptions
 		["-particles" particlesFilename]
 			export particles to .particle file
 
-
 generalOptions:
 	"-sel" | "-all"		export whole scene or only selected objects
 	"-world" | "-obj"	export in world or object coordinates
@@ -73,7 +71,6 @@ generalOptions:
 							("-lu pref" means to get unit from scene
 								preferences)
 	"-scale" s		scale the whole mesh by s
-
 	
 meshOptions:
 	["-shared"]				export using shared geometry
@@ -104,10 +101,8 @@ vertexAnimOptions:
 
 clipOptions:
 	"startEnd" s e ("frames" | "seconds") | "timeSlider"	specify clip range with start/end time or use time slider range
+```
 
---------------------------------------------------------------------------------
-Trouble Shooting:
---------------------------------------------------------------------------------
-
-- some users reported that they need to add an additional "-v" parameter after "-q" into the file "ogreExporter.mel",
-  in the lines 1924 to 1926 (details: http://www.ogre3d.org/forums/viewtopic.php?f=8&t=46563)
+# Troubleshooting
+- Some users reported that they need to add an additional "-v" parameter after "-q" into the file "ogreExporter.mel",
+  in the lines 1924 to 1926 (details: [Maya Ogre Exporter Save Settings problem - Download the fix](http://www.ogre3d.org/forums/viewtopic.php?f=8&t=46563))
