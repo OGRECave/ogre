@@ -516,55 +516,12 @@ namespace Ogre {
     }
 
     //-----------------------------------------------------------------------
-    RenderWindow* Root::initialise(bool autoCreateWindow, const String& windowTitle, const String& customCapabilitiesConfig)
+    RenderWindow* Root::initialise(bool autoCreateWindow, const String& windowTitle)
     {
         OgreAssert(mActiveRenderer, "Cannot initialise");
 
         if (!mControllerManager)
             mControllerManager.reset(new ControllerManager());
-
-        // .rendercaps manager
-        RenderSystemCapabilitiesManager& rscManager = RenderSystemCapabilitiesManager::getSingleton();
-        // caller wants to load custom RenderSystemCapabilities form a config file
-        if(!customCapabilitiesConfig.empty())
-        {
-            ConfigFile cfg;
-            cfg.load(customCapabilitiesConfig, "\t:=", false);
-
-            // Capabilities Database setting must be in the same format as
-            // resources.cfg in Ogre examples.
-            for(auto& it : cfg.getSettings("Capabilities Database"))
-            {
-                const String& archType = it.first;
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
-                String filename = it.second;
-
-                // Only adjust relative directories
-                if (!StringUtil::startsWith(filename, "/", false))
-                {
-                    filename = StringUtil::replaceAll(filename, "../", "");
-                    filename = String(macBundlePath() + "/Contents/Resources/" + filename);
-                }
-#else
-                String filename = it.second;
-#endif
-                rscManager.parseCapabilitiesFromArchive(filename, archType, true);
-            }
-
-            String capsName = cfg.getSetting("Custom Capabilities");
-            // The custom capabilities have been parsed, let's retrieve them
-            RenderSystemCapabilities* rsc = rscManager.loadParsedCapabilities(capsName);
-            if(rsc == 0)
-            {
-                OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND,
-                    String("Cannot load a RenderSystemCapability named ") + capsName,
-                    "Root::initialise");
-            }
-
-            // Tell RenderSystem to use the comon rsc
-            useCustomRenderSystemCapabilities(rsc);
-        }
-
 
         PlatformInformation::log(LogManager::getSingleton().getDefaultLog());
         mActiveRenderer->_initialise();

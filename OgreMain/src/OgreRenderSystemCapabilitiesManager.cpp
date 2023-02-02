@@ -29,8 +29,8 @@ THE SOFTWARE.
 
 #include "OgreRenderSystemCapabilitiesManager.h"
 #include "OgreRenderSystemCapabilitiesSerializer.h"
-
-
+#include "OgreConfigFile.h"
+#include "OgreFileSystemLayer.h"
 
 namespace Ogre {
 
@@ -60,6 +60,38 @@ namespace Ogre {
         }
 
         OGRE_DELETE mSerializer;
+    }
+
+    RenderSystemCapabilities* RenderSystemCapabilitiesManager::loadCapabilitiesConfig(const String& customConfig)
+    {
+        ConfigFile cfg;
+        cfg.load(customConfig, "\t:=", false);
+
+        // resolve relative path with regards to configfile
+        String baseDir, unused;
+        StringUtil::splitFilename(customConfig, unused, baseDir);
+
+        // Capabilities Database setting must be in the same format as
+        // resources.cfg in Ogre examples.
+        for(auto& it : cfg.getSettings("Capabilities Database"))
+        {
+            String filename = it.second;
+            if(filename.empty() || filename[0] == '.')
+                filename = baseDir + it.second;
+
+            filename = FileSystemLayer::resolveBundlePath(filename);
+            parseCapabilitiesFromArchive(filename, it.first, true);
+        }
+
+        String capsName = cfg.getSetting("Custom Capabilities");
+        // The custom capabilities have been parsed, let's retrieve them
+        RenderSystemCapabilities* rsc = loadParsedCapabilities(capsName);
+        if (rsc == 0)
+        {
+            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "Cannot load a RenderSystemCapability named '" + capsName + "'");
+        }
+
+        return rsc;
     }
 
     //-----------------------------------------------------------------------
