@@ -492,13 +492,6 @@ namespace Ogre {
 
     void GLES2RenderSystem::initialiseFromRenderSystemCapabilities(RenderSystemCapabilities* caps, RenderTarget* primary)
     {
-        if(caps->getRenderSystemName() != getName())
-        {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-                        "Trying to initialize GLES2RenderSystem from RenderSystemCapabilities that do not support OpenGL ES",
-                        "GLES2RenderSystem::initialiseFromRenderSystemCapabilities");
-        }
-
         if(caps->getNumVertexAttributes() < 16)
             GLSLProgramCommon::useTightAttributeLayout();
 

@@ -908,13 +908,6 @@ namespace Ogre
     void D3D11RenderSystem::initialiseFromRenderSystemCapabilities(
         RenderSystemCapabilities* caps, RenderTarget* primary)
     {
-        if(caps->getRenderSystemName() != getName())
-        {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
-                "Trying to initialize D3D11RenderSystem from RenderSystemCapabilities that do not support Direct3D11",
-                "D3D11RenderSystem::initialiseFromRenderSystemCapabilities");
-        }
-        
         // add hlsl
         HighLevelGpuProgramManager::getSingleton().addFactory(mHLSLProgramFactory);
     }

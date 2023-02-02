@@ -297,11 +297,16 @@ namespace Ogre {
     //---------------------------------------------------------------------------------------------
     void RenderSystem::useCustomRenderSystemCapabilities(RenderSystemCapabilities* capabilities)
     {
-        if (mRealCapabilities != 0)
+        if (mRealCapabilities)
         {
-          OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
-              "Custom render capabilities must be set before the RenderSystem is initialised.",
-              "RenderSystem::useCustomRenderSystemCapabilities");
+            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
+                        "Custom render capabilities must be set before the RenderSystem is initialised");
+        }
+
+        if (capabilities->getRenderSystemName() != getName())
+        {
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+                        "Trying to use RenderSystemCapabilities that were created for a different RenderSystem");
         }
 
         mCurrentCapabilities = capabilities;

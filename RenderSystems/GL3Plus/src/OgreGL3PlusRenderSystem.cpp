@@ -468,13 +468,6 @@ namespace Ogre {
 
     void GL3PlusRenderSystem::initialiseFromRenderSystemCapabilities(RenderSystemCapabilities* caps, RenderTarget* primary)
     {
-        if (caps->getRenderSystemName() != getName())
-        {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-                        "Trying to initialize GL3PlusRenderSystem from RenderSystemCapabilities that do not support OpenGL 3+",
-                        "GL3PlusRenderSystem::initialiseFromRenderSystemCapabilities");
-        }
-
         mProgramManager = new GLSLProgramManager(this);
         // Create GLSL shader factory
         mGLSLShaderFactory = new GLSLShaderFactory();

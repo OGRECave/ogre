@@ -700,13 +700,6 @@ namespace Ogre {
 
     void GLRenderSystem::initialiseFromRenderSystemCapabilities(RenderSystemCapabilities* caps, RenderTarget* primary)
     {
-        if(caps->getRenderSystemName() != getName())
-        {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-                        "Trying to initialize GLRenderSystem from RenderSystemCapabilities that do not support OpenGL",
-                        "GLRenderSystem::initialiseFromRenderSystemCapabilities");
-        }
-
         // set texture the number of texture units
         mFixedFunctionTextureUnits = caps->getNumTextureUnits();
 
