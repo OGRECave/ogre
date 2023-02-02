@@ -153,13 +153,13 @@ TEST_F(UseCustomCapabilitiesTests,CustomCapabilitiesGL)
 #else
     Root* root = OGRE_NEW Root("plugins.cfg");
 #endif
-
+    std::unique_ptr<Root> rootPtr(root);
 #endif
 
     RenderSystem* rs = root->getRenderSystemByName("OpenGL Rendering Subsystem");
     if(!rs)
     {
-        // This test is irrelevant because GL RenderSystem is not available
+        GTEST_SKIP() << "OpenGL RenderSystem not available";
     }
     else
     {
@@ -180,11 +180,11 @@ TEST_F(UseCustomCapabilitiesTests,CustomCapabilitiesGL)
             checkCaps(caps);
         }
         // clean up root, in case of error, and let cppunit to handle the exception
-        catch(...)
+        catch(std::exception& e)
         {
+            GTEST_SKIP() << e.what();
         }
     }
-    OGRE_DELETE root;
 }
 //--------------------------------------------------------------------------
 static void setUpD3D9RenderSystemOptions(Ogre::RenderSystem* rs)
@@ -212,11 +212,12 @@ TEST_F(UseCustomCapabilitiesTests,CustomCapabilitiesD3D9)
 #else
     Root* root = OGRE_NEW Root("plugins.cfg");
 #endif
+    std::unique_ptr<Root> rootPtr(root);
 
     RenderSystem* rs = root->getRenderSystemByName("Direct3D9 Rendering Subsystem");
     if(!rs)
     {
-        // This test is irrelevant because D3D9 RenderSystem is not available
+        GTEST_SKIP() << "Direct3D9 RenderSystem not available";
     }
     else
     {   
@@ -231,12 +232,11 @@ TEST_F(UseCustomCapabilitiesTests,CustomCapabilitiesD3D9)
             checkCaps(caps);
         }
         // clean up root, in case of error, and let cppunit to handle the exception
-        catch(...)
+        catch(std::exception& e)
         {
+            GTEST_SKIP() << e.what();
         }
     }
-
-    OGRE_DELETE root;
 }
 //--------------------------------------------------------------------------
 

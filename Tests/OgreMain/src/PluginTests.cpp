@@ -31,7 +31,7 @@ TEST_F(DotSceneTests, exportImport)
     }
     catch (const std::exception& e)
     {
-        return;
+        GTEST_SKIP() << "Plugin_DotScene not found";
     }
 
     mRoot->getInstalledPlugins().front()->initialise();
