@@ -138,9 +138,8 @@ This will freshly generate the API documentation for Ogre's classes from the hea
 Installing
 ----------
 
-Once the build is complete, you can optionally have the build system
-copy the built libraries and headers to a clean location. We recommend
-you do this step as it will make it easier to use Ogre in your projects.
+Once the build is complete, the libraries and headers must be copied to a clean location.
+This is required if you want to reference %Ogre in your own projects with CMake.
 In Visual Studio, just select and build the target *INSTALL*. When using the command line, type:
 
     cmake --build . --config Release --target install
