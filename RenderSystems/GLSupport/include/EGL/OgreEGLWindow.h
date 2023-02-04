@@ -79,7 +79,6 @@ namespace Ogre {
                * WINDOW         The X NativeWindowType target for rendering.
                * GLCONTEXT      The Ogre GLContext used for rendering.
                * DISPLAY        EGLDisplay connection behind that context.
-               * DISPLAYNAME    The name for the connected display.
                */
             void getCustomAttribute(const String& name, void* pData) override;
 

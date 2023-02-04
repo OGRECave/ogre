@@ -52,7 +52,6 @@ namespace Ogre {
             void start(void);
             void stop(void);
             ConfigOptionMap getConfigOptions();
-            virtual String getDisplayName(void);
             CFDictionaryRef chooseGLConfig(const GLint *attribList, GLint *nElements);
             GLint getGLConfigAttrib(CFDictionaryRef fbConfig, GLint attribute, GLint *value);
             void * getProcAddress(const char* name) const;

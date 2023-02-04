@@ -68,21 +68,6 @@ namespace Ogre {
         // The remaining functions are internal to the GLX Rendersystem:
 
         /**
-         * Get the name of the display and screen used for rendering
-         *
-         * Ogre normally opens its own connection to the X server
-         * and renders onto the screen where the user logged in
-         *
-         * However, if Ogre is passed a current GL context when the first
-         * RenderTarget is created, then it will connect to the X server
-         * using the same connection as that GL context and direct all
-         * subsequent rendering to the screen targeted by that GL context.
-         *
-         * @returns              Display name.
-         */
-        String getDisplayName (void);
-
-        /**
          * Get the Display connection used for rendering
          *
          * This function establishes the initial connection when necessary.

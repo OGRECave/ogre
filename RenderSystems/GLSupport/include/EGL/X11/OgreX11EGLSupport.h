@@ -57,8 +57,6 @@ namespace Ogre {
             X11EGLSupport(int profile);
             virtual ~X11EGLSupport();
 
-            String getDisplayName(void);
-
             NativeDisplayType getNativeDisplay(void);
             XVisualInfo *getVisualFromFBConfig(::EGLConfig glConfig);
             Atom mAtomDeleteWindow;
