@@ -2290,11 +2290,7 @@ namespace Ogre {
 
         // Find the correct type to render
         GLint primType;
-        int operationType = op.operationType;
-        // Use adjacency if there is a geometry program and it requested adjacency info
-        if(mProgramBound[GPT_GEOMETRY_PROGRAM] && mCurrentGeometryProgram && dynamic_cast<GpuProgram*>(mCurrentGeometryProgram)->isAdjacencyInfoRequired())
-            operationType |= RenderOperation::OT_DETAIL_ADJACENCY_BIT;
-        switch (operationType)
+        switch (op.operationType)
         {
         case RenderOperation::OT_POINT_LIST:
             primType = GL_POINTS;
