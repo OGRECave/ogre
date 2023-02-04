@@ -287,9 +287,6 @@ namespace Ogre {
             called for you.
         */
         void createInternalResources(void);
-
-        /// @deprecated use unload() instead
-        void freeInternalResources(void);
         
         /** Copies (and maybe scales to fit) the contents of this texture to
             another texture. */
@@ -461,33 +458,18 @@ namespace Ogre {
         PixelFormat mSrcFormat;
         uint32 mSrcWidth, mSrcHeight, mSrcDepth;
 
-        PixelFormat mDesiredFormat;
-        unsigned short mDesiredIntegerBitDepth;
-        unsigned short mDesiredFloatBitDepth;
-
         bool mTreatLuminanceAsAlpha;
         bool mInternalResourcesCreated;
         bool mMipmapsHardwareGenerated;
         bool mHwGamma;
 
-        /// vector of images that should be loaded (cubemap/ texture array)
-        std::vector<String> mLayerNames;
         String mFSAAHint;
-
-        /** Vector of images that were pulled from disk by
-            prepareLoad but have yet to be pushed into texture memory
-            by loadImpl.  Images should be deleted by loadImpl and unprepareImpl.
-        */
-        typedef std::vector<Image> LoadedImages;
-        LoadedImages mLoadedImages;
 
         /// Vector of pointers to subsurfaces
         typedef std::vector<HardwarePixelBufferSharedPtr> SurfaceList;
         SurfaceList mSurfaceList;
 
         TextureType mTextureType;
-
-        void readImage(LoadedImages& imgs, const String& name, const String& ext, bool haveNPOT);
 
         void prepareImpl() override;
         void unprepareImpl() override;
@@ -515,7 +497,23 @@ namespace Ogre {
         */
         uint32 getMaxMipmaps() const;
 
-        static const char* CUBEMAP_SUFFIXES[6];
+    private:
+        uchar mDesiredIntegerBitDepth;
+        uchar mDesiredFloatBitDepth;
+        PixelFormat mDesiredFormat;
+
+        /// vector of images that should be loaded (cubemap/ texture array)
+        std::vector<String> mLayerNames;
+
+        /** Vector of images that were pulled from disk by
+            prepareLoad but have yet to be pushed into texture memory
+            by loadImpl.  Images should be deleted by loadImpl and unprepareImpl.
+        */
+        typedef std::vector<Image> LoadedImages;
+        LoadedImages mLoadedImages;
+
+        void readImage(LoadedImages& imgs, const String& name, const String& ext, bool haveNPOT);
+        void freeInternalResources(void);
     };
     /** @} */
     /** @} */
