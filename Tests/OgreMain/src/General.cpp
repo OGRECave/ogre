@@ -531,12 +531,12 @@ TEST(Light, AnimableValue)
 
     l.setSpotlightInnerAngle(Radian(0));
     auto spotlightInner = l.createAnimableValue("spotlightInner");
-    spotlightInner->applyDeltaValue(Real(1));
+    spotlightInner->applyDeltaValue(Radian(1));
     EXPECT_EQ(l.getSpotlightInnerAngle(), Radian(1));
 
     l.setSpotlightOuterAngle(Radian(0));
     auto spotlightOuter = l.createAnimableValue("spotlightOuter");
-    spotlightOuter->applyDeltaValue(Real(1));
+    spotlightOuter->applyDeltaValue(Radian(1));
     EXPECT_EQ(l.getSpotlightOuterAngle(), Radian(1));
 
     l.setSpotlightFalloff(0);
