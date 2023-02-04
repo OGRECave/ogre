@@ -98,7 +98,6 @@ namespace Ogre {
             /// Only used when mFaceCamera == false
             Quaternion orientation;
         };
-        typedef std::vector<Element> ElementList;
 
         /** Constructor (don't use directly, use factory) 
         @param name The name to give this object
@@ -182,12 +181,6 @@ namespace Ogre {
             final buffers generated.
         */
         virtual bool getUseVertexColours(void) const { return mUseVertexColour; }
-
-        /// @deprecated do not use
-        OGRE_DEPRECATED void setDynamic(bool dyn);
-
-        /// @deprecated do not use
-        OGRE_DEPRECATED bool getDynamic(void) const { return mDynamic; }
 
         /** Set the auto update state
 
@@ -279,21 +272,15 @@ namespace Ogre {
     protected:
 
         /// Maximum length of each chain
-        size_t mMaxElementsPerChain;
+        uint32 mMaxElementsPerChain;
         /// Number of chains
-        size_t mChainCount;
+        uint32 mChainCount;
         /// Use texture coords?
         bool mUseTexCoords;
         /// Use vertex colour?
         bool mUseVertexColour;
-        /// @deprecated
-        bool mDynamic;
         /// Tell if vertex buffer should be update automatically.
         bool mAutoUpdate;
-        /// Vertex data
-        std::unique_ptr<VertexData> mVertexData;
-        /// Index data (to allow multiple unconnected chains)
-        std::unique_ptr<IndexData> mIndexData;
         /// Is the vertex declaration dirty?
         bool mVertexDeclDirty;
         /// Do the buffers need recreating?
@@ -314,16 +301,10 @@ namespace Ogre {
         TexCoordDirection mTexCoordDir;
         /// Other texture coord range
         Real mOtherTexCoordRange[2];
-        /// Camera last used to build the vertex buffer
-        Camera *mVertexCameraUsed;
         /// When true, the billboards always face the camera
         bool mFaceCamera;
-        /// Used when mFaceCamera == false; determines the billboard's "normal". i.e.
-        /// when the orientation is identity, the billboard is perpendicular to this
-        /// vector
-        Vector3 mNormalBase;
 
-
+        typedef std::vector<Element> ElementList;
         /// The list holding the chain elements
         ElementList mChainElementList;
 
@@ -346,6 +327,20 @@ namespace Ogre {
         typedef std::vector<ChainSegment> ChainSegmentList;
         ChainSegmentList mChainSegmentList;
 
+        /// Chain segment has no elements
+        static const size_t SEGMENT_EMPTY;
+    private:
+        /// Used when mFaceCamera == false; determines the billboard's "normal". i.e.
+        /// when the orientation is identity, the billboard is perpendicular to this
+        /// vector
+        Vector3 mNormalBase;
+        /// Camera last used to build the vertex buffer
+        Camera *mVertexCameraUsed;
+        /// Vertex data
+        std::unique_ptr<VertexData> mVertexData;
+        /// Index data (to allow multiple unconnected chains)
+        std::unique_ptr<IndexData> mIndexData;
+
         /// Setup the STL collections
         virtual void setupChainContainers(void);
         /// Setup vertex declaration
@@ -357,9 +352,6 @@ namespace Ogre {
         /// Update the contents of the index buffer
         virtual void updateIndexBuffer(void);
         virtual void updateBoundingBox(void) const;
-
-        /// Chain segment has no elements
-        static const size_t SEGMENT_EMPTY;
     };
 
 
