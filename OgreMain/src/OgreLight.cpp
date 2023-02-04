@@ -606,19 +606,18 @@ namespace Ogre {
     protected:
         Light* mLight;
     public:
-        LightSpotlightInnerValue(Light* l) :AnimableValue(REAL) 
-        { mLight = l; }
-        void setValue(Real val) override
+        LightSpotlightInnerValue(Light* l) : AnimableValue(RADIAN), mLight(l) {}
+        void setValue(const Radian& val) override
         {
-            mLight->setSpotlightInnerAngle(Radian(val));
+            mLight->setSpotlightInnerAngle(val);
         }
-        void applyDeltaValue(Real val) override
+        void applyDeltaValue(const Radian& val) override
         {
-            setValue(mLight->getSpotlightInnerAngle().valueRadians() + val);
+            setValue(mLight->getSpotlightInnerAngle() + val);
         }
         void setCurrentStateAsBaseValue(void) override
         {
-            setAsBaseValue(mLight->getSpotlightInnerAngle().valueRadians());
+            setAsBaseValue(mLight->getSpotlightInnerAngle());
         }
 
     };
@@ -628,19 +627,18 @@ namespace Ogre {
     protected:
         Light* mLight;
     public:
-        LightSpotlightOuterValue(Light* l) :AnimableValue(REAL) 
-        { mLight = l; }
-        void setValue(Real val) override
+        LightSpotlightOuterValue(Light* l) : AnimableValue(RADIAN), mLight(l) {}
+        void setValue(const Radian& val) override
         {
-            mLight->setSpotlightOuterAngle(Radian(val));
+            mLight->setSpotlightOuterAngle(val);
         }
-        void applyDeltaValue(Real val) override
+        void applyDeltaValue(const Radian& val) override
         {
-            setValue(mLight->getSpotlightOuterAngle().valueRadians() + val);
+            setValue(mLight->getSpotlightOuterAngle() + val);
         }
         void setCurrentStateAsBaseValue(void) override
         {
-            setAsBaseValue(mLight->getSpotlightOuterAngle().valueRadians());
+            setAsBaseValue(mLight->getSpotlightOuterAngle());
         }
 
     };
