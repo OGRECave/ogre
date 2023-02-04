@@ -79,12 +79,6 @@ namespace Ogre
         String doGet(const void* target) const override;
         void doSet(void* target, const String& val) override;
     };
-    class CmdAdjacency : public ParamCommand
-    {
-    public:
-        String doGet(const void* target) const override;
-        void doSet(void* target, const String& val) override;
-    };
 
     using CmdInstancing = SimpleParamCommand<GpuProgram, bool, &GpuProgram::isInstancingIncluded, &GpuProgram::setInstancingIncluded>;
     // Command object for setting / getting parameters
@@ -96,7 +90,6 @@ namespace Ogre
     static CmdPose msPoseCmd;
     static CmdVTF msVTFCmd;
     static CmdManualNamedConstsFile msManNamedConstsFileCmd;
-    static CmdAdjacency msAdjacencyCmd;
     }
 
     //-----------------------------------------------------------------------------
@@ -420,10 +413,6 @@ namespace Ogre
             ParameterDef("manual_named_constants", 
                          "File containing named parameter mappings for low-level programs.", PT_BOOL), 
             &msManNamedConstsFileCmd);
-        dict->addParameter(
-            ParameterDef("uses_adjacency_information",
-                         "Whether this geometry program requires adjacency information from the input primitives.", PT_BOOL),
-            &msAdjacencyCmd);
     }
 
     //-----------------------------------------------------------------------
@@ -533,21 +522,6 @@ namespace Ogre
     {
         GpuProgram* t = static_cast<GpuProgram*>(target);
         t->setManualNamedConstantsFile(val);
-    }
-    //-----------------------------------------------------------------------
-    String CmdAdjacency::doGet(const void* target) const
-    {
-        const GpuProgram* t = static_cast<const GpuProgram*>(target);
-        return StringConverter::toString(t->isAdjacencyInfoRequired());
-    }
-    void CmdAdjacency::doSet(void* target, const String& val)
-    {
-        LogManager::getSingleton().logWarning("'uses_adjacency_information' is deprecated. "
-        "Set the respective RenderOperation::OpertionType instead.");
-        GpuProgram* t = static_cast<GpuProgram*>(target);
-        OGRE_IGNORE_DEPRECATED_BEGIN
-        t->setAdjacencyInfoRequired(StringConverter::parseBool(val));
-        OGRE_IGNORE_DEPRECATED_END
     }
 }
 

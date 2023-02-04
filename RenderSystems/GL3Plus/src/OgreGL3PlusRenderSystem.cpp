@@ -1084,15 +1084,9 @@ namespace Ogre {
 
         auto numberOfInstances = op.numberOfInstances;
 
-        int operationType = op.operationType;
-        // Use adjacency if there is a geometry program and it requested adjacency info
-        auto currentGeometryShader = mCurrentShader[GPT_GEOMETRY_PROGRAM];
-        if(mProgramBound[GPT_GEOMETRY_PROGRAM] && currentGeometryShader && currentGeometryShader->isAdjacencyInfoRequired())
-            operationType |= RenderOperation::OT_DETAIL_ADJACENCY_BIT;
-
         // Determine the correct primitive type to render.
         GLint primType;
-        switch (operationType)
+        switch (op.operationType)
         {
         case RenderOperation::OT_POINT_LIST:
             primType = GL_POINTS;

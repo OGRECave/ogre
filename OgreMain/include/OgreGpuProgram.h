@@ -266,11 +266,6 @@ namespace Ogre {
     */
     virtual bool isVertexTextureFetchRequired(void) const { return mVertexTextureFetch; }
 
-    /// @deprecated use OT_DETAIL_ADJACENCY_BIT
-    OGRE_DEPRECATED virtual void setAdjacencyInfoRequired(bool r) { mNeedsAdjacencyInfo = r; }
-    /// @deprecated use OT_DETAIL_ADJACENCY_BIT
-    virtual bool isAdjacencyInfoRequired(void) const { return mNeedsAdjacencyInfo; }
-
     /** Get a reference to the default parameters which are to be used for all
         uses of this program.
 
