@@ -31,7 +31,7 @@ THE SOFTWARE.
 #include "OgreTexture.h"
 
 namespace Ogre {
-    const char* Texture::CUBEMAP_SUFFIXES[] = {"_rt", "_lf", "_up", "_dn", "_fr", "_bk"};
+    static const char* CUBEMAP_SUFFIXES[] = {"_rt", "_lf", "_up", "_dn", "_fr", "_bk"};
     static const char* CUBEMAP_SUFFIXES_ALT[] = {"_px", "_nx", "_py", "_ny", "_pz", "_nz"};
     //--------------------------------------------------------------------------
     Texture::Texture(ResourceManager* creator, const String& name, 
@@ -52,14 +52,14 @@ namespace Ogre {
             mSrcWidth(0),
             mSrcHeight(0), 
             mSrcDepth(0),
-            mDesiredFormat(PF_UNKNOWN),
-            mDesiredIntegerBitDepth(0),
-            mDesiredFloatBitDepth(0),
             mTreatLuminanceAsAlpha(false),
             mInternalResourcesCreated(false),
             mMipmapsHardwareGenerated(false),
             mHwGamma(false),
-            mTextureType(TEX_TYPE_2D)
+            mTextureType(TEX_TYPE_2D),
+            mDesiredIntegerBitDepth(0),
+            mDesiredFloatBitDepth(0),
+            mDesiredFormat(PF_UNKNOWN)
     {
         if (createParamDictionary("Texture"))
         {

@@ -80,7 +80,7 @@ namespace Ogre {
 
             if(FAILED(hr) || mDevice.isError())
             {
-                this->freeInternalResources();
+                this->unloadImpl();
 				String errorDescription = mDevice.getErrorDescription(hr);
 				OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr, "Can't get base texture\nError Description:" + errorDescription, 
                     "D3D11Texture::_queryInterface" );

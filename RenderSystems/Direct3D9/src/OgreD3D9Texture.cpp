@@ -380,7 +380,7 @@ namespace Ogre
             _createVolumeTex(d3d9Device);
             break;
         default:
-            freeInternalResources();
+            unloadImpl();
             OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, "Unknown texture type", "D3D9Texture::createInternalResources" );
         }
     }
@@ -490,7 +490,7 @@ namespace Ogre
         // check result and except if failed
         if (FAILED(hr))
         {
-            freeInternalResources();
+            unloadImpl();
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Error creating texture: " + String(DXGetErrorDescription(hr)), 
                 "D3D9Texture::_createNormTex" );
         }
@@ -499,7 +499,7 @@ namespace Ogre
         hr = textureResources->pNormTex->QueryInterface(IID_IDirect3DBaseTexture9, (void **)&textureResources->pBaseTex);
         if (FAILED(hr))
         {
-            freeInternalResources();
+            unloadImpl();
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Can't get base texture: " + String(DXGetErrorDescription(hr)), 
                 "D3D9Texture::_createNormTex" );
         }
@@ -510,7 +510,7 @@ namespace Ogre
         hr = textureResources->pNormTex->GetLevelDesc(0, &desc);
         if (FAILED(hr))
         {
-            freeInternalResources();
+            unloadImpl();
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Can't get texture description: " + String(DXGetErrorDescription(hr)), 
                 "D3D9Texture::_createNormTex" );
         }
@@ -641,7 +641,7 @@ namespace Ogre
         // check result and except if failed
         if (FAILED(hr))
         {
-            freeInternalResources();
+            unloadImpl();
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Error creating texture: " + String(DXGetErrorDescription(hr)), 
                 "D3D9Texture::_createCubeTex" );
         }
@@ -650,7 +650,7 @@ namespace Ogre
         hr = textureResources->pCubeTex->QueryInterface(IID_IDirect3DBaseTexture9, (void **)&textureResources->pBaseTex);
         if (FAILED(hr))
         {
-            freeInternalResources();
+            unloadImpl();
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Can't get base texture: " + String(DXGetErrorDescription(hr)), 
                 "D3D9Texture::_createCubeTex" );
         }
@@ -661,7 +661,7 @@ namespace Ogre
         hr = textureResources->pCubeTex->GetLevelDesc(0, &desc);
         if (FAILED(hr))
         {
-            freeInternalResources();
+            unloadImpl();
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Can't get texture description: " + String(DXGetErrorDescription(hr)), 
                 "D3D9Texture::_createCubeTex" );
         }
@@ -789,7 +789,7 @@ namespace Ogre
         // check result and except if failed
         if (FAILED(hr))
         {
-            freeInternalResources();
+            unloadImpl();
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Error creating texture: " + String(DXGetErrorDescription(hr)), 
                 "D3D9Texture::_createVolumeTex" );
         }
@@ -798,7 +798,7 @@ namespace Ogre
         hr = textureResources->pVolumeTex->QueryInterface(IID_IDirect3DBaseTexture9, (void **)&textureResources->pBaseTex);
         if (FAILED(hr))
         {
-            freeInternalResources();
+            unloadImpl();
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Can't get base texture: " + String(DXGetErrorDescription(hr)), 
                 "D3D9Texture::_createVolumeTex" );
         }
@@ -809,7 +809,7 @@ namespace Ogre
         hr = textureResources->pVolumeTex->GetLevelDesc(0, &desc);
         if (FAILED(hr))
         {
-            freeInternalResources();
+            unloadImpl();
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Can't get texture description: " + String(DXGetErrorDescription(hr)), 
                 "D3D9Texture::_createVolumeTex" );
         }
@@ -894,7 +894,7 @@ namespace Ogre
                 LogManager::getSingleton().logMessage("D3D9 : Loading Cube Texture, base image name : '" + getName() + "' with " + StringConverter::toString(mNumMipmaps) + " mip map levels");
             break;
         default:
-            freeInternalResources();
+            unloadImpl();
             OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, "Unknown texture type", "D3D9Texture::_setSrcAttributes" );
         }
     }
