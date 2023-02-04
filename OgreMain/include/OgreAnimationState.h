@@ -144,14 +144,7 @@ namespace Ogre {
       void createBlendMask(size_t blendMaskSizeHint, float initialWeight = 1.0f);
       /// Destroy the currently set blend mask
       void destroyBlendMask();
-      /** @brief Set the blend mask data (might be dangerous)
-       *
-       * @par The size of the array should match the number of entries the
-       *      blend mask was created with.
-       *
-       * @par Stick to the setBlendMaskEntry method if you don't know exactly what you're doing.
-       */
-      void _setBlendMaskData(const float* blendMaskData);
+
       /** @brief Set the blend mask
        *
        * @par The size of the array should match the number of entries the
@@ -173,6 +166,14 @@ namespace Ogre {
           return mBlendMask[boneHandle];
       }
     private:
+        /** @brief Set the blend mask data (might be dangerous)
+         *
+         * @par The size of the array should match the number of entries the
+         *      blend mask was created with.
+         *
+         * @par Stick to the setBlendMaskEntry method if you don't know exactly what you're doing.
+         */
+        void _setBlendMaskData(const float* blendMaskData);
         /// The blend mask (containing per bone weights)
         BoneBlendMask mBlendMask;
 
