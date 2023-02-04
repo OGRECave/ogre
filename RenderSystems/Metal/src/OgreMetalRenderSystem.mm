@@ -936,35 +936,21 @@ namespace Ogre
                                                       const GpuProgramParametersPtr& params,
                                                       uint16 variabilityMask )
     {
-        //MetalProgram *shader = 0;
+        mActiveParameters[gptype] = params;
+
         switch (gptype)
         {
-        case GPT_VERTEX_PROGRAM:
-            mActiveVertexGpuProgramParameters = params;
-            //shader = mPso->vertexShader;
-            break;
-        case GPT_FRAGMENT_PROGRAM:
-            mActiveFragmentGpuProgramParameters = params;
-            //shader = mPso->pixelShader;
-            break;
         case GPT_GEOMETRY_PROGRAM:
-            mActiveGeometryGpuProgramParameters = params;
             OGRE_EXCEPT( Exception::ERR_NOT_IMPLEMENTED,
                          "Geometry Shaders are not supported in Metal.");
             break;
         case GPT_HULL_PROGRAM:
-            mActiveTessellationHullGpuProgramParameters = params;
             OGRE_EXCEPT( Exception::ERR_NOT_IMPLEMENTED,
                          "Tesselation is different in Metal.");
             break;
         case GPT_DOMAIN_PROGRAM:
-            mActiveTessellationDomainGpuProgramParameters = params;
             OGRE_EXCEPT( Exception::ERR_NOT_IMPLEMENTED,
                          "Tesselation is different in Metal.");
-            break;
-        case GPT_COMPUTE_PROGRAM:
-            mActiveComputeGpuProgramParameters = params;
-            //shader = static_cast<MetalProgram*>( mComputePso->computeShader->_getBindingDelegate() );
             break;
         default:
             break;

@@ -1778,14 +1778,14 @@ namespace Ogre
     void D3D9RenderSystem::_setTextureCoordSet( size_t stage, size_t index )
     {
         // if vertex shader is being used, stage and index must match
-        if (mVertexProgramBound)
+        if (mProgramBound[GPT_VERTEX_PROGRAM])
             index = stage;
 
         HRESULT hr;
         // Record settings
         mTexStageDesc[stage].coordIndex = index;
 
-        if (mVertexProgramBound)
+        if (mProgramBound[GPT_VERTEX_PROGRAM])
             hr = __SetTextureStageState( static_cast<DWORD>(stage), D3DTSS_TEXCOORDINDEX, index );
         else
             hr = __SetTextureStageState( static_cast<DWORD>(stage), D3DTSS_TEXCOORDINDEX, D3D9Mappings::get(mTexStageDesc[stage].autoTexCoordType, mDeviceManager->getActiveDevice()->getD3D9DeviceCaps()) | index );
@@ -1801,7 +1801,7 @@ namespace Ogre
         mTexStageDesc[stage].autoTexCoordType = m;
         mTexStageDesc[stage].frustum = frustum;
 
-        if (mVertexProgramBound)
+        if (mProgramBound[GPT_VERTEX_PROGRAM])
             hr = __SetTextureStageState( static_cast<DWORD>(stage), D3DTSS_TEXCOORDINDEX, mTexStageDesc[stage].coordIndex );
         else
             hr = __SetTextureStageState( static_cast<DWORD>(stage), D3DTSS_TEXCOORDINDEX, D3D9Mappings::get(m, mDeviceManager->getActiveDevice()->getD3D9DeviceCaps()) | mTexStageDesc[stage].coordIndex );
@@ -1817,7 +1817,7 @@ namespace Ogre
         TexCoordCalcMethod autoTexCoordType = mTexStageDesc[stage].autoTexCoordType;
 
         // if a vertex program is bound, we mustn't set texture transforms
-        if (mVertexProgramBound)
+        if (mProgramBound[GPT_VERTEX_PROGRAM])
         {
             hr = __SetTextureStageState( static_cast<DWORD>(stage), D3DTSS_TEXTURETRANSFORMFLAGS, D3DTTFF_DISABLE );
             if( FAILED( hr ) )
@@ -3057,8 +3057,8 @@ namespace Ogre
         if ( !mEnableFixedPipeline && !mRealCapabilities->hasCapability(RSC_FIXED_FUNCTION)
              && 
              (
-                ( !mVertexProgramBound ) ||
-                (!mFragmentProgramBound && op.operationType != RenderOperation::OT_POINT_LIST)        
+                ( !mProgramBound[GPT_VERTEX_PROGRAM] ) ||
+                (!mProgramBound[GPT_FRAGMENT_PROGRAM] && op.operationType != RenderOperation::OT_POINT_LIST)
               )
            ) 
         {
@@ -3214,12 +3214,11 @@ namespace Ogre
                 "Null program bound.",
                 "D3D9RenderSystem::bindGpuProgram");
         }*/
-
+        mActiveParameters[gptype].reset();
         HRESULT hr;
         switch(gptype)
         {
         case GPT_VERTEX_PROGRAM:
-            mActiveVertexGpuProgramParameters.reset();
             hr = getActiveD3D9Device()->SetVertexShader(NULL);
             if (FAILED(hr))
             {
@@ -3228,7 +3227,6 @@ namespace Ogre
             }
             break;
         case GPT_FRAGMENT_PROGRAM:
-            mActiveFragmentGpuProgramParameters.reset();
             hr = getActiveD3D9Device()->SetPixelShader(NULL);
             if (FAILED(hr))
             {
@@ -3252,10 +3250,10 @@ namespace Ogre
         HRESULT hr;
         GpuLogicalBufferStructPtr floatLogical = params->getLogicalBufferStruct();
 
+        mActiveParameters[gptype] = params;
         switch(gptype)
         {
         case GPT_VERTEX_PROGRAM:
-            mActiveVertexGpuProgramParameters = params;
             {
                     OGRE_LOCK_MUTEX(floatLogical->mutex);
 
@@ -3293,7 +3291,6 @@ namespace Ogre
             }
             break;
         case GPT_FRAGMENT_PROGRAM:
-            mActiveFragmentGpuProgramParameters = params;
             {
                             OGRE_LOCK_MUTEX(floatLogical->mutex);
 
@@ -3351,7 +3348,7 @@ namespace Ogre
             dx9ClipPlane.c = plane.normal.z;
             dx9ClipPlane.d = plane.d;
 
-            if (mVertexProgramBound)
+            if (mProgramBound[GPT_VERTEX_PROGRAM])
             {
                 // programmable clips in clip space (ugh)
                 // must transform worldspace planes by view/proj
@@ -3712,8 +3709,8 @@ namespace Ogre
     void D3D9RenderSystem::notifyOnDeviceReset(D3D9Device* device)
     {       
         // Reset state attributes.  
-        mVertexProgramBound = false;
-        mFragmentProgramBound = false;
+        mProgramBound[GPT_VERTEX_PROGRAM] = false;
+        mProgramBound[GPT_FRAGMENT_PROGRAM] = false;
         mLastVertexSourceCount = 0;
 
         

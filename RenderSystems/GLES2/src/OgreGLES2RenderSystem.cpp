@@ -1654,15 +1654,14 @@ namespace Ogre {
     void GLES2RenderSystem::unbindGpuProgram(GpuProgramType gptype)
     {
         mProgramManager->setActiveShader(gptype, NULL);
+        mActiveParameters[gptype].reset();
 
         if (gptype == GPT_VERTEX_PROGRAM && mCurrentVertexProgram)
         {
-            mActiveVertexGpuProgramParameters.reset();
             mCurrentVertexProgram = 0;
         }
         else if (gptype == GPT_FRAGMENT_PROGRAM && mCurrentFragmentProgram)
         {
-            mActiveFragmentGpuProgramParameters.reset();
             mCurrentFragmentProgram = 0;
         }
         RenderSystem::unbindGpuProgram(gptype);
@@ -1670,17 +1669,7 @@ namespace Ogre {
 
     void GLES2RenderSystem::bindGpuProgramParameters(GpuProgramType gptype, const GpuProgramParametersPtr& params, uint16 mask)
     {
-        switch (gptype)
-        {
-            case GPT_VERTEX_PROGRAM:
-                mActiveVertexGpuProgramParameters = params;
-                break;
-            case GPT_FRAGMENT_PROGRAM:
-                mActiveFragmentGpuProgramParameters = params;
-                break;
-            default:
-                break;
-        }
+        mActiveParameters[gptype] = params;
 
         GLSLESProgramCommon* program = NULL;
 

@@ -1147,12 +1147,7 @@ namespace Ogre
         RenderTarget * mActiveRenderTarget;
 
         /** The Active GPU programs and gpu program parameters*/
-        GpuProgramParametersSharedPtr mActiveVertexGpuProgramParameters;
-        GpuProgramParametersSharedPtr mActiveGeometryGpuProgramParameters;
-        GpuProgramParametersSharedPtr mActiveFragmentGpuProgramParameters;
-        GpuProgramParametersSharedPtr mActiveTessellationHullGpuProgramParameters;
-        GpuProgramParametersSharedPtr mActiveTessellationDomainGpuProgramParameters;
-        GpuProgramParametersSharedPtr mActiveComputeGpuProgramParameters;
+        GpuProgramParametersPtr mActiveParameters[GPT_COUNT];
 
         // Texture manager
         // A concrete class of this will be created and
@@ -1213,12 +1208,7 @@ namespace Ogre
         typedef std::list<HardwareOcclusionQuery*> HardwareOcclusionQueryList;
         HardwareOcclusionQueryList mHwOcclusionQueries;
 
-        bool mVertexProgramBound;
-        bool mGeometryProgramBound;
-        bool mFragmentProgramBound;
-        bool mTessellationHullProgramBound;
-        bool mTessellationDomainProgramBound;
-        bool mComputeProgramBound;
+        std::array<bool, GPT_COUNT> mProgramBound;
 
         // Recording user clip planes
         PlaneList mClipPlanes;

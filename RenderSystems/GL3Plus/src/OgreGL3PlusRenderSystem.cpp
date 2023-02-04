@@ -1087,7 +1087,7 @@ namespace Ogre {
         int operationType = op.operationType;
         // Use adjacency if there is a geometry program and it requested adjacency info
         auto currentGeometryShader = mCurrentShader[GPT_GEOMETRY_PROGRAM];
-        if(mGeometryProgramBound && currentGeometryShader && currentGeometryShader->isAdjacencyInfoRequired())
+        if(mProgramBound[GPT_GEOMETRY_PROGRAM] && currentGeometryShader && currentGeometryShader->isAdjacencyInfoRequired())
             operationType |= RenderOperation::OT_DETAIL_ADJACENCY_BIT;
 
         // Determine the correct primitive type to render.
@@ -1665,32 +1665,7 @@ namespace Ogre {
     void GL3PlusRenderSystem::unbindGpuProgram(GpuProgramType gptype)
     {
         mProgramManager->setActiveShader(gptype, NULL);
-
-        if (gptype == GPT_VERTEX_PROGRAM && mCurrentShader[gptype])
-        {
-            mActiveVertexGpuProgramParameters.reset();
-        }
-        else if (gptype == GPT_GEOMETRY_PROGRAM && mCurrentShader[gptype])
-        {
-            mActiveGeometryGpuProgramParameters.reset();
-        }
-        else if (gptype == GPT_FRAGMENT_PROGRAM && mCurrentShader[gptype])
-        {
-            mActiveFragmentGpuProgramParameters.reset();
-        }
-        else if (gptype == GPT_HULL_PROGRAM && mCurrentShader[gptype])
-        {
-            mActiveTessellationHullGpuProgramParameters.reset();
-        }
-        else if (gptype == GPT_DOMAIN_PROGRAM && mCurrentShader[gptype])
-        {
-            mActiveTessellationDomainGpuProgramParameters.reset();
-        }
-        else if (gptype == GPT_COMPUTE_PROGRAM && mCurrentShader[gptype])
-        {
-            mActiveComputeGpuProgramParameters.reset();
-        }
-
+        mActiveParameters[gptype].reset();
         mCurrentShader[gptype] = NULL;
 
         RenderSystem::unbindGpuProgram(gptype);
@@ -1698,29 +1673,7 @@ namespace Ogre {
 
     void GL3PlusRenderSystem::bindGpuProgramParameters(GpuProgramType gptype, const GpuProgramParametersPtr& params, uint16 mask)
     {
-        switch (gptype)
-        {
-        case GPT_VERTEX_PROGRAM:
-            mActiveVertexGpuProgramParameters = params;
-            break;
-        case GPT_FRAGMENT_PROGRAM:
-            mActiveFragmentGpuProgramParameters = params;
-            break;
-        case GPT_GEOMETRY_PROGRAM:
-            mActiveGeometryGpuProgramParameters = params;
-            break;
-        case GPT_HULL_PROGRAM:
-            mActiveTessellationHullGpuProgramParameters = params;
-            break;
-        case GPT_DOMAIN_PROGRAM:
-            mActiveTessellationDomainGpuProgramParameters = params;
-            break;
-        case GPT_COMPUTE_PROGRAM:
-            mActiveComputeGpuProgramParameters = params;
-            break;
-        default:
-            break;
-        }
+        mActiveParameters[gptype] = params;
 
         GLSLProgram* program = NULL;
 

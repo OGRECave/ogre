@@ -69,12 +69,6 @@ namespace Ogre {
         , mDerivedDepthBiasSlopeScale(0.0f)
         , mGlobalInstanceVertexBufferVertexDeclaration(NULL)
         , mGlobalNumberOfInstances(1)
-        , mVertexProgramBound(false)
-        , mGeometryProgramBound(false)
-        , mFragmentProgramBound(false)
-        , mTessellationHullProgramBound(false)
-        , mTessellationDomainProgramBound(false)
-        , mComputeProgramBound(false)
         , mClipPlanesDirty(true)
         , mRealCapabilities(0)
         , mCurrentCapabilities(0)
@@ -286,12 +280,7 @@ namespace Ogre {
         // They should ALL call this superclass method from
         //   their own initialise() implementations.
         
-        mVertexProgramBound = false;
-        mGeometryProgramBound = false;
-        mFragmentProgramBound = false;
-        mTessellationHullProgramBound = false;
-        mTessellationDomainProgramBound = false;
-        mComputeProgramBound = false;
+        mProgramBound.fill(false);
     }
 
     //---------------------------------------------------------------------------------------------
@@ -734,36 +723,14 @@ namespace Ogre {
 
         const uint16 mask = GPV_PASS_ITERATION_NUMBER;
 
-        if (mActiveVertexGpuProgramParameters)
+        for (int i = 0; i < GPT_COUNT; i++)
         {
-            mActiveVertexGpuProgramParameters->incPassIterationNumber();
-            bindGpuProgramParameters(GPT_VERTEX_PROGRAM, mActiveVertexGpuProgramParameters, mask);
+            if (!mActiveParameters[i])
+                continue;
+            mActiveParameters[i]->incPassIterationNumber();
+            bindGpuProgramParameters(GpuProgramType(i), mActiveParameters[i], mask);
         }
-        if (mActiveGeometryGpuProgramParameters)
-        {
-            mActiveGeometryGpuProgramParameters->incPassIterationNumber();
-            bindGpuProgramParameters(GPT_GEOMETRY_PROGRAM, mActiveGeometryGpuProgramParameters, mask);
-        }
-        if (mActiveFragmentGpuProgramParameters)
-        {
-            mActiveFragmentGpuProgramParameters->incPassIterationNumber();
-            bindGpuProgramParameters(GPT_FRAGMENT_PROGRAM, mActiveFragmentGpuProgramParameters, mask);
-        }
-        if (mActiveTessellationHullGpuProgramParameters)
-        {
-            mActiveTessellationHullGpuProgramParameters->incPassIterationNumber();
-            bindGpuProgramParameters(GPT_HULL_PROGRAM, mActiveTessellationHullGpuProgramParameters, mask);
-        }
-        if (mActiveTessellationDomainGpuProgramParameters)
-        {
-            mActiveTessellationDomainGpuProgramParameters->incPassIterationNumber();
-            bindGpuProgramParameters(GPT_DOMAIN_PROGRAM, mActiveTessellationDomainGpuProgramParameters, mask);
-        }
-        if (mActiveComputeGpuProgramParameters)
-        {
-            mActiveComputeGpuProgramParameters->incPassIterationNumber();
-            bindGpuProgramParameters(GPT_COMPUTE_PROGRAM, mActiveComputeGpuProgramParameters, mask);
-        }
+
         return true;
     }
 
@@ -813,80 +780,26 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void RenderSystem::bindGpuProgram(GpuProgram* prg)
     {
-        switch(prg->getType())
-        {
-        case GPT_VERTEX_PROGRAM:
-            // mark clip planes dirty if changed (programmable can change space)
-            if (!mVertexProgramBound && !mClipPlanes.empty())
-                mClipPlanesDirty = true;
+        auto gptype = prg->getType();
+        // mark clip planes dirty if changed (programmable can change space)
+        if(gptype == GPT_VERTEX_PROGRAM && !mClipPlanes.empty() && !mProgramBound[gptype])
+            mClipPlanesDirty = true;
 
-            mVertexProgramBound = true;
-            break;
-        case GPT_GEOMETRY_PROGRAM:
-            mGeometryProgramBound = true;
-            break;
-        case GPT_FRAGMENT_PROGRAM:
-            mFragmentProgramBound = true;
-            break;
-        case GPT_HULL_PROGRAM:
-            mTessellationHullProgramBound = true;
-            break;
-        case GPT_DOMAIN_PROGRAM:
-            mTessellationDomainProgramBound = true;
-            break;
-        case GPT_COMPUTE_PROGRAM:
-            mComputeProgramBound = true;
-            break;
-        }
+        mProgramBound[gptype] = true;
     }
     //-----------------------------------------------------------------------
     void RenderSystem::unbindGpuProgram(GpuProgramType gptype)
     {
-        switch(gptype)
-        {
-        case GPT_VERTEX_PROGRAM:
-            // mark clip planes dirty if changed (programmable can change space)
-            if (mVertexProgramBound && !mClipPlanes.empty())
-                mClipPlanesDirty = true;
-            mVertexProgramBound = false;
-            break;
-        case GPT_GEOMETRY_PROGRAM:
-            mGeometryProgramBound = false;
-            break;
-        case GPT_FRAGMENT_PROGRAM:
-            mFragmentProgramBound = false;
-            break;
-        case GPT_HULL_PROGRAM:
-            mTessellationHullProgramBound = false;
-            break;
-        case GPT_DOMAIN_PROGRAM:
-            mTessellationDomainProgramBound = false;
-            break;
-        case GPT_COMPUTE_PROGRAM:
-            mComputeProgramBound = false;
-            break;
-        }
+        // mark clip planes dirty if changed (programmable can change space)
+        if(gptype == GPT_VERTEX_PROGRAM && !mClipPlanes.empty() && mProgramBound[gptype])
+            mClipPlanesDirty = true;
+
+        mProgramBound[gptype] = false;
     }
     //-----------------------------------------------------------------------
     bool RenderSystem::isGpuProgramBound(GpuProgramType gptype)
     {
-        switch(gptype)
-        {
-        case GPT_VERTEX_PROGRAM:
-            return mVertexProgramBound;
-        case GPT_GEOMETRY_PROGRAM:
-            return mGeometryProgramBound;
-        case GPT_FRAGMENT_PROGRAM:
-            return mFragmentProgramBound;
-        case GPT_HULL_PROGRAM:
-            return mTessellationHullProgramBound;
-        case GPT_DOMAIN_PROGRAM:
-            return mTessellationDomainProgramBound;
-        case GPT_COMPUTE_PROGRAM:
-            return mComputeProgramBound;
-        }
-        // Make compiler happy
-        return false;
+        return mProgramBound[gptype];
     }
     //---------------------------------------------------------------------
     void RenderSystem::_setTextureProjectionRelativeTo(bool enabled, const Vector3& pos)

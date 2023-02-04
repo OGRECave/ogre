@@ -1084,27 +1084,7 @@ namespace Ogre
                                                        const GpuProgramParametersPtr& params,
                                                        uint16 variabilityMask )
     {
-        switch( gptype )
-        {
-        case GPT_VERTEX_PROGRAM:
-            mActiveVertexGpuProgramParameters = params;
-            break;
-        case GPT_FRAGMENT_PROGRAM:
-            mActiveFragmentGpuProgramParameters = params;
-            break;
-        case GPT_GEOMETRY_PROGRAM:
-            mActiveGeometryGpuProgramParameters = params;
-            break;
-        case GPT_HULL_PROGRAM:
-            mActiveTessellationHullGpuProgramParameters = params;
-            break;
-        case GPT_DOMAIN_PROGRAM:
-            mActiveTessellationDomainGpuProgramParameters = params;
-            break;
-        case GPT_COMPUTE_PROGRAM:
-            mActiveComputeGpuProgramParameters = params;
-            break;
-        }
+        mActiveParameters[gptype] = params;
 
         auto sizeBytes = params->getConstantList().size();
         if(sizeBytes && gptype <= GPT_FRAGMENT_PROGRAM)

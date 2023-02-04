@@ -2292,7 +2292,7 @@ namespace Ogre {
         GLint primType;
         int operationType = op.operationType;
         // Use adjacency if there is a geometry program and it requested adjacency info
-        if(mGeometryProgramBound && mCurrentGeometryProgram && dynamic_cast<GpuProgram*>(mCurrentGeometryProgram)->isAdjacencyInfoRequired())
+        if(mProgramBound[GPT_GEOMETRY_PROGRAM] && mCurrentGeometryProgram && dynamic_cast<GpuProgram*>(mCurrentGeometryProgram)->isAdjacencyInfoRequired())
             operationType |= RenderOperation::OT_DETAIL_ADJACENCY_BIT;
         switch (operationType)
         {
@@ -2482,22 +2482,19 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void GLRenderSystem::unbindGpuProgram(GpuProgramType gptype)
     {
-
+        mActiveParameters[gptype].reset();
         if (gptype == GPT_VERTEX_PROGRAM && mCurrentVertexProgram)
         {
-            mActiveVertexGpuProgramParameters.reset();
             mCurrentVertexProgram->unbindProgram();
             mCurrentVertexProgram = 0;
         }
         else if (gptype == GPT_GEOMETRY_PROGRAM && mCurrentGeometryProgram)
         {
-            mActiveGeometryGpuProgramParameters.reset();
             mCurrentGeometryProgram->unbindProgram();
             mCurrentGeometryProgram = 0;
         }
         else if (gptype == GPT_FRAGMENT_PROGRAM && mCurrentFragmentProgram)
         {
-            mActiveFragmentGpuProgramParameters.reset();
             mCurrentFragmentProgram->unbindProgram();
             mCurrentFragmentProgram = 0;
         }
@@ -2514,19 +2511,16 @@ namespace Ogre {
             // for now, just copy
             params->_copySharedParams();
         }
-
+        mActiveParameters[gptype] = params;
         switch (gptype)
         {
         case GPT_VERTEX_PROGRAM:
-            mActiveVertexGpuProgramParameters = params;
             mCurrentVertexProgram->bindProgramParameters(params, mask);
             break;
         case GPT_GEOMETRY_PROGRAM:
-            mActiveGeometryGpuProgramParameters = params;
             mCurrentGeometryProgram->bindProgramParameters(params, mask);
             break;
         case GPT_FRAGMENT_PROGRAM:
-            mActiveFragmentGpuProgramParameters = params;
             mCurrentFragmentProgram->bindProgramParameters(params, mask);
             break;
         case GPT_COMPUTE_PROGRAM:
