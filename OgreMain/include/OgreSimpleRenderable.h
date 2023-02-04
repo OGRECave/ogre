@@ -58,9 +58,6 @@ namespace Ogre {
 
         MaterialPtr mMaterial;
 
-        /// The scene manager for the current frame.
-        SceneManager *mParentSceneManager;
-
         /// The camera for the current frame.
         Camera *mCamera;
 

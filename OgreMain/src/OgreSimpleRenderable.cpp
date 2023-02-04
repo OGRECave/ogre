@@ -32,25 +32,16 @@ namespace Ogre {
 
     uint SimpleRenderable::msGenNameCount = 0;
 
-    SimpleRenderable::SimpleRenderable()
-    : MovableObject()
-    , mTransform(Affine3::IDENTITY)
-    , mMaterial(MaterialManager::getSingleton().getDefaultMaterial())
-    , mParentSceneManager(NULL)
-    , mCamera(NULL)
-
+    SimpleRenderable::SimpleRenderable() : SimpleRenderable(BLANKSTRING)
     {
         // Generate name
-        StringStream name;
-        name << "SimpleRenderable" << msGenNameCount++;
-        mName = name.str();
+        mName = StringUtil::format("SimpleRenderable%d", msGenNameCount++);
     }
 
     SimpleRenderable::SimpleRenderable(const String& name)
     : MovableObject(name)
     , mTransform(Affine3::IDENTITY)
     , mMaterial(MaterialManager::getSingleton().getDefaultMaterial())
-    , mParentSceneManager(NULL)
     , mCamera(NULL)
     {
     }
