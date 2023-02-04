@@ -258,9 +258,6 @@ namespace Ogre
         directly, although  this can be done if the app wants to.
         */
         virtual void _initialise();
-
-        /** Query the real capabilities of the GPU and driver in the RenderSystem*/
-        virtual RenderSystemCapabilities* createRenderSystemCapabilities() const = 0;
  
         /** Get a pointer to the current capabilities being used by the RenderSystem.
 
@@ -1219,6 +1216,9 @@ namespace Ogre
 
         /// @deprecated only needed for fixed function APIs
         virtual void setClipPlanesImpl(const PlaneList& clipPlanes) {}
+
+        /** Query the real capabilities of the GPU and driver in the RenderSystem*/
+        virtual RenderSystemCapabilities* createRenderSystemCapabilities() const = 0;
 
         /** Initialize the render system from the capabilities*/
         virtual void initialiseFromRenderSystemCapabilities(RenderSystemCapabilities* caps, RenderTarget* primary) = 0;
