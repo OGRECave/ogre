@@ -2094,7 +2094,7 @@ namespace Ogre
         {
             //rendering without tessellation.   
             int operationType = op.operationType;
-            if(mGeometryProgramBound && mBoundGeometryProgram && mBoundGeometryProgram->isAdjacencyInfoRequired())
+            if(mProgramBound[GPT_GEOMETRY_PROGRAM] && mBoundGeometryProgram && mBoundGeometryProgram->isAdjacencyInfoRequired())
                 operationType |= RenderOperation::OT_DETAIL_ADJACENCY_BIT;
 
             if(mPolygonMode == PM_POINTS)
@@ -2299,12 +2299,11 @@ namespace Ogre
     //---------------------------------------------------------------------
     void D3D11RenderSystem::unbindGpuProgram(GpuProgramType gptype)
     {
-
+        mActiveParameters[gptype].reset();
         switch(gptype)
         {
         case GPT_VERTEX_PROGRAM:
             {
-                mActiveVertexGpuProgramParameters.reset();
                 mBoundVertexProgram = NULL;
                 //mDevice->VSSetShader(NULL);
                 mDevice.GetImmediateContext()->VSSetShader(NULL, NULL, 0);
@@ -2312,7 +2311,6 @@ namespace Ogre
             break;
         case GPT_FRAGMENT_PROGRAM:
             {
-                mActiveFragmentGpuProgramParameters.reset();
                 mBoundFragmentProgram = NULL;
                 //mDevice->PSSetShader(NULL);
                 mDevice.GetImmediateContext()->PSSetShader(NULL, NULL, 0);
@@ -2321,28 +2319,24 @@ namespace Ogre
             break;
         case GPT_GEOMETRY_PROGRAM:
             {
-                mActiveGeometryGpuProgramParameters.reset();
                 mBoundGeometryProgram = NULL;
                 mDevice.GetImmediateContext()->GSSetShader( NULL, NULL, 0 );
             }
             break;
         case GPT_HULL_PROGRAM:
             {
-                mActiveTessellationHullGpuProgramParameters.reset();
                 mBoundTessellationHullProgram = NULL;
                 mDevice.GetImmediateContext()->HSSetShader( NULL, NULL, 0 );
             }
             break;
         case GPT_DOMAIN_PROGRAM:
             {
-                mActiveTessellationDomainGpuProgramParameters.reset();
                 mBoundTessellationDomainProgram = NULL;
                 mDevice.GetImmediateContext()->DSSetShader( NULL, NULL, 0 );
             }
             break;
         case GPT_COMPUTE_PROGRAM:
             {
-                mActiveComputeGpuProgramParameters.reset();
                 mBoundComputeProgram = NULL;
                 mDevice.GetImmediateContext()->CSSetShader( NULL, NULL, 0 );
             }
