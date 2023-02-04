@@ -81,8 +81,7 @@ namespace Ogre {
             VECTOR4,
             QUATERNION,
             COLOUR,
-            RADIAN,
-            DEGREE
+            RADIAN
         };
     protected:
         /// Value type
@@ -175,10 +174,8 @@ namespace Ogre {
         virtual void setValue(const Radian&) {
             OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "", "");
         }
-        /// Set value 
-        virtual void setValue(const Degree&) {
-            OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "", "");
-        }
+        /// Set value
+        void setValue(const Degree& val) { setValue(Radian(val)); }
         /// Set value 
         virtual void setValue(const Any& val);
 
@@ -213,10 +210,8 @@ namespace Ogre {
         virtual void applyDeltaValue(const ColourValue&) {
             OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "", "");
         }
-        /// Apply delta value 
-        virtual void applyDeltaValue(const Degree&) {
-            OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "", "");
-        }
+        /// Apply delta value
+        void applyDeltaValue(const Degree& val) { applyDeltaValue(Radian(val)); }
         /// Apply delta value 
         virtual void applyDeltaValue(const Radian&) {
             OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "", "");
