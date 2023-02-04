@@ -232,37 +232,15 @@ namespace Ogre {
     */
     class _OgreExport AnimableObject
     {
-    protected:
-        typedef std::map<String, StringVector> AnimableDictionaryMap;
-        /// Static map of class name to list of animable value names
-        static AnimableDictionaryMap msAnimableDictionary;
-        /** Get the name of the animable dictionary for this class.
-
-            Subclasses must override this if they want to support animation of
-            their values.
-        */
-        virtual const String& getAnimableDictionaryName(void) const 
-        { return BLANKSTRING; }
-        /** Internal method for creating a dictionary of animable value names 
-            for the class, if it does not already exist.
-        */
-        void createAnimableDictionary(void) const;
-    
-        /// Get an updateable reference to animable value list
-        StringVector& _getAnimableValueNames(void);
-
-        /** Internal method for initialising dictionary; should be implemented by 
-            subclasses wanting to expose animable parameters.
-        */
-        virtual void initialiseAnimableDictionary(StringVector&) const {}
-
-
     public:
         AnimableObject() {}
         virtual ~AnimableObject() {}
 
         /** Gets a list of animable value names for this object. */
-        const StringVector& getAnimableValueNames(void) const;
+        virtual const StringVector& getAnimableValueNames(void) const
+        {
+            OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Animable value list not implemented");
+        }
 
         /** Create a reference-counted AnimableValuePtr for the named value.
 
@@ -272,9 +250,7 @@ namespace Ogre {
         */
         virtual AnimableValuePtr createAnimableValue(const String& valueName)
         {
-            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
-                "No animable value named '" + valueName + "' present.", 
-                "AnimableObject::createAnimableValue");
+            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "No animable value named '" + valueName + "' present");
         }
 
 
