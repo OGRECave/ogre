@@ -48,7 +48,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     /** Predefined controller value for getting the latest frame time.
     */
-    class _OgreExport FrameTimeControllerValue : public ControllerValue<Real>, public FrameListener
+    class _OgreExport FrameTimeControllerValue : public ControllerValue<Real>, private FrameListener
     {
     private:
         Real mFrameTime;
@@ -56,13 +56,13 @@ namespace Ogre {
         Real mElapsedTime;
         Real mFrameDelay;
 
+        bool frameStarted(const FrameEvent &evt) override;
     public:
         /// @deprecated use create()
         FrameTimeControllerValue();
 
         static ControllerValueRealPtr create() { return std::make_shared<FrameTimeControllerValue>(); }
 
-        bool frameStarted(const FrameEvent &evt) override;
         Real getValue(void) const override { return mFrameTime; }
         void setValue(Real value) override { /* Do nothing - value is set from frame listener */ }
         Real getTimeFactor(void) const { return mTimeFactor; }
