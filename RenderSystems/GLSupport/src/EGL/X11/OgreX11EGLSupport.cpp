@@ -126,11 +126,6 @@ namespace Ogre {
         return mNativeDisplay;
     }
 
-    String X11EGLSupport::getDisplayName(void)
-    {
-        return String((const char*)XDisplayName(DisplayString(mNativeDisplay)));
-    }
-
     XVisualInfo *X11EGLSupport::getVisualFromFBConfig(::EGLConfig glConfig)
     {
         XVisualInfo *vi, tmp;

@@ -480,12 +480,6 @@ namespace Ogre
     }
 
     //-------------------------------------------------------------------------------------------------//
-    String GLXGLSupport::getDisplayName(void)
-    {
-        return String((const char*)XDisplayName(DisplayString(mGLDisplay)));
-    }
-
-    //-------------------------------------------------------------------------------------------------//
     GLXFBConfig* GLXGLSupport::chooseFBConfig(const GLint *attribList, GLint *nElements)
     {
         GLXFBConfig *fbConfigs;

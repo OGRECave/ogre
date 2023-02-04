@@ -85,11 +85,6 @@ namespace Ogre {
         return mOptions;
     }
 
-    String EAGL2Support::getDisplayName(void)
-    {
-        return "todo";
-	}
-
     CFDictionaryRef EAGL2Support::chooseGLConfig(const GLint *attribList, GLint *nElements)
     {
         // TODO: DJR - implement

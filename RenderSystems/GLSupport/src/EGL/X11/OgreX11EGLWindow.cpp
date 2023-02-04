@@ -70,11 +70,6 @@ namespace Ogre {
             *static_cast<NativeDisplayType*>(pData) = mGLSupport->getNativeDisplay();
             return;
         }
-        else if (name == "DISPLAYNAME")
-        {
-            *static_cast<String*>(pData) = mGLSupport->getDisplayName();
-            return;
-        }
         else if (name == "XWINDOW")
         {
             *static_cast<NativeWindowType*>(pData) = mWindow;
