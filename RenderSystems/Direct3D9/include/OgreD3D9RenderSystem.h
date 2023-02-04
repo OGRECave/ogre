@@ -109,6 +109,9 @@ namespace Ogre
             IDirect3DBaseTexture9 *pTex;
         } mTexStageDesc[OGRE_MAX_TEXTURE_LAYERS];
 
+        /// Saved manual colour blends
+        ColourValue mManualBlendColours[OGRE_MAX_TEXTURE_LAYERS][2];
+
         // Array of up to 8 lights, indexed as per API
         // Note that a null value indicates a free slot
         Light* mLights[MAX_LIGHTS];     

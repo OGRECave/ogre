@@ -1164,9 +1164,6 @@ namespace Ogre
         size_t mFaceCount;
         size_t mVertexCount;
 
-        /// Saved manual colour blends
-        ColourValue mManualBlendColours[OGRE_MAX_TEXTURE_LAYERS][2];
-
         bool mInvertVertexWinding;
         bool mIsReverseDepthBufferEnabled;
 

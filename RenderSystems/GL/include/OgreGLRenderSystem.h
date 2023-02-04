@@ -72,6 +72,9 @@ namespace Ogre {
         /// Holds texture type settings for every stage
         GLenum mTextureTypes[OGRE_MAX_TEXTURE_LAYERS];
 
+        /// Saved manual colour blends
+        ColourValue mManualBlendColours[OGRE_MAX_TEXTURE_LAYERS][2];
+
         /// Number of fixed-function texture units
         unsigned short mFixedFunctionTextureUnits;
 
