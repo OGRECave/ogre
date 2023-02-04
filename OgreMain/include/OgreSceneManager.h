@@ -1331,10 +1331,10 @@ namespace Ogre {
                 If you wish to create a node with a specific name, call the alternative method
                 which takes a name parameter.
         */
-        virtual SceneNode* createSceneNode(void);
+        SceneNode* createSceneNode(void);
 
         /// @overload
-        virtual SceneNode* createSceneNode(const String& name);
+        SceneNode* createSceneNode(const String& name);
 
         /** Destroys a SceneNode.
 
