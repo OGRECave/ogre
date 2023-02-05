@@ -507,60 +507,58 @@ namespace Ogre {
         }
     }
     //---------------------------------------------------------------------
-    void Skeleton::_dumpContents(const String& filename)
+    std::ostream& operator<<(std::ostream& o, const Skeleton& s)
     {
-        std::ofstream of;
-
         Quaternion q;
         Radian angle;
         Vector3 axis;
-        of.open(filename.c_str());
 
-        of << "-= Debug output of skeleton " << mName << " =-" << std::endl << std::endl;
-        of << "== Bones ==" << std::endl;
-        of << "Number of bones: " << (unsigned int)mBoneList.size() << std::endl;
+        o << "-= Debug output of skeleton " << s.mName << " =-" << std::endl << std::endl;
+        o << "== Bones ==" << std::endl;
+        o << "Number of bones: " << (unsigned int)s.mBoneList.size() << std::endl;
         
-        for (auto *b : mBoneList)
+        for (auto *b : s.mBoneList)
         {
-            of << "-- Bone " << b->getHandle() << " --" << std::endl;
-            of << "Position: " << b->getPosition();
+            o << "-- Bone " << b->getHandle() << " --" << std::endl;
+            o << "Position: " << b->getPosition();
             q = b->getOrientation();
-            of << "Rotation: " << q;
+            o << "Rotation: " << q;
             q.ToAngleAxis(angle, axis);
-            of << " = " << angle.valueRadians() << " radians around axis " << axis << std::endl << std::endl;
+            o << " = " << angle.valueRadians() << " radians around axis " << axis << std::endl << std::endl;
         }
 
-        of << "== Animations ==" << std::endl;
-        of << "Number of animations: " << (unsigned int)mAnimationsList.size() << std::endl;
+        o << "== Animations ==" << std::endl;
+        o << "Number of animations: " << (unsigned int)s.mAnimationsList.size() << std::endl;
 
-        for (auto& a : mAnimationsList)
+        for (auto& a : s.mAnimationsList)
         {
             Animation* anim = a.second;
 
-            of << "-- Animation '" << anim->getName() << "' (length " << anim->getLength() << ") --" << std::endl;
-            of << "Number of tracks: " << anim->getNumNodeTracks() << std::endl;
+            o << "-- Animation '" << anim->getName() << "' (length " << anim->getLength() << ") --" << std::endl;
+            o << "Number of tracks: " << anim->getNumNodeTracks() << std::endl;
 
             for (unsigned short ti = 0; ti < anim->getNumNodeTracks(); ++ti)
             {
                 NodeAnimationTrack* track = anim->getNodeTrack(ti);
-                of << "  -- AnimationTrack " << ti << " --" << std::endl;
-                of << "  Affects bone: " << static_cast<Bone*>(track->getAssociatedNode())->getHandle() << std::endl;
-                of << "  Number of keyframes: " << track->getNumKeyFrames() << std::endl;
+                o << "  -- AnimationTrack " << ti << " --" << std::endl;
+                o << "  Affects bone: " << static_cast<Bone*>(track->getAssociatedNode())->getHandle() << std::endl;
+                o << "  Number of keyframes: " << track->getNumKeyFrames() << std::endl;
 
                 for (unsigned short ki = 0; ki < track->getNumKeyFrames(); ++ki)
                 {
                     TransformKeyFrame* key = track->getNodeKeyFrame(ki);
-                    of << "    -- KeyFrame " << ki << " --" << std::endl;
-                    of << "    Time index: " << key->getTime(); 
-                    of << "    Translation: " << key->getTranslate() << std::endl;
+                    o << "    -- KeyFrame " << ki << " --" << std::endl;
+                    o << "    Time index: " << key->getTime();
+                    o << "    Translation: " << key->getTranslate() << std::endl;
                     q = key->getRotation();
-                    of << "    Rotation: " << q;
+                    o << "    Rotation: " << q;
                     q.ToAngleAxis(angle, axis);
-                    of << " = " << angle.valueRadians() << " radians around axis " << axis << std::endl;
+                    o << " = " << angle.valueRadians() << " radians around axis " << axis << std::endl;
                 }
 
             }
         }
+        return o;
     }
     //---------------------------------------------------------------------
     SkeletonAnimationBlendMode Skeleton::getBlendMode() const
