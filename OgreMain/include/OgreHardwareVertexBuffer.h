@@ -84,7 +84,8 @@ namespace Ogre {
     OGRE_DEPRECATED typedef HardwareBufferLockGuard HardwareVertexBufferLockGuard;
 
     /// Vertex element semantics, used to identify the meaning of vertex buffer contents
-    enum VertexElementSemantic {
+    enum VertexElementSemantic : uint8
+    {
         /// Position, typically VET_FLOAT3
         VES_POSITION = 1,
         /// Blending weights
@@ -118,7 +119,7 @@ namespace Ogre {
      * because they aren't supported on any known hardware - they are unaligned as their size
      * is not a multiple of 4 bytes. Therefore drivers usually must add padding on upload.
      */
-    enum VertexElementType
+    enum VertexElementType : uint8
     {
         VET_FLOAT1 = 0,
         VET_FLOAT2 = 1,
