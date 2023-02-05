@@ -873,20 +873,6 @@ namespace Ogre {
 
         
     };
-
-    /** Factory object for creating Entity instances */
-    class _OgreExport EntityFactory : public MovableObjectFactory
-    {
-    private:
-        MovableObject* createInstanceImpl( const String& name, const NameValuePairList* params) override;
-    public:
-        EntityFactory() {}
-        ~EntityFactory() {}
-
-        static String FACTORY_TYPE_NAME;
-
-        const String& getType(void) const override;
-    };
     /** @} */
     /** @} */
 

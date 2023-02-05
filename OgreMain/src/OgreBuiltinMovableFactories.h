@@ -11,12 +11,84 @@
 
 namespace Ogre
 {
+class BillboardChainFactory : public MovableObjectFactory
+{
+    MovableObject* createInstanceImpl( const String& name, const NameValuePairList* params) override;
+
+public:
+    static String FACTORY_TYPE_NAME;
+    const String& getType(void) const override;
+};
+
+class BillboardSetFactory : public MovableObjectFactory
+{
+    MovableObject* createInstanceImpl( const String& name, const NameValuePairList* params) override;
+
+public:
+    static String FACTORY_TYPE_NAME;
+    const String& getType(void) const override;
+};
+
+class EntityFactory : public MovableObjectFactory
+{
+    MovableObject* createInstanceImpl( const String& name, const NameValuePairList* params) override;
+
+public:
+    static String FACTORY_TYPE_NAME;
+    const String& getType(void) const override;
+};
+
+class LightFactory : public MovableObjectFactory
+{
+    MovableObject* createInstanceImpl( const String& name, const NameValuePairList* params) override;
+
+public:
+    static String FACTORY_TYPE_NAME;
+    const String& getType(void) const override;
+};
+
+class ManualObjectFactory : public MovableObjectFactory
+{
+    MovableObject* createInstanceImpl( const String& name, const NameValuePairList* params) override;
+
+public:
+    static String FACTORY_TYPE_NAME;
+    const String& getType(void) const override;
+};
+
+class ParticleSystemFactory : public MovableObjectFactory
+{
+    MovableObject* createInstanceImpl(const String& name, const NameValuePairList* params) override;
+
+public:
+    static String FACTORY_TYPE_NAME;
+    const String& getType(void) const override;
+};
+
 class Rectangle2DFactory : public MovableObjectFactory
 {
     MovableObject* createInstanceImpl(const String& name, const NameValuePairList* params) override;
 
 public:
     static const String FACTORY_TYPE_NAME;
+    const String& getType(void) const override { return FACTORY_TYPE_NAME; }
+};
+
+class RibbonTrailFactory : public MovableObjectFactory
+{
+    MovableObject* createInstanceImpl( const String& name, const NameValuePairList* params) override;
+
+public:
+    static String FACTORY_TYPE_NAME;
+    const String& getType(void) const override;
+};
+
+class StaticGeometryFactory : public MovableObjectFactory
+{
+    MovableObject* createInstanceImpl( const String& name, const NameValuePairList* params) override { return NULL; }
+
+public:
+    static String FACTORY_TYPE_NAME;
     const String& getType(void) const override { return FACTORY_TYPE_NAME; }
 };
 } // namespace Ogre
