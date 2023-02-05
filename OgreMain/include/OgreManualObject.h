@@ -689,21 +689,6 @@ namespace Ogre
     private:
         void declareElement(VertexElementType t, VertexElementSemantic s);
     };
-
-
-    /** Factory object for creating ManualObject instances */
-    class _OgreExport ManualObjectFactory : public MovableObjectFactory
-    {
-    protected:
-        MovableObject* createInstanceImpl( const String& name, const NameValuePairList* params) override;
-    public:
-        ManualObjectFactory() {}
-        ~ManualObjectFactory() {}
-
-        static String FACTORY_TYPE_NAME;
-
-        const String& getType(void) const override;
-    };
     /** @} */
     /** @} */
 }

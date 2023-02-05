@@ -609,20 +609,6 @@ namespace Ogre {
         LightTypes mLightType;
         bool mOwnShadowFarDist;
     };
-
-    /** Factory object for creating Light instances. */
-    class _OgreExport LightFactory : public MovableObjectFactory
-    {
-    private:
-        MovableObject* createInstanceImpl( const String& name, const NameValuePairList* params) override;
-    public:
-        LightFactory() {}
-        ~LightFactory() {}
-
-        static String FACTORY_TYPE_NAME;
-
-        const String& getType(void) const override;
-    };
     /** @} */
     /** @} */
 

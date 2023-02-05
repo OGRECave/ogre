@@ -353,22 +353,6 @@ namespace Ogre {
         virtual void updateIndexBuffer(void);
         virtual void updateBoundingBox(void) const;
     };
-
-
-    /** Factory object for creating BillboardChain instances */
-    class _OgreExport BillboardChainFactory : public MovableObjectFactory
-    {
-    private:
-        MovableObject* createInstanceImpl( const String& name, const NameValuePairList* params) override;
-    public:
-        BillboardChainFactory() {}
-        ~BillboardChainFactory() {}
-
-        static String FACTORY_TYPE_NAME;
-
-        const String& getType(void) const override;
-    };
-
     /** @} */
     /** @} */
 

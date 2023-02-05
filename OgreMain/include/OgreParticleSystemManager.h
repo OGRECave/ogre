@@ -331,20 +331,6 @@ namespace Ogre {
         static ParticleSystemManager* getSingletonPtr(void);
 
     };
-
-    /** Factory object for creating ParticleSystem instances */
-    class _OgreExport ParticleSystemFactory : public MovableObjectFactory
-    {
-    private:
-        MovableObject* createInstanceImpl(const String& name, const NameValuePairList* params) override;
-    public:
-        ParticleSystemFactory() {}
-        ~ParticleSystemFactory() {}
-        
-        static String FACTORY_TYPE_NAME;
-
-        const String& getType(void) const override;
-    };
     /** @} */
     /** @} */
 

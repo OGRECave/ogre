@@ -722,19 +722,6 @@ namespace Ogre {
 
 
     };
-
-    /** Dummy factory to let Regions adhere to MovableObject protocol */
-    class _OgreExport StaticGeometryFactory : public MovableObjectFactory
-    {
-        MovableObject* createInstanceImpl( const String& name, const NameValuePairList* params) override { return NULL; }
-    public:
-        StaticGeometryFactory() {}
-        ~StaticGeometryFactory() {}
-
-        static String FACTORY_TYPE_NAME;
-
-        const String& getType(void) const override { return FACTORY_TYPE_NAME; }
-    };
     /** @} */
     /** @} */
 

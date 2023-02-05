@@ -218,21 +218,6 @@ namespace Ogre {
         virtual void resetAllTrails(void);
 
     };
-
-
-    /** Factory object for creating RibbonTrail instances */
-    class _OgreExport RibbonTrailFactory : public MovableObjectFactory
-    {
-    protected:
-        MovableObject* createInstanceImpl( const String& name, const NameValuePairList* params) override;
-    public:
-        RibbonTrailFactory() {}
-        ~RibbonTrailFactory() {}
-
-        static String FACTORY_TYPE_NAME;
-
-        const String& getType(void) const override;
-    };
     /** @} */
     /** @} */
 
