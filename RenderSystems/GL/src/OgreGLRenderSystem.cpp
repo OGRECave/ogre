@@ -63,9 +63,6 @@ THE SOFTWARE.
 extern "C" void glFlushRenderAPPLE();
 #endif
 
-// Convenience macro from ARB_vertex_buffer_object spec
-#define VBO_BUFFER_OFFSET(i) ((char *)(i))
-
 namespace Ogre {
 
     static GLNativeSupport* glsupport;

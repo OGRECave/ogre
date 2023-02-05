@@ -1160,7 +1160,7 @@ namespace Ogre {
 
             if (op.useIndexes)
             {
-                void *pBufferData = GL_BUFFER_OFFSET(op.indexData->indexStart *
+                void *pBufferData = VBO_BUFFER_OFFSET(op.indexData->indexStart *
                                                      op.indexData->indexBuffer->getIndexSize());
                 GLenum indexType = (op.indexData->indexBuffer->getType() == HardwareIndexBuffer::IT_16BIT) ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT;
                 OGRE_CHECK_GL_ERROR(glDrawElementsBaseVertex(GL_PATCHES, op.indexData->indexCount, indexType, pBufferData, op.vertexData->vertexStart));
@@ -1176,7 +1176,7 @@ namespace Ogre {
         }
         else if (op.useIndexes)
         {
-            void *pBufferData = GL_BUFFER_OFFSET(op.indexData->indexStart *
+            void *pBufferData = VBO_BUFFER_OFFSET(op.indexData->indexStart *
                                                  op.indexData->indexBuffer->getIndexSize());
 
             GLenum indexType = (op.indexData->indexBuffer->getType() == HardwareIndexBuffer::IT_16BIT) ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT;
@@ -1738,7 +1738,7 @@ namespace Ogre {
 
         const GL3PlusHardwareBuffer* hwGlBuffer = vertexBuffer->_getImpl<GL3PlusHardwareBuffer>();
         mStateCacheManager->bindGLBuffer(GL_ARRAY_BUFFER, hwGlBuffer->getGLBufferId());
-        void* pBufferData = GL_BUFFER_OFFSET(elem.getOffset() + vertexStart * vertexBuffer->getVertexSize());
+        void* pBufferData = VBO_BUFFER_OFFSET(elem.getOffset() + vertexStart * vertexBuffer->getVertexSize());
 
         if (vertexBuffer->isInstanceData())
         {

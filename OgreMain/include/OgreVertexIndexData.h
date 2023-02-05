@@ -95,9 +95,9 @@ namespace Ogre {
         /// Whether this class should delete the declaration and binding
         bool mDeleteDclBinding;
         /// The position in the bound buffers to start reading vertex data from. This allows you to use a single buffer for many different renderables.
-        size_t vertexStart;
+        uint32 vertexStart;
         /// The number of vertices to process in this particular rendering group
-        size_t vertexCount;
+        uint32 vertexCount;
 
 
         /// Struct used to hold hardware morph / pose vertex data information
@@ -107,10 +107,10 @@ namespace Ogre {
             Real parametric;
         };
         typedef std::vector<HardwareAnimationData> HardwareAnimationDataList;
+        /// Number of hardware animation data items used
+        uint32 hwAnimDataItemsUsed;
         /// VertexElements used for hardware morph / pose animation
         HardwareAnimationDataList hwAnimationDataList;
-        /// Number of hardware animation data items used
-        size_t hwAnimDataItemsUsed;
         
         /** Clones this vertex data, potentially including replicating any vertex buffers.
         @param copyData Whether to create new vertex buffers too or just reference the existing ones
@@ -270,10 +270,10 @@ namespace Ogre {
         HardwareIndexBufferSharedPtr indexBuffer;
 
         /// Index in the buffer to start from for this operation
-        size_t indexStart;
+        uint32 indexStart;
 
         /// The number of indexes to use from the buffer
-        size_t indexCount;
+        uint32 indexCount;
 
         /** Clones this index data, potentially including replicating the index buffer.
         @param copyData Whether to create new buffers too or just reference the existing ones

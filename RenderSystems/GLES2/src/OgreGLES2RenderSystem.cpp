@@ -60,9 +60,6 @@ THE SOFTWARE.
 Ogre::GLES2ManagedResourceManager* Ogre::GLES2RenderSystem::mResourceManager = NULL;
 #endif
 
-// Convenience macro from ARB_vertex_buffer_object spec
-#define VBO_BUFFER_OFFSET(i) ((char *)(i))
-
 #ifndef GL_PACK_ROW_LENGTH_NV
 #define GL_PACK_ROW_LENGTH_NV             0x0D02
 #endif

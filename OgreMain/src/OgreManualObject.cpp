@@ -124,13 +124,13 @@ ManualObject::ManualObject(const String& name)
         mTempIndexSize = newSize;
     }
     //-----------------------------------------------------------------------------
-    void ManualObject::estimateVertexCount(size_t vcount)
+    void ManualObject::estimateVertexCount(uint32 vcount)
     {
         resizeTempVertexBufferIfNeeded(vcount);
         mEstVertexCount = vcount;
     }
     //-----------------------------------------------------------------------------
-    void ManualObject::estimateIndexCount(size_t icount)
+    void ManualObject::estimateIndexCount(uint32 icount)
     {
         resizeTempIndexBufferIfNeeded(icount);
         mEstIndexCount = icount;

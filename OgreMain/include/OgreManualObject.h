@@ -133,7 +133,7 @@ namespace Ogre
             data - you can make the vertex buffers a little larger than their
             initial needs to allow for growth later with this method.
         */
-        virtual void estimateVertexCount(size_t vcount);
+        virtual void estimateVertexCount(uint32 vcount);
 
         /** Estimate the number of indices ahead of time.
 
@@ -142,7 +142,7 @@ namespace Ogre
             data - you can make the index buffer a little larger than the
             initial need to allow for growth later with this method.
         */
-        virtual void estimateIndexCount(size_t icount);
+        virtual void estimateIndexCount(uint32 icount);
 
         /** Start defining a part of the object.
 
@@ -653,9 +653,9 @@ namespace Ogre
         /// Current declaration vertex size
         size_t mDeclSize;
         /// Estimated vertex count
-        size_t mEstVertexCount;
+        uint32 mEstVertexCount;
         /// Estimated index count
-        size_t mEstIndexCount;
+        uint32 mEstIndexCount;
         /// Current texture coordinate
         ushort mTexCoordIndex;
         /// Bounding box

@@ -32,6 +32,9 @@ THE SOFTWARE.
 #include "OgreRenderSystem.h"
 #include "OgreRenderWindow.h"
 
+// Convenience macro from ARB_vertex_buffer_object spec
+#define VBO_BUFFER_OFFSET(i) ((char *)size_t(i))
+
 namespace Ogre {
     class GLContext;
     class GLSLProgramCommon;

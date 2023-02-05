@@ -34,7 +34,7 @@ namespace Ogre {
 
     //-----------------------------------------------------------------------------
     HardwareIndexBuffer::HardwareIndexBuffer(HardwareBufferManagerBase* mgr, IndexType idxType, 
-        size_t numIndexes, HardwareBuffer::Usage usage, 
+        size_t numIndexes, HardwareBuffer::Usage usage,
         bool useSystemMemory, bool useShadowBuffer) 
         : HardwareBuffer(usage, useSystemMemory, useShadowBuffer)
         , mIndexType(idxType)
