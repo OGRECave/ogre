@@ -49,9 +49,9 @@ namespace Ogre {
     {
             bool mIsInstanceData;
             HardwareBufferManagerBase* mMgr;
-            size_t mNumVertices;
-            size_t mVertexSize;
-            size_t mInstanceDataStepRate;           
+            uint32 mNumVertices;
+            uint32 mVertexSize;
+            uint32 mInstanceDataStepRate;
 
         public:
             /// Should be called by HardwareBufferManager
@@ -63,15 +63,15 @@ namespace Ogre {
             /// Return the manager of this buffer, if any
             HardwareBufferManagerBase* getManager() const { return mMgr; }
             /// Gets the size in bytes of a single vertex in this buffer
-            size_t getVertexSize(void) const { return mVertexSize; }
+            uint32 getVertexSize(void) const { return mVertexSize; }
             /// Get the number of vertices in this buffer
-            size_t getNumVertices(void) const { return mNumVertices; }
+            uint32 getNumVertices(void) const { return mNumVertices; }
             /// Get if this vertex buffer is an "instance data" buffer (per instance)
             bool isInstanceData() const { return mIsInstanceData; }
             /// Set if this vertex buffer is an "instance data" buffer (per instance)
             void setIsInstanceData(const bool val);
             /// Get the number of instances to draw using the same per-instance data before advancing in the buffer by one element.
-            size_t getInstanceDataStepRate() const;
+            uint32 getInstanceDataStepRate() const;
             /// Set the number of instances to draw using the same per-instance data before advancing in the buffer by one element.
             void setInstanceDataStepRate(const size_t val);
 

@@ -32,8 +32,8 @@ THE SOFTWARE.
 namespace Ogre {
 
     //-----------------------------------------------------------------------------
-    HardwareVertexBuffer::HardwareVertexBuffer(HardwareBufferManagerBase* mgr, size_t vertexSize,  
-        size_t numVertices, HardwareBuffer::Usage usage, 
+    HardwareVertexBuffer::HardwareVertexBuffer(HardwareBufferManagerBase* mgr, size_t vertexSize,
+        size_t numVertices, HardwareBuffer::Usage usage,
         bool useSystemMemory, bool useShadowBuffer) 
         : HardwareBuffer(usage, useSystemMemory, useShadowBuffer),
           mIsInstanceData(false),
@@ -78,7 +78,7 @@ namespace Ogre {
         mIsInstanceData = val;
     }
     //-----------------------------------------------------------------------------
-    size_t HardwareVertexBuffer::getInstanceDataStepRate() const
+    uint32 HardwareVertexBuffer::getInstanceDataStepRate() const
     {
         return mInstanceDataStepRate;
     }

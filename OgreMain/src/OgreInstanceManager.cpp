@@ -475,7 +475,7 @@ namespace Ogre
     }
     //-----------------------------------------------------------------------
     template< typename TIndexType >
-    void copyIndexBuffer(IndexData* idxData, const IndicesMap& indicesMap, size_t indexStart)
+    void copyIndexBuffer(IndexData* idxData, const IndicesMap& indicesMap, uint32 indexStart)
     {
         size_t start = std::max(indexStart, idxData->indexStart);
         size_t count = idxData->indexCount - (start - idxData->indexStart);

@@ -55,7 +55,7 @@ namespace Ogre {
             IndexType mIndexType;
             uint8 mIndexSize;
             HardwareBufferManagerBase* mMgr;
-            size_t mNumIndexes;
+            uint32 mNumIndexes;
         public:
             /// Should be called by HardwareBufferManager
             HardwareIndexBuffer(HardwareBufferManagerBase* mgr, IndexType idxType, size_t numIndexes,
@@ -68,7 +68,7 @@ namespace Ogre {
             /// Get the type of indexes used in this buffer
             IndexType getType(void) const { return mIndexType; }
             /// Get the number of indexes in this buffer
-            size_t getNumIndexes(void) const { return mNumIndexes; }
+            uint32 getNumIndexes(void) const { return mNumIndexes; }
             /// Get the size in bytes of each index
             uint8 getIndexSize(void) const { return mIndexSize; }
 

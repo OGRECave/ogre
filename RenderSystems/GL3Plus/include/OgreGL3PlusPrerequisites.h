@@ -62,9 +62,6 @@ namespace Ogre {
 
 #include <GL/gl3w.h>
 
-// Convenience macro from ARB_vertex_buffer_object spec
-#define GL_BUFFER_OFFSET(i) ((char *)(i))
-
 #if OGRE_COMPILER == OGRE_COMPILER_MSVC
 #   define __PRETTY_FUNCTION__ __FUNCTION__
 #endif
