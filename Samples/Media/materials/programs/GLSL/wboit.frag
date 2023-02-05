@@ -1,7 +1,7 @@
 #include <OgreUnifiedShader.h>
 
-uniform SAMPLER2D(accumTexture, 0);
-uniform SAMPLER2D(revealageTexture, 1);
+SAMPLER2D(accumTexture, 0);
+SAMPLER2D(revealageTexture, 1);
 
 #ifdef OGRE_HLSL
 void main(vec4 pos : POSITION, vec2 oUv0 : TEXCOORD0, out vec4 gl_FragColor : COLOR)
