@@ -567,3 +567,19 @@ TEST(Light, AnimationTrack)
     attenuation->apply(0.5);
     EXPECT_EQ(l.getAttenuation(), Vector4f(1.5, 3, 4.5, 6));
 }
+
+TEST(GpuProgramParams, Variability)
+{
+    auto constants = std::make_shared<GpuNamedConstants>();
+    constants->map["parameter"] = GpuConstantDefinition();
+
+    GpuProgramParameters params;
+    params._setNamedConstants(constants);
+    params.setNamedAutoConstant("parameter", GpuProgramParameters::ACT_WORLD_MATRIX);
+
+    GpuProgramParameters params2;
+    params2._setNamedConstants(constants);
+    params2.clearNamedAutoConstant("parameter");
+
+    EXPECT_EQ(params.getConstantDefinition("parameter").variability, GPV_PER_OBJECT);
+}
