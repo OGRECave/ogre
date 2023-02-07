@@ -129,6 +129,9 @@ namespace Ogre {
 
     void EGLContext::setCurrent()
     {
+        if(eglGetCurrentSurface(EGL_DRAW) == mDrawable)
+            return;
+
         EGLBoolean ret = eglMakeCurrent(mEglDisplay,
                                         mDrawable, mDrawable, mContext);
         EGL_CHECK_ERROR
