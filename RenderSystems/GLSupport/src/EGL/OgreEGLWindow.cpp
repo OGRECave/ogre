@@ -119,7 +119,7 @@ namespace Ogre {
         {
             return;
         }
-
+        mContext->setCurrent();
         if (eglSwapBuffers(mEglDisplay, mEglSurface) == EGL_FALSE)
         {
             EGL_CHECK_ERROR
