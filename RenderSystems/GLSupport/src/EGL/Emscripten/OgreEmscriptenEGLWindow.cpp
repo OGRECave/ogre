@@ -144,7 +144,6 @@ namespace Ogre {
                 }
                 
                 eglContext = eglGetCurrentContext();
-                mEglSurface = eglGetCurrentSurface(EGL_DRAW);
             }
 
             if((opt = miscParams->find("maxColourBufferSize")) != end)
@@ -184,12 +183,7 @@ namespace Ogre {
                 mCanvasSelector = opt->second;
             }
         }
-        
-        if (mEglSurface)
-        {
-            mEglConfig = mGLSupport->getGLConfigFromDrawable (mEglSurface, &width, &height);
-        }
-        
+
         if (!mEglConfig && eglContext)
         {
             mEglConfig = mGLSupport->getGLConfigFromContext(eglContext);
@@ -202,8 +196,6 @@ namespace Ogre {
                             "EGLWindow::create");
             }
         }
-        
-        mIsExternal = (mEglSurface != 0);
         
         if (!mEglConfig)
         {

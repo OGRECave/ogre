@@ -343,7 +343,6 @@ namespace Ogre {
                                 "EGLWindow::create");
                 }
 
-                mEglSurface = eglGetCurrentSurface(EGL_DRAW);
                 mEglDisplay = eglGetCurrentDisplay();
             }
 
@@ -389,11 +388,6 @@ namespace Ogre {
             }
         }
 
-        if (mEglSurface)
-        {
-            mEglConfig = mGLSupport->getGLConfigFromDrawable (mEglSurface, &width, &height);
-        }
-
         if (!mEglConfig && eglContext)
         {
             mEglConfig = mGLSupport->getGLConfigFromContext(eglContext);
@@ -406,10 +400,6 @@ namespace Ogre {
                             "EGLWindow::create");
             }
         }
-
-        mIsExternal = (mEglSurface != 0);
-
-
 
         if (!mEglConfig)
         {
@@ -444,10 +434,7 @@ namespace Ogre {
             mGLSupport->switchMode (width, height, frequency);
         }
 
-        if (!mIsExternal)
-        {
-            createNativeWindow(left, top, width, height, title);
-        }
+        createNativeWindow(left, top, width, height, title);
 
         mContext = createEGLContext(eglContext);
         mContext->setCurrent();

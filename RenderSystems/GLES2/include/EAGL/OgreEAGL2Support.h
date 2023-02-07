@@ -67,7 +67,6 @@ namespace Ogre {
 
             EAGLES2Context * createNewContext(CAEAGLLayer *drawable, EAGLSharegroup *group) const;
             CFDictionaryRef getGLConfigFromContext(EAGLES2Context context);
-            CFDictionaryRef getGLConfigFromDrawable(CAEAGLLayer *drawable, unsigned int *w, unsigned int *h);
 #endif
             CFDictionaryRef selectGLConfig(const int* minAttribs, const int *maxAttribs);
     };

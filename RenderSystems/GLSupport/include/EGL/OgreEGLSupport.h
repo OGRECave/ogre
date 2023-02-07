@@ -94,8 +94,6 @@ namespace Ogre {
             GLPBuffer* createPBuffer(PixelComponentType format, size_t width, size_t height) override;
 
             ::EGLConfig getGLConfigFromContext(::EGLContext context);
-            ::EGLConfig getGLConfigFromDrawable(::EGLSurface drawable,
-                                                unsigned int *w, unsigned int *h);
             ::EGLConfig selectGLConfig (const EGLint* minAttribs, const EGLint *maxAttribs);
             void switchMode(void);
             virtual void switchMode(uint& width, uint& height, short& frequency) {}
