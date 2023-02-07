@@ -187,12 +187,6 @@ String RsImageCodec::getType() const { return mType; }
 //---------------------------------------------------------------------
 String RsImageCodec::magicNumberToFileExt(const char* magicNumberPtr, size_t maxbytes) const { return BLANKSTRING; }
 
-const String& RsImagePlugin::getName() const
-{
-    static String name = "Rust Image Codec";
-    return name;
-}
-
 #ifndef OGRE_STATIC_LIB
 extern "C" void _OgreRsImageCodecExport dllStartPlugin();
 extern "C" void _OgreRsImageCodecExport dllStopPlugin();

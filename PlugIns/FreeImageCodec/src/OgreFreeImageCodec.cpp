@@ -574,11 +574,6 @@ namespace Ogre {
         }
     }
 
-    const String& FreeImagePlugin::getName() const {
-        static String name = "Free Image Codec";
-        return name;
-    }
-
 #ifndef OGRE_STATIC_LIB
     extern "C" void _OgreFreeImageCodecExport dllStartPlugin();
     extern "C" void _OgreFreeImageCodecExport dllStopPlugin();

@@ -44,16 +44,6 @@ namespace Ogre {
         /// Static method to shutdown and unregister the codecs
         _OgreRsImageCodecExport static void shutdown(void);
     };
-
-    class _OgreRsImageCodecExport RsImagePlugin : public Plugin
-    {
-    public:
-        const String& getName() const override;
-        void install() override { RsImageCodec::startup(); }
-        void uninstall() override { RsImageCodec::shutdown(); }
-        void initialise() override {}
-        void shutdown() override {}
-    };
     /** @} */
     /** @} */
 
