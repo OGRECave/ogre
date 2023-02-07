@@ -314,11 +314,6 @@ namespace Ogre {
 
         initNativeCreatedWindow(miscParams);
 
-        if (mEglSurface)
-        {
-            mEglConfig = mGLSupport->getGLConfigFromDrawable (mEglSurface, &width, &height);
-        }
-
         if (!mEglConfig && eglContext)
         {
             mEglConfig = mGLSupport->getGLConfigFromContext(eglContext);

@@ -109,15 +109,6 @@ namespace Ogre {
         return glConfig;
     }
 
-    CFDictionaryRef EAGL2Support::getGLConfigFromDrawable(CAEAGLLayer *drawable,
-                                                    unsigned int *w, unsigned int *h)
-    {
-        // TODO: DJR - implement
-        CFDictionaryRef glConfig = 0;
-
-        return glConfig;
-    }
-
     //------------------------------------------------------------------------
     // A helper class for the implementation of selectFBConfig
     //------------------------------------------------------------------------
