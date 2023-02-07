@@ -77,16 +77,6 @@ namespace Ogre {
         /// Static method to shutdown FreeImage and unregister the FreeImage codecs
         _OgreFreeImageCodecExport static void shutdown(void);
     };
-
-    class _OgreFreeImageCodecExport FreeImagePlugin : public Plugin
-    {
-    public:
-        const String& getName() const override;
-        void install() override { FreeImageCodec::startup(); }
-        void uninstall() override { FreeImageCodec::shutdown(); }
-        void initialise() override {}
-        void shutdown() override {}
-    };
     /** @} */
     /** @} */
 
