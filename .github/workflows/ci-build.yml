@@ -17,7 +17,7 @@ jobs:
           libfreetype6-dev libpugixml-dev libassimp-dev libbullet-dev qtbase5-dev cargo \
           nvidia-cg-dev glslang-dev spirv-tools spirv-headers \
           swig4.0 mono-mcs python3-dev \
-          python3-lxml texlive-binaries texlive-base graphviz doxygen g++-7
+          python3-lxml texlive-binaries texlive-base graphviz doxygen g++-10
     - uses: actions/checkout@v3
       with:
         fetch-depth: 2
@@ -27,8 +27,8 @@ jobs:
         cmake --build build -- -j 2
         cmake --build build --target OgreDoc > /dev/null
       env:  # need to fix warnings on newer compilers first
-        CC: gcc-7
-        CXX: g++-7
+        CC: gcc-10
+        CXX: g++-10
     - name: Test
       run: |
         # doxygen warnings check
