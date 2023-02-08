@@ -196,4 +196,15 @@ void OgreBites::StaticPluginLoader::unload()
         OGRE_DELETE p;
     }
     mPlugins.clear();
+#ifdef OGRE_BITES_STATIC_PLUGINS
+#ifdef OGRE_BUILD_PLUGIN_STBI
+    Ogre::STBIImageCodec::shutdown();
+#endif
+#if defined(OGRE_BUILD_PLUGIN_RSIMAGE)
+    Ogre::RsImageCodec::shutdown();
+#endif
+#if defined(OGRE_BUILD_PLUGIN_FREEIMAGE) && !defined(OGRE_BUILD_PLUGIN_STBI) && !defined(OGRE_BUILD_PLUGIN_RSIMAGE)
+    Ogre::FreeImageCodec::shutdown();
+#endif
+#endif
 }
