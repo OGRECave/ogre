@@ -319,24 +319,6 @@ namespace Ogre {
 
         initNativeCreatedWindow(miscParams);
 
-        if (mEglSurface)
-        {
-            mEglConfig = mGLSupport->getGLConfigFromDrawable (mEglSurface, &width, &height);
-        }
-
-        if (!mEglConfig && eglContext)
-        {
-            mEglConfig = mGLSupport->getGLConfigFromContext(eglContext);
-
-            if (!mEglConfig)
-            {
-                // This should never happen.
-                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-                            "Unexpected failure to determine a EGLFBConfig",
-                            "EGLWindow::create");
-            }
-        }
-
         if (!mEglConfig)
         {
             int minAttribs[] = {
