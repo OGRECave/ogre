@@ -75,7 +75,5 @@ bool ProgramWriterManager::isLanguageSupported(const String& lang)
 {
     return mProgramWriters.find(lang) != mProgramWriters.end();
 }
-//-----------------------------------------------------------------------
-ProgramWriter* ProgramWriterManager::createProgramWriter(const String& language) { return getProgramWriter(language); }
 }
 }
