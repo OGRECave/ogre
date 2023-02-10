@@ -53,19 +53,6 @@ namespace Ogre
     }
 
     FocusedShadowCameraSetup::~FocusedShadowCameraSetup() {}
-
-    //-----------------------------------------------------------------------
-    void FocusedShadowCameraSetup::calculateShadowMappingMatrix(const SceneManager& sm,
-        const Camera& cam, const Light& light, Affine3 *out_view, Matrix4 *out_proj,
-        Frustum *out_cam) const
-    {
-        OgreAssert(out_cam, "out_cam required");
-        DefaultShadowCameraSetup::getShadowCamera(&sm, &cam, NULL, &light, dynamic_cast<Camera*>(out_cam), 0);
-        if(out_view)
-            *out_view = out_cam->getViewMatrix();
-        if(out_proj)
-            *out_proj = out_cam->getProjectionMatrix();
-    }
     //-----------------------------------------------------------------------
     void FocusedShadowCameraSetup::calculateB(const SceneManager& sm, const Camera& cam, 
         const Light& light, const AxisAlignedBox& sceneBB, const AxisAlignedBox& receiverBB, 

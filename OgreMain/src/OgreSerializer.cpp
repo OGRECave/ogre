@@ -317,15 +317,6 @@ namespace Ogre {
         flipFromLittleEndian(pDest, sizeof(uint32), count);
     }
     //---------------------------------------------------------------------
-    String Serializer::readString(const DataStreamPtr& stream, size_t numChars)
-    {
-        OgreAssert(numChars <= 255, "");
-        char str[255];
-        stream->read(str, numChars);
-        str[numChars] = '\0';
-        return str;
-    }
-    //---------------------------------------------------------------------
     String Serializer::readString(const DataStreamPtr& stream)
     {
         return stream->getLine(false);

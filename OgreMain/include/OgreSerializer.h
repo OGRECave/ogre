@@ -104,7 +104,6 @@ namespace Ogre {
         void readObject(const DataStreamPtr& stream, Quaternion& pDest);
 
         static String readString(const DataStreamPtr& stream);
-        OGRE_DEPRECATED static String readString(const DataStreamPtr& stream, size_t numChars);
 
         void flipToLittleEndian(void* pData, size_t size, size_t count = 1);
         void flipFromLittleEndian(void* pData, size_t size, size_t count = 1);

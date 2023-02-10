@@ -139,10 +139,6 @@ namespace Ogre {
         mutable PointListBody mPointListBodyLVS;
 
     protected:
-        OGRE_DEPRECATED void calculateShadowMappingMatrix(const SceneManager& sm, const Camera& cam,
-            const Light& light, Affine3 *out_view,
-            Matrix4 *out_proj, Frustum *out_cam) const;
-
         /** Calculates the intersection bodyB.
 
             The intersection bodyB consists of the concatenation the cam frustum clipped 
