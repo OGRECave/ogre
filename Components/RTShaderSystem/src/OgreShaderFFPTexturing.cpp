@@ -462,12 +462,6 @@ void FFPTexturing::addPSBlendInvocations(Function* psMain,
 }
 
 //-----------------------------------------------------------------------
-TexCoordCalcMethod FFPTexturing::getTexCalcMethod(TextureUnitState* textureUnitState)
-{
-    return textureUnitState->_deriveTexCoordCalcMethod();
-}
-
-//-----------------------------------------------------------------------
 bool FFPTexturing::needsTextureMatrix(TextureUnitState* textureUnitState)
 {
     const TextureUnitState::EffectMap&      effectMap = textureUnitState->getEffects(); 

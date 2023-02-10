@@ -43,30 +43,10 @@ namespace RTShader {
 *  @{
 */
 
-/// @deprecated
-class _OgreRTSSExport OGRE_DEPRECATED ProgramWriterFactory : public RTShaderSystemAlloc
-{
-public:
-    ProgramWriterFactory() {}
-    virtual ~ProgramWriterFactory() {}
-    
-    /// Get the name of the language this factory creates programs for
-    virtual const String& getTargetLanguage(void) const = 0;
-    
-    /// Create writer instance
-    virtual ProgramWriter* create(void) OGRE_NODISCARD = 0;
-};
-
 class _OgreRTSSExport ProgramWriterManager 
     : public Singleton<ProgramWriterManager>, public RTShaderSystemAlloc
 {
     std::map<String, ProgramWriter*> mProgramWriters;
-public:
-    typedef std::map<String, ProgramWriterFactory*> FactoryMap;
-protected:
-    /// unused
-    FactoryMap mFactories;
-
 public:
     ProgramWriterManager();
     ~ProgramWriterManager();
@@ -76,21 +56,6 @@ public:
 
     /** Returns whether a given high-level language is supported. */
     bool isLanguageSupported(const String& lang);
-
-    /// @deprecated
-    OGRE_DEPRECATED void addFactory(ProgramWriterFactory* factory)
-    {
-        addProgramWriter(factory->getTargetLanguage(), factory->create());
-    }
-
-    /// @deprecated
-    OGRE_DEPRECATED void removeFactory(ProgramWriterFactory* factory)
-    {
-        mProgramWriters.erase(factory->getTargetLanguage());
-    }
-
-    /// @deprecated
-    OGRE_DEPRECATED ProgramWriter* createProgramWriter( const String& language);
 
     ProgramWriter* getProgramWriter(const String& language) const
     {
