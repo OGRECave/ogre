@@ -564,9 +564,9 @@ SHARED_PTR(StringInterface);
 %ignore Ogre::TextureUnitState::setTextureNameAlias;
 %ignore Ogre::TextureUnitState::getTextureNameAlias;
 %include "OgreTextureUnitState.h"
-%template(ControllerReal) Ogre::Controller<Ogre::Real>;
-%template(ControllerValueRealPtr) Ogre::SharedPtr<Ogre::ControllerValue<Ogre::Real> >;
-%template(ControllerFunctionPtr) Ogre::SharedPtr<Ogre::ControllerFunction<Ogre::Real> >;
+%template(ControllerFloat) Ogre::Controller<float>;
+%template(ControllerValueFloatPtr) Ogre::SharedPtr<Ogre::ControllerValue<float> >;
+%template(ControllerFunctionPtr) Ogre::SharedPtr<Ogre::ControllerFunction<float> >;
 %include "OgreControllerManager.h"
 %include "OgrePredefinedControllers.h"
 SHARED_PTR(Compositor);

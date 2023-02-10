@@ -48,7 +48,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     /** Predefined controller value for getting the latest frame time.
     */
-    class _OgreExport FrameTimeControllerValue : public ControllerValue<Real>, private FrameListener
+    class _OgreExport FrameTimeControllerValue : public ControllerValue<float>, private FrameListener
     {
     private:
         Real mFrameTime;
@@ -63,8 +63,8 @@ namespace Ogre {
 
         static ControllerValueRealPtr create() { return std::make_shared<FrameTimeControllerValue>(); }
 
-        Real getValue(void) const override { return mFrameTime; }
-        void setValue(Real value) override { /* Do nothing - value is set from frame listener */ }
+        float getValue(void) const override { return mFrameTime; }
+        void setValue(float value) override { /* Do nothing - value is set from frame listener */ }
         Real getTimeFactor(void) const { return mTimeFactor; }
         /// @copydoc ControllerManager::setTimeFactor
         void setTimeFactor(Real tf);
@@ -78,7 +78,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     /** Predefined controller value for getting / setting the frame number of a texture layer
     */
-    class _OgreExport TextureFrameControllerValue : public ControllerValue<Real>
+    class _OgreExport TextureFrameControllerValue : public ControllerValue<float>
     {
     private:
         TextureUnitState* mTextureLayer;
@@ -93,10 +93,10 @@ namespace Ogre {
 
         /** Gets the frame number as a parametric value in the range [0,1]
         */
-        Real getValue(void) const override;
+        float getValue(void) const override;
         /** Sets the frame number as a parametric value in the range [0,1]; the actual frame number is (value * numFrames) % numFrames).
         */
-        void setValue(Real value) override;
+        void setValue(float value) override;
 
     };
     //-----------------------------------------------------------------------
@@ -108,7 +108,7 @@ namespace Ogre {
         @par
             Because of the nature of this value, it can accept values outside the 0..1 parametric range.
     */
-    class _OgreExport TexCoordModifierControllerValue : public ControllerValue<Real>
+    class _OgreExport TexCoordModifierControllerValue : public ControllerValue<float>
     {
     private:
         bool mTransU, mTransV;
@@ -140,8 +140,8 @@ namespace Ogre {
             return std::make_shared<TexCoordModifierControllerValue>(t, translateU, translateV, scaleU, scaleV, rotate);
         }
 
-        Real getValue(void) const override;
-        void setValue(Real value) override;
+        float getValue(void) const override;
+        void setValue(float value) override;
 
     };
 
@@ -158,7 +158,7 @@ namespace Ogre {
         supported, therefore do not use this controller value as a source,
         only as a target.
     */
-    class _OgreExport FloatGpuParameterControllerValue : public ControllerValue<Real>
+    class _OgreExport FloatGpuParameterControllerValue : public ControllerValue<float>
     {
     private:
         /// The parameters to access
@@ -180,8 +180,8 @@ namespace Ogre {
             return std::make_shared<FloatGpuParameterControllerValue>(params, index);
         }
 
-        Real getValue(void) const override;
-        void setValue(Real value) override;
+        float getValue(void) const override;
+        void setValue(float value) override;
 
     };
     //-----------------------------------------------------------------------
@@ -191,7 +191,7 @@ namespace Ogre {
     /** Predefined controller function which just passes through the original source
     directly to dest.
     */
-    class _OgreExport PassthroughControllerFunction : public ControllerFunction<Real>
+    class _OgreExport PassthroughControllerFunction : public ControllerFunction<float>
     {
     public:
         /// @deprecated use create()
@@ -203,12 +203,12 @@ namespace Ogre {
             return std::make_shared<PassthroughControllerFunction>(deltaInput);
         }
 
-        Real calculate(Real source) override;
+        float calculate(float source) override;
     };
 
     /** Predefined controller function for dealing with animation.
     */
-    class _OgreExport AnimationControllerFunction : public ControllerFunction<Real>
+    class _OgreExport AnimationControllerFunction : public ControllerFunction<float>
     {
     private:
         Real mSeqTime;
@@ -228,7 +228,7 @@ namespace Ogre {
             return std::make_shared<AnimationControllerFunction>(sequenceTime, timeOffset);
         }
 
-        Real calculate(Real source) override;
+        float calculate(float source) override;
 
         /** Set the time value manually. */
         void setTime(Real timeVal);
@@ -239,7 +239,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     /** Predefined controller function which simply scales an input to an output value.
     */
-    class _OgreExport ScaleControllerFunction : public ControllerFunction<Real>
+    class _OgreExport ScaleControllerFunction : public ControllerFunction<float>
     {
     private:
         Real mScale;
@@ -259,7 +259,7 @@ namespace Ogre {
             return std::make_shared<ScaleControllerFunction>(scalefactor, deltaInput);
         }
 
-        Real calculate(Real source) override;
+        float calculate(float source) override;
     };
 
     //-----------------------------------------------------------------------
@@ -275,7 +275,7 @@ namespace Ogre {
         @par
             Hence a wave output of -1 becomes 0, a wave output of 1 becomes 1, and a wave output of 0 becomes 0.5.
     */
-    class _OgreExport WaveformControllerFunction : public ControllerFunction<Real>
+    class _OgreExport WaveformControllerFunction : public ControllerFunction<float>
     {
     private:
         WaveformType mWaveType;
@@ -309,13 +309,13 @@ namespace Ogre {
             return std::make_shared<WaveformControllerFunction>(wType, base, frequency, phase, amplitude, deltaInput, dutyCycle);
         }
 
-        Real calculate(Real source) override;
+        float calculate(float source) override;
     };
 
     //-----------------------------------------------------------------------
     /** Predefined controller function based on linear function interpolation.
     */
-    class _OgreExport LinearControllerFunction : public ControllerFunction<Real> {
+    class _OgreExport LinearControllerFunction : public ControllerFunction<float> {
         Real mFrequency;
         std::vector<Real> mKeys;
         std::vector<Real> mValues;
@@ -343,7 +343,7 @@ namespace Ogre {
             return std::make_shared<LinearControllerFunction>(keys, values, frequency, deltaInput);
         }
 
-        Real calculate(Real source) override;
+        float calculate(float source) override;
     };
     //-----------------------------------------------------------------------
     /** @} */

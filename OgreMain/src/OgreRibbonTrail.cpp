@@ -35,15 +35,15 @@ namespace Ogre
     {
         /** Controller value for pass frame time to RibbonTrail
         */
-        class _OgrePrivate TimeControllerValue : public ControllerValue<Real>
+        class _OgrePrivate TimeControllerValue : public ControllerValue<float>
         {
         protected:
             RibbonTrail* mTrail;
         public:
             TimeControllerValue(RibbonTrail* r) { mTrail = r; }
 
-            Real getValue(void) const override { return 0; }// not a source
-            void setValue(Real value) override { mTrail->_timeUpdate(value); }
+            float getValue(void) const override { return 0; }// not a source
+            void setValue(float value) override { mTrail->_timeUpdate(value); }
         };
     }
     //-----------------------------------------------------------------------

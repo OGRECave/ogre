@@ -287,7 +287,7 @@ namespace Ogre {
         is deleted explicitly elsewhere so this causes double-free problems.
         This wrapper acts as a bridge and it is this which is destroyed automatically.
     */
-    class _OgreExport AnimationStateControllerValue : public ControllerValue<Real>
+    class _OgreExport AnimationStateControllerValue : public ControllerValue<float>
     {
     private:
         AnimationState* mTargetAnimationState;
@@ -305,13 +305,13 @@ namespace Ogre {
         static ControllerValueRealPtr create(AnimationState* targetAnimationState, bool addTime = false);
 
         /** ControllerValue implementation. */
-        Real getValue(void) const override
+        float getValue(void) const override
         {
             return mTargetAnimationState->getTimePosition() / mTargetAnimationState->getLength();
         }
 
         /** ControllerValue implementation. */
-        void setValue(Real value) override
+        void setValue(float value) override
         {
             if(mAddTime)
                 mTargetAnimationState->addTime(value);
