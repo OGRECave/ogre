@@ -39,7 +39,7 @@ String BASIC_ROCKWALL_MATERIAL("Examples/Rockwall");
 String BASIC_ATHENE_MATERIAL("Examples/Athene/NormalMapped");
 
 /** This class 'wibbles' the light and billboard */
-class LightWibbler : public ControllerValue<Real>
+class LightWibbler : public ControllerValue<float>
 {
 protected:
     Light* mLight;
@@ -48,7 +48,7 @@ protected:
     ColourValue mMinColour;
     Real mMinSize;
     Real mSizeRange;
-    Real intensity;
+    float intensity;
 public:
     LightWibbler(Light* light, Billboard* billboard, const ColourValue& minColour, 
         const ColourValue& maxColour, Real minSize, Real maxSize)
@@ -62,12 +62,12 @@ public:
         
     }
 
-    Real  getValue (void) const override
+    float  getValue (void) const override
     {
         return intensity;
     }
 
-    void  setValue (Real value) override
+    void  setValue (float value) override
     {
         intensity = value;
 
@@ -77,7 +77,7 @@ public:
         mLight->setDiffuseColour(newColour);
         mBillboard->setColour(newColour);
         // set billboard size
-        Real newSize = mMinSize + (intensity * mSizeRange);
+        float newSize = mMinSize + (intensity * mSizeRange);
         mBillboard->setDimensions(newSize, newSize);
     }
 };
@@ -99,7 +99,7 @@ protected:
     ColourValue mMaxLightColour;
     Real mMinFlareSize;
     Real mMaxFlareSize;
-    ControllerReal* mController;
+    ControllerFloat* mController;
 
     enum ShadowProjection
     {
