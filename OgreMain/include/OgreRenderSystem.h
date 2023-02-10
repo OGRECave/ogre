@@ -538,9 +538,6 @@ namespace Ogre
         virtual void _setTexture(size_t unit, bool enabled, 
             const TexturePtr &texPtr) = 0;
 
-        /// @deprecated obsolete
-        OGRE_DEPRECATED virtual void _setVertexTexture(size_t unit, const TexturePtr& tex);
-
         /**
         Sets the texture coordinate set to use for a texture unit.
 
@@ -572,16 +569,6 @@ namespace Ogre
         @deprecated only needed for fixed function APIs
         */
         virtual void _setTextureBlendMode(size_t unit, const LayerBlendModeEx& bm) {}
-
-        /// @deprecated use _setSampler
-        OGRE_DEPRECATED virtual void _setTextureUnitFiltering(size_t unit, FilterType ftype, FilterOptions filter) {}
-
-        /// @deprecated use _setSampler
-        OGRE_DEPRECATED virtual void _setTextureUnitFiltering(size_t unit, FilterOptions minFilter,
-            FilterOptions magFilter, FilterOptions mipFilter);
-
-        /// @deprecated use _setSampler
-        OGRE_DEPRECATED virtual void _setTextureAddressingMode(size_t unit, const Sampler::UVWAddressingMode& uvw) {}
 
         /** Sets the texture coordinate transformation matrix for a texture unit.
         @param unit Texture unit to affect
