@@ -1595,17 +1595,6 @@ namespace Ogre {
 
     }
     //-----------------------------------------------------------------------------
-    void GLRenderSystem::_setTextureAddressingMode(size_t stage, const Sampler::UVWAddressingMode& uvw)
-    {
-        mStateCacheManager->activateGLTextureUnit(stage);
-        mStateCacheManager->setTexParameteri( mTextureTypes[stage], GL_TEXTURE_WRAP_S,
-                         getTextureAddressingMode(uvw.u));
-        mStateCacheManager->setTexParameteri( mTextureTypes[stage], GL_TEXTURE_WRAP_T,
-                         getTextureAddressingMode(uvw.v));
-        mStateCacheManager->setTexParameteri( mTextureTypes[stage], GL_TEXTURE_WRAP_R,
-                         getTextureAddressingMode(uvw.w));
-    }
-    //-----------------------------------------------------------------------------
     void GLRenderSystem::_setTextureMatrix(size_t stage, const Matrix4& xform)
     {
         if (stage >= mFixedFunctionTextureUnits)
@@ -1993,50 +1982,6 @@ namespace Ogre {
         };
         // to keep compiler happy
         return SOP_KEEP;
-    }
-    //---------------------------------------------------------------------
-    void GLRenderSystem::_setTextureUnitFiltering(size_t unit,
-                                                  FilterType ftype, FilterOptions fo)
-    {
-        mStateCacheManager->activateGLTextureUnit(unit);
-        switch(ftype)
-        {
-        case FT_MIN:
-            mMinFilter = fo;
-            // Combine with existing mip filter
-            mStateCacheManager->setTexParameteri(
-                mTextureTypes[unit],
-                GL_TEXTURE_MIN_FILTER,
-                getCombinedMinMipFilter(mMinFilter, mMipFilter));
-            break;
-        case FT_MAG:
-            switch (fo)
-            {
-            case FO_ANISOTROPIC: // GL treats linear and aniso the same
-            case FO_LINEAR:
-                mStateCacheManager->setTexParameteri(
-                    mTextureTypes[unit],
-                    GL_TEXTURE_MAG_FILTER,
-                    GL_LINEAR);
-                break;
-            case FO_POINT:
-            case FO_NONE:
-                mStateCacheManager->setTexParameteri(
-                    mTextureTypes[unit],
-                    GL_TEXTURE_MAG_FILTER,
-                    GL_NEAREST);
-                break;
-            }
-            break;
-        case FT_MIP:
-            mMipFilter = fo;
-            // Combine with existing min filter
-            mStateCacheManager->setTexParameteri(
-                mTextureTypes[unit],
-                GL_TEXTURE_MIN_FILTER,
-                getCombinedMinMipFilter(mMinFilter, mMipFilter));
-            break;
-        }
     }
     //-----------------------------------------------------------------------------
     void GLRenderSystem::_setTextureBlendMode(size_t stage, const LayerBlendModeEx& bm)

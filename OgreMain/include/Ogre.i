@@ -676,8 +676,6 @@ SHARED_PTR(Skeleton);
 SHARED_PTR(Material);
 %template(TechniqueList) std::vector<Ogre::Technique*>;
 %include "OgreMaterial.h"
-%ignore Ogre::RenderSystem::_setTextureUnitFiltering;
-%ignore Ogre::RenderSystem::_setTextureAddressingMode;
 %ignore Ogre::RenderSystem::_setSceneBlending;
 %ignore Ogre::RenderSystem::_setSeparateSceneBlending;
 %ignore Ogre::RenderSystem::_setDepthBufferCheckEnabled;
@@ -687,7 +685,6 @@ SHARED_PTR(Material);
 %ignore Ogre::RenderSystem::_setFog;
 %ignore Ogre::RenderSystem::_setWorldMatrix;
 %ignore Ogre::RenderSystem::_setViewMatrix;
-%ignore Ogre::RenderSystem::_setVertexTexture;
 %ignore Ogre::RenderSystem::_setProjectionMatrix;
 %ignore Ogre::RenderSystem::getRenderTargetIterator;
 %ignore Ogre::RenderSystem::getColourVertexElementType;

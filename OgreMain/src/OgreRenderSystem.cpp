@@ -456,15 +456,6 @@ namespace Ogre {
         _setTextureMatrix(texUnit, tl.getTextureTransform());
     }
     //-----------------------------------------------------------------------
-    void RenderSystem::_setVertexTexture(size_t unit, const TexturePtr& tex)
-    {
-        OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, 
-            "This rendersystem does not support separate vertex texture samplers, "
-            "you should use the regular texture samplers which are shared between "
-            "the vertex and fragment units.", 
-            "RenderSystem::_setVertexTexture");
-    }
-    //-----------------------------------------------------------------------
     void RenderSystem::_disableTextureUnit(size_t texUnit)
     {
         _setTexture(texUnit, false, sNullTexPtr);
@@ -480,16 +471,6 @@ namespace Ogre {
         {
             _disableTextureUnit(i);
         }
-    }
-    //-----------------------------------------------------------------------
-    void RenderSystem::_setTextureUnitFiltering(size_t unit, FilterOptions minFilter,
-            FilterOptions magFilter, FilterOptions mipFilter)
-    {
-        OGRE_IGNORE_DEPRECATED_BEGIN
-        _setTextureUnitFiltering(unit, FT_MIN, minFilter);
-        _setTextureUnitFiltering(unit, FT_MAG, magFilter);
-        _setTextureUnitFiltering(unit, FT_MIP, mipFilter);
-        OGRE_IGNORE_DEPRECATED_END
     }
     //---------------------------------------------------------------------
     void RenderSystem::_cleanupDepthBuffers( bool bCleanManualBuffers )
