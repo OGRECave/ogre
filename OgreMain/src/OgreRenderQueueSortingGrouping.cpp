@@ -138,6 +138,14 @@ namespace {
         addOrganisationMode(QueuedRenderableCollection::OM_PASS_GROUP);
     }
     //-----------------------------------------------------------------------
+    //-----------------------------------------------------------------------
+    static void addPassesTo(QueuedRenderableCollection& collection, Technique* pTech, Renderable* rend)
+    {
+        for (auto* p : pTech->getPasses())
+        {
+            collection.addRenderable(p, rend);
+        }
+    }
     void RenderPriorityGroup::addRenderable(Renderable* rend, Technique* pTech)
     {
         // Transparent and depth/colour settings mean depth sorting is required?
@@ -150,9 +158,9 @@ namespace {
              pTech->hasColourWriteDisabled())))
         {
             if (pTech->isTransparentSortingEnabled())
-                addTransparentRenderable(pTech, rend);
+                addPassesTo(mTransparents, pTech, rend);
             else
-                addUnsortedTransparentRenderable(pTech, rend);
+                addPassesTo(mTransparentsUnsorted, pTech, rend);
         }
         else
         {
@@ -162,7 +170,7 @@ namespace {
                  (rend->getCastsShadows() && mShadowCastersNotReceivers)))
             {
                 // Add solid renderable and add passes to no-shadow group
-                addSolidRenderable(pTech, rend, true);
+                addPassesTo(mSolidsNoShadowReceive, pTech, rend);
             }
             else
             {
@@ -172,31 +180,11 @@ namespace {
                 }
                 else
                 {
-                    addSolidRenderable(pTech, rend, false);
+                    addPassesTo(mSolidsBasic, pTech, rend);
                 }
             }
         }
 
-    }
-    //-----------------------------------------------------------------------
-    void RenderPriorityGroup::addSolidRenderable(Technique* pTech, 
-        Renderable* rend, bool addToNoShadow)
-    {
-        QueuedRenderableCollection* collection;
-        if (addToNoShadow)
-        {
-            collection = &mSolidsNoShadowReceive;
-        }
-        else
-        {
-            collection = &mSolidsBasic;
-        }
-
-        for(auto* p : pTech->getPasses())
-        {
-            // Insert into solid list
-            collection->addRenderable(p, rend);
-        }
     }
     //-----------------------------------------------------------------------
     void RenderPriorityGroup::addSolidRenderableSplitByLightType(Technique* pTech,
@@ -225,24 +213,6 @@ namespace {
             };
 
             collection->addRenderable(p->pass, rend);
-        }
-    }
-    //-----------------------------------------------------------------------
-    void RenderPriorityGroup::addUnsortedTransparentRenderable(Technique* pTech, Renderable* rend)
-    {
-        for(auto* p : pTech->getPasses())
-        {
-            // Insert into transparent list
-            mTransparentsUnsorted.addRenderable(p, rend);
-        }
-    }
-    //-----------------------------------------------------------------------
-    void RenderPriorityGroup::addTransparentRenderable(Technique* pTech, Renderable* rend)
-    {
-        for(auto *p : pTech->getPasses())
-        {
-            // Insert into transparent list
-            mTransparents.addRenderable(p, rend);
         }
     }
     //-----------------------------------------------------------------------
