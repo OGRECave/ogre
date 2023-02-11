@@ -260,15 +260,8 @@ namespace Ogre {
 
         /// remove a pass entry from all collections
         void removePassEntry(Pass* p);
-
-        /// Internal method for adding a solid renderable
-        void addSolidRenderable(Technique* pTech, Renderable* rend, bool toNoShadowMap);
         /// Internal method for adding a solid renderable
         void addSolidRenderableSplitByLightType(Technique* pTech, Renderable* rend);
-        /// Internal method for adding an unsorted transparent renderable
-        void addUnsortedTransparentRenderable(Technique* pTech, Renderable* rend);
-        /// Internal method for adding a transparent renderable
-        void addTransparentRenderable(Technique* pTech, Renderable* rend);
 
     public:
         RenderPriorityGroup(RenderQueueGroup* parent, 
