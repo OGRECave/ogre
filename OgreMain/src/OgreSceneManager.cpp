@@ -1075,7 +1075,7 @@ void SceneManager::prepareRenderQueue(void)
     }
 
     // Global split options
-    updateRenderQueueSplitOptions();
+    mShadowRenderer.updateSplitOptions(q);
 }
 //-----------------------------------------------------------------------
 void SceneManager::_renderScene(Camera* camera, Viewport* vp, bool includeOverlays)
@@ -2629,81 +2629,6 @@ void SceneManager::_notifyAutotrackingSceneNode(SceneNode* node, bool autoTrack)
 void SceneManager::setShadowTechnique(ShadowTechnique technique)
 {
     mShadowRenderer.setShadowTechnique(technique);
-}
-//---------------------------------------------------------------------
-void SceneManager::updateRenderQueueSplitOptions(void)
-{
-    if (isShadowTechniqueStencilBased())
-    {
-        // Casters can always be receivers
-        getRenderQueue()->setShadowCastersCannotBeReceivers(false);
-    }
-    else // texture based
-    {
-        getRenderQueue()->setShadowCastersCannotBeReceivers(!mShadowRenderer.mShadowTextureSelfShadow);
-    }
-
-    if (isShadowTechniqueAdditive() && !isShadowTechniqueIntegrated()
-        && mCurrentViewport->getShadowsEnabled())
-    {
-        // Additive lighting, we need to split everything by illumination stage
-        getRenderQueue()->setSplitPassesByLightingType(true);
-    }
-    else
-    {
-        getRenderQueue()->setSplitPassesByLightingType(false);
-    }
-
-    if (isShadowTechniqueInUse() && mCurrentViewport->getShadowsEnabled()
-        && !isShadowTechniqueIntegrated())
-    {
-        // Tell render queue to split off non-shadowable materials
-        getRenderQueue()->setSplitNoShadowPasses(true);
-    }
-    else
-    {
-        getRenderQueue()->setSplitNoShadowPasses(false);
-    }
-
-
-}
-//---------------------------------------------------------------------
-void SceneManager::updateRenderQueueGroupSplitOptions(RenderQueueGroup* group, 
-    bool suppressShadows, bool suppressRenderState)
-{
-    if (isShadowTechniqueStencilBased())
-    {
-        // Casters can always be receivers
-        group->setShadowCastersCannotBeReceivers(false);
-    }
-    else if (isShadowTechniqueTextureBased()) 
-    {
-        group->setShadowCastersCannotBeReceivers(!mShadowRenderer.mShadowTextureSelfShadow);
-    }
-
-    if (!suppressShadows && mCurrentViewport->getShadowsEnabled() &&
-        isShadowTechniqueAdditive() && !isShadowTechniqueIntegrated())
-    {
-        // Additive lighting, we need to split everything by illumination stage
-        group->setSplitPassesByLightingType(true);
-    }
-    else
-    {
-        group->setSplitPassesByLightingType(false);
-    }
-
-    if (!suppressShadows && mCurrentViewport->getShadowsEnabled() 
-        && isShadowTechniqueInUse())
-    {
-        // Tell render queue to split off non-shadowable materials
-        group->setSplitNoShadowPasses(true);
-    }
-    else
-    {
-        group->setSplitNoShadowPasses(false);
-    }
-
-
 }
 //-----------------------------------------------------------------------
 void SceneManager::_notifyLightsDirty(void)

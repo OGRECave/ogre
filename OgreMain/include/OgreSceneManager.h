@@ -725,6 +725,7 @@ namespace Ogre {
             void setShadowTextureCasterMaterial(const MaterialPtr& mat);
             void setShadowTextureReceiverMaterial(const MaterialPtr& mat);
             void setShadowColour(const ColourValue& colour);
+            void updateSplitOptions(RenderQueue* queue);
             void render(RenderQueueGroup* group, QueuedRenderableCollection::OrganisationMode om);
 
             /** Render a group with the added complexity of additive stencil shadows. */
@@ -1015,14 +1016,6 @@ namespace Ogre {
         /** Render a group in the ordinary way */
         void renderBasicQueueGroupObjects(RenderQueueGroup* pGroup,
             QueuedRenderableCollection::OrganisationMode om);
-
-        /** Update the state of the global render queue splitting based on a shadow
-        option change. */
-        void updateRenderQueueSplitOptions(void);
-        /** Update the state of the render queue group splitting based on a shadow
-        option change. */
-        void updateRenderQueueGroupSplitOptions(RenderQueueGroup* group,
-            bool suppressShadows, bool suppressRenderState);
 
         /// Set up a scissor rectangle from a group of lights
         ClipResult buildAndSetScissor(const LightList& ll, const Camera* cam);
