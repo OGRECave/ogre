@@ -104,15 +104,15 @@ static bool keyEvent(const KeyboardEvent& arg)
     else
         key = ImGui_ImplSDL2_KeycodeToImGuiKey(key);
 
-    io.AddKeyEvent(ImGuiKey_ModShift, arg.keysym.mod & KMOD_SHIFT);
-    io.AddKeyEvent(ImGuiKey_ModCtrl, arg.keysym.mod & KMOD_CTRL);
-    io.AddKeyEvent(ImGuiKey_ModAlt, arg.keysym.mod & KMOD_ALT);
-    io.AddKeyEvent(ImGuiKey_ModSuper, arg.keysym.mod & KMOD_GUI);
+    io.AddKeyEvent(ImGuiMod_Shift, arg.keysym.mod & KMOD_SHIFT);
+    io.AddKeyEvent(ImGuiMod_Ctrl, arg.keysym.mod & KMOD_CTRL);
+    io.AddKeyEvent(ImGuiMod_Alt, arg.keysym.mod & KMOD_ALT);
+    io.AddKeyEvent(ImGuiMod_Super, arg.keysym.mod & KMOD_GUI);
 
     if (key == ImGuiKey_None)
         return io.WantCaptureKeyboard;
 
-    io.AddKeyEvent(key, arg.type == OgreBites::KEYDOWN);
+    io.AddKeyEvent(ImGuiKey(key), arg.type == OgreBites::KEYDOWN);
     return io.WantCaptureKeyboard;
 }
 
