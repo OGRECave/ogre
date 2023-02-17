@@ -489,8 +489,7 @@ void ApplicationContextBase::locateResources()
         rgm.addResourceLocation(mediaDir + "/Terrain", "FileSystem", Ogre::RGN_INTERNAL);
 #endif
 #ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
-        rgm.addResourceLocation(mediaDir + "/RTShaderLib/GLSL", "FileSystem", Ogre::RGN_INTERNAL);
-        rgm.addResourceLocation(mediaDir + "/RTShaderLib/HLSL_Cg", "FileSystem", Ogre::RGN_INTERNAL);
+        rgm.addResourceLocation(mediaDir + "/RTShaderLib", "FileSystem", Ogre::RGN_INTERNAL);
 #endif
     }
 }
