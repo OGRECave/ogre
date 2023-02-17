@@ -52,7 +52,7 @@ void main()
 	vec4 a1 = texture(Tex1, oUv0); // Attribute 1: Normal+depth
 
 	// Clip fragment if depth is too close, so the skybox can be rendered on the background
-	if((a1.w - 0.0001) < 0.0)
+	if(a1.w > 0.95)
         discard;
 
 	// Calculate ambient colour of fragment

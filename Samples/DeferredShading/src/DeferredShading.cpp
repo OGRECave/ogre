@@ -187,6 +187,12 @@ void DeferredShadingSystem::createResources(void)
 
     // Create the main GBuffer compositor
     mGBufferInstance = compMan.addCompositor(mViewport, "DeferredShading/GBuffer");
+
+    if(!GpuProgramManager::getSingleton().isSyntaxSupported("hlsl"))
+    {
+        // need to clear depth to 1.0 for GL
+        mGBufferInstance->getTechnique()->getTargetPass(0)->getPass(0)->setClearColour(ColourValue(0.0, 0.0, 0.0, 1.0));
+    }
     
     // Create filters
     mInstance[DSM_SHOWLIT] = compMan.addCompositor(mViewport, "DeferredShading/ShowLit");
