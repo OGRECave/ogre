@@ -138,7 +138,7 @@ elseif(UNIX)
     set_source_files_properties(src/OgreBitesConfigDialog.cpp PROPERTIES COMPILE_DEFINITIONS HAVE_XAW)
     list(APPEND SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreGLXConfigDialog.cpp")
     list(APPEND DEPENDENCIES ${X11_Xt_LIB} ${XAW_LIBRARY})
-    install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/misc/GLX_backdrop.png" DESTINATION "share/OGRE/")
+    install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/misc/GLX_backdrop.png" DESTINATION "${OGRE_MEDIA_PATH}/../")
   endif()
 endif()
 

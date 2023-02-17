@@ -123,10 +123,11 @@ namespace Ogre
             if (pos != String::npos)
                 base.erase(pos);
 
-            // search inside ../share/OGRE
-            mConfigPaths.push_back(StringUtil::normalizeFilePath(base + "/../share/OGRE/", false));
+            String dirname = StringUtil::format("OGRE-%d.%d/", OGRE_VERSION_MAJOR, OGRE_VERSION_MINOR);
+            // search inside ../share/OGRE-X.Y
+            mConfigPaths.push_back(StringUtil::normalizeFilePath(base + "/../share/"+dirname, false));
             // then look relative to PIP structure
-            mConfigPaths.push_back(StringUtil::normalizeFilePath(base+"/../../../../share/OGRE/"));
+            mConfigPaths.push_back(StringUtil::normalizeFilePath(base+"/../../../../share/"+dirname));
         }
 
         // then try system wide /etc
