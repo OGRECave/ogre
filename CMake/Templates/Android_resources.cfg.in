@@ -1,7 +1,7 @@
 # Ogre Core Resources
 [OgreInternal]
 APKFileSystem=/Main
-APKFileSystem=/RTShaderLib/GLSL
+APKFileSystem=/RTShaderLib
 APKFileSystem=/Terrain
 
 # Resources required by the sample browser and most samples.

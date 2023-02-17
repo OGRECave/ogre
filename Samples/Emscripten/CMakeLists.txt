@@ -25,8 +25,8 @@ file(COPY
     DESTINATION ${MEDIA_DIR})
 
 file(COPY
-    "${CMAKE_SOURCE_DIR}/Media/RTShaderLib/GLSL"
-    DESTINATION "${MEDIA_DIR}/RTShaderLib/")
+    "${CMAKE_SOURCE_DIR}/Media/RTShaderLib"
+    DESTINATION "${MEDIA_DIR}/")
 
 file(COPY
     "${CMAKE_SOURCE_DIR}/Media/Main"
