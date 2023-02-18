@@ -22,9 +22,8 @@ compositor DeferredShading/GBuffer
 			// could do this with something like a visibility mask too
 			pass render_scene
 			{
-				//These values are synchronized with the code
 				first_render_queue 10
-				last_render_queue  79	
+				last_render_queue  80
 			}
 		}
 	}
@@ -66,19 +65,10 @@ compositor DeferredShading/ShowLit
 				input 1 mrt_output 1
 			}
 			
-			//Render the objects that skipped rendering into the gbuffer
+			//Render transparents and other post-GBuffer render queue objects
 			pass render_scene
 			{
-				material_scheme NoGBuffer
-				first_render_queue 10
-				last_render_queue 79
-			}
-			
-			//Render the post-GBuffer render queue objects
-			pass render_scene
-			{
-				//This value is synchronized with the code
-				first_render_queue 80
+				first_render_queue 90
 			}
 		}
 	}

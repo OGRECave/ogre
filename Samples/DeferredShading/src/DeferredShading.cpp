@@ -35,12 +35,10 @@ same license as the rest of the engine.
 #include "DeferredLightCP.h"
 #include "SSAOLogic.h"
 #include "GBufferSchemeHandler.h"
-#include "NullSchemeHandler.h"
 
 using namespace Ogre;
 
-const Ogre::uint8 DeferredShadingSystem::PRE_GBUFFER_RENDER_QUEUE = Ogre::RENDER_QUEUE_1;
-const Ogre::uint8 DeferredShadingSystem::POST_GBUFFER_RENDER_QUEUE = Ogre::RENDER_QUEUE_8;
+const Ogre::uint8 DeferredShadingSystem::POST_GBUFFER_RENDER_QUEUE = Ogre::RENDER_QUEUE_TRANSPARENTS;
 
 DeferredShadingSystem::DeferredShadingSystem(
         Viewport *vp, SceneManager *sm,  Camera *cam
@@ -164,7 +162,6 @@ void DeferredShadingSystem::createResources(void)
     if (firstTime)
     {
         MaterialManager::getSingleton().addListener(new GBufferSchemeHandler, "GBuffer");
-        MaterialManager::getSingleton().addListener(new NullSchemeHandler, "NoGBuffer");
 
         compMan.registerCustomCompositionPass("DeferredLight", new DeferredLightCompositionPass);
 
