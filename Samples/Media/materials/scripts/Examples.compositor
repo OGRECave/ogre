@@ -856,7 +856,11 @@ compositor WBOIT
 
         target opaque
         {
-            input previous
+            pass clear {}
+            pass render_scene
+            {
+                last_render_queue 90
+            }
         }
 
         target accum
@@ -870,8 +874,8 @@ compositor WBOIT
             {
                 // RTSS must use be used for transparents
                 material_scheme ShaderGeneratorDefaultScheme
-                first_render_queue 96
-                last_render_queue 97
+                first_render_queue 95
+                last_render_queue 95
             }
         }
 

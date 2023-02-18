@@ -111,13 +111,6 @@ void ToGBufferVP(
 We don't want to inspect the passes and generate the material each time an object is rendered, so we create a technique in the original material, and fill it with the auto-generated information. The next time the object will be rendered, it WILL have a technique for the GBuffer scheme, so
 the listener won't get called.
 
-### Postponing transparent objects
-We don't want to render transparent objects to the GBuffer, as it doesn't work properly later.
-
-To address this, we also create a technique with a scheme called called 'NoGBuffer'. If
-the object is transparent, we will not add an auto-generated pass to the 'GBuffer' technique, but instead copy the regular pass
-to the 'NoGBuffer' technique, to render it regularly later.
-
 ### Putting it all together
 This is how `GBufferSchemeHandler::handleSchemeNotFound` works:
 

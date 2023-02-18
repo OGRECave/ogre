@@ -355,7 +355,7 @@ namespace Ogre {
             bool alignCameraToFace;
 
             RenderSceneData()
-                : firstRenderQueue(RENDER_QUEUE_BACKGROUND), lastRenderQueue(RENDER_QUEUE_SKIES_LATE),
+                : firstRenderQueue(RENDER_QUEUE_BACKGROUND), lastRenderQueue(RENDER_QUEUE_TRANSPARENTS),
                   alignCameraToFace(false)
             {
             }

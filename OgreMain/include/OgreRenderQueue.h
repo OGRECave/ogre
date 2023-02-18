@@ -66,9 +66,10 @@ namespace Ogre {
         RENDER_QUEUE_7 = 70,
         RENDER_QUEUE_WORLD_GEOMETRY_2 = 75,
         RENDER_QUEUE_8 = 80,
-        RENDER_QUEUE_9 = 90,
-        /// Penultimate queue(before overlays), used for skyboxes if rendered last
-        RENDER_QUEUE_SKIES_LATE = 95,
+        /// Used for skyboxes if rendered last
+        RENDER_QUEUE_SKIES_LATE = 90,
+        /// Penultimate queue(before overlays)
+        RENDER_QUEUE_TRANSPARENTS = 95,
         /// Use this queue for objects which must be rendered last e.g. overlays
         RENDER_QUEUE_OVERLAY = 100, 
         /// Final possible render queue, don't exceed this
