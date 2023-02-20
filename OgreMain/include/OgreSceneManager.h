@@ -996,7 +996,6 @@ namespace Ogre {
             Viewport* viewport;
             Camera* camera;
             CompositorChain* activeChain;
-            RenderSystem::RenderSystemContext* rsContext;
         };
 
         /** Pause rendering of the frame. This has to be called when inside a renderScene call

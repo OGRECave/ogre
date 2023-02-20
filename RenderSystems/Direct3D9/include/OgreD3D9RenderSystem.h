@@ -288,8 +288,6 @@ namespace Ogre
         void _setAlphaRejectSettings( CompareFunction func, unsigned char value, bool alphaToCoverage );
         void _setViewport( Viewport *vp );      
         void _beginFrame();
-        virtual RenderSystemContext* _pauseFrame(void);
-        virtual void _resumeFrame(RenderSystemContext* context);
         void _endFrame();       
         void _setCullingMode( CullingMode mode );
         void _setDepthBufferParams( bool depthTest = true, bool depthWrite = true, CompareFunction depthFunction = CMPF_LESS_EQUAL );
