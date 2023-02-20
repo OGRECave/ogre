@@ -212,20 +212,10 @@ void SceneManager::ShadowRenderer::renderAdditiveStencilShadowedQueueGroupObject
 
     }// for each priority
 
-    // Iterate again - variable name changed to appease gcc.
     for (const auto& pg : pGroup->getPriorityGroups())
     {
-        RenderPriorityGroup* pPriorityGrp = pg.second;
-
-        // Do unsorted transparents
-        visitor->renderObjects(pPriorityGrp->getTransparentsUnsorted(), om, true, true);
-        // Do transparents (always descending sort)
-        visitor->renderObjects(pPriorityGrp->getTransparents(),
-            QueuedRenderableCollection::OM_SORT_DESCENDING, true, true);
-
-    }// for each priority
-
-
+        visitor->renderTransparents(pg.second, om);
+    }
 }
 //-----------------------------------------------------------------------
 void SceneManager::ShadowRenderer::renderModulativeStencilShadowedQueueGroupObjects(
@@ -282,30 +272,16 @@ void SceneManager::ShadowRenderer::renderModulativeStencilShadowedQueueGroupObje
     // Restore ambient light
     mSceneManager->setAmbientLight(currAmbient);
 
-    // Iterate again - variable name changed to appease gcc.
+    // Do non-shadowable solids
     for (const auto& pg : pGroup->getPriorityGroups())
     {
-        RenderPriorityGroup* pPriorityGrp = pg.second;
+        visitor->renderObjects(pg.second->getSolidsNoShadowReceive(), om, true, true);
+    }
 
-        // Do non-shadowable solids
-        visitor->renderObjects(pPriorityGrp->getSolidsNoShadowReceive(), om, true, true);
-
-    }// for each priority
-
-
-    // Iterate again - variable name changed to appease gcc.
     for (const auto& pg : pGroup->getPriorityGroups())
     {
-        RenderPriorityGroup* pPriorityGrp = pg.second;
-
-        // Do unsorted transparents
-        visitor->renderObjects(pPriorityGrp->getTransparentsUnsorted(), om, true, true);
-        // Do transparents (always descending sort)
-        visitor->renderObjects(pPriorityGrp->getTransparents(),
-            QueuedRenderableCollection::OM_SORT_DESCENDING, true, true);
-
-    }// for each priority
-
+        visitor->renderTransparents(pg.second, om);
+    }
 }
 //-----------------------------------------------------------------------
 void SceneManager::ShadowRenderer::renderTextureShadowCasterQueueGroupObjects(
@@ -478,19 +454,10 @@ void SceneManager::ShadowRenderer::renderModulativeTextureShadowedQueueGroupObje
 
     }
 
-    // Iterate again - variable name changed to appease gcc.
     for (const auto& pg : pGroup->getPriorityGroups())
     {
-        RenderPriorityGroup* pPriorityGrp = pg.second;
-
-        // Do unsorted transparents
-        visitor->renderObjects(pPriorityGrp->getTransparentsUnsorted(), om, true, true);
-        // Do transparents (always descending)
-        visitor->renderObjects(pPriorityGrp->getTransparents(),
-            QueuedRenderableCollection::OM_SORT_DESCENDING, true, true);
-
-    }// for each priority
-
+        visitor->renderTransparents(pg.second, om);
+    }
 }
 //-----------------------------------------------------------------------
 void SceneManager::ShadowRenderer::renderAdditiveTextureShadowedQueueGroupObjects(
@@ -593,19 +560,10 @@ void SceneManager::ShadowRenderer::renderAdditiveTextureShadowedQueueGroupObject
 
     }// for each priority
 
-    // Iterate again - variable name changed to appease gcc.
     for (const auto& pg : pGroup->getPriorityGroups())
     {
-        RenderPriorityGroup* pPriorityGrp = pg.second;
-
-        // Do unsorted transparents
-        visitor->renderObjects(pPriorityGrp->getTransparentsUnsorted(), om, true, true);
-        // Do transparents (always descending sort)
-        visitor->renderObjects(pPriorityGrp->getTransparents(),
-            QueuedRenderableCollection::OM_SORT_DESCENDING, true, true);
-
-    }// for each priority
-
+        visitor->renderTransparents(pg.second, om);
+    }
 }
 //-----------------------------------------------------------------------
 void SceneManager::ShadowRenderer::renderTextureShadowReceiverQueueGroupObjects(

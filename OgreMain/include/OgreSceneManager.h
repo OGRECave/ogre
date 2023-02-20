@@ -395,6 +395,8 @@ namespace Ogre {
             void renderObjects(const QueuedRenderableCollection& objs, QueuedRenderableCollection::OrganisationMode om,
                                bool lightScissoringClipping, bool doLightIteration,
                                const LightList* manualLightList = 0, bool transparentShadowCastersMode = false);
+
+            void renderTransparents(const RenderPriorityGroup* priorityGrp, QueuedRenderableCollection::OrganisationMode om);
         };
         /// Allow visitor helper to access protected methods
         friend class SceneMgrQueuedRenderableVisitor;
