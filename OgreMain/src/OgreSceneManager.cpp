@@ -1564,6 +1564,16 @@ void SceneManager::SceneMgrQueuedRenderableVisitor::renderObjects(const QueuedRe
     objs.acceptVisitor(this, om);
     transparentShadowCastersMode = false;
 }
+
+void SceneManager::SceneMgrQueuedRenderableVisitor::renderTransparents(const RenderPriorityGroup* priorityGrp,
+                                                                       QueuedRenderableCollection::OrganisationMode om)
+{
+    // Do unsorted transparents
+    renderObjects(priorityGrp->getTransparentsUnsorted(), om, true, true);
+    // Do transparents (always descending sort)
+    renderObjects(priorityGrp->getTransparents(), QueuedRenderableCollection::OM_SORT_DESCENDING, true, true);
+}
+
 //-----------------------------------------------------------------------
 bool SceneManager::validatePassForRendering(const Pass* pass)
 {
@@ -1662,11 +1672,7 @@ void SceneManager::renderBasicQueueGroupObjects(RenderQueueGroup* pGroup,
 
         // Do solids
         visitor->renderObjects(pPriorityGrp->getSolidsBasic(), om, true, true);
-        // Do unsorted transparents
-        visitor->renderObjects(pPriorityGrp->getTransparentsUnsorted(), om, true, true);
-        // Do transparents (always descending)
-        visitor->renderObjects(pPriorityGrp->getTransparents(), QueuedRenderableCollection::OM_SORT_DESCENDING, true,
-                               true);
+        visitor->renderTransparents(pPriorityGrp, om);
     }// for each priority
 }
 //-----------------------------------------------------------------------
