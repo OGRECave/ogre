@@ -217,11 +217,6 @@ namespace Ogre {
         mRTTManager->getBestDepthStencil( internalColourFormat, depthFormat, stencilFormat );
     }
 
-    unsigned int GLRenderSystemCommon::getDisplayMonitorCount() const
-    {
-        return mGLSupport->getDisplayMonitorCount();
-    }
-
     void GLRenderSystemCommon::registerThread()
     {
         OGRE_LOCK_MUTEX(mThreadInitMutex);

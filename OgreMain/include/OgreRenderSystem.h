@@ -1065,9 +1065,6 @@ namespace Ogre
         */
         virtual void unregisterThread() {}
 
-        /// @deprecated do not use
-        OGRE_DEPRECATED virtual unsigned int getDisplayMonitorCount() const { return 1; }
-
         /**
         * This marks the beginning of an event for GPU profiling.
         */

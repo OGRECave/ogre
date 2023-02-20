@@ -517,14 +517,6 @@ namespace Ogre {
         return glrc;
     }
 
-    unsigned int Win32GLSupport::getDisplayMonitorCount() const
-    {
-        if (mMonitorInfoList.empty())       
-            EnumDisplayMonitors(NULL, NULL, sCreateMonitorsInfoEnumProc, (LPARAM)&mMonitorInfoList);
-
-        return (unsigned int)mMonitorInfoList.size();
-    }
-
     String translateWGLError()
     {
         int winError = GetLastError();
