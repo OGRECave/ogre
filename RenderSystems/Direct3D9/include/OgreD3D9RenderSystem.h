@@ -353,9 +353,6 @@ namespace Ogre
         void determineFSAASettings(IDirect3DDevice9* d3d9Device, size_t fsaa, const String& fsaaHint, D3DFORMAT d3dPixelFormat, 
             bool fullScreen, D3DMULTISAMPLE_TYPE *outMultisampleType, DWORD *outMultisampleQuality);
 
-        /// @copydoc RenderSystem::getDisplayMonitorCount
-        unsigned int getDisplayMonitorCount() const;
-
         /// @copydoc RenderSystem::beginProfileEvent
         virtual void beginProfileEvent( const String &eventName );
 

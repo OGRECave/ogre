@@ -85,12 +85,6 @@ namespace Ogre
                 return extensionList.find(ext) != extensionList.end();
             }
 
-            /// @copydoc RenderSystem::getDisplayMonitorCount
-            virtual unsigned int getDisplayMonitorCount() const
-            {
-                return 1;
-            }
-
             /**
             * Start anything special
             */

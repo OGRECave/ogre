@@ -1301,16 +1301,6 @@ namespace Ogre {
 
     }
     //---------------------------------------------------------------------
-    unsigned int Root::getDisplayMonitorCount() const
-    {
-        OgreAssert(mActiveRenderer,
-                   "Cannot get display monitor count - No render system has been selected");
-
-        OGRE_IGNORE_DEPRECATED_BEGIN
-        return mActiveRenderer->getDisplayMonitorCount();
-        OGRE_IGNORE_DEPRECATED_END
-    }
-    //---------------------------------------------------------------------
     void Root::setWorkQueue(WorkQueue* queue)
     {
         if (mWorkQueue.get() != queue)

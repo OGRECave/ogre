@@ -3611,11 +3611,6 @@ namespace Ogre
 		return D3D9RenderSystem::getDeviceManager()->getActiveDevice()->isDeviceLost();
 	}
 
-    unsigned int D3D9RenderSystem::getDisplayMonitorCount() const
-    {
-        return mD3D->GetAdapterCount();
-    }
-
     //---------------------------------------------------------------------
     void D3D9RenderSystem::beginProfileEvent( const String &eventName )
     {

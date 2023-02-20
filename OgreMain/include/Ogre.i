@@ -690,7 +690,6 @@ SHARED_PTR(Material);
 %ignore Ogre::RenderSystem::getColourVertexElementType;
 %ignore Ogre::RenderSystem::setStencilCheckEnabled;
 %ignore Ogre::RenderSystem::setStencilBufferParams;
-%ignore Ogre::RenderSystem::getDisplayMonitorCount;
 %include "OgreRenderSystem.h"
 %include "OgreCompositorManager.h"
 #ifdef SWIGJAVA
@@ -883,7 +882,6 @@ SHARED_PTR(Mesh);
 %ignore Ogre::Root::createSceneManager(uint16);
 %ignore Ogre::Root::createSceneManager(uint16, const String&);
 %ignore Ogre::Root::getMovableObjectFactoryIterator;
-%ignore Ogre::Root::getDisplayMonitorCount;
 %include "OgreRoot.h"
 // dont wrap: platform specific
 // %include "OgreWindowEventUtilities.h"

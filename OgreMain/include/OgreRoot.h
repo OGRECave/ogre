@@ -871,9 +871,6 @@ namespace Ogre
         /// @deprecated use getMovableObjectFactories
         OGRE_DEPRECATED MovableObjectFactoryIterator getMovableObjectFactoryIterator(void) const;
 
-        /// @deprecated do not use
-        OGRE_DEPRECATED unsigned int getDisplayMonitorCount() const;
-
         /** Get the WorkQueue for processing background tasks.
             You are free to add new requests and handlers to this queue to
             process your custom background tasks using the shared thread pool. 

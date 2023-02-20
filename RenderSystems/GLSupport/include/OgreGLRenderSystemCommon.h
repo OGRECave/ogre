@@ -144,8 +144,6 @@ namespace Ogre {
         /** Complete destruction of VAOs and FBOs deferred while creator context was not current */
         void _completeDeferredVaoFboDestruction();
 
-        unsigned int getDisplayMonitorCount() const override;
-
         void registerThread() override;
         void unregisterThread() override;
         void preExtraThreadsStarted() override;
