@@ -790,18 +790,6 @@ namespace Ogre {
 
     }
     //---------------------------------------------------------------------
-    RenderSystem::RenderSystemContext* RenderSystem::_pauseFrame(void)
-    {
-        _endFrame();
-        return new RenderSystem::RenderSystemContext;
-    }
-    //---------------------------------------------------------------------
-    void RenderSystem::_resumeFrame(RenderSystemContext* context)
-    {
-        _beginFrame();
-        delete context;
-    }
-    //---------------------------------------------------------------------
     const String& RenderSystem::_getDefaultViewportMaterialScheme( void ) const
     {
 #ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS

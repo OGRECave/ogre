@@ -3038,7 +3038,7 @@ SceneManager::RenderContext* SceneManager::_pauseRendering()
     context->camera = mCameraInProgress;
     context->activeChain = _getActiveCompositorChain();
 
-    context->rsContext = mDestRenderSystem->_pauseFrame();
+    mDestRenderSystem->_endFrame();
     mRenderQueue = 0;
     return context;
 }
@@ -3068,7 +3068,7 @@ void SceneManager::_resumeRendering(SceneManager::RenderContext* context)
         mDestRenderSystem->setClipPlanes(camera->isWindowSet() ? camera->getWindowPlanes() : PlaneList());
     }
     mCameraInProgress = context->camera;
-    mDestRenderSystem->_resumeFrame(context->rsContext);
+    mDestRenderSystem->_beginFrame();
     
     mDestRenderSystem->_setTextureProjectionRelativeTo(mCameraRelativeRendering, mCameraInProgress->getDerivedPosition());
     delete context;

@@ -2879,32 +2879,6 @@ namespace Ogre
 
         mDeviceManager->destroyInactiveRenderDevices();
     }
-    //---------------------------------------------------------------------
-    struct D3D9RenderContext : public RenderSystem::RenderSystemContext
-    {
-        RenderTarget* target;
-    };
-    //---------------------------------------------------------------------
-    RenderSystem::RenderSystemContext* D3D9RenderSystem::_pauseFrame(void)
-    {
-        //Stop rendering
-        _endFrame();
-
-        D3D9RenderContext* context = OGRE_ALLOC_T(D3D9RenderContext, 1, MEMCATEGORY_RENDERSYS);
-        context->target = mActiveRenderTarget;
-        
-        
-        return context;
-    }
-    //---------------------------------------------------------------------
-    void D3D9RenderSystem::_resumeFrame(RenderSystemContext* context)
-    {
-        //Resume rendering
-        _beginFrame();
-        D3D9RenderContext* d3dContext = static_cast<D3D9RenderContext*>(context);
-
-        OGRE_FREE(context, MEMCATEGORY_RENDERSYS);
-    }
     void D3D9RenderSystem::setVertexDeclaration(VertexDeclaration* decl)
     {
         HRESULT hr;
