@@ -40,6 +40,8 @@ namespace Ogre {
     /** \addtogroup Scene
     *  @{
     */
+    struct WorldFragment;
+
     /** A class for performing queries on a scene.
 
         This is an abstract class for performing a query on a scene, i.e. to retrieve
@@ -67,60 +69,10 @@ namespace Ogre {
     */
     class _OgreExport SceneQuery : public SceneMgtAlloc
     {
-    public:
-        /** This type can be used by collaborating applications & SceneManagers to 
-            agree on the type of world geometry to be returned from queries. Not all
-            these types will be supported by all SceneManagers; once the application
-            has decided which SceneManager specialisation to use, it is expected that 
-            it will know which type of world geometry abstraction is available to it.
-
-            @note only supported by the BspSceneManager
-        */
-        enum WorldFragmentType {
-            /// Return no world geometry hits at all
-            WFT_NONE,
-            /// Return pointers to convex plane-bounded regions
-            WFT_PLANE_BOUNDED_REGION,
-            /// Return a single intersection point (typically RaySceneQuery only)
-            WFT_SINGLE_INTERSECTION,
-            /// Custom geometry as defined by the SceneManager
-            WFT_CUSTOM_GEOMETRY,
-            /// General RenderOperation structure
-            WFT_RENDER_OPERATION
-        };
-
-        /** Represents part of the world geometry that is a result of a SceneQuery. 
-
-            Since world geometry is normally vast and sprawling, we need a way of
-            retrieving parts of it based on a query. That is what this struct is for;
-            note there are potentially as many data structures for world geometry as there
-            are SceneManagers, however this structure includes a few common abstractions as 
-            well as a more general format.
-        @par
-            The type of world fragment that is returned from a query depends on the
-            SceneManager, and the option set using SceneQuery::setWorldFragmentType. 
-            You can see what fragment types are supported on the query in question by
-            calling SceneQuery::getSupportedWorldFragmentTypes().
-        */
-        struct WorldFragment {
-            /// The type of this world fragment
-            WorldFragmentType fragmentType;
-            /// Single intersection point, only applicable for WFT_SINGLE_INTERSECTION
-            Vector3 singleIntersection;
-            /// Planes bounding a convex region, only applicable for WFT_PLANE_BOUNDED_REGION
-            std::vector<Plane>* planes;
-            /// Custom geometry block, only applicable for WFT_CUSTOM_GEOMETRY
-            void* geometry;
-            /// General render operation structure, fallback if nothing else is available
-            RenderOperation* renderOp;
-            
-        };
     protected:
         SceneManager* mParentSceneMgr;
         uint32 mQueryMask;
         uint32 mQueryTypeMask;
-        std::set<WorldFragmentType> mSupportedWorldFragments;
-        WorldFragmentType mWorldFragmentType;
     
     public:
         /** Standard constructor, should be called by SceneManager. */
@@ -152,26 +104,7 @@ namespace Ogre {
         /** Returns the current mask for this query. */
         virtual uint32 getQueryTypeMask(void) const;
 
-        /** Tells the query what kind of world geometry to return from queries;
-            often the full renderable geometry is not what is needed. 
-
-            The application receiving the world geometry is expected to know 
-            what to do with it; inevitably this means that the application must 
-            have knowledge of at least some of the structures
-            used by the custom SceneManager.
-        @par
-            The default setting is WFT_NONE.
-        */
-        virtual void setWorldFragmentType(enum WorldFragmentType wft);
-
-        /** Gets the current world fragment types to be returned from the query. */
-        virtual WorldFragmentType getWorldFragmentType(void) const;
-
-        /** Returns the types of world fragments this query supports. */
-        virtual const std::set<WorldFragmentType>* getSupportedWorldFragmentTypes(void) const
-            {return &mSupportedWorldFragments;}
-
-        
+        typedef Ogre::WorldFragment WorldFragment;
     };
 
     /** This optional class allows you to receive per-result callbacks from
@@ -206,7 +139,7 @@ namespace Ogre {
     {
         /// List of movable objects in the query (entities, particle systems etc)
         SceneQueryResultMovableList movables;
-        /// List of world fragments
+        /// Only relevant for the BSP Scene Manager. List of world fragments
         SceneQueryResultWorldFragmentList worldFragments;
     };
 
@@ -219,7 +152,7 @@ namespace Ogre {
     class _OgreExport RegionSceneQuery
         : public SceneQuery, public SceneQueryListener
     {
-        SceneQueryResult* mLastResult;
+        SceneQueryResult mLastResult;
     public:
         /** Standard constructor, should be called by SceneManager. */
         RegionSceneQuery(SceneManager* mgr);
@@ -246,14 +179,14 @@ namespace Ogre {
         /** Gets the results of the last query that was run using this object, provided
             the query was executed using the collection-returning version of execute. 
         */
-        virtual SceneQueryResult& getLastResults(void) const;
+        const SceneQueryResult& getLastResults(void) const;
         /** Clears the results of the last query execution.
 
             You only need to call this if you specifically want to free up the memory
             used by this object to hold the last query results. This object clears the
             results itself when executing and when destroying itself.
         */
-        virtual void clearResults(void);
+        void clearResults(void);
 
         /** Self-callback in order to deal with execute which returns collection. */
         bool queryResult(MovableObject* first) override;
@@ -345,7 +278,7 @@ namespace Ogre {
         Real distance;
         /// The movable, or NULL if this is not a movable result
         MovableObject* movable;
-        /// The world fragment, or NULL if this is not a fragment result
+        /// Only relevant for the BSP Scene Manager. The world fragment, or NULL if this is not a fragment result
         SceneQuery::WorldFragment* worldFragment;
         /// Comparison operator for sorting
         bool operator < (const RaySceneQueryResultEntry& rhs) const
@@ -419,14 +352,14 @@ namespace Ogre {
         /** Gets the results of the last query that was run using this object, provided
             the query was executed using the collection-returning version of execute. 
         */
-        virtual RaySceneQueryResult& getLastResults(void);
+        const RaySceneQueryResult& getLastResults(void) const;
         /** Clears the results of the last query execution.
 
             You only need to call this if you specifically want to free up the memory
             used by this object to hold the last query results. This object clears the
             results itself when executing and when destroying itself.
         */
-        virtual void clearResults(void);
+        void clearResults(void);
 
         /** Self-callback in order to deal with execute which returns collection. */
         bool queryResult(MovableObject* obj, Real distance) override;

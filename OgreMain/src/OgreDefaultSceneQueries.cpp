@@ -32,8 +32,6 @@ namespace Ogre {
     DefaultIntersectionSceneQuery::DefaultIntersectionSceneQuery(SceneManager* creator)
     : IntersectionSceneQuery(creator)
     {
-        // No world geometry results supported
-        mSupportedWorldFragments.insert(SceneQuery::WFT_NONE);
     }
     //---------------------------------------------------------------------
     DefaultIntersectionSceneQuery::~DefaultIntersectionSceneQuery()
@@ -116,8 +114,6 @@ namespace Ogre {
     DefaultAxisAlignedBoxSceneQuery(SceneManager* creator)
     : AxisAlignedBoxSceneQuery(creator)
     {
-        // No world geometry results supported
-        mSupportedWorldFragments.insert(SceneQuery::WFT_NONE);
     }
     //---------------------------------------------------------------------
     DefaultAxisAlignedBoxSceneQuery::~DefaultAxisAlignedBoxSceneQuery()
@@ -148,8 +144,6 @@ namespace Ogre {
     DefaultRaySceneQuery::
     DefaultRaySceneQuery(SceneManager* creator) : RaySceneQuery(creator)
     {
-        // No world geometry results supported
-        mSupportedWorldFragments.insert(SceneQuery::WFT_NONE);
     }
     //---------------------------------------------------------------------
     DefaultRaySceneQuery::~DefaultRaySceneQuery()
@@ -192,8 +186,6 @@ namespace Ogre {
     DefaultSphereSceneQuery::
     DefaultSphereSceneQuery(SceneManager* creator) : SphereSceneQuery(creator)
     {
-        // No world geometry results supported
-        mSupportedWorldFragments.insert(SceneQuery::WFT_NONE);
     }
     //---------------------------------------------------------------------
     DefaultSphereSceneQuery::~DefaultSphereSceneQuery()
@@ -228,8 +220,6 @@ namespace Ogre {
     DefaultPlaneBoundedVolumeListSceneQuery(SceneManager* creator) 
     : PlaneBoundedVolumeListSceneQuery(creator)
     {
-        // No world geometry results supported
-        mSupportedWorldFragments.insert(SceneQuery::WFT_NONE);
     }
     //---------------------------------------------------------------------
     DefaultPlaneBoundedVolumeListSceneQuery::~DefaultPlaneBoundedVolumeListSceneQuery()
