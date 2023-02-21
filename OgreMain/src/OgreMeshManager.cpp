@@ -48,7 +48,7 @@ namespace Ogre
     //-----------------------------------------------------------------------
     template<> MeshManager* Singleton<MeshManager>::msSingleton = 0;
 
-    bool MeshManager::mBonesUseObjectSpace = false;
+    bool MeshManager::mBonesUseObjectSpace = true;
     MeshManager* MeshManager::getSingletonPtr(void)
     {
         return msSingleton;
