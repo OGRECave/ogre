@@ -247,20 +247,62 @@ namespace Ogre {
     /** BSP specialisation of IntersectionSceneQuery */
     class BspIntersectionSceneQuery : public DefaultIntersectionSceneQuery
     {
+        std::set<WorldFragmentType> mSupportedWorldFragments;
+        WorldFragmentType mWorldFragmentType;
     public:
         BspIntersectionSceneQuery(SceneManager* creator);
 
         /** See IntersectionSceneQuery. */
         void execute(IntersectionSceneQueryListener* listener) override;
 
+        /** Tells the query what kind of world geometry to return from queries;
+            often the full renderable geometry is not what is needed.
+
+            The application receiving the world geometry is expected to know
+            what to do with it; inevitably this means that the application must
+            have knowledge of at least some of the structures
+            used by the custom SceneManager.
+        @par
+            The default setting is WFT_NONE.
+        */
+        void setWorldFragmentType(enum WorldFragmentType wft)
+        {
+            // Check supported
+            OgreAssert(mSupportedWorldFragments.find(wft) != mSupportedWorldFragments.end(),
+                       "This world fragment type is not supported.");
+            mWorldFragmentType = wft;
+        }
+
+        /** Gets the current world fragment types to be returned from the query. */
+        WorldFragmentType getWorldFragmentType(void) const { return mWorldFragmentType; }
+
+        /** Returns the types of world fragments this query supports. */
+        const std::set<WorldFragmentType>* getSupportedWorldFragmentTypes() const { return &mSupportedWorldFragments; }
     };
 
     /** BSP specialisation of RaySceneQuery */
     class BspRaySceneQuery : public DefaultRaySceneQuery
     {
+        std::set<WorldFragmentType> mSupportedWorldFragments;
+        WorldFragmentType mWorldFragmentType;
     public:
         BspRaySceneQuery(SceneManager* creator);
         ~BspRaySceneQuery();
+
+        /// @copydoc BspIntersectionSceneQuery::setWorldFragmentType
+        void setWorldFragmentType(enum WorldFragmentType wft)
+        {
+            // Check supported
+            OgreAssert(mSupportedWorldFragments.find(wft) != mSupportedWorldFragments.end(),
+                       "This world fragment type is not supported.");
+            mWorldFragmentType = wft;
+        }
+
+        /// @copydoc BspIntersectionSceneQuery::getWorldFragmentType
+        WorldFragmentType getWorldFragmentType(void) const { return mWorldFragmentType; }
+
+        /// @copydoc BspIntersectionSceneQuery::getSupportedWorldFragmentTypes
+        const std::set<WorldFragmentType>* getSupportedWorldFragmentTypes() const { return &mSupportedWorldFragments; }
 
         /** See RaySceneQuery. */
         void execute(RaySceneQueryListener* listener) override;

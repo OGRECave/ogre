@@ -44,6 +44,7 @@ THE SOFTWARE.
 #include "OgreTextureUnitState.h"
 #include "OgreResourceGroupManager.h"
 #include "OgreHardwarePixelBuffer.h"
+#include "OgreBspSceneManager.h"
 
 namespace Ogre {
 
@@ -623,7 +624,7 @@ namespace Ogre {
                 ++brushSideIdx;
             }
             // Build world fragment
-            pBrush->fragment.fragmentType = SceneQuery::WFT_PLANE_BOUNDED_REGION;
+            pBrush->fragment.fragmentType = WFT_PLANE_BOUNDED_REGION;
             pBrush->fragment.planes = &(pBrush->planes);
 
             --progressCountdown;
@@ -688,7 +689,7 @@ namespace Ogre {
                 {
                     // Get brush 
                     BspNode::Brush *pBrush = &(mBrushes[realBrushIdx]);
-                    assert(pBrush->fragment.fragmentType == SceneQuery::WFT_PLANE_BOUNDED_REGION);
+                    assert(pBrush->fragment.fragmentType == WFT_PLANE_BOUNDED_REGION);
                     // Assign node pointer
                     node->mSolidBrushes.push_back(pBrush);
                 }

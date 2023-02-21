@@ -494,11 +494,11 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     //-----------------------------------------------------------------------
     BspIntersectionSceneQuery::BspIntersectionSceneQuery(SceneManager* creator) 
-        : DefaultIntersectionSceneQuery(creator)
+        : DefaultIntersectionSceneQuery(creator), mWorldFragmentType(WFT_NONE)
     {
+        mSupportedWorldFragments.insert(WFT_NONE);
         // Add bounds fragment type
-        mSupportedWorldFragments.insert(SceneQuery::WFT_PLANE_BOUNDED_REGION);
-        
+        mSupportedWorldFragments.insert(WFT_PLANE_BOUNDED_REGION);
     }
     void BspIntersectionSceneQuery::execute(IntersectionSceneQueryListener* listener)
     {
@@ -582,7 +582,7 @@ namespace Ogre {
                         if (brushIntersect)
                         {
                             // report this brush as it's WorldFragment
-                            assert((*bi)->fragment.fragmentType == SceneQuery::WFT_PLANE_BOUNDED_REGION);
+                            assert((*bi)->fragment.fragmentType == WFT_PLANE_BOUNDED_REGION);
                             if (!listener->queryResult(const_cast<MovableObject*>(aObj), 
                                     const_cast<WorldFragment*>(&((*bi)->fragment))))
                                 return; 
@@ -603,11 +603,12 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     //-----------------------------------------------------------------------
     BspRaySceneQuery::BspRaySceneQuery(SceneManager* creator)
-        :DefaultRaySceneQuery(creator)
+        :DefaultRaySceneQuery(creator), mWorldFragmentType(WFT_NONE)
     {
         // Add supported fragment types
-        mSupportedWorldFragments.insert(SceneQuery::WFT_SINGLE_INTERSECTION);
-        mSupportedWorldFragments.insert(SceneQuery::WFT_PLANE_BOUNDED_REGION);
+        mSupportedWorldFragments.insert(WFT_NONE);
+        mSupportedWorldFragments.insert(WFT_SINGLE_INTERSECTION);
+        mSupportedWorldFragments.insert(WFT_PLANE_BOUNDED_REGION);
     }
     //-----------------------------------------------------------------------
     void BspRaySceneQuery::execute(RaySceneQueryListener* listener)
@@ -742,22 +743,22 @@ namespace Ogre {
                 if(result.first && result.second <= maxDistance)
                 {
                     intersectedBrush = true;
-                    if(mWorldFragmentType == SceneQuery::WFT_SINGLE_INTERSECTION)
+                    if(mWorldFragmentType == WFT_SINGLE_INTERSECTION)
                     {
                         // We're interested in a single intersection
                         // Have to create these 
                         SceneQuery::WorldFragment* wf = OGRE_ALLOC_T(SceneQuery::WorldFragment, 1, MEMCATEGORY_SCENE_CONTROL);
-                        wf->fragmentType = SceneQuery::WFT_SINGLE_INTERSECTION;
+                        wf->fragmentType = WFT_SINGLE_INTERSECTION;
                         wf->singleIntersection = tracingRay.getPoint(result.second);
                         // save this so we can clean up later
                         mSingleIntersections.push_back(wf);
                         if (!listener->queryResult(wf, result.second + traceDistance))
                             return false;
                     }
-                    else if (mWorldFragmentType ==  SceneQuery::WFT_PLANE_BOUNDED_REGION)
+                    else if (mWorldFragmentType ==  WFT_PLANE_BOUNDED_REGION)
                     {
                         // We want the whole bounded volume
-                        assert((*bi)->fragment.fragmentType == SceneQuery::WFT_PLANE_BOUNDED_REGION);
+                        assert((*bi)->fragment.fragmentType == WFT_PLANE_BOUNDED_REGION);
                         if (!listener->queryResult(const_cast<WorldFragment*>(&(brush->fragment)), 
                             result.second + traceDistance))
                             return false; 
