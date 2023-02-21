@@ -116,6 +116,7 @@ bool CookTorranceLighting::createCpuSubPrograms(ProgramSet* programSet)
 
     fstage.mul(In(diffuse).xyz(), In(outDiffuse).xyz(), baseColor);
     fstage.assign(Vector3(0), Out(outDiffuse).xyz());
+    fstage.assign(In(diffuse).w(), Out(outDiffuse).w()); // forward alpha
 
     fstage.callFunction("PBR_MakeParams", {In(baseColor), In(mrparams), InOut(pixelParams)});
 
