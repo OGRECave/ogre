@@ -390,7 +390,7 @@ namespace Ogre {
          * Transforming to world space happens on the CPU and is the legacy behavior. Using object space bones
          * is more efficient as it allows to do the transformation in the vertex shader.
          */
-        static void setBonesUseObjectSpace(bool enable) { mBonesUseObjectSpace = true; }
+        static void setBonesUseObjectSpace(bool enable) { mBonesUseObjectSpace = enable; }
         /// whether the bone matrices are in object space or world space
         static bool getBonesUseObjectSpace() { return mBonesUseObjectSpace; }
 
