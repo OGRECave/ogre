@@ -14,7 +14,7 @@ install:
  - cmd: cd %APPVEYOR_BUILD_FOLDER%
  - cmd: git submodule update --init --recursive
 build_script:
- - set PATH=C:\Qt\5.15\msvc2019_64\bin;C:\Users\appveyor\.cargo\bin;%PATH%
+ - set PATH=C:\Qt\6.2\msvc2019_64\bin;C:\Users\appveyor\.cargo\bin;%PATH%
  - set VULKAN_SDK=C:\VulkanSDK\1.2.189.2
  - cmake -P ci-build.cmake
  - cmake --build build --config RelWithDebInfo --target INSTALL

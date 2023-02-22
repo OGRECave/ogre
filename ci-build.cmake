@@ -54,7 +54,7 @@ if(DEFINED ENV{APPVEYOR})
     set(OTHER
         "-DCMAKE_CXX_FLAGS=-WX -EHsc"
         -DCMAKE_GENERATOR_PLATFORM=x64
-        -DCMAKE_GENERATOR_TOOLSET=v141
+        -DCMAKE_GENERATOR_TOOLSET=v142
         -DOGRE_BUILD_DEPENDENCIES=TRUE
         "-DPYTHON_EXECUTABLE=C:\\Python310-x64\\python.exe"
         "-DPYTHON_LIBRARY=C:\\Python310-x64\\libs\\python310.lib"
@@ -62,8 +62,8 @@ if(DEFINED ENV{APPVEYOR})
 
     set(GENERATOR -G "Visual Studio 16 2019")
     set(OTHER ${OTHER}
-        -DCMAKE_PREFIX_PATH="C:\\Qt\\5.15\\msvc2019_64"
-        -DQt5_DIR="C:\\Qt\\5.15\\msvc2019_64\\lib\\cmake\\Qt5")
+        -DCMAKE_PREFIX_PATH="C:\\Qt\\6.2\\msvc2019_64"
+        -DQt6_DIR="C:\\Qt\\6.2\\msvc2019_64\\lib\\cmake\\Qt6")
 
     set(BUILD_DEPS TRUE)
     set(SWIG_EXECUTABLE "C:\\ProgramData\\chocolatey\\bin\\swig.exe")
