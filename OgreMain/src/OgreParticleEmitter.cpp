@@ -556,7 +556,7 @@ namespace Ogre
     void ParticleEmitter::setEnabled(bool enabled)
     {
         mEnabled = enabled;
-        mRemainder = mEmissionRate; // make sure we emit on next update
+        mRemainder = 1.0f; // make sure we emit a particle on next update. Turns emission rate to (t0;r] interval
         // Reset duration & repeat
         initDurationRepeat();
     }
