@@ -338,17 +338,22 @@ namespace Ogre {
     {
         OGRE_LOCK_AUTO_MUTEX;
 
-        for (auto& r : mResources)
+        ResourceMap::iterator i, iend;
+        iend = mResources.end();
+        for (i = mResources.begin(); i != iend;)
         {
             // A use count of 3 means that only RGM and RM have references
             // RGM has one (this one) and RM has 2 (by name and by handle)
-            if (r.second.use_count() == ResourceGroupManager::RESOURCE_SYSTEM_NUM_REFERENCE_COUNTS)
+            if (i->second.use_count() == ResourceGroupManager::RESOURCE_SYSTEM_NUM_REFERENCE_COUNTS)
             {
-                Resource* res = r.second.get();
+                Resource* res = (i++)->second.get();
                 if (!reloadableOnly || res->isReloadable())
                 {
-                    remove( res->getHandle() );
+                    remove(res->getHandle());
                 }
+            }
+            else {
+                ++i;
             }
         }
     }
