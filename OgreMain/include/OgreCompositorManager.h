@@ -63,10 +63,6 @@ namespace Ogre {
         CompositorManager();
         virtual ~CompositorManager();
 
-        /** Initialises the Compositor manager, which also triggers it to
-            parse all available .compositor scripts. */
-        void initialise(void);
-
         /**
          * Create a new compositor
          * @see ResourceManager::createResource
