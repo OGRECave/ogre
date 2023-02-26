@@ -31,7 +31,6 @@ THE SOFTWARE.
 
 #include "OgrePrerequisites.h"
 #include "OgreSingleton.h"
-#include "OgreScriptLoader.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {
@@ -69,8 +68,7 @@ namespace Ogre {
         templates. Instances of particle systems using these templates can
         then be created easily through the SceneManager::createParticleSystem method.
     */
-    class _OgreExport ParticleSystemManager: 
-        public Singleton<ParticleSystemManager>, public ScriptLoader, public FXAlloc
+    class _OgreExport ParticleSystemManager : public Singleton<ParticleSystemManager>
     {
         friend class ParticleSystemFactory;
     public:
@@ -295,13 +293,6 @@ namespace Ogre {
             on construction. OGRE will call this method when the rendering subsystem is initialised.
         */
         void _initialise(void);
-
-        /// @copydoc ScriptLoader::getScriptPatterns
-        const StringVector& getScriptPatterns(void) const override;
-        /// @copydoc ScriptLoader::parseScript
-        void parseScript(DataStreamPtr& stream, const String& groupName) override;
-        /// @copydoc ScriptLoader::getLoadingOrder
-        Real getLoadingOrder(void) const override;
 
         typedef MapIterator<ParticleAffectorFactoryMap> ParticleAffectorFactoryIterator;
         typedef MapIterator<ParticleEmitterFactoryMap> ParticleEmitterFactoryIterator;
