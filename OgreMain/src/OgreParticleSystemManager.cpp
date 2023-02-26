@@ -59,7 +59,6 @@ namespace Ogre {
     {
         removeAllTemplates(true); // Destroy all templates
         OGRE_LOCK_AUTO_MUTEX;
-        ResourceGroupManager::getSingleton()._unregisterScriptLoader(this);
         // delete billboard factory
         if (mBillboardRendererFactory)
         {
@@ -75,22 +74,6 @@ namespace Ogre {
             mFactory = 0;
         }
 
-    }
-    //-----------------------------------------------------------------------
-    const StringVector& ParticleSystemManager::getScriptPatterns(void) const
-    {
-        return mScriptPatterns;
-    }
-    //-----------------------------------------------------------------------
-    Real ParticleSystemManager::getLoadingOrder(void) const
-    {
-        /// Load late
-        return 1000.0f;
-    }
-    //-----------------------------------------------------------------------
-    void ParticleSystemManager::parseScript(DataStreamPtr& stream, const String& groupName)
-    {
-        ScriptCompilerManager::getSingleton().parseScript(stream, groupName);
     }
     //-----------------------------------------------------------------------
     void ParticleSystemManager::addEmitterFactory(ParticleEmitterFactory* factory)
