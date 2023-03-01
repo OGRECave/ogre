@@ -491,7 +491,7 @@ namespace Ogre {
     }
     //-----------------------------------------------------------------------------
     // Sort routine for VertexElement
-    bool VertexDeclaration::vertexElementLess(const VertexElement& e1, const VertexElement& e2)
+    static bool vertexElementLess(const VertexElement& e1, const VertexElement& e2)
     {
         // Sort by source first
         if (e1.getSource() < e2.getSource())
@@ -518,7 +518,7 @@ namespace Ogre {
     }
     void VertexDeclaration::sort(void)
     {
-        mElementList.sort(VertexDeclaration::vertexElementLess);
+        mElementList.sort(vertexElementLess);
     }
     //-----------------------------------------------------------------------------
     void VertexDeclaration::closeGapsInSource(void)
