@@ -31,68 +31,6 @@ THE SOFTWARE.
 #include "OgreImageResampler.h"
 
 namespace Ogre {
-    ImageCodec::~ImageCodec() {
-    }
-
-    void ImageCodec::decode(const DataStreamPtr& input, const Any& output) const
-    {
-        OGRE_IGNORE_DEPRECATED_BEGIN
-        DecodeResult res = decode(input);
-        OGRE_IGNORE_DEPRECATED_END
-
-        auto pData = static_cast<ImageCodec::ImageData*>(res.second.get());
-
-        Image* dest = any_cast<Image*>(output);
-        dest->mWidth = pData->width;
-        dest->mHeight = pData->height;
-        dest->mDepth = pData->depth;
-        dest->mBufSize = pData->size;
-        dest->mNumMipmaps = pData->num_mipmaps;
-        dest->mFlags = pData->flags;
-        dest->mFormat = pData->format;
-        // Just use internal buffer of returned memory stream
-        dest->mBuffer = res.first->getPtr();
-        // Make sure stream does not delete
-        res.first->setFreeOnClose(false);
-    }
-
-    DataStreamPtr ImageCodec::encode(const Any& input) const
-    {
-        Image* src = any_cast<Image*>(input);
-
-        auto imgData = std::make_shared<ImageCodec::ImageData>();
-        imgData->format = src->getFormat();
-        imgData->height = src->getHeight();
-        imgData->width = src->getWidth();
-        imgData->depth = src->getDepth();
-        imgData->size = src->getSize();
-        imgData->num_mipmaps = src->getNumMipmaps();
-
-        // Wrap memory, be sure not to delete when stream destroyed
-        auto wrapper = std::make_shared<MemoryDataStream>(src->getData(), src->getSize(), false);
-        OGRE_IGNORE_DEPRECATED_BEGIN
-        return encode(wrapper, imgData);
-        OGRE_IGNORE_DEPRECATED_END
-    }
-    void ImageCodec::encodeToFile(const Any& input, const String& outFileName) const
-    {
-        Image* src = any_cast<Image*>(input);
-
-        auto imgData = std::make_shared<ImageCodec::ImageData>();
-        imgData->format = src->getFormat();
-        imgData->height = src->getHeight();
-        imgData->width = src->getWidth();
-        imgData->depth = src->getDepth();
-        imgData->size = src->getSize();
-		imgData->num_mipmaps = src->getNumMipmaps();
-
-        // Wrap memory, be sure not to delete when stream destroyed
-        auto wrapper = std::make_shared<MemoryDataStream>(src->getData(), src->getSize(), false);
-        OGRE_IGNORE_DEPRECATED_BEGIN
-        encodeToFile(wrapper, outFileName, imgData);
-        OGRE_IGNORE_DEPRECATED_END
-    }
-
     //-----------------------------------------------------------------------------
     Image::Image(PixelFormat format, uint32 width, uint32 height, uint32 depth, uchar* buffer, bool autoDelete)
         : mWidth(0),
