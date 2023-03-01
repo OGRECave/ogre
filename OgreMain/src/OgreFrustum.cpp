@@ -161,14 +161,6 @@ namespace Ogre {
         return mProjMatrixRSDepth;
     }
     //-----------------------------------------------------------------------
-    const Matrix4& Frustum::getProjectionMatrixRS(void) const
-    {
-
-        updateFrustum();
-
-        return mProjMatrixRS;
-    }
-    //-----------------------------------------------------------------------
     const Affine3& Frustum::getViewMatrix(void) const
     {
         updateView();
@@ -459,12 +451,10 @@ namespace Ogre {
         if(renderSystem)
         {
             // API specific
-            renderSystem->_convertProjectionMatrix(mProjMatrix, mProjMatrixRS);
             renderSystem->_convertProjectionMatrix(mProjMatrix, mProjMatrixRSDepth, true);
         }
         else
         {
-            mProjMatrixRS = mProjMatrix;
             mProjMatrixRSDepth = mProjMatrix;
         }
 
