@@ -92,6 +92,7 @@ namespace Ogre {
     struct MovableObjectLodChangedEvent;
     struct EntityMeshLodChangedEvent;
     struct EntityMaterialLodChangedEvent;
+    class ShadowCasterSceneQueryListener;
 
     /** Structure collecting together information about the visible objects
     that have been discovered in a scene.
@@ -799,38 +800,6 @@ namespace Ogre {
 
             typedef std::vector<ShadowTextureListener*> ListenerList;
             ListenerList mListeners;
-
-            /// Inner class to use as callback for shadow caster scene query
-            class _OgreExport ShadowCasterSceneQueryListener : public SceneQueryListener, public SceneMgtAlloc
-            {
-            protected:
-                SceneManager* mSceneMgr;
-                ShadowCasterList* mCasterList;
-                bool mIsLightInFrustum;
-                const PlaneBoundedVolumeList* mLightClipVolumeList;
-                const Camera* mCamera;
-                const Light* mLight;
-                Real mFarDistSquared;
-            public:
-                ShadowCasterSceneQueryListener(SceneManager* sm) : mSceneMgr(sm),
-                    mCasterList(0), mIsLightInFrustum(false), mLightClipVolumeList(0),
-                    mCamera(0), mFarDistSquared(0) {}
-                // Prepare the listener for use with a set of parameters
-                void prepare(bool lightInFrustum, const PlaneBoundedVolumeList* lightClipVolumes,
-                             const Light* light, const Camera* cam, ShadowCasterList* casterList,
-                             Real farDistSquared)
-                {
-                    mCasterList = casterList;
-                    mIsLightInFrustum = lightInFrustum;
-                    mLightClipVolumeList = lightClipVolumes;
-                    mCamera = cam;
-                    mLight = light;
-                    mFarDistSquared = farDistSquared;
-                }
-                bool queryResult(MovableObject* object) override;
-                bool queryResult(SceneQuery::WorldFragment* fragment) override;
-            };
-
             std::unique_ptr<ShadowCasterSceneQueryListener> mShadowCasterQueryListener;
 
             /** Internal method for locating a list of shadow casters which
