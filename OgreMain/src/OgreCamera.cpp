@@ -73,7 +73,6 @@ namespace Ogre {
 
         // Init matrices
         mViewMatrix = Affine3::ZERO;
-        mProjMatrixRS = Matrix4::ZERO;
 
         mParentNode = 0;
 

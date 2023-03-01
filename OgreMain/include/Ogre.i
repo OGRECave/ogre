@@ -750,7 +750,6 @@ SHARED_PTR(Material);
         %include "OgreShadowCameraSetupPSSM.h"
             %template(SplitPointList) std::vector<Ogre::Real>;
     %ignore Ogre::Frustum::getFrustumExtents(Real&, Real& ,Real& ,Real&) const;
-    %ignore Ogre::Frustum::getProjectionMatrixRS;
     %include "OgreFrustum.h"
         %ignore Ogre::Camera::setPosition;
         %ignore Ogre::Camera::getPosition;
