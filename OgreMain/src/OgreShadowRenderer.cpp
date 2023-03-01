@@ -40,6 +40,38 @@ namespace Ogre {
 GpuProgramParametersSharedPtr SceneManager::ShadowRenderer::msInfiniteExtrusionParams;
 GpuProgramParametersSharedPtr SceneManager::ShadowRenderer::msFiniteExtrusionParams;
 
+typedef std::vector<ShadowCaster*> ShadowCasterList;
+
+/// Inner class to use as callback for shadow caster scene query
+class ShadowCasterSceneQueryListener : public SceneQueryListener
+{
+protected:
+    SceneManager* mSceneMgr;
+    ShadowCasterList* mCasterList;
+    bool mIsLightInFrustum;
+    const PlaneBoundedVolumeList* mLightClipVolumeList;
+    const Camera* mCamera;
+    const Light* mLight;
+    Real mFarDistSquared;
+public:
+    ShadowCasterSceneQueryListener(SceneManager* sm) : mSceneMgr(sm),
+        mCasterList(0), mIsLightInFrustum(false), mLightClipVolumeList(0),
+        mCamera(0), mFarDistSquared(0) {}
+    // Prepare the listener for use with a set of parameters
+    void prepare(bool lightInFrustum, const PlaneBoundedVolumeList* lightClipVolumes, const Light* light,
+                 const Camera* cam, ShadowCasterList* casterList, Real farDistSquared)
+    {
+        mCasterList = casterList;
+        mIsLightInFrustum = lightInFrustum;
+        mLightClipVolumeList = lightClipVolumes;
+        mCamera = cam;
+        mLight = light;
+        mFarDistSquared = farDistSquared;
+    }
+    bool queryResult(MovableObject* object) override;
+    bool queryResult(SceneQuery::WorldFragment* fragment) override;
+};
+
 SceneManager::ShadowRenderer::ShadowRenderer(SceneManager* owner) :
 mSceneManager(owner),
 mShadowTechnique(SHADOWTYPE_NONE),
@@ -1685,8 +1717,7 @@ void SceneManager::ShadowRenderer::resolveShadowTexture(TextureUnitState* tu, si
 }
 
 //---------------------------------------------------------------------
-bool SceneManager::ShadowRenderer::ShadowCasterSceneQueryListener::queryResult(
-    MovableObject* object)
+bool ShadowCasterSceneQueryListener::queryResult(MovableObject* object)
 {
     if (object->getCastShadows() && object->isVisible() &&
         mSceneMgr->isRenderQueueToBeProcessed(object->getRenderQueueGroup()) &&
@@ -1740,8 +1771,7 @@ bool SceneManager::ShadowRenderer::ShadowCasterSceneQueryListener::queryResult(
     return true;
 }
 //---------------------------------------------------------------------
-bool SceneManager::ShadowRenderer::ShadowCasterSceneQueryListener::queryResult(
-    SceneQuery::WorldFragment* fragment)
+bool ShadowCasterSceneQueryListener::queryResult(SceneQuery::WorldFragment* fragment)
 {
     // don't deal with world geometry
     return true;
