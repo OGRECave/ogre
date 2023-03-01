@@ -128,7 +128,7 @@ namespace Ogre {
             The implementor should return 'true' to continue returning objects,
             or 'false' to abandon any further results from this query.
         */
-        virtual bool queryResult(SceneQuery::WorldFragment* fragment) = 0;
+        virtual bool queryResult(SceneQuery::WorldFragment* fragment) { return false; }
 
     };
 
