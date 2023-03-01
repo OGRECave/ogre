@@ -41,9 +41,6 @@ namespace Ogre {
     *  @{
     */
     /** Codec specialized in images.
-
-            The users implementing subclasses of ImageCodec are required to return
-            a valid pointer to a ImageData class from the decode(...) function.
     */
     class _OgreExport ImageCodec : public Codec
     {
@@ -60,53 +57,7 @@ namespace Ogre {
             Bitwise::bswapBuffer(pData, size);
 #endif
         }
-
-    public:
-        using Codec::decode;
-        using Codec::encode;
-        using Codec::encodeToFile;
-
-        void decode(const DataStreamPtr& input, const Any& output) const override;
-        DataStreamPtr encode(const Any& input) const override;
-        void encodeToFile(const Any& input, const String& outFileName) const override;
-
-        virtual ~ImageCodec();
-        /** Codec return class for images. Has information about the size and the
-            pixel format of the image. */
-        class _OgrePrivate ImageData
-        {
-        public:
-            ImageData():
-                height(0), width(0), depth(1), size(0),
-                num_mipmaps(0), flags(0), format(PF_UNKNOWN)
-            {
-            }
-            uint32 height;
-            uint32 width;
-            uint32 depth;
-            size_t size;
-            
-            uint32 num_mipmaps;
-            uint flags;
-
-            PixelFormat format;
-        };
-        typedef SharedPtr<ImageData> CodecDataPtr;
-
-        /// @deprecated
-        OGRE_DEPRECATED virtual DataStreamPtr encode(const MemoryDataStreamPtr& input, const CodecDataPtr& pData) const { return encode(Any()); }
-        /// @deprecated
-        OGRE_DEPRECATED virtual void encodeToFile(const MemoryDataStreamPtr& input, const String& outFileName, const CodecDataPtr& pData) const
-        { encodeToFile(Any(), ""); }
-        /// Result of a decoding; both a decoded data stream and CodecData metadata
-        typedef std::pair<MemoryDataStreamPtr, CodecDataPtr> DecodeResult;
-        /// @deprecated
-        OGRE_DEPRECATED virtual DecodeResult decode(const DataStreamPtr& input) const
-        {
-            return DecodeResult();
-        }
     };
-
     /** @} */
     /** @} */
 } // namespace
