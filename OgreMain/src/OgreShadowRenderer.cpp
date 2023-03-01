@@ -69,7 +69,6 @@ public:
         mFarDistSquared = farDistSquared;
     }
     bool queryResult(MovableObject* object) override;
-    bool queryResult(SceneQuery::WorldFragment* fragment) override;
 };
 
 SceneManager::ShadowRenderer::ShadowRenderer(SceneManager* owner) :
@@ -1768,12 +1767,6 @@ bool ShadowCasterSceneQueryListener::queryResult(MovableObject* object)
 
         }
     }
-    return true;
-}
-//---------------------------------------------------------------------
-bool ShadowCasterSceneQueryListener::queryResult(SceneQuery::WorldFragment* fragment)
-{
-    // don't deal with world geometry
     return true;
 }
 //---------------------------------------------------------------------
