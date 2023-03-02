@@ -68,7 +68,6 @@ mWorldGeometryRenderQueue(RENDER_QUEUE_WORLD_GEOMETRY_1),
 mLastFrameNumber(0),
 mResetIdentityView(false),
 mResetIdentityProj(false),
-mNormaliseNormalsOnScale(true),
 mFlipCullingOnNegativeScale(true),
 mLightsDirtyCounter(0),
 mMovableNameGenerator("Ogre/MO"),
@@ -87,9 +86,6 @@ mGpuParamsDirty((uint16)GPV_ALL)
 {
     if (Root* root = Root::getSingletonPtr())
         _setDestinationRenderSystem(root->getRenderSystem());
-
-    if (mDestRenderSystem && mDestRenderSystem->getCapabilities())
-        mNormaliseNormalsOnScale = mDestRenderSystem->getCapabilities()->hasCapability(RSC_FIXED_FUNCTION);
 
     // Setup default queued renderable visitor
     mActiveQueuedRenderableVisitor = &mDefaultQueuedRenderableVisitor;
@@ -1901,15 +1897,6 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
     mAutoParamDataSource->setCurrentRenderable(rend);
 
     setWorldTransform(rend);
-
-    // Sort out normalisation
-    // Assume first world matrix representative - shaders that use multiple
-    // matrices should control renormalisation themselves
-    if ((pass->getNormaliseNormals() || mNormaliseNormalsOnScale) &&
-        mAutoParamDataSource->getWorldMatrix().linear().hasScale())
-        mDestRenderSystem->setNormaliseNormals(true);
-    else
-        mDestRenderSystem->setNormaliseNormals(false);
 
     // Sort out negative scaling
     // Assume first world matrix representative

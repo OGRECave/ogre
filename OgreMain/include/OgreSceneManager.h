@@ -552,7 +552,6 @@ namespace Ogre {
         bool mResetIdentityView;
         bool mResetIdentityProj;
 
-        bool mNormaliseNormalsOnScale;
         bool mFlipCullingOnNegativeScale;
         CullingMode mPassCullingMode;
 
@@ -3203,12 +3202,6 @@ namespace Ogre {
             whether they are being manually handled.
         */
         bool getFindVisibleObjects(void) { return mFindVisibleObjects; }
-
-        /// @deprecated do not use
-        OGRE_DEPRECATED void setNormaliseNormalsOnScale(bool n) { mNormaliseNormalsOnScale = n; }
-
-        /// @deprecated do not use
-        OGRE_DEPRECATED bool getNormaliseNormalsOnScale() const { return mNormaliseNormalsOnScale; }
 
         /** Set whether to automatically flip the culling mode on objects whenever they
             are negatively scaled.
