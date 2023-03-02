@@ -1733,31 +1733,15 @@ namespace Ogre {
     //-----------------------------------------------------------------------------
     void GLRenderSystem::_setDepthBufferParams(bool depthTest, bool depthWrite, CompareFunction depthFunction)
     {
-        _setDepthBufferCheckEnabled(depthTest);
-        _setDepthBufferWriteEnabled(depthWrite);
-        _setDepthBufferFunction(depthFunction);
-    }
-    //-----------------------------------------------------------------------------
-    void GLRenderSystem::_setDepthBufferCheckEnabled(bool enabled)
-    {
-        if (enabled)
+        if (depthTest)
         {
             mStateCacheManager->setClearDepth(1.0f);
         }
-        mStateCacheManager->setEnabled(GL_DEPTH_TEST, enabled);
-    }
-    //-----------------------------------------------------------------------------
-    void GLRenderSystem::_setDepthBufferWriteEnabled(bool enabled)
-    {
-        GLboolean flag = enabled ? GL_TRUE : GL_FALSE;
-        mStateCacheManager->setDepthMask( flag );
+        mStateCacheManager->setEnabled(GL_DEPTH_TEST, depthTest);
+        mStateCacheManager->setDepthMask( depthWrite );
         // Store for reference in _beginFrame
-        mDepthWrite = enabled;
-    }
-    //-----------------------------------------------------------------------------
-    void GLRenderSystem::_setDepthBufferFunction(CompareFunction func)
-    {
-        mStateCacheManager->setDepthFunc(convertCompareFunction(func));
+        mDepthWrite = depthWrite;
+        mStateCacheManager->setDepthFunc(convertCompareFunction(depthFunction));
     }
     //-----------------------------------------------------------------------------
     void GLRenderSystem::_setDepthBias(float constantBias, float slopeScaleBias)

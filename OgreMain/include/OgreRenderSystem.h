@@ -669,12 +669,6 @@ namespace Ogre
         */
         virtual void _setDepthBufferParams(bool depthTest = true, bool depthWrite = true, CompareFunction depthFunction = CMPF_LESS_EQUAL) = 0;
 
-        /// @deprecated use _setDepthBufferParams
-        OGRE_DEPRECATED virtual void _setDepthBufferCheckEnabled(bool enabled = true) {}
-        /// @deprecated use _setDepthBufferParams
-        OGRE_DEPRECATED virtual void _setDepthBufferWriteEnabled(bool enabled = true) {}
-        /// @deprecated use _setDepthBufferParams
-        OGRE_DEPRECATED virtual void _setDepthBufferFunction(CompareFunction func = CMPF_LESS_EQUAL) {}
         /// @deprecated use setColourBlendState
         OGRE_DEPRECATED void _setColourBufferWriteEnabled(bool red, bool green, bool blue, bool alpha)
         {

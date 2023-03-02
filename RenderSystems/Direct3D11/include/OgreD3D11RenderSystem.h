@@ -273,11 +273,7 @@ namespace Ogre
         void _setCullingMode( CullingMode mode );
         void _setDepthClamp(bool enable);
         void _setDepthBufferParams( bool depthTest = true, bool depthWrite = true, CompareFunction depthFunction = CMPF_LESS_EQUAL );
-        void _setDepthBufferCheckEnabled( bool enabled = true );
-        bool _getDepthBufferCheckEnabled( void );
         void setColourBlendState(const ColourBlendState& state);
-        void _setDepthBufferWriteEnabled(bool enabled = true);
-        void _setDepthBufferFunction( CompareFunction func = CMPF_LESS_EQUAL );
         void _setDepthBias(float constantBias, float slopeScaleBias);
 		void _convertProjectionMatrix(const Matrix4& matrix, Matrix4& dest, bool forGpuProgram = false);
         void _setPolygonMode(PolygonMode level);
