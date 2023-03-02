@@ -162,8 +162,6 @@ namespace Ogre {
         bool mIteratePerLight : 1;
         /// Should it only be run for a certain light type?
         bool mRunOnlyForOneLightType : 1;
-        /// Normalisation
-        bool mNormaliseNormals : 1;
         bool mPolygonModeOverrideable : 1;
         bool mFogOverride : 1;
         /// Is this pass queued for deletion?
@@ -1335,24 +1333,6 @@ namespace Ogre {
             @param variabilityMask A mask of GpuParamVariability which identifies which autos will need updating
         */
         void _updateAutoParams(const AutoParamDataSource* source, uint16 variabilityMask) const;
-
-        /** If set to true, this forces normals to be normalised dynamically
-            by the hardware for this pass.
-
-            This option can be used to prevent lighting variations when scaling an
-            object - normally because this scaling is hardware based, the normals
-            get scaled too which causes lighting to become inconsistent. By default the
-            SceneManager detects scaled objects and does this for you, but
-            this has an overhead so you might want to turn that off through
-            Ogre::SceneManager::setNormaliseNormalsOnScale(false) and only do it per-Pass
-            when you need to.
-
-            @deprecated Only used by fixed function APIs. Use shaders if you rely on this.
-        */
-        OGRE_DEPRECATED void setNormaliseNormals(bool normalise) { mNormaliseNormals = normalise; }
-
-        /** Returns true if this pass has auto-normalisation of normals set. */
-        bool getNormaliseNormals(void) const {return mNormaliseNormals; }
 
         /** Static method to retrieve all the Passes which need their
             hash values recalculated.

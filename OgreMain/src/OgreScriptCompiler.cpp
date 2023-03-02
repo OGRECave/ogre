@@ -1001,7 +1001,6 @@ namespace Ogre
         mIds["cull_software"] = ID_CULL_SOFTWARE;
         mIds["back"] = ID_BACK;
         mIds["front"] = ID_FRONT;
-        mIds["normalise_normals"] = ID_NORMALISE_NORMALS;
         mIds["lighting"] = ID_LIGHTING;
         mIds["shading"] = ID_SHADING;
         mIds["flat"] = ID_FLAT;

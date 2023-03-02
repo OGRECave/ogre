@@ -252,7 +252,6 @@ Here are the attributes you can use in a ’pass’ section of a .material scrip
 -   [light\_clip\_planes](#light_005fclip_005fplanes)
 -   [illumination\_stage](#illumination_005fstage)
 -   [transparent\_sorting](#transparent_005fsorting)
--   [normalise\_normals](#normalise_005fnormals)
 -   [cull\_hardware](#cull_005fhardware)
 -   [cull\_software](#cull_005fsoftware)
 -   [lighting](#lighting)
@@ -561,19 +560,6 @@ Default: light\_clip\_planes off
 
 @par
 Format: illumination\_stage &lt;ambient|per\_light|decal&gt; Default: none (autodetect)
-
-<a name="normalise_005fnormals"></a><a name="normalise_005fnormals-1"></a>
-
-## normalise\_normals
-
-Sets whether or not this pass renders with all vertex normals being automatically re-normalised.<br>
-@par
-Format: normalise\_normals &lt;on|off&gt;
-
-@copydetails Ogre::Pass::setNormaliseNormals
-
-@par
-Default: normalise\_normals off<br>
 
 <a name="transparent_005fsorting"></a><a name="transparent_005fsorting-1"></a>
 

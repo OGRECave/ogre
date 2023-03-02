@@ -705,14 +705,6 @@ namespace Ogre
                 writeValue(pPass->getPolygonModeOverrideable() ? "on" : "off");
             }
 
-            // normalise normals
-            if (mDefaults ||
-                pPass->getNormaliseNormals() != false)
-            {
-                writeAttribute(3, "normalise_normals");
-                writeValue(pPass->getNormaliseNormals() ? "on" : "off");
-            }
-
             //fog override
             if (mDefaults ||
                 pPass->getFogOverride() != false)

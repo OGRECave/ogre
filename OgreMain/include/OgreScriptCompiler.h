@@ -650,7 +650,6 @@ namespace Ogre
         ID_CULL_SOFTWARE,
             ID_BACK,
             ID_FRONT,
-        ID_NORMALISE_NORMALS,
         ID_LIGHTING,
         ID_SHADING,
             ID_FLAT, 
