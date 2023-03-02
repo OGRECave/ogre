@@ -741,9 +741,6 @@ namespace Ogre {
             BillboardSet::setTextureCoords()
         */
         const std::vector<FloatRect>& getTextureCoords() const { return mTextureCoords; }
-
-        /// @deprecated
-        OGRE_DEPRECATED Ogre::FloatRect const * getTextureCoords( uint16 * oNumCoords );
         /// @}
 
         /** Set whether or not the BillboardSet will use point rendering

@@ -1103,13 +1103,6 @@ namespace Ogre {
         assert( coordIndex == (size_t)stacks * slices );
     }
     //-----------------------------------------------------------------------
-    Ogre::FloatRect const * BillboardSet::getTextureCoords( uint16 * oNumCoords )
-    {
-        *oNumCoords = (uint16)mTextureCoords.size();
-        //  std::vector<> is guaranteed to be contiguous
-        return &mTextureCoords.front();
-    }
-    //-----------------------------------------------------------------------
     void BillboardSet::setPointRenderingEnabled(bool enabled)
     {
         // Override point rendering if not supported

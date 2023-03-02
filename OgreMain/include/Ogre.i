@@ -723,7 +723,6 @@ SHARED_PTR(Material);
         %ignore Ogre::RibbonTrail::getNodeIterator;
         %include "OgreRibbonTrail.h"
     %ignore Ogre::BillboardSet::setTextureCoords(const FloatRect*, uint16);
-    %ignore Ogre::BillboardSet::getTextureCoords(uint16*);
     %include "OgreBillboardSet.h"
     %include "OgreMovablePlane.h"
     %ignore Ogre::Light::setPosition;
