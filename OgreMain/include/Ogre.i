@@ -678,9 +678,6 @@ SHARED_PTR(Material);
 %include "OgreMaterial.h"
 %ignore Ogre::RenderSystem::_setSceneBlending;
 %ignore Ogre::RenderSystem::_setSeparateSceneBlending;
-%ignore Ogre::RenderSystem::_setDepthBufferCheckEnabled;
-%ignore Ogre::RenderSystem::_setDepthBufferWriteEnabled;
-%ignore Ogre::RenderSystem::_setDepthBufferFunction;
 %ignore Ogre::RenderSystem::_setColourBufferWriteEnabled;
 %ignore Ogre::RenderSystem::_setFog;
 %ignore Ogre::RenderSystem::_setWorldMatrix;

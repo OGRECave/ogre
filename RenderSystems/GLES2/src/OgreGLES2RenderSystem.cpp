@@ -939,14 +939,7 @@ namespace Ogre {
 
     void GLES2RenderSystem::_setDepthBufferParams(bool depthTest, bool depthWrite, CompareFunction depthFunction)
     {
-        _setDepthBufferCheckEnabled(depthTest);
-        _setDepthBufferWriteEnabled(depthWrite);
-        _setDepthBufferFunction(depthFunction);
-    }
-
-    void GLES2RenderSystem::_setDepthBufferCheckEnabled(bool enabled)
-    {
-        if (enabled)
+        if (depthTest)
         {
             mStateCacheManager->setClearDepth(1.0f);
             mStateCacheManager->setEnabled(GL_DEPTH_TEST);
@@ -955,17 +948,8 @@ namespace Ogre {
         {
             mStateCacheManager->setDisabled(GL_DEPTH_TEST);
         }
-    }
-
-    void GLES2RenderSystem::_setDepthBufferWriteEnabled(bool enabled)
-    {
-        // Store for reference in _beginFrame
-        mStateCacheManager->setDepthMask(enabled ? GL_TRUE : GL_FALSE);
-    }
-
-    void GLES2RenderSystem::_setDepthBufferFunction(CompareFunction func)
-    {
-        mStateCacheManager->setDepthFunc(convertCompareFunction(func));
+        mStateCacheManager->setDepthMask(depthWrite);
+        mStateCacheManager->setDepthFunc(convertCompareFunction(depthFunction));
     }
 
     void GLES2RenderSystem::_setDepthBias(float constantBias, float slopeScaleBias)
