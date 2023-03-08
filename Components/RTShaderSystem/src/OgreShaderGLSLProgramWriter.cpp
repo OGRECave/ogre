@@ -399,10 +399,16 @@ void GLSLProgramWriter::writeOutParameters(std::ostream& os, Function* function,
     if(gpuType == GPT_VERTEX_PROGRAM && !mIsGLSLES) // TODO: also use for GLSLES?
     {
         // Special case where gl_Position needs to be redeclared
-        if (mGLSLVersion >= 150 && Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(
-                                       RSC_GLSL_SSO_REDECLARE))
+        const RenderSystemCapabilities* rsc = Root::getSingleton().getRenderSystem()->getCapabilities();
+        if (mGLSLVersion >= 150 && rsc->hasCapability(RSC_GLSL_SSO_REDECLARE))
         {
-            os << "out gl_PerVertex\n{\nvec4 gl_Position;\nfloat gl_PointSize;\nfloat gl_ClipDistance[];\n};\n" << std::endl;
+            const bool clipDistBug =
+                ((OGRE_PLATFORM == OGRE_PLATFORM_WIN32) || (OGRE_PLATFORM == OGRE_PLATFORM_WINRT)) &&
+                rsc->getVendor() == GPU_INTEL;
+            const String clipDistDecl = clipDistBug ? "float gl_ClipDistance[1];" : "float gl_ClipDistance[];";
+
+            os << "out gl_PerVertex\n{\nvec4 gl_Position;\nfloat gl_PointSize;\n" + clipDistDecl + "\n};\n"
+               << std::endl;
         }
     }
 }
