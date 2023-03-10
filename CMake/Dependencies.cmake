@@ -48,7 +48,7 @@ set(OGREDEPS_SHARED FALSE)
 
 # get available processor cores
 include(ProcessorCount)
-ProcessorCount(N)
+ProcessorCount(NPROC)
 
 # can not get processor cores, fallback to default value
 if(N EQUAL 0)
