@@ -46,7 +46,16 @@ endif()
 # if we build our own deps, do it static as it generally eases distribution
 set(OGREDEPS_SHARED FALSE)
 
-set(BUILD_COMMAND_OPTS --target install --config ${CMAKE_BUILD_TYPE})
+# get available processor cores
+include(ProcessorCount)
+ProcessorCount(NPROC)
+
+# can not get processor cores, fallback to default value
+if(NPROC EQUAL 0)
+    set(NPROC 2)
+endif()
+
+set(BUILD_COMMAND_OPTS --target install -j ${NPROC} --config ${CMAKE_BUILD_TYPE})
 
 set(BUILD_COMMAND_COMMON ${CMAKE_COMMAND}
   -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
