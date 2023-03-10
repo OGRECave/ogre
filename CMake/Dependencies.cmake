@@ -51,7 +51,7 @@ include(ProcessorCount)
 ProcessorCount(NPROC)
 
 # can not get processor cores, fallback to default value
-if(N EQUAL 0)
+if(NPROC EQUAL 0)
     set(N 2)
 endif()
 
