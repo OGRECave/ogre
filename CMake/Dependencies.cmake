@@ -55,7 +55,7 @@ if(N EQUAL 0)
     set(N 2)
 endif()
 
-set(BUILD_COMMAND_OPTS --target install -j ${N} --config ${CMAKE_BUILD_TYPE})
+set(BUILD_COMMAND_OPTS --target install -j ${NPROC} --config ${CMAKE_BUILD_TYPE})
 
 set(BUILD_COMMAND_COMMON ${CMAKE_COMMAND}
   -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
