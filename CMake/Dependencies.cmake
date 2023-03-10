@@ -52,7 +52,7 @@ ProcessorCount(NPROC)
 
 # can not get processor cores, fallback to default value
 if(NPROC EQUAL 0)
-    set(N 2)
+    set(NPROC 2)
 endif()
 
 set(BUILD_COMMAND_OPTS --target install -j ${NPROC} --config ${CMAKE_BUILD_TYPE})
