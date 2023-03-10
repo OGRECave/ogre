@@ -173,10 +173,10 @@ if(OGRE_BUILD_DEPENDENCIES AND NOT EXISTS ${OGREDEPS_PATH})
 
     message(STATUS "Building Bullet")
     file(DOWNLOAD
-        https://github.com/bulletphysics/bullet3/archive/refs/tags/3.24.tar.gz
-        ${PROJECT_BINARY_DIR}/3.24.tar.gz)
+        https://github.com/bulletphysics/bullet3/archive/refs/tags/3.25.tar.gz
+        ${PROJECT_BINARY_DIR}/3.25.tar.gz)
     execute_process(COMMAND ${CMAKE_COMMAND}
-        -E tar xf 3.24.tar.gz WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
+        -E tar xf 3.25.tar.gz WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
     execute_process(COMMAND ${BUILD_COMMAND_COMMON}
         -DBUILD_SHARED_LIBS=OFF
         -DINSTALL_LIBS=ON
@@ -192,10 +192,10 @@ if(OGRE_BUILD_DEPENDENCIES AND NOT EXISTS ${OGREDEPS_PATH})
         -DBUILD_UNIT_TESTS=OFF
         -DCMAKE_RELWITHDEBINFO_POSTFIX= # fixes FindBullet on MSVC
         -DBUILD_CLSOCKET=OFF
-        ${PROJECT_BINARY_DIR}/bullet3-3.24
-        WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/bullet3-3.24)
+        ${PROJECT_BINARY_DIR}/bullet3-3.25
+        WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/bullet3-3.25)
     execute_process(COMMAND ${CMAKE_COMMAND}
-        --build ${PROJECT_BINARY_DIR}/bullet3-3.24 ${BUILD_COMMAND_OPTS})
+        --build ${PROJECT_BINARY_DIR}/bullet3-3.25 ${BUILD_COMMAND_OPTS})
     set(BULLET_ROOT ${OGREDEPS_PATH})
 endif()
 
