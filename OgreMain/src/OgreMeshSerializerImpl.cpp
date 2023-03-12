@@ -274,9 +274,6 @@ namespace Ogre {
             writeGeometry(s->vertexData);
         }
 
-        // write out texture alias chunks
-        writeSubMeshTextureAliases(s);
-
         // Operation type
         writeSubMeshOperation(s);
 
@@ -336,27 +333,6 @@ namespace Ogre {
     {
         return MSTREAM_OVERHEAD_SIZE + sizeof (unsigned short) +
             s->extremityPoints.size() * sizeof (float)* 3;
-    }
-
-
-    //---------------------------------------------------------------------
-    void MeshSerializerImpl::writeSubMeshTextureAliases(const SubMesh* s)
-    {
-        size_t chunkSize;
-        LogManager::getSingleton().logMessage("Exporting submesh texture aliases...");
-
-        // iterate through texture aliases and write them out as a chunk
-        for (auto& t : s->mTextureAliases)
-        {
-            chunkSize = MSTREAM_OVERHEAD_SIZE + calcStringSize(t.first) + calcStringSize(t.second);
-            writeChunkHeader(M_SUBMESH_TEXTURE_ALIAS, chunkSize);
-            // write out alias name
-            writeString(t.first);
-            // write out texture name
-            writeString(t.second);
-        }
-
-        LogManager::getSingleton().logMessage("Submesh texture aliases exported.");
     }
 
     //---------------------------------------------------------------------
@@ -567,7 +543,6 @@ namespace Ogre {
             size += calcGeometrySize(pSub->vertexData);
         }
 
-        size += calcSubMeshTextureAliasesSize(pSub);
         size += calcSubMeshOperationSize();
 
         // Bone assignments
@@ -579,18 +554,6 @@ namespace Ogre {
     size_t MeshSerializerImpl::calcSubMeshOperationSize()
     {
         return MSTREAM_OVERHEAD_SIZE + sizeof(uint16);
-    }
-    //---------------------------------------------------------------------
-    size_t MeshSerializerImpl::calcSubMeshTextureAliasesSize(const SubMesh* pSub)
-    {
-        size_t chunkSize = 0;
-        // iterate through texture alias map and calc size of strings
-        for (auto& t : pSub->mTextureAliases)
-        {
-            chunkSize += MSTREAM_OVERHEAD_SIZE + calcStringSize(t.first) + calcStringSize(t.second);
-        }
-
-        return chunkSize;
     }
     //---------------------------------------------------------------------
     size_t MeshSerializerImpl::calcGeometrySize(const VertexData* vertexData)
@@ -1009,7 +972,8 @@ namespace Ogre {
                     break;
                 case M_SUBMESH_TEXTURE_ALIAS:
                     seenTexAlias = true;
-                    readSubMeshTextureAlias(stream, pMesh, sm);
+                    String aliasName = readString(stream);
+                    String textureName = readString(stream);
                     break;
                 }
 
@@ -1021,7 +985,7 @@ namespace Ogre {
             }
 
             if (seenTexAlias)
-                LogManager::getSingleton().logWarning("texture aliases for SubMeshes are deprecated - " +
+                LogManager::getSingleton().logError("texture aliases for SubMeshes are unsupported - " +
                                                       stream->getName());
 
             if (!stream->eof())
@@ -1042,15 +1006,6 @@ namespace Ogre {
         unsigned short opType;
         readShorts(stream, &opType, 1);
         sm->operationType = static_cast<RenderOperation::OperationType>(opType);
-    }
-    //---------------------------------------------------------------------
-    void MeshSerializerImpl::readSubMeshTextureAlias(const DataStreamPtr& stream, Mesh* pMesh, SubMesh* sub)
-    {
-        String aliasName = readString(stream);
-        String textureName = readString(stream);
-        OGRE_IGNORE_DEPRECATED_BEGIN
-        sub->addTextureAlias(aliasName, textureName);
-        OGRE_IGNORE_DEPRECATED_END
     }
     //---------------------------------------------------------------------
     void MeshSerializerImpl::writeSkeletonLink(const String& skelName)

@@ -803,8 +803,6 @@ SHARED_PTR(Material);
 SHARED_PTR(Mesh);
 %include "OgreMesh.h"
 %ignore Ogre::SubMesh::getBoneAssignmentIterator;
-%ignore Ogre::SubMesh::getAliasTextureIterator;
-%ignore Ogre::SubMesh::removeAllTextureAliases;
 %include "OgreSubMesh.h"
 %ignore Ogre::StaticGeometry::getRegionIterator;
 %ignore Ogre::StaticGeometry::Region::getLODIterator;
