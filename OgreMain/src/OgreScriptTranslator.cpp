@@ -47,7 +47,7 @@ THE SOFTWARE.
 #include "OgreGpuProgramUsage.h"
 
 namespace Ogre{
-    static void applyTextureAliases(const Material* mat, const NameValuePairList& aliasList)
+    static void applyTextureAliases(ScriptCompiler *compiler, const Material* mat, const NameValuePairList& aliasList)
     {
         for (auto t : mat->getTechniques())
         {
@@ -59,11 +59,14 @@ namespace Ogre{
                     if (aliasIt == aliasList.end())
                         continue;
 
+                    ProcessResourceNameScriptCompilerEvent evt(ProcessResourceNameScriptCompilerEvent::TEXTURE, aliasIt->second);
+                    compiler->_fireEvent(&evt, 0);
+
                     if (tus->getNumFrames() > 1)
-                        tus->setAnimatedTextureName(aliasIt->second, tus->getNumFrames(),
+                        tus->setAnimatedTextureName(evt.mName, tus->getNumFrames(),
                                                     tus->getAnimationDuration());
                     else
-                        tus->setTextureName(aliasIt->second, tus->getTextureType());
+                        tus->setTextureName(evt.mName, tus->getTextureType());
                 }
             }
         }
@@ -1179,15 +1182,7 @@ namespace Ogre{
             }
         }
 
-        OGRE_IGNORE_DEPRECATED_BEGIN
-        // Apply the texture aliases
-        if(compiler->getListener())
-        {
-            PreApplyTextureAliasesScriptCompilerEvent locEvt(mMaterial, &mTextureAliases);
-            compiler->_fireEvent(&locEvt, 0);
-        }
-        OGRE_IGNORE_DEPRECATED_END
-        applyTextureAliases(mMaterial, mTextureAliases);
+        applyTextureAliases(compiler, mMaterial, mTextureAliases);
         mTextureAliases.clear();
     }
 

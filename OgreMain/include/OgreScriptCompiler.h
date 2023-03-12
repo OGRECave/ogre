@@ -461,18 +461,6 @@ namespace Ogre
         static ScriptCompilerManager* getSingletonPtr(void);
     };
 
-    /// @deprecated do not use
-    class OGRE_DEPRECATED _OgreExport PreApplyTextureAliasesScriptCompilerEvent : public ScriptCompilerEvent
-    {
-    public:
-        Material *mMaterial;
-        AliasTextureNamePairList *mAliases;
-        static String eventType;
-
-        PreApplyTextureAliasesScriptCompilerEvent(Material *material, AliasTextureNamePairList *aliases)
-            :ScriptCompilerEvent(eventType), mMaterial(material), mAliases(aliases){}
-    };
-
     class _OgreExport ProcessResourceNameScriptCompilerEvent : public ScriptCompilerEvent
     {
     public:
