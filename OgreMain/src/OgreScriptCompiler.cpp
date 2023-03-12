@@ -1613,8 +1613,6 @@ namespace Ogre
     }
 
     //-------------------------------------------------------------------------
-    String PreApplyTextureAliasesScriptCompilerEvent::eventType = "preApplyTextureAliases";
-    //-------------------------------------------------------------------------
     String ProcessResourceNameScriptCompilerEvent::eventType = "processResourceName";
     //-------------------------------------------------------------------------
     String ProcessNameExclusionScriptCompilerEvent::eventType = "processNameExclusion";
