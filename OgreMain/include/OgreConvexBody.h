@@ -150,9 +150,6 @@ namespace Ogre
         */
         _OgreExport friend std::ostream& operator<< ( std::ostream& strm, const ConvexBody& body );
 
-        /// @deprecated use operator<<
-        OGRE_DEPRECATED void logInfo() const;
-
         /// Initialise the internal polygon pool used to minimise allocations
         static void _initialisePool();
         /// Tear down the internal polygon pool used to minimise allocations
