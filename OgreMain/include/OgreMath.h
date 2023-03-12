@@ -654,9 +654,6 @@ namespace Ogre
         @param normalIsOutside Does the normal point outside the volume
         */
         static RayTestResult intersects(const Ray& ray, const std::vector<Plane>& planeList, bool normalIsOutside);
-        /// @deprecated migrate to @ref PlaneList
-        OGRE_DEPRECATED static RayTestResult intersects(const Ray& ray, const std::list<Plane>& planeList,
-                                                             bool normalIsOutside);
 
         /** Sphere / plane intersection test. 
         @remarks NB just do a plane.getDistance(sphere.getCenter()) for more detail!
