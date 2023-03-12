@@ -112,22 +112,6 @@ namespace Ogre {
             mBoneAssignments.end());
     }
     //---------------------------------------------------------------------
-    SubMesh::AliasTextureIterator SubMesh::getAliasTextureIterator(void) const
-    {
-        return AliasTextureIterator(mTextureAliases.begin(),
-            mTextureAliases.end());
-    }
-    //---------------------------------------------------------------------
-    void SubMesh::addTextureAlias(const String& aliasName, const String& textureName)
-    {
-        mTextureAliases[aliasName] = textureName;
-    }
-    //---------------------------------------------------------------------
-    void SubMesh::removeAllTextureAliases(void)
-    {
-        mTextureAliases.clear();
-    }
-    //---------------------------------------------------------------------
     void SubMesh::removeLodLevels(void)
     {
         LODFaceList::iterator lodi, lodend;
@@ -401,8 +385,6 @@ namespace Ogre {
         // Copy any bone assignments
         newSub->mBoneAssignments = this->mBoneAssignments;
         newSub->mBoneAssignmentsOutOfDate = this->mBoneAssignmentsOutOfDate;
-        // Copy texture aliases
-        newSub->mTextureAliases = this->mTextureAliases;
 
         // Copy lod face lists
         newSub->mLodFaceList.reserve(this->mLodFaceList.size());

@@ -185,16 +185,6 @@ namespace Ogre {
         /** Must be called once to compile bone assignments into geometry buffer. */
         void _compileBoneAssignments(void);
 
-        typedef ConstMapIterator<AliasTextureNamePairList> AliasTextureIterator;
-        /// @deprecated do not use
-        AliasTextureIterator getAliasTextureIterator(void) const;
-        /// @deprecated do not use
-        void addTextureAlias(const String& aliasName, const String& textureName);
-        /// @deprecated do not use
-        OGRE_DEPRECATED void removeAllTextureAliases(void);
-        /// @deprecated do not use
-        bool hasTextureAliases(void) const { return !mTextureAliases.empty(); }
-
         /** Get the type of any vertex animation used by dedicated geometry.
         */
         VertexAnimationType getVertexAnimationType(void) const;
@@ -238,9 +228,6 @@ namespace Ogre {
 
         /// the material this SubMesh uses.
         MaterialPtr mMaterial;
-
-        /// paired list of texture aliases and texture names
-        AliasTextureNamePairList mTextureAliases;
 
         VertexBoneAssignmentList mBoneAssignments;
 

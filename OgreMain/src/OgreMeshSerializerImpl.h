@@ -89,7 +89,6 @@ namespace Ogre {
         virtual void writeMesh(const Mesh* pMesh);
         virtual void writeSubMesh(const SubMesh* s);
         virtual void writeSubMeshOperation(const SubMesh* s);
-        virtual void writeSubMeshTextureAliases(const SubMesh* s);
         virtual void writeGeometry(const VertexData* pGeom);
         virtual void writeSkeletonLink(const String& skelName);
         virtual void writeMeshBoneAssignment(const VertexBoneAssignment& assign);
@@ -136,7 +135,6 @@ namespace Ogre {
         virtual size_t calcPoseKeyframeSize(const VertexPoseKeyFrame* kf);
         virtual size_t calcPoseKeyframePoseRefSize(void);
         virtual size_t calcPoseVertexSize(const Pose* pose);
-        virtual size_t calcSubMeshTextureAliasesSize(const SubMesh* pSub);
         virtual size_t calcBoundsInfoSize();
         virtual size_t calcExtremesSize(const Mesh* pMesh);
         virtual size_t calcSubMeshExtremesSize(const SubMesh* s);
@@ -146,7 +144,6 @@ namespace Ogre {
         virtual void readMesh(const DataStreamPtr& stream, Mesh* pMesh, MeshSerializerListener *listener);
         virtual void readSubMesh(const DataStreamPtr& stream, Mesh* pMesh, MeshSerializerListener *listener);
         virtual void readSubMeshOperation(const DataStreamPtr& stream, Mesh* pMesh, SubMesh* sub);
-        virtual void readSubMeshTextureAlias(const DataStreamPtr& stream, Mesh* pMesh, SubMesh* sub);
         virtual void readGeometry(const DataStreamPtr& stream, Mesh* pMesh, VertexData* dest);
         virtual void readGeometryVertexDeclaration(const DataStreamPtr& stream, Mesh* pMesh, VertexData* dest);
         virtual void readGeometryVertexElement(const DataStreamPtr& stream, Mesh* pMesh, VertexData* dest);

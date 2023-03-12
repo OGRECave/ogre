@@ -72,7 +72,6 @@ namespace Ogre {
         void writeGeometry(pugi::xml_node& mParentNode, const VertexData* pData);
         void writeSkeletonLink(pugi::xml_node& mMeshNode, const String& skelName);
         void writeBoneAssignment(pugi::xml_node& mBoneAssignNode, const VertexBoneAssignment* assign);
-        void writeTextureAliases(pugi::xml_node& mSubmeshesNode, const SubMesh* s);
         void writeLodInfo(pugi::xml_node& mMeshNode, const Mesh* pMesh);
         void writeLodUsageManual(pugi::xml_node& usageNode, unsigned short levelNum,
             const MeshLodUsage& usage);
@@ -90,7 +89,6 @@ namespace Ogre {
         void readSkeletonLink(pugi::xml_node& mSkelNode);
         void readBoneAssignments(pugi::xml_node& mBoneAssignmentsNode);
         void readBoneAssignments(pugi::xml_node& mBoneAssignmentsNode, SubMesh* sm);
-        void readTextureAliases(pugi::xml_node& mTextureAliasesNode, SubMesh* sm);
         void readLodInfo(pugi::xml_node&  lodNode);
         void readLodUsageManual(pugi::xml_node& manualNode, unsigned short index);
         void readLodUsageGenerated(pugi::xml_node& genNode, unsigned short index);

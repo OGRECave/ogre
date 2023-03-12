@@ -344,9 +344,6 @@ namespace Ogre {
             writeGeometry(geomNode, s->vertexData);
         }
 
-        // texture aliases
-        writeTextureAliases(subMeshNode, s);
-
         // Bone assignments
         if (mMesh->hasSkeleton())
         {
@@ -643,27 +640,6 @@ namespace Ogre {
 
     }
     //---------------------------------------------------------------------
-    void XMLMeshSerializer::writeTextureAliases(pugi::xml_node& mSubmeshesNode, const SubMesh* subMesh)
-    {
-        if (!subMesh->hasTextureAliases())
-            return; // do nothing
-
-        pugi::xml_node textureAliasesNode = mSubmeshesNode.append_child("textures");
-
-        // use ogre map iterator
-        SubMesh::AliasTextureIterator aliasIterator = subMesh->getAliasTextureIterator();
-
-        while (aliasIterator.hasMoreElements())
-        {
-            pugi::xml_node aliasTextureNode = textureAliasesNode.append_child("texture");
-            // iterator key is alias and value is texture name
-            aliasTextureNode.append_attribute("alias") = aliasIterator.peekNextKey().c_str();
-            aliasTextureNode.append_attribute("name") = aliasIterator.peekNextValue().c_str();
-            aliasIterator.moveNext();
-        }
-
-    }
-    //---------------------------------------------------------------------
     void XMLMeshSerializer::readSubMeshes(pugi::xml_node& mSubmeshesNode)
     {
         LogManager::getSingleton().logMessage("Reading submeshes...");
@@ -847,11 +823,6 @@ namespace Ogre {
                     readGeometry(geomNode, sm->vertexData);
                 }
             }
-
-            // texture aliases
-            pugi::xml_node textureAliasesNode = smElem.child("textures");
-            if(textureAliasesNode)
-                readTextureAliases(textureAliasesNode, sm);
 
             // Bone assignments
             pugi::xml_node boneAssigns = smElem.child("boneassignments");
@@ -1299,25 +1270,6 @@ namespace Ogre {
         }
 
         LogManager::getSingleton().logMessage("Bone assignments done.");
-    }
-    //---------------------------------------------------------------------
-    void XMLMeshSerializer::readTextureAliases(pugi::xml_node& mTextureAliasesNode, SubMesh* subMesh)
-    {
-        LogManager::getSingleton().logMessage("Reading sub mesh texture aliases...");
-
-        // Iterate over all children (texture entries)
-        for (pugi::xml_node& elem : mTextureAliasesNode.children())
-        {
-            // pass alias and texture name to submesh
-            // read attribute "alias"
-            String alias = elem.attribute("alias").value();
-            // read attribute "name"
-            String name = elem.attribute("name").value();
-
-            subMesh->addTextureAlias(alias, name);
-        }
-
-        LogManager::getSingleton().logMessage("Texture aliases done.");
     }
     //---------------------------------------------------------------------
     void XMLMeshSerializer::readSubMeshNames(pugi::xml_node& mMeshNamesNode, Mesh *sm)
