@@ -94,7 +94,6 @@ if(OGRE_BUILD_COMPONENT_BULLET)
     list(APPEND SWIG_COMPONENT_LIBRARIES "OgreBullet")
 endif()
 
-set(CMAKE_WARN_DEPRECATED OFF)
 swig_add_library(OgreJNI LANGUAGE java SOURCES ${SWIG_INPUT_MODULES})
 swig_link_libraries(OgreJNI ${SWIG_COMPONENT_LIBRARIES} ${JNI_LIBRARIES})
 
@@ -102,15 +101,15 @@ if(${Java_FOUND})
 	set(CLASS_OUTPUT_PATH "${PROJECT_BINARY_DIR}/java/classes")
 	set(JAR_NAME "${PROJECT_BINARY_DIR}/java/Ogre-${OGRE_VERSION}.jar")
 	file(MAKE_DIRECTORY ${CLASS_OUTPUT_PATH})
-	add_custom_command(TARGET ${SWIG_MODULE_OgreJNI_REAL_NAME} POST_BUILD
+	add_custom_command(TARGET OgreJNI POST_BUILD
     	COMMAND "${Java_JAVAC_EXECUTABLE}" -d ${CLASS_OUTPUT_PATH} "${PROJECT_BINARY_DIR}/java/src/org/ogre/*.java"
 		COMMAND "${Java_JAR_EXECUTABLE}" cf ${JAR_NAME} -C ${CLASS_OUTPUT_PATH} .
     )
 
     install(FILES ${JAR_NAME} DESTINATION share/java/)
-    ogre_install_target(${SWIG_MODULE_OgreJNI_REAL_NAME} "" FALSE)
+    ogre_install_target(OgreJNI "" FALSE)
 endif()
 
 if(ANDROID)
-	set_target_properties(${SWIG_MODULE_OgreJNI_REAL_NAME} PROPERTIES LINK_FLAGS -s) # strip symbols
+	set_target_properties(OgreJNI PROPERTIES LINK_FLAGS -s) # strip symbols
 endif()
