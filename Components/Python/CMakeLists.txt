@@ -31,9 +31,8 @@ if(OGRE_BUILD_COMPONENT_OVERLAY_IMGUI)
 endif()
 
 macro(ogre_python_module target)
-    set_target_properties(${SWIG_MODULE_${target}_REAL_NAME} PROPERTIES 
-                        DEBUG_POSTFIX "")
-    install(TARGETS ${SWIG_MODULE_${target}_REAL_NAME} LIBRARY DESTINATION ${PYTHON_SITE_PACKAGES})
+    set_target_properties(${target} PROPERTIES DEBUG_POSTFIX "")
+    install(TARGETS ${target} LIBRARY DESTINATION ${PYTHON_SITE_PACKAGES})
     install(FILES ${PROJECT_BINARY_DIR}/Components/Python/${target}.py DESTINATION ${PYTHON_SITE_PACKAGES})
 endmacro()
 
@@ -55,7 +54,6 @@ elseif(UNIX)
     set(PYTHON_LIBRARIES "")
 endif()
 
-set(CMAKE_WARN_DEPRECATED OFF)
 swig_add_library(Ogre LANGUAGE python SOURCES ../../OgreMain/include/Ogre.i)
 swig_link_libraries(Ogre OgreMain ${PYTHON_LIBRARIES})
 ogre_python_module(Ogre)

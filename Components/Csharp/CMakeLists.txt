@@ -78,15 +78,14 @@ if(OGRE_BUILD_COMPONENT_BULLET)
     list(APPEND SWIG_COMPONENT_LIBRARIES "OgreBullet")
 endif()
 
-set(CMAKE_WARN_DEPRECATED OFF)
 swig_add_library(libOgre LANGUAGE csharp SOURCES ${SWIG_INPUT_MODULES})
 SWIG_LINK_LIBRARIES(libOgre ${SWIG_COMPONENT_LIBRARIES})
 
 set(CLI_DEST lib/cli/ogre-sharp-${OGRE_VERSION})
-install(TARGETS ${SWIG_MODULE_libOgre_REAL_NAME} LIBRARY DESTINATION ${CLI_DEST}/)
+install(TARGETS libOgre LIBRARY DESTINATION ${CLI_DEST}/)
 
 # compile C# DLL
-add_custom_command(TARGET ${SWIG_MODULE_libOgre_REAL_NAME} POST_BUILD
+add_custom_command(TARGET libOgre POST_BUILD
     COMMAND "${CMAKE_CSharp_COMPILER}" -target:library -out:Ogre.dll "${PROJECT_BINARY_DIR}/csharp/*.cs"
     WORKING_DIRECTORY "${PROJECT_BINARY_DIR}/csharp/")
 
