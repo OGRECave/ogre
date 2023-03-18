@@ -175,7 +175,7 @@ namespace Ogre
          */
         static ShadowCameraSetupPtr create(Real n = 0.1f, bool useSimpleNOpt = true, Degree angle = Radian(0.451f))
         {
-            return std::make_shared<LiSPSMShadowCameraSetup>();
+            return std::make_shared<LiSPSMShadowCameraSetup>(n, useSimpleNOpt, angle);
         }
 
         /** Returns a LiSPSM shadow camera.
