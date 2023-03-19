@@ -215,7 +215,11 @@ namespace Ogre
 
             if (mIsManual)
             {
+                if (old==LOADSTATE_UNLOADED && mLoader)
+                    mLoader->prepareResource(this);
+
                 preLoadImpl();
+
                 // Load from manual loader
                 if (mLoader)
                 {
