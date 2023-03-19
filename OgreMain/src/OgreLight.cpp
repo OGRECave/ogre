@@ -284,7 +284,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     const String& Light::getMovableType(void) const
     {
-        return LightFactory::FACTORY_TYPE_NAME;
+        return MOT_LIGHT;
     }
 #ifdef OGRE_NODELESS_POSITIONING
     //-----------------------------------------------------------------------
@@ -885,11 +885,11 @@ namespace Ogre {
     }
     //-----------------------------------------------------------------------
     //-----------------------------------------------------------------------
-    String LightFactory::FACTORY_TYPE_NAME = "Light";
+    const String MOT_LIGHT = "Light";
     //-----------------------------------------------------------------------
     const String& LightFactory::getType(void) const
     {
-        return FACTORY_TYPE_NAME;
+        return MOT_LIGHT;
     }
     //-----------------------------------------------------------------------
     MovableObject* LightFactory::createInstanceImpl( const String& name, 

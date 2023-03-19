@@ -273,8 +273,7 @@ void SceneManager::destroyAllCameras(void)
 //-----------------------------------------------------------------------
 Light* SceneManager::createLight(const String& name)
 {
-    return static_cast<Light*>(
-        createMovableObject(name, LightFactory::FACTORY_TYPE_NAME));
+    return static_cast<Light*>(createMovableObject(name, MOT_LIGHT));
 }
 //-----------------------------------------------------------------------
 Light* SceneManager::createLight()
@@ -285,23 +284,7 @@ Light* SceneManager::createLight()
 //-----------------------------------------------------------------------
 Light* SceneManager::getLight(const String& name) const
 {
-    return static_cast<Light*>(
-        getMovableObject(name, LightFactory::FACTORY_TYPE_NAME));
-}
-//-----------------------------------------------------------------------
-bool SceneManager::hasLight(const String& name) const
-{
-    return hasMovableObject(name, LightFactory::FACTORY_TYPE_NAME);
-}
-//-----------------------------------------------------------------------
-void SceneManager::destroyLight(const String& name)
-{
-    destroyMovableObject(name, LightFactory::FACTORY_TYPE_NAME);
-}
-//-----------------------------------------------------------------------
-void SceneManager::destroyAllLights(void)
-{
-    destroyAllMovableObjectsByType(LightFactory::FACTORY_TYPE_NAME);
+    return static_cast<Light*>(getMovableObject(name, MOT_LIGHT));
 }
 //-----------------------------------------------------------------------
 const LightList& SceneManager::_getLightsAffectingFrustum(void) const
@@ -372,10 +355,7 @@ Entity* SceneManager::createEntity(
     NameValuePairList params;
     params["mesh"] = meshName;
     params["resourceGroup"] = groupName;
-    return static_cast<Entity*>(
-        createMovableObject(entityName, EntityFactory::FACTORY_TYPE_NAME, 
-            &params));
-
+    return static_cast<Entity*>(createMovableObject(entityName, MOT_ENTITY, &params));
 }
 //---------------------------------------------------------------------
 Entity* SceneManager::createEntity(const String& entityName, const MeshPtr& pMesh)
@@ -398,39 +378,12 @@ Entity* SceneManager::createEntity(const MeshPtr& pMesh)
 //-----------------------------------------------------------------------
 Entity* SceneManager::getEntity(const String& name) const
 {
-    return static_cast<Entity*>(
-        getMovableObject(name, EntityFactory::FACTORY_TYPE_NAME));
-}
-//-----------------------------------------------------------------------
-bool SceneManager::hasEntity(const String& name) const
-{
-    return hasMovableObject(name, EntityFactory::FACTORY_TYPE_NAME);
-}
-
-//-----------------------------------------------------------------------
-void SceneManager::destroyEntity(const String& name)
-{
-    destroyMovableObject(name, EntityFactory::FACTORY_TYPE_NAME);
-
-}
-
-//-----------------------------------------------------------------------
-void SceneManager::destroyAllEntities(void)
-{
-
-    destroyAllMovableObjectsByType(EntityFactory::FACTORY_TYPE_NAME);
-}
-
-//-----------------------------------------------------------------------
-void SceneManager::destroyAllBillboardSets(void)
-{
-    destroyAllMovableObjectsByType(BillboardSetFactory::FACTORY_TYPE_NAME);
+    return static_cast<Entity*>(getMovableObject(name, MOT_ENTITY));
 }
 //-----------------------------------------------------------------------
 ManualObject* SceneManager::createManualObject(const String& name)
 {
-    return static_cast<ManualObject*>(
-        createMovableObject(name, ManualObjectFactory::FACTORY_TYPE_NAME));
+    return static_cast<ManualObject*>(createMovableObject(name, MOT_MANUAL_OBJECT));
 }
 //-----------------------------------------------------------------------
 ManualObject* SceneManager::createManualObject()
@@ -441,51 +394,28 @@ ManualObject* SceneManager::createManualObject()
 //-----------------------------------------------------------------------
 ManualObject* SceneManager::getManualObject(const String& name) const
 {
-    return static_cast<ManualObject*>(
-        getMovableObject(name, ManualObjectFactory::FACTORY_TYPE_NAME));
-
-}
-//-----------------------------------------------------------------------
-bool SceneManager::hasManualObject(const String& name) const
-{
-    return hasMovableObject(name, ManualObjectFactory::FACTORY_TYPE_NAME);
-
-}
-//-----------------------------------------------------------------------
-void SceneManager::destroyManualObject(const String& name)
-{
-    destroyMovableObject(name, ManualObjectFactory::FACTORY_TYPE_NAME);
-}
-//-----------------------------------------------------------------------
-void SceneManager::destroyAllManualObjects(void)
-{
-    destroyAllMovableObjectsByType(ManualObjectFactory::FACTORY_TYPE_NAME);
+    return static_cast<ManualObject*>(getMovableObject(name, MOT_MANUAL_OBJECT));
 }
 Rectangle2D* SceneManager::createScreenSpaceRect(const String& name, bool includeTextureCoords)
 {
     NameValuePairList params;
     if(includeTextureCoords)
         params["includeTextureCoords"] = "true";
-    return static_cast<Rectangle2D*>(createMovableObject(name, Rectangle2DFactory::FACTORY_TYPE_NAME, &params));
+    return static_cast<Rectangle2D*>(createMovableObject(name, MOT_RECTANGLE2D, &params));
 }
 Rectangle2D* SceneManager::createScreenSpaceRect(bool includeTextureCoords)
 {
     return createScreenSpaceRect(mMovableNameGenerator.generate(), includeTextureCoords);
 }
 
-bool SceneManager::hasScreenSpaceRect(const String& name) const
-{
-    return hasMovableObject(name, Rectangle2DFactory::FACTORY_TYPE_NAME);
-}
 Rectangle2D* SceneManager::getScreenSpaceRect(const String& name) const
 {
-    return static_cast<Rectangle2D*>(getMovableObject(name, Rectangle2DFactory::FACTORY_TYPE_NAME));
+    return static_cast<Rectangle2D*>(getMovableObject(name, MOT_RECTANGLE2D));
 }
 //-----------------------------------------------------------------------
 BillboardChain* SceneManager::createBillboardChain(const String& name)
 {
-    return static_cast<BillboardChain*>(
-        createMovableObject(name, BillboardChainFactory::FACTORY_TYPE_NAME));
+    return static_cast<BillboardChain*>(createMovableObject(name, MOT_BILLBOARD_CHAIN));
 }
 //-----------------------------------------------------------------------
 BillboardChain* SceneManager::createBillboardChain()
@@ -496,30 +426,12 @@ BillboardChain* SceneManager::createBillboardChain()
 //-----------------------------------------------------------------------
 BillboardChain* SceneManager::getBillboardChain(const String& name) const
 {
-    return static_cast<BillboardChain*>(
-        getMovableObject(name, BillboardChainFactory::FACTORY_TYPE_NAME));
-
-}
-//-----------------------------------------------------------------------
-bool SceneManager::hasBillboardChain(const String& name) const
-{
-    return hasMovableObject(name, BillboardChainFactory::FACTORY_TYPE_NAME);
-}
-//-----------------------------------------------------------------------
-void SceneManager::destroyBillboardChain(const String& name)
-{
-    destroyMovableObject(name, BillboardChainFactory::FACTORY_TYPE_NAME);
-}
-//-----------------------------------------------------------------------
-void SceneManager::destroyAllBillboardChains(void)
-{
-    destroyAllMovableObjectsByType(BillboardChainFactory::FACTORY_TYPE_NAME);
+    return static_cast<BillboardChain*>(getMovableObject(name, MOT_BILLBOARD_CHAIN));
 }
 //-----------------------------------------------------------------------
 RibbonTrail* SceneManager::createRibbonTrail(const String& name)
 {
-    return static_cast<RibbonTrail*>(
-        createMovableObject(name, RibbonTrailFactory::FACTORY_TYPE_NAME));
+    return static_cast<RibbonTrail*>(createMovableObject(name, MOT_RIBBON_TRAIL));
 }
 //-----------------------------------------------------------------------
 RibbonTrail* SceneManager::createRibbonTrail()
@@ -530,47 +442,24 @@ RibbonTrail* SceneManager::createRibbonTrail()
 //-----------------------------------------------------------------------
 RibbonTrail* SceneManager::getRibbonTrail(const String& name) const
 {
-    return static_cast<RibbonTrail*>(
-        getMovableObject(name, RibbonTrailFactory::FACTORY_TYPE_NAME));
-
+    return static_cast<RibbonTrail*>(getMovableObject(name, MOT_RIBBON_TRAIL));
 }
 //-----------------------------------------------------------------------
-bool SceneManager::hasRibbonTrail(const String& name) const
-{
-    return hasMovableObject(name, RibbonTrailFactory::FACTORY_TYPE_NAME);
-}
-//-----------------------------------------------------------------------
-void SceneManager::destroyRibbonTrail(const String& name)
-{
-    destroyMovableObject(name, RibbonTrailFactory::FACTORY_TYPE_NAME);
-}
-//-----------------------------------------------------------------------
-void SceneManager::destroyAllRibbonTrails(void)
-{
-    destroyAllMovableObjectsByType(RibbonTrailFactory::FACTORY_TYPE_NAME);
-}
-//-----------------------------------------------------------------------
-ParticleSystem* SceneManager::createParticleSystem(const String& name,
-    const String& templateName)
+ParticleSystem* SceneManager::createParticleSystem(const String& name, const String& templateName)
 {
     NameValuePairList params;
     params["templateName"] = templateName;
-    
-    return static_cast<ParticleSystem*>(
-        createMovableObject(name, ParticleSystemFactory::FACTORY_TYPE_NAME, 
-            &params));
+
+    return static_cast<ParticleSystem*>(createMovableObject(name, MOT_PARTICLE_SYSTEM, &params));
 }
 //-----------------------------------------------------------------------
-ParticleSystem* SceneManager::createParticleSystem(const String& name,
-    size_t quota, const String& group)
+ParticleSystem* SceneManager::createParticleSystem(const String& name, size_t quota, const String& group)
 {
     NameValuePairList params;
     params["quota"] = StringConverter::toString(quota);
     params["resourceGroup"] = group;
-    
-    return static_cast<ParticleSystem*>(
-        createMovableObject(name, ParticleSystemFactory::FACTORY_TYPE_NAME, 
-            &params));
+
+    return static_cast<ParticleSystem*>(createMovableObject(name, MOT_PARTICLE_SYSTEM, &params));
 }
 //-----------------------------------------------------------------------
 ParticleSystem* SceneManager::createParticleSystem(size_t quota, const String& group)
@@ -582,24 +471,7 @@ ParticleSystem* SceneManager::createParticleSystem(size_t quota, const String& g
 //-----------------------------------------------------------------------
 ParticleSystem* SceneManager::getParticleSystem(const String& name) const
 {
-    return static_cast<ParticleSystem*>(
-        getMovableObject(name, ParticleSystemFactory::FACTORY_TYPE_NAME));
-
-}
-//-----------------------------------------------------------------------
-bool SceneManager::hasParticleSystem(const String& name) const
-{
-    return hasMovableObject(name, ParticleSystemFactory::FACTORY_TYPE_NAME);
-}
-//-----------------------------------------------------------------------
-void SceneManager::destroyParticleSystem(const String& name)
-{
-    destroyMovableObject(name, ParticleSystemFactory::FACTORY_TYPE_NAME);
-}
-//-----------------------------------------------------------------------
-void SceneManager::destroyAllParticleSystems(void)
-{
-    destroyAllMovableObjectsByType(ParticleSystemFactory::FACTORY_TYPE_NAME);
+    return static_cast<ParticleSystem*>(getMovableObject(name, MOT_PARTICLE_SYSTEM));
 }
 //-----------------------------------------------------------------------
 void SceneManager::clearScene(void)
@@ -2174,8 +2046,7 @@ BillboardSet* SceneManager::createBillboardSet(const String& name, unsigned int 
 {
     NameValuePairList params;
     params["poolSize"] = StringConverter::toString(poolSize);
-    return static_cast<BillboardSet*>(
-        createMovableObject(name, BillboardSetFactory::FACTORY_TYPE_NAME, &params));
+    return static_cast<BillboardSet*>(createMovableObject(name, MOT_BILLBOARD_SET, &params));
 }
 //-----------------------------------------------------------------------
 BillboardSet* SceneManager::createBillboardSet(unsigned int poolSize)
@@ -2186,18 +2057,7 @@ BillboardSet* SceneManager::createBillboardSet(unsigned int poolSize)
 //-----------------------------------------------------------------------
 BillboardSet* SceneManager::getBillboardSet(const String& name) const
 {
-    return static_cast<BillboardSet*>(
-        getMovableObject(name, BillboardSetFactory::FACTORY_TYPE_NAME));
-}
-//-----------------------------------------------------------------------
-bool SceneManager::hasBillboardSet(const String& name) const
-{
-    return hasMovableObject(name, BillboardSetFactory::FACTORY_TYPE_NAME);
-}
-//-----------------------------------------------------------------------
-void SceneManager::destroyBillboardSet(const String& name)
-{
-    destroyMovableObject(name, BillboardSetFactory::FACTORY_TYPE_NAME);
+    return static_cast<BillboardSet*>(getMovableObject(name, MOT_BILLBOARD_SET));
 }
 //-----------------------------------------------------------------------
 void SceneManager::setDisplaySceneNodes(bool display)
@@ -2633,9 +2493,7 @@ void SceneManager::findLightsAffectingFrustum(const Camera* camera)
 {
     // Basic iteration for this SM
 
-    MovableObjectCollection* lights =
-        getMovableObjectCollection(LightFactory::FACTORY_TYPE_NAME);
-
+    MovableObjectCollection* lights = getMovableObjectCollection(MOT_LIGHT);
 
     {
             OGRE_LOCK_MUTEX(lights->mutex);

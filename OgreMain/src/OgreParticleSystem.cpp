@@ -920,7 +920,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     const String& ParticleSystem::getMovableType(void) const
     {
-        return ParticleSystemFactory::FACTORY_TYPE_NAME;
+        return MOT_PARTICLE_SYSTEM;
     }
     //-----------------------------------------------------------------------
     void ParticleSystem::setDefaultDimensions( Real width, Real height )

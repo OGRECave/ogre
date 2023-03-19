@@ -322,6 +322,16 @@ namespace Ogre
 
     template <typename T, size_t Alignment = OGRE_SIMD_ALIGNMENT>
     using aligned_vector = std::vector<T, AlignedAllocator<T, Alignment>>;
+
+    _OgreExport extern const String MOT_ENTITY;
+    _OgreExport extern const String MOT_LIGHT;
+    _OgreExport extern const String MOT_MANUAL_OBJECT;
+    _OgreExport extern const String MOT_PARTICLE_SYSTEM;
+    _OgreExport extern const String MOT_BILLBOARD_SET;
+    _OgreExport extern const String MOT_BILLBOARD_CHAIN;
+    _OgreExport extern const String MOT_RIBBON_TRAIL;
+    _OgreExport extern const String MOT_RECTANGLE2D;
+    _OgreExport extern const String MOT_STATIC_GEOMETRY;
 }
 
 #endif // __OgrePrerequisites_H__
