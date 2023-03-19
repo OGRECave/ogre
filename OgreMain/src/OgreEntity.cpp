@@ -710,7 +710,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     const String& Entity::getMovableType(void) const
     {
-        return EntityFactory::FACTORY_TYPE_NAME;
+        return MOT_ENTITY;
     }
     //-----------------------------------------------------------------------
     bool Entity::tempVertexAnimBuffersBound(void) const
@@ -2230,11 +2230,11 @@ namespace Ogre {
     }
     //-----------------------------------------------------------------------
     //-----------------------------------------------------------------------
-    String EntityFactory::FACTORY_TYPE_NAME = "Entity";
+    const String MOT_ENTITY = "Entity";
     //-----------------------------------------------------------------------
     const String& EntityFactory::getType(void) const
     {
-        return FACTORY_TYPE_NAME;
+        return MOT_ENTITY;
     }
     //-----------------------------------------------------------------------
     MovableObject* EntityFactory::createInstanceImpl( const String& name,

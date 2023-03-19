@@ -1586,6 +1586,6 @@ namespace Ogre {
         return o;
     }
     //--------------------------------------------------------------------------
-    String StaticGeometryFactory::FACTORY_TYPE_NAME = "StaticGeometry";
+    const String MOT_STATIC_GEOMETRY = "StaticGeometry";
 }
 

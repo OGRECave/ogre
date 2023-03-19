@@ -646,7 +646,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     const String& BillboardChain::getMovableType(void) const
     {
-        return BillboardChainFactory::FACTORY_TYPE_NAME;
+        return MOT_BILLBOARD_CHAIN;
     }
     //-----------------------------------------------------------------------
     void BillboardChain::_updateRenderQueue(RenderQueue* queue)
@@ -703,11 +703,11 @@ namespace Ogre {
     }
     //-----------------------------------------------------------------------
     //-----------------------------------------------------------------------
-    String BillboardChainFactory::FACTORY_TYPE_NAME = "BillboardChain";
+    const String MOT_BILLBOARD_CHAIN = "BillboardChain";
     //-----------------------------------------------------------------------
     const String& BillboardChainFactory::getType(void) const
     {
-        return FACTORY_TYPE_NAME;
+        return MOT_BILLBOARD_CHAIN;
     }
     //-----------------------------------------------------------------------
     MovableObject* BillboardChainFactory::createInstanceImpl( const String& name,

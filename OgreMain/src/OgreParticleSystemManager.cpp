@@ -354,7 +354,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     //-----------------------------------------------------------------------
     //-----------------------------------------------------------------------
-    String ParticleSystemFactory::FACTORY_TYPE_NAME = "ParticleSystem";
+    const String MOT_PARTICLE_SYSTEM = "ParticleSystem";
     //-----------------------------------------------------------------------
     MovableObject* ParticleSystemFactory::createInstanceImpl( const String& name, 
             const NameValuePairList* params)
@@ -395,7 +395,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     const String& ParticleSystemFactory::getType(void) const
     {
-        return FACTORY_TYPE_NAME;
+        return MOT_PARTICLE_SYSTEM;
     }
     //-----------------------------------------------------------------------
 }

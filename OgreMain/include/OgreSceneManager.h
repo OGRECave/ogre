@@ -1196,7 +1196,7 @@ namespace Ogre {
         virtual Light* getLight(const String& name) const;
 
         /// @copydoc hasMovableObject()
-        virtual bool hasLight(const String& name) const;
+        virtual bool hasLight(const String& name) const { return hasMovableObject(name, MOT_LIGHT); }
 
         /** Retrieve a set of clipping planes for a given light. 
         */
@@ -1216,13 +1216,13 @@ namespace Ogre {
 
                 Any pointers held to this light after calling this method will be invalid.
         */
-        virtual void destroyLight(const String& name);
+        virtual void destroyLight(const String& name) { destroyMovableObject(name, MOT_LIGHT); }
 
         /// @overload
         void destroyLight(Light* light) { destroyMovableObject(light); }
         /** Removes and destroys all lights in the scene.
         */
-        virtual void destroyAllLights(void);
+        virtual void destroyAllLights(void) { destroyAllMovableObjectsByType(MOT_LIGHT); }
 
         /** Advanced method to increase the lights dirty counter due to lights having changed.
 
@@ -1398,31 +1398,27 @@ namespace Ogre {
         /// @copydoc getMovableObject()
         Entity* getEntity(const String& name) const;
         /// @copydoc hasMovableObject()
-        bool hasEntity(const String& name) const;
+        bool hasEntity(const String& name) const { return hasMovableObject(name, MOT_ENTITY); }
 
         /** Removes & destroys an Entity from the SceneManager.
             @warning
                 Must only be done if the Entity is not attached
                 to a SceneNode. It may be safer to wait to clear the whole
-                scene if you are unsure use clearScene.
-            @see
-                SceneManager::clearScene
+                scene if you are unsure use @ref clearScene.
         */
         void destroyEntity(MovableObject* ent) { destroyMovableObject(ent); }
 
         /// @overload
-        void destroyEntity(const String& name);
+        void destroyEntity(const String& name) { destroyMovableObject(name, MOT_ENTITY); }
 
         /** Removes & destroys all Entities.
             @warning
                 Again, use caution since no Entity must be referred to
                 elsewhere e.g. attached to a SceneNode otherwise a crash
-                is likely. Use clearScene if you are unsure (it clears SceneNode
+                is likely. Use @ref clearScene if you are unsure (it clears SceneNode
                 entries too.)
-            @see
-                SceneManager::clearScene
         */
-        virtual void destroyAllEntities(void);
+        void destroyAllEntities(void) { destroyAllMovableObjectsByType(MOT_ENTITY); }
         /// @}
 
         /// @name Manual Objects
@@ -1440,16 +1436,16 @@ namespace Ogre {
         /// @copydoc getMovableObject()
         ManualObject* getManualObject(const String& name) const;
         /// @copydoc hasMovableObject()
-        bool hasManualObject(const String& name) const;
+        bool hasManualObject(const String& name) const { return hasMovableObject(name, MOT_MANUAL_OBJECT); }
 
         /** Removes & destroys a ManualObject from the SceneManager.
         */
         void destroyManualObject(MovableObject* obj) {  destroyMovableObject(obj); }
         /// @overload
-        void destroyManualObject(const String& name);
+        void destroyManualObject(const String& name) { return destroyMovableObject(name, MOT_MANUAL_OBJECT); }
         /** Removes & destroys all ManualObjects from the SceneManager.
         */
-        void destroyAllManualObjects(void);
+        void destroyAllManualObjects(void) { destroyAllMovableObjectsByType(MOT_MANUAL_OBJECT); }
         /// @}
 
         /// @name Screenspace Rectangles
@@ -1463,7 +1459,7 @@ namespace Ogre {
         /// @overload
         Rectangle2D* createScreenSpaceRect(bool includeTextureCoords = false);
         /// @copydoc hasMovableObject()
-        bool hasScreenSpaceRect(const String& name) const;
+        bool hasScreenSpaceRect(const String& name) const { return hasMovableObject(name, MOT_RECTANGLE2D); }
         /// @copydoc getMovableObject()
         Rectangle2D* getScreenSpaceRect(const String& name) const;
         /// @}
@@ -1483,16 +1479,16 @@ namespace Ogre {
         /// @copydoc getMovableObject()
         BillboardChain* getBillboardChain(const String& name) const;
         /// @copydoc hasMovableObject()
-        bool hasBillboardChain(const String& name) const;
+        bool hasBillboardChain(const String& name) const { return hasMovableObject(name, MOT_BILLBOARD_CHAIN); }
 
         /** Removes & destroys a BillboardChain from the SceneManager.
         */
         void destroyBillboardChain(MovableObject* obj) { destroyMovableObject(obj); }
         /// @overload
-        void destroyBillboardChain(const String& name);
+        void destroyBillboardChain(const String& name) { destroyMovableObject(name, MOT_BILLBOARD_CHAIN); }
         /** Removes & destroys all BillboardChains from the SceneManager.
         */
-        void destroyAllBillboardChains(void);
+        void destroyAllBillboardChains(void) { destroyAllMovableObjectsByType(MOT_BILLBOARD_CHAIN); }
         /** Create a RibbonTrail, an object which you can use to render
             a linked chain of billboards which follows one or more nodes.
         @param
@@ -1506,16 +1502,16 @@ namespace Ogre {
         /// @copydoc getMovableObject()
         RibbonTrail* getRibbonTrail(const String& name) const;
         /// @copydoc hasMovableObject()
-        bool hasRibbonTrail(const String& name) const;
+        bool hasRibbonTrail(const String& name) const { return hasMovableObject(name, MOT_RIBBON_TRAIL); }
 
         /** Removes & destroys a RibbonTrail from the SceneManager.
         */
         void destroyRibbonTrail(MovableObject* obj) { destroyMovableObject(obj); }
         /// @overload
-        void destroyRibbonTrail(const String& name);
+        void destroyRibbonTrail(const String& name) { destroyMovableObject(name, MOT_RIBBON_TRAIL); }
         /** Removes & destroys all RibbonTrails from the SceneManager.
         */
-        void destroyAllRibbonTrails(void);
+        void destroyAllRibbonTrails(void) { destroyAllMovableObjectsByType(MOT_RIBBON_TRAIL); }
         /// @}
 
         /// @name Particle System
@@ -1571,16 +1567,16 @@ namespace Ogre {
         /// @copydoc getMovableObject()
         ParticleSystem* getParticleSystem(const String& name) const;
         /// @copydoc hasMovableObject()
-        bool hasParticleSystem(const String& name) const;
+        bool hasParticleSystem(const String& name) const { return hasMovableObject(name, MOT_PARTICLE_SYSTEM); }
 
         /** Removes & destroys a ParticleSystem from the SceneManager.
         */
         void destroyParticleSystem(MovableObject* obj) { destroyMovableObject(obj); }
         /// @overload
-        void destroyParticleSystem(const String& name);
+        void destroyParticleSystem(const String& name) { destroyMovableObject(name, MOT_PARTICLE_SYSTEM); }
         /** Removes & destroys all ParticleSystems from the SceneManager.
         */
-        void destroyAllParticleSystems(void);
+        void destroyAllParticleSystems(void) { destroyAllMovableObjectsByType(MOT_PARTICLE_SYSTEM); }
         /// @}
 
         /** Empties the entire scene, including all SceneNodes, Entities, Lights,
@@ -2130,7 +2126,7 @@ namespace Ogre {
         BillboardSet* getBillboardSet(const String& name) const;
         /** Returns whether a billboardset with the given name exists.
         */
-        bool hasBillboardSet(const String& name) const;
+        bool hasBillboardSet(const String& name) const { return hasMovableObject(name, MOT_BILLBOARD_SET); }
 
         /** Removes & destroys an BillboardSet from the SceneManager.
             @warning
@@ -2141,18 +2137,16 @@ namespace Ogre {
         void destroyBillboardSet(MovableObject* set) { destroyMovableObject(set); }
 
         /// @overload
-        void destroyBillboardSet(const String& name);
+        void destroyBillboardSet(const String& name) { destroyMovableObject(name, MOT_BILLBOARD_SET); }
 
         /** Removes & destroys all BillboardSets.
         @warning
         Again, use caution since no BillboardSet must be referred to
         elsewhere e.g. attached to a SceneNode otherwise a crash
-        is likely. Use clearScene if you are unsure (it clears SceneNode
+        is likely. Use @ref clearScene if you are unsure (it clears SceneNode
         entries too.)
-        @see
-        SceneManager::clearScene
         */
-        void destroyAllBillboardSets(void);
+        void destroyAllBillboardSets(void) { destroyAllMovableObjectsByType(MOT_BILLBOARD_SET); }
         /// @}
 
         typedef MapIterator<AnimationList> AnimationIterator;
