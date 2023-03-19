@@ -262,16 +262,17 @@ namespace Ogre {
             
             
             // lecture des tracks
-            int trackIndex = 0;
             pugi::xml_node tracksNode = animElem.child("tracks");
             
             for (pugi::xml_node& trackElem : tracksNode.children("track"))
             {
                 String boneName = trackElem.attribute("bone").value();
+                Bone * bone = skel->getBone(boneName);
+                unsigned short handle = bone->getHandle();
 
                 //LogManager::getSingleton().logMessage("Track sur le bone: " + boneName );
 
-                track = anim->createNodeTrack(trackIndex++,skel->getBone(boneName));
+                track = anim->createNodeTrack(handle, bone);
                 readKeyFrames(track, trackElem.child("keyframes"));
             }
             
