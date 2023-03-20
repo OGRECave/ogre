@@ -1484,12 +1484,6 @@ namespace Ogre {
         bool hasEntity(const String& name) const;
 
         /** Removes & destroys an Entity from the SceneManager.
-            @warning
-                Must only be done if the Entity is not attached
-                to a SceneNode. It may be safer to wait to clear the whole
-                scene if you are unsure use clearScene.
-            @see
-                SceneManager::clearScene
         */
         void destroyEntity(MovableObject* ent) { destroyMovableObject(ent); }
 
@@ -1497,13 +1491,6 @@ namespace Ogre {
         void destroyEntity(const String& name);
 
         /** Removes & destroys all Entities.
-            @warning
-                Again, use caution since no Entity must be referred to
-                elsewhere e.g. attached to a SceneNode otherwise a crash
-                is likely. Use clearScene if you are unsure (it clears SceneNode
-                entries too.)
-            @see
-                SceneManager::clearScene
         */
         virtual void destroyAllEntities(void);
         /// @}
@@ -2216,10 +2203,6 @@ namespace Ogre {
         bool hasBillboardSet(const String& name) const;
 
         /** Removes & destroys an BillboardSet from the SceneManager.
-            @warning
-                Must only be done if the BillboardSet is not attached
-                to a SceneNode. It may be safer to wait to clear the whole
-                scene. If you are unsure, use clearScene.
         */
         void destroyBillboardSet(MovableObject* set) { destroyMovableObject(set); }
 
@@ -2227,13 +2210,6 @@ namespace Ogre {
         void destroyBillboardSet(const String& name);
 
         /** Removes & destroys all BillboardSets.
-        @warning
-        Again, use caution since no BillboardSet must be referred to
-        elsewhere e.g. attached to a SceneNode otherwise a crash
-        is likely. Use clearScene if you are unsure (it clears SceneNode
-        entries too.)
-        @see
-        SceneManager::clearScene
         */
         void destroyAllBillboardSets(void);
         /// @}
