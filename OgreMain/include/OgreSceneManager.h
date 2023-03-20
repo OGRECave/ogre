@@ -1401,10 +1401,6 @@ namespace Ogre {
         bool hasEntity(const String& name) const { return hasMovableObject(name, MOT_ENTITY); }
 
         /** Removes & destroys an Entity from the SceneManager.
-            @warning
-                Must only be done if the Entity is not attached
-                to a SceneNode. It may be safer to wait to clear the whole
-                scene if you are unsure use @ref clearScene.
         */
         void destroyEntity(MovableObject* ent) { destroyMovableObject(ent); }
 
@@ -1412,11 +1408,6 @@ namespace Ogre {
         void destroyEntity(const String& name) { destroyMovableObject(name, MOT_ENTITY); }
 
         /** Removes & destroys all Entities.
-            @warning
-                Again, use caution since no Entity must be referred to
-                elsewhere e.g. attached to a SceneNode otherwise a crash
-                is likely. Use @ref clearScene if you are unsure (it clears SceneNode
-                entries too.)
         */
         void destroyAllEntities(void) { destroyAllMovableObjectsByType(MOT_ENTITY); }
         /// @}
@@ -2129,10 +2120,6 @@ namespace Ogre {
         bool hasBillboardSet(const String& name) const { return hasMovableObject(name, MOT_BILLBOARD_SET); }
 
         /** Removes & destroys an BillboardSet from the SceneManager.
-            @warning
-                Must only be done if the BillboardSet is not attached
-                to a SceneNode. It may be safer to wait to clear the whole
-                scene. If you are unsure, use clearScene.
         */
         void destroyBillboardSet(MovableObject* set) { destroyMovableObject(set); }
 
@@ -2140,11 +2127,6 @@ namespace Ogre {
         void destroyBillboardSet(const String& name) { destroyMovableObject(name, MOT_BILLBOARD_SET); }
 
         /** Removes & destroys all BillboardSets.
-        @warning
-        Again, use caution since no BillboardSet must be referred to
-        elsewhere e.g. attached to a SceneNode otherwise a crash
-        is likely. Use @ref clearScene if you are unsure (it clears SceneNode
-        entries too.)
         */
         void destroyAllBillboardSets(void) { destroyAllMovableObjectsByType(MOT_BILLBOARD_SET); }
         /// @}
