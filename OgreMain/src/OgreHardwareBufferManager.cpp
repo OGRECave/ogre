@@ -196,7 +196,6 @@ namespace Ogre {
             mTempVertexBufferLicenses.find(bufferCopy.get());
         if (i != mTempVertexBufferLicenses.end())
         {
-            printf("Releasing temp vertex buffer\n");
             const VertexBufferLicense& vbl = i->second;
             vbl.licensee->licenseExpired(vbl.buffer.get());
             mFreeTempVertexBufferMap.emplace(vbl.originalBufferPtr, vbl.buffer);
