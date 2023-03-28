@@ -119,9 +119,7 @@ bool TextureAtlasSampler::resolveParameters(ProgramSet* programSet)
 //-----------------------------------------------------------------------
 bool TextureAtlasSampler::resolveDependencies(ProgramSet* programSet)
 {
-    Program* vsProgram = programSet->getCpuProgram(GPT_VERTEX_PROGRAM);
     Program* psProgram = programSet->getCpuProgram(GPT_FRAGMENT_PROGRAM);
-    vsProgram->addDependency(FFP_LIB_COMMON);
     psProgram->addDependency(SGX_LIB_TEXTURE_ATLAS);
 
     return true;

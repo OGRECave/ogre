@@ -155,10 +155,8 @@ bool ShaderExInstancedViewports::resolveDependencies(ProgramSet* programSet)
     Program* vsProgram = programSet->getCpuProgram(GPT_VERTEX_PROGRAM);
     Program* psProgram = programSet->getCpuProgram(GPT_FRAGMENT_PROGRAM);
 
-    vsProgram->addDependency(FFP_LIB_COMMON);
     vsProgram->addDependency(SGX_LIB_INSTANCED_VIEWPORTS);
-    
-    psProgram->addDependency(FFP_LIB_COMMON);
+
     psProgram->addDependency(SGX_LIB_INSTANCED_VIEWPORTS);
     
     return true;
