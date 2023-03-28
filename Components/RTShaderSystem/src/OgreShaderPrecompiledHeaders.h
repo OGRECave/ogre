@@ -96,6 +96,7 @@ THE SOFTWARE.
 #define FFP_FUNC_TRANSFORM                          "FFP_Transform"
 
 // Fixed Function Library: Texturing functions
+#define FFP_LIB_TEXTURING                           "FFPLib_Texturing"
 #define FFP_FUNC_TRANSFORM_TEXCOORD                 "FFP_TransformTexCoord"
 #define FFP_FUNC_GENERATE_TEXCOORD_ENV_NORMAL       "FFP_GenerateTexCoord_EnvMap_Normal"
 #define FFP_FUNC_GENERATE_TEXCOORD_ENV_SPHERE       "FFP_GenerateTexCoord_EnvMap_Sphere"

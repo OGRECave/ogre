@@ -157,10 +157,9 @@ bool RTShaderSRSTexturedFog::resolveDependencies(ProgramSet* programSet)
     Program* vsProgram = programSet->getCpuProgram(GPT_VERTEX_PROGRAM);
     Program* psProgram = programSet->getCpuProgram(GPT_FRAGMENT_PROGRAM);
 
-    vsProgram->addDependency(FFP_LIB_FOG);
+    vsProgram->addDependency("FFPLib_Fog");
 
-    psProgram->addDependency(FFP_LIB_FOG);
-    psProgram->addDependency(FFP_LIB_TEXTURING);
+    psProgram->addDependency("FFPLib_Fog");
     
     return true;
 }
