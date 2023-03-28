@@ -364,10 +364,8 @@ bool RTShaderSRSSegmentedLights::resolveDependencies(ProgramSet* programSet)
     Program* vsProgram = programSet->getCpuProgram(GPT_VERTEX_PROGRAM);
     Program* psProgram = programSet->getCpuProgram(GPT_FRAGMENT_PROGRAM);
 
-    vsProgram->addDependency(FFP_LIB_COMMON);
     vsProgram->addDependency(SL_LIB_PERPIXELLIGHTING);
 
-    psProgram->addDependency(FFP_LIB_COMMON);
     psProgram->addDependency(SL_LIB_PERPIXELLIGHTING);
 
     return true;

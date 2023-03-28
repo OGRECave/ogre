@@ -77,7 +77,6 @@ enum FFPShaderStage
 	FFP_ALPHA_TEST						= 1000
 };
 
-#define FFP_LIB_COMMON    "FFPLib_Common"
 #define FFP_LIB_TEXTURING "FFPLib_Texturing"
 #define FFP_LIB_FOG       "FFPLib_Fog"
 
