@@ -81,6 +81,9 @@ function (TestRenderSystem render_system)
     "-P" # the script that carries this out
       "RunVTests.cmake")
       
+  # Set a longer timeout to avoid timeouts on the riscv hardware
+  set_tests_properties("TestContext_${render_system_nospace}" PROPERTIES TIMEOUT 4500)
+
 endfunction (TestRenderSystem)
 
 # Run the tests once for each rendersystem
