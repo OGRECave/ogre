@@ -2,7 +2,7 @@
 // code adapted from Google Filament
 // SPDX-License-Identifier: Apache-2.0
 
-#define PI 3.14159265359
+#include "RTSLib_Lighting.glsl"
 
 #ifdef OGRE_GLSLES
     // min roughness such that (MIN_PERCEPTUAL_ROUGHNESS^4) > 0 in fp16 (i.e. 2^(-14/4), rounded up)
@@ -40,7 +40,7 @@ float pow5(float x) {
 
 // https://google.github.io/filament/Filament.md.html#materialsystem/diffusebrdf
 float Fd_Lambert() {
-    return 1.0 / PI;
+    return 1.0 / M_PI;
 }
 
 // https://google.github.io/filament/Filament.md.html#materialsystem/specularbrdf/fresnel(specularf)
@@ -99,20 +99,8 @@ float D_GGX(float roughness, float NoH, const vec3 h, const vec3 n) {
 
     float a = NoH * roughness;
     float k = roughness / (oneMinusNoHSquared + a * a);
-    float d = k * k * (1.0 / PI);
+    float d = k * k * (1.0 / M_PI);
     return saturateMediump(d);
-}
-
-float getDistanceAttenuation(const vec3 params, float distance)
-{
-    return 1.0 / (params.x + params.y * distance + params.z * distance * distance);
-}
-
-float getAngleAttenuation(const vec3 params, const vec3 lightDir, const vec3 toLight)
-{
-    float rho		= dot(-lightDir, toLight);
-    float fSpotE	= saturate((rho - params.y) / (params.x - params.y));
-    return pow(fSpotE, params.z);
 }
 
 void evaluateLight(

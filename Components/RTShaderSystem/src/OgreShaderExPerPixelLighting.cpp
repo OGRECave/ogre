@@ -93,9 +93,6 @@ bool PerPixelLighting::resolveGlobalParameters(ProgramSet* programSet)
     // Get derived scene colour.
     mDerivedSceneColour = psProgram->resolveParameter(GpuProgramParameters::ACT_DERIVED_SCENE_COLOUR);
 
-    // Get surface shininess.
-    mSurfaceShininess = psProgram->resolveParameter(GpuProgramParameters::ACT_SURFACE_SHININESS);
-
     mViewNormal = psMain->getLocalParameter(Parameter::SPC_NORMAL_VIEW_SPACE);
 
     if(!mViewNormal)
@@ -122,6 +119,9 @@ bool PerPixelLighting::resolveGlobalParameters(ProgramSet* programSet)
 
     if (mSpecularEnable)
     {
+        // Get surface shininess.
+        mSurfaceShininess = psProgram->resolveParameter(GpuProgramParameters::ACT_SURFACE_SHININESS);
+
         mOutSpecular = psMain->resolveLocalParameter(Parameter::SPC_COLOR_SPECULAR);
 
         mVSInPosition = vsMain->getLocalParameter(Parameter::SPC_POSITION_OBJECT_SPACE);
@@ -146,62 +146,36 @@ bool PerPixelLighting::resolvePerLightParameters(ProgramSet* programSet)
     Function* vsMain = vsProgram->getEntryPointFunction();
     Function* psMain = psProgram->getEntryPointFunction();
 
-    bool needViewPos = false;
-
     // Resolve per light parameters.
-    for (unsigned int i=0; i < mLightParamsList.size(); ++i)
-    {       
-        switch (mLightParamsList[i].mType)
+    mPositions = psProgram->resolveParameter(GpuProgramParameters::ACT_LIGHT_POSITION_VIEW_SPACE_ARRAY, mLightCount);
+    mDirections = psProgram->resolveParameter(GpuProgramParameters::ACT_LIGHT_DIRECTION_VIEW_SPACE_ARRAY, mLightCount);
+    mAttenuatParams = psProgram->resolveParameter(GpuProgramParameters::ACT_LIGHT_ATTENUATION_ARRAY, mLightCount);
+    mSpotParams = psProgram->resolveParameter(GpuProgramParameters::ACT_SPOTLIGHT_PARAMS_ARRAY, mLightCount);
+
+    // Resolve diffuse colour.
+    if ((mTrackVertexColourType & TVC_DIFFUSE) == 0)
+    {
+        mDiffuseColours = psProgram->resolveParameter(GpuProgramParameters::ACT_DERIVED_LIGHT_DIFFUSE_COLOUR_ARRAY, mLightCount);
+    }
+    else
+    {
+        mDiffuseColours = psProgram->resolveParameter(GpuProgramParameters::ACT_LIGHT_DIFFUSE_COLOUR_POWER_SCALED_ARRAY, mLightCount);
+    }
+
+    if (mSpecularEnable)
+    {
+        // Resolve specular colour.
+        if ((mTrackVertexColourType & TVC_SPECULAR) == 0)
         {
-        case Light::LT_DIRECTIONAL:
-            mLightParamsList[i].mDirection = psProgram->resolveParameter(GpuProgramParameters::ACT_LIGHT_DIRECTION_VIEW_SPACE, i);
-            mLightParamsList[i].mPSInDirection = mLightParamsList[i].mDirection;
-            needViewPos = mSpecularEnable || needViewPos;
-            break;
-
-        case Light::LT_POINT:
-            mLightParamsList[i].mPosition = psProgram->resolveParameter(GpuProgramParameters::ACT_LIGHT_POSITION_VIEW_SPACE, i);
-            mLightParamsList[i].mAttenuatParams = psProgram->resolveParameter(GpuProgramParameters::ACT_LIGHT_ATTENUATION, i);
-            
-            needViewPos = true;
-            break;
-
-        case Light::LT_SPOTLIGHT:
-            mLightParamsList[i].mPosition = psProgram->resolveParameter(GpuProgramParameters::ACT_LIGHT_POSITION_VIEW_SPACE, i);
-            mLightParamsList[i].mDirection = psProgram->resolveParameter(GpuProgramParameters::ACT_LIGHT_DIRECTION_VIEW_SPACE, i);
-            mLightParamsList[i].mPSInDirection = mLightParamsList[i].mDirection;
-            mLightParamsList[i].mAttenuatParams = psProgram->resolveParameter(GpuProgramParameters::ACT_LIGHT_ATTENUATION, i);
-            mLightParamsList[i].mSpotParams = psProgram->resolveParameter(GpuProgramParameters::ACT_SPOTLIGHT_PARAMS, i);
-
-            needViewPos = true;
-            break;
-        }
-
-        // Resolve diffuse colour.
-        if ((mTrackVertexColourType & TVC_DIFFUSE) == 0)
-        {
-            mLightParamsList[i].mDiffuseColour = psProgram->resolveParameter(GpuProgramParameters::ACT_DERIVED_LIGHT_DIFFUSE_COLOUR, i);
+            mSpecularColours = psProgram->resolveParameter(GpuProgramParameters::ACT_DERIVED_LIGHT_SPECULAR_COLOUR_ARRAY, mLightCount);
         }
         else
         {
-            mLightParamsList[i].mDiffuseColour = psProgram->resolveParameter(GpuProgramParameters::ACT_LIGHT_DIFFUSE_COLOUR_POWER_SCALED, i);
+            mSpecularColours = psProgram->resolveParameter(GpuProgramParameters::ACT_LIGHT_SPECULAR_COLOUR_POWER_SCALED_ARRAY, mLightCount);
         }   
-
-        if (mSpecularEnable)
-        {
-            // Resolve specular colour.
-            if ((mTrackVertexColourType & TVC_SPECULAR) == 0)
-            {
-                mLightParamsList[i].mSpecularColour = psProgram->resolveParameter(GpuProgramParameters::ACT_DERIVED_LIGHT_SPECULAR_COLOUR, i);
-            }
-            else
-            {
-                mLightParamsList[i].mSpecularColour = psProgram->resolveParameter(GpuProgramParameters::ACT_LIGHT_SPECULAR_COLOUR_POWER_SCALED, i);
-            }   
-        }       
     }
 
-    if (needViewPos)
+    //if (needViewPos)
     {
         mWorldViewMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_WORLDVIEW_MATRIX);
         if(!mVSInPosition)
@@ -231,8 +205,7 @@ bool PerPixelLighting::resolveDependencies(ProgramSet* programSet)
 
     psProgram->addDependency(SGX_LIB_PERPIXELLIGHTING);
 
-    if(mNormalisedEnable)
-        psProgram->addPreprocessorDefines("NORMALISED");
+    addDefines(psProgram);
 
     return true;
 }
@@ -256,14 +229,12 @@ bool PerPixelLighting::addFunctionInvocations(ProgramSet* programSet)
         stage.callFunction("SGX_Flip_Backface_Normal", mFrontFacing, mTargetFlipped, mViewNormal);
 
     // Add per light functions.
-    int i = 0;
-    for (const auto& lp : mLightParamsList)
+    for (int i = 0; i < mLightCount; i++)
     {
-        addIlluminationInvocation(&lp, stage);
+        addIlluminationInvocation(i, stage);
 
         if(i > 0) // directional lights are in front
             continue;
-        i++;
 
         if (auto shadowFactor = psMain->getLocalParameter("lShadowFactor"))
         {
@@ -284,7 +255,7 @@ bool PerPixelLighting::addFunctionInvocations(ProgramSet* programSet)
 void PerPixelLighting::addVSInvocation(const FunctionStageRef& stage)
 {
     // Transform normal in view space.
-    if(!mLightParamsList.empty() && mVSInNormal)
+    if(mLightCount && mVSInNormal)
         stage.callFunction(FFP_FUNC_TRANSFORM, mWorldViewITMatrix, mVSInNormal, mVSOutNormal);
 
     // Transform view space position if need to.

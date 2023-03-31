@@ -68,11 +68,6 @@ public:
     int getExecutionOrder() const override;
 
     /** 
-    @see SubRenderState::updateGpuProgramsParams.
-    */
-    void updateGpuProgramsParams(Renderable* rend, const Pass* pass, const AutoParamDataSource* source, const LightList* pLightList) override;
-
-    /** 
     @see SubRenderState::copyFrom.
     */
     void copyFrom(const SubRenderState& rhs) override;
@@ -97,40 +92,23 @@ public:
 
 // Protected types:
 protected:
-
+    int mLightCount;
     // Per light parameters.
-    struct _OgreRTSSExport LightParams
-    {
-        Light::LightTypes       mType;              // Light type.      
-        // Light position.
-        UniformParameterPtr mPosition;
-        // Light direction.
-        UniformParameterPtr mDirection;
-        // Attenuation parameters.
-        UniformParameterPtr mAttenuatParams;
-        // Spot light parameters.
-        UniformParameterPtr mSpotParams;
-        // Diffuse colour.
-        UniformParameterPtr mDiffuseColour;
-        // Specular colour.
-        UniformParameterPtr mSpecularColour;
+    // Light position.
+    UniformParameterPtr mPositions;
+    // Light direction.
+    UniformParameterPtr mDirections;
+    // Attenuation parameters.
+    UniformParameterPtr mAttenuatParams;
+    // Spot light parameters.
+    UniformParameterPtr mSpotParams;
+    // Diffuse colour.
+    UniformParameterPtr mDiffuseColours;
+    // Specular colour.
+    UniformParameterPtr mSpecularColours;
 
-        // for normal mapping:
-        /// light direction (texture space for normal mapping, else same as mDirection).
-        ParameterPtr mPSInDirection;
+    void addDefines(Program* program);
 
-        /// Vertex shader output vertex position to light position direction (texture space).
-        ParameterPtr mVSOutToLightDir;
-        /// Vertex shader output light direction (texture space).
-        ParameterPtr mVSOutDirection;
-    };
-
-    typedef std::vector<LightParams>               LightParamsList;
-    typedef LightParamsList::iterator               LightParamsIterator;
-    typedef LightParamsList::const_iterator         LightParamsConstIterator;
-
-// Protected methods
-protected:
     /** 
     Set the track per vertex colour type. Ambient, Diffuse, Specular and Emissive lighting components source
     can be the vertex colour component. To establish such a link one should provide the matching flags to this
@@ -142,25 +120,6 @@ protected:
     Return the current track per vertex type.
     */
     TrackVertexColourType getTrackVertexColourType() const { return mTrackVertexColourType; }
-
-    /** 
-    Set the light count per light type that this sub render state will generate.
-    @see ShaderGenerator::setLightCount.
-    */
-    void setLightCount(const Vector3i& lightCount);
-
-    /** 
-    Get the light count per light type that this sub render state will generate.
-    @see ShaderGenerator::getLightCount.
-    */
-    Vector3i getLightCount() const;
-
-    /** 
-    Set the specular component state. If set to true this sub render state will compute a specular
-    lighting component in addition to the diffuse component.
-    @param enable Pass true to enable specular component computation.
-    */
-    void setSpecularEnable(bool enable) { mSpecularEnable = enable; }
 
     /** 
     @see SubRenderState::resolveParameters.
@@ -186,19 +145,15 @@ protected:
     /** 
     Internal method that adds per light illumination component functions invocations.
     */
-    void addIlluminationInvocation(const LightParams* curLightParams, const FunctionStageRef& stage);
+    void addIlluminationInvocation(int i, const FunctionStageRef& stage);
 
 
-// Attributes.
-protected:  
     // Track per vertex colour type.
     TrackVertexColourType mTrackVertexColourType;
     // Specular component enabled/disabled.
     bool mSpecularEnable;
     bool mNormalisedEnable;
     bool mTwoSidedLighting;
-    // Light list.
-    LightParamsList mLightParamsList;
     // World view matrix parameter.
     UniformParameterPtr mWorldViewMatrix;
     // World view matrix inverse transpose parameter.
