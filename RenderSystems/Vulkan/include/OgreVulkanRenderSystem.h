@@ -98,6 +98,7 @@ namespace Ogre
         VkPipelineRasterizationStateCreateInfo rasterState;
         VkPipelineColorBlendStateCreateInfo blendStateCi;
         std::array<VkPipelineShaderStageCreateInfo, GPT_COUNT> shaderStages;
+        std::array<uint32, GPT_COUNT> mBoundGpuPrograms;
 
         // descriptor set layout
         std::vector<VkDescriptorSetLayoutBinding> mDescriptorSetBindings;
