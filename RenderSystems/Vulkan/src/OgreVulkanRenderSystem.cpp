@@ -940,7 +940,7 @@ namespace Ogre
 
         for(uint32 i= 0; i < pipelineCi.stageCount; i++)
         {
-            hash = HashCombine(hash, pipelineCi.pStages[i]);
+            hash = HashCombine(hash, mBoundGpuPrograms[i]);
         }
 
         VkPipeline retVal = mPipelineCache[hash];
@@ -1079,6 +1079,7 @@ namespace Ogre
     {
         auto shader = static_cast<VulkanProgram*>(prg);
         shaderStages[prg->getType()] = shader->getPipelineShaderStageCi();
+        mBoundGpuPrograms[prg->getType()] = prg->_getHash();
     }
     void VulkanRenderSystem::bindGpuProgramParameters( GpuProgramType gptype,
                                                        const GpuProgramParametersPtr& params,
