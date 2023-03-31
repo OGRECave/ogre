@@ -182,6 +182,7 @@ struct _OgreRTSSExport InOut : Operand
 struct _OgreRTSSExport At : Operand
 {
     At(ParameterPtr p) : Operand(p, OPS_IN, OPM_ALL, 1) {}
+    At(int f) : Operand(ParameterFactory::createConstParam(f), OPS_IN, OPM_ALL, 1) {}
 };
 
 /** A class that represents an atomic code section of shader based program function.
