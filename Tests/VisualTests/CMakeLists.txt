@@ -31,16 +31,13 @@ if(ANDROID)
     return()
 endif()
 
-# setup cmake scripts
-configure_file(RunVTests.cmake ${CMAKE_BINARY_DIR}/Tests/VisualTests/RunVTests.cmake COPYONLY)
-
 # build a list of render systems to test
 set(TEST_RENDER_SYSTEMS "")
 
 if (OGRE_BUILD_RENDERSYSTEM_GL)
   list(APPEND TEST_RENDER_SYSTEMS "OpenGL Rendering Subsystem")
 endif ()
-if (OGRE_BUILD_RENDERSYSTEM_GLPLUS)
+if (OGRE_BUILD_RENDERSYSTEM_GL3PLUS)
   list(APPEND TEST_RENDER_SYSTEMS "OpenGL 3+ Rendering Subsystem")
 endif ()
 if (OGRE_BUILD_RENDERSYSTEM_D3D9)
@@ -69,20 +66,15 @@ function (TestRenderSystem render_system)
 
   # Run a CMake script that handles the test context
   add_test(NAME "TestContext_${render_system_nospace}"
-    COMMAND "cmake" 
-    "-D" # executable name
-      "TEST_CONTEXT_EXECUTABLE=$<TARGET_FILE_NAME:TestContext>"
-    "-D" # path to executable (this one's tricker than it seems, since it'll vary based on build config)
-      "TEST_CONTEXT_PATH=$<TARGET_FILE_DIR:TestContext>"
-    "-D" # the render system to use
-      "TEST_CONTEXT_RENDER_SYSTEM=${render_system}"
-    "-D" # the directory where the output file will go
-      "TEST_CONTEXT_RESULT_DIR=${USER_HOME_DIRECTORY}"
-    "-P" # the script that carries this out
-      "RunVTests.cmake")
+    COMMAND $<TARGET_FILE_NAME:TestContext>
+    -rs "${render_system}"  # Pick rendersystem
+    -n "AutomatedTest"      # Name it, so it overwrites itself each run
+    -m "Automated Test - ${render_system}" # A brief comment
+    -o "${USER_HOME_DIRECTORY}"
+    WORKING_DIRECTORY $<TARGET_FILE_DIR:TestContext>)
       
   # Set a longer timeout to avoid timeouts on the riscv hardware
-  set_tests_properties("TestContext_${render_system_nospace}" PROPERTIES TIMEOUT 4500)
+  set_tests_properties("TestContext_${render_system_nospace}" PROPERTIES TIMEOUT 4500 ENVIRONMENT OGRE_ONLY_COMMON_GL_TESTS=1)
 
 endfunction (TestRenderSystem)
 
