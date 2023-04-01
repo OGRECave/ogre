@@ -81,7 +81,7 @@ namespace Ogre
         }
 
         mMainRenderState.reset(new RenderState());
-        mMainRenderState->setLightCount(Vector3i(0, 1, 0));
+        mMainRenderState->setLightCount(1);
         mMainRenderState->addTemplateSubRenderStates(
             {"TerrainTransform", "TerrainSurface", SRS_PER_PIXEL_LIGHTING, SRS_FOG});
     }
@@ -320,7 +320,7 @@ namespace Ogre
                 if (isShadowingEnabled(LOW_LOD, terrain))
                 {
                     // light count needed to enable PSSM3
-                    lod1RenderState->setLightCount(Vector3i(0, 1, 0));
+                    lod1RenderState->setLightCount(1);
                     auto pssm = ShaderGenerator::getSingleton().createSubRenderState(SRS_INTEGRATED_PSSM3);
                     if(mPSSM)
                         pssm->setParameter("split_points", mPSSM->getSplitPoints());
@@ -370,7 +370,7 @@ namespace Ogre
         pass->getUserObjectBindings().setUserAny("Terrain", terrain);
 
         auto compRenderState = std::make_shared<TargetRenderState>();
-        compRenderState->setLightCount(Vector3i(0, 1, 0));
+        compRenderState->setLightCount(1);
 
         try
         {

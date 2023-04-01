@@ -110,7 +110,7 @@ bool IntegratedPSSM3::preAddToRenderState(const RenderState* renderState,
                                          Pass* srcPass, Pass* dstPass)
 {
     if (!srcPass->getParent()->getParent()->getReceiveShadows() ||
-        renderState->getLightCount().isZeroLength())
+        renderState->getLightCount() == 0)
         return false;
 
     mIsD3D9 = ShaderGenerator::getSingleton().getTargetLanguage() == "hlsl" &&

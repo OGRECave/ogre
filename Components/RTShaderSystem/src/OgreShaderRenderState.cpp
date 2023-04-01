@@ -35,9 +35,7 @@ const char* TargetRenderState::UserKey = "TargetRenderState";
 RenderState::RenderState()
 {
     mLightCountAutoUpdate    = true;    
-    mLightCount[0]           = 0;
-    mLightCount[1]           = 0;
-    mLightCount[2]           = 0;   
+    mLightCount              = 0;
 }
 
 //-----------------------------------------------------------------------
@@ -54,18 +52,6 @@ void RenderState::reset()
         ShaderGenerator::getSingleton().destroySubRenderState(it);
     }
     mSubRenderStateList.clear();
-}
-
-//-----------------------------------------------------------------------
-void RenderState::setLightCount(const Vector3i& lightCount)
-{
-    mLightCount = lightCount;
-}
-
-//-----------------------------------------------------------------------
-const Vector3i& RenderState::getLightCount() const
-{
-    return mLightCount;
 }
 
 void RenderState::addTemplateSubRenderStates(const StringVector& srsTypes)

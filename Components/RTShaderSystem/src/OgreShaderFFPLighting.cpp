@@ -292,8 +292,7 @@ bool FFPLighting::preAddToRenderState(const RenderState* renderState, Pass* srcP
 		return false;
 	//! [disable]
 
-	auto lightCount = renderState->getLightCount();
-	mLightCount = lightCount[0] + lightCount[1] + lightCount[2];
+	mLightCount = renderState->getLightCount();
 	
 	setTrackVertexColourType(srcPass->getVertexColourTracking());
 

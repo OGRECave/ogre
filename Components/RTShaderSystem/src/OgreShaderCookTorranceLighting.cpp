@@ -159,8 +159,7 @@ bool CookTorranceLighting::preAddToRenderState(const RenderState* renderState, P
     if (!srcPass->getLightingEnabled())
         return false;
 
-    auto lightsPerType = renderState->getLightCount();
-    mLightCount = lightsPerType[0] + lightsPerType[1] + lightsPerType[2];
+    mLightCount = renderState->getLightCount();
 
     if(mMetalRoughnessMapName.empty())
         return true;
