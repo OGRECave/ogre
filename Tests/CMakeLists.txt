@@ -82,6 +82,10 @@ if (OGRE_BUILD_TESTS)
     ogre_install_target(Test_Ogre "" FALSE)
     target_link_libraries(Test_Ogre OgreBites Codec_STBI ${OGRE_LIBRARIES} GTest::gtest)
     
+    add_test(NAME Test_Ogre
+        COMMAND $<TARGET_FILE_NAME:Test_Ogre>
+        WORKING_DIRECTORY $<TARGET_FILE_DIR:Test_Ogre>)
+
     if(ANDROID)
         set_target_properties(Test_Ogre PROPERTIES LINK_FLAGS -pie)
     endif()
