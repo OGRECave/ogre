@@ -180,7 +180,7 @@ void SGScriptTranslator::translatePass(ScriptCompiler* compiler, const AbstractN
                             RenderState* renderState = shaderGenerator->getRenderState(
                                 dstTechniqueSchemeName, *material, pass->getIndex());
 
-                            renderState->setLightCount(Vector3i(lightCount.data()));
+                            renderState->setLightCount(lightCount[0] + lightCount[1] + lightCount[2]);
                             renderState->setLightCountAutoUpdate(false);
                         }
                         else

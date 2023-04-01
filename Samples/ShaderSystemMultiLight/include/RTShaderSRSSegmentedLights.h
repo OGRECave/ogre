@@ -114,13 +114,8 @@ protected:
     Set the light count per light type that this sub render state will generate.
     @see ShaderGenerator::setLightCount.
     */
-    void setLightCount(const int lightCount[3]);
+    void setLightCount(int lightCount);
 
-    /** 
-    Get the light count per light type that this sub render state will generate.
-    @see ShaderGenerator::getLightCount.
-    */
-    void getLightCount(int lightCount[3]) const;
     /** 
     Set the specular component state. If set to true this sub render state will compute a specular
     lighting component in addition to the diffuse component.

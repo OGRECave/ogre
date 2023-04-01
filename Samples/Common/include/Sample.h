@@ -279,7 +279,7 @@ namespace OgreBites
             mShaderGenerator->addSceneManager(mSceneMgr);
             auto mainRenderState = mShaderGenerator->getRenderState(Ogre::MSN_SHADERGEN);
             // reset global light state
-            mainRenderState->setLightCount(Ogre::Vector3i(0));
+            mainRenderState->setLightCount(0);
             mainRenderState->setLightCountAutoUpdate(true);
 #endif
             if(mOverlaySystem)

@@ -1380,7 +1380,7 @@ void ShaderGenerator::SGPass::buildTargetRenderState()
     auto targetRenderState = std::make_shared<TargetRenderState>();
 
     // Set light properties.
-    Vector3i lightCount(0, 0, 0);
+    int32 lightCount = 0;
 
     // Use light count definitions of the custom render state if exists.
     if (mCustomRenderState != NULL && mCustomRenderState->getLightCountAutoUpdate() == false)
@@ -1758,18 +1758,11 @@ void ShaderGenerator::SGScheme::synchronizeWithLightSettings()
 
         const LightList& lightList =  sceneManager->_getLightsAffectingFrustum();
         
-        Vector3i sceneLightCount(0, 0, 0);
-        for (unsigned int i=0; i < lightList.size(); ++i)
-        {
-            sceneLightCount[lightList[i]->getType()]++;
-        }
-        
-        auto currLightCount = mRenderState->getLightCount();
-
-        auto lightDiff = currLightCount - sceneLightCount;
+        int32 sceneLightCount = lightList.size();
+        int32 currLightCount = mRenderState->getLightCount();
 
         // Case new light appeared -> invalidate. But dont invalidate the other way as shader compilation is costly.
-        if (!(Vector3i(-1) < lightDiff))
+        if ((currLightCount - sceneLightCount) < 0)
         {
             LogManager::getSingleton().stream(LML_TRIVIAL)
                 << "RTSS: invalidating scheme " << mName << " - lights changed " << currLightCount

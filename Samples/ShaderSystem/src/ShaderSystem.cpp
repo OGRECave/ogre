@@ -338,11 +338,6 @@ void Sample_ShaderSystem::setupContent()
     createDirectionalLight();
     createPointLight();
     createSpotLight();
-
-    RenderState* schemRenderState = mShaderGenerator->getRenderState(MSN_SHADERGEN);
-
-    // Take responsibility for updating the light count manually.
-    schemRenderState->setLightCountAutoUpdate(false);
     
     setupUI();
 
@@ -831,33 +826,7 @@ void Sample_ShaderSystem::updateLightState(const String& lightName, bool visible
         else
         {
             mSceneMgr->getLight(lightName)->setVisible(visible);
-        }   
-
-        RenderState* schemRenderState = mShaderGenerator->getRenderState(MSN_SHADERGEN);
-        
-        Vector3i lightCount(0, 0, 0);
-
-        // Update point light count.
-        if (mSceneMgr->getLight(POINT_LIGHT_NAME)->isVisible())
-        {
-            lightCount[0] = 1;
         }
-
-        // Update directional light count.
-        if (mSceneMgr->getLight(DIRECTIONAL_LIGHT_NAME)->isVisible())
-        {
-            lightCount[1] = 1;
-        }
-
-        // Update spot light count.
-        if (mSceneMgr->getLight(SPOT_LIGHT_NAME)->isVisible())
-        {
-            lightCount[2] = 1;
-        }
-
-        // Update the scheme light count.
-        schemRenderState->setLightCount(lightCount);
-        
 
         // Invalidate the scheme in order to re-generate all shaders based technique related to this scheme.
         mShaderGenerator->invalidateScheme(Ogre::MSN_SHADERGEN);

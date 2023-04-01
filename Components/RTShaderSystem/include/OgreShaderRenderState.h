@@ -82,23 +82,14 @@ public:
     SubRenderState* getSubRenderState(const String& type) const;
 
     /** 
-    Set the light count per light type.
-    @param 
-    lightCount The light count per type.
-    lightCount[0] defines the point light count.
-    lightCount[1] defines the directional light count.
-    lightCount[2] defines the spot light count.
+    Set the maximal light count to consider
     */
-    void setLightCount(const Vector3i& lightCount);
+    void setLightCount(int32 lightCount) { mLightCount = lightCount;}
 
     /** 
-    Get the light count per light type.
-
-    lightCount[0] defines the point light count.
-    lightCount[1] defines the directional light count.
-    lightCount[2] defines the spot light count.
+    Get the maximal light count to consider
     */
-    const Vector3i& getLightCount() const;
+    int32 getLightCount() const { return mLightCount; }
 
     /** 
     Set the light count auto update state.
@@ -122,7 +113,7 @@ protected:
     // The sub render states list.  
     SubRenderStateList mSubRenderStateList;
     // The light count per light type definition.
-    Vector3i mLightCount;
+    int32 mLightCount;
     // True if light count was explicitly set.
     bool mLightCountAutoUpdate;
 
