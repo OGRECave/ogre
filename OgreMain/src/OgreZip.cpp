@@ -206,12 +206,10 @@ namespace {
         OGRE_LOCK_AUTO_MUTEX;
         auto ret = std::make_shared<StringVector>();
 
-        FileInfoList::const_iterator i, iend;
-        iend = mFileList.end();
-        for (i = mFileList.begin(); i != iend; ++i)
-            if ((dirs == (i->compressedSize == size_t (-1))) &&
-                (recursive || i->path.empty()))
-                ret->push_back(i->filename);
+        for (auto& f : mFileList)
+            if ((dirs == (f.compressedSize == size_t (-1))) &&
+                (recursive || f.path.empty()))
+                ret->push_back(f.filename);
 
         return ret;
     }
@@ -220,12 +218,10 @@ namespace {
     {
         OGRE_LOCK_AUTO_MUTEX;
         auto ret = std::make_shared<FileInfoList>();
-        FileInfoList::const_iterator i, iend;
-        iend = mFileList.end();
-        for (i = mFileList.begin(); i != iend; ++i)
-            if ((dirs == (i->compressedSize == size_t (-1))) &&
-                (recursive || i->path.empty()))
-                ret->push_back(*i);
+        for (auto& f : mFileList)
+            if ((dirs == (f.compressedSize == size_t (-1))) &&
+                (recursive || f.path.empty()))
+                ret->push_back(f);
 
         return ret;
     }
@@ -239,14 +235,12 @@ namespace {
                           (pattern.find ('\\') != String::npos);
         bool wildCard = pattern.find('*') != String::npos;
             
-        FileInfoList::const_iterator i, iend;
-        iend = mFileList.end();
-        for (i = mFileList.begin(); i != iend; ++i)
-            if ((dirs == (i->compressedSize == size_t (-1))) &&
+        for (auto& f : mFileList)
+            if ((dirs == (f.compressedSize == size_t (-1))) &&
                 (recursive || full_match || wildCard))
                 // Check basename matches pattern (zip is case insensitive)
-                if (StringUtil::match(full_match ? i->filename : i->basename, pattern, false))
-                    ret->push_back(i->filename);
+                if (StringUtil::match(full_match ? f.filename : f.basename, pattern, false))
+                    ret->push_back(f.filename);
 
         return ret;
     }
@@ -261,14 +255,12 @@ namespace {
                           (pattern.find ('\\') != String::npos);
         bool wildCard = pattern.find('*') != String::npos;
 
-        FileInfoList::const_iterator i, iend;
-        iend = mFileList.end();
-        for (i = mFileList.begin(); i != iend; ++i)
-            if ((dirs == (i->compressedSize == size_t (-1))) &&
+        for (auto& f : mFileList)
+            if ((dirs == (f.compressedSize == size_t (-1))) &&
                 (recursive || full_match || wildCard))
                 // Check name matches pattern (zip is case insensitive)
-                if (StringUtil::match(full_match ? i->filename : i->basename, pattern, false))
-                    ret->push_back(*i);
+                if (StringUtil::match(full_match ? f.filename : f.basename, pattern, false))
+                    ret->push_back(f);
 
         return ret;
     }
