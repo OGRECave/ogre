@@ -42,10 +42,11 @@ namespace Ogre
         {
         case SO_FLAT:
             return D3DSHADE_FLAT;
+        case SO_PHONG:
+            // phong is not supported in D3D9
+            OGRE_FALLTHROUGH;
         case SO_GOURAUD:
             return D3DSHADE_GOURAUD;
-        case SO_PHONG:
-            return D3DSHADE_PHONG;
         }
         return 0;
     }
