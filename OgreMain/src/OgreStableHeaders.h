@@ -128,6 +128,10 @@ extern "C" {
 #define OGRE_IGNORE_DEPRECATED_END _Pragma("GCC diagnostic pop")
 #endif
 
+#ifndef OGRE_SERIALIZER_VALIDATE_CHUNKSIZE
+#define OGRE_SERIALIZER_VALIDATE_CHUNKSIZE OGRE_DEBUG_MODE
+#endif
+
 namespace Ogre
 {
 void logMaterialNotFound(const String& name, const String& groupName, const String& destType, const String& destName,
