@@ -76,7 +76,7 @@ namespace Ogre {
         if (!HardwareBufferManager::getSingletonPtr()) // LogManager might be also gone already
         {
             printf("ERROR: '%s' is being destroyed after HardwareBufferManager. This is a bug in user code.\n", mName.c_str());
-            OgreAssert(false,  "Mesh destroyed after HardwareBufferManager"); // assert in debug mode
+            OgreAssertDbg(false,  "Mesh destroyed after HardwareBufferManager"); // assert in debug mode
             return; // try not to crash
         }
         // have to call this here reather than in Resource destructor
