@@ -44,6 +44,8 @@ jobs:
         # validate XMLConverter output
         build/bin/OgreXMLConverter Samples/Media/models/jaiqua.mesh && build/bin/OgreXMLConverter Samples/Media/models/jaiqua.skeleton
         python3 Tools/XMLConverter/docs/validate.py Samples/Media/models/jaiqua.mesh.xml
+        # MeshUpgrader does not crash
+        build/bin/OgreMeshUpgrader Samples/Media/models/jaiqua.mesh
         # validate DotScene DTD
         python3 PlugIns/DotScene/misc/validate.py PlugIns/DotScene/misc/example.scene
         # check whitespace
