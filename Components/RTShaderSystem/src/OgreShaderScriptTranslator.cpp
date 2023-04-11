@@ -167,26 +167,26 @@ void SGScriptTranslator::translatePass(ScriptCompiler* compiler, const AbstractN
                 // Handle light count property.
                 if (prop->name == "light_count")
                 {
-                    if (prop->values.size() != 3)
+                    if (prop->values.size() == 3 || prop->values.size() == 1)
                     {
-                        compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+                        std::vector<int> lightCount;
+                        getVector(prop->values.begin(), prop->values.end(), lightCount, prop->values.size());
+                        int total = 0;
+                        for(auto & j : lightCount)
+                            total += j;
+                        shaderGenerator->createScheme(dstTechniqueSchemeName);
+                        auto renderState =
+                            shaderGenerator->getRenderState(dstTechniqueSchemeName, *material, pass->getIndex());
+
+                        renderState->setLightCount(total);
+                        renderState->setLightCountAutoUpdate(false);
+
+                        if(prop->values.size() == 3)
+                            compiler->addError(ScriptCompiler::CE_DEPRECATEDSYMBOL, prop->file, prop->line, "light_count only takes 1 parameter now");
                     }
                     else
                     {
-                        std::vector<int> lightCount;
-                        if (getVector(prop->values.begin(), prop->values.end(), lightCount, 3))
-                        {
-                            shaderGenerator->createScheme(dstTechniqueSchemeName);
-                            RenderState* renderState = shaderGenerator->getRenderState(
-                                dstTechniqueSchemeName, *material, pass->getIndex());
-
-                            renderState->setLightCount(lightCount[0] + lightCount[1] + lightCount[2]);
-                            renderState->setLightCountAutoUpdate(false);
-                        }
-                        else
-                        {
-                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
-                        }
+                        compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
                     }                   
                 }
 

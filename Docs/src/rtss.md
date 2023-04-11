@@ -170,9 +170,9 @@ Example: `fog_stage ffp per_pixel`
 
 ## light_count
 
-Override dynamic light count. Allows to customize which lights the RTSS will consider.
+Override dynamic light count. Fix the number of lights to be used in the shader. Avoids shader recompilation when the number of lights changes.
 @par
-Format: `light_count <pointLights> <directionalLights> <spotLights>`
+Format: `light_count <count>`
 
 <a name="triplanarTexturing"></a>
 

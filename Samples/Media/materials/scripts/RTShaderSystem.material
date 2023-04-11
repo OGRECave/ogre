@@ -92,7 +92,7 @@ material RTSS/NormalMapping_MultiPass
  				// ambient lighting shaders.
  				// If not doing that the RTSS it will use the current scene light count
  				// which will result in full lighting calculation in this pass.
-				light_count 0 0 0
+				light_count 0
 			}
 		}
 		
