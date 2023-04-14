@@ -661,9 +661,9 @@ namespace Ogre {
     //-----------------------------------------------------------------------------
     const Matrix4& AutoParamDataSource::getTextureViewProjMatrix(size_t index) const
     {
-        if (index < OGRE_MAX_SIMULTANEOUS_LIGHTS)
+        if (index < OGRE_MAX_SIMULTANEOUS_LIGHTS && mCurrentTextureProjector[index])
         {
-            if (mTextureViewProjMatrixDirty[index] && mCurrentTextureProjector[index])
+            if (mTextureViewProjMatrixDirty[index])
             {
                 if (mCameraRelativeRendering)
                 {
@@ -694,9 +694,9 @@ namespace Ogre {
     //-----------------------------------------------------------------------------
     const Matrix4& AutoParamDataSource::getTextureWorldViewProjMatrix(size_t index) const
     {
-        if (index < OGRE_MAX_SIMULTANEOUS_LIGHTS)
+        if (index < OGRE_MAX_SIMULTANEOUS_LIGHTS && mCurrentTextureProjector[index])
         {
-            if (mTextureWorldViewProjMatrixDirty[index] && mCurrentTextureProjector[index])
+            if (mTextureWorldViewProjMatrixDirty[index])
             {
                 mTextureWorldViewProjMatrix[index] = 
                     getTextureViewProjMatrix(index) * getWorldMatrix();
