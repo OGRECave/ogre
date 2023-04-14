@@ -19,11 +19,11 @@ list(APPEND HEADER_FILES
 file(GLOB SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
 
 if(OGRE_BUILD_COMPONENT_OVERLAY_IMGUI)
-  set(IMGUI_DIR "${PROJECT_BINARY_DIR}/imgui-1.89.4" CACHE PATH "")
+  set(IMGUI_DIR "${PROJECT_BINARY_DIR}/imgui-1.89.5" CACHE PATH "")
   if(NOT EXISTS ${IMGUI_DIR})
     message(STATUS "Downloading imgui")
     file(DOWNLOAD
-        https://github.com/ocornut/imgui/archive/v1.89.4.tar.gz
+        https://github.com/ocornut/imgui/archive/v1.89.5.tar.gz
         ${PROJECT_BINARY_DIR}/imgui.tar.gz)
     execute_process(COMMAND ${CMAKE_COMMAND}
         -E tar xf imgui.tar.gz WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
