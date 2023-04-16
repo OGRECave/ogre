@@ -2652,7 +2652,7 @@ namespace Ogre {
 
         // Disable textures
         _disableTextureUnitsFrom(0);
-	    
+
         // It's ready for switching
         if (mCurrentContext!=context)
         {
