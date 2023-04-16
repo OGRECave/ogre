@@ -2652,7 +2652,7 @@ namespace Ogre {
 
         // Disable textures
         _disableTextureUnitsFrom(0);
-
+	    
         // It's ready for switching
         if (mCurrentContext!=context)
         {
@@ -2660,11 +2660,11 @@ namespace Ogre {
             // NSGLContext::makeCurrentContext does not flush automatically. everybody else does.
             glFlushRenderAPPLE();
 #endif
-	    if (mCurrentContext)
+            if (mCurrentContext)
                 mCurrentContext->endCurrent();
             mCurrentContext = context;
         }
-	    
+
         if (mCurrentContext)
         {
             mCurrentContext->setCurrent();
