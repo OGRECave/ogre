@@ -2660,18 +2660,23 @@ namespace Ogre {
             // NSGLContext::makeCurrentContext does not flush automatically. everybody else does.
             glFlushRenderAPPLE();
 #endif
-            mCurrentContext->endCurrent();
+            if (mCurrentContext)
+                mCurrentContext->endCurrent();
             mCurrentContext = context;
         }
-        mCurrentContext->setCurrent();
 
-        mStateCacheManager = mCurrentContext->createOrRetrieveStateCacheManager<GLStateCacheManager>();
-
-        // Check if the context has already done one-time initialisation
-        if(!mCurrentContext->getInitialized())
+        if (mCurrentContext)
         {
-            _oneTimeContextInitialization();
-            mCurrentContext->setInitialized();
+            mCurrentContext->setCurrent();
+
+            mStateCacheManager = mCurrentContext->createOrRetrieveStateCacheManager<GLStateCacheManager>();
+
+            // Check if the context has already done one-time initialisation
+            if(!mCurrentContext->getInitialized())
+            {
+                _oneTimeContextInitialization();
+                mCurrentContext->setInitialized();
+            }
         }
 
         // Rebind GPU programs to new context
