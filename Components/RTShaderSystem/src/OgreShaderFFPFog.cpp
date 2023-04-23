@@ -111,14 +111,15 @@ bool FFPFog::resolveDependencies(ProgramSet* programSet)
     Program* vsProgram = programSet->getCpuProgram(GPT_VERTEX_PROGRAM);
     Program* psProgram = programSet->getCpuProgram(GPT_FRAGMENT_PROGRAM);
 
-    vsProgram->addDependency(FFP_LIB_FOG);
-
     // Per pixel fog.
     if (mCalcMode == CM_PER_PIXEL)
     {
         psProgram->addDependency(FFP_LIB_FOG);
-
-    }   
+    }
+    else
+    {
+        vsProgram->addDependency(FFP_LIB_FOG);
+    }
 
     return true;
 }
@@ -126,58 +127,32 @@ bool FFPFog::resolveDependencies(ProgramSet* programSet)
 //-----------------------------------------------------------------------
 bool FFPFog::addFunctionInvocations(ProgramSet* programSet)
 {
+    if (mFogMode == FOG_NONE)
+        return true;
+
     Program* vsProgram = programSet->getCpuProgram(GPT_VERTEX_PROGRAM);
     Program* psProgram = programSet->getCpuProgram(GPT_FRAGMENT_PROGRAM);
     Function* vsMain = vsProgram->getEntryPointFunction();
     Function* psMain = psProgram->getEntryPointFunction();
-
-    const char* fogfunc = NULL;
     
     // Per pixel fog.
     if (mCalcMode == CM_PER_PIXEL)
     {
         vsMain->getStage(FFP_VS_FOG).assign(In(mVSOutPos).w(), mVSOutDepth);
+        psProgram->addPreprocessorDefines(StringUtil::format("FOG_TYPE=%d", mFogMode));
 
-        switch (mFogMode)
-        {
-        case FOG_LINEAR:
-            fogfunc = FFP_FUNC_PIXELFOG_LINEAR;
-            break;
-        case FOG_EXP:
-            fogfunc = FFP_FUNC_PIXELFOG_EXP;
-            break;
-        case FOG_EXP2:
-            fogfunc = FFP_FUNC_PIXELFOG_EXP2;
-            break;
-        case FOG_NONE:
-            return true;
-        }
         psMain->getStage(FFP_PS_FOG)
-            .callFunction(fogfunc,
+            .callFunction("FFP_PixelFog",
                           {In(mPSInDepth), In(mFogParams), In(mFogColour), In(mPSOutDiffuse), Out(mPSOutDiffuse)});
     }
 
     // Per vertex fog.
     else
     {
-        switch (mFogMode)
-        {
-        case FOG_LINEAR:
-            fogfunc = FFP_FUNC_VERTEXFOG_LINEAR;
-            break;
-        case FOG_EXP:
-            fogfunc = FFP_FUNC_VERTEXFOG_EXP;
-            break;
-        case FOG_EXP2:
-            fogfunc = FFP_FUNC_VERTEXFOG_EXP2;
-            break;
-        case FOG_NONE:
-            return true;
-        }
-
+        vsProgram->addPreprocessorDefines(StringUtil::format("FOG_TYPE=%d", mFogMode));
         //! [func_invoc]
         auto vsFogStage = vsMain->getStage(FFP_VS_FOG);
-        vsFogStage.callFunction(fogfunc, mVSOutPos, mFogParams, mVSOutFogFactor);
+        vsFogStage.callFunction("FFP_FogFactor", In(mVSOutPos).w(), mFogParams, mVSOutFogFactor);
         //! [func_invoc]
         psMain->getStage(FFP_VS_FOG).callBuiltin("mix", mFogColour, mPSOutDiffuse, mPSInFogFactor, mPSOutDiffuse);
     }
