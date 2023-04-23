@@ -182,23 +182,10 @@ bool RTShaderSRSTexturedFog::addFunctionInvocations(ProgramSet* programSet)
     auto psStage = psMain->getStage(FFP_PS_FOG);
     psStage.sampleTexture(mBackgroundTextureSampler, mPSInPosView, mFogColour);
 
-    const char* fogFunc = NULL;
-    switch (mFogMode)
-    {
-    case FOG_LINEAR:
-        fogFunc = "FFP_PixelFog_Linear";
-        break;
-    case FOG_EXP:
-        fogFunc = "FFP_PixelFog_Exp";
-        break;
-    case FOG_EXP2:
-        fogFunc = "FFP_PixelFog_Exp2";
-        break;
-    case FOG_NONE:
-       break;
-    }
+    psProgram->addPreprocessorDefines(StringUtil::format("FOG_TYPE=%d", mFogMode));
+    vsProgram->addPreprocessorDefines(StringUtil::format("FOG_TYPE=%d", mFogMode));
 
-    psStage.callFunction(fogFunc,
+    psStage.callFunction("FFP_PixelFog",
                          {In(mPSInDepth), In(mFogParams), In(mFogColour), In(mPSOutDiffuse), Out(mPSOutDiffuse)});
     return true;
 }

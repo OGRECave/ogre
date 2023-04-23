@@ -107,13 +107,6 @@ THE SOFTWARE.
 
 // Fixed Function Library: Fog functions
 #define FFP_LIB_FOG                                 "FFPLib_Fog"
-#define FFP_FUNC_VERTEXFOG_LINEAR                   "FFP_VertexFog_Linear"
-#define FFP_FUNC_VERTEXFOG_EXP                      "FFP_VertexFog_Exp"
-#define FFP_FUNC_VERTEXFOG_EXP2                     "FFP_VertexFog_Exp2"
-#define FFP_FUNC_PIXELFOG_DEPTH                     "FFP_PixelFog_Depth"
-#define FFP_FUNC_PIXELFOG_LINEAR                    "FFP_PixelFog_Linear"
-#define FFP_FUNC_PIXELFOG_EXP                       "FFP_PixelFog_Exp"
-#define FFP_FUNC_PIXELFOG_EXP2                      "FFP_PixelFog_Exp2"
 
 // Fixed Function Library: Alpha Test
 #define FFP_LIB_ALPHA_TEST							"FFPLib_AlphaTest"
