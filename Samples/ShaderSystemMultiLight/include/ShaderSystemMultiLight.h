@@ -73,7 +73,7 @@ public:
 
         RTShader::RenderState* pMainRenderState = 
             RTShader::ShaderGenerator::getSingleton().createOrRetrieveRenderState(MSN_SHADERGEN).first;
-        pMainRenderState->reset();
+        pMainRenderState->resetToBuiltinSubRenderStates();
         
         if (mSRSSegLightFactory)
         {
@@ -161,7 +161,7 @@ protected:
 
         RTShader::RenderState* pMainRenderState = 
             mGen->createOrRetrieveRenderState(MSN_SHADERGEN).first;
-        pMainRenderState->reset();
+        pMainRenderState->resetToBuiltinSubRenderStates();
 
         // If we are using segmented lighting, no auto light update required. (prevent constant invalidation)
         pMainRenderState->setLightCountAutoUpdate(false);

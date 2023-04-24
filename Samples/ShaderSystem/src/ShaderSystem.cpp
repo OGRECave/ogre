@@ -80,7 +80,7 @@ Sample_ShaderSystem::~Sample_ShaderSystem()
 
 void Sample_ShaderSystem::_shutdown()
 {
-    mShaderGenerator->getRenderState(MSN_SHADERGEN)->reset();
+    mShaderGenerator->getRenderState(MSN_SHADERGEN)->resetToBuiltinSubRenderStates();
     destroyInstancedViewports();
     SdkSample::_shutdown();
 }
@@ -488,11 +488,6 @@ void Sample_ShaderSystem::setPerPixelFogEnable( bool enable )
         RenderState* schemRenderState = mShaderGenerator->getRenderState(MSN_SHADERGEN);
         // Search for the fog sub state.
         auto fogSubRenderState = schemRenderState->getSubRenderState(SRS_FOG);
-        if(!fogSubRenderState)
-        {
-            fogSubRenderState = mShaderGenerator->createSubRenderState(SRS_FOG);
-            schemRenderState->addTemplateSubRenderState(fogSubRenderState);
-        }
 
         // Select the desired fog calculation mode.
         fogSubRenderState->setParameter("calc_mode", mPerPixelFogEnable ? "per_pixel" : "per_vertex");
@@ -560,7 +555,7 @@ void Sample_ShaderSystem::generateShaders(Entity* entity)
                 MSN_SHADERGEN, *curMaterial);
 
             // Remove all sub render states.
-            renderState->reset();
+            renderState->resetToBuiltinSubRenderStates();
 
 
 #ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS

@@ -41,11 +41,20 @@ RenderState::RenderState()
 //-----------------------------------------------------------------------
 RenderState::~RenderState()
 {
-    reset();
+    clear();
+}
+
+void RenderState::resetToBuiltinSubRenderStates()
+{
+#ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
+    clear();
+    addTemplateSubRenderStates(
+        {SRS_TRANSFORM, SRS_VERTEX_COLOUR, SRS_PER_PIXEL_LIGHTING, SRS_TEXTURING, SRS_FOG, SRS_ALPHA_TEST});
+#endif
 }
 
 //-----------------------------------------------------------------------
-void RenderState::reset()
+void RenderState::clear()
 {
     for (auto & it : mSubRenderStateList)
     {
@@ -292,7 +301,11 @@ void TargetRenderState::link(const RenderState& templateRS, Pass* srcPass, Pass*
         }
 
         if(it != mSubRenderStateList.end())
-            continue;
+        {
+            ShaderGenerator::getSingleton().destroySubRenderState(*it);
+            std::swap(*it, mSubRenderStateList.back());
+            mSubRenderStateList.pop_back();
+        }
 
         // Check if this type of sub render state already exists.
         it = std::find_if(mSubRenderStateList.begin(), mSubRenderStateList.end(),
@@ -301,7 +314,11 @@ void TargetRenderState::link(const RenderState& templateRS, Pass* srcPass, Pass*
                           });
 
         if(it != mSubRenderStateList.end())
-            continue;
+        {
+            ShaderGenerator::getSingleton().destroySubRenderState(*it);
+            std::swap(*it, mSubRenderStateList.back());
+            mSubRenderStateList.pop_back();
+        }
 
         // Case custom sub render state not exits -> add it to custom list.
         auto newSubRenderState = ShaderGenerator::getSingleton().createSubRenderState(srcSubRenderState->getType());

@@ -60,7 +60,7 @@ public:
     virtual ~RenderState();
 
     /** Reset this render state */
-    void reset();
+    void resetToBuiltinSubRenderStates();
 
     /** Add a template sub render state to this render state.
     @param subRenderState The sub render state template to add.
@@ -118,6 +118,7 @@ protected:
     bool mLightCountAutoUpdate;
 
 private:
+    void clear();
     friend class ProgramManager;
 };
 

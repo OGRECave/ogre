@@ -68,11 +68,6 @@ class VisualTest : public OgreBites::Sample
     /** Unload all resources used by this sample */
     void unloadResources() override
     {
-#ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
-        auto& rtShaderGen = Ogre::RTShader::ShaderGenerator::getSingleton();
-        auto schemRenderState = rtShaderGen.getRenderState(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
-        schemRenderState->reset();
-#endif
         Ogre::ResourceGroupManager::getSingleton().clearResourceGroup(TRANSIENT_RESOURCE_GROUP);
         Sample::unloadResources();
         mAnimStateList.clear();
