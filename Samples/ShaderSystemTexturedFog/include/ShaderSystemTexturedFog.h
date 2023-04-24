@@ -36,7 +36,7 @@ public:
     {
         RTShader::RenderState* pMainRenderState = 
             RTShader::ShaderGenerator::getSingleton().createOrRetrieveRenderState(MSN_SHADERGEN).first;
-        pMainRenderState->reset();
+        pMainRenderState->resetToBuiltinSubRenderStates();
         
         if (mSRSTextureFogFactory)
         {
@@ -111,7 +111,7 @@ protected:
 
         RTShader::RenderState* pMainRenderState = 
             mGen->createOrRetrieveRenderState(MSN_SHADERGEN).first;
-        pMainRenderState->reset();
+        pMainRenderState->resetToBuiltinSubRenderStates();
 
         mSRSTextureFogFactory = new RTShaderSRSTexturedFogFactory;
         mGen->addSubRenderStateFactory(mSRSTextureFogFactory);

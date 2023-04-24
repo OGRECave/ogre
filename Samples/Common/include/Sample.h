@@ -281,6 +281,7 @@ namespace OgreBites
             // reset global light state
             mainRenderState->setLightCount(0);
             mainRenderState->setLightCountAutoUpdate(true);
+            mainRenderState->resetToBuiltinSubRenderStates();
 #endif
             if(mOverlaySystem)
                 mSceneMgr->addRenderQueueListener(mOverlaySystem);
