@@ -46,8 +46,8 @@ public:
         IStream (file_name), _stream(stream) {}
 
     bool    read (char c[], int n) override;
-    Imf::Int64   tellg () override;
-    void    seekg (Imf::Int64 pos) override;
+    uint64_t   tellg () override;
+    void    seekg (uint64_t pos) override;
     void    clear () override;
 
 private:
