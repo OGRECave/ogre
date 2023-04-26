@@ -39,11 +39,11 @@ bool O_IStream::read(char c[], int n) {
     return _stream.eof();
 }
 
-Int64 O_IStream::tellg() {
+uint64_t O_IStream::tellg() {
     return _stream.getCurrentPtr() - _stream.getPtr();
 }
 
-void O_IStream::seekg(Int64 pos) {
+void O_IStream::seekg(uint64_t pos) {
     _stream.seek(pos);
 }
 
