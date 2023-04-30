@@ -213,7 +213,6 @@ namespace Ogre {
     class RibbonTrail;
     class Root;
     class SceneManager;
-    class SceneManagerEnumerator;
     class SceneNode;
     class SceneQuery;
     class SceneQueryListener;

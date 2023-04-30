@@ -219,14 +219,11 @@ protected:
 /// Factory for OctreeSceneManager
 class OctreeSceneManagerFactory : public SceneManagerFactory
 {
-protected:
-    void initMetaData(void) const override;
 public:
-    OctreeSceneManagerFactory() {}
-    ~OctreeSceneManagerFactory() {}
     /// Factory type name
     static const String FACTORY_TYPE_NAME;
     SceneManager* createInstance(const String& instanceName) override;
+    const String& getTypeName(void) const override { return FACTORY_TYPE_NAME; }
 };
 
 

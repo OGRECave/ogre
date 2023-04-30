@@ -329,14 +329,11 @@ namespace Ogre {
     /// Factory for BspSceneManager
     class BspSceneManagerFactory : public SceneManagerFactory
     {
-    protected:
-        void initMetaData(void) const override;
     public:
-        BspSceneManagerFactory() {}
-        ~BspSceneManagerFactory() {}
         /// Factory type name
         static const String FACTORY_TYPE_NAME;
         SceneManager* createInstance(const String& instanceName) override;
+        const String& getTypeName(void) const override { return FACTORY_TYPE_NAME; }
     };
     /** @} */
     /** @} */

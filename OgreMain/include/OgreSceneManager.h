@@ -3358,38 +3358,13 @@ namespace Ogre {
         void execute(SceneQueryListener* listener) override;
     };
 
-    /** Structure containing information about a scene manager. */
-    struct SceneManagerMetaData
-    {
-        /// A globally unique string identifying the scene manager type
-        String typeName;
-        /// Flag indicating whether world geometry is supported
-        bool worldGeometrySupported;
-    };
-
-
-
     /** Class which will create instances of a given SceneManager. */
-    class _OgreExport SceneManagerFactory : public SceneMgtAlloc
+    class _OgreExport SceneManagerFactory
     {
-    protected:
-        mutable SceneManagerMetaData mMetaData;
-        mutable bool mMetaDataInit;
-        /// Internal method to initialise the metadata, must be implemented
-        virtual void initMetaData(void) const = 0;
     public:
-        SceneManagerFactory() : mMetaDataInit(true) {}
         virtual ~SceneManagerFactory() {}
-        /** Get information about the SceneManager type created by this factory. */
-        virtual const SceneManagerMetaData& getMetaData(void) const 
-        {
-            if (mMetaDataInit)
-            {
-                initMetaData();
-                mMetaDataInit = false;
-            }
-            return mMetaData; 
-        }
+        /** Get the SceneManager type created by this factory. */
+        virtual const String& getTypeName(void) const = 0;
         /** Create a new instance of a SceneManager.
 
         Don't call directly, use SceneManagerEnumerator::createSceneManager.
@@ -3399,6 +3374,9 @@ namespace Ogre {
         virtual void destroyInstance(SceneManager* instance) { delete instance; }
 
     };
+
+    /// Default scene manager type name
+    _OgreExport extern const String SMT_DEFAULT;
 
     /** @} */
     /** @} */

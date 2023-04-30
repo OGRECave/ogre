@@ -85,7 +85,7 @@ namespace Ogre
         if (!mCompositeMapSM)
         {
             // dedicated SceneManager
-            mCompositeMapSM = Root::getSingleton().createSceneManager(DefaultSceneManagerFactory::FACTORY_TYPE_NAME);
+            mCompositeMapSM = Root::getSingleton().createSceneManager();
             mCompositeMapCam = mCompositeMapSM->createCamera("cam");
             mCompositeMapSM->getRootSceneNode()->attachObject(mCompositeMapCam);
             mCompositeMapCam->setProjectionType(PT_ORTHOGRAPHIC);

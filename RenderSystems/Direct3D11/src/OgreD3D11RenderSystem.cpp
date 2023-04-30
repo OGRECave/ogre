@@ -37,7 +37,6 @@ THE SOFTWARE.
 #include "OgreViewport.h"
 #include "OgreLogManager.h"
 #include "OgreMeshManager.h"
-#include "OgreSceneManagerEnumerator.h"
 #include "OgreD3D11HardwareBufferManager.h"
 #include "OgreD3D11HardwareBuffer.h"
 #include "OgreD3D11VertexDeclaration.h"
@@ -52,6 +51,7 @@ THE SOFTWARE.
 #include "OgreD3D11HardwarePixelBuffer.h"
 #include "OgreD3D11RenderTarget.h"
 #include "OgreException.h"
+#include "OgreRoot.h"
 
 #if OGRE_NO_QUAD_BUFFER_STEREO == 0
 #include "OgreD3D11StereoDriverBridge.h"
@@ -1307,9 +1307,8 @@ namespace Ogre
         // release device depended resources
         fireDeviceEvent(&mDevice, "DeviceLost");
 
-        SceneManagerEnumerator::SceneManagerIterator scnIt = SceneManagerEnumerator::getSingleton().getSceneManagerIterator();
-        while(scnIt.hasMoreElements())
-            scnIt.getNext()->_releaseManualHardwareResources();
+        for(auto& it : Root::getSingleton().getSceneManagers())
+            it.second->_releaseManualHardwareResources();
 
         notifyDeviceLost(&mDevice);
 
@@ -1329,9 +1328,8 @@ namespace Ogre
 
         MeshManager::getSingleton().reloadAll(Resource::LF_PRESERVE_STATE);
 
-        scnIt = SceneManagerEnumerator::getSingleton().getSceneManagerIterator();
-        while(scnIt.hasMoreElements())
-            scnIt.getNext()->_restoreManualHardwareResources();
+        for(auto& it : Root::getSingleton().getSceneManagers())
+            it.second->_restoreManualHardwareResources();
 
         // Invalidate active view port.
         mActiveViewport = NULL;

@@ -779,12 +779,6 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     const String BspSceneManagerFactory::FACTORY_TYPE_NAME = "BspSceneManager";
     //-----------------------------------------------------------------------
-    void BspSceneManagerFactory::initMetaData(void) const
-    {
-        mMetaData.typeName = FACTORY_TYPE_NAME;
-        mMetaData.worldGeometrySupported = true;
-    }
-    //-----------------------------------------------------------------------
     SceneManager* BspSceneManagerFactory::createInstance(
         const String& instanceName)
     {

@@ -104,7 +104,6 @@ THE SOFTWARE.
 #include "OgreRibbonTrail.h"
 #include "OgreRoot.h"
 #include "OgreSceneManager.h"
-#include "OgreSceneManagerEnumerator.h"
 #include "OgreSceneNode.h"
 #include "OgreShadowCameraSetup.h"
 #include "OgreShadowCameraSetupFocused.h"
