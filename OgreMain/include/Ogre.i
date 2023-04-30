@@ -861,16 +861,9 @@ SHARED_PTR(Mesh);
 %template(MovableObjectMap) std::map<std::string, Ogre::MovableObject*>;
 %template(CameraMap) std::map<std::string, Ogre::Camera*>;
 %include "OgreSceneManager.h"
-%ignore Ogre::SceneManagerEnumerator::createSceneManager(uint16);
-%ignore Ogre::SceneManagerEnumerator::createSceneManager(uint16, const String&);
-%ignore Ogre::SceneManagerEnumerator::getSceneManagerIterator;
-%ignore Ogre::SceneManagerEnumerator::getMetaDataIterator;
 %include "OgreDefaultDebugDrawer.h"
-%include "OgreSceneManagerEnumerator.h"
 %include "OgreConfigDialog.h"
 %template(RenderSystemList) std::vector<Ogre::RenderSystem*>;
-%ignore Ogre::Root::getSceneManagerMetaDataIterator;
-%ignore Ogre::Root::getSceneManagerIterator;
 %ignore Ogre::Root::createSceneManager(uint16);
 %ignore Ogre::Root::createSceneManager(uint16, const String&);
 %ignore Ogre::Root::getMovableObjectFactoryIterator;

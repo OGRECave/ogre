@@ -369,14 +369,11 @@ namespace Ogre
     /// Factory for PCZSceneManager
     class PCZSceneManagerFactory : public SceneManagerFactory
     {
-    protected:
-        void initMetaData(void) const override;
     public:
-        PCZSceneManagerFactory() {}
-        ~PCZSceneManagerFactory() {}
         /// Factory type name
         static const String FACTORY_TYPE_NAME;
         SceneManager* createInstance(const String& instanceName) override;
+        const String& getTypeName(void) const override { return FACTORY_TYPE_NAME; }
     };
 
 

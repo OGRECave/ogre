@@ -1386,12 +1386,6 @@ namespace Ogre
     //-----------------------------------------------------------------------
     const String PCZSceneManagerFactory::FACTORY_TYPE_NAME = "PCZSceneManager";
     //-----------------------------------------------------------------------
-    void PCZSceneManagerFactory::initMetaData(void) const
-    {
-        mMetaData.typeName = FACTORY_TYPE_NAME;
-        mMetaData.worldGeometrySupported = false;
-    }
-    //-----------------------------------------------------------------------
     SceneManager* PCZSceneManagerFactory::createInstance(
         const String& instanceName)
     {

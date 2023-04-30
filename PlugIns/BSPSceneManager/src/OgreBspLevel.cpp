@@ -38,7 +38,6 @@ THE SOFTWARE.
 #include "OgreStringVector.h"
 #include "OgreStringConverter.h"
 #include "OgreLogManager.h"
-#include "OgreSceneManagerEnumerator.h"
 #include "OgreTechnique.h"
 #include "OgrePass.h"
 #include "OgreTextureUnitState.h"

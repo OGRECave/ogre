@@ -49,6 +49,7 @@ THE SOFTWARE.
 #include "OgreLodStrategyManager.h"
 #include "OgreFileSystemLayer.h"
 #include "OgreStaticGeometry.h"
+#include "OgreSceneManagerEnumerator.h"
 
 #if OGRE_NO_DDS_CODEC == 0
 #include "OgreDDSCodec.h"
@@ -560,27 +561,9 @@ namespace Ogre {
         mSceneManagerEnum->removeFactory(fact);
     }
     //-----------------------------------------------------------------------
-    const SceneManagerMetaData* Root::getSceneManagerMetaData(const String& typeName) const
-    {
-        return mSceneManagerEnum->getMetaData(typeName);
-    }
+    const StringVector& Root::getSceneManagerTypes(void) const { return mSceneManagerEnum->getMetaData(); }
     //-----------------------------------------------------------------------
-    SceneManagerEnumerator::MetaDataIterator
-    Root::getSceneManagerMetaDataIterator(void) const
-    {
-        OGRE_IGNORE_DEPRECATED_BEGIN
-        return mSceneManagerEnum->getMetaDataIterator();
-        OGRE_IGNORE_DEPRECATED_END
-    }
-    //-----------------------------------------------------------------------
-    const SceneManagerEnumerator::MetaDataList&
-    Root::getSceneManagerMetaData(void) const
-    {
-        return mSceneManagerEnum->getMetaData();
-    }
-    //-----------------------------------------------------------------------
-    SceneManager* Root::createSceneManager(const String& typeName,
-        const String& instanceName)
+    SceneManager* Root::createSceneManager(const String& typeName, const String& instanceName)
     {
         return mSceneManagerEnum->createSceneManager(typeName, instanceName);
     }
@@ -600,17 +583,7 @@ namespace Ogre {
         return mSceneManagerEnum->hasSceneManager(instanceName);
     }
     //-----------------------------------------------------------------------
-    SceneManagerEnumerator::SceneManagerIterator Root::getSceneManagerIterator(void)
-    {
-        OGRE_IGNORE_DEPRECATED_BEGIN
-        return mSceneManagerEnum->getSceneManagerIterator();
-        OGRE_IGNORE_DEPRECATED_END
-    }
-    //-----------------------------------------------------------------------
-    const SceneManagerEnumerator::Instances& Root::getSceneManagers(void) const
-    {
-        return mSceneManagerEnum->getSceneManagers();
-    }
+    const SceneManagerInstanceMap& Root::getSceneManagers(void) const { return mSceneManagerEnum->getSceneManagers(); }
     //-----------------------------------------------------------------------
     TextureManager* Root::getTextureManager(void)
     {

@@ -43,20 +43,17 @@ namespace Ogre {
     *  @{
     */
     /// Factory for default scene manager
-    class _OgreExport DefaultSceneManagerFactory : public SceneManagerFactory
+    class DefaultSceneManagerFactory : public SceneManagerFactory
     {
-    protected:
-        void initMetaData(void) const override;
     public:
         DefaultSceneManagerFactory() {}
         ~DefaultSceneManagerFactory() {}
-        /// Factory type name
-        static const String FACTORY_TYPE_NAME;
         SceneManager* createInstance(const String& instanceName) override;
+        const String& getTypeName(void) const override { return SMT_DEFAULT; }
     };
 
     /// Default scene manager
-    class _OgreExport DefaultSceneManager : public SceneManager
+    class DefaultSceneManager : public SceneManager
     {
     public:
         DefaultSceneManager(const String& name);
@@ -84,20 +81,18 @@ namespace Ogre {
             using a factory, should you choose, it's just not as flexible that way.
             Just instantiate your own SceneManager manually and use it directly.
     */
-    class _OgreExport SceneManagerEnumerator : public Singleton<SceneManagerEnumerator>, public SceneMgtAlloc
+    class SceneManagerEnumerator : public Singleton<SceneManagerEnumerator>, public SceneMgtAlloc
     {
     public:
         /// Scene manager instances, indexed by instance name
         typedef std::map<String, SceneManager*> Instances;
-        /// List of available scene manager types as meta data
-        typedef std::vector<const SceneManagerMetaData*> MetaDataList;
     private:
         /// Scene manager factories
-        typedef std::list<SceneManagerFactory*> Factories;
+        typedef std::map<String, SceneManagerFactory*> Factories;
         Factories mFactories;
         Instances mInstances;
         /// Stored separately to allow iteration
-        MetaDataList mMetaDataList;
+        StringVector mMetaDataList;
         /// Factory for default scene manager
         DefaultSceneManagerFactory mDefaultFactory;
         /// Count of creations for auto-naming
@@ -110,77 +105,20 @@ namespace Ogre {
         SceneManagerEnumerator();
         ~SceneManagerEnumerator();
 
-        /** Register a new SceneManagerFactory. 
-
-            Plugins should call this to register as new SceneManager providers.
-        */
         void addFactory(SceneManagerFactory* fact);
 
-        /** Remove a SceneManagerFactory. 
-        */
         void removeFactory(SceneManagerFactory* fact);
 
-        /** Get more information about a given type of SceneManager.
+        const StringVector& getMetaData() const { return mMetaDataList; }
 
-            The metadata returned tells you a few things about a given type 
-            of SceneManager, which can be created using a factory that has been
-            registered already. 
-        @param typeName The type name of the SceneManager you want to enquire on.
-            If you don't know the typeName already, you can iterate over the 
-            metadata for all types using getMetaDataIterator.
-        */
-        const SceneManagerMetaData* getMetaData(const String& typeName) const;
-
-        /** get all types of SceneManager available for construction
-
-            providing some information about each one.
-        */
-        const MetaDataList& getMetaData() const { return mMetaDataList; }
-
-        typedef ConstVectorIterator<MetaDataList> MetaDataIterator;
-        /** Iterate over all types of SceneManager available for construction, 
-            providing some information about each one.
-            @deprecated use getMetaData()
-        */
-        OGRE_DEPRECATED MetaDataIterator getMetaDataIterator(void) const;
-
-        /** Create a SceneManager instance of a given type.
-
-            You can use this method to create a SceneManager instance of a 
-            given specific type. You may know this type already, or you may
-            have discovered it by looking at the results from getMetaDataIterator.
-        @note
-            This method throws an exception if the named type is not found.
-        @param typeName String identifying a unique SceneManager type
-        @param instanceName Optional name to given the new instance that is
-            created. If you leave this blank, an auto name will be assigned.
-        */
         SceneManager* createSceneManager(const String& typeName, 
             const String& instanceName = BLANKSTRING);
 
-        /// @deprecated typeMask is obsolete
-        OGRE_DEPRECATED SceneManager* createSceneManager(uint16 typeMask,
-            const String& instanceName = BLANKSTRING)
-        { return createSceneManager(DefaultSceneManagerFactory::FACTORY_TYPE_NAME, instanceName); }
-
-        /** Destroy an instance of a SceneManager. */
         void destroySceneManager(SceneManager* sm);
 
-        /** Get an existing SceneManager instance that has already been created,
-            identified by the instance name.
-        @param instanceName The name of the instance to retrieve.
-        */
         SceneManager* getSceneManager(const String& instanceName) const;
 
-        /** Identify if a SceneManager instance already exists.
-        @param instanceName The name of the instance to retrieve.
-        */
         bool hasSceneManager(const String& instanceName) const;
-
-        typedef MapIterator<Instances> SceneManagerIterator;
-        /** Get an iterator over all the existing SceneManager instances.
-        @deprecated use getSceneManagers() instead */
-        OGRE_DEPRECATED SceneManagerIterator getSceneManagerIterator(void);
 
         /// Get all the existing SceneManager instances.
         const Instances& getSceneManagers() const;

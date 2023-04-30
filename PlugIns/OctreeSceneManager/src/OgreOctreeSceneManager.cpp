@@ -1124,12 +1124,6 @@ OctreeSceneManager::createIntersectionQuery(uint32 mask)
 //-----------------------------------------------------------------------
 const String OctreeSceneManagerFactory::FACTORY_TYPE_NAME = "OctreeSceneManager";
 //-----------------------------------------------------------------------
-void OctreeSceneManagerFactory::initMetaData(void) const
-{
-    mMetaData.typeName = FACTORY_TYPE_NAME;
-    mMetaData.worldGeometrySupported = false;
-}
-//-----------------------------------------------------------------------
 SceneManager* OctreeSceneManagerFactory::createInstance(
     const String& instanceName)
 {
