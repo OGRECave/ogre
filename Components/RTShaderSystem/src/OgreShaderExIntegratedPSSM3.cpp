@@ -305,7 +305,7 @@ bool IntegratedPSSM3::addVSInvocation(Function* vsMain, const int groupOrder)
 
     while(it != mShadowTextureParamsList.end())
     {
-        stage.callFunction(FFP_FUNC_TRANSFORM, it->mWorldViewProjMatrix, mVSInPos, it->mVSOutLightPosition);
+        stage.callBuiltin("mul", it->mWorldViewProjMatrix, mVSInPos, it->mVSOutLightPosition);
         ++it;
     }
 
