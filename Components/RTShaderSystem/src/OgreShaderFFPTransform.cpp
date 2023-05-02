@@ -107,7 +107,7 @@ bool FFPTransform::createCpuSubPrograms(ProgramSet* programSet)
         // we can end here because the world matrix will be identity with instanced rendering
         // so the code below will work as indended
     }
-    stage.callFunction(FFP_FUNC_TRANSFORM, wvpMatrix, positionIn, positionOut);
+    stage.callBuiltin("mul", wvpMatrix, positionIn, positionOut);
 
     if(!mSetPointSize || isHLSL) // not supported with DX11
         return true;

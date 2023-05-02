@@ -198,11 +198,11 @@ bool HardwareSkinningTechnique::addFunctionInvocations(ProgramSet* programSet)
         addPositionCalculations(stage);
         // update back the original position relative to the object
         if (!mObjSpaceBones)
-            stage.callFunction(FFP_FUNC_TRANSFORM, mParamInInvWorldMatrix, mParamInPosition, mParamInPosition);
+            stage.callBuiltin("mul", mParamInInvWorldMatrix, mParamInPosition, mParamInPosition);
     }
 
     // update from object to projective space
-    stage.callFunction(FFP_FUNC_TRANSFORM, mParamInWorldViewProjMatrix, mParamInPosition, mParamOutPositionProj);
+    stage.callBuiltin("mul", mParamInWorldViewProjMatrix, mParamInPosition, mParamOutPositionProj);
 
     //add functions to calculate normal and normal related data in world and object space
     if (mDoBoneCalculations && mDoLightCalculations)

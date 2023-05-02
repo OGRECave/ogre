@@ -190,7 +190,7 @@ void GBuffer::addNormalInvocations(ProgramSet* programSet, const ParameterPtr& o
         auto vsInNormal = vsMain->resolveInputParameter(Parameter::SPC_NORMAL_OBJECT_SPACE);
         auto vsOutNormal = vsMain->resolveOutputParameter(Parameter::SPC_NORMAL_VIEW_SPACE);
         auto worldViewITMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_NORMAL_MATRIX);
-        vstage.callFunction(FFP_FUNC_TRANSFORM, worldViewITMatrix, vsInNormal, vsOutNormal);
+        vstage.callBuiltin("mul", worldViewITMatrix, vsInNormal, vsOutNormal);
         vstage.callBuiltin("normalize", vsOutNormal, vsOutNormal);
 
         // pass through

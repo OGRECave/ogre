@@ -86,7 +86,7 @@ bool CookTorranceLighting::createCpuSubPrograms(ProgramSet* programSet)
     if (vsOutNormal)
     {
         auto worldViewITMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_NORMAL_MATRIX);
-        vstage.callFunction(FFP_FUNC_TRANSFORM, worldViewITMatrix, vsInNormal, vsOutNormal);
+        vstage.callBuiltin("mul", worldViewITMatrix, vsInNormal, vsOutNormal);
     }
 
     // add the lighting computation

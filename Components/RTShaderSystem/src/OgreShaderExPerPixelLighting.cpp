@@ -256,7 +256,7 @@ void PerPixelLighting::addVSInvocation(const FunctionStageRef& stage)
 {
     // Transform normal in view space.
     if(mLightCount && mVSInNormal)
-        stage.callFunction(FFP_FUNC_TRANSFORM, mWorldViewITMatrix, mVSInNormal, mVSOutNormal);
+        stage.callBuiltin("mul", mWorldViewITMatrix, mVSInNormal, mVSOutNormal);
 
     // Transform view space position if need to.
     if (mVSOutViewPos)
