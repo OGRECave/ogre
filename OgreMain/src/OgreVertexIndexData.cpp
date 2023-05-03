@@ -613,7 +613,7 @@ namespace Ogre {
             vertexBufferBinding->getBindings();
         for (auto& m : bindMap)
         {
-            const auto& elems = 
+            const auto& elems =
                 vertexDeclaration->findElementsBySource(m.first);
             bool conversionNeeded = false;
             for (auto& e : elems)
@@ -653,8 +653,8 @@ namespace Ogre {
                 {
                     if (e.getType() == _DETAIL_SWAP_RB)
                     {
-                        vertexDeclaration->modifyElement(elemIndex, 
-                            e.getSource(), e.getOffset(), destType, 
+                        vertexDeclaration->modifyElement(elemIndex,
+                            e.getSource(), e.getOffset(), destType,
                             e.getSemantic(), e.getIndex());
                     }
                     ++elemIndex;
