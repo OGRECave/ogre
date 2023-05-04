@@ -429,12 +429,13 @@ Next, you have to create the FFPLighting SRS that should be used for shader gene
 
 @note adding a SRS will automatically override the default SRS for the same stage. In the example we override the Ogre::RTShader::FFP_LIGHTING stage.
 
-## Creating shader based technique {#rtssTech}
-This step will associate the given technique with a destination shader generated based technique. Calling the `Ogre::RTShader::ShaderGenerator::createShaderBasedTechnique()` will cause the system to generate internal data structures associated with the source technique and will add new technique to the source material. This new technique will have the scheme name that was passed as an argument to this method and all its passes will contain shaders that the system will generate and update during the application runtime.
+## Creating the shader based technique {#rtssTech}
+This step will create a new, shader-based, technique based on the given technique. Calling Ogre::RTShader::ShaderGenerator::createShaderBasedTechnique() will cause the system to generate SubRenderStates based on the source technique and add a new technique using the given scheme name to the material.
+The passes of this new technique will receive shaders generated and updated by the system during as described in the @ref rtssGenerate section below.
 
 ![](CreateShaderBasedTech.svg)
 
-To use the generated technique set the change material scheme of your viewport(s) to the same scheme name you passed as argument to this method.
+To use the generated technique, change the material scheme of your viewport(s) to scheme name you passed as argument to this method.
 
 ```cpp
 // Create shader based technique from the default technique of the given material.
@@ -467,7 +468,7 @@ In order to extend the system with your own shader effects you'll have to follow
 * Implement the SubRenderState interface - This is the main class that is responsible for the actual effect processing such as preparing the destination pass, updating the CPU shader programs, updating the GPU shader parameters etc.
 * Implement the SubRenderStateFactory interface: This class will allow the RTSS to create instances of the previous class via code or script as well as export it to material script file.
 * Register the factory to the RTSS using the Ogre::RTShader::ShaderGenerator::addSubRenderStateFactory method.
-* Add shader files that will supply all the actual shader functions your SubRenderState needs. In order to support multiple shader languages you should supply code for your entire desired target shading languages (CG, HLSL, GLSL etc). These files should be placed in a way that the resource manager could access them. This can be done by placing them in a valid resource location or by dynamically adding resource location.
+* Add shader files that will supply all the actual shader functions your SubRenderState needs. In order to support multiple shader languages, @ref OgreUnifiedShader are provided. These shaders should be placed in a resource location known to the resource manager.
 
 Implementing the SubRenderState requires overriding the pure methods of the base class.
 * Ogre::RTShader::SubRenderState::getType() should return unique string that identify the sub class implementation. That value is shared among all instances and can be stored in a static string variable. It uses to system to match between SubRenderState instance and the factory to should destroy it.
@@ -491,13 +492,13 @@ In case of the Ogre::RTShader::FFPTransform we need the world view projection ma
 
 @par Resolving dependencies
 this stage should provide the name of the external shader library files that contains the actual shader code needed by this SubRenderState.
-In case of the Ogre::RTShader::FFPTexturing  it will add the common and texturing library for both vertex and pixel shader program.
+In case of the Ogre::RTShader::SRS_TEXTURING  it will add the common and texturing library for both vertex and pixel shader program.
 @par
 @snippet Components/RTShaderSystem/src/OgreShaderFFPTexturing.cpp deps_resolve
 
 @par Adding function invocations
 this stage creates the function calls within this SubRenderState requires. To add function invocations, you first need to obtain a Ogre::RTShader::FunctionStageRef for the respective stage.
-In case of the Ogre::RTShader::FFPFog it will add vertex depth calculation to the vertex shader program.
+In case of the Ogre::RTShader::SRS_FOG it will add vertex depth calculation to the vertex shader program.
 @par
 @snippet Components/RTShaderSystem/src/OgreShaderFFPFog.cpp func_invoc
 @par
