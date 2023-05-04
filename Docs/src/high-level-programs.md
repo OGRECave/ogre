@@ -859,7 +859,7 @@ The following defines are available:
 - The current shader type: e.g. @c OGRE_VERTEX_SHADER, @c OGRE_FRAGMENT_SHADER
 - Whether @ref reversed-depth is enabled: @c OGRE_REVERSED_Z
 
-# Cross-platform macros
+# Cross-platform macros {#OgreUnifiedShader}
 
 Additionally, the `OgreUnifiedShader.h` provides macros to map GLSL to HLSL and (to some extent) Metal.
 
@@ -869,6 +869,7 @@ In general, you have to do the following changes compared to regular GLSL:
 - Add the `#include <OgreUnifiedShader.h>` directive at the top of the file
 - Use the `MAIN_PARAMETERS` and `MAIN_DECLARATION` directives instead of `void main()`
 - Use the `IN`/ `OUT` macros to specify non-uniform parameters that are passed to the main function.
+- Wrap the uniform paramters in the `OGRE_UNIFORMS` macro
 - Declare Samplers with `SAMPLER2D/3D/CUBE/..` macros instead of `sampler2D/3D/Cube/..`
 - Use `mtxFromRows` / `mtxFromCols` to construct matrices from vectors
 - Use the HLSL style `mul` instead of `*` to multiply matrices
@@ -890,7 +891,10 @@ to make it cross-platform, we need to modify it as:
 
 ```cpp
 #include <OgreUnifiedShader.h>
+
+OGRE_UNIFORMS(
 uniform mat4 worldMatrix;
+)
 
 MAIN_PARAMETERS
 IN(vec4 vertex, POSITION)
