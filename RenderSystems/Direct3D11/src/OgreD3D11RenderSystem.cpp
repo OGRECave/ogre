@@ -204,6 +204,12 @@ namespace Ogre
             mHLSLProgramFactory = 0;
         }
 
+#if OGRE_NO_QUAD_BUFFER_STEREO == 0
+        // Stereo driver must be freed after device is created
+        D3D11StereoDriverBridge* stereoBridge = D3D11StereoDriverBridge::getSingletonPtr();
+        OGRE_DELETE stereoBridge;
+#endif
+
         LogManager::getSingleton().logMessage( "D3D11: " + getName() + " destroyed." );
     }
     //---------------------------------------------------------------------
