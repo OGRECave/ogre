@@ -546,11 +546,9 @@ namespace Ogre {
         // Check for error first
         const VertexDeclaration::VertexElementList& allelems = 
             vertexDeclaration->getElements();
-        VertexDeclaration::VertexElementList::const_iterator ai;
-        for (ai = allelems.begin(); ai != allelems.end(); ++ai)
+        for (auto& e : allelems)
         {
-            const VertexElement& elem = *ai;
-            if (!vertexBufferBinding->isBufferBound(elem.getSource()))
+            if (!vertexBufferBinding->isBufferBound(e.getSource()))
             {
                 OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND,
                     "No buffer is bound to that element source.",
@@ -564,7 +562,7 @@ namespace Ogre {
 
         // Modify vertex elements to reference to new buffer index
         unsigned short elemIndex = 0;
-        for (ai = allelems.begin(); ai != allelems.end(); ++ai, ++elemIndex)
+        for (auto ai = allelems.begin(); ai != allelems.end(); ++ai, ++elemIndex)
         {
             const VertexElement& elem = *ai;
             VertexBufferBinding::BindingIndexMap::const_iterator it =
@@ -587,11 +585,9 @@ namespace Ogre {
         // Collect used buffers
         const VertexDeclaration::VertexElementList& allelems = 
             vertexDeclaration->getElements();
-        VertexDeclaration::VertexElementList::const_iterator ai;
-        for (ai = allelems.begin(); ai != allelems.end(); ++ai)
+        for (auto& e : allelems)
         {
-            const VertexElement& elem = *ai;
-            usedBuffers.insert(elem.getSource());
+            usedBuffers.insert(e.getSource());
         }
 
         // Unset unused buffer bindings
@@ -615,17 +611,14 @@ namespace Ogre {
 
         const VertexBufferBinding::VertexBufferBindingMap& bindMap = 
             vertexBufferBinding->getBindings();
-        VertexBufferBinding::VertexBufferBindingMap::const_iterator bindi;
-        for (bindi = bindMap.begin(); bindi != bindMap.end(); ++bindi)
+        for (auto& m : bindMap)
         {
-            VertexDeclaration::VertexElementList elems = 
-                vertexDeclaration->findElementsBySource(bindi->first);
+            const auto& elems =
+                vertexDeclaration->findElementsBySource(m.first);
             bool conversionNeeded = false;
-            VertexDeclaration::VertexElementList::iterator elemi;
-            for (elemi = elems.begin(); elemi != elems.end(); ++elemi)
+            for (auto& e : elems)
             {
-                VertexElement& elem = *elemi;
-                if (elem.getType() == _DETAIL_SWAP_RB)
+                if (e.getType() == _DETAIL_SWAP_RB)
                 {
                     conversionNeeded = true;
                 }
@@ -633,48 +626,41 @@ namespace Ogre {
 
             if (conversionNeeded)
             {
-                void* pBase = bindi->second->lock(HardwareBuffer::HBL_NORMAL);
+                void* pBase = m.second->lock(HardwareBuffer::HBL_NORMAL);
 
-                for (size_t v = 0; v < bindi->second->getNumVertices(); ++v)
+                for (size_t v = 0; v < m.second->getNumVertices(); ++v)
                 {
 
-                    for (elemi = elems.begin(); elemi != elems.end(); ++elemi)
+                    for (auto& e : elems)
                     {
-                        VertexElement& elem = *elemi;
-                        if (elem.getType() == _DETAIL_SWAP_RB)
+                        if (e.getType() == _DETAIL_SWAP_RB)
                         {
                             uint32* pRGBA;
-                            elem.baseVertexPointerToElement(pBase, &pRGBA);
+                            e.baseVertexPointerToElement(pBase, &pRGBA);
                             swapPackedRB(pRGBA);
                         }
                     }
                     pBase = static_cast<void*>(
-                        static_cast<char*>(pBase) + bindi->second->getVertexSize());
+                        static_cast<char*>(pBase) + m.second->getVertexSize());
                 }
-                bindi->second->unlock();
+                m.second->unlock();
 
                 // Modify the elements to reflect the changed type
                 const VertexDeclaration::VertexElementList& allelems = 
                     vertexDeclaration->getElements();
-                VertexDeclaration::VertexElementList::const_iterator ai;
                 unsigned short elemIndex = 0;
-                for (ai = allelems.begin(); ai != allelems.end(); ++ai, ++elemIndex)
+                for (auto& e : allelems)
                 {
-                    const VertexElement& elem = *ai;
-                    if (elem.getType() == _DETAIL_SWAP_RB)
+                    if (e.getType() == _DETAIL_SWAP_RB)
                     {
-                        vertexDeclaration->modifyElement(elemIndex, 
-                            elem.getSource(), elem.getOffset(), destType, 
-                            elem.getSemantic(), elem.getIndex());
+                        vertexDeclaration->modifyElement(elemIndex,
+                            e.getSource(), e.getOffset(), destType,
+                            e.getSemantic(), e.getIndex());
                     }
+                    ++elemIndex;
                 }
-
             }
-
-
         } // each buffer
-
-
     }
     //-----------------------------------------------------------------------
     ushort VertexData::allocateHardwareAnimationElements(ushort count, bool animateNormals)
