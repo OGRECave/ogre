@@ -84,7 +84,7 @@ bool TerrainTransform::createCpuSubPrograms(ProgramSet* programSet)
         stage.assign(In(uvin).xy(), uv);
     }
 
-    stage.callFunction("FFP_Transform", wvpMatrix, positionIn, positionOut);
+    stage.callBuiltin("mul", wvpMatrix, positionIn, positionOut);
     stage.callFunction("applyLODMorph", {In(delta), In(lodMorph), InOut(positionOut).mask(heightAxis[mAlign])});
 
     return true;
@@ -237,7 +237,7 @@ bool TerrainSurface::createCpuSubPrograms(ProgramSet* programSet)
     auto stage = psMain->getStage(FFP_PS_COLOUR_BEGIN);
     stage.assign(Vector4(1), outDiffuse); // FFPColour logic
     stage.callFunction("SGX_FetchNormal", globalNormal, uvPS, normal);
-    stage.callFunction("FFP_Transform", ITMat, normal, normal);
+    stage.callBuiltin("mul", ITMat, normal, normal);
 
     auto psSpecular = psMain->resolveLocalParameter(Parameter::SPC_COLOR_SPECULAR);
     stage.assign(Vector4::ZERO, psSpecular);
