@@ -561,12 +561,12 @@ void Sample_ShaderSystem::generateShaders(Entity* entity)
 #ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
             if (mCurLightingModel == SSLM_CookTorranceLighting || mCurLightingModel == SSLM_ImageBasedLighting)
             {
-                auto lightModel = mShaderGenerator->createSubRenderState("CookTorranceLighting");
+                auto lightModel = mShaderGenerator->createSubRenderState(RTShader::SRS_COOK_TORRANCE_LIGHTING);
                 renderState->addTemplateSubRenderState(lightModel);
             }
             else if (mCurLightingModel == SSLM_PerPixelLighting)
             {
-                RTShader::SubRenderState* perPixelLightModel = mShaderGenerator->createSubRenderState("SGX_PerPixelLighting");
+                RTShader::SubRenderState* perPixelLightModel = mShaderGenerator->createSubRenderState(RTShader::SRS_PER_PIXEL_LIGHTING);
                 
                 renderState->addTemplateSubRenderState(perPixelLightModel);             
             }
@@ -575,7 +575,7 @@ void Sample_ShaderSystem::generateShaders(Entity* entity)
                 // Apply normal map only on main entity.
                 if (entity->getName() == MAIN_ENTITY_NAME)
                 {
-                    RTShader::SubRenderState* normalMapSubRS = mShaderGenerator->createSubRenderState("NormalMap");
+                    RTShader::SubRenderState* normalMapSubRS = mShaderGenerator->createSubRenderState(RTShader::SRS_NORMALMAP);
 
                     normalMapSubRS->setParameter("normalmap_space", "object_space");
                     normalMapSubRS->setParameter("texture", "Panels_Normal_Obj.png");
@@ -586,7 +586,7 @@ void Sample_ShaderSystem::generateShaders(Entity* entity)
                 // It is secondary entity -> use simple per pixel lighting.
                 else
                 {
-                    RTShader::SubRenderState* perPixelLightModel = mShaderGenerator->createSubRenderState("SGX_PerPixelLighting");
+                    RTShader::SubRenderState* perPixelLightModel = mShaderGenerator->createSubRenderState(RTShader::SRS_PER_PIXEL_LIGHTING);
                     renderState->addTemplateSubRenderState(perPixelLightModel);
                 }               
             }
@@ -597,7 +597,7 @@ void Sample_ShaderSystem::generateShaders(Entity* entity)
                 // Apply normal map only on main entity.
                 if (entity->getName() == MAIN_ENTITY_NAME)
                 {
-                    RTShader::SubRenderState* normalMapSubRS = mShaderGenerator->createSubRenderState("NormalMap");
+                    RTShader::SubRenderState* normalMapSubRS = mShaderGenerator->createSubRenderState(RTShader::SRS_NORMALMAP);
 
                     normalMapSubRS->setParameter("normalmap_space", "tangent_space");
                     normalMapSubRS->setParameter("texture", "Panels_Normal_Tangent.png");
@@ -608,7 +608,7 @@ void Sample_ShaderSystem::generateShaders(Entity* entity)
                 // It is secondary entity -> use simple per pixel lighting.
                 else
                 {
-                    RTShader::SubRenderState* perPixelLightModel = mShaderGenerator->createSubRenderState("SGX_PerPixelLighting");
+                    RTShader::SubRenderState* perPixelLightModel = mShaderGenerator->createSubRenderState(RTShader::SRS_PER_PIXEL_LIGHTING);
                     renderState->addTemplateSubRenderState(perPixelLightModel);
                 }
             }
