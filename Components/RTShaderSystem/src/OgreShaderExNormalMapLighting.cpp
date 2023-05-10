@@ -91,6 +91,22 @@ bool NormalMapLighting::createCpuSubPrograms(ProgramSet* programSet)
     auto normalMapSampler = psProgram->resolveParameter(GCT_SAMPLER2D, "gNormalMapSampler", mNormalMapSamplerIndex);
     fstage.callFunction(SGX_FUNC_FETCHNORMAL, normalMapSampler, psInTexcoord, newViewNormal);
 
+    if (mNormalMapSpace == NMS_PARALLAX)
+    {
+        // assuming: lighting stage computed this
+        auto vsOutViewPos = vsMain->resolveOutputParameter(Parameter::SPC_POSITION_VIEW_SPACE);
+        auto viewPos = psMain->resolveInputParameter(vsOutViewPos);
+
+        // TODO: user specificed scale and bias
+        fstage.callFunction("SGX_Generate_Parallax_Texcoord", {In(normalMapSampler), In(psInTexcoord), In(viewPos),
+                                                              In(Vector2(0.04, -0.02)), Out(psInTexcoord)});
+
+        // overwrite texcoord0 unconditionally, only one texcoord set is supported with parallax mapping
+        // we are before FFP_PS_TEXTURING, so the new value will be used
+        auto texcoord0 = psMain->resolveInputParameter(Parameter::SPC_TEXTURE_COORDINATE0, GCT_FLOAT2);
+        fstage.assign(psInTexcoord, texcoord0);
+    }
+
     if (mNormalMapSpace & NMS_TANGENT)
     {
         auto vsInTangent = vsMain->resolveInputParameter(Parameter::SPC_TANGENT_OBJECT_SPACE);
@@ -113,22 +129,6 @@ bool NormalMapLighting::createCpuSubPrograms(ProgramSet* programSet)
         // transform normal in FS
         auto normalMatrix = psProgram->resolveParameter(GpuProgramParameters::ACT_NORMAL_MATRIX);
         fstage.callFunction(FFP_FUNC_TRANSFORM, normalMatrix, newViewNormal, newViewNormal);
-    }
-
-    if (mNormalMapSpace == NMS_PARALLAX)
-    {
-        // assuming: lighting stage computed this
-        auto vsOutViewPos = vsMain->resolveOutputParameter(Parameter::SPC_POSITION_VIEW_SPACE);
-        auto viewPos = psMain->resolveInputParameter(vsOutViewPos);
-
-        // TODO: user specificed scale and bias
-        fstage.callFunction("SGX_Generate_Parallax_Texcoord", {In(normalMapSampler), In(psInTexcoord), In(viewPos),
-                                                              In(Vector2(0.04, -0.02)), Out(psInTexcoord)});
-
-        // overwrite texcoord0 unconditionally, only one texcoord set is supported with parallax mapping
-        // we are before FFP_PS_TEXTURING, so the new value will be used
-        auto texcoord0 = psMain->resolveInputParameter(Parameter::SPC_TEXTURE_COORDINATE0, GCT_FLOAT2);
-        fstage.assign(psInTexcoord, texcoord0);
     }
 
     return true;
