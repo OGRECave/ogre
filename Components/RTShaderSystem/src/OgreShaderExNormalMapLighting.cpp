@@ -87,9 +87,7 @@ bool NormalMapLighting::createCpuSubPrograms(ProgramSet* programSet)
     // Output texture coordinates.
     vstage.assign(vsInTexcoord, vsOutTexcoord);
 
-    // Add the normal fetch function invocation
     auto normalMapSampler = psProgram->resolveParameter(GCT_SAMPLER2D, "gNormalMapSampler", mNormalMapSamplerIndex);
-    fstage.callFunction(SGX_FUNC_FETCHNORMAL, normalMapSampler, psInTexcoord, newViewNormal);
 
     if (mNormalMapSpace == NMS_PARALLAX)
     {
@@ -106,6 +104,9 @@ bool NormalMapLighting::createCpuSubPrograms(ProgramSet* programSet)
         auto texcoord0 = psMain->resolveInputParameter(Parameter::SPC_TEXTURE_COORDINATE0, GCT_FLOAT2);
         fstage.assign(psInTexcoord, texcoord0);
     }
+
+    // Add the normal fetch function invocation
+    fstage.callFunction(SGX_FUNC_FETCHNORMAL, normalMapSampler, psInTexcoord, newViewNormal);
 
     if (mNormalMapSpace & NMS_TANGENT)
     {
