@@ -100,7 +100,6 @@ private:
     typedef ProgramList::iterator                       ProgramListIterator;
     typedef std::map<String, ProgramWriter*>           ProgramWriterMap;
     typedef ProgramWriterMap::iterator                  ProgramWriterIterator;
-    typedef std::vector<ProgramWriterFactory*>         ProgramWriterFactoryList;
     
     //-----------------------------------------------------------------------------
     typedef std::map<String, ProgramProcessor*>        ProgramProcessorMap;
@@ -172,8 +171,6 @@ private:
 
     // Map between target language and shader program processor.    
     ProgramProcessorMap mProgramProcessorsMap;
-    // Holds standard shader writer factories
-    ProgramWriterFactoryList mProgramWriterFactories;
     // The generated shaders.
     std::vector<GpuProgramPtr> mShaderList;
     // The default program processors.
