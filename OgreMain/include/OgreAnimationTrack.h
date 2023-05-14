@@ -346,10 +346,10 @@ namespace Ogre
             the same Node and the translations and rotations will be done in
             the Node's local space established by the call to setInitialState(). */
         virtual void setTransformSpace(Node::TransformSpace space);
-        
+
         /** Gets the space that this track's transformations are relative to. */
         virtual Node::TransformSpace getTransformSpace() const;
-        
+
         /// @copydoc AnimationTrack::getInterpolatedKeyFrame
         void getInterpolatedKeyFrame(const TimeIndex& timeIndex, KeyFrame* kf) const override;
 
