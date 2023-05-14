@@ -114,7 +114,7 @@ private:
 */
 class _OgreRTSSExport Function : public RTShaderSystemAlloc
 {
-    friend ProgramManager;
+    friend class ProgramManager;
 // Interface.
 public:
     /// @deprecated

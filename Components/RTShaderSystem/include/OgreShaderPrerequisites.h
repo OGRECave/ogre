@@ -57,7 +57,6 @@ class TargetRenderState;
 class SubRenderState;
 class SubRenderStateAccessor;
 class SubRenderStateFactory;
-class ProgramManager;
 class Program;
 class ProgramSet;
 class RenderState;
@@ -65,10 +64,7 @@ class Parameter;
 class UniformParameter;
 class Function;
 class FunctionStageRef;
-class FFPRenderStateBuilder;
 class ShaderGenerator;
-class SGMaterialSerializerListener;
-class ProgramWriterFactory;
 class ProgramWriterManager;
 
 typedef shared_ptr<Parameter>        ParameterPtr;

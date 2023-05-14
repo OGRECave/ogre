@@ -54,6 +54,8 @@ class SGRenderObjectListener;
 class SGSceneManagerListener;
 class SGScriptTranslatorManager;
 class SGResourceGroupListener;
+class SGMaterialSerializerListener;
+class ProgramManager;
 
 /** Shader generator system main interface. This singleton based class
 enables automatic generation of shader code based on existing material techniques.
