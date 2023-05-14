@@ -36,6 +36,7 @@ namespace Ogre {
 namespace RTShader {
 
     class ProgramWriter;
+    class ProgramProcessor;
 
 /** \addtogroup Optional
 *  @{
