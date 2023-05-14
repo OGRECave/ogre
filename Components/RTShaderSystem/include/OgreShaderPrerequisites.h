@@ -59,7 +59,6 @@ class SubRenderStateAccessor;
 class SubRenderStateFactory;
 class ProgramManager;
 class Program;
-class ProgramProcessor;
 class ProgramSet;
 class RenderState;
 class Parameter;

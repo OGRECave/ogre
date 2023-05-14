@@ -45,7 +45,7 @@ namespace RTShader {
 The base class perform only the generic processing. In order to provide target language specific services and 
 optimization one should derive from this class and register its factory via the ProgramManager instance.
 */
-class _OgreRTSSExport ProgramProcessor : public RTShaderSystemAlloc
+class ProgramProcessor : public RTShaderSystemAlloc
 {
 
 // Interface.
@@ -76,7 +76,7 @@ protected:
     
     //-----------------------------------------------------------------------------
     // Class that holds merge parameter information.
-    class _OgreRTSSExport MergeParameter 
+    class MergeParameter
     {
     // Interface.
     public:
@@ -133,7 +133,7 @@ protected:
     
     //-----------------------------------------------------------------------------
     // A struct that defines merge parameters combination.
-    struct _OgreRTSSExport MergeCombination
+    struct MergeCombination
     {       
         // The count of each source type. I.E (1 FLOAT1, 0 FLOAT2, 1 FLOAT3, 0 FLOAT4).
         size_t srcParameterTypeCount[4];
