@@ -331,6 +331,12 @@ namespace Ogre
     _OgreExport extern const String MOT_RIBBON_TRAIL;
     _OgreExport extern const String MOT_RECTANGLE2D;
     _OgreExport extern const String MOT_STATIC_GEOMETRY;
+    _OgreExport extern const String MOT_CAMERA;
+    _OgreExport extern const String MOT_FRUSTRUM;
+    _OgreExport extern const String MOT_MOVABLE_PLANE;
+    _OgreExport extern const String MOT_INSTANCE_BATCH;
+    _OgreExport extern const String MOT_INSTANCED_ENTITY;
+    _OgreExport extern const String MOT_SIMPLE_RENDERABLE;
 }
 
 #endif // __OgrePrerequisites_H__

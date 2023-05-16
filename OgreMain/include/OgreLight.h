@@ -593,9 +593,6 @@ namespace Ogre {
 
         Camera* mCameraToBeRelativeTo;
 
-        /// Shared class-level name for Movable type.
-        static String msMovableType;
-
         mutable PlaneBoundedVolume mNearClipVolume;
         mutable PlaneBoundedVolumeList mFrustumClipVolumes;
 

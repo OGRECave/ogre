@@ -35,6 +35,8 @@ THE SOFTWARE.
 
 namespace Ogre
 {
+    const String MOT_INSTANCED_ENTITY = "InstancedEntity";
+
     NameGenerator InstancedEntity::msNameGenerator("");
 
     InstancedEntity::InstancedEntity( InstanceBatch *batchOwner, uint32 instanceID, InstancedEntity* sharedTransformEntity ) :
@@ -150,8 +152,7 @@ namespace Ogre
     //-----------------------------------------------------------------------
     const String& InstancedEntity::getMovableType(void) const
     {
-        static String sType = "InstancedEntity";
-        return sType;
+        return MOT_INSTANCED_ENTITY;
     }
     //-----------------------------------------------------------------------
     size_t InstancedEntity::getTransforms( Matrix4 *xform ) const

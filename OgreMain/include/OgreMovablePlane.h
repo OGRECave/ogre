@@ -58,7 +58,6 @@ namespace Ogre {
         mutable Vector3 mLastTranslate;
         mutable Quaternion mLastRotate;
         mutable bool mDirty;
-        static String msMovableType;
     public:
 
         MovablePlane(const String& name);

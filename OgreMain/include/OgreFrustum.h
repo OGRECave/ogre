@@ -139,9 +139,6 @@ namespace Ogre
         /// Signal to update view information.
         virtual void invalidateView(void) const;
 
-        /// Shared class-level name for Movable type
-        static String msMovableType;
-
         ColourValue mDebugColour;
         /// Pointer to a reflection plane (automatically updated)
         const MovablePlane* mLinkedReflectPlane;
