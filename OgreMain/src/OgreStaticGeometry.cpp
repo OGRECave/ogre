@@ -498,7 +498,7 @@ namespace Ogre {
 
         for (auto mobj : node->getAttachedObjects())
         {
-            if (mobj->getMovableType() == "Entity")
+            if (mobj->getMovableType() == MOT_ENTITY)
             {
                 addEntity(static_cast<Entity*>(mobj),
                     node->_getDerivedPosition(),

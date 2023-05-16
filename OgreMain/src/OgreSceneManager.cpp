@@ -3214,7 +3214,7 @@ MovableObject* SceneManager::createMovableObject(const String& name,
     const String& typeName, const NameValuePairList* params)
 {
     // Nasty hack to make generalised Camera functions work without breaking add-on SMs
-    if (typeName == "Camera")
+    if (typeName == MOT_CAMERA)
     {
         return createCamera(name);
     }
@@ -3250,7 +3250,7 @@ MovableObject* SceneManager::createMovableObject(const String& typeName, const N
 void SceneManager::destroyMovableObject(const String& name, const String& typeName)
 {
     // Nasty hack to make generalised Camera functions work without breaking add-on SMs
-    if (typeName == "Camera")
+    if (typeName == MOT_CAMERA)
     {
         destroyCamera(name);
         return;
@@ -3274,7 +3274,7 @@ void SceneManager::destroyMovableObject(const String& name, const String& typeNa
 void SceneManager::destroyAllMovableObjectsByType(const String& typeName)
 {
     // Nasty hack to make generalised Camera functions work without breaking add-on SMs
-    if (typeName == "Camera")
+    if (typeName == MOT_CAMERA)
     {
         destroyAllCameras();
         return;
@@ -3328,7 +3328,7 @@ void SceneManager::destroyAllMovableObjects(void)
 MovableObject* SceneManager::getMovableObject(const String& name, const String& typeName) const
 {
     // Nasty hack to make generalised Camera functions work without breaking add-on SMs
-    if (typeName == "Camera")
+    if (typeName == MOT_CAMERA)
     {
         return getCamera(name);
     }
@@ -3352,7 +3352,7 @@ MovableObject* SceneManager::getMovableObject(const String& name, const String& 
 bool SceneManager::hasMovableObject(const String& name, const String& typeName) const
 {
     // Nasty hack to make generalised Camera functions work without breaking add-on SMs
-    if (typeName == "Camera")
+    if (typeName == MOT_CAMERA)
     {
         return hasCamera(name);
     }

@@ -976,7 +976,7 @@ void Sample_ShaderSystem::updateTargetObjInfo()
 
     String targetObjMaterialName;
 
-    if (mTargetObj->getMovableType() == "Entity")
+    if (mTargetObj->getMovableType() == MOT_ENTITY)
     {
         Entity* targetEnt = static_cast<Entity*>(mTargetObj);
         targetObjMaterialName = targetEnt->getSubEntity(0)->getMaterialName();
