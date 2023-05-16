@@ -90,7 +90,7 @@ void OctreeIntersectionSceneQuery::execute(IntersectionSceneQueryListener* liste
                     {
                         listener -> queryResult( e, m );
                         // deal with attached objects, since they are not directly attached to nodes
-                        if (m->getMovableType() == "Entity")
+                        if (m->getMovableType() == MOT_ENTITY)
                         {
                             Entity* e2 = static_cast<Entity*>(m);
                             for(auto c : e2->getAttachedObjects())
@@ -141,7 +141,7 @@ void OctreeAxisAlignedBoxSceneQuery::execute(SceneQueryListener* listener)
             {
                 listener -> queryResult( m );
                 // deal with attached objects, since they are not directly attached to nodes
-                if (m->getMovableType() == "Entity")
+                if (m->getMovableType() == MOT_ENTITY)
                 {
                     Entity* e = static_cast<Entity*>(m);
                     for (auto c : e->getAttachedObjects())
@@ -190,7 +190,7 @@ void OctreeRaySceneQuery::execute(RaySceneQueryListener* listener)
                 {
                     listener -> queryResult( m, result.second );
                     // deal with attached objects, since they are not directly attached to nodes
-                    if (m->getMovableType() == "Entity")
+                    if (m->getMovableType() == MOT_ENTITY)
                     {
                         Entity* e = static_cast<Entity*>(m);
                         for(auto c : e->getAttachedObjects())
@@ -243,7 +243,7 @@ void OctreeSphereSceneQuery::execute(SceneQueryListener* listener)
             {
                 listener -> queryResult( m );
                 // deal with attached objects, since they are not directly attached to nodes
-                if (m->getMovableType() == "Entity")
+                if (m->getMovableType() == MOT_ENTITY)
                 {
                     Entity* e = static_cast<Entity*>(m);
                     for(auto c : e->getAttachedObjects())
@@ -301,7 +301,7 @@ void OctreePlaneBoundedVolumeListSceneQuery::execute(SceneQueryListener* listene
                 {
                     listener -> queryResult( m );
                     // deal with attached objects, since they are not directly attached to nodes
-                    if (m->getMovableType() == "Entity")
+                    if (m->getMovableType() == MOT_ENTITY)
                     {
                         Entity* e = static_cast<Entity*>(m);
                         for(auto c : e->getAttachedObjects())

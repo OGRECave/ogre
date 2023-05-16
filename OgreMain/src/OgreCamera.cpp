@@ -32,7 +32,7 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-    String Camera::msMovableType = "Camera";
+    const String MOT_CAMERA = "Camera";
     //-----------------------------------------------------------------------
     Camera::Camera( const String& name, SceneManager* sm)
         : Frustum(name),
@@ -648,7 +648,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     const String& Camera::getMovableType(void) const
     {
-        return msMovableType;
+        return MOT_CAMERA;
     }
     //-----------------------------------------------------------------------
     void Camera::setLodBias(Real factor)

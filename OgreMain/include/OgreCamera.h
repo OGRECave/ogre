@@ -131,9 +131,6 @@ namespace Ogre {
         /// Stored number of visible batches in the last render
         unsigned int mVisBatchesLastRender;
 
-        /// Shared class-level name for Movable type
-        static String msMovableType;
-
 #ifdef OGRE_NODELESS_POSITIONING
         /// Real world orientation/position of the camera
         mutable Quaternion mRealOrientation;

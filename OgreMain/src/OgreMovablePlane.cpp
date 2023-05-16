@@ -30,7 +30,7 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-    String MovablePlane::msMovableType = "MovablePlane";
+    const String MOT_MOVABLE_PLANE = "MovablePlane";
     //-----------------------------------------------------------------------
     //-----------------------------------------------------------------------
     MovablePlane::MovablePlane(const String& name) : Plane(), MovableObject(name),
@@ -96,6 +96,6 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     const String& MovablePlane::getMovableType(void) const
     {
-        return msMovableType;
+        return MOT_MOVABLE_PLANE;
     }
 }

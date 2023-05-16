@@ -88,7 +88,7 @@ namespace Ogre
                         {
                             listener -> queryResult( e, m );
                             // deal with attached objects, since they are not directly attached to nodes
-                            if (m->getMovableType() == "Entity")
+                            if (m->getMovableType() == MOT_ENTITY)
                             {
                                 Entity* e2 = static_cast<Entity*>(m);
                                 for (auto c : e2->getAttachedObjects())
@@ -140,7 +140,7 @@ namespace Ogre
                 {
                     listener -> queryResult( m );
                     // deal with attached objects, since they are not directly attached to nodes
-                    if (m->getMovableType() == "Entity")
+                    if (m->getMovableType() == MOT_ENTITY)
                     {
                         Entity* e = static_cast<Entity*>(m);
                         for (auto c : e->getAttachedObjects())
@@ -192,7 +192,7 @@ namespace Ogre
                     {
                         listener -> queryResult( m, result.second );
                         // deal with attached objects, since they are not directly attached to nodes
-                        if (m->getMovableType() == "Entity")
+                        if (m->getMovableType() == MOT_ENTITY)
                         {
                             Entity* e = static_cast<Entity*>(m);
                             for (auto c : e->getAttachedObjects())
@@ -248,7 +248,7 @@ namespace Ogre
                 {
                     listener -> queryResult( m );
                     // deal with attached objects, since they are not directly attached to nodes
-                    if (m->getMovableType() == "Entity")
+                    if (m->getMovableType() == MOT_ENTITY)
                     {
                         Entity* e = static_cast<Entity*>(m);
                         for (auto c : e->getAttachedObjects())
@@ -309,7 +309,7 @@ namespace Ogre
                     {
                         listener -> queryResult( m );
                         // deal with attached objects, since they are not directly attached to nodes
-                        if (m->getMovableType() == "Entity")
+                        if (m->getMovableType() == MOT_ENTITY)
                         {
                             Entity* e = static_cast<Entity*>(m);
                             for (auto c : e->getAttachedObjects())

@@ -31,7 +31,7 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-    String Frustum::msMovableType = "Frustum";
+    const String MOT_FRUSTRUM = "Frustum";
     const Real Frustum::INFINITE_FAR_PLANE_ADJUST = 0.00001;
     //-----------------------------------------------------------------------
     Frustum::Frustum(const String& name) : 
@@ -734,7 +734,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     const String& Frustum::getMovableType(void) const
     {
-        return msMovableType;
+        return MOT_FRUSTRUM;
     }
     //-----------------------------------------------------------------------
     Real Frustum::getBoundingRadius(void) const
