@@ -141,9 +141,9 @@ void DefaultDebugDrawer::drawAxes(const Affine3& pose, float size)
         mAxes.triangle(base + 4, base + 5, base + 6);
     }
 }
-void DefaultDebugDrawer::drawBone(const Node* node)
+void DefaultDebugDrawer::drawBone(const Node* node, const Affine3 & transform)
 {
-    drawAxes(node->_getFullTransform());
+    drawAxes(transform * node->_getFullTransform());
 }
 void DefaultDebugDrawer::drawSceneNode(const SceneNode* node)
 {
