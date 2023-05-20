@@ -16,6 +16,7 @@ class _OgreExport DefaultDebugDrawer : public DebugDrawer
     ManualObject mAxes;
     int mDrawType;
     bool mStatic;
+    float mBoneAxesSize;
     void preFindVisibleObjects(SceneManager* source, SceneManager::IlluminationRenderStage irs, Viewport* v) override;
     void postFindVisibleObjects(SceneManager* source, SceneManager::IlluminationRenderStage irs, Viewport* v) override;
     void beginLines();
@@ -38,6 +39,8 @@ public:
     void drawWireBox(const AxisAlignedBox& aabb, const ColourValue& colour = ColourValue::White);
     /// draw coordinate axes
     void drawAxes(const Affine3& pose, float size = 1.0f);
+    /// Specifes the size of the axes drawn by drawBone()
+    void setBoneAxesSize(float size);
 };
 
 } /* namespace Ogre */
