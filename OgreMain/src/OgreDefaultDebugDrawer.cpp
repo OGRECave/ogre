@@ -8,7 +8,7 @@
 namespace Ogre
 {
 
-DefaultDebugDrawer::DefaultDebugDrawer() : mLines(""), mAxes(""), mDrawType(0), mStatic(false) {}
+DefaultDebugDrawer::DefaultDebugDrawer() : mLines(""), mAxes(""), mDrawType(0), mStatic(false), mBoneAxesSize(1.0f) {}
 
 void DefaultDebugDrawer::preFindVisibleObjects(SceneManager* source,
                                                SceneManager::IlluminationRenderStage irs, Viewport* v)
@@ -141,9 +141,13 @@ void DefaultDebugDrawer::drawAxes(const Affine3& pose, float size)
         mAxes.triangle(base + 4, base + 5, base + 6);
     }
 }
+void DefaultDebugDrawer::setBoneAxesSize(float size)
+{
+    mBoneAxesSize = size;
+}
 void DefaultDebugDrawer::drawBone(const Node* node, const Affine3 & transform)
 {
-    drawAxes(transform * node->_getFullTransform());
+    drawAxes(transform * node->_getFullTransform(), mBoneAxesSize);
 }
 void DefaultDebugDrawer::drawSceneNode(const SceneNode* node)
 {
