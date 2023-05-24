@@ -274,7 +274,7 @@ find_package(PythonLibs)
 macro_log_feature(PYTHONLIBS_FOUND "Python" "Language bindings to use OGRE from Python" "http://www.python.org/")
 
 # SWIG
-find_package(SWIG 3.0.8 QUIET)
+find_package(SWIG 3.0.12 QUIET)
 macro_log_feature(SWIG_FOUND "SWIG" "Language bindings (Python, Java, C#) for OGRE" "http://www.swig.org/")
 
 # pugixml
