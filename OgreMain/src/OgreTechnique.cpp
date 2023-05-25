@@ -171,7 +171,7 @@ namespace Ogre {
                 }
             }
 
-            
+
 
             //Check compilation errors for all program types.
             for (int t = 0; t < 6; t++)
@@ -229,7 +229,7 @@ namespace Ogre {
                         << std::endl;
                     return false;
                 }
-                    
+
             }
         }
 
@@ -286,22 +286,13 @@ namespace Ogre {
     //-----------------------------------------------------------------------------
     Pass* Technique::getPass(const String& name) const
     {
-        Passes::const_iterator i    = mPasses.begin();
-        Passes::const_iterator iend = mPasses.end();
-        Pass* foundPass = 0;
-
         // iterate through techniques to find a match
-        while (i != iend)
-        {
-            if ( (*i)->getName() == name )
-            {
-                foundPass = (*i);
-                break;
-            }
-            ++i;
+        for (Pass *p : mPasses) {
+            if (p->getName() == name )
+                return p;
         }
 
-        return foundPass;
+        return (Pass *)0;
     }
     //-----------------------------------------------------------------------------
     void Technique::removePass(unsigned short index)
@@ -550,7 +541,7 @@ namespace Ogre {
         for (auto *p : mPasses)
         {
             p->_unload();
-        }   
+        }
     }
     //-----------------------------------------------------------------------------
     bool Technique::isLoaded(void) const
@@ -758,11 +749,9 @@ namespace Ogre {
                             {
                                 // Alpha rejection passes must retain their transparency, so
                                 // we allow the texture units, but override the colour functions
-                                Pass::TextureUnitStates::const_iterator it;
-                                for(it = newPass->getTextureUnitStates().begin(); it != newPass->getTextureUnitStates().end(); ++it)
+                                for(auto *s : newPass->getTextureUnitStates())
                                 {
-                                    TextureUnitState* tus = *it;
-                                    tus->setColourOperationEx(LBX_SOURCE1, LBS_CURRENT);
+                                    s->setColourOperationEx(LBX_SOURCE1, LBS_CURRENT);
                                 }
                             }
                             else
@@ -844,11 +833,9 @@ namespace Ogre {
                             {
                                 // Alpha rejection passes must retain their transparency, so
                                 // we allow the texture units, but override the colour functions
-                                Pass::TextureUnitStates::const_iterator it;
-                                for(it = newPass->getTextureUnitStates().begin(); it != newPass->getTextureUnitStates().end(); ++it)
+                                for(auto *s : newPass->getTextureUnitStates())
                                 {
-                                    TextureUnitState* tus = *it;
-                                    tus->setColourOperationEx(LBX_SOURCE1, LBS_CURRENT);
+                                    s->setColourOperationEx(LBX_SOURCE1, LBS_CURRENT);
                                 }
                             }
                             else
@@ -981,13 +968,13 @@ namespace Ogre {
         return mParent->getGroup();
     }
     //-----------------------------------------------------------------------
-    Ogre::MaterialPtr  Technique::getShadowCasterMaterial() const 
-    { 
-        return mShadowCasterMaterial; 
+    Ogre::MaterialPtr  Technique::getShadowCasterMaterial() const
+    {
+        return mShadowCasterMaterial;
     }
     //-----------------------------------------------------------------------
-    void  Technique::setShadowCasterMaterial(Ogre::MaterialPtr val) 
-    { 
+    void  Technique::setShadowCasterMaterial(Ogre::MaterialPtr val)
+    {
         if (!val)
         {
             mShadowCasterMaterial.reset();
@@ -997,25 +984,25 @@ namespace Ogre {
         {
             // shadow caster material should never receive shadows
             val->setReceiveShadows(false); // should we warn if this is not set?
-            mShadowCasterMaterial = val; 
+            mShadowCasterMaterial = val;
             mShadowCasterMaterialName = val->getName();
         }
     }
     //-----------------------------------------------------------------------
-    void  Technique::setShadowCasterMaterial(const Ogre::String &name) 
-    { 
+    void  Technique::setShadowCasterMaterial(const Ogre::String &name)
+    {
         setShadowCasterMaterial(MaterialManager::getSingleton().getByName(name));
         // remember the name, even if it is not created yet
         mShadowCasterMaterialName = name;
     }
     //-----------------------------------------------------------------------
-    Ogre::MaterialPtr  Technique::getShadowReceiverMaterial() const 
-    { 
-        return mShadowReceiverMaterial; 
+    Ogre::MaterialPtr  Technique::getShadowReceiverMaterial() const
+    {
+        return mShadowReceiverMaterial;
     }
     //-----------------------------------------------------------------------
-    void  Technique::setShadowReceiverMaterial(Ogre::MaterialPtr val) 
-    { 
+    void  Technique::setShadowReceiverMaterial(Ogre::MaterialPtr val)
+    {
         if (!val)
         {
             mShadowReceiverMaterial.reset();
@@ -1023,13 +1010,13 @@ namespace Ogre {
         }
         else
         {
-            mShadowReceiverMaterial = val; 
+            mShadowReceiverMaterial = val;
             mShadowReceiverMaterialName = val->getName();
         }
     }
     //-----------------------------------------------------------------------
-    void  Technique::setShadowReceiverMaterial(const Ogre::String &name)  
-    { 
+    void  Technique::setShadowReceiverMaterial(const Ogre::String &name)
+    {
         mShadowReceiverMaterialName = name;
         mShadowReceiverMaterial = MaterialManager::getSingleton().getByName(name);
     }
@@ -1062,7 +1049,7 @@ namespace Ogre {
         return GPUVendorRuleIterator(mGPUVendorRules.begin(), mGPUVendorRules.end());
     }
     //---------------------------------------------------------------------
-    void Technique::addGPUDeviceNameRule(const String& devicePattern, 
+    void Technique::addGPUDeviceNameRule(const String& devicePattern,
         Technique::IncludeOrExclude includeOrExclude, bool caseSensitive)
     {
         addGPUDeviceNameRule(GPUDeviceNameRule(devicePattern, includeOrExclude, caseSensitive));
@@ -1091,6 +1078,4 @@ namespace Ogre {
         return GPUDeviceNameRuleIterator(mGPUDeviceNameRules.begin(), mGPUDeviceNameRules.end());
     }
     //---------------------------------------------------------------------
-
-
 }
