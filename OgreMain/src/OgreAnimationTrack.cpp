@@ -363,8 +363,8 @@ namespace Ogre {
     }
     //---------------------------------------------------------------------
     NodeAnimationTrack::NodeAnimationTrack(Animation* parent, unsigned short handle, Node* targetNode)
-        : AnimationTrack(parent, handle), mSplineBuildNeeded(false), mUseShortestRotationPath(true)
-        , mTransformSpace(Node::TS_PARENT), mTargetNode(targetNode), mSplines(0)
+        : AnimationTrack(parent, handle), mSplineBuildNeeded(false), mUseShortestRotationPath(true),
+          mTargetNode(targetNode), mSplines(0)
 
     {
     }
@@ -486,7 +486,7 @@ namespace Ogre {
 
         // add to existing. Weights are not relative, but treated as absolute multipliers for the animation
         Vector3 translate = kf.getTranslate() * weight * scl;
-        node->translate(translate, mTransformSpace);
+        node->translate(translate);
 
         // interpolate between no-rotation and full rotation, to point 'weight', so 0 = no rotate, 1 = full
         Quaternion rotate;
@@ -500,7 +500,7 @@ namespace Ogre {
         {
             rotate = Quaternion::Slerp(weight, Quaternion::IDENTITY, kf.getRotation(), mUseShortestRotationPath);
         }
-        node->rotate(rotate, mTransformSpace);
+        node->rotate(rotate);
 
         Vector3 scale = kf.getScale();
         // Not sure how to modify scale for cumulative anims... leave it alone
@@ -564,16 +564,6 @@ namespace Ogre {
     bool NodeAnimationTrack::getUseShortestRotationPath() const
     {
         return mUseShortestRotationPath ;
-    }
-    //---------------------------------------------------------------------
-    void NodeAnimationTrack::setTransformSpace(Node::TransformSpace space)
-    {
-        mTransformSpace = space;
-    }
-    //---------------------------------------------------------------------
-    Node::TransformSpace NodeAnimationTrack::getTransformSpace() const
-    {
-        return mTransformSpace;
     }
     //---------------------------------------------------------------------
     void NodeAnimationTrack::_keyFrameDataChanged(void) const
@@ -680,7 +670,6 @@ namespace Ogre {
         NodeAnimationTrack* newTrack = 
             newParent->createNodeTrack(mHandle, mTargetNode);
         newTrack->mUseShortestRotationPath = mUseShortestRotationPath;
-        newTrack->mTransformSpace = mTransformSpace;
         populateClone(newTrack);
         return newTrack;
     }
