@@ -67,8 +67,6 @@ namespace Ogre {
         , mDerivedDepthBiasBase(0.0f)
         , mDerivedDepthBiasMultiplier(0.0f)
         , mDerivedDepthBiasSlopeScale(0.0f)
-        , mGlobalInstanceVertexBufferVertexDeclaration(NULL)
-        , mGlobalNumberOfInstances(1)
         , mClipPlanesDirty(true)
         , mRealCapabilities(0)
         , mCurrentCapabilities(0)
@@ -76,6 +74,8 @@ namespace Ogre {
         , mNativeShadingLanguageVersion(0)
         , mTexProjRelative(false)
         , mTexProjRelativeOrigin(Vector3::ZERO)
+        , mGlobalInstanceVertexDeclaration(NULL)
+        , mGlobalNumberOfInstances(1)
     {
         mEventNames.push_back("RenderSystemCapabilitiesCreated");
     }
@@ -801,40 +801,10 @@ namespace Ogre {
         return MSN_DEFAULT;
     }
     //---------------------------------------------------------------------
-    Ogre::HardwareVertexBufferSharedPtr RenderSystem::getGlobalInstanceVertexBuffer() const
-    {
-        return mGlobalInstanceVertexBuffer;
-    }
-    //---------------------------------------------------------------------
     void RenderSystem::setGlobalInstanceVertexBuffer( const HardwareVertexBufferSharedPtr &val )
     {
-        if ( val && !val->isInstanceData() )
-        {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
-                        "A none instance data vertex buffer was set to be the global instance vertex buffer.",
-                        "RenderSystem::setGlobalInstanceVertexBuffer");
-        }
+        OgreAssert(!val || val->isInstanceData(), "not an instance buffer");
         mGlobalInstanceVertexBuffer = val;
-    }
-    //---------------------------------------------------------------------
-    size_t RenderSystem::getGlobalNumberOfInstances() const
-    {
-        return mGlobalNumberOfInstances;
-    }
-    //---------------------------------------------------------------------
-    void RenderSystem::setGlobalNumberOfInstances( const size_t val )
-    {
-        mGlobalNumberOfInstances = val;
-    }
-
-    VertexDeclaration* RenderSystem::getGlobalInstanceVertexBufferVertexDeclaration() const
-    {
-        return mGlobalInstanceVertexBufferVertexDeclaration;
-    }
-    //---------------------------------------------------------------------
-    void RenderSystem::setGlobalInstanceVertexBufferVertexDeclaration( VertexDeclaration* val )
-    {
-        mGlobalInstanceVertexBufferVertexDeclaration = val;
     }
     //---------------------------------------------------------------------
     void RenderSystem::getCustomAttribute(const String& name, void* pData)

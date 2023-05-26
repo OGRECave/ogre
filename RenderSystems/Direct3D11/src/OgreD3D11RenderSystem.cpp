@@ -1826,11 +1826,6 @@ namespace Ogre
 
         size_t numberOfInstances = op.numberOfInstances;
 
-        if (op.useGlobalInstancingVertexBufferIsAvailable)
-        {
-            numberOfInstances *= getGlobalNumberOfInstances();
-        }
-
         // Call super class
         RenderSystem::_render(op);
         

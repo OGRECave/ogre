@@ -440,22 +440,22 @@ namespace Ogre
 
         /** Returns the global instance vertex buffer.
         */
-        HardwareVertexBufferSharedPtr getGlobalInstanceVertexBuffer() const;
+        HardwareVertexBufferPtr getGlobalInstanceVertexBuffer() const { return mGlobalInstanceVertexBuffer; }
         /** Sets the global instance vertex buffer.
         */
-        void setGlobalInstanceVertexBuffer(const HardwareVertexBufferSharedPtr &val);
+        void setGlobalInstanceVertexBuffer(const HardwareVertexBufferPtr &val);
         /** Gets vertex declaration for the global vertex buffer for the global instancing
         */
-        VertexDeclaration* getGlobalInstanceVertexBufferVertexDeclaration() const;
+        VertexDeclaration* getGlobalInstanceVertexDeclaration() const { return mGlobalInstanceVertexDeclaration; }
         /** Sets vertex declaration for the global vertex buffer for the global instancing
         */
-        void setGlobalInstanceVertexBufferVertexDeclaration( VertexDeclaration* val);
+        void setGlobalInstanceVertexDeclaration( VertexDeclaration* val) { mGlobalInstanceVertexDeclaration = val; }
         /** Gets the global number of instances.
         */
-        size_t getGlobalNumberOfInstances() const;
+        uint32 getGlobalInstanceCount() const { return mGlobalNumberOfInstances; }
         /** Sets the global number of instances.
         */
-        void setGlobalNumberOfInstances(const size_t val);
+        void setGlobalInstanceCount(uint32 val) { mGlobalNumberOfInstances = val; }
 
         /** Retrieves an existing DepthBuffer or creates a new one suited for the given RenderTarget
             and sets it.
@@ -1137,13 +1137,6 @@ namespace Ogre
         float mDerivedDepthBiasMultiplier;
         float mDerivedDepthBiasSlopeScale;
 
-        /// a global vertex buffer for global instancing
-        HardwareVertexBufferSharedPtr mGlobalInstanceVertexBuffer;
-        /// a vertex declaration for the global vertex buffer for the global instancing
-        VertexDeclaration* mGlobalInstanceVertexBufferVertexDeclaration;
-        /// the number of global instances (this number will be multiply by the render op instance number) 
-        size_t mGlobalNumberOfInstances;
-
         /** updates pass iteration rendering state including bound gpu program parameter
         pass iteration auto constant entry
         @return True if more iterations are required
@@ -1205,6 +1198,13 @@ namespace Ogre
         static CompareFunction reverseCompareFunction(CompareFunction func);
     private:
         StencilState mStencilState;
+
+        /// a global vertex buffer for global instancing
+        HardwareVertexBufferSharedPtr mGlobalInstanceVertexBuffer;
+        /// a vertex declaration for the global vertex buffer for the global instancing
+        VertexDeclaration* mGlobalInstanceVertexDeclaration;
+        /// the number of global instances (this number will be multiply by the render op instance number)
+        uint32 mGlobalNumberOfInstances;
     };
     /** @} */
     /** @} */
