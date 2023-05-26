@@ -372,21 +372,6 @@ namespace Ogre {
 #endif
     }
     //-----------------------------------------------------------------------
-    void Profiler::beginGPUEvent(const String& event)
-    {
-        Root::getSingleton().getRenderSystem()->beginProfileEvent(event);
-    }
-    //-----------------------------------------------------------------------
-    void Profiler::endGPUEvent(const String& event)
-    {
-        Root::getSingleton().getRenderSystem()->endProfileEvent();
-    }
-    //-----------------------------------------------------------------------
-    void Profiler::markGPUEvent(const String& event)
-    {
-        Root::getSingleton().getRenderSystem()->markProfileEvent(event);
-    }
-    //-----------------------------------------------------------------------
     void Profiler::processFrameStats(ProfileInstance* instance, Real& maxFrameTime)
     {
         // calculate what percentage of frame time this profile took
