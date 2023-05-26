@@ -52,9 +52,9 @@ Ogre-dependent is in the visualization/logging routines and the use of the Timer
 #   define OgreProfileGroup( a, g ) Ogre::Profile OGRE_TOKEN_PASTE(_OgreProfileInstance, __LINE__) ( (a), (g) )
 #   define OgreProfileBeginGroup( a, g ) Ogre::Profiler::getSingleton().beginProfile( (a), (g) )
 #   define OgreProfileEndGroup( a, g ) Ogre::Profiler::getSingleton().endProfile( (a), (g) )
-#   define OgreProfileBeginGPUEvent( g ) Ogre::Profiler::getSingleton().beginGPUEvent(g)
-#   define OgreProfileEndGPUEvent( g ) Ogre::Profiler::getSingleton().endGPUEvent(g)
-#   define OgreProfileMarkGPUEvent( e ) Ogre::Profiler::getSingleton().markGPUEvent(e)
+#   define OgreProfileBeginGPUEvent( g ) Ogre::Root::getSingleton().getRenderSystem()->beginProfileEvent(g)
+#   define OgreProfileEndGPUEvent( g ) Ogre::Root::getSingleton().getRenderSystem()->endProfileEvent()
+#   define OgreProfileMarkGPUEvent( e ) Ogre::Root::getSingleton().getRenderSystem()->markProfileEvent(e)
 #else
 #   define OgreProfile( a )
 #   define OgreProfileBegin( a )
@@ -274,21 +274,6 @@ namespace Ogre {
             @param groupID A profile group identifier, which can allow you to mask profiles
             */
             void endProfile(const String& profileName, uint32 groupID = (uint32)OGREPROF_USER_DEFAULT);
-
-            /** Mark the beginning of a GPU event group
-             @remarks Can be safely called in the middle of the profile.
-             */
-            void beginGPUEvent(const String& event);
-
-            /** Mark the end of a GPU event group
-             @remarks Can be safely called in the middle of the profile.
-             */
-            void endGPUEvent(const String& event);
-
-            /** Mark a specific, ungrouped, GPU event
-             @remarks Can be safely called in the middle of the profile.
-             */
-            void markGPUEvent(const String& event);
 
             /** Sets whether this profiler is enabled. Only takes effect after the
                 the frame has ended.
