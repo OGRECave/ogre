@@ -635,7 +635,7 @@ ManualObject::ManualObject(const String& name)
         mRenderOperation.operationType = opType;
         // default to no indexes unless we're told
         mRenderOperation.useIndexes = false;
-        mRenderOperation.useGlobalInstancingVertexBufferIsAvailable = false;
+        mRenderOperation.useGlobalInstancing = false;
         mRenderOperation.vertexData = OGRE_NEW VertexData();
         mRenderOperation.vertexData->vertexCount = 0;
     }
@@ -649,7 +649,7 @@ ManualObject::ManualObject(const String& name)
 
         mRenderOperation.operationType = opType;
         mRenderOperation.useIndexes = false;
-        mRenderOperation.useGlobalInstancingVertexBufferIsAvailable = false;
+        mRenderOperation.useGlobalInstancing = false;
         mRenderOperation.vertexData = OGRE_NEW VertexData();
         mRenderOperation.vertexData->vertexCount = 0;
     }

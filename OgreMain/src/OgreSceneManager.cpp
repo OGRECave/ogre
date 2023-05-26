@@ -1605,11 +1605,11 @@ void SceneManager::issueRenderWithLights(Renderable* rend, const Pass* pass,
 //-----------------------------------------------------------------------
 static void injectGlobalInstancingDeclaration(RenderOperation& ro, const RenderSystem* rs)
 {
-    if (!ro.useGlobalInstancingVertexBufferIsAvailable)
+    if (!ro.useGlobalInstancing)
         return;
 
     // Create variables related to instancing.
-    VertexDeclaration* instanceDecl = rs->getGlobalInstanceVertexBufferVertexDeclaration();
+    VertexDeclaration* instanceDecl = rs->getGlobalInstanceVertexDeclaration();
 
     if(!instanceDecl || instanceDecl->getElements().empty())
         return;
@@ -1628,7 +1628,7 @@ static void injectGlobalInstancingDeclaration(RenderOperation& ro, const RenderS
     }
     ro.vertexData->vertexBufferBinding->setBinding(instancingSrc, rs->getGlobalInstanceVertexBuffer());
 
-    ro.numberOfInstances *= rs->getGlobalNumberOfInstances();
+    ro.numberOfInstances *= rs->getGlobalInstanceCount();
 }
 
 static PolygonMode derivePolygonMode(const Pass* pass, const Renderable* rend, const Camera* cam)

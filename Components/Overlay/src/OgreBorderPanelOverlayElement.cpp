@@ -178,7 +178,7 @@ namespace Ogre {
             mRenderOp2.indexData = OGRE_NEW IndexData();
             mRenderOp2.indexData->indexCount = 8 * 6;
             mRenderOp2.indexData->indexStart = 0;
-            mRenderOp2.useGlobalInstancingVertexBufferIsAvailable = false;
+            mRenderOp2.useGlobalInstancing = false;
 
             // Create sub-object for rendering border
             mBorderRenderable = OGRE_NEW BorderRenderable(this);

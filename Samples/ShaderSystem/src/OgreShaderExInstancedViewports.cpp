@@ -309,8 +309,8 @@ void ShaderExInstancedViewports::setMonitorsCount( const Vector2 monitorCount )
 
     auto rs = Ogre::Root::getSingleton().getRenderSystem();
     rs->setGlobalInstanceVertexBuffer(vbuf);
-    rs->setGlobalInstanceVertexBufferVertexDeclaration(vertexDeclaration);
-    rs->setGlobalNumberOfInstances(monitorCount.x * monitorCount.y);
+    rs->setGlobalInstanceVertexDeclaration(vertexDeclaration);
+    rs->setGlobalInstanceCount(monitorCount.x * monitorCount.y);
 }
 ShaderExInstancedViewports::~ShaderExInstancedViewports()
 {
@@ -318,15 +318,14 @@ ShaderExInstancedViewports::~ShaderExInstancedViewports()
         return;
 
     auto rs = Ogre::Root::getSingleton().getRenderSystem();
-    if (rs->getGlobalInstanceVertexBufferVertexDeclaration())
+    if (auto decl = rs->getGlobalInstanceVertexDeclaration())
     {
-        Ogre::HardwareBufferManager::getSingleton().destroyVertexDeclaration(
-            rs->getGlobalInstanceVertexBufferVertexDeclaration());
+        Ogre::HardwareBufferManager::getSingleton().destroyVertexDeclaration(decl);
     }
 
-    rs->setGlobalInstanceVertexBufferVertexDeclaration(NULL);
-    rs->setGlobalNumberOfInstances(1);
-    rs->setGlobalInstanceVertexBuffer(Ogre::HardwareVertexBufferSharedPtr() );
+    rs->setGlobalInstanceVertexDeclaration(NULL);
+    rs->setGlobalInstanceCount(1);
+    rs->setGlobalInstanceVertexBuffer( NULL );
 }
 
 //-----------------------------------------------------------------------
