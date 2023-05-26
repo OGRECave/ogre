@@ -1532,9 +1532,9 @@ void SceneManager::SceneMgrQueuedRenderableVisitor::visit(const Pass* p, Rendera
     if (!targetSceneMgr->validatePassForRendering(p))
         return;
 
-    OgreProfileBeginGPUEvent(p->getParent()->getParent()->getName());
     // Set pass, store the actual one used
     mUsedPass = targetSceneMgr->_setPass(p);
+    OgreProfileBeginGPUEvent(mUsedPass->getParent()->getParent()->getName());
 
     SubMesh* lastsm = 0;
     RenderableList instances;
@@ -1584,7 +1584,7 @@ void SceneManager::SceneMgrQueuedRenderableVisitor::visit(const Pass* p, Rendera
     if (!instances.empty())
         targetSceneMgr->renderInstancedObject(instances, mUsedPass, scissoring, autoLights, manualLightList);
 
-    OgreProfileEndGPUEvent(p->getParent()->getParent()->getName());
+    OgreProfileEndGPUEvent(mUsedPass->getParent()->getParent()->getName());
 }
 //-----------------------------------------------------------------------
 void SceneManager::SceneMgrQueuedRenderableVisitor::visit(RenderablePass* rp)
