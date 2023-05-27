@@ -34,6 +34,7 @@ THE SOFTWARE.
 #include "OgreSimpleSpline.h"
 #include "OgreRotationalSpline.h"
 #include "OgrePose.h"
+#include "OgreNode.h"
 
 namespace Ogre 
 {
@@ -339,6 +340,13 @@ namespace Ogre
         /** Gets the method of rotation calculation */
         virtual bool getUseShortestRotationPath() const;
 
+        /** Sets whether this track's translations are relative to local space.
+            Default is false, meaning translations are relative to the parent node's space. */
+        virtual void setUseLocalTranslation(bool useLocal);
+
+        /** Gets whether this track's translations are relative to local space. */
+        virtual bool getUseLocalTranslation() const;
+
         /// @copydoc AnimationTrack::getInterpolatedKeyFrame
         void getInterpolatedKeyFrame(const TimeIndex& timeIndex, KeyFrame* kf) const override;
 
@@ -383,6 +391,8 @@ namespace Ogre
         mutable bool mSplineBuildNeeded;
         /// Defines if rotation is done using shortest path
         mutable bool mUseShortestRotationPath;
+        /// Which space our translations are relative to.
+        Node::TransformSpace mTranslationSpace;
         Node* mTargetNode;
         // Prebuilt splines, must be mutable since lazy-update in const method
         mutable Splines* mSplines;

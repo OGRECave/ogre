@@ -364,8 +364,7 @@ namespace Ogre {
     //---------------------------------------------------------------------
     NodeAnimationTrack::NodeAnimationTrack(Animation* parent, unsigned short handle, Node* targetNode)
         : AnimationTrack(parent, handle), mSplineBuildNeeded(false), mUseShortestRotationPath(true),
-          mTargetNode(targetNode), mSplines(0)
-
+          mTranslationSpace(Node::TS_PARENT), mTargetNode(targetNode), mSplines(0)
     {
     }
     //---------------------------------------------------------------------
@@ -486,7 +485,7 @@ namespace Ogre {
 
         // add to existing. Weights are not relative, but treated as absolute multipliers for the animation
         Vector3 translate = kf.getTranslate() * weight * scl;
-        node->translate(translate);
+        node->translate(translate, mTranslationSpace);
 
         // interpolate between no-rotation and full rotation, to point 'weight', so 0 = no rotate, 1 = full
         Quaternion rotate;
@@ -564,6 +563,17 @@ namespace Ogre {
     bool NodeAnimationTrack::getUseShortestRotationPath() const
     {
         return mUseShortestRotationPath ;
+    }
+    //---------------------------------------------------------------------
+    void NodeAnimationTrack::setUseLocalTranslation(bool useLocal)
+    {
+        mTranslationSpace = useLocal ? Node::TS_LOCAL : Node::TS_PARENT;
+    }
+
+    //---------------------------------------------------------------------
+    bool NodeAnimationTrack::getUseLocalTranslation() const
+    {
+        return mTranslationSpace == Node::TS_LOCAL;
     }
     //---------------------------------------------------------------------
     void NodeAnimationTrack::_keyFrameDataChanged(void) const
@@ -670,6 +680,7 @@ namespace Ogre {
         NodeAnimationTrack* newTrack = 
             newParent->createNodeTrack(mHandle, mTargetNode);
         newTrack->mUseShortestRotationPath = mUseShortestRotationPath;
+        newTrack->mTranslationSpace = mTranslationSpace;
         populateClone(newTrack);
         return newTrack;
     }
