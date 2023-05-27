@@ -410,7 +410,6 @@ namespace Ogre {
 
         void renderInstancedObject(const RenderableList& rend, const Pass* pass,
             bool lightScissoringClipping, bool doLightIteration, const LightList* manualLightList = 0);
-    protected:
 
         /// Subclasses can override this to ensure their specialised SceneNode is used.
         virtual SceneNode* createSceneNodeImpl(void);
@@ -419,22 +418,21 @@ namespace Ogre {
 
         /// Instance name
         String mName;
-
         /// Queue of objects for rendering
         std::unique_ptr<RenderQueue> mRenderQueue;
-
-        /// The rendering system to send the scene to
-        RenderSystem *mDestRenderSystem;
-
-        /** Central list of cameras - for easy memory management and lookup.
-        */
-        CameraList mCameras;
 
         typedef std::map<String, StaticGeometry* > StaticGeometryList;
         StaticGeometryList mStaticGeometryList;
 
         typedef std::map<String, InstanceManager*> InstanceManagerMap;
         InstanceManagerMap  mInstanceManagerMap;
+
+        /// The rendering system to send the scene to
+        RenderSystem *mDestRenderSystem;
+    protected:
+        /** Central list of cameras - for easy memory management and lookup.
+        */
+        CameraList mCameras;
 
         typedef std::vector<SceneNode*> SceneNodeList;
 
@@ -446,11 +444,13 @@ namespace Ogre {
         */
         SceneNodeList mSceneNodes;
 
+        /// Camera in progress
+        Camera* mCameraInProgress;
+
+    private:
         /// additional map to speed up lookup by name
         std::map<String, SceneNode*> mNamedNodes;
 
-        /// Camera in progress
-        Camera* mCameraInProgress;
         /// Current Viewport
         Viewport* mCurrentViewport;
 
@@ -462,7 +462,7 @@ namespace Ogre {
         AutoTrackingSceneNodes mAutoTrackingSceneNodes;
 
         // Sky params
-        class _OgreExport SkyRenderer : public Listener, public Node::Listener
+        class SkyRenderer : public Listener, public Node::Listener
         {
         protected:
             SceneManager* mSceneManager;
@@ -488,7 +488,7 @@ namespace Ogre {
             void postFindVisibleObjects(SceneManager* source, IlluminationRenderStage irs, Viewport* vp) override;
         };
 
-        class _OgreExport SkyPlaneRenderer : public SkyRenderer
+        class SkyPlaneRenderer : public SkyRenderer
         {
             Entity* mSkyPlaneEntity;
             Plane mSkyPlane;
@@ -501,7 +501,7 @@ namespace Ogre {
                              int ysegments, const String& groupName);
         } mSkyPlane;
 
-        class _OgreExport SkyBoxRenderer : public SkyRenderer
+        class SkyBoxRenderer : public SkyRenderer
         {
             std::unique_ptr<ManualObject> mSkyBoxObj;
 
@@ -515,7 +515,7 @@ namespace Ogre {
                            const String& groupName);
         } mSkyBox;
 
-        class _OgreExport SkyDomeRenderer : public SkyRenderer
+        class SkyDomeRenderer : public SkyRenderer
         {
             std::array<Entity*, 5> mSkyDomeEntity;
             Quaternion mSkyDomeOrientation;
@@ -601,9 +601,6 @@ namespace Ogre {
                     MovableObjectMap map;
                     OGRE_MUTEX(mutex);
         };
-        typedef std::map<String, MovableObjectCollection*> MovableObjectCollectionMap;
-        MovableObjectCollectionMap mMovableObjectCollectionMap;
-        NameGenerator mMovableNameGenerator;
         /** Gets the movable object collection for the given type name.
 
             This method create new collection if the collection does not exist.
@@ -623,7 +620,151 @@ namespace Ogre {
         */
         virtual void initRenderQueue(void);
 
-        struct _OgreExport ShadowRenderer
+        /** Internal method to validate whether a Pass should be allowed to render.
+
+            Called just before a pass is about to be used for rendering a group to
+            allow the SceneManager to omit it if required. A return value of false
+            skips this pass.
+        */
+        bool validatePassForRendering(const Pass* pass);
+
+        /** Internal method to validate whether a Renderable should be allowed to render.
+
+        Called just before a pass is about to be used for rendering a Renderable to
+        allow the SceneManager to omit it if required. A return value of false
+        skips it.
+        */
+        bool validateRenderableForRendering(const Pass* pass, const Renderable* rend);
+
+        /** Internal utility method for rendering a single object.
+
+            Assumes that the pass has already been set up.
+        @copydetail _injectRenderWithPass
+        @param lightScissoringClipping If true, passes that have the getLightScissorEnabled
+        and/or getLightClipPlanesEnabled flags will cause calculation and setting of
+        scissor rectangle and user clip planes.
+        */
+        void renderSingleObject(Renderable* rend, const Pass* pass,
+            bool lightScissoringClipping, bool doLightIteration, const LightList* manualLightList = 0);
+
+        void updateCachedLightInfos(const Camera* camera);
+
+        /** Internal method for locating a list of lights which could be affecting the frustum.
+
+            Custom scene managers are encouraged to override this method to make use of their
+            scene partitioning scheme to more efficiently locate lights, and to eliminate lights
+            which may be occluded by world geometry.
+            If the list of lights is different to the list returned by
+            SceneManager::_getLightsAffectingFrustum before this method was called, then this
+            method should update that cached list and call SceneManager::_notifyLightsDirty to
+            mark that the internal light cache has changed.
+        */
+        virtual void findLightsAffectingFrustum(const Camera* camera);
+        /// Internal method for creating shadow textures (texture-based shadows)
+        virtual void ensureShadowTexturesCreated();
+
+        const std::vector<Camera*>& getShadowTextureCameras();
+        bool isShadowTextureConfigDirty() const;
+
+        /// Internal method for firing the queue start event, returns true if queue is to be skipped
+        virtual bool fireRenderQueueStarted(uint8 id, const String& cameraName);
+        /// Internal method for firing the queue end event, returns true if queue is to be repeated
+        virtual bool fireRenderQueueEnded(uint8 id, const String& cameraName);
+
+    private:
+        /** Internal method for creating the AutoParamDataSource instance. */
+        AutoParamDataSource* createAutoParamDataSource(void) const
+        {
+            return OGRE_NEW AutoParamDataSource();
+        }
+
+        /// Internal method for setting up materials for shadows
+        void initShadowVolumeMaterials(void);
+        /// Internal method for destroying shadow textures (texture-based shadows)
+        void destroyShadowTextures(void);
+
+        /** Internal method for rendering all objects using the default queue sequence. */
+        void renderVisibleObjectsDefaultSequence(void);
+        /** Internal method for preparing the render queue for use with each render. */
+        void prepareRenderQueue(void);
+
+        /** Internal method for setting the destination viewport for the next render. */
+        void setViewport(Viewport *vp);
+
+        /// Internal method for firing the queue start event
+        void firePreRenderQueues();
+        /// Internal method for firing the queue end event
+        void firePostRenderQueues();
+        /// Internal method for firing when rendering a single object.
+        void fireRenderSingleObject(Renderable* rend, const Pass* pass, const AutoParamDataSource* source,
+            const LightList* pLightList, bool suppressRenderStateChanges);
+        /// Internal method for firing pre update scene graph event
+        void firePreUpdateSceneGraph(Camera* camera);
+        /// Internal method for firing post update scene graph event
+        void firePostUpdateSceneGraph(Camera* camera);
+        /// Internal method for firing find visible objects event
+        void firePreFindVisibleObjects(Viewport* v);
+        /// Internal method for firing find visible objects event
+        void firePostFindVisibleObjects(Viewport* v);
+        /// Internal method for firing destruction event
+        void fireSceneManagerDestroyed();
+
+        /** Internal method used by _renderSingleObject to set the world transform */
+        void setWorldTransform(Renderable* rend);
+
+        /** Internal method used by _renderSingleObject to render a single light pass */
+        void issueRenderWithLights(Renderable* rend, const Pass* pass,
+                                   const LightList* pLightListToUse,
+                                   bool lightScissoringClipping);
+
+        /** Internal method used by _renderSingleObject to deal with renderables
+            which override the camera's own view / projection matrices. */
+        void resetViewProjMode();
+
+        typedef std::map<String, MovableObjectCollection*> MovableObjectCollectionMap;
+        MovableObjectCollectionMap mMovableObjectCollectionMap;
+        NameGenerator mMovableNameGenerator;
+
+        /// Flag indicating whether SceneNodes will be rendered as a set of 3 axes
+        bool mDisplayNodes;
+        std::unique_ptr<DebugDrawer> mDebugDrawer;
+
+        /// Storage of animations, lookup by name
+        AnimationList mAnimationsList;
+        OGRE_MUTEX(mAnimationsListMutex);
+        AnimationStateSet mAnimationStates;
+
+        typedef std::vector<RenderQueueListener*> RenderQueueListenerList;
+        RenderQueueListenerList mRenderQueueListeners;
+
+        typedef std::vector<RenderObjectListener*> RenderObjectListenerList;
+        RenderObjectListenerList mRenderObjectListeners;
+        typedef std::vector<Listener*> ListenerList;
+        ListenerList mListeners;
+
+        /** Flag that indicates if all of the scene node's bounding boxes should be shown as a wireframe. */
+        bool mShowBoundingBoxes;
+
+        /// Utility class for calculating automatic parameters for gpu programs
+        std::unique_ptr<AutoParamDataSource> mAutoParamDataSource;
+
+        GpuProgramParametersPtr mFixedFunctionParams;
+
+        CompositorChain* mActiveCompositorChain;
+        bool mLateMaterialResolving;
+
+        IlluminationRenderStage mIlluminationStage;
+
+        typedef std::vector<InstanceManager*>      InstanceManagerVec;
+        InstanceManagerVec mDirtyInstanceManagers;
+        InstanceManagerVec mDirtyInstanceMgrsTmp;
+
+        /** Updates all instance managaers with dirty instance batches. @see _addDirtyInstanceManager */
+        void updateDirtyInstanceManagers(void);
+
+        void _destroySceneNode(SceneNodeList::iterator it);
+
+        struct ShadowRenderer
         {
             typedef std::vector<Camera*> CameraList;
             typedef std::map< const Camera*, const Light* > ShadowCamLightMapping;
@@ -814,110 +955,6 @@ namespace Ogre {
             void sortLightsAffectingFrustum(LightList& lightList) const;
         } mShadowRenderer;
 
-        /** Internal method to validate whether a Pass should be allowed to render.
-
-            Called just before a pass is about to be used for rendering a group to
-            allow the SceneManager to omit it if required. A return value of false
-            skips this pass. 
-        */
-        bool validatePassForRendering(const Pass* pass);
-
-        /** Internal method to validate whether a Renderable should be allowed to render.
-
-        Called just before a pass is about to be used for rendering a Renderable to
-        allow the SceneManager to omit it if required. A return value of false
-        skips it. 
-        */
-        bool validateRenderableForRendering(const Pass* pass, const Renderable* rend);
-
-        /// Flag indicating whether SceneNodes will be rendered as a set of 3 axes
-        bool mDisplayNodes;
-        std::unique_ptr<DebugDrawer> mDebugDrawer;
-
-        /// Storage of animations, lookup by name
-        AnimationList mAnimationsList;
-        OGRE_MUTEX(mAnimationsListMutex);
-        AnimationStateSet mAnimationStates;
-        
-        /** Internal method used by _renderSingleObject to set the world transform */
-        void setWorldTransform(Renderable* rend);
-
-        /** Internal method used by _renderSingleObject to render a single light pass */
-        void issueRenderWithLights(Renderable* rend, const Pass* pass,
-                                   const LightList* pLightListToUse,
-                                   bool lightScissoringClipping);
-
-        /** Internal method used by _renderSingleObject to deal with renderables
-            which override the camera's own view / projection matrices. */
-        void resetViewProjMode();
-
-        typedef std::vector<RenderQueueListener*> RenderQueueListenerList;
-        RenderQueueListenerList mRenderQueueListeners;
-
-        typedef std::vector<RenderObjectListener*> RenderObjectListenerList;
-        RenderObjectListenerList mRenderObjectListeners;
-        typedef std::vector<Listener*> ListenerList;
-        ListenerList mListeners;
-        /// Internal method for firing the queue start event
-        void firePreRenderQueues();
-        /// Internal method for firing the queue end event
-        void firePostRenderQueues();
-        /// Internal method for firing the queue start event, returns true if queue is to be skipped
-        virtual bool fireRenderQueueStarted(uint8 id, const String& cameraName);
-        /// Internal method for firing the queue end event, returns true if queue is to be repeated
-        virtual bool fireRenderQueueEnded(uint8 id, const String& cameraName);
-        /// Internal method for firing when rendering a single object.
-        void fireRenderSingleObject(Renderable* rend, const Pass* pass, const AutoParamDataSource* source,
-            const LightList* pLightList, bool suppressRenderStateChanges);
-        /// Internal method for firing pre update scene graph event
-        void firePreUpdateSceneGraph(Camera* camera);
-        /// Internal method for firing post update scene graph event
-        void firePostUpdateSceneGraph(Camera* camera);
-        /// Internal method for firing find visible objects event
-        void firePreFindVisibleObjects(Viewport* v);
-        /// Internal method for firing find visible objects event
-        void firePostFindVisibleObjects(Viewport* v);
-        /// Internal method for firing destruction event
-        void fireSceneManagerDestroyed();
-        /** Internal method for setting the destination viewport for the next render. */
-        void setViewport(Viewport *vp);
-
-        /** Flag that indicates if all of the scene node's bounding boxes should be shown as a wireframe. */
-        bool mShowBoundingBoxes;      
-
-        /** Internal method for rendering all objects using the default queue sequence. */
-        void renderVisibleObjectsDefaultSequence(void);
-        /** Internal method for preparing the render queue for use with each render. */
-        void prepareRenderQueue(void);
-
-
-        /** Internal utility method for rendering a single object. 
-
-            Assumes that the pass has already been set up.
-        @copydetail _injectRenderWithPass
-        @param lightScissoringClipping If true, passes that have the getLightScissorEnabled
-        and/or getLightClipPlanesEnabled flags will cause calculation and setting of
-        scissor rectangle and user clip planes.
-        */
-        void renderSingleObject(Renderable* rend, const Pass* pass,
-            bool lightScissoringClipping, bool doLightIteration, const LightList* manualLightList = 0);
-
-        /** Internal method for creating the AutoParamDataSource instance. */
-        AutoParamDataSource* createAutoParamDataSource(void) const
-        {
-            return OGRE_NEW AutoParamDataSource();
-        }
-
-        /// Utility class for calculating automatic parameters for gpu programs
-        std::unique_ptr<AutoParamDataSource> mAutoParamDataSource;
-
-        GpuProgramParametersPtr mFixedFunctionParams;
-
-        CompositorChain* mActiveCompositorChain;
-        bool mLateMaterialResolving;
-
-        IlluminationRenderStage mIlluminationStage;
-
         /// Struct for caching light clipping information for re-use in a frame
         struct LightClippingInfo
         {
@@ -932,70 +969,18 @@ namespace Ogre {
         LightClippingInfoMap mLightClippingInfoMap;
         unsigned long mLightClippingInfoMapFrameNumber;
 
-        /** Internal method for locating a list of lights which could be affecting the frustum.
-
-            Custom scene managers are encouraged to override this method to make use of their
-            scene partitioning scheme to more efficiently locate lights, and to eliminate lights
-            which may be occluded by world geometry.
-            If the list of lights is different to the list returned by
-            SceneManager::_getLightsAffectingFrustum before this method was called, then this
-            method should update that cached list and call SceneManager::_notifyLightsDirty to
-            mark that the internal light cache has changed.
-        */
-        virtual void findLightsAffectingFrustum(const Camera* camera);
-        /// Internal method for setting up materials for shadows
-        virtual void initShadowVolumeMaterials(void);
-        /// Internal method for creating shadow textures (texture-based shadows)
-        virtual void ensureShadowTexturesCreated();
-        /// Internal method for destroying shadow textures (texture-based shadows)
-        virtual void destroyShadowTextures(void);
-
-        typedef std::vector<InstanceManager*>      InstanceManagerVec;
-        InstanceManagerVec mDirtyInstanceManagers;
-        InstanceManagerVec mDirtyInstanceMgrsTmp;
-
-        /** Updates all instance managaers with dirty instance batches. @see _addDirtyInstanceManager */
-        void updateDirtyInstanceManagers(void);
-        
-        void _destroySceneNode(SceneNodeList::iterator it);
-    public:
-        //A render context, used to store internal data for pausing/resuming rendering
-        struct RenderContext
-        {
-            RenderQueue* renderQueue;   
-            Viewport* viewport;
-            Camera* camera;
-            CompositorChain* activeChain;
-        };
-
-        /** Pause rendering of the frame. This has to be called when inside a renderScene call
-            (Usually using a listener of some sort)
-        */
-        RenderContext* _pauseRendering();
-        /** Resume rendering of the frame. This has to be called after a _pauseRendering call
-        @param context The rendring context, as returned by the _pauseRendering call
-        */
-        void _resumeRendering(RenderContext* context);
-
-    protected:
-        /// Visibility mask used to show / hide objects
-        uint32 mVisibilityMask;
-        bool mFindVisibleObjects;
-
-        /** Render a group in the ordinary way */
-        void renderBasicQueueGroupObjects(RenderQueueGroup* pGroup,
-            QueuedRenderableCollection::OrganisationMode om);
-
         /// Set up a scissor rectangle from a group of lights
         ClipResult buildAndSetScissor(const LightList& ll, const Camera* cam);
-        /// Update a scissor rectangle from a single light
-        void buildScissor(const Light* l, const Camera* cam, RealRect& rect);
         void resetScissor();
         /// Build a set of user clip planes from a single non-directional light
         ClipResult buildAndSetLightClip(const LightList& ll);
         void buildLightClip(const Light* l, PlaneList& planes);
         void resetLightClip();
         void checkCachedLightClippingInfo(bool forceScissorRectsInvalidation = false);
+
+        /// Visibility mask used to show / hide objects
+        uint32 mVisibilityMask;
+        bool mFindVisibleObjects;
 
         /// The active renderable visitor class - subclasses could override this
         SceneMgrQueuedRenderableVisitor* mActiveQueuedRenderableVisitor;
@@ -1004,12 +989,15 @@ namespace Ogre {
 
         /// Whether to use camera-relative rendering
         bool mCameraRelativeRendering;
-        Affine3 mCachedViewMatrix;
 
         /// Last light sets
         uint32 mLastLightHash;
         /// Gpu params that need rebinding (mask of GpuParamVariability)
         uint16 mGpuParamsDirty;
+
+        /** Render a group in the ordinary way */
+        void renderBasicQueueGroupObjects(RenderQueueGroup* pGroup,
+            QueuedRenderableCollection::OrganisationMode om);
 
         void useLights(const LightList* lights, ushort limit);
         void bindGpuProgram(GpuProgram* prog);
@@ -1032,6 +1020,24 @@ namespace Ogre {
         EntityMaterialLodChangedEventList mEntityMaterialLodChangedEvents;
 
     public:
+        //A render context, used to store internal data for pausing/resuming rendering
+        struct RenderContext
+        {
+            RenderQueue* renderQueue;
+            Viewport* viewport;
+            Camera* camera;
+            CompositorChain* activeChain;
+        };
+
+        /** Pause rendering of the frame. This has to be called when inside a renderScene call
+            (Usually using a listener of some sort)
+        */
+        RenderContext* _pauseRendering();
+        /** Resume rendering of the frame. This has to be called after a _pauseRendering call
+        @param context The rendring context, as returned by the _pauseRendering call
+        */
+        void _resumeRendering(RenderContext* context);
+
         /** Constructor.
         */
         SceneManager(const String& instanceName);

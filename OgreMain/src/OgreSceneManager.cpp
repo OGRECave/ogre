@@ -71,12 +71,12 @@ mResetIdentityProj(false),
 mFlipCullingOnNegativeScale(true),
 mLightsDirtyCounter(0),
 mMovableNameGenerator("Ogre/MO"),
-mShadowRenderer(this),
 mDisplayNodes(false),
 mShowBoundingBoxes(false),
 mActiveCompositorChain(0),
 mLateMaterialResolving(false),
 mIlluminationStage(IRS_NONE),
+mShadowRenderer(this),
 mLightClippingInfoMapFrameNumber(999),
 mVisibilityMask(0xFFFFFFFF),
 mFindVisibleObjects(true),
@@ -2489,6 +2489,33 @@ void SceneManager::_notifyLightsDirty(void)
     ++mLightsDirtyCounter;
 }
 //---------------------------------------------------------------------
+void SceneManager::updateCachedLightInfos(const Camera* camera)
+{
+    // Update lights affecting frustum if changed
+    if (mCachedLightInfos != mTestLightInfos)
+    {
+        mLightsAffectingFrustum.resize(mTestLightInfos.size());
+        LightInfoList::const_iterator i;
+        LightList::iterator j = mLightsAffectingFrustum.begin();
+        for (i = mTestLightInfos.begin(); i != mTestLightInfos.end(); ++i, ++j)
+        {
+            *j = i->light;
+            // add cam distance for sorting if texture shadows
+            if (isShadowTechniqueTextureBased())
+            {
+                (*j)->_calcTempSquareDist(camera->getDerivedPosition());
+            }
+        }
+
+        mShadowRenderer.sortLightsAffectingFrustum(mLightsAffectingFrustum);
+        // Use swap instead of copy operator for efficiently
+        mCachedLightInfos.swap(mTestLightInfos);
+
+        // notify light dirty, so all movable objects will re-populate
+        // their light list next time
+        _notifyLightsDirty();
+    }
+}
 void SceneManager::findLightsAffectingFrustum(const Camera* camera)
 {
     // Basic iteration for this SM
@@ -2542,37 +2569,19 @@ void SceneManager::findLightsAffectingFrustum(const Camera* camera)
         }
     } // release lock on lights collection
 
-    // Update lights affecting frustum if changed
-    if (mCachedLightInfos != mTestLightInfos)
-    {
-        mLightsAffectingFrustum.resize(mTestLightInfos.size());
-        LightInfoList::const_iterator i;
-        LightList::iterator j = mLightsAffectingFrustum.begin();
-        for (i = mTestLightInfos.begin(); i != mTestLightInfos.end(); ++i, ++j)
-        {
-            *j = i->light;
-            // add cam distance for sorting if texture shadows
-            if (isShadowTechniqueTextureBased())
-            {
-                (*j)->_calcTempSquareDist(camera->getDerivedPosition());
-            }
-        }
-
-        mShadowRenderer.sortLightsAffectingFrustum(mLightsAffectingFrustum);
-        // Use swap instead of copy operator for efficiently
-        mCachedLightInfos.swap(mTestLightInfos);
-
-        // notify light dirty, so all movable objects will re-populate
-        // their light list next time
-        _notifyLightsDirty();
-    }
-
+    updateCachedLightInfos(camera);
 }
 void SceneManager::initShadowVolumeMaterials()
 {
     mShadowRenderer.initShadowVolumeMaterials();
 }
 //---------------------------------------------------------------------
+static void buildScissor(const Light* light, const Camera* cam, RealRect& rect)
+{
+    // Project the sphere onto the camera
+    Sphere sphere(light->getDerivedPosition(), light->getAttenuationRange());
+    cam->Frustum::projectSphere(sphere, &(rect.left), &(rect.top), &(rect.right), &(rect.bottom));
+}
 const RealRect& SceneManager::getLightScissorRect(Light* l, const Camera* cam)
 {
     checkCachedLightClippingInfo();
@@ -2639,13 +2648,6 @@ ClipResult SceneManager::buildAndSetScissor(const LightList& ll, const Camera* c
     else
         return CLIPPED_NONE;
 
-}
-//---------------------------------------------------------------------
-void SceneManager::buildScissor(const Light* light, const Camera* cam, RealRect& rect)
-{
-    // Project the sphere onto the camera
-    Sphere sphere(light->getDerivedPosition(), light->getAttenuationRange());
-    cam->Frustum::projectSphere(sphere, &(rect.left), &(rect.top), &(rect.right), &(rect.bottom));
 }
 //---------------------------------------------------------------------
 void SceneManager::resetScissor()
@@ -2858,6 +2860,16 @@ void SceneManager::destroyShadowTextures(void)
 {
     mShadowRenderer.destroyShadowTextures();
 }
+const std::vector<Camera*>& SceneManager::getShadowTextureCameras()
+{
+    return mShadowRenderer.mShadowTextureCameras;
+}
+
+bool SceneManager::isShadowTextureConfigDirty() const
+{
+    return mShadowRenderer.mShadowTextureConfigDirty;
+}
+
 void SceneManager::prepareShadowTextures(Camera* cam, Viewport* vp, const LightList* lightList)
 {
         // Set the illumination stage, prevents recursive calls

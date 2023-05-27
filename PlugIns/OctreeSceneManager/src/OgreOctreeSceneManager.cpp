@@ -629,8 +629,8 @@ void OctreeSceneManager::walkOctree( OctreeCamera *camera, RenderQueue *queue,
 
                 mVisible.push_back( sn );
 
-                if (mDebugDrawer)
-                    mDebugDrawer->drawSceneNode(sn);
+                if (getDebugDrawer())
+                    getDebugDrawer()->drawSceneNode(sn);
             }
 
             ++it;
