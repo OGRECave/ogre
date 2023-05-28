@@ -635,8 +635,7 @@ SceneNode* SceneManager::getSceneNode(const String& name, bool throwExceptionIfN
 }
 
 //-----------------------------------------------------------------------
-const Pass* SceneManager::_setPass(const Pass* pass, bool evenIfSuppressed, 
-                                   bool shadowDerivation)
+const Pass* SceneManager::_setPass(const Pass* pass, bool shadowDerivation)
 {
     //If using late material resolving, swap now.
     if (isLateMaterialResolving()) 
@@ -3441,7 +3440,7 @@ void SceneManager::_injectRenderWithPass(Pass *pass, Renderable *rend, bool shad
     bool doLightIteration, const LightList* manualLightList)
 {
     // render something as if it came from the current queue
-    const Pass *usedPass = _setPass(pass, false, shadowDerivation);
+    const Pass *usedPass = _setPass(pass, shadowDerivation);
     renderSingleObject(rend, usedPass, false, doLightIteration, manualLightList);
 }
 //---------------------------------------------------------------------
