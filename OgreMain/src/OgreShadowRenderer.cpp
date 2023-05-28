@@ -1355,174 +1355,176 @@ void SceneManager::ShadowRenderer::initShadowVolumeMaterials()
 }
 const Pass* SceneManager::ShadowRenderer::deriveShadowCasterPass(const Pass* pass)
 {
-    if (mShadowTechnique & SHADOWDETAILTYPE_TEXTURE)
+    Pass* retPass;
+    if (pass->getParent()->getShadowCasterMaterial())
     {
-        Pass* retPass;
-        if (pass->getParent()->getShadowCasterMaterial())
-        {
-            return pass->getParent()->getShadowCasterMaterial()->getBestTechnique()->getPass(0);
-        }
-        else
-        {
-            retPass = mShadowTextureCustomCasterPass ?
-                mShadowTextureCustomCasterPass : mShadowCasterPlainBlackPass;
-        }
-
-
-        // Special case alpha-blended passes
-        if ((pass->getSourceBlendFactor() == SBF_SOURCE_ALPHA &&
-            pass->getDestBlendFactor() == SBF_ONE_MINUS_SOURCE_ALPHA)
-            || pass->getAlphaRejectFunction() != CMPF_ALWAYS_PASS)
-        {
-            // Alpha blended passes must retain their transparency
-            retPass->setAlphaRejectSettings(pass->getAlphaRejectFunction(),
-                pass->getAlphaRejectValue());
-            retPass->setSceneBlending(pass->getSourceBlendFactor(), pass->getDestBlendFactor());
-            retPass->getParent()->getParent()->setTransparencyCastsShadows(true);
-
-            // So we allow the texture units, but override the colour functions
-            // Copy texture state, shift up one since 0 is shadow texture
-            unsigned short origPassTUCount = pass->getNumTextureUnitStates();
-            for (unsigned short t = 0; t < origPassTUCount; ++t)
-            {
-                TextureUnitState* tex;
-                if (retPass->getNumTextureUnitStates() <= t)
-                {
-                    tex = retPass->createTextureUnitState();
-                }
-                else
-                {
-                    tex = retPass->getTextureUnitState(t);
-                }
-                // copy base state
-                (*tex) = *(pass->getTextureUnitState(t));
-                // override colour function
-                tex->setColourOperationEx(LBX_SOURCE1, LBS_MANUAL, LBS_CURRENT,
-                        mShadowTechnique & SHADOWDETAILTYPE_ADDITIVE ? ColourValue::Black : mShadowColour);
-
-            }
-            // Remove any extras
-            while (retPass->getNumTextureUnitStates() > origPassTUCount)
-            {
-                retPass->removeTextureUnitState(origPassTUCount);
-            }
-
-        }
-        else
-        {
-            // reset
-            retPass->setSceneBlending(SBT_REPLACE);
-            retPass->setAlphaRejectFunction(CMPF_ALWAYS_PASS);
-            while (retPass->getNumTextureUnitStates() > 0)
-            {
-                retPass->removeTextureUnitState(0);
-            }
-        }
-
-        // give the RTSS a chance to generate a better technique
-        retPass->getParent()->getParent()->load();
-
-        Technique* btech = retPass->getParent()->getParent()->getBestTechnique();
-        if( btech )
-        {
-            retPass = btech->getPass(0);
-        }
-
-        // Propagate culling modes
-        retPass->setCullingMode(pass->getCullingMode());
-        retPass->setManualCullingMode(pass->getManualCullingMode());
-
-        return retPass;
+        return pass->getParent()->getShadowCasterMaterial()->getBestTechnique()->getPass(0);
     }
     else
     {
-        return pass;
+        retPass = mShadowTextureCustomCasterPass ?
+            mShadowTextureCustomCasterPass : mShadowCasterPlainBlackPass;
     }
 
+    // Special case alpha-blended passes
+    if ((pass->getSourceBlendFactor() == SBF_SOURCE_ALPHA &&
+        pass->getDestBlendFactor() == SBF_ONE_MINUS_SOURCE_ALPHA)
+        || pass->getAlphaRejectFunction() != CMPF_ALWAYS_PASS)
+    {
+        // Alpha blended passes must retain their transparency
+        retPass->setAlphaRejectSettings(pass->getAlphaRejectFunction(),
+            pass->getAlphaRejectValue());
+        retPass->setSceneBlending(pass->getSourceBlendFactor(), pass->getDestBlendFactor());
+        retPass->getParent()->getParent()->setTransparencyCastsShadows(true);
+
+        // So we allow the texture units, but override the colour functions
+        // Copy texture state, shift up one since 0 is shadow texture
+        unsigned short origPassTUCount = pass->getNumTextureUnitStates();
+        for (unsigned short t = 0; t < origPassTUCount; ++t)
+        {
+            TextureUnitState* tex;
+            if (retPass->getNumTextureUnitStates() <= t)
+            {
+                tex = retPass->createTextureUnitState();
+            }
+            else
+            {
+                tex = retPass->getTextureUnitState(t);
+            }
+            // copy base state
+            (*tex) = *(pass->getTextureUnitState(t));
+            // override colour function
+            tex->setColourOperationEx(LBX_SOURCE1, LBS_MANUAL, LBS_CURRENT,
+                    mShadowTechnique & SHADOWDETAILTYPE_ADDITIVE ? ColourValue::Black : mShadowColour);
+
+        }
+        // Remove any extras
+        while (retPass->getNumTextureUnitStates() > origPassTUCount)
+        {
+            retPass->removeTextureUnitState(origPassTUCount);
+        }
+
+    }
+    else
+    {
+        // reset
+        retPass->setSceneBlending(SBT_REPLACE);
+        retPass->setAlphaRejectFunction(CMPF_ALWAYS_PASS);
+        while (retPass->getNumTextureUnitStates() > 0)
+        {
+            retPass->removeTextureUnitState(0);
+        }
+    }
+
+    // give the RTSS a chance to generate a better technique
+    retPass->getParent()->getParent()->load();
+
+    Technique* btech = retPass->getParent()->getParent()->getBestTechnique();
+    if( btech )
+    {
+        retPass = btech->getPass(0);
+    }
+
+    // Propagate culling modes
+    retPass->setCullingMode(pass->getCullingMode());
+    retPass->setManualCullingMode(pass->getManualCullingMode());
+
+    return retPass;
 }
 //---------------------------------------------------------------------
 const Pass* SceneManager::ShadowRenderer::deriveShadowReceiverPass(const Pass* pass)
 {
-
-    if (mShadowTechnique & SHADOWDETAILTYPE_TEXTURE)
+    if (pass->getParent()->getShadowReceiverMaterial())
     {
-        if (pass->getParent()->getShadowReceiverMaterial())
-        {
-            return pass->getParent()->getShadowReceiverMaterial()->getBestTechnique()->getPass(0);
-        }
-
-        Pass* retPass = mShadowTextureCustomReceiverPass ? mShadowTextureCustomReceiverPass : mShadowReceiverPass;
-
-        unsigned short keepTUCount;
-        // If additive, need lighting parameters & standard programs
-        if (mShadowTechnique & SHADOWDETAILTYPE_ADDITIVE)
-        {
-            retPass->setLightingEnabled(true);
-            retPass->setAmbient(pass->getAmbient());
-            retPass->setSelfIllumination(pass->getSelfIllumination());
-            retPass->setDiffuse(pass->getDiffuse());
-            retPass->setSpecular(pass->getSpecular());
-            retPass->setShininess(pass->getShininess());
-            retPass->setLightMask(pass->getLightMask());
-
-            // We need to keep alpha rejection settings
-            retPass->setAlphaRejectSettings(pass->getAlphaRejectFunction(),
-                pass->getAlphaRejectValue());
-            // Copy texture state, shift up one since 0 is shadow texture
-            unsigned short origPassTUCount = pass->getNumTextureUnitStates();
-            for (unsigned short t = 0; t < origPassTUCount; ++t)
-            {
-                unsigned short targetIndex = t+1;
-                TextureUnitState* tex;
-                if (retPass->getNumTextureUnitStates() <= targetIndex)
-                {
-                    tex = retPass->createTextureUnitState();
-                }
-                else
-                {
-                    tex = retPass->getTextureUnitState(targetIndex);
-                }
-                (*tex) = *(pass->getTextureUnitState(t));
-                // If programmable, have to adjust the texcoord sets too
-                // D3D insists that texcoordsets match tex unit in programmable mode
-                if (retPass->hasVertexProgram())
-                    tex->setTextureCoordSet(targetIndex);
-            }
-            keepTUCount = origPassTUCount + 1;
-        }// additive lighting
-        else
-        {
-            // need to keep spotlight fade etc
-            keepTUCount = retPass->getNumTextureUnitStates();
-        }
-
-        // re-/set light iteration settings
-        retPass->setIteratePerLight(pass->getIteratePerLight(), pass->getRunOnlyForOneLightType(),
-                                    pass->getOnlyLightType());
-
-        // Remove any extra texture units
-        while (retPass->getNumTextureUnitStates() > keepTUCount)
-        {
-            retPass->removeTextureUnitState(keepTUCount);
-        }
-
-        // give the RTSS a chance to generate a better technique
-        retPass->getParent()->getParent()->load();
-
-        Technique* btech = retPass->getParent()->getParent()->getBestTechnique();
-        if( btech )
-        {
-            retPass = btech->getPass(0);
-        }
-
-        return retPass;
+        return pass->getParent()->getShadowReceiverMaterial()->getBestTechnique()->getPass(0);
     }
+
+    Pass* retPass = mShadowTextureCustomReceiverPass ? mShadowTextureCustomReceiverPass : mShadowReceiverPass;
+
+    unsigned short keepTUCount;
+    // If additive, need lighting parameters & standard programs
+    if (mShadowTechnique & SHADOWDETAILTYPE_ADDITIVE)
+    {
+        retPass->setLightingEnabled(true);
+        retPass->setAmbient(pass->getAmbient());
+        retPass->setSelfIllumination(pass->getSelfIllumination());
+        retPass->setDiffuse(pass->getDiffuse());
+        retPass->setSpecular(pass->getSpecular());
+        retPass->setShininess(pass->getShininess());
+        retPass->setLightMask(pass->getLightMask());
+
+        // We need to keep alpha rejection settings
+        retPass->setAlphaRejectSettings(pass->getAlphaRejectFunction(),
+            pass->getAlphaRejectValue());
+        // Copy texture state, shift up one since 0 is shadow texture
+        unsigned short origPassTUCount = pass->getNumTextureUnitStates();
+        for (unsigned short t = 0; t < origPassTUCount; ++t)
+        {
+            unsigned short targetIndex = t+1;
+            TextureUnitState* tex;
+            if (retPass->getNumTextureUnitStates() <= targetIndex)
+            {
+                tex = retPass->createTextureUnitState();
+            }
+            else
+            {
+                tex = retPass->getTextureUnitState(targetIndex);
+            }
+            (*tex) = *(pass->getTextureUnitState(t));
+            // If programmable, have to adjust the texcoord sets too
+            // D3D insists that texcoordsets match tex unit in programmable mode
+            if (retPass->hasVertexProgram())
+                tex->setTextureCoordSet(targetIndex);
+        }
+        keepTUCount = origPassTUCount + 1;
+    }// additive lighting
     else
     {
-        return pass;
+        // need to keep spotlight fade etc
+        keepTUCount = retPass->getNumTextureUnitStates();
     }
 
+    // re-/set light iteration settings
+    retPass->setIteratePerLight(pass->getIteratePerLight(), pass->getRunOnlyForOneLightType(),
+                                pass->getOnlyLightType());
+
+    // Remove any extra texture units
+    while (retPass->getNumTextureUnitStates() > keepTUCount)
+    {
+        retPass->removeTextureUnitState(keepTUCount);
+    }
+
+    // give the RTSS a chance to generate a better technique
+    retPass->getParent()->getParent()->load();
+
+    Technique* btech = retPass->getParent()->getParent()->getBestTechnique();
+    if( btech )
+    {
+        retPass = btech->getPass(0);
+    }
+
+    return retPass;
 }
+
+const Pass* SceneManager::ShadowRenderer::deriveTextureShadowPass(const Pass* pass)
+{
+    if((mShadowTechnique & SHADOWDETAILTYPE_TEXTURE) == 0)
+        return pass;
+
+    if (mSceneManager->_getCurrentRenderStage() == IRS_RENDER_TO_TEXTURE)
+    {
+        // Derive a special shadow caster pass from this one
+        return deriveShadowCasterPass(pass);
+    }
+
+    if (mSceneManager->_getCurrentRenderStage() == IRS_RENDER_RECEIVER_PASS)
+    {
+        return deriveShadowReceiverPass(pass);
+    }
+
+    return pass;
+}
+
 //---------------------------------------------------------------------
 const VisibleObjectsBoundsInfo&
 SceneManager::ShadowRenderer::getShadowCasterBoundsInfo( const Light* light, size_t iteration ) const
