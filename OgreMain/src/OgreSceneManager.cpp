@@ -653,14 +653,9 @@ const Pass* SceneManager::_setPass(const Pass* pass, bool evenIfSuppressed,
         //Should we warn or throw an exception if an illegal state was achieved?
     }
 
-    if (mIlluminationStage == IRS_RENDER_TO_TEXTURE && shadowDerivation)
+    if (shadowDerivation)
     {
-        // Derive a special shadow caster pass from this one
-        pass = mShadowRenderer.deriveShadowCasterPass(pass);
-    }
-    else if (mIlluminationStage == IRS_RENDER_RECEIVER_PASS && shadowDerivation)
-    {
-        pass = mShadowRenderer.deriveShadowReceiverPass(pass);
+        pass = mShadowRenderer.deriveTextureShadowPass(pass);
     }
 
     // Tell params about current pass

@@ -864,6 +864,8 @@ namespace Ogre {
             */
             const Pass* deriveShadowReceiverPass(const Pass* pass);
 
+            const Pass* deriveTextureShadowPass(const Pass* pass);
+
             void initShadowVolumeMaterials();
             void setShadowTextureCasterMaterial(const MaterialPtr& mat);
             void setShadowTextureReceiverMaterial(const MaterialPtr& mat);
