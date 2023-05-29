@@ -538,27 +538,26 @@ namespace Ogre {
                 (*il)->pass->_load();
         }
 
-        if (mShadowCasterMaterial)
-        {
-            mShadowCasterMaterial->load();
-        }
-        else if (!mShadowCasterMaterialName.empty())
+        if (!mShadowCasterMaterial && !mShadowCasterMaterialName.empty())
         {
             // in case we could not get material as it wasn't yet parsed/existent at that time.
             mShadowCasterMaterial = MaterialManager::getSingleton().getByName(mShadowCasterMaterialName);
-            if (mShadowCasterMaterial)
-                mShadowCasterMaterial->load();
         }
-        if (mShadowReceiverMaterial)
+
+        if (mShadowCasterMaterial && mShadowCasterMaterial.get() != getParent())
         {
-            mShadowReceiverMaterial->load();
+            mShadowCasterMaterial->load();
         }
-        else if (!mShadowReceiverMaterialName.empty())
+
+        if(!mShadowReceiverMaterial && !mShadowReceiverMaterialName.empty())
         {
             // in case we could not get material as it wasn't yet parsed/existent at that time.
             mShadowReceiverMaterial = MaterialManager::getSingleton().getByName(mShadowReceiverMaterialName);
-            if (mShadowReceiverMaterial)
-                mShadowReceiverMaterial->load();
+        }
+
+        if (mShadowReceiverMaterial && mShadowReceiverMaterial.get() != getParent())
+        {
+            mShadowReceiverMaterial->load();
         }
     }
     //-----------------------------------------------------------------------------
