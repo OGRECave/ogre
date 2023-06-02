@@ -234,15 +234,6 @@ namespace Ogre
         ScriptCompilerListener *getListener();
         /// Returns the resource group currently set for this compiler
         const String &getResourceGroup() const;
-        /// Adds a name exclusion to the map
-        /**
-         * Name exclusions identify object types which cannot accept
-         * names. This means that excluded types will always have empty names.
-         * All values in the object header are stored as object values.
-         */
-        //void addNameExclusion(const String &type);
-        /// Removes a name exclusion
-        //void removeNameExclusion(const String &type);
         /// Internal method for firing the handleEvent method
         bool _fireEvent(ScriptCompilerEvent *evt, void *retval);
 
