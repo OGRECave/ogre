@@ -66,7 +66,7 @@ if(DEFINED ENV{APPVEYOR})
         -DQt5_DIR="C:\\Qt\\5.15\\msvc2019_64\\lib\\cmake\\Qt5")
 
     set(BUILD_DEPS TRUE)
-    set(SWIG_EXECUTABLE "C:\\ProgramData\\chocolatey\\bin\\swig.exe")
+    set(SWIG_EXECUTABLE "C:\\Python310-x64\\Scripts\\swig.exe")
 endif()
 
 if(DEFINED ENV{ANDROID})
