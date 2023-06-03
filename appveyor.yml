@@ -6,7 +6,8 @@ environment:
 image:
  - Visual Studio 2019
 install:
- - cmd: choco install swig -y --version 4.0.2.04082020 & exit 0
+ - cmd: SET PATH=C:\Python310-x64;C:\Python310-x64\Scripts;%PATH%
+ - cmd: pip install swig==4.1.1
  - cmd: curl -sSf -o rustup-init.exe https://win.rustup.rs/
  - cmd: rustup-init.exe -y --default-toolchain 1.69.0
  - cmd: curl -LO https://sdk.lunarg.com/sdk/download/1.2.189.2/windows/VulkanSDK-1.2.189.2-Installer.exe
