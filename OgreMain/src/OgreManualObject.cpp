@@ -36,7 +36,7 @@ namespace Ogre {
 #define TEMP_INITIAL_INDEX_SIZE sizeof(uint32) * TEMP_INITIAL_SIZE
     //-----------------------------------------------------------------------------
 ManualObject::ManualObject(const String& name)
-    : MovableObject(name), mBufferUsage(HardwareBuffer::HBU_STATIC_WRITE_ONLY), mCurrentSection(0),
+    : MovableObject(name), mBufferUsage(HBU_GPU_ONLY), mCurrentSection(0),
       mCurrentUpdating(false), mFirstVertex(true), mTempVertexPending(false), mTempVertexBuffer(0),
       mTempVertexSize(TEMP_INITIAL_VERTEX_SIZE), mTempIndexBuffer(0),
       mTempIndexSize(TEMP_INITIAL_INDEX_SIZE), mDeclSize(0), mEstVertexCount(0), mEstIndexCount(0),

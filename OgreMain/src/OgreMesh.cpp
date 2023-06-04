@@ -49,8 +49,8 @@ namespace Ogre {
         mHasManualLodLevel(false),
         mNumLods(1),
         mBufferManager(0),
-        mVertexBufferUsage(HardwareBuffer::HBU_STATIC_WRITE_ONLY),
-        mIndexBufferUsage(HardwareBuffer::HBU_STATIC_WRITE_ONLY),
+        mVertexBufferUsage(HBU_GPU_ONLY),
+        mIndexBufferUsage(HBU_GPU_ONLY),
         mVertexBufferShadowBuffer(false),
         mIndexBufferShadowBuffer(false),
         mPreparedForShadowVolumes(false),
@@ -1243,13 +1243,13 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void Mesh::setVertexBufferPolicy(HardwareBuffer::Usage vbUsage, bool shadowBuffer)
     {
-        mVertexBufferUsage = vbUsage;
+        mVertexBufferUsage = (HardwareBufferUsage)vbUsage;
         mVertexBufferShadowBuffer = shadowBuffer;
     }
     //---------------------------------------------------------------------
     void Mesh::setIndexBufferPolicy(HardwareBuffer::Usage vbUsage, bool shadowBuffer)
     {
-        mIndexBufferUsage = vbUsage;
+        mIndexBufferUsage = (HardwareBufferUsage)vbUsage;
         mIndexBufferShadowBuffer = shadowBuffer;
     }
     //---------------------------------------------------------------------
