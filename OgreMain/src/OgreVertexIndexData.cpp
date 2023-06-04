@@ -507,7 +507,7 @@ namespace Ogre {
         {
             VertexDeclaration::VertexElementList destElems = newDeclaration->findElementsBySource(b);
             // Initialise with most restrictive version
-            int final = HardwareBuffer::HBU_STATIC_WRITE_ONLY;
+            uint8 final = HBU_GPU_ONLY;
             for (VertexElement& destelem : destElems)
             {
                 // get source
@@ -518,12 +518,12 @@ namespace Ogre {
                 HardwareVertexBufferSharedPtr srcbuf = 
                     vertexBufferBinding->getBuffer(srcelem->getSource());
                 // improve flexibility only
-                if (srcbuf->getUsage() & HardwareBuffer::HBU_DYNAMIC)
+                if (srcbuf->getUsage() & HBU_CPU_ONLY)
                 {
                     // remove static
-                    final &= ~HardwareBuffer::HBU_STATIC;
+                    final &= ~HBU_GPU_TO_CPU;
                     // add dynamic
-                    final |= HardwareBuffer::HBU_DYNAMIC;
+                    final |= HBU_CPU_ONLY;
                 }
                 if (!(srcbuf->getUsage() & HBU_DETAIL_WRITE_ONLY))
                 {
@@ -531,7 +531,7 @@ namespace Ogre {
                     final &= ~HBU_DETAIL_WRITE_ONLY;
                 }
             }
-            usages.push_back(static_cast<HardwareBuffer::Usage>(final));
+            usages.push_back(static_cast<HardwareBufferUsage>(final));
         }
         // Call specific method
         reorganiseBuffers(newDeclaration, usages, mgr);
