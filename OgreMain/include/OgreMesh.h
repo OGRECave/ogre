@@ -168,8 +168,8 @@ namespace Ogre {
         MeshLodUsageList mMeshLodUsageList;
 #endif
         HardwareBufferManagerBase* mBufferManager;
-        HardwareBuffer::Usage mVertexBufferUsage;
-        HardwareBuffer::Usage mIndexBufferUsage;
+        HardwareBufferUsage mVertexBufferUsage;
+        HardwareBufferUsage mIndexBufferUsage;
         bool mVertexBufferShadowBuffer;
         bool mIndexBufferShadowBuffer;
 
@@ -572,9 +572,9 @@ namespace Ogre {
         */
         void setIndexBufferPolicy(HardwareBuffer::Usage usage, bool shadowBuffer = false);
         /** Gets the usage setting for this meshes vertex buffers. */
-        HardwareBuffer::Usage getVertexBufferUsage(void) const { return mVertexBufferUsage; }
+        HardwareBufferUsage getVertexBufferUsage(void) const { return mVertexBufferUsage; }
         /** Gets the usage setting for this meshes index buffers. */
-        HardwareBuffer::Usage getIndexBufferUsage(void) const { return mIndexBufferUsage; }
+        HardwareBufferUsage getIndexBufferUsage(void) const { return mIndexBufferUsage; }
         /** Gets whether or not this meshes vertex buffers are shadowed. */
         bool isVertexBufferShadowed(void) const { return mVertexBufferShadowBuffer; }
         /** Gets whether or not this meshes index buffers are shadowed. */
