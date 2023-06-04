@@ -56,6 +56,9 @@ namespace Ogre {
     {
         HighLevelGpuProgram::prepareImpl(); // loads source
 
+        if(mSource.empty())
+            return; // nothing to do
+
         // Preprocess the GLSL shader in order to get a clean source
         CPreprocessor cpp;
 
