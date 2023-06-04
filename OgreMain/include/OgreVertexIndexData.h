@@ -41,9 +41,6 @@ namespace Ogre {
     *  @{
     */
 
-    /// Define a list of usage flags
-    typedef std::vector<HardwareBuffer::Usage> BufferUsageList;
-
     /** collects together all the vertex-related information used to render geometry.
      *
      * The RenderOperation requires a pointer to a VertexData object, and it is also used in Mesh and
@@ -65,6 +62,10 @@ namespace Ogre {
         VertexData& operator=(const VertexData& rhs); /* do not use */
 
         HardwareBufferManagerBase* mMgr;
+
+        typedef std::vector<HardwareBufferUsage> BufferUsageList;
+        void reorganiseBuffers(VertexDeclaration* newDeclaration, const BufferUsageList& bufferUsage,
+                               HardwareBufferManagerBase* mgr);
     public:
         /** Constructor.
         @note 
@@ -161,28 +162,6 @@ namespace Ogre {
             can be reused in the shadow algorithm.
         */
         HardwareVertexBufferSharedPtr hardwareShadowVolWBuffer;
-
-
-        /** Reorganises the data in the vertex buffers according to the 
-            new vertex declaration passed in. Note that new vertex buffers
-            are created and written to, so if the buffers being referenced 
-            by this vertex data object are also used by others, then the 
-            original buffers will not be damaged by this operation.
-            Once this operation has completed, the new declaration 
-            passed in will overwrite the current one.
-        @param newDeclaration The vertex declaration which will be used
-            for the reorganised buffer state. Note that the new declaration
-            must not include any elements which do not already exist in the 
-            current declaration; you can drop elements by 
-            excluding them from the declaration if you wish, however.
-        @param bufferUsage Vector of usage flags which indicate the usage options
-            for each new vertex buffer created. The indexes of the entries must correspond
-            to the buffer binding values referenced in the declaration.
-        @param mgr Optional pointer to the manager to use to create new declarations
-            and buffers etc. If not supplied, the HardwareBufferManager singleton will be used
-        */
-        void reorganiseBuffers(VertexDeclaration* newDeclaration, const BufferUsageList& bufferUsage, 
-            HardwareBufferManagerBase* mgr = 0);
 
         /** Reorganises the data in the vertex buffers according to the 
             new vertex declaration passed in. Note that new vertex buffers

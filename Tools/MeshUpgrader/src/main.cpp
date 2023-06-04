@@ -207,12 +207,7 @@ void reorganiseVertexBuffers(const UpgradeOptions& opts, Mesh& mesh)
             mesh.sharedVertexData->vertexDeclaration->getAutoOrganisedDeclaration(
             mesh.hasSkeleton(), mesh.hasVertexAnimation(), mesh.getSharedVertexDataAnimationIncludesNormals());
         if (*newDcl != *(mesh.sharedVertexData->vertexDeclaration)) {
-            // Usages don't matter here since we're onlly exporting
-            BufferUsageList bufferUsages;
-            for (size_t u = 0; u <= newDcl->getMaxSource(); ++u) {
-                bufferUsages.push_back(HardwareBuffer::HBU_STATIC_WRITE_ONLY);
-            }
-            mesh.sharedVertexData->reorganiseBuffers(newDcl, bufferUsages);
+            mesh.sharedVertexData->reorganiseBuffers(newDcl);
         }
     }
 
@@ -227,12 +222,7 @@ void reorganiseVertexBuffers(const UpgradeOptions& opts, Mesh& mesh)
                 sm->vertexData->vertexDeclaration->getAutoOrganisedDeclaration(
                 mesh.hasSkeleton(), hasVertexAnim, sm->getVertexAnimationIncludesNormals() );
             if (*newDcl != *(sm->vertexData->vertexDeclaration)) {
-                // Usages don't matter here since we're onlly exporting
-                BufferUsageList bufferUsages;
-                for (size_t u = 0; u <= newDcl->getMaxSource(); ++u) {
-                    bufferUsages.push_back(HardwareBuffer::HBU_STATIC_WRITE_ONLY);
-                }
-                sm->vertexData->reorganiseBuffers(newDcl, bufferUsages);
+                sm->vertexData->reorganiseBuffers(newDcl);
             }
         }
     }
