@@ -125,6 +125,10 @@ namespace Ogre
 
         rsc->setDeviceName(mActiveDevice->mDevice.name.UTF8String);
 
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS || OGRE_CPU == OGRE_CPU_ARM
+        rsc->setVendor( GPU_APPLE );
+#endif
+
         rsc->setCapability(RSC_HWSTENCIL);
         rsc->setNumTextureUnits(16);
         rsc->setNumVertexTextureUnits(16);
@@ -134,9 +138,20 @@ namespace Ogre
         rsc->setCapability(RSC_TEXTURE_COMPRESSION_ASTC);
 #endif
 #if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
-        rsc->setCapability(RSC_TEXTURE_COMPRESSION_DXT);
-        rsc->setCapability(RSC_TEXTURE_COMPRESSION_BC4_BC5);
-        //rsc->setCapability(RSC_TEXTURE_COMPRESSION_BC6H_BC7);
+        // If the device is running macOS older than 11,
+        // then they are all x86 systems which all support BCn
+        bool supportsBCTextureCompression = true;
+        if( @available( macOS 11, * ) )
+        {
+            supportsBCTextureCompression = mActiveDevice->mDevice.supportsBCTextureCompression;
+        }
+
+        if( supportsBCTextureCompression )
+        {
+            rsc->setCapability( RSC_TEXTURE_COMPRESSION_DXT );
+            rsc->setCapability( RSC_TEXTURE_COMPRESSION_BC4_BC5 );
+            // rsc->setCapability(RSC_TEXTURE_COMPRESSION_BC6H_BC7);
+        }
 #else
         //Actually the limit is not the count but rather how many bytes are in the
         //GPU's internal TBDR cache (16 bytes for Family 1, 32 bytes for the rest)
