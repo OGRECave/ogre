@@ -280,6 +280,10 @@ namespace Ogre
     //---------------------------------------------------------------------
     void DeflateStream::compressFinal()
     {
+        // Prevent reenterancy
+        if( !mTmpWriteStream )
+            return;
+        
         // Close temp stream
         mTmpWriteStream->close();
         mTmpWriteStream.reset();
