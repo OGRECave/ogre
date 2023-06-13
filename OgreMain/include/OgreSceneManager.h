@@ -462,7 +462,7 @@ namespace Ogre {
         AutoTrackingSceneNodes mAutoTrackingSceneNodes;
 
         // Sky params
-        class SkyRenderer : public Listener, public Node::Listener
+        class _OgreExport SkyRenderer : public Listener, public Node::Listener
         {
         protected:
             SceneManager* mSceneManager;
@@ -764,7 +764,7 @@ namespace Ogre {
 
         void _destroySceneNode(SceneNodeList::iterator it);
 
-        struct ShadowRenderer
+        struct _OgreExport ShadowRenderer
         {
             typedef std::vector<Camera*> CameraList;
             typedef std::map< const Camera*, const Light* > ShadowCamLightMapping;
