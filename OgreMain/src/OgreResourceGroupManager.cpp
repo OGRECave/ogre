@@ -980,7 +980,7 @@ namespace Ogre {
                 }
 
                 // Remove the items here (not above) because during the erase the item destructor
-                // can unload some resources which can call _notifyResourceRemoved that removes 
+                // can unload some resources which can call _notifyResourceRemoved that removes
                 // the corresponding items from our container - this invalidates the iterator and we crash.
                 for (const auto& iter : arDel)
                 {
