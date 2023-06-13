@@ -971,23 +971,24 @@ namespace Ogre {
             // Iterate over all priorities
             for (auto & oi : grpi.second->loadResourceOrderMap)
             {
-                // Iterate over all resources
-                for (LoadUnloadResourceList::iterator l = oi.second.begin();
-                    l != oi.second.end(); )
+                // Iterate over all resources and collect which should be removed
+                std::vector<ResourcePtr> arDel;
+                arDel.reserve(oi.second.size());
+                for (const auto& iter : oi.second) {
+                    if (iter->getCreator() == manager)
+                        arDel.emplace_back(iter);
+                }
+
+                // Remove the items here (not above) because during the erase the item destructor
+                // can unload some resources which can call _notifyResourceRemoved that removes
+                // the corresponding items from our container - this invalidates the iterator and we crash.
+                for (const auto& iter : arDel)
                 {
-                    if ((*l)->getCreator() == manager)
-                    {
-                        // Increment first since iterator will be invalidated
-                        LoadUnloadResourceList::iterator del = l++;
-                        oi.second.erase(del);
-                    }
-                    else
-                    {
-                        ++l;
-                    }
+                    auto iFind = std::find(oi.second.begin(), oi.second.end(), iter);
+                    if (iFind != oi.second.end())
+                        oi.second.erase(iFind);
                 }
             }
-
         }
     }
     //-----------------------------------------------------------------------
