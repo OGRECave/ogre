@@ -889,7 +889,6 @@ namespace Ogre
 #endif
 
         rsc->setNumMultiRenderTargets(std::min(numMultiRenderTargets, (int)OGRE_MAX_MULTIPLE_RENDER_TARGETS));
-        rsc->setCapability(RSC_MRT_DIFFERENT_BIT_DEPTHS);
 
         rsc->setCapability(RSC_POINT_EXTENDED_PARAMETERS);
         rsc->setMaxPointSize(256); // TODO: guess!

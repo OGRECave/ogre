@@ -307,7 +307,6 @@ namespace Ogre {
         GLint buffers;
         OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_MAX_DRAW_BUFFERS, &buffers));
         rsc->setNumMultiRenderTargets(std::min<int>(buffers, (GLint)OGRE_MAX_MULTIPLE_RENDER_TARGETS));
-        rsc->setCapability(RSC_MRT_DIFFERENT_BIT_DEPTHS);
 
         // Stencil wrapping
         rsc->setCapability(RSC_STENCIL_WRAP);

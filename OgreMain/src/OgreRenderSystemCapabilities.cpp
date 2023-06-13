@@ -216,8 +216,6 @@ namespace Ogre {
             " * Hardware render-to-texture: "
             + StringConverter::toString(hasCapability(RSC_HWRENDER_TO_TEXTURE), true));
         pLog->logMessage("   - Multiple Render Targets: " + StringConverter::toString(mNumMultiRenderTargets));
-        pLog->logMessage("   - With different bit depths: " +
-                         StringConverter::toString(hasCapability(RSC_MRT_DIFFERENT_BIT_DEPTHS), true));
         pLog->logMessage(" * Point Sprites: " + StringConverter::toString(hasCapability(RSC_POINT_SPRITES), true));
         if (hasCapability(RSC_POINT_SPRITES))
         {
@@ -259,6 +257,8 @@ namespace Ogre {
             pLog->logMessage(
                 " * W-Buffer supported: "
                 + StringConverter::toString(hasCapability(RSC_WBUFFER), true));
+            pLog->logMessage(" * Multiple Render Targets must have same bit depth: " +
+                             StringConverter::toString(hasCapability(RSC_MRT_SAME_BIT_DEPTHS), true));
         }
     }
     //---------------------------------------------------------------------

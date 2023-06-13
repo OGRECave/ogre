@@ -76,7 +76,7 @@ namespace Ogre
                     "D3D9MultiRenderTarget::bindSurface");
             }
 
-            if (!Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_MRT_DIFFERENT_BIT_DEPTHS)
+            if (Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_MRT_SAME_BIT_DEPTHS)
                 && (PixelUtil::getNumElemBits(mRenderTargets[y]->getFormat()) != 
                     PixelUtil::getNumElemBits(buffer->getFormat())))
             {
