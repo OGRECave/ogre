@@ -122,12 +122,6 @@ namespace Ogre {
                     ss << ".";
                     OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, ss.str(), "GLFrameBufferObject::initialise");
                 }
-                if (!rsc->hasCapability(RSC_MRT_DIFFERENT_BIT_DEPTHS) && mColour[x].buffer->getGLFormat() != format)
-                {
-                    StringStream ss;
-                    ss << "Attachment " << x << " has incompatible format.";
-                    OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, ss.str(), "GLFrameBufferObject::initialise");
-                }
 
                 bool isDepth = PixelUtil::isDepth(mColour[x].buffer->getFormat());
                 mColour[x].buffer->bindToFramebuffer(

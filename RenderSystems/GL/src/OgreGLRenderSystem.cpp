@@ -646,7 +646,6 @@ namespace Ogre {
                 GLint buffers;
                 glGetIntegerv(GL_MAX_DRAW_BUFFERS_ARB, &buffers);
                 rsc->setNumMultiRenderTargets(std::min<int>(buffers, (GLint)OGRE_MAX_MULTIPLE_RENDER_TARGETS));
-                rsc->setCapability(RSC_MRT_DIFFERENT_BIT_DEPTHS);
 
             }
             rsc->setCapability(RSC_HWRENDER_TO_TEXTURE);

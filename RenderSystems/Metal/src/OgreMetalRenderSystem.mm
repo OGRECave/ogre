@@ -214,7 +214,6 @@ namespace Ogre
         }
 #endif
         rsc->setNumMultiRenderTargets( std::min<int>(mrtCount, OGRE_MAX_MULTIPLE_RENDER_TARGETS) );
-        rsc->setCapability(RSC_MRT_DIFFERENT_BIT_DEPTHS);
 
 #if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
         //uint16 max2DResolution = 16384;

@@ -153,8 +153,8 @@ namespace Ogre
         RSC_TEXTURE_COMPRESSION_BC6H_BC7 = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 8),
         /// Supports fixed-function pipeline
         RSC_FIXED_FUNCTION = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 9),
-        /// Supports MRTs with different bit depths
-        RSC_MRT_DIFFERENT_BIT_DEPTHS = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 10),
+        /// Supports #VET_INT_10_10_10_2_NORM
+        RSC_VERTEX_FORMAT_INT_10_10_10_2 = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 10),
         /// Supports Alpha to Coverage (A2C)
         RSC_ALPHA_TO_COVERAGE = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 11),
         /// Supports reading back compiled shaders
@@ -171,8 +171,6 @@ namespace Ogre
         RSC_VERTEX_BUFFER_INSTANCE_DATA = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 16),
         /// Supports hardware tessellation hull programs
         RSC_TESSELLATION_HULL_PROGRAM = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 17),
-        /// Supports #VET_INT_10_10_10_2_NORM
-        RSC_VERTEX_FORMAT_INT_10_10_10_2 = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 18),
 
         // ***** DirectX specific caps *****
         /// Is DirectX feature "per stage constants" supported
@@ -186,6 +184,8 @@ namespace Ogre
         /// D3D11: Supports asynchronous hardware occlusion queries
         RSC_HWOCCLUSION_ASYNCHRONOUS = OGRE_CAPS_VALUE(CAPS_CATEGORY_D3D9, 3),
         RSC_HWRENDER_TO_TEXTURE_3D = OGRE_CAPS_VALUE(CAPS_CATEGORY_D3D9, 4),
+        /// All MRTs must have same bit depths
+        RSC_MRT_SAME_BIT_DEPTHS = OGRE_CAPS_VALUE(CAPS_CATEGORY_D3D9, 5),
 
         // ***** GL Specific Caps *****
         /// Support for PBuffer

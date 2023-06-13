@@ -848,7 +848,6 @@ namespace Ogre
         rsc->setCapability(RSC_NON_POWER_OF_2_TEXTURES);
         rsc->setNonPOW2TexturesLimited(false);
         rsc->setNumMultiRenderTargets(OGRE_MAX_MULTIPLE_RENDER_TARGETS);
-        rsc->setCapability(RSC_MRT_DIFFERENT_BIT_DEPTHS);       
         rsc->setCapability(RSC_POINT_SPRITES);          
         rsc->setCapability(RSC_POINT_EXTENDED_PARAMETERS);                              
         rsc->setMaxPointSize(2.19902e+012f);
@@ -964,7 +963,7 @@ namespace Ogre
 
             if((rkCurCaps.PrimitiveMiscCaps & D3DPMISCCAPS_MRTINDEPENDENTBITDEPTHS) == 0)
             {
-                rsc->unsetCapability(RSC_MRT_DIFFERENT_BIT_DEPTHS);
+                rsc->setCapability(RSC_MRT_SAME_BIT_DEPTHS);
             }
 
             // Point sprites 
