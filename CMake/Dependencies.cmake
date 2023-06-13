@@ -41,6 +41,12 @@ if(CMAKE_CROSSCOMPILING)
         set(CROSS ${CROSS}
             -DCMAKE_FIND_ROOT_PATH=${CMAKE_FIND_ROOT_PATH})
     endif()
+
+endif()
+
+if(APPLE)
+    set(CROSS ${CROSS}
+        -DCMAKE_OSX_ARCHITECTURES=${CMAKE_OSX_ARCHITECTURES})
 endif()
 
 # if we build our own deps, do it static as it generally eases distribution
