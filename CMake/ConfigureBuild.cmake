@@ -22,7 +22,6 @@ if (APPLE_IOS)
   set(OGRE_SET_BUILD_PLATFORM_APPLE_IOS 1)
   set(OGRE_STATIC TRUE)
   set(OGRE_STATIC_LIB TRUE)
-  set(OGRE_CONFIG_ENABLE_PVRTC TRUE)
 endif()
 
 # should we build static libs?
