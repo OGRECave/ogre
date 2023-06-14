@@ -55,8 +55,7 @@ def main():
     ]
 
     if sys.platform == "win32":
-        cmake_args += ["-DSWIG_EXECUTABLE=C:/ProgramData/chocolatey/bin/swig.exe",
-                       "-DOGRE_BIN_DIRECTORY=Ogre", # direct dlls into python package
+        cmake_args += ["-DOGRE_BIN_DIRECTORY=Ogre", # direct dlls into python package
                        "-DOGRE_CFG_INSTALL_PATH=bin", # but keep config files in bin, relative to Media
                        "-DOGRE_BUILD_RENDERSYSTEM_D3D9=OFF", # do not require old runtime
                        "-DOGRE_BUILD_RENDERSYSTEM_VULKAN=ON",
@@ -70,6 +69,7 @@ def main():
                        "-DCMAKE_INSTALL_RPATH=$ORIGIN;$ORIGIN/OGRE"]
     elif sys.platform == "darwin":
         cmake_args += ["-DOGRE_BUILD_LIBS_AS_FRAMEWORKS=OFF",
+                       "-DCMAKE_OSX_ARCHITECTURES=arm64",
                        "-DCMAKE_INSTALL_RPATH=@loader_path;@loader_path/OGRE"]
 
     version = re.search("project\(OGRE VERSION (\S+)\)", open("CMakeLists.txt").read()).group(1)
