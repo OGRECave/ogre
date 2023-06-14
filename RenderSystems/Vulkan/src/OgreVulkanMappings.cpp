@@ -367,12 +367,6 @@ namespace Ogre
         case PF_BC6H_SF16:             return VK_FORMAT_BC6H_SFLOAT_BLOCK;
         case PF_BC7_UNORM:             return VK_FORMAT_BC7_UNORM_BLOCK;
         case PF_A4R4G4B4:              return VK_FORMAT_B4G4R4A4_UNORM_PACK16;
-        case PF_PVRTC_RGB2:            return VK_FORMAT_PVRTC1_2BPP_UNORM_BLOCK_IMG;
-        case PF_PVRTC_RGBA2:           return VK_FORMAT_PVRTC1_2BPP_UNORM_BLOCK_IMG;
-        case PF_PVRTC_RGB4:            return VK_FORMAT_PVRTC1_4BPP_UNORM_BLOCK_IMG;
-        case PF_PVRTC_RGBA4:           return VK_FORMAT_PVRTC1_4BPP_UNORM_BLOCK_IMG;
-        case PF_PVRTC2_2BPP:           return VK_FORMAT_PVRTC2_2BPP_UNORM_BLOCK_IMG;
-        case PF_PVRTC2_4BPP:           return VK_FORMAT_PVRTC2_4BPP_UNORM_BLOCK_IMG;
         case PF_ETC1_RGB8:             return VK_FORMAT_ETC2_R8G8B8_UNORM_BLOCK;
         case PF_ETC2_RGB8:             return VK_FORMAT_ETC2_R8G8B8_UNORM_BLOCK;
         case PF_ETC2_RGBA8:            return VK_FORMAT_ETC2_R8G8B8A8_UNORM_BLOCK;
@@ -401,6 +395,22 @@ namespace Ogre
         case PF_ATC_RGB:
         case PF_ATC_RGBA_EXPLICIT_ALPHA:
         case PF_ATC_RGBA_INTERPOLATED_ALPHA:
+        // PVRTC requires asking for extension VK_IMG_format_pvrtc before using
+        // VK_FORMAT_PVRTC* family of enums.
+        //
+        // However:
+        //  1. This extension is deprecated.
+        //  2. We have no way of testing the extension/functionality works and won't crash if Ogre
+        //     ever runs on PVRTC-enabled drivers. The oldest / most popular PVRTC GPU we can get is
+        //     the PowerVR GE8320 and it doesn't expose this extension.
+        //
+        // PVRTC on Vulkan is dead.
+        case PF_PVRTC_RGB2:
+        case PF_PVRTC_RGBA2:
+        case PF_PVRTC_RGB4:
+        case PF_PVRTC_RGBA4:
+        case PF_PVRTC2_2BPP:
+        case PF_PVRTC2_4BPP:
         default:
             return VK_FORMAT_UNDEFINED;
         }

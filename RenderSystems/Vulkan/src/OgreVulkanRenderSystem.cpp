@@ -534,11 +534,6 @@ namespace Ogre
                 rsc->setCapability( RSC_TEXTURE_COMPRESSION_ETC2 );
             }
 
-            vkGetPhysicalDeviceFormatProperties( mDevice->mPhysicalDevice,
-                                                 VulkanMappings::get( PF_PVRTC_RGB2 ), &props );
-            if( props.optimalTilingFeatures & VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT )
-                rsc->setCapability( RSC_TEXTURE_COMPRESSION_PVRTC );
-
             vkGetPhysicalDeviceFormatProperties(
                 mDevice->mPhysicalDevice, VulkanMappings::get( PF_ASTC_RGBA_4X4_LDR ), &props );
             if( props.optimalTilingFeatures & VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT )
