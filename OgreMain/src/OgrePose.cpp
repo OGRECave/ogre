@@ -35,7 +35,7 @@ namespace Ogre {
     {
     }
     //---------------------------------------------------------------------
-    void Pose::addVertex(size_t index, const Vector3& offset)
+    void Pose::addVertex(uint32 index, const Vector3f& offset)
     {
         OgreAssert(mNormalsMap.empty(),
                    "Inconsistent calls to addVertex, must include normals always or never");
@@ -49,7 +49,7 @@ namespace Ogre {
         mBuffer.reset();
     }
     //---------------------------------------------------------------------
-    void Pose::addVertex(size_t index, const Vector3& offset, const Vector3& normal)
+    void Pose::addVertex(uint32 index, const Vector3f& offset, const Vector3f& normal)
     {
         OgreAssert(mVertexOffsetMap.empty() || !mNormalsMap.empty(),
                    "Inconsistent calls to addVertex, must include normals always or never");
@@ -64,7 +64,7 @@ namespace Ogre {
         mBuffer.reset();
     }
     //---------------------------------------------------------------------
-    void Pose::removeVertex(size_t index)
+    void Pose::removeVertex(uint32 index)
     {
         VertexOffsetMap::iterator i = mVertexOffsetMap.find(index);
         if (i != mVertexOffsetMap.end())
@@ -161,15 +161,15 @@ namespace Ogre {
                 // Remember, vertex maps are *sparse* so may have missing entries
                 // This is why we skip
                 float* pDst = pFloat + (numFloatsPerVertex * v->first);
-                *pDst++ = v->second.x;
-                *pDst++ = v->second.y;
-                *pDst++ = v->second.z;
+                *pDst++ = v->second[0];
+                *pDst++ = v->second[1];
+                *pDst++ = v->second[2];
                 ++v;
                 if (normals)
                 {
-                    *pDst++ = n->second.x;
-                    *pDst++ = n->second.y;
-                    *pDst++ = n->second.z;
+                    *pDst++ = n->second[0];
+                    *pDst++ = n->second[1];
+                    *pDst++ = n->second[2];
                     ++n;
                 }
                 
