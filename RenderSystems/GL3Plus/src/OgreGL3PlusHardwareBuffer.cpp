@@ -181,10 +181,6 @@ namespace Ogre {
             mShadowBuffer->copyData(srcBuffer, srcOffset, dstOffset, length, discardWholeBuffer);
         }
 
-        // Zero out this(destination) buffer
-        mRenderSystem->_getStateCacheManager()->bindGLBuffer(mTarget, mBufferId);
-        OGRE_CHECK_GL_ERROR(glBufferData(mTarget, length, 0, getGLUsage(mUsage)));
-
         // Do it the fast way.
         mRenderSystem->_getStateCacheManager()->bindGLBuffer(
             GL_COPY_READ_BUFFER, static_cast<GL3PlusHardwareBuffer&>(srcBuffer).getGLBufferId());
