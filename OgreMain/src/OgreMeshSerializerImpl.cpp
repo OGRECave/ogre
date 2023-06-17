@@ -2300,7 +2300,7 @@ namespace Ogre {
                 case M_POSE_VERTEX:
                     // create vertex offset
                     uint32 vertIndex;
-                    Vector3 offset, normal;
+                    Vector3f offset, normal;
                     // unsigned long vertexIndex
                     readInts(stream, &vertIndex, 1);
                     // float xoffset, yoffset, zoffset
@@ -3100,7 +3100,7 @@ namespace Ogre {
                 case M_POSE_VERTEX:
                     // create vertex offset
                     uint32 vertIndex;
-                    Vector3 offset;
+                    Vector3f offset;
                     // unsigned long vertexIndex
                     readInts(stream, &vertIndex, 1);
                     // float xoffset, yoffset, zoffset
