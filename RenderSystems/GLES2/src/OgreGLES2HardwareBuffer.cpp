@@ -198,10 +198,6 @@ namespace Ogre {
         {
             mShadowBuffer->copyData(srcBuffer, srcOffset, dstOffset, length, discardWholeBuffer);
         }
-        // Zero out this(destination) buffer
-        OGRE_CHECK_GL_ERROR(glBindBuffer(mTarget, mBufferId));
-        OGRE_CHECK_GL_ERROR(glBufferData(mTarget, length, 0, getGLUsage(mUsage)));
-        OGRE_CHECK_GL_ERROR(glBindBuffer(mTarget, 0));
 
         // Do it the fast way.
         OGRE_CHECK_GL_ERROR(glBindBuffer(GL_COPY_READ_BUFFER,
