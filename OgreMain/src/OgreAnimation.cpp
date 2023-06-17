@@ -422,7 +422,7 @@ namespace Ogre {
         }
    }
     //---------------------------------------------------------------------
-    void Animation::applyToVertexData(VertexData* data, Real timePos, Real weight)
+    void Animation::applyToVertexData(VertexData* data, Real timePos, float weight)
     {
         _applyBaseKeyFrame();
         

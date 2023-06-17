@@ -56,7 +56,7 @@ namespace Ogre {
 
         /// @copydoc OptimisedUtil::softwareVertexMorph
         void softwareVertexMorph(
-            Real t,
+            float t,
             const float *srcPos1, const float *srcPos2,
             float *dstPos,
             size_t pos1VSize, size_t pos2VSize, size_t dstVSize, 
@@ -234,7 +234,7 @@ namespace Ogre {
     }
     //---------------------------------------------------------------------
     void OptimisedUtilGeneral::softwareVertexMorph(
-        Real t,
+        float t,
         const float *pSrc1, const float *pSrc2,
         float *pDst,
         size_t pos1VSize, size_t pos2VSize, size_t dstVSize,
@@ -245,7 +245,7 @@ namespace Ogre {
         size_t src2Skip = pos2VSize/sizeof(float) - 3 - (morphNormals ? 3 : 0);
         size_t dstSkip = dstVSize/sizeof(float) - 3 - (morphNormals ? 3 : 0);
         
-        Vector3 nlerpNormal;
+        Vector3f nlerpNormal;
         for (size_t i = 0; i < numVertices; ++i)
         {
             // x
@@ -263,16 +263,16 @@ namespace Ogre {
                 // normals must be in the same buffer as pos
                 // perform an nlerp
                 // we don't have enough information for a spherical interp
-                nlerpNormal.x = *pSrc1 + t * (*pSrc2 - *pSrc1);
+                nlerpNormal[0] = *pSrc1 + t * (*pSrc2 - *pSrc1);
                 ++pSrc1; ++pSrc2;
-                nlerpNormal.y = *pSrc1 + t * (*pSrc2 - *pSrc1);
+                nlerpNormal[1] = *pSrc1 + t * (*pSrc2 - *pSrc1);
                 ++pSrc1; ++pSrc2;
-                nlerpNormal.z = *pSrc1 + t * (*pSrc2 - *pSrc1);
+                nlerpNormal[2] = *pSrc1 + t * (*pSrc2 - *pSrc1);
                 ++pSrc1; ++pSrc2;
                 nlerpNormal.normalise();
-                *pDst++ = nlerpNormal.x;
-                *pDst++ = nlerpNormal.y;                
-                *pDst++ = nlerpNormal.z;                
+                *pDst++ = nlerpNormal[0];
+                *pDst++ = nlerpNormal[1];
+                *pDst++ = nlerpNormal[2];
             }
             
             pSrc1 += src1Skip;

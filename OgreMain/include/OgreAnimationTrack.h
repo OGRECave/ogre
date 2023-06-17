@@ -173,7 +173,7 @@ namespace Ogre
             value is, e.g. 0.0 for exactly at 1, 0.25 for a quarter etc. By definition the range of this 
             value is:  0.0 <= returnValue < 1.0 .
         */
-        virtual Real getKeyFramesAtTime(const TimeIndex& timeIndex, KeyFrame** keyFrame1, KeyFrame** keyFrame2,
+        float getKeyFramesAtTime(const TimeIndex& timeIndex, KeyFrame** keyFrame1, KeyFrame** keyFrame2,
             unsigned short* firstKeyIndex = 0) const;
 
         /** Creates a new KeyFrame and adds it to this animation at the given time index.
@@ -500,7 +500,7 @@ namespace Ogre
         /** As the 'apply' method but applies to specified VertexData instead of 
             associated data. */
         virtual void applyToVertexData(VertexData* data, 
-            const TimeIndex& timeIndex, Real weight = 1.0, 
+            const TimeIndex& timeIndex, float weight = 1.0,
             const PoseList* poseList = 0);
 
 
@@ -546,7 +546,7 @@ namespace Ogre
         KeyFrame* createKeyFrameImpl(Real time) override;
 
         /// Utility method for applying pose animation
-        void applyPoseToVertexData(const Pose* pose, VertexData* data, Real influence);
+        void applyPoseToVertexData(const Pose* pose, VertexData* data, float influence);
 
 
     };

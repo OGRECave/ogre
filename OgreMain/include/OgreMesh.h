@@ -785,7 +785,7 @@ namespace Ogre {
             buffer already bound, and the number of vertices must agree with the
             number in start and end
         */
-        static void softwareVertexMorph(Real t, 
+        static void softwareVertexMorph(float t,
             const HardwareVertexBufferSharedPtr& b1, 
             const HardwareVertexBufferSharedPtr& b2, 
             VertexData* targetVertexData);
@@ -809,7 +809,7 @@ namespace Ogre {
             buffer already bound, and the number of vertices must agree with the
             number in start and end.
         */
-        static void softwareVertexPoseBlend(Real weight, 
+        static void softwareVertexPoseBlend(float weight,
             const std::map<uint32, Vector3f>& vertexOffsetMap,
             const std::map<uint32, Vector3f>& normalsMap,
             VertexData* targetVertexData);
