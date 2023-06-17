@@ -1901,7 +1901,7 @@ namespace Ogre {
             targetVertexData->vertexCount);
     }
     //---------------------------------------------------------------------
-    void Mesh::softwareVertexMorph(Real t,
+    void Mesh::softwareVertexMorph(float t,
         const HardwareVertexBufferSharedPtr& b1,
         const HardwareVertexBufferSharedPtr& b2,
         VertexData* targetVertexData)
@@ -1950,7 +1950,7 @@ namespace Ogre {
             morphNormals);
     }
     //---------------------------------------------------------------------
-    void Mesh::softwareVertexPoseBlend(Real weight,
+    void Mesh::softwareVertexPoseBlend(float weight,
         const std::map<uint32, Vector3f>& vertexOffsetMap,
         const std::map<uint32, Vector3f>& normalsMap,
         VertexData* targetVertexData)

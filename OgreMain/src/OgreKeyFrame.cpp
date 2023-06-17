@@ -134,12 +134,12 @@ namespace Ogre
     {
     }
     //---------------------------------------------------------------------
-    void VertexPoseKeyFrame::addPoseReference(ushort poseIndex, Real influence)
+    void VertexPoseKeyFrame::addPoseReference(ushort poseIndex, float influence)
     {
         mPoseRefs.push_back(PoseRef(poseIndex, influence));
     }
     //---------------------------------------------------------------------
-    void VertexPoseKeyFrame::updatePoseReference(ushort poseIndex, Real influence)
+    void VertexPoseKeyFrame::updatePoseReference(ushort poseIndex, float influence)
     {
         for (auto & poseRef : mPoseRefs)
         {

@@ -105,7 +105,7 @@ namespace Ogre {
         struct HardwareAnimationData
         {
             unsigned short targetBufferIndex;
-            Real parametric;
+            float parametric;
         };
         typedef std::vector<HardwareAnimationData> HardwareAnimationDataList;
         /// Number of hardware animation data items used

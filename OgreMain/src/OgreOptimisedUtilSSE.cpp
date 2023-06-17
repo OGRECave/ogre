@@ -94,7 +94,7 @@ namespace Ogre {
 
         /// @copydoc OptimisedUtil::softwareVertexMorph
         void __OGRE_SIMD_ALIGN_ATTRIBUTE softwareVertexMorph(
-            Real t,
+            float t,
             const float *srcPos1, const float *srcPos2,
             float *dstPos,
             size_t pos1VSize, size_t pos2VSize, size_t dstVSize, 
@@ -185,7 +185,7 @@ namespace Ogre {
 
         /// @copydoc OptimisedUtil::softwareVertexMorph
         virtual void softwareVertexMorph(
-            Real t,
+            float t,
             const float *srcPos1, const float *srcPos2,
             float *dstPos,
             size_t pos1VSize, size_t pos2VSize, size_t dstVSize, 
@@ -1282,7 +1282,7 @@ namespace Ogre {
     }
     //---------------------------------------------------------------------
     void OptimisedUtilSSE::softwareVertexMorph(
-        Real t,
+        float t,
         const float *pSrc1, const float *pSrc2,
         float *pDst,
         size_t pos1VSize, size_t pos2VSize, size_t dstVSize, 

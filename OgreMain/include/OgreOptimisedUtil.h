@@ -123,7 +123,7 @@ namespace Ogre {
         @param morphNormals
         */
         virtual void softwareVertexMorph(
-            Real t,
+            float t,
             const float *srcPos1, const float *srcPos2,
             float *dstPos,
             size_t pos1VSize, size_t pos2VSize, size_t dstVSize, 
