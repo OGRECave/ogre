@@ -35,7 +35,7 @@ namespace Ogre
 {
     VulkanHardwareBuffer::VulkanHardwareBuffer(uint32 target,
         size_t sizeBytes, Usage usage, bool useShadowBuffer, VulkanDevice *device ) :
-        HardwareBuffer(usage, false, useShadowBuffer),
+        HardwareBuffer(usage, useShadowBuffer),
         mBuffer(VK_NULL_HANDLE),
         mDevice( device ),
         mTarget( target ),

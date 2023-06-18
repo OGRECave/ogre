@@ -63,7 +63,7 @@ namespace Ogre {
 
     D3D11HardwarePixelBuffer::D3D11HardwarePixelBuffer(D3D11Texture * parentTexture, D3D11Device & device, UINT mipLevel,
         size_t width, size_t height, size_t depth, UINT face, PixelFormat format, HardwareBuffer::Usage usage):
-    HardwarePixelBuffer(width, height, depth, format, usage, false, false),
+    HardwarePixelBuffer(width, height, depth, format, usage, false),
         mParentTexture(parentTexture),
         mDevice(device),
         mFace(face),

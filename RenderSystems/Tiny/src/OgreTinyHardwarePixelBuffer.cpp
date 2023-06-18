@@ -7,7 +7,7 @@
 namespace Ogre {
 
     TinyHardwarePixelBuffer::TinyHardwarePixelBuffer(const PixelBox& data, Usage usage)
-        : HardwarePixelBuffer(data.getWidth(), data.getHeight(), data.getDepth(), data.format, usage, true, false), mBuffer(data)
+        : HardwarePixelBuffer(data.getWidth(), data.getHeight(), data.getDepth(), data.format, usage, false), mBuffer(data)
     {
     }
 

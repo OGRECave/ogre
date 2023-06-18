@@ -38,7 +38,7 @@ namespace Ogre
     MetalHardwareBufferCommon::MetalHardwareBufferCommon( size_t sizeBytes, Usage usage, bool useShadowBuffer,
                                                           uint16 alignment,
                                                           MetalDevice *device ) :
-        HardwareBuffer(usage, false, false),
+        HardwareBuffer(usage, false),
         mBuffer( 0 ),
         mDevice( device )
     {

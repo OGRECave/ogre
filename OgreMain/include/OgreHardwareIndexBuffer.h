@@ -59,7 +59,7 @@ namespace Ogre {
         public:
             /// Should be called by HardwareBufferManager
             HardwareIndexBuffer(HardwareBufferManagerBase* mgr, IndexType idxType, size_t numIndexes,
-                                Usage usage, bool useSystemMemory, bool useShadowBuffer);
+                                Usage usage, bool useShadowBuffer);
             HardwareIndexBuffer(HardwareBufferManagerBase* mgr, IndexType idxType, size_t numIndexes,
                                 HardwareBuffer* delegate);
             ~HardwareIndexBuffer();

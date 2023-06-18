@@ -35,7 +35,7 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 namespace Ogre {
 
     GL3PlusHardwareBuffer::GL3PlusHardwareBuffer(GLenum target, size_t sizeInBytes, uint32 usage, bool useShadowBuffer)
-    : HardwareBuffer(usage, false, useShadowBuffer), mTarget(target)
+    : HardwareBuffer(usage, useShadowBuffer), mTarget(target)
     {
         mSizeInBytes = sizeInBytes;
         mRenderSystem = static_cast<GL3PlusRenderSystem*>(Root::getSingleton().getRenderSystem());
