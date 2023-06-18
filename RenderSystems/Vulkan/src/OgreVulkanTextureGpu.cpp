@@ -44,7 +44,7 @@ namespace Ogre
 {
     VulkanHardwarePixelBuffer::VulkanHardwarePixelBuffer(VulkanTextureGpu* tex, uint32 width, uint32 height, uint32 depth,
                                                         uint8 face, uint32 mip)
-        : HardwarePixelBuffer(width, height, depth, tex->getFormat(), tex->getUsage(), false, false), mParent(tex),
+        : HardwarePixelBuffer(width, height, depth, tex->getFormat(), tex->getUsage(), false), mParent(tex),
         mFace(face), mLevel(mip)
     {
         if(mParent->getUsage() & TU_RENDERTARGET)

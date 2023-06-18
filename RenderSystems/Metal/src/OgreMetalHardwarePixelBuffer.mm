@@ -39,7 +39,7 @@ namespace Ogre {
     MetalHardwarePixelBuffer::MetalHardwarePixelBuffer( uint32 width, uint32 height,
                                                         uint32 depth, PixelFormat format,
                                                         bool hwGamma, HardwareBuffer::Usage usage )
-        : HardwarePixelBuffer(width, height, depth, format, usage, false, false),
+        : HardwarePixelBuffer(width, height, depth, format, usage, false),
           mBuffer(width, height, depth, format)
     {
     }

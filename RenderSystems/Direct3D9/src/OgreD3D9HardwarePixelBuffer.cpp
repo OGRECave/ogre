@@ -47,7 +47,7 @@ namespace Ogre {
 
 D3D9HardwarePixelBuffer::D3D9HardwarePixelBuffer(HardwareBuffer::Usage usage, 
                                                  D3D9Texture* ownerTexture):
-    HardwarePixelBuffer(0, 0, 0, PF_UNKNOWN, usage, false, false),
+    HardwarePixelBuffer(0, 0, 0, PF_UNKNOWN, usage, false),
     mDoMipmapGen(false), mHWMipmaps(false), mOwnerTexture(ownerTexture)
 {   
 }

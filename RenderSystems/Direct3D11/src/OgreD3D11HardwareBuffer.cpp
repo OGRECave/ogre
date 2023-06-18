@@ -36,7 +36,7 @@ namespace Ogre {
         BufferType btype, size_t sizeBytes,
         HardwareBuffer::Usage usage, D3D11Device & device, 
         bool useShadowBuffer, bool streamOut)
-        : HardwareBuffer(usage, false,  useShadowBuffer),
+        : HardwareBuffer(usage, useShadowBuffer),
         mUseTempStagingBuffer(false),
         mBufferType(btype),
         mDevice(device)

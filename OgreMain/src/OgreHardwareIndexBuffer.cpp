@@ -34,9 +34,8 @@ namespace Ogre {
 
     //-----------------------------------------------------------------------------
     HardwareIndexBuffer::HardwareIndexBuffer(HardwareBufferManagerBase* mgr, IndexType idxType, 
-        size_t numIndexes, HardwareBuffer::Usage usage,
-        bool useSystemMemory, bool useShadowBuffer) 
-        : HardwareBuffer(usage, useSystemMemory, useShadowBuffer)
+        size_t numIndexes, HardwareBuffer::Usage usage, bool useShadowBuffer)
+        : HardwareBuffer(usage, useShadowBuffer)
         , mIndexType(idxType)
         , mMgr(mgr)
         , mNumIndexes(numIndexes)
@@ -62,8 +61,7 @@ namespace Ogre {
 
     HardwareIndexBuffer::HardwareIndexBuffer(HardwareBufferManagerBase* mgr, IndexType idxType,
                                              size_t numIndexes, HardwareBuffer* delegate)
-        : HardwareIndexBuffer(mgr, idxType, numIndexes, delegate->getUsage(), delegate->isSystemMemory(),
-                              false)
+        : HardwareIndexBuffer(mgr, idxType, numIndexes, delegate->getUsage(), false)
     {
         mDelegate.reset(delegate);
     }

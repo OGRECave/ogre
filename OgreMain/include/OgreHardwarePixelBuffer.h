@@ -83,7 +83,7 @@ namespace Ogre {
         /// Should be called by HardwareBufferManager
         HardwarePixelBuffer(uint32 mWidth, uint32 mHeight, uint32 mDepth,
                 PixelFormat mFormat,
-                HardwareBuffer::Usage usage, bool useSystemMemory, bool useShadowBuffer);
+                HardwareBuffer::Usage usage, bool useShadowBuffer);
         ~HardwarePixelBuffer();
 
         /** Make every lock method from HardwareBuffer available.

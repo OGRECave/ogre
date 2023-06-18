@@ -32,7 +32,7 @@ namespace Ogre
 GLHardwarePixelBufferCommon::GLHardwarePixelBufferCommon(uint32 inWidth, uint32 inHeight,
                                                        uint32 inDepth, PixelFormat inFormat,
                                                        HardwareBuffer::Usage usage)
-    : HardwarePixelBuffer(inWidth, inHeight, inDepth, inFormat, usage, false, false),
+    : HardwarePixelBuffer(inWidth, inHeight, inDepth, inFormat, usage, false),
       mBuffer(inWidth, inHeight, inDepth, inFormat),
       mGLInternalFormat(0)
 {

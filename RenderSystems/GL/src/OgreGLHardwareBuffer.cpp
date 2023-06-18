@@ -38,7 +38,7 @@ namespace Ogre {
     //---------------------------------------------------------------------
     GLHardwareVertexBuffer::GLHardwareVertexBuffer(GLenum target, size_t sizeInBytes,
         Usage usage, bool useShadowBuffer)
-        : HardwareBuffer(usage, false, useShadowBuffer), mTarget(target), mLockedToScratch(false),
+        : HardwareBuffer(usage, useShadowBuffer), mTarget(target), mLockedToScratch(false),
         mScratchOffset(0), mScratchSize(0), mScratchPtr(0), mScratchUploadOnUnlock(false)
     {
         mSizeInBytes = sizeInBytes;

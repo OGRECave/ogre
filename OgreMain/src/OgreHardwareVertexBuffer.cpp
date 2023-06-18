@@ -33,9 +33,8 @@ namespace Ogre {
 
     //-----------------------------------------------------------------------------
     HardwareVertexBuffer::HardwareVertexBuffer(HardwareBufferManagerBase* mgr, size_t vertexSize,
-        size_t numVertices, HardwareBuffer::Usage usage,
-        bool useSystemMemory, bool useShadowBuffer) 
-        : HardwareBuffer(usage, useSystemMemory, useShadowBuffer),
+        size_t numVertices, HardwareBuffer::Usage usage, bool useShadowBuffer)
+        : HardwareBuffer(usage, useShadowBuffer),
           mIsInstanceData(false),
           mMgr(mgr),
           mNumVertices(numVertices),
@@ -54,8 +53,7 @@ namespace Ogre {
     }
     HardwareVertexBuffer::HardwareVertexBuffer(HardwareBufferManagerBase* mgr, size_t vertexSize,
                                                size_t numVertices, HardwareBuffer* delegate)
-        : HardwareVertexBuffer(mgr, vertexSize, numVertices, delegate->getUsage(), delegate->isSystemMemory(),
-                               false)
+        : HardwareVertexBuffer(mgr, vertexSize, numVertices, delegate->getUsage(), false)
     {
         mDelegate.reset(delegate);
     }

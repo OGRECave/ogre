@@ -41,7 +41,7 @@ namespace Ogre {
     D3D9HardwareBuffer::D3D9HardwareBuffer(D3DFORMAT type, size_t sizeInBytes,
         Usage usage,
         bool useShadowBuffer)
-        : HardwareBuffer(usage, false, useShadowBuffer)
+        : HardwareBuffer(usage, useShadowBuffer)
     {
         mType = type;
         mSizeInBytes = sizeInBytes;
