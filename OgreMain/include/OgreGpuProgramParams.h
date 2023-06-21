@@ -1761,11 +1761,10 @@ namespace Ogre {
             @param name The name of the auto constant
         */
         static const AutoConstantDefinition* getAutoConstantDefinition(const String& name);
-        /** gets the auto constant definition using an index into the auto constant definition array.
-            If the index is out of bounds then NULL is returned;
-            @param idx The auto constant index
+        /** gets the auto constant definition by auto constant type.
+            @param type The auto constant type
         */
-        static const AutoConstantDefinition* getAutoConstantDefinition(const size_t idx);
+        static const AutoConstantDefinition* getAutoConstantDefinition(AutoConstantType type);
         /** Returns the number of auto constant definitions
          */
         static size_t getNumAutoConstantDefinitions(void);

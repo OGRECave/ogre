@@ -1654,7 +1654,6 @@ namespace Ogre
                 const GpuProgramParameters::AutoConstantDefinition* autoConstDef =
                     GpuProgramParameters::getAutoConstantDefinition(autoEntry->paramType);
 
-                assert(autoConstDef && "Bad auto constant Definition Table");
                 // output auto constant name
                 writeValue(quoteWord(autoConstDef->name), useMainBuffer);
                 // output data if it uses it
