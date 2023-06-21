@@ -751,6 +751,8 @@ namespace Ogre
         , mIgnoreMissingParams(false)
         , mActivePassIterationIndex(std::numeric_limits<size_t>::max())
     {
+        static_assert((sizeof(AutoConstantDictionary) / sizeof(AutoConstantDefinition) - 5) == ACT_POINT_PARAMS,
+                      "AutoConstantDictionary out of sync");
     }
     GpuProgramParameters::~GpuProgramParameters() {}
 
@@ -2547,17 +2549,12 @@ namespace Ogre
 
     //-----------------------------------------------------------------------
     const GpuProgramParameters::AutoConstantDefinition*
-    GpuProgramParameters::getAutoConstantDefinition(const size_t idx)
+    GpuProgramParameters::getAutoConstantDefinition(AutoConstantType idx)
     {
-        if (idx < getNumAutoConstantDefinitions())
-        {
-            // verify index is equal to acType
-            // if they are not equal then the dictionary was not setup properly
-            assert(idx == static_cast<size_t>(AutoConstantDictionary[idx].acType));
-            return &AutoConstantDictionary[idx];
-        }
-        else
-            return 0;
+        // verify index is equal to acType
+        // if they are not equal then the dictionary was not setup properly
+        assert(idx == AutoConstantDictionary[idx].acType);
+        return &AutoConstantDictionary[idx];
     }
     //-----------------------------------------------------------------------
     size_t GpuProgramParameters::getNumAutoConstantDefinitions(void)
