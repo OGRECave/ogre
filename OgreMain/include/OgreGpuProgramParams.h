@@ -1133,9 +1133,7 @@ namespace Ogre {
             ACT_LIGHT_CUSTOM,
             /// Point attenuation params.
             /// Packed as `(size, constant, linear, quadratic)`
-            ACT_POINT_PARAMS,
-
-            ACT_UNKNOWN = 999
+            ACT_POINT_PARAMS
         };
 
         /** Defines the type of the extra data item used by the auto constant.

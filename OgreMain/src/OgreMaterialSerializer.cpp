@@ -810,7 +810,6 @@ namespace Ogre
         case TextureUnitState::TAM_MIRROR:
             return "mirror";
         case TextureUnitState::TAM_WRAP:
-        case TextureUnitState::TAM_UNKNOWN:
             return "wrap";
         }
 

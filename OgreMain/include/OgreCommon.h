@@ -126,9 +126,7 @@ namespace Ogre {
         /// combined with filtering.
         TAM_CLAMP,
         /// %Texture coordinates outside the range [0.0, 1.0] are set to the border colour.
-        TAM_BORDER,
-        /// Unknown
-        TAM_UNKNOWN = 99
+        TAM_BORDER
     };
 
     /** %Light shading modes. */

@@ -260,8 +260,6 @@ namespace Ogre
             return VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
         case TAM_BORDER:
             return VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_BORDER;
-        case TAM_UNKNOWN:
-            return VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
         }
 
         return VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;

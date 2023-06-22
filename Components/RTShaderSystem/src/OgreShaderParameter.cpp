@@ -185,7 +185,7 @@ UniformParameter::UniformParameter(GpuConstantType type, const String& name,
     mVariability            = variability;
     mParamsPtr              = NULL;
     mPhysicalIndex          = -1;
-    mAutoConstantType       = GpuProgramParameters::ACT_UNKNOWN;
+    mAutoConstantType       = GpuProgramParameters::ACT_TIME;
 }
 
 static GpuConstantType getGCType(const GpuProgramParameters::AutoConstantDefinition* def)
