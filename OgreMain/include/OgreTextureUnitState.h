@@ -293,7 +293,6 @@ namespace Ogre {
         static const Ogre::TextureAddressingMode TAM_MIRROR = Ogre::TAM_MIRROR;
         static const Ogre::TextureAddressingMode TAM_CLAMP = Ogre::TAM_CLAMP;
         static const Ogre::TextureAddressingMode TAM_BORDER = Ogre::TAM_BORDER;
-        static const Ogre::TextureAddressingMode TAM_UNKNOWN = Ogre::TAM_UNKNOWN;
 
         OGRE_DEPRECATED typedef Ogre::TextureAddressingMode TextureAddressingMode;
         OGRE_DEPRECATED typedef Sampler::UVWAddressingMode UVWAddressingMode;
