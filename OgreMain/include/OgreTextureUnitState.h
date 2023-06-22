@@ -347,7 +347,7 @@ namespace Ogre {
         @param texCoordSet
             The index of the texture coordinate set to use.
         */
-        TextureUnitState( Pass* parent, const String& texName, unsigned int texCoordSet = 0);
+        TextureUnitState( Pass* parent, const String& texName, uint8 texCoordSet = 0);
 
         /** Get the name of current texture image for this layer.
 
@@ -534,14 +534,14 @@ namespace Ogre {
         @note
         Only applies to the fixed function pipeline and has no effect if a fragment program is used.
         */
-        unsigned int getTextureCoordSet(void) const;
+        uint8 getTextureCoordSet(void) const;
 
         /** Sets which texture coordinate set is to be used for this texture layer.
 
             A mesh can define multiple sets of texture coordinates, this sets which one this
             material uses.
         */
-        void setTextureCoordSet(unsigned int set);
+        void setTextureCoordSet(uint8 set);
 
         /// Enables Unordered Access to the provided mipLevel of the texture
         void setUnorderedAccessMipLevel(int mipLevel) { mUnorderedAccessMipLevel = mipLevel; }
@@ -990,14 +990,14 @@ namespace Ogre {
         @param mrtIndex
             The index of the wanted texture, if referencing an MRT.
         */
-        void setCompositorReference(const String& compositorName, const String& textureName, size_t mrtIndex = 0);
+        void setCompositorReference(const String& compositorName, const String& textureName, uint32 mrtIndex = 0);
 
         /** Gets the name of the compositor that this texture references. */
         const String& getReferencedCompositorName() const { return mCompositorRefName; }
         /** Gets the name of the texture in the compositor that this texture references. */
         const String& getReferencedTextureName() const { return mCompositorRefTexName; }
         /** Gets the MRT index of the texture in the compositor that this texture references. */ 
-        size_t getReferencedMRTIndex() const { return mCompositorRefMrtIndex; }
+        uint32 getReferencedMRTIndex() const { return mCompositorRefMrtIndex; }
     
         /// Gets the parent Pass object.
         Pass* getParent(void) const { return mParent; }
@@ -1062,8 +1062,6 @@ private:
         /// Duration of animation in seconds.
         Real mAnimDuration;
 
-        unsigned int mTextureCoordSetIndex;
-
         int mUnorderedAccessMipLevel;
 
         LayerBlendModeEx mColourBlendMode;
@@ -1083,8 +1081,10 @@ private:
         mutable bool mTextureLoadFailed;
         mutable bool mRecalcTexMatrix;
 
+        uint8 mTextureCoordSetIndex;
+
         /// The index of the referenced texture if referencing an MRT in a compositor.
-        size_t mCompositorRefMrtIndex;
+        uint32 mCompositorRefMrtIndex;
 
         //-----------------------------------------------------------------------------
         // Complex members (those that can't be copied using memcpy) are at the end to 
