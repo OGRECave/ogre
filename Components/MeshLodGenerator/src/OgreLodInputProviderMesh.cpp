@@ -204,18 +204,11 @@ namespace Ogre
             // Locking a zero length buffer on Linux with nvidia cards fails.
             return;
         }
-        VertexLookupList& lookup = useSharedVertexLookup ? mSharedVertexLookup : mVertexLookup;
 
         // Lock the buffer for reading.
-        char* iStart = static_cast<char*>(ibuf->lock(HardwareBuffer::HBL_READ_ONLY));
-        char* iEnd = iStart + ibuf->getSizeInBytes();
-        if (isize == sizeof(unsigned short)) {
-            addIndexDataImpl<unsigned short>(data, (unsigned short*) iStart, (unsigned short*) iEnd, lookup, submeshID, renderOp);
-        } else {
-            // Unsupported index size.
-            OgreAssert(isize == sizeof(unsigned int), "");
-            addIndexDataImpl<unsigned int>(data, (unsigned int*) iStart, (unsigned int*) iEnd, lookup, submeshID, renderOp);
-        }
+        uchar* iStart = static_cast<uchar*>(ibuf->lock(HardwareBuffer::HBL_READ_ONLY));
+        uchar* iEnd = iStart + ibuf->getSizeInBytes();
+        addIndexDataImpl(data, iStart, iEnd, isize, useSharedVertexLookup, submeshID, renderOp);
         ibuf->unlock();
     }   
 

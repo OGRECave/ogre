@@ -30,8 +30,8 @@
 
 namespace Ogre
 {
-    
-    void LodInputProvider::printTriangle(LodData::Triangle* triangle, std::ostream& str)
+#if OGRE_DEBUG_MODE
+static void printTriangle(LodData::Triangle* triangle, std::ostream& str)
 {
     for (int i = 0; i < 3; i++) {
         str << (i + 1) << ". vertex position: ("
@@ -39,6 +39,84 @@ namespace Ogre
             << triangle->vertex[i]->position.y << ", "
             << triangle->vertex[i]->position.z << ") "
             << "vertex ID: " << triangle->vertexID[i] << std::endl;
+    }
+}
+#endif
+
+template <typename IndexType>
+void LodInputProvider::addIndexDataImpl(LodData* data, IndexType* iPos, const IndexType* iEnd,
+                                        std::vector<LodData::Vertex*>& lookup, ushort submeshID,
+                                        RenderOperation::OperationType renderOp)
+{
+    if(iEnd - iPos < 3
+    || (renderOp != RenderOperation::OT_TRIANGLE_LIST
+    && renderOp != RenderOperation::OT_TRIANGLE_STRIP
+    && renderOp != RenderOperation::OT_TRIANGLE_FAN))
+        return;
+
+    IndexType i0 = iPos[0], i1 = iPos[1], i2 = iPos[2];
+    unsigned inc = (renderOp==RenderOperation::OT_TRIANGLE_LIST) ? 3 : 1;
+    unsigned triangleIdx = 0;
+
+    // Loop through all triangles and connect them to the vertices.
+    for (iPos += (3 - inc); iPos < iEnd; iPos += inc, ++triangleIdx) {
+        // It should never reallocate or every pointer will be invalid.
+        OgreAssertDbg(data->mTriangleList.capacity() > data->mTriangleList.size(), "");
+        data->mTriangleList.push_back(LodData::Triangle());
+        LodData::Triangle* tri = &data->mTriangleList.back();
+        tri->isRemoved = false;
+        tri->submeshID = submeshID;
+
+        if(triangleIdx > 0)
+        {
+            switch(renderOp)
+            {
+            case RenderOperation::OT_TRIANGLE_LIST:
+                i0 = iPos[0];
+                i1 = iPos[1];
+                i2 = iPos[2];
+                break;
+            case RenderOperation::OT_TRIANGLE_STRIP:
+                if(triangleIdx & 1)
+                    i0 = i2;
+                else
+                    i1 = i2;
+                i2 = iPos[0];
+                break;
+            case RenderOperation::OT_TRIANGLE_FAN:
+                i1 = i2;
+                i2 = iPos[0];
+                break;
+            default:
+                OgreAssert(false, "Invalid RenderOperation");
+                break;
+            }
+        }
+
+        // Invalid index: Index is bigger then vertex buffer size.
+        OgreAssertDbg(i0 < lookup.size() && i1 < lookup.size() && i2 < lookup.size(), "");
+        tri->vertexID[0] = i0;
+        tri->vertexID[1] = i1;
+        tri->vertexID[2] = i2;
+        tri->vertex[0] = lookup[i0];
+        tri->vertex[1] = lookup[i1];
+        tri->vertex[2] = lookup[i2];
+
+        if (tri->isMalformed()) {
+#if OGRE_DEBUG_MODE
+            std::stringstream str;
+            str << "In " << data->mMeshName << " malformed triangle found with ID: " << LodData::getVectorIDFromPointer(data->mTriangleList, tri) << ". " <<
+            std::endl;
+            printTriangle(tri, str);
+            str << "It will be excluded from Lod level calculations.";
+            LogManager::getSingleton().stream() << str.str();
+#endif
+            tri->isRemoved = true;
+            data->mIndexBufferInfoList[tri->submeshID].indexCount -= 3;
+            continue;
+        }
+        tri->computeNormal();
+        addTriangleToEdges(data, tri);
     }
 }
 
@@ -67,6 +145,22 @@ LodData::Triangle* LodInputProvider::isDuplicateTriangle(LodData::Triangle* tria
     }
     return NULL;
 }
+
+void LodInputProvider::addIndexDataImpl(LodData* data, uchar* iPos, const uchar* iEnd, size_t isize,
+                                        bool useSharedVertexLookup, ushort submeshID,
+                                        RenderOperation::OperationType renderOp)
+{
+    VertexLookupList& lookup = useSharedVertexLookup ? mSharedVertexLookup : mVertexLookup;
+
+    if (isize == sizeof(unsigned short)) {
+        addIndexDataImpl(data, (unsigned short*) iPos, (const unsigned short*) iEnd, lookup, submeshID, renderOp);
+    } else {
+        // Unsupported index size.
+        OgreAssert(isize == sizeof(unsigned int), "");
+        addIndexDataImpl(data, (unsigned int*) iPos, (const unsigned int*) iEnd, lookup, submeshID, renderOp);
+    }
+}
+
 void LodInputProvider::addTriangleToEdges(LodData* data, LodData::Triangle* triangle)
 {
     if(MESHLOD_QUALITY >= 3) {

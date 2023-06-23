@@ -37,16 +37,27 @@ namespace Ogre
 {
 
 class _OgreLodExport LodInputProvider {
+    template <typename IndexType>
+    void addIndexDataImpl(LodData* data, IndexType* iPos, const IndexType* iEnd, std::vector<LodData::Vertex*>& lookup,
+                          ushort submeshID, RenderOperation::OperationType renderOp);
+
 public:
     virtual ~LodInputProvider() {}
     /// Called when the data should be filled with the input.
     virtual void initData(LodData* data) = 0;
 protected:
+    // This helps to find the vertex* in LodData for index buffer indices
+    typedef std::vector<LodData::Vertex*> VertexLookupList;
+    VertexLookupList mSharedVertexLookup;
+    VertexLookupList mVertexLookup;
+
     // Helper functions
-    void printTriangle(LodData::Triangle* triangle, std::ostream& str);
     void addTriangleToEdges(LodData* data, LodData::Triangle* triangle);
     bool isDuplicateTriangle(LodData::Triangle* triangle, LodData::Triangle* triangle2);
     LodData::Triangle* isDuplicateTriangle(LodData::Triangle* triangle);
+
+    void addIndexDataImpl(LodData* data, uchar* iPos, const uchar* iEnd, size_t isize, bool useSharedVertexLookup,
+                          ushort submeshID, RenderOperation::OperationType renderOp);
 };
 
 }
