@@ -71,15 +71,6 @@ namespace Ogre {
                 break;
             }
 
-            if(program->getType() == GPT_FRAGMENT_PROGRAM && mGLSLVersion > 100)
-            {
-                // sampler3D has no default precision
-                os << "precision lowp sampler3D;" << std::endl;
-                os << "precision lowp sampler2DShadow;" << std::endl;
-                // also write float precision, as auto shader-patching is off if it sees "precision"
-                os << "precision mediump float;" << std::endl;
-            }
-
             // Generate source code header.
             writeProgramTitle(os, program);
             os<< std::endl;
