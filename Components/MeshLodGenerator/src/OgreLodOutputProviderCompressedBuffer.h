@@ -27,43 +27,27 @@
  * -----------------------------------------------------------------------------
  */
 
-#ifndef _LodInputProviderMesh_H__
-#define _LodInputProviderMesh_H__
+#ifndef _LodOutputProviderCompressedBuffer_H__
+#define _LodOutputProviderCompressedBuffer_H__
 
 #include "OgreLodPrerequisites.h"
-#include "OgreLodInputProvider.h"
-#include "OgreLodData.h"
-#include "OgreSharedPtr.h"
-#include "OgreLogManager.h"
-#include "OgreRenderOperation.h"
-#include "OgreHeaderPrefix.h"
-
-#include <sstream>
+#include "OgreLodOutputProviderCompressedMesh.h"
 
 namespace Ogre
 {
 
-class _OgreLodExport LodInputProviderMesh :
-    public LodInputProvider
+class LodOutputProviderCompressedBuffer :
+    public LodOutputProviderCompressedMesh
 {
 public:
-    LodInputProviderMesh(MeshPtr mesh);
-    /// Called when the data should be filled with the input.
-    void initData(LodData* data) override;
-    
-protected:
-    MeshPtr mMesh;
+    LodOutputProviderCompressedBuffer(MeshPtr mesh);
 
-    void tuneContainerSize(LodData* data);
-    void initialize(LodData* data);
-    void addIndexData(LodData* data, IndexData* indexData, bool useSharedVertexLookup, ushort submeshID, RenderOperation::OperationType renderOp);
-    void addVertexData(LodData* data, VertexData* vertexData, bool useSharedVertexLookup);
+protected:
+    void bakeFirstPass(LodData* data, int lodIndex) override;
+    void bakeSecondPass(LodData* data, int lodIndex) override;
 };
 
 }
-
-#include "OgreHeaderSuffix.h"
-
 #endif
 
 

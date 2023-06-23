@@ -27,27 +27,41 @@
  * -----------------------------------------------------------------------------
  */
 
-#ifndef _LodOutputProviderCompressedBuffer_H__
-#define _LodOutputProviderCompressedBuffer_H__
+#ifndef _LodInputProviderBuffer_H__
+#define _LodInputProviderBuffer_H__
 
 #include "OgreLodPrerequisites.h"
-#include "OgreLodOutputProviderCompressedMesh.h"
+#include "OgreLodInputProvider.h"
+#include "OgreLodData.h"
+#include "OgreLodBuffer.h"
+#include "OgreLogManager.h"
+#include "OgreHeaderPrefix.h"
+
+#include <sstream>
 
 namespace Ogre
 {
 
-class _OgreLodExport LodOutputProviderCompressedBuffer :
-    public LodOutputProviderCompressedMesh
+class LodInputProviderBuffer :
+    public LodInputProvider
 {
 public:
-    LodOutputProviderCompressedBuffer(MeshPtr mesh);
-
+    LodInputProviderBuffer(MeshPtr mesh);
+    /// Called when the data should be filled with the input.
+    void initData(LodData* data) override;
+    
 protected:
-    void bakeFirstPass(LodData* data, int lodIndex) override;
-    void bakeSecondPass(LodData* data, int lodIndex) override;
+
+    LodInputBuffer mBuffer;
+
+    void tuneContainerSize(LodData* data);
+    void initialize(LodData* data);
+    void addVertexData(LodData* data, LodVertexBuffer& vertexBuffer, bool useSharedVertexLookup);
+    void addIndexData(LodData* data, LodIndexBuffer& indexBuffer, bool useSharedVertexLookup, unsigned short submeshID);
 };
 
 }
+
+#include "OgreHeaderSuffix.h"
+
 #endif
-
-
