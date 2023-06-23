@@ -152,7 +152,6 @@ namespace Ogre
         size_t isize = indexBuffer.indexSize;
         data->mIndexBufferInfoList[submeshID].indexSize = isize;
         data->mIndexBufferInfoList[submeshID].indexCount = indexBuffer.indexCount;
-        VertexLookupList& lookup = useSharedVertexLookup ? mSharedVertexLookup : mVertexLookup;
 
         // Lock the buffer for reading.
         unsigned char* iStart = indexBuffer.indexBuffer.get();
@@ -160,13 +159,9 @@ namespace Ogre
             return;
         }
         unsigned char* iEnd = iStart + indexBuffer.indexCount * isize;
-        if (isize == sizeof(unsigned short)) {
-            addIndexDataImpl<unsigned short>(data, (unsigned short*) iStart, (unsigned short*) iEnd, lookup, submeshID);
-        } else {
-            // Unsupported index size.
-            OgreAssert(isize == sizeof(unsigned int), "");
-            addIndexDataImpl<unsigned int>(data, (unsigned int*) iStart, (unsigned int*) iEnd, lookup, submeshID);
-        }
+
+        auto renderOp = RenderOperation::OT_TRIANGLE_LIST;
+        addIndexDataImpl(data, iStart, iEnd, isize, useSharedVertexLookup, submeshID, renderOp);
     }
 
 }
