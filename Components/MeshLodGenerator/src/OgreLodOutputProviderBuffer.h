@@ -38,7 +38,7 @@
 namespace Ogre
 {
 
-class _OgreLodExport LodOutputProviderBuffer :
+class LodOutputProviderBuffer :
     public LodOutputProvider
 {
 public:

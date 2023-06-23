@@ -27,14 +27,15 @@
  * -----------------------------------------------------------------------------
  */
 
-#ifndef _LodInputProviderBuffer_H__
-#define _LodInputProviderBuffer_H__
+#ifndef _LodInputProviderMesh_H__
+#define _LodInputProviderMesh_H__
 
 #include "OgreLodPrerequisites.h"
 #include "OgreLodInputProvider.h"
 #include "OgreLodData.h"
-#include "OgreLodBuffer.h"
+#include "OgreSharedPtr.h"
 #include "OgreLogManager.h"
+#include "OgreRenderOperation.h"
 #include "OgreHeaderPrefix.h"
 
 #include <sstream>
@@ -42,22 +43,21 @@
 namespace Ogre
 {
 
-class _OgreLodExport LodInputProviderBuffer :
+class LodInputProviderMesh :
     public LodInputProvider
 {
 public:
-    LodInputProviderBuffer(MeshPtr mesh);
+    LodInputProviderMesh(MeshPtr mesh);
     /// Called when the data should be filled with the input.
     void initData(LodData* data) override;
-    
-protected:
 
-    LodInputBuffer mBuffer;
+protected:
+    MeshPtr mMesh;
 
     void tuneContainerSize(LodData* data);
     void initialize(LodData* data);
-    void addVertexData(LodData* data, LodVertexBuffer& vertexBuffer, bool useSharedVertexLookup);
-    void addIndexData(LodData* data, LodIndexBuffer& indexBuffer, bool useSharedVertexLookup, unsigned short submeshID);
+    void addIndexData(LodData* data, IndexData* indexData, bool useSharedVertexLookup, ushort submeshID, RenderOperation::OperationType renderOp);
+    void addVertexData(LodData* data, VertexData* vertexData, bool useSharedVertexLookup);
 };
 
 }

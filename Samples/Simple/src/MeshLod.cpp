@@ -6,7 +6,6 @@ using namespace OgreBites;
 #include "OgreLodConfigSerializer.h"
 #include "OgreMeshLodGenerator.h"
 #include "OgreLodCollapseCostQuadric.h"
-#include "OgreLodInputProviderMesh.h"
 #include "OgreLodOutsideMarker.h"
 #include "OgreLodData.h"
 #include "OgreLod0Stripifier.h"
