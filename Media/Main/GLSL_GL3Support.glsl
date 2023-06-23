@@ -4,6 +4,17 @@
 
 // @public-api
 
+#if defined(OGRE_FRAGMENT_SHADER) && defined(OGRE_GLSLES)
+// define default precisions for ES fragement shaders
+precision mediump float;
+
+#if __VERSION__ > 100
+precision lowp sampler2DArray;
+precision lowp sampler2DShadow;
+precision lowp sampler3D;
+#endif
+#endif
+
 #if __VERSION__ == 100
 mat2 transpose(mat2 m)
 {
