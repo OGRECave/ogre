@@ -51,16 +51,6 @@ namespace Ogre
 *  @{
 */
 
-struct _OgreLodExport LodWorkQueueRequest {
-    LodConfig config;
-    LodDataPtr data;
-    LodInputProviderPtr input;
-    LodOutputProviderPtr output;
-    LodCollapseCostPtr cost;
-    LodCollapserPtr collapser;
-    bool isCancelled;
-};
-
 class _OgreLodExport MeshLodGenerator :
 public Singleton<MeshLodGenerator>
 {

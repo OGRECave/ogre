@@ -33,6 +33,16 @@
 namespace Ogre
 {
 
+struct LodWorkQueueRequest {
+    LodConfig config;
+    LodDataPtr data;
+    LodInputProviderPtr input;
+    LodOutputProviderPtr output;
+    LodCollapseCostPtr cost;
+    LodCollapserPtr collapser;
+    bool isCancelled;
+};
+
 template<> MeshLodGenerator* Singleton<MeshLodGenerator>::msSingleton = 0;
 MeshLodGenerator* MeshLodGenerator::getSingletonPtr()
 {
