@@ -27,6 +27,7 @@
  */
 
 #include "OgreMeshLodPrecompiledHeaders.h"
+#include "OgreDefaultHardwareBufferManager.h"
 
 namespace Ogre
 {
@@ -36,13 +37,11 @@ namespace Ogre
         if (indexCount > 0) {
             const HardwareIndexBufferSharedPtr& hwIndexBuffer = data->indexBuffer;
             indexSize = hwIndexBuffer->getIndexSize();
-            unsigned char* pBuffer = (unsigned char*) hwIndexBuffer->lock(HardwareBuffer::HBL_READ_ONLY);
+            indexBuffer = std::make_shared<DefaultHardwareBuffer>(indexCount * indexSize);
             size_t offset = data->indexStart * indexSize;
-            indexBuffer = Ogre::SharedPtr<unsigned char>(new unsigned char[indexCount * indexSize]);
+            indexBuffer->copyData(*hwIndexBuffer, 0, offset, indexCount * indexSize);
             indexStart = 0;
             indexBufferSize = 0;
-            memcpy(indexBuffer.get(), pBuffer + offset, indexCount * indexSize);
-            hwIndexBuffer->unlock();
         }
     }
 

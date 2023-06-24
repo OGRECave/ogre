@@ -56,7 +56,7 @@ protected:
     bool isDuplicateTriangle(LodData::Triangle* triangle, LodData::Triangle* triangle2);
     LodData::Triangle* isDuplicateTriangle(LodData::Triangle* triangle);
 
-    void addIndexDataImpl(LodData* data, uchar* iPos, const uchar* iEnd, size_t isize, bool useSharedVertexLookup,
+    void addIndexDataImpl(LodData* data, const HardwareBufferPtr& ibuf, size_t isize, bool useSharedVertexLookup,
                           ushort submeshID, RenderOperation::OperationType renderOp);
 };
 

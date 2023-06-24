@@ -27,6 +27,7 @@
  */
 
 #include "OgreMeshLodPrecompiledHeaders.h"
+#include "OgreDefaultHardwareBufferManager.h"
 
 namespace Ogre
 {
@@ -81,8 +82,9 @@ namespace Ogre
             indexCount = std::max<size_t>(indexCount, 3);
             prevLod.indexCount = std::max<size_t>(data->mIndexBufferInfoList[i].prevIndexCount, 3u);
             prevLod.indexBufferSize = indexCount;
-            prevLod.indexBuffer = Ogre::SharedPtr<unsigned char>(new unsigned char[indexCount * data->mIndexBufferInfoList[i].indexSize]);
-            data->mIndexBufferInfoList[i].buf.pshort = (unsigned short*)prevLod.indexBuffer.get();
+            prevLod.indexBuffer = std::make_shared<DefaultHardwareBuffer>(indexCount * data->mIndexBufferInfoList[i].indexSize);
+            data->mIndexBufferInfoList[i].buf.pshort = (unsigned short*)prevLod.indexBuffer->lock(HardwareBuffer::HBL_NORMAL);
+            prevLod.indexBuffer->unlock(); // software buffer, safe to keep the pointer
 
             //Check if we should fill it with a "dummy" triangle.
             if (indexCount == 3) {
