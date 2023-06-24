@@ -42,7 +42,7 @@ namespace Ogre
 *  @{
 */
 /// Thread-safe buffer for storing Hardware index buffer
-struct _OgreLodExport LodIndexBuffer {
+struct LodIndexBuffer {
     size_t indexSize; /// Index size: 2 or 4 byte/index is supported only.
     size_t indexCount; /// index count from indexStart.
     size_t indexStart; /// Offset from the start of the indexBuffer
@@ -51,14 +51,14 @@ struct _OgreLodExport LodIndexBuffer {
     void fillBuffer(Ogre::IndexData* data); /// Fills the buffer from an Ogre::IndexData. Call this on Ogre main thread only
 };
 /// Thread-safe buffer for storing Hardware vertex buffer
-struct _OgreLodExport LodVertexBuffer {
+struct LodVertexBuffer {
     size_t vertexCount;
     Ogre::SharedPtr<Vector3> vertexBuffer;
     Ogre::SharedPtr<Vector3> vertexNormalBuffer;
     void fillBuffer(Ogre::VertexData* data);
 };
 /// Data representing all required information from a Mesh. Used by LodInputProviderBuffer.
-struct _OgreLodExport LodInputBuffer
+struct LodInputBuffer
 {
     struct _OgreLodExport Submesh {
         LodIndexBuffer indexBuffer;
@@ -72,7 +72,7 @@ struct _OgreLodExport LodInputBuffer
     void fillBuffer(Ogre::MeshPtr mesh);
 };
 /// Data representing the output of the Mesh reduction. Used by LodOutputProviderBuffer.
-struct _OgreLodExport LodOutputBuffer {
+struct LodOutputBuffer {
 
     struct _OgreLodExport Submesh {
         std::vector<LodIndexBuffer> genIndexBuffers;
