@@ -205,11 +205,7 @@ namespace Ogre
             return;
         }
 
-        // Lock the buffer for reading.
-        uchar* iStart = static_cast<uchar*>(ibuf->lock(HardwareBuffer::HBL_READ_ONLY));
-        uchar* iEnd = iStart + ibuf->getSizeInBytes();
-        addIndexDataImpl(data, iStart, iEnd, isize, useSharedVertexLookup, submeshID, renderOp);
-        ibuf->unlock();
+        addIndexDataImpl(data, ibuf, isize, useSharedVertexLookup, submeshID, renderOp);
     }   
 
 }

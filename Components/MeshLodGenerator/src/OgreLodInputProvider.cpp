@@ -146,18 +146,23 @@ LodData::Triangle* LodInputProvider::isDuplicateTriangle(LodData::Triangle* tria
     return NULL;
 }
 
-void LodInputProvider::addIndexDataImpl(LodData* data, uchar* iPos, const uchar* iEnd, size_t isize,
+void LodInputProvider::addIndexDataImpl(LodData* data, const HardwareBufferPtr& ibuf, size_t isize,
                                         bool useSharedVertexLookup, ushort submeshID,
                                         RenderOperation::OperationType renderOp)
 {
     VertexLookupList& lookup = useSharedVertexLookup ? mSharedVertexLookup : mVertexLookup;
 
+    // Lock the buffer for reading.
+    HardwareBufferLockGuard lock(ibuf, HardwareBuffer::HBL_READ_ONLY);
+    uchar* iStart = (uchar*)lock.pData;
+    uchar* iEnd = iStart + ibuf->getSizeInBytes();
+
     if (isize == sizeof(unsigned short)) {
-        addIndexDataImpl(data, (unsigned short*) iPos, (const unsigned short*) iEnd, lookup, submeshID, renderOp);
+        addIndexDataImpl(data, (unsigned short*) iStart, (const unsigned short*) iEnd, lookup, submeshID, renderOp);
     } else {
         // Unsupported index size.
         OgreAssert(isize == sizeof(unsigned int), "");
-        addIndexDataImpl(data, (unsigned int*) iPos, (const unsigned int*) iEnd, lookup, submeshID, renderOp);
+        addIndexDataImpl(data, (unsigned int*) iStart, (const unsigned int*) iEnd, lookup, submeshID, renderOp);
     }
 }
 

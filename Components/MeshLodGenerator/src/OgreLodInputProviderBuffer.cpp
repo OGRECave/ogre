@@ -153,15 +153,12 @@ namespace Ogre
         data->mIndexBufferInfoList[submeshID].indexSize = isize;
         data->mIndexBufferInfoList[submeshID].indexCount = indexBuffer.indexCount;
 
-        // Lock the buffer for reading.
-        unsigned char* iStart = indexBuffer.indexBuffer.get();
-        if(!iStart) {
+        if(!indexBuffer.indexBuffer) {
             return;
         }
-        unsigned char* iEnd = iStart + indexBuffer.indexCount * isize;
 
         auto renderOp = RenderOperation::OT_TRIANGLE_LIST;
-        addIndexDataImpl(data, iStart, iEnd, isize, useSharedVertexLookup, submeshID, renderOp);
+        addIndexDataImpl(data, indexBuffer.indexBuffer, isize, useSharedVertexLookup, submeshID, renderOp);
     }
 
 }

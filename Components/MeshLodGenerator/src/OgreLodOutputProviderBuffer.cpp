@@ -27,6 +27,7 @@
  */
 
 #include "OgreMeshLodPrecompiledHeaders.h"
+#include "OgreDefaultHardwareBufferManager.h"
 
 namespace Ogre
 {
@@ -79,9 +80,10 @@ namespace Ogre
             curLod.indexStart = 0;
             curLod.indexSize = data->mIndexBufferInfoList[i].indexSize;
             curLod.indexBufferSize = 0; // It means same as index count
-            curLod.indexBuffer = Ogre::SharedPtr<unsigned char>(new unsigned char[curLod.indexCount * curLod.indexSize]);
+            curLod.indexBuffer = std::make_shared<DefaultHardwareBuffer>(curLod.indexCount * curLod.indexSize);
             // buf is an union, so pint=pshort
-            data->mIndexBufferInfoList[i].buf.pshort = (unsigned short*) curLod.indexBuffer.get();
+            data->mIndexBufferInfoList[i].buf.pshort = (unsigned short*) curLod.indexBuffer->lock(HardwareBuffer::HBL_NORMAL);
+            curLod.indexBuffer->unlock(); // software buffer, safe to keep the pointer
 
             if (indexCount == 0) {
                 memset(data->mIndexBufferInfoList[i].buf.pshort, 0, 3 * data->mIndexBufferInfoList[i].indexSize);
@@ -133,10 +135,9 @@ void LodOutputProviderBuffer::inject()
                         buff.indexSize == 2 ?
                         HardwareIndexBuffer::IT_16BIT : HardwareIndexBuffer::IT_32BIT,
                         indexCount, mMesh->getIndexBufferUsage(), mMesh->isIndexBufferShadowed());
-                    size_t sizeInBytes = lods.back()->indexBuffer->getSizeInBytes();
-                    void* pOutBuff = lods.back()->indexBuffer->lock(0, sizeInBytes, HardwareBuffer::HBL_DISCARD);
-                    memcpy(pOutBuff, buff.indexBuffer.get(), sizeInBytes);
-                    lods.back()->indexBuffer->unlock();
+                    HardwareBufferLockGuard indexLock(buff.indexBuffer, HardwareBuffer::HBL_READ_ONLY);
+                    // do not use copyData, as we are copying from a software to hardware buffer here
+                    lods.back()->indexBuffer->writeData(0, lods.back()->indexBuffer->getSizeInBytes(), indexLock.pData, true);
                 }
             }
         }
