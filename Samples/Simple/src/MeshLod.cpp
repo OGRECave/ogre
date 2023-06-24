@@ -189,10 +189,16 @@ void Sample_MeshLod::changeSelectedMesh( const String& name )
         Ogre::MeshManager::getSingleton().remove(meshHullName);
     }
 
-    LodData data;
-    LodInputProviderMesh input(mLodConfig.mesh);
-    input.initData(&data);
-    LodOutsideMarker outsideMarker(data.mVertexList, data.mMeshBoundingSphereRadius, 0.0);
+    LodConfig inputConfig(mLodConfig.mesh);
+    LodInputProviderPtr input;
+    LodCollapseCostPtr cost;
+    LodDataPtr data;
+    LodOutputProviderPtr output;
+    LodCollapserPtr collapser;
+    MeshLodGenerator::getSingleton()._resolveComponents(inputConfig, cost, data, input, output, collapser);
+
+    input->initData(data.get());
+    LodOutsideMarker outsideMarker(data->mVertexList, data->mMeshBoundingSphereRadius, 0.0);
     MeshPtr meshHull = outsideMarker.createConvexHullMesh(meshHullName);
 
     mHullEntity = mSceneMgr->createEntity(meshHull);
