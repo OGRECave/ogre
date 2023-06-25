@@ -102,6 +102,10 @@ bool TerrainSurface::setParameter(const String& name, const String& value)
     {
         return StringConverter::parse(value, mUseParallaxMapping);
     }
+    else if (name == "use_steep_parallax_mapping")
+    {
+        return StringConverter::parse(value, mUseSteepParallaxMapping);
+    }
     else if (name == "use_specular_mapping")
     {
         return StringConverter::parse(value, mUseSpecularMapping);
@@ -199,7 +203,14 @@ bool TerrainSurface::createCpuSubPrograms(ProgramSet* programSet)
     ParameterPtr viewPos;
     if (mUseNormalMapping && mUseParallaxMapping)
     {
-        psProgram->addPreprocessorDefines("TERRAIN_PARALLAX_MAPPING");
+        if (mUseSteepParallaxMapping)
+        {
+            psProgram->addPreprocessorDefines("TERRAIN_STEEP_PARALLAX_MAPPING");
+        }
+        else
+        {
+            psProgram->addPreprocessorDefines("TERRAIN_PARALLAX_MAPPING");
+        }
         // assuming: lighting stage computed this
         auto vsOutViewPos = vsMain->resolveOutputParameter(Parameter::SPC_POSITION_VIEW_SPACE);
         viewPos = psMain->resolveInputParameter(vsOutViewPos);
@@ -251,6 +262,10 @@ bool TerrainSurface::createCpuSubPrograms(ProgramSet* programSet)
         blendWeights.push_back(weight);
     }
 
+    // Call TBN calculation
+    auto psOutTBN = psMain->resolveLocalParameter(GpuConstantType::GCT_MATRIX_3X3, "TBN");
+    stage.callFunction("SGX_CalculateTerrainTBN", {In(normal), In(ITMat), Out(psOutTBN)});
+
     stage.assign(Vector4::ZERO, diffuseSpec);
     stage.assign(Vector3(0, 0, 1), TSnormal);
     for (int l = 0; l < mTerrain->getLayerCount(); ++l)
@@ -260,10 +275,11 @@ bool TerrainSurface::createCpuSubPrograms(ProgramSet* programSet)
         std::vector<Operand> args = {blendWeight, In(uvPS), In(mUVMul[l/4]).mask(channel[l % 4])};
         if (mUseNormalMapping)
         {
-            if (mUseParallaxMapping)
+            if (mUseParallaxMapping || mUseSteepParallaxMapping)
             {
                 args.push_back(In(viewPos));
-                args.push_back(In(Vector2(0.03, -0.04)));
+                args.push_back(In(Vector2(0.03, 0.0)));
+                args.push_back(In(psOutTBN));
             }
             auto normtex = psProgram->resolveParameter(GCT_SAMPLER2D, "normtex", texUnit++);
             args.push_back(In(normtex));

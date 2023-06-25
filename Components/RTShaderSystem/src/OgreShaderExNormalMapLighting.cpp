@@ -46,6 +46,7 @@ NormalMapLighting::NormalMapLighting()
     mNormalMapSpace                 = NMS_TANGENT;
     mNormalMapSampler = TextureManager::getSingleton().createSampler();
     mNormalMapSampler->setMipmapBias(-1.0);
+    mParallaxScale = 0.04f;
 }
 
 //-----------------------------------------------------------------------
@@ -62,6 +63,7 @@ bool NormalMapLighting::createCpuSubPrograms(ProgramSet* programSet)
     Function* psMain = psProgram->getEntryPointFunction();
 
     vsProgram->addDependency(FFP_LIB_TRANSFORM);
+    vsProgram->addDependency(SGX_LIB_NORMALMAP);
 
     psProgram->addDependency(FFP_LIB_TRANSFORM);
     psProgram->addDependency(FFP_LIB_TEXTURING);
@@ -80,6 +82,11 @@ bool NormalMapLighting::createCpuSubPrograms(ProgramSet* programSet)
     auto viewNormal = psMain->resolveInputParameter(vsOutNormal);
     auto newViewNormal = psMain->resolveLocalParameter(Parameter::SPC_NORMAL_VIEW_SPACE);
 
+    // Resolve vertex tangent
+    auto vsInTangent = vsMain->resolveInputParameter(Parameter::SPC_TANGENT_OBJECT_SPACE);
+    auto vsOutTangent = vsMain->resolveOutputParameter(Parameter::SPC_TANGENT_OBJECT_SPACE);
+    auto psInTangent = psMain->resolveInputParameter(vsOutTangent);
+
     // insert before lighting stage
     auto vstage = vsMain->getStage(FFP_PS_COLOUR_BEGIN + 1);
     auto fstage = psMain->getStage(FFP_PS_COLOUR_BEGIN + 1);
@@ -89,6 +96,9 @@ bool NormalMapLighting::createCpuSubPrograms(ProgramSet* programSet)
 
     auto normalMapSampler = psProgram->resolveParameter(GCT_SAMPLER2D, "gNormalMapSampler", mNormalMapSamplerIndex);
 
+    auto psOutTBN = psMain->resolveLocalParameter(GpuConstantType::GCT_MATRIX_3X3, "TBN");
+    fstage.callFunction("SGX_CalculateTBN", {In(viewNormal), In(psInTangent), Out(psOutTBN)});
+
     if (mNormalMapSpace == NMS_PARALLAX)
     {
         // assuming: lighting stage computed this
@@ -96,8 +106,25 @@ bool NormalMapLighting::createCpuSubPrograms(ProgramSet* programSet)
         auto viewPos = psMain->resolveInputParameter(vsOutViewPos);
 
         // TODO: user specificed scale and bias
-        fstage.callFunction("SGX_Generate_Parallax_Texcoord", {In(normalMapSampler), In(psInTexcoord), In(viewPos),
-                                                              In(Vector2(0.04, -0.02)), Out(psInTexcoord)});
+        fstage.callFunction("SGX_Generate_Parallax_Texcoord", {In(normalMapSampler), In(psInTexcoord), In(viewPos), 
+                                In(Vector2(mParallaxScale, 0.0)), In(psOutTBN), Out(psInTexcoord)});
+
+        // overwrite texcoord0 unconditionally, only one texcoord set is supported with parallax mapping
+        // we are before FFP_PS_TEXTURING, so the new value will be used
+        auto texcoord0 = psMain->resolveInputParameter(Parameter::SPC_TEXTURE_COORDINATE0, GCT_FLOAT2);
+        fstage.assign(psInTexcoord, texcoord0);
+    }
+
+    if (mNormalMapSpace == NMS_PARALLAX_STEEP)
+    {
+        // assuming: lighting stage computed this
+        auto vsOutViewPos = vsMain->resolveOutputParameter(Parameter::SPC_POSITION_VIEW_SPACE);
+        auto viewPos = psMain->resolveInputParameter(vsOutViewPos);
+
+        // TODO: user specificed scale and bias
+        fstage.callFunction("SGX_Generate_Parallax_Steep_Texcoord",
+                            {In(normalMapSampler), In(psInTexcoord), In(viewPos), In(Vector2(mParallaxScale, 0.0)),
+                             In(psOutTBN), Out(psInTexcoord)});
 
         // overwrite texcoord0 unconditionally, only one texcoord set is supported with parallax mapping
         // we are before FFP_PS_TEXTURING, so the new value will be used
@@ -110,10 +137,6 @@ bool NormalMapLighting::createCpuSubPrograms(ProgramSet* programSet)
 
     if (mNormalMapSpace & NMS_TANGENT)
     {
-        auto vsInTangent = vsMain->resolveInputParameter(Parameter::SPC_TANGENT_OBJECT_SPACE);
-        auto vsOutTangent = vsMain->resolveOutputParameter(Parameter::SPC_TANGENT_OBJECT_SPACE);
-        auto psInTangent = psMain->resolveInputParameter(vsOutTangent);
-
         // transform normal & tangent
         auto normalMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_NORMAL_MATRIX);
         vstage.callBuiltin("mul", normalMatrix, vsInNormal, vsOutNormal);
@@ -123,7 +146,7 @@ bool NormalMapLighting::createCpuSubPrograms(ProgramSet* programSet)
         vstage.assign(In(vsInTangent).w(), Out(vsOutTangent).w());
 
         // transform normal
-        fstage.callFunction("SGX_TransformNormal", {In(viewNormal), In(psInTangent), InOut(newViewNormal)});
+        fstage.callFunction("SGX_TransformNormal", {In(psOutTBN), InOut(newViewNormal)});
     }
     else if (mNormalMapSpace & NMS_OBJECT)
     {
@@ -178,6 +201,11 @@ bool NormalMapLighting::setParameter(const String& name, const String& value)
             setNormalMapSpace(NMS_PARALLAX);
             return true;
         }
+        if (value == "parallax_steep")
+        {
+            setNormalMapSpace(NMS_PARALLAX_STEEP);
+            return true;
+        }
 		return false;
 	}
 
@@ -199,6 +227,12 @@ bool NormalMapLighting::setParameter(const String& name, const String& value)
         if(!sampler)
             return false;
         mNormalMapSampler = sampler;
+        return true;
+    }
+
+    if (name == "parallax_scale")
+    {
+        mParallaxScale = StringConverter::parseReal(value);
         return true;
     }
 
@@ -267,7 +301,6 @@ SubRenderState* NormalMapLightingFactory::createInstance(ScriptCompiler* compile
             }
         }
     }
-
     return NULL;
 }
 

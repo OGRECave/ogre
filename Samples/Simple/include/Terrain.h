@@ -49,6 +49,7 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
         , mTerrainPaging(0)
         , mPageManager(0)
         , mFly(false)
+        , mSteepParallax(false)
         , mFallVelocity(0)
         , mMode(MODE_NORMAL)
         , mLayerEdit(1)
@@ -348,6 +349,11 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
         {
             mFly = mFlyBox->isChecked();
         }
+        if (box == mSteepParallaxBox)
+        {
+            mSteepParallax = mSteepParallaxBox->isChecked();
+            changeShadows();
+        }
     }
 
  protected:
@@ -370,6 +376,7 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
     DummyPageProvider mDummyPageProvider;
 #endif
     bool mFly;
+    bool mSteepParallax;
     Real mFallVelocity;
     enum Mode
     {
@@ -397,6 +404,7 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
     SelectMenu* mEditMenu;
     SelectMenu* mShadowsMenu;
     CheckBox* mFlyBox;
+    CheckBox* mSteepParallaxBox;
     //! [infolabel]
     OgreBites::Label* mInfoLabel = nullptr;
     //! [infolabel]
@@ -502,20 +510,24 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
         //mTerrainGlobals->getDefaultMaterialGenerator()->setDebugLevel(1);
         //mTerrainGlobals->setLightMapSize(256);
 
+        TerrainMaterialGeneratorA::SM2Profile* matProfile = static_cast<TerrainMaterialGeneratorA::SM2Profile*>(
+            mTerrainGlobals->getDefaultMaterialGenerator()->getActiveProfile());
+
         // Disable the lightmap for OpenGL ES 2.0. The minimum number of samplers allowed is 8(as opposed to 16 on desktop).
         // Otherwise we will run over the limit by just one. The minimum was raised to 16 in GL ES 3.0.
         if (Ogre::Root::getSingletonPtr()->getRenderSystem()->getCapabilities()->getNumTextureUnits() < 9)
         {
-            TerrainMaterialGeneratorA::SM2Profile* matProfile =
-                static_cast<TerrainMaterialGeneratorA::SM2Profile*>(mTerrainGlobals->getDefaultMaterialGenerator()->getActiveProfile());
-            matProfile->setLightmapEnabled(false);
+            matProfile->setLightmapEnabled(false);         
         }
+
+        //Disable steep parallax by default
+        matProfile->setLayerSteepParallaxMappingEnabled(false);
 
         //! [composite_lighting]
         // Important to set these so that the terrain knows what to use for baked (non-realtime) data
         mTerrainGlobals->setLightMapDirection(l->getDerivedDirection());
         mTerrainGlobals->setCompositeMapAmbient(mSceneMgr->getAmbientLight());
-        mTerrainGlobals->setCompositeMapDiffuse(l->getDiffuseColour());
+        mTerrainGlobals->setCompositeMapDiffuse(l->getDiffuseColour());        
         //! [composite_lighting]
         //mTerrainGlobals->setCompositeMapAmbient(ColourValue::Red);
 
@@ -632,6 +644,9 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
             mSceneMgr->setShadowTechnique(SHADOWTYPE_NONE);
         }
 
+        //Update steep parallax
+        matProfile->setLayerSteepParallaxMappingEnabled(mSteepParallax);
+
         mShaderGenerator->invalidateScheme(MSN_SHADERGEN);
     }
 
@@ -677,6 +692,9 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
 
         mFlyBox = mTrayMgr->createCheckBox(TL_BOTTOM, "Fly", "Fly");
         mFlyBox->setChecked(false, false);
+
+        mSteepParallaxBox = mTrayMgr->createCheckBox(TL_BOTTOM, "SteepParallaxOcclusion", "Steep Parallax Occlusion");
+        mSteepParallaxBox->setChecked(false, false);
 
         mShadowsMenu = mTrayMgr->createLongSelectMenu(TL_BOTTOM, "Shadows", "Shadows", 370, 250, 3);
         mShadowsMenu->addItem("None");
