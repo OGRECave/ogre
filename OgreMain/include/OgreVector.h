@@ -289,7 +289,7 @@ namespace Ogre
 
         // use enable_if as function parameter for VC < 2017 compatibility
         template <int N = dims>
-        explicit Vector(const typename std::enable_if<N == 4, Vector3>::type& rhs, T fW = 1.0f) : VectorBase<dims, T>(rhs.x, rhs.y, rhs.z, fW) {}
+        explicit Vector(const typename std::enable_if<N == 4, Vector<3, T>>::type& rhs, T fW = 1.0f) : VectorBase<dims, T>(rhs[0], rhs[1], rhs[2], fW) {}
 
         template<typename U>
         explicit Vector(const U* _ptr) {
