@@ -124,6 +124,7 @@ bool NormalMapLighting::createCpuSubPrograms(ProgramSet* programSet)
         // TODO: user specificed scale and bias
         fstage.callFunction("SGX_Generate_Parallax_Steep_Texcoord",
                             {In(normalMapSampler), In(psInTexcoord), In(viewPos), In(Vector2(mParallaxScale, 0.0)),
+                             In(32), In(400.0), 
                              In(psOutTBN), Out(psInTexcoord)});
 
         // overwrite texcoord0 unconditionally, only one texcoord set is supported with parallax mapping
@@ -146,7 +147,7 @@ bool NormalMapLighting::createCpuSubPrograms(ProgramSet* programSet)
         vstage.assign(In(vsInTangent).w(), Out(vsOutTangent).w());
 
         // transform normal
-        fstage.callFunction("SGX_TransformNormal", {In(psOutTBN), InOut(newViewNormal)});
+        fstage.callBuiltin("mul", psOutTBN, newViewNormal, newViewNormal);
     }
     else if (mNormalMapSpace & NMS_OBJECT)
     {

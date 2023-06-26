@@ -275,10 +275,18 @@ bool TerrainSurface::createCpuSubPrograms(ProgramSet* programSet)
         std::vector<Operand> args = {blendWeight, In(uvPS), In(mUVMul[l/4]).mask(channel[l % 4])};
         if (mUseNormalMapping)
         {
-            if (mUseParallaxMapping || mUseSteepParallaxMapping)
+            if (mUseParallaxMapping && !mUseSteepParallaxMapping)
             {
                 args.push_back(In(viewPos));
-                args.push_back(In(Vector2(0.03, 0.0)));
+                args.push_back(In(Vector2(0.03, 0.0))); //Scale
+                args.push_back(In(psOutTBN));
+            }
+            else if (mUseSteepParallaxMapping)
+            {
+                args.push_back(In(viewPos));
+                args.push_back(In(Vector2(0.03, 0.0))); // Scale
+                args.push_back(In(32));                 // Layers
+                args.push_back(In(400));                // Distance
                 args.push_back(In(psOutTBN));
             }
             auto normtex = psProgram->resolveParameter(GCT_SAMPLER2D, "normtex", texUnit++);
