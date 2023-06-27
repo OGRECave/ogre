@@ -278,13 +278,13 @@ bool TerrainSurface::createCpuSubPrograms(ProgramSet* programSet)
             if (mUseParallaxMapping && !mUseSteepParallaxMapping)
             {
                 args.push_back(In(viewPos));
-                args.push_back(In(Vector2(0.03, 0.0))); //Scale
+                args.push_back(In(0.04)); //Scale
                 args.push_back(In(psOutTBN));
             }
             else if (mUseSteepParallaxMapping)
             {
                 args.push_back(In(viewPos));
-                args.push_back(In(Vector2(0.03, 0.0))); // Scale
+                args.push_back(In(0.04)); // Scale
                 args.push_back(In(32));                 // Layers
                 args.push_back(In(400));                // Distance
                 args.push_back(In(psOutTBN));

@@ -83,7 +83,7 @@ void SGX_TransformNormal(in mat3 TBN,
 void SGX_Generate_Parallax_Texcoord(in sampler2D normalHeightMap,
 						in vec2 texCoord,
 						in vec3 viewPos,
-						in vec2 scaleBias,
+						in float scaleBias,
 						in mat3 TBN,
 						out vec2 newTexCoord)
 {
@@ -97,9 +97,9 @@ void SGX_Generate_Parallax_Texcoord(in sampler2D normalHeightMap,
 
 	#ifndef TERRAIN_PARALLAX_MAPPING
 		eyeVec.y = -eyeVec.y; //Inverse y
-		vec2 p = eyeVec.xy / eyeVec.z * (height * scaleBias.x);
+		vec2 p = eyeVec.xy / eyeVec.z * (height * scaleBias);
 	#else
-	    vec2 p = eyeVec.xy * (height * scaleBias.x);
+	    vec2 p = eyeVec.xy * (height * scaleBias);
 	#endif
 
     newTexCoord = newTexCoord - p;
@@ -108,7 +108,7 @@ void SGX_Generate_Parallax_Texcoord(in sampler2D normalHeightMap,
 void SGX_Generate_Parallax_Steep_Texcoord(in sampler2D normalHeightMap,
 						in vec2 texCoord,
 						in vec3 viewPos,
-						in vec2 scaleBias,
+						in float scaleBias,
 						in float layerCount,
 						in float maxDistance,
 						in mat3 TBN,
@@ -126,7 +126,7 @@ void SGX_Generate_Parallax_Steep_Texcoord(in sampler2D normalHeightMap,
     float numLayers = layerCount;
     float layerDepth = 1.0 / numLayers;
     float currentLayerDepth = 0.0;
-    vec2 parallaxShift = (eyeVec.xy) * scaleBias.x;
+    vec2 parallaxShift = (eyeVec.xy) * scaleBias;
     vec2 deltaTexCoords = parallaxShift / numLayers;
 
 	newTexCoord = texCoord;

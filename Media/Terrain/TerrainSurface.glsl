@@ -31,10 +31,10 @@ void getShadowFactor(in sampler2D lightmap, in vec2 uv, inout float shadowFactor
 
 void blendTerrainLayer(in float blendWeight, in f32vec2 uv0, in float uvMul,
 #ifdef TERRAIN_PARALLAX_MAPPING
-                    in vec3 viewPos, in vec2 scaleBias, in mat3 TBN,
+                    in vec3 viewPos, in float scaleBias, in mat3 TBN,
 #endif
 #ifdef TERRAIN_STEEP_PARALLAX_MAPPING
-                    in vec3 viewPos, in vec2 scaleBias, in float parallaxLayerCount, in float parallaxDistance, in mat3 TBN,
+                    in vec3 viewPos, in float scaleBias, in float parallaxLayerCount, in float parallaxDistance, in mat3 TBN,
 #endif
 #ifdef TERRAIN_NORMAL_MAPPING
                     in sampler2D normtex, inout vec3 normal,

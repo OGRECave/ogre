@@ -10,12 +10,12 @@ material RTSS/SteepParallaxOcclusionMapping
            // Base diffuse texture map
            texture_unit
            {
-              texture rockwall.tga
+              texture bricksParallax.dds
            }
 
            rtshader_system
            {
-               lighting_stage normal_map rockwall_NH.tga parallax_steep
+               lighting_stage normal_map bricksParallax_normal.dds parallax_steep
            }
        }
    }
