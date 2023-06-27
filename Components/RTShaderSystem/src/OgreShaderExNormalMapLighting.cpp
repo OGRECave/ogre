@@ -27,33 +27,32 @@ THE SOFTWARE.
 #include "OgreShaderPrecompiledHeaders.h"
 #ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
 
-#define SGX_LIB_NORMALMAP                           "SGXLib_NormalMap"
-#define SGX_FUNC_FETCHNORMAL                        "SGX_FetchNormal"
+#define SGX_LIB_NORMALMAP "SGXLib_NormalMap"
+#define SGX_FUNC_FETCHNORMAL "SGX_FetchNormal"
 
-namespace Ogre {
-namespace RTShader {
+namespace Ogre
+{
+namespace RTShader
+{
 
 /************************************************************************/
 /*                                                                      */
 /************************************************************************/
-const String SRS_NORMALMAP                      = "NormalMap";
+const String SRS_NORMALMAP = "NormalMap";
 
 //-----------------------------------------------------------------------
 NormalMapLighting::NormalMapLighting()
 {
-    mNormalMapSamplerIndex          = 0;
-    mVSTexCoordSetIndex             = 0;
-    mNormalMapSpace                 = NMS_TANGENT;
+    mNormalMapSamplerIndex = 0;
+    mVSTexCoordSetIndex = 0;
+    mNormalMapSpace = NMS_TANGENT;
     mNormalMapSampler = TextureManager::getSingleton().createSampler();
     mNormalMapSampler->setMipmapBias(-1.0);
     mParallaxScale = 0.04f;
 }
 
 //-----------------------------------------------------------------------
-const String& NormalMapLighting::getType() const
-{
-    return SRS_NORMALMAP;
-}
+const String& NormalMapLighting::getType() const { return SRS_NORMALMAP; }
 //-----------------------------------------------------------------------
 bool NormalMapLighting::createCpuSubPrograms(ProgramSet* programSet)
 {
@@ -106,8 +105,9 @@ bool NormalMapLighting::createCpuSubPrograms(ProgramSet* programSet)
         auto viewPos = psMain->resolveInputParameter(vsOutViewPos);
 
         // TODO: user specificed scale and bias
-        fstage.callFunction("SGX_Generate_Parallax_Texcoord", {In(normalMapSampler), In(psInTexcoord), In(viewPos), 
-                                In(Vector2(mParallaxScale, 0.0)), In(psOutTBN), Out(psInTexcoord)});
+        fstage.callFunction("SGX_Generate_Parallax_Texcoord",
+                            {In(normalMapSampler), In(psInTexcoord), In(viewPos), In(Vector2(mParallaxScale, 0.0)),
+                             In(psOutTBN), Out(psInTexcoord)});
 
         // overwrite texcoord0 unconditionally, only one texcoord set is supported with parallax mapping
         // we are before FFP_PS_TEXTURING, so the new value will be used
@@ -124,8 +124,7 @@ bool NormalMapLighting::createCpuSubPrograms(ProgramSet* programSet)
         // TODO: user specificed scale and bias
         fstage.callFunction("SGX_Generate_Parallax_Steep_Texcoord",
                             {In(normalMapSampler), In(psInTexcoord), In(viewPos), In(Vector2(mParallaxScale, 0.0)),
-                             In(32), In(400.0), 
-                             In(psOutTBN), Out(psInTexcoord)});
+                             In(32), In(400.0), In(psOutTBN), Out(psInTexcoord)});
 
         // overwrite texcoord0 unconditionally, only one texcoord set is supported with parallax mapping
         // we are before FFP_PS_TEXTURING, so the new value will be used
@@ -183,8 +182,8 @@ bool NormalMapLighting::preAddToRenderState(const RenderState* renderState, Pass
 
 bool NormalMapLighting::setParameter(const String& name, const String& value)
 {
-	if(name == "normalmap_space")
-	{
+    if (name == "normalmap_space")
+    {
         // Normal map defines normals in tangent space.
         if (value == "tangent_space")
         {
@@ -207,25 +206,25 @@ bool NormalMapLighting::setParameter(const String& name, const String& value)
             setNormalMapSpace(NMS_PARALLAX_STEEP);
             return true;
         }
-		return false;
-	}
+        return false;
+    }
 
-	if(name == "texture" && !value.empty())
-	{
-		mNormalMapTextureName = value;
-		return true;
-	}
+    if (name == "texture" && !value.empty())
+    {
+        mNormalMapTextureName = value;
+        return true;
+    }
 
-	if(name == "texcoord_index" && !value.empty())
-	{
-		setTexCoordIndex(StringConverter::parseInt(value));
-		return true;
-	}
+    if (name == "texcoord_index" && !value.empty())
+    {
+        setTexCoordIndex(StringConverter::parseInt(value));
+        return true;
+    }
 
-    if(name == "sampler")
+    if (name == "sampler")
     {
         auto sampler = TextureManager::getSingleton().getSampler(value);
-        if(!sampler)
+        if (!sampler)
             return false;
         mNormalMapSampler = sampler;
         return true;
@@ -237,39 +236,36 @@ bool NormalMapLighting::setParameter(const String& name, const String& value)
         return true;
     }
 
-	return false;
+    return false;
 }
 
 //-----------------------------------------------------------------------
-const String& NormalMapLightingFactory::getType() const
-{
-    return SRS_NORMALMAP;
-}
+const String& NormalMapLightingFactory::getType() const { return SRS_NORMALMAP; }
 
 //-----------------------------------------------------------------------
-SubRenderState* NormalMapLightingFactory::createInstance(ScriptCompiler* compiler, 
-                                                        PropertyAbstractNode* prop, Pass* pass, SGScriptTranslator* translator)
+SubRenderState* NormalMapLightingFactory::createInstance(ScriptCompiler* compiler, PropertyAbstractNode* prop,
+                                                         Pass* pass, SGScriptTranslator* translator)
 {
     if (prop->name == "lighting_stage")
     {
-        if(prop->values.size() >= 2)
+        if (prop->values.size() >= 2)
         {
             AbstractNodeList::const_iterator it = prop->values.begin();
-            
+
             // Case light model type is normal map
             if ((*it)->getString() == "normal_map")
             {
                 ++it;
                 SubRenderState* subRenderState = createOrRetrieveInstance(translator);
                 NormalMapLighting* normalMapSubRenderState = static_cast<NormalMapLighting*>(subRenderState);
-                
+
                 subRenderState->setParameter("texture", (*it)->getString());
 
                 // Read normal map space type.
                 if (prop->values.size() >= 3)
-                {                   
+                {
                     ++it;
-                    if(!subRenderState->setParameter("normalmap_space", (*it)->getString()))
+                    if (!subRenderState->setParameter("normalmap_space", (*it)->getString()))
                     {
                         compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
                     }
@@ -277,7 +273,7 @@ SubRenderState* NormalMapLightingFactory::createInstance(ScriptCompiler* compile
 
                 // Read texture coordinate index.
                 if (prop->values.size() >= 4)
-                {   
+                {
                     unsigned int textureCoordinateIndex = 0;
 
                     ++it;
@@ -292,13 +288,13 @@ SubRenderState* NormalMapLightingFactory::createInstance(ScriptCompiler* compile
                 {
                     ++it;
                     // sampler reference
-                    if(!normalMapSubRenderState->setParameter("sampler", (*it)->getString()))
+                    if (!normalMapSubRenderState->setParameter("sampler", (*it)->getString()))
                     {
                         compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
                     }
                 }
-                                
-                return subRenderState;                              
+
+                return subRenderState;
             }
         }
     }
@@ -306,16 +302,15 @@ SubRenderState* NormalMapLightingFactory::createInstance(ScriptCompiler* compile
 }
 
 //-----------------------------------------------------------------------
-void NormalMapLightingFactory::writeInstance(MaterialSerializer* ser, 
-                                             SubRenderState* subRenderState, 
-                                             Pass* srcPass, Pass* dstPass)
+void NormalMapLightingFactory::writeInstance(MaterialSerializer* ser, SubRenderState* subRenderState, Pass* srcPass,
+                                             Pass* dstPass)
 {
     NormalMapLighting* normalMapSubRenderState = static_cast<NormalMapLighting*>(subRenderState);
 
     ser->writeAttribute(4, "lighting_stage");
     ser->writeValue("normal_map");
-    ser->writeValue(normalMapSubRenderState->getNormalMapTextureName());    
-    
+    ser->writeValue(normalMapSubRenderState->getNormalMapTextureName());
+
     if (normalMapSubRenderState->getNormalMapSpace() == NormalMapLighting::NMS_TANGENT)
     {
         ser->writeValue("tangent_space");
@@ -329,12 +324,9 @@ void NormalMapLightingFactory::writeInstance(MaterialSerializer* ser,
 }
 
 //-----------------------------------------------------------------------
-SubRenderState* NormalMapLightingFactory::createInstanceImpl()
-{
-    return OGRE_NEW NormalMapLighting;
-}
+SubRenderState* NormalMapLightingFactory::createInstanceImpl() { return OGRE_NEW NormalMapLighting; }
 
-}
-}
+} // namespace RTShader
+} // namespace Ogre
 
 #endif

@@ -44,9 +44,9 @@ void SGX_FetchNormal(in sampler2D s,
 void SGX_CalculateTBN(in vec3 vNormal,
 					  in vec4 vTangent,
 					  out mat3 TBN)
-{	
+{
 	vec3 vBinormal = cross(vNormal, vTangent.xyz) * vTangent.w;
-	
+
 	// direction: from tangent space to world
 	TBN = mtxFromCols(vTangent.xyz, vBinormal, vNormal);
 }
@@ -71,7 +71,7 @@ void SGX_CalculateTerrainTBN(in vec3 normal, in mat3 normalMatrix, out mat3 TBN)
     // derive final matrix
     TBN = mtxFromCols(tangent, binormal, normal);
 }
-					  
+
 //-----------------------------------------------------------------------------
 void SGX_TransformNormal(in mat3 TBN,
 						 inout vec3 vNormalTS)
@@ -90,19 +90,19 @@ void SGX_Generate_Parallax_Texcoord(in sampler2D normalHeightMap,
 	//Calculate eye direction
 	vec3 eyeVec = mul(-viewPos, TBN);
 	eyeVec = normalize(eyeVec);
-	
+
 	//Simple parallax mapping
 	newTexCoord = texCoord;
-	float height = 1.0f - texture2D(normalHeightMap, newTexCoord).a;   
-	
+	float height = 1.0f - texture2D(normalHeightMap, newTexCoord).a;
+
 	#ifndef TERRAIN_PARALLAX_MAPPING
 		eyeVec.y = -eyeVec.y; //Inverse y
 		vec2 p = eyeVec.xy / eyeVec.z * (height * scaleBias.x);
 	#else
 	    vec2 p = eyeVec.xy * (height * scaleBias.x);
 	#endif
-	
-    newTexCoord = newTexCoord - p; 
+
+    newTexCoord = newTexCoord - p;
 }
 
 void SGX_Generate_Parallax_Steep_Texcoord(in sampler2D normalHeightMap,
@@ -120,42 +120,42 @@ void SGX_Generate_Parallax_Steep_Texcoord(in sampler2D normalHeightMap,
 	#ifndef TERRAIN_STEEP_PARALLAX_MAPPING
 		eyeVec.y = -eyeVec.y; //Inverse y
 	#endif
-	
+
 	//Steep parallax occlusion mapping
 	//Configure steep mapping layering.
-    float numLayers = layerCount;	
-    float layerDepth = 1.0 / numLayers;	
-    float currentLayerDepth = 0.0;	
-    vec2 parallaxShift = (eyeVec.xy) * scaleBias.x; 
+    float numLayers = layerCount;
+    float layerDepth = 1.0 / numLayers;
+    float currentLayerDepth = 0.0;
+    vec2 parallaxShift = (eyeVec.xy) * scaleBias.x;
     vec2 deltaTexCoords = parallaxShift / numLayers;
-	
-	newTexCoord = texCoord;	
+
+	newTexCoord = texCoord;
 	float currentDepthMapValue = 1.0f - texture2D(normalHeightMap, newTexCoord).a;
-	
+
 	//Loop through layers and break early if match found.
 	for (int currentLayerId = 0; currentLayerId < int(numLayers); currentLayerId++)
 	{
 		// shift texture coordinates along direction of P
 		newTexCoord -= deltaTexCoords;
-		
+
 		// get depthmap value at current texture coordinates
-		currentDepthMapValue = 1.0f - texture2D(normalHeightMap, newTexCoord).a;  
-		
+		currentDepthMapValue = 1.0f - texture2D(normalHeightMap, newTexCoord).a;
+
 		//Break if layer height matched
 		if (currentLayerDepth > currentDepthMapValue)
 			break;
-		
+
 		// get depth of next layer
-		currentLayerDepth += layerDepth;  
-	}	
-	
+		currentLayerDepth += layerDepth;
+	}
+
 	// get texture coordinates before collision (reverse operations)
 	vec2 prevTexCoords = newTexCoord + deltaTexCoords;
 
 	// get depth after and before collision for linear interpolation
 	float afterDepth  = currentDepthMapValue - currentLayerDepth;
 	float beforeDepth = (1.0f - texture2D(normalHeightMap, prevTexCoords).a) - currentLayerDepth + layerDepth;
-	 
+
 	// interpolation of texture coordinates
 	float weight = afterDepth / (afterDepth - beforeDepth);
 	newTexCoord = prevTexCoords * weight + newTexCoord * (1.0 - weight);
