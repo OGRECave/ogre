@@ -38,6 +38,7 @@ jobs:
         build/bin/Test_Ogre
         # run visual tests
         cd build/bin && ./TestContext -rs "OpenGL 3+ Rendering Subsystem"
+        ./TestContext -rs "OpenGL ES 2.x Rendering Subsystem"
         # verify that the python modules are loadable
         cd ../lib && python -c "import _Ogre; import _RTShader"
         cd ../../
