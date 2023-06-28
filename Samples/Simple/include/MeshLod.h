@@ -10,6 +10,7 @@
 // To reduce checkboxes some developer features can be enabled with macros.
 #define SHOW_MESH_HULL 0
 #define ENABLE_THREADING 1
+#define ENABLE_COMPRESSION 1
 
 class _OgreSampleClassExport Sample_MeshLod :
     public OgreBites::SdkSample,
