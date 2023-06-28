@@ -122,7 +122,7 @@ void SGX_Generate_Parallax_Steep_Texcoord(in sampler2D normalHeightMap,
 	#endif
 
 	newTexCoord = texCoord;
-	
+
 	//Steep parallax occlusion mapping
 	if (length(viewPos) < maxDistance)
 	{
