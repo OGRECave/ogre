@@ -121,42 +121,45 @@ void SGX_Generate_Parallax_Steep_Texcoord(in sampler2D normalHeightMap,
 		eyeVec.y = -eyeVec.y; //Inverse y
 	#endif
 
-	//Steep parallax occlusion mapping
-	//Configure steep mapping layering.
-    float numLayers = layerCount;
-    float layerDepth = 1.0 / numLayers;
-    float currentLayerDepth = 0.0;
-    vec2 parallaxShift = (eyeVec.xy) * scaleBias;
-    vec2 deltaTexCoords = parallaxShift / numLayers;
-
 	newTexCoord = texCoord;
-	float currentDepthMapValue = 1.0f - texture2D(normalHeightMap, newTexCoord).a;
-
-	//Loop through layers and break early if match found.
-	for (int currentLayerId = 0; currentLayerId < int(numLayers); currentLayerId++)
+	
+	//Steep parallax occlusion mapping
+	if (length(viewPos) < maxDistance)
 	{
-		// shift texture coordinates along direction of P
-		newTexCoord -= deltaTexCoords;
+		//Configure steep mapping layering.
+		float layerDepth = 1.0 / layerCount;
+		float currentLayerDepth = 0.0;
+		vec2 parallaxShift = (eyeVec.xy) * scaleBias;
+		vec2 deltaTexCoords = parallaxShift / layerCount;
 
-		// get depthmap value at current texture coordinates
-		currentDepthMapValue = 1.0f - texture2D(normalHeightMap, newTexCoord).a;
+		float currentDepthMapValue = 1.0f - texture2D(normalHeightMap, newTexCoord).a;
 
-		//Break if layer height matched
-		if (currentLayerDepth > currentDepthMapValue)
-			break;
+		//Loop through layers and break early if match found.
+		for (int currentLayerId = 0; currentLayerId < int(layerCount); currentLayerId++)
+		{
+			// shift texture coordinates along direction of P
+			newTexCoord -= deltaTexCoords;
 
-		// get depth of next layer
-		currentLayerDepth += layerDepth;
+			// get depthmap value at current texture coordinates
+			currentDepthMapValue = 1.0f - texture2D(normalHeightMap, newTexCoord).a;
+
+			//Break if layer height matched
+			if (currentLayerDepth > currentDepthMapValue)
+				break;
+
+			// get depth of next layer
+			currentLayerDepth += layerDepth;
+		}
+
+		// get texture coordinates before collision (reverse operations)
+		vec2 prevTexCoords = newTexCoord + deltaTexCoords;
+
+		// get depth after and before collision for linear interpolation
+		float afterDepth  = currentDepthMapValue - currentLayerDepth;
+		float beforeDepth = (1.0f - texture2D(normalHeightMap, prevTexCoords).a) - currentLayerDepth + layerDepth;
+
+		// interpolation of texture coordinates
+		float weight = afterDepth / (afterDepth - beforeDepth);
+		newTexCoord = prevTexCoords * weight + newTexCoord * (1.0 - weight);
 	}
-
-	// get texture coordinates before collision (reverse operations)
-	vec2 prevTexCoords = newTexCoord + deltaTexCoords;
-
-	// get depth after and before collision for linear interpolation
-	float afterDepth  = currentDepthMapValue - currentLayerDepth;
-	float beforeDepth = (1.0f - texture2D(normalHeightMap, prevTexCoords).a) - currentLayerDepth + layerDepth;
-
-	// interpolation of texture coordinates
-	float weight = afterDepth / (afterDepth - beforeDepth);
-	newTexCoord = prevTexCoords * weight + newTexCoord * (1.0 - weight);
 }
