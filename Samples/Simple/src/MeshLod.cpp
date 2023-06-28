@@ -255,6 +255,7 @@ void Sample_MeshLod::loadAutomaticLod()
     LodConfig lodConfig;
     gen.getAutoconfig(mLodConfig.mesh, lodConfig);
     lodConfig.advanced.useBackgroundQueue = ENABLE_THREADING;
+    lodConfig.advanced.useCompression = ENABLE_COMPRESSION;
     lodConfig.advanced.profile = mLodConfig.advanced.profile;
     lodConfig.advanced.useVertexNormals = mLodConfig.advanced.useVertexNormals;
     gen.generateLodLevels(lodConfig);
@@ -276,6 +277,7 @@ void Sample_MeshLod::loadUserLod( bool useWorkLod )
 
     MeshLodGenerator& gen = MeshLodGenerator::getSingleton();
     mLodConfig.advanced.useBackgroundQueue = ENABLE_THREADING;
+    mLodConfig.advanced.useCompression = ENABLE_COMPRESSION;
     if(!useWorkLod){
         gen.generateLodLevels(mLodConfig);
 #if !ENABLE_THREADING
@@ -315,6 +317,7 @@ size_t Sample_MeshLod::getUniqueVertexCount( MeshPtr mesh )
     // It is constructing a mesh grid at the beginning, so if we reduce 0%, we will get the unique vertex count.
     LodConfig lodConfig(mesh, PixelCountLodStrategy::getSingletonPtr());
     lodConfig.advanced.useBackgroundQueue = false; // Non-threaded
+    lodConfig.advanced.useCompression = ENABLE_COMPRESSION;
     lodConfig.createGeneratedLodLevel(0, 0);
     MeshLodGenerator& gen = MeshLodGenerator::getSingleton();
     gen.generateLodLevels(lodConfig);
@@ -475,6 +478,7 @@ void Sample_MeshLod::addToProfile( Real cost )
     config.levels.clear();
     config.levels.push_back(mWorkLevel);
     config.advanced.useBackgroundQueue = false;
+    config.advanced.useCompression = ENABLE_COMPRESSION;
     MeshLodGenerator& gen = MeshLodGenerator::getSingleton();
     LodCollapserPtr collapser(new LodCollapser());
     LodDataPtr data(new LodData());
@@ -602,6 +606,7 @@ void Sample_MeshLod::buttonHit( OgreBites::Button* button )
             MeshLodGenerator::getSingleton().clearPendingLodRequests();
             MeshLodGenerator& gen = MeshLodGenerator::getSingleton();
             mLodConfig.advanced.useBackgroundQueue = false; // Non-threaded
+            mLodConfig.advanced.useCompression = ENABLE_COMPRESSION;
             gen.generateLodLevels(mLodConfig);
             forceLodLevel(-1); // disable Lod level forcing
         }
