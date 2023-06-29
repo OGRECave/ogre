@@ -56,8 +56,20 @@ protected:
     bool isDuplicateTriangle(LodData::Triangle* triangle, LodData::Triangle* triangle2);
     LodData::Triangle* isDuplicateTriangle(LodData::Triangle* triangle);
 
-    void addIndexDataImpl(LodData* data, const HardwareBufferPtr& ibuf, size_t isize, bool useSharedVertexLookup,
-                          ushort submeshID, RenderOperation::OperationType renderOp);
+    void addIndexDataImpl(LodData* data, const HardwareIndexBufferPtr& ibuf, size_t start, size_t count, size_t subMeshIndex);
+
+
+
+    virtual const String & getMeshName() = 0;
+    virtual size_t getMeshSharedVertexCount() = 0;
+    virtual float getMeshBoundingSphereRadius() = 0;
+
+    virtual size_t getSubMeshCount() = 0;
+
+    virtual bool getSubMeshUseSharedVertices(size_t subMeshIndex) = 0;
+    virtual size_t getSubMeshOwnVertexCount(size_t subMeshIndex) = 0;
+    virtual size_t getSubMeshIndexCount(size_t subMeshIndex) = 0;
+    virtual RenderOperation::OperationType getSubMeshRenderOp(size_t subMeshIndex) = 0;
 };
 
 }
