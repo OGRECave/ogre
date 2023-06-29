@@ -21,13 +21,13 @@ Also see acknowledgements in Readme.html
 #define TERRAIN_PAGE_MAX_X 0
 #define TERRAIN_PAGE_MAX_Y 0
 
-#include "SdkSample.h"
 #include "OgrePageManager.h"
 #include "OgreTerrain.h"
 #include "OgreTerrainGroup.h"
-#include "OgreTerrainQuadTreeNode.h"
 #include "OgreTerrainMaterialGeneratorA.h"
 #include "OgreTerrainPaging.h"
+#include "OgreTerrainQuadTreeNode.h"
+#include "SdkSample.h"
 
 #define TERRAIN_FILE_PREFIX String("testTerrain")
 #define TERRAIN_FILE_SUFFIX String("dat")
@@ -41,29 +41,19 @@ using namespace OgreBites;
 
 class _OgreSampleClassExport Sample_Terrain : public SdkSample
 {
- public:
-
- Sample_Terrain()
-     : mTerrainGlobals(0)
-        , mTerrainGroup(0)
-        , mTerrainPaging(0)
-        , mPageManager(0)
-        , mFly(false)
-        , mFallVelocity(0)
-        , mMode(MODE_NORMAL)
-        , mLayerEdit(1)
-        , mBrushSizeTerrainSpace(0.02)
-        , mHeightUpdateCountDown(0)
-        , mTerrainPos(1000,0,5000)
-        , mTerrainsImported(false)
-        , mKeyPressed(0)
+public:
+    Sample_Terrain()
+        : mTerrainGlobals(0), mTerrainGroup(0), mTerrainPaging(0), mPageManager(0), mFly(false), mParallaxOcclusion(false),
+          mFallVelocity(0), mMode(MODE_NORMAL), mLayerEdit(1), mBrushSizeTerrainSpace(0.02), mHeightUpdateCountDown(0),
+          mTerrainPos(1000, 0, 5000), mTerrainsImported(false), mKeyPressed(0)
 
     {
         mInfo["Title"] = "Terrain";
         mInfo["Description"] = "Demonstrates use of the terrain rendering plugin.";
         mInfo["Thumbnail"] = "thumb_terrain.png";
         mInfo["Category"] = "Environment";
-        mInfo["Help"] = "Left click and drag anywhere in the scene to look around. Let go again to show "
+        mInfo["Help"] =
+            "Left click and drag anywhere in the scene to look around. Let go again to show "
             "cursor and access widgets. Use WASD keys to move. Use +/- keys when in edit mode to change content.";
 
         // Update terrain at max 20fps
@@ -75,95 +65,91 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
         Vector3 tsPos;
         terrain->getTerrainPosition(centrepos, &tsPos);
 #if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
-        if (mKeyPressed == '+' || mKeyPressed == '-' || mKeyPressed == SDLK_KP_PLUS ||
-            mKeyPressed == SDLK_KP_MINUS)
+        if (mKeyPressed == '+' || mKeyPressed == '-' || mKeyPressed == SDLK_KP_PLUS || mKeyPressed == SDLK_KP_MINUS)
         {
-            switch(mMode)
+            switch (mMode)
             {
             case MODE_EDIT_HEIGHT:
+            {
+                // we need point coords
+                Real terrainSize = (terrain->getSize() - 1);
+                int startx = (tsPos.x - mBrushSizeTerrainSpace) * terrainSize;
+                int starty = (tsPos.y - mBrushSizeTerrainSpace) * terrainSize;
+                int endx = (tsPos.x + mBrushSizeTerrainSpace) * terrainSize;
+                int endy = (tsPos.y + mBrushSizeTerrainSpace) * terrainSize;
+                startx = std::max(startx, 0);
+                starty = std::max(starty, 0);
+                endx = std::min(endx, (int)terrainSize);
+                endy = std::min(endy, (int)terrainSize);
+                for (int y = starty; y <= endy; ++y)
                 {
-                    // we need point coords
-                    Real terrainSize = (terrain->getSize() - 1);
-                    int startx = (tsPos.x - mBrushSizeTerrainSpace) * terrainSize;
-                    int starty = (tsPos.y - mBrushSizeTerrainSpace) * terrainSize;
-                    int endx = (tsPos.x + mBrushSizeTerrainSpace) * terrainSize;
-                    int endy= (tsPos.y + mBrushSizeTerrainSpace) * terrainSize;
-                    startx = std::max(startx, 0);
-                    starty = std::max(starty, 0);
-                    endx = std::min(endx, (int)terrainSize);
-                    endy = std::min(endy, (int)terrainSize);
-                    for (int y = starty; y <= endy; ++y)
+                    for (int x = startx; x <= endx; ++x)
                     {
-                        for (int x = startx; x <= endx; ++x)
-                        {
-                            Real tsXdist = (x / terrainSize) - tsPos.x;
-                            Real tsYdist = (y / terrainSize)  - tsPos.y;
+                        Real tsXdist = (x / terrainSize) - tsPos.x;
+                        Real tsYdist = (y / terrainSize) - tsPos.y;
 
-                            Real weight = std::min((Real)1.0,
-                                                   Math::Sqrt(tsYdist * tsYdist + tsXdist * tsXdist) / Real(0.5 * mBrushSizeTerrainSpace));
-                            weight = 1.0 - (weight * weight);
+                        Real weight = std::min((Real)1.0, Math::Sqrt(tsYdist * tsYdist + tsXdist * tsXdist) /
+                                                              Real(0.5 * mBrushSizeTerrainSpace));
+                        weight = 1.0 - (weight * weight);
 
-                            float addedHeight = weight * 250.0 * timeElapsed;
-                            float newheight;
-                            if (mKeyPressed == '+'  || mKeyPressed == SDLK_KP_PLUS)
-                                newheight = terrain->getHeightAtPoint(x, y) + addedHeight;
-                            else
-                                newheight = terrain->getHeightAtPoint(x, y) - addedHeight;
-                            terrain->setHeightAtPoint(x, y, newheight);
-
-                        }
+                        float addedHeight = weight * 250.0 * timeElapsed;
+                        float newheight;
+                        if (mKeyPressed == '+' || mKeyPressed == SDLK_KP_PLUS)
+                            newheight = terrain->getHeightAtPoint(x, y) + addedHeight;
+                        else
+                            newheight = terrain->getHeightAtPoint(x, y) - addedHeight;
+                        terrain->setHeightAtPoint(x, y, newheight);
                     }
-                    if (mHeightUpdateCountDown == 0)
-                        mHeightUpdateCountDown = mHeightUpdateRate;
                 }
-                break;
+                if (mHeightUpdateCountDown == 0)
+                    mHeightUpdateCountDown = mHeightUpdateRate;
+            }
+            break;
             case MODE_EDIT_BLEND:
+            {
+                TerrainLayerBlendMap* layer = terrain->getLayerBlendMap(mLayerEdit);
+                // we need image coords
+                Real imgSize = terrain->getLayerBlendMapSize();
+                int startx = (tsPos.x - mBrushSizeTerrainSpace) * imgSize;
+                int starty = (tsPos.y - mBrushSizeTerrainSpace) * imgSize;
+                int endx = (tsPos.x + mBrushSizeTerrainSpace) * imgSize;
+                int endy = (tsPos.y + mBrushSizeTerrainSpace) * imgSize;
+                startx = std::max(startx, 0);
+                starty = std::max(starty, 0);
+                endx = std::min(endx, (int)imgSize);
+                endy = std::min(endy, (int)imgSize);
+                for (int y = starty; y <= endy; ++y)
                 {
-                    TerrainLayerBlendMap* layer = terrain->getLayerBlendMap(mLayerEdit);
-                    // we need image coords
-                    Real imgSize = terrain->getLayerBlendMapSize();
-                    int startx = (tsPos.x - mBrushSizeTerrainSpace) * imgSize;
-                    int starty = (tsPos.y - mBrushSizeTerrainSpace) * imgSize;
-                    int endx = (tsPos.x + mBrushSizeTerrainSpace) * imgSize;
-                    int endy= (tsPos.y + mBrushSizeTerrainSpace) * imgSize;
-                    startx = std::max(startx, 0);
-                    starty = std::max(starty, 0);
-                    endx = std::min(endx, (int)imgSize);
-                    endy = std::min(endy, (int)imgSize);
-                    for (int y = starty; y <= endy; ++y)
+                    for (int x = startx; x <= endx; ++x)
                     {
-                        for (int x = startx; x <= endx; ++x)
-                        {
-                            Real tsXdist = (x / imgSize) - tsPos.x;
-                            Real tsYdist = (y / imgSize)  - tsPos.y;
+                        Real tsXdist = (x / imgSize) - tsPos.x;
+                        Real tsYdist = (y / imgSize) - tsPos.y;
 
-                            Real weight = std::min((Real)1.0,
-                                                   Math::Sqrt(tsYdist * tsYdist + tsXdist * tsXdist) / Real(0.5 * mBrushSizeTerrainSpace));
-                            weight = 1.0 - (weight * weight);
+                        Real weight = std::min((Real)1.0, Math::Sqrt(tsYdist * tsYdist + tsXdist * tsXdist) /
+                                                              Real(0.5 * mBrushSizeTerrainSpace));
+                        weight = 1.0 - (weight * weight);
 
-                            float paint = weight * timeElapsed;
-                            uint32 imgY = imgSize - y;
-                            float val;
-                            if (mKeyPressed == '+'  || mKeyPressed == SDLK_KP_PLUS)
-                                val = layer->getBlendValue(x, imgY) + paint;
-                            else
-                                val = layer->getBlendValue(x, imgY) - paint;
-                            val = Math::Clamp(val, 0.0f, 1.0f);
-                            layer->setBlendValue(x, imgY, val);
-
-                        }
+                        float paint = weight * timeElapsed;
+                        uint32 imgY = imgSize - y;
+                        float val;
+                        if (mKeyPressed == '+' || mKeyPressed == SDLK_KP_PLUS)
+                            val = layer->getBlendValue(x, imgY) + paint;
+                        else
+                            val = layer->getBlendValue(x, imgY) - paint;
+                        val = Math::Clamp(val, 0.0f, 1.0f);
+                        layer->setBlendValue(x, imgY, val);
                     }
-
-                    layer->update();
                 }
-                break;
+
+                layer->update();
+            }
+            break;
             case MODE_NORMAL:
             case MODE_COUNT:
                 break;
             };
         }
 #endif
-
     }
     bool frameRenderingQueued(const FrameEvent& evt) override
     {
@@ -171,7 +157,7 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
         {
             // fire ray
             Ray ray;
-            //ray = mCamera->getCameraToViewportRay(0.5, 0.5);
+            // ray = mCamera->getCameraToViewportRay(0.5, 0.5);
             ray = mTrayMgr->getCursorRay(mCamera);
 
             TerrainGroup::RayResult rayResult = mTerrainGroup->rayIntersects(ray);
@@ -186,8 +172,7 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
                 Sphere sphere(rayResult.position, brushSizeWorldSpace);
                 mTerrainGroup->sphereIntersects(sphere, &terrainList);
 
-                for (TerrainGroup::TerrainList::iterator ti = terrainList.begin();
-                     ti != terrainList.end(); ++ti)
+                for (TerrainGroup::TerrainList::iterator ti = terrainList.begin(); ti != terrainList.end(); ++ti)
                     doTerrainModify(*ti, rayResult.position, evt.timeSinceLastFrame);
             }
             else
@@ -215,13 +200,10 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
                     mFallVelocity += evt.timeSinceLastFrame * 20;
                     mFallVelocity = std::min(mFallVelocity, fallSpeed);
                     newy = camPos.y - mFallVelocity * evt.timeSinceLastFrame;
-
                 }
                 newy = std::max(rayResult.position.y + distanceAboveTerrain, newy);
                 mCameraNode->setPosition(camPos.x, newy, camPos.z);
-
             }
-
         }
 
         if (mHeightUpdateCountDown > 0)
@@ -231,7 +213,6 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
             {
                 mTerrainGroup->update();
                 mHeightUpdateCountDown = 0;
-
             }
         }
 
@@ -262,13 +243,10 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
         }
         //! [loading_label]
 
-        return SdkSample::frameRenderingQueued(evt);  // don't forget the parent updates!
+        return SdkSample::frameRenderingQueued(evt); // don't forget the parent updates!
     }
 
-    void saveTerrains(bool onlyIfModified)
-    {
-        mTerrainGroup->saveAllTerrains(onlyIfModified);
-    }
+    void saveTerrains(bool onlyIfModified) { mTerrainGroup->saveAllTerrains(onlyIfModified); }
 
     bool keyReleased(const KeyboardEvent& evt) override
     {
@@ -276,7 +254,7 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
         return SdkSample::keyReleased(evt);
     }
 
-    bool keyPressed (const KeyboardEvent &e) override
+    bool keyPressed(const KeyboardEvent& e) override
     {
 #if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
         mKeyPressed = e.keysym.sym;
@@ -348,10 +326,14 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
         {
             mFly = mFlyBox->isChecked();
         }
+        if (box == mParallaxOcclusionBox)
+        {
+            mParallaxOcclusion = mParallaxOcclusionBox->isChecked();
+            changeShadows();
+        }
     }
 
- protected:
-
+protected:
     TerrainGlobalOptions* mTerrainGlobals;
     TerrainGroup* mTerrainGroup;
     bool mPaging;
@@ -370,6 +352,7 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
     DummyPageProvider mDummyPageProvider;
 #endif
     bool mFly;
+    bool mParallaxOcclusion;
     Real mFallVelocity;
     enum Mode
     {
@@ -397,6 +380,7 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
     SelectMenu* mEditMenu;
     SelectMenu* mShadowsMenu;
     CheckBox* mFlyBox;
+    CheckBox* mParallaxOcclusionBox;
     //! [infolabel]
     OgreBites::Label* mInfoLabel = nullptr;
     //! [infolabel]
@@ -498,18 +482,22 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
         mTerrainGlobals->setCompositeMapDistance(3000);
         //! [configure_lod]
 
-        //mTerrainGlobals->setUseRayBoxDistanceCalculation(true);
-        //mTerrainGlobals->getDefaultMaterialGenerator()->setDebugLevel(1);
-        //mTerrainGlobals->setLightMapSize(256);
+        // mTerrainGlobals->setUseRayBoxDistanceCalculation(true);
+        // mTerrainGlobals->getDefaultMaterialGenerator()->setDebugLevel(1);
+        // mTerrainGlobals->setLightMapSize(256);
 
-        // Disable the lightmap for OpenGL ES 2.0. The minimum number of samplers allowed is 8(as opposed to 16 on desktop).
-        // Otherwise we will run over the limit by just one. The minimum was raised to 16 in GL ES 3.0.
+        TerrainMaterialGeneratorA::SM2Profile* matProfile = static_cast<TerrainMaterialGeneratorA::SM2Profile*>(
+            mTerrainGlobals->getDefaultMaterialGenerator()->getActiveProfile());
+
+        // Disable the lightmap for OpenGL ES 2.0. The minimum number of samplers allowed is 8(as opposed to 16 on
+        // desktop). Otherwise we will run over the limit by just one. The minimum was raised to 16 in GL ES 3.0.
         if (Ogre::Root::getSingletonPtr()->getRenderSystem()->getCapabilities()->getNumTextureUnits() < 9)
         {
-            TerrainMaterialGeneratorA::SM2Profile* matProfile =
-                static_cast<TerrainMaterialGeneratorA::SM2Profile*>(mTerrainGlobals->getDefaultMaterialGenerator()->getActiveProfile());
             matProfile->setLightmapEnabled(false);
         }
+
+        // Disable steep parallax by default
+        matProfile->setLayerParallaxOcclusionMappingEnabled(false);
 
         //! [composite_lighting]
         // Important to set these so that the terrain knows what to use for baked (non-realtime) data
@@ -517,7 +505,7 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
         mTerrainGlobals->setCompositeMapAmbient(mSceneMgr->getAmbientLight());
         mTerrainGlobals->setCompositeMapDiffuse(l->getDiffuseColour());
         //! [composite_lighting]
-        //mTerrainGlobals->setCompositeMapAmbient(ColourValue::Red);
+        // mTerrainGlobals->setCompositeMapAmbient(ColourValue::Red);
 
         // Configure default import settings for if we use imported image
         //! [import_settings]
@@ -556,10 +544,7 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
         }
     }
 
-    void changeShadows()
-    {
-        configureShadows(mShadowMode != SHADOWS_NONE, mShadowMode == SHADOWS_DEPTH);
-    }
+    void changeShadows() { configureShadows(mShadowMode != SHADOWS_NONE, mShadowMode == SHADOWS_DEPTH); }
 
     void configureShadows(bool enabled, bool depthShadows)
     {
@@ -587,7 +572,7 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
             {
                 // shadow camera setup
                 PSSMShadowCameraSetup* pssmSetup = new PSSMShadowCameraSetup();
-                pssmSetup->setSplitPadding(mCamera->getNearClipDistance()*2);
+                pssmSetup->setSplitPadding(mCamera->getNearClipDistance() * 2);
                 pssmSetup->calculateSplitPoints(3, mCamera->getNearClipDistance(), mSceneMgr->getShadowFarDistance());
                 pssmSetup->setOptimalAdjustFactor(0, 2);
                 pssmSetup->setOptimalAdjustFactor(1, 1);
@@ -607,10 +592,12 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
                 mSceneMgr->setShadowCasterRenderBackFaces(true);
 
                 auto subRenderState = mShaderGenerator->createSubRenderState(RTShader::SRS_INTEGRATED_PSSM3);
-                subRenderState->setParameter("split_points",  static_cast<PSSMShadowCameraSetup*>(mPSSMSetup.get())->getSplitPoints());
+                subRenderState->setParameter("split_points",
+                                             static_cast<PSSMShadowCameraSetup*>(mPSSMSetup.get())->getSplitPoints());
                 schemRenderState->addTemplateSubRenderState(subRenderState);
 
-                mSceneMgr->setShadowTextureCasterMaterial(MaterialManager::getSingleton().getByName("PSSM/shadow_caster"));
+                mSceneMgr->setShadowTextureCasterMaterial(
+                    MaterialManager::getSingleton().getByName("PSSM/shadow_caster"));
             }
             else
             {
@@ -625,12 +612,15 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
 
             matProfile->setReceiveDynamicShadowsPSSM(static_cast<PSSMShadowCameraSetup*>(mPSSMSetup.get()));
 
-            //addTextureShadowDebugOverlay(TL_RIGHT, 3);
+            // addTextureShadowDebugOverlay(TL_RIGHT, 3);
         }
         else
         {
             mSceneMgr->setShadowTechnique(SHADOWTYPE_NONE);
         }
+
+        // Update parallax occlusion
+        matProfile->setLayerParallaxOcclusionMappingEnabled(mParallaxOcclusion);
 
         mShaderGenerator->invalidateScheme(MSN_SHADERGEN);
     }
@@ -652,7 +642,7 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
         //! [camera_setup]
 
         //! [camera_inf]
-        mCamera->setFarClipDistance(0);   // enable infinite far clip distance
+        mCamera->setFarClipDistance(0); // enable infinite far clip distance
         //! [camera_inf]
     }
 
@@ -673,16 +663,19 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
         mEditMenu->addItem("None");
         mEditMenu->addItem("Elevation");
         mEditMenu->addItem("Blend");
-        mEditMenu->selectItem(0);  // no edit mode
+        mEditMenu->selectItem(0); // no edit mode
 
         mFlyBox = mTrayMgr->createCheckBox(TL_BOTTOM, "Fly", "Fly");
         mFlyBox->setChecked(false, false);
+
+        mParallaxOcclusionBox = mTrayMgr->createCheckBox(TL_BOTTOM, "ParallaxOcclusion", "Parallax Occlusion Mapping");
+        mParallaxOcclusionBox->setChecked(false, false);
 
         mShadowsMenu = mTrayMgr->createLongSelectMenu(TL_BOTTOM, "Shadows", "Shadows", 370, 250, 3);
         mShadowsMenu->addItem("None");
         mShadowsMenu->addItem("Colour Shadows");
         mShadowsMenu->addItem("Depth Shadows");
-        mShadowsMenu->selectItem(0);  // no edit mode
+        mShadowsMenu->selectItem(0); // no edit mode
 
         // a friendly reminder
         StringVector names;
@@ -736,7 +729,7 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
         mTerrainGroup->setFilenameConvention(TERRAIN_FILE_PREFIX, TERRAIN_FILE_SUFFIX);
         mTerrainGroup->setOrigin(mTerrainPos);
         //! [terrain_create]
-        
+
         configureTerrainDefaults(l);
 #ifdef PAGING
         // Paging setup
@@ -747,8 +740,7 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
         mPageManager->addCamera(mCamera);
         mTerrainPaging = OGRE_NEW TerrainPaging(mPageManager);
         PagedWorld* world = mPageManager->createWorld();
-        mTerrainPaging->createWorldSection(world, mTerrainGroup, 2000, 3000,
-                                           TERRAIN_PAGE_MIN_X, TERRAIN_PAGE_MIN_Y,
+        mTerrainPaging->createWorldSection(world, mTerrainGroup, 2000, 3000, TERRAIN_PAGE_MIN_X, TERRAIN_PAGE_MIN_Y,
                                            TERRAIN_PAGE_MAX_X, TERRAIN_PAGE_MAX_Y);
 #else
         //! [define_loop]
@@ -804,7 +796,6 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
         //! [skybox]
         mSceneMgr->setSkyBox(true, "Examples/CloudyNoonSkyBox");
         //! [skybox]
-
     }
 
     void _shutdown() override
@@ -816,7 +807,7 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
             OGRE_DELETE mPageManager;
             mPageManager = 0;
         }
-        else if(mTerrainGroup)
+        else if (mTerrainGroup)
         {
             OGRE_DELETE mTerrainGroup;
             mTerrainGroup = 0;
@@ -832,8 +823,6 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
 
         SdkSample::_shutdown();
     }
-
-
 };
 
 #endif

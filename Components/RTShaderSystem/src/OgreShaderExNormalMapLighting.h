@@ -84,7 +84,8 @@ public:
     {
         NMS_OBJECT = 1,
         NMS_TANGENT = 2,
-        NMS_PARALLAX = 6
+        NMS_PARALLAX = 6,
+        NMS_PARALLAX_OCCLUSION = 7
     };
 
     /** 
@@ -119,6 +120,8 @@ protected:
     SamplerPtr mNormalMapSampler;
     // The normal map space.
     NormalMapSpace mNormalMapSpace;
+    // Parallax mapping scale
+    float mParallaxHeightScale;
 };
 
 

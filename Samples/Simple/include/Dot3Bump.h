@@ -101,6 +101,7 @@ protected:
 #ifdef INCLUDE_RTSHADER_SYSTEM
         matNames.push_back("RTSS/NormalMapping_SinglePass");
         matNames.push_back("RTSS/OffsetMapping");
+        matNames.push_back("RTSS/ParallaxOcclusionMapping");
         matNames.push_back("RTSS/NormalMapping_MultiPass");
 #endif
         matNames.push_back("Examples/BumpMapping/MultiLight");
@@ -111,6 +112,7 @@ protected:
 
     
         mPossibilities["ogrehead.mesh"] = matNames;
+        mPossibilities["cube.mesh"] = matNames;
         mPossibilities["knot.mesh"] = matNames;
 
         matNames.clear();
