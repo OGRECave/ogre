@@ -52,6 +52,7 @@ namespace Ogre {
         ~DefaultHardwareBuffer();
         void readData(size_t offset, size_t length, void* pDest) override;
         void writeData(size_t offset, size_t length, const void* pSource, bool discardWholeBuffer = false) override;
+        bool isSystemMemory(void) const override { return true; }
     };
 
     typedef DefaultHardwareBuffer DefaultHardwareUniformBuffer;

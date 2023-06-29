@@ -319,7 +319,7 @@ namespace Ogre {
             virtual void copyData(HardwareBuffer& srcBuffer, size_t srcOffset, 
                 size_t dstOffset, size_t length, bool discardWholeBuffer = false)
             {
-                if(mDelegate)
+                if(mDelegate && !srcBuffer.isSystemMemory())
                 {
                     mDelegate->copyData(*srcBuffer.mDelegate, srcOffset, dstOffset, length, discardWholeBuffer);
                     return;
@@ -363,6 +363,8 @@ namespace Ogre {
             size_t getSizeInBytes(void) const { return mSizeInBytes; }
             /// Returns the Usage flags with which this buffer was created
             Usage getUsage(void) const { return mUsage; }
+            /// Returns whether this buffer is held in system memory
+            virtual bool isSystemMemory(void) const { return mDelegate && mDelegate->isSystemMemory(); }
             /// Returns whether this buffer has a system memory shadow for quicker reading
             bool hasShadowBuffer(void) const { return mShadowBuffer || (mDelegate && mDelegate->hasShadowBuffer()); }
             /// Returns whether or not this buffer is currently locked.

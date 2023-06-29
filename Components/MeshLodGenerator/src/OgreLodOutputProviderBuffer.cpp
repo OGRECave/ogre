@@ -135,9 +135,7 @@ void LodOutputProviderBuffer::inject()
                         buff.indexSize == 2 ?
                         HardwareIndexBuffer::IT_16BIT : HardwareIndexBuffer::IT_32BIT,
                         indexCount, mMesh->getIndexBufferUsage(), mMesh->isIndexBufferShadowed());
-                    HardwareBufferLockGuard indexLock(buff.indexBuffer, HardwareBuffer::HBL_READ_ONLY);
-                    // do not use copyData, as we are copying from a software to hardware buffer here
-                    lods.back()->indexBuffer->writeData(0, lods.back()->indexBuffer->getSizeInBytes(), indexLock.pData, true);
+                    lods.back()->indexBuffer->copyData(*buff.indexBuffer);
                 }
             }
         }
