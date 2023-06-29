@@ -1,3 +1,7 @@
+#ifdef GL_ES
+precision mediump float;
+#endif
+
 uniform float size_value;
 uniform float time;
 uniform mat4 worldViewProjMatrix;
