@@ -80,7 +80,9 @@ namespace Ogre
             curLod.indexStart = 0;
             curLod.indexSize = data->mIndexBufferInfoList[i].indexSize;
             curLod.indexBufferSize = 0; // It means same as index count
-            curLod.indexBuffer = std::make_shared<DefaultHardwareBuffer>(curLod.indexCount * curLod.indexSize);
+            auto itype = curLod.indexSize == 2 ? HardwareIndexBuffer::IT_16BIT : HardwareIndexBuffer::IT_32BIT;
+            DefaultHardwareBufferManagerBase bfrMgr;
+            curLod.indexBuffer = bfrMgr.createIndexBuffer(itype, curLod.indexCount, HBU_CPU_ONLY);
             // buf is an union, so pint=pshort
             data->mIndexBufferInfoList[i].buf.pshort = (unsigned short*) curLod.indexBuffer->lock(HardwareBuffer::HBL_NORMAL);
             curLod.indexBuffer->unlock(); // software buffer, safe to keep the pointer

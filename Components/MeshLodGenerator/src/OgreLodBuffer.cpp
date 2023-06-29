@@ -37,7 +37,8 @@ namespace Ogre
         if (indexCount > 0) {
             const HardwareIndexBufferSharedPtr& hwIndexBuffer = data->indexBuffer;
             indexSize = hwIndexBuffer->getIndexSize();
-            indexBuffer = std::make_shared<DefaultHardwareBuffer>(indexCount * indexSize);
+            DefaultHardwareBufferManagerBase bfrMgr;
+            indexBuffer = bfrMgr.createIndexBuffer(hwIndexBuffer->getType(), indexCount, HBU_CPU_ONLY);
             size_t offset = data->indexStart * indexSize;
             indexBuffer->copyData(*hwIndexBuffer, 0, offset, indexCount * indexSize);
             indexStart = 0;
@@ -56,7 +57,7 @@ namespace Ogre
             OgreAssert(elemPos->getSize() == 12, "");
 
             HardwareVertexBufferSharedPtr vbuf = data->vertexBufferBinding->getBuffer(elemPos->getSource());
-            vertexBuffer = Ogre::SharedPtr<Vector3>(new Vector3[vertexCount]);
+            vertexBuffer = std::make_shared<DefaultHardwareBuffer>(vertexCount * 3 * sizeof(float));
 
             // Lock the buffer for reading.
             unsigned char* vStart = static_cast<unsigned char*>(vbuf->lock(HardwareBuffer::HBL_READ_ONLY));
@@ -72,8 +73,8 @@ namespace Ogre
             elemNormal = data->vertexDeclaration->findElementBySemantic(VES_NORMAL);
             useVertexNormals = useVertexNormals && (elemNormal != 0);
             if(useVertexNormals){
-                vertexNormalBuffer = Ogre::SharedPtr<Vector3>(new Vector3[vertexCount]);
-                pNormalOut = vertexNormalBuffer.get();
+                vertexNormalBuffer = std::make_shared<DefaultHardwareBuffer>(vertexCount * 3 * sizeof(float));
+                pNormalOut = (Vector3 *)vertexNormalBuffer->lock(HardwareBuffer::HBL_DISCARD);
                 if(elemNormal->getSource() == elemPos->getSource()){
                     vNormalBuf = vbuf;
                     vNormal = vStart;
@@ -85,7 +86,7 @@ namespace Ogre
             }
 
             // Loop through all vertices and insert them to the Unordered Map.
-            Vector3* pOut = vertexBuffer.get();
+            Vector3* pOut = (Vector3 *)vertexBuffer->lock(HardwareBuffer::HBL_DISCARD);
             Vector3* pEnd = pOut + vertexCount;
             for (; pOut < pEnd; pOut++) {
                 float* pFloat;
@@ -106,6 +107,10 @@ namespace Ogre
             vbuf->unlock();
             if(elemNormal && elemNormal->getSource() != elemPos->getSource()){
                 vNormalBuf->unlock();
+            }
+            vertexBuffer->unlock();
+            if (useVertexNormals){
+                vertexNormalBuffer->unlock();
             }
         }
     }
