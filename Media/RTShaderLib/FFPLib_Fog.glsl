@@ -86,7 +86,7 @@ void FFP_PixelFog(in float depth,
 				   in vec4 baseColor,
 				   out vec4 oColor)
 {
-	float fogFactor = 0;
+	float fogFactor = 0.0;
 	FFP_FogFactor(depth, fogParams, fogFactor);
 	oColor = mix(fogColor, baseColor, fogFactor);
 }
