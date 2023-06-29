@@ -170,14 +170,6 @@ namespace Ogre {
             std::vector<uint8> tmpdata(size);
             for (uint32 mip = 0; mip <= mNumMipmaps; mip++)
             {
-#if OGRE_DEBUG_MODE
-                LogManager::getSingleton().logMessage("GLES2Texture::create - Mip: " + StringConverter::toString(mip) +
-                                                      " Width: " + StringConverter::toString(width) +
-                                                      " Height: " + StringConverter::toString(height) +
-                                                      " Internal Format: " + StringUtil::format("%x", internalformat) +
-                                                      " Format: " + StringUtil::format("%x", format)
-                                                       );
-#endif
                 size = static_cast<GLsizei>(PixelUtil::getMemorySize(width, height, depth, mFormat));
                 
                 switch(mTextureType)
@@ -230,13 +222,6 @@ namespace Ogre {
 
         if(hasGLES30)
         {
-#if OGRE_DEBUG_MODE
-            LogManager::getSingleton().logMessage("GLES2Texture::create - Name: " + mName +
-                                                      " ID: " + StringConverter::toString(mTextureID) +
-                                                      " Width: " + StringConverter::toString(width) +
-                                                      " Height: " + StringConverter::toString(height) +
-                                                      " Internal Format: " + StringUtil::format("%x", internalformat));
-#endif
             switch(mTextureType)
             {
                 case TEX_TYPE_1D:
@@ -259,17 +244,6 @@ namespace Ogre {
         // Run through this process to pregenerate mipmap pyramid
         for(uint32 mip = 0; mip <= mNumMipmaps; mip++)
         {
-#if OGRE_DEBUG_MODE
-            LogManager::getSingleton().logMessage("GLES2Texture::create - Mip: " + StringConverter::toString(mip) +
-                                                  " Name: " + mName +
-                                                  " ID: " + StringConverter::toString(mTextureID) +
-                                                  " Width: " + StringConverter::toString(width) +
-                                                  " Height: " + StringConverter::toString(height) +
-                                                  " Internal Format: " + StringUtil::format("%x", internalformat) +
-                                                  " Format: " + StringUtil::format("%x", format) +
-                                                  " Datatype: " + StringUtil::format("%x", datatype)
-                                                  );
-#endif
             // Normal formats
             switch(mTextureType)
             {
