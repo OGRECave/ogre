@@ -203,14 +203,12 @@ bool TerrainSurface::createCpuSubPrograms(ProgramSet* programSet)
     ParameterPtr viewPos;
     if (mUseNormalMapping && mUseParallaxMapping)
     {
+        psProgram->addPreprocessorDefines("TERRAIN_PARALLAX_MAPPING");
         if (mUseParallaxOcclusionMapping)
         {
-            psProgram->addPreprocessorDefines("TERRAIN_PARALLAX_OCCLUSION_MAPPING");
+            psProgram->addPreprocessorDefines("POM_MAX_DISTANCE=400.0,POM_LAYER_COUNT=32");
         }
-        else
-        {
-            psProgram->addPreprocessorDefines("TERRAIN_PARALLAX_MAPPING");
-        }
+
         // assuming: lighting stage computed this
         auto vsOutViewPos = vsMain->resolveOutputParameter(Parameter::SPC_POSITION_VIEW_SPACE);
         viewPos = psMain->resolveInputParameter(vsOutViewPos);
@@ -275,20 +273,13 @@ bool TerrainSurface::createCpuSubPrograms(ProgramSet* programSet)
         std::vector<Operand> args = {blendWeight, In(uvPS), In(mUVMul[l/4]).mask(channel[l % 4])};
         if (mUseNormalMapping)
         {
-            if (mUseParallaxMapping && !mUseParallaxOcclusionMapping)
+            if (mUseParallaxMapping)
             {
                 args.push_back(In(viewPos));
                 args.push_back(In(0.04)); //Scale
                 args.push_back(In(psOutTBN));
             }
-            else if (mUseParallaxOcclusionMapping)
-            {
-                args.push_back(In(viewPos));
-                args.push_back(In(0.04)); // Scale
-                args.push_back(In(32));                 // Layers
-                args.push_back(In(400));                // Distance
-                args.push_back(In(psOutTBN));
-            }
+
             auto normtex = psProgram->resolveParameter(GCT_SAMPLER2D, "normtex", texUnit++);
             args.push_back(In(normtex));
             args.push_back(Out(TSnormal));

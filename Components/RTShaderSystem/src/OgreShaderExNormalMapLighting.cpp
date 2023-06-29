@@ -68,6 +68,9 @@ bool NormalMapLighting::createCpuSubPrograms(ProgramSet* programSet)
     psProgram->addDependency(FFP_LIB_TEXTURING);
     psProgram->addDependency(SGX_LIB_NORMALMAP);
 
+    if (mNormalMapSpace == NMS_PARALLAX_OCCLUSION)
+        psProgram->addPreprocessorDefines("POM_MAX_DISTANCE=400.0,POM_LAYER_COUNT=32");
+
     // Resolve texture coordinates.
     auto vsInTexcoord = vsMain->resolveInputParameter(
         Parameter::Content(Parameter::SPC_TEXTURE_COORDINATE0 + mVSTexCoordSetIndex), GCT_FLOAT2);
@@ -98,33 +101,15 @@ bool NormalMapLighting::createCpuSubPrograms(ProgramSet* programSet)
     auto psOutTBN = psMain->resolveLocalParameter(GpuConstantType::GCT_MATRIX_3X3, "TBN");
     fstage.callFunction("SGX_CalculateTBN", {In(viewNormal), In(psInTangent), Out(psOutTBN)});
 
-    if (mNormalMapSpace == NMS_PARALLAX)
+    if (mNormalMapSpace == NMS_PARALLAX || mNormalMapSpace == NMS_PARALLAX_OCCLUSION)
     {
         // assuming: lighting stage computed this
         auto vsOutViewPos = vsMain->resolveOutputParameter(Parameter::SPC_POSITION_VIEW_SPACE);
         auto viewPos = psMain->resolveInputParameter(vsOutViewPos);
 
-        // TODO: user specificed scale and bias
         fstage.callFunction("SGX_Generate_Parallax_Texcoord",
                             {In(normalMapSampler), In(psInTexcoord), In(viewPos), In(mParallaxHeightScale),
                              In(psOutTBN), Out(psInTexcoord)});
-
-        // overwrite texcoord0 unconditionally, only one texcoord set is supported with parallax mapping
-        // we are before FFP_PS_TEXTURING, so the new value will be used
-        auto texcoord0 = psMain->resolveInputParameter(Parameter::SPC_TEXTURE_COORDINATE0, GCT_FLOAT2);
-        fstage.assign(psInTexcoord, texcoord0);
-    }
-
-    if (mNormalMapSpace == NMS_PARALLAX_OCCLUSION)
-    {
-        // assuming: lighting stage computed this
-        auto vsOutViewPos = vsMain->resolveOutputParameter(Parameter::SPC_POSITION_VIEW_SPACE);
-        auto viewPos = psMain->resolveInputParameter(vsOutViewPos);
-
-        // TODO: user specificed scale and bias
-        fstage.callFunction("SGX_Generate_Parallax_Occlusion_Texcoord",
-                            {In(normalMapSampler), In(psInTexcoord), In(viewPos), In(mParallaxHeightScale),
-                             In(32), In(400.0), In(psOutTBN), Out(psInTexcoord)});
 
         // overwrite texcoord0 unconditionally, only one texcoord set is supported with parallax mapping
         // we are before FFP_PS_TEXTURING, so the new value will be used
@@ -232,8 +217,7 @@ bool NormalMapLighting::setParameter(const String& name, const String& value)
 
     if (name == "parallax_heightscale")
     {
-        mParallaxHeightScale = StringConverter::parseReal(value);
-        return true;
+        return StringConverter::parse(value, mParallaxHeightScale);
     }
 
     return false;
