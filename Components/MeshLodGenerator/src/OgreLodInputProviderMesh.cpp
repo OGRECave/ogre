@@ -57,17 +57,16 @@ namespace Ogre
         size_t vertexCount = 0;
         size_t vertexLookupSize = 0;
         size_t sharedVertexLookupSize = 0;
-        size_t submeshCount = mMesh->getNumSubMeshes();
+        size_t submeshCount = getSubMeshCount();
         for (size_t i = 0; i < submeshCount; i++) {
-            const SubMesh* submesh = mMesh->getSubMesh(i);
-            trianglesCount += getTriangleCount(submesh->operationType , submesh->indexData->indexCount);
-            if (!submesh->useSharedVertices) {
-                size_t count = submesh->vertexData->vertexCount;
+            trianglesCount += getTriangleCount(getSubMeshRenderOp(i), getSubMeshIndexCount(i));
+            if (!getSubMeshUseSharedVertices(i)) {
+                size_t count = getSubMeshOwnVertexCount(i);
                 vertexLookupSize = std::max(vertexLookupSize, count);
                 vertexCount += count;
             } else if (!sharedVerticesAdded) {
                 sharedVerticesAdded = true;
-                sharedVertexLookupSize = mMesh->sharedVertexData->vertexCount;
+                sharedVertexLookupSize = getMeshSharedVertexCount();
                 vertexCount += sharedVertexLookupSize;
             }
         }
@@ -86,27 +85,30 @@ namespace Ogre
     void LodInputProviderMesh::initialize( LodData* data )
     {
 #if OGRE_DEBUG_MODE
-        data->mMeshName = mMesh->getName();
+        data->mMeshName = getMeshName();
 #endif
-        data->mMeshBoundingSphereRadius = mMesh->getBoundingSphereRadius();
-        size_t submeshCount = mMesh->getNumSubMeshes();
+        data->mMeshBoundingSphereRadius = getMeshBoundingSphereRadius();
+        size_t submeshCount = getSubMeshCount();
         for (size_t i = 0; i < submeshCount; ++i) {
-            const SubMesh* submesh = mMesh->getSubMesh(i);
-            VertexData* vertexData = (submesh->useSharedVertices ? mMesh->sharedVertexData : submesh->vertexData);
-            addVertexData(data, vertexData, submesh->useSharedVertices);
-            if(submesh->indexData->indexCount > 0)
-                addIndexData(data, submesh->indexData, submesh->useSharedVertices, i, submesh->operationType);
+            addVertexData(data, i);
+            addIndexData(data, i);
         }
 
         // These were only needed for addIndexData() and addVertexData().
         mSharedVertexLookup.clear();
         mVertexLookup.clear();
     }
-    void LodInputProviderMesh::addVertexData(LodData* data, VertexData* vertexData, bool useSharedVertexLookup)
+    void LodInputProviderMesh::addVertexData(LodData* data, size_t subMeshIndex)
     {
-        if ((useSharedVertexLookup && !mSharedVertexLookup.empty())) { // We already loaded the shared vertex buffer.
-            return;
+        bool useSharedVertices = getSubMeshUseSharedVertices(subMeshIndex);
+
+        if (useSharedVertices && !mSharedVertexLookup.empty()) {
+            return; // We already loaded the shared vertex buffer.
         }
+
+        const SubMesh* submesh = mMesh->getSubMesh(subMeshIndex);
+        VertexData* vertexData = (submesh->useSharedVertices ? mMesh->sharedVertexData : submesh->vertexData);
+
         OgreAssert(vertexData->vertexCount != 0, "");
 
         // Locate position element and the buffer to go with it.
@@ -123,7 +125,7 @@ namespace Ogre
         size_t vSize = vbuf->getVertexSize();
         unsigned char* vEnd = vertex + vertexData->vertexCount * vSize;
 
-        VertexLookupList& lookup = useSharedVertexLookup ? mSharedVertexLookup : mVertexLookup;
+        VertexLookupList& lookup = useSharedVertices ? mSharedVertexLookup : mVertexLookup;
         lookup.clear();
 
         HardwareVertexBufferSharedPtr vNormalBuf;
@@ -194,18 +196,52 @@ namespace Ogre
             vNormalBuf->unlock();
         }
     }
-    void LodInputProviderMesh::addIndexData(LodData* data, IndexData* indexData, bool useSharedVertexLookup, ushort submeshID, RenderOperation::OperationType renderOp)
+    void LodInputProviderMesh::addIndexData(LodData* data, size_t subMeshIndex)
     {
-        const HardwareIndexBufferSharedPtr& ibuf = indexData->indexBuffer;
-        size_t isize = ibuf->getIndexSize();
-        data->mIndexBufferInfoList[submeshID].indexSize = isize;
-        data->mIndexBufferInfoList[submeshID].indexCount = indexData->indexCount;
-        if (indexData->indexCount == 0) {
+        IndexData* indexData = mMesh->getSubMesh(subMeshIndex)->indexData;
+        const HardwareIndexBufferPtr& ibuf = indexData->indexBuffer;
+
+        if (indexData->indexCount == 0 || ibuf == nullptr) {
             // Locking a zero length buffer on Linux with nvidia cards fails.
             return;
         }
 
-        addIndexDataImpl(data, ibuf, isize, useSharedVertexLookup, submeshID, renderOp);
-    }   
+        data->mIndexBufferInfoList[subMeshIndex].indexSize = ibuf->getIndexSize();
+        data->mIndexBufferInfoList[subMeshIndex].indexCount = indexData->indexCount;
 
+        addIndexDataImpl(data, ibuf, indexData->indexStart, indexData->indexCount, subMeshIndex);
+    }
+
+    const String & LodInputProviderMesh::getMeshName()
+    {
+        return mMesh->getName();
+    }
+    size_t LodInputProviderMesh::getMeshSharedVertexCount()
+    {
+        return mMesh->sharedVertexData->vertexCount;
+    }
+    float LodInputProviderMesh::getMeshBoundingSphereRadius()
+    {
+        return mMesh->getBoundingSphereRadius();
+    }
+    size_t LodInputProviderMesh::getSubMeshCount()
+    {
+        return mMesh->getNumSubMeshes();
+    }
+    bool LodInputProviderMesh::getSubMeshUseSharedVertices(size_t subMeshIndex)
+    {
+        return mMesh->getSubMesh(subMeshIndex)->useSharedVertices;
+    }
+    size_t LodInputProviderMesh::getSubMeshOwnVertexCount(size_t subMeshIndex)
+    {
+        return mMesh->getSubMesh(subMeshIndex)->vertexData->vertexCount;
+    }
+    size_t LodInputProviderMesh::getSubMeshIndexCount(size_t subMeshIndex)
+    {
+        return mMesh->getSubMesh(subMeshIndex)->indexData->indexCount;
+    }
+    RenderOperation::OperationType LodInputProviderMesh::getSubMeshRenderOp(size_t subMeshIndex)
+    {
+        return mMesh->getSubMesh(subMeshIndex)->operationType;
+    }
 }

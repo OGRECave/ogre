@@ -56,8 +56,22 @@ protected:
 
     void tuneContainerSize(LodData* data);
     void initialize(LodData* data);
-    void addIndexData(LodData* data, IndexData* indexData, bool useSharedVertexLookup, ushort submeshID, RenderOperation::OperationType renderOp);
-    void addVertexData(LodData* data, VertexData* vertexData, bool useSharedVertexLookup);
+    void addIndexData(LodData* data, size_t subMeshIndex);
+    void addVertexData(LodData* data, size_t subMeshIndex);
+
+
+
+    const String & getMeshName() override;
+    size_t getMeshSharedVertexCount() override;
+    float getMeshBoundingSphereRadius() override;
+
+    size_t getSubMeshCount() override;
+
+    bool getSubMeshUseSharedVertices(size_t subMeshIndex) override;
+    size_t getSubMeshOwnVertexCount(size_t subMeshIndex) override;
+    size_t getSubMeshIndexCount(size_t subMeshIndex) override;
+    RenderOperation::OperationType getSubMeshRenderOp(size_t subMeshIndex) override;
+
 };
 
 }
