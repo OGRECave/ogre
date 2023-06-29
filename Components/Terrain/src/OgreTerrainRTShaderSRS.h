@@ -54,7 +54,7 @@ protected:
     bool mUseNormalMapping = true;
     bool mUseSpecularMapping = false;
     bool mUseParallaxMapping = false;
-    bool mUseSteepParallaxMapping = false;
+    bool mUseParallaxOcclusionMapping = false;
     bool mForCompositeMap = false;
     int mNumLayers = 0;
 };

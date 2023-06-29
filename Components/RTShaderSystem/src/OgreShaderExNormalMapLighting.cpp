@@ -48,7 +48,7 @@ NormalMapLighting::NormalMapLighting()
     mNormalMapSpace = NMS_TANGENT;
     mNormalMapSampler = TextureManager::getSingleton().createSampler();
     mNormalMapSampler->setMipmapBias(-1.0);
-    mParallaxScale = 0.04f;
+    mParallaxHeightScale = 0.04f;
 }
 
 //-----------------------------------------------------------------------
@@ -106,7 +106,7 @@ bool NormalMapLighting::createCpuSubPrograms(ProgramSet* programSet)
 
         // TODO: user specificed scale and bias
         fstage.callFunction("SGX_Generate_Parallax_Texcoord",
-                            {In(normalMapSampler), In(psInTexcoord), In(viewPos), In(mParallaxScale),
+                            {In(normalMapSampler), In(psInTexcoord), In(viewPos), In(mParallaxHeightScale),
                              In(psOutTBN), Out(psInTexcoord)});
 
         // overwrite texcoord0 unconditionally, only one texcoord set is supported with parallax mapping
@@ -115,15 +115,15 @@ bool NormalMapLighting::createCpuSubPrograms(ProgramSet* programSet)
         fstage.assign(psInTexcoord, texcoord0);
     }
 
-    if (mNormalMapSpace == NMS_PARALLAX_STEEP)
+    if (mNormalMapSpace == NMS_PARALLAX_OCCLUSION)
     {
         // assuming: lighting stage computed this
         auto vsOutViewPos = vsMain->resolveOutputParameter(Parameter::SPC_POSITION_VIEW_SPACE);
         auto viewPos = psMain->resolveInputParameter(vsOutViewPos);
 
         // TODO: user specificed scale and bias
-        fstage.callFunction("SGX_Generate_Parallax_Steep_Texcoord",
-                            {In(normalMapSampler), In(psInTexcoord), In(viewPos), In(mParallaxScale),
+        fstage.callFunction("SGX_Generate_Parallax_Occlusion_Texcoord",
+                            {In(normalMapSampler), In(psInTexcoord), In(viewPos), In(mParallaxHeightScale),
                              In(32), In(400.0), In(psOutTBN), Out(psInTexcoord)});
 
         // overwrite texcoord0 unconditionally, only one texcoord set is supported with parallax mapping
@@ -201,9 +201,9 @@ bool NormalMapLighting::setParameter(const String& name, const String& value)
             setNormalMapSpace(NMS_PARALLAX);
             return true;
         }
-        if (value == "parallax_steep")
+        if (value == "parallax_occlusion")
         {
-            setNormalMapSpace(NMS_PARALLAX_STEEP);
+            setNormalMapSpace(NMS_PARALLAX_OCCLUSION);
             return true;
         }
         return false;
@@ -230,9 +230,9 @@ bool NormalMapLighting::setParameter(const String& name, const String& value)
         return true;
     }
 
-    if (name == "parallax_scale")
+    if (name == "parallax_heightscale")
     {
-        mParallaxScale = StringConverter::parseReal(value);
+        mParallaxHeightScale = StringConverter::parseReal(value);
         return true;
     }
 

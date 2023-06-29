@@ -27,13 +27,12 @@ void getShadowFactor(in sampler2D lightmap, in vec2 uv, inout float shadowFactor
 }
 
 #define MIN_BLEND_WEIGHT 0.0039 // 1/255
-#define TERRAIN_SURFACE true
 
 void blendTerrainLayer(in float blendWeight, in f32vec2 uv0, in float uvMul,
 #ifdef TERRAIN_PARALLAX_MAPPING
                     in vec3 viewPos, in float scaleBias, in mat3 TBN,
 #endif
-#ifdef TERRAIN_STEEP_PARALLAX_MAPPING
+#ifdef TERRAIN_PARALLAX_OCCLUSION_MAPPING
                     in vec3 viewPos, in float scaleBias, in float parallaxLayerCount, in float parallaxDistance, in mat3 TBN,
 #endif
 #ifdef TERRAIN_NORMAL_MAPPING
@@ -50,8 +49,8 @@ void blendTerrainLayer(in float blendWeight, in f32vec2 uv0, in float uvMul,
 #ifdef TERRAIN_PARALLAX_MAPPING
     SGX_Generate_Parallax_Texcoord(normtex, uv, viewPos, scaleBias, TBN, uv);
 #endif
-#ifdef TERRAIN_STEEP_PARALLAX_MAPPING
-    SGX_Generate_Parallax_Steep_Texcoord(normtex, uv, viewPos, scaleBias, parallaxLayerCount, parallaxDistance, TBN, uv);
+#ifdef TERRAIN_PARALLAX_OCCLUSION_MAPPING
+    SGX_Generate_Parallax_Occlusion_Texcoord(normtex, uv, viewPos, scaleBias, parallaxLayerCount, parallaxDistance, TBN, uv);
 #endif
 
     // sample diffuse texture

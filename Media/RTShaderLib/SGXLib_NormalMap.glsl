@@ -105,10 +105,10 @@ void SGX_Generate_Parallax_Texcoord(in sampler2D normalHeightMap,
     newTexCoord = newTexCoord - p;
 }
 
-void SGX_Generate_Parallax_Steep_Texcoord(in sampler2D normalHeightMap,
+void SGX_Generate_Parallax_Occlusion_Texcoord(in sampler2D normalHeightMap,
 						in vec2 texCoord,
 						in vec3 viewPos,
-						in float scaleBias,
+						in float heightScale,
 						in float layerCount,
 						in float maxDistance,
 						in mat3 TBN,
@@ -117,7 +117,7 @@ void SGX_Generate_Parallax_Steep_Texcoord(in sampler2D normalHeightMap,
 	//Calculate eye direction
 	vec3 eyeVec = mul(-viewPos, TBN);
 	eyeVec = normalize(eyeVec);
-	#ifndef TERRAIN_STEEP_PARALLAX_MAPPING
+	#ifndef TERRAIN_PARALLAX_OCCLUSION_MAPPING
 		eyeVec.y = -eyeVec.y; //Inverse y
 	#endif
 
@@ -129,7 +129,7 @@ void SGX_Generate_Parallax_Steep_Texcoord(in sampler2D normalHeightMap,
 		//Configure steep mapping layering.
 		float layerDepth = 1.0 / layerCount;
 		float currentLayerDepth = 0.0;
-		vec2 parallaxShift = (eyeVec.xy) * scaleBias;
+		vec2 parallaxShift = (eyeVec.xy) * heightScale;
 		vec2 deltaTexCoords = parallaxShift / layerCount;
 
 		float currentDepthMapValue = 1.0f - texture2D(normalHeightMap, newTexCoord).a;

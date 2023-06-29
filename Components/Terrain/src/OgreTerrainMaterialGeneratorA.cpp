@@ -96,7 +96,7 @@ namespace Ogre
         : mParent(parent)
         , mLayerNormalMappingEnabled(true)
         , mLayerParallaxMappingEnabled(true)
-        , mLayerSteepParallaxMappingEnabled(true)
+        , mLayerParallaxOcclusionMappingEnabled(true)
         , mLayerSpecularMappingEnabled(true)
         , mPSSM(0)
     {
@@ -132,11 +132,11 @@ namespace Ogre
         }
     }
     //---------------------------------------------------------------------
-    void TerrainMaterialGeneratorA::SM2Profile::setLayerSteepParallaxMappingEnabled(bool enabled)
+    void TerrainMaterialGeneratorA::SM2Profile::setLayerParallaxOcclusionMappingEnabled(bool enabled)
     {
-        if (enabled != mLayerSteepParallaxMappingEnabled)
+        if (enabled != mLayerParallaxOcclusionMappingEnabled)
         {
-            mLayerSteepParallaxMappingEnabled = enabled;
+            mLayerParallaxOcclusionMappingEnabled = enabled;
             mParent->_markChanged();
         }
     }
@@ -291,7 +291,7 @@ namespace Ogre
             auto surface = mainRenderState->getSubRenderState("TerrainSurface");
             OgreAssert(surface, "TerrainSurface SubRenderState not found");
             surface->setParameter("use_parallax_mapping", std::to_string(mLayerParallaxMappingEnabled));
-            surface->setParameter("use_steep_parallax_mapping", std::to_string(mLayerSteepParallaxMappingEnabled));
+            surface->setParameter("use_parallax_occlusion_mapping", std::to_string(mLayerParallaxOcclusionMappingEnabled));
             surface->setParameter("use_specular_mapping", std::to_string(mLayerSpecularMappingEnabled));
             if(isShadowingEnabled(HIGH_LOD, terrain))
             {

@@ -93,10 +93,10 @@ namespace Ogre
             void setLayerParallaxMappingEnabled(bool enabled);
             /** Whether to support steep parallax mapping per layer in the shader (default true).
              */
-            void setLayerSteepParallaxMappingEnabled(bool enabled);
+            void setLayerParallaxOcclusionMappingEnabled(bool enabled);
             /** Whether to support steep parallax mapping per layer in the shader (default true).
              */
-            bool isLayerSteepParallaxMappingEnabled() const { return mLayerSteepParallaxMappingEnabled; }
+            bool isLayerOcclusionMappingEnabled() const { return mLayerParallaxOcclusionMappingEnabled; }
             /** Whether to support specular mapping per layer in the shader (default true). 
             */
             bool isLayerSpecularMappingEnabled() const  { return mLayerSpecularMappingEnabled; }
@@ -129,7 +129,7 @@ namespace Ogre
             TerrainMaterialGeneratorA* mParent;
             bool mLayerNormalMappingEnabled;
             bool mLayerParallaxMappingEnabled;
-            bool mLayerSteepParallaxMappingEnabled;
+            bool mLayerParallaxOcclusionMappingEnabled;
             bool mLayerSpecularMappingEnabled;
             PSSMShadowCameraSetup* mPSSM;
         };

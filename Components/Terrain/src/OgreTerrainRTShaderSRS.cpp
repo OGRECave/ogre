@@ -102,9 +102,9 @@ bool TerrainSurface::setParameter(const String& name, const String& value)
     {
         return StringConverter::parse(value, mUseParallaxMapping);
     }
-    else if (name == "use_steep_parallax_mapping")
+    else if (name == "use_parallax_occlusion_mapping")
     {
-        return StringConverter::parse(value, mUseSteepParallaxMapping);
+        return StringConverter::parse(value, mUseParallaxOcclusionMapping);
     }
     else if (name == "use_specular_mapping")
     {
@@ -203,9 +203,9 @@ bool TerrainSurface::createCpuSubPrograms(ProgramSet* programSet)
     ParameterPtr viewPos;
     if (mUseNormalMapping && mUseParallaxMapping)
     {
-        if (mUseSteepParallaxMapping)
+        if (mUseParallaxOcclusionMapping)
         {
-            psProgram->addPreprocessorDefines("TERRAIN_STEEP_PARALLAX_MAPPING");
+            psProgram->addPreprocessorDefines("TERRAIN_PARALLAX_OCCLUSION_MAPPING");
         }
         else
         {
@@ -275,13 +275,13 @@ bool TerrainSurface::createCpuSubPrograms(ProgramSet* programSet)
         std::vector<Operand> args = {blendWeight, In(uvPS), In(mUVMul[l/4]).mask(channel[l % 4])};
         if (mUseNormalMapping)
         {
-            if (mUseParallaxMapping && !mUseSteepParallaxMapping)
+            if (mUseParallaxMapping && !mUseParallaxOcclusionMapping)
             {
                 args.push_back(In(viewPos));
                 args.push_back(In(0.04)); //Scale
                 args.push_back(In(psOutTBN));
             }
-            else if (mUseSteepParallaxMapping)
+            else if (mUseParallaxOcclusionMapping)
             {
                 args.push_back(In(viewPos));
                 args.push_back(In(0.04)); // Scale

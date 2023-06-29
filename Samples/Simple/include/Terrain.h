@@ -43,7 +43,7 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
 {
 public:
     Sample_Terrain()
-        : mTerrainGlobals(0), mTerrainGroup(0), mTerrainPaging(0), mPageManager(0), mFly(false), mSteepParallax(false),
+        : mTerrainGlobals(0), mTerrainGroup(0), mTerrainPaging(0), mPageManager(0), mFly(false), mParallaxOcclusion(false),
           mFallVelocity(0), mMode(MODE_NORMAL), mLayerEdit(1), mBrushSizeTerrainSpace(0.02), mHeightUpdateCountDown(0),
           mTerrainPos(1000, 0, 5000), mTerrainsImported(false), mKeyPressed(0)
 
@@ -326,9 +326,9 @@ public:
         {
             mFly = mFlyBox->isChecked();
         }
-        if (box == mSteepParallaxBox)
+        if (box == mParallaxOcclusionBox)
         {
-            mSteepParallax = mSteepParallaxBox->isChecked();
+            mParallaxOcclusion = mParallaxOcclusionBox->isChecked();
             changeShadows();
         }
     }
@@ -352,7 +352,7 @@ protected:
     DummyPageProvider mDummyPageProvider;
 #endif
     bool mFly;
-    bool mSteepParallax;
+    bool mParallaxOcclusion;
     Real mFallVelocity;
     enum Mode
     {
@@ -380,7 +380,7 @@ protected:
     SelectMenu* mEditMenu;
     SelectMenu* mShadowsMenu;
     CheckBox* mFlyBox;
-    CheckBox* mSteepParallaxBox;
+    CheckBox* mParallaxOcclusionBox;
     //! [infolabel]
     OgreBites::Label* mInfoLabel = nullptr;
     //! [infolabel]
@@ -497,7 +497,7 @@ protected:
         }
 
         // Disable steep parallax by default
-        matProfile->setLayerSteepParallaxMappingEnabled(false);
+        matProfile->setLayerParallaxOcclusionMappingEnabled(false);
 
         //! [composite_lighting]
         // Important to set these so that the terrain knows what to use for baked (non-realtime) data
@@ -619,8 +619,8 @@ protected:
             mSceneMgr->setShadowTechnique(SHADOWTYPE_NONE);
         }
 
-        // Update steep parallax
-        matProfile->setLayerSteepParallaxMappingEnabled(mSteepParallax);
+        // Update parallax occlusion
+        matProfile->setLayerParallaxOcclusionMappingEnabled(mParallaxOcclusion);
 
         mShaderGenerator->invalidateScheme(MSN_SHADERGEN);
     }
@@ -668,8 +668,8 @@ protected:
         mFlyBox = mTrayMgr->createCheckBox(TL_BOTTOM, "Fly", "Fly");
         mFlyBox->setChecked(false, false);
 
-        mSteepParallaxBox = mTrayMgr->createCheckBox(TL_BOTTOM, "SteepParallaxOcclusion", "Steep Parallax Occlusion");
-        mSteepParallaxBox->setChecked(false, false);
+        mParallaxOcclusionBox = mTrayMgr->createCheckBox(TL_BOTTOM, "ParallaxOcclusion", "Parallax Occlusion Mapping");
+        mParallaxOcclusionBox->setChecked(false, false);
 
         mShadowsMenu = mTrayMgr->createLongSelectMenu(TL_BOTTOM, "Shadows", "Shadows", 370, 250, 3);
         mShadowsMenu->addItem("None");

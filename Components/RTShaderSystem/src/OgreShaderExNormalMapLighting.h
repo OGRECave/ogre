@@ -85,7 +85,7 @@ public:
         NMS_OBJECT = 1,
         NMS_TANGENT = 2,
         NMS_PARALLAX = 6,
-        NMS_PARALLAX_STEEP = 7
+        NMS_PARALLAX_OCCLUSION = 7
     };
 
     /** 
@@ -121,7 +121,7 @@ protected:
     // The normal map space.
     NormalMapSpace mNormalMapSpace;
     // Parallax mapping scale
-    Real mParallaxScale;
+    float mParallaxHeightScale;
 };
 
 
