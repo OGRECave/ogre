@@ -129,16 +129,6 @@ namespace Ogre {
         mGLInternalFormat =
             GLES2PixelUtil::getGLInternalFormat(mFormat, parent->isHardwareGammaEnabled());
 
-#if OGRE_DEBUG_MODE
-        // Log a message
-        std::stringstream str;
-        str << "GLES2HardwarePixelBuffer constructed for texture " << parent->getName()
-            << " id " << mTextureID << " face " << face << " level " << mLevel << ":"
-            << " width=" << mWidth << " height="<< mHeight << " depth=" << mDepth
-            << " format=" << PixelUtil::getFormatName(mFormat);
-        LogManager::getSingleton().logMessage(LML_NORMAL, str.str());
-#endif
-
         // Set up a pixel box
         mBuffer = PixelBox(mWidth, mHeight, mDepth, mFormat);
         
@@ -202,29 +192,8 @@ namespace Ogre {
         buffer.writeData(0, dataSize, data.data, false);
 
         void* pdata = NULL;
-#if OGRE_DEBUG_MODE
-        std::stringstream str;
-        str << "GLES2TextureBuffer::upload: " << mTextureID
-        << " pixel buffer: " << buffer.getGLBufferId()
-        << " bytes: " << mSizeInBytes
-        << " dest depth: " << dest.getDepth()
-        << " dest front: " << dest.front
-        << " datasize: " << dataSize
-        << " face: " << mFace << " level: " << mLevel
-        << " width: " << mWidth << " height: "<< mHeight << " depth: " << mDepth
-        << " format: " << PixelUtil::getFormatName(mFormat)
-        << " data format: " << PixelUtil::getFormatName(data.format);
-        LogManager::getSingleton().logMessage(LML_NORMAL, str.str());
-#endif
 #else
         void* pdata = data.getTopLeftFrontPixelPtr();
-#if OGRE_DEBUG_MODE
-        LogManager::getSingleton().logMessage("GLES2TextureBuffer::upload - ID: " + StringConverter::toString(mTextureID) +
-                                              " Target: " + StringConverter::toString(mTarget) +
-                                              " Format: " + PixelUtil::getFormatName(data.format) +
-                                              " Origin format: " + StringUtil::format("%x", GLES2PixelUtil::getGLOriginFormat(data.format)) +
-                                              " Data type: " + StringUtil::format("%x", GLES2PixelUtil::getGLOriginDataType(data.format)));
-#endif
 #endif
 
         if (PixelUtil::isCompressed(data.format))
