@@ -49,7 +49,7 @@ THE SOFTWARE.
 namespace Ogre {
     void GLES2TextureBuffer::_blitFromMemory(const PixelBox &src, const Box &dst)
     {
-        if (!mBuffer.contains(src))
+        if (!mBuffer.contains(dst))
         {
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
                         "Destination box out of range",
