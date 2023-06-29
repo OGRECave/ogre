@@ -82,7 +82,9 @@ namespace Ogre
             indexCount = std::max<size_t>(indexCount, 3);
             prevLod.indexCount = std::max<size_t>(data->mIndexBufferInfoList[i].prevIndexCount, 3u);
             prevLod.indexBufferSize = indexCount;
-            prevLod.indexBuffer = std::make_shared<DefaultHardwareBuffer>(indexCount * data->mIndexBufferInfoList[i].indexSize);
+            auto itype = data->mIndexBufferInfoList[i].indexSize == 2 ? HardwareIndexBuffer::IT_16BIT : HardwareIndexBuffer::IT_32BIT;
+            DefaultHardwareBufferManagerBase bfrMgr;
+            prevLod.indexBuffer = bfrMgr.createIndexBuffer(itype, indexCount, HBU_CPU_ONLY);
             data->mIndexBufferInfoList[i].buf.pshort = (unsigned short*)prevLod.indexBuffer->lock(HardwareBuffer::HBL_NORMAL);
             prevLod.indexBuffer->unlock(); // software buffer, safe to keep the pointer
 

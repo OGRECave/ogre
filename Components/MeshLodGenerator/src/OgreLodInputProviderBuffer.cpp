@@ -104,15 +104,15 @@ namespace Ogre
         VertexLookupList& lookup = useSharedVertexLookup ? mSharedVertexLookup : mVertexLookup;
         lookup.clear();
 
-        const Vector3* pNormalOut = vertexBuffer.vertexNormalBuffer.get();
+        const Vector3* pNormalOut = (Vector3 *)vertexBuffer.vertexNormalBuffer->lock(HardwareBuffer::HBL_READ_ONLY);
         data->mUseVertexNormals = data->mUseVertexNormals && (pNormalOut != NULL);
 
         if(!data->mUseVertexNormals)
             pNormalOut = &Vector3::ZERO;
 
         // Loop through all vertices and insert them to the Unordered Map.
-        Vector3* pOut = vertexBuffer.vertexBuffer.get();
-        Vector3* pEnd = pOut + vertexBuffer.vertexCount;
+        const Vector3* pOut = (Vector3 *)vertexBuffer.vertexBuffer->lock(HardwareBuffer::HBL_READ_ONLY);
+        const Vector3* pEnd = pOut + vertexBuffer.vertexCount;
         for (; pOut < pEnd; pOut++) {
             data->mVertexList.push_back({*pOut, *pNormalOut});
             LodData::Vertex* v = &data->mVertexList.back();
@@ -145,6 +145,8 @@ namespace Ogre
             }
             lookup.push_back(v);
         }
+        vertexBuffer.vertexBuffer->unlock();
+        vertexBuffer.vertexNormalBuffer->unlock();
     }
 
     void LodInputProviderBuffer::addIndexData(LodData* data, LodIndexBuffer& indexBuffer, bool useSharedVertexLookup, unsigned short submeshID)
