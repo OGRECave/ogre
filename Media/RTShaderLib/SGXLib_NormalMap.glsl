@@ -85,10 +85,10 @@ void SGX_Generate_Parallax_Texcoord(in sampler2D normalHeightMap,
 		return;
 
 	//Configure steep mapping layering.
-	float layerDepth = 1.0 / POM_LAYER_COUNT;
+	float layerDepth = 1.0 / float(POM_LAYER_COUNT);
 	float currentLayerDepth = 0.0;
 	vec2 parallaxShift = (eyeVec.xy) * heightScale;
-	vec2 deltaTexCoords = parallaxShift / POM_LAYER_COUNT;
+	vec2 deltaTexCoords = parallaxShift / float(POM_LAYER_COUNT);
 
 	float currentDepthMapValue = 1.0f - texture2D(normalHeightMap, newTexCoord).a;
 
