@@ -1,4 +1,3 @@
-
 /*
  * -----------------------------------------------------------------------------
  * This source file is part of OGRE
@@ -27,38 +26,27 @@
  * -----------------------------------------------------------------------------
  */
 
-#ifndef _LodOutputProviderMesh_H__
-#define _LodOutputProviderMesh_H__
-
-#include "OgreLodPrerequisites.h"
 #include "OgreLodOutputProvider.h"
-#include "OgreSharedPtr.h"
-#include "OgreHeaderPrefix.h"
 
 namespace Ogre
 {
+    HardwareIndexBufferPtr LodOutputProvider::createIndexBuffer(size_t indexCount)
+    {
+        //If the index is empty we need to create a "dummy" triangle, just to keep the index buffer from being empty.
+        //The main reason for this is that the OpenGL render system will crash with a segfault unless the index has some values.
+        //This should hopefully be removed with future versions of Ogre. The most preferred solution would be to add the
+        //ability for a submesh to be excluded from rendering for a given LOD (which isn't possible currently 2012-12-09).
+        HardwareIndexBufferPtr buffer = createIndexBufferImpl(indexCount ? indexCount : 3);
 
-class LodOutputProviderMesh :
-    public LodOutputProvider
-{
-public:
-    LodOutputProviderMesh(MeshPtr mesh) : mMesh(mesh) {}
-    void prepare(LodData* data) override;
-    void finalize(LodData* data) override {}
-    void bakeManualLodLevel(LodData* data, String& manualMeshName, int lodIndex) override;
-    void bakeLodLevel(LodData* data, int lodIndex) override;
-protected:
-    MeshPtr mMesh;
+        //Check if we should fill it with a "dummy" triangle.
+        if (indexCount == 0)
+        {
+            void * addr = buffer->lock(HardwareBuffer::HBL_DISCARD);
+            memset(addr, 0, 3 * buffer->getIndexSize());
+            buffer->unlock();
+        }
 
-    size_t getSubMeshCount() override;
-
-    HardwareIndexBufferPtr createIndexBufferImpl(size_t indexCount) override;
-
-    void createSubMeshLodIndexData(size_t subMeshIndex, int lodIndex, const HardwareIndexBufferPtr & indexBuffer, size_t indexStart, size_t indexCount) override;
-};
+        return buffer;
+    }
 
 }
-
-#include "OgreHeaderSuffix.h"
-
-#endif
