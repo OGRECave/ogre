@@ -44,9 +44,7 @@ namespace Ogre
     class LodInputProviderBuffer;
     class LodOutputProvider;
     class LodOutputProviderMesh;
-    class LodOutputProviderCompressedMesh;
     class LodOutputProviderBuffer;
-    class LodOutputProviderCompressedBuffer;
     class LodOutsideMarker;
 
 

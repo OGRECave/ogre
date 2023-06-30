@@ -153,22 +153,14 @@ void MeshLodGenerator::_resolveComponents(LodConfig& lodConfig,
             input = LodInputProviderPtr(new LodInputProviderBuffer(lodConfig.mesh));
         }
         if(!output) {
-            if(lodConfig.advanced.useCompression) {
-                output = LodOutputProviderPtr(new LodOutputProviderCompressedBuffer(lodConfig.mesh));
-            } else {
-                output = LodOutputProviderPtr(new LodOutputProviderBuffer(lodConfig.mesh));
-            }
+            output = LodOutputProviderPtr(new LodOutputProviderBuffer(lodConfig.mesh, lodConfig.advanced.useCompression));
         }
     } else {
         if(!input) {
             input = LodInputProviderPtr(new LodInputProviderMesh(lodConfig.mesh));
         }
         if(!output) {
-            if(lodConfig.advanced.useCompression) {
-                output = LodOutputProviderPtr(new LodOutputProviderCompressedMesh(lodConfig.mesh));
-            } else {
-                output = LodOutputProviderPtr(new LodOutputProviderMesh(lodConfig.mesh));
-            }
+            output = LodOutputProviderPtr(new LodOutputProviderMesh(lodConfig.mesh, lodConfig.advanced.useCompression));
         }
     }
 }
