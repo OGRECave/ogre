@@ -59,16 +59,19 @@ struct _OgreLodExport LodData {
 
     struct Edge;
     struct Vertex;
+    struct Line;
     struct Triangle;
     struct VertexHash;
     struct VertexEqual;
 
     typedef std::vector<Vertex> VertexList;
+    typedef std::vector<Line> LineList;
     typedef std::vector<Triangle> TriangleList;
     typedef std::unordered_set<Vertex*, VertexHash, VertexEqual> UniqueVertexSet;
     typedef std::multimap<Real, Vertex*> CollapseCostHeap;
 
     typedef VectorSet<Edge, 8> VEdges;
+    typedef VectorSet<Line*, 7> VLines;
     typedef VectorSet<Triangle*, 7> VTriangles;
 
     /// Hash function for UniqueVertexSet.
@@ -102,6 +105,7 @@ struct _OgreLodExport LodData {
         Vector3 position;
         Vector3 normal;
         VEdges edges;
+        VLines lines;
         VTriangles triangles;
         
         Vertex* collapseTo;
@@ -110,6 +114,13 @@ struct _OgreLodExport LodData {
 
         void addEdge(const Edge& edge);
         void removeEdge(const Edge& edge);
+    };
+
+    struct Line {
+        Vertex* vertex[2];
+        bool isRemoved;
+        unsigned short submeshID; /// ID of the submesh. Usable with mMesh.getSubMesh() function.
+        unsigned int vertexID[2]; /// Vertex ID in the buffer associated with the submeshID.
     };
     
     struct Triangle {
@@ -152,6 +163,7 @@ struct _OgreLodExport LodData {
     UniqueVertexSet mUniqueVertexSet;
 
     VertexList mVertexList;
+    LineList mLineList;
     TriangleList mTriangleList;
 
     /// Makes possible to get the vertices with the smallest collapse cost.

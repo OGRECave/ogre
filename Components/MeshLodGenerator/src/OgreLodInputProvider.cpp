@@ -74,7 +74,7 @@ namespace Ogre
         if(MESHLOD_QUALITY >= 3) {
             LodData::Triangle* duplicate = isDuplicateTriangle(triangle);
             if (duplicate != NULL) {
-    #if OGRE_DEBUG_MODE
+#if OGRE_DEBUG_MODE
                 std::stringstream str;
                 str << "In " << data->mMeshName << " duplicate triangle found." << std::endl;
                 str << "Triangle " << LodData::getVectorIDFromPointer(data->mTriangleList, triangle) << " positions:" << std::endl;
@@ -83,7 +83,7 @@ namespace Ogre
                 printTriangle(duplicate, str);
                 str << "Triangle " << LodData::getVectorIDFromPointer(data->mTriangleList, triangle) << " will be excluded from Lod level calculations.";
                 LogManager::getSingleton().stream() << str.str();
-    #endif
+#endif
                 triangle->isRemoved = true;
                 data->mIndexBufferInfoList[triangle->submeshID].indexCount -= 3;
                 return;
@@ -101,6 +101,13 @@ namespace Ogre
         }
     }
 
+    void addLineToVertices(LodData* data, LodData::Line* line)
+    {
+        for (auto & i : line->vertex) {
+            i->lines.addNotExists(line);
+        }
+    }
+
     inline size_t getTriangleCount(RenderOperation::OperationType renderOp, size_t indexCount)
     {
         if(renderOp == RenderOperation::OT_TRIANGLE_LIST)
@@ -109,7 +116,16 @@ namespace Ogre
             return indexCount >= 3 ? indexCount - 2 : 0;
         return 0;
     }
-    
+
+    inline size_t getLineCount(RenderOperation::OperationType renderOp, size_t indexCount)
+    {
+        if(renderOp == RenderOperation::OT_LINE_LIST)
+            return indexCount / 2;
+        else if(renderOp == RenderOperation::OT_LINE_STRIP)
+            return indexCount >= 2 ? indexCount - 1 : 0;
+        return 0;
+    }
+
     void LodInputProvider::initData( LodData* data )
     {
         tuneContainerSize(data);
@@ -119,13 +135,15 @@ namespace Ogre
     {
         // Get Vertex count for container tuning.
         bool sharedVerticesAdded = false;
-        size_t trianglesCount = 0;
+        size_t triangleCount = 0;
+        size_t lineCount = 0;
         size_t vertexCount = 0;
         size_t vertexLookupSize = 0;
         size_t sharedVertexLookupSize = 0;
         size_t submeshCount = getSubMeshCount();
         for (size_t i = 0; i < submeshCount; i++) {
-            trianglesCount += getTriangleCount(getSubMeshRenderOp(i), getSubMeshIndexCount(i));
+            triangleCount += getTriangleCount(getSubMeshRenderOp(i), getSubMeshIndexCount(i));
+            lineCount += getLineCount(getSubMeshRenderOp(i), getSubMeshIndexCount(i));
             if (!getSubMeshUseSharedVertices(i)) {
                 size_t count = getSubMeshOwnVertexCount(i);
                 vertexLookupSize = std::max(vertexLookupSize, count);
@@ -140,7 +158,8 @@ namespace Ogre
         // Tune containers:
         data->mUniqueVertexSet.rehash(4 * vertexCount); // less then 0.25 item/bucket for low collision rate
 
-        data->mTriangleList.reserve(trianglesCount);
+        data->mTriangleList.reserve(triangleCount);
+        data->mLineList.reserve(lineCount);
 
         data->mVertexList.reserve(vertexCount);
         mSharedVertexLookup.reserve(sharedVertexLookupSize);
@@ -163,47 +182,13 @@ namespace Ogre
         mSharedVertexLookup.clear();
         mVertexLookup.clear();
     }
-    
-    void LodInputProvider::addIndexDataImpl(LodData* data, const HardwareIndexBufferPtr& ibuf, size_t start, size_t count, size_t subMeshIndex)
-    {
-        if (count == 0 || ibuf == nullptr) {
-            // Locking a zero length buffer on Linux with nvidia cards fails.
-            return;
-        }
 
-        data->mIndexBufferInfoList[subMeshIndex].indexSize = ibuf->getIndexSize();
-        data->mIndexBufferInfoList[subMeshIndex].indexCount = count;
-
-        bool useSharedVertexLookup = getSubMeshUseSharedVertices(subMeshIndex);
-        auto renderOp = getSubMeshRenderOp(subMeshIndex);
-        VertexLookupList& lookup = useSharedVertexLookup ? mSharedVertexLookup : mVertexLookup;
-
-        // Lock the buffer for reading.
-        HardwareBufferLockGuard lock(ibuf, HardwareBuffer::HBL_READ_ONLY);
-        size_t isize = ibuf->getIndexSize();
-        uchar* iStart = (uchar*)lock.pData + start * isize;
-        uchar* iEnd = iStart + count * isize;
-
-        if (isize == sizeof(unsigned short)) {
-            addIndexDataImpl(data, (unsigned short*) iStart, (const unsigned short*) iEnd, lookup, subMeshIndex, renderOp);
-        } else {
-            // Unsupported index size.
-            OgreAssert(isize == sizeof(unsigned int), "");
-            addIndexDataImpl(data, (unsigned int*) iStart, (const unsigned int*) iEnd, lookup, subMeshIndex, renderOp);
-        }
-    }
 
     template <typename IndexType>
-    void LodInputProvider::addIndexDataImpl(LodData* data, IndexType* iPos, const IndexType* iEnd,
-                                            std::vector<LodData::Vertex*>& lookup, ushort submeshID,
-                                            RenderOperation::OperationType renderOp)
+    void addTriangleIndices(LodData* data, IndexType* iPos, const IndexType* iEnd,
+                            std::vector<LodData::Vertex*>& lookup, ushort submeshID,
+                            RenderOperation::OperationType renderOp)
     {
-        if(iEnd - iPos < 3
-        || (renderOp != RenderOperation::OT_TRIANGLE_LIST
-        && renderOp != RenderOperation::OT_TRIANGLE_STRIP
-        && renderOp != RenderOperation::OT_TRIANGLE_FAN))
-            return;
-
         IndexType i0 = iPos[0], i1 = iPos[1], i2 = iPos[2];
         unsigned inc = (renderOp==RenderOperation::OT_TRIANGLE_LIST) ? 3 : 1;
         unsigned triangleIdx = 0;
@@ -270,4 +255,95 @@ namespace Ogre
         }
     }
 
+    template <typename IndexType>
+    void addLineIndices(LodData* data, IndexType* iPos, const IndexType* iEnd,
+                        std::vector<LodData::Vertex*>& lookup, ushort submeshID,
+                        RenderOperation::OperationType renderOp)
+    {
+        IndexType i0 = iPos[0], i1 = iPos[1];
+        unsigned inc = (renderOp==RenderOperation::OT_LINE_LIST) ? 2 : 1;
+        unsigned lineIdx = 0;
+
+        // Loop through all lines and connect them to the vertices.
+        for (iPos += (2 - inc); iPos < iEnd; iPos += inc, ++lineIdx) {
+            // It should never reallocate or every pointer will be invalid.
+            OgreAssertDbg(data->mLineList.capacity() > data->mLineList.size(), "");
+            data->mLineList.push_back(LodData::Line());
+            LodData::Line* line = &data->mLineList.back();
+            line->isRemoved = false;
+            line->submeshID = submeshID;
+
+            if(lineIdx > 0)
+            {
+                switch(renderOp)
+                {
+                case RenderOperation::OT_LINE_LIST:
+                    i0 = iPos[0];
+                    i1 = iPos[1];
+                    break;
+                case RenderOperation::OT_LINE_STRIP:
+                    i0 = i1;
+                    i1 = iPos[0];
+                    break;
+                default:
+                    OgreAssert(false, "Invalid RenderOperation");
+                    break;
+                }
+            }
+
+            // Invalid index: Index is bigger then vertex buffer size.
+            OgreAssertDbg(i0 < lookup.size() && i1 < lookup.size(), "");
+            line->vertexID[0] = i0;
+            line->vertexID[1] = i1;
+            line->vertex[0] = lookup[i0];
+            line->vertex[1] = lookup[i1];
+
+            addLineToVertices(data, line);
+        }
+    }
+
+    void LodInputProvider::addIndexDataImpl(LodData* data, const HardwareIndexBufferPtr& ibuf, size_t start, size_t count, size_t subMeshIndex)
+    {
+        if (count == 0 || ibuf == nullptr) {
+            // Locking a zero length buffer on Linux with nvidia cards fails.
+            return;
+        }
+
+        data->mIndexBufferInfoList[subMeshIndex].indexSize = ibuf->getIndexSize();
+        data->mIndexBufferInfoList[subMeshIndex].indexCount = count;
+
+        bool useSharedVertexLookup = getSubMeshUseSharedVertices(subMeshIndex);
+        auto renderOp = getSubMeshRenderOp(subMeshIndex);
+        VertexLookupList& lookup = useSharedVertexLookup ? mSharedVertexLookup : mVertexLookup;
+
+        // Lock the buffer for reading.
+        HardwareBufferLockGuard lock(ibuf, HardwareBuffer::HBL_READ_ONLY);
+        size_t isize = ibuf->getIndexSize();
+        uchar* iStart = (uchar*)lock.pData + start * isize;
+        uchar* iEnd = iStart + count * isize;
+
+        if (renderOp == RenderOperation::OT_TRIANGLE_LIST ||
+            renderOp == RenderOperation::OT_TRIANGLE_STRIP ||
+            renderOp == RenderOperation::OT_TRIANGLE_FAN)
+        {
+            if (isize == sizeof(unsigned short)) {
+                addTriangleIndices(data, (unsigned short*) iStart, (const unsigned short*) iEnd, lookup, subMeshIndex, renderOp);
+            } else {
+                // Unsupported index size.
+                OgreAssert(isize == sizeof(unsigned int), "");
+                addTriangleIndices(data, (unsigned int*) iStart, (const unsigned int*) iEnd, lookup, subMeshIndex, renderOp);
+            }
+        }
+        else if (renderOp == RenderOperation::OT_LINE_LIST ||
+                 renderOp == RenderOperation::OT_LINE_STRIP)
+        {
+            if (isize == sizeof(unsigned short)) {
+                addLineIndices(data, (unsigned short*) iStart, (const unsigned short*) iEnd, lookup, subMeshIndex, renderOp);
+            } else {
+                // Unsupported index size.
+                OgreAssert(isize == sizeof(unsigned int), "");
+                addLineIndices(data, (unsigned int*) iStart, (const unsigned int*) iEnd, lookup, subMeshIndex, renderOp);
+            }
+        }
+    }
 }
