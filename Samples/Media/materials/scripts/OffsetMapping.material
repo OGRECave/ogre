@@ -13,9 +13,13 @@ material RTSS/OffsetMapping
               texture Bricks076C_diffspec.dds
            }
 
-           rtshader_system
+           texture_unit
            {
-               lighting_stage normal_map Bricks076C_normheight.dds parallax
+               texture Bricks076C_normheight.dds
+               rtshader_system
+               {
+                  normal_map parallax
+               }
            }
        }
    }

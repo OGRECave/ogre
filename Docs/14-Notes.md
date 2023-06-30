@@ -92,6 +92,35 @@ Consequently, the `light_count` property now only takes a single count instead o
 
 The default (FFP) sub-renderstates are now added to the scheme render state first instead of last. This means that you can inspect and modify them in the scheme render state.
 
+The normal maps should now be specified at the `texture_unit` level instead of the `pass` level
+
+```nginx
+// with Ogre 13
+pass
+{
+    rtshader_system
+    {
+        lighting_stage normal_map Panels_Normal_Tangent.png tangent_space 0 RTSS/NormalMapSampler
+    }
+}
+
+// with Ogre 14
+pass
+{
+    texture_unit
+    {
+        texture Panels_Normal_Tangent.png
+        sampler_ref RTSS/NormalMapSampler
+        rtshader_system
+        {
+            normal_map tangent_space
+        }
+    }
+}
+```
+
+Additionally `parallax_occlusion` mapping is now supported by using the respective keyword. It is also available with the Terrain Component.
+
 ## Terrain
 
 The TerrainMaterialGenerator API was simplified by making the use of a Profile optional.

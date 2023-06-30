@@ -31,7 +31,7 @@ Here are the attributes you can use in a `rtshader_system` block of a `pass {}`:
 - [lighting_stage](#lighting_stage)
 - [image_based_lighting](#image_based_lighting)
 - [gbuffer](#gbuffer)
-- [normal_map](#normal_map)
+- [normal_map](#normal_map_pass)
 - [metal_roughness](#metal_roughness)
 - [fog_stage](#fog_stage)
 - [light_count](#light_count)
@@ -100,9 +100,11 @@ Example: `lighting_stage gbuffer normal_viewdepth diffuse_specular`
 
 @param target_layout with @c gbuffer, this specifies the data to be written into one or two MRT targets. Possible values are @c depth, @c normal, @c viewpos, @c normal_viewdepth and @c diffuse_specular
 
-<a name="normal_map"></a>
+<a name="normal_map_pass"></a>
 
 ## normal_map
+
+@deprecated use @ref normal_map instead
 
 @copybrief Ogre::RTShader::SRS_NORMALMAP
 
@@ -112,24 +114,7 @@ Format: `lighting_stage normal_map <texture> [normalmap_space] [texcoord_index] 
 Example: `lighting_stage normal_map Panels_Normal_Tangent.png tangent_space 0 SamplerToUse`
 
 @param texture normal map name to use
-@param normalmap_space <dl compact="compact">
-<dt>tangent_space</dt>
-<dd>Normal map contains normal data in tangent space.
-This is the default normal mapping behavior and it requires that the
-target mesh will have valid tangents within its vertex data.</dd>
-<dt>object_space</dt>
-<dd>Normal map contains normal data in object local space.
-This normal mapping technique has the advantages of better visualization results,
-lack of artifacts that comes from texture mirroring usage, it doesn't requires tangent
-and it also saves some instruction in the vertex shader stage.
-The main drawback of using this kind of normal map is that the target object must be static
-in terms of local space rotations and translations.</dd>
-<dt>parallax</dt>
-<dd>Normal map contains normal data in parallax corrected tangent space
-The restrictions of @c tangent_space apply. Additionally the alpha
-channel of the normal texture is expected to contain height displacement data.
-This is used for parallax corrected rendering.</dd>
-</dl>
+@param normalmap_space see @ref normal_map
 @param texcoord_index the start texcoord attribute index to read the uv coordinates from
 @param sampler the [Sampler](@ref Samplers) to use for the normal map
 
@@ -222,8 +207,42 @@ Example: `hardware_skinning 24 2 dual_quaternion true false`
 
 Here are the attributes you can use in a `rtshader_system` block of a `texture_unit {}`:
 
+- [normal_map](#normal_map)
 - [layered_blend](#layered_blend)
 - [source_modifier](#source_modifier)
+
+## normal_map {#normal_map}
+
+@copybrief Ogre::RTShader::SRS_NORMALMAP
+
+@par
+Format: `normal_map <normalmap_space> [height_scale scale] [texcoord_index idx]`
+@par
+Example: `normal_map parallax_occlusion height_scale 0.1`
+
+@param normalmap_space <dl compact="compact">
+<dt>tangent_space</dt>
+<dd>Normal map contains normal data in tangent space.
+This is the default normal mapping behavior and it requires that the
+target mesh will have valid tangents within its vertex data.</dd>
+<dt>object_space</dt>
+<dd>Normal map contains normal data in object local space.
+This normal mapping technique has the advantages of better visualization results,
+lack of artifacts that comes from texture mirroring usage, it doesn't requires tangent
+and it also saves some instruction in the vertex shader stage.
+The main drawback of using this kind of normal map is that the target object must be static
+in terms of local space rotations and translations.</dd>
+<dt>parallax</dt>
+<dd>Normal map contains normal data in parallax corrected tangent space
+The restrictions of @c tangent_space apply. Additionally the alpha
+channel of the normal texture is expected to contain height displacement data.
+This is used for parallax corrected rendering.</dd>
+<dt>parallax_occlusion</dt>
+<dd>An extension of @c parallax, which samples the texture multiple times to allow using
+a larger displacement value without getting artifacts.</dd>
+</dl>
+@param height_scale displacement scale factor, when using @c parallax or @c parallax_occlusion
+@param texcoord_index the texcoord attribute index to read the uv coordinates from
 
 <a name="layered_blend"></a>
 
@@ -234,8 +253,6 @@ Here are the attributes you can use in a `rtshader_system` block of a `texture_u
 Format: `layered_blend <effect>`
 @par
 Example: layered_blend luminosity
-
-@note only applicable inside a texture_unit section
 
 @param effect one of `default, normal, lighten, darken, multiply, average, add, subtract, difference, negation, exclusion, screen, overlay, hard_light, soft_light, color_dodge, color_burn, linear_dodge, linear_burn, linear_light, vivid_light, pin_light, hard_mix, reflect, glow, phoenix, saturation, color, luminosity`
 
@@ -250,8 +267,6 @@ Format: `source_modifier <operation> custom <parameterNum>`
 @par
 Example: `source_modifier src1_inverse_modulate custom 2`
 
-@note only applicable inside a texture_unit section
-
 @param operation one of `src1_modulate, src2_modulate, src1_inverse_modulate, src2_inverse_modulate`
 @param parameterNum number of the custom shader parameter that controls the operation
 
@@ -262,7 +277,7 @@ In case you need to set the properties programmatically, see the following examp
 ```cpp
 rtshader_system
 {
-	lighting_stage normal_map Default_normal.jpg
+	normal_map height_scale 0.1
 }
 ```
 becomes
@@ -275,7 +290,7 @@ RenderState* rs = shaderGen->getRenderState(MSN_SHADERGEN, *mat, 0);
 SubRenderState* srs = shaderGen->createSubRenderState(SRS_NORMALMAP);
 rs->addTemplateSubRenderState(srs);
 
-srs->setParameter("texture", "Default_normal.jpg");
+srs->setParameter("height_scale", "0.1");
 ```
 
 # System overview {#rtss_overview}

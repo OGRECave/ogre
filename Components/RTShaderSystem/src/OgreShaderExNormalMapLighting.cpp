@@ -43,7 +43,7 @@ const String SRS_NORMALMAP = "NormalMap";
 //-----------------------------------------------------------------------
 NormalMapLighting::NormalMapLighting()
 {
-    mNormalMapSamplerIndex = 0;
+    mNormalMapSamplerIndex = -1;
     mVSTexCoordSetIndex = 0;
     mNormalMapSpace = NMS_TANGENT;
     mNormalMapSampler = TextureManager::getSingleton().createSampler();
@@ -151,11 +151,16 @@ void NormalMapLighting::copyFrom(const SubRenderState& rhs)
     mNormalMapSpace = rhsLighting.mNormalMapSpace;
     mNormalMapTextureName = rhsLighting.mNormalMapTextureName;
     mNormalMapSampler = rhsLighting.mNormalMapSampler;
+    mNormalMapSamplerIndex = rhsLighting.mNormalMapSamplerIndex;
+    mParallaxHeightScale = rhsLighting.mParallaxHeightScale;
 }
 
 //-----------------------------------------------------------------------
 bool NormalMapLighting::preAddToRenderState(const RenderState* renderState, Pass* srcPass, Pass* dstPass)
 {
+    if(mNormalMapSamplerIndex >= 0)
+        return true;
+
     TextureUnitState* normalMapTexture = dstPass->createTextureUnitState();
 
     normalMapTexture->setTextureName(mNormalMapTextureName);
@@ -194,10 +199,15 @@ bool NormalMapLighting::setParameter(const String& name, const String& value)
         return false;
     }
 
-    if (name == "texture" && !value.empty())
+    if (name == "texture" && !value.empty() && mNormalMapSamplerIndex < 0)
     {
         mNormalMapTextureName = value;
         return true;
+    }
+
+    if (name == "texture_index" && mNormalMapTextureName.empty())
+    {
+        return StringConverter::parse(value, mNormalMapSamplerIndex);
     }
 
     if (name == "texcoord_index" && !value.empty())
@@ -206,7 +216,7 @@ bool NormalMapLighting::setParameter(const String& name, const String& value)
         return true;
     }
 
-    if (name == "sampler")
+    if (name == "sampler" && mNormalMapSamplerIndex < 0)
     {
         auto sampler = TextureManager::getSingleton().getSampler(value);
         if (!sampler)
@@ -215,7 +225,7 @@ bool NormalMapLighting::setParameter(const String& name, const String& value)
         return true;
     }
 
-    if (name == "parallax_heightscale")
+    if (name == "height_scale")
     {
         return StringConverter::parse(value, mParallaxHeightScale);
     }
@@ -276,12 +286,63 @@ SubRenderState* NormalMapLightingFactory::createInstance(ScriptCompiler* compile
                     {
                         compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
                     }
+                    compiler->addError(ScriptCompiler::CE_DEPRECATEDSYMBOL, prop->file, prop->line,
+                                       "use the texture_unit format to specify a sampler");
                 }
 
                 return subRenderState;
             }
         }
     }
+    return NULL;
+}
+
+SubRenderState* NormalMapLightingFactory::createInstance(ScriptCompiler* compiler, PropertyAbstractNode* prop,
+                                                         TextureUnitState* texState, SGScriptTranslator* translator)
+{
+    if (prop->name == "normal_map" && !prop->values.empty())
+    {
+        auto pass = texState->getParent();
+        auto texureIdx = pass->getTextureUnitStateIndex(texState);
+
+        // blacklist from FFP
+        std::set<uint16> nonFFP_TUS = any_cast<std::set<uint16>>(pass->getUserObjectBindings().getUserAny("_RTSS_nonFFP_TUS"));
+        nonFFP_TUS.insert(texureIdx);
+        pass->getUserObjectBindings().setUserAny("_RTSS_nonFFP_TUS", nonFFP_TUS);
+
+        SubRenderState* subRenderState = createOrRetrieveInstance(translator);
+        subRenderState->setParameter("texture_index", std::to_string(texureIdx));
+
+        auto it = prop->values.begin();
+        if (!subRenderState->setParameter("normalmap_space", (*it)->getString()))
+        {
+            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+            return subRenderState;
+        }
+
+        if (prop->values.size() % 2 != 1) // parameters must come in pairs now
+        {
+            compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line);
+            return subRenderState;
+        }
+
+        it++;
+        while(it != prop->values.end())
+        {
+            String paramName = (*it)->getString();
+            String paramValue = (*++it)->getString();
+
+            if (!subRenderState->setParameter(paramName, paramValue))
+            {
+                compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+                return subRenderState;
+            }
+            it++;
+        }
+
+        return subRenderState;
+    }
+
     return NULL;
 }
 
