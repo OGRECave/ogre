@@ -42,6 +42,7 @@ namespace Ogre
         {
             mFirstBufferPass = true;
             mTriangleCacheList.resize(data->mTriangleList.size());
+            mLineCacheList.resize(data->mLineList.size());
         }
     }
 
@@ -100,6 +101,36 @@ namespace Ogre
         }
     }
 
+    inline void writeTriangle(LodData * data, size_t i)
+    {
+        if (data->mIndexBufferInfoList[data->mTriangleList[i].submeshID].indexSize == 2) {
+            for (unsigned int m : data->mTriangleList[i].vertexID) {
+                *(data->mIndexBufferInfoList[data->mTriangleList[i].submeshID].buf.pshort++) =
+                    static_cast<uint16>(m);
+            }
+        } else {
+            for (unsigned int m : data->mTriangleList[i].vertexID) {
+                *(data->mIndexBufferInfoList[data->mTriangleList[i].submeshID].buf.pint++) =
+                    static_cast<uint32>(m);
+            }
+        }
+    }
+
+    inline void writeLine(LodData * data, size_t i)
+    {
+        if (data->mIndexBufferInfoList[data->mLineList[i].submeshID].indexSize == 2) {
+            for (unsigned int m : data->mLineList[i].vertexID) {
+                *(data->mIndexBufferInfoList[data->mLineList[i].submeshID].buf.pshort++) =
+                    static_cast<uint16>(m);
+            }
+        } else {
+            for (unsigned int m : data->mLineList[i].vertexID) {
+                *(data->mIndexBufferInfoList[data->mLineList[i].submeshID].buf.pint++) =
+                    static_cast<uint32>(m);
+            }
+        }
+    }
+
     void LodOutputProvider::bakeUncompressed(LodData* data, int lodIndex)
     {
         std::vector<HardwareIndexBufferPtr> lockedBuffers;
@@ -123,17 +154,14 @@ namespace Ogre
         for (size_t i = 0; i < triangleCount; i++) {
             if (!data->mTriangleList[i].isRemoved) {
                 assert(data->mIndexBufferInfoList[data->mTriangleList[i].submeshID].indexCount != 0);
-                if (data->mIndexBufferInfoList[data->mTriangleList[i].submeshID].indexSize == 2) {
-                    for (unsigned int m : data->mTriangleList[i].vertexID) {
-                        *(data->mIndexBufferInfoList[data->mTriangleList[i].submeshID].buf.pshort++) =
-                            static_cast<unsigned short>(m);
-                    }
-                } else {
-                    for (unsigned int m : data->mTriangleList[i].vertexID) {
-                        *(data->mIndexBufferInfoList[data->mTriangleList[i].submeshID].buf.pint++) =
-                            static_cast<unsigned int>(m);
-                    }
-                }
+                writeTriangle(data, i);
+            }
+        }
+        size_t lineCount = data->mLineList.size();
+        for (size_t i = 0; i < lineCount; i++) {
+            if (!data->mLineList[i].isRemoved) {
+                assert(data->mIndexBufferInfoList[data->mLineList[i].submeshID].indexCount != 0);
+                writeLine(data, i);
             }
         }
 
@@ -147,13 +175,14 @@ namespace Ogre
     {
         size_t submeshCount = getSubMeshCount();
         assert(mTriangleCacheList.size() == data->mTriangleList.size());
+        assert(mLineCacheList.size() == data->mLineList.size());
         mLastIndexBufferID = lodIndex;
 
         for (size_t i = 0; i < submeshCount; i++) {
             data->mIndexBufferInfoList[i].prevIndexCount = data->mIndexBufferInfoList[i].indexCount;
             data->mIndexBufferInfoList[i].prevOnlyIndexCount = 0;
         }
-
+        
         size_t triangleCount = mTriangleCacheList.size();
         for (size_t i = 0; i < triangleCount; i++) {
             mTriangleCacheList[i].vertexChanged = false;
@@ -161,6 +190,15 @@ namespace Ogre
                 mTriangleCacheList[i].vertexID[0] = data->mTriangleList[i].vertexID[0];
                 mTriangleCacheList[i].vertexID[1] = data->mTriangleList[i].vertexID[1];
                 mTriangleCacheList[i].vertexID[2] = data->mTriangleList[i].vertexID[2];
+            }
+        }
+
+        size_t lineCount = mLineCacheList.size();
+        for (size_t i = 0; i < lineCount; i++) {
+            mLineCacheList[i].vertexChanged = false;
+            if (!data->mLineList[i].isRemoved) {
+                mLineCacheList[i].vertexID[0] = data->mLineList[i].vertexID[0];
+                mLineCacheList[i].vertexID[1] = data->mLineList[i].vertexID[1];
             }
         }
     }
@@ -171,6 +209,7 @@ namespace Ogre
 
         size_t submeshCount = getSubMeshCount();
         assert(mTriangleCacheList.size() == data->mTriangleList.size());
+        assert(mLineCacheList.size() == data->mLineList.size());
         assert(lodIndex > mLastIndexBufferID); // Implementation limitation
 
         // Create buffers.
@@ -202,17 +241,15 @@ namespace Ogre
                 assert(mTriangleCacheList[i].vertexID[0] != mTriangleCacheList[i].vertexID[1]);
                 assert(mTriangleCacheList[i].vertexID[1] != mTriangleCacheList[i].vertexID[2]);
                 assert(mTriangleCacheList[i].vertexID[2] != mTriangleCacheList[i].vertexID[0]);
-                if (data->mIndexBufferInfoList[data->mTriangleList[i].submeshID].indexSize == 2) {
-                    for (int m = 0; m < 3; m++) {
-                        *(data->mIndexBufferInfoList[data->mTriangleList[i].submeshID].buf.pshort++) =
-                            static_cast<unsigned short>(mTriangleCacheList[i].vertexID[m]);
-                    }
-                } else {
-                    for (int m = 0; m < 3; m++) {
-                        *(data->mIndexBufferInfoList[data->mTriangleList[i].submeshID].buf.pint++) =
-                            static_cast<unsigned int>(mTriangleCacheList[i].vertexID[m]);
-                    }
-                }
+                writeTriangle(data, i);
+            }
+        }
+        size_t lineCount = mLineCacheList.size();
+        for (size_t i = 0; i < lineCount; i++) {
+            if (mLineCacheList[i].vertexChanged) {
+                assert(data->mIndexBufferInfoList[data->mLineList[i].submeshID].prevIndexCount != 0);
+                assert(mLineCacheList[i].vertexID[0] != mLineCacheList[i].vertexID[1]);
+                writeLine(data, i);
             }
         }
 
@@ -225,17 +262,17 @@ namespace Ogre
 
                 assert(data->mIndexBufferInfoList[data->mTriangleList[i].submeshID].indexCount != 0);
                 assert(data->mIndexBufferInfoList[data->mTriangleList[i].submeshID].prevIndexCount != 0);
-                if (data->mIndexBufferInfoList[data->mTriangleList[i].submeshID].indexSize == 2) {
-                    for (int m = 0; m < 3; m++) {
-                        *(data->mIndexBufferInfoList[data->mTriangleList[i].submeshID].buf.pshort++) =
-                            static_cast<unsigned short>(data->mTriangleList[i].vertexID[m]);
-                    }
-                } else {
-                    for (int m = 0; m < 3; m++) {
-                        *(data->mIndexBufferInfoList[data->mTriangleList[i].submeshID].buf.pint++) =
-                            static_cast<unsigned int>(data->mTriangleList[i].vertexID[m]);
-                    }
-                }
+                writeTriangle(data, i);
+            }
+        }
+        for (size_t i = 0; i < lineCount; i++) {
+            if (!data->mLineList[i].isRemoved && !mLineCacheList[i].vertexChanged) {
+                assert(mLineCacheList[i].vertexID[0] == data->mLineList[i].vertexID[0]);
+                assert(mLineCacheList[i].vertexID[1] == data->mLineList[i].vertexID[1]);
+
+                assert(data->mIndexBufferInfoList[data->mLineList[i].submeshID].indexCount != 0);
+                assert(data->mIndexBufferInfoList[data->mLineList[i].submeshID].prevIndexCount != 0);
+                writeLine(data, i);
             }
         }
 
@@ -243,17 +280,13 @@ namespace Ogre
         for (size_t i = 0; i < triangleCount; i++) {
             if (!data->mTriangleList[i].isRemoved && mTriangleCacheList[i].vertexChanged) {
                 assert(data->mIndexBufferInfoList[data->mTriangleList[i].submeshID].indexCount != 0);
-                if (data->mIndexBufferInfoList[data->mTriangleList[i].submeshID].indexSize == 2) {
-                    for (int m = 0; m < 3; m++) {
-                        *(data->mIndexBufferInfoList[data->mTriangleList[i].submeshID].buf.pshort++) =
-                            static_cast<unsigned short>(data->mTriangleList[i].vertexID[m]);
-                    }
-                } else {
-                    for (int m = 0; m < 3; m++) {
-                        *(data->mIndexBufferInfoList[data->mTriangleList[i].submeshID].buf.pint++) =
-                            static_cast<unsigned int>(data->mTriangleList[i].vertexID[m]);
-                    }
-                }
+                writeTriangle(data, i);
+            }
+        }
+        for (size_t i = 0; i < lineCount; i++) {
+            if (!data->mLineList[i].isRemoved && mLineCacheList[i].vertexChanged) {
+                assert(data->mIndexBufferInfoList[data->mLineList[i].submeshID].indexCount != 0);
+                writeLine(data, i);
             }
         }
 

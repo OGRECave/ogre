@@ -55,12 +55,18 @@ protected:
         unsigned int vertexID[3];
         bool vertexChanged;
     };
+    struct LineCache {
+        unsigned int vertexID[2];
+        bool vertexChanged;
+    };
 
     typedef std::vector<TriangleCache> TriangleCacheList;
+    typedef std::vector<LineCache> LineCacheList;
 
     /// First pass will create the mTriangleCacheList and second pass will use it.
     /// This is required, because the triangles from first pass will be changed and we need to keep the information.
     TriangleCacheList mTriangleCacheList;
+    LineCacheList mLineCacheList;
 
     bool mFirstBufferPass;
     int mLastIndexBufferID;
