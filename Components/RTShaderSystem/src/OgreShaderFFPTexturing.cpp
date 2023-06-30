@@ -63,6 +63,8 @@ bool FFPTexturing::resolveParameters(ProgramSet* programSet)
     for (auto & i : mTextureUnitParamsList)
     {
         TextureUnitParams* curParams = &i;
+        if(!curParams->mTextureUnitState)
+            continue;
 
         if (false == resolveUniformParams(curParams, programSet))
             return false;
@@ -229,6 +231,8 @@ bool FFPTexturing::addFunctionInvocations(ProgramSet* programSet)
     for (auto & i : mTextureUnitParamsList)
     {
         TextureUnitParams* curParams = &i;
+        if(!curParams->mTextureUnitState)
+            continue;
 
         if (false == addVSFunctionInvocations(curParams, vsMain))
             return false;
@@ -531,9 +535,18 @@ bool FFPTexturing::preAddToRenderState(const RenderState* renderState, Pass* src
 
     setTextureUnitCount(srcPass->getTextureUnitStates().size());
 
+    std::set<uint16> nonFFP_TUS;
+    auto nonFFPany = srcPass->getUserObjectBindings().getUserAny("_RTSS_nonFFP_TUS");
+    if(nonFFPany.has_value())
+    {
+        nonFFP_TUS = any_cast<std::set<uint16>>(nonFFPany);
+    }
+
     // Build texture stage sub states.
     for (unsigned short i=0; i < srcPass->getNumTextureUnitStates(); ++i)
-    {       
+    {
+        if(nonFFP_TUS.find(i) != nonFFP_TUS.end())
+            continue;
         TextureUnitState* texUnitState = srcPass->getTextureUnitState(i);
         setTextureUnit(i, texUnitState);
     }   
