@@ -45,47 +45,28 @@ namespace Ogre
     void LodOutputProviderMesh::bakeManualLodLevel( LodData* data, String& manualMeshName, int lodIndex)
     {
         // placeholder dummy
-        size_t submeshCount = mMesh->getNumSubMeshes();
+        size_t submeshCount = getSubMeshCount();
         for (size_t i = 0; i < submeshCount; i++) {
-            SubMesh::LODFaceList& lods = mMesh->getSubMesh(i)->mLodFaceList;
-            lods.insert(lods.begin() + lodIndex, OGRE_NEW IndexData());
+            createSubMeshLodIndexData(i, lodIndex, nullptr, 0, 0);
         }
     }
 
     void LodOutputProviderMesh::bakeLodLevel(LodData* data, int lodIndex)
     {
-        size_t submeshCount = mMesh->getNumSubMeshes();
+        std::vector<HardwareIndexBufferPtr> lockedBuffers;
+
+        size_t submeshCount = getSubMeshCount();
 
         // Create buffers.
         for (size_t i = 0; i < submeshCount; i++) {
-            SubMesh::LODFaceList& lods = mMesh->getSubMesh(i)->mLodFaceList;
             size_t indexCount = data->mIndexBufferInfoList[i].indexCount;
-            IndexData* curLod = OGRE_NEW IndexData();
-            curLod->indexStart = 0;
-            lods.insert(lods.begin() + lodIndex, curLod);
-            if (indexCount == 0) {
-                //If the index is empty we need to create a "dummy" triangle, just to keep the index buffer from being empty.
-                //The main reason for this is that the OpenGL render system will crash with a segfault unless the index has some values.
-                //This should hopefully be removed with future versions of Ogre. The most preferred solution would be to add the
-                //ability for a submesh to be excluded from rendering for a given LOD (which isn't possible currently 2012-12-09).
-                curLod->indexCount = 3;
-            } else {
-                curLod->indexCount = indexCount;
-            }
+            HardwareIndexBufferPtr indexBuffer = createIndexBuffer(indexCount);
 
-            curLod->indexBuffer = mMesh->getHardwareBufferManager()->createIndexBuffer(
-                data->mIndexBufferInfoList[i].indexSize == 2 ?
-                HardwareIndexBuffer::IT_16BIT : HardwareIndexBuffer::IT_32BIT,
-                curLod->indexCount, mMesh->getIndexBufferUsage(), mMesh->isIndexBufferShadowed());
+            createSubMeshLodIndexData(i, lodIndex, indexBuffer, 0, indexBuffer->getNumIndexes());
 
-            data->mIndexBufferInfoList[i].buf.pshort =
-                static_cast<unsigned short*>(curLod->indexBuffer->lock(0, curLod->indexBuffer->getSizeInBytes(),
-                HardwareBuffer::HBL_DISCARD));
+            data->mIndexBufferInfoList[i].buf.pshort = (unsigned short*) indexBuffer->lock(HardwareBuffer::HBL_DISCARD);
 
-            //Check if we should fill it with a "dummy" triangle.
-            if (indexCount == 0) {
-                memset(data->mIndexBufferInfoList[i].buf.pshort, 0, 3 * data->mIndexBufferInfoList[i].indexSize);
-            }
+            lockedBuffers.push_back(indexBuffer);
         }
 
         // Fill buffers.
@@ -94,24 +75,45 @@ namespace Ogre
             if (!data->mTriangleList[i].isRemoved) {
                 assert(data->mIndexBufferInfoList[data->mTriangleList[i].submeshID].indexCount != 0);
                 if (data->mIndexBufferInfoList[data->mTriangleList[i].submeshID].indexSize == 2) {
-                    for (int m = 0; m < 3; m++) {
+                    for (unsigned int m : data->mTriangleList[i].vertexID) {
                         *(data->mIndexBufferInfoList[data->mTriangleList[i].submeshID].buf.pshort++) =
-                            static_cast<unsigned short>(data->mTriangleList[i].vertexID[m]);
+                            static_cast<unsigned short>(m);
                     }
                 } else {
-                    for (int m = 0; m < 3; m++) {
+                    for (unsigned int m : data->mTriangleList[i].vertexID) {
                         *(data->mIndexBufferInfoList[data->mTriangleList[i].submeshID].buf.pint++) =
-                            static_cast<unsigned int>(data->mTriangleList[i].vertexID[m]);
+                            static_cast<unsigned int>(m);
                     }
                 }
             }
         }
 
         // Close buffers.
-        for (unsigned short i = 0; i < submeshCount; i++) {
-            SubMesh::LODFaceList& lods = mMesh->getSubMesh(i)->mLodFaceList;
-            lods[lodIndex]->indexBuffer->unlock();
+        for (auto & buffer : lockedBuffers) {
+            buffer->unlock();
         }
     }
 
+    size_t LodOutputProviderMesh::getSubMeshCount()
+    {
+        return mMesh->getNumSubMeshes();
+    }
+
+    HardwareIndexBufferPtr LodOutputProviderMesh::createIndexBufferImpl(size_t indexCount)
+    {
+        auto indexType = indexCount - 1 <= std::numeric_limits<uint16>::max() ? HardwareIndexBuffer::IT_16BIT : HardwareIndexBuffer::IT_32BIT;
+
+        return mMesh->getHardwareBufferManager()->createIndexBuffer(indexType, indexCount, mMesh->getIndexBufferUsage(), mMesh->isIndexBufferShadowed());
+    }
+
+    void LodOutputProviderMesh::createSubMeshLodIndexData(size_t subMeshIndex, int lodIndex, const HardwareIndexBufferPtr & indexBuffer, size_t indexStart, size_t indexCount)
+    {
+        IndexData* curLod = OGRE_NEW IndexData();
+        SubMesh::LODFaceList& lods = mMesh->getSubMesh(subMeshIndex)->mLodFaceList;
+        lods.insert(lods.begin() + lodIndex, curLod);
+
+        curLod->indexStart = 0;
+        curLod->indexCount = indexCount;
+        curLod->indexBuffer = indexBuffer;
+    }
 }

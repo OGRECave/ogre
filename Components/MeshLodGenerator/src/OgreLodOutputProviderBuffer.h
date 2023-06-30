@@ -52,6 +52,12 @@ public:
 protected:
     MeshPtr mMesh;
     LodOutputBuffer mBuffer;
+
+    size_t getSubMeshCount() override;
+
+    HardwareIndexBufferPtr createIndexBufferImpl(size_t indexCount) override;
+
+    void createSubMeshLodIndexData(size_t subMeshIndex, int lodIndex, const HardwareIndexBufferPtr & indexBuffer, size_t indexStart, size_t indexCount) override;
 };
 
 }
