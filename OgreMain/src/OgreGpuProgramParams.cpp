@@ -2361,6 +2361,7 @@ namespace Ogre
             _findNamedConstantDefinition(name, !mIgnoreMissingParams);
         if (def)
         {
+            OgreAssert(def->isFloat(), "incompatible parameter type in shader");
             def->variability = deriveVariability(acType);
             // make sure we also set variability on the logical index map
             getConstantLogicalIndexUse(def->logicalIndex, def->elementSize * def->arraySize, def->variability, BCT_FLOAT);
@@ -2377,6 +2378,7 @@ namespace Ogre
             _findNamedConstantDefinition(name, !mIgnoreMissingParams);
         if (def)
         {
+            OgreAssert(def->isFloat(), "incompatible parameter type in shader");
             def->variability = deriveVariability(acType);
             // make sure we also set variability on the logical index map
             getConstantLogicalIndexUse(def->logicalIndex, def->elementSize * def->arraySize, def->variability, BCT_FLOAT);
