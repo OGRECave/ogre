@@ -572,6 +572,7 @@ TEST(GpuProgramParams, Variability)
 {
     auto constants = std::make_shared<GpuNamedConstants>();
     constants->map["parameter"] = GpuConstantDefinition();
+    constants->map["parameter"].constType = GCT_MATRIX_4X4;
 
     GpuProgramParameters params;
     params._setNamedConstants(constants);
