@@ -48,18 +48,12 @@ class LodInputProviderMesh :
 {
 public:
     LodInputProviderMesh(MeshPtr mesh);
-    /// Called when the data should be filled with the input.
-    void initData(LodData* data) override;
 
 protected:
     MeshPtr mMesh;
 
-    void tuneContainerSize(LodData* data);
-    void initialize(LodData* data);
-    void addIndexData(LodData* data, size_t subMeshIndex);
-    void addVertexData(LodData* data, size_t subMeshIndex);
-
-
+    void addIndexData(LodData* data, size_t subMeshIndex) override;
+    void addVertexData(LodData* data, size_t subMeshIndex) override;
 
     const String & getMeshName() override;
     size_t getMeshSharedVertexCount() override;
@@ -71,7 +65,6 @@ protected:
     size_t getSubMeshOwnVertexCount(size_t subMeshIndex) override;
     size_t getSubMeshIndexCount(size_t subMeshIndex) override;
     RenderOperation::OperationType getSubMeshRenderOp(size_t subMeshIndex) override;
-
 };
 
 }

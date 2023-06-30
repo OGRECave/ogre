@@ -47,18 +47,12 @@ class LodInputProviderBuffer :
 {
 public:
     LodInputProviderBuffer(MeshPtr mesh);
-    /// Called when the data should be filled with the input.
-    void initData(LodData* data) override;
     
 protected:
-
     LodInputBuffer mBuffer;
 
-    void tuneContainerSize(LodData* data);
-    void initialize(LodData* data);
-    void addVertexData(LodData* data, size_t subMeshIndex);
-    void addIndexData(LodData* data, size_t subMeshIndex);
-
+    void addVertexData(LodData* data, size_t subMeshIndex) override;
+    void addIndexData(LodData* data, size_t subMeshIndex) override;
 
     const String & getMeshName() override;
     size_t getMeshSharedVertexCount() override;

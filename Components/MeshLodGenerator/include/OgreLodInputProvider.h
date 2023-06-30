@@ -37,28 +37,21 @@ namespace Ogre
 {
 
 class _OgreLodExport LodInputProvider {
-    template <typename IndexType>
-    void addIndexDataImpl(LodData* data, IndexType* iPos, const IndexType* iEnd, std::vector<LodData::Vertex*>& lookup,
-                          ushort submeshID, RenderOperation::OperationType renderOp);
-
 public:
     virtual ~LodInputProvider() {}
     /// Called when the data should be filled with the input.
-    virtual void initData(LodData* data) = 0;
+    virtual void initData(LodData* data);
+
 protected:
     // This helps to find the vertex* in LodData for index buffer indices
     typedef std::vector<LodData::Vertex*> VertexLookupList;
     VertexLookupList mSharedVertexLookup;
     VertexLookupList mVertexLookup;
 
-    // Helper functions
-    void addTriangleToEdges(LodData* data, LodData::Triangle* triangle);
-    bool isDuplicateTriangle(LodData::Triangle* triangle, LodData::Triangle* triangle2);
-    LodData::Triangle* isDuplicateTriangle(LodData::Triangle* triangle);
-
     void addIndexDataImpl(LodData* data, const HardwareIndexBufferPtr& ibuf, size_t start, size_t count, size_t subMeshIndex);
 
-
+    virtual void addVertexData(LodData* data, size_t subMeshIndex) = 0;
+    virtual void addIndexData(LodData* data, size_t subMeshIndex) = 0;
 
     virtual const String & getMeshName() = 0;
     virtual size_t getMeshSharedVertexCount() = 0;
@@ -70,6 +63,15 @@ protected:
     virtual size_t getSubMeshOwnVertexCount(size_t subMeshIndex) = 0;
     virtual size_t getSubMeshIndexCount(size_t subMeshIndex) = 0;
     virtual RenderOperation::OperationType getSubMeshRenderOp(size_t subMeshIndex) = 0;
+    
+private:
+    void tuneContainerSize(LodData* data);
+    void initialize(LodData* data);
+
+    template <typename IndexType>
+    void addIndexDataImpl(LodData* data, IndexType* iPos, const IndexType* iEnd, std::vector<LodData::Vertex*>& lookup,
+                          ushort submeshID, RenderOperation::OperationType renderOp);
+
 };
 
 }
