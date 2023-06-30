@@ -124,6 +124,7 @@ namespace Ogre
         for (size_t i = 0; i < submeshCount; i++) {
             const SubMesh* ogresubmesh = mesh->getSubMesh(i);
             LodInputBuffer::Submesh& outsubmesh = submesh[i];
+            outsubmesh.operationType = ogresubmesh->operationType;
             outsubmesh.indexBuffer.fillBuffer(ogresubmesh->indexData);
             outsubmesh.useSharedVertexBuffer = ogresubmesh->useSharedVertices;
             if (!outsubmesh.useSharedVertexBuffer) {

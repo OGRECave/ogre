@@ -62,6 +62,7 @@ struct LodInputBuffer
         LodIndexBuffer indexBuffer;
         LodVertexBuffer vertexBuffer;
         bool useSharedVertexBuffer;
+        RenderOperation::OperationType operationType;
     };
     std::vector<Submesh> submesh;
     LodVertexBuffer sharedVertexBuffer;

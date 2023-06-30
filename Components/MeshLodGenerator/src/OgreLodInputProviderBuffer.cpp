@@ -128,6 +128,6 @@ namespace Ogre
     }
     RenderOperation::OperationType LodInputProviderBuffer::getSubMeshRenderOp(size_t subMeshIndex)
     {
-        return RenderOperation::OT_TRIANGLE_LIST; //assume mBuffer provide triangle list only
+        return mBuffer.submesh[subMeshIndex].operationType;
     }
 }
