@@ -36,13 +36,12 @@ namespace Ogre
         indexCount = data->indexCount;
         if (indexCount > 0) {
             const HardwareIndexBufferSharedPtr& hwIndexBuffer = data->indexBuffer;
-            indexSize = hwIndexBuffer->getIndexSize();
+            auto indexSize = hwIndexBuffer->getIndexSize();
             DefaultHardwareBufferManagerBase bfrMgr;
             indexBuffer = bfrMgr.createIndexBuffer(hwIndexBuffer->getType(), indexCount, HBU_CPU_ONLY);
             size_t offset = data->indexStart * indexSize;
             indexBuffer->copyData(*hwIndexBuffer, 0, offset, indexCount * indexSize);
             indexStart = 0;
-            indexBufferSize = 0;
         }
     }
 
