@@ -42,58 +42,6 @@ namespace Ogre
         }
     }
 
-    void LodOutputProviderMesh::bakeManualLodLevel( LodData* data, String& manualMeshName, int lodIndex)
-    {
-        // placeholder dummy
-        size_t submeshCount = getSubMeshCount();
-        for (size_t i = 0; i < submeshCount; i++) {
-            createSubMeshLodIndexData(i, lodIndex, nullptr, 0, 0);
-        }
-    }
-
-    void LodOutputProviderMesh::bakeLodLevel(LodData* data, int lodIndex)
-    {
-        std::vector<HardwareIndexBufferPtr> lockedBuffers;
-
-        size_t submeshCount = getSubMeshCount();
-
-        // Create buffers.
-        for (size_t i = 0; i < submeshCount; i++) {
-            size_t indexCount = data->mIndexBufferInfoList[i].indexCount;
-            HardwareIndexBufferPtr indexBuffer = createIndexBuffer(indexCount);
-
-            createSubMeshLodIndexData(i, lodIndex, indexBuffer, 0, indexBuffer->getNumIndexes());
-
-            data->mIndexBufferInfoList[i].buf.pshort = (unsigned short*) indexBuffer->lock(HardwareBuffer::HBL_DISCARD);
-
-            lockedBuffers.push_back(indexBuffer);
-        }
-
-        // Fill buffers.
-        size_t triangleCount = data->mTriangleList.size();
-        for (size_t i = 0; i < triangleCount; i++) {
-            if (!data->mTriangleList[i].isRemoved) {
-                assert(data->mIndexBufferInfoList[data->mTriangleList[i].submeshID].indexCount != 0);
-                if (data->mIndexBufferInfoList[data->mTriangleList[i].submeshID].indexSize == 2) {
-                    for (unsigned int m : data->mTriangleList[i].vertexID) {
-                        *(data->mIndexBufferInfoList[data->mTriangleList[i].submeshID].buf.pshort++) =
-                            static_cast<unsigned short>(m);
-                    }
-                } else {
-                    for (unsigned int m : data->mTriangleList[i].vertexID) {
-                        *(data->mIndexBufferInfoList[data->mTriangleList[i].submeshID].buf.pint++) =
-                            static_cast<unsigned int>(m);
-                    }
-                }
-            }
-        }
-
-        // Close buffers.
-        for (auto & buffer : lockedBuffers) {
-            buffer->unlock();
-        }
-    }
-
     size_t LodOutputProviderMesh::getSubMeshCount()
     {
         return mMesh->getNumSubMeshes();

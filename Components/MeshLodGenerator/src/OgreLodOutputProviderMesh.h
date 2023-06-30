@@ -45,8 +45,6 @@ public:
     LodOutputProviderMesh(MeshPtr mesh) : mMesh(mesh) {}
     void prepare(LodData* data) override;
     void finalize(LodData* data) override {}
-    void bakeManualLodLevel(LodData* data, String& manualMeshName, int lodIndex) override;
-    void bakeLodLevel(LodData* data, int lodIndex) override;
 protected:
     MeshPtr mMesh;
 
