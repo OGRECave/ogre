@@ -51,22 +51,18 @@ namespace Ogre
             size_t buffCount = buffers.size();
             for (size_t n=0; n<buffCount;n++) {
                 LodIndexBuffer& buff = buffers[n];
-                size_t indexCount = (buff.indexBufferSize ? buff.indexBufferSize : buff.indexCount);
                 OgreAssert((int)buff.indexCount >= 0, "");
                 lods.push_back(OGRE_NEW IndexData());
                 lods.back()->indexStart = buff.indexStart;
                 lods.back()->indexCount = buff.indexCount;
-                if(indexCount != 0) {
+                if(buff.indexBuffer->getNumIndexes() != 0) {
                     if(n > 0 && buffers[n-1].indexBuffer == buff.indexBuffer){
                         lods.back()->indexBuffer = (*(++lods.rbegin()))->indexBuffer;
                     } else {
                         lods.back()->indexBuffer = mMesh->getHardwareBufferManager()->createIndexBuffer(
-                            buff.indexSize == 2 ?
-                            HardwareIndexBuffer::IT_16BIT : HardwareIndexBuffer::IT_32BIT,
-                            indexCount, mMesh->getIndexBufferUsage(), mMesh->isIndexBufferShadowed());
-                        HardwareBufferLockGuard indexLock(buff.indexBuffer, HardwareBuffer::HBL_READ_ONLY);
-                        // do not use copyData, as we are copying from a software to hardware buffer here
-                        lods.back()->indexBuffer->writeData(0, lods.back()->indexBuffer->getSizeInBytes(), indexLock.pData, true);
+                            buff.indexBuffer->getType(), buff.indexBuffer->getNumIndexes(),
+                            mMesh->getIndexBufferUsage(), mMesh->isIndexBufferShadowed());
+                        lods.back()->indexBuffer->copyData(*buff.indexBuffer);
                     }
                 }
             }
@@ -106,16 +102,5 @@ namespace Ogre
         curLod->indexStart = indexStart;
         curLod->indexCount = indexCount;
         curLod->indexBuffer = indexBuffer;
-
-        if (indexBuffer)
-        {
-            curLod->indexSize = indexBuffer->getIndexSize();
-            curLod->indexBufferSize = indexBuffer->getNumIndexes();
-        }
-        else
-        {
-            curLod->indexSize = 2;
-            curLod->indexBufferSize = 0;
-        }
     }
 }

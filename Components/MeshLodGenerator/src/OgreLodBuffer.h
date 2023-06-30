@@ -43,10 +43,8 @@ namespace Ogre
 */
 /// Thread-safe buffer for storing Hardware index buffer
 struct LodIndexBuffer {
-    size_t indexSize; /// Index size: 2 or 4 byte/index is supported only.
     size_t indexCount; /// index count from indexStart.
     size_t indexStart; /// Offset from the start of the indexBuffer
-    size_t indexBufferSize; /// size of the index buffer in bytes
     HardwareIndexBufferPtr indexBuffer; /// if NULL, then the previous Lod level's buffer is used. (compression)
     void fillBuffer(Ogre::IndexData* data); /// Fills the buffer from an Ogre::IndexData. Call this on Ogre main thread only
 };
