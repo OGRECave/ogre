@@ -108,6 +108,8 @@ void SGScriptTranslator::translateTextureUnit(ScriptCompiler* compiler, const Ab
         {
             if(i->type == ANT_PROPERTY)
             {
+                std::set<uint16> nonFFP_TUS;
+                pass->getUserObjectBindings().setUserAny("_RTSS_nonFFP_TUS", nonFFP_TUS);
                 PropertyAbstractNode *prop = static_cast<PropertyAbstractNode*>(i.get());
                 SubRenderState* subRenderState = ShaderGenerator::getSingleton().createSubRenderState(compiler, prop, texState, this);
                 
