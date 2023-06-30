@@ -113,7 +113,7 @@ protected:
     // The normal map texture name.
     String mNormalMapTextureName;
     // Normal map texture sampler index.
-    unsigned short mNormalMapSamplerIndex;
+    int mNormalMapSamplerIndex;
     // Vertex shader input texture coordinate set index.
     unsigned int mVSTexCoordSetIndex;
     // The normal map sampler
@@ -142,6 +142,8 @@ public:
     @see SubRenderStateFactory::createInstance.
     */
     SubRenderState* createInstance(ScriptCompiler* compiler, PropertyAbstractNode* prop, Pass* pass, SGScriptTranslator* translator) override;
+
+    SubRenderState* createInstance(ScriptCompiler* compiler, PropertyAbstractNode* prop, TextureUnitState* texState, SGScriptTranslator* translator) override;
 
     /** 
     @see SubRenderStateFactory::writeInstance.
