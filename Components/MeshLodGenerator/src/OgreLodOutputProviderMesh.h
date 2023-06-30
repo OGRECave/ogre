@@ -42,9 +42,12 @@ class LodOutputProviderMesh :
     public LodOutputProvider
 {
 public:
-    LodOutputProviderMesh(MeshPtr mesh) : mMesh(mesh) {}
+    LodOutputProviderMesh(MeshPtr mesh, bool useCompression = false)
+    : LodOutputProvider(useCompression)
+    , mMesh(mesh)
+    {}
     void prepare(LodData* data) override;
-    void finalize(LodData* data) override {}
+
 protected:
     MeshPtr mMesh;
 
