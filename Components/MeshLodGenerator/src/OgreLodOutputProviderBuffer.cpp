@@ -31,14 +31,10 @@
 
 namespace Ogre
 {
-    LodOutputBuffer& LodOutputProviderBuffer::getBuffer()
-    {
-        return mBuffer;
-    }
-
     void LodOutputProviderBuffer::prepare( LodData* data )
     {
-
+        LodOutputProvider::prepare(data);
+        
         mBuffer.submesh.resize(data->mIndexBufferInfoList.size());
     }
 

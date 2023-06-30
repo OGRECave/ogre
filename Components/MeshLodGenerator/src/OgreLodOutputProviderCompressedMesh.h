@@ -30,55 +30,18 @@
 #ifndef _LodOutputProviderCompressedMesh_H__
 #define _LodOutputProviderCompressedMesh_H__
 
-#include "OgreLodPrerequisites.h"
-#include "OgreLodOutputProvider.h"
-#include "OgreSharedPtr.h"
-#include "OgreHeaderPrefix.h"
+#include "OgreLodOutputProviderMesh.h"
 
 namespace Ogre
 {
 
 class LodOutputProviderCompressedMesh :
-    public LodOutputProvider
+    public LodOutputProviderMesh
 {
 public:
-    LodOutputProviderCompressedMesh(MeshPtr mesh);
-    ~LodOutputProviderCompressedMesh();
-    void prepare(LodData* data) override;
-    void finalize(LodData* data) override;
-    void bakeManualLodLevel(LodData* data, String& manualMeshName, int lodIndex) override;
-    void bakeLodLevel(LodData* data, int lodIndex) override;
-    void inject() override;
-
-    void triangleRemoved(LodData* data, LodData::Triangle* tri) override;
-    void triangleChanged(LodData* data, LodData::Triangle* tri) override;
-
-protected:
-
-    LodOutputProviderCompressedMesh();
-
-    struct TriangleCache {
-        unsigned int vertexID[3];
-        bool vertexChanged;
-    };
-
-    typedef std::vector<TriangleCache> TriangleCacheList;
-
-    /// First pass will create the mTriangleCacheList and second pass will use it.
-    /// This is required, because the triangles from first pass will be changed and we need to keep the information.
-    TriangleCacheList mTriangleCacheList;   
-
-    /// Lod index of the buffer for mTriangleCacheList.
-    bool mFirstBufferPass;
-
-    /// if uneven lod levels are created, we need to fall back for the last lod level.
-    LodOutputProvider* fallback;
-    MeshPtr mMesh;
-
-    int mLastIndexBufferID;
-
-    virtual void bakeFirstPass(LodData* data, int lodIndex);
-    virtual void bakeSecondPass(LodData* data, int lodIndex);
+    LodOutputProviderCompressedMesh(MeshPtr mesh)
+    : LodOutputProviderMesh(mesh, true)
+    {}
 };
 
 }
