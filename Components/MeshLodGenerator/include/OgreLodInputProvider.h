@@ -67,11 +67,6 @@ protected:
 private:
     void tuneContainerSize(LodData* data);
     void initialize(LodData* data);
-
-    template <typename IndexType>
-    void addIndexDataImpl(LodData* data, IndexType* iPos, const IndexType* iEnd, std::vector<LodData::Vertex*>& lookup,
-                          ushort submeshID, RenderOperation::OperationType renderOp);
-
 };
 
 }
