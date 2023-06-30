@@ -30,74 +30,11 @@
 
 namespace Ogre
 {
-    inline size_t getTriangleCount(RenderOperation::OperationType renderOp, size_t indexCount)
-    {
-        if(renderOp == RenderOperation::OT_TRIANGLE_LIST)
-            return indexCount / 3;
-        else if(renderOp == RenderOperation::OT_TRIANGLE_STRIP || renderOp == RenderOperation::OT_TRIANGLE_FAN)
-            return indexCount >= 3 ? indexCount - 2 : 0;
-        return 0;
-    }
-    
     LodInputProviderMesh::LodInputProviderMesh( MeshPtr mesh ) : mMesh(mesh)
     {
 
     }
 
-    void LodInputProviderMesh::initData( LodData* data )
-    {
-        tuneContainerSize(data);
-        initialize(data);
-    }
-    void LodInputProviderMesh::tuneContainerSize(LodData* data)
-    {
-        // Get Vertex count for container tuning.
-        bool sharedVerticesAdded = false;
-        size_t trianglesCount = 0;
-        size_t vertexCount = 0;
-        size_t vertexLookupSize = 0;
-        size_t sharedVertexLookupSize = 0;
-        size_t submeshCount = getSubMeshCount();
-        for (size_t i = 0; i < submeshCount; i++) {
-            trianglesCount += getTriangleCount(getSubMeshRenderOp(i), getSubMeshIndexCount(i));
-            if (!getSubMeshUseSharedVertices(i)) {
-                size_t count = getSubMeshOwnVertexCount(i);
-                vertexLookupSize = std::max(vertexLookupSize, count);
-                vertexCount += count;
-            } else if (!sharedVerticesAdded) {
-                sharedVerticesAdded = true;
-                sharedVertexLookupSize = getMeshSharedVertexCount();
-                vertexCount += sharedVertexLookupSize;
-            }
-        }
-
-        // Tune containers:
-        data->mUniqueVertexSet.rehash(4 * vertexCount); // less then 0.25 item/bucket for low collision rate
-
-        data->mTriangleList.reserve(trianglesCount);
-
-        data->mVertexList.reserve(vertexCount);
-        mSharedVertexLookup.reserve(sharedVertexLookupSize);
-        mVertexLookup.reserve(vertexLookupSize);
-        data->mIndexBufferInfoList.resize(submeshCount);
-    }
-
-    void LodInputProviderMesh::initialize( LodData* data )
-    {
-#if OGRE_DEBUG_MODE
-        data->mMeshName = getMeshName();
-#endif
-        data->mMeshBoundingSphereRadius = getMeshBoundingSphereRadius();
-        size_t submeshCount = getSubMeshCount();
-        for (size_t i = 0; i < submeshCount; ++i) {
-            addVertexData(data, i);
-            addIndexData(data, i);
-        }
-
-        // These were only needed for addIndexData() and addVertexData().
-        mSharedVertexLookup.clear();
-        mVertexLookup.clear();
-    }
     void LodInputProviderMesh::addVertexData(LodData* data, size_t subMeshIndex)
     {
         bool useSharedVertices = getSubMeshUseSharedVertices(subMeshIndex);
@@ -196,20 +133,11 @@ namespace Ogre
             vNormalBuf->unlock();
         }
     }
+
     void LodInputProviderMesh::addIndexData(LodData* data, size_t subMeshIndex)
     {
-        IndexData* indexData = mMesh->getSubMesh(subMeshIndex)->indexData;
-        const HardwareIndexBufferPtr& ibuf = indexData->indexBuffer;
-
-        if (indexData->indexCount == 0 || ibuf == nullptr) {
-            // Locking a zero length buffer on Linux with nvidia cards fails.
-            return;
-        }
-
-        data->mIndexBufferInfoList[subMeshIndex].indexSize = ibuf->getIndexSize();
-        data->mIndexBufferInfoList[subMeshIndex].indexCount = indexData->indexCount;
-
-        addIndexDataImpl(data, ibuf, indexData->indexStart, indexData->indexCount, subMeshIndex);
+        IndexData* id = mMesh->getSubMesh(subMeshIndex)->indexData;
+        addIndexDataImpl(data, id->indexBuffer, id->indexStart, id->indexCount, subMeshIndex);
     }
 
     const String & LodInputProviderMesh::getMeshName()
