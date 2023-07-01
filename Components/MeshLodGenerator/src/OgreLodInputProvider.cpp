@@ -298,6 +298,19 @@ namespace Ogre
             line->vertex[0] = lookup[i0];
             line->vertex[1] = lookup[i1];
 
+            if (line->isMalformed()) {
+#if OGRE_DEBUG_MODE
+                std::stringstream str;
+                str << "In " << data->mMeshName << " malformed line found with ID: " << LodData::getVectorIDFromPointer(data->mLineList, line) << ". " <<
+                std::endl;
+//                printLine(tri, str);
+                str << "It will be excluded from Lod level calculations.";
+                LogManager::getSingleton().stream() << str.str();
+#endif
+                line->isRemoved = true;
+                data->mIndexBufferInfoList[line->submeshID].indexCount -= 2;
+                continue;
+            }
             addLineToVertices(data, line);
         }
     }

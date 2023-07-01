@@ -70,6 +70,21 @@ size_t LodData::VertexHash::operator() (const LodData::Vertex* v) const
     return (size_t)hash;
 }
 
+unsigned int LodData::Line::getVertexID(const LodData::Vertex* v) const
+{
+    for (int i = 0; i < 2; i++) {
+        if (vertex[i] == v) {
+            return vertexID[i];
+        }
+    }
+    OgreAssert(0, "");
+    return 0;
+}
+bool LodData::Line::isMalformed()
+{
+    return vertex[0] == vertex[1];
+}
+
 unsigned int LodData::Triangle::getVertexID(const LodData::Vertex* v) const
 {
     for (int i = 0; i < 3; i++) {

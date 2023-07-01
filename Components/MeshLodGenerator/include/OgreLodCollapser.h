@@ -92,8 +92,10 @@ protected:
     void assertValidVertex(LodData* data, LodData::Vertex* v);
     bool hasSrcID(unsigned int srcID, size_t submeshID);
     void removeTriangleFromEdges(LodData::Triangle* triangle, LodData::Vertex* skip);
+    void removeLine(LodData::Line* triangle, LodData::Vertex* skip);
     size_t findDstID(unsigned int srcID, size_t submeshID);
     void replaceVertexID(LodData::Triangle* triangle, unsigned int oldID, unsigned int newID, LodData::Vertex* dst);
+    void replaceVertexID(LodData::Line* line, unsigned int oldID, unsigned int newID, LodData::Vertex* dst);
 };
 /** @} */
 /** @} */
