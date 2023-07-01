@@ -318,6 +318,27 @@ namespace Ogre
         }
     }
 
+    void LodOutputProvider::lineRemoved( LodData* data, LodData::Line* line )
+    {
+        if (mUseCompression)
+        {
+            lineChanged(data, line);
+        }
+    }
+
+    void LodOutputProvider::lineChanged( LodData* data, LodData::Line* line )
+    {
+        if (mUseCompression)
+        {
+            assert(!line->isRemoved);
+            LineCache& cache = mLineCacheList[LodData::getVectorIDFromPointer(data->mLineList, line)];
+            if(!cache.vertexChanged){
+                cache.vertexChanged = true;
+                data->mIndexBufferInfoList[line->submeshID].prevOnlyIndexCount += 2;
+            }
+        }
+    }
+
     HardwareIndexBufferPtr LodOutputProvider::createIndexBuffer(size_t indexCount)
     {
         //If the index is empty we need to create a "dummy" triangle, just to keep the index buffer from being empty.

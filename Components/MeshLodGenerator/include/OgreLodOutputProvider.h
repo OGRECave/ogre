@@ -46,6 +46,8 @@ public:
     virtual void bakeLodLevel(LodData* data, int lodIndex);
     virtual void triangleRemoved(LodData* data, LodData::Triangle* tri);
     virtual void triangleChanged(LodData* data, LodData::Triangle* tri);
+    virtual void lineRemoved(LodData* data, LodData::Line* tri);
+    virtual void lineChanged(LodData* data, LodData::Line* tri);
     virtual void inject(){}
 
 protected:

@@ -121,6 +121,14 @@ struct _OgreLodExport LodData {
         bool isRemoved;
         unsigned short submeshID; /// ID of the submesh. Usable with mMesh.getSubMesh() function.
         unsigned int vertexID[2]; /// Vertex ID in the buffer associated with the submeshID.
+
+        bool hasVertex(const Vertex* v) const
+        {
+            return (v == vertex[0] || v == vertex[1]);
+        }
+
+        unsigned int getVertexID(const Vertex* v) const;
+        bool isMalformed();
     };
     
     struct Triangle {

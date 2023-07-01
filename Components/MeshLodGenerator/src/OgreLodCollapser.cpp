@@ -126,6 +126,16 @@ namespace Ogre
             }
         }
     }
+    void LodCollapser::removeLine(LodData::Line* line, LodData::Vertex* skip)
+    {
+        line->isRemoved = true;
+
+        for (auto & i : line->vertex) {
+            if (i != skip) {
+                i->lines.removeExists(line);
+            }
+        }
+    }
 
     size_t LodCollapser::findDstID(unsigned int srcID, size_t submeshID)
     {
@@ -166,6 +176,20 @@ namespace Ogre
                 }
                 triangle->vertex[i] = dst;
                 triangle->vertexID[i] = newID;
+                return;
+            }
+        }
+        OgreAssert(0, "");
+    }
+    void LodCollapser::replaceVertexID(LodData::Line* line, unsigned int oldID, unsigned int newID, LodData::Vertex* dst)
+    {
+        dst->lines.addNotExists(line);
+        // NOTE: line is not removed from src. This is implementation specific optimization.
+
+        for (int i = 0; i < 2; i++) {
+            if (line->vertexID[i] == oldID) {
+                line->vertex[i] = dst;
+                line->vertexID[i] = newID;
                 return;
             }
         }
@@ -219,6 +243,36 @@ namespace Ogre
         OgreAssert(tmpCollapsedEdges.size(), "");
         OgreAssert(dst->edges.find(LodData::Edge(src)) == dst->edges.end(), "");
 
+        LodData::VLines::iterator lineIt = src->lines.begin();
+        LodData::VLines::iterator lineItEnd = src->lines.end();
+        for (; lineIt != lineItEnd; ++lineIt)
+        {
+            LodData::Line* line = *lineIt;
+            if (line->hasVertex(dst))
+            {
+                // Remove a line
+                // Tasks:
+                // 1. Add it to the collapsed edges list.
+                // 2. Reduce index count for the Lods, which will not have this line.
+                // 3. Remove references/pointers to this line and mark as removed.
+
+                // 1. task
+                unsigned int srcID = line->getVertexID(src);
+                if (!hasSrcID(srcID, line->submeshID)) {
+                    tmpCollapsedEdges.push_back(CollapsedEdge());
+                    tmpCollapsedEdges.back().srcID = srcID;
+                    tmpCollapsedEdges.back().dstID = line->getVertexID(dst);
+                    tmpCollapsedEdges.back().submeshID = line->submeshID;
+                }
+
+                // 2. task
+                data->mIndexBufferInfoList[line->submeshID].indexCount -= 2;
+                output->lineRemoved(data, line);
+                // 3. task
+                removeLine(line, src);
+            }
+        }
+
         it = src->triangles.begin();
         for (; it != itEnd; ++it) {
             LodData::Triangle* triangle = *it;
@@ -249,6 +303,37 @@ namespace Ogre
 #if MESHLOD_QUALITY >= 3
                 triangle->computeNormal();
 #endif
+            }
+        }
+
+        lineIt = src->lines.begin();
+        for (; lineIt != lineItEnd; ++lineIt)
+        {
+            LodData::Line* line = *lineIt;
+            if (!line->hasVertex(dst))
+            {
+                // Replace a line
+                // Tasks:
+                // 1. Determine the edge which we will move along. (we need to modify single vertex only)
+                // 2. Move along the selected edge.
+
+                // 1. task
+                unsigned int srcID = line->getVertexID(src);
+                size_t id = findDstID(srcID, line->submeshID);
+                if (id == std::numeric_limits<size_t>::max()) {
+                    // Not found any edge to move along.
+                    // Destroy the triangle.
+                    data->mIndexBufferInfoList[line->submeshID].indexCount -= 2;
+                    output->lineRemoved(data, line);
+                    removeLine(line, src);
+                    continue;
+                }
+                unsigned int dstID = tmpCollapsedEdges[id].dstID;
+
+                // 2. task
+                replaceVertexID(line, srcID, dstID, dst);
+
+                output->lineChanged(data, line);
             }
         }
 
@@ -301,6 +386,7 @@ namespace Ogre
 #endif // ifndef MESHLOD_QUALITY
         data->mCollapseCostHeap.erase(src->costHeapPosition); // Remove src from collapse costs.
         src->edges.clear(); // Free memory
+        src->lines.clear(); // Free memory
         src->triangles.clear(); // Free memory
 #if OGRE_DEBUG_MODE
         src->costHeapPosition = data->mCollapseCostHeap.end();
