@@ -46,7 +46,7 @@ namespace RTShader {
 @see http://msdn.microsoft.com/en-us/library/bb206269.aspx
 Derives from SubRenderState class.
 */
-class _OgreRTSSExport FFPTransform : public SubRenderState
+class FFPTransform : public SubRenderState
 {
 
 // Interface.
@@ -74,17 +74,12 @@ public:
 
     bool preAddToRenderState(const RenderState* renderState, Pass* srcPass, Pass* dstPass) override;
 
-    void setInstancingParams(bool enabled, int texCoordIndex)
-    {
-        mInstanced = enabled;
-        mTexCoordIndex = Parameter::Content(Parameter::SPC_TEXTURE_COORDINATE0 + texCoordIndex);
-    }
+    bool setParameter(const String& name, const String& value) override;
 
     static String Type;
 protected:
-    Parameter::Content mTexCoordIndex = Parameter::SPC_TEXTURE_COORDINATE0;
+    int mInstancingTexCoordIndex = 0;
     bool mSetPointSize;
-    bool mInstanced = false;
     bool mDoLightCalculations;
 };
 
@@ -93,7 +88,7 @@ protected:
 A factory that enables creation of FFPTransform instances.
 @remarks Sub class of SubRenderStateFactory
 */
-class _OgreRTSSExport FFPTransformFactory : public SubRenderStateFactory
+class FFPTransformFactory : public SubRenderStateFactory
 {
 public:
 
