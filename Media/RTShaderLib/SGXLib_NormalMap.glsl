@@ -81,8 +81,10 @@ void SGX_Generate_Parallax_Texcoord(in sampler2D normalHeightMap,
     newTexCoord = newTexCoord - p;
 #else
 	// parallax occlusion mapping
+#ifdef POM_MAX_DISTANCE
 	if (abs(viewPos.z) > POM_MAX_DISTANCE)
 		return;
+#endif
 
 	//Configure steep mapping layering.
 	float layerDepth = 1.0 / float(POM_LAYER_COUNT);

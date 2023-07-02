@@ -69,7 +69,7 @@ bool NormalMapLighting::createCpuSubPrograms(ProgramSet* programSet)
     psProgram->addDependency(SGX_LIB_NORMALMAP);
 
     if (mNormalMapSpace == NMS_PARALLAX_OCCLUSION)
-        psProgram->addPreprocessorDefines("POM_MAX_DISTANCE=400.0,POM_LAYER_COUNT=32");
+        psProgram->addPreprocessorDefines("POM_LAYER_COUNT=32");
 
     // Resolve texture coordinates.
     auto vsInTexcoord = vsMain->resolveInputParameter(
