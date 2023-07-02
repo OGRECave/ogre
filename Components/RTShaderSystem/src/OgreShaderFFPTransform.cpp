@@ -81,10 +81,10 @@ bool FFPTransform::createCpuSubPrograms(ProgramSet* programSet)
     // This requires GLES3.0
     if (ShaderGenerator::getSingleton().getTargetLanguage() == "glsles" &&
         !GpuProgramManager::getSingleton().isSyntaxSupported("glsl300es"))
-        mInstanced = false;
+        mInstancingTexCoordIndex = 0;
 
     auto stage = vsEntry->getStage(FFP_VS_TRANSFORM);
-    if(mInstanced)
+    if(mInstancingTexCoordIndex)
     {
         vsProgram->setInstancingIncluded(true);
         // this at prevents software skinning, which is not supported with instancing
@@ -96,7 +96,8 @@ bool FFPTransform::createCpuSubPrograms(ProgramSet* programSet)
             vsProgram->setUseColumnMajorMatrices(false);
         }
 
-        auto wMatrix = vsEntry->resolveInputParameter(mTexCoordIndex, GCT_MATRIX_3X4);
+        auto wMatrix = vsEntry->resolveInputParameter(
+            Parameter::Content(Parameter::SPC_TEXTURE_COORDINATE0 + mInstancingTexCoordIndex), GCT_MATRIX_3X4);
         stage.callFunction(FFP_FUNC_TRANSFORM, wMatrix, positionIn, Out(positionIn).xyz());
 
         if(mDoLightCalculations)
@@ -128,8 +129,16 @@ void FFPTransform::copyFrom(const SubRenderState& rhs)
 {
     const FFPTransform& rhsTransform = static_cast<const FFPTransform&>(rhs);
     mSetPointSize = rhsTransform.mSetPointSize;
-    mInstanced = rhsTransform.mInstanced;
-    mTexCoordIndex = rhsTransform.mTexCoordIndex;
+    mInstancingTexCoordIndex = rhsTransform.mInstancingTexCoordIndex;
+}
+
+bool FFPTransform::setParameter(const String& name, const String& value)
+{
+    if (name == "instanced")
+    {
+        return StringConverter::parse(value, mInstancingTexCoordIndex);
+    }
+    return false;
 }
 
 //-----------------------------------------------------------------------
@@ -146,16 +155,16 @@ SubRenderState* FFPTransformFactory::createInstance(ScriptCompiler* compiler,
     {
         if(prop->values.size() > 0)
         {
-            int texCoordSlot = 1;
-
             auto it = prop->values.begin();
-            const String& modelType = (*it)->getString();
+            if((*it)->getString() != "instanced")
+                return NULL;
 
+            int texCoordSlot = 1;
             if(++it != prop->values.end() && !SGScriptTranslator::getInt(*++it, &texCoordSlot))
                 return NULL;
 
-            auto ret = static_cast<FFPTransform*>(createOrRetrieveInstance(translator));
-            ret->setInstancingParams(modelType == "instanced", texCoordSlot);
+            auto ret = createOrRetrieveInstance(translator);
+            ret->setParameter("instanced", std::to_string(texCoordSlot));
 
             return ret;
         }

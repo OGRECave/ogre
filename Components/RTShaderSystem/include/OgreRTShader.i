@@ -22,6 +22,5 @@
 %ignore Ogre::RTShader::ShaderGenerator::removeShaderBasedTechnique(const String&, const String&, const String&);
 %include "OgreShaderGenerator.h"
 %include "OgreShaderRenderState.h"
-%include "OgreShaderFFPTransform.h"
 %include "OgreShaderExLayeredBlending.h"
 %include "OgreShaderExHardwareSkinning.h"

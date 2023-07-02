@@ -52,7 +52,7 @@ Format: `transform_stage <type> [attrIndex]`
 Example: `transform_stage instanced 1`
 
 @param type either `ffp` or `instanced`
-@param attrIndex the start texcoord attribute index to read the instanced world matrix from
+@param attrIndex the start texcoord attribute index to read the instanced world matrix from. Must be greater than 0.
 
 @see @ref Instancing-in-Vertex-Programs
 @see Ogre::InstanceBatchHW
