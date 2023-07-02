@@ -427,7 +427,15 @@ bool AssimpLoader::_load(const char* name, Assimp::Importer& importer, Mesh* mes
         if(tex->mHeight == 0)
         {
             auto stream = std::make_shared<MemoryDataStream>(tex->pcData, tex->mWidth, false);
-            img.load(stream, tex->achFormatHint);
+            try
+            {
+                img.load(stream, tex->achFormatHint);
+            }
+            catch (Exception& e)
+            {
+                LogManager::getSingleton().logError("Could not load embedded image - " + e.getDescription());
+                continue;
+            }
         }
         else
         {
@@ -813,8 +821,6 @@ bool AssimpLoader::isNodeNeeded(const char* name)
 
 void AssimpLoader::grabBoneNamesFromNode(const aiScene* mScene, const aiNode* pNode)
 {
-    static int meshNum = 0;
-    meshNum++;
     if (pNode->mNumMeshes > 0)
     {
         for (unsigned int idx = 0; idx < pNode->mNumMeshes; ++idx)
