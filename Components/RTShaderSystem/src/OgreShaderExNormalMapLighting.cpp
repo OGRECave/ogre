@@ -59,10 +59,8 @@ bool NormalMapLighting::createCpuSubPrograms(ProgramSet* programSet)
     Program* psProgram = programSet->getCpuProgram(GPT_FRAGMENT_PROGRAM);
     Function* psMain = psProgram->getEntryPointFunction();
 
-    vsProgram->addDependency(FFP_LIB_TRANSFORM);
     vsProgram->addDependency(SGX_LIB_NORMALMAP);
 
-    psProgram->addDependency(FFP_LIB_TRANSFORM);
     psProgram->addDependency(FFP_LIB_TEXTURING);
     psProgram->addDependency(SGX_LIB_NORMALMAP);
 
@@ -135,7 +133,7 @@ bool NormalMapLighting::createCpuSubPrograms(ProgramSet* programSet)
     {
         // transform normal in FS
         auto normalMatrix = psProgram->resolveParameter(GpuProgramParameters::ACT_NORMAL_MATRIX);
-        fstage.callFunction(FFP_FUNC_TRANSFORM, normalMatrix, newViewNormal, newViewNormal);
+        fstage.callBuiltin("mul", normalMatrix, newViewNormal, newViewNormal);
     }
 
     return true;
