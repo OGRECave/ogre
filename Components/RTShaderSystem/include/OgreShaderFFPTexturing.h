@@ -81,11 +81,11 @@ public:
     
     static String Type;
 
-// Protected types:
-protected:
-    
+private:
+    friend class LayeredBlending;
+
     // Per texture unit parameters.
-    struct _OgreRTSSExport TextureUnitParams
+    struct TextureUnitParams
     {
         // Texture unit state.
         TextureUnitState* mTextureUnitState;
@@ -117,9 +117,6 @@ protected:
     typedef TextureUnitParamsList::iterator         TextureUnitParamsIterator;
     typedef TextureUnitParamsList::const_iterator   TextureUnitParamsConstIterator;
 
-// Protected methods
-protected:
-
     /** 
     Set the number of texture units this texturing sub state has to handle.
     @param count The number of texture unit states.
@@ -139,11 +136,6 @@ protected:
     void setTextureUnit(unsigned short index, TextureUnitState* textureUnitState);
 
     /** 
-    @see SubRenderState::resolveParameters.
-    */
-    bool resolveParameters(ProgramSet* programSet) override;
-
-    /** 
     Internal method that resolves uniform parameters of the given texture unit parameters.
     */
     bool resolveUniformParams(TextureUnitParams* textureUnitParams, ProgramSet* programSet);
@@ -153,11 +145,21 @@ protected:
     */
     bool resolveFunctionsParams(TextureUnitParams* textureUnitParams, ProgramSet* programSet);
 
+//protected:
+    /**
+    @see SubRenderState::resolveParameters.
+    */
+    bool resolveParameters(ProgramSet* programSet) override;
+
     /** 
     @see SubRenderState::resolveDependencies.
     */
     bool resolveDependencies(ProgramSet* programSet) override;
 
+    virtual void addPSBlendInvocations(Function* psMain, ParameterPtr arg1, ParameterPtr arg2,
+                ParameterPtr texel,int samplerIndex, const LayerBlendModeEx& blendMode,
+                const int groupOrder, Operand::OpMask targetChannels);
+private:
     /** 
     @see SubRenderState::addFunctionInvocations.
     */
@@ -177,15 +179,11 @@ protected:
     /** 
     Adds the fragment shader code which samples the texel color in the texture
     */
-    virtual void addPSSampleTexelInvocation(TextureUnitParams* textureUnitParams, Function* psMain, 
+    void addPSSampleTexelInvocation(TextureUnitParams* textureUnitParams, Function* psMain,
         const ParameterPtr& texel, int groupOrder);
 
     ParameterPtr getPSArgument(ParameterPtr texel, LayerBlendSource blendSrc, const ColourValue& colourValue,
                                Real alphaValue, bool isAlphaArgument) const;
-
-    virtual void addPSBlendInvocations(Function* psMain, ParameterPtr arg1, ParameterPtr arg2,
-                ParameterPtr texel,int samplerIndex, const LayerBlendModeEx& blendMode,
-                const int groupOrder, Operand::OpMask targetChannels);
     
     /** 
     Determines if the given texture unit state need to use texture transformation matrix.
@@ -194,8 +192,6 @@ protected:
 
     bool setParameter(const String& name, const String& value) override;
 
-// Attributes.
-protected:
     // Texture units list.      
     TextureUnitParamsList mTextureUnitParamsList;
     // World matrix parameter.
@@ -208,8 +204,10 @@ protected:
     ParameterPtr mVSInputNormal;
     // Vertex shader input position parameter.      
     ParameterPtr mVSInputPos;
+//protected:
     // Pixel shader output colour.
     ParameterPtr mPSOutDiffuse;
+private:
     // Pixel shader diffuse colour.
     ParameterPtr mPSDiffuse;
     // Pixel shader specular colour.
@@ -217,41 +215,6 @@ protected:
 
     bool mIsPointSprite;
     bool mLateAddBlend;
-};
-
-
-/** 
-A factory that enables creation of FFPTexturing instances.
-@remarks Sub class of SubRenderStateFactory
-*/
-class _OgreRTSSExport FFPTexturingFactory : public SubRenderStateFactory
-{
-public:
-
-    /** 
-    @see SubRenderStateFactory::getType.
-    */
-    const String& getType() const override;
-
-    /** 
-    @see SubRenderStateFactory::createInstance.
-    */
-    SubRenderState* createInstance(ScriptCompiler* compiler, PropertyAbstractNode* prop, Pass* pass, SGScriptTranslator* translator) override;
-
-    /** 
-    @see SubRenderStateFactory::writeInstance.
-    */
-    void writeInstance(MaterialSerializer* ser, SubRenderState* subRenderState, Pass* srcPass, Pass* dstPass) override;
-
-    
-protected:
-
-    /** 
-    @see SubRenderStateFactory::createInstanceImpl.
-    */
-    SubRenderState* createInstanceImpl() override;
-
-
 };
 
 /** @} */
