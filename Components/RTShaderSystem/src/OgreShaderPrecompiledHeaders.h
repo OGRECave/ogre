@@ -113,11 +113,35 @@ THE SOFTWARE.
 #define FFP_FUNC_ALPHA_TEST							"FFP_Alpha_Test"
 
 #define SGX_LIB_PERPIXELLIGHTING                    "SGXLib_PerPixelLighting"
-#define SGX_FUNC_LIGHT_DIRECTIONAL_DIFFUSE          "SGX_Light_Directional_Diffuse"
-#define SGX_FUNC_LIGHT_DIRECTIONAL_DIFFUSESPECULAR  "SGX_Light_Directional_DiffuseSpecular"
-#define SGX_FUNC_LIGHT_POINT_DIFFUSE                "SGX_Light_Point_Diffuse"
-#define SGX_FUNC_LIGHT_POINT_DIFFUSESPECULAR        "SGX_Light_Point_DiffuseSpecular"
-#define SGX_FUNC_LIGHT_SPOT_DIFFUSE                 "SGX_Light_Spot_Diffuse"
-#define SGX_FUNC_LIGHT_SPOT_DIFFUSESPECULAR         "SGX_Light_Spot_DiffuseSpecular"
+
+namespace Ogre {
+namespace RTShader {
+class LayeredBlendingFactory : public SubRenderStateFactory
+{
+public:
+    const String& getType() const override;
+    SubRenderState* createInstance(ScriptCompiler* compiler, PropertyAbstractNode* prop, TextureUnitState* texState,
+                                   SGScriptTranslator* translator) override;
+    void writeInstance(MaterialSerializer* ser, SubRenderState* subRenderState, const TextureUnitState* srcTextureUnit,
+                       const TextureUnitState* dstTextureUnit) override;
+
+private:
+    SubRenderState* createInstanceImpl() override;
+    LayeredBlending* createOrRetrieveSubRenderState(SGScriptTranslator* translator);
+};
+
+class FFPTexturingFactory : public SubRenderStateFactory
+{
+public:
+    const String& getType() const override;
+    SubRenderState* createInstance(ScriptCompiler* compiler, PropertyAbstractNode* prop, Pass* pass,
+                                   SGScriptTranslator* translator) override;
+    void writeInstance(MaterialSerializer* ser, SubRenderState* subRenderState, Pass* srcPass, Pass* dstPass) override;
+protected:
+    SubRenderState* createInstanceImpl() override;
+};
+
+} // namespace RTShader
+} // namespace Ogre
 
 #endif 

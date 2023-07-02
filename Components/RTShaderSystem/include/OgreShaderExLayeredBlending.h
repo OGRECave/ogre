@@ -89,7 +89,6 @@ public:
 
     static String Type;
 
-// Protected methods
 private:
     
     /** 
@@ -136,47 +135,6 @@ private:
     };
     std::vector<TextureBlend> mTextureBlends;
 
-};
-
-
-
-/** 
-A factory that enables creation of LayeredBlending instances.
-@remarks Sub class of SubRenderStateFactory
-*/
-class _OgreRTSSExport LayeredBlendingFactory : public SubRenderStateFactory
-{
-public:
-
-    /** 
-    @see SubRenderStateFactory::getType.
-    */
-    const String& getType() const override;
-
-    /** 
-    @see SubRenderStateFactory::createInstance.
-    */
-    SubRenderState* createInstance(ScriptCompiler* compiler, PropertyAbstractNode* prop, TextureUnitState* texState, SGScriptTranslator* translator) override;
-
-    /** 
-    @see SubRenderStateFactory::writeInstance.
-    */
-    void writeInstance(MaterialSerializer* ser, SubRenderState* subRenderState, const TextureUnitState* srcTextureUnit, const TextureUnitState* dstTextureUnit) override;
-
-    
-protected:
-
-    /** 
-    @see SubRenderStateFactory::createInstanceImpl.
-    */
-    SubRenderState* createInstanceImpl() override;
-
-    /** 
-    Returns the LayeredBlending sub-rener state previously created for this material/pass.
-    if no such sub-render state exists creates a new one
-    @param translator compiler
-    */
-    LayeredBlending* createOrRetrieveSubRenderState(SGScriptTranslator* translator);
 };
 
 } // namespace RTShader
