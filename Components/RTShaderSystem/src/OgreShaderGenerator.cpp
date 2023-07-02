@@ -1314,6 +1314,20 @@ const String& ShaderGenerator::getRTShaderScheme(size_t index) const
     else return BLANKSTRING;
 }
 
+void ShaderGenerator::_markNonFFP(const TextureUnitState* tu)
+{
+    auto pass = tu->getParent();
+    auto texureIdx = pass->getTextureUnitStateIndex(tu);
+
+    // add to blacklist
+    std::set<uint16> nonFFP_TUS;
+    auto any = pass->getUserObjectBindings().getUserAny("_RTSS_nonFFP_TUS");
+    if(any.has_value())
+        nonFFP_TUS = any_cast<std::set<uint16>>(any);
+    nonFFP_TUS.insert(texureIdx);
+    pass->getUserObjectBindings().setUserAny("_RTSS_nonFFP_TUS", nonFFP_TUS);
+}
+
 //-----------------------------------------------------------------------------
 
 bool ShaderGenerator::getIsFinalizing() const

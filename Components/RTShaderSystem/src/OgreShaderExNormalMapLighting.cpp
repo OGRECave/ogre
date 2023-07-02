@@ -46,8 +46,6 @@ NormalMapLighting::NormalMapLighting()
     mNormalMapSamplerIndex = -1;
     mVSTexCoordSetIndex = 0;
     mNormalMapSpace = NMS_TANGENT;
-    mNormalMapSampler = TextureManager::getSingleton().createSampler();
-    mNormalMapSampler->setMipmapBias(-1.0);
     mParallaxHeightScale = 0.04f;
 }
 
@@ -149,8 +147,6 @@ void NormalMapLighting::copyFrom(const SubRenderState& rhs)
     const NormalMapLighting& rhsLighting = static_cast<const NormalMapLighting&>(rhs);
 
     mNormalMapSpace = rhsLighting.mNormalMapSpace;
-    mNormalMapTextureName = rhsLighting.mNormalMapTextureName;
-    mNormalMapSampler = rhsLighting.mNormalMapSampler;
     mNormalMapSamplerIndex = rhsLighting.mNormalMapSamplerIndex;
     mParallaxHeightScale = rhsLighting.mParallaxHeightScale;
 }
@@ -158,16 +154,13 @@ void NormalMapLighting::copyFrom(const SubRenderState& rhs)
 //-----------------------------------------------------------------------
 bool NormalMapLighting::preAddToRenderState(const RenderState* renderState, Pass* srcPass, Pass* dstPass)
 {
-    if(mNormalMapSamplerIndex >= 0)
+    if (mNormalMapSamplerIndex >= 0)
+    {
+        mVSTexCoordSetIndex = srcPass->getTextureUnitState(mNormalMapSamplerIndex)->getTextureCoordSet();
         return true;
+    }
 
-    TextureUnitState* normalMapTexture = dstPass->createTextureUnitState();
-
-    normalMapTexture->setTextureName(mNormalMapTextureName);
-    normalMapTexture->setSampler(mNormalMapSampler);
-    mNormalMapSamplerIndex = dstPass->getNumTextureUnitStates() - 1;
-
-    return true;
+    return false;
 }
 
 bool NormalMapLighting::setParameter(const String& name, const String& value)
@@ -199,30 +192,9 @@ bool NormalMapLighting::setParameter(const String& name, const String& value)
         return false;
     }
 
-    if (name == "texture" && !value.empty() && mNormalMapSamplerIndex < 0)
-    {
-        mNormalMapTextureName = value;
-        return true;
-    }
-
-    if (name == "texture_index" && mNormalMapTextureName.empty())
+    if (name == "texture_index")
     {
         return StringConverter::parse(value, mNormalMapSamplerIndex);
-    }
-
-    if (name == "texcoord_index" && !value.empty())
-    {
-        setTexCoordIndex(StringConverter::parseInt(value));
-        return true;
-    }
-
-    if (name == "sampler" && mNormalMapSamplerIndex < 0)
-    {
-        auto sampler = TextureManager::getSingleton().getSampler(value);
-        if (!sampler)
-            return false;
-        mNormalMapSampler = sampler;
-        return true;
     }
 
     if (name == "height_scale")
@@ -251,9 +223,13 @@ SubRenderState* NormalMapLightingFactory::createInstance(ScriptCompiler* compile
             {
                 ++it;
                 SubRenderState* subRenderState = createOrRetrieveInstance(translator);
-                NormalMapLighting* normalMapSubRenderState = static_cast<NormalMapLighting*>(subRenderState);
 
-                subRenderState->setParameter("texture", (*it)->getString());
+                TextureUnitState* normalMapTexture = pass->createTextureUnitState();
+                uint16 texureIdx = pass->getNumTextureUnitStates() - 1;
+                normalMapTexture->setTextureName((*it)->getString());
+                subRenderState->setParameter("texture_index", std::to_string(texureIdx));
+
+                ShaderGenerator::_markNonFFP(normalMapTexture);
 
                 // Read normal map space type.
                 if (prop->values.size() >= 3)
@@ -273,8 +249,10 @@ SubRenderState* NormalMapLightingFactory::createInstance(ScriptCompiler* compile
                     ++it;
                     if (SGScriptTranslator::getUInt(*it, &textureCoordinateIndex))
                     {
-                        normalMapSubRenderState->setTexCoordIndex(textureCoordinateIndex);
+                        normalMapTexture->setTextureCoordSet(textureCoordinateIndex);
                     }
+                    compiler->addError(ScriptCompiler::CE_DEPRECATEDSYMBOL, prop->file, prop->line,
+                                       "use the texture_unit format to specify tex_coord_set and sampler_ref");
                 }
 
                 // Read texture filtering format.
@@ -282,12 +260,14 @@ SubRenderState* NormalMapLightingFactory::createInstance(ScriptCompiler* compile
                 {
                     ++it;
                     // sampler reference
-                    if (!normalMapSubRenderState->setParameter("sampler", (*it)->getString()))
+                    if (auto sampler = TextureManager::getSingleton().getSampler((*it)->getString()))
+                    {
+                        normalMapTexture->setSampler(sampler);
+                    }
+                    else
                     {
                         compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
                     }
-                    compiler->addError(ScriptCompiler::CE_DEPRECATEDSYMBOL, prop->file, prop->line,
-                                       "use the texture_unit format to specify a sampler");
                 }
 
                 return subRenderState;
@@ -306,9 +286,7 @@ SubRenderState* NormalMapLightingFactory::createInstance(ScriptCompiler* compile
         auto texureIdx = pass->getTextureUnitStateIndex(texState);
 
         // blacklist from FFP
-        std::set<uint16> nonFFP_TUS = any_cast<std::set<uint16>>(pass->getUserObjectBindings().getUserAny("_RTSS_nonFFP_TUS"));
-        nonFFP_TUS.insert(texureIdx);
-        pass->getUserObjectBindings().setUserAny("_RTSS_nonFFP_TUS", nonFFP_TUS);
+        ShaderGenerator::_markNonFFP(texState);
 
         SubRenderState* subRenderState = createOrRetrieveInstance(translator);
         subRenderState->setParameter("texture_index", std::to_string(texureIdx));
@@ -347,25 +325,32 @@ SubRenderState* NormalMapLightingFactory::createInstance(ScriptCompiler* compile
 }
 
 //-----------------------------------------------------------------------
-void NormalMapLightingFactory::writeInstance(MaterialSerializer* ser, SubRenderState* subRenderState, Pass* srcPass,
-                                             Pass* dstPass)
+void NormalMapLightingFactory::writeInstance(MaterialSerializer* ser, SubRenderState* subRenderState,
+                                             const TextureUnitState* srcTex, const TextureUnitState* dstTex)
 {
     NormalMapLighting* normalMapSubRenderState = static_cast<NormalMapLighting*>(subRenderState);
 
-    ser->writeAttribute(4, "lighting_stage");
-    ser->writeValue("normal_map");
-    ser->writeValue(normalMapSubRenderState->getNormalMapTextureName());
+    auto textureIdx = srcTex->getParent()->getTextureUnitStateIndex(srcTex);
+    if(textureIdx != normalMapSubRenderState->getNormalMapSamplerIndex())
+        return;
 
-    if (normalMapSubRenderState->getNormalMapSpace() == NormalMapLighting::NMS_TANGENT)
+    ser->writeAttribute(5, "normal_map");
+
+    switch (normalMapSubRenderState->getNormalMapSpace())
     {
+    case NormalMapLighting::NMS_TANGENT:
         ser->writeValue("tangent_space");
-    }
-    else if (normalMapSubRenderState->getNormalMapSpace() == NormalMapLighting::NMS_OBJECT)
-    {
+        break;
+    case NormalMapLighting::NMS_OBJECT:
         ser->writeValue("object_space");
+        break;
+    case NormalMapLighting::NMS_PARALLAX:
+        ser->writeValue("parallax");
+        break;
+    case NormalMapLighting::NMS_PARALLAX_OCCLUSION:
+        ser->writeValue("parallax_occlusion");
+        break;
     }
-
-    ser->writeValue(StringConverter::toString(normalMapSubRenderState->getTexCoordIndex()));
 }
 
 //-----------------------------------------------------------------------

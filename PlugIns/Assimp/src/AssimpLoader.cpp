@@ -1032,11 +1032,17 @@ static MaterialPtr createMaterial(const aiMaterial* mat, const Ogre::String &gro
             LogManager::getSingleton().logMessage("Found normal map: " + basename);
         }
 
+        auto tus = omat->getTechnique(0)->getPass(0)->createTextureUnitState(basename);
+
+        // mark as normal map
+        shaderGen->_markNonFFP(tus);
+        uint16 texureIdx = tus->getParent()->getNumTextureUnitStates() - 1;
+
         shaderGen->createShaderBasedTechnique(omat->getTechnique(0), MSN_SHADERGEN);
         auto rs = shaderGen->getRenderState(MSN_SHADERGEN, *omat, 0);
         auto srs = shaderGen->createSubRenderState("NormalMap");
 
-        srs->setParameter("texture", basename);
+        srs->setParameter("texture_index", std::to_string(texureIdx));
         rs->addTemplateSubRenderState(srs);
     }
 

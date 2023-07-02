@@ -70,16 +70,6 @@ public:
     */
     bool preAddToRenderState(const RenderState* renderState, Pass* srcPass, Pass* dstPass) override;
 
-    /** 
-    Set the index of the input vertex shader texture coordinate set 
-    */
-    void setTexCoordIndex(unsigned int index) { mVSTexCoordSetIndex = index;}
-
-    /** 
-    Return the index of the input vertex shader texture coordinate set.
-    */
-    unsigned int getTexCoordIndex() const { return mVSTexCoordSetIndex; }
-
     enum NormalMapSpace
     {
         NMS_OBJECT = 1,
@@ -97,10 +87,7 @@ public:
     /** Return the normal map space. */
     NormalMapSpace getNormalMapSpace() const { return mNormalMapSpace; }
 
-    /** 
-    Return the normal map texture name.
-    */
-    const String& getNormalMapTextureName() const { return mNormalMapTextureName; }
+    int getNormalMapSamplerIndex() const { return mNormalMapSamplerIndex; }
 
     bool setParameter(const String& name, const String& value) override;
 
@@ -109,15 +96,11 @@ protected:
     bool createCpuSubPrograms(ProgramSet* programSet) override;
 
 // Attributes.
-protected:  
-    // The normal map texture name.
-    String mNormalMapTextureName;
+protected:
     // Normal map texture sampler index.
     int mNormalMapSamplerIndex;
     // Vertex shader input texture coordinate set index.
     unsigned int mVSTexCoordSetIndex;
-    // The normal map sampler
-    SamplerPtr mNormalMapSampler;
     // The normal map space.
     NormalMapSpace mNormalMapSpace;
     // Parallax mapping scale
@@ -148,7 +131,7 @@ public:
     /** 
     @see SubRenderStateFactory::writeInstance.
     */
-    void writeInstance(MaterialSerializer* ser, SubRenderState* subRenderState, Pass* srcPass, Pass* dstPass) override;
+    void writeInstance(MaterialSerializer* ser, SubRenderState* subRenderState, const TextureUnitState* srcTex, const TextureUnitState* dstTex) override;
 
     
 protected:

@@ -442,9 +442,11 @@ public:
     */
     const String& getRTShaderScheme(size_t index) const;
 
+    /// mark the given texture unit as non-FFP
+    static void _markNonFFP(const TextureUnitState* tu);
+
     /// same as @ref MSN_SHADERGEN
     static String DEFAULT_SCHEME_NAME;
-
 private:
     class SGPass;
     class SGTechnique;
