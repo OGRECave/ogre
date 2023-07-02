@@ -519,6 +519,18 @@ void Sample_ShaderSystem::updateSystemShaders()
 }
 
 //-----------------------------------------------------------------------
+static void setNormalMap(Pass* pass, const String& normalMapName)
+{
+    if(pass->getNumTextureUnitStates() > 1)
+    {
+        // remove the previous normal map
+        pass->removeTextureUnitState(1);
+    }
+
+    auto tu = pass->createTextureUnitState(normalMapName);
+    ShaderGenerator::_markNonFFP(tu);
+}
+
 void Sample_ShaderSystem::generateShaders(Entity* entity)
 {
     for (unsigned int i=0; i < entity->getNumSubEntities(); ++i)
@@ -578,8 +590,8 @@ void Sample_ShaderSystem::generateShaders(Entity* entity)
                     RTShader::SubRenderState* normalMapSubRS = mShaderGenerator->createSubRenderState(RTShader::SRS_NORMALMAP);
 
                     normalMapSubRS->setParameter("normalmap_space", "object_space");
-                    normalMapSubRS->setParameter("texture", "Panels_Normal_Obj.png");
-
+                    setNormalMap(curPass, "Panels_Normal_Obj.png");
+                    normalMapSubRS->setParameter("texture_index", "1");
                     renderState->addTemplateSubRenderState(normalMapSubRS);
                 }
 
@@ -600,7 +612,8 @@ void Sample_ShaderSystem::generateShaders(Entity* entity)
                     RTShader::SubRenderState* normalMapSubRS = mShaderGenerator->createSubRenderState(RTShader::SRS_NORMALMAP);
 
                     normalMapSubRS->setParameter("normalmap_space", "tangent_space");
-                    normalMapSubRS->setParameter("texture", "Panels_Normal_Tangent.png");
+                    setNormalMap(curPass, "Panels_Normal_Tangent.png");
+                    normalMapSubRS->setParameter("texture_index", "1");
 
                     renderState->addTemplateSubRenderState(normalMapSubRS);
                 }
