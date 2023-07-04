@@ -52,7 +52,7 @@ public:
 
 protected:
     bool mUseCompression;
-    
+
     struct TriangleCache {
         unsigned int vertexID[3];
         bool vertexChanged;
@@ -77,7 +77,7 @@ protected:
     void bakeFirstPass(LodData* data, int lodIndex);
     void bakeSecondPass(LodData* data, int lodIndex);
 
-    
+
     // TODO: remove implementation and make pure virtual. These are just to make the compressed version work.
     virtual size_t getSubMeshCount() { return 0; } // = 0;
 

@@ -63,7 +63,7 @@ protected:
     virtual size_t getSubMeshOwnVertexCount(size_t subMeshIndex) = 0;
     virtual size_t getSubMeshIndexCount(size_t subMeshIndex) = 0;
     virtual RenderOperation::OperationType getSubMeshRenderOp(size_t subMeshIndex) = 0;
-    
+
 private:
     void tuneContainerSize(LodData* data);
     void initialize(LodData* data);
