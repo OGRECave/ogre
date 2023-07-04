@@ -43,7 +43,7 @@ namespace Ogre
 */
 class _OgreLodExport LodCollapseCost {
 public:
-    LodCollapseCost() : mPreventPunchingHoles(true) {}
+    LodCollapseCost() : mPreventPunchingHoles(false), mPreventBreakingLines(false) {}
     virtual ~LodCollapseCost() {}
     /// This is called after the LodInputProvider has initialized LodData.
     virtual void initCollapseCosts(LodData* data);
