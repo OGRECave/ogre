@@ -132,13 +132,16 @@ void MeshLodGenerator::_resolveComponents(LodConfig& lodConfig,
 {
     if(!cost) {
         cost = LodCollapseCostPtr(new LodCollapseCostCurvature);
+        cost->setPreventPunchingHoles(lodConfig.advanced.preventPunchingHoles);
         if(lodConfig.advanced.outsideWeight != 0) {
             cost =
                 LodCollapseCostPtr(new LodCollapseCostOutside(cost, lodConfig.advanced.outsideWeight,
                                                               lodConfig.advanced.outsideWalkAngle));
+            cost->setPreventPunchingHoles(lodConfig.advanced.preventPunchingHoles);
         }
         if(!lodConfig.advanced.profile.empty()) {
             cost = LodCollapseCostPtr(new LodCollapseCostProfiler(lodConfig.advanced.profile, cost));
+            cost->setPreventPunchingHoles(lodConfig.advanced.preventPunchingHoles);
         }
 
     }
