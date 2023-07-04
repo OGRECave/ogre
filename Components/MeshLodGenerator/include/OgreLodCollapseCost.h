@@ -57,12 +57,15 @@ public:
     virtual Real computeEdgeCollapseCost(LodData* data, LodData::Vertex* src, LodData::Edge* dstEdge) = 0;
     /// Set true to prevent collapsing edges that would result in the destruction of a triangle.
     void setPreventPunchingHoles(bool prevent) { mPreventPunchingHoles = prevent; }
+    /// Set true to prevent collapsing edges that would result in the destruction of a line.
+    void setPreventBreakingLines(bool prevent) { mPreventBreakingLines = prevent; }
 protected:
     // Helper functions:
     bool isBorderVertex(const LodData::Vertex* vertex) const;
 private:
     bool isEdgeCollapsible(LodData::Vertex * src, LodData::Vertex * dst);
     bool mPreventPunchingHoles;
+    bool mPreventBreakingLines;
 };
 /** @} */
 /** @} */
