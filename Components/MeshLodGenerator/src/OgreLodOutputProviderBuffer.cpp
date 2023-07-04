@@ -34,7 +34,7 @@ namespace Ogre
     void LodOutputProviderBuffer::prepare( LodData* data )
     {
         LodOutputProvider::prepare(data);
-        
+
         mBuffer.submesh.resize(data->mIndexBufferInfoList.size());
     }
 
@@ -68,7 +68,7 @@ namespace Ogre
             }
         }
     }
-    
+
     size_t LodOutputProviderBuffer::getSubMeshCount()
     {
         return mBuffer.submesh.size();

@@ -35,7 +35,7 @@ namespace Ogre
     , mFirstBufferPass(true)
     , mLastIndexBufferID(0)
     {}
-    
+
     void LodOutputProvider::prepare(LodData *data)
     {
         if (mUseCompression)
@@ -182,7 +182,7 @@ namespace Ogre
             data->mIndexBufferInfoList[i].prevIndexCount = data->mIndexBufferInfoList[i].indexCount;
             data->mIndexBufferInfoList[i].prevOnlyIndexCount = 0;
         }
-        
+
         size_t triangleCount = mTriangleCacheList.size();
         for (size_t i = 0; i < triangleCount; i++) {
             mTriangleCacheList[i].vertexChanged = false;
@@ -202,7 +202,7 @@ namespace Ogre
             }
         }
     }
-    
+
     void LodOutputProvider::bakeSecondPass(LodData* data, int lodIndex)
     {
         std::vector<HardwareIndexBufferPtr> lockedBuffers;
