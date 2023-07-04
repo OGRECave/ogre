@@ -43,6 +43,7 @@ namespace Ogre
 */
 class _OgreLodExport LodCollapseCost {
 public:
+    LodCollapseCost() : mPreventPunchingHoles(true) {}
     virtual ~LodCollapseCost() {}
     /// This is called after the LodInputProvider has initialized LodData.
     virtual void initCollapseCosts(LodData* data);
@@ -54,9 +55,14 @@ public:
     virtual void computeVertexCollapseCost(LodData* data, LodData::Vertex* vertex, Real& collapseCost, LodData::Vertex*& collapseTo);
     /// Returns the collapse cost of the given edge. 
     virtual Real computeEdgeCollapseCost(LodData* data, LodData::Vertex* src, LodData::Edge* dstEdge) = 0;
+    /// Set true to prevent collapsing edges that would result in the destruction of a triangle.
+    void setPreventPunchingHoles(bool prevent) { mPreventPunchingHoles = prevent; }
 protected:
     // Helper functions:
     bool isBorderVertex(const LodData::Vertex* vertex) const;
+private:
+    bool isEdgeCollapsible(LodData::Vertex * src, LodData::Vertex * dst);
+    bool mPreventPunchingHoles;
 };
 /** @} */
 /** @} */
