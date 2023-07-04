@@ -19,6 +19,7 @@
 %ignore ImGui::TreeNodeV;
 %ignore ImGui::TreeNodeExV;
 %ignore ImGui::SetTooltipV;
+%ignore ImGui::SetItemTooltipV;
 %ignore ImGuiTextBuffer::appendfv;
 
 %typemap(in) ImTextureID {
