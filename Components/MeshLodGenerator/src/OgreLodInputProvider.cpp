@@ -43,7 +43,7 @@ namespace Ogre
     }
 #endif
 
-    bool isDuplicateTriangle(LodData::Triangle* triangle, LodData::Triangle* triangle2)
+    static bool isDuplicateTriangle(LodData::Triangle* triangle, LodData::Triangle* triangle2)
     {
         for (auto & i : triangle->vertex) {
             if (i != triangle2->vertex[0] ||
@@ -55,7 +55,7 @@ namespace Ogre
         return true;
     }
 
-    LodData::Triangle* isDuplicateTriangle(LodData::Triangle* triangle)
+    static LodData::Triangle* isDuplicateTriangle(LodData::Triangle* triangle)
     {
         // duplicate triangle detection (where all vertices has the same position)
         LodData::VTriangles::iterator itEnd = triangle->vertex[0]->triangles.end();
@@ -69,7 +69,7 @@ namespace Ogre
         return NULL;
     }
 
-    void addTriangleToEdges(LodData* data, LodData::Triangle* triangle)
+    static void addTriangleToEdges(LodData* data, LodData::Triangle* triangle)
     {
         if(MESHLOD_QUALITY >= 3) {
             LodData::Triangle* duplicate = isDuplicateTriangle(triangle);
@@ -101,7 +101,7 @@ namespace Ogre
         }
     }
 
-    void addLineToVertices(LodData* data, LodData::Line* line)
+    static void addLineToVertices(LodData* data, LodData::Line* line)
     {
         for (auto & i : line->vertex) {
             i->lines.addNotExists(line);
