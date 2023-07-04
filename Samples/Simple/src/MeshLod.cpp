@@ -256,7 +256,8 @@ void Sample_MeshLod::loadAutomaticLod()
     gen.getAutoconfig(mLodConfig.mesh, lodConfig);
     lodConfig.advanced.useBackgroundQueue = ENABLE_THREADING;
     lodConfig.advanced.useCompression = ENABLE_COMPRESSION;
-    lodConfig.advanced.preventPunchingHoles = PREVENT_HOLES;
+    lodConfig.advanced.preventPunchingHoles = PREVENT_HOLES_BREAKS;
+    lodConfig.advanced.preventBreakingLines = PREVENT_HOLES_BREAKS;
     lodConfig.advanced.profile = mLodConfig.advanced.profile;
     lodConfig.advanced.useVertexNormals = mLodConfig.advanced.useVertexNormals;
     gen.generateLodLevels(lodConfig);
@@ -279,7 +280,8 @@ void Sample_MeshLod::loadUserLod( bool useWorkLod )
     MeshLodGenerator& gen = MeshLodGenerator::getSingleton();
     mLodConfig.advanced.useBackgroundQueue = ENABLE_THREADING;
     mLodConfig.advanced.useCompression = ENABLE_COMPRESSION;
-    mLodConfig.advanced.preventPunchingHoles = PREVENT_HOLES;
+    mLodConfig.advanced.preventPunchingHoles = PREVENT_HOLES_BREAKS;
+    mLodConfig.advanced.preventBreakingLines = PREVENT_HOLES_BREAKS;
     if(!useWorkLod){
         gen.generateLodLevels(mLodConfig);
 #if !ENABLE_THREADING
@@ -320,7 +322,8 @@ size_t Sample_MeshLod::getUniqueVertexCount( MeshPtr mesh )
     LodConfig lodConfig(mesh, PixelCountLodStrategy::getSingletonPtr());
     lodConfig.advanced.useBackgroundQueue = false; // Non-threaded
     lodConfig.advanced.useCompression = ENABLE_COMPRESSION;
-    lodConfig.advanced.preventPunchingHoles = PREVENT_HOLES;
+    lodConfig.advanced.preventPunchingHoles = PREVENT_HOLES_BREAKS;
+    lodConfig.advanced.preventBreakingLines = PREVENT_HOLES_BREAKS;
     lodConfig.createGeneratedLodLevel(0, 0);
     MeshLodGenerator& gen = MeshLodGenerator::getSingleton();
     gen.generateLodLevels(lodConfig);
@@ -482,7 +485,8 @@ void Sample_MeshLod::addToProfile( Real cost )
     config.levels.push_back(mWorkLevel);
     config.advanced.useBackgroundQueue = false;
     config.advanced.useCompression = ENABLE_COMPRESSION;
-    config.advanced.preventPunchingHoles = PREVENT_HOLES;
+    config.advanced.preventPunchingHoles = PREVENT_HOLES_BREAKS;
+    config.advanced.preventBreakingLines = PREVENT_HOLES_BREAKS;
     MeshLodGenerator& gen = MeshLodGenerator::getSingleton();
     LodCollapserPtr collapser(new LodCollapser());
     LodDataPtr data(new LodData());
@@ -611,7 +615,8 @@ void Sample_MeshLod::buttonHit( OgreBites::Button* button )
             MeshLodGenerator& gen = MeshLodGenerator::getSingleton();
             mLodConfig.advanced.useBackgroundQueue = false; // Non-threaded
             mLodConfig.advanced.useCompression = ENABLE_COMPRESSION;
-            mLodConfig.advanced.preventPunchingHoles = PREVENT_HOLES;
+            mLodConfig.advanced.preventPunchingHoles = PREVENT_HOLES_BREAKS;
+            mLodConfig.advanced.preventBreakingLines = PREVENT_HOLES_BREAKS;
             gen.generateLodLevels(mLodConfig);
             forceLodLevel(-1); // disable Lod level forcing
         }

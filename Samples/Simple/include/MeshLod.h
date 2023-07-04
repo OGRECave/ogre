@@ -11,7 +11,7 @@
 #define SHOW_MESH_HULL 0
 #define ENABLE_THREADING 1
 #define ENABLE_COMPRESSION 1
-#define PREVENT_HOLES 0
+#define PREVENT_HOLES_BREAKS 0
 
 class _OgreSampleClassExport Sample_MeshLod :
     public OgreBites::SdkSample,

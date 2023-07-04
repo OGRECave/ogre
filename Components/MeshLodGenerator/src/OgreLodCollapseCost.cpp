@@ -53,7 +53,7 @@ namespace Ogre
 
     bool LodCollapseCost::isEdgeCollapsible(LodData::Vertex * src, LodData::Vertex * dst)
     {
-        // For every triangle on the src vertex there must be a triangle in the same submesh connecting src and dst.
+        // For every primitive on the src vertex we need a primitive in the same submesh connecting src and dst.
         if (mPreventPunchingHoles)
         {
             for (auto & testTri : src->triangles)
@@ -64,6 +64,26 @@ namespace Ogre
                 for (auto & solveTri : dst->triangles)
                 {
                     if (solveTri->submeshID == srcSubmeshID && solveTri->hasVertex(src) && solveTri->hasVertex(dst))
+                    {
+                        canConnect = true;
+                        break;
+                    }
+                }
+
+                if (canConnect == false)
+                    return false;
+            }
+        }
+        if (mPreventBreakingLines)
+        {
+            for (auto & testLine : src->lines)
+            {
+                auto srcSubmeshID = testLine->submeshID;
+                bool canConnect = false;
+
+                for (auto & solveLine : dst->lines)
+                {
+                    if (solveLine->submeshID == srcSubmeshID && solveLine->hasVertex(src) && solveLine->hasVertex(dst))
                     {
                         canConnect = true;
                         break;
