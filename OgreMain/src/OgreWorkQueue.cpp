@@ -152,13 +152,12 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void DefaultWorkQueueBase::_processNextRequest()
     {
-        if (mTasks.empty())
-            return;
-
         std::function<void()> task;
         {
             // scoped to only lock while retrieving the next request
             OGRE_WQ_LOCK_MUTEX(mRequestMutex);
+            if (mTasks.empty())
+                return;
             LogManager::getSingleton().stream(LML_TRIVIAL)
                 << "DefaultWorkQueueBase('" << mName << "') - PROCESS_TASK(thread:" << OGRE_THREAD_CURRENT_ID
                 << ")";
