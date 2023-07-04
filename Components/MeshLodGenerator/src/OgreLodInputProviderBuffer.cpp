@@ -47,17 +47,20 @@ namespace Ogre
         lookup.clear();
 
         LodVertexBuffer& vertexBuffer = useSharedVertices ? mBuffer.sharedVertexBuffer : mBuffer.submesh[subMeshIndex].vertexBuffer;
-        const Vector3* pNormalOut = (Vector3 *)vertexBuffer.vertexNormalBuffer->lock(HardwareBuffer::HBL_READ_ONLY);
+        const Vector3f* pNormalOut = (Vector3f *)vertexBuffer.vertexNormalBuffer->lock(HardwareBuffer::HBL_READ_ONLY);
         data->mUseVertexNormals = data->mUseVertexNormals && (pNormalOut != NULL);
 
         if(!data->mUseVertexNormals)
-            pNormalOut = &Vector3::ZERO;
+        {
+            static Vector3f zeroNormal(0, 0, 0);
+            pNormalOut = &zeroNormal;
+        }
 
         // Loop through all vertices and insert them to the Unordered Map.
-        const Vector3* pOut = (Vector3 *)vertexBuffer.vertexBuffer->lock(HardwareBuffer::HBL_READ_ONLY);
-        const Vector3* pEnd = pOut + vertexBuffer.vertexCount;
+        const Vector3f* pOut = (Vector3f *)vertexBuffer.vertexBuffer->lock(HardwareBuffer::HBL_READ_ONLY);
+        const Vector3f* pEnd = pOut + vertexBuffer.vertexCount;
         for (; pOut < pEnd; pOut++) {
-            data->mVertexList.push_back({*pOut, *pNormalOut});
+            data->mVertexList.push_back({Vector3(*pOut), Vector3(*pNormalOut)});
             LodData::Vertex* v = &data->mVertexList.back();
             std::pair<LodData::UniqueVertexSet::iterator, bool> ret;
             ret = data->mUniqueVertexSet.insert(v);
@@ -67,8 +70,8 @@ namespace Ogre
                 v = *ret.first; // Point to the existing vertex.
                 v->seam = true;
                 if(data->mUseVertexNormals){
-                    if(v->normal.x != (*pNormalOut).x){
-                        v->normal += *pNormalOut;
+                    if(v->normal.x != (*pNormalOut)[0]){
+                        v->normal += Vector3(*pNormalOut);
                         if(v->normal.isZeroLength()){
                             v->normal = Vector3(1.0, 0.0, 0.0);
                         }
