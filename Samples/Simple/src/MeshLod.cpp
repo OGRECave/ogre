@@ -60,7 +60,6 @@ void Sample_MeshLod::cleanupContent()
     if(mMeshEntity){
         mSceneMgr->destroyEntity(mMeshEntity);
         mMeshEntity = 0;
-        saveConfig();
     }
     cleanupControls();
 }
@@ -148,7 +147,6 @@ void Sample_MeshLod::changeSelectedMesh( const String& name )
     if(mMeshEntity){
         mSceneMgr->destroyEntity(mMeshEntity);
         mMeshEntity = 0;
-        saveConfig();
     }
     mLodConfig.mesh = MeshManager::getSingleton().load(name, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
     if(mLodConfig.mesh->getBounds().isNull() || mLodConfig.mesh->getBoundingSphereRadius() == 0.0){
