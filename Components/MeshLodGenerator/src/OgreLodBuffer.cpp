@@ -53,7 +53,7 @@ namespace Ogre
             const VertexElement* elemPos = data->vertexDeclaration->findElementBySemantic(VES_POSITION);
 
             // Only float supported.
-            OgreAssert(elemPos->getSize() == 12, "");
+            OgreAssert(elemPos->getType() == VET_FLOAT3, "");
 
             HardwareVertexBufferSharedPtr vbuf = data->vertexBufferBinding->getBuffer(elemPos->getSource());
             vertexBuffer = std::make_shared<DefaultHardwareBuffer>(vertexCount * 3 * sizeof(float));
@@ -66,14 +66,14 @@ namespace Ogre
             const VertexElement* elemNormal = 0;
             HardwareVertexBufferSharedPtr vNormalBuf;
             unsigned char* vNormal = NULL;
-            Vector3* pNormalOut = NULL;
+            Vector3f* pNormalOut = NULL;
             size_t vNormalSize = 0;
             bool useVertexNormals = true;
             elemNormal = data->vertexDeclaration->findElementBySemantic(VES_NORMAL);
             useVertexNormals = useVertexNormals && (elemNormal != 0);
             if(useVertexNormals){
-                vertexNormalBuffer = std::make_shared<DefaultHardwareBuffer>(vertexCount * 3 * sizeof(float));
-                pNormalOut = (Vector3 *)vertexNormalBuffer->lock(HardwareBuffer::HBL_DISCARD);
+                vertexNormalBuffer = std::make_shared<DefaultHardwareBuffer>(vertexCount * sizeof(Vector3f));
+                pNormalOut = (Vector3f *)vertexNormalBuffer->lock(HardwareBuffer::HBL_DISCARD);
                 if(elemNormal->getSource() == elemPos->getSource()){
                     vNormalBuf = vbuf;
                     vNormal = vStart;
@@ -85,20 +85,16 @@ namespace Ogre
             }
 
             // Loop through all vertices and insert them to the Unordered Map.
-            Vector3* pOut = (Vector3 *)vertexBuffer->lock(HardwareBuffer::HBL_DISCARD);
-            Vector3* pEnd = pOut + vertexCount;
+            Vector3f* pOut = (Vector3f *)vertexBuffer->lock(HardwareBuffer::HBL_DISCARD);
+            Vector3f* pEnd = pOut + vertexCount;
             for (; pOut < pEnd; pOut++) {
                 float* pFloat;
                 elemPos->baseVertexPointerToElement(vertex, &pFloat);
-                pOut->x = *pFloat;
-                pOut->y = *(++pFloat);
-                pOut->z = *(++pFloat);
+                memcpy(pOut, pFloat, sizeof(Vector3f));
                 vertex += vSize;
                 if(useVertexNormals){
                     elemNormal->baseVertexPointerToElement(vNormal, &pFloat);
-                    pNormalOut->x = *pFloat;
-                    pNormalOut->y = *(++pFloat);
-                    pNormalOut->z = *(++pFloat);
+                    memcpy(pNormalOut, pFloat, sizeof(Vector3f));
                     pNormalOut++;
                     vNormal += vNormalSize;
                 }
