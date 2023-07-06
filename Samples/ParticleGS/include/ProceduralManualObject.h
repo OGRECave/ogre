@@ -27,7 +27,7 @@ namespace Ogre
         ProceduralManualObject() {}
         virtual ~ProceduralManualObject() {}
 
-        void setRenderToVertexBuffer(RenderToVertexBufferSharedPtr r2vbObject)
+        void setRenderToVertexBuffer(const RenderToVertexBufferSharedPtr& r2vbObject)
         { mR2vbObject = r2vbObject; }
         const RenderToVertexBufferSharedPtr& getRenderToVertexBuffer()
         { return mR2vbObject; }

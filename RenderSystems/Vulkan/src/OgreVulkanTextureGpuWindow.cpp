@@ -38,7 +38,7 @@ namespace Ogre
 {
     extern const String CustomAttributeIdString_GLCONTEXT;
 
-    VulkanTextureGpuWindow::VulkanTextureGpuWindow(String name,
+    VulkanTextureGpuWindow::VulkanTextureGpuWindow(const String& name,
         TextureType initialType, TextureManager *textureManager,
         VulkanWindow *window ) :
         VulkanTextureGpu( textureManager, name, 0, "", true, 0),

@@ -167,7 +167,7 @@ namespace Ogre {
         size_t mParamIndex;
     public:
         /// @deprecated use create()
-        FloatGpuParameterControllerValue(GpuProgramParametersSharedPtr params, size_t index);
+        FloatGpuParameterControllerValue(const GpuProgramParametersSharedPtr& params, size_t index);
 
         /** Constructor.
             @param
@@ -175,7 +175,7 @@ namespace Ogre {
             @param
                 index The index of the parameter to be set
         */
-        static ControllerValueRealPtr create(GpuProgramParametersSharedPtr params, size_t index)
+        static ControllerValueRealPtr create(const GpuProgramParametersSharedPtr& params, size_t index)
         {
             return std::make_shared<FloatGpuParameterControllerValue>(params, index);
         }

@@ -121,7 +121,7 @@ namespace Ogre {
             VertexBufferLicense(
                 HardwareVertexBuffer* orig,
                 size_t delay,
-                HardwareVertexBufferSharedPtr buf, 
+                const HardwareVertexBufferSharedPtr& buf,
                 HardwareBufferLicensee* lic) 
                 : originalBufferPtr(orig)
                 , expiredDelay(delay)

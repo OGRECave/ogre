@@ -49,7 +49,7 @@ namespace Ogre
 		void generateRemapInfo(const MeshPtr& mesh, bool stableVertexOrder);
 		static void performIndexDataRemap(HardwareBufferManagerBase* pHWBufferManager, IndexData* indexData, const RemapInfo& remapInfo);
 		static void performVertexDataRemap(HardwareBufferManagerBase* pHWBufferManager, VertexData* vertexData, const RemapInfo& remapInfo);
-		static HardwareVertexBufferSharedPtr getRemappedVertexBuffer(HardwareBufferManagerBase* pHWBufferManager, HardwareVertexBufferSharedPtr vb, size_t srcStart, size_t srcCount, const RemapInfo& remapInfo);
+		static HardwareVertexBufferSharedPtr getRemappedVertexBuffer(HardwareBufferManagerBase* pHWBufferManager, const HardwareVertexBufferSharedPtr& vb, size_t srcStart, size_t srcCount, const RemapInfo& remapInfo);
 		template<class MeshOrSubmesh> static void performBoneAssignmentRemap(MeshOrSubmesh* m, const RemapInfo& remapInfo);
 		static void performPoseRemap(Pose* pose, const RemapInfo& remapInfo);
 		static void performAnimationTrackRemap(HardwareBufferManagerBase* pHWBufferManager, VertexAnimationTrack* track, const RemapInfo& remapInfo);
@@ -213,7 +213,7 @@ namespace Ogre
 	}
 
 	inline HardwareVertexBufferSharedPtr Lod0Stripifier::getRemappedVertexBuffer(HardwareBufferManagerBase* pHWBufferManager,
-		HardwareVertexBufferSharedPtr srcbuf, size_t srcStart, size_t srcCount, const RemapInfo& remapInfo)
+		const HardwareVertexBufferSharedPtr& srcbuf, size_t srcStart, size_t srcCount, const RemapInfo& remapInfo)
 	{
 		assert(!remapInfo.nothingToStrip());
 

@@ -71,7 +71,7 @@ namespace Ogre {
         */
         void updateUniforms(GpuProgramParametersSharedPtr params, uint16 mask, GpuProgramType fromProgType) override;
 
-        void updateAtomicCounters(GpuProgramParametersSharedPtr params, uint16 mask,
+        void updateAtomicCounters(const GpuProgramParametersSharedPtr& params, uint16 mask,
                                   GpuProgramType fromProgType) {}
     };
 

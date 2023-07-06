@@ -114,7 +114,7 @@ namespace Ogre
     {
     }
     //---------------------------------------------------------------------
-    void TerrainGlobalOptions::setDefaultMaterialGenerator(TerrainMaterialGeneratorPtr gen)
+    void TerrainGlobalOptions::setDefaultMaterialGenerator(const TerrainMaterialGeneratorPtr& gen)
     {
         mDefaultMaterialGenerator = gen;
     }

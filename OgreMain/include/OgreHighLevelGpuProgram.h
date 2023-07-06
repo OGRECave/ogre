@@ -90,7 +90,7 @@ namespace Ogre {
         /// Internal unload implementation, must be implemented by subclasses
         virtual void unloadHighLevelImpl(void) = 0;
         /// Populate the passed parameters with name->index map
-        void populateParameterNames(GpuProgramParametersSharedPtr params);
+        void populateParameterNames(const GpuProgramParametersSharedPtr& params);
         /** Build the constant definition map, must be overridden.
         @note The implementation must fill in the (inherited) mConstantDefs field at a minimum, 
             and if the program requires that parameters are bound using logical 

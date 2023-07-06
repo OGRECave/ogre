@@ -370,7 +370,7 @@ void TextureAtlasSamplerFactory::writeInstance(MaterialSerializer* ser, SubRende
 }
 
 //-----------------------------------------------------------------------
-bool TextureAtlasSamplerFactory::addTexutreAtlasDefinition( const Ogre::String& filename, TextureAtlasTablePtr textureAtlasTable )
+bool TextureAtlasSamplerFactory::addTexutreAtlasDefinition( const Ogre::String& filename, const TextureAtlasTablePtr& textureAtlasTable )
 {
     std::ifstream inp;
     inp.open(filename.c_str(), std::ios::in | std::ios::binary);
@@ -384,7 +384,7 @@ bool TextureAtlasSamplerFactory::addTexutreAtlasDefinition( const Ogre::String& 
 
 }
 //-----------------------------------------------------------------------
-bool TextureAtlasSamplerFactory::addTexutreAtlasDefinition( DataStreamPtr stream, TextureAtlasTablePtr textureAtlasTable )
+bool TextureAtlasSamplerFactory::addTexutreAtlasDefinition( const DataStreamPtr& stream, const TextureAtlasTablePtr& textureAtlasTable )
 {
     stream->seek(0);
 

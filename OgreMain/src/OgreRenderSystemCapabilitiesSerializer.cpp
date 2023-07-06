@@ -98,7 +98,7 @@ namespace Ogre
     }
 
     //-----------------------------------------------------------------------
-    void RenderSystemCapabilitiesSerializer::writeScript(const RenderSystemCapabilities* caps, const String &name, String filename)
+    void RenderSystemCapabilitiesSerializer::writeScript(const RenderSystemCapabilities* caps, const String &name, const String& filename)
     {
         using namespace std;
 

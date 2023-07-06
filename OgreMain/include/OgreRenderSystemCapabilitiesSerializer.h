@@ -51,7 +51,7 @@ namespace Ogre {
         RenderSystemCapabilitiesSerializer();
 
         /** Writes a RenderSystemCapabilities object to a data stream */
-        void writeScript(const RenderSystemCapabilities* caps, const String &name, String filename);
+        void writeScript(const RenderSystemCapabilities* caps, const String &name, const String& filename);
         
         /** Writes a RenderSystemCapabilities object to a string */
         String writeString(const RenderSystemCapabilities* caps, const String &name);
@@ -96,7 +96,7 @@ namespace Ogre {
         typedef std::map<String, Capabilities> CapabilitiesMap;
         CapabilitiesMap mCapabilitiesMap;
 
-        inline void addCapabilitiesMapping(String name, Capabilities cap)
+        inline void addCapabilitiesMapping(const String& name, Capabilities cap)
         {
             mCapabilitiesMap.emplace(name, cap);
         }
@@ -113,7 +113,7 @@ namespace Ogre {
 
         RenderSystemCapabilities* mCurrentCapabilities;
 
-        inline void addKeywordType(String keyword, CapabilityKeywordType type)
+        inline void addKeywordType(const String& keyword, CapabilityKeywordType type)
         {
             mKeywordTypeMap.emplace(keyword, type);
         }
@@ -128,7 +128,7 @@ namespace Ogre {
             return SET_CAPABILITY_ENUM_BOOL;
         }
 
-        inline void addSetStringMethod(String keyword, SetStringMethod method)
+        inline void addSetStringMethod(const String& keyword, SetStringMethod method)
         {
             mSetStringMethodDispatchTable.emplace(keyword, method);
         }
@@ -148,7 +148,7 @@ namespace Ogre {
         }
 
 
-        inline void addSetIntMethod(String keyword, SetIntMethod method)
+        inline void addSetIntMethod(const String& keyword, SetIntMethod method)
         {
             mSetIntMethodDispatchTable.emplace(keyword, method);
         }
@@ -168,7 +168,7 @@ namespace Ogre {
         }
 
 
-        inline void addSetBoolMethod(String keyword, SetBoolMethod method)
+        inline void addSetBoolMethod(const String& keyword, SetBoolMethod method)
         {
             mSetBoolMethodDispatchTable.emplace(keyword, method);
         }
@@ -188,7 +188,7 @@ namespace Ogre {
         }
 
 
-        inline void addSetRealMethod(String keyword, SetRealMethod method)
+        inline void addSetRealMethod(const String& keyword, SetRealMethod method)
         {
             mSetRealMethodDispatchTable.emplace(keyword, method);
         }

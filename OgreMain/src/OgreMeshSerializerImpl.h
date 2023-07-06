@@ -70,7 +70,7 @@ namespace Ogre {
         @param stream The destination stream
         @param endianMode The endian mode for the written file
         */
-        void exportMesh(const Mesh* pMesh, const DataStreamPtr stream,
+        void exportMesh(const Mesh* pMesh, const DataStreamPtr& stream,
             Endian endianMode = ENDIAN_NATIVE);
 
         /** Imports Mesh and (optionally) Material data from a .mesh file DataStream.

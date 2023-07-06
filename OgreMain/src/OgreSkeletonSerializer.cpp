@@ -56,7 +56,7 @@ namespace Ogre {
     }
     //---------------------------------------------------------------------
     void SkeletonSerializer::exportSkeleton(const Skeleton* pSkeleton, 
-        DataStreamPtr stream, SkeletonVersion ver, Endian endianMode)
+        const DataStreamPtr& stream, SkeletonVersion ver, Endian endianMode)
     {
         setWorkingVersion(ver);
         // Decide on endian mode

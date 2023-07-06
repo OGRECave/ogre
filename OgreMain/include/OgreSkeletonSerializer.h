@@ -93,7 +93,7 @@ namespace Ogre {
         @param ver @copydoc SkeletonVersion
         @param endianMode The endian mode to write in
         */
-        void exportSkeleton(const Skeleton* pSkeleton, DataStreamPtr stream,
+        void exportSkeleton(const Skeleton* pSkeleton, const DataStreamPtr& stream,
             SkeletonVersion ver = SKELETON_VERSION_LATEST, Endian endianMode = ENDIAN_NATIVE);
         /** Imports Skeleton and animation data from a .skeleton file DataStream.
 

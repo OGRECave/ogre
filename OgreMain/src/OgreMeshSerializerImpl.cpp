@@ -56,7 +56,7 @@ namespace Ogre {
     }
     //---------------------------------------------------------------------
     void MeshSerializerImpl::exportMesh(const Mesh* pMesh, 
-        const DataStreamPtr stream, Endian endianMode)
+        const DataStreamPtr& stream, Endian endianMode)
     {
         LogManager::getSingleton().logMessage("MeshSerializer writing mesh data to stream " + stream->getName() + "...");
 

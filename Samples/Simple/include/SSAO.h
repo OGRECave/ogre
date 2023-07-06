@@ -458,7 +458,7 @@ protected:
      * Change the compositor to be used.
      * @param compositor The name of the compositor
      */
-    void changeCompositor(Ogre::String compositor)
+    void changeCompositor(const Ogre::String& compositor)
     {
         CompositorManager::getSingleton().setCompositorEnabled(mViewport, mCurrentCompositor, false);
         mCurrentCompositor = compositor;
@@ -569,7 +569,7 @@ protected:
      * Change the post filter to be used.
      * @param post The name of the new post processing filter.
      */
-    void changePost(Ogre::String post)
+    void changePost(const Ogre::String& post)
     {
         CompositorManager::getSingleton().setCompositorEnabled(mViewport, mCurrentPost, false);
         mCurrentPost = post;

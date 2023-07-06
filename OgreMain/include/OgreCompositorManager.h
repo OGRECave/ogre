@@ -243,9 +243,9 @@ namespace Ogre {
         ChainTexturesByDef mChainTexturesByDef;
 
         bool isInputPreviousTarget(CompositorInstance* inst, const Ogre::String& localName);
-        bool isInputPreviousTarget(CompositorInstance* inst, TexturePtr tex);
+        bool isInputPreviousTarget(CompositorInstance* inst, const TexturePtr& tex);
         bool isInputToOutputTarget(CompositorInstance* inst, const Ogre::String& localName);
-        bool isInputToOutputTarget(CompositorInstance* inst, TexturePtr tex);
+        bool isInputToOutputTarget(CompositorInstance* inst, const TexturePtr& tex);
 
     };
     /** @} */
