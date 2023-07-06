@@ -279,11 +279,11 @@ namespace Ogre {
         /** Saves the microcode cache to disk.
         @param stream The destination stream
         */
-        void saveMicrocodeCache( DataStreamPtr stream ) const;
+        void saveMicrocodeCache( const DataStreamPtr& stream ) const;
         /** Loads the microcode cache from disk.
         @param stream The source stream
         */
-        void loadMicrocodeCache( DataStreamPtr stream );
+        void loadMicrocodeCache( const DataStreamPtr& stream );
         
         /** Add a new factory object for programs of a given language. */
         void addFactory(GpuProgramFactory* factory);

@@ -121,7 +121,7 @@ namespace Ogre {
         }
 
         /// @overload
-        void exportMesh(const Mesh* pMesh, DataStreamPtr stream, Endian endianMode = ENDIAN_NATIVE)
+        void exportMesh(const Mesh* pMesh, const DataStreamPtr& stream, Endian endianMode = ENDIAN_NATIVE)
         {
             exportMesh(pMesh, stream, MESH_VERSION_LATEST, endianMode);
         }

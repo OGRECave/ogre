@@ -139,7 +139,7 @@ void CompositorChain::destroyOriginalScene()
 }
 
 //-----------------------------------------------------------------------
-CompositorInstance* CompositorChain::addCompositor(CompositorPtr filter, size_t addPosition, const String& scheme)
+CompositorInstance* CompositorChain::addCompositor(const CompositorPtr& filter, size_t addPosition, const String& scheme)
 {
 
 

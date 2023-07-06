@@ -322,7 +322,7 @@ bool CompositorManager::isInputPreviousTarget(CompositorInstance* inst, const Og
 
 }
 //---------------------------------------------------------------------
-bool CompositorManager::isInputPreviousTarget(CompositorInstance* inst, TexturePtr tex)
+bool CompositorManager::isInputPreviousTarget(CompositorInstance* inst, const TexturePtr& tex)
 {
     const CompositionTechnique::TargetPasses& passes = inst->getTechnique()->getTargetPasses();
     for (auto *tp : passes)
@@ -357,7 +357,7 @@ bool CompositorManager::isInputToOutputTarget(CompositorInstance* inst, const Og
 
 }
 //---------------------------------------------------------------------()
-bool CompositorManager::isInputToOutputTarget(CompositorInstance* inst, TexturePtr tex)
+bool CompositorManager::isInputToOutputTarget(CompositorInstance* inst, const TexturePtr& tex)
 {
     CompositionTargetPass* tp = inst->getTechnique()->getOutputTargetPass();
     for (auto *p : tp->getPasses())

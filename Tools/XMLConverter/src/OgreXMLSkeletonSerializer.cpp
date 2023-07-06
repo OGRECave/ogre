@@ -516,7 +516,7 @@ namespace Ogre {
 
 
     void XMLSkeletonSerializer::writeBoneParent(pugi::xml_node& boneHierarchyNode,
-        String boneName, String parentName)
+        const String& boneName, const String& parentName)
     {
         pugi::xml_node boneParentNode = boneHierarchyNode.append_child("boneparent");
         /*

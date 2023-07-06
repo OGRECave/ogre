@@ -72,7 +72,7 @@ struct OgreIOStream : public Assimp::IOStream
 {
     DataStreamPtr stream;
 
-    OgreIOStream(DataStreamPtr _stream) : stream(_stream) {}
+    OgreIOStream(const DataStreamPtr& _stream) : stream(_stream) {}
 
     size_t Read(void* pvBuffer, size_t pSize, size_t pCount) override
     {

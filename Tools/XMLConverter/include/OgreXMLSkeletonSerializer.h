@@ -65,7 +65,7 @@ namespace Ogre {
     private:
         void writeSkeleton(const Skeleton* pSkel, pugi::xml_node& root);
         void writeBone(pugi::xml_node& bonesElement, const Bone* pBone);
-        void writeBoneParent(pugi::xml_node& boneHierarchyNode, String boneName , String parentName);
+        void writeBoneParent(pugi::xml_node& boneHierarchyNode, const String& boneName , const String& parentName);
         void writeAnimation(pugi::xml_node& animsNode, const Animation* anim);
         void writeAnimationTrack(pugi::xml_node& tracksNode,
             const NodeAnimationTrack* track);

@@ -153,7 +153,7 @@ public:
 class RSQuadOperation: public CompositorInstance::RenderSystemOperation
 {
 public:
-    RSQuadOperation(CompositorInstance *inInstance, uint32 inPass_id, MaterialPtr inMat):
+    RSQuadOperation(CompositorInstance *inInstance, uint32 inPass_id, const MaterialPtr& inMat):
       mat(inMat), instance(inInstance), pass_id(inPass_id),
       mQuadCornerModified(false),
       mQuadFarCorners(false),
@@ -277,7 +277,7 @@ public:
     CompositorInstance *instance;
     uint32 pass_id;
 
-    RSComputeOperation(CompositorInstance *inInstance, uint32 inPass_id, MaterialPtr inMat):
+    RSComputeOperation(CompositorInstance *inInstance, uint32 inPass_id, const MaterialPtr& inMat):
       mat(inMat), instance(inInstance), pass_id(inPass_id)
     {
         instance->_fireNotifyMaterialSetup(pass_id, mat);

@@ -3731,7 +3731,7 @@ namespace Ogre{
         }
     }
 
-    void GpuProgramTranslator::translateProgramParameters(ScriptCompiler *compiler, GpuProgramParametersSharedPtr params, ObjectAbstractNode *obj)
+    void GpuProgramTranslator::translateProgramParameters(ScriptCompiler *compiler, const GpuProgramParametersSharedPtr& params, ObjectAbstractNode *obj)
     {
         uint32 animParametricsCount = 0;
 

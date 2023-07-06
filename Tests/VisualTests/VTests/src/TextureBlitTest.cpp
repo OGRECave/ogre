@@ -105,7 +105,7 @@ static struct {
 
 namespace
 {
-    void ReplaceTexture(Ogre::MaterialPtr mat, const Ogre::String & texture)
+    void ReplaceTexture(const Ogre::MaterialPtr& mat, const Ogre::String & texture)
     {
         // Now look for the texture
         bool found = false;

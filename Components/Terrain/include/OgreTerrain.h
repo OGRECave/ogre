@@ -1969,7 +1969,7 @@ namespace Ogre
 
         /** Set the default material generator.
         */
-        void setDefaultMaterialGenerator(TerrainMaterialGeneratorPtr gen);
+        void setDefaultMaterialGenerator(const TerrainMaterialGeneratorPtr& gen);
 
         /** Get the default size of the blend maps for a new terrain. 
         */

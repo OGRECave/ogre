@@ -337,7 +337,7 @@ namespace {
         }
     }
     //---------------------------------------------------------------------
-    void GpuProgramManager::saveMicrocodeCache( DataStreamPtr stream ) const
+    void GpuProgramManager::saveMicrocodeCache( const DataStreamPtr& stream ) const
     {
         if (!mCacheDirty)
             return; 
@@ -372,7 +372,7 @@ namespace {
         serialiser.writeChunkEnd(CACHE_CHUNK_ID);
     }
     //---------------------------------------------------------------------
-    void GpuProgramManager::loadMicrocodeCache( DataStreamPtr stream )
+    void GpuProgramManager::loadMicrocodeCache( const DataStreamPtr& stream )
     {
         mMicrocodeCache.clear();
 

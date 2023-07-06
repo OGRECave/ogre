@@ -44,7 +44,7 @@ namespace Ogre
         void freeInternalResourcesImpl( void ) override;
 
     public:
-        VulkanTextureGpuWindow(String name, TextureType initialType, TextureManager* textureManager,
+        VulkanTextureGpuWindow(const String& name, TextureType initialType, TextureManager* textureManager,
                                VulkanWindow* window);
         virtual ~VulkanTextureGpuWindow();
 

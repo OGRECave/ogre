@@ -263,7 +263,7 @@ namespace Ogre
 
     }
     //---------------------------------------------------------------------
-    void HighLevelGpuProgram::populateParameterNames(GpuProgramParametersSharedPtr params)
+    void HighLevelGpuProgram::populateParameterNames(const GpuProgramParametersSharedPtr& params)
     {
         getConstantDefinitions();
         params->_setNamedConstants(mConstantDefs);
