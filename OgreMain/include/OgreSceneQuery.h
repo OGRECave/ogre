@@ -464,7 +464,7 @@ namespace Ogre {
             used by this object to hold the last query results. This object clears the
             results itself when executing and when destroying itself.
         */
-        virtual void clearResults(void);
+        void clearResults(void);
 
         /** Self-callback in order to deal with execute which returns collection. */
         bool queryResult(MovableObject* first, MovableObject* second) override;

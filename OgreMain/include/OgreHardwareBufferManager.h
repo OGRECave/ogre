@@ -102,12 +102,12 @@ namespace Ogre {
         /// Internal method for creates a new vertex declaration, may be overridden by certain rendering APIs.
         virtual VertexDeclaration* createVertexDeclarationImpl(void);
         /// Internal method for destroys a vertex declaration, may be overridden by certain rendering APIs.
-        virtual void destroyVertexDeclarationImpl(VertexDeclaration* decl);
+        void destroyVertexDeclarationImpl(VertexDeclaration* decl);
 
         /// Internal method for creates a new VertexBufferBinding, may be overridden by certain rendering APIs.
         virtual VertexBufferBinding* createVertexBufferBindingImpl(void);
         /// Internal method for destroys a VertexBufferBinding, may be overridden by certain rendering APIs.
-        virtual void destroyVertexBufferBindingImpl(VertexBufferBinding* binding);
+        void destroyVertexBufferBindingImpl(VertexBufferBinding* binding);
 
     private:
         /** Struct holding details of a license to use a temporary shared buffer. */

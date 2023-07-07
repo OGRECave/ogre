@@ -146,7 +146,7 @@ namespace Ogre
         virtual void setupVertices( const SubMesh* baseSubMesh ) = 0;
         virtual void setupIndices( const SubMesh* baseSubMesh ) = 0;
         virtual void createAllInstancedEntities(void);
-        virtual void deleteAllInstancedEntities(void);
+        void deleteAllInstancedEntities(void);
         virtual void deleteUnusedInstancedEntities(void);
         /// Creates a new InstancedEntity instance
         virtual InstancedEntity* generateInstancedEntity(size_t num);

@@ -342,7 +342,7 @@ namespace Ogre {
         std::unique_ptr<IndexData> mIndexData;
 
         /// Setup the STL collections
-        virtual void setupChainContainers(void);
+        void setupChainContainers(void);
         /// Setup vertex declaration
         virtual void setupVertexDeclaration(void);
         /// Setup buffers
