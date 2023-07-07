@@ -28,6 +28,8 @@ THE SOFTWARE.
 
 #include "OgreVulkanTextureGpu.h"
 
+#include <memory>
+
 #include "OgreException.h"
 #include "OgreVector.h"
 #include "OgreVulkanMappings.h"
@@ -74,7 +76,7 @@ namespace Ogre
         if(options != HBL_DISCARD && options != HBL_WRITE_ONLY)
             target |= VK_BUFFER_USAGE_TRANSFER_DST_BIT;
 
-        mStagingBuffer.reset(new VulkanHardwareBuffer(target, ret.getConsecutiveSize(), HBU_CPU_ONLY, false, device));
+        mStagingBuffer = std::make_unique<VulkanHardwareBuffer>(target, ret.getConsecutiveSize(), HBU_CPU_ONLY, false, device);
 
         if (options != HBL_DISCARD && options != HBL_WRITE_ONLY)
         {
@@ -740,7 +742,7 @@ namespace Ogre
 
         if(!depthTarget)
         {
-            mDepthTexture.reset(new VulkanTextureGpu(texMgr, mName+"/Depth", 0, "", true, 0));
+            mDepthTexture = std::make_unique<VulkanTextureGpu>(texMgr, mName+"/Depth", 0, "", true, nullptr);
             mDepthTexture->setWidth(target->getWidth());
             mDepthTexture->setHeight(target->getHeight());
             mDepthTexture->setFormat(PF_DEPTH32);
@@ -748,7 +750,7 @@ namespace Ogre
             mDepthTexture->setFSAA(1, "");
         }
 
-        mRenderPassDescriptor.reset(new VulkanRenderPassDescriptor(&device->mGraphicsQueue, device->mRenderSystem));
+        mRenderPassDescriptor = std::make_unique<VulkanRenderPassDescriptor>(&device->mGraphicsQueue, device->mRenderSystem);
         mRenderPassDescriptor->mColour[0] = depthTarget ? 0 : target;
         mRenderPassDescriptor->mSlice = face;
         mRenderPassDescriptor->mDepth = depthTarget ? target : mDepthTexture.get();

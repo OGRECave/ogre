@@ -27,6 +27,8 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 */
 
 #include "OgreGL3PlusHardwareBuffer.h"
+
+#include <memory>
 #include "OgreRoot.h"
 #include "OgreGL3PlusRenderSystem.h"
 #include "OgreGL3PlusStateCacheManager.h"
@@ -51,7 +53,7 @@ namespace Ogre {
 
         if (useShadowBuffer)
         {
-            mShadowBuffer.reset(new DefaultHardwareBuffer(mSizeInBytes));
+            mShadowBuffer = std::make_unique<DefaultHardwareBuffer>(mSizeInBytes);
         }
     }
 

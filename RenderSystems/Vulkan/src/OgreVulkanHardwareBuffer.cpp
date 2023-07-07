@@ -28,6 +28,8 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 #include "OgreVulkanHardwareBuffer.h"
 
+#include <memory>
+
 #include "OgreVulkanDevice.h"
 #include "OgreVulkanUtils.h"
 
@@ -47,7 +49,7 @@ namespace Ogre
 
         if(mUsage == HBU_GPU_ONLY)
         {
-            mShadowBuffer.reset(new VulkanHardwareBuffer(VK_BUFFER_USAGE_TRANSFER_SRC_BIT, sizeBytes, HBU_CPU_ONLY, false, mDevice));
+            mShadowBuffer = std::make_unique<VulkanHardwareBuffer>(VK_BUFFER_USAGE_TRANSFER_SRC_BIT, sizeBytes, HBU_CPU_ONLY, false, mDevice);
         }
     }
 

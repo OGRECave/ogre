@@ -26,6 +26,8 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
+#include <memory>
+
 #include "OgreStableHeaders.h"
 
 #include "OgreEntity.h"
@@ -194,7 +196,7 @@ void SceneManager::SkyBoxRenderer::setSkyBox(
         // Create object
         if (!mSkyBoxObj)
         {
-            mSkyBoxObj.reset(new ManualObject("SkyBox"));
+            mSkyBoxObj = std::make_unique<ManualObject>("SkyBox");
             mSkyBoxObj->setCastShadows(false);
             mSceneNode->attachObject(mSkyBoxObj.get());
         }

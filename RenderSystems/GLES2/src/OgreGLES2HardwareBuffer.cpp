@@ -27,6 +27,8 @@ THE SOFTWARE.
 */
 
 #include "OgreGLES2HardwareBuffer.h"
+
+#include <memory>
 #include "OgreRoot.h"
 #include "OgreGLES2RenderSystem.h"
 #include "OgreGLES2StateCacheManager.h"
@@ -42,7 +44,7 @@ namespace Ogre {
 
         if (useShadowBuffer || HANDLE_CONTEXT_LOSS)
         {
-            mShadowBuffer.reset(new DefaultHardwareBuffer(mSizeInBytes));
+            mShadowBuffer = std::make_unique<DefaultHardwareBuffer>(mSizeInBytes);
         }
     }
 

@@ -29,6 +29,8 @@ THE SOFTWARE.
 #include "OgreStableHeaders.h"
 #include "OgreRenderToVertexBuffer.h"
 
+#include <memory>
+
 namespace Ogre {
     //-----------------------------------------------------------------------
     RenderToVertexBuffer::RenderToVertexBuffer() :
@@ -38,7 +40,7 @@ namespace Ogre {
         mSourceRenderable(0),
         mMaxVertexCount(1000)
     {
-        mVertexData.reset(new VertexData);
+        mVertexData = std::make_unique<VertexData>();
     }
     RenderToVertexBuffer::~RenderToVertexBuffer() = default; // ensure unique_ptr destructors are in cpp
     //-----------------------------------------------------------------------
