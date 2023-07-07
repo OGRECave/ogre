@@ -598,12 +598,12 @@ namespace Ogre {
             You can call build() again after this and it will pick up all the
             same entities / nodes you queued last time.
         */
-        virtual void destroy(void);
+        void destroy(void);
 
         /** Clears any of the entities / nodes added to this geometry and 
             destroys anything which has already been built.
         */
-        virtual void reset(void);
+        void reset(void);
 
         /** Sets the distance at which batches are no longer rendered.
 

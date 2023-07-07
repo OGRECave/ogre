@@ -1116,14 +1116,14 @@ namespace Ogre {
             @param
                 cam Pointer to the camera to remove
         */
-        virtual void destroyCamera(Camera *cam);
+        void destroyCamera(Camera *cam);
 
         /** Removes a camera from the scene.
 
                 This method removes an camera from the scene based on the
                 camera's name rather than a pointer.
         */
-        virtual void destroyCamera(const String& name);
+        void destroyCamera(const String& name);
 
         /** Removes (and destroys) all cameras from the scene.
 
@@ -1133,7 +1133,7 @@ namespace Ogre {
                 technique other than texture-based, which will destroy all internal
                 created shadow cameras and textures.
         */
-        virtual void destroyAllCameras(void);
+        void destroyAllCameras(void);
 
         /** Set whether to use camera-relative coordinates when rendering, ie
             to always place the camera at the origin and move the world around it.

@@ -216,7 +216,7 @@ namespace Ogre {
         unsigned short mNumVisibleBillboards;
 
         /// Internal method for increasing pool size
-        virtual void increasePool(size_t size);
+        void increasePool(size_t size);
 
 
         //-----------------------------------------------------------------------
@@ -400,7 +400,7 @@ namespace Ogre {
         @param size
             The new size for the pool.
         */
-        virtual void setPoolSize(size_t size);
+        void setPoolSize(size_t size);
 
         /** Returns the current size of the billboard pool.
         @return

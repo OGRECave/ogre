@@ -187,7 +187,7 @@ namespace Ogre
         virtual void removeKeyFrame(unsigned short index);
 
         /** Removes all the KeyFrames from this track. */
-        virtual void removeAllKeyFrames(void);
+        void removeAllKeyFrames(void);
 
 
         /** Gets a KeyFrame object which contains the interpolated transforms at the time index specified.

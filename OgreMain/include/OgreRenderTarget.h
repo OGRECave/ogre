@@ -485,7 +485,7 @@ namespace Ogre {
         /// internal method for firing events
         virtual void fireViewportAdded(Viewport* vp);
         /// internal method for firing events
-        virtual void fireViewportRemoved(Viewport* vp);
+        void fireViewportRemoved(Viewport* vp);
         
         /// Internal implementation of update()
         virtual void updateImpl();

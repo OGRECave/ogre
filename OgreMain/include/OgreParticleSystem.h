@@ -391,7 +391,7 @@ namespace Ogre {
             @param height
                 The new default height for the particles in this set. Must be non-negative!
         */
-        virtual void setDefaultDimensions(Real width, Real height);
+        void setDefaultDimensions(Real width, Real height);
 
         /** See setDefaultDimensions - this sets 1 component individually. */
         virtual void setDefaultWidth(Real width);

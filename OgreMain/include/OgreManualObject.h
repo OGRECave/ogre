@@ -124,7 +124,7 @@ namespace Ogre
             of clear() begin(). However if you do want to modify the structure 
             from time to time you can do so by clearing and re-specifying the data.
         */
-        virtual void clear(void);
+        void clear(void);
         
         /** Estimate the number of vertices ahead of time.
 

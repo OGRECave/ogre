@@ -50,7 +50,7 @@ namespace {
         /// @copydoc Archive::load
         void load() override;
         /// @copydoc Archive::unload
-        void unload() override;
+        void unload() final override;
 
         /// @copydoc Archive::open
         DataStreamPtr open(const String& filename, bool readOnly = true) const override;

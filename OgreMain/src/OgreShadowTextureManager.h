@@ -86,7 +86,7 @@ namespace Ogre
             from TextureManager; note that it is up to the SceneManagers to clear 
             their local references.
         */
-        virtual void clear();
+        void clear();
 
         /// @copydoc Singleton::getSingleton()
         static ShadowTextureManager& getSingleton(void);

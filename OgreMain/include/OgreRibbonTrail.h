@@ -103,9 +103,9 @@ namespace Ogre {
             far apart each segment will be, ie length / max_elements. 
         @param len The length of the trail in world units
         */
-        virtual void setTrailLength(Real len);
+        void setTrailLength(Real len);
         /** Get the length of the trail. */
-        virtual Real getTrailLength(void) const { return mTrailLength; }
+        Real getTrailLength(void) const { return mTrailLength; }
 
         /** @copydoc BillboardChain::setMaxChainElements */
         void setMaxChainElements(size_t maxElements) override;
@@ -209,13 +209,13 @@ namespace Ogre {
         ControllerValueRealPtr mTimeControllerValue;
 
         /// Manage updates to the time controller
-        virtual void manageController(void);
+        void manageController(void);
         /// Node has changed position, update
-        virtual void updateTrail(size_t index, const Node* node);
+        void updateTrail(size_t index, const Node* node);
         /// Reset the tracked chain to initial state
-        virtual void resetTrail(size_t index, const Node* node);
+        void resetTrail(size_t index, const Node* node);
         /// Reset all tracked chains to initial state
-        virtual void resetAllTrails(void);
+        void resetAllTrails(void);
 
     };
     /** @} */
