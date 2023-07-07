@@ -25,6 +25,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
+#include <memory>
+
 #include "OgreStableHeaders.h"
 
 #include "OgreGpuProgramUsage.h"
@@ -251,7 +253,7 @@ namespace Ogre {
         {
             auto& programUsage = mProgramUsage[i];
             auto& othUsage = oth.mProgramUsage[i];
-            othUsage ? programUsage.reset(new GpuProgramUsage(*othUsage, this)) : programUsage.reset();
+            programUsage = othUsage ? std::make_unique<GpuProgramUsage>(*othUsage, this) : nullptr;
         }
 
         // Clear texture units but doesn't notify need recompilation in the case
@@ -788,7 +790,7 @@ namespace Ogre {
         {
             if (!programUsage)
             {
-                programUsage.reset(new GpuProgramUsage(type, this));
+                programUsage = std::make_unique<GpuProgramUsage>(type, this);
             }
             programUsage->setProgram(program, resetParams);
         }

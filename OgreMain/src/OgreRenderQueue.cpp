@@ -28,6 +28,8 @@ THE SOFTWARE.
 #include "OgreStableHeaders.h"
 
 #include "OgreRenderQueue.h"
+
+#include <memory>
 #include "OgreMaterial.h"
 #include "OgreRenderQueueSortingGrouping.h"
 #include "OgreSceneManagerEnumerator.h"
@@ -42,8 +44,8 @@ namespace Ogre {
         , mRenderableListener(0)
     {
         // Create the 'main' queue up-front since we'll always need that
-        mGroups[RENDER_QUEUE_MAIN].reset(new RenderQueueGroup(
-            mSplitPassesByLightingType, mSplitNoShadowPasses, mShadowCastersCannotBeReceivers));
+        mGroups[RENDER_QUEUE_MAIN] = std::make_unique<RenderQueueGroup>(
+            mSplitPassesByLightingType, mSplitNoShadowPasses, mShadowCastersCannotBeReceivers);
 
         // set default queue
         mDefaultQueueGroup = RENDER_QUEUE_MAIN;
@@ -179,8 +181,8 @@ namespace Ogre {
         if (!mGroups[groupID])
         {
             // Insert new
-            mGroups[groupID].reset(new RenderQueueGroup(mSplitPassesByLightingType, mSplitNoShadowPasses,
-                                                        mShadowCastersCannotBeReceivers));
+            mGroups[groupID] = std::make_unique<RenderQueueGroup>(mSplitPassesByLightingType, mSplitNoShadowPasses,
+                                                        mShadowCastersCannotBeReceivers);
         }
 
         return mGroups[groupID].get();

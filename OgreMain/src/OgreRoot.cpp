@@ -26,6 +26,8 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 // Ogre includes
+#include <memory>
+
 #include "OgreStableHeaders.h"
 
 #include "OgreRenderWindow.h"
@@ -121,7 +123,7 @@ namespace Ogre {
         // Create log manager and default log file if there is no log manager yet
         if(!LogManager::getSingletonPtr())
         {
-            mLogManager.reset(new LogManager());
+            mLogManager = std::make_unique<LogManager>();
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
             // suppress writing log to Emscripten virtual FS, improves performance
@@ -136,9 +138,9 @@ namespace Ogre {
         mLogManager->getDefaultLog()->addListener(mAndroidLogger.get());
 #endif
 
-        mDynLibManager.reset(new DynLibManager());
-        mArchiveManager.reset(new ArchiveManager());
-        mResourceGroupManager.reset(new ResourceGroupManager());
+        mDynLibManager = std::make_unique<DynLibManager>();
+        mArchiveManager = std::make_unique<ArchiveManager>();
+        mResourceGroupManager = std::make_unique<ResourceGroupManager>();
 
         // WorkQueue (note: users can replace this if they want)
         DefaultWorkQueue* defaultQ = OGRE_NEW DefaultWorkQueue("Root");
@@ -154,18 +156,18 @@ namespace Ogre {
         mWorkQueue.reset(defaultQ);
 
         // ResourceBackgroundQueue
-        mResourceBackgroundQueue.reset(new ResourceBackgroundQueue());
+        mResourceBackgroundQueue = std::make_unique<ResourceBackgroundQueue>();
 
         // Create SceneManager enumerator (note - will be managed by singleton)
-        mSceneManagerEnum.reset(new SceneManagerEnumerator());
-        mShadowTextureManager.reset(new ShadowTextureManager());
-        mRenderSystemCapabilitiesManager.reset(new RenderSystemCapabilitiesManager());
-        mMaterialManager.reset(new MaterialManager());
-        mMeshManager.reset(new MeshManager());
-        mSkeletonManager.reset(new SkeletonManager());
-        mParticleManager.reset(new ParticleSystemManager());
-        mTimer.reset(new Timer());
-        mLodStrategyManager.reset(new LodStrategyManager());
+        mSceneManagerEnum = std::make_unique<SceneManagerEnumerator>();
+        mShadowTextureManager = std::make_unique<ShadowTextureManager>();
+        mRenderSystemCapabilitiesManager = std::make_unique<RenderSystemCapabilitiesManager>();
+        mMaterialManager = std::make_unique<MaterialManager>();
+        mMeshManager = std::make_unique<MeshManager>();
+        mSkeletonManager = std::make_unique<SkeletonManager>();
+        mParticleManager = std::make_unique<ParticleSystemManager>();
+        mTimer = std::make_unique<Timer>();
+        mLodStrategyManager = std::make_unique<LodStrategyManager>();
 
 #if OGRE_PROFILING
         // Profiler
@@ -174,12 +176,12 @@ namespace Ogre {
 #endif
 
 
-        mFileSystemArchiveFactory.reset(new FileSystemArchiveFactory());
+        mFileSystemArchiveFactory = std::make_unique<FileSystemArchiveFactory>();
         ArchiveManager::getSingleton().addArchiveFactory( mFileSystemArchiveFactory.get() );
 #   if OGRE_NO_ZIP_ARCHIVE == 0
-        mZipArchiveFactory.reset(new ZipArchiveFactory());
+        mZipArchiveFactory = std::make_unique<ZipArchiveFactory>();
         ArchiveManager::getSingleton().addArchiveFactory( mZipArchiveFactory.get() );
-        mEmbeddedZipArchiveFactory.reset(new EmbeddedZipArchiveFactory());
+        mEmbeddedZipArchiveFactory = std::make_unique<EmbeddedZipArchiveFactory>();
         ArchiveManager::getSingleton().addArchiveFactory( mEmbeddedZipArchiveFactory.get() );
 #   endif
 
@@ -197,30 +199,30 @@ namespace Ogre {
         ASTCCodec::startup();
 #endif
 
-        mGpuProgramManager.reset(new GpuProgramManager());
-        mExternalTextureSourceManager.reset(new ExternalTextureSourceManager());
-        mCompositorManager.reset(new CompositorManager());
-        mCompilerManager.reset(new ScriptCompilerManager());
+        mGpuProgramManager = std::make_unique<GpuProgramManager>();
+        mExternalTextureSourceManager = std::make_unique<ExternalTextureSourceManager>();
+        mCompositorManager = std::make_unique<CompositorManager>();
+        mCompilerManager = std::make_unique<ScriptCompilerManager>();
 
         // Auto window
         mAutoWindow = 0;
 
         // instantiate and register base movable factories
-        mEntityFactory.reset(new EntityFactory());
+        mEntityFactory = std::make_unique<EntityFactory>();
         addMovableObjectFactory(mEntityFactory.get());
-        mLightFactory.reset(new LightFactory());
+        mLightFactory = std::make_unique<LightFactory>();
         addMovableObjectFactory(mLightFactory.get());
-        mBillboardSetFactory.reset(new BillboardSetFactory());
+        mBillboardSetFactory = std::make_unique<BillboardSetFactory>();
         addMovableObjectFactory(mBillboardSetFactory.get());
-        mManualObjectFactory.reset(new ManualObjectFactory());
+        mManualObjectFactory = std::make_unique<ManualObjectFactory>();
         addMovableObjectFactory(mManualObjectFactory.get());
-        mBillboardChainFactory.reset(new BillboardChainFactory());
+        mBillboardChainFactory = std::make_unique<BillboardChainFactory>();
         addMovableObjectFactory(mBillboardChainFactory.get());
-        mRibbonTrailFactory.reset(new RibbonTrailFactory());
+        mRibbonTrailFactory = std::make_unique<RibbonTrailFactory>();
         addMovableObjectFactory(mRibbonTrailFactory.get());
-        mStaticGeometryFactory.reset(new StaticGeometryFactory());
+        mStaticGeometryFactory = std::make_unique<StaticGeometryFactory>();
         addMovableObjectFactory(mStaticGeometryFactory.get());
-        mRectangle2DFactory.reset(new Rectangle2DFactory());
+        mRectangle2DFactory = std::make_unique<Rectangle2DFactory>();
         addMovableObjectFactory(mRectangle2DFactory.get());
 
         // Load plugins
@@ -522,7 +524,7 @@ namespace Ogre {
         OgreAssert(mActiveRenderer, "Cannot initialise");
 
         if (!mControllerManager)
-            mControllerManager.reset(new ControllerManager());
+            mControllerManager = std::make_unique<ControllerManager>();
 
         PlatformInformation::log(LogManager::getSingleton().getDefaultLog());
         mActiveRenderer->_initialise();

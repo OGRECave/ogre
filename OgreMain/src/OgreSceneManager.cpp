@@ -48,6 +48,7 @@ THE SOFTWARE.
 // This class implements the most basic scene manager
 
 #include <cstdio>
+#include <memory>
 
 namespace Ogre {
 //-----------------------------------------------------------------------
@@ -93,7 +94,7 @@ mGpuParamsDirty((uint16)GPV_ALL)
     // init shadow texture config
     setShadowTextureCount(1);
 
-    mDebugDrawer.reset(new DefaultDebugDrawer());
+    mDebugDrawer = std::make_unique<DefaultDebugDrawer>();
     addListener(mDebugDrawer.get());
 
     // create the auto param data source instance
@@ -129,7 +130,7 @@ RenderQueue* SceneManager::getRenderQueue(void)
 //-----------------------------------------------------------------------
 void SceneManager::initRenderQueue(void)
 {
-    mRenderQueue.reset(new RenderQueue());
+    mRenderQueue = std::make_unique<RenderQueue>();
     // init render queues that do not need shadows
     mRenderQueue->getQueueGroup(RENDER_QUEUE_BACKGROUND)->setShadowsEnabled(false);
     mRenderQueue->getQueueGroup(RENDER_QUEUE_OVERLAY)->setShadowsEnabled(false);

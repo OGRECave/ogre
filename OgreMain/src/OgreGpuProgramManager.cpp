@@ -27,6 +27,8 @@ THE SOFTWARE.
 */
 #include "OgreStableHeaders.h"
 #include "OgreGpuProgramManager.h"
+
+#include <memory>
 #include "OgreHighLevelGpuProgramManager.h"
 #include "OgreUnifiedHighLevelGpuProgram.h"
 #include "OgreStreamSerialiser.h"
@@ -131,9 +133,9 @@ namespace {
         mSaveMicrocodesToCache = false;
         mCacheDirty = false;
 
-        mNullFactory.reset(new NullProgramFactory());
+        mNullFactory = std::make_unique<NullProgramFactory>();
         addFactory(mNullFactory.get());
-        mUnifiedFactory.reset(new UnifiedHighLevelGpuProgramFactory());
+        mUnifiedFactory = std::make_unique<UnifiedHighLevelGpuProgramFactory>();
         addFactory(mUnifiedFactory.get());
 
         ResourceGroupManager::getSingleton()._registerResourceManager(mResourceType, this);

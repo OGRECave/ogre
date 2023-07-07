@@ -25,6 +25,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
+#include <memory>
+
 #include "OgreStableHeaders.h"
 
 #include "OgrePatchMesh.h"
@@ -67,12 +69,12 @@ namespace Ogre
         mLoadOrder = 350.0f;
         mResourceType = "Mesh";
 
-        mMeshCodec.reset(new MeshCodec());
+        mMeshCodec = std::make_unique<MeshCodec>();
         Codec::registerCodec(mMeshCodec.get());
 
         ResourceGroupManager::getSingleton()._registerResourceManager(mResourceType, this);
 
-        mPrefabLoader.reset(new PrefabFactory());
+        mPrefabLoader = std::make_unique<PrefabFactory>();
     }
     //-----------------------------------------------------------------------
     MeshManager::~MeshManager()

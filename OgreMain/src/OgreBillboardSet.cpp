@@ -31,6 +31,7 @@ THE SOFTWARE.
 #include "OgreBillboard.h"
 
 #include <algorithm>
+#include <memory>
 
 namespace Ogre {
     //-----------------------------------------------------------------------
@@ -562,7 +563,7 @@ namespace Ogre {
                 "expect.");
         }
 
-        mVertexData.reset(new VertexData());
+        mVertexData = std::make_unique<VertexData>();
         if (mPointRendering)
             mVertexData->vertexCount = mPoolSize;
         else
@@ -595,7 +596,7 @@ namespace Ogre {
 
         if (!mPointRendering)
         {
-            mIndexData.reset(new IndexData());
+            mIndexData = std::make_unique<IndexData>();
             mIndexData->indexStart = 0;
             mIndexData->indexCount = mPoolSize * 6;
 
