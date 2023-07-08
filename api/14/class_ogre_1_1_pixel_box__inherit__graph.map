@@ -1,0 +1,7 @@
+<map id="Ogre::PixelBox" name="Ogre::PixelBox">
+<area shape="rect" id="Node000001" title="A primitive describing a volume (3D), image (2D) or line (1D) of pixels in memory." alt="" coords="47,79,165,104"/>
+<area shape="rect" id="Node000002" href="$struct_ogre_1_1_box.html" title="Structure used to define a box in a 3&#45;D integer space." alt="" coords="5,5,92,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="69,40,99,77,95,80,64,43"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="116,5,211,31"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="148,43,117,80,113,77,143,40"/>
+</map>

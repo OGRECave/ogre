@@ -1,0 +1,41 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="Node000000" title=" " alt="" coords="35,161,188,187"/>
+<area shape="rect" id="Node000001" href="$class_ogre_1_1_composition_pass.html" title="Object representing one pass or operation in a composition sequence." alt="" coords="288,5,461,31"/>
+<area shape="poly" id="edge280_Node000000_Node000001" title=" " alt="" coords="131,149,187,94,224,64,264,40,293,28,295,33,267,44,227,69,190,98,134,153"/>
+<area shape="rect" id="Node000002" href="$class_ogre_1_1_composition_target_pass.html" title="Object representing one render to a RenderTarget or Viewport in the Ogre Composition framework." alt="" coords="268,55,481,80"/>
+<area shape="poly" id="edge281_Node000000_Node000002" title=" " alt="" coords="142,152,198,120,264,89,302,77,304,83,266,94,200,124,145,156"/>
+<area shape="rect" id="Node000003" href="$class_ogre_1_1_composition_technique.html" title="Base composition technique, can be subclassed in plugins." alt="" coords="271,104,479,129"/>
+<area shape="poly" id="edge282_Node000000_Node000003" title=" " alt="" coords="183,156,315,127,316,132,184,161"/>
+<area shape="rect" id="Node000004" href="$class_ogre_1_1_composition_technique_1_1_texture_definition.html" title="Local texture definition." alt="" coords="271,154,479,194"/>
+<area shape="poly" id="edge283_Node000000_Node000004" title=" " alt="" coords="202,171,270,171,270,177,202,177"/>
+<area shape="rect" id="Node000005" href="$class_ogre_1_1_compositor_chain.html" title="Chain of compositor effects applying to one viewport." alt="" coords="288,333,461,359"/>
+<area shape="poly" id="edge284_Node000000_Node000005" title=" " alt="" coords="132,196,188,258,225,291,267,318,297,331,295,336,264,323,222,295,184,262,128,200"/>
+<area shape="rect" id="Node000018" href="$class_ogre_1_1_compositor_instance.html" title="An instance of a Compositor object for one Viewport." alt="" coords="279,219,470,244"/>
+<area shape="poly" id="edge285_Node000000_Node000018" title=" " alt="" coords="184,187,316,216,315,221,183,192"/>
+<area shape="rect" id="Node000019" href="$class_ogre_1_1_compositor_instance_1_1_render_system_operation.html" title="Specific render system operation." alt="" coords="279,269,470,309"/>
+<area shape="poly" id="edge286_Node000000_Node000019" title=" " alt="" coords="147,191,202,222,266,253,302,266,300,271,264,258,199,227,144,196"/>
+<area shape="rect" id="Node000006" href="$class_ogre_1_1_render_target_listener.html" title="A interface class defining a listener which can be used to receive notifications of RenderTarget even..." alt="" coords="12,333,211,359"/>
+<area shape="poly" id="edge287_Node000006_Node000005" title=" " alt="" coords="225,343,288,343,288,349,225,349"/>
+<area shape="rect" id="Node000016" href="$class_ogre_1_1_resource_group_listener.html" title="This class defines an interface which is called back during resource group loading to indicate the pr..." alt="" coords="5,432,217,457"/>
+<area shape="rect" id="Node000015" href="$class_ogre_bites_1_1_tray_manager.html" title="Main class to manage a cursor, backdrop, trays and widgets." alt="" coords="285,432,464,457"/>
+<area shape="poly" id="edge288_Node000016_Node000015" title=" " alt="" coords="231,442,285,442,285,447,231,447"/>
+<area shape="rect" id="Node000007" href="$class_ogre_1_1_viewport_1_1_listener.html" title="Listener interface so you can be notified of Viewport changes." alt="" coords="22,383,201,408"/>
+<area shape="poly" id="edge289_Node000007_Node000005" title=" " alt="" coords="193,377,305,356,306,361,194,383"/>
+<area shape="rect" id="Node000008" href="$class_ogre_bites_1_1_camera_gizmo.html" title=" " alt="" coords="281,383,468,408"/>
+<area shape="poly" id="edge290_Node000007_Node000008" title=" " alt="" coords="214,393,281,393,281,398,214,398"/>
+<area shape="rect" id="Node000009" href="$struct_ogre_bites_1_1_input_listener.html" title="the return values of the callbacks are ignored by ApplicationContext however they can be used to cont..." alt="" coords="22,539,201,564"/>
+<area shape="poly" id="edge297_Node000009_Node000015" title=" " alt="" coords="185,532,216,517,230,505,239,493,248,480,264,468,294,455,296,460,267,472,252,484,243,496,234,509,219,522,187,537"/>
+<area shape="poly" id="edge292_Node000009_Node000008" title=" " alt="" coords="194,531,216,517,226,506,233,494,238,468,244,442,252,430,264,417,283,406,286,410,267,421,256,433,249,444,243,469,238,495,231,509,219,521,197,535"/>
+<area shape="rect" id="Node000010" href="$class_ogre_bites_1_1_advanced_render_controls.html" title=" " alt="" coords="273,595,477,635"/>
+<area shape="poly" id="edge291_Node000009_Node000010" title=" " alt="" coords="179,565,292,593,291,598,177,570"/>
+<area shape="rect" id="Node000011" href="$class_ogre_bites_1_1_camera_man.html" title="Utility class for controlling the camera in samples." alt="" coords="288,660,461,685"/>
+<area shape="poly" id="edge293_Node000009_Node000011" title=" " alt="" coords="142,570,197,608,266,645,305,657,303,662,264,650,195,613,139,575"/>
+<area shape="rect" id="Node000012" href="$class_ogre_bites_1_1_gizmo.html" title="Class which applies a manipulable gizmo to a SceneNode." alt="" coords="307,709,443,735"/>
+<area shape="poly" id="edge294_Node000009_Node000012" title=" " alt="" coords="132,573,188,635,225,668,267,696,307,711,305,716,264,700,222,673,184,639,128,577"/>
+<area shape="rect" id="Node000013" href="$struct_ogre_bites_1_1_im_gui_input_listener.html" title=" " alt="" coords="265,481,484,507"/>
+<area shape="poly" id="edge295_Node000009_Node000013" title=" " alt="" coords="183,533,315,504,316,509,184,538"/>
+<area shape="rect" id="Node000014" href="$class_ogre_bites_1_1_input_listener_chain.html" title="Chain of multiple InputListeners that acts as a single InputListener." alt="" coords="285,531,464,571"/>
+<area shape="poly" id="edge296_Node000009_Node000014" title=" " alt="" coords="214,549,285,549,285,554,214,554"/>
+<area shape="rect" id="Node000017" href="$class_ogre_bites_1_1_tray_listener.html" title="Listener class for responding to tray events." alt="" coords="24,481,199,507"/>
+<area shape="poly" id="edge298_Node000017_Node000015" title=" " alt="" coords="193,476,305,455,306,460,194,481"/>
+</map>

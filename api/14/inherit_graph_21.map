@@ -1,0 +1,25 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="Node000000" title=" " alt="" coords="5,197,100,223"/>
+<area shape="rect" id="Node000001" href="$class_ogre_1_1_hardware_buffer.html" title="Abstract class defining common features of hardware buffers." alt="" coords="193,104,357,129"/>
+<area shape="poly" id="edge263_Node000000_Node000001" title=" " alt="" coords="96,189,242,127,244,132,98,194"/>
+<area shape="rect" id="Node000006" href="$class_ogre_1_1_hardware_buffer_manager_base.html" title="Base definition of a hardware buffer manager." alt="" coords="148,197,401,223"/>
+<area shape="poly" id="edge268_Node000000_Node000006" title=" " alt="" coords="114,207,148,207,148,213,114,213"/>
+<area shape="rect" id="Node000011" href="$class_ogre_1_1_vertex_cache_profiler.html" title="Vertex cache profiler." alt="" coords="179,247,370,272"/>
+<area shape="poly" id="edge272_Node000000_Node000011" title=" " alt="" coords="114,223,149,231,207,244,206,249,147,237,113,228"/>
+<area shape="rect" id="Node000002" href="$class_ogre_1_1_default_hardware_buffer.html" title="Specialisation of HardwareBuffer for emulation." alt="" coords="454,5,666,31"/>
+<area shape="poly" id="edge264_Node000001_Node000002" title=" " alt="" coords="312,96,375,67,449,39,490,28,492,33,450,45,377,72,315,100"/>
+<area shape="rect" id="Node000003" href="$class_ogre_1_1_hardware_index_buffer.html" title="Specialisation of HardwareBuffer for vertex index buffers, still abstract." alt="" coords="460,55,660,80"/>
+<area shape="poly" id="edge265_Node000001_Node000003" title=" " alt="" coords="362,99,485,77,486,83,363,104"/>
+<area shape="rect" id="Node000004" href="$class_ogre_1_1_hardware_pixel_buffer.html" title="Specialisation of HardwareBuffer for a pixel buffer." alt="" coords="462,104,658,129"/>
+<area shape="poly" id="edge266_Node000001_Node000004" title=" " alt="" coords="371,114,462,114,462,119,371,119"/>
+<area shape="rect" id="Node000005" href="$class_ogre_1_1_hardware_vertex_buffer.html" title="Specialisation of HardwareBuffer for a vertex buffer." alt="" coords="457,153,663,179"/>
+<area shape="poly" id="edge267_Node000001_Node000005" title=" " alt="" coords="363,129,486,151,485,156,362,134"/>
+<area shape="rect" id="Node000007" href="$class_ogre_1_1_default_hardware_buffer_manager_base.html" title="Specialisation of HardwareBufferManagerBase to emulate hardware buffers." alt="" coords="454,203,666,243"/>
+<area shape="poly" id="edge269_Node000006_Node000007" title=" " alt="" coords="415,214,454,216,454,221,415,219"/>
+<area shape="rect" id="Node000008" href="$class_ogre_1_1_hardware_buffer_manager.html" title="Singleton wrapper for hardware buffer manager." alt="" coords="449,280,671,305"/>
+<area shape="poly" id="edge270_Node000006_Node000008" title=" " alt="" coords="371,223,402,231,427,242,450,253,519,277,517,282,448,258,424,247,400,237,370,228"/>
+<area shape="rect" id="Node000009" href="$class_ogre_1_1_default_hardware_buffer_manager.html" title="DefaultHardwareBufferManager as a Singleton." alt="" coords="719,273,931,313"/>
+<area shape="poly" id="edge271_Node000008_Node000009" title=" " alt="" coords="685,290,718,290,718,295,685,295"/>
+<area shape="rect" id="Node000010" href="$class_ogre_1_1_singleton.html" title=" " alt="" coords="175,297,375,337"/>
+<area shape="poly" id="edge273_Node000010_Node000008" title=" " alt="" coords="388,304,449,299,449,305,389,310"/>
+</map>

@@ -1,0 +1,5 @@
+<map id="OgreBites::SelectMenu" name="OgreBites::SelectMenu">
+<area shape="rect" id="Node000001" title="Basic selection menu widget." alt="" coords="5,79,176,104"/>
+<area shape="rect" id="Node000002" href="$class_ogre_bites_1_1_widget.html" title="Abstract base class for all widgets." alt="" coords="21,5,161,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="93,44,93,79,88,79,88,44"/>
+</map>

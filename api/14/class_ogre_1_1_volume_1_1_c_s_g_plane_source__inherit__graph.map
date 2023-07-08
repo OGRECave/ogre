@@ -1,0 +1,5 @@
+<map id="Ogre::Volume::CSGPlaneSource" name="Ogre::Volume::CSGPlaneSource">
+<area shape="rect" id="Node000001" title="A plane." alt="" coords="5,79,232,104"/>
+<area shape="rect" id="Node000002" href="$class_ogre_1_1_volume_1_1_source.html" title="Abstract class defining the density function." alt="" coords="37,5,200,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="121,44,121,79,116,79,116,44"/>
+</map>

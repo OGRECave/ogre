@@ -1,0 +1,7 @@
+<map id="Ogre::Octree" name="Ogre::Octree">
+<area shape="rect" id="Node000001" title="Octree datastructure for managing scene nodes." alt="" coords="77,79,181,104"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,5,93,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="74,38,118,76,114,80,70,42"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="118,5,301,31"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="188,42,144,80,141,76,185,38"/>
+</map>

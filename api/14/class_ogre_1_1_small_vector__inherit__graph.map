@@ -1,0 +1,17 @@
+<map id="Ogre::SmallVector&lt; T, N &gt;" name="Ogre::SmallVector&lt; T, N &gt;">
+<area shape="rect" id="Node000001" title="SmallVector &#45; This is a &#39;vector&#39; (really, a variable&#45;sized array), optimized for the case when the ar..." alt="" coords="976,55,1127,95"/>
+<area shape="rect" id="Node000006" href="$struct_ogre_1_1_vector_set.html" title=" " alt="" coords="1175,5,1377,31"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="1139,50,1174,41,1224,28,1225,33,1175,46,1141,55"/>
+<area shape="rect" id="Node000007" href="$struct_ogre_1_1_vector_set.html" title=" " alt="" coords="1193,55,1359,95"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="1141,73,1192,73,1192,78,1141,78"/>
+<area shape="rect" id="Node000008" href="$struct_ogre_1_1_vector_set.html" title=" " alt="" coords="1181,119,1371,159"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="1136,97,1206,117,1205,122,1135,102"/>
+<area shape="rect" id="Node000002" href="$class_ogre_1_1_small_vector_impl.html" title="SmallVectorImpl &#45; This class consists of common code factored out of the SmallVector class to reduce ..." alt="" coords="721,63,928,88"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="942,73,975,73,975,78,942,78"/>
+<area shape="rect" id="Node000003" href="$class_ogre_1_1_small_vector_template_base.html" title=" " alt="" coords="473,48,673,103"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="687,73,721,73,721,78,687,78"/>
+<area shape="rect" id="Node000004" href="$class_ogre_1_1_small_vector_template_common.html" title=" " alt="" coords="225,55,425,95"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="439,73,473,73,473,78,439,78"/>
+<area shape="rect" id="Node000005" href="$class_ogre_1_1_small_vector_base.html" title="SmallVectorBase &#45; This is all the non&#45;templated stuff common to all SmallVectors." alt="" coords="5,63,177,88"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="191,73,225,73,225,78,191,78"/>
+</map>

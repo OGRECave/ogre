@@ -1,0 +1,17 @@
+<map id="Ogre::SphereSceneQuery" name="Ogre::SphereSceneQuery">
+<area shape="rect" id="Node000001" title="Specialises the SceneQuery class for querying within a sphere." alt="" coords="148,225,332,251"/>
+<area shape="rect" id="Node000006" href="$class_ogre_1_1_default_sphere_scene_query.html" title="Default implementation of SphereSceneQuery." alt="" coords="143,299,337,339"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="243,264,243,299,237,299,237,264"/>
+<area shape="rect" id="Node000002" href="$class_ogre_1_1_region_scene_query.html" title="Abstract class defining a query which returns single results from a region." alt="" coords="148,152,332,177"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="243,191,243,225,237,225,237,191"/>
+<area shape="rect" id="Node000003" href="$class_ogre_1_1_scene_query.html" title="A class for performing queries on a scene." alt="" coords="76,79,215,104"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="173,110,226,150,223,154,170,114"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="86,5,205,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="148,44,148,79,143,79,143,44"/>
+<area shape="rect" id="Node000005" href="$class_ogre_1_1_scene_query_listener.html" title="This optional class allows you to receive per&#45;result callbacks from SceneQuery executions instead of ..." alt="" coords="239,79,430,104"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="310,114,257,154,254,150,307,110"/>
+<area shape="rect" id="Node000007" href="$class_ogre_1_1_octree_sphere_scene_query.html" title="Octree implementation of SphereSceneQuery." alt="" coords="5,387,232,412"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="201,348,138,389,135,384,198,344"/>
+<area shape="rect" id="Node000008" href="$class_ogre_1_1_p_c_z_sphere_scene_query.html" title="PCZ implementation of SphereSceneQuery." alt="" coords="256,387,467,412"/>
+<area shape="poly" id="edge7_Node000006_Node000008" title=" " alt="" coords="282,344,345,384,342,389,279,348"/>
+</map>

@@ -1,0 +1,7 @@
+<map id="Ogre::ExternalTextureSourceManager" name="Ogre::ExternalTextureSourceManager">
+<area shape="rect" id="Node000001" title="Singleton Class which handles the registering and control of texture plugins." alt="" coords="85,93,292,133"/>
+<area shape="rect" id="Node000002" href="$class_ogre_1_1_singleton.html" title=" " alt="" coords="5,5,196,45"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="132,53,171,91,167,95,128,57"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="221,13,335,38"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="258,49,210,95,207,91,254,46"/>
+</map>

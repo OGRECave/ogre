@@ -1,0 +1,19 @@
+<map id="Ogre::BaseInstanceBatchVTF" name="Ogre::BaseInstanceBatchVTF">
+<area shape="rect" id="Node000001" title="Instancing implementation using vertex texture through Vertex Texture Fetch (VTF) This implementation..." alt="" coords="112,225,323,251"/>
+<area shape="rect" id="Node000008" href="$class_ogre_1_1_instance_batch_h_w___v_t_f.html" title="Instancing implementation using vertex texture through Vertex Texture Fetch (VTF) and hardware instan..." alt="" coords="5,299,213,324"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="190,260,128,301,126,296,187,256"/>
+<area shape="rect" id="Node000009" href="$class_ogre_1_1_instance_batch_v_t_f.html" title=" " alt="" coords="237,299,416,324"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="248,256,310,296,307,301,245,260"/>
+<area shape="rect" id="Node000002" href="$class_ogre_1_1_instance_batch.html" title="InstanceBatch forms part of the new Instancing system This is an abstract class that must be derived ..." alt="" coords="141,152,294,177"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="220,191,220,225,215,225,215,191"/>
+<area shape="rect" id="Node000003" href="$class_ogre_1_1_renderable.html" title="Abstract class defining the interface all renderable objects must implement." alt="" coords="65,79,199,104"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="158,110,205,150,202,154,154,115"/>
+<area shape="rect" id="Node000004" href="$class_ogre_1_1_movable_object.html" title="Abstract class defining a movable object in a scene." alt="" coords="223,79,382,104"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="280,115,233,154,230,150,277,110"/>
+<area shape="rect" id="Node000005" href="$class_ogre_1_1_shadow_caster.html" title="This class defines the interface that must be implemented by shadow casters." alt="" coords="41,5,196,31"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="162,33,274,76,272,81,160,38"/>
+<area shape="rect" id="Node000006" href="$class_ogre_1_1_animable_object.html" title="Defines an interface to classes which have one or more AnimableValue instances to expose." alt="" coords="220,5,385,31"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="305,44,305,79,300,79,300,44"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="410,5,521,31"/>
+<area shape="poly" id="edge6_Node000004_Node000007" title=" " alt="" coords="428,39,330,81,328,76,426,34"/>
+</map>

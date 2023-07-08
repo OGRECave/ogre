@@ -1,0 +1,15 @@
+<map id="Ogre::OverlayContainer" name="Ogre::OverlayContainer">
+<area shape="rect" id="Node000001" title="A 2D element which contains other OverlayElement instances." alt="" coords="167,152,342,177"/>
+<area shape="rect" id="Node000006" href="$class_ogre_1_1_panel_overlay_element.html" title="OverlayElement representing a flat, single&#45;material (or transparent) panel which can contain other el..." alt="" coords="153,225,356,251"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="257,191,257,225,252,225,252,191"/>
+<area shape="rect" id="Node000002" href="$class_ogre_1_1_overlay_element.html" title="Abstract definition of a 2D element to be displayed in an Overlay." alt="" coords="171,79,338,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="257,118,257,152,252,152,252,118"/>
+<area shape="rect" id="Node000003" href="$class_ogre_1_1_string_interface.html" title="Class defining the common interface which classes can use to present a reflection&#45;style,..." alt="" coords="5,5,163,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="125,33,228,76,226,81,123,38"/>
+<area shape="rect" id="Node000004" href="$class_ogre_1_1_renderable.html" title="Abstract class defining the interface all renderable objects must implement." alt="" coords="187,5,322,31"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="257,44,257,79,252,79,252,44"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="346,5,451,31"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="365,39,279,81,277,76,362,34"/>
+<area shape="rect" id="Node000007" href="$class_ogre_1_1_border_panel_overlay_element.html" title="A specialisation of the PanelOverlayElement to provide a panel with a border." alt="" coords="159,299,350,339"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="257,264,257,299,252,299,252,264"/>
+</map>

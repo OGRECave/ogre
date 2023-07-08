@@ -1,0 +1,15 @@
+<map id="Ogre::ArchiveFactory" name="Ogre::ArchiveFactory">
+<area shape="rect" id="Node000001" title="Abstract factory class, archive codec plugins can register concrete subclasses of this." alt="" coords="264,70,423,95"/>
+<area shape="rect" id="Node000004" href="$class_ogre_1_1_a_p_k_file_system_archive_factory.html" title=" " alt="" coords="482,5,689,45"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="410,64,500,43,501,48,412,69"/>
+<area shape="rect" id="Node000005" href="$class_ogre_1_1_file_system_archive_factory.html" title="Specialisation of the ArchiveFactory to allow reading of files from filesystem folders / directories." alt="" coords="471,70,700,95"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="436,80,470,80,470,85,436,85"/>
+<area shape="rect" id="Node000006" href="$class_ogre_1_1_zip_archive_factory.html" title="Specialisation to allow reading of files from a zip format source archive." alt="" coords="496,119,675,145"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="420,96,523,117,522,122,419,101"/>
+<area shape="rect" id="Node000002" href="$class_ogre_1_1_factory_obj.html" title=" " alt="" coords="5,45,216,70"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="230,68,264,71,264,77,230,73"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="59,94,162,119"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="176,97,263,88,264,93,176,103"/>
+<area shape="rect" id="Node000007" href="$class_ogre_1_1_embedded_zip_archive_factory.html" title="Specialisation of ZipArchiveFactory for embedded Zip files." alt="" coords="748,112,948,152"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="688,129,748,129,748,135,688,135"/>
+</map>

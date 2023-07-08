@@ -1,0 +1,5 @@
+<map id="Ogre::ProcessNameExclusionScriptCompilerEvent" name="Ogre::ProcessNameExclusionScriptCompilerEvent">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,79,217,119"/>
+<area shape="rect" id="Node000002" href="$class_ogre_1_1_script_compiler_event.html" title="This struct is a base class for events which can be thrown by the compilers and caught by subscribers..." alt="" coords="14,5,209,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="114,44,114,79,109,79,109,44"/>
+</map>

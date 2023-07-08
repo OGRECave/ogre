@@ -1,0 +1,17 @@
+<map id="OgreBites::InputListener" name="OgreBites::InputListener">
+<area shape="rect" id="Node000001" title="the return values of the callbacks are ignored by ApplicationContext however they can be used to cont..." alt="" coords="5,169,184,194"/>
+<area shape="rect" id="Node000002" href="$class_ogre_bites_1_1_advanced_render_controls.html" title=" " alt="" coords="239,5,443,45"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="114,156,163,105,196,78,231,55,256,43,259,48,233,60,199,83,167,109,117,160"/>
+<area shape="rect" id="Node000003" href="$class_ogre_bites_1_1_camera_gizmo.html" title=" " alt="" coords="248,70,435,95"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="125,159,174,131,231,104,268,93,270,98,233,109,176,136,128,164"/>
+<area shape="rect" id="Node000004" href="$class_ogre_bites_1_1_camera_man.html" title="Utility class for controlling the camera in samples." alt="" coords="255,119,428,145"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="171,163,276,142,277,147,172,169"/>
+<area shape="rect" id="Node000005" href="$class_ogre_bites_1_1_gizmo.html" title="Class which applies a manipulable gizmo to a SceneNode." alt="" coords="273,169,409,194"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="198,179,273,179,273,184,198,184"/>
+<area shape="rect" id="Node000006" href="$struct_ogre_bites_1_1_im_gui_input_listener.html" title=" " alt="" coords="232,218,451,243"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="172,194,277,215,276,221,171,199"/>
+<area shape="rect" id="Node000007" href="$class_ogre_bites_1_1_input_listener_chain.html" title="Chain of multiple InputListeners that acts as a single InputListener." alt="" coords="252,268,431,308"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="130,199,178,226,233,252,269,265,267,270,231,257,175,230,127,203"/>
+<area shape="rect" id="Node000008" href="$class_ogre_bites_1_1_tray_manager.html" title="Main class to manage a cursor, backdrop, trays and widgets." alt="" coords="252,333,431,358"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="115,204,164,262,197,292,233,318,263,330,261,335,231,322,193,296,160,266,111,207"/>
+</map>

@@ -1,0 +1,29 @@
+<map id="Ogre::SceneQueryListener" name="Ogre::SceneQueryListener">
+<area shape="rect" id="Node000001" title="This optional class allows you to receive per&#45;result callbacks from SceneQuery executions instead of ..." alt="" coords="5,183,196,209"/>
+<area shape="rect" id="Node000002" href="$class_ogre_1_1_region_scene_query.html" title="Abstract class defining a query which returns single results from a region." alt="" coords="244,183,428,209"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="210,193,244,193,244,199,210,199"/>
+<area shape="rect" id="Node000003" href="$class_ogre_1_1_axis_aligned_box_scene_query.html" title="Specialises the SceneQuery class for querying within an axis aligned box." alt="" coords="477,84,679,124"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="383,176,523,122,525,127,384,181"/>
+<area shape="rect" id="Node000007" href="$class_ogre_1_1_plane_bounded_volume_list_scene_query.html" title="Specialises the SceneQuery class for querying within a plane&#45;bounded volume." alt="" coords="476,176,680,216"/>
+<area shape="poly" id="edge6_Node000002_Node000007" title=" " alt="" coords="442,193,476,193,476,199,442,199"/>
+<area shape="rect" id="Node000011" href="$class_ogre_1_1_sphere_scene_query.html" title="Specialises the SceneQuery class for querying within a sphere." alt="" coords="486,243,670,269"/>
+<area shape="poly" id="edge10_Node000002_Node000011" title=" " alt="" coords="402,209,527,241,525,246,401,215"/>
+<area shape="rect" id="Node000004" href="$class_ogre_1_1_default_axis_aligned_box_scene_query.html" title="Default implementation of AxisAlignedBoxSceneQuery." alt="" coords="736,69,923,109"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="693,95,736,92,736,97,693,100"/>
+<area shape="rect" id="Node000005" href="$class_ogre_1_1_octree_axis_aligned_box_scene_query.html" title="Octree implementation of AxisAlignedBoxSceneQuery." alt="" coords="991,5,1197,45"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="925,63,1010,43,1011,48,927,69"/>
+<area shape="rect" id="Node000006" href="$class_ogre_1_1_p_c_z_axis_aligned_box_scene_query.html" title="PCZ implementation of AxisAlignedBoxSceneQuery." alt="" coords="980,69,1208,109"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="936,87,980,87,980,92,936,92"/>
+<area shape="rect" id="Node000008" href="$class_ogre_1_1_default_plane_bounded_volume_list_scene_query.html" title="Default implementation of PlaneBoundedVolumeListSceneQuery." alt="" coords="728,176,931,216"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="694,193,728,193,728,199,694,199"/>
+<area shape="rect" id="Node000009" href="$class_ogre_1_1_octree_plane_bounded_volume_list_scene_query.html" title="Octree implementation of PlaneBoundedVolumeListSceneQuery." alt="" coords="995,133,1193,173"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="944,175,995,167,996,172,945,180"/>
+<area shape="rect" id="Node000010" href="$class_ogre_1_1_p_c_z_plane_bounded_volume_list_scene_query.html" title="PCZ implementation of PlaneBoundedVolumeListSceneQuery." alt="" coords="979,197,1209,237"/>
+<area shape="poly" id="edge9_Node000008_Node000010" title=" " alt="" coords="944,203,979,205,978,211,944,208"/>
+<area shape="rect" id="Node000012" href="$class_ogre_1_1_default_sphere_scene_query.html" title="Default implementation of SphereSceneQuery." alt="" coords="733,255,926,295"/>
+<area shape="poly" id="edge11_Node000011_Node000012" title=" " alt="" coords="684,261,733,265,732,270,683,266"/>
+<area shape="rect" id="Node000013" href="$class_ogre_1_1_octree_sphere_scene_query.html" title="Octree implementation of SphereSceneQuery." alt="" coords="981,262,1207,287"/>
+<area shape="poly" id="edge12_Node000012_Node000013" title=" " alt="" coords="940,272,980,272,980,277,940,277"/>
+<area shape="rect" id="Node000014" href="$class_ogre_1_1_p_c_z_sphere_scene_query.html" title="PCZ implementation of SphereSceneQuery." alt="" coords="989,311,1199,337"/>
+<area shape="poly" id="edge13_Node000012_Node000014" title=" " alt="" coords="940,293,1026,309,1025,314,939,298"/>
+</map>

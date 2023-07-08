@@ -1,0 +1,11 @@
+<map id="Ogre::CompositorManager" name="Ogre::CompositorManager">
+<area shape="rect" id="Node000001" title="Class for managing Compositor settings for Ogre." alt="" coords="165,167,359,192"/>
+<area shape="rect" id="Node000002" href="$class_ogre_1_1_resource_manager.html" title="Defines a generic resource handler." alt="" coords="63,86,242,111"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="182,117,247,164,244,169,179,122"/>
+<area shape="rect" id="Node000003" href="$class_ogre_1_1_script_loader.html" title="Abstract class defining the interface used by classes which wish to perform script loading to define ..." alt="" coords="5,5,148,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="99,39,143,84,139,88,95,42"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="173,5,287,31"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="211,42,166,88,162,84,207,39"/>
+<area shape="rect" id="Node000005" href="$class_ogre_1_1_singleton.html" title=" " alt="" coords="267,79,479,119"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="336,129,280,168,277,164,333,125"/>
+</map>

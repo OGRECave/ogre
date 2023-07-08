@@ -1,0 +1,11 @@
+<map id="Ogre::FontManager" name="Ogre::FontManager">
+<area shape="rect" id="Node000001" title="Manages Font resources, parsing .fontdef files and generally organising them." alt="" coords="195,152,342,177"/>
+<area shape="rect" id="Node000002" href="$class_ogre_1_1_resource_manager.html" title="Defines a generic resource handler." alt="" coords="63,79,242,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="184,109,251,149,248,154,181,113"/>
+<area shape="rect" id="Node000003" href="$class_ogre_1_1_script_loader.html" title="Abstract class defining the interface used by classes which wish to perform script loading to define ..." alt="" coords="5,5,148,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="101,38,142,76,138,80,97,42"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="173,5,287,31"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="209,42,167,80,164,76,206,38"/>
+<area shape="rect" id="Node000005" href="$class_ogre_1_1_singleton.html" title=" " alt="" coords="266,79,503,104"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="356,113,289,154,286,149,353,109"/>
+</map>

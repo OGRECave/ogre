@@ -1,0 +1,17 @@
+<map id="Ogre::DefaultAxisAlignedBoxSceneQuery" name="Ogre::DefaultAxisAlignedBoxSceneQuery">
+<area shape="rect" id="Node000001" title="Default implementation of AxisAlignedBoxSceneQuery." alt="" coords="135,313,322,353"/>
+<area shape="rect" id="Node000007" href="$class_ogre_1_1_octree_axis_aligned_box_scene_query.html" title="Octree implementation of AxisAlignedBoxSceneQuery." alt="" coords="5,401,212,441"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="192,364,137,403,134,399,189,359"/>
+<area shape="rect" id="Node000008" href="$class_ogre_1_1_p_c_z_axis_aligned_box_scene_query.html" title="PCZ implementation of AxisAlignedBoxSceneQuery." alt="" coords="236,401,464,441"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="268,359,325,399,322,403,265,363"/>
+<area shape="rect" id="Node000002" href="$class_ogre_1_1_axis_aligned_box_scene_query.html" title="Specialises the SceneQuery class for querying within an axis aligned box." alt="" coords="127,225,330,265"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="231,279,231,313,226,313,226,279"/>
+<area shape="rect" id="Node000003" href="$class_ogre_1_1_region_scene_query.html" title="Abstract class defining a query which returns single results from a region." alt="" coords="137,152,321,177"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="231,191,231,225,226,225,226,191"/>
+<area shape="rect" id="Node000004" href="$class_ogre_1_1_scene_query.html" title="A class for performing queries on a scene." alt="" coords="65,79,203,104"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="162,110,215,150,212,154,159,114"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="75,5,193,31"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="137,44,137,79,131,79,131,44"/>
+<area shape="rect" id="Node000006" href="$class_ogre_1_1_scene_query_listener.html" title="This optional class allows you to receive per&#45;result callbacks from SceneQuery executions instead of ..." alt="" coords="228,79,419,104"/>
+<area shape="poly" id="edge5_Node000003_Node000006" title=" " alt="" coords="299,114,246,154,243,150,296,110"/>
+</map>

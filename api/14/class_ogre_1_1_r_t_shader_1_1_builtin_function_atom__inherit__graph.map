@@ -1,0 +1,7 @@
+<map id="Ogre::RTShader::BuiltinFunctionAtom" name="Ogre::RTShader::BuiltinFunctionAtom">
+<area shape="rect" id="Node000001" title="shorthand for &quot;dst = BUILTIN(args);&quot;" alt="" coords="5,152,268,177"/>
+<area shape="rect" id="Node000002" href="$class_ogre_1_1_r_t_shader_1_1_function_atom.html" title="A class that represents an atomic code section of shader based program function." alt="" coords="26,79,247,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="139,118,139,152,134,152,134,118"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="54,5,219,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="139,44,139,79,134,79,134,44"/>
+</map>

@@ -1,0 +1,5 @@
+<map id="Ogre::StaticGeometry::OptimisedSubMeshGeometry" name="Ogre::StaticGeometry::OptimisedSubMeshGeometry">
+<area shape="rect" id="Node000001" title="Struct holding geometry optimised per SubMesh / LOD level, ready for copying to instances." alt="" coords="5,79,227,119"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="30,5,202,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="119,44,119,79,113,79,113,44"/>
+</map>

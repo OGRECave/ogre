@@ -1,0 +1,9 @@
+<map id="Ogre::Quake3ShaderManager" name="Ogre::Quake3ShaderManager">
+<area shape="rect" id="Node000001" title="Class for managing Quake3 custom shaders." alt="" coords="181,93,393,119"/>
+<area shape="rect" id="Node000002" href="$class_ogre_1_1_script_loader.html" title="Abstract class defining the interface used by classes which wish to perform script loading to define ..." alt="" coords="5,13,148,38"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="121,40,258,91,256,96,119,45"/>
+<area shape="rect" id="Node000003" href="$class_ogre_1_1_singleton.html" title=" " alt="" coords="172,5,403,45"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="290,59,290,93,285,93,285,59"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="427,13,542,38"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="444,46,317,96,315,91,442,41"/>
+</map>

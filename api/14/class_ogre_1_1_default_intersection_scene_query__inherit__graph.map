@@ -1,0 +1,17 @@
+<map id="Ogre::DefaultIntersectionSceneQuery" name="Ogre::DefaultIntersectionSceneQuery">
+<area shape="rect" id="Node000001" title="Default implementation of IntersectionSceneQuery." alt="" coords="700,69,887,109"/>
+<area shape="rect" id="Node000006" href="$class_ogre_1_1_bsp_intersection_scene_query.html" title="BSP specialisation of IntersectionSceneQuery." alt="" coords="935,5,1137,45"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="882,63,959,43,960,48,884,68"/>
+<area shape="rect" id="Node000007" href="$class_ogre_1_1_octree_intersection_scene_query.html" title="Octree implementation of IntersectionSceneQuery." alt="" coords="945,69,1127,109"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="900,87,945,87,945,92,900,92"/>
+<area shape="rect" id="Node000008" href="$class_ogre_1_1_p_c_z_intersection_scene_query.html" title="PCZ implementation of IntersectionSceneQuery." alt="" coords="935,133,1137,173"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="884,110,960,131,959,136,882,115"/>
+<area shape="rect" id="Node000002" href="$class_ogre_1_1_intersection_scene_query.html" title="Separate SceneQuery class to query for pairs of objects which are possibly intersecting one another." alt="" coords="436,77,652,102"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="666,87,700,87,700,92,666,92"/>
+<area shape="rect" id="Node000003" href="$class_ogre_1_1_scene_query.html" title="A class for performing queries on a scene." alt="" coords="211,47,349,73"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="363,67,436,75,435,80,363,72"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="5,47,124,73"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="138,57,210,57,210,63,138,63"/>
+<area shape="rect" id="Node000005" href="$class_ogre_1_1_intersection_scene_query_listener.html" title="Alternative listener class for dealing with IntersectionSceneQuery." alt="" coords="172,97,388,137"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="401,102,436,98,436,103,402,107"/>
+</map>
