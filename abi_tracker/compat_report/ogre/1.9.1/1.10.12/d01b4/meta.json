@@ -2,9 +2,9 @@
   "Affected": "66.6",
   "Added": 557,
   "Removed": 533,
-  "TotalProblems": 1641,
+  "TotalProblems": 1642,
   "Source_Affected": "35.8",
-  "Source_TotalProblems": "701",
+  "Source_TotalProblems": "702",
   "Source_ReportPath": "compat_report/ogre/1.9.1/1.10.12/d01b4/src_compat_report.html",
   "Object1": "lib/libOgreMain.so.1.9.0",
   "Object2": "lib/libOgreMain.so.1.10.12"

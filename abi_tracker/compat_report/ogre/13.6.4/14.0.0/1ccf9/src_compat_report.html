@@ -1,0 +1,3804 @@
+<!-- verdict:incompatible;affected:34.1;added:3;removed:144;type_problems_high:104;type_problems_medium:13;type_problems_low:7;interface_problems_high:16;interface_problems_medium:12;interface_problems_low:5;changed_constants:0;type_changes_other:27;interface_changes_other:18;tool_version:2.3 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta name="keywords" content="libOgreRTShaderSystem, source compatibility, API, report" />
+<meta name="description" content="Source compatibility report for the libOgreRTShaderSystem object between 13.6.4 and 14.0.0 versions" />
+<title>libOgreRTShaderSystem: 13.6.4 to 14.0.0 source compatibility report</title>
+<style type="text/css">
+body {
+    font-family:Arial, sans-serif;
+    background-color:White;
+    color:Black;
+}
+hr {
+    color:Black;
+    background-color:Black;
+    height:1px;
+    border:0;
+}
+h1 {
+    margin-bottom:0px;
+    padding-bottom:0px;
+    font-size:1.625em;
+}
+h2 {
+    margin-bottom:0px;
+    padding-bottom:0px;
+    font-size:1.25em;
+    white-space:nowrap;
+}
+span.section {
+    font-weight:bold;
+    cursor:pointer;
+    color:#003E69;
+    white-space:nowrap;
+    margin-left:0.3125em;
+}
+span.new_sign {
+    font-weight:bold;
+    margin-left:1.65em;
+    color:#003E69;
+}
+span.new_sign_lbl {
+    margin-left:3em;
+    font-size:1em;
+    color:Black;
+}
+span:hover.section {
+    color:#336699;
+}
+span.sect_aff {
+    cursor:pointer;
+    padding-left:1.55em;
+    font-size:0.875em;
+    color:#cc3300;
+}
+span.sect_info {
+    cursor:pointer;
+    padding-left:1.55em;
+    font-size:0.875em;
+    color:Black;
+}
+span.ext {
+    font-weight:normal;
+}
+span.h_name {
+    color:#cc3300;
+    font-size:0.875em;
+    font-weight:bold;
+}
+div.h_list, div.lib_list {
+    font-size:0.94em;
+    padding-left:0.4em;
+}
+span.ns {
+    color:#408080;
+    font-size:0.94em;
+}
+span.lib_name {
+    color:Green;
+    font-size:0.875em;
+    font-weight:bold;
+}
+span.iname {
+    font-weight:bold;
+    color:#003E69;
+    margin-left:0.3125em;
+}
+span.iname_b {
+    font-weight:bold;
+}
+span.iname_a {
+    color:#333333;
+    font-weight:bold;
+    font-size:0.94em;
+}
+span.sym_p {
+    font-weight:normal;
+    white-space:normal;
+}
+span.sym_pd {
+    white-space:normal;
+}
+span.sym_p span, span.sym_pd span {
+    white-space:nowrap;
+}
+div.affect {
+    padding-left:1em;
+    padding-bottom:10px;
+    font-size:0.87em;
+    font-style:italic;
+    line-height:0.9em;
+}
+div.affected {
+    padding-left:1.9em;
+    padding-top:10px;
+}
+table.ptable {
+    border-collapse:collapse;
+    border:1px outset black;
+    margin-left:0.95em;
+    margin-top:3px;
+    margin-bottom:3px;
+    width:56.25em;
+}
+table.ptable td {
+    border:1px solid gray;
+    padding:3px;
+    font-size:0.875em;
+    text-align:left;
+    vertical-align:top;
+    max-width:28em;
+    word-wrap:break-word;
+}
+table.ptable th.pn {
+    width:2%;
+}
+table.ptable th.chg {
+    width:47%;
+}
+table.vtable {
+    border-collapse:collapse;
+    border:1px outset black;
+    margin-left:1.9em;
+    margin-top:0.7em;
+}
+table.vtable td {
+    border:1px solid gray;
+    padding:3px;
+    font-size:0.875em;
+    vertical-align:top;
+    max-width:450px;
+    word-wrap:break-word;
+}
+table.ptable th, table.vtable th {
+    background-color:#eeeeee;
+    font-weight:bold;
+    color:#333333;
+    font-family:Verdana, Arial;
+    font-size:0.875em;
+    border:1px solid gray;
+    text-align:center;
+    vertical-align:top;
+    white-space:nowrap;
+    padding:3px;
+}
+table.summary {
+    border-collapse:collapse;
+    border:1px outset black;
+}
+table.summary th {
+    background-color:#eeeeee;
+    font-weight:normal;
+    text-align:left;
+    font-size:0.94em;
+    white-space:nowrap;
+    border:1px inset gray;
+    padding:3px;
+}
+table.summary td {
+    text-align:right;
+    white-space:nowrap;
+    border:1px inset gray;
+    padding:3px 5px 3px 10px;
+}
+span.mngl {
+    padding-left:1em;
+    font-size:0.875em;
+    cursor:text;
+    color:#444444;
+    font-weight:bold;
+}
+span.pleft {
+    padding-left:2.5em;
+}
+span.sym_ver {
+    color:#333333;
+    white-space:nowrap;
+    font-family:"DejaVu Sans Mono", Monospace;
+}
+span.attr {
+    color:#333333;
+    font-weight:normal;
+}
+span.color_p {
+    font-style:italic;
+    color:Brown;
+}
+span.p {
+    font-style:italic;
+}
+span.fp {
+    font-style:italic;
+    background-color:#DCDCDC;
+}
+span.ttype {
+    font-weight:normal;
+}
+span.nowrap {
+    white-space:nowrap;
+}
+span.value {
+    font-weight:bold;
+}
+.passed {
+    background-color:#CCFFCC;
+    font-weight:normal;
+}
+.warning {
+    background-color:#F4F4AF;
+    font-weight:normal;
+}
+.failed {
+    background-color:#FFCCCC;
+    font-weight:normal;
+}
+.new {
+    background-color:#C6DEFF;
+    font-weight:normal;
+}
+.compatible {
+    background-color:#CCFFCC;
+    font-weight:normal;
+}
+.almost_compatible {
+    background-color:#FFDAA3;
+    font-weight:normal;
+}
+.incompatible {
+    background-color:#FFCCCC;
+    font-weight:normal;
+}
+.gray {
+    background-color:#DCDCDC;
+    font-weight:normal;
+}
+.top_ref {
+    font-size:0.69em;
+}
+.footer {
+    font-size:0.75em;
+}
+</style>
+<script type="text/javascript" language="JavaScript">
+<!--
+function showContent(header, id)
+{
+    e = document.getElementById(id);
+    if(e.style.display == 'none')
+    {
+        e.style.display = 'block';
+        e.style.visibility = 'visible';
+        header.innerHTML = header.innerHTML.replace(/\[[^0-9 ]\]/gi,"[&minus;]");
+    }
+    else
+    {
+        e.style.display = 'none';
+        e.style.visibility = 'hidden';
+        header.innerHTML = header.innerHTML.replace(/\[[^0-9 ]\]/gi,"[+]");
+    }
+}
+-->
+</script>
+</head>
+
+<body>
+<div><a name='Top'></a>
+<h1>Source compatibility report for the <span style='color:Blue;'>libOgreRTShaderSystem.so</span> object between <span style='color:Red;'>13.6.4</span> and <span style='color:Red;'>14.0.0</span> versions</h1>
+
+<h2>Test Info</h2><hr/>
+<table class='summary'>
+<tr><th>Module Name</th><td>libOgreRTShaderSystem</td></tr>
+<tr><th>Version #1</th><td>13.6.4</td></tr>
+<tr><th>Version #2</th><td>14.0.0</td></tr>
+<tr><th>Arch</th><td>x86_64</td></tr>
+</table>
+<h2>Test Results</h2><hr/>
+<table class='summary'><tr><th>Total Header Files</th><td><a href='#Headers' style='color:Blue;'>52</a></td></tr>
+<tr><th>Total Source Files</th><td><a href='#Sources' style='color:Blue;'>29</a></td></tr>
+<tr><th>Total Objects</th><td><a href='#Libs' style='color:Blue;'>1</a></td></tr>
+<tr><th>Total Symbols / Types</th><td>734 / 140</td></tr>
+<tr><th>Compatibility</th>
+<td class='incompatible'>65.9%</td>
+</tr>
+</table>
+<h2>Problem Summary</h2><hr/>
+<table class='summary'><tr><th></th><th style='text-align:center;'>Severity</th><th style='text-align:center;'>Count</th></tr><tr><th>Added Symbols</th><td>-</td><td class='new'><a href='#Added' style='color:Blue;'>3</a></td></tr>
+<tr><th>Removed Symbols</th><td>High</td><td class='failed'><a href='#Removed' style='color:Blue;'>144</a></td></tr>
+<tr><th rowspan='3'>Problems with<br/>Data Types</th><td>High</td><td class='failed'><a href='#Type_Problems_High' style='color:Blue;'>104</a></td></tr>
+<tr><td>Medium</td><td class='failed'><a href='#Type_Problems_Medium' style='color:Blue;'>13</a></td></tr>
+<tr><td>Low</td><td class='warning'><a href='#Type_Problems_Low' style='color:Blue;'>7</a></td></tr>
+<tr><th rowspan='3'>Problems with<br/>Symbols</th><td>High</td><td class='failed'><a href='#Symbol_Problems_High' style='color:Blue;'>16</a></td></tr>
+<tr><td>Medium</td><td class='failed'><a href='#Symbol_Problems_Medium' style='color:Blue;'>12</a></td></tr>
+<tr><td>Low</td><td class='warning'><a href='#Symbol_Problems_Low' style='color:Blue;'>5</a></td></tr>
+<tr><th>Problems with<br/>Constants</th><td>Low</td><td>0</td></tr>
+<tr><th>Other Changes<br/>in Data Types</th><td>-</td><td class='passed'><a href='#Other_Changes_In_Types' style='color:Blue;'>27</a></td></tr>
+<tr><th>Other Changes<br/>in Symbols</th><td>-</td><td class='passed'><a href='#Other_Changes_In_Symbols' style='color:Blue;'>18</a></td></tr>
+</table>
+
+<a name='Added'></a><h2>Added Symbols <span class='new'>&nbsp;3&nbsp;</span></h2><hr/>
+<span class='h_name'>OgreShaderExHardwareSkinning.h</span><br/>
+<span class='ns'>namespace <b>Ogre::RTShader</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_204')">
+HardwareSkinningFactory::mMaxCalculableBoneCount <span class='attr'>[data]</span></span>
+<br/>
+<div id="c_204" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader23HardwareSkinningFactory23mMaxCalculableBoneCountE</span>
+<br/>
+<br/>
+</div>
+
+<br/>
+<span class='h_name'>OgreShaderExLayeredBlending.h</span><br/>
+<span class='ns'>namespace <b>Ogre::RTShader</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_205')">
+LayeredBlending::getSourceModifier&#160;<span class='sym_p'><span>(&#160;unsigned short <span class='color_p'>index</span></span>, <span>enum SourceModifier&amp; <span class='color_p'>modType</span></span>, <span>int&amp; <span class='color_p'>customNum</span></span>&#160;)</span> const</span>
+<br/>
+<div id="c_205" style="display:none;">
+<span class='mngl'>_ZNK4Ogre8RTShader15LayeredBlending17getSourceModifierEtRNS0_14SourceModifierERi</span>
+<br/>
+<br/>
+</div>
+
+<br/>
+<span class='h_name'>OgreShaderGenerator.h</span><br/>
+<span class='ns'>namespace <b>Ogre::RTShader</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_206')">
+ShaderGenerator::_markNonFFP&#160;<span class='sym_p'><span>(&#160;Ogre::TextureUnitState const* <span class='color_p'>tu</span></span>&#160;)</span> <span class='attr'>[static]</span></span>
+<br/>
+<div id="c_206" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader15ShaderGenerator11_markNonFFPEPKNS_16TextureUnitStateE</span>
+<br/>
+<br/>
+</div>
+
+<br/>
+<a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='Removed'></a><a name='Withdrawn'></a><h2>Removed Symbols <span class='failed'>&nbsp;144&nbsp;</span></h2><hr/>
+<span class='h_name'>OgreShaderExGBuffer.h</span><br/>
+<span class='ns'>namespace <b>Ogre::RTShader</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_207')">
+GBuffer::copyFrom&#160;<span class='sym_p'><span>(&#160;SubRenderState const&amp; <span class='color_p'>rhs</span></span>&#160;)</span></span>
+<br/>
+<div id="c_207" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader7GBuffer8copyFromERKNS0_14SubRenderStateE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_208')">
+GBuffer::createCpuSubPrograms&#160;<span class='sym_p'><span>(&#160;ProgramSet* <span class='color_p'>programSet</span></span>&#160;)</span></span>
+<br/>
+<div id="c_208" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader7GBuffer20createCpuSubProgramsEPNS0_10ProgramSetE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_209')">
+GBuffer::getExecutionOrder&#160;<span class='sym_p'>(&#160;)</span> const</span>
+<br/>
+<div id="c_209" style="display:none;">
+<span class='mngl'>_ZNK4Ogre8RTShader7GBuffer17getExecutionOrderEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_210')">
+GBuffer::getType&#160;<span class='sym_p'>(&#160;)</span> const</span>
+<br/>
+<div id="c_210" style="display:none;">
+<span class='mngl'>_ZNK4Ogre8RTShader7GBuffer7getTypeB5cxx11Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_211')">
+GBuffer::preAddToRenderState&#160;<span class='sym_p'><span>(&#160;RenderState const* <span class='color_p'>renderState</span></span>, <span>Ogre::Pass* <span class='color_p'>srcPass</span></span>, <span>Ogre::Pass* <span class='color_p'>dstPass</span></span>&#160;)</span></span>
+<br/>
+<div id="c_211" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader7GBuffer19preAddToRenderStateEPKNS0_11RenderStateEPNS_4PassES6_</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_212')">
+GBuffer::Type <span class='attr'>[data]</span></span>
+<br/>
+<div id="c_212" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader7GBuffer4TypeB5cxx11E</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_213')">
+GBuffer::~GBuffer <span class='attr'>[D0]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_213" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader7GBufferD0Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_214')">
+GBuffer::~GBuffer <span class='attr'>[D1]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_214" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader7GBufferD1Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_215')">
+GBuffer::~GBuffer <span class='attr'>[D2]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_215" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader7GBufferD2Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_216')">
+GBufferFactory::createInstance&#160;<span class='sym_p'><span>(&#160;Ogre::ScriptCompiler* <span class='color_p'>compiler</span></span>, <span>Ogre::PropertyAbstractNode* <span class='color_p'>prop</span></span>, <span>Ogre::Pass* <span class='color_p'>pass</span></span>, <span>SGScriptTranslator* <span class='color_p'>translator</span></span>&#160;)</span></span>
+<br/>
+<div id="c_216" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader14GBufferFactory14createInstanceEPNS_14ScriptCompilerEPNS_20PropertyAbstractNodeEPNS_4PassEPNS0_18SGScriptTranslatorE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_217')">
+GBufferFactory::createInstanceImpl&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_217" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader14GBufferFactory18createInstanceImplEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_218')">
+GBufferFactory::getType&#160;<span class='sym_p'>(&#160;)</span> const</span>
+<br/>
+<div id="c_218" style="display:none;">
+<span class='mngl'>_ZNK4Ogre8RTShader14GBufferFactory7getTypeB5cxx11Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_219')">
+GBufferFactory::writeInstance&#160;<span class='sym_p'><span>(&#160;Ogre::MaterialSerializer* <span class='color_p'>ser</span></span>, <span>SubRenderState* <span class='color_p'>subRenderState</span></span>, <span>Ogre::Pass* <span class='color_p'>srcPass</span></span>, <span>Ogre::Pass* <span class='color_p'>dstPass</span></span>&#160;)</span></span>
+<br/>
+<div id="c_219" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader14GBufferFactory13writeInstanceEPNS_18MaterialSerializerEPNS0_14SubRenderStateEPNS_4PassES7_</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_220')">
+GBufferFactory::~GBufferFactory <span class='attr'>[D0]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_220" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader14GBufferFactoryD0Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_221')">
+GBufferFactory::~GBufferFactory <span class='attr'>[D1]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_221" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader14GBufferFactoryD1Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_222')">
+GBufferFactory::~GBufferFactory <span class='attr'>[D2]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_222" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader14GBufferFactoryD2Ev</span>
+<br/>
+<br/>
+</div>
+
+<br/>
+<span class='h_name'>OgreShaderExHardwareSkinning.h</span><br/>
+<span class='ns'>namespace <b>Ogre::RTShader</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_223')">
+HardwareSkinning::addFunctionInvocations&#160;<span class='sym_p'><span>(&#160;ProgramSet* <span class='color_p'>programSet</span></span>&#160;)</span></span>
+<br/>
+<div id="c_223" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader16HardwareSkinning22addFunctionInvocationsEPNS0_10ProgramSetE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_224')">
+HardwareSkinning::copyFrom&#160;<span class='sym_p'><span>(&#160;SubRenderState const&amp; <span class='color_p'>rhs</span></span>&#160;)</span></span>
+<br/>
+<div id="c_224" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader16HardwareSkinning8copyFromERKNS0_14SubRenderStateE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_225')">
+HardwareSkinning::getBoneCount&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_225" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader16HardwareSkinning12getBoneCountEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_226')">
+HardwareSkinning::getExecutionOrder&#160;<span class='sym_p'>(&#160;)</span> const</span>
+<br/>
+<div id="c_226" style="display:none;">
+<span class='mngl'>_ZNK4Ogre8RTShader16HardwareSkinning17getExecutionOrderEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_227')">
+HardwareSkinning::getSkinningType&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_227" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader16HardwareSkinning15getSkinningTypeEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_228')">
+HardwareSkinning::getType&#160;<span class='sym_p'>(&#160;)</span> const</span>
+<br/>
+<div id="c_228" style="display:none;">
+<span class='mngl'>_ZNK4Ogre8RTShader16HardwareSkinning7getTypeB5cxx11Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_229')">
+HardwareSkinning::getWeightCount&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_229" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader16HardwareSkinning14getWeightCountEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_230')">
+HardwareSkinning::HardwareSkinning <span class='attr'>[C1]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_230" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader16HardwareSkinningC1Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_231')">
+HardwareSkinning::HardwareSkinning <span class='attr'>[C2]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_231" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader16HardwareSkinningC2Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_232')">
+HardwareSkinning::hasCorrectAntipodalityHandling&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_232" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader16HardwareSkinning30hasCorrectAntipodalityHandlingEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_233')">
+HardwareSkinning::hasScalingShearingSupport&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_233" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader16HardwareSkinning25hasScalingShearingSupportEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_234')">
+HardwareSkinning::preAddToRenderState&#160;<span class='sym_p'><span>(&#160;RenderState const* <span class='color_p'>renderState</span></span>, <span>Ogre::Pass* <span class='color_p'>srcPass</span></span>, <span>Ogre::Pass* <span class='color_p'>dstPass</span></span>&#160;)</span></span>
+<br/>
+<div id="c_234" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader16HardwareSkinning19preAddToRenderStateEPKNS0_11RenderStateEPNS_4PassES6_</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_235')">
+HardwareSkinning::resolveDependencies&#160;<span class='sym_p'><span>(&#160;ProgramSet* <span class='color_p'>programSet</span></span>&#160;)</span></span>
+<br/>
+<div id="c_235" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader16HardwareSkinning19resolveDependenciesEPNS0_10ProgramSetE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_236')">
+HardwareSkinning::resolveParameters&#160;<span class='sym_p'><span>(&#160;ProgramSet* <span class='color_p'>programSet</span></span>&#160;)</span></span>
+<br/>
+<div id="c_236" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader16HardwareSkinning17resolveParametersEPNS0_10ProgramSetE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_237')">
+HardwareSkinning::setHardwareSkinningParam&#160;<span class='sym_p'><span>(&#160;Ogre::ushort <span class='color_p'>boneCount</span></span>, <span>Ogre::ushort <span class='color_p'>weightCount</span></span>, <span>enum SkinningType <span class='color_p'>skinningType</span></span>, <span>bool <span class='color_p'>correctAntipodalityHandling</span></span>, <span>bool <span class='color_p'>scalingShearingSupport</span></span>&#160;)</span></span>
+<br/>
+<div id="c_237" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader16HardwareSkinning24setHardwareSkinningParamEttNS0_12SkinningTypeEbb</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_238')">
+HardwareSkinning::Type <span class='attr'>[data]</span></span>
+<br/>
+<div id="c_238" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader16HardwareSkinning4TypeB5cxx11E</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_239')">
+HardwareSkinning::~HardwareSkinning <span class='attr'>[D0]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_239" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader16HardwareSkinningD0Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_240')">
+HardwareSkinning::~HardwareSkinning <span class='attr'>[D1]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_240" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader16HardwareSkinningD1Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_241')">
+HardwareSkinning::~HardwareSkinning <span class='attr'>[D2]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_241" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader16HardwareSkinningD2Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_242')">
+HardwareSkinningFactory::extractSkeletonData&#160;<span class='sym_p'><span>(&#160;Ogre::Entity const* <span class='color_p'>pEntity</span></span>, <span>size_t <span class='color_p'>subEntityIndex</span></span>, <span>Ogre::ushort&amp; <span class='color_p'>boneCount</span></span>, <span>Ogre::ushort&amp; <span class='color_p'>weightCount</span></span>&#160;)</span></span>
+<br/>
+<div id="c_242" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader23HardwareSkinningFactory19extractSkeletonDataEPKNS_6EntityEmRtS5_</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_243')">
+HardwareSkinningFactory::imprintSkeletonData&#160;<span class='sym_p'><span>(&#160;Ogre::MaterialPtr const&amp; <span class='color_p'>pMaterial</span></span>, <span>bool <span class='color_p'>isVaild</span></span>, <span>Ogre::ushort <span class='color_p'>boneCount</span></span>, <span>Ogre::ushort <span class='color_p'>weightCount</span></span>, <span>enum SkinningType <span class='color_p'>skinningType</span></span>, <span>bool <span class='color_p'>correctAntidpodalityHandling</span></span>, <span>bool <span class='color_p'>scalingShearingSupport</span></span>&#160;)</span></span>
+<br/>
+<div id="c_243" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader23HardwareSkinningFactory19imprintSkeletonDataERKNS_9SharedPtrINS_8MaterialEEEbttNS0_12SkinningTypeEbb</span>
+<br/>
+<br/>
+</div>
+
+<br/>
+<span class='h_name'>OgreShaderExIntegratedPSSM3.h</span><br/>
+<span class='ns'>namespace <b>Ogre::RTShader</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_244')">
+IntegratedPSSM3::addFunctionInvocations&#160;<span class='sym_p'><span>(&#160;ProgramSet* <span class='color_p'>programSet</span></span>&#160;)</span></span>
+<br/>
+<div id="c_244" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader15IntegratedPSSM322addFunctionInvocationsEPNS0_10ProgramSetE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_245')">
+IntegratedPSSM3::addPSInvocation&#160;<span class='sym_p'><span>(&#160;Program* <span class='color_p'>psProgram</span></span>, <span>int const <span class='color_p'>groupOrder</span></span>&#160;)</span></span>
+<br/>
+<div id="c_245" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader15IntegratedPSSM315addPSInvocationEPNS0_7ProgramEi</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_246')">
+IntegratedPSSM3::addVSInvocation&#160;<span class='sym_p'><span>(&#160;Function* <span class='color_p'>vsMain</span></span>, <span>int const <span class='color_p'>groupOrder</span></span>&#160;)</span></span>
+<br/>
+<div id="c_246" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader15IntegratedPSSM315addVSInvocationEPNS0_8FunctionEi</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_247')">
+IntegratedPSSM3::copyFrom&#160;<span class='sym_p'><span>(&#160;SubRenderState const&amp; <span class='color_p'>rhs</span></span>&#160;)</span></span>
+<br/>
+<div id="c_247" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader15IntegratedPSSM38copyFromERKNS0_14SubRenderStateE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_248')">
+IntegratedPSSM3::getExecutionOrder&#160;<span class='sym_p'>(&#160;)</span> const</span>
+<br/>
+<div id="c_248" style="display:none;">
+<span class='mngl'>_ZNK4Ogre8RTShader15IntegratedPSSM317getExecutionOrderEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_249')">
+IntegratedPSSM3::IntegratedPSSM3 <span class='attr'>[C1]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_249" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader15IntegratedPSSM3C1Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_250')">
+IntegratedPSSM3::IntegratedPSSM3 <span class='attr'>[C2]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_250" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader15IntegratedPSSM3C2Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_251')">
+IntegratedPSSM3::preAddToRenderState&#160;<span class='sym_p'><span>(&#160;RenderState const* <span class='color_p'>renderState</span></span>, <span>Ogre::Pass* <span class='color_p'>srcPass</span></span>, <span>Ogre::Pass* <span class='color_p'>dstPass</span></span>&#160;)</span></span>
+<br/>
+<div id="c_251" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader15IntegratedPSSM319preAddToRenderStateEPKNS0_11RenderStateEPNS_4PassES6_</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_252')">
+IntegratedPSSM3::resolveDependencies&#160;<span class='sym_p'><span>(&#160;ProgramSet* <span class='color_p'>programSet</span></span>&#160;)</span></span>
+<br/>
+<div id="c_252" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader15IntegratedPSSM319resolveDependenciesEPNS0_10ProgramSetE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_253')">
+IntegratedPSSM3::resolveParameters&#160;<span class='sym_p'><span>(&#160;ProgramSet* <span class='color_p'>programSet</span></span>&#160;)</span></span>
+<br/>
+<div id="c_253" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader15IntegratedPSSM317resolveParametersEPNS0_10ProgramSetE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_254')">
+IntegratedPSSM3::setParameter&#160;<span class='sym_p'><span>(&#160;Ogre::String const&amp; <span class='color_p'>name</span></span>, <span>Ogre::String const&amp; <span class='color_p'>value</span></span>&#160;)</span></span>
+<br/>
+<div id="c_254" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader15IntegratedPSSM312setParameterERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEES9_</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_255')">
+IntegratedPSSM3::setSplitPoints&#160;<span class='sym_p'><span>(&#160;IntegratedPSSM3::SplitPointList const&amp; <span class='color_p'>newSplitPoints</span></span>&#160;)</span></span>
+<br/>
+<div id="c_255" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader15IntegratedPSSM314setSplitPointsERKSt6vectorIfSaIfEE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_256')">
+IntegratedPSSM3::Type <span class='attr'>[data]</span></span>
+<br/>
+<div id="c_256" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader15IntegratedPSSM34TypeB5cxx11E</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_257')">
+IntegratedPSSM3::updateGpuProgramsParams&#160;<span class='sym_p'><span>(&#160;Ogre::Renderable* <span class='color_p'>rend</span></span>, <span>Ogre::Pass const* <span class='color_p'>pass</span></span>, <span>Ogre::AutoParamDataSource const* <span class='color_p'>source</span></span>, <span>Ogre::HashedVector&lt;Ogre::Light*&gt;const* <span class='color_p'>pLightList</span></span>&#160;)</span></span>
+<br/>
+<div id="c_257" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader15IntegratedPSSM323updateGpuProgramsParamsEPNS_10RenderableEPKNS_4PassEPKNS_19AutoParamDataSourceEPKNS_12HashedVectorIPNS_5LightEEE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_258')">
+IntegratedPSSM3::~IntegratedPSSM3 <span class='attr'>[D0]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_258" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader15IntegratedPSSM3D0Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_259')">
+IntegratedPSSM3::~IntegratedPSSM3 <span class='attr'>[D1]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_259" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader15IntegratedPSSM3D1Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_260')">
+IntegratedPSSM3::~IntegratedPSSM3 <span class='attr'>[D2]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_260" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader15IntegratedPSSM3D2Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_261')">
+IntegratedPSSM3Factory::createInstance&#160;<span class='sym_p'><span>(&#160;Ogre::ScriptCompiler* <span class='color_p'>compiler</span></span>, <span>Ogre::PropertyAbstractNode* <span class='color_p'>prop</span></span>, <span>Ogre::Pass* <span class='color_p'>pass</span></span>, <span>SGScriptTranslator* <span class='color_p'>translator</span></span>&#160;)</span></span>
+<br/>
+<div id="c_261" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader22IntegratedPSSM3Factory14createInstanceEPNS_14ScriptCompilerEPNS_20PropertyAbstractNodeEPNS_4PassEPNS0_18SGScriptTranslatorE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_262')">
+IntegratedPSSM3Factory::createInstanceImpl&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_262" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader22IntegratedPSSM3Factory18createInstanceImplEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_263')">
+IntegratedPSSM3Factory::~IntegratedPSSM3Factory <span class='attr'>[D0]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_263" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader22IntegratedPSSM3FactoryD0Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_264')">
+IntegratedPSSM3Factory::~IntegratedPSSM3Factory <span class='attr'>[D1]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_264" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader22IntegratedPSSM3FactoryD1Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_265')">
+IntegratedPSSM3Factory::~IntegratedPSSM3Factory <span class='attr'>[D2]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_265" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader22IntegratedPSSM3FactoryD2Ev</span>
+<br/>
+<br/>
+</div>
+
+<br/>
+<span class='h_name'>OgreShaderExLayeredBlending.h</span><br/>
+<span class='ns'>namespace <b>Ogre::RTShader</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_266')">
+LayeredBlending::getSourceModifier&#160;<span class='sym_p'><span>(&#160;unsigned short <span class='color_p'>index</span></span>, <span>enum LayeredBlending::SourceModifier&amp; <span class='color_p'>modType</span></span>, <span>int&amp; <span class='color_p'>customNum</span></span>&#160;)</span> const</span>
+<br/>
+<div id="c_266" style="display:none;">
+<span class='mngl'>_ZNK4Ogre8RTShader15LayeredBlending17getSourceModifierEtRNS1_14SourceModifierERi</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_267')">
+LayeredBlending::setBlendMode&#160;<span class='sym_p'><span>(&#160;unsigned short <span class='color_p'>index</span></span>, <span>enum LayeredBlending::BlendMode <span class='color_p'>mode</span></span>&#160;)</span></span>
+<br/>
+<div id="c_267" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader15LayeredBlending12setBlendModeEtNS1_9BlendModeE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_268')">
+LayeredBlending::setSourceModifier&#160;<span class='sym_p'><span>(&#160;unsigned short <span class='color_p'>index</span></span>, <span>enum LayeredBlending::SourceModifier <span class='color_p'>modType</span></span>, <span>int <span class='color_p'>customNum</span></span>&#160;)</span></span>
+<br/>
+<div id="c_268" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader15LayeredBlending17setSourceModifierEtNS1_14SourceModifierEi</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_269')">
+LayeredBlendingFactory::createInstance&#160;<span class='sym_p'><span>(&#160;Ogre::ScriptCompiler* <span class='color_p'>compiler</span></span>, <span>Ogre::PropertyAbstractNode* <span class='color_p'>prop</span></span>, <span>Ogre::TextureUnitState* <span class='color_p'>texState</span></span>, <span>SGScriptTranslator* <span class='color_p'>translator</span></span>&#160;)</span></span>
+<br/>
+<div id="c_269" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader22LayeredBlendingFactory14createInstanceEPNS_14ScriptCompilerEPNS_20PropertyAbstractNodeEPNS_16TextureUnitStateEPNS0_18SGScriptTranslatorE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_270')">
+LayeredBlendingFactory::createInstanceImpl&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_270" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader22LayeredBlendingFactory18createInstanceImplEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_271')">
+LayeredBlendingFactory::createOrRetrieveSubRenderState&#160;<span class='sym_p'><span>(&#160;SGScriptTranslator* <span class='color_p'>translator</span></span>&#160;)</span></span>
+<br/>
+<div id="c_271" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader22LayeredBlendingFactory30createOrRetrieveSubRenderStateEPNS0_18SGScriptTranslatorE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_272')">
+LayeredBlendingFactory::getType&#160;<span class='sym_p'>(&#160;)</span> const</span>
+<br/>
+<div id="c_272" style="display:none;">
+<span class='mngl'>_ZNK4Ogre8RTShader22LayeredBlendingFactory7getTypeB5cxx11Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_273')">
+LayeredBlendingFactory::writeInstance&#160;<span class='sym_p'><span>(&#160;Ogre::MaterialSerializer* <span class='color_p'>ser</span></span>, <span>SubRenderState* <span class='color_p'>subRenderState</span></span>, <span>Ogre::TextureUnitState const* <span class='color_p'>srcTextureState</span></span>, <span>Ogre::TextureUnitState const* <span class='color_p'>dstTextureState</span></span>&#160;)</span></span>
+<br/>
+<div id="c_273" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader22LayeredBlendingFactory13writeInstanceEPNS_18MaterialSerializerEPNS0_14SubRenderStateEPKNS_16TextureUnitStateES8_</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_274')">
+LayeredBlendingFactory::~LayeredBlendingFactory <span class='attr'>[D0]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_274" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader22LayeredBlendingFactoryD0Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_275')">
+LayeredBlendingFactory::~LayeredBlendingFactory <span class='attr'>[D1]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_275" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader22LayeredBlendingFactoryD1Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_276')">
+LayeredBlendingFactory::~LayeredBlendingFactory <span class='attr'>[D2]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_276" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader22LayeredBlendingFactoryD2Ev</span>
+<br/>
+<br/>
+</div>
+
+<br/>
+<span class='h_name'>OgreShaderExTriplanarTexturing.h</span><br/>
+<span class='ns'>namespace <b>Ogre::RTShader</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_277')">
+TriplanarTexturing::addFunctionInvocations&#160;<span class='sym_p'><span>(&#160;ProgramSet* <span class='color_p'>programSet</span></span>&#160;)</span></span>
+<br/>
+<div id="c_277" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader18TriplanarTexturing22addFunctionInvocationsEPNS0_10ProgramSetE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_278')">
+TriplanarTexturing::copyFrom&#160;<span class='sym_p'><span>(&#160;SubRenderState const&amp; <span class='color_p'>rhs</span></span>&#160;)</span></span>
+<br/>
+<div id="c_278" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader18TriplanarTexturing8copyFromERKNS0_14SubRenderStateE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_279')">
+TriplanarTexturing::getExecutionOrder&#160;<span class='sym_p'>(&#160;)</span> const</span>
+<br/>
+<div id="c_279" style="display:none;">
+<span class='mngl'>_ZNK4Ogre8RTShader18TriplanarTexturing17getExecutionOrderEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_280')">
+TriplanarTexturing::getType&#160;<span class='sym_p'>(&#160;)</span> const</span>
+<br/>
+<div id="c_280" style="display:none;">
+<span class='mngl'>_ZNK4Ogre8RTShader18TriplanarTexturing7getTypeB5cxx11Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_281')">
+TriplanarTexturing::preAddToRenderState&#160;<span class='sym_p'><span>(&#160;RenderState const* <span class='color_p'>renderState</span></span>, <span>Ogre::Pass* <span class='color_p'>srcPass</span></span>, <span>Ogre::Pass* <span class='color_p'>dstPass</span></span>&#160;)</span></span>
+<br/>
+<div id="c_281" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader18TriplanarTexturing19preAddToRenderStateEPKNS0_11RenderStateEPNS_4PassES6_</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_282')">
+TriplanarTexturing::resolveDependencies&#160;<span class='sym_p'><span>(&#160;ProgramSet* <span class='color_p'>programSet</span></span>&#160;)</span></span>
+<br/>
+<div id="c_282" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader18TriplanarTexturing19resolveDependenciesEPNS0_10ProgramSetE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_283')">
+TriplanarTexturing::resolveParameters&#160;<span class='sym_p'><span>(&#160;ProgramSet* <span class='color_p'>programSet</span></span>&#160;)</span></span>
+<br/>
+<div id="c_283" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader18TriplanarTexturing17resolveParametersEPNS0_10ProgramSetE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_284')">
+TriplanarTexturing::setParameters&#160;<span class='sym_p'><span>(&#160;Ogre::Vector3 const&amp; <span class='color_p'>parameters</span></span>&#160;)</span></span>
+<br/>
+<div id="c_284" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader18TriplanarTexturing13setParametersERKNS_6VectorILi3EfEE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_285')">
+TriplanarTexturing::setTextureNames&#160;<span class='sym_p'><span>(&#160;Ogre::String const&amp; <span class='color_p'>textureNameFromX</span></span>, <span>Ogre::String const&amp; <span class='color_p'>textureNameFromY</span></span>, <span>Ogre::String const&amp; <span class='color_p'>textureNameFromZ</span></span>&#160;)</span></span>
+<br/>
+<div id="c_285" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader18TriplanarTexturing15setTextureNamesERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEES9_S9_</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_286')">
+TriplanarTexturing::type <span class='attr'>[data]</span></span>
+<br/>
+<div id="c_286" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader18TriplanarTexturing4typeB5cxx11E</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_287')">
+TriplanarTexturing::updateGpuProgramsParams&#160;<span class='sym_p'><span>(&#160;Ogre::Renderable* <span class='color_p'>rend</span></span>, <span>Ogre::Pass const* <span class='color_p'>pass</span></span>, <span>Ogre::AutoParamDataSource const* <span class='color_p'>source</span></span>, <span>Ogre::HashedVector&lt;Ogre::Light*&gt;const* <span class='color_p'>pLightList</span></span>&#160;)</span></span>
+<br/>
+<div id="c_287" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader18TriplanarTexturing23updateGpuProgramsParamsEPNS_10RenderableEPKNS_4PassEPKNS_19AutoParamDataSourceEPKNS_12HashedVectorIPNS_5LightEEE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_288')">
+TriplanarTexturing::~TriplanarTexturing <span class='attr'>[D0]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_288" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader18TriplanarTexturingD0Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_289')">
+TriplanarTexturing::~TriplanarTexturing <span class='attr'>[D1]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_289" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader18TriplanarTexturingD1Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_290')">
+TriplanarTexturing::~TriplanarTexturing <span class='attr'>[D2]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_290" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader18TriplanarTexturingD2Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_291')">
+TriplanarTexturingFactory::createInstance&#160;<span class='sym_p'><span>(&#160;Ogre::ScriptCompiler* <span class='color_p'>compiler</span></span>, <span>Ogre::PropertyAbstractNode* <span class='color_p'>prop</span></span>, <span>Ogre::Pass* <span class='color_p'>pass</span></span>, <span>SGScriptTranslator* <span class='color_p'>translator</span></span>&#160;)</span></span>
+<br/>
+<div id="c_291" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader25TriplanarTexturingFactory14createInstanceEPNS_14ScriptCompilerEPNS_20PropertyAbstractNodeEPNS_4PassEPNS0_18SGScriptTranslatorE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_292')">
+TriplanarTexturingFactory::createInstanceImpl&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_292" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader25TriplanarTexturingFactory18createInstanceImplEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_293')">
+TriplanarTexturingFactory::getType&#160;<span class='sym_p'>(&#160;)</span> const</span>
+<br/>
+<div id="c_293" style="display:none;">
+<span class='mngl'>_ZNK4Ogre8RTShader25TriplanarTexturingFactory7getTypeB5cxx11Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_294')">
+TriplanarTexturingFactory::~TriplanarTexturingFactory <span class='attr'>[D0]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_294" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader25TriplanarTexturingFactoryD0Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_295')">
+TriplanarTexturingFactory::~TriplanarTexturingFactory <span class='attr'>[D1]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_295" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader25TriplanarTexturingFactoryD1Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_296')">
+TriplanarTexturingFactory::~TriplanarTexturingFactory <span class='attr'>[D2]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_296" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader25TriplanarTexturingFactoryD2Ev</span>
+<br/>
+<br/>
+</div>
+
+<br/>
+<span class='h_name'>OgreShaderFFPTexturing.h</span><br/>
+<span class='ns'>namespace <b>Ogre::RTShader</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_297')">
+FFPTexturing::getTexCalcMethod&#160;<span class='sym_p'><span>(&#160;Ogre::TextureUnitState* <span class='color_p'>textureUnitState</span></span>&#160;)</span></span>
+<br/>
+<div id="c_297" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader12FFPTexturing16getTexCalcMethodEPNS_16TextureUnitStateE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_298')">
+FFPTexturingFactory::createInstance&#160;<span class='sym_p'><span>(&#160;Ogre::ScriptCompiler* <span class='color_p'>compiler</span></span>, <span>Ogre::PropertyAbstractNode* <span class='color_p'>prop</span></span>, <span>Ogre::Pass* <span class='color_p'>pass</span></span>, <span>SGScriptTranslator* <span class='color_p'>translator</span></span>&#160;)</span></span>
+<br/>
+<div id="c_298" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader19FFPTexturingFactory14createInstanceEPNS_14ScriptCompilerEPNS_20PropertyAbstractNodeEPNS_4PassEPNS0_18SGScriptTranslatorE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_299')">
+FFPTexturingFactory::createInstanceImpl&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_299" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader19FFPTexturingFactory18createInstanceImplEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_300')">
+FFPTexturingFactory::getType&#160;<span class='sym_p'>(&#160;)</span> const</span>
+<br/>
+<div id="c_300" style="display:none;">
+<span class='mngl'>_ZNK4Ogre8RTShader19FFPTexturingFactory7getTypeB5cxx11Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_301')">
+FFPTexturingFactory::writeInstance&#160;<span class='sym_p'><span>(&#160;Ogre::MaterialSerializer* <span class='color_p'>ser</span></span>, <span>SubRenderState* <span class='color_p'>subRenderState</span></span>, <span>Ogre::Pass* <span class='color_p'>srcPass</span></span>, <span>Ogre::Pass* <span class='color_p'>dstPass</span></span>&#160;)</span></span>
+<br/>
+<div id="c_301" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader19FFPTexturingFactory13writeInstanceEPNS_18MaterialSerializerEPNS0_14SubRenderStateEPNS_4PassES7_</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_302')">
+FFPTexturingFactory::~FFPTexturingFactory <span class='attr'>[D0]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_302" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader19FFPTexturingFactoryD0Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_303')">
+FFPTexturingFactory::~FFPTexturingFactory <span class='attr'>[D1]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_303" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader19FFPTexturingFactoryD1Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_304')">
+FFPTexturingFactory::~FFPTexturingFactory <span class='attr'>[D2]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_304" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader19FFPTexturingFactoryD2Ev</span>
+<br/>
+<br/>
+</div>
+
+<br/>
+<span class='h_name'>OgreShaderFFPTransform.h</span><br/>
+<span class='ns'>namespace <b>Ogre::RTShader</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_305')">
+FFPTransform::copyFrom&#160;<span class='sym_p'><span>(&#160;SubRenderState const&amp; <span class='color_p'>rhs</span></span>&#160;)</span></span>
+<br/>
+<div id="c_305" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader12FFPTransform8copyFromERKNS0_14SubRenderStateE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_306')">
+FFPTransform::createCpuSubPrograms&#160;<span class='sym_p'><span>(&#160;ProgramSet* <span class='color_p'>programSet</span></span>&#160;)</span></span>
+<br/>
+<div id="c_306" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader12FFPTransform20createCpuSubProgramsEPNS0_10ProgramSetE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_307')">
+FFPTransform::getExecutionOrder&#160;<span class='sym_p'>(&#160;)</span> const</span>
+<br/>
+<div id="c_307" style="display:none;">
+<span class='mngl'>_ZNK4Ogre8RTShader12FFPTransform17getExecutionOrderEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_308')">
+FFPTransform::getType&#160;<span class='sym_p'>(&#160;)</span> const</span>
+<br/>
+<div id="c_308" style="display:none;">
+<span class='mngl'>_ZNK4Ogre8RTShader12FFPTransform7getTypeB5cxx11Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_309')">
+FFPTransform::preAddToRenderState&#160;<span class='sym_p'><span>(&#160;RenderState const* <span class='color_p'>renderState</span></span>, <span>Ogre::Pass* <span class='color_p'>srcPass</span></span>, <span>Ogre::Pass* <span class='color_p'>dstPass</span></span>&#160;)</span></span>
+<br/>
+<div id="c_309" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader12FFPTransform19preAddToRenderStateEPKNS0_11RenderStateEPNS_4PassES6_</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_310')">
+FFPTransform::Type <span class='attr'>[data]</span></span>
+<br/>
+<div id="c_310" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader12FFPTransform4TypeB5cxx11E</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_311')">
+FFPTransform::~FFPTransform <span class='attr'>[D0]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_311" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader12FFPTransformD0Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_312')">
+FFPTransform::~FFPTransform <span class='attr'>[D1]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_312" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader12FFPTransformD1Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_313')">
+FFPTransform::~FFPTransform <span class='attr'>[D2]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_313" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader12FFPTransformD2Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_314')">
+FFPTransformFactory::createInstance&#160;<span class='sym_p'><span>(&#160;Ogre::ScriptCompiler* <span class='color_p'>compiler</span></span>, <span>Ogre::PropertyAbstractNode* <span class='color_p'>prop</span></span>, <span>Ogre::Pass* <span class='color_p'>pass</span></span>, <span>SGScriptTranslator* <span class='color_p'>translator</span></span>&#160;)</span></span>
+<br/>
+<div id="c_314" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader19FFPTransformFactory14createInstanceEPNS_14ScriptCompilerEPNS_20PropertyAbstractNodeEPNS_4PassEPNS0_18SGScriptTranslatorE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_315')">
+FFPTransformFactory::createInstanceImpl&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_315" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader19FFPTransformFactory18createInstanceImplEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_316')">
+FFPTransformFactory::getType&#160;<span class='sym_p'>(&#160;)</span> const</span>
+<br/>
+<div id="c_316" style="display:none;">
+<span class='mngl'>_ZNK4Ogre8RTShader19FFPTransformFactory7getTypeB5cxx11Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_317')">
+FFPTransformFactory::writeInstance&#160;<span class='sym_p'><span>(&#160;Ogre::MaterialSerializer* <span class='color_p'>ser</span></span>, <span>SubRenderState* <span class='color_p'>subRenderState</span></span>, <span>Ogre::Pass* <span class='color_p'>srcPass</span></span>, <span>Ogre::Pass* <span class='color_p'>dstPass</span></span>&#160;)</span></span>
+<br/>
+<div id="c_317" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader19FFPTransformFactory13writeInstanceEPNS_18MaterialSerializerEPNS0_14SubRenderStateEPNS_4PassES7_</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_318')">
+FFPTransformFactory::~FFPTransformFactory <span class='attr'>[D0]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_318" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader19FFPTransformFactoryD0Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_319')">
+FFPTransformFactory::~FFPTransformFactory <span class='attr'>[D1]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_319" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader19FFPTransformFactoryD1Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_320')">
+FFPTransformFactory::~FFPTransformFactory <span class='attr'>[D2]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_320" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader19FFPTransformFactoryD2Ev</span>
+<br/>
+<br/>
+</div>
+
+<br/>
+<span class='h_name'>OgreShaderProgramProcessor.h</span><br/>
+<span class='ns'>namespace <b>Ogre::RTShader</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_321')">
+ProgramProcessor::buildMergeCombinations&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_321" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader16ProgramProcessor22buildMergeCombinationsEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_322')">
+ProgramProcessor::buildParameterReferenceMap&#160;<span class='sym_p'><span>(&#160;FunctionAtomInstanceList const&amp; <span class='color_p'>funcAtomList</span></span>, <span>ProgramProcessor::ParameterOperandMap&amp; <span class='color_p'>paramsRefMap</span></span>&#160;)</span></span>
+<br/>
+<div id="c_322" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader16ProgramProcessor26buildParameterReferenceMapERKSt6vectorIPNS0_12FunctionAtomESaIS4_EERSt3mapIPNS0_9ParameterES2_IPNS0_7OperandESaISD_EESt4lessISB_ESaISt4pairIKSB_SF_EEE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_323')">
+ProgramProcessor::buildTexcoordTable&#160;<span class='sym_p'><span>(&#160;ShaderParameterList const&amp; <span class='color_p'>paramList</span></span>, <span>ShaderParameterList* <span class='color_p'>outParamsTable</span></span>&#160;)</span></span>
+<br/>
+<div id="c_323" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader16ProgramProcessor18buildTexcoordTableERKSt6vectorISt10shared_ptrINS0_9ParameterEESaIS5_EEPS7_</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_324')">
+ProgramProcessor::countVsTexcoordOutputs&#160;<span class='sym_p'><span>(&#160;Function* <span class='color_p'>vsMain</span></span>, <span>int&amp; <span class='color_p'>outTexCoordSlots</span></span>, <span>int&amp; <span class='color_p'>outTexCoordFloats</span></span>&#160;)</span></span>
+<br/>
+<div id="c_324" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader16ProgramProcessor22countVsTexcoordOutputsEPNS0_8FunctionERiS4_</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_325')">
+ProgramProcessor::generateLocalSplitParameters&#160;<span class='sym_p'><span>(&#160;Function* <span class='color_p'>func</span></span>, <span>enum Ogre::GpuProgramType <span class='color_p'>progType</span></span>, <span>ProgramProcessor::MergeParameterList&amp; <span class='color_p'>mergedParams</span></span>, <span>ShaderParameterList&amp; <span class='color_p'>splitParams</span></span>, <span>ProgramProcessor::LocalParameterMap&amp; <span class='color_p'>localParamsMap</span></span>&#160;)</span></span>
+<br/>
+<div id="c_325" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader16ProgramProcessor28generateLocalSplitParametersEPNS0_8FunctionENS_14GpuProgramTypeERSt6vectorINS1_14MergeParameterESaIS6_EERS5_ISt10shared_ptrINS0_9ParameterEESaISC_EERSt3mapIPSB_SC_St4lessISH_ESaISt4pairIKSH_SC_EEE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_326')">
+ProgramProcessor::getParameterFloatCount&#160;<span class='sym_p'><span>(&#160;enum Ogre::GpuConstantType <span class='color_p'>type</span></span>&#160;)</span> <span class='attr'>[static]</span></span>
+<br/>
+<div id="c_326" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader16ProgramProcessor22getParameterFloatCountENS_15GpuConstantTypeE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_327')">
+ProgramProcessor::getParameterMaskByFloatCount&#160;<span class='sym_p'><span>(&#160;int <span class='color_p'>floatCount</span></span>&#160;)</span> <span class='attr'>[static]</span></span>
+<br/>
+<div id="c_327" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader16ProgramProcessor28getParameterMaskByFloatCountEi</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_328')">
+ProgramProcessor::getParameterMaskByType&#160;<span class='sym_p'><span>(&#160;enum Ogre::GpuConstantType <span class='color_p'>type</span></span>&#160;)</span> <span class='attr'>[static]</span></span>
+<br/>
+<div id="c_328" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader16ProgramProcessor22getParameterMaskByTypeENS_15GpuConstantTypeE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_329')">
+ProgramProcessor::MergeParameter::addSourceParameter&#160;<span class='sym_p'><span>(&#160;ParameterPtr <span class='color_p'>srcParam</span></span>, <span>enum Operand::OpMask <span class='color_p'>mask</span></span>&#160;)</span></span>
+<br/>
+<div id="c_329" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader16ProgramProcessor14MergeParameter18addSourceParameterESt10shared_ptrINS0_9ParameterEENS0_7Operand6OpMaskE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_330')">
+ProgramProcessor::MergeParameter::clear&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_330" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader16ProgramProcessor14MergeParameter5clearEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_331')">
+ProgramProcessor::MergeParameter::createDestinationParameter&#160;<span class='sym_p'><span>(&#160;int <span class='color_p'>usage</span></span>, <span>int <span class='color_p'>index</span></span>&#160;)</span></span>
+<br/>
+<div id="c_331" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader16ProgramProcessor14MergeParameter26createDestinationParameterEii</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_332')">
+ProgramProcessor::MergeParameter::getDestinationParameter&#160;<span class='sym_p'><span>(&#160;int <span class='color_p'>usage</span></span>, <span>int <span class='color_p'>index</span></span>&#160;)</span></span>
+<br/>
+<div id="c_332" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader16ProgramProcessor14MergeParameter23getDestinationParameterEii</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_333')">
+ProgramProcessor::MergeParameter::getUsedFloatCount&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_333" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader16ProgramProcessor14MergeParameter17getUsedFloatCountEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_334')">
+ProgramProcessor::MergeParameter::MergeParameter <span class='attr'>[C1]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_334" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader16ProgramProcessor14MergeParameterC1Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_335')">
+ProgramProcessor::MergeParameter::MergeParameter <span class='attr'>[C2]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_335" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader16ProgramProcessor14MergeParameterC2Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_336')">
+ProgramProcessor::mergeParameters&#160;<span class='sym_p'><span>(&#160;ShaderParameterList* <span class='color_p'>paramsTable</span></span>, <span>ProgramProcessor::MergeParameterList&amp; <span class='color_p'>mergedParams</span></span>, <span>ShaderParameterList&amp; <span class='color_p'>splitParams</span></span>&#160;)</span></span>
+<br/>
+<div id="c_336" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader16ProgramProcessor15mergeParametersEPSt6vectorISt10shared_ptrINS0_9ParameterEESaIS5_EERS2_INS1_14MergeParameterESaIS9_EERS7_</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_337')">
+ProgramProcessor::mergeParametersByCombination&#160;<span class='sym_p'><span>(&#160;struct ProgramProcessor::MergeCombination const&amp; <span class='color_p'>combination</span></span>, <span>ShaderParameterList* <span class='color_p'>paramsTable</span></span>, <span>ProgramProcessor::MergeParameter* <span class='color_p'>mergedParameter</span></span>&#160;)</span></span>
+<br/>
+<div id="c_337" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader16ProgramProcessor28mergeParametersByCombinationERKNS1_16MergeCombinationEPSt6vectorISt10shared_ptrINS0_9ParameterEESaIS8_EEPNS1_14MergeParameterE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_338')">
+ProgramProcessor::mergeParametersByPredefinedCombinations&#160;<span class='sym_p'><span>(&#160;ShaderParameterList* <span class='color_p'>paramsTable</span></span>, <span>ProgramProcessor::MergeParameterList&amp; <span class='color_p'>mergedParams</span></span>&#160;)</span></span>
+<br/>
+<div id="c_338" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader16ProgramProcessor39mergeParametersByPredefinedCombinationsEPSt6vectorISt10shared_ptrINS0_9ParameterEESaIS5_EERS2_INS1_14MergeParameterESaIS9_EE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_339')">
+ProgramProcessor::mergeParametersReminders&#160;<span class='sym_p'><span>(&#160;ShaderParameterList* <span class='color_p'>paramsTable</span></span>, <span>ProgramProcessor::MergeParameterList&amp; <span class='color_p'>mergedParams</span></span>, <span>ShaderParameterList&amp; <span class='color_p'>splitParams</span></span>&#160;)</span></span>
+<br/>
+<div id="c_339" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader16ProgramProcessor24mergeParametersRemindersEPSt6vectorISt10shared_ptrINS0_9ParameterEESaIS5_EERS2_INS1_14MergeParameterESaIS9_EERS7_</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_340')">
+ProgramProcessor::ProgramProcessor <span class='attr'>[C1]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_340" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader16ProgramProcessorC1Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_341')">
+ProgramProcessor::ProgramProcessor <span class='attr'>[C2]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_341" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader16ProgramProcessorC2Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_342')">
+ProgramProcessor::rebuildFunctionInvocations&#160;<span class='sym_p'><span>(&#160;FunctionAtomInstanceList const&amp; <span class='color_p'>funcAtomList</span></span>, <span>ProgramProcessor::MergeParameterList&amp; <span class='color_p'>mergedParams</span></span>, <span>ProgramProcessor::LocalParameterMap&amp; <span class='color_p'>localParamsMap</span></span>&#160;)</span></span>
+<br/>
+<div id="c_342" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader16ProgramProcessor26rebuildFunctionInvocationsERKSt6vectorIPNS0_12FunctionAtomESaIS4_EERS2_INS1_14MergeParameterESaIS9_EERSt3mapIPNS0_9ParameterESt10shared_ptrISE_ESt4lessISF_ESaISt4pairIKSF_SH_EEE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_343')">
+ProgramProcessor::rebuildParameterList&#160;<span class='sym_p'><span>(&#160;Function* <span class='color_p'>func</span></span>, <span>int <span class='color_p'>paramsUsage</span></span>, <span>ProgramProcessor::MergeParameterList&amp; <span class='color_p'>mergedParams</span></span>&#160;)</span></span>
+<br/>
+<div id="c_343" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader16ProgramProcessor20rebuildParameterListEPNS0_8FunctionEiRSt6vectorINS1_14MergeParameterESaIS5_EE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_344')">
+ProgramProcessor::replaceParametersReferences&#160;<span class='sym_p'><span>(&#160;ProgramProcessor::MergeParameterList&amp; <span class='color_p'>mergedParams</span></span>, <span>ProgramProcessor::ParameterOperandMap&amp; <span class='color_p'>paramsRefMap</span></span>&#160;)</span></span>
+<br/>
+<div id="c_344" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader16ProgramProcessor27replaceParametersReferencesERSt6vectorINS1_14MergeParameterESaIS3_EERSt3mapIPNS0_9ParameterES2_IPNS0_7OperandESaISB_EESt4lessIS9_ESaISt4pairIKS9_SD_EEE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_345')">
+ProgramProcessor::replaceSplitParametersReferences&#160;<span class='sym_p'><span>(&#160;ProgramProcessor::LocalParameterMap&amp; <span class='color_p'>localParamsMap</span></span>, <span>ProgramProcessor::ParameterOperandMap&amp; <span class='color_p'>paramsRefMap</span></span>&#160;)</span></span>
+<br/>
+<div id="c_345" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader16ProgramProcessor32replaceSplitParametersReferencesERSt3mapIPNS0_9ParameterESt10shared_ptrIS3_ESt4lessIS4_ESaISt4pairIKS4_S6_EEERS2_IS4_St6vectorIPNS0_7OperandESaISH_EES8_SaIS9_ISA_SJ_EEE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_346')">
+ProgramProcessor::~ProgramProcessor <span class='attr'>[D0]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_346" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader16ProgramProcessorD0Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_347')">
+ProgramProcessor::~ProgramProcessor <span class='attr'>[D1]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_347" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader16ProgramProcessorD1Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_348')">
+ProgramProcessor::~ProgramProcessor <span class='attr'>[D2]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_348" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader16ProgramProcessorD2Ev</span>
+<br/>
+<br/>
+</div>
+
+<br/>
+<span class='h_name'>OgreShaderProgramWriterManager.h</span><br/>
+<span class='ns'>namespace <b>Ogre::RTShader</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_349')">
+ProgramWriterManager::createProgramWriter&#160;<span class='sym_p'><span>(&#160;Ogre::String const&amp; <span class='color_p'>language</span></span>&#160;)</span></span>
+<br/>
+<div id="c_349" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader20ProgramWriterManager19createProgramWriterERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE</span>
+<br/>
+<br/>
+</div>
+
+<br/>
+<span class='h_name'>OgreShaderRenderState.h</span><br/>
+<span class='ns'>namespace <b>Ogre::RTShader</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_350')">
+RenderState::reset&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_350" style="display:none;">
+<span class='mngl'>_ZN4Ogre8RTShader11RenderState5resetEv</span>
+<br/>
+<br/>
+</div>
+
+<br/>
+<a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='High_Risk_Problems'></a><a name='Type_Problems_High'></a>
+<h2>Problems with Data Types, High Severity <span class='failed'>&nbsp;104&nbsp;</span></h2><hr/>
+<span class='h_name'>OgreGpuProgramParams.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_351')">
+<span class='ext'>[+]</span> <span class='ttype'>enum</span> GpuProgramParameters::AutoConstantType <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_351" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>The member <b>ACT_UNKNOWN</b> has been removed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_352')">
+[+] affected symbols: 9 (1.2%)</span>
+<div id="c_352" style="display:none;">
+<div class='affected'><span class='iname_a'>RTShader::UniformParameter::UniformParameter&#160;<span class='sym_p'><span>(&#160;enum GpuProgramParameters::AutoConstantType <span class='fp'>autoType</span></span>, <span>float <i>fAutoConstantData</i></span>, <span>size_t <i>size</i></span>&#160;)</span></span><br/>
+<div class='affect'>1st parameter &#39;autoType&#39; is of type &#39;enum GpuProgramParameters::AutoConstantType&#39;.</div>
+<span class='iname_a'>RTShader::UniformParameter::UniformParameter&#160;<span class='sym_p'><span>(&#160;enum GpuProgramParameters::AutoConstantType <span class='fp'>autoType</span></span>, <span>float <i>fAutoConstantData</i></span>, <span>size_t <i>size</i></span>, <span>enum GpuConstantType <i>type</i></span>&#160;)</span></span><br/>
+<div class='affect'>1st parameter &#39;autoType&#39; is of type &#39;enum GpuProgramParameters::AutoConstantType&#39;.</div>
+<span class='iname_a'>RTShader::UniformParameter::UniformParameter&#160;<span class='sym_p'><span>(&#160;enum GpuProgramParameters::AutoConstantType <span class='fp'>autoType</span></span>, <span>uint32 <i>nAutoConstantData</i></span>, <span>size_t <i>size</i></span>&#160;)</span></span><br/>
+<div class='affect'>1st parameter &#39;autoType&#39; is of type &#39;enum GpuProgramParameters::AutoConstantType&#39;.</div>
+<span class='iname_a'>RTShader::UniformParameter::UniformParameter&#160;<span class='sym_p'><span>(&#160;enum GpuProgramParameters::AutoConstantType <span class='fp'>autoType</span></span>, <span>uint32 <i>nAutoConstantData</i></span>, <span>size_t <i>size</i></span>, <span>enum GpuConstantType <i>type</i></span>&#160;)</span></span><br/>
+<div class='affect'>1st parameter &#39;autoType&#39; is of type &#39;enum GpuProgramParameters::AutoConstantType&#39;.</div>
+<span class='iname_a'>RTShader::Program::resolveParameter&#160;<span class='sym_p'><span>(&#160;enum GpuProgramParameters::AutoConstantType <span class='fp'>autoType</span></span>, <span>uint32 <i>data</i></span>&#160;)</span></span><br/>
+<div class='affect'>1st parameter &#39;autoType&#39; is of type &#39;enum GpuProgramParameters::AutoConstantType&#39;.</div>
+<span class='iname_a'>RTShader::Program::getParameterByAutoType&#160;<span class='sym_p'><span>(&#160;enum GpuProgramParameters::AutoConstantType <span class='fp'>autoType</span></span>&#160;)</span></span><br/>
+<div class='affect'>1st parameter &#39;autoType&#39; is of type &#39;enum GpuProgramParameters::AutoConstantType&#39;.</div>
+<span class='iname_a'>RTShader::Program::resolveAutoParameterInt&#160;<span class='sym_p'><span>(&#160;enum GpuProgramParameters::AutoConstantType <span class='fp'>autoType</span></span>, <span>enum GpuConstantType <i>type</i></span>, <span>uint32 <i>data</i></span>, <span>size_t <i>size</i></span>&#160;)</span></span><br/>
+<div class='affect'>1st parameter &#39;autoType&#39; is of type &#39;enum GpuProgramParameters::AutoConstantType&#39;.</div>
+<span class='iname_a'>RTShader::Program::resolveAutoParameterReal&#160;<span class='sym_p'><span>(&#160;enum GpuProgramParameters::AutoConstantType <span class='fp'>autoType</span></span>, <span>Real <i>data</i></span>, <span>size_t <i>size</i></span>&#160;)</span></span><br/>
+<div class='affect'>1st parameter &#39;autoType&#39; is of type &#39;enum GpuProgramParameters::AutoConstantType&#39;.</div>
+<span class='iname_a'>RTShader::Program::resolveAutoParameterReal&#160;<span class='sym_p'><span>(&#160;enum GpuProgramParameters::AutoConstantType <span class='fp'>autoType</span></span>, <span>enum GpuConstantType <i>type</i></span>, <span>float <i>data</i></span>, <span>size_t <i>size</i></span>&#160;)</span></span><br/>
+<div class='affect'>1st parameter &#39;autoType&#39; is of type &#39;enum GpuProgramParameters::AutoConstantType&#39;.</div>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<span class='h_name'>OgreHardwareBuffer.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_353')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> HardwareBuffer <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_353" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Pure virtual method <span class='iname_b'>isSystemMemory&#160;<span class='sym_pd'>(&#160;)</span> const</span> has been added to this class.</td>
+<td>Recompilation of a client program may be broken with the error message: cannot allocate an object of abstract type <b>HardwareBuffer</b> because the following virtual functions are pure within <b>HardwareBuffer</b>: virtual <span class='iname_b'>isSystemMemory&#160;<span class='sym_pd'>(&#160;)</span> const</span>.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_354')">
+[+] affected symbols: 7 (1%)</span>
+<div id="c_354" style="display:none;">
+<div class='affected'><span class='iname_a'>HardwareBuffer::unlockImpl&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;HardwareBuffer&#39; class.</div>
+<span class='iname_a'>HardwareBuffer::_updateFromShadow&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;HardwareBuffer&#39; class.</div>
+<span class='iname_a'>HardwareBuffer::lock&#160;<span class='sym_p'><span>(&#160;size_t <i>p1</i></span>, <span>size_t <i>p2</i></span>, <span>enum HardwareBuffer::LockOptions <i>p3</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;HardwareBuffer&#39; class.</div>
+<span class='iname_a'>HardwareBuffer::copyData&#160;<span class='sym_p'><span>(&#160;HardwareBuffer&amp; <i>p1</i></span>, <span>size_t <i>p2</i></span>, <span>size_t <i>p3</i></span>, <span>size_t <i>p4</i></span>, <span>bool <i>p5</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;HardwareBuffer&#39; class.</div>
+<span class='iname_a'>HardwareBuffer::lockImpl&#160;<span class='sym_p'><span>(&#160;size_t <i>p1</i></span>, <span>size_t <i>p2</i></span>, <span>enum HardwareBuffer::LockOptions <i>p3</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;HardwareBuffer&#39; class.</div>
+<span class='iname_a'>HardwareBuffer::readData&#160;<span class='sym_p'><span>(&#160;size_t <i>p1</i></span>, <span>size_t <i>p2</i></span>, <span>void* <i>p3</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;HardwareBuffer&#39; class.</div>
+<span class='iname_a'>HardwareBuffer::writeData&#160;<span class='sym_p'><span>(&#160;size_t <i>p1</i></span>, <span>size_t <i>p2</i></span>, <span>void const* <i>p3</i></span>, <span>bool <i>p4</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;HardwareBuffer&#39; class.</div>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<span class='h_name'>OgreRenderObjectListener.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_355')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> RenderObjectListener <span class='failed'>&nbsp;2&nbsp;</span></span>
+<br/>
+<div id="c_355" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Pure virtual method <span class='iname_b'>notifyRenderSingleObject&#160;<span class='sym_pd'><span>(&#160;Renderable*</span>, <span>Pass const*</span>, <span>AutoParamDataSource const*</span>, <span>std::vector&lt;Light*&gt;const*</span>, <span>bool</span>&#160;)</span></span> has been added to this class.</td>
+<td>Recompilation of a client program may be broken with the error message: cannot allocate an object of abstract type <b>RenderObjectListener</b> because the following virtual functions are pure within <b>RenderObjectListener</b>: virtual <span class='iname_b'>notifyRenderSingleObject&#160;<span class='sym_pd'><span>(&#160;Renderable*</span>, <span>Pass const*</span>, <span>AutoParamDataSource const*</span>, <span>std::vector&lt;Light*&gt;const*</span>, <span>bool</span>&#160;)</span></span>.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>Pure virtual method <span class='iname_b'>notifyRenderSingleObject&#160;<span class='sym_pd'><span>(&#160;Renderable*</span>, <span>Pass const*</span>, <span>AutoParamDataSource const*</span>, <span>HashedVector&lt;Light*&gt;const*</span>, <span>bool</span>&#160;)</span></span> has been removed from this class.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_356')">
+[+] affected symbols: 2 (0.3%)</span>
+<div id="c_356" style="display:none;">
+<div class='affected'><span class='iname_a'>RenderObjectListener::RenderObjectListener&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This constructor is from &#39;RenderObjectListener&#39; class.</div>
+<span class='iname_a'>RenderObjectListener::~RenderObjectListener&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This destructor is from &#39;RenderObjectListener&#39; class.</div>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<span class='h_name'>OgreShaderExHardwareSkinning.h</span><br/>
+<span class='ns'>namespace <b>Ogre::RTShader</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_357')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> HardwareSkinningFactory <span class='failed'>&nbsp;5&nbsp;</span></span>
+<br/>
+<div id="c_357" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Field <b>mCustomShadowCasterMaterialsDualQuaternion</b> has been removed from this type.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>HardwareSkinningFactory</b>' has no member named '<b>mCustomShadowCasterMaterialsDualQuaternion</b>'.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>Field <b>mCustomShadowCasterMaterialsLinear</b> has been removed from this type.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>HardwareSkinningFactory</b>' has no member named '<b>mCustomShadowCasterMaterialsLinear</b>'.</td>
+</tr>
+<tr>
+<th>3</th>
+<td>Field <b>mCustomShadowReceiverMaterialsDualQuaternion</b> has been removed from this type.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>HardwareSkinningFactory</b>' has no member named '<b>mCustomShadowReceiverMaterialsDualQuaternion</b>'.</td>
+</tr>
+<tr>
+<th>4</th>
+<td>Field <b>mCustomShadowReceiverMaterialsLinear</b> has been removed from this type.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>HardwareSkinningFactory</b>' has no member named '<b>mCustomShadowReceiverMaterialsLinear</b>'.</td>
+</tr>
+<tr>
+<th>5</th>
+<td>Field <b>mMaxCalculableBoneCount</b> has been removed from this type.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>HardwareSkinningFactory</b>' has no member named '<b>mMaxCalculableBoneCount</b>'.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_358')">
+[+] affected symbols: 14 (1.9%)</span>
+<div id="c_358" style="display:none;">
+<div class='affected'><span class='iname_a'>HardwareSkinningFactory::getSingleton&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>Return value (reference) has base type &#39;HardwareSkinningFactory&#39;.</div>
+<span class='iname_a'>HardwareSkinningFactory::writeInstance&#160;<span class='sym_p'><span>(&#160;Ogre::MaterialSerializer* <i>ser</i></span>, <span>SubRenderState* <i>subRenderState</i></span>, <span>Ogre::Pass* <i>srcPass</i></span>, <span>Ogre::Pass* <i>dstPass</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;HardwareSkinningFactory&#39; class.</div>
+<span class='iname_a'>HardwareSkinningFactory::createInstance&#160;<span class='sym_p'><span>(&#160;Ogre::ScriptCompiler* <i>compiler</i></span>, <span>Ogre::PropertyAbstractNode* <i>prop</i></span>, <span>Ogre::Pass* <i>pass</i></span>, <span>SGScriptTranslator* <i>translator</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;HardwareSkinningFactory&#39; class.</div>
+<span class='iname_a'>HardwareSkinningFactory::getSingletonPtr&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>Return value (pointer) has base type &#39;HardwareSkinningFactory&#39;.</div>
+<span class='iname_a'>HardwareSkinningFactory::createInstanceImpl&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;HardwareSkinningFactory&#39; class.</div>
+<span class='iname_a'>HardwareSkinningFactory::prepareEntityForSkinning&#160;<span class='sym_p'><span>(&#160;Ogre::Entity const* <i>pEntity</i></span>, <span>enum SkinningType <i>skinningType</i></span>, <span>bool <i>correctAntidpodalityHandling</i></span>, <span>bool <i>shearScale</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;HardwareSkinningFactory&#39; class.</div>
+<span class='iname_a'>HardwareSkinningFactory::setCustomShadowCasterMaterials&#160;<span class='sym_p'><span>(&#160;enum SkinningType const <i>skinningType</i></span>, <span>Ogre::MaterialPtr const&amp; <i>caster1Weight</i></span>, <span>Ogre::MaterialPtr const&amp; <i>caster2Weight</i></span>, <span>Ogre::MaterialPtr const&amp; <i>caster3Weight</i></span>, <span>Ogre::MaterialPtr const&amp; <i>caster4Weight</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;HardwareSkinningFactory&#39; class.</div>
+<span class='iname_a'>HardwareSkinningFactory::setCustomShadowReceiverMaterials&#160;<span class='sym_p'><span>(&#160;enum SkinningType const <i>skinningType</i></span>, <span>Ogre::MaterialPtr const&amp; <i>receiver1Weight</i></span>, <span>Ogre::MaterialPtr const&amp; <i>receiver2Weight</i></span>, <span>Ogre::MaterialPtr const&amp; <i>receiver3Weight</i></span>, <span>Ogre::MaterialPtr const&amp; <i>receiver4Weight</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;HardwareSkinningFactory&#39; class.</div>
+<span class='iname_a'>HardwareSkinningFactory::HardwareSkinningFactory&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This constructor is from &#39;HardwareSkinningFactory&#39; class.</div>
+<span class='iname_a'>HardwareSkinningFactory::~HardwareSkinningFactory&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This destructor is from &#39;HardwareSkinningFactory&#39; class.</div>
+ <b>...</b>
+<br/>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<span class='h_name'>OgreShaderParameter.h</span><br/>
+<span class='ns'>namespace <b>Ogre::RTShader</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_359')">
+<span class='ext'>[+]</span> <span class='ttype'>enum</span> Parameter::Content <span class='failed'>&nbsp;94&nbsp;</span></span>
+<br/>
+<div id="c_359" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>The member <b>SPC_BINORMAL_TANGENT_SPACE</b> has been removed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>The member <b>SPC_DEPTH_OBJECT_SPACE</b> has been removed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>3</th>
+<td>The member <b>SPC_LIGHTDIRECTION_OBJECT_SPACE0</b> has been removed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>4</th>
+<td>The member <b>SPC_LIGHTDIRECTION_OBJECT_SPACE1</b> has been removed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>5</th>
+<td>The member <b>SPC_LIGHTDIRECTION_OBJECT_SPACE2</b> has been removed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>6</th>
+<td>The member <b>SPC_LIGHTDIRECTION_OBJECT_SPACE3</b> has been removed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>7</th>
+<td>The member <b>SPC_LIGHTDIRECTION_OBJECT_SPACE4</b> has been removed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>8</th>
+<td>The member <b>SPC_LIGHTDIRECTION_OBJECT_SPACE5</b> has been removed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>9</th>
+<td>The member <b>SPC_LIGHTDIRECTION_OBJECT_SPACE6</b> has been removed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>10</th>
+<td>The member <b>SPC_LIGHTDIRECTION_OBJECT_SPACE7</b> has been removed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>11</th>
+<td>The member <b>SPC_LIGHTDIRECTION_TANGENT_SPACE0</b> has been removed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>12</th>
+<td>The member <b>SPC_LIGHTDIRECTION_TANGENT_SPACE1</b> has been removed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>13</th>
+<td>The member <b>SPC_LIGHTDIRECTION_TANGENT_SPACE2</b> has been removed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>14</th>
+<td>The member <b>SPC_LIGHTDIRECTION_TANGENT_SPACE3</b> has been removed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>15</th>
+<td>The member <b>SPC_LIGHTDIRECTION_TANGENT_SPACE4</b> has been removed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>16</th>
+<td>The member <b>SPC_LIGHTDIRECTION_TANGENT_SPACE5</b> has been removed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>17</th>
+<td>The member <b>SPC_LIGHTDIRECTION_TANGENT_SPACE6</b> has been removed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>18</th>
+<td>The member <b>SPC_LIGHTDIRECTION_TANGENT_SPACE7</b> has been removed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>19</th>
+<td>The member <b>SPC_LIGHTDIRECTION_VIEW_SPACE0</b> has been removed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>20</th>
+<td>The member <b>SPC_LIGHTDIRECTION_VIEW_SPACE1</b> has been removed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>21</th>
+<td>The member <b>SPC_LIGHTDIRECTION_VIEW_SPACE2</b> has been removed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>22</th>
+<td>The member <b>SPC_LIGHTDIRECTION_VIEW_SPACE3</b> has been removed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>23</th>
+<td>The member <b>SPC_LIGHTDIRECTION_VIEW_SPACE4</b> has been removed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>24</th>
+<td>The member <b>SPC_LIGHTDIRECTION_VIEW_SPACE5</b> has been removed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>25</th>
+<td>The member <b>SPC_LIGHTDIRECTION_VIEW_SPACE6</b> has been removed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>26</th>
+<td>The member <b>SPC_LIGHTDIRECTION_VIEW_SPACE7</b> has been removed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>27</th>
+<td>The member <b>SPC_LIGHTDIRECTION_WORLD_SPACE0</b> has been removed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>28</th>
+<td>The member <b>SPC_LIGHTDIRECTION_WORLD_SPACE1</b> has been removed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>29</th>
+<td>The member <b>SPC_LIGHTDIRECTION_WORLD_SPACE2</b> has been removed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>30</th>
+<td>The member <b>SPC_LIGHTDIRECTION_WORLD_SPACE3</b> has been removed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>31</th>
+<td>The member <b>SPC_LIGHTDIRECTION_WORLD_SPACE4</b> has been removed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>32</th>
+<td>The member <b>SPC_LIGHTDIRECTION_WORLD_SPACE5</b> has been removed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>33</th>
+<td>The member <b>SPC_LIGHTDIRECTION_WORLD_SPACE6</b> has been removed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>34</th>
+<td>The member <b>SPC_LIGHTDIRECTION_WORLD_SPACE7</b> has been removed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>35</th>
+<td>The member <b>SPC_LIGHTPOSITIONVIEW_SPACE0</b> has been removed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>36</th>
+<td>The member <b>SPC_LIGHTPOSITIONVIEW_SPACE1</b> has been removed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>37</th>
+<td>The member <b>SPC_LIGHTPOSITIONVIEW_SPACE2</b> has been removed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>38</th>
+<td>The member <b>SPC_LIGHTPOSITIONVIEW_SPACE3</b> has been removed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>39</th>
+<td>The member <b>SPC_LIGHTPOSITIONVIEW_SPACE4</b> has been removed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>40</th>
+<td>The member <b>SPC_LIGHTPOSITIONVIEW_SPACE5</b> has been removed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>41</th>
+<td>The member <b>SPC_LIGHTPOSITIONVIEW_SPACE6</b> has been removed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>42</th>
+<td>The member <b>SPC_LIGHTPOSITIONVIEW_SPACE7</b> has been removed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>43</th>
+<td>The member <b>SPC_LIGHTPOSITION_OBJECT_SPACE0</b> has been removed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>44</th>
+<td>The member <b>SPC_LIGHTPOSITION_OBJECT_SPACE1</b> has been removed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>45</th>
+<td>The member <b>SPC_LIGHTPOSITION_OBJECT_SPACE2</b> has been removed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>46</th>
+<td>The member <b>SPC_LIGHTPOSITION_OBJECT_SPACE3</b> has been removed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>47</th>
+<td>The member <b>SPC_LIGHTPOSITION_OBJECT_SPACE4</b> has been removed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>48</th>
+<td>The member <b>SPC_LIGHTPOSITION_OBJECT_SPACE5</b> has been removed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>49</th>
+<td>The member <b>SPC_LIGHTPOSITION_OBJECT_SPACE6</b> has been removed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>50</th>
+<td>The member <b>SPC_LIGHTPOSITION_OBJECT_SPACE7</b> has been removed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>51</th>
+<td>The member <b>SPC_LIGHTPOSITION_TANGENT_SPACE</b> has been removed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>52</th>
+<td>The member <b>SPC_LIGHTPOSITION_WORLD_SPACE0</b> has been removed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>53</th>
+<td>The member <b>SPC_LIGHTPOSITION_WORLD_SPACE1</b> has been removed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>54</th>
+<td>The member <b>SPC_LIGHTPOSITION_WORLD_SPACE2</b> has been removed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>55</th>
+<td>The member <b>SPC_LIGHTPOSITION_WORLD_SPACE3</b> has been removed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>56</th>
+<td>The member <b>SPC_LIGHTPOSITION_WORLD_SPACE4</b> has been removed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>57</th>
+<td>The member <b>SPC_LIGHTPOSITION_WORLD_SPACE5</b> has been removed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>58</th>
+<td>The member <b>SPC_LIGHTPOSITION_WORLD_SPACE6</b> has been removed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>59</th>
+<td>The member <b>SPC_LIGHTPOSITION_WORLD_SPACE7</b> has been removed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>60</th>
+<td>The member <b>SPC_NORMAL_TANGENT_SPACE</b> has been removed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>61</th>
+<td>The member <b>SPC_POSTOCAMERA_TANGENT_SPACE</b> has been removed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>62</th>
+<td>The member <b>SPC_POSTOLIGHT_OBJECT_SPACE0</b> has been removed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>63</th>
+<td>The member <b>SPC_POSTOLIGHT_OBJECT_SPACE1</b> has been removed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>64</th>
+<td>The member <b>SPC_POSTOLIGHT_OBJECT_SPACE2</b> has been removed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>65</th>
+<td>The member <b>SPC_POSTOLIGHT_OBJECT_SPACE3</b> has been removed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>66</th>
+<td>The member <b>SPC_POSTOLIGHT_OBJECT_SPACE4</b> has been removed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>67</th>
+<td>The member <b>SPC_POSTOLIGHT_OBJECT_SPACE5</b> has been removed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>68</th>
+<td>The member <b>SPC_POSTOLIGHT_OBJECT_SPACE6</b> has been removed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>69</th>
+<td>The member <b>SPC_POSTOLIGHT_OBJECT_SPACE7</b> has been removed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>70</th>
+<td>The member <b>SPC_POSTOLIGHT_TANGENT_SPACE0</b> has been removed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>71</th>
+<td>The member <b>SPC_POSTOLIGHT_TANGENT_SPACE1</b> has been removed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>72</th>
+<td>The member <b>SPC_POSTOLIGHT_TANGENT_SPACE2</b> has been removed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>73</th>
+<td>The member <b>SPC_POSTOLIGHT_TANGENT_SPACE3</b> has been removed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>74</th>
+<td>The member <b>SPC_POSTOLIGHT_TANGENT_SPACE4</b> has been removed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>75</th>
+<td>The member <b>SPC_POSTOLIGHT_TANGENT_SPACE5</b> has been removed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>76</th>
+<td>The member <b>SPC_POSTOLIGHT_TANGENT_SPACE6</b> has been removed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>77</th>
+<td>The member <b>SPC_POSTOLIGHT_TANGENT_SPACE7</b> has been removed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>78</th>
+<td>The member <b>SPC_POSTOLIGHT_VIEW_SPACE0</b> has been removed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>79</th>
+<td>The member <b>SPC_POSTOLIGHT_VIEW_SPACE1</b> has been removed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>80</th>
+<td>The member <b>SPC_POSTOLIGHT_VIEW_SPACE2</b> has been removed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>81</th>
+<td>The member <b>SPC_POSTOLIGHT_VIEW_SPACE3</b> has been removed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>82</th>
+<td>The member <b>SPC_POSTOLIGHT_VIEW_SPACE4</b> has been removed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>83</th>
+<td>The member <b>SPC_POSTOLIGHT_VIEW_SPACE5</b> has been removed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>84</th>
+<td>The member <b>SPC_POSTOLIGHT_VIEW_SPACE6</b> has been removed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>85</th>
+<td>The member <b>SPC_POSTOLIGHT_VIEW_SPACE7</b> has been removed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>86</th>
+<td>The member <b>SPC_POSTOLIGHT_WORLD_SPACE0</b> has been removed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>87</th>
+<td>The member <b>SPC_POSTOLIGHT_WORLD_SPACE1</b> has been removed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>88</th>
+<td>The member <b>SPC_POSTOLIGHT_WORLD_SPACE2</b> has been removed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>89</th>
+<td>The member <b>SPC_POSTOLIGHT_WORLD_SPACE3</b> has been removed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>90</th>
+<td>The member <b>SPC_POSTOLIGHT_WORLD_SPACE4</b> has been removed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>91</th>
+<td>The member <b>SPC_POSTOLIGHT_WORLD_SPACE5</b> has been removed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>92</th>
+<td>The member <b>SPC_POSTOLIGHT_WORLD_SPACE6</b> has been removed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>93</th>
+<td>The member <b>SPC_POSTOLIGHT_WORLD_SPACE7</b> has been removed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>94</th>
+<td>The member <b>SPC_TANGENT_TANGENT_SPACE</b> has been removed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_360')">
+[+] affected symbols: 14 (1.9%)</span>
+<div id="c_360" style="display:none;">
+<div class='affected'><span class='iname_a'>ConstParameter&lt;float&gt;::ConstParameter&#160;<span class='sym_p'><span>(&#160;float <i>val</i></span>, <span>enum Ogre::GpuConstantType <i>type</i></span>, <span>enum Parameter::Semantic const&amp; <i>semantic</i></span>, <span>enum Parameter::Content const&amp; <span class='fp'>content</span></span>&#160;)</span></span><br/>
+<div class='affect'>4th parameter &#39;content&#39; (reference) has base type &#39;enum Parameter::Content&#39;.</div>
+<span class='iname_a'>ConstParameter&lt;Ogre::Vector&lt;2, float&gt; &gt;::ConstParameter&#160;<span class='sym_p'><span>(&#160;Ogre::Vector&lt;2, float&gt; <i>val</i></span>, <span>enum Ogre::GpuConstantType <i>type</i></span>, <span>enum Parameter::Semantic const&amp; <i>semantic</i></span>, <span>enum Parameter::Content const&amp; <span class='fp'>content</span></span>&#160;)</span></span><br/>
+<div class='affect'>4th parameter &#39;content&#39; (reference) has base type &#39;enum Parameter::Content&#39;.</div>
+<span class='iname_a'>ConstParameter&lt;Ogre::Vector&lt;3, float&gt; &gt;::ConstParameter&#160;<span class='sym_p'><span>(&#160;Ogre::Vector&lt;3, float&gt; <i>val</i></span>, <span>enum Ogre::GpuConstantType <i>type</i></span>, <span>enum Parameter::Semantic const&amp; <i>semantic</i></span>, <span>enum Parameter::Content const&amp; <span class='fp'>content</span></span>&#160;)</span></span><br/>
+<div class='affect'>4th parameter &#39;content&#39; (reference) has base type &#39;enum Parameter::Content&#39;.</div>
+<span class='iname_a'>ConstParameter&lt;Ogre::Vector&lt;4, float&gt; &gt;::ConstParameter&#160;<span class='sym_p'><span>(&#160;Ogre::Vector&lt;4, float&gt; <i>val</i></span>, <span>enum Ogre::GpuConstantType <i>type</i></span>, <span>enum Parameter::Semantic const&amp; <i>semantic</i></span>, <span>enum Parameter::Content const&amp; <span class='fp'>content</span></span>&#160;)</span></span><br/>
+<div class='affect'>4th parameter &#39;content&#39; (reference) has base type &#39;enum Parameter::Content&#39;.</div>
+<span class='iname_a'>ParameterFactory::createInPosition&#160;<span class='sym_p'><span>(&#160;int <i>index</i></span>, <span>enum Parameter::Content <span class='fp'>content</span></span>&#160;)</span></span><br/>
+<div class='affect'>2nd parameter &#39;content&#39; is of type &#39;enum Parameter::Content&#39;.</div>
+<span class='iname_a'>ParameterFactory::createInTexcoord&#160;<span class='sym_p'><span>(&#160;enum Ogre::GpuConstantType <i>type</i></span>, <span>int <i>index</i></span>, <span>enum Parameter::Content <span class='fp'>content</span></span>&#160;)</span></span><br/>
+<div class='affect'>3rd parameter &#39;content&#39; is of type &#39;enum Parameter::Content&#39;.</div>
+<span class='iname_a'>ParameterFactory::createOutTexcoord&#160;<span class='sym_p'><span>(&#160;enum Ogre::GpuConstantType <i>type</i></span>, <span>int <i>index</i></span>, <span>enum Parameter::Content <span class='fp'>content</span></span>&#160;)</span></span><br/>
+<div class='affect'>3rd parameter &#39;content&#39; is of type &#39;enum Parameter::Content&#39;.</div>
+<span class='iname_a'>UniformParameter::UniformParameter&#160;<span class='sym_p'><span>(&#160;enum Ogre::GpuConstantType <i>type</i></span>, <span>Ogre::String const&amp; <i>name</i></span>, <span>enum Parameter::Semantic const&amp; <i>semantic</i></span>, <span>int <i>index</i></span>, <span>enum Parameter::Content const&amp; <span class='fp'>content</span></span>, <span>Ogre::uint16 <i>variability</i></span>, <span>size_t <i>size</i></span>&#160;)</span></span><br/>
+<div class='affect'>5th parameter &#39;content&#39; (reference) has base type &#39;enum Parameter::Content&#39;.</div>
+<span class='iname_a'>Function::resolveInputParameter&#160;<span class='sym_p'><span>(&#160;enum Parameter::Semantic <i>semantic</i></span>, <span>int <i>index</i></span>, <span>enum Parameter::Content const <span class='fp'>content</span></span>, <span>enum Ogre::GpuConstantType <i>type</i></span>&#160;)</span></span><br/>
+<div class='affect'>3rd parameter &#39;content&#39; has base type &#39;enum Parameter::Content&#39;.</div>
+<span class='iname_a'>Function::resolveLocalParameter&#160;<span class='sym_p'><span>(&#160;enum Parameter::Content const <span class='fp'>content</span></span>, <span>enum Ogre::GpuConstantType <i>type</i></span>&#160;)</span></span><br/>
+<div class='affect'>1st parameter &#39;content&#39; has base type &#39;enum Parameter::Content&#39;.</div>
+ <b>...</b>
+<br/>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<span class='h_name'>OgreShaderProgramWriterManager.h</span><br/>
+<span class='ns'>namespace <b>Ogre::RTShader</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_361')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> ProgramWriterManager <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_361" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Field <b>mFactories</b> has been removed from this type.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>ProgramWriterManager</b>' has no member named '<b>mFactories</b>'.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_362')">
+[+] affected symbols: 7 (1%)</span>
+<div id="c_362" style="display:none;">
+<div class='affected'><span class='iname_a'>ProgramWriterManager::getSingleton&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>Return value (reference) has base type &#39;ProgramWriterManager&#39;.</div>
+<span class='iname_a'>ProgramWriterManager::getSingletonPtr&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>Return value (pointer) has base type &#39;ProgramWriterManager&#39;.</div>
+<span class='iname_a'>ProgramWriterManager::addProgramWriter&#160;<span class='sym_p'><span>(&#160;Ogre::String const&amp; <i>lang</i></span>, <span>ProgramWriter* <i>writer</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;ProgramWriterManager&#39; class.</div>
+<span class='iname_a'>ProgramWriterManager::isLanguageSupported&#160;<span class='sym_p'><span>(&#160;Ogre::String const&amp; <i>lang</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;ProgramWriterManager&#39; class.</div>
+<span class='iname_a'>ProgramWriterManager::ProgramWriterManager&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This constructor is from &#39;ProgramWriterManager&#39; class.</div>
+<span class='iname_a'>ProgramWriterManager::~ProgramWriterManager&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This destructor is from &#39;ProgramWriterManager&#39; class.</div>
+<span class='iname_a'>Ogre::Singleton&lt;ProgramWriterManager&gt;::msSingleton <span class='attr'>[data]</span></span><br/>
+<div class='affect'>Return value (pointer) has base type &#39;ProgramWriterManager&#39;.</div>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='Symbol_Problems_High'></a><a name='Interface_Problems_High'></a>
+<h2>Problems with Symbols, High Severity <span class='failed'>&nbsp;16&nbsp;</span></h2><hr/>
+<span class='h_name'>OgreShaderExHardwareSkinning.h</span><br/>
+<span class='ns'>namespace <b>Ogre::RTShader</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_363')">
+<span class='ext'>[+]</span> HardwareSkinningFactory::createInstanceImpl&#160;<span class='sym_p'>(&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_363" style="display:none;">
+
+<span class='mngl pleft'>_ZN4Ogre8RTShader23HardwareSkinningFactory18createInstanceImplEv</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>This method became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>_ZN4Ogre8RTShader23HardwareSkinningFactory18createInstanceImplEv</b>' is private.</td>
+</tr>
+</table>
+<br/>
+</div>
+<br/>
+<span class='h_name'>OgreShaderExLayeredBlending.h</span><br/>
+<span class='ns'>namespace <b>Ogre::RTShader</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_364')">
+<span class='ext'>[+]</span> LayeredBlending::addPSBlendInvocations&#160;<span class='sym_p'><span>(&#160;Function* <span class='color_p'>psMain</span></span>, <span>ParameterPtr <span class='color_p'>arg1</span></span>, <span>ParameterPtr <span class='color_p'>arg2</span></span>, <span>ParameterPtr <span class='color_p'>texel</span></span>, <span>int <span class='color_p'>samplerIndex</span></span>, <span>Ogre::LayerBlendModeEx const&amp; <span class='color_p'>blendMode</span></span>, <span>int const <span class='color_p'>groupOrder</span></span>, <span>enum Operand::OpMask <span class='color_p'>mask</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_364" style="display:none;">
+
+<span class='mngl pleft'>_ZN4Ogre8RTShader15LayeredBlending21addPSBlendInvocationsEPNS0_8FunctionESt10shared_ptrINS0_9ParameterEES6_S6_iRKNS_16LayerBlendModeExEiNS0_7Operand6OpMaskE</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>This method became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>_ZN4Ogre8RTShader15LayeredBlending21addPSBlendInvocationsEPNS0_8FunctionESt10shared_ptrINS0_9ParameterEES6_S6_iRKNS_16LayerBlendModeExEiNS0_7Operand6OpMaskE</b>' is private.</td>
+</tr>
+</table>
+<br/>
+</div>
+<span class="section" onclick="javascript:showContent(this, 'c_365')">
+<span class='ext'>[+]</span> LayeredBlending::addPSModifierInvocation&#160;<span class='sym_p'><span>(&#160;Function* <span class='color_p'>psMain</span></span>, <span>int <span class='color_p'>samplerIndex</span></span>, <span>ParameterPtr <span class='color_p'>arg1</span></span>, <span>ParameterPtr <span class='color_p'>arg2</span></span>, <span>int const <span class='color_p'>groupOrder</span></span>, <span>enum Operand::OpMask <span class='color_p'>mask</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_365" style="display:none;">
+
+<span class='mngl pleft'>_ZN4Ogre8RTShader15LayeredBlending23addPSModifierInvocationEPNS0_8FunctionEiSt10shared_ptrINS0_9ParameterEES6_iNS0_7Operand6OpMaskE</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>This method became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>_ZN4Ogre8RTShader15LayeredBlending23addPSModifierInvocationEPNS0_8FunctionEiSt10shared_ptrINS0_9ParameterEES6_iNS0_7Operand6OpMaskE</b>' is private.</td>
+</tr>
+</table>
+<br/>
+</div>
+<span class="section" onclick="javascript:showContent(this, 'c_366')">
+<span class='ext'>[+]</span> LayeredBlending::resolveDependencies&#160;<span class='sym_p'><span>(&#160;ProgramSet* <span class='color_p'>programSet</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_366" style="display:none;">
+
+<span class='mngl pleft'>_ZN4Ogre8RTShader15LayeredBlending19resolveDependenciesEPNS0_10ProgramSetE</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>This method became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>_ZN4Ogre8RTShader15LayeredBlending19resolveDependenciesEPNS0_10ProgramSetE</b>' is private.</td>
+</tr>
+</table>
+<br/>
+</div>
+<span class="section" onclick="javascript:showContent(this, 'c_367')">
+<span class='ext'>[+]</span> LayeredBlending::resolveParameters&#160;<span class='sym_p'><span>(&#160;ProgramSet* <span class='color_p'>programSet</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_367" style="display:none;">
+
+<span class='mngl pleft'>_ZN4Ogre8RTShader15LayeredBlending17resolveParametersEPNS0_10ProgramSetE</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>This method became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>_ZN4Ogre8RTShader15LayeredBlending17resolveParametersEPNS0_10ProgramSetE</b>' is private.</td>
+</tr>
+</table>
+<br/>
+</div>
+<br/>
+<span class='h_name'>OgreShaderFFPTexturing.h</span><br/>
+<span class='ns'>namespace <b>Ogre::RTShader</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_368')">
+<span class='ext'>[+]</span> FFPTexturing::addFunctionInvocations&#160;<span class='sym_p'><span>(&#160;ProgramSet* <span class='color_p'>programSet</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_368" style="display:none;">
+
+<span class='mngl pleft'>_ZN4Ogre8RTShader12FFPTexturing22addFunctionInvocationsEPNS0_10ProgramSetE</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>This method became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>_ZN4Ogre8RTShader12FFPTexturing22addFunctionInvocationsEPNS0_10ProgramSetE</b>' is private.</td>
+</tr>
+</table>
+<br/>
+</div>
+<span class="section" onclick="javascript:showContent(this, 'c_369')">
+<span class='ext'>[+]</span> FFPTexturing::addPSFunctionInvocations&#160;<span class='sym_p'><span>(&#160;struct FFPTexturing::TextureUnitParams* <span class='color_p'>textureUnitParams</span></span>, <span>Function* <span class='color_p'>psMain</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_369" style="display:none;">
+
+<span class='mngl pleft'>_ZN4Ogre8RTShader12FFPTexturing24addPSFunctionInvocationsEPNS1_17TextureUnitParamsEPNS0_8FunctionE</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>This method became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>_ZN4Ogre8RTShader12FFPTexturing24addPSFunctionInvocationsEPNS1_17TextureUnitParamsEPNS0_8FunctionE</b>' is private.</td>
+</tr>
+</table>
+<br/>
+</div>
+<span class="section" onclick="javascript:showContent(this, 'c_370')">
+<span class='ext'>[+]</span> FFPTexturing::addPSSampleTexelInvocation&#160;<span class='sym_p'><span>(&#160;struct FFPTexturing::TextureUnitParams* <span class='color_p'>textureUnitParams</span></span>, <span>Function* <span class='color_p'>psMain</span></span>, <span>ParameterPtr const&amp; <span class='color_p'>texel</span></span>, <span>int <span class='color_p'>groupOrder</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_370" style="display:none;">
+
+<span class='mngl pleft'>_ZN4Ogre8RTShader12FFPTexturing26addPSSampleTexelInvocationEPNS1_17TextureUnitParamsEPNS0_8FunctionERKSt10shared_ptrINS0_9ParameterEEi</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>This method became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>_ZN4Ogre8RTShader12FFPTexturing26addPSSampleTexelInvocationEPNS1_17TextureUnitParamsEPNS0_8FunctionERKSt10shared_ptrINS0_9ParameterEEi</b>' is private.</td>
+</tr>
+</table>
+<br/>
+</div>
+<span class="section" onclick="javascript:showContent(this, 'c_371')">
+<span class='ext'>[+]</span> FFPTexturing::addVSFunctionInvocations&#160;<span class='sym_p'><span>(&#160;struct FFPTexturing::TextureUnitParams* <span class='color_p'>textureUnitParams</span></span>, <span>Function* <span class='color_p'>vsMain</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_371" style="display:none;">
+
+<span class='mngl pleft'>_ZN4Ogre8RTShader12FFPTexturing24addVSFunctionInvocationsEPNS1_17TextureUnitParamsEPNS0_8FunctionE</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>This method became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>_ZN4Ogre8RTShader12FFPTexturing24addVSFunctionInvocationsEPNS1_17TextureUnitParamsEPNS0_8FunctionE</b>' is private.</td>
+</tr>
+</table>
+<br/>
+</div>
+<span class="section" onclick="javascript:showContent(this, 'c_372')">
+<span class='ext'>[+]</span> FFPTexturing::getPSArgument&#160;<span class='sym_p'><span>(&#160;ParameterPtr <span class='color_p'>texel</span></span>, <span>enum Ogre::LayerBlendSource <span class='color_p'>blendSrc</span></span>, <span>Ogre::ColourValue const&amp; <span class='color_p'>colourValue</span></span>, <span>Ogre::Real <span class='color_p'>alphaValue</span></span>, <span>bool <span class='color_p'>isAlphaArgument</span></span>&#160;)</span> const <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_372" style="display:none;">
+
+<span class='mngl pleft'>_ZNK4Ogre8RTShader12FFPTexturing13getPSArgumentESt10shared_ptrINS0_9ParameterEENS_16LayerBlendSourceERKNS_11ColourValueEfb</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>This method became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>_ZNK4Ogre8RTShader12FFPTexturing13getPSArgumentESt10shared_ptrINS0_9ParameterEENS_16LayerBlendSourceERKNS_11ColourValueEfb</b>' is private.</td>
+</tr>
+</table>
+<br/>
+</div>
+<span class="section" onclick="javascript:showContent(this, 'c_373')">
+<span class='ext'>[+]</span> FFPTexturing::needsTextureMatrix&#160;<span class='sym_p'><span>(&#160;Ogre::TextureUnitState* <span class='color_p'>textureUnitState</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_373" style="display:none;">
+
+<span class='mngl pleft'>_ZN4Ogre8RTShader12FFPTexturing18needsTextureMatrixEPNS_16TextureUnitStateE</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>This method became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>_ZN4Ogre8RTShader12FFPTexturing18needsTextureMatrixEPNS_16TextureUnitStateE</b>' is private.</td>
+</tr>
+</table>
+<br/>
+</div>
+<span class="section" onclick="javascript:showContent(this, 'c_374')">
+<span class='ext'>[+]</span> FFPTexturing::resolveFunctionsParams&#160;<span class='sym_p'><span>(&#160;struct FFPTexturing::TextureUnitParams* <span class='color_p'>textureUnitParams</span></span>, <span>ProgramSet* <span class='color_p'>programSet</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_374" style="display:none;">
+
+<span class='mngl pleft'>_ZN4Ogre8RTShader12FFPTexturing22resolveFunctionsParamsEPNS1_17TextureUnitParamsEPNS0_10ProgramSetE</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>This method became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>_ZN4Ogre8RTShader12FFPTexturing22resolveFunctionsParamsEPNS1_17TextureUnitParamsEPNS0_10ProgramSetE</b>' is private.</td>
+</tr>
+</table>
+<br/>
+</div>
+<span class="section" onclick="javascript:showContent(this, 'c_375')">
+<span class='ext'>[+]</span> FFPTexturing::resolveUniformParams&#160;<span class='sym_p'><span>(&#160;struct FFPTexturing::TextureUnitParams* <span class='color_p'>textureUnitParams</span></span>, <span>ProgramSet* <span class='color_p'>programSet</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_375" style="display:none;">
+
+<span class='mngl pleft'>_ZN4Ogre8RTShader12FFPTexturing20resolveUniformParamsEPNS1_17TextureUnitParamsEPNS0_10ProgramSetE</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>This method became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>_ZN4Ogre8RTShader12FFPTexturing20resolveUniformParamsEPNS1_17TextureUnitParamsEPNS0_10ProgramSetE</b>' is private.</td>
+</tr>
+</table>
+<br/>
+</div>
+<span class="section" onclick="javascript:showContent(this, 'c_376')">
+<span class='ext'>[+]</span> FFPTexturing::setParameter&#160;<span class='sym_p'><span>(&#160;Ogre::String const&amp; <span class='color_p'>name</span></span>, <span>Ogre::String const&amp; <span class='color_p'>value</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_376" style="display:none;">
+
+<span class='mngl pleft'>_ZN4Ogre8RTShader12FFPTexturing12setParameterERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEES9_</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>This method became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>_ZN4Ogre8RTShader12FFPTexturing12setParameterERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEES9_</b>' is private.</td>
+</tr>
+</table>
+<br/>
+</div>
+<span class="section" onclick="javascript:showContent(this, 'c_377')">
+<span class='ext'>[+]</span> FFPTexturing::setTextureUnit&#160;<span class='sym_p'><span>(&#160;unsigned short <span class='color_p'>index</span></span>, <span>Ogre::TextureUnitState* <span class='color_p'>textureUnitState</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_377" style="display:none;">
+
+<span class='mngl pleft'>_ZN4Ogre8RTShader12FFPTexturing14setTextureUnitEtPNS_16TextureUnitStateE</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>This method became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>_ZN4Ogre8RTShader12FFPTexturing14setTextureUnitEtPNS_16TextureUnitStateE</b>' is private.</td>
+</tr>
+</table>
+<br/>
+</div>
+<span class="section" onclick="javascript:showContent(this, 'c_378')">
+<span class='ext'>[+]</span> FFPTexturing::setTextureUnitCount&#160;<span class='sym_p'><span>(&#160;size_t <span class='color_p'>count</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_378" style="display:none;">
+
+<span class='mngl pleft'>_ZN4Ogre8RTShader12FFPTexturing19setTextureUnitCountEm</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>This method became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>_ZN4Ogre8RTShader12FFPTexturing19setTextureUnitCountEm</b>' is private.</td>
+</tr>
+</table>
+<br/>
+</div>
+<br/>
+<a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='Medium_Risk_Problems'></a><a name='Type_Problems_Medium'></a>
+<h2>Problems with Data Types, Medium Severity <span class='failed'>&nbsp;13&nbsp;</span></h2><hr/>
+<span class='h_name'>OgreShaderExLayeredBlending.h</span><br/>
+<span class='ns'>namespace <b>Ogre::RTShader</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_379')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> LayeredBlending <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_379" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Field <b>mTextureBlends</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>LayeredBlending</b>::<b>mTextureBlends</b>' is private.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_380')">
+[+] affected symbols: 11 (1.5%)</span>
+<div id="c_380" style="display:none;">
+<div class='affected'><span class='iname_a'>LayeredBlending::setBlendMode&#160;<span class='sym_p'><span>(&#160;Ogre::uint16 <i>index</i></span>, <span>Ogre::String const&amp; <i>mode</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;LayeredBlending&#39; class.</div>
+<span class='iname_a'>LayeredBlending::resolveParameters&#160;<span class='sym_p'><span>(&#160;ProgramSet* <i>programSet</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;LayeredBlending&#39; class.</div>
+<span class='iname_a'>LayeredBlending::setSourceModifier&#160;<span class='sym_p'><span>(&#160;unsigned short <i>index</i></span>, <span>Ogre::String const&amp; <i>modType</i></span>, <span>int <i>customNum</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;LayeredBlending&#39; class.</div>
+<span class='iname_a'>LayeredBlending::resolveDependencies&#160;<span class='sym_p'><span>(&#160;ProgramSet* <i>programSet</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;LayeredBlending&#39; class.</div>
+<span class='iname_a'>LayeredBlending::addPSBlendInvocations&#160;<span class='sym_p'><span>(&#160;Function* <i>psMain</i></span>, <span>ParameterPtr <i>arg1</i></span>, <span>ParameterPtr <i>arg2</i></span>, <span>ParameterPtr <i>texel</i></span>, <span>int <i>samplerIndex</i></span>, <span>Ogre::LayerBlendModeEx const&amp; <i>blendMode</i></span>, <span>int const <i>groupOrder</i></span>, <span>enum Operand::OpMask <i>mask</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;LayeredBlending&#39; class.</div>
+<span class='iname_a'>LayeredBlending::addPSModifierInvocation&#160;<span class='sym_p'><span>(&#160;Function* <i>psMain</i></span>, <span>int <i>samplerIndex</i></span>, <span>ParameterPtr <i>arg1</i></span>, <span>ParameterPtr <i>arg2</i></span>, <span>int const <i>groupOrder</i></span>, <span>enum Operand::OpMask <i>mask</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;LayeredBlending&#39; class.</div>
+<span class='iname_a'>LayeredBlending::copyFrom&#160;<span class='sym_p'><span>(&#160;SubRenderState const&amp; <i>rhs</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;LayeredBlending&#39; class.</div>
+<span class='iname_a'>LayeredBlending::LayeredBlending&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This constructor is from &#39;LayeredBlending&#39; class.</div>
+<span class='iname_a'>LayeredBlending::~LayeredBlending&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This destructor is from &#39;LayeredBlending&#39; class.</div>
+<span class='iname_a'>LayeredBlending::getBlendMode&#160;<span class='sym_p'><span>(&#160;unsigned short <i>index</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;LayeredBlending&#39; class.</div>
+ <b>...</b>
+<br/>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<span class='h_name'>OgreShaderFFPTexturing.h</span><br/>
+<span class='ns'>namespace <b>Ogre::RTShader</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_381')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> FFPTexturing <span class='failed'>&nbsp;11&nbsp;</span></span>
+<br/>
+<div id="c_381" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Field <b>mIsPointSprite</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>FFPTexturing</b>::<b>mIsPointSprite</b>' is private.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>Field <b>mLateAddBlend</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>FFPTexturing</b>::<b>mLateAddBlend</b>' is private.</td>
+</tr>
+<tr>
+<th>3</th>
+<td>Field <b>mPSDiffuse</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>FFPTexturing</b>::<b>mPSDiffuse</b>' is private.</td>
+</tr>
+<tr>
+<th>4</th>
+<td>Field <b>mPSOutDiffuse</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>FFPTexturing</b>::<b>mPSOutDiffuse</b>' is private.</td>
+</tr>
+<tr>
+<th>5</th>
+<td>Field <b>mPSSpecular</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>FFPTexturing</b>::<b>mPSSpecular</b>' is private.</td>
+</tr>
+<tr>
+<th>6</th>
+<td>Field <b>mTextureUnitParamsList</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>FFPTexturing</b>::<b>mTextureUnitParamsList</b>' is private.</td>
+</tr>
+<tr>
+<th>7</th>
+<td>Field <b>mVSInputNormal</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>FFPTexturing</b>::<b>mVSInputNormal</b>' is private.</td>
+</tr>
+<tr>
+<th>8</th>
+<td>Field <b>mVSInputPos</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>FFPTexturing</b>::<b>mVSInputPos</b>' is private.</td>
+</tr>
+<tr>
+<th>9</th>
+<td>Field <b>mViewMatrix</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>FFPTexturing</b>::<b>mViewMatrix</b>' is private.</td>
+</tr>
+<tr>
+<th>10</th>
+<td>Field <b>mWorldITMatrix</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>FFPTexturing</b>::<b>mWorldITMatrix</b>' is private.</td>
+</tr>
+<tr>
+<th>11</th>
+<td>Field <b>mWorldMatrix</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>FFPTexturing</b>::<b>mWorldMatrix</b>' is private.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_382')">
+[+] affected symbols: 16 (2.2%)</span>
+<div id="c_382" style="display:none;">
+<div class='affected'><span class='iname_a'>FFPTexturing::setParameter&#160;<span class='sym_p'><span>(&#160;Ogre::String const&amp; <i>name</i></span>, <span>Ogre::String const&amp; <i>value</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;FFPTexturing&#39; class.</div>
+<span class='iname_a'>FFPTexturing::setTextureUnit&#160;<span class='sym_p'><span>(&#160;unsigned short <i>index</i></span>, <span>Ogre::TextureUnitState* <i>textureUnitState</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;FFPTexturing&#39; class.</div>
+<span class='iname_a'>FFPTexturing::needsTextureMatrix&#160;<span class='sym_p'><span>(&#160;Ogre::TextureUnitState* <i>textureUnitState</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;FFPTexturing&#39; class.</div>
+<span class='iname_a'>FFPTexturing::preAddToRenderState&#160;<span class='sym_p'><span>(&#160;RenderState const* <i>renderState</i></span>, <span>Ogre::Pass* <i>srcPass</i></span>, <span>Ogre::Pass* <i>dstPass</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;FFPTexturing&#39; class.</div>
+<span class='iname_a'>FFPTexturing::setTextureUnitCount&#160;<span class='sym_p'><span>(&#160;size_t <i>count</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;FFPTexturing&#39; class.</div>
+<span class='iname_a'>FFPTexturing::resolveUniformParams&#160;<span class='sym_p'><span>(&#160;struct FFPTexturing::TextureUnitParams* <i>textureUnitParams</i></span>, <span>ProgramSet* <i>programSet</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;FFPTexturing&#39; class.</div>
+<span class='iname_a'>FFPTexturing::addFunctionInvocations&#160;<span class='sym_p'><span>(&#160;ProgramSet* <i>programSet</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;FFPTexturing&#39; class.</div>
+<span class='iname_a'>FFPTexturing::resolveFunctionsParams&#160;<span class='sym_p'><span>(&#160;struct FFPTexturing::TextureUnitParams* <i>textureUnitParams</i></span>, <span>ProgramSet* <i>programSet</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;FFPTexturing&#39; class.</div>
+<span class='iname_a'>FFPTexturing::addPSFunctionInvocations&#160;<span class='sym_p'><span>(&#160;struct FFPTexturing::TextureUnitParams* <i>textureUnitParams</i></span>, <span>Function* <i>psMain</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;FFPTexturing&#39; class.</div>
+<span class='iname_a'>FFPTexturing::addVSFunctionInvocations&#160;<span class='sym_p'><span>(&#160;struct FFPTexturing::TextureUnitParams* <i>textureUnitParams</i></span>, <span>Function* <i>vsMain</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;FFPTexturing&#39; class.</div>
+ <b>...</b>
+<br/>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<span class='h_name'>OgreShaderRenderState.h</span><br/>
+<span class='ns'>namespace <b>Ogre::RTShader</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_383')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> RenderState <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_383" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Type of field <b>mLightCount</b> has been changed from <b>Ogre::Vector3i</b> to <b>Ogre::int32</b> of different format.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_384')">
+[+] affected symbols: 13 (1.8%)</span>
+<div id="c_384" style="display:none;">
+<div class='affected'><span class='iname_a'>RenderState::removeSubRenderState&#160;<span class='sym_p'><span>(&#160;SubRenderState* <i>subRenderState</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;RenderState&#39; class.</div>
+<span class='iname_a'>RenderState::RenderState&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This constructor is from &#39;RenderState&#39; class.</div>
+<span class='iname_a'>RenderState::~RenderState&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This destructor is from &#39;RenderState&#39; class.</div>
+<span class='iname_a'>FFPTexturing::preAddToRenderState&#160;<span class='sym_p'><span>(&#160;RenderState const* <span class='fp'>renderState</span></span>, <span>Ogre::Pass* <i>srcPass</i></span>, <span>Ogre::Pass* <i>dstPass</i></span>&#160;)</span></span><br/>
+<div class='affect'>1st parameter &#39;renderState&#39; (pointer) has base type &#39;RenderState&#39;.</div>
+<span class='iname_a'>ShaderGenerator::SGTechnique::getRenderState&#160;<span class='sym_p'><span>(&#160;unsigned short <i>passIndex</i></span>&#160;)</span></span><br/>
+<div class='affect'>Return value (pointer) has base type &#39;RenderState&#39;.</div>
+<span class='iname_a'>ShaderGenerator::getRenderState&#160;<span class='sym_p'><span>(&#160;Ogre::String const&amp; <i>schemeName</i></span>&#160;)</span></span><br/>
+<div class='affect'>Return value (pointer) has base type &#39;RenderState&#39;.</div>
+<span class='iname_a'>ShaderGenerator::getRenderState&#160;<span class='sym_p'><span>(&#160;Ogre::String const&amp; <i>schemeName</i></span>, <span>Ogre::String const&amp; <i>materialName</i></span>, <span>Ogre::String const&amp; <i>groupName</i></span>, <span>unsigned short <i>passIndex</i></span>&#160;)</span></span><br/>
+<div class='affect'>Return value (pointer) has base type &#39;RenderState&#39;.</div>
+<span class='iname_a'>ShaderGenerator::SGPass::buildTargetRenderState&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mCustomRenderState&#39; in the object of this method has base type &#39;RenderState&#39;.</div>
+<span class='iname_a'>ShaderGenerator::SGPass::SGPass&#160;<span class='sym_p'><span>(&#160;ShaderGenerator::SGTechnique* <i>parent</i></span>, <span>Ogre::Pass* <i>srcPass</i></span>, <span>Ogre::Pass* <i>dstPass</i></span>, <span>enum Ogre::IlluminationStage <i>stage</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mCustomRenderState&#39; in the object of this method has base type &#39;RenderState&#39;.</div>
+<span class='iname_a'>ShaderGenerator::SGPass::~SGPass&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mCustomRenderState&#39; in the object of this method has base type &#39;RenderState&#39;.</div>
+ <b>...</b>
+<br/>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='Symbol_Problems_Medium'></a><a name='Interface_Problems_Medium'></a>
+<h2>Problems with Symbols, Medium Severity <span class='failed'>&nbsp;12&nbsp;</span></h2><hr/>
+<span class='h_name'>OgreRenderObjectListener.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_385')">
+<span class='ext'>[+]</span> RenderObjectListener::notifyRenderSingleObject&#160;<span class='sym_p'><span>(&#160;Renderable* <span class='color_p'>p1</span></span>, <span>Pass const* <span class='color_p'>p2</span></span>, <span>AutoParamDataSource const* <span class='color_p'>p3</span></span>, <span>HashedVector&lt;Light*&gt;const* <span class='color_p'>p4</span></span>, <span>bool <span class='color_p'>p5</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_385" style="display:none;">
+
+
+<span class='new_sign_lbl'>&#8675;</span>
+<br/>
+<span class='new_sign'>RenderObjectListener::notifyRenderSingleObject&#160;<span class='sym_p'><span>(&#160;Renderable* <span class='color_p'>p1</span></span>, <span>Pass const* <span class='color_p'>p2</span></span>, <span>AutoParamDataSource const* <span class='color_p'>p3</span></span>, <span>std::vector&lt;Light*&gt;const* <span class='color_p'>p4</span></span>, <span>bool <span class='color_p'>p5</span></span>&#160;)</span></span><br/>
+<span class='mngl pleft'>_ZN4Ogre20RenderObjectListener24notifyRenderSingleObjectEPNS_10RenderableEPKNS_4PassEPKNS_19AutoParamDataSourceEPKNS_12HashedVectorIPNS_5LightEEEb</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>Parameters list has been changed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+</table>
+<br/>
+</div>
+<br/>
+<span class='h_name'>OgreShaderExHardwareSkinning.h</span><br/>
+<span class='ns'>namespace <b>Ogre::RTShader</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_386')">
+<span class='ext'>[+]</span> HardwareSkinningFactory::getCustomShadowCasterMaterial&#160;<span class='sym_p'><span>(&#160;enum SkinningType const <span class='color_p'>skinningType</span></span>, <span>Ogre::ushort <span class='color_p'>index</span></span>&#160;)</span> const <span class='failed'>&nbsp;2&nbsp;</span></span>
+<br/>
+<div id="c_386" style="display:none;">
+
+
+<span class='new_sign_lbl'>&#8675;</span>
+<br/>
+<span class='new_sign'>&#160;<span class='sym_p'>(&#160;)</span> const</span><br/>
+<span class='mngl pleft'>_ZNK4Ogre8RTShader23HardwareSkinningFactory29getCustomShadowCasterMaterialENS0_12SkinningTypeEt</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>Method became <b>non-const</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: passing 'const <b>HardwareSkinningFactory</b>' as 'this' argument of '<b>_ZNK4Ogre8RTShader23HardwareSkinningFactory29getCustomShadowCasterMaterialENS0_12SkinningTypeEt</b>' discards qualifiers.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>Type of <b>1st</b> parameter <b>skinningType</b> has been changed from <span class='value'>enum SkinningType const</span> to <b>Ogre::ushort</b> (became <b>non-const</b>).</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+</table>
+<br/>
+</div>
+<span class="section" onclick="javascript:showContent(this, 'c_387')">
+<span class='ext'>[+]</span> HardwareSkinningFactory::getCustomShadowReceiverMaterial&#160;<span class='sym_p'><span>(&#160;enum SkinningType const <span class='color_p'>skinningType</span></span>, <span>Ogre::ushort <span class='color_p'>index</span></span>&#160;)</span> const <span class='failed'>&nbsp;2&nbsp;</span></span>
+<br/>
+<div id="c_387" style="display:none;">
+
+
+<span class='new_sign_lbl'>&#8675;</span>
+<br/>
+<span class='new_sign'>&#160;<span class='sym_p'>(&#160;)</span> const</span><br/>
+<span class='mngl pleft'>_ZNK4Ogre8RTShader23HardwareSkinningFactory31getCustomShadowReceiverMaterialENS0_12SkinningTypeEt</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>Method became <b>non-const</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: passing 'const <b>HardwareSkinningFactory</b>' as 'this' argument of '<b>_ZNK4Ogre8RTShader23HardwareSkinningFactory31getCustomShadowReceiverMaterialENS0_12SkinningTypeEt</b>' discards qualifiers.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>Type of <b>1st</b> parameter <b>skinningType</b> has been changed from <span class='value'>enum SkinningType const</span> to <b>Ogre::ushort</b> (became <b>non-const</b>).</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+</table>
+<br/>
+</div>
+<span class="section" onclick="javascript:showContent(this, 'c_388')">
+<span class='ext'>[+]</span> HardwareSkinningFactory::prepareEntityForSkinning&#160;<span class='sym_p'><span>(&#160;Ogre::Entity const* <span class='color_p'>pEntity</span></span>, <span>enum SkinningType <span class='color_p'>skinningType</span></span>, <span>bool <span class='color_p'>correctAntidpodalityHandling</span></span>, <span>bool <span class='color_p'>shearScale</span></span>&#160;)</span> <span class='failed'>&nbsp;2&nbsp;</span></span>
+<br/>
+<div id="c_388" style="display:none;">
+
+
+<span class='new_sign_lbl'>&#8675;</span>
+<br/>
+<span class='new_sign'>HardwareSkinningFactory::prepareEntityForSkinning&#160;<span class='sym_p'><span>(&#160;Ogre::Entity const* <span class='color_p'>pEntity</span></span>, <span>enum SkinningType <span class='color_p'>skinningType</span></span>, <span>bool <span class='color_p'>correctAntidpodalityHandling</span></span>, <span>bool <span class='color_p'>shearScale</span></span>&#160;)</span> <span class='attr'>[static]</span></span><br/>
+<span class='mngl pleft'>_ZN4Ogre8RTShader23HardwareSkinningFactory24prepareEntityForSkinningEPKNS_6EntityENS0_12SkinningTypeEbb</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>Type of <b>1st</b> parameter <b>pEntity</b> has been changed from <span class='value'>Ogre::Entity const*</span> to <span class='value'>enum SkinningType</span> (became <b>non-const</b>).</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>The pointer level of <b>1st</b> parameter <b>pEntity</b> has been increased from <b>1</b> to <b>0</b>.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+</table>
+<br/>
+</div>
+<span class="section" onclick="javascript:showContent(this, 'c_389')">
+<span class='ext'>[+]</span> HardwareSkinningFactory::setCustomShadowCasterMaterials&#160;<span class='sym_p'><span>(&#160;enum SkinningType const <span class='color_p'>skinningType</span></span>, <span>Ogre::MaterialPtr const&amp; <span class='color_p'>caster1Weight</span></span>, <span>Ogre::MaterialPtr const&amp; <span class='color_p'>caster2Weight</span></span>, <span>Ogre::MaterialPtr const&amp; <span class='color_p'>caster3Weight</span></span>, <span>Ogre::MaterialPtr const&amp; <span class='color_p'>caster4Weight</span></span>&#160;)</span> <span class='failed'>&nbsp;2&nbsp;</span></span>
+<br/>
+<div id="c_389" style="display:none;">
+
+
+<span class='new_sign_lbl'>&#8675;</span>
+<br/>
+<span class='new_sign'>HardwareSkinningFactory::setCustomShadowCasterMaterials&#160;<span class='sym_p'><span>(&#160;enum SkinningType const <span class='color_p'>skinningType</span></span>, <span>Ogre::MaterialPtr const&amp; <span class='color_p'>caster1Weight</span></span>, <span>Ogre::MaterialPtr const&amp; <span class='color_p'>caster2Weight</span></span>, <span>Ogre::MaterialPtr const&amp; <span class='color_p'>caster3Weight</span></span>, <span>Ogre::MaterialPtr const&amp; <span class='color_p'>caster4Weight</span></span>&#160;)</span> <span class='attr'>[static]</span></span><br/>
+<span class='mngl pleft'>_ZN4Ogre8RTShader23HardwareSkinningFactory30setCustomShadowCasterMaterialsENS0_12SkinningTypeERKNS_9SharedPtrINS_8MaterialEEES7_S7_S7_</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>The pointer level of <b>1st</b> parameter <b>skinningType</b> has been increased from <b>0</b> to <b>1</b>.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>Type of parameter <b>skinningType</b> has been changed from <span class='value'>enum SkinningType const</span> to <span class='value'>Ogre::MaterialPtr const&amp;</span> of different format.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+</table>
+<br/>
+</div>
+<span class="section" onclick="javascript:showContent(this, 'c_390')">
+<span class='ext'>[+]</span> HardwareSkinningFactory::setCustomShadowReceiverMaterials&#160;<span class='sym_p'><span>(&#160;enum SkinningType const <span class='color_p'>skinningType</span></span>, <span>Ogre::MaterialPtr const&amp; <span class='color_p'>receiver1Weight</span></span>, <span>Ogre::MaterialPtr const&amp; <span class='color_p'>receiver2Weight</span></span>, <span>Ogre::MaterialPtr const&amp; <span class='color_p'>receiver3Weight</span></span>, <span>Ogre::MaterialPtr const&amp; <span class='color_p'>receiver4Weight</span></span>&#160;)</span> <span class='failed'>&nbsp;2&nbsp;</span></span>
+<br/>
+<div id="c_390" style="display:none;">
+
+
+<span class='new_sign_lbl'>&#8675;</span>
+<br/>
+<span class='new_sign'>HardwareSkinningFactory::setCustomShadowReceiverMaterials&#160;<span class='sym_p'><span>(&#160;enum SkinningType const <span class='color_p'>skinningType</span></span>, <span>Ogre::MaterialPtr const&amp; <span class='color_p'>receiver1Weight</span></span>, <span>Ogre::MaterialPtr const&amp; <span class='color_p'>receiver2Weight</span></span>, <span>Ogre::MaterialPtr const&amp; <span class='color_p'>receiver3Weight</span></span>, <span>Ogre::MaterialPtr const&amp; <span class='color_p'>receiver4Weight</span></span>&#160;)</span> <span class='attr'>[static]</span></span><br/>
+<span class='mngl pleft'>_ZN4Ogre8RTShader23HardwareSkinningFactory32setCustomShadowReceiverMaterialsENS0_12SkinningTypeERKNS_9SharedPtrINS_8MaterialEEES7_S7_S7_</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>The pointer level of <b>1st</b> parameter <b>skinningType</b> has been increased from <b>0</b> to <b>1</b>.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>Type of parameter <b>skinningType</b> has been changed from <span class='value'>enum SkinningType const</span> to <span class='value'>Ogre::MaterialPtr const&amp;</span> of different format.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+</table>
+<br/>
+</div>
+<br/>
+<span class='h_name'>OgreShaderExLayeredBlending.h</span><br/>
+<span class='ns'>namespace <b>Ogre::RTShader</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_391')">
+<span class='ext'>[+]</span> LayeredBlending::getSourceModifier&#160;<span class='sym_p'><span>(&#160;unsigned short <span class='color_p'>index</span></span>, <span>enum LayeredBlending::SourceModifier&amp; <span class='color_p'>modType</span></span>, <span>int&amp; <span class='color_p'>customNum</span></span>&#160;)</span> const <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_391" style="display:none;">
+
+
+<span class='new_sign_lbl'>&#8675;</span>
+<br/>
+<span class='new_sign'>LayeredBlending::getSourceModifier&#160;<span class='sym_p'><span>(&#160;unsigned short <span class='color_p'>index</span></span>, <span>enum SourceModifier&amp; <span class='color_p'>modType</span></span>, <span>int&amp; <span class='color_p'>customNum</span></span>&#160;)</span> const</span><br/>
+<span class='mngl pleft'>_ZNK4Ogre8RTShader15LayeredBlending17getSourceModifierEtRNS1_14SourceModifierERi</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>Parameters list has been changed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+</table>
+<br/>
+</div>
+<br/>
+<a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='Low_Risk_Problems'></a><a name='Type_Problems_Low'></a>
+<h2>Problems with Data Types, Low Severity <span class='warning'>&nbsp;7&nbsp;</span></h2><hr/>
+<span class='h_name'>OgreShaderExHardwareSkinning.h</span><br/>
+<span class='ns'>namespace <b>Ogre::RTShader</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_392')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> HardwareSkinning <span class='warning'>&nbsp;5&nbsp;</span></span>
+<br/>
+<div id="c_392" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Virtual method <span class='iname_b'>HardwareSkinning::resolveParameters&#160;<span class='sym_pd'><span>(&#160;ProgramSet*</span>&#160;)</span></span> has been overridden by <span class='iname_b'>SubRenderState::resolveParameters&#160;<span class='sym_pd'><span>(&#160;ProgramSet*</span>&#160;)</span></span>.</td>
+<td>Method <span class='iname_b'>SubRenderState::resolveParameters&#160;<span class='sym_pd'><span>(&#160;ProgramSet*</span>&#160;)</span></span> will be called after recompilation instead of <span class='iname_b'>HardwareSkinning::resolveParameters&#160;<span class='sym_pd'><span>(&#160;ProgramSet*</span>&#160;)</span></span>.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>Virtual method <span class='iname_b'>HardwareSkinning::resolveDependencies&#160;<span class='sym_pd'><span>(&#160;ProgramSet*</span>&#160;)</span></span> has been overridden by <span class='iname_b'>SubRenderState::resolveDependencies&#160;<span class='sym_pd'><span>(&#160;ProgramSet*</span>&#160;)</span></span>.</td>
+<td>Method <span class='iname_b'>SubRenderState::resolveDependencies&#160;<span class='sym_pd'><span>(&#160;ProgramSet*</span>&#160;)</span></span> will be called after recompilation instead of <span class='iname_b'>HardwareSkinning::resolveDependencies&#160;<span class='sym_pd'><span>(&#160;ProgramSet*</span>&#160;)</span></span>.</td>
+</tr>
+<tr>
+<th>3</th>
+<td>Virtual method <span class='iname_b'>HardwareSkinning::addFunctionInvocations&#160;<span class='sym_pd'><span>(&#160;ProgramSet*</span>&#160;)</span></span> has been overridden by <span class='iname_b'>SubRenderState::addFunctionInvocations&#160;<span class='sym_pd'><span>(&#160;ProgramSet*</span>&#160;)</span></span>.</td>
+<td>Method <span class='iname_b'>SubRenderState::addFunctionInvocations&#160;<span class='sym_pd'><span>(&#160;ProgramSet*</span>&#160;)</span></span> will be called after recompilation instead of <span class='iname_b'>HardwareSkinning::addFunctionInvocations&#160;<span class='sym_pd'><span>(&#160;ProgramSet*</span>&#160;)</span></span>.</td>
+</tr>
+<tr>
+<th>4</th>
+<td>Virtual method <span class='iname_b'>HardwareSkinning::~HardwareSkinning&#160;<span class='sym_pd'>(&#160;)</span></span> has been overridden by <span class='iname_b'>SubRenderState::~SubRenderState&#160;<span class='sym_pd'>(&#160;)</span></span>.</td>
+<td>Method <span class='iname_b'>SubRenderState::~SubRenderState&#160;<span class='sym_pd'>(&#160;)</span></span> will be called after recompilation instead of <span class='iname_b'>HardwareSkinning::~HardwareSkinning&#160;<span class='sym_pd'>(&#160;)</span></span>.</td>
+</tr>
+<tr>
+<th>5</th>
+<td>Virtual method <span class='iname_b'>HardwareSkinning::~HardwareSkinning&#160;<span class='sym_pd'>(&#160;)</span></span> has been overridden by <span class='iname_b'>SubRenderState::~SubRenderState&#160;<span class='sym_pd'>(&#160;)</span></span>.</td>
+<td>Method <span class='iname_b'>SubRenderState::~SubRenderState&#160;<span class='sym_pd'>(&#160;)</span></span> will be called after recompilation instead of <span class='iname_b'>HardwareSkinning::~HardwareSkinning&#160;<span class='sym_pd'>(&#160;)</span></span>.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_393')">
+[+] affected symbols: 4 (0.5%)</span>
+<div id="c_393" style="display:none;">
+<div class='affected'><span class='iname_a'>HardwareSkinning::resolveParameters&#160;<span class='sym_p'><span>(&#160;ProgramSet* <i>programSet</i></span>&#160;)</span></span><br/>
+<div class='affect'>The method &#39;_ZN4Ogre8RTShader14SubRenderState17resolveParametersEPNS0_10ProgramSetE&#39; will be called instead of this method.</div>
+<span class='iname_a'>HardwareSkinning::resolveDependencies&#160;<span class='sym_p'><span>(&#160;ProgramSet* <i>programSet</i></span>&#160;)</span></span><br/>
+<div class='affect'>The method &#39;_ZN4Ogre8RTShader14SubRenderState19resolveDependenciesEPNS0_10ProgramSetE&#39; will be called instead of this method.</div>
+<span class='iname_a'>HardwareSkinning::addFunctionInvocations&#160;<span class='sym_p'><span>(&#160;ProgramSet* <i>programSet</i></span>&#160;)</span></span><br/>
+<div class='affect'>The method &#39;_ZN4Ogre8RTShader14SubRenderState22addFunctionInvocationsEPNS0_10ProgramSetE&#39; will be called instead of this method.</div>
+<span class='iname_a'>HardwareSkinning::~HardwareSkinning&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>The method &#39;_ZN4Ogre8RTShader14SubRenderStateD1Ev&#39; will be called instead of this method.</div>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<span class='h_name'>OgreShaderExLayeredBlending.h</span><br/>
+<span class='ns'>namespace <b>Ogre::RTShader</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_394')">
+<span class='ext'>[+]</span> <span class='ttype'>struct</span> LayeredBlending::TextureBlend <span class='warning'>&nbsp;2&nbsp;</span></span>
+<br/>
+<div id="c_394" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Type of field <b>blendMode</b> has been changed from <span class='value'>enum LayeredBlending::BlendMode</span> to <span class='value'>enum BlendMode</span>.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>Type of field <b>sourceModifier</b> has been changed from <span class='value'>enum LayeredBlending::SourceModifier</span> to <span class='value'>enum SourceModifier</span>.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_395')">
+[+] affected symbols: 4 (0.5%)</span>
+<div id="c_395" style="display:none;">
+<div class='affected'><span class='iname_a'>LayeredBlending::TextureBlend::TextureBlend&#160;<span class='sym_p'><span>(&#160;struct LayeredBlending::TextureBlend&amp;& <span class='fp'>p1</span></span>&#160;)</span></span><br/>
+<div class='affect'>1st parameter &#39;p1&#39; has base type &#39;struct LayeredBlending::TextureBlend&#39;.</div>
+<span class='iname_a'>LayeredBlending::TextureBlend::TextureBlend&#160;<span class='sym_p'><span>(&#160;struct LayeredBlending::TextureBlend const&amp; <span class='fp'>p1</span></span>&#160;)</span></span><br/>
+<div class='affect'>1st parameter &#39;p1&#39; (reference) has base type &#39;struct LayeredBlending::TextureBlend&#39;.</div>
+<span class='iname_a'>LayeredBlending::TextureBlend::TextureBlend&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This constructor is from &#39;struct LayeredBlending::TextureBlend&#39; class.</div>
+<span class='iname_a'>LayeredBlending::TextureBlend::~TextureBlend&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This destructor is from &#39;struct LayeredBlending::TextureBlend&#39; class.</div>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='Symbol_Problems_Low'></a><a name='Interface_Problems_Low'></a>
+<h2>Problems with Symbols, Low Severity <span class='warning'>&nbsp;5&nbsp;</span></h2><hr/>
+<span class='h_name'>OgreShaderExHardwareSkinning.h</span><br/>
+<span class='ns'>namespace <b>Ogre::RTShader</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_396')">
+<span class='ext'>[+]</span> HardwareSkinningFactory::getCustomShadowCasterMaterial&#160;<span class='sym_p'><span>(&#160;enum SkinningType const <span class='color_p'>skinningType</span></span>, <span>Ogre::ushort <span class='color_p'>index</span></span>&#160;)</span> const <span class='warning'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_396" style="display:none;">
+
+
+<span class='new_sign_lbl'>&#8675;</span>
+<br/>
+<span class='new_sign'>&#160;<span class='sym_p'>(&#160;)</span> const</span><br/>
+<span class='mngl pleft'>_ZNK4Ogre8RTShader23HardwareSkinningFactory29getCustomShadowCasterMaterialENS0_12SkinningTypeEt</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>Type of <b>1st</b> parameter <b>skinningType</b> has been changed from <span class='value'>enum SkinningType const</span> to <b>Ogre::ushort</b>.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+</table>
+<br/>
+</div>
+<span class="section" onclick="javascript:showContent(this, 'c_397')">
+<span class='ext'>[+]</span> HardwareSkinningFactory::getCustomShadowReceiverMaterial&#160;<span class='sym_p'><span>(&#160;enum SkinningType const <span class='color_p'>skinningType</span></span>, <span>Ogre::ushort <span class='color_p'>index</span></span>&#160;)</span> const <span class='warning'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_397" style="display:none;">
+
+
+<span class='new_sign_lbl'>&#8675;</span>
+<br/>
+<span class='new_sign'>&#160;<span class='sym_p'>(&#160;)</span> const</span><br/>
+<span class='mngl pleft'>_ZNK4Ogre8RTShader23HardwareSkinningFactory31getCustomShadowReceiverMaterialENS0_12SkinningTypeEt</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>Type of <b>1st</b> parameter <b>skinningType</b> has been changed from <span class='value'>enum SkinningType const</span> to <b>Ogre::ushort</b>.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+</table>
+<br/>
+</div>
+<span class="section" onclick="javascript:showContent(this, 'c_398')">
+<span class='ext'>[+]</span> HardwareSkinningFactory::prepareEntityForSkinning&#160;<span class='sym_p'><span>(&#160;Ogre::Entity const* <span class='color_p'>pEntity</span></span>, <span>enum SkinningType <span class='color_p'>skinningType</span></span>, <span>bool <span class='color_p'>correctAntidpodalityHandling</span></span>, <span>bool <span class='color_p'>shearScale</span></span>&#160;)</span> <span class='warning'>&nbsp;2&nbsp;</span></span>
+<br/>
+<div id="c_398" style="display:none;">
+
+
+<span class='new_sign_lbl'>&#8675;</span>
+<br/>
+<span class='new_sign'>HardwareSkinningFactory::prepareEntityForSkinning&#160;<span class='sym_p'><span>(&#160;Ogre::Entity const* <span class='color_p'>pEntity</span></span>, <span>enum SkinningType <span class='color_p'>skinningType</span></span>, <span>bool <span class='color_p'>correctAntidpodalityHandling</span></span>, <span>bool <span class='color_p'>shearScale</span></span>&#160;)</span> <span class='attr'>[static]</span></span><br/>
+<span class='mngl pleft'>_ZN4Ogre8RTShader23HardwareSkinningFactory24prepareEntityForSkinningEPKNS_6EntityENS0_12SkinningTypeEbb</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>Type of <b>1st</b> parameter <b>pEntity</b> has been changed from <span class='value'>Ogre::Entity const*</span> to <span class='value'>enum SkinningType</span>.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>Type of <b>2nd</b> parameter <b>skinningType</b> has been changed from <span class='value'>enum SkinningType</span> to <b>bool</b>.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+</table>
+<br/>
+</div>
+<br/>
+<span class='h_name'>OgreShaderExLayeredBlending.h</span><br/>
+<span class='ns'>namespace <b>Ogre::RTShader</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_399')">
+<span class='ext'>[+]</span> LayeredBlending::getBlendMode&#160;<span class='sym_p'><span>(&#160;unsigned short <span class='color_p'>index</span></span>&#160;)</span> const <span class='warning'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_399" style="display:none;">
+
+<span class='mngl pleft'>_ZNK4Ogre8RTShader15LayeredBlending12getBlendModeEt</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>Type of return value has been changed from <span class='value'>enum LayeredBlending::BlendMode</span> to <span class='value'>enum BlendMode</span>.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+</table>
+<br/>
+</div>
+<br/>
+<a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='Other_Changes'></a><a name='Other_Changes_In_Types'></a>
+<h2>Other Changes in Data Types <span class='passed'>&nbsp;27&nbsp;</span></h2><hr/>
+<span class='h_name'>OgreShaderParameter.h</span><br/>
+<span class='ns'>namespace <b>Ogre::RTShader</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_400')">
+<span class='ext'>[+]</span> <span class='ttype'>enum</span> Parameter::Content <span class='passed'>&nbsp;27&nbsp;</span></span>
+<br/>
+<div id="c_400" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Value of member <b>SPC_BLEND_INDICES</b> has been changed from <b>111</b> to <b>20</b>.</td>
+<td>No effect.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>Value of member <b>SPC_BLEND_WEIGHTS</b> has been changed from <b>110</b> to <b>19</b>.</td>
+<td>No effect.</td>
+</tr>
+<tr>
+<th>3</th>
+<td>Value of member <b>SPC_BINORMAL_OBJECT_SPACE</b> has been changed from <b>116</b> to <b>24</b>.</td>
+<td>No effect.</td>
+</tr>
+<tr>
+<th>4</th>
+<td>Value of member <b>SPC_BINORMAL_VIEW_SPACE</b> has been changed from <b>118</b> to <b>26</b>.</td>
+<td>No effect.</td>
+</tr>
+<tr>
+<th>5</th>
+<td>Value of member <b>SPC_BINORMAL_WORLD_SPACE</b> has been changed from <b>117</b> to <b>25</b>.</td>
+<td>No effect.</td>
+</tr>
+<tr>
+<th>6</th>
+<td>Value of member <b>SPC_COLOR_DIFFUSE</b> has been changed from <b>120</b> to <b>27</b>.</td>
+<td>No effect.</td>
+</tr>
+<tr>
+<th>7</th>
+<td>Value of member <b>SPC_COLOR_SPECULAR</b> has been changed from <b>121</b> to <b>28</b>.</td>
+<td>No effect.</td>
+</tr>
+<tr>
+<th>8</th>
+<td>Value of member <b>SPC_DEPTH_PROJECTIVE_SPACE</b> has been changed from <b>125</b> to <b>31</b>.</td>
+<td>No effect.</td>
+</tr>
+<tr>
+<th>9</th>
+<td>Value of member <b>SPC_DEPTH_VIEW_SPACE</b> has been changed from <b>124</b> to <b>30</b>.</td>
+<td>No effect.</td>
+</tr>
+<tr>
+<th>10</th>
+<td>Value of member <b>SPC_DEPTH_WORLD_SPACE</b> has been changed from <b>123</b> to <b>29</b>.</td>
+<td>No effect.</td>
+</tr>
+<tr>
+<th>11</th>
+<td>Value of member <b>SPC_FRONT_FACING</b> has been changed from <b>136</b> to <b>42</b>.</td>
+<td>No effect.</td>
+</tr>
+<tr>
+<th>12</th>
+<td>Value of member <b>SPC_POINTSPRITE_COORDINATE</b> has been changed from <b>134</b> to <b>40</b>.</td>
+<td>No effect.</td>
+</tr>
+<tr>
+<th>13</th>
+<td>Value of member <b>SPC_POINTSPRITE_SIZE</b> has been changed from <b>135</b> to <b>41</b>.</td>
+<td>No effect.</td>
+</tr>
+<tr>
+<th>14</th>
+<td>Value of member <b>SPC_POSTOCAMERA_OBJECT_SPACE</b> has been changed from <b>17</b> to <b>16</b>.</td>
+<td>No effect.</td>
+</tr>
+<tr>
+<th>15</th>
+<td>Value of member <b>SPC_POSTOCAMERA_VIEW_SPACE</b> has been changed from <b>19</b> to <b>18</b>.</td>
+<td>No effect.</td>
+</tr>
+<tr>
+<th>16</th>
+<td>Value of member <b>SPC_POSTOCAMERA_WORLD_SPACE</b> has been changed from <b>18</b> to <b>17</b>.</td>
+<td>No effect.</td>
+</tr>
+<tr>
+<th>17</th>
+<td>Value of member <b>SPC_TANGENT_OBJECT_SPACE</b> has been changed from <b>112</b> to <b>21</b>.</td>
+<td>No effect.</td>
+</tr>
+<tr>
+<th>18</th>
+<td>Value of member <b>SPC_TANGENT_VIEW_SPACE</b> has been changed from <b>114</b> to <b>23</b>.</td>
+<td>No effect.</td>
+</tr>
+<tr>
+<th>19</th>
+<td>Value of member <b>SPC_TANGENT_WORLD_SPACE</b> has been changed from <b>113</b> to <b>22</b>.</td>
+<td>No effect.</td>
+</tr>
+<tr>
+<th>20</th>
+<td>Value of member <b>SPC_TEXTURE_COORDINATE0</b> has been changed from <b>126</b> to <b>32</b>.</td>
+<td>No effect.</td>
+</tr>
+<tr>
+<th>21</th>
+<td>Value of member <b>SPC_TEXTURE_COORDINATE1</b> has been changed from <b>127</b> to <b>33</b>.</td>
+<td>No effect.</td>
+</tr>
+<tr>
+<th>22</th>
+<td>Value of member <b>SPC_TEXTURE_COORDINATE2</b> has been changed from <b>128</b> to <b>34</b>.</td>
+<td>No effect.</td>
+</tr>
+<tr>
+<th>23</th>
+<td>Value of member <b>SPC_TEXTURE_COORDINATE3</b> has been changed from <b>129</b> to <b>35</b>.</td>
+<td>No effect.</td>
+</tr>
+<tr>
+<th>24</th>
+<td>Value of member <b>SPC_TEXTURE_COORDINATE4</b> has been changed from <b>130</b> to <b>36</b>.</td>
+<td>No effect.</td>
+</tr>
+<tr>
+<th>25</th>
+<td>Value of member <b>SPC_TEXTURE_COORDINATE5</b> has been changed from <b>131</b> to <b>37</b>.</td>
+<td>No effect.</td>
+</tr>
+<tr>
+<th>26</th>
+<td>Value of member <b>SPC_TEXTURE_COORDINATE6</b> has been changed from <b>132</b> to <b>38</b>.</td>
+<td>No effect.</td>
+</tr>
+<tr>
+<th>27</th>
+<td>Value of member <b>SPC_TEXTURE_COORDINATE7</b> has been changed from <b>133</b> to <b>39</b>.</td>
+<td>No effect.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_401')">
+[+] affected symbols: 14 (1.9%)</span>
+<div id="c_401" style="display:none;">
+<div class='affected'><span class='iname_a'>ConstParameter&lt;float&gt;::ConstParameter&#160;<span class='sym_p'><span>(&#160;float <i>val</i></span>, <span>enum Ogre::GpuConstantType <i>type</i></span>, <span>enum Parameter::Semantic const&amp; <i>semantic</i></span>, <span>enum Parameter::Content const&amp; <span class='fp'>content</span></span>&#160;)</span></span><br/>
+<div class='affect'>4th parameter &#39;content&#39; (reference) has base type &#39;enum Parameter::Content&#39;.</div>
+<span class='iname_a'>ConstParameter&lt;Ogre::Vector&lt;2, float&gt; &gt;::ConstParameter&#160;<span class='sym_p'><span>(&#160;Ogre::Vector&lt;2, float&gt; <i>val</i></span>, <span>enum Ogre::GpuConstantType <i>type</i></span>, <span>enum Parameter::Semantic const&amp; <i>semantic</i></span>, <span>enum Parameter::Content const&amp; <span class='fp'>content</span></span>&#160;)</span></span><br/>
+<div class='affect'>4th parameter &#39;content&#39; (reference) has base type &#39;enum Parameter::Content&#39;.</div>
+<span class='iname_a'>ConstParameter&lt;Ogre::Vector&lt;3, float&gt; &gt;::ConstParameter&#160;<span class='sym_p'><span>(&#160;Ogre::Vector&lt;3, float&gt; <i>val</i></span>, <span>enum Ogre::GpuConstantType <i>type</i></span>, <span>enum Parameter::Semantic const&amp; <i>semantic</i></span>, <span>enum Parameter::Content const&amp; <span class='fp'>content</span></span>&#160;)</span></span><br/>
+<div class='affect'>4th parameter &#39;content&#39; (reference) has base type &#39;enum Parameter::Content&#39;.</div>
+<span class='iname_a'>ConstParameter&lt;Ogre::Vector&lt;4, float&gt; &gt;::ConstParameter&#160;<span class='sym_p'><span>(&#160;Ogre::Vector&lt;4, float&gt; <i>val</i></span>, <span>enum Ogre::GpuConstantType <i>type</i></span>, <span>enum Parameter::Semantic const&amp; <i>semantic</i></span>, <span>enum Parameter::Content const&amp; <span class='fp'>content</span></span>&#160;)</span></span><br/>
+<div class='affect'>4th parameter &#39;content&#39; (reference) has base type &#39;enum Parameter::Content&#39;.</div>
+<span class='iname_a'>ParameterFactory::createInPosition&#160;<span class='sym_p'><span>(&#160;int <i>index</i></span>, <span>enum Parameter::Content <span class='fp'>content</span></span>&#160;)</span></span><br/>
+<div class='affect'>2nd parameter &#39;content&#39; is of type &#39;enum Parameter::Content&#39;.</div>
+<span class='iname_a'>ParameterFactory::createInTexcoord&#160;<span class='sym_p'><span>(&#160;enum Ogre::GpuConstantType <i>type</i></span>, <span>int <i>index</i></span>, <span>enum Parameter::Content <span class='fp'>content</span></span>&#160;)</span></span><br/>
+<div class='affect'>3rd parameter &#39;content&#39; is of type &#39;enum Parameter::Content&#39;.</div>
+<span class='iname_a'>ParameterFactory::createOutTexcoord&#160;<span class='sym_p'><span>(&#160;enum Ogre::GpuConstantType <i>type</i></span>, <span>int <i>index</i></span>, <span>enum Parameter::Content <span class='fp'>content</span></span>&#160;)</span></span><br/>
+<div class='affect'>3rd parameter &#39;content&#39; is of type &#39;enum Parameter::Content&#39;.</div>
+<span class='iname_a'>UniformParameter::UniformParameter&#160;<span class='sym_p'><span>(&#160;enum Ogre::GpuConstantType <i>type</i></span>, <span>Ogre::String const&amp; <i>name</i></span>, <span>enum Parameter::Semantic const&amp; <i>semantic</i></span>, <span>int <i>index</i></span>, <span>enum Parameter::Content const&amp; <span class='fp'>content</span></span>, <span>Ogre::uint16 <i>variability</i></span>, <span>size_t <i>size</i></span>&#160;)</span></span><br/>
+<div class='affect'>5th parameter &#39;content&#39; (reference) has base type &#39;enum Parameter::Content&#39;.</div>
+<span class='iname_a'>Function::resolveInputParameter&#160;<span class='sym_p'><span>(&#160;enum Parameter::Semantic <i>semantic</i></span>, <span>int <i>index</i></span>, <span>enum Parameter::Content const <span class='fp'>content</span></span>, <span>enum Ogre::GpuConstantType <i>type</i></span>&#160;)</span></span><br/>
+<div class='affect'>3rd parameter &#39;content&#39; has base type &#39;enum Parameter::Content&#39;.</div>
+<span class='iname_a'>Function::resolveLocalParameter&#160;<span class='sym_p'><span>(&#160;enum Parameter::Content const <span class='fp'>content</span></span>, <span>enum Ogre::GpuConstantType <i>type</i></span>&#160;)</span></span><br/>
+<div class='affect'>1st parameter &#39;content&#39; has base type &#39;enum Parameter::Content&#39;.</div>
+ <b>...</b>
+<br/>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='Other_Changes_In_Symbols'></a><a name='Other_Changes_In_Interfaces'></a>
+<h2>Other Changes in Symbols <span class='passed'>&nbsp;18&nbsp;</span></h2><hr/>
+<span class='h_name'>OgreShaderExHardwareSkinning.h</span><br/>
+<span class='ns'>namespace <b>Ogre::RTShader</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_402')">
+<span class='ext'>[+]</span> HardwareSkinningFactory::getCustomShadowCasterMaterial&#160;<span class='sym_p'><span>(&#160;enum SkinningType const <span class='color_p'>skinningType</span></span>, <span>Ogre::ushort <span class='color_p'>index</span></span>&#160;)</span> const <span class='passed'>&nbsp;2&nbsp;</span></span>
+<br/>
+<div id="c_402" style="display:none;">
+
+
+<span class='new_sign_lbl'>&#8675;</span>
+<br/>
+<span class='new_sign'>&#160;<span class='sym_p'>(&#160;)</span> const</span><br/>
+<span class='mngl pleft'>_ZNK4Ogre8RTShader23HardwareSkinningFactory29getCustomShadowCasterMaterialENS0_12SkinningTypeEt</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>Method became <b>static</b>.</td>
+<td>No effect.</td>
+</tr>
+<tr>
+<th>2</th>
+<td><b>1st</b> parameter <b>skinningType</b> has been renamed to <b>index</b>.</td>
+<td>No effect.</td>
+</tr>
+</table>
+<br/>
+</div>
+<span class="section" onclick="javascript:showContent(this, 'c_403')">
+<span class='ext'>[+]</span> HardwareSkinningFactory::getCustomShadowReceiverMaterial&#160;<span class='sym_p'><span>(&#160;enum SkinningType const <span class='color_p'>skinningType</span></span>, <span>Ogre::ushort <span class='color_p'>index</span></span>&#160;)</span> const <span class='passed'>&nbsp;2&nbsp;</span></span>
+<br/>
+<div id="c_403" style="display:none;">
+
+
+<span class='new_sign_lbl'>&#8675;</span>
+<br/>
+<span class='new_sign'>&#160;<span class='sym_p'>(&#160;)</span> const</span><br/>
+<span class='mngl pleft'>_ZNK4Ogre8RTShader23HardwareSkinningFactory31getCustomShadowReceiverMaterialENS0_12SkinningTypeEt</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>Method became <b>static</b>.</td>
+<td>No effect.</td>
+</tr>
+<tr>
+<th>2</th>
+<td><b>1st</b> parameter <b>skinningType</b> has been renamed to <b>index</b>.</td>
+<td>No effect.</td>
+</tr>
+</table>
+<br/>
+</div>
+<span class="section" onclick="javascript:showContent(this, 'c_404')">
+<span class='ext'>[+]</span> HardwareSkinningFactory::prepareEntityForSkinning&#160;<span class='sym_p'><span>(&#160;Ogre::Entity const* <span class='color_p'>pEntity</span></span>, <span>enum SkinningType <span class='color_p'>skinningType</span></span>, <span>bool <span class='color_p'>correctAntidpodalityHandling</span></span>, <span>bool <span class='color_p'>shearScale</span></span>&#160;)</span> <span class='passed'>&nbsp;4&nbsp;</span></span>
+<br/>
+<div id="c_404" style="display:none;">
+
+
+<span class='new_sign_lbl'>&#8675;</span>
+<br/>
+<span class='new_sign'>HardwareSkinningFactory::prepareEntityForSkinning&#160;<span class='sym_p'><span>(&#160;Ogre::Entity const* <span class='color_p'>pEntity</span></span>, <span>enum SkinningType <span class='color_p'>skinningType</span></span>, <span>bool <span class='color_p'>correctAntidpodalityHandling</span></span>, <span>bool <span class='color_p'>shearScale</span></span>&#160;)</span> <span class='attr'>[static]</span></span><br/>
+<span class='mngl pleft'>_ZN4Ogre8RTShader23HardwareSkinningFactory24prepareEntityForSkinningEPKNS_6EntityENS0_12SkinningTypeEbb</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>Method became <b>static</b>.</td>
+<td>No effect.</td>
+</tr>
+<tr>
+<th>2</th>
+<td><b>1st</b> parameter <b>pEntity</b> has been renamed to <b>skinningType</b>.</td>
+<td>No effect.</td>
+</tr>
+<tr>
+<th>3</th>
+<td><b>2nd</b> parameter <b>skinningType</b> has been renamed to <b>correctAntidpodalityHandling</b>.</td>
+<td>No effect.</td>
+</tr>
+<tr>
+<th>4</th>
+<td><b>3rd</b> parameter <b>correctAntidpodalityHandling</b> has been renamed to <b>shearScale</b>.</td>
+<td>No effect.</td>
+</tr>
+</table>
+<br/>
+</div>
+<span class="section" onclick="javascript:showContent(this, 'c_405')">
+<span class='ext'>[+]</span> HardwareSkinningFactory::setCustomShadowCasterMaterials&#160;<span class='sym_p'><span>(&#160;enum SkinningType const <span class='color_p'>skinningType</span></span>, <span>Ogre::MaterialPtr const&amp; <span class='color_p'>caster1Weight</span></span>, <span>Ogre::MaterialPtr const&amp; <span class='color_p'>caster2Weight</span></span>, <span>Ogre::MaterialPtr const&amp; <span class='color_p'>caster3Weight</span></span>, <span>Ogre::MaterialPtr const&amp; <span class='color_p'>caster4Weight</span></span>&#160;)</span> <span class='passed'>&nbsp;5&nbsp;</span></span>
+<br/>
+<div id="c_405" style="display:none;">
+
+
+<span class='new_sign_lbl'>&#8675;</span>
+<br/>
+<span class='new_sign'>HardwareSkinningFactory::setCustomShadowCasterMaterials&#160;<span class='sym_p'><span>(&#160;enum SkinningType const <span class='color_p'>skinningType</span></span>, <span>Ogre::MaterialPtr const&amp; <span class='color_p'>caster1Weight</span></span>, <span>Ogre::MaterialPtr const&amp; <span class='color_p'>caster2Weight</span></span>, <span>Ogre::MaterialPtr const&amp; <span class='color_p'>caster3Weight</span></span>, <span>Ogre::MaterialPtr const&amp; <span class='color_p'>caster4Weight</span></span>&#160;)</span> <span class='attr'>[static]</span></span><br/>
+<span class='mngl pleft'>_ZN4Ogre8RTShader23HardwareSkinningFactory30setCustomShadowCasterMaterialsENS0_12SkinningTypeERKNS_9SharedPtrINS_8MaterialEEES7_S7_S7_</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>Method became <b>static</b>.</td>
+<td>No effect.</td>
+</tr>
+<tr>
+<th>2</th>
+<td><b>1st</b> parameter <b>skinningType</b> has been renamed to <b>caster1Weight</b>.</td>
+<td>No effect.</td>
+</tr>
+<tr>
+<th>3</th>
+<td><b>2nd</b> parameter <b>caster1Weight</b> has been renamed to <b>caster2Weight</b>.</td>
+<td>No effect.</td>
+</tr>
+<tr>
+<th>4</th>
+<td><b>3rd</b> parameter <b>caster2Weight</b> has been renamed to <b>caster3Weight</b>.</td>
+<td>No effect.</td>
+</tr>
+<tr>
+<th>5</th>
+<td><b>4th</b> parameter <b>caster3Weight</b> has been renamed to <b>caster4Weight</b>.</td>
+<td>No effect.</td>
+</tr>
+</table>
+<br/>
+</div>
+<span class="section" onclick="javascript:showContent(this, 'c_406')">
+<span class='ext'>[+]</span> HardwareSkinningFactory::setCustomShadowReceiverMaterials&#160;<span class='sym_p'><span>(&#160;enum SkinningType const <span class='color_p'>skinningType</span></span>, <span>Ogre::MaterialPtr const&amp; <span class='color_p'>receiver1Weight</span></span>, <span>Ogre::MaterialPtr const&amp; <span class='color_p'>receiver2Weight</span></span>, <span>Ogre::MaterialPtr const&amp; <span class='color_p'>receiver3Weight</span></span>, <span>Ogre::MaterialPtr const&amp; <span class='color_p'>receiver4Weight</span></span>&#160;)</span> <span class='passed'>&nbsp;5&nbsp;</span></span>
+<br/>
+<div id="c_406" style="display:none;">
+
+
+<span class='new_sign_lbl'>&#8675;</span>
+<br/>
+<span class='new_sign'>HardwareSkinningFactory::setCustomShadowReceiverMaterials&#160;<span class='sym_p'><span>(&#160;enum SkinningType const <span class='color_p'>skinningType</span></span>, <span>Ogre::MaterialPtr const&amp; <span class='color_p'>receiver1Weight</span></span>, <span>Ogre::MaterialPtr const&amp; <span class='color_p'>receiver2Weight</span></span>, <span>Ogre::MaterialPtr const&amp; <span class='color_p'>receiver3Weight</span></span>, <span>Ogre::MaterialPtr const&amp; <span class='color_p'>receiver4Weight</span></span>&#160;)</span> <span class='attr'>[static]</span></span><br/>
+<span class='mngl pleft'>_ZN4Ogre8RTShader23HardwareSkinningFactory32setCustomShadowReceiverMaterialsENS0_12SkinningTypeERKNS_9SharedPtrINS_8MaterialEEES7_S7_S7_</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>Method became <b>static</b>.</td>
+<td>No effect.</td>
+</tr>
+<tr>
+<th>2</th>
+<td><b>1st</b> parameter <b>skinningType</b> has been renamed to <b>receiver1Weight</b>.</td>
+<td>No effect.</td>
+</tr>
+<tr>
+<th>3</th>
+<td><b>2nd</b> parameter <b>receiver1Weight</b> has been renamed to <b>receiver2Weight</b>.</td>
+<td>No effect.</td>
+</tr>
+<tr>
+<th>4</th>
+<td><b>3rd</b> parameter <b>receiver2Weight</b> has been renamed to <b>receiver3Weight</b>.</td>
+<td>No effect.</td>
+</tr>
+<tr>
+<th>5</th>
+<td><b>4th</b> parameter <b>receiver3Weight</b> has been renamed to <b>receiver4Weight</b>.</td>
+<td>No effect.</td>
+</tr>
+</table>
+<br/>
+</div>
+<br/>
+<a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='Headers'></a><h2>Header Files <span class='gray'>&nbsp;52&nbsp;</span></h2><hr/>
+<div class='h_list'>
+OgreAny.h<br/>
+OgreAutoParamDataSource.h<br/>
+OgreAxisAlignedBox.h<br/>
+OgreBlendMode.h<br/>
+OgreColourValue.h<br/>
+OgreCommon.h<br/>
+OgreFileSystemLayer.h<br/>
+OgreGpuProgram.h<br/>
+OgreGpuProgramParams.h<br/>
+OgreHardwareBuffer.h<br/>
+OgreLight.h<br/>
+OgreMaterialSerializer.h<br/>
+OgreMath.h<br/>
+OgreMatrix4.h<br/>
+OgreMemoryAllocatorConfig.h<br/>
+OgrePass.h<br/>
+OgrePlatform.h<br/>
+OgrePrerequisites.h<br/>
+OgreRenderObjectListener.h<br/>
+OgreRenderSystemCapabilities.h<br/>
+OgreResourceGroupManager.h<br/>
+OgreSceneManager.h<br/>
+OgreScriptCompiler.h<br/>
+OgreScriptTranslator.h<br/>
+OgreShaderExGBuffer.h<br/>
+OgreShaderExHardwareSkinning.h<br/>
+OgreShaderExIntegratedPSSM3.h<br/>
+OgreShaderExLayeredBlending.h<br/>
+OgreShaderExTriplanarTexturing.h<br/>
+OgreShaderFFPTexturing.h<br/>
+OgreShaderFFPTransform.h<br/>
+OgreShaderFunction.h<br/>
+OgreShaderFunctionAtom.h<br/>
+OgreShaderGenerator.h<br/>
+OgreShaderParameter.h<br/>
+OgreShaderPrerequisites.h<br/>
+OgreShaderProgram.h<br/>
+OgreShaderProgramManager.h<br/>
+OgreShaderProgramProcessor.h<br/>
+OgreShaderProgramSet.h<br/>
+OgreShaderProgramWriter.h<br/>
+OgreShaderProgramWriterManager.h<br/>
+OgreShaderRenderState.h<br/>
+OgreShaderScriptTranslator.h<br/>
+OgreShaderSubRenderState.h<br/>
+OgreSharedPtr.h<br/>
+OgreSingleton.h<br/>
+OgreStringVector.h<br/>
+OgreTechnique.h<br/>
+OgreTextureUnitState.h<br/>
+OgreUserObjectBindings.h<br/>
+OgreVector.h<br/>
+</div>
+<br/><a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='Sources'></a><h2>Source Files <span class='gray'>&nbsp;29&nbsp;</span></h2><hr/>
+<div class='h_list'>
+OgreShaderCookTorranceLighting.cpp<br/>
+OgreShaderExGBuffer.cpp<br/>
+OgreShaderExHardwareSkinning.cpp<br/>
+OgreShaderExIntegratedPSSM3.cpp<br/>
+OgreShaderExLayeredBlending.cpp<br/>
+OgreShaderExNormalMapLighting.cpp<br/>
+OgreShaderExPerPixelLighting.cpp<br/>
+OgreShaderExTriplanarTexturing.cpp<br/>
+OgreShaderExWBOIT.cpp<br/>
+OgreShaderFFPAlphaTest.cpp<br/>
+OgreShaderFFPColour.cpp<br/>
+OgreShaderFFPFog.cpp<br/>
+OgreShaderFFPLighting.cpp<br/>
+OgreShaderFFPTexturing.cpp<br/>
+OgreShaderFFPTransform.cpp<br/>
+OgreShaderFunction.cpp<br/>
+OgreShaderFunctionAtom.cpp<br/>
+OgreShaderGenerator.cpp<br/>
+OgreShaderImageBasedLighting.cpp<br/>
+OgreShaderParameter.cpp<br/>
+OgreShaderProgram.cpp<br/>
+OgreShaderProgramManager.cpp<br/>
+OgreShaderProgramProcessor.cpp<br/>
+OgreShaderProgramSet.cpp<br/>
+OgreShaderProgramWriter.cpp<br/>
+OgreShaderProgramWriterManager.cpp<br/>
+OgreShaderRenderState.cpp<br/>
+OgreShaderScriptTranslator.cpp<br/>
+OgreShaderSubRenderState.cpp<br/>
+</div>
+<br/><a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='Libs'></a><h2>Objects <span class='gray'>&nbsp;1&nbsp;</span></h2><hr/>
+<div class='lib_list'>
+libOgreRTShaderSystem.so.13.6<br/>
+</div>
+<br/><a class='top_ref' href='#Top'>to the top</a><br/>
+</div>
+<br/><br/><br/>
+<hr/>
+<div class='footer' align='right'><i>Generated by <a href='https://github.com/lvc/abi-compliance-checker'>ABI Compliance Checker</a> 2.3 &#160;</i>
+</div>
+<br/>
+
+</body></html>

@@ -1,0 +1,11 @@
+{
+  "Affected": "89.8",
+  "Added": 22,
+  "Removed": 79,
+  "TotalProblems": 32,
+  "Source_Affected": "33.7",
+  "Source_TotalProblems": "28",
+  "Source_ReportPath": "compat_report/ogre/13.6.4/14.0.0/37b13/src_compat_report.html",
+  "Object1": "lib/libOgreMeshLodGenerator.so.13.6",
+  "Object2": "lib/libOgreMeshLodGenerator.so.14.0"
+}

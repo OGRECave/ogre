@@ -1,0 +1,1006 @@
+<!-- verdict:incompatible;affected:12.4;added:0;removed:11;type_problems_high:0;type_problems_medium:8;type_problems_low:4;interface_problems_high:0;interface_problems_medium:0;interface_problems_low:0;changed_constants:0;tool_version:2.3 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta name="keywords" content="libOgreVolume, binary compatibility, API, report" />
+<meta name="description" content="Binary compatibility report for the libOgreVolume object between 13.6.4 and 14.0.0 versions on x86_64" />
+<title>libOgreVolume: 13.6.4 to 14.0.0 binary compatibility report</title>
+<style type="text/css">
+body {
+    font-family:Arial, sans-serif;
+    background-color:White;
+    color:Black;
+}
+hr {
+    color:Black;
+    background-color:Black;
+    height:1px;
+    border:0;
+}
+h1 {
+    margin-bottom:0px;
+    padding-bottom:0px;
+    font-size:1.625em;
+}
+h2 {
+    margin-bottom:0px;
+    padding-bottom:0px;
+    font-size:1.25em;
+    white-space:nowrap;
+}
+span.section {
+    font-weight:bold;
+    cursor:pointer;
+    color:#003E69;
+    white-space:nowrap;
+    margin-left:0.3125em;
+}
+span.new_sign {
+    font-weight:bold;
+    margin-left:1.65em;
+    color:#003E69;
+}
+span.new_sign_lbl {
+    margin-left:3em;
+    font-size:1em;
+    color:Black;
+}
+span:hover.section {
+    color:#336699;
+}
+span.sect_aff {
+    cursor:pointer;
+    padding-left:1.55em;
+    font-size:0.875em;
+    color:#cc3300;
+}
+span.sect_info {
+    cursor:pointer;
+    padding-left:1.55em;
+    font-size:0.875em;
+    color:Black;
+}
+span.ext {
+    font-weight:normal;
+}
+span.h_name {
+    color:#cc3300;
+    font-size:0.875em;
+    font-weight:bold;
+}
+div.h_list, div.lib_list {
+    font-size:0.94em;
+    padding-left:0.4em;
+}
+span.ns {
+    color:#408080;
+    font-size:0.94em;
+}
+span.lib_name {
+    color:Green;
+    font-size:0.875em;
+    font-weight:bold;
+}
+span.iname {
+    font-weight:bold;
+    color:#003E69;
+    margin-left:0.3125em;
+}
+span.iname_b {
+    font-weight:bold;
+}
+span.iname_a {
+    color:#333333;
+    font-weight:bold;
+    font-size:0.94em;
+}
+span.sym_p {
+    font-weight:normal;
+    white-space:normal;
+}
+span.sym_pd {
+    white-space:normal;
+}
+span.sym_p span, span.sym_pd span {
+    white-space:nowrap;
+}
+div.affect {
+    padding-left:1em;
+    padding-bottom:10px;
+    font-size:0.87em;
+    font-style:italic;
+    line-height:0.9em;
+}
+div.affected {
+    padding-left:1.9em;
+    padding-top:10px;
+}
+table.ptable {
+    border-collapse:collapse;
+    border:1px outset black;
+    margin-left:0.95em;
+    margin-top:3px;
+    margin-bottom:3px;
+    width:56.25em;
+}
+table.ptable td {
+    border:1px solid gray;
+    padding:3px;
+    font-size:0.875em;
+    text-align:left;
+    vertical-align:top;
+    max-width:28em;
+    word-wrap:break-word;
+}
+table.ptable th.pn {
+    width:2%;
+}
+table.ptable th.chg {
+    width:47%;
+}
+table.vtable {
+    border-collapse:collapse;
+    border:1px outset black;
+    margin-left:1.9em;
+    margin-top:0.7em;
+}
+table.vtable td {
+    border:1px solid gray;
+    padding:3px;
+    font-size:0.875em;
+    vertical-align:top;
+    max-width:450px;
+    word-wrap:break-word;
+}
+table.ptable th, table.vtable th {
+    background-color:#eeeeee;
+    font-weight:bold;
+    color:#333333;
+    font-family:Verdana, Arial;
+    font-size:0.875em;
+    border:1px solid gray;
+    text-align:center;
+    vertical-align:top;
+    white-space:nowrap;
+    padding:3px;
+}
+table.summary {
+    border-collapse:collapse;
+    border:1px outset black;
+}
+table.summary th {
+    background-color:#eeeeee;
+    font-weight:normal;
+    text-align:left;
+    font-size:0.94em;
+    white-space:nowrap;
+    border:1px inset gray;
+    padding:3px;
+}
+table.summary td {
+    text-align:right;
+    white-space:nowrap;
+    border:1px inset gray;
+    padding:3px 5px 3px 10px;
+}
+span.mngl {
+    padding-left:1em;
+    font-size:0.875em;
+    cursor:text;
+    color:#444444;
+    font-weight:bold;
+}
+span.pleft {
+    padding-left:2.5em;
+}
+span.sym_ver {
+    color:#333333;
+    white-space:nowrap;
+    font-family:"DejaVu Sans Mono", Monospace;
+}
+span.attr {
+    color:#333333;
+    font-weight:normal;
+}
+span.color_p {
+    font-style:italic;
+    color:Brown;
+}
+span.p {
+    font-style:italic;
+}
+span.fp {
+    font-style:italic;
+    background-color:#DCDCDC;
+}
+span.ttype {
+    font-weight:normal;
+}
+span.nowrap {
+    white-space:nowrap;
+}
+span.value {
+    font-weight:bold;
+}
+.passed {
+    background-color:#CCFFCC;
+    font-weight:normal;
+}
+.warning {
+    background-color:#F4F4AF;
+    font-weight:normal;
+}
+.failed {
+    background-color:#FFCCCC;
+    font-weight:normal;
+}
+.new {
+    background-color:#C6DEFF;
+    font-weight:normal;
+}
+.compatible {
+    background-color:#CCFFCC;
+    font-weight:normal;
+}
+.almost_compatible {
+    background-color:#FFDAA3;
+    font-weight:normal;
+}
+.incompatible {
+    background-color:#FFCCCC;
+    font-weight:normal;
+}
+.gray {
+    background-color:#DCDCDC;
+    font-weight:normal;
+}
+.top_ref {
+    font-size:0.69em;
+}
+.footer {
+    font-size:0.75em;
+}
+</style>
+<script type="text/javascript" language="JavaScript">
+<!--
+function showContent(header, id)
+{
+    e = document.getElementById(id);
+    if(e.style.display == 'none')
+    {
+        e.style.display = 'block';
+        e.style.visibility = 'visible';
+        header.innerHTML = header.innerHTML.replace(/\[[^0-9 ]\]/gi,"[&minus;]");
+    }
+    else
+    {
+        e.style.display = 'none';
+        e.style.visibility = 'hidden';
+        header.innerHTML = header.innerHTML.replace(/\[[^0-9 ]\]/gi,"[+]");
+    }
+}
+-->
+</script>
+</head>
+
+<body>
+<div><a name='Top'></a>
+<h1>Binary compatibility report for the <span style='color:Blue;'>libOgreVolume.so</span> object between <span style='color:Red;'>13.6.4</span> and <span style='color:Red;'>14.0.0</span> versions on <span style='color:Blue;'>x86_64</span></h1>
+
+<h2>Test Info</h2><hr/>
+<table class='summary'>
+<tr><th>Module Name</th><td>libOgreVolume</td></tr>
+<tr><th>Version #1</th><td>13.6.4</td></tr>
+<tr><th>Version #2</th><td>14.0.0</td></tr>
+<tr><th>Arch</th><td>x86_64</td></tr>
+<tr><th>GCC Version</th><td>9.4.0</td></tr>
+</table>
+<h2>Test Results</h2><hr/>
+<table class='summary'><tr><th>Total Header Files</th><td><a href='#Headers' style='color:Blue;'>30</a></td></tr>
+<tr><th>Total Source Files</th><td><a href='#Sources' style='color:Blue;'>15</a></td></tr>
+<tr><th>Total Objects</th><td><a href='#Libs' style='color:Blue;'>1</a></td></tr>
+<tr><th>Total Symbols / Types</th><td>209 / 76</td></tr>
+<tr><th>Compatibility</th>
+<td class='almost_compatible'>87.6%</td>
+</tr>
+</table>
+<h2>Problem Summary</h2><hr/>
+<table class='summary'><tr><th></th><th style='text-align:center;'>Severity</th><th style='text-align:center;'>Count</th></tr><tr><th>Added Symbols</th><td>-</td><td>0</td></tr>
+<tr><th>Removed Symbols</th><td>High</td><td class='failed'><a href='#Removed' style='color:Blue;'>11</a></td></tr>
+<tr><th rowspan='3'>Problems with<br/>Data Types</th><td>High</td><td>0</td></tr>
+<tr><td>Medium</td><td class='failed'><a href='#Type_Problems_Medium' style='color:Blue;'>8</a></td></tr>
+<tr><td>Low</td><td class='warning'><a href='#Type_Problems_Low' style='color:Blue;'>4</a></td></tr>
+<tr><th rowspan='3'>Problems with<br/>Symbols</th><td>High</td><td>0</td></tr>
+<tr><td>Medium</td><td>0</td></tr>
+<tr><td>Low</td><td>0</td></tr>
+<tr><th>Problems with<br/>Constants</th><td>Low</td><td>0</td></tr>
+</table>
+
+<a name='Removed'></a><a name='Withdrawn'></a><h2>Removed Symbols <span class='failed'>&nbsp;11&nbsp;</span></h2><hr/>
+<span class='h_name'>OgreVolumeChunk.h</span>, <span class='lib_name'>libOgreVolume.so.13.6</span><br/>
+<span class='ns'>namespace <b>Ogre::Volume</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_1')">
+Chunk::mChunkHandler <span class='attr'>[data]</span></span>
+<br/>
+<div id="c_1" style="display:none;">
+<span class='mngl'>_ZN4Ogre6Volume5Chunk13mChunkHandlerE</span>
+<br/>
+<br/>
+</div>
+
+<br/>
+<span class='h_name'>OgreVolumeChunkHandler.h</span>, <span class='lib_name'>libOgreVolume.so.13.6</span><br/>
+<span class='ns'>namespace <b>Ogre::Volume</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_2')">
+ChunkHandler::ChunkHandler <span class='attr'>[C1]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_2" style="display:none;">
+<span class='mngl'>_ZN4Ogre6Volume12ChunkHandlerC1Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_3')">
+ChunkHandler::ChunkHandler <span class='attr'>[C2]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_3" style="display:none;">
+<span class='mngl'>_ZN4Ogre6Volume12ChunkHandlerC2Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_4')">
+ChunkHandler::handleRequest&#160;<span class='sym_p'><span>(&#160;Ogre::WorkQueue::Request const* <span class='color_p'>req</span></span>, <span>Ogre::WorkQueue const* <span class='color_p'>srcQ</span></span>&#160;)</span></span>
+<br/>
+<div id="c_4" style="display:none;">
+<span class='mngl'>_ZN4Ogre6Volume12ChunkHandler13handleRequestEPKNS_9WorkQueue7RequestEPKS2_</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_5')">
+ChunkHandler::handleResponse&#160;<span class='sym_p'><span>(&#160;struct Ogre::WorkQueue::Response const* <span class='color_p'>res</span></span>, <span>Ogre::WorkQueue const* <span class='color_p'>srcQ</span></span>&#160;)</span></span>
+<br/>
+<div id="c_5" style="display:none;">
+<span class='mngl'>_ZN4Ogre6Volume12ChunkHandler14handleResponseEPKNS_9WorkQueue8ResponseEPKS2_</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_6')">
+ChunkHandler::init&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_6" style="display:none;">
+<span class='mngl'>_ZN4Ogre6Volume12ChunkHandler4initEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_7')">
+ChunkHandler::WORKQUEUE_LOAD_REQUEST <span class='attr'>[data]</span></span>
+<br/>
+<div id="c_7" style="display:none;">
+<span class='mngl'>_ZN4Ogre6Volume12ChunkHandler22WORKQUEUE_LOAD_REQUESTE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_8')">
+ChunkHandler::~ChunkHandler <span class='attr'>[D0]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_8" style="display:none;">
+<span class='mngl'>_ZN4Ogre6Volume12ChunkHandlerD0Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_9')">
+ChunkHandler::~ChunkHandler <span class='attr'>[D1]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_9" style="display:none;">
+<span class='mngl'>_ZN4Ogre6Volume12ChunkHandlerD1Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_10')">
+ChunkHandler::~ChunkHandler <span class='attr'>[D2]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_10" style="display:none;">
+<span class='mngl'>_ZN4Ogre6Volume12ChunkHandlerD2Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_11')">
+vtable for ChunkHandler <span class='attr'>[data]</span></span>
+<br/>
+<div id="c_11" style="display:none;">
+<span class='mngl'>_ZTVN4Ogre6Volume12ChunkHandlerE</span>
+<br/>
+<br/>
+</div>
+
+<br/>
+<a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='Medium_Risk_Problems'></a><a name='Type_Problems_Medium'></a>
+<h2>Problems with Data Types, Medium Severity <span class='failed'>&nbsp;8&nbsp;</span></h2><hr/>
+<span class='h_name'>OgreVertexIndexData.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_12')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> IndexData <span class='failed'>&nbsp;2&nbsp;</span></span>
+<br/>
+<div id="c_12" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Type of field <b>indexStart</b> has been changed from <span class='nowrap'><b>size_t</b> (<b>8</b> bytes)</span> to <span class='nowrap'><b>uint32</b> (<b>4</b> bytes)</span>.</td>
+<td>1) Size of the inclusive type has been changed.<br/>2) Previous accesses of applications and library functions to this field and fields at higher positions of the structure definition may be broken.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>Type of field <b>indexCount</b> has been changed from <span class='nowrap'><b>size_t</b> (<b>8</b> bytes)</span> to <span class='nowrap'><b>uint32</b> (<b>4</b> bytes)</span>.</td>
+<td>1) This field may be incorrectly initialized or accessed by applications.<br/>2) Size of the inclusive type has been changed.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_13')">
+[+] affected symbols: 1 (0.5%)</span>
+<div id="c_13" style="display:none;">
+<div class='affected'><span class='iname_a'>Volume::MeshBuilder::generateBuffers&#160;<span class='sym_p'><span>(&#160;RenderOperation&amp; <span class='fp'>operation</span></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;operation.indexData&#39; in 1st parameter &#39;operation&#39; (reference) has base type &#39;IndexData&#39;.</div>
+</div>
+</div>
+<br/><br/></div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_14')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> VertexData <span class='failed'>&nbsp;5&nbsp;</span></span>
+<br/>
+<div id="c_14" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Type of field <b>vertexStart</b> has been changed from <span class='nowrap'><b>size_t</b> (<b>8</b> bytes)</span> to <span class='nowrap'><b>uint32</b> (<b>4</b> bytes)</span>.</td>
+<td>This field may be incorrectly initialized or accessed by applications.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>Type of field <b>hwAnimDataItemsUsed</b> has been changed from <span class='nowrap'><b>size_t</b> (<b>8</b> bytes)</span> to <span class='nowrap'><b>uint32</b> (<b>4</b> bytes)</span>.</td>
+<td>1) Size of the inclusive type has been changed.<br/>2) Previous accesses of applications and library functions to this field and fields at higher positions of the structure definition may be broken.</td>
+</tr>
+<tr>
+<th>3</th>
+<td>Type of field <b>vertexCount</b> has been changed from <span class='nowrap'><b>size_t</b> (<b>8</b> bytes)</span> to <span class='nowrap'><b>uint32</b> (<b>4</b> bytes)</span>.</td>
+<td>1) Size of the inclusive type has been changed.<br/>2) Previous accesses of applications and library functions to this field and fields at higher positions of the structure definition may be broken.</td>
+</tr>
+<tr>
+<th>4</th>
+<td>The relative position of field <b>hwAnimDataItemsUsed</b> has been changed from <b>7</b> to <b>6</b>.</td>
+<td>1) Applications will access incorrect memory when attempting to access this field.<br/>2) Size of the inclusive type has been changed.</td>
+</tr>
+<tr>
+<th>5</th>
+<td>The relative position of field <b>hwAnimationDataList</b> has been changed from <b>6</b> to <b>7</b>.</td>
+<td>1) Applications will access incorrect memory when attempting to access this field.<br/>2) Size of the inclusive type has been changed.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_15')">
+[+] affected symbols: 1 (0.5%)</span>
+<div id="c_15" style="display:none;">
+<div class='affected'><span class='iname_a'>Volume::MeshBuilder::generateBuffers&#160;<span class='sym_p'><span>(&#160;RenderOperation&amp; <span class='fp'>operation</span></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;operation.vertexData&#39; in 1st parameter &#39;operation&#39; (reference) has base type &#39;VertexData&#39;.</div>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<span class='h_name'>OgreVolumeChunk.h</span><br/>
+<span class='ns'>namespace <b>Ogre::Volume</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_16')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> Chunk <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_16" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>The layout of v-table has been changed for <b>unknown</b> reason.</td>
+<td>Call of any method in this class may result in crash or incorrect behavior of applications.</td>
+</tr>
+</table>
+<span class="sect_info" onclick="javascript:showContent(this, 'c_17')">
+[+] show v-table (old and new)</span>
+<br/>
+<div id="c_17" style="display:none;">
+<table class='vtable'><tr><th>Offset</th><th>Virtual Table (Old) - 89 entries</th><th>Virtual Table (New) - 88 entries</th></tr><tr><th>0</th>
+<td>(int (*)(...)) 0</td>
+<td>(int (*)(...)) 0</td></tr>
+<tr><th>8</th>
+<td>(int (*)(...)) (&amp; typeinfo for Chunk)</td>
+<td>(int (*)(...)) (&amp; typeinfo for Chunk)</td></tr>
+<tr><th>16</th>
+<td>~Chunk</td>
+<td>~Chunk</td></tr>
+<tr><th>24</th>
+<td>~Chunk</td>
+<td>~Chunk</td></tr>
+<tr><th>32</th>
+<td>(int (*)(...)) 0x1a52c</td>
+<td>(int (*)(...)) 0x1aa2c</td></tr>
+<tr><th>40</th>
+<td>(int (*)(...)) 0x1a522</td>
+<td>(int (*)(...)) 0x1aa22</td></tr>
+<tr><th>48</th>
+<td>Ogre::MovableObject::getWorldBoundingBox(bool) const</td>
+<td>Ogre::MovableObject::getWorldBoundingBox(bool) const</td></tr>
+<tr><th>56</th>
+<td>Ogre::MovableObject::getLightCapBounds() const</td>
+<td>Ogre::MovableObject::getLightCapBounds() const</td></tr>
+<tr><th>64</th>
+<td>Ogre::MovableObject::getDarkCapBounds(Ogre::Light const&amp;, float) const</td>
+<td>Ogre::MovableObject::getDarkCapBounds(Ogre::Light const&amp;, float) const</td></tr>
+<tr><th>72</th>
+<td>Ogre::MovableObject::getShadowVolumeRenderableList(Ogre::Light const*, Ogre::SharedPtr&lt;Ogre::HardwareIndexBuffer&gt; const&amp;, unsigned long&amp;, float, int)</td>
+<td>Ogre::MovableObject::getShadowVolumeRenderableList(Ogre::Light const*, Ogre::SharedPtr&lt;Ogre::HardwareIndexBuffer&gt; const&amp;, unsigned long&amp;, float, int)</td></tr>
+<tr><th>80</th>
+<td>Ogre::MovableObject::getPointExtrusionDistance(Ogre::Light const*) const</td>
+<td>Ogre::MovableObject::getPointExtrusionDistance(Ogre::Light const*) const</td></tr>
+<tr><th>88</th>
+<td>Ogre::ShadowCaster::updateEdgeListLightFacing(Ogre::EdgeData*, Ogre::Vector&lt;4, float&gt; const&amp;)</td>
+<td>Ogre::ShadowCaster::updateEdgeListLightFacing(Ogre::EdgeData*, Ogre::Vector&lt;4, float&gt; const&amp;)</td></tr>
+<tr><th>96</th>
+<td>Ogre::ShadowCaster::generateShadowVolume(Ogre::EdgeData*, Ogre::SharedPtr&lt;Ogre::HardwareIndexBuffer&gt; const&amp;, unsigned long&amp;, Ogre::Light const*, std::vector&lt;Ogre::ShadowRenderable*, std::allocator&lt;Ogre::ShadowRenderable*&gt; &gt;&amp;, unsigned long)</td>
+<td>Ogre::ShadowCaster::generateShadowVolume(Ogre::EdgeData*, Ogre::SharedPtr&lt;Ogre::HardwareIndexBuffer&gt; const&amp;, unsigned long&amp;, Ogre::Light const*, std::vector&lt;Ogre::ShadowRenderable*, std::allocator&lt;Ogre::ShadowRenderable*&gt; &gt;&amp;, unsigned long)</td></tr>
+<tr><th>104</th>
+<td>Ogre::ShadowCaster::extrudeBounds(Ogre::AxisAlignedBox&amp;, Ogre::Vector&lt;4, float&gt; const&amp;, float) const</td>
+<td>Ogre::ShadowCaster::extrudeBounds(Ogre::AxisAlignedBox&amp;, Ogre::Vector&lt;4, float&gt; const&amp;, float) const</td></tr>
+<tr><th>112</th>
+<td>(int (*)(...)) 0x1a4f2</td>
+<td>(int (*)(...)) 0x1a9f2</td></tr>
+<tr><th>120</th>
+<td>(int (*)(...)) 0x1a4fc</td>
+<td>(int (*)(...)) 0x1a9fc</td></tr>
+<tr><th>128</th>
+<td>(int (*)(...)) 0x1a506</td>
+<td>(int (*)(...)) 0x1aa06</td></tr>
+<tr><th>136</th>
+<td>(int (*)(...)) 0x1a50c</td>
+<td>(int (*)(...)) 0x1aa0c</td></tr>
+<tr><th>144</th>
+<td>Chunk::getMovableType[abi:cxx11]() const</td>
+<td>Chunk::getMovableType[abi:cxx11]() const</td></tr>
+<tr><th>152</th>
+<td>Ogre::MovableObject::_notifyAttached(Ogre::Node*, bool)</td>
+<td>Ogre::MovableObject::_notifyAttached(Ogre::Node*, bool)</td></tr>
+<tr><th>160</th>
+<td>Ogre::MovableObject::isInScene() const</td>
+<td>Ogre::MovableObject::isInScene() const</td></tr>
+<tr><th>168</th>
+<td>Ogre::MovableObject::_notifyMoved()</td>
+<td>Ogre::MovableObject::_notifyMoved()</td></tr>
+<tr><th>176</th>
+<td>Ogre::SimpleRenderable::_notifyCurrentCamera(Ogre::Camera*)</td>
+<td>Ogre::SimpleRenderable::_notifyCurrentCamera(Ogre::Camera*)</td></tr>
+<tr><th>184</th>
+<td>Ogre::SimpleRenderable::getBoundingBox() const</td>
+<td>Ogre::SimpleRenderable::getBoundingBox() const</td></tr>
+<tr><th>192</th>
+<td>Chunk::getBoundingRadius() const</td>
+<td>Chunk::getBoundingRadius() const</td></tr>
+<tr><th>200</th>
+<td>Ogre::MovableObject::getWorldBoundingSphere(bool) const</td>
+<td>Ogre::MovableObject::getWorldBoundingSphere(bool) const</td></tr>
+<tr><th>208</th>
+<td>Ogre::SimpleRenderable::_updateRenderQueue(Ogre::RenderQueue*)</td>
+<td>Ogre::SimpleRenderable::_updateRenderQueue(Ogre::RenderQueue*)</td></tr>
+<tr><th>216</th>
+<td>Ogre::MovableObject::isVisible() const</td>
+<td>Ogre::MovableObject::isVisible() const</td></tr>
+<tr><th>224</th>
+<td>Ogre::MovableObject::setRenderQueueGroup(unsigned char)</td>
+<td>Ogre::MovableObject::setRenderQueueGroup(unsigned char)</td></tr>
+<tr><th>232</th>
+<td>Ogre::MovableObject::setRenderQueueGroupAndPriority(unsigned char, unsigned short)</td>
+<td>Ogre::MovableObject::setRenderQueueGroupAndPriority(unsigned char, unsigned short)</td></tr>
+<tr><th>240</th>
+<td>Ogre::MovableObject::_getParentNodeFullTransform() const</td>
+<td>Ogre::MovableObject::_getParentNodeFullTransform() const</td></tr>
+<tr><th>248</th>
+<td>(int (*)(...)) 0x1a512</td>
+<td>(int (*)(...)) 0x1aa12</td></tr>
+<tr><th>256</th>
+<td>(int (*)(...)) 0x1a51a</td>
+<td>(int (*)(...)) 0x1aa1a</td></tr>
+<tr><th>264</th>
+<td>Ogre::MovableObject::getTypeFlags() const</td>
+<td>Ogre::MovableObject::getTypeFlags() const</td></tr>
+<tr><th>272</th>
+<td>Ogre::SimpleRenderable::visitRenderables(Ogre::Renderable::Visitor*, bool)</td>
+<td>Ogre::SimpleRenderable::visitRenderables(Ogre::Renderable::Visitor*, bool)</td></tr>
+<tr><th>280</th>
+<td>(int (*)(...)) 0x1a53c</td>
+<td>(int (*)(...)) 0x1aa3c</td></tr>
+<tr><th>288</th>
+<td>Chunk::setMaterial(Ogre::SharedPtr&lt;Ogre::Material&gt; const&amp;)</td>
+<td>Chunk::setMaterial(Ogre::SharedPtr&lt;Ogre::Material&gt; const&amp;)</td></tr>
+<tr><th>296</th>
+<td>Ogre::SimpleRenderable::getMaterial() const</td>
+<td>Ogre::SimpleRenderable::getMaterial() const</td></tr>
+<tr><th>304</th>
+<td>Ogre::SimpleRenderable::setRenderOperation(Ogre::RenderOperation const&amp;)</td>
+<td>Ogre::SimpleRenderable::setRenderOperation(Ogre::RenderOperation const&amp;)</td></tr>
+<tr><th>312</th>
+<td>Ogre::SimpleRenderable::getRenderOperation(Ogre::RenderOperation&amp;)</td>
+<td>Ogre::SimpleRenderable::getRenderOperation(Ogre::RenderOperation&amp;)</td></tr>
+<tr><th>320</th>
+<td>Ogre::SimpleRenderable::getWorldTransforms(Ogre::Matrix4*) const</td>
+<td>Ogre::SimpleRenderable::getWorldTransforms(Ogre::Matrix4*) const</td></tr>
+<tr><th>328</th>
+<td>Ogre::SimpleRenderable::getLights() const</td>
+<td>Ogre::SimpleRenderable::getLights() const</td></tr>
+<tr><th>336</th>
+<td>Chunk::loadChunk(Ogre::SceneNode*, Ogre::Vector&lt;3, float&gt; const&amp;, Ogre::Vector&lt;3, float&gt; const&amp;, Ogre::Vector&lt;3, float&gt; const&amp;, Ogre::Vector&lt;3, float&gt; const&amp;, unsigned long, unsigned long)</td>
+<td>Chunk::loadChunk(Ogre::SceneNode*, Ogre::Vector&lt;3, float&gt; const&amp;, Ogre::Vector&lt;3, float&gt; const&amp;, Ogre::Vector&lt;3, float&gt; const&amp;, Ogre::Vector&lt;3, float&gt; const&amp;, unsigned long, unsigned long)</td></tr>
+<tr><th>344</th>
+<td>Chunk::contributesToVolumeMesh(Ogre::Vector&lt;3, float&gt; const&amp;, Ogre::Vector&lt;3, float&gt; const&amp;) const</td>
+<td>Chunk::contributesToVolumeMesh(Ogre::Vector&lt;3, float&gt; const&amp;, Ogre::Vector&lt;3, float&gt; const&amp;) const</td></tr>
+<tr><th>352</th>
+<td>Chunk::loadChildren(Ogre::SceneNode*, Ogre::Vector&lt;3, float&gt; const&amp;, Ogre::Vector&lt;3, float&gt; const&amp;, Ogre::Vector&lt;3, float&gt; const&amp;, Ogre::Vector&lt;3, float&gt; const&amp;, unsigned long, unsigned long)</td>
+<td>Chunk::loadChildren(Ogre::SceneNode*, Ogre::Vector&lt;3, float&gt; const&amp;, Ogre::Vector&lt;3, float&gt; const&amp;, Ogre::Vector&lt;3, float&gt; const&amp;, Ogre::Vector&lt;3, float&gt; const&amp;, unsigned long, unsigned long)</td></tr>
+<tr><th>360</th>
+<td>Chunk::doLoad(Ogre::SceneNode*, Ogre::Vector&lt;3, float&gt; const&amp;, Ogre::Vector&lt;3, float&gt; const&amp;, Ogre::Vector&lt;3, float&gt; const&amp;, Ogre::Vector&lt;3, float&gt; const&amp;, unsigned long, unsigned long)</td>
+<td>Chunk::doLoad(Ogre::SceneNode*, Ogre::Vector&lt;3, float&gt; const&amp;, Ogre::Vector&lt;3, float&gt; const&amp;, Ogre::Vector&lt;3, float&gt; const&amp;, Ogre::Vector&lt;3, float&gt; const&amp;, unsigned long, unsigned long)</td></tr>
+<tr><th>368</th>
+<td>Chunk::prepareGeometry(unsigned long, OctreeNode*, DualGridGenerator*, MeshBuilder*, Ogre::Vector&lt;3, float&gt; const&amp;, Ogre::Vector&lt;3, float&gt; const&amp;)</td>
+<td>Chunk::prepareGeometry(unsigned long, OctreeNode*, DualGridGenerator*, MeshBuilder*, Ogre::Vector&lt;3, float&gt; const&amp;, Ogre::Vector&lt;3, float&gt; const&amp;)</td></tr>
+<tr><th>376</th>
+<td>Chunk::loadGeometry(MeshBuilder*, DualGridGenerator*, OctreeNode*, unsigned long, bool)</td>
+<td>Chunk::loadGeometry(MeshBuilder*, DualGridGenerator*, OctreeNode*, unsigned long, bool)</td></tr>
+<tr><th>384</th>
+<td>Chunk::getSquaredViewDepth(Ogre::Camera const*) const</td>
+<td>Chunk::getSquaredViewDepth(Ogre::Camera const*) const</td></tr>
+<tr><th>392</th>
+<td>Chunk::load(Ogre::SceneNode*, Ogre::Vector&lt;3, float&gt; const&amp;, Ogre::Vector&lt;3, float&gt; const&amp;, unsigned long, ChunkParameters const*)</td>
+<td>Chunk::load(Ogre::SceneNode*, Ogre::Vector&lt;3, float&gt; const&amp;, Ogre::Vector&lt;3, float&gt; const&amp;, unsigned long, ChunkParameters const*)</td></tr>
+<tr><th>400</th>
+<td>Chunk::load(Ogre::SceneNode*, Ogre::SceneManager*, std::__cxx11::basic_string&lt;char, std::char_traits&lt;char&gt;, std::allocator&lt;char&gt; &gt; const&amp;, bool, MeshBuilderCallback*, std::__cxx11::basic_string&lt;char, std::char_traits&lt;char&gt;, std::allocator&lt;char&gt; &gt; const&amp;)</td>
+<td>Chunk::load(Ogre::SceneNode*, Ogre::SceneManager*, std::__cxx11::basic_string&lt;char, std::char_traits&lt;char&gt;, std::allocator&lt;char&gt; &gt; const&amp;, bool, MeshBuilderCallback*, std::__cxx11::basic_string&lt;char, std::char_traits&lt;char&gt;, std::allocator&lt;char&gt; &gt; const&amp;)</td></tr>
+<tr><th>408</th>
+<td>Chunk::setDualGridVisible(bool)</td>
+<td>Chunk::setDualGridVisible(bool)</td></tr>
+<tr><th>416</th>
+<td>Chunk::getDualGridVisible() const</td>
+<td>Chunk::getDualGridVisible() const</td></tr>
+<tr><th>424</th>
+<td>Chunk::setOctreeVisible(bool)</td>
+<td>Chunk::setOctreeVisible(bool)</td></tr>
+<tr><th>432</th>
+<td>Chunk::getOctreeVisible() const</td>
+<td>Chunk::getOctreeVisible() const</td></tr>
+<tr><th>440</th>
+<td>Chunk::setVolumeVisible(bool)</td>
+<td>Chunk::setVolumeVisible(bool)</td></tr>
+<tr><th>448</th>
+<td>Chunk::getVolumeVisible() const</td>
+<td>Chunk::getVolumeVisible() const</td></tr>
+<tr><th>456</th>
+<td>Chunk::frameStarted(Ogre::FrameEvent const&amp;)</td>
+<td>Chunk::frameStarted(Ogre::FrameEvent const&amp;)</td></tr>
+<tr><th>464</th>
+<td>Chunk::createInstance()</td>
+<td>Chunk::createInstance()</td></tr>
+<tr><th>472</th>
+<td>Chunk::getChunksOfLevel(unsigned long, std::vector&lt;Chunk const*, std::allocator&lt;Chunk const*&gt; &gt;&amp;) const</td>
+<td>Chunk::getChunksOfLevel(unsigned long, std::vector&lt;Chunk const*, std::allocator&lt;Chunk const*&gt; &gt;&amp;) const</td></tr>
+<tr><th>480</th>
+<td>(int (*)(...)) -0x00000000000008</td>
+<td>(int (*)(...)) -0x00000000000008</td></tr>
+<tr><th>488</th>
+<td>(int (*)(...)) (&amp; typeinfo for Chunk)</td>
+<td>(int (*)(...)) (&amp; typeinfo for Chunk)</td></tr>
+<tr><th>496</th>
+<td>(int (*)(...)) 0x1a4e0</td>
+<td>non-virtual thunk to ~Chunk</td></tr>
+<tr><th>504</th>
+<td>(int (*)(...)) 0x1a4ec</td>
+<td>non-virtual thunk to ~Chunk</td></tr>
+<tr><th>512</th>
+<td>non-virtual thunk to ~Chunk</td>
+<td>(int (*)(...)) 0x1b7b2</td></tr>
+<tr><th>520</th>
+<td>non-virtual thunk to ~Chunk</td>
+<td>(int (*)(...)) 0x1ba8e</td></tr>
+<tr><th>528</th>
+<td>(int (*)(...)) 0x1b49e</td>
+<td>(int (*)(...)) -0x000000000000e0</td></tr>
+<tr><th>536</th>
+<td class='failed'>(int (*)(...)) -0x000000000000e8</td>
+<td class='failed'>(int (*)(...)) (&amp; typeinfo for Chunk)</td></tr>
+<tr><th>544</th>
+<td class='failed'>(int (*)(...)) (&amp; typeinfo for Chunk)</td>
+<td class='failed'>non-virtual thunk to ~Chunk</td></tr>
+<tr><th>552</th>
+<td>non-virtual thunk to ~Chunk</td>
+<td>non-virtual thunk to ~Chunk</td></tr>
+<tr><th>560</th>
+<td class='failed'>non-virtual thunk to ~Chunk</td>
+<td class='failed'>non-virtual thunk to Ogre::SimpleRenderable::getMaterial() const</td></tr>
+<tr><th>568</th>
+<td>non-virtual thunk to Ogre::SimpleRenderable::getMaterial() const</td>
+<td>(int (*)(...)) 0x1ab0a</td></tr>
+<tr><th>576</th>
+<td>(int (*)(...)) 0x1a606</td>
+<td>non-virtual thunk to Ogre::SimpleRenderable::getRenderOperation(Ogre::RenderOperation&amp;)</td></tr>
+<tr><th>584</th>
+<td>non-virtual thunk to Ogre::SimpleRenderable::getRenderOperation(Ogre::RenderOperation&amp;)</td>
+<td>(int (*)(...)) 0x1a9d8</td></tr>
+<tr><th>592</th>
+<td>(int (*)(...)) 0x1a4c6</td>
+<td>(int (*)(...)) 0x1a9e2</td></tr>
+<tr><th>600</th>
+<td>(int (*)(...)) 0x1a4d0</td>
+<td>non-virtual thunk to Ogre::SimpleRenderable::getWorldTransforms(Ogre::Matrix4*) const</td></tr>
+<tr><th>608</th>
+<td>non-virtual thunk to Ogre::SimpleRenderable::getWorldTransforms(Ogre::Matrix4*) const</td>
+<td>(int (*)(...)) 0x1a9e8</td></tr>
+<tr><th>616</th>
+<td>(int (*)(...)) 0x1a4d6</td>
+<td>non-virtual thunk to Chunk::getSquaredViewDepth(Ogre::Camera const*) const</td></tr>
+<tr><th>624</th>
+<td class='failed'>non-virtual thunk to Chunk::getSquaredViewDepth(Ogre::Camera const*) const</td>
+<td class='failed'>non-virtual thunk to Ogre::SimpleRenderable::getLights() const</td></tr>
+<tr><th>632</th>
+<td>non-virtual thunk to Ogre::SimpleRenderable::getLights() const</td>
+<td>(int (*)(...)) 0x1aa4f</td></tr>
+<tr><th>640</th>
+<td>(int (*)(...)) 0x1a54f</td>
+<td>Ogre::Renderable::_updateCustomGpuParameter(Ogre::GpuProgramParameters::AutoConstantEntry const&amp;, Ogre::GpuProgramParameters*) const</td></tr>
+<tr><th>648</th>
+<td class='failed'>Ogre::Renderable::_updateCustomGpuParameter(Ogre::GpuProgramParameters::AutoConstantEntry const&amp;, Ogre::GpuProgramParameters*) const</td>
+<td class='failed'>(int (*)(...)) -0x000000000001c0</td></tr>
+<tr><th>656</th>
+<td class='failed'>(int (*)(...)) -0x000000000001d0</td>
+<td class='failed'>(int (*)(...)) (&amp; typeinfo for Chunk)</td></tr>
+<tr><th>664</th>
+<td class='failed'>(int (*)(...)) (&amp; typeinfo for Chunk)</td>
+<td class='failed'>non-virtual thunk to Chunk::frameStarted(Ogre::FrameEvent const&amp;)</td></tr>
+<tr><th>672</th>
+<td>non-virtual thunk to Chunk::frameStarted(Ogre::FrameEvent const&amp;)</td>
+<td>(int (*)(...)) 0x1aa70</td></tr>
+<tr><th>680</th>
+<td>(int (*)(...)) 0x1a570</td>
+<td>(int (*)(...)) 0x1aa7a</td></tr>
+<tr><th>688</th>
+<td>(int (*)(...)) 0x1a57a</td>
+<td>non-virtual thunk to ~Chunk</td></tr>
+<tr><th>696</th>
+<td>non-virtual thunk to ~Chunk</td>
+<td>non-virtual thunk to ~Chunk</td></tr>
+<tr><th>704</th>
+<td class='failed'>non-virtual thunk to ~Chunk</td>
+<td class='failed'></td></tr>
+</table><br/>
+</div>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_18')">
+[+] affected symbols: 27 (12.9%)</span>
+<div id="c_18" style="display:none;">
+<div class='affected'><span class='iname_a'>Chunk::setMaterial&#160;<span class='sym_p'><span>(&#160;Ogre::MaterialPtr const&amp; <i>mat</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Chunk&#39; class.</div>
+<span class='iname_a'>Chunk::frameStarted&#160;<span class='sym_p'><span>(&#160;struct Ogre::FrameEvent const&amp; <i>evt</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Chunk&#39; class.</div>
+<span class='iname_a'>Chunk::loadChildren&#160;<span class='sym_p'><span>(&#160;Ogre::SceneNode* <i>parent</i></span>, <span>Ogre::Vector3 const&amp; <i>from</i></span>, <span>Ogre::Vector3 const&amp; <i>to</i></span>, <span>Ogre::Vector3 const&amp; <i>totalFrom</i></span>, <span>Ogre::Vector3 const&amp; <i>totalTo</i></span>, <span>size_t const <i>level</i></span>, <span>size_t const <i>maxLevels</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Chunk&#39; class.</div>
+<span class='iname_a'>Chunk::loadGeometry&#160;<span class='sym_p'><span>(&#160;MeshBuilder* <i>meshBuilder</i></span>, <span>DualGridGenerator* <i>dualGridGenerator</i></span>, <span>OctreeNode* <i>root</i></span>, <span>size_t <i>level</i></span>, <span>bool <i>isUpdate</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Chunk&#39; class.</div>
+<span class='iname_a'>Chunk::mChunkHandler <span class='attr'>[data]</span></span><br/>
+<div class='affect'>This method is from &#39;Chunk&#39; class.</div>
+<span class='iname_a'>Chunk::createInstance&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Chunk&#39; class.</div>
+<span class='iname_a'>Chunk::prepareGeometry&#160;<span class='sym_p'><span>(&#160;size_t <i>level</i></span>, <span>OctreeNode* <i>root</i></span>, <span>DualGridGenerator* <i>dualGridGenerator</i></span>, <span>MeshBuilder* <i>meshBuilder</i></span>, <span>Ogre::Vector3 const&amp; <i>totalFrom</i></span>, <span>Ogre::Vector3 const&amp; <i>totalTo</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Chunk&#39; class.</div>
+<span class='iname_a'>Chunk::setOctreeVisible&#160;<span class='sym_p'><span>(&#160;bool const <i>visible</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Chunk&#39; class.</div>
+<span class='iname_a'>Chunk::setVolumeVisible&#160;<span class='sym_p'><span>(&#160;bool <i>visible</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Chunk&#39; class.</div>
+<span class='iname_a'>Chunk::MOVABLE_TYPE_NAME <span class='attr'>[data]</span></span><br/>
+<div class='affect'>This method is from &#39;Chunk&#39; class.</div>
+ <b>...</b>
+<br/>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='Low_Risk_Problems'></a><a name='Type_Problems_Low'></a>
+<h2>Problems with Data Types, Low Severity <span class='warning'>&nbsp;4&nbsp;</span></h2><hr/>
+<span class='h_name'>OgreRenderOperation.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_19')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> RenderOperation <span class='warning'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_19" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Field <b>useGlobalInstancingVertexBufferIsAvailable</b> has been renamed to <b>useGlobalInstancing</b>.</td>
+<td>Renaming of a field in data type may indicate a change in the semantic meaning of the field.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_20')">
+[+] affected symbols: 1 (0.5%)</span>
+<div id="c_20" style="display:none;">
+<div class='affected'><span class='iname_a'>Volume::MeshBuilder::generateBuffers&#160;<span class='sym_p'><span>(&#160;RenderOperation&amp; <span class='fp'>operation</span></span>&#160;)</span></span><br/>
+<div class='affect'>1st parameter &#39;operation&#39; (reference) has base type &#39;RenderOperation&#39;.</div>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<span class='h_name'>OgreVertexIndexData.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_21')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> IndexData <span class='warning'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_21" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Size of this type has been changed from <b>32</b> bytes to <b>24</b> bytes.</td>
+<td>The fields or parameters of such data type may be incorrectly initialized or accessed by old client applications.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_22')">
+[+] affected symbols: 1 (0.5%)</span>
+<div id="c_22" style="display:none;">
+<div class='affected'><span class='iname_a'>Volume::MeshBuilder::generateBuffers&#160;<span class='sym_p'><span>(&#160;RenderOperation&amp; <span class='fp'>operation</span></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;operation.indexData&#39; in 1st parameter &#39;operation&#39; (reference) has base type &#39;IndexData&#39;.</div>
+</div>
+</div>
+<br/><br/></div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_23')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> VertexData <span class='warning'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_23" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Size of this type has been changed from <b>96</b> bytes to <b>80</b> bytes.</td>
+<td>The fields or parameters of such data type may be incorrectly initialized or accessed by old client applications.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_24')">
+[+] affected symbols: 1 (0.5%)</span>
+<div id="c_24" style="display:none;">
+<div class='affected'><span class='iname_a'>Volume::MeshBuilder::generateBuffers&#160;<span class='sym_p'><span>(&#160;RenderOperation&amp; <span class='fp'>operation</span></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;operation.vertexData&#39; in 1st parameter &#39;operation&#39; (reference) has base type &#39;VertexData&#39;.</div>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<span class='h_name'>OgreVolumeChunk.h</span><br/>
+<span class='ns'>namespace <b>Ogre::Volume</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_25')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> Chunk <span class='warning'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_25" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Size of this type has been changed from <b>528</b> bytes to <b>512</b> bytes.</td>
+<td>The fields or parameters of such data type may be incorrectly initialized or accessed by old client applications.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_26')">
+[+] affected symbols: 25 (12%)</span>
+<div id="c_26" style="display:none;">
+<div class='affected'><span class='iname_a'>Chunk::setMaterial&#160;<span class='sym_p'><span>(&#160;Ogre::MaterialPtr const&amp; <i>mat</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Chunk&#39; class.</div>
+<span class='iname_a'>Chunk::frameStarted&#160;<span class='sym_p'><span>(&#160;struct Ogre::FrameEvent const&amp; <i>evt</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Chunk&#39; class.</div>
+<span class='iname_a'>Chunk::loadChildren&#160;<span class='sym_p'><span>(&#160;Ogre::SceneNode* <i>parent</i></span>, <span>Ogre::Vector3 const&amp; <i>from</i></span>, <span>Ogre::Vector3 const&amp; <i>to</i></span>, <span>Ogre::Vector3 const&amp; <i>totalFrom</i></span>, <span>Ogre::Vector3 const&amp; <i>totalTo</i></span>, <span>size_t const <i>level</i></span>, <span>size_t const <i>maxLevels</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Chunk&#39; class.</div>
+<span class='iname_a'>Chunk::loadGeometry&#160;<span class='sym_p'><span>(&#160;MeshBuilder* <i>meshBuilder</i></span>, <span>DualGridGenerator* <i>dualGridGenerator</i></span>, <span>OctreeNode* <i>root</i></span>, <span>size_t <i>level</i></span>, <span>bool <i>isUpdate</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Chunk&#39; class.</div>
+<span class='iname_a'>Chunk::createInstance&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>Return value (pointer) has base type &#39;Chunk&#39;.</div>
+<span class='iname_a'>Chunk::prepareGeometry&#160;<span class='sym_p'><span>(&#160;size_t <i>level</i></span>, <span>OctreeNode* <i>root</i></span>, <span>DualGridGenerator* <i>dualGridGenerator</i></span>, <span>MeshBuilder* <i>meshBuilder</i></span>, <span>Ogre::Vector3 const&amp; <i>totalFrom</i></span>, <span>Ogre::Vector3 const&amp; <i>totalTo</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Chunk&#39; class.</div>
+<span class='iname_a'>Chunk::setOctreeVisible&#160;<span class='sym_p'><span>(&#160;bool const <i>visible</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Chunk&#39; class.</div>
+<span class='iname_a'>Chunk::setVolumeVisible&#160;<span class='sym_p'><span>(&#160;bool <i>visible</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Chunk&#39; class.</div>
+<span class='iname_a'>Chunk::getChunkParameters&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Chunk&#39; class.</div>
+<span class='iname_a'>Chunk::setDualGridVisible&#160;<span class='sym_p'><span>(&#160;bool const <i>visible</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Chunk&#39; class.</div>
+ <b>...</b>
+<br/>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='Headers'></a><h2>Header Files <span class='gray'>&nbsp;30&nbsp;</span></h2><hr/>
+<div class='h_list'>
+OgreAny.h<br/>
+OgreAxisAlignedBox.h<br/>
+OgreFrameListener.h<br/>
+OgreHardwareVertexBuffer.h<br/>
+OgreMemoryAllocatorConfig.h<br/>
+OgrePlatform.h<br/>
+OgrePrerequisites.h<br/>
+OgreRay.h<br/>
+OgreRenderable.h<br/>
+OgreRenderOperation.h<br/>
+OgreSharedPtr.h<br/>
+OgreSimpleRenderable.h<br/>
+OgreVector.h<br/>
+OgreVertexIndexData.h<br/>
+OgreVolumeCacheSource.h<br/>
+OgreVolumeChunk.h<br/>
+OgreVolumeChunkHandler.h<br/>
+OgreVolumeCSGSource.h<br/>
+OgreVolumeDualGridGenerator.h<br/>
+OgreVolumeGridSource.h<br/>
+OgreVolumeHalfFloatGridSource.h<br/>
+OgreVolumeIsoSurface.h<br/>
+OgreVolumeIsoSurfaceMC.h<br/>
+OgreVolumeMeshBuilder.h<br/>
+OgreVolumeOctreeNode.h<br/>
+OgreVolumeOctreeNodeSplitPolicy.h<br/>
+OgreVolumeSimplexNoise.h<br/>
+OgreVolumeSource.h<br/>
+OgreVolumeTextureSource.h<br/>
+OgreWorkQueue.h<br/>
+</div>
+<br/><a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='Sources'></a><h2>Source Files <span class='gray'>&nbsp;15&nbsp;</span></h2><hr/>
+<div class='h_list'>
+OgreVolumeCacheSource.cpp<br/>
+OgreVolumeChunk.cpp<br/>
+OgreVolumeChunkHandler.cpp<br/>
+OgreVolumeCSGSource.cpp<br/>
+OgreVolumeDualGridGenerator.cpp<br/>
+OgreVolumeGridSource.cpp<br/>
+OgreVolumeHalfFloatGridSource.cpp<br/>
+OgreVolumeIsoSurface.cpp<br/>
+OgreVolumeIsoSurfaceMC.cpp<br/>
+OgreVolumeMeshBuilder.cpp<br/>
+OgreVolumeOctreeNode.cpp<br/>
+OgreVolumeOctreeNodeSplitPolicy.cpp<br/>
+OgreVolumeSimplexNoise.cpp<br/>
+OgreVolumeSource.cpp<br/>
+OgreVolumeTextureSource.cpp<br/>
+</div>
+<br/><a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='Libs'></a><h2>Objects <span class='gray'>&nbsp;1&nbsp;</span></h2><hr/>
+<div class='lib_list'>
+libOgreVolume.so.13.6<br/>
+</div>
+<br/><a class='top_ref' href='#Top'>to the top</a><br/>
+</div>
+<br/><br/><br/>
+<hr/>
+<div class='footer' align='right'><i>Generated by <a href='https://github.com/lvc/abi-compliance-checker'>ABI Compliance Checker</a> 2.3 &#160;</i>
+</div>
+<br/>
+
+</body></html>

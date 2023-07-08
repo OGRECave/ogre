@@ -1,0 +1,1641 @@
+<!-- verdict:incompatible;affected:47.1;added:0;removed:10;type_problems_high:1;type_problems_medium:58;type_problems_low:6;interface_problems_high:10;interface_problems_medium:0;interface_problems_low:0;changed_constants:0;tool_version:2.3 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta name="keywords" content="libOgrePaging, source compatibility, API, report" />
+<meta name="description" content="Source compatibility report for the libOgrePaging object between 1.12.13 and 14.0.0 versions" />
+<title>libOgrePaging: 1.12.13 to 14.0.0 source compatibility report</title>
+<style type="text/css">
+body {
+    font-family:Arial, sans-serif;
+    background-color:White;
+    color:Black;
+}
+hr {
+    color:Black;
+    background-color:Black;
+    height:1px;
+    border:0;
+}
+h1 {
+    margin-bottom:0px;
+    padding-bottom:0px;
+    font-size:1.625em;
+}
+h2 {
+    margin-bottom:0px;
+    padding-bottom:0px;
+    font-size:1.25em;
+    white-space:nowrap;
+}
+span.section {
+    font-weight:bold;
+    cursor:pointer;
+    color:#003E69;
+    white-space:nowrap;
+    margin-left:0.3125em;
+}
+span.new_sign {
+    font-weight:bold;
+    margin-left:1.65em;
+    color:#003E69;
+}
+span.new_sign_lbl {
+    margin-left:3em;
+    font-size:1em;
+    color:Black;
+}
+span:hover.section {
+    color:#336699;
+}
+span.sect_aff {
+    cursor:pointer;
+    padding-left:1.55em;
+    font-size:0.875em;
+    color:#cc3300;
+}
+span.sect_info {
+    cursor:pointer;
+    padding-left:1.55em;
+    font-size:0.875em;
+    color:Black;
+}
+span.ext {
+    font-weight:normal;
+}
+span.h_name {
+    color:#cc3300;
+    font-size:0.875em;
+    font-weight:bold;
+}
+div.h_list, div.lib_list {
+    font-size:0.94em;
+    padding-left:0.4em;
+}
+span.ns {
+    color:#408080;
+    font-size:0.94em;
+}
+span.lib_name {
+    color:Green;
+    font-size:0.875em;
+    font-weight:bold;
+}
+span.iname {
+    font-weight:bold;
+    color:#003E69;
+    margin-left:0.3125em;
+}
+span.iname_b {
+    font-weight:bold;
+}
+span.iname_a {
+    color:#333333;
+    font-weight:bold;
+    font-size:0.94em;
+}
+span.sym_p {
+    font-weight:normal;
+    white-space:normal;
+}
+span.sym_pd {
+    white-space:normal;
+}
+span.sym_p span, span.sym_pd span {
+    white-space:nowrap;
+}
+div.affect {
+    padding-left:1em;
+    padding-bottom:10px;
+    font-size:0.87em;
+    font-style:italic;
+    line-height:0.9em;
+}
+div.affected {
+    padding-left:1.9em;
+    padding-top:10px;
+}
+table.ptable {
+    border-collapse:collapse;
+    border:1px outset black;
+    margin-left:0.95em;
+    margin-top:3px;
+    margin-bottom:3px;
+    width:56.25em;
+}
+table.ptable td {
+    border:1px solid gray;
+    padding:3px;
+    font-size:0.875em;
+    text-align:left;
+    vertical-align:top;
+    max-width:28em;
+    word-wrap:break-word;
+}
+table.ptable th.pn {
+    width:2%;
+}
+table.ptable th.chg {
+    width:47%;
+}
+table.vtable {
+    border-collapse:collapse;
+    border:1px outset black;
+    margin-left:1.9em;
+    margin-top:0.7em;
+}
+table.vtable td {
+    border:1px solid gray;
+    padding:3px;
+    font-size:0.875em;
+    vertical-align:top;
+    max-width:450px;
+    word-wrap:break-word;
+}
+table.ptable th, table.vtable th {
+    background-color:#eeeeee;
+    font-weight:bold;
+    color:#333333;
+    font-family:Verdana, Arial;
+    font-size:0.875em;
+    border:1px solid gray;
+    text-align:center;
+    vertical-align:top;
+    white-space:nowrap;
+    padding:3px;
+}
+table.summary {
+    border-collapse:collapse;
+    border:1px outset black;
+}
+table.summary th {
+    background-color:#eeeeee;
+    font-weight:normal;
+    text-align:left;
+    font-size:0.94em;
+    white-space:nowrap;
+    border:1px inset gray;
+    padding:3px;
+}
+table.summary td {
+    text-align:right;
+    white-space:nowrap;
+    border:1px inset gray;
+    padding:3px 5px 3px 10px;
+}
+span.mngl {
+    padding-left:1em;
+    font-size:0.875em;
+    cursor:text;
+    color:#444444;
+    font-weight:bold;
+}
+span.pleft {
+    padding-left:2.5em;
+}
+span.sym_ver {
+    color:#333333;
+    white-space:nowrap;
+    font-family:"DejaVu Sans Mono", Monospace;
+}
+span.attr {
+    color:#333333;
+    font-weight:normal;
+}
+span.color_p {
+    font-style:italic;
+    color:Brown;
+}
+span.p {
+    font-style:italic;
+}
+span.fp {
+    font-style:italic;
+    background-color:#DCDCDC;
+}
+span.ttype {
+    font-weight:normal;
+}
+span.nowrap {
+    white-space:nowrap;
+}
+span.value {
+    font-weight:bold;
+}
+.passed {
+    background-color:#CCFFCC;
+    font-weight:normal;
+}
+.warning {
+    background-color:#F4F4AF;
+    font-weight:normal;
+}
+.failed {
+    background-color:#FFCCCC;
+    font-weight:normal;
+}
+.new {
+    background-color:#C6DEFF;
+    font-weight:normal;
+}
+.compatible {
+    background-color:#CCFFCC;
+    font-weight:normal;
+}
+.almost_compatible {
+    background-color:#FFDAA3;
+    font-weight:normal;
+}
+.incompatible {
+    background-color:#FFCCCC;
+    font-weight:normal;
+}
+.gray {
+    background-color:#DCDCDC;
+    font-weight:normal;
+}
+.top_ref {
+    font-size:0.69em;
+}
+.footer {
+    font-size:0.75em;
+}
+</style>
+<script type="text/javascript" language="JavaScript">
+<!--
+function showContent(header, id)
+{
+    e = document.getElementById(id);
+    if(e.style.display == 'none')
+    {
+        e.style.display = 'block';
+        e.style.visibility = 'visible';
+        header.innerHTML = header.innerHTML.replace(/\[[^0-9 ]\]/gi,"[&minus;]");
+    }
+    else
+    {
+        e.style.display = 'none';
+        e.style.visibility = 'hidden';
+        header.innerHTML = header.innerHTML.replace(/\[[^0-9 ]\]/gi,"[+]");
+    }
+}
+-->
+</script>
+</head>
+
+<body>
+<div><a name='Top'></a>
+<h1>Source compatibility report for the <span style='color:Blue;'>libOgrePaging.so</span> object between <span style='color:Red;'>1.12.13</span> and <span style='color:Red;'>14.0.0</span> versions</h1>
+
+<h2>Test Info</h2><hr/>
+<table class='summary'>
+<tr><th>Module Name</th><td>libOgrePaging</td></tr>
+<tr><th>Version #1</th><td>1.12.13</td></tr>
+<tr><th>Version #2</th><td>14.0.0</td></tr>
+<tr><th>Arch</th><td>x86_64</td></tr>
+</table>
+<h2>Test Results</h2><hr/>
+<table class='summary'><tr><th>Total Header Files</th><td><a href='#Headers' style='color:Blue;'>25</a></td></tr>
+<tr><th>Total Source Files</th><td><a href='#Sources' style='color:Blue;'>9</a></td></tr>
+<tr><th>Total Objects</th><td><a href='#Libs' style='color:Blue;'>1</a></td></tr>
+<tr><th>Total Symbols / Types</th><td>349 / 77</td></tr>
+<tr><th>Compatibility</th>
+<td class='incompatible'>52.9%</td>
+</tr>
+</table>
+<h2>Problem Summary</h2><hr/>
+<table class='summary'><tr><th></th><th style='text-align:center;'>Severity</th><th style='text-align:center;'>Count</th></tr><tr><th>Added Symbols</th><td>-</td><td>0</td></tr>
+<tr><th>Removed Symbols</th><td>High</td><td class='failed'><a href='#Removed' style='color:Blue;'>10</a></td></tr>
+<tr><th rowspan='3'>Problems with<br/>Data Types</th><td>High</td><td class='failed'><a href='#Type_Problems_High' style='color:Blue;'>1</a></td></tr>
+<tr><td>Medium</td><td class='failed'><a href='#Type_Problems_Medium' style='color:Blue;'>58</a></td></tr>
+<tr><td>Low</td><td class='warning'><a href='#Type_Problems_Low' style='color:Blue;'>6</a></td></tr>
+<tr><th rowspan='3'>Problems with<br/>Symbols</th><td>High</td><td class='failed'><a href='#Symbol_Problems_High' style='color:Blue;'>10</a></td></tr>
+<tr><td>Medium</td><td>0</td></tr>
+<tr><td>Low</td><td>0</td></tr>
+<tr><th>Problems with<br/>Constants</th><td>Low</td><td>0</td></tr>
+</table>
+
+<a name='Removed'></a><a name='Withdrawn'></a><h2>Removed Symbols <span class='failed'>&nbsp;10&nbsp;</span></h2><hr/>
+<span class='h_name'>OgrePage.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_46')">
+Page::canHandleRequest&#160;<span class='sym_p'><span>(&#160;WorkQueue::Request const* <span class='color_p'>req</span></span>, <span>WorkQueue const* <span class='color_p'>srcQ</span></span>&#160;)</span></span>
+<br/>
+<div id="c_46" style="display:none;">
+<span class='mngl'>_ZN4Ogre4Page16canHandleRequestEPKNS_9WorkQueue7RequestEPKS1_</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_47')">
+Page::canHandleResponse&#160;<span class='sym_p'><span>(&#160;struct WorkQueue::Response const* <span class='color_p'>res</span></span>, <span>WorkQueue const* <span class='color_p'>srcQ</span></span>&#160;)</span></span>
+<br/>
+<div id="c_47" style="display:none;">
+<span class='mngl'>_ZN4Ogre4Page17canHandleResponseEPKNS_9WorkQueue8ResponseEPKS1_</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_48')">
+Page::WORKQUEUE_CHANGECOLLECTION_REQUEST <span class='attr'>[data]</span></span>
+<br/>
+<div id="c_48" style="display:none;">
+<span class='mngl'>_ZN4Ogre4Page34WORKQUEUE_CHANGECOLLECTION_REQUESTE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_49')">
+Page::WORKQUEUE_PREPARE_REQUEST <span class='attr'>[data]</span></span>
+<br/>
+<div id="c_49" style="display:none;">
+<span class='mngl'>_ZN4Ogre4Page25WORKQUEUE_PREPARE_REQUESTE</span>
+<br/>
+<br/>
+</div>
+
+<br/>
+<span class='h_name'>OgreWorkQueue.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_50')">
+WorkQueue::RequestHandler::~RequestHandler <span class='attr'>[D0]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_50" style="display:none;">
+<span class='mngl'>_ZN4Ogre9WorkQueue14RequestHandlerD0Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_51')">
+WorkQueue::RequestHandler::~RequestHandler <span class='attr'>[D1]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_51" style="display:none;">
+<span class='mngl'>_ZN4Ogre9WorkQueue14RequestHandlerD1Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_52')">
+WorkQueue::RequestHandler::~RequestHandler <span class='attr'>[D2]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_52" style="display:none;">
+<span class='mngl'>_ZN4Ogre9WorkQueue14RequestHandlerD2Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_53')">
+WorkQueue::ResponseHandler::~ResponseHandler <span class='attr'>[D0]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_53" style="display:none;">
+<span class='mngl'>_ZN4Ogre9WorkQueue15ResponseHandlerD0Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_54')">
+WorkQueue::ResponseHandler::~ResponseHandler <span class='attr'>[D1]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_54" style="display:none;">
+<span class='mngl'>_ZN4Ogre9WorkQueue15ResponseHandlerD1Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_55')">
+WorkQueue::ResponseHandler::~ResponseHandler <span class='attr'>[D2]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_55" style="display:none;">
+<span class='mngl'>_ZN4Ogre9WorkQueue15ResponseHandlerD2Ev</span>
+<br/>
+<br/>
+</div>
+
+<br/>
+<a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='High_Risk_Problems'></a><a name='Type_Problems_High'></a>
+<h2>Problems with Data Types, High Severity <span class='failed'>&nbsp;1&nbsp;</span></h2><hr/>
+<span class='h_name'>OgrePage.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_56')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> Page <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_56" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Field <b>mWorkQueueChannel</b> has been removed from this type.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>Page</b>' has no member named '<b>mWorkQueueChannel</b>'.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_57')">
+[+] affected symbols: 59 (16.9%)</span>
+<div id="c_57" style="display:none;">
+<div class='affected'><span class='iname_a'>PagedWorld::_loadProceduralPage&#160;<span class='sym_p'><span>(&#160;Page* <span class='fp'>page</span></span>, <span>PagedWorldSection* <i>section</i></span>&#160;)</span></span><br/>
+<div class='affect'>1st parameter &#39;page&#39; (pointer) has base type &#39;Page&#39;.</div>
+<span class='iname_a'>PagedWorld::_unloadProceduralPage&#160;<span class='sym_p'><span>(&#160;Page* <span class='fp'>page</span></span>, <span>PagedWorldSection* <i>section</i></span>&#160;)</span></span><br/>
+<div class='affect'>1st parameter &#39;page&#39; (pointer) has base type &#39;Page&#39;.</div>
+<span class='iname_a'>PagedWorld::_prepareProceduralPage&#160;<span class='sym_p'><span>(&#160;Page* <span class='fp'>page</span></span>, <span>PagedWorldSection* <i>section</i></span>&#160;)</span></span><br/>
+<div class='affect'>1st parameter &#39;page&#39; (pointer) has base type &#39;Page&#39;.</div>
+<span class='iname_a'>PagedWorld::_unprepareProceduralPage&#160;<span class='sym_p'><span>(&#160;Page* <span class='fp'>page</span></span>, <span>PagedWorldSection* <i>section</i></span>&#160;)</span></span><br/>
+<div class='affect'>1st parameter &#39;page&#39; (pointer) has base type &#39;Page&#39;.</div>
+<span class='iname_a'>PageContent::_notifyAttached&#160;<span class='sym_p'><span>(&#160;PageContentCollection* <span class='fp'>parent</span></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;parent.mParent&#39; in 1st parameter &#39;parent&#39; (pointer) has base type &#39;Page&#39;.</div>
+<span class='iname_a'>PageContent::PageContent&#160;<span class='sym_p'><span>(&#160;PageContentFactory* <i>creator</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mParent.mParent&#39; in the object of this method has base type &#39;Page&#39;.</div>
+<span class='iname_a'>PageContent::~PageContent&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mParent.mParent&#39; in the object of this method has base type &#39;Page&#39;.</div>
+<span class='iname_a'>PageManager::createContent&#160;<span class='sym_p'><span>(&#160;String const&amp; <i>typeName</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;retval.mParent.mParent&#39; in the return value (pointer) has base type &#39;Page&#39;.</div>
+<span class='iname_a'>PageManager::destroyContent&#160;<span class='sym_p'><span>(&#160;PageContent* <span class='fp'>c</span></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;c.mParent.mParent&#39; in 1st parameter &#39;c&#39; (pointer) has base type &#39;Page&#39;.</div>
+<span class='iname_a'>PageManager::_loadProceduralPage&#160;<span class='sym_p'><span>(&#160;Page* <span class='fp'>page</span></span>, <span>PagedWorldSection* <i>section</i></span>&#160;)</span></span><br/>
+<div class='affect'>1st parameter &#39;page&#39; (pointer) has base type &#39;Page&#39;.</div>
+ <b>...</b>
+<br/>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='Symbol_Problems_High'></a><a name='Interface_Problems_High'></a>
+<h2>Problems with Symbols, High Severity <span class='failed'>&nbsp;10&nbsp;</span></h2><hr/>
+<span class='h_name'>OgreGrid2DPageStrategy.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_58')">
+<span class='ext'>[+]</span> Grid2DPageStrategyData::updateDerivedMetrics&#160;<span class='sym_p'>(&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_58" style="display:none;">
+
+<span class='mngl pleft'>_ZN4Ogre22Grid2DPageStrategyData20updateDerivedMetricsEv</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>This method became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>_ZN4Ogre22Grid2DPageStrategyData20updateDerivedMetricsEv</b>' is private.</td>
+</tr>
+</table>
+<br/>
+</div>
+<br/>
+<span class='h_name'>OgrePage.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_59')">
+<span class='ext'>[+]</span> Page::generateFilename&#160;<span class='sym_p'>(&#160;)</span> const <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_59" style="display:none;">
+
+<span class='mngl pleft'>_ZNK4Ogre4Page16generateFilenameB5cxx11Ev</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>This method became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>_ZNK4Ogre4Page16generateFilenameB5cxx11Ev</b>' is private.</td>
+</tr>
+</table>
+<br/>
+</div>
+<span class="section" onclick="javascript:showContent(this, 'c_60')">
+<span class='ext'>[+]</span> Page::handleRequest&#160;<span class='sym_p'><span>(&#160;WorkQueue::Request const* <span class='color_p'>req</span></span>, <span>WorkQueue const* <span class='color_p'>srcQ</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_60" style="display:none;">
+
+<span class='mngl pleft'>_ZN4Ogre4Page13handleRequestEPKNS_9WorkQueue7RequestEPKS1_</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>This method became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>_ZN4Ogre4Page13handleRequestEPKNS_9WorkQueue7RequestEPKS1_</b>' is private.</td>
+</tr>
+</table>
+<br/>
+</div>
+<span class="section" onclick="javascript:showContent(this, 'c_61')">
+<span class='ext'>[+]</span> Page::handleResponse&#160;<span class='sym_p'><span>(&#160;struct WorkQueue::Response const* <span class='color_p'>res</span></span>, <span>WorkQueue const* <span class='color_p'>srcQ</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_61" style="display:none;">
+
+<span class='mngl pleft'>_ZN4Ogre4Page14handleResponseEPKNS_9WorkQueue8ResponseEPKS1_</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>This method became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>_ZN4Ogre4Page14handleResponseEPKNS_9WorkQueue8ResponseEPKS1_</b>' is private.</td>
+</tr>
+</table>
+<br/>
+</div>
+<span class="section" onclick="javascript:showContent(this, 'c_62')">
+<span class='ext'>[+]</span> Page::loadImpl&#160;<span class='sym_p'>(&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_62" style="display:none;">
+
+<span class='mngl pleft'>_ZN4Ogre4Page8loadImplEv</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>This method became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>_ZN4Ogre4Page8loadImplEv</b>' is private.</td>
+</tr>
+</table>
+<br/>
+</div>
+<span class="section" onclick="javascript:showContent(this, 'c_63')">
+<span class='ext'>[+]</span> Page::prepareImpl&#160;<span class='sym_p'><span>(&#160;StreamSerialiser&amp; <span class='color_p'>stream</span></span>, <span>struct Page::PageData* <span class='color_p'>dataToPopulate</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_63" style="display:none;">
+
+<span class='mngl pleft'>_ZN4Ogre4Page11prepareImplERNS_16StreamSerialiserEPNS0_8PageDataE</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>This method became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>_ZN4Ogre4Page11prepareImplERNS_16StreamSerialiserEPNS0_8PageDataE</b>' is private.</td>
+</tr>
+</table>
+<br/>
+</div>
+<span class="section" onclick="javascript:showContent(this, 'c_64')">
+<span class='ext'>[+]</span> Page::prepareImpl&#160;<span class='sym_p'><span>(&#160;struct Page::PageData* <span class='color_p'>dataToPopulate</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_64" style="display:none;">
+
+<span class='mngl pleft'>_ZN4Ogre4Page11prepareImplEPNS0_8PageDataE</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>This method became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>_ZN4Ogre4Page11prepareImplEPNS0_8PageDataE</b>' is private.</td>
+</tr>
+</table>
+<br/>
+</div>
+<span class="section" onclick="javascript:showContent(this, 'c_65')">
+<span class='ext'>[+]</span> Page::updateDebugDisplay&#160;<span class='sym_p'>(&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_65" style="display:none;">
+
+<span class='mngl pleft'>_ZN4Ogre4Page18updateDebugDisplayEv</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>This method became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>_ZN4Ogre4Page18updateDebugDisplayEv</b>' is private.</td>
+</tr>
+</table>
+<br/>
+</div>
+<br/>
+<span class='h_name'>OgrePageManager.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_66')">
+<span class='ext'>[+]</span> PageManager::createStandardContentFactories&#160;<span class='sym_p'>(&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_66" style="display:none;">
+
+<span class='mngl pleft'>_ZN4Ogre11PageManager30createStandardContentFactoriesEv</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>This method became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>_ZN4Ogre11PageManager30createStandardContentFactoriesEv</b>' is private.</td>
+</tr>
+</table>
+<br/>
+</div>
+<span class="section" onclick="javascript:showContent(this, 'c_67')">
+<span class='ext'>[+]</span> PageManager::createStandardStrategies&#160;<span class='sym_p'>(&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_67" style="display:none;">
+
+<span class='mngl pleft'>_ZN4Ogre11PageManager24createStandardStrategiesEv</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>This method became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>_ZN4Ogre11PageManager24createStandardStrategiesEv</b>' is private.</td>
+</tr>
+</table>
+<br/>
+</div>
+<br/>
+<a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='Medium_Risk_Problems'></a><a name='Type_Problems_Medium'></a>
+<h2>Problems with Data Types, Medium Severity <span class='failed'>&nbsp;58&nbsp;</span></h2><hr/>
+<span class='h_name'>OgreAxisAlignedBox.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_68')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> AxisAlignedBox <span class='failed'>&nbsp;3&nbsp;</span></span>
+<br/>
+<div id="c_68" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Field <b>mExtent</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>AxisAlignedBox</b>::<b>mExtent</b>' is private.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>Field <b>mMaximum</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>AxisAlignedBox</b>::<b>mMaximum</b>' is private.</td>
+</tr>
+<tr>
+<th>3</th>
+<td>Field <b>mMinimum</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>AxisAlignedBox</b>::<b>mMinimum</b>' is private.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_69')">
+[+] affected symbols: 98 (28.1%)</span>
+<div id="c_69" style="display:none;">
+<div class='affected'><span class='iname_a'>PagedWorld::getSection&#160;<span class='sym_p'><span>(&#160;String const&amp; <i>name</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;retval.mAABB&#39; in the return value (pointer) is of type &#39;AxisAlignedBox&#39;.</div>
+<span class='iname_a'>PagedWorld::createSection&#160;<span class='sym_p'><span>(&#160;PageStrategy* <i>strategy</i></span>, <span>SceneManager* <i>sceneMgr</i></span>, <span>String const&amp; <i>sectionName</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;retval.mAABB&#39; in the return value (pointer) is of type &#39;AxisAlignedBox&#39;.</div>
+<span class='iname_a'>PagedWorld::createSection&#160;<span class='sym_p'><span>(&#160;SceneManager* <i>sceneMgr</i></span>, <span>String const&amp; <i>typeName</i></span>, <span>String const&amp; <i>sectionName</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;retval.mAABB&#39; in the return value (pointer) is of type &#39;AxisAlignedBox&#39;.</div>
+<span class='iname_a'>PagedWorld::createSection&#160;<span class='sym_p'><span>(&#160;String const&amp; <i>strategyName</i></span>, <span>SceneManager* <i>sceneMgr</i></span>, <span>String const&amp; <i>sectionName</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;retval.mAABB&#39; in the return value (pointer) is of type &#39;AxisAlignedBox&#39;.</div>
+<span class='iname_a'>PagedWorld::destroySection&#160;<span class='sym_p'><span>(&#160;PagedWorldSection* <span class='fp'>sec</span></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;sec.mAABB&#39; in 1st parameter &#39;sec&#39; (pointer) is of type &#39;AxisAlignedBox&#39;.</div>
+<span class='iname_a'>PagedWorld::_readPageStream&#160;<span class='sym_p'><span>(&#160;PageID <i>pageID</i></span>, <span>PagedWorldSection* <span class='fp'>section</span></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;section.mAABB&#39; in 2nd parameter &#39;section&#39; (pointer) is of type &#39;AxisAlignedBox&#39;.</div>
+<span class='iname_a'>PagedWorld::_writePageStream&#160;<span class='sym_p'><span>(&#160;PageID <i>pageID</i></span>, <span>PagedWorldSection* <span class='fp'>section</span></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;section.mAABB&#39; in 2nd parameter &#39;section&#39; (pointer) is of type &#39;AxisAlignedBox&#39;.</div>
+<span class='iname_a'>PagedWorld::_loadProceduralPage&#160;<span class='sym_p'><span>(&#160;Page* <span class='fp'>page</span></span>, <span>PagedWorldSection* <i>section</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;page.mParent.mAABB&#39; in 1st parameter &#39;page&#39; (pointer) is of type &#39;AxisAlignedBox&#39;.</div>
+<span class='iname_a'>PagedWorld::_unloadProceduralPage&#160;<span class='sym_p'><span>(&#160;Page* <span class='fp'>page</span></span>, <span>PagedWorldSection* <i>section</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;page.mParent.mAABB&#39; in 1st parameter &#39;page&#39; (pointer) is of type &#39;AxisAlignedBox&#39;.</div>
+<span class='iname_a'>PagedWorld::_prepareProceduralPage&#160;<span class='sym_p'><span>(&#160;Page* <span class='fp'>page</span></span>, <span>PagedWorldSection* <i>section</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;page.mParent.mAABB&#39; in 1st parameter &#39;page&#39; (pointer) is of type &#39;AxisAlignedBox&#39;.</div>
+ <b>...</b>
+<br/>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<span class='h_name'>OgreGrid2DPageStrategy.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_70')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> Grid2DPageStrategyData <span class='failed'>&nbsp;12&nbsp;</span></span>
+<br/>
+<div id="c_70" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Field <b>mCellSize</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>Grid2DPageStrategyData</b>::<b>mCellSize</b>' is private.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>Field <b>mHoldRadius</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>Grid2DPageStrategyData</b>::<b>mHoldRadius</b>' is private.</td>
+</tr>
+<tr>
+<th>3</th>
+<td>Field <b>mHoldRadiusInCells</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>Grid2DPageStrategyData</b>::<b>mHoldRadiusInCells</b>' is private.</td>
+</tr>
+<tr>
+<th>4</th>
+<td>Field <b>mLoadRadius</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>Grid2DPageStrategyData</b>::<b>mLoadRadius</b>' is private.</td>
+</tr>
+<tr>
+<th>5</th>
+<td>Field <b>mLoadRadiusInCells</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>Grid2DPageStrategyData</b>::<b>mLoadRadiusInCells</b>' is private.</td>
+</tr>
+<tr>
+<th>6</th>
+<td>Field <b>mMaxCellX</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>Grid2DPageStrategyData</b>::<b>mMaxCellX</b>' is private.</td>
+</tr>
+<tr>
+<th>7</th>
+<td>Field <b>mMaxCellY</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>Grid2DPageStrategyData</b>::<b>mMaxCellY</b>' is private.</td>
+</tr>
+<tr>
+<th>8</th>
+<td>Field <b>mMinCellX</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>Grid2DPageStrategyData</b>::<b>mMinCellX</b>' is private.</td>
+</tr>
+<tr>
+<th>9</th>
+<td>Field <b>mMinCellY</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>Grid2DPageStrategyData</b>::<b>mMinCellY</b>' is private.</td>
+</tr>
+<tr>
+<th>10</th>
+<td>Field <b>mMode</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>Grid2DPageStrategyData</b>::<b>mMode</b>' is private.</td>
+</tr>
+<tr>
+<th>11</th>
+<td>Field <b>mOrigin</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>Grid2DPageStrategyData</b>::<b>mOrigin</b>' is private.</td>
+</tr>
+<tr>
+<th>12</th>
+<td>Field <b>mWorldOrigin</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>Grid2DPageStrategyData</b>::<b>mWorldOrigin</b>' is private.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_71')">
+[+] affected symbols: 23 (6.6%)</span>
+<div id="c_71" style="display:none;">
+<div class='affected'><span class='iname_a'>Grid2DPageStrategyData::setCellSize&#160;<span class='sym_p'><span>(&#160;Real <i>sz</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Grid2DPageStrategyData&#39; class.</div>
+<span class='iname_a'>Grid2DPageStrategyData::setCellRange&#160;<span class='sym_p'><span>(&#160;int32 <i>minX</i></span>, <span>int32 <i>minY</i></span>, <span>int32 <i>maxX</i></span>, <span>int32 <i>maxY</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Grid2DPageStrategyData&#39; class.</div>
+<span class='iname_a'>Grid2DPageStrategyData::calculateCell&#160;<span class='sym_p'><span>(&#160;PageID <i>inPageID</i></span>, <span>int32* <i>x</i></span>, <span>int32* <i>y</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Grid2DPageStrategyData&#39; class.</div>
+<span class='iname_a'>Grid2DPageStrategyData::setHoldRadius&#160;<span class='sym_p'><span>(&#160;Real <i>sz</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Grid2DPageStrategyData&#39; class.</div>
+<span class='iname_a'>Grid2DPageStrategyData::setLoadRadius&#160;<span class='sym_p'><span>(&#160;Real <i>sz</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Grid2DPageStrategyData&#39; class.</div>
+<span class='iname_a'>Grid2DPageStrategyData::calculatePageID&#160;<span class='sym_p'><span>(&#160;int32 <i>x</i></span>, <span>int32 <i>y</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Grid2DPageStrategyData&#39; class.</div>
+<span class='iname_a'>Grid2DPageStrategyData::setCellRangeMaxX&#160;<span class='sym_p'><span>(&#160;int32 <i>maxX</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Grid2DPageStrategyData&#39; class.</div>
+<span class='iname_a'>Grid2DPageStrategyData::setCellRangeMaxY&#160;<span class='sym_p'><span>(&#160;int32 <i>maxY</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Grid2DPageStrategyData&#39; class.</div>
+<span class='iname_a'>Grid2DPageStrategyData::setCellRangeMinX&#160;<span class='sym_p'><span>(&#160;int32 <i>minX</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Grid2DPageStrategyData&#39; class.</div>
+<span class='iname_a'>Grid2DPageStrategyData::setCellRangeMinY&#160;<span class='sym_p'><span>(&#160;int32 <i>minY</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Grid2DPageStrategyData&#39; class.</div>
+ <b>...</b>
+<br/>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<span class='h_name'>OgreGrid3DPageStrategy.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_72')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> Grid3DPageStrategyData <span class='failed'>&nbsp;11&nbsp;</span></span>
+<br/>
+<div id="c_72" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Field <b>mCellSize</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>Grid3DPageStrategyData</b>::<b>mCellSize</b>' is private.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>Field <b>mHoldRadius</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>Grid3DPageStrategyData</b>::<b>mHoldRadius</b>' is private.</td>
+</tr>
+<tr>
+<th>3</th>
+<td>Field <b>mLoadRadius</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>Grid3DPageStrategyData</b>::<b>mLoadRadius</b>' is private.</td>
+</tr>
+<tr>
+<th>4</th>
+<td>Field <b>mMaxCellX</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>Grid3DPageStrategyData</b>::<b>mMaxCellX</b>' is private.</td>
+</tr>
+<tr>
+<th>5</th>
+<td>Field <b>mMaxCellY</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>Grid3DPageStrategyData</b>::<b>mMaxCellY</b>' is private.</td>
+</tr>
+<tr>
+<th>6</th>
+<td>Field <b>mMaxCellZ</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>Grid3DPageStrategyData</b>::<b>mMaxCellZ</b>' is private.</td>
+</tr>
+<tr>
+<th>7</th>
+<td>Field <b>mMinCellX</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>Grid3DPageStrategyData</b>::<b>mMinCellX</b>' is private.</td>
+</tr>
+<tr>
+<th>8</th>
+<td>Field <b>mMinCellY</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>Grid3DPageStrategyData</b>::<b>mMinCellY</b>' is private.</td>
+</tr>
+<tr>
+<th>9</th>
+<td>Field <b>mMinCellZ</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>Grid3DPageStrategyData</b>::<b>mMinCellZ</b>' is private.</td>
+</tr>
+<tr>
+<th>10</th>
+<td>Field <b>mOrigin</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>Grid3DPageStrategyData</b>::<b>mOrigin</b>' is private.</td>
+</tr>
+<tr>
+<th>11</th>
+<td>Field <b>mWorldOrigin</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>Grid3DPageStrategyData</b>::<b>mWorldOrigin</b>' is private.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_73')">
+[+] affected symbols: 21 (6%)</span>
+<div id="c_73" style="display:none;">
+<div class='affected'><span class='iname_a'>Grid3DPageStrategyData::setCellSize&#160;<span class='sym_p'><span>(&#160;Vector3 const&amp; <i>sz</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Grid3DPageStrategyData&#39; class.</div>
+<span class='iname_a'>Grid3DPageStrategyData::setCellRange&#160;<span class='sym_p'><span>(&#160;int32 <i>minX</i></span>, <span>int32 <i>minY</i></span>, <span>int32 <i>minZ</i></span>, <span>int32 <i>maxX</i></span>, <span>int32 <i>maxY</i></span>, <span>int32 <i>maxZ</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Grid3DPageStrategyData&#39; class.</div>
+<span class='iname_a'>Grid3DPageStrategyData::calculateCell&#160;<span class='sym_p'><span>(&#160;PageID <i>inPageID</i></span>, <span>int32* <i>x</i></span>, <span>int32* <i>y</i></span>, <span>int32* <i>z</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Grid3DPageStrategyData&#39; class.</div>
+<span class='iname_a'>Grid3DPageStrategyData::setHoldRadius&#160;<span class='sym_p'><span>(&#160;Real <i>sz</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Grid3DPageStrategyData&#39; class.</div>
+<span class='iname_a'>Grid3DPageStrategyData::setLoadRadius&#160;<span class='sym_p'><span>(&#160;Real <i>sz</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Grid3DPageStrategyData&#39; class.</div>
+<span class='iname_a'>Grid3DPageStrategyData::calculatePageID&#160;<span class='sym_p'><span>(&#160;int32 <i>x</i></span>, <span>int32 <i>y</i></span>, <span>int32 <i>z</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Grid3DPageStrategyData&#39; class.</div>
+<span class='iname_a'>Grid3DPageStrategyData::setCellRangeMaxX&#160;<span class='sym_p'><span>(&#160;int32 <i>maxX</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Grid3DPageStrategyData&#39; class.</div>
+<span class='iname_a'>Grid3DPageStrategyData::setCellRangeMaxY&#160;<span class='sym_p'><span>(&#160;int32 <i>maxY</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Grid3DPageStrategyData&#39; class.</div>
+<span class='iname_a'>Grid3DPageStrategyData::setCellRangeMaxZ&#160;<span class='sym_p'><span>(&#160;int32 <i>maxZ</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Grid3DPageStrategyData&#39; class.</div>
+<span class='iname_a'>Grid3DPageStrategyData::setCellRangeMinX&#160;<span class='sym_p'><span>(&#160;int32 <i>minX</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Grid3DPageStrategyData&#39; class.</div>
+ <b>...</b>
+<br/>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<span class='h_name'>OgreNameGenerator.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_74')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> NameGenerator <span class='failed'>&nbsp;2&nbsp;</span></span>
+<br/>
+<div id="c_74" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Field <b>mNext</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>NameGenerator</b>::<b>mNext</b>' is private.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>Field <b>mPrefix</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>NameGenerator</b>::<b>mPrefix</b>' is private.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_75')">
+[+] affected symbols: 145 (41.5%)</span>
+<div id="c_75" style="display:none;">
+<div class='affected'><span class='iname_a'>PagedWorld::frameStart&#160;<span class='sym_p'><span>(&#160;Real <i>t</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mManager.mWorldNameGenerator&#39; in the object of this method is of type &#39;NameGenerator&#39;.</div>
+<span class='iname_a'>PagedWorld::getSection&#160;<span class='sym_p'><span>(&#160;String const&amp; <i>name</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;retval.mParent.mSectionNameGenerator&#39; in the return value (pointer) is of type &#39;NameGenerator&#39;.</div>
+<span class='iname_a'>PagedWorld::notifyCamera&#160;<span class='sym_p'><span>(&#160;Camera* <i>cam</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mManager.mWorldNameGenerator&#39; in the object of this method is of type &#39;NameGenerator&#39;.</div>
+<span class='iname_a'>PagedWorld::createSection&#160;<span class='sym_p'><span>(&#160;PageStrategy* <span class='fp'>strategy</span></span>, <span>SceneManager* <i>sceneMgr</i></span>, <span>String const&amp; <i>sectionName</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;strategy.mManager.mWorldNameGenerator&#39; in 1st parameter &#39;strategy&#39; (pointer) is of type &#39;NameGenerator&#39;.</div>
+<span class='iname_a'>PagedWorld::createSection&#160;<span class='sym_p'><span>(&#160;SceneManager* <i>sceneMgr</i></span>, <span>String const&amp; <i>typeName</i></span>, <span>String const&amp; <i>sectionName</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;retval.mParent.mSectionNameGenerator&#39; in the return value (pointer) is of type &#39;NameGenerator&#39;.</div>
+<span class='iname_a'>PagedWorld::createSection&#160;<span class='sym_p'><span>(&#160;String const&amp; <i>strategyName</i></span>, <span>SceneManager* <i>sceneMgr</i></span>, <span>String const&amp; <i>sectionName</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;retval.mParent.mSectionNameGenerator&#39; in the return value (pointer) is of type &#39;NameGenerator&#39;.</div>
+<span class='iname_a'>PagedWorld::destroySection&#160;<span class='sym_p'><span>(&#160;PagedWorldSection* <span class='fp'>sec</span></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;sec.mParent.mSectionNameGenerator&#39; in 1st parameter &#39;sec&#39; (pointer) is of type &#39;NameGenerator&#39;.</div>
+<span class='iname_a'>PagedWorld::destroySection&#160;<span class='sym_p'><span>(&#160;String const&amp; <i>name</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mManager.mWorldNameGenerator&#39; in the object of this method is of type &#39;NameGenerator&#39;.</div>
+<span class='iname_a'>PagedWorld::_readPageStream&#160;<span class='sym_p'><span>(&#160;PageID <i>pageID</i></span>, <span>PagedWorldSection* <span class='fp'>section</span></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;section.mParent.mSectionNameGenerator&#39; in 2nd parameter &#39;section&#39; (pointer) is of type &#39;NameGenerator&#39;.</div>
+<span class='iname_a'>PagedWorld::_writePageStream&#160;<span class='sym_p'><span>(&#160;PageID <i>pageID</i></span>, <span>PagedWorldSection* <span class='fp'>section</span></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;section.mParent.mSectionNameGenerator&#39; in 2nd parameter &#39;section&#39; (pointer) is of type &#39;NameGenerator&#39;.</div>
+ <b>...</b>
+<br/>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<span class='h_name'>OgrePage.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_76')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> Page <span class='failed'>&nbsp;7&nbsp;</span></span>
+<br/>
+<div id="c_76" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Field <b>mContentCollections</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>Page</b>::<b>mContentCollections</b>' is private.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>Field <b>mDebugNode</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>Page</b>::<b>mDebugNode</b>' is private.</td>
+</tr>
+<tr>
+<th>3</th>
+<td>Field <b>mDeferredProcessInProgress</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>Page</b>::<b>mDeferredProcessInProgress</b>' is private.</td>
+</tr>
+<tr>
+<th>4</th>
+<td>Field <b>mFrameLastHeld</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>Page</b>::<b>mFrameLastHeld</b>' is private.</td>
+</tr>
+<tr>
+<th>5</th>
+<td>Field <b>mID</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>Page</b>::<b>mID</b>' is private.</td>
+</tr>
+<tr>
+<th>6</th>
+<td>Field <b>mModified</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>Page</b>::<b>mModified</b>' is private.</td>
+</tr>
+<tr>
+<th>7</th>
+<td>Field <b>mParent</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>Page</b>::<b>mParent</b>' is private.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_77')">
+[+] affected symbols: 59 (16.9%)</span>
+<div id="c_77" style="display:none;">
+<div class='affected'><span class='iname_a'>PagedWorld::_loadProceduralPage&#160;<span class='sym_p'><span>(&#160;Page* <span class='fp'>page</span></span>, <span>PagedWorldSection* <i>section</i></span>&#160;)</span></span><br/>
+<div class='affect'>1st parameter &#39;page&#39; (pointer) has base type &#39;Page&#39;.</div>
+<span class='iname_a'>PagedWorld::_unloadProceduralPage&#160;<span class='sym_p'><span>(&#160;Page* <span class='fp'>page</span></span>, <span>PagedWorldSection* <i>section</i></span>&#160;)</span></span><br/>
+<div class='affect'>1st parameter &#39;page&#39; (pointer) has base type &#39;Page&#39;.</div>
+<span class='iname_a'>PagedWorld::_prepareProceduralPage&#160;<span class='sym_p'><span>(&#160;Page* <span class='fp'>page</span></span>, <span>PagedWorldSection* <i>section</i></span>&#160;)</span></span><br/>
+<div class='affect'>1st parameter &#39;page&#39; (pointer) has base type &#39;Page&#39;.</div>
+<span class='iname_a'>PagedWorld::_unprepareProceduralPage&#160;<span class='sym_p'><span>(&#160;Page* <span class='fp'>page</span></span>, <span>PagedWorldSection* <i>section</i></span>&#160;)</span></span><br/>
+<div class='affect'>1st parameter &#39;page&#39; (pointer) has base type &#39;Page&#39;.</div>
+<span class='iname_a'>PageContent::_notifyAttached&#160;<span class='sym_p'><span>(&#160;PageContentCollection* <span class='fp'>parent</span></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;parent.mParent&#39; in 1st parameter &#39;parent&#39; (pointer) has base type &#39;Page&#39;.</div>
+<span class='iname_a'>PageContent::PageContent&#160;<span class='sym_p'><span>(&#160;PageContentFactory* <i>creator</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mParent.mParent&#39; in the object of this method has base type &#39;Page&#39;.</div>
+<span class='iname_a'>PageContent::~PageContent&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mParent.mParent&#39; in the object of this method has base type &#39;Page&#39;.</div>
+<span class='iname_a'>PageManager::createContent&#160;<span class='sym_p'><span>(&#160;String const&amp; <i>typeName</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;retval.mParent.mParent&#39; in the return value (pointer) has base type &#39;Page&#39;.</div>
+<span class='iname_a'>PageManager::destroyContent&#160;<span class='sym_p'><span>(&#160;PageContent* <span class='fp'>c</span></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;c.mParent.mParent&#39; in 1st parameter &#39;c&#39; (pointer) has base type &#39;Page&#39;.</div>
+<span class='iname_a'>PageManager::_loadProceduralPage&#160;<span class='sym_p'><span>(&#160;Page* <span class='fp'>page</span></span>, <span>PagedWorldSection* <i>section</i></span>&#160;)</span></span><br/>
+<div class='affect'>1st parameter &#39;page&#39; (pointer) has base type &#39;Page&#39;.</div>
+ <b>...</b>
+<br/>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<span class='h_name'>OgrePageContentCollection.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_78')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> PageContentCollection <span class='failed'>&nbsp;2&nbsp;</span></span>
+<br/>
+<div id="c_78" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Field <b>mCreator</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>PageContentCollection</b>::<b>mCreator</b>' is private.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>Field <b>mParent</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>PageContentCollection</b>::<b>mParent</b>' is private.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_79')">
+[+] affected symbols: 17 (4.9%)</span>
+<div id="c_79" style="display:none;">
+<div class='affected'><span class='iname_a'>PageContent::_notifyAttached&#160;<span class='sym_p'><span>(&#160;PageContentCollection* <span class='fp'>parent</span></span>&#160;)</span></span><br/>
+<div class='affect'>1st parameter &#39;parent&#39; (pointer) has base type &#39;PageContentCollection&#39;.</div>
+<span class='iname_a'>PageContent::PageContent&#160;<span class='sym_p'><span>(&#160;PageContentFactory* <i>creator</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mParent&#39; in the object of this method has base type &#39;PageContentCollection&#39;.</div>
+<span class='iname_a'>PageContent::~PageContent&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mParent&#39; in the object of this method has base type &#39;PageContentCollection&#39;.</div>
+<span class='iname_a'>PageManager::createContent&#160;<span class='sym_p'><span>(&#160;String const&amp; <i>typeName</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;retval.mParent&#39; in the return value (pointer) has base type &#39;PageContentCollection&#39;.</div>
+<span class='iname_a'>PageManager::destroyContent&#160;<span class='sym_p'><span>(&#160;PageContent* <span class='fp'>c</span></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;c.mParent&#39; in 1st parameter &#39;c&#39; (pointer) has base type &#39;PageContentCollection&#39;.</div>
+<span class='iname_a'>PageContentCollection::_notifyAttached&#160;<span class='sym_p'><span>(&#160;Page* <i>parent</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;PageContentCollection&#39; class.</div>
+<span class='iname_a'>PageContentCollection::PageContentCollection&#160;<span class='sym_p'><span>(&#160;PageContentCollectionFactory* <i>creator</i></span>&#160;)</span></span><br/>
+<div class='affect'>This constructor is from &#39;PageContentCollection&#39; class.</div>
+<span class='iname_a'>PageContentCollection::~PageContentCollection&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This destructor is from &#39;PageContentCollection&#39; class.</div>
+<span class='iname_a'>SimplePageContentCollection::createContent&#160;<span class='sym_p'><span>(&#160;String const&amp; <i>typeName</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;retval.mParent&#39; in the return value (pointer) has base type &#39;PageContentCollection&#39;.</div>
+<span class='iname_a'>SimplePageContentCollection::destroyContent&#160;<span class='sym_p'><span>(&#160;PageContent* <span class='fp'>c</span></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;c.mParent&#39; in 1st parameter &#39;c&#39; (pointer) has base type &#39;PageContentCollection&#39;.</div>
+ <b>...</b>
+<br/>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<span class='h_name'>OgrePagedWorld.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_80')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> PagedWorld <span class='failed'>&nbsp;5&nbsp;</span></span>
+<br/>
+<div id="c_80" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Field <b>mManager</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>PagedWorld</b>::<b>mManager</b>' is private.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>Field <b>mName</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>PagedWorld</b>::<b>mName</b>' is private.</td>
+</tr>
+<tr>
+<th>3</th>
+<td>Field <b>mPageProvider</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>PagedWorld</b>::<b>mPageProvider</b>' is private.</td>
+</tr>
+<tr>
+<th>4</th>
+<td>Field <b>mSectionNameGenerator</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>PagedWorld</b>::<b>mSectionNameGenerator</b>' is private.</td>
+</tr>
+<tr>
+<th>5</th>
+<td>Field <b>mSections</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>PagedWorld</b>::<b>mSections</b>' is private.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_81')">
+[+] affected symbols: 113 (32.4%)</span>
+<div id="c_81" style="display:none;">
+<div class='affected'><span class='iname_a'>PagedWorld::frameStart&#160;<span class='sym_p'><span>(&#160;Real <i>t</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;PagedWorld&#39; class.</div>
+<span class='iname_a'>PagedWorld::getSection&#160;<span class='sym_p'><span>(&#160;String const&amp; <i>name</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;retval.mParent&#39; in the return value (pointer) has base type &#39;PagedWorld&#39;.</div>
+<span class='iname_a'>PagedWorld::notifyCamera&#160;<span class='sym_p'><span>(&#160;Camera* <i>cam</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;PagedWorld&#39; class.</div>
+<span class='iname_a'>PagedWorld::createSection&#160;<span class='sym_p'><span>(&#160;PageStrategy* <i>strategy</i></span>, <span>SceneManager* <i>sceneMgr</i></span>, <span>String const&amp; <i>sectionName</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;retval.mParent&#39; in the return value (pointer) has base type &#39;PagedWorld&#39;.</div>
+<span class='iname_a'>PagedWorld::createSection&#160;<span class='sym_p'><span>(&#160;SceneManager* <i>sceneMgr</i></span>, <span>String const&amp; <i>typeName</i></span>, <span>String const&amp; <i>sectionName</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;retval.mParent&#39; in the return value (pointer) has base type &#39;PagedWorld&#39;.</div>
+<span class='iname_a'>PagedWorld::createSection&#160;<span class='sym_p'><span>(&#160;String const&amp; <i>strategyName</i></span>, <span>SceneManager* <i>sceneMgr</i></span>, <span>String const&amp; <i>sectionName</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;retval.mParent&#39; in the return value (pointer) has base type &#39;PagedWorld&#39;.</div>
+<span class='iname_a'>PagedWorld::destroySection&#160;<span class='sym_p'><span>(&#160;PagedWorldSection* <span class='fp'>sec</span></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;sec.mParent&#39; in 1st parameter &#39;sec&#39; (pointer) has base type &#39;PagedWorld&#39;.</div>
+<span class='iname_a'>PagedWorld::destroySection&#160;<span class='sym_p'><span>(&#160;String const&amp; <i>name</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;PagedWorld&#39; class.</div>
+<span class='iname_a'>PagedWorld::_readPageStream&#160;<span class='sym_p'><span>(&#160;PageID <i>pageID</i></span>, <span>PagedWorldSection* <span class='fp'>section</span></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;section.mParent&#39; in 2nd parameter &#39;section&#39; (pointer) has base type &#39;PagedWorld&#39;.</div>
+<span class='iname_a'>PagedWorld::_writePageStream&#160;<span class='sym_p'><span>(&#160;PageID <i>pageID</i></span>, <span>PagedWorldSection* <span class='fp'>section</span></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;section.mParent&#39; in 2nd parameter &#39;section&#39; (pointer) has base type &#39;PagedWorld&#39;.</div>
+ <b>...</b>
+<br/>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<span class='h_name'>OgrePageManager.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_82')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> PageManager <span class='failed'>&nbsp;15&nbsp;</span></span>
+<br/>
+<div id="c_82" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Field <b>mCameraList</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>PageManager</b>::<b>mCameraList</b>' is private.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>Field <b>mContentCollectionFactories</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>PageManager</b>::<b>mContentCollectionFactories</b>' is private.</td>
+</tr>
+<tr>
+<th>3</th>
+<td>Field <b>mContentFactories</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>PageManager</b>::<b>mContentFactories</b>' is private.</td>
+</tr>
+<tr>
+<th>4</th>
+<td>Field <b>mDebugDisplayLvl</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>PageManager</b>::<b>mDebugDisplayLvl</b>' is private.</td>
+</tr>
+<tr>
+<th>5</th>
+<td>Field <b>mEventRouter</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>PageManager</b>::<b>mEventRouter</b>' is private.</td>
+</tr>
+<tr>
+<th>6</th>
+<td>Field <b>mGrid2DPageStrategy</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>PageManager</b>::<b>mGrid2DPageStrategy</b>' is private.</td>
+</tr>
+<tr>
+<th>7</th>
+<td>Field <b>mGrid3DPageStrategy</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>PageManager</b>::<b>mGrid3DPageStrategy</b>' is private.</td>
+</tr>
+<tr>
+<th>8</th>
+<td>Field <b>mPageProvider</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>PageManager</b>::<b>mPageProvider</b>' is private.</td>
+</tr>
+<tr>
+<th>9</th>
+<td>Field <b>mPageResourceGroup</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>PageManager</b>::<b>mPageResourceGroup</b>' is private.</td>
+</tr>
+<tr>
+<th>10</th>
+<td>Field <b>mPagingEnabled</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>PageManager</b>::<b>mPagingEnabled</b>' is private.</td>
+</tr>
+<tr>
+<th>11</th>
+<td>Field <b>mSimpleCollectionFactory</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>PageManager</b>::<b>mSimpleCollectionFactory</b>' is private.</td>
+</tr>
+<tr>
+<th>12</th>
+<td>Field <b>mStrategies</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>PageManager</b>::<b>mStrategies</b>' is private.</td>
+</tr>
+<tr>
+<th>13</th>
+<td>Field <b>mWorldNameGenerator</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>PageManager</b>::<b>mWorldNameGenerator</b>' is private.</td>
+</tr>
+<tr>
+<th>14</th>
+<td>Field <b>mWorldSectionFactories</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>PageManager</b>::<b>mWorldSectionFactories</b>' is private.</td>
+</tr>
+<tr>
+<th>15</th>
+<td>Field <b>mWorlds</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>PageManager</b>::<b>mWorlds</b>' is private.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_83')">
+[+] affected symbols: 143 (41%)</span>
+<div id="c_83" style="display:none;">
+<div class='affected'><span class='iname_a'>PagedWorld::frameStart&#160;<span class='sym_p'><span>(&#160;Real <i>t</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mManager&#39; in the object of this method has base type &#39;PageManager&#39;.</div>
+<span class='iname_a'>PagedWorld::getSection&#160;<span class='sym_p'><span>(&#160;String const&amp; <i>name</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;retval.mParent.mManager&#39; in the return value (pointer) has base type &#39;PageManager&#39;.</div>
+<span class='iname_a'>PagedWorld::notifyCamera&#160;<span class='sym_p'><span>(&#160;Camera* <i>cam</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mManager&#39; in the object of this method has base type &#39;PageManager&#39;.</div>
+<span class='iname_a'>PagedWorld::createSection&#160;<span class='sym_p'><span>(&#160;PageStrategy* <span class='fp'>strategy</span></span>, <span>SceneManager* <i>sceneMgr</i></span>, <span>String const&amp; <i>sectionName</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;strategy.mManager&#39; in 1st parameter &#39;strategy&#39; (pointer) has base type &#39;PageManager&#39;.</div>
+<span class='iname_a'>PagedWorld::createSection&#160;<span class='sym_p'><span>(&#160;SceneManager* <i>sceneMgr</i></span>, <span>String const&amp; <i>typeName</i></span>, <span>String const&amp; <i>sectionName</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;retval.mParent.mManager&#39; in the return value (pointer) has base type &#39;PageManager&#39;.</div>
+<span class='iname_a'>PagedWorld::createSection&#160;<span class='sym_p'><span>(&#160;String const&amp; <i>strategyName</i></span>, <span>SceneManager* <i>sceneMgr</i></span>, <span>String const&amp; <i>sectionName</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;retval.mParent.mManager&#39; in the return value (pointer) has base type &#39;PageManager&#39;.</div>
+<span class='iname_a'>PagedWorld::destroySection&#160;<span class='sym_p'><span>(&#160;PagedWorldSection* <span class='fp'>sec</span></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;sec.mParent.mManager&#39; in 1st parameter &#39;sec&#39; (pointer) has base type &#39;PageManager&#39;.</div>
+<span class='iname_a'>PagedWorld::destroySection&#160;<span class='sym_p'><span>(&#160;String const&amp; <i>name</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mManager&#39; in the object of this method has base type &#39;PageManager&#39;.</div>
+<span class='iname_a'>PagedWorld::_readPageStream&#160;<span class='sym_p'><span>(&#160;PageID <i>pageID</i></span>, <span>PagedWorldSection* <span class='fp'>section</span></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;section.mParent.mManager&#39; in 2nd parameter &#39;section&#39; (pointer) has base type &#39;PageManager&#39;.</div>
+<span class='iname_a'>PagedWorld::_writePageStream&#160;<span class='sym_p'><span>(&#160;PageID <i>pageID</i></span>, <span>PagedWorldSection* <span class='fp'>section</span></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;section.mParent.mManager&#39; in 2nd parameter &#39;section&#39; (pointer) has base type &#39;PageManager&#39;.</div>
+ <b>...</b>
+<br/>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<span class='h_name'>OgreSimplePageContentCollection.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_84')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> SimplePageContentCollection <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_84" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Field <b>mContentList</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>SimplePageContentCollection</b>::<b>mContentList</b>' is private.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_85')">
+[+] affected symbols: 12 (3.4%)</span>
+<div id="c_85" style="display:none;">
+<div class='affected'><span class='iname_a'>SimplePageContentCollection::frameStart&#160;<span class='sym_p'><span>(&#160;Real <i>timeSinceLastFrame</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;SimplePageContentCollection&#39; class.</div>
+<span class='iname_a'>SimplePageContentCollection::notifyCamera&#160;<span class='sym_p'><span>(&#160;Camera* <i>cam</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;SimplePageContentCollection&#39; class.</div>
+<span class='iname_a'>SimplePageContentCollection::createContent&#160;<span class='sym_p'><span>(&#160;String const&amp; <i>typeName</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;SimplePageContentCollection&#39; class.</div>
+<span class='iname_a'>SimplePageContentCollection::destroyContent&#160;<span class='sym_p'><span>(&#160;PageContent* <i>c</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;SimplePageContentCollection&#39; class.</div>
+<span class='iname_a'>SimplePageContentCollection::load&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;SimplePageContentCollection&#39; class.</div>
+<span class='iname_a'>SimplePageContentCollection::save&#160;<span class='sym_p'><span>(&#160;StreamSerialiser&amp; <i>stream</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;SimplePageContentCollection&#39; class.</div>
+<span class='iname_a'>SimplePageContentCollection::unload&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;SimplePageContentCollection&#39; class.</div>
+<span class='iname_a'>SimplePageContentCollection::prepare&#160;<span class='sym_p'><span>(&#160;StreamSerialiser&amp; <i>stream</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;SimplePageContentCollection&#39; class.</div>
+<span class='iname_a'>SimplePageContentCollection::frameEnd&#160;<span class='sym_p'><span>(&#160;Real <i>timeElapsed</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;SimplePageContentCollection&#39; class.</div>
+<span class='iname_a'>SimplePageContentCollection::unprepare&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;SimplePageContentCollection&#39; class.</div>
+ <b>...</b>
+<br/>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='Low_Risk_Problems'></a><a name='Type_Problems_Low'></a>
+<h2>Problems with Data Types, Low Severity <span class='warning'>&nbsp;6&nbsp;</span></h2><hr/>
+<span class='h_name'>OgreCommon.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_86')">
+<span class='ext'>[+]</span> <span class='ttype'>typedef</span> String <span class='warning'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_86" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Base type has been changed from <b>_StringBase</b> to <b>std::string</b>.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_87')">
+[+] affected symbols: 31 (8.9%)</span>
+<div id="c_87" style="display:none;">
+<div class='affected'><span class='iname_a'>PagedWorld::getSection&#160;<span class='sym_p'><span>(&#160;String const&amp; <span class='fp'>name</span></span>&#160;)</span></span><br/>
+<div class='affect'>1st parameter &#39;name&#39; (reference) has base type &#39;String&#39;.</div>
+<span class='iname_a'>PagedWorld::createSection&#160;<span class='sym_p'><span>(&#160;PageStrategy* <i>strategy</i></span>, <span>SceneManager* <i>sceneMgr</i></span>, <span>String const&amp; <span class='fp'>sectionName</span></span>&#160;)</span></span><br/>
+<div class='affect'>3rd parameter &#39;sectionName&#39; (reference) has base type &#39;String&#39;.</div>
+<span class='iname_a'>PagedWorld::createSection&#160;<span class='sym_p'><span>(&#160;SceneManager* <i>sceneMgr</i></span>, <span>String const&amp; <i>typeName</i></span>, <span>String const&amp; <span class='fp'>sectionName</span></span>&#160;)</span></span><br/>
+<div class='affect'>3rd parameter &#39;sectionName&#39; (reference) has base type &#39;String&#39;.</div>
+<span class='iname_a'>PagedWorld::createSection&#160;<span class='sym_p'><span>(&#160;String const&amp; <i>strategyName</i></span>, <span>SceneManager* <i>sceneMgr</i></span>, <span>String const&amp; <span class='fp'>sectionName</span></span>&#160;)</span></span><br/>
+<div class='affect'>3rd parameter &#39;sectionName&#39; (reference) has base type &#39;String&#39;.</div>
+<span class='iname_a'>PagedWorld::destroySection&#160;<span class='sym_p'><span>(&#160;String const&amp; <span class='fp'>name</span></span>&#160;)</span></span><br/>
+<div class='affect'>1st parameter &#39;name&#39; (reference) has base type &#39;String&#39;.</div>
+<span class='iname_a'>PagedWorld::load&#160;<span class='sym_p'><span>(&#160;String const&amp; <span class='fp'>filename</span></span>&#160;)</span></span><br/>
+<div class='affect'>1st parameter &#39;filename&#39; (reference) has base type &#39;String&#39;.</div>
+<span class='iname_a'>PagedWorld::PagedWorld&#160;<span class='sym_p'><span>(&#160;String const&amp; <span class='fp'>name</span></span>, <span>PageManager* <i>manager</i></span>&#160;)</span></span><br/>
+<div class='affect'>1st parameter &#39;name&#39; (reference) has base type &#39;String&#39;.</div>
+<span class='iname_a'>PageManager::createWorld&#160;<span class='sym_p'><span>(&#160;String const&amp; <span class='fp'>name</span></span>&#160;)</span></span><br/>
+<div class='affect'>1st parameter &#39;name&#39; (reference) has base type &#39;String&#39;.</div>
+<span class='iname_a'>PageManager::getStrategy&#160;<span class='sym_p'><span>(&#160;String const&amp; <span class='fp'>name</span></span>&#160;)</span></span><br/>
+<div class='affect'>1st parameter &#39;name&#39; (reference) has base type &#39;String&#39;.</div>
+<span class='iname_a'>PageManager::destroyWorld&#160;<span class='sym_p'><span>(&#160;String const&amp; <span class='fp'>name</span></span>&#160;)</span></span><br/>
+<div class='affect'>1st parameter &#39;name&#39; (reference) has base type &#39;String&#39;.</div>
+ <b>...</b>
+<br/>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<span class='h_name'>OgrePage.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_88')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> Page <span class='warning'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_88" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Base class <b>AllocatedObject&lt;0&gt;</b> has been removed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_89')">
+[+] affected symbols: 34 (9.7%)</span>
+<div id="c_89" style="display:none;">
+<div class='affected'><span class='iname_a'>Page::frameStart&#160;<span class='sym_p'><span>(&#160;Real <i>timeSinceLastFrame</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Page&#39; class.</div>
+<span class='iname_a'>Page::prepareImpl&#160;<span class='sym_p'><span>(&#160;struct Page::PageData* <i>dataToPopulate</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Page&#39; class.</div>
+<span class='iname_a'>Page::prepareImpl&#160;<span class='sym_p'><span>(&#160;StreamSerialiser&amp; <i>stream</i></span>, <span>struct Page::PageData* <i>dataToPopulate</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Page&#39; class.</div>
+<span class='iname_a'>Page::notifyCamera&#160;<span class='sym_p'><span>(&#160;Camera* <i>cam</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Page&#39; class.</div>
+<span class='iname_a'>Page::CHUNK_VERSION <span class='attr'>[data]</span></span><br/>
+<div class='affect'>This method is from &#39;Page&#39; class.</div>
+<span class='iname_a'>Page::handleRequest&#160;<span class='sym_p'><span>(&#160;WorkQueue::Request const* <i>req</i></span>, <span>WorkQueue const* <i>srcQ</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Page&#39; class.</div>
+<span class='iname_a'>Page::handleResponse&#160;<span class='sym_p'><span>(&#160;struct WorkQueue::Response const* <i>res</i></span>, <span>WorkQueue const* <i>srcQ</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Page&#39; class.</div>
+<span class='iname_a'>Page::canHandleRequest&#160;<span class='sym_p'><span>(&#160;WorkQueue::Request const* <i>req</i></span>, <span>WorkQueue const* <i>srcQ</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Page&#39; class.</div>
+<span class='iname_a'>Page::canHandleResponse&#160;<span class='sym_p'><span>(&#160;struct WorkQueue::Response const* <i>res</i></span>, <span>WorkQueue const* <i>srcQ</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Page&#39; class.</div>
+<span class='iname_a'>Page::updateDebugDisplay&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;Page&#39; class.</div>
+ <b>...</b>
+<br/>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<span class='h_name'>OgrePlatform.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_90')">
+<span class='ext'>[+]</span> <span class='ttype'>typedef</span> int32 <span class='warning'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_90" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Base type has been changed from <b>int</b> to <b>int32_t</b>.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_91')">
+[+] affected symbols: 44 (12.6%)</span>
+<div id="c_91" style="display:none;">
+<div class='affected'><span class='iname_a'>Grid2DPageStrategyData::setCellSize&#160;<span class='sym_p'><span>(&#160;Real <i>sz</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mMaxCellX&#39; in the object of this method is of type &#39;int32&#39;.</div>
+<span class='iname_a'>Grid2DPageStrategyData::setCellRange&#160;<span class='sym_p'><span>(&#160;int32 <i>minX</i></span>, <span>int32 <i>minY</i></span>, <span>int32 <span class='fp'>maxX</span></span>, <span>int32 <i>maxY</i></span>&#160;)</span></span><br/>
+<div class='affect'>3rd parameter &#39;maxX&#39; is of type &#39;int32&#39;.</div>
+<span class='iname_a'>Grid2DPageStrategyData::calculateCell&#160;<span class='sym_p'><span>(&#160;PageID <i>inPageID</i></span>, <span>int32* <span class='fp'>x</span></span>, <span>int32* <i>y</i></span>&#160;)</span></span><br/>
+<div class='affect'>2nd parameter &#39;x&#39; (pointer) has base type &#39;int32&#39;.</div>
+<span class='iname_a'>Grid2DPageStrategyData::setHoldRadius&#160;<span class='sym_p'><span>(&#160;Real <i>sz</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mMaxCellX&#39; in the object of this method is of type &#39;int32&#39;.</div>
+<span class='iname_a'>Grid2DPageStrategyData::setLoadRadius&#160;<span class='sym_p'><span>(&#160;Real <i>sz</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mMaxCellX&#39; in the object of this method is of type &#39;int32&#39;.</div>
+<span class='iname_a'>Grid2DPageStrategyData::calculatePageID&#160;<span class='sym_p'><span>(&#160;int32 <span class='fp'>x</span></span>, <span>int32 <i>y</i></span>&#160;)</span></span><br/>
+<div class='affect'>1st parameter &#39;x&#39; is of type &#39;int32&#39;.</div>
+<span class='iname_a'>Grid2DPageStrategyData::setCellRangeMaxX&#160;<span class='sym_p'><span>(&#160;int32 <span class='fp'>maxX</span></span>&#160;)</span></span><br/>
+<div class='affect'>1st parameter &#39;maxX&#39; is of type &#39;int32&#39;.</div>
+<span class='iname_a'>Grid2DPageStrategyData::setCellRangeMaxY&#160;<span class='sym_p'><span>(&#160;int32 <span class='fp'>maxY</span></span>&#160;)</span></span><br/>
+<div class='affect'>1st parameter &#39;maxY&#39; is of type &#39;int32&#39;.</div>
+<span class='iname_a'>Grid2DPageStrategyData::setCellRangeMinX&#160;<span class='sym_p'><span>(&#160;int32 <span class='fp'>minX</span></span>&#160;)</span></span><br/>
+<div class='affect'>1st parameter &#39;minX&#39; is of type &#39;int32&#39;.</div>
+<span class='iname_a'>Grid2DPageStrategyData::setCellRangeMinY&#160;<span class='sym_p'><span>(&#160;int32 <span class='fp'>minY</span></span>&#160;)</span></span><br/>
+<div class='affect'>1st parameter &#39;minY&#39; is of type &#39;int32&#39;.</div>
+ <b>...</b>
+<br/>
+</div>
+</div>
+<br/><br/></div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_92')">
+<span class='ext'>[+]</span> <span class='ttype'>typedef</span> uint16 <span class='warning'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_92" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Base type has been changed from <span class='value'>unsigned short</span> to <b>uint16_t</b>.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_93')">
+[+] affected symbols: 9 (2.6%)</span>
+<div id="c_93" style="display:none;">
+<div class='affected'><span class='iname_a'>PagedWorld::CHUNK_VERSION <span class='attr'>[data]</span></span><br/>
+<div class='affect'>Return value has base type &#39;uint16&#39;.</div>
+<span class='iname_a'>PagedWorldSection::CHUNK_VERSION <span class='attr'>[data]</span></span><br/>
+<div class='affect'>Return value has base type &#39;uint16&#39;.</div>
+<span class='iname_a'>PageContentCollection::CHUNK_VERSION <span class='attr'>[data]</span></span><br/>
+<div class='affect'>Return value has base type &#39;uint16&#39;.</div>
+<span class='iname_a'>Grid2DPageStrategyData::CHUNK_VERSION <span class='attr'>[data]</span></span><br/>
+<div class='affect'>Return value has base type &#39;uint16&#39;.</div>
+<span class='iname_a'>Grid3DPageStrategyData::CHUNK_VERSION <span class='attr'>[data]</span></span><br/>
+<div class='affect'>Return value has base type &#39;uint16&#39;.</div>
+<span class='iname_a'>SimplePageContentCollection::SUBCLASS_CHUNK_VERSION <span class='attr'>[data]</span></span><br/>
+<div class='affect'>Return value has base type &#39;uint16&#39;.</div>
+<span class='iname_a'>Page::CHUNK_VERSION <span class='attr'>[data]</span></span><br/>
+<div class='affect'>Return value has base type &#39;uint16&#39;.</div>
+<span class='iname_a'>Page::handleRequest&#160;<span class='sym_p'><span>(&#160;WorkQueue::Request const* <span class='fp'>req</span></span>, <span>WorkQueue const* <i>srcQ</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;req.mChannel&#39; in 1st parameter &#39;req&#39; (pointer) is of type &#39;uint16&#39;.</div>
+<span class='iname_a'>Page::handleResponse&#160;<span class='sym_p'><span>(&#160;struct WorkQueue::Response const* <span class='fp'>res</span></span>, <span>WorkQueue const* <i>srcQ</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;res.mRequest.mType&#39; in 1st parameter &#39;res&#39; (pointer) is of type &#39;uint16&#39;.</div>
+</div>
+</div>
+<br/><br/></div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_94')">
+<span class='ext'>[+]</span> <span class='ttype'>typedef</span> uint32 <span class='warning'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_94" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Base type has been changed from <span class='value'>unsigned int</span> to <b>uint32_t</b>.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_95')">
+[+] affected symbols: 9 (2.6%)</span>
+<div id="c_95" style="display:none;">
+<div class='affected'><span class='iname_a'>PagedWorld::CHUNK_SECTIONDECLARATION_ID <span class='attr'>[data]</span></span><br/>
+<div class='affect'>Return value has base type &#39;uint32&#39;.</div>
+<span class='iname_a'>PagedWorld::CHUNK_ID <span class='attr'>[data]</span></span><br/>
+<div class='affect'>Return value has base type &#39;uint32&#39;.</div>
+<span class='iname_a'>PagedWorldSection::CHUNK_ID <span class='attr'>[data]</span></span><br/>
+<div class='affect'>Return value has base type &#39;uint32&#39;.</div>
+<span class='iname_a'>PageContentCollection::CHUNK_ID <span class='attr'>[data]</span></span><br/>
+<div class='affect'>Return value has base type &#39;uint32&#39;.</div>
+<span class='iname_a'>Grid2DPageStrategyData::CHUNK_ID <span class='attr'>[data]</span></span><br/>
+<div class='affect'>Return value has base type &#39;uint32&#39;.</div>
+<span class='iname_a'>Grid3DPageStrategyData::CHUNK_ID <span class='attr'>[data]</span></span><br/>
+<div class='affect'>Return value has base type &#39;uint32&#39;.</div>
+<span class='iname_a'>SimplePageContentCollection::SUBCLASS_CHUNK_ID <span class='attr'>[data]</span></span><br/>
+<div class='affect'>Return value has base type &#39;uint32&#39;.</div>
+<span class='iname_a'>Page::CHUNK_CONTENTCOLLECTION_DECLARATION_ID <span class='attr'>[data]</span></span><br/>
+<div class='affect'>Return value has base type &#39;uint32&#39;.</div>
+<span class='iname_a'>Page::CHUNK_ID <span class='attr'>[data]</span></span><br/>
+<div class='affect'>Return value has base type &#39;uint32&#39;.</div>
+</div>
+</div>
+<br/><br/></div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_96')">
+<span class='ext'>[+]</span> <span class='ttype'>typedef</span> uint8 <span class='warning'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_96" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Base type has been changed from <span class='value'>unsigned char</span> to <b>uint8_t</b>.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_97')">
+[+] affected symbols: 143 (41%)</span>
+<div id="c_97" style="display:none;">
+<div class='affected'><span class='iname_a'>PagedWorld::frameStart&#160;<span class='sym_p'><span>(&#160;Real <i>t</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mManager.mDebugDisplayLvl&#39; in the object of this method is of type &#39;uint8&#39;.</div>
+<span class='iname_a'>PagedWorld::getSection&#160;<span class='sym_p'><span>(&#160;String const&amp; <i>name</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;retval.mParent.mManager.mDebugDisplayLvl&#39; in the return value (pointer) is of type &#39;uint8&#39;.</div>
+<span class='iname_a'>PagedWorld::notifyCamera&#160;<span class='sym_p'><span>(&#160;Camera* <i>cam</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mManager.mDebugDisplayLvl&#39; in the object of this method is of type &#39;uint8&#39;.</div>
+<span class='iname_a'>PagedWorld::createSection&#160;<span class='sym_p'><span>(&#160;PageStrategy* <span class='fp'>strategy</span></span>, <span>SceneManager* <i>sceneMgr</i></span>, <span>String const&amp; <i>sectionName</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;strategy.mManager.mDebugDisplayLvl&#39; in 1st parameter &#39;strategy&#39; (pointer) is of type &#39;uint8&#39;.</div>
+<span class='iname_a'>PagedWorld::createSection&#160;<span class='sym_p'><span>(&#160;SceneManager* <i>sceneMgr</i></span>, <span>String const&amp; <i>typeName</i></span>, <span>String const&amp; <i>sectionName</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;retval.mParent.mManager.mDebugDisplayLvl&#39; in the return value (pointer) is of type &#39;uint8&#39;.</div>
+<span class='iname_a'>PagedWorld::createSection&#160;<span class='sym_p'><span>(&#160;String const&amp; <i>strategyName</i></span>, <span>SceneManager* <i>sceneMgr</i></span>, <span>String const&amp; <i>sectionName</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;retval.mParent.mManager.mDebugDisplayLvl&#39; in the return value (pointer) is of type &#39;uint8&#39;.</div>
+<span class='iname_a'>PagedWorld::destroySection&#160;<span class='sym_p'><span>(&#160;PagedWorldSection* <span class='fp'>sec</span></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;sec.mParent.mManager.mDebugDisplayLvl&#39; in 1st parameter &#39;sec&#39; (pointer) is of type &#39;uint8&#39;.</div>
+<span class='iname_a'>PagedWorld::destroySection&#160;<span class='sym_p'><span>(&#160;String const&amp; <i>name</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mManager.mDebugDisplayLvl&#39; in the object of this method is of type &#39;uint8&#39;.</div>
+<span class='iname_a'>PagedWorld::_readPageStream&#160;<span class='sym_p'><span>(&#160;PageID <i>pageID</i></span>, <span>PagedWorldSection* <span class='fp'>section</span></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;section.mParent.mManager.mDebugDisplayLvl&#39; in 2nd parameter &#39;section&#39; (pointer) is of type &#39;uint8&#39;.</div>
+<span class='iname_a'>PagedWorld::_writePageStream&#160;<span class='sym_p'><span>(&#160;PageID <i>pageID</i></span>, <span>PagedWorldSection* <span class='fp'>section</span></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;section.mParent.mManager.mDebugDisplayLvl&#39; in 2nd parameter &#39;section&#39; (pointer) is of type &#39;uint8&#39;.</div>
+ <b>...</b>
+<br/>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='Headers'></a><h2>Header Files <span class='gray'>&nbsp;25&nbsp;</span></h2><hr/>
+<div class='h_list'>
+OgreAny.h<br/>
+OgreAxisAlignedBox.h<br/>
+OgreCamera.h<br/>
+OgreCommon.h<br/>
+OgreFrameListener.h<br/>
+OgreGrid2DPageStrategy.h<br/>
+OgreGrid3DPageStrategy.h<br/>
+OgreMemoryAllocatorConfig.h<br/>
+OgreNameGenerator.h<br/>
+OgrePage.h<br/>
+OgrePageContent.h<br/>
+OgrePageContentCollection.h<br/>
+OgrePageContentCollectionFactory.h<br/>
+OgrePageContentFactory.h<br/>
+OgrePagedWorld.h<br/>
+OgrePagedWorldSection.h<br/>
+OgrePageManager.h<br/>
+OgrePageStrategy.h<br/>
+OgrePagingPrerequisites.h<br/>
+OgrePlatform.h<br/>
+OgrePrerequisites.h<br/>
+OgreSharedPtr.h<br/>
+OgreSimplePageContentCollection.h<br/>
+OgreVector.h<br/>
+OgreWorkQueue.h<br/>
+</div>
+<br/><a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='Sources'></a><h2>Source Files <span class='gray'>&nbsp;9&nbsp;</span></h2><hr/>
+<div class='h_list'>
+OgreGrid2DPageStrategy.cpp<br/>
+OgreGrid3DPageStrategy.cpp<br/>
+OgrePage.cpp<br/>
+OgrePageContent.cpp<br/>
+OgrePageContentCollection.cpp<br/>
+OgrePagedWorld.cpp<br/>
+OgrePagedWorldSection.cpp<br/>
+OgrePageManager.cpp<br/>
+OgreSimplePageContentCollection.cpp<br/>
+</div>
+<br/><a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='Libs'></a><h2>Objects <span class='gray'>&nbsp;1&nbsp;</span></h2><hr/>
+<div class='lib_list'>
+libOgrePaging.so.1.12.13<br/>
+</div>
+<br/><a class='top_ref' href='#Top'>to the top</a><br/>
+</div>
+<br/><br/><br/>
+<hr/>
+<div class='footer' align='right'><i>Generated by <a href='https://github.com/lvc/abi-compliance-checker'>ABI Compliance Checker</a> 2.3 &#160;</i>
+</div>
+<br/>
+
+</body></html>

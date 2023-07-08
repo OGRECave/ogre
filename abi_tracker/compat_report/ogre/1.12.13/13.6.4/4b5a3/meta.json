@@ -1,0 +1,11 @@
+{
+  "Affected": "75.9",
+  "Added": 29,
+  "Removed": 41,
+  "TotalProblems": 345,
+  "Source_Affected": "50.9",
+  "Source_TotalProblems": "294",
+  "Source_ReportPath": "compat_report/ogre/1.12.13/13.6.4/4b5a3/src_compat_report.html",
+  "Object1": "lib/libOgreTerrain.so.1.12.13",
+  "Object2": "lib/libOgreTerrain.so.13.6"
+}

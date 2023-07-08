@@ -1,0 +1,1950 @@
+<!-- verdict:incompatible;affected:33.7;added:13;removed:92;type_problems_high:13;type_problems_medium:0;type_problems_low:12;interface_problems_high:3;interface_problems_medium:0;interface_problems_low:0;changed_constants:0;type_changes_other:7;tool_version:2.3 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta name="keywords" content="libOgreMeshLodGenerator, source compatibility, API, report" />
+<meta name="description" content="Source compatibility report for the libOgreMeshLodGenerator object between 13.6.4 and 14.0.0 versions" />
+<title>libOgreMeshLodGenerator: 13.6.4 to 14.0.0 source compatibility report</title>
+<style type="text/css">
+body {
+    font-family:Arial, sans-serif;
+    background-color:White;
+    color:Black;
+}
+hr {
+    color:Black;
+    background-color:Black;
+    height:1px;
+    border:0;
+}
+h1 {
+    margin-bottom:0px;
+    padding-bottom:0px;
+    font-size:1.625em;
+}
+h2 {
+    margin-bottom:0px;
+    padding-bottom:0px;
+    font-size:1.25em;
+    white-space:nowrap;
+}
+span.section {
+    font-weight:bold;
+    cursor:pointer;
+    color:#003E69;
+    white-space:nowrap;
+    margin-left:0.3125em;
+}
+span.new_sign {
+    font-weight:bold;
+    margin-left:1.65em;
+    color:#003E69;
+}
+span.new_sign_lbl {
+    margin-left:3em;
+    font-size:1em;
+    color:Black;
+}
+span:hover.section {
+    color:#336699;
+}
+span.sect_aff {
+    cursor:pointer;
+    padding-left:1.55em;
+    font-size:0.875em;
+    color:#cc3300;
+}
+span.sect_info {
+    cursor:pointer;
+    padding-left:1.55em;
+    font-size:0.875em;
+    color:Black;
+}
+span.ext {
+    font-weight:normal;
+}
+span.h_name {
+    color:#cc3300;
+    font-size:0.875em;
+    font-weight:bold;
+}
+div.h_list, div.lib_list {
+    font-size:0.94em;
+    padding-left:0.4em;
+}
+span.ns {
+    color:#408080;
+    font-size:0.94em;
+}
+span.lib_name {
+    color:Green;
+    font-size:0.875em;
+    font-weight:bold;
+}
+span.iname {
+    font-weight:bold;
+    color:#003E69;
+    margin-left:0.3125em;
+}
+span.iname_b {
+    font-weight:bold;
+}
+span.iname_a {
+    color:#333333;
+    font-weight:bold;
+    font-size:0.94em;
+}
+span.sym_p {
+    font-weight:normal;
+    white-space:normal;
+}
+span.sym_pd {
+    white-space:normal;
+}
+span.sym_p span, span.sym_pd span {
+    white-space:nowrap;
+}
+div.affect {
+    padding-left:1em;
+    padding-bottom:10px;
+    font-size:0.87em;
+    font-style:italic;
+    line-height:0.9em;
+}
+div.affected {
+    padding-left:1.9em;
+    padding-top:10px;
+}
+table.ptable {
+    border-collapse:collapse;
+    border:1px outset black;
+    margin-left:0.95em;
+    margin-top:3px;
+    margin-bottom:3px;
+    width:56.25em;
+}
+table.ptable td {
+    border:1px solid gray;
+    padding:3px;
+    font-size:0.875em;
+    text-align:left;
+    vertical-align:top;
+    max-width:28em;
+    word-wrap:break-word;
+}
+table.ptable th.pn {
+    width:2%;
+}
+table.ptable th.chg {
+    width:47%;
+}
+table.vtable {
+    border-collapse:collapse;
+    border:1px outset black;
+    margin-left:1.9em;
+    margin-top:0.7em;
+}
+table.vtable td {
+    border:1px solid gray;
+    padding:3px;
+    font-size:0.875em;
+    vertical-align:top;
+    max-width:450px;
+    word-wrap:break-word;
+}
+table.ptable th, table.vtable th {
+    background-color:#eeeeee;
+    font-weight:bold;
+    color:#333333;
+    font-family:Verdana, Arial;
+    font-size:0.875em;
+    border:1px solid gray;
+    text-align:center;
+    vertical-align:top;
+    white-space:nowrap;
+    padding:3px;
+}
+table.summary {
+    border-collapse:collapse;
+    border:1px outset black;
+}
+table.summary th {
+    background-color:#eeeeee;
+    font-weight:normal;
+    text-align:left;
+    font-size:0.94em;
+    white-space:nowrap;
+    border:1px inset gray;
+    padding:3px;
+}
+table.summary td {
+    text-align:right;
+    white-space:nowrap;
+    border:1px inset gray;
+    padding:3px 5px 3px 10px;
+}
+span.mngl {
+    padding-left:1em;
+    font-size:0.875em;
+    cursor:text;
+    color:#444444;
+    font-weight:bold;
+}
+span.pleft {
+    padding-left:2.5em;
+}
+span.sym_ver {
+    color:#333333;
+    white-space:nowrap;
+    font-family:"DejaVu Sans Mono", Monospace;
+}
+span.attr {
+    color:#333333;
+    font-weight:normal;
+}
+span.color_p {
+    font-style:italic;
+    color:Brown;
+}
+span.p {
+    font-style:italic;
+}
+span.fp {
+    font-style:italic;
+    background-color:#DCDCDC;
+}
+span.ttype {
+    font-weight:normal;
+}
+span.nowrap {
+    white-space:nowrap;
+}
+span.value {
+    font-weight:bold;
+}
+.passed {
+    background-color:#CCFFCC;
+    font-weight:normal;
+}
+.warning {
+    background-color:#F4F4AF;
+    font-weight:normal;
+}
+.failed {
+    background-color:#FFCCCC;
+    font-weight:normal;
+}
+.new {
+    background-color:#C6DEFF;
+    font-weight:normal;
+}
+.compatible {
+    background-color:#CCFFCC;
+    font-weight:normal;
+}
+.almost_compatible {
+    background-color:#FFDAA3;
+    font-weight:normal;
+}
+.incompatible {
+    background-color:#FFCCCC;
+    font-weight:normal;
+}
+.gray {
+    background-color:#DCDCDC;
+    font-weight:normal;
+}
+.top_ref {
+    font-size:0.69em;
+}
+.footer {
+    font-size:0.75em;
+}
+</style>
+<script type="text/javascript" language="JavaScript">
+<!--
+function showContent(header, id)
+{
+    e = document.getElementById(id);
+    if(e.style.display == 'none')
+    {
+        e.style.display = 'block';
+        e.style.visibility = 'visible';
+        header.innerHTML = header.innerHTML.replace(/\[[^0-9 ]\]/gi,"[&minus;]");
+    }
+    else
+    {
+        e.style.display = 'none';
+        e.style.visibility = 'hidden';
+        header.innerHTML = header.innerHTML.replace(/\[[^0-9 ]\]/gi,"[+]");
+    }
+}
+-->
+</script>
+</head>
+
+<body>
+<div><a name='Top'></a>
+<h1>Source compatibility report for the <span style='color:Blue;'>libOgreMeshLodGenerator.so</span> object between <span style='color:Red;'>13.6.4</span> and <span style='color:Red;'>14.0.0</span> versions</h1>
+
+<h2>Test Info</h2><hr/>
+<table class='summary'>
+<tr><th>Module Name</th><td>libOgreMeshLodGenerator</td></tr>
+<tr><th>Version #1</th><td>13.6.4</td></tr>
+<tr><th>Version #2</th><td>14.0.0</td></tr>
+<tr><th>Arch</th><td>x86_64</td></tr>
+</table>
+<h2>Test Results</h2><hr/>
+<table class='summary'><tr><th>Total Header Files</th><td><a href='#Headers' style='color:Blue;'>40</a></td></tr>
+<tr><th>Total Source Files</th><td><a href='#Sources' style='color:Blue;'>21</a></td></tr>
+<tr><th>Total Objects</th><td><a href='#Libs' style='color:Blue;'>1</a></td></tr>
+<tr><th>Total Symbols / Types</th><td>344 / 94</td></tr>
+<tr><th>Compatibility</th>
+<td class='incompatible'>66.3%</td>
+</tr>
+</table>
+<h2>Problem Summary</h2><hr/>
+<table class='summary'><tr><th></th><th style='text-align:center;'>Severity</th><th style='text-align:center;'>Count</th></tr><tr><th>Added Symbols</th><td>-</td><td class='new'><a href='#Added' style='color:Blue;'>13</a></td></tr>
+<tr><th>Removed Symbols</th><td>High</td><td class='failed'><a href='#Removed' style='color:Blue;'>92</a></td></tr>
+<tr><th rowspan='3'>Problems with<br/>Data Types</th><td>High</td><td class='failed'><a href='#Type_Problems_High' style='color:Blue;'>13</a></td></tr>
+<tr><td>Medium</td><td>0</td></tr>
+<tr><td>Low</td><td class='warning'><a href='#Type_Problems_Low' style='color:Blue;'>12</a></td></tr>
+<tr><th rowspan='3'>Problems with<br/>Symbols</th><td>High</td><td class='failed'><a href='#Symbol_Problems_High' style='color:Blue;'>3</a></td></tr>
+<tr><td>Medium</td><td>0</td></tr>
+<tr><td>Low</td><td>0</td></tr>
+<tr><th>Problems with<br/>Constants</th><td>Low</td><td>0</td></tr>
+<tr><th>Other Changes<br/>in Data Types</th><td>-</td><td class='passed'><a href='#Other_Changes_In_Types' style='color:Blue;'>7</a></td></tr>
+</table>
+
+<a name='Added'></a><h2>Added Symbols <span class='new'>&nbsp;13&nbsp;</span></h2><hr/>
+<span class='h_name'>OgreLodCollapser.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_141')">
+LodCollapser::removeLine&#160;<span class='sym_p'><span>(&#160;struct LodData::Line* <span class='color_p'>line</span></span>, <span>struct LodData::Vertex* <span class='color_p'>skip</span></span>&#160;)</span></span>
+<br/>
+<div id="c_141" style="display:none;">
+<span class='mngl'>_ZN4Ogre12LodCollapser10removeLineEPNS_7LodData4LineEPNS1_6VertexE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_142')">
+LodCollapser::replaceVertexID&#160;<span class='sym_p'><span>(&#160;struct LodData::Line* <span class='color_p'>line</span></span>, <span>unsigned int <span class='color_p'>oldID</span></span>, <span>unsigned int <span class='color_p'>newID</span></span>, <span>struct LodData::Vertex* <span class='color_p'>dst</span></span>&#160;)</span></span>
+<br/>
+<div id="c_142" style="display:none;">
+<span class='mngl'>_ZN4Ogre12LodCollapser15replaceVertexIDEPNS_7LodData4LineEjjPNS1_6VertexE</span>
+<br/>
+<br/>
+</div>
+
+<br/>
+<span class='h_name'>OgreLodData.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_143')">
+LodData::Line::getVertexID&#160;<span class='sym_p'><span>(&#160;struct LodData::Vertex const* <span class='color_p'>v</span></span>&#160;)</span> const</span>
+<br/>
+<div id="c_143" style="display:none;">
+<span class='mngl'>_ZNK4Ogre7LodData4Line11getVertexIDEPKNS0_6VertexE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_144')">
+LodData::Line::isMalformed&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_144" style="display:none;">
+<span class='mngl'>_ZN4Ogre7LodData4Line11isMalformedEv</span>
+<br/>
+<br/>
+</div>
+
+<br/>
+<span class='h_name'>OgreLodOutputProvider.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_145')">
+LodOutputProvider::bakeFirstPass&#160;<span class='sym_p'><span>(&#160;struct LodData* <span class='color_p'>data</span></span>, <span>int <span class='color_p'>lodIndex</span></span>&#160;)</span></span>
+<br/>
+<div id="c_145" style="display:none;">
+<span class='mngl'>_ZN4Ogre17LodOutputProvider13bakeFirstPassEPNS_7LodDataEi</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_146')">
+LodOutputProvider::bakeSecondPass&#160;<span class='sym_p'><span>(&#160;struct LodData* <span class='color_p'>data</span></span>, <span>int <span class='color_p'>lodIndex</span></span>&#160;)</span></span>
+<br/>
+<div id="c_146" style="display:none;">
+<span class='mngl'>_ZN4Ogre17LodOutputProvider14bakeSecondPassEPNS_7LodDataEi</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_147')">
+LodOutputProvider::bakeUncompressed&#160;<span class='sym_p'><span>(&#160;struct LodData* <span class='color_p'>data</span></span>, <span>int <span class='color_p'>lodIndex</span></span>&#160;)</span></span>
+<br/>
+<div id="c_147" style="display:none;">
+<span class='mngl'>_ZN4Ogre17LodOutputProvider16bakeUncompressedEPNS_7LodDataEi</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_148')">
+LodOutputProvider::createIndexBuffer&#160;<span class='sym_p'><span>(&#160;size_t <span class='color_p'>indexCount</span></span>&#160;)</span></span>
+<br/>
+<div id="c_148" style="display:none;">
+<span class='mngl'>_ZN4Ogre17LodOutputProvider17createIndexBufferEm</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_149')">
+LodOutputProvider::lineChanged&#160;<span class='sym_p'><span>(&#160;struct LodData* <span class='color_p'>data</span></span>, <span>struct LodData::Line* <span class='color_p'>line</span></span>&#160;)</span></span>
+<br/>
+<div id="c_149" style="display:none;">
+<span class='mngl'>_ZN4Ogre17LodOutputProvider11lineChangedEPNS_7LodDataEPNS1_4LineE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_150')">
+LodOutputProvider::lineRemoved&#160;<span class='sym_p'><span>(&#160;struct LodData* <span class='color_p'>data</span></span>, <span>struct LodData::Line* <span class='color_p'>line</span></span>&#160;)</span></span>
+<br/>
+<div id="c_150" style="display:none;">
+<span class='mngl'>_ZN4Ogre17LodOutputProvider11lineRemovedEPNS_7LodDataEPNS1_4LineE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_151')">
+LodOutputProvider::LodOutputProvider <span class='attr'>[C1]</span>&#160;<span class='sym_p'><span>(&#160;bool <span class='color_p'>useCompression</span></span>&#160;)</span></span>
+<br/>
+<div id="c_151" style="display:none;">
+<span class='mngl'>_ZN4Ogre17LodOutputProviderC1Eb</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_152')">
+LodOutputProvider::LodOutputProvider <span class='attr'>[C2]</span>&#160;<span class='sym_p'><span>(&#160;bool <span class='color_p'>useCompression</span></span>&#160;)</span></span>
+<br/>
+<div id="c_152" style="display:none;">
+<span class='mngl'>_ZN4Ogre17LodOutputProviderC2Eb</span>
+<br/>
+<br/>
+</div>
+
+<br/>
+<span class='h_name'>OgreMeshLodGenerator.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_153')">
+MeshLodGenerator::clearPendingLodRequests&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_153" style="display:none;">
+<span class='mngl'>_ZN4Ogre16MeshLodGenerator23clearPendingLodRequestsEv</span>
+<br/>
+<br/>
+</div>
+
+<br/>
+<a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='Removed'></a><a name='Withdrawn'></a><h2>Removed Symbols <span class='failed'>&nbsp;92&nbsp;</span></h2><hr/>
+<span class='h_name'>OgreLodBuffer.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_154')">
+LodIndexBuffer::fillBuffer&#160;<span class='sym_p'><span>(&#160;IndexData* <span class='color_p'>data</span></span>&#160;)</span></span>
+<br/>
+<div id="c_154" style="display:none;">
+<span class='mngl'>_ZN4Ogre14LodIndexBuffer10fillBufferEPNS_9IndexDataE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_155')">
+LodInputBuffer::fillBuffer&#160;<span class='sym_p'><span>(&#160;MeshPtr <span class='color_p'>mesh</span></span>&#160;)</span></span>
+<br/>
+<div id="c_155" style="display:none;">
+<span class='mngl'>_ZN4Ogre14LodInputBuffer10fillBufferENS_9SharedPtrINS_4MeshEEE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_156')">
+LodVertexBuffer::fillBuffer&#160;<span class='sym_p'><span>(&#160;VertexData* <span class='color_p'>data</span></span>&#160;)</span></span>
+<br/>
+<div id="c_156" style="display:none;">
+<span class='mngl'>_ZN4Ogre15LodVertexBuffer10fillBufferEPNS_10VertexDataE</span>
+<br/>
+<br/>
+</div>
+
+<br/>
+<span class='h_name'>OgreLodInputProvider.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_157')">
+LodInputProvider::addTriangleToEdges&#160;<span class='sym_p'><span>(&#160;struct LodData* <span class='color_p'>data</span></span>, <span>struct LodData::Triangle* <span class='color_p'>triangle</span></span>&#160;)</span></span>
+<br/>
+<div id="c_157" style="display:none;">
+<span class='mngl'>_ZN4Ogre16LodInputProvider18addTriangleToEdgesEPNS_7LodDataEPNS1_8TriangleE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_158')">
+LodInputProvider::isDuplicateTriangle&#160;<span class='sym_p'><span>(&#160;struct LodData::Triangle* <span class='color_p'>triangle</span></span>&#160;)</span></span>
+<br/>
+<div id="c_158" style="display:none;">
+<span class='mngl'>_ZN4Ogre16LodInputProvider19isDuplicateTriangleEPNS_7LodData8TriangleE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_159')">
+LodInputProvider::isDuplicateTriangle&#160;<span class='sym_p'><span>(&#160;struct LodData::Triangle* <span class='color_p'>triangle</span></span>, <span>struct LodData::Triangle* <span class='color_p'>triangle2</span></span>&#160;)</span></span>
+<br/>
+<div id="c_159" style="display:none;">
+<span class='mngl'>_ZN4Ogre16LodInputProvider19isDuplicateTriangleEPNS_7LodData8TriangleES3_</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_160')">
+LodInputProvider::printTriangle&#160;<span class='sym_p'><span>(&#160;struct LodData::Triangle* <span class='color_p'>triangle</span></span>, <span>std::ostream&amp; <span class='color_p'>str</span></span>&#160;)</span></span>
+<br/>
+<div id="c_160" style="display:none;">
+<span class='mngl'>_ZN4Ogre16LodInputProvider13printTriangleEPNS_7LodData8TriangleERSo</span>
+<br/>
+<br/>
+</div>
+
+<br/>
+<span class='h_name'>OgreLodInputProviderBuffer.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_161')">
+LodInputProviderBuffer::addIndexData&#160;<span class='sym_p'><span>(&#160;struct LodData* <span class='color_p'>data</span></span>, <span>struct LodIndexBuffer&amp; <span class='color_p'>indexBuffer</span></span>, <span>bool <span class='color_p'>useSharedVertexLookup</span></span>, <span>unsigned short <span class='color_p'>submeshID</span></span>&#160;)</span></span>
+<br/>
+<div id="c_161" style="display:none;">
+<span class='mngl'>_ZN4Ogre22LodInputProviderBuffer12addIndexDataEPNS_7LodDataERNS_14LodIndexBufferEbt</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_162')">
+LodInputProviderBuffer::addVertexData&#160;<span class='sym_p'><span>(&#160;struct LodData* <span class='color_p'>data</span></span>, <span>struct LodVertexBuffer&amp; <span class='color_p'>vertexBuffer</span></span>, <span>bool <span class='color_p'>useSharedVertexLookup</span></span>&#160;)</span></span>
+<br/>
+<div id="c_162" style="display:none;">
+<span class='mngl'>_ZN4Ogre22LodInputProviderBuffer13addVertexDataEPNS_7LodDataERNS_15LodVertexBufferEb</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_163')">
+LodInputProviderBuffer::initData&#160;<span class='sym_p'><span>(&#160;struct LodData* <span class='color_p'>data</span></span>&#160;)</span></span>
+<br/>
+<div id="c_163" style="display:none;">
+<span class='mngl'>_ZN4Ogre22LodInputProviderBuffer8initDataEPNS_7LodDataE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_164')">
+LodInputProviderBuffer::initialize&#160;<span class='sym_p'><span>(&#160;struct LodData* <span class='color_p'>data</span></span>&#160;)</span></span>
+<br/>
+<div id="c_164" style="display:none;">
+<span class='mngl'>_ZN4Ogre22LodInputProviderBuffer10initializeEPNS_7LodDataE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_165')">
+LodInputProviderBuffer::LodInputProviderBuffer <span class='attr'>[C1]</span>&#160;<span class='sym_p'><span>(&#160;MeshPtr <span class='color_p'>mesh</span></span>&#160;)</span></span>
+<br/>
+<div id="c_165" style="display:none;">
+<span class='mngl'>_ZN4Ogre22LodInputProviderBufferC1ENS_9SharedPtrINS_4MeshEEE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_166')">
+LodInputProviderBuffer::LodInputProviderBuffer <span class='attr'>[C2]</span>&#160;<span class='sym_p'><span>(&#160;MeshPtr <span class='color_p'>mesh</span></span>&#160;)</span></span>
+<br/>
+<div id="c_166" style="display:none;">
+<span class='mngl'>_ZN4Ogre22LodInputProviderBufferC2ENS_9SharedPtrINS_4MeshEEE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_167')">
+LodInputProviderBuffer::tuneContainerSize&#160;<span class='sym_p'><span>(&#160;struct LodData* <span class='color_p'>data</span></span>&#160;)</span></span>
+<br/>
+<div id="c_167" style="display:none;">
+<span class='mngl'>_ZN4Ogre22LodInputProviderBuffer17tuneContainerSizeEPNS_7LodDataE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_168')">
+LodInputProviderBuffer::~LodInputProviderBuffer <span class='attr'>[D0]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_168" style="display:none;">
+<span class='mngl'>_ZN4Ogre22LodInputProviderBufferD0Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_169')">
+LodInputProviderBuffer::~LodInputProviderBuffer <span class='attr'>[D1]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_169" style="display:none;">
+<span class='mngl'>_ZN4Ogre22LodInputProviderBufferD1Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_170')">
+LodInputProviderBuffer::~LodInputProviderBuffer <span class='attr'>[D2]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_170" style="display:none;">
+<span class='mngl'>_ZN4Ogre22LodInputProviderBufferD2Ev</span>
+<br/>
+<br/>
+</div>
+
+<br/>
+<span class='h_name'>OgreLodInputProviderMesh.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_171')">
+LodInputProviderMesh::addIndexData&#160;<span class='sym_p'><span>(&#160;struct LodData* <span class='color_p'>data</span></span>, <span>IndexData* <span class='color_p'>indexData</span></span>, <span>bool <span class='color_p'>useSharedVertexLookup</span></span>, <span>ushort <span class='color_p'>submeshID</span></span>, <span>enum RenderOperation::OperationType <span class='color_p'>renderOp</span></span>&#160;)</span></span>
+<br/>
+<div id="c_171" style="display:none;">
+<span class='mngl'>_ZN4Ogre20LodInputProviderMesh12addIndexDataEPNS_7LodDataEPNS_9IndexDataEbtNS_15RenderOperation13OperationTypeE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_172')">
+LodInputProviderMesh::addVertexData&#160;<span class='sym_p'><span>(&#160;struct LodData* <span class='color_p'>data</span></span>, <span>VertexData* <span class='color_p'>vertexData</span></span>, <span>bool <span class='color_p'>useSharedVertexLookup</span></span>&#160;)</span></span>
+<br/>
+<div id="c_172" style="display:none;">
+<span class='mngl'>_ZN4Ogre20LodInputProviderMesh13addVertexDataEPNS_7LodDataEPNS_10VertexDataEb</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_173')">
+LodInputProviderMesh::initData&#160;<span class='sym_p'><span>(&#160;struct LodData* <span class='color_p'>data</span></span>&#160;)</span></span>
+<br/>
+<div id="c_173" style="display:none;">
+<span class='mngl'>_ZN4Ogre20LodInputProviderMesh8initDataEPNS_7LodDataE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_174')">
+LodInputProviderMesh::initialize&#160;<span class='sym_p'><span>(&#160;struct LodData* <span class='color_p'>data</span></span>&#160;)</span></span>
+<br/>
+<div id="c_174" style="display:none;">
+<span class='mngl'>_ZN4Ogre20LodInputProviderMesh10initializeEPNS_7LodDataE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_175')">
+LodInputProviderMesh::LodInputProviderMesh <span class='attr'>[C1]</span>&#160;<span class='sym_p'><span>(&#160;MeshPtr <span class='color_p'>mesh</span></span>&#160;)</span></span>
+<br/>
+<div id="c_175" style="display:none;">
+<span class='mngl'>_ZN4Ogre20LodInputProviderMeshC1ENS_9SharedPtrINS_4MeshEEE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_176')">
+LodInputProviderMesh::LodInputProviderMesh <span class='attr'>[C2]</span>&#160;<span class='sym_p'><span>(&#160;MeshPtr <span class='color_p'>mesh</span></span>&#160;)</span></span>
+<br/>
+<div id="c_176" style="display:none;">
+<span class='mngl'>_ZN4Ogre20LodInputProviderMeshC2ENS_9SharedPtrINS_4MeshEEE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_177')">
+LodInputProviderMesh::tuneContainerSize&#160;<span class='sym_p'><span>(&#160;struct LodData* <span class='color_p'>data</span></span>&#160;)</span></span>
+<br/>
+<div id="c_177" style="display:none;">
+<span class='mngl'>_ZN4Ogre20LodInputProviderMesh17tuneContainerSizeEPNS_7LodDataE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_178')">
+LodInputProviderMesh::~LodInputProviderMesh <span class='attr'>[D0]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_178" style="display:none;">
+<span class='mngl'>_ZN4Ogre20LodInputProviderMeshD0Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_179')">
+LodInputProviderMesh::~LodInputProviderMesh <span class='attr'>[D1]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_179" style="display:none;">
+<span class='mngl'>_ZN4Ogre20LodInputProviderMeshD1Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_180')">
+LodInputProviderMesh::~LodInputProviderMesh <span class='attr'>[D2]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_180" style="display:none;">
+<span class='mngl'>_ZN4Ogre20LodInputProviderMeshD2Ev</span>
+<br/>
+<br/>
+</div>
+
+<br/>
+<span class='h_name'>OgreLodOutputProviderBuffer.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_181')">
+LodOutputProviderBuffer::bakeLodLevel&#160;<span class='sym_p'><span>(&#160;struct LodData* <span class='color_p'>data</span></span>, <span>int <span class='color_p'>lodIndex</span></span>&#160;)</span></span>
+<br/>
+<div id="c_181" style="display:none;">
+<span class='mngl'>_ZN4Ogre23LodOutputProviderBuffer12bakeLodLevelEPNS_7LodDataEi</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_182')">
+LodOutputProviderBuffer::bakeManualLodLevel&#160;<span class='sym_p'><span>(&#160;struct LodData* <span class='color_p'>data</span></span>, <span>String&amp; <span class='color_p'>manualMeshName</span></span>, <span>int <span class='color_p'>lodIndex</span></span>&#160;)</span></span>
+<br/>
+<div id="c_182" style="display:none;">
+<span class='mngl'>_ZN4Ogre23LodOutputProviderBuffer18bakeManualLodLevelEPNS_7LodDataERNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEEi</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_183')">
+LodOutputProviderBuffer::getBuffer&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_183" style="display:none;">
+<span class='mngl'>_ZN4Ogre23LodOutputProviderBuffer9getBufferEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_184')">
+LodOutputProviderBuffer::inject&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_184" style="display:none;">
+<span class='mngl'>_ZN4Ogre23LodOutputProviderBuffer6injectEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_185')">
+LodOutputProviderBuffer::prepare&#160;<span class='sym_p'><span>(&#160;struct LodData* <span class='color_p'>data</span></span>&#160;)</span></span>
+<br/>
+<div id="c_185" style="display:none;">
+<span class='mngl'>_ZN4Ogre23LodOutputProviderBuffer7prepareEPNS_7LodDataE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_186')">
+LodOutputProviderBuffer::~LodOutputProviderBuffer <span class='attr'>[D0]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_186" style="display:none;">
+<span class='mngl'>_ZN4Ogre23LodOutputProviderBufferD0Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_187')">
+LodOutputProviderBuffer::~LodOutputProviderBuffer <span class='attr'>[D1]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_187" style="display:none;">
+<span class='mngl'>_ZN4Ogre23LodOutputProviderBufferD1Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_188')">
+LodOutputProviderBuffer::~LodOutputProviderBuffer <span class='attr'>[D2]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_188" style="display:none;">
+<span class='mngl'>_ZN4Ogre23LodOutputProviderBufferD2Ev</span>
+<br/>
+<br/>
+</div>
+
+<br/>
+<span class='h_name'>OgreLodOutputProviderCompressedBuffer.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_189')">
+LodOutputProviderCompressedBuffer::bakeFirstPass&#160;<span class='sym_p'><span>(&#160;struct LodData* <span class='color_p'>data</span></span>, <span>int <span class='color_p'>lodIndex</span></span>&#160;)</span></span>
+<br/>
+<div id="c_189" style="display:none;">
+<span class='mngl'>_ZN4Ogre33LodOutputProviderCompressedBuffer13bakeFirstPassEPNS_7LodDataEi</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_190')">
+LodOutputProviderCompressedBuffer::bakeSecondPass&#160;<span class='sym_p'><span>(&#160;struct LodData* <span class='color_p'>data</span></span>, <span>int <span class='color_p'>lodIndex</span></span>&#160;)</span></span>
+<br/>
+<div id="c_190" style="display:none;">
+<span class='mngl'>_ZN4Ogre33LodOutputProviderCompressedBuffer14bakeSecondPassEPNS_7LodDataEi</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_191')">
+LodOutputProviderCompressedBuffer::LodOutputProviderCompressedBuffer <span class='attr'>[C1]</span>&#160;<span class='sym_p'><span>(&#160;MeshPtr <span class='color_p'>mesh</span></span>&#160;)</span></span>
+<br/>
+<div id="c_191" style="display:none;">
+<span class='mngl'>_ZN4Ogre33LodOutputProviderCompressedBufferC1ENS_9SharedPtrINS_4MeshEEE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_192')">
+LodOutputProviderCompressedBuffer::LodOutputProviderCompressedBuffer <span class='attr'>[C2]</span>&#160;<span class='sym_p'><span>(&#160;MeshPtr <span class='color_p'>mesh</span></span>&#160;)</span></span>
+<br/>
+<div id="c_192" style="display:none;">
+<span class='mngl'>_ZN4Ogre33LodOutputProviderCompressedBufferC2ENS_9SharedPtrINS_4MeshEEE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_193')">
+LodOutputProviderCompressedBuffer::~LodOutputProviderCompressedBuffer <span class='attr'>[D0]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_193" style="display:none;">
+<span class='mngl'>_ZN4Ogre33LodOutputProviderCompressedBufferD0Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_194')">
+LodOutputProviderCompressedBuffer::~LodOutputProviderCompressedBuffer <span class='attr'>[D1]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_194" style="display:none;">
+<span class='mngl'>_ZN4Ogre33LodOutputProviderCompressedBufferD1Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_195')">
+LodOutputProviderCompressedBuffer::~LodOutputProviderCompressedBuffer <span class='attr'>[D2]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_195" style="display:none;">
+<span class='mngl'>_ZN4Ogre33LodOutputProviderCompressedBufferD2Ev</span>
+<br/>
+<br/>
+</div>
+
+<br/>
+<span class='h_name'>OgreLodOutputProviderCompressedMesh.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_196')">
+LodOutputProviderCompressedMesh::bakeFirstPass&#160;<span class='sym_p'><span>(&#160;struct LodData* <span class='color_p'>data</span></span>, <span>int <span class='color_p'>lodIndex</span></span>&#160;)</span></span>
+<br/>
+<div id="c_196" style="display:none;">
+<span class='mngl'>_ZN4Ogre31LodOutputProviderCompressedMesh13bakeFirstPassEPNS_7LodDataEi</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_197')">
+LodOutputProviderCompressedMesh::bakeLodLevel&#160;<span class='sym_p'><span>(&#160;struct LodData* <span class='color_p'>data</span></span>, <span>int <span class='color_p'>lodIndex</span></span>&#160;)</span></span>
+<br/>
+<div id="c_197" style="display:none;">
+<span class='mngl'>_ZN4Ogre31LodOutputProviderCompressedMesh12bakeLodLevelEPNS_7LodDataEi</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_198')">
+LodOutputProviderCompressedMesh::bakeManualLodLevel&#160;<span class='sym_p'><span>(&#160;struct LodData* <span class='color_p'>data</span></span>, <span>String&amp; <span class='color_p'>manualMeshName</span></span>, <span>int <span class='color_p'>lodIndex</span></span>&#160;)</span></span>
+<br/>
+<div id="c_198" style="display:none;">
+<span class='mngl'>_ZN4Ogre31LodOutputProviderCompressedMesh18bakeManualLodLevelEPNS_7LodDataERNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEEi</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_199')">
+LodOutputProviderCompressedMesh::bakeSecondPass&#160;<span class='sym_p'><span>(&#160;struct LodData* <span class='color_p'>data</span></span>, <span>int <span class='color_p'>lodIndex</span></span>&#160;)</span></span>
+<br/>
+<div id="c_199" style="display:none;">
+<span class='mngl'>_ZN4Ogre31LodOutputProviderCompressedMesh14bakeSecondPassEPNS_7LodDataEi</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_200')">
+LodOutputProviderCompressedMesh::finalize&#160;<span class='sym_p'><span>(&#160;struct LodData* <span class='color_p'>data</span></span>&#160;)</span></span>
+<br/>
+<div id="c_200" style="display:none;">
+<span class='mngl'>_ZN4Ogre31LodOutputProviderCompressedMesh8finalizeEPNS_7LodDataE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_201')">
+LodOutputProviderCompressedMesh::inject&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_201" style="display:none;">
+<span class='mngl'>_ZN4Ogre31LodOutputProviderCompressedMesh6injectEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_202')">
+LodOutputProviderCompressedMesh::LodOutputProviderCompressedMesh <span class='attr'>[C1]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_202" style="display:none;">
+<span class='mngl'>_ZN4Ogre31LodOutputProviderCompressedMeshC1Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_203')">
+LodOutputProviderCompressedMesh::LodOutputProviderCompressedMesh <span class='attr'>[C2]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_203" style="display:none;">
+<span class='mngl'>_ZN4Ogre31LodOutputProviderCompressedMeshC2Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_204')">
+LodOutputProviderCompressedMesh::LodOutputProviderCompressedMesh <span class='attr'>[C1]</span>&#160;<span class='sym_p'><span>(&#160;MeshPtr <span class='color_p'>mesh</span></span>&#160;)</span></span>
+<br/>
+<div id="c_204" style="display:none;">
+<span class='mngl'>_ZN4Ogre31LodOutputProviderCompressedMeshC1ENS_9SharedPtrINS_4MeshEEE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_205')">
+LodOutputProviderCompressedMesh::LodOutputProviderCompressedMesh <span class='attr'>[C2]</span>&#160;<span class='sym_p'><span>(&#160;MeshPtr <span class='color_p'>mesh</span></span>&#160;)</span></span>
+<br/>
+<div id="c_205" style="display:none;">
+<span class='mngl'>_ZN4Ogre31LodOutputProviderCompressedMeshC2ENS_9SharedPtrINS_4MeshEEE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_206')">
+LodOutputProviderCompressedMesh::prepare&#160;<span class='sym_p'><span>(&#160;struct LodData* <span class='color_p'>data</span></span>&#160;)</span></span>
+<br/>
+<div id="c_206" style="display:none;">
+<span class='mngl'>_ZN4Ogre31LodOutputProviderCompressedMesh7prepareEPNS_7LodDataE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_207')">
+LodOutputProviderCompressedMesh::triangleChanged&#160;<span class='sym_p'><span>(&#160;struct LodData* <span class='color_p'>data</span></span>, <span>struct LodData::Triangle* <span class='color_p'>tri</span></span>&#160;)</span></span>
+<br/>
+<div id="c_207" style="display:none;">
+<span class='mngl'>_ZN4Ogre31LodOutputProviderCompressedMesh15triangleChangedEPNS_7LodDataEPNS1_8TriangleE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_208')">
+LodOutputProviderCompressedMesh::triangleRemoved&#160;<span class='sym_p'><span>(&#160;struct LodData* <span class='color_p'>data</span></span>, <span>struct LodData::Triangle* <span class='color_p'>tri</span></span>&#160;)</span></span>
+<br/>
+<div id="c_208" style="display:none;">
+<span class='mngl'>_ZN4Ogre31LodOutputProviderCompressedMesh15triangleRemovedEPNS_7LodDataEPNS1_8TriangleE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_209')">
+LodOutputProviderCompressedMesh::~LodOutputProviderCompressedMesh <span class='attr'>[D0]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_209" style="display:none;">
+<span class='mngl'>_ZN4Ogre31LodOutputProviderCompressedMeshD0Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_210')">
+LodOutputProviderCompressedMesh::~LodOutputProviderCompressedMesh <span class='attr'>[D1]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_210" style="display:none;">
+<span class='mngl'>_ZN4Ogre31LodOutputProviderCompressedMeshD1Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_211')">
+LodOutputProviderCompressedMesh::~LodOutputProviderCompressedMesh <span class='attr'>[D2]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_211" style="display:none;">
+<span class='mngl'>_ZN4Ogre31LodOutputProviderCompressedMeshD2Ev</span>
+<br/>
+<br/>
+</div>
+
+<br/>
+<span class='h_name'>OgreLodOutputProviderMesh.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_212')">
+LodOutputProviderMesh::bakeLodLevel&#160;<span class='sym_p'><span>(&#160;struct LodData* <span class='color_p'>data</span></span>, <span>int <span class='color_p'>lodIndex</span></span>&#160;)</span></span>
+<br/>
+<div id="c_212" style="display:none;">
+<span class='mngl'>_ZN4Ogre21LodOutputProviderMesh12bakeLodLevelEPNS_7LodDataEi</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_213')">
+LodOutputProviderMesh::bakeManualLodLevel&#160;<span class='sym_p'><span>(&#160;struct LodData* <span class='color_p'>data</span></span>, <span>String&amp; <span class='color_p'>manualMeshName</span></span>, <span>int <span class='color_p'>lodIndex</span></span>&#160;)</span></span>
+<br/>
+<div id="c_213" style="display:none;">
+<span class='mngl'>_ZN4Ogre21LodOutputProviderMesh18bakeManualLodLevelEPNS_7LodDataERNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEEi</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_214')">
+LodOutputProviderMesh::prepare&#160;<span class='sym_p'><span>(&#160;struct LodData* <span class='color_p'>data</span></span>&#160;)</span></span>
+<br/>
+<div id="c_214" style="display:none;">
+<span class='mngl'>_ZN4Ogre21LodOutputProviderMesh7prepareEPNS_7LodDataE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_215')">
+LodOutputProviderMesh::~LodOutputProviderMesh <span class='attr'>[D0]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_215" style="display:none;">
+<span class='mngl'>_ZN4Ogre21LodOutputProviderMeshD0Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_216')">
+LodOutputProviderMesh::~LodOutputProviderMesh <span class='attr'>[D1]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_216" style="display:none;">
+<span class='mngl'>_ZN4Ogre21LodOutputProviderMeshD1Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_217')">
+LodOutputProviderMesh::~LodOutputProviderMesh <span class='attr'>[D2]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_217" style="display:none;">
+<span class='mngl'>_ZN4Ogre21LodOutputProviderMeshD2Ev</span>
+<br/>
+<br/>
+</div>
+
+<br/>
+<span class='h_name'>OgreLodWorkQueueInjector.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_218')">
+LodWorkQueueInjector::getSingleton&#160;<span class='sym_p'>(&#160;)</span> <span class='attr'>[static]</span></span>
+<br/>
+<div id="c_218" style="display:none;">
+<span class='mngl'>_ZN4Ogre20LodWorkQueueInjector12getSingletonEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_219')">
+LodWorkQueueInjector::getSingletonPtr&#160;<span class='sym_p'>(&#160;)</span> <span class='attr'>[static]</span></span>
+<br/>
+<div id="c_219" style="display:none;">
+<span class='mngl'>_ZN4Ogre20LodWorkQueueInjector15getSingletonPtrEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_220')">
+LodWorkQueueInjector::handleResponse&#160;<span class='sym_p'><span>(&#160;struct WorkQueue::Response const* <span class='color_p'>res</span></span>, <span>WorkQueue const* <span class='color_p'>srcQ</span></span>&#160;)</span></span>
+<br/>
+<div id="c_220" style="display:none;">
+<span class='mngl'>_ZN4Ogre20LodWorkQueueInjector14handleResponseEPKNS_9WorkQueue8ResponseEPKS1_</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_221')">
+LodWorkQueueInjector::LodWorkQueueInjector <span class='attr'>[C1]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_221" style="display:none;">
+<span class='mngl'>_ZN4Ogre20LodWorkQueueInjectorC1Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_222')">
+LodWorkQueueInjector::LodWorkQueueInjector <span class='attr'>[C2]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_222" style="display:none;">
+<span class='mngl'>_ZN4Ogre20LodWorkQueueInjectorC2Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_223')">
+LodWorkQueueInjector::~LodWorkQueueInjector <span class='attr'>[D0]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_223" style="display:none;">
+<span class='mngl'>_ZN4Ogre20LodWorkQueueInjectorD0Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_224')">
+LodWorkQueueInjector::~LodWorkQueueInjector <span class='attr'>[D1]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_224" style="display:none;">
+<span class='mngl'>_ZN4Ogre20LodWorkQueueInjectorD1Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_225')">
+LodWorkQueueInjector::~LodWorkQueueInjector <span class='attr'>[D2]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_225" style="display:none;">
+<span class='mngl'>_ZN4Ogre20LodWorkQueueInjectorD2Ev</span>
+<br/>
+<br/>
+</div>
+
+<br/>
+<span class='h_name'>OgreLodWorkQueueWorker.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_226')">
+LodWorkQueueWorker::addRequestToQueue&#160;<span class='sym_p'><span>(&#160;struct LodConfig&amp; <span class='color_p'>lodConfig</span></span>, <span>LodCollapseCostPtr&amp; <span class='color_p'>cost</span></span>, <span>LodDataPtr&amp; <span class='color_p'>data</span></span>, <span>LodInputProviderPtr&amp; <span class='color_p'>input</span></span>, <span>LodOutputProviderPtr&amp; <span class='color_p'>output</span></span>, <span>LodCollapserPtr&amp; <span class='color_p'>collapser</span></span>&#160;)</span></span>
+<br/>
+<div id="c_226" style="display:none;">
+<span class='mngl'>_ZN4Ogre18LodWorkQueueWorker17addRequestToQueueERNS_9LodConfigERSt10shared_ptrINS_15LodCollapseCostEERS3_INS_7LodDataEERS3_INS_16LodInputProviderEERS3_INS_17LodOutputProviderEERS3_INS_12LodCollapserEE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_227')">
+LodWorkQueueWorker::addRequestToQueue&#160;<span class='sym_p'><span>(&#160;struct LodWorkQueueRequest* <span class='color_p'>request</span></span>&#160;)</span></span>
+<br/>
+<div id="c_227" style="display:none;">
+<span class='mngl'>_ZN4Ogre18LodWorkQueueWorker17addRequestToQueueEPNS_19LodWorkQueueRequestE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_228')">
+LodWorkQueueWorker::clearPendingLodRequests&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_228" style="display:none;">
+<span class='mngl'>_ZN4Ogre18LodWorkQueueWorker23clearPendingLodRequestsEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_229')">
+LodWorkQueueWorker::getSingleton&#160;<span class='sym_p'>(&#160;)</span> <span class='attr'>[static]</span></span>
+<br/>
+<div id="c_229" style="display:none;">
+<span class='mngl'>_ZN4Ogre18LodWorkQueueWorker12getSingletonEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_230')">
+LodWorkQueueWorker::getSingletonPtr&#160;<span class='sym_p'>(&#160;)</span> <span class='attr'>[static]</span></span>
+<br/>
+<div id="c_230" style="display:none;">
+<span class='mngl'>_ZN4Ogre18LodWorkQueueWorker15getSingletonPtrEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_231')">
+LodWorkQueueWorker::handleRequest&#160;<span class='sym_p'><span>(&#160;WorkQueue::Request const* <span class='color_p'>req</span></span>, <span>WorkQueue const* <span class='color_p'>srcQ</span></span>&#160;)</span></span>
+<br/>
+<div id="c_231" style="display:none;">
+<span class='mngl'>_ZN4Ogre18LodWorkQueueWorker13handleRequestEPKNS_9WorkQueue7RequestEPKS1_</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_232')">
+LodWorkQueueWorker::LodWorkQueueWorker <span class='attr'>[C1]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_232" style="display:none;">
+<span class='mngl'>_ZN4Ogre18LodWorkQueueWorkerC1Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_233')">
+LodWorkQueueWorker::LodWorkQueueWorker <span class='attr'>[C2]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_233" style="display:none;">
+<span class='mngl'>_ZN4Ogre18LodWorkQueueWorkerC2Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_234')">
+LodWorkQueueWorker::~LodWorkQueueWorker <span class='attr'>[D0]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_234" style="display:none;">
+<span class='mngl'>_ZN4Ogre18LodWorkQueueWorkerD0Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_235')">
+LodWorkQueueWorker::~LodWorkQueueWorker <span class='attr'>[D1]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_235" style="display:none;">
+<span class='mngl'>_ZN4Ogre18LodWorkQueueWorkerD1Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_236')">
+LodWorkQueueWorker::~LodWorkQueueWorker <span class='attr'>[D2]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_236" style="display:none;">
+<span class='mngl'>_ZN4Ogre18LodWorkQueueWorkerD2Ev</span>
+<br/>
+<br/>
+</div>
+
+<br/>
+<span class='h_name'>OgreMeshLodGenerator.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_237')">
+MeshLodGenerator::_initWorkQueue&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_237" style="display:none;">
+<span class='mngl'>_ZN4Ogre16MeshLodGenerator14_initWorkQueueEv</span>
+<br/>
+<br/>
+</div>
+
+<br/>
+<span class='h_name'>OgreSingleton.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_238')">
+Singleton&lt;LodWorkQueueInjector&gt;::msSingleton <span class='attr'>[data]</span></span>
+<br/>
+<div id="c_238" style="display:none;">
+<span class='mngl'>_ZN4Ogre9SingletonINS_20LodWorkQueueInjectorEE11msSingletonE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_239')">
+Singleton&lt;LodWorkQueueWorker&gt;::msSingleton <span class='attr'>[data]</span></span>
+<br/>
+<div id="c_239" style="display:none;">
+<span class='mngl'>_ZN4Ogre9SingletonINS_18LodWorkQueueWorkerEE11msSingletonE</span>
+<br/>
+<br/>
+</div>
+
+<br/>
+<span class='h_name'>OgreWorkQueue.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_240')">
+WorkQueue::RequestHandler::~RequestHandler <span class='attr'>[D0]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_240" style="display:none;">
+<span class='mngl'>_ZN4Ogre9WorkQueue14RequestHandlerD0Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_241')">
+WorkQueue::RequestHandler::~RequestHandler <span class='attr'>[D1]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_241" style="display:none;">
+<span class='mngl'>_ZN4Ogre9WorkQueue14RequestHandlerD1Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_242')">
+WorkQueue::RequestHandler::~RequestHandler <span class='attr'>[D2]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_242" style="display:none;">
+<span class='mngl'>_ZN4Ogre9WorkQueue14RequestHandlerD2Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_243')">
+WorkQueue::ResponseHandler::~ResponseHandler <span class='attr'>[D0]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_243" style="display:none;">
+<span class='mngl'>_ZN4Ogre9WorkQueue15ResponseHandlerD0Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_244')">
+WorkQueue::ResponseHandler::~ResponseHandler <span class='attr'>[D1]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_244" style="display:none;">
+<span class='mngl'>_ZN4Ogre9WorkQueue15ResponseHandlerD1Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_245')">
+WorkQueue::ResponseHandler::~ResponseHandler <span class='attr'>[D2]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_245" style="display:none;">
+<span class='mngl'>_ZN4Ogre9WorkQueue15ResponseHandlerD2Ev</span>
+<br/>
+<br/>
+</div>
+
+<br/>
+<a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='High_Risk_Problems'></a><a name='Type_Problems_High'></a>
+<h2>Problems with Data Types, High Severity <span class='failed'>&nbsp;13&nbsp;</span></h2><hr/>
+<span class='h_name'>OgreLodInputProvider.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_246')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> LodInputProvider <span class='failed'>&nbsp;10&nbsp;</span></span>
+<br/>
+<div id="c_246" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Pure virtual method <span class='iname_b'>getMeshName&#160;<span class='sym_pd'>(&#160;)</span></span> has been added to this class.</td>
+<td>Recompilation of a client program may be broken with the error message: cannot allocate an object of abstract type <b>LodInputProvider</b> because the following virtual functions are pure within <b>LodInputProvider</b>: virtual <span class='iname_b'>getMeshName&#160;<span class='sym_pd'>(&#160;)</span></span>.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>Pure virtual method <span class='iname_b'>addVertexData&#160;<span class='sym_pd'><span>(&#160;struct LodData*</span>, <span>size_t</span>&#160;)</span></span> has been added to this class.</td>
+<td>Recompilation of a client program may be broken with the error message: cannot allocate an object of abstract type <b>LodInputProvider</b> because the following virtual functions are pure within <b>LodInputProvider</b>: virtual <span class='iname_b'>addVertexData&#160;<span class='sym_pd'><span>(&#160;struct LodData*</span>, <span>size_t</span>&#160;)</span></span>.</td>
+</tr>
+<tr>
+<th>3</th>
+<td>Pure virtual method <span class='iname_b'>getSubMeshCount&#160;<span class='sym_pd'>(&#160;)</span></span> has been added to this class.</td>
+<td>Recompilation of a client program may be broken with the error message: cannot allocate an object of abstract type <b>LodInputProvider</b> because the following virtual functions are pure within <b>LodInputProvider</b>: virtual <span class='iname_b'>getSubMeshCount&#160;<span class='sym_pd'>(&#160;)</span></span>.</td>
+</tr>
+<tr>
+<th>4</th>
+<td>Pure virtual method <span class='iname_b'>getSubMeshRenderOp&#160;<span class='sym_pd'><span>(&#160;size_t</span>&#160;)</span></span> has been added to this class.</td>
+<td>Recompilation of a client program may be broken with the error message: cannot allocate an object of abstract type <b>LodInputProvider</b> because the following virtual functions are pure within <b>LodInputProvider</b>: virtual <span class='iname_b'>getSubMeshRenderOp&#160;<span class='sym_pd'><span>(&#160;size_t</span>&#160;)</span></span>.</td>
+</tr>
+<tr>
+<th>5</th>
+<td>Pure virtual method <span class='iname_b'>getSubMeshIndexCount&#160;<span class='sym_pd'><span>(&#160;size_t</span>&#160;)</span></span> has been added to this class.</td>
+<td>Recompilation of a client program may be broken with the error message: cannot allocate an object of abstract type <b>LodInputProvider</b> because the following virtual functions are pure within <b>LodInputProvider</b>: virtual <span class='iname_b'>getSubMeshIndexCount&#160;<span class='sym_pd'><span>(&#160;size_t</span>&#160;)</span></span>.</td>
+</tr>
+<tr>
+<th>6</th>
+<td>Pure virtual method <span class='iname_b'>getMeshSharedVertexCount&#160;<span class='sym_pd'>(&#160;)</span></span> has been added to this class.</td>
+<td>Recompilation of a client program may be broken with the error message: cannot allocate an object of abstract type <b>LodInputProvider</b> because the following virtual functions are pure within <b>LodInputProvider</b>: virtual <span class='iname_b'>getMeshSharedVertexCount&#160;<span class='sym_pd'>(&#160;)</span></span>.</td>
+</tr>
+<tr>
+<th>7</th>
+<td>Pure virtual method <span class='iname_b'>getSubMeshOwnVertexCount&#160;<span class='sym_pd'><span>(&#160;size_t</span>&#160;)</span></span> has been added to this class.</td>
+<td>Recompilation of a client program may be broken with the error message: cannot allocate an object of abstract type <b>LodInputProvider</b> because the following virtual functions are pure within <b>LodInputProvider</b>: virtual <span class='iname_b'>getSubMeshOwnVertexCount&#160;<span class='sym_pd'><span>(&#160;size_t</span>&#160;)</span></span>.</td>
+</tr>
+<tr>
+<th>8</th>
+<td>Pure virtual method <span class='iname_b'>getMeshBoundingSphereRadius&#160;<span class='sym_pd'>(&#160;)</span></span> has been added to this class.</td>
+<td>Recompilation of a client program may be broken with the error message: cannot allocate an object of abstract type <b>LodInputProvider</b> because the following virtual functions are pure within <b>LodInputProvider</b>: virtual <span class='iname_b'>getMeshBoundingSphereRadius&#160;<span class='sym_pd'>(&#160;)</span></span>.</td>
+</tr>
+<tr>
+<th>9</th>
+<td>Pure virtual method <span class='iname_b'>getSubMeshUseSharedVertices&#160;<span class='sym_pd'><span>(&#160;size_t</span>&#160;)</span></span> has been added to this class.</td>
+<td>Recompilation of a client program may be broken with the error message: cannot allocate an object of abstract type <b>LodInputProvider</b> because the following virtual functions are pure within <b>LodInputProvider</b>: virtual <span class='iname_b'>getSubMeshUseSharedVertices&#160;<span class='sym_pd'><span>(&#160;size_t</span>&#160;)</span></span>.</td>
+</tr>
+<tr>
+<th>10</th>
+<td>Pure virtual method <span class='iname_b'>getSubMeshIndexData&#160;<span class='sym_pd'><span>(&#160;size_t</span>&#160;)</span> const</span> has been added to this class.</td>
+<td>Recompilation of a client program may be broken with the error message: cannot allocate an object of abstract type <b>LodInputProvider</b> because the following virtual functions are pure within <b>LodInputProvider</b>: virtual <span class='iname_b'>getSubMeshIndexData&#160;<span class='sym_pd'><span>(&#160;size_t</span>&#160;)</span> const</span>.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_247')">
+[+] affected symbols: 2 (0.6%)</span>
+<div id="c_247" style="display:none;">
+<div class='affected'><span class='iname_a'>LodInputProvider::LodInputProvider&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This constructor is from &#39;LodInputProvider&#39; class.</div>
+<span class='iname_a'>LodInputProvider::~LodInputProvider&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This destructor is from &#39;LodInputProvider&#39; class.</div>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<span class='h_name'>OgreLodOutputProvider.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_248')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> LodOutputProvider <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_248" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Pure virtual method <span class='iname_b'>inject&#160;<span class='sym_pd'>(&#160;)</span></span> has been removed from this class.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_249')">
+[+] affected symbols: 1 (0.3%)</span>
+<div id="c_249" style="display:none;">
+<div class='affected'><span class='iname_a'>LodOutputProvider::~LodOutputProvider&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This destructor is from &#39;LodOutputProvider&#39; class.</div>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<span class='h_name'>OgreMeshLodGenerator.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_250')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> MeshLodGenerator <span class='failed'>&nbsp;2&nbsp;</span></span>
+<br/>
+<div id="c_250" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Field <b>mWQInjector</b> has been removed from this type.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>MeshLodGenerator</b>' has no member named '<b>mWQInjector</b>'.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>Field <b>mWQWorker</b> has been removed from this type.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>MeshLodGenerator</b>' has no member named '<b>mWQWorker</b>'.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_251')">
+[+] affected symbols: 13 (3.8%)</span>
+<div id="c_251" style="display:none;">
+<div class='affected'><span class='iname_a'>MeshLodGenerator::computeLods&#160;<span class='sym_p'><span>(&#160;struct LodConfig&amp; <i>lodConfig</i></span>, <span>struct LodData* <i>data</i></span>, <span>LodCollapseCost* <i>cost</i></span>, <span>LodOutputProvider* <i>output</i></span>, <span>LodCollapser* <i>collapser</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;MeshLodGenerator&#39; class.</div>
+<span class='iname_a'>MeshLodGenerator::getSingleton&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>Return value (reference) has base type &#39;MeshLodGenerator&#39;.</div>
+<span class='iname_a'>MeshLodGenerator::getAutoconfig&#160;<span class='sym_p'><span>(&#160;MeshPtr&amp; <i>inMesh</i></span>, <span>struct LodConfig&amp; <i>outLodConfig</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;MeshLodGenerator&#39; class.</div>
+<span class='iname_a'>MeshLodGenerator::getSingletonPtr&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>Return value (pointer) has base type &#39;MeshLodGenerator&#39;.</div>
+<span class='iname_a'>MeshLodGenerator::generateLodLevels&#160;<span class='sym_p'><span>(&#160;struct LodConfig&amp; <i>lodConfig</i></span>, <span>LodCollapseCostPtr <i>cost</i></span>, <span>LodDataPtr <i>data</i></span>, <span>LodInputProviderPtr <i>input</i></span>, <span>LodOutputProviderPtr <i>output</i></span>, <span>LodCollapserPtr <i>collapser</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;MeshLodGenerator&#39; class.</div>
+<span class='iname_a'>MeshLodGenerator::_resolveComponents&#160;<span class='sym_p'><span>(&#160;struct LodConfig&amp; <i>lodConfig</i></span>, <span>LodCollapseCostPtr&amp; <i>cost</i></span>, <span>LodDataPtr&amp; <i>data</i></span>, <span>LodInputProviderPtr&amp; <i>input</i></span>, <span>LodOutputProviderPtr&amp; <i>output</i></span>, <span>LodCollapserPtr&amp; <i>collapser</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;MeshLodGenerator&#39; class.</div>
+<span class='iname_a'>MeshLodGenerator::calcLodVertexCount&#160;<span class='sym_p'><span>(&#160;struct LodLevel const&amp; <i>lodLevel</i></span>, <span>size_t <i>uniqueVertexCount</i></span>, <span>size_t&amp; <i>outVertexCountLimit</i></span>, <span>Real&amp; <i>outCollapseCostLimit</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;MeshLodGenerator&#39; class.</div>
+<span class='iname_a'>MeshLodGenerator::_generateManualLodLevels&#160;<span class='sym_p'><span>(&#160;struct LodConfig&amp; <i>lodConfig</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;MeshLodGenerator&#39; class.</div>
+<span class='iname_a'>MeshLodGenerator::generateAutoconfiguredLodLevels&#160;<span class='sym_p'><span>(&#160;MeshPtr&amp; <i>mesh</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;MeshLodGenerator&#39; class.</div>
+<span class='iname_a'>MeshLodGenerator::_process&#160;<span class='sym_p'><span>(&#160;struct LodConfig&amp; <i>lodConfig</i></span>, <span>LodCollapseCost* <i>cost</i></span>, <span>struct LodData* <i>data</i></span>, <span>LodInputProvider* <i>input</i></span>, <span>LodOutputProvider* <i>output</i></span>, <span>LodCollapser* <i>collapser</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;MeshLodGenerator&#39; class.</div>
+ <b>...</b>
+<br/>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='Symbol_Problems_High'></a><a name='Interface_Problems_High'></a>
+<h2>Problems with Symbols, High Severity <span class='failed'>&nbsp;3&nbsp;</span></h2><hr/>
+<span class='h_name'>OgreMeshLodGenerator.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_252')">
+<span class='ext'>[+]</span> MeshLodGenerator::_process&#160;<span class='sym_p'><span>(&#160;struct LodConfig&amp; <span class='color_p'>lodConfig</span></span>, <span>LodCollapseCost* <span class='color_p'>cost</span></span>, <span>struct LodData* <span class='color_p'>data</span></span>, <span>LodInputProvider* <span class='color_p'>input</span></span>, <span>LodOutputProvider* <span class='color_p'>output</span></span>, <span>LodCollapser* <span class='color_p'>collapser</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_252" style="display:none;">
+
+<span class='mngl pleft'>_ZN4Ogre16MeshLodGenerator8_processERNS_9LodConfigEPNS_15LodCollapseCostEPNS_7LodDataEPNS_16LodInputProviderEPNS_17LodOutputProviderEPNS_12LodCollapserE</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>This method became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>_ZN4Ogre16MeshLodGenerator8_processERNS_9LodConfigEPNS_15LodCollapseCostEPNS_7LodDataEPNS_16LodInputProviderEPNS_17LodOutputProviderEPNS_12LodCollapserE</b>' is private.</td>
+</tr>
+</table>
+<br/>
+</div>
+<span class="section" onclick="javascript:showContent(this, 'c_253')">
+<span class='ext'>[+]</span> MeshLodGenerator::calcLodVertexCount&#160;<span class='sym_p'><span>(&#160;struct LodLevel const&amp; <span class='color_p'>lodLevel</span></span>, <span>size_t <span class='color_p'>uniqueVertexCount</span></span>, <span>size_t&amp; <span class='color_p'>outVertexCountLimit</span></span>, <span>Real&amp; <span class='color_p'>outCollapseCostLimit</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_253" style="display:none;">
+
+<span class='mngl pleft'>_ZN4Ogre16MeshLodGenerator18calcLodVertexCountERKNS_8LodLevelEmRmRf</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>This method became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>_ZN4Ogre16MeshLodGenerator18calcLodVertexCountERKNS_8LodLevelEmRmRf</b>' is private.</td>
+</tr>
+</table>
+<br/>
+</div>
+<span class="section" onclick="javascript:showContent(this, 'c_254')">
+<span class='ext'>[+]</span> MeshLodGenerator::computeLods&#160;<span class='sym_p'><span>(&#160;struct LodConfig&amp; <span class='color_p'>lodConfig</span></span>, <span>struct LodData* <span class='color_p'>data</span></span>, <span>LodCollapseCost* <span class='color_p'>cost</span></span>, <span>LodOutputProvider* <span class='color_p'>output</span></span>, <span>LodCollapser* <span class='color_p'>collapser</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_254" style="display:none;">
+
+<span class='mngl pleft'>_ZN4Ogre16MeshLodGenerator11computeLodsERNS_9LodConfigEPNS_7LodDataEPNS_15LodCollapseCostEPNS_17LodOutputProviderEPNS_12LodCollapserE</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>This method became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>_ZN4Ogre16MeshLodGenerator11computeLodsERNS_9LodConfigEPNS_7LodDataEPNS_15LodCollapseCostEPNS_17LodOutputProviderEPNS_12LodCollapserE</b>' is private.</td>
+</tr>
+</table>
+<br/>
+</div>
+<br/>
+<a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='Low_Risk_Problems'></a><a name='Type_Problems_Low'></a>
+<h2>Problems with Data Types, Low Severity <span class='warning'>&nbsp;12&nbsp;</span></h2><hr/>
+<span class='h_name'>OgreLodConfig.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_255')">
+<span class='ext'>[+]</span> <span class='ttype'>struct</span> LodConfig::Advanced <span class='warning'>&nbsp;2&nbsp;</span></span>
+<br/>
+<div id="c_255" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Field <b>preventBreakingLines</b> has been added to this type.</td>
+<td>This field will not be initialized or used by old client applications.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>Field <b>preventPunchingHoles</b> has been added to this type.</td>
+<td>This field will not be initialized or used by old client applications.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_256')">
+[+] affected symbols: 19 (5.5%)</span>
+<div id="c_256" style="display:none;">
+<div class='affected'><span class='iname_a'>MeshLodGenerator::computeLods&#160;<span class='sym_p'><span>(&#160;struct LodConfig&amp; <span class='fp'>lodConfig</span></span>, <span>struct LodData* <i>data</i></span>, <span>LodCollapseCost* <i>cost</i></span>, <span>LodOutputProvider* <i>output</i></span>, <span>LodCollapser* <i>collapser</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;lodConfig.advanced&#39; in 1st parameter &#39;lodConfig&#39; (reference) is of type &#39;struct LodConfig::Advanced&#39;.</div>
+<span class='iname_a'>MeshLodGenerator::getAutoconfig&#160;<span class='sym_p'><span>(&#160;MeshPtr&amp; <i>inMesh</i></span>, <span>struct LodConfig&amp; <span class='fp'>outLodConfig</span></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;outLodConfig.advanced&#39; in 2nd parameter &#39;outLodConfig&#39; (reference) is of type &#39;struct LodConfig::Advanced&#39;.</div>
+<span class='iname_a'>MeshLodGenerator::generateLodLevels&#160;<span class='sym_p'><span>(&#160;struct LodConfig&amp; <span class='fp'>lodConfig</span></span>, <span>LodCollapseCostPtr <i>cost</i></span>, <span>LodDataPtr <i>data</i></span>, <span>LodInputProviderPtr <i>input</i></span>, <span>LodOutputProviderPtr <i>output</i></span>, <span>LodCollapserPtr <i>collapser</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;lodConfig.advanced&#39; in 1st parameter &#39;lodConfig&#39; (reference) is of type &#39;struct LodConfig::Advanced&#39;.</div>
+<span class='iname_a'>MeshLodGenerator::_resolveComponents&#160;<span class='sym_p'><span>(&#160;struct LodConfig&amp; <span class='fp'>lodConfig</span></span>, <span>LodCollapseCostPtr&amp; <i>cost</i></span>, <span>LodDataPtr&amp; <i>data</i></span>, <span>LodInputProviderPtr&amp; <i>input</i></span>, <span>LodOutputProviderPtr&amp; <i>output</i></span>, <span>LodCollapserPtr&amp; <i>collapser</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;lodConfig.advanced&#39; in 1st parameter &#39;lodConfig&#39; (reference) is of type &#39;struct LodConfig::Advanced&#39;.</div>
+<span class='iname_a'>MeshLodGenerator::_configureMeshLodUsage&#160;<span class='sym_p'><span>(&#160;struct LodConfig const&amp; <span class='fp'>lodConfig</span></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;lodConfig.advanced&#39; in 1st parameter &#39;lodConfig&#39; (reference) is of type &#39;struct LodConfig::Advanced&#39;.</div>
+<span class='iname_a'>MeshLodGenerator::_generateManualLodLevels&#160;<span class='sym_p'><span>(&#160;struct LodConfig&amp; <span class='fp'>lodConfig</span></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;lodConfig.advanced&#39; in 1st parameter &#39;lodConfig&#39; (reference) is of type &#39;struct LodConfig::Advanced&#39;.</div>
+<span class='iname_a'>MeshLodGenerator::_process&#160;<span class='sym_p'><span>(&#160;struct LodConfig&amp; <span class='fp'>lodConfig</span></span>, <span>LodCollapseCost* <i>cost</i></span>, <span>struct LodData* <i>data</i></span>, <span>LodInputProvider* <i>input</i></span>, <span>LodOutputProvider* <i>output</i></span>, <span>LodCollapser* <i>collapser</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;lodConfig.advanced&#39; in 1st parameter &#39;lodConfig&#39; (reference) is of type &#39;struct LodConfig::Advanced&#39;.</div>
+<span class='iname_a'>LodConfigSerializer::exportLodConfig&#160;<span class='sym_p'><span>(&#160;struct LodConfig&amp; <span class='fp'>config</span></span>, <span>DataStreamPtr <i>stream</i></span>, <span>enum Serializer::Endian <i>endianMode</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;config.advanced&#39; in 1st parameter &#39;config&#39; (reference) is of type &#39;struct LodConfig::Advanced&#39;.</div>
+<span class='iname_a'>LodConfigSerializer::exportLodConfig&#160;<span class='sym_p'><span>(&#160;struct LodConfig&amp; <span class='fp'>config</span></span>, <span>String const&amp; <i>filename</i></span>, <span>enum Serializer::Endian <i>endianMode</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;config.advanced&#39; in 1st parameter &#39;config&#39; (reference) is of type &#39;struct LodConfig::Advanced&#39;.</div>
+<span class='iname_a'>LodConfigSerializer::importLodConfig&#160;<span class='sym_p'><span>(&#160;struct LodConfig* <span class='fp'>config</span></span>, <span>String const&amp; <i>filename</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;config.advanced&#39; in 1st parameter &#39;config&#39; (pointer) is of type &#39;struct LodConfig::Advanced&#39;.</div>
+ <b>...</b>
+<br/>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<span class='h_name'>OgreLodData.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_257')">
+<span class='ext'>[+]</span> <span class='ttype'>struct</span> LodData <span class='warning'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_257" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Field <b>mLineList</b> has been added to this type.</td>
+<td>This field will not be initialized or used by old client applications.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_258')">
+[+] affected symbols: 25 (7.3%)</span>
+<div id="c_258" style="display:none;">
+<div class='affected'><span class='iname_a'>LodCollapser::collapseVertex&#160;<span class='sym_p'><span>(&#160;struct LodData* <span class='fp'>data</span></span>, <span>LodCollapseCost* <i>cost</i></span>, <span>LodOutputProvider* <i>output</i></span>, <span>struct LodData::Vertex* <i>src</i></span>&#160;)</span></span><br/>
+<div class='affect'>1st parameter &#39;data&#39; (pointer) has base type &#39;struct LodData&#39;.</div>
+<span class='iname_a'>LodCollapser::_getLastVertexPos&#160;<span class='sym_p'><span>(&#160;struct LodData* <span class='fp'>data</span></span>, <span>Vector3&amp; <i>outVec</i></span>&#160;)</span></span><br/>
+<div class='affect'>1st parameter &#39;data&#39; (pointer) has base type &#39;struct LodData&#39;.</div>
+<span class='iname_a'>LodCollapser::_getLastVertexCollapseTo&#160;<span class='sym_p'><span>(&#160;struct LodData* <span class='fp'>data</span></span>, <span>Vector3&amp; <i>outVec</i></span>&#160;)</span></span><br/>
+<div class='affect'>1st parameter &#39;data&#39; (pointer) has base type &#39;struct LodData&#39;.</div>
+<span class='iname_a'>LodCollapser::collapse&#160;<span class='sym_p'><span>(&#160;struct LodData* <span class='fp'>data</span></span>, <span>LodCollapseCost* <i>cost</i></span>, <span>LodOutputProvider* <i>output</i></span>, <span>int <i>vertexCountLimit</i></span>, <span>Real <i>collapseCostLimit</i></span>&#160;)</span></span><br/>
+<div class='affect'>1st parameter &#39;data&#39; (pointer) has base type &#39;struct LodData&#39;.</div>
+<span class='iname_a'>LodCollapseCost::initCollapseCosts&#160;<span class='sym_p'><span>(&#160;struct LodData* <span class='fp'>data</span></span>&#160;)</span></span><br/>
+<div class='affect'>1st parameter &#39;data&#39; (pointer) has base type &#39;struct LodData&#39;.</div>
+<span class='iname_a'>LodCollapseCost::initVertexCollapseCost&#160;<span class='sym_p'><span>(&#160;struct LodData* <span class='fp'>data</span></span>, <span>struct LodData::Vertex* <i>vertex</i></span>&#160;)</span></span><br/>
+<div class='affect'>1st parameter &#39;data&#39; (pointer) has base type &#39;struct LodData&#39;.</div>
+<span class='iname_a'>LodCollapseCost::updateVertexCollapseCost&#160;<span class='sym_p'><span>(&#160;struct LodData* <span class='fp'>data</span></span>, <span>struct LodData::Vertex* <i>vertex</i></span>&#160;)</span></span><br/>
+<div class='affect'>1st parameter &#39;data&#39; (pointer) has base type &#39;struct LodData&#39;.</div>
+<span class='iname_a'>LodCollapseCost::computeVertexCollapseCost&#160;<span class='sym_p'><span>(&#160;struct LodData* <span class='fp'>data</span></span>, <span>struct LodData::Vertex* <i>vertex</i></span>, <span>Real&amp; <i>collapseCost</i></span>, <span>struct LodData::Vertex*&amp; <i>collapseTo</i></span>&#160;)</span></span><br/>
+<div class='affect'>1st parameter &#39;data&#39; (pointer) has base type &#39;struct LodData&#39;.</div>
+<span class='iname_a'>MeshLodGenerator::computeLods&#160;<span class='sym_p'><span>(&#160;struct LodConfig&amp; <i>lodConfig</i></span>, <span>struct LodData* <span class='fp'>data</span></span>, <span>LodCollapseCost* <i>cost</i></span>, <span>LodOutputProvider* <i>output</i></span>, <span>LodCollapser* <i>collapser</i></span>&#160;)</span></span><br/>
+<div class='affect'>2nd parameter &#39;data&#39; (pointer) has base type &#39;struct LodData&#39;.</div>
+<span class='iname_a'>MeshLodGenerator::_process&#160;<span class='sym_p'><span>(&#160;struct LodConfig&amp; <i>lodConfig</i></span>, <span>LodCollapseCost* <i>cost</i></span>, <span>struct LodData* <span class='fp'>data</span></span>, <span>LodInputProvider* <i>input</i></span>, <span>LodOutputProvider* <i>output</i></span>, <span>LodCollapser* <i>collapser</i></span>&#160;)</span></span><br/>
+<div class='affect'>3rd parameter &#39;data&#39; (pointer) has base type &#39;struct LodData&#39;.</div>
+ <b>...</b>
+<br/>
+</div>
+</div>
+<br/><br/></div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_259')">
+<span class='ext'>[+]</span> <span class='ttype'>struct</span> LodData::Vertex <span class='warning'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_259" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Field <b>lines</b> has been added to this type.</td>
+<td>This field will not be initialized or used by old client applications.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_260')">
+[+] affected symbols: 39 (11.3%)</span>
+<div id="c_260" style="display:none;">
+<div class='affected'><span class='iname_a'>LodCollapser::collapseVertex&#160;<span class='sym_p'><span>(&#160;struct LodData* <i>data</i></span>, <span>LodCollapseCost* <i>cost</i></span>, <span>LodOutputProvider* <i>output</i></span>, <span>struct LodData::Vertex* <span class='fp'>src</span></span>&#160;)</span></span><br/>
+<div class='affect'>4th parameter &#39;src&#39; (pointer) has base type &#39;struct LodData::Vertex&#39;.</div>
+<span class='iname_a'>LodCollapser::replaceVertexID&#160;<span class='sym_p'><span>(&#160;struct LodData::Triangle* <i>triangle</i></span>, <span>unsigned int <i>oldID</i></span>, <span>unsigned int <i>newID</i></span>, <span>struct LodData::Vertex* <span class='fp'>dst</span></span>&#160;)</span></span><br/>
+<div class='affect'>4th parameter &#39;dst&#39; (pointer) has base type &#39;struct LodData::Vertex&#39;.</div>
+<span class='iname_a'>LodCollapser::_getLastVertexPos&#160;<span class='sym_p'><span>(&#160;struct LodData* <i>data</i></span>, <span>Vector3&amp; <i>outVec</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mLastReducedVertex&#39; in the object of this method has base type &#39;struct LodData::Vertex&#39;.</div>
+<span class='iname_a'>LodCollapser::removeTriangleFromEdges&#160;<span class='sym_p'><span>(&#160;struct LodData::Triangle* <i>triangle</i></span>, <span>struct LodData::Vertex* <span class='fp'>skip</span></span>&#160;)</span></span><br/>
+<div class='affect'>2nd parameter &#39;skip&#39; (pointer) has base type &#39;struct LodData::Vertex&#39;.</div>
+<span class='iname_a'>LodCollapser::_getLastVertexCollapseTo&#160;<span class='sym_p'><span>(&#160;struct LodData* <i>data</i></span>, <span>Vector3&amp; <i>outVec</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mLastReducedVertex&#39; in the object of this method has base type &#39;struct LodData::Vertex&#39;.</div>
+<span class='iname_a'>LodCollapser::collapse&#160;<span class='sym_p'><span>(&#160;struct LodData* <i>data</i></span>, <span>LodCollapseCost* <i>cost</i></span>, <span>LodOutputProvider* <i>output</i></span>, <span>int <i>vertexCountLimit</i></span>, <span>Real <i>collapseCostLimit</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mLastReducedVertex&#39; in the object of this method has base type &#39;struct LodData::Vertex&#39;.</div>
+<span class='iname_a'>LodCollapser::hasSrcID&#160;<span class='sym_p'><span>(&#160;unsigned int <i>srcID</i></span>, <span>size_t <i>submeshID</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mLastReducedVertex&#39; in the object of this method has base type &#39;struct LodData::Vertex&#39;.</div>
+<span class='iname_a'>LodCollapser::findDstID&#160;<span class='sym_p'><span>(&#160;unsigned int <i>srcID</i></span>, <span>size_t <i>submeshID</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mLastReducedVertex&#39; in the object of this method has base type &#39;struct LodData::Vertex&#39;.</div>
+<span class='iname_a'>LodCollapser::LodCollapser&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mLastReducedVertex&#39; in the object of this method has base type &#39;struct LodData::Vertex&#39;.</div>
+<span class='iname_a'>LodCollapser::~LodCollapser&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>Field &#39;this.mLastReducedVertex&#39; in the object of this method has base type &#39;struct LodData::Vertex&#39;.</div>
+ <b>...</b>
+<br/>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<span class='h_name'>OgreLodInputProvider.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_261')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> LodInputProvider <span class='warning'>&nbsp;2&nbsp;</span></span>
+<br/>
+<div id="c_261" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Field <b>mSharedVertexLookup</b> has been added to this type.</td>
+<td>This field will not be initialized or used by old client applications.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>Field <b>mVertexLookup</b> has been added to this type.</td>
+<td>This field will not be initialized or used by old client applications.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_262')">
+[+] affected symbols: 3 (0.9%)</span>
+<div id="c_262" style="display:none;">
+<div class='affected'><span class='iname_a'>LodInputProvider::LodInputProvider&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This constructor is from &#39;LodInputProvider&#39; class.</div>
+<span class='iname_a'>LodInputProvider::~LodInputProvider&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This destructor is from &#39;LodInputProvider&#39; class.</div>
+<span class='iname_a'>MeshLodGenerator::_process&#160;<span class='sym_p'><span>(&#160;struct LodConfig&amp; <i>lodConfig</i></span>, <span>LodCollapseCost* <i>cost</i></span>, <span>struct LodData* <i>data</i></span>, <span>LodInputProvider* <span class='fp'>input</span></span>, <span>LodOutputProvider* <i>output</i></span>, <span>LodCollapser* <i>collapser</i></span>&#160;)</span></span><br/>
+<div class='affect'>4th parameter &#39;input&#39; (pointer) has base type &#39;LodInputProvider&#39;.</div>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<span class='h_name'>OgreLodOutputProvider.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_263')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> LodOutputProvider <span class='warning'>&nbsp;5&nbsp;</span></span>
+<br/>
+<div id="c_263" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Field <b>mFirstBufferPass</b> has been added to this type.</td>
+<td>This field will not be initialized or used by old client applications.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>Field <b>mLastIndexBufferID</b> has been added to this type.</td>
+<td>This field will not be initialized or used by old client applications.</td>
+</tr>
+<tr>
+<th>3</th>
+<td>Field <b>mLineCacheList</b> has been added to this type.</td>
+<td>This field will not be initialized or used by old client applications.</td>
+</tr>
+<tr>
+<th>4</th>
+<td>Field <b>mTriangleCacheList</b> has been added to this type.</td>
+<td>This field will not be initialized or used by old client applications.</td>
+</tr>
+<tr>
+<th>5</th>
+<td>Field <b>mUseCompression</b> has been added to this type.</td>
+<td>This field will not be initialized or used by old client applications.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_264')">
+[+] affected symbols: 5 (1.5%)</span>
+<div id="c_264" style="display:none;">
+<div class='affected'><span class='iname_a'>LodCollapser::collapseVertex&#160;<span class='sym_p'><span>(&#160;struct LodData* <i>data</i></span>, <span>LodCollapseCost* <i>cost</i></span>, <span>LodOutputProvider* <span class='fp'>output</span></span>, <span>struct LodData::Vertex* <i>src</i></span>&#160;)</span></span><br/>
+<div class='affect'>3rd parameter &#39;output&#39; (pointer) has base type &#39;LodOutputProvider&#39;.</div>
+<span class='iname_a'>LodCollapser::collapse&#160;<span class='sym_p'><span>(&#160;struct LodData* <i>data</i></span>, <span>LodCollapseCost* <i>cost</i></span>, <span>LodOutputProvider* <span class='fp'>output</span></span>, <span>int <i>vertexCountLimit</i></span>, <span>Real <i>collapseCostLimit</i></span>&#160;)</span></span><br/>
+<div class='affect'>3rd parameter &#39;output&#39; (pointer) has base type &#39;LodOutputProvider&#39;.</div>
+<span class='iname_a'>MeshLodGenerator::computeLods&#160;<span class='sym_p'><span>(&#160;struct LodConfig&amp; <i>lodConfig</i></span>, <span>struct LodData* <i>data</i></span>, <span>LodCollapseCost* <i>cost</i></span>, <span>LodOutputProvider* <span class='fp'>output</span></span>, <span>LodCollapser* <i>collapser</i></span>&#160;)</span></span><br/>
+<div class='affect'>4th parameter &#39;output&#39; (pointer) has base type &#39;LodOutputProvider&#39;.</div>
+<span class='iname_a'>MeshLodGenerator::_process&#160;<span class='sym_p'><span>(&#160;struct LodConfig&amp; <i>lodConfig</i></span>, <span>LodCollapseCost* <i>cost</i></span>, <span>struct LodData* <i>data</i></span>, <span>LodInputProvider* <i>input</i></span>, <span>LodOutputProvider* <span class='fp'>output</span></span>, <span>LodCollapser* <i>collapser</i></span>&#160;)</span></span><br/>
+<div class='affect'>5th parameter &#39;output&#39; (pointer) has base type &#39;LodOutputProvider&#39;.</div>
+<span class='iname_a'>LodOutputProvider::~LodOutputProvider&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This destructor is from &#39;LodOutputProvider&#39; class.</div>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<span class='h_name'>OgreLodWorkQueueRequest.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_265')">
+<span class='ext'>[+]</span> <span class='ttype'>struct</span> LodWorkQueueRequest <span class='warning'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_265" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Field <b>isCancelled</b> has been added to this type.</td>
+<td>This field will not be initialized or used by old client applications.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_266')">
+[+] affected symbols: 1 (0.3%)</span>
+<div id="c_266" style="display:none;">
+<div class='affected'><span class='iname_a'>Any::Any&lt;LodWorkQueueRequest*&gt;&#160;<span class='sym_p'><span>(&#160;struct LodWorkQueueRequest*const&amp; <span class='fp'>value</span></span>&#160;)</span></span><br/>
+<div class='affect'>1st parameter &#39;value&#39; (reference) has base type &#39;struct LodWorkQueueRequest&#39;.</div>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='Other_Changes'></a><a name='Other_Changes_In_Types'></a>
+<h2>Other Changes in Data Types <span class='passed'>&nbsp;7&nbsp;</span></h2><hr/>
+<span class='h_name'>OgreLodInputProvider.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_267')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> LodInputProvider <span class='passed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_267" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Virtual method <b>_ZN4Ogre16LodInputProvider8initDataEPNS_7LodDataE</b> became <b>non-pure</b>.</td>
+<td>No effect.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_268')">
+[+] affected symbols: 2 (0.6%)</span>
+<div id="c_268" style="display:none;">
+<div class='affected'><span class='iname_a'>LodInputProvider::LodInputProvider&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This constructor is from &#39;LodInputProvider&#39; class.</div>
+<span class='iname_a'>LodInputProvider::~LodInputProvider&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This destructor is from &#39;LodInputProvider&#39; class.</div>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<span class='h_name'>OgreLodOutputProvider.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_269')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> LodOutputProvider <span class='passed'>&nbsp;6&nbsp;</span></span>
+<br/>
+<div id="c_269" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Virtual method <b>_ZN4Ogre17LodOutputProvider12bakeLodLevelEPNS_7LodDataEi</b> became <b>non-pure</b>.</td>
+<td>No effect.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>Virtual method <b>_ZN4Ogre17LodOutputProvider15triangleChangedEPNS_7LodDataEPNS1_8TriangleE</b> became <b>non-pure</b>.</td>
+<td>No effect.</td>
+</tr>
+<tr>
+<th>3</th>
+<td>Virtual method <b>_ZN4Ogre17LodOutputProvider15triangleRemovedEPNS_7LodDataEPNS1_8TriangleE</b> became <b>non-pure</b>.</td>
+<td>No effect.</td>
+</tr>
+<tr>
+<th>4</th>
+<td>Virtual method <b>_ZN4Ogre17LodOutputProvider18bakeManualLodLevelEPNS_7LodDataERNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEEi</b> became <b>non-pure</b>.</td>
+<td>No effect.</td>
+</tr>
+<tr>
+<th>5</th>
+<td>Virtual method <b>_ZN4Ogre17LodOutputProvider7prepareEPNS_7LodDataE</b> became <b>non-pure</b>.</td>
+<td>No effect.</td>
+</tr>
+<tr>
+<th>6</th>
+<td>Virtual method <b>_ZN4Ogre17LodOutputProvider8finalizeEPNS_7LodDataE</b> became <b>non-pure</b>.</td>
+<td>No effect.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_270')">
+[+] affected symbols: 1 (0.3%)</span>
+<div id="c_270" style="display:none;">
+<div class='affected'><span class='iname_a'>LodOutputProvider::~LodOutputProvider&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This destructor is from &#39;LodOutputProvider&#39; class.</div>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='Headers'></a><h2>Header Files <span class='gray'>&nbsp;40&nbsp;</span></h2><hr/>
+<div class='h_list'>
+OgreAny.h<br/>
+OgreHardwareVertexBuffer.h<br/>
+OgreLodBuffer.h<br/>
+OgreLodCollapseCost.h<br/>
+OgreLodCollapseCostCurvature.h<br/>
+OgreLodCollapseCostOutside.h<br/>
+OgreLodCollapseCostProfiler.h<br/>
+OgreLodCollapseCostQuadric.h<br/>
+OgreLodCollapser.h<br/>
+OgreLodConfig.h<br/>
+OgreLodConfigSerializer.h<br/>
+OgreLodData.h<br/>
+OgreLodInputProvider.h<br/>
+OgreLodInputProviderBuffer.h<br/>
+OgreLodInputProviderMesh.h<br/>
+OgreLodOutputProvider.h<br/>
+OgreLodOutputProviderBuffer.h<br/>
+OgreLodOutputProviderCompressedBuffer.h<br/>
+OgreLodOutputProviderCompressedMesh.h<br/>
+OgreLodOutputProviderMesh.h<br/>
+OgreLodOutsideMarker.h<br/>
+OgreLodPrerequisites.h<br/>
+OgreLodWorkQueueInjector.h<br/>
+OgreLodWorkQueueInjectorListener.h<br/>
+OgreLodWorkQueueRequest.h<br/>
+OgreLodWorkQueueWorker.h<br/>
+OgreMatrix4.h<br/>
+OgreMemoryAllocatorConfig.h<br/>
+OgreMeshLodGenerator.h<br/>
+OgrePlatform.h<br/>
+OgrePrerequisites.h<br/>
+OgreRenderOperation.h<br/>
+OgreSerializer.h<br/>
+OgreSharedPtr.h<br/>
+OgreSingleton.h<br/>
+OgreSmallVector.h<br/>
+OgreVector.h<br/>
+OgreVectorSet.h<br/>
+OgreVertexIndexData.h<br/>
+OgreWorkQueue.h<br/>
+</div>
+<br/><a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='Sources'></a><h2>Source Files <span class='gray'>&nbsp;21&nbsp;</span></h2><hr/>
+<div class='h_list'>
+OgreLodBuffer.cpp<br/>
+OgreLodCollapseCost.cpp<br/>
+OgreLodCollapseCostCurvature.cpp<br/>
+OgreLodCollapseCostOutside.cpp<br/>
+OgreLodCollapseCostProfiler.cpp<br/>
+OgreLodCollapseCostQuadric.cpp<br/>
+OgreLodCollapser.cpp<br/>
+OgreLodConfig.cpp<br/>
+OgreLodConfigSerializer.cpp<br/>
+OgreLodData.cpp<br/>
+OgreLodInputProvider.cpp<br/>
+OgreLodInputProviderBuffer.cpp<br/>
+OgreLodInputProviderMesh.cpp<br/>
+OgreLodOutputProviderBuffer.cpp<br/>
+OgreLodOutputProviderCompressedBuffer.cpp<br/>
+OgreLodOutputProviderCompressedMesh.cpp<br/>
+OgreLodOutputProviderMesh.cpp<br/>
+OgreLodOutsideMarker.cpp<br/>
+OgreLodWorkQueueInjector.cpp<br/>
+OgreLodWorkQueueWorker.cpp<br/>
+OgreMeshLodGenerator.cpp<br/>
+</div>
+<br/><a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='Libs'></a><h2>Objects <span class='gray'>&nbsp;1&nbsp;</span></h2><hr/>
+<div class='lib_list'>
+libOgreMeshLodGenerator.so.13.6<br/>
+</div>
+<br/><a class='top_ref' href='#Top'>to the top</a><br/>
+</div>
+<br/><br/><br/>
+<hr/>
+<div class='footer' align='right'><i>Generated by <a href='https://github.com/lvc/abi-compliance-checker'>ABI Compliance Checker</a> 2.3 &#160;</i>
+</div>
+<br/>
+
+</body></html>
