@@ -237,11 +237,6 @@ namespace Ogre {
     /** Summary class collecting together index data source information. */
     class _OgreExport IndexData : public IndexDataAlloc
     {
-    private:
-        /// Protected copy constructor, to prevent misuse
-        IndexData(const IndexData& rhs); /* do nothing, should not use */
-        /// Protected operator=, to prevent misuse
-        IndexData& operator=(const IndexData& rhs); /* do not use */
     public:
         IndexData();
         ~IndexData();
