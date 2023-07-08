@@ -32,6 +32,7 @@
 
 #include "OgreLodPrerequisites.h"
 #include "OgreLodData.h"
+#include "OgreHardwareIndexBuffer.h"
 
 namespace Ogre
 {
