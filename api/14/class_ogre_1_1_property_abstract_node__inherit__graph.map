@@ -1,0 +1,7 @@
+<map id="Ogre::PropertyAbstractNode" name="Ogre::PropertyAbstractNode">
+<area shape="rect" id="Node000001" title="This abstract node represents a script property." alt="" coords="5,152,209,177"/>
+<area shape="rect" id="Node000002" href="$class_ogre_1_1_abstract_node.html" title=" " alt="" coords="33,79,182,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="110,118,110,152,105,152,105,118"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="36,5,179,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="110,44,110,79,105,79,105,44"/>
+</map>

@@ -1,0 +1,25 @@
+<map id="Ogre::Exception" name="Ogre::Exception">
+<area shape="rect" id="Node000001" title="When thrown, provides information about an error that has occurred inside the engine." alt="" coords="168,228,293,253"/>
+<area shape="rect" id="Node000003" href="$class_ogre_1_1_file_not_found_exception.html" title=" " alt="" coords="359,5,568,31"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="236,214,249,175,270,127,300,80,318,58,340,40,360,29,362,33,343,44,322,62,304,83,275,130,254,176,241,215"/>
+<area shape="rect" id="Node000004" href="$class_ogre_1_1_i_o_exception.html" title=" " alt="" coords="394,55,533,80"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="241,214,278,151,306,117,340,89,366,77,393,69,394,75,367,82,343,94,310,121,283,154,246,217"/>
+<area shape="rect" id="Node000005" href="$class_ogre_1_1_internal_error_exception.html" title=" " alt="" coords="360,104,567,129"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="249,216,288,175,313,155,340,138,369,127,371,132,343,143,316,160,291,179,252,219"/>
+<area shape="rect" id="Node000006" href="$class_ogre_1_1_invalid_call_exception.html" title=" " alt="" coords="366,153,561,179"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="266,219,340,187,383,176,385,181,342,193,268,224"/>
+<area shape="rect" id="Node000007" href="$class_ogre_1_1_invalid_parameters_exception.html" title=" " alt="" coords="341,203,585,228"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="307,230,347,225,347,231,307,235"/>
+<area shape="rect" id="Node000008" href="$class_ogre_1_1_invalid_state_exception.html" title=" " alt="" coords="362,252,565,277"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="308,246,362,252,362,257,307,251"/>
+<area shape="rect" id="Node000009" href="$class_ogre_1_1_item_identity_exception.html" title=" " alt="" coords="361,301,566,327"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="269,257,342,287,385,299,383,304,340,293,267,262"/>
+<area shape="rect" id="Node000010" href="$class_ogre_1_1_rendering_a_p_i_exception.html" title=" " alt="" coords="357,351,569,376"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="253,262,292,301,316,321,343,337,372,348,370,353,340,342,313,325,288,305,249,266"/>
+<area shape="rect" id="Node000011" href="$class_ogre_1_1_runtime_assertion_exception.html" title=" " alt="" coords="343,400,584,425"/>
+<area shape="poly" id="edge10_Node000001_Node000011" title=" " alt="" coords="246,264,283,327,310,360,343,386,365,397,363,402,340,391,306,363,278,330,241,267"/>
+<area shape="rect" id="Node000012" href="$class_ogre_1_1_unimplemented_exception.html" title="Template struct which creates a distinct type for each exception code." alt="" coords="348,449,579,475"/>
+<area shape="poly" id="edge11_Node000001_Node000012" title=" " alt="" coords="241,266,254,305,275,351,304,398,322,418,343,436,362,447,360,451,340,440,319,422,300,401,270,354,249,307,236,268"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,228,120,253"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="134,238,167,238,167,243,134,243"/>
+</map>

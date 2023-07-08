@@ -1,0 +1,7 @@
+<map id="Ogre::ObjectAbstractNode" name="Ogre::ObjectAbstractNode">
+<area shape="rect" id="Node000001" title="This specific abstract node represents a script object." alt="" coords="5,152,196,177"/>
+<area shape="rect" id="Node000002" href="$class_ogre_1_1_abstract_node.html" title=" " alt="" coords="26,79,175,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="103,118,103,152,98,152,98,118"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="29,5,172,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="103,44,103,79,98,79,98,44"/>
+</map>

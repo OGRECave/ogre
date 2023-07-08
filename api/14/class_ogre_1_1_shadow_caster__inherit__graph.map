@@ -1,0 +1,63 @@
+<map id="Ogre::ShadowCaster" name="Ogre::ShadowCaster">
+<area shape="rect" id="Node000001" title="This class defines the interface that must be implemented by shadow casters." alt="" coords="5,327,160,352"/>
+<area shape="rect" id="Node000002" href="$class_ogre_1_1_movable_object.html" title="Abstract class defining a movable object in a scene." alt="" coords="208,327,367,352"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="174,337,208,337,208,342,174,342"/>
+<area shape="rect" id="Node000003" href="$class_ogre_1_1_billboard_chain.html" title="Allows the rendering of a chain of connected billboards." alt="" coords="437,5,593,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="289,312,300,256,322,182,338,143,358,105,383,70,413,40,435,27,438,31,416,44,387,74,363,108,343,145,327,184,305,257,295,313"/>
+<area shape="rect" id="Node000005" href="$class_ogre_1_1_billboard_set.html" title="A collection of billboards (faces which are always facing the given direction) with the same (default..." alt="" coords="445,55,585,80"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="292,312,306,264,329,204,364,142,387,114,413,89,443,74,446,78,416,94,391,117,369,145,334,206,311,266,297,314"/>
+<area shape="rect" id="Node000006" href="$class_ogre_1_1_entity.html" title="Defines an instance of a discrete, movable object based on a Mesh." alt="" coords="465,104,564,129"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="295,312,312,273,337,226,371,179,413,138,438,126,464,118,466,123,440,131,416,143,375,182,341,229,317,276,300,314"/>
+<area shape="rect" id="Node000007" href="$class_ogre_1_1_frustum.html" title="A frustum represents a pyramid, capped at the near and far end which is used to represent either a vi..." alt="" coords="457,153,572,179"/>
+<area shape="poly" id="edge6_Node000002_Node000007" title=" " alt="" coords="300,313,345,250,377,216,413,188,456,171,458,176,416,192,380,220,349,253,305,316"/>
+<area shape="rect" id="Node000011" href="$class_ogre_1_1_instance_batch.html" title="InstanceBatch forms part of the new Instancing system This is an abstract class that must be derived ..." alt="" coords="438,203,591,228"/>
+<area shape="poly" id="edge10_Node000002_Node000011" title=" " alt="" coords="309,315,355,275,383,254,414,237,443,226,445,231,416,242,386,259,358,279,312,319"/>
+<area shape="rect" id="Node000017" href="$class_ogre_1_1_instanced_entity.html" title=" " alt="" coords="433,252,596,277"/>
+<area shape="poly" id="edge16_Node000002_Node000017" title=" " alt="" coords="329,319,414,286,454,275,456,280,416,291,331,324"/>
+<area shape="rect" id="Node000018" href="$class_ogre_1_1_light.html" title="Representation of a dynamic light source in the scene." alt="" coords="468,301,561,327"/>
+<area shape="poly" id="edge17_Node000002_Node000018" title=" " alt="" coords="381,326,468,316,468,322,381,332"/>
+<area shape="rect" id="Node000020" href="$class_ogre_1_1_manual_object.html" title="Class providing a much simplified interface to generating manual objects with custom geometry." alt="" coords="439,351,590,376"/>
+<area shape="poly" id="edge19_Node000002_Node000020" title=" " alt="" coords="381,347,440,353,439,358,380,352"/>
+<area shape="rect" id="Node000021" href="$class_ogre_1_1_movable_plane.html" title="Definition of a Plane that may be attached to a node, and the derived details of it retrieved simply." alt="" coords="438,400,591,425"/>
+<area shape="poly" id="edge20_Node000002_Node000021" title=" " alt="" coords="333,355,415,385,460,397,459,403,414,390,331,360"/>
+<area shape="rect" id="Node000022" href="$class_ogre_1_1_particle_system.html" title="Class defining particle system based special effects." alt="" coords="435,449,594,475"/>
+<area shape="poly" id="edge21_Node000002_Node000022" title=" " alt="" coords="313,359,358,398,416,434,449,447,447,452,413,439,355,402,309,363"/>
+<area shape="rect" id="Node000023" href="$class_ogre_1_1_portal_base.html" title="PortalBase &#45; Base class to Portal and AntiPortal classes." alt="" coords="449,499,580,524"/>
+<area shape="poly" id="edge22_Node000002_Node000023" title=" " alt="" coords="305,362,350,424,381,456,416,484,450,498,448,503,413,488,377,460,346,427,301,365"/>
+<area shape="rect" id="Node000026" href="$class_ogre_1_1_simple_renderable.html" title="Simple implementation of MovableObject and Renderable for single&#45;part custom objects." alt="" coords="425,548,605,573"/>
+<area shape="poly" id="edge25_Node000002_Node000026" title=" " alt="" coords="300,364,317,402,342,448,375,494,416,533,440,546,437,550,413,538,371,498,337,451,312,404,295,366"/>
+<area shape="rect" id="Node000030" href="$class_ogre_1_1_static_geometry_1_1_region.html" title="The details of a topological region which is the highest level of partitioning for this class." alt="" coords="433,598,596,638"/>
+<area shape="poly" id="edge29_Node000002_Node000030" title=" " alt="" coords="298,365,312,412,336,470,371,531,392,558,416,583,436,596,433,600,413,587,388,562,366,533,331,472,307,413,293,366"/>
+<area shape="rect" id="Node000031" href="$class_ogre_1_1_terrain_quad_tree_node.html" title="A node in a quad tree used to store a patch of terrain." alt="" coords="415,663,615,688"/>
+<area shape="poly" id="edge30_Node000002_Node000031" title=" " alt="" coords="294,365,304,424,326,501,342,541,362,580,387,617,416,648,436,660,433,665,413,652,382,620,357,583,337,543,321,503,299,425,289,366"/>
+<area shape="rect" id="Node000004" href="$class_ogre_1_1_ribbon_trail.html" title="Subclass of BillboardChain which automatically leaves a trail behind one or more Node instances." alt="" coords="701,5,835,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="606,15,700,15,700,21,606,21"/>
+<area shape="rect" id="Node000008" href="$class_ogre_1_1_camera.html" title="A viewpoint from which the scene will be rendered." alt="" coords="712,104,824,129"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="585,150,711,125,712,130,586,155"/>
+<area shape="rect" id="Node000009" href="$class_ogre_1_1_octree_camera.html" title="Specialized viewpoint from which an Octree can be rendered." alt="" coords="948,55,1103,80"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="837,101,958,77,959,83,838,106"/>
+<area shape="rect" id="Node000010" href="$class_ogre_1_1_p_c_z_camera.html" title="Specialized viewpoint from which an PCZone Scene can be rendered." alt="" coords="956,104,1095,129"/>
+<area shape="poly" id="edge9_Node000008_Node000010" title=" " alt="" coords="838,114,956,114,956,119,838,119"/>
+<area shape="rect" id="Node000012" href="$class_ogre_1_1_base_instance_batch_v_t_f.html" title="Instancing implementation using vertex texture through Vertex Texture Fetch (VTF) This implementation..." alt="" coords="663,153,873,179"/>
+<area shape="poly" id="edge11_Node000011_Node000012" title=" " alt="" coords="594,197,701,176,702,181,595,203"/>
+<area shape="rect" id="Node000015" href="$class_ogre_1_1_instance_batch_h_w.html" title="This is technique requires true instancing hardware support." alt="" coords="680,203,856,228"/>
+<area shape="poly" id="edge14_Node000011_Node000015" title=" " alt="" coords="605,213,680,213,680,218,605,218"/>
+<area shape="rect" id="Node000016" href="$class_ogre_1_1_instance_batch_shader.html" title="Basically it creates a large vertex buffer with many repeating entities, and sends per instance data ..." alt="" coords="669,252,867,277"/>
+<area shape="poly" id="edge15_Node000011_Node000016" title=" " alt="" coords="595,228,702,249,701,255,594,233"/>
+<area shape="rect" id="Node000013" href="$class_ogre_1_1_instance_batch_h_w___v_t_f.html" title="Instancing implementation using vertex texture through Vertex Texture Fetch (VTF) and hardware instan..." alt="" coords="921,153,1129,179"/>
+<area shape="poly" id="edge12_Node000012_Node000013" title=" " alt="" coords="887,163,921,163,921,169,887,169"/>
+<area shape="rect" id="Node000014" href="$class_ogre_1_1_instance_batch_v_t_f.html" title=" " alt="" coords="936,203,1115,228"/>
+<area shape="poly" id="edge13_Node000012_Node000014" title=" " alt="" coords="849,179,959,200,958,205,848,184"/>
+<area shape="rect" id="Node000019" href="$class_ogre_1_1_p_c_z_light.html" title="Specialized version of Ogre::Light which caches which zones the light affects." alt="" coords="709,301,827,327"/>
+<area shape="poly" id="edge18_Node000018_Node000019" title=" " alt="" coords="575,311,708,311,708,317,575,317"/>
+<area shape="rect" id="Node000024" href="$class_ogre_1_1_anti_portal.html" title="AntiPortal datastructure for occlusion culling." alt="" coords="705,449,831,475"/>
+<area shape="poly" id="edge23_Node000023_Node000024" title=" " alt="" coords="593,493,704,472,705,477,594,499"/>
+<area shape="rect" id="Node000025" href="$class_ogre_1_1_portal.html" title="Portal datastructure for connecting zones." alt="" coords="719,499,817,524"/>
+<area shape="poly" id="edge24_Node000023_Node000025" title=" " alt="" coords="594,509,719,509,719,514,594,514"/>
+<area shape="rect" id="Node000027" href="$class_ogre_1_1_rectangle2_d.html" title="Allows the rendering of a simple 2D rectangle This class renders a simple 2D rectangle; this rectangl..." alt="" coords="696,548,840,573"/>
+<area shape="poly" id="edge26_Node000026_Node000027" title=" " alt="" coords="618,558,696,558,696,563,618,563"/>
+<area shape="rect" id="Node000028" href="$class_ogre_1_1_volume_1_1_chunk.html" title="A single volume chunk mesh." alt="" coords="688,597,848,623"/>
+<area shape="poly" id="edge27_Node000026_Node000028" title=" " alt="" coords="595,573,702,595,701,600,594,579"/>
+<area shape="rect" id="Node000029" href="$class_ogre_1_1_wire_bounding_box.html" title="Allows the rendering of a wireframe bounding box." alt="" coords="679,647,857,672"/>
+<area shape="poly" id="edge28_Node000026_Node000029" title=" " alt="" coords="600,576,616,584,632,596,641,609,650,622,664,633,690,644,688,649,661,638,646,625,636,612,628,600,613,588,597,580"/>
+</map>

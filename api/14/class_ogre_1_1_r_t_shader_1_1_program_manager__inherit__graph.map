@@ -1,0 +1,7 @@
+<map id="Ogre::RTShader::ProgramManager" name="Ogre::RTShader::ProgramManager">
+<area shape="rect" id="Node000001" title="A singleton manager class that manages shader based programs." alt="" coords="81,93,324,119"/>
+<area shape="rect" id="Node000002" href="$class_ogre_1_1_singleton.html" title=" " alt="" coords="5,5,197,45"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="138,52,189,91,186,95,135,56"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="221,13,387,38"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="280,49,219,95,216,91,276,45"/>
+</map>

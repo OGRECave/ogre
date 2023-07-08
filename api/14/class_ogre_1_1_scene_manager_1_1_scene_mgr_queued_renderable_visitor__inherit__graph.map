@@ -1,0 +1,5 @@
+<map id="Ogre::SceneManager::SceneMgrQueuedRenderableVisitor" name="Ogre::SceneManager::SceneMgrQueuedRenderableVisitor">
+<area shape="rect" id="Node000001" title="Inner helper class to implement the visitor pattern for rendering objects in a queue." alt="" coords="9,79,228,133"/>
+<area shape="rect" id="Node000002" href="$class_ogre_1_1_queued_renderable_visitor.html" title="Visitor interface for items in a QueuedRenderableCollection." alt="" coords="5,5,232,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="121,44,121,79,116,79,116,44"/>
+</map>

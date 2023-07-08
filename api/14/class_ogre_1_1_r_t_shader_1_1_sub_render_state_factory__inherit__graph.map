@@ -1,0 +1,7 @@
+<map id="Ogre::RTShader::SubRenderStateFactory" name="Ogre::RTShader::SubRenderStateFactory">
+<area shape="rect" id="Node000001" title="Abstract factory interface for creating SubRenderState implementation instances." alt="" coords="5,79,207,119"/>
+<area shape="rect" id="Node000003" href="$class_ogre_1_1_r_t_shader_1_1_hardware_skinning_factory.html" title="A factory that enables creation of HardwareSkinning instances." alt="" coords="9,167,203,207"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="109,133,109,166,103,166,103,133"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="23,5,189,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="109,44,109,79,103,79,103,44"/>
+</map>

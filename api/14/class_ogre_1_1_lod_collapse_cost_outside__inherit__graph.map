@@ -1,0 +1,5 @@
+<map id="Ogre::LodCollapseCostOutside" name="Ogre::LodCollapseCostOutside">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,79,224,104"/>
+<area shape="rect" id="Node000002" href="$class_ogre_1_1_lod_collapse_cost.html" title=" " alt="" coords="30,5,199,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="117,44,117,79,112,79,112,44"/>
+</map>

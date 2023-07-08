@@ -1,0 +1,5 @@
+<map id="Ogre::ColourImageAffector::CmdImageAdjust" name="Ogre::ColourImageAffector::CmdImageAdjust">
+<area shape="rect" id="Node000001" title="Command object for red adjust (see ParamCommand)." alt="" coords="5,79,200,119"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="17,5,188,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="105,44,105,79,100,79,100,44"/>
+</map>

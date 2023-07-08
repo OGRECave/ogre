@@ -1,0 +1,9 @@
+<map id="Ogre::CompositorChain" name="Ogre::CompositorChain">
+<area shape="rect" id="Node000001" title="Chain of compositor effects applying to one viewport." alt="" coords="231,79,405,104"/>
+<area shape="rect" id="Node000002" href="$class_ogre_1_1_render_target_listener.html" title="A interface class defining a listener which can be used to receive notifications of RenderTarget even..." alt="" coords="5,5,204,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="153,32,284,76,283,81,151,37"/>
+<area shape="rect" id="Node000003" href="$class_ogre_1_1_viewport_1_1_listener.html" title="Listener interface so you can be notified of Viewport changes." alt="" coords="229,5,407,31"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="321,44,321,79,315,79,315,44"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="432,5,585,31"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="466,38,350,81,348,76,464,33"/>
+</map>

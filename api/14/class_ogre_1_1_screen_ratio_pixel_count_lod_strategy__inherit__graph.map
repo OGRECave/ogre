@@ -1,0 +1,11 @@
+<map id="Ogre::ScreenRatioPixelCountLodStrategy" name="Ogre::ScreenRatioPixelCountLodStrategy">
+<area shape="rect" id="Node000001" title=" " alt="" coords="607,27,816,67"/>
+<area shape="rect" id="Node000002" href="$class_ogre_1_1_pixel_count_lod_strategy_base.html" title="Abstract base class for level of detail strategy based on pixel count approximations from bounding sp..." alt="" coords="317,5,559,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="570,29,607,33,606,39,569,35"/>
+<area shape="rect" id="Node000003" href="$class_ogre_1_1_lod_strategy.html" title="Strategy for determining level of detail." alt="" coords="131,5,269,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="283,15,317,15,317,21,283,21"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="5,5,83,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="96,15,130,15,130,21,96,21"/>
+<area shape="rect" id="Node000005" href="$class_ogre_1_1_singleton.html" title=" " alt="" coords="331,55,545,95"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="559,60,606,55,607,61,560,66"/>
+</map>

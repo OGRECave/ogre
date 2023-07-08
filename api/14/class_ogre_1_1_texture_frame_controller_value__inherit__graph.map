@@ -1,0 +1,7 @@
+<map id="Ogre::TextureFrameControllerValue" name="Ogre::TextureFrameControllerValue">
+<area shape="rect" id="Node000001" title="Predefined controller value for getting / setting the frame number of a texture layer." alt="" coords="5,167,220,207"/>
+<area shape="rect" id="Node000002" href="$class_ogre_1_1_controller_value.html" title=" " alt="" coords="31,79,194,119"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="115,133,115,166,110,166,110,133"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="53,5,172,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="115,44,115,79,110,79,110,44"/>
+</map>

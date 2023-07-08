@@ -1,0 +1,7 @@
+<map id="Ogre::DefaultHardwareBuffer" name="Ogre::DefaultHardwareBuffer">
+<area shape="rect" id="Node000001" title="Specialisation of HardwareBuffer for emulation." alt="" coords="5,152,217,177"/>
+<area shape="rect" id="Node000002" href="$class_ogre_1_1_hardware_buffer.html" title="Abstract class defining common features of hardware buffers." alt="" coords="29,79,193,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="114,118,114,152,109,152,109,118"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="64,5,159,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="114,44,114,79,109,79,109,44"/>
+</map>

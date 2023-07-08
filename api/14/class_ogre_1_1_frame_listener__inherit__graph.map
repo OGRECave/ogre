@@ -1,0 +1,11 @@
+<map id="Ogre::FrameListener" name="Ogre::FrameListener">
+<area shape="rect" id="Node000001" title="A interface class defining a listener which can be used to receive notifications of frame events." alt="" coords="5,70,160,95"/>
+<area shape="rect" id="Node000002" href="$class_ogre_1_1_frame_time_controller_value.html" title="Predefined controller value for getting the latest frame time." alt="" coords="234,5,433,45"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="152,64,245,43,246,48,153,69"/>
+<area shape="rect" id="Node000003" href="$class_ogre_1_1_volume_1_1_chunk.html" title="A single volume chunk mesh." alt="" coords="253,70,413,95"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="173,80,253,80,253,85,173,85"/>
+<area shape="rect" id="Node000004" href="$class_ogre_bites_1_1_application_context_base.html" title="Base class responsible for setting up a common context for applications." alt="" coords="208,119,459,145"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="162,95,268,117,267,122,161,101"/>
+<area shape="rect" id="Node000005" href="$class_ogre_bites_1_1_application_context_qt.html" title="Specialization for connecting with Qt." alt="" coords="507,119,740,145"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="472,129,507,129,507,135,472,135"/>
+</map>

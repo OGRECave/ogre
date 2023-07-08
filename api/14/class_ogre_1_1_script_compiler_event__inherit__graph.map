@@ -1,0 +1,17 @@
+<map id="Ogre::ScriptCompilerEvent" name="Ogre::ScriptCompilerEvent">
+<area shape="rect" id="Node000001" title="This struct is a base class for events which can be thrown by the compilers and caught by subscribers..." alt="" coords="5,205,200,230"/>
+<area shape="rect" id="Node000002" href="$class_ogre_1_1_create_compositor_script_compiler_event.html" title=" " alt="" coords="265,5,481,45"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="117,191,169,123,205,86,247,55,271,43,274,48,249,60,208,90,173,127,121,195"/>
+<area shape="rect" id="Node000003" href="$class_ogre_1_1_create_gpu_program_script_compiler_event.html" title=" " alt="" coords="262,69,485,109"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="129,194,181,156,247,119,279,107,281,112,249,124,184,160,132,198"/>
+<area shape="rect" id="Node000004" href="$class_ogre_1_1_create_gpu_shared_parameters_script_compiler_event.html" title=" " alt="" coords="248,133,499,173"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="170,199,287,171,289,176,171,204"/>
+<area shape="rect" id="Node000005" href="$class_ogre_1_1_create_material_script_compiler_event.html" title=" " alt="" coords="276,197,471,237"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="214,215,276,215,276,220,214,220"/>
+<area shape="rect" id="Node000006" href="$class_ogre_1_1_create_particle_system_script_compiler_event.html" title=" " alt="" coords="272,261,475,301"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="171,231,289,259,287,264,170,236"/>
+<area shape="rect" id="Node000007" href="$class_ogre_1_1_process_name_exclusion_script_compiler_event.html" title=" " alt="" coords="267,325,479,365"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="132,237,184,274,249,311,281,323,279,328,247,316,181,279,129,241"/>
+<area shape="rect" id="Node000008" href="$class_ogre_1_1_process_resource_name_script_compiler_event.html" title=" " alt="" coords="268,389,479,429"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="121,240,173,308,208,344,249,375,274,387,271,392,247,380,205,348,169,311,117,243"/>
+</map>

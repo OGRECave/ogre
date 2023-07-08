@@ -1,0 +1,7 @@
+<map id="Ogre::MapIterator&lt; T &gt;" name="Ogre::MapIterator&lt; T &gt;">
+<area shape="rect" id="Node000001" title="Concrete IteratorWrapper for nonconst access to the underlying key&#45;value container." alt="" coords="21,181,195,207"/>
+<area shape="rect" id="Node000002" href="$class_ogre_1_1_map_iterator_wrapper.html" title=" " alt="" coords="12,93,204,133"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="111,147,111,181,105,181,105,147"/>
+<area shape="rect" id="Node000003" href="$class_ogre_1_1_iterator_wrapper.html" title="Basefunctionality for IteratorWrappers." alt="" coords="5,5,211,45"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="111,59,111,93,105,93,105,59"/>
+</map>

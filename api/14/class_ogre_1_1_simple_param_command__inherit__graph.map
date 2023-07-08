@@ -1,0 +1,5 @@
+<map id="Ogre::SimpleParamCommand&lt; _Class, Param, getter, setter &gt;" name="Ogre::SimpleParamCommand&lt; _Class, Param, getter, setter &gt;">
+<area shape="rect" id="Node000001" title="Generic ParamCommand implementation stores pointers to the class getter and setter functions." alt="" coords="5,79,220,133"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="27,5,198,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="115,44,115,79,110,79,110,44"/>
+</map>

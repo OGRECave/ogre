@@ -1,0 +1,15 @@
+<map id="Ogre::RTShader::FunctionAtom" name="Ogre::RTShader::FunctionAtom">
+<area shape="rect" id="Node000001" title="A class that represents an atomic code section of shader based program function." alt="" coords="219,104,440,129"/>
+<area shape="rect" id="Node000003" href="$class_ogre_1_1_r_t_shader_1_1_assignment_atom.html" title="shorthand for &quot;lhs = rhs;&quot; insted of using FFP_Assign(rhs, lhs)" alt="" coords="498,5,741,31"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="364,95,420,66,487,39,531,28,532,33,489,45,423,71,366,100"/>
+<area shape="rect" id="Node000004" href="$class_ogre_1_1_r_t_shader_1_1_binary_op_atom.html" title="shorthand for &quot;dst = a OP b;&quot;" alt="" coords="506,55,733,80"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="418,99,543,77,544,83,418,104"/>
+<area shape="rect" id="Node000005" href="$class_ogre_1_1_r_t_shader_1_1_builtin_function_atom.html" title="shorthand for &quot;dst = BUILTIN(args);&quot;" alt="" coords="488,104,751,129"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="454,114,488,114,488,119,454,119"/>
+<area shape="rect" id="Node000006" href="$class_ogre_1_1_r_t_shader_1_1_function_invocation.html" title="A class that represents function invocation code from shader based program function." alt="" coords="526,154,713,194"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="408,129,526,153,525,158,407,135"/>
+<area shape="rect" id="Node000007" href="$class_ogre_1_1_r_t_shader_1_1_sample_texture_atom.html" title="shorthand for &quot;dst = texture(sampler, uv);&quot; instead of using FFP_SampleTexture" alt="" coords="488,219,751,244"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="361,135,419,170,489,204,533,216,531,221,487,208,416,175,358,139"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,104,171,129"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="184,114,219,114,219,119,184,119"/>
+</map>

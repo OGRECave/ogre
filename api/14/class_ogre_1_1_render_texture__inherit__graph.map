@@ -1,0 +1,7 @@
+<map id="Ogre::RenderTexture" name="Ogre::RenderTexture">
+<area shape="rect" id="Node000001" title="This class represents a RenderTarget that renders to a Texture." alt="" coords="5,152,160,177"/>
+<area shape="rect" id="Node000002" href="$class_ogre_1_1_render_target.html" title="A &#39;canvas&#39; which can receive the results of a rendering operation." alt="" coords="9,79,156,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="85,118,85,152,80,152,80,118"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="21,5,144,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="85,44,85,79,80,79,80,44"/>
+</map>

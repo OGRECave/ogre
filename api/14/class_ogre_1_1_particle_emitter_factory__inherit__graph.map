@@ -1,0 +1,5 @@
+<map id="Ogre::ParticleEmitterFactory" name="Ogre::ParticleEmitterFactory">
+<area shape="rect" id="Node000001" title="Abstract class defining the interface to be implemented by creators of ParticleEmitter subclasses." alt="" coords="5,79,212,104"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="73,5,144,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="111,44,111,79,106,79,106,44"/>
+</map>

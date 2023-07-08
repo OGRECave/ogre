@@ -1,0 +1,7 @@
+<map id="Ogre::RTShader::ShaderGenerator" name="Ogre::RTShader::ShaderGenerator">
+<area shape="rect" id="Node000001" title="Shader generator system main interface." alt="" coords="135,79,376,104"/>
+<area shape="rect" id="Node000002" href="$class_ogre_1_1_singleton.html" title=" " alt="" coords="5,5,268,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="169,35,237,76,235,81,166,40"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="293,5,458,31"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="345,40,276,81,274,76,343,35"/>
+</map>

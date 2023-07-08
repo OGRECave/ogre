@@ -1,0 +1,5 @@
+<map id="Ogre::Volume::OctreeNode" name="Ogre::Volume::OctreeNode">
+<area shape="rect" id="Node000001" title="A node in the volume octree." alt="" coords="5,79,201,104"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="56,5,151,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="106,44,106,79,101,79,101,44"/>
+</map>

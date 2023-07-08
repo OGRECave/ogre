@@ -1,0 +1,5 @@
+<map id="Ogre::Bullet::RigidBodyState" name="Ogre::Bullet::RigidBodyState">
+<area shape="rect" id="Node000001" title="A MotionState is Bullet&#39;s way of informing you about updates to an object." alt="" coords="5,79,212,104"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="51,5,166,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="111,44,111,79,106,79,106,44"/>
+</map>

@@ -1,0 +1,5 @@
+<map id="OgreBites::Slider" name="OgreBites::Slider">
+<area shape="rect" id="Node000001" title="Basic slider widget." alt="" coords="10,79,141,104"/>
+<area shape="rect" id="Node000002" href="$class_ogre_bites_1_1_widget.html" title="Abstract base class for all widgets." alt="" coords="5,5,145,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="78,44,78,79,73,79,73,44"/>
+</map>

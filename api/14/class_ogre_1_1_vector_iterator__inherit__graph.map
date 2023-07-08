@@ -1,0 +1,7 @@
+<map id="Ogre::VectorIterator&lt; T &gt;" name="Ogre::VectorIterator&lt; T &gt;">
+<area shape="rect" id="Node000001" title="Concrete IteratorWrapper for nonconst access to the underlying container." alt="" coords="14,181,203,207"/>
+<area shape="rect" id="Node000002" href="$class_ogre_1_1_vector_iterator_wrapper.html" title=" " alt="" coords="5,93,212,133"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="111,147,111,181,106,181,106,147"/>
+<area shape="rect" id="Node000003" href="$class_ogre_1_1_iterator_wrapper.html" title="Basefunctionality for IteratorWrappers." alt="" coords="6,5,211,45"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="111,59,111,93,106,93,106,59"/>
+</map>

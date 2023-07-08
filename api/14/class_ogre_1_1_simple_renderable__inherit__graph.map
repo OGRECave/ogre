@@ -1,0 +1,19 @@
+<map id="Ogre::SimpleRenderable" name="Ogre::SimpleRenderable">
+<area shape="rect" id="Node000001" title="Simple implementation of MovableObject and Renderable for single&#45;part custom objects." alt="" coords="262,152,442,177"/>
+<area shape="rect" id="Node000007" href="$class_ogre_1_1_rectangle2_d.html" title="Allows the rendering of a simple 2D rectangle This class renders a simple 2D rectangle; this rectangl..." alt="" coords="104,225,248,251"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="312,185,206,228,204,223,310,180"/>
+<area shape="rect" id="Node000008" href="$class_ogre_1_1_volume_1_1_chunk.html" title="A single volume chunk mesh." alt="" coords="272,225,432,251"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="355,191,355,225,349,225,349,191"/>
+<area shape="rect" id="Node000009" href="$class_ogre_1_1_wire_bounding_box.html" title="Allows the rendering of a wireframe bounding box." alt="" coords="457,225,634,251"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="397,179,515,223,513,228,395,184"/>
+<area shape="rect" id="Node000002" href="$class_ogre_1_1_movable_object.html" title="Abstract class defining a movable object in a scene." alt="" coords="187,79,346,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="292,110,340,150,336,154,289,115"/>
+<area shape="rect" id="Node000003" href="$class_ogre_1_1_shadow_caster.html" title="This class defines the interface that must be implemented by shadow casters." alt="" coords="5,5,160,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="126,33,238,76,236,81,124,38"/>
+<area shape="rect" id="Node000004" href="$class_ogre_1_1_animable_object.html" title="Defines an interface to classes which have one or more AnimableValue instances to expose." alt="" coords="184,5,349,31"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="269,44,269,79,264,79,264,44"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="374,5,485,31"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="392,39,294,81,292,76,390,34"/>
+<area shape="rect" id="Node000006" href="$class_ogre_1_1_renderable.html" title="Abstract class defining the interface all renderable objects must implement." alt="" coords="370,79,505,104"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="415,115,368,154,364,150,412,110"/>
+</map>
