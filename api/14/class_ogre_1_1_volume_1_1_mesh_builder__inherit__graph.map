@@ -1,0 +1,5 @@
+<map id="Ogre::Volume::MeshBuilder" name="Ogre::Volume::MeshBuilder">
+<area shape="rect" id="Node000001" title="Class to build up a mesh with vertices and indices." alt="" coords="5,79,205,104"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="58,5,153,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="108,44,108,79,103,79,103,44"/>
+</map>

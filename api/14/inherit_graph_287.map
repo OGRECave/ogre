@@ -1,0 +1,37 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="Node000000" title=" " alt="" coords="5,244,92,269"/>
+<area shape="rect" id="Node000001" href="$class_ogre_1_1_page_content.html" title="Interface definition for a unit of content within a page." alt="" coords="185,5,329,31"/>
+<area shape="poly" id="edge525_Node000000_Node000001" title=" " alt="" coords="51,229,59,187,75,136,100,84,118,60,138,40,160,27,184,19,186,24,162,32,142,44,122,64,105,87,80,138,64,189,56,231"/>
+<area shape="rect" id="Node000002" href="$class_ogre_1_1_page_content_collection.html" title="Definition of the interface for a collection of PageContent instances." alt="" coords="153,55,362,80"/>
+<area shape="poly" id="edge526_Node000000_Node000002" title=" " alt="" coords="54,230,65,198,83,160,107,122,138,91,161,78,164,83,142,95,111,125,87,162,70,199,59,232"/>
+<area shape="rect" id="Node000004" href="$class_ogre_1_1_page_content_collection_factory.html" title="Define the interface to a factory class that will create subclasses of PageContentCollection." alt="" coords="153,105,362,145"/>
+<area shape="poly" id="edge528_Node000000_Node000004" title=" " alt="" coords="64,231,95,191,116,171,139,154,163,142,165,147,141,159,119,175,99,195,68,234"/>
+<area shape="rect" id="Node000006" href="$class_ogre_1_1_page_content_factory.html" title="Define the interface to a factory class that will create subclasses of PageContent." alt="" coords="161,169,353,195"/>
+<area shape="poly" id="edge530_Node000000_Node000006" title=" " alt="" coords="79,234,139,204,177,192,178,197,141,208,81,239"/>
+<area shape="rect" id="Node000007" href="$class_ogre_1_1_page_manager.html" title="The PageManager is the entry point through which you load all PagedWorld instances,..." alt="" coords="182,219,333,244"/>
+<area shape="poly" id="edge531_Node000000_Node000007" title=" " alt="" coords="105,247,181,238,182,243,106,252"/>
+<area shape="rect" id="Node000008" href="$class_ogre_1_1_page_strategy.html" title="Defines the interface to a strategy class which is responsible for deciding when Page instances are r..." alt="" coords="183,268,331,293"/>
+<area shape="poly" id="edge532_Node000000_Node000008" title=" " alt="" coords="106,261,183,270,183,275,105,266"/>
+<area shape="rect" id="Node000011" href="$class_ogre_1_1_page_strategy_data.html" title="Abstract marker class representing the data held against the PagedWorldSection which is specifically ..." alt="" coords="168,317,347,343"/>
+<area shape="poly" id="edge535_Node000000_Node000011" title=" " alt="" coords="83,274,141,302,183,315,182,320,139,307,81,279"/>
+<area shape="rect" id="Node000014" href="$class_ogre_1_1_paged_world.html" title="This class represents a collection of pages which make up a world." alt="" coords="188,367,327,392"/>
+<area shape="poly" id="edge538_Node000000_Node000014" title=" " alt="" coords="68,279,99,317,119,336,141,352,164,362,189,369,187,374,162,367,139,356,116,340,95,321,64,282"/>
+<area shape="rect" id="Node000015" href="$class_ogre_1_1_paged_world_section.html" title="Represents a section of the PagedWorld which uses a given PageStrategy, and which is made up of a gen..." alt="" coords="164,416,351,441"/>
+<area shape="poly" id="edge539_Node000000_Node000015" title=" " alt="" coords="61,281,90,343,113,376,142,402,165,415,162,419,138,407,109,379,85,346,56,283"/>
+<area shape="rect" id="Node000017" href="$class_ogre_1_1_paged_world_section_factory.html" title="A factory class for creating types of world section." alt="" coords="140,465,375,491"/>
+<area shape="poly" id="edge541_Node000000_Node000017" title=" " alt="" coords="57,282,66,321,82,367,107,413,123,434,142,452,160,463,157,468,138,456,119,438,102,416,77,369,61,322,52,284"/>
+<area shape="rect" id="Node000003" href="$class_ogre_1_1_simple_page_content_collection.html" title="Specialisation of PageContentCollection which just provides a simple list of PageContent instances." alt="" coords="423,55,677,80"/>
+<area shape="poly" id="edge527_Node000002_Node000003" title=" " alt="" coords="376,65,422,65,422,70,376,70"/>
+<area shape="rect" id="Node000005" href="$class_ogre_1_1_simple_page_content_collection_factory.html" title="Factory class for SimplePageContentCollection." alt="" coords="423,105,677,145"/>
+<area shape="poly" id="edge529_Node000004_Node000005" title=" " alt="" coords="376,122,422,122,422,127,376,127"/>
+<area shape="rect" id="Node000009" href="$class_ogre_1_1_grid2_d_page_strategy.html" title="Page strategy which loads new pages based on a regular 2D grid." alt="" coords="453,219,647,244"/>
+<area shape="poly" id="edge533_Node000008_Node000009" title=" " alt="" coords="345,263,473,241,474,247,345,269"/>
+<area shape="rect" id="Node000010" href="$class_ogre_1_1_grid3_d_page_strategy.html" title="Page strategy which loads new pages based on a regular 3D grid." alt="" coords="453,268,647,293"/>
+<area shape="poly" id="edge534_Node000008_Node000010" title=" " alt="" coords="345,278,453,278,453,283,345,283"/>
+<area shape="rect" id="Node000012" href="$class_ogre_1_1_grid2_d_page_strategy_data.html" title="Specialisation of PageStrategyData for Grid2DPageStrategy." alt="" coords="438,317,662,343"/>
+<area shape="poly" id="edge536_Node000011_Node000012" title=" " alt="" coords="361,327,438,327,438,333,361,333"/>
+<area shape="rect" id="Node000013" href="$class_ogre_1_1_grid3_d_page_strategy_data.html" title="Specialisation of PageStrategyData for Grid3DPageStrategy." alt="" coords="438,367,662,392"/>
+<area shape="poly" id="edge537_Node000011_Node000013" title=" " alt="" coords="347,342,474,364,473,369,346,348"/>
+<area shape="rect" id="Node000016" href="$class_ogre_1_1_terrain_paged_world_section.html" title="A world section which includes paged terrain." alt="" coords="435,416,665,441"/>
+<area shape="poly" id="edge540_Node000015_Node000016" title=" " alt="" coords="365,426,434,426,434,431,365,431"/>
+</map>

@@ -1,0 +1,67 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="Node000000" title=" " alt="" coords="54,531,219,556"/>
+<area shape="rect" id="Node000001" href="$class_ogre_1_1_r_t_shader_1_1_function.html" title="A class that represents a shader based program function." alt="" coords="344,317,531,343"/>
+<area shape="poly" id="edge567_Node000000_Node000001" title=" " alt="" coords="151,518,177,480,215,435,261,389,315,352,342,340,345,345,317,356,265,394,219,439,182,484,155,521"/>
+<area shape="rect" id="Node000002" href="$class_ogre_1_1_r_t_shader_1_1_function_atom.html" title="A class that represents an atomic code section of shader based program function." alt="" coords="327,219,548,244"/>
+<area shape="poly" id="edge568_Node000000_Node000002" title=" " alt="" coords="150,517,215,418,261,358,314,303,362,267,407,242,410,246,365,272,318,307,265,362,219,421,154,520"/>
+<area shape="rect" id="Node000008" href="$class_ogre_1_1_r_t_shader_1_1_operand.html" title="A class that represents a function operand (its the combination of a parameter the in/out semantic an..." alt="" coords="344,367,531,392"/>
+<area shape="poly" id="edge574_Node000000_Node000008" title=" " alt="" coords="158,519,224,459,268,427,315,401,346,390,348,395,317,406,270,432,227,463,161,523"/>
+<area shape="rect" id="Node000013" href="$class_ogre_1_1_r_t_shader_1_1_parameter.html" title="A class that represents a shader based program parameter." alt="" coords="338,416,537,441"/>
+<area shape="poly" id="edge579_Node000000_Node000013" title=" " alt="" coords="170,521,236,486,315,451,360,439,362,444,317,457,238,491,172,526"/>
+<area shape="rect" id="Node000016" href="$class_ogre_1_1_r_t_shader_1_1_program.html" title="A class that represents a shader based program." alt="" coords="344,531,531,556"/>
+<area shape="poly" id="edge582_Node000000_Node000016" title=" " alt="" coords="233,541,344,541,344,546,233,546"/>
+<area shape="rect" id="Node000017" href="$class_ogre_1_1_r_t_shader_1_1_program_manager.html" title="A singleton manager class that manages shader based programs." alt="" coords="316,104,559,129"/>
+<area shape="poly" id="edge583_Node000000_Node000017" title=" " alt="" coords="139,517,153,441,184,339,207,284,236,231,272,182,314,140,335,127,338,132,318,144,276,186,240,234,212,287,189,341,158,443,144,518"/>
+<area shape="rect" id="Node000019" href="$class_ogre_1_1_r_t_shader_1_1_program_set.html" title="Container class for shader based programs." alt="" coords="334,580,541,605"/>
+<area shape="poly" id="edge584_Node000000_Node000019" title=" " alt="" coords="228,556,359,577,359,583,228,561"/>
+<area shape="rect" id="Node000020" href="$class_ogre_1_1_r_t_shader_1_1_program_writer.html" title="Base class interface for shader program writers." alt="" coords="324,695,551,720"/>
+<area shape="poly" id="edge585_Node000000_Node000020" title=" " alt="" coords="161,564,227,622,271,653,317,680,353,692,351,697,315,684,268,658,224,626,158,568"/>
+<area shape="rect" id="Node000021" href="$class_ogre_1_1_r_t_shader_1_1_program_writer_manager.html" title=" " alt="" coords="324,794,551,834"/>
+<area shape="poly" id="edge586_Node000000_Node000021" title=" " alt="" coords="152,567,176,613,213,671,260,730,288,757,317,780,339,792,337,796,315,784,284,761,256,733,208,674,171,616,147,569"/>
+<area shape="rect" id="Node000023" href="$class_ogre_1_1_r_t_shader_1_1_render_state.html" title="This is a container class for sub render state class." alt="" coords="332,744,543,769"/>
+<area shape="poly" id="edge587_Node000000_Node000023" title=" " alt="" coords="155,566,182,603,219,648,265,693,317,730,343,741,341,746,315,735,261,697,215,652,177,606,151,569"/>
+<area shape="rect" id="Node000025" href="$class_ogre_1_1_r_t_shader_1_1_shader_generator.html" title="Shader generator system main interface." alt="" coords="317,859,558,884"/>
+<area shape="poly" id="edge589_Node000000_Node000025" title=" " alt="" coords="153,567,240,725,287,803,318,844,341,856,338,861,314,848,282,806,235,727,149,570"/>
+<area shape="rect" id="Node000027" href="$class_ogre_1_1_r_t_shader_1_1_sub_render_state.html" title="This class is the base interface of sub part from a shader based rendering pipeline." alt="" coords="337,154,538,194"/>
+<area shape="poly" id="edge590_Node000000_Node000027" title=" " alt="" coords="141,517,160,453,194,368,217,323,245,280,277,239,314,204,335,191,338,196,318,208,281,243,249,283,222,326,199,371,165,455,147,518"/>
+<area shape="rect" id="Node000030" href="$class_ogre_1_1_r_t_shader_1_1_sub_render_state_factory.html" title="Abstract factory interface for creating SubRenderState implementation instances." alt="" coords="337,630,538,670"/>
+<area shape="poly" id="edge593_Node000000_Node000030" title=" " alt="" coords="179,559,317,614,359,627,357,632,315,619,177,564"/>
+<area shape="rect" id="Node000003" href="$class_ogre_1_1_r_t_shader_1_1_assignment_atom.html" title="shorthand for &quot;lhs = rhs;&quot; insted of using FFP_Assign(rhs, lhs)" alt="" coords="617,169,859,195"/>
+<area shape="poly" id="edge569_Node000002_Node000003" title=" " alt="" coords="528,214,659,192,660,197,529,219"/>
+<area shape="rect" id="Node000004" href="$class_ogre_1_1_r_t_shader_1_1_binary_op_atom.html" title="shorthand for &quot;dst = a OP b;&quot;" alt="" coords="625,219,851,244"/>
+<area shape="poly" id="edge570_Node000002_Node000004" title=" " alt="" coords="562,229,624,229,624,234,562,234"/>
+<area shape="rect" id="Node000005" href="$class_ogre_1_1_r_t_shader_1_1_builtin_function_atom.html" title="shorthand for &quot;dst = BUILTIN(args);&quot;" alt="" coords="607,268,869,293"/>
+<area shape="poly" id="edge571_Node000002_Node000005" title=" " alt="" coords="529,244,660,265,659,271,528,249"/>
+<area shape="rect" id="Node000006" href="$class_ogre_1_1_r_t_shader_1_1_function_invocation.html" title="A class that represents function invocation code from shader based program function." alt="" coords="645,55,831,95"/>
+<area shape="poly" id="edge572_Node000002_Node000006" title=" " alt="" coords="547,210,557,204,568,193,575,181,580,156,586,131,593,118,605,105,623,93,643,85,646,90,626,98,608,109,597,121,591,132,585,157,580,183,572,196,560,208,550,215"/>
+<area shape="rect" id="Node000007" href="$class_ogre_1_1_r_t_shader_1_1_sample_texture_atom.html" title="shorthand for &quot;dst = texture(sampler, uv);&quot; instead of using FFP_SampleTexture" alt="" coords="607,120,869,145"/>
+<area shape="poly" id="edge573_Node000002_Node000007" title=" " alt="" coords="540,212,557,204,572,192,580,180,590,167,605,154,633,143,635,148,608,159,593,170,585,183,576,196,560,208,542,217"/>
+<area shape="rect" id="Node000009" href="$struct_ogre_1_1_r_t_shader_1_1_at.html" title="shorthand for operator[] on preceding operand. e.g. myArray[p]" alt="" coords="665,367,811,392"/>
+<area shape="poly" id="edge575_Node000008_Node000009" title=" " alt="" coords="544,377,665,377,665,382,544,382"/>
+<area shape="rect" id="Node000010" href="$struct_ogre_1_1_r_t_shader_1_1_in.html" title=" " alt="" coords="667,416,809,441"/>
+<area shape="poly" id="edge576_Node000008_Node000010" title=" " alt="" coords="529,392,667,414,666,420,528,397"/>
+<area shape="rect" id="Node000011" href="$struct_ogre_1_1_r_t_shader_1_1_in_out.html" title=" " alt="" coords="655,465,821,491"/>
+<area shape="poly" id="edge577_Node000008_Node000011" title=" " alt="" coords="545,394,560,401,576,413,585,427,594,439,608,450,656,467,654,472,605,455,590,443,580,430,572,417,557,406,543,399"/>
+<area shape="rect" id="Node000012" href="$struct_ogre_1_1_r_t_shader_1_1_out.html" title=" " alt="" coords="661,317,815,343"/>
+<area shape="poly" id="edge578_Node000008_Node000012" title=" " alt="" coords="528,362,660,340,661,345,529,367"/>
+<area shape="rect" id="Node000014" href="$class_ogre_1_1_r_t_shader_1_1_const_parameter.html" title="Helper template which is the base for our ConstParameters." alt="" coords="620,515,856,555"/>
+<area shape="poly" id="edge580_Node000013_Node000014" title=" " alt="" coords="542,443,560,452,576,464,585,476,594,488,608,500,637,513,635,518,605,504,590,492,581,479,572,467,557,456,540,448"/>
+<area shape="rect" id="Node000015" href="$class_ogre_1_1_r_t_shader_1_1_uniform_parameter.html" title="Uniform parameter class." alt="" coords="612,580,864,605"/>
+<area shape="poly" id="edge581_Node000013_Node000015" title=" " alt="" coords="550,445,560,452,573,466,581,481,585,510,590,539,596,552,608,565,629,578,626,582,605,569,592,556,585,541,580,511,575,482,569,469,557,456,547,449"/>
+<area shape="rect" id="Node000024" href="$class_ogre_1_1_r_t_shader_1_1_target_render_state.html" title="This is the target render state." alt="" coords="629,737,847,777"/>
+<area shape="poly" id="edge588_Node000023_Node000024" title=" " alt="" coords="556,754,629,754,629,759,556,759"/>
+<area shape="rect" id="Node000028" href="$class_ogre_1_1_r_t_shader_1_1_f_f_p_texturing.html" title="Texturing sub render state implementation of the Fixed Function Pipeline." alt="" coords="631,5,845,31"/>
+<area shape="poly" id="edge591_Node000027_Node000028" title=" " alt="" coords="549,145,557,139,568,127,574,116,580,91,586,66,593,53,605,41,629,28,631,32,608,45,597,56,591,68,585,92,579,118,572,130,560,143,552,149"/>
+<area shape="rect" id="Node000029" href="$class_ogre_1_1_r_t_shader_1_1_layered_blending.html" title=" " alt="" coords="917,5,1157,31"/>
+<area shape="poly" id="edge592_Node000028_Node000029" title=" " alt="" coords="859,15,917,15,917,21,859,21"/>
+<area shape="rect" id="Node000031" href="$class_ogre_1_1_r_t_shader_1_1_hardware_skinning_factory.html" title="A factory that enables creation of HardwareSkinning instances." alt="" coords="641,630,835,670"/>
+<area shape="poly" id="edge594_Node000030_Node000031" title=" " alt="" coords="552,647,641,647,641,653,552,653"/>
+<area shape="rect" id="Node000032" href="$class_ogre_1_1_singleton.html" title=" " alt="" coords="337,466,537,506"/>
+<area shape="poly" id="edge595_Node000032_Node000031" title=" " alt="" coords="552,509,560,516,572,528,579,541,585,567,591,592,597,603,608,615,642,633,639,638,605,619,593,606,586,594,580,568,574,543,568,531,557,520,548,514"/>
+<area shape="rect" id="Node000018" href="$class_ogre_1_1_singleton.html" title=" " alt="" coords="41,97,233,137"/>
+<area shape="poly" id="edge596_Node000018_Node000017" title=" " alt="" coords="247,114,316,114,316,119,247,119"/>
+<area shape="rect" id="Node000022" href="$class_ogre_1_1_singleton.html" title=" " alt="" coords="41,794,233,834"/>
+<area shape="poly" id="edge597_Node000022_Node000021" title=" " alt="" coords="246,811,324,811,324,817,246,817"/>
+<area shape="rect" id="Node000026" href="$class_ogre_1_1_singleton.html" title=" " alt="" coords="5,859,268,884"/>
+<area shape="poly" id="edge598_Node000026_Node000025" title=" " alt="" coords="282,869,316,869,316,874,282,874"/>
+</map>

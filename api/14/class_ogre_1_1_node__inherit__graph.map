@@ -1,0 +1,17 @@
+<map id="Ogre::Node" name="Ogre::Node">
+<area shape="rect" id="Node000001" title="Class representing a general&#45;purpose node an articulated scene graph." alt="" coords="184,79,279,104"/>
+<area shape="rect" id="Node000003" href="$class_ogre_1_1_bone.html" title="A bone in a skeleton." alt="" coords="115,152,209,177"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="212,116,175,154,171,150,209,112"/>
+<area shape="rect" id="Node000005" href="$class_ogre_1_1_scene_node.html" title="Class representing a node in the scene graph." alt="" coords="244,152,379,177"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="256,111,300,150,296,154,252,115"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="187,5,275,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="234,44,234,79,229,79,229,44"/>
+<area shape="rect" id="Node000004" href="$class_ogre_1_1_tag_point.html" title="A tagged point on a skeleton, which can be used to attach entities to on specific other entities." alt="" coords="5,225,121,251"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="137,187,81,227,78,223,134,183"/>
+<area shape="rect" id="Node000006" href="$class_ogre_1_1_bsp_scene_node.html" title="Specialisation of SceneNode for the BspSceneManager." alt="" coords="145,225,304,251"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="289,188,241,227,237,223,285,184"/>
+<area shape="rect" id="Node000007" href="$class_ogre_1_1_octree_node.html" title="Specialized SceneNode that is customized for working within an Octree." alt="" coords="329,225,467,251"/>
+<area shape="poly" id="edge6_Node000005_Node000007" title=" " alt="" coords="337,184,386,223,382,227,334,188"/>
+<area shape="rect" id="Node000008" href="$class_ogre_1_1_p_c_z_scene_node.html" title="The PCZSceneNode is an extension used to store zone information and provide additional functionality ..." alt="" coords="491,225,651,251"/>
+<area shape="poly" id="edge7_Node000005_Node000008" title=" " alt="" coords="367,178,530,223,529,228,366,183"/>
+</map>

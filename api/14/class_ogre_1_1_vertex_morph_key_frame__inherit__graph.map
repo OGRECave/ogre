@@ -1,0 +1,7 @@
+<map id="Ogre::VertexMorphKeyFrame" name="Ogre::VertexMorphKeyFrame">
+<area shape="rect" id="Node000001" title="Specialised KeyFrame which stores absolute vertex positions for a complete buffer,..." alt="" coords="5,152,216,177"/>
+<area shape="rect" id="Node000002" href="$class_ogre_1_1_key_frame.html" title="A key frame in an animation sequence defined by an AnimationTrack." alt="" coords="47,79,174,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="113,118,113,152,108,152,108,118"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="50,5,171,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="113,44,113,79,108,79,108,44"/>
+</map>

@@ -1,0 +1,13 @@
+<map id="OgreBites::InputListener" name="OgreBites::InputListener">
+<area shape="rect" id="Node000001" title="the return values of the callbacks are ignored by ApplicationContext however they can be used to cont..." alt="" coords="5,119,184,145"/>
+<area shape="rect" id="Node000002" href="$class_ogre_bites_1_1_advanced_render_controls.html" title=" " alt="" coords="239,5,443,45"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="126,110,175,82,231,55,263,43,265,48,233,60,177,87,129,115"/>
+<area shape="rect" id="Node000003" href="$class_ogre_bites_1_1_camera_man.html" title="Utility class for controlling the camera in samples." alt="" coords="255,70,428,95"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="171,114,276,93,277,98,172,119"/>
+<area shape="rect" id="Node000004" href="$struct_ogre_bites_1_1_im_gui_input_listener.html" title=" " alt="" coords="232,119,451,145"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="198,129,232,129,232,135,198,135"/>
+<area shape="rect" id="Node000005" href="$class_ogre_bites_1_1_input_listener_chain.html" title="Chain of multiple InputListeners that acts as a single InputListener." alt="" coords="252,169,431,209"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="164,145,255,167,254,172,163,150"/>
+<area shape="rect" id="Node000006" href="$class_ogre_bites_1_1_tray_manager.html" title="Main class to manage a cursor, backdrop, trays and widgets." alt="" coords="252,234,431,259"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="123,151,173,186,233,219,271,231,269,236,231,224,170,190,120,155"/>
+</map>

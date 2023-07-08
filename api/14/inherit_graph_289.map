@@ -1,0 +1,23 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="Node000000" title=" " alt="" coords="5,203,100,228"/>
+<area shape="rect" id="Node000001" href="$class_ogre_1_1_plugin.html" title="Class defining a generic OGRE plugin." alt="" coords="148,203,249,228"/>
+<area shape="poly" id="edge543_Node000000_Node000001" title=" " alt="" coords="114,213,148,213,148,218,114,218"/>
+<area shape="rect" id="Node000002" href="$class_ogre_1_1_assimp_plugin.html" title=" " alt="" coords="333,5,483,31"/>
+<area shape="poly" id="edge544_Node000001_Node000002" title=" " alt="" coords="205,189,217,154,235,114,262,74,296,40,332,23,334,28,299,44,266,77,240,117,222,156,210,190"/>
+<area shape="rect" id="Node000003" href="$class_ogre_1_1_bsp_scene_manager_plugin.html" title="Plugin instance for BSPSceneManager." alt="" coords="297,55,519,80"/>
+<area shape="poly" id="edge545_Node000001_Node000003" title=" " alt="" coords="210,189,244,138,268,111,296,89,320,78,322,83,299,94,272,115,248,141,215,192"/>
+<area shape="rect" id="Node000004" href="$class_ogre_1_1_cg_plugin.html" title="Plugin instance for Cg Program Manager." alt="" coords="349,104,467,129"/>
+<area shape="poly" id="edge546_Node000001_Node000004" title=" " alt="" coords="221,191,255,164,296,138,348,122,349,127,298,143,258,168,224,196"/>
+<area shape="rect" id="Node000005" href="$class_ogre_1_1_dot_scene_plugin.html" title=" " alt="" coords="327,153,489,179"/>
+<area shape="poly" id="edge547_Node000001_Node000005" title=" " alt="" coords="260,197,297,187,346,176,347,181,298,193,261,202"/>
+<area shape="rect" id="Node000006" href="$class_ogre_1_1_g_l_s_lang_plugin.html" title="Plugin instance for Cg Program Manager." alt="" coords="329,203,487,228"/>
+<area shape="poly" id="edge548_Node000001_Node000006" title=" " alt="" coords="263,213,329,213,329,218,263,218"/>
+<area shape="rect" id="Node000007" href="$class_ogre_1_1_octree_plugin.html" title="Plugin instance for Octree Manager." alt="" coords="336,252,480,277"/>
+<area shape="poly" id="edge549_Node000001_Node000007" title=" " alt="" coords="263,228,298,237,352,249,350,255,297,242,262,234"/>
+<area shape="rect" id="Node000008" href="$class_ogre_1_1_octree_zone_plugin.html" title="Plugin instance for OctreeZone." alt="" coords="319,301,497,327"/>
+<area shape="poly" id="edge550_Node000001_Node000008" title=" " alt="" coords="225,235,258,262,298,286,333,299,331,304,296,291,255,266,222,239"/>
+<area shape="rect" id="Node000009" href="$class_ogre_1_1_p_c_z_plugin.html" title="Plugin instance for PCZ Manager." alt="" coords="345,351,471,376"/>
+<area shape="poly" id="edge551_Node000001_Node000009" title=" " alt="" coords="215,239,249,289,272,314,299,336,321,347,345,354,343,359,319,352,296,340,268,318,244,292,211,242"/>
+<area shape="rect" id="Node000010" href="$class_ogre_1_1_particle_f_x_plugin.html" title="Plugin instance for ParticleFX Manager." alt="" coords="325,400,491,425"/>
+<area shape="poly" id="edge552_Node000001_Node000010" title=" " alt="" coords="210,240,222,274,240,313,266,352,299,385,326,399,323,404,296,389,262,356,236,316,217,276,205,242"/>
+</map>

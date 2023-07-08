@@ -1,0 +1,7 @@
+<map id="Ogre::InvalidCallException" name="Ogre::InvalidCallException">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,152,200,177"/>
+<area shape="rect" id="Node000002" href="$class_ogre_1_1_exception.html" title="When thrown, provides information about an error that has occurred inside the engine." alt="" coords="40,79,165,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="105,118,105,152,100,152,100,118"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="45,5,160,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="105,44,105,79,100,79,100,44"/>
+</map>

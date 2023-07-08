@@ -1,0 +1,5 @@
+<map id="Ogre::IlluminationPass" name="Ogre::IlluminationPass">
+<area shape="rect" id="Node000001" title="Struct recording a pass which can be used for a specific illumination stage." alt="" coords="5,79,175,104"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="48,5,132,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="93,44,93,79,87,79,87,44"/>
+</map>

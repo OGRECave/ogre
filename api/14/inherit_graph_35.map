@@ -1,0 +1,29 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="Node000000" title=" " alt="" coords="74,159,151,185"/>
+<area shape="rect" id="Node000001" href="$class_ogre_1_1_lod_strategy.html" title="Strategy for determining level of detail." alt="" coords="297,159,435,185"/>
+<area shape="poly" id="edge329_Node000000_Node000001" title=" " alt="" coords="165,169,297,169,297,175,165,175"/>
+<area shape="rect" id="Node000012" href="$class_ogre_1_1_lod_strategy_manager.html" title="Manager for LOD strategies." alt="" coords="268,213,464,238"/>
+<area shape="poly" id="edge336_Node000000_Node000012" title=" " alt="" coords="165,180,305,210,304,215,164,185"/>
+<area shape="rect" id="Node000002" href="$class_ogre_1_1_distance_lod_strategy_base.html" title="Level of detail strategy based on distance from camera." alt="" coords="519,70,747,95"/>
+<area shape="poly" id="edge330_Node000001_Node000002" title=" " alt="" coords="403,151,454,127,511,105,559,93,560,98,513,111,456,132,405,156"/>
+<area shape="rect" id="Node000007" href="$class_ogre_1_1_pixel_count_lod_strategy_base.html" title="Abstract base class for level of detail strategy based on pixel count approximations from bounding sp..." alt="" coords="512,249,753,274"/>
+<area shape="poly" id="edge333_Node000001_Node000007" title=" " alt="" coords="439,187,465,198,490,216,499,225,513,234,549,246,547,251,511,238,496,230,486,220,463,202,437,192"/>
+<area shape="rect" id="Node000003" href="$class_ogre_1_1_distance_lod_box_strategy.html" title="Level of detail strategy based on distance from camera to an object&#39;s bounding box." alt="" coords="811,42,1033,67"/>
+<area shape="poly" id="edge331_Node000002_Node000003" title=" " alt="" coords="760,68,811,63,811,68,761,73"/>
+<area shape="rect" id="Node000005" href="$class_ogre_1_1_distance_lod_sphere_strategy.html" title="Level of detail strategy based on distance from camera to an object&#39;s bounding sphere." alt="" coords="801,110,1043,135"/>
+<area shape="poly" id="edge332_Node000002_Node000005" title=" " alt="" coords="739,95,830,107,829,113,738,100"/>
+<area shape="rect" id="Node000008" href="$class_ogre_1_1_absolute_pixel_count_lod_strategy.html" title=" " alt="" coords="828,209,1016,249"/>
+<area shape="poly" id="edge334_Node000007_Node000008" title=" " alt="" coords="761,244,828,237,828,242,762,250"/>
+<area shape="rect" id="Node000010" href="$class_ogre_1_1_screen_ratio_pixel_count_lod_strategy.html" title=" " alt="" coords="817,285,1027,325"/>
+<area shape="poly" id="edge335_Node000007_Node000010" title=" " alt="" coords="730,273,818,287,817,292,730,279"/>
+<area shape="rect" id="Node000009" href="$class_ogre_1_1_singleton.html" title=" " alt="" coords="535,184,730,224"/>
+<area shape="poly" id="edge337_Node000009_Node000008" title=" " alt="" coords="744,211,828,218,827,224,743,216"/>
+<area shape="rect" id="Node000004" href="$class_ogre_1_1_singleton.html" title=" " alt="" coords="535,5,730,45"/>
+<area shape="poly" id="edge338_Node000004_Node000003" title=" " alt="" coords="744,34,812,41,811,46,744,39"/>
+<area shape="rect" id="Node000006" href="$class_ogre_1_1_singleton.html" title=" " alt="" coords="535,120,730,160"/>
+<area shape="poly" id="edge339_Node000006_Node000005" title=" " alt="" coords="744,131,801,127,801,133,744,136"/>
+<area shape="rect" id="Node000013" href="$class_ogre_1_1_singleton.html" title=" " alt="" coords="5,209,220,249"/>
+<area shape="poly" id="edge340_Node000013_Node000012" title=" " alt="" coords="234,225,268,224,268,230,234,230"/>
+<area shape="rect" id="Node000011" href="$class_ogre_1_1_singleton.html" title=" " alt="" coords="525,299,740,339"/>
+<area shape="poly" id="edge341_Node000011_Node000010" title=" " alt="" coords="754,310,817,307,817,313,754,316"/>
+</map>

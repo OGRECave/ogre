@@ -1,0 +1,13 @@
+<map id="Ogre::HollowEllipsoidEmitter" name="Ogre::HollowEllipsoidEmitter">
+<area shape="rect" id="Node000001" title="Particle emitter which emits particles randomly from points inside a hollow ellipsoid." alt="" coords="58,299,267,324"/>
+<area shape="rect" id="Node000002" href="$class_ogre_1_1_ellipsoid_emitter.html" title="Particle emitter which emits particles randomly from points inside an ellipsoid." alt="" coords="81,225,245,251"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="165,264,165,299,160,299,160,264"/>
+<area shape="rect" id="Node000003" href="$class_ogre_1_1_area_emitter.html" title="Particle emitter which emits particles randomly from points inside an area (box, sphere,..." alt="" coords="93,152,232,177"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="165,191,165,225,160,225,160,191"/>
+<area shape="rect" id="Node000004" href="$class_ogre_1_1_particle_emitter.html" title="Abstract class defining the interface to be implemented by particle emitters." alt="" coords="83,79,242,104"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="165,118,165,152,160,152,160,118"/>
+<area shape="rect" id="Node000005" href="$class_ogre_1_1_string_interface.html" title="Class defining the common interface which classes can use to present a reflection&#45;style,..." alt="" coords="5,5,163,31"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="109,38,152,76,148,80,105,42"/>
+<area shape="rect" id="Node000006" href="$class_ogre_1_1_particle.html" title="Class representing a single particle instance." alt="" coords="187,5,298,31"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="222,42,178,80,174,76,218,38"/>
+</map>

@@ -1,0 +1,9 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="Node000000" href="$class_ogre_1_1_scene_manager_factory.html" title="Class which will create instances of a given SceneManager." alt="" coords="5,63,211,88"/>
+<area shape="rect" id="Node000001" href="$class_ogre_1_1_bsp_scene_manager_factory.html" title="Factory for BspSceneManager." alt="" coords="259,5,489,31"/>
+<area shape="poly" id="edge438_Node000000_Node000001" title=" " alt="" coords="180,57,314,28,315,33,182,62"/>
+<area shape="rect" id="Node000002" href="$class_ogre_1_1_octree_scene_manager_factory.html" title="Factory for OctreeSceneManager." alt="" coords="274,55,474,95"/>
+<area shape="poly" id="edge439_Node000000_Node000002" title=" " alt="" coords="224,73,274,73,274,78,224,78"/>
+<area shape="rect" id="Node000003" href="$class_ogre_1_1_p_c_z_scene_manager_factory.html" title="Factory for PCZSceneManager." alt="" coords="259,120,489,145"/>
+<area shape="poly" id="edge440_Node000000_Node000003" title=" " alt="" coords="182,88,315,117,314,123,180,94"/>
+</map>

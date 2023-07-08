@@ -1,0 +1,11 @@
+<map id="Ogre::MaterialManager" name="Ogre::MaterialManager">
+<area shape="rect" id="Node000001" title="Class for managing Material settings for Ogre." alt="" coords="171,167,343,192"/>
+<area shape="rect" id="Node000002" href="$class_ogre_1_1_resource_manager.html" title="Defines a generic resource handler." alt="" coords="63,86,242,111"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="180,117,243,164,240,169,177,122"/>
+<area shape="rect" id="Node000003" href="$class_ogre_1_1_script_loader.html" title="Abstract class defining the interface used by classes which wish to perform script loading to define ..." alt="" coords="5,5,148,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="99,39,143,84,139,88,95,42"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="173,5,287,31"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="211,42,166,88,162,84,207,39"/>
+<area shape="rect" id="Node000005" href="$class_ogre_1_1_singleton.html" title=" " alt="" coords="267,79,457,119"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="327,129,274,168,271,164,324,125"/>
+</map>

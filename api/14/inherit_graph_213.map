@@ -1,0 +1,29 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="Node000000" href="$class_ogre_1_1_singleton.html" title=" " alt="" coords="5,5,187,45"/>
+<area shape="rect" id="Node000001" href="$class_ogre_1_1_terrain_global_options.html" title="Options class which just stores default options for the terrain." alt="" coords="251,13,449,38"/>
+<area shape="poly" id="edge451_Node000000_Node000001" title=" " alt="" coords="201,23,251,23,251,28,201,28"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="47,242,145,267"/>
+<area shape="poly" id="edge456_Node000002_Node000001" title=" " alt="" coords="105,228,123,188,150,139,187,90,209,68,233,48,258,36,261,40,236,53,213,72,191,93,155,142,128,190,109,230"/>
+<area shape="rect" id="Node000003" href="$class_ogre_1_1_terrain_1_1_gpu_buffer_allocator.html" title="Interface used to by the Terrain instance to allocate GPU buffers." alt="" coords="261,63,439,103"/>
+<area shape="poly" id="edge452_Node000002_Node000003" title=" " alt="" coords="113,229,162,170,196,139,233,112,259,100,261,105,236,117,199,143,166,174,117,232"/>
+<area shape="rect" id="Node000005" href="$class_ogre_1_1_terrain_auto_update_lod.html" title="Terrain automatic LOD loading." alt="" coords="247,127,453,153"/>
+<area shape="poly" id="edge454_Node000002_Node000005" title=" " alt="" coords="122,231,172,196,234,163,272,150,274,155,236,168,175,201,125,236"/>
+<area shape="rect" id="Node000007" href="$struct_ogre_1_1_terrain_group_1_1_terrain_slot.html" title="Slot for a terrain instance, together with its definition." alt="" coords="278,177,422,217"/>
+<area shape="poly" id="edge457_Node000002_Node000007" title=" " alt="" coords="158,238,277,211,278,216,160,243"/>
+<area shape="rect" id="Node000008" href="$class_ogre_1_1_terrain_layer_blend_map.html" title="Class exposing an interface to a blend map for a given layer." alt="" coords="247,242,453,267"/>
+<area shape="poly" id="edge458_Node000002_Node000008" title=" " alt="" coords="159,252,246,252,246,257,159,257"/>
+<area shape="rect" id="Node000009" href="$class_ogre_1_1_terrain_material_generator.html" title="Class that provides functionality to generate materials for use with a terrain." alt="" coords="238,291,462,317"/>
+<area shape="poly" id="edge459_Node000002_Node000009" title=" " alt="" coords="160,264,284,289,283,294,159,269"/>
+<area shape="rect" id="Node000011" href="$class_ogre_1_1_terrain_paged_world_section_1_1_terrain_definer.html" title=" " alt="" coords="235,341,465,381"/>
+<area shape="poly" id="edge461_Node000002_Node000011" title=" " alt="" coords="130,272,179,300,236,327,269,339,267,344,234,332,177,305,128,277"/>
+<area shape="rect" id="Node000012" href="$class_ogre_1_1_terrain_paging.html" title="This class is the &#39;core&#39; class for paging terrain, that will integrate with the larger paging system ..." alt="" coords="275,406,425,431"/>
+<area shape="poly" id="edge462_Node000002_Node000012" title=" " alt="" coords="116,277,165,335,199,366,236,391,276,406,274,411,233,396,195,370,162,339,112,280"/>
+<area shape="rect" id="Node000013" href="$struct_ogre_1_1_terrain_quad_tree_node_1_1_lod_level.html" title=" " alt="" coords="250,456,450,496"/>
+<area shape="poly" id="edge463_Node000002_Node000013" title=" " alt="" coords="111,278,130,315,158,359,194,404,236,442,257,454,255,458,233,446,190,408,154,362,126,318,106,281"/>
+<area shape="rect" id="Node000004" href="$class_ogre_1_1_terrain_1_1_default_gpu_buffer_allocator.html" title="Standard implementation of a buffer allocator which re&#45;uses buffers." alt="" coords="537,60,723,100"/>
+<area shape="poly" id="edge453_Node000003_Node000004" title=" " alt="" coords="453,79,536,78,536,84,453,84"/>
+<area shape="rect" id="Node000006" href="$class_ogre_1_1_terrain_auto_update_lod_by_distance.html" title="Class implementing TerrainAutoUpdateLod interface." alt="" coords="527,124,733,164"/>
+<area shape="poly" id="edge455_Node000005_Node000006" title=" " alt="" coords="467,139,527,140,527,145,467,144"/>
+<area shape="rect" id="Node000010" href="$class_ogre_1_1_terrain_material_generator_a.html" title="A TerrainMaterialGenerator which can cope with normal mapped, specular mapped terrain." alt="" coords="513,291,747,317"/>
+<area shape="poly" id="edge460_Node000009_Node000010" title=" " alt="" coords="476,301,513,301,513,307,476,307"/>
+</map>

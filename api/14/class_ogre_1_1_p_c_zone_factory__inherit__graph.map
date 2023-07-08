@@ -1,0 +1,9 @@
+<map id="Ogre::PCZoneFactory" name="Ogre::PCZoneFactory">
+<area shape="rect" id="Node000001" title="Factory for PCZones." alt="" coords="127,79,285,104"/>
+<area shape="rect" id="Node000003" href="$class_ogre_1_1_default_zone_factory.html" title=" " alt="" coords="5,152,196,177"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="179,114,119,154,116,150,176,110"/>
+<area shape="rect" id="Node000004" href="$class_ogre_1_1_octree_zone_factory.html" title="Factory for OctreeZone." alt="" coords="220,152,405,177"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="236,109,297,150,294,154,233,114"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="115,5,297,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="209,44,209,79,203,79,203,44"/>
+</map>

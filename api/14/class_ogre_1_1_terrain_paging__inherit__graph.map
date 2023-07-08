@@ -1,0 +1,5 @@
+<map id="Ogre::TerrainPaging" name="Ogre::TerrainPaging">
+<area shape="rect" id="Node000001" title="This class is the &#39;core&#39; class for paging terrain, that will integrate with the larger paging system ..." alt="" coords="5,79,155,104"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="31,5,129,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="83,44,83,79,77,79,77,44"/>
+</map>

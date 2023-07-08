@@ -1,0 +1,9 @@
+<map id="OgreBites::TrayManager" name="OgreBites::TrayManager">
+<area shape="rect" id="Node000001" title="Main class to manage a cursor, backdrop, trays and widgets." alt="" coords="221,79,399,104"/>
+<area shape="rect" id="Node000002" href="$class_ogre_bites_1_1_tray_listener.html" title="Listener class for responding to tray events." alt="" coords="5,5,180,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="141,32,276,76,274,81,140,37"/>
+<area shape="rect" id="Node000003" href="$class_ogre_1_1_resource_group_listener.html" title="This class defines an interface which is called back during resource group loading to indicate the pr..." alt="" coords="204,5,416,31"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="313,44,313,79,307,79,307,44"/>
+<area shape="rect" id="Node000004" href="$struct_ogre_bites_1_1_input_listener.html" title="the return values of the callbacks are ignored by ApplicationContext however they can be used to cont..." alt="" coords="441,5,619,31"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="482,37,346,81,345,76,481,32"/>
+</map>

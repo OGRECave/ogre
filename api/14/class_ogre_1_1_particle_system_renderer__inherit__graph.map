@@ -1,0 +1,9 @@
+<map id="Ogre::ParticleSystemRenderer" name="Ogre::ParticleSystemRenderer">
+<area shape="rect" id="Node000001" title="Abstract class defining the interface required to be implemented by classes which provide rendering c..." alt="" coords="44,79,263,104"/>
+<area shape="rect" id="Node000004" href="$class_ogre_1_1_billboard_particle_renderer.html" title="Specialisation of ParticleSystemRenderer to render particles using a BillboardSet." alt="" coords="40,152,267,177"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="156,118,156,152,151,152,151,118"/>
+<area shape="rect" id="Node000002" href="$class_ogre_1_1_string_interface.html" title="Class defining the common interface which classes can use to present a reflection&#45;style,..." alt="" coords="5,5,163,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="107,39,144,77,140,80,103,43"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="187,5,258,31"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="204,43,166,80,163,77,200,39"/>
+</map>

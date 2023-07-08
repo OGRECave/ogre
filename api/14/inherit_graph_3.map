@@ -1,0 +1,29 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="Node000000" title=" " alt="" coords="5,129,127,155"/>
+<area shape="rect" id="Node000001" href="$class_ogre_1_1_animation.html" title="An animation sequence." alt="" coords="202,5,330,31"/>
+<area shape="poly" id="edge8_Node000000_Node000001" title=" " alt="" coords="85,117,123,77,147,57,173,40,201,28,203,33,176,44,150,61,127,81,88,120"/>
+<area shape="rect" id="Node000002" href="$class_ogre_1_1_animation_state.html" title="Represents the state of an animation and the weight of its influence." alt="" coords="185,55,347,80"/>
+<area shape="poly" id="edge9_Node000000_Node000002" title=" " alt="" coords="102,121,174,89,210,78,211,83,176,94,104,126"/>
+<area shape="rect" id="Node000003" href="$class_ogre_1_1_animation_state_set.html" title="Class encapsulating a set of AnimationState objects." alt="" coords="175,104,357,129"/>
+<area shape="poly" id="edge10_Node000000_Node000003" title=" " alt="" coords="140,130,174,126,175,131,141,135"/>
+<area shape="rect" id="Node000004" href="$class_ogre_1_1_animation_track.html" title="A &#39;track&#39; in an animation sequence, i.e." alt="" coords="185,153,347,179"/>
+<area shape="poly" id="edge11_Node000000_Node000004" title=" " alt="" coords="141,148,185,154,184,159,140,154"/>
+<area shape="rect" id="Node000008" href="$class_ogre_1_1_key_frame.html" title="A key frame in an animation sequence defined by an AnimationTrack." alt="" coords="203,227,329,252"/>
+<area shape="poly" id="edge15_Node000000_Node000008" title=" " alt="" coords="107,158,240,224,238,229,104,163"/>
+<area shape="rect" id="Node000013" href="$class_ogre_1_1_pose.html" title="A pose is a linked set of vertex offsets applying to one set of vertex data." alt="" coords="220,276,312,301"/>
+<area shape="poly" id="edge20_Node000000_Node000013" title=" " alt="" coords="85,165,122,214,148,239,176,261,198,272,221,279,219,284,196,277,173,266,144,243,118,217,80,168"/>
+<area shape="rect" id="Node000005" href="$class_ogre_1_1_node_animation_track.html" title="Specialised AnimationTrack for dealing with node transforms." alt="" coords="416,55,613,80"/>
+<area shape="poly" id="edge12_Node000004_Node000005" title=" " alt="" coords="341,146,356,138,370,127,379,114,388,101,404,89,431,78,433,82,407,94,392,105,383,117,374,130,359,143,343,151"/>
+<area shape="rect" id="Node000006" href="$class_ogre_1_1_numeric_animation_track.html" title="Specialised AnimationTrack for dealing with generic animable values." alt="" coords="405,104,624,129"/>
+<area shape="poly" id="edge13_Node000004_Node000006" title=" " alt="" coords="343,148,449,127,450,132,344,153"/>
+<area shape="rect" id="Node000007" href="$class_ogre_1_1_vertex_animation_track.html" title="Specialised AnimationTrack for dealing with changing vertex position information." alt="" coords="411,153,618,179"/>
+<area shape="poly" id="edge14_Node000004_Node000007" title=" " alt="" coords="361,163,411,163,411,169,361,169"/>
+<area shape="rect" id="Node000009" href="$class_ogre_1_1_numeric_key_frame.html" title="Specialised KeyFrame which stores any numeric value." alt="" coords="424,203,605,228"/>
+<area shape="poly" id="edge16_Node000008_Node000009" title=" " alt="" coords="343,229,424,221,424,227,343,235"/>
+<area shape="rect" id="Node000010" href="$class_ogre_1_1_transform_key_frame.html" title="Specialised KeyFrame which stores a full transform." alt="" coords="419,252,611,277"/>
+<area shape="poly" id="edge17_Node000008_Node000010" title=" " alt="" coords="343,244,418,252,418,258,343,250"/>
+<area shape="rect" id="Node000011" href="$class_ogre_1_1_vertex_morph_key_frame.html" title="Specialised KeyFrame which stores absolute vertex positions for a complete buffer,..." alt="" coords="409,301,620,327"/>
+<area shape="poly" id="edge18_Node000008_Node000011" title=" " alt="" coords="337,253,358,261,383,274,406,286,448,299,446,304,404,291,380,278,356,266,335,258"/>
+<area shape="rect" id="Node000012" href="$class_ogre_1_1_vertex_pose_key_frame.html" title="Specialised KeyFrame which references a Mesh::Pose at a certain influence level, which stores offsets..." alt="" coords="415,351,615,376"/>
+<area shape="poly" id="edge19_Node000008_Node000012" title=" " alt="" coords="344,252,359,261,376,280,384,300,391,319,407,336,430,348,428,353,404,340,386,321,379,302,371,283,356,265,341,257"/>
+</map>

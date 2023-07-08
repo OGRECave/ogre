@@ -1,0 +1,9 @@
+<map id="Ogre::FreeImageCodec" name="Ogre::FreeImageCodec">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,225,176,251"/>
+<area shape="rect" id="Node000002" href="$class_ogre_1_1_image_codec.html" title="Codec specialized in images." alt="" coords="19,152,162,177"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="93,191,93,225,88,225,88,191"/>
+<area shape="rect" id="Node000003" href="$class_ogre_1_1_codec.html" title="Abstract class that defines a &#39;codec&#39;." alt="" coords="40,79,141,104"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="93,118,93,152,88,152,88,118"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="43,5,138,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="93,44,93,79,88,79,88,44"/>
+</map>

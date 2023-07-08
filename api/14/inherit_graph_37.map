@@ -1,0 +1,43 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="Node000000" title=" " alt="" coords="79,79,167,104"/>
+<area shape="rect" id="Node000001" href="$class_ogre_1_1_bsp_node.html" title="Encapsulates a node in a BSP tree." alt="" coords="337,29,455,55"/>
+<area shape="poly" id="edge345_Node000000_Node000001" title=" " alt="" coords="180,78,336,50,337,55,181,84"/>
+<area shape="rect" id="Node000002" href="$class_ogre_1_1_node.html" title="Class representing a general&#45;purpose node an articulated scene graph." alt="" coords="349,79,443,104"/>
+<area shape="poly" id="edge346_Node000000_Node000002" title=" " alt="" coords="180,89,348,89,348,94,180,94"/>
+<area shape="rect" id="Node000009" href="$class_ogre_1_1_octree.html" title="Octree datastructure for managing scene nodes." alt="" coords="344,128,448,153"/>
+<area shape="poly" id="edge353_Node000000_Node000009" title=" " alt="" coords="181,99,344,129,343,134,180,104"/>
+<area shape="rect" id="Node000003" href="$class_ogre_1_1_bone.html" title="A bone in a skeleton." alt="" coords="600,5,695,31"/>
+<area shape="poly" id="edge347_Node000002_Node000003" title=" " alt="" coords="456,76,503,63,610,28,612,33,505,69,458,81"/>
+<area shape="rect" id="Node000005" href="$class_ogre_1_1_scene_node.html" title="Class representing a node in the scene graph." alt="" coords="580,79,715,104"/>
+<area shape="poly" id="edge349_Node000002_Node000005" title=" " alt="" coords="457,89,580,89,580,94,457,94"/>
+<area shape="rect" id="Node000004" href="$class_ogre_1_1_tag_point.html" title="A tagged point on a skeleton, which can be used to attach entities to on specific other entities." alt="" coords="813,5,929,31"/>
+<area shape="poly" id="edge348_Node000003_Node000004" title=" " alt="" coords="708,15,813,15,813,21,708,21"/>
+<area shape="rect" id="Node000006" href="$class_ogre_1_1_bsp_scene_node.html" title="Specialisation of SceneNode for the BspSceneManager." alt="" coords="791,55,950,80"/>
+<area shape="poly" id="edge350_Node000005_Node000006" title=" " alt="" coords="728,80,791,73,791,78,729,85"/>
+<area shape="rect" id="Node000007" href="$class_ogre_1_1_octree_node.html" title="Specialized SceneNode that is customized for working within an Octree." alt="" coords="801,104,940,129"/>
+<area shape="poly" id="edge351_Node000005_Node000007" title=" " alt="" coords="729,98,802,106,801,112,728,103"/>
+<area shape="rect" id="Node000008" href="$class_ogre_1_1_p_c_z_scene_node.html" title="The PCZSceneNode is an extension used to store zone information and provide additional functionality ..." alt="" coords="791,153,951,179"/>
+<area shape="poly" id="edge352_Node000005_Node000008" title=" " alt="" coords="722,105,744,113,768,125,792,138,826,151,824,156,790,143,766,130,742,118,720,110"/>
+<area shape="rect" id="Node000010" title=" " alt="" coords="31,227,214,252"/>
+<area shape="poly" id="edge354_Node000010_Node000009" title=" " alt="" coords="159,218,218,190,287,162,343,147,344,152,289,167,220,194,161,223"/>
+<area shape="rect" id="Node000011" href="$class_ogre_1_1_p_c_zone.html" title="Portal&#45;Connected Zone datastructure for managing scene nodes." alt="" coords="341,177,451,203"/>
+<area shape="poly" id="edge355_Node000010_Node000011" title=" " alt="" coords="206,222,340,197,341,202,207,227"/>
+<area shape="rect" id="Node000014" href="$class_ogre_1_1_p_c_zone_factory.html" title="Factory for PCZones." alt="" coords="317,227,475,252"/>
+<area shape="poly" id="edge358_Node000010_Node000014" title=" " alt="" coords="227,237,316,237,316,242,227,242"/>
+<area shape="rect" id="Node000017" href="$class_ogre_1_1_p_c_zone_factory_manager.html" title=" " alt="" coords="288,325,504,351"/>
+<area shape="poly" id="edge361_Node000010_Node000017" title=" " alt="" coords="162,256,221,283,289,310,333,323,331,328,287,315,219,288,160,261"/>
+<area shape="rect" id="Node000019" href="$class_ogre_1_1_zone_data.html" title=" " alt="" coords="333,276,459,301"/>
+<area shape="poly" id="edge362_Node000010_Node000019" title=" " alt="" coords="208,252,334,275,333,280,207,257"/>
+<area shape="rect" id="Node000012" href="$class_ogre_1_1_default_zone.html" title=" " alt="" coords="576,128,719,153"/>
+<area shape="poly" id="edge356_Node000011_Node000012" title=" " alt="" coords="465,174,581,151,582,156,466,179"/>
+<area shape="rect" id="Node000013" href="$class_ogre_1_1_octree_zone.html" title=" " alt="" coords="579,177,716,203"/>
+<area shape="poly" id="edge357_Node000011_Node000013" title=" " alt="" coords="465,187,578,187,578,193,465,193"/>
+<area shape="rect" id="Node000015" href="$class_ogre_1_1_default_zone_factory.html" title=" " alt="" coords="552,227,743,252"/>
+<area shape="poly" id="edge359_Node000014_Node000015" title=" " alt="" coords="490,237,552,237,552,242,490,242"/>
+<area shape="rect" id="Node000016" href="$class_ogre_1_1_octree_zone_factory.html" title="Factory for OctreeZone." alt="" coords="555,276,740,301"/>
+<area shape="poly" id="edge360_Node000014_Node000016" title=" " alt="" coords="475,252,582,273,581,279,474,257"/>
+<area shape="rect" id="Node000020" href="$class_ogre_1_1_octree_zone_data.html" title=" " alt="" coords="563,325,731,351"/>
+<area shape="poly" id="edge363_Node000019_Node000020" title=" " alt="" coords="473,301,582,323,581,328,472,306"/>
+<area shape="rect" id="Node000018" href="$class_ogre_1_1_singleton.html" title=" " alt="" coords="5,318,240,358"/>
+<area shape="poly" id="edge364_Node000018_Node000017" title=" " alt="" coords="254,335,288,335,288,341,254,341"/>
+</map>

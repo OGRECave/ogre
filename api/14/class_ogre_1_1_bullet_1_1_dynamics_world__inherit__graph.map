@@ -1,0 +1,5 @@
+<map id="Ogre::Bullet::DynamicsWorld" name="Ogre::Bullet::DynamicsWorld">
+<area shape="rect" id="Node000001" title="simplified wrapper with automatic memory management" alt="" coords="5,79,216,104"/>
+<area shape="rect" id="Node000002" href="$class_ogre_1_1_bullet_1_1_collision_world.html" title="simplified wrapper with automatic memory management" alt="" coords="10,5,211,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="113,44,113,79,108,79,108,44"/>
+</map>

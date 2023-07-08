@@ -1,0 +1,9 @@
+<map id="Ogre::PCZone" name="Ogre::PCZone">
+<area shape="rect" id="Node000001" title="Portal&#45;Connected Zone datastructure for managing scene nodes." alt="" coords="103,79,213,104"/>
+<area shape="rect" id="Node000003" href="$class_ogre_1_1_default_zone.html" title=" " alt="" coords="5,152,148,177"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="136,115,92,154,88,150,133,111"/>
+<area shape="rect" id="Node000004" href="$class_ogre_1_1_octree_zone.html" title=" " alt="" coords="172,152,309,177"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="183,111,229,150,225,154,180,115"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="67,5,249,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="161,44,161,79,155,79,155,44"/>
+</map>

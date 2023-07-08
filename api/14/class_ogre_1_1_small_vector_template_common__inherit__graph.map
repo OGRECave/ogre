@@ -1,0 +1,45 @@
+<map id="Ogre::SmallVectorTemplateCommon&lt; T &gt;" name="Ogre::SmallVectorTemplateCommon&lt; T &gt;">
+<area shape="rect" id="Node000001" title=" " alt="" coords="225,363,425,403"/>
+<area shape="rect" id="Node000003" href="$class_ogre_1_1_small_vector_template_base.html" title=" " alt="" coords="474,158,674,213"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="347,350,399,286,434,252,472,222,491,211,494,215,475,226,437,256,403,289,351,353"/>
+<area shape="rect" id="Node000015" href="$class_ogre_1_1_small_vector_template_base.html" title=" " alt="" coords="474,237,674,291"/>
+<area shape="poly" id="edge14_Node000001_Node000015" title=" " alt="" coords="371,354,472,300,498,289,500,294,474,305,373,358"/>
+<area shape="rect" id="Node000016" href="$class_ogre_1_1_small_vector_template_base.html" title=" " alt="" coords="474,315,674,370"/>
+<area shape="poly" id="edge15_Node000001_Node000016" title=" " alt="" coords="439,362,473,356,474,361,440,367"/>
+<area shape="rect" id="Node000017" href="$class_ogre_1_1_small_vector_template_base.html" title=" " alt="" coords="473,394,675,449"/>
+<area shape="poly" id="edge16_Node000001_Node000017" title=" " alt="" coords="439,398,473,403,473,408,439,403"/>
+<area shape="rect" id="Node000018" href="$class_ogre_1_1_small_vector_template_base.html" title="SmallVectorTemplateBase&lt;isPodLike = false&gt; &#45; This is where we put method implementations that are des..." alt="" coords="474,473,674,513"/>
+<area shape="poly" id="edge17_Node000001_Node000018" title=" " alt="" coords="373,407,474,459,506,471,504,476,472,464,371,412"/>
+<area shape="rect" id="Node000022" href="$class_ogre_1_1_small_vector_template_base_3_01_t_00_01true_01_4.html" title="SmallVectorTemplateBase&lt;isPodLike = true&gt; &#45; This is where we put method implementations that are desi..." alt="" coords="474,537,674,577"/>
+<area shape="poly" id="edge21_Node000001_Node000022" title=" " alt="" coords="353,411,405,468,439,498,475,523,498,535,496,540,472,528,435,502,401,472,349,415"/>
+<area shape="rect" id="Node000002" href="$class_ogre_1_1_small_vector_base.html" title="SmallVectorBase &#45; This is all the non&#45;templated stuff common to all SmallVectors." alt="" coords="5,370,177,395"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="191,380,225,380,225,385,191,385"/>
+<area shape="rect" id="Node000004" href="$class_ogre_1_1_small_vector_impl.html" title="SmallVectorImpl &#45; This class consists of common code factored out of the SmallVector class to reduce ..." alt="" coords="723,173,929,198"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="688,183,723,183,723,188,688,188"/>
+<area shape="rect" id="Node000005" href="$class_ogre_1_1_small_vector.html" title=" " alt="" coords="977,5,1128,45"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="847,161,903,110,976,55,998,43,1001,48,979,60,907,114,851,165"/>
+<area shape="rect" id="Node000007" href="$class_ogre_1_1_small_vector.html" title=" " alt="" coords="977,69,1128,109"/>
+<area shape="poly" id="edge6_Node000004_Node000007" title=" " alt="" coords="868,165,1003,107,1005,112,870,170"/>
+<area shape="rect" id="Node000008" href="$class_ogre_1_1_small_vector.html" title=" " alt="" coords="977,133,1128,173"/>
+<area shape="poly" id="edge7_Node000004_Node000008" title=" " alt="" coords="929,168,977,161,978,167,930,173"/>
+<area shape="rect" id="Node000009" href="$class_ogre_1_1_small_vector.html" title=" " alt="" coords="977,197,1128,237"/>
+<area shape="poly" id="edge8_Node000004_Node000009" title=" " alt="" coords="930,197,978,204,977,209,929,203"/>
+<area shape="rect" id="Node000010" href="$class_ogre_1_1_small_vector.html" title="SmallVector &#45; This is a &#39;vector&#39; (really, a variable&#45;sized array), optimized for the case when the ar..." alt="" coords="977,261,1128,301"/>
+<area shape="poly" id="edge9_Node000004_Node000010" title=" " alt="" coords="870,201,1005,259,1003,264,868,206"/>
+<area shape="rect" id="Node000014" href="$class_ogre_1_1_small_vector_3_01_t_00_010_01_4.html" title="Specialize SmallVector at N=0." alt="" coords="977,325,1128,365"/>
+<area shape="poly" id="edge13_Node000004_Node000014" title=" " alt="" coords="851,206,907,257,979,311,1001,323,998,328,976,316,903,261,847,210"/>
+<area shape="rect" id="Node000006" href="$struct_ogre_1_1_vector_set.html" title="VectorSet is basically a helper to use a vector as a small set container." alt="" coords="1188,13,1367,38"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="1142,23,1188,23,1188,28,1142,28"/>
+<area shape="rect" id="Node000011" href="$struct_ogre_1_1_vector_set.html" title=" " alt="" coords="1176,211,1379,237"/>
+<area shape="poly" id="edge10_Node000010_Node000011" title=" " alt="" coords="1141,256,1175,247,1225,234,1226,239,1177,252,1142,261"/>
+<area shape="rect" id="Node000012" href="$struct_ogre_1_1_vector_set.html" title=" " alt="" coords="1194,261,1361,301"/>
+<area shape="poly" id="edge11_Node000010_Node000012" title=" " alt="" coords="1142,279,1194,279,1194,284,1142,284"/>
+<area shape="rect" id="Node000013" href="$struct_ogre_1_1_vector_set.html" title=" " alt="" coords="1182,325,1373,365"/>
+<area shape="poly" id="edge12_Node000010_Node000013" title=" " alt="" coords="1138,303,1207,323,1206,328,1136,308"/>
+<area shape="rect" id="Node000019" href="$class_ogre_1_1_small_vector_impl.html" title=" " alt="" coords="741,409,911,449"/>
+<area shape="poly" id="edge18_Node000018_Node000019" title=" " alt="" coords="666,467,746,447,747,452,667,472"/>
+<area shape="rect" id="Node000020" href="$class_ogre_1_1_small_vector_impl.html" title=" " alt="" coords="741,473,911,513"/>
+<area shape="poly" id="edge19_Node000018_Node000020" title=" " alt="" coords="688,491,741,491,741,496,688,496"/>
+<area shape="rect" id="Node000021" href="$class_ogre_1_1_small_vector_impl.html" title=" " alt="" coords="741,537,911,577"/>
+<area shape="poly" id="edge20_Node000018_Node000021" title=" " alt="" coords="667,514,747,535,746,540,666,519"/>
+</map>

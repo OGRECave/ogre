@@ -1,0 +1,17 @@
+<map id="Ogre::RaySceneQuery" name="Ogre::RaySceneQuery">
+<area shape="rect" id="Node000001" title="Specialises the SceneQuery class for querying along a ray." alt="" coords="239,152,403,177"/>
+<area shape="rect" id="Node000005" href="$class_ogre_1_1_default_ray_scene_query.html" title="Default implementation of RaySceneQuery." alt="" coords="215,225,427,251"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="323,191,323,225,318,225,318,191"/>
+<area shape="rect" id="Node000002" href="$class_ogre_1_1_scene_query.html" title="A class for performing queries on a scene." alt="" coords="151,79,290,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="249,110,306,150,303,154,246,114"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="161,5,280,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="223,44,223,79,218,79,218,44"/>
+<area shape="rect" id="Node000004" href="$class_ogre_1_1_ray_scene_query_listener.html" title="Alternative listener class for dealing with RaySceneQuery." alt="" coords="314,79,530,104"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="396,114,339,154,336,150,393,110"/>
+<area shape="rect" id="Node000006" href="$class_ogre_1_1_bsp_ray_scene_query.html" title="BSP specialisation of RaySceneQuery." alt="" coords="5,299,193,324"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="273,257,136,301,134,296,272,252"/>
+<area shape="rect" id="Node000007" href="$class_ogre_1_1_octree_ray_scene_query.html" title="Octree implementation of RaySceneQuery." alt="" coords="217,299,424,324"/>
+<area shape="poly" id="edge6_Node000005_Node000007" title=" " alt="" coords="323,264,323,299,318,299,318,264"/>
+<area shape="rect" id="Node000008" href="$class_ogre_1_1_p_c_z_ray_scene_query.html" title="PCZ implementation of RaySceneQuery." alt="" coords="448,299,639,324"/>
+<area shape="poly" id="edge7_Node000005_Node000008" title=" " alt="" coords="370,252,508,296,506,301,368,257"/>
+</map>

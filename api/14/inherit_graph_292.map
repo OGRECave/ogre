@@ -1,0 +1,11 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="Node000000" title=" " alt="" coords="5,80,148,105"/>
+<area shape="rect" id="Node000001" href="$class_ogre_1_1_queued_renderable_collection.html" title="Lowest level collection of renderables." alt="" coords="196,5,447,31"/>
+<area shape="poly" id="edge561_Node000000_Node000001" title=" " alt="" coords="115,72,195,39,240,28,241,33,197,45,117,76"/>
+<area shape="rect" id="Node000002" href="$class_ogre_1_1_render_priority_group.html" title="Collection of renderables by priority." alt="" coords="225,55,418,80"/>
+<area shape="poly" id="edge562_Node000000_Node000002" title=" " alt="" coords="162,81,224,75,225,80,163,86"/>
+<area shape="rect" id="Node000003" href="$class_ogre_1_1_render_queue.html" title="Class to manage the scene object rendering queue." alt="" coords="247,104,396,129"/>
+<area shape="poly" id="edge563_Node000000_Node000003" title=" " alt="" coords="163,98,247,107,246,112,162,104"/>
+<area shape="rect" id="Node000004" href="$class_ogre_1_1_render_queue_group.html" title="A grouping level underneath RenderQueue which groups renderables to be issued at coarsely the same ti..." alt="" coords="227,153,415,179"/>
+<area shape="poly" id="edge564_Node000000_Node000004" title=" " alt="" coords="119,108,197,138,247,151,245,156,195,143,117,113"/>
+</map>

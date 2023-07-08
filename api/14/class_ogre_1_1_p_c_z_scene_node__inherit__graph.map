@@ -1,0 +1,9 @@
+<map id="Ogre::PCZSceneNode" name="Ogre::PCZSceneNode">
+<area shape="rect" id="Node000001" title="The PCZSceneNode is an extension used to store zone information and provide additional functionality ..." alt="" coords="5,225,165,251"/>
+<area shape="rect" id="Node000002" href="$class_ogre_1_1_scene_node.html" title="Class representing a node in the scene graph." alt="" coords="18,152,153,177"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="88,191,88,225,83,225,83,191"/>
+<area shape="rect" id="Node000003" href="$class_ogre_1_1_node.html" title="Class representing a general&#45;purpose node an articulated scene graph." alt="" coords="38,79,133,104"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="88,118,88,152,83,152,83,118"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="41,5,129,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="88,44,88,79,83,79,83,44"/>
+</map>

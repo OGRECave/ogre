@@ -1,0 +1,21 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="Node000000" title=" " alt="" coords="28,161,181,187"/>
+<area shape="rect" id="Node000001" href="$class_ogre_1_1_composition_pass.html" title="Object representing one pass or operation in a composition sequence." alt="" coords="272,5,445,31"/>
+<area shape="poly" id="edge280_Node000000_Node000001" title=" " alt="" coords="123,149,176,94,212,64,251,40,279,28,281,33,253,44,215,69,180,97,127,153"/>
+<area shape="rect" id="Node000002" href="$class_ogre_1_1_composition_target_pass.html" title="Object representing one render to a RenderTarget or Viewport in the Ogre Composition framework." alt="" coords="252,55,465,80"/>
+<area shape="poly" id="edge281_Node000000_Node000002" title=" " alt="" coords="134,151,187,119,251,89,287,78,289,83,253,94,190,124,137,156"/>
+<area shape="rect" id="Node000003" href="$class_ogre_1_1_composition_technique.html" title="Base composition technique, can be subclassed in plugins." alt="" coords="255,104,463,129"/>
+<area shape="poly" id="edge282_Node000000_Node000003" title=" " alt="" coords="174,156,301,127,302,132,175,161"/>
+<area shape="rect" id="Node000004" href="$class_ogre_1_1_composition_technique_1_1_texture_definition.html" title="Local texture definition." alt="" coords="255,154,463,194"/>
+<area shape="poly" id="edge283_Node000000_Node000004" title=" " alt="" coords="195,171,255,171,255,177,195,177"/>
+<area shape="rect" id="Node000005" href="$class_ogre_1_1_compositor_chain.html" title="Chain of compositor effects applying to one viewport." alt="" coords="272,333,445,359"/>
+<area shape="poly" id="edge284_Node000000_Node000005" title=" " alt="" coords="125,196,178,258,213,291,253,318,283,331,281,336,251,323,210,295,174,262,121,199"/>
+<area shape="rect" id="Node000008" href="$class_ogre_1_1_compositor_instance.html" title="An instance of a Compositor object for one Viewport." alt="" coords="263,219,454,244"/>
+<area shape="poly" id="edge285_Node000000_Node000008" title=" " alt="" coords="175,187,302,216,301,221,174,192"/>
+<area shape="rect" id="Node000009" href="$class_ogre_1_1_compositor_instance_1_1_render_system_operation.html" title="Specific render system operation." alt="" coords="263,269,454,309"/>
+<area shape="poly" id="edge286_Node000000_Node000009" title=" " alt="" coords="139,192,191,222,253,253,288,266,286,271,251,258,189,227,136,196"/>
+<area shape="rect" id="Node000006" href="$class_ogre_1_1_render_target_listener.html" title="A interface class defining a listener which can be used to receive notifications of RenderTarget even..." alt="" coords="5,308,204,333"/>
+<area shape="poly" id="edge287_Node000006_Node000005" title=" " alt="" coords="218,329,272,335,272,340,218,335"/>
+<area shape="rect" id="Node000007" href="$class_ogre_1_1_viewport_1_1_listener.html" title="Listener interface so you can be notified of Viewport changes." alt="" coords="15,357,194,383"/>
+<area shape="poly" id="edge288_Node000007_Node000005" title=" " alt="" coords="208,358,272,352,272,357,208,363"/>
+</map>

@@ -1,0 +1,7 @@
+<map id="Ogre::ParticleAffectorFactory" name="Ogre::ParticleAffectorFactory">
+<area shape="rect" id="Node000001" title="Abstract class defining the interface to be implemented by creators of ParticleAffector subclasses." alt="" coords="11,79,220,104"/>
+<area shape="rect" id="Node000003" href="$class_ogre_1_1_texture_animator_affector_factory.html" title="Factory class for TextureAnimatorAffector." alt="" coords="5,152,225,192"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="118,118,118,152,113,152,113,118"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="80,5,151,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="118,44,118,79,113,79,113,44"/>
+</map>

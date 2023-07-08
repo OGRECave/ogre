@@ -1,0 +1,7 @@
+<map id="Ogre::SubEntity" name="Ogre::SubEntity">
+<area shape="rect" id="Node000001" title="Utility class which defines the sub&#45;parts of an Entity." alt="" coords="86,79,209,104"/>
+<area shape="rect" id="Node000002" href="$class_ogre_1_1_renderable.html" title="Abstract class defining the interface all renderable objects must implement." alt="" coords="5,5,140,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="96,38,137,77,133,80,93,42"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="164,5,280,31"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="202,42,161,80,158,77,198,38"/>
+</map>

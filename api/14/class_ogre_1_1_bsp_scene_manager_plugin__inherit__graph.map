@@ -1,0 +1,7 @@
+<map id="Ogre::BspSceneManagerPlugin" name="Ogre::BspSceneManagerPlugin">
+<area shape="rect" id="Node000001" title="Plugin instance for BSPSceneManager." alt="" coords="5,152,227,177"/>
+<area shape="rect" id="Node000002" href="$class_ogre_1_1_plugin.html" title="Class defining a generic OGRE plugin." alt="" coords="65,79,167,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="119,118,119,152,113,152,113,118"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="69,5,163,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="119,44,119,79,113,79,113,44"/>
+</map>
