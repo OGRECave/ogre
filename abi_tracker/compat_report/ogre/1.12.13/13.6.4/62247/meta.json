@@ -1,0 +1,11 @@
+{
+  "Affected": "7.4",
+  "Added": 0,
+  "Removed": 0,
+  "TotalProblems": 23,
+  "Source_Affected": "8",
+  "Source_TotalProblems": "14",
+  "Source_ReportPath": "compat_report/ogre/1.12.13/13.6.4/62247/src_compat_report.html",
+  "Object1": "lib/libOgreVolume.so.1.12.13",
+  "Object2": "lib/libOgreVolume.so.13.6"
+}

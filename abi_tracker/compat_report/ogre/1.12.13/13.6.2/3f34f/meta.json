@@ -1,0 +1,11 @@
+{
+  "Affected": "0",
+  "Added": 0,
+  "Removed": 0,
+  "TotalProblems": 1,
+  "Source_Affected": "1.6",
+  "Source_TotalProblems": "2",
+  "Source_ReportPath": "compat_report/ogre/1.12.13/13.6.2/3f34f/src_compat_report.html",
+  "Object1": "lib/libOgreProperty.so.1.12.13",
+  "Object2": "lib/libOgreProperty.so.13.6"
+}

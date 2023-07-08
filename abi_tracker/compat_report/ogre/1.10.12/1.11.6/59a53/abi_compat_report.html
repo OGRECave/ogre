@@ -1,4 +1,4 @@
-<!-- verdict:incompatible;affected:75.1;added:58;removed:111;type_problems_high:4;type_problems_medium:130;type_problems_low:55;interface_problems_high:10;interface_problems_medium:2;interface_problems_low:3;changed_constants:0;type_changes_other:7;tool_version:2.3 -->
+<!-- verdict:incompatible;affected:75.1;added:58;removed:111;type_problems_high:4;type_problems_medium:130;type_problems_low:55;interface_problems_high:9;interface_problems_medium:2;interface_problems_low:3;changed_constants:0;type_changes_other:7;tool_version:2.3 -->
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
@@ -312,7 +312,7 @@ function showContent(header, id)
 <tr><th rowspan='3'>Problems with<br/>Data Types</th><td>High</td><td class='failed'><a href='#Type_Problems_High' style='color:Blue;'>4</a></td></tr>
 <tr><td>Medium</td><td class='failed'><a href='#Type_Problems_Medium' style='color:Blue;'>130</a></td></tr>
 <tr><td>Low</td><td class='warning'><a href='#Type_Problems_Low' style='color:Blue;'>55</a></td></tr>
-<tr><th rowspan='3'>Problems with<br/>Symbols</th><td>High</td><td class='failed'><a href='#Symbol_Problems_High' style='color:Blue;'>10</a></td></tr>
+<tr><th rowspan='3'>Problems with<br/>Symbols</th><td>High</td><td class='failed'><a href='#Symbol_Problems_High' style='color:Blue;'>9</a></td></tr>
 <tr><td>Medium</td><td class='failed'><a href='#Symbol_Problems_Medium' style='color:Blue;'>2</a></td></tr>
 <tr><td>Low</td><td class='warning'><a href='#Symbol_Problems_Low' style='color:Blue;'>3</a></td></tr>
 <tr><th>Problems with<br/>Constants</th><td>Low</td><td>0</td></tr>
@@ -2042,7 +2042,7 @@ TerrainQuadTreeNode::writePosVertex&#160;<span class='sym_p'><span>(&#160;bool <
 <br/>
 <a class='top_ref' href='#Top'>to the top</a><br/>
 <a name='Symbol_Problems_High'></a><a name='Interface_Problems_High'></a>
-<h2>Problems with Symbols, High Severity <span class='failed'>&nbsp;10&nbsp;</span></h2><hr/>
+<h2>Problems with Symbols, High Severity <span class='failed'>&nbsp;9&nbsp;</span></h2><hr/>
 <span class='h_name'>OgreTerrain.h</span>, <span class='lib_name'>libOgreTerrain.so.1.10.12</span><br/>
 <span class='ns'>namespace <b>Ogre</b></span><br/>
 <span class="section" onclick="javascript:showContent(this, 'c_178')">
@@ -2196,39 +2196,12 @@ TerrainQuadTreeNode::writePosVertex&#160;<span class='sym_p'><span>(&#160;bool <
 <br/>
 </div>
 <br/>
-<span class='h_name'>OgreTerrainMaterialGenerator.h</span>, <span class='lib_name'>libOgreTerrain.so.1.10.12</span><br/>
-<span class='ns'>namespace <b>Ogre</b></span><br/>
-<span class="section" onclick="javascript:showContent(this, 'c_184')">
-<span class='ext'>[+]</span> TerrainMaterialGenerator::_renderCompositeMap&#160;<span class='sym_p'><span>(&#160;size_t <span class='color_p'>size</span></span>, <span>Rect const&amp; <span class='color_p'>rect</span></span>, <span>std::shared_ptr&lt;DataStream&gt;const&amp; <span class='color_p'>mat</span></span>, <span>std::shared_ptr&lt;DataStream&gt;const&amp; <span class='color_p'>destCompositeMap</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
-<br/>
-<div id="c_184" style="display:none;">
-
-
-<span class='new_sign_lbl'>&#8675;</span>
-<br/>
-<span class='new_sign'>TerrainMaterialGenerator::_renderCompositeMap&#160;<span class='sym_p'><span>(&#160;size_t <span class='color_p'>size</span></span>, <span>Rect const&amp; <span class='color_p'>rect</span></span>, <span>SharedPtr&lt;Material&gt;const&amp; <span class='color_p'>mat</span></span>, <span>SharedPtr&lt;Texture&gt;const&amp; <span class='color_p'>destCompositeMap</span></span>&#160;)</span></span><br/>
-<span class='mngl pleft'>_ZN4Ogre24TerrainMaterialGenerator19_renderCompositeMapEmRKNS_5TRectIlEERKSt10shared_ptrINS_8MaterialEERKS5_INS_7TextureEE</span><br/>
-<table class='ptable'>
-<tr>
-<th class='pn'></th>
-<th class='chg'>Change</th>
-<th>Effect</th>
-</tr>
-<tr>
-<th>1</th>
-<td>Parameters list has been changed.</td>
-<td>The name of the appropriate symbol for this function on binary level has been changed from <b>_ZN4Ogre24TerrainMaterialGenerator19_renderCompositeMapEmRKNS_5TRectIlEERKSt10shared_ptrINS_8MaterialEERKS5_INS_7TextureEE</b> to <b>_ZN4Ogre24TerrainMaterialGenerator19_renderCompositeMapEmRKNS_5TRectIlEERKNS_9SharedPtrINS_8MaterialEEERKNS5_INS_7TextureEEE</b>. This may cause undefined reference linker error in old client applications.</td>
-</tr>
-</table>
-<br/>
-</div>
-<br/>
 <span class='h_name'>OgreTerrainMaterialGeneratorA.h</span>, <span class='lib_name'>libOgreTerrain.so.1.10.12</span><br/>
 <span class='ns'>namespace <b>Ogre</b></span><br/>
-<span class="section" onclick="javascript:showContent(this, 'c_185')">
+<span class="section" onclick="javascript:showContent(this, 'c_184')">
 <span class='ext'>[+]</span> TerrainMaterialGeneratorA::SM2Profile::addTechnique&#160;<span class='sym_p'><span>(&#160;std::shared_ptr&lt;DataStream&gt;const&amp; <span class='color_p'>mat</span></span>, <span>Terrain const* <span class='color_p'>terrain</span></span>, <span>enum TerrainMaterialGeneratorA::SM2Profile::TechniqueType <span class='color_p'>tt</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
 <br/>
-<div id="c_185" style="display:none;">
+<div id="c_184" style="display:none;">
 
 
 <span class='new_sign_lbl'>&#8675;</span>
@@ -2249,10 +2222,10 @@ TerrainQuadTreeNode::writePosVertex&#160;<span class='sym_p'><span>(&#160;bool <
 </table>
 <br/>
 </div>
-<span class="section" onclick="javascript:showContent(this, 'c_186')">
+<span class="section" onclick="javascript:showContent(this, 'c_185')">
 <span class='ext'>[+]</span> TerrainMaterialGeneratorA::SM2Profile::isShadowingEnabled&#160;<span class='sym_p'><span>(&#160;enum TerrainMaterialGeneratorA::SM2Profile::TechniqueType <span class='color_p'>tt</span></span>, <span>Terrain const* <span class='color_p'>terrain</span></span>&#160;)</span> const <span class='failed'>&nbsp;1&nbsp;</span></span>
 <br/>
-<div id="c_186" style="display:none;">
+<div id="c_185" style="display:none;">
 
 
 <span class='new_sign_lbl'>&#8675;</span>
@@ -2276,10 +2249,10 @@ TerrainQuadTreeNode::writePosVertex&#160;<span class='sym_p'><span>(&#160;bool <
 <br/>
 <span class='h_name'>OgreTerrainQuadTreeNode.h</span>, <span class='lib_name'>libOgreTerrain.so.1.10.12</span><br/>
 <span class='ns'>namespace <b>Ogre</b></span><br/>
-<span class="section" onclick="javascript:showContent(this, 'c_187')">
+<span class="section" onclick="javascript:showContent(this, 'c_186')">
 <span class='ext'>[+]</span> TerrainQuadTreeNode::updateVertexBuffer&#160;<span class='sym_p'><span>(&#160;std::shared_ptr&lt;DataStream&gt;&amp; <span class='color_p'>posbuf</span></span>, <span>std::shared_ptr&lt;DataStream&gt;&amp; <span class='color_p'>deltabuf</span></span>, <span>Rect const&amp; <span class='color_p'>rect</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
 <br/>
-<div id="c_187" style="display:none;">
+<div id="c_186" style="display:none;">
 
 
 <span class='new_sign_lbl'>&#8675;</span>
@@ -2306,10 +2279,10 @@ TerrainQuadTreeNode::writePosVertex&#160;<span class='sym_p'><span>(&#160;bool <
 <h2>Problems with Data Types, Medium Severity <span class='failed'>&nbsp;130&nbsp;</span></h2><hr/>
 <span class='h_name'>OgreAxisAlignedBox.h</span><br/>
 <span class='ns'>namespace <b>Ogre</b></span><br/>
-<span class="section" onclick="javascript:showContent(this, 'c_188')">
+<span class="section" onclick="javascript:showContent(this, 'c_187')">
 <span class='ext'>[+]</span> <span class='ttype'>class</span> AxisAlignedBox <span class='failed'>&nbsp;1&nbsp;</span></span>
 <br/>
-<div id="c_188" style="display:none;">
+<div id="c_187" style="display:none;">
 <table class='ptable'><tr>
 <th class='pn'></th>
 <th class='chg'>Change</th>
@@ -2319,9 +2292,9 @@ TerrainQuadTreeNode::writePosVertex&#160;<span class='sym_p'><span>(&#160;bool <
 <td>1) Applications will access incorrect memory when attempting to access this field.<br/>2) Size of the inclusive type has been changed.</td>
 </tr>
 </table>
-<span class="sect_aff" onclick="javascript:showContent(this, 'c_189')">
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_188')">
 [+] affected symbols: 218 (39.3%)</span>
-<div id="c_189" style="display:none;">
+<div id="c_188" style="display:none;">
 <div class='affected'><span class='iname_a'>TerrainGroup::TerrainSlot::freeInstance&#160;<span class='sym_p'>(&#160;)</span></span><br/>
 <div class='affect'>Field &#39;this.instance.mQuadTree.mAABB&#39; in the object of this method is of type &#39;AxisAlignedBox&#39;.</div>
 <span class='iname_a'>TerrainGroup::TerrainSlot::~TerrainSlot&#160;<span class='sym_p'>(&#160;)</span></span><br/>
@@ -2351,10 +2324,10 @@ TerrainQuadTreeNode::writePosVertex&#160;<span class='sym_p'><span>(&#160;bool <
 <br/>
 <span class='h_name'>OgreCommon.h</span><br/>
 <span class='ns'>namespace <b>Ogre</b></span><br/>
-<span class="section" onclick="javascript:showContent(this, 'c_190')">
+<span class="section" onclick="javascript:showContent(this, 'c_189')">
 <span class='ext'>[+]</span> <span class='ttype'>class</span> HashedVector&lt;Light*&gt; <span class='failed'>&nbsp;1&nbsp;</span></span>
 <br/>
-<div id="c_190" style="display:none;">
+<div id="c_189" style="display:none;">
 <table class='ptable'><tr>
 <th class='pn'></th>
 <th class='chg'>Change</th>
@@ -2364,9 +2337,9 @@ TerrainQuadTreeNode::writePosVertex&#160;<span class='sym_p'><span>(&#160;bool <
 <td>1) Size of the inclusive type has been changed.<br/>2) Previous accesses of applications and library functions to this field and fields at higher positions of the structure definition may be broken.</td>
 </tr>
 </table>
-<span class="sect_aff" onclick="javascript:showContent(this, 'c_191')">
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_190')">
 [+] affected symbols: 2 (0.4%)</span>
-<div id="c_191" style="display:none;">
+<div id="c_190" style="display:none;">
 <div class='affected'><span class='iname_a'>TerrainQuadTreeNode::Rend::getLights&#160;<span class='sym_p'>(&#160;)</span></span><br/>
 <div class='affect'>Return value (reference) has base type &#39;HashedVector&lt;Light*&gt;&#39;.</div>
 <span class='iname_a'>TerrainQuadTreeNode::getLights&#160;<span class='sym_p'>(&#160;)</span></span><br/>
@@ -2378,10 +2351,10 @@ TerrainQuadTreeNode::writePosVertex&#160;<span class='sym_p'><span>(&#160;bool <
 <br/>
 <span class='h_name'>OgrePixelFormat.h</span><br/>
 <span class='ns'>namespace <b>Ogre</b></span><br/>
-<span class="section" onclick="javascript:showContent(this, 'c_192')">
+<span class="section" onclick="javascript:showContent(this, 'c_191')">
 <span class='ext'>[+]</span> <span class='ttype'>enum</span> PixelFormat <span class='failed'>&nbsp;107&nbsp;</span></span>
 <br/>
-<div id="c_192" style="display:none;">
+<div id="c_191" style="display:none;">
 <table class='ptable'><tr>
 <th class='pn'></th>
 <th class='chg'>Change</th>
@@ -2921,9 +2894,9 @@ TerrainQuadTreeNode::writePosVertex&#160;<span class='sym_p'><span>(&#160;bool <
 <td>Applications may execute a wrong branch of code in the library and therefore change the behavior.</td>
 </tr>
 </table>
-<span class="sect_aff" onclick="javascript:showContent(this, 'c_193')">
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_192')">
 [+] affected symbols: 257 (46.3%)</span>
-<div id="c_193" style="display:none;">
+<div id="c_192" style="display:none;">
 <div class='affected'><span class='iname_a'>TerrainGroup::loadTerrain&#160;<span class='sym_p'><span>(&#160;long <i>x</i></span>, <span>long <i>y</i></span>, <span>bool <i>synchronous</i></span>&#160;)</span></span><br/>
 <div class='affect'>Field &#39;this.mDefaultImportData.inputImage.mFormat&#39; in the object of this method is of type &#39;enum PixelFormat&#39;.</div>
 <span class='iname_a'>TerrainGroup::TerrainSlot::freeInstance&#160;<span class='sym_p'>(&#160;)</span></span><br/>
@@ -2953,10 +2926,10 @@ TerrainQuadTreeNode::writePosVertex&#160;<span class='sym_p'><span>(&#160;bool <
 <br/>
 <span class='h_name'>OgreRenderOperation.h</span><br/>
 <span class='ns'>namespace <b>Ogre</b></span><br/>
-<span class="section" onclick="javascript:showContent(this, 'c_194')">
+<span class="section" onclick="javascript:showContent(this, 'c_193')">
 <span class='ext'>[+]</span> <span class='ttype'>class</span> RenderOperation <span class='failed'>&nbsp;1&nbsp;</span></span>
 <br/>
-<div id="c_194" style="display:none;">
+<div id="c_193" style="display:none;">
 <table class='ptable'><tr>
 <th class='pn'></th>
 <th class='chg'>Change</th>
@@ -2966,9 +2939,9 @@ TerrainQuadTreeNode::writePosVertex&#160;<span class='sym_p'><span>(&#160;bool <
 <td>1) Applications will access incorrect memory when attempting to access this field.<br/>2) Layout of structure fields has been changed and therefore fields at higher positions of the structure definition may be incorrectly accessed by applications.</td>
 </tr>
 </table>
-<span class="sect_aff" onclick="javascript:showContent(this, 'c_195')">
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_194')">
 [+] affected symbols: 2 (0.4%)</span>
-<div id="c_195" style="display:none;">
+<div id="c_194" style="display:none;">
 <div class='affected'><span class='iname_a'>TerrainQuadTreeNode::getRenderOperation&#160;<span class='sym_p'><span>(&#160;RenderOperation&amp; <span class='fp'>op</span></span>&#160;)</span></span><br/>
 <div class='affect'>1st parameter &#39;op&#39; (reference) has base type &#39;RenderOperation&#39;.</div>
 <span class='iname_a'>TerrainQuadTreeNode::Rend::getRenderOperation&#160;<span class='sym_p'><span>(&#160;RenderOperation&amp; <span class='fp'>op</span></span>&#160;)</span></span><br/>
@@ -2980,10 +2953,10 @@ TerrainQuadTreeNode::writePosVertex&#160;<span class='sym_p'><span>(&#160;bool <
 <br/>
 <span class='h_name'>OgreTechnique.h</span><br/>
 <span class='ns'>namespace <b>Ogre</b></span><br/>
-<span class="section" onclick="javascript:showContent(this, 'c_196')">
+<span class="section" onclick="javascript:showContent(this, 'c_195')">
 <span class='ext'>[+]</span> <span class='ttype'>class</span> Technique <span class='failed'>&nbsp;10&nbsp;</span></span>
 <br/>
-<div id="c_196" style="display:none;">
+<div id="c_195" style="display:none;">
 <table class='ptable'><tr>
 <th class='pn'></th>
 <th class='chg'>Change</th>
@@ -3038,9 +3011,9 @@ TerrainQuadTreeNode::writePosVertex&#160;<span class='sym_p'><span>(&#160;bool <
 <td>Applications will access incorrect memory when attempting to access this field.</td>
 </tr>
 </table>
-<span class="sect_aff" onclick="javascript:showContent(this, 'c_197')">
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_196')">
 [+] affected symbols: 2 (0.4%)</span>
-<div id="c_197" style="display:none;">
+<div id="c_196" style="display:none;">
 <div class='affected'><span class='iname_a'>TerrainQuadTreeNode::getTechnique&#160;<span class='sym_p'>(&#160;)</span></span><br/>
 <div class='affect'>Return value (pointer) has base type &#39;Technique&#39;.</div>
 <span class='iname_a'>TerrainQuadTreeNode::Rend::getTechnique&#160;<span class='sym_p'>(&#160;)</span></span><br/>
@@ -3052,10 +3025,10 @@ TerrainQuadTreeNode::writePosVertex&#160;<span class='sym_p'><span>(&#160;bool <
 <br/>
 <span class='h_name'>OgreTerrain.h</span><br/>
 <span class='ns'>namespace <b>Ogre</b></span><br/>
-<span class="section" onclick="javascript:showContent(this, 'c_198')">
+<span class="section" onclick="javascript:showContent(this, 'c_197')">
 <span class='ext'>[+]</span> <span class='ttype'>class</span> Terrain::GpuBufferAllocator <span class='failed'>&nbsp;2&nbsp;</span></span>
 <br/>
-<div id="c_198" style="display:none;">
+<div id="c_197" style="display:none;">
 <table class='ptable'><tr>
 <th class='pn'></th>
 <th class='chg'>Change</th>
@@ -3070,9 +3043,9 @@ TerrainQuadTreeNode::writePosVertex&#160;<span class='sym_p'><span>(&#160;bool <
 <td>Applications will provide an older method to the library instead of expected newely added <b>virtual</b> method. This may result in crash or incorrect behavior of applications.</td>
 </tr>
 </table>
-<span class="sect_aff" onclick="javascript:showContent(this, 'c_199')">
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_198')">
 [+] affected symbols: 2 (0.4%)</span>
-<div id="c_199" style="display:none;">
+<div id="c_198" style="display:none;">
 <div class='affected'><span class='iname_a'>Terrain::DefaultGpuBufferAllocator::freeVertexBuffers&#160;<span class='sym_p'><span>(&#160;std::shared_ptr&lt;DataStream&gt;const&amp; <i>posbuf</i></span>, <span>std::shared_ptr&lt;DataStream&gt;const&amp; <i>deltabuf</i></span>&#160;)</span></span><br/>
 <div class='affect'>This method is from derived class &#39;Terrain::DefaultGpuBufferAllocator&#39;.</div>
 <span class='iname_a'>Terrain::DefaultGpuBufferAllocator::allocateVertexBuffers&#160;<span class='sym_p'><span>(&#160;Terrain* <i>forTerrain</i></span>, <span>size_t <i>numVertices</i></span>, <span>std::shared_ptr&lt;DataStream&gt;&amp; <i>destPos</i></span>, <span>std::shared_ptr&lt;DataStream&gt;&amp; <i>destDelta</i></span>&#160;)</span></span><br/>
@@ -3084,10 +3057,10 @@ TerrainQuadTreeNode::writePosVertex&#160;<span class='sym_p'><span>(&#160;bool <
 <br/>
 <span class='h_name'>OgreTerrainGroup.h</span><br/>
 <span class='ns'>namespace <b>Ogre</b></span><br/>
-<span class="section" onclick="javascript:showContent(this, 'c_200')">
+<span class="section" onclick="javascript:showContent(this, 'c_199')">
 <span class='ext'>[+]</span> <span class='ttype'>class</span> TerrainGroup <span class='failed'>&nbsp;1&nbsp;</span></span>
 <br/>
-<div id="c_200" style="display:none;">
+<div id="c_199" style="display:none;">
 <table class='ptable'><tr>
 <th class='pn'></th>
 <th class='chg'>Change</th>
@@ -3097,10 +3070,10 @@ TerrainQuadTreeNode::writePosVertex&#160;<span class='sym_p'><span>(&#160;bool <
 <td>Applications will pass parameters of older replaced method to newly added <b>virtual</b> method. This may result in crash or incorrect behavior of applications.</td>
 </tr>
 </table>
-<span class="sect_info" onclick="javascript:showContent(this, 'c_201')">
+<span class="sect_info" onclick="javascript:showContent(this, 'c_200')">
 [+] show v-table (old and new)</span>
 <br/>
-<div id="c_201" style="display:none;">
+<div id="c_200" style="display:none;">
 <table class='vtable'><tr><th>Offset</th><th>Virtual Table (Old) - 35 entries</th><th>Virtual Table (New) - 35 entries</th></tr><tr><th>0</th>
 <td>(int (*)(...)) 0</td>
 <td>(int (*)(...)) 0</td></tr>
@@ -3208,9 +3181,9 @@ TerrainQuadTreeNode::writePosVertex&#160;<span class='sym_p'><span>(&#160;bool <
 <td>non-virtual thunk to TerrainGroup::handleResponse(WorkQueue::Response const*, WorkQueue const*)</td></tr>
 </table><br/>
 </div>
-<span class="sect_aff" onclick="javascript:showContent(this, 'c_202')">
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_201')">
 [+] affected symbols: 1 (0.2%)</span>
-<div id="c_202" style="display:none;">
+<div id="c_201" style="display:none;">
 <div class='affected'><span class='iname_a'>TerrainGroup::setOrigin&#160;<span class='sym_p'><span>(&#160;Vector3 const&amp; <i>pos</i></span>&#160;)</span></span><br/>
 <div class='affect'>This method is from &#39;TerrainGroup&#39; class.</div>
 </div>
@@ -3220,10 +3193,10 @@ TerrainQuadTreeNode::writePosVertex&#160;<span class='sym_p'><span>(&#160;bool <
 <br/>
 <span class='h_name'>OgreTerrainMaterialGenerator.h</span><br/>
 <span class='ns'>namespace <b>Ogre</b></span><br/>
-<span class="section" onclick="javascript:showContent(this, 'c_203')">
+<span class="section" onclick="javascript:showContent(this, 'c_202')">
 <span class='ext'>[+]</span> <span class='ttype'>class</span> TerrainMaterialGenerator <span class='failed'>&nbsp;2&nbsp;</span></span>
 <br/>
-<div id="c_203" style="display:none;">
+<div id="c_202" style="display:none;">
 <table class='ptable'><tr>
 <th class='pn'></th>
 <th class='chg'>Change</th>
@@ -3238,10 +3211,10 @@ TerrainQuadTreeNode::writePosVertex&#160;<span class='sym_p'><span>(&#160;bool <
 <td>Applications will pass parameters of older replaced method to newly added <b>virtual</b> method. This may result in crash or incorrect behavior of applications.</td>
 </tr>
 </table>
-<span class="sect_info" onclick="javascript:showContent(this, 'c_204')">
+<span class="sect_info" onclick="javascript:showContent(this, 'c_203')">
 [+] show v-table (old and new)</span>
 <br/>
-<div id="c_204" style="display:none;">
+<div id="c_203" style="display:none;">
 <table class='vtable'><tr><th>Offset</th><th>Virtual Table (Old) - 21 entries</th><th>Virtual Table (New) - 21 entries</th></tr><tr><th>0</th>
 <td>(int (*)(...)) 0</td>
 <td>(int (*)(...)) 0</td></tr>
@@ -3307,9 +3280,9 @@ TerrainQuadTreeNode::writePosVertex&#160;<span class='sym_p'><span>(&#160;bool <
 <td class='failed'>TerrainMaterialGenerator::_renderCompositeMap(unsigned long, TRect&lt;long&gt; const&amp;, SharedPtr&lt;Material&gt; const&amp;, SharedPtr&lt;Texture&gt; const&amp;)</td></tr>
 </table><br/>
 </div>
-<span class="sect_aff" onclick="javascript:showContent(this, 'c_205')">
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_204')">
 [+] affected symbols: 5 (0.9%)</span>
-<div id="c_205" style="display:none;">
+<div id="c_204" style="display:none;">
 <div class='affected'><span class='iname_a'>TerrainMaterialGenerator::_renderCompositeMap&#160;<span class='sym_p'><span>(&#160;size_t <i>size</i></span>, <span>Rect const&amp; <i>rect</i></span>, <span>std::shared_ptr&lt;DataStream&gt;const&amp; <i>mat</i></span>, <span>std::shared_ptr&lt;DataStream&gt;const&amp; <i>destCompositeMap</i></span>&#160;)</span></span><br/>
 <div class='affect'>This method is from &#39;TerrainMaterialGenerator&#39; class.</div>
 <span class='iname_a'>TerrainMaterialGenerator::Profile::updateCompositeMap&#160;<span class='sym_p'><span>(&#160;Terrain const* <i>terrain</i></span>, <span>Rect const&amp; <i>rect</i></span>&#160;)</span></span><br/>
@@ -3324,10 +3297,10 @@ TerrainQuadTreeNode::writePosVertex&#160;<span class='sym_p'><span>(&#160;bool <
 </div>
 <br/><br/></div>
 
-<span class="section" onclick="javascript:showContent(this, 'c_206')">
+<span class="section" onclick="javascript:showContent(this, 'c_205')">
 <span class='ext'>[+]</span> <span class='ttype'>class</span> TerrainMaterialGenerator::Profile <span class='failed'>&nbsp;2&nbsp;</span></span>
 <br/>
-<div id="c_206" style="display:none;">
+<div id="c_205" style="display:none;">
 <table class='ptable'><tr>
 <th class='pn'></th>
 <th class='chg'>Change</th>
@@ -3342,10 +3315,10 @@ TerrainQuadTreeNode::writePosVertex&#160;<span class='sym_p'><span>(&#160;bool <
 <td>Applications will provide an older method to the library instead of expected newely added <b>virtual</b> method. This may result in crash or incorrect behavior of applications.</td>
 </tr>
 </table>
-<span class="sect_info" onclick="javascript:showContent(this, 'c_207')">
+<span class="sect_info" onclick="javascript:showContent(this, 'c_206')">
 [+] show v-table (old and new)</span>
 <br/>
-<div id="c_207" style="display:none;">
+<div id="c_206" style="display:none;">
 <table class='vtable'><tr><th>Offset</th><th>Virtual Table (Old) - 13 entries</th><th>Virtual Table (New) - 13 entries</th></tr><tr><th>0</th>
 <td>(int (*)(...)) 0</td>
 <td>(int (*)(...)) 0</td></tr>
@@ -3387,9 +3360,9 @@ TerrainQuadTreeNode::writePosVertex&#160;<span class='sym_p'><span>(&#160;bool <
 <td>__cxa_pure_virtual</td></tr>
 </table><br/>
 </div>
-<span class="sect_aff" onclick="javascript:showContent(this, 'c_208')">
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_207')">
 [+] affected symbols: 3 (0.5%)</span>
-<div id="c_208" style="display:none;">
+<div id="c_207" style="display:none;">
 <div class='affected'><span class='iname_a'>TerrainMaterialGenerator::Profile::updateCompositeMap&#160;<span class='sym_p'><span>(&#160;Terrain const* <i>terrain</i></span>, <span>Rect const&amp; <i>rect</i></span>&#160;)</span></span><br/>
 <div class='affect'>This method is from &#39;TerrainMaterialGenerator::Profile&#39; class.</div>
 <span class='iname_a'>TerrainMaterialGeneratorA::SM2Profile::updateParams&#160;<span class='sym_p'><span>(&#160;std::shared_ptr&lt;DataStream&gt;const&amp; <i>mat</i></span>, <span>Terrain const* <i>terrain</i></span>&#160;)</span></span><br/>
@@ -3403,10 +3376,10 @@ TerrainQuadTreeNode::writePosVertex&#160;<span class='sym_p'><span>(&#160;bool <
 <br/>
 <span class='h_name'>OgreTerrainPagedWorldSection.h</span><br/>
 <span class='ns'>namespace <b>Ogre</b></span><br/>
-<span class="section" onclick="javascript:showContent(this, 'c_209')">
+<span class="section" onclick="javascript:showContent(this, 'c_208')">
 <span class='ext'>[+]</span> <span class='ttype'>class</span> TerrainPagedWorldSection <span class='failed'>&nbsp;1&nbsp;</span></span>
 <br/>
-<div id="c_209" style="display:none;">
+<div id="c_208" style="display:none;">
 <table class='ptable'><tr>
 <th class='pn'></th>
 <th class='chg'>Change</th>
@@ -3416,10 +3389,10 @@ TerrainQuadTreeNode::writePosVertex&#160;<span class='sym_p'><span>(&#160;bool <
 <td>Call of any method in this class may result in crash or incorrect behavior of applications.</td>
 </tr>
 </table>
-<span class="sect_info" onclick="javascript:showContent(this, 'c_210')">
+<span class="sect_info" onclick="javascript:showContent(this, 'c_209')">
 [+] show v-table (old and new)</span>
 <br/>
-<div id="c_210" style="display:none;">
+<div id="c_209" style="display:none;">
 <table class='vtable'><tr><th>Offset</th><th>Virtual Table (Old) - 73 entries</th><th>Virtual Table (New) - 73 entries</th></tr><tr><th>0</th>
 <td>(int (*)(...)) 0</td>
 <td>(int (*)(...)) 0</td></tr>
@@ -3641,9 +3614,9 @@ TerrainQuadTreeNode::writePosVertex&#160;<span class='sym_p'><span>(&#160;bool <
 <td>non-virtual thunk to TerrainPagedWorldSection::handleResponse(WorkQueue::Response const*, WorkQueue const*)</td></tr>
 </table><br/>
 </div>
-<span class="sect_aff" onclick="javascript:showContent(this, 'c_211')">
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_210')">
 [+] affected symbols: 28 (5%)</span>
-<div id="c_211" style="display:none;">
+<div id="c_210" style="display:none;">
 <div class='affected'><span class='iname_a'>TerrainPagedWorldSection::unloadPage&#160;<span class='sym_p'><span>(&#160;PageID <i>pageID</i></span>, <span>bool <i>forceSynchronous</i></span>&#160;)</span></span><br/>
 <div class='affect'>This method is from &#39;TerrainPagedWorldSection&#39; class.</div>
 <span class='iname_a'>TerrainPagedWorldSection::setPageRange&#160;<span class='sym_p'><span>(&#160;int32 <i>minX</i></span>, <span>int32 <i>minY</i></span>, <span>int32 <i>maxX</i></span>, <span>int32 <i>maxY</i></span>&#160;)</span></span><br/>
@@ -3673,10 +3646,10 @@ TerrainQuadTreeNode::writePosVertex&#160;<span class='sym_p'><span>(&#160;bool <
 <br/>
 <span class='h_name'>OgreTerrainQuadTreeNode.h</span><br/>
 <span class='ns'>namespace <b>Ogre</b></span><br/>
-<span class="section" onclick="javascript:showContent(this, 'c_212')">
+<span class="section" onclick="javascript:showContent(this, 'c_211')">
 <span class='ext'>[+]</span> <span class='ttype'>class</span> TerrainQuadTreeNode <span class='failed'>&nbsp;1&nbsp;</span></span>
 <br/>
-<div id="c_212" style="display:none;">
+<div id="c_211" style="display:none;">
 <table class='ptable'><tr>
 <th class='pn'></th>
 <th class='chg'>Change</th>
@@ -3686,9 +3659,9 @@ TerrainQuadTreeNode::writePosVertex&#160;<span class='sym_p'><span>(&#160;bool <
 <td>1) Size of the inclusive type has been changed.<br/>2) Previous accesses of applications and library functions to this field and fields at higher positions of the structure definition may be broken.</td>
 </tr>
 </table>
-<span class="sect_aff" onclick="javascript:showContent(this, 'c_213')">
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_212')">
 [+] affected symbols: 217 (39.1%)</span>
-<div id="c_213" style="display:none;">
+<div id="c_212" style="display:none;">
 <div class='affected'><span class='iname_a'>TerrainGroup::TerrainSlot::freeInstance&#160;<span class='sym_p'>(&#160;)</span></span><br/>
 <div class='affect'>Field &#39;this.instance.mQuadTree&#39; in the object of this method has base type &#39;TerrainQuadTreeNode&#39;.</div>
 <span class='iname_a'>TerrainGroup::TerrainSlot::~TerrainSlot&#160;<span class='sym_p'>(&#160;)</span></span><br/>
@@ -3715,10 +3688,10 @@ TerrainQuadTreeNode::writePosVertex&#160;<span class='sym_p'><span>(&#160;bool <
 </div>
 <br/><br/></div>
 
-<span class="section" onclick="javascript:showContent(this, 'c_214')">
+<span class="section" onclick="javascript:showContent(this, 'c_213')">
 <span class='ext'>[+]</span> <span class='ttype'>class</span> TerrainQuadTreeNode::Movable <span class='failed'>&nbsp;1&nbsp;</span></span>
 <br/>
-<div id="c_214" style="display:none;">
+<div id="c_213" style="display:none;">
 <table class='ptable'><tr>
 <th class='pn'></th>
 <th class='chg'>Change</th>
@@ -3728,10 +3701,10 @@ TerrainQuadTreeNode::writePosVertex&#160;<span class='sym_p'><span>(&#160;bool <
 <td>Call of any method in this class may result in crash or incorrect behavior of applications.</td>
 </tr>
 </table>
-<span class="sect_info" onclick="javascript:showContent(this, 'c_215')">
+<span class="sect_info" onclick="javascript:showContent(this, 'c_214')">
 [+] show v-table (old and new)</span>
 <br/>
-<div id="c_215" style="display:none;">
+<div id="c_214" style="display:none;">
 <table class='vtable'><tr><th>Offset</th><th>Virtual Table (Old) - 41 entries</th><th>Virtual Table (New) - 41 entries</th></tr><tr><th>0</th>
 <td>(int (*)(...)) 0</td>
 <td>(int (*)(...)) 0</td></tr>
@@ -3857,9 +3830,9 @@ TerrainQuadTreeNode::writePosVertex&#160;<span class='sym_p'><span>(&#160;bool <
 <td>(int (*)(...)) 0x5bcf8</td></tr>
 </table><br/>
 </div>
-<span class="sect_aff" onclick="javascript:showContent(this, 'c_216')">
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_215')">
 [+] affected symbols: 11 (2%)</span>
-<div id="c_216" style="display:none;">
+<div id="c_215" style="display:none;">
 <div class='affected'><span class='iname_a'>TerrainQuadTreeNode::Movable::visitRenderables&#160;<span class='sym_p'><span>(&#160;Renderable::Visitor* <i>visitor</i></span>, <span>bool <i>debugRenderables</i></span>&#160;)</span></span><br/>
 <div class='affect'>This method is from &#39;TerrainQuadTreeNode::Movable&#39; class.</div>
 <span class='iname_a'>TerrainQuadTreeNode::Movable::_updateRenderQueue&#160;<span class='sym_p'><span>(&#160;RenderQueue* <i>queue</i></span>&#160;)</span></span><br/>
@@ -3892,10 +3865,10 @@ TerrainQuadTreeNode::writePosVertex&#160;<span class='sym_p'><span>(&#160;bool <
 <h2>Problems with Symbols, Medium Severity <span class='failed'>&nbsp;2&nbsp;</span></h2><hr/>
 <span class='h_name'>OgreTerrain.h</span>, <span class='lib_name'>libOgreTerrain.so.1.10.12</span><br/>
 <span class='ns'>namespace <b>Ogre</b></span><br/>
-<span class="section" onclick="javascript:showContent(this, 'c_217')">
+<span class="section" onclick="javascript:showContent(this, 'c_216')">
 <span class='ext'>[+]</span> Terrain::checkQuadIntersection&#160;<span class='sym_p'><span>(&#160;int <span class='color_p'>x</span></span>, <span>int <span class='color_p'>z</span></span>, <span>Ray const&amp; <span class='color_p'>ray</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
 <br/>
-<div id="c_217" style="display:none;">
+<div id="c_216" style="display:none;">
 
 <span class='mngl pleft'>_ZN4Ogre7Terrain21checkQuadIntersectionEiiRKNS_3RayE</span><br/>
 <table class='ptable'>
@@ -3912,10 +3885,10 @@ TerrainQuadTreeNode::writePosVertex&#160;<span class='sym_p'><span>(&#160;bool <
 </table>
 <br/>
 </div>
-<span class="section" onclick="javascript:showContent(this, 'c_218')">
+<span class="section" onclick="javascript:showContent(this, 'c_217')">
 <span class='ext'>[+]</span> Terrain::rayIntersects&#160;<span class='sym_p'><span>(&#160;Ray const&amp; <span class='color_p'>ray</span></span>, <span>bool <span class='color_p'>cascadeToNeighbours</span></span>, <span>Real <span class='color_p'>distanceLimit</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
 <br/>
-<div id="c_218" style="display:none;">
+<div id="c_217" style="display:none;">
 
 <span class='mngl pleft'>_ZN4Ogre7Terrain13rayIntersectsERKNS_3RayEbf</span><br/>
 <table class='ptable'>
@@ -3938,10 +3911,10 @@ TerrainQuadTreeNode::writePosVertex&#160;<span class='sym_p'><span>(&#160;bool <
 <h2>Problems with Data Types, Low Severity <span class='warning'>&nbsp;55&nbsp;</span></h2><hr/>
 <span class='h_name'>OgreAxisAlignedBox.h</span><br/>
 <span class='ns'>namespace <b>Ogre</b></span><br/>
-<span class="section" onclick="javascript:showContent(this, 'c_219')">
+<span class="section" onclick="javascript:showContent(this, 'c_218')">
 <span class='ext'>[+]</span> <span class='ttype'>class</span> AxisAlignedBox <span class='warning'>&nbsp;3&nbsp;</span></span>
 <br/>
-<div id="c_219" style="display:none;">
+<div id="c_218" style="display:none;">
 <table class='ptable'><tr>
 <th class='pn'></th>
 <th class='chg'>Change</th>
@@ -3961,9 +3934,9 @@ TerrainQuadTreeNode::writePosVertex&#160;<span class='sym_p'><span>(&#160;bool <
 <td>Replacement of field base type may indicate a change in the semantic meaning of the field.</td>
 </tr>
 </table>
-<span class="sect_aff" onclick="javascript:showContent(this, 'c_220')">
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_219')">
 [+] affected symbols: 218 (39.3%)</span>
-<div id="c_220" style="display:none;">
+<div id="c_219" style="display:none;">
 <div class='affected'><span class='iname_a'>TerrainGroup::TerrainSlot::freeInstance&#160;<span class='sym_p'>(&#160;)</span></span><br/>
 <div class='affect'>Field &#39;this.instance.mQuadTree.mAABB&#39; in the object of this method is of type &#39;AxisAlignedBox&#39;.</div>
 <span class='iname_a'>TerrainGroup::TerrainSlot::~TerrainSlot&#160;<span class='sym_p'>(&#160;)</span></span><br/>
@@ -3993,10 +3966,10 @@ TerrainQuadTreeNode::writePosVertex&#160;<span class='sym_p'><span>(&#160;bool <
 <br/>
 <span class='h_name'>OgreCommon.h</span><br/>
 <span class='ns'>namespace <b>Ogre</b></span><br/>
-<span class="section" onclick="javascript:showContent(this, 'c_221')">
+<span class="section" onclick="javascript:showContent(this, 'c_220')">
 <span class='ext'>[+]</span> <span class='ttype'>class</span> HashedVector&lt;Light*&gt; <span class='warning'>&nbsp;1&nbsp;</span></span>
 <br/>
-<div id="c_221" style="display:none;">
+<div id="c_220" style="display:none;">
 <table class='ptable'><tr>
 <th class='pn'></th>
 <th class='chg'>Change</th>
@@ -4006,9 +3979,9 @@ TerrainQuadTreeNode::writePosVertex&#160;<span class='sym_p'><span>(&#160;bool <
 <td>The fields or parameters of such data type may be incorrectly initialized or accessed by old client applications.</td>
 </tr>
 </table>
-<span class="sect_aff" onclick="javascript:showContent(this, 'c_222')">
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_221')">
 [+] affected symbols: 2 (0.4%)</span>
-<div id="c_222" style="display:none;">
+<div id="c_221" style="display:none;">
 <div class='affected'><span class='iname_a'>TerrainQuadTreeNode::Rend::getLights&#160;<span class='sym_p'>(&#160;)</span></span><br/>
 <div class='affect'>Return value (reference) has base type &#39;HashedVector&lt;Light*&gt;&#39;.</div>
 <span class='iname_a'>TerrainQuadTreeNode::getLights&#160;<span class='sym_p'>(&#160;)</span></span><br/>
@@ -4020,10 +3993,10 @@ TerrainQuadTreeNode::writePosVertex&#160;<span class='sym_p'><span>(&#160;bool <
 <br/>
 <span class='h_name'>OgrePagedWorldSection.h</span><br/>
 <span class='ns'>namespace <b>Ogre</b></span><br/>
-<span class="section" onclick="javascript:showContent(this, 'c_223')">
+<span class="section" onclick="javascript:showContent(this, 'c_222')">
 <span class='ext'>[+]</span> <span class='ttype'>class</span> PagedWorldSectionFactory <span class='warning'>&nbsp;2&nbsp;</span></span>
 <br/>
-<div id="c_223" style="display:none;">
+<div id="c_222" style="display:none;">
 <table class='ptable'><tr>
 <th class='pn'></th>
 <th class='chg'>Change</th>
@@ -4038,9 +4011,9 @@ TerrainQuadTreeNode::writePosVertex&#160;<span class='sym_p'><span>(&#160;bool <
 <td>Possible incorrect access of applications to the memory occupied by the base classes.</td>
 </tr>
 </table>
-<span class="sect_aff" onclick="javascript:showContent(this, 'c_224')">
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_223')">
 [+] affected symbols: 7 (1.3%)</span>
-<div id="c_224" style="display:none;">
+<div id="c_223" style="display:none;">
 <div class='affected'><span class='iname_a'>TerrainPaging::SectionFactory::FACTORY_NAME <span class='attr'>[data]</span></span><br/>
 <div class='affect'>This method is from derived class &#39;TerrainPaging::SectionFactory&#39;.</div>
 <span class='iname_a'>TerrainPaging::SectionFactory::createInstance&#160;<span class='sym_p'><span>(&#160;String const&amp; <i>name</i></span>, <span>PagedWorld* <i>parent</i></span>, <span>SceneManager* <i>sm</i></span>&#160;)</span></span><br/>
@@ -4062,10 +4035,10 @@ TerrainQuadTreeNode::writePosVertex&#160;<span class='sym_p'><span>(&#160;bool <
 <br/>
 <span class='h_name'>OgrePixelFormat.h</span><br/>
 <span class='ns'>namespace <b>Ogre</b></span><br/>
-<span class="section" onclick="javascript:showContent(this, 'c_225')">
+<span class="section" onclick="javascript:showContent(this, 'c_224')">
 <span class='ext'>[+]</span> <span class='ttype'>class</span> PixelBox <span class='warning'>&nbsp;1&nbsp;</span></span>
 <br/>
-<div id="c_225" style="display:none;">
+<div id="c_224" style="display:none;">
 <table class='ptable'><tr>
 <th class='pn'></th>
 <th class='chg'>Change</th>
@@ -4075,9 +4048,9 @@ TerrainQuadTreeNode::writePosVertex&#160;<span class='sym_p'><span>(&#160;bool <
 <td>Replacement of the field data type may indicate a change in the semantic meaning of the field.</td>
 </tr>
 </table>
-<span class="sect_aff" onclick="javascript:showContent(this, 'c_226')">
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_225')">
 [+] affected symbols: 177 (31.9%)</span>
-<div id="c_226" style="display:none;">
+<div id="c_225" style="display:none;">
 <div class='affected'><span class='iname_a'>TerrainGroup::TerrainSlot::freeInstance&#160;<span class='sym_p'>(&#160;)</span></span><br/>
 <div class='affect'>Field &#39;this.instance.mCpuTerrainNormalMap&#39; in the object of this method has base type &#39;PixelBox&#39;.</div>
 <span class='iname_a'>TerrainGroup::TerrainSlot::~TerrainSlot&#160;<span class='sym_p'>(&#160;)</span></span><br/>
@@ -4104,10 +4077,10 @@ TerrainQuadTreeNode::writePosVertex&#160;<span class='sym_p'><span>(&#160;bool <
 </div>
 <br/><br/></div>
 
-<span class="section" onclick="javascript:showContent(this, 'c_227')">
+<span class="section" onclick="javascript:showContent(this, 'c_226')">
 <span class='ext'>[+]</span> <span class='ttype'>enum</span> PixelFormat <span class='warning'>&nbsp;3&nbsp;</span></span>
 <br/>
-<div id="c_227" style="display:none;">
+<div id="c_226" style="display:none;">
 <table class='ptable'><tr>
 <th class='pn'></th>
 <th class='chg'>Change</th>
@@ -4127,9 +4100,9 @@ TerrainQuadTreeNode::writePosVertex&#160;<span class='sym_p'><span>(&#160;bool <
 <td>This may result in crash or incorrect behavior of applications because the library may not handle removed member anymore.</td>
 </tr>
 </table>
-<span class="sect_aff" onclick="javascript:showContent(this, 'c_228')">
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_227')">
 [+] affected symbols: 257 (46.3%)</span>
-<div id="c_228" style="display:none;">
+<div id="c_227" style="display:none;">
 <div class='affected'><span class='iname_a'>TerrainGroup::loadTerrain&#160;<span class='sym_p'><span>(&#160;long <i>x</i></span>, <span>long <i>y</i></span>, <span>bool <i>synchronous</i></span>&#160;)</span></span><br/>
 <div class='affect'>Field &#39;this.mDefaultImportData.inputImage.mFormat&#39; in the object of this method is of type &#39;enum PixelFormat&#39;.</div>
 <span class='iname_a'>TerrainGroup::TerrainSlot::freeInstance&#160;<span class='sym_p'>(&#160;)</span></span><br/>
@@ -4159,10 +4132,10 @@ TerrainQuadTreeNode::writePosVertex&#160;<span class='sym_p'><span>(&#160;bool <
 <br/>
 <span class='h_name'>OgrePrerequisites.h</span><br/>
 <span class='ns'>namespace <b>Ogre</b></span><br/>
-<span class="section" onclick="javascript:showContent(this, 'c_229')">
+<span class="section" onclick="javascript:showContent(this, 'c_228')">
 <span class='ext'>[+]</span> <span class='ttype'>typedef</span> MaterialPtr <span class='warning'>&nbsp;1&nbsp;</span></span>
 <br/>
-<div id="c_229" style="display:none;">
+<div id="c_228" style="display:none;">
 <table class='ptable'><tr>
 <th class='pn'></th>
 <th class='chg'>Change</th>
@@ -4172,9 +4145,9 @@ TerrainQuadTreeNode::writePosVertex&#160;<span class='sym_p'><span>(&#160;bool <
 <td>Replacement of the base data type may indicate a change in its semantic meaning.</td>
 </tr>
 </table>
-<span class="sect_aff" onclick="javascript:showContent(this, 'c_230')">
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_229')">
 [+] affected symbols: 4 (0.7%)</span>
-<div id="c_230" style="display:none;">
+<div id="c_229" style="display:none;">
 <div class='affected'><span class='iname_a'>TerrainQuadTreeNode::getMaterial&#160;<span class='sym_p'>(&#160;)</span></span><br/>
 <div class='affect'>Return value (reference) has base type &#39;MaterialPtr&#39;.</div>
 <span class='iname_a'>TerrainQuadTreeNode::Rend::getMaterial&#160;<span class='sym_p'>(&#160;)</span></span><br/>
@@ -4187,10 +4160,10 @@ TerrainQuadTreeNode::writePosVertex&#160;<span class='sym_p'><span>(&#160;bool <
 </div>
 <br/><br/></div>
 
-<span class="section" onclick="javascript:showContent(this, 'c_231')">
+<span class="section" onclick="javascript:showContent(this, 'c_230')">
 <span class='ext'>[+]</span> <span class='ttype'>typedef</span> TexturePtr <span class='warning'>&nbsp;1&nbsp;</span></span>
 <br/>
-<div id="c_231" style="display:none;">
+<div id="c_230" style="display:none;">
 <table class='ptable'><tr>
 <th class='pn'></th>
 <th class='chg'>Change</th>
@@ -4200,9 +4173,9 @@ TerrainQuadTreeNode::writePosVertex&#160;<span class='sym_p'><span>(&#160;bool <
 <td>Replacement of the base data type may indicate a change in its semantic meaning.</td>
 </tr>
 </table>
-<span class="sect_aff" onclick="javascript:showContent(this, 'c_232')">
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_231')">
 [+] affected symbols: 1 (0.2%)</span>
-<div id="c_232" style="display:none;">
+<div id="c_231" style="display:none;">
 <div class='affected'><span class='iname_a'>Terrain::getLayerBlendTexture&#160;<span class='sym_p'><span>(&#160;uint8 <i>index</i></span>&#160;)</span></span><br/>
 <div class='affect'>Return value (reference) has base type &#39;TexturePtr&#39;.</div>
 </div>
@@ -4212,10 +4185,10 @@ TerrainQuadTreeNode::writePosVertex&#160;<span class='sym_p'><span>(&#160;bool <
 <br/>
 <span class='h_name'>OgreRay.h</span><br/>
 <span class='ns'>namespace <b>Ogre</b></span><br/>
-<span class="section" onclick="javascript:showContent(this, 'c_233')">
+<span class="section" onclick="javascript:showContent(this, 'c_232')">
 <span class='ext'>[+]</span> <span class='ttype'>class</span> Ray <span class='warning'>&nbsp;2&nbsp;</span></span>
 <br/>
-<div id="c_233" style="display:none;">
+<div id="c_232" style="display:none;">
 <table class='ptable'><tr>
 <th class='pn'></th>
 <th class='chg'>Change</th>
@@ -4230,9 +4203,9 @@ TerrainQuadTreeNode::writePosVertex&#160;<span class='sym_p'><span>(&#160;bool <
 <td>Replacement of field base type may indicate a change in the semantic meaning of the field.</td>
 </tr>
 </table>
-<span class="sect_aff" onclick="javascript:showContent(this, 'c_234')">
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_233')">
 [+] affected symbols: 4 (0.7%)</span>
-<div id="c_234" style="display:none;">
+<div id="c_233" style="display:none;">
 <div class='affected'><span class='iname_a'>Terrain::rayIntersects&#160;<span class='sym_p'><span>(&#160;Ray const&amp; <span class='fp'>ray</span></span>, <span>bool <i>cascadeToNeighbours</i></span>, <span>Real <i>distanceLimit</i></span>&#160;)</span></span><br/>
 <div class='affect'>1st parameter &#39;ray&#39; (reference) has base type &#39;Ray&#39;.</div>
 <span class='iname_a'>Terrain::raySelectNeighbour&#160;<span class='sym_p'><span>(&#160;Ray const&amp; <span class='fp'>ray</span></span>, <span>Real <i>distanceLimit</i></span>&#160;)</span></span><br/>
@@ -4248,10 +4221,10 @@ TerrainQuadTreeNode::writePosVertex&#160;<span class='sym_p'><span>(&#160;bool <
 <br/>
 <span class='h_name'>OgreSphere.h</span><br/>
 <span class='ns'>namespace <b>Ogre</b></span><br/>
-<span class="section" onclick="javascript:showContent(this, 'c_235')">
+<span class="section" onclick="javascript:showContent(this, 'c_234')">
 <span class='ext'>[+]</span> <span class='ttype'>class</span> Sphere <span class='warning'>&nbsp;1&nbsp;</span></span>
 <br/>
-<div id="c_235" style="display:none;">
+<div id="c_234" style="display:none;">
 <table class='ptable'><tr>
 <th class='pn'></th>
 <th class='chg'>Change</th>
@@ -4261,9 +4234,9 @@ TerrainQuadTreeNode::writePosVertex&#160;<span class='sym_p'><span>(&#160;bool <
 <td>Replacement of field base type may indicate a change in the semantic meaning of the field.</td>
 </tr>
 </table>
-<span class="sect_aff" onclick="javascript:showContent(this, 'c_236')">
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_235')">
 [+] affected symbols: 1 (0.2%)</span>
-<div id="c_236" style="display:none;">
+<div id="c_235" style="display:none;">
 <div class='affected'><span class='iname_a'>TerrainGroup::sphereIntersects&#160;<span class='sym_p'><span>(&#160;Sphere const&amp; <span class='fp'>sphere</span></span>, <span>vector&lt;Terrain*&gt;::type* <i>resultList</i></span>&#160;)</span></span><br/>
 <div class='affect'>1st parameter &#39;sphere&#39; (reference) has base type &#39;Sphere&#39;.</div>
 </div>
@@ -4273,10 +4246,10 @@ TerrainQuadTreeNode::writePosVertex&#160;<span class='sym_p'><span>(&#160;bool <
 <br/>
 <span class='h_name'>OgreStringVector.h</span><br/>
 <span class='ns'>namespace <b>Ogre</b></span><br/>
-<span class="section" onclick="javascript:showContent(this, 'c_237')">
+<span class="section" onclick="javascript:showContent(this, 'c_236')">
 <span class='ext'>[+]</span> <span class='ttype'>typedef</span> StringVector <span class='warning'>&nbsp;1&nbsp;</span></span>
 <br/>
-<div id="c_237" style="display:none;">
+<div id="c_236" style="display:none;">
 <table class='ptable'><tr>
 <th class='pn'></th>
 <th class='chg'>Change</th>
@@ -4286,9 +4259,9 @@ TerrainQuadTreeNode::writePosVertex&#160;<span class='sym_p'><span>(&#160;bool <
 <td>Replacement of the base data type may indicate a change in its semantic meaning.</td>
 </tr>
 </table>
-<span class="sect_aff" onclick="javascript:showContent(this, 'c_238')">
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_237')">
 [+] affected symbols: 3 (0.5%)</span>
-<div id="c_238" style="display:none;">
+<div id="c_237" style="display:none;">
 <div class='affected'><span class='iname_a'>Terrain::replaceLayer&#160;<span class='sym_p'><span>(&#160;uint8 <i>index</i></span>, <span>bool <i>keepBlends</i></span>, <span>Real <i>worldSize</i></span>, <span>vector&lt;std::__cxx11::basic_string&lt;char&gt; &gt;::type const* <span class='fp'>textureNames</span></span>&#160;)</span></span><br/>
 <div class='affect'>4th parameter &#39;textureNames&#39; (pointer) has base type &#39;StringVector&#39;.</div>
 <span class='iname_a'>Terrain::addLayer&#160;<span class='sym_p'><span>(&#160;Real <i>worldSize</i></span>, <span>vector&lt;std::__cxx11::basic_string&lt;char&gt; &gt;::type const* <span class='fp'>textureNames</span></span>&#160;)</span></span><br/>
@@ -4302,10 +4275,10 @@ TerrainQuadTreeNode::writePosVertex&#160;<span class='sym_p'><span>(&#160;bool <
 <br/>
 <span class='h_name'>OgreTerrain.h</span><br/>
 <span class='ns'>namespace <b>Ogre</b></span><br/>
-<span class="section" onclick="javascript:showContent(this, 'c_239')">
+<span class="section" onclick="javascript:showContent(this, 'c_238')">
 <span class='ext'>[+]</span> <span class='ttype'>class</span> Terrain <span class='warning'>&nbsp;3&nbsp;</span></span>
 <br/>
-<div id="c_239" style="display:none;">
+<div id="c_238" style="display:none;">
 <table class='ptable'><tr>
 <th class='pn'></th>
 <th class='chg'>Change</th>
@@ -4325,10 +4298,10 @@ TerrainQuadTreeNode::writePosVertex&#160;<span class='sym_p'><span>(&#160;bool <
 <td>Possible incorrect access of applications to the memory occupied by the base classes.</td>
 </tr>
 </table>
-<span class="sect_info" onclick="javascript:showContent(this, 'c_240')">
+<span class="sect_info" onclick="javascript:showContent(this, 'c_239')">
 [+] show v-table (old and new)</span>
 <br/>
-<div id="c_240" style="display:none;">
+<div id="c_239" style="display:none;">
 <table class='vtable'><tr><th>Offset</th><th>Virtual Table (Old) - 29 entries</th><th>Virtual Table (New) - 29 entries</th></tr><tr><th>0</th>
 <td>(int (*)(...)) 0</td>
 <td>(int (*)(...)) 0</td></tr>
@@ -4418,9 +4391,9 @@ TerrainQuadTreeNode::writePosVertex&#160;<span class='sym_p'><span>(&#160;bool <
 <td>non-virtual thunk to Terrain::handleResponse(WorkQueue::Response const*, WorkQueue const*)</td></tr>
 </table><br/>
 </div>
-<span class="sect_aff" onclick="javascript:showContent(this, 'c_241')">
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_240')">
 [+] affected symbols: 245 (44.1%)</span>
-<div id="c_241" style="display:none;">
+<div id="c_240" style="display:none;">
 <div class='affected'><span class='iname_a'>TerrainGroup::TerrainSlot::freeInstance&#160;<span class='sym_p'>(&#160;)</span></span><br/>
 <div class='affect'>Field &#39;this.instance&#39; in the object of this method has base type &#39;Terrain&#39;.</div>
 <span class='iname_a'>TerrainGroup::TerrainSlot::~TerrainSlot&#160;<span class='sym_p'>(&#160;)</span></span><br/>
@@ -4447,10 +4420,10 @@ TerrainQuadTreeNode::writePosVertex&#160;<span class='sym_p'><span>(&#160;bool <
 </div>
 <br/><br/></div>
 
-<span class="section" onclick="javascript:showContent(this, 'c_242')">
+<span class="section" onclick="javascript:showContent(this, 'c_241')">
 <span class='ext'>[+]</span> <span class='ttype'>class</span> Terrain::GpuBufferAllocator <span class='warning'>&nbsp;2&nbsp;</span></span>
 <br/>
-<div id="c_242" style="display:none;">
+<div id="c_241" style="display:none;">
 <table class='ptable'><tr>
 <th class='pn'></th>
 <th class='chg'>Change</th>
@@ -4465,9 +4438,9 @@ TerrainQuadTreeNode::writePosVertex&#160;<span class='sym_p'><span>(&#160;bool <
 <td>Possible incorrect access of applications to the memory occupied by the base classes.</td>
 </tr>
 </table>
-<span class="sect_aff" onclick="javascript:showContent(this, 'c_243')">
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_242')">
 [+] affected symbols: 13 (2.3%)</span>
-<div id="c_243" style="display:none;">
+<div id="c_242" style="display:none;">
 <div class='affected'><span class='iname_a'>Terrain::GpuBufferAllocator::freeAllBuffers&#160;<span class='sym_p'>(&#160;)</span></span><br/>
 <div class='affect'>This method is from &#39;Terrain::GpuBufferAllocator&#39; class.</div>
 <span class='iname_a'>Terrain::GpuBufferAllocator::freeVertexBuffers&#160;<span class='sym_p'><span>(&#160;std::shared_ptr&lt;DataStream&gt;const&amp; <i>p1</i></span>, <span>std::shared_ptr&lt;DataStream&gt;const&amp; <i>p2</i></span>&#160;)</span></span><br/>
@@ -4494,10 +4467,10 @@ TerrainQuadTreeNode::writePosVertex&#160;<span class='sym_p'><span>(&#160;bool <
 </div>
 <br/><br/></div>
 
-<span class="section" onclick="javascript:showContent(this, 'c_244')">
+<span class="section" onclick="javascript:showContent(this, 'c_243')">
 <span class='ext'>[+]</span> <span class='ttype'>class</span> TerrainGlobalOptions <span class='warning'>&nbsp;3&nbsp;</span></span>
 <br/>
-<div id="c_244" style="display:none;">
+<div id="c_243" style="display:none;">
 <table class='ptable'><tr>
 <th class='pn'></th>
 <th class='chg'>Change</th>
@@ -4517,9 +4490,9 @@ TerrainQuadTreeNode::writePosVertex&#160;<span class='sym_p'><span>(&#160;bool <
 <td>Possible incorrect access of applications to the memory occupied by the base classes.</td>
 </tr>
 </table>
-<span class="sect_aff" onclick="javascript:showContent(this, 'c_245')">
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_244')">
 [+] affected symbols: 6 (1.1%)</span>
-<div id="c_245" style="display:none;">
+<div id="c_244" style="display:none;">
 <div class='affected'><span class='iname_a'>TerrainGlobalOptions::getSingleton&#160;<span class='sym_p'>(&#160;)</span></span><br/>
 <div class='affect'>This method is from &#39;TerrainGlobalOptions&#39; class.</div>
 <span class='iname_a'>TerrainGlobalOptions::getSingletonPtr&#160;<span class='sym_p'>(&#160;)</span></span><br/>
@@ -4536,10 +4509,10 @@ TerrainQuadTreeNode::writePosVertex&#160;<span class='sym_p'><span>(&#160;bool <
 </div>
 <br/><br/></div>
 
-<span class="section" onclick="javascript:showContent(this, 'c_246')">
+<span class="section" onclick="javascript:showContent(this, 'c_245')">
 <span class='ext'>[+]</span> <span class='ttype'>struct</span> Terrain::ImportData <span class='warning'>&nbsp;1&nbsp;</span></span>
 <br/>
-<div id="c_246" style="display:none;">
+<div id="c_245" style="display:none;">
 <table class='ptable'><tr>
 <th class='pn'></th>
 <th class='chg'>Change</th>
@@ -4549,9 +4522,9 @@ TerrainQuadTreeNode::writePosVertex&#160;<span class='sym_p'><span>(&#160;bool <
 <td>Replacement of field base type may indicate a change in the semantic meaning of the field.</td>
 </tr>
 </table>
-<span class="sect_aff" onclick="javascript:showContent(this, 'c_247')">
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_246')">
 [+] affected symbols: 91 (16.4%)</span>
-<div id="c_247" style="display:none;">
+<div id="c_246" style="display:none;">
 <div class='affected'><span class='iname_a'>TerrainGroup::loadTerrain&#160;<span class='sym_p'><span>(&#160;long <i>x</i></span>, <span>long <i>y</i></span>, <span>bool <i>synchronous</i></span>&#160;)</span></span><br/>
 <div class='affect'>Field &#39;this.mDefaultImportData&#39; in the object of this method is of type &#39;struct Terrain::ImportData&#39;.</div>
 <span class='iname_a'>TerrainGroup::TerrainSlot::freeInstance&#160;<span class='sym_p'>(&#160;)</span></span><br/>
@@ -4578,10 +4551,10 @@ TerrainQuadTreeNode::writePosVertex&#160;<span class='sym_p'><span>(&#160;bool <
 </div>
 <br/><br/></div>
 
-<span class="section" onclick="javascript:showContent(this, 'c_248')">
+<span class="section" onclick="javascript:showContent(this, 'c_247')">
 <span class='ext'>[+]</span> <span class='ttype'>typedef</span> Terrain::LayerInstanceList <span class='warning'>&nbsp;1&nbsp;</span></span>
 <br/>
-<div id="c_248" style="display:none;">
+<div id="c_247" style="display:none;">
 <table class='ptable'><tr>
 <th class='pn'></th>
 <th class='chg'>Change</th>
@@ -4591,9 +4564,9 @@ TerrainQuadTreeNode::writePosVertex&#160;<span class='sym_p'><span>(&#160;bool <
 <td>Replacement of the base data type may indicate a change in its semantic meaning.</td>
 </tr>
 </table>
-<span class="sect_aff" onclick="javascript:showContent(this, 'c_249')">
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_248')">
 [+] affected symbols: 4 (0.7%)</span>
-<div id="c_249" style="display:none;">
+<div id="c_248" style="display:none;">
 <div class='affected'><span class='iname_a'>TerrainGroup::defineTerrain&#160;<span class='sym_p'><span>(&#160;long <i>x</i></span>, <span>long <i>y</i></span>, <span>float const* <i>pFloat</i></span>, <span>vector&lt;Terrain::LayerInstance&gt;::type const* <span class='fp'>layers</span></span>&#160;)</span></span><br/>
 <div class='affect'>4th parameter &#39;layers&#39; (pointer) has base type &#39;Terrain::LayerInstanceList&#39;.</div>
 <span class='iname_a'>TerrainGroup::defineTerrain&#160;<span class='sym_p'><span>(&#160;long <i>x</i></span>, <span>long <i>y</i></span>, <span>Image const* <i>img</i></span>, <span>vector&lt;Terrain::LayerInstance&gt;::type const* <span class='fp'>layers</span></span>&#160;)</span></span><br/>
@@ -4609,10 +4582,10 @@ TerrainQuadTreeNode::writePosVertex&#160;<span class='sym_p'><span>(&#160;bool <
 <br/>
 <span class='h_name'>OgreTerrainAutoUpdateLod.h</span><br/>
 <span class='ns'>namespace <b>Ogre</b></span><br/>
-<span class="section" onclick="javascript:showContent(this, 'c_250')">
+<span class="section" onclick="javascript:showContent(this, 'c_249')">
 <span class='ext'>[+]</span> <span class='ttype'>class</span> TerrainAutoUpdateLod <span class='warning'>&nbsp;2&nbsp;</span></span>
 <br/>
-<div id="c_250" style="display:none;">
+<div id="c_249" style="display:none;">
 <table class='ptable'><tr>
 <th class='pn'></th>
 <th class='chg'>Change</th>
@@ -4627,9 +4600,9 @@ TerrainQuadTreeNode::writePosVertex&#160;<span class='sym_p'><span>(&#160;bool <
 <td>Possible incorrect access of applications to the memory occupied by the base classes.</td>
 </tr>
 </table>
-<span class="sect_aff" onclick="javascript:showContent(this, 'c_251')">
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_250')">
 [+] affected symbols: 5 (0.9%)</span>
-<div id="c_251" style="display:none;">
+<div id="c_250" style="display:none;">
 <div class='affected'><span class='iname_a'>TerrainAutoUpdateLod::autoUpdateLod&#160;<span class='sym_p'><span>(&#160;Terrain* <i>p1</i></span>, <span>bool <i>p2</i></span>, <span>Any const&amp; <i>p3</i></span>&#160;)</span></span><br/>
 <div class='affect'>This method is from &#39;TerrainAutoUpdateLod&#39; class.</div>
 <span class='iname_a'>TerrainAutoUpdateLod::getStrategyId&#160;<span class='sym_p'>(&#160;)</span></span><br/>
@@ -4647,10 +4620,10 @@ TerrainQuadTreeNode::writePosVertex&#160;<span class='sym_p'><span>(&#160;bool <
 <br/>
 <span class='h_name'>OgreTerrainGroup.h</span><br/>
 <span class='ns'>namespace <b>Ogre</b></span><br/>
-<span class="section" onclick="javascript:showContent(this, 'c_252')">
+<span class="section" onclick="javascript:showContent(this, 'c_251')">
 <span class='ext'>[+]</span> <span class='ttype'>class</span> TerrainGroup <span class='warning'>&nbsp;3&nbsp;</span></span>
 <br/>
-<div id="c_252" style="display:none;">
+<div id="c_251" style="display:none;">
 <table class='ptable'><tr>
 <th class='pn'></th>
 <th class='chg'>Change</th>
@@ -4670,10 +4643,10 @@ TerrainQuadTreeNode::writePosVertex&#160;<span class='sym_p'><span>(&#160;bool <
 <td>Possible incorrect access of applications to the memory occupied by the base classes.</td>
 </tr>
 </table>
-<span class="sect_info" onclick="javascript:showContent(this, 'c_253')">
+<span class="sect_info" onclick="javascript:showContent(this, 'c_252')">
 [+] show v-table (old and new)</span>
 <br/>
-<div id="c_253" style="display:none;">
+<div id="c_252" style="display:none;">
 <table class='vtable'><tr><th>Offset</th><th>Virtual Table (Old) - 35 entries</th><th>Virtual Table (New) - 35 entries</th></tr><tr><th>0</th>
 <td>(int (*)(...)) 0</td>
 <td>(int (*)(...)) 0</td></tr>
@@ -4781,9 +4754,9 @@ TerrainQuadTreeNode::writePosVertex&#160;<span class='sym_p'><span>(&#160;bool <
 <td>non-virtual thunk to TerrainGroup::handleResponse(WorkQueue::Response const*, WorkQueue const*)</td></tr>
 </table><br/>
 </div>
-<span class="sect_aff" onclick="javascript:showContent(this, 'c_254')">
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_253')">
 [+] affected symbols: 91 (16.4%)</span>
-<div id="c_254" style="display:none;">
+<div id="c_253" style="display:none;">
 <div class='affected'><span class='iname_a'>TerrainGroup::loadTerrain&#160;<span class='sym_p'><span>(&#160;long <i>x</i></span>, <span>long <i>y</i></span>, <span>bool <i>synchronous</i></span>&#160;)</span></span><br/>
 <div class='affect'>This method is from &#39;TerrainGroup&#39; class.</div>
 <span class='iname_a'>TerrainGroup::unpackIndex&#160;<span class='sym_p'><span>(&#160;uint32 <i>key</i></span>, <span>long* <i>x</i></span>, <span>long* <i>y</i></span>&#160;)</span></span><br/>
@@ -4810,10 +4783,10 @@ TerrainQuadTreeNode::writePosVertex&#160;<span class='sym_p'><span>(&#160;bool <
 </div>
 <br/><br/></div>
 
-<span class="section" onclick="javascript:showContent(this, 'c_255')">
+<span class="section" onclick="javascript:showContent(this, 'c_254')">
 <span class='ext'>[+]</span> <span class='ttype'>struct</span> TerrainGroup::RayResult <span class='warning'>&nbsp;1&nbsp;</span></span>
 <br/>
-<div id="c_255" style="display:none;">
+<div id="c_254" style="display:none;">
 <table class='ptable'><tr>
 <th class='pn'></th>
 <th class='chg'>Change</th>
@@ -4823,19 +4796,19 @@ TerrainQuadTreeNode::writePosVertex&#160;<span class='sym_p'><span>(&#160;bool <
 <td>Replacement of field base type may indicate a change in the semantic meaning of the field.</td>
 </tr>
 </table>
-<span class="sect_aff" onclick="javascript:showContent(this, 'c_256')">
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_255')">
 [+] affected symbols: 1 (0.2%)</span>
-<div id="c_256" style="display:none;">
+<div id="c_255" style="display:none;">
 <div class='affected'><span class='iname_a'>TerrainGroup::rayIntersects&#160;<span class='sym_p'><span>(&#160;Ray const&amp; <i>ray</i></span>, <span>Real <i>distanceLimit</i></span>&#160;)</span></span><br/>
 <div class='affect'>Return value is of type &#39;struct TerrainGroup::RayResult&#39;.</div>
 </div>
 </div>
 <br/><br/></div>
 
-<span class="section" onclick="javascript:showContent(this, 'c_257')">
+<span class="section" onclick="javascript:showContent(this, 'c_256')">
 <span class='ext'>[+]</span> <span class='ttype'>struct</span> TerrainGroup::TerrainSlot <span class='warning'>&nbsp;2&nbsp;</span></span>
 <br/>
-<div id="c_257" style="display:none;">
+<div id="c_256" style="display:none;">
 <table class='ptable'><tr>
 <th class='pn'></th>
 <th class='chg'>Change</th>
@@ -4850,10 +4823,10 @@ TerrainQuadTreeNode::writePosVertex&#160;<span class='sym_p'><span>(&#160;bool <
 <td>Possible incorrect access of applications to the memory occupied by the base classes.</td>
 </tr>
 </table>
-<span class="sect_info" onclick="javascript:showContent(this, 'c_258')">
+<span class="sect_info" onclick="javascript:showContent(this, 'c_257')">
 [+] show v-table (old and new)</span>
 <br/>
-<div id="c_258" style="display:none;">
+<div id="c_257" style="display:none;">
 <table class='vtable'><tr><th>Offset</th><th>Virtual Table (Old) - 4 entries</th><th>Virtual Table (New) - 4 entries</th></tr><tr><th>0</th>
 <td>(int (*)(...)) 0</td>
 <td>(int (*)(...)) 0</td></tr>
@@ -4868,9 +4841,9 @@ TerrainQuadTreeNode::writePosVertex&#160;<span class='sym_p'><span>(&#160;bool <
 <td>TerrainGroup::~TerrainSlot</td></tr>
 </table><br/>
 </div>
-<span class="sect_aff" onclick="javascript:showContent(this, 'c_259')">
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_258')">
 [+] affected symbols: 2 (0.4%)</span>
-<div id="c_259" style="display:none;">
+<div id="c_258" style="display:none;">
 <div class='affected'><span class='iname_a'>TerrainGroup::TerrainSlot::freeInstance&#160;<span class='sym_p'>(&#160;)</span></span><br/>
 <div class='affect'>This method is from &#39;struct TerrainGroup::TerrainSlot&#39; class.</div>
 <span class='iname_a'>TerrainGroup::TerrainSlot::~TerrainSlot&#160;<span class='sym_p'>(&#160;)</span></span><br/>
@@ -4879,10 +4852,10 @@ TerrainQuadTreeNode::writePosVertex&#160;<span class='sym_p'><span>(&#160;bool <
 </div>
 <br/><br/></div>
 
-<span class="section" onclick="javascript:showContent(this, 'c_260')">
+<span class="section" onclick="javascript:showContent(this, 'c_259')">
 <span class='ext'>[+]</span> <span class='ttype'>typedef</span> TerrainGroup::ConstTerrainIterator <span class='warning'>&nbsp;1&nbsp;</span></span>
 <br/>
-<div id="c_260" style="display:none;">
+<div id="c_259" style="display:none;">
 <table class='ptable'><tr>
 <th class='pn'></th>
 <th class='chg'>Change</th>
@@ -4892,19 +4865,19 @@ TerrainQuadTreeNode::writePosVertex&#160;<span class='sym_p'><span>(&#160;bool <
 <td>Replacement of the base data type may indicate a change in its semantic meaning.</td>
 </tr>
 </table>
-<span class="sect_aff" onclick="javascript:showContent(this, 'c_261')">
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_260')">
 [+] affected symbols: 1 (0.2%)</span>
-<div id="c_261" style="display:none;">
+<div id="c_260" style="display:none;">
 <div class='affected'><span class='iname_a'>TerrainGroup::getTerrainIterator&#160;<span class='sym_p'>(&#160;)</span></span><br/>
 <div class='affect'>Return value is of type &#39;TerrainGroup::ConstTerrainIterator&#39;.</div>
 </div>
 </div>
 <br/><br/></div>
 
-<span class="section" onclick="javascript:showContent(this, 'c_262')">
+<span class="section" onclick="javascript:showContent(this, 'c_261')">
 <span class='ext'>[+]</span> <span class='ttype'>typedef</span> TerrainGroup::TerrainIterator <span class='warning'>&nbsp;1&nbsp;</span></span>
 <br/>
-<div id="c_262" style="display:none;">
+<div id="c_261" style="display:none;">
 <table class='ptable'><tr>
 <th class='pn'></th>
 <th class='chg'>Change</th>
@@ -4914,19 +4887,19 @@ TerrainQuadTreeNode::writePosVertex&#160;<span class='sym_p'><span>(&#160;bool <
 <td>Replacement of the base data type may indicate a change in its semantic meaning.</td>
 </tr>
 </table>
-<span class="sect_aff" onclick="javascript:showContent(this, 'c_263')">
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_262')">
 [+] affected symbols: 1 (0.2%)</span>
-<div id="c_263" style="display:none;">
+<div id="c_262" style="display:none;">
 <div class='affected'><span class='iname_a'>TerrainGroup::getTerrainIterator&#160;<span class='sym_p'>(&#160;)</span></span><br/>
 <div class='affect'>Return value is of type &#39;TerrainGroup::TerrainIterator&#39;.</div>
 </div>
 </div>
 <br/><br/></div>
 
-<span class="section" onclick="javascript:showContent(this, 'c_264')">
+<span class="section" onclick="javascript:showContent(this, 'c_263')">
 <span class='ext'>[+]</span> <span class='ttype'>typedef</span> TerrainGroup::TerrainList <span class='warning'>&nbsp;1&nbsp;</span></span>
 <br/>
-<div id="c_264" style="display:none;">
+<div id="c_263" style="display:none;">
 <table class='ptable'><tr>
 <th class='pn'></th>
 <th class='chg'>Change</th>
@@ -4936,9 +4909,9 @@ TerrainQuadTreeNode::writePosVertex&#160;<span class='sym_p'><span>(&#160;bool <
 <td>Replacement of the base data type may indicate a change in its semantic meaning.</td>
 </tr>
 </table>
-<span class="sect_aff" onclick="javascript:showContent(this, 'c_265')">
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_264')">
 [+] affected symbols: 2 (0.4%)</span>
-<div id="c_265" style="display:none;">
+<div id="c_264" style="display:none;">
 <div class='affected'><span class='iname_a'>TerrainGroup::boxIntersects&#160;<span class='sym_p'><span>(&#160;AxisAlignedBox const&amp; <i>box</i></span>, <span>vector&lt;Terrain*&gt;::type* <span class='fp'>resultList</span></span>&#160;)</span></span><br/>
 <div class='affect'>2nd parameter &#39;resultList&#39; (pointer) has base type &#39;TerrainGroup::TerrainList&#39;.</div>
 <span class='iname_a'>TerrainGroup::sphereIntersects&#160;<span class='sym_p'><span>(&#160;Sphere const&amp; <i>sphere</i></span>, <span>vector&lt;Terrain*&gt;::type* <span class='fp'>resultList</span></span>&#160;)</span></span><br/>
@@ -4950,10 +4923,10 @@ TerrainQuadTreeNode::writePosVertex&#160;<span class='sym_p'><span>(&#160;bool <
 <br/>
 <span class='h_name'>OgreTerrainLayerBlendMap.h</span><br/>
 <span class='ns'>namespace <b>Ogre</b></span><br/>
-<span class="section" onclick="javascript:showContent(this, 'c_266')">
+<span class="section" onclick="javascript:showContent(this, 'c_265')">
 <span class='ext'>[+]</span> <span class='ttype'>class</span> TerrainLayerBlendMap <span class='warning'>&nbsp;2&nbsp;</span></span>
 <br/>
-<div id="c_266" style="display:none;">
+<div id="c_265" style="display:none;">
 <table class='ptable'><tr>
 <th class='pn'></th>
 <th class='chg'>Change</th>
@@ -4968,10 +4941,10 @@ TerrainQuadTreeNode::writePosVertex&#160;<span class='sym_p'><span>(&#160;bool <
 <td>Possible incorrect access of applications to the memory occupied by the base classes.</td>
 </tr>
 </table>
-<span class="sect_info" onclick="javascript:showContent(this, 'c_267')">
+<span class="sect_info" onclick="javascript:showContent(this, 'c_266')">
 [+] show v-table (old and new)</span>
 <br/>
-<div id="c_267" style="display:none;">
+<div id="c_266" style="display:none;">
 <table class='vtable'><tr><th>Offset</th><th>Virtual Table (Old) - 4 entries</th><th>Virtual Table (New) - 4 entries</th></tr><tr><th>0</th>
 <td>(int (*)(...)) 0</td>
 <td>(int (*)(...)) 0</td></tr>
@@ -4986,9 +4959,9 @@ TerrainQuadTreeNode::writePosVertex&#160;<span class='sym_p'><span>(&#160;bool <
 <td>~TerrainLayerBlendMap</td></tr>
 </table><br/>
 </div>
-<span class="sect_aff" onclick="javascript:showContent(this, 'c_268')">
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_267')">
 [+] affected symbols: 20 (3.6%)</span>
-<div id="c_268" style="display:none;">
+<div id="c_267" style="display:none;">
 <div class='affected'><span class='iname_a'>TerrainLayerBlendMap::getBlendValue&#160;<span class='sym_p'><span>(&#160;size_t <i>x</i></span>, <span>size_t <i>y</i></span>&#160;)</span></span><br/>
 <div class='affect'>This method is from &#39;TerrainLayerBlendMap&#39; class.</div>
 <span class='iname_a'>TerrainLayerBlendMap::setBlendValue&#160;<span class='sym_p'><span>(&#160;size_t <i>x</i></span>, <span>size_t <i>y</i></span>, <span>float <i>val</i></span>&#160;)</span></span><br/>
@@ -5018,10 +4991,10 @@ TerrainQuadTreeNode::writePosVertex&#160;<span class='sym_p'><span>(&#160;bool <
 <br/>
 <span class='h_name'>OgreTerrainLodManager.h</span><br/>
 <span class='ns'>namespace <b>Ogre</b></span><br/>
-<span class="section" onclick="javascript:showContent(this, 'c_269')">
+<span class="section" onclick="javascript:showContent(this, 'c_268')">
 <span class='ext'>[+]</span> <span class='ttype'>class</span> TerrainLodManager <span class='warning'>&nbsp;2&nbsp;</span></span>
 <br/>
-<div id="c_269" style="display:none;">
+<div id="c_268" style="display:none;">
 <table class='ptable'><tr>
 <th class='pn'></th>
 <th class='chg'>Change</th>
@@ -5036,10 +5009,10 @@ TerrainQuadTreeNode::writePosVertex&#160;<span class='sym_p'><span>(&#160;bool <
 <td>Possible incorrect access of applications to the memory occupied by the base classes.</td>
 </tr>
 </table>
-<span class="sect_info" onclick="javascript:showContent(this, 'c_270')">
+<span class="sect_info" onclick="javascript:showContent(this, 'c_269')">
 [+] show v-table (old and new)</span>
 <br/>
-<div id="c_270" style="display:none;">
+<div id="c_269" style="display:none;">
 <table class='vtable'><tr><th>Offset</th><th>Virtual Table (Old) - 14 entries</th><th>Virtual Table (New) - 14 entries</th></tr><tr><th>0</th>
 <td>(int (*)(...)) 0</td>
 <td>(int (*)(...)) 0</td></tr>
@@ -5084,9 +5057,9 @@ TerrainQuadTreeNode::writePosVertex&#160;<span class='sym_p'><span>(&#160;bool <
 <td>non-virtual thunk to TerrainLodManager::handleResponse(WorkQueue::Response const*, WorkQueue const*)</td></tr>
 </table><br/>
 </div>
-<span class="sect_aff" onclick="javascript:showContent(this, 'c_271')">
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_270')">
 [+] affected symbols: 13 (2.3%)</span>
-<div id="c_271" style="display:none;">
+<div id="c_270" style="display:none;">
 <div class='affected'><span class='iname_a'>TerrainLodManager::readLodData&#160;<span class='sym_p'><span>(&#160;uint16 <i>lowerLodBound</i></span>, <span>uint16 <i>higherLodBound</i></span>&#160;)</span></span><br/>
 <div class='affect'>This method is from &#39;TerrainLodManager&#39; class.</div>
 <span class='iname_a'>TerrainLodManager::handleRequest&#160;<span class='sym_p'><span>(&#160;WorkQueue::Request const* <i>req</i></span>, <span>WorkQueue const* <i>srcQ</i></span>&#160;)</span></span><br/>
@@ -5116,10 +5089,10 @@ TerrainQuadTreeNode::writePosVertex&#160;<span class='sym_p'><span>(&#160;bool <
 <br/>
 <span class='h_name'>OgreTerrainMaterialGenerator.h</span><br/>
 <span class='ns'>namespace <b>Ogre</b></span><br/>
-<span class="section" onclick="javascript:showContent(this, 'c_272')">
+<span class="section" onclick="javascript:showContent(this, 'c_271')">
 <span class='ext'>[+]</span> <span class='ttype'>class</span> TerrainMaterialGenerator <span class='warning'>&nbsp;3&nbsp;</span></span>
 <br/>
-<div id="c_272" style="display:none;">
+<div id="c_271" style="display:none;">
 <table class='ptable'><tr>
 <th class='pn'></th>
 <th class='chg'>Change</th>
@@ -5139,10 +5112,10 @@ TerrainQuadTreeNode::writePosVertex&#160;<span class='sym_p'><span>(&#160;bool <
 <td>Possible incorrect access of applications to the memory occupied by the base classes.</td>
 </tr>
 </table>
-<span class="sect_info" onclick="javascript:showContent(this, 'c_273')">
+<span class="sect_info" onclick="javascript:showContent(this, 'c_272')">
 [+] show v-table (old and new)</span>
 <br/>
-<div id="c_273" style="display:none;">
+<div id="c_272" style="display:none;">
 <table class='vtable'><tr><th>Offset</th><th>Virtual Table (Old) - 21 entries</th><th>Virtual Table (New) - 21 entries</th></tr><tr><th>0</th>
 <td>(int (*)(...)) 0</td>
 <td>(int (*)(...)) 0</td></tr>
@@ -5208,9 +5181,9 @@ TerrainQuadTreeNode::writePosVertex&#160;<span class='sym_p'><span>(&#160;bool <
 <td class='failed'>TerrainMaterialGenerator::_renderCompositeMap(unsigned long, TRect&lt;long&gt; const&amp;, SharedPtr&lt;Material&gt; const&amp;, SharedPtr&lt;Texture&gt; const&amp;)</td></tr>
 </table><br/>
 </div>
-<span class="sect_aff" onclick="javascript:showContent(this, 'c_274')">
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_273')">
 [+] affected symbols: 7 (1.3%)</span>
-<div id="c_274" style="display:none;">
+<div id="c_273" style="display:none;">
 <div class='affected'><span class='iname_a'>TerrainMaterialGenerator::_renderCompositeMap&#160;<span class='sym_p'><span>(&#160;size_t <i>size</i></span>, <span>Rect const&amp; <i>rect</i></span>, <span>std::shared_ptr&lt;DataStream&gt;const&amp; <i>mat</i></span>, <span>std::shared_ptr&lt;DataStream&gt;const&amp; <i>destCompositeMap</i></span>&#160;)</span></span><br/>
 <div class='affect'>This method is from &#39;TerrainMaterialGenerator&#39; class.</div>
 <span class='iname_a'>TerrainMaterialGenerator::Profile::updateCompositeMap&#160;<span class='sym_p'><span>(&#160;Terrain const* <i>terrain</i></span>, <span>Rect const&amp; <i>rect</i></span>&#160;)</span></span><br/>
@@ -5229,10 +5202,10 @@ TerrainQuadTreeNode::writePosVertex&#160;<span class='sym_p'><span>(&#160;bool <
 </div>
 <br/><br/></div>
 
-<span class="section" onclick="javascript:showContent(this, 'c_275')">
+<span class="section" onclick="javascript:showContent(this, 'c_274')">
 <span class='ext'>[+]</span> <span class='ttype'>class</span> TerrainMaterialGenerator::Profile <span class='warning'>&nbsp;2&nbsp;</span></span>
 <br/>
-<div id="c_275" style="display:none;">
+<div id="c_274" style="display:none;">
 <table class='ptable'><tr>
 <th class='pn'></th>
 <th class='chg'>Change</th>
@@ -5247,10 +5220,10 @@ TerrainQuadTreeNode::writePosVertex&#160;<span class='sym_p'><span>(&#160;bool <
 <td>Possible incorrect access of applications to the memory occupied by the base classes.</td>
 </tr>
 </table>
-<span class="sect_info" onclick="javascript:showContent(this, 'c_276')">
+<span class="sect_info" onclick="javascript:showContent(this, 'c_275')">
 [+] show v-table (old and new)</span>
 <br/>
-<div id="c_276" style="display:none;">
+<div id="c_275" style="display:none;">
 <table class='vtable'><tr><th>Offset</th><th>Virtual Table (Old) - 13 entries</th><th>Virtual Table (New) - 13 entries</th></tr><tr><th>0</th>
 <td>(int (*)(...)) 0</td>
 <td>(int (*)(...)) 0</td></tr>
@@ -5292,9 +5265,9 @@ TerrainQuadTreeNode::writePosVertex&#160;<span class='sym_p'><span>(&#160;bool <
 <td>__cxa_pure_virtual</td></tr>
 </table><br/>
 </div>
-<span class="sect_aff" onclick="javascript:showContent(this, 'c_277')">
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_276')">
 [+] affected symbols: 30 (5.4%)</span>
-<div id="c_277" style="display:none;">
+<div id="c_276" style="display:none;">
 <div class='affected'><span class='iname_a'>TerrainMaterialGenerator::Profile::updateParams&#160;<span class='sym_p'><span>(&#160;std::shared_ptr&lt;DataStream&gt;const&amp; <i>p1</i></span>, <span>Terrain const* <i>p2</i></span>&#160;)</span></span><br/>
 <div class='affect'>This method is from &#39;TerrainMaterialGenerator::Profile&#39; class.</div>
 <span class='iname_a'>TerrainMaterialGenerator::Profile::requestOptions&#160;<span class='sym_p'><span>(&#160;Terrain* <i>p1</i></span>&#160;)</span></span><br/>
@@ -5324,10 +5297,10 @@ TerrainQuadTreeNode::writePosVertex&#160;<span class='sym_p'><span>(&#160;bool <
 <br/>
 <span class='h_name'>OgreTerrainMaterialGeneratorA.h</span><br/>
 <span class='ns'>namespace <b>Ogre</b></span><br/>
-<span class="section" onclick="javascript:showContent(this, 'c_278')">
+<span class="section" onclick="javascript:showContent(this, 'c_277')">
 <span class='ext'>[+]</span> <span class='ttype'>class</span> TerrainMaterialGeneratorA::SM2Profile <span class='warning'>&nbsp;1&nbsp;</span></span>
 <br/>
-<div id="c_278" style="display:none;">
+<div id="c_277" style="display:none;">
 <table class='ptable'><tr>
 <th class='pn'></th>
 <th class='chg'>Change</th>
@@ -5337,9 +5310,9 @@ TerrainQuadTreeNode::writePosVertex&#160;<span class='sym_p'><span>(&#160;bool <
 <td>Replacement of field base type may indicate a change in the semantic meaning of the field.</td>
 </tr>
 </table>
-<span class="sect_aff" onclick="javascript:showContent(this, 'c_279')">
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_278')">
 [+] affected symbols: 17 (3.1%)</span>
-<div id="c_279" style="display:none;">
+<div id="c_278" style="display:none;">
 <div class='affected'><span class='iname_a'>TerrainMaterialGeneratorA::SM2Profile::requestOptions&#160;<span class='sym_p'><span>(&#160;Terrain* <i>terrain</i></span>&#160;)</span></span><br/>
 <div class='affect'>This method is from &#39;TerrainMaterialGeneratorA::SM2Profile&#39; class.</div>
 <span class='iname_a'>TerrainMaterialGeneratorA::SM2Profile::setLightmapEnabled&#160;<span class='sym_p'><span>(&#160;bool <i>enabled</i></span>&#160;)</span></span><br/>
@@ -5369,10 +5342,10 @@ TerrainQuadTreeNode::writePosVertex&#160;<span class='sym_p'><span>(&#160;bool <
 <br/>
 <span class='h_name'>OgreTerrainPaging.h</span><br/>
 <span class='ns'>namespace <b>Ogre</b></span><br/>
-<span class="section" onclick="javascript:showContent(this, 'c_280')">
+<span class="section" onclick="javascript:showContent(this, 'c_279')">
 <span class='ext'>[+]</span> <span class='ttype'>class</span> TerrainPaging <span class='warning'>&nbsp;2&nbsp;</span></span>
 <br/>
-<div id="c_280" style="display:none;">
+<div id="c_279" style="display:none;">
 <table class='ptable'><tr>
 <th class='pn'></th>
 <th class='chg'>Change</th>
@@ -5387,10 +5360,10 @@ TerrainQuadTreeNode::writePosVertex&#160;<span class='sym_p'><span>(&#160;bool <
 <td>Possible incorrect access of applications to the memory occupied by the base classes.</td>
 </tr>
 </table>
-<span class="sect_info" onclick="javascript:showContent(this, 'c_281')">
+<span class="sect_info" onclick="javascript:showContent(this, 'c_280')">
 [+] show v-table (old and new)</span>
 <br/>
-<div id="c_281" style="display:none;">
+<div id="c_280" style="display:none;">
 <table class='vtable'><tr><th>Offset</th><th>Virtual Table (Old) - 4 entries</th><th>Virtual Table (New) - 4 entries</th></tr><tr><th>0</th>
 <td>(int (*)(...)) 0</td>
 <td>(int (*)(...)) 0</td></tr>
@@ -5405,9 +5378,9 @@ TerrainQuadTreeNode::writePosVertex&#160;<span class='sym_p'><span>(&#160;bool <
 <td>~TerrainPaging</td></tr>
 </table><br/>
 </div>
-<span class="sect_aff" onclick="javascript:showContent(this, 'c_282')">
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_281')">
 [+] affected symbols: 3 (0.5%)</span>
-<div id="c_282" style="display:none;">
+<div id="c_281" style="display:none;">
 <div class='affected'><span class='iname_a'>TerrainPaging::createWorldSection&#160;<span class='sym_p'><span>(&#160;PagedWorld* <i>world</i></span>, <span>TerrainGroup* <i>terrainGroup</i></span>, <span>Real <i>loadRadius</i></span>, <span>Real <i>holdRadius</i></span>, <span>int32 <i>minX</i></span>, <span>int32 <i>minY</i></span>, <span>int32 <i>maxX</i></span>, <span>int32 <i>maxY</i></span>, <span>String const&amp; <i>sectionName</i></span>, <span>uint32 <i>loadingIntervalMs</i></span>&#160;)</span></span><br/>
 <div class='affect'>This method is from &#39;TerrainPaging&#39; class.</div>
 <span class='iname_a'>TerrainPaging::TerrainPaging&#160;<span class='sym_p'><span>(&#160;PageManager* <i>pageMgr</i></span>&#160;)</span></span><br/>
@@ -5421,10 +5394,10 @@ TerrainQuadTreeNode::writePosVertex&#160;<span class='sym_p'><span>(&#160;bool <
 <br/>
 <span class='h_name'>OgreTerrainQuadTreeNode.h</span><br/>
 <span class='ns'>namespace <b>Ogre</b></span><br/>
-<span class="section" onclick="javascript:showContent(this, 'c_283')">
+<span class="section" onclick="javascript:showContent(this, 'c_282')">
 <span class='ext'>[+]</span> <span class='ttype'>class</span> TerrainQuadTreeNode <span class='warning'>&nbsp;3&nbsp;</span></span>
 <br/>
-<div id="c_283" style="display:none;">
+<div id="c_282" style="display:none;">
 <table class='ptable'><tr>
 <th class='pn'></th>
 <th class='chg'>Change</th>
@@ -5444,10 +5417,10 @@ TerrainQuadTreeNode::writePosVertex&#160;<span class='sym_p'><span>(&#160;bool <
 <td>Possible incorrect access of applications to the memory occupied by the base classes.</td>
 </tr>
 </table>
-<span class="sect_info" onclick="javascript:showContent(this, 'c_284')">
+<span class="sect_info" onclick="javascript:showContent(this, 'c_283')">
 [+] show v-table (old and new)</span>
 <br/>
-<div id="c_284" style="display:none;">
+<div id="c_283" style="display:none;">
 <table class='vtable'><tr><th>Offset</th><th>Virtual Table (Old) - 4 entries</th><th>Virtual Table (New) - 4 entries</th></tr><tr><th>0</th>
 <td>(int (*)(...)) 0</td>
 <td>(int (*)(...)) 0</td></tr>
@@ -5462,9 +5435,9 @@ TerrainQuadTreeNode::writePosVertex&#160;<span class='sym_p'><span>(&#160;bool <
 <td>~TerrainQuadTreeNode</td></tr>
 </table><br/>
 </div>
-<span class="sect_aff" onclick="javascript:showContent(this, 'c_285')">
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_284')">
 [+] affected symbols: 222 (40%)</span>
-<div id="c_285" style="display:none;">
+<div id="c_284" style="display:none;">
 <div class='affected'><span class='iname_a'>TerrainGroup::TerrainSlot::freeInstance&#160;<span class='sym_p'>(&#160;)</span></span><br/>
 <div class='affect'>Field &#39;this.instance.mQuadTree&#39; in the object of this method has base type &#39;TerrainQuadTreeNode&#39;.</div>
 <span class='iname_a'>TerrainGroup::TerrainSlot::~TerrainSlot&#160;<span class='sym_p'>(&#160;)</span></span><br/>
@@ -5491,10 +5464,10 @@ TerrainQuadTreeNode::writePosVertex&#160;<span class='sym_p'><span>(&#160;bool <
 </div>
 <br/><br/></div>
 
-<span class="section" onclick="javascript:showContent(this, 'c_286')">
+<span class="section" onclick="javascript:showContent(this, 'c_285')">
 <span class='ext'>[+]</span> <span class='ttype'>class</span> TerrainQuadTreeNode::Movable <span class='warning'>&nbsp;1&nbsp;</span></span>
 <br/>
-<div id="c_286" style="display:none;">
+<div id="c_285" style="display:none;">
 <table class='ptable'><tr>
 <th class='pn'></th>
 <th class='chg'>Change</th>
@@ -5504,9 +5477,9 @@ TerrainQuadTreeNode::writePosVertex&#160;<span class='sym_p'><span>(&#160;bool <
 <td>The fields or parameters of such data type may be incorrectly initialized or accessed by old client applications.</td>
 </tr>
 </table>
-<span class="sect_aff" onclick="javascript:showContent(this, 'c_287')">
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_286')">
 [+] affected symbols: 220 (39.6%)</span>
-<div id="c_287" style="display:none;">
+<div id="c_286" style="display:none;">
 <div class='affected'><span class='iname_a'>TerrainGroup::TerrainSlot::freeInstance&#160;<span class='sym_p'>(&#160;)</span></span><br/>
 <div class='affect'>Field &#39;this.instance.mQuadTree.mMovable&#39; in the object of this method has base type &#39;TerrainQuadTreeNode::Movable&#39;.</div>
 <span class='iname_a'>TerrainGroup::TerrainSlot::~TerrainSlot&#160;<span class='sym_p'>(&#160;)</span></span><br/>
@@ -5533,10 +5506,10 @@ TerrainQuadTreeNode::writePosVertex&#160;<span class='sym_p'><span>(&#160;bool <
 </div>
 <br/><br/></div>
 
-<span class="section" onclick="javascript:showContent(this, 'c_288')">
+<span class="section" onclick="javascript:showContent(this, 'c_287')">
 <span class='ext'>[+]</span> <span class='ttype'>class</span> TerrainQuadTreeNode::Rend <span class='warning'>&nbsp;2&nbsp;</span></span>
 <br/>
-<div id="c_288" style="display:none;">
+<div id="c_287" style="display:none;">
 <table class='ptable'><tr>
 <th class='pn'></th>
 <th class='chg'>Change</th>
@@ -5551,10 +5524,10 @@ TerrainQuadTreeNode::writePosVertex&#160;<span class='sym_p'><span>(&#160;bool <
 <td>Possible incorrect access of applications to the memory occupied by the base classes.</td>
 </tr>
 </table>
-<span class="sect_info" onclick="javascript:showContent(this, 'c_289')">
+<span class="sect_info" onclick="javascript:showContent(this, 'c_288')">
 [+] show v-table (old and new)</span>
 <br/>
-<div id="c_289" style="display:none;">
+<div id="c_288" style="display:none;">
 <table class='vtable'><tr><th>Offset</th><th>Virtual Table (Old) - 15 entries</th><th>Virtual Table (New) - 15 entries</th></tr><tr><th>0</th>
 <td>(int (*)(...)) 0</td>
 <td>(int (*)(...)) 0</td></tr>
@@ -5602,9 +5575,9 @@ TerrainQuadTreeNode::writePosVertex&#160;<span class='sym_p'><span>(&#160;bool <
 <td>(int (*)(...)) 0x5c1ca</td></tr>
 </table><br/>
 </div>
-<span class="sect_aff" onclick="javascript:showContent(this, 'c_290')">
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_289')">
 [+] affected symbols: 9 (1.6%)</span>
-<div id="c_290" style="display:none;">
+<div id="c_289" style="display:none;">
 <div class='affected'><span class='iname_a'>TerrainQuadTreeNode::Rend::getRenderOperation&#160;<span class='sym_p'><span>(&#160;RenderOperation&amp; <i>op</i></span>&#160;)</span></span><br/>
 <div class='affect'>This method is from &#39;TerrainQuadTreeNode::Rend&#39; class.</div>
 <span class='iname_a'>TerrainQuadTreeNode::Rend::Rend&#160;<span class='sym_p'><span>(&#160;TerrainQuadTreeNode* <i>parent</i></span>&#160;)</span></span><br/>
@@ -5633,10 +5606,10 @@ TerrainQuadTreeNode::writePosVertex&#160;<span class='sym_p'><span>(&#160;bool <
 <h2>Problems with Symbols, Low Severity <span class='warning'>&nbsp;3&nbsp;</span></h2><hr/>
 <span class='h_name'>OgreTerrainGroup.h</span>, <span class='lib_name'>libOgreTerrain.so.1.10.12</span><br/>
 <span class='ns'>namespace <b>Ogre</b></span><br/>
-<span class="section" onclick="javascript:showContent(this, 'c_291')">
+<span class="section" onclick="javascript:showContent(this, 'c_290')">
 <span class='ext'>[+]</span> TerrainGroup::getTerrainSlotPosition&#160;<span class='sym_p'><span>(&#160;long <span class='color_p'>x</span></span>, <span>long <span class='color_p'>y</span></span>&#160;)</span> <span class='warning'>&nbsp;1&nbsp;</span></span>
 <br/>
-<div id="c_291" style="display:none;">
+<div id="c_290" style="display:none;">
 
 <span class='mngl pleft'>_ZN4Ogre12TerrainGroup22getTerrainSlotPositionEll</span><br/>
 <table class='ptable'>
@@ -5656,10 +5629,10 @@ TerrainQuadTreeNode::writePosVertex&#160;<span class='sym_p'><span>(&#160;bool <
 <br/>
 <span class='h_name'>OgreTerrainMaterialGeneratorA.h</span>, <span class='lib_name'>libOgreTerrain.so.1.10.12</span><br/>
 <span class='ns'>namespace <b>Ogre</b></span><br/>
-<span class="section" onclick="javascript:showContent(this, 'c_292')">
+<span class="section" onclick="javascript:showContent(this, 'c_291')">
 <span class='ext'>[+]</span> TerrainMaterialGeneratorA::SM2Profile::setLayerNormalMappingEnabled&#160;<span class='sym_p'><span>(&#160;bool <span class='color_p'>enabled</span></span>&#160;)</span> <span class='warning'>&nbsp;1&nbsp;</span></span>
 <br/>
-<div id="c_292" style="display:none;">
+<div id="c_291" style="display:none;">
 
 <span class='mngl pleft'>_ZN4Ogre25TerrainMaterialGeneratorA10SM2Profile28setLayerNormalMappingEnabledEb</span><br/>
 <table class='ptable'>
@@ -5676,10 +5649,10 @@ TerrainQuadTreeNode::writePosVertex&#160;<span class='sym_p'><span>(&#160;bool <
 </table>
 <br/>
 </div>
-<span class="section" onclick="javascript:showContent(this, 'c_293')">
+<span class="section" onclick="javascript:showContent(this, 'c_292')">
 <span class='ext'>[+]</span> TerrainMaterialGeneratorA::SM2Profile::setLayerSpecularMappingEnabled&#160;<span class='sym_p'><span>(&#160;bool <span class='color_p'>enabled</span></span>&#160;)</span> <span class='warning'>&nbsp;1&nbsp;</span></span>
 <br/>
-<div id="c_293" style="display:none;">
+<div id="c_292" style="display:none;">
 
 <span class='mngl pleft'>_ZN4Ogre25TerrainMaterialGeneratorA10SM2Profile30setLayerSpecularMappingEnabledEb</span><br/>
 <table class='ptable'>
@@ -5702,10 +5675,10 @@ TerrainQuadTreeNode::writePosVertex&#160;<span class='sym_p'><span>(&#160;bool <
 <h2>Other Changes in Data Types <span class='passed'>&nbsp;7&nbsp;</span></h2><hr/>
 <span class='h_name'>OgrePixelFormat.h</span><br/>
 <span class='ns'>namespace <b>Ogre</b></span><br/>
-<span class="section" onclick="javascript:showContent(this, 'c_294')">
+<span class="section" onclick="javascript:showContent(this, 'c_293')">
 <span class='ext'>[+]</span> <span class='ttype'>enum</span> PixelFormat <span class='passed'>&nbsp;2&nbsp;</span></span>
 <br/>
-<div id="c_294" style="display:none;">
+<div id="c_293" style="display:none;">
 <table class='ptable'><tr>
 <th class='pn'></th>
 <th class='chg'>Change</th>
@@ -5720,9 +5693,9 @@ TerrainQuadTreeNode::writePosVertex&#160;<span class='sym_p'><span>(&#160;bool <
 <td>No effect.</td>
 </tr>
 </table>
-<span class="sect_aff" onclick="javascript:showContent(this, 'c_295')">
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_294')">
 [+] affected symbols: 257 (46.3%)</span>
-<div id="c_295" style="display:none;">
+<div id="c_294" style="display:none;">
 <div class='affected'><span class='iname_a'>TerrainGroup::loadTerrain&#160;<span class='sym_p'><span>(&#160;long <i>x</i></span>, <span>long <i>y</i></span>, <span>bool <i>synchronous</i></span>&#160;)</span></span><br/>
 <div class='affect'>Field &#39;this.mDefaultImportData.inputImage.mFormat&#39; in the object of this method is of type &#39;enum PixelFormat&#39;.</div>
 <span class='iname_a'>TerrainGroup::TerrainSlot::freeInstance&#160;<span class='sym_p'>(&#160;)</span></span><br/>
@@ -5752,10 +5725,10 @@ TerrainQuadTreeNode::writePosVertex&#160;<span class='sym_p'><span>(&#160;bool <
 <br/>
 <span class='h_name'>OgreRenderOperation.h</span><br/>
 <span class='ns'>namespace <b>Ogre</b></span><br/>
-<span class="section" onclick="javascript:showContent(this, 'c_296')">
+<span class="section" onclick="javascript:showContent(this, 'c_295')">
 <span class='ext'>[+]</span> <span class='ttype'>enum</span> RenderOperation::OperationType <span class='passed'>&nbsp;5&nbsp;</span></span>
 <br/>
-<div id="c_296" style="display:none;">
+<div id="c_295" style="display:none;">
 <table class='ptable'><tr>
 <th class='pn'></th>
 <th class='chg'>Change</th>
@@ -5785,9 +5758,9 @@ TerrainQuadTreeNode::writePosVertex&#160;<span class='sym_p'><span>(&#160;bool <
 <td>No effect.</td>
 </tr>
 </table>
-<span class="sect_aff" onclick="javascript:showContent(this, 'c_297')">
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_296')">
 [+] affected symbols: 2 (0.4%)</span>
-<div id="c_297" style="display:none;">
+<div id="c_296" style="display:none;">
 <div class='affected'><span class='iname_a'>TerrainQuadTreeNode::getRenderOperation&#160;<span class='sym_p'><span>(&#160;RenderOperation&amp; <span class='fp'>op</span></span>&#160;)</span></span><br/>
 <div class='affect'>Field &#39;op.operationType&#39; in 1st parameter &#39;op&#39; (reference) is of type &#39;enum RenderOperation::OperationType&#39;.</div>
 <span class='iname_a'>TerrainQuadTreeNode::Rend::getRenderOperation&#160;<span class='sym_p'><span>(&#160;RenderOperation&amp; <span class='fp'>op</span></span>&#160;)</span></span><br/>

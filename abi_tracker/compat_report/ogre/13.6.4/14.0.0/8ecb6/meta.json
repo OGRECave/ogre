@@ -1,0 +1,11 @@
+{
+  "Affected": "20.3",
+  "Added": 0,
+  "Removed": 4,
+  "TotalProblems": 8,
+  "Source_Affected": "3.5",
+  "Source_TotalProblems": "3",
+  "Source_ReportPath": "compat_report/ogre/13.6.4/14.0.0/8ecb6/src_compat_report.html",
+  "Object1": "lib/libOgrePaging.so.13.6",
+  "Object2": "lib/libOgrePaging.so.14.0"
+}

@@ -1,0 +1,11 @@
+{
+  "Affected": "50.7",
+  "Added": 41,
+  "Removed": 40,
+  "TotalProblems": 162,
+  "Source_Affected": "23",
+  "Source_TotalProblems": "148",
+  "Source_ReportPath": "compat_report/ogre/1.12.13/14.0.0/8e2ed/src_compat_report.html",
+  "Object1": "lib/libOgreBites.so.1.12.13",
+  "Object2": "lib/libOgreBites.so.14.0"
+}

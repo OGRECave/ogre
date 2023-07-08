@@ -1,0 +1,1478 @@
+<!-- verdict:incompatible;affected:16.7;added:2;removed:29;type_problems_high:2;type_problems_medium:11;type_problems_low:4;interface_problems_high:19;interface_problems_medium:1;interface_problems_low:0;changed_constants:0;tool_version:2.3 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta name="keywords" content="libOgreMeshLodGenerator, source compatibility, API, report" />
+<meta name="description" content="Source compatibility report for the libOgreMeshLodGenerator object between 1.12.13 and 14.0.0 versions" />
+<title>libOgreMeshLodGenerator: 1.12.13 to 14.0.0 source compatibility report</title>
+<style type="text/css">
+body {
+    font-family:Arial, sans-serif;
+    background-color:White;
+    color:Black;
+}
+hr {
+    color:Black;
+    background-color:Black;
+    height:1px;
+    border:0;
+}
+h1 {
+    margin-bottom:0px;
+    padding-bottom:0px;
+    font-size:1.625em;
+}
+h2 {
+    margin-bottom:0px;
+    padding-bottom:0px;
+    font-size:1.25em;
+    white-space:nowrap;
+}
+span.section {
+    font-weight:bold;
+    cursor:pointer;
+    color:#003E69;
+    white-space:nowrap;
+    margin-left:0.3125em;
+}
+span.new_sign {
+    font-weight:bold;
+    margin-left:1.65em;
+    color:#003E69;
+}
+span.new_sign_lbl {
+    margin-left:3em;
+    font-size:1em;
+    color:Black;
+}
+span:hover.section {
+    color:#336699;
+}
+span.sect_aff {
+    cursor:pointer;
+    padding-left:1.55em;
+    font-size:0.875em;
+    color:#cc3300;
+}
+span.sect_info {
+    cursor:pointer;
+    padding-left:1.55em;
+    font-size:0.875em;
+    color:Black;
+}
+span.ext {
+    font-weight:normal;
+}
+span.h_name {
+    color:#cc3300;
+    font-size:0.875em;
+    font-weight:bold;
+}
+div.h_list, div.lib_list {
+    font-size:0.94em;
+    padding-left:0.4em;
+}
+span.ns {
+    color:#408080;
+    font-size:0.94em;
+}
+span.lib_name {
+    color:Green;
+    font-size:0.875em;
+    font-weight:bold;
+}
+span.iname {
+    font-weight:bold;
+    color:#003E69;
+    margin-left:0.3125em;
+}
+span.iname_b {
+    font-weight:bold;
+}
+span.iname_a {
+    color:#333333;
+    font-weight:bold;
+    font-size:0.94em;
+}
+span.sym_p {
+    font-weight:normal;
+    white-space:normal;
+}
+span.sym_pd {
+    white-space:normal;
+}
+span.sym_p span, span.sym_pd span {
+    white-space:nowrap;
+}
+div.affect {
+    padding-left:1em;
+    padding-bottom:10px;
+    font-size:0.87em;
+    font-style:italic;
+    line-height:0.9em;
+}
+div.affected {
+    padding-left:1.9em;
+    padding-top:10px;
+}
+table.ptable {
+    border-collapse:collapse;
+    border:1px outset black;
+    margin-left:0.95em;
+    margin-top:3px;
+    margin-bottom:3px;
+    width:56.25em;
+}
+table.ptable td {
+    border:1px solid gray;
+    padding:3px;
+    font-size:0.875em;
+    text-align:left;
+    vertical-align:top;
+    max-width:28em;
+    word-wrap:break-word;
+}
+table.ptable th.pn {
+    width:2%;
+}
+table.ptable th.chg {
+    width:47%;
+}
+table.vtable {
+    border-collapse:collapse;
+    border:1px outset black;
+    margin-left:1.9em;
+    margin-top:0.7em;
+}
+table.vtable td {
+    border:1px solid gray;
+    padding:3px;
+    font-size:0.875em;
+    vertical-align:top;
+    max-width:450px;
+    word-wrap:break-word;
+}
+table.ptable th, table.vtable th {
+    background-color:#eeeeee;
+    font-weight:bold;
+    color:#333333;
+    font-family:Verdana, Arial;
+    font-size:0.875em;
+    border:1px solid gray;
+    text-align:center;
+    vertical-align:top;
+    white-space:nowrap;
+    padding:3px;
+}
+table.summary {
+    border-collapse:collapse;
+    border:1px outset black;
+}
+table.summary th {
+    background-color:#eeeeee;
+    font-weight:normal;
+    text-align:left;
+    font-size:0.94em;
+    white-space:nowrap;
+    border:1px inset gray;
+    padding:3px;
+}
+table.summary td {
+    text-align:right;
+    white-space:nowrap;
+    border:1px inset gray;
+    padding:3px 5px 3px 10px;
+}
+span.mngl {
+    padding-left:1em;
+    font-size:0.875em;
+    cursor:text;
+    color:#444444;
+    font-weight:bold;
+}
+span.pleft {
+    padding-left:2.5em;
+}
+span.sym_ver {
+    color:#333333;
+    white-space:nowrap;
+    font-family:"DejaVu Sans Mono", Monospace;
+}
+span.attr {
+    color:#333333;
+    font-weight:normal;
+}
+span.color_p {
+    font-style:italic;
+    color:Brown;
+}
+span.p {
+    font-style:italic;
+}
+span.fp {
+    font-style:italic;
+    background-color:#DCDCDC;
+}
+span.ttype {
+    font-weight:normal;
+}
+span.nowrap {
+    white-space:nowrap;
+}
+span.value {
+    font-weight:bold;
+}
+.passed {
+    background-color:#CCFFCC;
+    font-weight:normal;
+}
+.warning {
+    background-color:#F4F4AF;
+    font-weight:normal;
+}
+.failed {
+    background-color:#FFCCCC;
+    font-weight:normal;
+}
+.new {
+    background-color:#C6DEFF;
+    font-weight:normal;
+}
+.compatible {
+    background-color:#CCFFCC;
+    font-weight:normal;
+}
+.almost_compatible {
+    background-color:#FFDAA3;
+    font-weight:normal;
+}
+.incompatible {
+    background-color:#FFCCCC;
+    font-weight:normal;
+}
+.gray {
+    background-color:#DCDCDC;
+    font-weight:normal;
+}
+.top_ref {
+    font-size:0.69em;
+}
+.footer {
+    font-size:0.75em;
+}
+</style>
+<script type="text/javascript" language="JavaScript">
+<!--
+function showContent(header, id)
+{
+    e = document.getElementById(id);
+    if(e.style.display == 'none')
+    {
+        e.style.display = 'block';
+        e.style.visibility = 'visible';
+        header.innerHTML = header.innerHTML.replace(/\[[^0-9 ]\]/gi,"[&minus;]");
+    }
+    else
+    {
+        e.style.display = 'none';
+        e.style.visibility = 'hidden';
+        header.innerHTML = header.innerHTML.replace(/\[[^0-9 ]\]/gi,"[+]");
+    }
+}
+-->
+</script>
+</head>
+
+<body>
+<div><a name='Top'></a>
+<h1>Source compatibility report for the <span style='color:Blue;'>libOgreMeshLodGenerator.so</span> object between <span style='color:Red;'>1.12.13</span> and <span style='color:Red;'>14.0.0</span> versions</h1>
+
+<h2>Test Info</h2><hr/>
+<table class='summary'>
+<tr><th>Module Name</th><td>libOgreMeshLodGenerator</td></tr>
+<tr><th>Version #1</th><td>1.12.13</td></tr>
+<tr><th>Version #2</th><td>14.0.0</td></tr>
+<tr><th>Arch</th><td>x86_64</td></tr>
+</table>
+<h2>Test Results</h2><hr/>
+<table class='summary'><tr><th>Total Header Files</th><td><a href='#Headers' style='color:Blue;'>41</a></td></tr>
+<tr><th>Total Source Files</th><td><a href='#Sources' style='color:Blue;'>21</a></td></tr>
+<tr><th>Total Objects</th><td><a href='#Libs' style='color:Blue;'>1</a></td></tr>
+<tr><th>Total Symbols / Types</th><td>431 / 129</td></tr>
+<tr><th>Compatibility</th>
+<td class='almost_compatible'>83.3%</td>
+</tr>
+</table>
+<h2>Problem Summary</h2><hr/>
+<table class='summary'><tr><th></th><th style='text-align:center;'>Severity</th><th style='text-align:center;'>Count</th></tr><tr><th>Added Symbols</th><td>-</td><td class='new'><a href='#Added' style='color:Blue;'>2</a></td></tr>
+<tr><th>Removed Symbols</th><td>High</td><td class='failed'><a href='#Removed' style='color:Blue;'>29</a></td></tr>
+<tr><th rowspan='3'>Problems with<br/>Data Types</th><td>High</td><td class='failed'><a href='#Type_Problems_High' style='color:Blue;'>2</a></td></tr>
+<tr><td>Medium</td><td class='failed'><a href='#Type_Problems_Medium' style='color:Blue;'>11</a></td></tr>
+<tr><td>Low</td><td class='warning'><a href='#Type_Problems_Low' style='color:Blue;'>4</a></td></tr>
+<tr><th rowspan='3'>Problems with<br/>Symbols</th><td>High</td><td class='failed'><a href='#Symbol_Problems_High' style='color:Blue;'>19</a></td></tr>
+<tr><td>Medium</td><td class='failed'><a href='#Symbol_Problems_Medium' style='color:Blue;'>1</a></td></tr>
+<tr><td>Low</td><td>0</td></tr>
+<tr><th>Problems with<br/>Constants</th><td>Low</td><td>0</td></tr>
+</table>
+
+<a name='Added'></a><h2>Added Symbols <span class='new'>&nbsp;2&nbsp;</span></h2><hr/>
+<span class='h_name'>OgreLodInputProvider.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_68')">
+LodInputProvider::printTriangle&#160;<span class='sym_p'><span>(&#160;struct LodData::Triangle* <span class='color_p'>triangle</span></span>, <span>std::ostream&amp; <span class='color_p'>str</span></span>&#160;)</span></span>
+<br/>
+<div id="c_68" style="display:none;">
+<span class='mngl'>_ZN4Ogre16LodInputProvider13printTriangleEPNS_7LodData8TriangleERSo</span>
+<br/>
+<br/>
+</div>
+
+<br/>
+<span class='h_name'>OgreMeshLodGenerator.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_69')">
+MeshLodGenerator::clearPendingLodRequests&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_69" style="display:none;">
+<span class='mngl'>_ZN4Ogre16MeshLodGenerator23clearPendingLodRequestsEv</span>
+<br/>
+<br/>
+</div>
+
+<br/>
+<a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='Removed'></a><a name='Withdrawn'></a><h2>Removed Symbols <span class='failed'>&nbsp;29&nbsp;</span></h2><hr/>
+<span class='h_name'>OgreLodInputProvider.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_70')">
+LodInputProvider::printTriangle&#160;<span class='sym_p'><span>(&#160;struct LodData::Triangle* <span class='color_p'>triangle</span></span>, <span>stringstream&amp; <span class='color_p'>str</span></span>&#160;)</span></span>
+<br/>
+<div id="c_70" style="display:none;">
+<span class='mngl'>_ZN4Ogre16LodInputProvider13printTriangleEPNS_7LodData8TriangleERNSt7__cxx1118basic_stringstreamIcSt11char_traitsIcESaIcEEE</span>
+<br/>
+<br/>
+</div>
+
+<br/>
+<span class='h_name'>OgreLodWorkQueueInjector.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_71')">
+LodWorkQueueInjector::getSingleton&#160;<span class='sym_p'>(&#160;)</span> <span class='attr'>[static]</span></span>
+<br/>
+<div id="c_71" style="display:none;">
+<span class='mngl'>_ZN4Ogre20LodWorkQueueInjector12getSingletonEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_72')">
+LodWorkQueueInjector::getSingletonPtr&#160;<span class='sym_p'>(&#160;)</span> <span class='attr'>[static]</span></span>
+<br/>
+<div id="c_72" style="display:none;">
+<span class='mngl'>_ZN4Ogre20LodWorkQueueInjector15getSingletonPtrEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_73')">
+LodWorkQueueInjector::handleResponse&#160;<span class='sym_p'><span>(&#160;struct WorkQueue::Response const* <span class='color_p'>res</span></span>, <span>WorkQueue const* <span class='color_p'>srcQ</span></span>&#160;)</span></span>
+<br/>
+<div id="c_73" style="display:none;">
+<span class='mngl'>_ZN4Ogre20LodWorkQueueInjector14handleResponseEPKNS_9WorkQueue8ResponseEPKS1_</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_74')">
+LodWorkQueueInjector::LodWorkQueueInjector <span class='attr'>[C1]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_74" style="display:none;">
+<span class='mngl'>_ZN4Ogre20LodWorkQueueInjectorC1Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_75')">
+LodWorkQueueInjector::LodWorkQueueInjector <span class='attr'>[C2]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_75" style="display:none;">
+<span class='mngl'>_ZN4Ogre20LodWorkQueueInjectorC2Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_76')">
+LodWorkQueueInjector::~LodWorkQueueInjector <span class='attr'>[D0]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_76" style="display:none;">
+<span class='mngl'>_ZN4Ogre20LodWorkQueueInjectorD0Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_77')">
+LodWorkQueueInjector::~LodWorkQueueInjector <span class='attr'>[D1]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_77" style="display:none;">
+<span class='mngl'>_ZN4Ogre20LodWorkQueueInjectorD1Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_78')">
+LodWorkQueueInjector::~LodWorkQueueInjector <span class='attr'>[D2]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_78" style="display:none;">
+<span class='mngl'>_ZN4Ogre20LodWorkQueueInjectorD2Ev</span>
+<br/>
+<br/>
+</div>
+
+<br/>
+<span class='h_name'>OgreLodWorkQueueWorker.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_79')">
+LodWorkQueueWorker::addRequestToQueue&#160;<span class='sym_p'><span>(&#160;struct LodConfig&amp; <span class='color_p'>lodConfig</span></span>, <span>LodCollapseCostPtr&amp; <span class='color_p'>cost</span></span>, <span>LodDataPtr&amp; <span class='color_p'>data</span></span>, <span>LodInputProviderPtr&amp; <span class='color_p'>input</span></span>, <span>LodOutputProviderPtr&amp; <span class='color_p'>output</span></span>, <span>LodCollapserPtr&amp; <span class='color_p'>collapser</span></span>&#160;)</span></span>
+<br/>
+<div id="c_79" style="display:none;">
+<span class='mngl'>_ZN4Ogre18LodWorkQueueWorker17addRequestToQueueERNS_9LodConfigERSt10shared_ptrINS_15LodCollapseCostEERS3_INS_7LodDataEERS3_INS_16LodInputProviderEERS3_INS_17LodOutputProviderEERS3_INS_12LodCollapserEE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_80')">
+LodWorkQueueWorker::addRequestToQueue&#160;<span class='sym_p'><span>(&#160;struct LodWorkQueueRequest* <span class='color_p'>request</span></span>&#160;)</span></span>
+<br/>
+<div id="c_80" style="display:none;">
+<span class='mngl'>_ZN4Ogre18LodWorkQueueWorker17addRequestToQueueEPNS_19LodWorkQueueRequestE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_81')">
+LodWorkQueueWorker::clearPendingLodRequests&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_81" style="display:none;">
+<span class='mngl'>_ZN4Ogre18LodWorkQueueWorker23clearPendingLodRequestsEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_82')">
+LodWorkQueueWorker::getSingleton&#160;<span class='sym_p'>(&#160;)</span> <span class='attr'>[static]</span></span>
+<br/>
+<div id="c_82" style="display:none;">
+<span class='mngl'>_ZN4Ogre18LodWorkQueueWorker12getSingletonEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_83')">
+LodWorkQueueWorker::getSingletonPtr&#160;<span class='sym_p'>(&#160;)</span> <span class='attr'>[static]</span></span>
+<br/>
+<div id="c_83" style="display:none;">
+<span class='mngl'>_ZN4Ogre18LodWorkQueueWorker15getSingletonPtrEv</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_84')">
+LodWorkQueueWorker::handleRequest&#160;<span class='sym_p'><span>(&#160;WorkQueue::Request const* <span class='color_p'>req</span></span>, <span>WorkQueue const* <span class='color_p'>srcQ</span></span>&#160;)</span></span>
+<br/>
+<div id="c_84" style="display:none;">
+<span class='mngl'>_ZN4Ogre18LodWorkQueueWorker13handleRequestEPKNS_9WorkQueue7RequestEPKS1_</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_85')">
+LodWorkQueueWorker::LodWorkQueueWorker <span class='attr'>[C1]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_85" style="display:none;">
+<span class='mngl'>_ZN4Ogre18LodWorkQueueWorkerC1Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_86')">
+LodWorkQueueWorker::LodWorkQueueWorker <span class='attr'>[C2]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_86" style="display:none;">
+<span class='mngl'>_ZN4Ogre18LodWorkQueueWorkerC2Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_87')">
+LodWorkQueueWorker::~LodWorkQueueWorker <span class='attr'>[D0]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_87" style="display:none;">
+<span class='mngl'>_ZN4Ogre18LodWorkQueueWorkerD0Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_88')">
+LodWorkQueueWorker::~LodWorkQueueWorker <span class='attr'>[D1]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_88" style="display:none;">
+<span class='mngl'>_ZN4Ogre18LodWorkQueueWorkerD1Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_89')">
+LodWorkQueueWorker::~LodWorkQueueWorker <span class='attr'>[D2]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_89" style="display:none;">
+<span class='mngl'>_ZN4Ogre18LodWorkQueueWorkerD2Ev</span>
+<br/>
+<br/>
+</div>
+
+<br/>
+<span class='h_name'>OgreMeshLodGenerator.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_90')">
+MeshLodGenerator::_initWorkQueue&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_90" style="display:none;">
+<span class='mngl'>_ZN4Ogre16MeshLodGenerator14_initWorkQueueEv</span>
+<br/>
+<br/>
+</div>
+
+<br/>
+<span class='h_name'>OgreSingleton.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_91')">
+Singleton&lt;LodWorkQueueInjector&gt;::msSingleton <span class='attr'>[data]</span></span>
+<br/>
+<div id="c_91" style="display:none;">
+<span class='mngl'>_ZN4Ogre9SingletonINS_20LodWorkQueueInjectorEE11msSingletonE</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_92')">
+Singleton&lt;LodWorkQueueWorker&gt;::msSingleton <span class='attr'>[data]</span></span>
+<br/>
+<div id="c_92" style="display:none;">
+<span class='mngl'>_ZN4Ogre9SingletonINS_18LodWorkQueueWorkerEE11msSingletonE</span>
+<br/>
+<br/>
+</div>
+
+<br/>
+<span class='h_name'>OgreWorkQueue.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_93')">
+WorkQueue::RequestHandler::~RequestHandler <span class='attr'>[D0]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_93" style="display:none;">
+<span class='mngl'>_ZN4Ogre9WorkQueue14RequestHandlerD0Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_94')">
+WorkQueue::RequestHandler::~RequestHandler <span class='attr'>[D1]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_94" style="display:none;">
+<span class='mngl'>_ZN4Ogre9WorkQueue14RequestHandlerD1Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_95')">
+WorkQueue::RequestHandler::~RequestHandler <span class='attr'>[D2]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_95" style="display:none;">
+<span class='mngl'>_ZN4Ogre9WorkQueue14RequestHandlerD2Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_96')">
+WorkQueue::ResponseHandler::~ResponseHandler <span class='attr'>[D0]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_96" style="display:none;">
+<span class='mngl'>_ZN4Ogre9WorkQueue15ResponseHandlerD0Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_97')">
+WorkQueue::ResponseHandler::~ResponseHandler <span class='attr'>[D1]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_97" style="display:none;">
+<span class='mngl'>_ZN4Ogre9WorkQueue15ResponseHandlerD1Ev</span>
+<br/>
+<br/>
+</div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_98')">
+WorkQueue::ResponseHandler::~ResponseHandler <span class='attr'>[D2]</span>&#160;<span class='sym_p'>(&#160;)</span></span>
+<br/>
+<div id="c_98" style="display:none;">
+<span class='mngl'>_ZN4Ogre9WorkQueue15ResponseHandlerD2Ev</span>
+<br/>
+<br/>
+</div>
+
+<br/>
+<a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='High_Risk_Problems'></a><a name='Type_Problems_High'></a>
+<h2>Problems with Data Types, High Severity <span class='failed'>&nbsp;2&nbsp;</span></h2><hr/>
+<span class='h_name'>OgreMeshLodGenerator.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_99')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> MeshLodGenerator <span class='failed'>&nbsp;2&nbsp;</span></span>
+<br/>
+<div id="c_99" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Field <b>mWQInjector</b> has been removed from this type.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>MeshLodGenerator</b>' has no member named '<b>mWQInjector</b>'.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>Field <b>mWQWorker</b> has been removed from this type.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>MeshLodGenerator</b>' has no member named '<b>mWQWorker</b>'.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_100')">
+[+] affected symbols: 13 (3%)</span>
+<div id="c_100" style="display:none;">
+<div class='affected'><span class='iname_a'>MeshLodGenerator::computeLods&#160;<span class='sym_p'><span>(&#160;struct LodConfig&amp; <i>lodConfig</i></span>, <span>struct LodData* <i>data</i></span>, <span>LodCollapseCost* <i>cost</i></span>, <span>LodOutputProvider* <i>output</i></span>, <span>LodCollapser* <i>collapser</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;MeshLodGenerator&#39; class.</div>
+<span class='iname_a'>MeshLodGenerator::getSingleton&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>Return value (reference) has base type &#39;MeshLodGenerator&#39;.</div>
+<span class='iname_a'>MeshLodGenerator::getAutoconfig&#160;<span class='sym_p'><span>(&#160;MeshPtr&amp; <i>inMesh</i></span>, <span>struct LodConfig&amp; <i>outLodConfig</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;MeshLodGenerator&#39; class.</div>
+<span class='iname_a'>MeshLodGenerator::getSingletonPtr&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>Return value (pointer) has base type &#39;MeshLodGenerator&#39;.</div>
+<span class='iname_a'>MeshLodGenerator::generateLodLevels&#160;<span class='sym_p'><span>(&#160;struct LodConfig&amp; <i>lodConfig</i></span>, <span>LodCollapseCostPtr <i>cost</i></span>, <span>LodDataPtr <i>data</i></span>, <span>LodInputProviderPtr <i>input</i></span>, <span>LodOutputProviderPtr <i>output</i></span>, <span>LodCollapserPtr <i>collapser</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;MeshLodGenerator&#39; class.</div>
+<span class='iname_a'>MeshLodGenerator::_resolveComponents&#160;<span class='sym_p'><span>(&#160;struct LodConfig&amp; <i>lodConfig</i></span>, <span>LodCollapseCostPtr&amp; <i>cost</i></span>, <span>LodDataPtr&amp; <i>data</i></span>, <span>LodInputProviderPtr&amp; <i>input</i></span>, <span>LodOutputProviderPtr&amp; <i>output</i></span>, <span>LodCollapserPtr&amp; <i>collapser</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;MeshLodGenerator&#39; class.</div>
+<span class='iname_a'>MeshLodGenerator::calcLodVertexCount&#160;<span class='sym_p'><span>(&#160;struct LodLevel const&amp; <i>lodLevel</i></span>, <span>size_t <i>uniqueVertexCount</i></span>, <span>size_t&amp; <i>outVertexCountLimit</i></span>, <span>Real&amp; <i>outCollapseCostLimit</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;MeshLodGenerator&#39; class.</div>
+<span class='iname_a'>MeshLodGenerator::_generateManualLodLevels&#160;<span class='sym_p'><span>(&#160;struct LodConfig&amp; <i>lodConfig</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;MeshLodGenerator&#39; class.</div>
+<span class='iname_a'>MeshLodGenerator::generateAutoconfiguredLodLevels&#160;<span class='sym_p'><span>(&#160;MeshPtr&amp; <i>mesh</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;MeshLodGenerator&#39; class.</div>
+<span class='iname_a'>MeshLodGenerator::_process&#160;<span class='sym_p'><span>(&#160;struct LodConfig&amp; <i>lodConfig</i></span>, <span>LodCollapseCost* <i>cost</i></span>, <span>struct LodData* <i>data</i></span>, <span>LodInputProvider* <i>input</i></span>, <span>LodOutputProvider* <i>output</i></span>, <span>LodCollapser* <i>collapser</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;MeshLodGenerator&#39; class.</div>
+ <b>...</b>
+<br/>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='Symbol_Problems_High'></a><a name='Interface_Problems_High'></a>
+<h2>Problems with Symbols, High Severity <span class='failed'>&nbsp;19&nbsp;</span></h2><hr/>
+<span class='h_name'>OgreLodCollapseCostProfiler.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_101')">
+<span class='ext'>[+]</span> LodCollapseCostProfiler::injectProfile&#160;<span class='sym_p'><span>(&#160;struct LodData* <span class='color_p'>data</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_101" style="display:none;">
+
+<span class='mngl pleft'>_ZN4Ogre23LodCollapseCostProfiler13injectProfileEPNS_7LodDataE</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>This method became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>_ZN4Ogre23LodCollapseCostProfiler13injectProfileEPNS_7LodDataE</b>' is private.</td>
+</tr>
+</table>
+<br/>
+</div>
+<br/>
+<span class='h_name'>OgreLodConfigSerializer.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_102')">
+<span class='ext'>[+]</span> LodConfigSerializer::calcLodAdvancedInfoSize&#160;<span class='sym_p'>(&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_102" style="display:none;">
+
+<span class='mngl pleft'>_ZN4Ogre19LodConfigSerializer23calcLodAdvancedInfoSizeEv</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>This method became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>_ZN4Ogre19LodConfigSerializer23calcLodAdvancedInfoSizeEv</b>' is private.</td>
+</tr>
+</table>
+<br/>
+</div>
+<span class="section" onclick="javascript:showContent(this, 'c_103')">
+<span class='ext'>[+]</span> LodConfigSerializer::calcLodBasicInfoSize&#160;<span class='sym_p'>(&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_103" style="display:none;">
+
+<span class='mngl pleft'>_ZN4Ogre19LodConfigSerializer20calcLodBasicInfoSizeEv</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>This method became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>_ZN4Ogre19LodConfigSerializer20calcLodBasicInfoSizeEv</b>' is private.</td>
+</tr>
+</table>
+<br/>
+</div>
+<span class="section" onclick="javascript:showContent(this, 'c_104')">
+<span class='ext'>[+]</span> LodConfigSerializer::calcLodConfigSize&#160;<span class='sym_p'>(&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_104" style="display:none;">
+
+<span class='mngl pleft'>_ZN4Ogre19LodConfigSerializer17calcLodConfigSizeEv</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>This method became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>_ZN4Ogre19LodConfigSerializer17calcLodConfigSizeEv</b>' is private.</td>
+</tr>
+</table>
+<br/>
+</div>
+<span class="section" onclick="javascript:showContent(this, 'c_105')">
+<span class='ext'>[+]</span> LodConfigSerializer::calcLodLevelsSize&#160;<span class='sym_p'>(&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_105" style="display:none;">
+
+<span class='mngl pleft'>_ZN4Ogre19LodConfigSerializer17calcLodLevelsSizeEv</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>This method became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>_ZN4Ogre19LodConfigSerializer17calcLodLevelsSizeEv</b>' is private.</td>
+</tr>
+</table>
+<br/>
+</div>
+<span class="section" onclick="javascript:showContent(this, 'c_106')">
+<span class='ext'>[+]</span> LodConfigSerializer::calcLodProfileSize&#160;<span class='sym_p'>(&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_106" style="display:none;">
+
+<span class='mngl pleft'>_ZN4Ogre19LodConfigSerializer18calcLodProfileSizeEv</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>This method became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>_ZN4Ogre19LodConfigSerializer18calcLodProfileSizeEv</b>' is private.</td>
+</tr>
+</table>
+<br/>
+</div>
+<span class="section" onclick="javascript:showContent(this, 'c_107')">
+<span class='ext'>[+]</span> LodConfigSerializer::readLodAdvancedInfo&#160;<span class='sym_p'>(&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_107" style="display:none;">
+
+<span class='mngl pleft'>_ZN4Ogre19LodConfigSerializer19readLodAdvancedInfoEv</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>This method became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>_ZN4Ogre19LodConfigSerializer19readLodAdvancedInfoEv</b>' is private.</td>
+</tr>
+</table>
+<br/>
+</div>
+<span class="section" onclick="javascript:showContent(this, 'c_108')">
+<span class='ext'>[+]</span> LodConfigSerializer::readLodBasicInfo&#160;<span class='sym_p'>(&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_108" style="display:none;">
+
+<span class='mngl pleft'>_ZN4Ogre19LodConfigSerializer16readLodBasicInfoEv</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>This method became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>_ZN4Ogre19LodConfigSerializer16readLodBasicInfoEv</b>' is private.</td>
+</tr>
+</table>
+<br/>
+</div>
+<span class="section" onclick="javascript:showContent(this, 'c_109')">
+<span class='ext'>[+]</span> LodConfigSerializer::readLodConfig&#160;<span class='sym_p'>(&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_109" style="display:none;">
+
+<span class='mngl pleft'>_ZN4Ogre19LodConfigSerializer13readLodConfigEv</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>This method became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>_ZN4Ogre19LodConfigSerializer13readLodConfigEv</b>' is private.</td>
+</tr>
+</table>
+<br/>
+</div>
+<span class="section" onclick="javascript:showContent(this, 'c_110')">
+<span class='ext'>[+]</span> LodConfigSerializer::readLodLevels&#160;<span class='sym_p'>(&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_110" style="display:none;">
+
+<span class='mngl pleft'>_ZN4Ogre19LodConfigSerializer13readLodLevelsEv</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>This method became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>_ZN4Ogre19LodConfigSerializer13readLodLevelsEv</b>' is private.</td>
+</tr>
+</table>
+<br/>
+</div>
+<span class="section" onclick="javascript:showContent(this, 'c_111')">
+<span class='ext'>[+]</span> LodConfigSerializer::readLodProfile&#160;<span class='sym_p'>(&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_111" style="display:none;">
+
+<span class='mngl pleft'>_ZN4Ogre19LodConfigSerializer14readLodProfileEv</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>This method became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>_ZN4Ogre19LodConfigSerializer14readLodProfileEv</b>' is private.</td>
+</tr>
+</table>
+<br/>
+</div>
+<span class="section" onclick="javascript:showContent(this, 'c_112')">
+<span class='ext'>[+]</span> LodConfigSerializer::writeLodAdvancedInfo&#160;<span class='sym_p'>(&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_112" style="display:none;">
+
+<span class='mngl pleft'>_ZN4Ogre19LodConfigSerializer20writeLodAdvancedInfoEv</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>This method became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>_ZN4Ogre19LodConfigSerializer20writeLodAdvancedInfoEv</b>' is private.</td>
+</tr>
+</table>
+<br/>
+</div>
+<span class="section" onclick="javascript:showContent(this, 'c_113')">
+<span class='ext'>[+]</span> LodConfigSerializer::writeLodBasicInfo&#160;<span class='sym_p'>(&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_113" style="display:none;">
+
+<span class='mngl pleft'>_ZN4Ogre19LodConfigSerializer17writeLodBasicInfoEv</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>This method became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>_ZN4Ogre19LodConfigSerializer17writeLodBasicInfoEv</b>' is private.</td>
+</tr>
+</table>
+<br/>
+</div>
+<span class="section" onclick="javascript:showContent(this, 'c_114')">
+<span class='ext'>[+]</span> LodConfigSerializer::writeLodConfig&#160;<span class='sym_p'>(&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_114" style="display:none;">
+
+<span class='mngl pleft'>_ZN4Ogre19LodConfigSerializer14writeLodConfigEv</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>This method became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>_ZN4Ogre19LodConfigSerializer14writeLodConfigEv</b>' is private.</td>
+</tr>
+</table>
+<br/>
+</div>
+<span class="section" onclick="javascript:showContent(this, 'c_115')">
+<span class='ext'>[+]</span> LodConfigSerializer::writeLodLevels&#160;<span class='sym_p'>(&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_115" style="display:none;">
+
+<span class='mngl pleft'>_ZN4Ogre19LodConfigSerializer14writeLodLevelsEv</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>This method became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>_ZN4Ogre19LodConfigSerializer14writeLodLevelsEv</b>' is private.</td>
+</tr>
+</table>
+<br/>
+</div>
+<span class="section" onclick="javascript:showContent(this, 'c_116')">
+<span class='ext'>[+]</span> LodConfigSerializer::writeLodProfile&#160;<span class='sym_p'>(&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_116" style="display:none;">
+
+<span class='mngl pleft'>_ZN4Ogre19LodConfigSerializer15writeLodProfileEv</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>This method became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>_ZN4Ogre19LodConfigSerializer15writeLodProfileEv</b>' is private.</td>
+</tr>
+</table>
+<br/>
+</div>
+<br/>
+<span class='h_name'>OgreMeshLodGenerator.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_117')">
+<span class='ext'>[+]</span> MeshLodGenerator::_process&#160;<span class='sym_p'><span>(&#160;struct LodConfig&amp; <span class='color_p'>lodConfig</span></span>, <span>LodCollapseCost* <span class='color_p'>cost</span></span>, <span>struct LodData* <span class='color_p'>data</span></span>, <span>LodInputProvider* <span class='color_p'>input</span></span>, <span>LodOutputProvider* <span class='color_p'>output</span></span>, <span>LodCollapser* <span class='color_p'>collapser</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_117" style="display:none;">
+
+<span class='mngl pleft'>_ZN4Ogre16MeshLodGenerator8_processERNS_9LodConfigEPNS_15LodCollapseCostEPNS_7LodDataEPNS_16LodInputProviderEPNS_17LodOutputProviderEPNS_12LodCollapserE</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>This method became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>_ZN4Ogre16MeshLodGenerator8_processERNS_9LodConfigEPNS_15LodCollapseCostEPNS_7LodDataEPNS_16LodInputProviderEPNS_17LodOutputProviderEPNS_12LodCollapserE</b>' is private.</td>
+</tr>
+</table>
+<br/>
+</div>
+<span class="section" onclick="javascript:showContent(this, 'c_118')">
+<span class='ext'>[+]</span> MeshLodGenerator::calcLodVertexCount&#160;<span class='sym_p'><span>(&#160;struct LodLevel const&amp; <span class='color_p'>lodLevel</span></span>, <span>size_t <span class='color_p'>uniqueVertexCount</span></span>, <span>size_t&amp; <span class='color_p'>outVertexCountLimit</span></span>, <span>Real&amp; <span class='color_p'>outCollapseCostLimit</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_118" style="display:none;">
+
+<span class='mngl pleft'>_ZN4Ogre16MeshLodGenerator18calcLodVertexCountERKNS_8LodLevelEmRmRf</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>This method became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>_ZN4Ogre16MeshLodGenerator18calcLodVertexCountERKNS_8LodLevelEmRmRf</b>' is private.</td>
+</tr>
+</table>
+<br/>
+</div>
+<span class="section" onclick="javascript:showContent(this, 'c_119')">
+<span class='ext'>[+]</span> MeshLodGenerator::computeLods&#160;<span class='sym_p'><span>(&#160;struct LodConfig&amp; <span class='color_p'>lodConfig</span></span>, <span>struct LodData* <span class='color_p'>data</span></span>, <span>LodCollapseCost* <span class='color_p'>cost</span></span>, <span>LodOutputProvider* <span class='color_p'>output</span></span>, <span>LodCollapser* <span class='color_p'>collapser</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_119" style="display:none;">
+
+<span class='mngl pleft'>_ZN4Ogre16MeshLodGenerator11computeLodsERNS_9LodConfigEPNS_7LodDataEPNS_15LodCollapseCostEPNS_17LodOutputProviderEPNS_12LodCollapserE</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>This method became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>_ZN4Ogre16MeshLodGenerator11computeLodsERNS_9LodConfigEPNS_7LodDataEPNS_15LodCollapseCostEPNS_17LodOutputProviderEPNS_12LodCollapserE</b>' is private.</td>
+</tr>
+</table>
+<br/>
+</div>
+<br/>
+<a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='Medium_Risk_Problems'></a><a name='Type_Problems_Medium'></a>
+<h2>Problems with Data Types, Medium Severity <span class='failed'>&nbsp;11&nbsp;</span></h2><hr/>
+<span class='h_name'>OgreHardwareVertexBuffer.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_120')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> VertexBufferBinding <span class='failed'>&nbsp;2&nbsp;</span></span>
+<br/>
+<div id="c_120" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Field <b>mBindingMap</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>VertexBufferBinding</b>::<b>mBindingMap</b>' is private.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>Field <b>mHighIndex</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>VertexBufferBinding</b>::<b>mHighIndex</b>' is private.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_121')">
+[+] affected symbols: 2 (0.5%)</span>
+<div id="c_121" style="display:none;">
+<div class='affected'><span class='iname_a'>LodVertexBuffer::fillBuffer&#160;<span class='sym_p'><span>(&#160;VertexData* <span class='fp'>data</span></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;data.vertexBufferBinding&#39; in 1st parameter &#39;data&#39; (pointer) has base type &#39;VertexBufferBinding&#39;.</div>
+<span class='iname_a'>LodInputProviderMesh::addVertexData&#160;<span class='sym_p'><span>(&#160;struct LodData* <i>data</i></span>, <span>VertexData* <span class='fp'>vertexData</span></span>, <span>bool <i>useSharedVertexLookup</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;vertexData.vertexBufferBinding&#39; in 2nd parameter &#39;vertexData&#39; (pointer) has base type &#39;VertexBufferBinding&#39;.</div>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<span class='h_name'>OgreLodCollapseCostOutside.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_122')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> LodCollapseCostOutside <span class='failed'>&nbsp;4&nbsp;</span></span>
+<br/>
+<div id="c_122" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Field <b>mCostCalculator</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>LodCollapseCostOutside</b>::<b>mCostCalculator</b>' is private.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>Field <b>mOutsideMarker</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>LodCollapseCostOutside</b>::<b>mOutsideMarker</b>' is private.</td>
+</tr>
+<tr>
+<th>3</th>
+<td>Field <b>mOutsideWalkAngle</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>LodCollapseCostOutside</b>::<b>mOutsideWalkAngle</b>' is private.</td>
+</tr>
+<tr>
+<th>4</th>
+<td>Field <b>mOutsideWeight</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>LodCollapseCostOutside</b>::<b>mOutsideWeight</b>' is private.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_123')">
+[+] affected symbols: 4 (0.9%)</span>
+<div id="c_123" style="display:none;">
+<div class='affected'><span class='iname_a'>LodCollapseCostOutside::initCollapseCosts&#160;<span class='sym_p'><span>(&#160;struct LodData* <i>data</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;LodCollapseCostOutside&#39; class.</div>
+<span class='iname_a'>LodCollapseCostOutside::computeEdgeCollapseCost&#160;<span class='sym_p'><span>(&#160;struct LodData* <i>data</i></span>, <span>struct LodData::Vertex* <i>src</i></span>, <span>struct LodData::Edge* <i>dstEdge</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;LodCollapseCostOutside&#39; class.</div>
+<span class='iname_a'>LodCollapseCostOutside::LodCollapseCostOutside&#160;<span class='sym_p'><span>(&#160;LodCollapseCostPtr <i>costCalculator</i></span>, <span>Real <i>outsideWeight</i></span>, <span>Real <i>outsideWalkAngle</i></span>&#160;)</span></span><br/>
+<div class='affect'>This constructor is from &#39;LodCollapseCostOutside&#39; class.</div>
+<span class='iname_a'>LodCollapseCostOutside::~LodCollapseCostOutside&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This destructor is from &#39;LodCollapseCostOutside&#39; class.</div>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<span class='h_name'>OgreLodCollapseCostProfiler.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_124')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> LodCollapseCostProfiler <span class='failed'>&nbsp;4&nbsp;</span></span>
+<br/>
+<div id="c_124" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Field <b>mCostCalculator</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>LodCollapseCostProfiler</b>::<b>mCostCalculator</b>' is private.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>Field <b>mHasProfile</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>LodCollapseCostProfiler</b>::<b>mHasProfile</b>' is private.</td>
+</tr>
+<tr>
+<th>3</th>
+<td>Field <b>mProfile</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>LodCollapseCostProfiler</b>::<b>mProfile</b>' is private.</td>
+</tr>
+<tr>
+<th>4</th>
+<td>Field <b>mProfileLookup</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>LodCollapseCostProfiler</b>::<b>mProfileLookup</b>' is private.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_125')">
+[+] affected symbols: 6 (1.4%)</span>
+<div id="c_125" style="display:none;">
+<div class='affected'><span class='iname_a'>LodCollapseCostProfiler::injectProfile&#160;<span class='sym_p'><span>(&#160;struct LodData* <i>data</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;LodCollapseCostProfiler&#39; class.</div>
+<span class='iname_a'>LodCollapseCostProfiler::initCollapseCosts&#160;<span class='sym_p'><span>(&#160;struct LodData* <i>data</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;LodCollapseCostProfiler&#39; class.</div>
+<span class='iname_a'>LodCollapseCostProfiler::computeEdgeCollapseCost&#160;<span class='sym_p'><span>(&#160;struct LodData* <i>data</i></span>, <span>struct LodData::Vertex* <i>src</i></span>, <span>struct LodData::Edge* <i>dstEdge</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;LodCollapseCostProfiler&#39; class.</div>
+<span class='iname_a'>LodCollapseCostProfiler::computeVertexCollapseCost&#160;<span class='sym_p'><span>(&#160;struct LodData* <i>data</i></span>, <span>struct LodData::Vertex* <i>vertex</i></span>, <span>Real&amp; <i>collapseCost</i></span>, <span>struct LodData::Vertex*&amp; <i>collapseTo</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;LodCollapseCostProfiler&#39; class.</div>
+<span class='iname_a'>LodCollapseCostProfiler::LodCollapseCostProfiler&#160;<span class='sym_p'><span>(&#160;LodProfile&amp; <i>profile</i></span>, <span>LodCollapseCostPtr&amp; <i>costCalculator</i></span>&#160;)</span></span><br/>
+<div class='affect'>This constructor is from &#39;LodCollapseCostProfiler&#39; class.</div>
+<span class='iname_a'>LodCollapseCostProfiler::~LodCollapseCostProfiler&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This destructor is from &#39;LodCollapseCostProfiler&#39; class.</div>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<span class='h_name'>OgreLodConfigSerializer.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_126')">
+<span class='ext'>[+]</span> <span class='ttype'>class</span> LodConfigSerializer <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_126" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Field <b>mLodConfig</b> became <b>private</b>.</td>
+<td>Recompilation of a client program may be broken with the error message: '<b>LodConfigSerializer</b>::<b>mLodConfig</b>' is private.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_127')">
+[+] affected symbols: 20 (4.6%)</span>
+<div id="c_127" style="display:none;">
+<div class='affected'><span class='iname_a'>LodConfigSerializer::readLodConfig&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;LodConfigSerializer&#39; class.</div>
+<span class='iname_a'>LodConfigSerializer::readLodLevels&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;LodConfigSerializer&#39; class.</div>
+<span class='iname_a'>LodConfigSerializer::readLodProfile&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;LodConfigSerializer&#39; class.</div>
+<span class='iname_a'>LodConfigSerializer::writeLodConfig&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;LodConfigSerializer&#39; class.</div>
+<span class='iname_a'>LodConfigSerializer::writeLodLevels&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;LodConfigSerializer&#39; class.</div>
+<span class='iname_a'>LodConfigSerializer::exportLodConfig&#160;<span class='sym_p'><span>(&#160;struct LodConfig&amp; <i>config</i></span>, <span>DataStreamPtr <i>stream</i></span>, <span>enum Serializer::Endian <i>endianMode</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;LodConfigSerializer&#39; class.</div>
+<span class='iname_a'>LodConfigSerializer::exportLodConfig&#160;<span class='sym_p'><span>(&#160;struct LodConfig&amp; <i>config</i></span>, <span>String const&amp; <i>filename</i></span>, <span>enum Serializer::Endian <i>endianMode</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;LodConfigSerializer&#39; class.</div>
+<span class='iname_a'>LodConfigSerializer::importLodConfig&#160;<span class='sym_p'><span>(&#160;struct LodConfig* <i>config</i></span>, <span>String const&amp; <i>filename</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;LodConfigSerializer&#39; class.</div>
+<span class='iname_a'>LodConfigSerializer::importLodConfig&#160;<span class='sym_p'><span>(&#160;struct LodConfig* <i>config</i></span>, <span>DataStreamPtr&amp; <i>stream</i></span>&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;LodConfigSerializer&#39; class.</div>
+<span class='iname_a'>LodConfigSerializer::writeLodProfile&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This method is from &#39;LodConfigSerializer&#39; class.</div>
+ <b>...</b>
+<br/>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='Symbol_Problems_Medium'></a><a name='Interface_Problems_Medium'></a>
+<h2>Problems with Symbols, Medium Severity <span class='failed'>&nbsp;1&nbsp;</span></h2><hr/>
+<span class='h_name'>OgreLodInputProvider.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_128')">
+<span class='ext'>[+]</span> LodInputProvider::printTriangle&#160;<span class='sym_p'><span>(&#160;struct LodData::Triangle* <span class='color_p'>triangle</span></span>, <span>stringstream&amp; <span class='color_p'>str</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_128" style="display:none;">
+
+
+<span class='new_sign_lbl'>&#8675;</span>
+<br/>
+<span class='new_sign'>LodInputProvider::printTriangle&#160;<span class='sym_p'><span>(&#160;struct LodData::Triangle* <span class='color_p'>triangle</span></span>, <span>std::ostream&amp; <span class='color_p'>str</span></span>&#160;)</span></span><br/>
+<span class='mngl pleft'>_ZN4Ogre16LodInputProvider13printTriangleEPNS_7LodData8TriangleERNSt7__cxx1118basic_stringstreamIcSt11char_traitsIcESaIcEEE</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>Parameters list has been changed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+</table>
+<br/>
+</div>
+<br/>
+<a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='Low_Risk_Problems'></a><a name='Type_Problems_Low'></a>
+<h2>Problems with Data Types, Low Severity <span class='warning'>&nbsp;4&nbsp;</span></h2><hr/>
+<span class='h_name'>OgreCommon.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_129')">
+<span class='ext'>[+]</span> <span class='ttype'>typedef</span> String <span class='warning'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_129" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Base type has been changed from <b>_StringBase</b> to <b>std::string</b>.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_130')">
+[+] affected symbols: 7 (1.6%)</span>
+<div id="c_130" style="display:none;">
+<div class='affected'><span class='iname_a'>LodOutsideMarker::createConvexHullMesh&#160;<span class='sym_p'><span>(&#160;String const&amp; <span class='fp'>meshName</span></span>, <span>String const&amp; <i>resourceGroupName</i></span>&#160;)</span></span><br/>
+<div class='affect'>1st parameter &#39;meshName&#39; (reference) has base type &#39;String&#39;.</div>
+<span class='iname_a'>LodConfigSerializer::exportLodConfig&#160;<span class='sym_p'><span>(&#160;struct LodConfig&amp; <i>config</i></span>, <span>String const&amp; <span class='fp'>filename</span></span>, <span>enum Serializer::Endian <i>endianMode</i></span>&#160;)</span></span><br/>
+<div class='affect'>2nd parameter &#39;filename&#39; (reference) has base type &#39;String&#39;.</div>
+<span class='iname_a'>LodConfigSerializer::importLodConfig&#160;<span class='sym_p'><span>(&#160;struct LodConfig* <i>config</i></span>, <span>String const&amp; <span class='fp'>filename</span></span>&#160;)</span></span><br/>
+<div class='affect'>2nd parameter &#39;filename&#39; (reference) has base type &#39;String&#39;.</div>
+<span class='iname_a'>LodOutputProviderMesh::bakeManualLodLevel&#160;<span class='sym_p'><span>(&#160;struct LodData* <i>data</i></span>, <span>String&amp; <span class='fp'>manualMeshName</span></span>, <span>int <i>lodIndex</i></span>&#160;)</span></span><br/>
+<div class='affect'>2nd parameter &#39;manualMeshName&#39; (reference) has base type &#39;String&#39;.</div>
+<span class='iname_a'>LodOutputProviderBuffer::bakeManualLodLevel&#160;<span class='sym_p'><span>(&#160;struct LodData* <i>data</i></span>, <span>String&amp; <span class='fp'>manualMeshName</span></span>, <span>int <i>lodIndex</i></span>&#160;)</span></span><br/>
+<div class='affect'>2nd parameter &#39;manualMeshName&#39; (reference) has base type &#39;String&#39;.</div>
+<span class='iname_a'>LodOutputProviderCompressedMesh::bakeManualLodLevel&#160;<span class='sym_p'><span>(&#160;struct LodData* <i>data</i></span>, <span>String&amp; <span class='fp'>manualMeshName</span></span>, <span>int <i>lodIndex</i></span>&#160;)</span></span><br/>
+<div class='affect'>2nd parameter &#39;manualMeshName&#39; (reference) has base type &#39;String&#39;.</div>
+<span class='iname_a'>LodConfig::createManualLodLevel&#160;<span class='sym_p'><span>(&#160;Real <i>distance</i></span>, <span>String const&amp; <span class='fp'>manualMeshName</span></span>&#160;)</span></span><br/>
+<div class='affect'>2nd parameter &#39;manualMeshName&#39; (reference) has base type &#39;String&#39;.</div>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<span class='h_name'>OgreLodWorkQueueRequest.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_131')">
+<span class='ext'>[+]</span> <span class='ttype'>struct</span> LodWorkQueueRequest <span class='warning'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_131" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Field <b>isCancelled</b> has been added to this type.</td>
+<td>This field will not be initialized or used by old client applications.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_132')">
+[+] affected symbols: 2 (0.5%)</span>
+<div id="c_132" style="display:none;">
+<div class='affected'><span class='iname_a'>LodWorkQueueRequest::LodWorkQueueRequest&#160;<span class='sym_p'>(&#160;)</span></span><br/>
+<div class='affect'>This constructor is from &#39;struct LodWorkQueueRequest&#39; class.</div>
+<span class='iname_a'>Any::Any&lt;LodWorkQueueRequest*&gt;&#160;<span class='sym_p'><span>(&#160;struct LodWorkQueueRequest*const&amp; <span class='fp'>value</span></span>&#160;)</span></span><br/>
+<div class='affect'>1st parameter &#39;value&#39; (reference) has base type &#39;struct LodWorkQueueRequest&#39;.</div>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<span class='h_name'>OgrePrerequisites.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_133')">
+<span class='ext'>[+]</span> <span class='ttype'>typedef</span> HardwareIndexBufferSharedPtr <span class='warning'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_133" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Base type has been changed from <b>SharedPtr&lt;HardwareIndexBuffer&gt;</b> to <b>HardwareIndexBufferPtr</b>.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_134')">
+[+] affected symbols: 2 (0.5%)</span>
+<div id="c_134" style="display:none;">
+<div class='affected'><span class='iname_a'>LodIndexBuffer::fillBuffer&#160;<span class='sym_p'><span>(&#160;IndexData* <span class='fp'>data</span></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;data.indexBuffer&#39; in 1st parameter &#39;data&#39; (pointer) is of type &#39;HardwareIndexBufferSharedPtr&#39;.</div>
+<span class='iname_a'>LodInputProviderMesh::addIndexData&#160;<span class='sym_p'><span>(&#160;struct LodData* <i>data</i></span>, <span>IndexData* <span class='fp'>indexData</span></span>, <span>bool <i>useSharedVertexLookup</i></span>, <span>ushort <i>submeshID</i></span>, <span>enum RenderOperation::OperationType <i>renderOp</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;indexData.indexBuffer&#39; in 2nd parameter &#39;indexData&#39; (pointer) is of type &#39;HardwareIndexBufferSharedPtr&#39;.</div>
+</div>
+</div>
+<br/><br/></div>
+
+<span class="section" onclick="javascript:showContent(this, 'c_135')">
+<span class='ext'>[+]</span> <span class='ttype'>typedef</span> HardwareVertexBufferSharedPtr <span class='warning'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_135" style="display:none;">
+<table class='ptable'><tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th></tr><tr>
+<th>1</th>
+<td>Base type has been changed from <b>SharedPtr&lt;HardwareVertexBuffer&gt;</b> to <b>HardwareVertexBufferPtr</b>.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+</table>
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_136')">
+[+] affected symbols: 2 (0.5%)</span>
+<div id="c_136" style="display:none;">
+<div class='affected'><span class='iname_a'>LodVertexBuffer::fillBuffer&#160;<span class='sym_p'><span>(&#160;VertexData* <span class='fp'>data</span></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;data.hardwareShadowVolWBuffer&#39; in 1st parameter &#39;data&#39; (pointer) is of type &#39;HardwareVertexBufferSharedPtr&#39;.</div>
+<span class='iname_a'>LodInputProviderMesh::addVertexData&#160;<span class='sym_p'><span>(&#160;struct LodData* <i>data</i></span>, <span>VertexData* <span class='fp'>vertexData</span></span>, <span>bool <i>useSharedVertexLookup</i></span>&#160;)</span></span><br/>
+<div class='affect'>Field &#39;vertexData.hardwareShadowVolWBuffer&#39; in 2nd parameter &#39;vertexData&#39; (pointer) is of type &#39;HardwareVertexBufferSharedPtr&#39;.</div>
+</div>
+</div>
+<br/><br/></div>
+
+<br/>
+<a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='Headers'></a><h2>Header Files <span class='gray'>&nbsp;41&nbsp;</span></h2><hr/>
+<div class='h_list'>
+OgreAny.h<br/>
+OgreCommon.h<br/>
+OgreHardwareVertexBuffer.h<br/>
+OgreLodBuffer.h<br/>
+OgreLodCollapseCost.h<br/>
+OgreLodCollapseCostCurvature.h<br/>
+OgreLodCollapseCostOutside.h<br/>
+OgreLodCollapseCostProfiler.h<br/>
+OgreLodCollapseCostQuadric.h<br/>
+OgreLodCollapser.h<br/>
+OgreLodConfig.h<br/>
+OgreLodConfigSerializer.h<br/>
+OgreLodData.h<br/>
+OgreLodInputProvider.h<br/>
+OgreLodInputProviderBuffer.h<br/>
+OgreLodInputProviderMesh.h<br/>
+OgreLodOutputProvider.h<br/>
+OgreLodOutputProviderBuffer.h<br/>
+OgreLodOutputProviderCompressedBuffer.h<br/>
+OgreLodOutputProviderCompressedMesh.h<br/>
+OgreLodOutputProviderMesh.h<br/>
+OgreLodOutsideMarker.h<br/>
+OgreLodPrerequisites.h<br/>
+OgreLodWorkQueueInjector.h<br/>
+OgreLodWorkQueueInjectorListener.h<br/>
+OgreLodWorkQueueRequest.h<br/>
+OgreLodWorkQueueWorker.h<br/>
+OgreMatrix4.h<br/>
+OgreMemoryAllocatorConfig.h<br/>
+OgreMeshLodGenerator.h<br/>
+OgrePlatform.h<br/>
+OgrePrerequisites.h<br/>
+OgreRenderOperation.h<br/>
+OgreSerializer.h<br/>
+OgreSharedPtr.h<br/>
+OgreSingleton.h<br/>
+OgreSmallVector.h<br/>
+OgreVector.h<br/>
+OgreVectorSet.h<br/>
+OgreVertexIndexData.h<br/>
+OgreWorkQueue.h<br/>
+</div>
+<br/><a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='Sources'></a><h2>Source Files <span class='gray'>&nbsp;21&nbsp;</span></h2><hr/>
+<div class='h_list'>
+OgreLodBuffer.cpp<br/>
+OgreLodCollapseCost.cpp<br/>
+OgreLodCollapseCostCurvature.cpp<br/>
+OgreLodCollapseCostOutside.cpp<br/>
+OgreLodCollapseCostProfiler.cpp<br/>
+OgreLodCollapseCostQuadric.cpp<br/>
+OgreLodCollapser.cpp<br/>
+OgreLodConfig.cpp<br/>
+OgreLodConfigSerializer.cpp<br/>
+OgreLodData.cpp<br/>
+OgreLodInputProvider.cpp<br/>
+OgreLodInputProviderBuffer.cpp<br/>
+OgreLodInputProviderMesh.cpp<br/>
+OgreLodOutputProviderBuffer.cpp<br/>
+OgreLodOutputProviderCompressedBuffer.cpp<br/>
+OgreLodOutputProviderCompressedMesh.cpp<br/>
+OgreLodOutputProviderMesh.cpp<br/>
+OgreLodOutsideMarker.cpp<br/>
+OgreLodWorkQueueInjector.cpp<br/>
+OgreLodWorkQueueWorker.cpp<br/>
+OgreMeshLodGenerator.cpp<br/>
+</div>
+<br/><a class='top_ref' href='#Top'>to the top</a><br/>
+<a name='Libs'></a><h2>Objects <span class='gray'>&nbsp;1&nbsp;</span></h2><hr/>
+<div class='lib_list'>
+libOgreMeshLodGenerator.so.1.12.13<br/>
+</div>
+<br/><a class='top_ref' href='#Top'>to the top</a><br/>
+</div>
+<br/><br/><br/>
+<hr/>
+<div class='footer' align='right'><i>Generated by <a href='https://github.com/lvc/abi-compliance-checker'>ABI Compliance Checker</a> 2.3 &#160;</i>
+</div>
+<br/>
+
+</body></html>

@@ -1,4 +1,4 @@
-<!-- verdict:incompatible;affected:31.3;added:51;removed:73;type_problems_high:105;type_problems_medium:5;type_problems_low:113;interface_problems_high:4;interface_problems_medium:23;interface_problems_low:0;changed_constants:0;type_changes_other:184;interface_changes_other:2;tool_version:2.3 -->
+<!-- verdict:incompatible;affected:31.6;added:51;removed:73;type_problems_high:105;type_problems_medium:5;type_problems_low:113;interface_problems_high:4;interface_problems_medium:28;interface_problems_low:0;changed_constants:0;type_changes_other:184;interface_changes_other:2;tool_version:2.3 -->
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
@@ -302,7 +302,7 @@ function showContent(header, id)
 <tr><th>Total Objects</th><td><a href='#Libs' style='color:Blue;'>1</a></td></tr>
 <tr><th>Total Symbols / Types</th><td>1120 / 316</td></tr>
 <tr><th>Compatibility</th>
-<td class='incompatible'>68.7%</td>
+<td class='incompatible'>68.4%</td>
 </tr>
 </table>
 <h2>Problem Summary</h2><hr/>
@@ -312,7 +312,7 @@ function showContent(header, id)
 <tr><td>Medium</td><td class='failed'><a href='#Type_Problems_Medium' style='color:Blue;'>5</a></td></tr>
 <tr><td>Low</td><td class='warning'><a href='#Type_Problems_Low' style='color:Blue;'>113</a></td></tr>
 <tr><th rowspan='3'>Problems with<br/>Symbols</th><td>High</td><td class='failed'><a href='#Symbol_Problems_High' style='color:Blue;'>4</a></td></tr>
-<tr><td>Medium</td><td class='failed'><a href='#Symbol_Problems_Medium' style='color:Blue;'>23</a></td></tr>
+<tr><td>Medium</td><td class='failed'><a href='#Symbol_Problems_Medium' style='color:Blue;'>28</a></td></tr>
 <tr><td>Low</td><td>0</td></tr>
 <tr><th>Problems with<br/>Constants</th><td>Low</td><td>0</td></tr>
 <tr><th>Other Changes<br/>in Data Types</th><td>-</td><td class='passed'><a href='#Other_Changes_In_Types' style='color:Blue;'>184</a></td></tr>
@@ -2842,13 +2842,139 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 <br/>
 <a class='top_ref' href='#Top'>to the top</a><br/>
 <a name='Symbol_Problems_Medium'></a><a name='Interface_Problems_Medium'></a>
-<h2>Problems with Symbols, Medium Severity <span class='failed'>&nbsp;23&nbsp;</span></h2><hr/>
-<span class='h_name'>OgreShaderExHardwareSkinning.h</span><br/>
-<span class='ns'>namespace <b>Ogre::RTShader</b></span><br/>
+<h2>Problems with Symbols, Medium Severity <span class='failed'>&nbsp;28&nbsp;</span></h2><hr/>
+<span class='h_name'>OgreResourceGroupManager.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
 <span class="section" onclick="javascript:showContent(this, 'c_528')">
-<span class='ext'>[+]</span> HardwareSkinningFactory::imprintSkeletonData&#160;<span class='sym_p'><span>(&#160;std::shared_ptr&lt;Ogre::DataStream&gt;const&amp; <span class='color_p'>pMaterial</span></span>, <span>bool <span class='color_p'>isVaild</span></span>, <span>Ogre::ushort <span class='color_p'>boneCount</span></span>, <span>Ogre::ushort <span class='color_p'>weightCount</span></span>, <span>enum SkinningType <span class='color_p'>skinningType</span></span>, <span>bool <span class='color_p'>correctAntidpodalityHandling</span></span>, <span>bool <span class='color_p'>scalingShearingSupport</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
+<span class='ext'>[+]</span> ResourceGroupListener::resourceCreated&#160;<span class='sym_p'><span>(&#160;std::shared_ptr&lt;DataStream&gt;const&amp; <span class='color_p'>p1</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
 <br/>
 <div id="c_528" style="display:none;">
+
+
+<span class='new_sign_lbl'>&#8675;</span>
+<br/>
+<span class='new_sign'>ResourceGroupListener::resourceCreated&#160;<span class='sym_p'><span>(&#160;SharedPtr&lt;Resource&gt;const&amp; <span class='color_p'>p1</span></span>&#160;)</span></span><br/>
+<span class='mngl pleft'>_ZN4Ogre21ResourceGroupListener15resourceCreatedERKSt10shared_ptrINS_8ResourceEE</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>Parameters list has been changed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+</table>
+<br/>
+</div>
+<span class="section" onclick="javascript:showContent(this, 'c_529')">
+<span class='ext'>[+]</span> ResourceGroupListener::resourceLoadStarted&#160;<span class='sym_p'><span>(&#160;std::shared_ptr&lt;DataStream&gt;const&amp; <span class='color_p'>p1</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_529" style="display:none;">
+
+
+<span class='new_sign_lbl'>&#8675;</span>
+<br/>
+<span class='new_sign'>ResourceGroupListener::resourceLoadStarted&#160;<span class='sym_p'><span>(&#160;SharedPtr&lt;Resource&gt;const&amp; <span class='color_p'>p1</span></span>&#160;)</span></span><br/>
+<span class='mngl pleft'>_ZN4Ogre21ResourceGroupListener19resourceLoadStartedERKSt10shared_ptrINS_8ResourceEE</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>Parameters list has been changed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+</table>
+<br/>
+</div>
+<span class="section" onclick="javascript:showContent(this, 'c_530')">
+<span class='ext'>[+]</span> ResourceGroupListener::resourcePrepareStarted&#160;<span class='sym_p'><span>(&#160;std::shared_ptr&lt;DataStream&gt;const&amp; <span class='color_p'>p1</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_530" style="display:none;">
+
+
+<span class='new_sign_lbl'>&#8675;</span>
+<br/>
+<span class='new_sign'>ResourceGroupListener::resourcePrepareStarted&#160;<span class='sym_p'><span>(&#160;SharedPtr&lt;Resource&gt;const&amp; <span class='color_p'>p1</span></span>&#160;)</span></span><br/>
+<span class='mngl pleft'>_ZN4Ogre21ResourceGroupListener22resourcePrepareStartedERKSt10shared_ptrINS_8ResourceEE</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>Parameters list has been changed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+</table>
+<br/>
+</div>
+<span class="section" onclick="javascript:showContent(this, 'c_531')">
+<span class='ext'>[+]</span> ResourceGroupListener::resourceRemove&#160;<span class='sym_p'><span>(&#160;std::shared_ptr&lt;DataStream&gt;const&amp; <span class='color_p'>p1</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_531" style="display:none;">
+
+
+<span class='new_sign_lbl'>&#8675;</span>
+<br/>
+<span class='new_sign'>ResourceGroupListener::resourceRemove&#160;<span class='sym_p'><span>(&#160;SharedPtr&lt;Resource&gt;const&amp; <span class='color_p'>p1</span></span>&#160;)</span></span><br/>
+<span class='mngl pleft'>_ZN4Ogre21ResourceGroupListener14resourceRemoveERKSt10shared_ptrINS_8ResourceEE</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>Parameters list has been changed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+</table>
+<br/>
+</div>
+<br/>
+<span class='h_name'>OgreScriptTranslator.h</span><br/>
+<span class='ns'>namespace <b>Ogre</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_532')">
+<span class='ext'>[+]</span> ScriptTranslatorManager::getTranslator&#160;<span class='sym_p'><span>(&#160;std::shared_ptr&lt;DataStream&gt;const&amp; <span class='color_p'>p1</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_532" style="display:none;">
+
+
+<span class='new_sign_lbl'>&#8675;</span>
+<br/>
+<span class='new_sign'>ScriptTranslatorManager::getTranslator&#160;<span class='sym_p'><span>(&#160;SharedPtr&lt;AbstractNode&gt;const&amp; <span class='color_p'>p1</span></span>&#160;)</span></span><br/>
+<span class='mngl pleft'>_ZN4Ogre23ScriptTranslatorManager13getTranslatorERKSt10shared_ptrINS_12AbstractNodeEE</span><br/>
+<table class='ptable'>
+<tr>
+<th class='pn'></th>
+<th class='chg'>Change</th>
+<th>Effect</th>
+</tr>
+<tr>
+<th>1</th>
+<td>Parameters list has been changed.</td>
+<td>Recompilation of a client program may be broken.</td>
+</tr>
+</table>
+<br/>
+</div>
+<br/>
+<span class='h_name'>OgreShaderExHardwareSkinning.h</span><br/>
+<span class='ns'>namespace <b>Ogre::RTShader</b></span><br/>
+<span class="section" onclick="javascript:showContent(this, 'c_533')">
+<span class='ext'>[+]</span> HardwareSkinningFactory::imprintSkeletonData&#160;<span class='sym_p'><span>(&#160;std::shared_ptr&lt;Ogre::DataStream&gt;const&amp; <span class='color_p'>pMaterial</span></span>, <span>bool <span class='color_p'>isVaild</span></span>, <span>Ogre::ushort <span class='color_p'>boneCount</span></span>, <span>Ogre::ushort <span class='color_p'>weightCount</span></span>, <span>enum SkinningType <span class='color_p'>skinningType</span></span>, <span>bool <span class='color_p'>correctAntidpodalityHandling</span></span>, <span>bool <span class='color_p'>scalingShearingSupport</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
+<br/>
+<div id="c_533" style="display:none;">
 
 
 <span class='new_sign_lbl'>&#8675;</span>
@@ -2872,10 +2998,10 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 <br/>
 <span class='h_name'>OgreShaderExNormalMapLighting.h</span><br/>
 <span class='ns'>namespace <b>Ogre::RTShader</b></span><br/>
-<span class="section" onclick="javascript:showContent(this, 'c_529')">
+<span class="section" onclick="javascript:showContent(this, 'c_534')">
 <span class='ext'>[+]</span> NormalMapLighting::addPSIlluminationInvocation&#160;<span class='sym_p'><span>(&#160;struct PerPixelLighting::LightParams* <span class='color_p'>curLightParams</span></span>, <span>Function* <span class='color_p'>psMain</span></span>, <span>int const <span class='color_p'>groupOrder</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
 <br/>
-<div id="c_529" style="display:none;">
+<div id="c_534" style="display:none;">
 
 
 <span class='new_sign_lbl'>&#8675;</span>
@@ -2896,10 +3022,10 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 </table>
 <br/>
 </div>
-<span class="section" onclick="javascript:showContent(this, 'c_530')">
+<span class="section" onclick="javascript:showContent(this, 'c_535')">
 <span class='ext'>[+]</span> NormalMapLighting::addVSIlluminationInvocation&#160;<span class='sym_p'><span>(&#160;struct PerPixelLighting::LightParams* <span class='color_p'>curLightParams</span></span>, <span>Function* <span class='color_p'>vsMain</span></span>, <span>int const <span class='color_p'>groupOrder</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
 <br/>
-<div id="c_530" style="display:none;">
+<div id="c_535" style="display:none;">
 
 
 <span class='new_sign_lbl'>&#8675;</span>
@@ -2923,10 +3049,10 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 <br/>
 <span class='h_name'>OgreShaderExTextureAtlasSampler.h</span><br/>
 <span class='ns'>namespace <b>Ogre::RTShader</b></span><br/>
-<span class="section" onclick="javascript:showContent(this, 'c_531')">
+<span class="section" onclick="javascript:showContent(this, 'c_536')">
 <span class='ext'>[+]</span> TextureAtlasSampler::getAdressingFunctionName&#160;<span class='sym_p'><span>(&#160;enum Ogre::TextureUnitState::TextureAddressingMode <span class='color_p'>mode</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
 <br/>
-<div id="c_531" style="display:none;">
+<div id="c_536" style="display:none;">
 
 
 <span class='new_sign_lbl'>&#8675;</span>
@@ -2947,10 +3073,10 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 </table>
 <br/>
 </div>
-<span class="section" onclick="javascript:showContent(this, 'c_532')">
+<span class="section" onclick="javascript:showContent(this, 'c_537')">
 <span class='ext'>[+]</span> TextureAtlasSamplerFactory::addTexutreAtlasDefinition&#160;<span class='sym_p'><span>(&#160;std::shared_ptr&lt;Ogre::DataStream&gt; <span class='color_p'>stream</span></span>, <span>std::shared_ptr&lt;Ogre::DataStream&gt; <span class='color_p'>textureAtlasTable</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
 <br/>
-<div id="c_532" style="display:none;">
+<div id="c_537" style="display:none;">
 
 
 <span class='new_sign_lbl'>&#8675;</span>
@@ -2971,10 +3097,10 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 </table>
 <br/>
 </div>
-<span class="section" onclick="javascript:showContent(this, 'c_533')">
+<span class="section" onclick="javascript:showContent(this, 'c_538')">
 <span class='ext'>[+]</span> TextureAtlasSamplerFactory::addTexutreAtlasDefinition&#160;<span class='sym_p'><span>(&#160;Ogre::String const&amp; <span class='color_p'>filename</span></span>, <span>std::shared_ptr&lt;Ogre::DataStream&gt; <span class='color_p'>textureAtlasTable</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
 <br/>
-<div id="c_533" style="display:none;">
+<div id="c_538" style="display:none;">
 
 
 <span class='new_sign_lbl'>&#8675;</span>
@@ -2995,10 +3121,10 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 </table>
 <br/>
 </div>
-<span class="section" onclick="javascript:showContent(this, 'c_534')">
+<span class="section" onclick="javascript:showContent(this, 'c_539')">
 <span class='ext'>[+]</span> TextureAtlasSamplerFactory::setTextureAtlasTable&#160;<span class='sym_p'><span>(&#160;Ogre::String const&amp; <span class='color_p'>textureName</span></span>, <span>std::shared_ptr&lt;Ogre::DataStream&gt;const&amp; <span class='color_p'>atlasData</span></span>, <span>bool <span class='color_p'>autoBorderAdjust</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
 <br/>
-<div id="c_534" style="display:none;">
+<div id="c_539" style="display:none;">
 
 
 <span class='new_sign_lbl'>&#8675;</span>
@@ -3022,10 +3148,10 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 <br/>
 <span class='h_name'>OgreShaderFunctionAtom.h</span><br/>
 <span class='ns'>namespace <b>Ogre::RTShader</b></span><br/>
-<span class="section" onclick="javascript:showContent(this, 'c_535')">
+<span class="section" onclick="javascript:showContent(this, 'c_540')">
 <span class='ext'>[+]</span> AssignmentAtom::AssignmentAtom <span class='attr'>[C1]</span>&#160;<span class='sym_p'><span>(&#160;std::shared_ptr&lt;Ogre::DataStream&gt; <span class='color_p'>lhs</span></span>, <span>std::shared_ptr&lt;Ogre::DataStream&gt; <span class='color_p'>rhs</span></span>, <span>int <span class='color_p'>groupOrder</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
 <br/>
-<div id="c_535" style="display:none;">
+<div id="c_540" style="display:none;">
 
 
 <span class='new_sign_lbl'>&#8675;</span>
@@ -3046,10 +3172,10 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 </table>
 <br/>
 </div>
-<span class="section" onclick="javascript:showContent(this, 'c_536')">
+<span class="section" onclick="javascript:showContent(this, 'c_541')">
 <span class='ext'>[+]</span> AssignmentAtom::AssignmentAtom <span class='attr'>[C2]</span>&#160;<span class='sym_p'><span>(&#160;std::shared_ptr&lt;Ogre::DataStream&gt; <span class='color_p'>lhs</span></span>, <span>std::shared_ptr&lt;Ogre::DataStream&gt; <span class='color_p'>rhs</span></span>, <span>int <span class='color_p'>groupOrder</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
 <br/>
-<div id="c_536" style="display:none;">
+<div id="c_541" style="display:none;">
 
 
 <span class='new_sign_lbl'>&#8675;</span>
@@ -3073,10 +3199,10 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 <br/>
 <span class='h_name'>OgreShaderGenerator.h</span><br/>
 <span class='ns'>namespace <b>Ogre::RTShader</b></span><br/>
-<span class="section" onclick="javascript:showContent(this, 'c_537')">
+<span class="section" onclick="javascript:showContent(this, 'c_542')">
 <span class='ext'>[+]</span> ShaderGenerator::createShaderBasedTechnique&#160;<span class='sym_p'><span>(&#160;Ogre::String const&amp; <span class='color_p'>materialName</span></span>, <span>Ogre::String const&amp; <span class='color_p'>groupName</span></span>, <span>Ogre::String const&amp; <span class='color_p'>srcTechniqueSchemeName</span></span>, <span>Ogre::String const&amp; <span class='color_p'>dstTechniqueSchemeName</span></span>, <span>bool <span class='color_p'>overProgrammable</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
 <br/>
-<div id="c_537" style="display:none;">
+<div id="c_542" style="display:none;">
 
 
 <span class='new_sign_lbl'>&#8675;</span>
@@ -3097,10 +3223,10 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 </table>
 <br/>
 </div>
-<span class="section" onclick="javascript:showContent(this, 'c_538')">
+<span class="section" onclick="javascript:showContent(this, 'c_543')">
 <span class='ext'>[+]</span> ShaderGenerator::getTranslator&#160;<span class='sym_p'><span>(&#160;std::shared_ptr&lt;Ogre::DataStream&gt;const&amp; <span class='color_p'>node</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
 <br/>
-<div id="c_538" style="display:none;">
+<div id="c_543" style="display:none;">
 
 
 <span class='new_sign_lbl'>&#8675;</span>
@@ -3121,10 +3247,10 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 </table>
 <br/>
 </div>
-<span class="section" onclick="javascript:showContent(this, 'c_539')">
+<span class="section" onclick="javascript:showContent(this, 'c_544')">
 <span class='ext'>[+]</span> ShaderGenerator::setTargetLanguage&#160;<span class='sym_p'><span>(&#160;Ogre::String const&amp; <span class='color_p'>shaderLanguage</span></span>, <span>float const <span class='color_p'>version</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
 <br/>
-<div id="c_539" style="display:none;">
+<div id="c_544" style="display:none;">
 
 
 <span class='new_sign_lbl'>&#8675;</span>
@@ -3145,10 +3271,10 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 </table>
 <br/>
 </div>
-<span class="section" onclick="javascript:showContent(this, 'c_540')">
+<span class="section" onclick="javascript:showContent(this, 'c_545')">
 <span class='ext'>[+]</span> ShaderGenerator::SGResourceGroupListener::resourceRemove&#160;<span class='sym_p'><span>(&#160;std::shared_ptr&lt;Ogre::DataStream&gt;const&amp; <span class='color_p'>p1</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
 <br/>
-<div id="c_540" style="display:none;">
+<div id="c_545" style="display:none;">
 
 
 <span class='new_sign_lbl'>&#8675;</span>
@@ -3169,10 +3295,10 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 </table>
 <br/>
 </div>
-<span class="section" onclick="javascript:showContent(this, 'c_541')">
+<span class="section" onclick="javascript:showContent(this, 'c_546')">
 <span class='ext'>[+]</span> ShaderGenerator::SGScriptTranslatorManager::getTranslator&#160;<span class='sym_p'><span>(&#160;std::shared_ptr&lt;Ogre::DataStream&gt;const&amp; <span class='color_p'>p1</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
 <br/>
-<div id="c_541" style="display:none;">
+<div id="c_546" style="display:none;">
 
 
 <span class='new_sign_lbl'>&#8675;</span>
@@ -3193,10 +3319,10 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 </table>
 <br/>
 </div>
-<span class="section" onclick="javascript:showContent(this, 'c_542')">
+<span class="section" onclick="javascript:showContent(this, 'c_547')">
 <span class='ext'>[+]</span> ShaderGenerator::SGTechnique::SGTechnique <span class='attr'>[C1]</span>&#160;<span class='sym_p'><span>(&#160;ShaderGenerator::SGMaterial* <span class='color_p'>parent</span></span>, <span>Ogre::Technique* <span class='color_p'>srcTechnique</span></span>, <span>Ogre::String const&amp; <span class='color_p'>dstTechniqueSchemeName</span></span>, <span>bool <span class='color_p'>overProgrammable</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
 <br/>
-<div id="c_542" style="display:none;">
+<div id="c_547" style="display:none;">
 
 
 <span class='new_sign_lbl'>&#8675;</span>
@@ -3217,10 +3343,10 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 </table>
 <br/>
 </div>
-<span class="section" onclick="javascript:showContent(this, 'c_543')">
+<span class="section" onclick="javascript:showContent(this, 'c_548')">
 <span class='ext'>[+]</span> ShaderGenerator::SGTechnique::SGTechnique <span class='attr'>[C2]</span>&#160;<span class='sym_p'><span>(&#160;ShaderGenerator::SGMaterial* <span class='color_p'>parent</span></span>, <span>Ogre::Technique* <span class='color_p'>srcTechnique</span></span>, <span>Ogre::String const&amp; <span class='color_p'>dstTechniqueSchemeName</span></span>, <span>bool <span class='color_p'>overProgrammable</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
 <br/>
-<div id="c_543" style="display:none;">
+<div id="c_548" style="display:none;">
 
 
 <span class='new_sign_lbl'>&#8675;</span>
@@ -3244,10 +3370,10 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 <br/>
 <span class='h_name'>OgreShaderParameter.h</span><br/>
 <span class='ns'>namespace <b>Ogre::RTShader</b></span><br/>
-<span class="section" onclick="javascript:showContent(this, 'c_544')">
+<span class="section" onclick="javascript:showContent(this, 'c_549')">
 <span class='ext'>[+]</span> UniformParameter::bind&#160;<span class='sym_p'><span>(&#160;std::shared_ptr&lt;Ogre::DataStream&gt; <span class='color_p'>paramsPtr</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
 <br/>
-<div id="c_544" style="display:none;">
+<div id="c_549" style="display:none;">
 
 
 <span class='new_sign_lbl'>&#8675;</span>
@@ -3271,10 +3397,10 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 <br/>
 <span class='h_name'>OgreShaderProgramManager.h</span><br/>
 <span class='ns'>namespace <b>Ogre::RTShader</b></span><br/>
-<span class="section" onclick="javascript:showContent(this, 'c_545')">
+<span class="section" onclick="javascript:showContent(this, 'c_550')">
 <span class='ext'>[+]</span> ProgramManager::bindUniformParameters&#160;<span class='sym_p'><span>(&#160;Program* <span class='color_p'>pCpuProgram</span></span>, <span>std::shared_ptr&lt;Ogre::DataStream&gt;const&amp; <span class='color_p'>passParams</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
 <br/>
-<div id="c_545" style="display:none;">
+<div id="c_550" style="display:none;">
 
 
 <span class='new_sign_lbl'>&#8675;</span>
@@ -3295,10 +3421,10 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 </table>
 <br/>
 </div>
-<span class="section" onclick="javascript:showContent(this, 'c_546')">
+<span class="section" onclick="javascript:showContent(this, 'c_551')">
 <span class='ext'>[+]</span> ProgramManager::destroyGpuProgram&#160;<span class='sym_p'><span>(&#160;std::shared_ptr&lt;Ogre::DataStream&gt;&amp; <span class='color_p'>gpuProgram</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
 <br/>
-<div id="c_546" style="display:none;">
+<div id="c_551" style="display:none;">
 
 
 <span class='new_sign_lbl'>&#8675;</span>
@@ -3319,10 +3445,10 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 </table>
 <br/>
 </div>
-<span class="section" onclick="javascript:showContent(this, 'c_547')">
+<span class="section" onclick="javascript:showContent(this, 'c_552')">
 <span class='ext'>[+]</span> ProgramManager::flushGpuProgramsCache&#160;<span class='sym_p'><span>(&#160;Ogre::map&lt;std::__cxx11::basic_string&lt;char&gt;, std::shared_ptr&lt;Ogre::GpuProgram&gt;, std::less&lt;std::__cxx11::basic_string&lt;char&gt; &gt; &gt;::type&amp; <span class='color_p'>gpuProgramsMap</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
 <br/>
-<div id="c_547" style="display:none;">
+<div id="c_552" style="display:none;">
 
 
 <span class='new_sign_lbl'>&#8675;</span>
@@ -3343,10 +3469,10 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 </table>
 <br/>
 </div>
-<span class="section" onclick="javascript:showContent(this, 'c_548')">
+<span class="section" onclick="javascript:showContent(this, 'c_553')">
 <span class='ext'>[+]</span> ProgramManager::generateHash&#160;<span class='sym_p'><span>(&#160;Ogre::String const&amp; <span class='color_p'>programString</span></span>&#160;)</span> <span class='attr'>[static]</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
 <br/>
-<div id="c_548" style="display:none;">
+<div id="c_553" style="display:none;">
 
 
 <span class='new_sign_lbl'>&#8675;</span>
@@ -3370,10 +3496,10 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 <br/>
 <span class='h_name'>OgreShaderScriptTranslator.h</span><br/>
 <span class='ns'>namespace <b>Ogre::RTShader</b></span><br/>
-<span class="section" onclick="javascript:showContent(this, 'c_549')">
+<span class="section" onclick="javascript:showContent(this, 'c_554')">
 <span class='ext'>[+]</span> SGScriptTranslator::translatePass&#160;<span class='sym_p'><span>(&#160;Ogre::ScriptCompiler* <span class='color_p'>compiler</span></span>, <span>std::shared_ptr&lt;Ogre::DataStream&gt;const&amp; <span class='color_p'>node</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
 <br/>
-<div id="c_549" style="display:none;">
+<div id="c_554" style="display:none;">
 
 
 <span class='new_sign_lbl'>&#8675;</span>
@@ -3394,10 +3520,10 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 </table>
 <br/>
 </div>
-<span class="section" onclick="javascript:showContent(this, 'c_550')">
+<span class="section" onclick="javascript:showContent(this, 'c_555')">
 <span class='ext'>[+]</span> SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;Ogre::ScriptCompiler* <span class='color_p'>compiler</span></span>, <span>std::shared_ptr&lt;Ogre::DataStream&gt;const&amp; <span class='color_p'>node</span></span>&#160;)</span> <span class='failed'>&nbsp;1&nbsp;</span></span>
 <br/>
-<div id="c_550" style="display:none;">
+<div id="c_555" style="display:none;">
 
 
 <span class='new_sign_lbl'>&#8675;</span>
@@ -3424,10 +3550,10 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 <h2>Problems with Data Types, Low Severity <span class='warning'>&nbsp;113&nbsp;</span></h2><hr/>
 <span class='h_name'>OgreAutoParamDataSource.h</span><br/>
 <span class='ns'>namespace <b>Ogre</b></span><br/>
-<span class="section" onclick="javascript:showContent(this, 'c_551')">
+<span class="section" onclick="javascript:showContent(this, 'c_556')">
 <span class='ext'>[+]</span> <span class='ttype'>class</span> AutoParamDataSource <span class='warning'>&nbsp;17&nbsp;</span></span>
 <br/>
-<div id="c_551" style="display:none;">
+<div id="c_556" style="display:none;">
 <table class='ptable'><tr>
 <th class='pn'></th>
 <th class='chg'>Change</th>
@@ -3517,9 +3643,9 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 <td>Recompilation of a client program may be broken.</td>
 </tr>
 </table>
-<span class="sect_aff" onclick="javascript:showContent(this, 'c_552')">
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_557')">
 [+] affected symbols: 10 (0.9%)</span>
-<div id="c_552" style="display:none;">
+<div id="c_557" style="display:none;">
 <div class='affected'><span class='iname_a'>RTShader::FFPLighting::updateGpuProgramsParams&#160;<span class='sym_p'><span>(&#160;Renderable* <i>rend</i></span>, <span>Pass* <i>pass</i></span>, <span>AutoParamDataSource const* <span class='fp'>source</span></span>, <span>LightList const* <i>pLightList</i></span>&#160;)</span></span><br/>
 <div class='affect'>3rd parameter &#39;source&#39; (pointer) has base type &#39;AutoParamDataSource&#39;.</div>
 <span class='iname_a'>RTShader::FFPAlphaTest::updateGpuProgramsParams&#160;<span class='sym_p'><span>(&#160;Renderable* <i>rend</i></span>, <span>Pass* <i>pass</i></span>, <span>AutoParamDataSource const* <span class='fp'>source</span></span>, <span>LightList const* <i>pLightList</i></span>&#160;)</span></span><br/>
@@ -3547,10 +3673,10 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 <br/>
 <span class='h_name'>OgreAxisAlignedBox.h</span><br/>
 <span class='ns'>namespace <b>Ogre</b></span><br/>
-<span class="section" onclick="javascript:showContent(this, 'c_553')">
+<span class="section" onclick="javascript:showContent(this, 'c_558')">
 <span class='ext'>[+]</span> <span class='ttype'>class</span> AxisAlignedBox <span class='warning'>&nbsp;2&nbsp;</span></span>
 <br/>
-<div id="c_553" style="display:none;">
+<div id="c_558" style="display:none;">
 <table class='ptable'><tr>
 <th class='pn'></th>
 <th class='chg'>Change</th>
@@ -3565,9 +3691,9 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 <td>Recompilation of a client program may be broken.</td>
 </tr>
 </table>
-<span class="sect_aff" onclick="javascript:showContent(this, 'c_554')">
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_559')">
 [+] affected symbols: 10 (0.9%)</span>
-<div id="c_554" style="display:none;">
+<div id="c_559" style="display:none;">
 <div class='affected'><span class='iname_a'>RTShader::FFPLighting::updateGpuProgramsParams&#160;<span class='sym_p'><span>(&#160;Renderable* <i>rend</i></span>, <span>Pass* <i>pass</i></span>, <span>AutoParamDataSource const* <span class='fp'>source</span></span>, <span>LightList const* <i>pLightList</i></span>&#160;)</span></span><br/>
 <div class='affect'>Field &#39;source.mMainCamBoundsInfo.aabb&#39; in 3rd parameter &#39;source&#39; (pointer) is of type &#39;AxisAlignedBox&#39;.</div>
 <span class='iname_a'>RTShader::FFPAlphaTest::updateGpuProgramsParams&#160;<span class='sym_p'><span>(&#160;Renderable* <i>rend</i></span>, <span>Pass* <i>pass</i></span>, <span>AutoParamDataSource const* <span class='fp'>source</span></span>, <span>LightList const* <i>pLightList</i></span>&#160;)</span></span><br/>
@@ -3595,10 +3721,10 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 <br/>
 <span class='h_name'>OgrePass.h</span><br/>
 <span class='ns'>namespace <b>Ogre</b></span><br/>
-<span class="section" onclick="javascript:showContent(this, 'c_555')">
+<span class="section" onclick="javascript:showContent(this, 'c_560')">
 <span class='ext'>[+]</span> <span class='ttype'>class</span> Pass <span class='warning'>&nbsp;7&nbsp;</span></span>
 <br/>
-<div id="c_555" style="display:none;">
+<div id="c_560" style="display:none;">
 <table class='ptable'><tr>
 <th class='pn'></th>
 <th class='chg'>Change</th>
@@ -3638,9 +3764,9 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 <td>Recompilation of a client program may be broken.</td>
 </tr>
 </table>
-<span class="sect_aff" onclick="javascript:showContent(this, 'c_556')">
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_561')">
 [+] affected symbols: 75 (6.7%)</span>
-<div id="c_556" style="display:none;">
+<div id="c_561" style="display:none;">
 <div class='affected'><span class='iname_a'>Any::Any&lt;RTShader::ShaderGenerator::SGPass*&gt;&#160;<span class='sym_p'><span>(&#160;RTShader::ShaderGenerator::SGPass*const&amp; <span class='fp'>value</span></span>&#160;)</span></span><br/>
 <div class='affect'>Field &#39;value.mDstPass&#39; in 1st parameter &#39;value&#39; (reference) has base type &#39;Pass&#39;.</div>
 <span class='iname_a'>RTShader::FFPLighting::preAddToRenderState&#160;<span class='sym_p'><span>(&#160;RTShader::RenderState const* <i>renderState</i></span>, <span>Pass* <i>srcPass</i></span>, <span>Pass* <span class='fp'>dstPass</span></span>&#160;)</span></span><br/>
@@ -3670,10 +3796,10 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 <br/>
 <span class='h_name'>OgrePrerequisites.h</span><br/>
 <span class='ns'>namespace <b>Ogre</b></span><br/>
-<span class="section" onclick="javascript:showContent(this, 'c_557')">
+<span class="section" onclick="javascript:showContent(this, 'c_562')">
 <span class='ext'>[+]</span> <span class='ttype'>typedef</span> MaterialPtr <span class='warning'>&nbsp;1&nbsp;</span></span>
 <br/>
-<div id="c_557" style="display:none;">
+<div id="c_562" style="display:none;">
 <table class='ptable'><tr>
 <th class='pn'></th>
 <th class='chg'>Change</th>
@@ -3683,9 +3809,9 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 <td>Recompilation of a client program may be broken.</td>
 </tr>
 </table>
-<span class="sect_aff" onclick="javascript:showContent(this, 'c_558')">
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_563')">
 [+] affected symbols: 28 (2.5%)</span>
-<div id="c_558" style="display:none;">
+<div id="c_563" style="display:none;">
 <div class='affected'><span class='iname_a'>RTShader::HardwareSkinning::getBoneCount&#160;<span class='sym_p'>(&#160;)</span></span><br/>
 <div class='affect'>Field &#39;this.mCreator.mCustomShadowCasterMaterialsLinear&#39; in the object of this method has base type &#39;MaterialPtr&#39;.</div>
 <span class='iname_a'>RTShader::HardwareSkinning::getWeightCount&#160;<span class='sym_p'>(&#160;)</span></span><br/>
@@ -3715,10 +3841,10 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 <br/>
 <span class='h_name'>OgreScriptCompiler.h</span><br/>
 <span class='ns'>namespace <b>Ogre</b></span><br/>
-<span class="section" onclick="javascript:showContent(this, 'c_559')">
+<span class="section" onclick="javascript:showContent(this, 'c_564')">
 <span class='ext'>[+]</span> <span class='ttype'>class</span> AbstractNode <span class='warning'>&nbsp;2&nbsp;</span></span>
 <br/>
-<div id="c_559" style="display:none;">
+<div id="c_564" style="display:none;">
 <table class='ptable'><tr>
 <th class='pn'></th>
 <th class='chg'>Change</th>
@@ -3733,9 +3859,9 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 <td>Recompilation of a client program may be broken.</td>
 </tr>
 </table>
-<span class="sect_aff" onclick="javascript:showContent(this, 'c_560')">
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_565')">
 [+] affected symbols: 2 (0.2%)</span>
-<div id="c_560" style="display:none;">
+<div id="c_565" style="display:none;">
 <div class='affected'><span class='iname_a'>AbstractNode::clone&#160;<span class='sym_p'>(&#160;)</span></span><br/>
 <div class='affect'>This method is from &#39;AbstractNode&#39; class.</div>
 <span class='iname_a'>AbstractNode::getValue&#160;<span class='sym_p'>(&#160;)</span></span><br/>
@@ -3747,10 +3873,10 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 <br/>
 <span class='h_name'>OgreScriptTranslator.h</span><br/>
 <span class='ns'>namespace <b>Ogre</b></span><br/>
-<span class="section" onclick="javascript:showContent(this, 'c_561')">
+<span class="section" onclick="javascript:showContent(this, 'c_566')">
 <span class='ext'>[+]</span> <span class='ttype'>class</span> ScriptTranslator <span class='warning'>&nbsp;2&nbsp;</span></span>
 <br/>
-<div id="c_561" style="display:none;">
+<div id="c_566" style="display:none;">
 <table class='ptable'><tr>
 <th class='pn'></th>
 <th class='chg'>Change</th>
@@ -3765,9 +3891,9 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 <td>Recompilation of a client program may be broken.</td>
 </tr>
 </table>
-<span class="sect_aff" onclick="javascript:showContent(this, 'c_562')">
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_567')">
 [+] affected symbols: 10 (0.9%)</span>
-<div id="c_562" style="display:none;">
+<div id="c_567" style="display:none;">
 <div class='affected'><span class='iname_a'>ScriptTranslator::translate&#160;<span class='sym_p'><span>(&#160;ScriptCompiler* <i>p1</i></span>, <span>std::shared_ptr&lt;DataStream&gt;const&amp; <i>p2</i></span>&#160;)</span></span><br/>
 <div class='affect'>This method is from &#39;ScriptTranslator&#39; class.</div>
 <span class='iname_a'>ScriptTranslator::ScriptTranslator&#160;<span class='sym_p'>(&#160;)</span></span><br/>
@@ -3792,10 +3918,10 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 </div>
 <br/><br/></div>
 
-<span class="section" onclick="javascript:showContent(this, 'c_563')">
+<span class="section" onclick="javascript:showContent(this, 'c_568')">
 <span class='ext'>[+]</span> <span class='ttype'>class</span> ScriptTranslatorManager <span class='warning'>&nbsp;2&nbsp;</span></span>
 <br/>
-<div id="c_563" style="display:none;">
+<div id="c_568" style="display:none;">
 <table class='ptable'><tr>
 <th class='pn'></th>
 <th class='chg'>Change</th>
@@ -3810,9 +3936,9 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 <td>Recompilation of a client program may be broken.</td>
 </tr>
 </table>
-<span class="sect_aff" onclick="javascript:showContent(this, 'c_564')">
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_569')">
 [+] affected symbols: 8 (0.7%)</span>
-<div id="c_564" style="display:none;">
+<div id="c_569" style="display:none;">
 <div class='affected'><span class='iname_a'>ScriptTranslatorManager::getTranslator&#160;<span class='sym_p'><span>(&#160;std::shared_ptr&lt;DataStream&gt;const&amp; <i>p1</i></span>&#160;)</span></span><br/>
 <div class='affect'>This method is from &#39;ScriptTranslatorManager&#39; class.</div>
 <span class='iname_a'>ScriptTranslatorManager::ScriptTranslatorManager&#160;<span class='sym_p'>(&#160;)</span></span><br/>
@@ -3836,10 +3962,10 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 <br/>
 <span class='h_name'>OgreShaderExHardwareSkinning.h</span><br/>
 <span class='ns'>namespace <b>Ogre::RTShader</b></span><br/>
-<span class="section" onclick="javascript:showContent(this, 'c_565')">
+<span class="section" onclick="javascript:showContent(this, 'c_570')">
 <span class='ext'>[+]</span> <span class='ttype'>class</span> HardwareSkinning <span class='warning'>&nbsp;3&nbsp;</span></span>
 <br/>
-<div id="c_565" style="display:none;">
+<div id="c_570" style="display:none;">
 <table class='ptable'><tr>
 <th class='pn'></th>
 <th class='chg'>Change</th>
@@ -3859,9 +3985,9 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 <td>Recompilation of a client program may be broken.</td>
 </tr>
 </table>
-<span class="sect_aff" onclick="javascript:showContent(this, 'c_566')">
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_571')">
 [+] affected symbols: 15 (1.3%)</span>
-<div id="c_566" style="display:none;">
+<div id="c_571" style="display:none;">
 <div class='affected'><span class='iname_a'>HardwareSkinning::getBoneCount&#160;<span class='sym_p'>(&#160;)</span></span><br/>
 <div class='affect'>This method is from &#39;HardwareSkinning&#39; class.</div>
 <span class='iname_a'>HardwareSkinning::getWeightCount&#160;<span class='sym_p'>(&#160;)</span></span><br/>
@@ -3891,10 +4017,10 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 <br/>
 <span class='h_name'>OgreShaderExHardwareSkinningTechnique.h</span><br/>
 <span class='ns'>namespace <b>Ogre::RTShader</b></span><br/>
-<span class="section" onclick="javascript:showContent(this, 'c_567')">
+<span class="section" onclick="javascript:showContent(this, 'c_572')">
 <span class='ext'>[+]</span> <span class='ttype'>class</span> HardwareSkinningTechnique <span class='warning'>&nbsp;2&nbsp;</span></span>
 <br/>
-<div id="c_567" style="display:none;">
+<div id="c_572" style="display:none;">
 <table class='ptable'><tr>
 <th class='pn'></th>
 <th class='chg'>Change</th>
@@ -3909,9 +4035,9 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 <td>Recompilation of a client program may be broken.</td>
 </tr>
 </table>
-<span class="sect_aff" onclick="javascript:showContent(this, 'c_568')">
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_573')">
 [+] affected symbols: 24 (2.1%)</span>
-<div id="c_568" style="display:none;">
+<div id="c_573" style="display:none;">
 <div class='affected'><span class='iname_a'>LinearSkinning::resolveParameters&#160;<span class='sym_p'><span>(&#160;ProgramSet* <i>programSet</i></span>&#160;)</span></span><br/>
 <div class='affect'>This method is from derived class &#39;LinearSkinning&#39;.</div>
 <span class='iname_a'>LinearSkinning::resolveDependencies&#160;<span class='sym_p'><span>(&#160;ProgramSet* <i>programSet</i></span>&#160;)</span></span><br/>
@@ -3941,10 +4067,10 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 <br/>
 <span class='h_name'>OgreShaderExIntegratedPSSM3.h</span><br/>
 <span class='ns'>namespace <b>Ogre::RTShader</b></span><br/>
-<span class="section" onclick="javascript:showContent(this, 'c_569')">
+<span class="section" onclick="javascript:showContent(this, 'c_574')">
 <span class='ext'>[+]</span> <span class='ttype'>typedef</span> IntegratedPSSM3::SplitPointList <span class='warning'>&nbsp;1&nbsp;</span></span>
 <br/>
-<div id="c_569" style="display:none;">
+<div id="c_574" style="display:none;">
 <table class='ptable'><tr>
 <th class='pn'></th>
 <th class='chg'>Change</th>
@@ -3954,9 +4080,9 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 <td>Recompilation of a client program may be broken.</td>
 </tr>
 </table>
-<span class="sect_aff" onclick="javascript:showContent(this, 'c_570')">
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_575')">
 [+] affected symbols: 1 (0.1%)</span>
-<div id="c_570" style="display:none;">
+<div id="c_575" style="display:none;">
 <div class='affected'><span class='iname_a'>IntegratedPSSM3::setSplitPoints&#160;<span class='sym_p'><span>(&#160;Ogre::vector&lt;float&gt;::type const&amp; <span class='fp'>newSplitPoints</span></span>&#160;)</span></span><br/>
 <div class='affect'>1st parameter &#39;newSplitPoints&#39; (reference) has base type &#39;IntegratedPSSM3::SplitPointList&#39;.</div>
 </div>
@@ -3966,10 +4092,10 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 <br/>
 <span class='h_name'>OgreShaderExLayeredBlending.h</span><br/>
 <span class='ns'>namespace <b>Ogre::RTShader</b></span><br/>
-<span class="section" onclick="javascript:showContent(this, 'c_571')">
+<span class="section" onclick="javascript:showContent(this, 'c_576')">
 <span class='ext'>[+]</span> <span class='ttype'>class</span> LayeredBlending <span class='warning'>&nbsp;1&nbsp;</span></span>
 <br/>
-<div id="c_571" style="display:none;">
+<div id="c_576" style="display:none;">
 <table class='ptable'><tr>
 <th class='pn'></th>
 <th class='chg'>Change</th>
@@ -3979,9 +4105,9 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 <td>Recompilation of a client program may be broken.</td>
 </tr>
 </table>
-<span class="sect_aff" onclick="javascript:showContent(this, 'c_572')">
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_577')">
 [+] affected symbols: 13 (1.2%)</span>
-<div id="c_572" style="display:none;">
+<div id="c_577" style="display:none;">
 <div class='affected'><span class='iname_a'>LayeredBlending::setBlendMode&#160;<span class='sym_p'><span>(&#160;unsigned short <i>index</i></span>, <span>enum LayeredBlending::BlendMode <i>mode</i></span>&#160;)</span></span><br/>
 <div class='affect'>This method is from &#39;LayeredBlending&#39; class.</div>
 <span class='iname_a'>LayeredBlending::resolveParameters&#160;<span class='sym_p'><span>(&#160;ProgramSet* <i>programSet</i></span>&#160;)</span></span><br/>
@@ -4011,10 +4137,10 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 <br/>
 <span class='h_name'>OgreShaderExNormalMapLighting.h</span><br/>
 <span class='ns'>namespace <b>Ogre::RTShader</b></span><br/>
-<span class="section" onclick="javascript:showContent(this, 'c_573')">
+<span class="section" onclick="javascript:showContent(this, 'c_578')">
 <span class='ext'>[+]</span> <span class='ttype'>class</span> NormalMapLighting <span class='warning'>&nbsp;2&nbsp;</span></span>
 <br/>
-<div id="c_573" style="display:none;">
+<div id="c_578" style="display:none;">
 <table class='ptable'><tr>
 <th class='pn'></th>
 <th class='chg'>Change</th>
@@ -4029,9 +4155,9 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 <td>Recompilation of a client program may be broken.</td>
 </tr>
 </table>
-<span class="sect_aff" onclick="javascript:showContent(this, 'c_574')">
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_579')">
 [+] affected symbols: 12 (1.1%)</span>
-<div id="c_574" style="display:none;">
+<div id="c_579" style="display:none;">
 <div class='affected'><span class='iname_a'>NormalMapLighting::addVSInvocation&#160;<span class='sym_p'><span>(&#160;Function* <i>vsMain</i></span>, <span>int const <i>groupOrder</i></span>&#160;)</span></span><br/>
 <div class='affect'>This method is from &#39;NormalMapLighting&#39; class.</div>
 <span class='iname_a'>NormalMapLighting::preAddToRenderState&#160;<span class='sym_p'><span>(&#160;RenderState const* <i>renderState</i></span>, <span>Ogre::Pass* <i>srcPass</i></span>, <span>Ogre::Pass* <i>dstPass</i></span>&#160;)</span></span><br/>
@@ -4061,10 +4187,10 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 <br/>
 <span class='h_name'>OgreShaderExTextureAtlasSampler.h</span><br/>
 <span class='ns'>namespace <b>Ogre::RTShader</b></span><br/>
-<span class="section" onclick="javascript:showContent(this, 'c_575')">
+<span class="section" onclick="javascript:showContent(this, 'c_580')">
 <span class='ext'>[+]</span> <span class='ttype'>class</span> TextureAtlasSampler <span class='warning'>&nbsp;1&nbsp;</span></span>
 <br/>
-<div id="c_575" style="display:none;">
+<div id="c_580" style="display:none;">
 <table class='ptable'><tr>
 <th class='pn'></th>
 <th class='chg'>Change</th>
@@ -4074,9 +4200,9 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 <td>Recompilation of a client program may be broken.</td>
 </tr>
 </table>
-<span class="sect_aff" onclick="javascript:showContent(this, 'c_576')">
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_581')">
 [+] affected symbols: 10 (0.9%)</span>
-<div id="c_576" style="display:none;">
+<div id="c_581" style="display:none;">
 <div class='affected'><span class='iname_a'>TextureAtlasSampler::resolveParameters&#160;<span class='sym_p'><span>(&#160;ProgramSet* <i>programSet</i></span>&#160;)</span></span><br/>
 <div class='affect'>This method is from &#39;TextureAtlasSampler&#39; class.</div>
 <span class='iname_a'>TextureAtlasSampler::preAddToRenderState&#160;<span class='sym_p'><span>(&#160;RenderState const* <i>renderState</i></span>, <span>Ogre::Pass* <i>srcPass</i></span>, <span>Ogre::Pass* <i>dstPass</i></span>&#160;)</span></span><br/>
@@ -4101,10 +4227,10 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 </div>
 <br/><br/></div>
 
-<span class="section" onclick="javascript:showContent(this, 'c_577')">
+<span class="section" onclick="javascript:showContent(this, 'c_582')">
 <span class='ext'>[+]</span> <span class='ttype'>typedef</span> TextureAtlasTablePtr <span class='warning'>&nbsp;1&nbsp;</span></span>
 <br/>
-<div id="c_577" style="display:none;">
+<div id="c_582" style="display:none;">
 <table class='ptable'><tr>
 <th class='pn'></th>
 <th class='chg'>Change</th>
@@ -4114,9 +4240,9 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 <td>Recompilation of a client program may be broken.</td>
 </tr>
 </table>
-<span class="sect_aff" onclick="javascript:showContent(this, 'c_578')">
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_583')">
 [+] affected symbols: 11 (1%)</span>
-<div id="c_578" style="display:none;">
+<div id="c_583" style="display:none;">
 <div class='affected'><span class='iname_a'>TextureAtlasSampler::resolveParameters&#160;<span class='sym_p'><span>(&#160;ProgramSet* <i>programSet</i></span>&#160;)</span></span><br/>
 <div class='affect'>Field &#39;this.mAtlasTableDatas&#39; in the object of this method has base type &#39;TextureAtlasTablePtr&#39;.</div>
 <span class='iname_a'>TextureAtlasSampler::preAddToRenderState&#160;<span class='sym_p'><span>(&#160;RenderState const* <i>renderState</i></span>, <span>Ogre::Pass* <i>srcPass</i></span>, <span>Ogre::Pass* <i>dstPass</i></span>&#160;)</span></span><br/>
@@ -4146,10 +4272,10 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 <br/>
 <span class='h_name'>OgreShaderExTriplanarTexturing.h</span><br/>
 <span class='ns'>namespace <b>Ogre::RTShader</b></span><br/>
-<span class="section" onclick="javascript:showContent(this, 'c_579')">
+<span class="section" onclick="javascript:showContent(this, 'c_584')">
 <span class='ext'>[+]</span> <span class='ttype'>class</span> TriplanarTexturing <span class='warning'>&nbsp;1&nbsp;</span></span>
 <br/>
-<div id="c_579" style="display:none;">
+<div id="c_584" style="display:none;">
 <table class='ptable'><tr>
 <th class='pn'></th>
 <th class='chg'>Change</th>
@@ -4159,9 +4285,9 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 <td>Recompilation of a client program may be broken.</td>
 </tr>
 </table>
-<span class="sect_aff" onclick="javascript:showContent(this, 'c_580')">
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_585')">
 [+] affected symbols: 11 (1%)</span>
-<div id="c_580" style="display:none;">
+<div id="c_585" style="display:none;">
 <div class='affected'><span class='iname_a'>TriplanarTexturing::setTextureNames&#160;<span class='sym_p'><span>(&#160;Ogre::String const&amp; <i>textureNameFromX</i></span>, <span>Ogre::String const&amp; <i>textureNameFromY</i></span>, <span>Ogre::String const&amp; <i>textureNameFromZ</i></span>&#160;)</span></span><br/>
 <div class='affect'>This method is from &#39;TriplanarTexturing&#39; class.</div>
 <span class='iname_a'>TriplanarTexturing::resolveParameters&#160;<span class='sym_p'><span>(&#160;ProgramSet* <i>programSet</i></span>&#160;)</span></span><br/>
@@ -4191,10 +4317,10 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 <br/>
 <span class='h_name'>OgreShaderFFPFog.h</span><br/>
 <span class='ns'>namespace <b>Ogre::RTShader</b></span><br/>
-<span class="section" onclick="javascript:showContent(this, 'c_581')">
+<span class="section" onclick="javascript:showContent(this, 'c_586')">
 <span class='ext'>[+]</span> <span class='ttype'>class</span> FFPFog <span class='warning'>&nbsp;1&nbsp;</span></span>
 <br/>
-<div id="c_581" style="display:none;">
+<div id="c_586" style="display:none;">
 <table class='ptable'><tr>
 <th class='pn'></th>
 <th class='chg'>Change</th>
@@ -4204,9 +4330,9 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 <td>Recompilation of a client program may be broken.</td>
 </tr>
 </table>
-<span class="sect_aff" onclick="javascript:showContent(this, 'c_582')">
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_587')">
 [+] affected symbols: 11 (1%)</span>
-<div id="c_582" style="display:none;">
+<div id="c_587" style="display:none;">
 <div class='affected'><span class='iname_a'>FFPFog::setFogProperties&#160;<span class='sym_p'><span>(&#160;enum Ogre::FogMode <i>fogMode</i></span>, <span>Ogre::ColourValue const&amp; <i>fogColour</i></span>, <span>float <i>fogStart</i></span>, <span>float <i>fogEnd</i></span>, <span>float <i>fogDensity</i></span>&#160;)</span></span><br/>
 <div class='affect'>This method is from &#39;FFPFog&#39; class.</div>
 <span class='iname_a'>FFPFog::resolveParameters&#160;<span class='sym_p'><span>(&#160;ProgramSet* <i>programSet</i></span>&#160;)</span></span><br/>
@@ -4236,10 +4362,10 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 <br/>
 <span class='h_name'>OgreShaderFFPLighting.h</span><br/>
 <span class='ns'>namespace <b>Ogre::RTShader</b></span><br/>
-<span class="section" onclick="javascript:showContent(this, 'c_583')">
+<span class="section" onclick="javascript:showContent(this, 'c_588')">
 <span class='ext'>[+]</span> <span class='ttype'>class</span> FFPLighting <span class='warning'>&nbsp;5&nbsp;</span></span>
 <br/>
-<div id="c_583" style="display:none;">
+<div id="c_588" style="display:none;">
 <table class='ptable'><tr>
 <th class='pn'></th>
 <th class='chg'>Change</th>
@@ -4269,9 +4395,9 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 <td>This field will not be initialized or used by old client applications.</td>
 </tr>
 </table>
-<span class="sect_aff" onclick="javascript:showContent(this, 'c_584')">
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_589')">
 [+] affected symbols: 14 (1.2%)</span>
-<div id="c_584" style="display:none;">
+<div id="c_589" style="display:none;">
 <div class='affected'><span class='iname_a'>FFPLighting::setLightCount&#160;<span class='sym_p'><span>(&#160;int const* <i>lightCount</i></span>&#160;)</span></span><br/>
 <div class='affect'>This method is from &#39;FFPLighting&#39; class.</div>
 <span class='iname_a'>FFPLighting::resolveParameters&#160;<span class='sym_p'><span>(&#160;ProgramSet* <i>programSet</i></span>&#160;)</span></span><br/>
@@ -4298,10 +4424,10 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 </div>
 <br/><br/></div>
 
-<span class="section" onclick="javascript:showContent(this, 'c_585')">
+<span class="section" onclick="javascript:showContent(this, 'c_590')">
 <span class='ext'>[+]</span> <span class='ttype'>struct</span> FFPLighting::LightParams <span class='warning'>&nbsp;4&nbsp;</span></span>
 <br/>
-<div id="c_585" style="display:none;">
+<div id="c_590" style="display:none;">
 <table class='ptable'><tr>
 <th class='pn'></th>
 <th class='chg'>Change</th>
@@ -4326,9 +4452,9 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 <td>This field will not be initialized or used by old client applications.</td>
 </tr>
 </table>
-<span class="sect_aff" onclick="javascript:showContent(this, 'c_586')">
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_591')">
 [+] affected symbols: 5 (0.4%)</span>
-<div id="c_586" style="display:none;">
+<div id="c_591" style="display:none;">
 <div class='affected'><span class='iname_a'>FFPLighting::LightParams::LightParams&#160;<span class='sym_p'><span>(&#160;struct FFPLighting::LightParams&amp;& <span class='fp'>p1</span></span>&#160;)</span></span><br/>
 <div class='affect'>1st parameter &#39;p1&#39; has base type &#39;struct FFPLighting::LightParams&#39;.</div>
 <span class='iname_a'>FFPLighting::LightParams::LightParams&#160;<span class='sym_p'><span>(&#160;struct FFPLighting::LightParams const&amp; <span class='fp'>p1</span></span>&#160;)</span></span><br/>
@@ -4346,10 +4472,10 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 <br/>
 <span class='h_name'>OgreShaderFFPRenderStateBuilder.h</span><br/>
 <span class='ns'>namespace <b>Ogre::RTShader</b></span><br/>
-<span class="section" onclick="javascript:showContent(this, 'c_587')">
+<span class="section" onclick="javascript:showContent(this, 'c_592')">
 <span class='ext'>[+]</span> <span class='ttype'>class</span> FFPRenderStateBuilder <span class='warning'>&nbsp;2&nbsp;</span></span>
 <br/>
-<div id="c_587" style="display:none;">
+<div id="c_592" style="display:none;">
 <table class='ptable'><tr>
 <th class='pn'></th>
 <th class='chg'>Change</th>
@@ -4364,9 +4490,9 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 <td>Recompilation of a client program may be broken.</td>
 </tr>
 </table>
-<span class="sect_aff" onclick="javascript:showContent(this, 'c_588')">
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_593')">
 [+] affected symbols: 9 (0.8%)</span>
-<div id="c_588" style="display:none;">
+<div id="c_593" style="display:none;">
 <div class='affected'><span class='iname_a'>FFPRenderStateBuilder::initialize&#160;<span class='sym_p'>(&#160;)</span></span><br/>
 <div class='affect'>This method is from &#39;FFPRenderStateBuilder&#39; class.</div>
 <span class='iname_a'>FFPRenderStateBuilder::getSingleton&#160;<span class='sym_p'>(&#160;)</span></span><br/>
@@ -4392,10 +4518,10 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 <br/>
 <span class='h_name'>OgreShaderFunction.h</span><br/>
 <span class='ns'>namespace <b>Ogre::RTShader</b></span><br/>
-<span class="section" onclick="javascript:showContent(this, 'c_589')">
+<span class="section" onclick="javascript:showContent(this, 'c_594')">
 <span class='ext'>[+]</span> <span class='ttype'>class</span> Function <span class='warning'>&nbsp;3&nbsp;</span></span>
 <br/>
-<div id="c_589" style="display:none;">
+<div id="c_594" style="display:none;">
 <table class='ptable'><tr>
 <th class='pn'></th>
 <th class='chg'>Change</th>
@@ -4415,9 +4541,9 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 <td>Recompilation of a client program may be broken.</td>
 </tr>
 </table>
-<span class="sect_aff" onclick="javascript:showContent(this, 'c_590')">
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_595')">
 [+] affected symbols: 160 (14.3%)</span>
-<div id="c_590" style="display:none;">
+<div id="c_595" style="display:none;">
 <div class='affected'><span class='iname_a'>Ogre::Any::Any&lt;ShaderGenerator::SGPass*&gt;&#160;<span class='sym_p'><span>(&#160;ShaderGenerator::SGPass*const&amp; <span class='fp'>value</span></span>&#160;)</span></span><br/>
 <div class='affect'>Field &#39;value.mTargetRenderState.mProgramSet.mPSCpuProgram.mEntryPointFunction&#39; in 1st parameter &#39;value&#39; (reference) has base type &#39;Function&#39;.</div>
 <span class='iname_a'>ProgramSet::ProgramSet&#160;<span class='sym_p'>(&#160;)</span></span><br/>
@@ -4447,10 +4573,10 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 <br/>
 <span class='h_name'>OgreShaderFunctionAtom.h</span><br/>
 <span class='ns'>namespace <b>Ogre::RTShader</b></span><br/>
-<span class="section" onclick="javascript:showContent(this, 'c_591')">
+<span class="section" onclick="javascript:showContent(this, 'c_596')">
 <span class='ext'>[+]</span> <span class='ttype'>class</span> FunctionAtom <span class='warning'>&nbsp;2&nbsp;</span></span>
 <br/>
-<div id="c_591" style="display:none;">
+<div id="c_596" style="display:none;">
 <table class='ptable'><tr>
 <th class='pn'></th>
 <th class='chg'>Change</th>
@@ -4465,9 +4591,9 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 <td>Recompilation of a client program may be broken.</td>
 </tr>
 </table>
-<span class="sect_aff" onclick="javascript:showContent(this, 'c_592')">
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_597')">
 [+] affected symbols: 21 (1.9%)</span>
-<div id="c_592" style="display:none;">
+<div id="c_597" style="display:none;">
 <div class='affected'><span class='iname_a'>FunctionAtom::getFunctionAtomType&#160;<span class='sym_p'>(&#160;)</span></span><br/>
 <div class='affect'>This method is from &#39;FunctionAtom&#39; class.</div>
 <span class='iname_a'>FunctionAtom::FunctionAtom&#160;<span class='sym_p'>(&#160;)</span></span><br/>
@@ -4494,10 +4620,10 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 </div>
 <br/><br/></div>
 
-<span class="section" onclick="javascript:showContent(this, 'c_593')">
+<span class="section" onclick="javascript:showContent(this, 'c_598')">
 <span class='ext'>[+]</span> <span class='ttype'>class</span> Operand <span class='warning'>&nbsp;2&nbsp;</span></span>
 <br/>
-<div id="c_593" style="display:none;">
+<div id="c_598" style="display:none;">
 <table class='ptable'><tr>
 <th class='pn'></th>
 <th class='chg'>Change</th>
@@ -4512,9 +4638,9 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 <td>Recompilation of a client program may be broken.</td>
 </tr>
 </table>
-<span class="sect_aff" onclick="javascript:showContent(this, 'c_594')">
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_599')">
 [+] affected symbols: 9 (0.8%)</span>
-<div id="c_594" style="display:none;">
+<div id="c_599" style="display:none;">
 <div class='affected'><span class='iname_a'>Operand::getFloatCount&#160;<span class='sym_p'><span>(&#160;int <i>mask</i></span>&#160;)</span></span><br/>
 <div class='affect'>This method is from &#39;Operand&#39; class.</div>
 <span class='iname_a'>Operand::getMaskAsString&#160;<span class='sym_p'><span>(&#160;int <i>mask</i></span>&#160;)</span></span><br/>
@@ -4537,10 +4663,10 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 </div>
 <br/><br/></div>
 
-<span class="section" onclick="javascript:showContent(this, 'c_595')">
+<span class="section" onclick="javascript:showContent(this, 'c_600')">
 <span class='ext'>[+]</span> <span class='ttype'>typedef</span> FunctionAtomInstanceList <span class='warning'>&nbsp;1&nbsp;</span></span>
 <br/>
-<div id="c_595" style="display:none;">
+<div id="c_600" style="display:none;">
 <table class='ptable'><tr>
 <th class='pn'></th>
 <th class='chg'>Change</th>
@@ -4550,9 +4676,9 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 <td>Recompilation of a client program may be broken.</td>
 </tr>
 </table>
-<span class="sect_aff" onclick="javascript:showContent(this, 'c_596')">
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_601')">
 [+] affected symbols: 3 (0.3%)</span>
-<div id="c_596" style="display:none;">
+<div id="c_601" style="display:none;">
 <div class='affected'><span class='iname_a'>ProgramProcessor::buildParameterReferenceMap&#160;<span class='sym_p'><span>(&#160;Ogre::vector&lt;FunctionAtom*&gt;::type const&amp; <span class='fp'>funcAtomList</span></span>, <span>Ogre::map&lt;Parameter*, std::vector&lt;Operand*&gt;, std::less&lt;Parameter*&gt; &gt;::type&amp; <i>paramsRefMap</i></span>&#160;)</span></span><br/>
 <div class='affect'>1st parameter &#39;funcAtomList&#39; (reference) has base type &#39;FunctionAtomInstanceList&#39;.</div>
 <span class='iname_a'>ProgramProcessor::rebuildFunctionInvocations&#160;<span class='sym_p'><span>(&#160;Ogre::vector&lt;FunctionAtom*&gt;::type const&amp; <span class='fp'>funcAtomList</span></span>, <span>Ogre::vector&lt;ProgramProcessor::MergeParameter&gt;::type&amp; <i>mergedParams</i></span>, <span>Ogre::map&lt;Parameter*, std::shared_ptr&lt;Parameter&gt;, std::less&lt;Parameter*&gt; &gt;::type&amp; <i>localParamsMap</i></span>&#160;)</span></span><br/>
@@ -4566,10 +4692,10 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 <br/>
 <span class='h_name'>OgreShaderGenerator.h</span><br/>
 <span class='ns'>namespace <b>Ogre::RTShader</b></span><br/>
-<span class="section" onclick="javascript:showContent(this, 'c_597')">
+<span class="section" onclick="javascript:showContent(this, 'c_602')">
 <span class='ext'>[+]</span> <span class='ttype'>class</span> ShaderGenerator <span class='warning'>&nbsp;3&nbsp;</span></span>
 <br/>
-<div id="c_597" style="display:none;">
+<div id="c_602" style="display:none;">
 <table class='ptable'><tr>
 <th class='pn'></th>
 <th class='chg'>Change</th>
@@ -4589,9 +4715,9 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 <td>Recompilation of a client program may be broken.</td>
 </tr>
 </table>
-<span class="sect_aff" onclick="javascript:showContent(this, 'c_598')">
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_603')">
 [+] affected symbols: 70 (6.2%)</span>
-<div id="c_598" style="display:none;">
+<div id="c_603" style="display:none;">
 <div class='affected'><span class='iname_a'>ShaderGenerator::initialize&#160;<span class='sym_p'>(&#160;)</span></span><br/>
 <div class='affect'>This method is from &#39;ShaderGenerator&#39; class.</div>
 <span class='iname_a'>ShaderGenerator::_initialize&#160;<span class='sym_p'>(&#160;)</span></span><br/>
@@ -4618,10 +4744,10 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 </div>
 <br/><br/></div>
 
-<span class="section" onclick="javascript:showContent(this, 'c_599')">
+<span class="section" onclick="javascript:showContent(this, 'c_604')">
 <span class='ext'>[+]</span> <span class='ttype'>class</span> ShaderGenerator::SGPass <span class='warning'>&nbsp;2&nbsp;</span></span>
 <br/>
-<div id="c_599" style="display:none;">
+<div id="c_604" style="display:none;">
 <table class='ptable'><tr>
 <th class='pn'></th>
 <th class='chg'>Change</th>
@@ -4636,9 +4762,9 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 <td>Recompilation of a client program may be broken.</td>
 </tr>
 </table>
-<span class="sect_aff" onclick="javascript:showContent(this, 'c_600')">
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_605')">
 [+] affected symbols: 9 (0.8%)</span>
-<div id="c_600" style="display:none;">
+<div id="c_605" style="display:none;">
 <div class='affected'><span class='iname_a'>ShaderGenerator::SGPass::acquirePrograms&#160;<span class='sym_p'>(&#160;)</span></span><br/>
 <div class='affect'>This method is from &#39;ShaderGenerator::SGPass&#39; class.</div>
 <span class='iname_a'>ShaderGenerator::SGPass::releasePrograms&#160;<span class='sym_p'>(&#160;)</span></span><br/>
@@ -4661,10 +4787,10 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 </div>
 <br/><br/></div>
 
-<span class="section" onclick="javascript:showContent(this, 'c_601')">
+<span class="section" onclick="javascript:showContent(this, 'c_606')">
 <span class='ext'>[+]</span> <span class='ttype'>class</span> ShaderGenerator::SGScheme <span class='warning'>&nbsp;2&nbsp;</span></span>
 <br/>
-<div id="c_601" style="display:none;">
+<div id="c_606" style="display:none;">
 <table class='ptable'><tr>
 <th class='pn'></th>
 <th class='chg'>Change</th>
@@ -4679,9 +4805,9 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 <td>Recompilation of a client program may be broken.</td>
 </tr>
 </table>
-<span class="sect_aff" onclick="javascript:showContent(this, 'c_602')">
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_607')">
 [+] affected symbols: 14 (1.2%)</span>
-<div id="c_602" style="display:none;">
+<div id="c_607" style="display:none;">
 <div class='affected'><span class='iname_a'>ShaderGenerator::SGScheme::invalidate&#160;<span class='sym_p'><span>(&#160;Ogre::String const&amp; <i>materialName</i></span>, <span>Ogre::String const&amp; <i>groupName</i></span>&#160;)</span></span><br/>
 <div class='affect'>This method is from &#39;ShaderGenerator::SGScheme&#39; class.</div>
 <span class='iname_a'>ShaderGenerator::SGScheme::invalidate&#160;<span class='sym_p'>(&#160;)</span></span><br/>
@@ -4708,10 +4834,10 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 </div>
 <br/><br/></div>
 
-<span class="section" onclick="javascript:showContent(this, 'c_603')">
+<span class="section" onclick="javascript:showContent(this, 'c_608')">
 <span class='ext'>[+]</span> <span class='ttype'>class</span> ShaderGenerator::SGTechnique <span class='warning'>&nbsp;2&nbsp;</span></span>
 <br/>
-<div id="c_603" style="display:none;">
+<div id="c_608" style="display:none;">
 <table class='ptable'><tr>
 <th class='pn'></th>
 <th class='chg'>Change</th>
@@ -4726,9 +4852,9 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 <td>Recompilation of a client program may be broken.</td>
 </tr>
 </table>
-<span class="sect_aff" onclick="javascript:showContent(this, 'c_604')">
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_609')">
 [+] affected symbols: 14 (1.2%)</span>
-<div id="c_604" style="display:none;">
+<div id="c_609" style="display:none;">
 <div class='affected'><span class='iname_a'>ShaderGenerator::SGTechnique::createSGPasses&#160;<span class='sym_p'>(&#160;)</span></span><br/>
 <div class='affect'>This method is from &#39;ShaderGenerator::SGTechnique&#39; class.</div>
 <span class='iname_a'>ShaderGenerator::SGTechnique::getRenderState&#160;<span class='sym_p'><span>(&#160;unsigned short <i>passIndex</i></span>&#160;)</span></span><br/>
@@ -4758,10 +4884,10 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 <br/>
 <span class='h_name'>OgreShaderGLSLProgramWriter.h</span><br/>
 <span class='ns'>namespace <b>Ogre::RTShader</b></span><br/>
-<span class="section" onclick="javascript:showContent(this, 'c_605')">
+<span class="section" onclick="javascript:showContent(this, 'c_610')">
 <span class='ext'>[+]</span> <span class='ttype'>class</span> GLSLProgramWriter <span class='warning'>&nbsp;1&nbsp;</span></span>
 <br/>
-<div id="c_605" style="display:none;">
+<div id="c_610" style="display:none;">
 <table class='ptable'><tr>
 <th class='pn'></th>
 <th class='chg'>Change</th>
@@ -4771,9 +4897,9 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 <td>Recompilation of a client program may be broken.</td>
 </tr>
 </table>
-<span class="sect_aff" onclick="javascript:showContent(this, 'c_606')">
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_611')">
 [+] affected symbols: 7 (0.6%)</span>
-<div id="c_606" style="display:none;">
+<div id="c_611" style="display:none;">
 <div class='affected'><span class='iname_a'>GLSLProgramWriter::writeSourceCode&#160;<span class='sym_p'><span>(&#160;std::ostream&amp; <i>os</i></span>, <span>Program* <i>program</i></span>&#160;)</span></span><br/>
 <div class='affect'>This method is from &#39;GLSLProgramWriter&#39; class.</div>
 <span class='iname_a'>GLSLProgramWriter::writeOutParameters&#160;<span class='sym_p'><span>(&#160;std::ostream&amp; <i>os</i></span>, <span>Function* <i>function</i></span>, <span>enum Ogre::GpuProgramType <i>gpuType</i></span>&#160;)</span></span><br/>
@@ -4795,10 +4921,10 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 <br/>
 <span class='h_name'>OgreShaderMaterialSerializerListener.h</span><br/>
 <span class='ns'>namespace <b>Ogre::RTShader</b></span><br/>
-<span class="section" onclick="javascript:showContent(this, 'c_607')">
+<span class="section" onclick="javascript:showContent(this, 'c_612')">
 <span class='ext'>[+]</span> <span class='ttype'>class</span> SGMaterialSerializerListener <span class='warning'>&nbsp;2&nbsp;</span></span>
 <br/>
-<div id="c_607" style="display:none;">
+<div id="c_612" style="display:none;">
 <table class='ptable'><tr>
 <th class='pn'></th>
 <th class='chg'>Change</th>
@@ -4813,9 +4939,9 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 <td>Recompilation of a client program may be broken.</td>
 </tr>
 </table>
-<span class="sect_aff" onclick="javascript:showContent(this, 'c_608')">
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_613')">
 [+] affected symbols: 8 (0.7%)</span>
-<div id="c_608" style="display:none;">
+<div id="c_613" style="display:none;">
 <div class='affected'><span class='iname_a'>SGMaterialSerializerListener::passEventRaised&#160;<span class='sym_p'><span>(&#160;Ogre::MaterialSerializer* <i>ser</i></span>, <span>enum Ogre::MaterialSerializer::SerializeEvent <i>event</i></span>, <span>bool&amp; <i>skip</i></span>, <span>Ogre::Pass const* <i>pass</i></span>&#160;)</span></span><br/>
 <div class='affect'>This method is from &#39;SGMaterialSerializerListener&#39; class.</div>
 <span class='iname_a'>SGMaterialSerializerListener::createSGPassList&#160;<span class='sym_p'><span>(&#160;Ogre::Material* <i>mat</i></span>, <span>Ogre::vector&lt;ShaderGenerator::SGPass*&gt;::type&amp; <i>passList</i></span>&#160;)</span></span><br/>
@@ -4836,10 +4962,10 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 </div>
 <br/><br/></div>
 
-<span class="section" onclick="javascript:showContent(this, 'c_609')">
+<span class="section" onclick="javascript:showContent(this, 'c_614')">
 <span class='ext'>[+]</span> <span class='ttype'>typedef</span> SGMaterialSerializerListener::SGPassList <span class='warning'>&nbsp;1&nbsp;</span></span>
 <br/>
-<div id="c_609" style="display:none;">
+<div id="c_614" style="display:none;">
 <table class='ptable'><tr>
 <th class='pn'></th>
 <th class='chg'>Change</th>
@@ -4849,9 +4975,9 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 <td>Recompilation of a client program may be broken.</td>
 </tr>
 </table>
-<span class="sect_aff" onclick="javascript:showContent(this, 'c_610')">
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_615')">
 [+] affected symbols: 1 (0.1%)</span>
-<div id="c_610" style="display:none;">
+<div id="c_615" style="display:none;">
 <div class='affected'><span class='iname_a'>SGMaterialSerializerListener::createSGPassList&#160;<span class='sym_p'><span>(&#160;Ogre::Material* <i>mat</i></span>, <span>Ogre::vector&lt;ShaderGenerator::SGPass*&gt;::type&amp; <span class='fp'>passList</span></span>&#160;)</span></span><br/>
 <div class='affect'>2nd parameter &#39;passList&#39; (reference) has base type &#39;SGMaterialSerializerListener::SGPassList&#39;.</div>
 </div>
@@ -4861,10 +4987,10 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 <br/>
 <span class='h_name'>OgreShaderParameter.h</span><br/>
 <span class='ns'>namespace <b>Ogre::RTShader</b></span><br/>
-<span class="section" onclick="javascript:showContent(this, 'c_611')">
+<span class="section" onclick="javascript:showContent(this, 'c_616')">
 <span class='ext'>[+]</span> <span class='ttype'>class</span> Parameter <span class='warning'>&nbsp;4&nbsp;</span></span>
 <br/>
-<div id="c_611" style="display:none;">
+<div id="c_616" style="display:none;">
 <table class='ptable'><tr>
 <th class='pn'></th>
 <th class='chg'>Change</th>
@@ -4889,9 +5015,9 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 <td>Recompilation of a client program may be broken.</td>
 </tr>
 </table>
-<span class="sect_aff" onclick="javascript:showContent(this, 'c_612')">
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_617')">
 [+] affected symbols: 25 (2.2%)</span>
-<div id="c_612" style="display:none;">
+<div id="c_617" style="display:none;">
 <div class='affected'><span class='iname_a'>ConstParameter&lt;float&gt;::ConstParameter&#160;<span class='sym_p'><span>(&#160;float <i>val</i></span>, <span>enum Ogre::GpuConstantType <i>type</i></span>, <span>enum Parameter::Semantic const&amp; <i>semantic</i></span>, <span>enum Parameter::Content const&amp; <i>content</i></span>&#160;)</span></span><br/>
 <div class='affect'>This constructor is from derived class &#39;ConstParameter&lt;float&gt;&#39;.</div>
 <span class='iname_a'>ConstParameter&lt;float&gt;::~ConstParameter&#160;<span class='sym_p'>(&#160;)</span></span><br/>
@@ -4921,10 +5047,10 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 <br/>
 <span class='h_name'>OgreShaderPrerequisites.h</span><br/>
 <span class='ns'>namespace <b>Ogre::RTShader</b></span><br/>
-<span class="section" onclick="javascript:showContent(this, 'c_613')">
+<span class="section" onclick="javascript:showContent(this, 'c_618')">
 <span class='ext'>[+]</span> <span class='ttype'>typedef</span> ParameterPtr <span class='warning'>&nbsp;1&nbsp;</span></span>
 <br/>
-<div id="c_613" style="display:none;">
+<div id="c_618" style="display:none;">
 <table class='ptable'><tr>
 <th class='pn'></th>
 <th class='chg'>Change</th>
@@ -4934,9 +5060,9 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 <td>Recompilation of a client program may be broken.</td>
 </tr>
 </table>
-<span class="sect_aff" onclick="javascript:showContent(this, 'c_614')">
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_619')">
 [+] affected symbols: 26 (2.3%)</span>
-<div id="c_614" style="display:none;">
+<div id="c_619" style="display:none;">
 <div class='affected'><span class='iname_a'>FFPTexturing::addPSSampleTexelInvocation&#160;<span class='sym_p'><span>(&#160;struct FFPTexturing::TextureUnitParams* <i>textureUnitParams</i></span>, <span>Function* <i>psMain</i></span>, <span>std::shared_ptr&lt;Ogre::DataStream&gt;const&amp; <span class='fp'>texel</span></span>, <span>int <i>groupOrder</i></span>&#160;)</span></span><br/>
 <div class='affect'>3rd parameter &#39;texel&#39; (reference) has base type &#39;ParameterPtr&#39;.</div>
 <span class='iname_a'>LinearSkinning::addNormalRelatedCalculations&#160;<span class='sym_p'><span>(&#160;Function* <i>vsMain</i></span>, <span>std::shared_ptr&lt;Ogre::DataStream&gt;&amp; <span class='fp'>pNormalRelatedParam</span></span>, <span>std::shared_ptr&lt;Ogre::DataStream&gt;&amp; <i>pNormalWorldRelatedParam</i></span>&#160;)</span></span><br/>
@@ -4963,10 +5089,10 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 </div>
 <br/><br/></div>
 
-<span class="section" onclick="javascript:showContent(this, 'c_615')">
+<span class="section" onclick="javascript:showContent(this, 'c_620')">
 <span class='ext'>[+]</span> <span class='ttype'>typedef</span> ShaderParameterList <span class='warning'>&nbsp;1&nbsp;</span></span>
 <br/>
-<div id="c_615" style="display:none;">
+<div id="c_620" style="display:none;">
 <table class='ptable'><tr>
 <th class='pn'></th>
 <th class='chg'>Change</th>
@@ -4976,9 +5102,9 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 <td>Recompilation of a client program may be broken.</td>
 </tr>
 </table>
-<span class="sect_aff" onclick="javascript:showContent(this, 'c_616')">
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_621')">
 [+] affected symbols: 8 (0.7%)</span>
-<div id="c_616" style="display:none;">
+<div id="c_621" style="display:none;">
 <div class='affected'><span class='iname_a'>ProgramProcessor::mergeParameters&#160;<span class='sym_p'><span>(&#160;Ogre::vector&lt;std::shared_ptr&lt;Parameter&gt; &gt;::type* <span class='fp'>paramsTable</span></span>, <span>Ogre::vector&lt;ProgramProcessor::MergeParameter&gt;::type&amp; <i>mergedParams</i></span>, <span>Ogre::vector&lt;std::shared_ptr&lt;Parameter&gt; &gt;::type&amp; <i>splitParams</i></span>&#160;)</span></span><br/>
 <div class='affect'>1st parameter &#39;paramsTable&#39; (pointer) has base type &#39;ShaderParameterList&#39;.</div>
 <span class='iname_a'>ProgramProcessor::buildTexcoordTable&#160;<span class='sym_p'><span>(&#160;Ogre::vector&lt;std::shared_ptr&lt;Parameter&gt; &gt;::type const&amp; <i>paramList</i></span>, <span>Ogre::vector&lt;std::shared_ptr&lt;Parameter&gt; &gt;::type* <span class='fp'>outParamsTable</span></span>&#160;)</span></span><br/>
@@ -4999,10 +5125,10 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 </div>
 <br/><br/></div>
 
-<span class="section" onclick="javascript:showContent(this, 'c_617')">
+<span class="section" onclick="javascript:showContent(this, 'c_622')">
 <span class='ext'>[+]</span> <span class='ttype'>typedef</span> UniformParameterPtr <span class='warning'>&nbsp;1&nbsp;</span></span>
 <br/>
-<div id="c_617" style="display:none;">
+<div id="c_622" style="display:none;">
 <table class='ptable'><tr>
 <th class='pn'></th>
 <th class='chg'>Change</th>
@@ -5012,9 +5138,9 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 <td>Recompilation of a client program may be broken.</td>
 </tr>
 </table>
-<span class="sect_aff" onclick="javascript:showContent(this, 'c_618')">
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_623')">
 [+] affected symbols: 10 (0.9%)</span>
-<div id="c_618" style="display:none;">
+<div id="c_623" style="display:none;">
 <div class='affected'><span class='iname_a'>TextureAtlasSampler::resolveParameters&#160;<span class='sym_p'><span>(&#160;ProgramSet* <i>programSet</i></span>&#160;)</span></span><br/>
 <div class='affect'>Field &#39;this.mPSTextureSizes&#39; in the object of this method has base type &#39;UniformParameterPtr&#39;.</div>
 <span class='iname_a'>TextureAtlasSampler::preAddToRenderState&#160;<span class='sym_p'><span>(&#160;RenderState const* <i>renderState</i></span>, <span>Ogre::Pass* <i>srcPass</i></span>, <span>Ogre::Pass* <i>dstPass</i></span>&#160;)</span></span><br/>
@@ -5042,10 +5168,10 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 <br/>
 <span class='h_name'>OgreShaderProgram.h</span><br/>
 <span class='ns'>namespace <b>Ogre::RTShader</b></span><br/>
-<span class="section" onclick="javascript:showContent(this, 'c_619')">
+<span class="section" onclick="javascript:showContent(this, 'c_624')">
 <span class='ext'>[+]</span> <span class='ttype'>class</span> Program <span class='warning'>&nbsp;3&nbsp;</span></span>
 <br/>
-<div id="c_619" style="display:none;">
+<div id="c_624" style="display:none;">
 <table class='ptable'><tr>
 <th class='pn'></th>
 <th class='chg'>Change</th>
@@ -5065,9 +5191,9 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 <td>Recompilation of a client program may be broken.</td>
 </tr>
 </table>
-<span class="sect_aff" onclick="javascript:showContent(this, 'c_620')">
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_625')">
 [+] affected symbols: 111 (9.9%)</span>
-<div id="c_620" style="display:none;">
+<div id="c_625" style="display:none;">
 <div class='affected'><span class='iname_a'>Ogre::Any::Any&lt;ShaderGenerator::SGPass*&gt;&#160;<span class='sym_p'><span>(&#160;ShaderGenerator::SGPass*const&amp; <span class='fp'>value</span></span>&#160;)</span></span><br/>
 <div class='affect'>Field &#39;value.mTargetRenderState.mProgramSet.mPSCpuProgram&#39; in 1st parameter &#39;value&#39; (reference) has base type &#39;Program&#39;.</div>
 <span class='iname_a'>ProgramSet::ProgramSet&#160;<span class='sym_p'>(&#160;)</span></span><br/>
@@ -5097,10 +5223,10 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 <br/>
 <span class='h_name'>OgreShaderProgramManager.h</span><br/>
 <span class='ns'>namespace <b>Ogre::RTShader</b></span><br/>
-<span class="section" onclick="javascript:showContent(this, 'c_621')">
+<span class="section" onclick="javascript:showContent(this, 'c_626')">
 <span class='ext'>[+]</span> <span class='ttype'>class</span> ProgramManager <span class='warning'>&nbsp;2&nbsp;</span></span>
 <br/>
-<div id="c_621" style="display:none;">
+<div id="c_626" style="display:none;">
 <table class='ptable'><tr>
 <th class='pn'></th>
 <th class='chg'>Change</th>
@@ -5115,9 +5241,9 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 <td>Recompilation of a client program may be broken.</td>
 </tr>
 </table>
-<span class="sect_aff" onclick="javascript:showContent(this, 'c_622')">
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_627')">
 [+] affected symbols: 23 (2.1%)</span>
-<div id="c_622" style="display:none;">
+<div id="c_627" style="display:none;">
 <div class='affected'><span class='iname_a'>ProgramManager::generateHash&#160;<span class='sym_p'><span>(&#160;Ogre::String const&amp; <i>programString</i></span>&#160;)</span></span><br/>
 <div class='affect'>This method is from &#39;ProgramManager&#39; class.</div>
 <span class='iname_a'>ProgramManager::getSingleton&#160;<span class='sym_p'>(&#160;)</span></span><br/>
@@ -5147,10 +5273,10 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 <br/>
 <span class='h_name'>OgreShaderProgramProcessor.h</span><br/>
 <span class='ns'>namespace <b>Ogre::RTShader</b></span><br/>
-<span class="section" onclick="javascript:showContent(this, 'c_623')">
+<span class="section" onclick="javascript:showContent(this, 'c_628')">
 <span class='ext'>[+]</span> <span class='ttype'>class</span> ProgramProcessor <span class='warning'>&nbsp;3&nbsp;</span></span>
 <br/>
-<div id="c_623" style="display:none;">
+<div id="c_628" style="display:none;">
 <table class='ptable'><tr>
 <th class='pn'></th>
 <th class='chg'>Change</th>
@@ -5170,9 +5296,9 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 <td>Recompilation of a client program may be broken.</td>
 </tr>
 </table>
-<span class="sect_aff" onclick="javascript:showContent(this, 'c_624')">
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_629')">
 [+] affected symbols: 38 (3.4%)</span>
-<div id="c_624" style="display:none;">
+<div id="c_629" style="display:none;">
 <div class='affected'><span class='iname_a'>ProgramManager::addProgramProcessor&#160;<span class='sym_p'><span>(&#160;ProgramProcessor* <span class='fp'>processor</span></span>&#160;)</span></span><br/>
 <div class='affect'>1st parameter &#39;processor&#39; (pointer) has base type &#39;ProgramProcessor&#39;.</div>
 <span class='iname_a'>ProgramManager::removeProgramProcessor&#160;<span class='sym_p'><span>(&#160;ProgramProcessor* <span class='fp'>processor</span></span>&#160;)</span></span><br/>
@@ -5199,10 +5325,10 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 </div>
 <br/><br/></div>
 
-<span class="section" onclick="javascript:showContent(this, 'c_625')">
+<span class="section" onclick="javascript:showContent(this, 'c_630')">
 <span class='ext'>[+]</span> <span class='ttype'>typedef</span> ProgramProcessor::LocalParameterMap <span class='warning'>&nbsp;1&nbsp;</span></span>
 <br/>
-<div id="c_625" style="display:none;">
+<div id="c_630" style="display:none;">
 <table class='ptable'><tr>
 <th class='pn'></th>
 <th class='chg'>Change</th>
@@ -5212,9 +5338,9 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 <td>Recompilation of a client program may be broken.</td>
 </tr>
 </table>
-<span class="sect_aff" onclick="javascript:showContent(this, 'c_626')">
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_631')">
 [+] affected symbols: 3 (0.3%)</span>
-<div id="c_626" style="display:none;">
+<div id="c_631" style="display:none;">
 <div class='affected'><span class='iname_a'>ProgramProcessor::rebuildFunctionInvocations&#160;<span class='sym_p'><span>(&#160;Ogre::vector&lt;FunctionAtom*&gt;::type const&amp; <i>funcAtomList</i></span>, <span>Ogre::vector&lt;ProgramProcessor::MergeParameter&gt;::type&amp; <i>mergedParams</i></span>, <span>Ogre::map&lt;Parameter*, std::shared_ptr&lt;Parameter&gt;, std::less&lt;Parameter*&gt; &gt;::type&amp; <span class='fp'>localParamsMap</span></span>&#160;)</span></span><br/>
 <div class='affect'>3rd parameter &#39;localParamsMap&#39; (reference) has base type &#39;ProgramProcessor::LocalParameterMap&#39;.</div>
 <span class='iname_a'>ProgramProcessor::generateLocalSplitParameters&#160;<span class='sym_p'><span>(&#160;Function* <i>func</i></span>, <span>enum Ogre::GpuProgramType <i>progType</i></span>, <span>Ogre::vector&lt;ProgramProcessor::MergeParameter&gt;::type&amp; <i>mergedParams</i></span>, <span>Ogre::vector&lt;std::shared_ptr&lt;Parameter&gt; &gt;::type&amp; <i>splitParams</i></span>, <span>Ogre::map&lt;Parameter*, std::shared_ptr&lt;Parameter&gt;, std::less&lt;Parameter*&gt; &gt;::type&amp; <span class='fp'>localParamsMap</span></span>&#160;)</span></span><br/>
@@ -5225,10 +5351,10 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 </div>
 <br/><br/></div>
 
-<span class="section" onclick="javascript:showContent(this, 'c_627')">
+<span class="section" onclick="javascript:showContent(this, 'c_632')">
 <span class='ext'>[+]</span> <span class='ttype'>typedef</span> ProgramProcessor::MergeParameterList <span class='warning'>&nbsp;1&nbsp;</span></span>
 <br/>
-<div id="c_627" style="display:none;">
+<div id="c_632" style="display:none;">
 <table class='ptable'><tr>
 <th class='pn'></th>
 <th class='chg'>Change</th>
@@ -5238,9 +5364,9 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 <td>Recompilation of a client program may be broken.</td>
 </tr>
 </table>
-<span class="sect_aff" onclick="javascript:showContent(this, 'c_628')">
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_633')">
 [+] affected symbols: 7 (0.6%)</span>
-<div id="c_628" style="display:none;">
+<div id="c_633" style="display:none;">
 <div class='affected'><span class='iname_a'>ProgramProcessor::mergeParameters&#160;<span class='sym_p'><span>(&#160;Ogre::vector&lt;std::shared_ptr&lt;Parameter&gt; &gt;::type* <i>paramsTable</i></span>, <span>Ogre::vector&lt;ProgramProcessor::MergeParameter&gt;::type&amp; <span class='fp'>mergedParams</span></span>, <span>Ogre::vector&lt;std::shared_ptr&lt;Parameter&gt; &gt;::type&amp; <i>splitParams</i></span>&#160;)</span></span><br/>
 <div class='affect'>2nd parameter &#39;mergedParams&#39; (reference) has base type &#39;ProgramProcessor::MergeParameterList&#39;.</div>
 <span class='iname_a'>ProgramProcessor::rebuildParameterList&#160;<span class='sym_p'><span>(&#160;Function* <i>func</i></span>, <span>int <i>paramsUsage</i></span>, <span>Ogre::vector&lt;ProgramProcessor::MergeParameter&gt;::type&amp; <span class='fp'>mergedParams</span></span>&#160;)</span></span><br/>
@@ -5259,10 +5385,10 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 </div>
 <br/><br/></div>
 
-<span class="section" onclick="javascript:showContent(this, 'c_629')">
+<span class="section" onclick="javascript:showContent(this, 'c_634')">
 <span class='ext'>[+]</span> <span class='ttype'>typedef</span> ProgramProcessor::ParameterOperandMap <span class='warning'>&nbsp;1&nbsp;</span></span>
 <br/>
-<div id="c_629" style="display:none;">
+<div id="c_634" style="display:none;">
 <table class='ptable'><tr>
 <th class='pn'></th>
 <th class='chg'>Change</th>
@@ -5272,9 +5398,9 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 <td>Recompilation of a client program may be broken.</td>
 </tr>
 </table>
-<span class="sect_aff" onclick="javascript:showContent(this, 'c_630')">
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_635')">
 [+] affected symbols: 3 (0.3%)</span>
-<div id="c_630" style="display:none;">
+<div id="c_635" style="display:none;">
 <div class='affected'><span class='iname_a'>ProgramProcessor::buildParameterReferenceMap&#160;<span class='sym_p'><span>(&#160;Ogre::vector&lt;FunctionAtom*&gt;::type const&amp; <i>funcAtomList</i></span>, <span>Ogre::map&lt;Parameter*, std::vector&lt;Operand*&gt;, std::less&lt;Parameter*&gt; &gt;::type&amp; <span class='fp'>paramsRefMap</span></span>&#160;)</span></span><br/>
 <div class='affect'>2nd parameter &#39;paramsRefMap&#39; (reference) has base type &#39;ProgramProcessor::ParameterOperandMap&#39;.</div>
 <span class='iname_a'>ProgramProcessor::replaceParametersReferences&#160;<span class='sym_p'><span>(&#160;Ogre::vector&lt;ProgramProcessor::MergeParameter&gt;::type&amp; <i>mergedParams</i></span>, <span>Ogre::map&lt;Parameter*, std::vector&lt;Operand*&gt;, std::less&lt;Parameter*&gt; &gt;::type&amp; <span class='fp'>paramsRefMap</span></span>&#160;)</span></span><br/>
@@ -5288,10 +5414,10 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 <br/>
 <span class='h_name'>OgreShaderProgramSet.h</span><br/>
 <span class='ns'>namespace <b>Ogre::RTShader</b></span><br/>
-<span class="section" onclick="javascript:showContent(this, 'c_631')">
+<span class="section" onclick="javascript:showContent(this, 'c_636')">
 <span class='ext'>[+]</span> <span class='ttype'>class</span> ProgramSet <span class='warning'>&nbsp;2&nbsp;</span></span>
 <br/>
-<div id="c_631" style="display:none;">
+<div id="c_636" style="display:none;">
 <table class='ptable'><tr>
 <th class='pn'></th>
 <th class='chg'>Change</th>
@@ -5306,9 +5432,9 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 <td>Recompilation of a client program may be broken.</td>
 </tr>
 </table>
-<span class="sect_aff" onclick="javascript:showContent(this, 'c_632')">
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_637')">
 [+] affected symbols: 10 (0.9%)</span>
-<div id="c_632" style="display:none;">
+<div id="c_637" style="display:none;">
 <div class='affected'><span class='iname_a'>ProgramSet::getCpuVertexProgram&#160;<span class='sym_p'>(&#160;)</span></span><br/>
 <div class='affect'>This method is from &#39;ProgramSet&#39; class.</div>
 <span class='iname_a'>ProgramSet::getGpuVertexProgram&#160;<span class='sym_p'>(&#160;)</span></span><br/>
@@ -5336,10 +5462,10 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 <br/>
 <span class='h_name'>OgreShaderProgramWriter.h</span><br/>
 <span class='ns'>namespace <b>Ogre::RTShader</b></span><br/>
-<span class="section" onclick="javascript:showContent(this, 'c_633')">
+<span class="section" onclick="javascript:showContent(this, 'c_638')">
 <span class='ext'>[+]</span> <span class='ttype'>class</span> ProgramWriter <span class='warning'>&nbsp;2&nbsp;</span></span>
 <br/>
-<div id="c_633" style="display:none;">
+<div id="c_638" style="display:none;">
 <table class='ptable'><tr>
 <th class='pn'></th>
 <th class='chg'>Change</th>
@@ -5354,9 +5480,9 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 <td>Recompilation of a client program may be broken.</td>
 </tr>
 </table>
-<span class="sect_aff" onclick="javascript:showContent(this, 'c_634')">
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_639')">
 [+] affected symbols: 37 (3.3%)</span>
-<div id="c_634" style="display:none;">
+<div id="c_639" style="display:none;">
 <div class='affected'><span class='iname_a'>ProgramWriter::writeSourceCode&#160;<span class='sym_p'><span>(&#160;std::ostream&amp; <i>p1</i></span>, <span>Program* <i>p2</i></span>&#160;)</span></span><br/>
 <div class='affect'>This method is from &#39;ProgramWriter&#39; class.</div>
 <span class='iname_a'>ProgramWriter::writeProgramTitle&#160;<span class='sym_p'><span>(&#160;std::ostream&amp; <i>os</i></span>, <span>Program* <i>program</i></span>&#160;)</span></span><br/>
@@ -5386,10 +5512,10 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 <br/>
 <span class='h_name'>OgreShaderProgramWriterManager.h</span><br/>
 <span class='ns'>namespace <b>Ogre::RTShader</b></span><br/>
-<span class="section" onclick="javascript:showContent(this, 'c_635')">
+<span class="section" onclick="javascript:showContent(this, 'c_640')">
 <span class='ext'>[+]</span> <span class='ttype'>class</span> ProgramWriterFactory <span class='warning'>&nbsp;2&nbsp;</span></span>
 <br/>
-<div id="c_635" style="display:none;">
+<div id="c_640" style="display:none;">
 <table class='ptable'><tr>
 <th class='pn'></th>
 <th class='chg'>Change</th>
@@ -5404,9 +5530,9 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 <td>Recompilation of a client program may be broken.</td>
 </tr>
 </table>
-<span class="sect_aff" onclick="javascript:showContent(this, 'c_636')">
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_641')">
 [+] affected symbols: 10 (0.9%)</span>
-<div id="c_636" style="display:none;">
+<div id="c_641" style="display:none;">
 <div class='affected'><span class='iname_a'>ProgramWriterFactory::create&#160;<span class='sym_p'>(&#160;)</span></span><br/>
 <div class='affect'>This method is from &#39;ProgramWriterFactory&#39; class.</div>
 <span class='iname_a'>ProgramWriterFactory::ProgramWriterFactory&#160;<span class='sym_p'>(&#160;)</span></span><br/>
@@ -5431,10 +5557,10 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 </div>
 <br/><br/></div>
 
-<span class="section" onclick="javascript:showContent(this, 'c_637')">
+<span class="section" onclick="javascript:showContent(this, 'c_642')">
 <span class='ext'>[+]</span> <span class='ttype'>class</span> ProgramWriterManager <span class='warning'>&nbsp;2&nbsp;</span></span>
 <br/>
-<div id="c_637" style="display:none;">
+<div id="c_642" style="display:none;">
 <table class='ptable'><tr>
 <th class='pn'></th>
 <th class='chg'>Change</th>
@@ -5449,9 +5575,9 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 <td>Recompilation of a client program may be broken.</td>
 </tr>
 </table>
-<span class="sect_aff" onclick="javascript:showContent(this, 'c_638')">
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_643')">
 [+] affected symbols: 8 (0.7%)</span>
-<div id="c_638" style="display:none;">
+<div id="c_643" style="display:none;">
 <div class='affected'><span class='iname_a'>ProgramWriterManager::addFactory&#160;<span class='sym_p'><span>(&#160;ProgramWriterFactory* <i>factory</i></span>&#160;)</span></span><br/>
 <div class='affect'>This method is from &#39;ProgramWriterManager&#39; class.</div>
 <span class='iname_a'>ProgramWriterManager::getSingleton&#160;<span class='sym_p'>(&#160;)</span></span><br/>
@@ -5475,10 +5601,10 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 <br/>
 <span class='h_name'>OgreShaderRenderState.h</span><br/>
 <span class='ns'>namespace <b>Ogre::RTShader</b></span><br/>
-<span class="section" onclick="javascript:showContent(this, 'c_639')">
+<span class="section" onclick="javascript:showContent(this, 'c_644')">
 <span class='ext'>[+]</span> <span class='ttype'>class</span> RenderState <span class='warning'>&nbsp;2&nbsp;</span></span>
 <br/>
-<div id="c_639" style="display:none;">
+<div id="c_644" style="display:none;">
 <table class='ptable'><tr>
 <th class='pn'></th>
 <th class='chg'>Change</th>
@@ -5493,9 +5619,9 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 <td>Recompilation of a client program may be broken.</td>
 </tr>
 </table>
-<span class="sect_aff" onclick="javascript:showContent(this, 'c_640')">
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_645')">
 [+] affected symbols: 8 (0.7%)</span>
-<div id="c_640" style="display:none;">
+<div id="c_645" style="display:none;">
 <div class='affected'><span class='iname_a'>RenderState::removeTemplateSubRenderState&#160;<span class='sym_p'><span>(&#160;SubRenderState* <i>subRenderState</i></span>&#160;)</span></span><br/>
 <div class='affect'>This method is from &#39;RenderState&#39; class.</div>
 <span class='iname_a'>RenderState::RenderState&#160;<span class='sym_p'>(&#160;)</span></span><br/>
@@ -5519,10 +5645,10 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 <br/>
 <span class='h_name'>OgreShaderSubRenderState.h</span><br/>
 <span class='ns'>namespace <b>Ogre::RTShader</b></span><br/>
-<span class="section" onclick="javascript:showContent(this, 'c_641')">
+<span class="section" onclick="javascript:showContent(this, 'c_646')">
 <span class='ext'>[+]</span> <span class='ttype'>class</span> SubRenderState <span class='warning'>&nbsp;2&nbsp;</span></span>
 <br/>
-<div id="c_641" style="display:none;">
+<div id="c_646" style="display:none;">
 <table class='ptable'><tr>
 <th class='pn'></th>
 <th class='chg'>Change</th>
@@ -5537,9 +5663,9 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 <td>Recompilation of a client program may be broken.</td>
 </tr>
 </table>
-<span class="sect_aff" onclick="javascript:showContent(this, 'c_642')">
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_647')">
 [+] affected symbols: 187 (16.7%)</span>
-<div id="c_642" style="display:none;">
+<div id="c_647" style="display:none;">
 <div class='affected'><span class='iname_a'>FFPLighting::msBlankLight <span class='attr'>[data]</span></span><br/>
 <div class='affect'>This method is from derived class &#39;FFPLighting&#39;.</div>
 <span class='iname_a'>FFPLighting::setLightCount&#160;<span class='sym_p'><span>(&#160;int const* <i>lightCount</i></span>&#160;)</span></span><br/>
@@ -5566,10 +5692,10 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 </div>
 <br/><br/></div>
 
-<span class="section" onclick="javascript:showContent(this, 'c_643')">
+<span class="section" onclick="javascript:showContent(this, 'c_648')">
 <span class='ext'>[+]</span> <span class='ttype'>class</span> SubRenderStateFactory <span class='warning'>&nbsp;2&nbsp;</span></span>
 <br/>
-<div id="c_643" style="display:none;">
+<div id="c_648" style="display:none;">
 <table class='ptable'><tr>
 <th class='pn'></th>
 <th class='chg'>Change</th>
@@ -5584,9 +5710,9 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 <td>Recompilation of a client program may be broken.</td>
 </tr>
 </table>
-<span class="sect_aff" onclick="javascript:showContent(this, 'c_644')">
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_649')">
 [+] affected symbols: 108 (9.6%)</span>
-<div id="c_644" style="display:none;">
+<div id="c_649" style="display:none;">
 <div class='affected'><span class='iname_a'>FFPFogFactory::writeInstance&#160;<span class='sym_p'><span>(&#160;Ogre::MaterialSerializer* <i>ser</i></span>, <span>SubRenderState* <i>subRenderState</i></span>, <span>Ogre::Pass* <i>srcPass</i></span>, <span>Ogre::Pass* <i>dstPass</i></span>&#160;)</span></span><br/>
 <div class='affect'>This method is from derived class &#39;FFPFogFactory&#39;.</div>
 <span class='iname_a'>FFPFogFactory::createInstance&#160;<span class='sym_p'><span>(&#160;Ogre::ScriptCompiler* <i>compiler</i></span>, <span>Ogre::PropertyAbstractNode* <i>prop</i></span>, <span>Ogre::Pass* <i>pass</i></span>, <span>SGScriptTranslator* <i>translator</i></span>&#160;)</span></span><br/>
@@ -5616,10 +5742,10 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 <br/>
 <span class='h_name'>OgreStringVector.h</span><br/>
 <span class='ns'>namespace <b>Ogre</b></span><br/>
-<span class="section" onclick="javascript:showContent(this, 'c_645')">
+<span class="section" onclick="javascript:showContent(this, 'c_650')">
 <span class='ext'>[+]</span> <span class='ttype'>typedef</span> StringVector <span class='warning'>&nbsp;1&nbsp;</span></span>
 <br/>
-<div id="c_645" style="display:none;">
+<div id="c_650" style="display:none;">
 <table class='ptable'><tr>
 <th class='pn'></th>
 <th class='chg'>Change</th>
@@ -5629,9 +5755,9 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 <td>Recompilation of a client program may be broken.</td>
 </tr>
 </table>
-<span class="sect_aff" onclick="javascript:showContent(this, 'c_646')">
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_651')">
 [+] affected symbols: 1 (0.1%)</span>
-<div id="c_646" style="display:none;">
+<div id="c_651" style="display:none;">
 <div class='affected'><span class='iname_a'>RTShader::ProgramManager::createGpuProgram&#160;<span class='sym_p'><span>(&#160;RTShader::Program* <i>shaderProgram</i></span>, <span>RTShader::ProgramWriter* <i>programWriter</i></span>, <span>String const&amp; <i>language</i></span>, <span>String const&amp; <i>profiles</i></span>, <span>vector&lt;std::__cxx11::basic_string&lt;char&gt; &gt;::type const&amp; <span class='fp'>profilesList</span></span>, <span>String const&amp; <i>cachePath</i></span>&#160;)</span></span><br/>
 <div class='affect'>5th parameter &#39;profilesList&#39; (reference) has base type &#39;StringVector&#39;.</div>
 </div>
@@ -5641,10 +5767,10 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 <br/>
 <span class='h_name'>OgreTextureUnitState.h</span><br/>
 <span class='ns'>namespace <b>Ogre</b></span><br/>
-<span class="section" onclick="javascript:showContent(this, 'c_647')">
+<span class="section" onclick="javascript:showContent(this, 'c_652')">
 <span class='ext'>[+]</span> <span class='ttype'>class</span> TextureUnitState <span class='warning'>&nbsp;2&nbsp;</span></span>
 <br/>
-<div id="c_647" style="display:none;">
+<div id="c_652" style="display:none;">
 <table class='ptable'><tr>
 <th class='pn'></th>
 <th class='chg'>Change</th>
@@ -5659,9 +5785,9 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 <td>Recompilation of a client program may be broken.</td>
 </tr>
 </table>
-<span class="sect_aff" onclick="javascript:showContent(this, 'c_648')">
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_653')">
 [+] affected symbols: 17 (1.5%)</span>
-<div id="c_648" style="display:none;">
+<div id="c_653" style="display:none;">
 <div class='affected'><span class='iname_a'>RTShader::FFPTexturing::setTextureUnit&#160;<span class='sym_p'><span>(&#160;unsigned short <i>index</i></span>, <span>TextureUnitState* <span class='fp'>textureUnitState</span></span>&#160;)</span></span><br/>
 <div class='affect'>2nd parameter &#39;textureUnitState&#39; (pointer) has base type &#39;TextureUnitState&#39;.</div>
 <span class='iname_a'>RTShader::FFPTexturing::getTexCalcMethod&#160;<span class='sym_p'><span>(&#160;TextureUnitState* <span class='fp'>textureUnitState</span></span>&#160;)</span></span><br/>
@@ -5694,10 +5820,10 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 <h2>Other Changes in Data Types <span class='passed'>&nbsp;184&nbsp;</span></h2><hr/>
 <span class='h_name'>OgreGpuProgramParams.h</span><br/>
 <span class='ns'>namespace <b>Ogre</b></span><br/>
-<span class="section" onclick="javascript:showContent(this, 'c_649')">
+<span class="section" onclick="javascript:showContent(this, 'c_654')">
 <span class='ext'>[+]</span> <span class='ttype'>enum</span> GpuConstantType <span class='passed'>&nbsp;45&nbsp;</span></span>
 <br/>
-<div id="c_649" style="display:none;">
+<div id="c_654" style="display:none;">
 <table class='ptable'><tr>
 <th class='pn'></th>
 <th class='chg'>Change</th>
@@ -5927,9 +6053,9 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 <td>No effect.</td>
 </tr>
 </table>
-<span class="sect_aff" onclick="javascript:showContent(this, 'c_650')">
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_655')">
 [+] affected symbols: 30 (2.7%)</span>
-<div id="c_650" style="display:none;">
+<div id="c_655" style="display:none;">
 <div class='affected'><span class='iname_a'>RTShader::FFPTexturing::TextureUnitParams::TextureUnitParams&#160;<span class='sym_p'><span>(&#160;struct RTShader::FFPTexturing::TextureUnitParams&amp;& <span class='fp'>p1</span></span>&#160;)</span></span><br/>
 <div class='affect'>Field &#39;p1.mTextureSamplerType&#39; in 1st parameter &#39;p1&#39; is of type &#39;enum GpuConstantType&#39;.</div>
 <span class='iname_a'>RTShader::FFPTexturing::TextureUnitParams::TextureUnitParams&#160;<span class='sym_p'>(&#160;)</span></span><br/>
@@ -5956,10 +6082,10 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 </div>
 <br/><br/></div>
 
-<span class="section" onclick="javascript:showContent(this, 'c_651')">
+<span class="section" onclick="javascript:showContent(this, 'c_656')">
 <span class='ext'>[+]</span> <span class='ttype'>enum</span> GpuProgramParameters::AutoConstantType <span class='passed'>&nbsp;55&nbsp;</span></span>
 <br/>
-<div id="c_651" style="display:none;">
+<div id="c_656" style="display:none;">
 <table class='ptable'><tr>
 <th class='pn'></th>
 <th class='chg'>Change</th>
@@ -6239,9 +6365,9 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 <td>No effect.</td>
 </tr>
 </table>
-<span class="sect_aff" onclick="javascript:showContent(this, 'c_652')">
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_657')">
 [+] affected symbols: 12 (1.1%)</span>
-<div id="c_652" style="display:none;">
+<div id="c_657" style="display:none;">
 <div class='affected'><span class='iname_a'>RTShader::UniformParameter::UniformParameter&#160;<span class='sym_p'><span>(&#160;enum GpuConstantType <i>type</i></span>, <span>String const&amp; <i>name</i></span>, <span>enum RTShader::Parameter::Semantic const&amp; <i>semantic</i></span>, <span>int <i>index</i></span>, <span>enum RTShader::Parameter::Content const&amp; <i>content</i></span>, <span>uint16 <i>variability</i></span>, <span>size_t <i>size</i></span>&#160;)</span></span><br/>
 <div class='affect'>Field &#39;this.mAutoConstantType&#39; in the object of this method is of type &#39;enum GpuProgramParameters::AutoConstantType&#39;.</div>
 <span class='iname_a'>RTShader::UniformParameter::UniformParameter&#160;<span class='sym_p'><span>(&#160;enum GpuProgramParameters::AutoConstantType <span class='fp'>autoType</span></span>, <span>Real <i>fAutoConstantData</i></span>, <span>size_t <i>size</i></span>&#160;)</span></span><br/>
@@ -6271,10 +6397,10 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 <br/>
 <span class='h_name'>OgrePass.h</span><br/>
 <span class='ns'>namespace <b>Ogre</b></span><br/>
-<span class="section" onclick="javascript:showContent(this, 'c_653')">
+<span class="section" onclick="javascript:showContent(this, 'c_658')">
 <span class='ext'>[+]</span> <span class='ttype'>class</span> Pass <span class='passed'>&nbsp;56&nbsp;</span></span>
 <br/>
-<div id="c_653" style="display:none;">
+<div id="c_658" style="display:none;">
 <table class='ptable'><tr>
 <th class='pn'></th>
 <th class='chg'>Change</th>
@@ -6559,9 +6685,9 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 <td>No effect.</td>
 </tr>
 </table>
-<span class="sect_aff" onclick="javascript:showContent(this, 'c_654')">
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_659')">
 [+] affected symbols: 75 (6.7%)</span>
-<div id="c_654" style="display:none;">
+<div id="c_659" style="display:none;">
 <div class='affected'><span class='iname_a'>Any::Any&lt;RTShader::ShaderGenerator::SGPass*&gt;&#160;<span class='sym_p'><span>(&#160;RTShader::ShaderGenerator::SGPass*const&amp; <span class='fp'>value</span></span>&#160;)</span></span><br/>
 <div class='affect'>Field &#39;value.mDstPass&#39; in 1st parameter &#39;value&#39; (reference) has base type &#39;Pass&#39;.</div>
 <span class='iname_a'>RTShader::FFPLighting::preAddToRenderState&#160;<span class='sym_p'><span>(&#160;RTShader::RenderState const* <i>renderState</i></span>, <span>Pass* <i>srcPass</i></span>, <span>Pass* <span class='fp'>dstPass</span></span>&#160;)</span></span><br/>
@@ -6591,10 +6717,10 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 <br/>
 <span class='h_name'>OgreRenderOperation.h</span><br/>
 <span class='ns'>namespace <b>Ogre</b></span><br/>
-<span class="section" onclick="javascript:showContent(this, 'c_655')">
+<span class="section" onclick="javascript:showContent(this, 'c_660')">
 <span class='ext'>[+]</span> <span class='ttype'>enum</span> RenderOperation::OperationType <span class='passed'>&nbsp;5&nbsp;</span></span>
 <br/>
-<div id="c_655" style="display:none;">
+<div id="c_660" style="display:none;">
 <table class='ptable'><tr>
 <th class='pn'></th>
 <th class='chg'>Change</th>
@@ -6624,9 +6750,9 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 <td>No effect.</td>
 </tr>
 </table>
-<span class="sect_aff" onclick="javascript:showContent(this, 'c_656')">
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_661')">
 [+] affected symbols: 1 (0.1%)</span>
-<div id="c_656" style="display:none;">
+<div id="c_661" style="display:none;">
 <div class='affected'><span class='iname_a'>RenderOperation::RenderOperation&#160;<span class='sym_p'>(&#160;)</span></span><br/>
 <div class='affect'>Field &#39;this.operationType&#39; in the object of this method is of type &#39;enum RenderOperation::OperationType&#39;.</div>
 </div>
@@ -6636,10 +6762,10 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 <br/>
 <span class='h_name'>OgreShaderExNormalMapLighting.h</span><br/>
 <span class='ns'>namespace <b>Ogre::RTShader</b></span><br/>
-<span class="section" onclick="javascript:showContent(this, 'c_657')">
+<span class="section" onclick="javascript:showContent(this, 'c_662')">
 <span class='ext'>[+]</span> <span class='ttype'>class</span> NormalMapLighting <span class='passed'>&nbsp;11&nbsp;</span></span>
 <br/>
-<div id="c_657" style="display:none;">
+<div id="c_662" style="display:none;">
 <table class='ptable'><tr>
 <th class='pn'></th>
 <th class='chg'>Change</th>
@@ -6699,9 +6825,9 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 <td>No effect.</td>
 </tr>
 </table>
-<span class="sect_aff" onclick="javascript:showContent(this, 'c_658')">
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_663')">
 [+] affected symbols: 12 (1.1%)</span>
-<div id="c_658" style="display:none;">
+<div id="c_663" style="display:none;">
 <div class='affected'><span class='iname_a'>NormalMapLighting::addVSInvocation&#160;<span class='sym_p'><span>(&#160;Function* <i>vsMain</i></span>, <span>int const <i>groupOrder</i></span>&#160;)</span></span><br/>
 <div class='affect'>This method is from &#39;NormalMapLighting&#39; class.</div>
 <span class='iname_a'>NormalMapLighting::preAddToRenderState&#160;<span class='sym_p'><span>(&#160;RenderState const* <i>renderState</i></span>, <span>Ogre::Pass* <i>srcPass</i></span>, <span>Ogre::Pass* <i>dstPass</i></span>&#160;)</span></span><br/>
@@ -6731,10 +6857,10 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 <br/>
 <span class='h_name'>OgreShaderFFPLighting.h</span><br/>
 <span class='ns'>namespace <b>Ogre::RTShader</b></span><br/>
-<span class="section" onclick="javascript:showContent(this, 'c_659')">
+<span class="section" onclick="javascript:showContent(this, 'c_664')">
 <span class='ext'>[+]</span> <span class='ttype'>class</span> FFPLighting <span class='passed'>&nbsp;2&nbsp;</span></span>
 <br/>
-<div id="c_659" style="display:none;">
+<div id="c_664" style="display:none;">
 <table class='ptable'><tr>
 <th class='pn'></th>
 <th class='chg'>Change</th>
@@ -6749,9 +6875,9 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 <td>No effect.</td>
 </tr>
 </table>
-<span class="sect_aff" onclick="javascript:showContent(this, 'c_660')">
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_665')">
 [+] affected symbols: 14 (1.2%)</span>
-<div id="c_660" style="display:none;">
+<div id="c_665" style="display:none;">
 <div class='affected'><span class='iname_a'>FFPLighting::setLightCount&#160;<span class='sym_p'><span>(&#160;int const* <i>lightCount</i></span>&#160;)</span></span><br/>
 <div class='affect'>This method is from &#39;FFPLighting&#39; class.</div>
 <span class='iname_a'>FFPLighting::resolveParameters&#160;<span class='sym_p'><span>(&#160;ProgramSet* <i>programSet</i></span>&#160;)</span></span><br/>
@@ -6781,10 +6907,10 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 <br/>
 <span class='h_name'>OgreTechnique.h</span><br/>
 <span class='ns'>namespace <b>Ogre</b></span><br/>
-<span class="section" onclick="javascript:showContent(this, 'c_661')">
+<span class="section" onclick="javascript:showContent(this, 'c_666')">
 <span class='ext'>[+]</span> <span class='ttype'>class</span> Technique <span class='passed'>&nbsp;10&nbsp;</span></span>
 <br/>
-<div id="c_661" style="display:none;">
+<div id="c_666" style="display:none;">
 <table class='ptable'><tr>
 <th class='pn'></th>
 <th class='chg'>Change</th>
@@ -6839,9 +6965,9 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 <td>No effect.</td>
 </tr>
 </table>
-<span class="sect_aff" onclick="javascript:showContent(this, 'c_662')">
+<span class="sect_aff" onclick="javascript:showContent(this, 'c_667')">
 [+] affected symbols: 91 (8.1%)</span>
-<div id="c_662" style="display:none;">
+<div id="c_667" style="display:none;">
 <div class='affected'><span class='iname_a'>Any::Any&lt;RTShader::ShaderGenerator::SGTechnique*&gt;&#160;<span class='sym_p'><span>(&#160;RTShader::ShaderGenerator::SGTechnique*const&amp; <span class='fp'>value</span></span>&#160;)</span></span><br/>
 <div class='affect'>Field &#39;value.mDstTechnique&#39; in 1st parameter &#39;value&#39; (reference) has base type &#39;Technique&#39;.</div>
 <span class='iname_a'>Any::Any&lt;RTShader::ShaderGenerator::SGPass*&gt;&#160;<span class='sym_p'><span>(&#160;RTShader::ShaderGenerator::SGPass*const&amp; <span class='fp'>value</span></span>&#160;)</span></span><br/>
@@ -6874,10 +7000,10 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 <h2>Other Changes in Symbols <span class='passed'>&nbsp;2&nbsp;</span></h2><hr/>
 <span class='h_name'>OgreShaderExLayeredBlending.h</span><br/>
 <span class='ns'>namespace <b>Ogre::RTShader</b></span><br/>
-<span class="section" onclick="javascript:showContent(this, 'c_663')">
+<span class="section" onclick="javascript:showContent(this, 'c_668')">
 <span class='ext'>[+]</span> LayeredBlending::addPSBlendInvocations&#160;<span class='sym_p'><span>(&#160;Function* <span class='color_p'>psMain</span></span>, <span>std::shared_ptr&lt;Ogre::DataStream&gt; <span class='color_p'>arg1</span></span>, <span>std::shared_ptr&lt;Ogre::DataStream&gt; <span class='color_p'>arg2</span></span>, <span>std::shared_ptr&lt;Ogre::DataStream&gt; <span class='color_p'>texel</span></span>, <span>int <span class='color_p'>samplerIndex</span></span>, <span>Ogre::LayerBlendModeEx const&amp; <span class='color_p'>blendMode</span></span>, <span>int const <span class='color_p'>groupOrder</span></span>, <span>int <span class='color_p'>targetChannels</span></span>&#160;)</span> <span class='passed'>&nbsp;1&nbsp;</span></span>
 <br/>
-<div id="c_663" style="display:none;">
+<div id="c_668" style="display:none;">
 
 
 <span class='new_sign_lbl'>&#8675;</span>
@@ -6898,10 +7024,10 @@ SGScriptTranslator::translateTextureUnit&#160;<span class='sym_p'><span>(&#160;O
 </table>
 <br/>
 </div>
-<span class="section" onclick="javascript:showContent(this, 'c_664')">
+<span class="section" onclick="javascript:showContent(this, 'c_669')">
 <span class='ext'>[+]</span> LayeredBlending::addPSModifierInvocation&#160;<span class='sym_p'><span>(&#160;Function* <span class='color_p'>psMain</span></span>, <span>int <span class='color_p'>samplerIndex</span></span>, <span>std::shared_ptr&lt;Ogre::DataStream&gt; <span class='color_p'>arg1</span></span>, <span>std::shared_ptr&lt;Ogre::DataStream&gt; <span class='color_p'>arg2</span></span>, <span>int const <span class='color_p'>groupOrder</span></span>, <span>int <span class='color_p'>targetChannels</span></span>&#160;)</span> <span class='passed'>&nbsp;1&nbsp;</span></span>
 <br/>
-<div id="c_664" style="display:none;">
+<div id="c_669" style="display:none;">
 
 
 <span class='new_sign_lbl'>&#8675;</span>
