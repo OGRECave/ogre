@@ -45,12 +45,12 @@ namespace Ogre
         mMesh->removeLodLevels();
         for (unsigned short i = 0; i < submeshCount; i++) {
             SubMesh::LODFaceList& lods = mMesh->getSubMesh(i)->mLodFaceList;
-            typedef std::vector<LodIndexBuffer> GenBuffers;
+            typedef std::vector<IndexData> GenBuffers;
             GenBuffers& buffers = mBuffer.submesh[i].genIndexBuffers;
 
             size_t buffCount = buffers.size();
             for (size_t n=0; n<buffCount;n++) {
-                LodIndexBuffer& buff = buffers[n];
+                auto& buff = buffers[n];
                 OgreAssert((int)buff.indexCount >= 0, "");
                 lods.push_back(OGRE_NEW IndexData());
                 lods.back()->indexStart = buff.indexStart;
@@ -83,20 +83,20 @@ namespace Ogre
 
     void LodOutputProviderBuffer::createSubMeshLodIndexData(size_t subMeshIndex, int lodIndex, const HardwareIndexBufferPtr & indexBuffer, size_t indexStart, size_t indexCount)
     {
-        std::vector<LodIndexBuffer>& lods = mBuffer.submesh[subMeshIndex].genIndexBuffers;
+        auto& lods = mBuffer.submesh[subMeshIndex].genIndexBuffers;
         lods.reserve(lods.size() + 1);
-        LodIndexBuffer * curLod;
+        IndexData * curLod;
 
         // I don't know what the negative lodIndex should mean but this logic
         // was present in the original code.
         if (lodIndex < 0)
         {
-            lods.push_back(LodIndexBuffer());
+            lods.push_back(IndexData());
             curLod = &lods.back();
         }
         else
         {
-            curLod = &*lods.insert(lods.begin() + lodIndex, LodIndexBuffer());
+            curLod = &*lods.insert(lods.begin() + lodIndex, IndexData());
         }
 
         curLod->indexStart = indexStart;

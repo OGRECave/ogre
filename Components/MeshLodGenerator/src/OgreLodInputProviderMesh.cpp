@@ -134,10 +134,9 @@ namespace Ogre
         }
     }
 
-    void LodInputProviderMesh::addIndexData(LodData* data, size_t subMeshIndex)
+    const IndexData* LodInputProviderMesh::getSubMeshIndexData(size_t subMeshIndex) const
     {
-        IndexData* id = mMesh->getSubMesh(subMeshIndex)->indexData;
-        addIndexDataImpl(data, id->indexBuffer, id->indexStart, id->indexCount, subMeshIndex);
+        return mMesh->getSubMesh(subMeshIndex)->indexData;
     }
 
     const String & LodInputProviderMesh::getMeshName()

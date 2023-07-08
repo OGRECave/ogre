@@ -315,25 +315,27 @@ namespace Ogre
         }
     }
 
-    void LodInputProvider::addIndexDataImpl(LodData* data, const HardwareIndexBufferPtr& ibuf, size_t start, size_t count, size_t subMeshIndex)
+    void LodInputProvider::addIndexData(LodData* data, size_t subMeshIndex)
     {
-        if (count == 0 || ibuf == nullptr) {
+        const IndexData* id = getSubMeshIndexData(subMeshIndex);
+
+        if (!id->indexCount || !id->indexBuffer) {
             // Locking a zero length buffer on Linux with nvidia cards fails.
             return;
         }
 
-        data->mIndexBufferInfoList[subMeshIndex].indexSize = ibuf->getIndexSize();
-        data->mIndexBufferInfoList[subMeshIndex].indexCount = count;
+        data->mIndexBufferInfoList[subMeshIndex].indexSize = id->indexBuffer->getIndexSize();
+        data->mIndexBufferInfoList[subMeshIndex].indexCount = id->indexCount;
 
         bool useSharedVertexLookup = getSubMeshUseSharedVertices(subMeshIndex);
         auto renderOp = getSubMeshRenderOp(subMeshIndex);
         VertexLookupList& lookup = useSharedVertexLookup ? mSharedVertexLookup : mVertexLookup;
 
         // Lock the buffer for reading.
-        HardwareBufferLockGuard lock(ibuf, HardwareBuffer::HBL_READ_ONLY);
-        size_t isize = ibuf->getIndexSize();
-        uchar* iStart = (uchar*)lock.pData + start * isize;
-        uchar* iEnd = iStart + count * isize;
+        HardwareBufferLockGuard lock(id->indexBuffer, HardwareBuffer::HBL_READ_ONLY);
+        size_t isize = id->indexBuffer->getIndexSize();
+        uchar* iStart = (uchar*)lock.pData + id->indexStart * isize;
+        uchar* iEnd = iStart + id->indexCount * isize;
 
         if (renderOp == RenderOperation::OT_TRIANGLE_LIST ||
             renderOp == RenderOperation::OT_TRIANGLE_STRIP ||

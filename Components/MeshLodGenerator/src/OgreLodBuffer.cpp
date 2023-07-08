@@ -31,20 +31,6 @@
 
 namespace Ogre
 {
-    void LodIndexBuffer::fillBuffer( Ogre::IndexData* data )
-    {
-        indexCount = data->indexCount;
-        if (indexCount > 0) {
-            const HardwareIndexBufferSharedPtr& hwIndexBuffer = data->indexBuffer;
-            auto indexSize = hwIndexBuffer->getIndexSize();
-            DefaultHardwareBufferManagerBase bfrMgr;
-            indexBuffer = bfrMgr.createIndexBuffer(hwIndexBuffer->getType(), indexCount, HBU_CPU_ONLY);
-            size_t offset = data->indexStart * indexSize;
-            indexBuffer->copyData(*hwIndexBuffer, 0, offset, indexCount * indexSize);
-            indexStart = 0;
-        }
-    }
-
     void LodVertexBuffer::fillBuffer( Ogre::VertexData* data )
     {
         vertexCount = data->vertexCount;
@@ -117,11 +103,15 @@ namespace Ogre
         bool sharedVerticesAdded = false;
         size_t submeshCount = mesh->getNumSubMeshes();
         submesh.resize(submeshCount);
+        DefaultHardwareBufferManagerBase bfrMgr;
         for (size_t i = 0; i < submeshCount; i++) {
             const SubMesh* ogresubmesh = mesh->getSubMesh(i);
             LodInputBuffer::Submesh& outsubmesh = submesh[i];
             outsubmesh.operationType = ogresubmesh->operationType;
-            outsubmesh.indexBuffer.fillBuffer(ogresubmesh->indexData);
+
+            std::unique_ptr<IndexData> tmp(ogresubmesh->indexData->clone(true, &bfrMgr));
+            outsubmesh.indexBuffer = *tmp;
+
             outsubmesh.useSharedVertexBuffer = ogresubmesh->useSharedVertices;
             if (!outsubmesh.useSharedVertexBuffer) {
                 outsubmesh.vertexBuffer.fillBuffer(ogresubmesh->vertexData);
