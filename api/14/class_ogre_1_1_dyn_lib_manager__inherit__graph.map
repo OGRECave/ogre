@@ -1,0 +1,7 @@
+<map id="Ogre::DynLibManager" name="Ogre::DynLibManager">
+<area shape="rect" id="Node000001" title="Manager for Dynamic&#45;loading Libraries." alt="" coords="151,79,314,104"/>
+<area shape="rect" id="Node000002" href="$class_ogre_1_1_singleton.html" title=" " alt="" coords="5,5,260,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="161,36,218,76,215,81,158,41"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="285,5,383,31"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="308,41,251,81,248,76,305,36"/>
+</map>

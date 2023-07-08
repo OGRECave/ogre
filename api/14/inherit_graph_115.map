@@ -1,0 +1,11 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="Node000000" href="$class_ogre_1_1_lod_collapse_cost.html" title=" " alt="" coords="5,80,175,105"/>
+<area shape="rect" id="Node000001" href="$class_ogre_1_1_lod_collapse_cost_curvature.html" title=" " alt="" coords="223,5,456,31"/>
+<area shape="poly" id="edge377_Node000000_Node000001" title=" " alt="" coords="132,72,222,39,267,28,268,33,223,45,134,77"/>
+<area shape="rect" id="Node000002" href="$class_ogre_1_1_lod_collapse_cost_outside.html" title=" " alt="" coords="230,55,449,80"/>
+<area shape="poly" id="edge378_Node000000_Node000002" title=" " alt="" coords="188,80,229,76,230,81,189,85"/>
+<area shape="rect" id="Node000003" href="$class_ogre_1_1_lod_collapse_cost_profiler.html" title=" " alt="" coords="231,104,447,129"/>
+<area shape="poly" id="edge379_Node000000_Node000003" title=" " alt="" coords="188,99,231,104,231,109,188,105"/>
+<area shape="rect" id="Node000004" href="$class_ogre_1_1_lod_collapse_cost_quadric.html" title=" " alt="" coords="230,153,449,179"/>
+<area shape="poly" id="edge380_Node000000_Node000004" title=" " alt="" coords="136,108,223,138,274,151,272,156,222,143,134,113"/>
+</map>

@@ -1,0 +1,11 @@
+<map id="Ogre::PCZSceneManager" name="Ogre::PCZSceneManager">
+<area shape="rect" id="Node000001" title="Specialized SceneManager that uses Portal&#45;Connected&#45;Zones to divide the scene spatially." alt="" coords="203,152,385,177"/>
+<area shape="rect" id="Node000002" href="$class_ogre_1_1_scene_manager.html" title="Manages the organisation and rendering of a &#39;scene&#39;: a collection of objects and potentially world ge..." alt="" coords="111,79,269,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="220,110,278,150,275,154,217,114"/>
+<area shape="rect" id="Node000003" href="$class_ogre_1_1_animation_container.html" title="An animation container interface, which allows generic access to sibling animations." alt="" coords="5,5,196,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="127,37,177,76,174,81,124,41"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="220,5,339,31"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="256,41,206,81,203,76,253,37"/>
+<area shape="rect" id="Node000005" href="$struct_ogre_1_1_shadow_texture_listener.html" title=" " alt="" coords="293,79,505,104"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="372,114,313,154,310,150,369,110"/>
+</map>

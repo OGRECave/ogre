@@ -1,0 +1,15 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="Node000000" title=" " alt="" coords="5,56,120,81"/>
+<area shape="rect" id="Node000001" href="$class_ogre_1_1_material_serializer.html" title="Class for serializing Materials to a .material script." alt="" coords="168,31,344,56"/>
+<area shape="poly" id="edge602_Node000000_Node000001" title=" " alt="" coords="133,57,167,52,168,58,134,62"/>
+<area shape="rect" id="Node000002" href="$class_ogre_1_1_serializer.html" title="Generic class for serialising data to / from binary stream&#45;based files." alt="" coords="195,80,317,105"/>
+<area shape="poly" id="edge603_Node000000_Node000002" title=" " alt="" coords="134,75,195,82,194,88,133,80"/>
+<area shape="rect" id="Node000003" href="$class_ogre_1_1_gpu_named_constants_serializer.html" title="Simple class for loading / saving GpuNamedConstants." alt="" coords="392,5,652,31"/>
+<area shape="poly" id="edge604_Node000002_Node000003" title=" " alt="" coords="320,73,343,65,367,52,391,40,432,28,434,33,393,44,369,57,345,70,322,78"/>
+<area shape="rect" id="Node000004" href="$class_ogre_1_1_lod_config_serializer.html" title=" " alt="" coords="429,55,615,80"/>
+<area shape="poly" id="edge605_Node000002_Node000004" title=" " alt="" coords="331,83,428,74,429,79,331,88"/>
+<area shape="rect" id="Node000005" href="$class_ogre_1_1_mesh_serializer.html" title="Class for serialising mesh data to/from an OGRE .mesh file." alt="" coords="443,104,601,129"/>
+<area shape="poly" id="edge606_Node000002_Node000005" title=" " alt="" coords="331,97,443,107,443,112,331,102"/>
+<area shape="rect" id="Node000006" href="$class_ogre_1_1_skeleton_serializer.html" title="Class for serialising skeleton data to/from an OGRE .skeleton file." alt="" coords="433,153,611,179"/>
+<area shape="poly" id="edge607_Node000002_Node000006" title=" " alt="" coords="302,108,393,138,447,151,446,156,391,143,301,113"/>
+</map>

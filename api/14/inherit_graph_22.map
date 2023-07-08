@@ -1,0 +1,15 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="Node000000" title=" " alt="" coords="5,80,100,105"/>
+<area shape="rect" id="Node000001" href="$class_ogre_1_1_codec.html" title="Abstract class that defines a &#39;codec&#39;." alt="" coords="148,80,249,105"/>
+<area shape="poly" id="edge274_Node000000_Node000001" title=" " alt="" coords="114,90,148,90,148,95,114,95"/>
+<area shape="rect" id="Node000002" href="$class_ogre_1_1_image_codec.html" title="Codec specialized in images." alt="" coords="297,80,440,105"/>
+<area shape="poly" id="edge275_Node000001_Node000002" title=" " alt="" coords="263,90,297,90,297,95,263,95"/>
+<area shape="rect" id="Node000003" href="$class_ogre_1_1_e_x_r_codec.html" title=" " alt="" coords="510,5,637,31"/>
+<area shape="poly" id="edge276_Node000002_Node000003" title=" " alt="" coords="409,72,487,39,522,28,524,33,489,45,411,77"/>
+<area shape="rect" id="Node000004" href="$class_ogre_1_1_free_image_codec.html" title=" " alt="" coords="488,55,659,80"/>
+<area shape="poly" id="edge277_Node000002_Node000004" title=" " alt="" coords="453,80,487,75,488,81,454,85"/>
+<area shape="rect" id="Node000005" href="$class_ogre_1_1_rs_image_codec.html" title=" " alt="" coords="494,104,653,129"/>
+<area shape="poly" id="edge278_Node000002_Node000005" title=" " alt="" coords="454,100,494,105,493,110,453,105"/>
+<area shape="rect" id="Node000006" href="$class_ogre_1_1_s_t_b_i_image_codec.html" title=" " alt="" coords="488,153,659,179"/>
+<area shape="poly" id="edge279_Node000002_Node000006" title=" " alt="" coords="413,108,489,138,528,151,526,156,487,143,411,113"/>
+</map>

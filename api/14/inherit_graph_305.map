@@ -1,0 +1,11 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="Node000000" title=" " alt="" coords="5,80,133,105"/>
+<area shape="rect" id="Node000001" href="$class_ogre_1_1_vertex_buffer_binding.html" title="Records the state of all the vertex buffer bindings required to provide a vertex declaration with the..." alt="" coords="181,5,375,31"/>
+<area shape="poly" id="edge667_Node000000_Node000001" title=" " alt="" coords="106,71,180,39,218,28,219,33,182,45,109,76"/>
+<area shape="rect" id="Node000002" href="$class_ogre_1_1_vertex_data.html" title="collects together all the vertex&#45;related information used to render geometry." alt="" coords="211,55,345,80"/>
+<area shape="poly" id="edge668_Node000000_Node000002" title=" " alt="" coords="147,81,210,73,211,78,147,86"/>
+<area shape="rect" id="Node000003" href="$class_ogre_1_1_vertex_declaration.html" title="This class declares the format of a set of vertex inputs, which can be issued to the rendering API th..." alt="" coords="189,104,367,129"/>
+<area shape="poly" id="edge669_Node000000_Node000003" title=" " alt="" coords="147,99,189,104,188,109,147,104"/>
+<area shape="rect" id="Node000004" href="$class_ogre_1_1_vertex_element.html" title="This class declares the usage of a single vertex buffer as a component of a complete VertexDeclaratio..." alt="" coords="199,153,357,179"/>
+<area shape="poly" id="edge670_Node000000_Node000004" title=" " alt="" coords="110,109,182,138,224,151,223,156,180,143,108,114"/>
+</map>

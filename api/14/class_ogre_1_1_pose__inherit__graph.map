@@ -1,0 +1,5 @@
+<map id="Ogre::Pose" name="Ogre::Pose">
+<area shape="rect" id="Node000001" title="A pose is a linked set of vertex offsets applying to one set of vertex data." alt="" coords="20,79,112,104"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,5,127,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="69,44,69,79,63,79,63,44"/>
+</map>

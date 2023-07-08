@@ -1,0 +1,9 @@
+<map id="Ogre::PageStrategyData" name="Ogre::PageStrategyData">
+<area shape="rect" id="Node000001" title="Abstract marker class representing the data held against the PagedWorldSection which is specifically ..." alt="" coords="152,79,331,104"/>
+<area shape="rect" id="Node000003" href="$class_ogre_1_1_grid2_d_page_strategy_data.html" title="Specialisation of PageStrategyData for Grid2DPageStrategy." alt="" coords="5,152,229,177"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="211,113,139,154,136,149,208,108"/>
+<area shape="rect" id="Node000004" href="$class_ogre_1_1_grid3_d_page_strategy_data.html" title="Specialisation of PageStrategyData for Grid3DPageStrategy." alt="" coords="253,152,477,177"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="274,108,346,149,344,154,272,113"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="198,5,285,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="244,44,244,79,239,79,239,44"/>
+</map>

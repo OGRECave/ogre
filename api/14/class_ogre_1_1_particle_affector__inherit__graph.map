@@ -1,0 +1,27 @@
+<map id="Ogre::ParticleAffector" name="Ogre::ParticleAffector">
+<area shape="rect" id="Node000001" title="Abstract class defining the interface to be implemented by particle affectors." alt="" coords="211,248,372,273"/>
+<area shape="rect" id="Node000004" href="$class_ogre_1_1_colour_fader_affector.html" title="This affector modifies the colour of particles in flight." alt="" coords="435,5,625,31"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="298,234,313,191,338,138,373,85,394,61,418,40,439,28,442,33,422,44,398,64,377,88,343,141,318,193,303,236"/>
+<area shape="rect" id="Node000005" href="$class_ogre_1_1_colour_fader_affector2.html" title=" " alt="" coords="431,55,629,80"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="302,234,320,201,346,161,379,122,419,89,442,78,444,83,421,94,383,126,350,164,325,203,307,237"/>
+<area shape="rect" id="Node000006" href="$class_ogre_1_1_colour_image_affector.html" title=" " alt="" coords="433,104,627,129"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="309,235,355,186,386,161,419,140,450,127,452,132,421,144,389,165,359,190,313,239"/>
+<area shape="rect" id="Node000007" href="$class_ogre_1_1_colour_interpolator_affector.html" title=" " alt="" coords="441,154,619,194"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="331,240,419,204,455,192,457,197,421,208,333,245"/>
+<area shape="rect" id="Node000008" href="$class_ogre_1_1_deflector_plane_affector.html" title="This affector defines a plane which deflects particles which collide with it." alt="" coords="426,219,634,244"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="385,246,426,241,427,247,386,252"/>
+<area shape="rect" id="Node000009" href="$class_ogre_1_1_direction_randomiser_affector.html" title="This affector applies randomness to the movement of the particles." alt="" coords="431,269,629,309"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="386,269,431,274,430,280,386,274"/>
+<area shape="rect" id="Node000010" href="$class_ogre_1_1_linear_force_affector.html" title="This affector applies a force vector to all particles to modify their trajectory." alt="" coords="437,333,623,359"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="329,277,372,298,421,318,464,331,463,336,419,323,370,303,327,282"/>
+<area shape="rect" id="Node000011" href="$class_ogre_1_1_rotation_affector.html" title="This affector rotates particles in flight." alt="" coords="447,383,613,408"/>
+<area shape="poly" id="edge10_Node000001_Node000011" title=" " alt="" coords="314,282,360,327,390,350,421,369,450,380,448,385,419,374,387,354,357,331,311,286"/>
+<area shape="rect" id="Node000012" href="$class_ogre_1_1_scale_affector.html" title="This affector scales particles in flight." alt="" coords="457,432,603,457"/>
+<area shape="poly" id="edge11_Node000001_Node000012" title=" " alt="" coords="308,284,326,316,352,352,384,388,421,418,457,433,455,438,419,423,380,392,348,356,322,319,303,287"/>
+<area shape="rect" id="Node000013" href="$class_ogre_1_1_texture_animator_affector.html" title="This affector makes it possible to have an animated texture for each individual particle." alt="" coords="420,481,640,507"/>
+<area shape="poly" id="edge12_Node000001_Node000013" title=" " alt="" coords="303,285,319,326,344,376,378,426,399,449,422,468,442,479,439,484,418,472,395,452,374,429,339,379,314,328,298,287"/>
+<area shape="rect" id="Node000002" href="$class_ogre_1_1_string_interface.html" title="Class defining the common interface which classes can use to present a reflection&#45;style,..." alt="" coords="5,223,163,248"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="176,244,211,248,210,253,176,249"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="49,272,119,297"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="133,276,210,267,211,273,133,282"/>
+</map>

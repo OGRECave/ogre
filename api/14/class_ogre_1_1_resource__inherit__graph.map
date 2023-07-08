@@ -1,0 +1,33 @@
+<map id="Ogre::Resource" name="Ogre::Resource">
+<area shape="rect" id="Node000001" title="Abstract class representing a loadable resource." alt="" coords="211,179,332,204"/>
+<area shape="rect" id="Node000004" href="$class_ogre_1_1_bsp_level.html" title="Holds all the data associated with a Binary Space Parition (BSP) based indoor level." alt="" coords="391,5,511,31"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="282,165,319,103,346,69,378,40,399,28,402,33,382,44,350,73,324,106,287,168"/>
+<area shape="rect" id="Node000005" href="$class_ogre_1_1_compositor.html" title="Class representing a Compositor object." alt="" coords="383,55,519,80"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="291,166,329,127,379,89,403,78,405,82,381,94,333,131,294,170"/>
+<area shape="rect" id="Node000006" href="$class_ogre_1_1_font.html" title="Class representing a font in the system." alt="" coords="407,104,496,129"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="308,170,379,138,410,127,411,132,381,143,311,175"/>
+<area shape="rect" id="Node000007" href="$class_ogre_1_1_gpu_program.html" title="Defines a program which runs on the GPU such as a vertex or fragment program." alt="" coords="380,153,523,179"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="345,178,379,173,380,179,346,184"/>
+<area shape="rect" id="Node000011" href="$class_ogre_1_1_material.html" title="Class encapsulates rendering properties of an object." alt="" coords="394,203,509,228"/>
+<area shape="poly" id="edge10_Node000001_Node000011" title=" " alt="" coords="346,199,394,205,394,210,345,204"/>
+<area shape="rect" id="Node000012" href="$class_ogre_1_1_mesh.html" title="Resource holding data about 3D mesh." alt="" coords="403,252,499,277"/>
+<area shape="poly" id="edge11_Node000001_Node000012" title=" " alt="" coords="312,208,381,238,411,249,410,254,379,243,310,212"/>
+<area shape="rect" id="Node000014" href="$class_ogre_1_1_skeleton.html" title="A collection of Bone objects used to animate a skinned mesh." alt="" coords="393,301,510,327"/>
+<area shape="poly" id="edge13_Node000001_Node000014" title=" " alt="" coords="294,213,333,251,381,288,405,299,403,304,379,292,329,255,291,216"/>
+<area shape="rect" id="Node000016" href="$class_ogre_1_1_texture.html" title="Abstract class representing a Texture resource." alt="" coords="397,351,506,376"/>
+<area shape="poly" id="edge15_Node000001_Node000016" title=" " alt="" coords="287,215,324,276,350,309,382,337,402,348,399,353,378,341,347,313,320,279,282,217"/>
+<area shape="rect" id="Node000002" href="$class_ogre_1_1_string_interface.html" title="Class defining the common interface which classes can use to present a reflection&#45;style,..." alt="" coords="5,153,163,179"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="177,176,211,180,210,186,176,181"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="27,203,141,228"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="155,204,210,196,210,202,156,209"/>
+<area shape="rect" id="Node000008" href="$class_ogre_1_1_high_level_gpu_program.html" title="Abstract base class representing a high&#45;level program (a vertex or fragment program)." alt="" coords="571,153,777,179"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="536,163,571,163,571,169,536,169"/>
+<area shape="rect" id="Node000009" href="$class_ogre_1_1_cg_program.html" title="Specialisation of HighLevelGpuProgram to provide support for nVidia&#39;s CG language." alt="" coords="845,129,978,155"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="791,152,844,146,845,151,791,157"/>
+<area shape="rect" id="Node000010" href="$class_ogre_1_1_g_l_s_lang_program.html" title="Specialisation of HighLevelGpuProgram to provide support for the GLSLang compiler by Khronos." alt="" coords="825,179,997,204"/>
+<area shape="poly" id="edge9_Node000008_Node000010" title=" " alt="" coords="791,176,826,180,825,185,791,181"/>
+<area shape="rect" id="Node000013" href="$class_ogre_1_1_patch_mesh.html" title="Patch specialisation of Mesh." alt="" coords="608,252,740,277"/>
+<area shape="poly" id="edge12_Node000012_Node000013" title=" " alt="" coords="513,262,608,262,608,267,513,267"/>
+<area shape="rect" id="Node000015" href="$class_ogre_1_1_skeleton_instance.html" title="A SkeletonInstance is a single instance of a Skeleton used by a world object." alt="" coords="588,301,760,327"/>
+<area shape="poly" id="edge14_Node000014_Node000015" title=" " alt="" coords="524,311,588,311,588,317,524,317"/>
+</map>

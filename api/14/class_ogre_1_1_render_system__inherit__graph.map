@@ -1,0 +1,15 @@
+<map id="Ogre::RenderSystem" name="Ogre::RenderSystem">
+<area shape="rect" id="Node000001" title="Defines the functionality of a 3D API." alt="" coords="176,104,332,129"/>
+<area shape="rect" id="Node000003" href="$class_ogre_1_1_d3_d11_render_system.html" title="Implementation of DirectX11 as a rendering system." alt="" coords="381,5,581,31"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="282,94,326,66,379,40,413,28,415,33,381,44,329,71,285,99"/>
+<area shape="rect" id="Node000004" href="$class_ogre_1_1_d3_d9_render_system.html" title="Implementation of DirectX9 as a rendering system." alt="" coords="385,55,577,80"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="326,98,421,77,422,83,327,104"/>
+<area shape="rect" id="Node000005" href="$class_ogre_1_1_metal_render_system.html" title=" " alt="" coords="384,104,577,129"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="346,114,384,114,384,119,346,119"/>
+<area shape="rect" id="Node000006" href="$class_ogre_1_1_tiny_render_system.html" title="Software rasterizer Implementation as a rendering system." alt="" coords="389,153,572,179"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="327,130,422,151,421,156,326,135"/>
+<area shape="rect" id="Node000007" href="$class_ogre_1_1_vulkan_render_system.html" title=" " alt="" coords="380,203,581,228"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="285,135,329,163,381,189,415,200,413,205,379,194,326,167,282,139"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,104,128,129"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="142,114,176,114,176,119,142,119"/>
+</map>

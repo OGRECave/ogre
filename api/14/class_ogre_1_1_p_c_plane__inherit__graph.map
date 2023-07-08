@@ -1,0 +1,5 @@
+<map id="Ogre::PCPlane" name="Ogre::PCPlane">
+<area shape="rect" id="Node000001" title="Portal Culling Plane." alt="" coords="5,79,120,104"/>
+<area shape="rect" id="Node000002" href="$class_ogre_1_1_plane.html" title="Defines a plane in 3D space." alt="" coords="14,5,111,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="65,44,65,79,60,79,60,44"/>
+</map>

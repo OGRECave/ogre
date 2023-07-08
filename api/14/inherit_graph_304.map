@@ -1,0 +1,25 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="Node000000" title=" " alt="" coords="5,179,100,204"/>
+<area shape="rect" id="Node000001" href="$class_ogre_1_1_config_dialog.html" title="Defines the behaviour of an automatic renderer configuration dialog." alt="" coords="196,5,341,31"/>
+<area shape="poly" id="edge656_Node000000_Node000001" title=" " alt="" coords="60,164,91,101,116,68,146,40,170,28,195,20,196,25,172,33,150,44,120,71,96,104,65,167"/>
+<area shape="rect" id="Node000002" href="$class_ogre_1_1_volume_1_1_dual_grid_generator.html" title="Class for the generation of the DualGrid." alt="" coords="148,55,389,80"/>
+<area shape="poly" id="edge657_Node000000_Node000002" title=" " alt="" coords="68,165,101,125,123,106,147,89,173,78,175,83,149,94,126,110,105,129,72,169"/>
+<area shape="rect" id="Node000003" href="$class_ogre_1_1_volume_1_1_iso_surface.html" title="Abstract IsoSurface." alt="" coords="175,104,362,129"/>
+<area shape="poly" id="edge658_Node000000_Node000003" title=" " alt="" coords="84,169,147,138,186,127,188,132,149,143,86,174"/>
+<area shape="rect" id="Node000005" href="$class_ogre_1_1_volume_1_1_mesh_builder.html" title="Class to build up a mesh with vertices and indices." alt="" coords="169,153,369,179"/>
+<area shape="poly" id="edge660_Node000000_Node000005" title=" " alt="" coords="113,182,168,175,169,180,114,187"/>
+<area shape="rect" id="Node000006" href="$class_ogre_1_1_volume_1_1_octree_node.html" title="A node in the volume octree." alt="" coords="171,203,367,228"/>
+<area shape="poly" id="edge661_Node000000_Node000006" title=" " alt="" coords="114,195,171,202,170,207,114,201"/>
+<area shape="rect" id="Node000007" href="$class_ogre_1_1_work_queue.html" title="Interface to a general purpose task&#45;basedbackground work queue." alt="" coords="200,252,337,277"/>
+<area shape="poly" id="edge662_Node000000_Node000007" title=" " alt="" coords="88,208,149,237,200,251,199,256,147,242,86,213"/>
+<area shape="rect" id="Node000010" href="$class_ogre_1_1_work_queue_1_1_request.html" title="General purpose request structure." alt="" coords="169,301,368,327"/>
+<area shape="poly" id="edge665_Node000000_Node000010" title=" " alt="" coords="73,214,105,252,126,271,149,286,179,299,177,304,147,291,123,275,102,256,69,217"/>
+<area shape="rect" id="Node000011" href="$struct_ogre_1_1_work_queue_1_1_response.html" title="General purpose response structure." alt="" coords="165,351,373,376"/>
+<area shape="poly" id="edge666_Node000000_Node000011" title=" " alt="" coords="66,216,97,277,120,309,150,336,174,348,171,353,146,340,116,313,92,280,61,218"/>
+<area shape="rect" id="Node000004" href="$class_ogre_1_1_volume_1_1_iso_surface_m_c.html" title="Marching Cubes implementation like at http://local.wasp.uwa.edu.au/~pbourke/geometry/polygonise/." alt="" coords="442,104,650,129"/>
+<area shape="poly" id="edge659_Node000003_Node000004" title=" " alt="" coords="376,114,442,114,442,119,376,119"/>
+<area shape="rect" id="Node000008" href="$class_ogre_1_1_default_work_queue_base.html" title="Base for a general purpose task&#45;based background work queue." alt="" coords="437,252,655,277"/>
+<area shape="poly" id="edge663_Node000007_Node000008" title=" " alt="" coords="351,262,437,262,437,267,351,267"/>
+<area shape="rect" id="Node000009" href="$class_ogre_1_1_default_work_queue.html" title="Implementation of a general purpose request / response style background work queue." alt="" coords="703,252,888,277"/>
+<area shape="poly" id="edge664_Node000008_Node000009" title=" " alt="" coords="668,262,702,262,702,267,668,267"/>
+</map>

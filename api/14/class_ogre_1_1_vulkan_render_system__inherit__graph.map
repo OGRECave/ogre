@@ -1,0 +1,7 @@
+<map id="Ogre::VulkanRenderSystem" name="Ogre::VulkanRenderSystem">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,152,207,177"/>
+<area shape="rect" id="Node000002" href="$class_ogre_1_1_render_system.html" title="Defines the functionality of a 3D API." alt="" coords="28,79,184,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="109,118,109,152,103,152,103,118"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="45,5,167,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="109,44,109,79,103,79,103,44"/>
+</map>

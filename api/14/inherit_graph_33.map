@@ -1,0 +1,9 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="Node000000" title=" " alt="" coords="5,5,100,31"/>
+<area shape="rect" id="Node000001" href="$class_ogre_1_1_image.html" title="Class representing an image file." alt="" coords="156,5,259,31"/>
+<area shape="poly" id="edge325_Node000000_Node000001" title=" " alt="" coords="114,15,156,15,156,21,114,21"/>
+<area shape="rect" id="Node000002" href="$class_ogre_1_1_pixel_box.html" title="A primitive describing a volume (3D), image (2D) or line (1D) of pixels in memory." alt="" coords="148,55,267,80"/>
+<area shape="poly" id="edge326_Node000000_Node000002" title=" " alt="" coords="107,32,167,52,166,57,106,38"/>
+<area shape="rect" id="Node000003" href="$struct_ogre_1_1_box.html" title="Structure used to define a box in a 3&#45;D integer space." alt="" coords="9,55,96,80"/>
+<area shape="poly" id="edge327_Node000003_Node000002" title=" " alt="" coords="110,65,148,65,148,70,110,70"/>
+</map>

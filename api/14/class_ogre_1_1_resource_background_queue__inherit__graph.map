@@ -1,0 +1,5 @@
+<map id="Ogre::ResourceBackgroundQueue" name="Ogre::ResourceBackgroundQueue">
+<area shape="rect" id="Node000001" title="This class is used to perform Resource operations in a background thread." alt="" coords="5,93,204,133"/>
+<area shape="rect" id="Node000002" href="$class_ogre_1_1_singleton.html" title=" " alt="" coords="6,5,203,45"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="107,59,107,93,102,93,102,59"/>
+</map>

@@ -1,0 +1,5 @@
+<map id="Ogre::HollowEllipsoidEmitter::CmdInnerX" name="Ogre::HollowEllipsoidEmitter::CmdInnerX">
+<area shape="rect" id="Node000001" title="Command object for inner size (see ParamCommand)." alt="" coords="5,79,215,119"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="25,5,195,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="113,44,113,79,107,79,107,44"/>
+</map>

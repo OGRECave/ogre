@@ -1,0 +1,11 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="Node000000" title=" " alt="" coords="5,55,108,80"/>
+<area shape="rect" id="Node000001" href="$class_ogre_1_1_gpu_program_factory.html" title="Interface definition for factories of GpuProgram." alt="" coords="156,29,347,55"/>
+<area shape="poly" id="edge311_Node000000_Node000001" title=" " alt="" coords="121,56,155,52,156,57,122,62"/>
+<area shape="rect" id="Node000004" href="$class_ogre_1_1_instance_manager.html" title="This is the main starting point for the new instancing system." alt="" coords="165,79,338,104"/>
+<area shape="poly" id="edge314_Node000000_Node000004" title=" " alt="" coords="122,73,165,78,164,83,121,78"/>
+<area shape="rect" id="Node000002" href="$class_ogre_1_1_cg_program_factory.html" title="Factory class for Cg programs." alt="" coords="414,5,595,31"/>
+<area shape="poly" id="edge312_Node000001_Node000002" title=" " alt="" coords="360,29,413,24,414,29,360,34"/>
+<area shape="rect" id="Node000003" href="$class_ogre_1_1_g_l_s_lang_program_factory.html" title="Factory class for GLSLang programs." alt="" coords="395,55,615,80"/>
+<area shape="poly" id="edge313_Node000001_Node000003" title=" " alt="" coords="360,50,395,54,394,59,360,55"/>
+</map>

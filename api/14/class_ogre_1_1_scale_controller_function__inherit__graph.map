@@ -1,0 +1,7 @@
+<map id="Ogre::ScaleControllerFunction" name="Ogre::ScaleControllerFunction">
+<area shape="rect" id="Node000001" title="Predefined controller function which simply scales an input to an output value." alt="" coords="5,167,220,192"/>
+<area shape="rect" id="Node000002" href="$class_ogre_1_1_controller_function.html" title=" " alt="" coords="23,79,203,119"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="115,132,115,166,110,166,110,132"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="53,5,172,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="115,44,115,79,110,79,110,44"/>
+</map>

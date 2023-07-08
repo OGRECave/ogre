@@ -1,0 +1,37 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="Node000000" title=" " alt="" coords="288,5,516,31"/>
+<area shape="rect" id="Node000001" href="$class_ogre_1_1_d3_d11_render_system.html" title="Implementation of DirectX11 as a rendering system." alt="" coords="567,9,767,35"/>
+<area shape="poly" id="edge290_Node000000_Node000001" title=" " alt="" coords="530,17,567,18,567,23,530,23"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="60,203,183,228"/>
+<area shape="rect" id="Node000008" href="$class_ogre_1_1_depth_buffer.html" title="An abstract class that contains a depth/stencil buffer." alt="" coords="332,55,472,80"/>
+<area shape="poly" id="edge291_Node000007_Node000008" title=" " alt="" coords="143,191,203,139,242,112,284,89,331,74,333,79,286,94,245,116,207,143,147,195"/>
+<area shape="rect" id="Node000009" href="$class_ogre_1_1_hardware_occlusion_query.html" title="Query how many pixels have passed the per&#45;fragment tests." alt="" coords="289,104,515,129"/>
+<area shape="poly" id="edge292_Node000007_Node000009" title=" " alt="" coords="157,194,216,165,284,138,326,127,327,132,286,143,218,170,159,199"/>
+<area shape="rect" id="Node000002" href="$class_ogre_1_1_render_system.html" title="Defines the functionality of a 3D API." alt="" coords="324,153,480,179"/>
+<area shape="poly" id="edge293_Node000007_Node000002" title=" " alt="" coords="196,200,329,176,330,181,197,205"/>
+<area shape="rect" id="Node000010" href="$class_ogre_1_1_render_system_capabilities.html" title="This class stores the capabilities of the graphics card." alt="" coords="285,203,519,228"/>
+<area shape="poly" id="edge299_Node000007_Node000010" title=" " alt="" coords="196,213,285,213,285,218,196,218"/>
+<area shape="rect" id="Node000011" href="$class_ogre_1_1_render_system_capabilities_manager.html" title="Class for managing RenderSystemCapabilities database for Ogre." alt="" coords="285,367,519,407"/>
+<area shape="poly" id="edge300_Node000007_Node000011" title=" " alt="" coords="145,236,205,295,244,326,287,353,313,365,311,370,284,358,241,330,201,299,141,240"/>
+<area shape="rect" id="Node000013" href="$class_ogre_1_1_render_system_capabilities_serializer.html" title="Class for serializing RenderSystemCapabilities to / from a .rendercaps script." alt="" coords="285,253,519,293"/>
+<area shape="poly" id="edge301_Node000007_Node000013" title=" " alt="" coords="197,228,304,250,303,255,196,233"/>
+<area shape="rect" id="Node000014" href="$class_ogre_1_1_render_target.html" title="A &#39;canvas&#39; which can receive the results of a rendering operation." alt="" coords="329,317,475,343"/>
+<area shape="poly" id="edge302_Node000007_Node000014" title=" " alt="" coords="155,233,214,269,286,302,329,315,328,320,284,307,212,273,152,238"/>
+<area shape="poly" id="edge294_Node000002_Node000001" title=" " alt="" coords="492,152,517,139,534,118,540,95,547,71,565,48,592,32,595,37,568,52,552,74,546,96,539,120,520,143,494,157"/>
+<area shape="rect" id="Node000003" href="$class_ogre_1_1_d3_d9_render_system.html" title="Implementation of DirectX9 as a rendering system." alt="" coords="571,63,763,88"/>
+<area shape="poly" id="edge295_Node000002_Node000003" title=" " alt="" coords="492,148,517,138,532,129,541,118,550,107,565,97,594,86,596,91,568,102,554,111,545,122,535,133,520,143,494,153"/>
+<area shape="rect" id="Node000004" href="$class_ogre_1_1_metal_render_system.html" title=" " alt="" coords="571,112,764,137"/>
+<area shape="poly" id="edge296_Node000002_Node000004" title=" " alt="" coords="493,149,585,135,586,140,494,154"/>
+<area shape="rect" id="Node000005" href="$class_ogre_1_1_tiny_render_system.html" title="Software rasterizer Implementation as a rendering system." alt="" coords="576,161,759,187"/>
+<area shape="poly" id="edge297_Node000002_Node000005" title=" " alt="" coords="494,166,576,169,576,174,494,171"/>
+<area shape="rect" id="Node000006" href="$class_ogre_1_1_vulkan_render_system.html" title=" " alt="" coords="567,211,768,236"/>
+<area shape="poly" id="edge298_Node000002_Node000006" title=" " alt="" coords="479,179,519,187,611,208,610,213,518,193,478,184"/>
+<area shape="rect" id="Node000015" href="$class_ogre_1_1_multi_render_target.html" title="This class represents a render target that renders to multiple RenderTextures at once." alt="" coords="577,268,757,293"/>
+<area shape="poly" id="edge303_Node000014_Node000015" title=" " alt="" coords="484,312,598,291,599,296,485,317"/>
+<area shape="rect" id="Node000016" href="$class_ogre_1_1_render_texture.html" title="This class represents a RenderTarget that renders to a Texture." alt="" coords="590,317,745,343"/>
+<area shape="poly" id="edge304_Node000014_Node000016" title=" " alt="" coords="489,327,590,327,590,333,489,333"/>
+<area shape="rect" id="Node000017" href="$class_ogre_1_1_render_window.html" title="Manages the target rendering window." alt="" coords="588,367,747,392"/>
+<area shape="poly" id="edge305_Node000014_Node000017" title=" " alt="" coords="485,343,599,364,598,369,484,348"/>
+<area shape="rect" id="Node000012" href="$class_ogre_1_1_singleton.html" title=" " alt="" coords="5,367,237,407"/>
+<area shape="poly" id="edge306_Node000012_Node000011" title=" " alt="" coords="251,385,285,385,285,390,251,390"/>
+</map>

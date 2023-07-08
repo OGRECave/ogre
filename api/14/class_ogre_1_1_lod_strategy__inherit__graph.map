@@ -1,0 +1,17 @@
+<map id="Ogre::LodStrategy" name="Ogre::LodStrategy">
+<area shape="rect" id="Node000001" title="Strategy for determining level of detail." alt="" coords="131,84,269,109"/>
+<area shape="rect" id="Node000003" href="$class_ogre_1_1_distance_lod_strategy_base.html" title="Level of detail strategy based on distance from camera." alt="" coords="324,55,552,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="282,84,335,77,335,83,283,89"/>
+<area shape="rect" id="Node000006" href="$class_ogre_1_1_pixel_count_lod_strategy_base.html" title="Abstract base class for level of detail strategy based on pixel count approximations from bounding sp..." alt="" coords="317,112,559,137"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="283,104,330,109,330,115,283,109"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,84,83,109"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="96,94,130,94,130,99,96,99"/>
+<area shape="rect" id="Node000004" href="$class_ogre_1_1_distance_lod_box_strategy.html" title="Level of detail strategy based on distance from camera to an object&#39;s bounding box." alt="" coords="617,5,838,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="526,50,651,28,652,33,527,55"/>
+<area shape="rect" id="Node000005" href="$class_ogre_1_1_distance_lod_sphere_strategy.html" title="Level of detail strategy based on distance from camera to an object&#39;s bounding sphere." alt="" coords="607,55,848,80"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="566,65,607,65,607,70,566,70"/>
+<area shape="rect" id="Node000007" href="$class_ogre_1_1_absolute_pixel_count_lod_strategy.html" title=" " alt="" coords="633,105,821,145"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="572,122,633,122,633,127,572,127"/>
+<area shape="rect" id="Node000008" href="$class_ogre_1_1_screen_ratio_pixel_count_lod_strategy.html" title=" " alt="" coords="623,169,832,209"/>
+<area shape="poly" id="edge7_Node000006_Node000008" title=" " alt="" coords="510,138,637,166,636,171,509,143"/>
+</map>

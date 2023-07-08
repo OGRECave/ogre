@@ -1,0 +1,19 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="Node000000" href="$struct_ogre_1_1_vector_base.html" title="helper class to implement legacy API. Notably x, y, z access" alt="" coords="5,179,219,204"/>
+<area shape="rect" id="Node000001" href="$class_ogre_1_1_vector.html" title=" " alt="" coords="268,5,447,31"/>
+<area shape="poly" id="edge492_Node000000_Node000001" title=" " alt="" coords="129,166,185,103,223,69,265,40,291,28,293,33,268,44,227,73,189,106,133,169"/>
+<area shape="rect" id="Node000002" href="$class_ogre_1_1_vector.html" title=" " alt="" coords="268,55,447,80"/>
+<area shape="poly" id="edge493_Node000000_Node000002" title=" " alt="" coords="138,168,195,128,266,89,297,78,299,83,268,94,198,133,141,172"/>
+<area shape="rect" id="Node000003" href="$class_ogre_1_1_vector.html" title=" " alt="" coords="268,104,447,129"/>
+<area shape="poly" id="edge494_Node000000_Node000003" title=" " alt="" coords="162,172,266,138,306,127,307,132,267,143,164,177"/>
+<area shape="rect" id="Node000004" href="$class_ogre_1_1_vector.html" title=" " alt="" coords="268,153,447,179"/>
+<area shape="poly" id="edge495_Node000000_Node000004" title=" " alt="" coords="232,176,268,173,268,178,232,182"/>
+<area shape="rect" id="Node000005" href="$class_ogre_1_1_vector.html" title=" " alt="" coords="274,203,441,228"/>
+<area shape="poly" id="edge496_Node000000_Node000005" title=" " alt="" coords="232,200,274,205,273,210,232,206"/>
+<area shape="rect" id="Node000006" href="$class_ogre_1_1_vector.html" title=" " alt="" coords="268,252,447,277"/>
+<area shape="poly" id="edge497_Node000000_Node000006" title=" " alt="" coords="167,206,267,237,311,249,309,254,266,242,165,211"/>
+<area shape="rect" id="Node000007" href="$class_ogre_1_1_vector.html" title=" " alt="" coords="268,301,447,327"/>
+<area shape="poly" id="edge498_Node000000_Node000007" title=" " alt="" coords="142,210,199,248,268,286,303,299,301,304,266,291,196,253,139,214"/>
+<area shape="rect" id="Node000008" href="$class_ogre_1_1_vector.html" title="Standard N&#45;dimensional vector." alt="" coords="267,351,448,376"/>
+<area shape="poly" id="edge499_Node000000_Node000008" title=" " alt="" coords="133,213,189,274,227,307,268,336,297,348,295,353,265,340,224,312,186,278,129,217"/>
+</map>

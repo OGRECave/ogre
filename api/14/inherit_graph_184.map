@@ -1,0 +1,17 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="Node000000" href="$class_ogre_1_1_resource_group_listener.html" title="This class defines an interface which is called back during resource group loading to indicate the pr..." alt="" coords="5,5,217,31"/>
+<area shape="rect" id="Node000001" href="$class_ogre_bites_1_1_tray_manager.html" title="Main class to manage a cursor, backdrop, trays and widgets." alt="" coords="285,29,464,55"/>
+<area shape="poly" id="edge428_Node000000_Node000001" title=" " alt="" coords="232,26,285,31,285,37,231,32"/>
+<area shape="rect" id="Node000002" href="$struct_ogre_bites_1_1_input_listener.html" title="the return values of the callbacks are ignored by ApplicationContext however they can be used to cont..." alt="" coords="22,144,201,169"/>
+<area shape="poly" id="edge433_Node000002_Node000001" title=" " alt="" coords="143,134,209,94,264,65,304,52,306,57,266,70,211,99,146,139"/>
+<area shape="rect" id="Node000003" href="$class_ogre_bites_1_1_advanced_render_controls.html" title=" " alt="" coords="273,79,477,119"/>
+<area shape="poly" id="edge429_Node000002_Node000003" title=" " alt="" coords="183,138,282,117,283,122,184,144"/>
+<area shape="rect" id="Node000004" href="$class_ogre_bites_1_1_camera_man.html" title="Utility class for controlling the camera in samples." alt="" coords="288,144,461,169"/>
+<area shape="poly" id="edge430_Node000002_Node000004" title=" " alt="" coords="214,154,288,154,288,159,214,159"/>
+<area shape="rect" id="Node000005" href="$struct_ogre_bites_1_1_im_gui_input_listener.html" title=" " alt="" coords="265,193,484,219"/>
+<area shape="poly" id="edge431_Node000002_Node000005" title=" " alt="" coords="194,169,306,191,305,196,193,175"/>
+<area shape="rect" id="Node000006" href="$class_ogre_bites_1_1_input_listener_chain.html" title="Chain of multiple InputListeners that acts as a single InputListener." alt="" coords="285,243,464,283"/>
+<area shape="poly" id="edge432_Node000002_Node000006" title=" " alt="" coords="149,174,204,201,266,229,300,241,299,246,264,234,201,206,147,178"/>
+<area shape="rect" id="Node000007" href="$class_ogre_bites_1_1_tray_listener.html" title="Listener class for responding to tray events." alt="" coords="24,55,199,80"/>
+<area shape="poly" id="edge434_Node000007_Node000001" title=" " alt="" coords="212,55,285,48,285,53,213,60"/>
+</map>

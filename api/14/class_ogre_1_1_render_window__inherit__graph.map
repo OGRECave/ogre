@@ -1,0 +1,7 @@
+<map id="Ogre::RenderWindow" name="Ogre::RenderWindow">
+<area shape="rect" id="Node000001" title="Manages the target rendering window." alt="" coords="5,152,164,177"/>
+<area shape="rect" id="Node000002" href="$class_ogre_1_1_render_target.html" title="A &#39;canvas&#39; which can receive the results of a rendering operation." alt="" coords="11,79,158,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="87,118,87,152,82,152,82,118"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="23,5,146,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="87,44,87,79,82,79,82,44"/>
+</map>
