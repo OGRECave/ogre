@@ -1,0 +1,7 @@
+<map id="Ogre::RTShader::In" name="Ogre::RTShader::In">
+<area shape="rect" id="Node000001" title=" " alt="" coords="27,152,170,177"/>
+<area shape="rect" id="Node000002" href="$class_ogre_1_1_r_t_shader_1_1_operand.html" title="A class that represents a function operand (its the combination of a parameter the in/out semantic an..." alt="" coords="5,79,192,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="101,118,101,152,96,152,96,118"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="16,5,181,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="101,44,101,79,96,79,96,44"/>
+</map>

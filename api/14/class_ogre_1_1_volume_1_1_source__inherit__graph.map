@@ -1,0 +1,33 @@
+<map id="Ogre::Volume::Source" name="Ogre::Volume::Source">
+<area shape="rect" id="Node000001" title="Abstract class defining the density function." alt="" coords="5,183,168,209"/>
+<area shape="rect" id="Node000002" href="$class_ogre_1_1_volume_1_1_c_s_g_cube_source.html" title="A not rotated cube." alt="" coords="222,19,445,45"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="101,170,147,112,179,81,215,55,244,42,246,47,217,60,182,85,151,115,105,174"/>
+<area shape="rect" id="Node000003" href="$class_ogre_1_1_volume_1_1_c_s_g_operation_source.html" title="Abstract operation volume source holding two sources as operants." alt="" coords="228,69,439,109"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="116,173,162,146,215,119,248,107,250,112,217,124,164,150,119,178"/>
+<area shape="rect" id="Node000007" href="$class_ogre_1_1_volume_1_1_c_s_g_plane_source.html" title="A plane." alt="" coords="220,134,447,159"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="163,178,268,157,269,162,164,183"/>
+<area shape="rect" id="Node000008" href="$class_ogre_1_1_volume_1_1_c_s_g_sphere_source.html" title="A sphere." alt="" coords="216,183,451,209"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="182,193,216,193,216,199,182,199"/>
+<area shape="rect" id="Node000009" href="$class_ogre_1_1_volume_1_1_c_s_g_unary_source.html" title="Source which does a unary operation to another one." alt="" coords="219,233,448,258"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="164,209,269,230,268,235,163,214"/>
+<area shape="rect" id="Node000013" href="$class_ogre_1_1_volume_1_1_cache_source.html" title="A caching Source." alt="" coords="232,282,435,307"/>
+<area shape="poly" id="edge12_Node000001_Node000013" title=" " alt="" coords="119,214,164,242,217,267,258,279,257,284,215,272,161,246,116,219"/>
+<area shape="rect" id="Node000014" href="$class_ogre_1_1_volume_1_1_grid_source.html" title="A volume source from a discrete 3d grid." alt="" coords="238,339,429,365"/>
+<area shape="poly" id="edge13_Node000001_Node000014" title=" " alt="" coords="108,218,154,269,184,295,217,318,264,337,262,342,215,322,181,299,151,273,104,222"/>
+<area shape="rect" id="Node000004" href="$class_ogre_1_1_volume_1_1_c_s_g_difference_source.html" title="Builds the difference between two sources." alt="" coords="510,5,725,45"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="435,64,527,43,529,48,437,69"/>
+<area shape="rect" id="Node000005" href="$class_ogre_1_1_volume_1_1_c_s_g_intersection_source.html" title="Builds the intersection between two sources." alt="" coords="506,69,729,109"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="452,87,506,87,506,92,452,92"/>
+<area shape="rect" id="Node000006" href="$class_ogre_1_1_volume_1_1_c_s_g_union_source.html" title="Builds the union between two sources." alt="" coords="503,134,731,159"/>
+<area shape="poly" id="edge5_Node000003_Node000006" title=" " alt="" coords="447,109,554,131,553,137,446,115"/>
+<area shape="rect" id="Node000010" href="$class_ogre_1_1_volume_1_1_c_s_g_negate_source.html" title="Negates the given volume." alt="" coords="499,183,736,209"/>
+<area shape="poly" id="edge9_Node000009_Node000010" title=" " alt="" coords="420,228,543,206,544,211,421,233"/>
+<area shape="rect" id="Node000011" href="$class_ogre_1_1_volume_1_1_c_s_g_noise_source.html" title=" " alt="" coords="504,233,731,258"/>
+<area shape="poly" id="edge10_Node000009_Node000011" title=" " alt="" coords="462,243,504,243,504,248,462,248"/>
+<area shape="rect" id="Node000012" href="$class_ogre_1_1_volume_1_1_c_s_g_scale_source.html" title="Scales the given volume source." alt="" coords="505,282,730,307"/>
+<area shape="poly" id="edge11_Node000009_Node000012" title=" " alt="" coords="421,258,544,279,543,285,420,263"/>
+<area shape="rect" id="Node000015" href="$class_ogre_1_1_volume_1_1_half_float_grid_source.html" title="A volume source from a 16 Bit float 3D grid capable of loading volume serializations." alt="" coords="514,332,721,372"/>
+<area shape="poly" id="edge14_Node000014_Node000015" title=" " alt="" coords="442,349,514,349,514,355,442,355"/>
+<area shape="rect" id="Node000016" href="$class_ogre_1_1_volume_1_1_texture_source.html" title="A volume source from a 3D texture." alt="" coords="512,397,723,422"/>
+<area shape="poly" id="edge15_Node000014_Node000016" title=" " alt="" coords="411,365,554,394,553,399,410,370"/>
+</map>

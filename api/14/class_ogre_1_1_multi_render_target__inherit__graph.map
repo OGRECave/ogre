@@ -1,0 +1,7 @@
+<map id="Ogre::MultiRenderTarget" name="Ogre::MultiRenderTarget">
+<area shape="rect" id="Node000001" title="This class represents a render target that renders to multiple RenderTextures at once." alt="" coords="5,152,185,177"/>
+<area shape="rect" id="Node000002" href="$class_ogre_1_1_render_target.html" title="A &#39;canvas&#39; which can receive the results of a rendering operation." alt="" coords="22,79,169,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="98,118,98,152,93,152,93,118"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="34,5,157,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="98,44,98,79,93,79,93,44"/>
+</map>

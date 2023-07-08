@@ -1,0 +1,11 @@
+<map id="Ogre::PortalBaseFactory" name="Ogre::PortalBaseFactory">
+<area shape="rect" id="Node000001" title="Factory object for creating Portal instances." alt="" coords="95,152,273,177"/>
+<area shape="rect" id="Node000004" href="$class_ogre_1_1_anti_portal_factory.html" title="Factory object for creating AntiPortal instances." alt="" coords="5,225,179,251"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="160,188,109,227,105,223,157,183"/>
+<area shape="rect" id="Node000005" href="$class_ogre_1_1_portal_factory.html" title="Factory object for creating Portal instances." alt="" coords="203,225,349,251"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="211,183,263,223,259,227,208,188"/>
+<area shape="rect" id="Node000002" href="$class_ogre_1_1_movable_object_factory.html" title="Interface definition for a factory class which produces a certain kind of MovableObject,..." alt="" coords="81,79,287,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="187,118,187,152,181,152,181,118"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="129,5,239,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="187,44,187,79,181,79,181,44"/>
+</map>

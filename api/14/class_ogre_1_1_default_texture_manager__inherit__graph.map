@@ -1,0 +1,13 @@
+<map id="Ogre::DefaultTextureManager" name="Ogre::DefaultTextureManager">
+<area shape="rect" id="Node000001" title="Specialisation of TextureManager for offline processing. Cannot be used with an active RenderSystem." alt="" coords="148,240,363,265"/>
+<area shape="rect" id="Node000002" href="$class_ogre_1_1_texture_manager.html" title="Class for loading &amp; managing textures." alt="" coords="172,167,339,192"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="258,206,258,240,253,240,253,206"/>
+<area shape="rect" id="Node000003" href="$class_ogre_1_1_resource_manager.html" title="Defines a generic resource handler." alt="" coords="63,86,242,111"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="181,118,242,164,239,169,177,122"/>
+<area shape="rect" id="Node000004" href="$class_ogre_1_1_script_loader.html" title="Abstract class defining the interface used by classes which wish to perform script loading to define ..." alt="" coords="5,5,148,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="99,39,143,84,139,88,95,42"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="173,5,287,31"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="211,42,166,88,162,84,207,39"/>
+<area shape="rect" id="Node000006" href="$class_ogre_1_1_singleton.html" title=" " alt="" coords="267,79,452,119"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="325,129,273,168,269,164,322,125"/>
+</map>

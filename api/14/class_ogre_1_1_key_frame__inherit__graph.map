@@ -1,0 +1,13 @@
+<map id="Ogre::KeyFrame" name="Ogre::KeyFrame">
+<area shape="rect" id="Node000001" title="A key frame in an animation sequence defined by an AnimationTrack." alt="" coords="175,80,301,105"/>
+<area shape="rect" id="Node000003" href="$class_ogre_1_1_numeric_key_frame.html" title="Specialised KeyFrame which stores any numeric value." alt="" coords="364,5,545,31"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="274,71,348,39,388,28,390,33,350,45,277,76"/>
+<area shape="rect" id="Node000004" href="$class_ogre_1_1_transform_key_frame.html" title="Specialised KeyFrame which stores a full transform." alt="" coords="359,55,551,80"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="315,81,358,76,359,81,316,86"/>
+<area shape="rect" id="Node000005" href="$class_ogre_1_1_vertex_morph_key_frame.html" title="Specialised KeyFrame which stores absolute vertex positions for a complete buffer,..." alt="" coords="349,104,560,129"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="315,99,350,102,349,108,315,104"/>
+<area shape="rect" id="Node000006" href="$class_ogre_1_1_vertex_pose_key_frame.html" title="Specialised KeyFrame which references a Mesh::Pose at a certain influence level, which stores offsets..." alt="" coords="355,153,555,179"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="277,109,350,139,390,151,388,156,348,145,275,114"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,80,127,105"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="141,90,175,90,175,95,141,95"/>
+</map>

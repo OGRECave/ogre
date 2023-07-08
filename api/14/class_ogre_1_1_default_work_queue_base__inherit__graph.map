@@ -1,0 +1,9 @@
+<map id="Ogre::DefaultWorkQueueBase" name="Ogre::DefaultWorkQueueBase">
+<area shape="rect" id="Node000001" title="Base for a general purpose task&#45;based background work queue." alt="" coords="5,152,223,177"/>
+<area shape="rect" id="Node000004" href="$class_ogre_1_1_default_work_queue.html" title="Implementation of a general purpose request / response style background work queue." alt="" coords="21,225,207,251"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="117,191,117,225,111,225,111,191"/>
+<area shape="rect" id="Node000002" href="$class_ogre_1_1_work_queue.html" title="Interface to a general purpose task&#45;basedbackground work queue." alt="" coords="45,79,183,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="117,118,117,152,111,152,111,118"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="67,5,161,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="117,44,117,79,111,79,111,44"/>
+</map>

@@ -1,0 +1,9 @@
+<map id="Ogre::ScriptCompilerManager" name="Ogre::ScriptCompilerManager">
+<area shape="rect" id="Node000001" title="Manages threaded compilation of scripts." alt="" coords="227,93,441,119"/>
+<area shape="rect" id="Node000002" href="$class_ogre_1_1_singleton.html" title=" " alt="" coords="5,5,239,45"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="186,48,304,91,302,96,185,53"/>
+<area shape="rect" id="Node000003" href="$class_ogre_1_1_script_loader.html" title="Abstract class defining the interface used by classes which wish to perform script loading to define ..." alt="" coords="263,13,405,38"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="337,52,337,93,331,93,331,52"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="429,13,580,38"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="469,46,360,96,358,91,466,41"/>
+</map>

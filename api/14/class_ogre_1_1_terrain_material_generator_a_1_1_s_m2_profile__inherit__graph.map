@@ -1,0 +1,5 @@
+<map id="Ogre::TerrainMaterialGeneratorA::SM2Profile" name="Ogre::TerrainMaterialGeneratorA::SM2Profile">
+<area shape="rect" id="Node000001" title="Shader model 2 profile target." alt="" coords="5,93,229,133"/>
+<area shape="rect" id="Node000002" href="$struct_ogre_1_1_terrain_material_generator_1_1_profile.html" title=" " alt="" coords="5,5,229,45"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="120,59,120,93,115,93,115,59"/>
+</map>

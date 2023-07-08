@@ -1,0 +1,7 @@
+<map id="Ogre::LinearControllerFunction" name="Ogre::LinearControllerFunction">
+<area shape="rect" id="Node000001" title="Predefined controller function based on linear function interpolation." alt="" coords="5,167,225,192"/>
+<area shape="rect" id="Node000002" href="$class_ogre_1_1_controller_function.html" title=" " alt="" coords="25,79,205,119"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="118,132,118,166,113,166,113,132"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="56,5,175,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="118,44,118,79,113,79,113,44"/>
+</map>
