@@ -41,13 +41,6 @@ namespace Ogre
 /** \addtogroup MeshLodGenerator
 *  @{
 */
-/// Thread-safe buffer for storing Hardware index buffer
-struct LodIndexBuffer {
-    size_t indexCount; /// index count from indexStart.
-    size_t indexStart; /// Offset from the start of the indexBuffer
-    HardwareIndexBufferPtr indexBuffer; /// if NULL, then the previous Lod level's buffer is used. (compression)
-    void fillBuffer(Ogre::IndexData* data); /// Fills the buffer from an Ogre::IndexData. Call this on Ogre main thread only
-};
 /// Thread-safe buffer for storing Hardware vertex buffer
 struct LodVertexBuffer {
     size_t vertexCount;
@@ -59,7 +52,7 @@ struct LodVertexBuffer {
 struct LodInputBuffer
 {
     struct _OgreLodExport Submesh {
-        LodIndexBuffer indexBuffer;
+        IndexData indexBuffer;
         LodVertexBuffer vertexBuffer;
         bool useSharedVertexBuffer;
         RenderOperation::OperationType operationType;
@@ -74,7 +67,7 @@ struct LodInputBuffer
 struct LodOutputBuffer {
 
     struct _OgreLodExport Submesh {
-        std::vector<LodIndexBuffer> genIndexBuffers;
+        std::vector<IndexData> genIndexBuffers;
     };
     /// Contains every generated indexBuffer from every submesh. submeshCount*lodLevelCount buffers.
     std::vector<Submesh> submesh;

@@ -52,7 +52,7 @@ public:
 protected:
     MeshPtr mMesh;
 
-    void addIndexData(LodData* data, size_t subMeshIndex) override;
+    const IndexData* getSubMeshIndexData(size_t subMeshIndex) const override;
     void addVertexData(LodData* data, size_t subMeshIndex) override;
 
     const String & getMeshName() override;

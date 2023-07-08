@@ -95,10 +95,9 @@ namespace Ogre
         vertexBuffer.vertexNormalBuffer->unlock();
     }
 
-    void LodInputProviderBuffer::addIndexData(LodData* data, size_t subMeshIndex)
+    const IndexData* LodInputProviderBuffer::getSubMeshIndexData(size_t subMeshIndex) const
     {
-        LodIndexBuffer& ib = mBuffer.submesh[subMeshIndex].indexBuffer;
-        addIndexDataImpl(data, ib.indexBuffer, ib.indexStart, ib.indexCount, subMeshIndex);
+        return &mBuffer.submesh[subMeshIndex].indexBuffer;
     }
 
     const String & LodInputProviderBuffer::getMeshName()

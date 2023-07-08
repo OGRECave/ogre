@@ -48,11 +48,7 @@ protected:
     VertexLookupList mSharedVertexLookup;
     VertexLookupList mVertexLookup;
 
-    void addIndexDataImpl(LodData* data, const HardwareIndexBufferPtr& ibuf, size_t start, size_t count, size_t subMeshIndex);
-
     virtual void addVertexData(LodData* data, size_t subMeshIndex) = 0;
-    virtual void addIndexData(LodData* data, size_t subMeshIndex) = 0;
-
     virtual const String & getMeshName() = 0;
     virtual size_t getMeshSharedVertexCount() = 0;
     virtual float getMeshBoundingSphereRadius() = 0;
@@ -62,9 +58,11 @@ protected:
     virtual bool getSubMeshUseSharedVertices(size_t subMeshIndex) = 0;
     virtual size_t getSubMeshOwnVertexCount(size_t subMeshIndex) = 0;
     virtual size_t getSubMeshIndexCount(size_t subMeshIndex) = 0;
+    virtual const IndexData* getSubMeshIndexData(size_t subMeshIndex) const = 0;
     virtual RenderOperation::OperationType getSubMeshRenderOp(size_t subMeshIndex) = 0;
 
 private:
+    void addIndexData(LodData* data, size_t subMeshIndex);
     void tuneContainerSize(LodData* data);
     void initialize(LodData* data);
 };

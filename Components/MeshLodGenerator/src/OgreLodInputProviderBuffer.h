@@ -52,7 +52,7 @@ protected:
     LodInputBuffer mBuffer;
 
     void addVertexData(LodData* data, size_t subMeshIndex) override;
-    void addIndexData(LodData* data, size_t subMeshIndex) override;
+    const IndexData* getSubMeshIndexData(size_t subMeshIndex) const override;
 
     const String & getMeshName() override;
     size_t getMeshSharedVertexCount() override;
