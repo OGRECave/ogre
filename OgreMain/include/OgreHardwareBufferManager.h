@@ -99,6 +99,7 @@ namespace Ogre {
         /// Internal method for destroys all vertex buffer bindings.
         void destroyAllBindings(void);
 
+    private:
         /// Internal method for creates a new vertex declaration, may be overridden by certain rendering APIs.
         virtual VertexDeclaration* createVertexDeclarationImpl(void);
         /// Internal method for destroys a vertex declaration, may be overridden by certain rendering APIs.
@@ -109,7 +110,6 @@ namespace Ogre {
         /// Internal method for destroys a VertexBufferBinding, may be overridden by certain rendering APIs.
         void destroyVertexBufferBindingImpl(VertexBufferBinding* binding);
 
-    private:
         /** Struct holding details of a license to use a temporary shared buffer. */
         class _OgrePrivate VertexBufferLicense
         {
