@@ -34,7 +34,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     SubEntity::SubEntity (Entity* parent, SubMesh* subMeshBasis)
         : Renderable(), mParentEntity(parent),
-        mSubMesh(subMeshBasis), mMaterialLodIndex(0), mCachedCamera(0)
+        mSubMesh(subMeshBasis), mCachedCamera(0)
     {
         mVisible = true;
         mRenderQueueID = 0;
@@ -89,11 +89,6 @@ namespace Ogre {
 
         // tell parent to reconsider material vertex processing options
         mParentEntity->reevaluateVertexProcessing();
-    }
-    //-----------------------------------------------------------------------
-    Technique* SubEntity::getTechnique(void) const
-    {
-        return mMaterialPtr->getBestTechnique(mMaterialLodIndex, this);
     }
     //-----------------------------------------------------------------------
     void SubEntity::getRenderOperation(RenderOperation& op)

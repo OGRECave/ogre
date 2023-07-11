@@ -59,7 +59,6 @@ namespace Ogre
         , mDepth(depth)
         , mBoundingRadius(0)
         , mCurrentLod(-1)
-        , mMaterialLodIndex(0)
         , mLodTransition(0)
         , mChildWithMaxHeightDelta(0)
         , mSelfOrChildRendered(false)
