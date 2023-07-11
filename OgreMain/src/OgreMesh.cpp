@@ -1699,7 +1699,7 @@ namespace Ogre {
 
         mMeshLodUsageList[0].edgeData = eb.build();
 
-#if OGREUG_MODE
+#if OGRE_DEBUG_MODE
         // Override default log
         Log* log = LogManager::getSingleton().createLog(
             mName + "_lod0"+

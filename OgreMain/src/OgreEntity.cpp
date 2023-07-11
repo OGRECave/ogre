@@ -1573,9 +1573,6 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     EdgeData* Entity::getEdgeList(void)
     {
-#if OGRE_NO_MESHLOD
-        unsigned short mMeshLodIndex = 0;
-#endif
         // Get from Mesh
         return mMesh->getEdgeList(mMeshLodIndex);
     }
