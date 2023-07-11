@@ -96,12 +96,8 @@ namespace Ogre {
         bool mRenderQueuePrioritySet;
         /// The render queue priority to use when rendering this renderable
         ushort mRenderQueuePriority;
-#if !OGRE_NO_MESHLOD
         /// The LOD number of the material to use, calculated by Entity::_notifyCurrentCamera
         unsigned short mMaterialLodIndex;
-#else
-        const unsigned short mMaterialLodIndex; // = 0
-#endif
         /// Blend buffer details for dedicated geometry
         std::unique_ptr<VertexData> mSkelAnimVertexData;
         /// Quick lookup of buffers

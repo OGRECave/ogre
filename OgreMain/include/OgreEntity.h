@@ -264,13 +264,6 @@ namespace Ogre {
         /// Index of maximum detail LOD (NB lower index is higher detail).
         ushort mMaxMeshLodIndex;
 
-        /// LOD bias factor, not transformed.
-        Real mMaterialLodFactor;
-        /// Index of minimum detail LOD (NB higher index is lower detail).
-        ushort mMinMaterialLodIndex;
-        /// Index of maximum detail LOD (NB lower index is higher detail).
-        ushort mMaxMaterialLodIndex;
-
         /** List of LOD Entity instances (for manual LODs).
             We don't know when the mesh is using manual LODs whether one LOD to the next will have the
             same number of SubMeshes, therefore we have to allow a separate Entity list
@@ -283,10 +276,13 @@ namespace Ogre {
         const Real mMeshLodFactorTransformed;
         const ushort mMinMeshLodIndex;
         const ushort mMaxMeshLodIndex;
-        const Real mMaterialLodFactor;
-        const ushort mMinMaterialLodIndex;
-        const ushort mMaxMaterialLodIndex;
 #endif
+        /// LOD bias factor, not transformed.
+        Real mMaterialLodFactor;
+        /// Index of minimum detail LOD (NB higher index is lower detail).
+        ushort mMinMaterialLodIndex;
+        /// Index of maximum detail LOD (NB lower index is higher detail).
+        ushort mMaxMaterialLodIndex;
         /** This Entity's personal copy of the skeleton, if skeletally animated.
         */
         SkeletonInstance* mSkeletonInstance;
@@ -517,7 +513,7 @@ namespace Ogre {
             LOD will be limited by the number in the Mesh).
         */
         void setMeshLodBias(Real factor, ushort maxDetailIndex = 0, ushort minDetailIndex = 99);
-
+#endif
         /** Sets a level-of-detail bias for the material detail of this entity.
 
             Level of detail reduction is normally applied automatically based on the Material
@@ -548,7 +544,7 @@ namespace Ogre {
             LOD will be limited by the number of LOD indexes used in the Material).
         */
         void setMaterialLodBias(Real factor, ushort maxDetailIndex = 0, ushort minDetailIndex = 99);
-#endif
+
         /** Sets whether the polygon mode of this entire entity may be
             overridden by the camera detail settings.
         */
