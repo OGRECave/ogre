@@ -184,6 +184,7 @@ namespace Ogre
         AutoConstantDefinition(ACT_LOD_CAMERA_POSITION_OBJECT_SPACE,  "lod_camera_position_object_space", 3, ET_REAL, ACDT_NONE),
         AutoConstantDefinition(ACT_LIGHT_CUSTOM,        "light_custom", 4, ET_REAL, ACDT_INT),
         AutoConstantDefinition(ACT_POINT_PARAMS,                    "point_params",                   4, ET_REAL, ACDT_NONE),
+        AutoConstantDefinition(ACT_MATERIAL_LOD_INDEX,       "material_lod_index",             1, ET_INT, ACDT_NONE),
 
         // NOTE: new auto constants must be added before this line, as the following are merely aliases
         // to allow legacy world_ names in scripts
@@ -751,7 +752,7 @@ namespace Ogre
         , mIgnoreMissingParams(false)
         , mActivePassIterationIndex(std::numeric_limits<size_t>::max())
     {
-        static_assert((sizeof(AutoConstantDictionary) / sizeof(AutoConstantDefinition) - 5) == ACT_POINT_PARAMS,
+        static_assert((sizeof(AutoConstantDictionary) / sizeof(AutoConstantDefinition) - 5) == ACT_MATERIAL_LOD_INDEX,
                       "AutoConstantDictionary out of sync");
     }
     GpuProgramParameters::~GpuProgramParameters() {}
@@ -1795,7 +1796,9 @@ namespace Ogre
                 case ACT_LOD_CAMERA_POSITION:
                     _writeRawConstant(ac.physicalIndex, source->getLodCameraPosition(), ac.elementCount);
                     break;
-
+                case ACT_MATERIAL_LOD_INDEX:
+                    _writeRawConstant(ac.physicalIndex, (float)source->getMaterialLodIndex());
+                    break;
                 case ACT_TEXTURE_WORLDVIEWPROJ_MATRIX:
                     // can also be updated in lights
                     _writeRawConstant(ac.physicalIndex, source->getTextureWorldViewProjMatrix(ac.data),ac.elementCount);
