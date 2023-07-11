@@ -375,18 +375,19 @@ namespace Ogre {
 
             for (auto *s : mSubEntityList)
             {
-#if !OGRE_NO_MESHLOD
                 // Get sub-entity material
                 const MaterialPtr& material = s->getMaterial();
                 
                 // Get material LOD strategy
                 const LodStrategy *materialStrategy = material->getLodStrategy();
-                
+
                 // Recalculate LOD value if strategies do not match
                 Real biasedMaterialLodValue;
+#if !OGRE_NO_MESHLOD
                 if (meshStrategy == materialStrategy)
                     biasedMaterialLodValue = biasedMeshLodValue;
                 else
+#endif
                     biasedMaterialLodValue = materialStrategy->getValue(this, cam) * materialStrategy->transformBias(mMaterialLodFactor);
 
                 // Get the index at this biased depth
@@ -407,7 +408,6 @@ namespace Ogre {
 
                 // Change LOD index
                 s->mMaterialLodIndex = subEntEvt.newLodIndex;
-#endif
                 // Also invalidate any camera distance cache
                 s->_invalidateCameraCache ();
             }
@@ -1357,6 +1357,7 @@ namespace Ogre {
         mMaxMeshLodIndex = maxDetailIndex;
         mMinMeshLodIndex = minDetailIndex;
     }
+#endif
     //-----------------------------------------------------------------------
     void Entity::setMaterialLodBias(Real factor, ushort maxDetailIndex, ushort minDetailIndex)
     {
@@ -1364,7 +1365,7 @@ namespace Ogre {
         mMaxMaterialLodIndex = maxDetailIndex;
         mMinMaterialLodIndex = minDetailIndex;
     }
-#endif
+
     //-----------------------------------------------------------------------
     void Entity::buildSubEntityList(MeshPtr& mesh, SubEntityList* sublist)
     {
