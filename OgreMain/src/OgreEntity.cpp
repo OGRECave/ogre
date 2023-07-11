@@ -371,9 +371,6 @@ namespace Ogre {
 
             // Change LOD index
             mMeshLodIndex = evt.newLodIndex;
-
-            // Now do material LOD
-            lodValue *= mMaterialLodFactorTransformed;
 #endif
 
 
@@ -389,14 +386,14 @@ namespace Ogre {
                 // Recalculate LOD value if strategies do not match
                 Real biasedMaterialLodValue;
                 if (meshStrategy == materialStrategy)
-                    biasedMaterialLodValue = lodValue;
+                    biasedMaterialLodValue = biasedMeshLodValue;
                 else
                     biasedMaterialLodValue = materialStrategy->getValue(this, cam) * materialStrategy->transformBias(mMaterialLodFactor);
 
                 // Get the index at this biased depth
                 unsigned short idx = material->getLodIndex(biasedMaterialLodValue);
                 // Apply maximum detail restriction (remember lower = higher detail, higher = lower detail)
-                idx = Math::Clamp(idx, mMaxMeshLodIndex, mMinMeshLodIndex);
+                idx = Math::Clamp(idx, mMaxMaterialLodIndex, mMinMaterialLodIndex);
 
                 // Construct event object
                 EntityMaterialLodChangedEvent subEntEvt;
