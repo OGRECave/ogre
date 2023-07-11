@@ -64,7 +64,6 @@ namespace Ogre {
         mMinMeshLodIndex(99),
         mMaxMeshLodIndex(0),        // Backwards, remember low value = high detail
         mMaterialLodFactor(1.0f),
-        mMaterialLodFactorTransformed(1.0f),
         mMinMaterialLodIndex(99),
         mMaxMaterialLodIndex(0),        // Backwards, remember low value = high detail
         mSkeletonInstance(0),
@@ -1362,7 +1361,6 @@ namespace Ogre {
     void Entity::setMaterialLodBias(Real factor, ushort maxDetailIndex, ushort minDetailIndex)
     {
         mMaterialLodFactor = factor;
-        mMaterialLodFactorTransformed = mMesh->getLodStrategy()->transformBias(factor);
         mMaxMaterialLodIndex = maxDetailIndex;
         mMinMaterialLodIndex = minDetailIndex;
     }
