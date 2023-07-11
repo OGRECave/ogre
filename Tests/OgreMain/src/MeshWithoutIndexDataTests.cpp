@@ -33,10 +33,9 @@ THE SOFTWARE.
 #include "OgreArchiveManager.h"
 #include "MeshWithoutIndexDataTests.h"
 #include "OgreLodStrategyManager.h"
-#include "OgreLodConfig.h"
-
 
 #ifdef OGRE_BUILD_COMPONENT_MESHLODGENERATOR
+#include "OgreLodConfig.h"
 #include "OgreMeshLodGenerator.h"
 #endif
 

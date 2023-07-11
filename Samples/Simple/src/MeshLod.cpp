@@ -1,3 +1,5 @@
+#include "OgreComponents.h"
+#ifdef OGRE_BUILD_COMPONENT_MESHLODGENERATOR
 #include "MeshLod.h"
 
 using namespace Ogre;
@@ -652,3 +654,4 @@ void Sample_MeshLod::injectionCompleted( LodWorkQueueRequest* request )
     recreateEntity(); // Needed for manual lod levels.
     forceLodLevel(mForcedLodLevel, false);
 }
+#endif

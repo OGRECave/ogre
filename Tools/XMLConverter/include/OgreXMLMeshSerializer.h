@@ -89,9 +89,11 @@ namespace Ogre {
         void readSkeletonLink(pugi::xml_node& mSkelNode);
         void readBoneAssignments(pugi::xml_node& mBoneAssignmentsNode);
         void readBoneAssignments(pugi::xml_node& mBoneAssignmentsNode, SubMesh* sm);
+#if !OGRE_NO_MESHLOD
         void readLodInfo(pugi::xml_node&  lodNode);
         void readLodUsageManual(pugi::xml_node& manualNode, unsigned short index);
         void readLodUsageGenerated(pugi::xml_node& genNode, unsigned short index);
+#endif
         void readSubMeshNames(pugi::xml_node& mMeshNamesNode, Mesh* sm);
         void readPoses(pugi::xml_node& posesNode, Mesh *m);
         void readAnimations(pugi::xml_node& mAnimationsNode, Mesh *m);

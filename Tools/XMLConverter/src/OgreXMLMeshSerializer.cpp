@@ -92,10 +92,12 @@ namespace Ogre {
         if (elem)
             readBoneAssignments(elem);
 
+#if !OGRE_NO_MESHLOD
         //Lod
         elem = rootElem.child("levelofdetail");
         if (elem)
             readLodInfo(elem);
+#endif
 
         // submesh names
         elem = rootElem.child("submeshnames");
@@ -1456,6 +1458,7 @@ namespace Ogre {
             }
         }
     }
+#if !OGRE_NO_MESHLOD
     //---------------------------------------------------------------------
     void XMLMeshSerializer::readLodInfo(pugi::xml_node&  lodNode)
     {
@@ -1625,6 +1628,7 @@ namespace Ogre {
         }
         
     }
+#endif
     //-----------------------------------------------------------------------------
     void XMLMeshSerializer::readExtremes(pugi::xml_node& extremesNode, Mesh *m)
     {
