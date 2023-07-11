@@ -68,7 +68,11 @@ namespace Ogre {
             DEFAULT_PRIORITY = 100
         };
 
-        Renderable() : mPolygonModeOverrideable(true), mUseIdentityProjection(false), mUseIdentityView(false){}
+        Renderable()
+            : mMaterialLodIndex(0), mPolygonModeOverrideable(true), mUseIdentityProjection(false),
+              mUseIdentityView(false)
+        {
+        }
         /** Virtual destructor needed as class has virtual methods. */
         virtual ~Renderable() {}
         /** Retrieves a weak reference to the material this renderable object uses.
@@ -82,7 +86,7 @@ namespace Ogre {
             This is to allow Renderables to use a chosen Technique if they wish, otherwise
             they will use the best Technique available for the Material they are using.
         */
-        virtual Technique* getTechnique(void) const { return getMaterial()->getBestTechnique(0, this); }
+        virtual Technique* getTechnique(void) const { return getMaterial()->getBestTechnique(mMaterialLodIndex, this); }
         /** Gets the render operation required to send this object to the frame buffer.
         */
         virtual void getRenderOperation(RenderOperation& op) = 0;
@@ -350,6 +354,7 @@ namespace Ogre {
         typedef std::map<size_t, Vector4f> CustomParameterMap;
         CustomParameterMap mCustomParameters;
         UserObjectBindings mUserObjectBindings;      /// User objects binding.
+        uint16 mMaterialLodIndex;
         bool mPolygonModeOverrideable;
         bool mUseIdentityProjection;
         bool mUseIdentityView;

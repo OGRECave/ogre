@@ -274,7 +274,6 @@ namespace Ogre
         AxisAlignedBox mAABB; /// Relative to mLocalCentre
         Real mBoundingRadius; /// Relative to mLocalCentre
         int mCurrentLod; /// -1 = none (do not render)
-        unsigned short mMaterialLodIndex;
         float mLodTransition; /// 0-1 transition to lower LOD
         /// The child with the largest height delta 
         TerrainQuadTreeNode* mChildWithMaxHeightDelta;

@@ -50,7 +50,6 @@ namespace Ogre
                 mBoundsDirty( false ),
                 mBoundsUpdated( false ),
                 mCurrentCamera( 0 ),
-                mMaterialLodIndex( 0 ),
                 mDirtyAnimation(true),
                 mTechnSupportsSkeletal( true ),
                 mCameraDistLastUpdateFrameNumber( std::numeric_limits<unsigned long>::max() ),
@@ -544,11 +543,6 @@ namespace Ogre
     const LightList& InstanceBatch::getLights( void ) const
     {
         return queryLights();
-    }
-    //-----------------------------------------------------------------------
-    Technique* InstanceBatch::getTechnique( void ) const
-    {
-        return mMaterial->getBestTechnique( mMaterialLodIndex, this );
     }
     //-----------------------------------------------------------------------
     void InstanceBatch::_updateRenderQueue( RenderQueue* queue )
