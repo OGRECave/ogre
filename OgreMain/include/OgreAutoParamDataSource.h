@@ -264,6 +264,7 @@ namespace Ogre {
         Real getNearClipDistance() const;
         Real getFarClipDistance() const;
         int getPassNumber(void) const;
+        int getMaterialLodIndex() const;
         void setPassNumber(const int passNumber);
         void incPassNumber(void);
         void updateLightCustomGpuParameter(const GpuProgramParameters::AutoConstantEntry& constantEntry, GpuProgramParameters *params) const;

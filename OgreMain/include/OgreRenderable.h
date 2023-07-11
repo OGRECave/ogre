@@ -91,6 +91,8 @@ namespace Ogre {
         */
         virtual void getRenderOperation(RenderOperation& op) = 0;
 
+        uint16 _getMaterialLodIndex() const { return mMaterialLodIndex; }
+
         /** Called just prior to the Renderable being rendered. 
 
             OGRE is a queued renderer, so the actual render commands are executed 

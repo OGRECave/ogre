@@ -1053,6 +1053,10 @@ namespace Ogre {
     {
         ++mPassNumber;
     }
+    int AutoParamDataSource::getMaterialLodIndex() const
+    {
+        return mCurrentRenderable->_getMaterialLodIndex();
+    }
     //-----------------------------------------------------------------------------
     const Vector4& AutoParamDataSource::getSceneDepthRange() const
     {
