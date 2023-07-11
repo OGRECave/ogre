@@ -266,8 +266,6 @@ namespace Ogre {
 
         /// LOD bias factor, not transformed.
         Real mMaterialLodFactor;
-        /// LOD bias factor, transformed for optimisation when calculating adjusted LOD value.
-        Real mMaterialLodFactorTransformed;
         /// Index of minimum detail LOD (NB higher index is lower detail).
         ushort mMinMaterialLodIndex;
         /// Index of maximum detail LOD (NB lower index is higher detail).
@@ -286,7 +284,6 @@ namespace Ogre {
         const ushort mMinMeshLodIndex;
         const ushort mMaxMeshLodIndex;
         const Real mMaterialLodFactor;
-        const Real mMaterialLodFactorTransformed;
         const ushort mMinMaterialLodIndex;
         const ushort mMaxMaterialLodIndex;
 #endif
