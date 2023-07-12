@@ -1075,6 +1075,7 @@ namespace Ogre{
         mMaterial->_notifyOrigin(obj->file);
 
         bool bval;
+        String sval;
 
         for(auto & i : obj->children)
         {
@@ -1124,26 +1125,17 @@ namespace Ogre{
                     }
                     break;
                 case ID_LOD_STRATEGY:
-                    if (prop->values.empty())
+                    if(getValue(prop, compiler, sval))
                     {
-                        compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
-                    }
-                    else if (prop->values.size() > 1)
-                    {
-                        compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line,
-                                           "lod_strategy only supports 1 argument");
-                    }
-                    else
-                    {
-                        LodStrategy *strategy = LodStrategyManager::getSingleton().getStrategy(prop->values.front()->getString());
-                        if (strategy)
-                            mMaterial->setLodStrategy(strategy);
+                            if (sval == "Distance" || sval == "PixelCount")
+                                compiler->addError(ScriptCompiler::CE_DEPRECATEDSYMBOL, prop->file, prop->line,
+                                                   sval + ". use distance_box or pixel_count");
 
-                        if (!strategy)
-                        {
-                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                               "lod_strategy argument must be a valid LOD strategy");
-                        }
+                            LodStrategy* strategy = LodStrategyManager::getSingleton().getStrategy(sval);
+                            if (strategy)
+                                mMaterial->setLodStrategy(strategy);
+                            else
+                                compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line, sval);
                     }
                     break;
                 case ID_RECEIVE_SHADOWS:
