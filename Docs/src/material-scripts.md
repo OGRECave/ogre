@@ -72,23 +72,32 @@ The outermost section of a material definition does not have a lot of attributes
 
 ## lod\_strategy
 
-Sets the name of the LOD strategy to use. Defaults to ’Distance’ which means LOD changes based on distance from the camera. Also supported is ’PixelCount’ which changes LOD based on an estimate of the screen-space pixels affected. 
+Sets the name of the LOD strategy to be used.
+
 @par
-Format: lod\_strategy &lt;name&gt;<br> Default: lod\_strategy Distance
+Format: lod\_strategy &lt;name&gt;
+@par
+Default: lod\_strategy distance_sphere
+
+@par Valid values are:
+- @c distance_sphere which means LOD changes based on distance from the camera (calculated via the bounding sphere radius).
+- @c distance_box behaves the same as 'distance_sphere' except that it uses the object’s bounding box to approximate the distance.
+- @c pixel_count changes LOD levels based on an absolute estimate of the screen-space pixels occupied (internally approximated via the bounding radius).
+- @c screen_ratio_pixel_count sets that absolute screen space value in relation to the screen size (1.0 = object covering complete screen, 0.5 = half screen covered by object, etc.).
 
 <a name="lod_005fvalues"></a>
 <a name="lod_005fvalues-1"></a>
 
 ## lod\_values
 
-This attribute defines the values used to control the LOD transition for this material. By setting this attribute, you indicate that you want this material to alter the Technique that it uses based on some metric, such as the distance from the camera, or the approximate screen space coverage. The exact meaning of these values is determined by the option you select for [lod\_strategy](#lod_005fstrategy) - it is a list of distances for the ’Distance’ strategy, and a list of pixel counts for the ’PixelCount’ strategy, for example. You must give it a list of values, in order from highest LOD value to lowest LOD value, each one indicating the point at which the material will switch to the next LOD. Implicitly, all materials activate LOD index 0 for values less than the first entry, so you do not have to specify ’0’ at the start of the list. You must ensure that there is at least one Technique with a [lod\_index](#lod_005findex) value for each value in the list (so if you specify 3 values, you must have techniques for LOD indexes 0, 1, 2 and 3). Note you must always have at least one Technique at lod\_index 0.
+This attribute defines the values used to control the LOD transition for this material. By setting this attribute, you indicate that you want this material to alter the Technique that it uses based on some metric, such as the distance from the camera, or the approximate screen space coverage. The exact meaning of these values is determined by the option you select for [lod\_strategy](#lod_005fstrategy) - it is a list of distances for the @c distance_sphere strategy, and a list of pixel counts for the @c pixel_count strategy, for example. You must give it a list of values, in order from highest LOD value to lowest LOD value, each one indicating the point at which the material will switch to the next LOD. All materials automatically activate LOD index 0 for values less than the first entry, so you don't have to explicitly specify this. Additionally, if there is no technique that matches the active LOD index, a technique with a lower LOD index will be used instead. Therefore, it is important to always have at least one technique with LOD index 0.
 
 @par
 Format: lod\_values &lt;value0&gt; &lt;value1&gt; &lt;value2&gt; ...
 @par
 Default: none
 @par Example:
-lod\_strategy Distance
+lod\_strategy distance_sphere
 @par
 lod\_values 300.0 600.5 1200
 
@@ -183,7 +192,7 @@ Format: lod\_index &lt;number&gt;<br> NB Valid values are 0 (highest level of de
 @par
 Example: lod\_index 1
 
-All techniques must belong to a LOD index, by default they all belong to index 0, i.e. the highest LOD. Increasing indexes denote lower levels of detail. You can (and often will) assign more than one technique to the same LOD index, what this means is that OGRE will pick the best technique of the ones listed at the same LOD index. For readability, it is advised that you list your techniques in order of LOD, then in order of preference, although the latter is the only prerequisite (OGRE determines which one is ’best’ by which one is listed first). You must always have at least one Technique at lod\_index 0. The distance at which a LOD level is applied is determined by the [lod_values](#lod_005fvalues) attribute of the containing material.
+All techniques are automatically assigned to a LOD index, with the default being index 0, which corresponds to the highest LOD. Increasing indexes denote lower levels of detail. You can (and often will) assign more than one technique to the same LOD index, what this means is that OGRE will pick the best technique of the ones listed at the same LOD index. For readability, it is advised that you list your techniques in order of LOD, then in order of preference, although the latter is the only prerequisite (OGRE determines which one is ’best’ by which one is listed first). You must always have at least one Technique at lod\_index 0. The distance at which a LOD level is applied is determined by the [lod_values](#lod_005fvalues) attribute of the containing material.
 
 @par
 Default: lod\_index 0
