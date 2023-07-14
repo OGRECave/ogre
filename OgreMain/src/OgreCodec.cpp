@@ -50,10 +50,9 @@ namespace Ogre {
     {
         StringVector result;
         result.reserve(msMapCodecs.size());
-        CodecList::const_iterator i;
-        for (i = msMapCodecs.begin(); i != msMapCodecs.end(); ++i)
+        for (auto& c : msMapCodecs)
         {
-            result.push_back(i->first);
+            result.push_back(c.first);
         }
         return result;
     }

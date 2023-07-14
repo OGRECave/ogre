@@ -162,12 +162,8 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void AnimationTrack::removeAllKeyFrames(void)
     {
-        KeyFrameList::iterator i = mKeyFrames.begin();
-
-        for (; i != mKeyFrames.end(); ++i)
-        {
-            OGRE_DELETE *i;
-        }
+        for (auto *f : mKeyFrames)
+            OGRE_DELETE f;
 
         _keyFrameDataChanged();
         mParent->_keyFrameListChanged();
@@ -536,11 +532,9 @@ namespace Ogre {
         splines->rotationSpline.clear();
         splines->scaleSpline.clear();
 
-        KeyFrameList::const_iterator i, iend;
-        iend = mKeyFrames.end(); // precall to avoid overhead
-        for (i = mKeyFrames.begin(); i != iend; ++i)
+        for (auto *f : mKeyFrames)
         {
-            TransformKeyFrame* kf = static_cast<TransformKeyFrame*>(*i);
+            TransformKeyFrame* kf = static_cast<TransformKeyFrame*>(f);
             splines->positionSpline.addPoint(kf->getTranslate());
             splines->rotationSpline.addPoint(kf->getRotation());
             splines->scaleSpline.addPoint(kf->getScale());
