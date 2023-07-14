@@ -15,7 +15,7 @@ shadowed. We do not care about parts of the scene seen only by the
 light.
 
 Please note that this tutorial is more explicit and in depth than required
-to merely render shadows in OGRE as to teach you the theory behind the 
+to merely render shadows in OGRE as to teach you the theory behind the
 rendering shadows as well.
 
 In practice, the snapshot from the viewpoint of the light is stored as a
