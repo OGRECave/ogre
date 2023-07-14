@@ -71,7 +71,7 @@ namespace Ogre {
                             bool isManual = false, ManualResourceLoader* loader = 0,
                             const NameValuePairList* createParams = 0);
 
-        /// Get a resource by name
+        /// Get a resource by name. For example, a compositor defined in some .compositor script.
         /// @see ResourceManager::getResourceByName
         CompositorPtr getByName(const String& name, const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME) const;
 

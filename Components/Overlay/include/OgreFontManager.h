@@ -54,7 +54,7 @@ namespace Ogre
                             bool isManual = false, ManualResourceLoader* loader = 0,
                             const NameValuePairList* createParams = 0);
 
-        /// Get a resource by name
+        /// Get a font by name. For example, one defined in some .fontdef file.
         /// @see ResourceManager::getResourceByName
         FontPtr getByName(const String& name, const String& groupName OGRE_RESOURCE_GROUP_INIT) const;
 

@@ -98,7 +98,7 @@ namespace Ogre {
 
         /** Create a new Overlay. */
         Overlay* create(const String& name);
-        /** Retrieve an Overlay by name 
+        /** Retrieve an Overlay by name. For example, one defined in some .overlay file.
         @return A pointer to the Overlay, or 0 if not found
         */
         Overlay* getByName(const String& name);
