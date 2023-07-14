@@ -162,7 +162,7 @@ namespace Ogre {
                             bool isManual = false, ManualResourceLoader* loader = 0,
                             const NameValuePairList* createParams = 0);
         
-        /// Get a resource by name
+        /// Get a material by name. For example, to get a MaterialPtr to a material defined in .material script.
         /// @see ResourceManager::getResourceByName
         MaterialPtr getByName(const String& name, const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME) const;
 

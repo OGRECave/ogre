@@ -105,7 +105,7 @@ namespace Ogre {
         GpuProgramManager();
         virtual ~GpuProgramManager();
 
-        /// Get a resource by name
+        /// Get a GPU Program by name. For example, a GPU Program defined in some .program file.
         /// @see GpuProgramManager::getResourceByName
         GpuProgramPtr getByName(const String& name, const String& group OGRE_RESOURCE_GROUP_INIT) const;
 
