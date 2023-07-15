@@ -1511,7 +1511,7 @@ The requirements to read from or write to the fixed function pipeline are simila
 
 Some of Ogre's render systems do not support the Fixed Function pipeline. In that, case if you supply vertex shader, you will need to supply a fragment shader as well or use the RTSS.
 
-Compute shader can be referenced in your materials with syntax like vertex shadeds.
+Compute shader can be referenced in your materials with syntax like vertex shaders.
 
 # Adding new Techniques, Passes, to copied materials {#Adding-new-Techniques_002c-Passes_002c-to-copied-materials_003a}
 
