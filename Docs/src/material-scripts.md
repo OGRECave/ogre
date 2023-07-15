@@ -1489,7 +1489,7 @@ Format: comp_func &lt;func&gt;
 
 # Using GPU Programs in a Pass {#Using-Vertex_002fGeometry_002fFragment-Programs-in-a-Pass}
 
-Within a pass section of a material script, you can reference a vertex, geometry and / or a fragment program which is been defined in a .program script (See [GPU Program Scripts](@ref Declaring-Vertex_002fGeometry_002fFragment-Programs)). The programs are defined separately from the usage of them in the pass, since the programs are very likely to be reused between many separate materials, probably across many different .material scripts, so this approach lets you define the program only once and use it many times.
+Within a pass section of a material script, you can reference a vertex, geometry, tessellation, compute, and / or a fragment program which is been defined in a .program script (See [GPU Program Scripts](@ref Declaring-Vertex_002fGeometry_002fFragment-Programs)). The programs are defined separately from the usage of them in the pass, since the programs are very likely to be reused between many separate materials, probably across many different .material scripts, so this approach lets you define the program only once and use it many times.
 
 As well as naming the program in question, you can also provide parameters to it. Here’s a simple example:
 
@@ -1503,11 +1503,15 @@ vertex_program_ref myVertexProgram
 
 In this example, we bind a vertex program called ’myVertexProgram’ (which will be defined elsewhere) to the pass, and give it 2 parameters, one is an ’auto’ parameter, meaning we do not have to supply a value as such, just a recognised code (in this case it’s the world/view/projection matrix which is kept up to date automatically by Ogre). The second parameter is a manually specified parameter, a 4-element float. The indexes are described later.
 
-The syntax of the link to a vertex program and a fragment or geometry program are identical, the only difference is that ’fragment\_program\_ref’ and ’geometry\_program\_ref’ are used respectively instead of ’vertex\_program\_ref’.
+The syntax of the link to a vertex program and a fragment or geometry program are identical, the only difference is that `fragment_program_ref` and `geometry_program_ref` are used respectively instead of `vertex_program_ref`. For tessellation shaders, use `tessellation_hull_program_ref` and `tessellation_domain_program_ref` to link to the hull tessellation program and the domain tessellation program respectively. Compute shader programs can be linked with `compute_program_ref`.
 
 For many situations vertex, geometry and fragment programs are associated with each other in a pass but this is not cast in stone. You could have a vertex program that can be used by several different fragment programs. Another situation that arises is that you can mix fixed pipeline and programmable pipeline (shaders) together. You could use the non-programmable vertex fixed function pipeline and then provide a fragment\_program\_ref in a pass i.e. there would be no vertex\_program\_ref section in the pass. The fragment program referenced in the pass must meet the requirements as defined in the related API in order to read from the outputs of the vertex fixed pipeline. You could also just have a vertex program that outputs to the fragment fixed function pipeline.
 
 The requirements to read from or write to the fixed function pipeline are similar between rendering API’s (DirectX and OpenGL) but how its actually done in each type of shader (vertex, geometry or fragment) depends on the shader language. For HLSL (DirectX API) and associated asm consult MSDN at <http://msdn.microsoft.com/library/>. For GLSL (OpenGL), consult section 7.6 of the GLSL spec 1.1 available at <http://www.opengl.org/registry/>. The built in varying variables provided in GLSL allow your program to read/write to the fixed function pipeline varyings. For Cg consult the Language Profiles section in CgUsersManual.pdf that comes with the Cg Toolkit available at <https://developer.nvidia.com/cg-toolkit>. For HLSL and Cg its the varying bindings that allow your shader programs to read/write to the fixed function pipeline varyings.
+
+Some of Ogre's render systems do not support the Fixed Function pipeline. In that, case if you supply vertex shader, you will need to supply a fragment shader as well or use the RTSS.
+
+Compute shader can be referenced in your materials with syntax like vertex shaders.
 
 # Adding new Techniques, Passes, to copied materials {#Adding-new-Techniques_002c-Passes_002c-to-copied-materials_003a}
 

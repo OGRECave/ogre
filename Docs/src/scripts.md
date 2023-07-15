@@ -23,6 +23,7 @@ The extensions, however, do specify the order in which the scripts are parsed, w
 3. "*.particle"
 4. "*.compositor"
 5. "*.os"
+6. "*.overlay"
 
 # Format {#Format}
 

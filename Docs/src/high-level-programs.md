@@ -20,7 +20,9 @@ vertex_program myVertexProgram asm
 }
 ```
 
-As you can see, that’s very simple, and defining a fragment or geometry program is exactly the same, just with @c vertex_program replaced with @c fragment_program or @c geometry_program, respectively. You give the program a name in the header, followed by the word ’asm’ to indicate that this is a low-level program. Inside the braces, you specify where the source is going to come from (and this is loaded from any of the resource locations as with other media), and also indicate the syntax being used. You might wonder why the syntax specification is required when many of the assembler syntaxes have a header identifying them anyway - well the reason is that the engine needs to know what syntax the program is in before reading it, because during compilation of the material, we want to skip programs which use an unsupportable syntax quickly, without loading the program first.
+As you can see, that’s very simple, and defining a fragment or geometry program is exactly the same, just with @c vertex_program replaced with @c fragment_program or @c geometry_program, respectively. Likewise, for tessellation and compute programs, use @c tessellation_hull_program, @c tessellation_domain_program, and @c compute_program.
+
+You give the program a name in the header, followed by the word ’asm’ to indicate that this is a low-level program. Inside the braces, you specify where the source is going to come from (and this is loaded from any of the resource locations as with other media), and also indicate the syntax being used. You might wonder why the syntax specification is required when many of the assembler syntaxes have a header identifying them anyway - well the reason is that the engine needs to know what syntax the program is in before reading it, because during compilation of the material, we want to skip programs which use an unsupportable syntax quickly, without loading the program first.
 
 # Default Program Parameters {#Default-Program-Parameters}
 
