@@ -13,6 +13,8 @@ Object space bones are now enabled by default. Use `MeshManager::setBonesUseObje
 
 All builtin Factory classes were made private. Replace `DefaultSceneManagerFactory::FACTORY_TYPE_NAME` by `SMT_DEFAULT` and e.g. `ManualObjectFactory::FACTORY_TYPE_NAME` by `MOT_MANUAL_OBJECT`.
 
+Since 14.1, `ACT_MATERIAL_LOD_INDEX` is available to implement multiple material LOD levels in a single shader.
+
 ### OgreUnifiedShader.h
 
 Sampler definitions now implicitly include the `uniform` keyword to support Vulkan; i.e. this will generate an error:
