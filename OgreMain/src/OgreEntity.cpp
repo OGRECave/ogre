@@ -396,15 +396,15 @@ namespace Ogre {
                 idx = Math::Clamp(idx, mMaxMaterialLodIndex, mMinMaterialLodIndex);
 
                 // Construct event object
-                EntityMaterialLodChangedEvent subEntEvt;
-                subEntEvt.subEntity = s;
+                MaterialLodChangedEvent subEntEvt;
+                subEntEvt.renderable = s;
                 subEntEvt.camera = cam;
                 subEntEvt.lodValue = biasedMaterialLodValue;
                 subEntEvt.previousLodIndex = s->mMaterialLodIndex;
                 subEntEvt.newLodIndex = idx;
 
                 // Notify LOD event listeners
-                cam->getSceneManager()->_notifyEntityMaterialLodChanged(subEntEvt);
+                cam->getSceneManager()->_notifyMaterialLodChanged(subEntEvt);
 
                 // Change LOD index
                 s->mMaterialLodIndex = subEntEvt.newLodIndex;

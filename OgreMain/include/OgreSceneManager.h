@@ -91,7 +91,7 @@ namespace Ogre {
     class LodListener;
     struct MovableObjectLodChangedEvent;
     struct EntityMeshLodChangedEvent;
-    struct EntityMaterialLodChangedEvent;
+    struct MaterialLodChangedEvent;
     class ShadowCasterSceneQueryListener;
 
     /** Structure collecting together information about the visible objects
@@ -1017,9 +1017,9 @@ namespace Ogre {
         typedef std::vector<EntityMeshLodChangedEvent> EntityMeshLodChangedEventList;
         EntityMeshLodChangedEventList mEntityMeshLodChangedEvents;
 
-        /// List of entity material LOD changed events
-        typedef std::vector<EntityMaterialLodChangedEvent> EntityMaterialLodChangedEventList;
-        EntityMaterialLodChangedEventList mEntityMaterialLodChangedEvents;
+        /// List of material LOD changed events
+        typedef std::vector<MaterialLodChangedEvent> MaterialLodChangedEventList;
+        MaterialLodChangedEventList mMaterialLodChangedEvents;
 
     public:
         //A render context, used to store internal data for pausing/resuming rendering
@@ -3293,8 +3293,8 @@ namespace Ogre {
         /** Notify that an entity mesh LOD change event has occurred. */
         void _notifyEntityMeshLodChanged(EntityMeshLodChangedEvent& evt);
 
-        /** Notify that an entity material LOD change event has occurred. */
-        void _notifyEntityMaterialLodChanged(EntityMaterialLodChangedEvent& evt);
+        /** Notify that an material LOD change event has occurred. */
+        void _notifyMaterialLodChanged(MaterialLodChangedEvent& evt);
 
         /** Handle LOD events. */
         void _handleLodEvents();
