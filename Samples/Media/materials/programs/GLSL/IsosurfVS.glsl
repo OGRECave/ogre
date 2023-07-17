@@ -1,4 +1,6 @@
-#version 150
+#ifdef OGRE_GLSL
+#version 120
+#endif
 
 // Ogre port of Nvidia's IsoSurf.cg file
 // Modified code follows. See http://developer.download.nvidia.com/SDK/10/opengl/samples.html for original
@@ -11,13 +13,7 @@
 // Copyright (c) NVIDIA Corporation. All rights reserved.
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-in vec4 vertex;
-
-out VertexData {
-    vec3 N;
-    vec2 Field;
-    // vec4 Color;
-} VertexOut;
+#include <OgreUnifiedShader.h>
 
 uniform float IsoValue;
 uniform mat4 WorldViewProj;
@@ -43,7 +39,11 @@ vec4 Metaball(vec3 Pos, vec3 Center, float RadiusSq)
     return o;
 }
 
-void main()
+MAIN_PARAMETERS
+IN(vec4 vertex, POSITION)
+OUT(vec3 N, TEXCOORD0)
+OUT(vec2 oField, TEXCOORD1)
+MAIN_DECLARATION
 {
     vec4 Pos;
 
@@ -62,12 +62,12 @@ void main()
     mat3 WorldViewIT = mat3(origWorldViewIT[0].xyz, origWorldViewIT[1].xyz, origWorldViewIT[2].xyz);
     
     // Transform position and normals
-    gl_Position = WorldViewProj * vec4(Pos.xyz, 1);
-    VertexOut.N = WorldViewIT * Field.xyz;        // we want normals in world space
-    VertexOut.Field.x = Field.w;
+    gl_Position = mul(WorldViewProj, vec4(Pos.xyz, 1));
+    N = mul(WorldViewIT, Field.xyz);        // we want normals in world space
+    oField.x = Field.w;
 
     // Generate in-out flags
-    VertexOut.Field.y = (Field.w < IsoValue) ? 1 : 0;
+    oField.y = (Field.w < IsoValue) ? 1 : 0;
 
-    // VertexOut.Color = (Field*0.5+0.5) * (Field.w / 10.0);
+    // Color = (Field*0.5+0.5) * (Field.w / 10.0);
 }
