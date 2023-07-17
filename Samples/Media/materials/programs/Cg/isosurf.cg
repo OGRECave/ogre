@@ -35,52 +35,6 @@ uniform int3 SizeShift = { 0, 6, 12 };
 
 uniform float IsoValue = 1.0;
 
-// Metaball function
-// Returns metaball function value in .w and its gradient in .xyz
-
-float4 Metaball(float3 Pos, float3 Center, float RadiusSq)
-{
-	float epsilon = 0.001;
-
-	float3 Dist = Pos - Center;
-	float InvDistSq = 1 / (dot(Dist, Dist) + epsilon);
-
-	float4 o;
-	o.xyz = -2 * RadiusSq * InvDistSq * InvDistSq * Dist;
-	o.w = RadiusSq * InvDistSq;
-	return o;
-}
-
-// Vertex shader
-SampleData mainVS(float4 pos : POSITION,
-		  uniform float4x4 WorldViewProj,
-		  uniform float4x4 origWorldViewIT)
-{
-	SampleData o;
-
-	// Sum up contributions from all metaballs
-	float4 Field = 0;
-	for (int i = 0; i < 2; i++)
-	{
-		Field += Metaball(pos.xyz, Metaballs[i].xyz, Metaballs[i].w);
-	}
-
-	float3x3 WorldViewIT = { origWorldViewIT[0].xyz, origWorldViewIT[1].xyz, origWorldViewIT[2].xyz };
-
-	// Transform position and normals
-	o.Pos = mul(WorldViewProj, pos);
-	o.N = mul(WorldViewIT, Field.xyz);	// we want normals in world space
-	o.Field.x = Field.w;
-
-	// Generate in-out flags
-	o.Field.y = (Field.w < IsoValue) ? 1 : 0;
-
-	//o.Color = (Field*0.5+0.5) * (Field.w / 10.0);
-	return o;
-}
-
-
-
 // Estimate where isosurface intersects grid edge with endpoints v0, v1
 void CalcIntersection(float4 Pos0,
 					  float3 N0,
@@ -140,16 +94,4 @@ void mainGS(
 			CalcIntersection(Pos[e1.z], N[e1.z], Field[e1.z], Pos[e1.w], N[e1.w], Field[e1.w]);
 		}
 	}
-}
-
-// Pixel shader
-float4 mainPS(float3 N : TEXCOORD0) : COLOR
-{
-	//Sanitize input
-	N = normalize(N);
-	float3 L = float3(0, 0, 1);
-	//return float4(N*0.5+0.5, 1);
-	float3 materials[2] = { float3(1, 1, 1), float3(0, 0, 0.5)};
-        float nDotL = dot( N, L);
-	return float4(abs(nDotL) * materials[nDotL < 0.0], 0.1);
 }
