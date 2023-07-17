@@ -136,6 +136,9 @@ namespace Ogre {
 			}
 		}
 		args.push_back("-DOGRE_CG");
+		if (getType() == GPT_VERTEX_PROGRAM)
+			args.push_back("-DOGRE_VERTEX_SHADER");
+
 		// Now split args into that god-awful char** that Cg insists on
 		freeCgArgs();
 		mCgArguments = OGRE_ALLOC_T(char*, args.size() + 1, MEMCATEGORY_RESOURCE);
