@@ -64,7 +64,6 @@ MeshPtr ProceduralTools::generateTetrahedra()
 
     tetrahedraSubMesh->useSharedVertices = false;
     tetrahedraSubMesh->vertexData = new VertexData;
-    tetrahedraSubMesh->indexData = new IndexData;
 
     tetrahedraSubMesh->vertexData->vertexDeclaration->addElement(0, 0, 
                                                                  VET_FLOAT4, VES_POSITION);

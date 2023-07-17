@@ -49,7 +49,7 @@ namespace OgreBites {
         
         mTetrahedraMesh = ProceduralTools::generateTetrahedra();
         // Create tetrahedra and add it to the root scene node
-        tetrahedra = mSceneMgr->createEntity("TetrahedraEntity", mTetrahedraMesh->getName());
+        tetrahedra = mSceneMgr->createEntity("TetrahedraEntity", mTetrahedraMesh);
         //tetrahedra->setDebugDisplayEnabled(true);
         Ogre::SceneNode* parentNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
         parentNode->attachObject(tetrahedra);
@@ -58,7 +58,7 @@ namespace OgreBites {
 
     void Sample_Isosurf::cleanupContent()
     {
-        MeshManager::getSingleton().remove(mTetrahedraMesh->getName(), ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+        MeshManager::getSingleton().remove(mTetrahedraMesh);
     }
 
     bool Sample_Isosurf::frameRenderingQueued(const FrameEvent& evt)
