@@ -17,7 +17,7 @@
 
 // Pixel shader
 MAIN_PARAMETERS
-IN(vec3 oNormal, NORMAL)
+IN(vec3 oNormal, TEXCOORD0)
 MAIN_DECLARATION
 {
     // Sanitize input

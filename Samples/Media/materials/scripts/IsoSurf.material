@@ -18,8 +18,7 @@ geometry_program Ogre/Isosurf/TessellateTetrahedraGS_HLSL hlsl
 //////////
 vertex_program Ogre/Isosurf/SampleFieldVS_CG cg
 {
-	source isosurf.cg
-	entry_point mainVS
+	source IsosurfVS.glsl
 	profiles vp40 arbvp1
 
 	default_params
@@ -44,8 +43,7 @@ geometry_program Ogre/Isosurf/TessellateTetrahedraGS_CG cg
 
 fragment_program Ogre/Isosurf/MetaballPS_CG cg
 {
-	source isosurf.cg
-	entry_point mainPS
+	source IsosurfFS.glsl
 	profiles fp40 arbfp1
 }
 
