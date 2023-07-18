@@ -13,16 +13,15 @@ Vertex, geometry and fragment programs can be low-level (i.e. assembler code wri
 Here is an example of a definition of a low-level vertex program:
 
 ```cpp
-vertex_program myVertexProgram asm
+vertex_program myVertexProgram spirv
 {
-    source myVertexProgram.asm
-    syntax vs_1_1
+    source myVertexProgram.spv
 }
 ```
 
 As you can see, that’s very simple, and defining a fragment or geometry program is exactly the same, just with @c vertex_program replaced with @c fragment_program or @c geometry_program, respectively. Likewise, for tessellation and compute programs, use @c tessellation_hull_program, @c tessellation_domain_program, and @c compute_program.
 
-You give the program a name in the header, followed by the word ’asm’ to indicate that this is a low-level program. Inside the braces, you specify where the source is going to come from (and this is loaded from any of the resource locations as with other media), and also indicate the syntax being used. You might wonder why the syntax specification is required when many of the assembler syntaxes have a header identifying them anyway - well the reason is that the engine needs to know what syntax the program is in before reading it, because during compilation of the material, we want to skip programs which use an unsupportable syntax quickly, without loading the program first.
+You give the program a name in the header, followed by the word @c spirv to indicate the syntax being used. Inside the braces, you specify where the source is going to come from (and this is loaded from any of the resource locations as with other media). The syntax specification is necessary for the engine to know what syntax the program is in before reading it. During the compilation of the material, it is important to quickly skip programs that use unsupported syntax to avoid loading the program first.
 
 # Default Program Parameters {#Default-Program-Parameters}
 
@@ -253,7 +252,7 @@ fragment_program myCgFragmentProgram cg
 }
 ```
 
-There are a few differences between this and the assembler program - to begin with, we declare that the fragment program is of type `cg` rather than `asm`, which indicates that it’s a high-level program using Cg. The `source` parameter is the same, except this time it’s referencing a Cg source file instead of a file of assembler.
+There are a few differences between this and the assembler program - to begin with, we declare that the fragment program is of type `cg` rather than `spirv`, which indicates that it’s a high-level program using Cg. The `source` parameter is the same, except this time it’s referencing a Cg source file instead of a file of assembler.
 
 Here is where things start to change. Instead of a fixed `syntax` parameter, you specify one or more `profiles`; profiles are how Cg compiles a program down to the low-level assembler. The profiles have the same names as the assembler syntax codes mentioned above; the main difference is that you can list more than one, thus allowing the program to be compiled down to more low-level syntaxes so you can write a single high-level program which runs on both D3D and GL. You are advised to just enter the simplest profiles under which your programs can be compiled in order to give it the maximum compatibility. The ordering also matters; if a card supports more than one syntax then the one listed first will be used.
 
@@ -370,10 +369,9 @@ You can get a definitive list of the syntaxes supported by the current card by c
 Assembler shaders don’t have named constants (also called uniform parameters) because the language does not support them - however if you for example decided to precompile your shaders from a high-level language down to assembler for performance or obscurity, you might still want to use the named parameters. Well, you actually can - GpuNamedConstants which contains the named parameter mappings has a ’save’ method which you can use to write this data to disk, where you can reference it later using the manual\_named\_constants directive inside your assembler program declaration, e.g.
 
 ```cpp
-vertex_program myVertexProgram asm
+vertex_program myVertexProgram spirv
 {
-    source myVertexProgram.asm
-    syntax vs_1_1
+    source myVertexProgram.spv
     manual_named_constants myVertexProgram.constants
 }
 ```
