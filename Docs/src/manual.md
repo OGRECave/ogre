@@ -186,11 +186,12 @@ Entities automatically have Material’s associated with them if they use a Ogre
 
 Overlays allow you to render 2D and 3D elements on top of the normal scene contents to create effects like heads-up displays (HUDs), menu systems, status panels etc. The frame rate statistics panel which comes as standard with OGRE is an example of an overlay. Overlays can contain 2D or 3D elements. 2D elements are used for HUDs, and 3D elements can be used to create cockpits or any other 3D object which you wish to be rendered on top of the rest of the scene.
 
-You can create overlays either through the Ogre::OverlayManager::create method, or you can define them in an .overlay script. See [Overlay Scripts](@ref Overlay-Scripts) for more info. In reality the latter is likely to be the most practical because it is easier to tweak (without the need to recompile the code). Note that you can define as many overlays as you like: they all start off life hidden, and you display them by calling Ogre::Overlay::show. You can also show multiple overlays at once, and their Z order is determined by the Ogre::Overlay::setZOrder() method.
+You can create overlays either through the Ogre::OverlayManager::create method, or you can define them in an .overlay script. See [Overlay Scripts](@ref Overlay-Scripts) for more info. In reality the latter is likely to be the most practical because it is easier to tweak (without the need to recompile the code). Note that you can define as many overlays as you like: they all start off life hidden, and you display them by calling Ogre::Overlay::show. You can get pointers to them with Ogre::OverlayManager::getByName. You can also show multiple overlays at once, and their Z order is determined by the Ogre::Overlay::setZOrder() method.
 
-<a name="Notes-on-Integration"></a>
+<a name="Notes-On-Integration"></a> <!-- left in just in case something links to it -->
+<a name="How-to-Enable-Overlays"></a>
 
-## Notes on Integration
+## How to Enable Overlays
 
 The OverlaySystem is its own component, you need to manually initialize it, with the following two lines of code (mSceneMgr is a pointer to your current Ogre::SceneManager):
 
@@ -200,6 +201,14 @@ mSceneMgr->addRenderQueueListener(pOverlaySystem);
 ```
 
 One Ogre::OverlaySystem per application is enough but you need to call addRenderQueueListener once per SceneManager.
+
+If you are using OgreBites, then you need to fetch the pre-existing OverlaySystem.
+```cpp
+Ogre::OverlaySystem* pOverlaySystem = myApplicationContext.getOverlaySystem();
+mSceneMgr->addRenderQueueListener(pOverlaySystem);
+```
+
+Where `myApplicationContext` is your OgreBites::ApplicationContext object.
 
 <a name="Creating-2D-Elements"></a>
 
