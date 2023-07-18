@@ -62,8 +62,7 @@ MeshPtr ProceduralTools::generateTetrahedra()
     Ogre::uint nTotalBits = sizeLog2[0] + sizeLog2[1] + sizeLog2[2];
     Ogre::uint nPointsTotal = 1 << nTotalBits;
 
-    tetrahedraSubMesh->useSharedVertices = false;
-    tetrahedraSubMesh->vertexData = new VertexData;
+    tetrahedraSubMesh->createVertexData();
 
     tetrahedraSubMesh->vertexData->vertexDeclaration->addElement(0, 0, 
                                                                  VET_FLOAT4, VES_POSITION);

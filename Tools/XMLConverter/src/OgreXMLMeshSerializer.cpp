@@ -72,7 +72,7 @@ namespace Ogre {
         {
             if(StringConverter::parseInt(elem.attribute("vertexcount").value()) > 0)
             {
-                mMesh->sharedVertexData = new VertexData();
+                mMesh->createVertexData();
                 readGeometry(elem, mMesh->sharedVertexData);
             }
         }
@@ -821,7 +821,7 @@ namespace Ogre {
                 pugi::xml_node geomNode = smElem.child("geometry");
                 if (geomNode)
                 {
-                    sm->vertexData = new VertexData();
+                    sm->createVertexData();
                     readGeometry(geomNode, sm->vertexData);
                 }
             }

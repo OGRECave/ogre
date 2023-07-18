@@ -76,6 +76,17 @@ namespace Ogre {
         */
         VertexData *vertexData;
 
+        /// replace the vertex data with a new one
+        void resetVertexData(VertexData* data = nullptr)
+        {
+            delete vertexData;
+            vertexData = data;
+            useSharedVertices = data == nullptr;
+        }
+
+        /// Creates a new local vertex data object
+        void createVertexData(HardwareBufferManagerBase* mgr = nullptr) { resetVertexData(new VertexData(mgr)); }
+
         /// Face index data
         IndexData *indexData;
 

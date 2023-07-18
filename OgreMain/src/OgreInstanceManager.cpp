@@ -587,8 +587,7 @@ namespace Ogre
 			}
 
             // Store new attributes
-            subMesh->useSharedVertices = false;
-            subMesh->vertexData = newVertexData;
+            subMesh->resetVertexData(newVertexData);
 
             // Transfer bone assignments to the submesh
             size_t offset = curVertexOffset + newVertexData->vertexCount;
@@ -606,8 +605,7 @@ namespace Ogre
         }
 
         // Release shared vertex data
-        delete mesh->sharedVertexData;
-        mesh->sharedVertexData = NULL;
+        mesh->resetVertexData();
         mesh->clearBoneAssignments();
 
         if( mesh->isEdgeListBuilt() )

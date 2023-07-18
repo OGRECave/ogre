@@ -82,8 +82,7 @@ namespace Ogre {
     void PatchMesh::loadImpl(void)
     {
         SubMesh* sm = this->createSubMesh();
-        sm->vertexData = OGRE_NEW VertexData();
-        sm->useSharedVertices = false;
+        sm->createVertexData();
 
         // Set up vertex buffer
         sm->vertexData->vertexStart = 0;

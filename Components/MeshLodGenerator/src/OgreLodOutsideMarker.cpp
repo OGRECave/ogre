@@ -468,7 +468,7 @@ Ogre::MeshPtr LodOutsideMarker::createConvexHullMesh(const String& meshName, con
     }
 
     /// Create vertex data structure for 8 vertices shared between submeshes
-    mesh->sharedVertexData = new VertexData();
+    mesh->createVertexData();
     mesh->sharedVertexData->vertexCount = mHull.size() * 3;
 
     /// Create declaration (memory format) of vertex data
