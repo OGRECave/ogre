@@ -901,6 +901,8 @@ pass->setInput(0, "rt0");
 
 Overlay scripts offer you the ability to define overlays in a script which can be reused easily. Whilst you could set up all overlays for a scene in code using the methods of the SceneManager, Overlay and OverlayElement classes, in practice it’s a bit unwieldy. Instead you can store overlay definitions in text files which can then be loaded whenever required.
 
+To use overlays defined in `.overlay` scripts, see [Overlays](@ref Overlays).
+
 @tableofcontents
 
 ```cpp
