@@ -100,7 +100,7 @@ namespace Ogre {
         //! [manual_plane_geometry]
 
         //! [vertex_data]
-        mesh->sharedVertexData = new VertexData();
+        mesh->createVertexData();
         mesh->sharedVertexData->vertexCount = 4;
         VertexDeclaration* decl = mesh->sharedVertexData->vertexDeclaration;
         VertexBufferBinding* bind = mesh->sharedVertexData->vertexBufferBinding;
@@ -236,7 +236,7 @@ namespace Ogre {
             0,0 
         };
 
-        mesh->sharedVertexData = OGRE_NEW VertexData();
+        mesh->createVertexData();
         mesh->sharedVertexData->vertexCount = NUM_VERTICES;
         VertexDeclaration* decl = mesh->sharedVertexData->vertexDeclaration;
         VertexBufferBinding* bind = mesh->sharedVertexData->vertexBufferBinding;
@@ -304,7 +304,7 @@ namespace Ogre {
         const int NUM_RINGS = 16;
         const Real SPHERE_RADIUS = 50.0;
 
-        mesh->sharedVertexData = OGRE_NEW VertexData();
+        mesh->createVertexData();
         VertexData* vertexData = mesh->sharedVertexData;
 
         // define the vertex format
@@ -469,7 +469,7 @@ namespace Ogre {
 
         // Set up vertex data
         // Use a single shared buffer
-        pMesh->sharedVertexData = OGRE_NEW VertexData();
+        pMesh->createVertexData();
         VertexData* vertexData = pMesh->sharedVertexData;
         // Set up Vertex Declaration
         VertexDeclaration* vertexDecl = vertexData->vertexDeclaration;
@@ -599,7 +599,7 @@ namespace Ogre {
         SubMesh *pSub = pMesh->createSubMesh();
 
         // Set options
-        pMesh->sharedVertexData = OGRE_NEW VertexData();
+        pMesh->createVertexData();
         pMesh->sharedVertexData->vertexStart = 0;
         VertexBufferBinding* bind = pMesh->sharedVertexData->vertexBufferBinding;
         VertexDeclaration* decl = pMesh->sharedVertexData->vertexDeclaration;
@@ -739,7 +739,7 @@ namespace Ogre {
 
         // Set up vertex data
         // Use a single shared buffer
-        pMesh->sharedVertexData = OGRE_NEW VertexData();
+        pMesh->createVertexData();
         VertexData* vertexData = pMesh->sharedVertexData;
         // Set up Vertex Declaration
         VertexDeclaration* vertexDecl = vertexData->vertexDeclaration;

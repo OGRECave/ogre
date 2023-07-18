@@ -30,7 +30,7 @@ void GeomUtils::createSphere(  const String& strName
 {
     MeshPtr pSphere = MeshManager::getSingleton().createManual(strName, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
     SubMesh *pSphereVertex = pSphere->createSubMesh();
-    pSphere->sharedVertexData = new VertexData();
+    pSphere->createVertexData();
 
     createSphere(pSphere->sharedVertexData, pSphereVertex->indexData
         , radius
@@ -171,7 +171,7 @@ void GeomUtils::createCone(const Ogre::String& strName , float radius , float he
 {
     MeshPtr pCone = MeshManager::getSingleton().createManual(strName, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
     SubMesh *pConeVertex = pCone->createSubMesh();
-    pCone->sharedVertexData = new VertexData();
+    pCone->createVertexData();
 
     createCone(pCone->sharedVertexData, pConeVertex->indexData
         , radius

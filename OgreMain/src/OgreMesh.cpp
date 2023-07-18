@@ -249,8 +249,7 @@ namespace Ogre {
         }
         if (sharedVertexData)
         {
-            OGRE_DELETE sharedVertexData;
-            sharedVertexData = NULL;
+            resetVertexData();
         }
         // Clear SubMesh lists
         mSubMeshList.clear();
@@ -320,7 +319,7 @@ namespace Ogre {
         // Copy shared geometry and index map, if any
         if (sharedVertexData)
         {
-            newMesh->sharedVertexData = sharedVertexData->clone(true, mBufferManager);
+            newMesh->resetVertexData(sharedVertexData->clone(true, mBufferManager));
             newMesh->sharedBlendIndexToBoneIndexMap = sharedBlendIndexToBoneIndexMap;
         }
 

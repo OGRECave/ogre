@@ -38,6 +38,7 @@ THE SOFTWARE.
 #include "OgreHeaderPrefix.h"
 #include "OgreSharedPtr.h"
 #include "OgreUserObjectBindings.h"
+#include "OgreVertexIndexData.h"
 
 
 namespace Ogre {
@@ -308,6 +309,16 @@ namespace Ogre {
             model data is converted to the OGRE .mesh format.
         */
         VertexData *sharedVertexData;
+
+        /// replace the shared vertex data with a new one
+        void resetVertexData(VertexData* data = nullptr)
+        {
+            delete sharedVertexData;
+            sharedVertexData = data;
+        }
+
+        /// Creates a new shared vertex data object
+        void createVertexData(HardwareBufferManagerBase* mgr = nullptr) { resetVertexData(new VertexData(mgr)); }
 
         /** Shared index map for translating blend index to bone index.
 

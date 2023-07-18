@@ -818,15 +818,14 @@ namespace Ogre {
                 switch(streamID)
                 {
                 case M_GEOMETRY:
-                    pMesh->sharedVertexData = OGRE_NEW VertexData();
+                    pMesh->createVertexData();
                     try {
                         readGeometry(stream, pMesh, pMesh->sharedVertexData);
                     }
                     catch (ItemIdentityException&)
                     {
                         // duff geometry data entry with 0 vertices
-                        OGRE_DELETE pMesh->sharedVertexData;
-                        pMesh->sharedVertexData = 0;
+                        pMesh->resetVertexData();
                         // Skip this stream (pointer will have been returned to just after header)
                         stream->skip(mCurrentstreamLen - MSTREAM_OVERHEAD_SIZE);
                     }
@@ -947,7 +946,7 @@ namespace Ogre {
                 OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Missing geometry data in mesh file",
                     "MeshSerializerImpl::readSubMesh");
             }
-            sm->vertexData = OGRE_NEW VertexData();
+            sm->createVertexData();
             readGeometry(stream, pMesh, sm->vertexData);
         }
 

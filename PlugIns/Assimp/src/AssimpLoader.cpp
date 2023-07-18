@@ -1095,8 +1095,7 @@ bool AssimpLoader::createSubMesh(const String& name, int index, const aiNode* pN
     aiColor4D *col = mesh->mColors[0];
 
     // We must create the vertex data, indicating how many vertices there will be
-    submesh->useSharedVertices = false;
-    submesh->vertexData = new VertexData();
+    submesh->createVertexData();
     submesh->vertexData->vertexStart = 0;
     submesh->vertexData->vertexCount = mesh->mNumVertices;
 
