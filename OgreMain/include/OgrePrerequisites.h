@@ -247,6 +247,7 @@ namespace Ogre {
     class UserObjectBindings;
     template <int dims, typename T> class _OgreMaybeExport Vector;
     typedef Vector<2, Real> Vector2;
+    typedef Vector<2, float> Vector2f;
     typedef Vector<2, int> Vector2i;
     typedef Vector<3, Real> Vector3;
     typedef Vector<3, float> Vector3f;

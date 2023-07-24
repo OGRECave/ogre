@@ -214,10 +214,16 @@ namespace Ogre {
         return getLight(index).getPowerScale();
     }
     //-----------------------------------------------------------------------------
-    const Vector4f& AutoParamDataSource::getLightAttenuation(size_t index) const
+    Vector4f AutoParamDataSource::getLightAttenuation(size_t index) const
     {
+        const Light& l = getLight(index);
+        if(l.getType() == Light::LT_RECTLIGHT)
+        {
+            auto rot = getViewMatrix().linear();
+            return Vector4f(rot * l.getDerivedSourceHalfHeight(), 0.0);
+        }
         // range, const, linear, quad
-        return getLight(index).getAttenuation();
+        return l.getAttenuation();
     }
     //-----------------------------------------------------------------------------
     Vector4f AutoParamDataSource::getSpotlightParams(size_t index) const
@@ -230,6 +236,11 @@ namespace Ogre {
                            Math::Cos(l.getSpotlightOuterAngle().valueRadians() * 0.5f),
                            l.getSpotlightFalloff(),
                            1.0);
+        }
+        else if(l.getType() == Light::LT_RECTLIGHT)
+        {
+            auto rot = getViewMatrix().linear();
+            return Vector4f(rot * l.getDerivedSourceHalfWidth(), 2.0);
         }
         else
         {

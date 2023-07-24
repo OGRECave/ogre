@@ -29,37 +29,7 @@ THE SOFTWARE.
 
 namespace Ogre {
     //-----------------------------------------------------------------------
-    Light::Light()
-        :
-#ifdef OGRE_NODELESS_POSITIONING
-          mPosition(Vector3::ZERO),
-          mDirection(Vector3::NEGATIVE_UNIT_Z),
-          mDerivedPosition(Vector3::ZERO),
-          mDerivedDirection(Vector3::NEGATIVE_UNIT_Z),
-          mDerivedCamRelativePosition(Vector3::ZERO),
-          mDerivedCamRelativeDirty(false),
-          mDerivedTransformDirty(false),
-#endif
-          mDiffuse(ColourValue::White),
-          mSpecular(ColourValue::Black),
-          mSpotOuter(Degree(40.0f)),
-          mSpotInner(Degree(30.0f)),
-          mSpotFalloff(1.0f),
-          mSpotNearClip(0.0f),
-          mAttenuation(100000.f, 1.f, 0.f, 0.f),
-          mShadowFarDist(0),
-          mShadowFarDistSquared(0),
-          mIndexInFrame(0),
-          mShadowNearClipDist(-1),
-          mShadowFarClipDist(-1),
-          mCameraToBeRelativeTo(0),
-          mPowerScale(1.0f),
-          mLightType(LT_POINT),
-          mOwnShadowFarDist(false)
-    {
-        //mMinPixelSize should always be zero for lights otherwise lights will disapear
-        mMinPixelSize = 0;
-    }
+    Light::Light() : Light(BLANKSTRING) {}
     //-----------------------------------------------------------------------
     Light::Light(const String& name) : MovableObject(name),
 #ifdef OGRE_NODELESS_POSITIONING
@@ -84,6 +54,7 @@ namespace Ogre {
         mShadowFarClipDist(-1),
         mCameraToBeRelativeTo(0),
         mPowerScale(1.0f),
+        mSourceSize(0, 0),
         mLightType(LT_POINT),
         mOwnShadowFarDist(false)
     {
@@ -319,6 +290,18 @@ namespace Ogre {
         {
             return Vector4(getDerivedPosition(cameraRelativeIfSet), 1.0);
         }
+    }
+    Vector3f Light::getDerivedSourceHalfWidth() const
+    {
+        auto& ori = mParentNode->_getDerivedOrientation();
+        auto& scale = mParentNode->_getDerivedScale();
+        return ori.xAxis() * mSourceSize[0] * scale[0] * 0.5f;
+    }
+    Vector3f Light::getDerivedSourceHalfHeight() const
+    {
+        auto& ori = mParentNode->_getDerivedOrientation();
+        auto& scale = mParentNode->_getDerivedScale();
+        return ori.yAxis() * mSourceSize[1] * scale[1] * 0.5f;
     }
     //-----------------------------------------------------------------------
     const PlaneBoundedVolume& Light::_getNearClipVolume(const Camera* const cam) const

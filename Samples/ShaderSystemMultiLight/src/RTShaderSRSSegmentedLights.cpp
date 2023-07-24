@@ -115,7 +115,7 @@ void RTShaderSRSSegmentedLights::updateGpuProgramsParams(Renderable* rend, const
             // Update light attenuation parameters.
             curParams.mSpotParams->setGpuParameter(Ogre::Vector3(1 / srcLight->getAttenuationRange(),0,0));
             break;
-
+        case Light::LT_RECTLIGHT:
         case Light::LT_SPOTLIGHT:
             {                       
                 Ogre::Vector3 vec3;
@@ -318,6 +318,7 @@ bool RTShaderSRSSegmentedLights::resolvePerLightParameters(ProgramSet* programSe
     {       
         switch (i.mType)
         {
+        case Light::LT_RECTLIGHT:
         case Light::LT_DIRECTIONAL:
             i.mDirection = psProgram->resolveParameter(GCT_FLOAT3, -1, (uint16)GPV_LIGHTS, "light_direction_space");
             break;
@@ -591,7 +592,7 @@ bool RTShaderSRSSegmentedLights::addPSIlluminationInvocation(LightParams* curLig
     
     switch (curLightParams->mType)
     {
-
+    case Light::LT_RECTLIGHT:
     case Light::LT_DIRECTIONAL:         
         if (mSpecularEnable)
         {               

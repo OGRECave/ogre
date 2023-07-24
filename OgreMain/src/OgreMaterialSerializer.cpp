@@ -374,6 +374,9 @@ namespace Ogre
                     case Light::LT_SPOTLIGHT:
                         writeValue("spot");
                         break;
+                    case Light::LT_RECTLIGHT:
+                        writeValue("rect");
+                        break;
                     };
                 }
             }
