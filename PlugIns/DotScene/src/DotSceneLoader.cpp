@@ -1050,6 +1050,9 @@ void DotSceneLoader::writeNode(pugi::xml_node& parentXML, const SceneNode* n)
             case Light::LT_SPOTLIGHT:
                 light.append_attribute("type") = "spot";
                 break;
+            case Light::LT_RECTLIGHT:
+                light.append_attribute("type") = "rect";
+                break;
             }
 
             if(l->getType() != Light::LT_DIRECTIONAL)

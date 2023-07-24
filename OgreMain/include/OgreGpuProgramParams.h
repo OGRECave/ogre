@@ -761,13 +761,18 @@ namespace Ogre {
             ACT_LIGHT_DIFFUSE_COLOUR,
             /// Light specular colour (index determined by setAutoConstant call)
             ACT_LIGHT_SPECULAR_COLOUR,
-            /// Light attenuation parameters, Vector4(range, constant, linear, quadric)
+            /** Light attenuation parameters.
+             * Packed as `(range, constant, linear, quadric)`.
+             * For area lights this contains the height half-vector `(x, y, z, 0)` of the light in viewspace.
+             */
             ACT_LIGHT_ATTENUATION,
             /** Spotlight parameters.
-                Packed as `(innerFactor, outerFactor, falloff, isSpot)`
+                Packed as `(innerFactor, outerFactor, falloff, spotType)`
                 innerFactor and outerFactor are cos(angle/2)
-                The isSpot parameter is 0.0f for non-spotlights, 1.0f for spotlights.
-                Also for non-spotlights the inner and outer factors are 1 and nearly 1 respectively
+                The spotType parameter is 0.0f for non-spotlights, 1.0f for spotlights and 2.0f for
+                area spotlights.
+                For area lights this contains the width half-vector `(x, y, z, 2)` of the light in viewspace.
+                Also for non-spotlights the inner and outer factors are 1 and 0 respectively
             */
             ACT_SPOTLIGHT_PARAMS,
             /** A light position in world space (index determined by setAutoConstant call).
@@ -815,8 +820,8 @@ namespace Ogre {
             ACT_LIGHT_DIFFUSE_COLOUR_POWER_SCALED_ARRAY,
             /// Array of light specular colours scaled by light power (count set by extra param)
             ACT_LIGHT_SPECULAR_COLOUR_POWER_SCALED_ARRAY,
-            /// Array of light attenuation parameters, Vector4(range, constant, linear, quadric)
-            /// (count set by extra param)
+            /// Array of light attenuation parameters.
+            /// @copydetails #ACT_LIGHT_ATTENUATION (count set by extra param)
             ACT_LIGHT_ATTENUATION_ARRAY,
             /// Array of light positions in world space (count set by extra param)
             ACT_LIGHT_POSITION_ARRAY,
@@ -839,12 +844,10 @@ namespace Ogre {
                 (count set by extra param)
             */
             ACT_LIGHT_POWER_SCALE_ARRAY,
-            /** Spotlight parameters array of Vector4(innerFactor, outerFactor, falloff, isSpot)
-                innerFactor and outerFactor are cos(angle/2)
-                The isSpot parameter is 0.0f for non-spotlights, 1.0f for spotlights.
-                Also for non-spotlights the inner and outer factors are 1 and nearly 1 respectively.
-                (count set by extra param)
-            */
+            /** Spotlight parameters array
+             * @copydetails #ACT_SPOTLIGHT_PARAMS
+             * (count set by extra param)
+             */
             ACT_SPOTLIGHT_PARAMS_ARRAY,
 
             /** The derived ambient light colour, with 'r', 'g', 'b' components filled with

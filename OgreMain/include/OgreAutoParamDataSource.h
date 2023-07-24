@@ -190,7 +190,7 @@ namespace Ogre {
         Vector4 getLightAs4DVector(size_t index) const;
         Vector3 getLightDirection(size_t index) const;
         Real getLightPowerScale(size_t index) const;
-        const Vector4f& getLightAttenuation(size_t index) const;
+        Vector4f getLightAttenuation(size_t index) const;
         Vector4f getSpotlightParams(size_t index) const;
         void setAmbientLightColour(const ColourValue& ambient);
         const ColourValue& getAmbientLightColour(void) const;

@@ -227,6 +227,7 @@ namespace Ogre
                             }
                         }
                         break;
+                    case Light::LT_RECTLIGHT:
                     case Light::LT_SPOTLIGHT:
                         // spotlights - just check if within illumination range
                         // Technically, we should check if the portal is within
