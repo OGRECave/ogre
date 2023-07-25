@@ -113,6 +113,9 @@ JNIEnv* OgreJNIGetEnv() {
     catch (Swig::DirectorException &e) { 
         SWIG_fail;
     }
+    catch (std::length_error &e) {
+        SWIG_fail;
+    }
 #endif
     catch (const std::exception& e) {
         SWIG_exception(SWIG_RuntimeError, e.what());
@@ -205,15 +208,17 @@ JNIEnv* OgreJNIGetEnv() {
 %csmethodmodifiers Ogre::BillboardChain::preRender "public";
 #endif
 
-// connect operator[] to __getitem__
-%feature("python:slot", "sq_item", functype="ssizeargfunc") *::operator[];
-%rename(__getitem__) *::operator[];
+// connect __getitem__
+%feature("python:slot", "sq_item", functype="ssizeargfunc") *::__getitem__;
 %ignore Ogre::Matrix3::operator[];
 %ignore Ogre::Matrix4::operator[];
 %ignore Ogre::ColourValue::operator[];
 
 // connect __setitem__
 %feature("python:slot", "sq_ass_item", functype="ssizeobjargproc") *::__setitem__;
+
+// connect __len__
+%feature("python:slot", "sq_length", functype="lenfunc") *::__len__;
 
 // stringinterface internal
 %rename("$ignore", regextarget=1) "^Cmd+";
@@ -277,6 +282,18 @@ ADD_REPR(Radian)
 %include "OgreVector.h"
 ADD_REPR(Vector)
 
+%define SEQUENCE_METHODS
+{
+    void __setitem__(uint i, float v) { (*$self)[i] = v; }
+    size_t __len__() { return sizeof(*$self)/sizeof(float); }
+    float __getitem__(uint i) {
+        if(i >= sizeof(*$self)/sizeof(float))
+            throw std::length_error("out of bounds");
+        return (*$self)[i];
+    }
+}
+%enddef
+
 %define TPL_VECTOR(N)
 %ignore Ogre::VectorBase<N, Ogre::Real>::VectorBase;
 %ignore Ogre::VectorBase<N, Ogre::Real>::ZERO;
@@ -290,18 +307,20 @@ ADD_REPR(Vector)
 %template(VectorBase ## N) Ogre::VectorBase<N, Ogre::Real>;
 %template(Vector ## N) Ogre::Vector<N, Ogre::Real>;
 
-%extend Ogre::Vector<N, Ogre::Real> {
-    void __setitem__(uint i, float v) { (*$self)[i] = v; }
-}
+%extend Ogre::Vector<N, Ogre::Real> SEQUENCE_METHODS
 %enddef
 
 %ignore Ogre::VectorBase<3, int>::VectorBase;
 %template(VectorBase3i) Ogre::VectorBase<3, int>;
 %template(Vector3i) Ogre::Vector<3, int>;
+%extend Ogre::Vector<3, int> SEQUENCE_METHODS
 
 TPL_VECTOR(2)
 TPL_VECTOR(3)
 TPL_VECTOR(4)
+
+%extend Ogre::ColourValue SEQUENCE_METHODS
+%extend Ogre::Quaternion SEQUENCE_METHODS
 
 #ifdef SWIGCSHARP
 %define CS_VECTOR_OPS(N)
@@ -368,13 +387,7 @@ CS_VECTOR_OPS(4);
     if (SWIG_IsOK(res)) {
         $1 = ($ltype)(argp);
     } else {
-        if (!PySequence_Check($input)) {
-            SWIG_exception_fail(SWIG_TypeError, "Expected TYPE or sequence") ;
-        }
         int len = PySequence_Length($input);
-        if (!(LEN_CHECK)) {
-            SWIG_exception_fail(SWIG_ValueError, "Size mismatch. Expected LEN_CHECK");
-        }
         for (int i = 0; i < len; i++) {
             PyObject *o = PySequence_GetItem($input, i);
             if (!PyNumber_Check(o)) {
@@ -387,14 +400,21 @@ CS_VECTOR_OPS(4);
         $1 = &temp;
     }
 }
-%typecheck(SWIG_TYPECHECK_POINTER) const TYPE& {
-    // actual check in the typemap, just skip strings here
-    $1 = PyUnicode_Check($input) == 0;
+%typecheck(SWIG_TYPECHECK_STRING) const TYPE& {
+    if (PySequence_Check($input))
+    {
+        int len = PySequence_Length($input);
+        $1 = (LEN_CHECK);
+    }
+    else {
+        $1 = false;
+    }
 }
 %enddef
 TYPEMAP_SEQUENCE_FOR(Ogre::Vector2, len == 2)
 TYPEMAP_SEQUENCE_FOR(Ogre::Vector3, len == 3)
 TYPEMAP_SEQUENCE_FOR(Ogre::Vector4, len == 4)
+TYPEMAP_SEQUENCE_FOR(Ogre::Quaternion, len == 4)
 TYPEMAP_SEQUENCE_FOR(Ogre::ColourValue, len >= 3 && len <= 4)
 #endif
 
