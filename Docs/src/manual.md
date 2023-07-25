@@ -254,7 +254,7 @@ Another nice feature of overlays is being able to rotate, scroll and scale them 
 
 ## GUI systems
 
-Overlays are only really designed for non-interactive screen elements, although you can create a simple GUI using the [Trays System](@ref trays). For a far more complete GUI solution, we recommend or [Dear ImGui](<https://github.com/OGRECave/ogre-imgui>), [CEGui](<http://www.cegui.org.uk>) or [MyGUI](<http://mygui.info/>).
+Overlays are only really designed for non-interactive screen elements, although you can create a simple GUI using the [Trays System](@ref trays). For a far more complete GUI solution, we recommend Ogre's integration with [Dear ImGui](<https://github.com/OGRECave/ogre/blob/master/Samples/Simple/include/ImGuiDemo.h>), or third-party libraries like [CEGui](<http://www.cegui.org.uk>) or [MyGUI](<http://mygui.info/>).
 
 @page Mesh-Tools Mesh Tools
 
