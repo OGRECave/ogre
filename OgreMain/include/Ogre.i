@@ -161,6 +161,19 @@ JNIEnv* OgreJNIGetEnv() {
 %template(classname ## Ptr) Ogre::SharedPtr<Ogre::classname >;
 %enddef
 
+%ignore *::operator[];
+%define SEQUENCE_METHODS
+{
+    void __setitem__(uint i, float v) { (*$self)[i] = v; }
+    size_t __len__() { return sizeof(*$self)/sizeof(float); }
+    float __getitem__(uint i) {
+        if(i >= sizeof(*$self)/sizeof(float))
+            throw std::length_error("out of bounds");
+        return (*$self)[i];
+    }
+}
+%enddef
+
 #ifdef SWIGJAVA
 // use proper (1.5+) enums
 %include "enums.swg"
@@ -210,9 +223,6 @@ JNIEnv* OgreJNIGetEnv() {
 
 // connect __getitem__
 %feature("python:slot", "sq_item", functype="ssizeargfunc") *::__getitem__;
-%ignore Ogre::Matrix3::operator[];
-%ignore Ogre::Matrix4::operator[];
-%ignore Ogre::ColourValue::operator[];
 
 // connect __setitem__
 %feature("python:slot", "sq_ass_item", functype="ssizeobjargproc") *::__setitem__;
@@ -282,18 +292,6 @@ ADD_REPR(Radian)
 %include "OgreVector.h"
 ADD_REPR(Vector)
 
-%define SEQUENCE_METHODS
-{
-    void __setitem__(uint i, float v) { (*$self)[i] = v; }
-    size_t __len__() { return sizeof(*$self)/sizeof(float); }
-    float __getitem__(uint i) {
-        if(i >= sizeof(*$self)/sizeof(float))
-            throw std::length_error("out of bounds");
-        return (*$self)[i];
-    }
-}
-%enddef
-
 %define TPL_VECTOR(N)
 %ignore Ogre::VectorBase<N, Ogre::Real>::VectorBase;
 %ignore Ogre::VectorBase<N, Ogre::Real>::ZERO;
@@ -341,18 +339,24 @@ CS_VECTOR_OPS(4);
 
 #ifdef SWIGPYTHON
 // enable implicit conversion from float to Radian
-%typemap(in) const Ogre::Radian& (float tmp) {
+%typemap(in) const Ogre::Radian& (Ogre::Radian tmp) {
     void *argp = 0;
     int res = SWIG_ConvertPtr($input, &argp, $descriptor, $disown);
     if (SWIG_IsOK(res)) {
         $1 = ($ltype)(argp);
     }
-    else {
-        res = SWIG_AsVal_float($input, &tmp);
-        $1 = (Ogre::Radian*)&tmp;
+    else if(SWIG_IsOK(SWIG_ConvertPtr($input, &argp, $descriptor(Ogre::Degree*), $disown)))
+    {
+        tmp = *((Ogre::Degree*)argp);
+        $1 = &tmp;
+    }
+    else
+    {
+        res = SWIG_AsVal_float($input, (float*)&tmp);
+        $1 = &tmp;
 
         if (!SWIG_IsOK(res))
-            SWIG_exception_fail(SWIG_TypeError, "Expected float or Ogre::Radian");
+            SWIG_exception_fail(SWIG_TypeError, "Expected float (Ogre::Radian) or Ogre::Degree");
     }
 }
 // punch through overload resolution
