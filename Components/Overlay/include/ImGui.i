@@ -63,6 +63,7 @@
 %rename("%(strip:[ImGui])s", regextarget=1) "^ImGui.+_.+";
 
 %apply bool* INOUT { bool* p_open };
+%apply bool* INOUT { bool* v };
 %apply float* INOUT { float* v };
 %apply int* INOUT { int* v };
 %include "imgui.h"
