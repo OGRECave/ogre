@@ -34,7 +34,7 @@
     $1 = true; // actual check in the typemap
 }
 
-%typemap(in) float[4], float[3] {
+%typemap(in) float[4], float[3], float[2] {
     void* argp;
     int res = SWIG_ConvertPtr($input, &argp, $descriptor(ImVec4*), $disown);
     if (SWIG_IsOK(res)) {
@@ -46,12 +46,12 @@
 
 #ifdef SWIGPYTHON
 // match the signature of the by value variants
-%typemap(argout) float[4], float[3] {
+%typemap(argout) float[4], float[3], float[2] {
     $result = SWIG_Python_AppendOutput($result, SWIG_NewPointerObj($1, $descriptor(ImVec4*), 0));
 }
 #endif
 
-%typecheck(SWIG_TYPECHECK_STRING) float[4], float[3] {
+%typecheck(SWIG_TYPECHECK_STRING) float[4], float[3], float[2] {
     $1 = true; // actual check in the typemap
 }
 
