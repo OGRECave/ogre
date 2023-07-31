@@ -125,18 +125,14 @@ bool IntegratedPSSM3::preAddToRenderState(const RenderState* renderState,
 
     ShadowTextureParamsIterator it = mShadowTextureParamsList.begin();
 
+    auto shadowSampler = TextureManager::getSingleton().getSampler(mUseTextureCompare ? "Ogre/DepthShadowSampler"
+                                                                                      : "Ogre/ShadowSampler");
     while(it != mShadowTextureParamsList.end())
     {
         TextureUnitState* curShadowTexture = dstPass->createTextureUnitState();
             
         curShadowTexture->setContentType(TextureUnitState::CONTENT_SHADOW);
-        curShadowTexture->setTextureAddressingMode(TextureUnitState::TAM_BORDER);
-        curShadowTexture->setTextureBorderColour(ColourValue::White);
-        if(mUseTextureCompare)
-        {
-            curShadowTexture->setTextureCompareEnabled(true);
-            curShadowTexture->setTextureCompareFunction(CMPF_LESS_EQUAL);
-        }
+        curShadowTexture->setSampler(shadowSampler);
         it->mTextureSamplerIndex = dstPass->getNumTextureUnitStates() - 1;
         ++it;
     }

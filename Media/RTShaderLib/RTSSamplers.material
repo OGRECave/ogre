@@ -1,0 +1,11 @@
+sampler Ogre/ShadowSampler
+{
+    tex_address_mode border
+    tex_border_colour 1 1 1 1
+}
+
+sampler Ogre/DepthShadowSampler : Ogre/ShadowSampler
+{
+    compare_test on
+    comp_func less_equal
+}
