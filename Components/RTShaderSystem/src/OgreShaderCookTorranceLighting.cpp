@@ -16,7 +16,7 @@ namespace RTShader
 const String SRS_COOK_TORRANCE_LIGHTING = "CookTorranceLighting";
 
 //-----------------------------------------------------------------------
-CookTorranceLighting::CookTorranceLighting() : mLightCount(0), mMRMapSamplerIndex(0) {}
+CookTorranceLighting::CookTorranceLighting() : mLightCount(0), mMRMapSamplerIndex(0), mLtcLUT1SamplerIndex(-1) {}
 
 //-----------------------------------------------------------------------
 const String& CookTorranceLighting::getType() const { return SRS_COOK_TORRANCE_LIGHTING; }
@@ -133,6 +133,14 @@ bool CookTorranceLighting::createCpuSubPrograms(ProgramSet* programSet)
                                        In(lightDiffuse),     In(pointParams), In(lightDirView),      In(spotParams),
                                        In(pixelParams),      InOut(outDiffuse).xyz()};
 
+        if(mLtcLUT1SamplerIndex > -1)
+        {
+            auto ltcLUT1 = psProgram->resolveParameter(GCT_SAMPLER2D, "ltcLUT1Sampler", mLtcLUT1SamplerIndex);
+            auto ltcLUT2 = psProgram->resolveParameter(GCT_SAMPLER2D, "ltcLUT2Sampler", mLtcLUT1SamplerIndex + 1);
+            params.insert(params.begin(), {In(ltcLUT1), In(ltcLUT2)});
+            psProgram->addPreprocessorDefines("HAVE_AREA_LIGHTS");
+        }
+
         if (auto shadowFactor = psMain->getLocalParameter("lShadowFactor"))
         {
             params.insert(params.begin(), In(shadowFactor));
@@ -160,6 +168,9 @@ bool CookTorranceLighting::preAddToRenderState(const RenderState* renderState, P
         return false;
 
     mLightCount = renderState->getLightCount();
+
+    if(renderState->haveAreaLights())
+        mLtcLUT1SamplerIndex = ensureLtcLUTPresent(dstPass);
 
     if(mMetalRoughnessMapName.empty())
         return true;

@@ -141,6 +141,8 @@ protected:
     SubRenderState* createInstanceImpl() override;
 };
 
+uint16 ensureLtcLUTPresent(Pass* dstPass);
+
 } // namespace RTShader
 } // namespace Ogre
 

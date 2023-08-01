@@ -9,3 +9,9 @@ sampler Ogre/DepthShadowSampler : Ogre/ShadowSampler
     compare_test on
     comp_func less_equal
 }
+
+sampler Ogre/LtcLUTSampler
+{
+    filtering point linear point
+    tex_address_mode clamp
+}

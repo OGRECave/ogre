@@ -4,6 +4,10 @@
 
 #include "RTSLib_Lighting.glsl"
 
+#ifdef HAVE_AREA_LIGHTS
+#include "RTSLib_LTC.glsl"
+#endif
+
 #ifdef OGRE_GLSLES
     // min roughness such that (MIN_PERCEPTUAL_ROUGHNESS^4) > 0 in fp16 (i.e. 2^(-14/4), rounded up)
     #define MIN_PERCEPTUAL_ROUGHNESS 0.089
@@ -191,6 +195,10 @@ void PBR_Lights(
 #ifdef HAVE_SHADOW_FACTOR
                 in float shadowFactor,
 #endif
+#ifdef HAVE_AREA_LIGHTS
+                in sampler2D ltcLUT1,
+                in sampler2D ltcLUT2,
+#endif
                 in vec3 vNormal,
                 in vec3 viewPos,
                 in vec4 ambient,
@@ -210,6 +218,18 @@ void PBR_Lights(
 
     for(int i = 0; i < LIGHT_COUNT; i++)
     {
+#ifdef HAVE_AREA_LIGHTS
+        if(spotParams[i].w == 2.0)
+        {
+            // rect area light
+            vec3 dcol = pixel.diffuseColor;
+            vec3 scol = pixel.f0;
+            evaluateRectLight(ltcLUT1, ltcLUT2, pixel.roughness, normalize(vNormal), viewPos,
+                              lightPos[i].xyz, spotParams[i].xyz, pointParams[i].xyz, scol, dcol);
+            vOutColour += lightColor[i].xyz * (scol + dcol) * 4.0;
+            continue;
+        }
+#endif
         evaluateLight(vNormal, viewPos, lightPos[i], lightColor[i].xyz, pointParams[i], vLightDirView[i], spotParams[i],
                       pixel, vOutColour);
 

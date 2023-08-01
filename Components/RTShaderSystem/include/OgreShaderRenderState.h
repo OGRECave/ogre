@@ -105,7 +105,8 @@ public:
     */
     bool getLightCountAutoUpdate() const { return mLightCountAutoUpdate; }
 
-    
+    bool haveAreaLights() const { return mHaveAreaLights; }
+    void setHaveAreaLights(bool val) { mHaveAreaLights = val; }
 
 
     // Attributes.
@@ -116,6 +117,7 @@ protected:
     int32 mLightCount;
     // True if light count was explicitly set.
     bool mLightCountAutoUpdate;
+    bool mHaveAreaLights;
 
 private:
     void clear();

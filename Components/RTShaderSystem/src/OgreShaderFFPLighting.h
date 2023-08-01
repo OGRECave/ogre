@@ -154,6 +154,8 @@ protected:
     bool mSpecularEnable;
     bool mNormalisedEnable;
     bool mTwoSidedLighting;
+    int8 mLtcLUT1SamplerIndex;
+
     // World view matrix parameter.
     UniformParameterPtr mWorldViewMatrix;
     // World view matrix inverse transpose parameter.
@@ -182,6 +184,9 @@ protected:
     UniformParameterPtr mSurfaceEmissiveColour;
     // Surface shininess parameter.
     UniformParameterPtr mSurfaceShininess;
+
+    UniformParameterPtr mLTCLUT1;
+    UniformParameterPtr mLTCLUT2;
 };
 
 

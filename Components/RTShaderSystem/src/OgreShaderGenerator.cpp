@@ -1385,6 +1385,7 @@ void ShaderGenerator::SGPass::buildTargetRenderState()
 
     // Set light properties.
     int32 lightCount = 0;
+    bool haveAreaLights = false;
 
     // Use light count definitions of the custom render state if exists.
     if (mCustomRenderState != NULL && mCustomRenderState->getLightCountAutoUpdate() == false)
@@ -1396,10 +1397,12 @@ void ShaderGenerator::SGPass::buildTargetRenderState()
     else if (renderStateGlobal != NULL)
     {
         lightCount = renderStateGlobal->getLightCount();
+        haveAreaLights = renderStateGlobal->haveAreaLights();
     }
     
     
     targetRenderState->setLightCount(lightCount);
+    targetRenderState->setHaveAreaLights(haveAreaLights);
 
     // Link the target render state with the scheme render state of the shader generator.
     if (renderStateGlobal != NULL)
@@ -1760,7 +1763,12 @@ void ShaderGenerator::SGScheme::synchronizeWithLightSettings()
         OgreAssert(sceneManager, "no active SceneManager. Did you forget to call ShaderGenerator::addSceneManager?");
 
         const LightList& lightList =  sceneManager->_getLightsAffectingFrustum();
-        
+
+        // area lights a costy, so we check whether there are any in the scene
+        bool haveAreaLights = false;
+        for (const Light* l : lightList)
+            haveAreaLights = haveAreaLights || l->getType() == Light::LT_RECTLIGHT;
+
         int32 sceneLightCount = lightList.size();
         int32 currLightCount = mRenderState->getLightCount();
 
@@ -1771,6 +1779,14 @@ void ShaderGenerator::SGScheme::synchronizeWithLightSettings()
                 << "RTSS: invalidating scheme " << mName << " - lights changed " << currLightCount
                 << " -> " << sceneLightCount;
             curRenderState->setLightCount(sceneLightCount);
+            invalidate();
+        }
+
+        if(!curRenderState->haveAreaLights() && haveAreaLights)
+        {
+            LogManager::getSingleton().stream(LML_TRIVIAL)
+                << "RTSS: invalidating scheme " << mName << " - enabling area lights";
+            curRenderState->setHaveAreaLights(true);
             invalidate();
         }
     }
