@@ -42,6 +42,7 @@ FFPLighting::FFPLighting()
 	mNormalisedEnable               = false;
 	mTwoSidedLighting               = false;
 	mLightCount						= 0;
+	mLtcLUT1SamplerIndex            = -1;
 }
 
 //-----------------------------------------------------------------------
@@ -270,6 +271,11 @@ void FFPLighting::addIlluminationInvocation(int i, const FunctionStageRef& stage
 		args.insert(args.end(), {In(mSpecularColours), At(i), In(mSurfaceShininess), InOut(mOutSpecular).xyz()});
 	}
 
+	if(mLTCLUT1)
+	{
+		args.insert(args.end(), {In(mLTCLUT1), In(mLTCLUT2)});
+	}
+
 	stage.callFunction("evaluateLight", args);
 }
 
@@ -282,6 +288,25 @@ void FFPLighting::copyFrom(const SubRenderState& rhs)
 	mLightCount 	  = rhsLighting.mLightCount;
 	mNormalisedEnable = rhsLighting.mNormalisedEnable;
 	mTwoSidedLighting = rhsLighting.mTwoSidedLighting;
+}
+
+uint16 ensureLtcLUTPresent(Pass* dstPass)
+{
+	auto tus = dstPass->getTextureUnitState("ltc_1.dds");
+	// return idx of existing texture unit
+	if(tus)
+		return dstPass->getTextureUnitStateIndex(tus);
+
+	auto ltcSampler = TextureManager::getSingleton().getSampler("Ogre/LtcLUTSampler");
+	tus = dstPass->createTextureUnitState("ltc_1.dds");
+	tus->setNumMipmaps(0);
+	tus->setName("ltc_1.dds");
+	tus->setSampler(ltcSampler);
+	tus = dstPass->createTextureUnitState("ltc_2.dds");
+	tus->setNumMipmaps(0);
+	tus->setSampler(ltcSampler);
+
+	return dstPass->getNumTextureUnitStates() - 2; // idx of first LUT
 }
 
 //-----------------------------------------------------------------------
@@ -308,6 +333,9 @@ bool FFPLighting::preAddToRenderState(const RenderState* renderState, Pass* srcP
 	{
 		mLightCount = 0;
 	}
+
+	if (renderState->haveAreaLights())
+		mLtcLUT1SamplerIndex = ensureLtcLUTPresent(dstPass);
 
 	return true;
 }

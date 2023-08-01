@@ -281,6 +281,7 @@ namespace Ogre
         auto mainRenderState = std::make_shared<TargetRenderState>();
         auto tplRS = static_cast<TerrainMaterialGeneratorA*>(mParent)->getMainRenderState();
         mainRenderState->setLightCount(tplRS->getLightCount());
+        mainRenderState->setHaveAreaLights(tplRS->haveAreaLights());
 
         if(auto surface = tplRS->getSubRenderState("TerrainSurface"))
             surface->setParameter("use_normal_mapping", std::to_string(mLayerNormalMappingEnabled));

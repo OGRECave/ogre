@@ -135,6 +135,12 @@ bool PerPixelLighting::resolveGlobalParameters(ProgramSet* programSet)
         mWorldViewMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_WORLDVIEW_MATRIX);
     }
 
+    if(mLtcLUT1SamplerIndex > -1)
+    {
+        mLTCLUT1 = psProgram->resolveParameter(GCT_SAMPLER2D, "ltcLUT1Sampler", mLtcLUT1SamplerIndex);
+        mLTCLUT2 = psProgram->resolveParameter(GCT_SAMPLER2D, "ltcLUT2Sampler", mLtcLUT1SamplerIndex + 1);
+    }
+
     return true;
 }
 
@@ -206,6 +212,9 @@ bool PerPixelLighting::resolveDependencies(ProgramSet* programSet)
     psProgram->addDependency(SGX_LIB_PERPIXELLIGHTING);
 
     addDefines(psProgram);
+
+    if(mLtcLUT1SamplerIndex > -1)
+        psProgram->addPreprocessorDefines("HAVE_AREA_LIGHTS");
 
     return true;
 }

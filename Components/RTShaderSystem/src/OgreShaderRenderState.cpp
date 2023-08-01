@@ -35,6 +35,7 @@ const char* TargetRenderState::UserKey = "TargetRenderState";
 RenderState::RenderState()
 {
     mLightCountAutoUpdate    = true;    
+    mHaveAreaLights           = false;
     mLightCount              = 0;
 }
 

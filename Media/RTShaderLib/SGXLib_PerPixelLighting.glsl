@@ -36,6 +36,9 @@ THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
 #include "RTSLib_Lighting.glsl"
+#ifdef HAVE_AREA_LIGHTS
+#include "RTSLib_LTC.glsl"
+#endif
 
 #ifdef OGRE_HLSL
 void SGX_Flip_Backface_Normal(in float triArea, in float targetFlipped, inout vec3 normal)
@@ -72,11 +75,47 @@ void evaluateLight(
 				in float fSpecularPower,
 				inout vec3 vOutSpecular
 #endif
+#ifdef HAVE_AREA_LIGHTS
+				, in sampler2D ltcLUT1,
+				in sampler2D ltcLUT2
+#endif
 				)
 {
 
     vec3 vLightView = vLightPos.xyz;
     float fLightD = 0.0;
+
+#ifdef TVC_DIFFUSE
+	vDiffuseColour *= vInVertexColour;
+#endif
+
+#ifdef HAVE_AREA_LIGHTS
+	if(spotParams.w == 2.0)
+	{
+		// rect area light
+		vec3 dcol = vDiffuseColour.rgb;
+#ifdef USE_SPECULAR
+#ifdef TVC_SPECULAR
+		vSpecularColour *= vInVertexColour;
+#endif
+		vec3 scol = vSpecularColour.rgb;
+#else
+		vec3 scol = vec3_splat(0.0);
+		float fSpecularPower = 0.0;
+#endif
+		float roughness = saturate(1.0 - fSpecularPower/128.0); // convert specular to roughness
+		roughness *= roughness; // perceptual to physical roughness
+		evaluateRectLight(ltcLUT1, ltcLUT2, roughness, normalize(vNormal), vViewPos, vLightPos.xyz, spotParams.xyz, vAttParams.xyz, scol, dcol);
+		// linear to gamma
+		dcol = pow(dcol, vec3_splat(1.0/2.2));
+		scol = pow(scol, vec3_splat(1.0/2.2));
+		vOutDiffuse.rgb = saturate(vOutDiffuse.rgb + dcol);
+#ifdef USE_SPECULAR
+		vOutSpecular.rgb = saturate(vOutSpecular.rgb + scol);
+#endif
+		return;
+	}
+#endif
 
     if (vLightPos.w != 0.0)
     {
@@ -100,10 +139,6 @@ void evaluateLight(
     {
         fAtten *= getAngleAttenuation(spotParams.xyz, vLightDirView.xyz, vLightView);
     }
-
-#ifdef TVC_DIFFUSE
-	vDiffuseColour *= vInVertexColour;
-#endif
 
 	vOutDiffuse  += vDiffuseColour.rgb * nDotL * fAtten;
 	vOutDiffuse = saturate(vOutDiffuse);
