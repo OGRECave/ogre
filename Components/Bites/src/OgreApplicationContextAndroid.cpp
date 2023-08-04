@@ -119,7 +119,7 @@ void ApplicationContextAndroid::pollEvents()
 {
     for(auto *w : mWindows)
     {
-        win->windowMovedOrResized();
+        w->windowMovedOrResized();
         windowResized(w);
     }
 }
