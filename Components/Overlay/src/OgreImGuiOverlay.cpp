@@ -96,13 +96,13 @@ ImFont* ImGuiOverlay::addFont(const String& name, const String& group)
 
     ImGuiIO& io = ImGui::GetIO();
     const ImWchar* cprangePtr = io.Fonts->GetGlyphRangesDefault();
-    if (!cprange.empty())
-    {
-        cprange.push_back(0); // terminate
-        mCodePointRanges.push_back(cprange);
-        // ptr must persist until createFontTexture
-        cprangePtr = mCodePointRanges.back().data();
-    }
+    if (cprange.empty())
+        cprange = {32, 126}; // ogre default
+
+    cprange.push_back(0); // terminate
+    mCodePointRanges.push_back(cprange);
+    // ptr must persist until createFontTexture
+    cprangePtr = mCodePointRanges.back().data();
 
     float vpScale = OverlayManager::getSingleton().getPixelRatio();
 
