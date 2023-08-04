@@ -220,8 +220,6 @@ namespace Ogre
         bbs->setBillboardOrigin(BBO_CENTER_LEFT);
         bbs->setDefaultDimensions(0, 0);
 
-        float spaceWidth = mCodePointMap.find('0')->second.advance * height;
-
         text.resize(text.size() + 3); // add padding for decoder
         auto it = text.c_str();
         auto end = text.c_str() + text.size() - 3;
@@ -238,12 +236,6 @@ namespace Ogre
             if(err)
                 continue;
 
-            if (cpId == ' ')
-            {
-                left += spaceWidth;
-                continue;
-            }
-
             if(cpId == '\n')
             {
                 top -= height;
@@ -251,17 +243,18 @@ namespace Ogre
                 continue;
             }
 
-            auto cp = mCodePointMap.find(cpId);
-            if (cp == mCodePointMap.end())
-                continue;
+            const auto& cp = getGlyphInfo(cpId);
 
-            left += cp->second.bearing * height;
+            left += cp.bearing * height;
 
-            auto bb = bbs->createBillboard(Vector3(left, top, 0), colour);
-            bb->setDimensions(cp->second.aspectRatio * height, height);
-            bb->setTexcoordRect(cp->second.uvRect);
+            if(!cp.uvRect.isNull())
+            {
+                auto bb = bbs->createBillboard(Vector3(left, top, 0), colour);
+                bb->setDimensions(cp.aspectRatio * height, height);
+                bb->setTexcoordRect(cp.uvRect);
+            }
 
-            left += (cp->second.advance - cp->second.bearing) * height;
+            left += (cp.advance - cp.bearing) * height;
         }
     }
 
@@ -357,7 +350,7 @@ namespace Ogre
         // If codepoints not supplied, assume ASCII
         if (mCodePointRangeList.empty())
         {
-            mCodePointRangeList.push_back(CodePointRange(33, 126));
+            mCodePointRangeList.push_back(CodePointRange(32, 126));
         }
         float vpScale = OverlayManager::getSingleton().getPixelRatio();
 #ifdef HAVE_FREETYPE
@@ -465,19 +458,13 @@ namespace Ogre
                 if (ftResult)
                 {
                     // problem loading this glyph, continue
-                    LogManager::getSingleton().logError(StringUtil::format(
-                        "Freetype could not load charcode %u in font %s", cp, mSource.c_str()));
+                    LogManager::getSingleton().logError(
+                        StringUtil::format("Charcode %u is not in font %s", cp, mSource.c_str()));
                     continue;
                 }
 
                 buffer = face->glyph->bitmap.buffer;
-                if (!buffer)
-                {
-                    // Yuck, FT didn't detect this but generated a null pointer!
-                    LogManager::getSingleton().logWarning(StringUtil::format(
-                        "Freetype did not find charcode %u in font %s", cp, mSource.c_str()));
-                    continue;
-                }
+                OgreAssertDbg(buffer || (!face->glyph->bitmap.width && !face->glyph->bitmap.rows), "attempting to load NULL buffer");
 
                 uint advance = face->glyph->advance.x >> 6;
                 uint width = face->glyph->bitmap.width;
@@ -546,7 +533,8 @@ namespace Ogre
                                     float(x_bearing) / max_height, float(advance) / max_height});
 
                 // Advance a column
-                l += (width + char_spacer);
+                if(width)
+                    l += (width + char_spacer);
             }
         }
 #ifdef HAVE_FREETYPE
