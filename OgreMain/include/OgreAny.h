@@ -220,12 +220,11 @@ namespace Ogre
     template<typename ValueType>
     ValueType * any_cast(Any * operand)
     {
+        const auto& valueTypeInfo = typeid(ValueType);
+        const auto& operandTypeInfo = operand->type();
+        // Must double check because some compiler just check once
         return operand &&
-#if OGRE_COMPILER == OGRE_COMPILER_GNUC && OGRE_COMP_VER < 450
-                (std::strcmp(operand->type().name(), typeid(ValueType).name()) == 0)
-#else
-                (operand->type() == typeid(ValueType))
-#endif
+                ((operandTypeInfo == valueTypeInfo) || (std::strcmp(operandTypeInfo.name(), valueTypeInfo.name()) == 0))
                     ? &static_cast<Any::holder<ValueType> *>(operand->mContent)->held
                     : 0;
     }
