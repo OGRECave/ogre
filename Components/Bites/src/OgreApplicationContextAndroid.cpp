@@ -117,10 +117,10 @@ void ApplicationContextAndroid::shutdown()
 
 void ApplicationContextAndroid::pollEvents()
 {
-    for(auto *w : mWindows)
+    for(auto& w : mWindows)
     {
-        w->windowMovedOrResized();
-        windowResized(w);
+        w.windowMovedOrResized();
+        windowResized(&w);
     }
 }
 
