@@ -105,7 +105,6 @@ namespace Ogre {
     #define UNICODE_CR 0x000D
     #define UNICODE_LF 0x000A
     #define UNICODE_SPACE 0x0020
-    #define UNICODE_ZERO 0x0030
     //---------------------------------------------------------------------
     TextAreaOverlayElement::TextAreaOverlayElement(const String& name)
         : OverlayElement(name), mColourBottom(ColourValue::White), mColourTop(ColourValue::White)
@@ -246,10 +245,9 @@ namespace Ogre {
         float left = _getDerivedLeft() * 2.0f - 1.0f;
         float top = -( (_getDerivedTop() * 2.0f ) - 1.0f );
 
-        // Derive space with from a number 0
-        if(mSpaceWidth == 0)
+        if(!mSpaceWidth)
         {
-            mSpaceWidth = mFont->getGlyphInfo(UNICODE_ZERO).advance * mCharHeight;
+            mSpaceWidth = mFont->getGlyphInfo(UNICODE_SPACE).advance * mCharHeight;
         }
 
         // Use iterator
