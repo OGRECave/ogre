@@ -119,8 +119,8 @@ void ApplicationContextAndroid::pollEvents()
 {
     for(auto& w : mWindows)
     {
-        w.windowMovedOrResized();
-        windowResized(&w);
+        w.render->windowMovedOrResized();
+        windowResized(w.render);
     }
 }
 
