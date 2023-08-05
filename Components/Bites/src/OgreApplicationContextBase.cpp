@@ -445,17 +445,13 @@ void ApplicationContextBase::locateResources()
 
     Ogre::String sec, type, arch;
     // go through all specified resource groups
-    Ogre::ConfigFile::SettingsBySection_::const_iterator seci;
-    for(seci = cf.getSettingsBySection().begin(); seci != cf.getSettingsBySection().end(); ++seci) {
-        sec = seci->first;
-        const Ogre::ConfigFile::SettingsMultiMap& settings = seci->second;
-        Ogre::ConfigFile::SettingsMultiMap::const_iterator i;
-
+    for(auto& s : cf.getSettingsBySection()) {
+        sec = s.first;
         // go through all resource paths
-        for (i = settings.begin(); i != settings.end(); i++)
+        for (auto& t : s.second)
         {
-            type = i->first;
-            arch = i->second;
+            type = t.first;
+            arch = t.second;
 
             Ogre::StringUtil::trim(arch);
             if (arch.empty() || arch[0] == '.')

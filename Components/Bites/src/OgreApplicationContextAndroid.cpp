@@ -117,13 +117,10 @@ void ApplicationContextAndroid::shutdown()
 
 void ApplicationContextAndroid::pollEvents()
 {
-    for(WindowList::iterator it = mWindows.begin(); it != mWindows.end(); ++it)
+    for(auto& w : mWindows)
     {
-        Ogre::RenderWindow* win = it->render;
-        win->windowMovedOrResized();
-        // it->native becomes invalid after surface change
-        // win->resize(w, h);
-        windowResized(win);
+        w.render->windowMovedOrResized();
+        windowResized(w.render);
     }
 }
 
