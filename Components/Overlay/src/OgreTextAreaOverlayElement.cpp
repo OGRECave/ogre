@@ -245,11 +245,6 @@ namespace Ogre {
         float left = _getDerivedLeft() * 2.0f - 1.0f;
         float top = -( (_getDerivedTop() * 2.0f ) - 1.0f );
 
-        if(!mSpaceWidth)
-        {
-            mSpaceWidth = mFont->getGlyphInfo(UNICODE_SPACE).advance * mCharHeight;
-        }
-
         // Use iterator
         auto iend = decoded.end();
         bool newLine = true;
@@ -267,7 +262,7 @@ namespace Ogre {
                     {
                         break;
                     }
-                    else if (character == UNICODE_SPACE) // space
+                    else if (character == UNICODE_SPACE && mSpaceWidth) // space
                     {
                         len += mSpaceWidth * 2.0f * mViewportAspectCoef;
                     }
@@ -310,7 +305,7 @@ namespace Ogre {
                 }
                 continue;
             }
-            else if (character == UNICODE_SPACE) // space
+            else if (character == UNICODE_SPACE && mSpaceWidth) // space
             {
                 // Just leave a gap, no tris
                 left += mSpaceWidth * 2.0f * mViewportAspectCoef;
@@ -322,6 +317,15 @@ namespace Ogre {
             const auto& glyphInfo = mFont->getGlyphInfo(character);
             Real horiz_height = glyphInfo.aspectRatio * mViewportAspectCoef ;
             const Font::UVRect& uvRect = glyphInfo.uvRect;
+
+            if(uvRect.isNull())
+            {
+                // Just leave a gap, no tris
+                left += glyphInfo.advance * mCharHeight * 2.0f * mViewportAspectCoef;
+                // Also reduce tri count
+                mRenderOp.vertexData->vertexCount -= 6;
+                continue;
+            }
 
             left += glyphInfo.bearing * mCharHeight * 2 * mViewportAspectCoef;
 
