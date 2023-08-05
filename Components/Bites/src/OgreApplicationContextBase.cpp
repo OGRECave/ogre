@@ -445,7 +445,6 @@ void ApplicationContextBase::locateResources()
 
     Ogre::String sec, type, arch;
     // go through all specified resource groups
-    Ogre::ConfigFile::SettingsBySection_::const_iterator seci;
     for(auto& s : cf.getSettingsBySection()) {
         sec = s.first;
         // go through all resource paths
