@@ -216,6 +216,9 @@ void ElementTranslator::translate(ScriptCompiler* compiler, const AbstractNodePt
                 succ = getString(prop->values.front(), &val);
             }
 
+            if(prop->name == "space_width")
+                compiler->addError(ScriptCompiler::CE_DEPRECATEDSYMBOL, prop->file, prop->line, prop->name);
+
             if(!succ || !newElement->setParameter(prop->name, val))
                 compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
         }
