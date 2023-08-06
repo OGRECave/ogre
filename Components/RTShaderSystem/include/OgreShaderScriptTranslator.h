@@ -61,6 +61,7 @@ public:
     using ScriptTranslator::getInt;
     using ScriptTranslator::getReal;
     using ScriptTranslator::getUInt;
+    using ScriptTranslator::getVector;
 
     /**
     * Returns a sub render state of a given name which has already 

@@ -352,38 +352,35 @@ SubRenderState* IntegratedPSSM3Factory::createInstance(ScriptCompiler* compiler,
                                                       PropertyAbstractNode* prop, Pass* pass, SGScriptTranslator* translator)
 {
     if (prop->name == "integrated_pssm4")
-    {       
-        if (prop->values.size() == 4)
+    {
+        SubRenderState* subRenderState = createOrRetrieveInstance(translator);
+
+        auto it = prop->values.begin();
+        auto itEnd = prop->values.end();
+
+        if (prop->values.size() >= 4)
         {
-            IntegratedPSSM3::SplitPointList splitPointList; 
+            IntegratedPSSM3::SplitPointList splitPointList;
+            if(SGScriptTranslator::getVector(it, itEnd, splitPointList, 4))
+                subRenderState->setParameter("split_points", splitPointList);
 
-            AbstractNodeList::const_iterator it = prop->values.begin();
-            AbstractNodeList::const_iterator itEnd = prop->values.end();
+            std::advance(it, 4);
+        }
 
-            while(it != itEnd)
+        for (; it != itEnd; ++it)
+        {
+            const auto& val = (*it)->getString();
+            if(val == "debug")
             {
-                Real curSplitValue;
-                
-                if (false == SGScriptTranslator::getReal(*it, &curSplitValue))
-                {
-                    return NULL;
-                }
-
-                splitPointList.push_back(curSplitValue);
-
-                ++it;
+                subRenderState->setParameter("debug", "true");
             }
-
-            if (splitPointList.size() == 4)
+            else if(val == "pcf16")
             {
-                SubRenderState* subRenderState = createOrRetrieveInstance(translator);
-                IntegratedPSSM3* pssmSubRenderState = static_cast<IntegratedPSSM3*>(subRenderState);
-
-                pssmSubRenderState->setParameter("split_points", splitPointList);
-
-                return pssmSubRenderState;
+                subRenderState->setParameter("filter", "pcf16");
             }
-        }       
+        }
+
+        return subRenderState;
     }
 
     return NULL;
