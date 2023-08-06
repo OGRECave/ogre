@@ -1,180 +1,3 @@
-
-// ***-- Begin HLSL section --**
-vertex_program Ogre/DepthShadowmap/ReceiverVP_HLSL hlsl
-{
-    source DepthShadowmap.hlsl
-    entry_point receiverVP
-    target vs_2_0
-}
-
-
-fragment_program Ogre/DepthShadowmap/ReceiverFP_HLSL hlsl
-{
-    source DepthShadowmap.hlsl
-    entry_point receiverFP
-	target ps_2_0
-
-	preprocessor_defines PCF=0
-}
-
-fragment_program Ogre/DepthShadowmap/ReceiverFPPCF_HLSL hlsl
-{
-    source DepthShadowmap.hlsl
-    entry_point receiverFP
-	target ps_2_0
-
-	preprocessor_defines PCF=1
-}
-vertex_program Ogre/DepthShadowmap/NormalMapReceiverVP_HLSL hlsl
-{
-    source DepthShadowmap.hlsl
-    entry_point normalMapShadowReceiverVp
-    target vs_2_0
-}
-
-fragment_program Ogre/DepthShadowmap/NormalMapReceiverFP_HLSL hlsl
-{
-    source DepthShadowmap.hlsl
-    entry_point normalMapShadowReceiverFp
-	target ps_2_0
-
-	preprocessor_defines PCF=0
-}
-fragment_program Ogre/DepthShadowmap/NormalMapReceiverFPPCF_HLSL hlsl
-{
-    source DepthShadowmap.hlsl
-    entry_point normalMapShadowReceiverFp
-	target ps_2_0
-
-	preprocessor_defines PCF=1
-}
-
-
-
-// **-- End HLSL Section --**
-
-// **-- Begin GLSL Section --**
-vertex_program Ogre/DepthShadowmap/ReceiverVP_GLSL glsl glsles
-{
-    source DepthShadowmapReceiverVp.glsl
-}
-
-
-fragment_program Ogre/DepthShadowmap/ReceiverFP_GLSL glsl glsles
-{
-    source DepthShadowmapReceiverFp.glsl
-	preprocessor_defines PCF=0
-
-	default_params
-    {
-		param_named shadowMap int 0
-    }
-}
-
-fragment_program Ogre/DepthShadowmap/ReceiverFPPCF_GLSL glsl glsles
-{
-    source DepthShadowmapReceiverFp.glsl
-	preprocessor_defines PCF=1
-}
-vertex_program Ogre/DepthShadowmap/NormalMapReceiverVP_GLSL glsl glsles
-{
-    source DepthShadowmapNormalMapReceiverVp.glsl
-}
-
-fragment_program Ogre/DepthShadowmap/NormalMapReceiverFP_GLSL glsl glsles
-{
-    source DepthShadowmapNormalMapReceiverFp.glsl
-	preprocessor_defines PCF=0
-
-	default_params
-    {
-		param_named shadowMap int 0
-		param_named normalMap int 1
-    }
-}
-fragment_program Ogre/DepthShadowmap/NormalMapReceiverFPPCF_GLSL glsl glsles
-{
-    source DepthShadowmapNormalMapReceiverFp.glsl
-
-	preprocessor_defines PCF=1
-
-	default_params
-    {
-		param_named shadowMap int 0
-		param_named normalMap int 1
-    }
-}
-
-// **-- End GLSL Section --**
-
-// **-- Begin Unified Section --**
-vertex_program Ogre/DepthShadowmap/ReceiverVP unified
-{
-	delegate Ogre/DepthShadowmap/ReceiverVP_GLSL
-	delegate Ogre/DepthShadowmap/ReceiverVP_HLSL
-
-	default_params
-    {
-        param_named_auto world world_matrix
-        param_named_auto worldIT inverse_transpose_world_matrix
-		param_named_auto worldViewProj worldviewproj_matrix
-		param_named_auto texViewProj texture_viewproj_matrix
-		param_named_auto lightPosition light_position 0
-		param_named_auto lightColour light_diffuse_colour 0
-    }
-}
-fragment_program Ogre/DepthShadowmap/ReceiverFP unified
-{
-	delegate Ogre/DepthShadowmap/ReceiverFP_GLSL
-	delegate Ogre/DepthShadowmap/ReceiverFP_HLSL
-}
-fragment_program Ogre/DepthShadowmap/ReceiverFPPCF unified
-{
-	delegate Ogre/DepthShadowmap/ReceiverFPPCF_GLSL
-	delegate Ogre/DepthShadowmap/ReceiverFPPCF_HLSL
-
-	default_params
-    {
-        param_named_auto inverseShadowmapSize inverse_texture_size 0
-    }
-}
-vertex_program Ogre/DepthShadowmap/NormalMapReceiverVP unified
-{
-	delegate Ogre/DepthShadowmap/NormalMapReceiverVP_GLSL
-	delegate Ogre/DepthShadowmap/NormalMapReceiverVP_HLSL
-
-	default_params
-    {
-        param_named_auto world world_matrix
-		param_named_auto worldViewProj worldviewproj_matrix
-		param_named_auto texViewProj texture_viewproj_matrix
-		param_named_auto lightPosition light_position_object_space 0
-    }
-}
-fragment_program Ogre/DepthShadowmap/NormalMapReceiverFP unified
-{
-	delegate Ogre/DepthShadowmap/NormalMapReceiverFP_GLSL
-	delegate Ogre/DepthShadowmap/NormalMapReceiverFP_HLSL
-
-	default_params
-    {
-		param_named_auto lightColour light_diffuse_colour 0
-	}
-}
-fragment_program Ogre/DepthShadowmap/NormalMapReceiverFPPCF unified
-{
-	delegate Ogre/DepthShadowmap/NormalMapReceiverFPPCF_GLSL
-	delegate Ogre/DepthShadowmap/NormalMapReceiverFPPCF_HLSL
-
-	default_params
-    {
-		param_named_auto lightColour light_diffuse_colour 0
-        param_named_auto inverseShadowmapSize inverse_texture_size 0
-	}
-}
-
-// **-- End Unified Section --**
-
 //! [shadow_material]
 // Specific receiver material for rockwall
 material Ogre/DepthShadowmap/Receiver/RockWall
@@ -206,26 +29,13 @@ material Ogre/DepthShadowmap/Receiver/RockWall
 			// do this for each light
 			iteration once_per_light
 
-		
 			scene_blend add
-			
-			// Vertex program reference
-			vertex_program_ref Ogre/DepthShadowmap/ReceiverVP
-			{
-			}
-
-			// Fragment program
-			fragment_program_ref Ogre/DepthShadowmap/ReceiverFP
-			{
-			}
 
 			// using integrated shadows
-            texture_unit
-            {
-                tex_address_mode clamp
-                filtering none
-				content_type shadow
-            }
+			rtshader_system
+			{
+				integrated_pssm4 true
+			}
 		}
 		
 		// Decal pass
@@ -284,28 +94,20 @@ material Ogre/DepthShadowmap/Receiver/Athene
 		
 			scene_blend add
 
-			// Vertex program reference
-			vertex_program_ref Ogre/DepthShadowmap/NormalMapReceiverVP
-			{
-			}
-
-			// Fragment program
-			fragment_program_ref Ogre/DepthShadowmap/NormalMapReceiverFP
-			{
-			}
-
 			// using integrated shadows
-            texture_unit
-            {
-                tex_address_mode clamp
-                filtering none
-				content_type shadow
-            }
+			rtshader_system
+			{
+				integrated_pssm4 true
+			}
 
 			// Base bump map
 			texture_unit
 			{
 				texture atheneNormalMap.png
+				rtshader_system
+				{
+					normal_map tangent_space
+				}
 			}
 		}
 		
@@ -338,9 +140,9 @@ material Ogre/DepthShadowmap/Receiver/RockWall/PCF : Ogre/DepthShadowmap/Receive
 	{
 		pass lighting
 		{
-			// override just fragment program
-			fragment_program_ref Ogre/DepthShadowmap/ReceiverFPPCF
+			rtshader_system
 			{
+				integrated_pssm4 pcf16
 			}
 		}
 	}
@@ -352,9 +154,9 @@ material Ogre/DepthShadowmap/Receiver/Athene/PCF : Ogre/DepthShadowmap/Receiver/
 	{
 		pass lighting
 		{
-			// override just fragment program
-			fragment_program_ref Ogre/DepthShadowmap/NormalMapReceiverFPPCF
+			rtshader_system
 			{
+				integrated_pssm4 pcf16
 			}
 		}
 	}
