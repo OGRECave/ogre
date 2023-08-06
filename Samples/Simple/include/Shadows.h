@@ -32,7 +32,6 @@ using namespace OgreBites;
 // New depth shadowmapping
 String CUSTOM_ROCKWALL_MATERIAL("Ogre/DepthShadowmap/Receiver/RockWall");
 String CUSTOM_CASTER_MATERIAL("PSSM/shadow_caster");
-String CUSTOM_RECEIVER_MATERIAL("Ogre/DepthShadowmap/Receiver/Float");
 String CUSTOM_ATHENE_MATERIAL("Ogre/DepthShadowmap/Receiver/Athene");
 
 String BASIC_ROCKWALL_MATERIAL("Examples/Rockwall");
@@ -544,6 +543,7 @@ protected:
 
                 break;
             case MAT_DEPTH_FLOAT:
+                mViewport->setMaterialScheme(MSN_SHADERGEN); // ensure RTSS is enabled
                 mSceneMgr->setShadowTexturePixelFormat(PF_DEPTH16);
                 mSceneMgr->setShadowTechnique(SHADOWTYPE_TEXTURE_ADDITIVE_INTEGRATED);
 
@@ -565,6 +565,7 @@ protected:
                 updateDepthShadowParams();
                 break;
             case MAT_DEPTH_FLOAT_PCF:
+                mViewport->setMaterialScheme(MSN_SHADERGEN); // ensure RTSS is enabled
                 mSceneMgr->setShadowTexturePixelFormat(PF_DEPTH16);
                 mSceneMgr->setShadowTechnique(SHADOWTYPE_TEXTURE_ADDITIVE_INTEGRATED);
 
