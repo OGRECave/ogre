@@ -107,6 +107,7 @@ Ogre provides three types of lighting.
 * Ogre::Light::LT\_POINT - This Light speads out equally in all directions from a point.
 * Ogre::Light::LT\_SPOTLIGHT - This Light works like a flashlight. It produces a solid cylinder of light that is brighter at the center and fades off.
 * Ogre::Light::LT\_DIRECTIONAL - This Light simulates a huge source that is very far away - like daylight. Light hits the entire scene at the same angle everywhere.
+* Ogre::Light::LT\_RECTLIGHT - A rectangular area light, requires position, direction, width and height.
 
 The Ogre::Light class has a wide range of properties. Two of the most important are the [diffuse](http://www.ogre3d.org/tikiwiki/tiki-index.php?page=-Diffuse+%28Light%29) and [specular](http://www.ogre3d.org/tikiwiki/tiki-index.php?page=-Specular+%28Light%29) color. Each material script defines how much specular and diffuse lighting a material reflects. These properties will be covered in some of the later tutorials.
 
