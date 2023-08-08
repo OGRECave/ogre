@@ -363,9 +363,6 @@ bool AssimpLoader::_load(const char* name, Assimp::Importer& importer, Mesh* mes
     uint32 flags = aiProcessPreset_TargetRealtime_Fast | aiProcess_TransformUVCoords | aiProcess_FlipUVs;
     flags &= ~(aiProcess_JoinIdenticalVertices | aiProcess_CalcTangentSpace); // optimize for fast loading
 
-    if(StringUtil::endsWith(name, ".gltf") || StringUtil::endsWith(name, ".glb"))
-        flags |= aiProcess_JoinIdenticalVertices;
-
     flags |= options.postProcessSteps;
 
     if((flags & (aiProcess_GenSmoothNormals | aiProcess_GenNormals)) != aiProcess_GenNormals)
@@ -384,7 +381,6 @@ bool AssimpLoader::_load(const char* name, Assimp::Importer& importer, Mesh* mes
     mAnimationSpeedModifier = options.animationSpeedModifier;
     mLoaderParams = options.params;
     mQuietMode = mLoaderParams & LP_QUIET_MODE;
-    mUseIndexBuffer = flags & aiProcess_JoinIdenticalVertices;
     mCustomAnimationName = options.customAnimationName;
     mNodeDerivedTransformByName.clear();
 
@@ -1263,9 +1259,6 @@ bool AssimpLoader::createSubMesh(const String& name, int index, const aiNode* pN
     {
         LogManager::getSingleton().logMessage(StringConverter::toString(mesh->mNumFaces) + " faces");
     }
-
-    if(!mUseIndexBuffer)
-        return true;
 
     aiFace* faces = mesh->mFaces;
     int faceSz = mesh->mPrimitiveTypes == aiPrimitiveType_LINE ? 2 : 3;
