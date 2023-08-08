@@ -135,7 +135,6 @@ private:
     static int msBoneCount;
 
     bool mQuietMode;
-    bool mUseIndexBuffer;
     Real mTicksPerSecond;
     Real mAnimationSpeedModifier;
 };
