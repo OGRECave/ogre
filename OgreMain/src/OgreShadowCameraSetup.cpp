@@ -122,7 +122,7 @@ namespace Ogre
              texCam->getParentNode()->setOrientation(rot);
         }
         // Spotlight
-        else if (light->getType() == Light::LT_SPOTLIGHT)
+        else if (light->getType() == Light::LT_SPOTLIGHT || light->getType() == Light::LT_RECTLIGHT)
         {
             // Set perspective projection
             texCam->setProjectionType(PT_PERSPECTIVE);
