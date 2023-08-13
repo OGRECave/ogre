@@ -176,10 +176,11 @@ public:
 
     local parameters do not have index or semantic.
     @param name The name of the parameter.
-    @param type The type of the desired parameter.  
+    @param type The type of the desired parameter.
+    @param arraySize If > 0, the parameter will be an array of the given size.
     @return parameter instance in case of that resolve operation succeeded.
     */
-    ParameterPtr resolveLocalParameter(GpuConstantType type, const String& name);
+    ParameterPtr resolveLocalParameter(GpuConstantType type, const String& name, size_t arraySize = 0);
 
     /** Resolve local parameter of this function
 
