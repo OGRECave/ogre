@@ -364,14 +364,14 @@ ParameterPtr Function::resolveOutputParameter(Parameter::Semantic semantic,
 }
 
 //-----------------------------------------------------------------------------
-ParameterPtr Function::resolveLocalParameter(GpuConstantType type, const String& name)
+ParameterPtr Function::resolveLocalParameter(GpuConstantType type, const String& name, size_t arraySize)
 {
     ParameterPtr param;
 
     param = _getParameterByName(mLocalParameters, name);
     if (param.get() != NULL)
     {
-        if (param->getType() == type)
+        if (param->getType() == type && param->getSize() == arraySize)
         {
             return param;
         }
@@ -382,7 +382,7 @@ ParameterPtr Function::resolveLocalParameter(GpuConstantType type, const String&
         }       
     }
         
-    param = std::make_shared<Parameter>(type, name, Parameter::SPS_UNKNOWN, 0, Parameter::SPC_UNKNOWN);
+    param = std::make_shared<Parameter>(type, name, Parameter::SPS_UNKNOWN, 0, Parameter::SPC_UNKNOWN, arraySize);
     addParameter(mLocalParameters, param);
             
     return param;
