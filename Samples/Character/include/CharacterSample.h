@@ -73,7 +73,7 @@ protected:
         // add integrated depth shadows
         auto& rtShaderGen = RTShader::ShaderGenerator::getSingleton();
         auto schemRenderState = rtShaderGen.getRenderState(MSN_SHADERGEN);
-        schemRenderState->addTemplateSubRenderState(rtShaderGen.createSubRenderState(RTShader::SRS_INTEGRATED_PSSM3));
+        schemRenderState->addTemplateSubRenderState(rtShaderGen.createSubRenderState(RTShader::SRS_SHADOW_MAPPING));
 
         // Make this viewport work with shader generator scheme.
         mViewport->setMaterialScheme(MSN_SHADERGEN);

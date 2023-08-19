@@ -144,7 +144,6 @@ bool CookTorranceLighting::createCpuSubPrograms(ProgramSet* programSet)
         if (auto shadowFactor = psMain->getLocalParameter("lShadowFactor"))
         {
             params.insert(params.begin(), In(shadowFactor));
-            psProgram->addPreprocessorDefines("HAVE_SHADOW_FACTOR");
         }
 
         fstage.callFunction("PBR_Lights", params);

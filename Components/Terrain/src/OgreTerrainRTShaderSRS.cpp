@@ -298,12 +298,17 @@ bool TerrainSurface::createCpuSubPrograms(ProgramSet* programSet)
 
     if(lightMap)
     {
-        auto shadowFactor = psMain->resolveLocalParameter(GCT_FLOAT1, "lShadowFactor");
+        auto shadowFactor = psMain->getLocalParameter("lShadowFactor");
+        if(!shadowFactor)
+        {
+            shadowFactor = psMain->resolveLocalParameter(GCT_FLOAT1, "lShadowFactor", 1);
+            psProgram->addPreprocessorDefines("SHADOWLIGHT_COUNT=1");
+        }
         stage = psMain->getStage(FFP_PS_COLOUR_BEGIN - 1); // before the PSSM stage
-        stage.assign(1, shadowFactor);
+        stage.assign({In(1), Out(shadowFactor), At(0)});
 
         stage = psMain->getStage(FFP_PS_COLOUR_BEGIN + 1); // after the PSSM stage
-        stage.callFunction("getShadowFactor", {In(lightMap), In(uvPS), InOut(shadowFactor)});
+        stage.callFunction("getShadowFactor", {In(lightMap), In(uvPS), InOut(shadowFactor), At(0)});
     }
 
     if(globalColourMap)

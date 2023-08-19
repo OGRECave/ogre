@@ -156,6 +156,9 @@ bool FFPLighting::resolveDependencies(ProgramSet* programSet)
 
 	addDefines(vsProgram);
 
+	if(mSpecularEnable)
+		programSet->getCpuProgram(GPT_FRAGMENT_PROGRAM)->addPreprocessorDefines("USE_SPECULAR");
+
 	return true;
 }
 
@@ -200,14 +203,18 @@ bool FFPLighting::addFunctionInvocations(ProgramSet* programSet)
         auto psOutDiffuse = psMain->resolveOutputParameter(Parameter::SPC_COLOR_DIFFUSE);
 
         auto fstage = psMain->getStage(FFP_PS_COLOUR_BEGIN);
-        fstage.callFunction("SGX_ApplyShadowFactor_Diffuse", {In(ambient), In(shadowFactor), InOut(psOutDiffuse)});
+
+		std::vector<Operand> args = {In(ambient), In(shadowFactor),InOut(psOutDiffuse)};
+
         if (mSpecularEnable)
         {
             auto psSpecular = psMain->getInputParameter(Parameter::SPC_COLOR_SPECULAR);
             if (!psSpecular)
-                psMain->getLocalParameter(Parameter::SPC_COLOR_SPECULAR);
-            fstage.mul(psSpecular, shadowFactor, psSpecular);
+                psSpecular = psMain->getLocalParameter(Parameter::SPC_COLOR_SPECULAR);
+			args.push_back(InOut(psSpecular));
         }
+
+        fstage.callFunction("SGX_ApplyShadowFactor_Modulative", args);
     }
 
     return true;
@@ -269,6 +276,14 @@ void FFPLighting::addIlluminationInvocation(int i, const FunctionStageRef& stage
     if (mSpecularEnable)
     {
 		args.insert(args.end(), {In(mSpecularColours), At(i), In(mSurfaceShininess), InOut(mOutSpecular).xyz()});
+	}
+
+	if (mShadowFactor)
+	{
+		if(i < int(mShadowFactor->getSize()))
+			args.insert(args.end(), {In(mShadowFactor), At(i)});
+		else
+			args.push_back(In(1));
 	}
 
 	if(mLTCLUT1)
