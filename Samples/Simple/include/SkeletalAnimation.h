@@ -21,9 +21,6 @@ class _OgreSampleClassExport Sample_SkeletalAnimation : public SdkSample
     };
 public:
     Sample_SkeletalAnimation() : NUM_MODELS(6), ANIM_CHOP(8)
-#ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
-        , mSrsHardwareSkinning(0)
-#endif
     {
         mInfo["Title"] = "Skeletal Animation";
         mInfo["Description"] = "A demo of the skeletal animation feature, including spline animation.";
@@ -151,15 +148,15 @@ protected:
     void setupContent() override
     {
 
-#if defined(INCLUDE_RTSHADER_SYSTEM) && defined(RTSHADER_SYSTEM_BUILD_EXT_SHADERS)
+#ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
         // Make this viewport work with shader generator scheme.
         mShaderGenerator->invalidateScheme(MSN_SHADERGEN);
         mViewport->setMaterialScheme(MSN_SHADERGEN);
 
         //Add the hardware skinning to the shader generator default render state
-        mSrsHardwareSkinning = mShaderGenerator->createSubRenderState(RTShader::SRS_HARDWARE_SKINNING);
+        auto srsHardwareSkinning = mShaderGenerator->createSubRenderState(RTShader::SRS_HARDWARE_SKINNING);
         Ogre::RTShader::RenderState* renderState = mShaderGenerator->getRenderState(MSN_SHADERGEN);
-        renderState->addTemplateSubRenderState(mSrsHardwareSkinning);
+        renderState->addTemplateSubRenderState(srsHardwareSkinning);
 
         Ogre::MaterialPtr pCast1 = Ogre::MaterialManager::getSingleton().getByName("Ogre/RTShader/shadow_caster_dq_skinning_1weight");
         Ogre::MaterialPtr pCast2 = Ogre::MaterialManager::getSingleton().getByName("Ogre/RTShader/shadow_caster_dq_skinning_2weight");
@@ -168,15 +165,20 @@ protected:
 
         Ogre::RTShader::HardwareSkinningFactory::setCustomShadowCasterMaterials(Ogre::RTShader::ST_DUAL_QUATERNION,
                                                                                 pCast1, pCast2, pCast3, pCast4);
-#endif
+
+
+        auto srs = mShaderGenerator->createSubRenderState(RTShader::SRS_SHADOW_MAPPING);
+        srs->setParameter("light_count", "2");
+        renderState->addTemplateSubRenderState(srs);
+
         // set shadow properties
-        mSceneMgr->setShadowTechnique(SHADOWTYPE_TEXTURE_MODULATIVE);
-        mSceneMgr->setShadowTextureSize(512);
-        mSceneMgr->setShadowColour(ColourValue(0.6, 0.6, 0.6));
+        mSceneMgr->setShadowTechnique(SHADOWTYPE_TEXTURE_MODULATIVE_INTEGRATED);
         mSceneMgr->setShadowTextureCount(2);
+        mSceneMgr->setShadowTextureSize(512);
+#endif
 
         // add a little ambient lighting
-        mSceneMgr->setAmbientLight(ColourValue(0.5, 0.5, 0.5));
+        mSceneMgr->setAmbientLight(ColourValue(0.3, 0.3, 0.3));
 
         SceneNode* lightsBbsNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
         BillboardSet* bbs;
@@ -349,12 +351,6 @@ protected:
         mModelNodes.clear();
         mAnimStates.clear();
         MeshManager::getSingleton().remove("floor", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
-        mSceneMgr->destroyEntity("Jaiqua");
-
-#if defined(INCLUDE_RTSHADER_SYSTEM) && defined(RTSHADER_SYSTEM_BUILD_EXT_SHADERS)
-        Ogre::RTShader::RenderState* renderState = mShaderGenerator->getRenderState(MSN_SHADERGEN);
-        renderState->removeSubRenderState(mSrsHardwareSkinning);
-#endif
     }
 
     const int NUM_MODELS;
@@ -370,10 +366,6 @@ protected:
 
     Vector3 mSneakStartPos;
     Vector3 mSneakEndPos;
-
-#ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
-    RTShader::SubRenderState* mSrsHardwareSkinning;
-#endif
 };
 
 #endif
