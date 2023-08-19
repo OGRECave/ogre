@@ -554,7 +554,7 @@ protected:
         matProfile->setReceiveDynamicShadowsLowLod(SHADOWS_IN_LOW_LOD_MATERIAL);
 
         RTShader::RenderState* schemRenderState = mShaderGenerator->getRenderState(MSN_SHADERGEN);
-        if (auto srs = schemRenderState->getSubRenderState(RTShader::SRS_INTEGRATED_PSSM3))
+        if (auto srs = schemRenderState->getSubRenderState(RTShader::SRS_SHADOW_MAPPING))
         {
             schemRenderState->removeSubRenderState(srs);
         }
@@ -591,7 +591,7 @@ protected:
                 mSceneMgr->setShadowTextureSelfShadow(true);
                 mSceneMgr->setShadowCasterRenderBackFaces(true);
 
-                auto subRenderState = mShaderGenerator->createSubRenderState(RTShader::SRS_INTEGRATED_PSSM3);
+                auto subRenderState = mShaderGenerator->createSubRenderState(RTShader::SRS_SHADOW_MAPPING);
                 subRenderState->setParameter("split_points",
                                              static_cast<PSSMShadowCameraSetup*>(mPSSMSetup.get())->getSplitPoints());
                 schemRenderState->addTemplateSubRenderState(subRenderState);

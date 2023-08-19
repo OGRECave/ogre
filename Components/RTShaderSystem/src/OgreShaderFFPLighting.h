@@ -187,6 +187,8 @@ protected:
 
     UniformParameterPtr mLTCLUT1;
     UniformParameterPtr mLTCLUT2;
+
+    ParameterPtr mShadowFactor;
 };
 
 

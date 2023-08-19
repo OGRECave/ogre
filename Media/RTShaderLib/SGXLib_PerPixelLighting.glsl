@@ -75,6 +75,9 @@ void evaluateLight(
 				in float fSpecularPower,
 				inout vec3 vOutSpecular
 #endif
+#ifdef SHADOWLIGHT_COUNT
+				, in float shadowFactor
+#endif
 #ifdef HAVE_AREA_LIGHTS
 				, in sampler2D ltcLUT1,
 				in sampler2D ltcLUT2
@@ -106,11 +109,17 @@ void evaluateLight(
 		float roughness = saturate(1.0 - fSpecularPower/128.0); // convert specular to roughness
 		roughness *= roughness; // perceptual to physical roughness
 		evaluateRectLight(ltcLUT1, ltcLUT2, roughness, normalize(vNormal), vViewPos, vLightPos.xyz, spotParams.xyz, vAttParams.xyz, scol, dcol);
+
+#ifdef SHADOWLIGHT_COUNT
+		dcol *= shadowFactor;
+		scol *= shadowFactor;
+#endif
+
 		// linear to gamma
 		dcol = pow(dcol, vec3_splat(1.0/2.2));
-		scol = pow(scol, vec3_splat(1.0/2.2));
 		vOutDiffuse.rgb = saturate(vOutDiffuse.rgb + dcol);
 #ifdef USE_SPECULAR
+		scol = pow(scol, vec3_splat(1.0/2.2));
 		vOutSpecular.rgb = saturate(vOutSpecular.rgb + scol);
 #endif
 		return;
@@ -134,6 +143,10 @@ void evaluateLight(
 		return;
 
 	float fAtten	   = getDistanceAttenuation(vAttParams.yzw, fLightD);
+
+#ifdef SHADOWLIGHT_COUNT
+	fAtten *= shadowFactor;
+#endif
 
     if(spotParams.w != 0.0)
     {

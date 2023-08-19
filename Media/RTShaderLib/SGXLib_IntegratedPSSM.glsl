@@ -37,26 +37,32 @@ THE SOFTWARE.
 #define SAMPLER_TYPE sampler2D
 #endif
 
-#ifdef DEBUG_PSSM
-STATIC vec3 pssm_lod_info = vec3(0.0, 0.0, 0.0);
-#endif
-
 // default to 2x2 PCF
 #ifndef PCF_XSAMPLES
 #define PCF_XSAMPLES 2.0
 #endif
 
 //-----------------------------------------------------------------------------
-void SGX_ApplyShadowFactor_Diffuse(in vec4 ambient, 
-					  in float fShadowFactor,
-					  inout vec4 oLight)
+#ifdef SHADOWLIGHT_COUNT
+void SGX_ApplyShadowFactor_Modulative(in vec4 ambient,
+					  in float fShadowFactor[SHADOWLIGHT_COUNT],
+					  inout vec4 diffCol
+#ifdef USE_SPECULAR
+					  , inout vec4 specCol
+#endif
+					  )
 {
-	oLight.rgb = mix(ambient.rgb, oLight.rgb, fShadowFactor);
+	float shadowFactor = fShadowFactor[0];
+	for(int i = 1; i < SHADOWLIGHT_COUNT; ++i)
+		shadowFactor *= fShadowFactor[i];
 
-#ifdef DEBUG_PSSM
-	oLight.rgb += pssm_lod_info;
+	diffCol.rgb = mix(ambient.rgb, diffCol.rgb, shadowFactor);
+
+#ifdef USE_SPECULAR
+	specCol.rgb *= shadowFactor;
 #endif
 }
+#endif
 	
 float sampleDepth(in SAMPLER_TYPE shadowMap, vec2 uv, float depth)
 {
@@ -121,9 +127,13 @@ void SGX_ComputeShadowFactor_PSSM3(in float fDepth,
 							in vec4 lightPosition3,
 							in SAMPLER_TYPE shadowMap3,
 							in vec2 invShadowMapSize3,
-							out float oShadowFactor)
+							out float oShadowFactor
+							#ifdef DEBUG_PSSM
+							, out vec4 oDiffuse
+							#endif
+							)
 {
-#if defined(PROJ_SPACE_SPLITS) && !defined(OGRE_REVERSED_Z) && !defined(OGRE_HLSL) && !defined(VULKAN)
+#if !defined(OGRE_REVERSED_Z) && !defined(OGRE_HLSL) && !defined(VULKAN)
 	vSplitPoints = vSplitPoints * 0.5 + 0.5; // convert -1..1 to 0..1
 #endif
 
@@ -136,7 +146,7 @@ void SGX_ComputeShadowFactor_PSSM3(in float fDepth,
 	{
 		SGX_ShadowPCF4(shadowMap0, lightPosition0, invShadowMapSize0, oShadowFactor);
 #ifdef DEBUG_PSSM
-        pssm_lod_info.r = 1.0;
+        oDiffuse.r += 1.0;
 #endif
 	}
 #if PSSM_NUM_SPLITS > 2
@@ -144,7 +154,7 @@ void SGX_ComputeShadowFactor_PSSM3(in float fDepth,
 	{
 		SGX_ShadowPCF4(shadowMap1, lightPosition1, invShadowMapSize1, oShadowFactor);
 #ifdef DEBUG_PSSM
-        pssm_lod_info.g = 1.0;
+        oDiffuse.g += 1.0;
 #endif
 	}
 #endif
@@ -153,8 +163,8 @@ void SGX_ComputeShadowFactor_PSSM3(in float fDepth,
 	{
 		SGX_ShadowPCF4(shadowMap2, lightPosition2, invShadowMapSize2, oShadowFactor);
 #ifdef DEBUG_PSSM
-		pssm_lod_info.r = 1.0;
-        pssm_lod_info.g = 1.0;
+		oDiffuse.r += 1.0;
+        oDiffuse.g += 1.0;
 #endif
 	}
 #endif
@@ -162,7 +172,7 @@ void SGX_ComputeShadowFactor_PSSM3(in float fDepth,
 	{
 		SGX_ShadowPCF4(shadowMap3, lightPosition3, invShadowMapSize3, oShadowFactor);
 #ifdef DEBUG_PSSM
-        pssm_lod_info.b = 1.0;
+        oDiffuse.b += 1.0;
 #endif
 	}
 	else

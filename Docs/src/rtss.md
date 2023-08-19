@@ -36,6 +36,7 @@ Here are the attributes you can use in a `rtshader_system` block of a `pass {}`:
 - [fog_stage](#fog_stage)
 - [light_count](#light_count)
 - [triplanarTexturing](#triplanarTexturing)
+- [shadow_mapping](#shadow_mapping)
 - [integrated_pssm4](#integrated_pssm4)
 - [hardware_skinning](#hardware_skinning)
 - [layered_blend](#layered_blend)
@@ -186,6 +187,14 @@ Valid values are [0; 0.57] not bigger to avoid division by zero
 Format: `integrated_pssm4 <znear> <sp0> <sp1> <zfar> [debug] [filter]`
 @param debug visualize the active shadow-splits in the scene
 @param filter one of `pcf4, pcf16` (default: @c pcf4)
+
+## shadow_mapping {#shadow_mapping}
+@copybrief Ogre::RTShader::SRS_SHADOW_MAPPING
+
+@par
+Format: `shadow_mapping [light_count <num>] [filter <type>]`
+@param filter one of `pcf4, pcf16` (default: @c pcf4)
+@param light_count number of lights to support (default: 1)
 
 <a name="hardware_skinning"></a>
 

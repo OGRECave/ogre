@@ -54,8 +54,10 @@ _OgreRTSSExport extern const String SRS_PER_VERTEX_LIGHTING;
 _OgreRTSSExport extern const String SRS_FOG;
 /// Enables alpha-testing
 _OgreRTSSExport extern const String SRS_ALPHA_TEST;
-/// PSSM shadow receiver with up to 3 splits. Custom split points.
+/// @deprecated use #SRS_SHADOW_MAPPING
 _OgreRTSSExport extern const String SRS_INTEGRATED_PSSM3;
+/// shadow mapping receiver with multiple lights or single PSSM light with up to 3 custom splits.
+_OgreRTSSExport extern const String SRS_SHADOW_MAPPING;
 /// Adds per-pixel lighting calulations (Phong Shading)
 _OgreRTSSExport extern const String SRS_PER_PIXEL_LIGHTING;
 /// Use metal roughness parametrisation for lighting calulations
