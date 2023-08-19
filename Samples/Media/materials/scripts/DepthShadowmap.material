@@ -2,102 +2,41 @@
 // Specific receiver material for rockwall
 material Ogre/DepthShadowmap/Receiver/RockWall
 {
-
-	// This is the preferred technique which uses both vertex and
-	// fragment programs, supports coloured lights
 	technique
 	{
-		// Base ambient pass
 		pass
 		{
-			// base colours, not needed for rendering, but as information
-			// to lighting pass categorisation routine
-			ambient 1 1 1
-			diffuse 0 0 0 
-			specular 0 0 0 0 
-			
-			depth_bias -1
-		}
-		// Now do the lighting pass
-		// NB we don't do decal texture here because this is repeated per light
-		pass lighting
-		{
-			// base colours, not needed for rendering, but as information
-			// to lighting pass categorisation routine
-			ambient 0 0 0 
-			
-			// do this for each light
-			iteration once_per_light
-
-			scene_blend add
-
 			// using integrated shadows
 			rtshader_system
 			{
-				integrated_pssm4 true
+				shadow_mapping light_count 2
 			}
-		}
-		
-		// Decal pass
-		pass
-		{
-			// base colours, not needed for rendering, but as information
-			// to lighting pass categorisation routine
-			lighting off
 
-
-			scene_blend dest_colour zero
-
-			depth_bias 1
-			
 			texture_unit
 			{
 				texture rockwall.tga
 			}
-			
 		}
 	}
-
-
 }
 //! [shadow_material]
 
 // Specific receiver material for Athene
 material Ogre/DepthShadowmap/Receiver/Athene
 {
-
-	// This is the preferred technique which uses both vertex and
-	// fragment programs, supports coloured lights
 	technique
 	{
-		// Base ambient pass
 		pass
 		{
-			// base colours, not needed for rendering, but as information
-			// to lighting pass categorisation routine
-			ambient 1 1 1
-			diffuse 0 0 0 
-			specular 0 0 0 0 
-			
-			depth_bias -1
-		}
-		// Now do the lighting pass
-		// NB we don't do decal texture here because this is repeated per light
-		pass lighting
-		{
-			// base colours, not needed for rendering, but as information
-			// to lighting pass categorisation routine
-			ambient 0 0 0 
-			
-			// do this for each light
-			iteration once_per_light
-		
-			scene_blend add
-
 			// using integrated shadows
 			rtshader_system
 			{
-				integrated_pssm4 true
+				shadow_mapping light_count 2
+			}
+
+			texture_unit
+			{
+				texture egyptrockyfull.jpg
 			}
 
 			// Base bump map
@@ -110,27 +49,7 @@ material Ogre/DepthShadowmap/Receiver/Athene
 				}
 			}
 		}
-		
-		// Decal pass
-		pass
-		{
-			// base colours, not needed for rendering, but as information
-			// to lighting pass categorisation routine
-			lighting off
-			
-			scene_blend dest_colour zero
-
-			depth_bias 1
-			
-			texture_unit
-			{
-				texture egyptrockyfull.jpg 
-			}
-			
-		}
 	}
-
-
 }
 
 // Specialisation to use PCF
@@ -138,11 +57,11 @@ material Ogre/DepthShadowmap/Receiver/RockWall/PCF : Ogre/DepthShadowmap/Receive
 {
 	technique
 	{
-		pass lighting
+		pass
 		{
 			rtshader_system
 			{
-				integrated_pssm4 pcf16
+				shadow_mapping filter pcf16
 			}
 		}
 	}
@@ -152,11 +71,11 @@ material Ogre/DepthShadowmap/Receiver/Athene/PCF : Ogre/DepthShadowmap/Receiver/
 {
 	technique
 	{
-		pass lighting
+		pass
 		{
 			rtshader_system
 			{
-				integrated_pssm4 pcf16
+				shadow_mapping filter pcf16
 			}
 		}
 	}

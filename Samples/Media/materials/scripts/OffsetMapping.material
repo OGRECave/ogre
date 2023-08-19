@@ -56,53 +56,6 @@ material Examples/OffsetMapping/Specular
    }
 }
 
-
-// Single-pass offset mapping with shadows
-vertex_program Examples/OffsetMappingIntegratedShadowsVPhlsl hlsl 
-{ 
-   source OffsetMapping.hlsl
-   entry_point integratedshadows_vp 
-   target vs_2_0
-} 
-vertex_program Examples/OffsetMappingIntegratedShadowsVPglsl glsl glsles
-{ 
-   source OffsetMappingShadowsVp.glsl
-} 
-
-// Single-pass offset mapping with shadows
-fragment_program Examples/OffsetMappingIntegratedShadowsFPhlsl hlsl
-{ 
-   source OffsetMapping.hlsl
-   entry_point integratedshadows_fp
-   target ps_2_0
-} 
-fragment_program Examples/OffsetMappingIntegratedShadowsFPglsl glsl glsles
-{
-	source OffsetMappingShadowsFp.glsl
-	default_params
-	{
-		// assign samplers as required by GLSL
-		param_named normalHeightMap int 0
-		param_named diffuseMap int 1
-		param_named shadowMap1 int 2
-		param_named shadowMap2 int 3
-	}
-}
-// Single-pass offset mapping with shadows
-vertex_program Examples/OffsetMappingIntegratedShadowsVP unified
-{
-	delegate Examples/OffsetMappingIntegratedShadowsVPhlsl
-	delegate Examples/OffsetMappingIntegratedShadowsVPglsl
-}
-// Single-pass offset mapping with shadows
-fragment_program Examples/OffsetMappingIntegratedShadowsFP unified
-{
-	delegate Examples/OffsetMappingIntegratedShadowsFPhlsl
-	delegate Examples/OffsetMappingIntegratedShadowsFPglsl
-}
-
-
-
 material Examples/OffsetMapping/IntegratedShadows 
 { 
 
@@ -111,59 +64,25 @@ material Examples/OffsetMapping/IntegratedShadows
       // do the lighting  and bump mapping with parallax pass 
       pass 
       { 
-       
-         // Vertex program reference 
-         vertex_program_ref Examples/OffsetMappingIntegratedShadowsVP
-         { 
-            param_named_auto lightPosition light_position_object_space 0
-            param_named_auto eyePosition camera_position_object_space 
-            param_named_auto worldViewProj worldviewproj_matrix 
-			param_named_auto spotDirection light_direction_object_space 0
-
-            param_named_auto lightPosition1 light_position_object_space 1
-			param_named_auto spotDirection1 light_direction_object_space 1
-			// shadow texture projections
-			param_named_auto worldMatrix world_matrix
-			param_named_auto texViewProj1 texture_viewproj_matrix 0
-			param_named_auto texViewProj2 texture_viewproj_matrix 1
-         } 
-
-         // Fragment program 
-         fragment_program_ref Examples/OffsetMappingIntegratedShadowsFP
-         { 
-            param_named_auto lightDiffuse light_diffuse_colour 0 
-			param_named_auto spotParams spotlight_params 0
-
-			param_named_auto lightDiffuse1 light_diffuse_colour 1
-			param_named_auto spotParams1 spotlight_params 1
-            // Parallax Height scale and bias 
-            param_named scaleBias float4 0.04 -0.02 1 0 
-         } 
-          
+         rtshader_system
+         {
+            shadow_mapping light_count 2
+         }
          // Normal + height(alpha) map 
          texture_unit 
          { 
             texture rockwall_NH.tga
-            tex_coord_set 0 
+            rtshader_system
+            {
+               normal_map parallax
+            }
          } 
 
          // Base diffuse texture map 
          texture_unit 
          { 
             texture rockwall.tga
-            tex_coord_set 1 
-         } 
-
-		 // shadowmap 1
-		 texture_unit
-		 {
-		 	content_type shadow
-		 }
-		 // shadowmap 2
-		 texture_unit
-		 {
-		 	content_type shadow
-		 }
+         }
       } 
    }
 }

@@ -603,6 +603,8 @@ protected:
                 mSlopedBiasSlider->hide();
                 mTrayMgr->removeWidgetFromTray(mSlopedBiasSlider);
             }
+
+            mShaderGenerator->invalidateScheme(MSN_SHADERGEN);
         }
     }
 };
