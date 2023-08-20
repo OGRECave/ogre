@@ -137,6 +137,10 @@ The TerrainMaterialGenerator API was simplified by making the use of a Profile o
 Furthermore, the required TerrainLayer metadata was reduced to a minimum.
 If you have a custom `TerrainMaterialGenerator`, you will need to update it.
 
+## Bullet
+
+A separate `CollisionWorld` wrapper was split off from `DynamicsWorld`, enabling the use of Bullet for collision detection only.
+
 ## MeshLodGenerator
 
 The MeshLodGenerator now also support line primitives and correctly handles the boundaries between SubMeshes. The latter needs to be explicitly enabled, as it increases LOD generation time and is not required, if only a single submesh is used.
