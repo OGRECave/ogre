@@ -528,22 +528,6 @@ void OctreeSceneManager::_updateSceneGraph( Camera * cam )
     SceneManager::_updateSceneGraph( cam );
 }
 
-void OctreeSceneManager::_alertVisibleObjects( void )
-{
-    OGRE_EXCEPT( Exception::ERR_NOT_IMPLEMENTED,
-        "Function doesn't do as advertised",
-        "OctreeSceneManager::_alertVisibleObjects" );
-
-//    Octree::NodeList::iterator it = mVisible.begin();
-//
-//    while ( it != mVisible.end() )
-//    {
-//        OctreeNode * node = *it;
-//
-//        ++it;
-//    }
-}
-
 void OctreeSceneManager::_findVisibleObjects(Camera * cam, 
     VisibleObjectsBoundsInfo* visibleBounds, bool onlyShadowCasters )
 {
