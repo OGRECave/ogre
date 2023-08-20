@@ -878,24 +878,6 @@ namespace Ogre
         pczsn->setHomeZone(zone);
     }
 
-    // (optional) post processing for any scene node found visible for the frame
-    void PCZSceneManager::_alertVisibleObjects( void )
-    {
-        OGRE_EXCEPT( Exception::ERR_NOT_IMPLEMENTED,
-            "Function doesn't do as advertised",
-            "PCZSceneManager::_alertVisibleObjects" );
-
-//        NodeList::iterator it = mVisible.begin();
-//
-//        while ( it != mVisible.end() )
-//        {
-//            SceneNode * node = *it;
-//            // this is where you would do whatever you wanted to the visible node
-//            // but right now, it does nothing.
-//            ++it;
-//        }
-    }
-
     //-----------------------------------------------------------------------
     Light* PCZSceneManager::createLight(const String& name)
     {

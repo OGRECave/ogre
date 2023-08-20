@@ -141,12 +141,6 @@ namespace Ogre
         void _findVisibleObjects ( Camera * cam,
             VisibleObjectsBoundsInfo* visibleBounds, bool onlyShadowCasters ) override;
 
-        /** Alerts each unculled object, notifying it that it will be drawn.
-        * Useful for doing calculations only on nodes that will be drawn, prior
-        * to drawing them...
-        */
-        virtual void _alertVisibleObjects( void );
-
         /** Creates a light for use in the scene.
 
                 Lights can either be in a fixed position and independent of the
