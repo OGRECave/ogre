@@ -148,7 +148,7 @@ if(OGRE_BUILD_DEPENDENCIES AND NOT EXISTS ${OGREDEPS_PATH})
       file(DOWNLOAD
           http://zlib.net/zlib-1.3.tar.gz
           ${PROJECT_BINARY_DIR}/zlib-1.3.tar.gz
-          EXPECTED_HASH SHA256=60373b133d630f74f4a1f94c1185a53f)
+          EXPECTED_HASH SHA256=ff0ba4c292013dbc27530b3a81e1f9a813cd39de01ca5e0f8bf355702efa593e)
       execute_process(COMMAND ${CMAKE_COMMAND}
           -E tar xf zlib-1.3.tar.gz WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
       execute_process(COMMAND ${BUILD_COMMAND_COMMON}
