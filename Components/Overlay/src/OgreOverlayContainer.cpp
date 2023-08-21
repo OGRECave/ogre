@@ -74,7 +74,7 @@ namespace Ogre {
         ChildMap::iterator i = mChildren.find(name);
         if (i != mChildren.end())
         {
-            OGRE_EXCEPT(Exception::ERR_DUPLICATE_ITEM, "Child with name " + name + 
+            OGRE_EXCEPT(Exception::ERR_DUPLICATE_ITEM, "Child with name " + name +
                 " already defined.", "OverlayContainer::addChild");
         }
 
@@ -87,7 +87,7 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void OverlayContainer::addChildImpl(OverlayContainer* cont)
     {
-        // Add to main map first 
+        // Add to main map first
         // This will pick up duplicates
         OverlayElement* pElem = cont;
         addChildImpl(pElem);
@@ -119,7 +119,7 @@ namespace Ogre {
         ChildMap::iterator i = mChildren.find(name);
         if (i == mChildren.end())
         {
-            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "Child with name " + name + 
+            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "Child with name " + name +
                 " not found.", "OverlayContainer::removeChild");
         }
 
@@ -151,7 +151,7 @@ namespace Ogre {
         ChildMap::iterator i = mChildren.find(name);
         if (i == mChildren.end())
         {
-            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "Child with name " + name + 
+            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "Child with name " + name +
                 " not found.", "OverlayContainer::removeChild");
         }
 
@@ -171,7 +171,7 @@ namespace Ogre {
         ChildMap::iterator i = mChildren.find(name);
         if (i == mChildren.end())
         {
-            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "Child with name " + name + 
+            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "Child with name " + name +
                 " not found.", "OverlayContainer::getChild");
         }
 
@@ -190,15 +190,13 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void OverlayContainer::initialise(void)
     {
-        ChildContainerMap::iterator coni;
-        for (coni =  mChildContainers.begin(); coni != mChildContainers.end(); ++coni)
+        for (const auto& c : mChildContainers)
         {
-            coni->second->initialise();
+            c.second->initialise();
         }
-        ChildMap::iterator ci;
-        for (ci =  mChildren.begin(); ci != mChildren.end(); ++ci)
+        for (const auto& c : mChildren)
         {
-            ci->second->initialise();
+            c.second->initialise();
         }
     }
     //---------------------------------------------------------------------
@@ -229,7 +227,7 @@ namespace Ogre {
     {
         OverlayElement::_notifyZOrder(newZOrder);
         // One for us
-        newZOrder++; 
+        newZOrder++;
 
         // Update children
         for (const auto& p : mChildren)
@@ -270,7 +268,7 @@ namespace Ogre {
         // Update children
         for (const auto& p : mChildren)
         {
-            // Notify the children of the overlay 
+            // Notify the children of the overlay
             p.second->_notifyParent(this, overlay);
         }
     }
@@ -339,9 +337,9 @@ namespace Ogre {
                  OverlayElement* oldChildElement = p.second;
                  if (oldChildElement->isCloneable())
                  {
-                     OverlayElement* newChildElement = 
+                     OverlayElement* newChildElement =
                          OverlayManager::getSingleton().createOverlayElement(
-                            oldChildElement->getTypeName(), 
+                            oldChildElement->getTypeName(),
                             mName+"/"+oldChildElement->getName());
                      newChildElement->copyFromTemplate(oldChildElement);
                      addChild(newChildElement);

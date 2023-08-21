@@ -46,12 +46,12 @@ namespace Ogre {
         return msSingleton;
     }
     OverlayManager& OverlayManager::getSingleton(void)
-    {  
-        assert( msSingleton );  return ( *msSingleton );  
+    {
+        assert( msSingleton );  return ( *msSingleton );
     }
     //---------------------------------------------------------------------
-    OverlayManager::OverlayManager() 
-      : mLastViewportWidth(0), 
+    OverlayManager::OverlayManager()
+      : mLastViewportWidth(0),
         mLastViewportHeight(0),
         mPixelRatio(1)
     {
@@ -69,9 +69,9 @@ namespace Ogre {
         destroyAllOverlayElements(false);
         destroyAllOverlayElements(true);
 
-        for(FactoryMap::iterator i = mFactories.begin(); i != mFactories.end(); ++i)
+        for(auto& f : mFactories)
         {
-            OGRE_DELETE i->second;
+            OGRE_DELETE f.second;
         }
 
         // Unregister with resource group manager
@@ -80,14 +80,14 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void OverlayManager::_releaseManualHardwareResources()
     {
-        for(ElementMap::iterator i = mElements.begin(), i_end = mElements.end(); i != i_end; ++i)
-            i->second->_releaseManualHardwareResources();
+        for(auto& e : mElements)
+            e.second->_releaseManualHardwareResources();
     }
     //---------------------------------------------------------------------
     void OverlayManager::_restoreManualHardwareResources()
     {
-        for(ElementMap::iterator i = mElements.begin(), i_end = mElements.end(); i != i_end; ++i)
-            i->second->_restoreManualHardwareResources();
+        for(auto& e : mElements)
+            e.second->_restoreManualHardwareResources();
     }
     //---------------------------------------------------------------------
     const StringVector& OverlayManager::getScriptPatterns(void) const
@@ -114,7 +114,7 @@ namespace Ogre {
         }
         else
         {
-            OGRE_EXCEPT(Exception::ERR_DUPLICATE_ITEM, 
+            OGRE_EXCEPT(Exception::ERR_DUPLICATE_ITEM,
                 "Overlay with name '" + name + "' already exists!",
                 "OverlayManager::create");
         }
@@ -150,7 +150,7 @@ namespace Ogre {
         OverlayMap::iterator i = mOverlayMap.find(name);
         if (i == mOverlayMap.end())
         {
-            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
+            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND,
                 "Overlay with name '" + name + "' not found.",
                 "OverlayManager::destroy");
         }
@@ -174,17 +174,16 @@ namespace Ogre {
             }
         }
 
-        OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
+        OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND,
             "Overlay not found.",
             "OverlayManager::destroy");
     }
     //---------------------------------------------------------------------
     void OverlayManager::destroyAll(void)
     {
-        for (OverlayMap::iterator i = mOverlayMap.begin();
-            i != mOverlayMap.end(); ++i)
+        for (auto& o : mOverlayMap)
         {
-            OGRE_DELETE i->second;
+            OGRE_DELETE o.second;
         }
         mOverlayMap.clear();
     }
@@ -206,7 +205,7 @@ namespace Ogre {
         ScriptCompilerManager::getSingleton().parseScript(stream, groupName);
     }
     //---------------------------------------------------------------------
-    void OverlayManager::_queueOverlaysForRendering(Camera* cam, 
+    void OverlayManager::_queueOverlaysForRendering(Camera* cam,
         RenderQueue* pQueue, Viewport* vp)
     {
         // Flag for update pixel-based GUIElements if viewport has changed dimensions
@@ -217,12 +216,9 @@ namespace Ogre {
             mLastViewportHeight = int(vp->getActualHeight() / mPixelRatio);
         }
 
-        OverlayMap::iterator i, iend;
-        iend = mOverlayMap.end();
-        for (i = mOverlayMap.begin(); i != iend; ++i)
+        for (auto& o : mOverlayMap)
         {
-            Overlay* o = i->second;
-            o->_findVisibleObjects(cam, pQueue, vp);
+            o.second->_findVisibleObjects(cam, pQueue, vp);
         }
     }
     //---------------------------------------------------------------------
@@ -262,7 +258,7 @@ namespace Ogre {
         }
         else
         {
-            // no template 
+            // no template
             OverlayElement* templateGui = getOverlayElement(templateName, true);
 
             String typeNameToCreate;
@@ -384,7 +380,7 @@ namespace Ogre {
             FactoryMap::iterator fi = mFactories.find(element->getTypeName());
             if (fi == mFactories.end())
             {
-                OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "Cannot locate factory for element " 
+                OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "Cannot locate factory for element "
                     + element->getName(),
                     "OverlayManager::destroyAllOverlayElements");
             }
