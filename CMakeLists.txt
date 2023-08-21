@@ -155,7 +155,7 @@ if (MSVC)
 
   # Enable intrinsics on MSVC in debug mode
   set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /Oi")
-  if (CMAKE_CL_64)
+  if (MSVC AND CMAKE_SIZEOF_VOID_P EQUAL 8)
     # Visual Studio bails out on debug builds in 64bit mode unless
 	# this flag is set...
 	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /bigobj")

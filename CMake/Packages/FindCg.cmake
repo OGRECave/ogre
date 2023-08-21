@@ -46,7 +46,7 @@ findpkg_framework(Cg)
 
 find_path(Cg_INCLUDE_DIR NAMES cg.h HINTS ${Cg_FRAMEWORK_INCLUDES} ${Cg_INC_SEARCH_PATH} ${Cg_PKGC_INCLUDE_DIRS} PATH_SUFFIXES Cg)
 
-if (CMAKE_CL_64)
+if (CMAKE_SIZEOF_VOID_P EQUAL 8)
   set (Cg_LIB_SEARCH_PATH ${Cg_HOME}/lib.x64 ${ENV_Cg_LIB64_PATH}
     ${ENV_Cg_HOME}/lib.x64 ${Cg_LIB_SEARCH_PATH})
 else()
@@ -59,7 +59,7 @@ find_library(Cg_LIBRARY_DBG NAMES ${Cg_LIBRARY_NAMES_DBG} HINTS ${Cg_LIB_SEARCH_
 make_library_set(Cg_LIBRARY)
 
 if (WIN32)
-	if (CMAKE_CL_64)
+	if (CMAKE_SIZEOF_VOID_P EQUAL 8)
 		set(Cg_BIN_SEARCH_PATH ${OGRE_DEPENDENCIES_DIR}/bin ${CMAKE_SOURCE_DIR}/Dependencies/bin ${Cg_HOME}/bin.x64
 			${ENV_Cg_BIN64_PATH} ${ENV_Cg_HOME}/bin.x64 ${ENV_OGRE_DEPENDENCIES_DIR}/bin
 			${OGRE_SOURCE}/Dependencies/bin ${ENV_OGRE_SOURCE}/Dependencies/bin

@@ -49,11 +49,11 @@ set(Softimage_PREFIX_PATH
   "$ENV{ProgramW6432}/Autodesk/Softimage 2013/XSISDK"
 )
 
-if (CMAKE_CL_64)
+if (CMAKE_SIZEOF_VOID_P EQUAL 8)
   set(Softimage_LIBPATH_SUFFIX "nt-x86-64")
-else(CMAKE_CL_64)
+else(CMAKE_SIZEOF_VOID_P EQUAL 8)
   set(Softimage_LIBPATH_SUFFIX "nt-x86")
-endif(CMAKE_CL_64)
+endif(CMAKE_SIZEOF_VOID_P EQUAL 8)
 
 create_search_paths(Softimage)
 # redo search if prefix path changed
