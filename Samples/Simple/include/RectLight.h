@@ -69,6 +69,7 @@ public:
         mCameraMan->setYawPitchDist(Degree(180), Degree(15), 50);
 
         mTrayMgr->createCheckBox(TL_TOPLEFT, "rectlight", "Rectangular Light")->setChecked(true, false);
+        mTrayMgr->showCursor();
     }
 
     void checkBoxToggled(CheckBox* box) override
