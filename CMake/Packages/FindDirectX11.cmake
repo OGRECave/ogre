@@ -84,11 +84,11 @@ if(WIN32) # The only platform it makes sense to check for DirectX11 SDK
 
 		# dlls are in DirectX11_ROOT_DIR/Developer Runtime/x64|x86
 		# lib files are in DirectX11_ROOT_DIR/Lib/x64|x86
-		if(CMAKE_CL_64)
+		if(CMAKE_SIZEOF_VOID_P EQUAL 8)
 			set(DirectX11_LIBPATH_SUFFIX "x64")
-		else(CMAKE_CL_64)
+		else(CMAKE_SIZEOF_VOID_P EQUAL 8)
 			set(DirectX11_LIBPATH_SUFFIX "x86")
-		endif(CMAKE_CL_64)
+		endif(CMAKE_SIZEOF_VOID_P EQUAL 8)
 
 		# look for D3D11 components
 		find_path(DirectX11_INCLUDE_DIR NAMES d3d11.h HINTS ${DirectX11_INC_SEARCH_PATH})
@@ -127,5 +127,5 @@ if(WIN32) # The only platform it makes sense to check for DirectX11 SDK
 	endif () # Legacy Direct X SDK
 
 	findpkg_finish(DirectX11)
-	
+
 endif(WIN32)
