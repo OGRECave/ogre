@@ -67,7 +67,7 @@ public:
         mCameraMan->setStyle(OgreBites::CS_ORBIT);
         mCameraMan->setTarget(lightnode);
         mCameraMan->setYawPitchDist(Degree(180), Degree(15), 50);
-        
+
         mTrayMgr->createCheckBox(TL_TOPLEFT, "rectlight", "Rectangular Light")->setChecked(true, false);
         mTrayMgr->showCursor();
     }
