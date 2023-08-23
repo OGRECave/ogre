@@ -647,6 +647,8 @@ namespace Ogre {
 
     void CocoaWindow::createNewWindow(unsigned int widthPt, unsigned int heightPt, String title)
     {
+        OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Builtin Window creation broken. Use an external Window (e.g SDL2) or fix this");
+
         // Get the dimensions of the display. We will use it for the window size but not context resolution
         NSRect windowRect = NSZeroRect;
         if(mIsFullScreen)
