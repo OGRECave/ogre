@@ -60,7 +60,7 @@ int IntegratedPSSM3::getExecutionOrder() const
 
 //-----------------------------------------------------------------------
 void IntegratedPSSM3::updateGpuProgramsParams(Renderable* rend, const Pass* pass,
-                                             const AutoParamDataSource* source, 
+                                             const AutoParamDataSource* source,
                                              const LightList* pLightList)
 {
     if (mMultiLightCount > 1)
@@ -100,18 +100,15 @@ void IntegratedPSSM3::copyFrom(const SubRenderState& rhs)
     mShadowTextureParamsList.resize(rhsPssm.mShadowTextureParamsList.size());
 
     ShadowTextureParamsConstIterator itSrc = rhsPssm.mShadowTextureParamsList.begin();
-    ShadowTextureParamsIterator itDst = mShadowTextureParamsList.begin();
-
-    while(itDst != mShadowTextureParamsList.end())
+    for (auto& p : mShadowTextureParamsList)
     {
-        itDst->mMaxRange = itSrc->mMaxRange;        
+        p.mMaxRange = itSrc->mMaxRange;
         ++itSrc;
-        ++itDst;
     }
 }
 
 //-----------------------------------------------------------------------
-bool IntegratedPSSM3::preAddToRenderState(const RenderState* renderState, 
+bool IntegratedPSSM3::preAddToRenderState(const RenderState* renderState,
                                          Pass* srcPass, Pass* dstPass)
 {
     if (!srcPass->getParent()->getParent()->getReceiveShadows() ||
@@ -131,21 +128,15 @@ bool IntegratedPSSM3::preAddToRenderState(const RenderState* renderState,
     if(mMultiLightCount > 1)
         mShadowTextureParamsList.resize(mMultiLightCount);
 
-    ShadowTextureParamsIterator it = mShadowTextureParamsList.begin();
-
     auto shadowSampler = TextureManager::getSingleton().getSampler(mUseTextureCompare ? "Ogre/DepthShadowSampler"
                                                                                       : "Ogre/ShadowSampler");
-    while(it != mShadowTextureParamsList.end())
+    for (auto& p : mShadowTextureParamsList)
     {
         TextureUnitState* curShadowTexture = dstPass->createTextureUnitState();
-            
         curShadowTexture->setContentType(TextureUnitState::CONTENT_SHADOW);
         curShadowTexture->setSampler(shadowSampler);
-        it->mTextureSamplerIndex = dstPass->getNumTextureUnitStates() - 1;
-        ++it;
+        p.mTextureSamplerIndex = dstPass->getNumTextureUnitStates() - 1;
     }
-
-    
 
     return true;
 }
@@ -212,12 +203,12 @@ bool IntegratedPSSM3::resolveParameters(ProgramSet* programSet)
     Program* psProgram = programSet->getCpuProgram(GPT_FRAGMENT_PROGRAM);
     Function* vsMain = vsProgram->getEntryPointFunction();
     Function* psMain = psProgram->getEntryPointFunction();
-    
+
     // Get input position parameter.
     mVSInPos = vsMain->getLocalParameter(Parameter::SPC_POSITION_OBJECT_SPACE);
     if(!mVSInPos)
         mVSInPos = vsMain->getInputParameter(Parameter::SPC_POSITION_OBJECT_SPACE);
-    
+
     // Get output position parameter.
     mVSOutPos = vsMain->getOutputParameter(Parameter::SPC_POSITION_PROJECTIVE_SPACE);
 
@@ -234,23 +225,18 @@ bool IntegratedPSSM3::resolveParameters(ProgramSet* programSet)
 
     // Resolve computed local shadow colour parameter.
     mPSSplitPoints = psProgram->resolveParameter(GCT_FLOAT4, "pssm_split_points");
-    
-    ShadowTextureParamsIterator it = mShadowTextureParamsList.begin();
+
     int lightIndex = 0;
 
-    while(it != mShadowTextureParamsList.end())
+    for (auto& p : mShadowTextureParamsList)
     {
-        it->mWorldViewProjMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_TEXTURE_WORLDVIEWPROJ_MATRIX, lightIndex);
-
-        it->mVSOutLightPosition = vsMain->resolveOutputParameter(Parameter::Content(Parameter::SPC_POSITION_LIGHT_SPACE0 + lightIndex));        
-        it->mPSInLightPosition = psMain->resolveInputParameter(it->mVSOutLightPosition);
+        p.mWorldViewProjMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_TEXTURE_WORLDVIEWPROJ_MATRIX, lightIndex);
+        p.mVSOutLightPosition = vsMain->resolveOutputParameter(Parameter::Content(Parameter::SPC_POSITION_LIGHT_SPACE0 + lightIndex));
+        p.mPSInLightPosition = psMain->resolveInputParameter(p.mVSOutLightPosition);
         auto stype = mUseTextureCompare ? GCT_SAMPLER2DSHADOW : GCT_SAMPLER2D;
-        it->mTextureSampler = psProgram->resolveParameter(stype, "shadow_map", it->mTextureSamplerIndex);
-        it->mInvTextureSize = psProgram->resolveParameter(GpuProgramParameters::ACT_INVERSE_TEXTURE_SIZE,
-                                                          it->mTextureSamplerIndex);
-
+        p.mTextureSampler = psProgram->resolveParameter(stype, "shadow_map", p.mTextureSamplerIndex);
+        p.mInvTextureSize = psProgram->resolveParameter(GpuProgramParameters::ACT_INVERSE_TEXTURE_SIZE, p.mTextureSamplerIndex);
         ++lightIndex;
-        ++it;
     }
 
     if (!(mVSInPos.get()) || !(mVSOutPos.get()))
@@ -285,8 +271,8 @@ bool IntegratedPSSM3::resolveDependencies(ProgramSet* programSet)
 //-----------------------------------------------------------------------
 bool IntegratedPSSM3::addFunctionInvocations(ProgramSet* programSet)
 {
-    Program* vsProgram = programSet->getCpuProgram(GPT_VERTEX_PROGRAM); 
-    Function* vsMain = vsProgram->getEntryPointFunction();  
+    Program* vsProgram = programSet->getCpuProgram(GPT_VERTEX_PROGRAM);
+    Function* vsMain = vsProgram->getEntryPointFunction();
     Program* psProgram = programSet->getCpuProgram(GPT_FRAGMENT_PROGRAM);
 
     // Add vertex shader invocations.
@@ -311,13 +297,10 @@ bool IntegratedPSSM3::addVSInvocation(Function* vsMain, const int groupOrder)
         stage.assign(vsOutPos, mVSOutPos);
     }
 
-    // Compute world space position.    
-    ShadowTextureParamsIterator it = mShadowTextureParamsList.begin();
-
-    while(it != mShadowTextureParamsList.end())
+    // Compute world space position.
+    for (auto& p : mShadowTextureParamsList)
     {
-        stage.callBuiltin("mul", it->mWorldViewProjMatrix, mVSInPos, it->mVSOutLightPosition);
-        ++it;
+        stage.callBuiltin("mul", p.mWorldViewProjMatrix, mVSInPos, p.mVSOutLightPosition);
     }
 
     return true;
@@ -373,7 +356,7 @@ bool IntegratedPSSM3::addPSInvocation(Program* psProgram, const int groupOrder)
 }
 
 //-----------------------------------------------------------------------
-SubRenderState* IntegratedPSSM3Factory::createInstance(ScriptCompiler* compiler, 
+SubRenderState* IntegratedPSSM3Factory::createInstance(ScriptCompiler* compiler,
                                                       PropertyAbstractNode* prop, Pass* pass, SGScriptTranslator* translator)
 {
     if (prop->name == "integrated_pssm4")
