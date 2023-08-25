@@ -98,10 +98,10 @@ void CGProgramWriter::writeSourceCode(std::ostream& os, Program* program)
     writeUniformParametersTitle(os, program);
     os << std::endl;
 
-    for (const auto& param : program->getParameters())
+    for (const auto& p : program->getParameters())
     {
-        param->isSampler() ? writeSamplerParameter(os, param) : writeParameter(os, param);
-        os << ";" << std::endl;             
+        p->isSampler() ? writeSamplerParameter(os, p) : writeParameter(os, p);
+        os << ";" << std::endl;
     }
     os << std::endl;
 
@@ -114,23 +114,17 @@ void CGProgramWriter::writeSourceCode(std::ostream& os, Program* program)
     os << "{" << std::endl;
 
     // Write local parameters.
-    const ShaderParameterList& localParams = curFunction->getLocalParameters();
-    ShaderParameterConstIterator itParam;
-
-    for (itParam=localParams.begin();  itParam != localParams.end(); ++itParam)
+    for (const auto& p : curFunction->getLocalParameters())
     {
         os << "\t";
-        writeParameter(os, *itParam);
+        writeParameter(os, p);
         os << ";" << std::endl;
     }
 
-    const FunctionAtomInstanceList& atomInstances = curFunction->getAtomInstances();
-    FunctionAtomInstanceConstIterator itAtom;
-
-    for (itAtom=atomInstances.begin(); itAtom != atomInstances.end(); ++itAtom)
+    for (const auto& a : curFunction->getAtomInstances())
     {
-        redirectGlobalWrites(os, *itAtom, curFunction->getInputParameters(), program->getParameters());
-        writeAtomInstance(os, *itAtom);
+        redirectGlobalWrites(os, a, curFunction->getInputParameters(), program->getParameters());
+        writeAtomInstance(os, a);
     }
 
 
@@ -171,28 +165,22 @@ void CGProgramWriter::writeFunctionParameter(std::ostream& os, ParameterPtr para
 //-----------------------------------------------------------------------
 void CGProgramWriter::writeFunctionDeclaration(std::ostream& os, Function* function)
 {
-    const ShaderParameterList& inParams  = function->getInputParameters();
-    const ShaderParameterList& outParams = function->getOutputParameters();
-
-
     os << "void main(\n";
 
-    ShaderParameterConstIterator it;
-
     // Write input parameters.
-    for (it=inParams.begin(); it != inParams.end(); ++it)
-    {                   
+    for (const auto& p : function->getInputParameters())
+    {
         os << "\t in ";
-        writeFunctionParameter(os, *it);
+        writeFunctionParameter(os, p);
         os << ",\n";
     }
 
 
     // Write output parameters.
-    for (it=outParams.begin(); it != outParams.end(); ++it)
+    for (const auto& p : function->getOutputParameters())
     {
         os << "\t out ";
-        writeFunctionParameter(os, *it);
+        writeFunctionParameter(os, p);
         os << ",\n";
     }
 
