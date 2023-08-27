@@ -604,7 +604,7 @@ void AssimpLoader::parseAnimation(const aiScene* mScene, int index, aiAnimation*
             defBonePoseInv.makeInverseTransform(bone->getPosition(), bone->getScale(),
                                                 bone->getOrientation());
 
-            NodeAnimationTrack* track = animation->createNodeTrack(i, bone);
+            NodeAnimationTrack* track = animation->createNodeTrack(bone->getHandle(), bone);
 
             // Ogre needs translate rotate and scale for each keyframe in the track
             KeyframesMap keyframes;
