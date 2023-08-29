@@ -532,8 +532,6 @@ ParameterPtr Function::_getParameterBySemantic(const ShaderParameterList& parame
 //-----------------------------------------------------------------------------
 ParameterPtr Function::_getParameterByContent(const ShaderParameterList& parameterList, const Parameter::Content content, GpuConstantType type)
 {
-    ShaderParameterConstIterator it;
-
     if(type == GCT_UNKNOWN)
         type = typeFromContent(content);
 
