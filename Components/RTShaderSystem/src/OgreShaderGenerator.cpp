@@ -29,7 +29,7 @@ THE SOFTWARE.
 namespace Ogre {
 
 //-----------------------------------------------------------------------
-template<> 
+template<>
 RTShader::ShaderGenerator* Singleton<RTShader::ShaderGenerator>::msSingleton = 0;
 
 namespace RTShader {
@@ -121,7 +121,7 @@ ShaderGenerator* ShaderGenerator::getSingletonPtr()
 //-----------------------------------------------------------------------
 ShaderGenerator& ShaderGenerator::getSingleton()
 {
-    assert( msSingleton );  
+    assert( msSingleton );
     return ( *msSingleton );
 }
 
@@ -166,7 +166,7 @@ ShaderGenerator::ShaderGenerator() :
 //-----------------------------------------------------------------------------
 ShaderGenerator::~ShaderGenerator()
 {
-    
+
 }
 
 //-----------------------------------------------------------------------------
@@ -182,7 +182,7 @@ bool ShaderGenerator::initialize()
             return false;
         }
     }
-        
+
     return true;
 }
 
@@ -207,7 +207,7 @@ bool ShaderGenerator::_initialize()
 
     // Create the default scheme.
     createScheme(MSN_SHADERGEN);
-	
+
 	mResourceGroupListener.reset(new SGResourceGroupListener(this));
 	ResourceGroupManager::getSingleton().addResourceGroupListener(mResourceGroupListener.get());
 
@@ -253,11 +253,11 @@ void ShaderGenerator::createBuiltinSRSFactories()
         && !GpuProgramManager::getSingleton().isSyntaxSupported("vs_4_0"));
     if(!d3d11AndLowProfile)
     {
-        curFactory = OGRE_NEW PerPixelLightingFactory;  
+        curFactory = OGRE_NEW PerPixelLightingFactory;
         addSubRenderStateFactory(curFactory);
         mBuiltinSRSFactories.push_back(curFactory);
 
-        curFactory = OGRE_NEW NormalMapLightingFactory; 
+        curFactory = OGRE_NEW NormalMapLightingFactory;
         addSubRenderStateFactory(curFactory);
         mBuiltinSRSFactories.push_back(curFactory);
 
@@ -269,19 +269,19 @@ void ShaderGenerator::createBuiltinSRSFactories()
         addSubRenderStateFactory(curFactory);
         mBuiltinSRSFactories.push_back(curFactory);
 
-        curFactory = OGRE_NEW IntegratedPSSM3Factory;   
+        curFactory = OGRE_NEW IntegratedPSSM3Factory;
         addSubRenderStateFactory(curFactory);
         mBuiltinSRSFactories.push_back(curFactory);
 
-        curFactory = OGRE_NEW LayeredBlendingFactory;   
+        curFactory = OGRE_NEW LayeredBlendingFactory;
         addSubRenderStateFactory(curFactory);
         mBuiltinSRSFactories.push_back(curFactory);
 
-        curFactory = OGRE_NEW HardwareSkinningFactory;  
+        curFactory = OGRE_NEW HardwareSkinningFactory;
         addSubRenderStateFactory(curFactory);
         mBuiltinSRSFactories.push_back(curFactory);
     }
-    
+
     curFactory = OGRE_NEW TriplanarTexturingFactory;
     addSubRenderStateFactory(curFactory);
     mBuiltinSRSFactories.push_back(curFactory);
@@ -312,27 +312,27 @@ void ShaderGenerator::destroy()
 void ShaderGenerator::_destroy()
 {
     OGRE_LOCK_AUTO_MUTEX;
-    
+
     mIsFinalizing = true;
-    
+
     // Delete technique entries.
-    for (SGTechniqueMapIterator itTech = mTechniqueEntriesMap.begin(); itTech != mTechniqueEntriesMap.end(); ++itTech)
-    {           
-        OGRE_DELETE (itTech->second);
+    for (auto& e : mTechniqueEntriesMap)
+    {
+        OGRE_DELETE (e.second);
     }
     mTechniqueEntriesMap.clear();
 
     // Delete material entries.
-    for (SGMaterialIterator itMat = mMaterialEntriesMap.begin(); itMat != mMaterialEntriesMap.end(); ++itMat)
-    {       
-        OGRE_DELETE (itMat->second);
+    for (auto& m : mMaterialEntriesMap)
+    {
+        OGRE_DELETE (m.second);
     }
     mMaterialEntriesMap.clear();
 
     // Delete scheme entries.
-    for (SGSchemeIterator itScheme = mSchemeEntriesMap.begin(); itScheme != mSchemeEntriesMap.end(); ++itScheme)
-    {       
-        OGRE_DELETE (itScheme->second);
+    for (auto& s : mSchemeEntriesMap)
+    {
+        OGRE_DELETE (s.second);
     }
     mSchemeEntriesMap.clear();
 
@@ -357,7 +357,7 @@ void ShaderGenerator::_destroy()
         mResourceGroupListener.reset();
     }
 
-    // Remove all scene managers.   
+    // Remove all scene managers.
     while (mSceneManagerMap.empty() == false)
     {
         removeSceneManager(*mSceneManagerMap.begin());
@@ -392,8 +392,8 @@ void ShaderGenerator::addSubRenderStateFactory(SubRenderStateFactory* factory)
         OGRE_EXCEPT(Exception::ERR_DUPLICATE_ITEM,
             "A factory of type '" + factory->getType() + "' already exists.",
             "ShaderGenerator::addSubRenderStateFactory");
-    }       
-    
+    }
+
     mSubRenderStateFactories[factory->getType()] = factory;
 }
 
@@ -422,7 +422,7 @@ SubRenderStateFactory*  ShaderGenerator::getSubRenderStateFactory(size_t index)
     OGRE_EXCEPT(Exception::ERR_DUPLICATE_ITEM,
         "A factory on index " + StringConverter::toString(index) + " does not exist.",
         "ShaderGenerator::addSubRenderStateFactory");
-        
+
     return NULL;
 }
 //-----------------------------------------------------------------------------
@@ -474,48 +474,40 @@ void ShaderGenerator::destroySubRenderState(SubRenderState* subRenderState)
     if (itFind != mSubRenderStateFactories.end())
     {
          itFind->second->destroyInstance(subRenderState);
-    }   
+    }
 }
 
 //-----------------------------------------------------------------------------
-SubRenderState* ShaderGenerator::createSubRenderState(ScriptCompiler* compiler, 
+SubRenderState* ShaderGenerator::createSubRenderState(ScriptCompiler* compiler,
                                                       PropertyAbstractNode* prop, Pass* pass, SGScriptTranslator* translator)
 {
     OGRE_LOCK_AUTO_MUTEX;
-
-    SubRenderStateFactoryIterator it = mSubRenderStateFactories.begin();
-    SubRenderStateFactoryIterator itEnd = mSubRenderStateFactories.end();
     SubRenderState* subRenderState = NULL;
 
-    while (it != itEnd)
+    for (auto& s : mSubRenderStateFactories)
     {
-        subRenderState = it->second->createInstance(compiler, prop, pass, translator);
-        if (subRenderState != NULL)     
-            break;              
-        ++it;
-    }   
+        subRenderState = s.second->createInstance(compiler, prop, pass, translator);
+        if (subRenderState != NULL)
+            break;
+    }
 
     return subRenderState;
 }
 
 
 //-----------------------------------------------------------------------------
-SubRenderState* ShaderGenerator::createSubRenderState(ScriptCompiler* compiler, 
+SubRenderState* ShaderGenerator::createSubRenderState(ScriptCompiler* compiler,
                                                       PropertyAbstractNode* prop, TextureUnitState* texState, SGScriptTranslator* translator)
 {
     OGRE_LOCK_AUTO_MUTEX;
-
-    SubRenderStateFactoryIterator it = mSubRenderStateFactories.begin();
-    SubRenderStateFactoryIterator itEnd = mSubRenderStateFactories.end();
     SubRenderState* subRenderState = NULL;
 
-    while (it != itEnd)
+    for (auto& s : mSubRenderStateFactories)
     {
-        subRenderState = it->second->createInstance(compiler, prop, texState, translator);
-        if (subRenderState != NULL)     
-            break;              
-        ++it;
-    }   
+        subRenderState = s.second->createInstance(compiler, prop, texState, translator);
+        if (subRenderState != NULL)
+            break;
+    }
 
     return subRenderState;
 }
@@ -532,14 +524,14 @@ RenderState* ShaderGenerator::getRenderState(const String& schemeName)
     OGRE_LOCK_AUTO_MUTEX;
 
     SGSchemeIterator itFind = mSchemeEntriesMap.find(schemeName);
-    
+
     if (itFind == mSchemeEntriesMap.end())
     {
         OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND,
             "A scheme named'" + schemeName + "' doesn't exists.",
-            "ShaderGenerator::getRenderState"); 
-    }   
-    
+            "ShaderGenerator::getRenderState");
+    }
+
     return itFind->second->getRenderState();
 }
 
@@ -582,9 +574,9 @@ ShaderGenerator::SchemeCreateOrRetrieveResult ShaderGenerator::createOrRetrieveS
     return SchemeCreateOrRetrieveResult(schemeEntry, wasCreated);
 }
 //-----------------------------------------------------------------------------
-RenderState* ShaderGenerator::getRenderState(const String& schemeName, 
-                                     const String& materialName, 
-                                     const String& groupName, 
+RenderState* ShaderGenerator::getRenderState(const String& schemeName,
+                                     const String& materialName,
+                                     const String& groupName,
                                      unsigned short passIndex)
 {
     OGRE_LOCK_AUTO_MUTEX;
@@ -610,12 +602,12 @@ void ShaderGenerator::addSceneManager(SceneManager* sceneMgr)
 
     if (!mRenderObjectListener)
         mRenderObjectListener.reset(new SGRenderObjectListener(this));
-    
+
     sceneMgr->addRenderObjectListener(mRenderObjectListener.get());
 
     if (!mSceneManagerListener)
         mSceneManagerListener.reset(new SGSceneManagerListener(this));
-    
+
     sceneMgr->addListener(mSceneManagerListener.get());
 
     // Update the active scene manager.
@@ -628,7 +620,7 @@ void ShaderGenerator::removeSceneManager(SceneManager* sceneMgr)
 {
     // Make sure this scene manager exists in the map.
     SceneManagerIterator itFind = mSceneManagerMap.find(sceneMgr);
-    
+
     if (itFind != mSceneManagerMap.end())
     {
         (*itFind)->removeRenderObjectListener(mRenderObjectListener.get());
@@ -688,9 +680,9 @@ const String& ShaderGenerator::getShaderProfiles(GpuProgramType type) const
     }
 }
 //-----------------------------------------------------------------------------
-bool ShaderGenerator::hasShaderBasedTechnique(const String& materialName, 
-                                                 const String& groupName, 
-                                                 const String& srcTechniqueSchemeName, 
+bool ShaderGenerator::hasShaderBasedTechnique(const String& materialName,
+                                                 const String& groupName,
+                                                 const String& srcTechniqueSchemeName,
                                                  const String& dstTechniqueSchemeName) const
 {
     OGRE_LOCK_AUTO_MUTEX;
@@ -699,9 +691,9 @@ bool ShaderGenerator::hasShaderBasedTechnique(const String& materialName,
     if (false == MaterialManager::getSingleton().resourceExists(materialName, groupName))
         return false;
 
-    
+
     SGMaterialConstIterator itMatEntry = findMaterialEntryIt(materialName, groupName);
-    
+
     // Check if technique already created.
     if (itMatEntry != mMaterialEntriesMap.end())
     {
@@ -715,7 +707,7 @@ bool ShaderGenerator::hasShaderBasedTechnique(const String& materialName,
                 (*itTechEntry)->getDestinationTechniqueSchemeName() == dstTechniqueSchemeName)
             {
                 return true;
-            }           
+            }
         }
     }
     return false;
@@ -753,11 +745,11 @@ static Technique* findSourceTechnique(const Material& mat, const String& srcTech
 }
 //-----------------------------------------------------------------------------
 bool ShaderGenerator::createShaderBasedTechnique(const Material& srcMat,
-                                                 const String& srcTechniqueSchemeName, 
+                                                 const String& srcTechniqueSchemeName,
                                                  const String& dstTechniqueSchemeName,
                                                  bool overProgrammable)
 {
-    // No technique created -> check if one can be created from the given source technique scheme.  
+    // No technique created -> check if one can be created from the given source technique scheme.
     Technique* srcTechnique = findSourceTechnique(srcMat, srcTechniqueSchemeName, overProgrammable);
 
     // No appropriate source technique found.
@@ -897,17 +889,17 @@ bool ShaderGenerator::removeAllShaderBasedTechniques(const String& materialName,
 
     // Find the material entry.
     SGMaterialIterator itMatEntry = findMaterialEntryIt(materialName, groupName);
-    
+
     // Case material not found.
     if (itMatEntry == mMaterialEntriesMap.end())
         return false;
 
 
     SGTechniqueList& matTechniqueEntires = itMatEntry->second->getTechniqueList();
-        
+
     // Remove all technique entries from material techniques list.
     while (matTechniqueEntires.empty() == false)
-    {   
+    {
         SGTechniqueIterator itTechEntry = matTechniqueEntires.begin();
 
         removeShaderBasedTechnique((*itTechEntry)->getSourceTechnique(),
@@ -916,7 +908,7 @@ bool ShaderGenerator::removeAllShaderBasedTechniques(const String& materialName,
 
     OGRE_DELETE itMatEntry->second;
     mMaterialEntriesMap.erase(itMatEntry);
-    
+
     return true;
 }
 
@@ -928,7 +920,7 @@ bool ShaderGenerator::cloneShaderBasedTechniques(const Material& srcMat, Materia
 
     //remove any techniques in the destination material so the new techniques may be copied
     removeAllShaderBasedTechniques(dstMat);
-    
+
     //
     //remove any techniques from the destination material which have RTSS associated schemes from
     //the source material. This code is performed in case the user performed a clone of a material
@@ -959,12 +951,12 @@ bool ShaderGenerator::cloneShaderBasedTechniques(const Material& srcMat, Materia
             dstMat.removeTechnique(ti);
         }
     }
-    
+
     //
     // Clone the render states from source to destination
     //
 
-    // Check if RTSS techniques exist in the source material 
+    // Check if RTSS techniques exist in the source material
     if (itSrcMatEntry != mMaterialEntriesMap.end())
     {
         const SGTechniqueList& techniqueEntires = itSrcMatEntry->second->getTechniqueList();
@@ -975,8 +967,8 @@ bool ShaderGenerator::cloneShaderBasedTechniques(const Material& srcMat, Materia
         {
             String srcFromTechniqueScheme = (*itTechEntry)->getSourceTechnique()->getSchemeName();
             String srcToTechniqueScheme = (*itTechEntry)->getDestinationTechniqueSchemeName();
-            
-            //for every technique in the source material create a shader based technique in the 
+
+            //for every technique in the source material create a shader based technique in the
             //destination material
             if (createShaderBasedTechnique(dstMat, srcFromTechniqueScheme, srcToTechniqueScheme))
             {
@@ -990,7 +982,7 @@ bool ShaderGenerator::cloneShaderBasedTechniques(const Material& srcMat, Materia
                         RenderState* srcRenderState = (*itTechEntry)->getRenderState(pi);
                         RenderState* dstRenderState = getRenderState(srcToTechniqueScheme, dstMat, pi);
 
-                        const SubRenderStateList& srcSubRenderState = 
+                        const SubRenderStateList& srcSubRenderState =
                             srcRenderState->getSubRenderStates();
 
                         SubRenderStateList::const_iterator itSubState = srcSubRenderState.begin(),
@@ -1025,9 +1017,9 @@ void ShaderGenerator::removeAllShaderBasedTechniques()
 }
 
 //-----------------------------------------------------------------------------
- void ShaderGenerator::notifyRenderSingleObject(Renderable* rend, 
-     const Pass* pass,  
-     const AutoParamDataSource* source, 
+ void ShaderGenerator::notifyRenderSingleObject(Renderable* rend,
+     const Pass* pass,
+     const AutoParamDataSource* source,
      const LightList* pLightList, bool suppressRenderStateChanges)
 {
     if (mActiveViewportValid)
@@ -1035,25 +1027,25 @@ void ShaderGenerator::removeAllShaderBasedTechniques()
         const Any& passUserData = pass->getUserObjectBindings().getUserAny(TargetRenderState::UserKey);
 
         if (!passUserData.has_value() || suppressRenderStateChanges)
-            return; 
+            return;
 
         OGRE_LOCK_AUTO_MUTEX;
 
         auto renderState = any_cast<TargetRenderStatePtr>(passUserData);
-        renderState->updateGpuProgramsParams(rend, pass, source, pLightList);        
-    }   
+        renderState->updateGpuProgramsParams(rend, pass, source, pLightList);
+    }
 }
 
 
 //-----------------------------------------------------------------------------
-void ShaderGenerator::preFindVisibleObjects(SceneManager* source, 
-                                            SceneManager::IlluminationRenderStage irs, 
+void ShaderGenerator::preFindVisibleObjects(SceneManager* source,
+                                            SceneManager::IlluminationRenderStage irs,
                                             Viewport* v)
 {
     OGRE_LOCK_AUTO_MUTEX;
 
     const String& curMaterialScheme = v->getMaterialScheme();
-        
+
     mActiveSceneMgr      = source;
     mActiveViewportValid = validateScheme(curMaterialScheme);
 }
@@ -1065,9 +1057,9 @@ void ShaderGenerator::invalidateScheme(const String& schemeName)
 
     SGSchemeIterator itScheme = mSchemeEntriesMap.find(schemeName);
 
-    if (itScheme != mSchemeEntriesMap.end())    
-        itScheme->second->invalidate(); 
-    
+    if (itScheme != mSchemeEntriesMap.end())
+        itScheme->second->invalidate();
+
 }
 
 //-----------------------------------------------------------------------------
@@ -1078,7 +1070,7 @@ bool ShaderGenerator::validateScheme(const String& schemeName)
     SGSchemeIterator itScheme = mSchemeEntriesMap.find(schemeName);
 
     // No such scheme exists.
-    if (itScheme == mSchemeEntriesMap.end())    
+    if (itScheme == mSchemeEntriesMap.end())
         return false;
 
     itScheme->second->validate();
@@ -1092,9 +1084,9 @@ void ShaderGenerator::invalidateMaterial(const String& schemeName, const String&
     OGRE_LOCK_AUTO_MUTEX;
 
     SGSchemeIterator itScheme = mSchemeEntriesMap.find(schemeName);
-    
-    if (itScheme != mSchemeEntriesMap.end())            
-        itScheme->second->invalidate(materialName, groupName);  
+
+    if (itScheme != mSchemeEntriesMap.end())
+        itScheme->second->invalidate(materialName, groupName);
 }
 
 //-----------------------------------------------------------------------------
@@ -1105,10 +1097,10 @@ bool ShaderGenerator::validateMaterial(const String& schemeName, const String& m
     SGSchemeIterator itScheme = mSchemeEntriesMap.find(schemeName);
 
     // No such scheme exists.
-    if (itScheme == mSchemeEntriesMap.end())    
+    if (itScheme == mSchemeEntriesMap.end())
         return false;
 
-    return itScheme->second->validate(materialName, groupName); 
+    return itScheme->second->validate(materialName, groupName);
 }
 
 //-----------------------------------------------------------------------------
@@ -1148,24 +1140,18 @@ MaterialSerializer::Listener* ShaderGenerator::getMaterialSerializerListener()
 //-----------------------------------------------------------------------------
 void ShaderGenerator::flushShaderCache()
 {
-    SGTechniqueMapIterator itTech = mTechniqueEntriesMap.begin();
-    SGTechniqueMapIterator itTechEnd = mTechniqueEntriesMap.end();
-
     // Release all programs.
-    for (; itTech != itTechEnd; ++itTech)
-    {           
-        itTech->second->releasePrograms();
+    for (auto& t : mTechniqueEntriesMap)
+    {
+        t.second->releasePrograms();
     }
 
     ProgramManager::getSingleton().flushGpuProgramsCache();
-    
-    SGSchemeIterator itScheme = mSchemeEntriesMap.begin();
-    SGSchemeIterator itSchemeEnd = mSchemeEntriesMap.end();
 
     // Invalidate all schemes.
-    for (; itScheme != itSchemeEnd; ++itScheme)
+    for (auto& s : mSchemeEntriesMap)
     {
-        itScheme->second->invalidate();
+        s.second->invalidate();
     }
 }
 
@@ -1176,12 +1162,12 @@ ScriptTranslator* ShaderGenerator::getTranslator(const AbstractNodePtr& node)
 
     if(node->type != ANT_OBJECT)
         return NULL;
-    
+
     ObjectAbstractNode *obj = static_cast<ObjectAbstractNode*>(node.get());
 
     if(obj->id == ID_RT_SHADER_SYSTEM)
         return &mCoreScriptTranslator;
-    
+
     return NULL;
 }
 
@@ -1224,16 +1210,16 @@ void ShaderGenerator::setShaderCachePath( const String& cachePath )
         // Case this is a valid file path -> add as resource location in order to make sure that
         // generated shaders could be loaded by the file system archive.
         if (mShaderCachePath.empty() == false)
-        {   
+        {
             // Make sure this is a valid writable path.
             String outTestFileName(mShaderCachePath + "ShaderGenerator.tst");
             std::ofstream outFile(outTestFileName.c_str());
-            
+
             if (!outFile)
             {
                 OGRE_EXCEPT(Exception::ERR_CANNOT_WRITE_TO_FILE,
                     "Could not create output files in the given shader cache path '" + mShaderCachePath,
-                    "ShaderGenerator::setShaderCachePath"); 
+                    "ShaderGenerator::setShaderCachePath");
             }
 
             // Close and remove the test file.
@@ -1360,10 +1346,10 @@ ShaderGenerator::SGPassList ShaderGenerator::createSGPassList(Material* mat) con
 //-----------------------------------------------------------------------------
 ShaderGenerator::SGPass::SGPass(SGTechnique* parent, Pass* srcPass, Pass* dstPass, IlluminationStage stage)
 {
-    mParent             = parent;
-    mSrcPass            = srcPass;
-	mDstPass			= dstPass;
-	mStage				= stage;
+    mParent       = parent;
+    mSrcPass      = srcPass;
+    mDstPass			= dstPass;
+    mStage				= stage;
     mCustomRenderState  = NULL;
 }
 
@@ -1375,11 +1361,11 @@ ShaderGenerator::SGPass::~SGPass()
 
 //-----------------------------------------------------------------------------
 void ShaderGenerator::SGPass::buildTargetRenderState()
-{   
+{
     if(mSrcPass->isProgrammable() && !mParent->overProgrammablePass() && !isIlluminationPass()) return;
     const String& schemeName = mParent->getDestinationTechniqueSchemeName();
     const RenderState* renderStateGlobal = ShaderGenerator::getSingleton().getRenderState(schemeName);
-    
+
 
     auto targetRenderState = std::make_shared<TargetRenderState>();
 
@@ -1399,8 +1385,8 @@ void ShaderGenerator::SGPass::buildTargetRenderState()
         lightCount = renderStateGlobal->getLightCount();
         haveAreaLights = renderStateGlobal->haveAreaLights();
     }
-    
-    
+
+
     targetRenderState->setLightCount(lightCount);
     targetRenderState->setHaveAreaLights(haveAreaLights);
 
@@ -1507,7 +1493,7 @@ ShaderGenerator::SGTechnique::~SGTechnique()
     if (MaterialManager::getSingleton().resourceExists(materialName, groupName))
     {
         MaterialPtr mat = MaterialManager::getSingleton().getByName(materialName, groupName);
-    
+
         // Remove the destination technique from parent material.
         for (ushort i=0; i < mat->getNumTechniques(); ++i)
         {
@@ -1526,7 +1512,7 @@ ShaderGenerator::SGTechnique::~SGTechnique()
                     mat->touch();
                 }
                 break;
-            }       
+            }
         }
     }
 
@@ -1537,18 +1523,18 @@ ShaderGenerator::SGTechnique::~SGTechnique()
         {
             OGRE_DELETE mCustomRenderStates[i];
             mCustomRenderStates[i] = NULL;
-        }       
+        }
     }
     mCustomRenderStates.clear();
-    
+
 }
 
 //-----------------------------------------------------------------------------
 void ShaderGenerator::SGTechnique::destroySGPasses()
 {
-    for (SGPassIterator itPass = mPassEntries.begin(); itPass != mPassEntries.end(); ++itPass)
+    for (auto& p : mPassEntries)
     {
-        OGRE_DELETE (*itPass);
+        OGRE_DELETE p;
     }
     mPassEntries.clear();
 }
@@ -1570,9 +1556,9 @@ void ShaderGenerator::SGTechnique::buildTargetRenderState()
                 break;
             }
         }
-        destroySGPasses();      
+        destroySGPasses();
     }
-        
+
     // Create the destination technique and passes.
     mDstTechnique   = mSrcTechnique->getParent()->createTechnique();
     mDstTechnique->getUserObjectBindings().setUserAny(SGTechnique::UserKey, this);
@@ -1580,12 +1566,11 @@ void ShaderGenerator::SGTechnique::buildTargetRenderState()
     mDstTechnique->setSchemeName(mDstTechniqueSchemeName);
     createSGPasses();
 
-
     // Build render state for each pass.
-    for (SGPassIterator itPass = mPassEntries.begin(); itPass != mPassEntries.end(); ++itPass)
+    for (auto& p : mPassEntries)
     {
-		assert(!(*itPass)->isIlluminationPass()); // this is not so important, but intended to be so here.
-        (*itPass)->buildTargetRenderState();
+		assert(!p->isIlluminationPass()); // this is not so important, but intended to be so here.
+        p->buildTargetRenderState();
     }
 
     // Turn off the build destination technique flag.
@@ -1603,9 +1588,10 @@ void ShaderGenerator::SGTechnique::buildIlluminationTargetRenderState()
 
 	// Build render state for each pass.
 	for(SGPassIterator itPass = mPassEntries.begin(); itPass != mPassEntries.end(); ++itPass)
+	for(auto& p : mPassEntries)
 	{
-		if((*itPass)->isIlluminationPass())
-			(*itPass)->buildTargetRenderState();
+	    if(p->isIlluminationPass())
+		    p->buildTargetRenderState();
 	}
 }
 
@@ -1637,8 +1623,8 @@ RenderState* ShaderGenerator::SGTechnique::getRenderState(unsigned short passInd
 {
     RenderState* renderState = NULL;
 
-    if (passIndex >= mCustomRenderStates.size())    
-        mCustomRenderStates.resize(passIndex + 1, NULL);        
+    if (passIndex >= mCustomRenderStates.size())
+        mCustomRenderStates.resize(passIndex + 1, NULL);
 
     renderState = mCustomRenderStates[passIndex];
     if (renderState == NULL)
@@ -1646,7 +1632,7 @@ RenderState* ShaderGenerator::SGTechnique::getRenderState(unsigned short passInd
         renderState = OGRE_NEW RenderState;
         mCustomRenderStates[passIndex] = renderState;
     }
-    
+
     return renderState;
 }
 //-----------------------------------------------------------------------------
@@ -1682,18 +1668,15 @@ RenderState* ShaderGenerator::SGScheme::getRenderState()
 //-----------------------------------------------------------------------------
 RenderState* ShaderGenerator::SGScheme::getRenderState(const String& materialName, const String& groupName, unsigned short passIndex)
 {
-    SGTechniqueIterator itTech;
-
     // Find the desired technique.
     bool doAutoDetect = groupName == ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME;
-    for (itTech = mTechniqueEntries.begin(); itTech != mTechniqueEntries.end(); ++itTech)
+    for (auto& t : mTechniqueEntries)
     {
-        SGTechnique* curTechEntry = *itTech;
-        Material* curMat = curTechEntry->getSourceTechnique()->getParent();
-        if ((curMat->getName() == materialName) && 
+        Material* curMat = t->getSourceTechnique()->getParent();
+        if ((curMat->getName() == materialName) &&
             ((doAutoDetect == true) || (curMat->getGroup() == groupName)))
         {
-            return curTechEntry->getRenderState(passIndex);         
+            return t->getRenderState(passIndex);
         }
     }
 
@@ -1724,13 +1707,13 @@ void ShaderGenerator::SGScheme::removeTechniqueEntry(SGTechnique* techEntry)
         {
             mTechniqueEntries.erase(itTech);
             break;
-        }       
+        }
     }
 }
 
 //-----------------------------------------------------------------------------
 void ShaderGenerator::SGScheme::validate()
-{   
+{
     // Synchronize with light settings.
     synchronizeWithLightSettings();
 
@@ -1747,7 +1730,7 @@ void ShaderGenerator::SGScheme::validate()
         if (curTechEntry->getBuildDestinationTechnique())
             curTechEntry->buildTargetRenderState();
     }
-    
+
     // Mark this scheme as up to date.
     mOutOfDate = false;
 }
@@ -1817,22 +1800,22 @@ bool ShaderGenerator::SGScheme::validate(const String& materialName, const Strin
 
 
     SGTechniqueIterator itTech;
-    
+
     // Find the desired technique.
     bool doAutoDetect = groupName == ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME;
     for (itTech = mTechniqueEntries.begin(); itTech != mTechniqueEntries.end(); ++itTech)
     {
         SGTechnique* curTechEntry = *itTech;
         const SGMaterial* curMat = curTechEntry->getParent();
-        if ((curMat->getMaterialName() == materialName) && 
+        if ((curMat->getMaterialName() == materialName) &&
             ((doAutoDetect == true) || (curMat->getGroupName() == groupName)) &&
             (curTechEntry->getBuildDestinationTechnique()))
-        {       
+        {
             // Build render state for each technique and Acquire the CPU/GPU programs.
             curTechEntry->buildTargetRenderState();
 
 			return true;
-        }                   
+        }
     }
 
     return false;
@@ -1890,12 +1873,12 @@ void ShaderGenerator::SGScheme::invalidate(const String& materialName, const Str
     {
         const SGMaterial* curMaterial = curTechEntry->getParent();
         if ((curMaterial->getMaterialName() == materialName) &&
-            ((doAutoDetect == true) || (curMaterial->getGroupName() == groupName))) 
-        {           
+            ((doAutoDetect == true) || (curMaterial->getGroupName() == groupName)))
+        {
             // Turn on the build destination technique flag.
             curTechEntry->setBuildDestinationTechnique(true);
-            break;          
-        }                   
+            break;
+        }
     }
 
     mOutOfDate = true;
@@ -1910,7 +1893,7 @@ void ShaderGenerator::SGScheme::invalidate()
         curTechEntry->setBuildDestinationTechnique(true);
     }
 
-    mOutOfDate = true;          
+    mOutOfDate = true;
 }
 
 }
