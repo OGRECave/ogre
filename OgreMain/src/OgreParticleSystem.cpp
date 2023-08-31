@@ -1552,6 +1552,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     ParticleAffectorFactory::~ParticleAffectorFactory() 
     {
+        OGRE_IGNORE_DEPRECATED_BEGIN
         // Destroy all affectors
         for (auto *a : mAffectors)
         {
@@ -1559,20 +1560,23 @@ namespace Ogre {
         }
             
         mAffectors.clear();
+        OGRE_IGNORE_DEPRECATED_END
     }
     //-----------------------------------------------------------------------
     void ParticleAffectorFactory::destroyAffector(ParticleAffector* e)
     {
+        delete e;
+        OGRE_IGNORE_DEPRECATED_BEGIN
         std::vector<ParticleAffector*>::iterator i;
         for (i = mAffectors.begin(); i != mAffectors.end(); ++i)
         {
             if ((*i) == e)
             {
                 mAffectors.erase(i);
-                OGRE_DELETE e;
                 break;
             }
         }
+        OGRE_IGNORE_DEPRECATED_END
     }
 
 }
