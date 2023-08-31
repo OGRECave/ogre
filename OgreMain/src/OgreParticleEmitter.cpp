@@ -686,6 +686,7 @@ namespace Ogre
     //-----------------------------------------------------------------------
     ParticleEmitterFactory::~ParticleEmitterFactory()
     {
+        OGRE_IGNORE_DEPRECATED_BEGIN
         // Destroy all emitters
         for (auto& e : mEmitters)
         {
@@ -693,15 +694,18 @@ namespace Ogre
         }
             
         mEmitters.clear();
+        OGRE_IGNORE_DEPRECATED_END
     }
     //-----------------------------------------------------------------------
     void ParticleEmitterFactory::destroyEmitter(ParticleEmitter* e)        
     {
+        delete e;
+        OGRE_IGNORE_DEPRECATED_BEGIN
         auto i = std::find(std::begin(mEmitters), std::end(mEmitters), e);
         if (i != std::end(mEmitters)) {
             mEmitters.erase(i);
-            OGRE_DELETE e;
         }
+        OGRE_IGNORE_DEPRECATED_END
     }
 
     //-----------------------------------------------------------------------

@@ -39,12 +39,7 @@ namespace Ogre {
     {
         String getName() const override { return "ColourInterpolator"; }
 
-        ParticleAffector* createAffector(ParticleSystem* psys) override
-        {
-            ParticleAffector* p = new ColourInterpolatorAffector(psys);
-            mAffectors.push_back(p);
-            return p;
-        }
+        ParticleAffector* createAffector(ParticleSystem* psys) override { return new ColourInterpolatorAffector(psys); }
     };
 
 

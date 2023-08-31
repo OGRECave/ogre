@@ -66,12 +66,7 @@ namespace Ogre {
     {
         String getName() const override { return "TextureAnimator"; }
 
-        ParticleAffector* createAffector(ParticleSystem* psys) override
-        {
-            ParticleAffector* p = OGRE_NEW TextureAnimatorAffector(psys);
-            mAffectors.push_back(p);
-            return p;
-        }
+        ParticleAffector* createAffector(ParticleSystem* psys) override { return new TextureAnimatorAffector(psys); }
     };
 
     /** @} */

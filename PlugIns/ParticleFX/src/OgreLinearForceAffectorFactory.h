@@ -39,12 +39,7 @@ namespace Ogre {
     {
         String getName() const override { return "LinearForce"; }
 
-        ParticleAffector* createAffector(ParticleSystem* psys) override
-        {
-            ParticleAffector* p = OGRE_NEW LinearForceAffector(psys);
-            mAffectors.push_back(p);
-            return p;
-        }
+        ParticleAffector* createAffector(ParticleSystem* psys) override { return new LinearForceAffector(psys); }
     };
 
 

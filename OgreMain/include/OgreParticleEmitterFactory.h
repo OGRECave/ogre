@@ -56,7 +56,7 @@ namespace Ogre {
     class _OgreExport ParticleEmitterFactory : public FXAlloc
     {
     protected:
-        std::vector<ParticleEmitter*> mEmitters;
+        OGRE_DEPRECATED std::vector<ParticleEmitter*> mEmitters;
     public:
         ParticleEmitterFactory() {}
         virtual ~ParticleEmitterFactory();
