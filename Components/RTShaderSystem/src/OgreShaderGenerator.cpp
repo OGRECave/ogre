@@ -1587,7 +1587,6 @@ void ShaderGenerator::SGTechnique::buildIlluminationTargetRenderState()
 	createIlluminationSGPasses();
 
 	// Build render state for each pass.
-	for(SGPassIterator itPass = mPassEntries.begin(); itPass != mPassEntries.end(); ++itPass)
 	for(auto& p : mPassEntries)
 	{
 	    if(p->isIlluminationPass())
