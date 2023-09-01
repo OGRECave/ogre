@@ -1430,7 +1430,7 @@ void ShaderGenerator::SGTechnique::createIlluminationSGPasses()
 		const Any& origPassUserData = p->originalPass->getUserObjectBindings().getUserAny(TargetRenderState::UserKey);
 		if(origPassUserData.has_value())
 		{
-            for(auto sgp : mPassEntries)
+            for(auto *sgp : mPassEntries)
             {
                 if(sgp->getDstPass() == p->originalPass)
                 {
@@ -1547,7 +1547,7 @@ void ShaderGenerator::SGTechnique::buildTargetRenderState()
     createSGPasses();
 
     // Build render state for each pass.
-    for (auto& p : mPassEntries)
+    for (auto *p : mPassEntries)
     {
 		assert(!p->isIlluminationPass()); // this is not so important, but intended to be so here.
         p->buildTargetRenderState();
@@ -1567,7 +1567,7 @@ void ShaderGenerator::SGTechnique::buildIlluminationTargetRenderState()
 	createIlluminationSGPasses();
 
 	// Build render state for each pass.
-	for(auto& p : mPassEntries) {
+	for(auto *p : mPassEntries) {
 
 	    if(p->isIlluminationPass())
 		    p->buildTargetRenderState();
