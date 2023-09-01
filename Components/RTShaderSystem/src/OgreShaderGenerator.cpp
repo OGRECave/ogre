@@ -1779,7 +1779,7 @@ bool ShaderGenerator::SGScheme::validate(const String& materialName, const Strin
 
     // Find the desired technique.
     bool doAutoDetect = groupName == ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME;
-    for (const auto *t : mTechniqueEntries)
+    for (auto *t : mTechniqueEntries)
     {
         const SGMaterial* curMat = t->getParent();
         if ((curMat->getMaterialName() == materialName) &&
