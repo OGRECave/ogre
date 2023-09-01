@@ -944,7 +944,7 @@ bool ShaderGenerator::cloneShaderBasedTechniques(const Material& srcMat, Materia
         const SGTechniqueList& techniqueEntires = itSrcMatEntry->second->getTechniqueList();
 
         //Go over all rtss techniques in the source material
-        for (auto& t : techniqueEntires)
+        for (auto* t : techniqueEntires)
         {
             String srcFromTechniqueScheme = t->getSourceTechnique()->getSchemeName();
             String srcToTechniqueScheme = t->getDestinationTechniqueSchemeName();
