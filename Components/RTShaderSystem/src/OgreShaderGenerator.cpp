@@ -698,7 +698,7 @@ bool ShaderGenerator::hasShaderBasedTechnique(const String& materialName,
     if (itMatEntry != mMaterialEntriesMap.end())
     {
         const SGTechniqueList& techniqueEntires = itMatEntry->second->getTechniqueList();
-        for (auto& t : techniqueEntires) {
+        for (auto* t : techniqueEntires) {
             // Check requested mapping already exists.
             if (t->getSourceTechnique()->getSchemeName() == srcTechniqueSchemeName && t->getDestinationTechniqueSchemeName() == dstTechniqueSchemeName)
                 return true;
