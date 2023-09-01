@@ -1649,7 +1649,7 @@ RenderState* ShaderGenerator::SGScheme::getRenderState(const String& materialNam
 {
     // Find the desired technique.
     bool doAutoDetect = groupName == ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME;
-    for (auto& t : mTechniqueEntries)
+    for (auto *t : mTechniqueEntries)
     {
         Material* curMat = t->getSourceTechnique()->getParent();
         if ((curMat->getName() == materialName) &&
@@ -1779,7 +1779,7 @@ bool ShaderGenerator::SGScheme::validate(const String& materialName, const Strin
 
     // Find the desired technique.
     bool doAutoDetect = groupName == ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME;
-    for (const auto& t : mTechniqueEntries)
+    for (const auto *t : mTechniqueEntries)
     {
         const SGMaterial* curMat = t->getParent();
         if ((curMat->getMaterialName() == materialName) &&
@@ -1824,7 +1824,7 @@ void ShaderGenerator::SGScheme::invalidateIlluminationPasses(const String& mater
 {
 	// Find the desired technique.
 	bool doAutoDetect = groupName == ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME;
-	for(auto& t : mTechniqueEntries)
+	for(auto *t : mTechniqueEntries)
 	{
 		const SGMaterial* curMat = t->getParent();
 		if((curMat->getMaterialName() == materialName) &&
