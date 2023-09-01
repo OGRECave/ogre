@@ -46,13 +46,7 @@ namespace Ogre {
     public:
         String getName() const override { return "Box"; }
 
-        ParticleEmitter* createEmitter(ParticleSystem* psys) override
-        {
-            ParticleEmitter* emit = OGRE_NEW BoxEmitter(psys);
-            mEmitters.push_back(emit);
-            return emit;
-        }
-
+        ParticleEmitter* createEmitter(ParticleSystem* psys) override { return new BoxEmitter(psys); }
     };
 
 }

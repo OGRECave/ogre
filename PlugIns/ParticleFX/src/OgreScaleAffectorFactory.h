@@ -39,12 +39,7 @@ namespace Ogre {
     {
         String getName() const override { return "Scaler"; }
 
-        ParticleAffector* createAffector(ParticleSystem* psys) override
-        {
-            ParticleAffector* p = OGRE_NEW ScaleAffector(psys);
-            mAffectors.push_back(p);
-            return p;
-        }
+        ParticleAffector* createAffector(ParticleSystem* psys) override { return new ScaleAffector(psys); }
     };
 
 
