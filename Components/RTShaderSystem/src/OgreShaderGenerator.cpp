@@ -1549,7 +1549,7 @@ void ShaderGenerator::SGTechnique::buildTargetRenderState()
     // Build render state for each pass.
     for (auto *p : mPassEntries)
     {
-		assert(!p->isIlluminationPass()); // this is not so important, but intended to be so here.
+	assert(!p->isIlluminationPass()); // this is not so important, but intended to be so here.
         p->buildTargetRenderState();
     }
 
