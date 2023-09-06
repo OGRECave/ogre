@@ -68,8 +68,8 @@ void Program::addParameter(UniformParameterPtr parameter)
 {
     if (getParameterByName(parameter->getName()).get() != NULL)
     {
-        OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, 
-            "Parameter <" + parameter->getName() + "> already declared in program.", 
+        OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
+            "Parameter <" + parameter->getName() + "> already declared in program.",
             "Program::addParameter" );
     }
 
@@ -144,7 +144,7 @@ UniformParameterPtr Program::resolveParameter(GpuProgramParameters::AutoConstant
 
     uint32 size = 0;
     if(isArray(autoType)) std::swap(size, data); // for array autotypes the extra parameter is the size
-    
+
     // Create new parameter
     param = std::make_shared<UniformParameter>(autoType, data, size);
     addParameter(param);
@@ -152,7 +152,7 @@ UniformParameterPtr Program::resolveParameter(GpuProgramParameters::AutoConstant
     return param;
 }
 
-UniformParameterPtr Program::resolveAutoParameterReal(GpuProgramParameters::AutoConstantType autoType, 
+UniformParameterPtr Program::resolveAutoParameterReal(GpuProgramParameters::AutoConstantType autoType,
                                                 Real data, size_t size)
 {
     UniformParameterPtr param;
@@ -168,7 +168,7 @@ UniformParameterPtr Program::resolveAutoParameterReal(GpuProgramParameters::Auto
             return param;
         }
     }
-    
+
     // Create new parameter.
     param = std::make_shared<UniformParameter>(autoType, float(data), size);
     addParameter(param);
@@ -193,7 +193,7 @@ UniformParameterPtr Program::resolveAutoParameterReal(GpuProgramParameters::Auto
             return param;
         }
     }
-    
+
     // Create new parameter.
     param = std::make_shared<UniformParameter>(autoType, data, size, type);
     addParameter(param);
@@ -202,7 +202,7 @@ UniformParameterPtr Program::resolveAutoParameterReal(GpuProgramParameters::Auto
 }
 
 //-----------------------------------------------------------------------------
-UniformParameterPtr Program::resolveAutoParameterInt(GpuProgramParameters::AutoConstantType autoType, GpuConstantType type, 
+UniformParameterPtr Program::resolveAutoParameterInt(GpuProgramParameters::AutoConstantType autoType, GpuConstantType type,
                                            uint32 data, size_t size)
 {
     UniformParameterPtr param;
@@ -227,7 +227,7 @@ UniformParameterPtr Program::resolveAutoParameterInt(GpuProgramParameters::AutoC
 }
 
 //-----------------------------------------------------------------------------
-UniformParameterPtr Program::resolveParameter(GpuConstantType type, 
+UniformParameterPtr Program::resolveParameter(GpuConstantType type,
                                     int index, uint16 variability,
                                     const String& suggestedName,
                                     size_t size)
@@ -255,11 +255,11 @@ UniformParameterPtr Program::resolveParameter(GpuConstantType type,
         // Check if parameter already exists.
         param = getParameterByType(type, index);
         if (param.get() != NULL)
-        {       
-            return param;       
+        {
+            return param;
         }
     }
-    
+
     // Create new parameter.
     param = ParameterFactory::createUniform(type, index, variability, suggestedName, size);
     addParameter(param);
@@ -305,14 +305,10 @@ UniformParameterPtr Program::getParameterByType(GpuConstantType type, int index)
 //-----------------------------------------------------------------------------
 UniformParameterPtr Program::getParameterByAutoType(GpuProgramParameters::AutoConstantType autoType)
 {
-    UniformParameterIterator it;
-
-    for (it = mParameters.begin(); it != mParameters.end(); ++it)
+    for (const auto& p : mParameters)
     {
-        if ((*it)->isAutoConstantParameter() && (*it)->getAutoConstantType() == autoType)
-        {
-            return *it;
-        }
+        if (p->isAutoConstantParameter() && p->getAutoConstantType() == autoType)
+            return p;
     }
 
     return UniformParameterPtr();
