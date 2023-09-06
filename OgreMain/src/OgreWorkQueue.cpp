@@ -173,20 +173,17 @@ namespace Ogre {
         unsigned long msCurrent = 0;
 
         // keep going until we run out of responses or out of time
-        while(true)
+        while(!mMainThreadTasks.empty())
         {
-            if(!mMainThreadTasks.empty())
+            std::function<void()> task;
             {
-                std::function<void()> task;
-                {
-                    OGRE_WQ_LOCK_MUTEX(mResponseMutex);
-                    LogManager::getSingleton().stream(LML_TRIVIAL)
-                        << "DefaultWorkQueueBase('" << mName << "') - PROCESS_MAIN_TASK";
-                    task = std::move(mMainThreadTasks.front());
-                    mMainThreadTasks.pop_front();
-                }
-                task();
+                OGRE_WQ_LOCK_MUTEX(mResponseMutex);
+                LogManager::getSingleton().stream(LML_TRIVIAL)
+                    << "DefaultWorkQueueBase('" << mName << "') - PROCESS_MAIN_TASK";
+                task = std::move(mMainThreadTasks.front());
+                mMainThreadTasks.pop_front();
             }
+            task();
 
             // time limit
             if (mResposeTimeLimitMS)
