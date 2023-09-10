@@ -65,6 +65,7 @@ def main():
         cmake_args += ["-DOGRE_GLSUPPORT_USE_EGL=ON",
                        "-DOGRE_BUILD_RENDERSYSTEM_VULKAN=ON",
                        "-DOGRE_BUILD_PLUGIN_GLSLANG=ON",
+                       "-DPYTHON_LIBRARY=dontcare", # workaround issue with cmake & manylinux
                        "-DCMAKE_CXX_FLAGS=-s", # strip assimp
                        "-DCMAKE_INSTALL_RPATH=$ORIGIN;$ORIGIN/OGRE"]
     elif sys.platform == "darwin":
