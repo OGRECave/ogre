@@ -326,7 +326,7 @@ void GLSLProgramWriter::writeOutParameters(std::ostream& os, Function* function,
     const ShaderParameterList& outParams = function->getOutputParameters();
     int vsOutLocation = 0;
 
-    for (const auto* p : outParams)
+    for (const auto& p : outParams)
     {
         if(gpuType == GPT_VERTEX_PROGRAM)
         {
