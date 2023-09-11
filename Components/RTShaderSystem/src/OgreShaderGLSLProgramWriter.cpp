@@ -138,7 +138,7 @@ void GLSLProgramWriter::writeMainSourceCode(std::ostream& os, Program* program)
     }
 
     const UniformParameterList& parameterList = program->getParameters();
-    
+
     // Generate global variable code.
     writeUniformParametersTitle(os, program);
     os << std::endl;
@@ -180,7 +180,7 @@ void GLSLProgramWriter::writeMainSourceCode(std::ostream& os, Program* program)
         writeParameter(os, uparam);
         os << ";\n";
     }
-    os << std::endl;            
+    os << std::endl;
 
     Function* curFunction = program->getMain();
     const ShaderParameterList& inParams = curFunction->getInputParameters();
@@ -256,7 +256,7 @@ void GLSLProgramWriter::writeInputParameters(std::ostream& os, Function* functio
     int psInLocation = 0;
 
     for ( ; itParam != itParamEnd; ++itParam)
-    {       
+    {
         const ParameterPtr& pParam = *itParam;
         auto paramContent = pParam->getContent();
         auto paramSemantic = pParam->getSemantic();
@@ -284,7 +284,7 @@ void GLSLProgramWriter::writeInputParameters(std::ostream& os, Function* functio
             if(pParam->isHighP())
                 os << "f32"; // rely on unified shader vor f32vec4 etc.
             os << mGpuConstTypeMap[pParam->getType()];
-            os << "\t"; 
+            os << "\t";
             os << paramName;
             os << ", " << psInLocation++ << ")\n";
         }
@@ -312,7 +312,7 @@ void GLSLProgramWriter::writeInputParameters(std::ostream& os, Function* functio
                     type = GpuConstantType(type & ~GpuConstantDefinition::getBaseType(type));
                 os << mGpuConstTypeMap[type];
             }
-            os << "\t"; 
+            os << "\t";
             os << pParam->getName() << ", ";
             writeParameterSemantic(os, pParam);  // maps to location
             os << ")\n";
@@ -324,26 +324,20 @@ void GLSLProgramWriter::writeInputParameters(std::ostream& os, Function* functio
 void GLSLProgramWriter::writeOutParameters(std::ostream& os, Function* function, GpuProgramType gpuType)
 {
     const ShaderParameterList& outParams = function->getOutputParameters();
-
-    ShaderParameterConstIterator itParam = outParams.begin();
-    ShaderParameterConstIterator itParamEnd = outParams.end();
-
     int vsOutLocation = 0;
 
-    for ( ; itParam != itParamEnd; ++itParam)
+    for (const auto& p : outParams)
     {
-        const ParameterPtr& pParam = *itParam;
-
         if(gpuType == GPT_VERTEX_PROGRAM)
         {
             // GLSL vertex program has to write always gl_Position (but this is also deprecated after version 130)
-            if(pParam->getSemantic() == Parameter::SPS_POSITION)
+            if(p->getSemantic() == Parameter::SPS_POSITION)
             {
-                pParam->_rename("gl_Position");
+                p->_rename("gl_Position");
             }
-            else if(pParam->getContent() == Parameter::SPC_POINTSPRITE_SIZE)
+            else if(p->getContent() == Parameter::SPC_POINTSPRITE_SIZE)
             {
-                pParam->_rename("gl_PointSize");
+                p->_rename("gl_PointSize");
             }
             else
             {
@@ -352,25 +346,25 @@ void GLSLProgramWriter::writeOutParameters(std::ostream& os, Function* function,
                 // In the vertex and fragment program the variable names must match.
                 // Unfortunately now the input params are prefixed with an 'i' and output params with 'o'.
                 // Thats why we rename the params which are used in function atoms
-                String paramName = pParam->getName();
+                String paramName = p->getName();
                 paramName[0] = 'i';
-                pParam->_rename(paramName);
+                p->_rename(paramName);
 
-                writeParameter(os, pParam);
+                writeParameter(os, p);
                 os << ", " << vsOutLocation++ << ")\n";
             }
         }
         else if(gpuType == GPT_FRAGMENT_PROGRAM &&
-                pParam->getSemantic() == Parameter::SPS_COLOR)
-        {                   
-            if(pParam->getIndex() == 0)
+                p->getSemantic() == Parameter::SPS_COLOR)
+        {
+            if(p->getIndex() == 0)
             {
                 // handled by UnifiedShader
-                pParam->_rename("gl_FragColor");
+                p->_rename("gl_FragColor");
                 continue;
             }
 
-            os << "OUT(vec4\t" << pParam->getName() << ", " << pParam->getIndex() << ")\n";
+            os << "OUT(vec4\t" << p->getName() << ", " << p->getIndex() << ")\n";
         }
     }
 }
