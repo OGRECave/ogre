@@ -32,6 +32,7 @@ THE SOFTWARE.
 namespace Ogre {
 
     const String MOT_FRUSTUM = "Frustum";
+    const String MOT_FRUSTRUM = MOT_FRUSTUM;
     const Real Frustum::INFINITE_FAR_PLANE_ADJUST = 0.00001;
     //-----------------------------------------------------------------------
     Frustum::Frustum(const String& name) : 
