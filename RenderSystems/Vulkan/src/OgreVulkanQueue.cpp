@@ -713,15 +713,11 @@ namespace Ogre
                 dstStage = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
 
 #if OGRE_DEBUG_MODE
-                FastArray<TextureGpu *>::const_iterator itor = mImageMemBarrierPtrs.begin();
-                FastArray<TextureGpu *>::const_iterator endt = mImageMemBarrierPtrs.end();
-
-                while( itor != endt )
+                for (const auto *b : mImageMemBarriers)
                 {
-                    OgreAssert( (( *itor )->getUsage() & TU_RENDERTARGET) == 0/*&& !( *itor )->isUav()*/,
+                    OgreAssert((b->getUsage() & TU_RENDERTARGET) == 0/*&& !( *itor )->isUav()*/,
                                         "endCopyEncoder says nothing will wait on this texture(s) but "
                                         "we don't know if a subsequent stage will write to it" );
-                    ++itor;
                 }
 #endif
             }
@@ -736,14 +732,8 @@ namespace Ogre
             mImageMemBarriers.clear();
             mImageMemBarrierPtrs.clear();
 
-            TextureGpuDownloadMap::const_iterator itor = mCopyDownloadTextures.begin();
-            TextureGpuDownloadMap::const_iterator endt = mCopyDownloadTextures.end();
-
-            while( itor != endt )
-            {
-                itor->first->mCurrLayout = itor->first->mNextLayout;
-                ++itor;
-            }
+            for (const auto& t : mCopyDownloadTextures)
+                t.first->mCurrLayout = t.first->mNextLayout;
         }
 
         mCopyEndReadSrcBufferFlags = 0;

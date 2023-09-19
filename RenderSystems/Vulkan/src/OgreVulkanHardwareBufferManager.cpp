@@ -46,26 +46,20 @@ namespace Ogre
     {
         {
             OGRE_LOCK_MUTEX( mVertexBuffersMutex );
-            VertexBufferList::const_iterator itor = mVertexBuffers.begin();
-            VertexBufferList::const_iterator end = mVertexBuffers.end();
 
-            while( itor != end )
+            for (auto *b : mVertexBuffers)
             {
-                auto hwBuffer = (*itor)->_getImpl<VulkanHardwareBuffer>();
+                auto hwBuffer = b->_getImpl<VulkanHardwareBuffer>();
                 hwBuffer->_notifyDeviceStalled();
-                ++itor;
             }
         }
         {
             OGRE_LOCK_MUTEX( mIndexBuffersMutex );
-            IndexBufferList::const_iterator itor = mIndexBuffers.begin();
-            IndexBufferList::const_iterator end = mIndexBuffers.end();
 
-            while( itor != end )
+            for (auto *b : mIndexBuffers)
             {
-                auto hwBuffer = (*itor)->_getImpl<VulkanHardwareBuffer>();
+                auto hwBuffer = b->_getImpl<VulkanHardwareBuffer>();
                 hwBuffer->_notifyDeviceStalled();
-                ++itor;
             }
         }
     }
