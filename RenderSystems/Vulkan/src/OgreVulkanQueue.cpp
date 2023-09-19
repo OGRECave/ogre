@@ -713,7 +713,7 @@ namespace Ogre
                 dstStage = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
 
 #if OGRE_DEBUG_MODE
-                for (const auto *b : mImageMemBarriers)
+                for (auto *b : mImageMemBarriers)
                 {
                     OgreAssert((b->getUsage() & TU_RENDERTARGET) == 0/*&& !( *itor )->isUav()*/,
                                         "endCopyEncoder says nothing will wait on this texture(s) but "
