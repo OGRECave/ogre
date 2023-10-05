@@ -40,36 +40,28 @@ namespace Ogre
     //-----------------------------------------------------------------------
     GLES2ManagedResourceManager::~GLES2ManagedResourceManager()
     {
-    
+
     }
     //-----------------------------------------------------------------------
     void GLES2ManagedResourceManager::notifyOnContextLost()
-    {               
-        ResourceContainerIterator it = mResources.begin();
-        while (it != mResources.end())
-        {
-            (*it)->notifyOnContextLost();
-            ++it;
-        }               
+    {
+        for (auto& r : mResources)
+            r->notifyOnContextLost();
     }
     //-----------------------------------------------------------------------
     void GLES2ManagedResourceManager::notifyOnContextReset()
     {
-        ResourceContainerIterator it = mResources.begin();
-        while (it != mResources.end())
-        {
-            (*it)->notifyOnContextReset();
-            ++it;
-        }   
+        for (auto& r : mResources)
+            r->notifyOnContextReset();
     }
     //-----------------------------------------------------------------------
     void GLES2ManagedResourceManager::_notifyResourceCreated(GLES2ManagedResource* pResource)
-    {           
+    {
         mResources.push_back(pResource);
     }
     //-----------------------------------------------------------------------
     void GLES2ManagedResourceManager::_notifyResourceDestroyed(GLES2ManagedResource* pResource)
-    {       
+    {
         ResourceContainerIterator it = std::find( mResources.begin(), mResources.end(), pResource );
         if(it != mResources.end())
             mResources.erase(it);

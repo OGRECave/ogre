@@ -48,8 +48,8 @@ namespace Ogre {
     void GL3PlusHardwareBufferManager::notifyContextDestroyed(GLContext* context)
     {
         OGRE_LOCK_MUTEX(mVertexDeclarationsMutex);
-        for(VertexDeclarationList::iterator it = mVertexDeclarations.begin(), it_end = mVertexDeclarations.end(); it != it_end; ++it)
-            static_cast<GLVertexArrayObject*>(*it)->notifyContextDestroyed(context);
+        for(auto& d : mVertexDeclarations)
+            static_cast<GLVertexArrayObject*>(d)->notifyContextDestroyed(context);
     }
 
     HardwareVertexBufferSharedPtr
