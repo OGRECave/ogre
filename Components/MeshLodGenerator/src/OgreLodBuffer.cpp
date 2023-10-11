@@ -74,13 +74,10 @@ namespace Ogre
             Vector3f* pOut = (Vector3f *)vertexBuffer->lock(HardwareBuffer::HBL_DISCARD);
             Vector3f* pEnd = pOut + vertexCount;
             for (; pOut < pEnd; pOut++) {
-                float* pFloat;
-                elemPos->baseVertexPointerToElement(vertex, &pFloat);
-                memcpy(pOut, pFloat, sizeof(Vector3f));
+                memcpy(pOut, vertex + elemPos->getOffset(), sizeof(Vector3f));
                 vertex += vSize;
                 if(useVertexNormals){
-                    elemNormal->baseVertexPointerToElement(vNormal, &pFloat);
-                    memcpy(pNormalOut, pFloat, sizeof(Vector3f));
+                    memcpy(pNormalOut, vNormal + elemNormal->getOffset(), sizeof(Vector3f));
                     pNormalOut++;
                     vNormal += vNormalSize;
                 }
