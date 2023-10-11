@@ -230,7 +230,7 @@ namespace Ogre {
         /** Get an iterator over all the animation states in this set.
         @deprecated use getAnimationStates()
         */
-        OGRE_DEPRECATED AnimationStateIterator getAnimationStateIterator(void);
+        AnimationStateIterator getAnimationStateIterator(void);
         /** Get an iterator over all the animation states in this set.
         @deprecated use getAnimationStates()
         */
