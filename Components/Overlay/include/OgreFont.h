@@ -307,15 +307,15 @@ namespace Ogre
          */
         void putText(BillboardSet* bbs, String text, float height, const ColourValue& colour = ColourValue::White);
 
-        /** Sets whether or not the colour of this font is antialiased as it is generated
+        /** Sets whether the colour of this font is multiplied with alpha as it is generated
             from a true type font.
 
             This is valid only for a FT_TRUETYPE font. If you are planning on using 
-            alpha blending to draw your font, then it is a good idea to set this to
+            alpha blending to draw your font, then set this to
             false (which is the default), otherwise the darkening of the font will combine
             with the fading out of the alpha around the edges and make your font look thinner
-            than it should. However, if you intend to blend your font using a colour blending
-            mode (add or modulate for example) then it's a good idea to set this to true, in
+            than it should. However, if you intend to use premultipled alpha or a colour blending
+            mode (add or modulate for example) then set this to true, in
             order to soften your font edges.
         */
         inline void setAntialiasColour(bool enabled)

@@ -303,7 +303,7 @@ namespace Ogre
         // Set up blending
         if (mTexture->hasAlpha())
         {
-            mMaterial->setSceneBlending( SBT_TRANSPARENT_ALPHA );
+            mMaterial->setSceneBlending(mAntialiasColour ? SBF_ONE : SBF_SOURCE_ALPHA, SBF_ONE_MINUS_SOURCE_ALPHA);
             mMaterial->getTechnique(0)->getPass(0)->setTransparentSortingEnabled(false);
         }
         else
