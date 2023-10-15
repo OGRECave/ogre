@@ -66,7 +66,7 @@ if (APPLE AND NOT ANDROID)
   add_definitions(-D__ASSERT_MACROS_DEFINE_VERSIONS_WITHOUT_UNDERSCORES=0)
 endif ()
 
-project(OGRE VERSION 14.1.0)
+project(OGRE VERSION 14.1.1)
 
 # extra version info
 set(OGRE_VERSION_SUFFIX "")
