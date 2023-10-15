@@ -125,7 +125,7 @@ namespace Ogre
     Font::Font(ResourceManager* creator, const String& name, ResourceHandle handle,
         const String& group, bool isManual, ManualResourceLoader* loader)
         :Resource (creator, name, handle, group, isManual, loader),
-        mType(FT_TRUETYPE), mTtfSize(0), mTtfResolution(0), mTtfMaxBearingY(0), mAntialiasColour(false)
+        mType(FT_TRUETYPE), mTtfSize(0), mTtfResolution(0), mTtfMaxBearingY(0), mAntialiasColour(true)
     {
 
         if (createParamDictionary("Font"))
