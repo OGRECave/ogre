@@ -104,6 +104,7 @@ void FontTranslator::parseAttribute(ScriptCompiler* compiler, FontPtr& pFont,
             return;
         }
         pFont->setAntialiasColour(flag);
+        compiler->addError(ScriptCompiler::CE_DEPRECATEDSYMBOL, prop->file, prop->line, attrib);
     }
     else if (attrib == "code_points")
     {
