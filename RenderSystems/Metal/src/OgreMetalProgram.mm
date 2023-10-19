@@ -84,6 +84,7 @@ namespace Ogre {
                                             PT_STRING),&msCmdShaderReflectionPairHint);
         }
         mTargetBufferName = "";
+        mEntryPoint = "mainfunc"; // 1.4.4: A Metal function cannot be called main.
     }
     //---------------------------------------------------------------------------
     MetalProgram::~MetalProgram()
@@ -284,6 +285,10 @@ namespace Ogre {
                              "MetalProgram::analyzeRenderParameters" );
             }
             shader->load();
+
+            if(shader->hasCompileError())
+                return;
+
             assert( dynamic_cast<MetalProgram*>( shader->_getBindingDelegate() ) );
             MetalProgram *vertexShader = static_cast<MetalProgram*>( shader->_getBindingDelegate() );
             autoFillDummyVertexAttributesForShader( vertexShader->getMetalFunction(), psd );
@@ -430,13 +435,11 @@ namespace Ogre {
 
         if( mType != GPT_COMPUTE_PROGRAM )
         {
-            //You think this is a code smell? How about making BUILDconstantDefinitions const???
-            //It's an oxymoron.
-            const_cast<MetalProgram*>(this)->analyzeRenderParameters();
+            analyzeRenderParameters();
         }
         else
         {
-            const_cast<MetalProgram*>(this)->analyzeComputeParameters();
+            analyzeComputeParameters();
         }
 
         mLogicalToPhysical.reset(); // disallow access by index for now
