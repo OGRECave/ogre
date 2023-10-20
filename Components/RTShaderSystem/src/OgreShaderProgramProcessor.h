@@ -63,13 +63,13 @@ public:
     @param programSet The program set container.
     Return true on success.
     */
-    virtual bool preCreateGpuPrograms(ProgramSet* programSet) = 0;
+    bool preCreateGpuPrograms(ProgramSet* programSet);
 
     /** Called after creation of the GPU programs.
     @param programSet The program set container.
     Return true on success.
     */
-    virtual bool postCreateGpuPrograms(ProgramSet* programSet) = 0;
+    bool postCreateGpuPrograms(ProgramSet* programSet);
  
 // Protected types.
 protected:
@@ -250,6 +250,7 @@ protected:
     /** Bind the auto parameters for a given CPU and GPU program set. */
     void bindAutoParameters(Program* pCpuProgram, GpuProgramPtr pGpuProgram);
 
+    void bindTextureSamplers(Program* pCpuProgram, GpuProgramPtr pGpuProgram);
 protected:
     // Merging combinations defs.
     MergeCombinationList mParamMergeCombinations;

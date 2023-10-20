@@ -45,6 +45,34 @@ ProgramProcessor::~ProgramProcessor()
 }
 
 //-----------------------------------------------------------------------------
+bool ProgramProcessor::preCreateGpuPrograms(ProgramSet* programSet)
+{
+    Program* vsProgram = programSet->getCpuProgram(GPT_VERTEX_PROGRAM);
+    Program* fsProgram = programSet->getCpuProgram(GPT_FRAGMENT_PROGRAM);
+    Function* vsMain   = vsProgram->getEntryPointFunction();
+    Function* fsMain   = fsProgram->getEntryPointFunction();
+
+    // Compact vertex shader outputs.
+    return compactVsOutputs(vsMain, fsMain);
+}
+
+
+bool ProgramProcessor::postCreateGpuPrograms(ProgramSet* programSet)
+{
+    // Bind vertex auto parameters.
+    for(auto type : {GPT_VERTEX_PROGRAM, GPT_FRAGMENT_PROGRAM})
+        bindAutoParameters(programSet->getCpuProgram(type), programSet->getGpuProgram(type));
+
+    if(ShaderGenerator::getSingleton().getTargetLanguage().find("glsl") == String::npos)
+        return true;
+
+    for(auto type : {GPT_VERTEX_PROGRAM, GPT_FRAGMENT_PROGRAM})
+        bindTextureSamplers(programSet->getCpuProgram(type), programSet->getGpuProgram(type));
+
+    return true;
+}
+
+//-----------------------------------------------------------------------------
 void ProgramProcessor::bindAutoParameters(Program* pCpuProgram, GpuProgramPtr pGpuProgram)
 {
     GpuProgramParametersSharedPtr pGpuParams = pGpuProgram->getDefaultParameters();
@@ -95,6 +123,25 @@ void ProgramProcessor::bindAutoParameters(Program* pCpuProgram, GpuProgramPtr pG
                     }
                 }
             }
+        }
+    }
+}
+
+void ProgramProcessor::bindTextureSamplers(Program* pCpuProgram, GpuProgramPtr pGpuProgram)
+{
+    if (StringConverter::parseBool(pGpuProgram->getParameter("has_sampler_binding")))
+        return;
+
+    GpuProgramParametersSharedPtr pGpuParams = pGpuProgram->getDefaultParameters();
+
+    // Bind the samplers.
+    for (const auto& pCurParam : pCpuProgram->getParameters())
+    {
+        if (pCurParam->isSampler() && pCurParam->isUsed())
+        {
+            // The optimizer may remove some unnecessary parameters, so we should ignore them
+            pGpuParams->setIgnoreMissingParams(true);
+            pGpuParams->setNamedConstant(pCurParam->getName(), pCurParam->getIndex());
         }
     }
 }
