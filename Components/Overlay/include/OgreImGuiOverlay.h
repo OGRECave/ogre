@@ -13,16 +13,28 @@
 
 namespace Ogre
 {
+///Ogre's integrated support for [Dear ImGui](https://github.com/ocornut/imgui)
 class _OgreOverlayExport ImGuiOverlay : public Overlay
 {
 public:
     ImGuiOverlay();
     ~ImGuiOverlay();
 
-    /// add font from ogre .fontdef file
-    /// must be called before first show()
+    /// add font from ogre .fontdef file.
+    /// Must be called before first show()
+    /// for the new font to be used.
     ImFont* addFont(const String& name, const String& group OGRE_RESOURCE_GROUP_INIT);
 
+    /// generally should be called before every frame, 
+    /// before you render things with ImGui
+    /// for example, at the start of a RenderTargetListener::preViewportUpdate
+    ///
+    /// Must be called before the first frame
+    /// with a visible ImGuiOverlay is rendered
+    /// or else ImgGUI will SegFault.
+    ///
+    /// Must be called before many ImgGUI functions
+    /// or else they will SegFault.
     static void NewFrame();
 
     void _findVisibleObjects(Camera* cam, RenderQueue* queue, Viewport* vp) override;
