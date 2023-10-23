@@ -25,7 +25,7 @@ public:
     /// for the new font to be used.
     ImFont* addFont(const String& name, const String& group OGRE_RESOURCE_GROUP_INIT);
 
-    /// generally should be called before every frame, 
+    /// generally should be called before every frame,
     /// before you render things with ImGui
     /// for example, at the start of a RenderTargetListener::preViewportUpdate
     ///
