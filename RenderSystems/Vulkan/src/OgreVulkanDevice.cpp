@@ -73,14 +73,8 @@ namespace Ogre
     //-------------------------------------------------------------------------
     void VulkanDevice::destroyQueues( FastArray<VulkanQueue> &queueArray )
     {
-        FastArray<VulkanQueue>::iterator itor = queueArray.begin();
-        FastArray<VulkanQueue>::iterator endt = queueArray.end();
-
-        while( itor != endt )
-        {
-            itor->destroy();
-            ++itor;
-        }
+        for (auto& q : queueArray)
+            q.destroy();
         queueArray.clear();
     }
     //-------------------------------------------------------------------------
@@ -304,24 +298,16 @@ namespace Ogre
         vkGetDeviceQueue( mDevice, mGraphicsQueue.mFamilyIdx, mGraphicsQueue.mQueueIdx, &queue );
         mGraphicsQueue.init( mDevice, queue, mRenderSystem );
 
-        FastArray<VulkanQueue>::iterator itor = mComputeQueues.begin();
-        FastArray<VulkanQueue>::iterator endt = mComputeQueues.end();
-
-        while( itor != endt )
+        for (auto& q : mComputeQueues)
         {
-            vkGetDeviceQueue( mDevice, itor->mFamilyIdx, itor->mQueueIdx, &queue );
-            itor->init( mDevice, queue, mRenderSystem );
-            ++itor;
+            vkGetDeviceQueue( mDevice, q.mFamilyIdx, q.mQueueIdx, &queue);
+            q.init(mDevice, queue, mRenderSystem);
         }
 
-        itor = mTransferQueues.begin();
-        endt = mTransferQueues.end();
-
-        while( itor != endt )
+        for (auto& q : mTransferQueues)
         {
-            vkGetDeviceQueue( mDevice, itor->mFamilyIdx, itor->mQueueIdx, &queue );
-            itor->init( mDevice, queue, mRenderSystem );
-            ++itor;
+            vkGetDeviceQueue(mDevice, q.mFamilyIdx, q.mQueueIdx, &queue);
+            q.init(mDevice, queue, mRenderSystem);
         }
 
         TODO_findRealPresentQueue;
