@@ -342,14 +342,6 @@ void GLSLProgramWriter::writeOutParameters(std::ostream& os, Function* function,
             else
             {
                 os << "OUT(";
-
-                // In the vertex and fragment program the variable names must match.
-                // Unfortunately now the input params are prefixed with an 'i' and output params with 'o'.
-                // Thats why we rename the params which are used in function atoms
-                String paramName = p->getName();
-                paramName[0] = 'i';
-                p->_rename(paramName);
-
                 writeParameter(os, p);
                 os << ", " << vsOutLocation++ << ")\n";
             }

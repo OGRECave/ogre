@@ -106,12 +106,12 @@ protected:
         int getUsedFloatCount();
         
         /** Return the destination parameter. */
-        ParameterPtr getDestinationParameter(int usage, int index);
+        ParameterPtr getDestinationParameter(int index);
 
     protected:
     
         /** Creates the destination parameter by a given class and index. */
-        void createDestinationParameter(int usage, int index);
+        void createDestinationParameter(int index);
 
 
     protected:
