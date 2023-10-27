@@ -150,18 +150,6 @@ private:
         const String& language,
         const String& profiles,
         const String& cachePath);
-
-    /** 
-    Add program processor instance to this manager.
-    @param processor The instance to add.
-    */
-    void addProgramProcessor(const String& lang, ProgramProcessor* processor);
-
-    /** 
-    Remove program processor instance from this manager. 
-    @param processor The instance to remove.
-    */
-    void removeProgramProcessor(const String& lang);
     
     /** Return the number of created shaders. */
     size_t getShaderCount(GpuProgramType type) const;
