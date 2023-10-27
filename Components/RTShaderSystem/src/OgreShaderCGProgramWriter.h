@@ -81,9 +81,6 @@ protected:
     /** Initialize string maps. */
     void initializeStringMaps();
 
-    /** Write the program dependencies. */
-    virtual void writeProgramDependencies(std::ostream& os, Program* program);
-
     /** Write a function parameter. */
     void writeFunctionParameter(std::ostream& os, ParameterPtr parameter);
 

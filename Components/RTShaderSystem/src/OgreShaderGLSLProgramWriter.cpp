@@ -233,19 +233,6 @@ void GLSLProgramWriter::writeMainSourceCode(std::ostream& os, Program* program)
 }
 
 //-----------------------------------------------------------------------
-void GLSLProgramWriter::writeProgramDependencies(std::ostream& os, Program* program)
-{
-    os << "//-----------------------------------------------------------------------------" << std::endl;
-    os << "//                         PROGRAM DEPENDENCIES" << std::endl;
-    os << "//-----------------------------------------------------------------------------" << std::endl;
-    os << "#include <OgreUnifiedShader.h>" << std::endl;
-
-    for (unsigned int i=0; i < program->getDependencyCount(); ++i)
-    {
-        os << "#include \"" << program->getDependency(i) << ".glsl\"" << std::endl;
-    }
-}
-//-----------------------------------------------------------------------
 void GLSLProgramWriter::writeInputParameters(std::ostream& os, Function* function, GpuProgramType gpuType)
 {
     const ShaderParameterList& inParams = function->getInputParameters();

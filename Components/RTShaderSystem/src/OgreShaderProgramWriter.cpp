@@ -164,5 +164,20 @@ void ProgramWriter::redirectGlobalWrites(std::ostream& os, FunctionAtom* func, c
         }
     }
 }
+
+//-----------------------------------------------------------------------
+void ProgramWriter::writeProgramDependencies(std::ostream& os, Program* program)
+{
+    os << "//-----------------------------------------------------------------------------" << std::endl;
+    os << "//                         PROGRAM DEPENDENCIES" << std::endl;
+    os << "//-----------------------------------------------------------------------------" << std::endl;
+    os << "#include <OgreUnifiedShader.h>" << std::endl;
+
+    for (unsigned int i=0; i < program->getDependencyCount(); ++i)
+    {
+        os << "#include \"" << program->getDependency(i) << ".glsl\"" << std::endl;
+    }
+}
+
 }
 }

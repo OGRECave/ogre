@@ -80,9 +80,6 @@ protected:
     /** Initialize string maps. */
     void initializeStringMaps();
 
-    /** Write the program dependencies. */
-    void writeProgramDependencies(std::ostream& os, Program* program);
-
     /** Write the input params of the function */
     void writeInputParameters(std::ostream& os, Function* function, GpuProgramType gpuType);
     
