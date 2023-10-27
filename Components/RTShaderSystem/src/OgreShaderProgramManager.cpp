@@ -257,11 +257,6 @@ String ProgramManager::generateHash(const String& programString, const String& d
     return StringUtil::format("%08x%08x%08x%08x", hash[0], hash[1], hash[2], hash[3]);
 }
 
-
-//-----------------------------------------------------------------------------
-void ProgramManager::addProgramProcessor(const String& lang, ProgramProcessor* processor) {}
-void ProgramManager::removeProgramProcessor(const String& lang) {}
-
 //-----------------------------------------------------------------------
 void ProgramManager::matchVStoPSInterface( ProgramSet* programSet )
 {
