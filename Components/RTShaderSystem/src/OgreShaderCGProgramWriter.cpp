@@ -132,28 +132,6 @@ void CGProgramWriter::writeSourceCode(std::ostream& os, Program* program)
     os << std::endl;
 }
 
-
-//-----------------------------------------------------------------------
-void CGProgramWriter::writeProgramDependencies(std::ostream& os, Program* program)
-{
-    os << "//-----------------------------------------------------------------------------" << std::endl;
-    os << "//                         PROGRAM DEPENDENCIES" << std::endl;
-    os << "//-----------------------------------------------------------------------------" << std::endl;
-
-    os << "#include <OgreUnifiedShader.h>" << std::endl;
-
-    const auto& rgm = ResourceGroupManager::getSingleton();
-
-    for (unsigned int i=0; i < program->getDependencyCount(); ++i)
-    {
-        String curDependency = program->getDependency(i) + ".cg";
-        if (!rgm.resourceExistsInAnyGroup(curDependency))
-            curDependency = program->getDependency(i) + ".glsl"; // fall back to glsl extension
-
-        os << "#include \"" << curDependency << '\"' << std::endl;
-    }
-}
-
 //-----------------------------------------------------------------------
 void CGProgramWriter::writeFunctionParameter(std::ostream& os, ParameterPtr parameter)
 {
