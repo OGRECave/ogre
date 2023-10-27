@@ -159,6 +159,8 @@ void FunctionStageRef::callBuiltin(const char* name, const std::vector<Operand>&
 }
 
 //-----------------------------------------------------------------------------
+Function::Function(GpuProgramType type) : mType(type) {}
+
 Function::~Function()
 {
     for(const auto& j : mAtomInstances)
@@ -270,11 +272,12 @@ ParameterPtr Function::resolveInputParameter(Parameter::Semantic semantic,
         }
     }
 
+    const char* prefix = mType == GPT_VERTEX_PROGRAM ? "i" : "vs";
 
     // No parameter found -> create new one.
     OgreAssert(semantic != Parameter::SPS_UNKNOWN, "unknown semantic");
     param =
-        std::make_shared<Parameter>(type, getParameterName("i", semantic, index), semantic, index, content);
+        std::make_shared<Parameter>(type, getParameterName(prefix, semantic, index), semantic, index, content);
     addInputParameter(param);
 
     return param;
@@ -330,6 +333,7 @@ ParameterPtr Function::resolveOutputParameter(Parameter::Semantic semantic,
         }
     }
 
+    const char* prefix = mType == GPT_VERTEX_PROGRAM ? "vs" : "o";
 
     // No parameter found -> create new one.
     switch (semantic)
@@ -337,7 +341,7 @@ ParameterPtr Function::resolveOutputParameter(Parameter::Semantic semantic,
     case Parameter::SPS_TEXTURE_COORDINATES:
     case Parameter::SPS_COLOR:
     case Parameter::SPS_POSITION:
-        param = std::make_shared<Parameter>(type, getParameterName("o", semantic, index), semantic, index,
+        param = std::make_shared<Parameter>(type, getParameterName(prefix, semantic, index), semantic, index,
                                             content);
         break;
 

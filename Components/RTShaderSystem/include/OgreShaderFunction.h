@@ -255,6 +255,8 @@ public:
     /** Delete all output parameters from this function. */
     void deleteAllOutputParameters();
 
+    explicit Function(GpuProgramType type = GPT_VERTEX_PROGRAM);
+
 private:
 
     static ParameterPtr _getParameterByName(const ShaderParameterList& parameterList, const String& name);
@@ -279,7 +281,9 @@ private:
     // Atom instances composing this function.
     std::map<size_t, FunctionAtomInstanceList> mAtomInstances;
     FunctionAtomInstanceList mSortedAtomInstances;
-private:
+
+    GpuProgramType mType;
+
     friend class Program;
 };
 

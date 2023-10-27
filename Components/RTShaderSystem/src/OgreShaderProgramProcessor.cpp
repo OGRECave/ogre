@@ -626,11 +626,11 @@ void ProgramProcessor::rebuildParameterList(Function* func, int paramsUsage, Mer
 
         if (paramsUsage == Operand::OPS_OUT)
         {
-            func->addOutputParameter(curMergeParameter.getDestinationParameter(paramsUsage, i));
+            func->addOutputParameter(curMergeParameter.getDestinationParameter(i));
         }
         else if (paramsUsage == Operand::OPS_IN)
         {
-            func->addInputParameter(curMergeParameter.getDestinationParameter(paramsUsage, i));
+            func->addInputParameter(curMergeParameter.getDestinationParameter(i));
         }
     }
 }
@@ -671,14 +671,14 @@ void ProgramProcessor::generateLocalSplitParameters(Function* func, GpuProgramTy
                     FunctionAtom* curFuncInvocation = OGRE_NEW AssignmentAtom(FFP_VS_POST_PROCESS);
 
                     curFuncInvocation->pushOperand(itFind->second, Operand::OPS_IN, curMergeParameter.getSourceParameterMask(p));
-                    curFuncInvocation->pushOperand(curMergeParameter.getDestinationParameter(Operand::OPS_OUT, i), Operand::OPS_OUT, curMergeParameter.getDestinationParameterMask(p));
+                    curFuncInvocation->pushOperand(curMergeParameter.getDestinationParameter(i), Operand::OPS_OUT, curMergeParameter.getDestinationParameterMask(p));
                     func->addAtomInstance(curFuncInvocation);
                 }
                 else if (progType == GPT_FRAGMENT_PROGRAM)
                 {
                     FunctionAtom* curFuncInvocation = OGRE_NEW AssignmentAtom(FFP_PS_PRE_PROCESS);
 
-                    curFuncInvocation->pushOperand(curMergeParameter.getDestinationParameter(Operand::OPS_IN, i), Operand::OPS_IN, curMergeParameter.getDestinationParameterMask(p));
+                    curFuncInvocation->pushOperand(curMergeParameter.getDestinationParameter(i), Operand::OPS_IN, curMergeParameter.getDestinationParameterMask(p));
                     curFuncInvocation->pushOperand(itFind->second, Operand::OPS_OUT, curMergeParameter.getSourceParameterMask(p));
                     func->addAtomInstance(curFuncInvocation);
                 }
@@ -740,7 +740,7 @@ void ProgramProcessor::replaceParametersReferences(MergeParameterList& mergedPar
                 // Case the source parameter is fully contained within the destination merged parameter.
                 if (curMergeParameter.getSourceParameterMask(j) == Operand::OPM_ALL)
                 {
-                    dstParameter = curMergeParameter.getDestinationParameter(Operand::OPS_INOUT, i);
+                    dstParameter = curMergeParameter.getDestinationParameter(i);
 
                     for (auto srcOperandPtr : srcParamRefs)
                     {
@@ -952,7 +952,13 @@ int ProgramProcessor::MergeParameter::getUsedFloatCount()
 }
 
 //-----------------------------------------------------------------------------
-void ProgramProcessor::MergeParameter::createDestinationParameter(int usage, int index)
+static ParameterPtr createTexcoordParam(GpuConstantType type, int index)
+{
+    return std::make_shared<Parameter>(type, StringUtil::format("vsTexcoord_%d", index),
+                                       Parameter::SPS_TEXTURE_COORDINATES, index, Parameter::SPC_UNKNOWN);
+}
+
+void ProgramProcessor::MergeParameter::createDestinationParameter(int index)
 {
     GpuConstantType dstParamType = GCT_UNKNOWN;
 
@@ -976,22 +982,14 @@ void ProgramProcessor::MergeParameter::createDestinationParameter(int usage, int
 
     }
 
-
-    if (usage == Operand::OPS_IN)
-    {
-        mDstParameter = ParameterFactory::createInTexcoord(dstParamType, index, Parameter::SPC_UNKNOWN);
-    }
-    else if (usage == Operand::OPS_OUT)
-    {
-        mDstParameter = ParameterFactory::createOutTexcoord(dstParamType, index, Parameter::SPC_UNKNOWN);
-    }
+    mDstParameter = createTexcoordParam(dstParamType, index);
 }
 
 //-----------------------------------------------------------------------------
-Ogre::RTShader::ParameterPtr ProgramProcessor::MergeParameter::getDestinationParameter(int usage, int index)
+Ogre::RTShader::ParameterPtr ProgramProcessor::MergeParameter::getDestinationParameter(int index)
 {
     if (!mDstParameter)
-        createDestinationParameter(usage, index);
+        createDestinationParameter(index);
 
     return mDstParameter;
 }
