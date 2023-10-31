@@ -868,8 +868,9 @@ SHARED_PTR(Mesh);
 %ignore Ogre::Viewport::getActualDimensions(int&, int& ,int& ,int&) const;
 %include "OgreViewport.h"
 %ignore Ogre::CompositorChain::getNumCompositors;
-%ignore Ogre::CompositorChain::getCompositor;
+%ignore Ogre::CompositorChain::getCompositor(size_t) const;
 %ignore Ogre::CompositorChain::getCompositors;
+%template(CompositorInstanceList) std::vector<Ogre::CompositorInstance*>;
 %include "OgreCompositorChain.h"
 %ignore Ogre::RenderQueueGroup::getIterator;
 %include "OgreRenderQueueSortingGrouping.h"
