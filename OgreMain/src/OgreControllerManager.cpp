@@ -61,7 +61,7 @@ namespace Ogre {
     {
         ControllerFloat* c = OGRE_NEW ControllerFloat(src, dest, func);
 
-        mControllers.insert(c);
+        mControllers.push_back(c);
         return c;
     }
     //-----------------------------------------------------------------------
@@ -206,10 +206,11 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void ControllerManager::destroyController(ControllerFloat* controller)
     {
-        ControllerList::iterator i = mControllers.find(controller);
+        ControllerList::iterator i = std::find(mControllers.begin(), mControllers.end(), controller);
         if (i != mControllers.end())
         {
-            mControllers.erase(i);
+            std::swap(*i, mControllers.back());
+            mControllers.pop_back();
             OGRE_DELETE controller;
         }
     }
