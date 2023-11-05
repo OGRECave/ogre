@@ -56,7 +56,7 @@ namespace Ogre {
     class _OgreExport ControllerManager : public Singleton<ControllerManager>, public ControllerAlloc
     {
     private:
-        typedef std::set<ControllerFloat*> ControllerList;
+        typedef std::vector<ControllerFloat*> ControllerList;
         ControllerList mControllers;
 
         /// Global predefined controller
