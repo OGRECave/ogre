@@ -137,7 +137,7 @@ TEST_F(SceneNodeTest, detachAllObjects){
     EXPECT_EQ(child->numAttachedObjects(), 1);
 }
 
-TEST_F(SceneNodeTest, destroyGraphSegment)
+TEST_F(SceneNodeTest, destroyAllChildrenAndObjects)
 {
 	auto sinbad = mSceneMgr->createEntity("sinbad", "Sinbad.mesh");
 	SceneNode* node = mSceneMgr->getRootSceneNode()->createChildSceneNode("parent");
@@ -151,7 +151,7 @@ TEST_F(SceneNodeTest, destroyGraphSegment)
 	SceneNode* grandchild = node->createChildSceneNode("grandchild");
     grandchild->attachObject(sinbad3);
 
-    node->destroyGraphSegment();
+    node->destroyAllChildrenAndObjects();
     EXPECT_FALSE(mSceneMgr->hasSceneNode("grandchild"));
     EXPECT_FALSE(mSceneMgr->hasEntity("sinbad3"));
     EXPECT_FALSE(mSceneMgr->hasSceneNode("child"));
@@ -160,7 +160,7 @@ TEST_F(SceneNodeTest, destroyGraphSegment)
     EXPECT_TRUE(mSceneMgr->hasSceneNode("parent"));
 }
 
-TEST_F(SceneNodeTest, destroyChildGraphSegment)
+TEST_F(SceneNodeTest, destroyChildAndObjects)
 {
 
 	auto sinbad = mSceneMgr->createEntity("sinbad", "Sinbad.mesh");
@@ -175,7 +175,8 @@ TEST_F(SceneNodeTest, destroyChildGraphSegment)
 	SceneNode* grandchild = child->createChildSceneNode("grandchild");
     grandchild->attachObject(sinbad3);
 
-    node->destroyChildGraphSegment("child");
+    node->destroyChildAndObjects("child");
+
     EXPECT_FALSE(mSceneMgr->hasSceneNode("grandchild"));
     EXPECT_FALSE(mSceneMgr->hasSceneNode("child"));
     EXPECT_TRUE(mSceneMgr->hasSceneNode("parent"));

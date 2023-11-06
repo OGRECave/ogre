@@ -196,8 +196,8 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void SceneNode::destroyAllObjects(void)
     {
-        while (getAttachedObjects().size() > 0) {
-            auto obj = getAttachedObjects()[0];
+        while (getAttachedObjects().empty() {
+            auto obj = getAttachedObjects().front();
             getCreator()->destroyMovableObject(obj);
         }
         needUpdate();
