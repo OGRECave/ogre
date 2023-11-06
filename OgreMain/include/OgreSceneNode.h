@@ -281,11 +281,11 @@ namespace Ogre {
          *
          * Does **not** destroy animation, textures, meshes associated with those movable objects
          * */
-        void destroyChildGraphSegment(const String& name);
+        void destroyChildAndObjects(const String& name);
         ///@overload
-        void destroyChildGraphSegment(unsigned short index);
+        void destroyChildAndObjects(unsigned short index);
         ///@overload
-        void destroyChildGraphSegment(SceneNode * child);
+        void destroyChildAndObjects(SceneNode * child);
 
         /** Destroys everything attatched to or decended from this node
          * @par
@@ -299,7 +299,7 @@ namespace Ogre {
          * Does **not** destroy animations, textures, meshes associated with those movable objects
          * Does not destroy the node itself
          * */
-        void destroyGraphSegment();
+        void destroyAllChildrenAndObjects();
 
         /**
          * Load a scene from a file as children of this node

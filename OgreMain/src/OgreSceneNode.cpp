@@ -196,7 +196,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void SceneNode::destroyAllObjects(void)
     {
-        while (getAttachedObjects().empty() {
+        while (!getAttachedObjects().empty()) {
             auto obj = getAttachedObjects().front();
             getCreator()->destroyMovableObject(obj);
         }
@@ -287,20 +287,18 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void SceneNode::removeAndDestroyChild(const String& name)
     {
-        SceneNode* pChild = static_cast<SceneNode*>(getChild(name));
+        SceneNode* pChild = static_cast<SceneNode*>(removeChild(name));
         pChild->removeAndDestroyAllChildren();
 
-        removeChild(name);
         pChild->getCreator()->destroySceneNode(name);
 
     }
     //-----------------------------------------------------------------------
     void SceneNode::removeAndDestroyChild(unsigned short index)
     {
-        SceneNode* pChild = static_cast<SceneNode*>(getChildren()[index]);
+        SceneNode* pChild = static_cast<SceneNode*>(removeChild(index));
         pChild->removeAndDestroyAllChildren();
 
-        removeChild(index);
         pChild->getCreator()->destroySceneNode(pChild);
     }
     //-----------------------------------------------------------------------
@@ -325,31 +323,30 @@ namespace Ogre {
         needUpdate();
     }
     //-----------------------------------------------------------------------
-    void SceneNode::destroyChildGraphSegment(const String& name) {
+    void SceneNode::destroyChildAndObjects(const String& name) {
         SceneNode* pChild = static_cast<SceneNode*>(getChild(name));
-        pChild->destroyGraphSegment();
+        pChild->destroyAllChildrenAndObjects();
 
         removeChild(name);
         pChild->getCreator()->destroySceneNode(name);
 
     }
 
-    void SceneNode::destroyChildGraphSegment(unsigned short index) {
-        SceneNode* pChild = static_cast<SceneNode*>(getChildren()[index]);
-        pChild->destroyGraphSegment();
+    void SceneNode::destroyChildAndObjects(unsigned short index) {
+        SceneNode* pChild = static_cast<SceneNode*>(removeChild(index));
+        pChild->destroyAllChildrenAndObjects();
 
-        removeChild(index);
         pChild->getCreator()->destroySceneNode(pChild);
     }
 
-    void SceneNode::destroyChildGraphSegment(SceneNode * child)
+    void SceneNode::destroyChildAndObjects(SceneNode * child)
     {
         auto it = std::find(getChildren().begin(), getChildren().end(), child);
         OgreAssert(it != getChildren().end(), "Not a child of this SceneNode");
-        destroyChildGraphSegment(it - getChildren().begin());
+        destroyChildAndObjects(it - getChildren().begin());
     }
 
-    void SceneNode::destroyGraphSegment()
+    void SceneNode::destroyAllChildrenAndObjects()
     {
         //remove objects directly attached to this node
         destroyAllObjects();
@@ -358,7 +355,7 @@ namespace Ogre {
         while(!getChildren().empty()) {
             SceneNode* child = static_cast<SceneNode*>(getChildren().front());
             //recurse
-            child->destroyGraphSegment();
+            child->destroyAllChildrenAndObjects();
 
             //destroy child
             child->getCreator()->destroySceneNode(child);
