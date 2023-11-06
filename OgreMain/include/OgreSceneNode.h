@@ -162,6 +162,12 @@ namespace Ogre {
         */
         virtual void detachAllObjects(void);
 
+        /** Detaches and destroys all objects attached to this node.
+         *
+         * Does not destroy objects attached to children of this node
+        */
+        void destroyAllObjects(void);
+
         /** Determines whether this node is in the scene graph, i.e.
             whether it's ultimate ancestor is the root scene node.
         */
@@ -269,6 +275,31 @@ namespace Ogre {
             node will be detached but will not be destroyed.
         */
         void removeAndDestroyAllChildren(void);
+
+        /** Removes and destroys the child and all movable objects attached to the child,
+         * and does the same to any children of that child node.
+         *
+         * Does **not** destroy animation, textures, meshes associated with those movable objects
+         * */
+        void destroyChildGraphSegment(const String& name);
+        ///@overload
+        void destroyChildGraphSegment(unsigned short index);
+        ///@overload
+        void destroyChildGraphSegment(SceneNode * child);
+
+        /** Destroys everything attatched to or decended from this node
+         * @par
+         * Detaches and destroys all objects attached to this node or
+         * its children.
+         * Removes and destroys all the children of this node 
+         * @par
+         * Use this method to complete destroy a node, for example,
+         * if you want to recreate its render tree from scratch.  
+         * @par
+         * Does **not** destroy animations, textures, meshes associated with those movable objects
+         * Does not destroy the node itself
+         * */
+        void destroyGraphSegment();
 
         /**
          * Load a scene from a file as children of this node

@@ -194,6 +194,14 @@ namespace Ogre {
         needUpdate();
     }
     //-----------------------------------------------------------------------
+    void SceneNode::destroyAllObjects(void)
+    { 
+        for (auto obj : getAttachedObjects()) {
+            getCreator()->destroyMovableObject(obj);
+        }
+        needUpdate();
+    }
+    //-----------------------------------------------------------------------
     void SceneNode::_updateBounds(void)
     {
         // Reset bounds first
@@ -315,6 +323,51 @@ namespace Ogre {
         mChildren.clear();
         needUpdate();
     }
+    //-----------------------------------------------------------------------
+    void SceneNode::destroyChildGraphSegment(const String& name) {
+        SceneNode* pChild = static_cast<SceneNode*>(getChild(name));
+        pChild->destroyGraphSegment();
+
+        removeChild(name);
+        pChild->getCreator()->destroySceneNode(name);
+
+    }
+
+    void SceneNode::destroyChildGraphSegment(unsigned short index) {
+        SceneNode* pChild = static_cast<SceneNode*>(getChildren()[index]);
+        pChild->destroyGraphSegment();
+
+        removeChild(index);
+        pChild->getCreator()->destroySceneNode(pChild);
+    }
+
+    void SceneNode::destroyChildGraphSegment(SceneNode * child)
+    {
+        auto it = std::find(getChildren().begin(), getChildren().end(), child);
+        OgreAssert(it != getChildren().end(), "Not a child of this SceneNode");
+        destroyChildGraphSegment(it - getChildren().begin());
+        
+    }
+    void SceneNode::destroyGraphSegment()
+    {
+        //remove objects directly attached to this node
+        destroyAllObjects();
+
+        //go over children
+        while(!getChildren().empty()) {
+            SceneNode* child = static_cast<SceneNode*>(getChildren().front());
+            //destroy all objects attached to the child
+            child->destroyAllObjects();
+            //recurse
+            child->destroyGraphSegment();
+
+            //destroy child
+            child->getCreator()->destroySceneNode(child);
+        }
+        mChildren.clear();
+        needUpdate();
+    }
+    //-----------------------------------------------------------------------
     void SceneNode::loadChildren(const String& filename)
     {
         String baseName, strExt;
