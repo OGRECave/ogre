@@ -255,7 +255,7 @@ namespace Ogre {
             node but does not destroy it, this method destroys the child
             and all of it's children. 
         @par
-            Use this if you wish to recursively destroy a node as well as 
+            Use this if you wish to recursively destroy a node as well as
             detaching it from it's parent. Note that any objects attached to
             the nodes will be detached but will not themselves be destroyed.
         */
@@ -291,10 +291,10 @@ namespace Ogre {
          * @par
          * Detaches and destroys all objects attached to this node or
          * its children.
-         * Removes and destroys all the children of this node 
+         * Removes and destroys all the children of this node
          * @par
          * Use this method to complete destroy a node, for example,
-         * if you want to recreate its render tree from scratch.  
+         * if you want to recreate its render tree from scratch. 
          * @par
          * Does **not** destroy animations, textures, meshes associated with those movable objects
          * Does not destroy the node itself

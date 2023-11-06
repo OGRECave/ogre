@@ -195,7 +195,7 @@ namespace Ogre {
     }
     //-----------------------------------------------------------------------
     void SceneNode::destroyAllObjects(void)
-    { 
+    {
         while (getAttachedObjects().size() > 0) {
             auto obj = getAttachedObjects()[0];
             getCreator()->destroyMovableObject(obj);
@@ -347,8 +347,8 @@ namespace Ogre {
         auto it = std::find(getChildren().begin(), getChildren().end(), child);
         OgreAssert(it != getChildren().end(), "Not a child of this SceneNode");
         destroyChildGraphSegment(it - getChildren().begin());
-        
     }
+
     void SceneNode::destroyGraphSegment()
     {
         //remove objects directly attached to this node
