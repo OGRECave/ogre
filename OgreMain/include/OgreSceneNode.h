@@ -294,7 +294,7 @@ namespace Ogre {
          * Removes and destroys all the children of this node
          * @par
          * Use this method to complete destroy a node, for example,
-         * if you want to recreate its render tree from scratch. 
+         * if you want to recreate its render tree from scratch.
          * @par
          * Does **not** destroy animations, textures, meshes associated with those movable objects
          * Does not destroy the node itself
