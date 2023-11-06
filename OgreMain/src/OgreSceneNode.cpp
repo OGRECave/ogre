@@ -356,8 +356,6 @@ namespace Ogre {
         //go over children
         while(!getChildren().empty()) {
             SceneNode* child = static_cast<SceneNode*>(getChildren().front());
-            //destroy all objects attached to the child
-            child->destroyAllObjects();
             //recurse
             child->destroyGraphSegment();
 
