@@ -194,6 +194,15 @@ namespace Ogre {
         needUpdate();
     }
     //-----------------------------------------------------------------------
+    void SceneNode::destroyAllObjects(void)
+    {
+        while (!getAttachedObjects().empty()) {
+            auto obj = getAttachedObjects().front();
+            getCreator()->destroyMovableObject(obj);
+        }
+        needUpdate();
+    }
+    //-----------------------------------------------------------------------
     void SceneNode::_updateBounds(void)
     {
         // Reset bounds first
@@ -278,20 +287,18 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void SceneNode::removeAndDestroyChild(const String& name)
     {
-        SceneNode* pChild = static_cast<SceneNode*>(getChild(name));
+        SceneNode* pChild = static_cast<SceneNode*>(removeChild(name));
         pChild->removeAndDestroyAllChildren();
 
-        removeChild(name);
         pChild->getCreator()->destroySceneNode(name);
 
     }
     //-----------------------------------------------------------------------
     void SceneNode::removeAndDestroyChild(unsigned short index)
     {
-        SceneNode* pChild = static_cast<SceneNode*>(getChildren()[index]);
+        SceneNode* pChild = static_cast<SceneNode*>(removeChild(index));
         pChild->removeAndDestroyAllChildren();
 
-        removeChild(index);
         pChild->getCreator()->destroySceneNode(pChild);
     }
     //-----------------------------------------------------------------------
@@ -315,6 +322,48 @@ namespace Ogre {
         mChildren.clear();
         needUpdate();
     }
+    //-----------------------------------------------------------------------
+    void SceneNode::destroyChildAndObjects(const String& name) {
+        SceneNode* pChild = static_cast<SceneNode*>(getChild(name));
+        pChild->destroyAllChildrenAndObjects();
+
+        removeChild(name);
+        pChild->getCreator()->destroySceneNode(name);
+
+    }
+
+    void SceneNode::destroyChildAndObjects(unsigned short index) {
+        SceneNode* pChild = static_cast<SceneNode*>(removeChild(index));
+        pChild->destroyAllChildrenAndObjects();
+
+        pChild->getCreator()->destroySceneNode(pChild);
+    }
+
+    void SceneNode::destroyChildAndObjects(SceneNode * child)
+    {
+        auto it = std::find(getChildren().begin(), getChildren().end(), child);
+        OgreAssert(it != getChildren().end(), "Not a child of this SceneNode");
+        destroyChildAndObjects(it - getChildren().begin());
+    }
+
+    void SceneNode::destroyAllChildrenAndObjects()
+    {
+        //remove objects directly attached to this node
+        destroyAllObjects();
+
+        //go over children
+        while(!getChildren().empty()) {
+            SceneNode* child = static_cast<SceneNode*>(getChildren().front());
+            //recurse
+            child->destroyAllChildrenAndObjects();
+
+            //destroy child
+            child->getCreator()->destroySceneNode(child);
+        }
+        mChildren.clear();
+        needUpdate();
+    }
+    //-----------------------------------------------------------------------
     void SceneNode::loadChildren(const String& filename)
     {
         String baseName, strExt;

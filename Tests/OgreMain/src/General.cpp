@@ -101,13 +101,88 @@ TEST(Root,shutdown)
     root.shutdown();
 }
 
-TEST(SceneManager,removeAndDestroyAllChildren)
+TEST(SceneManager, removeAndDestroyAllChildren)
 {
     Root root("");
     SceneManager* sm = root.createSceneManager();
     sm->getRootSceneNode()->createChildSceneNode();
     sm->getRootSceneNode()->createChildSceneNode();
     sm->getRootSceneNode()->removeAndDestroyAllChildren();
+}
+
+struct SceneNodeTest : public RootWithoutRenderSystemFixture {
+    SceneManager* mSceneMgr;
+
+    void SetUp() override {
+        RootWithoutRenderSystemFixture::SetUp();
+        mSceneMgr = mRoot->createSceneManager();
+    }
+};
+
+TEST_F(SceneNodeTest, detachAllObjects){
+	auto sinbad = mSceneMgr->createEntity("sinbad", "Sinbad.mesh");
+	auto sinbad2 = mSceneMgr->createEntity("sinbad2", "Sinbad.mesh");
+	SceneNode* node = mSceneMgr->getRootSceneNode()->createChildSceneNode("parent");
+    node->attachObject(sinbad);
+    node->attachObject(sinbad2);
+
+	auto sinbad3 = mSceneMgr->createEntity("sinbad3", "Sinbad.mesh");
+	SceneNode* child = node->createChildSceneNode("child");
+    child->attachObject(sinbad3);
+    node->destroyAllObjects();
+    EXPECT_FALSE(mSceneMgr->hasEntity("sinbad"));
+    EXPECT_FALSE(mSceneMgr->hasEntity("sinbad2"));
+    EXPECT_TRUE(mSceneMgr->hasEntity("sinbad3"));
+    EXPECT_EQ(node->numAttachedObjects(), 0);
+    EXPECT_EQ(child->numAttachedObjects(), 1);
+}
+
+TEST_F(SceneNodeTest, destroyAllChildrenAndObjects)
+{
+	auto sinbad = mSceneMgr->createEntity("sinbad", "Sinbad.mesh");
+	SceneNode* node = mSceneMgr->getRootSceneNode()->createChildSceneNode("parent");
+    node->attachObject(sinbad);
+
+	auto sinbad2 = mSceneMgr->createEntity("sinbad2", "Sinbad.mesh");
+	SceneNode* child = node->createChildSceneNode("child");
+    child->attachObject(sinbad2);
+
+	auto sinbad3 = mSceneMgr->createEntity("sinbad3", "Sinbad.mesh");
+	SceneNode* grandchild = node->createChildSceneNode("grandchild");
+    grandchild->attachObject(sinbad3);
+
+    node->destroyAllChildrenAndObjects();
+    EXPECT_FALSE(mSceneMgr->hasSceneNode("grandchild"));
+    EXPECT_FALSE(mSceneMgr->hasEntity("sinbad3"));
+    EXPECT_FALSE(mSceneMgr->hasSceneNode("child"));
+    EXPECT_FALSE(mSceneMgr->hasEntity("sinbad2"));
+    EXPECT_FALSE(mSceneMgr->hasEntity("sinbad"));
+    EXPECT_TRUE(mSceneMgr->hasSceneNode("parent"));
+}
+
+TEST_F(SceneNodeTest, destroyChildAndObjects)
+{
+
+	auto sinbad = mSceneMgr->createEntity("sinbad", "Sinbad.mesh");
+	SceneNode* node = mSceneMgr->getRootSceneNode()->createChildSceneNode("parent");
+    node->attachObject(sinbad);
+
+	auto sinbad2 = mSceneMgr->createEntity("sinbad2", "Sinbad.mesh");
+	SceneNode* child = node->createChildSceneNode("child");
+    child->attachObject(sinbad2);
+
+	auto sinbad3 = mSceneMgr->createEntity("sinbad3", "Sinbad.mesh");
+	SceneNode* grandchild = child->createChildSceneNode("grandchild");
+    grandchild->attachObject(sinbad3);
+
+    node->destroyChildAndObjects("child");
+
+    EXPECT_FALSE(mSceneMgr->hasSceneNode("grandchild"));
+    EXPECT_FALSE(mSceneMgr->hasSceneNode("child"));
+    EXPECT_TRUE(mSceneMgr->hasSceneNode("parent"));
+    EXPECT_FALSE(mSceneMgr->hasEntity("sinbad2"));
+    EXPECT_FALSE(mSceneMgr->hasEntity("sinbad3"));
+    EXPECT_TRUE(mSceneMgr->hasEntity("sinbad"));
 }
 
 static void createRandomEntityClones(Entity* ent, size_t cloneCount, const Vector3& min,
