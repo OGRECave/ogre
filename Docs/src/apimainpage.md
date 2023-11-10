@@ -5,7 +5,11 @@
 This is the complete API reference for <a href="https://www.ogre3d.org"><b>OGRE</b></a> (<b>O</b>bject-Oriented <b>G</b>raphics <b>R</b>endering <b>E</b>ngine). Contained within are the 
 specifications for each namespace/module/class and the methods from those which you can refer to when writing code which uses OGRE. 
 
-The API references for some of the previous OGRE versions can be found under the following link: https://ogrecave.github.io/ogre/api/X.Y (replace X.Y with the version number, for example 1.10, 1.11, etc.).
+The API reference for a specific OGRE version can be found under:
+- https://ogrecave.github.io/ogre/api/13
+- https://ogrecave.github.io/ogre/api/1.12
+
+i.e. replace the last part with the version number, for example 14, 1.11, etc.
 
 # It's so BIG!
 
