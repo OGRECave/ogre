@@ -438,7 +438,7 @@ This directive changes the operation which is applied between the two components
 @par
 Format: scene\_blend\_op &lt;op&gt; 
 
-@copydoc Ogre::Pass::setSceneBlendingOperation
+@copydetails Ogre::Pass::setSceneBlendingOperation
 You may change this to ’add’, ’subtract’, ’reverse_subtract’, ’min’ or ’max’.
 
 <a name="separate_005fscene_005fblend_005fop"></a><a name="separate_005fscene_005fblend_005fop-1"></a>
@@ -1085,7 +1085,7 @@ Format: content\_type &lt;type&gt; \[&lt;compositorName&gt;\] \[&lt;textureName&
 <dl compact="compact">
 <dt>named</dt> <dd>
 
-@copydoc Ogre::TextureUnitState::CONTENT_NAMED
+@copybrief Ogre::TextureUnitState::CONTENT_NAMED
 
 </dd> <dt>shadow</dt> <dd>
 
@@ -1093,7 +1093,7 @@ This option allows you to pull in a shadow texture, and is only valid when you u
 
 </dd> <dt>compositor</dt> <dd>
 
-@copydoc Ogre::TextureUnitState::CONTENT_COMPOSITOR This can be either in a render\_scene directive inside a compositor script, or in a general pass in a viewport that has a compositor attached. Note that this is a reference only, meaning that it does not change the render order. You must make sure that the order is reasonable for what you are trying to achieve (for example, texture pooling might cause the referenced texture to be overwritten by something else by the time it is referenced).
+@copybrief Ogre::TextureUnitState::CONTENT_COMPOSITOR This can be either in a render\_scene directive inside a compositor script, or in a general pass in a viewport that has a compositor attached. Note that this is a reference only, meaning that it does not change the render order. You must make sure that the order is reasonable for what you are trying to achieve (for example, texture pooling might cause the referenced texture to be overwritten by something else by the time it is referenced).
 
 </dd> </dl>
 
@@ -1110,7 +1110,8 @@ Default: content\_type named
 
 ## tex\_coord\_set
 
-@copydoc Ogre::TextureUnitState::setTextureCoordSet
+@copybrief Ogre::TextureUnitState::setTextureCoordSet
+@copydetails Ogre::TextureUnitState::setTextureCoordSet
 
 @par
 Format: tex\_coord\_set &lt;set\_num&gt;
@@ -1193,7 +1194,7 @@ Environment maps make an object look reflective by using automatic texture coord
 <dl compact="compact">
 <dt>spherical</dt> <dd>
 
-@copydoc Ogre::TextureUnitState::ENV_CURVED
+@copybrief Ogre::TextureUnitState::ENV_CURVED
 Requires a single texture which is either a fish-eye lens view of the reflected scene, or some other texture which looks good as a spherical map (a texture of glossy highlights is popular especially in car sims). This effect is based on the relationship between the eye direction and the vertex normals of the object, so works best when there are a lot of gradually changing normals, i.e. curved objects.
 
 </dd> <dt>planar</dt> <dd>
@@ -1204,11 +1205,11 @@ The effect is based on the position of the vertices in the viewport rather than 
 
 </dd> <dt>cubic\_reflection</dt> <dd>
 
-@copydoc Ogre::TextureUnitState::ENV_REFLECTION
+@copybrief Ogre::TextureUnitState::ENV_REFLECTION
 Uses a group of 6 textures making up the inside of a cube, each of which is a view if the scene down each axis. Works extremely well in all cases but has a higher technical requirement from the card than spherical mapping. Requires that you bind a [cubic texture](#texture) to this unit.
 
 </dd> <dt>cubic\_normal</dt> <dd>
-@copydoc Ogre::TextureUnitState::ENV_NORMAL
+@copybrief Ogre::TextureUnitState::ENV_NORMAL
 Generates 3D texture coordinates containing the camera space normal vector from the normal information held in the vertex data. Again, use of this feature requires a [cubic texture](#texture).
 
 </dd> </dl> <br>
@@ -1345,7 +1346,7 @@ Example: sampler_ref mySampler
 <a name="unordered_access_mip"></a>
 ## unordered_access_mip
 
-@copydoc Ogre::TextureUnitState::setUnorderedAccessMipLevel
+@copybrief Ogre::TextureUnitState::setUnorderedAccessMipLevel
 
 @par
 Format: unordered_access_mip &lt;mipLevel&gt;
@@ -1422,16 +1423,24 @@ Format: filtering &lt;none|bilinear|trilinear|anisotropic&gt;<br> Default: filte
 
 <dl compact="compact">
 <dt>none</dt> <dd>
-@copydoc Ogre::TFO_NONE
+@copybrief Ogre::TFO_NONE
+
+@copydetails Ogre::TFO_NONE
 </dd> 
 <dt>bilinear</dt> <dd> 
-@copydoc Ogre::TFO_BILINEAR 
+@copybrief Ogre::TFO_BILINEAR
+
+@copydetails Ogre::TFO_BILINEAR
 </dd> 
 <dt>trilinear</dt> <dd> 
-@copydoc Ogre::TFO_TRILINEAR
+@copybrief Ogre::TFO_TRILINEAR
+
+@copydetails Ogre::TFO_TRILINEAR
 </dd> 
 <dt>anisotropic</dt> <dd> 
-@copydoc Ogre::TFO_ANISOTROPIC
+@copybrief Ogre::TFO_ANISOTROPIC
+
+@copydetails Ogre::TFO_ANISOTROPIC
 </dd> </dl> 
 
 ### Complex Format
@@ -1469,7 +1478,9 @@ Format: mipmap\_bias &lt;value&gt;<br> Default: mipmap\_bias 0
 <a name="compare_test"></a>
 ## compare_test
 
-@copydoc Ogre::Sampler::setCompareEnabled
+@copybrief Ogre::Sampler::setCompareEnabled
+
+@copydetails Ogre::Sampler::setCompareEnabled
 
 @par
 Format: compare_test on
