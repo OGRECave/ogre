@@ -482,6 +482,9 @@ namespace Ogre
                     continue;
                 }
 
+                if(cp == ' ') // should figure out how advance works for stbtt..
+                    idx = stbtt_FindGlyphIndex(&font, '0');
+
                 TRect<int> r;
                 stbtt_GetGlyphBitmapBox(&font, idx, scale, scale, &r.left, &r.top, &r.right, &r.bottom);
 
