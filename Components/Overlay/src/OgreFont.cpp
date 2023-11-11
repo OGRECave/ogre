@@ -67,12 +67,6 @@ namespace Ogre
         String doGet(const void* target) const override;
         void doSet(void* target, const String& val) override;
     };
-    class CmdCharSpacer : public ParamCommand
-    {
-    public:
-        String doGet(const void* target) const override;
-        void doSet(void* target, const String& val) override;
-    };
     class CmdSize : public ParamCommand
     {
     public:
@@ -95,7 +89,6 @@ namespace Ogre
     // Command object for setting / getting parameters
     static CmdType msTypeCmd;
     static CmdSource msSourceCmd;
-    static CmdCharSpacer msCharacterSpacerCmd;
     static CmdSize msSizeCmd;
     static CmdResolution msResolutionCmd;
     static CmdCodePoints msCodePointsCmd;
@@ -137,9 +130,6 @@ namespace Ogre
             dict->addParameter(
                 ParameterDef("source", "Filename of the source of the font.", PT_STRING),
                 &msSourceCmd);
-            dict->addParameter(
-                ParameterDef("character_spacer", "Spacing between characters to prevent overlap artifacts.", PT_STRING),
-                &msCharacterSpacerCmd);
             dict->addParameter(
                 ParameterDef("size", "True type size", PT_REAL),
                 &msSizeCmd);
@@ -585,12 +575,6 @@ namespace Ogre
         Font* f = static_cast<Font*>(target);
         f->setSource(val);
     }
-    //-----------------------------------------------------------------------
-    String CmdCharSpacer::doGet(const void* target) const
-    {
-        return "1";
-    }
-    void CmdCharSpacer::doSet(void* target, const String& val) {}
     //-----------------------------------------------------------------------
     String CmdSize::doGet(const void* target) const
     {
