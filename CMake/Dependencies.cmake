@@ -87,16 +87,16 @@ set(CMAKE_FRAMEWORK_PATH ${CMAKE_FRAMEWORK_PATH} ${OGRE_DEP_SEARCH_PATH})
 if(OGRE_BUILD_DEPENDENCIES AND NOT EXISTS ${OGREDEPS_PATH})
     message(STATUS "Building pugixml")
     file(DOWNLOAD
-        https://github.com/zeux/pugixml/releases/download/v1.13/pugixml-1.13.tar.gz
-        ${PROJECT_BINARY_DIR}/pugixml-1.13.tar.gz)
+        https://github.com/zeux/pugixml/releases/download/v1.14/pugixml-1.14.tar.gz
+        ${PROJECT_BINARY_DIR}/pugixml-1.14.tar.gz)
     execute_process(COMMAND ${CMAKE_COMMAND}
-        -E tar xf pugixml-1.13.tar.gz WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
+        -E tar xf pugixml-1.14.tar.gz WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
     execute_process(COMMAND ${BUILD_COMMAND_COMMON}
         -DCMAKE_POSITION_INDEPENDENT_CODE=TRUE # this will be linked into a shared lib
-        ${PROJECT_BINARY_DIR}/pugixml-1.13
-        WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/pugixml-1.13)
+        ${PROJECT_BINARY_DIR}/pugixml-1.14
+        WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/pugixml-1.14)
     execute_process(COMMAND ${CMAKE_COMMAND}
-        --build ${PROJECT_BINARY_DIR}/pugixml-1.13 ${BUILD_COMMAND_OPTS})
+        --build ${PROJECT_BINARY_DIR}/pugixml-1.14 ${BUILD_COMMAND_OPTS})
 
     #find_package(Freetype)
     if (NOT FREETYPE_FOUND)
