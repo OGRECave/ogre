@@ -106,7 +106,7 @@ namespace Ogre {
         mAttribsBound.clear();
         mInstanceAttribsBound.clear();
 
-        for (auto& elem : mElementList)
+        for (const auto& elem : mElementList)
         {
             uint16 source = elem.getSource();
 
