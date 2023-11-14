@@ -69,7 +69,7 @@ namespace Ogre {
         if(mNeedsUpdate)
             return true;
 
-        for (auto& elem : mElementList)
+        for (const auto& elem : mElementList)
         {
             uint16 source = elem.getSource();
 
