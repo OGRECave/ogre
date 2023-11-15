@@ -210,13 +210,10 @@ namespace Ogre {
 
             void load(EGLSupport* const glSupport, EGLConfig glConfig)
             {
-                std::map<int,int>::iterator it;
-
-                for (it = fields.begin(); it != fields.end(); it++)
+                for (auto& f : fields)
                 {
-                    it->second = EGL_NONE;
-
-                    glSupport->getGLConfigAttrib(glConfig, it->first, &it->second);
+                    f.second = EGL_NONE;
+                    glSupport->getGLConfigAttrib(glConfig, f.first, &f.second);
                 }
             }
 
@@ -237,12 +234,10 @@ namespace Ogre {
                     }
                 }
 
-                std::map<int,int>::iterator it;
-
-                for (it = fields.begin(); it != fields.end(); it++)
+                for (auto& f : fields)
                 {
-                    if (it->first != EGL_CONFIG_CAVEAT &&
-                        fields[it->first] > alternative.fields[it->first])
+                    if (f.first != EGL_CONFIG_CAVEAT &&
+                        fields[f.first] > alternative.fields[f.first])
                     {
                         return true;
                     }
@@ -312,7 +307,7 @@ namespace Ogre {
 
     ::EGLContext EGLSupport::createNewContext(EGLDisplay eglDisplay,
                           ::EGLConfig glconfig,
-                                              ::EGLContext shareList) const 
+                                              ::EGLContext shareList) const
     {
         EGLint contextAttrs[] = {
             EGL_CONTEXT_MAJOR_VERSION, 3,

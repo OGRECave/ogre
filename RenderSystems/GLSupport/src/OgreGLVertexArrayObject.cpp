@@ -43,7 +43,7 @@ namespace Ogre {
             rs->_destroyVao(mCreatorContext, mVAO);
         }
     }
-    
+
     void GLVertexArrayObject::bind(GLRenderSystemCommon* rs)
     {
         if(mCreatorContext && mCreatorContext != rs->_getCurrentContext()) // VAO is unusable with current context, destroy it
@@ -69,13 +69,8 @@ namespace Ogre {
         if(mNeedsUpdate)
             return true;
 
-        VertexDeclaration::VertexElementList::const_iterator elemIter, elemEnd;
-        elemEnd = mElementList.end();
-
-        for (elemIter = mElementList.begin(); elemIter != elemEnd; ++elemIter)
+        for (const auto& elem : mElementList)
         {
-            const VertexElement & elem = *elemIter;
-
             uint16 source = elem.getSource();
 
             if (!vertexBufferBinding->isBufferBound(source))
@@ -111,13 +106,8 @@ namespace Ogre {
         mAttribsBound.clear();
         mInstanceAttribsBound.clear();
 
-        VertexDeclaration::VertexElementList::const_iterator elemIter, elemEnd;
-        elemEnd = mElementList.end();
-
-        for (elemIter = mElementList.begin(); elemIter != elemEnd; ++elemIter)
+        for (const auto& elem : mElementList)
         {
-            const VertexElement& elem = *elemIter;
-
             uint16 source = elem.getSource();
 
             if (!vertexBufferBinding->isBufferBound(source))
