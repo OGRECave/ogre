@@ -1,19 +1,10 @@
 # Change Log
 
-## v1.13.0 [Tsathoggua] (Pending) - MAJOR RELEASE
-
-## v1.12.12 [Rhagorthua] (21 Apr 2021) - MAJOR RELEASE
-* [New and Noteworthy in OGRE 1.12](1.12-Notes.md)
-
-## v1.11.6 [Rhagorthua] (24 Apr 2019) - MAJOR RELEASE
-* [New and Noteworthy in OGRE 1.11](1.11-Notes.md)
-
-## v1.10.12 [Xalafu] (27 Apr 2018) - MAJOR RELEASE
-* [New and Noteworthy in OGRE 1.10](1.10-Notes.md)
-* [Closed JIRA tickets for Ogre 1.10](https://ogre3d.atlassian.net/browse/OGRE-536?jql=fixVersion%20in%20%28%221.10.0%22%29%20AND%20status%20in%20%28Resolved%2C%20Closed%29%20ORDER%20BY%20key%20DESC)
+## v1.10 and newer
+See "New and Noteworthy" for each release - e.g. [1.10-Notes.md](1.10-Notes.md)
 
 ## v1.9.0 [Ghadamon] (22 November 2013) - MAJOR RELEASE
-* [Change log in the Ogre3D wiki](http://www.ogre3d.org/tikiwiki/tiki-index.php?page=GhadamonNotes)
+* [Change log in the Ogre3D wiki](https://wiki.ogre3d.org/tiki-index.php?page=GhadamonNotes)
 * [Closed JIRA tickets for Ogre 1.9](https://ogre3d.atlassian.net/issues/?jql=fixVersion%20in%20%28%221.9.0%22%2C%20%221.9.0%20RC1%22%2C%20%221.9.0%20RC2%22%29%20AND%20status%20in%20%28Resolved%2C%20Closed%29%20ORDER%20BY%20key%20DESC)
 
 ## v1.8.1 [Byatis] (02 September 2012) - MAINTENANCE RELEASE
@@ -110,19 +101,16 @@ shows only the highlights of new features.
 <ul>
 <li><b>Platform support</b>
     <ul>
-
         <li><b>iOS</b>
             <ul>
                 <li>Use the device's screen size to determine the default screen size on iPhone OS platforms.</li>
                 <li>Profiling showed that aligning loops on iPhone would be a good thing.</li>
                 <li>iOS: Changing OGRE_PLATFORM_IPHONE to OGRE_PLATFORM_APPLE_IOS</li>
             </ul></li>
-
         <li><b>NaCl</b>
             <ul>
                 <li>Added NaCl platform support</li>
             </ul></li>
-
     </ul></li>
 
 <li><b>Render systems</b>
@@ -132,7 +120,6 @@ shows only the highlights of new features.
                 <li>Added GLES2 render system.</li>
                 <li>Uses the RT shader system for fixed-function emulation.</li>
             </ul></li>
-
         <li><b>D3D9 render system</b>
             <ul>
                 <li>Hardware buffers system memory consumption reduced. Only write only access buffers allocates extra memory.</li>
@@ -141,7 +128,6 @@ shows only the highlights of new features.
                 <li>Only default pool hardware buffers are re-created after device reset (Should fix resizing issues)</li>
                 <li>Added new config option related to system memory usage when multiple devices involved.</li>
             </ul></li>
-
         <li><b>D3D11 render system</b>
             <ul>
                 <li>Removed the obsolete shader generator (Now that we have the RTSS – we don’t need it anymore).</li>
@@ -161,7 +147,6 @@ shows only the highlights of new features.
                 <li>Support for Terrain vertex compression.</li>
                 <li>Terrain now defaults to saving compressed files (can still load uncompressed)</li>
             </ul></li>
-
         <li><b>Real-Time Shader System (RTSS)</b>
             <ul>
                 <li>Added layered blending. Added an entity that shows the feature to the RTSS sample - a rock wall with the OGRE logo blended with the new "overlay" blend.</li>
@@ -565,14 +550,12 @@ demomedia.wxi.in was generated using 'heat dir Media -gg -cg OgreMedia -out demo
             </li></ul>
     </li><li> Manual switching between supported compositor techniques is now possible on the fly
         <ul><li> Compositor techniques can now have 'scheme' names, you can manually switch between supported techniques using the scheme name to drop to different approaches for reasons other than hardware compatibility (performance, alternative tweaks etc)
-
             </li><li> You can keep &amp; share the textures used by previously active techniques so switching back &amp; forth is faster (must use 'pooled' option for this).
             </li></ul>
     </li><li> Compositors can now specify if they don't want to inherit the FSAA setting from the main target for texture definitions ('no_fsaa')
     </li><li> Compositors can now turn on sRGB gamma conversion per texture definition instead of just inheriting from the main surface ('gamma')
     </li><li> Cross-compositor communication (from <a href="http://www.ogre3d.org/wiki/index.php/SoC2009_Compositor" title="SoC2009 Compositor">SoC2009 Compositor</a>)
         <ul><li> Define a texture as accessible from other locations by the chain_scope or global_scope directive in the texture definition
-
             </li><li> Reference a texture from a different compositor in the chain (or in general) using the texture_ref directive
             </li></ul>
     </li><li> Compositor &lt;-&gt; code connection improvements (from <a href="http://www.ogre3d.org/wiki/index.php/SoC2009_Compositor" title="SoC2009 Compositor">SoC2009 Compositor</a>)
@@ -594,7 +577,6 @@ demomedia.wxi.in was generated using 'heat dir Media -gg -cg OgreMedia -out demo
 <ul><li> Support for Coverage Sampled AA (CSAA) - Dx9 &amp; Dx10 only for now
     </li><li> Unified &amp; simplified AA settings
         <ul><li> on Root's config options the setting is now called 'FSAA' in all cases, and consist of samples and a hint string (separated by spaces)
-
             </li><li> on the miscParams to createRenderWindow you can supply 'FSAA' and 'FSAAHint'. The former is the number of samples, the latter any hinting (e.g. 'Quality')
             </li></ul>
     </li></ul>
@@ -612,7 +594,6 @@ demomedia.wxi.in was generated using 'heat dir Media -gg -cg OgreMedia -out demo
     </li></ul>
 </li><li> <b>Profiler changes</b>
 <ul><li> Allow milliseconds as well as percentage view - gives a better idea of absolute fluctuations.
-
     </li><li> Define profiler masks so that profiling can be added to core OGRE but still filtered out by categories (added some simple profiling to test)
     </li><li> Hierarchy of profiles is now inclusive instead of exclusive (children no longer subtract their time from parents). This is more useful in practice when doing breakdowns
     </li><li> Added numerical indicators instead of a scale with 'ticks' since its more useful
@@ -639,7 +620,6 @@ demomedia.wxi.in was generated using 'heat dir Media -gg -cg OgreMedia -out demo
     </li></ul>
 </li><li> <b>Build changes</b>
 <ul><li> <a href="http://www.cmake.org" class="external text" title="http://www.cmake.org" rel="nofollow">Cmake</a> is now used to generate project files, separate explicitly maintained build systems are being removed. See <a href="http://www.ogre3d.org/wiki/index.php/Building_With_CMake" title="Building With CMake">Building With CMake</a>
-
     </li></ul>
 </li><li> <b>RenderWindow changes</b>
 <ul><li> miscParams now supports 'vsyncInterval' option, allowing you to sync to a multiple of the refresh rate if you want (and the hardware supports it)
@@ -649,7 +629,6 @@ demomedia.wxi.in was generated using 'heat dir Media -gg -cg OgreMedia -out demo
     </li></ul>
 </li><li> <b>Image changes</b>
 <ul><li> Added loadTwoImagesAsRGBA and combineTwoImagesAsRGBA to make it easier to construct combined normal/height and diffuse/specular images etc
-
     </li></ul>
 </li><li> <b>New Paging Component</b>
 <ul><li> SceneManager-independent, separate optional component (OGRE_HOME/Components/Paging)
@@ -659,14 +638,12 @@ demomedia.wxi.in was generated using 'heat dir Media -gg -cg OgreMedia -out demo
     </li></ul>
 </li><li> <b>New Terrain Component</b>
 <ul><li> SceneManager-independent, separate optional component (OGRE_HOME/Components/Terrain)
-
     </li><li> Inherently editable
     </li><li> Hierarchical geometry batching; batch counts reduce at lower LODs as well as vertex count. At the lowest level of detail, the entire terrain page is a single batch.
     </li><li> LOD now adapts in real-time to camera settings (viewport sizes &amp; LOD bias) so you can use the same terrain with multiple views efficiently
     </li><li> Skirts are used instead of stitching to avoid cracks in geometry; this means fewer indexing arrangements &amp; lower overall index buffer usage
     </li><li> Saving &amp; loading of terrain built in, including loading / processing in a background thread
     </li><li> In-built support for splatting layers, configurable sampler inputs and pluggable material generators
-
     </li><li> Support for generating global normal maps and light maps, in a background thread
     </li></ul>
 </li><li> <b>New 'Real Time Shader System' (RTSS) Component</b>
