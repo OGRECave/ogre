@@ -931,7 +931,7 @@ namespace Ogre
 
         /** Get the default minimum pixel size for object to be rendered by
         */
-        Real getDefaultMinPixelSize() const { return mDefaultMinPixelSize; }
+        Real getDefaultMinPixelSize() { return mDefaultMinPixelSize; }
     };
     /** @} */
     /** @} */
