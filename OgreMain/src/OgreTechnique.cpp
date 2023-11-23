@@ -99,6 +99,27 @@ namespace Ogre {
             // Adjust pass index
             currPass->_notifyIndex(passNum);
 
+            // Check a few fixed-function options in texture layers
+            size_t texUnit = 0;
+            for(const TextureUnitState* tex : currPass->getTextureUnitStates())
+            {
+                const char* err = 0;
+                if ((tex->getTextureType() == TEX_TYPE_3D) && !caps->hasCapability(RSC_TEXTURE_3D))
+                    err = "Volume";
+
+                if ((tex->getTextureType() == TEX_TYPE_2D_ARRAY) && !caps->hasCapability(RSC_TEXTURE_2D_ARRAY))
+                    err = "Array";
+
+                if (err)
+                {
+                    // Fail
+                    compileErrors << "Pass " << passNum << " Tex " << texUnit << ": " << err
+                                    << " textures not supported by RenderSystem";
+                    return false;
+                }
+                ++texUnit;
+            }
+
             // Check texture unit requirements
             size_t numTexUnitsRequested = currPass->getNumTextureUnitStates();
             // Don't trust getNumTextureUnits for programmable
@@ -126,27 +147,6 @@ namespace Ogre {
                             << std::endl;
                         return false;
                     }
-                }
-
-                // Check a few fixed-function options in texture layers
-                size_t texUnit = 0;
-                for(const TextureUnitState* tex : currPass->getTextureUnitStates())
-                {
-                    const char* err = 0;
-                    if ((tex->getTextureType() == TEX_TYPE_3D) && !caps->hasCapability(RSC_TEXTURE_3D))
-                        err = "Volume";
-
-                    if ((tex->getTextureType() == TEX_TYPE_2D_ARRAY) && !caps->hasCapability(RSC_TEXTURE_2D_ARRAY))
-                        err = "Array";
-
-                    if (err)
-                    {
-                        // Fail
-                        compileErrors << "Pass " << passNum << " Tex " << texUnit << ": " << err
-                                      << " textures not supported by RenderSystem";
-                        return false;
-                    }
-                    ++texUnit;
                 }
 
                 // We're ok on operations, now we need to check # texture units
