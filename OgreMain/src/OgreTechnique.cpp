@@ -99,6 +99,12 @@ namespace Ogre {
             // Adjust pass index
             currPass->_notifyIndex(passNum);
 
+            if(currPass->getPointSpritesEnabled() && !caps->hasCapability(RSC_POINT_SPRITES))
+            {
+                compileErrors << "Pass " << passNum << ": Point sprites not supported by RenderSystem";
+                return false;
+            }
+
             // Check a few fixed-function options in texture layers
             size_t texUnit = 0;
             for(const TextureUnitState* tex : currPass->getTextureUnitStates())
