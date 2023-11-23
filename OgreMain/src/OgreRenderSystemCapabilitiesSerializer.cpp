@@ -356,7 +356,6 @@ namespace Ogre
         addCapabilitiesMapping("texture_1d", RSC_TEXTURE_1D);
         addCapabilitiesMapping("point_sprites", RSC_POINT_SPRITES);
         addCapabilitiesMapping("wide_lines", RSC_WIDE_LINES);
-        addCapabilitiesMapping("point_extended_parameters", RSC_POINT_EXTENDED_PARAMETERS);
         addCapabilitiesMapping("vertex_texture_fetch", RSC_VERTEX_TEXTURE_FETCH);
         addCapabilitiesMapping("mipmap_lod_bias", RSC_MIPMAP_LOD_BIAS);
         addCapabilitiesMapping("atomic_counters", RSC_READ_WRITE_BUFFERS);

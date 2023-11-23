@@ -431,9 +431,6 @@ namespace Ogre {
             glPointParameterfv = glPointParameterfvEXT;
         }
 
-        rsc->setCapability(RSC_POINT_EXTENDED_PARAMETERS);
-
-
         // Check for hardware stencil support and set bit depth
         GLint stencil;
         glGetIntegerv(GL_STENCIL_BITS,&stencil);

@@ -177,7 +177,6 @@ namespace Ogre
         rsc->setCapability(RSC_HWRENDER_TO_TEXTURE);
         rsc->setCapability(RSC_TEXTURE_FLOAT);
         rsc->setCapability(RSC_POINT_SPRITES);
-        rsc->setCapability(RSC_POINT_EXTENDED_PARAMETERS);
         rsc->setCapability(RSC_TEXTURE_1D);
         rsc->setCapability(RSC_TEXTURE_3D);
         // rsc->setCapability(RSC_TEXTURE_SIGNED_INT);
