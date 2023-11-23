@@ -60,6 +60,7 @@ namespace Ogre {
         , mStencilBufferBitDepth(8)
         , mConstantFloatCount{}
         , mNumMultiRenderTargets(1)
+        , mMaxPointSize(1)
         , mNonPOW2TexturesLimited(false)
         , mMaxSupportedAnisotropy(0)
         , mGeometryProgramNumOutputVertices(0)
@@ -219,8 +220,6 @@ namespace Ogre {
         pLog->logMessage(" * Point Sprites: " + StringConverter::toString(hasCapability(RSC_POINT_SPRITES), true));
         if (hasCapability(RSC_POINT_SPRITES))
         {
-            pLog->logMessage("   - Extended parameters: " +
-                             StringConverter::toString(hasCapability(RSC_POINT_EXTENDED_PARAMETERS), true));
             pLog->logMessage("   - Max Size: " + StringConverter::toString(mMaxPointSize));
         }
         pLog->logMessage(

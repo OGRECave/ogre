@@ -122,16 +122,16 @@ namespace Ogre
         RSC_TEXTURE_3D              = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 21),
         /// Supports basic point sprite rendering
         RSC_POINT_SPRITES           = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 22),
-        /// Supports extra point parameters (minsize, maxsize, attenuation)
-        RSC_POINT_EXTENDED_PARAMETERS = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 23),
+        /// @deprecated same as RSC_POINT_SPRITES
+        RSC_POINT_EXTENDED_PARAMETERS = RSC_POINT_SPRITES,
+        /// Supports rendering to vertex buffers
+        RSC_HWRENDER_TO_VERTEX_BUFFER = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 23),
         /// Supports vertex texture fetch
         RSC_VERTEX_TEXTURE_FETCH = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 24),
         /// Supports mipmap LOD biasing
         RSC_MIPMAP_LOD_BIAS = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 25),
         /// Supports hardware geometry programs
         RSC_GEOMETRY_PROGRAM = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 26),
-        /// Supports rendering to vertex buffers
-        RSC_HWRENDER_TO_VERTEX_BUFFER = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 27),
 
         /// Supports compressed textures
         RSC_TEXTURE_COMPRESSION = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 0),

@@ -848,8 +848,7 @@ namespace Ogre
         rsc->setCapability(RSC_NON_POWER_OF_2_TEXTURES);
         rsc->setNonPOW2TexturesLimited(false);
         rsc->setNumMultiRenderTargets(OGRE_MAX_MULTIPLE_RENDER_TARGETS);
-        rsc->setCapability(RSC_POINT_SPRITES);          
-        rsc->setCapability(RSC_POINT_EXTENDED_PARAMETERS);                              
+        rsc->setCapability(RSC_POINT_SPRITES);
         rsc->setMaxPointSize(2.19902e+012f);
         rsc->setCapability(RSC_MIPMAP_LOD_BIAS);                
         rsc->setCapability(RSC_PERSTAGECONSTANT);
@@ -970,8 +969,6 @@ namespace Ogre
             if (rkCurCaps.MaxPointSize <= 1.0f)
             {
                 rsc->unsetCapability(RSC_POINT_SPRITES);
-                // sprites and extended parameters go together in D3D
-                rsc->unsetCapability(RSC_POINT_EXTENDED_PARAMETERS);                
             }
             
             // Take the minimum point size.

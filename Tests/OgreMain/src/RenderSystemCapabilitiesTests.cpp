@@ -304,7 +304,6 @@ TEST_F(RenderSystemCapabilitiesTests,WriteAllFalseCapabilities)
     EXPECT_TRUE(find(lines.begin(), lines.end(), "\tnon_power_of_2_textures false") != lines.end());
     EXPECT_TRUE(find(lines.begin(), lines.end(), "\ttexture_3d false") != lines.end());
     EXPECT_TRUE(find(lines.begin(), lines.end(), "\tpoint_sprites false") != lines.end());
-    EXPECT_TRUE(find(lines.begin(), lines.end(), "\tpoint_extended_parameters false") != lines.end());
     EXPECT_TRUE(find(lines.begin(), lines.end(), "\tvertex_texture_fetch false") != lines.end());
     EXPECT_TRUE(find(lines.begin(), lines.end(), "\tmipmap_lod_bias false") != lines.end());
 
@@ -348,7 +347,6 @@ TEST_F(RenderSystemCapabilitiesTests,WriteAllTrueCapabilities)
     caps.setCapability(RSC_NON_POWER_OF_2_TEXTURES);
     caps.setCapability(RSC_TEXTURE_3D);
     caps.setCapability(RSC_POINT_SPRITES);
-    caps.setCapability(RSC_POINT_EXTENDED_PARAMETERS);
     caps.setCapability(RSC_VERTEX_TEXTURE_FETCH);
     caps.setCapability(RSC_MIPMAP_LOD_BIAS);
 
@@ -406,7 +404,6 @@ TEST_F(RenderSystemCapabilitiesTests,WriteAllTrueCapabilities)
     EXPECT_TRUE(find(lines.begin(), lines.end(), "\tnon_power_of_2_textures true") != lines.end());
     EXPECT_TRUE(find(lines.begin(), lines.end(), "\ttexture_3d true") != lines.end());
     EXPECT_TRUE(find(lines.begin(), lines.end(), "\tpoint_sprites true") != lines.end());
-    EXPECT_TRUE(find(lines.begin(), lines.end(), "\tpoint_extended_parameters true") != lines.end());
     EXPECT_TRUE(find(lines.begin(), lines.end(), "\tvertex_texture_fetch true") != lines.end());
     EXPECT_TRUE(find(lines.begin(), lines.end(), "\tmipmap_lod_bias true") != lines.end());
 
@@ -442,7 +439,6 @@ TEST_F(RenderSystemCapabilitiesTests,WriteAndReadComplexCapabilities)
     caps.setCapability(RSC_TEXTURE_FLOAT);
     caps.setCapability(RSC_NON_POWER_OF_2_TEXTURES);
     caps.setCapability(RSC_TEXTURE_3D);
-    caps.setCapability(RSC_POINT_EXTENDED_PARAMETERS);
     caps.setCapability(RSC_MIPMAP_LOD_BIAS);
     caps.setCapability(RSC_TEXTURE_COMPRESSION);
     caps.setCapability(RSC_TEXTURE_COMPRESSION_DXT);
@@ -512,7 +508,6 @@ TEST_F(RenderSystemCapabilitiesTests,WriteAndReadComplexCapabilities)
     EXPECT_EQ(caps.hasCapability(RSC_NON_POWER_OF_2_TEXTURES), caps2.hasCapability(RSC_NON_POWER_OF_2_TEXTURES));
     EXPECT_EQ(caps.hasCapability(RSC_TEXTURE_3D), caps2.hasCapability(RSC_TEXTURE_3D));
     EXPECT_EQ(caps.hasCapability(RSC_POINT_SPRITES), caps2.hasCapability(RSC_POINT_SPRITES));
-    EXPECT_EQ(caps.hasCapability(RSC_POINT_EXTENDED_PARAMETERS), caps2.hasCapability(RSC_POINT_EXTENDED_PARAMETERS));
     EXPECT_EQ(caps.hasCapability(RSC_VERTEX_TEXTURE_FETCH), caps2.hasCapability(RSC_VERTEX_TEXTURE_FETCH));
     EXPECT_EQ(caps.hasCapability(RSC_MIPMAP_LOD_BIAS), caps2.hasCapability(RSC_MIPMAP_LOD_BIAS));
 
@@ -570,7 +565,6 @@ TEST_F(RenderSystemCapabilitiesTests, CustomCapabilities)
     EXPECT_EQ(caps->hasCapability(RSC_NON_POWER_OF_2_TEXTURES), false);
     EXPECT_EQ(caps->hasCapability(RSC_TEXTURE_3D), true);
     EXPECT_EQ(caps->hasCapability(RSC_POINT_SPRITES), true);
-    EXPECT_EQ(caps->hasCapability(RSC_POINT_EXTENDED_PARAMETERS), true);
     EXPECT_EQ(caps->hasCapability(RSC_VERTEX_TEXTURE_FETCH), false);
     EXPECT_EQ(caps->hasCapability(RSC_MIPMAP_LOD_BIAS), true);
 

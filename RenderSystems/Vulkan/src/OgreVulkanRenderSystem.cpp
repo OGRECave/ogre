@@ -578,7 +578,6 @@ namespace Ogre
         if( mActiveDevice->mDeviceFeatures.largePoints )
         {
             rsc->setCapability( RSC_POINT_SPRITES );
-            rsc->setCapability( RSC_POINT_EXTENDED_PARAMETERS );
         }
         rsc->setCapability( RSC_TEXTURE_2D_ARRAY );
         rsc->setCapability( RSC_ALPHA_TO_COVERAGE );

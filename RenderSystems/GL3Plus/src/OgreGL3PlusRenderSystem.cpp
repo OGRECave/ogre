@@ -252,7 +252,6 @@ namespace Ogre {
 
         // Point sprites
         rsc->setCapability(RSC_POINT_SPRITES);
-        rsc->setCapability(RSC_POINT_EXTENDED_PARAMETERS);
 
         // Check for hardware stencil support and set bit depth
         rsc->setCapability(RSC_HWSTENCIL);
