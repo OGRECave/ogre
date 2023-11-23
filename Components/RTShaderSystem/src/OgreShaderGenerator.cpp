@@ -724,7 +724,7 @@ static Technique* findSourceTechnique(const Material& mat, const String& srcTech
     // Find the source technique
     for (auto *t : mat.getTechniques())
     {
-        if (t->getSchemeName() == srcTechniqueSchemeName &&
+        if (t->getSchemeName() == srcTechniqueSchemeName && t->isSupported() &&
             (hasFixedFunctionPass(t) || overProgrammable))
         {
             return t;
