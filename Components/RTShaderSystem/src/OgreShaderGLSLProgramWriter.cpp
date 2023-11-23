@@ -256,6 +256,11 @@ void GLSLProgramWriter::writeInputParameters(std::ostream& os, Function* functio
                 pParam->_rename("gl_PointCoord");
                 continue;
             }
+            else if(paramContent == Parameter::SPC_POINTSPRITE_SIZE)
+            {
+                // injected by matchVStoPSInterface, but only available in VS
+                continue;
+            }
             else if(paramSemantic == Parameter::SPS_POSITION)
             {
                 pParam->_rename("gl_FragCoord");
