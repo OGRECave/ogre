@@ -575,14 +575,17 @@ namespace Ogre
         rsc->setNonPOW2TexturesLimited( false );
         rsc->setCapability( RSC_HWRENDER_TO_TEXTURE );
         rsc->setCapability( RSC_TEXTURE_FLOAT );
-        rsc->setCapability( RSC_POINT_SPRITES );
-        rsc->setCapability( RSC_POINT_EXTENDED_PARAMETERS );
+        if( mActiveDevice->mDeviceFeatures.largePoints )
+        {
+            rsc->setCapability( RSC_POINT_SPRITES );
+            rsc->setCapability( RSC_POINT_EXTENDED_PARAMETERS );
+        }
         rsc->setCapability( RSC_TEXTURE_2D_ARRAY );
         rsc->setCapability( RSC_ALPHA_TO_COVERAGE );
         rsc->setCapability( RSC_HW_GAMMA );
         rsc->setCapability( RSC_VERTEX_BUFFER_INSTANCE_DATA );
         rsc->setCapability(RSC_VERTEX_FORMAT_INT_10_10_10_2);
-        rsc->setMaxPointSize( 256 );
+        rsc->setMaxPointSize( deviceLimits.pointSizeRange[1] );
 
         //rsc->setMaximumResolutions( 16384, 4096, 16384 );
         auto maxFloatVectors = deviceLimits.maxUniformBufferRange / (4 * sizeof(float));
