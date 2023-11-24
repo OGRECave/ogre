@@ -9,7 +9,7 @@ install:
  - cmd: SET PATH=C:\Python310-x64;C:\Python310-x64\Scripts;%PATH%
  - cmd: pip install swig==4.1.1
  - cmd: curl -sSf -o rustup-init.exe https://win.rustup.rs/
- - cmd: rustup-init.exe -y --default-toolchain 1.69.0
+ - cmd: rustup-init.exe -y
  - cmd: curl -LO https://sdk.lunarg.com/sdk/download/1.2.189.2/windows/VulkanSDK-1.2.189.2-Installer.exe
  - cmd: VulkanSDK-1.2.189.2-Installer.exe --accept-licenses --default-answer --confirm-command install
  - cmd: cd %APPVEYOR_BUILD_FOLDER%
