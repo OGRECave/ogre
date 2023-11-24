@@ -1,4 +1,6 @@
-#if PCF
+#define PCF
+
+#ifdef PCF
 uniform float inverseShadowmapSize;
 #endif
 uniform sampler2D shadowMap;
@@ -18,7 +20,7 @@ void main()
 #endif
 
 	// shadowUV.z contains lightspace position of current object
-#if PCF
+#ifdef PCF
   	float pixeloffset = inverseShadowmapSize;
     vec4 depths = vec4(
         texture2D(shadowMap, shadowUV.xy + vec2(-pixeloffset, 0.0)).x,

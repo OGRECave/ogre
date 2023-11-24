@@ -14,7 +14,7 @@ question). Parts of the scene visible only to the camera must be
 shadowed. We do not care about parts of the scene seen only by the
 light.
 
-Please note that this tutorial is more explicit and in depth than required
+@note This tutorial is more explicit and in depth than required
 to merely render shadows in OGRE as to teach you the theory behind the
 rendering shadows as well.
 
@@ -22,7 +22,7 @@ In practice, the snapshot from the viewpoint of the light is stored as a
 floating point depth buffer. It is important to use a format that
 supports enough precision to avoid shadow acne (z-fighting) on lit
 surfaces. In Ogre, we can specify the depth format to use; in the
-example code, we will choose the 32-bit format.
+example code, we will choose the 16-bit format.
 
 Once shadow determination has occurred (whether a fragment is in shadow
 or not), Ogre provides two different ways to render the shadows into the
@@ -335,18 +335,19 @@ See  @cite Chong06 for a unified notion of aliasing.
 
 Ogre provides a powerful framework that allows us to do a lot of shadow
 map customization. In Ogre, we turn on custom shadow mapping through the
-scene manager (here, sceneMgr). It is recommended that this happen early
+scene manager. It is recommended that this happen early
 as it may affect how certain resources are loaded.
 
 ```cpp
 // Use Ogre's custom shadow mapping ability
-MaterialManager *materialMgr = Ogre::MaterialManager::getSingletonPtr();
-sceneMgr->setShadowTexturePixelFormat(PF_DEPTH16);
-sceneMgr->setShadowTechnique( SHADOWTYPE_TEXTURE_ADDITIVE );
-sceneMgr->setShadowTextureCasterMaterial(materialMgr->getByName("Ogre/DepthShadowmap/Caster/Float"));
-sceneMgr->setShadowTextureReceiverMaterial(materialMgr->getByName("Ogre/DepthShadowmap/Receiver/Float"));
-sceneMgr->setShadowTextureSelfShadow(true); 
-sceneMgr->setShadowTextureSize(1024);
+Ogre::SceneManager *mSceneMgr = ...;
+Ogre::MaterialManager *materialMgr = Ogre::MaterialManager::getSingletonPtr();
+mSceneMgr->setShadowTexturePixelFormat(PF_DEPTH16);
+mSceneMgr->setShadowTechnique( SHADOWTYPE_TEXTURE_ADDITIVE );
+mSceneMgr->setShadowTextureCasterMaterial(materialMgr->getByName("PSSM/shadow_caster"));
+mSceneMgr->setShadowTextureReceiverMaterial(materialMgr->getByName("Ogre/DepthShadowmap/Receiver/RockWall"));
+mSceneMgr->setShadowTextureSelfShadow(true);
+mSceneMgr->setShadowTextureSize(1024);
 ```
 
 The setShadowTechnique call is all that is required for Ogre’s default
@@ -361,17 +362,7 @@ defined in a material script. They tell Ogre which shaders to use when
 rendering shadow casters into the shadow map and rendering shadow
 receivers during shadow determination.
 
-The `DepthShadowmap.material` script is given below:
-
-@snippet Samples/Media/materials/scripts/DepthShadowmap.material shadow_material
-
-The material uses unified programs for HLSL, GLSL and GLSLES. 
-We’ll present the GLSL code below. Note that while most of the
-shader files are direct translations of each other, DirectX HLSL shaders
-must handle percentage closest filtering slightly differently from
-OpenGL. OpenGL chooses the convention of having integers index sample
-centers whereas DirectX chooses integers to index sample corners. Also
-note the variable names in the shaders presented below are slightly
+We’ll present the GLSL code below. Note that the variable names in the shaders presented below are slightly
 different from those presented earlier in this document. This is due in
 part to the awkwardness of expressing subscripts in variable names and
 also in part because \f$u_3\f$ is less evocative of depth than \f$z\f$, etc.
@@ -379,13 +370,24 @@ With minimal effort one can match the shader equations with those
 presented earlier. The code is presented here mostly to demonstrate how
 things fit together.
 
-@include Samples/Media/materials/programs/GLSL/pssmCasterVp.glsl
+## Caster
+```cpp
+uniform mat4 worldViewProjMatrix;
+attribute vec4 vertex;
+
+void main()
+{
+	gl_Position = worldViewProjMatrix * vertex;
+}
+```
 
 This is a pretty standard vertex shader.
 
 @include Samples/Media/materials/programs/GLSL/pssmCasterFp.glsl
 
 Just write out the depth values here. The bias and derivatives are handled by the @c depth_bias set in the pass.
+
+## Receiver
 
 @include Samples/Media/materials/programs/GLSL/DepthShadowmapReceiverVp.glsl
 
@@ -394,10 +396,7 @@ This is a pretty standard vertex shader as well.
 @include Samples/Media/materials/programs/GLSL/DepthShadowmapReceiverFp.glsl
 
 Additionally this file implements percentage closest filtering. To use unfiltered
-shadow mapping, comment out the PCF block as noted and uncomment the
-Non-PCF block. Note that after doing this, the uSTexWidth and
-uSTexHeight variables are likely to be optimized away and so you should
-uncomment these variables in the materials script as well.
+shadow mapping, comment out the PCF define.
 
 ## Debugging Shadows
 Since shadows are a difficult subject, so it is a good idea to have the Shadow Map 
@@ -451,8 +450,8 @@ Ogre is provided with several alternative shadow camera setups:
  - Ogre::PSSMShadowCameraSetup: Parallel Split Shadow Map (PSSM) shadow camera setup.
  - Ogre::PlaneOptimalShadowCameraSetup: Implements the plane optimal shadow camera algorithm.
 
-These Shadow Camera Setups can be enabled for the whole Scene with SceneManager::setShadowCameraSetup 
-or per light with Light::setCustomShadowCameraSetup
+These Shadow Camera Setups can be enabled for the whole Scene with Ogre::SceneManager::setShadowCameraSetup
+or per light with Ogre::Light::setCustomShadowCameraSetup
 
 The following shows how to activate Plane Optimal Shadow Mapping given
 some pointer to a MovablePlane and a pointer to a light.
@@ -461,14 +460,12 @@ Ogre::MovablePlane *movablePlane = new Ogre::MovablePlane( Ogre::Vector3::UNIT_Y
 Ogre::Entity *movablePlaneEntity = mSceneMgr->createEntity( "movablePlane", "Floor.mesh" );
 Ogre::SceneNode *movablePlaneNode = mSceneMgr->getRootSceneNode()->createChildSceneNode("MovablePlaneNode");
 movablePlaneNode->attachObject(movablePlaneEntity);
-Ogre::ShadowCameraSetupPtr shadowCameraSetup = Ogre::PlaneOptimalShadowCameraSetup::create(movablePlane);
-light->setCustomShadowCameraSetup(Ogre::ShadowCameraSetupPtr(shadowCameraSetup));
+light->setCustomShadowCameraSetup(Ogre::PlaneOptimalShadowCameraSetup::create(movablePlane));
 ```
 
 Another example, using LiSPSM Camera Setup:
 ```cpp
-Ogre::ShadowCameraSetupPtr shadowCameraSetup = Ogre::LiSPSMShadowCameraSetup::create();
-mSceneMgr->setShadowCameraSetup(shadowCameraSetup);
+mSceneMgr->setShadowCameraSetup(Ogre::LiSPSMShadowCameraSetup::create());
 ```
 
 For big scenes with directional lights one of the better performing Shadow Camera Setups is PSSM.
@@ -489,7 +486,7 @@ mSceneMgr->setShadowTextureConfig(0, 2048, 2048, Ogre::PF_DEPTH16);
 mSceneMgr->setShadowTextureConfig(1, 1024, 1024, Ogre::PF_DEPTH16);
 mSceneMgr->setShadowTextureConfig(2, 512, 512, Ogre::PF_DEPTH16);
 
-Ogre::PSSMShadowCameraSetup* pssmSetup = new Ogre::PSSMShadowCameraSetup(); //static_cast<Ogre::PSSMShadowCameraSetup*>(shadowCameraSetup->getPointer());
+Ogre::PSSMShadowCameraSetup* pssmSetup = new Ogre::PSSMShadowCameraSetup();
 pssmSetup->setSplitPadding(1);
 pssmSetup->calculateSplitPoints(3, 1, mSceneMgr->getShadowFarDistance());
 pssmSetup->setOptimalAdjustFactor(0, 2);
