@@ -54,13 +54,12 @@ if(DEFINED ENV{APPVEYOR})
     set(OTHER
         "-DCMAKE_CXX_FLAGS=-WX -EHsc"
         -DCMAKE_GENERATOR_PLATFORM=x64
-        -DCMAKE_GENERATOR_TOOLSET=v142
         -DOGRE_BUILD_DEPENDENCIES=TRUE
         "-DPYTHON_EXECUTABLE=C:\\Python310-x64\\python.exe"
         "-DPYTHON_LIBRARY=C:\\Python310-x64\\libs\\python310.lib"
         -DOGRE_DEPENDENCIES_DIR=${CMAKE_CURRENT_SOURCE_DIR}/ogredeps)
 
-    set(GENERATOR -G "Visual Studio 16 2019")
+    set(GENERATOR -G "Visual Studio 14 2015")
     set(OTHER ${OTHER}
         -DCMAKE_PREFIX_PATH="C:\\Qt\\6.2\\msvc2019_64"
         -DQt6_DIR="C:\\Qt\\6.2\\msvc2019_64\\lib\\cmake\\Qt6")

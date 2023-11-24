@@ -4,12 +4,12 @@ environment:
   CS_APIKEY:
     secure: XiSyqXBlbnIqawfinZqXimatuEdpYsI38+HK2TgvuUGHQEoeFHA62700/EhFJ4M1
 image:
- - Visual Studio 2019
+ - Visual Studio 2015
 install:
- - cmd: SET PATH=C:\Python310-x64;C:\Python310-x64\Scripts;%PATH%
+ - cmd: SET PATH=C:\Python37-x64;C:\Python37-x64\Scripts;%PATH%
  - cmd: pip install swig==4.1.1
  - cmd: curl -sSf -o rustup-init.exe https://win.rustup.rs/
- - cmd: rustup-init.exe -y --default-toolchain 1.69.0
+ - cmd: rustup-init.exe -y
  - cmd: curl -LO https://sdk.lunarg.com/sdk/download/1.2.189.2/windows/VulkanSDK-1.2.189.2-Installer.exe
  - cmd: VulkanSDK-1.2.189.2-Installer.exe --accept-licenses --default-answer --confirm-command install
  - cmd: cd %APPVEYOR_BUILD_FOLDER%
@@ -29,12 +29,3 @@ branches:
     - master
     - stable
     - /v\d+\.\d+\.\d+/
-after_build:
-  - IF NOT "%APPVEYOR_REPO_TAG%" == "true" set APPVEYOR_REPO_TAG_NAME=master
-  - 7z a ogre-sdk-%APPVEYOR_REPO_TAG_NAME%-msvc142-x64.zip ./build/sdk/*
-  - SET PATH=C:\Python310-x64;C:\Python310-x64\Scripts;%PATH%
-  - pip install --upgrade cloudsmith-cli
-  - IF "%APPVEYOR_PULL_REQUEST_NUMBER%" == "" cloudsmith push raw ogrecave/ogre ogre-sdk-%APPVEYOR_REPO_TAG_NAME%-msvc142-x64.zip --republish --version %APPVEYOR_REPO_TAG_NAME% -k %CS_APIKEY%
-artifacts:
-  - path: ogre-sdk-master-msvc142-x64.zip
-    name: ogre-sdk-master-msvc142-x64
