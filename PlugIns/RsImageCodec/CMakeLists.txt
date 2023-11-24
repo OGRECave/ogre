@@ -28,7 +28,7 @@ add_dependencies(Codec_RsImage rsimage)
 target_link_libraries(Codec_RsImage PUBLIC OgreMain PRIVATE ${RS_LIB_PATH} ${CMAKE_DL_LIBS})
 
 if(MSVC)
-    target_link_libraries(Codec_RsImage PRIVATE wsock32 ws2_32 bcrypt userenv)
+    target_link_libraries(Codec_RsImage PRIVATE wsock32 ws2_32 bcrypt userenv Ntdll)
 endif()
 
 target_include_directories(Codec_RsImage PUBLIC
