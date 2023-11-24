@@ -1,4 +1,3 @@
-//! [shadow_material]
 // Specific receiver material for rockwall
 material Ogre/DepthShadowmap/Receiver/RockWall
 {
@@ -19,7 +18,6 @@ material Ogre/DepthShadowmap/Receiver/RockWall
 		}
 	}
 }
-//! [shadow_material]
 
 // Specific receiver material for Athene
 material Ogre/DepthShadowmap/Receiver/Athene
