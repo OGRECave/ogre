@@ -33,7 +33,7 @@ This document describes the coding standards all developers are expected to adhe
             <li>Use abstract classes or templates not `void*`</li>
             <li>Use overloaded methods not varargs.</li>
         </ul></li>
-    <li>Minimum C++ compiler level is MSVC 12 (VS2013) or gcc 4.8. Compilers which do not support C++11 properly are not supported.</li>
+    <li>Minimum C++ compiler level is MSVC 14 (VS2015) or gcc 5. Compilers which do not support C++14 properly are not supported.</li>
     <li>Use the <a href="https://en.cppreference.com/w/cpp/language/pimpl">PImpl idiom</a> to reduce dependencies between classes.</li>
     <li>Always use <a href="https://isocpp.org/wiki/faq/const-correctness">const-correctness</a>. Methods taking non-primitive types as parameters should generally take them as const references, methods returning non-primitive types should generally return them as const references. Declare all methods that do not modify internal state `const`. For lazy-update getter methods, declare the internal state which is lazy-updated `mutable`.</li>
     <li>Prefer `private` over `protected` to encourage encapsulation. Use public interfaces internally too.</li>
