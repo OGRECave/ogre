@@ -146,8 +146,7 @@ namespace Ogre {
                     {
                         // The user disabled auto pass split
                         compileErrors << "Pass " << passNum <<
-                            ": Too many texture units for the current hardware and no splitting allowed."
-                            << std::endl;
+                            ": Too many texture units for the current hardware and no splitting allowed";
                         return false;
                     }
                     else if (currPass->hasVertexProgram())
@@ -155,8 +154,7 @@ namespace Ogre {
                         // Can't do this one, and can't split a programmable pass
                         compileErrors << "Pass " << passNum <<
                             ": Too many texture units for the current hardware and "
-                            "cannot split programmable passes."
-                            << std::endl;
+                            "cannot split programmable passes";
                         return false;
                     }
                 }
@@ -198,13 +196,12 @@ namespace Ogre {
                             ": " << GpuProgram::getProgramTypeName(programType) + " program " << program->getName()
                             << " cannot be used - ";
                         if (program->hasCompileError() && program->getSource().empty())
-                            compileErrors << "resource not found.";
+                            compileErrors << "resource not found";
                         else if (program->hasCompileError())
-                            compileErrors << "compile error.";
+                            compileErrors << "compile error";
                         else
-                            compileErrors << "not supported.";
+                            compileErrors << "not supported";
 
-                        compileErrors << std::endl;
                         return false;
                     }
                 }
