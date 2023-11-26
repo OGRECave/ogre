@@ -3640,6 +3640,10 @@ namespace Ogre{
         if(prog->isSupported() && params)
         {
             GpuProgramParametersSharedPtr ptr = prog->getDefaultParameters();
+
+            if(prog->hasCompileError())
+                return;
+
             GpuProgramTranslator::translateProgramParameters(compiler, ptr, static_cast<ObjectAbstractNode*>(params.get()));
         }
     }
