@@ -99,9 +99,16 @@ namespace Ogre {
             // Adjust pass index
             currPass->_notifyIndex(passNum);
 
-            if(currPass->getPointSpritesEnabled() && !caps->hasCapability(RSC_POINT_SPRITES))
+            const char* err = 0;
+
+            if(currPass->getLineWidth() != 1 && !caps->hasCapability(RSC_WIDE_LINES))
+                err = "line_width > 1";
+            else if(currPass->getPointSize() != 1 && !caps->hasCapability(RSC_POINT_SPRITES))
+                err = "point_size > 1";
+
+            if(err)
             {
-                compileErrors << "Pass " << passNum << ": Point sprites not supported by RenderSystem";
+                compileErrors << "Pass " << passNum << ": " << err << " not supported by RenderSystem";
                 return false;
             }
 
@@ -109,7 +116,6 @@ namespace Ogre {
             size_t texUnit = 0;
             for(const TextureUnitState* tex : currPass->getTextureUnitStates())
             {
-                const char* err = 0;
                 if ((tex->getTextureType() == TEX_TYPE_3D) && !caps->hasCapability(RSC_TEXTURE_3D))
                     err = "Volume";
 
