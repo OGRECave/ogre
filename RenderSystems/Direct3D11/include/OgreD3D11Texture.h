@@ -101,8 +101,6 @@ namespace Ogre {
         void createInternalResourcesImpl(void);
         /// free internal resources
         void freeInternalResourcesImpl(void);
-        /// internal method, set Texture class source image protected attributes
-        void _setSrcAttributes(unsigned long width, unsigned long height, unsigned long depth, PixelFormat format);
         /// internal method, set Texture class final texture protected attributes
         void _setFinalAttributes(unsigned long width, unsigned long height, unsigned long depth, PixelFormat format, UINT miscflags);
 
@@ -112,9 +110,6 @@ namespace Ogre {
 
         void notifyDeviceLost(D3D11Device* device);
         void notifyDeviceRestored(D3D11Device* device);
-
-        /// overridden from Resource
-        void loadImpl();
 
     protected:
         D3D11Device&	mDevice;

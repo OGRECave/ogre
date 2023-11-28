@@ -105,18 +105,6 @@ namespace Ogre
 
     }
     //---------------------------------------------------------------------
-    void D3D11Texture::loadImpl()
-    {
-        Texture::loadImpl();
-
-        if (mUsage & TU_RENDERTARGET)
-        {
-            return;
-        }
-
-        _setSrcAttributes(mWidth, mHeight, mDepth, mFormat);
-    }
-    //---------------------------------------------------------------------
     void D3D11Texture::freeInternalResourcesImpl()
     {
         mpTex.Reset();
@@ -481,16 +469,6 @@ namespace Ogre
 
         // Create list of subsurfaces for getBuffer()
         _createSurfaceList();
-    }
-    //---------------------------------------------------------------------
-    void D3D11Texture::_setSrcAttributes(unsigned long width, unsigned long height, 
-        unsigned long depth, PixelFormat format)
-    { 
-        // set source image attributes
-        mSrcWidth = width; 
-        mSrcHeight = height; 
-        mSrcDepth = depth;
-        mSrcFormat = format;
     }
     //---------------------------------------------------------------------
     void D3D11Texture::_createSurfaceList(void)
