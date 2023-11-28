@@ -857,48 +857,6 @@ namespace Ogre
         _createSurfaceList(d3d9Device, textureResources);
     }
     /****************************************************************************************/
-    void D3D9Texture::_setSrcAttributes(unsigned long width, unsigned long height, 
-        unsigned long depth, PixelFormat format)
-    { 
-        // set source image attributes
-        mSrcWidth = width; 
-        mSrcHeight = height; 
-        mSrcDepth = depth;
-        mSrcFormat = format;
-        // say to the world what we are doing
-        if (!TextureManager::getSingleton().getVerbose()) return;
-        switch (getTextureType())
-        {
-        case TEX_TYPE_1D:
-            if (mUsage & TU_RENDERTARGET)
-                LogManager::getSingleton().logMessage("D3D9 : Creating 1D RenderTarget, name : '" + getName() + "' with " + StringConverter::toString(mNumMipmaps) + " mip map levels");
-            else
-                LogManager::getSingleton().logMessage("D3D9 : Loading 1D Texture, image name : '" + getName() + "' with " + StringConverter::toString(mNumMipmaps) + " mip map levels");
-            break;
-        case TEX_TYPE_2D:
-            if (mUsage & TU_RENDERTARGET)
-                LogManager::getSingleton().logMessage("D3D9 : Creating 2D RenderTarget, name : '" + getName() + "' with " + StringConverter::toString(mNumMipmaps) + " mip map levels");
-            else
-                LogManager::getSingleton().logMessage("D3D9 : Loading 2D Texture, image name : '" + getName() + "' with " + StringConverter::toString(mNumMipmaps) + " mip map levels");
-            break;
-        case TEX_TYPE_3D:
-            if (mUsage & TU_RENDERTARGET)
-                LogManager::getSingleton().logMessage("D3D9 : Creating 3D RenderTarget, name : '" + getName() + "' with " + StringConverter::toString(mNumMipmaps) + " mip map levels");
-            else
-                LogManager::getSingleton().logMessage("D3D9 : Loading 3D Texture, image name : '" + getName() + "' with " + StringConverter::toString(mNumMipmaps) + " mip map levels");
-            break;
-        case TEX_TYPE_CUBE_MAP:
-            if (mUsage & TU_RENDERTARGET)
-                LogManager::getSingleton().logMessage("D3D9 : Creating Cube map RenderTarget, name : '" + getName() + "' with " + StringConverter::toString(mNumMipmaps) + " mip map levels");
-            else
-                LogManager::getSingleton().logMessage("D3D9 : Loading Cube Texture, base image name : '" + getName() + "' with " + StringConverter::toString(mNumMipmaps) + " mip map levels");
-            break;
-        default:
-            unloadImpl();
-            OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, "Unknown texture type", "D3D9Texture::_setSrcAttributes" );
-        }
-    }
-    /****************************************************************************************/
     D3DTEXTUREFILTERTYPE D3D9Texture::_getBestFilterMethod(IDirect3DDevice9* d3d9Device)
     {
         D3D9Device* device = D3D9RenderSystem::getDeviceManager()->getDeviceFromD3D9Device(d3d9Device);

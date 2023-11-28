@@ -88,8 +88,6 @@ namespace Ogre {
         void createInternalResourcesImpl(IDirect3DDevice9* d3d9Device);
         /// free internal resources
         void freeInternalResourcesImpl(void);
-        /// internal method, set Texture class source image protected attributes
-        void _setSrcAttributes(unsigned long width, unsigned long height, unsigned long depth, PixelFormat format);
         /// internal method, set Texture class final texture protected attributes
         void _setFinalAttributes(IDirect3DDevice9* d3d9Device, TextureResources* textureResources, 
             unsigned long width, unsigned long height, unsigned long depth, PixelFormat format);
