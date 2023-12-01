@@ -76,12 +76,20 @@ _OgreBulletExport btCylinderShape* createCylinderCollider(const MovableObject* m
 struct _OgreBulletExport CollisionListener
 {
     virtual ~CollisionListener() {}
+    /** Called when two objects collide
+    * @param other the other object
+    * @param manifoldPoint the collision point
+    */
     virtual void contact(const MovableObject* other, const btManifoldPoint& manifoldPoint) = 0;
 };
 
 struct _OgreBulletExport RayResultCallback
 {
     virtual ~RayResultCallback() {}
+    /** Called for each object hit by the ray
+    * @param other the other object
+    * @param distance the distance from ray origin to hit point
+    */
     virtual void addSingleResult(const MovableObject* other, float distance) = 0;
 };
 
@@ -113,6 +121,14 @@ public:
     explicit DynamicsWorld(const Vector3& gravity);
     DynamicsWorld(btDynamicsWorld* btWorld) : CollisionWorld(btWorld) {}
 
+    /** Add an Entity as a rigid body to the DynamicsWorld
+    * @param mass the mass of the object
+    * @param ent the entity to control
+    * @param ct the collider type
+    * @param listener a listener to call on collision with other objects
+    * @param group the collision group
+    * @param mask the collision mask
+    */
     btRigidBody* addRigidBody(float mass, Entity* ent, ColliderType ct, CollisionListener* listener = nullptr,
                               int group = 1, int mask = -1);
 
