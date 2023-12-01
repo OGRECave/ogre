@@ -68,7 +68,7 @@ For an exhaustive list, see the [features page](http://www.ogre3d.org/about/feat
 - [Gazebo - Robot simulation](http://gazebosim.org/)
 - [OpenCV OVIS visualization module](https://docs.opencv.org/master/d2/d17/group__ovis.html)
 - [ROS 3D visualization tool](http://wiki.ros.org/rviz)
-- [RAISIM Physics](https://github.com/raisimTech/raisimOgre#news)
+- [Surgical Image Toolkit](https://github.com/IRCAD/sight#applications)
 
 **Closed Source**
 - [Hob](http://store.steampowered.com/app/404680/Hob/)
