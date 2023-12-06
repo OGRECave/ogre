@@ -83,7 +83,7 @@ namespace Ogre
     {
         assert(mResourcesCopy.empty()); // reentrancy is not expected nor supported
         mResourcesCopy = mResources;
-        for(const auto *r : mResourcesCopy) {
+        for (auto *r : mResourcesCopy) {
             if(r)
                 r->notifyDeviceLost(device);
         }
@@ -94,7 +94,7 @@ namespace Ogre
     {
         assert(mResourcesCopy.empty()); // reentrancy is not expected nor supported
         mResourcesCopy = mResources;
-        for(const auto *r : mResourcesCopy) {
+        for (auto *r : mResourcesCopy) {
             if(r)
                 r->notifyDeviceRestored(device);
         }
