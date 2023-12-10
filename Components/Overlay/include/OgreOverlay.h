@@ -94,7 +94,7 @@ namespace Ogre {
         mutable Matrix4 mTransform;
         mutable bool mTransformOutOfDate;
         bool mTransformUpdated;
-        ulong mZOrder;
+        ushort mZOrder;
         bool mVisible;
         bool mInitialised;
         String mOrigin;
