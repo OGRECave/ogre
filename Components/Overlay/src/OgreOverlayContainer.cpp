@@ -263,14 +263,14 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void OverlayContainer::_notifyParent(OverlayContainer* parent, Overlay* overlay)
     {
-        OverlayElement::_notifyParent(parent, overlay);
-
-        // Update children
+        // Update children first as notifyParent may call initialise on them
         for (const auto& p : mChildren)
         {
             // Notify the children of the overlay
             p.second->_notifyParent(this, overlay);
         }
+
+        OverlayElement::_notifyParent(parent, overlay);
     }
 
     //---------------------------------------------------------------------
