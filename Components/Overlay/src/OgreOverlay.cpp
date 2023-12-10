@@ -70,7 +70,7 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void Overlay::assignZOrders()
     {
-        ushort zorder = static_cast<ushort>(mZOrder * 100.0f);
+        ushort zorder = mZOrder * ushort(100);
 
         // Notify attached 2D elements
         for (auto *e : m2DElements)
@@ -90,7 +90,7 @@ namespace Ogre {
     //---------------------------------------------------------------------
     ushort Overlay::getZOrder(void) const
     {
-        return (ushort)mZOrder;
+        return mZOrder;
     }
     //---------------------------------------------------------------------
     bool Overlay::isVisible(void) const
