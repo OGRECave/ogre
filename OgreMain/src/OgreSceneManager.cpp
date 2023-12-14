@@ -2948,7 +2948,7 @@ StaticGeometry* SceneManager::createStaticGeometry(const String& name)
 //---------------------------------------------------------------------
 StaticGeometry* SceneManager::getStaticGeometry(const String& name) const
 {
-    StaticGeometryList::const_iterator i = mStaticGeometryList.find(name);
+    StaticGeometryMap::const_iterator i = mStaticGeometryList.find(name);
     if (i == mStaticGeometryList.end())
     {
         OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
@@ -2963,6 +2963,12 @@ bool SceneManager::hasStaticGeometry(const String& name) const
     return (mStaticGeometryList.find(name) != mStaticGeometryList.end());
 }
 
+//-----------------------------------------------------------------------
+const SceneManager::StaticGeometryMap* SceneManager:: getStaticGeometryCollection() const
+{
+  return &mStaticGeometryList;
+}
+
 //---------------------------------------------------------------------
 void SceneManager::destroyStaticGeometry(StaticGeometry* geom)
 {
@@ -2971,7 +2977,7 @@ void SceneManager::destroyStaticGeometry(StaticGeometry* geom)
 //---------------------------------------------------------------------
 void SceneManager::destroyStaticGeometry(const String& name)
 {
-    StaticGeometryList::iterator i = mStaticGeometryList.find(name);
+    StaticGeometryMap::iterator i = mStaticGeometryList.find(name);
     if (i != mStaticGeometryList.end())
     {
         OGRE_DELETE i->second;

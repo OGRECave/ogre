@@ -666,6 +666,10 @@ SHARED_PTR(HardwarePixelBuffer);
         typedef pointer_category category;
         static const char* type_name() { return "Ogre::Camera"; }
     };
+    template<> struct traits<Ogre::StaticGeometry> {
+        typedef pointer_category category;
+        static const char* type_name() { return "Ogre::StaticGeometry"; }
+    };
     }
 %}
 #endif
@@ -884,6 +888,7 @@ SHARED_PTR(Mesh);
 %newobject Ogre::SceneManager::createRayQuery(const Ray&);
 %rename(SceneManager_Listener) Ogre::SceneManager::Listener;
 %template(MovableObjectMap) std::map<std::string, Ogre::MovableObject*>;
+%template(StaticGeometryMap) std::map<std::string, Ogre::StaticGeometry*>;
 %template(CameraMap) std::map<std::string, Ogre::Camera*>;
 %include "OgreSceneManager.h"
 %include "OgreDefaultDebugDrawer.h"

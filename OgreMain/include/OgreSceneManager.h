@@ -405,6 +405,7 @@ namespace Ogre {
         typedef std::map<String, Camera* > CameraList;
         typedef std::map<String, Animation*> AnimationList;
         typedef std::map<String, MovableObject*> MovableObjectMap;
+        typedef std::map<String, StaticGeometry* > StaticGeometryMap;
     private:
         HardwareVertexBufferPtr mInstanceBuffer;
 
@@ -421,8 +422,7 @@ namespace Ogre {
         /// Queue of objects for rendering
         std::unique_ptr<RenderQueue> mRenderQueue;
 
-        typedef std::map<String, StaticGeometry* > StaticGeometryList;
-        StaticGeometryList mStaticGeometryList;
+        StaticGeometryMap mStaticGeometryList;
 
         typedef std::map<String, InstanceManager*> InstanceManagerMap;
         InstanceManagerMap  mInstanceManagerMap;
@@ -2979,6 +2979,8 @@ namespace Ogre {
         StaticGeometry* getStaticGeometry(const String& name) const;
         /** Returns whether a static geometry instance with the given name exists. */
         bool hasStaticGeometry(const String& name) const;
+        /** Returns all static geometry instances with names. */
+        const StaticGeometryMap* getStaticGeometryCollection() const;
         /** Remove & destroy a StaticGeometry instance. */
         void destroyStaticGeometry(StaticGeometry* geom);
         /** Remove & destroy a StaticGeometry instance. */
