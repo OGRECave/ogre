@@ -221,7 +221,7 @@ namespace Ogre
     ValueType * any_cast(Any * operand)
     {
         return operand &&
-#if OGRE_COMPILER == OGRE_COMPILER_GNUC && OGRE_COMP_VER < 450
+#if (OGRE_COMPILER == OGRE_COMPILER_GNUC && OGRE_COMP_VER < 450) || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
                 (std::strcmp(operand->type().name(), typeid(ValueType).name()) == 0)
 #else
                 (operand->type() == typeid(ValueType))
