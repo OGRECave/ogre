@@ -139,6 +139,18 @@ namespace Ogre
         WorkQueue() {}
         virtual ~WorkQueue() {}
 
+        /** Get the number of worker threads that this queue will start when
+            startup() is called.
+        */
+        virtual size_t getWorkerThreadCount() const { return 1; }
+
+        /** Set the number of worker threads that this queue will start
+            when startup() is called (default 1).
+            Calling this will have no effect unless the queue is shut down and
+            restarted.
+        */
+        virtual void setWorkerThreadCount(size_t c) {}
+
         /** Start up the queue with the options that have been set.
         @param forceRestart If the queue is already running, whether to shut it
             down and restart.
@@ -218,17 +230,6 @@ namespace Ogre
         virtual ~DefaultWorkQueueBase();
         /// Get the name of the work queue
         const String& getName() const;
-        /** Get the number of worker threads that this queue will start when 
-            startup() is called. 
-        */
-        virtual size_t getWorkerThreadCount() const;
-
-        /** Set the number of worker threads that this queue will start
-            when startup() is called (default 1).
-            Calling this will have no effect unless the queue is shut down and
-            restarted.
-        */
-        virtual void setWorkerThreadCount(size_t c);
 
         /** Get whether worker threads will be allowed to access render system
             resources. 
@@ -283,7 +284,8 @@ namespace Ogre
         unsigned long getResponseProcessingTimeLimit() const override { return mResposeTimeLimitMS; }
         /// @copydoc WorkQueue::setResponseProcessingTimeLimit
         void setResponseProcessingTimeLimit(unsigned long ms) override { mResposeTimeLimitMS = ms; }
-
+        size_t getWorkerThreadCount() const override { return mWorkerThreadCount; }
+        void setWorkerThreadCount(size_t c) override { mWorkerThreadCount = c; }
         void addMainThreadTask(std::function<void()> task) override;
         void addTask(std::function<void()> task) override;
     protected:
