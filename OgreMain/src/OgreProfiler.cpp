@@ -541,17 +541,9 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void ProfileInstance::logResults() 
     {
-        // create an indent that represents the hierarchical order of the profile
-        String indent = "";
-        for (uint i = 0; i < hierarchicalLvl; ++i) 
-        {
-            indent = indent + "\t";
-        }
-
-        LogManager::getSingleton().logMessage(indent + "Name " + name + 
-                        " | Min " + StringConverter::toString(history.minTimePercent) + 
-                        " | Max " + StringConverter::toString(history.maxTimePercent) + 
-                        " | Avg "+ StringConverter::toString(history.totalTimePercent / history.totalCalls));   
+        LogManager::getSingleton().logMessage(StringUtil::format(
+            "%*s%s\t| Min %.2f | Max %.2f | Avg %.2f", hierarchicalLvl * 4, "", name.c_str(), history.minTimePercent,
+            history.maxTimePercent, history.totalTimePercent / history.totalCalls));
 
         for(auto& it : children)
         {
