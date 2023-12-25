@@ -78,16 +78,6 @@ namespace Ogre {
         return mName;
     }
     //---------------------------------------------------------------------
-    size_t DefaultWorkQueueBase::getWorkerThreadCount() const
-    {
-        return mWorkerThreadCount;
-    }
-    //---------------------------------------------------------------------
-    void DefaultWorkQueueBase::setWorkerThreadCount(size_t c)
-    {
-        mWorkerThreadCount = c;
-    }
-    //---------------------------------------------------------------------
     bool DefaultWorkQueueBase::getWorkersCanAccessRenderSystem() const
     {
         return mWorkerRenderSystemAccess;
