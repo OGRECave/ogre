@@ -1,7 +1,9 @@
 # Ignore CLion project directory and iml files
 .idea/
 *.iml
-
+*.obj
+*.ipch
+*.pch
 # Ignore build directories
 cmake-build-*/
 /build/
