@@ -194,6 +194,7 @@ namespace Ogre {
     void BillboardParticleRenderer::_updateRenderQueue(RenderQueue* queue, 
         std::vector<Particle*>& currentParticles, bool cullIndividually)
     {
+        OgreProfile("BillboardParticleRenderer");
         mBillboardSet->setCullIndividually(cullIndividually);
 
         // Update billboard set geometry

@@ -25,6 +25,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
+#include "OgreProfiler.h"
 #include "OgreStableHeaders.h"
 
 #include "OgreParticleSystem.h"
@@ -427,6 +428,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void ParticleSystem::_update(Real timeElapsed)
     {
+        OgreProfile("ParticleSystem");
         // Only update if attached to a node
         if (!mParentNode)
             return;
@@ -503,6 +505,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void ParticleSystem::_expire(Real timeElapsed)
     {
+        OgreProfile("_expire");
         Particle* pParticle;
         ParticleEmitter* pParticleEmitter;
 
@@ -548,6 +551,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void ParticleSystem::_triggerEmitters(Real timeElapsed)
     {
+        OgreProfile("_triggerEmitters");
         // Add up requests for emission
         static std::vector<unsigned> requested;
         static std::vector<unsigned> emittedRequested;
@@ -682,6 +686,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void ParticleSystem::_triggerAffectors(Real timeElapsed)
     {
+        OgreProfile("_triggerAffectors");
         for (auto a : mAffectors)
         {
             a->_affectParticles(this, timeElapsed);
@@ -830,7 +835,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void ParticleSystem::_updateBounds()
     {
-
+        OgreProfile("_updateBounds");
         if (mParentNode && (mBoundsAutoUpdate || mBoundsUpdateTime > 0.0f))
         {
             if (mActiveParticles.empty())
