@@ -181,10 +181,20 @@ namespace Ogre {
                 }
             }
 
-
+            // try to catch user missing a program early on
+            if (!caps->hasCapability(RSC_FIXED_FUNCTION) && currPass->isProgrammable() &&
+                !currPass->hasGpuProgram(GPT_COMPUTE_PROGRAM))
+            {
+                if (!currPass->hasVertexProgram() ||
+                    (!currPass->hasFragmentProgram() && !currPass->hasGeometryProgram()))
+                {
+                    compileErrors << "Pass " << passNum << ": RenderSystem requires both vertex and fragment programs";
+                    return false;
+                }
+            }
 
             //Check compilation errors for all program types.
-            for (int t = 0; t < 6; t++)
+            for (int t = 0; t < GPT_COUNT; t++)
             {
                 GpuProgramType programType = GpuProgramType(t);
                 if (currPass->hasGpuProgram(programType))
