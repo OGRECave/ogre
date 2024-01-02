@@ -300,6 +300,7 @@ public:
             rs->bindGpuProgramParameters(GPT_COMPUTE_PROGRAM, params, GPV_GLOBAL);
             rs->_dispatchCompute(thread_groups);
         }
+        rs->unbindGpuProgram(GPT_COMPUTE_PROGRAM);
     }
 };
 
