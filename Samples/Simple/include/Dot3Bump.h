@@ -128,10 +128,10 @@ protected:
 
         mPossibilities["athene.mesh"] = matNames;
 
-        for (std::map<String, StringVector>::iterator it = mPossibilities.begin(); it != mPossibilities.end(); it++)
+        for (const auto& p : mPossibilities)
         {
             // load each mesh with non-default hardware buffer usage options
-            MeshPtr mesh = MeshManager::getSingleton().load(it->first, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
+            MeshPtr mesh = MeshManager::getSingleton().load(p.first, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
                 HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY);
 
             // build tangent vectors for our mesh
@@ -141,7 +141,7 @@ protected:
 
             // create an entity from the mesh and set the first available material
             Entity* ent = mSceneMgr->createEntity(mesh->getName(), mesh->getName());
-            ent->setMaterialName(it->second.front());
+            ent->setMaterialName(p.second.front());
         }
     }
 
@@ -192,8 +192,8 @@ protected:
 
         // create a menu to choose the model displayed
         mMeshMenu = mTrayMgr->createLongSelectMenu(TL_BOTTOM, "Mesh", "Mesh", 370, 290, 10);
-        for (std::map<String, StringVector>::iterator it = mPossibilities.begin(); it != mPossibilities.end(); it++)
-            mMeshMenu->addItem(it->first);
+        for (const auto& p : mPossibilities)
+            mMeshMenu->addItem(p.first);
 
         // create a menu to choose the material used by the model
         mMaterialMenu = mTrayMgr->createLongSelectMenu(TL_BOTTOM, "Material", "Material", 370, 290, 10);
