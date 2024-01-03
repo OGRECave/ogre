@@ -471,7 +471,7 @@ namespace Ogre
             @return
                 A random number in the range from [0,1].
         */
-        static float UnitRandom();
+        static float UnitRandom() { return mRandProvider ? mRandProvider->getRandomUnit() : rand() / float(RAND_MAX); }
 
         /** Generate a random number within the range provided.
             @param fLow
