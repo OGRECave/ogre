@@ -136,13 +136,6 @@ namespace Ogre
             return Radian(-HALF_PI);
         }
     }
-    //-----------------------------------------------------------------------
-    float Math::UnitRandom ()
-    {
-        if (mRandProvider)
-            return mRandProvider->getRandomUnit();
-        else return rand() / float(RAND_MAX);
-    }
     
     //-----------------------------------------------------------------------
     void Math::SetRandomValueProvider(RandomValueProvider* provider)
