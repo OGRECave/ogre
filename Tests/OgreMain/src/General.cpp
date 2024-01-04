@@ -54,6 +54,9 @@ THE SOFTWARE.
 
 #include "OgreKeyFrame.h"
 
+#include "OgreBillboardSet.h"
+#include "OgreBillboard.h"
+
 #include <random>
 using std::minstd_rand;
 
@@ -658,4 +661,38 @@ TEST(GpuProgramParams, Variability)
     params2.clearNamedAutoConstant("parameter");
 
     EXPECT_EQ(params.getConstantDefinition("parameter").variability, GPV_PER_OBJECT);
+}
+
+TEST(Billboard, TextureCoords)
+{
+    Root root("");
+    MaterialManager::getSingleton().initialise();
+
+    float xsegs = 3;
+    float ysegs = 3;
+    BillboardSet bbs("name");
+    bbs.setTextureStacksAndSlices(ysegs, xsegs);
+
+    auto& texcoords = bbs.getTextureCoords();
+
+
+    float width = 300;
+    float height = 300;
+    float gap = 20;
+
+    for (int y = 0; y < ysegs; ++y)
+    {
+        for (int x = 0; x < xsegs; ++x)
+        {
+            FloatRect ref((x + 0) / xsegs, (ysegs - y - 1) / ysegs, // uv
+                          (x + 1) / xsegs, (ysegs - y - 0) / ysegs);
+            auto& genRect = texcoords[(ysegs - y - 1)*xsegs + x];
+            EXPECT_EQ(genRect, ref);
+
+            // only for visualisation
+            Billboard* bb = bbs.createBillboard({(x * width / xsegs) + ((x - 1) * gap), // position
+                                                 (y * height / ysegs) + ((y - 1) * gap), 0});
+            bb->setTexcoordIndex((ysegs - y - 1)*xsegs + x);
+        }
+    }
 }
