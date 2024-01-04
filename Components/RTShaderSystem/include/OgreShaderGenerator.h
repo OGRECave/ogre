@@ -318,7 +318,7 @@ public:
     @param dstMat The destination material
     @return True if successful
     */
-    bool cloneShaderBasedTechniques(const Material& srcMat, Material& dstMat);
+    bool cloneShaderBasedTechniques(Material& srcMat, Material& dstMat);
 
     /** 
     Remove all shader based techniques that created by this shader generator.   
