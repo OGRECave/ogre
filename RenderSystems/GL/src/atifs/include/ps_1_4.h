@@ -286,7 +286,7 @@ private:
 #ifdef _DEBUG
     FILE* fp;
     // full compiler test with output results going to a text file
-    void testCompile(char* testname, char* teststr, SymbolID* testresult,
+    void testCompile(const char* testname, const char* teststr, SymbolID* testresult,
         uint testresultsize, GLuint* MachinInstResults = NULL, uint MachinInstResultsSize = 0);
 #endif // _DEBUG
 
