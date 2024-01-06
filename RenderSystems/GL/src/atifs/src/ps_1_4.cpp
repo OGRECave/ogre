@@ -1831,10 +1831,10 @@ void PS_1_4::test()
   };
 
   #define PART2INST 17
-  char TestStr3[] = "mov r0,c1";
-  char TestSymbols[] = "mov";
-  char passed[] = "PASSED\n";
-  char failed[] = "***** FAILED *****\n";
+  const char TestStr3[] = "mov r0,c1";
+  const char TestSymbols[] = "mov";
+  const char passed[] = "PASSED\n";
+  const char failed[] = "***** FAILED *****\n";
 
   int resultID = 0;
 
@@ -2071,7 +2071,7 @@ void PS_1_4::test()
 // **************************************************************
 }
 
-void PS_1_4::testCompile(char* testname, char* teststr, SymbolID* testresult, uint testresultsize, GLuint* MachinInstResults, uint MachinInstResultsSize)
+void PS_1_4::testCompile(const char* testname, const char* teststr, SymbolID* testresult, uint testresultsize, GLuint* MachinInstResults, uint MachinInstResultsSize)
 {
 
     char passed[] = "PASSED\n";
