@@ -249,7 +249,7 @@ namespace Ogre {
         mIlluminationStage = oth.mIlluminationStage;
         mLightMask = oth.mLightMask;
 
-        for(int i = 0; i < GPT_COUNT; i++)
+        for(int i = 0; i < GPT_PIPELINE_COUNT; i++)
         {
             auto& programUsage = mProgramUsage[i];
             auto& othUsage = oth.mProgramUsage[i];
@@ -882,12 +882,12 @@ namespace Ogre {
     }
 
     std::unique_ptr<GpuProgramUsage>& Pass::getProgramUsage(GpuProgramType programType) {
-        return mProgramUsage[programType];
+        return mProgramUsage[programType % GPT_PIPELINE_COUNT];
     }
 
     const std::unique_ptr<GpuProgramUsage>& Pass::getProgramUsage(GpuProgramType programType) const
     {
-        return mProgramUsage[programType];
+        return mProgramUsage[programType % GPT_PIPELINE_COUNT];
     }
 
     bool Pass::hasGpuProgram(GpuProgramType programType) const {
@@ -896,8 +896,9 @@ namespace Ogre {
     const GpuProgramPtr& Pass::getGpuProgram(GpuProgramType programType) const
 	{
         OGRE_LOCK_MUTEX(mGpuProgramChangeMutex);
-        OgreAssert(mProgramUsage[programType], "check whether program is available using hasGpuProgram()");
-        return mProgramUsage[programType]->getProgram();
+        auto programType_ = programType % GPT_PIPELINE_COUNT;
+        OgreAssert(mProgramUsage[programType_], "check whether program is available using hasGpuProgram()");
+        return mProgramUsage[programType_]->getProgram();
 	}
     //-----------------------------------------------------------------------
     const String& Pass::getGpuProgramName(GpuProgramType type) const
