@@ -45,12 +45,12 @@ class lwEnvelope
 public:
     lwEnvelope()
     {
-        name = 0;
+        name = nullptr;
     }
 
     ~lwEnvelope()
     {
-        if (name) free(name);
+        delete[] name;
         unsigned int i;
         for (i=0; i<keys.size(); delete keys[i++]);
         for (i=0; i<cfilters.size(); delete cfilters[i++]);
