@@ -52,9 +52,9 @@ THE SOFTWARE.
 }
 
 // some D3D commonly used macros
-#define SAFE_DELETE(p)       { if(p) { delete (p);     (p)=NULL; } }
-#define SAFE_DELETE_ARRAY(p) { if(p) { delete[] (p);   (p)=NULL; } }
-#define SAFE_RELEASE(p)      { if(p) { (p)->Release(); (p)=NULL; } }
+#define SAFE_DELETE(p)       { (p)=nullptr; }
+#define SAFE_DELETE_ARRAY(p) { (p)=nullptr; }
+#define SAFE_RELEASE(p)      { if(p) { (p)->Release(); (p)=nullptr; } }
 
 #if defined(_WIN32_WINNT_WIN8) // Win8 SDK required to compile, will work on Windows 8 and Platform Update for Windows 7
 #define OGRE_D3D11_PROFILING 1
