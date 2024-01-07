@@ -295,13 +295,13 @@ namespace Ogre {
     {
         auto& ori = mParentNode->_getDerivedOrientation();
         auto& scale = mParentNode->_getDerivedScale();
-        return ori.xAxis() * mSourceSize[0] * scale[0] * 0.5f;
+        return Vector3f(ori.xAxis()) * mSourceSize[0] * scale[0] * 0.5f;
     }
     Vector3f Light::getDerivedSourceHalfHeight() const
     {
         auto& ori = mParentNode->_getDerivedOrientation();
         auto& scale = mParentNode->_getDerivedScale();
-        return ori.yAxis() * mSourceSize[1] * scale[1] * 0.5f;
+        return Vector3f(ori.yAxis()) * mSourceSize[1] * scale[1] * 0.5f;
     }
     //-----------------------------------------------------------------------
     const PlaneBoundedVolume& Light::_getNearClipVolume(const Camera* const cam) const
