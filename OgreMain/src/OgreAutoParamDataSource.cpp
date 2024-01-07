@@ -220,7 +220,7 @@ namespace Ogre {
         if(l.getType() == Light::LT_RECTLIGHT)
         {
             auto rot = getViewMatrix().linear();
-            return Vector4f(rot * l.getDerivedSourceHalfHeight(), 0.0);
+            return Vector4f(Vector3f(rot * Vector3(l.getDerivedSourceHalfHeight())), 0.0);
         }
         // range, const, linear, quad
         return l.getAttenuation();
@@ -240,7 +240,7 @@ namespace Ogre {
         else if(l.getType() == Light::LT_RECTLIGHT)
         {
             auto rot = getViewMatrix().linear();
-            return Vector4f(rot * l.getDerivedSourceHalfWidth(), 2.0);
+            return Vector4f(Vector3f(rot * Vector3(l.getDerivedSourceHalfWidth())), 2.0);
         }
         else
         {
