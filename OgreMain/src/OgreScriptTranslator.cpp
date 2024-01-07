@@ -72,26 +72,6 @@ namespace Ogre{
         }
     }
 
-    static GpuProgramType translateIDToGpuProgramType(uint32 id)
-    {
-        switch (id)
-        {
-        case ID_VERTEX_PROGRAM:
-        default:
-            return GPT_VERTEX_PROGRAM;
-        case ID_GEOMETRY_PROGRAM:
-            return GPT_GEOMETRY_PROGRAM;
-        case ID_FRAGMENT_PROGRAM:
-            return GPT_FRAGMENT_PROGRAM;
-            case ID_TESSELLATION_HULL_PROGRAM:
-            return GPT_HULL_PROGRAM;
-            case ID_TESSELLATION_DOMAIN_PROGRAM:
-            return GPT_DOMAIN_PROGRAM;
-        case ID_COMPUTE_PROGRAM:
-            return GPT_COMPUTE_PROGRAM;
-        }
-    }
-
     String getPropertyName(const ScriptCompiler *compiler, uint32 id)
     {
         for(auto& kv : compiler->mIds)
@@ -3577,7 +3557,7 @@ namespace Ogre{
         }
 
         // Allocate the program
-        GpuProgramType gpt = translateIDToGpuProgramType(obj->id);
+        GpuProgramType gpt = getProgramType(obj->id);
         GpuProgram *prog = 0;
 
         if(language == "asm")
