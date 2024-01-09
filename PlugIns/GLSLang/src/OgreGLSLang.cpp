@@ -383,6 +383,16 @@ void GLSLangProgram::prepareImpl()
         auto isUBO = blockIdx != -1;
         auto uoffset = program.getUniformBufferOffset(i);
 
+        if(isUBO)
+        {
+            auto uboName = String(program.getUniformBlockName(blockIdx));
+            if(uboName != "OgreUniforms")
+            {
+                GpuProgramManager::getSingleton().getSharedParameters(uboName);
+                // TODO: there is no public API to set the binding point and create the correct buffer yet
+            }
+        }
+
         GpuConstantDefinition def;
         def.logicalIndex = isUBO ? uoffset : utype->getQualifier().layoutLocation;
         def.arraySize = program.getUniformArraySize(i);
