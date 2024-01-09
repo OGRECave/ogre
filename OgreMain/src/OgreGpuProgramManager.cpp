@@ -253,9 +253,8 @@ namespace {
         SharedParametersMap::const_iterator i = mSharedParametersMap.find(name);
         if (i == mSharedParametersMap.end())
         {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
-                "No shared parameter set with name '" + name + "'!", 
-                "GpuProgramManager::getSharedParameters");
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+                        "referenced shared_params '" + name + "' not found");
         }
         return i->second;
     }
