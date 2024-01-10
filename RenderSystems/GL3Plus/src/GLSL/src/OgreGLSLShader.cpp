@@ -474,6 +474,20 @@ namespace Ogre {
         mLinked = 0;
     }
 
+    void GLSLShader::extractAttributes()
+    {
+        GLint numAttributes = 0;
+        OGRE_CHECK_GL_ERROR(glGetProgramInterfaceiv(mGLProgramHandle, GL_PROGRAM_INPUT, GL_ACTIVE_RESOURCES, &numAttributes));
+        GLenum prop = GL_LOCATION;
+        for (int attr = 0; attr < numAttributes; ++attr)
+        {
+            GLint val;
+            OGRE_CHECK_GL_ERROR(
+                glGetProgramResourceiv(mGLProgramHandle, GL_PROGRAM_INPUT, attr, 1, &prop, 1, NULL, &val));
+            mActiveInputs.push_back(val);
+        }
+    }
+
     void GLSLShader::extractUniforms(int block) const
     {
         GLint numUniforms = 0;
@@ -630,6 +644,8 @@ namespace Ogre {
             extractUniforms();
             extractBufferBlocks(GL_UNIFORM_BLOCK);
             extractBufferBlocks(GL_SHADER_STORAGE_BLOCK);
+            if(mType == GPT_VERTEX_PROGRAM)
+                extractAttributes();
             return;
         }
 

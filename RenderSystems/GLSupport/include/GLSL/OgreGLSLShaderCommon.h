@@ -106,6 +106,8 @@ namespace Ogre {
 
         /// GLSL does not provide access to the low level code of the shader, so use this shader for binding as well
         GpuProgram* _getBindingDelegate(void) override { return this; }
+
+        void validateDeclaration(const VertexDeclaration* decl);
     protected:
         /// GLSL does not provide access to the low level implementation of the shader, so this method s a no-op
         void createLowLevelImpl() override {}
@@ -143,6 +145,8 @@ namespace Ogre {
 
         /// Pointer to the uniform cache for this shader
         GLUniformCache    mUniformCache;
+
+        std::vector<int>  mActiveInputs; // only for vertex shaders
 
         /// Keep track of the number of shaders created.
         static uint mShaderCount;

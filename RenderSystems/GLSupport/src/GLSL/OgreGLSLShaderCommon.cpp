@@ -36,6 +36,7 @@ THE SOFTWARE.
 
 #include "OgreGLSLShaderCommon.h"
 #include "OgreGLSLPreprocessor.h"
+#include "OgreGLSLProgramCommon.h"
 
 namespace Ogre {
     //-----------------------------------------------------------------------
@@ -43,6 +44,28 @@ namespace Ogre {
 
     GLSLShaderCommon::CmdAttach GLSLShaderCommon::msCmdAttach;
     GLSLShaderCommon::CmdColumnMajorMatrices GLSLShaderCommon::msCmdColumnMajorMatrices;
+
+    void GLSLShaderCommon::validateDeclaration(const VertexDeclaration* decl)
+    {
+        for(auto sloc : mActiveInputs)
+        {
+            bool found = false;
+            for (const VertexElement & elem : decl->getElements())
+            {
+                auto eidx = GLSLProgramCommon::getFixedAttributeIndex(elem.getSemantic(), elem.getIndex());
+                if(eidx == sloc)
+                {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found)
+            {
+                LogManager::getSingleton().logError("Vertex Shader " + mName + " consumes input at location " +
+                                                    std::to_string(sloc) + " but no such VertexElement provided");
+            }
+        }
+    }
 
     String GLSLShaderCommon::getResourceLogName() const
     {
