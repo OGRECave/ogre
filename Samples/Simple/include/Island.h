@@ -24,7 +24,7 @@ public:
     {
         OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "This sample is not yet finished."
                 " Sorry!", "Sample_Island::testCapabilities");
-        if (!caps->hasCapability(RSC_TESSELLATION_HULL_PROGRAM) || !caps->hasCapability(RSC_TESSELLATION_DOMAIN_PROGRAM))
+        if (!caps->hasCapability(RSC_TESSELLATION_PROGRAM))
         {
             OGRE_EXCEPT(Exception::ERR_INVALID_STATE, "Your graphics card does not support tesselation shaders. Sorry!",
                 "Sample_Island:testCapabilities");
