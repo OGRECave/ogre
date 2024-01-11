@@ -5,6 +5,7 @@ add_library(Plugin_GLSLangProgramManager ${OGRE_LIB_TYPE} ${HEADER_FILES} src/Og
 target_include_directories(Plugin_GLSLangProgramManager PUBLIC
     "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
     $<INSTALL_INTERFACE:include/OGRE/Plugins/GLSLang>)
+target_compile_features(Plugin_GLSLangProgramManager PRIVATE cxx_std_17)
 
 if(ANDROID)
     target_include_directories(Plugin_GLSLangProgramManager SYSTEM PRIVATE
