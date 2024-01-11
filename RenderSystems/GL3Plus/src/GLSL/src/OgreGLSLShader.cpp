@@ -628,8 +628,17 @@ namespace Ogre {
         if(caps->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
         {
             extractUniforms();
-            extractBufferBlocks(GL_UNIFORM_BLOCK);
-            extractBufferBlocks(GL_SHADER_STORAGE_BLOCK);
+            try
+            {
+                extractBufferBlocks(GL_UNIFORM_BLOCK);
+                extractBufferBlocks(GL_SHADER_STORAGE_BLOCK);
+            }
+            catch (const InvalidParametersException& e)
+            {
+                LogManager::getSingleton().stream(LML_CRITICAL)
+                    << "Program '" << mName << "' is not supported: " << e.getDescription();
+                mCompileError = true;
+            }
             return;
         }
 
