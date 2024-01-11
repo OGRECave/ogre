@@ -820,7 +820,6 @@ namespace Ogre
         convertPixelShaderCaps(rsc);
         convertGeometryShaderCaps(rsc);
         convertHullShaderCaps(rsc);
-        convertDomainShaderCaps(rsc);
         convertComputeShaderCaps(rsc);
         rsc->addShaderProfile("hlsl");
 
@@ -997,28 +996,19 @@ namespace Ogre
         if (mFeatureLevel >= D3D_FEATURE_LEVEL_11_0)
         {
             rsc->addShaderProfile("hs_5_0");
+            rsc->addShaderProfile("ds_5_0");
             
-            rsc->setCapability(RSC_TESSELLATION_HULL_PROGRAM);
+            rsc->setCapability(RSC_TESSELLATION_PROGRAM);
 
             // float params, always 4D
             rsc->setTessellationHullProgramConstantFloatCount(D3D11_REQ_CONSTANT_BUFFER_ELEMENT_COUNT);
+            rsc->setTessellationDomainProgramConstantFloatCount(D3D11_REQ_CONSTANT_BUFFER_ELEMENT_COUNT);
         }
 
     }
     //---------------------------------------------------------------------
     void D3D11RenderSystem::convertDomainShaderCaps(RenderSystemCapabilities* rsc) const
     {
-        // Only for shader model 5.0
-        if (mFeatureLevel >= D3D_FEATURE_LEVEL_11_0)
-        {
-            rsc->addShaderProfile("ds_5_0");
-
-            rsc->setCapability(RSC_TESSELLATION_DOMAIN_PROGRAM);
-
-            // float params, always 4D
-            rsc->setTessellationDomainProgramConstantFloatCount(D3D11_REQ_CONSTANT_BUFFER_ELEMENT_COUNT);
-        }
-
     }
     //---------------------------------------------------------------------
     void D3D11RenderSystem::convertComputeShaderCaps(RenderSystemCapabilities* rsc) const

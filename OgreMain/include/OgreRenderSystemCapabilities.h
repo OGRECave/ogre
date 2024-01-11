@@ -96,8 +96,8 @@ namespace Ogre
         /// Supports vertex programs (vertex shaders)
         /// @deprecated All targeted APIs by Ogre support this feature
         RSC_VERTEX_PROGRAM          = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 9),
-        /// Supports hardware tessellation domain programs
-        RSC_TESSELLATION_DOMAIN_PROGRAM = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 10),
+        /// Supports tessellation domain and hull programs
+        RSC_TESSELLATION_PROGRAM = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 10),
         /// Supports 2D Texture Arrays
         RSC_TEXTURE_2D_ARRAY        = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 11),
         /// Supports separate stencil updates for both front and back faces
@@ -169,8 +169,6 @@ namespace Ogre
         RSC_RTT_DEPTHBUFFER_RESOLUTION_LESSEQUAL = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 15),
         /// Supports using vertex buffers for instance data
         RSC_VERTEX_BUFFER_INSTANCE_DATA = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 16),
-        /// Supports hardware tessellation hull programs
-        RSC_TESSELLATION_HULL_PROGRAM = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 17),
 
         // ***** DirectX specific caps *****
         /// Is DirectX feature "per stage constants" supported
@@ -206,7 +204,9 @@ namespace Ogre
         /// @deprecated assume present
         RSC_INFINITE_FAR_PLANE = RSC_VERTEX_PROGRAM,
         /// @deprecated assume present
-        RSC_FRAGMENT_PROGRAM = RSC_VERTEX_PROGRAM
+        RSC_FRAGMENT_PROGRAM = RSC_VERTEX_PROGRAM,
+        RSC_TESSELLATION_DOMAIN_PROGRAM = RSC_TESSELLATION_PROGRAM,
+        RSC_TESSELLATION_HULL_PROGRAM = RSC_TESSELLATION_PROGRAM
     };
 
     /// DriverVersion is used by RenderSystemCapabilities and both GL and D3D9
