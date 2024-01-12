@@ -1204,7 +1204,7 @@ namespace Ogre
         size_t logicalIndex, size_t requestedSize, uint16 variability, BaseConstantType type)
     {
         OgreAssert(type != BCT_SAMPLER, "");
-        if (!mLogicalToPhysical)
+        if (!mLogicalToPhysical || int(logicalIndex) == -1)
             return NULL;
 
         GpuLogicalIndexUse* indexUse = 0;
@@ -1229,8 +1229,7 @@ namespace Ogre
 
                 // Set up a mapping for all items in the count
                 size_t currPhys = physicalIndex;
-                size_t count = requestedSize / 4;
-                GpuLogicalIndexUseMap::iterator insertedIterator;
+                size_t count = std::max<size_t>(requestedSize / 4, 1);
 
                 for (size_t logicalNum = 0; logicalNum < count; ++logicalNum)
                 {
@@ -1241,10 +1240,8 @@ namespace Ogre
                     currPhys += 4;
 
                     if (logicalNum == 0)
-                        insertedIterator = it;
+                        indexUse = &(it->second);
                 }
-
-                indexUse = &(insertedIterator->second);
             }
             else
             {
@@ -1255,15 +1252,15 @@ namespace Ogre
         }
         else
         {
-            size_t physicalIndex = logi->second.physicalIndex;
             indexUse = &(logi->second);
             // check size
-            if (logi->second.currentSize < requestedSize)
+            if (indexUse->currentSize < requestedSize)
             {
+                size_t physicalIndex = indexUse->physicalIndex;
                 // init buffer entry wasn't big enough; could be a mistake on the part
                 // of the original use, or perhaps a variable length we can't predict
                 // until first actual runtime use e.g. world matrix array
-                size_t insertCount = requestedSize - logi->second.currentSize;
+                size_t insertCount = requestedSize - indexUse->currentSize;
                 auto insertPos = mConstants.begin();
                 std::advance(insertPos, physicalIndex);
                 mConstants.insert(insertPos, insertCount*4, 0);
@@ -1293,7 +1290,7 @@ namespace Ogre
                     mNamedConstants->bufferSize += insertCount;
                 }
 
-                logi->second.currentSize += insertCount;
+                indexUse->currentSize += insertCount;
             }
         }
 
