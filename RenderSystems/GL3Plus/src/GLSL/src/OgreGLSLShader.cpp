@@ -574,11 +574,11 @@ namespace Ogre {
             if (name == "OgreUniforms") // default buffer
             {
                 extractUniforms(blockIdx);
-                int binding = int(mType);
+                int binding = mType == GPT_COMPUTE_PROGRAM ? 0 : int(mType);
                 if (binding > 1)
                     LogManager::getSingleton().logWarning(
                         getResourceLogName() +
-                        " - using a UBO in this shader type will alias with shared_params");
+                        " - using 'OgreUniforms' in this shader type does alias with shared_params");
 
                 mDefaultBuffer = hbm.createUniformBuffer(values[2]);
                 static_cast<GL3PlusHardwareBuffer*>(mDefaultBuffer.get())->setGLBufferBinding(binding);
