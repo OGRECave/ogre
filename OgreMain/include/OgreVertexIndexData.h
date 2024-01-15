@@ -277,7 +277,7 @@ namespace Ogre {
     {
         public:
             VertexCacheProfiler(unsigned int cachesize = 16)
-                : size ( cachesize ), tail (0), buffersize (0), hit (0), miss (0)
+                : size ( cachesize ), tail (0), buffersize (0), hit (0), miss (0), triangles(0)
             {
                 cache = OGRE_ALLOC_T(uint32, size, MEMCATEGORY_GEOMETRY);
             }
@@ -288,18 +288,25 @@ namespace Ogre {
             }
 
             void profile(const HardwareIndexBufferSharedPtr& indexBuffer);
-            void reset() { hit = 0; miss = 0; tail = 0; buffersize = 0; }
+            void reset() { hit = 0; miss = 0; tail = 0; buffersize = 0; triangles = 0; }
             void flush() { tail = 0; buffersize = 0; }
 
             unsigned int getHits() { return hit; }
             unsigned int getMisses() { return miss; }
             unsigned int getSize() { return size; }
+
+            /** Get the average cache miss ratio
+
+            @return ratio of vertex cache misses to the triangle count (0.5 - 3.0)
+            */
+            float getAvgCacheMissRatio() { return (float)miss / triangles; }
         private:
             unsigned int size;
             uint32 *cache;
 
             unsigned int tail, buffersize;
             unsigned int hit, miss;
+            uint32 triangles;
 
             bool inCache(unsigned int index);
     };

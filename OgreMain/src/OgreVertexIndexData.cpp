@@ -989,6 +989,8 @@ namespace Ogre {
         }
 
         indexBuffer->unlock();
+
+        triangles += indexBuffer->getNumIndexes()/3;
     }
 
     //-----------------------------------------------------------------------
