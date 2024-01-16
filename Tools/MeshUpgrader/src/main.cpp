@@ -50,6 +50,7 @@ R"HELP(Usage: OgreMeshUpgrader [opts] sourcefile [destfile]
   Upgrades or downgrades .mesh file versions.
 
 -pack          = Pack normals and tangents as int_10_10_10_2
+-optvtxcache   = Reorder the indexes to optimise vertex cache utilisation
 -autogen       = Generate autoconfigured LOD. No LOD options needed
 -l lodlevels   = number of LOD levels
 -d loddist     = distance increment to reduce LOD
@@ -81,6 +82,7 @@ struct UpgradeOptions {
     bool dontReorganise;
     bool lodAutoconfigure;
     bool packNormalsTangents;
+    bool optimiseVertexCache;
     unsigned short numLods;
     Real lodDist;
     Real lodPercent;
@@ -123,6 +125,7 @@ UpgradeOptions parseOpts(UnaryOptionList& unOpts, BinaryOptionList& binOpts)
     opts.lodAutoconfigure = unOpts["-autogen"];
     opts.dontReorganise = unOpts["-r"];
     opts.packNormalsTangents = unOpts["-pack"];
+    opts.optimiseVertexCache = unOpts["-optvtxcache"];
 
     // Unary options (true/false options that don't take a parameter)
     if (unOpts["-b"]) {
@@ -448,6 +451,7 @@ int main(int numargs, char** args)
         unOptList["-autogen"] = false;
         unOptList["-pack"] = false;
         unOptList["-b"] = false;
+        unOptList["-optvtxcache"] = false;
         binOptList["-l"] = "";
         binOptList["-d"] = "";
         binOptList["-p"] = "";
@@ -557,6 +561,27 @@ int main(int numargs, char** args)
 
         if (opts.recalcBounds) {
             recalcBounds(mesh);
+        }
+
+        if(opts.optimiseVertexCache)
+        {
+            logMgr.logMessage("Vertex cache optimization...");
+            VertexCacheProfiler vcp;
+            VertexCacheProfiler vcpnew;
+
+            for (auto s : mesh->getSubMeshes())
+            {
+                if(!s->indexData->indexBuffer)
+                    continue;
+                vcp.profile(s->indexData->indexBuffer);
+                s->indexData->optimiseVertexCacheTriList();
+                vcpnew.profile(s->indexData->indexBuffer);
+                vcp.flush();
+                vcpnew.flush();
+            }
+
+            logMgr.logMessage(StringUtil::format("Vertex cache optimization: ACMR change %.2f -> %.2f",
+                                                 vcp.getAvgCacheMissRatio(), vcpnew.getAvgCacheMissRatio()));
         }
 
         meshSerializer.exportMesh(mesh, dest, opts.targetVersion, opts.endian);
