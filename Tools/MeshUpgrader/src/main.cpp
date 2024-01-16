@@ -426,11 +426,6 @@ struct MeshResourceCreator : public MeshSerializerListener
 
 int main(int numargs, char** args)
 {
-    if (numargs < 2) {
-        help();
-        return -1;
-    }
-
     int retCode = 0;
 
     LogManager logMgr;
@@ -463,6 +458,13 @@ int main(int numargs, char** args)
         binOptList["-log"] = "OgreMeshUpgrader.log";
 
         int startIdx = findCommandLineOpts(numargs, args, unOptList, binOptList);
+
+        if(numargs < 2 || numargs == startIdx)
+        {
+            help();
+            return -1;
+        }
+
         auto opts = parseOpts(unOptList, binOptList);
 
         logMgr.setDefaultLog(NULL); // swallow startup messages
