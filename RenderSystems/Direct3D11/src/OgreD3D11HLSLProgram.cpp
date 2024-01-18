@@ -1171,6 +1171,9 @@ namespace Ogre {
             } // columns
             break;
         case D3D10_SVT_FLOAT:
+            if(d3dDesc.Rows > 1 && mColumnMajorMatrices)
+                std::swap(d3dDesc.Rows, d3dDesc.Columns);
+
             switch(d3dDesc.Rows)
             {
             case 1:
