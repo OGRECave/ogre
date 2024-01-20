@@ -182,16 +182,6 @@ namespace Ogre {
         READ_UINT(SamplerSize)
         READ_END
 
-        READ_START(mD3d11ShaderVariableSubparts, GpuConstantDefinitionWithName)
-        READ_NAME2(Name)
-        READ_ENUM(constType, GpuConstantType)
-        READ_UINT(physicalIndex)
-        READ_UINT(logicalIndex)
-        READ_UINT(elementSize)
-        READ_UINT(arraySize)
-        READ_UINT(variability)
-        READ_END
-
         READ_START(mD3d11ShaderBufferDescs, D3D11_SHADER_BUFFER_DESC)
         READ_NAME(Name)
         READ_ENUM(Type, D3D_CBUFFER_TYPE)
@@ -457,10 +447,6 @@ namespace Ogre {
                         String * name = new String(curVar.Name);
                         mSerStrings.push_back(name);
                         curVar.Name = &(*name)[0]; 
-
-                        // Recursively descend through the structure levels
-                        if(v == 0) // but only for main buffer
-                            processParamElement( "", *name, varRef->GetType());
                     }
 
                     switch (constantBufferDesc.Type)
@@ -564,7 +550,6 @@ namespace Ogre {
                 GET_SIZE_OF_NAMES(inputNamesSize, mD3d11ShaderInputParameters, SemanticName);
                 GET_SIZE_OF_NAMES(outputNamesSize, mD3d11ShaderOutputParameters, SemanticName);
                 GET_SIZE_OF_NAMES(varNamesSize, mD3d11ShaderVariables, Name);
-                GET_SIZE_OF_NAMES(varSubpartSize, mD3d11ShaderVariableSubparts, Name.c_str());
                 GET_SIZE_OF_NAMES(d3d11ShaderBufferDescsSize, mD3d11ShaderBufferDescs, Name);
                 GET_SIZE_OF_NAMES(varDescBufferSize, mVarDescBuffer, Name);
                 GET_SIZE_OF_NAMES(varDescPointerSize, mVarDescPointer, Name);
@@ -610,16 +595,6 @@ namespace Ogre {
                                 SIZE_OF_DATA_UINT(TextureSize)
                                 SIZE_OF_DATA_UINT(StartSampler)
                                 SIZE_OF_DATA_UINT(SamplerSize)
-                                SIZE_OF_DATA_END
-
-                                SIZE_OF_DATA_START(mD3d11ShaderVariableSubparts, GpuConstantDefinitionWithName)
-                                SIZE_OF_DATA_NAME(Name)
-                                SIZE_OF_DATA_ENUM(constType, GpuConstantType)
-                                SIZE_OF_DATA_UINT(physicalIndex)
-                                SIZE_OF_DATA_UINT(logicalIndex)
-                                SIZE_OF_DATA_UINT(elementSize)
-                                SIZE_OF_DATA_UINT(arraySize)
-                                SIZE_OF_DATA_UINT(variability)
                                 SIZE_OF_DATA_END
 
                                 SIZE_OF_DATA_START(mD3d11ShaderBufferDescs, D3D11_SHADER_BUFFER_DESC)
@@ -682,7 +657,6 @@ namespace Ogre {
                                  + inputNamesSize
                                  + outputNamesSize
                                  + varNamesSize
-                                 + varSubpartSize
                                  + d3d11ShaderBufferDescsSize
                                  + varDescBufferSize
                                  + varDescPointerSize
@@ -772,16 +746,6 @@ namespace Ogre {
                 WRITE_UINT(SamplerSize)
                 WRITE_END
 
-                WRITE_START(mD3d11ShaderVariableSubparts, GpuConstantDefinitionWithName)
-                WRITE_NAME(Name.c_str())
-                WRITE_ENUM(constType, GpuConstantType)
-                WRITE_UINT(physicalIndex)
-                WRITE_UINT(logicalIndex)
-                WRITE_UINT(elementSize)
-                WRITE_UINT(arraySize)
-                WRITE_UINT(variability)
-                WRITE_END
-
                 WRITE_START(mD3d11ShaderBufferDescs, D3D11_SHADER_BUFFER_DESC)
                 WRITE_NAME(Name)
                 WRITE_ENUM(Type, D3D_CBUFFER_TYPE)
@@ -856,60 +820,15 @@ namespace Ogre {
     void D3D11HLSLProgram::analizeMicrocode()
     {
         getConstantDefinitions();
-        auto& params = *mConstantDefs;
-
-        UINT bufferCount = 0;
-        UINT pointerCount = 0;
-        UINT typeCount = 0;
-        UINT memberCount = 0;
-        UINT interCount = 0;
-        UINT nameCount = 0;
 
         for(UINT b = 0; b < mConstantBufferNr; b++)
         {           
             switch (mD3d11ShaderBufferDescs[b].Type)
             {
-            // For this buffer type, all variables are interfaces, 
-            // so just parse and store interface slots
-            case D3D_CT_INTERFACE_POINTERS:
-                {
-                    for(UINT v = 0; v < mD3d11ShaderBufferDescs[b].Variables; v++)
-                    {
-                        interCount++;
-                        pointerCount++;
-                        // Only parse if is used
-                        if (mVarDescPointer[pointerCount-1].uFlags & D3D_SVF_USED)
-                        {
-                            mSlotMap.insert(std::make_pair(mVarDescPointer[pointerCount-1].Name, mInterfaceSlots[interCount-1]));
-
-                            /*
-                            D3D11_SHADER_TYPE_DESC typeDesc;
-                            ID3D11ShaderReflectionType* varType = var->GetType();
-                            varType->GetDesc(&typeDesc);
-                                    
-                            // Get all interface slots if inside an array
-                            //unsigned int numInterface = varType->GetNumInterfaces();
-                            for(UINT ifs = 0; ifs < typeDesc.Elements; ifs++)
-                            {
-                                std::string name = varDesc.Name;
-                                name += "[";
-                                name += StringConverter::toString(ifs);
-                                name += "]";
-                                mSlotMap.insert(std::make_pair(name, ifs));
-                            }
-                            */
-                        }
-                    }
-                }
-                break;
-
-            // These buffers store variables and class instances, 
-            // so parse all.
             case D3D_CT_CBUFFER:
             case D3D_CT_TBUFFER:
                 {
                     String cb_name = mD3d11ShaderBufferDescs[b].Name;
-                    bool isDefault = false;
                     if(cb_name == "$Globals" || cb_name == "$Params" || cb_name == "OgreUniforms")
                     {
                         if(mDefaultBuffer)
@@ -917,7 +836,6 @@ namespace Ogre {
                         else
                         {
                             mDefaultBuffer = HardwareBufferManager::getSingleton().createUniformBuffer(mD3d11ShaderBufferDescs[b].Size);
-                            isDefault = true;
                         }
                     }
                     else
@@ -927,56 +845,6 @@ namespace Ogre {
                         auto cbuffer = HardwareBufferManager::getSingleton().createUniformBuffer(mD3d11ShaderBufferDescs[b].Size);
                         blockSharedParams->_setHardwareBuffer(cbuffer);
                         mBufferInfoMap[cb_name] = b;
-                    }
-
-                    if(!isDefault)
-                        continue; // only record default buffer variables
-
-                    // Now, parse variables for this buffer
-                    for(unsigned int i = 0; i < mD3d11ShaderBufferDescs[b].Variables ; i++)
-                    {
-                        // Only parse if variable is used
-                        bufferCount++;
-                        if (mVarDescBuffer[bufferCount-1].uFlags & D3D_SVF_USED)
-                        {
-                            typeCount++;
-                            switch (mD3d11ShaderTypeDescs[typeCount-1].Class)
-                            {
-                            // Class instance variables
-                            case D3D_SVC_STRUCT:
-                                {
-                                    // Offset if relative to parent struct, so store offset
-                                    // of class instance, and add to offset of inner variables
-                                    const UINT parentOffset = mVarDescBuffer[bufferCount - 1].StartOffset;
-                                    for(UINT m = 0; m < mD3d11ShaderTypeDescs[typeCount-1].Members; m++)
-                                    {
-                                        String name = mVarDescBuffer[bufferCount-1].Name;
-                                        name += ".";
-                                        name += mMemberTypeName[nameCount++].Name;
-
-                                        auto& def = params.map[name];
-                                        /*newVar.size = mMemberTypeDesc[memberCount].Rows * mMemberTypeDesc[memberCount].Columns *
-                                                                    (mMemberTypeDesc[memberCount].Type == D3D_SVT_FLOAT ||
-                                                                        mMemberTypeDesc[memberCount].Type == D3D_SVT_INT ? 4 : 1);*/
-                                        def.physicalIndex = parentOffset + mMemberTypeDesc[memberCount].Offset;
-                                        memberCount++;
-                                    }
-                                }
-                                break;
-
-                            // scalar, vector or matrix variables
-                            case D3D_SVC_SCALAR:
-                            case D3D_SVC_VECTOR:
-                            case D3D_SVC_MATRIX_ROWS:
-                            case D3D_SVC_MATRIX_COLUMNS:
-                                {
-                                    auto& name = mVarDescBuffer[bufferCount-1].Name;
-                                    params.map[name].physicalIndex = mVarDescBuffer[bufferCount-1].StartOffset;
-                                }
-                                break;
-                            };
-
-                        }
                     }
                 }
                 break;
@@ -1032,7 +900,6 @@ namespace Ogre {
         mD3d11ShaderOutputParameters.clear();
         mD3d11ShaderBufferDescs.clear();
         mD3d11ShaderVariables.clear();
-        mD3d11ShaderVariableSubparts.clear();
         mVarDescBuffer.clear();
         mD3d11ShaderTypeDescs.clear();
     }
@@ -1043,75 +910,120 @@ namespace Ogre {
         createParameterMappingStructures(true);
         mLogicalToPhysical.reset();
 
-        for(GpuConstantDefinitionWithName def : mD3d11ShaderVariableSubparts)
+        // find the default cbuffer desc
+        D3D11_SHADER_BUFFER_DESC* defaultBufferDesc = NULL;
+        for(D3D11_SHADER_BUFFER_DESC& desc : mD3d11ShaderBufferDescs)
         {
-            OgreAssert(def.isFloat() || def.isInt() || def.isUnsignedInt(), "Invalid type");
-
-            def.physicalIndex = mConstantDefs->bufferSize;
-            mConstantDefs->bufferSize += def.arraySize * def.elementSize * 4;
-
-            mConstantDefs->map.emplace(def.Name, def);
-        }
-    }
-    //-----------------------------------------------------------------------
-    void D3D11HLSLProgram::processParamElement(String prefix, String paramName, ID3D11ShaderReflectionType* varRefType)
-    {
-        D3D11_SHADER_TYPE_DESC varRefTypeDesc;
-        HRESULT hr = varRefType->GetDesc(&varRefTypeDesc);
-
-        // Since D3D HLSL doesn't deal with naming of array and struct parameters
-        // automatically, we have to do it by hand
-        if (FAILED(hr))
-        {
-			OGRE_EXCEPT_EX(Exception::ERR_INTERNAL_ERROR, hr,
-                "Cannot retrieve constant description from HLSL program.", 
-                "D3D11HLSLProgram::processParamElement");
-        }
-
-        // trim the odd '$' which appears at the start of the names in HLSL
-        if (paramName.at(0) == '$' || paramName.at(0) == '_')
-            paramName.erase(paramName.begin());
-
-        // Also trim the '[0]' suffix if it exists, we will add our own indexing later
-        if (StringUtil::endsWith(paramName, "[0]", false))
-        {
-            paramName.erase(paramName.size() - 3);
-        }
-
-        if (varRefTypeDesc.Class == D3D_SVC_STRUCT)
-        {
-            // work out a new prefix for nested members, if it's an array, we need an index
-            prefix = prefix + paramName + ".";
-            // Cascade into struct
-            for (unsigned int i = 0; i < varRefTypeDesc.Members; ++i)
+            // For this buffer type, all variables are interfaces,
+            // so just parse and store interface slots
+            if(desc.Type == D3D_CT_INTERFACE_POINTERS)
             {
-                processParamElement(prefix, varRefType->GetMemberTypeName(i), varRefType->GetMemberTypeByIndex(i));
+                UINT pointerCount = 0;
+                UINT interCount = 0;
+                for(UINT v = 0; v < desc.Variables; v++)
+                {
+                    interCount++;
+                    pointerCount++;
+                    // Only parse if is used
+                    if (mVarDescPointer[pointerCount-1].uFlags & D3D_SVF_USED)
+                    {
+                        mSlotMap.insert(std::make_pair(mVarDescPointer[pointerCount-1].Name, mInterfaceSlots[interCount-1]));
+
+                        /*
+                        D3D11_SHADER_TYPE_DESC typeDesc;
+                        ID3D11ShaderReflectionType* varType = var->GetType();
+                        varType->GetDesc(&typeDesc);
+
+                        // Get all interface slots if inside an array
+                        //unsigned int numInterface = varType->GetNumInterfaces();
+                        for(UINT ifs = 0; ifs < typeDesc.Elements; ifs++)
+                        {
+                            std::string name = varDesc.Name;
+                            name += "[";
+                            name += StringConverter::toString(ifs);
+                            name += "]";
+                            mSlotMap.insert(std::make_pair(name, ifs));
+                        }
+                        */
+                    }
+                }
             }
-        }
-        else
-        {
-            // Process params
-            if (   varRefTypeDesc.Type == D3D_SVT_FLOAT 
-                || varRefTypeDesc.Type == D3D_SVT_INT 
-                || varRefTypeDesc.Type == D3D_SVT_UINT 
-                || varRefTypeDesc.Type == D3D_SVT_BOOL)
+
+
+            if(desc.Type != D3D_CT_CBUFFER)
+                continue;
+
+            String name = desc.Name;
+            if(name == "$Globals" || name == "$Params" || name == "OgreUniforms")
             {
-                GpuConstantDefinitionWithName def;
-                def.Name = prefix + paramName;
-
-                GpuConstantDefinitionWithName* prev_def = mD3d11ShaderVariableSubparts.empty() ? NULL : &mD3d11ShaderVariableSubparts.back();
-                def.logicalIndex = prev_def ? prev_def->logicalIndex + prev_def->elementSize / 4 : 0;
-
-                // populate type, array size & element size
-                populateDef(varRefTypeDesc, def);
-
-                mD3d11ShaderVariableSubparts.push_back(def);
+                defaultBufferDesc = &desc;
+                break;
             }
         }
 
+        if(!defaultBufferDesc)
+            return;
+
+        mConstantDefs->bufferSize = defaultBufferDesc->Size/4;
+
+        UINT bufferCount = 0;
+        UINT typeCount = 0;
+        UINT memberCount = 0;
+        UINT nameCount = 0;
+
+        // Now, parse variables for this buffer
+        for(unsigned int i = 0; i < defaultBufferDesc->Variables ; i++)
+        {
+            // Only parse if variable is used
+            bufferCount++;
+            if (mVarDescBuffer[bufferCount-1].uFlags & D3D_SVF_USED)
+            {
+                String name;
+                GpuConstantDefinition def;
+
+                typeCount++;
+                switch (mD3d11ShaderTypeDescs[typeCount-1].Class)
+                {
+                // Class instance variables
+                case D3D_SVC_STRUCT:
+                    {
+                        // Offset if relative to parent struct, so store offset
+                        // of class instance, and add to offset of inner variables
+                        const UINT parentOffset = mVarDescBuffer[bufferCount - 1].StartOffset;
+                        for(UINT m = 0; m < mD3d11ShaderTypeDescs[typeCount-1].Members; m++)
+                        {
+                            name = mVarDescBuffer[bufferCount-1].Name;
+                            name += ".";
+                            name += mMemberTypeName[nameCount++].Name;
+
+                            def.physicalIndex = parentOffset + mMemberTypeDesc[memberCount].Offset;
+                            def.elementSize = GpuConstantDefinition::getElementSize(def.constType, false); // guess
+                            populateDef(mMemberTypeDesc[memberCount], def);
+                            memberCount++;
+                        }
+                    }
+                    break;
+
+                // scalar, vector or matrix variables
+                case D3D_SVC_SCALAR:
+                case D3D_SVC_VECTOR:
+                case D3D_SVC_MATRIX_ROWS:
+                case D3D_SVC_MATRIX_COLUMNS:
+                    {
+                        name = mVarDescBuffer[bufferCount-1].Name;
+                        def.physicalIndex = mVarDescBuffer[bufferCount-1].StartOffset;
+                        populateDef(mD3d11ShaderTypeDescs[typeCount-1], def);
+                        def.elementSize = mVarDescBuffer[bufferCount-1].Size / 4 / def.arraySize;
+                    }
+                    break;
+                };
+
+                mConstantDefs->map.emplace(name, def);
+            }
+        }
     }
     //-----------------------------------------------------------------------
-    void D3D11HLSLProgram::populateDef(D3D11_SHADER_TYPE_DESC& d3dDesc, GpuConstantDefinition& def) const
+    void D3D11HLSLProgram::populateDef(D3D11_SHADER_TYPE_DESC& d3dDesc, GpuConstantDefinition& def)
     {
         def.arraySize = std::max<unsigned int>(d3dDesc.Elements, 1);
         switch(d3dDesc.Type)
@@ -1224,11 +1136,6 @@ namespace Ogre {
             // not mapping samplers, don't need to take the space 
             break;
         };
-
-        // HLSL pads to 4 elements
-        def.elementSize = GpuConstantDefinition::getElementSize(def.constType, true);
-
-
     }
     //-----------------------------------------------------------------------
     D3D11HLSLProgram::D3D11HLSLProgram(ResourceManager* creator, const String& name, 
@@ -1607,7 +1514,7 @@ namespace Ogre {
         std::vector<ID3D11Buffer*> buffers;
         if(mDefaultBuffer)
         {
-            OgreAssert(mDefaultBuffer->getSizeInBytes() <= params->getConstantList().size(), "unexpected buffer size");
+            OgreAssert(mDefaultBuffer->getSizeInBytes() == params->getConstantList().size(), "unexpected buffer size");
             mDefaultBuffer->writeData(0, mDefaultBuffer->getSizeInBytes(), params->getConstantList().data(), true);
 
             buffers.push_back(static_cast<D3D11HardwareBuffer*>(mDefaultBuffer.get())->getD3DBuffer());

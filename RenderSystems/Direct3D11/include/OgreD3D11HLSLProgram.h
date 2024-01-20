@@ -87,10 +87,7 @@ namespace Ogre {
         void unloadHighLevelImpl(void) override;
         void unprepareImpl() override;
 
-        // Recursive utility method for populateParameterNames
-        void processParamElement(String prefix, String paramName, ID3D11ShaderReflectionType* varRefType);
-
-        void populateDef(D3D11_SHADER_TYPE_DESC& d3dDesc, GpuConstantDefinition& def) const;
+        static void populateDef(D3D11_SHADER_TYPE_DESC& d3dDesc, GpuConstantDefinition& def);
 
         bool mColumnMajorMatrices;
         bool mEnableBackwardsCompatibility;
@@ -124,13 +121,6 @@ namespace Ogre {
         typedef std::vector<D3D11_SHADER_VARIABLE_DESC> D3d11ShaderVariables;
         typedef D3d11ShaderVariables::iterator D3d11ShaderVariablesIter; 
 
-        struct GpuConstantDefinitionWithName : GpuConstantDefinition
-        {
-            String                  Name;
-        };
-        typedef std::vector<GpuConstantDefinitionWithName> D3d11ShaderVariableSubparts;
-        typedef D3d11ShaderVariableSubparts::iterator D3d11ShaderVariableSubpartsIter; 
-
         struct MemberTypeName
         {
             String                  Name;
@@ -149,7 +139,6 @@ namespace Ogre {
         D3d11ShaderParameters mD3d11ShaderInputParameters;
         D3d11ShaderParameters mD3d11ShaderOutputParameters;
         D3d11ShaderVariables mD3d11ShaderVariables;
-        D3d11ShaderVariableSubparts mD3d11ShaderVariableSubparts;
         D3d11ShaderBufferDescs mD3d11ShaderBufferDescs;
         D3d11ShaderVariables mVarDescBuffer;
         D3d11ShaderVariables mVarDescPointer;
