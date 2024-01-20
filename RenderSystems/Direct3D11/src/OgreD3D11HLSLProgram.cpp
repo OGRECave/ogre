@@ -1041,34 +1041,14 @@ namespace Ogre {
     void D3D11HLSLProgram::buildConstantDefinitions()
     {
         createParameterMappingStructures(true);
+        mLogicalToPhysical.reset();
 
-        for(unsigned int i = 0 ; i < mD3d11ShaderVariableSubparts.size() ; i++)
+        for(GpuConstantDefinitionWithName def : mD3d11ShaderVariableSubparts)
         {
-            GpuConstantDefinitionWithName def = mD3d11ShaderVariableSubparts[i];
-            int paramIndex = def.logicalIndex;
-            GpuLogicalBufferStruct* currentBuffer = NULL;
-            size_t* currentBufferSize = NULL;
-            if (def.isFloat() || def.isInt() || def.isUnsignedInt())
-            {
-                currentBuffer = mLogicalToPhysical.get();
-                currentBufferSize = &mConstantDefs->bufferSize;
-            }
+            OgreAssert(def.isFloat() || def.isInt() || def.isUnsignedInt(), "Invalid type");
 
-            if (currentBuffer != NULL && currentBufferSize != NULL)
-            {
-                def.physicalIndex = currentBuffer->bufferSize*4;
-                OGRE_LOCK_MUTEX(currentBuffer->mutex);
-                currentBuffer->map.emplace(
-                    paramIndex, GpuLogicalIndexUse(def.physicalIndex, def.arraySize * def.elementSize, GPV_GLOBAL, BCT_UNKNOWN));
-                currentBuffer->bufferSize += def.arraySize * def.elementSize;
-                *currentBufferSize = currentBuffer->bufferSize;
-            }
-            else
-            {
-                OGRE_EXCEPT(Exception::ERR_INVALID_STATE, 
-                            "Currently the only supported variables for Direct3D11 hlsl program are: 'float', 'int' and ' unsigned int'", 
-                            "D3D11HLSLProgram::getConstantBuffer");
-            }
+            def.physicalIndex = mConstantDefs->bufferSize;
+            mConstantDefs->bufferSize += def.arraySize * def.elementSize * 4;
 
             mConstantDefs->map.emplace(def.Name, def);
         }
