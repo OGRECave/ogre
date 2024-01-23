@@ -425,12 +425,8 @@ SelectMenu::SelectMenu(const Ogre::String &name, const Ogre::DisplayString &capt
 }
 
 void SelectMenu::copyItemsFrom(SelectMenu *other){
-    const Ogre::StringVector& items = other->getItems();
-    Ogre::StringVector::const_iterator it, itEnd;
-    itEnd = items.end();
-    for(it=items.begin(); it != itEnd; it++){
-        this->addItem(*it);
-    }
+    for(const auto& i : other->getItems())
+        addItem(i);
 }
 
 void SelectMenu::setCaption(const Ogre::DisplayString &caption)
@@ -538,17 +534,11 @@ void SelectMenu::selectItem(size_t index, bool notifyListener)
 
 bool SelectMenu::containsItem(const Ogre::DisplayString &item)
 {
-    bool res = false;
-    for (unsigned int i = 0; i < mItems.size(); i++)
-    {
-        if (item == mItems[i])
-        {
-            res = true;
-            break;
-        }
-    }
+    auto i = std::find(mItems.begin(), mItems.end(), item);
+    if (i != mItems.end())
+        return true;
 
-    return res;
+    return false;
 }
 
 void SelectMenu::selectItem(const Ogre::DisplayString &item, bool notifyListener)
@@ -1193,10 +1183,8 @@ TrayManager::~TrayManager()
 
     destroyAllWidgets();
 
-    for (unsigned int i = 0; i < mWidgetDeathRow.size(); i++)   // delete widgets queued for destruction
-    {
-        delete mWidgetDeathRow[i];
-    }
+    for (auto *w : mWidgetDeathRow) // delete widgets queued for destruction
+        delete w;
     mWidgetDeathRow.clear();
 
     om.destroy(mBackdropLayer);
