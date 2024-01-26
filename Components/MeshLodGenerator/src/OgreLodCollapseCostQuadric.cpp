@@ -97,18 +97,15 @@ namespace Ogre
 
         return cost;
 
-    }   
+    }
 
     void LodCollapseCostQuadric::computeVertexQuadric( LodData* data, size_t vertexID )
     {
         Matrix4& quadric = mVertexQuadricList[vertexID];
         quadric = Matrix4::ZERO;
         LodData::Vertex& vertex = data->mVertexList[vertexID];
-        LodData::VTriangles::iterator tri, triEnd;
-        tri = vertex.triangles.begin();
-        triEnd = vertex.triangles.end();
-        for (;tri != triEnd; ++tri) {
-            size_t id = LodData::getVectorIDFromPointer(data->mTriangleList, *tri);
+        for (const auto& t : vertex.triangles) {
+            size_t id = LodData::getVectorIDFromPointer(data->mTriangleList, t);
             quadric = quadric + mTrianglePlaneQuadricList[id];
         }
     }
