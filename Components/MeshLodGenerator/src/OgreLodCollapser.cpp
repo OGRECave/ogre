@@ -60,14 +60,14 @@ namespace Ogre
         // Allows to find bugs in collapsing.
         for (const auto& t : v->triangles) {
             for (int i = 0; i < 3; i++) {
-                OgreAssert(t.vertex[i]->costHeapPosition != data->mCollapseCostHeap.end(), "");
-                t.vertex[i]->edges.findExists(LodData::Edge(t.vertex[i]->collapseTo));
+                OgreAssert(t->vertex[i]->costHeapPosition != data->mCollapseCostHeap.end(), "");
+                t->vertex[i]->edges.findExists(LodData::Edge(t->vertex[i]->collapseTo));
                 for (int n = 0; n < 3; n++) {
                     if (i != n) {
-                        LodData::VEdges::iterator edgeIt = t.vertex[i]->edges.findExists(LodData::Edge(t.vertex[n]));
+                        LodData::VEdges::iterator edgeIt = t->vertex[i]->edges.findExists(LodData::Edge(t->vertex[n]));
                         OgreAssert(edgeIt->collapseCost != LodData::UNINITIALIZED_COLLAPSE_COST, "");
                     } else {
-                        OgreAssert(t.vertex[i]->edges.find(LodData::Edge(t.vertex[n])) == t.vertex[i]->edges.end(), "");
+                        OgreAssert(t->vertex[i]->edges.find(LodData::Edge(t->vertex[n])) == t->vertex[i]->edges.end(), "");
                     }
                 }
             }
@@ -78,10 +78,10 @@ namespace Ogre
     {
         // Validates that collapsing has updated all edges needed by computeEdgeCollapseCost.
         // This will OgreAssert if the dependencies inside computeEdgeCollapseCost changes.
-        for (const auto& e : vertex->edges) {
-            OgreAssert(e.collapseCost == cost->computeEdgeCollapseCost(data, vertex, &*it), "");
+        for (auto& e : vertex->edges) {
+            OgreAssert(e.collapseCost == cost->computeEdgeCollapseCost(data, vertex, &e), "");
             LodData::Vertex* neighbor = e.dst;
-            for (const auto& e1 : vertex->edges) {
+            for (auto& e1 : vertex->edges) {
                 OgreAssert(e1.collapseCost == cost->computeEdgeCollapseCost(data, neighbor, &e1), "");
             }
         }
