@@ -51,21 +51,14 @@ namespace Ogre
         // Allows to find bugs in collapsing.
         //  size_t s1 = mUniqueVertexSet.size();
         //  size_t s2 = mCollapseCostHeap.size();
-        LodData::CollapseCostHeap::iterator it = data->mCollapseCostHeap.begin();
-        LodData::CollapseCostHeap::iterator itEnd = data->mCollapseCostHeap.end();
-        while (it != itEnd) {
-            assertValidVertex(data, it->second);
-            it++;
-        }
+        for (const auto& c : data->mCollapseCostHeap)
+            assertValidVertex(data, c.second);
     }
 
     void LodCollapser::assertValidVertex(LodData* data, LodData::Vertex* v)
     {
         // Allows to find bugs in collapsing.
-        LodData::VTriangles::iterator it = v->triangles.begin();
-        LodData::VTriangles::iterator itEnd = v->triangles.end();
-        for (; it != itEnd; it++) {
-            LodData::Triangle* t = *it;
+        for (const auto& t : v->triangles) {
             for (int i = 0; i < 3; i++) {
                 OgreAssert(t->vertex[i]->costHeapPosition != data->mCollapseCostHeap.end(), "");
                 t->vertex[i]->edges.findExists(LodData::Edge(t->vertex[i]->collapseTo));
@@ -85,15 +78,11 @@ namespace Ogre
     {
         // Validates that collapsing has updated all edges needed by computeEdgeCollapseCost.
         // This will OgreAssert if the dependencies inside computeEdgeCollapseCost changes.
-        LodData::VEdges::iterator it = vertex->edges.begin();
-        LodData::VEdges::iterator itEnd = vertex->edges.end();
-        for (; it != itEnd; it++) {
-            OgreAssert(it->collapseCost == cost->computeEdgeCollapseCost(data, vertex, &*it), "");
-            LodData::Vertex* neighbor = it->dst;
-            LodData::VEdges::iterator it2 = neighbor->edges.begin();
-            LodData::VEdges::iterator it2End = neighbor->edges.end();
-            for (; it2 != it2End; it2++) {
-                OgreAssert(it2->collapseCost == cost->computeEdgeCollapseCost(data, neighbor, &*it2), "");
+        for (auto& e : vertex->edges) {
+            OgreAssert(e.collapseCost == cost->computeEdgeCollapseCost(data, vertex, &e), "");
+            LodData::Vertex* neighbor = e.dst;
+            for (auto& e1 : vertex->edges) {
+                OgreAssert(e1.collapseCost == cost->computeEdgeCollapseCost(data, neighbor, &e1), "");
             }
         }
     }
@@ -113,7 +102,7 @@ namespace Ogre
     {
         triangle->isRemoved = true;
         // skip is needed if we are iterating on the vertex's edges or triangles.
-        for (auto & i : triangle->vertex) {
+        for (auto& i : triangle->vertex) {
             if (i != skip) {
                 i->triangles.removeExists(triangle);
             }
@@ -130,7 +119,7 @@ namespace Ogre
     {
         line->isRemoved = true;
 
-        for (auto & i : line->vertex) {
+        for (auto& i : line->vertex) {
             if (i != skip) {
                 i->lines.removeExists(line);
             }
@@ -212,11 +201,8 @@ namespace Ogre
         // so we need to connect them correctly based on deleted triangle's edge.
         // mCollapsedEdgeIDs will be used, when looking up the connections for replacement.
         tmpCollapsedEdges.clear();
-        LodData::VTriangles::iterator it = src->triangles.begin();
-        LodData::VTriangles::iterator itEnd = src->triangles.end();
-        for (; it != itEnd; ++it) {
-            LodData::Triangle* triangle = *it;
-            if (triangle->hasVertex(dst)) {
+        for (const auto& t : src->triangles) {
+            if (t->hasVertex(dst)) {
                 // Remove a triangle
                 // Tasks:
                 // 1. Add it to the collapsed edges list.
@@ -224,31 +210,27 @@ namespace Ogre
                 // 3. Remove references/pointers to this triangle and mark as removed.
 
                 // 1. task
-                unsigned int srcID = triangle->getVertexID(src);
-                if (!hasSrcID(srcID, triangle->submeshID)) {
+                unsigned int srcID = t->getVertexID(src);
+                if (!hasSrcID(srcID, t->submeshID)) {
                     tmpCollapsedEdges.push_back(CollapsedEdge());
                     tmpCollapsedEdges.back().srcID = srcID;
-                    tmpCollapsedEdges.back().dstID = triangle->getVertexID(dst);
-                    tmpCollapsedEdges.back().submeshID = triangle->submeshID;
+                    tmpCollapsedEdges.back().dstID = t->getVertexID(dst);
+                    tmpCollapsedEdges.back().submeshID = t->submeshID;
                 }
 
                 // 2. task
-                data->mIndexBufferInfoList[triangle->submeshID].indexCount -= 3;
-                output->triangleRemoved(data, triangle);
+                data->mIndexBufferInfoList[t->submeshID].indexCount -= 3;
+                output->triangleRemoved(data, t);
                 // 3. task
-                removeTriangleFromEdges(triangle, src);
+                removeTriangleFromEdges(t, src);
 
             }
         }
         OgreAssert(tmpCollapsedEdges.size(), "");
         OgreAssert(dst->edges.find(LodData::Edge(src)) == dst->edges.end(), "");
-
-        LodData::VLines::iterator lineIt = src->lines.begin();
-        LodData::VLines::iterator lineItEnd = src->lines.end();
-        for (; lineIt != lineItEnd; ++lineIt)
+        for (const auto& l : src->lines)
         {
-            LodData::Line* line = *lineIt;
-            if (line->hasVertex(dst))
+            if (l->hasVertex(dst))
             {
                 // Remove a line
                 // Tasks:
@@ -257,60 +239,56 @@ namespace Ogre
                 // 3. Remove references/pointers to this line and mark as removed.
 
                 // 1. task
-                unsigned int srcID = line->getVertexID(src);
-                if (!hasSrcID(srcID, line->submeshID)) {
+                unsigned int srcID = l->getVertexID(src);
+                if (!hasSrcID(srcID, l->submeshID)) {
                     tmpCollapsedEdges.push_back(CollapsedEdge());
                     tmpCollapsedEdges.back().srcID = srcID;
-                    tmpCollapsedEdges.back().dstID = line->getVertexID(dst);
-                    tmpCollapsedEdges.back().submeshID = line->submeshID;
+                    tmpCollapsedEdges.back().dstID = l->getVertexID(dst);
+                    tmpCollapsedEdges.back().submeshID = l->submeshID;
                 }
 
                 // 2. task
-                data->mIndexBufferInfoList[line->submeshID].indexCount -= 2;
-                output->lineRemoved(data, line);
+                data->mIndexBufferInfoList[l->submeshID].indexCount -= 2;
+                output->lineRemoved(data, l);
                 // 3. task
-                removeLine(line, src);
+                removeLine(l, src);
             }
         }
 
-        it = src->triangles.begin();
-        for (; it != itEnd; ++it) {
-            LodData::Triangle* triangle = *it;
-            if (!triangle->hasVertex(dst)) {
+        for (const auto& t : src->triangles) {
+            if (!t->hasVertex(dst)) {
                 // Replace a triangle
                 // Tasks:
                 // 1. Determine the edge which we will move along. (we need to modify single vertex only)
                 // 2. Move along the selected edge.
 
                 // 1. task
-                unsigned int srcID = triangle->getVertexID(src);
-                size_t id = findDstID(srcID, triangle->submeshID);
+                unsigned int srcID = t->getVertexID(src);
+                size_t id = findDstID(srcID, t->submeshID);
                 if (id == std::numeric_limits<size_t>::max()) {
                     // Not found any edge to move along.
                     // Destroy the triangle.
-                    data->mIndexBufferInfoList[triangle->submeshID].indexCount -= 3;
-                    output->triangleRemoved(data, triangle);
-                    removeTriangleFromEdges(triangle, src);
+                    data->mIndexBufferInfoList[t->submeshID].indexCount -= 3;
+                    output->triangleRemoved(data, t);
+                    removeTriangleFromEdges(t, src);
                     continue;
                 }
                 unsigned int dstID = tmpCollapsedEdges[id].dstID;
 
                 // 2. task
-                replaceVertexID(triangle, srcID, dstID, dst);
+                replaceVertexID(t, srcID, dstID, dst);
 
-                output->triangleChanged(data, triangle);
+                output->triangleChanged(data, t);
 
 #if MESHLOD_QUALITY >= 3
-                triangle->computeNormal();
+                t->computeNormal();
 #endif
             }
         }
 
-        lineIt = src->lines.begin();
-        for (; lineIt != lineItEnd; ++lineIt)
+        for (const auto& l : src->lines)
         {
-            LodData::Line* line = *lineIt;
-            if (!line->hasVertex(dst))
+            if (!l->hasVertex(dst))
             {
                 // Replace a line
                 // Tasks:
@@ -318,68 +296,58 @@ namespace Ogre
                 // 2. Move along the selected edge.
 
                 // 1. task
-                unsigned int srcID = line->getVertexID(src);
-                size_t id = findDstID(srcID, line->submeshID);
+                unsigned int srcID = l->getVertexID(src);
+                size_t id = findDstID(srcID, l->submeshID);
                 if (id == std::numeric_limits<size_t>::max()) {
                     // Not found any edge to move along.
                     // Destroy the triangle.
-                    data->mIndexBufferInfoList[line->submeshID].indexCount -= 2;
-                    output->lineRemoved(data, line);
-                    removeLine(line, src);
+                    data->mIndexBufferInfoList[l->submeshID].indexCount -= 2;
+                    output->lineRemoved(data, l);
+                    removeLine(l, src);
                     continue;
                 }
                 unsigned int dstID = tmpCollapsedEdges[id].dstID;
 
                 // 2. task
-                replaceVertexID(line, srcID, dstID, dst);
+                replaceVertexID(l, srcID, dstID, dst);
 
-                output->lineChanged(data, line);
+                output->lineChanged(data, l);
             }
         }
 
         dst->seam |= src->seam; // Inherit seam property
 
 #if MESHLOD_QUALITY <= 2
-        LodData::VEdges::iterator it3 = src->edges.begin();
-        LodData::VEdges::iterator it3End = src->edges.end();
-        for (; it3 != it3End; ++it3) {
-            cost->updateVertexCollapseCost(data, it3->dst);
+        for (const auto& e : src->edges) {
+            cost->updateVertexCollapseCost(data, e.dst);
         }
 #else
         // TODO: Find out why is this needed. assertOutdatedCollapseCost() fails on some
         // rare situations without this. For example goblin.mesh fails.
         typedef SmallVector<LodData::Vertex*, 64> UpdatableList;
         UpdatableList updatable;
-        LodData::VEdges::iterator it3 = src->edges.begin();
-        LodData::VEdges::iterator it3End = src->edges.end();
-        for (; it3 != it3End; it3++) {
-            updatable.push_back(it3->dst);
-            LodData::VEdges::iterator it4End = it3->dst->edges.end();
-            LodData::VEdges::iterator it4 = it3->dst->edges.begin();
-            for (; it4 != it4End; it4++) {
-                updatable.push_back(it4->dst);
+        for (const auto& e : src->edges) {
+            updatable.push_back(e.dst);
+            for (const auto& e1 : src->edges) {
+                updatable.push_back(e1.dst);
             }
         }
 
         // Remove duplicates.
-        UpdatableList::iterator it5 = updatable.begin();
-        UpdatableList::iterator it5End = updatable.end();
-        std::sort(it5, it5End);
-        it5End = std::unique(it5, it5End);
+        UpdatableList::iterator it = updatable.begin();
+        UpdatableList::iterator itEnd = updatable.end();
+        std::sort(it, itEnd);
+        itEnd = std::unique(it, itEnd);
 
-        for (; it5 != it5End; it5++) {
-            cost->updateVertexCollapseCost(data, *it5);
+        for (const auto& u : updatable) {
+            cost->updateVertexCollapseCost(data, u);
         }
 #if OGRE_DEBUG_MODE
-        it3 = src->edges.begin();
-        it3End = src->edges.end();
-        for (; it3 != it3End; it3++) {
-            assertOutdatedCollapseCost(data, cost, it3->dst);
+        for (const auto& e : src->edges) {
+            assertOutdatedCollapseCost(data, cost, e.dst);
         }
-        it3 = dst->edges.begin();
-        it3End = dst->edges.end();
-        for (; it3 != it3End; it3++) {
-            assertOutdatedCollapseCost(data, cost, it3->dst);
+        for (const auto& e : src->edges) {
+            assertOutdatedCollapseCost(data, cost, e.dst);
         }
         assertOutdatedCollapseCost(data, cost, dst);
 #endif // ifndef OGRE_DEBUG_MODE
