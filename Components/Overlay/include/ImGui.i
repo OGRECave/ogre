@@ -49,6 +49,29 @@
 %typemap(argout) float[4], float[3], float[2] {
     $result = SWIG_Python_AppendOutput($result, SWIG_NewPointerObj($1, $descriptor(ImVec4*), 0));
 }
+
+// for PlotHistogram, PlotLines
+%typemap(in) (const float* values, int values_count)
+{
+    Py_buffer view;
+    int res = PyObject_GetBuffer($input, &view, PyBUF_CONTIG_RO | PyBUF_FORMAT);
+    if (res < 0) {
+        SWIG_fail;
+    }
+    PyBuffer_Release(&view);
+
+    if(view.ndim != 1 || strcmp(view.format, "f") != 0) {
+        PyErr_SetString(PyExc_TypeError, "Expected a 1D array of floats");
+        SWIG_fail;
+    }
+
+    $1 = ($ltype)view.buf;
+    $2 = view.len / sizeof(float);
+}
+
+%typecheck(SWIG_TYPECHECK_STRING) (const float* values, int values_count) {
+    $1 = true; // actual check in the typemap
+}
 #endif
 
 %typecheck(SWIG_TYPECHECK_STRING) float[4], float[3], float[2] {
