@@ -104,4 +104,11 @@ jobs:
         set -o pipefail && cmake --build build | xcpretty
       env:
         IOS: true
-      
+  custombuild:
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v3
+    - name: Build
+      run: |
+        cmake -Bbuild -DOGRE_BUILD_DEPENDENCIES=OFF -DSWIG_EXECUTABLE=none -DOGRE_CONFIG_DOUBLE=ON -DOGRE_ASSERT_MODE=1 -DOGRE_PROFILING=ON .
+        cmake --build build -- -j 2
