@@ -135,13 +135,9 @@ namespace Ogre
                 {
                     if (mTimeStamp)
                     {
-                        struct tm *pTime;
-                        time_t ctTime; time(&ctTime);
-                        pTime = localtime( &ctTime );
-                        mLog << std::setw(2) << std::setfill('0') << pTime->tm_hour
-                            << ":" << std::setw(2) << std::setfill('0') << pTime->tm_min
-                            << ":" << std::setw(2) << std::setfill('0') << pTime->tm_sec
-                            << ": ";
+                        auto t = std::time(nullptr);
+                        auto pTime = std::localtime(&t);
+                        mLog << std::put_time(pTime, "%T: ");
                     }
                     mLog << message << std::endl;
 
