@@ -34,22 +34,12 @@ namespace Ogre {
     {
         // Set up matrix
         // Hermite polynomial
-        mCoeffs[0][0] = 2;
-        mCoeffs[0][1] = -2;
-        mCoeffs[0][2] = 1;
-        mCoeffs[0][3] = 1;
-        mCoeffs[1][0] = -3;
-        mCoeffs[1][1] = 3;
-        mCoeffs[1][2] = -2;
-        mCoeffs[1][3] = -1;
-        mCoeffs[2][0] = 0;
-        mCoeffs[2][1] = 0;
-        mCoeffs[2][2] = 1;
-        mCoeffs[2][3] = 0;
-        mCoeffs[3][0] = 1;
-        mCoeffs[3][1] = 0;
-        mCoeffs[3][2] = 0;
-        mCoeffs[3][3] = 0;
+        mCoeffs = {
+             2, -2,  1,  1,
+            -3,  3, -2, -1,
+             0,  0,  1,  0,
+             1,  0,  0,  0
+        };
 
         mAutoCalc = true;
     }
@@ -73,11 +63,11 @@ namespace Ogre {
         // change where this is not the case
         // TODO: base on arclength?
 
-        
+
         // Work out which segment this is in
         Real fSeg = t * (mPoints.size() - 1);
         unsigned int segIdx = (unsigned int)fSeg;
-        // Apportion t 
+        // Apportion t
         t = fSeg - segIdx;
 
         return interpolate(segIdx, t);
@@ -153,7 +143,7 @@ namespace Ogre {
     void SimpleSpline::recalcTangents(void)
     {
         // Catmull-Rom approach
-        // 
+        //
         // tangent[i] = 0.5 * (point[i+1] - point[i-1])
         //
         // Assume endpoint tangents are parallel with line with neighbour
@@ -214,7 +204,7 @@ namespace Ogre {
             {
                 mTangents[i] = 0.5 * (mPoints[i+1] - mPoints[i-1]);
             }
-            
+
         }
 
 
