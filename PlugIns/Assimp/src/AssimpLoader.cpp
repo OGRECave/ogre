@@ -1363,7 +1363,7 @@ struct AssimpCodec : public Codec
 
     static void startup()
     {
-        String version = StringUtil::format("Assimp - %d.%d.%d - Open-Asset-Importer", aiGetVersionMajor(),
+        String version = StringUtil::format("Assimp - %d.%d.%x - Open-Asset-Importer", aiGetVersionMajor(),
                                             aiGetVersionMinor(), aiGetVersionRevision());
         LogManager::getSingleton().logMessage(version);
 
