@@ -119,12 +119,6 @@ namespace Ogre {
 
         std::vector<Vector3> mPoints;
         std::vector<Vector3> mTangents;
-
-        /// Matrix of coefficients 
-        Matrix4 mCoeffs;
-
-
-
     };
 
     /** @} */
