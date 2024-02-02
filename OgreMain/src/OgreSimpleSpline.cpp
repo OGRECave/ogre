@@ -32,25 +32,6 @@ namespace Ogre {
     //---------------------------------------------------------------------
     SimpleSpline::SimpleSpline()
     {
-        // Set up matrix
-        // Hermite polynomial
-        mCoeffs[0][0] = 2;
-        mCoeffs[0][1] = -2;
-        mCoeffs[0][2] = 1;
-        mCoeffs[0][3] = 1;
-        mCoeffs[1][0] = -3;
-        mCoeffs[1][1] = 3;
-        mCoeffs[1][2] = -2;
-        mCoeffs[1][3] = -1;
-        mCoeffs[2][0] = 0;
-        mCoeffs[2][1] = 0;
-        mCoeffs[2][2] = 1;
-        mCoeffs[2][3] = 0;
-        mCoeffs[3][0] = 1;
-        mCoeffs[3][1] = 0;
-        mCoeffs[3][2] = 0;
-        mCoeffs[3][3] = 0;
-
         mAutoCalc = true;
     }
     //---------------------------------------------------------------------
@@ -108,6 +89,15 @@ namespace Ogre {
             return mPoints[fromIndex + 1];
         }
 
+        // Set up matrix
+        // Hermite polynomial
+        static Matrix4 hCoeffs = {
+             2, -2,  1,  1,
+            -3,  3, -2, -1,
+             0,  0,  1,  0,
+             1,  0,  0,  0
+        };
+
         // Real interpolation
         // Form a vector of powers of t
         Real t2, t3;
@@ -116,7 +106,7 @@ namespace Ogre {
         Vector4 powers(t3, t2, t, 1);
 
 
-        // Algorithm is ret = powers * mCoeffs * Matrix4(point1, point2, tangent1, tangent2)
+        // Algorithm is ret = powers * hCoeffs * Matrix4(point1, point2, tangent1, tangent2)
         const Vector3& point1 = mPoints[fromIndex];
         const Vector3& point2 = mPoints[fromIndex+1];
         const Vector3& tan1 = mTangents[fromIndex];
@@ -140,7 +130,7 @@ namespace Ogre {
         pt[3][2] = tan2.z;
         pt[3][3] = 1.0f;
 
-        Vector4 ret = powers * mCoeffs * pt;
+        Vector4 ret = powers * hCoeffs * pt;
 
 
         return Vector3(ret.x, ret.y, ret.z);
