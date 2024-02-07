@@ -58,12 +58,9 @@ namespace Ogre
     static LodData::Triangle* isDuplicateTriangle(LodData::Triangle* triangle)
     {
         // duplicate triangle detection (where all vertices has the same position)
-        LodData::VTriangles::iterator itEnd = triangle->vertex[0]->triangles.end();
-        LodData::VTriangles::iterator it = triangle->vertex[0]->triangles.begin();
-        for (; it != itEnd; ++it) {
-            LodData::Triangle* t = *it;
+        for (const auto& t : triangle->vertex[0]->triangles) {
             if (isDuplicateTriangle(triangle, t)) {
-                return *it;
+                return t;
             }
         }
         return NULL;
