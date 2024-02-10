@@ -200,10 +200,8 @@ namespace OgreBites
         */
         virtual void loadResources();
 
-        /**
-        Reconfigures the context. Attempts to preserve the current sample state.
-        */
-        virtual void reconfigure(const Ogre::String& renderer, Ogre::NameValuePairList& options);
+        /// @deprecated use do not use
+        OGRE_DEPRECATED virtual void reconfigure(const Ogre::String& renderer, Ogre::NameValuePairList& options);
 
 
         /**
