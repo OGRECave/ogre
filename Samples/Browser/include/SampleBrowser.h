@@ -353,10 +353,8 @@ namespace OgreBites
             {
                 bool reset = false;
 
-                auto options =
-                    mRoot->getRenderSystemByName(mRendererMenu->getSelectedItem())->getConfigOptions();
-
-                Ogre::NameValuePairList newOptions;
+                Ogre::RenderSystem* rs = mRoot->getRenderSystemByName(mRendererMenu->getSelectedItem());
+                auto options = rs->getConfigOptions();
 
                 // collect new settings and decide if a reset is needed
 
@@ -367,12 +365,15 @@ namespace OgreBites
                 for (unsigned int i = 3; i < mTrayMgr->getWidgets(mRendererMenu->getTrayLocation()).size(); i++)
                 {
                     SelectMenu* menu = (SelectMenu*)mTrayMgr->getWidgets(mRendererMenu->getTrayLocation())[i];
-                    if (menu->getSelectedItem() != options[menu->getCaption()].currentValue) reset = true;
-                    newOptions[menu->getCaption()] = menu->getSelectedItem();
+                    if (menu->getSelectedItem() != options[menu->getCaption()].currentValue)
+                    {
+                        rs->setConfigOption(menu->getCaption(), menu->getSelectedItem());
+                        reset = true;
+                    }
                 }
 
                 // reset with new settings if necessary
-                if (reset) reconfigure(mRendererMenu->getSelectedItem(), newOptions);
+                if (reset) reconfigure(mRendererMenu->getSelectedItem());
             }
             else
             {
@@ -1080,7 +1081,7 @@ namespace OgreBites
         /*-----------------------------------------------------------------------------
           | Extends reconfigure to save the view and the index of last sample run.
           -----------------------------------------------------------------------------*/
-        void reconfigure(const Ogre::String& renderer, Ogre::NameValuePairList& options) override
+        void reconfigure(const Ogre::String& renderer)
         {
             mLastViewCategory = mCategoryMenu->getSelectionIndex();
             mLastViewTitle = mSampleMenu->getSelectionIndex();
@@ -1097,7 +1098,7 @@ namespace OgreBites
                 }
             }
 
-            SampleContext::reconfigure(renderer, options);
+            SampleContext::reconfigure(renderer);
         }
     public:
         /*-----------------------------------------------------------------------------

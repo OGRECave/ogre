@@ -326,15 +326,21 @@ namespace OgreBites
         /*-----------------------------------------------------------------------------
         | Reconfigures the context. Attempts to preserve the current sample state.
         -----------------------------------------------------------------------------*/
-        void reconfigure(const Ogre::String& renderer, Ogre::NameValuePairList& options) override
+        void reconfigure(const Ogre::String& renderer)
         {
             // save current sample state
             mLastSample = mCurrentSample;
             if (mCurrentSample) mCurrentSample->saveState(mLastSampleState);
 
             mLastRun = false;             // we want to go again with the new settings
-            ApplicationContext::reconfigure(renderer, options);
+            mNextRenderer = renderer;
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
+            // Need to save the config on iOS to make sure that changes are kept on disk
+            mRoot->saveConfig();
+#endif
+            mRoot->queueEndRendering(); // break from render loop
         }
+        using ApplicationContextBase::reconfigure; // unused, silence warning
 
         /*-----------------------------------------------------------------------------
         | Recovers the last sample after a reset. You can override in the case that
