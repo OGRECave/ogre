@@ -28,7 +28,7 @@
     if(SWIG_IsOK(res))
         $1 = ($ltype)(argp);
     else
-        SWIG_exception_fail(SWIG_TypeError, "Expected size_t");
+        %argument_fail(SWIG_TypeError, "size_t", $symname, $argnum);
 }
 %typecheck(SWIG_TYPECHECK_POINTER) ImTextureID {
     $1 = true; // actual check in the typemap
@@ -40,7 +40,7 @@
     if (SWIG_IsOK(res)) {
         $1 = ($ltype)argp;
     } else {
-        SWIG_exception_fail(SWIG_TypeError, "Expected ImVec4");
+        %argument_fail(SWIG_TypeError, "ImVec4", $symname, $argnum);
     }
 }
 
@@ -61,8 +61,7 @@
     PyBuffer_Release(&view);
 
     if(view.ndim != 1 || strcmp(view.format, "f") != 0) {
-        PyErr_SetString(PyExc_TypeError, "Expected a 1D array of floats");
-        SWIG_fail;
+        %argument_fail(SWIG_TypeError, "array(f)", $symname, $argnum);
     }
 
     $1 = ($ltype)view.buf;
