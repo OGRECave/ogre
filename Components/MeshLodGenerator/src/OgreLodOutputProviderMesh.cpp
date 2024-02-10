@@ -62,7 +62,7 @@ namespace Ogre
         SubMesh::LODFaceList& lods = mMesh->getSubMesh(subMeshIndex)->mLodFaceList;
         lods.insert(lods.begin() + lodIndex, curLod);
 
-        curLod->indexStart = 0;
+        curLod->indexStart = indexStart;
         curLod->indexCount = indexCount;
         curLod->indexBuffer = indexBuffer;
     }
