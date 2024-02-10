@@ -241,7 +241,17 @@ namespace Ogre
                 assert(mTriangleCacheList[i].vertexID[0] != mTriangleCacheList[i].vertexID[1]);
                 assert(mTriangleCacheList[i].vertexID[1] != mTriangleCacheList[i].vertexID[2]);
                 assert(mTriangleCacheList[i].vertexID[2] != mTriangleCacheList[i].vertexID[0]);
-                writeTriangle(data, i);
+                if (data->mIndexBufferInfoList[data->mTriangleList[i].submeshID].indexSize == 2) {
+                    for (unsigned int m : mTriangleCacheList[i].vertexID) {
+                        *(data->mIndexBufferInfoList[data->mTriangleList[i].submeshID].buf.pshort++) =
+                            static_cast<unsigned short>(m);
+                    }
+                } else {
+                    for (unsigned int m : mTriangleCacheList[i].vertexID) {
+                        *(data->mIndexBufferInfoList[data->mTriangleList[i].submeshID].buf.pint++) =
+                            static_cast<unsigned int>(m);
+                    }
+                }
             }
         }
         size_t lineCount = mLineCacheList.size();
@@ -249,7 +259,17 @@ namespace Ogre
             if (mLineCacheList[i].vertexChanged) {
                 assert(data->mIndexBufferInfoList[data->mLineList[i].submeshID].prevIndexCount != 0);
                 assert(mLineCacheList[i].vertexID[0] != mLineCacheList[i].vertexID[1]);
-                writeLine(data, i);
+                if (data->mIndexBufferInfoList[data->mLineList[i].submeshID].indexSize == 2) {
+                    for (unsigned int m : mLineCacheList[i].vertexID) {
+                        *(data->mIndexBufferInfoList[data->mLineList[i].submeshID].buf.pshort++) =
+                            static_cast<uint16>(m);
+                    }
+                } else {
+                    for (unsigned int m : mLineCacheList[i].vertexID) {
+                        *(data->mIndexBufferInfoList[data->mLineList[i].submeshID].buf.pint++) =
+                            static_cast<uint32>(m);
+                    }
+                }
             }
         }
 
