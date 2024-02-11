@@ -268,10 +268,19 @@ This tool can convert binary .mesh and .skeleton files to XML and back again - t
 
 @par Usage
 ```
-OgreXMLConverter [options] sourcefile [destfile]
+OgreXMLConverter [parameters] sourcefile [destfile]
 ```
 
-Run the tool with no arguments to see the available options.
+@param -v        Display version information
+@param -merge    [n0,n1] Merge texcoordn0 with texcoordn1. The , separator must be
+                 present, otherwise only n0 is provided assuming n1 = n0+1;
+                 n0 and n1 must be in the same buffer source & adjacent
+                 to each other for the merge to work.
+@param -o        DON'T optimise out redundant tracks & keyframes
+@param -E        Set endian mode `big` `little` or `native` (default)
+@param -x        Generate no more than num eXtremes for every submesh (default 0)
+@param -q        Quiet mode, less output
+@param -log      name of the log file (default: `OgreXMLConverter.log`)
 
 # MeshUpgrader {#MeshUpgrader}
 
@@ -281,10 +290,28 @@ See the @ref meshlod-generator Tutorial for details.
 
 @par Usage
 ```
-OgreMeshUpgrader [options] sourcefile [destfile]
+OgreMeshUpgrader [parameters] sourcefile [destfile]
 ```
 
-Run the tool with no arguments to see the available options.
+@param -pack          Pack normals and tangents as @c int_10_10_10_2
+@param -optvtxcache   Reorder the indexes to optimise vertex cache utilisation
+@param -autogen       Generate autoconfigured LOD. No LOD options needed
+@param -l             number of LOD levels
+@param -d             distance increment to reduce LOD
+@param -p             Percentage triangle reduction amount per LOD
+@param -f             Fixed vertex reduction per LOD
+@param -el            generate edge lists (for stencil shadows)
+@param -t             Generate tangents (for normal mapping)
+@param -ts            Tangent size (4 includes parity, default: 3)
+@param -tm            Split tangent vertices at UV mirror points
+@param -tr            Split tangent vertices where basis is rotated > 90 degrees
+@param -r             DON'T reorganise buffers to recommended format
+@param -E             Set endian mode `big` `little` or `native` (default)
+@param -b             Recalculate bounding box (static meshes only)
+@param -V             Specify OGRE version format to write instead of latest
+                      Options are: `1.10, 1.8, 1.7, 1.4, 1.0`
+@param -log filename  name of the log file (default: `OgreMeshUpgrader.log`)
+
 
 @note
 The OGRE release notes will notify you when meshes should be upgraded with a new release.
@@ -295,10 +322,16 @@ This tool converts 3D-formats supported by [assimp](https://assimp-docs.readthed
 
 @par Usage
 ```
-OgreAssimpConverter [options] sourcefile [destination]
+OgreAssimpConverter [parameters] sourcefile [destination]
 ```
 
-Run the tool with no arguments to see the available options.
+@param -q                  Quiet mode, less output
+@param -log filename       name of the log file (default: `OgreAssimp.log`)
+@param -aniSpeedMod [0..1] Factor to scale the animation speed (default: 1.0)
+@param -3ds_ani_fix        Fix for 3ds max, which exports the animation over a
+                           longer time frame than the animation actually plays
+@param -max_edge_angle deg When normals are generated, max angle between
+                           two faces to smooth over
 
 # Exporters {#Exporters}
 
