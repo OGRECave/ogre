@@ -28,6 +28,7 @@
 #ifndef __Sample_H__
 #define __Sample_H__
 
+#include "OgreApplicationContextBase.h"
 #include "OgreRoot.h"
 #include "OgreOverlaySystem.h"
 #include "OgreResourceManager.h"
@@ -83,8 +84,7 @@ namespace OgreBites
             mCameraNode = 0;
             mViewport = 0;
 
-            mFSLayer = 0;
-            mOverlaySystem = 0;
+            mContext = 0;
 
             // so we don't have to worry about checking if these keys exist later
             mInfo["Title"] = "Untitled";
@@ -172,12 +172,10 @@ namespace OgreBites
         /*-----------------------------------------------------------------------------
         | Sets up a sample. Used by the SampleContext class. Do not call directly.
         -----------------------------------------------------------------------------*/
-        virtual void _setup(Ogre::RenderWindow* window, Ogre::FileSystemLayer* fsLayer, Ogre::OverlaySystem* overlaySys)
+        virtual void _setup(ApplicationContextBase* context)
         {
-            mOverlaySystem = overlaySys;
-            mWindow = window;
-
-            mFSLayer = fsLayer;
+            mContext = context;
+            mWindow = context->getRenderWindow();
 
             locateResources();
             createSceneManager();
@@ -214,7 +212,7 @@ namespace OgreBites
 #ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
                 mShaderGenerator->removeSceneManager(mSceneMgr);
 #endif
-                mSceneMgr->removeRenderQueueListener(mOverlaySystem);
+                mSceneMgr->removeRenderQueueListener(mContext->getOverlaySystem());
                 mRoot->destroySceneManager(mSceneMgr);              
             }
             mSceneMgr = 0;
@@ -283,8 +281,8 @@ namespace OgreBites
             mainRenderState->setLightCountAutoUpdate(true);
             mainRenderState->resetToBuiltinSubRenderStates();
 #endif
-            if(mOverlaySystem)
-                mSceneMgr->addRenderQueueListener(mOverlaySystem);
+            if(auto overlaySystem = mContext->getOverlaySystem())
+                mSceneMgr->addRenderQueueListener(overlaySystem);
         }
 
         /*-----------------------------------------------------------------------------
@@ -314,10 +312,9 @@ namespace OgreBites
             }
         }   
 
+        ApplicationContextBase* mContext;
         Ogre::Root* mRoot;                // OGRE root object
-        Ogre::OverlaySystem* mOverlaySystem; // OverlaySystem
         Ogre::RenderWindow* mWindow;      // context render window
-        Ogre::FileSystemLayer* mFSLayer;          // file system abstraction layer
         Ogre::SceneManager* mSceneMgr;    // scene manager for this sample
         Ogre::NameValuePairList mInfo;    // custom sample info
 

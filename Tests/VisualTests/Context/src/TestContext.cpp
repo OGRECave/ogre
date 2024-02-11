@@ -119,6 +119,8 @@ void TestContext::setup()
     mWindow = mRoot->createRenderWindow(desc);
 #endif
 
+    mWindows.push_back({mWindow});
+
     mWindow->setDeactivateOnFocusChange(false);
     
     locateResources();
