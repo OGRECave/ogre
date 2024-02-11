@@ -190,9 +190,9 @@ namespace OgreBites
         /*-----------------------------------------------------------------------------
         | Extended to setup a default tray interface and camera controller.
         -----------------------------------------------------------------------------*/
-        void _setup(Ogre::RenderWindow* window, Ogre::FileSystemLayer* fsLayer, Ogre::OverlaySystem* overlaySys) override
+        void _setup(ApplicationContextBase* context) override
         {
-            Sample::_setup(window, fsLayer, overlaySys);
+            Sample::_setup(context);
 
             if(mTrayMgr)
                 mControls.reset(new AdvancedRenderControls(mTrayMgr.get(), mCamera));

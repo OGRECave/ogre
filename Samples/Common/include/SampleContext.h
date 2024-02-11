@@ -106,7 +106,7 @@ namespace OgreBites
 #ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
                 s->setShaderGenerator(mShaderGenerator);
 #endif
-                s->_setup(mWindow, mFSLayer, mOverlaySystem);   // start new sample
+                s->_setup(this);   // start new sample
             }
 
             if (prof)

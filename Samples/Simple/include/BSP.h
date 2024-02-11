@@ -41,8 +41,8 @@ class _OgreSampleClassExport Sample_BSP : public SdkSample
 #ifdef INCLUDE_RTSHADER_SYSTEM
         mShaderGenerator->addSceneManager(mSceneMgr);
 #endif
-        if(mOverlaySystem)
-            mSceneMgr->addRenderQueueListener(mOverlaySystem);
+        if(auto overlaySystem = mContext->getOverlaySystem())
+            mSceneMgr->addRenderQueueListener(overlaySystem);
     }
 
     void loadResources() override

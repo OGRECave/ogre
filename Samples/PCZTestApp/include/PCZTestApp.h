@@ -59,8 +59,8 @@ public:
         mShaderGenerator->addSceneManager(mSceneMgr);
 #endif
 
-        if(mOverlaySystem)
-            mSceneMgr->addRenderQueueListener(mOverlaySystem);
+        if(auto overlaySystem = mContext->getOverlaySystem())
+            mSceneMgr->addRenderQueueListener(overlaySystem);
     }
 
     // utility function to create terrain zones easily
