@@ -78,7 +78,7 @@ namespace Ogre {
         optFSAA.immutable = false;
         for (int sampleLevel : mGLSupport->getFSAALevels())
         {
-            optFSAA.possibleValues.push_back(StringConverter::toString(sampleLevel));
+            optFSAA.possibleValues.push_back(StringUtil::format("%2d", sampleLevel));
         }
         if (!optFSAA.possibleValues.empty())
         {
