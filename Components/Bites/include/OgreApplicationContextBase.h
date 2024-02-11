@@ -273,9 +273,9 @@ namespace OgreBites
         void destroyWindow(const Ogre::String& name);
 
         /**
-         * get the FileSystemLayer instace pointing to an application specific directory
+         * get the FileSystemLayer instance pointing to an application specific directory
          */
-        Ogre::FileSystemLayer& getFSLayer() { return *mFSLayer; }
+        Ogre::FileSystemLayer& getFSLayer() const { return *mFSLayer; }
 
         /**
          * the directory where the media files were installed
