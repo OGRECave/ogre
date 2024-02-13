@@ -53,7 +53,7 @@ namespace OgreBites
     | Base class responsible for everything specific to one sample.
     | Designed to be subclassed for each sample.
     =============================================================================*/
-    class Sample : public InputListener, public TrayListener, public Ogre::GeneralAllocatedObject
+    class Sample : public InputListener, public TrayListener, public Ogre::FrameListener
     {
     public:
         /*=============================================================================
@@ -250,12 +250,6 @@ namespace OgreBites
         | Restores the sample state. Optional. Used during reconfiguration.
         -----------------------------------------------------------------------------*/
         virtual void restoreState(Ogre::NameValuePairList& state) {}
-
-        // callback interface copied from various listeners to be used by SampleContext
-
-        virtual bool frameStarted(const Ogre::FrameEvent& evt) { return true; }
-        virtual bool frameRenderingQueued(const Ogre::FrameEvent& evt) { return true; }
-        virtual bool frameEnded(const Ogre::FrameEvent& evt) { return true; }
     protected:
 
         /*-----------------------------------------------------------------------------
