@@ -52,6 +52,7 @@ namespace OgreBites
         -----------------------------------------------------------------------------*/
         void unpaused() override
         {
+            Sample::unpaused();
             mTrayMgr->refreshCursor();
         }
 
