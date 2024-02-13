@@ -189,6 +189,7 @@ namespace OgreBites
             mContentSetup = true;
 
             mDone = false;
+            mContext->addInputListener(this);
         }
 
         /*-----------------------------------------------------------------------------
@@ -197,6 +198,8 @@ namespace OgreBites
         virtual void _shutdown()
         {
             Ogre::ControllerManager::getSingleton().clearControllers();
+
+            mContext->removeInputListener(this);
 
             if (mContentSetup)
                 cleanupContent();
@@ -224,13 +227,19 @@ namespace OgreBites
         | Actions to perform when the context stops sending frame listener events
         | and input device events to this sample.
         -----------------------------------------------------------------------------*/
-        virtual void paused() {}
+        virtual void paused()
+        {
+            mContext->removeInputListener(this);
+        }
 
         /*-----------------------------------------------------------------------------
         | Actions to perform when the context continues sending frame listener
         | events and input device events to this sample.
         -----------------------------------------------------------------------------*/
-        virtual void unpaused() {}
+        virtual void unpaused()
+        {
+            mContext->addInputListener(this);
+        }
 
         /*-----------------------------------------------------------------------------
         | Saves the sample state. Optional. Used during reconfiguration.
