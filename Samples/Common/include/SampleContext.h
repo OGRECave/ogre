@@ -212,39 +212,6 @@ namespace OgreBites
             return true;
         }
 
-        /*-----------------------------------------------------------------------------
-        | Processes window size change event. Adjusts mouse's region to match that
-        | of the window. You could also override this method to prevent resizing.
-        -----------------------------------------------------------------------------*/
-        void windowResized(Ogre::RenderWindow* rw) override
-        {
-            // manually call sample callback to ensure correct order
-            if (!isCurrentSamplePaused()) mCurrentSample->windowResized(rw);
-        }
-
-        // window event callbacks which manually call their respective sample callbacks to ensure correct order
-
-        void windowMoved(Ogre::RenderWindow* rw) override
-        {
-            if (!isCurrentSamplePaused()) mCurrentSample->windowMoved(rw);
-        }
-
-        bool windowClosing(Ogre::RenderWindow* rw) override
-        {
-            if (!isCurrentSamplePaused()) return mCurrentSample->windowClosing(rw);
-            return true;
-        }
-
-        void windowClosed(Ogre::RenderWindow* rw) override
-        {
-            if (!isCurrentSamplePaused()) mCurrentSample->windowClosed(rw);
-        }
-
-        void windowFocusChange(Ogre::RenderWindow* rw) override
-        {
-            if (!isCurrentSamplePaused()) mCurrentSample->windowFocusChange(rw);
-        }
-
         bool isFirstRun() { return mFirstRun; }
         void setFirstRun(bool flag) { mFirstRun = flag; }
         bool isLastRun() { return mLastRun; }

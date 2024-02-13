@@ -256,11 +256,6 @@ namespace OgreBites
         virtual bool frameStarted(const Ogre::FrameEvent& evt) { return true; }
         virtual bool frameRenderingQueued(const Ogre::FrameEvent& evt) { return true; }
         virtual bool frameEnded(const Ogre::FrameEvent& evt) { return true; }
-        virtual void windowMoved(Ogre::RenderWindow* rw) {}
-        virtual void windowResized(Ogre::RenderWindow* rw) {}
-        virtual bool windowClosing(Ogre::RenderWindow* rw) { return true; }
-        virtual void windowClosed(Ogre::RenderWindow* rw) {}
-        virtual void windowFocusChange(Ogre::RenderWindow* rw) {}
     protected:
 
         /*-----------------------------------------------------------------------------
