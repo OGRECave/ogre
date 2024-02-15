@@ -635,16 +635,8 @@ namespace OgreBites
                 }
             }
 
-            if (isCurrentSamplePaused()) return mTrayMgr->mousePressed(evt);
-
-            return SampleContext::mousePressed(evt);
-        }
-
-        // convert and redirect
-        bool touchPressed(const TouchFingerEvent& evt) override {
-            MouseButtonEvent e;
-            e.button = BUTTON_LEFT;
-            return mousePressed(e);
+            if(!isCurrentSamplePaused()) return true; // stop propagation
+            return false;
         }
 
         bool buttonPressed(const ButtonEvent& evt) override
@@ -673,17 +665,9 @@ namespace OgreBites
           | Extends pointerReleased to inject mouse release into tray manager.
           -----------------------------------------------------------------------------*/
         bool mouseReleased(const MouseButtonEvent& evt) override
-         {
-            if (isCurrentSamplePaused()) return mTrayMgr->mouseReleased(evt);
-
-            return SampleContext::mouseReleased(evt);
-        }
-
-        // convert and redirect
-        bool touchReleased(const TouchFingerEvent& evt) override {
-            MouseButtonEvent e;
-            e.button = BUTTON_LEFT;
-            return mouseReleased(e);
+        {
+            if(!isCurrentSamplePaused()) return true; // stop propagation
+            return false;
         }
 
         /*-----------------------------------------------------------------------------
@@ -692,19 +676,8 @@ namespace OgreBites
           -----------------------------------------------------------------------------*/
         bool mouseMoved(const MouseMotionEvent& evt) override
         {
-            if (isCurrentSamplePaused()) return mTrayMgr->mouseMoved(evt);
-
-            return SampleContext::mouseMoved(evt);
-        }
-
-        // convert and redirect
-        bool touchMoved(const TouchFingerEvent& evt) override {
-            MouseMotionEvent e;
-            e.x = evt.x * mWindow->getWidth();
-            e.y = evt.y * mWindow->getHeight();
-            e.xrel = evt.dx * mWindow->getWidth();
-            e.yrel = evt.dy * mWindow->getHeight();
-            return mouseMoved(e);
+            if(!isCurrentSamplePaused()) return true; // stop propagation
+            return false;
         }
 
         //TODO: Handle iOS and Android.
@@ -715,8 +688,9 @@ namespace OgreBites
             if(mTrayMgr->mouseWheelRolled(evt))
                 return true;
 
-            if (isCurrentSamplePaused() && mTitleLabel->getTrayLocation() != TL_NONE &&
-                mSampleMenu->getNumItems() != 0)
+            if(!isCurrentSamplePaused()) return true; // stop propagation
+
+            if (mTitleLabel->getTrayLocation() != TL_NONE && mSampleMenu->getNumItems() != 0)
             {
                 int newIndex = mSampleMenu->getSelectionIndex() - evt.y / Ogre::Math::Abs(evt.y);
                 mSampleMenu->selectItem(Ogre::Math::Clamp<int>(newIndex, 0, mSampleMenu->getNumItems() - 1));
@@ -762,7 +736,9 @@ namespace OgreBites
         {
             ApplicationContext::setup();
             mWindow = getRenderWindow();
-            addInputListener(this);
+
+            mInputListenerChain = TouchAgnosticInputListenerChain(mWindow, {this, mTrayMgr});
+            addInputListener(&mInputListenerChain);
             if(mGrabInput) setWindowGrab();
             else mTrayMgr->hideCursor();
 #ifdef OGRE_STATIC_LIB
@@ -1184,6 +1160,7 @@ namespace OgreBites
         int mLastViewCategory;                         // last sample category viewed
         int mLastSampleIndex;                          // index of last sample running
         int mStartSampleIndex;                         // directly starts the sample with the given index
+        TouchAgnosticInputListenerChain mInputListenerChain;
     public:
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
         SampleBrowserGestureView *mGestureView;
