@@ -4,6 +4,9 @@
 
 #include "OgreApplicationContextBase.h"
 
+#include "OgreImGuiOverlay.h"
+#include "OgreOverlayManager.h"
+#include "OgreImGuiInputListener.h"
 #include "OgreRoot.h"
 #include "OgreGpuProgramManager.h"
 #include "OgreConfigFile.h"
@@ -493,6 +496,23 @@ void ApplicationContextBase::locateResources()
 void ApplicationContextBase::loadResources()
 {
     Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
+}
+
+Ogre::ImGuiOverlay* ApplicationContextBase::initialiseImGui()
+{
+        if(auto overlay = Ogre::OverlayManager::getSingleton().getByName("ImGuiOverlay"))
+            return static_cast<Ogre::ImGuiOverlay*>(overlay);
+
+        auto imguiOverlay = new Ogre::ImGuiOverlay();
+        Ogre::OverlayManager::getSingleton().addOverlay(imguiOverlay); // now owned by overlaymgr
+
+        // handle DPI scaling
+        float vpScale = Ogre::OverlayManager::getSingleton().getPixelRatio();
+        ImGui::GetStyle().ScaleAllSizes(vpScale);
+
+        mImGuiListener.reset(new ImGuiInputListener());
+
+        return imguiOverlay;
 }
 
 void ApplicationContextBase::reconfigure(const Ogre::String &renderer, Ogre::NameValuePairList &options)
