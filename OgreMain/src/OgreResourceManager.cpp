@@ -167,6 +167,12 @@ namespace Ogre {
     {
         OgreAssert(res, "attempting to remove nullptr");
 
+#if OGRE_RESOURCEMANAGER_STRICT
+        if (res->getCreator() != this)
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Resource '" + res->getName() + "' was not created by the '" +
+                                                          getResourceType() + "' ResourceManager");
+#endif
+
         OGRE_LOCK_AUTO_MUTEX;
 
         if(ResourceGroupManager::getSingleton().isResourceGroupInGlobalPool(res->getGroup()))
