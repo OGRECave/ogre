@@ -46,6 +46,7 @@ extern "C" struct SDL_Window;
 
 namespace Ogre {
     class OverlaySystem;
+    class ImGuiOverlay;
 }
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
@@ -283,6 +284,13 @@ namespace OgreBites
          * same as OGRE_MEDIA_DIR in CMake
          */
         static Ogre::String getDefaultMediaDir();
+
+        /**
+         * Set up the overlay system for usage with ImGui
+         */
+        Ogre::ImGuiOverlay* initialiseImGui();
+
+        InputListener* getImGuiInputListener() const { return mImGuiListener.get(); }
     protected:
         /// internal method to destroy both the render and the native window
         virtual void _destroyWindow(const NativeWindowPair& win);
@@ -301,6 +309,8 @@ namespace OgreBites
 
         typedef std::set<std::pair<uint32_t, InputListener*> > InputListenerList;
         InputListenerList mInputListeners;
+
+        std::unique_ptr<InputListener> mImGuiListener;
 
 #ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
         Ogre::RTShader::ShaderGenerator*       mShaderGenerator; // The Shader generator instance.

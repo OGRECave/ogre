@@ -9,7 +9,6 @@ using namespace OgreBites;
 
 class _OgreSampleClassExport Sample_ImGui : public SdkSample, public RenderTargetListener
 {
-    std::unique_ptr<ImGuiInputListener> mImguiListener;
 public:
     // Basic constructor
     Sample_ImGui()
@@ -32,16 +31,13 @@ public:
 
     void setupContent(void) override
     {
-        auto imguiOverlay = new ImGuiOverlay();
+        auto imguiOverlay = mContext->initialiseImGui();
 
-        // handle DPI scaling
         float vpScale = OverlayManager::getSingleton().getPixelRatio();
         ImGui::GetIO().FontGlobalScale = std::round(vpScale); // default font does not work with fractional scaling
-        ImGui::GetStyle().ScaleAllSizes(vpScale);
 
         imguiOverlay->setZOrder(300);
         imguiOverlay->show();
-        OverlayManager::getSingleton().addOverlay(imguiOverlay); // now owned by overlaymgr
 
         /*
             NOTE:
@@ -52,9 +48,8 @@ public:
         */
         mWindow->addListener(this);
 
-        mImguiListener.reset(new ImGuiInputListener());
-        mInputListenerChain =
-            TouchAgnosticInputListenerChain(mWindow, {mTrayMgr.get(), mImguiListener.get(), mCameraMan.get()});
+        mInputListenerChain = TouchAgnosticInputListenerChain(
+            mWindow, {mTrayMgr.get(), mContext->getImGuiInputListener(), mCameraMan.get()});
 
         mTrayMgr->showCursor();
         mCameraMan->setStyle(OgreBites::CS_ORBIT);
