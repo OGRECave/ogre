@@ -203,10 +203,18 @@ public:
     InputListenerChain() {}
     InputListenerChain(std::vector<InputListener*> chain) : mListenerChain(chain) {}
 
+    bool empty() const { return mListenerChain.empty(); }
+
     InputListenerChain& operator=(const InputListenerChain& o)
     {
         mListenerChain = o.mListenerChain;
         return *this;
+    }
+
+    void frameRendered(const Ogre::FrameEvent& evt) override
+    {
+        for (auto listener : mListenerChain)
+            listener->frameRendered(evt);
     }
 
     bool keyPressed(const KeyboardEvent& evt) override
