@@ -296,6 +296,10 @@ void ImGuiOverlay::ImGUIRenderable::initialise(void)
 //-----------------------------------------------------------------------------------
 ImGuiOverlay::ImGUIRenderable::~ImGUIRenderable()
 {
+    if(mFontTex)
+        TextureManager::getSingleton().remove(mFontTex);
+    if(mMaterial)
+        MaterialManager::getSingleton().remove(mMaterial);
     OGRE_DELETE mRenderOp.vertexData;
     OGRE_DELETE mRenderOp.indexData;
 }
