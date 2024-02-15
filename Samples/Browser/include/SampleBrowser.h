@@ -138,8 +138,6 @@ namespace OgreBites
 
                 try
                 {
-                    if(auto ts = dynamic_cast<SdkSample*>(s))
-                        ts->_setupTrays(mWindow);
                     SampleContext::runSample(s);
                 }
                 catch (Ogre::Exception& e)   // if failed to start, show error and fall back to menu
