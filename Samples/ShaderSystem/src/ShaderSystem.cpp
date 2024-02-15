@@ -220,7 +220,9 @@ bool Sample_ShaderSystem::frameRenderingQueued( const FrameEvent& evt )
 //-----------------------------------------------------------------------
 void Sample_ShaderSystem::setupContent()
 {
-    
+    mTextureAtlasFactory = OGRE_NEW TextureAtlasSamplerFactory;
+    mShaderGenerator->addSubRenderStateFactory(mTextureAtlasFactory);
+
     // Setup default effects values.
     mCurLightingModel       = SSLM_PerPixelLighting;
     mPerPixelFogEnable      = false;
@@ -932,13 +934,6 @@ void Sample_ShaderSystem::testCapabilities( const RenderSystemCapabilities* caps
         return;
 
     OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "RTSS not supported on your system");
-}
-
-//-----------------------------------------------------------------------
-void Sample_ShaderSystem::loadResources()
-{
-    mTextureAtlasFactory = OGRE_NEW TextureAtlasSamplerFactory;
-    mShaderGenerator->addSubRenderStateFactory(mTextureAtlasFactory);
 }
 
 //-----------------------------------------------------------------------

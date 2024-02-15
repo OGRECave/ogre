@@ -77,7 +77,6 @@ namespace OgreBites
             mWindow = 0;
             mSceneMgr = 0;
             mDone = true;
-            mResourcesLoaded = false;
             mContentSetup = false;
 
             mCamera = 0;
@@ -167,12 +166,8 @@ namespace OgreBites
             mContext = context;
             mWindow = context->getRenderWindow();
 
-            locateResources();
             createSceneManager();
             setupView();
-
-            loadResources();
-            mResourcesLoaded = true;
             setupContent();
             mContentSetup = true;
 
@@ -192,9 +187,7 @@ namespace OgreBites
                 mSceneMgr->clearScene();
             mContentSetup = false;
 
-            if (mResourcesLoaded)
-                unloadResources();
-            mResourcesLoaded = false;
+            unloadResources();
             if (mSceneMgr) 
             {
 #ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
@@ -229,18 +222,6 @@ namespace OgreBites
         -----------------------------------------------------------------------------*/
         virtual void restoreState(Ogre::NameValuePairList& state) {}
     protected:
-
-        /*-----------------------------------------------------------------------------
-        | Finds sample-specific resources. No such effort is made for most samples,
-        | but this is useful for special samples with large, exclusive resources.
-        -----------------------------------------------------------------------------*/
-        virtual void locateResources() {}
-
-        /*-----------------------------------------------------------------------------
-        | Loads sample-specific resources. No such effort is made for most samples,
-        | but this is useful for special samples with large, exclusive resources.
-        -----------------------------------------------------------------------------*/
-        virtual void loadResources() {}
 
         /*-----------------------------------------------------------------------------
         | Creates a scene manager for the sample. A generic one is the default,
@@ -299,7 +280,6 @@ namespace OgreBites
         Ogre::SceneNode* mCameraNode;       // camera node
 
         bool mDone;               // flag to mark the end of the sample
-        bool mResourcesLoaded;    // whether or not resources have been loaded
         bool mContentSetup;       // whether or not scene was created
 #ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
         Ogre::RTShader::ShaderGenerator*            mShaderGenerator;           // The Shader generator instance.

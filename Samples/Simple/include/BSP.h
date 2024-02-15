@@ -28,13 +28,6 @@ class _OgreSampleClassExport Sample_BSP : public SdkSample
     }
 
  protected:
-
-    void locateResources() override
-    {
-    	// Pick a new resource group so Q3Shader parser is correctly registered
-    	ResourceGroupManager::getSingleton().setWorldResourceGroupName("BSPWorld");
-    }
-
     void createSceneManager() override
     {
         mSceneMgr = mRoot->createSceneManager("BspSceneManager");   // the BSP scene manager is required for this sample
@@ -45,7 +38,7 @@ class _OgreSampleClassExport Sample_BSP : public SdkSample
             mSceneMgr->addRenderQueueListener(overlaySystem);
     }
 
-    void loadResources() override
+    void loadResources()
     {
         /* NOTE: The browser initialises everything at the beginning already, so we use a 0 init proportion.
            If you're not compiling this sample for use with the browser, then leave the init proportion at 0.7. */
@@ -53,6 +46,10 @@ class _OgreSampleClassExport Sample_BSP : public SdkSample
 
         // associate the world geometry with the world resource group, and then load the group
         ResourceGroupManager& rgm = ResourceGroupManager::getSingleton();
+
+        // Pick a new resource group so Q3Shader parser is correctly registered
+        rgm.setWorldResourceGroupName("BSPWorld");
+
         rgm.setCustomStagesForResourceGroup("BSPWorld", mSceneMgr->estimateWorldGeometry("maps/oa_rpg3dm2.bsp"));
         rgm.initialiseResourceGroup("BSPWorld");
         rgm.loadResourceGroup("BSPWorld");
@@ -72,6 +69,8 @@ class _OgreSampleClassExport Sample_BSP : public SdkSample
 
     void setupContent() override
     {
+        loadResources();
+
         // modify camera for close work
         mCamera->setNearClipDistance(4);
         mCamera->setFarClipDistance(4000);

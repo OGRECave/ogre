@@ -150,9 +150,6 @@ protected:
     
     /** @see Sample::setupContent. */
     void cleanupContent() override;
-
-    /** @see Sample::loadResources. */
-    void loadResources() override;
     
     /** @see Sample::unloadResources. */
     void unloadResources() override;
