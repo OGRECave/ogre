@@ -34,6 +34,35 @@
 
 namespace OgreBites
 {
+    class TouchAgnosticInputListenerChain : public InputListenerChain
+    {
+        Ogre::RenderWindow* mWindow;
+    public:
+        TouchAgnosticInputListenerChain() : mWindow(NULL) {}
+        TouchAgnosticInputListenerChain(Ogre::RenderWindow* window, std::vector<InputListener*> chain)
+            : InputListenerChain(chain), mWindow(window)
+        {
+        }
+
+        // convert and redirect
+        bool touchMoved(const TouchFingerEvent& evt) override {
+            MouseMotionEvent e;
+            e.xrel = evt.dx * mWindow->getWidth();
+            e.yrel = evt.dy * mWindow->getHeight();
+            return mouseMoved(e);
+        }
+        bool touchPressed(const TouchFingerEvent& evt) override {
+            MouseButtonEvent e;
+            e.button = BUTTON_LEFT;
+            return mousePressed(e);
+        }
+        bool touchReleased(const TouchFingerEvent& evt) override {
+            MouseButtonEvent e;
+            e.button = BUTTON_LEFT;
+            return mouseReleased(e);
+        }
+    };
+
     /*=============================================================================
     // Base SDK sample class. Includes default player camera and SDK trays.
     =============================================================================*/
@@ -85,16 +114,10 @@ namespace OgreBites
 
         bool frameRenderingQueued(const Ogre::FrameEvent& evt) override
         {
-            if(!mTrayMgr) return true;
+            if (mTrayMgr->isDialogVisible())
+                return true;
 
-            mTrayMgr->frameRendered(evt);
-            mControls->frameRendered(evt);
-
-            if (!mTrayMgr->isDialogVisible())
-            {
-                mCameraMan->frameRendered(evt);   // if dialog isn't up, then update the camera
-            }
-
+            mInputListenerChain.frameRendered(evt);
             return true;
         }
 
@@ -110,84 +133,32 @@ namespace OgreBites
 
             if (mTrayMgr->isDialogVisible()) return true;   // don't process any more keys if dialog is up
 
-            mControls->keyPressed(evt);
-            mCameraMan->keyPressed(evt);
-            return true;
-        }
-
-        bool keyReleased(const KeyboardEvent& evt) override
-        {
-            mCameraMan->keyReleased(evt);
-
-            return true;
-        }
-
-        /* IMPORTANT: When overriding these following handlers, remember to allow the tray manager
-        to filter out any interface-related mouse events before processing them in your scene.
-        If the tray manager handler returns true, the event was meant for the trays, not you. */
-        bool mouseMoved(const MouseMotionEvent& evt) override
-        {
-            if (mTrayMgr->mouseMoved(evt)) return true;
-
-            mCameraMan->mouseMoved(evt);
-            return true;
-        }
-
-        // convert and redirect
-        bool touchMoved(const TouchFingerEvent& evt) override {
-            MouseMotionEvent e;
-            e.xrel = evt.dx * mWindow->getWidth();
-            e.yrel = evt.dy * mWindow->getHeight();
-            return mouseMoved(e);
+            // pass down
+            return false;
         }
 
         bool mousePressed(const MouseButtonEvent& evt) override
         {
-            if (mTrayMgr->mousePressed(evt)) return true;
-
             if (mDragLook && evt.button == BUTTON_LEFT)
             {
                 mCameraMan->setStyle(CS_FREELOOK);
                 mTrayMgr->hideCursor();
             }
 
-            mCameraMan->mousePressed(evt);
-            return true;
-        }
-
-        // convert and redirect
-        bool touchPressed(const TouchFingerEvent& evt) override {
-            MouseButtonEvent e;
-            e.button = BUTTON_LEFT;
-            return mousePressed(e);
+            // pass down
+            return false;
         }
 
         bool mouseReleased(const MouseButtonEvent& evt) override
         {
-            if (mTrayMgr->mouseReleased(evt)) return true;
-
             if (mDragLook && evt.button == BUTTON_LEFT)
             {
                 mCameraMan->setStyle(CS_MANUAL);
                 mTrayMgr->showCursor();
             }
 
-            mCameraMan->mouseReleased(evt);
-            return true;
-        }
-
-        // convert and redirect
-        bool touchReleased(const TouchFingerEvent& evt) override {
-            MouseButtonEvent e;
-            e.button = BUTTON_LEFT;
-            return mouseReleased(e);
-        }
-
-        bool mouseWheelRolled(const MouseWheelEvent& evt) override {
-            if(mTrayMgr->mouseWheelRolled(evt))
-                return true;
-            mCameraMan->mouseWheelRolled(evt);
-            return true;
+            // pass down
+            return false;
         }
 
         /*-----------------------------------------------------------------------------
@@ -205,12 +176,17 @@ namespace OgreBites
 
             mControls.reset(new AdvancedRenderControls(mTrayMgr.get(), mCamera));
 
-            mContext->addInputListener(this);
+            if (mInputListenerChain.empty()) // allow overrides
+                mInputListenerChain =
+                    TouchAgnosticInputListenerChain(mWindow, {mTrayMgr.get(), this, mCameraMan.get(), mControls.get()});
+
+            mContext->addInputListener(&mInputListenerChain);
         }
 
         void _shutdown() override
         {
-            mContext->removeInputListener(this);
+            if(mContext)
+                mContext->removeInputListener(&mInputListenerChain);
 
             Sample::_shutdown();
 
@@ -299,6 +275,7 @@ namespace OgreBites
         std::unique_ptr<TrayManager> mTrayMgr;           // tray interface manager
         std::unique_ptr<CameraMan> mCameraMan;           // basic camera controller
         std::unique_ptr<AdvancedRenderControls> mControls; // sample details panel
+        TouchAgnosticInputListenerChain mInputListenerChain;
         bool mCursorWasVisible;             // was cursor visible before dialog appeared
         bool mDragLook;                     // click and drag to free-look
     };
