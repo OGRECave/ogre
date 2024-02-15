@@ -195,22 +195,17 @@ namespace OgreBites
         -----------------------------------------------------------------------------*/
         void _setup(ApplicationContextBase* context) override
         {
-            Sample::_setup(context);
-
-            if(mTrayMgr)
-                mControls.reset(new AdvancedRenderControls(mTrayMgr.get(), mCamera));
-
-            mContext->addInputListener(this);
-        }
-
-        // enable trays GUI for this sample
-        void _setupTrays(Ogre::RenderWindow* window)
-        {
-            mTrayMgr.reset(new TrayManager("SampleControls", window, this));  // create a tray interface
+            mTrayMgr.reset(new TrayManager("SampleControls", context->getRenderWindow(), this));  // create a tray interface
             // show stats and logo and hide the cursor
             mTrayMgr->showFrameStats(TL_BOTTOMLEFT);
             mTrayMgr->showLogo(TL_BOTTOMRIGHT);
             mTrayMgr->hideCursor();
+
+            Sample::_setup(context);
+
+            mControls.reset(new AdvancedRenderControls(mTrayMgr.get(), mCamera));
+
+            mContext->addInputListener(this);
         }
 
         void _shutdown() override
