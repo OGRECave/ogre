@@ -159,16 +159,6 @@ namespace OgreBites
             return false;
         }
 
-        // enable trays GUI for this sample
-        void _setupTrays(Ogre::RenderWindow* window)
-        {
-            mTrayMgr.reset(new TrayManager("SampleControls", window, this));  // create a tray interface
-            // show stats and logo and hide the cursor
-            mTrayMgr->showFrameStats(TL_BOTTOMLEFT);
-            mTrayMgr->showLogo(TL_BOTTOMRIGHT);
-            mTrayMgr->hideCursor();
-        }
-
         /*-----------------------------------------------------------------------------
         | Sets up a sample. Used by the SampleContext class. Do not call directly.
         -----------------------------------------------------------------------------*/
@@ -181,15 +171,12 @@ namespace OgreBites
             createSceneManager();
             setupView();
 
-            mCameraMan.reset(new CameraMan(mCameraNode));   // create a default camera controller
-
             loadResources();
             mResourcesLoaded = true;
             setupContent();
             mContentSetup = true;
 
             mDone = false;
-            mContext->addInputListener(this);
         }
 
         /*-----------------------------------------------------------------------------
@@ -198,8 +185,6 @@ namespace OgreBites
         virtual void _shutdown()
         {
             Ogre::ControllerManager::getSingleton().clearControllers();
-
-            mContext->removeInputListener(this);
 
             if (mContentSetup)
                 cleanupContent();
@@ -224,22 +209,15 @@ namespace OgreBites
         }
 
         /*-----------------------------------------------------------------------------
-        | Actions to perform when the context stops sending frame listener events
-        | and input device events to this sample.
+        | Actions to perform when the context stops
         -----------------------------------------------------------------------------*/
-        virtual void paused()
-        {
-            mContext->removeInputListener(this);
-        }
+        virtual void paused() {}
 
         /*-----------------------------------------------------------------------------
         | Actions to perform when the context continues sending frame listener
         | events and input device events to this sample.
         -----------------------------------------------------------------------------*/
-        virtual void unpaused()
-        {
-            mContext->addInputListener(this);
-        }
+        virtual void unpaused() {}
 
         /*-----------------------------------------------------------------------------
         | Saves the sample state. Optional. Used during reconfiguration.
@@ -319,10 +297,6 @@ namespace OgreBites
         Ogre::Viewport* mViewport;          // main viewport
         Ogre::Camera* mCamera;              // main camera
         Ogre::SceneNode* mCameraNode;       // camera node
-
-        // SdkSample fields
-        std::unique_ptr<TrayManager> mTrayMgr;           // tray interface manager
-        std::unique_ptr<CameraMan> mCameraMan;           // basic camera controller
 
         bool mDone;               // flag to mark the end of the sample
         bool mResourcesLoaded;    // whether or not resources have been loaded

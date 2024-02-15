@@ -47,12 +47,14 @@ namespace OgreBites
             mDragLook = false;
         }
 
+        void paused() override { mContext->removeInputListener(this); }
+
         /*-----------------------------------------------------------------------------
         | Manually update the cursor position after being unpaused.
         -----------------------------------------------------------------------------*/
         void unpaused() override
         {
-            Sample::unpaused();
+            mContext->addInputListener(this);
             mTrayMgr->refreshCursor();
         }
 
@@ -197,10 +199,24 @@ namespace OgreBites
 
             if(mTrayMgr)
                 mControls.reset(new AdvancedRenderControls(mTrayMgr.get(), mCamera));
+
+            mContext->addInputListener(this);
+        }
+
+        // enable trays GUI for this sample
+        void _setupTrays(Ogre::RenderWindow* window)
+        {
+            mTrayMgr.reset(new TrayManager("SampleControls", window, this));  // create a tray interface
+            // show stats and logo and hide the cursor
+            mTrayMgr->showFrameStats(TL_BOTTOMLEFT);
+            mTrayMgr->showLogo(TL_BOTTOMRIGHT);
+            mTrayMgr->hideCursor();
         }
 
         void _shutdown() override
         {
+            mContext->removeInputListener(this);
+
             Sample::_shutdown();
 
             mControls.reset();
@@ -221,6 +237,8 @@ namespace OgreBites
             mCameraNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
             mCameraNode->attachObject(mCamera);
             mCameraNode->setFixedYawAxis(true);
+            mCameraMan.reset(new CameraMan(mCameraNode));   // create a default camera controller
+
             mViewport = mWindow->addViewport(mCamera);
             mCamera->setAspectRatio((Ogre::Real)mViewport->getActualWidth() / (Ogre::Real)mViewport->getActualHeight());
             mCamera->setAutoAspectRatio(true);
@@ -283,6 +301,8 @@ namespace OgreBites
             w->getOverlayElement()->setMaterial(debugMat);
         }
 
+        std::unique_ptr<TrayManager> mTrayMgr;           // tray interface manager
+        std::unique_ptr<CameraMan> mCameraMan;           // basic camera controller
         std::unique_ptr<AdvancedRenderControls> mControls; // sample details panel
         bool mCursorWasVisible;             // was cursor visible before dialog appeared
         bool mDragLook;                     // click and drag to free-look
