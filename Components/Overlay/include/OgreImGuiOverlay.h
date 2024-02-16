@@ -13,6 +13,13 @@
 
 namespace Ogre
 {
+/** Draws a renderer configuration menu using ImGui
+  *
+  * Wrap this in a Begin() and End() call to draw the dialog.
+  * @param renderSystemName The name of the render system that the user selected
+  */
+_OgreOverlayExport void RenderingSettings(String& renderSystemName);
+
 ///Ogre's integrated support for [Dear ImGui](https://github.com/ocornut/imgui)
 class _OgreOverlayExport ImGuiOverlay : public Overlay
 {
