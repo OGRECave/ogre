@@ -28,6 +28,9 @@
 #ifndef __SampleBrowser_H__
 #define __SampleBrowser_H__
 
+#include "OgreImGuiOverlay.h"
+#include "OgreOverlayManager.h"
+#include "OgreRenderTargetListener.h"
 #include "SampleContext.h"
 #include "SamplePlugin.h"
 #include "OgreTrays.h"
@@ -66,7 +69,7 @@ namespace OgreBites
       | The OGRE Sample Browser. Features a menu accessible from all samples,
       | dynamic configuration, resource reloading, node labeling, and more.
       =============================================================================*/
-    class SampleBrowser : public SampleContext, public TrayListener
+    class SampleBrowser : public SampleContext, public TrayListener, public Ogre::RenderTargetListener
     {
 #ifdef OGRE_STATIC_LIB
         typedef std::map<Ogre::String, SamplePlugin*> PluginMap;
@@ -88,7 +91,6 @@ namespace OgreBites
             mSampleSlider = 0;
             mTitleLabel = 0;
             mDescBox = 0;
-            mRendererMenu = 0;
             mCarouselPlace = 0.0f;
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
@@ -285,6 +287,15 @@ namespace OgreBites
             }
             else if (b->getName() == "Configure")   // enter configuration screen
             {
+                mOwnsImGuiOverlay = !Ogre::OverlayManager::getSingleton().getByName("ImGuiOverlay");
+                auto imguiOverlay = initialiseImGui();
+                imguiOverlay->addFont("SdkTrays/Caption", "Essential");
+                imguiOverlay->setZOrder(300);
+                imguiOverlay->show();
+
+                mWindow->addListener(this);
+                mInputListenerChain = TouchAgnosticInputListenerChain(mWindow, {this, mTrayMgr, getImGuiInputListener()});
+
                 mTrayMgr->removeWidgetFromTray("StartStop");
                 mTrayMgr->removeWidgetFromTray("Configure");
 #if OGRE_PLATFORM != OGRE_PLATFORM_ANDROID
@@ -309,20 +320,17 @@ namespace OgreBites
                     mTrayMgr->removeWidgetFromTray(TL_LEFT, 0);
                 }
 
-                mTrayMgr->moveWidgetToTray("ConfigLabel", TL_LEFT);
-                mTrayMgr->moveWidgetToTray(mRendererMenu, TL_LEFT);
-                mTrayMgr->moveWidgetToTray("ConfigSeparator", TL_LEFT);
-
-                mRendererMenu->selectItem(mRoot->getRenderSystem()->getName());
-
                 windowResized(mWindow);
             }
             else if (b->getName() == "Back")   // leave configuration screen
             {
-                while (mTrayMgr->getWidgets(mRendererMenu->getTrayLocation()).size() > 3)
-                {
-                    mTrayMgr->destroyWidget(mRendererMenu->getTrayLocation(), 3);
-                }
+                if(mOwnsImGuiOverlay)
+                    Ogre::OverlayManager::getSingleton().destroy("ImGuiOverlay"); // bring down overly to avoid interfering with samples
+                else
+                    Ogre::ImGuiOverlay::NewFrame(); // clear dialog
+
+                mInputListenerChain = TouchAgnosticInputListenerChain(mWindow, {this, mTrayMgr});
+                mWindow->removeListener(this);
 
                 while (!mTrayMgr->getWidgets(TL_NONE).empty())
                 {
@@ -331,9 +339,6 @@ namespace OgreBites
 
                 mTrayMgr->removeWidgetFromTray("Apply");
                 mTrayMgr->removeWidgetFromTray("Back");
-                mTrayMgr->removeWidgetFromTray("ConfigLabel");
-                mTrayMgr->removeWidgetFromTray(mRendererMenu);
-                mTrayMgr->removeWidgetFromTray("ConfigSeparator");
 
                 mTrayMgr->moveWidgetToTray("StartStop", TL_RIGHT);
 #if OGRE_PLATFORM != OGRE_PLATFORM_ANDROID
@@ -349,34 +354,28 @@ namespace OgreBites
             }
             else if (b->getName() == "Apply")   // apply any changes made in the configuration screen
             {
-                bool reset = false;
-
-                Ogre::RenderSystem* rs = mRoot->getRenderSystemByName(mRendererMenu->getSelectedItem());
-                auto options = rs->getConfigOptions();
-
-                // collect new settings and decide if a reset is needed
-
-                if (mRendererMenu->getSelectedItem() != mRoot->getRenderSystem()->getName()) {
-                    reset = true;
-                }
-
-                for (unsigned int i = 3; i < mTrayMgr->getWidgets(mRendererMenu->getTrayLocation()).size(); i++)
-                {
-                    SelectMenu* menu = (SelectMenu*)mTrayMgr->getWidgets(mRendererMenu->getTrayLocation())[i];
-                    if (menu->getSelectedItem() != options[menu->getCaption()].currentValue)
-                    {
-                        rs->setConfigOption(menu->getCaption(), menu->getSelectedItem());
-                        reset = true;
-                    }
-                }
-
-                // reset with new settings if necessary
-                if (reset) reconfigure(mRendererMenu->getSelectedItem());
+                reconfigure(mNextRenderer);
             }
             else
             {
                 mRoot->queueEndRendering();   // exit browser
             }
+        }
+
+        void preViewportUpdate(const Ogre::RenderTargetViewportEvent& evt) override
+        {
+            Ogre::ImGuiOverlay::NewFrame();
+
+            auto flags = ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoCollapse |
+                         ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoMove;
+            auto center = ImGui::GetMainViewport()->GetCenter();
+            if(mWindow->getWidth() <= 1280)
+                ImGui::SetNextWindowPos(ImVec2(0, center.y), ImGuiCond_Always, ImVec2(0.f, 0.5f));
+            else
+                ImGui::SetNextWindowPos(center, ImGuiCond_Always, ImVec2(0.5f, 0.5f));
+            ImGui::Begin("Configuration", NULL, flags);
+            Ogre::RenderingSettings(mNextRenderer);
+            ImGui::End();
         }
 
         /*-----------------------------------------------------------------------------
@@ -456,36 +455,6 @@ namespace OgreBites
 
                 if (mCurrentSample != s) ((Button*)mTrayMgr->getWidget("StartStop"))->setCaption("Start Sample");
                 else ((Button*)mTrayMgr->getWidget("StartStop"))->setCaption("Stop Sample");
-            }
-            else if (menu == mRendererMenu)    // renderer selected, so update all settings
-            {
-                while (mTrayMgr->getWidgets(mRendererMenu->getTrayLocation()).size() > 3)
-                {
-                    mTrayMgr->destroyWidget(mRendererMenu->getTrayLocation(), 3);
-                }
-
-                auto options = mRoot->getRenderSystemByName(menu->getSelectedItem())->getConfigOptions();
-
-                unsigned int i = 0;
-
-                // create all the config option select menus
-                for (Ogre::ConfigOptionMap::iterator it = options.begin(); it != options.end(); it++)
-                {
-                    i++;
-                    SelectMenu* optionMenu = mTrayMgr->createLongSelectMenu
-                        (TL_LEFT, "ConfigOption" + Ogre::StringConverter::toString(i), it->first, 450, 240, 10);
-                    optionMenu->setItems(it->second.possibleValues);
-
-                    // if the current config value is not in the menu, add it
-                    if(optionMenu->containsItem(it->second.currentValue) == false)
-                    {
-                        optionMenu->addItem(it->second.currentValue);
-                    }
-
-                    optionMenu->selectItem(it->second.currentValue);
-                }
-
-                windowResized(mWindow);
             }
         }
 
@@ -985,20 +954,6 @@ namespace OgreBites
             mTrayMgr->createButton(TL_NONE, "Apply", "Apply Changes");
             mTrayMgr->createButton(TL_NONE, "Back", "Go Back");
 
-            // create configuration screen label and renderer menu
-            mTrayMgr->createLabel(TL_NONE, "ConfigLabel", "Configuration");
-            mRendererMenu = mTrayMgr->createLongSelectMenu(TL_NONE, "RendererMenu", "Render System", 450, 240, 10);
-            mTrayMgr->createSeparator(TL_NONE, "ConfigSeparator");
-
-            // populate render system names
-            Ogre::StringVector rsNames;
-            Ogre::RenderSystemList rsList = mRoot->getAvailableRenderers();
-            for (unsigned int i = 0; i < rsList.size(); i++)
-            {
-                rsNames.push_back(rsList[i]->getName());
-            }
-            mRendererMenu->setItems(rsNames);
-
             populateSampleMenus();
         }
 
@@ -1098,7 +1053,6 @@ namespace OgreBites
             mSampleSlider = 0;
             mTitleLabel = 0;
             mDescBox = 0;
-            mRendererMenu = 0;
             mHiddenOverlays.clear();
             mThumbs.clear();
             mCarouselPlace = 0;
@@ -1152,7 +1106,6 @@ namespace OgreBites
         Slider* mSampleSlider;                         // sample slider bar
         Label* mTitleLabel;                            // sample title label
         TextBox* mDescBox;                             // sample description box
-        SelectMenu* mRendererMenu;                     // render system selection menu
         std::vector<Ogre::Overlay*> mHiddenOverlays;   // sample overlays hidden for pausing
         std::vector<Ogre::OverlayContainer*> mThumbs;  // sample thumbnails
         Ogre::Real mCarouselPlace;                     // current state of carousel
@@ -1167,6 +1120,7 @@ namespace OgreBites
 #endif
         bool mIsShuttingDown;
         bool mGrabInput;
+        bool mOwnsImGuiOverlay;
     };
 }
 
