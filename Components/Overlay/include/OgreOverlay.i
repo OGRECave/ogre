@@ -82,5 +82,6 @@ SHARED_PTR(TextAreaOverlayElement);
 %include "OgreTextAreaOverlayElement.h"
 
 #ifdef HAVE_IMGUI
+%apply Ogre::String* INOUT { Ogre::String& renderSystemName };
 %include "OgreImGuiOverlay.h"
 #endif
