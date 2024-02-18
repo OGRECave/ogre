@@ -91,6 +91,10 @@ static ImGuiKey ImGui_ImplSDL2_KeycodeToImGuiKey(int keycode)
 
 static bool keyEvent(const KeyboardEvent& arg)
 {
+    // silently ignore events if context dissapeared
+    if(!ImGui::GetCurrentContext())
+        return false;
+
     ImGuiIO& io = ImGui::GetIO();
 
     int key = arg.keysym.sym;
@@ -118,6 +122,10 @@ static bool keyEvent(const KeyboardEvent& arg)
 
 static bool buttonEvent(const ButtonEvent& evt)
 {
+    // silently ignore events if context dissapeared
+    if(!ImGui::GetCurrentContext())
+        return false;
+
     ImGuiIO& io = ImGui::GetIO();
     bool down = evt.type == OgreBites::CONTROLLERBUTTONDOWN;
     switch(evt.button)
@@ -155,6 +163,10 @@ ImGuiInputListener::ImGuiInputListener()
 
 bool ImGuiInputListener::mouseWheelRolled(const MouseWheelEvent& arg)
 {
+    // silently ignore events if context dissapeared
+    if(!ImGui::GetCurrentContext())
+        return false;
+
     ImGuiIO& io = ImGui::GetIO();
     io.AddMouseWheelEvent(0.f, Ogre::Math::Sign(arg.y));
     return io.WantCaptureMouse;
@@ -162,6 +174,9 @@ bool ImGuiInputListener::mouseWheelRolled(const MouseWheelEvent& arg)
 
 bool ImGuiInputListener::mouseMoved(const MouseMotionEvent& arg)
 {
+    // silently ignore events if context dissapeared
+    if(!ImGui::GetCurrentContext())
+        return false;
 
     ImGuiIO& io = ImGui::GetIO();
     io.AddMousePosEvent(arg.x, arg.y);
@@ -170,6 +185,10 @@ bool ImGuiInputListener::mouseMoved(const MouseMotionEvent& arg)
 
 bool ImGuiInputListener::mousePressed(const MouseButtonEvent& arg)
 {
+    // silently ignore events if context dissapeared
+    if(!ImGui::GetCurrentContext())
+        return false;
+
     ImGuiIO& io = ImGui::GetIO();
     int b = sdl2imgui(arg.button);
     if (b < 5)
@@ -180,6 +199,10 @@ bool ImGuiInputListener::mousePressed(const MouseButtonEvent& arg)
 }
 bool ImGuiInputListener::mouseReleased(const MouseButtonEvent& arg)
 {
+    // silently ignore events if context dissapeared
+    if(!ImGui::GetCurrentContext())
+        return false;
+
     ImGuiIO& io = ImGui::GetIO();
     int b = sdl2imgui(arg.button);
     if (b < 5)
@@ -190,6 +213,10 @@ bool ImGuiInputListener::mouseReleased(const MouseButtonEvent& arg)
 }
 bool ImGuiInputListener::textInput (const TextInputEvent& evt)
 {
+    // silently ignore events if context dissapeared
+    if(!ImGui::GetCurrentContext())
+        return false;
+
     ImGuiIO& io = ImGui::GetIO ();
     io.AddInputCharactersUTF8 (evt.chars);
     return true;
