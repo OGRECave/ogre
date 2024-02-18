@@ -374,7 +374,7 @@ namespace OgreBites
             else
                 ImGui::SetNextWindowPos(center, ImGuiCond_Always, ImVec2(0.5f, 0.5f));
             ImGui::Begin("Configuration", NULL, flags);
-            Ogre::RenderingSettings(mNextRenderer);
+            Ogre::DrawRenderingSettings(mNextRenderer);
             ImGui::End();
         }
 
