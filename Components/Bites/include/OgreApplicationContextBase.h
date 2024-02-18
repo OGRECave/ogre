@@ -225,6 +225,12 @@ namespace OgreBites
           */
         void destroyDummyScene();
 
+        /** Show the renderer configuration menu
+         *
+         * creates a dummy scene to allow rendering the dialog
+         */
+        void runRenderingSettingsDialog();
+
         /**
          * enables the caching of compiled shaders to file
          *
