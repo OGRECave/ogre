@@ -254,6 +254,70 @@ void ApplicationContextBase::destroyDummyScene()
     mRoot->destroySceneManager(dummyScene);
 }
 
+struct ImGuiConfigDialog : Ogre::FrameListener
+{
+    Ogre::String nextRenderer;
+    bool saveConfig;
+
+    bool frameStarted(const Ogre::FrameEvent& evt) override
+    {
+        Ogre::ImGuiOverlay::NewFrame();
+
+        auto flags = ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoCollapse |
+                     ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoMove;
+        auto center = ImGui::GetMainViewport()->GetCenter();
+        ImGui::SetNextWindowPos(center, ImGuiCond_Always, ImVec2(0.5f, 0.5f));
+        ImGui::Begin("Rendering Settings", NULL, flags);
+        Ogre::RenderingSettings(nextRenderer);
+        ImGui::Separator();
+        if (ImGui::Button("Accept"))
+        {
+            Ogre::Root::getSingleton().queueEndRendering();
+            saveConfig = true;
+        }
+        ImGui::SameLine();
+        if (ImGui::Button("Cancel"))
+            Ogre::Root::getSingleton().queueEndRendering();
+        ImGui::End();
+        return true;
+    }
+};
+
+void ApplicationContextBase::runRenderingSettingsDialog()
+{
+    createRoot();
+    oneTimeConfig();
+    auto rs = getRoot()->getRenderSystem();
+    auto oldVm = rs->getConfigOptions().at("Video Mode").currentValue;
+    rs->setConfigOption("Video Mode", "800 x 600");
+    setup();
+    rs->setConfigOption("Video Mode", oldVm);
+    createDummyScene();
+
+    float vpScale = getDisplayDPI()/96;
+    Ogre::OverlayManager::getSingleton().setPixelRatio(vpScale);
+    auto overlay = initialiseImGui();
+    ImGui::GetIO().FontGlobalScale = std::round(vpScale); // default font does not work with fractional scaling
+    overlay->show();
+
+    addInputListener(getImGuiInputListener());
+
+    ImGuiConfigDialog dialog;
+    getRoot()->addFrameListener(&dialog);
+    getRoot()->startRendering();
+
+    destroyDummyScene();
+    shutdown();
+    mRoot->shutdown();
+    if(dialog.saveConfig)
+    {
+        mRoot->setRenderSystem(mRoot->getRenderSystemByName(dialog.nextRenderer));
+        mRoot->saveConfig();
+    }
+    delete mRoot;
+    mRoot = NULL;
+}
+
 void ApplicationContextBase::enableShaderCache() const
 {
     Ogre::GpuProgramManager::getSingleton().setSaveMicrocodesToCache(true);
