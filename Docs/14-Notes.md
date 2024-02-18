@@ -81,7 +81,7 @@ This simplifies many advanced algorithms, such as deferred shading, where you wa
 
 The second argument of `RenderQueueListener::renderQueueStarted` now contains the current camera name and hence is always non-empty.
 
-## Rectangular Area Lights (since 14.1)
+### Rectangular Area Lights (since 14.1)
 
 A new spot light type `LT_RECTLIGHT` has been introduced along with the `setSourceSize` method, enabling the rendering of rectangular area lights. In order to process this light type in your shader, verify that the `spotlight_params.w` autoparam is equal to 2. Then, `spotlight_params.xyz` contains the light width in the view space, and `light_attenuation.xyz` contains the light height.
 
@@ -92,6 +92,13 @@ Since 14.1, `Checkbox` and multidimensional input (e.g. `ColorEdit3` `InputFloat
 
 Since 14.1, primitive types like `Ogre.Vector3`, `Ogre.ColourValue` etc. behave like Python sequences and can be used with `len()` and expanded `myfun(*Ogre.Quaternion())`.
 Additionally, `Ogre.Degree` can be transparently used where `Ogre.Radian` is required.
+
+## Bites
+
+Since 14.2 `ApplicationContextBase::runRenderingSettingsDialog()` is available, that displays an ImGui based dialog to change the rendering settings.
+This replaces the platform specific `getNativeConfigDialog()` based dialogs which will be removed in a future release.
+
+Additionally, there is `DrawRenderingSettings` in the overlay component, that allows you to integrate the dialog logic into your application. See the SampleBrowser for an example.
 
 ## RTShader System
 
