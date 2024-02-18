@@ -268,7 +268,7 @@ struct ImGuiConfigDialog : Ogre::FrameListener
         auto center = ImGui::GetMainViewport()->GetCenter();
         ImGui::SetNextWindowPos(center, ImGuiCond_Always, ImVec2(0.5f, 0.5f));
         ImGui::Begin("Rendering Settings", NULL, flags);
-        Ogre::RenderingSettings(nextRenderer);
+        Ogre::DrawRenderingSettings(nextRenderer);
         ImGui::Separator();
         if (ImGui::Button("Accept"))
         {

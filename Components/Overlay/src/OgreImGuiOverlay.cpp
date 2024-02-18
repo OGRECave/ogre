@@ -37,7 +37,7 @@ static void DrawConfigOption(RenderSystem* rs, const ConfigOption& opt)
     }
 }
 
-void RenderingSettings(String& rsName)
+void DrawRenderingSettings(String& rsName)
 {
     auto root = Root::getSingletonPtr();
     OgreAssert(root, "Root must be created");
