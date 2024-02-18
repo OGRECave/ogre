@@ -73,9 +73,6 @@ class TestContext : public OgreBites::SampleContext
      *        @return The initial tets or sample to run */
     OgreBites::Sample* loadTests();
 
-    /** Setup the Root */
-    void createRoot() override;
-
     /** Start it up */
     void go(OgreBites::Sample* initialSample = 0) override;
 
