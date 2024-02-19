@@ -29,14 +29,13 @@ int main(int argc, char *argv[])
 
 //! [setup]
     // get a pointer to the already created root
-    Ogre::Root* root = ctx.getRoot();
-    Ogre::SceneManager* scnMgr = root->createSceneManager();
+    auto scnMgr = ctx.getSceneManager();
 
     // register our scene with the RTSS
     Ogre::RTShader::ShaderGenerator* shadergen = Ogre::RTShader::ShaderGenerator::getSingletonPtr();
     shadergen->addSceneManager(scnMgr);
 
-    // without light we would just get a black screen    
+    // without light we would just get a black screen
     Ogre::Light* light = scnMgr->createLight("MainLight");
     Ogre::SceneNode* lightNode = scnMgr->getRootSceneNode()->createChildSceneNode();
     lightNode->setPosition(0, 10, 15);
@@ -67,7 +66,7 @@ int main(int argc, char *argv[])
     KeyHandler keyHandler;
     ctx.addInputListener(&keyHandler);
 
-    ctx.getRoot()->startRendering();
+    ctx.mainLoop();
     ctx.closeApp();
 //! [main]
     return 0;

@@ -173,6 +173,7 @@ void ApplicationContextBase::setup()
 
     // adds context as listener to process context-level (above the sample level) events
     mRoot->addFrameListener(this);
+    mSceneManager = createSceneManager();
 }
 
 void ApplicationContextBase::createRoot()
@@ -638,6 +639,20 @@ void ApplicationContextBase::pollEvents()
 {
     // just avoid "window not responding"
     WindowEventUtilities::messagePump();
+}
+
+void ApplicationContextBase::mainLoop() {
+    OgreAssert(mRoot, "No root object created");
+    mRoot->startRendering();
+}
+
+Ogre::SceneManager *ApplicationContextBase::createSceneManager(Ogre::String type) {
+    OgreAssert(mRoot, "No root object created");
+    return mRoot->createSceneManager(type);
+}
+
+Ogre::SceneManager *ApplicationContextBase::getSceneManager() {
+    return mSceneManager;
 }
 
 }

@@ -292,6 +292,21 @@ namespace OgreBites
         static Ogre::String getDefaultMediaDir();
 
         /**
+         * Main loop for application
+         */
+        virtual void mainLoop();
+
+        /**
+         * create Scene Manager
+         */
+        Ogre::SceneManager *createSceneManager(Ogre::String type = Ogre::SMT_DEFAULT);
+
+        /**
+         * get Scene Manager
+         */
+        Ogre::SceneManager *getSceneManager();
+
+        /**
          * Set up the overlay system for usage with ImGui
          */
         Ogre::ImGuiOverlay* initialiseImGui();
@@ -309,6 +324,7 @@ namespace OgreBites
         bool mFirstRun;
         Ogre::String mNextRenderer;     // name of renderer used for next run
         Ogre::String mAppName;
+        Ogre::SceneManager *mSceneManager;
 
         typedef std::vector<NativeWindowPair> WindowList;
         WindowList mWindows; // all windows
