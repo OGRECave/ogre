@@ -534,7 +534,7 @@ void LodOutsideMarker::markVertices()
             CHVertex* vert = stack.back();
             stack.pop_back();
             for (auto& tr : vert->triangles) {
-                if (t.normal.dotProduct((tr)->normal) > mWalkAngle) {
+                if (t.normal.dotProduct(tr->normal) > mWalkAngle) {
                     addHullTriangleVertices(stack, tr);
                 }
             }
