@@ -269,6 +269,7 @@ ADD_REPR(TRect)
 %ignore Ogre::Any::destroy; // deprecated
 %ignore Ogre::Any::isEmpty; // deprecated
 %include "OgreAny.h"
+%ignore Ogre::Math::calculateTangentSpaceVector; // deprecated
 %include "OgreMath.h"
 ADD_REPR(Degree)
 ADD_REPR(Radian)
@@ -422,6 +423,7 @@ TYPEMAP_SEQUENCE_FOR(Ogre::Quaternion, len == 4)
 TYPEMAP_SEQUENCE_FOR(Ogre::ColourValue, len >= 3 && len <= 4)
 #endif
 
+%ignore Ogre::Matrix3::Orthonormalize;
 %include "OgreMatrix3.h"
 ADD_REPR(Matrix3)
 %extend Ogre::Matrix3
@@ -517,6 +519,7 @@ SHARED_PTR(FileHandleDataStream);
 %feature("director") Ogre::MeshSerializerListener;
 %feature("director") Ogre::ResourceLoadingListener;
 // More Data Types
+%ignore Ogre::ColourValue::getHSB; // deprecated
 %include "OgreColourValue.h"
 ADD_REPR(ColourValue)
 %include "OgrePixelFormat.h"
@@ -545,8 +548,10 @@ ADD_REPR(ColourValue)
 %ignore Ogre::GpuSharedParameters::getConstantDefinitionIterator;
 SHARED_PTR(GpuProgramParameters);
 %include "OgreGpuProgramParams.h"
+%ignore Ogre::Image::getFileExtFromMagic;
 %include "OgreImage.h"
 %include "OgreBillboard.h"
+%ignore Ogre::Particle::hasOwnDimensions ; // deprecated
 %include "OgreParticle.h"
 %include "OgreHardwareOcclusionQuery.h"
 SHARED_PTR(HardwareBuffer);
@@ -606,11 +611,11 @@ SHARED_PTR(Compositor);
 %ignore Ogre::CompositionTargetPass::getNumPasses;
 %ignore Ogre::CompositionTargetPass::getPassIterator;
 %include "OgreCompositionTargetPass.h"
-SHARED_PTR(HardwareBuffer);
 SHARED_PTR(HardwareVertexBuffer);
 #ifdef SWIGPYTHON
 %template(VertexElementList) std::list<Ogre::VertexElement>;
 #endif
+%ignore Ogre::VertexElement::getBestColourVertexElementType;
 %include "OgreHardwareVertexBuffer.h"
 SHARED_PTR(HardwareIndexBuffer);
 %include "OgreHardwareIndexBuffer.h"
@@ -640,7 +645,9 @@ SHARED_PTR(HardwarePixelBuffer);
     // ambiguity as enums are just ints
     %ignore Ogre::TextureManager::createManual(const String&, const String&,TextureType,uint,uint,int,PixelFormat,int);
     %ignore Ogre::TextureManager::createManual(const String&, const String&,TextureType,uint,uint,int,PixelFormat);
+    %ignore Ogre::TextureManager::load(const String&, const String&,TextureType,int,float,bool,PixelFormat=PF_UNKNOWN,bool=false);
     %include "OgreTextureManager.h"
+    %ignore Ogre::TextureManager::getByName(const String&, const String&,bool) const;
     %include "OgreGpuProgramManager.h"
     %include "OgreHighLevelGpuProgramManager.h"
 // animations
@@ -714,6 +721,7 @@ SHARED_PTR(Material);
 %ignore Ogre::RenderSystem::getColourVertexElementType;
 %ignore Ogre::RenderSystem::setStencilCheckEnabled;
 %ignore Ogre::RenderSystem::setStencilBufferParams;
+%ignore Ogre::RenderSystem::setScissorTest(bool, uint32, uint32 = 0, uint32 = 800, uint32 = 600);
 %include "OgreRenderSystem.h"
 %include "OgreCompositorManager.h"
 #ifdef SWIGJAVA
@@ -752,6 +760,7 @@ SHARED_PTR(Material);
     %ignore Ogre::Light::setPosition;
     %ignore Ogre::Light::getPosition;
     %ignore Ogre::Light::getDirection;
+    %ignore Ogre::Light::_deriveShadowFarClipDistance(const Camera*) const;
     %include "OgreLight.h"
     %ignore Ogre::Node::getChildIterator;
     %template(NodeList) std::vector<Ogre::Node*>;
@@ -799,6 +808,8 @@ SHARED_PTR(Material);
     %ignore Ogre::Entity::getAttachedObjectIterator;
     %include "OgreEntity.h"
     %include "OgreSubEntity.h"
+    %ignore Ogre::ParticleSystemRenderer::_createVisualData;
+    %ignore Ogre::ParticleSystemRenderer::_destroyVisualData;
     %include "OgreParticleSystemRenderer.h"
     SHARED_PTR(ParticleSystem);
     %ignore Ogre::ParticleSystem::_getIterator;
@@ -828,6 +839,8 @@ SHARED_PTR(Material);
 %template(SubMeshList) std::vector<Ogre::SubMesh*>;
 %apply unsigned short& OUTPUT { unsigned short& outSourceCoordSet, unsigned short& outIndex };
 SHARED_PTR(Mesh);
+%ignore Ogre::Mesh::buildTangentVectors(VertexElementSemantic,unsigned short=0,unsigned short=0,bool=false,bool=false,bool=false);
+%ignore Ogre::Mesh::suggestTangentVectorBuildParams(VertexElementSemantic,unsigned short&,unsigned short&);
 %include "OgreMesh.h"
 %ignore Ogre::SubMesh::getBoneAssignmentIterator;
 %include "OgreSubMesh.h"
