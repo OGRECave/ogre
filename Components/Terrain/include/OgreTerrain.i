@@ -33,6 +33,8 @@
 
 %template(LayerInstanceList) std::vector<Ogre::Terrain::LayerInstance>;
 %template(TerrainRayResult) std::pair<bool, Ogre::Vector3>;
+%ignore Ogre::Terrain::getBlendTextureCount;
+%ignore Ogre::Terrain::getBlendTextureName;
 %include "OgreTerrain.h"
 
 %ignore Ogre::TerrainGroup::rayIntersects;
