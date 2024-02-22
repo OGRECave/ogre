@@ -9,7 +9,7 @@ jobs:
   linux:
     runs-on: ubuntu-20.04
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Docker Image
       run: docker build SDK -t pypi
     - name: Build
@@ -22,11 +22,11 @@ jobs:
   windows:
     runs-on: windows-2019
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - uses: ilammy/msvc-dev-cmd@v1
       with:
         toolset: 14.1
-    - uses: actions/setup-python@v4
+    - uses: actions/setup-python@v5
       with:
         python-version: '3.10'
     # see https://github.com/actions/runner-images/issues/6627#issuecomment-1328214957
@@ -49,8 +49,8 @@ jobs:
   macos:
     runs-on: macos-12
     steps:
-    - uses: actions/checkout@v3
-    - uses: actions/setup-python@v4
+    - uses: actions/checkout@v4
+    - uses: actions/setup-python@v5
       with:
         python-version: '3.10'
     - name: Build
