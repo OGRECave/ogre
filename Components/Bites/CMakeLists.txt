@@ -107,8 +107,11 @@ elseif(ANDROID)
   list(APPEND SOURCES  "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreApplicationContextAndroid.cpp")
 endif()
 
-if(ANDROID OR EMSCRIPTEN OR APPLE_IOS OR WINDOWS_STORE OR WINDOWS_PHONE)
-  # no config dialog available
+cmake_dependent_option(OGRE_BITES_NATIVE_DIALOG "Provide a platform specific ConfigDialog implementation"
+  ON "NOT ANDROID;NOT EMSCRIPTEN;NOT APPLE_IOS;NOT WINDOWS_STORE;NOT WINDOWS_PHONE;NOT UNIX OR APPLE OR XAW_LIBRARY" OFF)
+
+if(NOT OGRE_BITES_NATIVE_DIALOG)
+  set_source_files_properties(src/OgreBitesConfigDialog.cpp PROPERTIES COMPILE_DEFINITIONS DISABLE_NATIVE_DIALOG)
 elseif(WIN32)
   include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src")
   list(APPEND SOURCES 
@@ -131,15 +134,16 @@ elseif(APPLE)
   set(RESOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/misc/ogrelogo.png")
   source_group(Resources FILES ${RESOURCE_FILES})
   set(DEPENDENCIES ${DEPENDENCIES} "-framework Cocoa")
-elseif(UNIX)
+elseif(UNIX AND XAW_LIBRARY)
+  list(APPEND SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreGLXConfigDialog.cpp")
+  list(APPEND DEPENDENCIES ${X11_Xt_LIB} ${XAW_LIBRARY})
+  install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/misc/GLX_backdrop.png" DESTINATION "${OGRE_MEDIA_PATH}/../")
+endif()
+
+if(UNIX AND NOT APPLE)
+  # for WindowEventUtilities
   list(APPEND DEPENDENCIES ${X11_X11_LIB})
   set(NATIVE_INCLUDES ${X11_Xlib_INCLUDE_PATH})
-  if(XAW_LIBRARY)
-    set_source_files_properties(src/OgreBitesConfigDialog.cpp PROPERTIES COMPILE_DEFINITIONS HAVE_XAW)
-    list(APPEND SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreGLXConfigDialog.cpp")
-    list(APPEND DEPENDENCIES ${X11_Xt_LIB} ${XAW_LIBRARY})
-    install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/misc/GLX_backdrop.png" DESTINATION "${OGRE_MEDIA_PATH}/../")
-  endif()
 endif()
 
 if(OGRE_BUILD_COMPONENT_OVERLAY_IMGUI)

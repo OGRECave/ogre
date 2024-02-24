@@ -8,7 +8,7 @@
 
 namespace OgreBites {
     Ogre::ConfigDialog* getNativeConfigDialog() {
-#if defined(HAVE_XAW) || (OGRE_PLATFORM == OGRE_PLATFORM_WIN32 && !defined(__MINGW32__)) || OGRE_PLATFORM == OGRE_PLATFORM_APPLE
+#ifndef DISABLE_NATIVE_DIALOG
         static ConfigDialog dialog;
         return &dialog;
 #else
