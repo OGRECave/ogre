@@ -118,7 +118,10 @@ void ImGuiOverlay::ImGUIRenderable::createMaterial()
 ImFont* ImGuiOverlay::addFont(const String& name, const String& group)
 {
     FontPtr font = FontManager::getSingleton().getByName(name, group);
-    OgreAssert(font, "font does not exist");
+    if (!font)
+        OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND,
+                    StringUtil::format("Font '%s' not found in group '%s'", name.c_str(), group.c_str()));
+
     OgreAssert(font->getType() == FT_TRUETYPE, "font must be of FT_TRUETYPE");
     DataStreamPtr dataStreamPtr =
         ResourceGroupManager::getSingleton().openResource(font->getSource(), font->getGroup());
