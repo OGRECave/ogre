@@ -61,6 +61,7 @@ JNIEnv* OgreJNIGetEnv();
 #endif
 
 %include "OgreComponents.h"
+%ignore OgreBites::ApplicationContextBase::reconfigure;
 %include "OgreApplicationContextBase.h"
 %include "OgreApplicationContext.h"
 %include "OgreCameraMan.h"

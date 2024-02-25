@@ -202,7 +202,7 @@ namespace OgreBites
         virtual void loadResources();
 
         /// @deprecated use do not use
-        OGRE_DEPRECATED virtual void reconfigure(const Ogre::String& renderer, Ogre::NameValuePairList& options);
+        OGRE_DEPRECATED void reconfigure(const Ogre::String& renderer, Ogre::NameValuePairList& options);
 
 
         /**
