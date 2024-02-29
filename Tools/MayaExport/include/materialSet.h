@@ -41,7 +41,8 @@ namespace OgreMayaExporter
         //destructor
         ~MaterialSet(){
             clear();
-            delete m_pDefaultMat;
+            if (m_pDefaultMat)
+                delete m_pDefaultMat;
         }
         //clear
         void clear(){
