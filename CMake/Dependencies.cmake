@@ -177,13 +177,14 @@ if(OGRE_BUILD_DEPENDENCIES AND NOT EXISTS ${OGREDEPS_PATH})
         --build ${PROJECT_BINARY_DIR}/assimp-5.3.1 ${BUILD_COMMAND_OPTS})
     endif()
 
-    message(STATUS "Building Bullet")
-    file(DOWNLOAD
+    if(OGRE_BUILD_COMPONENT_BULLET)
+     message(STATUS "Downloading and building Bullet")
+     file(DOWNLOAD
         https://github.com/bulletphysics/bullet3/archive/refs/tags/3.25.tar.gz
         ${PROJECT_BINARY_DIR}/3.25.tar.gz)
-    execute_process(COMMAND ${CMAKE_COMMAND}
+     execute_process(COMMAND ${CMAKE_COMMAND}
         -E tar xf 3.25.tar.gz WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
-    execute_process(COMMAND ${BUILD_COMMAND_COMMON}
+     execute_process(COMMAND ${BUILD_COMMAND_COMMON}
         -DBUILD_SHARED_LIBS=OFF
         -DINSTALL_LIBS=ON
         -DCMAKE_POSITION_INDEPENDENT_CODE=ON
@@ -200,9 +201,9 @@ if(OGRE_BUILD_DEPENDENCIES AND NOT EXISTS ${OGREDEPS_PATH})
         -DBUILD_CLSOCKET=OFF
         ${PROJECT_BINARY_DIR}/bullet3-3.25
         WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/bullet3-3.25)
-    execute_process(COMMAND ${CMAKE_COMMAND}
+     execute_process(COMMAND ${CMAKE_COMMAND}
         --build ${PROJECT_BINARY_DIR}/bullet3-3.25 ${BUILD_COMMAND_OPTS})
-    set(BULLET_ROOT ${OGREDEPS_PATH})
+     set(BULLET_ROOT ${OGREDEPS_PATH})
 endif()
 
 #######################################################################

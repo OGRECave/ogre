@@ -9,7 +9,7 @@ target_include_directories(OgreBullet PUBLIC
   $<INSTALL_INTERFACE:include/OGRE/Bullet>)
 target_include_directories(OgreBullet SYSTEM PUBLIC "$<BUILD_INTERFACE:${BULLET_INCLUDE_DIRS}>")
 
-if(OGRE_BUILD_DEPENDENCIES)
+if(OGRE_BUILD_DEPENDENCIES AND OGRE_BUILD_COMPONENT_BULLET)
   target_include_directories(OgreBullet PUBLIC "$<INSTALL_INTERFACE:include/bullet>")
   target_link_libraries(OgreBullet PUBLIC "$<BUILD_INTERFACE:${BULLET_LIBRARIES}>")
 else()
