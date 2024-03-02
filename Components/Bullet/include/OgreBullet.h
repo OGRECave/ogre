@@ -143,6 +143,8 @@ class _OgreBulletExport DebugDrawer : public btIDebugDraw
     ManualObject mLines;
     int mDebugMode;
 
+    DefaultColors colors;
+
 public:
     DebugDrawer(SceneNode* node, btCollisionWorld* world)
         : mNode(node), mWorld(world), mLines(""), mDebugMode(DBG_DrawWireframe)
@@ -158,6 +160,10 @@ public:
         if (!mLines.getSections().empty()) // begin was called
             mLines.end();
     }
+
+    void setDefaultColors(const DefaultColors& defaultColors) override { colors = defaultColors; };
+
+    DefaultColors getDefaultColors() const override { return colors; };
 
     void drawLine(const btVector3& from, const btVector3& to, const btVector3& color) override;
 
