@@ -46,6 +46,8 @@ using namespace std;
 #define OGRE_STATIC_MUTEX(arg)
 #define OGRE_MUTEX(arg)
 
+typedef long int time_t;
+
 %feature("autodoc", "1");
 %feature("director") *::Listener;
 #ifdef SWIGPYTHON
