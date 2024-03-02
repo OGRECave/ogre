@@ -721,7 +721,7 @@ void DebugDrawer::drawLine(const btVector3& from, const btVector3& to, const btV
     else if (mLines.getCurrentVertexCount() == 0)
         mLines.beginUpdate(0);
 
-    ColourValue col(color.x(), color.x(), color.z());
+    ColourValue col(color.x(), color.y(), color.z());
     mLines.position(convert(from));
     mLines.colour(col);
     mLines.position(convert(to));
