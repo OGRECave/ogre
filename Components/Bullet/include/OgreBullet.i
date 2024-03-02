@@ -41,6 +41,7 @@
 #define ATTRIBUTE_ALIGNED16(a) a
 typedef float btScalar;
 %include "LinearMath/btVector3.h"
+%include "LinearMath/btIDebugDraw.h"
 %include "BulletCollision/NarrowPhaseCollision/btManifoldPoint.h"
 %include "BulletCollision/CollisionDispatch/btCollisionObject.h"
 %include "BulletDynamics/Dynamics/btRigidBody.h"
