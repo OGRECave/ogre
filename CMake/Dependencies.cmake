@@ -204,6 +204,7 @@ if(OGRE_BUILD_DEPENDENCIES AND NOT EXISTS ${OGREDEPS_PATH})
      execute_process(COMMAND ${CMAKE_COMMAND}
         --build ${PROJECT_BINARY_DIR}/bullet3-3.25 ${BUILD_COMMAND_OPTS})
      set(BULLET_ROOT ${OGREDEPS_PATH})
+    endif()
 endif()
 
 #######################################################################
