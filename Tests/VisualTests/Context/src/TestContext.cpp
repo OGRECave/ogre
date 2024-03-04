@@ -33,6 +33,7 @@ THE SOFTWARE.
 #include "OgreConfigFile.h"
 #include "OgrePlatform.h"
 #include "OgreBitesConfigDialog.h"
+#include <SdkSample.h>
 
 #include <iostream>
 
@@ -317,6 +318,11 @@ void TestContext::runSample(OgreBites::Sample* sampleToRun)
     if(sampleToRun)
         LogManager::getSingleton().logMessage("----- Running Visual Test " + sampleToRun->getInfo()["Title"] + " -----");
     SampleContext::runSample(sampleToRun);
+
+    if(auto sdkSample = dynamic_cast<OgreBites::SdkSample*>(sampleToRun))
+    {
+        sdkSample->_removeTrays();
+    }
 }
 //-----------------------------------------------------------------------
 
