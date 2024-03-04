@@ -116,7 +116,7 @@ namespace OgreBites
 
         bool frameRenderingQueued(const Ogre::FrameEvent& evt) override
         {
-            if (mTrayMgr->isDialogVisible())
+            if (mTrayMgr && mTrayMgr->isDialogVisible())
                 return true;
 
             mInputListenerChain.frameRendered(evt);
@@ -183,6 +183,13 @@ namespace OgreBites
                     TouchAgnosticInputListenerChain(mWindow, {mTrayMgr.get(), this, mCameraMan.get(), mControls.get()});
 
             mContext->addInputListener(&mInputListenerChain);
+        }
+
+        void _removeTrays()
+        {
+            mControls.reset();
+            mTrayMgr.reset();
+            mInputListenerChain = TouchAgnosticInputListenerChain(mWindow, {});
         }
 
         void _shutdown() override
