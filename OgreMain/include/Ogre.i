@@ -583,6 +583,7 @@ SHARED_PTR(StringInterface);
             SHARED_PTR(HighLevelGpuProgram);
             %include "OgreHighLevelGpuProgram.h"
 %include "OgreRenderSystemCapabilities.h"
+%ignore getPropertyName;
 %include "OgreScriptCompiler.h"
 %ignore Ogre::TextureUnitState::setCubicTexture;
 %ignore Ogre::TextureUnitState::setCubicTextureName;
