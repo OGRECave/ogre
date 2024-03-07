@@ -184,6 +184,10 @@ JNIEnv* OgreJNIGetEnv() {
 #endif
 
 #ifdef SWIGCSHARP
+typedef uint32_t uint32;
+typedef uint16_t uint16;
+typedef uint8_t uint8;
+
 %ignore Ogre::HardwareBuffer::UsageEnum;
 %ignore Ogre::TextureUsage;
 %ignore Ogre::GpuConstantType;
