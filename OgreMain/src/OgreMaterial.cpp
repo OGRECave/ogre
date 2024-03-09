@@ -127,15 +127,16 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void Material::loadImpl(void)
     {
+        // compile if required
+        if (mCompilationRequired)
+            compile();
+
         // Load all supported techniques
         for (auto *t : mSupportedTechniques)
         {
             t->_load();
         }
 
-        // compile if required
-        if (mCompilationRequired)
-            compile();
     }
     //-----------------------------------------------------------------------
     void Material::unloadImpl(void)
