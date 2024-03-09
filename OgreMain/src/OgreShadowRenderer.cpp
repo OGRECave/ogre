@@ -1360,13 +1360,13 @@ const Pass* SceneManager::ShadowRenderer::deriveShadowCasterPass(const Pass* pas
     Pass* retPass;
     if (pass->getParent()->getShadowCasterMaterial())
     {
-        return pass->getParent()->getShadowCasterMaterial()->getBestTechnique()->getPass(0);
+        auto bestTech = pass->getParent()->getShadowCasterMaterial()->getBestTechnique();
+        if (bestTech && bestTech->getNumPasses() > 0) {
+            return bestTech->getPass(0);
+        }
     }
-    else
-    {
-        retPass = mShadowTextureCustomCasterPass ?
-            mShadowTextureCustomCasterPass : mShadowCasterPlainBlackPass;
-    }
+    retPass = mShadowTextureCustomCasterPass ?
+        mShadowTextureCustomCasterPass : mShadowCasterPlainBlackPass;
 
     // Special case alpha-blended passes
     if ((pass->getSourceBlendFactor() == SBF_SOURCE_ALPHA &&
