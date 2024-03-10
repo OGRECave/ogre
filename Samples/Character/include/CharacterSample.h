@@ -24,47 +24,6 @@ public:
             "start/stop a silly dance routine.";
     }
 
-    bool frameRenderingQueued(const FrameEvent& evt) override
-    {
-        // let character update animations and camera
-        mChara->addTime(evt.timeSinceLastFrame);
-        return SdkSample::frameRenderingQueued(evt);
-    }
-    
-    bool keyPressed(const KeyboardEvent& evt) override
-    {
-        // relay input events to character controller
-        if (!mTrayMgr->isDialogVisible()) mChara->injectKeyDown(evt);
-        return SdkSample::keyPressed(evt);
-    }
-    
-    bool keyReleased(const KeyboardEvent& evt) override
-    {
-        // relay input events to character controller
-        if (!mTrayMgr->isDialogVisible()) mChara->injectKeyUp(evt);
-        return SdkSample::keyReleased(evt);
-    }
-
-    bool mouseMoved(const MouseMotionEvent& evt) override
-    {
-        // Relay input events to character controller.
-        if (!mTrayMgr->isDialogVisible()) mChara->injectMouseMove(evt);
-        return SdkSample::mouseMoved(evt);
-    }
-
-    bool mouseWheelRolled(const MouseWheelEvent& evt) override {
-        // Relay input events to character controller.
-        if (!mTrayMgr->isDialogVisible()) mChara->injectMouseWheel(evt);
-        return SdkSample::mouseWheelRolled(evt);
-    }
-
-    bool mousePressed(const MouseButtonEvent& evt) override
-    {
-        // Relay input events to character controller.
-        if (!mTrayMgr->isDialogVisible()) mChara->injectMouseDown(evt);
-        return SdkSample::mousePressed(evt);
-    }
-
 protected:
 
     void setupContent() override
@@ -119,7 +78,9 @@ protected:
 
 //      LogManager::getSingleton().logMessage("creating sinbad");
         // create our character controller
-        mChara = new SinbadCharacterController(mCamera);
+        mChara = std::make_unique<SinbadCharacterController>(mCamera);
+
+        mInputListenerChain = TouchAgnosticInputListenerChain(mWindow, {mTrayMgr.get(), this, mChara.get()});
 
 //      LogManager::getSingleton().logMessage("toggling stats");
         mTrayMgr->toggleAdvancedFrameStats();
@@ -135,16 +96,10 @@ protected:
 
     void cleanupContent() override
     {
-        // clean up character controller and the floor mesh
-        if (mChara)
-        {
-            delete mChara;
-            mChara = 0;
-        }
         MeshManager::getSingleton().remove("floor", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
     }
 
-    SinbadCharacterController* mChara;
+    std::unique_ptr<SinbadCharacterController> mChara;
 };
 
 #endif
