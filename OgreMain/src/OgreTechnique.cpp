@@ -71,11 +71,7 @@ namespace Ogre {
     {
         StringStream errors;
 
-        if(!Root::getSingleton().getRenderSystem()) {
-            errors << "NULL RenderSystem";
-        } else {
-            mIsSupported = checkGPURules(errors) && checkHardwareSupport(autoManageTextureUnits, errors);
-        }
+        mIsSupported = checkGPURules(errors) && checkHardwareSupport(autoManageTextureUnits, errors);
 
         // Compile for categorised illumination on demand
         clearIlluminationPasses();
@@ -90,8 +86,15 @@ namespace Ogre {
         // Go through each pass, checking requirements
         Passes::iterator i;
         unsigned short passNum = 0;
-        const RenderSystemCapabilities* caps =
-            Root::getSingleton().getRenderSystem()->getCapabilities();
+        const RenderSystemCapabilities* caps = nullptr;
+        if (auto rs = Root::getSingleton().getRenderSystem())
+            caps = rs->getCapabilities();
+        else
+        {
+            static RenderSystemCapabilities nullCaps;
+            caps = &nullCaps;
+        }
+
         unsigned short numTexUnits = caps->getNumTextureUnits();
         for (i = mPasses.begin(); i != mPasses.end(); ++i, ++passNum)
         {
@@ -223,8 +226,15 @@ namespace Ogre {
     //---------------------------------------------------------------------
     bool Technique::checkGPURules(StringStream& errors)
     {
-        const RenderSystemCapabilities* caps =
-            Root::getSingleton().getRenderSystem()->getCapabilities();
+        const RenderSystemCapabilities* caps = nullptr;
+        if (auto rs = Root::getSingleton().getRenderSystem())
+            caps = rs->getCapabilities();
+
+        if (!caps && (!mGPUVendorRules.empty() || !mGPUDeviceNameRules.empty()))
+        {
+            errors << "GPU rules failed because the RenderSystem is NULL";
+            return false;
+        }
 
         StringStream includeRules;
         bool includeRulesPresent = false;
