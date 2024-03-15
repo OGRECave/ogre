@@ -54,12 +54,12 @@ namespace Ogre
         // For every primitive on the src vertex we need a primitive in the same submesh connecting src and dst.
         if (mPreventPunchingHoles)
         {
-            for (auto & testTri : src->triangles)
+            for (auto& testTri : src->triangles)
             {
                 auto srcSubmeshID = testTri->submeshID;
                 bool canConnect = false;
 
-                for (auto & solveTri : dst->triangles)
+                for (auto& solveTri : dst->triangles)
                 {
                     if (solveTri->submeshID == srcSubmeshID && solveTri->hasVertex(src) && solveTri->hasVertex(dst))
                     {
@@ -74,12 +74,12 @@ namespace Ogre
         }
         if (mPreventBreakingLines)
         {
-            for (auto & testLine : src->lines)
+            for (auto& testLine : src->lines)
             {
                 auto srcSubmeshID = testLine->submeshID;
                 bool canConnect = false;
 
-                for (auto & solveLine : dst->lines)
+                for (auto& solveLine : dst->lines)
                 {
                     if (solveLine->submeshID == srcSubmeshID && solveLine->hasVertex(src) && solveLine->hasVertex(dst))
                     {
@@ -97,16 +97,15 @@ namespace Ogre
 
     void LodCollapseCost::computeVertexCollapseCost( LodData* data, LodData::Vertex* vertex, Real& collapseCost, LodData::Vertex*& collapseTo )
     {
-        LodData::VEdges::iterator it = vertex->edges.begin();
-        for (; it != vertex->edges.end(); ++it) {
-            if (isEdgeCollapsible(vertex, it->dst)) {
-                it->collapseCost = computeEdgeCollapseCost(data, vertex, &*it);
+        for (auto& e : vertex->edges) {
+            if (isEdgeCollapsible(vertex, e.dst)) {
+                e.collapseCost = computeEdgeCollapseCost(data, vertex, &e);
             } else {
-                it->collapseCost = LodData::NEVER_COLLAPSE_COST;
+                e.collapseCost = LodData::NEVER_COLLAPSE_COST;
             }
-            if (collapseCost > it->collapseCost) {
-                collapseCost = it->collapseCost;
-                collapseTo = it->dst;
+            if (collapseCost > e.collapseCost) {
+                collapseCost = e.collapseCost;
+                collapseTo = e.dst;
             }
         }
     }
@@ -145,12 +144,9 @@ namespace Ogre
 
     bool LodCollapseCost::isBorderVertex(const LodData::Vertex* vertex) const
     {
-        LodData::VEdges::const_iterator it = vertex->edges.begin();
-        LodData::VEdges::const_iterator itEnd = vertex->edges.end();
-        for (; it != itEnd; ++it) {
-            if (it->refCount == 1) {
+        for (auto& e : vertex->edges) {
+            if (e.refCount == 1)
                 return true;
-            }
         }
         return false;
     }
