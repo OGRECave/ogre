@@ -1802,7 +1802,7 @@ void PS_1_4::test()
   };
 
   struct testfloatresult{
-    char *teststr;
+    const char *teststr;
     float fvalue;
     int charsize;
   };
