@@ -2606,7 +2606,7 @@ namespace Ogre{
                             bool isAlpha = false;
                             bool sRGBRead = false;
                             PixelFormat format = PF_UNKNOWN;
-                            int mipmaps = MIP_DEFAULT;
+                            int mipmaps = TextureManager::getSingleton().getDefaultNumMipmaps(); // MIP_DEFAULT
 
                             ++j;
                             while(j != prop->values.end())
@@ -2667,6 +2667,18 @@ namespace Ogre{
                                 // format = PF_A8; should only be done, if src is luminance, which we dont know here
                                 compiler->addError(ScriptCompiler::CE_DEPRECATEDSYMBOL, prop->file,
                                                    prop->line, "alpha. Use PF_A8 instead");
+                            }
+
+                            if(const auto& tex = TextureManager::getSingleton().getByName(evt.mName, mUnit->getParent()->getResourceGroup()))
+                            {
+                                // the texture is shared with another texture unit, report any discrepancies
+                                if (tex->getDesiredFormat() != format || tex->getNumMipmaps() != uint(mipmaps) ||
+                                    tex->isHardwareGammaEnabled() != sRGBRead || tex->getTextureType() != texType)
+                                {
+                                    compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+                                                       "overriding previous declarations of texture '" + evt.mName +
+                                                           "' with different parameters");
+                                }
                             }
 
                             mUnit->setTextureName(evt.mName, texType);
