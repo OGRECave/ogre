@@ -196,7 +196,7 @@ if((CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU") AND NOT OGRE_STATIC)
   set(OGRE_VISIBILITY_FLAGS "-DOGRE_GCC_VISIBILITY") # for legacy headers
 endif()
 
-# determine system endianess
+# determine system endianness
 if (MSVC OR ANDROID OR EMSCRIPTEN OR APPLE_IOS)
   # This doesn't work on VS 2010
   # MSVC only builds for intel anyway
