@@ -28,7 +28,10 @@
 #ifndef __SampleBrowser_H__
 #define __SampleBrowser_H__
 
+#ifdef HAVE_IMGUI
 #include "OgreImGuiOverlay.h"
+#endif
+
 #include "OgreOverlayManager.h"
 #include "OgreRenderTargetListener.h"
 #include "SampleContext.h"
@@ -285,6 +288,7 @@ namespace OgreBites
                     catch (Ogre::Exception&) {}
                 }
             }
+#ifdef HAVE_IMGUI
             else if (b->getName() == "Configure")   // enter configuration screen
             {
                 mOwnsImGuiOverlay = !Ogre::OverlayManager::getSingleton().getByName("ImGuiOverlay");
@@ -374,6 +378,7 @@ namespace OgreBites
                 mCarouselPlace += CAROUSEL_REDRAW_EPS;  // force redraw
                 windowResized(mWindow);
             }
+#endif
             else if (b->getName() == "Apply")   // apply any changes made in the configuration screen
             {
                 reconfigure(mNextRenderer);
@@ -386,6 +391,7 @@ namespace OgreBites
 
         void preViewportUpdate(const Ogre::RenderTargetViewportEvent& evt) override
         {
+#ifdef HAVE_IMGUI
             Ogre::ImGuiOverlay::NewFrame();
 
             auto flags = ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoCollapse |
@@ -398,6 +404,7 @@ namespace OgreBites
             ImGui::Begin("Configuration", NULL, flags);
             Ogre::DrawRenderingSettings(mNextRenderer);
             ImGui::End();
+#endif
         }
 
         /*-----------------------------------------------------------------------------
@@ -950,7 +957,7 @@ namespace OgreBites
 #if (OGRE_PLATFORM != OGRE_PLATFORM_WINRT) && (OGRE_PLATFORM != OGRE_PLATFORM_ANDROID)
             mTrayMgr->createButton(TL_RIGHT, "UnloadReload", mLoadedSamples.empty() ? "Reload Samples" : "Unload Samples");
 #endif
-#if (OGRE_PLATFORM != OGRE_PLATFORM_WINRT)
+#if (OGRE_PLATFORM != OGRE_PLATFORM_WINRT) && defined(HAVE_IMGUI)
             mTrayMgr->createButton(TL_RIGHT, "Configure", "Configure");
 #endif
 #if (OGRE_PLATFORM != OGRE_PLATFORM_ANDROID)

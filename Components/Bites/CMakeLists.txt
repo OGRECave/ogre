@@ -163,6 +163,10 @@ target_include_directories(OgreBites PUBLIC
   "$<BUILD_INTERFACE:${NATIVE_INCLUDES}>"
   $<INSTALL_INTERFACE:include/OGRE/Bites>)
 
+if(OGRE_BUILD_COMPONENT_OVERLAY_IMGUI)
+  target_compile_definitions(OgreBites PRIVATE -DHAVE_IMGUI)
+endif()
+
 if (OGRE_STATIC OR OGRE_BITES_STATIC_PLUGINS)
   target_compile_definitions(OgreBites PRIVATE OGRE_BITES_STATIC_PLUGINS)
 endif()

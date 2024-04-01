@@ -4,9 +4,7 @@
 
 #include "OgreApplicationContextBase.h"
 
-#include "OgreImGuiOverlay.h"
 #include "OgreOverlayManager.h"
-#include "OgreImGuiInputListener.h"
 #include "OgreRoot.h"
 #include "OgreGpuProgramManager.h"
 #include "OgreConfigFile.h"
@@ -22,6 +20,11 @@
 #include "OgreArchiveManager.h"
 
 #include "OgreConfigPaths.h"
+
+#ifdef HAVE_IMGUI
+#include "OgreImGuiOverlay.h"
+#include "OgreImGuiInputListener.h"
+#endif
 
 namespace OgreBites {
 
@@ -254,6 +257,7 @@ void ApplicationContextBase::destroyDummyScene()
     mRoot->destroySceneManager(dummyScene);
 }
 
+#ifdef HAVE_IMGUI
 struct ImGuiConfigDialog : Ogre::FrameListener
 {
     Ogre::String nextRenderer;
@@ -282,9 +286,14 @@ struct ImGuiConfigDialog : Ogre::FrameListener
         return true;
     }
 };
+#endif
 
 void ApplicationContextBase::runRenderingSettingsDialog()
 {
+#ifndef HAVE_IMGUI
+    OGRE_EXCEPT(Ogre::Exception::ERR_NOT_IMPLEMENTED,
+                "OGRE_BUILD_COMPONENT_OVERLAY_IMGUI=ON is required to run the rendering settings dialog");
+#else
     createRoot();
     oneTimeConfig();
     auto rs = getRoot()->getRenderSystem();
@@ -316,6 +325,7 @@ void ApplicationContextBase::runRenderingSettingsDialog()
     }
     delete mRoot;
     mRoot = NULL;
+#endif
 }
 
 void ApplicationContextBase::enableShaderCache() const
@@ -564,6 +574,11 @@ void ApplicationContextBase::loadResources()
 
 Ogre::ImGuiOverlay* ApplicationContextBase::initialiseImGui()
 {
+#ifndef HAVE_IMGUI
+    OGRE_EXCEPT(Ogre::Exception::ERR_NOT_IMPLEMENTED,
+                "OGRE_BUILD_COMPONENT_OVERLAY_IMGUI=ON is required to use ImGui");
+    return NULL;
+#else
         if(auto overlay = Ogre::OverlayManager::getSingleton().getByName("ImGuiOverlay"))
             return static_cast<Ogre::ImGuiOverlay*>(overlay);
 
@@ -577,6 +592,7 @@ Ogre::ImGuiOverlay* ApplicationContextBase::initialiseImGui()
         mImGuiListener.reset(new ImGuiInputListener());
 
         return imguiOverlay;
+#endif
 }
 
 void ApplicationContextBase::reconfigure(const Ogre::String &renderer, Ogre::NameValuePairList &options)
