@@ -53,7 +53,7 @@ format: quota &lt;max\_particles&gt;<br> example: quota 10000<br> default: 10<br
 
 ### material
 
-Sets the name of the material which all particles in this system will use. All particles in a system use the same material, although each particle can tint this material through the use of it’s colour property.
+Sets the name of the material which all particles in this system will use. All particles in a system use the same material, although each particle can tint this material through the use of its colour property.
 
 format: material &lt;material\_name&gt;<br> example: material Examples/Flare<br> default: none (blank material)<br>
 
@@ -131,7 +131,7 @@ These are actually attributes of the @c billboard particle renderer (the default
 
 ### billboard\_type
 
-There is more than 1 way to orient a billboard. The classic approach is for the billboard to directly face the camera: this is the default behaviour. However this arrangement only looks good for particles which are representing something vaguely spherical like a light flare. For more linear effects like laser fire, you actually want the particle to have an orientation of it’s own.
+There is more than 1 way to orient a billboard. The classic approach is for the billboard to directly face the camera: this is the default behaviour. However this arrangement only looks good for particles which are representing something vaguely spherical like a light flare. For more linear effects like laser fire, you actually want the particle to have an orientation of its own.
 
 format: billboard\_type &lt;point|oriented\_common|oriented\_self|perpendicular\_common|perpendicular\_self&gt;<br> example: billboard\_type oriented\_self<br> default: point<br>
 
@@ -433,20 +433,20 @@ emitter Point
 
 @copybrief Ogre::BoxEmitter
 
-It’s extra attributes are:
+Its extra attributes are:
 
 <dl compact="compact">
 <dt>width</dt> <dd>
 
-Sets the width of the box (this is the size of the box along it’s local X axis, which is dependent on the ’direction’ attribute which forms the box’s local Z).<br> format: width &lt;units&gt;<br> example: width 250<br> default: 100<br>
+Sets the width of the box (this is the size of the box along its local X axis, which is dependent on the ’direction’ attribute which forms the box’s local Z).<br> format: width &lt;units&gt;<br> example: width 250<br> default: 100<br>
 
 </dd> <dt>height</dt> <dd>
 
-Sets the height of the box (this is the size of the box along it’s local Y axis, which is dependent on the ’direction’ attribute which forms the box’s local Z).<br> format: height &lt;units&gt;<br> example: height 250<br> default: 100<br>
+Sets the height of the box (this is the size of the box along its local Y axis, which is dependent on the ’direction’ attribute which forms the box’s local Z).<br> format: height &lt;units&gt;<br> example: height 250<br> default: 100<br>
 
 </dd> <dt>depth</dt> <dd>
 
-Sets the depth of the box (this is the size of the box along it’s local Z axis, which is the same as the ’direction’ attribute).<br> format: depth &lt;units&gt;<br> example: depth 250<br> default: 100<br>
+Sets the depth of the box (this is the size of the box along its local Z axis, which is the same as the ’direction’ attribute).<br> format: depth &lt;units&gt;<br> example: depth 250<br> default: 100<br>
 
 </dd> </dl> <br>
 
@@ -463,7 +463,7 @@ emitter Box
 
 @copybrief Ogre::CylinderEmitter
 
-This emitter has exactly the same parameters as the [Box Emitter](#Box-Emitter) so there are no additional parameters to consider here - the width and height determine the shape of the cylinder along it’s axis (if they are different it is an ellipsoid cylinder), the depth determines the length of the cylinder.
+This emitter has exactly the same parameters as the [Box Emitter](#Box-Emitter) so there are no additional parameters to consider here - the width and height determine the shape of the cylinder along its axis (if they are different it is an ellipsoid cylinder), the depth determines the length of the cylinder.
 
 ## Ellipsoid Emitter {#Ellipsoid-Emitter}
 
@@ -532,7 +532,7 @@ Ogre comes preconfigured with a few particle affectors. New ones can be added by
 
 @copybrief Ogre::LinearForceAffector
 
-It’s extra attributes are:
+Its extra attributes are:
 
 <dl compact="compact">
 <dt>force\_vector</dt> <dd>
@@ -567,7 +567,7 @@ affector LinearForce
 
 @copybrief Ogre::ColourFaderAffector
 
-It’s extra attributes are:
+Its extra attributes are:
 
 <dl compact="compact">
 <dt>red</dt> <dd>
@@ -653,7 +653,7 @@ affector ColourFader2
 
 @copybrief Ogre::ScaleAffector
 
-It’s extra attributes are:
+Its extra attributes are:
 
 
 @par rate
@@ -678,7 +678,7 @@ affector Scaler
 
 @copybrief Ogre::RotationAffector
 
-It’s extra attributes are:
+Its extra attributes are:
 
 <dl compact="compact">
 <dt>rotation\_speed\_range\_start</dt> <dd>
@@ -712,7 +712,7 @@ affector Rotator
 
 Similar to the ColourFader and ColourFader2 Affectors, this affector modifies the colour of particles in flight, except it has a variable number of defined stages. It swaps the particle colour for several stages in the life of a particle and interpolates between them.
 
-It’s extra attributes are:
+Its extra attributes are:
 
 <dl compact="compact">
 <dt>time0</dt> <dd>

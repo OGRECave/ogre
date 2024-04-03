@@ -144,7 +144,7 @@ Format: set\_texture\_alias &lt;alias name&gt; &lt;texture name&gt;
 
 # Techniques {#Techniques}
 
-A "technique" section in your material script encapsulates a single method of rendering an object. The simplest of material definitions only contains a single technique, however since PC hardware varies quite greatly in it’s capabilities, you can only do this if you are sure that every card for which you intend to target your application will support the capabilities which your technique requires. In addition, it can be useful to define simpler ways to render a material if you wish to use material LOD, such that more distant objects use a simpler, less performance-hungry technique.
+A "technique" section in your material script encapsulates a single method of rendering an object. The simplest of material definitions only contains a single technique, however since PC hardware varies quite greatly in its capabilities, you can only do this if you are sure that every card for which you intend to target your application will support the capabilities which your technique requires. In addition, it can be useful to define simpler ways to render a material if you wish to use material LOD, such that more distant objects use a simpler, less performance-hungry technique.
 
 When a material is used for the first time, it is ’compiled’. That involves scanning the techniques which have been defined, and marking which of them are supportable using the current rendering API and graphics card. If no techniques are supportable, your material will render as blank white. The compilation examines a number of things, such as:
 
@@ -671,7 +671,7 @@ Format: polygon\_mode\_overrideable &lt;override&gt;
 
 ## fog\_override
 
-Tells the pass whether it should override the scene fog settings, and enforce it’s own. Very useful for things that you don’t want to be affected by fog when the rest of the scene is fogged, or vice versa.
+Tells the pass whether it should override the scene fog settings, and enforce its own. Very useful for things that you don’t want to be affected by fog when the rest of the scene is fogged, or vice versa.
 @par
 Format: fog\_override &lt;override?&gt; \[&lt;type&gt; &lt;colour&gt; &lt;density&gt; &lt;start&gt; &lt;end&gt;\]
 @par

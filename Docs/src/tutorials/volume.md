@@ -1,7 +1,7 @@
 # Volume Component {#volume}
 
-Welcome to the Volume Component of OGRE. It is a component to render volumes. It can handle any volume data but featurewise has a tedency towards terrains.
-The terrain aspect means, that it's all about huge meshes being displayed with high performance via a level of detail mechanism. Thanks to volume rendering, caves, cliffes, holes and similar geometry can be displayed. Also constructive solid geometry gets easy. 
+Welcome to the Volume Component of OGRE. It is a component to render volumes. It can handle any volume data but featurewise has a tendency towards terrains.
+The terrain aspect means, that it's all about huge meshes being displayed with high performance via a level of detail mechanism. Thanks to volume rendering, caves, cliffs, holes and similar geometry can be displayed. Also constructive solid geometry gets easy.
 
 @tableofcontents
 

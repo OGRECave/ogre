@@ -123,7 +123,7 @@ as a function of \f$u_1\f$ and \f$u_2\f$. Once these values are computed, it
 makes sense to then add some weighted combination of these to the stored
 depth value (e.g., some scale of the Jacobian’s Frobenius norm).
 
-But even if the light is staring at a plane straight on (view direciton
+But even if the light is staring at a plane straight on (view direction
 lines up with plane’s normal), making \f$\frac{du_3}{du_1}\f$ and
 \f$\frac{du_3}{du_2}\f$ both zero, we would still need a slight offset
 because rounding due to the float’s finite representation may still

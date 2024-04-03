@@ -707,7 +707,7 @@ material myShadowReceiverMaterial
 }
 ```
 
-For the purposes of writing the alternate program, there is an automatic parameter binding of @c texture_worldviewproj_matrix which provides the program with texture projection parameters. The vertex program should do it’s normal vertex processing, and generate texture coordinates using this matrix and place them in texture coord sets 0 and 1, since some shadow techniques use 2 texture units. The colour of the vertices output by this vertex program must always be white, so as not to affect the final colour of the rendered shadow.
+For the purposes of writing the alternate program, there is an automatic parameter binding of @c texture_worldviewproj_matrix which provides the program with texture projection parameters. The vertex program should do its normal vertex processing, and generate texture coordinates using this matrix and place them in texture coord sets 0 and 1, since some shadow techniques use 2 texture units. The colour of the vertices output by this vertex program must always be white, so as not to affect the final colour of the rendered shadow.
 
 When using additive texture shadows, the @c shadow_receiver_material replaces the lighting render, so if you perform any fragment program lighting you also need to pull in a custom fragment program:
 
@@ -875,7 +875,7 @@ In general, you have to do the following changes compared to regular GLSL:
 - Use the HLSL style `mul` instead of `*` to multiply matrices
 - Use `vec2_splat(1.0)` instead of the `vec2(1.0)` single component constructor.
 
-Lets take a look on how to use the `OgreUnifiedShader.h` macros by starting with a simple GLSL shader:
+Let's take a look at how to use the `OgreUnifiedShader.h` macros by starting with a simple GLSL shader:
 
 ```cpp
 uniform mat4 worldMatrix;

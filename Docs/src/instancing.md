@@ -285,7 +285,7 @@ Normally, Ogre first updates all instances' position, then their AABBs;
 and while at it, computes the AABB for each batch that encloses all of its instances.
 
 When frustum culling, we first cull the batches, then we cull their instances[^9] (that are inside those culled batches).
-**This is the typical hierachial culling optimization**.
+**This is the typical hierarchical culling optimization**.
 We then upload the instances transforms to the GPU.
 
 After moving many instances around the whole world, they will make the batch' enclosing AABB bigger and bigger.
