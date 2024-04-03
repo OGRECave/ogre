@@ -1110,7 +1110,7 @@ Default: vert\_align top<br>
 
 ## left
 
-Sets the horizontal position of the element relative to it’s parent.
+Sets the horizontal position of the element relative to its parent.
 @par
 Format: left &lt;value&gt;<br> Example: left 0.5
 
@@ -1122,7 +1122,7 @@ Default: left 0<br>
 
 ## top
 
-Sets the vertical position of the element relative to it’s parent.
+Sets the vertical position of the element relative to its parent.
 @par
 Format: top &lt;value&gt;<br> Example: top 0.5
 
@@ -1202,7 +1202,7 @@ This section describes how you define their custom attributes in an .overlay scr
 
 This is the most bog-standard container you can use. It is a rectangular area which can contain other elements (or containers) and may or may not have a background, which can be tiled however you like. The background material is determined by the material attribute, but is only displayed if transparency is off.
 
-@param transparent <b>&lt;true | false&gt;</b> If set to ’true’ the panel is transparent and is not rendered itself, it is just used as a grouping level for it’s children.
+@param transparent <b>&lt;true | false&gt;</b> If set to ’true’ the panel is transparent and is not rendered itself, it is just used as a grouping level for its children.
 
 @param tiling <b>&lt;layer&gt; &lt;x\_tile&gt; &lt;y\_tile&gt;</b> Sets the number of times the texture(s) of the material are tiled across the panel in the x and y direction. &lt;layer&gt; is the texture layer, from 0 to the number of texture layers in the material minus one. By setting tiling per layer you can create some nice multitextured backdrops for your panels, this works especially well when you animate one of the layers.
 

@@ -22,9 +22,9 @@ Next, we will position the Camera and use a method called lookAt to set its dire
 @snippet Samples/Tutorials/BasicTutorial2.cpp cameraposition
 The Ogre::SceneNode::lookAt method is very useful. It does exactly what it says. It rotates the SceneNode so that its line of sight focuses on the vector you give it. It makes the Camera "look at" the point.
 
-[//]: <> (TODO: add explanation about second arguemnt of lookAt method)
+[//]: <> (TODO: add explanation about second argument of lookAt method)
 
-The last thing we'll do (apart of attachning camera to a SceneNode) is set the near clipping distance to 5 units. This is the distance at which the Camera will no longer render any mesh. If you get very close to a mesh, this will sometimes cut the mesh and allow you to see inside of it. The alternative is filling the entire screen with a tiny, highly magnified piece of the mesh's texture. It's up to you what you want in your scene. For demonstration, we'll set it here.
+The last thing we'll do (apart from attaching camera to a SceneNode) is set the near clipping distance to 5 units. This is the distance at which the Camera will no longer render any mesh. If you get very close to a mesh, this will sometimes cut the mesh and allow you to see inside of it. The alternative is filling the entire screen with a tiny, highly magnified piece of the mesh's texture. It's up to you what you want in your scene. For demonstration, we'll set it here.
 
 @snippet Samples/Tutorials/BasicTutorial2.cpp cameralaststep
 
@@ -87,7 +87,7 @@ And finally we need to give our ground a material. For now, it will be easiest t
 Make sure you add the texture for the material and the Examples.material script to your resource loading path. In our case, the texture is called 'rockwall.tga'. You can find the name yourself by reading the entry in the material script.
 
 # Using Shadows in Ogre {#bt2UsingShadowsinOgre}
-Enabling shadows in Ogre is easy. The SceneManager class has a Ogre::SceneManager::setShadowTechnique method we can use. Then whenever we create an Entity, we call Ogre::Entity::setCastShadows to choose which ones will cast shadows. setShadowTechinique method takes several of different techniques. Refer to Ogre::ShadowTechnique for more details.
+Enabling shadows in Ogre is easy. The SceneManager class has a Ogre::SceneManager::setShadowTechnique method we can use. Then whenever we create an Entity, we call Ogre::Entity::setCastShadows to choose which ones will cast shadows. setShadowTechnique method takes several of different techniques. Refer to Ogre::ShadowTechnique for more details.
 
 Let's turn off the ambient light so we can see the full effect of our lights. Add the following changes:
 

@@ -1,6 +1,6 @@
 # External Texture Sources {#External-Texture-Sources}
 
-This tutorial will provide a brief introduction of ExternalTextureSource and ExternalTextureSourceManager classes, their relationship, and how the PlugIns work. For those interested in developing a Texture Source Plugin or maybe just wanting to know more about this system, take a look the [TheoraVideoSystem Plugin](https://github.com/OGRECave/ogre-audiovideo), which you can find more about on the OGRE forums.
+This tutorial will provide a brief introduction to ExternalTextureSource and ExternalTextureSourceManager classes, their relationship, and how the PlugIns work. For those interested in developing a Texture Source Plugin or maybe just wanting to know more about this system, take a look at the [TheoraVideoSystem Plugin](https://github.com/OGRECave/ogre-audiovideo), which you can find more about on the OGRE forums.
 
 <a name="What-Is-An-External-Texture-Source_003f"></a>
 
@@ -8,7 +8,7 @@ This tutorial will provide a brief introduction of ExternalTextureSource and Ext
 
 What is a texture source? Well, a texture source could be anything - png, bmp, jpeg, etc. However, loading textures from traditional bitmap files is already handled by another part OGRE. There are, however, other types of sources to get texture data from - i.e. ogg/avi/etc movie files, run-time generated source, user defined, etc.
 
-How do external texture source plugins benefit OGRE? Well, the main answer is: adding support for any type of texture source does not require changing OGRE to support it... all that is involved is writing a new plugin. Additionally, because the manager uses the Ogre::StringInterface class to issue commands/params, no change to the material script reader is needs to be made. As a result, if a plugin needs a special parameter set, it just creates a new command in it’s Parameter Dictionary. - see TheoraVideoSystem plugin for an example. To make this work, two classes have been added to OGRE:
+How do external texture source plugins benefit OGRE? Well, the main answer is: adding support for any type of texture source does not require changing OGRE to support it... all that is involved is writing a new plugin. Additionally, because the manager uses the Ogre::StringInterface class to issue commands/params, no change to the material script reader needs to be made. As a result, if a plugin needs a special parameter set, it just creates a new command in its Parameter Dictionary. - see TheoraVideoSystem plugin for an example. To make this work, two classes have been added to OGRE:
 - Ogre::ExternalTextureSource
 - Ogre::ExternalTextureSourceManager
 

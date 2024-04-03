@@ -92,7 +92,7 @@ The interplay of usage mode on creation, and locking options when reading / upda
 1.  Aim for the ’perfect’ buffer by creating with @c HBU_GPU_ONLY, with no shadow buffer, and locking all of it once only with @c HBL_DISCARD to populate it. Never touch it again.
 2.  If you need to update a buffer regularly, you will have to compromise. Use @c HBU_CPU_TO_GPU when creating (still no shadow buffer), and use @c HBL_DISCARD to lock the entire buffer, or if you can’t then use @c HBL_NO_OVERWRITE to lock parts of it.
 3.  If you really need to read data from the buffer, create it with a shadow buffer. Make sure you use @c HBL_READ_ONLY when locking for reading because it will avoid the upload normally associated with unlocking the buffer. You can also combine this with either of the 2 previous points, obviously try for @c HBU_GPU_ONLY if you can - remember that the usage refers to the hardware buffer so can be safely used with a shadow buffer you read from.
-4.  Split your vertex buffers up if you find that your usage patterns for different elements of the vertex are different. No point having one huge updatable buffer with all the vertex data in it, if all you need to update is the texture coordinates. Split that part out into it’s own buffer and make the rest @c HBU_GPU_ONLY.
+4.  Split your vertex buffers up if you find that your usage patterns for different elements of the vertex are different. No point having one huge updatable buffer with all the vertex data in it, if all you need to update is the texture coordinates. Split that part out into its own buffer and make the rest @c HBU_GPU_ONLY.
 
 ## Vulkan specific notes
 
@@ -145,7 +145,7 @@ Tells the declaration how far in bytes the element is offset from the start of e
 
 </dd> <dt>type</dt> <dd>
 
-This defines the data type of the vertex input, including it’s size. This is an important element because as GPUs become more advanced, we can no longer assume that position input will always require 3 floating point numbers, because programmable vertex pipelines allow full control over the inputs and outputs. This part of the element definition covers the basic type and size, e.g. VET\_FLOAT3 is 3 floating point numbers - the meaning of the data is dealt with in the next parameter.
+This defines the data type of the vertex input, including its size. This is an important element because as GPUs become more advanced, we can no longer assume that position input will always require 3 floating point numbers, because programmable vertex pipelines allow full control over the inputs and outputs. This part of the element definition covers the basic type and size, e.g. VET\_FLOAT3 is 3 floating point numbers - the meaning of the data is dealt with in the next parameter.
 
 </dd> <dt>semantic</dt> <dd>
 
@@ -211,7 +211,7 @@ This results in the vertex buffer you created earlier being bound to source inde
 
 ## Updating Vertex Buffers {#Updating-Vertex-Buffers}
 
-The complexity of updating a vertex buffer entirely depends on how its contents are laid out. You can [lock a buffer](@ref Locking-buffers), but how you write data into it vert much depends on what it contains. Lets start with a vert simple example. Lets say you have a buffer which only contains vertex positions, so it only contains sets of 3 floating point numbers per vertex. In this case, all you need to do to write data into it is:
+The complexity of updating a vertex buffer entirely depends on how its contents are laid out. You can [lock a buffer](@ref Locking-buffers), but how you write data into it vert much depends on what it contains. Let's start with a vert simple example. Let's say you have a buffer which only contains vertex positions, so it only contains sets of 3 floating point numbers per vertex. In this case, all you need to do to write data into it is:
 
 ```cpp
 auto pFloat = static_cast<float*>(vbuf->lock(HardwareBuffer::HBL_DISCARD));
@@ -253,7 +253,7 @@ Index buffers are used to render geometry by building triangles out of vertices 
 
 ## The IndexData class {#The-IndexData-class}
 
-This class summarises the information required to use a set of indexes to render geometry. It’s members are as follows:
+This class summarises the information required to use a set of indexes to render geometry. Its members are as follows:
 
 <dl compact="compact">
 <dt>indexStart</dt> <dd>

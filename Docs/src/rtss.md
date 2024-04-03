@@ -312,7 +312,7 @@ Correctly ordering these functions, providing them with the right input values a
 To this end the RTSS defines a set of stages; e.g Ogre::RTShader::FFP_VS_TRANSFORM, Ogre::RTShader::FFP_PS_TEXTURING.
 It then queries each registered Ogre::RTShader::SubRenderState to attach its functions to these stages. Then it generates the entry function (e.g. `main()` for GLSL) by sequentially calling these functions.
 
-You can think of stages as a way to group shader "effects" inside a Ogre::Pass - similarly how a Ogre::RenderQueueGroup groups [renderables](@ref Ogre::Renderable) for rendering.
+You can think of stages as a way to group shader "effects" inside a Ogre::Pass - similarly to how a Ogre::RenderQueueGroup groups [renderables](@ref Ogre::Renderable) for rendering.
 
 Basically it performs the following (simplified) transformation, given
 ```cpp
@@ -349,13 +349,13 @@ void main() {
 
 As you can see the RTSS also resolved the required parameters and routed them into the correct functions. See @ref creating-extensions for details about parameter resolution.
 
-Now that you know what the RTSS does, you are probably wondering how to change which functions are emitted per stage. Lets say, change the lighting from the FFP style per-vertex lighting to per-pixel lighting.
+Now that you know what the RTSS does, you are probably wondering how to change which functions are emitted per stage. Let's say, change the lighting from the FFP style per-vertex lighting to per-pixel lighting.
 
 The RTSS is flexible enough to "just" move the according calculations from the vertex shader to the pixel shader.
 
 ## Core features of the system {#core-feats}
 * Runtime shader generation synchronized with scene state. Each time scene settings change, a new set of shaders is generated.
-* Full Fixed Function Pipeline (FFP) emulation. This feature is most useful combined with render system that doesn't provide any FFP functionality (OpenGL ES 2.0, D3D11 etc).
+* Full Fixed Function Pipeline (FFP) emulation. This feature is most useful combined with render systems that don't provide any FFP functionality (OpenGL ES 2.0, D3D11 etc).
 * Shader language independent interface: the logic representation of the shader programs is completely independent from the target shader language. You can generate code for different shader languages from the same program.
 * Pluggable interface for different shader languages.
 * Pluggable interface for shader based functions in a seamless way. Each function will be automatically combined with the rest of the shader code.
@@ -379,7 +379,7 @@ to set a fixed number of lights the materials should consider.
 
 When the user asks the system to generate shaders for a given technique he has to provide a name for the target technique scheme. The system then creates a new technique based on the source technique but with a different scheme name.
 
-The idea behind this concept is to use Ogre's built in mechanism of material schemes, so all the user has to do in order to use the new technique is to call Ogre::Viewport::setMaterialScheme.
+The idea behind this concept is to use Ogre's built-in mechanism of material schemes, so all the user has to do in order to use the new technique is to call Ogre::Viewport::setMaterialScheme.
 
 Before each viewport update, the system performs a validation step of all associated shader based techniques it created. This step includes automatic synchronization with the scene lights and fog states. When the system detects that a scheme is out of date it generates the appropriate shaders for each technique new.
 
@@ -391,7 +391,7 @@ The logic programs are then sent to specific shader language writers that produc
 Before rendering of an object that uses generated shaders the system allows each sub render state to update the GPU constants associated with it.
 
 ## Main components {#rtss__components}
-The following is an partial list of components within the RTSS. These components are listed as they have great importance in understanding controlling and later extending the RTSS system.
+The following is a partial list of components within the RTSS. These components are listed as they have great importance in understanding controlling and later extending the RTSS system.
 
 @par ShaderGenerator
 The ShaderGenerator is the main interface to the RTSS system. Through it you can request to generate and destroy the shaders, influence from what parts to create the shaders, and control general system settings such as the shading language and shader caching.
@@ -418,7 +418,7 @@ By default, %Ogre adds the following 5 SRSs to every scheme RenderState to recre
 @par SubRenderStateFactory
 As the name suggests, sub render state factories are factories that produce sub render states. Each factory generates a specific SRS.
 @par
-These type of components are note worthy for 2 reason. The first and obvious one is that they allow the system to generate new SRSs for the materials it is asked to generate. The second reason is that they perform as script readers and writers allowing the system to create specific or specialized SRSs per material.
+These type of components are noteworthy for two reasons. The first and obvious one is that they allow the system to generate new SRSs for the materials it is asked to generate. The second reason is that they perform as script readers and writers allowing the system to create specific or specialized SRSs per material.
 
 ## Initializing the system
 
@@ -443,7 +443,7 @@ if (Ogre::RTShader::ShaderGenerator::initialize())
 
 ## Customizing the default RenderState {#rtss_custom_api}
 
-Lets say, you wanted to globally change the default per-pixel lighting mode of the RTSS back to the FFP style per-vertex lighting.
+Let's say, you wanted to globally change the default per-pixel lighting mode of the RTSS back to the FFP style per-vertex lighting.
 For this you have to grab the global RenderState associated with the active material scheme,  as
 
 @snippet Components/Bites/src/OgreAdvancedRenderControls.cpp rtss_per_pixel
@@ -458,7 +458,7 @@ The passes of this new technique will receive shaders generated and updated by t
 
 ![](CreateShaderBasedTech.svg)
 
-To use the generated technique, change the material scheme of your viewport(s) to scheme name you passed as argument to this method.
+To use the generated technique, change the material scheme of your viewport(s) to the scheme name you passed as argument to this method.
 
 ```cpp
 // Create shader based technique from the default technique of the given material.
@@ -471,7 +471,7 @@ mViewport->setMaterialScheme(Ogre::MSN_SHADERGEN);
 @note you can automate the shader generation process for all materials. First set the viewport scheme to the destination scheme of the RTSS shaders. Second register to the `Ogre::MaterialManager::Listener` implementing `handleSchemeNotFound()` - e.g. OgreBites::SGTechniqueResolverListener
 
 ## Shader generation at runtime {#rtssGenerate}
-During the application runtime the @c ShaderGenerator instance receives notifications on per frame basis from its target @c SceneManager.
+During the application runtime the @c ShaderGenerator instance receives notifications on a per frame basis from its target @c SceneManager.
 At this point it checks the material scheme in use. In case the current scheme has representations in the manager, it executes its validate method.
 The @c SGScheme validation includes synchronization with scene light and fog settings. In case it is out of date it will rebuild all shader generated techniques.
 1. The first step is to loop over every @c SGTechnique associated with this @c SGScheme and build its @c RenderStates - one for each pass.
@@ -494,17 +494,17 @@ In order to extend the system with your own shader effects you'll have to follow
 * Add shader files that will supply all the actual shader functions your SubRenderState needs. In order to support multiple shader languages, @ref OgreUnifiedShader are provided. These shaders should be placed in a resource location known to the resource manager.
 
 Implementing the SubRenderState requires overriding the pure methods of the base class.
-* Ogre::RTShader::SubRenderState::getType() should return unique string that identify the sub class implementation. That value is shared among all instances and can be stored in a static string variable. It uses to system to match between SubRenderState instance and the factory to should destroy it.
+* Ogre::RTShader::SubRenderState::getType() should return a unique string that identifies the sub class implementation. That value is shared among all instances and can be stored in a static string variable. It is used by the system to match between the SubRenderState instance and the factory that should destroy it.
 * Ogre::RTShader::SubRenderState::getExecutionOrder() should return integer value that will use the system to sort all SubRenderState instances of the same render state before each one of them will create its part in the CPU shader programs. Note that:
  * The execution order does not imply the order of the parameter definitions and function calls within the generated shader.
- * If an execution number is set to be the same as one of the basic fixed pipeline SRSs. Than that SRS will be built __instead__ of the fixed pipeline SRS.
-* Ogre::RTShader::SubRenderState::copyFrom() a simple copy method that uses the system when coping one instance to another. **Note:** Only configuration data attributes should be copy here.
+ * If an execution number is set to be the same as one of the basic fixed pipeline SRSs, then that SRS will be built __instead__ of the fixed pipeline SRS.
+* Ogre::RTShader::SubRenderState::copyFrom() a simple copy method that uses the system when copying one instance to another. **Note:** Only configuration data attributes should be copied here.
 * Ogre::RTShader::SubRenderState::createCpuSubPrograms - This is the heart of this interface. This method should update the CPU shader programs with the specific details of the overriding class.
 
-The SubRenderState supply default implementation for this method which break down this method into three stages:
+The SubRenderState supplies default implementation for this method which breaks down this method into three stages:
 
 @par Resolving parameters
-this stage should grab all the needed parameters for this SubRenderState. Typically there several SubRenderStates working on a common set of Parameters - either to cooperate or because they use the same inputs.
+this stage should grab all the needed parameters for this SubRenderState. Typically there are several SubRenderStates working on a common set of Parameters - either to cooperate or because they use the same inputs.
 Therefore parameters are not resolved by name (except for local variables), but rather by symbolic constants. These can either be of Ogre::GpuProgramParameters::AutoConstantType, which should already be familiar to you or of Ogre::RTShader::Parameter::Content.
 @par
 You can think of the latter as an extension of the Cg/ HLSL Semantics to the actual content of the parameter.
@@ -515,7 +515,7 @@ In case of the Ogre::RTShader::FFPTransform we need the world view projection ma
 
 @par Resolving dependencies
 this stage should provide the name of the external shader library files that contains the actual shader code needed by this SubRenderState.
-In case of the Ogre::RTShader::SRS_TEXTURING  it will add the common and texturing library for both vertex and pixel shader program.
+In case of the Ogre::RTShader::SRS_TEXTURING it will add the common and texturing library for both vertex and pixel shader program.
 @par
 @snippet Components/RTShaderSystem/src/OgreShaderFFPTexturing.cpp deps_resolve
 
@@ -528,7 +528,7 @@ In case of the Ogre::RTShader::SRS_FOG it will add vertex depth calculation to t
 The arguments to the function are the ones you resolved in the first step and the function name must be available in one of the libraries you provided in the second step.
 You can add call as many functions as you need. The calls will appear in the same order in the generates shader source code.
 @note
-* The ordering of the function invocation is crucial. Use the Ogre::RTShader::FFPVertexShaderStage and Ogre::RTShader::FFPFragmentShaderStage enumarations to place your invocations in the desired global order.
+* The ordering of the function invocation is crucial. Use the Ogre::RTShader::FFPVertexShaderStage and Ogre::RTShader::FFPFragmentShaderStage enumerations to place your invocations in the desired global order.
 * Make sure the parameter semantic (in/out) in the SubRenderState code matches to your shader code implementation you supplied in the library file. GLSL will fail to link to library functions if it won't be able to find a perfect function declaration match.
 * Ogre::RTShader::SubRenderState::updateGpuProgramsParams - As the name suggest this method should be overridden only in case your SubRenderState should update some parameter it created before.
 * Ogre::RTShader::SubRenderState::preAddToRenderState(): this method called before adding this SubRenderState to a parent RenderState instances. It allows this SubRenderState to exclude itself from the list in case the source pass is not matching. I.E in case of SubRenderState that perform lighting calculations it can return false when the given source pass specifies that lighting calculations disabled for it.
@@ -542,7 +542,7 @@ Implementing the Ogre::RTShader::SubRenderStateFactory is much simpler and invol
 
 ## Tips for debugging shaders {#debugging}
 A couple of notes on debugging shaders coming from the RTSS:
-* Call OgreBites::ApplicationContext::setRTSSWriteShadersToDisk. This will cache the generated shaders onto the disk under the directory [WRITABLE_PATH](@ref Ogre::FileSystemLayer::getWritablePath)`/RTShaderLib/cache`. This is important for 2 reasons:
+* Call OgreBites::ApplicationContext::setRTSSWriteShadersToDisk. This will cache the generated shaders onto the disk under the directory [WRITABLE_PATH](@ref Ogre::FileSystemLayer::getWritablePath)`/RTShaderLib/cache`. This is important for two reasons:
   * It will make compilation problems easier to detect.
   * Once a shader is written to the disk, as long as you don't change the code behind it, the same shader will be picked up in the next application run even if its content has changed. If you have compilation or visual problems with the shader you can try to manually tinker with it without compiling the code again and again.
-* Other common problems with creating shaders in RTSS usually occur from defining vertex shader parameters and using them in the pixel shader and vice versa. so watch out for those.
+* Other common problems with creating shaders in RTSS usually occur from defining vertex shader parameters and using them in the pixel shader and vice versa. So watch out for those.

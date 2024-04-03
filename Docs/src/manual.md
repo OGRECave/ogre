@@ -162,7 +162,7 @@ When a Ogre::Mesh is loaded, it automatically comes with a number of materials d
 
 To understand how this works, you have to know that all Mesh objects are actually composed of Ogre::SubMesh objects, each of which represents a part of the mesh using one Material. If a Ogre::Mesh uses only one Ogre::Material, it will only have one Ogre::SubMesh.
 
-When an Ogre::Entity is created based on this Mesh, it is composed of (possibly) multiple Ogre::SubEntity objects, each matching 1 for 1 with the Ogre::SubMesh objects from the original Mesh. You can access the Ogre::SubEntity objects using the Ogre::Entity::getSubEntity method. Once you have a reference to a Ogre::SubEntity, you can change the material it uses by calling it’s setMaterialName method. In this way you can make an Ogre::Entity deviate from the default materials and thus create an individual looking version of it.
+When an Ogre::Entity is created based on this Mesh, it is composed of (possibly) multiple Ogre::SubEntity objects, each matching 1 for 1 with the Ogre::SubMesh objects from the original Mesh. You can access the Ogre::SubEntity objects using the Ogre::Entity::getSubEntity method. Once you have a reference to a Ogre::SubEntity, you can change the material it uses by calling its setMaterialName method. In this way you can make an Ogre::Entity deviate from the default materials and thus create an individual looking version of it.
 
 # Materials {#Materials}
 
@@ -170,7 +170,7 @@ The Ogre::Material object controls how objects in the scene are rendered. It spe
 
 Materials can either be set up programmatically, by calling Ogre::MaterialManager::create and tweaking the settings, or by specifying it in a ’script’ which is loaded at runtime. See [Material Scripts](@ref Material-Scripts) for more info.
 
-Basically everything about the appearance of an object apart from it’s shape is controlled by the Material class.
+Basically everything about the appearance of an object apart from its shape is controlled by the Material class.
 
 The Ogre::MaterialManager class manages the master list of materials available to the scene. The list can be added to by the application by calling Ogre::MaterialManager::create, or by loading a Mesh (which will in turn load material properties).
 
@@ -178,7 +178,7 @@ The Ogre::MaterialManager class manages the master list of materials available t
 
 You can alter these settings by calling Ogre::MaterialManager::getDefaultSettings() and making the required changes to the Material which is returned.
 
-Entities automatically have Material’s associated with them if they use a Ogre::Mesh object, since the Ogre::Mesh object typically sets up it’s required materials on loading. You can also customise the material used by an entity as described in @ref Entities. Just create a new Material, set it up how you like (you can copy an existing material into it if you like using a standard assignment statement) and point the SubEntity entries at it using Ogre::SubEntity::setMaterialName().
+Entities automatically have Material’s associated with them if they use a Ogre::Mesh object, since the Ogre::Mesh object typically sets up its required materials on loading. You can also customise the material used by an entity as described in @ref Entities. Just create a new Material, set it up how you like (you can copy an existing material into it if you like using a standard assignment statement) and point the SubEntity entries at it using Ogre::SubEntity::setMaterialName().
 
 
 
@@ -226,7 +226,7 @@ The third important class is Ogre::OverlayManager. Whenever an application wishe
 
 Only OverlayContainers can be added direct to an overlay. The reason is that each level of container establishes the Zorder of the elements contained within it, so if you nest several containers, inner containers have a higher Z-order than outer ones to ensure they are displayed correctly. To add a container (such as a Panel) to the overlay, simply call Ogre::Overlay::add2D.
 
-If you wish to add child elements to that container, call Ogre::OverlayContainer::addChild. Child elements can be Ogre::OverlayElements or Ogre::OverlayContainer instances themselves. Remember that the position of a child element is relative to the top-left corner of it’s parent.
+If you wish to add child elements to that container, call Ogre::OverlayContainer::addChild. Child elements can be Ogre::OverlayElements or Ogre::OverlayContainer instances themselves. Remember that the position of a child element is relative to the top-left corner of its parent.
 
 <a name="A-word-about-2D-coordinates"></a>
 
@@ -241,7 +241,7 @@ This mode is useful when you want to specify an exact size for your overlay item
 
 </dd> <dt>Relative Mode</dt> <dd>
 
-This mode is useful when you want items in the overlay to be the same size on the screen no matter what the resolution. In relative mode, the top-left of the screen is (0,0) and the bottom-right is (1,1). So if you place an element at (0.5, 0.5), it’s top-left corner is placed exactly in the center of the screen, no matter what resolution the application is running in. The same principle applies to sizes; if you set the width of an element to 0.5, it covers half the width of the screen. Note that because the aspect ratio of the screen is typically 1.3333 : 1 (width : height), an element with dimensions (0.25, 0.25) will not be square, but it will take up exactly 1/16th of the screen in area terms. If you want square-looking areas you will have to compensate using the typical aspect ratio e.g. use (0.1875, 0.25) instead.
+This mode is useful when you want items in the overlay to be the same size on the screen no matter what the resolution. In relative mode, the top-left of the screen is (0,0) and the bottom-right is (1,1). So if you place an element at (0.5, 0.5), its top-left corner is placed exactly in the center of the screen, no matter what resolution the application is running in. The same principle applies to sizes; if you set the width of an element to 0.5, it covers half the width of the screen. Note that because the aspect ratio of the screen is typically 1.3333 : 1 (width : height), an element with dimensions (0.25, 0.25) will not be square, but it will take up exactly 1/16th of the screen in area terms. If you want square-looking areas you will have to compensate using the typical aspect ratio e.g. use (0.1875, 0.25) instead.
 
 </dd> </dl>
 
@@ -518,7 +518,7 @@ The main disadvantage to texture shadows is that, because they are simply a text
 <dl compact="compact">
 <dt>Choosing a projection basis</dt> <dd>
 
-The simplest projection is just to render the shadow casters from the lights perspective using a regular camera setup. This can look bad though, so there are many other projections which can help to improve the quality from the main camera’s perspective. OGRE supports pluggable projection bases via it’s ShadowCameraSetup class, and comes with several existing options
+The simplest projection is just to render the shadow casters from the lights perspective using a regular camera setup. This can look bad though, so there are many other projections which can help to improve the quality from the main camera’s perspective. OGRE supports pluggable projection bases via its ShadowCameraSetup class, and comes with several existing options
 - **Uniform**, which is the simplest,
 - **Uniform Focused**, which is still a normal camera projection, except that the camera is focused into the area that the main viewing camera is looking at
 - **Light Space Perspective Shadow Mapping** (LiSPSM), which both focuses and distorts the shadow frustum based on the main view camera and
@@ -748,7 +748,7 @@ Ogre is pretty good at classifying and splitting your passes to ensure that the 
 
 In practice this is very easy. Even though your vertex program could be doing a lot of complex, highly customised processing, it can still be classified into one of the 3 types listed above. All you need to do to tell Ogre what you’re doing is to use the pass attributes ambient, diffuse, specular and self\_illumination, just as if you were not using a vertex program. Sure, these attributes do nothing (as far as rendering is concerned) when you’re using vertex programs, but it’s the easiest way to indicate to Ogre which light components you’re using in your vertex program. Ogre will then classify and potentially split your programmable pass based on this information - it will leave the vertex program as-is (so that any split passes will respect any vertex modification that is being done). 
 
-Note that when classifying a diffuse/specular programmable pass, Ogre checks to see whether you have indicated the pass can be run once per light (iteration once\_per\_light). If so, the pass is left intact, including it’s vertex and fragment programs. However, if this attribute is not included in the pass, Ogre tries to split off the per-light part, and in doing so it will disable the fragment program, since in the absence of the ’iteration once\_per\_light’ attribute it can only assume that the fragment program is performing decal work and hence must not be used per light.
+Note that when classifying a diffuse/specular programmable pass, Ogre checks to see whether you have indicated the pass can be run once per light (iteration once\_per\_light). If so, the pass is left intact, including its vertex and fragment programs. However, if this attribute is not included in the pass, Ogre tries to split off the per-light part, and in doing so it will disable the fragment program, since in the absence of the ’iteration once\_per\_light’ attribute it can only assume that the fragment program is performing decal work and hence must not be used per light.
 
 So clearly, when you use additive light masking as a shadow technique, you need to make sure that programmable passes you use are properly set up so that they can be classified correctly. However, also note that the changes you have to make to ensure the classification is correct does not affect the way the material renders when you choose not to use additive lighting, so the principle that you should be able to use the same material definitions for all lighting scenarios still holds. Here is an example of a programmable material which will be classified correctly by the illumination pass classifier:
 
@@ -810,7 +810,7 @@ Skeletal animation can be performed in software, or implemented in shaders (hard
 
 SceneNode animation is created from the SceneManager in order to animate the movement of SceneNodes, to make any attached objects move around automatically. You can see this performing a camera swoop in the CameraTrack Sample, or controlling how the fish move around in the pond in the Fresnel Sample.
 
-At it’s heart, scene node animation is mostly the same code which animates the underlying skeleton in skeletal animation. After creating the main Animation using Ogre::SceneManager::createAnimation you can create a NodeAnimationTrack per SceneNode that you want to animate, and create keyframes which control its position, orientation and scale which can be interpolated linearly or via splines. You use @ref Animation-State in the same way as you do for skeletal/vertex animation, except you obtain the state from SceneManager instead of from an individual Entity. Animations are applied automatically every frame, or the state can be applied manually in advance using the \_applySceneAnimations() method on SceneManager. See the API reference for full details of the interface for configuring scene animations.
+At its heart, scene node animation is mostly the same code which animates the underlying skeleton in skeletal animation. After creating the main Animation using Ogre::SceneManager::createAnimation you can create a NodeAnimationTrack per SceneNode that you want to animate, and create keyframes which control its position, orientation and scale which can be interpolated linearly or via splines. You use @ref Animation-State in the same way as you do for skeletal/vertex animation, except you obtain the state from SceneManager instead of from an individual Entity. Animations are applied automatically every frame, or the state can be applied manually in advance using the \_applySceneAnimations() method on SceneManager. See the API reference for full details of the interface for configuring scene animations.
 
 # Vertex Animation {#Vertex-Animation}
 
