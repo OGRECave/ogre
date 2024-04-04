@@ -338,6 +338,8 @@ void DotSceneLoader::processLight(pugi::xml_node& XMLNode, SceneNode* pParent)
         pLight->setType(Light::LT_SPOTLIGHT);
     else if (sValue == "radPoint")
         pLight->setType(Light::LT_POINT);
+    else if (sValue == "rect")
+        pLight->setType(Light::LT_RECTLIGHT);
 
     pLight->setVisible(getAttribBool(XMLNode, "visible", true));
     pLight->setCastShadows(getAttribBool(XMLNode, "castShadows", true));
@@ -361,6 +363,14 @@ void DotSceneLoader::processLight(pugi::xml_node& XMLNode, SceneNode* pParent)
         if (auto pElement = XMLNode.child("lightAttenuation"))
             processLightAttenuation(pElement, pLight);
     }
+
+    if (sValue == "rect")
+    {
+        // Process lightSourceSize (?)
+        if (auto pElement = XMLNode.child("lightSourceSize"))
+            processLightSourceSize(pElement, pLight);
+	}
+
     // Process userDataReference (?)
     if (auto pElement = XMLNode.child("userData"))
         processUserData(pElement, pLight->getUserObjectBindings());
@@ -845,6 +855,16 @@ void DotSceneLoader::processLightAttenuation(pugi::xml_node& XMLNode, Light* pLi
 
     // Setup the light attenuation
     pLight->setAttenuation(range, constant, linear, quadratic);
+}
+
+void DotSceneLoader::processLightSourceSize(pugi::xml_node& XMLNode, Light* pLight)
+{
+    // Process attributes
+    Real width = getAttribReal(XMLNode, "width");
+    Real height = getAttribReal(XMLNode, "height");
+
+    // Setup the light range
+    pLight->setSourceSize(width, height);
 }
 
 void DotSceneLoader::processUserData(pugi::xml_node& XMLNode, UserObjectBindings& userData)

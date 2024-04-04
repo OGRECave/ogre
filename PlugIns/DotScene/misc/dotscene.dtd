@@ -36,11 +36,11 @@
     template    CDATA    #REQUIRED
 >
 
-<!ELEMENT light (colourDiffuse?, colourSpecular?, lightRange?, lightAttenuation?, userData?)>
+<!ELEMENT light (colourDiffuse?, colourSpecular?, lightRange?, lightAttenuation?, lightSourceSize?, userData?)>
 <!ATTLIST light
     name            CDATA    #IMPLIED
     id                ID        #IMPLIED
-    type            (point | directional | spot ) "point"
+    type            (point | directional | spot | rect) "point"
     visible            (true | false) "true"
     castShadows        (true | false) "true"
     powerScale      CDATA   "1.0"
@@ -79,6 +79,12 @@
     inner    CDATA    #REQUIRED
     outer    CDATA    #REQUIRED
     falloff CDATA    #REQUIRED
+>
+
+<!ELEMENT lightSourceSize EMPTY>
+<!ATTLIST lightSourceSize
+    width   CDATA    #REQUIRED
+    height  CDATA    #REQUIRED
 >
 
 <!ELEMENT entity (userData?)>
