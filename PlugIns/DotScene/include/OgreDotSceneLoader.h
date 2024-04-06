@@ -72,6 +72,7 @@ protected:
 
     void processLightRange(pugi::xml_node& XMLNode, Ogre::Light* pLight);
     void processLightAttenuation(pugi::xml_node& XMLNode, Ogre::Light* pLight);
+	void processLightSourceSize(pugi::xml_node& XMLNode, Ogre::Light* pLight);
 
     Ogre::SceneManager* mSceneMgr;
     Ogre::SceneNode* mAttachNode;
