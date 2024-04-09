@@ -36,9 +36,9 @@ THE SOFTWARE.
 #include <iostream>
 
 #include "Ogre.h"
+#include "OgreCodec.h"
 #include "OgreDefaultHardwareBufferManager.h"
 
-#include "OgreAssimpLoader.h"
 #include <assimp/postprocess.h>
 
 #ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
@@ -78,7 +78,7 @@ struct AssOptions
     String dest;
     String logFile;
 
-    AssimpLoader::Options options;
+    BinaryOptionList options;
 
     AssOptions() { logFile = "OgreAssimp.log"; };
 };
@@ -106,18 +106,18 @@ AssOptions parseArgs(int numArgs, char** args)
 
     if (unOpt["-q"])
     {
-        opts.options.params |= AssimpLoader::LP_QUIET_MODE;
+        opts.options["quiet"] = "true";
     }
     if (unOpt["-3ds_ani_fix"])
     {
-        opts.options.params |= AssimpLoader::LP_CUT_ANIMATION_WHERE_NO_FURTHER_CHANGE;
+        opts.options["cutAnimation"] = "true";
     }
 
-    opts.options.postProcessSteps = aiProcessPreset_TargetRealtime_Quality;
+    opts.options["postProcessSteps"] = std::to_string(aiProcessPreset_TargetRealtime_Quality);
     opts.logFile = binOpt["-log"];
-    StringConverter::parse(binOpt["-aniSpeedMod"], opts.options.animationSpeedModifier);
-    opts.options.customAnimationName = binOpt["-aniName"];
-    StringConverter::parse(binOpt["-max_edge_angle"], opts.options.maxEdgeAngle);
+    opts.options["animationSpeedModifier"] = binOpt["-aniSpeedMod"];
+    opts.options["customAnimationName"] = binOpt["-aniName"];
+    opts.options["maxEdgeAngle"] = binOpt["-max_edge_angle"];
 
     // Source / dest
     if (numArgs > startIndex)
@@ -151,7 +151,7 @@ AssOptions parseArgs(int numArgs, char** args)
 
         std::cout << "source file               = " << opts.source << std::endl;
         std::cout << "destination               = " << opts.dest << std::endl;
-        std::cout << "animation speed modifier  = " << opts.options.animationSpeedModifier << std::endl;
+        std::cout << "animation speed modifier  = " << opts.options["animationSpeedModifier"] << std::endl;
         std::cout << "log file                  = " << opts.logFile << std::endl;
 
         std::cout << "-- END OPTIONS --" << std::endl;
@@ -180,6 +180,12 @@ int main(int numargs, char** args)
 
     try
     {
+        FileSystemLayer fsLayer("Ogre3D");
+        ConfigFile pluginsCfg;
+        pluginsCfg.load(fsLayer.getConfigFilePath("plugins.cfg"));
+
+        auto pluginDir = pluginsCfg.getSetting("PluginFolder")+"/";
+
         logMgr.setDefaultLog(NULL); // swallow startup messages
         Root root("", "", "");
         // get rid of the temporary log as we use the new log now
@@ -187,6 +193,8 @@ int main(int numargs, char** args)
 
         // use the log specified by the cmdline params
         logMgr.setDefaultLog(logMgr.createLog(opts.logFile, false, true));
+
+        root.loadPlugin(pluginDir + "/Codec_Assimp");
 
         MaterialManager::getSingleton().initialise();
 
@@ -200,11 +208,11 @@ int main(int numargs, char** args)
         String basename, ext, path;
         StringUtil::splitFullFilename(opts.source, basename, ext, path);
 
-        MeshPtr mesh = MeshManager::getSingleton().createManual(basename + "." + ext, RGN_DEFAULT);
-        SkeletonPtr skeleton;
+        auto codec = Codec::getCodec(ext);
 
-        AssimpLoader loader;
-        loader.load(opts.source, mesh.get(), skeleton, opts.options);
+        MeshPtr mesh = MeshManager::getSingleton().createManual(basename + "." + ext, RGN_DEFAULT);
+        mesh->getUserObjectBindings().setUserAny("_AssimpLoaderOptions", opts.options);
+        codec->decode(Root::openFileStream(opts.source), mesh.get());
 
         if (!opts.dest.empty())
         {
@@ -214,7 +222,7 @@ int main(int numargs, char** args)
         MeshSerializer meshSer;
         meshSer.exportMesh(mesh, path + basename + ".mesh");
 
-        if (skeleton)
+        if (auto skeleton = mesh->getSkeleton())
         {
             SkeletonSerializer binSer;
             binSer.exportSkeleton(skeleton.get(), path + skeleton->getName());
