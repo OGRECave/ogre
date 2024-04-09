@@ -32,6 +32,8 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 #include "OgreAssimpLoader.h"
+#include "OgreString.h"
+#include "OgreStringConverter.h"
 
 #include <assimp/version.h>
 #include <assimp/scene.h>
@@ -360,15 +362,39 @@ bool AssimpLoader::load(const String& source, Mesh* mesh, SkeletonPtr& skeletonP
 bool AssimpLoader::_load(const char* name, Assimp::Importer& importer, Mesh* mesh, SkeletonPtr& skeletonPtr,
                          const Options& options)
 {
+    mAnimationSpeedModifier = options.animationSpeedModifier;
+    mLoaderParams = options.params;
+    mCustomAnimationName = options.customAnimationName;
+
+    float maxEdgeAngle = options.maxEdgeAngle;
+    int postProcessSteps = options.postProcessSteps;
+    auto optsAny = mesh->getUserObjectBindings().getUserAny("_AssimpLoaderOptions");
+    if(optsAny.has_value())
+    {
+        auto strOpts = any_cast<BinaryOptionList>(optsAny);
+        if(strOpts.find("quiet") != strOpts.end())
+            mLoaderParams |= LP_QUIET_MODE;
+        if(strOpts.find("customAnimationName") != strOpts.end())
+            mCustomAnimationName = strOpts["customAnimationName"];
+        if(strOpts.find("animationSpeedModifier") != strOpts.end())
+            StringConverter::parse(strOpts["animationSpeedModifier"], mAnimationSpeedModifier);
+        if(strOpts.find("maxEdgeAngle") != strOpts.end())
+            StringConverter::parse(strOpts["maxEdgeAngle"], maxEdgeAngle);
+        if(strOpts.find("postProcessSteps") != strOpts.end())
+            StringConverter::parse(strOpts["postProcessSteps"], postProcessSteps);
+        if(strOpts.find("cutAnimation") != strOpts.end())
+            mLoaderParams |= LP_CUT_ANIMATION_WHERE_NO_FURTHER_CHANGE;
+    }
+
     uint32 flags = aiProcessPreset_TargetRealtime_Fast | aiProcess_TransformUVCoords | aiProcess_FlipUVs;
     flags &= ~(aiProcess_JoinIdenticalVertices | aiProcess_CalcTangentSpace); // optimize for fast loading
 
-    flags |= options.postProcessSteps;
+    flags |= postProcessSteps;
 
     if((flags & (aiProcess_GenSmoothNormals | aiProcess_GenNormals)) != aiProcess_GenNormals)
         flags &= ~aiProcess_GenNormals; // prefer smooth normals
 
-    importer.SetPropertyFloat("PP_GSN_MAX_SMOOTHING_ANGLE", options.maxEdgeAngle);
+    importer.SetPropertyFloat("PP_GSN_MAX_SMOOTHING_ANGLE", maxEdgeAngle);
     const aiScene* scene = importer.ReadFile(name, flags);
 
     // If the import failed, report it
@@ -378,10 +404,7 @@ bool AssimpLoader::_load(const char* name, Assimp::Importer& importer, Mesh* mes
         return false;
     }
 
-    mAnimationSpeedModifier = options.animationSpeedModifier;
-    mLoaderParams = options.params;
     mQuietMode = mLoaderParams & LP_QUIET_MODE;
-    mCustomAnimationName = options.customAnimationName;
     mNodeDerivedTransformByName.clear();
 
     String basename, extension;
