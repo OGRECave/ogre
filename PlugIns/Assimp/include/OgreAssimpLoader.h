@@ -65,7 +65,7 @@ namespace Ogre
 * %Codec for loading geometry using the [Open-Asset-Importer](https://github.com/assimp/assimp)
 * @{
 */
-class _OgreAssimpExport AssimpLoader
+class AssimpLoader
 {
 public:
     enum LoaderParams
