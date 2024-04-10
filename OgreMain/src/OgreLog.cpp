@@ -137,7 +137,7 @@ namespace Ogre
                     {
                         auto t = std::time(nullptr);
                         auto pTime = std::localtime(&t);
-                        mLog << std::put_time(pTime, "%T: ");
+                        mLog << std::put_time(pTime, "%H:%M:%S: ");
                     }
                     mLog << message << std::endl;
 
