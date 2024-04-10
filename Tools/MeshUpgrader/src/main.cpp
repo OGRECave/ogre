@@ -42,6 +42,14 @@ using namespace Ogre;
 
 namespace {
 
+void print_version(void)
+{
+    // OgreMeshUpgrader <Name> (1.10.0) unstable
+    cout << "OgreMeshUpgrader " << OGRE_VERSION_NAME << " "
+         << "(" << OGRE_VERSION_MAJOR << "." << OGRE_VERSION_MINOR << "." << OGRE_VERSION_PATCH << ")"
+         << " " << OGRE_VERSION_SUFFIX << endl;
+}
+
 void help(void)
 {
     cout <<
@@ -49,6 +57,7 @@ R"HELP(Usage: OgreMeshUpgrader [opts] sourcefile [destfile]
 
   Upgrades or downgrades .mesh file versions.
 
+-v             = Display version information
 -pack          = Pack normals and tangents as int_10_10_10_2
 -optvtxcache   = Reorder the indexes to optimise vertex cache utilisation
 -autogen       = Generate autoconfigured LOD. No LOD options needed
@@ -452,6 +461,7 @@ int main(int numargs, char** args)
         unOptList["-pack"] = false;
         unOptList["-b"] = false;
         unOptList["-optvtxcache"] = false;
+        unOptList["-v"] = false;
         binOptList["-l"] = "";
         binOptList["-d"] = "";
         binOptList["-p"] = "";
@@ -462,6 +472,12 @@ int main(int numargs, char** args)
         binOptList["-log"] = "OgreMeshUpgrader.log";
 
         int startIdx = findCommandLineOpts(numargs, args, unOptList, binOptList);
+
+		if (unOptList["-v"])
+		{
+			print_version();
+			exit(0);
+		}
 
         if(numargs < 2 || numargs == startIdx)
         {
