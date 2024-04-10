@@ -555,8 +555,10 @@ int main(int numargs, char** args)
 
         if(opts.packNormalsTangents)
         {
+            logMgr.logMessage("Pack normals and tangents into INT_10_10_10_2...");
             mesh->_convertVertexElement(VES_NORMAL, VET_INT_10_10_10_2_NORM);
             mesh->_convertVertexElement(VES_TANGENT, VET_INT_10_10_10_2_NORM);
+            logMgr.logMessage("Pack normals and tangents into INT_10_10_10_2... success");
         }
 
         if (opts.recalcBounds) {
