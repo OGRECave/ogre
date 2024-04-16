@@ -3,19 +3,19 @@
  This source file is part of OGRE
  (Object-oriented Graphics Rendering Engine)
  For the latest info, see http://www.ogre3d.org/
- 
+
  Copyright (c) 2000-2014 Torus Knot Software Ltd
- 
+
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
  in the Software without restriction, including without limitation the rights
  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  copies of the Software, and to permit persons to whom the Software is
  furnished to do so, subject to the following conditions:
- 
+
  The above copyright notice and this permission notice shall be included in
  all copies or substantial portions of the Software.
- 
+
  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -80,16 +80,13 @@ namespace OgreBites
             if (s)
             {
                 // retrieve sample's required plugins and currently installed plugins
-                Ogre::Root::PluginInstanceList ip = mRoot->getInstalledPlugins();
-                Ogre::StringVector rp = s->getRequiredPlugins();
-
-                for (Ogre::StringVector::iterator j = rp.begin(); j != rp.end(); j++)
+                for (const auto& p : s->getRequiredPlugins())
                 {
                     bool found = false;
                     // try to find the required plugin in the current installed plugins
-                    for (Ogre::Root::PluginInstanceList::iterator k = ip.begin(); k != ip.end(); k++)
+                    for (const auto *i : mRoot->getInstalledPlugins())
                     {
-                        if ((*k)->getName() == *j)
+                        if (i->getName() == p)
                         {
                             found = true;
                             break;
@@ -97,7 +94,7 @@ namespace OgreBites
                     }
                     if (!found)  // throw an exception if a plugin is not found
                     {
-                        OGRE_EXCEPT(Ogre::Exception::ERR_NOT_IMPLEMENTED, "Sample requires plugin: " + *j);
+                        OGRE_EXCEPT(Ogre::Exception::ERR_NOT_IMPLEMENTED, "Sample requires plugin: " + p);
                     }
                 }
 
@@ -139,7 +136,7 @@ namespace OgreBites
 #endif
 
                 loadStartUpSample();
-        
+
                 if (mRoot->getRenderSystem() != NULL)
                 {
                     mRoot->startRendering();    // start the render loop
@@ -176,7 +173,7 @@ namespace OgreBites
                 mCurrentSample->unpaused();
             }
         }
-            
+
         /*-----------------------------------------------------------------------------
         | Processes frame started events.
         -----------------------------------------------------------------------------*/
@@ -187,7 +184,7 @@ namespace OgreBites
             // manually call sample callback to ensure correct order
             return !isCurrentSamplePaused() ? mCurrentSample->frameStarted(evt) : true;
         }
-            
+
         /*-----------------------------------------------------------------------------
         | Processes rendering queued events.
         -----------------------------------------------------------------------------*/
@@ -196,7 +193,7 @@ namespace OgreBites
             // manually call sample callback to ensure correct order
             return !isCurrentSamplePaused() ? mCurrentSample->frameRenderingQueued(evt) : true;
         }
-            
+
         /*-----------------------------------------------------------------------------
         | Processes frame ended events.
         -----------------------------------------------------------------------------*/
@@ -262,7 +259,7 @@ namespace OgreBites
 
             ApplicationContext::shutdown();
         }
-        
+
         Sample* mCurrentSample;         // The active sample (0 if none is active)
         bool mSamplePaused;             // whether current sample is paused
         bool mLastRun;                  // whether or not this is the final run

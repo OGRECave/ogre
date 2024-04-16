@@ -160,15 +160,11 @@ void HDRListener::notifyViewportSize(int width, int height)
 void HDRListener::notifyCompositor(Ogre::CompositorInstance* instance)
 {
     // Get some RTT dimensions for later calculations
-    const Ogre::CompositionTechnique::TextureDefinitions& defs =
-        instance->getTechnique()->getTextureDefinitions();
-    Ogre::CompositionTechnique::TextureDefinitions::const_iterator defIter;
-    for (defIter = defs.begin(); defIter != defs.end(); ++defIter)
+    for (const auto *t : instance->getTechnique()->getTextureDefinitions())
     {
-        Ogre::CompositionTechnique::TextureDefinition* def = *defIter;
-        if(def->name == "rt_bloom0")
+        if(t->name == "rt_bloom0")
         {
-            mBloomSize = (int)def->width; // should be square
+            mBloomSize = (int)t->width; // should be square
             // Calculate gaussian texture offsets & weights
             float deviation = 3.0f;
             float texelSize = 1.0f / (float)mBloomSize;
@@ -205,7 +201,6 @@ void HDRListener::notifyCompositor(Ogre::CompositorInstance* instance)
                 mBloomTexOffsetsVert[i][0] = 0.0f;
                 mBloomTexOffsetsVert[i][1] = -mBloomTexOffsetsVert[i - 7][1];
             }
-
         }
     }
 }
