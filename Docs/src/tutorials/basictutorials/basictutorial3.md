@@ -31,13 +31,13 @@ This should look familiar from the previous tutorial.
 @snippet Samples/Simple/include/Terrain.h camera_inf
 
 The last thing we do is to set the far clip distance to zero (which means ''no'' far clipping).
-## Setting Up a Light for Our Terrain
+## Setting Up a Light
 The Terrain component can use a directional light to compute a lightmap. Let's add a Light for this purpose and add some ambient light to the scene while we're at it.
 
 @snippet Samples/Simple/include/Terrain.h light
 
 This was also covered in the previous tutorial if you're confused by any of it. The `normalise` method will make the vector's length equal to one while maintaining its direction. This is something that you will see a lot of when working with vectors. It is done to avoid extra factors showing up in calculations.
-## Terrain loading overview {#bt3Overview}
+## Loading overview {#bt3Overview}
 Now we'll get into the actual terrain setup. First, we create TerrainGlobalOptions.
 
 @snippet Samples/Simple/include/Terrain.h global_opts
@@ -69,7 +69,7 @@ We get a TerrainIterator from our TerrainGroup and then loop through any Terrain
 The last thing we will do is make sure to cleanup any temporary resources that were created while configuring our terrain.
 
 That completes our `setupContent` method. Now we just have to complete all of the methods we jumped over.
-## Terrain appearance {#bt3Appearance}
+## Appearance {#bt3Appearance}
 The %Ogre Terrain component has a large number of options that can be set to change how the terrain is rendered. To start out, we configure the level of detail (LOD). There are two LOD approaches in the Terrain component, one controlling the geometry and the other controlling the texture.
 
 @snippet Samples/Simple/include/Terrain.h configure_lod
@@ -98,11 +98,18 @@ After that, we set each texture's `worldSize` and add them to the list.
 
 The texture's `worldSize` determines how big each splat of texture is going to be when applied to the terrain. A smaller value will increase the resolution of the rendered texture layer because each piece will be stretched less to fill in the terrain.
 
+## Merging textures {#bt3MergingTextures}
+
 The default material generator requires two textures maps per layer:
 1. one containing diffuse + specular data and
 2. another containing normal + displacement data.
 
-It is recommended that you pre-merge your textures accordingly e.g. using [ImageMagick](https://imagemagick.org/). This way you save storage space and speed up loading.
+It is recommended that you pre-merge your textures accordingly e.g. using [ImageMagick](https://imagemagick.org/) like this:
+```sh
+convert Ground37_col.jpg Ground37_spec.png -compose copy-opacity -composite Ground37_diffspec.dds
+```
+This way you save storage space and speed up loading.
+
 However if you want more flexibility, you can also make %Ogre combine the images at loading accordingly as shown below
 
 @snippet Samples/Simple/include/Terrain.h tex_from_src
@@ -125,7 +132,7 @@ Finally, we will finish up our configuration methods by completing the `initBlen
 
 @snippet Samples/Simple/include/Terrain.h blendmap
 
-## Terrain Loading Label {#bt3LoadingLabel}
+## Loading Label {#bt3LoadingLabel}
 
 There are a number of things we will improve. We will add a label to the overlay that allows us to see when the terrain generation has finished. We will also make sure to save our terrain so that it can be reloaded instead of rebuilding it every time. Finally, we will make sure to clean up after ourselves.
 
