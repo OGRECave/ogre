@@ -775,9 +775,6 @@ void DotSceneLoader::processSkyBox(pugi::xml_node& XMLNode)
     String material = getAttrib(XMLNode, "material", "BaseWhite");
     Real distance = getAttribReal(XMLNode, "distance", 5000);
     bool drawFirst = getAttribBool(XMLNode, "drawFirst", true);
-    bool active = getAttribBool(XMLNode, "active", false);
-    if (!active)
-        return;
 
     // Process rotation (?)
     Quaternion rotation = Quaternion::IDENTITY;
