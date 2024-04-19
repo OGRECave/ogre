@@ -119,7 +119,7 @@
 <!ATTLIST skyBox
     material    CDATA #REQUIRED
     distance    CDATA     "5000"
-    drawFirst   (true | false)    "true"
+    drawFirst    (true | false)    "true"
 >
 
 <!ELEMENT skyDome (rotation?)>
