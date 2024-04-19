@@ -1092,8 +1092,8 @@ namespace Ogre {
         /// @{
         /** Creates a camera to be managed by this scene manager.
 
-                This camera must be added to the scene at a later time using
-                the attachObject method of the SceneNode class.
+            This camera must be added to the scene at a later time using
+            the attachObject method of the SceneNode class.
             @param
                 name Name to give the new camera.
         */
@@ -1110,9 +1110,9 @@ namespace Ogre {
 
         /** Removes a camera from the scene.
 
-                This method removes a previously added camera from the scene.
-                The camera is deleted so the caller must ensure no references
-                to it's previous instance (e.g. in a SceneNode) are used.
+            This method removes a previously added camera from the scene.
+            The camera is deleted so the caller must ensure no references
+            to it's previous instance (e.g. in a SceneNode) are used.
             @param
                 cam Pointer to the camera to remove
         */
@@ -1127,11 +1127,11 @@ namespace Ogre {
 
         /** Removes (and destroys) all cameras from the scene.
 
-                Some cameras are internal created to dealing with texture shadow,
-                their aren't supposed to destroy outside. So, while you are using
-                texture shadow, don't call this method, or you can set the shadow
-                technique other than texture-based, which will destroy all internal
-                created shadow cameras and textures.
+            Some cameras are internal created to dealing with texture shadow,
+            their aren't supposed to destroy outside. So, while you are using
+            texture shadow, don't call this method, or you can set the shadow
+            technique other than texture-based, which will destroy all internal
+            created shadow cameras and textures.
         */
         void destroyAllCameras(void);
 
@@ -1171,11 +1171,11 @@ namespace Ogre {
         /// @{
         /** Creates a light for use in the scene.
 
-                Lights can either be in a fixed position and independent of the
-                scene graph, or they can be attached to SceneNodes so they derive
-                their position from the parent node. Either way, they are created
-                using this method so that the SceneManager manages their
-                existence.
+            Lights can either be in a fixed position and independent of the
+            scene graph, or they can be attached to SceneNodes so they derive
+            their position from the parent node. Either way, they are created
+            using this method so that the SceneManager manages their
+            existence.
             @param
                 name The name of the new light, to identify it later.
         */
@@ -1260,10 +1260,11 @@ namespace Ogre {
         /** Populate a light list with an ordered set of the lights which are closest
         to the position specified.
 
-            Note that since directional lights have no position, they are always considered
-            closer than any point lights and as such will always take precedence.
-            The returned lights are those in the cached list of lights (i.e. those
-            returned by SceneManager::_getLightsAffectingFrustum) sorted by distance.
+        @note since directional lights have no position, they are always considered
+        closer than any point lights and as such will always take precedence.
+
+        The returned lights are those in the cached list of lights (i.e. those
+        returned by SceneManager::_getLightsAffectingFrustum) sorted by distance.
         @par
             The number of items in the list may exceed the maximum number of lights supported
             by the renderer, but the extraneous ones will never be used. In fact the limit will
@@ -1287,11 +1288,12 @@ namespace Ogre {
         /// @{
         /** Creates an instance of a SceneNode.
 
-                Note that this does not add the SceneNode to the scene hierarchy.
-                This method is for convenience, since it allows an instance to
-                be created for which the SceneManager is responsible for
-                allocating and releasing memory, which is convenient in complex
-                scenes.
+            @note this does not add the SceneNode to the scene hierarchy.
+
+            This method is for convenience, since it allows an instance to
+            be created for which the SceneManager is responsible for
+            allocating and releasing memory, which is convenient in complex
+            scenes.
             @par
                 To include the returned SceneNode in the scene, use the addChild
                 method of the SceneNode which is to be it's parent.
@@ -1319,15 +1321,15 @@ namespace Ogre {
 
         /** Gets the SceneNode at the root of the scene hierarchy.
 
-                The entire scene is held as a hierarchy of nodes, which
-                allows things like relative transforms, general changes in
-                rendering state etc (See the SceneNode class for more info).
-                In this basic SceneManager class, the application using
-                Ogre is free to structure this hierarchy however it likes,
-                since it has no real significance apart from making transforms
-                relative to each node (more specialised subclasses will
-                provide utility methods for building specific node structures
-                e.g. loading a BSP tree).
+            The entire scene is held as a hierarchy of nodes, which
+            allows things like relative transforms, general changes in
+            rendering state etc (See the SceneNode class for more info).
+            In this basic SceneManager class, the application using
+            Ogre is free to structure this hierarchy however it likes,
+            since it has no real significance apart from making transforms
+            relative to each node (more specialised subclasses will
+            provide utility methods for building specific node structures
+            e.g. loading a BSP tree).
             @par
                 However, in all cases there is only ever one root node of
                 the hierarchy, and this method returns a pointer to it.
@@ -1529,7 +1531,8 @@ namespace Ogre {
             subclasses, a ParticleSystem is not rendered until it is attached to a SceneNode. 
         @par
             This is probably the more useful particle system creation method since it does not require manual
-            setup of the system. Note that the initial quota is based on the template but may be changed later.
+            setup of the system.
+        @note the initial quota is based on the template but may be changed later.
         @param 
             name The name to give the new particle system instance.
         @param 
@@ -1587,15 +1590,15 @@ namespace Ogre {
 
         /** Sets the ambient light level to be used for the scene.
 
-                This sets the colour and intensity of the ambient light in the scene, i.e. the
-                light which is 'sourceless' and illuminates all objects equally.
-                The colour of an object is affected by a combination of the light in the scene,
-                and the amount of light that object reflects (in this case based on the Material::ambient
-                property).
+            This sets the colour and intensity of the ambient light in the scene, i.e. the
+            light which is 'sourceless' and illuminates all objects equally.
+            The colour of an object is affected by a combination of the light in the scene,
+            and the amount of light that object reflects (in this case based on the Material::ambient
+            property).
 
-                By default the ambient light in the scene is ColourValue::Black, i.e. no ambient light. This
-                means that any objects rendered with a Material which has lighting enabled (see Material::setLightingEnabled)
-                will not be visible unless you have some dynamic lights in your scene.
+            By default the ambient light in the scene is ColourValue::Black, i.e. no ambient light. This
+            means that any objects rendered with a Material which has lighting enabled (see Material::setLightingEnabled)
+            will not be visible unless you have some dynamic lights in your scene.
         */
         void setAmbientLight(const ColourValue& colour);
 
@@ -1608,14 +1611,14 @@ namespace Ogre {
         /** Sets the source of the 'world' geometry, i.e. the large, mainly static geometry
             making up the world e.g. rooms, landscape etc.
 
-                Depending on the type of SceneManager (subclasses will be specialised
-                for particular world geometry types) you have requested via the Root or
-                SceneManagerEnumerator classes, you can pass a filename to this method and it
-                will attempt to load the world-level geometry for use. If you try to load
-                an inappropriate type of world data an exception will be thrown. The default
-                SceneManager cannot handle any sort of world geometry and so will always
-                throw an exception. However subclasses like BspSceneManager can load
-                particular types of world geometry e.g. "q3dm1.bsp".
+            Depending on the type of SceneManager (subclasses will be specialised
+            for particular world geometry types) you have requested via the Root or
+            SceneManagerEnumerator classes, you can pass a filename to this method and it
+            will attempt to load the world-level geometry for use. If you try to load
+            an inappropriate type of world data an exception will be thrown. The default
+            SceneManager cannot handle any sort of world geometry and so will always
+            throw an exception. However subclasses like BspSceneManager can load
+            particular types of world geometry e.g. "q3dm1.bsp".
         */
         virtual void setWorldGeometry(const String& filename);
 
@@ -1656,10 +1659,10 @@ namespace Ogre {
 
         /** Asks the SceneManager to provide a suggested viewpoint from which the scene should be viewed.
 
-                Typically this method returns the origin unless a) world geometry has been loaded using
-                SceneManager::setWorldGeometry and b) that world geometry has suggested 'start' points.
-                If there is more than one viewpoint which the scene manager can suggest, it will always suggest
-                the first one unless the random parameter is true.
+            Typically this method returns the origin unless a) world geometry has been loaded using
+            SceneManager::setWorldGeometry and b) that world geometry has suggested 'start' points.
+            If there is more than one viewpoint which the scene manager can suggest, it will always suggest
+            the first one unless the random parameter is true.
             @param
                 random If true, and there is more than one possible suggestion, a random one will be used. If false
                 the same one will always be suggested.
@@ -1742,21 +1745,21 @@ namespace Ogre {
 
         /** Internal method for updating the scene graph ie the tree of SceneNode instances managed by this class.
 
-                This must be done before issuing objects to the rendering pipeline, since derived transformations from
-                parent nodes are not updated until required. This SceneManager is a basic implementation which simply
-                updates all nodes from the root. This ensures the scene is up to date but requires all the nodes
-                to be updated even if they are not visible. Subclasses could trim this such that only potentially visible
-                nodes are updated.
+            This must be done before issuing objects to the rendering pipeline, since derived transformations from
+            parent nodes are not updated until required. This SceneManager is a basic implementation which simply
+            updates all nodes from the root. This ensures the scene is up to date but requires all the nodes
+            to be updated even if they are not visible. Subclasses could trim this such that only potentially visible
+            nodes are updated.
         */
         virtual void _updateSceneGraph(Camera* cam);
 
         /** Internal method which parses the scene to find visible objects to render.
 
-                If you're implementing a custom scene manager, this is the most important method to
-                override since it's here you can apply your custom world partitioning scheme. Once you
-                have added the appropriate objects to the render queue, you can let the default
-                SceneManager objects _renderVisibleObjects handle the actual rendering of the objects
-                you pick.
+            If you're implementing a custom scene manager, this is the most important method to
+            override since it's here you can apply your custom world partitioning scheme. Once you
+            have added the appropriate objects to the render queue, you can let the default
+            SceneManager objects _renderVisibleObjects handle the actual rendering of the objects
+            you pick.
             @par
                 Any visible objects will be added to a rendering queue, which is indexed by material in order
                 to ensure objects with the same material are rendered together to minimise render state changes.
@@ -1772,12 +1775,12 @@ namespace Ogre {
 
         /** Prompts the class to send its contents to the renderer.
 
-                This method prompts the scene manager to send the
-                contents of the scene it manages to the rendering
-                pipeline, possibly preceded by some sorting, culling
-                or other scene management tasks. Note that this method is not normally called
-                directly by the user application; it is called automatically
-                by the Ogre rendering loop.
+            This method prompts the scene manager to send the
+            contents of the scene it manages to the rendering
+            pipeline, possibly preceded by some sorting, culling
+            or other scene management tasks. Note that this method is not normally called
+            directly by the user application; it is called automatically
+            by the Ogre rendering loop.
             @param camera Pointer to a camera from whose viewpoint the scene is to
                 be rendered.
             @param vp The target viewport
@@ -1787,9 +1790,9 @@ namespace Ogre {
 
         /** Notifies the scene manager of its destination render system
 
-                Called automatically by RenderSystem::addSceneManager
-                this method simply notifies the manager of the render
-                system to which its output must be directed.
+            Called automatically by RenderSystem::addSceneManager
+            this method simply notifies the manager of the render
+            system to which its output must be directed.
             @param
                 sys Pointer to the RenderSystem subclass to be used as a render target.
         */
@@ -1797,19 +1800,19 @@ namespace Ogre {
 
         /** Notifies the scene manager that hardware resources were lost
 
-                Called automatically by RenderSystem if hardware resources
-                were lost and can not be restored using some internal mechanism.
-                Among affected resources are manual meshes without loaders, 
-                manual textures without loaders, ManualObjects, etc.
+            Called automatically by RenderSystem if hardware resources
+            were lost and can not be restored using some internal mechanism.
+            Among affected resources are manual meshes without loaders,
+            manual textures without loaders, ManualObjects, etc.
         */
         void _releaseManualHardwareResources();
 
         /** Notifies the scene manager that hardware resources should be restored
 
-                Called automatically by RenderSystem if hardware resources
-                were lost and can not be restored using some internal mechanism.
-                Among affected resources are manual meshes without loaders, 
-                manual textures without loaders, ManualObjects, etc.
+            Called automatically by RenderSystem if hardware resources
+            were lost and can not be restored using some internal mechanism.
+            Among affected resources are manual meshes without loaders,
+            manual textures without loaders, ManualObjects, etc.
         */
         void _restoreManualHardwareResources();
 
@@ -1818,13 +1821,13 @@ namespace Ogre {
         /** Enables / disables a 'sky plane' i.e. a plane at constant
             distance from the camera representing the sky.
 
-                You can create sky planes yourself using the standard mesh and
-                entity methods, but this creates a plane which the camera can
-                never get closer or further away from - it moves with the camera.
-                (NB you could create this effect by creating a world plane which
-                was attached to the same SceneNode as the Camera too, but this
-                would only apply to a single camera whereas this plane applies to
-                any camera using this scene manager).
+            You can create sky planes yourself using the standard mesh and
+            entity methods, but this creates a plane which the camera can
+            never get closer or further away from - it moves with the camera.
+            (NB you could create this effect by creating a world plane which
+            was attached to the same SceneNode as the Camera too, but this
+            would only apply to a single camera whereas this plane applies to
+            any camera using this scene manager).
             @note
                 To apply scaling, scrolls etc to the sky texture(s) you
                 should use the TextureUnitState class methods.
@@ -1897,13 +1900,13 @@ namespace Ogre {
         /** Enables / disables a 'sky box' i.e. a 6-sided box at constant
             distance from the camera representing the sky.
 
-                You could create a sky box yourself using the standard mesh and
-                entity methods, but this creates a plane which the camera can
-                never get closer or further away from - it moves with the camera.
-                (NB you could create this effect by creating a world box which
-                was attached to the same SceneNode as the Camera too, but this
-                would only apply to a single camera whereas this skybox applies
-                to any camera using this scene manager).
+            You could create a sky box yourself using the standard mesh and
+            entity methods, but this creates a plane which the camera can
+            never get closer or further away from - it moves with the camera.
+            (NB you could create this effect by creating a world box which
+            was attached to the same SceneNode as the Camera too, but this
+            would only apply to a single camera whereas this skybox applies
+            to any camera using this scene manager).
             @par
                 The material you use for the skybox can either contain layers
                 which are single textures, or they can be cubic textures, i.e.
@@ -1960,17 +1963,17 @@ namespace Ogre {
 
         /** Enables / disables a 'sky dome' i.e. an illusion of a curved sky.
 
-                A sky dome is actually formed by 5 sides of a cube, but with
-                texture coordinates generated such that the surface appears
-                curved like a dome. Sky domes are appropriate where you need a
-                realistic looking sky where the scene is not going to be
-                'fogged', and there is always a 'floor' of some sort to prevent
-                the viewer looking below the horizon (the distortion effect below
-                the horizon can be pretty horrible, and there is never anything
-                directly below the viewer). If you need a complete wrap-around
-                background, use the setSkyBox method instead. You can actually
-                combine a sky box and a sky dome if you want, to give a positional
-                backdrop with an overlaid curved cloud layer.
+            A sky dome is actually formed by 5 sides of a cube, but with
+            texture coordinates generated such that the surface appears
+            curved like a dome. Sky domes are appropriate where you need a
+            realistic looking sky where the scene is not going to be
+            'fogged', and there is always a 'floor' of some sort to prevent
+            the viewer looking below the horizon (the distortion effect below
+            the horizon can be pretty horrible, and there is never anything
+            directly below the viewer). If you need a complete wrap-around
+            background, use the setSkyBox method instead. You can actually
+            combine a sky box and a sky dome if you want, to give a positional
+            backdrop with an overlaid curved cloud layer.
             @par
                 Sky domes work well with 2D repeating textures like clouds. You
                 can change the apparent 'curvature' of the sky depending on how
@@ -2046,9 +2049,9 @@ namespace Ogre {
         /// @{
         /** Sets the fogging mode applied to the scene.
 
-                This method sets up the scene-wide fogging effect. These settings
-                apply to all geometry rendered, UNLESS the material with which it
-                is rendered has it's own fog settings (see Material::setFog).
+            This method sets up the scene-wide fogging effect. These settings
+            apply to all geometry rendered, UNLESS the material with which it
+            is rendered has it's own fog settings (see Material::setFog).
             @param
                 mode Set up the mode of fog as described in the FogMode
                 enum, or set to FOG_NONE to turn off.
@@ -2097,18 +2100,14 @@ namespace Ogre {
         /// @{
         /** Creates a new BillboardSet for use with this scene manager.
 
-                This method creates a new BillboardSet which is registered with
-                the SceneManager. The SceneManager will destroy this object when
-                it shuts down or when the SceneManager::clearScene method is
-                called, so the caller does not have to worry about destroying
-                this object (in fact, it definitely should not do this).
-            @par
-                See the BillboardSet documentations for full details of the
-                returned class.
+            This method creates a new BillboardSet which is registered with
+            the SceneManager. The SceneManager will destroy this object when
+            it shuts down or when the SceneManager::clearScene method is
+            called, so the caller does not have to worry about destroying
+            this object (in fact, it definitely should not do this).
+
             @param
                 poolSize The initial size of the pool of billboards (see BillboardSet for more information)
-            @see
-                BillboardSet
         */
         BillboardSet* createBillboardSet(unsigned int poolSize = 20);
 
@@ -2162,8 +2161,7 @@ namespace Ogre {
             A single animation can affect multiple Node objects (each AnimationTrack affects a single Node).
             In addition, through animation blending a single Node can be affected by multiple animations,
             although this is more useful when performing skeletal animation (see Skeleton::createAnimation).
-        @par
-            Note that whilst it uses the same classes, the animations created here are kept separate from the
+        @note whilst it uses the same classes, the animations created here are kept separate from the
             skeletal animations of meshes (each Skeleton owns those animations).
         @param name The name of the animation, must be unique within this SceneManager.
         @param length The total length of the animation.
@@ -2526,14 +2524,14 @@ namespace Ogre {
         bool getShowDebugShadows(void ) const { return mShadowRenderer.mDebugShadows; }
 
         /** Set the colour used to modulate areas in shadow. 
-        @remarks This is only applicable for shadow techniques which involve 
+        This is only applicable for shadow techniques which involve
             darkening the area in shadow, as opposed to masking out the light. 
             This colour provided is used as a modulative value to darken the
             areas.
         */
         void setShadowColour(const ColourValue& colour) { mShadowRenderer.setShadowColour(colour); }
         /** Get the colour used to modulate areas in shadow. 
-        @remarks This is only applicable for shadow techniques which involve 
+        This is only applicable for shadow techniques which involve
         darkening the area in shadow, as opposed to masking out the light. 
         This colour provided is used as a modulative value to darken the
         areas.
@@ -2644,7 +2642,7 @@ namespace Ogre {
             vertex program capable cards on Direct3D7) does not
             support it</LI>
             <LI>Direct3D on GeForce3 and GeForce4 Ti does not seem to support
-            infinite projection<LI>
+            infinite projection</LI>
             </UL>
             Therefore in the RenderSystem implementation, we may veto the use
             of an infinite far plane based on these heuristics.
@@ -2871,7 +2869,6 @@ namespace Ogre {
         @note
             Individual objects may also override the vertex program in
             your default material if their materials include 
-            shadow_caster_vertex_program_ref, shadow_receiver_vertex_program_ref
             shadow_caster_material entries, so if you use both make sure they are compatible.           
         @note
             Only a single pass is allowed in your material, although multiple
@@ -2894,8 +2891,7 @@ namespace Ogre {
             otherwise you should rely on the texture_viewproj_matrix auto binding)
         @note
             Individual objects may also override the vertex program in
-            your default material if their materials include 
-            shadow_caster_vertex_program_ref shadow_receiver_vertex_program_ref
+            your default material if their materials include
             shadow_receiver_material entries, so if you use both make sure they are compatible.
         @note
             Only a single pass is allowed in your material, although multiple
