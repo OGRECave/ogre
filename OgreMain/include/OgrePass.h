@@ -479,9 +479,14 @@ namespace Ogre {
 
             When performing point rendering or point sprite rendering,
             point size can be attenuated with distance. The equation for
-            doing this is 
+            doing this is:
             
-            $$attenuation = 1 / (constant + linear * dist + quadratic * d^2)$$
+            \f[ S_a = V_h \cdot S \cdot \frac{1}{\sqrt{constant + linear \cdot d + quadratic \cdot d^2}} \f]
+
+            Where
+            - \f$d\f$ is the distance from the camera to the point
+            - \f$S\f$ is the point size parameter
+            - \f$V_h\f$ is the viewport height in pixels
 
             For example, to disable distance attenuation (constant screensize)
             you would set constant to 1, and linear and quadratic to 0. A
