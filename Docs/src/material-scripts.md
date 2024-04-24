@@ -875,7 +875,9 @@ material Fur
 @copydetails Ogre::Pass::setPointSize
 
 @par
-Format: point\_size &lt;size&gt; Default: point\_size 1.0
+Format: point\_size &lt;size&gt;
+@par
+Default: point\_size 1.0
 
 @ffp_rtss_only
 
@@ -886,7 +888,9 @@ Format: point\_size &lt;size&gt; Default: point\_size 1.0
 @copydetails Ogre::Pass::setPointSpritesEnabled
 
 @par
-Format: point\_sprites &lt;on|off&gt; Default: point\_sprites off
+Format: point\_sprites &lt;on|off&gt;
+@par
+Default: point\_sprites off
 
 <a name="point_005fsize_005fattenuation"></a><a name="point_005fsize_005fattenuation-1"></a>
 
@@ -895,7 +899,9 @@ Format: point\_sprites &lt;on|off&gt; Default: point\_sprites off
 Defines whether point size is attenuated with view space distance, and in what fashion.
 
 @par
-Format: point\_size\_attenuation &lt;enabled&gt; \[constant linear quadratic\] Default: point\_size\_attenuation off
+Format: point\_size\_attenuation &lt;enabled&gt; \[constant linear quadratic\]
+@par
+Default: point\_size\_attenuation off
 
 @copydetails Ogre::Pass::setPointAttenuation
 
@@ -907,7 +913,9 @@ Format: point\_size\_attenuation &lt;enabled&gt; \[constant linear quadratic\] D
 
 Sets the minimum point size after attenuation ([point\_size\_attenuation](#point_005fsize_005fattenuation)). For details on the size metrics, See [point\_size](#point_005fsize).
 @par
-Format: point\_size\_min &lt;size&gt; Default: point\_size\_min 0
+Format: point\_size\_min &lt;size&gt;
+@par
+Default: point\_size\_min 0
 
 <a name="point_005fsize_005fmax"></a><a name="point_005fsize_005fmax-1"></a>
 
@@ -915,7 +923,9 @@ Format: point\_size\_min &lt;size&gt; Default: point\_size\_min 0
 
 Sets the maximum point size after attenuation ([point\_size\_attenuation](#point_005fsize_005fattenuation)). For details on the size metrics, See [point\_size](#point_005fsize). A value of 0 means the maximum is set to the same as the max size reported by the current card. 
 @par
-Format: point\_size\_max &lt;size&gt; Default: point\_size\_max 0
+Format: point\_size\_max &lt;size&gt;
+@par
+Default: point\_size\_max 0
 
 <a name="line_width"></a>
 ## line_width
