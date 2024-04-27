@@ -50,12 +50,12 @@ namespace Ogre {
     */
     /** Class representing a node in the scene graph.
 
-            A SceneNode is a type of Node which is used to organise objects in a scene.
-            It has the same hierarchical transformation properties of the generic Node class,
-            but also adds the ability to attach world objects to the node, and stores hierarchical
-            bounding volumes of the nodes in the tree.
-            Child nodes are contained within the bounds of the parent, and so on down the
-            tree, allowing for fast culling.
+        A SceneNode is a type of Node which is used to organise objects in a scene.
+        It has the same hierarchical transformation properties of the generic Node class,
+        but also adds the ability to attach world objects to the node, and stores hierarchical
+        bounding volumes of the nodes in the tree.
+        Child nodes are contained within the bounds of the parent, and so on down the
+        tree, allowing for fast culling.
     */
     class _OgreExport SceneNode : public Node
     {
@@ -200,10 +200,10 @@ namespace Ogre {
 
         /** Internal method which locates any visible objects attached to this node and adds them to the passed in queue.
 
-                Should only be called by a SceneManager implementation, and only after the _updat method has been called to
-                ensure transforms and world bounds are up to date.
-                SceneManager implementations can choose to let the search cascade automatically, or choose to prevent this
-                and select nodes themselves based on some other criteria.
+            Should only be called by a SceneManager implementation, and only after the _updat method has been called to
+            ensure transforms and world bounds are up to date.
+            SceneManager implementations can choose to let the search cascade automatically, or choose to prevent this
+            and select nodes themselves based on some other criteria.
             @param
                 cam The active camera
             @param

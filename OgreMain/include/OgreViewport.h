@@ -43,15 +43,15 @@ namespace Ogre {
     /** An abstraction of a viewport, i.e. a rendering region on a render
         target.
 
-            A viewport is the meeting of a camera and a rendering surface -
-            the camera renders the scene from a viewpoint, and places its
-            results into some subset of a rendering target, which may be the
-            whole surface or just a part of the surface. Each viewport has a
-            single camera as source and a single target as destination. A
-            camera only has 1 viewport, but a render target may have several.
-            A viewport also has a Z-order, i.e. if there is more than one
-            viewport on a single render target and they overlap, one must
-            obscure the other in some predetermined way.
+        A viewport is the meeting of a camera and a rendering surface -
+        the camera renders the scene from a viewpoint, and places its
+        results into some subset of a rendering target, which may be the
+        whole surface or just a part of the surface. Each viewport has a
+        single camera as source and a single target as destination. A
+        camera only has 1 viewport, but a render target may have several.
+        A viewport also has a Z-order, i.e. if there is more than one
+        viewport on a single render target and they overlap, one must
+        obscure the other in some predetermined way.
     */
     class _OgreExport Viewport : public ViewportAlloc
     {
@@ -95,8 +95,8 @@ namespace Ogre {
 
         /** Notifies the viewport of a possible change in dimensions.
 
-                Used by the target to update the viewport's dimensions
-                (usually the result of a change in target size).
+            Used by the target to update the viewport's dimensions
+            (usually the result of a change in target size).
             @note
                 Internal use by Ogre only.
         */

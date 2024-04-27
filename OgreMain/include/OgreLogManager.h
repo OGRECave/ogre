@@ -46,11 +46,11 @@ namespace Ogre
     /** The log manager handles the creation and retrieval of logs for the
         application.
 
-            This class will create new log files and will retrieve instances
-            of existing ones. Other classes wishing to log output can either
-            create a fresh log or retrieve an existing one to output to.
-            One log is the default log, and is the one written to when the
-            logging methods of this class are called.
+        This class will create new log files and will retrieve instances
+        of existing ones. Other classes wishing to log output can either
+        create a fresh log or retrieve an existing one to output to.
+        One log is the default log, and is the one written to when the
+        logging methods of this class are called.
         @par
             By default, Root will instantiate a LogManager (which becomes the 
             Singleton instance) on construction, and will create a default log

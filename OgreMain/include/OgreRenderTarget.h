@@ -51,13 +51,11 @@ namespace Ogre {
     /** A 'canvas' which can receive the results of a rendering
         operation.
 
-            This abstract class defines a common root to all targets of rendering operations. A
-            render target could be a window on a screen, or another
-            offscreen surface like a texture or bump map etc.
+        This abstract class defines a common root to all targets of rendering operations. A
+        render target could be a window on a screen, or another
+        offscreen surface like a texture or bump map etc.
         @author
             Steven Streeting
-        @version
-            1.0
      */
     class _OgreExport RenderTarget : public RenderSysAlloc
     {
@@ -126,12 +124,12 @@ namespace Ogre {
 
         /** Tells the target to update it's contents.
 
-                If OGRE is not running in an automatic rendering loop
-                (started using Root::startRendering),
-                the user of the library is responsible for asking each render
-                target to refresh. This is the method used to do this. It automatically
-                re-renders the contents of the target using whatever cameras have been
-                pointed at it (using Camera::setRenderTarget).
+            If OGRE is not running in an automatic rendering loop
+            (started using Root::startRendering),
+            the user of the library is responsible for asking each render
+            target to refresh. This is the method used to do this. It automatically
+            re-renders the contents of the target using whatever cameras have been
+            pointed at it (using Camera::setRenderTarget).
             @par
                 This allows OGRE to be used in multi-windowed utilities
                 and for contents to be refreshed only when required, rather than
@@ -149,22 +147,22 @@ namespace Ogre {
         virtual void update(bool swapBuffers = true);
         /** Swaps the frame buffers to display the next frame.
 
-                For targets that are double-buffered so that no
-                'in-progress' versions of the scene are displayed
-                during rendering. Once rendering has completed (to
-                an off-screen version of the window) the buffers
-                are swapped to display the new frame.
+            For targets that are double-buffered so that no
+            'in-progress' versions of the scene are displayed
+            during rendering. Once rendering has completed (to
+            an off-screen version of the window) the buffers
+            are swapped to display the new frame.
         */
         virtual void swapBuffers() {}
 
         /** Adds a viewport to the rendering target.
 
-                A viewport is the rectangle into which rendering output is sent. This method adds
-                a viewport to the render target, rendering from the supplied camera. The
-                rest of the parameters are only required if you wish to add more than one viewport
-                to a single rendering target. Note that size information passed to this method is
-                passed as a parametric, i.e. it is relative rather than absolute. This is to allow
-                viewports to automatically resize along with the target.
+            A viewport is the rectangle into which rendering output is sent. This method adds
+            a viewport to the render target, rendering from the supplied camera. The
+            rest of the parameters are only required if you wish to add more than one viewport
+            to a single rendering target. Note that size information passed to this method is
+            passed as a parametric, i.e. it is relative rather than absolute. This is to allow
+            viewports to automatically resize along with the target.
             @param
                 cam The camera from which the viewport contents will be rendered (mandatory)
             @param

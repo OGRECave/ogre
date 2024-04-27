@@ -57,16 +57,16 @@ namespace Ogre
 
     /** The root class of the Ogre system.
 
-            The Ogre::Root class represents a starting point for the client
-            application. From here, the application can gain access to the
-            fundamentals of the system, namely the rendering systems
-            available, management of saved configurations, logging, and
-            access to other classes in the system. Acts as a hub from which
-            all other objects may be reached. An instance of Root must be
-            created before any other Ogre operations are called. Once an
-            instance has been created, the same instance is accessible
-            throughout the life of that object by using Root::getSingleton
-            (as a reference) or Root::getSingletonPtr (as a pointer).
+        The Ogre::Root class represents a starting point for the client
+        application. From here, the application can gain access to the
+        fundamentals of the system, namely the rendering systems
+        available, management of saved configurations, logging, and
+        access to other classes in the system. Acts as a hub from which
+        all other objects may be reached. An instance of Root must be
+        created before any other Ogre operations are called. Once an
+        instance has been created, the same instance is accessible
+        throughout the life of that object by using Root::getSingleton
+        (as a reference) or Root::getSingletonPtr (as a pointer).
     */
     class _OgreExport Root : public Singleton<Root>, public RootAlloc
     {
@@ -222,16 +222,16 @@ namespace Ogre
 
         /** Saves the details of the current configuration
 
-                Stores details of the current configuration so it may be
-                restored later on.
+            Stores details of the current configuration so it may be
+            restored later on.
         */
         void saveConfig(void);
 
         /** Checks for saved video/sound/etc settings
 
-                This method checks to see if there is a valid saved configuration
-                from a previous run. If there is, the state of the system will
-                be restored to that configuration.
+            This method checks to see if there is a valid saved configuration
+            from a previous run. If there is, the state of the system will
+            be restored to that configuration.
 
             @return
                 If a valid configuration was found, <b>true</b> is returned.
@@ -243,14 +243,14 @@ namespace Ogre
 
         /** Displays a dialog asking the user to choose system settings.
 
-                This method displays the default dialog allowing the user to
-                choose the rendering system, video mode etc. If there is are
-                any settings saved already, they will be restored automatically
-                before displaying the dialogue. When the user accepts a group of
-                settings, this will automatically call Root::setRenderSystem,
-                RenderSystem::setConfigOption and Root::saveConfig with the
-                user's choices. This is the easiest way to get the system
-                configured.
+            This method displays the default dialog allowing the user to
+            choose the rendering system, video mode etc. If there is are
+            any settings saved already, they will be restored automatically
+            before displaying the dialogue. When the user accepts a group of
+            settings, this will automatically call Root::setRenderSystem,
+            RenderSystem::setConfigOption and Root::saveConfig with the
+            user's choices. This is the easiest way to get the system
+            configured.
             @param dialog ConfigDialog implementation to use.
                 If NULL, the first available render system with the default options
                 will be selected.
@@ -264,22 +264,22 @@ namespace Ogre
 
         /** Adds a new rendering subsystem to the list of available renderers.
 
-                Intended for use by advanced users and plugin writers only!
-                Calling this method with a pointer to a valid RenderSystem
-                (subclass) adds a rendering API implementation to the list of
-                available ones. Typical examples would be an OpenGL
-                implementation and a Direct3D implementation.
+            Intended for use by advanced users and plugin writers only!
+            Calling this method with a pointer to a valid RenderSystem
+            (subclass) adds a rendering API implementation to the list of
+            available ones. Typical examples would be an OpenGL
+            implementation and a Direct3D implementation.
             @note
-                <br>This should usually be called from the dllStartPlugin()
+                This should usually be called from the dllStartPlugin()
                 function of an extension plug-in.
         */
         void addRenderSystem(RenderSystem* newRend);
 
         /** Retrieve a list of the available render systems.
 
-                Retrieves a pointer to the list of available renderers as a
-                list of RenderSystem subclasses. Can be used to build a
-                custom settings dialog.
+            Retrieves a pointer to the list of available renderers as a
+            list of RenderSystem subclasses. Can be used to build a
+            custom settings dialog.
         */
         const RenderSystemList& getAvailableRenderers(void);
 
@@ -293,13 +293,13 @@ namespace Ogre
 
         /** Sets the rendering subsystem to be used.
 
-                This method indicates to OGRE which rendering system is to be
-                used (e.g. Direct3D, OpenGL etc). This is called
-                automatically by the default config dialog, and when settings
-                are restored from a previous configuration. If used manually
-                it could be used to set the renderer from a custom settings
-                dialog. Once this has been done, the renderer can be
-                initialised using Root::initialise.
+            This method indicates to OGRE which rendering system is to be
+            used (e.g. Direct3D, OpenGL etc). This is called
+            automatically by the default config dialog, and when settings
+            are restored from a previous configuration. If used manually
+            it could be used to set the renderer from a custom settings
+            dialog. Once this has been done, the renderer can be
+            initialised using Root::initialise.
             @par
                 This method is also called by render systems if they are
                 initialised directly.
@@ -316,9 +316,9 @@ namespace Ogre
 
         /** Initialises the renderer.
 
-                This method can only be called after a renderer has been
-                selected with Root::setRenderSystem, and it will initialise
-                the selected rendering system ready for use.
+            This method can only be called after a renderer has been
+            selected with Root::setRenderSystem, and it will initialise
+            the selected rendering system ready for use.
             @param
                 autoCreateWindow If true, a rendering window will
                 automatically be created (saving a call to
@@ -407,9 +407,9 @@ namespace Ogre
 
         /** Retrieves a reference to the current TextureManager.
 
-                This performs the same function as
-                TextureManager::getSingleton, but is provided for convenience
-                particularly to scripting engines.
+            This performs the same function as
+            TextureManager::getSingleton, but is provided for convenience
+            particularly to scripting engines.
             @par
                 Note that a TextureManager will NOT be available until the
                 Ogre system has been initialised by selecting a RenderSystem,
@@ -424,57 +424,49 @@ namespace Ogre
 
         /** Retrieves a reference to the current MeshManager.
 
-                This performs the same function as MeshManager::getSingleton
-                and is provided for convenience to scripting engines.
+            This performs the same function as MeshManager::getSingleton
+            and is provided for convenience to scripting engines.
         */
         MeshManager* getMeshManager(void);
 
         /** Registers a FrameListener which will be called back every frame.
 
-                A FrameListener is a class which implements methods which
-                will be called every frame.
+            A FrameListener is a class which implements methods which
+            will be called every frame.
             @par
                 See the FrameListener class for more details on the specifics
                 It is imperative that the instance passed to this method is
                 not destroyed before either the rendering loop ends, or the
                 class is removed from the listening list using
-                removeFrameListener.
+                removeFrameListener().
             @note
-                <br>This method can only be called after Root::initialise has
+                This method can only be called after Root::initialise has
                 been called.
-            @see
-                FrameListener, Root::removeFrameListener
         */
         void addFrameListener(FrameListener* newListener);
 
         /** Removes a FrameListener from the list of listening classes.
-            @see
-                FrameListener, Root::addFrameListener
         */
         void removeFrameListener(FrameListener* oldListener);
 
         /** Queues the end of rendering.
 
-                This method will do nothing unless startRendering() has
-                been called, in which case before the next frame is rendered
-                the rendering loop will bail out.
-            @see
-                Root, Root::startRendering
+            This method will do nothing unless startRendering() has
+            been called, in which case before the next frame is rendered
+            the rendering loop will bail out.
         */
         void queueEndRendering(bool state = true);
 
         /** Check for planned end of rendering.
 
-                This method return true if queueEndRendering() was called before.
-            @see
-                Root, Root::queueEndRendering, Root::startRendering
+            This method return true if queueEndRendering() was called before.
         */
         bool endRenderingQueued(void);
 
         /** Starts / restarts the automatic rendering cycle.
 
-                This method begins the automatic rendering of the scene. It
-                will <b>NOT</b> return until the rendering cycle is halted.
+            This method begins the automatic rendering of the scene. It
+            will <b>NOT</b> return until the rendering cycle is halted.
             @par
                 During rendering, any FrameListener classes registered using
                 addFrameListener will be called back for each frame that is
@@ -519,10 +511,10 @@ namespace Ogre
 
         /** Shuts down the system manually.
 
-                This is normally done by Ogre automatically so don't think
-                you have to call this yourself. However this is here for
-                convenience, especially for dealing with unexpected errors or
-                for systems which need to shut down Ogre on demand.
+            This is normally done by Ogre automatically so don't think
+            you have to call this yourself. However this is here for
+            convenience, especially for dealing with unexpected errors or
+            for systems which need to shut down Ogre on demand.
         */
         void shutdown(void);
 
@@ -568,8 +560,8 @@ namespace Ogre
 
         /** Retrieves a pointer to the window that was created automatically
 
-                When Root is initialised an optional window is created. This
-                method retrieves a pointer to that window.
+            When Root is initialised an optional window is created. This
+            method retrieves a pointer to that window.
             @note
                 returns a null pointer when Root has not been initialised with
                 the option of creating a window.

@@ -367,9 +367,9 @@ namespace Ogre {
     /** A grouping level underneath RenderQueue which groups renderables
     to be issued at coarsely the same time to the renderer.
 
-        Each instance of this class itself hold RenderPriorityGroup instances, 
-        which are the groupings of renderables by priority for fine control
-        of ordering (not required for most instances).
+    Each instance of this class itself hold RenderPriorityGroup instances,
+    which are the groupings of renderables by priority for fine control
+    of ordering (not required for most instances).
     */
     class _OgreExport RenderQueueGroup : public RenderQueueAlloc
     {

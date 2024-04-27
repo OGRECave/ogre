@@ -45,8 +45,8 @@ namespace Ogre {
 
     /** Class representing colour.
 
-            Colour is represented as 4 components, each of which is a
-            floating-point value from 0.0 to 1.0.
+        Colour is represented as 4 components, each of which is a
+        floating-point value from 0.0 to 1.0.
         @par
             The 3 'normal' colour components are red, green and blue, a higher
             number indicating greater amounts of that component in the colour.

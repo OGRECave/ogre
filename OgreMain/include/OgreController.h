@@ -44,10 +44,10 @@ namespace Ogre {
     
     /** Subclasses of this class are responsible for performing a function on an input value for a Controller.
 
-            This abstract class provides the interface that needs to be supported for a custom function which
-            can be 'plugged in' to a Controller instance, which controls some object value based on an input value.
-            For example, the WaveControllerFunction class provided by Ogre allows you to use various waveforms to
-            translate an input value to an output value.
+        This abstract class provides the interface that needs to be supported for a custom function which
+        can be 'plugged in' to a Controller instance, which controls some object value based on an input value.
+        For example, the WaveControllerFunction class provided by Ogre allows you to use various waveforms to
+        translate an input value to an output value.
         @par
             You are free to create your own subclasses in order to define any function you wish.
     */
@@ -107,11 +107,11 @@ namespace Ogre {
 
     /** Instances of this class 'control' the value of another object in the system.
 
-            Controller classes are used to manage the values of object automatically based
-            on the value of some input. For example, a Controller could animate a texture
-            by controlling the current frame of the texture based on time, or a different Controller
-            could change the colour of a material used for a spaceship shield mesh based on the remaining
-            shield power level of the ship.
+        Controller classes are used to manage the values of object automatically based
+        on the value of some input. For example, a Controller could animate a texture
+        by controlling the current frame of the texture based on time, or a different Controller
+        could change the colour of a material used for a spaceship shield mesh based on the remaining
+        shield power level of the ship.
         @par
             The Controller is an intentionally abstract concept - it can generate values
             based on input and a function, which can either be one of the standard ones
@@ -143,8 +143,8 @@ namespace Ogre {
 
         /** Usual constructor.
 
-                Requires source and destination values, and a function object. None of these are destroyed
-                with the Controller when it is deleted (they can be shared) so you must delete these as appropriate.
+            Requires source and destination values, and a function object. None of these are destroyed
+            with the Controller when it is deleted (they can be shared) so you must delete these as appropriate.
         */
         Controller(const SharedPtr< ControllerValue<T> >& src, 
             const SharedPtr< ControllerValue<T> >& dest, const SharedPtr< ControllerFunction<T> >& func)

@@ -51,8 +51,10 @@ namespace Ogre {
     */
     /** Defines a plane in 3D space.
 
-            A plane is defined in 3D space by the equation
-            Ax + By + Cz + D = 0
+        A plane is defined in 3D space by the equation
+        ```
+        Ax + By + Cz + D = 0
+        ```
         @par
             This equates to a vector (the normal of the plane, whose x, y
             and z components equate to the coefficients A, B and C
@@ -206,8 +208,8 @@ namespace Ogre {
 
         /** Normalises the plane.
 
-                This method normalises the plane's normal and the length scale of d
-                is as well.
+            This method normalises the plane's normal and the length scale of d
+            is as well.
             @note
                 This function will not crash for zero-sized vectors, but there
                 will be no changes made to their components.

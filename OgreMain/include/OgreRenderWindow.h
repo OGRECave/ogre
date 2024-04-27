@@ -40,24 +40,22 @@ namespace Ogre
     */
     /** Manages the target rendering window.
 
-            This class handles a window into which the contents
-            of a scene are rendered. There is a many-to-1 relationship
-            between instances of this class an instance of RenderSystem
-            which controls the rendering of the scene. There may be
-            more than one window in the case of level editor tools etc.
-            This class is abstract since there may be
-            different implementations for different windowing systems.
+        This class handles a window into which the contents
+        of a scene are rendered. There is a many-to-1 relationship
+        between instances of this class an instance of RenderSystem
+        which controls the rendering of the scene. There may be
+        more than one window in the case of level editor tools etc.
+        This class is abstract since there may be
+        different implementations for different windowing systems.
 
-            Instances are created and communicated with by the render system
-            although client programs can get a reference to it from
-            the render system if required for resizing or moving.
-            Note that you can have multiple viewpoints
-            in the window for effects like rear-view mirrors and
-            picture-in-picture views (see Viewport and Camera).
+        Instances are created and communicated with by the render system
+        although client programs can get a reference to it from
+        the render system if required for resizing or moving.
+        Note that you can have multiple viewpoints
+        in the window for effects like rear-view mirrors and
+        picture-in-picture views (see Viewport and Camera).
         @author
             Steven Streeting
-        @version
-            1.0
     */
     class _OgreExport RenderWindow : public RenderTarget
     {

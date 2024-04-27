@@ -141,16 +141,6 @@ namespace Ogre
         void _findVisibleObjects ( Camera * cam,
             VisibleObjectsBoundsInfo* visibleBounds, bool onlyShadowCasters ) override;
 
-        /** Creates a light for use in the scene.
-
-                Lights can either be in a fixed position and independent of the
-                scene graph, or they can be attached to SceneNodes so they derive
-                their position from the parent node. Either way, they are created
-                using this method so that the SceneManager manages their
-                existence.
-            @param
-                name The name of the new light, to identify it later.
-        */
         Light* createLight(const String& name) override;
 
         /** Returns a pointer to the named Light which has previously been added to the scene.
@@ -162,10 +152,6 @@ namespace Ogre
         */
         bool hasLight(const String& name) const override;
 
-        /** Removes the named light from the scene and destroys it.
-
-                Any pointers held to this light after calling this method will be invalid.
-        */
         void destroyLight(const String& name) override;
 
         /** Removes and destroys all lights in the scene.

@@ -47,14 +47,14 @@ namespace Ogre {
             This gives you time between frame start & frame end,
             and between frame end and next frame start.
 
-                This may not be the elapsed time but the average
+            @note This may not be the elapsed time but the average
                 elapsed time between recently fired events.
         */
         Real timeSinceLastEvent;
         /** Elapsed time in seconds since the last event of the same type,
             i.e. time for a complete frame.
 
-                This may not be the elapsed time but the average
+            @note  This may not be the elapsed time but the average
                 elapsed time between recently fired events of the same type.
         */
         Real timeSinceLastFrame;
@@ -64,17 +64,17 @@ namespace Ogre {
     /** A interface class defining a listener which can be used to receive
         notifications of frame events.
 
-            A 'listener' is an interface designed to be called back when
-            particular events are called. This class defines the
-            interface relating to frame events. In order to receive
-            notifications of frame events, you should create a subclass of
-            FrameListener and override the methods for which you would like
-            to customise the resulting processing. You should then call
-            Root::addFrameListener passing an instance of this class.
-            There is no limit to the number of frame listeners you can register,
-            allowing you to register multiple listeners for different purposes.
-            Note that a frame event occurs once for all rendering targets,
-            not once per target.
+        A 'listener' is an interface designed to be called back when
+        particular events are called. This class defines the
+        interface relating to frame events. In order to receive
+        notifications of frame events, you should create a subclass of
+        FrameListener and override the methods for which you would like
+        to customise the resulting processing. You should then call
+        Root::addFrameListener passing an instance of this class.
+        There is no limit to the number of frame listeners you can register,
+        allowing you to register multiple listeners for different purposes.
+        Note that a frame event occurs once for all rendering targets,
+        not once per target.
     */
     class _OgreExport FrameListener
     {

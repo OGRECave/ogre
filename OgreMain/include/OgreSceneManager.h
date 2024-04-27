@@ -1120,8 +1120,8 @@ namespace Ogre {
 
         /** Removes a camera from the scene.
 
-                This method removes an camera from the scene based on the
-                camera's name rather than a pointer.
+            This method removes an camera from the scene based on the
+            camera's name rather than a pointer.
         */
         void destroyCamera(const String& name);
 
@@ -1222,7 +1222,7 @@ namespace Ogre {
 
         /** Removes the light from the scene and destroys it.
 
-                Any pointers held to this light after calling this method will be invalid.
+            Any pointers held to this light after calling this method will be invalid.
         */
         virtual void destroyLight(const String& name) { destroyMovableObject(name, MOT_LIGHT); }
 
@@ -3283,7 +3283,7 @@ namespace Ogre {
         /**
         Remove a level of detail listener.
 
-            Do not call from inside an LodListener callback method.
+        Do not call from inside an LodListener callback method.
         */
         void removeLodListener(LodListener *listener);
 

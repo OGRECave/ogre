@@ -306,14 +306,12 @@ namespace Ogre {
     enum SortMode : uint8
     {
 
-        /** Sort by direction of the camera
-         *
+        /** Sort by direction of the camera.
          * The distance along the camera view as in `cam->getDerivedDirection().dotProduct(diff)`
          * Best for @ref PT_ORTHOGRAPHIC
          */
         SM_DIRECTION,
-        /** Sort by distance from the camera
-         *
+        /** Sort by distance from the camera.
          * The euclidean distance as in `diff.squaredLength()`
          * Best for @ref PT_PERSPECTIVE
          */

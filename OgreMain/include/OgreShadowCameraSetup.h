@@ -78,8 +78,8 @@ namespace Ogre {
 
     /** Implements default shadow camera setup
 
-            This implements the default shadow camera setup algorithm.  This is what might
-            be referred to as "normal" shadow mapping.  
+        This implements the default shadow camera setup algorithm.  This is what might
+        be referred to as "normal" shadow mapping.
     */
     class _OgreExport DefaultShadowCameraSetup : public ShadowCameraSetup
     {

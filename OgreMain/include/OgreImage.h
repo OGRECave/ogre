@@ -48,10 +48,10 @@ namespace Ogre {
     };
     /** Class representing an image file.
 
-            The Image class usually holds uncompressed image data and is the
-            only object that can be loaded in a texture. Image  objects handle 
-            image data decoding themselves by the means of locating the correct 
-            Codec object for each data type.
+        The Image class usually holds uncompressed image data and is the
+        only object that can be loaded in a texture. Image  objects handle
+        image data decoding themselves by the means of locating the correct
+        Codec object for each data type.
         @par
             Typically, you would want to use an Image object to load a texture
             when extra processing needs to be done on an image before it is
@@ -99,47 +99,47 @@ namespace Ogre {
 
         /** Flips (mirrors) the image around the Y-axis. 
 
-                An example of an original and flipped image:
-                <pre>                
-                originalimg
-                00000000000
-                00000000000
-                00000000000
-                00000000000
-                00000000000
-                ------------> flip axis
-                00000000000
-                00000000000
-                00000000000
-                00000000000
-                00000000000
-                originalimg
-                </pre>
+            An example of an original and flipped image:
+            <pre>
+            originalimg
+            00000000000
+            00000000000
+            00000000000
+            00000000000
+            00000000000
+            ------------> flip axis
+            00000000000
+            00000000000
+            00000000000
+            00000000000
+            00000000000
+            originalimg
+            </pre>
         */
         Image & flipAroundY();
 
         /** Flips (mirrors) the image around the X-axis.
 
-                An example of an original and flipped image:
-                <pre>
-                        flip axis
-                            |
-                originalimg|gmilanigiro
-                00000000000|00000000000
-                00000000000|00000000000
-                00000000000|00000000000
-                00000000000|00000000000
-                00000000000|00000000000
-                </pre>
+            An example of an original and flipped image:
+            <pre>
+                   flip axis
+                       |
+            originalimg|gmilanigiro
+            00000000000|00000000000
+            00000000000|00000000000
+            00000000000|00000000000
+            00000000000|00000000000
+            00000000000|00000000000
+            </pre>
         */                 
         Image & flipAroundX();
 
         /** Stores a pointer to raw data in memory. The pixel format has to be specified.
 
-                This method loads an image into memory held in the object. The 
-                pixel format will be either greyscale or RGB with an optional
-                Alpha component.
-                The type can be determined by calling getFormat().             
+            This method loads an image into memory held in the object. The
+            pixel format will be either greyscale or RGB with an optional
+            Alpha component.
+            The type can be determined by calling getFormat().
             @note
                 Whilst typically your image is likely to be a simple 2D image,
                 you can define complex images including cube maps, volume maps,
@@ -191,7 +191,7 @@ namespace Ogre {
         /** Loads raw data from a stream. See the function
             loadDynamicImage for a description of the parameters.
 
-                The size of the buffer must be numFaces * PixelUtil::getMemorySize(width, height, depth, format)
+            The size of the buffer must be numFaces * PixelUtil::getMemorySize(width, height, depth, format)
             @note
                 Whilst typically your image is likely to be a simple 2D image,
                 you can define complex images including cube maps
@@ -217,11 +217,11 @@ namespace Ogre {
 
         /** Loads an image file.
 
-                This method loads an image into memory. Any format for which 
-                an associated ImageCodec is registered can be loaded. 
-                This can include complex formats like DDS with embedded custom 
-                mipmaps, cube faces and volume textures.
-                The type can be determined by calling getFormat().             
+            This method loads an image into memory. Any format for which
+            an associated ImageCodec is registered can be loaded.
+            This can include complex formats like DDS with embedded custom
+            mipmaps, cube faces and volume textures.
+            The type can be determined by calling getFormat().
             @param
                 filename Name of an image file to load.
             @param
@@ -234,15 +234,15 @@ namespace Ogre {
 
         /** Loads an image file from a stream.
 
-                This method works in the same way as the filename-based load 
-                method except it loads the image from a DataStream object. 
-                This DataStream is expected to contain the 
-                encoded data as it would be held in a file. 
-                Any format for which an associated ImageCodec is registered 
-                can be loaded. 
-                This can include complex formats like DDS with embedded custom 
-                mipmaps, cube faces and volume textures.
-                The type can be determined by calling getFormat().             
+            This method works in the same way as the filename-based load
+            method except it loads the image from a DataStream object.
+            This DataStream is expected to contain the
+            encoded data as it would be held in a file.
+            Any format for which an associated ImageCodec is registered
+            can be loaded.
+            This can include complex formats like DDS with embedded custom
+            mipmaps, cube faces and volume textures.
+            The type can be determined by calling getFormat().
             @param
                 stream The source data.
             @param
@@ -432,7 +432,7 @@ namespace Ogre {
             @param  src         PixelBox containing the source pointer, dimensions and format
             @param  dst         PixelBox containing the destination pointer, dimensions and format
             @param  filter      Which filter to use
-            @remarks    This function can do pixel format conversion in the process.
+            This function can do pixel format conversion in the process.
             @note   dst and src can point to the same PixelBox object without any problem
         */
         static void scale(const PixelBox &src, const PixelBox &dst, Filter filter = FILTER_BILINEAR);

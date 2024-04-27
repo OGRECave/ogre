@@ -49,12 +49,12 @@ namespace Ogre {
     /** This utility class is used to hold the information used to generate the matrices
     and other information required to automatically populate GpuProgramParameters.
 
-        This class exercises a lazy-update scheme in order to avoid having to update all
-        the information a GpuProgramParameters class could possibly want all the time. 
-        It relies on the SceneManager to update it when the base data has changed, and
-        will calculate concatenated matrices etc only when required, passing back precalculated
-        matrices when they are requested more than once when the underlying information has
-        not altered.
+    This class exercises a lazy-update scheme in order to avoid having to update all
+    the information a GpuProgramParameters class could possibly want all the time.
+    It relies on the SceneManager to update it when the base data has changed, and
+    will calculate concatenated matrices etc only when required, passing back precalculated
+    matrices when they are requested more than once when the underlying information has
+    not altered.
     */
     class _OgreExport AutoParamDataSource : public SceneMgtAlloc
     {

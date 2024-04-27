@@ -182,7 +182,7 @@ namespace Ogre {
         /** Takes a value with a given src bit mask, and produces another
             value with a desired bit mask.
 
-                This routine is useful for colour conversion.
+            This routine is useful for colour conversion.
         */
         template<typename SrcT, typename DestT>
         static inline DestT convertBitPattern(SrcT srcValue, SrcT srcBitMask, DestT destBitMask)

@@ -88,18 +88,18 @@ namespace Ogre
 
         /** Generates a vector perpendicular to this vector (eg an 'up' vector).
 
-                This method will return a vector which is perpendicular to this
-                vector. There are an infinite number of possibilities but this
-                method will guarantee to generate one of them. If you need more
-                control you should use the Quaternion class.
+            This method will return a vector which is perpendicular to this
+            vector. There are an infinite number of possibilities but this
+            method will guarantee to generate one of them. If you need more
+            control you should use the Quaternion class.
         */
         Vector2 perpendicular(void) const;
 
         /** Generates a new random vector which deviates from this vector by a
             given angle in a random direction.
 
-                This method assumes that the random number generator has already
-                been seeded appropriately.
+            This method assumes that the random number generator has already
+            been seeded appropriately.
             @param angle
                 The angle at which to deviate in radians
             @return
@@ -136,10 +136,10 @@ namespace Ogre
         /** Calculates the cross-product of 2 vectors, i.e. the vector that
             lies perpendicular to them both.
 
-                The cross-product is normally used to calculate the normal
-                vector of a plane, by calculating the cross-product of 2
-                non-equivalent vectors which lie on the plane (e.g. 2 edges
-                of a triangle).
+            The cross-product is normally used to calculate the normal
+            vector of a plane, by calculating the cross-product of 2
+            non-equivalent vectors which lie on the plane (e.g. 2 edges
+            of a triangle).
             @param rkVector
                 Vector which, together with this one, will be used to
                 calculate the cross-product.
@@ -165,17 +165,17 @@ namespace Ogre
 
         /** Generates a vector perpendicular to this vector (eg an 'up' vector).
 
-                This method will return a vector which is perpendicular to this
-                vector. There are an infinite number of possibilities but this
-                method will guarantee to generate one of them. If you need more
-                control you should use the Quaternion class.
+            This method will return a vector which is perpendicular to this
+            vector. There are an infinite number of possibilities but this
+            method will guarantee to generate one of them. If you need more
+            control you should use the Quaternion class.
         */
         Vector3 perpendicular(void) const;
 
         /** Calculates the absolute dot (scalar) product of this vector with another.
 
-                This function work similar dotProduct, except it use absolute value
-                of each component of the vector to computing.
+            This function work similar dotProduct, except it use absolute value
+            of each component of the vector to computing.
             @param
                 vec Vector with which to calculate the absolute dot product (together
                 with this one).
@@ -195,8 +195,8 @@ namespace Ogre
         /** Generates a new random vector which deviates from this vector by a
             given angle in a random direction.
 
-                This method assumes that the random number generator has already
-                been seeded appropriately.
+            This method assumes that the random number generator has already
+            been seeded appropriately.
             @param
                 angle The angle at which to deviate
             @param
@@ -381,9 +381,9 @@ namespace Ogre
         /** Sets this vector's components to the minimum of its own and the
             ones of the passed in vector.
 
-                'Minimum' in this case means the combination of the lowest
-                value of x, y and z from both vectors. Lowest is taken just
-                numerically, not magnitude, so -1 < 0.
+            'Minimum' in this case means the combination of the lowest
+            value of x, y and z from both vectors. Lowest is taken just
+            numerically, not magnitude, so -1 < 0.
         */
         void makeFloor(const Vector& cmp)
         {
@@ -395,9 +395,9 @@ namespace Ogre
         /** Sets this vector's components to the maximum of its own and the
             ones of the passed in vector.
 
-                'Maximum' in this case means the combination of the highest
-                value of x, y and z from both vectors. Highest is taken just
-                numerically, not magnitude, so 1 > -3.
+            'Maximum' in this case means the combination of the highest
+            value of x, y and z from both vectors. Highest is taken just
+            numerically, not magnitude, so 1 > -3.
         */
         void makeCeil(const Vector& cmp)
         {
@@ -408,12 +408,12 @@ namespace Ogre
 
         /** Calculates the dot (scalar) product of this vector with another.
 
-                The dot product can be used to calculate the angle between 2
-                vectors. If both are unit vectors, the dot product is the
-                cosine of the angle; otherwise the dot product must be
-                divided by the product of the lengths of both vectors to get
-                the cosine of the angle. This result can further be used to
-                calculate the distance of a point from a plane.
+            The dot product can be used to calculate the angle between 2
+            vectors. If both are unit vectors, the dot product is the
+            cosine of the angle; otherwise the dot product must be
+            divided by the product of the lengths of both vectors to get
+            the cosine of the angle. This result can further be used to
+            calculate the distance of a point from a plane.
             @param
                 vec Vector with which to calculate the dot product (together
                 with this one).
@@ -430,13 +430,13 @@ namespace Ogre
 
         /** Returns the square of the length(magnitude) of the vector.
 
-                This  method is for efficiency - calculating the actual
-                length of a vector requires a square root, which is expensive
-                in terms of the operations required. This method returns the
-                square of the length of the vector, i.e. the same as the
-                length but before the square root is taken. Use this if you
-                want to find the longest / shortest vector without incurring
-                the square root.
+            This  method is for efficiency - calculating the actual
+            length of a vector requires a square root, which is expensive
+            in terms of the operations required. This method returns the
+            square of the length of the vector, i.e. the same as the
+            length but before the square root is taken. Use this if you
+            want to find the longest / shortest vector without incurring
+            the square root.
         */
         T squaredLength() const { return dotProduct(*this); }
 
@@ -469,13 +469,13 @@ namespace Ogre
 
         /** Returns the square of the distance to another vector.
 
-                This method is for efficiency - calculating the actual
-                distance to another vector requires a square root, which is
-                expensive in terms of the operations required. This method
-                returns the square of the distance to another vector, i.e.
-                the same as the distance but before the square root is taken.
-                Use this if you want to find the longest / shortest distance
-                without incurring the square root.
+            This method is for efficiency - calculating the actual
+            distance to another vector requires a square root, which is
+            expensive in terms of the operations required. This method
+            returns the square of the distance to another vector, i.e.
+            the same as the distance but before the square root is taken.
+            Use this if you want to find the longest / shortest distance
+            without incurring the square root.
         */
         T squaredDistance(const Vector& rhs) const
         {
@@ -484,8 +484,8 @@ namespace Ogre
 
         /** Normalises the vector.
 
-                This method normalises the vector such that it's
-                length / magnitude is 1. The result is called a unit vector.
+            This method normalises the vector such that it's
+            length / magnitude is 1. The result is called a unit vector.
             @note
                 This function will not crash for zero-sized vectors, but there
                 will be no changes made to their components.
@@ -548,7 +548,7 @@ namespace Ogre
         }
 
         /** Calculates a reflection vector to the plane with the given normal .
-        @remarks NB assumes 'this' is pointing AWAY FROM the plane, invert if it is not.
+        @note assumes 'this' is pointing AWAY FROM the plane, invert if it is not.
         */
         Vector reflect(const Vector& normal) const { return *this - (2 * dotProduct(normal) * normal); }
 

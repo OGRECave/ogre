@@ -49,10 +49,10 @@ namespace Ogre {
 
     /** List of valid texture blending operations, for use with TextureUnitState::setColourOperation.
 
-            This list is a more limited list than LayerBlendOperationEx because it only
-            includes operations that are supportable in both multipass and multitexture
-            rendering and thus provides automatic fallback if multitexture hardware
-            is lacking or insufficient.
+        This list is a more limited list than LayerBlendOperationEx because it only
+        includes operations that are supportable in both multipass and multitexture
+        rendering and thus provides automatic fallback if multitexture hardware
+        is lacking or insufficient.
     */
     enum LayerBlendOperation {
         /// Replace all colour with texture with no adjustment
@@ -124,12 +124,12 @@ namespace Ogre {
     };
     /** Class which manages blending of both colour and alpha components.
 
-            This class is a utility class used by both TextureUnitState and
-            RenderSystem to wrap up the details of a blending operation. This blending
-            operation could be used for blending colour or alpha in a texture layer.
-            This class is really only for use by OGRE, since apps can deal with
-            blending modes through the TextureUnitState class methods
-            setColourOperation and setAlphaOperation.
+        This class is a utility class used by both TextureUnitState and
+        RenderSystem to wrap up the details of a blending operation. This blending
+        operation could be used for blending colour or alpha in a texture layer.
+        This class is really only for use by OGRE, since apps can deal with
+        blending modes through the TextureUnitState class methods
+        setColourOperation and setAlphaOperation.
         @par
             It's worth noting that these operations are for blending <i>between texture
             layers</i> and not between rendered objects and the existing scene. If

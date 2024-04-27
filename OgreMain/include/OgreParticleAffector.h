@@ -44,9 +44,9 @@ namespace Ogre {
     */
 /** Abstract class defining the interface to be implemented by particle affectors.
 
-        Particle affectors modify particles in a particle system over their lifetime. They can be
-        grouped into types, e.g. 'vector force' affectors, 'fader' affectors etc; each type will 
-        modify particles in a different way, using different parameters.
+    Particle affectors modify particles in a particle system over their lifetime. They can be
+    grouped into types, e.g. 'vector force' affectors, 'fader' affectors etc; each type will
+    modify particles in a different way, using different parameters.
     @par
         Because there are so many types of affectors you could use, OGRE chooses not to dictate
         the available types. It comes with some in-built, but allows plugins or applications to extend the affector types available.
