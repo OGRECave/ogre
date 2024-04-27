@@ -45,8 +45,8 @@ namespace Ogre {
     */
     /** Class for quickly loading settings from a text file.
 
-            This class is designed to quickly parse a simple file containing
-            key/value pairs, mainly for use in configuration settings.
+        This class is designed to quickly parse a simple file containing
+        key/value pairs, mainly for use in configuration settings.
         @par
             This is a very simplified approach, no multiple values per key
             are allowed, no grouping or context is being kept etc.

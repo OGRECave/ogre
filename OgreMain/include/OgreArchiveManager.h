@@ -64,8 +64,8 @@ namespace Ogre {
 
         /** Opens an archive for file reading.
 
-                The archives are created using class factories within
-                extension libraries.
+            The archives are created using class factories within
+            extension libraries.
             @param filename
                 The filename that will be opened
             @param archiveType
@@ -96,9 +96,9 @@ namespace Ogre {
 
         /** Adds a new ArchiveFactory to the list of available factories.
 
-                Plugin developers who add new archive codecs need to call
-                this after defining their ArchiveFactory subclass and
-                Archive subclasses for their archive type.
+            Plugin developers who add new archive codecs need to call
+            this after defining their ArchiveFactory subclass and
+            Archive subclasses for their archive type.
         */
         void addArchiveFactory(ArchiveFactory* factory);
         /// @copydoc Singleton::getSingleton()

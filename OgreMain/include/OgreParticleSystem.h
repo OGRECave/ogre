@@ -383,9 +383,9 @@ namespace Ogre {
 
         /** Sets the default dimensions of the particles in this set.
 
-                All particles in a set are created with these default dimensions. The set will render most efficiently if
-                all the particles in the set are the default size. It is possible to alter the size of individual
-                particles at the expense of extra calculation. See the Particle class for more info.
+            All particles in a set are created with these default dimensions. The set will render most efficiently if
+            all the particles in the set are the default size. It is possible to alter the size of individual
+            particles at the expense of extra calculation. See the Particle class for more info.
             @param width
                 The new default width for the particles in this set. Must be non-negative!
             @param height

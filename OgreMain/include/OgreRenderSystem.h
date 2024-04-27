@@ -158,8 +158,6 @@ namespace Ogre
     of exactly which 3D API is in use.
     @author
     Steven Streeting
-    @version
-    1.0
     */
     class _OgreExport RenderSystem : public RenderSysAlloc
     {
@@ -460,7 +458,7 @@ namespace Ogre
         /** Retrieves an existing DepthBuffer or creates a new one suited for the given RenderTarget
             and sets it.
 
-                RenderTarget's pool ID is respected. @see RenderTarget::setDepthBufferPool()
+            RenderTarget's pool ID is respected. @see RenderTarget::setDepthBufferPool()
         */
         void setDepthBufferFor( RenderTarget *renderTarget );
 
@@ -610,19 +608,19 @@ namespace Ogre
 
         /** Creates a DepthBuffer that can be attached to the specified RenderTarget
 
-                It doesn't attach anything, it just returns a pointer to a new DepthBuffer
-                Caller is responsible for putting this buffer into the right pool, for
-                attaching, and deleting it. Here's where API-specific magic happens.
-                Don't call this directly unless you know what you're doing.
+            It doesn't attach anything, it just returns a pointer to a new DepthBuffer
+            Caller is responsible for putting this buffer into the right pool, for
+            attaching, and deleting it. Here's where API-specific magic happens.
+            Don't call this directly unless you know what you're doing.
         */
         virtual DepthBuffer* _createDepthBufferFor( RenderTarget *renderTarget ) = 0;
 
         /** Removes all depth buffers. Should be called on device lost and shutdown
 
-                Advanced users can call this directly with bCleanManualBuffers=false to
-                remove all depth buffers created for RTTs; when they think the pool has
-                grown too big or they've used lots of depth buffers they don't need anymore,
-                freeing GPU RAM.
+            Advanced users can call this directly with bCleanManualBuffers=false to
+            remove all depth buffers created for RTTs; when they think the pool has
+            grown too big or they've used lots of depth buffers they don't need anymore,
+            freeing GPU RAM.
         */
         void _cleanupDepthBuffers( bool bCleanManualBuffers=true );
 

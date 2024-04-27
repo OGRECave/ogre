@@ -50,11 +50,9 @@ namespace Ogre
         (lower memory consumption and basic culling) techniques
 
 
-            Design discussion webpage: http://www.ogre3d.org/forums/viewtopic.php?f=4&t=59902
+        Design discussion webpage: http://www.ogre3d.org/forums/viewtopic.php?f=4&t=59902
         @author
             Matias N. Goldberg ("dark_sylinc")
-        @version
-            1.2
      */
     class _OgreExport InstanceBatchHW_VTF : public BaseInstanceBatchVTF
     {

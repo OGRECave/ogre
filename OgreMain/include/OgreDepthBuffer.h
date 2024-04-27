@@ -60,17 +60,17 @@ namespace Ogre
 
         Behavior is consistent across all render systems, if, and only if, the same RSC flags are set
         RSC flags that affect this class are:
-            * RSC_RTT_MAIN_DEPTHBUFFER_ATTACHABLE:
-                some APIs (ie. OpenGL w/ FBO) don't allow using
-                the main depth buffer for offscreen RTTs. When this flag is set, the depth buffer can be
-                shared between the main window and an RTT.
-            * RSC_RTT_DEPTHBUFFER_RESOLUTION_LESSEQUAL:
-                When this flag isn't set, the depth buffer can only be shared across RTTs who have the EXACT
-                same resolution. When it's set, it can be shared with RTTs as long as they have a
-                resolution less or equal than the depth buffer's.
+        - #RSC_RTT_MAIN_DEPTHBUFFER_ATTACHABLE:
+        some APIs (ie. OpenGL w/ FBO) don't allow using
+        the main depth buffer for offscreen RTTs. When this flag is set, the depth buffer can be
+        shared between the main window and an RTT.
+        - #RSC_RTT_DEPTHBUFFER_RESOLUTION_LESSEQUAL:
+        When this flag isn't set, the depth buffer can only be shared across RTTs who have the EXACT
+        same resolution. When it's set, it can be shared with RTTs as long as they have a
+        resolution less or equal than the depth buffer's.
 
 
-            Design discussion http://www.ogre3d.org/forums/viewtopic.php?f=4&t=53534&p=365582
+        Design discussion http://www.ogre3d.org/forums/viewtopic.php?f=4&t=53534&p=365582
      */
     class _OgreExport DepthBuffer : public RenderSysAlloc
     {
@@ -102,26 +102,26 @@ namespace Ogre
         /** Returns whether the specified RenderTarget is compatible with this DepthBuffer
             That is, this DepthBuffer can be attached to that RenderTarget
 
-                Most APIs impose the following restrictions:
-                Width & height must be equal or higher than the render target's
-                They must be of the same bit depth.
-                They need to have the same FSAA setting
+            Most APIs impose the following restrictions:
+            - Width & height must be equal or higher than the render target's
+            - They must be of the same bit depth.
+            - They need to have the same FSAA setting
             @param renderTarget The render target to test against
         */
         virtual bool isCompatible( RenderTarget *renderTarget ) const;
 
         /** Called when a RenderTarget is attaches this DepthBuffer
 
-                This function doesn't actually attach. It merely informs the DepthBuffer
-                which RenderTarget did attach. The real attachment happens in
-                RenderTarget::attachDepthBuffer()
+            This function doesn't actually attach. It merely informs the DepthBuffer
+            which RenderTarget did attach. The real attachment happens in
+            RenderTarget::attachDepthBuffer()
             @param renderTarget The RenderTarget that has just been attached
         */
         virtual void _notifyRenderTargetAttached( RenderTarget *renderTarget );
 
         /** Called when a RenderTarget is detaches from this DepthBuffer
 
-                Same as DepthBuffer::_notifyRenderTargetAttached()
+            Same as DepthBuffer::_notifyRenderTargetAttached()
             @param renderTarget The RenderTarget that has just been detached
         */
         virtual void _notifyRenderTargetDetached( RenderTarget *renderTarget );

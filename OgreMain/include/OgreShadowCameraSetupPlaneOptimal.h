@@ -43,19 +43,19 @@ namespace Ogre {
     */
     /** Implements the plane optimal shadow camera algorithm.
 
-            Given a plane of interest, it is possible to set up the shadow camera
-            matrix such that the mapping between screen and shadow map is the identity
-            (when restricted to pixels that view the plane of interest).  Therefore,
-            if the shadow map resolution matches the screen space resolution (of the 
-            seen planar receiver), we can get pixel perfect shadowing on the plane. 
-            Off the plane, the shadowing is not guaranteed to be perfect and will 
-            likely exhibit the usual sampling artifacts associated with shadow mapping.
-        @note Important: this routine requires double-precision calculations. When you
+        Given a plane of interest, it is possible to set up the shadow camera
+        matrix such that the mapping between screen and shadow map is the identity
+        (when restricted to pixels that view the plane of interest).  Therefore,
+        if the shadow map resolution matches the screen space resolution (of the
+        seen planar receiver), we can get pixel perfect shadowing on the plane.
+        Off the plane, the shadowing is not guaranteed to be perfect and will
+        likely exhibit the usual sampling artifacts associated with shadow mapping.
+        @attention this routine requires double-precision calculations. When you
             are running under Direct3D, you must ensure that you set the floating
             point mode to 'Consistent' rather than 'Fastest' to ensure this precision.
             This does allegedly come with some performance cost but when measuring 
             it appears to be negligible in modern systems for normal usage.
-        @note Second important note: this projection also only works for lights with
+        @note this projection also only works for lights with
             a finite position. Therefore you cannot use it for directional lights
             at this time.
     */

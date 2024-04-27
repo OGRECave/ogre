@@ -102,9 +102,9 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     /** Predefined controller value for getting / setting a texture coordinate modifications (scales and translates).
 
-            Effects can be applied to the scale or the offset of the u or v coordinates, or both. If separate
-            modifications are required to u and v then 2 instances are required to control both independently, or 4
-            if you want separate u and v scales as well as separate u and v offsets.
+        Effects can be applied to the scale or the offset of the u or v coordinates, or both. If separate
+        modifications are required to u and v then 2 instances are required to control both independently, or 4
+        if you want separate u and v scales as well as separate u and v offsets.
         @par
             Because of the nature of this value, it can accept values outside the 0..1 parametric range.
     */
@@ -265,7 +265,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     /** Predefined controller function based on a waveform.
 
-            A waveform function translates parametric input to parametric output based on a wave.
+        A waveform function translates parametric input to parametric output based on a wave.
         @par
             Note that for simplicity of integration with the rest of the controller insfrastructure, the output of
             the wave is parametric i.e. 0..1, rather than the typical wave output of [-1,1]. To compensate for this, the

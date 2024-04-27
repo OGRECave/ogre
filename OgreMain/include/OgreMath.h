@@ -197,12 +197,12 @@ namespace Ogre
 
     /** Class to provide access to common mathematical functions.
 
-            Most of the maths functions are aliased versions of the C runtime
-            library functions. They are aliased here to provide future
-            optimisation opportunities, either from faster RTLs or custom
-            math approximations.
+        Most of the maths functions are aliased versions of the C runtime
+        library functions. They are aliased here to provide future
+        optimisation opportunities, either from faster RTLs or custom
+        math approximations.
         @note
-            <br>This is based on MgcMath.h from
+            This is based on MgcMath.h from
             <a href="http://www.geometrictools.com/">Wild Magic</a>.
     */
     class _OgreExport Math 
@@ -537,9 +537,9 @@ namespace Ogre
        /** Checks whether a given point is inside a triangle, in a
             2-dimensional (Cartesian) space.
 
-                The vertices of the triangle must be given in either
-                trigonometrical (anticlockwise) or inverse trigonometrical
-                (clockwise) order.
+            The vertices of the triangle must be given in either
+            trigonometrical (anticlockwise) or inverse trigonometrical
+            (clockwise) order.
             @param p
                 The point.
             @param a

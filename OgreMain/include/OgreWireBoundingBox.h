@@ -42,8 +42,8 @@ namespace Ogre {
     */
     /** Allows the rendering of a wireframe bounding box.
 
-            This class builds a wireframe renderable from a given aabb. A pointer to this class can be
-            added to a render queue to display the bounding box of an object.
+        This class builds a wireframe renderable from a given aabb. A pointer to this class can be
+        added to a render queue to display the bounding box of an object.
     */
     class _OgreExport WireBoundingBox : public SimpleRenderable
     {

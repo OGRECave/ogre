@@ -51,16 +51,16 @@ namespace Ogre {
     */
     /** Handles the management of mesh resources.
 
-            This class deals with the runtime management of
-            mesh data; like other resource managers it handles
-            the creation of resources (in this case mesh data),
-            working within a fixed memory budget.
+        This class deals with the runtime management of
+        mesh data; like other resource managers it handles
+        the creation of resources (in this case mesh data),
+        working within a fixed memory budget.
 
-            Ogre loads model files from it's own proprietary
-            format called .mesh. This is because having a single file
-            format is better for runtime performance, and we also have
-            control over pre-processed data (such as
-            collision boxes, LOD reductions etc). 
+        Ogre loads model files from it's own proprietary
+        format called .mesh. This is because having a single file
+        format is better for runtime performance, and we also have
+        control over pre-processed data (such as
+        collision boxes, LOD reductions etc).
     */
     class _OgreExport MeshManager: public ResourceManager, public Singleton<MeshManager>
     {

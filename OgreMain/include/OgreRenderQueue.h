@@ -82,8 +82,8 @@ namespace Ogre {
 
     /** Class to manage the scene object rendering queue.
 
-            Objects are grouped by material to minimise rendering state changes. The map from
-            material to renderable object is wrapped in a class for ease of use.
+        Objects are grouped by material to minimise rendering state changes. The map from
+        material to renderable object is wrapped in a class for ease of use.
         @par
             This class now includes the concept of 'queue groups' which allows the application
             adding the renderable to specifically schedule it so that it is included in 

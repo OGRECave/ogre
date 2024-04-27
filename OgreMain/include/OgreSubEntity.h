@@ -45,11 +45,11 @@ namespace Ogre {
     */
     /** Utility class which defines the sub-parts of an Entity.
 
-            Just as meshes are split into submeshes, an Entity is made up of
-            potentially multiple SubMeshes. These are mainly here to provide the
-            link between the Material which the SubEntity uses (which may be the
-            default Material for the SubMesh or may have been changed for this
-            object) and the SubMesh data.
+        Just as meshes are split into submeshes, an Entity is made up of
+        potentially multiple SubMeshes. These are mainly here to provide the
+        link between the Material which the SubEntity uses (which may be the
+        default Material for the SubMesh or may have been changed for this
+        object) and the SubMesh data.
         @par
             The SubEntity also allows the application some flexibility in the
             material properties for this section of a particular instance of this
@@ -127,9 +127,9 @@ namespace Ogre {
 
         /** Sets the name of the Material to be used.
 
-                By default a SubEntity uses the default Material that the SubMesh
-                uses. This call can alter that so that the Material is different
-                for this instance.
+            By default a SubEntity uses the default Material that the SubMesh
+            uses. This call can alter that so that the Material is different
+            for this instance.
         */
         void setMaterialName( const String& name, const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME );
 
@@ -226,9 +226,9 @@ namespace Ogre {
         /** Advanced method to get the temporarily blended vertex information
         for entities which are software skinned. 
 
-            Internal engine will eliminate software animation if possible, this
-            information is unreliable unless added request for software animation
-            via Entity::addSoftwareAnimationRequest.
+        Internal engine will eliminate software animation if possible, this
+        information is unreliable unless added request for software animation
+        via Entity::addSoftwareAnimationRequest.
         @note
             The positions/normals of the returned vertex data is in object space.
         */

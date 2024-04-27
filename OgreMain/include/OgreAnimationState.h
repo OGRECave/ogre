@@ -98,7 +98,7 @@ namespace Ogre {
         /** Modifies the time position, adjusting for animation length
         @param offset The amount of time, in seconds, to extend the animation.
 
-            This method loops at the edges if animation looping is enabled.
+        This method loops at the edges if animation looping is enabled.
         */
         void addTime(Real offset);
 

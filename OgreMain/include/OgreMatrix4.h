@@ -47,14 +47,14 @@ namespace Ogre
     Matrix4 operator*(const Matrix4 &m, const Matrix4 &m2);
     /** Class encapsulating a standard 4x4 homogeneous matrix.
 
-            OGRE uses column vectors when applying matrix multiplications,
-            This means a vector is represented as a single column, 4-row
-            matrix. This has the effect that the transformations implemented
-            by the matrices happens right-to-left e.g. if vector V is to be
-            transformed by M1 then M2 then M3, the calculation would be
-            M3 * M2 * M1 * V. The order that matrices are concatenated is
-            vital since matrix multiplication is not commutative, i.e. you
-            can get a different result if you concatenate in the wrong order.
+        OGRE uses column vectors when applying matrix multiplications,
+        This means a vector is represented as a single column, 4-row
+        matrix. This has the effect that the transformations implemented
+        by the matrices happens right-to-left e.g. if vector V is to be
+        transformed by M1 then M2 then M3, the calculation would be
+        M3 * M2 * M1 * V. The order that matrices are concatenated is
+        vital since matrix multiplication is not commutative, i.e. you
+        can get a different result if you concatenate in the wrong order.
         @par
             The use of column vectors and right-to-left ordering is the
             standard in most mathematical texts, and is the same as used in
@@ -540,8 +540,8 @@ namespace Ogre
 
     /** Vector transformation using '*'.
 
-            Transforms the given 3-D vector by the matrix, projecting the
-            result back into <i>w</i> = 1.
+        Transforms the given 3-D vector by the matrix, projecting the
+        result back into <i>w</i> = 1.
         @note
             This means that the initial <i>w</i> is considered to be 1.0,
             and then all the tree elements of the resulting 3-D vector are

@@ -351,8 +351,8 @@ namespace Ogre
         @param pageID The ID of the page being requested
         @param section The parent section to which this page will belong
 
-            The StreamSerialiser returned is the responsibility of the caller to
-            delete. 
+        The StreamSerialiser returned is the responsibility of the caller to
+        delete.
         */
         StreamSerialiser* _readPageStream(PageID pageID, PagedWorldSection* section);
 

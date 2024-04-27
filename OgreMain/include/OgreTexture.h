@@ -121,12 +121,12 @@ namespace Ogre {
 
     /** Abstract class representing a Texture resource.
 
-            The actual concrete subclass which will exist for a texture
-            is dependent on the rendering system in use (Direct3D, OpenGL etc).
-            This class represents the commonalities, and is the one 'used'
-            by programmers even though the real implementation could be
-            different in reality. Texture objects are created through
-            the 'create' method of the TextureManager concrete subclass.
+        The actual concrete subclass which will exist for a texture
+        is dependent on the rendering system in use (Direct3D, OpenGL etc).
+        This class represents the commonalities, and is the one 'used'
+        by programmers even though the real implementation could be
+        different in reality. Texture objects are created through
+        the 'create' method of the TextureManager concrete subclass.
      */
     class _OgreExport Texture : public Resource
     {

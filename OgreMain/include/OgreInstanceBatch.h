@@ -46,22 +46,23 @@ namespace Ogre
 
     /** InstanceBatch forms part of the new Instancing system
         This is an abstract class that must be derived to implement different instancing techniques
-        (@see InstanceManager::InstancingTechnique)
+        (@ref InstanceManager::InstancingTechnique)
         OGRE wasn't truly thought for instancing. OGRE assumes that either:
-            a. One MovableObject -> No Renderable
-            b. One MovableObject -> One Renderable
-            c. One MovableObject -> Many Renderable.
+            1. One MovableObject -> No Renderable
+            2. One MovableObject -> One Renderable
+            3. One MovableObject -> Many Renderable.
+
         However, instances work on reverse: Many MovableObject have the same Renderable.
         <b>Instancing is already difficult to cull by a CPU</b>, but the main drawback from this assumption
         is that it makes it even harder to take advantage from OGRE's culling capabilities
-        (i.e. @see OctreeSceneManager)
+        (i.e. @ref OctreeSceneManager)
     @par
         To workaround this problem, InstanceBatch updates on almost every frame,
         growing the bounding box to fit all instances that are not being culled individually.
         This helps by avoiding a huge bbox that may cover the whole scene, which decreases shadow
         quality considerably (as it is seen as large shadow receiver)
         Furthermore, if no individual instance is visible, the InstanceBatch switches it's visibility
-        (@see MovableObject::setVisible) to avoid sending this Renderable to the GPU. This happens because
+        (@ref MovableObject::setVisible) to avoid sending this Renderable to the GPU. This happens because
         even when no individual instance is visible, their merged bounding box may cause OGRE to think
         the batch is visible (i.e. the camera is looking between object A & B, but A & B aren't visible)
     @par
@@ -69,21 +70,17 @@ namespace Ogre
         the same textures and materials</b>
     @par
         Each InstanceBatch preallocates a fixed amount of mInstancesPerBatch instances once it's been
-        built (@see build, @see buildFrom).
-        @see createInstancedEntity and @see removeInstancedEntity on how to retrieve those instances
+        built (@ref build, @ref buildFrom).
+        @ref createInstancedEntity and @ref removeInstancedEntity on how to retrieve those instances
         remove them from scene.
         Note that, on GPU side, removing an instance from scene doesn't save GPU cycles on what
         respects vertex shaders, but saves a little fillrate and pixel shaders; unless all instances
         are removed, which saves GPU.
-        For more information, @see InstancedEntity
-        For information on how Ogre manages multiple Instance batches, @see InstanceManager
+        For more information, @ref InstancedEntity
+        For information on how Ogre manages multiple Instance batches, @ref InstanceManager
 
-
-        Design discussion webpage
     @author
         Matias N. Goldberg ("dark_sylinc")
-    @version
-        1.0
     */
     class _OgreExport InstanceBatch : public Renderable, public MovableObject
     {
@@ -210,14 +207,14 @@ namespace Ogre
         /** Constructs all the data needed to use this batch, as well as the
             InstanceEntities. Placed here because in the constructor virtual
             tables may not have been yet filled.
-        @param baseSubMesh A sub mesh which the instances will be based upon from
 
-            Call this only ONCE. This is done automatically by Ogre::InstanceManager
+            @note Call this only ONCE. This is done automatically by Ogre::InstanceManager
             Caller is responsible for freeing buffers in this RenderOperation
             Buffers inside the RenderOp may be null if the built failed.
+        @param baseSubMesh A sub mesh which the instances will be based upon from
         @return
             A render operation which is very useful to pass to other InstanceBatches
-            (@see buildFrom) so that they share the same vertex buffers and indices,
+            (see buildFrom()) so that they share the same vertex buffers and indices,
             when possible
         */
         virtual RenderOperation build( const SubMesh* baseSubMesh );
@@ -232,7 +229,7 @@ namespace Ogre
         @param baseSubMesh A sub mesh which the instances will be based upon from
         @param renderOperation The RenderOp to reference.
 
-            Caller is responsible for freeing buffers passed as input arguments
+        @note Caller is responsible for freeing buffers passed as input arguments
             This function replaces the need to call build()
         */
         virtual void buildFrom( const SubMesh *baseSubMesh, const RenderOperation &renderOperation );
@@ -287,12 +284,11 @@ namespace Ogre
             memory advantages (less VRAM, less bandwidth) and not LOD support. Very useful for
             billboards of trees, repeating vegetation, etc.
 
-                This function moves a lot of processing time from the CPU to the GPU. If the GPU
-                is already a bottleneck, you may see a decrease in performance instead!
-                Call this function again (with bStatic=true) if you've made a change to an
-                InstancedEntity and wish this change to take effect.
-                Be sure to call this after you've set all your instances
-                @see InstanceBatchHW::setStaticAndUpdate
+            @note This function moves a lot of processing time from the CPU to the GPU. If the GPU
+            is already a bottleneck, you may see a decrease in performance instead!
+            Call this function again (with bStatic=true) if you've made a change to an
+            InstancedEntity and wish this change to take effect.
+            Be sure to call this after you've set all your instances
         */
         virtual void setStaticAndUpdate( bool bStatic )     {}
 
@@ -304,14 +300,14 @@ namespace Ogre
             Note it's actually preallocated, so no memory allocation happens at
             this point.
 
-                Returns NULL if all instances are being used
+            @note Returns NULL if all instances are being used
         */
         InstancedEntity* createInstancedEntity();
 
         /** Removes an InstancedEntity from the scene retrieved with
             getNewInstancedEntity, putting back into a queue
 
-                Throws an exception if the instanced entity wasn't created by this batch
+            @note Throws an exception if the instanced entity wasn't created by this batch
                 Removed instanced entities save little CPU time, but _not_ GPU
         */
         void removeInstancedEntity( InstancedEntity *instancedEntity );

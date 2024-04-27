@@ -51,12 +51,10 @@ namespace Ogre {
 
     /** Resource holding data about a dynamic library.
 
-            This class holds the data required to get symbols from
-            libraries loaded at run-time (i.e. from DLL's for so's)
+        This class holds the data required to get symbols from
+        libraries loaded at run-time (i.e. from DLL's for so's)
         @author
             Adrian Cearn„u (cearny@cearny.ro)
-        @since
-            27 January 2002
     */
     class _OgreExport DynLib : public DynLibAlloc
     {

@@ -43,8 +43,8 @@ namespace Ogre {
     */
     /** Packages the details of a configuration option.
 
-            Used for RenderSystem::getConfigOptions. If immutable is true, this
-            option must be disabled for modifying.
+        Used for RenderSystem::getConfigOptions. If immutable is true, this
+        option must be disabled for modifying.
     */
     struct ConfigOption
     {

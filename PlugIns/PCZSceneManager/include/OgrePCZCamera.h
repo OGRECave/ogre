@@ -65,10 +65,6 @@ namespace Ogre
         /* Standard destructor */
         ~PCZCamera();
 
-        /** Overridden: Retrieves the local axis-aligned bounding box for this object.
-
-                This bounding box is in local coordinates.
-        */
         const AxisAlignedBox& getBoundingBox(void) const override;
 
         /* Overridden isVisible function for aabb */

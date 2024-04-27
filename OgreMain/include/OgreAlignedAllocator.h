@@ -77,9 +77,9 @@ namespace Ogre {
 
         /** Allocate memory with default platform dependent alignment.
 
-                The default alignment depend on target machine, this function
-                guarantee aligned memory according with SIMD processing and
-                cache boundary friendly.
+            The default alignment depend on target machine, this function
+            guarantee aligned memory according with SIMD processing and
+            cache boundary friendly.
             @param
                 size The size of memory need to allocate.
             @return

@@ -221,11 +221,11 @@ namespace Ogre {
 
     /** The profiler allows you to measure the performance of your code
 
-            Do not create profiles directly from this unless you want a profile to last
-            outside of its scope (i.e. the main game loop). For most cases, use the macro
-            OgreProfile(name) and braces to limit the scope. You must enable the Profile
-            before you can used it with setEnabled(true). If you want to disable profiling
-            in Ogre, simply set the macro OGRE_PROFILING to 0.
+        Do not create profiles directly from this unless you want a profile to last
+        outside of its scope (i.e. the main game loop). For most cases, use the macro
+        OgreProfile(name) and braces to limit the scope. You must enable the Profile
+        before you can used it with setEnabled(true). If you want to disable profiling
+        in Ogre, simply set the macro OGRE_PROFILING to 0.
         @author Amit Mathew (amitmathew (at) yahoo (dot) com)
         @todo resolve artificial cap on number of profiles displayed
         @todo fix display ordering of profiles not called every frame
@@ -429,12 +429,12 @@ namespace Ogre {
 
     /** An individual profile that will be processed by the Profiler
 
-            Use the macro OgreProfile(name) instead of instantiating this profile directly
+        Use the macro OgreProfile(name) instead of instantiating this profile directly
 
-            We use this Profile to allow scoping rules to signify the beginning and end of
-            the profile. Use the Profiler singleton (through the macro OgreProfileBegin(name)
-            and OgreProfileEnd(name)) directly if you want a profile to last
-            outside of a scope (i.e. the main game loop).
+        We use this Profile to allow scoping rules to signify the beginning and end of
+        the profile. Use the Profiler singleton (through the macro OgreProfileBegin(name)
+        and OgreProfileEnd(name)) directly if you want a profile to last
+        outside of a scope (i.e. the main game loop).
         @author Amit Mathew (amitmathew (at) yahoo (dot) com)
     */
     class Profile : public ProfilerAlloc

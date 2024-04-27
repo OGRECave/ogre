@@ -45,9 +45,9 @@ namespace Ogre
     */
     /** Holds a solid representation of a convex body.
 
-            Administers a convex body. All polygons of the body are convex and
-            planar. Several operations may be applied, ranging from intersection
-            to join where each result it itself a convex body.
+        Administers a convex body. All polygons of the body are convex and
+        planar. Several operations may be applied, ranging from intersection
+        to join where each result it itself a convex body.
     */
     class _OgreExport ConvexBody
     {

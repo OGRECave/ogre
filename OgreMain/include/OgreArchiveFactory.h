@@ -43,12 +43,12 @@ namespace Ogre {
     /** Abstract factory class, archive codec plugins can register concrete
         subclasses of this.
 
-            All access to 'archives' (collections of files, compressed or
-            just folders, maybe even remote) is managed via the abstract
-            Archive class. Plugins are expected to provide the
-            implementation for the actual codec itself, but because a
-            subclass of Archive has to be created for every archive, a
-            factory class is required to create the appropriate subclass.
+        All access to 'archives' (collections of files, compressed or
+        just folders, maybe even remote) is managed via the abstract
+        Archive class. Plugins are expected to provide the
+        implementation for the actual codec itself, but because a
+        subclass of Archive has to be created for every archive, a
+        factory class is required to create the appropriate subclass.
         @par
             So archive plugins create a subclass of Archive AND a subclass
             of ArchiveFactory which creates instances of the Archive

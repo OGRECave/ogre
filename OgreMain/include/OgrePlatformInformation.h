@@ -84,11 +84,11 @@ namespace Ogre {
 
     /** Class which provides the run-time platform information Ogre runs on.
 
-            Ogre is designed to be platform-independent, but some platform
-            and run-time environment specific optimised functions are built-in
-            to maximise performance, and those special optimised routines are
-            need to determine run-time environment for select variant executing
-            path.
+        Ogre is designed to be platform-independent, but some platform
+        and run-time environment specific optimised functions are built-in
+        to maximise performance, and those special optimised routines are
+        need to determine run-time environment for select variant executing
+        path.
         @par
             This class manages that provides a couple of functions to determine
             platform information of the run-time environment.

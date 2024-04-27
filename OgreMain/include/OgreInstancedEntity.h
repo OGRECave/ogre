@@ -69,12 +69,8 @@ namespace Ogre
         InstancedEntity. This is obviously a limitation from instancing in general, not this particular
         implementation
 
-
-            Design discussion webpage
         @author
             Matias N. Goldberg ("dark_sylinc")
-        @version
-            1.0
      */
     class _OgreExport InstancedEntity : public MovableObject
     {

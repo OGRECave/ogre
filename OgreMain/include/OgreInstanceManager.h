@@ -237,7 +237,7 @@ namespace Ogre
             to fewer batches, in this case leaving only one batch with 80 entities
 
 
-            This function takes time. Make sure to call this only when you're sure there's
+        @note This function takes time. Make sure to call this only when you're sure there's
             too much of fragmentation and you won't be creating more InstancedEntities soon
             Also in many cases cleanupEmptyBatches() ought to be enough
             Defragmentation is done per material

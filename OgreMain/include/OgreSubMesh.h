@@ -46,11 +46,11 @@ namespace Ogre {
     */
     /** Defines a part of a complete mesh.
 
-            Meshes which make up the definition of a discrete 3D object
-            are made up of potentially multiple parts. This is because
-            different parts of the mesh may use different materials or
-            use different vertex formats, such that a rendering state
-            change is required between them.
+        Meshes which make up the definition of a discrete 3D object
+        are made up of potentially multiple parts. This is because
+        different parts of the mesh may use different materials or
+        use different vertex formats, such that a rendering state
+        change is required between them.
         @par
             Like the Mesh class, instantiations of 3D objects in the scene
             share the SubMesh instances, and have the option of overriding
@@ -69,7 +69,7 @@ namespace Ogre {
 
         /** Dedicated vertex data (only valid if useSharedVertices = false).
 
-                This data is completely owned by this submesh.
+            This data is completely owned by this submesh.
             @par
                 The use of shared or non-shared buffers is determined when
                 model data is converted to the OGRE .mesh format.
@@ -92,7 +92,7 @@ namespace Ogre {
 
         /** Dedicated index map for translate blend index to bone index (only valid if useSharedVertices = false).
 
-                This data is completely owned by this submesh.
+            This data is completely owned by this submesh.
             @par
                 We collect actually used bones of all bone assignments, and build the
                 blend index in 'packed' form, then the range of the blend index in vertex
@@ -117,19 +117,19 @@ namespace Ogre {
 
         /** A list of extreme points on the submesh (optional).
 
-                These points are some arbitrary points on the mesh that are used
-                by engine to better sort submeshes by depth. This doesn't matter
-                much for non-transparent submeshes, as Z-buffer takes care of invisible
-                surface culling anyway, but is pretty useful for semi-transparent
-                submeshes because the order in which transparent submeshes must be
-                rendered cannot be always correctly deduced from entity position.
+            These points are some arbitrary points on the mesh that are used
+            by engine to better sort submeshes by depth. This doesn't matter
+            much for non-transparent submeshes, as Z-buffer takes care of invisible
+            surface culling anyway, but is pretty useful for semi-transparent
+            submeshes because the order in which transparent submeshes must be
+            rendered cannot be always correctly deduced from entity position.
             @par
                 These points are intelligently chosen from the points that make up
                 the submesh, the criteria for choosing them should be that these points
                 somewhat characterize the submesh outline, e.g. they should not be
                 close to each other, and they should be on the outer hull of the submesh.
                 They can be stored in the .mesh file, or generated at runtime
-                (see generateExtremes ()).
+                (see generateExtremes()).
             @par
                 If this array is empty, submesh sorting is done like in older versions -
                 by comparing the positions of the owning entity.
@@ -204,7 +204,7 @@ namespace Ogre {
         bool getVertexAnimationIncludesNormals() const { return mVertexAnimationIncludesNormals; }
 
 
-        /** Generate the submesh extremes (@see extremityPoints).
+        /** Generate the submesh extremes (see extremityPoints()).
         @param count
             Number of extreme points to compute for the submesh.
         */

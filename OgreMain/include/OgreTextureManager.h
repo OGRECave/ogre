@@ -46,16 +46,16 @@ namespace Ogre {
     */
     /** Class for loading & managing textures.
 
-            Note that this class is abstract - the particular
-            RenderSystem that is in use at the time will create
-            a concrete subclass of this. Note that the concrete
-            class will be available via the abstract singleton
-            obtained from TextureManager::getSingleton(), but
-            you should not assume that it is available until you
-            have a) initialised Ogre (after selecting a RenderSystem
-            and calling initialise from the Root object), and b)
-            created at least one window - this may be done at the
-            same time as part a if you allow Ogre to autocreate one.
+        Note that this class is abstract - the particular
+        RenderSystem that is in use at the time will create
+        a concrete subclass of this. Note that the concrete
+        class will be available via the abstract singleton
+        obtained from TextureManager::getSingleton(), but
+        you should not assume that it is available until you
+        have a) initialised Ogre (after selecting a RenderSystem
+        and calling initialise from the Root object), and b)
+        created at least one window - this may be done at the
+        same time as part a if you allow Ogre to autocreate one.
      */
     class _OgreExport TextureManager : public ResourceManager, public Singleton<TextureManager>
     {

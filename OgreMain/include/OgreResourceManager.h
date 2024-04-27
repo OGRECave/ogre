@@ -144,10 +144,10 @@ namespace Ogre {
         
         /** Set a limit on the amount of memory this resource handler may use.
 
-                If, when asked to load a new resource, the manager believes it will exceed this memory
-                budget, it will temporarily unload a resource to make room for the new one. This unloading
-                is not permanent and the Resource is not destroyed; it simply needs to be reloaded when
-                next used.
+            If, when asked to load a new resource, the manager believes it will exceed this memory
+            budget, it will temporarily unload a resource to make room for the new one. This unloading
+            is not permanent and the Resource is not destroyed; it simply needs to be reloaded when
+            next used.
         */
         void setMemoryBudget(size_t bytes);
 

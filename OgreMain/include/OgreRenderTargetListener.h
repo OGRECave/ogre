@@ -58,21 +58,21 @@ namespace Ogre {
     /** A interface class defining a listener which can be used to receive
         notifications of RenderTarget events.
 
-            A 'listener' is an interface designed to be called back when
-            particular events are called. This class defines the
-            interface relating to RenderTarget events. In order to receive
-            notifications of RenderTarget events, you should create a subclass of
-            RenderTargetListener and override the methods for which you would like
-            to customise the resulting processing. You should then call
-            RenderTarget::addListener passing an instance of this class.
-            There is no limit to the number of RenderTarget listeners you can register,
-            allowing you to register multiple listeners for different purposes.
+        A 'listener' is an interface designed to be called back when
+        particular events are called. This class defines the
+        interface relating to RenderTarget events. In order to receive
+        notifications of RenderTarget events, you should create a subclass of
+        RenderTargetListener and override the methods for which you would like
+        to customise the resulting processing. You should then call
+        RenderTarget::addListener passing an instance of this class.
+        There is no limit to the number of RenderTarget listeners you can register,
+        allowing you to register multiple listeners for different purposes.
 
-            RenderTarget events occur before and after the target is updated as a whole,
-            and before and after each viewport on that target is updated. Each RenderTarget
-            holds it's own set of listeners, but you can register the same listener on
-            multiple render targets if you like since the event contains details of the
-            originating RenderTarget.
+        RenderTarget events occur before and after the target is updated as a whole,
+        and before and after each viewport on that target is updated. Each RenderTarget
+        holds it's own set of listeners, but you can register the same listener on
+        multiple render targets if you like since the event contains details of the
+        originating RenderTarget.
     */
     class _OgreExport RenderTargetListener
     {

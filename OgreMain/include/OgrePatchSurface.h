@@ -45,9 +45,9 @@ namespace Ogre {
     */
     /** A surface which is defined by curves of some kind to form a patch, e.g. a Bezier patch.
 
-            This object will take a list of control points with various assorted data, and will
-            subdivide it into a patch mesh. Currently only Bezier curves are supported for defining
-            the surface, but other techniques such as NURBS would follow the same basic approach.
+        This object will take a list of control points with various assorted data, and will
+        subdivide it into a patch mesh. Currently only Bezier curves are supported for defining
+        the surface, but other techniques such as NURBS would follow the same basic approach.
     */
     class _OgreExport PatchSurface : public PatchAlloc
     {
@@ -77,11 +77,11 @@ namespace Ogre {
         };
         /** Sets up the surface by defining it's control points, type and initial subdivision level.
 
-                This method initialises the surface by passing it a set of control points. The type of curves to be used
-                are also defined here, although the only supported option currently is a bezier patch. You can also
-                specify a global subdivision level here if you like, although it is recommended that the parameter
-                is left as AUTO_LEVEL, which means the system decides how much subdivision is required (based on the
-                curvature of the surface)
+            This method initialises the surface by passing it a set of control points. The type of curves to be used
+            are also defined here, although the only supported option currently is a bezier patch. You can also
+            specify a global subdivision level here if you like, although it is recommended that the parameter
+            is left as AUTO_LEVEL, which means the system decides how much subdivision is required (based on the
+            curvature of the surface)
             @param
                 controlPointBuffer A pointer to a buffer containing the vertex data which defines control points 
                 of the curves rather than actual vertices. Note that you are expected to provide not
@@ -137,12 +137,12 @@ namespace Ogre {
         /** Tells the system to build the mesh relating to the surface into externally created
             buffers.
 
-                The VertexDeclaration of the vertex buffer must be identical to the one passed into
-                defineSurface.  In addition, there must be enough space in the buffer to 
-                accommodate the patch at full detail level; you should call getRequiredVertexCount
-                and getRequiredIndexCount to determine this. This method does not create an internal
-                mesh for this patch and so getMesh will return null if you call it after building the
-                patch this way.
+            The VertexDeclaration of the vertex buffer must be identical to the one passed into
+            defineSurface.  In addition, there must be enough space in the buffer to
+            accommodate the patch at full detail level; you should call getRequiredVertexCount
+            and getRequiredIndexCount to determine this. This method does not create an internal
+            mesh for this patch and so getMesh will return null if you call it after building the
+            patch this way.
             @param destVertexBuffer The destination vertex buffer in which to build the patch.
             @param vertexStart The offset at which to start writing vertices for this patch
             @param destIndexBuffer The destination index buffer in which to build the patch.
@@ -154,11 +154,11 @@ namespace Ogre {
 
         /** Alters the level of subdivision for this surface.
 
-                This method changes the proportionate detail level of the patch; since
-                the U and V directions can have different subdivision levels, this method
-                takes a single Real value where 0 is the minimum detail (the control points)
-                and 1 is the maximum detail level as supplied to the original call to 
-                defineSurface.
+            This method changes the proportionate detail level of the patch; since
+            the U and V directions can have different subdivision levels, this method
+            takes a single Real value where 0 is the minimum detail (the control points)
+            and 1 is the maximum detail level as supplied to the original call to
+            defineSurface.
         */
         void setSubdivisionFactor(Real factor);
 
