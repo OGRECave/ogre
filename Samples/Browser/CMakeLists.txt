@@ -118,6 +118,10 @@ else()
     add_executable(SampleBrowser WIN32 ${HEADER_FILES} ${SOURCE_FILES} ${RESOURCE_FILES})
 endif()
 
+if(OGRE_BUILD_COMPONENT_OVERLAY_IMGUI)
+  target_compile_definitions(SampleBrowser PRIVATE -DHAVE_IMGUI)
+endif()
+
 # Fix for static build with MinGW
 if (OGRE_BUILD_RENDERSYSTEM_D3D9 AND OGRE_STATIC)
    target_link_libraries(SampleBrowser ${DirectX9_LIBRARIES})
