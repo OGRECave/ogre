@@ -422,13 +422,11 @@ namespace Ogre {
         {
 
         }
-        void visit(Renderable* rend, ushort lodIndex, bool isDebug, 
-            Any* pAny = 0) override
+        void visit(Renderable* rend, ushort lodIndex, bool isDebug, Any* pAny = 0) override
         {
-            Technique* tech = rend->getTechnique();
-            bool techReceivesShadows = tech && tech->getParent()->getReceiveShadows();
-            anyReceiveShadows = anyReceiveShadows || 
-                techReceivesShadows || !tech;
+            const auto& mat = rend->getMaterial();
+            bool techReceivesShadows = !mat || mat->getReceiveShadows();
+            anyReceiveShadows = anyReceiveShadows || techReceivesShadows;
         }
     };
     //---------------------------------------------------------------------
