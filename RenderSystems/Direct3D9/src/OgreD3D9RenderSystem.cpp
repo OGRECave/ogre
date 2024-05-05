@@ -95,7 +95,7 @@ namespace Ogre
         mDeviceManager = NULL;  
         mPerStageConstantSupport = false;
         mEnableFixedPipeline = true;
-        mAutoHardwareBufferManagement = false;
+        mAutoHardwareBufferManagement = true;
 
 		for(int i = 0 ; i < OGRE_MAX_TEXTURE_LAYERS ; i++)
 		{
