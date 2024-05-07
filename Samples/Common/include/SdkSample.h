@@ -78,14 +78,14 @@ namespace OgreBites
             mDragLook = false;
         }
 
-        void paused() override { mContext->removeInputListener(this); }
+        void paused() override { mContext->removeInputListener(&mInputListenerChain); }
 
         /*-----------------------------------------------------------------------------
         | Manually update the cursor position after being unpaused.
         -----------------------------------------------------------------------------*/
         void unpaused() override
         {
-            mContext->addInputListener(this);
+            mContext->addInputListener(&mInputListenerChain);
             mTrayMgr->refreshCursor();
         }
 
