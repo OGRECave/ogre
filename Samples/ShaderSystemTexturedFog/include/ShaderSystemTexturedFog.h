@@ -166,7 +166,7 @@ protected:
         }
         if (cbName == ACTIVATE_SKY_BUTTON)
         {
-            mSceneMgr->setSkyBox(!mSceneMgr->isSkyBoxEnabled(),"BaseWhiteNoLighting",2000);
+            mSceneMgr->setSkyRenderingEnabled(!mSceneMgr->isSkyRenderingEnabled());
 
         }
     }

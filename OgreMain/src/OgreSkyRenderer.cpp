@@ -40,11 +40,11 @@ SceneManager::SkyRenderer::SkyRenderer(SceneManager* owner)
 {
 }
 
-void SceneManager::SkyRenderer::nodeDestroyed(const Node*)
+SceneManager::SkyRenderer::~SkyRenderer()
 {
-    // Remove sky nodes since they've been deleted
-    mSceneNode = 0;
-    mEnabled = false;
+    setEnabled(false);
+    if(mSceneNode)
+        mSceneManager->destroySceneNode(mSceneNode);
 }
 
 void SceneManager::SkyRenderer::setEnabled(bool enable)
@@ -54,8 +54,7 @@ void SceneManager::SkyRenderer::setEnabled(bool enable)
     enable ? mSceneManager->addListener(this) : mSceneManager->removeListener(this);
 }
 
-void SceneManager::SkyPlaneRenderer::setSkyPlane(
-                               bool enable,
+void SceneManager::SkyPlaneRenderer::create(
                                const Plane& plane,
                                const String& materialName,
                                Real gscale,
@@ -65,85 +64,67 @@ void SceneManager::SkyPlaneRenderer::setSkyPlane(
                                int xsegments, int ysegments,
                                const String& groupName)
 {
-    if (enable)
+    String meshName = mSceneManager->mName + "SkyPlane";
+    mSkyPlane = plane;
+
+    MaterialPtr m = MaterialManager::getSingleton().getByName(materialName, groupName);
+    if (!m)
     {
-        String meshName = mSceneManager->mName + "SkyPlane";
-        mSkyPlane = plane;
-
-        MaterialPtr m = MaterialManager::getSingleton().getByName(materialName, groupName);
-        if (!m)
-        {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-                "Sky plane material '" + materialName + "' not found.",
-                "SceneManager::setSkyPlane");
-        }
-        // Make sure the material doesn't update the depth buffer
-        m->setDepthWriteEnabled(false);
-        // Ensure loaded
-        m->load();
-
-        // Set up the plane
-        MeshPtr planeMesh = MeshManager::getSingleton().getByName(meshName, groupName);
-        if (planeMesh)
-        {
-            // Destroy the old one
-            MeshManager::getSingleton().remove(planeMesh);
-        }
-
-        // Create up vector
-        Vector3 up = plane.normal.crossProduct(Vector3::UNIT_X);
-        if (up == Vector3::ZERO)
-            up = plane.normal.crossProduct(-Vector3::UNIT_Z);
-
-        // Create skyplane
-        if( bow > 0 )
-        {
-            // Build a curved skyplane
-            planeMesh = MeshManager::getSingleton().createCurvedPlane(
-                meshName, groupName, plane, gscale * 100, gscale * 100, gscale * bow * 100,
-                xsegments, ysegments, false, 1, tiling, tiling, up);
-        }
-        else
-        {
-            planeMesh = MeshManager::getSingleton().createPlane(
-                meshName, groupName, plane, gscale * 100, gscale * 100, xsegments, ysegments, false,
-                1, tiling, tiling, up);
-        }
-
-        // Create entity
-        if (mSkyPlaneEntity)
-        {
-            // destroy old one, do it by name for speed
-            mSceneManager->destroyEntity(meshName);
-            mSkyPlaneEntity = 0;
-        }
-        // Create, use the same name for mesh and entity
-        // manually construct as we don't want this to be destroyed on destroyAllMovableObjects
-        MovableObjectFactory* factory = Root::getSingleton().getMovableObjectFactory(MOT_ENTITY);
-        NameValuePairList params;
-        params["mesh"] = meshName;
-        mSkyPlaneEntity = static_cast<Entity*>(factory->createInstance(meshName, mSceneManager, &params));
-        mSkyPlaneEntity->setMaterialName(materialName, groupName);
-        mSkyPlaneEntity->setCastShadows(false);
-        mSkyPlaneEntity->setRenderQueueGroup(renderQueue);
-
-        MovableObjectCollection* objectMap = mSceneManager->getMovableObjectCollection(MOT_ENTITY);
-        objectMap->map[meshName] = mSkyPlaneEntity;
-
-        // Create node and attach
-        if (!mSceneNode)
-        {
-            mSceneNode = mSceneManager->createSceneNode();
-            mSceneNode->setListener(this);
-        }
-        else
-        {
-            mSceneNode->detachAllObjects();
-        }
-        mSceneNode->attachObject(mSkyPlaneEntity);
-
+        OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+            "Sky plane material '" + materialName + "' not found.",
+            "SceneManager::setSkyPlane");
     }
-    setEnabled(enable);
+    // Make sure the material doesn't update the depth buffer
+    m->setDepthWriteEnabled(false);
+    // Ensure loaded
+    m->load();
+
+    // Set up the plane
+    MeshPtr planeMesh = MeshManager::getSingleton().getByName(meshName, groupName);
+    if (planeMesh)
+    {
+        // Destroy the old one
+        MeshManager::getSingleton().remove(planeMesh);
+    }
+
+    // Create up vector
+    Vector3 up = plane.normal.crossProduct(Vector3::UNIT_X);
+    if (up == Vector3::ZERO)
+        up = plane.normal.crossProduct(-Vector3::UNIT_Z);
+
+    // Create skyplane
+    if( bow > 0 )
+    {
+        // Build a curved skyplane
+        planeMesh = MeshManager::getSingleton().createCurvedPlane(
+            meshName, groupName, plane, gscale * 100, gscale * 100, gscale * bow * 100,
+            xsegments, ysegments, false, 1, tiling, tiling, up);
+    }
+    else
+    {
+        planeMesh = MeshManager::getSingleton().createPlane(
+            meshName, groupName, plane, gscale * 100, gscale * 100, xsegments, ysegments, false,
+            1, tiling, tiling, up);
+    }
+
+    // Create entity
+    // Create, use the same name for mesh and entity
+    // manually construct as we don't want this to be destroyed on destroyAllMovableObjects
+    MovableObjectFactory* factory = Root::getSingleton().getMovableObjectFactory(MOT_ENTITY);
+    NameValuePairList params;
+    params["mesh"] = meshName;
+    mSkyPlaneEntity = static_cast<Entity*>(factory->createInstance(meshName, mSceneManager, &params));
+    mSkyPlaneEntity->setMaterialName(materialName, groupName);
+    mSkyPlaneEntity->setCastShadows(false);
+    mSkyPlaneEntity->setRenderQueueGroup(renderQueue);
+
+    MovableObjectCollection* objectMap = mSceneManager->getMovableObjectCollection(MOT_ENTITY);
+    objectMap->map[meshName] = mSkyPlaneEntity;
+
+    // Create node and attach
+    mSceneNode = mSceneManager->createSceneNode();
+    mSceneNode->attachObject(mSkyPlaneEntity);
+
     mSkyPlaneGenParameters.skyPlaneBow = bow;
     mSkyPlaneGenParameters.skyPlaneScale = gscale;
     mSkyPlaneGenParameters.skyPlaneTiling = tiling;
@@ -151,100 +132,80 @@ void SceneManager::SkyPlaneRenderer::setSkyPlane(
     mSkyPlaneGenParameters.skyPlaneYSegments = ysegments;
 }
 
-void SceneManager::SkyBoxRenderer::setSkyBox(
-                             bool enable,
+void SceneManager::SkyBoxRenderer::create(
                              const String& materialName,
                              Real distance,
                              uint8 renderQueue,
                              const Quaternion& orientation,
                              const String& groupName)
 {
-    if (enable)
+    MaterialPtr m = MaterialManager::getSingleton().getByName(materialName, groupName);
+    if (!m)
     {
-        MaterialPtr m = MaterialManager::getSingleton().getByName(materialName, groupName);
-        if (!m)
-        {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-                "Sky box material '" + materialName + "' not found.",
-                "SceneManager::setSkyBox");
-        }
-        // Ensure loaded
-        m->load();
-
-        bool valid = m->getBestTechnique() && m->getBestTechnique()->getNumPasses();
-        if(valid)
-        {
-            Pass* pass = m->getBestTechnique()->getPass(0);
-            valid = valid && pass->getNumTextureUnitStates() &&
-                    pass->getTextureUnitState(0)->getTextureType() == TEX_TYPE_CUBE_MAP;
-        }
-
-        if (!valid)
-        {
-            LogManager::getSingleton().logWarning("skybox material " + materialName +
-                                                  " is not supported, defaulting");
-            m = MaterialManager::getSingleton().getDefaultSettings();
-        }
-
-        // Create node
-        if (!mSceneNode)
-        {
-            mSceneNode = mSceneManager->createSceneNode();
-            mSceneNode->setListener(this);
-        }
-
-        // Create object
-        if (!mSkyBoxObj)
-        {
-            mSkyBoxObj = std::make_unique<ManualObject>("SkyBox");
-            mSkyBoxObj->setCastShadows(false);
-            mSceneNode->attachObject(mSkyBoxObj.get());
-        }
-        else
-        {
-            if (!mSkyBoxObj->isAttached())
-            {
-                mSceneNode->attachObject(mSkyBoxObj.get());
-            }
-            mSkyBoxObj->clear();
-        }
-
-        mSkyBoxObj->setRenderQueueGroup(renderQueue);
-        mSkyBoxObj->begin(materialName, RenderOperation::OT_TRIANGLE_STRIP, groupName);
-
-        // rendering cube, only using 14 vertices
-        const Vector3 cube_strip[14] = {
-            {-1.f, 1.f, 1.f},   // Front-top-left
-            {1.f, 1.f, 1.f},    // Front-top-right
-            {-1.f, -1.f, 1.f},  // Front-bottom-left
-            {1.f, -1.f, 1.f},   // Front-bottom-right
-            {1.f, -1.f, -1.f},  // Back-bottom-right
-            {1.f, 1.f, 1.f},    // Front-top-right
-            {1.f, 1.f, -1.f},   // Back-top-right
-            {-1.f, 1.f, 1.f},   // Front-top-left
-            {-1.f, 1.f, -1.f},  // Back-top-left
-            {-1.f, -1.f, 1.f},  // Front-bottom-left
-            {-1.f, -1.f, -1.f}, // Back-bottom-left
-            {1.f, -1.f, -1.f},  // Back-bottom-right
-            {-1.f, 1.f, -1.f},  // Back-top-left
-            {1.f, 1.f, -1.f}    // Back-top-right
-        };
-
-        for (const auto& vtx : cube_strip)
-        {
-            mSkyBoxObj->position(orientation * (vtx * distance));
-            // Note UVs mirrored front/back
-            mSkyBoxObj->textureCoord(vtx.normalisedCopy() * Vector3(1, 1, -1));
-        }
-
-        mSkyBoxObj->end();
+        OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+            "Sky box material '" + materialName + "' not found.",
+            "SceneManager::setSkyBox");
     }
-    setEnabled(enable);
+    // Ensure loaded
+    m->load();
+
+    bool valid = m->getBestTechnique() && m->getBestTechnique()->getNumPasses();
+    if(valid)
+    {
+        Pass* pass = m->getBestTechnique()->getPass(0);
+        valid = valid && pass->getNumTextureUnitStates() &&
+                pass->getTextureUnitState(0)->getTextureType() == TEX_TYPE_CUBE_MAP;
+    }
+
+    if (!valid)
+    {
+        LogManager::getSingleton().logWarning("skybox material " + materialName +
+                                                " is not supported, defaulting");
+        m = MaterialManager::getSingleton().getDefaultSettings();
+    }
+
+    // Create node
+    mSceneNode = mSceneManager->createSceneNode();
+
+    // Create object
+    mSkyBoxObj = std::make_unique<ManualObject>("SkyBox");
+    mSkyBoxObj->setCastShadows(false);
+    mSceneNode->attachObject(mSkyBoxObj.get());
+
+    mSkyBoxObj->setRenderQueueGroup(renderQueue);
+    mSkyBoxObj->begin(materialName, RenderOperation::OT_TRIANGLE_STRIP, groupName);
+
+    // rendering cube, only using 14 vertices
+    const Vector3 cube_strip[14] = {
+        {-1.f, 1.f, 1.f},   // Front-top-left
+        {1.f, 1.f, 1.f},    // Front-top-right
+        {-1.f, -1.f, 1.f},  // Front-bottom-left
+        {1.f, -1.f, 1.f},   // Front-bottom-right
+        {1.f, -1.f, -1.f},  // Back-bottom-right
+        {1.f, 1.f, 1.f},    // Front-top-right
+        {1.f, 1.f, -1.f},   // Back-top-right
+        {-1.f, 1.f, 1.f},   // Front-top-left
+        {-1.f, 1.f, -1.f},  // Back-top-left
+        {-1.f, -1.f, 1.f},  // Front-bottom-left
+        {-1.f, -1.f, -1.f}, // Back-bottom-left
+        {1.f, -1.f, -1.f},  // Back-bottom-right
+        {-1.f, 1.f, -1.f},  // Back-top-left
+        {1.f, 1.f, -1.f}    // Back-top-right
+    };
+
+    for (const auto& vtx : cube_strip)
+    {
+        mSkyBoxObj->position(orientation * (vtx * distance));
+        // Note UVs mirrored front/back
+        mSkyBoxObj->textureCoord(vtx.normalisedCopy() * Vector3(1, 1, -1));
+    }
+
+    mSkyBoxObj->end();
+
     mSkyBoxGenParameters.skyBoxDistance = distance;
 }
 
-void SceneManager::SkyDomeRenderer::setSkyDome(
-                              bool enable,
+void SceneManager::SkyDomeRenderer::create(
                               const String& materialName,
                               Real curvature,
                               Real tiling,
@@ -254,67 +215,55 @@ void SceneManager::SkyDomeRenderer::setSkyDome(
                               int xsegments, int ysegments, int ySegmentsToKeep,
                               const String& groupName)
 {
-    if (enable)
+    MaterialPtr m = MaterialManager::getSingleton().getByName(materialName, groupName);
+    if (!m)
     {
-        MaterialPtr m = MaterialManager::getSingleton().getByName(materialName, groupName);
-        if (!m)
-        {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-                "Sky dome material '" + materialName + "' not found.",
-                "SceneManager::setSkyDome");
-        }
-        // Make sure the material doesn't update the depth buffer
-        m->setDepthWriteEnabled(false);
-        // Ensure loaded
-        m->load();
-
-        // Create node
-        if (!mSceneNode)
-        {
-            mSceneNode = mSceneManager->createSceneNode();
-            mSceneNode->setListener(this);
-        }
-        else
-        {
-            mSceneNode->detachAllObjects();
-        }
-
-        // Set up the dome (5 planes)
-        for (int i = 0; i < 5; ++i)
-        {
-            MeshPtr planeMesh = createSkydomePlane((BoxPlane)i, curvature,
-                tiling, distance, orientation, xsegments, ysegments,
-                i!=BP_UP ? ySegmentsToKeep : -1, groupName);
-
-            String entName = "SkyDomePlane" + StringConverter::toString(i);
-
-            // Create entity
-            if (mSkyDomeEntity[i])
-            {
-                // destroy old one, do it by name for speed
-                mSceneManager->destroyEntity(entName);
-                mSkyDomeEntity[i] = 0;
-            }
-            // construct manually so we don't have problems if destroyAllMovableObjects called
-            MovableObjectFactory* factory = Root::getSingleton().getMovableObjectFactory(MOT_ENTITY);
-
-            NameValuePairList params;
-            params["mesh"] = planeMesh->getName();
-            mSkyDomeEntity[i] = static_cast<Entity*>(factory->createInstance(entName, mSceneManager, &params));
-            mSkyDomeEntity[i]->setMaterialName(m->getName(), groupName);
-            mSkyDomeEntity[i]->setCastShadows(false);
-            mSkyDomeEntity[i]->setRenderQueueGroup(renderQueue);
-
-
-            MovableObjectCollection* objectMap = mSceneManager->getMovableObjectCollection(MOT_ENTITY);
-            objectMap->map[entName] = mSkyDomeEntity[i];
-
-            // Attach to node
-            mSceneNode->attachObject(mSkyDomeEntity[i]);
-        } // for each plane
-
+        OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+            "Sky dome material '" + materialName + "' not found.",
+            "SceneManager::setSkyDome");
     }
-    setEnabled(enable);
+    // Make sure the material doesn't update the depth buffer
+    m->setDepthWriteEnabled(false);
+    // Ensure loaded
+    m->load();
+
+    // Create node
+    mSceneNode = mSceneManager->createSceneNode();
+
+    // Set up the dome (5 planes)
+    for (int i = 0; i < 5; ++i)
+    {
+        MeshPtr planeMesh = createSkydomePlane((BoxPlane)i, curvature,
+            tiling, distance, orientation, xsegments, ysegments,
+            i!=BP_UP ? ySegmentsToKeep : -1, groupName);
+
+        String entName = "SkyDomePlane" + StringConverter::toString(i);
+
+        // Create entity
+        if (mSkyDomeEntity[i])
+        {
+            // destroy old one, do it by name for speed
+            mSceneManager->destroyEntity(entName);
+            mSkyDomeEntity[i] = 0;
+        }
+        // construct manually so we don't have problems if destroyAllMovableObjects called
+        MovableObjectFactory* factory = Root::getSingleton().getMovableObjectFactory(MOT_ENTITY);
+
+        NameValuePairList params;
+        params["mesh"] = planeMesh->getName();
+        mSkyDomeEntity[i] = static_cast<Entity*>(factory->createInstance(entName, mSceneManager, &params));
+        mSkyDomeEntity[i]->setMaterialName(m->getName(), groupName);
+        mSkyDomeEntity[i]->setCastShadows(false);
+        mSkyDomeEntity[i]->setRenderQueueGroup(renderQueue);
+
+
+        MovableObjectCollection* objectMap = mSceneManager->getMovableObjectCollection(MOT_ENTITY);
+        objectMap->map[entName] = mSkyDomeEntity[i];
+
+        // Attach to node
+        mSceneNode->attachObject(mSkyDomeEntity[i]);
+    } // for each plane
+
     mSkyDomeGenParameters.skyDomeCurvature = curvature;
     mSkyDomeGenParameters.skyDomeDistance = distance;
     mSkyDomeGenParameters.skyDomeTiling = tiling;
