@@ -129,7 +129,7 @@ namespace Ogre
         void _renderScene(Camera *cam, Viewport *vp, bool includeOverlays) override;
 
         /** Enable/disable sky rendering */
-        void enableSky(bool);
+        void enableSky(bool enable) { setSkyRenderingEnabled(enable); }
 
         /** Set the zone which contains the sky node */
         void setSkyZone(PCZone * zone);

@@ -441,23 +441,6 @@ namespace Ogre
         SceneManager::_renderScene(cam, vp, includeOverlays);
     }
 
-    /* enable/disable sky rendering */
-    void PCZSceneManager::enableSky(bool onoff)
-    {
-        if (getSkyBoxNode())
-        {
-            setSkyBoxEnabled(onoff);
-        }
-        else if (getSkyDomeNode())
-        {
-            setSkyDomeEnabled(onoff);
-        }
-        else if (getSkyPlaneNode())
-        {
-            setSkyPlaneEnabled(onoff);
-        }
-    }
-
     /* Set the zone which contains the sky node */
     void PCZSceneManager::setSkyZone(PCZone * zone)
     {
@@ -466,25 +449,12 @@ namespace Ogre
             // if no zone specified, use default zone
             zone = mDefaultZone;
         }
-        if (auto node = (PCZSceneNode*)getSkyBoxNode())
+        if (auto node = (PCZSceneNode*)getSkyNode())
         {
             node->setHomeZone(zone);
             node->anchorToHomeZone(zone);
             zone->setHasSky(true);
         }
-        if (auto node = (PCZSceneNode*)getSkyDomeNode())
-        {
-            node->setHomeZone(zone);
-            node->anchorToHomeZone(zone);
-            zone->setHasSky(true);
-        }
-        if (auto node = (PCZSceneNode*)getSkyPlaneNode())
-        {
-            node->setHomeZone(zone);
-            node->anchorToHomeZone(zone);
-            zone->setHasSky(true);
-        }
-        
     }
 
     //-----------------------------------------------------------------------
