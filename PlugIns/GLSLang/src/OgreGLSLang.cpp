@@ -110,6 +110,70 @@ TBuiltInResource DefaultTBuiltInResource = {
     /* .maxDualSourceDrawBuffersEXT =  1,*/
     /* .limits = memset below*/
     };
+
+    /// punch through the private glslang API to get layoutLocation
+    struct TQualifier
+    {
+        // DANGER!! this must be kept in sync with the layout of glslang::TQualifier
+        const char*         semanticName;
+        int  storage      : 6;
+        int  builtIn      : 9;
+        int  declaredBuiltIn : 9;
+        int  precision    : 3;
+        bool invariant    : 1;
+        bool centroid     : 1;
+        bool smooth       : 1;
+        bool flat         : 1;
+        bool specConstant : 1;
+        bool nonUniform   : 1;
+        bool explicitOffset   : 1;
+        bool defaultBlock : 1;
+        bool noContraction: 1;
+        bool nopersp      : 1;
+        bool explicitInterp : 1;
+        bool pervertexNV  : 1;
+        bool perPrimitiveNV : 1;
+        bool perViewNV : 1;
+        bool perTaskNV : 1;
+        bool patch        : 1;
+        bool sample       : 1;
+        bool restrict     : 1;
+        bool readonly     : 1;
+        bool writeonly    : 1;
+        bool coherent     : 1;
+        bool volatil      : 1;
+        bool devicecoherent : 1;
+        bool queuefamilycoherent : 1;
+        bool workgroupcoherent : 1;
+        bool subgroupcoherent  : 1;
+        bool shadercallcoherent : 1;
+        bool nonprivate   : 1;
+        bool nullInit : 1;
+        bool spirvByReference : 1;
+        bool spirvLiteral : 1;
+
+        int layoutMatrix  : 3;
+        int layoutPacking : 4;
+        int layoutOffset;
+        int layoutAlign;
+
+        unsigned int layoutLocation             : 12;
+    };
+    struct TType
+    {
+        virtual ~TType() {}
+
+        // DANGER!! this must be kept in sync with the layout of glslang::TType
+        int basicType        : 8;
+        int vectorSize       : 4;
+        int matrixCols       : 4;
+        int matrixRows       : 4;
+        bool vector1         : 1;
+        bool coopmat         : 1;
+        TQualifier qualifier;
+
+        const TQualifier& getQualifier() const { return qualifier; }
+    };
 }
 
 namespace Ogre
@@ -375,8 +439,8 @@ void GLSLangProgram::prepareImpl()
     int blockIdx = -1;
     for(int i = 0; i < nuniforms; i++)
     {
-        auto utype = program.getUniformTType(i);
-        if(utype->isOpaque())
+        auto constType = mapToGCT(program.getUniformType(i));
+        if(GpuConstantDefinition::isSampler(constType) || constType == GCT_UNKNOWN)
             continue;
 
         blockIdx = program.getUniformBlockIndex(i);
@@ -393,11 +457,12 @@ void GLSLangProgram::prepareImpl()
             }
         }
 
+        auto utype = (const TType*)program.getUniformTType(i);
         GpuConstantDefinition def;
         def.logicalIndex = isUBO ? uoffset : utype->getQualifier().layoutLocation;
         def.arraySize = program.getUniformArraySize(i);
         def.physicalIndex = isUBO ? uoffset : mConstantDefs->bufferSize * 4;
-        def.constType = mapToGCT(program.getUniformType(i));
+        def.constType = constType;
         bool doPadding = isUBO && GpuConstantDefinition::getElementSize(def.constType, false) > 1;
         def.elementSize = GpuConstantDefinition::getElementSize(def.constType, doPadding);
 
