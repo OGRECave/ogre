@@ -109,9 +109,8 @@ public:
         schemRenderState->addTemplateSubRenderState(subRenderState);
 #endif
         mSceneMgr->setShadowTechnique(SHADOWTYPE_TEXTURE_MODULATIVE_INTEGRATED);
-        mSceneMgr->setShadowTextureSettings(256, 1, PF_FLOAT32_R);
+        mSceneMgr->setShadowTextureSettings(256, 1, PF_DEPTH16);
         mSceneMgr->setShadowTextureSelfShadow( true );
-        mSceneMgr->setShadowTextureCasterMaterial(MaterialManager::getSingleton().getByName("PSSM/shadow_caster"));
 
         auto statusPanel = mTrayMgr->createParamsPanel(TL_TOPLEFT, "HelpMessage", 200, {"Help"});
         statusPanel->setParamValue("Help", "H / F1");
