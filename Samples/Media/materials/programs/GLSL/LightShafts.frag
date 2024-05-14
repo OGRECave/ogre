@@ -30,7 +30,11 @@ MAIN_DECLARATION
     iUV.z = iUV.z * 0.5 + 0.5;
 #endif
 
+#ifdef OGRE_REVERSED_Z
+    if (Depth > iUV.z)
+#else
     if (Depth < iUV.z)
+#endif
     {
         gl_FragColor = vec4(0,0,0,1);
     }
