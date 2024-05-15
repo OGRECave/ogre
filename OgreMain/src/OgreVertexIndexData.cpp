@@ -511,12 +511,9 @@ namespace Ogre {
             for (VertexElement& destelem : destElems)
             {
                 // get source
-                const VertexElement* srcelem =
-                    vertexDeclaration->findElementBySemantic(
-                        destelem.getSemantic(), destelem.getIndex());
-                // get buffer
-                HardwareVertexBufferSharedPtr srcbuf = 
-                    vertexBufferBinding->getBuffer(srcelem->getSource());
+                auto srcelem = vertexDeclaration->findElementBySemantic(destelem.getSemantic(), destelem.getIndex());
+                OgreAssert(srcelem, "Semantic not found in existing declaration");
+                const auto& srcbuf = vertexBufferBinding->getBuffer(srcelem->getSource());
                 // improve flexibility only
                 if (srcbuf->getUsage() & HBU_CPU_ONLY)
                 {
