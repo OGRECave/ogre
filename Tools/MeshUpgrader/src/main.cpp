@@ -414,7 +414,7 @@ struct MeshResourceCreator : public MeshSerializerListener
     {
 		if(name->empty()) {
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-                "The provided mesh file has an empty material name. See https://ogrecave.github.io/ogre/api/latest/_mesh-_tools.html#autotoc_md32");
+                "The provided mesh file has an empty material name. See https://ogrecave.github.io/ogre/api/latest/_mesh-_tools.html#empty-material-names");
 		}
         else {
             // create material because we do not load any .material files

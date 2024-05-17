@@ -368,7 +368,7 @@ struct MeshResourceCreator : public MeshSerializerListener
         if (name->empty())
         {
             LogManager::getSingleton().logWarning("one of the SubMeshes is using an empty material name. "
-                                                  "See https://ogrecave.github.io/ogre/api/latest/_mesh-_tools.html#autotoc_md32");
+                                                  "See https://ogrecave.github.io/ogre/api/latest/_mesh-_tools.html#empty-material-names");
             // here, we explicitly want to allow fixing that
             return;
         }
