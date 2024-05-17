@@ -335,34 +335,32 @@ OgreAssimpConverter [parameters] sourcefile [destination]
 
 # Exporters {#Exporters}
 
-Exporters are plugins to 3D modelling tools which write meshes and skeletal animation to file formats which OGRE can use for realtime rendering. The files the exporters write end in .mesh and .skeleton respectively.
+Exporters are plugins to 3D modelling tools which write meshes and skeletal animation to file formats which OGRE can use for realtime rendering. The files the exporters write end in `.mesh` and `.skeleton` respectively.
 
 Each exporter has to be written specifically for the modeller in question, although they all use a common set of facilities provided by  Ogre::MeshSerializer and Ogre::SkeletonSerializer. They also normally require you to own the modelling tool.
 
-All the exporters here can be built from the source code, or you can download precompiled versions from the OGRE web site.
+Full documentation for each exporter is provided along with the exporter itself, and there is a [selection of the currently supported modelling tools at OGRECave](https://github.com/OGRECave).
 
-## A Note About Modelling / Animation For OGRE
+<a name="autotoc_md32"></a> <!-- legacy anchor by tools of Ogre 14.2.5 and earlier -->
+## Empty material names {#empty-material-names}
 
-There are a few rules when creating an animated model for OGRE:
+All mesh files are required to have a material name set, otherwise most mesh tools will fail with an exception.
+Even if they don't, the exception will happen deep inside the render-loop which is way harder to debug (unless you set the material programmatically).
+
+To set a material name for the mesh, you have these options:
+
+ - Re-export the mesh, making sure that a material has been assigned.
+ - Edit the mesh.xml file to set a material name and reprocess the xml with @c OgreXMLConverter.
+
+## Skeletal animation
+
+There are a few rules when creating an animated model:
 
 -   You must have no more than 4 weighted bone assignments per vertex. If you have more, OGRE will eliminate the lowest weighted assignments and re-normalise the other weights. This limit is imposed by hardware blending limitations.
 -   All vertices must be assigned to at least one bone - assign static vertices to the root bone.
 -   At the very least each bone must have a keyframe at the beginning and end of the animation.
 
 If you’re creating non-animated meshes, then you do not need to be concerned with the above.
-
-Full documentation for each exporter is provided along with the exporter itself, and there is a [selection of the currently supported modelling tools at OGRECave](https://github.com/OGRECave).
-
-## A Note About empty Material Names
-
-All mesh files are required to have a material name set, otherwise most mesh tools will fail with an exception.
-Even if they don't, the exception will happen deep inside the render-loop which is way harder to debug  (unless you set the material programmatically).
-
-To set a material name for the mesh, you have these options:
-
- - Re-export the mesh from your preferred DCC (Digital Content Creator) exporter, making sure that a material has been assigned.
- - Edit the mesh.xml file to set a material name and reprocess the xml with @c OgreXMLConverter.
- - Edit the mesh file with [MeshMagick](https://github.com/OGRECave/meshmagick) to set a material name
 
 @page Shadows Shadows
 
