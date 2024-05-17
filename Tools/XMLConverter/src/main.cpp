@@ -287,14 +287,12 @@ void meshToXML(const XmlOptions& opts, MeshSerializer& meshSerializer)
 void XMLToBinary(const XmlOptions& opts, MeshSerializer& meshSerializer)
 {
     // Read root element and decide from there what type
-    String response;
     pugi::xml_document doc;
-
-    // Some double-parsing here but never mind
-    if (!doc.load_file(opts.source.c_str()))
+    auto result = doc.load_file(opts.source.c_str());
+    if (!result)
     {
-        LogManager::getSingleton().logError("Unable to load file " + opts.source);
-        exit (1);
+        OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
+                    StringUtil::format("Unable to load '%s' - %s", opts.source.c_str(), result.description()));
     }
     pugi::xml_node root = doc.document_element();
     if (StringUtil::startsWith("mesh", root.name()))
