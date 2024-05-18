@@ -45,6 +45,7 @@ THE SOFTWARE.
 #include "OgreParticleSystem.h"
 #include "OgreHighLevelGpuProgram.h"
 #include "OgreGpuProgramUsage.h"
+#include "OgreScriptIDs.h"
 
 namespace Ogre{
     static void applyTextureAliases(ScriptCompiler *compiler, const Material* mat, const NameValuePairList& aliasList)
@@ -3091,7 +3092,7 @@ namespace Ogre{
                             AtomAbstractNode *atom = (AtomAbstractNode*)prop->values.front().get();
                             switch(atom->id)
                             {
-                            case ScriptCompiler::ID_OFF:
+                            case ID_OFF:
                                 mUnit->setEnvironmentMap(false);
                                 break;
                             case ID_SPHERICAL:
