@@ -19,6 +19,18 @@ classes.
 | Linux, OSX, Android, iOS | [![CI Build](https://github.com/OGRECave/ogre/workflows/CI%20Build/badge.svg?branch=master)](https://github.com/OGRECave/ogre/actions?query=branch%3Amaster) |
 | MSVC | [![Build status](https://ci.appveyor.com/api/projects/status/kcki7y0n1ahrggdw/branch/master?svg=true)](https://ci.appveyor.com/project/paroj/ogre-bsrh7/branch/master) |
 
+### Citing
+If you use Ogre in your research, please cite it like this:
+
+```bibtex
+  @misc{rojtberg2024ogre,
+    author = "{Rojtberg, Pavel and Rogers, David and Streeting, Steve and others}",
+    title = "OGRE scene-oriented, flexible 3D engine",
+    year = "2001 -- 2024",
+    howpublished = "\url{https://www.ogre3d.org/}",
+  }
+```
+
 ## Index Of Contents
 * [What's New?](Docs/14-Notes.md)
 A summary of the new and altered features in this release.
@@ -33,6 +45,7 @@ A gold mine of tutorials, tips and code snippets which will help you get up to s
 
 ## Try it
 * [Online Emscripten Demo](https://ogrecave.github.io/ogre/emscripten/)
+* [Windows Demos Distribution](https://dl.cloudsmith.io/public/ogrecave/ogre/raw/versions/master/ogre-sdk-master-msvc142-x64.zip)
 * [Linux Snap Package](https://snapcraft.io/ogre)
 * [Android App on F-Droid](https://f-droid.org/packages/org.ogre.browser/)
 
