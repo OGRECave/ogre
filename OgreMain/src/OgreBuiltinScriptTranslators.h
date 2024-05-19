@@ -38,7 +38,6 @@ namespace Ogre{
     class MaterialTranslator : public ScriptTranslator
     {
     protected:
-        Material *mMaterial;
         Ogre::AliasTextureNamePairList mTextureAliases;
     public:
         MaterialTranslator();
