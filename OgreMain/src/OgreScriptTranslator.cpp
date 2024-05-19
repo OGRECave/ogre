@@ -1025,7 +1025,6 @@ namespace Ogre{
      * MaterialTranslator
      *************************************************************************/
     MaterialTranslator::MaterialTranslator()
-        :mMaterial(0)
     {
     }
     //-------------------------------------------------------------------------
@@ -1033,7 +1032,12 @@ namespace Ogre{
     {
         ObjectAbstractNode *obj = static_cast<ObjectAbstractNode*>(node.get());
         if(obj->name.empty())
+        {
             compiler->addError(ScriptCompiler::CE_OBJECTNAMEEXPECTED, obj->file, obj->line);
+            return;
+        }
+
+        Material* mMaterial = 0;
 
         // Create a material with the given name
         CreateMaterialScriptCompilerEvent evt(node->file, obj->name, compiler->getResourceGroup());
