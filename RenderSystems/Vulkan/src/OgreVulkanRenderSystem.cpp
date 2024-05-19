@@ -555,7 +555,7 @@ namespace Ogre
         //rsc->setCapability( RSC_STORE_AND_MULTISAMPLE_RESOLVE );
         //rsc->setCapability( RSC_TEXTURE_GATHER );
 
-        rsc->setCapability( RSC_COMPUTE_PROGRAM );
+        rsc->setCapability( RSC_VERTEX_PROGRAM );
         //rsc->setCapability( RSC_UAV );
         //rsc->setCapability( RSC_TYPED_UAV_LOADS );
         //rsc->setCapability( RSC_EXPLICIT_FSAA_RESOLVE );
