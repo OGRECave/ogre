@@ -324,8 +324,6 @@ namespace Ogre {
         mVisible = true;
         mClosed = false;
         mName = [windowTitle cStringUsingEncoding:NSUTF8StringEncoding];
-        mWidth = _getPixelFromPoint(widthPt);
-        mHeight = _getPixelFromPoint(heightPt);
         mFSAA = fsaa_samples;
 
         if(!externalWindowHandle)
@@ -358,8 +356,8 @@ namespace Ogre {
             }
 
             NSRect b = [mView bounds];
-            mWidth = _getPixelFromPoint((int)b.size.width);
-            mHeight = _getPixelFromPoint((int)b.size.height);
+            widthPt = (unsigned int)b.size.width;
+            heightPt = (unsigned int)b.size.height;
 
             mWindow = [mView window];
             mIsExternal = true;
@@ -378,6 +376,13 @@ namespace Ogre {
         if([mGLContext view] != mView)
             [mGLContext setView:mView];
         [mGLContext makeCurrentContext];
+
+        mContentScalingFactor =
+            ([mView respondsToSelector:@selector(wantsBestResolutionOpenGLSurface)] && [(id)mView wantsBestResolutionOpenGLSurface]) ?
+            (mView.window.screen ?: [NSScreen mainScreen]).backingScaleFactor : 1.0f;
+
+        mWidth = _getPixelFromPoint(widthPt);
+        mHeight = _getPixelFromPoint(heightPt);
 
 #if OGRE_DEBUG_MODE
         // Crash on functions that have been removed from the API
