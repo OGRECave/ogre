@@ -537,7 +537,7 @@ namespace Ogre {
         {
             std::pair<Archive*, ResourceGroup*> ret = resourceExistsInAnyGroupImpl(resourceName);
 
-            if(ret.second && resourceBeingLoaded && !grp->inGlobalPool) {
+            if(ret.second && resourceBeingLoaded && !ret.second->inGlobalPool) {
                 resourceBeingLoaded->changeGroupOwnership(ret.second->name);
             }
 
