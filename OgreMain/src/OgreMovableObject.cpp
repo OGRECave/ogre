@@ -345,30 +345,6 @@ namespace Ogre {
         return mLightList;
     }
     //-----------------------------------------------------------------------
-    const ShadowRenderableList& MovableObject::getShadowVolumeRenderableList(
-        const Light* light, const HardwareIndexBufferPtr& indexBuffer, size_t& indexBufferUsedSize,
-        float extrusionDist, int flags)
-    {
-        static ShadowRenderableList dummyList;
-        return dummyList;
-    }
-    //-----------------------------------------------------------------------
-    const AxisAlignedBox& MovableObject::getLightCapBounds(void) const
-    {
-        // Same as original bounds
-        return getWorldBoundingBox();
-    }
-    //-----------------------------------------------------------------------
-    const AxisAlignedBox& MovableObject::getDarkCapBounds(const Light& light, Real extrusionDist) const
-    {
-        // Extrude own light cap bounds
-        mWorldDarkCapBounds = getLightCapBounds();
-        this->extrudeBounds(mWorldDarkCapBounds, light.getAs4DVector(), 
-            extrusionDist);
-        return mWorldDarkCapBounds;
-
-    }
-    //-----------------------------------------------------------------------
     Real MovableObject::getPointExtrusionDistance(const Light* l) const
     {
         if (mParentNode)

@@ -98,6 +98,22 @@ namespace Ogre {
         static LightList ll;
         return ll;
     }
+    //-----------------------------------------------------------------------
+    const ShadowRenderableList& ShadowCaster::getShadowVolumeRenderableList(
+        const Light* light, const HardwareIndexBufferPtr& indexBuffer, size_t& indexBufferUsedSize,
+        float extrusionDist, int flags)
+    {
+        static ShadowRenderableList dummyList;
+        return dummyList;
+    }
+    //-----------------------------------------------------------------------
+    const AxisAlignedBox& ShadowCaster::getDarkCapBounds(const Light& light, Real extrusionDist) const
+    {
+        // Extrude own light cap bounds
+        mWorldDarkCapBounds = getLightCapBounds();
+        extrudeBounds(mWorldDarkCapBounds, light.getAs4DVector(), extrusionDist);
+        return mWorldDarkCapBounds;
+    }
     // ------------------------------------------------------------------------
     void ShadowCaster::clearShadowRenderableList(ShadowRenderableList& shadowRenderables)
     {
