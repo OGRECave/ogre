@@ -190,7 +190,7 @@ namespace Ogre {
 
         // pre-count the size of index data we need since it makes a big perf difference
         // to GL in particular if we lock a smaller area of the index buffer
-        size_t preCountIndexes = 0;
+        uint32 preCountIndexes = 0;
 
         si = shadowRenderables.begin();
         for (auto& eg : edgeData->edgeGroups)
@@ -315,7 +315,7 @@ namespace Ogre {
             sizeof(unsigned short) * indexBufferUsedSize, sizeof(unsigned short) * preCountIndexes,
             indexBufferUsedSize == 0 ? HardwareBuffer::HBL_DISCARD : HardwareBuffer::HBL_NO_OVERWRITE);
         unsigned short* pIdx = static_cast<unsigned short*>(indexLock.pData);
-        size_t numIndices = indexBufferUsedSize;
+        uint32 numIndices = indexBufferUsedSize;
         
         // Iterate over the groups and form renderables for each based on their
         // lightFacing
@@ -333,7 +333,7 @@ namespace Ogre {
 
             indexData->indexStart = numIndices;
             // original number of verts (without extruded copy)
-            size_t originalVertexCount = eg.vertexData->vertexCount;
+            uint32 originalVertexCount = eg.vertexData->vertexCount;
             bool  firstDarkCapTri = true;
             unsigned short darkCapStart = 0;
 
@@ -345,8 +345,8 @@ namespace Ogre {
                 if ((edge.degenerate && lightFacing) ||
                     (!edge.degenerate && (lightFacing != edgeData->triangleLightFacings[edge.triIndex[1]])))
                 {
-                    size_t v0 = edge.vertIndex[0];
-                    size_t v1 = edge.vertIndex[1];
+                    uint32 v0 = edge.vertIndex[0];
+                    uint32 v1 = edge.vertIndex[1];
                     if (!lightFacing)
                     {
                         // Inverse edge indexes when t1 is light away
