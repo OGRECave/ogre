@@ -220,15 +220,7 @@ namespace Ogre {
             const IndexData* indexData; /// The index information which describes the triangles.
             RenderOperation::OperationType opType;  /// The operation type used to render this geometry
         };
-        /** Comparator for sorting geometries by vertex set */
-        struct geometryLess {
-            bool operator()(const Geometry& a, const Geometry& b) const
-            {
-                if (a.vertexSet < b.vertexSet) return true;
-                if (a.vertexSet > b.vertexSet) return false;
-                return a.indexSet < b.indexSet;
-            }
-        };
+        friend struct geometryLess;
         /** Comparator for unique vertex list */
         struct vectorLess {
             bool operator()(const Vector3f& a, const Vector3f& b) const
