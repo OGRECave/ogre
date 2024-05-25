@@ -31,6 +31,15 @@ THE SOFTWARE.
 #include "OgreOptimisedUtil.h"
 
 namespace Ogre {
+    /** Comparator for sorting geometries by vertex set */
+    struct geometryLess {
+        bool operator()(const EdgeListBuilder::Geometry& a, const EdgeListBuilder::Geometry& b) const
+        {
+            if (a.vertexSet < b.vertexSet) return true;
+            if (a.vertexSet > b.vertexSet) return false;
+            return a.indexSet < b.indexSet;
+        }
+    };
 
     EdgeData::EdgeData() : isClosed(false){}
     
