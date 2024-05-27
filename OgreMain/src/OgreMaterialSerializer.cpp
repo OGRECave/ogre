@@ -387,7 +387,7 @@ namespace Ogre
                 writeValue(StringConverter::toString(pPass->getLightMask()));
             }
 
-            if (pPass->getLightingEnabled())
+            if (pPass->getLightingEnabled() || pPass->getVertexColourTracking() != TVC_NONE)
             {
                 // Ambient
                 if (mDefaults ||
