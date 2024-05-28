@@ -80,10 +80,9 @@ namespace Ogre {
         SubMesh* mSubMesh;
 
         /// override the start index for the RenderOperation
-        size_t mIndexStart;
-
+        uint32 mIndexStart;
         /// override the end index for the RenderOperation
-        size_t mIndexEnd;
+        uint32 mIndexEnd;
 
         /// Is this SubEntity visible?
         bool mVisible;
@@ -193,26 +192,17 @@ namespace Ogre {
         const MaterialPtr& getMaterial(void) const override { return mMaterialPtr; }
         void getRenderOperation(RenderOperation& op) override;
 
-        /** Tells this SubEntity to draw a subset of the SubMesh by adjusting the index buffer extents.
-         * Default value is zero so that the entire index buffer is used when drawing.
-         * Valid values are zero to getIndexDataEndIndex()
-        */
-        void setIndexDataStartIndex(size_t start_index);
+        /// @deprecated api about to be removed
+        OGRE_DEPRECATED void setIndexDataStartIndex(uint32 start_index);
 
-        /** Returns the current value of the start index used for drawing.
-         * \see setIndexDataStartIndex
-        */
-        size_t getIndexDataStartIndex() const;
+        /// @deprecated api about to be removed
+        OGRE_DEPRECATED uint32 getIndexDataStartIndex() const { return mIndexStart; }
 
-        /** Tells this SubEntity to draw a subset of the SubMesh by adjusting the index buffer extents.
-         * Default value is SubMesh::indexData::indexCount so that the entire index buffer is used when drawing.
-         * Valid values are mStartIndex to SubMesh::indexData::indexCount
-        */
-        void setIndexDataEndIndex(size_t end_index);
+        /// @deprecated api about to be removed
+        OGRE_DEPRECATED void setIndexDataEndIndex(uint32 end_index);
 
-        /** Returns the current value of the start index used for drawing.
-        */
-        size_t getIndexDataEndIndex() const;
+        /// @deprecated api about to be removed
+        OGRE_DEPRECATED uint32 getIndexDataEndIndex() const { return mIndexEnd; }
 
         /** Reset the custom start/end index to the default values.
         */
