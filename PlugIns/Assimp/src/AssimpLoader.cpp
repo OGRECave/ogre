@@ -415,7 +415,7 @@ bool AssimpLoader::_load(const char* name, Assimp::Importer& importer, Mesh* mes
     {
         const aiTexture* tex = scene->mTextures[i];
         auto texname =
-            StringUtil::format("%s%s.%s", mesh->getName().c_str(), tex->mFilename.C_Str(), tex->achFormatHint);
+            StringUtil::format("%s%s%d.%s", mesh->getName().c_str(), tex->mFilename.C_Str(), i, tex->achFormatHint);
         if (TextureManager::getSingleton().resourceExists(texname, mesh->getGroup()))
             continue;
 
@@ -888,7 +888,8 @@ static bool getTextureName(const aiMaterial* mat, aiTextureType type, const aiSc
         const aiTexture* tex = scene->GetEmbeddedTexture(path.C_Str());
         if(tex)
         {
-            basename = StringUtil::format("%s%s.%.8s", meshName.c_str(), tex->mFilename.C_Str(), tex->achFormatHint);
+            basename = StringUtil::format("%s%s%s.%.8s", meshName.c_str(), tex->mFilename.C_Str(), path.C_Str() + 1,
+                                          tex->achFormatHint);
             return true;
         }
 
