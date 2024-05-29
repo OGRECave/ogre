@@ -46,6 +46,9 @@ def view(o):
     elif isinstance(o, Ogre.Matrix3):
         shape = (3, 3)
         ptr = o.this
+    elif isinstance(o, Ogre.Affine3):
+        shape = (3, 4)
+        ptr = o.this
     elif isinstance(o, Ogre.Matrix4):
         shape = (4, 4)
         ptr = o.this
