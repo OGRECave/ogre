@@ -448,6 +448,7 @@ ADD_REPR(Matrix4)
     Ogre::Vector4 operator*(const Ogre::Vector4& v) { return *$self * v; }
     Ogre::Vector3 operator*(const Ogre::Vector3& v) { return *$self * v; }
     Ogre::Matrix4 operator*(const Ogre::Matrix4& m) { return *$self * m; }
+    Ogre::Matrix4 operator*(const Ogre::Affine3& m) { return *$self * m; }
     Ogre::Matrix4 operator+(const Ogre::Matrix4& m) { return *$self + m; }
     Ogre::Matrix4 operator-(const Ogre::Matrix4& m) { return *$self - m; }
     Ogre::Real __getitem__(int row, int column) { return (*$self)[row][column]; }
@@ -458,6 +459,7 @@ ADD_REPR(Affine3)
     Ogre::Vector4 operator*(const Ogre::Vector4& v) { return *$self * v; }
     Ogre::Vector3 operator*(const Ogre::Vector3& v) { return *$self * v; }
     Ogre::Affine3 operator*(const Ogre::Affine3& m) { return *$self * m; }
+    Ogre::Matrix4 operator*(const Ogre::Matrix4& m) { return *$self * m; }
 }
 %include "OgreQuaternion.h"
 ADD_REPR(Quaternion)
