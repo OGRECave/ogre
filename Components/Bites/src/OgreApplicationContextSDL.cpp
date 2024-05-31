@@ -13,6 +13,10 @@
 
 #include "SDLInputMapping.h"
 
+#ifdef OGRE_WAYLAND
+#include <wayland-egl.h>
+#endif
+
 namespace OgreBites {
 
 ApplicationContextSDL::ApplicationContextSDL(const Ogre::String& appName) : ApplicationContextBase(appName)
@@ -68,7 +72,34 @@ NativeWindowPair ApplicationContextSDL::createWindow(const Ogre::String& name, O
     p.miscParams["sdlwin"] = Ogre::StringConverter::toString(size_t(ret.native));
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_LINUX
-    p.miscParams["externalWindowHandle"] = Ogre::StringConverter::toString(size_t(wmInfo.info.x11.window));
+    if (wmInfo.subsystem == SDL_SYSWM_WAYLAND)
+    {
+#ifdef OGRE_WAYLAND
+        Ogre::LogManager::getSingleton().logMessage("[SDL] Creating Wayland window");
+        wl_egl_window *win_impl = (wl_egl_window*)SDL_GetWindowData(ret.native, "wl_egl_window");
+
+        if(!win_impl)
+        {
+          Ogre::LogManager::getSingleton().logMessage("[SDL] Creating wl_egl_window");
+          int width, height;
+          SDL_GetWindowSize(ret.native, &width, &height);
+          wl_surface* surface = wmInfo.info.wl.surface;
+          win_impl = wl_egl_window_create(surface, width, height);
+          SDL_SetWindowData(ret.native, "wl_egl_window", win_impl);
+        }
+        p.miscParams["externalDisplay"] = Ogre::StringConverter::toString(size_t(wmInfo.info.wl.display));
+        p.miscParams["externalSurface"] = Ogre::StringConverter::toString(size_t(wmInfo.info.wl.surface));
+        p.miscParams["externalWindowHandle"] = Ogre::StringConverter::toString(size_t(win_impl)); //Ogre::StringConverter::toString(size_t(wmInfo.info.wl.egl_window));
+
+        p.miscParams["externalXdgSurface"] = Ogre::StringConverter::toString(size_t(wmInfo.info.wl.xdg_surface));
+        p.miscParams["externalXdgToplevel"] = Ogre::StringConverter::toString(size_t(wmInfo.info.wl.xdg_toplevel));
+#endif
+    }
+    else if (wmInfo.subsystem == SDL_SYSWM_X11)
+    {
+        Ogre::LogManager::getSingleton().logMessage("[SDL] Creating X11 window");
+        p.miscParams["externalWindowHandle"] = Ogre::StringConverter::toString(size_t(wmInfo.info.x11.window));
+    }
 #elif OGRE_PLATFORM == OGRE_PLATFORM_WIN32
     p.miscParams["externalWindowHandle"] = Ogre::StringConverter::toString(size_t(wmInfo.info.win.window));
 #elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE

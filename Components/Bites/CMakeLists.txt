@@ -142,6 +142,8 @@ endif()
 
 if(UNIX AND NOT APPLE)
   # for WindowEventUtilities
+  # TODO: This will not work for wayland windows.
+  # Should it be skipped altogether if x11 is missing?
   list(APPEND DEPENDENCIES ${X11_X11_LIB})
   set(NATIVE_INCLUDES ${X11_Xlib_INCLUDE_PATH})
 endif()
@@ -178,6 +180,10 @@ endif()
 
 if(SDL2_FOUND)
   target_link_libraries(OgreBites PRIVATE SDL2::SDL2)
+  if(OGRE_GLSUPPORT_USE_WAYLAND)
+    target_link_libraries(OgreBites PRIVATE PkgConfig::waylands)
+    target_compile_definitions(OgreBites PRIVATE OGRE_WAYLAND)
+  endif()
 elseif(NOT EMSCRIPTEN)
   message(WARNING "SDL2 not found - no input handling and reduced window creation capabilites")
 endif()

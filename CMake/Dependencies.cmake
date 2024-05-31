@@ -219,8 +219,36 @@ macro_log_feature(FREETYPE_FOUND "freetype" "Portable font engine" "http://www.f
 
 # Find X11
 if (UNIX AND NOT APPLE AND NOT ANDROID AND NOT EMSCRIPTEN)
-  find_package(X11 REQUIRED)
+  find_package(PkgConfig)
+  if (PKG_CONFIG_FOUND)
+    pkg_check_modules(waylands IMPORTED_TARGET wayland-client wayland-egl egl)
+    pkg_check_modules(wayland-scanner REQUIRED IMPORTED_TARGET wayland-scanner)
+    pkg_check_modules(wayland-protocols REQUIRED IMPORTED_TARGET wayland-protocols)
+    pkg_get_variable(_WAYLAND_SCANNER wayland-scanner wayland_scanner)
+    pkg_get_variable(_WAYLAND_PROTOCOLS_DIR wayland-protocols pkgdatadir)
+    set(_XDG_SHELL_XML ${_WAYLAND_PROTOCOLS_DIR}/stable/xdg-shell/xdg-shell.xml)
+
+    add_custom_command(
+      OUTPUT ${CMAKE_BINARY_DIR}/xdg_shell/xdg-shell-client-protocol.h ${CMAKE_BINARY_DIR}/xdg_shell/xdg-shell-client-protocol.c
+      COMMAND "${CMAKE_COMMAND}" "-E" "make_directory" ${CMAKE_BINARY_DIR}/xdg_shell
+      COMMAND ${_WAYLAND_SCANNER} client-header ${_XDG_SHELL_XML} ${CMAKE_BINARY_DIR}/xdg_shell/xdg-shell-client-protocol.h
+      COMMAND ${_WAYLAND_SCANNER} private-code ${_XDG_SHELL_XML} ${CMAKE_BINARY_DIR}/xdg_shell/xdg-shell-client-protocol.c
+      COMMENT "Generate wayland protocols implementation"
+    )
+    add_custom_target(xdg_shell
+      DEPENDS ${CMAKE_BINARY_DIR}/xdg_shell/xdg-shell-client-protocol.h ${CMAKE_BINARY_DIR}/xdg_shell/xdg-shell-client-protocol.c)
+
+    # perhaps need wayland-protocols as well
+    macro_log_feature(waylands_FOUND "Wayland" "Wayland window system" "https://wayland.freedesktop.org")
+  endif ()
+
+  if (NOT waylands_FOUND)
+    find_package(X11 REQUIRED)
+  else ()
+    find_package(X11)
+  endif ()
   macro_log_feature(X11_FOUND "X11" "X Window system" "http://www.x.org")
+
 endif ()
 
 

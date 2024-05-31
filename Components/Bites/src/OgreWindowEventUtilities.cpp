@@ -37,6 +37,7 @@ THE SOFTWARE.
 #  endif
 #  include <windows.h>
 #elif OGRE_PLATFORM == OGRE_PLATFORM_LINUX
+// TODO: Add wayland-equivalent stuff as alternative
 #include <X11/Xlib.h>
 #endif
 
@@ -185,6 +186,7 @@ void WindowEventUtilities::messagePump()
         DispatchMessage( &msg );
     }
 #elif OGRE_PLATFORM == OGRE_PLATFORM_LINUX
+// TODO write wayland-alternative
     //GLX Message Pump
     Display* xDisplay = 0; // same for all windows
 

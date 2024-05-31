@@ -13,6 +13,8 @@
 
 if(EGL_FOUND)
   cmake_dependent_option(OGRE_GLSUPPORT_USE_EGL "use EGL for GL Context Creation instead of GLX/ WGL" TRUE "NOT WIN32" FALSE)
+
+  cmake_dependent_option(OGRE_GLSUPPORT_USE_WAYLAND "use Wayland window manager" FALSE "UNIX;NOT APPLE;NOT EMSCRIPTEN;NOT ANDROID" FALSE)
 endif()
 
 if(ANDROID)
@@ -64,13 +66,28 @@ elseif (APPLE)
   set(PLATFORM_LIBS "-framework AppKit" ${OPENGL_gl_LIBRARY})
 elseif (UNIX)
   if(OGRE_GLSUPPORT_USE_EGL)
-    file(GLOB PLATFORM_HEADERS "include/EGL/X11/*.h" "include/EGL/*.h")
-    file(GLOB PLATFORM_SOURCES "src/EGL/X11/*.cpp" "src/EGL/*.cpp" "src/X11/*.cpp")
-    
-    set(NATIVE_INCLUDES
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/EGL
+    list(APPEND _EGL_HEADERS "include/EGL/*.h")
+    list(APPEND _EGL_SOURCES "src/EGL/*.cpp")
+    list(APPEND NATIVE_INCLUDES ${CMAKE_CURRENT_SOURCE_DIR}/include/EGL)
+    if(OGRE_GLSUPPORT_USE_WAYLAND)
+      list(APPEND _EGL_HEADERS "include/EGL/Wayland/*.h")
+      list(APPEND _EGL_SOURCES "src/EGL/Wayland/*.cpp")
+      list(APPEND _EGL_SOURCES ${CMAKE_BINARY_DIR}/xdg_shell/xdg-shell-client-protocol.c)
+      list(APPEND NATIVE_INCLUDES
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/EGL/Wayland)
+      set(WAYLAND_LIBRARIES PkgConfig::waylands)
+    else()
+      list(APPEND _EGL_HEADERS "include/EGL/X11/*.h")
+      list(APPEND _EGL_SOURCES "src/EGL/X11/*.cpp")
+      list(APPEND _EGL_SOURCES "src/X11/*.cpp")
+      list(APPEND NATIVE_INCLUDES
         ${CMAKE_CURRENT_SOURCE_DIR}/include/EGL/X11)
-    set(PLATFORM_LIBS ${X11_LIBRARIES} ${X11_Xrandr_LIB} ${EGL_LIBRARIES})
+    endif()
+
+    file(GLOB PLATFORM_HEADERS ${_EGL_HEADERS})
+    file(GLOB PLATFORM_SOURCES ${_EGL_SOURCES})
+
+    set(PLATFORM_LIBS ${X11_LIBRARIES} ${X11_Xrandr_LIB} ${EGL_LIBRARIES} ${WAYLAND_LIBRARIES})
   else()
     file(GLOB PLATFORM_HEADERS "include/GLX/*.h")
     file(GLOB PLATFORM_SOURCES "src/GLX/*.cpp" "src/X11/*.cpp")
@@ -85,6 +102,7 @@ elseif (UNIX)
 
     set(PLATFORM_LIBS ${X11_LIBRARIES} ${X11_Xrandr_LIB} ${OPENGL_glx_LIBRARY})
   endif()
+  #TODO: this should not be included if OGRE_GLSUPPORT_USE_WAYLAND
   list(APPEND NATIVE_INCLUDES "${CMAKE_CURRENT_SOURCE_DIR}/src/X11/")
 endif ()
 
@@ -115,6 +133,16 @@ target_include_directories(OgreGLSupport PUBLIC
     "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
     "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/GLSL>"
     PRIVATE "$<BUILD_INTERFACE:${NATIVE_INCLUDES}>")
+
+  if(OGRE_GLSUPPORT_USE_WAYLAND)
+    target_compile_definitions(OgreGLSupport PUBLIC OGRE_WAYLAND)
+    # TODO should be part of include file?
+
+    add_dependencies(OgreGLSupport xdg_shell)
+    target_include_directories(OgreGLSupport PRIVATE
+      $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/xdg_shell>)
+
+  endif()
 
 set_property(TARGET OgreGLSupport PROPERTY POSITION_INDEPENDENT_CODE ON)
 generate_export_header(OgreGLSupport 

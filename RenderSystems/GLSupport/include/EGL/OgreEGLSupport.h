@@ -30,6 +30,17 @@ THE SOFTWARE.
 #ifndef __EGLSupport_H__
 #define __EGLSupport_H__
 
+#ifndef OGRE_WAYLAND
+// Tell EGL that we are using X11 (to select the appropriate definitions)
+#define USE_X11
+#else
+// Tell EGL to not include X11 headers
+#define EGL_NO_X11
+// Tell EGL that we are using wayland
+#ifndef WL_EGL_PLATFORM
+#define WL_EGL_PLATFORM 1
+#endif
+#endif
 
 #include "OgreGLNativeSupport.h"
 #include <EGL/egl.h>

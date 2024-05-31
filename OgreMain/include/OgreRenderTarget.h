@@ -218,7 +218,7 @@ namespace Ogre {
 
             | Name        | Description                        |
             |-------------|------------------------------------|
-            | WINDOW      | The native window handle. (X11 Window XID/ HWND / NSWindow*) |
+            | WINDOW      | The native window handle. (Wayland wl_egl_window* /X11 Window XID/ HWND / NSWindow*) |
             | HWND        | deprecated (same as WINDOW) |
             | GL_FBOID | the id of the OpenGL framebuffer object |
             | GL_MULTISAMPLEFBOID | the id of the OpenGL framebuffer object used for multisampling |
@@ -228,6 +228,7 @@ namespace Ogre {
             | TARGET | deprecated, do not use |
             | XDISPLAY     | The X Display connection behind that context. |
             | ATOM        | The X Atom used in client delete events. |
+            | (TBD) | Wayland-specific structures |
             | VIEW | Cocoa NSView* |
             | NSOPENGLCONTEXT | Cocoa NSOpenGLContext* |
             | NSOPENGLPIXELFORMAT | Cocoa NSOpenGLPixelFormat* |
