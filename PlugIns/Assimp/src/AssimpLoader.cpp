@@ -464,7 +464,10 @@ bool AssimpLoader::_load(const char* name, Assimp::Importer& importer, Mesh* mes
         TextureManager::getSingleton().loadImage(texname, mesh->getGroup(), img);
     }
 
-    loadDataFromNode(scene, scene->mRootNode, mesh);
+    auto aabb = loadDataFromNode(scene, scene->mRootNode, mesh);
+    // We must indicate the bounding box
+    mesh->_setBounds(aabb);
+    mesh->_setBoundingSphereRadius((aabb.getMaximum() - aabb.getMinimum()).length() / 2);
 
     Assimp::DefaultLogger::kill();
 
@@ -1331,12 +1334,11 @@ bool AssimpLoader::createSubMesh(const String& name, int index, const aiNode* pN
     return true;
 }
 
-void AssimpLoader::loadDataFromNode(const aiScene* mScene, const aiNode* pNode, Mesh* mesh)
+AxisAlignedBox AssimpLoader::loadDataFromNode(const aiScene* mScene, const aiNode* pNode, Mesh* mesh)
 {
+    AxisAlignedBox aabb;
     if (pNode->mNumMeshes > 0)
     {
-        AxisAlignedBox mAAB = mesh->getBounds();
-
         for (unsigned int idx = 0; idx < pNode->mNumMeshes; ++idx)
         {
             aiMesh* pAIMesh = mScene->mMeshes[pNode->mMeshes[idx]];
@@ -1349,20 +1351,18 @@ void AssimpLoader::loadDataFromNode(const aiScene* mScene, const aiNode* pNode, 
             // Create a material instance for the mesh.
             const aiMaterial* pAIMaterial = mScene->mMaterials[pAIMesh->mMaterialIndex];
             MaterialPtr matptr = createMaterial(pAIMaterial, mesh->getGroup(), mesh->getName(), mScene, !mQuietMode);
-            createSubMesh(pNode->mName.data, idx, pNode, pAIMesh, matptr, mesh, mAAB);
+            createSubMesh(pNode->mName.data, idx, pNode, pAIMesh, matptr, mesh, aabb);
         }
-
-        // We must indicate the bounding box
-        mesh->_setBounds(mAAB);
-        mesh->_setBoundingSphereRadius((mAAB.getMaximum() - mAAB.getMinimum()).length() / 2);
     }
 
     // Traverse all child nodes of the current node instance
     for (unsigned int childIdx = 0; childIdx < pNode->mNumChildren; childIdx++)
     {
         const aiNode* pChildNode = pNode->mChildren[childIdx];
-        loadDataFromNode(mScene, pChildNode, mesh);
+        aabb.merge(loadDataFromNode(mScene, pChildNode, mesh));
     }
+
+    return aabb;
 }
 
 static std::vector<std::unique_ptr<Codec> > registeredCodecs;

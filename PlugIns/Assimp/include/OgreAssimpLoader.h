@@ -109,7 +109,7 @@ private:
                                       const aiMatrix4x4& accTransform);
     void createBonesFromNode(const aiScene* mScene, const aiNode* pNode);
     void createBoneHiearchy(const aiScene* mScene, const aiNode* pNode);
-    void loadDataFromNode(const aiScene* mScene, const aiNode* pNode, Mesh* mesh);
+    AxisAlignedBox loadDataFromNode(const aiScene* mScene, const aiNode* pNode, Mesh* mesh);
     void markAllChildNodesAsNeeded(const aiNode* pNode);
     void flagNodeAsNeeded(const char* name);
     bool isNodeNeeded(const char* name);
