@@ -187,6 +187,9 @@ int main(int numargs, char** args)
         auto pluginDir = pluginsCfg.getSetting("PluginFolder")+"/";
 
         logMgr.setDefaultLog(NULL); // swallow startup messages
+
+        DefaultHardwareBufferManager bufferManager; // needed because we don't have a rendersystem
+
         Root root("", "", "");
         // get rid of the temporary log as we use the new log now
         logMgr.destroyLog("Temporary log");
@@ -202,7 +205,6 @@ int main(int numargs, char** args)
         RTShader::ShaderGenerator::initialize();
 #endif
 
-        DefaultHardwareBufferManager bufferManager; // needed because we don't have a rendersystem
         DefaultTextureManager texMgr;
 
         String basename, ext, path;
