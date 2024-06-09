@@ -115,9 +115,9 @@ namespace Ogre {
     /**
      * Vertex element type, used to identify the base types of the vertex contents
      *
-     * @note VET_SHORT1, VET_SHORT3, VET_USHORT1 and VET_USHORT3 should never be used
-     * because they aren't supported on any known hardware - they are unaligned as their size
-     * is not a multiple of 4 bytes. Therefore drivers usually must add padding on upload.
+     * VET_SHORT1, VET_SHORT3, VET_USHORT1 and VET_USHORT3 should be used with caution
+     * because they aren't supported on D3D9 and D3D11 - they are unaligned as their size
+     * is not a multiple of 4 bytes. Therefore drivers usually add padding on upload.
      */
     enum VertexElementType : uint8
     {
@@ -126,9 +126,9 @@ namespace Ogre {
         VET_FLOAT3 = 2,
         VET_FLOAT4 = 3,
 
-        VET_SHORT1 = 5,  ///< @deprecated (see #VertexElementType note)
+        VET_SHORT1 = 5,  ///< not supported on D3D9
         VET_SHORT2 = 6,
-        VET_SHORT3 = 7,  ///< @deprecated (see #VertexElementType note)
+        VET_SHORT3 = 7,  ///< not supported on D3D9 and D3D11
         VET_SHORT4 = 8,
         VET_UBYTE4 = 9,
         _DETAIL_SWAP_RB = 10,
@@ -138,9 +138,9 @@ namespace Ogre {
         VET_DOUBLE2 = 13,
         VET_DOUBLE3 = 14,
         VET_DOUBLE4 = 15,
-        VET_USHORT1 = 16,  ///< @deprecated (see #VertexElementType note)
+        VET_USHORT1 = 16,  ///< not supported on D3D9
         VET_USHORT2 = 17,
-        VET_USHORT3 = 18,  ///< @deprecated (see #VertexElementType note)
+        VET_USHORT3 = 18,  ///< not supported on D3D9 and D3D11
         VET_USHORT4 = 19,
         VET_INT1 = 20,
         VET_INT2 = 21,
