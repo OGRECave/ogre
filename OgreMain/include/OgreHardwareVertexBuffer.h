@@ -158,6 +158,10 @@ namespace Ogre {
         VET_USHORT2_NORM = 33, ///< unsigned shorts (normalized to 0..1)
         VET_USHORT4_NORM = 34,
         VET_INT_10_10_10_2_NORM = 35, ///< signed int (normalized to 0..1)
+        VET_HALF1 = 36, ///< not supported on D3D9
+        VET_HALF2 = 37,
+        VET_HALF3 = 38, ///< not supported on D3D9 and D3D11
+        VET_HALF4 = 39,
         VET_COLOUR = VET_UBYTE4_NORM,  ///< @deprecated use VET_UBYTE4_NORM
         VET_COLOUR_ARGB = VET_UBYTE4_NORM,  ///< @deprecated use VET_UBYTE4_NORM
         VET_COLOUR_ABGR = VET_UBYTE4_NORM,  ///< @deprecated use VET_UBYTE4_NORM

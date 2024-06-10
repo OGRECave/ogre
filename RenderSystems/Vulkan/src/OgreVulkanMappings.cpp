@@ -207,10 +207,14 @@ namespace Ogre
             return VK_FORMAT_R16G16_UNORM;
         case VET_USHORT4_NORM:
             return VK_FORMAT_R16G16B16A16_UNORM;
-        //case VET_HALF2:
-        //    return VK_FORMAT_R16G16_SFLOAT;
-        //case VET_HALF4:
-        //    return VK_FORMAT_R16G16B16A16_SFLOAT;
+        case VET_HALF1:
+            return VK_FORMAT_R16_SFLOAT;
+        case VET_HALF2:
+            return VK_FORMAT_R16G16_SFLOAT;
+        case VET_HALF3:
+            return VK_FORMAT_R16G16B16_SFLOAT;
+        case VET_HALF4:
+            return VK_FORMAT_R16G16B16A16_SFLOAT;
         case VET_INT_10_10_10_2_NORM:
             return VK_FORMAT_A2B10G10R10_SNORM_PACK32;
         case _DETAIL_SWAP_RB:
