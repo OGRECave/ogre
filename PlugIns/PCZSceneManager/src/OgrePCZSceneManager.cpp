@@ -74,6 +74,15 @@ namespace Ogre
         }
         mPortals.clear();
 
+        AntiPortal * ap;
+        AntiPortalList::iterator iap = mAntiPortals.begin();
+        for (iap = mAntiPortals.begin(); iap != mAntiPortals.end(); iap++)
+        {
+            ap = *iap;
+            OGRE_DELETE ap;
+        }
+        mAntiPortals.clear();
+
         // delete all the zones
         for (ZoneMap::iterator j = mZones.begin();
             j != mZones.end(); ++j)
@@ -102,6 +111,15 @@ namespace Ogre
             OGRE_DELETE p;
         }
         mPortals.clear();
+
+        AntiPortal * ap;
+        AntiPortalList::iterator iap = mAntiPortals.begin();
+        for (iap = mAntiPortals.begin(); iap != mAntiPortals.end(); iap++)
+        {
+            ap = *iap;
+            OGRE_DELETE ap;
+        }
+        mAntiPortals.clear();
 
         // delete all the zones
         for (ZoneMap::iterator j = mZones.begin();
