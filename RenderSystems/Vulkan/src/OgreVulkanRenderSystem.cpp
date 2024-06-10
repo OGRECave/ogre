@@ -1018,7 +1018,7 @@ namespace Ogre
         if(!vertexBuffers.empty())
             vkCmdBindVertexBuffers(cmdBuffer, 0, vertexBuffers.size(), vertexBuffers.data(), offsets);
 
-        if(op.indexData)
+        if(op.useIndexes)
         {
             auto itype = VkIndexType(op.indexData->indexBuffer->getType());
             auto b = op.indexData->indexBuffer->_getImpl<VulkanHardwareBuffer>()->getVkBuffer();
