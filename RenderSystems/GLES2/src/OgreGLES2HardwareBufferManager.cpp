@@ -109,6 +109,11 @@ namespace Ogre {
             case VET_FLOAT3:
             case VET_FLOAT4:
                 return GL_FLOAT;
+            case VET_HALF1:
+            case VET_HALF2:
+            case VET_HALF3:
+            case VET_HALF4:
+                return GL_HALF_FLOAT;
             case VET_SHORT1:
             case VET_SHORT2:
             case VET_SHORT3:
