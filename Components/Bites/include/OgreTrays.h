@@ -518,12 +518,12 @@ namespace OgreBites
 
         /// Do not instantiate any widgets directly. Use TrayManager.
         Slider(const Ogre::String& name, const Ogre::DisplayString& caption, Ogre::Real width, Ogre::Real trackWidth,
-            Ogre::Real valueBoxWidth, Ogre::Real minValue, Ogre::Real maxValue, unsigned int snaps);
+            Ogre::Real valueBoxWidth, float minValue, float maxValue, unsigned int snaps);
 
         /**
         Sets the minimum value, maximum value, and the number of snapping points.
         */
-        void setRange(Ogre::Real minValue, Ogre::Real maxValue, unsigned int snaps, bool notifyListener = true);
+        void setRange(float minValue, float maxValue, unsigned int snaps, bool notifyListener = true);
 
         const Ogre::DisplayString& getValueCaption()
         {
@@ -538,12 +538,9 @@ namespace OgreBites
             mValueTextArea->setCaption(caption);
         }
 
-        void setValue(Ogre::Real value, bool notifyListener = true);
+        void setValue(float value, bool notifyListener = true);
 
-        Ogre::Real getValue()
-        {
-            return mValue;
-        }
+        float getValue() { return mValue; }
 
         const Ogre::DisplayString& getCaption()
         {
@@ -569,7 +566,7 @@ namespace OgreBites
         Internal method - given a percentage (from left to right), gets the
         value of the nearest marker.
         */
-        Ogre::Real getSnappedValue(Ogre::Real percentage)
+        float getSnappedValue(float percentage)
         {
             percentage = Ogre::Math::saturate(percentage);
             unsigned int whichMarker = (unsigned int) (percentage * (mMaxValue - mMinValue) / mInterval + 0.5);
@@ -583,10 +580,10 @@ namespace OgreBites
         bool mDragging;
         bool mFitToContents;
         Ogre::Real mDragOffset;
-        Ogre::Real mValue;
-        Ogre::Real mMinValue;
-        Ogre::Real mMaxValue;
-        Ogre::Real mInterval;
+        float mValue;
+        float mMinValue;
+        float mMaxValue;
+        float mInterval;
     };
 
     /**
