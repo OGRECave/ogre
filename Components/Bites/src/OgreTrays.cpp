@@ -781,7 +781,7 @@ Separator::Separator(const Ogre::String &name, Ogre::Real width)
     }
 }
 
-Slider::Slider(const Ogre::String &name, const Ogre::DisplayString &caption, Ogre::Real width, Ogre::Real trackWidth, Ogre::Real valueBoxWidth, Ogre::Real minValue, Ogre::Real maxValue, unsigned int snaps)
+Slider::Slider(const Ogre::String &name, const Ogre::DisplayString &caption, Ogre::Real width, Ogre::Real trackWidth, Ogre::Real valueBoxWidth, float minValue, float maxValue, unsigned int snaps)
     : mDragOffset(0.0f)
     , mValue(0.0f)
     , mMinValue(0.0f)
@@ -826,7 +826,7 @@ Slider::Slider(const Ogre::String &name, const Ogre::DisplayString &caption, Ogr
     setRange(minValue, maxValue, snaps, false);
 }
 
-void Slider::setRange(Ogre::Real minValue, Ogre::Real maxValue, unsigned int snaps, bool notifyListener)
+void Slider::setRange(float minValue, float maxValue, unsigned int snaps, bool notifyListener)
 {
     mMinValue = minValue;
     mMaxValue = maxValue;
@@ -847,11 +847,11 @@ void Slider::setRange(Ogre::Real minValue, Ogre::Real maxValue, unsigned int sna
     }
 }
 
-void Slider::setValue(Ogre::Real value, bool notifyListener)
+void Slider::setValue(float value, bool notifyListener)
 {
     if (mInterval == 0) return;
 
-    mValue = Ogre::Math::Clamp<Ogre::Real>(value, mMinValue, mMaxValue);
+    mValue = Ogre::Math::Clamp(value, mMinValue, mMaxValue);
 
     setValueCaption(Ogre::StringConverter::toString(mValue));
 
