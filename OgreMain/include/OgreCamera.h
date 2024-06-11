@@ -601,8 +601,7 @@ namespace Ogre {
             Real* left, Real* top, Real* right, Real* bottom) const override;
         float getNearClipDistance(void) const override;
         float getFarClipDistance(void) const override;
-        /// @copydoc Frustum::getViewMatrix
-        const Affine3& getViewMatrix(void) const;
+        const Affine3& getViewMatrix(void) const override;
         /** Specialised version of getViewMatrix allowing caller to differentiate
             whether the custom culling frustum should be allowed or not. 
 
