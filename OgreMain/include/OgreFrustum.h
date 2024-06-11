@@ -311,7 +311,7 @@ namespace Ogre
 
         /** Gets the view matrix for this frustum. Mainly for use by OGRE internally.
         */
-        const Affine3& getViewMatrix(void) const;
+        virtual const Affine3& getViewMatrix(void) const;
 
         /** Calculate a view matrix for this frustum, relative to a potentially dynamic point. 
             Mainly for use by OGRE internally when using camera-relative rendering
