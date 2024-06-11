@@ -42,8 +42,8 @@ public:
     bool isVisible(const Vector3& vert, FrustumPlane* culledBy = 0) const override {return true;};
     bool projectSphere(const Sphere& sphere, 
         Real* left, Real* top, Real* right, Real* bottom) const override {*left = *bottom = -1.0f; *right = *top = 1.0f; return true;};
-    Real getNearClipDistance(void) const {return 1.0;};
-    Real getFarClipDistance(void) const {return 9999999999999.0f;};
+    float getNearClipDistance(void) const override {return 1.0;};
+    float getFarClipDistance(void) const override {return 9999999999999.0f;};
     const Plane& getFrustumPlane( unsigned short plane ) const override
     {
         return mFrustumPlanes[plane];

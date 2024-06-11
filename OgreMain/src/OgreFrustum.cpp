@@ -91,30 +91,18 @@ namespace Ogre {
 
 
     //-----------------------------------------------------------------------
-    void Frustum::setFarClipDistance(Real farPlane)
+    void Frustum::setFarClipDistance(float farPlane)
     {
         mFarDist = farPlane;
         invalidateFrustum();
     }
 
     //-----------------------------------------------------------------------
-    Real Frustum::getFarClipDistance(void) const
-    {
-        return mFarDist;
-    }
-
-    //-----------------------------------------------------------------------
-    void Frustum::setNearClipDistance(Real nearPlane)
+    void Frustum::setNearClipDistance(float nearPlane)
     {
         OgreAssert(nearPlane > 0, "Invalid clip distance");
         mNearDist = nearPlane;
         invalidateFrustum();
-    }
-
-    //-----------------------------------------------------------------------
-    Real Frustum::getNearClipDistance(void) const
-    {
-        return mNearDist;
     }
 
     //---------------------------------------------------------------------
