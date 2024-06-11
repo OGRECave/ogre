@@ -1660,7 +1660,7 @@ namespace Ogre {
             @param name The name of the parameter
             @param val The value to set
         */
-        void setNamedConstant(const String& name, Real val);
+        void setNamedConstant(const String& name, float val);
         /// @overload
         void setNamedConstant(const String& name, int val);
         /// @overload
