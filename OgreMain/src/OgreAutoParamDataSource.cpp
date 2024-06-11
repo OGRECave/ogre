@@ -1035,17 +1035,17 @@ namespace Ogre {
         return mCurrentCamera->getDerivedUp();
     }
     //-----------------------------------------------------------------------------
-    Real AutoParamDataSource::getFOV() const
+    float AutoParamDataSource::getFOV() const
     { 
         return mCurrentCamera->getFOVy().valueRadians(); 
     }
     //-----------------------------------------------------------------------------
-    Real AutoParamDataSource::getNearClipDistance() const
+    float AutoParamDataSource::getNearClipDistance() const
     { 
         return mCurrentCamera->getNearClipDistance(); 
     }
     //-----------------------------------------------------------------------------
-    Real AutoParamDataSource::getFarClipDistance() const
+    float AutoParamDataSource::getFarClipDistance() const
     { 
         return mCurrentCamera->getFarClipDistance(); 
     }

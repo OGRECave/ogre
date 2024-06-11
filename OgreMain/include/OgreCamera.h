@@ -599,10 +599,8 @@ namespace Ogre {
         /// @copydoc Frustum::projectSphere
         bool projectSphere(const Sphere& sphere, 
             Real* left, Real* top, Real* right, Real* bottom) const override;
-        /// @copydoc Frustum::getNearClipDistance
-        Real getNearClipDistance(void) const;
-        /// @copydoc Frustum::getFarClipDistance
-        Real getFarClipDistance(void) const;
+        float getNearClipDistance(void) const override;
+        float getFarClipDistance(void) const override;
         /// @copydoc Frustum::getViewMatrix
         const Affine3& getViewMatrix(void) const;
         /** Specialised version of getViewMatrix allowing caller to differentiate

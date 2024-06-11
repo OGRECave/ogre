@@ -72,9 +72,9 @@ namespace Ogre
         /// y-direction field-of-view (default 45)
         Radian mFOVy;
         /// Far clip distance - default 10000
-        Real mFarDist;
+        float mFarDist;
         /// Near clip distance - default 100
-        Real mNearDist;
+        float mNearDist;
         /// x/y viewport ratio - default 1.3333
         Real mAspect;
         /// Ortho height size (world units)
@@ -197,11 +197,11 @@ namespace Ogre
         @param nearDist
             The distance to the near clipping plane from the frustum in world coordinates.
          */
-        void setNearClipDistance(Real nearDist);
+        void setNearClipDistance(float nearDist);
 
         /** Retrieves the distance from the frustum to the near clipping plane.
         */
-        Real getNearClipDistance(void) const;
+        virtual float getNearClipDistance(void) const { return mNearDist; }
 
         /** Sets the distance to the far clipping plane.
 
@@ -223,11 +223,11 @@ namespace Ogre
             distance which is useful especially when projecting shadows; but
             be careful not to use a near distance too close.
         */
-        void setFarClipDistance(Real farDist);
+        void setFarClipDistance(float farDist);
 
         /** Retrieves the distance from the frustum to the far clipping plane.
         */
-        Real getFarClipDistance(void) const;
+        virtual float getFarClipDistance(void) const { return mFarDist; }
 
         /** Sets the aspect ratio for the frustum viewport.
 
