@@ -2214,7 +2214,7 @@ namespace Ogre
         return def->physicalIndex + offset * def->elementSize;
     }
 
-    void GpuProgramParameters::setNamedConstant(const String& name, Real val)
+    void GpuProgramParameters::setNamedConstant(const String& name, float val)
     {
         // look up, and throw an exception if we're not ignoring missing
         const GpuConstantDefinition* def =
