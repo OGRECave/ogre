@@ -2219,8 +2219,10 @@ namespace Ogre
         // look up, and throw an exception if we're not ignoring missing
         const GpuConstantDefinition* def =
             _findNamedConstantDefinition(name, !mIgnoreMissingParams);
-        if (def)
-            _writeRawConstant(withArrayOffset(def, name), val);
+        if (!def)
+            return;
+        OgreAssert(def->isFloat(), "Constant type mismatch");
+        _writeRawConstant(withArrayOffset(def, name), val);
     }
     //---------------------------------------------------------------------------
     void GpuProgramParameters::setNamedConstant(const String& name, int val)
@@ -2232,9 +2234,13 @@ namespace Ogre
             return;
 
         if(def->isSampler())
+        {
             _writeRegisters(withArrayOffset(def, name), &val, 1);
-        else
-            _writeRawConstant(withArrayOffset(def, name), val);
+            return;
+        }
+
+        OgreAssert(def->isInt(), "Constant type mismatch");
+        _writeRawConstant(withArrayOffset(def, name), val);
     }
     //---------------------------------------------------------------------------
     void GpuProgramParameters::setNamedConstant(const String& name, uint val)
@@ -2242,8 +2248,11 @@ namespace Ogre
         // look up, and throw an exception if we're not ignoring missing
         const GpuConstantDefinition* def =
             _findNamedConstantDefinition(name, !mIgnoreMissingParams);
-        if (def)
-            _writeRawConstant(withArrayOffset(def, name), val);
+        if (!def)
+            return;
+
+        OgreAssert(def->isUnsignedInt(), "Constant type mismatch");
+        _writeRawConstant(withArrayOffset(def, name), val);
     }
     //---------------------------------------------------------------------------
     void GpuProgramParameters::setNamedConstant(const String& name, const Vector4& vec)
