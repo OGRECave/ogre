@@ -102,7 +102,7 @@ void GLSLProgramWriter::initializeStringMaps()
 void GLSLProgramWriter::writeSourceCode(std::ostream& os, Program* program)
 {
     // Write the current version (this force the driver to more fulfill the glsl standard)
-    os << "#version "<< mGLSLVersion << std::endl;
+    os << "OGRE_NATIVE_GLSL_VERSION_DIRECTIVE\n";
 
     // Generate dependencies.
     writeProgramDependencies(os, program);

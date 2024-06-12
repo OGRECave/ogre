@@ -62,8 +62,9 @@ namespace Ogre {
         // Preprocess the GLSL shader in order to get a clean source
         CPreprocessor cpp;
 
+        bool isGLES = getLanguage() == "glsles";
         // Define "predefined" macros.
-        if(getLanguage() == "glsles")
+        if(isGLES)
             cpp.Define("GL_ES", 5, "1", 1);
 
         size_t versionPos = mSource.find("#version");
@@ -71,10 +72,23 @@ namespace Ogre {
         {
             mShaderVersion = StringConverter::parseInt(mSource.substr(versionPos+9, 3));
         }
+
+        auto renderSystem = Root::getSingleton().getRenderSystem();
+
+        versionPos = mSource.find("OGRE_NATIVE_GLSL_VERSION_DIRECTIVE");
+        if(versionPos != String::npos)
+        {
+            mShaderVersion = renderSystem ? renderSystem->getNativeShadingLanguageVersion() : 120;
+            // Replace the version directive with the actual version
+            mSource.replace(
+                versionPos, 34,
+                StringUtil::format("#version %d%s", mShaderVersion, (isGLES && mShaderVersion > 100) ? " es" : ""));
+        }
+
         String verStr = std::to_string(mShaderVersion);
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
-        auto rsc = Root::getSingleton().getRenderSystem()->getCapabilities();
+        auto rsc = renderSystem->getCapabilities();
         // OSX driver only supports glsl150+ in core profile, GL3+ will auto-upgrade code
         if(mShaderVersion < 150 && getLanguage() == "glsl" && rsc->isShaderProfileSupported("glsl150"))
             verStr = "150";

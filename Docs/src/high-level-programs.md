@@ -390,7 +390,7 @@ fragment_program myFragmentShader glsl glsles
 }
 ```
 
-If you use the built-in defines like @c OGRE_HLSL, you can even write programs compatible with both HLSL and GLSL. In fact, you can use `#include <OgreUnifiedShader.h>` in the shader which provides cross-language macros to help with this.
+You can even write programs compatible with both HLSL and GLSL by using `#include <OgreUnifiedShader.h>` in the shader which provides cross-language macros to help with this. See @ref Cross-platform-Shaders for more information.
 
 # Unified High-level Programs {#Unified-High_002dlevel-Programs}
 
@@ -858,6 +858,7 @@ The following defines are available:
 - The current shading language and native version: e.g. @c OGRE_GLSL=120, @c OGRE_HLSL=3
 - The current shader type: e.g. @c OGRE_VERTEX_SHADER, @c OGRE_FRAGMENT_SHADER
 - Whether @ref reversed-depth is enabled: @c OGRE_REVERSED_Z
+- @c OGRE_NATIVE_GLSL_VERSION_DIRECTIVE which expands to e.g. `#version 300 es` for GLSL programs and nothing on other rendersystems.
 
 # Cross-platform macros {#OgreUnifiedShader}
 
@@ -878,6 +879,7 @@ In general, you have to do the following changes compared to regular GLSL:
 Let's take a look at how to use the `OgreUnifiedShader.h` macros by starting with a simple GLSL shader:
 
 ```cpp
+#version 120
 uniform mat4 worldMatrix;
 
 attribute vec4 vertex;
@@ -890,6 +892,7 @@ void main()
 to make it cross-platform, we need to modify it as:
 
 ```cpp
+OGRE_NATIVE_GLSL_VERSION_DIRECTIVE
 #include <OgreUnifiedShader.h>
 
 OGRE_UNIFORMS(
