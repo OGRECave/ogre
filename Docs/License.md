@@ -274,4 +274,7 @@ Licensed Under:</td>
     <li>
         <p>studio_garden.jpg adapted from Sergej Majboroda, published under CC-0 https://polyhaven.com/a/studio_garden</p>
     </li>
+    <li>
+        <p>lego.mesh adapted with LightGaussian (Zhiwen Fan, et. al.) from Mip-Splatting (Zehao Yu, et. al.) originally by Heinzelnisse, published under CC-BY-NC: https://www.blendswap.com/blend/11490</p>
+    </li>
 </ul>
