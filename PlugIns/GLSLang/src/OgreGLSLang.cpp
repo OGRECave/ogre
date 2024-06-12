@@ -396,6 +396,12 @@ void GLSLangProgram::prepareImpl()
     }
     shader.setPreamble(preamble.c_str());
 
+    size_t versionPos = mSource.find("OGRE_NATIVE_GLSL_VERSION_DIRECTIVE");
+    if(versionPos != String::npos)
+    {
+        mSource.replace(versionPos, 34, "#version 460\n");
+    }
+
     mSource = _resolveIncludes(mSource, this, mFilename, true);
     const char* source = mSource.c_str();
     const char* name = mFilename.empty() ? NULL : mFilename.c_str();

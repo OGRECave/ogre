@@ -1,8 +1,4 @@
-#ifdef GL_ES
-#version 300 es
-#else
-#version 150
-#endif
+OGRE_NATIVE_GLSL_VERSION_DIRECTIVE
 
 in vec4 ambientUV;
 in vec3 ray;

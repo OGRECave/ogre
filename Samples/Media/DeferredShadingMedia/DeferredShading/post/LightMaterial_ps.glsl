@@ -31,11 +31,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //////////////////////////////////////////////////////////////////////////////
 // Helper function section
 //////////////////////////////////////////////////////////////////////////////
-#ifdef GL_ES
-#version 300 es
-#else
-#version 150
-#endif
+OGRE_NATIVE_GLSL_VERSION_DIRECTIVE
 
 void checkShadow(
     sampler2D shadowMap,

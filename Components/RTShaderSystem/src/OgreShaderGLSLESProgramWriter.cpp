@@ -51,13 +51,7 @@ namespace Ogre {
             Program* program)
         {
             // Write the current version (this forces the driver to fulfill the glsl es standard)
-            os << "#version "<< mGLSLVersion;
-
-            // Starting with ES 3.0 the version must contain the string "es" after the version number with a space separating them
-            if(mGLSLVersion > 100)
-                os << " es";
-
-            os << std::endl;
+            os << "OGRE_NATIVE_GLSL_VERSION_DIRECTIVE\n";
 
             for(const auto& p : program->getParameters())
             {

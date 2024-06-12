@@ -1,8 +1,4 @@
-#ifdef GL_ES
-#version 300 es
-#else
-#version 150
-#endif
+OGRE_NATIVE_GLSL_VERSION_DIRECTIVE
 
 uniform mat4 worldViewProj;
 in vec4 vertex;
