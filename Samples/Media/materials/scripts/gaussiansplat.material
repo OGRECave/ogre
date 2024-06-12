@@ -1,0 +1,52 @@
+
+vertex_program gsplatting_vp glsl glsles glslang
+{
+	source gsplat.vert
+
+	default_params
+	{
+		param_named_auto projmatrix worldviewproj_matrix
+		param_named_auto viewmatrix worldview_matrix
+		param_named_auto vpsize viewport_size
+		param_named_auto fovy fov
+	}
+}
+
+fragment_program gsplatting_fp glsl150 glsles glslang
+{
+	source gsplat.frag
+}
+
+material Example/GaussianSplatting
+{
+	technique
+	{
+		pass
+		{
+			scene_blend alpha_blend
+			depth_write off
+
+			vertex_program_ref gsplatting_vp
+			{
+			}
+
+			fragment_program_ref gsplatting_fp
+			{
+			}
+		}
+	}
+}
+
+material Example/Pointcloud
+{
+	technique
+	{
+		pass
+		{
+			lighting off
+			ambient vertexcolour
+			point_size_attenuation on 1 10000 0
+			scene_blend alpha_blend
+		}
+	}
+}

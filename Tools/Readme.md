@@ -7,6 +7,7 @@ For further info, visit http://www.ogre3d.org
 ## Index
  - [AssimpConverter](#assimpconverter)
  - [BitmapFontBuilderTool](#bitmapfontbuildertool)
+ - [gsplat_to_mesh](#gsplat_to_mesh)
  - [LightwaveConverter](#lightwaveconverter)
  - [MayaExport](#mayaexport)
  - [OgreXMLConverter](#ogrexmlconverter)
@@ -40,6 +41,11 @@ destination         = optional name of directory to write to. If you don't
 
 ## BitmapFontBuilderTool
 Tool designed to take the binary width files from BitmapFontBuilder http://www.lmnopc.com/bitmapfontbuilder/ and convert them into Ogre .fontdef 'glyph' statements.
+
+## gsplat_to_mesh
+
+Converts 3D gaussian splatting .ply files to OGRE .mesh files while reducing the size.
+See https://www.rojtberg.net/2801/incorporating-3d-gaussian-splats-into-the-graphics-pipeline/
 
 ## LightwaveConverter
 Lwo2Mesh v0.89 by Dennis Verbeek ( dennis.verbeek@chello.nl )
