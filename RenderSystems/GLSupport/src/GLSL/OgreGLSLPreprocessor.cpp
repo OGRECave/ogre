@@ -1016,6 +1016,7 @@ namespace Ogre {
 
         EnableElif <<= 1;
         EnableOutput <<= 1;
+        Passthrough <<= 1;
         if (val)
             EnableOutput |= 1;
         else
@@ -1145,6 +1146,22 @@ namespace Ogre {
         return true;
     }
 
+    static const char* strnstr(const char* haystack, size_t length, const char* needle)
+    {
+        size_t needle_length = strlen(needle);
+        for (size_t i = 0; i < length; i++)
+        {
+            if (i + needle_length > length)
+            {
+                return NULL;
+            }
+            if (strncmp(&haystack[i], needle, needle_length) == 0)
+            {
+                return &haystack[i];
+            }
+        }
+        return NULL;
+    }
 
     CPreprocessor::Token CPreprocessor::HandleDirective (Token &iToken, int iLine)
     {
@@ -1205,6 +1222,19 @@ namespace Ogre {
         }
     Done:
 
+        if (strncmp(directive, "if", 2) == 0)
+        {
+            for(auto def : PassthroughList)
+            {
+                if(strnstr(t.String, t.Length, def))
+                {
+                    Passthrough |= 1;
+                }
+            }
+        }
+
+        bool passthrough = Passthrough & 1;
+
 #define IS_DIRECTIVE(s)                                                 \
         (dirlen == strlen(s) && (strncmp (directive, s, dirlen) == 0))
 
@@ -1215,9 +1245,9 @@ namespace Ogre {
             rc = HandleDefine (t, iLine);
         else if (IS_DIRECTIVE ("undef") && outputEnabled)
             rc = HandleUnDef (t, iLine);
-        else if (IS_DIRECTIVE ("ifdef"))
+        else if (IS_DIRECTIVE ("ifdef") && !passthrough)
             rc = HandleIfDef (t, iLine);
-        else if (IS_DIRECTIVE ("ifndef"))
+        else if (IS_DIRECTIVE ("ifndef") && !passthrough)
         {
             rc = HandleIfDef (t, iLine);
             if (rc)
@@ -1226,19 +1256,18 @@ namespace Ogre {
                 EnableElif ^= 1;
             }
         }
-        else if (IS_DIRECTIVE ("if"))
+        else if (IS_DIRECTIVE ("if") && !passthrough)
             rc = HandleIf (t, iLine);
-        else if (IS_DIRECTIVE ("elif"))
+        else if (IS_DIRECTIVE ("elif") && !passthrough)
             rc = HandleElif (t, iLine);
 
-        else if (IS_DIRECTIVE ("else"))
+        else if (IS_DIRECTIVE ("else") && !passthrough)
             rc = HandleElse (t, iLine);
-        else if (IS_DIRECTIVE ("endif"))
+        else if (IS_DIRECTIVE ("endif") && !passthrough)
             rc = HandleEndIf (t, iLine);
         else
         {
-            //Error (iLine, "Unknown preprocessor directive", &iToken);
-            //return Token (Token::TK_ERROR);
+            if(IS_DIRECTIVE ("endif")) Passthrough &= ~1;
 
             // Unknown preprocessor directive, roll back and pass through
             Line = old_line;
@@ -1297,6 +1326,7 @@ namespace Ogre {
         BOL = true;
         EnableOutput = 1;
         EnableElif = 0;
+        Passthrough = 0;
 
         // Accumulate output into this token
         Token output (Token::TK_TEXT);

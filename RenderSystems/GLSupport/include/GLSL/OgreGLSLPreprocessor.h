@@ -209,8 +209,12 @@ namespace Ogre {
         /// A stack of 32 booleans packed into one value :)
         unsigned EnableOutput;
         unsigned EnableElif;
+        unsigned Passthrough;
         /// The list of macros defined so far
         std::forward_list<Macro> MacroList;
+
+        /// List of define prefixes to pass through
+        std::vector<const char*> PassthroughList;
 
         /**
          * Private constructor to re-parse a single token.
@@ -445,6 +449,14 @@ namespace Ogre {
 
         /// Destroy the preprocessor object
         virtual ~CPreprocessor ();
+
+        /** Define-prefixes from this list cause the #if directive not to be expanded
+
+            useful to test GLSL extension support at runtime
+            @param lst the list. Supposed to contain string literals. Make sure that the memory pointed
+            is available throughout the lifetime of CPreprocessor otherwise.
+        */
+        void setPassthroughDefines(const std::vector<const char*>& lst) { PassthroughList = lst; }
 
         /**
          * Define a macro without parameters.
