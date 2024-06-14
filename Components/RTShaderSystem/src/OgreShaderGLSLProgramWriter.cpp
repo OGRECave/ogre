@@ -33,18 +33,23 @@ namespace RTShader {
 String GLSLProgramWriter::TargetLanguage = "glsl";
 
 //-----------------------------------------------------------------------
-GLSLProgramWriter::GLSLProgramWriter() : mIsGLSLES(false), mIsVulkan(false)
+GLSLProgramWriter::GLSLProgramWriter() : mGLSLVersion(100), mIsGLSLES(false), mIsVulkan(false)
 {
-    auto* rs = Root::getSingleton().getRenderSystem();
-    mGLSLVersion = rs ? rs->getNativeShadingLanguageVersion() : 120;
+    initializeStringMaps();
 
-    if(rs && rs->getCapabilities()->isShaderProfileSupported("spirv"))
+    auto* rs = Root::getSingleton().getRenderSystem();
+    if (!rs)
+        return;
+
+    mGLSLVersion = rs->getNativeShadingLanguageVersion();
+
+    if (rs->getCapabilities()->isShaderProfileSupported("spirv"))
     {
         mGLSLVersion = 460;
         mIsVulkan = true;
     }
 
-    initializeStringMaps();
+    mIsGLSLES = rs->getCapabilities()->isShaderProfileSupported("glsles");
 }
 
 //-----------------------------------------------------------------------
@@ -103,6 +108,18 @@ void GLSLProgramWriter::writeSourceCode(std::ostream& os, Program* program)
 {
     // Write the current version (this force the driver to more fulfill the glsl standard)
     os << "OGRE_NATIVE_GLSL_VERSION_DIRECTIVE\n";
+
+    for(const auto& p : program->getParameters())
+    {
+        if(p->getType() != GCT_SAMPLER_EXTERNAL_OES)
+            continue;
+        if(mGLSLVersion > 100)
+            os << "#extension GL_OES_EGL_image_external_essl3 : require\n";
+        else
+            os << "#extension GL_OES_EGL_image_external : require\n";
+
+        break;
+    }
 
     // Generate dependencies.
     writeProgramDependencies(os, program);

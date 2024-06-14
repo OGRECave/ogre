@@ -86,7 +86,6 @@ THE SOFTWARE.
 #include "OgreShaderProgramWriterManager.h"
 #include "OgreShaderCGProgramWriter.h"
 #include "OgreShaderGLSLProgramWriter.h"
-#include "OgreShaderGLSLESProgramWriter.h"
 
 // Fixed Function Library: Transform functions
 #define FFP_LIB_TRANSFORM                           "FFPLib_Transform"

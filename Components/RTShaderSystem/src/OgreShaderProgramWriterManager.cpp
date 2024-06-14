@@ -55,7 +55,7 @@ ProgramWriterManager::ProgramWriterManager()
     addProgramWriter("hlsl", new CGProgramWriter());
 #endif
     addProgramWriter("glslang", new GLSLProgramWriter());
-    addProgramWriter("glsles", new GLSLESProgramWriter());
+    addProgramWriter("glsles", new GLSLProgramWriter());
 }
 //-----------------------------------------------------------------------
 ProgramWriterManager::~ProgramWriterManager()
