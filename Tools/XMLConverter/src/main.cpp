@@ -278,10 +278,6 @@ void meshToXML(const XmlOptions& opts, MeshSerializer& meshSerializer)
    
     XMLMeshSerializer xmlMeshSerializer;
     xmlMeshSerializer.exportMesh(mesh.get(), opts.dest);
-
-    // Clean up the conversion mesh
-    MeshManager::getSingleton().remove("conversion",
-                                       ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
 }
 
 void XMLToBinary(const XmlOptions& opts, MeshSerializer& meshSerializer)
@@ -318,9 +314,6 @@ void XMLToBinary(const XmlOptions& opts, MeshSerializer& meshSerializer)
         }
 
         meshSerializer.exportMesh(newMesh, opts.dest, opts.endian);
-
-        // Clean up the conversion mesh
-        MeshManager::getSingleton().remove("conversion", RGN_DEFAULT);
     }
     else if (StringUtil::startsWith("skeleton", root.name()))
     {
@@ -334,9 +327,6 @@ void XMLToBinary(const XmlOptions& opts, MeshSerializer& meshSerializer)
         }
         SkeletonSerializer skeletonSerializer;
         skeletonSerializer.exportSkeleton(newSkel.get(), opts.dest, SKELETON_VERSION_LATEST, opts.endian);
-
-        // Clean up the conversion skeleton
-        SkeletonManager::getSingleton().remove("conversion", RGN_DEFAULT);
     }
 }
 
@@ -356,9 +346,6 @@ void skeletonToXML(const XmlOptions& opts)
 
     XMLSkeletonSerializer xmlSkeletonSerializer;
     xmlSkeletonSerializer.exportSkeleton(skel.get(), opts.dest);
-
-    // Clean up the conversion skeleton
-    SkeletonManager::getSingleton().remove("conversion", RGN_DEFAULT);
 }
 
 struct MeshResourceCreator : public MeshSerializerListener
@@ -412,6 +399,8 @@ int main(int numargs, char** args)
     try 
     {
         logMgr.setDefaultLog(NULL); // swallow startup messages
+
+        DefaultHardwareBufferManager bufferManager; // needed because we don't have a rendersystem
         Root root("", "", "");
         // get rid of the temporary log as we use the new log now
         logMgr.destroyLog("Temporary log");
@@ -424,7 +413,6 @@ int main(int numargs, char** args)
         MeshSerializer meshSerializer;
         MeshResourceCreator resCreator;
         meshSerializer.setListener(&resCreator);
-        DefaultHardwareBufferManager bufferManager; // needed because we don't have a rendersystem
 
         if (opts.sourceExt == "mesh")
         {
