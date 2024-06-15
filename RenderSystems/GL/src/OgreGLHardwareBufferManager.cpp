@@ -33,6 +33,10 @@ THE SOFTWARE.
 #include "OgreRoot.h"
 #include "OgreRenderSystemCapabilities.h"
 
+#ifndef GL_HALF_FLOAT
+#define GL_HALF_FLOAT                     0x140B
+#endif
+
 namespace Ogre {
     //-----------------------------------------------------------------------
     // Scratch pool management (32 bit structure)
@@ -129,6 +133,11 @@ namespace Ogre {
             case VET_USHORT2_NORM:
             case VET_USHORT4_NORM:
                 return GL_UNSIGNED_SHORT;
+            case VET_HALF1:
+            case VET_HALF2:
+            case VET_HALF3:
+            case VET_HALF4:
+                return GL_HALF_FLOAT;
             default:
                 return 0;
         };
