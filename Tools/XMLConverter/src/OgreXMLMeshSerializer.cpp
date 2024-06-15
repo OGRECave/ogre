@@ -504,11 +504,21 @@ namespace Ogre {
                     switch(elem.getSemantic())
                     {
                     case VES_POSITION:
-                        elem.baseVertexPointerToElement(pVert, &pFloat);
                         dataNode = vertexNode.append_child("position");
-                        dataNode.append_attribute("x") = StringConverter::toString(pFloat[0]).c_str();
-                        dataNode.append_attribute("y") = StringConverter::toString(pFloat[1]).c_str();
-                        dataNode.append_attribute("z") = StringConverter::toString(pFloat[2]).c_str();
+                        if(elem.getType() == VET_HALF3)
+                        {
+                            elem.baseVertexPointerToElement(pVert, &pShort);
+                            dataNode.append_attribute("x") = StringConverter::toString(Bitwise::halfToFloat(*pShort++)).c_str();
+                            dataNode.append_attribute("y") = StringConverter::toString(Bitwise::halfToFloat(*pShort++)).c_str();
+                            dataNode.append_attribute("z") = StringConverter::toString(Bitwise::halfToFloat(*pShort++)).c_str();
+                        }
+                        else
+                        {
+                            elem.baseVertexPointerToElement(pVert, &pFloat);
+                            dataNode.append_attribute("x") = StringConverter::toString(pFloat[0]).c_str();
+                            dataNode.append_attribute("y") = StringConverter::toString(pFloat[1]).c_str();
+                            dataNode.append_attribute("z") = StringConverter::toString(pFloat[2]).c_str();
+                        }
                         break;
                     case VES_NORMAL:
                         elem.baseVertexPointerToElement(pVert, &pFloat);
