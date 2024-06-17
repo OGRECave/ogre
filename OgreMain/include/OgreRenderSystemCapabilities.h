@@ -132,6 +132,8 @@ namespace Ogre
         RSC_MIPMAP_LOD_BIAS = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 25),
         /// Supports hardware geometry programs
         RSC_GEOMETRY_PROGRAM = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 26),
+        /// Supports unaligned #VET_HALF3, #VET_SHORT3, #VET_USHORT3 formats
+        RSC_VERTEX_FORMAT_16X3 = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 27),
 
         /// Supports compressed textures
         RSC_TEXTURE_COMPRESSION = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 0),
