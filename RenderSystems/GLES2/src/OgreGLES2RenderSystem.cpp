@@ -442,7 +442,10 @@ namespace Ogre {
         }
 
         if(hasMinGLVersion(3, 0))
+        {
             rsc->setCapability(RSC_VERTEX_FORMAT_INT_10_10_10_2);
+            rsc->setCapability(RSC_VERTEX_FORMAT_16X3);
+        }
 
         if (hasMinGLVersion(3, 0) || checkExtension("GL_EXT_instanced_arrays"))
         {
