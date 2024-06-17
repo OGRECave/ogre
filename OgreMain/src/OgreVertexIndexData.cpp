@@ -69,11 +69,17 @@ namespace Ogre {
             pFloat[3] = pPacked->w;
     }
 
-    static void copy_float3(uint8* pDst, uint8* pSrc, int elemOffset)
+    static void extract_float3(uint8* pDst, uint8* pSrc, int elemOffset)
     {
         memcpy(pDst, pSrc + elemOffset, sizeof(float) * 3);
     }
 
+    /** Splice out an element from a vertex buffer
+     * @param elem The element to splice out of the vertex
+     * @param srcBuf Source buffer
+     * @param pDst Destination buffer for the vertex without the element
+     * @param pElemDst Destination buffer for the element (can be the same as pDst)
+     */
     static void spliceElement(const VertexElement* elem, const HardwareVertexBufferPtr& srcBuf, uint8* pDst,
                               uint8* pElemDst, uint32 newElemSize, void (*elemConvert)(uint8*, uint8*, int))
     {
@@ -340,7 +346,7 @@ namespace Ogre {
         {
             // Basically we just memcpy the vertex excluding the position
             HardwareBufferLockGuard destRemLock(newRemainderBuffer, HardwareBuffer::HBL_DISCARD);
-            spliceElement(posElem, vbuf, (uint8*)destRemLock.pData, (uint8*)pDest, posElem->getSize(), copy_float3);
+            spliceElement(posElem, vbuf, (uint8*)destRemLock.pData, (uint8*)pDest, posElem->getSize(), extract_float3);
         }
         else
         {
