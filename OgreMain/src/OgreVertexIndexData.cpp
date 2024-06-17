@@ -137,7 +137,7 @@ namespace Ogre {
             if (&e == elem)
             {
                 // Modify element
-                decl->modifyElement(idx, newSource, newElemOffset, newType, elem->getSemantic());
+                decl->modifyElement(idx, newSource, newElemOffset, newType, elem->getSemantic(), elem->getIndex());
             }
             else if (e.getSource() == oldSource && e.getOffset() > oldElemOffset)
             {
@@ -247,9 +247,9 @@ namespace Ogre {
         return dest;
     }
 
-    void VertexData::convertVertexElement(VertexElementSemantic semantic, VertexElementType dstType)
+    void VertexData::convertVertexElement(VertexElementSemantic semantic, VertexElementType dstType, uint16 index)
     {
-        auto elem = vertexDeclaration->findElementBySemantic(semantic);
+        auto elem = vertexDeclaration->findElementBySemantic(semantic, index);
 
         if (!elem || VertexElement::getBaseType(elem->getType()) == VertexElement::getBaseType(dstType))
             return; // nothing to do
