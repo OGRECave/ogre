@@ -146,7 +146,7 @@ namespace Ogre {
         void prepareForShadowVolume(void);
 
         /// converts between #VET_FLOAT3 or #VET_FLOAT4 and #VET_INT_10_10_10_2_NORM
-        void convertVertexElement(VertexElementSemantic semantic, VertexElementType dstType);
+        void convertVertexElement(VertexElementSemantic semantic, VertexElementType dstType, uint16 index = 0);
 
         /** Additional shadow volume vertex buffer storage. 
 
