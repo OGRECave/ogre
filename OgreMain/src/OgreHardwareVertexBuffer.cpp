@@ -236,6 +236,7 @@ namespace Ogre {
         case VET_DOUBLE1:
         case VET_INT1:
         case VET_UINT1:
+        case VET_HALF1:
             // evil enumeration arithmetic
             return static_cast<VertexElementType>( baseType + count - 1 );
 
