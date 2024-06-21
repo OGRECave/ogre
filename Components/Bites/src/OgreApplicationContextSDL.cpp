@@ -78,6 +78,8 @@ NativeWindowPair ApplicationContextSDL::createWindow(const Ogre::String& name, O
         Ogre::LogManager::getSingleton().logMessage("[SDL] Creating Wayland window");
         wl_egl_window *win_impl = (wl_egl_window*)SDL_GetWindowData(ret.native, "wl_egl_window");
 
+        // https://github.com/libsdl-org/SDL/issues/5386
+        // https://github.com/bkaradzic/bgfx/blob/00fa5ad179f5aa13c1e44d0bcbccdc535aba2d00/examples/common/entry/entry_sdl.cpp#L53-L64
         if(!win_impl)
         {
           Ogre::LogManager::getSingleton().logMessage("[SDL] Creating wl_egl_window");

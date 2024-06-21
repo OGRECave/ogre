@@ -37,8 +37,9 @@ THE SOFTWARE.
 #  endif
 #  include <windows.h>
 #elif OGRE_PLATFORM == OGRE_PLATFORM_LINUX
-// TODO: Add wayland-equivalent stuff as alternative
-#include <X11/Xlib.h>
+#  if !defined(OGRE_WAYLAND)
+#   include <X11/Xlib.h>
+#  endif
 #endif
 
 using namespace Ogre;
@@ -49,7 +50,9 @@ static WindowEventListeners _msListeners;
 static RenderWindowList _msWindows;
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_LINUX
+#  if !defined(OGRE_WAYLAND)
 static void GLXProc( RenderWindow *win, const XEvent &event );
+#  endif
 #endif
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
@@ -186,6 +189,7 @@ void WindowEventUtilities::messagePump()
         DispatchMessage( &msg );
     }
 #elif OGRE_PLATFORM == OGRE_PLATFORM_LINUX
+#if !defined(OGRE_WAYLAND)
 // TODO write wayland-alternative
     //GLX Message Pump
     Display* xDisplay = 0; // same for all windows
@@ -211,6 +215,7 @@ void WindowEventUtilities::messagePump()
             GLXProc(w, event);
         }
     }
+#  endif
 #endif
 }
 
@@ -243,6 +248,7 @@ void WindowEventUtilities::_removeRenderWindow(RenderWindow* window)
 }
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_LINUX
+#  if !defined(OGRE_WAYLAND)
 //--------------------------------------------------------------------------------//
 static void GLXProc( Ogre::RenderWindow *win, const XEvent &event )
 {
@@ -349,6 +355,7 @@ static void GLXProc( Ogre::RenderWindow *win, const XEvent &event )
         break;
     } //End switch event.type
 }
+#  endif
 #endif
 
 }

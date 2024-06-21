@@ -67,11 +67,11 @@ void WaylandEGLWindow::initNativeCreatedWindow(const NameValuePairList* miscPara
         if ((opt = miscParams->find("externalDisplay")) != end)
         {
           StringVector tokens = StringUtil::split(opt->second, " :");
-          LogManager::getSingleton().logWarning("GOT DISPLAY HANDLE:" + tokens[0]);
+          LogManager::getSingleton().logWarning("GOT DISPLAY POINTER:" + tokens[0]);
 
           auto tmp = (wl_display*)StringConverter::parseSizeT(tokens[0]);
-          LogManager::getSingleton().stream() << "SDL DISPLAY HANDLE:" << tmp;
-          LogManager::getSingleton().stream() << "MY DISPLAY HANDLE:" << mNativeDisplay;
+          LogManager::getSingleton().stream() << "EXTERNAL DISPLAY POINTER:" << tmp;
+          LogManager::getSingleton().stream() << "EXISTING DISPLAY POINTER:" << mNativeDisplay;
           mNativeDisplay = tmp;
           mGLSupport->setNativeDisplay(mNativeDisplay);
 

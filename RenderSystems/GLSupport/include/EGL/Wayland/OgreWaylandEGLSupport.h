@@ -11,6 +11,7 @@
 #include <wayland-egl.h> // include before egl
 
 #include "OgreEGLSupport.h"
+#include <OgreGLNativeSupport.h>
 
 namespace Ogre
 {
@@ -20,9 +21,13 @@ public:
     wl_surface* mWlSurface;
     wl_region* mWlRegion;
     wl_compositor* mWlCompositor;
+    wl_output* mWlOutput;
     bool mIsExternalDisplay;
 
 protected:
+
+    VideoModes mCbVideoModes;
+
 public:
     WaylandEGLSupport(int profile);
     virtual ~WaylandEGLSupport();
@@ -41,12 +46,25 @@ public:
                             const NameValuePairList* miscParams = 0) override;
 
 
-    static void globalRegistryHandler(void* data, struct wl_registry* registry, uint32_t id, const char* interface,
+    static void globalRegistryHandler(void* data, wl_registry* registry, uint32_t id, const char* interface,
                                       uint32_t version);
 
-    static void globalRegistryRemover(void* data, struct wl_registry* registry, uint32_t id);
+    static void globalRegistryRemover(void* data, wl_registry* registry, uint32_t id);
 
-    static const struct wl_registry_listener mRegistryListener;
+    static void output_handle_geometry(
+        void *data, wl_output *wl_output,
+        int32_t x, int32_t y,
+        int32_t physical_width, int32_t physical_height,
+        int32_t subpixel,
+        const char *make, const char *model,
+        int32_t output_transform);
+    static void output_handle_mode(
+        void *data, wl_output *wl_output,
+        uint32_t flags, int32_t width, int32_t height,
+        int32_t refresh);
+
+    static const wl_registry_listener mRegistryListener;
+    static const wl_output_listener mOutputListener;
 };
 
 } // namespace Ogre
