@@ -222,23 +222,27 @@ if (UNIX AND NOT APPLE AND NOT ANDROID AND NOT EMSCRIPTEN)
   find_package(PkgConfig)
   if (PKG_CONFIG_FOUND)
     pkg_check_modules(waylands IMPORTED_TARGET wayland-client wayland-egl egl)
-    pkg_check_modules(wayland-scanner REQUIRED IMPORTED_TARGET wayland-scanner)
-    pkg_check_modules(wayland-protocols REQUIRED IMPORTED_TARGET wayland-protocols)
-    pkg_get_variable(_WAYLAND_SCANNER wayland-scanner wayland_scanner)
-    pkg_get_variable(_WAYLAND_PROTOCOLS_DIR wayland-protocols pkgdatadir)
-    set(_XDG_SHELL_XML ${_WAYLAND_PROTOCOLS_DIR}/stable/xdg-shell/xdg-shell.xml)
+    pkg_check_modules(wayland-scanner IMPORTED_TARGET wayland-scanner)
+    pkg_check_modules(wayland-protocols IMPORTED_TARGET wayland-protocols)
 
-    add_custom_command(
-      OUTPUT ${CMAKE_BINARY_DIR}/xdg_shell/xdg-shell-client-protocol.h ${CMAKE_BINARY_DIR}/xdg_shell/xdg-shell-client-protocol.c
-      COMMAND "${CMAKE_COMMAND}" "-E" "make_directory" ${CMAKE_BINARY_DIR}/xdg_shell
-      COMMAND ${_WAYLAND_SCANNER} client-header ${_XDG_SHELL_XML} ${CMAKE_BINARY_DIR}/xdg_shell/xdg-shell-client-protocol.h
-      COMMAND ${_WAYLAND_SCANNER} private-code ${_XDG_SHELL_XML} ${CMAKE_BINARY_DIR}/xdg_shell/xdg-shell-client-protocol.c
-      COMMENT "Generate wayland protocols implementation"
-    )
-    add_custom_target(xdg_shell
-      DEPENDS ${CMAKE_BINARY_DIR}/xdg_shell/xdg-shell-client-protocol.h ${CMAKE_BINARY_DIR}/xdg_shell/xdg-shell-client-protocol.c)
+    if(wayland-scanner_FOUND AND wayland-protocols_FOUND)
+      pkg_get_variable(_WAYLAND_SCANNER wayland-scanner wayland_scanner)
+      pkg_get_variable(_WAYLAND_PROTOCOLS_DIR wayland-protocols pkgdatadir)
+      set(_XDG_SHELL_XML ${_WAYLAND_PROTOCOLS_DIR}/stable/xdg-shell/xdg-shell.xml)
 
-    # perhaps need wayland-protocols as well
+      add_custom_command(
+        OUTPUT ${CMAKE_BINARY_DIR}/xdg_shell/xdg-shell-client-protocol.h ${CMAKE_BINARY_DIR}/xdg_shell/xdg-shell-client-protocol.c
+        COMMAND "${CMAKE_COMMAND}" "-E" "make_directory" ${CMAKE_BINARY_DIR}/xdg_shell
+        COMMAND ${_WAYLAND_SCANNER} client-header ${_XDG_SHELL_XML} ${CMAKE_BINARY_DIR}/xdg_shell/xdg-shell-client-protocol.h
+        COMMAND ${_WAYLAND_SCANNER} private-code ${_XDG_SHELL_XML} ${CMAKE_BINARY_DIR}/xdg_shell/xdg-shell-client-protocol.c
+        COMMENT "Generate wayland protocols implementation"
+      )
+      add_custom_target(xdg_shell
+        DEPENDS ${CMAKE_BINARY_DIR}/xdg_shell/xdg-shell-client-protocol.h ${CMAKE_BINARY_DIR}/xdg_shell/xdg-shell-client-protocol.c)
+    else()
+      set(waylands_FOUND FALSE)
+    endif()
+
     macro_log_feature(waylands_FOUND "Wayland" "Wayland window system" "https://wayland.freedesktop.org")
   endif ()
 
