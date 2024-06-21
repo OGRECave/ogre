@@ -19,7 +19,7 @@
 #ifdef OGRE_WAYLAND
 // This is a private, unstable header (package: qtbase5-private-dev)
 // Since Qt 6.5 another stable native interface becomes available, QWaylandApplication
-#include <5.15.8/QtGui/qpa/qplatformnativeinterface.h>
+#include <5.12.8/QtGui/qpa/qplatformnativeinterface.h>
 #include <wayland-client-protocol.h>
 #include <wayland-egl.h>
 #define EGL_NO_X11
@@ -155,17 +155,10 @@ namespace OgreBites
         auto display = static_cast<wl_display*>(nativeInterface->nativeResourceForWindow("display", nullptr));
         auto surface = static_cast<wl_surface*>(nativeInterface->nativeResourceForWindow("surface", window));
 
-        // Is this needed?
-        auto egldisplay = static_cast<EGLDisplay>(nativeInterface->nativeResourceForWindow("egldisplay", nullptr));
-
         // Is window (QWindow) actually an instance of wl_egl_window?
         p.miscParams["externalWindowHandle"] = Ogre::StringConverter::toString(size_t(window));
         p.miscParams["externalDisplay"] = Ogre::StringConverter::toString(size_t(display));
         p.miscParams["externalSurface"] = Ogre::StringConverter::toString(size_t(surface));
-
-        // Should external compositor be fetched too?
-        // @TODO: xdg-stuff
-
 #endif
 
         if (!mWindows.empty())

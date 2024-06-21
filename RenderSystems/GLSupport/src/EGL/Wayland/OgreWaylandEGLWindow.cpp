@@ -22,8 +22,6 @@ WaylandEGLWindow::WaylandEGLWindow(WaylandEGLSupport* glsupport) : EGLWindow(gls
 {
     mGLSupport = glsupport;
     mNativeDisplay = nullptr; //glsupport->getNativeDisplay();
-    mXdgSurface = nullptr;
-    mXdgToplevel = nullptr;
 }
 
 WaylandEGLWindow::~WaylandEGLWindow()
@@ -52,7 +50,6 @@ void WaylandEGLWindow::getCustomAttribute(const String& name, void* pData)
         *static_cast<NativeWindowType*>(pData) = mWindow;
         return;
     }
-    // ADD XDG stuff also
 }
 
 void WaylandEGLWindow::initNativeCreatedWindow(const NameValuePairList* miscParams)
@@ -67,11 +64,8 @@ void WaylandEGLWindow::initNativeCreatedWindow(const NameValuePairList* miscPara
         if ((opt = miscParams->find("externalDisplay")) != end)
         {
           StringVector tokens = StringUtil::split(opt->second, " :");
-          LogManager::getSingleton().logWarning("GOT DISPLAY POINTER:" + tokens[0]);
 
           auto tmp = (wl_display*)StringConverter::parseSizeT(tokens[0]);
-          LogManager::getSingleton().stream() << "EXTERNAL DISPLAY POINTER:" << tmp;
-          LogManager::getSingleton().stream() << "EXISTING DISPLAY POINTER:" << mNativeDisplay;
           mNativeDisplay = tmp;
           mGLSupport->setNativeDisplay(mNativeDisplay);
 
@@ -81,8 +75,6 @@ void WaylandEGLWindow::initNativeCreatedWindow(const NameValuePairList* miscPara
         {
             StringVector tokens = StringUtil::split(opt->second, " :");
 
-            LogManager::getSingleton().logWarning("GOT WINDOW HANDLE:" + tokens[0]);
-
             // Qt: This casts QWindow to wl_egl_window, which may not work..
             mWindow = (wl_egl_window*)StringConverter::parseSizeT(tokens[0]);
             mIsExternal = true;
@@ -91,24 +83,8 @@ void WaylandEGLWindow::initNativeCreatedWindow(const NameValuePairList* miscPara
         if ((opt = miscParams->find("externalSurface")) != end)
         {
             StringVector tokens = StringUtil::split(opt->second, " :");
-            LogManager::getSingleton().logWarning("GOT SURFACE POINTER:" + tokens[0]);
 
             mGLSupport->mWlSurface = (wl_surface*)StringConverter::parseSizeT(tokens[0]);
-        }
-        // Are these really needed?
-        if ((opt = miscParams->find("externalXdgSurface")) != end)
-        {
-            StringVector tokens = StringUtil::split(opt->second, " :");
-            LogManager::getSingleton().logWarning("GOT XDG SURFACE HANDLE:" + tokens[0]);
-
-            mXdgSurface = (xdg_surface*)StringConverter::parseSizeT(tokens[0]);
-        }
-        if ((opt = miscParams->find("externalXdgToplevel")) != end)
-        {
-            StringVector tokens = StringUtil::split(opt->second, " :");
-            LogManager::getSingleton().logWarning("GOT XDG TOPLEVEL HANDLE:" + tokens[0]);
-
-            mXdgToplevel = (xdg_toplevel*)StringConverter::parseSizeT(tokens[0]);
         }
     }
     mNativeDisplay = mGLSupport->getNativeDisplay();
@@ -120,12 +96,7 @@ void WaylandEGLWindow::createNativeWindow(uint& width, uint& height, String& tit
 
     if (!mGLSupport->mWlSurface)
     {
-        LogManager::getSingleton().logWarning("NO WAYLAND SURFACE, CREATING IT");
         mGLSupport->mWlSurface = wl_compositor_create_surface(mGLSupport->mWlCompositor);
-    }
-    else
-    {
-        LogManager::getSingleton().logWarning("WAYLAND SURFACE EXISTS");
     }
 
     if (mGLSupport->mWlSurface == nullptr)
@@ -139,12 +110,7 @@ void WaylandEGLWindow::createNativeWindow(uint& width, uint& height, String& tit
 
     if (!mWindow)
     {
-        LogManager::getSingleton().logWarning("NO WAYLAND WINDOW, CREATING IT");
         mWindow = wl_egl_window_create(mGLSupport->mWlSurface, width, height);
-    }
-    else
-    {
-        LogManager::getSingleton().logWarning("WAYLAND WINDOW EXISTS");
     }
 
     if (mWindow == EGL_NO_SURFACE)
@@ -160,23 +126,6 @@ void WaylandEGLWindow::createNativeWindow(uint& width, uint& height, String& tit
     wl_surface_commit(mGLSupport->mWlSurface);
     wl_display_dispatch_pending(mNativeDisplay);
     wl_display_flush(mNativeDisplay);
-}
-
-void WaylandEGLWindow::setFullscreen(bool fullscreen, uint width, uint height)
-{
-
-    if (mXdgToplevel)
-    {
-        if (fullscreen)
-            xdg_toplevel_set_fullscreen(mXdgToplevel, nullptr);
-        else
-            xdg_toplevel_unset_fullscreen(mXdgToplevel);
-
-        wl_surface_damage(mGLSupport->mWlSurface, 0, 0, mWidth, mHeight);
-        wl_surface_commit(mGLSupport->mWlSurface);
-        wl_display_dispatch_pending(mNativeDisplay);
-        wl_display_flush(mNativeDisplay);
-    }
 }
 
 void WaylandEGLWindow::resize(uint width, uint height)
@@ -222,28 +171,13 @@ void WaylandEGLWindow::windowMovedOrResized()
     resize(width, height);
 }
 
-void WaylandEGLWindow::switchFullScreen(bool fullscreen)
-{
-    if (mXdgToplevel)
-    {
-        if (fullscreen)
-            xdg_toplevel_set_fullscreen(mXdgToplevel, nullptr);
-        else
-            xdg_toplevel_unset_fullscreen(mXdgToplevel);
-
-        wl_surface_damage(mGLSupport->mWlSurface, 0, 0, mWidth, mHeight);
-        wl_surface_commit(mGLSupport->mWlSurface);
-        wl_display_dispatch_pending(mNativeDisplay);
-        wl_display_flush(mNativeDisplay);
-    }
-}
-
 void WaylandEGLWindow::create(const String& name, uint width, uint height, bool fullScreen,
                               const NameValuePairList* miscParams)
 {
     String title = name;
     int samples = 0;
     short frequency = 0;
+    int maxBufferSize(32), minBufferSize(16), maxDepthSize(16), maxStencilSize(0);
     bool vsync = false;
     ::EGLContext eglContext = NULL;
 
@@ -269,6 +203,28 @@ void WaylandEGLWindow::create(const String& name, uint width, uint height, bool 
 
             mEglDisplay = eglGetCurrentDisplay();
             EGL_CHECK_ERROR
+        }
+
+
+        if((opt = miscParams->find("maxColourBufferSize")) != end)
+        {
+          maxBufferSize = Ogre::StringConverter::parseInt(opt->second);
+        }
+
+        if((opt = miscParams->find("maxDepthBufferSize")) != end)
+        {
+          maxDepthSize = Ogre::StringConverter::parseInt(opt->second);
+        }
+
+        if((opt = miscParams->find("maxStencilBufferSize")) != end)
+        {
+          maxStencilSize = Ogre::StringConverter::parseInt(opt->second);
+        }
+
+        if((opt = miscParams->find("minColourBufferSize")) != end)
+        {
+          minBufferSize = Ogre::StringConverter::parseInt(opt->second);
+          if (minBufferSize > maxBufferSize) minBufferSize = maxBufferSize;
         }
 
         if ((opt = miscParams->find("FSAA")) != end)
@@ -312,29 +268,25 @@ void WaylandEGLWindow::create(const String& name, uint width, uint height, bool 
 
     if (!mEglConfig)
     {
-        int minAttribs[] = {EGL_RED_SIZE,
-                            5,
-                            EGL_GREEN_SIZE,
-                            6,
-                            EGL_BLUE_SIZE,
-                            5,
-                            EGL_DEPTH_SIZE,
-                            16,
-                            EGL_SAMPLES,
-                            0,
-                            EGL_ALPHA_SIZE,
-                            EGL_DONT_CARE,
-                            EGL_STENCIL_SIZE,
-                            EGL_DONT_CARE,
-                            EGL_SAMPLE_BUFFERS,
-                            0,
-                            EGL_NONE};
+      int MSAAminAttribs[] = {
+        //EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
+        EGL_BUFFER_SIZE, minBufferSize,
+        EGL_DEPTH_SIZE, 16,
+        EGL_SAMPLE_BUFFERS, 1,
+        EGL_SAMPLES, samples,
+        EGL_NONE
+      };
+      int MSAAmaxAttribs[] = {
+        //EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
+        EGL_BUFFER_SIZE, maxBufferSize,
+        EGL_DEPTH_SIZE, maxDepthSize,
+        EGL_STENCIL_SIZE, maxStencilSize,
+        EGL_SAMPLE_BUFFERS, 1,
+        EGL_SAMPLES, samples,
+        EGL_NONE
+      };
 
-        int maxAttribs[] = {EGL_RED_SIZE,       8,  EGL_GREEN_SIZE, 8,       EGL_BLUE_SIZE,    8,
-                            EGL_DEPTH_SIZE,     24, EGL_ALPHA_SIZE, 8,       EGL_STENCIL_SIZE, 8,
-                            EGL_SAMPLE_BUFFERS, 1,  EGL_SAMPLES,    samples, EGL_NONE};
-
-        mEglConfig = mGLSupport->selectGLConfig(minAttribs, maxAttribs);
+      mEglConfig = mGLSupport->selectGLConfig(MSAAminAttribs, MSAAmaxAttribs);
     }
 
     if (!mIsTopLevel)

@@ -14,7 +14,7 @@ jobs:
         sudo apt update
         sudo apt install -y libxrandr-dev \
           libgles2-mesa-dev mesa-common-dev libgl1-mesa-dev mesa-vulkan-drivers \
-          libwayland-dev libwayland-egl1 pkg-config libegl-dev wayland-protocols \
+          libwayland-dev libwayland-egl1 pkg-config libegl-dev \
           qtwayland5 qtbase5-private-dev \
           libfreetype6-dev libpugixml-dev libassimp-dev libbullet-dev qtbase5-dev cargo \
           nvidia-cg-dev glslang-dev spirv-tools spirv-headers \

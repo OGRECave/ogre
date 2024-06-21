@@ -21,56 +21,23 @@ GLNativeSupport* getGLSupport(int profile) { return new WaylandEGLSupport(profil
 const wl_registry_listener WaylandEGLSupport::mRegistryListener = {
     .global = WaylandEGLSupport::globalRegistryHandler, .global_remove = WaylandEGLSupport::globalRegistryRemover};
 
-const wl_output_listener WaylandEGLSupport::mOutputListener = {
-    .geometry = WaylandEGLSupport::output_handle_geometry,
-    .mode = WaylandEGLSupport::output_handle_mode,
-  };
-
 void WaylandEGLSupport::globalRegistryHandler(void* data, struct wl_registry* registry, uint32_t id,
                                               const char* interface, uint32_t version)
 {
-    LogManager::getSingleton().logMessage("Got a registry event for " + std::string(interface) + " " +
-                                          std::to_string(id)); //, LogMessageLevel::LML_TRIVIAL);
+    /*LogManager::getSingleton().logMessage("Got a registry event for " + std::string(interface) + " " +
+                                          std::to_string(id)); //, LogMessageLevel::LML_TRIVIAL);*/
 
     auto ptr = static_cast<WaylandEGLSupport*>(data);
 
     if (std::string(interface) == std::string(wl_compositor_interface.name))
     {
         ptr->mWlCompositor = static_cast<wl_compositor*>(wl_registry_bind(registry, id, &wl_compositor_interface, 4));
-    } else if (std::string(interface) == std::string(wl_output_interface.name)) {
-      ptr->mWlOutput = static_cast<wl_output*>(wl_registry_bind(registry, id, &wl_output_interface, 1));
-      wl_output_add_listener(ptr->mWlOutput, &WaylandEGLSupport::mOutputListener, ptr);
     }
 }
 
 void WaylandEGLSupport::globalRegistryRemover(void* data, struct wl_registry* registry, uint32_t id)
 {
-    // auto ptr = static_cast<WaylandEGLSupport*>(data);
-    LogManager::getSingleton().logMessage("Got a registry losing event for " + std::to_string(id));
-}
-
-void WaylandEGLSupport::output_handle_geometry(
-    void *data, wl_output *wl_output,
-    int32_t x, int32_t y,
-    int32_t physical_width, int32_t physical_height,
-    int32_t subpixel,
-    const char *make, const char *model,
-    int32_t output_transform)
-{}
-
-void WaylandEGLSupport::output_handle_mode(
-    void *data, wl_output *wl_output,
-    uint32_t flags, int32_t width, int32_t height,
-    int32_t refresh)
-{
-  auto ptr = static_cast<WaylandEGLSupport*>(data);
-  Ogre::VideoMode a_mode;
-  //a_mode.flags = flags
-  // what is VideoMode::bpp?
-  a_mode.width = width;
-  a_mode.height = height;
-  a_mode.refreshRate = refresh/1000; // mHz to Hz
-  ptr->mCbVideoModes.push_back(a_mode);
+    LogManager::getSingleton().logMessage("Got a registry losing event for " + std::to_string(id), LogMessageLevel::LML_TRIVIAL);
 }
 
 WaylandEGLSupport::WaylandEGLSupport(int profile) : EGLSupport(profile)
@@ -80,8 +47,6 @@ WaylandEGLSupport::WaylandEGLSupport(int profile) : EGLSupport(profile)
     mWlOutput = nullptr;
     mWlRegion = nullptr;
     mIsExternalDisplay = false;
-
-    // doInit();
 }
 
 void WaylandEGLSupport::doInit()
@@ -100,21 +65,12 @@ void WaylandEGLSupport::doInit()
         mCurrentMode.refreshRate = 0;
         mVideoModes.push_back(mCurrentMode);
     }
-    else
-    {
-        if(!mCbVideoModes.empty()){
-          std::copy(mCbVideoModes.begin(), mCbVideoModes.end(), back_inserter(mVideoModes));
-          mCurrentMode.width = mCbVideoModes[0].width;
-          mCurrentMode.height = mCbVideoModes[0].height;
-          mCurrentMode.refreshRate = mCbVideoModes[0].refreshRate;
-        }
-    }
 
     if (mVideoModes.empty()) // none of the above worked
     {
-        // TODO fix this
-        mCurrentMode.width = 640;  // DisplayWidth(mNativeDisplay, DefaultScreen(mNativeDisplay));
-        mCurrentMode.height = 480; // DisplayHeight(mNativeDisplay, DefaultScreen(mNativeDisplay));
+        // TODO: query and set a suitable width and height?
+        mCurrentMode.width = 640;
+        mCurrentMode.height = 480;
         mCurrentMode.refreshRate = 0;
         mVideoModes.push_back(mCurrentMode);
     }

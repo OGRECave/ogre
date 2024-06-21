@@ -72,7 +72,6 @@ elseif (UNIX)
     if(OGRE_GLSUPPORT_USE_WAYLAND)
       list(APPEND _EGL_HEADERS "include/EGL/Wayland/*.h")
       list(APPEND _EGL_SOURCES "src/EGL/Wayland/*.cpp")
-      list(APPEND _EGL_SOURCES ${CMAKE_BINARY_DIR}/xdg_shell/xdg-shell-client-protocol.c)
       list(APPEND NATIVE_INCLUDES
         ${CMAKE_CURRENT_SOURCE_DIR}/include/EGL/Wayland)
       set(WAYLAND_LIBRARIES PkgConfig::waylands)
@@ -136,12 +135,6 @@ target_include_directories(OgreGLSupport PUBLIC
 
   if(OGRE_GLSUPPORT_USE_WAYLAND)
     target_compile_definitions(OgreGLSupport PUBLIC OGRE_WAYLAND)
-    # TODO should be part of include file?
-
-    add_dependencies(OgreGLSupport xdg_shell)
-    target_include_directories(OgreGLSupport PRIVATE
-      $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/xdg_shell>)
-
   endif()
 
 set_property(TARGET OgreGLSupport PROPERTY POSITION_INDEPENDENT_CODE ON)

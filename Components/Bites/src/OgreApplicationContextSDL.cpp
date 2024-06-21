@@ -13,10 +13,6 @@
 
 #include "SDLInputMapping.h"
 
-#ifdef OGRE_WAYLAND
-#include <wayland-egl.h>
-#endif
-
 namespace OgreBites {
 
 ApplicationContextSDL::ApplicationContextSDL(const Ogre::String& appName) : ApplicationContextBase(appName)
@@ -76,25 +72,11 @@ NativeWindowPair ApplicationContextSDL::createWindow(const Ogre::String& name, O
     {
 #ifdef OGRE_WAYLAND
         Ogre::LogManager::getSingleton().logMessage("[SDL] Creating Wayland window");
-        wl_egl_window *win_impl = (wl_egl_window*)SDL_GetWindowData(ret.native, "wl_egl_window");
 
-        // https://github.com/libsdl-org/SDL/issues/5386
-        // https://github.com/bkaradzic/bgfx/blob/00fa5ad179f5aa13c1e44d0bcbccdc535aba2d00/examples/common/entry/entry_sdl.cpp#L53-L64
-        if(!win_impl)
-        {
-          Ogre::LogManager::getSingleton().logMessage("[SDL] Creating wl_egl_window");
-          int width, height;
-          SDL_GetWindowSize(ret.native, &width, &height);
-          wl_surface* surface = wmInfo.info.wl.surface;
-          win_impl = wl_egl_window_create(surface, width, height);
-          SDL_SetWindowData(ret.native, "wl_egl_window", win_impl);
-        }
         p.miscParams["externalDisplay"] = Ogre::StringConverter::toString(size_t(wmInfo.info.wl.display));
         p.miscParams["externalSurface"] = Ogre::StringConverter::toString(size_t(wmInfo.info.wl.surface));
-        p.miscParams["externalWindowHandle"] = Ogre::StringConverter::toString(size_t(win_impl)); //Ogre::StringConverter::toString(size_t(wmInfo.info.wl.egl_window));
-
-        p.miscParams["externalXdgSurface"] = Ogre::StringConverter::toString(size_t(wmInfo.info.wl.xdg_surface));
-        p.miscParams["externalXdgToplevel"] = Ogre::StringConverter::toString(size_t(wmInfo.info.wl.xdg_toplevel));
+#else
+        OgreAssert(false, "recompile Ogre with Wayland support");
 #endif
     }
     else if (wmInfo.subsystem == SDL_SYSWM_X11)

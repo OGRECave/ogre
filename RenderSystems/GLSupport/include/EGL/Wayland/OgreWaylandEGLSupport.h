@@ -51,20 +51,7 @@ public:
 
     static void globalRegistryRemover(void* data, wl_registry* registry, uint32_t id);
 
-    static void output_handle_geometry(
-        void *data, wl_output *wl_output,
-        int32_t x, int32_t y,
-        int32_t physical_width, int32_t physical_height,
-        int32_t subpixel,
-        const char *make, const char *model,
-        int32_t output_transform);
-    static void output_handle_mode(
-        void *data, wl_output *wl_output,
-        uint32_t flags, int32_t width, int32_t height,
-        int32_t refresh);
-
     static const wl_registry_listener mRegistryListener;
-    static const wl_output_listener mOutputListener;
 };
 
 } // namespace Ogre

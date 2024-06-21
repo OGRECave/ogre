@@ -176,7 +176,6 @@ if(OGRE_STATIC AND APPLE AND OGRE_BUILD_PLUGIN_CG)
 endif()
 
 if(OGRE_GLSUPPORT_USE_WAYLAND)
-  target_link_libraries(OgreBites PRIVATE PkgConfig::waylands)
   target_compile_definitions(OgreBites PRIVATE OGRE_WAYLAND)
 endif()
 
