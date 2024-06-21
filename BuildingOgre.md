@@ -48,11 +48,11 @@ On linux you additionally need the following system headers to build the GL, GL3
     # X11:
     sudo apt-get install libxrandr-dev
     # Wayland:
-    sudo apt-get install libwayland-dev libwayland-egl pkg-config
+    sudo apt-get install pkg-config libwayland-dev libwayland-egl1 wayland-protocols libegl-dev
 
 * Fedora
 
-    sudo dnf install mesa-libGL-devel mesa-vulkan-devel glslang-devel
+    sudo dnf install mesa-libGL-devel mesa-vulkan-devel glslang-devel mesa-libEGL-devel
 
 furthermore we recommend installing the following optional packages
 
